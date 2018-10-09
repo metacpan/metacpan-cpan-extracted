@@ -3,6 +3,8 @@ package IO::Handle::Util::Tie;
 use strict;
 use warnings;
 
+our $VERSION = '0.02';
+
 sub TIEHANDLE {
     my ( $class, $fh ) = @_;
     bless \$fh, $class;

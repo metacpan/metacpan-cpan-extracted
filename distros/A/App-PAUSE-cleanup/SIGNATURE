@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f3a3782794e9dacd84d9d65064bc93ad2ee7f043 CODE_OF_CONDUCT.md
+SHA1 8fbd0af89184858bd69e6f1930a15c93a1104c4d CONTRIBUTORS
+SHA1 d07e07bf0275bdd85609464203221b1a43ed558c Changes
+SHA1 437229580b635c8213fe00358151d055e683d0d5 INSTALL
+SHA1 a8ab1e4559237952b46f70916e6830cb12b8b1d2 LICENSE
+SHA1 20c0467c90dc21dc1787cc9405923306cadf1a93 MANIFEST
+SHA1 acf44e264b09938b699f3f70141d828809ff5c83 META.json
+SHA1 921a97b87e5e9c7aab2d8e844a05f6bf6b66f7c7 META.yml
+SHA1 3be4bb2e2ca0ff9362c718c044bc4624dcac7357 Makefile.PL
+SHA1 2172b5305b912c0301efd2f5f253321413a0e8c7 README.mkdn
+SHA1 2e6ea4dba73b1632322e54362c5230bee9636a9d bin/pause-cleanup
+SHA1 3a06d60e800a1c4e3cdeb92cfb2f80f1845e69ea cpanfile
+SHA1 4e77deff9eabd4f7b2ae1a642fe6c34724e7f07f dist.ini
+SHA1 3f8a95bfd33f4bd90421b7585c5b7ef572eb6186 doap.xml
+SHA1 83a226af24a4b98d9aca90e6ac314b9cfa6cef5e lib/App/PAUSE/cleanup.pm
+SHA1 a6e433551a5d67af6b9567c071253e89afee6d2d t/00-compile.t
+SHA1 73c1527e4f6bf8d72382a59fff671bd2e7482b1f t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 141c1ac74d7f64bd5aa141df9185e7ad528ebaf4 t/01-basic.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlu3+OkACgkQ34Hwf+GwC4xjnQCg0FbFzeOl4VcJVsptHxk0FXA5
+hOoAmgMSXvW/2DyMa/Atyv47TY9iU7US
+=R7ac
+-----END PGP SIGNATURE-----

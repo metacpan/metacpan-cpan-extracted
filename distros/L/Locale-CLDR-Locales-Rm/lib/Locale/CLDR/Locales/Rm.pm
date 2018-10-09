@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Rm - Package for language Romansh
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Rm - Package for language Romansh
 
 package Locale::CLDR::Locales::Rm;
 # This file auto generated from Data\common\main\rm.xml
-#	on Sun  5 Aug  6:18:51 pm GMT
+#	on Sun  7 Oct 10:55:04 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -3311,31 +3313,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
 				'narrow' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'wide' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'narrow' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},

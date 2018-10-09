@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Brx - Package for language Bodo
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Brx - Package for language Bodo
 
 package Locale::CLDR::Locales::Brx;
 # This file auto generated from Data\common\main\brx.xml
-#	on Sun  5 Aug  5:53:19 pm GMT
+#	on Sun  7 Oct 10:23:00 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -2730,8 +2732,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'pm' => q{बेलासे},
 					'am' => q{फुं},
+					'pm' => q{बेलासे},
 				},
 				'abbreviated' => {
 					'am' => q{फुं},
@@ -2819,7 +2821,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Gy => q{y G},
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, MMM d, y G},
@@ -2846,7 +2848,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Gy => q{y G},
 			GyMMM => q{MMM, y G},
 			GyMMMEd => q{E, MMM d, y G},

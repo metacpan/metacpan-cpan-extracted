@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::Any" : "0",
+            "Log::Any" : "1.032",
             "perl" : "5.008001",
             "utf8::all" : "0"
          }
@@ -58,15 +58,15 @@
    "provides" : {
       "Log::Any::Adapter::Duperr" : {
          "file" : "lib/Log/Any/Adapter/Duperr.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Log::Any::Adapter::Dupout" : {
          "file" : "lib/Log/Any/Adapter/Dupout.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Log::Any::Adapter::Dupstd" : {
          "file" : "lib/Log/Any/Adapter/Dupstd.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -80,11 +80,12 @@
          "web" : "https://github.com/ivanych/Log-Any-Adapter-Dupstd"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:IVANYCH",
    "x_contributors" : [
       "Mikhail Ivanov <m.ivanov@i-free.com>",
-      "Mikhail Ivanov <m.ivanych@gmail.com>"
+      "Mikhail Ivanov <m.ivanych@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

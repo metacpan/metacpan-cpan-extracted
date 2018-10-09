@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '1.009'; # VERSION
+our $VERSION = '1.011'; # VERSION
 
 =head1 NAME
 
@@ -2213,6 +2213,19 @@ sub bgsave : method {
     $self->execute_command(qw(BGSAVE) => @args)
 }
 
+=head2 client_id
+
+Returns the client ID for the current connection.
+
+L<https://redis.io/commands/client-id>
+
+=cut
+
+sub client_id : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLIENT ID) => @args)
+}
+
 =head2 client_kill
 
 Kill the connection of a client.
@@ -2321,6 +2334,27 @@ L<https://redis.io/commands/client-setname>
 sub client_setname : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(CLIENT SETNAME) => @args)
+}
+
+=head2 client_unblock
+
+Unblock a client blocked in a blocking command from a different connection.
+
+=over 4
+
+=item * client-id
+
+=item * [TIMEOUT|ERROR]
+
+=back
+
+L<https://redis.io/commands/client-unblock>
+
+=cut
+
+sub client_unblock : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLIENT UNBLOCK) => @args)
 }
 
 =head2 command

@@ -1,11 +1,25 @@
-TODO:
+Revision history for App-PAUSE-cleanup
 
-0.0012 Sunday December 05 17:19:30 PST 2010:
-    - Added Crypt::SSLeay prerequisite
+0.0014 2018-10-05
+  [ ENHANCEMENTS ]
+    - Change the shebang of the pause-cleanup script so  that it's replaced
+      by the perl that does the install. [GH#1, grinnz]
 
-0.0011 Monday June 14 12:00:49 PDT 2010:
-    - Better handling of latest
-    - Fix for handling development versions (*_1, etc.)
+  [ STATISTICS ]
+    - code churn: 5 files changed, 28 insertions(+), 10 deletions(-)
 
-0.0010 2010-06-08:
-    - Initial release
+0.0013 2018-10-05
+  - Update to work with new pause format. [GH#2]
+
+  [ STATISTICS ]
+    - code churn: 12 files changed, 133 insertions(+), 156 deletions(-)
+
+0.0012 2010-12-05
+  - Added Crypt::SSLeay prerequisite
+
+0.0011 2010-06-14
+  - Better handling of latest
+  - Fix for handling development versions (*_1, etc.)
+
+0.0010 2010-06-08
+  - Initial release

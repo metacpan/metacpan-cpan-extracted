@@ -10,7 +10,6 @@ use Lab::Moose;
 use File::Temp 'tempfile';
 
 my ( undef, $filename ) = tempfile();
-warn "output folder: $filename\n";
 
 sub dummysource {
     return instrument(
@@ -28,7 +27,7 @@ sub dummysource {
 my $gate = dummysource();
 my $bias = dummysource();
 
-my $size   = 300;
+my $size   = 50;
 my $center = $size / 2;
 
 my $gate_sweep = sweep(
@@ -43,7 +42,8 @@ my $bias_sweep = sweep(
 my $datafile_3d = sweep_datafile( columns => [qw/gate bias current/] );
 $datafile_3d->add_plot(
     type => 'pm3d', x => 'gate', y => 'bias',
-    z    => 'current'
+    z    => 'current',
+    refresh => 'manual',    # want to refresh only at end of sweep
 );
 
 my $meas = sub {
@@ -60,3 +60,6 @@ $gate_sweep->start(
     measurement => $meas,
     folder      => $filename,
 );
+$gate_sweep->refresh_plots();
+
+warn "output folder: ", $gate_sweep->foldername();

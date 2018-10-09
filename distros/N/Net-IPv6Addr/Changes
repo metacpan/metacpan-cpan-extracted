@@ -1,5 +1,18 @@
 Revision history for Perl module Net::IPv6Addr
 
+0.96 2018-10-06
+	* Requirement on Math::BigInt changed to add version
+
+0.95 2018-10-06
+	* "from_bigint" method added
+	* Documentation updated to reflect the current RFCs
+	* Tests of "to_bigint", rfc compliance; fix broken string test
+	* Any valid ipv6 value can now be output as mixed ipv6 and ipv4
+
+0.94 2018-10-06     Ben Bullock <bkb@cpan.org>
+	* Pod error fixed
+	* EXPORTS_OK corrected
+
 0.93 2018-10-05     Ben Bullock <bkb@cpan.org>
 	* Remove README and use generated one
 	* Fix bad links in documentation

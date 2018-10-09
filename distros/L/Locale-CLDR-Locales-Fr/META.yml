@@ -22,151 +22,151 @@ name: Locale-CLDR-Locales-Fr
 provides:
   Locale::CLDR::Locales::Fr:
     file: lib/Locale/CLDR/Locales/Fr.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any:
     file: lib/Locale/CLDR/Locales/Fr/Any.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Be:
     file: lib/Locale/CLDR/Locales/Fr/Any/Be.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Bf:
     file: lib/Locale/CLDR/Locales/Fr/Any/Bf.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Bi:
     file: lib/Locale/CLDR/Locales/Fr/Any/Bi.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Bj:
     file: lib/Locale/CLDR/Locales/Fr/Any/Bj.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Bl:
     file: lib/Locale/CLDR/Locales/Fr/Any/Bl.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Ca:
     file: lib/Locale/CLDR/Locales/Fr/Any/Ca.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Cd:
     file: lib/Locale/CLDR/Locales/Fr/Any/Cd.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Cf:
     file: lib/Locale/CLDR/Locales/Fr/Any/Cf.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Cg:
     file: lib/Locale/CLDR/Locales/Fr/Any/Cg.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Ch:
     file: lib/Locale/CLDR/Locales/Fr/Any/Ch.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Ci:
     file: lib/Locale/CLDR/Locales/Fr/Any/Ci.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Cm:
     file: lib/Locale/CLDR/Locales/Fr/Any/Cm.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Dj:
     file: lib/Locale/CLDR/Locales/Fr/Any/Dj.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Dz:
     file: lib/Locale/CLDR/Locales/Fr/Any/Dz.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Fr:
     file: lib/Locale/CLDR/Locales/Fr/Any/Fr.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Ga:
     file: lib/Locale/CLDR/Locales/Fr/Any/Ga.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Gf:
     file: lib/Locale/CLDR/Locales/Fr/Any/Gf.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Gn:
     file: lib/Locale/CLDR/Locales/Fr/Any/Gn.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Gp:
     file: lib/Locale/CLDR/Locales/Fr/Any/Gp.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Gq:
     file: lib/Locale/CLDR/Locales/Fr/Any/Gq.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Ht:
     file: lib/Locale/CLDR/Locales/Fr/Any/Ht.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Km:
     file: lib/Locale/CLDR/Locales/Fr/Any/Km.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Lu:
     file: lib/Locale/CLDR/Locales/Fr/Any/Lu.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Ma:
     file: lib/Locale/CLDR/Locales/Fr/Any/Ma.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Mc:
     file: lib/Locale/CLDR/Locales/Fr/Any/Mc.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Mf:
     file: lib/Locale/CLDR/Locales/Fr/Any/Mf.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Mg:
     file: lib/Locale/CLDR/Locales/Fr/Any/Mg.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Ml:
     file: lib/Locale/CLDR/Locales/Fr/Any/Ml.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Mq:
     file: lib/Locale/CLDR/Locales/Fr/Any/Mq.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Mr:
     file: lib/Locale/CLDR/Locales/Fr/Any/Mr.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Mu:
     file: lib/Locale/CLDR/Locales/Fr/Any/Mu.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Nc:
     file: lib/Locale/CLDR/Locales/Fr/Any/Nc.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Ne:
     file: lib/Locale/CLDR/Locales/Fr/Any/Ne.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Pf:
     file: lib/Locale/CLDR/Locales/Fr/Any/Pf.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Pm:
     file: lib/Locale/CLDR/Locales/Fr/Any/Pm.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Re:
     file: lib/Locale/CLDR/Locales/Fr/Any/Re.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Rw:
     file: lib/Locale/CLDR/Locales/Fr/Any/Rw.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Sc:
     file: lib/Locale/CLDR/Locales/Fr/Any/Sc.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Sn:
     file: lib/Locale/CLDR/Locales/Fr/Any/Sn.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Sy:
     file: lib/Locale/CLDR/Locales/Fr/Any/Sy.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Td:
     file: lib/Locale/CLDR/Locales/Fr/Any/Td.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Tg:
     file: lib/Locale/CLDR/Locales/Fr/Any/Tg.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Tn:
     file: lib/Locale/CLDR/Locales/Fr/Any/Tn.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Vu:
     file: lib/Locale/CLDR/Locales/Fr/Any/Vu.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Wf:
     file: lib/Locale/CLDR/Locales/Fr/Any/Wf.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Fr::Any::Yt:
     file: lib/Locale/CLDR/Locales/Fr/Any/Yt.pm
-    version: v0.33.0
+    version: v0.33.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.33.0
+  Locale::CLDR: v0.33.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -176,5 +176,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.33.0
+version: v0.33.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

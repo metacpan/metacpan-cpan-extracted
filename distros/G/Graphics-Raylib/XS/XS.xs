@@ -634,14 +634,14 @@ void
 EndVrDrawing()
 
 void
-ExportImage(fileName, image)
-    char *    fileName
+ExportImage(image, fileName)
     Image    image
+    char *    fileName
 
 void
-ExportMesh(fileName, mesh)
-    char *    fileName
+ExportMesh(mesh, fileName)
     Mesh    mesh
+    char *    fileName
 
 Color
 Fade(color, alpha)

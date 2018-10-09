@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::USB;
-$Lab::Moose::Connection::USB::VERSION = '3.661';
+$Lab::Moose::Connection::USB::VERSION = '3.662';
 #ABSTRACT: Connection backend to USB Test & Measurement (USBTMC) bus
 
 use 5.010;
@@ -140,7 +140,7 @@ Lab::Moose::Connection::USB - Connection backend to USB Test & Measurement (USBT
 
 =head1 VERSION
 
-version 3.661
+version 3.662
 
 =head1 SYNOPSIS
 

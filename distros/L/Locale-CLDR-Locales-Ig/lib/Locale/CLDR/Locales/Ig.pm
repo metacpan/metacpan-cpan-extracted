@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ig - Package for language Igbo
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ig - Package for language Igbo
 
 package Locale::CLDR::Locales::Ig;
 # This file auto generated from Data\common\main\ig.xml
-#	on Sun  5 Aug  6:05:51 pm GMT
+#	on Sun  7 Oct 10:38:23 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -580,27 +582,27 @@ has 'day_periods' => (
 					'am' => q{A.M.},
 					'pm' => q{P.M.},
 				},
-				'wide' => {
+				'narrow' => {
 					'am' => q{A.M.},
 					'pm' => q{P.M.},
 				},
-				'narrow' => {
+				'wide' => {
 					'pm' => q{P.M.},
 					'am' => q{A.M.},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{P.M.},
+				'narrow' => {
 					'am' => q{A.M.},
+					'pm' => q{P.M.},
 				},
 				'wide' => {
 					'am' => q{A.M.},
 					'pm' => q{P.M.},
 				},
-				'narrow' => {
-					'am' => q{A.M.},
+				'abbreviated' => {
 					'pm' => q{P.M.},
+					'am' => q{A.M.},
 				},
 			},
 		},

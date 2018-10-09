@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Plot a network graph of the chords of a given song.
+
+use GraphViz2;
+use Music::BachChoralHarmony;
+
+my $id = shift || '000106b_';
+
+my $bach = Music::BachChoralHarmony->new;
+my $progression = $bach->parse();
+
+# Redefine the progression for the given id:
+$progression = $progression->{$id};
+
+my %score;
+my $last;
+
+for my $struct ( @{ $progression->{events} } ) {
+    my $chord = $struct->{chord};
+
+    $score{ $last . ' ' . $chord }++ if $last;
+
+    $last = $chord;
+}
+
+my $g = GraphViz2->new(
+    global => { directed => 1 },
+    node   => { shape => 'oval' },
+    edge   => { color => 'grey' },
+);
+
+my %nodes;
+my %edges;
+
+my $key = $progression->{key};
+
+for my $bigram ( keys %score ) {
+    my ( $i, $j ) = split ' ', $bigram;
+
+    my $color = $i eq $key ? 'red' : 'black';
+
+    $g->add_node( name => $i, color => $color )
+        unless $nodes{$i}++;
+
+    $color = $j eq $key ? 'red' : 'black';
+
+    $g->add_node( name => $j, color => $color )
+        unless $nodes{$j}++;
+
+    $g->add_edge( from => $i, to => $j, label => $score{$bigram} )
+        unless $edges{$bigram}++;
+}
+
+$g->run( format => 'png', output_file => $0 . '.png' );

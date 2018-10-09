@@ -1,5 +1,9 @@
 Revision history for Perl extension App-AsciiChart
 
+0.03 2018-10-05T19:29:12Z
+
+    - show help when no sequence is passed
+
 0.02 2018-10-03T17:41:17Z
 
     - show the graph that is produced by the example in Synopsis (perlancar)

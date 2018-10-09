@@ -1,5 +1,10 @@
 Revision history for Perl extension Log-Any-Adapter-Dupstd
 
+0.04 2018-10-07T20:28:37Z
+
+    - Unit-test has been redone
+    - pull#1 Proposed fix for CPANTESTER fail reports
+
 0.03 2018-09-26T21:20:50Z
 
     - Authoring tool changed from EUMM to Minilla

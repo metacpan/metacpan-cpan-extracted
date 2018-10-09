@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.004'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,21 +21,22 @@ requires:
   HTTP::Headers: '0'
   List::Util: '0'
   Module::Pluggable: '5.1'
-  MongoDB: '1'
+  MongoDB: '2'
   Moose: '2.0'
   MooseX::Role::Parameterized: '1.08'
   MooseX::Singleton: '0'
   Params::Coerce: '0'
   Scalar::Util: '0'
+  Test::Fatal: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/rodrigolive/mongoose/issues
   homepage: https://github.com/rodrigolive/mongoose
   repository: https://github.com/rodrigolive/mongoose.git
-version: '1.02'
+version: '2.00'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -49,62 +50,62 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Basic/GatherDir'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Basic/PruneCruft'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Basic/ManifestSkip'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Basic/MetaYAML'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Basic/License'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Basic/Readme'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Basic/ExtraTests'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Basic/ExecDir'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Basic/ShareDir'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Basic/MakeMaker'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Basic/Manifest'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Basic/TestRelease'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Basic/ConfirmRelease'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Basic/UploadToCPAN'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -117,10 +118,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          git_version: 2.19.0
           repo_root: .
       name: '@Git/Check'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -134,12 +135,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          git_version: 2.19.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -147,16 +148,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.02
+          tag: v2.00
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          git_version: 2.19.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -165,10 +166,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          git_version: 2.19.0
           repo_root: .
       name: '@Git/Push'
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
@@ -180,7 +181,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -189,88 +190,88 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.11.1
+          git_version: 2.19.0
           repo_root: .
       name: Git::NextVersion
-      version: '2.041'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
       name: ReadmePodInRoot
-      version: '0.161170'
+      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.006'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.006'
+      version: '6.011'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.006'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+    version: '6.011'
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -4,7 +4,7 @@ Parallel::ForkManager - A simple parallel processing fork manager
 
 # VERSION
 
-version 1.20
+version 2.02
 
 # SYNOPSIS
 
@@ -95,6 +95,23 @@ C for child.
 
     The new method will die if the temporary directory does not exist or it is not
     a directory.
+
+    Since version 2.00, the constructor can also be called in the typical Moo/Moose 
+    fashion. I.e.
+
+    ```perl
+    my $fm = Parallel::ForkManager->new(
+        max_procs => 4,
+        tempdir => '...',
+        child_role => 'Parallel::ForkManager::CustomChild',
+    );
+    ```
+
+- child\_role 
+
+    Returns the name of the role consumed by the ForkManager object in 
+    child processes. Defaults to [Parallel::ForkManager::Child](https://metacpan.org/pod/Parallel::ForkManager::Child) and can 
+    be set to something else via the constructor.
 
 - start \[ $process\_identifier \]
 
@@ -540,6 +557,80 @@ can add the following to your program:
 $pm->run_on_start(sub { srand });
 ```
 
+# EXTENDING 
+
+As of version 2.0.0, `Parallel::ForkManager` uses [Moo](https://metacpan.org/pod/Moo) under the hood. When 
+a process is being forked from the parent object, the forked instance of the 
+object will be modified to consume the [Parallel::ForkManager::Child](https://metacpan.org/pod/Parallel::ForkManager::Child)
+role. All of this makes extending [Parallel::ForkManager](https://metacpan.org/pod/Parallel::ForkManager) to implement 
+any storing/retrieving mechanism or any other behavior fairly easy.
+
+## Example: store and retrieve data via a web service
+
+```perl
+{
+    package Parallel::ForkManager::Web;
+
+    use HTTP::Tiny;
+
+    use Moo;
+    extends 'Parallel::ForkManager';
+
+    has ua => (
+        is => 'ro',
+        lazy => 1,
+        default => sub {
+            HTTP::Tiny->new;
+        }
+    );
+
+    sub store {
+        my( $self, $data ) = @_;
+
+        $self->ua->post( "http://.../store/$$", { body => $data } );
+    }
+
+    sub retrieve {
+        my( $self, $kid_id ) = @_;
+
+        $self->ua->get( "http://.../store/$kid_id" )->{content};
+    }
+
+}
+
+my $fm = Parallel::ForkManager::Web->new(2);
+
+$fm->run_on_finish(sub{
+    my $retrieved = $_[5];
+
+    print "got ", $retrieved, "\n";
+});
+
+$fm->start_child(sub {
+    return $_**2;
+}) for 1..3;
+
+$fm->wait_all_children;
+```
+
+## Example: have the child processes exit differently
+
+```perl
+use Parallel::ForkManager;
+
+package Parallel::ForkManager::Child::PosixExit {
+    use Moo::Role;
+    with 'Parallel::ForkManager::Child';
+
+    sub finish  { POSIX::_exit() };
+}
+
+my $fm = Parallel::ForkManager->new(
+    max_proc   => 1,
+    child_role => 'Parallel::ForkManager::Child::PosixExit'
+);
+```
+
 # SECURITY
 
 Parallel::ForkManager uses temporary files when 
@@ -567,8 +658,8 @@ open(IN, '<:unix:gzip', ...
 
 # BUGS AND LIMITATIONS
 
-Do not use Parallel::ForkManager in an environment, where other child
-processes can affect the run of the main program, so using this module
+Do not use Parallel::ForkManager in an environment where other child
+processes can affect the run of the main program; using this module
 is not recommended in an environment where fork() / wait() is already used.
 
 If you want to use more than one copies of the Parallel::ForkManager, then

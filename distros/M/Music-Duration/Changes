@@ -1,5 +1,27 @@
 Revision history for Music-Duration
 
+0.0602 2018-10-05 21:06:11
+    - Improved documentation.
+    - Increased expected digits of precision in test.
+
+0.0601 2018-10-05 12:10:43
+    - Fixed documentation again!
+
+0.0600 2018-10-05 11:41:55
+    - Removed the entire fractional() function as it is useless.
+
+0.0505 2018-10-05 10:23:45
+    - Improved test again.
+    - Improved documentation again!
+
+0.0504 2018-10-05 09:59:01
+    - Improved test.
+    - Improved documentation.
+
+0.0503 2018-10-05 09:36:27
+    - Improved documentation.
+    - Repaired test.
+
 0.0502 2018-10-04 09:21:20
     - Improved documentation slightly again.
 

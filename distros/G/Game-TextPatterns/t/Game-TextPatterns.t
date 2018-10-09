@@ -98,9 +98,9 @@ EOF
     my $totrim = Game::TextPatterns->new( pattern => [ "cxxr", "cyyr", "czzr" ] );
     # error is generated from an internal routine, not crop, but needs
     # to be as if from the caller, not that internal routine nor crop
-    my $file = __FILE__;
+    my $this_file = __FILE__;
     throws_ok( sub { $totrim->crop( [ 0, 0 ], [ 99, 99 ] ) },
-        qr/crop point.*$file/ );
+        qr/crop point.*$this_file/ );
 
     $totrim->crop( [ 1, 1 ], [ 2, 1 ] );
     is( $totrim->string, "yy\n" );
@@ -109,11 +109,11 @@ EOF
     is( $totrim->string, "\n" );
     $totrim = $totrim->rebuild;
 
-    $totrim->crop( [ 1, 1 ], [ -1, -1 ] );
+    $totrim->crop( [ 1, 1 ], [ -2, -2 ] );
     is( $totrim->string, "yy\n" );
     $totrim = $totrim->rebuild;
 
-    $totrim->crop( [ -1, -1 ], [ 1, 1 ] );
+    $totrim->crop( [ -2, -2 ], [ 1, 1 ] );
     is( $totrim->string, "yy\n" );
     $totrim = $totrim->rebuild;
 
@@ -163,14 +163,22 @@ EOF
 EOF
     eq_or_diff( $wide->clone->flip_four->pattern,
         [ "321123", "654456", "654456", "321123" ] );
-
     eq_or_diff(
         $wide->clone->four_up( '?', 1 )->pattern,
         [ "2512", "1445", "5441", "2152" ]
     );
-
     eq_or_diff( $wide->clone->four_up('x')->pattern,
         [ "x36xxx", "x25123", "x14456", "65441x", "32152x", "xxx63x" ] );
+
+    # or with reduction
+    eq_or_diff( $wide->clone->flip_four(1)->pattern,
+        [ "32123", "65456", "32123" ] );
+    eq_or_diff(
+        $wide->clone->flip_four( 1, 0 )->pattern,
+        [ "32123", "65456", "65456", "32123" ]
+    );
+    eq_or_diff( $wide->clone->flip_four( 0, 1 )->pattern,
+        [ "321123", "654456", "321123" ] );
 
     my $tall = Game::TextPatterns->new( pattern => <<"EOF" );
 12
@@ -179,12 +187,10 @@ EOF
 EOF
     eq_or_diff( $tall->clone->flip_four->pattern,
         [ "2112", "4334", "6556", "6556", "4334", "2112" ] );
-
     eq_or_diff(
         $tall->clone->four_up( '?', 1 )->pattern,
         [ "4634", "3556", "6553", "4364" ]
     );
-
     eq_or_diff( $tall->clone->four_up('x')->pattern,
         [ "xxx12x", "24634x", "13556x", "x65531", "x43642", "x21xxx" ] );
 }
@@ -297,4 +303,4 @@ EOF
 #$v->mask( '.', $i );
 #diag "\n", $v->string;
 
-done_testing 55
+done_testing 58

@@ -14,7 +14,7 @@ use warnings;
 our ($_SIGCHLD, $_SIGCHLD_CNT, $REAP) = (0,0,0);
 our (@CHLD_HANDLE_HISTORY, @SIGCHLD_CAUGHT) = (0);
 our $SIG_DEBUG = $ENV{SIG_DEBUG};
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 my %bastards;
 
 #
@@ -171,6 +171,21 @@ sub handle_bastards {
 1;
 
 __END__
+
+=head1 NAME
+
+Forks::Super::Sigchld - SIGCHLD handler for Forks::Super distribution
+
+=head1 DESCRIPTION
+
+C<Forks::Super::Sigchld> provides the custom SIGCHLD handler for
+background processes spawned by L<Forks::Super|Forks::Super>. 
+There is little need for a L<Forks::Super|Forks::Super> user to
+call the functions in this package directly.
+
+See L<Forks::Super|Forks::Super>
+
+=cut
 
 
 Signal handling, since v0.40

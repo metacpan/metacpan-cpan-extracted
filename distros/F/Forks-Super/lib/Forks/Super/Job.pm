@@ -26,7 +26,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(@ALL_JOBS %ALL_JOBS PREFORK POSTFORK 
                  POSTFORK_PARENT POSTFORK_CHILD);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 our (@ALL_JOBS, %ALL_JOBS, @ARCHIVED_JOBS, $WIN32_PROC, $WIN32_PROC_PID);
 our $OVERLOAD_ENABLED = 0;
@@ -606,7 +606,7 @@ sub _robust_fork {
     my $job = shift;
     my $retries = $job->{retries} || 0;
 
-    # the other 18,000 lines in this distro
+    # the other 21,000 lines in this distribution
     # are just a wrapper around this line:
 
     my $pid = _CORE_fork();
@@ -2642,7 +2642,7 @@ Forks::Super::Job - object representing a background task
 
 =head1 VERSION
 
-0.96
+0.97
 
 =head1 SYNOPSIS
 

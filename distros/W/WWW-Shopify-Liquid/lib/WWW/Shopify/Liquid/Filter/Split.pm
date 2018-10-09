@@ -6,6 +6,6 @@ package WWW::Shopify::Liquid::Filter::Split;
 use base 'WWW::Shopify::Liquid::Filter';
 use Devel::StackTrace;
 
-sub operate { return [split($_[3], $_[2])]; }
+sub operate { return [split($_[3], defined $_[2] ? $_[2] : '')]; }
 
 1;

@@ -1,3 +1,14 @@
+0.004  2018-09-30 18:38:59 CEST
+   - release after 235 PASSes in CPAN Testers (Thanks!)
+
+0.003  2018-09-25 21:31:27 CEST
+   - example configurations
+   - enable Sparrow in Travis-CI (thanks Alexey Melezhik)
+     (see https://github.com/polettix/WebService-Fake/pull/2/files)
+   - fix test, using Mojo::JSON::true instead of \1 as value for "true"
+   - make cpanfile.snapshot more complete
+   - hopefully better badges in documentation in GitHub
+
 0.002  2016-11-26 14:06:03 CET
    - badges in documentation
    - Travis-CI configuration

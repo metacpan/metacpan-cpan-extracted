@@ -1,5 +1,20 @@
 Revision history for App-MechaCPAN
 
+0.24  2018-10-08 23:12:15 EDT
+  - Display the path to the log file (GH#8)
+  - Add the --shared-lib option (GH#8)
+  - Improve restart_script to work better without --directory (GH#8)
+  - Copy App::MechaCPAN to the new locations if it doesn't already exist
+    in the destination directory (GH#8)
+  - Thanks to James Pattie/pattieja1 for the changes and testing with CH#8
+  - Logs now have a much more humane name that includes a timestamp
+  - The amount of random, temporary files, both during processing as well as
+    after exceptions, has been reduced
+  - System tar will now be used before Archive::Tar if possible
+  - A simple heuristic has been added to prevent local/ being confused as the
+    project directory.
+  - Typo fix via Tim Heaney/oylenshpeegul (GH#7)
+
 0.23  2018-03-05 00:29:51 EST
   - Fix a bug where if a path has a perl like verion in it would cause t/13
     to fail.

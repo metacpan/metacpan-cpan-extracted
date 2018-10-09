@@ -1,5 +1,5 @@
 {
-   "abstract" : "Add 32nd, 64th, fractional and tuple durations to MIDI-Perl",
+   "abstract" : "Add 32nd, 64th and tuple durations to MIDI-Perl",
    "author" : [
       "Gene Boggs <gene@cpan.org>"
    ],
@@ -60,7 +60,7 @@
          "web" : "https://github.com/ology/Music-Duration"
       }
    },
-   "version" : "0.0502",
+   "version" : "0.0602",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -288,16 +288,24 @@
                      "Thirtysecond",
                      "dden",
                      "ddx",
+                     "ddxn",
                      "ddy",
+                     "ddyn",
                      "durations",
                      "dx",
+                     "dxn",
                      "dy",
+                     "dyn",
                      "nd",
                      "sixtyfourth",
                      "th",
                      "thirtysecond",
                      "tx",
-                     "ty"
+                     "txn",
+                     "ty",
+                     "tyn",
+                     "xn",
+                     "yn"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }

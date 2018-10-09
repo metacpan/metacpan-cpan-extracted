@@ -6,7 +6,7 @@ package Graphics::ColorNames::Windows;
 use strict;
 use warnings;
 
-our $VERSION = 'v3.2.0';
+our $VERSION = 'v3.2.1';
 
 sub NamesRgbTable() {
     use integer;
@@ -44,7 +44,7 @@ Graphics::ColorNames::Windows - Windows color names and equivalent RGB values
 
 =head1 VERSION
 
-version v3.2.0
+version v3.2.1
 
 =head1 SYNOPSIS
 

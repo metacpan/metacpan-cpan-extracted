@@ -35,6 +35,7 @@ $loop->add(
         }
     )->start
 );
+# DB::enable_profile();
 Future->wait_all(
     map $_->connect, values %conn
 )->then(sub {
@@ -45,7 +46,7 @@ Future->wait_all(
             my $redis = $conn{$_};
             (fmap0 {
                 $loop->delay_future(
-                    after => 0.025 * rand
+                    after => 0.001 * rand
                 )->then(sub {
                     $redis->incr($key)->then(sub {
                         my ($count) = @_;
@@ -59,3 +60,4 @@ Future->wait_all(
         } keys %conn
     )
 })->get;
+# DB::disable_profile();

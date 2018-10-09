@@ -1,6 +1,6 @@
 package Lab::Connection::VICP;
 #ABSTRACT: VICP ethernet protocol connection
-$Lab::Connection::VICP::VERSION = '3.661';
+$Lab::Connection::VICP::VERSION = '3.662';
 use strict;
 use Time::HiRes qw (usleep sleep);
 use Lab::Connection::GPIB;
@@ -88,7 +88,7 @@ Lab::Connection::VICP - VICP ethernet protocol connection
 
 =head1 VERSION
 
-version 3.661
+version 3.662
 
 =head1 SYNOPSIS
 

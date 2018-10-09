@@ -1,6 +1,6 @@
 package Net::IDN::Punycode::PP;
 
-use 5.006;
+use 5.008;
 
 use strict;
 use utf8;
@@ -9,7 +9,7 @@ use warnings;
 use Carp;
 use Exporter;
 
-our $VERSION = "1.101";
+our $VERSION = "2.500";
 
 our @ISA = qw(Exporter);
 our @EXPORT = ();
@@ -47,6 +47,7 @@ sub _adapt {
 
 sub decode_punycode {
     die("Usage: Net::IDN::Punycode::decode_punycode(input)") unless @_;
+    no warnings 'utf8';
 
     my $input = shift;
 
@@ -105,6 +106,7 @@ sub decode_punycode {
 
 sub encode_punycode {
     die("Usage: Net::IDN::Punycode::encode_punycode(input)") unless @_;
+    no warnings 'utf8';
 
     my $input = shift;
     my $input_length = length $input;
@@ -180,7 +182,7 @@ Claus FE<auml>rber E<lt>CFAERBER@cpan.orgE<gt> (from version 1.00)
 
 Copyright 2002-2004 Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
 
-Copyright 2007-2010 Claus FE<auml>rber E<lt>CFAERBER@cpan.orgE<gt>
+Copyright 2007-2018 Claus FE<auml>rber E<lt>CFAERBER@cpan.orgE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

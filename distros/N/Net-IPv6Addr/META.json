@@ -1,5 +1,5 @@
 {
-   "abstract" : "Check validity of IPv6 addresses",
+   "abstract" : "Check and manipulate IPv6 addresses",
    "author" : [
       "Ben Bullock <bkb@cpan.org>"
    ],
@@ -34,7 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "Math::Base85" : "0.2",
-            "Math::BigInt" : "0",
+            "Math::BigInt" : "1.999813",
             "Net::IPv4Addr" : "0.10",
             "perl" : "5.006000"
          }
@@ -51,7 +51,7 @@
          "web" : "https://github.com/benkasminbullock/net-ipv6addr"
       }
    },
-   "version" : "0.93",
+   "version" : "0.96",
    "x_contributors" : [
       "Jyrki Soini",
       "Joacim Haggmark",

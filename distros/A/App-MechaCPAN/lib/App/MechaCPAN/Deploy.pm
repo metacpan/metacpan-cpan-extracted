@@ -6,7 +6,6 @@ use autodie;
 use Carp;
 use CPAN::Meta;
 use List::Util qw/first reduce/;
-use File::Temp qw/tempdir/;
 use App::MechaCPAN qw/:go/;
 
 our @args = (
@@ -55,10 +54,8 @@ sub munge_args
     {
       info 'git-clone', "Cloning $git_url";
 
-      my $dir = tempdir(
-        TEMPLATE => File::Spec->tmpdir . '/mechacpan_XXXXXXXX',
-        CLEANUP  => 1
-      );
+      my ($descr) = $git_url =~ m{ ([^/]*) $}xms;
+      my $dir = humane_tmpdir($descr);
 
       # We use a temp directory and --seperate-git-dir  since byt his point
       # local exists because we're created it and started logging. These

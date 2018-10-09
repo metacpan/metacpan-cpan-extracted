@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ar::Any::Sa - Package for language Arabic
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ar::Any::Sa - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::Sa;
 # This file auto generated from Data\common\main\ar_SA.xml
-#	on Sun  5 Aug  5:50:56 pm GMT
+#	on Sun  7 Oct 10:20:18 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -117,37 +119,37 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 0
-						&& $time < 100;
-					return 'night2' if $time >= 100
-						&& $time < 300;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1800;
-					return 'morning1' if $time >= 300
-						&& $time < 600;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
-				}
 				if($day_period_type eq 'selection') {
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'night2' if $time >= 100
+						&& $time < 300;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1800;
+					return 'morning1' if $time >= 300
+						&& $time < 600;
+					return 'night1' if $time >= 0
+						&& $time < 100;
+				}
+				if($day_period_type eq 'default') {
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 100;
+					return 'morning1' if $time >= 300
+						&& $time < 600;
+					return 'night2' if $time >= 100
+						&& $time < 300;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
-					return 'morning1' if $time >= 300
-						&& $time < 600;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1800;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'night2' if $time >= 100
-						&& $time < 300;
-					return 'night1' if $time >= 0
-						&& $time < 100;
 				}
 				last SWITCH;
 				}
@@ -169,12 +171,12 @@ has 'day_periods' => (
 			'format' => {
 				'abbreviated' => {
 					'night2' => q{ل},
-					'night1' => q{منتصف الليل},
-					'morning2' => q{ص},
 					'afternoon1' => q{ظهرًا},
+					'morning2' => q{ص},
 					'evening1' => q{مساءً},
-					'morning1' => q{فجرًا},
 					'afternoon2' => q{بعد الظهر},
+					'morning1' => q{فجرًا},
+					'night1' => q{منتصف الليل},
 				},
 			},
 		},

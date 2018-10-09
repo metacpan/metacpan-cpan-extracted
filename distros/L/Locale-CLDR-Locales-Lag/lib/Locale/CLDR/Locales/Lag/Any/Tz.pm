@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Lag::Any::Tz - Package for language Langi
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Lag::Any::Tz - Package for language Langi
 
 package Locale::CLDR::Locales::Lag::Any::Tz;
 # This file auto generated from Data\common\main\lag_TZ.xml
-#	on Sun  5 Aug  6:09:40 pm GMT
+#	on Sun  7 Oct 10:43:37 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Sd - Package for language Sindhi
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Sd - Package for language Sindhi
 
 package Locale::CLDR::Locales::Sd;
 # This file auto generated from Data\common\main\sd.xml
-#	on Sun  5 Aug  6:20:13 pm GMT
+#	on Sun  7 Oct 10:56:52 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4362,27 +4364,27 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'wide' => {
+					'pm' => q{منجهند، شام},
+					'am' => q{صبح، منجهند},
+				},
+				'narrow' => {
+					'pm' => q{منجهند، شام},
+					'am' => q{صبح، منجهند},
+				},
 				'abbreviated' => {
 					'pm' => q{شام، منجهند},
 					'am' => q{صبح، منجهند},
 				},
-				'wide' => {
-					'pm' => q{منجهند، شام},
-					'am' => q{صبح، منجهند},
-				},
-				'narrow' => {
-					'am' => q{صبح، منجهند},
-					'pm' => q{منجهند، شام},
-				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{منجهند، شام},
-					'am' => q{صبح، منجهند},
-				},
 				'narrow' => {
 					'pm' => q{منجهند، شام},
 					'am' => q{صبح، منجهند},
+				},
+				'wide' => {
+					'am' => q{صبح، منجهند},
+					'pm' => q{منجهند، شام},
 				},
 				'abbreviated' => {
 					'pm' => q{منجهند، شام},

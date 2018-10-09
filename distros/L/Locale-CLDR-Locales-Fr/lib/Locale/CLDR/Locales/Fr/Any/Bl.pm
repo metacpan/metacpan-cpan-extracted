@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Fr::Any::Bl - Package for language French
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Bl - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Bl;
 # This file auto generated from Data\common\main\fr_BL.xml
-#	on Sun  5 Aug  6:01:43 pm GMT
+#	on Sun  7 Oct 10:33:21 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

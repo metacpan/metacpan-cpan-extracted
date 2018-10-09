@@ -10,7 +10,7 @@ if (CAN_TEST_LEAKS) {
     = sub { warn $_[0] unless ($_[0] =~ /Unhandled type: (GLOB|REGEXP)/); };
 }
 else {
-  plan skip_all => 'test for memory leaks';
+  plan skip_all => 'test requires Test::Memory::Cycle';
 }
 
 use Mojo::UserAgent;

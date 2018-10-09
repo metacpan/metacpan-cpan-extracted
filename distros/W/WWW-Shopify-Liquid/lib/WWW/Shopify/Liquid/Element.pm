@@ -39,7 +39,10 @@ sub optimize_subelement($$$\$) {
 	if (ref($element) eq 'ARRAY') {
 		for my $idx (0..(int(@$element)-1)) {
 			my $inner = $element->[$idx];
-			$element->[$idx] = !$self->is_processed($inner) ? $inner->optimize($optimizer, $hash) : $inner;
+			if (!$self->is_processed($inner)) {
+				$inner = $inner->optimize($optimizer, $hash);
+				$element->[$idx] = $inner
+			}
 		}
 	} else {
 		$value = !$self->is_processed($$element) ? ($$element)->optimize($optimizer, $hash) : $$element;

@@ -57,7 +57,7 @@
    "provides" : {
       "Mojo::UserAgent::Role::Queued" : {
          "file" : "lib/Mojo/UserAgent/Role/Queued.pm",
-         "version" : "1.13"
+         "version" : "1.14"
       },
       "Mojo::UserAgent::Role::Queued::Queue" : {
          "file" : "lib/Mojo/UserAgent/Role/Queued/Queue.pm"
@@ -74,7 +74,7 @@
          "web" : "https://github.com/dotandimet/Mojo-UserAgent-Role-Queued"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_contributors" : [
       "Dan Book <grinnz@gmail.com>",
       "Vidar Tyldum <vidar@ksat.no>"

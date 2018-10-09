@@ -3,7 +3,7 @@ package Net::Async::Redis::Protocol;
 use strict;
 use warnings;
 
-our $VERSION = '1.009'; # VERSION
+our $VERSION = '1.011'; # VERSION
 
 =head1 NAME
 
@@ -110,7 +110,7 @@ sub decode {
             die 'invalid numeric value for length ' . $len unless 0+$len eq $len;
             $self->{parsing_bulk} = $len;
         } elsif(s{^\*-1$CRLF}{}) {
-            $self->item_array(undef);
+            $self->item(undef);
         } elsif(s{^\*([0-9]+)$CRLF}{}) {
             my $pending = $1;
             die 'invalid numeric value for array ' . $pending unless 0+$pending eq $pending;
@@ -142,8 +142,9 @@ sub item {
 }
 
 sub item_error {
-    $log->warnf("Received Redis error %s", $_[1]);
-    $_[0]
+    my ($self, $err) = @_;
+    $self->{error}->($err) if $self->{error};
+    $self
 }
 
 1;

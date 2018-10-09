@@ -1,12 +1,10 @@
 # -*- Perl -*-
 #
-# generate patterns of text
-#
-# Run perldoc(1) on this file for additional documentation.
+# generate patterns of text. run perldoc(1) on this file for documentation
 
 package Game::TextPatterns;
 
-use 5.14.0;
+use 5.24.0;
 use warnings;
 use Carp qw(croak);
 use List::Util qw(min);
@@ -14,7 +12,7 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.42';
+our $VERSION = '0.73';
 
 with 'MooX::Rebuild';    # for ->rebuild (which differs from ->clone)
 
@@ -31,12 +29,12 @@ has pattern => (
             return \@pat;
         } elsif ( $type eq 'ARRAY' ) {
             my $len = length $_[0]->[0];
-            for my $i ( 1 .. $#{ $_[0] } ) {
+            for my $i ( 1 .. $_[0]->$#* ) {
                 die "columns must be of equal length" if length $_[0]->[$i] != $len;
             }
-            return [ @{ $_[0] } ];
+            return [ $_[0]->@* ];
         } elsif ( $_[0]->can("pattern") ) {
-            return [ @{ $_[0]->pattern } ];
+            return [ $_[0]->pattern->@* ];
         } else {
             die "unknown pattern type '$type'";
         }
@@ -57,21 +55,20 @@ sub append_cols {
     croak "need append_cols(fill, pattern)" if !defined $pattern;
     my ( $fill_cur, $fill_new );
     if ( ref $fill eq 'ARRAY' ) {
-        ( $fill_cur, $fill_new ) = @$fill;
+        ( $fill_cur, $fill_new ) = $fill->@*;
     } else {
         $fill_cur = $fill_new = $fill;
     }
     my $pat     = $self->pattern;
-    my @cur_dim = ( length $_[0]->pattern->[0], scalar @{ $_[0]->pattern } );
+    my @cur_dim = ( length $_[0]->pattern->[0], scalar $_[0]->pattern->@* );
     my @new_dim = $pattern->dimensions;
     if ( $cur_dim[1] > $new_dim[1] ) {
-        # fill for new below where the
         for my $i ( 1 .. $cur_dim[1] - $new_dim[1] ) {
             $pat->[ -$i ] .= $fill_new x $new_dim[0];
         }
     } elsif ( $cur_dim[1] < $new_dim[1] ) {
         for my $i ( 1 .. $new_dim[1] - $cur_dim[1] ) {
-            push @$pat, $fill_cur x $cur_dim[0];
+            push $pat->@*, $fill_cur x $cur_dim[0];
         }
     }
     my $new = $pattern->pattern;
@@ -86,14 +83,14 @@ sub append_rows {
     croak "need append_rows(fill, pattern)" if !defined $pattern;
     my ( $fill_cur, $fill_new );
     if ( ref $fill eq 'ARRAY' ) {
-        ( $fill_cur, $fill_new ) = @$fill;
+        ( $fill_cur, $fill_new ) = $fill->@*;
     } else {
         $fill_cur = $fill_new = $fill;
     }
     my $pat     = $self->pattern;
-    my @cur_dim = ( length $_[0]->pattern->[0], scalar @{ $_[0]->pattern } );
+    my @cur_dim = ( length $_[0]->pattern->[0], scalar $_[0]->pattern->@* );
     my @new_dim = $pattern->dimensions;
-    push @$pat, @{ $pattern->pattern };
+    push $pat->@*, $pattern->pattern->@*;
     if ( $cur_dim[0] > $new_dim[0] ) {
         for my $i ( 0 .. $new_dim[1] - 1 ) {
             $pat->[ $cur_dim[1] + $i ] .= $fill_new x ( $cur_dim[0] - $new_dim[0] );
@@ -110,7 +107,7 @@ sub as_array {
     my ($self) = @_;
     my $pat = $self->pattern;
     my @array;
-    for my $row (@$pat) {
+    for my $row ( $pat->@* ) {
         push @array, [ split //, $row ];
     }
     return \@array;
@@ -132,10 +129,10 @@ sub border {
         $char = '#';
     }
     my $pat = $self->pattern;
-    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my ( $cols, $rows ) = ( length $pat->[0], scalar $pat->@* );
     my ( $newcols, $newrows ) = map { $_ + ( $width << 1 ) } $cols, $rows;
     my @np = ( $char x $newcols ) x $width;
-    for my $row (@$pat) {
+    for my $row ( $pat->@* ) {
         push @np, ( $char x $width ) . $row . ( $char x $width );
     }
     push @np, ( $char x $newcols ) x $width;
@@ -146,14 +143,14 @@ sub border {
 sub clone { __PACKAGE__->new( pattern => $_[0]->pattern ) }
 
 sub cols       { length $_[0]->pattern->[0] }
-sub dimensions { length $_[0]->pattern->[0], scalar @{ $_[0]->pattern } }
-sub rows       { scalar @{ $_[0]->pattern } }
+sub dimensions { length $_[0]->pattern->[0], scalar $_[0]->pattern->@* }
+sub rows       { scalar $_[0]->pattern->@* }
 
 sub _normalize_rectangle {
     my ( $self, $p1, $p2, $cols, $rows ) = @_;
     for my $p ( $p1, $p2 ) {
-        $p->[0] += $cols - 1 if $p->[0] < 0;
-        $p->[1] += $rows - 1 if $p->[1] < 0;
+        $p->[0] += $cols if $p->[0] < 0;
+        $p->[1] += $rows if $p->[1] < 0;
         if ( $p->[0] < 0 or $p->[0] >= $cols or $p->[1] < 0 or $p->[1] >= $rows ) {
             local $" = ',';
             return undef, "crop point @$p out of bounds";
@@ -167,7 +164,7 @@ sub _normalize_rectangle {
 sub crop {
     my ( $self, $p1, $p2 ) = @_;
     my $pat = $self->pattern;
-    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my ( $cols, $rows ) = ( length $pat->[0], scalar $pat->@* );
     if ( !$p2 ) {
         $p2 = $p1;
         $p1 = [ 0, 0 ];
@@ -187,7 +184,7 @@ sub crop {
 sub draw_in {
     my ( $self, $p1, $p2, $pattern ) = @_;
     my $pat = $self->pattern;
-    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my ( $cols, $rows ) = ( length $pat->[0], scalar $pat->@* );
     if ( !defined $pattern ) {
         $pattern = $p2;
         croak "need pattern to draw into the object" if !defined $pattern;
@@ -195,7 +192,7 @@ sub draw_in {
     }
     ( $p1, $p2 ) = $self->_normalize_rectangle( $p1, $p2, $cols, $rows );
     my $draw = $pattern->pattern;
-    my ( $draw_cols, $draw_rows ) = ( length $draw->[0], scalar @$draw );
+    my ( $draw_cols, $draw_rows ) = ( length $draw->[0], scalar $draw->@* );
     my $ccount = min( $draw_cols, $p2->[0] - $p1->[0] + 1 );
     my $rcount = min( $draw_rows, $p2->[1] - $p1->[1] + 1 );
     for my $rnum ( 0 .. $rcount - 1 ) {
@@ -210,42 +207,50 @@ sub draw_in {
 sub flip_both {
     my ($self) = @_;
     my $pat = $self->pattern;
-    for my $row (@$pat) {
+    for my $row ( $pat->@* ) {
         $row = reverse $row;
     }
-    @$pat = reverse @$pat if @$pat > 1;
+    $pat->@* = reverse $pat->@* if $pat->@* > 1;
     return $self;
 }
 
 sub flip_cols {
     my ($self) = @_;
-    for my $row ( @{ $self->pattern } ) {
+    for my $row ( $self->pattern->@* ) {
         $row = reverse $row;
     }
     return $self;
 }
 
 sub flip_four {
-    my ($self) = @_;
-    my @quads = $self->clone;
-    push @quads, $quads[0]->clone->flip_cols;
-    push @quads, $quads[-1]->clone->flip_rows;
-    push @quads, $quads[0]->clone->flip_rows;
-    $quads[1]->append_cols( '?', $quads[0] );
-    $quads[2]->append_cols( '?', $quads[3] );
-    $quads[1]->append_rows( '?', $quads[2] );
-    return $quads[1];
+    my ( $self, $reduce_col, $reduce_row ) = @_;
+    $reduce_row //= $reduce_col;
+    my $q1 = $self->clone;
+    my $q2 = $q1->clone->flip_cols;
+    if ($reduce_col) {
+        $q2->crop( [ 0, 0 ], [ -2, -1 ] );
+    }
+    my $q3 = $q2->clone->flip_rows;
+    my $q4 = $q1->clone->flip_rows;
+    if ($reduce_row) {
+        $q3->crop( [ 0, 1 ], [ -1, -1 ] );
+        $q4->crop( [ 0, 1 ], [ -1, -1 ] );
+    }
+    $q2->append_cols( '?', $q1 );
+    $q3->append_cols( '?', $q4 );
+    $q2->append_rows( '?', $q3 );
+    return $q2;
 }
 
 sub flip_rows {
     my ($self) = @_;
     my $pat = $self->pattern;
-    @$pat = reverse @$pat if @$pat > 1;
+    $pat->@* = reverse $pat->@* if $pat->@* > 1;
     return $self;
 }
 
 sub four_up {
-    my ( $self, $fill, $do_crop ) = @_;
+    my ( $self, $fill, $do_crop, $reduce ) = @_;
     if ( defined $fill ) {
         croak "fill to four_up must not be a ref" if ref $fill;
     } else {
@@ -253,7 +258,7 @@ sub four_up {
     }
     my @quads = $self->clone;
     my $pat   = $quads[0]->pattern;
-    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my ( $cols, $rows ) = ( length $pat->[0], scalar $pat->@* );
     if ($do_crop) {
         my $rownum = $rows - 1;
         if ( $cols > $rows ) {    # wide
@@ -286,8 +291,8 @@ sub four_up {
 sub from_array {
     my ( $self, $array ) = @_;
     my @pat;
-    for my $row (@$array) {
-        push @pat, join( '', @$row );
+    for my $row ( $array->@* ) {
+        push @pat, join( '', $row->@* );
     }
     $self->pattern( \@pat );
     return $self;
@@ -296,7 +301,7 @@ sub from_array {
 sub mask {
     my ( $self, $mask, $pattern ) = @_;
     my $pat = $self->pattern;
-    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my ( $cols, $rows ) = ( length $pat->[0], scalar $pat->@* );
     my $rep = $pattern->pattern;
     for my $r ( 0 .. $rows - 1 ) {
         $pat->[$r] =~ s{([$mask]+)}{substr($rep->[$r], $-[0], $+[0] - $-[0]) || $1}eg;
@@ -320,12 +325,12 @@ sub multiply {
         $rows = $cols;
     }
     if ( $cols > 1 ) {
-        for my $row ( @{ $self->pattern } ) {
+        for my $row ( $self->pattern->@* ) {
             $row = $row x $cols;
         }
     }
     if ( $rows > 1 ) {
-        $self->pattern( [ ( @{ $self->pattern } ) x $rows ] );
+        $self->pattern( [ ( $self->pattern->@* ) x $rows ] );
     }
     return $self;
 }
@@ -357,7 +362,7 @@ sub rotate {
         return $self->flip_both;
     }
     my $pat = $self->pattern;
-    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my ( $cols, $rows ) = ( length $pat->[0], scalar $pat->@* );
     my @new;
     if ( $rotate_by == 1 ) {         # 90 degrees
         for my $char ( split //, $pat->[0] ) {
@@ -389,22 +394,24 @@ sub rotate {
 sub string {
     my ( $self, $sep ) = @_;
     $sep //= $/;
-    return join( $sep, @{ $self->pattern } ) . $sep;
+    return join( $sep, $self->pattern->@* ) . $sep;
 }
 
 sub trim {
     my ( $self, $amount ) = @_;
-    return $self->crop( [ $amount, $amount ], [ -$amount, -$amount ] );
+    # -1 is the last index, so need at least one more than that
+    my $neg = -( $amount + 1 );
+    return $self->crop( [ $amount, $amount ], [ $neg, $neg ] );
 }
 
 sub white_noise {
     my ( $self, $char, $percent ) = @_;
     my $pat = $self->pattern;
-    my ( $cols, $rows ) = ( length $pat->[0], scalar @$pat );
+    my ( $cols, $rows ) = ( length $pat->[0], scalar $pat->@* );
     my $total   = $cols * $rows;
     my $to_fill = int( $total * $percent );
     if ( $to_fill > 0 ) {
-        for my $row (@$pat) {
+        for my $row ( $pat->@* ) {
             for my $i ( 0 .. $cols - 1 ) {
                 if ( rand() < $to_fill / $total ) {
                     substr( $row, $i, 1 ) = $char;
@@ -428,11 +435,11 @@ Game::TextPatterns - generate patterns of text
 
   use Game::TextPatterns;
 
-  my $v = Game::TextPatterns->new( pattern => ".#\n#." );
+  my $pat = Game::TextPatterns->new( pattern => ".#\n#." );
 
-  $v->multiply(7,3)->border->border(1, '.')->border;
+  $pat->multiply(7,3)->border->border(1, '.')->border;
 
-  print $v->string;
+  print $pat->string;
 
 Ta-da! You should now have an Angband checker type vault. (Doors not
 included. Items and monsters may cost extra.)
@@ -455,8 +462,8 @@ Items might be added by applying an appropriate B<mask>:
   my $i = Game::TextPatterns->new( pattern => "." );
   $i->multiply( 19, 11 );
   $i->white_noise( '?', .1 );
-  $v->mask( '.', $i );
-  print $v->string;
+  $pat->mask( '.', $i );
+  print $pat->string;
 
 Which could result in
 
@@ -475,7 +482,7 @@ Which could result in
 
 And this pattern adjusted with B<four_up>, twice
 
-  my $pat = Game::TextPatterns->new( pattern => <<"EOF" );
+  $pat = Game::TextPatterns->new( pattern => <<"EOF" );
   ..##.
   ...##
   #....
@@ -507,6 +514,9 @@ creates
   ##...#..####...#..##
   .##..##.#..##..##.#.
 
+Consult the C<eg/> and C<t/> directories under this module's
+distribution for more example code.
+
 =head1 DESCRIPTION
 
 L<Game::TextPatterns> contains methods that generate and alter text
@@ -526,7 +536,18 @@ Columns (x, width) and Rows (y, height) are used in various places.
   .  #.......@'...<...#
   .  ##################
 
-The B<pattern> text can be most any string value.
+The B<pattern> text should be ASCII; Unicode or other such multibyte
+encodings may cause problems.
+
+Geometrical terms (quadrant I or Q1 in the following diagram) are used,
+though for angles of rotation C<0 1 2 3> are used instead of 0, 90, 180,
+270 degress or other forms.
+
+     90 (1)
+  Q2 | Q1
+  ---+--- 0 (0)
+  Q3 | Q4
+     270 (3)
 
 =head1 CONSTRUCTORS
 
@@ -562,7 +583,7 @@ Only one at the moment.
 
 Required. Must be a string (which will be split on C<$/> into an array
 reference) or an array reference of strings or an object that has a
-B<pattern> method that ideally returns one of the previous types.
+B<pattern> method that does the same thing as B<pattern> of this module.
 
 L<File::Slurper> may help read pattern data directly from a file.
 
@@ -575,24 +596,25 @@ reference directly.
 =head1 METHODS
 
 Call these on something returned by a constructor. Those that modify the
-pattern in-place can be chained with other methods. If something goes
-wrong these will throw an exception.
+pattern in-place (some though do not) can be chained with other methods.
+If something goes wrong these will throw an exception.
 
 =over 4
 
 =item B<append_cols> I<fill> I<pattern>
 
-Appends the given I<pattern> to the right of the existing object. If the
-patterns are of unequal size the I<fill> character (or array reference)
-will be used to fill in the gaps. If I<fill> is an array reference the
-first character of that reference will be used to fill gaps should the
-object be smaller, or otherwise the second character of the array will
-be used as fill if the object is larger than the given I<pattern>.
+Appends the given I<pattern> to the right of the existing object (or a
+sort of a horizontal L<cat(1)>). If the patterns are of unequal size the
+I<fill> character (or array reference) will be used to fill in the gaps.
+If I<fill> is an array reference the first character of that reference
+will be used to fill gaps should the object be smaller, or otherwise the
+second character of the array will be used as fill if the object is
+larger than the given I<pattern>.
 
 =item B<append_rows> I<fill> I<pattern>
 
-Appends the given I<pattern> below the existing object. Same rules for
-I<fill> as for B<append_cols>.
+Appends the given I<pattern> below the existing object (much like
+L<cat(1)> does for text). Same rules for I<fill> as for B<append_cols>.
 
 =item B<as_array>
 
@@ -635,23 +657,54 @@ See also the more complicated B<overlay>.
 
 =item B<flip_both>
 
-Flips the B<pattern> by columns and by rows.
+Flips the B<pattern> by columns and by rows. Similar to a rotate by
+180 degrees.
+
+  ###.  ->  ...#
+  #...  ->  .###
 
 =item B<flip_cols>
 
 Flips the columns (vertical mirror) in the B<pattern>.
 
-=item B<flip_four>
+  ###.  ->  .###
+  #...  ->  ...#
+
+=item B<flip_four> [ I<reduce-col?> [ I<reduce-row?> ] ]
 
 Treats the object as a pattern in quadrant I of the unit circle and
 returns a new object with that pattern flipped as appropriate into the
 other three quadrants. See also B<four_up>.
 
-Note that this does not modify the object in-place.
+      ###.
+      #... becomes:
+  
+  .######.
+  ...##...
+  ...##...
+  .######.
+
+Note that this does not modify the object in-place, to do that:
+
+  $pat = $pat->flip_four;
+
+The optional I<reduce-col> and I<reduce-row> will cause a row, a column,
+or if only I<reduce-col> is supplied and is true, both a row and a
+column to be lost. That is C<flip_four(1)> causes
+
+     ###.
+     #... to become
+  
+  .#####.
+  ...#...
+  .#####.
 
 =item B<flip_rows>
 
 Flips the rows (horizontal mirror).
+
+  ###.  ->  #...
+  #...  ->  ###.
 
 =item B<four_up> [ I<fill> ] [ I<crop?> ]
 
@@ -659,10 +712,22 @@ Treats the object as a pattern in quadrant I of the unit circle and
 returns a new object with that pattern rotated into the other three
 quadrants by an appropriate number of degrees. See also B<flip_four>.
 
+      ###.
+      #... becomes:
+  
+  ??..????
+  ??#.????
+  ??#.###.
+  ??###...
+  ...###??
+  .###.#??
+  ????.#??
+  ????..??
+
 I<fill> will be used if the input is not a square during various calls
 to B<append_cols> and B<append_rows>, unless I<crop> is a true value, in
 which case the object used will be cropped to be a square before the
-rotations.
+rotations. The default I<fill> as shown above is C<?>.
 
 Note that this does not modify the object in-place.
 
@@ -741,17 +806,33 @@ B<flip_four> and B<four_up> probably need better names.
 Some of the calling arguments to various methods likely need
 improvements which will probably break backwards compatibility.
 
+Unicode is not really supported, would instead need to operate on
+characters or potentially even allow for lengths of text in each cell of
+the pattern grid.
+
 =head1 SEE ALSO
 
-L<https://github.com/thrig/ministry-of-silly-vaults/>
+L<Game::DijkstraMap> can path-find across text patterns, handy if one
+desires maps that do not completely thwart a player.
 
-Consult the C<t/> directory under this module's distribution for
-example code.
+  use 5.24.0;
+  ...
+  $pat = $pat->four_up->four_up;
+  my $dm = Game::DijkstraMap->new;
+  $dm->map( $pat->as_array );
+  # assuming the pattern did not have any goals already on it
+  my $uc = $dm->unconnected;
+  $dm->update( [ $uc->[0]->@*, $dm->min_cost ] );
+  $dm->recalc;
+  # then check if anything still unconnected...
 
 Another option might be to use a standard image library and then devise
 a conversion such that particular colors become particular ASCII symbols
 (or combinations of symbols, with Unicode or control sequences to set
 colors or such).
+
+And then there is also the
+L<https://github.com/thrig/ministry-of-silly-vaults/>
 
 =head1 AUTHOR
 

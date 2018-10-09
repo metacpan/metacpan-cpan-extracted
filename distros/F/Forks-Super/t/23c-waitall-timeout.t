@@ -15,7 +15,7 @@ $Forks::Super::ON_BUSY = "queue";
 
 my $t4 = Time::HiRes::time();
 my $p2 = fork { sub => sub { sleep 1 } };   # should take 1s
-my $p1 = fork { sub => sub { sleep 7 } };   # should take 7s
+my $p1 = fork { sub => sub { sleep 9 } };   # should take 9s
 my $p3 = fork { sub => sub { sleep 1 } };   # should take 1s
 my $p4 = fork { sub => sub { sleep 15 } };  # should take 1+15s
 my $t5 = 0.5 * ($t4 + Time::HiRes::time());
@@ -25,10 +25,10 @@ if ($t5 > $t4 + 1) {
 
 
 my $t = Time::HiRes::time();
-my $count = waitall 3.5 + ($t5 - $t);
+my $count = waitall 3 + ($t5 - $t);
 $t = Time::HiRes::time() - $t5;
 ok($count == 2, "waitall reaped $count==2 processes after 2 sec"); ### 1 ###
-okl($t >= 3.33 && $t <= 4.5, "waitall respected timeout ${t}s expected ~3.5s");
+okl($t >= 2.8 && $t <= 4.15, "waitall respected timeout ${t}s expected ~3s");
 
 $t = Time::HiRes::time();
 $count = waitall 5 + ($t5 - $t);

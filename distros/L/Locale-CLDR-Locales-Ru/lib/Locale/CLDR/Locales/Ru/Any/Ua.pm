@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ru::Any::Ua - Package for language Russian
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ru::Any::Ua - Package for language Russian
 
 package Locale::CLDR::Locales::Ru::Any::Ua;
 # This file auto generated from Data\common\main\ru_UA.xml
-#	on Sun  5 Aug  6:20:06 pm GMT
+#	on Sun  7 Oct 10:56:43 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -60,53 +62,53 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 400;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
 					return 'night1' if $time >= 0
 						&& $time < 400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 400;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
 					return 'night1' if $time >= 0
 						&& $time < 400;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
@@ -205,34 +207,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			yMMM => {
-				y => q{LLL y – LLL y},
-			},
-			yMMMEd => {
-				y => q{ccc, d MMM y – ccc, d MMM y},
-			},
-			yMMMM => {
-				y => q{LLLL y – LLLL y},
-			},
-			yMMMd => {
-				y => q{d MMM y – d MMM y},
-			},
-		},
 		'generic' => {
 			H => {
 				H => q{HH–HH 'ч'.},
@@ -271,6 +245,34 @@ has 'datetime_formats_interval' => (
 			yMMMd => {
 				M => q{d MMM – d MMM y},
 				d => q{d–d MMM y},
+				y => q{d MMM y – d MMM y},
+			},
+		},
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			yMMM => {
+				y => q{LLL y – LLL y},
+			},
+			yMMMEd => {
+				y => q{ccc, d MMM y – ccc, d MMM y},
+			},
+			yMMMM => {
+				y => q{LLLL y – LLLL y},
+			},
+			yMMMd => {
 				y => q{d MMM y – d MMM y},
 			},
 		},

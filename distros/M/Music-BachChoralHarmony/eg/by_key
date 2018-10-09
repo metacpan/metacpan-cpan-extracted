@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Plot a network graph of the outgoing chords of all songs in the given key.
+
+use GraphViz2;
+use Music::BachChoralHarmony;
+
+my $key = shift || 'A_m';
+
+my $bach = Music::BachChoralHarmony->new;
+my $progression = $bach->parse();
+
+# Get a list of all song events for the given key
+my @events;
+for my $song ( keys %$progression ) {
+    next unless $progression->{$song}{key} && $progression->{$song}{key} eq $key;
+    push @events, $progression->{$song}{events};
+}
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",scalar(@events),"\n");
+
+# Get a hash of all bigrams and their scores
+my %score;
+for my $song ( @events ) {
+    my $last;
+
+    for my $struct ( @$song ) {
+        my $chord = $struct->{chord};
+
+        $score{ $last . ' ' . $chord }++ if $last;
+
+        $last = $chord;
+    }
+}
+
+my $g = GraphViz2->new(
+    global => { directed => 1 },
+    node   => { shape => 'oval' },
+    edge   => { color => 'grey' },
+);
+
+my %nodes;
+my %edges;
+
+for my $bigram ( keys %score ) {
+    my ( $i, $j ) = split ' ', $bigram;
+
+    next unless $i eq $key;
+
+    my $color = $i eq $key ? 'red' : 'black';
+
+    $g->add_node( name => $i, color => $color )
+        unless $nodes{$i}++;
+
+    $color = $j eq $key ? 'red' : 'black';
+
+    $g->add_node( name => $j, color => $color )
+        unless $nodes{$j}++;
+
+    $g->add_edge( from => $i, to => $j, label => $score{$bigram} )
+        unless $edges{$bigram}++;
+}
+
+$g->run( format => 'png', output_file => $0 . '.png' );

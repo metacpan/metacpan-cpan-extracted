@@ -3,7 +3,7 @@ package App::MechaCPAN::Perl;
 use v5.14;
 use autodie;
 use Config;
-use File::Fetch qw//;
+use FindBin;
 use App::MechaCPAN qw/:go/;
 
 our @args = (
@@ -13,6 +13,7 @@ our @args = (
   'skip-lib!',
   'smart-tests!',
   'devel!',
+  'shared-lib!',
 );
 
 my $perl5_ver_re = qr/v? 5 [.] (\d{1,2}) (?: [.] (\d{1,2}) )?/xms;
@@ -31,10 +32,11 @@ sub go
     return 0;
   }
 
-  my $orig_dir = &dest_dir;
-  my @orig_dir = File::Spec->splitdir("$orig_dir");
-  my $orig_len = $#orig_dir;
-  my $dest_dir = "$orig_dir/perl";
+  my $orig_dir = &get_project_dir;
+  my $dest_dir = &dest_dir;
+  my @dest_dir = File::Spec->splitdir("$dest_dir");
+  my $dest_len = $#dest_dir;
+  my $perl_dir = "$dest_dir/perl";
   my $pv_ver;    # Version in .perl-version file
 
   # Attempt to find the perl version if none was given
@@ -62,7 +64,7 @@ sub go
     info("Looks like $src_tz is perl $version, assuming that's true");
   }
 
-  if ( -e -x "$dest_dir/bin/perl" )
+  if ( -e -x "$perl_dir/bin/perl" )
   {
     unless ( $opts->{is_restarted_process} )
     {
@@ -92,16 +94,16 @@ sub go
   if ( !-e 'Configure' )
   {
     my @files = glob('*');
-    if ( @files > 1 )
+    if ( @files != 1 )
     {
       die 'Could not find perl to configure';
     }
     chdir $files[0];
   }
 
-  my $local_dir = File::Spec->catdir( @orig_dir, qw/lib perl5/ );
+  my $local_dir = File::Spec->catdir( @dest_dir, qw/lib perl5/ );
   my $lib_dir
-    = File::Spec->catdir( @orig_dir[ 0 .. $orig_len - 1 ], qw/lib/ );
+    = File::Spec->catdir( @dest_dir[ 0 .. $dest_len - 1 ], qw/lib/ );
 
   my @otherlib = (
     !$opts->{'skip-local'} ? $local_dir : (),
@@ -110,14 +112,19 @@ sub go
 
   my @config = (
     q[-des],
-    qq[-Dprefix=$dest_dir],
+    qq[-Dprefix=$perl_dir],
     q[-Accflags=-DAPPLLIB_EXP=\"] . join( ":", @otherlib ) . q[\"],
-    qq[-A'eval:scriptdir=$dest_dir/bin'],
+    qq[-A'eval:scriptdir=$perl_dir/bin'],
   );
 
   if ( $opts->{threads} )
   {
     push @config, '-Dusethreads';
+  }
+
+  if ( $opts->{'shared-lib'} )
+  {
+    push @config, '-Duseshrplib';
   }
 
   if ( $opts->{devel} )
@@ -187,14 +194,12 @@ sub _dnld_url
   my $minor   = shift;
   my $mirror  = 'http://www.cpan.org/src/5.0';
 
-  return "$mirror/perl-5.$version.$minor.tar.bz2";
+  return "$mirror/perl-5.$version.$minor.tar.gz";
 }
 
 sub _get_targz
 {
   my $src = shift;
-
-  local $File::Fetch::WARN;
 
   # If there's no src, find the newest version.
   if ( !defined $src )
@@ -209,10 +214,9 @@ sub _get_targz
 
     # Verify our guess
     {
-      my $dnld = _dnld_url( $major, 0 ) . ".md5.txt";
-      my $ff       = File::Fetch->new( uri => $dnld );
+      my $dnld     = _dnld_url( $major, 0 ) . ".md5.txt";
       my $contents = '';
-      my $where    = $ff->fetch( to => \$contents );
+      my $where    = eval { fetch_file( $dnld => \$contents ) };
 
       if ( !defined $where && $major > 12 )
       {
@@ -254,10 +258,9 @@ sub _get_targz
       {
         my $i = int( @possible / 2 );
         $minor = $possible[$i];
-        my $dnld = _dnld_url( $version, $minor ) . ".md5.txt";
-        my $ff       = File::Fetch->new( uri => $dnld );
+        my $dnld     = _dnld_url( $version, $minor ) . ".md5.txt";
         my $contents = '';
-        my $where    = $ff->fetch( to => \$contents );
+        my $where    = eval { fetch_file( $dnld => \$contents ) };
 
         if ( defined $where )
         {
@@ -326,6 +329,10 @@ C<$version> is either 0 or 1 parameter:
 =head3 threads
 
 By default, perl is compiled without threads. If you'd like to enable threads, use this argument.
+
+=head3 shared-lib
+
+By default, perl will generate a libperl.a file.  If you need libperl.so, then use this argument.
 
 =head3 skip-tests
 

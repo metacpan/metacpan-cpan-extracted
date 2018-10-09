@@ -1,50 +1,55 @@
-#!/usr/local/bin/perl -w
+use strict;
+use warnings;
 
-use strict ;
-use Test::More ;
 use Carp ;
-use File::Slurp ;
+use File::Spec ();
+use File::Slurp;
+use File::Temp qw(tempfile);
+use IO::Handle ();
+use Test::More;
 
 BEGIN {
-	plan skip_all => 'Older Perl lacking unicode support'
-		if $] < 5.008001 ;
+    plan skip_all => 'Older Perl lacking unicode support' if $] < 5.008001;
 }
 
-plan tests => 2 ;
+# older EUMMs turn this on. We don't want to emit warnings.
+# also, some of our CORE function overrides emit warnings. Silence those.
+local $^W;
 
-my $suf = 'utf8' ;
-my $mode = ":$suf" ;
 
-my $is_win32 = $^O =~ /win32/i ;
+plan tests => 4;
 
-my $orig_text = "\x{20ac}\n" ;
-( my $win32_text = $orig_text ) =~ s/\n/\015\012/ ;
-my $unicode_length = length $orig_text ;
+my $suf = 'utf8';
+my $mode = ":$suf";
 
-my $control_file = "control.$suf" ;
-my $slurp_file = "slurp.$suf" ;
+# euro symbol with \r\n or \n
+my $orig_text = "\x{20ac}\n";
+my $win_text = "\x{20ac}\015\012";
+my $expected_text = $^O eq 'MSWin32' ? $win_text : $orig_text;
+my $unicode_length = length $orig_text;
 
-open( my $fh, ">$mode", $control_file ) or
-	die "cannot create control unicode file '$control_file' $!" ;
-print $fh $orig_text ;
-close $fh ;
+my (undef, $control_file) = tempfile('ctrlXXXXX', DIR => File::Spec->tmpdir, OPEN => 0);
+my (undef, $slurp_file) = tempfile('slurpXXXXX', DIR => File::Spec->tmpdir, OPEN => 0);
 
-my $slurp_utf = read_file( $control_file, binmode => $mode ) ;
-my $written_text = $is_win32 ? $win32_text : $orig_text ;
-is( $slurp_utf, $written_text, "read_file of $mode file" ) ;
+{ # print to the control file
+    open(my $fh, ">$mode", $control_file) or
+        die "cannot create control unicode file '$control_file' $!";
+    $fh->print($orig_text);
+}
 
-# my $slurp_utf_length = length $slurp_utf ;
-# my $slurp_text = read_file( $control_file ) ;
-# my $slurp_text_length = length $slurp_text ;
-# print "LEN UTF $slurp_utf_length TXT $slurp_text_length\n" ;
+my $slurp_utf = read_file( $control_file, binmode => $mode);
+is($slurp_utf, $expected_text, "read_file of $mode file");
 
-write_file( $slurp_file, {binmode => $mode}, $orig_text ) ;
+my $res = write_file($slurp_file, {binmode => $mode}, $orig_text);
+ok($res, "write_file: binmode opt");
 
-open( $fh, "<$mode", $slurp_file ) or
-	die "cannot open slurp test file '$slurp_file' $!" ;
-my $read_length = read( $fh, my $utf_text, $unicode_length ) ;
-close $fh ;
-
-is( $utf_text, $orig_text, "write_file of $mode file" ) ;
-
-unlink( $control_file, $slurp_file ) ;
+my $read_length;
+{ # read the slurp file
+    open(my $fh, "<$mode", $slurp_file) or
+        die "cannot open slurp test file '$slurp_file' $!";
+    my $read_length = read($fh, my $utf_text, $unicode_length);
+    $fh->close();
+    is($read_length, $unicode_length, "read lengths match");
+    is($utf_text, $orig_text, "write_file of $mode file");
+}
+unlink($control_file, $slurp_file);

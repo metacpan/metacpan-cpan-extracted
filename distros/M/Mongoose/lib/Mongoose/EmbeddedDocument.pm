@@ -1,5 +1,5 @@
 package Mongoose::EmbeddedDocument;
-$Mongoose::EmbeddedDocument::VERSION = '1.02';
+$Mongoose::EmbeddedDocument::VERSION = '2.00';
 use MooseX::Role::Parameterized;
 use Mongoose::Meta::AttributeTraits;
 

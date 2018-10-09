@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000420';
+our $VERSION='1.0000423';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -4240,9 +4240,10 @@ if ($get_BerkeleyDB && $^O ne 'cygwin') {
          }
          unless (exists $ENV{'BERKELEYDB_INCLUDE'} &&
                $ENV{'BERKELEYDB_INCLUDE'}) {
-            my $BerkDownload='http://www.oracle.com/technetwork/products/'.
-                             'berkeleydb/downloads/index.html';
-            my $PackManagers='http://en.wikipedia.org/wiki/'.
+            my $BerkDownload='https://www.oracle.com/technetwork/database/'.
+                             'database-technologies/berkeleydb/downloads/'.
+                             'index.html';
+            my $PackManagers='https://en.wikipedia.org/wiki/'.
                              'List_of_software_package_management_systems';
             my $w='      ';
             my $die="\n$w ".
@@ -4401,8 +4402,9 @@ END
          $die.="\n(Hint: Run Cygwin $stup and install Oracle Berkley ".
                "DB under the Category 'Database' ).";
       } else {
-         $die.="\n(Hint: goto ->  http://www.oracle.com/technetwork/".
-               "products/berkeleydb/downloads/index.html ).";
+         $die.="\n(Hint: goto ->  https://www.oracle.com/technetwork/".
+               "database/database-technologies/berkeleydb/downloads/".
+               "index.html ).";
       }
       $die.="\n\n";
       fa_die($die);
@@ -4414,8 +4416,9 @@ END
 sub download_berkeleydb {
 
    my $url=
-      'http://www.oracle.com/technetwork/'.
-      'products/berkeleydb/downloads/index.html';
+      'https://www.oracle.com/technetwork/database/'.
+      'database-technologies/berkeleydb/downloads/'.
+      'index.html';
    if ($CPAN::META->has_usable('LWP')) {
       FA::LWP::UserAgent->config;
       print "Fetching with LWP:\n  $url\n";

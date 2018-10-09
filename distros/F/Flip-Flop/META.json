@@ -30,7 +30,7 @@
    "provides" : {
       "Flip::Flop" : {
          "file" : "lib/Flip/Flop.pm",
-         "version" : "20180925"
+         "version" : "20181005"
       }
    },
    "release_status" : "stable",
@@ -39,6 +39,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20180925",
+   "version" : "20181005",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

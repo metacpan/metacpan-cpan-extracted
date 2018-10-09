@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
     "File::Path" => 0,
     "Getopt::Long" => 0,
     "Hook::LexWrap" => 0,
+    "IO::Compress::Bzip2" => 0,
     "IO::File" => 0,
     "IO::Handle" => 0,
     "IO::Select" => 0,
@@ -85,6 +86,7 @@ my %WriteMakefileArgs = (
     "File::Slurper" => 0,
     "File::Spec::Functions" => 0,
     "File::Temp" => 0,
+    "IO::Uncompress::Bunzip2" => 0,
     "PDL::Ufunc" => 0,
     "Test::Builder::Module" => 0,
     "Test::Fatal" => 0,
@@ -95,9 +97,9 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.661",
+  "VERSION" => "3.662",
   "test" => {
-    "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
+    "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/DataFile/Gnuplot/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }
 );
 
@@ -123,11 +125,13 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "Getopt::Long" => 0,
   "Hook::LexWrap" => 0,
+  "IO::Compress::Bzip2" => 0,
   "IO::File" => 0,
   "IO::Handle" => 0,
   "IO::Select" => 0,
   "IO::Socket" => 0,
   "IO::Socket::INET" => 0,
+  "IO::Uncompress::Bunzip2" => 0,
   "List::MoreUtils" => 0,
   "List::Util" => 0,
   "Math::Complex" => 0,

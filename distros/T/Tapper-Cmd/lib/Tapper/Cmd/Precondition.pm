@@ -1,6 +1,6 @@
 package Tapper::Cmd::Precondition;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Precondition::VERSION = '5.0.9';
+$Tapper::Cmd::Precondition::VERSION = '5.0.10';
 use Moose;
 
 use YAML::Syck;

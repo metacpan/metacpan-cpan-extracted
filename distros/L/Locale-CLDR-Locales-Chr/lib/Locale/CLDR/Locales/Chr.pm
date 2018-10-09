@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Chr - Package for language Cherokee
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Chr - Package for language Cherokee
 
 package Locale::CLDR::Locales::Chr;
 # This file auto generated from Data\common\main\chr.xml
-#	on Sun  5 Aug  5:55:10 pm GMT
+#	on Sun  7 Oct 10:25:15 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4622,14 +4624,14 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 2400;
 				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
+				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
@@ -4638,14 +4640,14 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 2400;
 				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
+				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
@@ -4669,49 +4671,49 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{ᏒᎯᏱᎢ},
-					'am' => q{ᏌᎾᎴ},
-					'morning1' => q{ᏌᎾᎴ},
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
-					'noon' => q{ᎢᎦ},
-				},
-				'narrow' => {
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
-					'morning1' => q{ᏌᎾᎴ},
-					'pm' => q{Ꮢ},
-					'am' => q{Ꮜ},
-					'noon' => q{Ꭲ},
-				},
 				'wide' => {
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'noon' => q{ᎢᎦ},
 					'morning1' => q{ᏌᎾᎴ},
 					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
 					'am' => q{ᏌᎾᎴ},
+				},
+				'narrow' => {
+					'am' => q{Ꮜ},
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'pm' => q{Ꮢ},
+					'morning1' => q{ᏌᎾᎴ},
+					'noon' => q{Ꭲ},
+				},
+				'abbreviated' => {
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'am' => q{ᏌᎾᎴ},
+					'morning1' => q{ᏌᎾᎴ},
 					'noon' => q{ᎢᎦ},
+					'pm' => q{ᏒᎯᏱᎢ},
 				},
 			},
 			'stand-alone' => {
+				'narrow' => {
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'am' => q{ᏌᎾᎴ},
+					'noon' => q{ᎢᎦ},
+					'morning1' => q{ᏌᎾᎴ},
+					'pm' => q{ᏒᎯᏱᎢ},
+				},
+				'wide' => {
+					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
+					'morning1' => q{ᏌᎾᎴ},
+					'noon' => q{ᎢᎦ},
+					'am' => q{ᏌᎾᎴ},
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+				},
 				'abbreviated' => {
 					'noon' => q{ᎢᎦ},
 					'morning1' => q{ᏌᎾᎴ},
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
 					'pm' => q{ᏒᎯᏱᎢ},
-					'am' => q{ᏌᎾᎴ},
-				},
-				'narrow' => {
-					'am' => q{ᏌᎾᎴ},
-					'pm' => q{ᏒᎯᏱᎢ},
-					'morning1' => q{ᏌᎾᎴ},
 					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
-					'noon' => q{ᎢᎦ},
-				},
-				'wide' => {
 					'am' => q{ᏌᎾᎴ},
-					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
-					'morning1' => q{ᏌᎾᎴ},
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
-					'noon' => q{ᎢᎦ},
 				},
 			},
 		},

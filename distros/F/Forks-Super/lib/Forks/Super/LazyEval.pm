@@ -11,7 +11,7 @@ use warnings;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(bg_eval bg_qx BG_EVAL BG_QX);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 use constant BG_EVAL => 'Forks::Super::bg_eval';
 use constant BG_QX   => 'Forks::Super::bg_qx';
@@ -112,7 +112,7 @@ sub bg_qx {
     if ($$ != $p) {
 	# a WTF observed on Windows
 	croak 'Forks::Super::bg_qx: ',
-	"Inconsistency in process IDs: $p changed to $$!\n";
+            "Inconsistency in process IDs: $p changed to $$!\n";
     }
     return $result;
 }
@@ -337,7 +337,7 @@ Forks::Super::LazyEval - deferred processing of output from a background proc
 
 =head1 VERSION
 
-0.96
+0.97
 
 =head1 DESCRIPTION
 
@@ -346,6 +346,7 @@ and L<Forks::Super::bg_eval|Forks::Super/bg_eval> functions,
 and C<Forks::Super::bg_qx> and C<Forks::Super::bg_eval> tied
 classes for retrieving results of external commands and
 Perl subroutines executed in background processes.
+
 See L<Forks::Super|Forks::Super> for details.
 
 =head1 AUTHOR

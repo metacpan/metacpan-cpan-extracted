@@ -1,7 +1,7 @@
 package HTTP::Tiny::ProgressAny;
 
-our $DATE = '2015-01-23'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2018-10-06'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 use 5.010001;
 use strict;
@@ -92,7 +92,7 @@ HTTP::Tiny::ProgressAny - See progress for your HTTP::Tiny requests
 
 =head1 VERSION
 
-This document describes version 0.03 of HTTP::Tiny::ProgressAny (from Perl distribution HTTP-Tiny-ProgressAny), released on 2015-01-23.
+This document describes version 0.040 of HTTP::Tiny::ProgressAny (from Perl distribution HTTP-Tiny-ProgressAny), released on 2018-10-06.
 
 =head1 SYNOPSIS
 
@@ -100,7 +100,7 @@ This document describes version 0.03 of HTTP::Tiny::ProgressAny (from Perl distr
  use Progress::Any::Output;
 
  Progress::Any::Output->set("TermProgressBarColor");
- my $resp = HTTP::Tiny->new->get("http://example.com/some-big-file");
+ my $resp = HTTP::Tiny::ProgressAny->new->get("http://example.com/some-big-file");
  # you will see a progress bar in your terminal
 
 =head1 DESCRIPTION
@@ -111,10 +111,6 @@ see progress during HTTP requests.
 Sample output:
 
 =for HTML <img src="https://perlancar.files.wordpress.com/2015/01/screenshot-http-tiny-progany-1.jpg" />
-
-=head1 SEE ALSO
-
-L<LWP::UserAgent::ProgressAny>
 
 =head1 HOMEPAGE
 
@@ -132,13 +128,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<LWP::UserAgent::ProgressAny>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Fur::Any::It - Package for language Friulian
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Fur::Any::It - Package for language Friulian
 
 package Locale::CLDR::Locales::Fur::Any::It;
 # This file auto generated from Data\common\main\fur_IT.xml
-#	on Sun  5 Aug  6:01:55 pm GMT
+#	on Sun  7 Oct 10:33:36 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

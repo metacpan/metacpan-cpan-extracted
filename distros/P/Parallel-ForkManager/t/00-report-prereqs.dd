@@ -16,9 +16,12 @@ do { my $x = {
                                       'File::Path' => '0',
                                       'File::Spec' => '0',
                                       'File::Temp' => '0',
+                                      'Moo' => '0',
+                                      'Moo::Role' => '0',
                                       'POSIX' => '0',
                                       'Storable' => '0',
-                                      'strict' => '0'
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -32,8 +35,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0.94',
                                    'Test::Warn' => '0',
-                                   'perl' => '5.006',
-                                   'warnings' => '0'
+                                   'perl' => '5.006'
                                  }
                  }
      };

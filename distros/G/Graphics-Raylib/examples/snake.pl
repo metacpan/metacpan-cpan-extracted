@@ -89,89 +89,90 @@ sub InitGame {
 
 # Update game (one frame)
 sub UpdateGame {
-    if (!$gameOver) {
-         $pause = !$pause if IsKeyPressed(ord('P'));
-
-         if (!$pause) {
-             # control
-             if (IsKeyPressed(KEY_RIGHT) && ($snake[0]{speed}->x == 0) && $allowMove) {
-                 $snake[0]{speed} = vector(SQUARE_SIZE, 0);
-                 $allowMove = 0;
-             }
-             if (IsKeyPressed(KEY_LEFT) && ($snake[0]{speed}->x == 0) && $allowMove) {
-                 $snake[0]{speed} = vector(-SQUARE_SIZE, 0);
-                 $allowMove = 0;
-             }
-             if (IsKeyPressed(KEY_UP) && ($snake[0]{speed}->y == 0) && $allowMove) {
-                 $snake[0]{speed} = vector(0, -SQUARE_SIZE);
-                 $allowMove = 0;
-             }
-             if (IsKeyPressed(KEY_DOWN) && ($snake[0]{speed}->y == 0) && $allowMove) {
-                 $snake[0]{speed} = vector(0, SQUARE_SIZE);
-                 $allowMove = 0;
-             }
-
-             # movement
-             for (my $i = 0; $i < $counterTail; $i++) {
-                 $snakePosition[$i] = $snake[$i]{position};
-             }
-
-             if (($framesCounter%5) == 0) {
-                 for (my $i = 0; $i < $counterTail; $i++) {
-                     if ($i == 0) {
-                         $snake[0]{position} += $snake[0]{speed};
-                         $allowMove = 1;
-                     } else {
-                         $snake[$i]{position} = $snakePosition[$i-1];
-                     }
-                 }
-             }
-
-             # wall behaviour
-             if ((($snake[0]{position}->x) > (screenWidth  - $offset{x})) ||
-                 (($snake[0]{position}->y) > (screenHeight - $offset{y})) ||
-                 ($snake[0]{position}->x < 0) || ($snake[0]{position}->y < 0)) {
-                 $gameOver = 1;
-             }
-
-             # collision with yourself
-             for (my $i = 1; $i < $counterTail; $i++) {
-                 if ($snake[0]{position} == $snake[$i]{position}) {
-                     $gameOver = 1;
-                 }
-             }
-
-             # TODO: review logic: fruit.position calculation
-             if (!$fruit{active}) {
-                 $fruit{active} = 1;
-                 $fruit{position} = vector(GetRandomValue(0, (screenWidth/SQUARE_SIZE) - 1)*SQUARE_SIZE + $offset{x}/2, GetRandomValue(0, (screenHeight/SQUARE_SIZE) - 1)*SQUARE_SIZE + $offset{y}/2);
-
-                 for (my $i = 0; $i < $counterTail; $i++) {
-                     while ($fruit{position} == $snake[$i]{position}) {
-                         $fruit{position} = vector(GetRandomValue(0, (screenWidth/SQUARE_SIZE) - 1)*SQUARE_SIZE, GetRandomValue(0, (screenHeight/SQUARE_SIZE) - 1)*SQUARE_SIZE);
-                         $i = 0;
-                     }
-                 }
-             }
-
-            # collision
-            if (CheckCollisionRecs(
-                    rectangle(position => $snake[0]{position}, size => $snake[0]{size}),
-                    rectangle(position => $fruit{position},    size => $fruit{size})
-            )) {
-                $snake[$counterTail]{position} = $snakePosition[$counterTail - 1];
-                $counterTail += 1;
-                $fruit{active} = 0;
-                PlaySound($fruit{sound}) if defined $fruit{sound};
-            }
-
-            $framesCounter++;
-        }
-    } else {
+    if ($gameOver) {
         if (IsKeyPressed(KEY_ENTER)) {
             InitGame();
             $gameOver = 0;
         }
+        return;
+    }
+
+    $pause = !$pause if IsKeyPressed(ord('P'));
+
+    if (!$pause) {
+        # control
+        if (IsKeyPressed(KEY_RIGHT) && ($snake[0]{speed}->x == 0) && $allowMove) {
+            $snake[0]{speed} = vector(SQUARE_SIZE, 0);
+            $allowMove = 0;
+        }
+        if (IsKeyPressed(KEY_LEFT) && ($snake[0]{speed}->x == 0) && $allowMove) {
+            $snake[0]{speed} = vector(-SQUARE_SIZE, 0);
+            $allowMove = 0;
+        }
+        if (IsKeyPressed(KEY_UP) && ($snake[0]{speed}->y == 0) && $allowMove) {
+            $snake[0]{speed} = vector(0, -SQUARE_SIZE);
+            $allowMove = 0;
+        }
+        if (IsKeyPressed(KEY_DOWN) && ($snake[0]{speed}->y == 0) && $allowMove) {
+            $snake[0]{speed} = vector(0, SQUARE_SIZE);
+            $allowMove = 0;
+        }
+
+        # movement
+        for (my $i = 0; $i < $counterTail; $i++) {
+            $snakePosition[$i] = $snake[$i]{position};
+        }
+
+        if (($framesCounter%5) == 0) {
+            for (my $i = 0; $i < $counterTail; $i++) {
+                if ($i == 0) {
+                    $snake[0]{position} += $snake[0]{speed};
+                    $allowMove = 1;
+                } else {
+                    $snake[$i]{position} = $snakePosition[$i-1];
+                }
+            }
+        }
+
+        # wall behaviour
+        if ((($snake[0]{position}->x) > (screenWidth  - $offset{x})) ||
+            (($snake[0]{position}->y) > (screenHeight - $offset{y})) ||
+            ($snake[0]{position}->x < 0) || ($snake[0]{position}->y < 0)) {
+            $gameOver = 1;
+        }
+
+        # collision with yourself
+        for (my $i = 1; $i < $counterTail; $i++) {
+            if ($snake[0]{position} == $snake[$i]{position}) {
+                $gameOver = 1;
+            }
+        }
+
+        # TODO: review logic: fruit.position calculation
+        if (!$fruit{active}) {
+            $fruit{active} = 1;
+            $fruit{position} = vector(GetRandomValue(0, (screenWidth/SQUARE_SIZE) - 1)*SQUARE_SIZE + $offset{x}/2, GetRandomValue(0, (screenHeight/SQUARE_SIZE) - 1)*SQUARE_SIZE + $offset{y}/2);
+
+            for (my $i = 0; $i < $counterTail; $i++) {
+                while ($fruit{position} == $snake[$i]{position}) {
+                    $fruit{position} = vector(GetRandomValue(0, (screenWidth/SQUARE_SIZE) - 1)*SQUARE_SIZE, GetRandomValue(0, (screenHeight/SQUARE_SIZE) - 1)*SQUARE_SIZE);
+                    $i = 0;
+                }
+            }
+        }
+
+        # collision
+        if (($snake[0]{position}->x < ($fruit{position}->x + $fruit{size}->x)
+        &&  ($snake[0]{position}->x + $snake[0]{size}->x) > $fruit{position}->x)
+        &&  ($snake[0]{position}->y < ($fruit{position}->y + $fruit{size}->y)
+        &&  ($snake[0]{position}->y + $snake[0]{size}->y) > $fruit{position}->y)) {
+            $snake[$counterTail]{position} = $snakePosition[$counterTail - 1];
+            $counterTail += 1;
+            $fruit{active} = 0;
+            PlaySound($fruit{sound}) if defined $fruit{sound};
+        }
+
+        $framesCounter++;
     }
 }
 

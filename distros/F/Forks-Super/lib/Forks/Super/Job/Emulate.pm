@@ -6,7 +6,7 @@ use Carp;
 use Forks::Super::Debug ':all';
 use Forks::Super::Util ':all';
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 my $emulate_id = 0;
 
@@ -151,7 +151,7 @@ Forks::Super::Job::Emulate - support emulation mode for Job object
 
 =head1 VERSION
 
-0.96
+0.97
 
 =head1 DESCRIPTION
 

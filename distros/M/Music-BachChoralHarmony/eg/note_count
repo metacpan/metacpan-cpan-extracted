@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Plot the number of notes for each song.
+
+use Music::BachChoralHarmony;
+
+my $bach = Music::BachChoralHarmony->new;
+my $songs = $bach->parse();
+
+my %score;
+for my $id ( keys %$songs ) {
+    my $sum = 0;
+
+    for my $event ( @{ $songs->{$id}{events} } ) {
+        $sum += count_ones( $event->{notes} );
+    }
+
+    $score{$id} = $sum;
+}
+
+use Chart::Points;
+my $chart = Chart::Points->new( 1000, 400 );
+
+$chart->set(
+    title         => 'Number of Notes by Chorale',
+    pt_size       => 10,
+    legend_labels => ['No.'],
+    x_label       => 'Chorale BWV',
+    y_label       => 'Number of notes',
+    x_ticks       => 'vertical',
+    precision     => 0,
+    grid_lines    => 1,
+    colors        => {
+        grid_lines => 'gray',
+    },
+);
+
+my @sorted = sort { $score{$a} <=> $score{$b} } keys %score;
+$chart->add_dataset( map { $songs->{$_}{bwv} } @sorted );
+$chart->add_dataset( map { $score{$_} } @sorted );
+
+$chart->png("$0.png");
+
+sub count_ones {
+    my ($bits) = @_;
+    $bits =~ tr/0//d;
+    return length $bits;
+}

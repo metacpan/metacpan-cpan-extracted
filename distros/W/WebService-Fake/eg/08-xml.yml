@@ -1,0 +1,8 @@
+defaults:
+  headers:
+    - Content-Type: text/xml
+  body_wrapper: |
+     <foo>[% content %]</foo>
+routes:
+  - path: '/:name'
+    body: '<bar>[% stash.name %]</bar>'

@@ -3,6 +3,8 @@ abstract: 'generate patterns of text'
 author:
   - 'Jeremy Mates <jmates@cpan.org>'
 build_requires:
+  Algorithm::Diff: '0'
+  Test::More: '0.88'
   Test::Most: '0'
   lib: '0'
 configure_requires:
@@ -26,11 +28,9 @@ requires:
   MooX::Rebuild: '0'
   Scalar::Util: '0'
   namespace::clean: '0'
+  perl: '5.024000'
   strict: '0'
-version: '0.42'
-x_homepageresources:
-  repository:
-    type: git
-    url: git://github.com/thrig/Game-TextPatterns.git
-    web: https://github.com/thrig/Game-TextPatterns
+resources:
+  repository: https://github.com/thrig/Game-TextPatterns
+version: '0.73'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

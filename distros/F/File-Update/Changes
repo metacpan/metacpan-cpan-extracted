@@ -1,5 +1,8 @@
 Revision history for File-Update
 
+0.0.3       2018-10-07
+    - Add a modify_on_change example.
+
 0.0.2       2018-06-18
     - Added some tests as t/test1.t .
 

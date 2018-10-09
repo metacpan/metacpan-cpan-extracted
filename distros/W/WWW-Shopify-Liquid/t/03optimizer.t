@@ -289,9 +289,7 @@ $ast = $parser->parse_tokens(@tokens);
 $ast = $optimizer->optimize({}, $ast);
 ok($ast);
 
-isa_ok($ast, 'WWW::Shopify::Liquid::Operator::Concatenate');
-is(int(@{$ast->{operands}}), 10);
-
+isa_ok($ast, 'WWW::Shopify::Liquid::Token::Text');
 is($renderer->render({ }, $ast), '1 2 3 4 5 6 7 8 9 10 ');
 
 
@@ -518,5 +516,17 @@ $ast = $optimizer->optimize({ }, $ast);
 
 isa_ok($ast, 'WWW::Shopify::Liquid::Token::Text');
 is($ast->{core}, 'ASD');
+
+@tokens = $lexer->parse_text("{% for a in (1..2) %}{% continue %}{{ a }}{% endfor %}2");
+$ast = $parser->parse_tokens(@tokens);
+$ast = $optimizer->optimize({ b => 0 }, $ast);
+
+
+
+@tokens = $lexer->parse_text("{% for a in (10..14) %}{{ forloop.index }}|{% endfor %}");
+$ast = $parser->parse_tokens(@tokens);
+$ast = $optimizer->optimize({ b => 0 }, $ast);
+is($ast->{core}, '1|2|3|4|5|');
+
 
 done_testing();

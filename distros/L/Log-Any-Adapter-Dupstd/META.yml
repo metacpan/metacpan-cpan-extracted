@@ -28,24 +28,25 @@ no_index:
 provides:
   Log::Any::Adapter::Duperr:
     file: lib/Log/Any/Adapter/Duperr.pm
-    version: '0.03'
+    version: '0.04'
   Log::Any::Adapter::Dupout:
     file: lib/Log/Any/Adapter/Dupout.pm
-    version: '0.03'
+    version: '0.04'
   Log::Any::Adapter::Dupstd:
     file: lib/Log/Any/Adapter/Dupstd.pm
-    version: '0.03'
+    version: '0.04'
 requires:
-  Log::Any: '0'
+  Log::Any: '1.032'
   perl: '5.008001'
   utf8::all: '0'
 resources:
   bugtracker: https://github.com/ivanych/Log-Any-Adapter-Dupstd/issues
   homepage: https://github.com/ivanych/Log-Any-Adapter-Dupstd
   repository: git://github.com/ivanych/Log-Any-Adapter-Dupstd.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:IVANYCH
 x_contributors:
   - 'Mikhail Ivanov <m.ivanov@i-free.com>'
   - 'Mikhail Ivanov <m.ivanych@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

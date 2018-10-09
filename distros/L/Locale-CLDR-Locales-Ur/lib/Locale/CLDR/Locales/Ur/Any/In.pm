@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ur::Any::In - Package for language Urdu
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ur::Any::In - Package for language Urdu
 
 package Locale::CLDR::Locales::Ur::Any::In;
 # This file auto generated from Data\common\main\ur_IN.xml
-#	on Sun  5 Aug  6:27:21 pm GMT
+#	on Sun  7 Oct 11:05:48 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -6,7 +6,7 @@
                                                                        
 
 
-This is the README for Net::IPv6Addr version 0.93.
+This is the README for Net::IPv6Addr version 0.96.
 
 Net::IPv6Addr is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -24,25 +24,64 @@ four sections:
 
 1. ABOUT
 
-Net::IPv6Addr - Check validity of IPv6 addresses
+Net::IPv6Addr - Check and manipulate IPv6 addresses
 
-"Net::IPv6Addr" checks strings for valid IPv6 addresses, as specified
-in "RFC1884", and converts addresses into various formats. It
-is able to process addresses formatted in the following styles;
+"Net::IPv6Addr" can check whether strings contain valid IPv6
+addresses, and convert them into various formats.
 
-preferred form: x:x:x:x:x:x:x:x
+All of "new", "is_ipv6", and "ipv6_parse" can
+process the following formats:
 
-zero-compressed form: the infamous double-colon.  
+Preferred form: x:x:x:x:x:x:x:x
 
-Too many pattern matches to describe in this margin.
+"2001:db8:0:0:0:ff00:42:8329"
 
-mixed IPv4/IPv6 format: x:x:x:x:x:x:d.d.d.d
+This is the form described as the "preferred form" in section 2.2 of
+"RFC1884" et al. Output with "to_string_preferred".
 
-mixed IPv4/IPv6 with compression: ::d.d.d.d or ::FFFF:d.d.d.d
+Compressed form with double colon: x::x etc.
 
-base-85-encoded: [0-9A-Za-z!#$%&()*+;<=>?@^_`{|}~-]{20}
+"2001:db8::ff00:42:8329"
 
-(This encoding was given in "RFC1924" as an April Fool's joke.)
+This is the "canonical text representation format" of "RFC5952".
+Output with "to_string_compressed".
+
+Mixed IPv4/IPv6 format: x:x:x:x:x:x:d.d.d.d
+
+"2001:db8:0:0:0:ff00:0.66.131.41"
+
+Output with "to_string_ipv4".
+
+Mixed IPv4/IPv6 with compression: x::x:d.d.d.d, etc.
+
+"2001:db8::ff00:0.66.131.41"
+
+Output with "to_string_ipv4_compressed".
+
+Base-85-encoded: [0-9A-Za-z!#$%&()*+;<=>?@^_`{|}~-]{20}
+
+"9R}vSQ9RqiCvG6zn?Zyh"
+
+This encoding was given in "RFC1924" as an April Fool's joke. Output
+with "to_string_base85".
+
+In addition, the following formats can be output:
+
+Big integers
+
+An IPv6 can be changed to a "Math::BigInt" object or a digit string
+using "to_bigint". Big integers can also be input with
+"from_bigint".
+
+Arrays
+
+An IPv6 can be processed into its component pieces with "to_array"
+or "to_intarray".
+
+Reverse-address pointer
+
+An IPv6 can be processed into its reverse-address pointer, as defined
+by "RFC1886", using "to_string_ip6_int".
 
 -----------------------------------------------------------------------------
 
@@ -74,11 +113,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Net::IPv6Addr
 
-To install the module from the source file, Net-IPv6Addr-0.93.tar.gz,
+To install the module from the source file, Net-IPv6Addr-0.96.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Net-IPv6Addr-0.93.tar.gz
-    cd Net-IPv6Addr-0.93
+    tar xfz Net-IPv6Addr-0.96.tar.gz
+    cd Net-IPv6Addr-0.96
     perl Makefile.PL
     make
     make install
@@ -103,6 +142,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Fri Oct  5 11:53:52 2018.
+This README was written on Sat Oct  6 15:06:09 2018.
 
 -----------------------------------------------------------------------------

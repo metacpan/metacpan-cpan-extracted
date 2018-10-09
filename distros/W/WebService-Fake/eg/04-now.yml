@@ -1,0 +1,6 @@
+#vim: ts=2 sw=2 expandtab
+routes:
+  - path: '/'
+    body: '{"now":"[%= scalar localtime %]"}'
+    headers:
+      - Server: 'WebService::Fake/0.001'

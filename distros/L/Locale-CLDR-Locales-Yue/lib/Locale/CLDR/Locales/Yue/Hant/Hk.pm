@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Yue::Hant::Hk - Package for language Cantonese
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Yue::Hant::Hk - Package for language Cantonese
 
 package Locale::CLDR::Locales::Yue::Hant::Hk;
 # This file auto generated from Data\common\main\yue_Hant_HK.xml
-#	on Sun  5 Aug  6:29:02 pm GMT
+#	on Sun  7 Oct 11:07:51 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

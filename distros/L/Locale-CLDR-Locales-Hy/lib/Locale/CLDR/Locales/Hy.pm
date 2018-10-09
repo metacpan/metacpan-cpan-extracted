@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Hy - Package for language Armenian
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Hy - Package for language Armenian
 
 package Locale::CLDR::Locales::Hy;
 # This file auto generated from Data\common\main\hy.xml
-#	on Sun  5 Aug  6:05:13 pm GMT
+#	on Sun  7 Oct 10:37:34 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4787,24 +4789,24 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 				}
@@ -4812,24 +4814,24 @@ has 'day_period_data' => (
 				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 0
-						&& $time < 600;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 600;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 				}
@@ -4851,67 +4853,67 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'narrow' => {
+					'noon' => q{կօ․},
+					'pm' => q{հ},
+					'midnight' => q{կգ․},
+					'afternoon1' => q{ցրկ},
+					'night1' => q{գշր},
+					'morning1' => q{առվ},
+					'evening1' => q{երկ},
+					'am' => q{ա},
+				},
 				'wide' => {
 					'midnight' => q{կեսգիշերին},
-					'pm' => q{ԿՀ},
-					'night1' => q{գիշերը},
-					'evening1' => q{երեկոյան},
 					'afternoon1' => q{ցերեկը},
-					'morning1' => q{առավոտյան},
-					'am' => q{ԿԱ},
+					'pm' => q{ԿՀ},
 					'noon' => q{կեսօրին},
-				},
-				'narrow' => {
-					'evening1' => q{երկ},
-					'afternoon1' => q{ցրկ},
-					'morning1' => q{առվ},
-					'am' => q{ա},
-					'noon' => q{կօ․},
-					'midnight' => q{կգ․},
-					'pm' => q{հ},
-					'night1' => q{գշր},
+					'am' => q{ԿԱ},
+					'evening1' => q{երեկոյան},
+					'morning1' => q{առավոտյան},
+					'night1' => q{գիշերը},
 				},
 				'abbreviated' => {
+					'pm' => q{ԿՀ},
+					'noon' => q{կեսօր},
+					'midnight' => q{կեսգիշեր},
+					'afternoon1' => q{ցերեկը},
+					'night1' => q{գիշերը},
+					'morning1' => q{առավոտյան},
 					'am' => q{ԿԱ},
 					'evening1' => q{երեկոյան},
-					'morning1' => q{առավոտյան},
-					'afternoon1' => q{ցերեկը},
-					'noon' => q{կեսօր},
-					'pm' => q{ԿՀ},
-					'midnight' => q{կեսգիշեր},
-					'night1' => q{գիշերը},
 				},
 			},
 			'stand-alone' => {
 				'narrow' => {
 					'am' => q{ԿԱ},
 					'evening1' => q{երեկո},
-					'afternoon1' => q{ցերեկ},
 					'morning1' => q{առավոտ},
-					'noon' => q{կեսօր},
-					'pm' => q{ԿՀ},
-					'midnight' => q{կեսգիշեր},
 					'night1' => q{գիշեր},
+					'afternoon1' => q{ցերեկ},
+					'midnight' => q{կեսգիշեր},
+					'pm' => q{ԿՀ},
+					'noon' => q{կեսօր},
 				},
 				'wide' => {
-					'pm' => q{ԿՀ},
 					'midnight' => q{կեսգիշեր},
-					'night1' => q{գիշեր},
-					'am' => q{ԿԱ},
 					'afternoon1' => q{ցերեկ},
+					'pm' => q{ԿՀ},
+					'noon' => q{կեսօր},
+					'am' => q{ԿԱ},
 					'evening1' => q{երեկո},
 					'morning1' => q{առավոտ},
-					'noon' => q{կեսօր},
+					'night1' => q{գիշեր},
 				},
 				'abbreviated' => {
-					'pm' => q{ԿՀ},
-					'midnight' => q{կեսգիշեր},
 					'night1' => q{գիշեր},
+					'morning1' => q{առավոտ},
 					'am' => q{ԿԱ},
 					'evening1' => q{երեկո},
-					'afternoon1' => q{ցերեկ},
-					'morning1' => q{առավոտ},
+					'pm' => q{ԿՀ},
 					'noon' => q{կեսօր},
+					'afternoon1' => q{ցերեկ},
+					'midnight' => q{կեսգիշեր},
 				},
 			},
 		},

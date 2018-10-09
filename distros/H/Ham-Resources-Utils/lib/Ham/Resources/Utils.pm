@@ -8,16 +8,16 @@ use warnings;
 
 =head1 NAME
 
-Ham::Resources::Utils - Calculation of distance and course beetwen two points 
+Ham::Resources::Utils - Calculation of distance and course beetwen two points
 on Earth (through coordinates or grid locator), and Sunrise, Sunset and Midday time for these locations (in UTC). Also sexagesimal degrees and decimal degrees convertion and grid location. For use mainly for Radio Amateurs.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my %coordinates = (
 		long_1 	=> "",
@@ -26,18 +26,20 @@ my %coordinates = (
 		lat_2 	=> "",
 );
 
+my $locator_precision = 8;
+
 my $self = {};
 
 =head1 SYNOPSIS
 
-This module calculates the distance and course between two points on the Earth. 
+This module calculates the distance and course between two points on the Earth.
 Also Sunrise, Sunset and Midday time for both locations.
 
 The data of the locations may be in terrestrial coordinates or through 'Maidenhead Locator System' (grid Locator) notacion.
 
-The module offer the possibility to access to some methods that uses it, for 
-example conversions between sexagesimal degrees into decimal degrees or 
-conversion between grid locator to sexagesimal degrees. 
+The module offer the possibility to access to some methods that uses it, for
+example conversions between sexagesimal degrees into decimal degrees or
+conversion between grid locator to sexagesimal degrees.
 
 Also access to convert decimal degrees to compass names, and more.
 
@@ -52,7 +54,7 @@ Also access to convert decimal degrees to compass names, and more.
 =head2 new
 
 This is the constructor.
-	
+
     my $foo = Ham::Resources::Utils->new();
 
 =cut
@@ -62,17 +64,17 @@ sub new { bless {}, shift }
 
 =head2 data_by_coordinates
 
-Gets a string with the date and a hash with the coordinates in sexagesimal 
-values from point A and point B and returns a hash with all previous 
-data and Distance, course and compass values and Sunrise, Sunset and Midday 
+Gets a string with the date and a hash with the coordinates in sexagesimal
+values from point A and point B and returns a hash with all previous
+data and Distance, course and compass values and Sunrise, Sunset and Midday
 times for both locations if needed.
 
     my $date = "14-03-2012";
-    my %coordinates = ( lat_1 => "41N23", 
-    			long_1 => "2E11", 
-    			lat_2 => "30S0", 
+    my %coordinates = ( lat_1 => "41N23",
+    			long_1 => "2E11",
+    			lat_2 => "30S0",
     			long_2 => "10W45");
-   
+
     my %data = $foo->data_by_coordinates{$date, %coordinates};
     print Dumper(%data);
 
@@ -106,7 +108,7 @@ An output example:
     sunset_arrive: 17h 58m          # Sun set time on point B (destination) in UTC
     sunset_departure: 17h 58m       # Sun set time on point A (origin) in UTC
 
- 
+
 =cut
 
 sub data_by_coordinates {
@@ -118,14 +120,14 @@ sub data_by_coordinates {
 
 =head2 data_by_locator
 
-Gets a string with the date and a string with the locator of point 'A' and an 
-string with a locator for point 'B'. Returns a hash with the data shown it in the 
+Gets a string with the date and a string with the locator of point 'A' and an
+string with a locator for point 'B'. Returns a hash with the data shown it in the
 previous method.
 
    my $date = "14-03-2012"; # date in 'dd-mm-yyyy' format
    my $locator_dep = "JN11cj";
    my $locator_arr = "IJ90ca";
-   
+
    my %data = $foo->data_by_locator($date,$locator_dep,$locator_arr);
    print Dumper(%data);
 
@@ -138,7 +140,7 @@ sub data_by_locator {
 	my ($lat_dep, $long_dep, $lat_arr, $long_arr) = undef;
 	($lat_dep, $long_dep) = loc2degree($self,$locator_dep) if ($locator_dep);
 	($lat_arr, $long_arr) = loc2degree($self,$locator_arr) if ($locator_arr);
-	
+
 	$lat_dep =~ s/\./N/ if ($lat_dep !~ /^\s\d+/);
 	$lat_dep =~ s/\./S/ if ($lat_dep =~ /^\s\d+/);
 	$lat_arr =~ s/\./N/ if ($lat_arr !~ /^\s\d+/);
@@ -155,7 +157,7 @@ sub data_by_locator {
 			long_2	=> $long_arr,
 			lat_2	=> $lat_arr,
 	);
-	
+
 	my %data = data_constructor($self, $date, %coordinates);
 }
 
@@ -174,11 +176,11 @@ sub data_constructor {
 	$km = sprintf("%.2f",$km);
 	my $mi = $km / 1.609344; # miles conversion
 	$mi = sprintf("%.2f",$mi);
-	my $rad = great_circle_direction(@DEPARTURE, @ARRIVE); 
+	my $rad = great_circle_direction(@DEPARTURE, @ARRIVE);
 	my $sexag = dec2sexag($self, rad2deg($rad));
 	my $rad_round = sprintf("%.2f",(rad2deg($rad)));
 	my $compass = compass($self, rad2deg($rad));
-	
+
 	my $locator_dep = degree2loc($self, $coord{lat_1}, $coord{long_1});
 	my $locator_arr = degree2loc($self, $coord{lat_2}, $coord{long_2});
 
@@ -198,28 +200,29 @@ sub data_constructor {
 					%sun_departure, %sun_arrive
 	);
 	if ($error) { return my %error = (_error => $error); }
-	
-	return %coord;	
+
+	return %coord;
 }
 
 =head2 loc2degree
 
-Gets a string with grid locator value and returns an array with the latitude and 
-longitude in sexagesimal degrees form.
+Gets a string with grid locator value and returns an array with the latitude and
+longitude in sexagesimal degrees form. Grid precision only 6 digit.
 
 =cut
 
 sub loc2degree {
 	my ($self,$loc) = @_;
 	my $grid = new Ham::Locator;
-	my $set_loc = $grid->set_loc($loc);
+	$grid->set_precision($locator_precision);
+	$loc = substr($loc, 0, 6) if (length($loc) > 6);
 
+	$grid->set_loc($loc);
 	my ($latitude, $longitude) = $grid->loc2latlng;
-
 	my $lat_sexag = dec2sexag($self, $latitude);
 	my $long_sexag = dec2sexag($self, $longitude);
 
-	$lat_sexag =~ tr/-/ / if($latitude < 0);	
+	$lat_sexag =~ tr/-/ / if($latitude < 0);
 	$long_sexag =~ tr/S/W/ if($longitude < 0);
 	$long_sexag =~ tr/N/E/ if($longitude > 0);
 	$long_sexag =~ tr/-/ / if($longitude < 0);
@@ -229,8 +232,9 @@ sub loc2degree {
 
 =head2 degree2loc
 
-Gets a string with the latitude and a string with the longitude, in sexagesimal 
+Gets a string with the latitude and a string with the longitude, in sexagesimal
 notation, of a point on Earth and returns a string with the grid locator notation.
+Grid precision now is 8 digit.
 
     my $lat = "41N23";
     my $long = "2E11";
@@ -240,24 +244,24 @@ notation, of a point on Earth and returns a string with the grid locator notatio
 
 sub degree2loc {
 	my ($self, $lat, $long) = @_;
-	my %deg_coord = ( 
-		lat_1  => $lat, 
-		long_1 => $long 
+	my %deg_coord = (
+		lat_1  => $lat,
+		long_1 => $long
 	);
 	my %dec_coord = sexag2dec($self, %deg_coord);
 	my %check = check_error(%dec_coord);
 	if ($check{_error}) { return "Error to convert degrees to locator."; }
 
 	my $m = new Ham::Locator;
-	$m->set_precision(6);
+	$m->set_precision($locator_precision);
 	$m->set_latlng($dec_coord{lat_1_dec}, $dec_coord{long_1_dec});
 	my $loc = $m->latlng2loc;
 }
 
 =head2 compass
 
-Gets an integer with a decimal degree and returns a string with its 
-equivalent value in a compass (North, East, ...). It uses a separation of 11.25 
+Gets an integer with a decimal degree and returns a string with its
+equivalent value in a compass (North, East, ...). It uses a separation of 11.25
 degrees for each position, 32 cardinal positions of total.
 Values range must be between 0 to 360 degrees.
 
@@ -271,13 +275,13 @@ sub compass {
 	my $course = shift;
 	my $pattern = qr/(\+?)(-?)\d{1,3}(\.?)(\d*)$/;
 	my $error_msg = "Error value must be a integer between 0 to 360";
-	
+
 	if ($course !~ $pattern) {
 		return $error_msg;
 	} else {
 		if ($course < -360 or $course > 360) { return $error_msg; }
 		my @rosa = ('NbE','NNE','NEbN','NE','NEbE','ENE','EbN','E','EbS','ESE','SEbE','SE','SEbS','SSE','SbE','S','SbW','SSW','SWbS','SW','SWbW','WSW','WbS','W','WbN','WNW','NWbW','NW','NWbN','NNW','NbW','N');
-			
+
 		my $rosa_index = int((+$course / 11.25))-1;
 		return $rosa[$rosa_index];
 	}
@@ -285,30 +289,30 @@ sub compass {
 
 =head2 dec2sexag
 
-Gets an integer with a decimal degree value and returns a string  with its 
+Gets an integer with a decimal degree value and returns a string  with its
 equivalence to sexagesimal degree form. Only returns degrees and minutes.
 
 =cut
 
 sub  dec2sexag{
 	my ($self, $course) = @_;
-	my @degree_part = split(/\./, $course);	
+	my @degree_part = split(/\./, $course);
 	my $decimal = (('0.'.$degree_part[1]) * 60);
-	my $min = int((sprintf("%.2f",$decimal)));	
+	my $min = int((sprintf("%.2f",$decimal)));
 	my $sexag = $degree_part[0].".".$min;
 }
 
 =head2 sexag2dec
 
-Gets a hash with sexagesimal value (maximun four) and returns a hash with its 
+Gets a hash with sexagesimal value (maximun four) and returns a hash with its
 decimal values.
 
 Range of values are -90 to 90 for latitudes, and -180 to 180 for longitudes.
 
-Values must be a pair, longitude and latitude. Two values for one point or 
+Values must be a pair, longitude and latitude. Two values for one point or
 four values (two pairs) for two points.
 
-There is not mandatory send a complete hash (4 values), but you will receive a 
+There is not mandatory send a complete hash (4 values), but you will receive a
 hash with the four.
 
 You can use it like this:
@@ -322,15 +326,15 @@ You can use it like this:
       say $key." = ".$sexag{$key} if ($sexag{$key});
     }
 
-The index send it, you will receive with '_dec' suffix, ie, you send 
+The index send it, you will receive with '_dec' suffix, ie, you send
 'latitude' and receive 'latitude_dec'
 
 =cut
 
-sub sexag2dec {	
+sub sexag2dec {
 	my $self = shift;
    my %coord = @_;
-   
+
    my $error_msg_1 = "Error sexagesimal conversion. Out of range. (-90 to 90)";
    my $error_msg_2 = "Error sexagesimal conversion. Out of range. (-180 to 180)";
 
@@ -340,7 +344,7 @@ sub sexag2dec {
 			lat_2_dec		=> '',
 			long_1_dec		=> '',
 			long_2_dec		=> '',
-	);   
+	);
 	my $secs = undef;
    foreach my $key (sort keys %coord) {
 		if ($4) {$secs = $4/3600;} else {$secs = 0}
@@ -361,18 +365,18 @@ sub sexag2dec {
 
 =head2 cicle_sun
 
-Gets three strings with latitude, longitude, in decimal degrees, and date, in 
-'dd-mm-yyyy' format and returns a hash with Sunrise time, Sunset time and 
+Gets three strings with latitude, longitude, in decimal degrees, and date, in
+'dd-mm-yyyy' format and returns a hash with Sunrise time, Sunset time and
 Midday time in hours and minutes format in Universal Time (UTC).
 
     my %sun = $foo->cicle_sun($lat,$long,$date);
-    
+
 =cut
 
 sub cicle_sun {
 	my $self = shift;
 	my ($Lat, $Long, $date, $origin_point) = @_;
-	
+
 	$origin_point = "" if (!$origin_point);
 	$date = "00-00-0000" if ($date =~ /Error/);
 	$Lat = 0 if ($Lat =~ /Error/);
@@ -392,7 +396,7 @@ sub cicle_sun {
 	# Julian data
 	my $GGG = 1;
 	my $S = 1;
-	
+
 	if ($year <= 1585) { $GGG = 0; }
 	my $JD = -1 * int(7 * (int(($month + 9) / 12 ) + $year) / 4);
 	if (($month - 9) < 0) { $S = -1; }
@@ -423,7 +427,7 @@ sub cicle_sun {
 	}
 	my $L = $P + $V;
 	$L = $L - 2 * pi * int($L / (2 * pi));
-	
+
 	#AR and DEC calculus
 	my $Z = ($J2 - 2415020.5) / 365.2422;
 	my $OB = 23.452294 - (0.46845 * $Z + 0.00000059 * $Z * $Z) / 3600;
@@ -586,23 +590,23 @@ Internal function to check if a date is valid.
 
 =cut
 
-sub NESW { 
-	deg2rad($_[0]), deg2rad(90 - $_[1]) 
+sub NESW {
+	deg2rad($_[0]), deg2rad(90 - $_[1])
 }
 
 sub is_date {
 	my $date = shift;
 	my $pattern = qr/\d{1,2}(-)\d{1,2}(-)\d{4}/;
-	
+
 	if ($date !~ $pattern) {
 		return "Error date format. Must be dd-mm-yyyy";
 	} else {
 		my @part_of_date = split(/-/,$date);
-		
+
 		my $intDay = ($part_of_date[0] <= 9) ? sprintf("%02d", $part_of_date[0]) : sprintf("%2d", $part_of_date[0]);
 		my $intMonth = ($part_of_date[1] <= 9) ? sprintf("%02d", $part_of_date[1]) : sprintf("%2d", $part_of_date[1]);
 		my $intYear = $part_of_date[2];
-		
+
 		my %array_month = (
 			'01' => 31,
 			'02' => 0,
@@ -627,7 +631,7 @@ sub is_date {
 		if ($intMonth == 0) {
 			if ($intDay > 0 && $intDay < 29) {
 				return 1;
-			} 
+			}
 			elsif ($intDay == 29) {
 				if (($intYear % 4 == 0) && ($intYear % 100 != 0) || ($intYear % 400) == 0) {
 					return 1;
@@ -668,7 +672,7 @@ In complex functions, like data_by_coordinates, that responses with a hash, you 
 ... or something like this :p
 
 =cut
- 
+
 
 =head1 AUTHOR
 
@@ -725,7 +729,7 @@ L<http://search.cpan.org/dist/Ham-Resources-Utils/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2016 CJUAN.
+Copyright 2012-2018 CJUAN.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

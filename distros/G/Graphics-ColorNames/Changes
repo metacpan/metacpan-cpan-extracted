@@ -1,5 +1,9 @@
 Revision history for Graphics-ColorNames:
 
+v3.2.1    2018-10-06 10:59:36+01:00 Europe/London
+  [Bug Fixes]
+  - Fix VERSION, RT 127301.
+
 v3.2.0    2018-10-04 00:35:01+01:00 Europe/London
   [Bug Fixes]
   - Pass through RGB hexidecimals prefixed by "0x", as claimed

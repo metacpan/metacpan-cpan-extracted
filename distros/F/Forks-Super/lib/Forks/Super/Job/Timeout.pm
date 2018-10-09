@@ -18,7 +18,7 @@ use warnings;
 use constant FOREVER => 9E9;
 use constant LONG_TIME => 9E8;
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 our $MAIN_PID = $$;
 our $DISABLE_INT = 0;
@@ -358,3 +358,19 @@ sub _time_from_natural_language {
 }
 
 1;
+
+=head1 NAME
+
+Forks::Super::Job::Timeout - routines to manage background jobs with an
+expiration time
+
+=head1 DESCRIPTION
+
+The C<Forks::Super::Job::Timeout> package implements the
+L<timeout|Forks::Super/"delay"> and L<expiration|Forks::Super/"expire">
+options of the L<Forks::Super::fork|Forks::Super/"fork"> function.
+
+Most L<Forks::Super|Forks::Super> users will not have any reason
+to use the subroutines and variables in this package directly.
+
+=cut

@@ -9,3 +9,8 @@ requires 'Template::Perlish', '1.52';
 on test => sub {
    requires 'Test::More', '0.88';
 };
+
+on develop => sub {
+   requires 'Test::Pod';
+   requires 'Test::Pod::Coverage', '1.04';
+};

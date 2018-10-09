@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -32,6 +32,7 @@ shopify-liquid-verify.pl [files]
 	
 	--verbose	Displays extra info.
 	--quiet		Suppress everything except errors.
+	--strict-filters Errors on any unrecognized filter.
 	
 	--help		Displays this messaqge.
 	--fullhelp	Displays the full pod doc.
@@ -77,6 +78,7 @@ GetOptions(
 	'base=s' => \my @bases,
 	'class=s' => \my $class,
 	'verbose' => \my $verbose,
+	'strict-filters' => \my $strict_filters,
 	'quiet' => \my $quiet,
 	'<>' => sub { push(@ARGS, $_[0]); }
 );
@@ -108,6 +110,7 @@ eval {
 	$class = 'WWW::Shopify::Liquid' if !$class;
 	print "Using liquid class $class.\n" if $verbose;
 	my $liquid = $class->new;
+	$liquid->parser->accept_unknown_filters(1) if !$strict_filters;
 	for my $potential (@ARGS) {
 		die "File $potential doesn't exist." unless -e $potential;
 		my @files;

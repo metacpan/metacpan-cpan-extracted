@@ -8,10 +8,8 @@ use Cwd qw/cwd/;
 use JSON::PP qw//;
 use File::Spec qw//;
 use File::Path qw//;
-use File::Temp qw/tempdir tempfile/;
 use CPAN::Meta qw//;
 use CPAN::Meta::Prereqs qw//;
-use File::Fetch qw//;
 use Module::CoreList;
 use ExtUtils::MakeMaker qw//;
 use App::MechaCPAN qw/:go/;
@@ -696,15 +694,8 @@ sub _search_metacpan
     $dnld .= '?version=' . _escape($constraint);
   }
 
-  local $File::Fetch::WARN;
-  my $ff = File::Fetch->new( uri => $dnld );
-  $ff->scheme('http')
-    if $ff->scheme eq 'https';
   my $json_info = '';
-  my $where = $ff->fetch( to => \$json_info );
-
-  croak "Could not find module $src on metacpan"
-    if !defined $where;
+  fetch_file( $dnld => \$json_info );
 
   my $result = JSON::PP::decode_json($json_info);
   $seen{$src}->{$constraint} = $result;
@@ -736,13 +727,11 @@ sub _get_targz
       unless has_git;
 
     my ( $git_url, $commit ) = $src =~ git_extract_re;
+    my ($descr) = $git_url =~ m{ ([^/]*) $}xms;
 
-    my $dir
-      = tempdir( TEMPLATE => File::Spec->tmpdir . '/mechacpan_XXXXXXXX' );
-    my ( $fh, $file ) = tempfile(
-      TEMPLATE => File::Spec->tmpdir . '/mechacpan_tar.gz_XXXXXXXX',
-      CLEANUP  => 1
-    );
+    my $dir  = humane_tmpdir($descr);
+    my $fh   = humane_tmpfile($descr);
+    my $file = $fh->filename;
 
     run( 'git', 'clone', '--bare', $git_url, $dir );
     run(
@@ -750,7 +739,7 @@ sub _get_targz
       $commit || 'master'
     );
     close $fh;
-    return $file;
+    return $fh;
   }
 
   # URL
@@ -798,17 +787,7 @@ sub _get_targz
       $target->{distvname} = $package;
     }
 
-    local $File::Fetch::WARN;
-    my $ff = File::Fetch->new( uri => $url );
-    my $dest_dir = dest_dir() . "/pkgs";
-
-    $ff->scheme('http')
-      if $ff->scheme eq 'https';
-    my $where = $ff->fetch( to => $dest_dir );
-    croak $ff->error || "Could not download $url"
-      if !defined $where;
-
-    return $where;
+    return fetch_file($url);
   }
 
   croak "Cannot find $src\n";

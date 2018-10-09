@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ca::Any::Es - Package for language Catalan
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ca::Any::Es - Package for language Catalan
 
 package Locale::CLDR::Locales::Ca::Any::Es;
 # This file auto generated from Data\common\main\ca_ES.xml
-#	on Sun  5 Aug  5:54:35 pm GMT
+#	on Sun  7 Oct 10:24:32 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

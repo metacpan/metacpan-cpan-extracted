@@ -360,7 +360,7 @@ is(int(@{$ast->{operands}}), 2);
 is(int(grep { defined $_ } @{$ast->{operands}}), 2);
 
 ($text, $hash) = $liquid->render_text({ order => { } }, "{{ order.metafields.size }}");
-is($text, undef);
+is($text, '');
 
 @tokens = $liquid->lexer->parse_text("{{ 'a{{ item }}b{{ item }}c' | split: '\{\{ item }}' | last }}");
 is(int(@tokens), 1);

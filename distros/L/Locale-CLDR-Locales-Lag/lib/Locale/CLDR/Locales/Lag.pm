@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Lag - Package for language Langi
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Lag - Package for language Langi
 
 package Locale::CLDR::Locales::Lag;
 # This file auto generated from Data\common\main\lag.xml
-#	on Sun  5 Aug  6:09:39 pm GMT
+#	on Sun  7 Oct 10:43:36 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -818,12 +820,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{MUU},
 					'am' => q{TOO},
+					'pm' => q{MUU},
 				},
 				'wide' => {
-					'pm' => q{MUU},
 					'am' => q{TOO},
+					'pm' => q{MUU},
 				},
 			},
 		},

@@ -1,6 +1,6 @@
 package Tapper::Cmd::Cobbler;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Cobbler::VERSION = '5.0.9';
+$Tapper::Cmd::Cobbler::VERSION = '5.0.10';
 use warnings;
 use strict;
 

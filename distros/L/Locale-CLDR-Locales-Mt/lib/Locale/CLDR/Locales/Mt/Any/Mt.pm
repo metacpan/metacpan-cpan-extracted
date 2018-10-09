@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Mt::Any::Mt - Package for language Maltese
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Mt::Any::Mt - Package for language Maltese
 
 package Locale::CLDR::Locales::Mt::Any::Mt;
 # This file auto generated from Data\common\main\mt_MT.xml
-#	on Sun  5 Aug  6:12:51 pm GMT
+#	on Sun  7 Oct 10:47:52 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

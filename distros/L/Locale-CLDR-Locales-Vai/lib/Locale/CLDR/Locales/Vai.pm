@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Vai - Package for language Vai
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Vai - Package for language Vai
 
 package Locale::CLDR::Locales::Vai;
 # This file auto generated from Data\common\main\vai.xml
-#	on Sun  5 Aug  6:27:42 pm GMT
+#	on Sun  7 Oct 11:06:11 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

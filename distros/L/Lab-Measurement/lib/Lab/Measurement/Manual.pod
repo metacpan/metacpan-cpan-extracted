@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.661
+version 3.662
 
 =head1 OVERVIEW
 
@@ -67,6 +67,8 @@ instruments and the high-level Lab::XPRESS interface
 =item * L<Lab::Moose::DataFile>
 
 =item * L<Lab::Moose::DataFile::Gnuplot>
+
+=item * L<Lab::Moose::DataFile::Gnuplot::Compressed>
 
 =item * L<Lab::Moose::DataFile::Meta>
 

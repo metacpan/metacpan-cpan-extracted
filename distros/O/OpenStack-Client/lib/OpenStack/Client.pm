@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 cPanel, Inc.
+# Copyright (c) 2018 cPanel, Inc.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -17,7 +17,7 @@ use LWP::UserAgent ();
 use JSON        ();
 use URI::Encode ();
 
-our $VERSION = '1.0003';
+our $VERSION = '1.0004';
 
 =encoding utf8
 
@@ -169,40 +169,28 @@ sub uri ($$) {
 
 =over
 
-=item C<$client-E<gt>call(I<$method>, I<$path>, I<$body>)>
+=item C<$client-E<gt>call(I<$args>)>
 
-Perform a call to the service endpoint using the HTTP method I<$method>,
-accessing the resource I<$path> (relative to the absolute endpoint URI), passing
-an arbitrary value in I<$body> that is to be encoded to JSON as a request
-body.  This method may return the following:
+Perform a call to the service endpoint using named arguments in the hash.  The
+following arguments are required:
 
 =over
 
-=item * For B<application/json>: A decoded JSON object
+=item C<method> - Request method
 
-=item * For other response types: The unmodified response body
+=item C<path> - Resource path
 
 =back
 
-I<$body> may be supplied as a C<CODE> reference which, when called, will return
-a chunk of data to be supplied to the API endpoint.  The stream is ended when
-the supplied subroutine returns an empty string or undef.
+The following arguments are optional:
 
-=item C<$client-E<gt>call(I<$method>, I<$headers>, I<$path>, I<$body>)>
+=over
 
-There exists a second form of C<call> that allows one to pass in
-I<$headers> as an optional input parameter (hash reference), which
-allows one to directly modify the following headers sent along with
-the request; when used, I<$headers> must be placed in the second
-position after I<$method>.
+=item C<headers> - Request headers
 
-Headers are case I<insensitive>, and if one sets duplicate headers, one of
-them will get set; but there are no guarantess which one will. Repeat
-headers at your own risk.
-
-I<$body> may be supplied as a C<CODE> reference which, when called, will return
-a chunk of data to be supplied to the API endpoint.  The stream is ended when
-the supplied subroutine returns an empty string or undef.
+Headers are case I<insensitive>; if duplicate header values are declared under
+different cases, it is undefined which headers shall take precedence.  The
+following headers are sent by default:
 
 =over
 
@@ -221,53 +209,114 @@ expect a different type; the the case of an image update, the expected
 type is C<application/openstack-images-v2.1-json-patch> or some version
 thereof.
 
-For example, the following shows how one may update image metadata using
-the PATCH method supported by version 2 of the Image API. 
-
-In the example below, C<@image_updates> is an array of hash references of the
-structure defined by the PATCH RFC (6902) governing "JavaScript Object
-Notation (JSON) Patch"; i.e., operations consisting of C<add>, C<replace>,
-or C<delete>.
-
-    my $headers  = {
-        'Content-Type' => 'application/openstack-images-v2.1-json-patch'
-    };
-
-    my $response = $glance->call('PATCH', $headers,
-        qq[/v2/images/$image->{id}], \@image_updates
-    );
-
 =back
 
 Except for C<X-Auth-Token>, any additional token will be added to the request.
+
+=item C<body> - Request body
+
+This may be a scalar reference to a data structure to be encoded to JSON, or a
+CODE reference to a subroutine which, when called, will return a chunk of data
+to be supplied to the API endpoint; the stream is ended when the supplied
+subroutine returns an empty string or undef.
+
+=item C<handler> - Response body handler function
+
+When specified, this function will be called with two arguments; the first
+argument is a scalar value containing a chunk of data in the response body, and
+the second is a scalar reference to a L<HTTP::Response> object representing the
+current response.  This is useful for retrieving very large resources without
+having to store the entire response body in memory at once for parsing.
+
+=back
+
+All forms of this method may return the following:
+
+=over
+
+=item * For B<application/json>: A decoded JSON object
+
+=item * For other response types: The unmodified response body
+
+=back
 
 In exceptional conditions (such as when the service returns a 4xx or 5xx HTTP
 response), the client will die with the raw text response from the HTTP
 service, indicating the nature of the service-side failure to service the
 current call.
 
+=item C<$client-E<gt>call(I<$method>, I<$path>, I<$body>)>
+
+Perform a call to the service endpoint using the HTTP method I<$method>,
+accessing the resource I<$path> (relative to the absolute endpoint URI),
+passing an arbitrary value in I<$body>.
+
+=item C<$client-E<gt>call(I<$method>, I<$headers>, I<$path>, I<$body>)>
+
+Perform a call to the service endpoint using the HTTP method I<$method>,
+accessing the resource I<$path> (relative to the absolute endpoint URI),
+specifying the headers in I<$headers>, passing an arbitrary value in I<$body>.
+
+=back
+
+=head1 EXAMPLES
+
+The following shows how one may update image metadata using the PATCH method
+supported by version 2 of the Image API.  C<@image_updates> is an array of hash
+references of the structure defined by the PATCH RFC (6902) governing
+"JavaScript Object Notation (JSON) Patch"; i.e., operations consisting of
+C<add>, C<replace>, or C<delete>.
+
+    my $headers = {
+        'Content-Type' => 'application/openstack-images-v2.1-json-patch'
+    };
+
+    my $response = $glance->call({
+        'method'  => 'PATCH',
+        'headers' => $headers,
+        'path'    => qq[/v2/images/$image->{id}],
+        'body'    => \@image_updates
+    );
+
 =cut
 
 sub call {
     my $self = shift;
 
-    my ($method, $path, $body);
-    my $headers = {};
-
-    # if 4 arguments, $headers is in the second position after $method
     if (scalar @_ == 4) {
-      ($method, $headers, $path, $body) = @_;
+        return $self->call({
+            'method'  => $_[0],
+            'headers' => $_[1],
+            'path'    => $_[2],
+            'body'    => $_[3]
+        });
+    } elsif (scalar @_ == 3) {
+        return $self->call({
+            'method'  => $_[0],
+            'headers' => {},
+            'path'    => $_[1],
+            'body'    => $_[2],
+        });
+    } elsif (scalar @_ == 2) {
+        return $self->call({
+            'method'  => $_[0],
+            'headers' => {},
+            'path'    => $_[1],
+            'body'    => undef
+        });
+    } elsif (scalar @_ != 1) {
+        die "Invalid number of arguments: @_";
     }
-    # original case, do not check @_ count
-    else {
-      ($method, $path, $body) = @_;
-    }
+
+    my ($args) = @_;
+
+    $args->{'headers'} ||= {};
 
     my $request = $self->{'package_request'}->new(
-        $method => $self->uri($path)
+        $args->{'method'} => $self->uri($args->{'path'})
     );
 
-    my @headers = $self->_get_headers_list($headers);
+    my @headers = $self->_get_headers_list($args->{'headers'});
 
     my $count = scalar @headers;
 
@@ -278,24 +327,25 @@ sub call {
         $request->header($name => $value);
     }
 
-    if (defined $body) {
+    if (defined $args->{'body'}) {
         #
         # Allow the request body to be supplied by a subroutine reference
         # which, when called, will supply a chunk of data returned as per the
         # behavior of LWP::UserAgent.  This is useful for uploading arbitrary
         # amounts of data in a request body.
         #
-        if (ref($body) =~ /CODE/) {
-            $request->content($body);
+        if (ref($args->{'body'}) =~ /CODE/) {
+            $request->content($args->{'body'});
         } else {
-            $request->content(JSON::encode_json($body));
+            $request->content(JSON::encode_json($args->{'body'}));
         }
     }
 
-    my $response = $self->{'ua'}->request($request);
+    my $response = $self->{'ua'}->request($request,
+        defined $args->{'handler'}? $args->{'handler'}: ());
 
-    my $type     = $response->header('Content-Type');
-    my $content  = $response->decoded_content;
+    my $type    = $response->header('Content-Type');
+    my $content = $response->decoded_content;
 
     if ($response->code =~ /^[45]\d{2}$/) {
         $content ||= "@{[$response->code]} Unknown error";
@@ -303,11 +353,13 @@ sub call {
         die $content;
     }
 
-    if (lc($type) =~ qr{^application/json}i && defined $content && length $content) {
-        return JSON::decode_json($content);
-    } else {
-        return $content;
+    if (defined $content && length $content) {
+        if (lc($type) =~ qr{^application/json}i) {
+            return JSON::decode_json($content);
+        }
     }
+
+    return $content;
 }
 
 sub _lc_merge {
@@ -358,8 +410,6 @@ sub _get_headers_list {
 
     return %new_headers;
 }
-
-=back
 
 =head1 FETCHING REMOTE RESOURCES
 

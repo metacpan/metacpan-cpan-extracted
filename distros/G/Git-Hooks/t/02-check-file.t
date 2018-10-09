@@ -153,7 +153,7 @@ $repo->run(qw/config githooks.checkfile.path.allow txt/);
 
 check_can_commit('allow path', 'file.txt');
 
-$repo->run(qw/config --remove-section githooks.checkfile/);
+$repo->run(qw/config --remove-section githooks.checkfile.path/);
 
 sub filesystem_is_case_sentitive {
     # Check using the technique described in
@@ -179,12 +179,12 @@ SKIP: {
                         'File.Txt');
 
     $repo->run(qw/reset --hard/);
+
+    $repo->run(qw/config --remove-section githooks.checkfile/);
 }
 
 SKIP: {
     test_requires_git skip => 1, version_ge => '1.7.4';
-
-    $repo->run(qw/config --remove-section githooks.checkfile/);
 
     $repo->run(qw/config githooks.checkfile.deny-token FIXME/);
 
@@ -196,9 +196,9 @@ SKIP: {
                     );
 
     $repo->run(qw/reset --hard/);
-}
 
-$repo->run(qw/config --remove-section githooks.checkfile/);
+    $repo->run(qw/config --remove-section githooks.checkfile/);
+}
 
 $repo->run(qw/config githooks.checkfile.executable *.sh/);
 
@@ -273,7 +273,7 @@ check_cannot_push('big file', qr/the current limit is/, 'file.txt', 'truncate', 
 $clone->run(qw/config --remove-section githooks.checkfile/);
 
 SKIP: {
-    skip "Non-Windows checks", 2 if $^O eq 'MSWin32';
+    skip "Case-sensitive filesystem checks", 2 if $^O =~ /MSWin32|darwin/;
 
     check_can_push('Allow push case conflict by default', 'FILE2.TXT');
 
@@ -282,12 +282,12 @@ SKIP: {
     check_cannot_push('Deny push case conflict',
                       qr/adds a file with a name that will conflict/,
                       'File2.Txt');
+
+    $clone->run(qw/config --remove-section githooks.checkfile/);
 }
 
 SKIP: {
     test_requires_git skip => 1, version_ge => '1.7.4';
-
-    $clone->run(qw/config --remove-section githooks.checkfile/);
 
     $clone->run(qw/config githooks.checkfile.deny-token FIXME/);
 
@@ -297,4 +297,6 @@ SKIP: {
                       undef,
                       "FIXME: something\n",
                   );
+
+    $clone->run(qw/config --remove-section githooks.checkfile/);
 }

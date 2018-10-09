@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Luo::Any::Ke - Package for language Luo
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Luo::Any::Ke - Package for language Luo
 
 package Locale::CLDR::Locales::Luo::Any::Ke;
 # This file auto generated from Data\common\main\luo_KE.xml
-#	on Sun  5 Aug  6:10:46 pm GMT
+#	on Sun  7 Oct 10:45:05 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

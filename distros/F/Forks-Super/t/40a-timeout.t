@@ -4,14 +4,17 @@ use Carp;
 use strict;
 use warnings;
 
-#########################################################
-# if this test fails, and particularly if it hangs,
-# then your system may benefit from using the
-# "poor man's alarm". Set $PREFER_ALTERNATE_ALARM = 1
-# in lib/Forks/Super/SysInfo.pm or run Makefile.PL
-# with the environment variable "PREFER_ALT_ALARM" set
-# to a true value.
-#########################################################
+############################################################
+# IF THIS TEST FAILS (AND PARTICULARLY IF IT HANGS):
+# your system may benefit from using the "poor man's alarm".
+# Try setting  $PREFER_ALTERNATE_ALARM = 1
+# in  lib/Forks/Super/SysInfo.pm  or run  Makefile.PL
+# with the environment variable "PREFER_ALT_ALARM" set to
+# a true value.
+# Also try running the script  spike-pma.pl  in this
+# distribution and report the results (output and exit
+# status) to  mob@cpan.org
+#############################################################
 
 
 if ($^O eq 'MSWin32') {

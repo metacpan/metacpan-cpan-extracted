@@ -1,9 +1,31 @@
 ==================================================
-Changes from 2017-07-29 00:00:00 +0000 to present.
+Changes from 2017-10-07 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.021 at 2018-07-29 11:39:05 +0000
+version 0.022 at 2018-10-07 08:51:25 +0000
+------------------------------------------
+
+  Change: 04a00561fecdf2b3d7aae093a0cf1d459ec6635e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-10-07 10:50:36 +0000
+
+    Point at newest raylib for macOS fixes
+
+    fixes issues with viewport size on Retina displays and for missing
+    initial render on macOS Mojave. 
+
+  Change: 7eac3ad4afd5a0c8028a1d9caff64652b0e3c85e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-10-07 10:50:36 +0000
+
+    Don't build universal binaries on macOS Mojave and higher
+
+    32-bit libraries are no longer included by default and would fail the
+    build. 
+
+------------------------------------------
+version 0.021 at 2018-07-29 11:38:58 +0000
 ------------------------------------------
 
   Change: 516f486f19376fe306ce11c784b95ecb3dfba4a1
@@ -214,16 +236,6 @@ version 0.004 at 2017-10-07 18:38:07 +0000
 
     s/http/https/ in download url 
 
-------------------------------------------
-version 0.003 at 2017-10-04 13:04:49 +0000
-------------------------------------------
-
-  Change: 3985aebb058b464f1af15ab8694f0916236591c2
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-10-04 15:04:49 +0000
-
-    Migrate to Alien::Build 
-
 ================================================
-Plus 2 releases after 2017-07-29 00:00:00 +0000.
+Plus 3 releases after 2017-10-07 00:00:00 +0000.
 ================================================

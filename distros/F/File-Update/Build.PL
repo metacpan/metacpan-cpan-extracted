@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "File-Update",
-  "dist_version" => "0.0.2",
+  "dist_version" => "0.0.3",
   "license" => "mit",
   "module_name" => "File::Update",
   "recursive_test_files" => 1,

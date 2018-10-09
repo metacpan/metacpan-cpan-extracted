@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::YokogawaGS200;
-$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.661';
+$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.662';
 #ABSTRACT: YokogawaGS200 voltage/current source.
 
 use 5.010;
@@ -279,7 +279,7 @@ Lab::Moose::Instrument::YokogawaGS200 - YokogawaGS200 voltage/current source.
 
 =head1 VERSION
 
-version 3.661
+version 3.662
 
 =head1 SYNOPSIS
 

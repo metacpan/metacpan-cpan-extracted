@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Gl - Package for language Galician
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Gl - Package for language Galician
 
 package Locale::CLDR::Locales::Gl;
 # This file auto generated from Data\common\main\gl.xml
-#	on Sun  5 Aug  6:02:55 pm GMT
+#	on Sun  7 Oct 10:34:45 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4750,58 +4752,58 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
+				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'evening1' if $time >= 1300
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'evening1' if $time >= 1300
+						&& $time < 2100;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
 				}
-				if($day_period_type eq 'selection') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100
 						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1300
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
+					return 'evening1' if $time >= 1300
+						&& $time < 2100;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
+				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'night1' if $time >= 2100
-						&& $time < 2400;
-					return 'evening1' if $time >= 1300
-						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'evening1' if $time >= 1300
+						&& $time < 2100;
+					return 'night1' if $time >= 2100
+						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
 				}
-				if($day_period_type eq 'selection') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100
 						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1300
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
+					return 'evening1' if $time >= 1300
+						&& $time < 2100;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
 				}
 				last SWITCH;
 				}
@@ -4822,66 +4824,66 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
+					'afternoon1' => q{do mediodía},
+					'morning2' => q{da mañá},
 					'midnight' => q{da noite},
 					'pm' => q{p.m.},
-					'night1' => q{da noite},
-					'afternoon1' => q{do mediodía},
-					'evening1' => q{da tarde},
-					'morning1' => q{da madrugada},
 					'am' => q{a.m.},
-					'morning2' => q{da mañá},
+					'evening1' => q{da tarde},
+					'night1' => q{da noite},
+					'morning1' => q{da madrugada},
 				},
 				'narrow' => {
-					'evening1' => q{da tarde},
-					'afternoon1' => q{do mediodía},
+					'night1' => q{da noite},
 					'morning1' => q{da madrugada},
 					'am' => q{a.m.},
+					'evening1' => q{da tarde},
+					'pm' => q{p.m.},
+					'afternoon1' => q{do mediodía},
 					'morning2' => q{da mañá},
 					'midnight' => q{da noite},
-					'pm' => q{p.m.},
-					'night1' => q{da noite},
 				},
 				'abbreviated' => {
-					'night1' => q{da noite},
 					'pm' => q{p.m.},
-					'midnight' => q{da noite},
-					'morning2' => q{da mañá},
-					'am' => q{a.m.},
 					'afternoon1' => q{do mediodía},
-					'evening1' => q{da tarde},
+					'morning2' => q{da mañá},
+					'midnight' => q{da noite},
+					'night1' => q{da noite},
 					'morning1' => q{da madrugada},
+					'evening1' => q{da tarde},
+					'am' => q{a.m.},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'night1' => q{noite},
+				'abbreviated' => {
 					'midnight' => q{medianoite},
-					'pm' => q{p.m.},
 					'morning2' => q{mañá},
 					'afternoon1' => q{mediodía},
+					'pm' => q{p.m.},
 					'evening1' => q{tarde},
-					'morning1' => q{madrugada},
 					'am' => q{a.m.},
+					'morning1' => q{madrugada},
+					'night1' => q{noite},
+				},
+				'narrow' => {
+					'evening1' => q{tarde},
+					'am' => q{a.m.},
+					'morning1' => q{madrugada},
+					'night1' => q{noite},
+					'midnight' => q{medianoite},
+					'afternoon1' => q{mediodía},
+					'morning2' => q{mañá},
+					'pm' => q{p.m.},
 				},
 				'wide' => {
-					'night1' => q{noite},
+					'afternoon1' => q{mediodía},
+					'morning2' => q{mañá},
 					'midnight' => q{medianoite},
 					'pm' => q{p.m.},
-					'morning2' => q{mañá},
 					'evening1' => q{tarde},
-					'afternoon1' => q{mediodía},
-					'morning1' => q{madrugada},
-					'am' => q{a.m.},
-				},
-				'abbreviated' => {
-					'morning2' => q{mañá},
-					'afternoon1' => q{mediodía},
-					'evening1' => q{tarde},
-					'morning1' => q{madrugada},
 					'am' => q{a.m.},
 					'night1' => q{noite},
-					'midnight' => q{medianoite},
-					'pm' => q{p.m.},
+					'morning1' => q{madrugada},
 				},
 			},
 		},

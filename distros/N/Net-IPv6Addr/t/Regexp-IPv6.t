@@ -156,7 +156,8 @@ fe80::1
 ::
 
 # These are valid addresses, but the original Tony Monroe
-# Net::IPv6Addr did not recognise them, so I've moved them here.
+# Net::IPv6Addr did not recognise them. From version 0.92, these are
+# accepted by the module, so the disqualifier is no longer here.
 
 1:2:3:4:5:6:1.2.3.4
 1:2:3:4:5::1.2.3.4

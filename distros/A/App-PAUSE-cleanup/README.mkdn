@@ -1,0 +1,49 @@
+# NAME
+
+App::PAUSE::cleanup - Manage (delete/undelete) your PAUSE files
+
+# VERSION
+
+version 0.0014
+
+# SYNOPSIS
+
+```perl
+$ pause-cleanup
+
+$ pause-cleanup -?
+```
+
+# DESCRIPTION
+
+`pause-cleanup` is a tool for managing the files in your PAUSE account. Run from the commandline, it will launch `$EDITOR` (or `$VISUAL`) with an editable document containing the state of your account. By editing the document you can delete or undelete files
+
+# USAGE
+
+```perl
+Usage: pause-cleanup <options>
+
+    --username <username>   Your PAUSE username
+    --password <password>   The password for the above
+                            Instead of supplying your identity on the
+                            commandline, you can setup \$HOME/.pause like so:
+
+                                user <username>
+                                password <password>
+
+    -d, --dump              Dump the list of files to STDOUT
+    
+    -h, -?, --help          This help
+```
+
+# AUTHORS
+
+- Robert Krimen <robertkrimen@gmail.com>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Robert Krimen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

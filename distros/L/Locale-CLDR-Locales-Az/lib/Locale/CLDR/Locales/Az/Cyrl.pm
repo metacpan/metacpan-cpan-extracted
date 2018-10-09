@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Az::Cyrl - Package for language Azerbaijani
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Az::Cyrl - Package for language Azerbaijani
 
 package Locale::CLDR::Locales::Az::Cyrl;
 # This file auto generated from Data\common\main\az_Cyrl.xml
-#	on Sun  5 Aug  5:51:55 pm GMT
+#	on Sun  7 Oct 10:21:28 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1102,66 +1104,66 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
+				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1700
 						&& $time < 1900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
 					return 'night2' if $time >= 0
 						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
 					return 'morning1' if $time >= 400
 						&& $time < 600;
-					return 'night2' if $time >= 0
-						&& $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'night2' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
+				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1700
 						&& $time < 1900;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'morning1' if $time >= 400
-						&& $time < 600;
 					return 'night2' if $time >= 0
 						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
-				}
-				if($day_period_type eq 'selection') {
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
 					return 'morning1' if $time >= 400
 						&& $time < 600;
-					return 'night2' if $time >= 0
-						&& $time < 400;
+				}
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
+					return 'morning1' if $time >= 400
+						&& $time < 600;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'night2' if $time >= 0
+						&& $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 				}
@@ -1184,74 +1186,74 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'noon' => q{ҝүнорта},
-					'night2' => q{ҝеҹә},
-					'morning2' => q{сәһәр},
-					'afternoon1' => q{ҝүндүз},
-					'evening1' => q{ахшамүстү},
-					'morning1' => q{сүбһ},
-					'am' => q{АМ},
-					'night1' => q{ахшам},
-					'midnight' => q{ҝеҹәјары},
-					'pm' => q{ПМ},
-				},
-				'wide' => {
-					'night1' => q{ахшам},
-					'midnight' => q{ҝеҹәјары},
 					'pm' => q{ПМ},
 					'noon' => q{ҝүнорта},
-					'night2' => q{ҝеҹә},
-					'morning2' => q{сәһәр},
-					'evening1' => q{ахшамүстү},
+					'midnight' => q{ҝеҹәјары},
 					'afternoon1' => q{ҝүндүз},
+					'morning2' => q{сәһәр},
 					'morning1' => q{сүбһ},
+					'night1' => q{ахшам},
 					'am' => q{АМ},
+					'evening1' => q{ахшамүстү},
+					'night2' => q{ҝеҹә},
 				},
 				'narrow' => {
-					'night2' => q{ҝеҹә},
-					'morning2' => q{сәһәр},
-					'noon' => q{ҝ},
-					'am' => q{а},
-					'evening1' => q{ахшамүстү},
-					'morning1' => q{сүбһ},
-					'afternoon1' => q{ҝүндүз},
-					'night1' => q{ахшам},
 					'pm' => q{п},
+					'noon' => q{ҝ},
+					'morning2' => q{сәһәр},
+					'afternoon1' => q{ҝүндүз},
 					'midnight' => q{ҝеҹәјары},
+					'night1' => q{ахшам},
+					'morning1' => q{сүбһ},
+					'am' => q{а},
+					'night2' => q{ҝеҹә},
+					'evening1' => q{ахшамүстү},
+				},
+				'wide' => {
+					'noon' => q{ҝүнорта},
+					'pm' => q{ПМ},
+					'afternoon1' => q{ҝүндүз},
+					'morning2' => q{сәһәр},
+					'midnight' => q{ҝеҹәјары},
+					'morning1' => q{сүбһ},
+					'night1' => q{ахшам},
+					'night2' => q{ҝеҹә},
+					'evening1' => q{ахшамүстү},
+					'am' => q{АМ},
 				},
 			},
 			'stand-alone' => {
 				'wide' => {
-					'noon' => q{ҝүнорта},
-					'morning2' => q{сәһәр},
+					'am' => q{АМ},
 					'night2' => q{ҝеҹә},
 					'evening1' => q{ахшамүстү},
-					'afternoon1' => q{ҝүндүз},
 					'morning1' => q{сүбһ},
-					'am' => q{АМ},
 					'night1' => q{ахшам},
+					'morning2' => q{сәһәр},
+					'afternoon1' => q{ҝүндүз},
 					'midnight' => q{ҝеҹәјары},
 					'pm' => q{ПМ},
+					'noon' => q{ҝүнорта},
 				},
 				'narrow' => {
-					'night2' => q{ҝеҹә},
 					'morning2' => q{сәһәр},
-					'noon' => q{ҝүнорта},
-					'evening1' => q{ахшамүстү},
 					'afternoon1' => q{ҝүндүз},
+					'midnight' => q{ҝеҹәјары},
+					'noon' => q{ҝүнорта},
+					'night2' => q{ҝеҹә},
+					'evening1' => q{ахшамүстү},
 					'morning1' => q{сүбһ},
 					'night1' => q{ахшам},
-					'midnight' => q{ҝеҹәјары},
 				},
 				'abbreviated' => {
-					'evening1' => q{ахшамүстү},
-					'afternoon1' => q{ҝүндүз},
-					'morning1' => q{сүбһ},
 					'noon' => q{ҝүнорта},
-					'night2' => q{ҝеҹә},
-					'morning2' => q{сәһәр},
 					'midnight' => q{ҝеҹәјары},
+					'afternoon1' => q{ҝүндүз},
+					'morning2' => q{сәһәр},
 					'night1' => q{ахшам},
+					'morning1' => q{сүбһ},
+					'evening1' => q{ахшамүстү},
+					'night2' => q{ҝеҹә},
 				},
 			},
 		},

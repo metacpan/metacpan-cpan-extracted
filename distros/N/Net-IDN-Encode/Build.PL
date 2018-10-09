@@ -20,7 +20,7 @@ my $b = Module::Build->new(
 		'Unicode::Normalize' => 0,
 		'perl'	=> 5.008005,
 	},
-	'build_requires' => {
+	'test_requires' => {
 		'Test::More' => 0, 
 		'Test::NoWarnings' => 0,
 	},
@@ -39,9 +39,12 @@ my $b = Module::Build->new(
 	'no_index' => {
 		'directory' => ['eg', 'data']
 	},
-	'resources' => {
-		'homepage' => 'http://search.cpan.org/dist/Net-IDN-Encode',
-		'repository' => 'http://github.com/cfaerber/Net-IDN-Encode',
+	'meta_add' => {
+		'resources' => {
+			'homepage' => 'https://metacpan.org/release/Net-IDN-Encode',
+			'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Net-IDN-Encode',
+			'repository' => 'http://github.com/cfaerber/Net-IDN-Encode',
+		},
 	},
 );
 

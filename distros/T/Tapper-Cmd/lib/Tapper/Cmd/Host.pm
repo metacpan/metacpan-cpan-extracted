@@ -1,6 +1,6 @@
 package Tapper::Cmd::Host;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Host::VERSION = '5.0.9';
+$Tapper::Cmd::Host::VERSION = '5.0.10';
 use Moose;
 
 use Tapper::Model 'model';

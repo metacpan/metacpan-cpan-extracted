@@ -1,17 +1,10 @@
 package Object::Signature::File;
 
-use 5.005;
 use strict;
-use Object::Signature ();
+use warnings;
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.07';
-	@ISA     = 'Object::Signature';
-}
-
-
-
+our $VERSION = '1.08';
+use base 'Object::Signature';
 
 
 #####################################################################
@@ -63,7 +56,7 @@ If the method returns a null string, it indicates that the file should
 be stored with no extension.
 
 If the method return C<undef> (the default value), it indicates no
-preference for the extention the file.
+preference for the extension of the file.
 
 =head2 signature_name
 

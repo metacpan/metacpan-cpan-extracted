@@ -31,8 +31,8 @@ bless $camera, 'Graphics::Raylib::XS::Camera3D';
 my $cubePosition = vector(0, 0, 0);
 
 $g->fps(60);
-
-#while (!$g->exiting) {
+my $i = 0;
+while (!$g->exiting && $i++ != 60) {
     Graphics::Raylib::draw {
         $g->clear;
 
@@ -47,7 +47,7 @@ $g->fps(60);
         DrawText("Welcome to the third dimension!", 10, 40, 20, DARKGRAY);
         Graphics::Raylib::Text::FPS->draw;
     };
-#}
+}
 sleep 1;
 ok 1;
 done_testing

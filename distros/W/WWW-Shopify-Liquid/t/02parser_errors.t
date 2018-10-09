@@ -99,4 +99,9 @@ expected_exception(q(<html>
 </body>
 </html>) =>  ['WWW::Shopify::Liquid::Exception::Parser::NoClose', 18, 4]);
 
+expected_exception("{% for a in b %}
+{% endfor % }
+
+{% asdasd %}" =>  ['WWW::Shopify::Liquid::Exception::Lexer::UnbalancedBrace', 2, 2]);
+
 done_testing();

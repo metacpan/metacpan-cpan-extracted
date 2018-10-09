@@ -14,7 +14,7 @@ Date::Holidays::KR - Determine Korean public holidays
 
 # DESCRIPTION
 
-Date::Holidays::KR determines public holidays for Korean. 
+Date::Holidays::KR determines public holidays for Korean.
 
 # FUNCTION
 

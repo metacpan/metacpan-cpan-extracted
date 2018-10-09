@@ -2,10 +2,15 @@ Changes
 examples/array.pl
 examples/bigint.pl
 examples/compressed.pl
+examples/from-bigint.pl
+examples/inet.pl
+examples/inos.pl
 examples/intarray.pl
 examples/preferred.pl
 examples/string-ip6-int.pl
 examples/synopsis.pl
+examples/to-string-ipv4-comp.pl
+examples/to-string-ipv4.pl
 lib/Net/IPv6Addr.pm
 lib/Net/IPv6Addr.pod
 Makefile.PL
@@ -13,6 +18,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/base85.t
+t/bigint.t
 t/chkip.t
 t/compressed.t
 t/in-network.t
@@ -22,6 +28,7 @@ t/new.t
 t/parse.t
 t/preferred.t
 t/Regexp-IPv6.t
+t/rfc5952.t
 t/string.t
 t/synopsis.t
 t/vietnam.t

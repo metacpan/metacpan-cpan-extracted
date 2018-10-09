@@ -28,7 +28,9 @@ get '/die_code'     => sub { die };
 get '/with_include' => 'include';
 get '/with_wrapper' => 'wrapper';
 get '/foo/:message' => 'index';
+get '/bar/:message' => 'index_ep';
 get '/on-disk'      => 'foo';
+get '/on-disk-ep'   => 'bar';
 
 my $t = Test::Mojo->new;
 
@@ -37,15 +39,17 @@ $t->get_ok('/exception')->status_is(500)->content_like(qr/error|^$/i);
 # will "die" inside Xslate execution
 $t->get_ok('/die_tpl')->status_is(500)->content_like(qr/error|^$/i);
 
-# dies before Xslate does anything and Xslate will not be used since 
+# dies before Xslate does anything and Xslate will not be used since
 # internal mojo diagnostic templates are handled by default renderer
-# (i.e.: EP renderer) 
+# (i.e.: EP renderer)
 $t->get_ok('/die_code')->status_is(500)->content_like(qr/error|^$/i);
 
 $t->get_ok('/foo/hello')->content_like(qr/^hello\s*$/);
+$t->get_ok('/bar/hello')->content_like(qr/^hello\s*$/);
 $t->get_ok('/with_include')->content_like(qr/^Hello\s*Include!Hallo\s*$/);
 $t->get_ok('/with_wrapper')->content_like(qr/^wrapped\s*$/);
 $t->get_ok('/on-disk')->content_is(4);
+$t->get_ok('/on-disk-ep')->content_is(4);
 $t->get_ok('/not_found')->status_is(404)->content_like(qr/not found/i);
 
 {
@@ -56,15 +60,17 @@ $t->get_ok('/not_found')->status_is(404)->content_like(qr/not found/i);
 
     $t->get_ok('/die_tpl')->status_is(500)->content_like(qr/error|^$/i);
 
-    # dies before Xslate does anything but then mojolicious wants to 
+    # dies before Xslate does anything but then mojolicious wants to
     # render the (optional and here unavailable) exception template
     # using Xslate engine which will not be able to locate that file
     $t->get_ok('/die_code')->status_is(500)->content_like(qr/error|^$/i);
 
     $t->get_ok('/foo/hello')->content_like(qr/^hello\s*$/);
+    $t->get_ok('/bar/hello')->content_like(qr/^hello\s*$/);
     $t->get_ok('/with_include')->content_like(qr/^Hello\s*Include!Hallo\s*$/);
     $t->get_ok('/with_wrapper')->content_like(qr/^wrapped\s*$/);
     $t->get_ok('/on-disk')->content_is(4);
+    $t->get_ok('/on-disk-ep')->content_is(4);
     $t->get_ok('/not_found')->status_is(404)->content_like(qr/not found/i);
 
     app->renderer->default_handler($old_default);
@@ -82,6 +88,9 @@ __DATA__
 
 @@ index.html.tt
 [%- message -%]
+
+@@ index_ep.html.ep
+<%= $message %>\
 
 @@ include.inc
 Hello

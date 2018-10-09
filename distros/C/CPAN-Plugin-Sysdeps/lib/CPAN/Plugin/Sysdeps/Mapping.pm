@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 # shortcuts
 #  os and distros
@@ -605,7 +605,7 @@ sub mapping {
        [package => [qw(libmcrypt-devel libtool-ltdl-devel)]]],
      ],
 
-     [cpanmod => ['Crypt::OpenSSL::DSA', 'Crypt::OpenSSL::Random', 'Crypt::OpenSSL::X509', 'Net::SSLeay', 'IO::Socket::SSL'],
+     [cpanmod => ['Crypt::OpenSSL::DSA', 'Crypt::OpenSSL::Random', 'Crypt::OpenSSL::RSA', 'Crypt::OpenSSL::X509', 'Net::SSLeay', 'IO::Socket::SSL'],
       # freebsd has all libssl in the base system
       [like_debian,
        [package => ['libssl-dev', 'zlib1g-dev']]],
@@ -3019,6 +3019,15 @@ sub mapping {
        [package => 'libxtst-dev']],
       [like_fedora,
        [package => 'libXtst-devel']],
+     ],
+
+     [cpanmod => 'YAML::LibYAML::API',
+      [os_freebsd,
+       [package => 'libyaml']],
+      [like_debian,
+       [package => 'libyaml-dev']],
+      [like_fedora,
+       [package => 'libyaml-devel']],
      ],
 
      [cpanmod => 'ZMQ::FFI',

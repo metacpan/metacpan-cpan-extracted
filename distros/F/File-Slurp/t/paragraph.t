@@ -1,14 +1,16 @@
-#!/usr/local/bin/perl -w
+use strict;
+use warnings;
 
-use strict ;
+use File::Basename ();
+use File::Spec ();
+use lib File::Spec->catdir(File::Spec->rel2abs(File::Basename::dirname(__FILE__)), 'lib');
+use FileSlurpTest qw(temp_file_path);
 
-use File::Slurp ;
-use Test::More ;
-use Carp ;
+use File::Slurp qw(read_file write_file);
+use Test::More;
 
 
-my $file = 'slurp.data' ;
-unlink $file ;
+my $file = temp_file_path();
 
 my @text_data = (
 	[],

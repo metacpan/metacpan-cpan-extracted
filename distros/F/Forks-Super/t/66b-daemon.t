@@ -41,9 +41,10 @@ for (1..10) {
 
     $new_priority = get_os_priority($daemon);
     if ($new_priority != -99) {
-	if ($np > 1 && Forks::Super::Config::CONFIG('Sys::CpuAffinity')) {
+	if ($np > 1 && Forks::Super::Config::CONFIG('Sys::CpuAffinity')
+                    && ${^TAINT} <= 0) {
 	    $affinity = Sys::CpuAffinity::getAffinity($daemon);
-	    last if $new_priority != $base_priority && $affinity == 2;
+	    last if $new_priority != $base_priority;
 	} else {
 	    last if $new_priority != $base_priority;
 	}
@@ -77,6 +78,9 @@ SKIP: {
     }
     if (!Forks::Super::Config::CONFIG('Sys::CpuAffinity')) {
 	skip 'Sys::CpuAffinity not avail. Skip CPU affinity test', 1;
+    }
+    if (${^TAINT} > 0) {
+        skip 'Sys::CpuAffinity might not be avail in taint mode.', 1;
     }
     ok($affinity == 2, "set CPU affinity on daemon process")    ### 2 ###
 	or diag("affinity of $daemon was $affinity, expected 2; ",

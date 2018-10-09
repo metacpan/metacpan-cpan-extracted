@@ -1,12 +1,15 @@
 Revision history for Perl extension Date-Holidays-KR
 
+0.07 2018-10-06T15:16:17Z
+        - Add utf8 pragma
+
 0.06 2016-01-05T07:52:05Z
         - Add holiday(Day of Hangul)
 
 0.05 2013-08-01T14:09:12Z
         - Fix http://www.cpantesters.org/cpan/report/0bab814a-f52b-11e2-9591-b4ba88f30751
         - Use Minilla
-        
+
 0.0402  Wed Feb 29 18:00:00 2012 KST
         - DRY
 

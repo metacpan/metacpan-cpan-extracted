@@ -9,7 +9,7 @@ use File::Basename;
 use File::Spec::Functions qw(rel2abs);
 use Serge::Util qw(subst_macros);
 
-our $VERSION = "0.0.1";
+our $VERSION = "0.0.2";
 
 sub name {
     return

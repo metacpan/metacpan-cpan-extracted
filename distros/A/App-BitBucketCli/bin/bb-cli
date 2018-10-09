@@ -15,7 +15,7 @@ use FindBin qw/$Bin/;
 use YAML::Syck qw/LoadFile DumpFile/;
 use Path::Tiny;
 
-our $VERSION = 0.005;
+our $VERSION = 0.006;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 exit main();
@@ -26,11 +26,12 @@ sub main {
         'force|f!',
         'host|h=s',
         'long|l',
+        'max|M=i',
         'password|P=s',
         'project|p=s',
+        'regexp|R',
         'remote|m=s',
         'repository|r=s',
-        'regexp|R',
         'sleep|s=i',
         'test|T!',
         'username|U=s',
@@ -85,6 +86,7 @@ sub main {
         host => $options->{host},
         user => $options->{username},
         pass => $options->{password},
+        max  => $options->{max},
         opt  => $options,
     );
 
@@ -168,7 +170,7 @@ sub sub_commands {
 
     mkdir $sub_file->parent if ! -d $sub_file->parent;
 
-    return LoadFile("$sub_file") if -f $sub_file;
+    return LoadFile("$sub_file") if -f $sub_file && (stat $sub_file)[9] > time - 60 * 60 * 24 * 31;
 
     return generate_sub_command();
 }
@@ -202,7 +204,7 @@ bb-cli - Command line tool for communicating with BitBucket Server
 
 =head1 VERSION
 
-0his documentation refers to bb-cli version 0.005
+0his documentation refers to bb-cli version 0.006
 
 =head1 SYNOPSIS
 
@@ -219,6 +221,7 @@ bb-cli - Command line tool for communicating with BitBucket Server
                     current colour names aborted, disabled and notbuilt
   -f --force        Force action
   -l --long         Show long form data if possible
+  -M --max[=]int    The maximum number of records to fetch from BitBucket/Stash
   -p --project[=]str
                     For commands that need a project name this is the name to use
   -R --recipient[=]str

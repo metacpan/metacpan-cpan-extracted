@@ -1,8 +1,8 @@
 package Mongoose::File;
-$Mongoose::File::VERSION = '1.02';
+$Mongoose::File::VERSION = '2.00';
 use Moose;
 
-has file_id => ( is => 'ro', isa => 'MongoDB::OID', required => 1 );
+has file_id => ( is => 'ro', isa => 'BSON::OID', required => 1 );
 has bucket  => ( is => 'ro', isa => 'MongoDB::GridFSBucket', required => 1 );
 
 has stream_download =>

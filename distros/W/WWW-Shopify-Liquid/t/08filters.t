@@ -54,4 +54,14 @@ $text = liquid_render_text({ a => "" }, "{{ '08/28/15' | date_parse | date: '%Y'
 $text = liquid_render_text({ a => "2015-01-01T00:00:00 EST5EDT" }, "{{ a | date_parse | date_set_time_zone: 'GMT' }}");
 is($text, DateTime->new(year => 2015, month => 1, day => 1, hour=>5, minute=>0, second=>0, time_zone => 'GMT')->iso8601);
 
+
+$text = liquid_render_text({ a => 10.43545 }, "{{ a | round }}");
+is($text, 10);
+$text = liquid_render_text({ a => 10.43545 }, "{{ a | round: 0 }}");
+is($text, 10);
+$text = liquid_render_text({ a => 10.43545 }, "{{ a | round: 1 }}");
+is($text, 10.4);
+$text = liquid_render_text({ a => 10.43545 }, "{{ a | round: 2 }}");
+is($text, 10.44);
+
 done_testing();

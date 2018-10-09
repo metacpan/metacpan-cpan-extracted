@@ -3,7 +3,6 @@ package Amazon::SQS::Simple::Base;
 use strict;
 use warnings;
 use Carp qw( croak carp );
-use Digest::HMAC_SHA1;
 use Digest::SHA qw(hmac_sha256 sha256);
 use LWP::UserAgent;
 use MIME::Base64;
@@ -15,6 +14,7 @@ use AWS::Signature4;
 use POSIX qw(strftime);
 use Encode qw(encode);
 use Data::Dumper;
+use Time::HiRes;
 use VM::EC2::Security::CredentialCache;
 
 use base qw(Exporter);
@@ -169,6 +169,8 @@ sub _debug_log {
 
 sub _escape_params {
     my ($self, $params) = @_;
+	
+    my $escaped_params = {%$params};
 
     # Need to escape + characters in signature
     # see http://docs.amazonwebservices.com/AWSSimpleQueueService/2006-04-01/Query_QueryAuth.html
@@ -181,9 +183,9 @@ sub _escape_params {
     foreach my $key (keys %$params) {
         next unless $key =~ m/$to_escape/;
         my $octets = encode('utf-8-strict', $params->{$key});
-        $params->{$key} = uri_escape($octets, $URI_SAFE_CHARACTERS);
+        $escaped_params->{$key} = uri_escape($octets, $URI_SAFE_CHARACTERS);
     }
-    return $params;
+    return $escaped_params;
 }
 
 sub _escape_param {

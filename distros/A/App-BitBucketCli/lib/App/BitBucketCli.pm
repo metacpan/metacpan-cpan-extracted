@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use App::BitBucketCli::Core;
 
-our $VERSION = 0.005;
+our $VERSION = 0.006;
 
 has core => (
     is      => 'ro',
@@ -50,7 +50,7 @@ App::BitBucketCli - Library for talking to BitBucket Server (or Stash)
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli version 0.005
+This documentation refers to App::BitBucketCli version 0.006
 
 =head1 SYNOPSIS
 

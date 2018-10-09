@@ -3,6 +3,8 @@ package IO::Handle::Util::Overloading;
 use strict;
 use warnings;
 
+our $VERSION = '0.02';
+
 use asa 'IO::Handle';
 
 use overload (

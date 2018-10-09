@@ -18,7 +18,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(run_callback);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 our $IN_CALLBACK;
 
 sub run_callback {
@@ -100,3 +100,16 @@ sub Forks::Super::Job::_config_callback_child {
 }
 
 1;
+
+=head1 NAME
+
+Forks::Super::Job::Callback - implement event callbacks on Forks::Super 
+background processes
+
+=head1 DESCRPITION
+
+Implementation of L<callback|Forks::Super/"callback"> features of
+L<Forks::Super::fork|Forks::Super/"fork">.
+See L<Forks::Super> for more details.
+
+=cut

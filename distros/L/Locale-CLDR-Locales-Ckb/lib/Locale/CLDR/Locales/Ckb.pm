@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ckb - Package for language Central Kurdish
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ckb - Package for language Central Kurdish
 
 package Locale::CLDR::Locales::Ckb;
 # This file auto generated from Data\common\main\ckb.xml
-#	on Sun  5 Aug  5:55:25 pm GMT
+#	on Sun  7 Oct 10:25:33 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1165,11 +1167,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'generic' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{ب.ن},
-					'pm' => q{د.ن},
-				},
 				'wide' => {
+					'pm' => q{د.ن},
+					'am' => q{ب.ن},
+				},
+				'abbreviated' => {
 					'am' => q{ب.ن},
 					'pm' => q{د.ن},
 				},
@@ -1181,27 +1183,27 @@ has 'day_periods' => (
 					'pm' => q{د.ن},
 					'am' => q{ب.ن},
 				},
-				'wide' => {
-					'pm' => q{د.ن},
-					'am' => q{ب.ن},
-				},
 				'narrow' => {
+					'am' => q{ب.ن},
+					'pm' => q{د.ن},
+				},
+				'wide' => {
 					'pm' => q{د.ن},
 					'am' => q{ب.ن},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{د.ن},
+				'abbreviated' => {
 					'am' => q{ب.ن},
+					'pm' => q{د.ن},
+				},
+				'narrow' => {
+					'am' => q{ب.ن},
+					'pm' => q{د.ن},
 				},
 				'wide' => {
 					'am' => q{ب.ن},
 					'pm' => q{د.ن},
-				},
-				'abbreviated' => {
-					'pm' => q{د.ن},
-					'am' => q{ب.ن},
 				},
 			},
 		},

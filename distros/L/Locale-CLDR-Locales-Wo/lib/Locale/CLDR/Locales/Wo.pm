@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Wo - Package for language Wolof
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Wo - Package for language Wolof
 
 package Locale::CLDR::Locales::Wo;
 # This file auto generated from Data\common\main\wo.xml
-#	on Sun  5 Aug  6:28:09 pm GMT
+#	on Sun  7 Oct 11:06:41 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1068,17 +1070,17 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{Sub},
-					'pm' => q{Ngo},
-				},
 				'narrow' => {
-					'pm' => q{Ngo},
 					'am' => q{Sub},
+					'pm' => q{Ngo},
 				},
 				'wide' => {
 					'am' => q{Sub},
 					'pm' => q{Ngo},
+				},
+				'abbreviated' => {
+					'pm' => q{Ngo},
+					'am' => q{Sub},
 				},
 			},
 			'stand-alone' => {
@@ -1180,33 +1182,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			E => q{ccc},
-			Ed => q{E, d},
-			Gy => q{y G},
-			GyMMM => q{MMM, y G},
-			GyMMMEd => q{E, d MMM, y G},
-			GyMMMd => q{d MMM, y G},
-			M => q{L},
-			MEd => q{E, dd-MM},
-			MMM => q{LLL},
-			MMMEd => q{E, d MMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{dd-MM},
-			d => q{d},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{MM y GGGGG},
-			yyyyMEd => q{E, dd/MM/y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E, d MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d/MM/y G},
-			yyyyMd => q{d/M/y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -1248,6 +1223,33 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
+		'generic' => {
+			E => q{ccc},
+			Ed => q{E, d},
+			Gy => q{y G},
+			GyMMM => q{MMM, y G},
+			GyMMMEd => q{E, d MMM, y G},
+			GyMMMd => q{d MMM, y G},
+			M => q{L},
+			MEd => q{E, dd-MM},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{dd-MM},
+			d => q{d},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{MM y GGGGG},
+			yyyyMEd => q{E, dd/MM/y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d/MM/y G},
+			yyyyMd => q{d/M/y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 	} },
 );
 
@@ -1267,10 +1269,10 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			fallback => '{0} – {1}',
 		},
-		'gregorian' => {
+		'generic' => {
 			fallback => '{0} – {1}',
 		},
 	} },

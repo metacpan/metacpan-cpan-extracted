@@ -2,22 +2,45 @@
 abstract: 'Manage (delete/undelete) your PAUSE files'
 author:
   - 'Robert Krimen <robertkrimen@gmail.com>'
+  - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  Test::Most: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 6.31
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-PAUSE-cleanup
+provides:
+  App::PAUSE::cleanup:
+    file: lib/App/PAUSE/cleanup.pm
+    version: '0.0014'
 requires:
-  Config::Identity: 0.0015
-  Crypt::SSLeay: 0
-  Getopt::Long: 0
-  Getopt::Usaginator: 0
-  Term::EditorEdit: 0
-  WWW::Mechanize: 0
-version: 0.0012
+  Config::Identity::PAUSE: '0'
+  Getopt::Long: '0'
+  Getopt::Usaginator: '0'
+  Term::EditorEdit: '0'
+  WWW::Mechanize: '0'
+  Web::Query: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/App-PAUSE-cleanup/issues
+  homepage: https://github.com/yanick/App-PAUSE-cleanup
+  repository: https://github.com/yanick/App-PAUSE-cleanup.git
+version: '0.0014'
+x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.01
+x_contributors:
+  - 'Dan Book <grinnz@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

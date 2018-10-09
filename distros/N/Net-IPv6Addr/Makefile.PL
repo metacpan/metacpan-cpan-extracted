@@ -17,7 +17,7 @@ WriteMakefile(
 	'Net::IPv4Addr' => '0.10', 
 	'Math::Base85' => '0.2',
 	'Carp' => '0',
-	'Math::BigInt' => '0',
+	'Math::BigInt' => '1.999813',
     },
     LICENSE => 'perl',
     META_MERGE => {

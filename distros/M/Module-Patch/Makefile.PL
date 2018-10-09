@@ -17,8 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Module::Patch",
   "PREREQ_PM" => {
-    "Monkey::Patch::Action" => "0.01",
-    "Package::MoreUtil" => 0,
+    "Log::ger" => "0.023",
+    "Monkey::Patch::Action" => "0.060",
+    "Package::MoreUtil" => "0.590",
     "strict" => 0,
     "warnings" => 0
   },
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.270",
+  "VERSION" => "0.274",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,9 +48,10 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.023",
   "Module::Load" => 0,
-  "Monkey::Patch::Action" => "0.01",
-  "Package::MoreUtil" => 0,
+  "Monkey::Patch::Action" => "0.060",
+  "Package::MoreUtil" => "0.590",
   "Test::Exception" => 0,
   "Test::More" => "0.96",
   "lib" => 0,

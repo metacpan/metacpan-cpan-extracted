@@ -14,7 +14,7 @@ sub verify {
 }
 
 sub retrieve_include {
-	my ($self, $hash, $action, $pipeline, $string, $argument) = @_;
+	my ($self, $hash, $action, $pipeline, $string) = @_;
 	if ($pipeline->inclusion_context && $pipeline->parent) {
 		# Inclusion contexts are evaluated from left to right, in order of priority.
 		my @inclusion_contexts = $pipeline->inclusion_context && ref($pipeline->inclusion_context) && ref($pipeline->inclusion_context) eq "ARRAY" ? @{$pipeline->inclusion_context} : $pipeline->inclusion_context;

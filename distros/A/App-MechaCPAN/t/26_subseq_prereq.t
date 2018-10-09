@@ -10,7 +10,7 @@ require q[./t/helper.pm];
 # Make sure the prereqs from a previous module don't prevent newer prereqs
 my $pwd = cwd;
 
-my $tmpdir = tempdir( TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX", CLEANUP => 0 );
+my $tmpdir = tempdir( TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX", CLEANUP => 1 );
 chdir $tmpdir;
 my $dir = cwd;
 

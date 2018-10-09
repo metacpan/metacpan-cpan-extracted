@@ -9,7 +9,7 @@ use File::Slurp;
 use List::MoreUtils qw(firstidx part);
 use Module::Find;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -98,6 +98,12 @@ use Scalar::Util qw(blessed);
 
 sub new {
 	my $package = shift;
+	my %hash = ();
+	if ($_[0] && ref($_[0]) eq 'HASH') {
+		%hash = %{$_[0]};
+	} else {
+		%hash = @_;
+	}
 	my $self = bless {
 		filters => [],
 		operators => [],
@@ -111,7 +117,7 @@ sub new {
 		
 		dialects => [],
 		
-		@_
+		%hash
 	}, $package;
 	
 	$self->lexer->parent($self) if $self->lexer;
@@ -167,7 +173,7 @@ sub file_context {
 	my ($self, $file) = @_;
 	$self->lexer->file_context($file);
 	$self->parser->file_context($file);
-	$self->renderer->file_context($file);
+	$self->renderer->file_context($file) if $self->renderer;
 }
 
 sub operate { return $_[0]->operators->{$_[3]}->($_[0], $_[1], $_[2], $_[4]); }

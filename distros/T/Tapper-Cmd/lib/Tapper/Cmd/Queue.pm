@@ -1,6 +1,6 @@
 package Tapper::Cmd::Queue;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Queue::VERSION = '5.0.9';
+$Tapper::Cmd::Queue::VERSION = '5.0.10';
 use Moose;
 
 use DateTime;

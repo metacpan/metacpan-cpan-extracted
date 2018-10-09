@@ -1,4 +1,3 @@
-use 5.8.0;
 use Module::Build;
 
 my $b = Module::Build->new(
@@ -7,7 +6,7 @@ my $b = Module::Build->new(
   dist_abstract      => 'Write data in tabular text format',
   license            => 'perl',
   module_name        => 'Data::Table::Text',
-  perl               => '5.8.0',
+  perl               => '5.20',
   requires           => {
      Carp            => 0,
      Cwd             => 0,

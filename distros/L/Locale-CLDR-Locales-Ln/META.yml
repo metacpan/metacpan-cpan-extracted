@@ -22,25 +22,25 @@ name: Locale-CLDR-Locales-Ln
 provides:
   Locale::CLDR::Locales::Ln:
     file: lib/Locale/CLDR/Locales/Ln.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Ln::Any:
     file: lib/Locale/CLDR/Locales/Ln/Any.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Ln::Any::Ao:
     file: lib/Locale/CLDR/Locales/Ln/Any/Ao.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Ln::Any::Cd:
     file: lib/Locale/CLDR/Locales/Ln/Any/Cd.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Ln::Any::Cf:
     file: lib/Locale/CLDR/Locales/Ln/Any/Cf.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Ln::Any::Cg:
     file: lib/Locale/CLDR/Locales/Ln/Any/Cg.pm
-    version: v0.33.0
+    version: v0.33.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.33.0
+  Locale::CLDR: v0.33.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -50,5 +50,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.33.0
+version: v0.33.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -16,3 +16,5 @@ t/cicle_sun.t
 t/data_by_coordinates.t
 t/data_by_locator.t
 t/Ham-Resources-Utils-test.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

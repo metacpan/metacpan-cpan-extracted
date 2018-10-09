@@ -1,4 +1,9 @@
-Revision history for Package-MoreUtil
+0.590   2018-10-07 (PERLANCAR)
+
+	- Add list_package_subs.
+
+	- [optimize] Remove regex check in package_exists() to make it faster.
+
 
 0.58    2014-12-05 (PERLANCAR)
 

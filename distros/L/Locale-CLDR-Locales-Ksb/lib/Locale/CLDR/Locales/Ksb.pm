@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ksb - Package for language Shambala
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ksb - Package for language Shambala
 
 package Locale::CLDR::Locales::Ksb;
 # This file auto generated from Data\common\main\ksb.xml
-#	on Sun  5 Aug  6:09:15 pm GMT
+#	on Sun  7 Oct 10:43:04 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -839,11 +841,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{makeo},
-					'pm' => q{nyiaghuo},
-				},
 				'abbreviated' => {
+					'pm' => q{nyiaghuo},
+					'am' => q{makeo},
+				},
+				'wide' => {
 					'pm' => q{nyiaghuo},
 					'am' => q{makeo},
 				},

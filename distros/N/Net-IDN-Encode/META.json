@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "Test::More" : "0",
-            "Test::NoWarnings" : "0"
+            "ExtUtils::CBuilder" : "0"
          }
       },
       "configure" : {
@@ -37,14 +35,24 @@
             "Unicode::Normalize" : "0",
             "perl" : "5.008005"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Net-IDN-Encode"
+      },
+      "homepage" : "https://metacpan.org/release/Net-IDN-Encode",
+      "repository" : {
+         "url" : "http://github.com/cfaerber/Net-IDN-Encode"
+      }
    },
-   "version" : "2.401",
+   "version" : "2.500",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

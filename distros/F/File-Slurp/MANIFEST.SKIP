@@ -1,0 +1,13 @@
+^\.git
+^blib/
+^experiment/
+^slurp_talk/
+TODO
+Makefile$
+\.bak$
+^extras/
+pm_to_blib
+\.lock$
+^cover_db/
+^File-Slurp
+^MYMETA\.

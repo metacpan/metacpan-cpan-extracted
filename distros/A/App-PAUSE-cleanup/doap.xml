@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>App-PAUSE-cleanup</name>
+  <shortdesc>Manage (delete/undelete) your PAUSE files</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Robert Krimen</foaf:name>
+      <foaf:mbox rdf:resource="mailto:robertkrimen@gmail.com" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Dan Book</foaf:name>
+      <foaf:mbox rdf:resource="mailto:grinnz@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/yanick/App-PAUSE-cleanup" />
+  <bug-database rdf:resource="https://github.com/yanick/App-PAUSE-cleanup/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/yanick/App-PAUSE-cleanup" />
+      <location rdf:resource="https://github.com/yanick/App-PAUSE-cleanup.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0010</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2010-06-08</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0011</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2010-06-14</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0012</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2010-12-05</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0013</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-10-05</dc:issued>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

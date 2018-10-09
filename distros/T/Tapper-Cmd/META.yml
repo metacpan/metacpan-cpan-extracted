@@ -51,7 +51,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Tapper-Cmd
   homepage: http://metacpan.org/release/Tapper-Cmd
   repository: git://github.com/tapper/Tapper-Cmd.git
-version: 5.0.9
+version: 5.0.10
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -314,7 +314,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v5.0.9
+          tag: v5.0.10
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -341,6 +341,10 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '5.041'
+    -
+      class: Dist::Zilla::Plugin::Encoding
+      name: Encoding
       version: '5.041'
     -
       class: Dist::Zilla::Plugin::FinderCode

@@ -61,6 +61,7 @@ lib/Dpkg/Shlibs/Objdump.pm
 lib/Dpkg/Shlibs/Symbol.pm
 lib/Dpkg/Shlibs/SymbolFile.pm
 lib/Dpkg/Source/Archive.pm
+lib/Dpkg/Source/BinaryFiles.pm
 lib/Dpkg/Source/Functions.pm
 lib/Dpkg/Source/Package.pm
 lib/Dpkg/Source/Package/V1.pm
@@ -80,6 +81,7 @@ lib/Dpkg/Vendor/Default.pm
 lib/Dpkg/Vendor/Ubuntu.pm
 lib/Dpkg/Version.pm
 lib/Test/Dpkg.pm
+LICENSE
 MANIFEST			This list of files
 t/codespell.t
 t/codespell/stopwords

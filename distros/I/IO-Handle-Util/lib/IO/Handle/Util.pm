@@ -1,11 +1,9 @@
-package IO::Handle::Util;
+package IO::Handle::Util; # git description: IO-Handle-Util-0.01-3-g2f36f79
 
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
-$VERSION = eval $VERSION;
-
+our $VERSION = '0.02';
 
 use warnings::register;
 
@@ -379,8 +377,6 @@ will have the C<openr> method invoked on it.
 
 Anything else is an error.
 
-=over 4
-
 =item io_from_string $str
 
 Instantiates an L<IO::String> object using C<$str> as the buffer.
@@ -534,7 +530,7 @@ The C<fileno> builtin returns the same thing as C<fileno> invoked as a method.
 =back
 
 If these conditions hold the handle is I<probably> OK to work with using the IO
-builtins directly, or passing the filedesctiptor to C land, instead of by
+builtins directly, or passing the filedescriptor to C land, instead of by
 invoking methods on it.
 
 =back

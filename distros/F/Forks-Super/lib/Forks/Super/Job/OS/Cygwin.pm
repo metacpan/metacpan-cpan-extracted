@@ -12,7 +12,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 if (!&IS_CYGWIN) {
     Carp::confess "Loaded Cygwin-only module into \$^O=$^O!\n";
@@ -107,3 +107,18 @@ sub terminate {
 }
 
 1;
+
+=head1 NAME
+
+Forks::Super::Job::OS::Cygwin - Cygwin specific implementations of
+operating system-specific functions and options for Forks::Super::fork
+
+=head1 DESCRIPTION
+
+Subset of L<Forks::Super::Job::OS> functionality implemented for
+Cygwin systems. Cygwin systems share some things in common with
+Windows and other things in common with Unix/POSIX. This package
+seeks to present a common interface to maximize portability of
+L<Forks::Super> scripts developed on a different platform.
+
+=cut

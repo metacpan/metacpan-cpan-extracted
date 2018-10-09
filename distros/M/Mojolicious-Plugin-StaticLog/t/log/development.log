@@ -1,54 +1,62 @@
-[Sat Apr 16 13:09:29 2016] [debug] GET "/"
-[Sat Apr 16 13:09:29 2016] [debug] Routing to a callback
-[Sat Apr 16 13:09:29 2016] [debug] 200 OK (0.000701s, 1426.534/s)
-[Sat Apr 16 13:09:29 2016] [debug] Static 200    151 /one-eyed.txt
-[Sat Apr 16 13:09:30 2016] [debug] Static 200    151 /one-eyed.txt
-[Sat Apr 16 13:09:30 2016] [debug] Static 200    151 /one-eyed.txt
-[Sat Apr 16 13:09:30 2016] [info] Static 200    151 /one-eyed.txt
-[Sat Apr 16 13:09:46 2016] [debug] GET "/"
-[Sat Apr 16 13:09:46 2016] [debug] Routing to a callback
-[Sat Apr 16 13:09:46 2016] [debug] 200 OK (0.000695s, 1438.849/s)
-[Sat Apr 16 13:09:46 2016] [debug] Static 200    151 /one-eyed.txt
-[Sat Apr 16 13:09:46 2016] [debug] Static 200    151 /one-eyed.txt
-[Sat Apr 16 13:09:46 2016] [debug] Static 200    151 /one-eyed.txt
-[Sat Apr 16 13:09:47 2016] [info] Static 200    151 /one-eyed.txt
-[Sat Apr 16 13:11:08 2016] [debug] Static 200    151 /one-eyed.txt
-[Sat Apr 16 13:11:09 2016] [info] Static 200    151 /one-eyed.txt
-[Tue May 24 12:25:45 2016] [debug] GET "/"
-[Tue May 24 12:25:45 2016] [debug] Routing to a callback
-[Tue May 24 12:25:45 2016] [debug] 200 OK (0.000716s, 1396.648/s)
-[Tue May 24 12:25:45 2016] [error] Can't locate object method "is_debug" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
-
-[Tue May 24 12:25:45 2016] [debug] Template "exception.development.html.ep" not found
-[Tue May 24 12:25:45 2016] [debug] Template "exception.html.ep" not found
-[Tue May 24 12:25:45 2016] [debug] Rendering template "mojo/debug.html.ep"
-[Tue May 24 12:25:45 2016] [debug] Rendering template "mojo/menubar.html.ep"
-[Tue May 24 12:25:45 2016] [debug] Your secret passphrase needs to be changed
-[Tue May 24 12:25:46 2016] [error] Can't locate object method "is_debug" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
-
-[Tue May 24 12:25:46 2016] [debug] Template "exception.development.html.ep" not found
-[Tue May 24 12:25:46 2016] [debug] Template "exception.html.ep" not found
-[Tue May 24 12:25:46 2016] [debug] Rendering template "mojo/debug.html.ep"
-[Tue May 24 12:25:46 2016] [debug] Rendering template "mojo/menubar.html.ep"
-[Tue May 24 12:25:46 2016] [debug] Your secret passphrase needs to be changed
-[Tue May 24 12:25:46 2016] [error] Can't locate object method "is_debug" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
-
-[Tue May 24 12:25:46 2016] [error] Can't locate object method "is_debug" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
-
-[Tue May 24 12:25:46 2016] [debug] Template "exception.development.html.ep" not found
-[Tue May 24 12:25:46 2016] [debug] Template "exception.html.ep" not found
-[Tue May 24 12:25:46 2016] [debug] Rendering cached template "mojo/debug.html.ep"
-[Tue May 24 12:25:46 2016] [debug] Rendering cached template "mojo/menubar.html.ep"
-[Tue May 24 12:25:46 2016] [error] Can't locate object method "is_info" via package "Mojo::Log" at /home/frankc/local/Mojolicious-Plugin-StaticLog/lib/Mojolicious/Plugin/StaticLog.pm line 16.
-
-[Tue May 24 12:30:33 2016] [debug] GET "/"
-[Tue May 24 12:30:33 2016] [debug] Routing to a callback
-[Tue May 24 12:30:33 2016] [debug] 200 OK (0.000642s, 1557.632/s)
-[Tue May 24 12:30:33 2016] [debug] Static 200    151 /one-eyed.txt
-[Tue May 24 12:30:33 2016] [debug] Static 200    151 /one-eyed.txt
-[Tue May 24 12:30:33 2016] [debug] Static 200    151 /one-eyed.txt
-[Tue May 24 12:30:33 2016] [info] Static 200    151 /one-eyed.txt
-[Tue May 24 12:32:09 2016] [debug] Static 200    151 /one-eyed.txt
-[Tue May 24 12:32:10 2016] [info] Static 200    151 /one-eyed.txt
-[Tue May 24 12:39:32 2016] [debug] Static 200    151 /one-eyed.txt
-[Tue May 24 12:39:32 2016] [info] Static 200    151 /one-eyed.txt
+[Sun Oct  7 11:55:15 2018] [debug] GET "/" (9e4ca5d4)
+[Sun Oct  7 11:55:15 2018] [debug] Routing to a callback
+[Sun Oct  7 11:55:15 2018] [debug] 200 OK (0.000795s, 1257.862/s)
+[Sun Oct  7 11:55:15 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 11:55:16 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 11:55:16 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 11:55:16 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 11:55:16 2018] [info] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:00:10 2018] [debug] GET "/" (2ef8148f)
+[Sun Oct  7 12:00:10 2018] [debug] Routing to a callback
+[Sun Oct  7 12:00:10 2018] [debug] 200 OK (0.000866s, 1154.734/s)
+[Sun Oct  7 12:00:10 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:01:38 2018] [debug] GET "/" (4ee86516)
+[Sun Oct  7 12:01:38 2018] [debug] Routing to a callback
+[Sun Oct  7 12:01:38 2018] [debug] 200 OK (0.000789s, 1267.427/s)
+[Sun Oct  7 12:01:38 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:02:31 2018] [debug] GET "/" (f9de1586)
+[Sun Oct  7 12:02:31 2018] [debug] Routing to a callback
+[Sun Oct  7 12:02:31 2018] [debug] 200 OK (0.000819s, 1221.001/s)
+[Sun Oct  7 12:02:31 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:05:40 2018] [debug] GET "/" (fe95d246)
+[Sun Oct  7 12:05:40 2018] [debug] Routing to a callback
+[Sun Oct  7 12:05:40 2018] [debug] 200 OK (0.000801s, 1248.439/s)
+[Sun Oct  7 12:05:40 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:05:40 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:05:40 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:05:40 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:05:41 2018] [info] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:05:53 2018] [debug] GET "/" (b42a1e09)
+[Sun Oct  7 12:05:53 2018] [debug] Routing to a callback
+[Sun Oct  7 12:05:53 2018] [debug] 200 OK (0.000868s, 1152.074/s)
+[Sun Oct  7 12:05:53 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:06:00 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:06:00 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:06:00 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:10:22 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:10:22 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:10:22 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:18:37 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:18:37 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:18:37 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:29:17 2018] [info] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:33:20 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:33:20 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:33:27 2018] [debug] GET "/" (2a8d9e63)
+[Sun Oct  7 12:33:27 2018] [debug] Routing to a callback
+[Sun Oct  7 12:33:27 2018] [debug] 200 OK (0.000812s, 1231.527/s)
+[Sun Oct  7 12:33:27 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:33:28 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:33:28 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:33:28 2018] [info] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:34:55 2018] [debug] GET "/" (838da4a0)
+[Sun Oct  7 12:34:55 2018] [debug] Routing to a callback
+[Sun Oct  7 12:34:55 2018] [debug] 200 OK (0.000831s, 1203.369/s)
+[Sun Oct  7 12:34:55 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:34:56 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:34:56 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:34:56 2018] [info] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:39:33 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 12:39:33 2018] [info] Static 200    151 /one-eyed.txt
+[Sun Oct  7 14:29:46 2018] [debug] Static 200    151 /one-eyed.txt
+[Sun Oct  7 14:29:47 2018] [info] Static 200    151 /one-eyed.txt

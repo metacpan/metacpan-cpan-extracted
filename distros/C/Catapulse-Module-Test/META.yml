@@ -1,0 +1,23 @@
+---
+abstract: 'A test module for Catapulse'
+author:
+  - 'Daniel Brosseau <dab@catapulse.org>'
+build_requires:
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  Test::Pod::Coverage: '1.10'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catapulse-Module-Test
+requires:
+  Catalyst::Runtime: '5.90097'
+version: '0.01'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

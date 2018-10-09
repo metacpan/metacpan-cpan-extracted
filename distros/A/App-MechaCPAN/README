@@ -50,7 +50,7 @@ DESCRIPTION
 
  Should I use App::MechaCPAN instead of <tool>
 
-    Probably not, no. It can be used in place of some tools, but it's focus
+    Probably not, no. It can be used in place of some tools, but its focus
     is not on the features a developer needs. If your needs are very simple
     and you don't need many options, you might be able to get away with
     only using App::MechaCPAN. However be prepared to run into limitations
@@ -139,7 +139,8 @@ OPTIONS
  --directory=<path>
 
     Changes to a specified directory before any processing is done. This
-    allows you to specify what directory you want local/ to be in.
+    allows you to specify what directory you want local/ to be in. If this
+    isn't provided, the current working directory is used instead.
 
  $ENV{MECHACPAN_TIMEOUT}
 
@@ -155,7 +156,9 @@ SCRIPT RESTART WARNING
     This module WILL restart the running script IF it's used as a module
     (e.g. with use) and the perl that is running is not the version
     installed in local/. It does this at two points: First right before
-    run-time and Second right after a perl is installed into local/.
+    run-time and Second right after a perl is installed into local/. During
+    restart, App::MechaCPAN will attempt to install itself into local/
+    unless it was invoked as a fully-contained version of mechacpan.
 
     The scripts and modules that come with App::MechaCPAN are prepared to
     handle this. If you use App::MechaCPAN as a module, you should to be

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::It::Any::Sm - Package for language Italian
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::It::Any::Sm - Package for language Italian
 
 package Locale::CLDR::Locales::It::Any::Sm;
 # This file auto generated from Data\common\main\it_SM.xml
-#	on Sun  5 Aug  6:06:35 pm GMT
+#	on Sun  7 Oct 10:39:21 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

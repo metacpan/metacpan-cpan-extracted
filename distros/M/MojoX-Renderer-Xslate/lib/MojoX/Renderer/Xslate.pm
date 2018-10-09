@@ -8,7 +8,7 @@ use Mojo::Base -base;
 use Mojo::Loader qw(data_section);
 use Text::Xslate ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 $VERSION = eval $VERSION;
 
 has 'xslate';
@@ -60,18 +60,23 @@ sub _render {
     my $xslate_err;
 
     local $@;
-    if (defined(my $inline = $options->{inline})) {
-        eval {
-            local $SIG{__DIE__} = sub { $xslate_err = shift };
+    eval {
+        local $SIG{__DIE__} = sub { $xslate_err = shift };
+
+        if (defined(my $inline = $options->{inline})) {
             $$output = $self->xslate->render_string($inline, \%params);
-        };
-    }
-    else {
-        eval {
-            local $SIG{__DIE__} = sub { $xslate_err = shift };
-            $$output = $self->xslate->render($name, \%params);
-        };
-    }
+        } else {
+            if (defined ($renderer->template_path($options))) {
+                $c->app->log->debug(qq{Rendering template "$name"});
+                $$output = $self->xslate->render($name, \%params);
+            } elsif (defined (my $data_template = $renderer->get_data_template($options))) {
+                $c->app->log->debug(qq{Rendering template "$name" from DATA section});
+                $$output = $self->xslate->render_string($data_template, \%params);
+            } else {
+                $c->app->log->debug(qq{Template "$name" not found})
+            }
+        }
+    };
     $@ = $xslate_err if $xslate_err;
 
     if ($@) {
@@ -185,7 +190,7 @@ L<http://search.cpan.org/dist/MojoX-Renderer-Xslate/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2016 gray <gray at cpan.org>, all rights reserved.
+Copyright (C) 2010-2018 gray <gray at cpan.org>, all rights reserved.
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

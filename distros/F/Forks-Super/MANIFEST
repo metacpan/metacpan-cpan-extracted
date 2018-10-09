@@ -12,7 +12,7 @@ lib/Forks/Super/Job/OS/Cygwin.pm
 lib/Forks/Super/Job/OS/Win32.pm
 lib/Forks/Super/Job/Timeout.pm
 lib/Forks/Super/LazyEval.pm
-lib/Forks/Super/LazyEval/BackgroundArray.pm    # removed v0.52, restored v0.60, renamed v0.69
+lib/Forks/Super/LazyEval/BackgroundArray.pm
 lib/Forks/Super/LazyEval/BackgroundScalar.pm
 lib/Forks/Super/Sync.pm
 lib/Forks/Super/Sync/IPCSemaphore.pm
@@ -27,9 +27,9 @@ lib/Forks/Super/Tie/IPCPipeHandle.pm
 lib/Forks/Super/Sigchld.pm
 lib/Forks/Super/Util.pm
 lib/Forks/Super/Wait.pm
-lib/Signals/XSIG.pm                       # v0.14 bundled since F::S v0.54
-lib/Signals/XSIG/Default.pm               # v0.14 bundled since F::S v0.54
-lib/Signals/XSIG/TieArray56.pm            # v0.14 bundled since F::S v0.54
+lib/Signals/XSIG.pm
+lib/Signals/XSIG/Default.pm
+lib/Signals/XSIG/TieArray56.pm
 Makefile.PL
 MANIFEST
 README
@@ -242,6 +242,8 @@ bundle/Sys-CpuLoadX/MANIFEST
 bundle/Sys-CpuLoadX/README
 bundle/Sys-CpuLoadX/t/00-load.t
 bundle/Sys-CpuLoadX/t/01-get_cpu_load.t
+examples/Benchmark.pm
+examples/forked_harness.pl
 TODO
 TODO-1.0                                 # roadmap for major release
 META.yml                                 Module YAML meta-data (added by MakeMaker)

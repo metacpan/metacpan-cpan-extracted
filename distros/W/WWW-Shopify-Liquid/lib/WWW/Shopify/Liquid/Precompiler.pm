@@ -9,6 +9,7 @@ use File::Find;
 use File::stat;
 use File::Slurp;
 use File::Basename;
+use Encode;
 
 use strict;
 use warnings;
@@ -47,7 +48,7 @@ sub should_compile {
 	return $file if stat($file)->mtime < $mtime;
 	my $entity = $self->analyzer->add_refresh_path($target, values(%{$self->{entities}}));
 	$self->{entities}->{$entity->id} = $entity;
-	return $file if int(grep { $mtime < stat($_)->mtime } (@{$entity->{full_dependencies}})) > 0;
+	return $file if int(grep { $_->file && $mtime < stat($_->file)->mtime } (@{$entity->{full_dependencies}})) > 0;
 	return 0;
 }
 
@@ -59,7 +60,7 @@ sub options {
 sub compile {
 	my ($self, $file, $target) = @_;
 	my $text = $self->{liquid}->render_file($self->options($file), $file);
-	write_file($target, $text);
+	write_file($target, encode("UTF-8", $text));
 	return $target;
 }
 

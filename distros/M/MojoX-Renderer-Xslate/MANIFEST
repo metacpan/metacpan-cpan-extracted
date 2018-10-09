@@ -8,6 +8,7 @@ README
 t/00_compile.t
 t/default.t
 t/lite_app.t
+t/templates/bar.html.ep
 t/templates/foo.html.tx
 xt/kwalitee.t
 xt/perlcritic.t

@@ -8,7 +8,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = "1.002";
+our $VERSION = "2.500";
 $VERSION = eval $VERSION;
 
 our @ISA = ('Exporter');
@@ -92,16 +92,13 @@ sub _process {
 #
   my @ll = split /\./, $label, -1;
 
-  ## Note: leading dots must be ignored (IDNA test vectors)
-  ##
-  shift @ll while @ll and (length $ll[0] <= 0);
-
   ## IDNA test vectors: an empty label at the end (separating the root domain
   ##                    "", if present) must be preserved. It is not checked for
   ##			the minumum length criteria and the dot separting it is
   ##			not included in the maximum length of the domain.
   ##
   my $rooted = @ll && length($ll[$#ll]) < 1; pop @ll if $rooted;
+  my $is_bidi = 0;
 
 # 4. Convert/Validate
 #
@@ -117,7 +114,11 @@ sub _process {
       _validate_label($l,%param,'_AssumeNFC' => 1);
     }
 
-    _validate_bidi($l,%param);
+    $is_bidi = 1 if !$is_bidi && $l =~ m/[\p{Bc:R}\p{Bc:AL}\p{Bc:AN}]/;
+  }
+
+  foreach my $l (@ll) {
+    _validate_bidi($l,%param)		if $is_bidi;
     _validate_contextj($l,%param);
 
     if(defined $to_ascii) {
@@ -165,32 +166,39 @@ sub _validate_label {
   }
 
   if($param{'TransitionalProcessing'}) {
-    $l =~m/(\p{IsDeviation})/		and croak sprintf "contains deviation character U+%04X [V6]", ord $1;
+    $l =~ m/(\p{IsDeviation})/		and croak sprintf "contains deviation character U+%04X [V6]", ord $1;
   }
 
+  $l =~ m/(\p{IsIgnored})/		and croak sprintf "contains ignored character U+%04X [V6]", ord $1;
+  $l =~ m/(\p{IsMapped}|\p{IsDisallowedSTD3Mapped})/ and croak sprintf "contains mapped character U+%04X [V6]", ord $1;
   $l =~ m/(\p{IsDisallowed})/		and croak sprintf "contains disallowed character U+%04X [V6]", ord $1;
 
   return 1;
 }
 
+# For perl versions < 5.11, there is a bug where Bc:L does not match some
+# character blocks that are not fully included in the main UnicodeData.txt file:
+#
+# 3400;<CJK Ideograph Extension A, First>;Lo;0;L;;;;;N;;;;;
+# 4DB5;<CJK Ideograph Extension A, Last>;Lo;0;L;;;;;N;;;;;
+# 4E00;<CJK Ideograph, First>;Lo;0;L;;;;;N;;;;;
+# 9FBB;<CJK Ideograph, Last>;Lo;0;L;;;;;N;;;;;
+# AC00;<Hangul Syllable, First>;Lo;0;L;;;;;N;;;;;
+# D7A3;<Hangul Syllable, Last>;Lo;0;L;;;;;N;;;;;
+# 20000;<CJK Ideograph Extension B, First>;Lo;0;L;;;;;N;;;;;
+# 2A6D6;<CJK Ideograph Extension B, Last>;Lo;0;L;;;;;N;;;;;
+#
+my $_RE_BidiClass_L 	= $] >= 5.011 ? '\p{Bc:L}' : '\p{Bc:L}\x{3400}-\x{4DB5}\x{4E00}-\x{9FBB}\x{AC00}-\x{D7A3}\x{20000}-\x{2A6D6}';
+
 sub _validate_bidi {
   my($l,%param) = @_;
   no warnings 'utf8';
 
-  ## IDNA test vectors: _labels_ that don't contain RTL characters are skipped
-  ##			(RFC 5893 mandates checks for _all_ labels if the 
-  ##			_domain_ contains RTL characters in any label) 
   return 1 unless length($l); 
-  return 1 unless $l =~ m/[\p{Bc:R}\p{Bc:AL}\p{Bc:AN}]/;
 
-
-  ## IDNA test vectors: LTR labels may start with "neutral" characters of
-  ##			BidiClass NSM or EN (RFC 5893 says LTR labels must
-  ##			start with BidiClass L)
-  ##
-  if( $l =~ m/^[\p{Bc:NSM}\p{Bc:EN}]*\p{Bc:L}/ ) { # LTR (left-to-right)
-    $l =~ m/[^\p{Bc:L}\p{Bc:EN}\p{Bc:ES}\p{Bc:CS}\p{Bc:ET}\p{Bc:BN}\p{Bc:ON}\p{Bc:NSM}]/ and croak 'contains characters with wrong bidi class for LTR [B5]';
-    $l =~ m/[\p{Bc:L}\p{Bc:EN}][\p{Bc:NSM}\P{Assigned}]*$/ or croak 'ends with character of wrong bidi class for LTR [B6]';
+  if( $l =~ m/^[$_RE_BidiClass_L]/o ) { # LTR (left-to-right)
+    $l =~ m/[^$_RE_BidiClass_L\p{Bc:EN}\p{Bc:ES}\p{Bc:CS}\p{Bc:ET}\p{Bc:BN}\p{Bc:ON}\p{Bc:NSM}]/o and croak 'contains characters with wrong bidi class for LTR [B5]';
+    $l =~ m/[$_RE_BidiClass_L\p{Bc:EN}][\p{Bc:NSM}\P{Assigned}]*$/o or croak 'ends with character of wrong bidi class for LTR [B6]';
     return 1;
   } 
 
@@ -204,7 +212,8 @@ sub _validate_bidi {
   croak 'starts with character of wrong bidi class [B1]';
 }
 
-# For perl versions < 5.11, we use a conrete list of characters; this is safe
+# For perl versions < 5.11, some Unicode properties such as Ccc or Joining_Type
+# are not supported. Instead, we use a conrete list of characters; this is safe
 # because the Unicode version supported by theses perl versions will not be
 # updated. For newer perl versions, we use the Unicode property (which is
 # supported from 5.11), so we will always be up-to-date with the Unicode

@@ -1,23 +1,23 @@
 package Locale::CLDR::Collator;
 
 use version;
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
 
+#line 6538
 use Unicode::Normalize('NFD');
 use Unicode::UCD qw( charinfo );
 use List::MoreUtils qw(pairwise);
 use Moo;
-use Types::Standard qw(Str Int Maybe ArrayRef InstanceOf);
+use Types::Standard qw(Str Int Maybe ArrayRef InstanceOf RegexpRef Bool);
 with 'Locale::CLDR::CollatorBase';
 
 my $NUMBER_SORT_TOP = "\x{FD00}\x{0034}";
 my $LEVEL_SEPARATOR = "\x{0001}";
-my $FIELD_SEPARATOR = "\x{0002}";
 
 has 'type' => (
 	is => 'ro',
@@ -38,6 +38,7 @@ has 'alternate' => (
 	default => 'noignore'
 );
 
+# Note that backwards is only at level 2
 has 'backwards' => (
 	is => 'ro',
 	isa => Str,
@@ -59,7 +60,7 @@ has 'case_ordering' => (
 has 'normalization' => (
 	is => 'ro',
 	isa => Str,
-	default => 'false',
+	default => 'true',
 );
 
 has 'numeric' => (
@@ -83,7 +84,26 @@ has 'strength' => (
 has 'max_variable' => (
 	is => 'ro',
 	isa => Str,
-	default => 'punct',
+	default => chr(0x0397),
+);
+
+has _character_rx => (
+	is => 'ro',
+	isa => RegexpRef,
+	lazy => 1,
+	init_arg => undef,
+	default => sub {
+		my $self = shift;
+		my $list = join '|', @{$self->multi_rx()}, '.';
+		return qr/\G($list)/s;
+	},
+);
+
+has _in_variable_weigting => (
+	is => 'rw',
+	isa => Bool,
+	init_arg => undef,
+	default => 0,
 );
 
 # Set up the locale overrides
@@ -100,85 +120,146 @@ sub BUILD {
 	}
 }
 
-sub _get_sort_digraphs_rx {
-	my $self = shift;
-	
-	my $digraphs = $self->_digraphs();
-	
-	my $rx = join '|', @$digraphs, '.';
-	
-	# Fix numeric sorting here
-	if ($self->numeric eq 'true') {
-		$rx = "\\p{Nd}+|$rx";
-	}
-	
-	return qr/$rx/;
-}
-
-
 # Get the collation element at the current strength
-sub get_collation_element {
-	my ($self, $grapheme) = @_;
-	my $ce;
-	if ($self->numeric && $grapheme =~/^\p{Nd}/) {
+sub get_collation_elements {
+	my ($self, $string) = @_;
+	my @ce;
+	if ($self->numeric eq 'true' && $string =~/^\p{Nd}^/) {
 		my $numeric_top = $self->collation_elements()->{$NUMBER_SORT_TOP};
-		my @numbers = $self->_convert_digits_to_numbers($grapheme);
-		$ce = join '', map { "$numeric_top${LEVEL_SEPARATOR}№$_" } @numbers;
+		my @numbers = $self->_convert_digits_to_numbers($string);
+		@ce = map { "$numeric_top${LEVEL_SEPARATOR}№$_" } @numbers;
 	}
 	else {
-		$ce = $self->collation_elements()->{$grapheme};
-	}
-
-	my $strength = $self->strength;
-	my @elements = split /$LEVEL_SEPARATOR/, $ce;
-	foreach my $element (@elements) {
-		my @parts = split /$FIELD_SEPARATOR/, $element;
-		if (@parts > $strength) {
-			@parts = @parts[0 .. $strength - 1];
+		my $rx = $self->_character_rx;
+		my @characters = $string =~ /$rx/g;
+			
+		foreach my $character (@characters) {
+			my @current_ce;
+			if (length $character > 1) {
+				# We have a collation element that dependeds on two or more codepoints
+				# Remove the code points that the collation element depends on and if 
+				# there are still codepoints get the collation elements for them
+				my @multi_rx = @{$self->multi_rx};
+				my $multi;
+				for (my $count = 0; $count < @multi_rx; $count++) {
+					if ($character =~ /$multi_rx[$count]/) {
+						$multi = $self->multi_class()->[$count];
+						last;
+					}
+				}
+				
+				my $match = $character;  
+				eval "\$match =~ tr/$multi//cd;";
+				push @current_ce, $self->collation_elements()->{$match};
+				$character =~ s/$multi//g;
+				if (length $character) {
+					foreach my $codepoint (split //, $character) {
+						push @current_ce,
+							$self->collation_elements()->{$codepoint}
+							// $self->generate_ce($codepoint);
+					}
+				}
+			}
+			else {
+				my $ce = $self->collation_elements()->{$character};
+				$ce //= $self->generate_ce($character);
+				push @current_ce, $ce;
+			}
+			push @ce, $self->_process_variable_weightings(@current_ce);
 		}
-		$element = join $FIELD_SEPARATOR, @parts;
 	}
-	
-	return @elements;
+	return @ce;
 }
 
-# Converts $string into a string of Collation Elements
+sub _process_variable_weightings {
+	my ($self, @ce) = @_;
+	return @ce if $self->alternate() eq 'noignore';
+	
+	foreach my $ce (@ce) {
+		if ($ce->[0] le $self->max_variable) {
+			# Variable waighted codepoint
+			if ($self->alternate eq 'blanked') {
+				@$ce = map { chr() } qw(0 0 0);
+				
+			}
+			if ($self->alternate eq 'shifted') {
+				my $l4;
+				if ($ce->[0] eq "\0" && $ce->[1] eq "\0" && $ce->[2] eq "\0") {
+					$ce->[3] = "\0";
+				}
+				else {
+					$ce->[3] = $ce->[1]; 
+				}
+				@$ce[0 .. 2] = map { chr() } qw (0 0 0);
+			}
+			$self->_in_variable_weigting(1);
+		}
+		else {
+			if ($self->_in_variable_weigting()) {
+				if( $ce->[0] eq "\0" && $self->alternate eq 'shifted' ) {
+					$ce->[3] = "\0";
+				}
+				elsif($ce->[0] ne "\0") {
+					$self->_in_variable_weigting(0);
+					if ( $self->alternate eq 'shifted' ) {
+						$ce->[3] = chr(0xFFFF)
+					}
+				}
+			}
+		}
+	}
+}
+
+# Converts $string into a sort key. Two sort keys can be correctly sorted by cmp
 sub getSortKey {
 	my ($self, $string) = @_;
 
 	$string = NFD($string) if $self->normalization eq 'true';
+
+	my @sort_key;
 	
-	my $entity_rx = $self->_get_sort_digraphs_rx();
+	my @ce = $self->get_collation_elements($string);
 
-	my @ce;
-	while (my ($grapheme) = $string =~ /($entity_rx)/g ) {
-		push @ce, $self->get_collation_element($grapheme)
+	for (my $count = 0; $count < $self->strength(); $count++ ) {
+		foreach my $ce (@ce) {
+			$ce = [ split //, $ce] unless ref $ce;
+			if (defined $ce->[$count] && $ce->[$count] ne "\0") {
+				push @sort_key, $ce->[$count];
+			}
+		}
 	}
-
-	return \@ce;
+	
+	return join "\0", @sort_key;
 }
 
 sub generate_ce {
 	my ($self, $character) = @_;
 	
-	my $base;
+	my $aaaa;
+	my $bbbb;
 	
-	if ($character =~ /\p{Unified_Ideograph}/) {
-		if ($character =~ /\p{Block=CJK_Unified_Ideographs}/ || $character =~ /\p{Block=CJK_Compatibility_Ideographs}/) {
-			$base = 0xFB40;
-		}
-		else {
-			$base = 0xFB80;
-		}
+	if ($^V ge v5.26 && eval q($character =~ /(?!\p{Cn})(?:\p{Block=Tangut}|\p{Block=Tangut_Components})/)) {
+		$aaaa = 0xFB00;
+		$bbbb = (ord($character) - 0x17000) | 0x8000;
+	}
+	# Block Nushu was added in Perl 5.28
+	elsif ($^V ge v5.28 && eval q($character =~ /(?!\p{Cn})\p{Block=Nushu}/)) {
+		$aaaa = 0xFB01;
+		$bbbb = (ord($character) - 0x1B170) | 0x8000;
+	}
+	elsif ($character =~ /(?=\p{Unified_Ideograph=True})(?:\p{Block=CJK_Unified_Ideographs}|\p{Block=CJK_Compatibility_Ideographs})/) {
+		$aaaa = 0xFB40 + (ord($character) >> 15);
+		$bbbb = (ord($character) & 0x7FFFF) | 0x8000;
+	}
+	elsif ($character =~ /(?=\p{Unified_Ideograph=True})(?!\p{Block=CJK_Unified_Ideographs})(?!\p{Block=CJK_Compatibility_Ideographs})/) {
+		$aaaa = 0xFB80 + (ord($character) >> 15);
+		$bbbb = (ord($character) & 0x7FFFF) | 0x8000;
 	}
 	else {
-		$base = 0xFBC0;
+		$aaaa = 0xFBC0 + (ord($character) >> 15);
+		$bbbb = (ord($character) & 0x7FFFF) | 0x8000;
 	}
-	
-	my $aaaa = $base + unpack( 'L', (pack ('L', ord($character)) >> 15));
-	my $bbbb = unpack('L', (pack('L', ord($character)) & 0x7FFF) | 0x8000);
-	
-	return join '', map {chr($_)} $aaaa, 0x0020, 0x0002,0, $bbbb,0,0,0;
+	return join '', map {chr($_)} $aaaa, 0x0020, 0x0002, ord($LEVEL_SEPARATOR), $bbbb, 0, 0;
 }
 
 # sorts a list according to the locales collation rules
@@ -269,4 +350,3 @@ no Moo;
 1;
 
 # vim: tabstop=4
-

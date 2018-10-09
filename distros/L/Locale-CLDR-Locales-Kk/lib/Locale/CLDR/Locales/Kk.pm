@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Kk - Package for language Kazakh
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Kk - Package for language Kazakh
 
 package Locale::CLDR::Locales::Kk;
 # This file auto generated from Data\common\main\kk.xml
-#	on Sun  5 Aug  6:07:46 pm GMT
+#	on Sun  7 Oct 10:41:00 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4535,78 +4537,78 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'coptic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+				if($day_period_type eq 'selection') {
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 				}
 				last SWITCH;
 				}
@@ -4627,66 +4629,66 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'noon' => q{түскі},
-					'morning1' => q{таңғы},
-					'evening1' => q{кешкі},
 					'afternoon1' => q{түстен кейінгі},
-					'am' => q{AM},
-					'night1' => q{түнгі},
 					'midnight' => q{түн жарымы},
 					'pm' => q{PM},
-				},
-				'narrow' => {
+					'noon' => q{түскі},
 					'am' => q{AM},
 					'evening1' => q{кешкі},
-					'afternoon1' => q{түстен кейінгі},
+					'night1' => q{түнгі},
 					'morning1' => q{таңғы},
+				},
+				'wide' => {
+					'midnight' => q{түн жарымы},
+					'afternoon1' => q{түстен кейінгі},
+					'pm' => q{PM},
+					'noon' => q{түскі},
+					'am' => q{AM},
+					'evening1' => q{кешкі},
+					'night1' => q{түнгі},
+					'morning1' => q{таңғы},
+				},
+				'narrow' => {
 					'noon' => q{түскі},
 					'pm' => q{PM},
 					'midnight' => q{түнгі},
-					'night1' => q{түнгі},
-				},
-				'wide' => {
-					'noon' => q{түскі},
 					'afternoon1' => q{түстен кейінгі},
-					'evening1' => q{кешкі},
 					'morning1' => q{таңғы},
-					'am' => q{AM},
 					'night1' => q{түнгі},
-					'midnight' => q{түн жарымы},
-					'pm' => q{PM},
+					'evening1' => q{кешкі},
+					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'noon' => q{талтүс},
-					'am' => q{AM},
 					'afternoon1' => q{түстен кейін},
-					'evening1' => q{кеш},
-					'morning1' => q{таң},
-					'night1' => q{түн},
-					'pm' => q{PM},
 					'midnight' => q{түн жарымы},
+					'noon' => q{талтүс},
+					'pm' => q{PM},
+					'evening1' => q{кеш},
+					'am' => q{AM},
+					'night1' => q{түн},
+					'morning1' => q{таң},
 				},
 				'wide' => {
-					'afternoon1' => q{түстен кейін},
 					'evening1' => q{кеш},
-					'morning1' => q{таң},
 					'am' => q{AM},
-					'noon' => q{талтүс},
-					'midnight' => q{түн жарымы},
-					'pm' => q{PM},
+					'morning1' => q{таң},
 					'night1' => q{түн},
+					'midnight' => q{түн жарымы},
+					'afternoon1' => q{түстен кейін},
+					'noon' => q{талтүс},
+					'pm' => q{PM},
 				},
 				'narrow' => {
+					'am' => q{AM},
+					'evening1' => q{кеш},
 					'night1' => q{түн},
+					'morning1' => q{таң},
+					'afternoon1' => q{түстен кейін},
 					'midnight' => q{түн жарымы},
 					'pm' => q{PM},
 					'noon' => q{талтүс},
-					'afternoon1' => q{түстен кейін},
-					'evening1' => q{кеш},
-					'morning1' => q{таң},
-					'am' => q{AM},
 				},
 			},
 		},

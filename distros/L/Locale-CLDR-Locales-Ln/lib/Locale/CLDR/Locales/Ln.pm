@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ln - Package for language Lingala
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ln - Package for language Lingala
 
 package Locale::CLDR::Locales::Ln;
 # This file auto generated from Data\common\main\ln.xml
-#	on Sun  5 Aug  6:09:56 pm GMT
+#	on Sun  7 Oct 10:43:56 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1594,12 +1596,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{ntɔ́ngɔ́},
 					'pm' => q{mpókwa},
+					'am' => q{ntɔ́ngɔ́},
 				},
 				'abbreviated' => {
-					'pm' => q{mpókwa},
 					'am' => q{ntɔ́ngɔ́},
+					'pm' => q{mpókwa},
 				},
 			},
 		},

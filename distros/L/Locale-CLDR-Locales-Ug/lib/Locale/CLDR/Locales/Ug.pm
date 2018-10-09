@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ug - Package for language Uyghur
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ug - Package for language Uyghur
 
 package Locale::CLDR::Locales::Ug;
 # This file auto generated from Data\common\main\ug.xml
-#	on Sun  5 Aug  6:26:33 pm GMT
+#	on Sun  7 Oct 11:04:57 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4637,31 +4639,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'am' => q{ب},
-					'pm' => q{ك},
-				},
 				'wide' => {
 					'am' => q{چۈشتىن بۇرۇن},
 					'pm' => q{چۈشتىن كېيىن},
 				},
+				'narrow' => {
+					'pm' => q{ك},
+					'am' => q{ب},
+				},
 				'abbreviated' => {
-					'pm' => q{چ.ك},
 					'am' => q{چ.ب},
+					'pm' => q{چ.ك},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{چ.ك},
 					'am' => q{چ.ب},
+				},
+				'wide' => {
+					'am' => q{چ.ب},
+					'pm' => q{چ.ك},
 				},
 				'narrow' => {
-					'am' => q{چ.ب},
 					'pm' => q{چ.ك},
-				},
-				'abbreviated' => {
 					'am' => q{چ.ب},
-					'pm' => q{چ.ك},
 				},
 			},
 		},
@@ -4836,15 +4838,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'islamic' => {
-			M => q{L},
-			Md => q{d/‏M},
-			d => q{d},
-			yyyyM => q{M‏/y G},
-			yyyyMEd => q{E، d/‏M/‏y G},
-			yyyyMMM => q{MMM y G},
-			yyyyMd => q{d‏/M‏/y G},
-		},
 		'generic' => {
 			Ed => q{d E},
 			Gy => q{y G},
@@ -4911,6 +4904,15 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
 			yw => q{y، w-ھەپتە},
+		},
+		'islamic' => {
+			M => q{L},
+			Md => q{d/‏M},
+			d => q{d},
+			yyyyM => q{M‏/y G},
+			yyyyMEd => q{E، d/‏M/‏y G},
+			yyyyMMM => q{MMM y G},
+			yyyyMd => q{d‏/M‏/y G},
 		},
 	} },
 );

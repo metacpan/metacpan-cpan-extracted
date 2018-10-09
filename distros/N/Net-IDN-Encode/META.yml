@@ -23,6 +23,8 @@ requires:
   Unicode::Normalize: '0'
   perl: '5.008005'
 resources:
-  license: http://dev.perl.org/licenses/
-version: '2.401'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-IDN-Encode
+  homepage: https://metacpan.org/release/Net-IDN-Encode
+  repository: http://github.com/cfaerber/Net-IDN-Encode
+version: '2.500'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

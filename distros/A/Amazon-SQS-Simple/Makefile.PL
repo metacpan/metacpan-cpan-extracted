@@ -12,10 +12,10 @@ WriteMakefile(
     PREREQ_PM => {
 		'AWS::Signature4'   => 0,
         'Test::More'        => 0,
-        'Digest::HMAC_SHA1' => 0,
         'Digest::SHA'       => 0,
         'LWP::UserAgent'    => 0,
         'MIME::Base64'      => 0,
+        'Time::HiRes'       => 0,
         'URI::Escape'       => 0,
         'XML::Simple'       => 0,
         'VM::EC2::Security::CredentialCache' => 0,

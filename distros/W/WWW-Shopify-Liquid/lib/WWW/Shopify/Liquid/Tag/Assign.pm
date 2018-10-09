@@ -13,7 +13,7 @@ sub verify {
 	my ($self) = @_;
 	die new WWW::Shopify::Liquid::Exception::Parser::Arguments($self, "Requires assignment operator to be the first thing in an assign tag.") unless
 		$self->{arguments}->[0]->isa('WWW::Shopify::Liquid::Operator::Assignment');
-	die new WWW::Shopify::Liquid::Exception::Parser::Arguments($self, "Requires variable for what you're assigning to.") unless
+	die new WWW::Shopify::Liquid::Exception::Parser::Arguments($self, "Requires a literal referring to a variable for what you're assigning to.") unless
 		$self->{arguments}->[0]->{operands}->[0]->isa('WWW::Shopify::Liquid::Token::Variable');
 }
 sub process {

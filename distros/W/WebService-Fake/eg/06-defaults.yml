@@ -1,0 +1,14 @@
+defaults:
+  headers:
+    - Content-Type: text/plain
+      X-Whatever: whatever
+      Server: 'Something/Fake 1.0'
+routes:
+  - path: '/hello/:name'
+    body: 'Hello, [% stash.name %]!'
+  - path: '/negate/:something'
+    body: '[% stash.something %] is no-no!'
+  - path: '/json/hello/:name'
+    headers:
+      - Content-Type: application/json
+    body: '{"hello": "[% stash.name %]"}'

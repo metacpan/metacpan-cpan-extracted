@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Yo - Package for language Yoruba
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Yo - Package for language Yoruba
 
 package Locale::CLDR::Locales::Yo;
 # This file auto generated from Data\common\main\yo.xml
-#	on Sun  5 Aug  6:28:13 pm GMT
+#	on Sun  7 Oct 11:06:46 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1061,29 +1063,29 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'pm' => q{Ọ̀sán},
+				'abbreviated' => {
 					'am' => q{Àárọ̀},
+					'pm' => q{Ọ̀sán},
 				},
 				'wide' => {
-					'pm' => q{Ọ̀sán},
 					'am' => q{Àárọ̀},
+					'pm' => q{Ọ̀sán},
 				},
-				'abbreviated' => {
+				'narrow' => {
 					'pm' => q{Ọ̀sán},
 					'am' => q{Àárọ̀},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{Ọ̀sán},
 					'am' => q{Àárọ̀},
 				},
 				'narrow' => {
-					'pm' => q{Ọ̀sán},
 					'am' => q{Àárọ̀},
+					'pm' => q{Ọ̀sán},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{Ọ̀sán},
 					'am' => q{Àárọ̀},
 				},
@@ -1169,6 +1171,29 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, M/d},
+			MMM => q{LLL},
+			MMMEd => q{E, MMM d},
+			MMMMEd => q{E, MMMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			hm => q{h:mm a},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E, M/d/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E, MMM d, y},
+			yMMMM => q{MMMM y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -1212,29 +1237,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 			yw => q{'week' w 'of' y},
-		},
-		'generic' => {
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, M/d},
-			MMM => q{LLL},
-			MMMEd => q{E, MMM d},
-			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E, M/d/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E, MMM d, y},
-			yMMMM => q{MMMM y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
 		},
 	} },
 );

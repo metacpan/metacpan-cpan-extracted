@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Kea - Package for language Kabuverdianu
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Kea - Package for language Kabuverdianu
 
 package Locale::CLDR::Locales::Kea;
 # This file auto generated from Data\common\main\kea.xml
-#	on Sun  5 Aug  6:07:39 pm GMT
+#	on Sun  7 Oct 10:40:51 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -2894,17 +2896,17 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{am},
 					'pm' => q{pm},
+				},
+				'wide' => {
+					'pm' => q{pm},
+					'am' => q{am},
 				},
 				'narrow' => {
-					'pm' => q{p},
 					'am' => q{a},
-				},
-				'abbreviated' => {
-					'pm' => q{pm},
-					'am' => q{am},
+					'pm' => q{p},
 				},
 			},
 		},

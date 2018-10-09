@@ -99,6 +99,7 @@ sub deregister_filter {
 sub parse_filter_tokens {
 	my ($self, $initial, @tokens) = @_;
 	my $filter = shift(@tokens);
+	die new WWW::Shopify::Liquid::Exception::Parser($initial, "Each filter requires exactly one operand.") unless $filter;
 	my $filter_name = $filter->isa('WWW::Shopify::Liquid::Token::Operator') ? $filter->{core} : $filter->{core}->[0]->{core};
 	# TODO God, this is stupid, but temporary patch.
 	my $filter_package;
@@ -368,6 +369,7 @@ sub unparse_argument_tokens {
 	}
 }
 
+use Scalar::Util qw(blessed);
 sub unparse_tokens {
 	my ($self, $ast) = @_;
 	return $ast if $self->is_processed($ast) || $ast->isa('WWW::Shopify::Liquid::Token');
@@ -376,7 +378,7 @@ sub unparse_tokens {
 		if ($ast->isa('WWW::Shopify::Liquid::Tag::Enclosing')) {
 			if ($ast->isa('WWW::Shopify::Liquid::Tag::If')) {
 				return (WWW::Shopify::Liquid::Token::Tag->new([0,0,0], $ast->{core}, \@arguments), $self->unparse_tokens($ast->{true_path}), WWW::Shopify::Liquid::Token::Tag->new([0,0,0], 'end' . $ast->{core})) if !$ast->{false_path};
-				if ($ast->{false_path}->isa('WWW::Shopify::Liquid::Tag::If')) {
+				if (blessed($ast->{false_path}) && $ast->{false_path}->isa('WWW::Shopify::Liquid::Tag::If')) {
 					# Untangle the thing, and spread out in an array all if statement that have if statements as their false_paths.
 					my @elsifs;
 					my $recursive;

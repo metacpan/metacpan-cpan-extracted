@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Prg - Package for language Prussian
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Prg - Package for language Prussian
 
 package Locale::CLDR::Locales::Prg;
 # This file auto generated from Data\common\main\prg.xml
-#	on Sun  5 Aug  6:17:54 pm GMT
+#	on Sun  7 Oct 10:53:56 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -779,13 +781,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
 				'wide' => {
 					'pm' => q{pa pussideinan},
 					'am' => q{ankstāinan},
-				},
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
 				},
 			},
 		},
@@ -927,9 +929,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			fallback => '{0} – {1}',
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -1024,6 +1023,9 @@ has 'datetime_formats_interval' => (
 				d => q{dd.MM.y–dd.MM.y},
 				y => q{dd.MM.y–dd.MM.y},
 			},
+		},
+		'generic' => {
+			fallback => '{0} – {1}',
 		},
 	} },
 );

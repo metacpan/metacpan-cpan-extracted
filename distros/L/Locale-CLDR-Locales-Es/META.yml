@@ -22,97 +22,97 @@ name: Locale-CLDR-Locales-Es
 provides:
   Locale::CLDR::Locales::Es:
     file: lib/Locale/CLDR/Locales/Es.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any:
     file: lib/Locale/CLDR/Locales/Es/Any.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::419:
     file: lib/Locale/CLDR/Locales/Es/Any/419.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Ar:
     file: lib/Locale/CLDR/Locales/Es/Any/Ar.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Bo:
     file: lib/Locale/CLDR/Locales/Es/Any/Bo.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Br:
     file: lib/Locale/CLDR/Locales/Es/Any/Br.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Bz:
     file: lib/Locale/CLDR/Locales/Es/Any/Bz.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Cl:
     file: lib/Locale/CLDR/Locales/Es/Any/Cl.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Co:
     file: lib/Locale/CLDR/Locales/Es/Any/Co.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Cr:
     file: lib/Locale/CLDR/Locales/Es/Any/Cr.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Cu:
     file: lib/Locale/CLDR/Locales/Es/Any/Cu.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Do:
     file: lib/Locale/CLDR/Locales/Es/Any/Do.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Ea:
     file: lib/Locale/CLDR/Locales/Es/Any/Ea.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Ec:
     file: lib/Locale/CLDR/Locales/Es/Any/Ec.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Es:
     file: lib/Locale/CLDR/Locales/Es/Any/Es.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Gq:
     file: lib/Locale/CLDR/Locales/Es/Any/Gq.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Gt:
     file: lib/Locale/CLDR/Locales/Es/Any/Gt.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Hn:
     file: lib/Locale/CLDR/Locales/Es/Any/Hn.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Ic:
     file: lib/Locale/CLDR/Locales/Es/Any/Ic.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Mx:
     file: lib/Locale/CLDR/Locales/Es/Any/Mx.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Ni:
     file: lib/Locale/CLDR/Locales/Es/Any/Ni.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Pa:
     file: lib/Locale/CLDR/Locales/Es/Any/Pa.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Pe:
     file: lib/Locale/CLDR/Locales/Es/Any/Pe.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Ph:
     file: lib/Locale/CLDR/Locales/Es/Any/Ph.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Pr:
     file: lib/Locale/CLDR/Locales/Es/Any/Pr.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Py:
     file: lib/Locale/CLDR/Locales/Es/Any/Py.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Sv:
     file: lib/Locale/CLDR/Locales/Es/Any/Sv.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Us:
     file: lib/Locale/CLDR/Locales/Es/Any/Us.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Uy:
     file: lib/Locale/CLDR/Locales/Es/Any/Uy.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Es::Any::Ve:
     file: lib/Locale/CLDR/Locales/Es/Any/Ve.pm
-    version: v0.33.0
+    version: v0.33.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.33.0
+  Locale::CLDR: v0.33.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -122,5 +122,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.33.0
+version: v0.33.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

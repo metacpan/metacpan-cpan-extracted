@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Fr::Any::Ch - Package for language French
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Ch - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Ch;
 # This file auto generated from Data\common\main\fr_CH.xml
-#	on Sun  5 Aug  6:01:47 pm GMT
+#	on Sun  7 Oct 10:33:25 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1070,52 +1072,52 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'generic') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 0
-						&& $time < 400;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 0
-						&& $time < 400;
 				}
 				last SWITCH;
 				}
@@ -1135,21 +1137,21 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'narrow' => {
+					'afternoon1' => q{de l’ap.m.},
+					'midnight' => q{min.},
+					'evening1' => q{du soir},
+					'morning1' => q{du mat.},
+					'night1' => q{du mat.},
+					'noon' => q{midi},
+				},
 				'abbreviated' => {
 					'morning1' => q{du mat.},
-					'evening1' => q{du soir},
-					'afternoon1' => q{de l’ap.m.},
-					'midnight' => q{min.},
-					'noon' => q{midi},
 					'night1' => q{du mat.},
-				},
-				'narrow' => {
-					'evening1' => q{du soir},
-					'morning1' => q{du mat.},
-					'afternoon1' => q{de l’ap.m.},
-					'midnight' => q{min.},
 					'noon' => q{midi},
-					'night1' => q{du mat.},
+					'afternoon1' => q{de l’ap.m.},
+					'evening1' => q{du soir},
+					'midnight' => q{min.},
 				},
 			},
 			'stand-alone' => {
@@ -1222,14 +1224,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			MEd => q{E, dd.MM.},
-			MMdd => q{dd.MM},
-			Md => q{dd.MM.},
-			yM => q{MM.y GGGGG},
-			yMEd => q{E, dd.MM.y GGGGG},
-			yMd => q{dd.MM.y GGGGG},
-		},
 		'gregorian' => {
 			MEd => q{E, dd.MM.},
 			MMdd => q{dd.MM},
@@ -1237,6 +1231,14 @@ has 'datetime_formats_available_formats' => (
 			yM => q{MM.y},
 			yMEd => q{E, dd.MM.y},
 			yMd => q{dd.MM.y},
+		},
+		'generic' => {
+			MEd => q{E, dd.MM.},
+			MMdd => q{dd.MM},
+			Md => q{dd.MM.},
+			yM => q{MM.y GGGGG},
+			yMEd => q{E, dd.MM.y GGGGG},
+			yMd => q{dd.MM.y GGGGG},
 		},
 	} },
 );
@@ -1254,6 +1256,30 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'gregorian' => {
+			MEd => {
+				M => q{E, dd.MM – E, dd.MM},
+				d => q{E, dd.MM – E, dd.MM},
+			},
+			Md => {
+				M => q{dd.MM – dd.MM},
+				d => q{dd.MM – dd.MM},
+			},
+			yM => {
+				M => q{MM.y – MM.y},
+				y => q{MM.y – MM.y},
+			},
+			yMEd => {
+				M => q{E, dd.MM.y – E, dd.MM.y},
+				d => q{E, dd.MM.y – E, dd.MM.y},
+				y => q{E, dd.MM.y – E, dd.MM.y},
+			},
+			yMd => {
+				M => q{dd.MM.y – dd.MM.y},
+				d => q{dd.MM.y – dd.MM.y},
+				y => q{dd.MM.y – dd.MM.y},
+			},
+		},
 		'generic' => {
 			H => {
 				H => q{HH–HH},
@@ -1325,30 +1351,6 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM.y – dd.MM.y GGGGG},
 				d => q{dd.MM.y – dd.MM.y GGGGG},
 				y => q{dd.MM.y – dd.MM.y GGGGG},
-			},
-		},
-		'gregorian' => {
-			MEd => {
-				M => q{E, dd.MM – E, dd.MM},
-				d => q{E, dd.MM – E, dd.MM},
-			},
-			Md => {
-				M => q{dd.MM – dd.MM},
-				d => q{dd.MM – dd.MM},
-			},
-			yM => {
-				M => q{MM.y – MM.y},
-				y => q{MM.y – MM.y},
-			},
-			yMEd => {
-				M => q{E, dd.MM.y – E, dd.MM.y},
-				d => q{E, dd.MM.y – E, dd.MM.y},
-				y => q{E, dd.MM.y – E, dd.MM.y},
-			},
-			yMd => {
-				M => q{dd.MM.y – dd.MM.y},
-				d => q{dd.MM.y – dd.MM.y},
-				y => q{dd.MM.y – dd.MM.y},
 			},
 		},
 	} },

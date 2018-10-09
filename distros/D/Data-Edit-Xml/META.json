@@ -23,7 +23,7 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Table::Text" : "20181001",
+            "Data::Table::Text" : "20181008",
             "Storable" : "0",
             "Test2::API" : "0",
             "Test::More" : "0",
@@ -35,7 +35,7 @@
    "provides" : {
       "Data::Edit::Xml" : {
          "file" : "lib/Data/Edit/Xml.pm",
-         "version" : "20181001"
+         "version" : "20181008"
       }
    },
    "release_status" : "stable",
@@ -44,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20181001",
+   "version" : "20181008",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

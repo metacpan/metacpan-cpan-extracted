@@ -1,11 +1,12 @@
 package Date::Holidays::KR;
+use utf8;
 use strict;
 use warnings;
 use base 'Exporter';
 use Date::Korean;
 use DateTime;
 use Try::Tiny;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @EXPORT = qw/is_holiday holidays/;
 our @EXPORT_OK = qw/is_solar_holiday is_lunar_holiday/;
@@ -44,7 +45,7 @@ sub is_lunar_holiday {
     my ($year, $month, $day) = @_;
     defined $year  || return;
     defined $month || return;
-    defined $day   || return; 
+    defined $day   || return;
 
     my ($ly, $lm, $ld, $leap) = sol2lun($year, $month, $day);
 
@@ -130,7 +131,7 @@ Date::Holidays::KR - Determine Korean public holidays
 
 =head1 DESCRIPTION
 
-Date::Holidays::KR determines public holidays for Korean. 
+Date::Holidays::KR determines public holidays for Korean.
 
 =head1 FUNCTION
 

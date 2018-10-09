@@ -25,5 +25,17 @@ my $tmpdir = tempdir( TEMPLATE => File::Spec->tmpdir . "/mechacpan_t_XXXXXXXX", 
   ok( -e "$tmpdir/local/lib/perl5/$name.pm", 'Library exists as expected' );
 }
 
+{
+  chdir $tmpdir;
+  is( App::MechaCPAN::get_project_dir(), "$tmpdir", 'Calling get_project_dir does the right thing with cwd' );
+
+  chdir "$tmpdir/local";
+  is( App::MechaCPAN::get_project_dir(), "$tmpdir", 'Calling get_project_dir inside local strips local' );
+
+  chdir $tmpdir;
+  $App::MechaCPAN::PROJ_DIR = "$tmpdir/local";
+  is( App::MechaCPAN::get_project_dir(), "$tmpdir/local", 'Calling get_project_dir with PROJ_DIR outputs PROJ_DIR' );
+}
+
 chdir $pwd;
 done_testing;

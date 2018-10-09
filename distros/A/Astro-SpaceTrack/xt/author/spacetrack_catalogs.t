@@ -90,14 +90,16 @@ spacetrack_skip_no_prompt();
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h2>Complete Data Files (Daily TLEs)</h2>  These links show every element set (&quot;elset&quot; or &quot;TLE&quot;) published on the indicated Julian date (GMT). Note that not every satellite may be represented on every day, while some satellites may have many ELSETS in a given day. <br />
-                    <br />
-                    <div class="col-md-3">
-                        <ul>
-                            <li>
-                            <li>
-                        </ul>
-                    </div>
+                    <h2>Complete Data Files (Daily TLEs)</h2>
+                    <p>These links show every element set (&quot;elset&quot; or &quot;TLE&quot;) published on the indicated Julian date (GMT). Note that not every satellite may be represented on every day, while some satellites may have many ELSETS in a given day.<ul class=" margin-top-10">
+                        <li>
+                        <li>
+                    </ul>
+                </div>
+                <div class="col-md-6 margin-top-30">
+                    <h2>Well-Tracked Analyst Objects</h2>
+                    <p>Well-tracked analyst objects are on-orbit objects that are consistently tracked by the U.S. Space Surveillance Network that cannot be associated with a specific launch. These objects of unknown origin are not entered into the <a href="https://www.space-track.org/#/catalog">satellite catalog</a>, but are maintained using satellite numbers between 80000 and 89999. For more information, please see our <a href="https://www.space-track.org/documentation#/faq">FAQ</a>. The following link shows every element set (elset or &quot;TLE&quot;) published for current well-tracked analyst objects <i>within the last 30 days</i>. <p><b>Note: There will be no SATCAT entries for analyst objects.</b><ul class="margin-top-10">
+                        <li><a href="https://www.space-track.org/basicspacedata/query/class/tle_latest/ORDINAL/1/EPOCH/&gt;now-30/NORAD_CAT_ID/80000--89999/orderby/NORAD_CAT_ID/format/tle/emptyresult/show" target="_blank">Two Line Analyst Satellite TLEs</a></ul>
                 </div>
             </div>
         </div>

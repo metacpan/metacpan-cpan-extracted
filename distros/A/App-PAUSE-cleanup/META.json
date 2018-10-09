@@ -1,0 +1,84 @@
+{
+   "abstract" : "Manage (delete/undelete) your PAUSE files",
+   "author" : [
+      "Robert Krimen <robertkrimen@gmail.com>",
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-PAUSE-cleanup",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Identity::PAUSE" : "0",
+            "Getopt::Long" : "0",
+            "Getopt::Usaginator" : "0",
+            "Term::EditorEdit" : "0",
+            "WWW::Mechanize" : "0",
+            "Web::Query" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "App::PAUSE::cleanup" : {
+         "file" : "lib/App/PAUSE/cleanup.pm",
+         "version" : "0.0014"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/App-PAUSE-cleanup/issues"
+      },
+      "homepage" : "https://github.com/yanick/App-PAUSE-cleanup",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/App-PAUSE-cleanup.git",
+         "web" : "https://github.com/yanick/App-PAUSE-cleanup"
+      }
+   },
+   "version" : "0.0014",
+   "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
+   "x_contributors" : [
+      "Dan Book <grinnz@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+}
+

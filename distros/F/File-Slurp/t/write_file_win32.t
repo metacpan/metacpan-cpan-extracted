@@ -1,20 +1,27 @@
 use strict;
-use File::Slurp ;
+use warnings;
+use IO::Handle ();
 
-use Test::More tests => 1;
+use File::Basename ();
+use File::Spec ();
+use lib File::Spec->catdir(File::Spec->rel2abs(File::Basename::dirname(__FILE__)), 'lib');
 
-BEGIN { $^W = 1 }
+use FileSlurpTest qw(temp_file_path trap_function);
+
+use File::Slurp qw(write_file read_file);
+use Test::More ;
+
+plan tests => 1;
 
 sub simple_write_file {
-    open FH, ">$_[0]" or die "Couldn't open $_[0] for write: $!";
-    print FH $_[1];
-    close FH ;
+    open my $fh, ">", $_[0] or die "Couldn't open $_[0] for write: $!";
+    $fh->print($_[1]);
 }
 
 sub newline_size {
     my ($code) = @_;
 
-    my $file = __FILE__ . '.tmp';
+    my $file = temp_file_path();
 
     local $\ = '';
     $code->($file, "\n" x 3);

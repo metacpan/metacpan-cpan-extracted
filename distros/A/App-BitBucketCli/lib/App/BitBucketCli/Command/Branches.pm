@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 
 extends 'App::BitBucketCli';
 
-our $VERSION = 0.005;
+our $VERSION = 0.006;
 
 sub options {
     return [qw/
@@ -53,7 +53,7 @@ App::BitBucketCli::Command::Branches - Show branches of a repository
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Command::Branches version 0.005
+This documentation refers to App::BitBucketCli::Command::Branches version 0.006
 
 =head1 SYNOPSIS
 

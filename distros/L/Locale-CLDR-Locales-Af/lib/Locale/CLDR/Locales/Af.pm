@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Af - Package for language Afrikaans
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Af - Package for language Afrikaans
 
 package Locale::CLDR::Locales::Af;
 # This file auto generated from Data\common\main\af.xml
-#	on Sun  5 Aug  5:49:56 pm GMT
+#	on Sun  7 Oct 10:19:04 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -5086,51 +5088,51 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 500;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
@@ -5150,60 +5152,60 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'night1' => q{die nag},
-					'evening1' => q{die aand},
-					'afternoon1' => q{die middag},
+				'wide' => {
 					'morning1' => q{die oggend},
-					'midnight' => q{middernag},
-					'am' => q{vm.},
+					'night1' => q{die nag},
 					'pm' => q{nm.},
+					'afternoon1' => q{die middag},
+					'midnight' => q{middernag},
+					'evening1' => q{die aand},
+					'am' => q{vm.},
 				},
 				'narrow' => {
+					'night1' => q{n},
+					'morning1' => q{o},
+					'pm' => q{n},
 					'midnight' => q{mn},
 					'evening1' => q{a},
 					'afternoon1' => q{m},
-					'morning1' => q{o},
 					'am' => q{v},
-					'pm' => q{n},
-					'night1' => q{n},
 				},
-				'wide' => {
+				'abbreviated' => {
+					'morning1' => q{die oggend},
 					'night1' => q{die nag},
 					'pm' => q{nm.},
-					'am' => q{vm.},
-					'morning1' => q{die oggend},
-					'evening1' => q{die aand},
 					'afternoon1' => q{die middag},
+					'evening1' => q{die aand},
 					'midnight' => q{middernag},
+					'am' => q{vm.},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'night1' => q{nag},
-					'am' => q{vm.},
-					'pm' => q{nm.},
-					'evening1' => q{aand},
-					'afternoon1' => q{middag},
-					'midnight' => q{middernag},
-					'morning1' => q{oggend},
-				},
 				'narrow' => {
-					'night1' => q{n},
-					'afternoon1' => q{m},
-					'evening1' => q{a},
-					'morning1' => q{o},
-					'midnight' => q{mn},
-					'pm' => q{n},
 					'am' => q{v},
+					'afternoon1' => q{m},
+					'midnight' => q{mn},
+					'evening1' => q{a},
+					'pm' => q{n},
+					'morning1' => q{o},
+					'night1' => q{n},
 				},
 				'wide' => {
-					'night1' => q{nag},
-					'evening1' => q{aand},
-					'morning1' => q{oggend},
 					'afternoon1' => q{middag},
+					'evening1' => q{aand},
 					'midnight' => q{middernag},
+					'am' => q{vm.},
+					'morning1' => q{oggend},
+					'night1' => q{nag},
 					'pm' => q{nm.},
+				},
+				'abbreviated' => {
+					'night1' => q{nag},
+					'morning1' => q{oggend},
+					'pm' => q{nm.},
+					'midnight' => q{middernag},
+					'evening1' => q{aand},
+					'afternoon1' => q{middag},
 					'am' => q{vm.},
 				},
 			},

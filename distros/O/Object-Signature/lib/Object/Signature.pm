@@ -1,14 +1,12 @@
-package Object::Signature;
+package Object::Signature; # git description: 5b580b0
 
-use 5.005;
 use strict;
+use warnings;
+
+our $VERSION = '1.08';
+
 use Storable    2.11 ();
 use Digest::MD5 2.00 ();
-
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.07';
-}
 
 sub signature {
 	local $Storable::canonical = 1;
@@ -45,14 +43,14 @@ order to allow your objects to generate unique cryptographic signatures.
 The method used to generate the signature is based on L<Storable> and
 L<Digest::MD5>. The object is fed to C<Storable::nfreeze> to get a string,
 which is then passed to L<Digest::MD5::md5_hex> to get a unique 32
-character hexidecimal signature.
+character hexadecimal signature.
 
 =head1 METHODS
 
 =head2 signature
 
 The C<signature> method is the only method added to your class, and will
-generate a unique 32 hexidecimal signature for any object it is called on.
+generate a unique 32 hexadecimal signature for any object it is called on.
 
 =head1 SUPPORT
 

@@ -1,0 +1,7 @@
+Build.PL
+lib/Data/Edit/Xml/Xref.pm
+lib/Data/Edit/Xml/Xref.pm.backup
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

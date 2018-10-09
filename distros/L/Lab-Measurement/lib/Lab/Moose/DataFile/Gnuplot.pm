@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.661';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.662';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use 5.010;
@@ -596,7 +596,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.661
+version 3.662
 
 =head1 SYNOPSIS
 
@@ -797,6 +797,15 @@ F<data.png>. Mandatory if you add multiple plots to one datafile.
 
 Terminal for hard_copy option. Use png terminal by default. The 'output'
 terminal option must be supported.
+
+=item * live
+
+Set to false to only create the hardcopy and no live plot.
+
+ $file->add_plot(
+     live => 0,
+     ...,
+ );
 
 =back
 

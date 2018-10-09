@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Kln - Package for language Kalenjin
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Kln - Package for language Kalenjin
 
 package Locale::CLDR::Locales::Kln;
 # This file auto generated from Data\common\main\kln.xml
-#	on Sun  5 Aug  6:08:04 pm GMT
+#	on Sun  7 Oct 10:41:26 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -844,8 +846,8 @@ has 'day_periods' => (
 					'pm' => q{koosk},
 				},
 				'wide' => {
-					'am' => q{karoon},
 					'pm' => q{kooskoliny},
+					'am' => q{karoon},
 				},
 			},
 		},

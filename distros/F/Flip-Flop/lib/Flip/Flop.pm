@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 
 package Flip::Flop;
-our $VERSION = 20180925;
+our $VERSION = 20181005;
 use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;
@@ -69,12 +69,19 @@ If the upload succeeds, your program source code will be modified to read:
 so that the next time you run your program from your IDE this lengthy operation
 will not be performed unless you explicitly re-request it.
 
-If the run does not succeed the switch will be left unchanged.
+If the run does not succeed the switch will be left unchanged. The switch will
+only be reset if your program requests the reset and exits explicitly or
+implicitly with exit(0).
 
 You can have as many such switches as desired.
 
 If your program L<forks|/fork>, then only the process in which Perl was started
 will update the Flip::Flop switches.
+
+This capability will only be useful to you if you are using an editor that
+detects changes made independently to the file currently being edited. If you
+do use such an editor this technique is surprisingly useful for simplifying,
+standardizing, streamlining and supporting your edit/run cycle.
 
 =head1 Installation
 

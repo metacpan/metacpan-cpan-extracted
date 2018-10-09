@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Gsw - Package for language Swiss German
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Gsw - Package for language Swiss German
 
 package Locale::CLDR::Locales::Gsw;
 # This file auto generated from Data\common\main\gsw.xml
-#	on Sun  5 Aug  6:03:11 pm GMT
+#	on Sun  7 Oct 10:35:03 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4047,21 +4049,19 @@ has 'day_period_data' => (
 			if ($_ eq 'buddhist') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
 					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
@@ -4070,27 +4070,27 @@ has 'day_period_data' => (
 						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
 					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
@@ -4099,27 +4099,27 @@ has 'day_period_data' => (
 						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'selection') {
 					return 'midnight' if $time == 0;
-					return 'afternoon2' if $time >= 1400
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
@@ -4128,6 +4128,8 @@ has 'day_period_data' => (
 						&& $time < 1200;
 					return 'night1' if $time >= 0
 						&& $time < 500;
+					return 'afternoon2' if $time >= 1400
+						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -4147,37 +4149,37 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{nam.},
-					'midnight' => q{Mitternacht},
-					'afternoon2' => q{am Namittag},
-					'night1' => q{znacht},
-					'am' => q{vorm.},
-					'evening1' => q{zaabig},
-					'afternoon1' => q{zmittag},
-					'morning1' => q{am Morge},
-				},
 				'wide' => {
 					'am' => q{am Vormittag},
 					'evening1' => q{zaabig},
-					'afternoon1' => q{zmittag},
-					'morning1' => q{am Morge},
-					'pm' => q{am Namittag},
 					'afternoon2' => q{am Namittag},
-					'midnight' => q{Mitternacht},
 					'night1' => q{znacht},
+					'morning1' => q{am Morge},
+					'midnight' => q{Mitternacht},
+					'afternoon1' => q{zmittag},
+					'pm' => q{am Namittag},
+				},
+				'abbreviated' => {
+					'evening1' => q{zaabig},
+					'am' => q{vorm.},
+					'morning1' => q{am Morge},
+					'night1' => q{znacht},
+					'afternoon2' => q{am Namittag},
+					'afternoon1' => q{zmittag},
+					'midnight' => q{Mitternacht},
+					'pm' => q{nam.},
 				},
 			},
 			'stand-alone' => {
 				'wide' => {
-					'afternoon1' => q{Mittag},
-					'evening1' => q{Aabig},
-					'morning1' => q{Morge},
-					'am' => q{Vormittag},
-					'night1' => q{Nacht},
-					'afternoon2' => q{Namittag},
 					'midnight' => q{Mitternacht},
+					'afternoon1' => q{Mittag},
 					'pm' => q{Namittag},
+					'am' => q{Vormittag},
+					'evening1' => q{Aabig},
+					'afternoon2' => q{Namittag},
+					'morning1' => q{Morge},
+					'night1' => q{Nacht},
 				},
 			},
 		},
@@ -4273,7 +4275,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d.},
 			H => q{H},
 			Hm => q{HH:mm},
@@ -4302,7 +4304,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d.},
 			H => q{H},
 			Hm => q{HH:mm},
@@ -4347,7 +4349,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -4445,7 +4447,7 @@ has 'datetime_formats_interval' => (
 				y => q{dd.MM.y – dd.MM.y},
 			},
 		},
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},

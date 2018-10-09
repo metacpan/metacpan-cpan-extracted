@@ -14,12 +14,17 @@ use English qw/ -no_match_vars /;
 
 extends 'App::BitBucketCli';
 
-our $VERSION = 0.005;
+our $VERSION = 0.006;
 
 sub options {
     return [qw/
         colors|c=s%
         force|f!
+        author|a=s
+        to_branch|to-branch|t=s
+        from_branch|from-branch|f=s
+        title|T=s
+        state|s=s
         long|l
         project|p=s
         regexp|R
@@ -35,11 +40,20 @@ sub pull_requests {
     my @pull_requests = sort {
             lc $a->id cmp lc $b->id;
         }
-        $self->core->pull_requests($self->opt->{project}, $self->opt->{repository});
+        $self->core->pull_requests($self->opt->{project}, $self->opt->{repository}, $self->opt->{state} || 'OPEN');
 
     my @prs;
     my %max;
+    my $author      = $self->opt->author();
+    my $to_branch   = $self->opt->to_branch();
+    my $from_branch = $self->opt->from_branch();
+    my $title       = $self->opt->title();
     for my $pull_request (@pull_requests) {
+        next if $author && $pull_request->author->{user}{displayName} !~ /$author/;
+        next if $to_branch && $pull_request->toRef->{displayId} !~ /$to_branch/;
+        next if $from_branch && $pull_request->fromRef->{displayId} !~ /$from_branch/;
+        next if $title && $pull_request->title !~ /$title/;
+
         push @prs, {
             id     => $pull_request->id,
             title  => $pull_request->title,
@@ -72,7 +86,7 @@ App::BitBucketCli::Command::PullRequests - Show the pull requests of a repositor
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Command::PullRequests version 0.005
+This documentation refers to App::BitBucketCli::Command::PullRequests version 0.006
 
 =head1 SYNOPSIS
 
@@ -95,6 +109,16 @@ This documentation refers to App::BitBucketCli::Command::PullRequests version 0.
   -s --sleep[=]seconds
                     ??
   -t --test         ??
+  -a --author[=]regex
+                    Show only pull requests by this author
+  -t --to-branch[=]regex
+                    Show only pull requests to this branch
+  -f --from-branch[=]rege
+                    Show only pull requests from this branchx
+  -T --title[=]regex
+                    Show only pull requests matching this title
+  -s --state[=](OPEN|MERGED|DECLINED|ALL)
+                    Show pull requests of this type (Default OPEN)
 
  CONFIGURATION:
   -h --host[=]str   Specify the Stash/Bitbucket Servier host name

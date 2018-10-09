@@ -1,3 +1,4 @@
+# vim: set noai ts=4 sw=4:
 package DBIx::Class::TopoSort;
 
 use 5.008_004;
@@ -5,9 +6,64 @@ use 5.008_004;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.050010';
+our $VERSION = '0.050100';
 
 use Graph;
+
+# Even though JSON::MaybeXS is recommended, DBIx::Class already uses JSON::Any,
+# so we can depend on it existing in the world.
+# Note: We cannot use JSON::DWIW because it does not provide a canonical()
+# method. We need this in order to ensure the same hash is encoded the same way
+# every time. Otherwise, preserve the order provided.
+use JSON::Any qw(CPANEL XS JSON PP);
+use Memoize qw(memoize unmemoize);
+use Scalar::Util qw(reftype);
+
+my $MEMOIZED = 0;
+sub enable_toposort_memoize {
+    disable_toposort_memoize() if $MEMOIZED;
+
+    shift;
+    my ($normalizer) = @_;
+    $normalizer ||= sub {
+        my @keys = (
+            $$,
+        );
+
+        # toposort() could be called either as $schema->toposort(%opts) or as
+        # DBIx::Class::TopoSort->toposort($schema, %opts)
+        my $schema = shift;
+        unless (ref($schema) && $schema->isa('DBIx::Class::Schema')) {
+            $schema = shift;
+        }
+
+        # If you give me a $schema object, the graph is going to be the same
+        # for every instance of that schema, so we can use the schema's class
+        # for the anchor.
+        push @keys, reftype($schema);
+
+        # We need to track the %opts provided because invocations with different
+        # parameters may result in different outputs.
+        my %opts = @_;
+        if (%opts) {
+            push @keys, JSON::Any->new->canonical(1)->encode(\%opts);
+        }
+
+        return join ':', @keys;
+    };
+
+    $MEMOIZED = 1;
+    memoize('DBIx::Class::TopoSort::toposort',
+        NORMALIZER => $normalizer,
+    );
+}
+
+sub disable_toposort_memoize {
+    return unless $MEMOIZED;
+
+    $MEMOIZED = 0;
+    unmemoize('DBIx::Class::TopoSort::toposort');
+}
 
 sub toposort_graph {
     my $self = shift;
@@ -39,6 +95,12 @@ sub toposort_graph {
                 }
             }
         }
+    }
+
+    if ($opts{detect_cycle}) {
+        my @cycle = $g->find_a_cycle;
+        die 'Found circular relationships between [' . join(', ', @cycle) . ']'
+            if @cycle;
     }
 
     return $g;
@@ -146,7 +208,39 @@ names.
       Artist => [ qw/ first_album / ],
   },
 
+=item detect_cycle
+
+If this is true, then L<Graph/find_a_cycle> will be called and, if a cycle is
+found, this will die detailing the cycle found.
+
+This is useful because the L<Graph/toposort> method dies with a cyclic
+graph, but doesn't tell you what any of the cycles are that killed it.
+
+B<NOTE>: Finding cycles can be expensive. Don't do this on a regular basis.
+
 =back
+
+=head2 enable_toposort_memoize (Class method)
+
+This will L<Memoize/memoize> the L</toposort> function. By default, it uses a
+normalizer function that concatenates the following (in order):
+
+=over 4
+
+=item * The PID of this process
+
+=item * The class of the schema
+
+=item * The canonicalized JSON of any options provided.
+
+=back
+
+You may pass in a different function if you need to.
+
+=head2 disable_toposort_memoize (Class method)
+
+This will disable any memoize on L</toposort>. Unlike L<Memoize/unmemoize>, this
+will not croak if you haven't already memoized.
 
 =head1 SEE ALSO
 
@@ -159,6 +253,10 @@ L<Graph/toposort>
 =item * Rob Kinyon <rob.kinyon@gmail.com>
 
 =back
+
+=head1 CONTRIBUTIONS
+
+Contributions have been generously donated by ZipRecruiter.
 
 =head1 LICENSE
 

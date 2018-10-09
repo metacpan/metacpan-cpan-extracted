@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Te::Any::In - Package for language Telugu
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Te::Any::In - Package for language Telugu
 
 package Locale::CLDR::Locales::Te::Any::In;
 # This file auto generated from Data\common\main\te_IN.xml
-#	on Sun  5 Aug  6:23:58 pm GMT
+#	on Sun  7 Oct 11:01:44 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

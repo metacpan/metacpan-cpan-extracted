@@ -18,7 +18,11 @@ sub process {
     and my $job = shift @{$self->jobs})
   {
     $self->active($self->active + 1);
-    $self->callback->( @$job );
+    my $tx = shift @$job;
+    my $cb = shift @$job;
+    weaken $self;
+    $tx->on(finish => sub { $self->tx_finish(); });
+    $self->callback->( $tx, $cb );
   }
   if (scalar @{$self->jobs} == 0 && $self->active == 0) {
     $self->emit('queue_empty');
@@ -32,7 +36,8 @@ sub tx_finish {
 }
 
 sub enqueue {
-    my ($self, $job) = @_;
+    my ($self, $tx, $cb) = @_;
+    my $job = [$tx, $cb];
     push @{$self->jobs}, $job;
     $self->process();
 }

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ebu - Package for language Embu
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ebu - Package for language Embu
 
 package Locale::CLDR::Locales::Ebu;
 # This file auto generated from Data\common\main\ebu.xml
-#	on Sun  5 Aug  5:57:18 pm GMT
+#	on Sun  7 Oct 10:27:53 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -838,11 +840,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{KI},
 					'pm' => q{UT},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{UT},
 					'am' => q{KI},
 				},

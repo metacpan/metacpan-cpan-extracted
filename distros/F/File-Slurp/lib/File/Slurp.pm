@@ -1,9 +1,10 @@
 package File::Slurp;
 
-use 5.6.2 ;
-
 use strict;
 use warnings ;
+
+our $VERSION = '9999.21';
+$VERSION = eval $VERSION;
 
 use Carp ;
 use Exporter ;
@@ -12,10 +13,8 @@ use POSIX qw( :fcntl_h ) ;
 use Errno ;
 #use Symbol ;
 
-use vars qw( @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION ) ;
+use vars qw( @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS  ) ;
 @ISA = qw( Exporter ) ;
-
-$VERSION = '9999.19';
 
 my @std_export = qw(
 	read_file
@@ -25,16 +24,24 @@ my @std_export = qw(
 	read_dir
 ) ;
 
-my @edit_export = qw( 
+my @edit_export = qw(
 	edit_file
 	edit_file_lines
 ) ;
 
-my @ok_export = qw( 
+my @ok_export = qw(
+) ;
+
+my @abbrev_export = qw(
+	rf
+	wf
+	ef
+	efl
 ) ;
 
 @EXPORT_OK = (
 	@edit_export,
+	@abbrev_export,
 	qw(
 		slurp
 		prepend_file
@@ -42,9 +49,10 @@ my @ok_export = qw(
 ) ;
 
 %EXPORT_TAGS = (
-	'all'	=> [ @std_export, @edit_export, @EXPORT_OK ],
+	'all'	=> [ @std_export, @edit_export, @abbrev_export, @EXPORT_OK ],
 	'edit'	=> [ @edit_export ],
 	'std'	=> [ @std_export ],
+	'abr'	=> [ @abbrev_export ],
 ) ;
 
 @EXPORT = @std_export ;
@@ -103,6 +111,7 @@ BEGIN {
 
 
 *slurp = \&read_file ;
+*rf = \&read_file ;
 
 sub read_file {
 
@@ -363,6 +372,8 @@ ERR
 }
 
 
+*wf = \&write_file ;
+
 sub write_file {
 
 	my $file_name = shift ;
@@ -543,7 +554,7 @@ sub write_file {
 	return 1 ;
 }
 
-# this is for backwards compatibility with the previous File::Slurp module. 
+# this is for backwards compatibility with the previous File::Slurp module.
 # write_file always overwrites an existing file
 
 *overwrite_file = \&write_file ;
@@ -631,6 +642,8 @@ sub prepend_file {
 
 # edit a file as a scalar in $_
 
+*ef = \&edit_file ;
+
 sub edit_file(&$;$) {
 
 	my( $edit_code, $file_name, $opts ) = @_ ;
@@ -683,6 +696,8 @@ sub edit_file(&$;$) {
 
 	return $write_result ;
 }
+
+*efl = \&edit_file_lines ;
 
 sub edit_file_lines(&$;$) {
 
@@ -838,7 +853,7 @@ File::Slurp - Simple and Efficient Reading/Writing/Modifying of Complete Files
 # insert text at the beginning of a file
   prepend_file( 'filename', $text ) ;
 
-# in-place edit to replace all 'foo' with 'bar' in file 
+# in-place edit to replace all 'foo' with 'bar' in file
   edit_file { s/foo/bar/g } 'filename' ;
 
 # in-place edit to delete all lines with 'foo' from file
@@ -873,7 +888,7 @@ current value of $/ as the separator including support for paragraph
 mode when it is set to '').
 
   my $text = read_file( 'filename' ) ;
-  my $bin = read_file( 'filename' { binmode => ':raw' } ) ;
+  my $bin = read_file( 'filename', { binmode => ':raw' } ) ;
   my @lines = read_file( 'filename' ) ;
   my $lines = read_file( 'filename', array_ref => 1 ) ;
 
@@ -885,14 +900,14 @@ If the file argument is a handle (if it is a ref and is an IO or GLOB
 object), then that handle is slurped in. This mode is supported so you
 slurp handles such as C<DATA> and C<STDIN>. See the test handle.t for
 an example that does C<open( '-|' )> and the child process spews data
-to the parant which slurps it in.  All of the options that control how
+to the parent which slurps it in.  All of the options that control how
 the data is returned to the caller still work in this case.
 
 If the first argument is an overloaded object then its stringified value
 is used for the filename and that file is opened.  This is a new feature
 in 9999.14. See the stringify.t test for an example.
 
-By default C<read_file> returns an undef in scalar contex or a single
+By default C<read_file> returns an undef in scalar context or a single
 undef in list context if it encounters an error. Those are both
 impossible to get with a clean read_file call which means you can check
 the return value and always know if you had an error. You can change how
@@ -973,7 +988,7 @@ an already open handle (like \*STDIN). It defaults to 1MB.
 
 You can use this option to control how read_file behaves when an error
 occurs. This option defaults to 'croak'. You can set it to 'carp' or to
-'quiet to have no special error handling. This code wants to carp and
+'quiet' to have no special error handling. This code wants to carp and
 then read another file if it fails.
 
 	my $text_ref = read_file( $file, err_mode => 'carp' ) ;
@@ -982,7 +997,7 @@ then read another file if it fails.
 		# read a different file but croak if not found
 		$text_ref = read_file( $another_file ) ;
 	}
-	
+
 	# process ${$text_ref}
 
 =head2 B<write_file>
@@ -1132,7 +1147,7 @@ data to be written to the file and that is passed to C<write_file> as is
 
 Only the C<binmode> and C<err_mode> options are supported. The
 C<write_file> call has the C<atomic> option set so you will always have
-a consistant file. See above for more about those options.
+a consistent file. See above for more about those options.
 
 C<prepend_file> is not exported by default, you need to import it
 explicitly.
@@ -1164,11 +1179,11 @@ block or a code reference. The code block is not followed by a comma
 comma. See the examples below for both styles. The next argument is
 the filename. The last argument is an optional hash reference and it
 contains key/values that can modify the behavior of
-C<prepend_file>. 
+C<prepend_file>.
 
 Only the C<binmode> and C<err_mode> options are supported. The
 C<write_file> call has the C<atomic> option set so you will always
-have a consistant file. See above for more about those options.
+have a consistent file. See above for more about those options.
 
 Each group of calls below show a Perl command line instance and the
 equivalent calls to C<edit_file> and C<edit_file_lines>.
@@ -1221,7 +1236,7 @@ list of files.
 If this boolean option is set, the string "$dir/" is prefixed to each
 dir entry. This means you can directly use the results to open
 files. A common newbie mistake is not putting the directory in front
-of entries when opening themn.
+of entries when opening them.
 
 	my @paths = read_dir( '/path/to/dir', prefix => 1 ) ;
 
@@ -1237,7 +1252,7 @@ of entries when opening themn.
 
   edit_file edit_file_lines
 
-  You can get all subs in the module exported with 
+  You can get all subs in the module exported with
 	use File::Slurp qw( :all ) ;
 
 =head2 LICENSE
@@ -1248,11 +1263,6 @@ of entries when opening themn.
 
 An article on file slurping in extras/slurp_article.pod. There is
 also a benchmarking script in extras/slurp_bench.pl.
-
-=head2 BUGS
-
-If run under Perl 5.004, slurping from the DATA handle will fail as
-that requires B.pm which didn't get into core until 5.005.
 
 =head1 AUTHOR
 

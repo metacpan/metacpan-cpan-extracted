@@ -221,12 +221,16 @@ sub probe_system {
 *
 * This module is not receiving any cpantesters.org
 * reports from MacOS users, and I'm not sure why.
+* I suspect that the tests in the t/40*.t series
+* are hanging; see the note at the top of t/40a-timeout.t.
+*
 * If this build fails for you, please consider sending
 * a bug report including all output produced in the
 * build process to   bug-Forks-Super@rt.cpan.org
 * or to me personally at   mob@cpan.org  .
 *******************************************************
 <><><>
+        print STDERR "\a\n";
     }
         
     system($^X, 'SysInfo.pm.PL', 'lib/Forks/Super/SysInfo.pm');

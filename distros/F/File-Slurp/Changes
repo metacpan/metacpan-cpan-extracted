@@ -1,11 +1,51 @@
 Revision history File::Slurp
 
+9999.21    2018-10-08
+	- Unset $^W in a few strategic places to silence warnings when Test::Harness
+	  or ExtUtils::MakeMaker turn them on. (Thanks, Graham Knop).
+	- Got rid of a few MYMETA leftovers in the MANIFEST
+	- Add Git repository info to the Makefile
+	- Add a contributor's list for display on metacpan
+
+9999.20_02     2018-10-04  (TRIAL)
+	- Update TravisCI tests to show coverage.
+	- Update all remaining test files
+	- Get rid of assumption of . in @INC in tests
+	- Remove t/TestDriver.pm
+	- Add t/lib/FileSlurpTest.pm
+	- Make sure all tests use a properly acquired temp file
+	- Clean up prereqs a bit further
+	- Document all failure cases in the 01-error* tests.
+	- Moved the CORE:: function overrides to their own test class to only be
+	  included when overriding is necessary
+
+9999.20_01     2018-09-27  (TRIAL)
+	- Fixed spelling mistakes in POD (RT #85251)
+	- Fixed a typo in an example (RTs #72116, #80279)
+	- Remove doc mentions of Perl < 5.006 as that's required.
+	- Fix POD coverage tests by adding a few more ignored functions
+	- Added t/edit_file.t (James Keenan)
+	- Move the POD tests to xt/author
+	- Update t/append_null.t
+	- Update t/binmode.t
+	- Update t/data_list.t
+	- Update t/data_scalar.t
+	- Update t/error_mode.t
+	- Update t/large.t
+	- Update t/original.t
+	- Update t/stringify.t
+	- Added t/00-report-prereqs.t
+	- Added more xt/author tests
+	- Fix all trailing whitespace in accordance with xt/author/eol.t
+	- Updated the Makefile.PL to get all of the prereqs in there.
+	- Add CI testing via TravisCI and AppVeyor
+
 9999.19	  Tue Jun  7 04:06:06 EDT 2011
 	- Fixed use line in t/edit_file.t to import :edit first
 	  Thanks to paul
 	- read_file and write_file work even when interrupted by signals
 	  this includes a test for read_file interrupt
-	  Thanks to Andrew Danforth 
+	  Thanks to Andrew Danforth
 	- Fixed bugs in the config synopsis example
 
 9999.18	  Fri May 13 02:30:05 EDT 2011
@@ -63,10 +103,10 @@ Revision history File::Slurp
 	  and save memory due to not making a copy
 		Thanks to Peter Edwards
 	- read_file in list mode keeps data tainted
-		Thanks to Sébastien Aperghis-Tramoni
+		Thanks to Sï¿½bastien Aperghis-Tramoni
 	- read_file checks for an overloaded object to get the file
-	  name. 
-		Thanks to Sébastien Aperghis-Tramoni
+	  name.
+		Thanks to Sï¿½bastien Aperghis-Tramoni
 
 9999.13   Tue Oct 10 02:04:51 EDT 2006
 	- Refactored the extras/slurp_bench.pl script. It has options,
@@ -98,7 +138,7 @@ Revision history File::Slurp
 	  defined in perl 5.004
 	- File::Slurp now runs on perl 5.004 and newer (see BUGS section)
 	  All of the above thanks to Smylers <Smylers@stripey.com>,
-	  Piers Kent <piers.kent@bbc.co.uk> and 
+	  Piers Kent <piers.kent@bbc.co.uk> and
 	  John Alden <john.alden@bbc.co.uk>
 	- Added pod.t and pod_coverage.t tests. This is to pass all
 	  the CPANTS tests.
@@ -164,4 +204,3 @@ Revision history File::Slurp
 9999.01  Mon Sep  1 00:20:56 2003
 	- original version; created by h2xs 1.21 with options
 		-AX -n File::FastSlurp
-

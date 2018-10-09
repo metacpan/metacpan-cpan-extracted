@@ -1,8 +1,8 @@
+use utf8;
 use strict;
 use DateTime;
 use Date::Holidays::KR;
 use Test::More tests => 24;
-
 
 my %tests = (
     1989 => {

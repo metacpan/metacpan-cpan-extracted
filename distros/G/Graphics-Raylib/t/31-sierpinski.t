@@ -24,12 +24,15 @@ my $img = Graphics::Raylib::Texture->new(
     },
     fullscreen => 1
 );
-$g->fps(1);
+$g->fps(30);
 
-$g->clear;
-Graphics::Raylib::draw {
-    $img->draw;
-};
+my $i = 0;
+while (!$g->exiting && $i++ != 30) {
+    $g->clear;
+    Graphics::Raylib::draw {
+        $img->draw;
+    };
+}
 
 sleep($ENV{RAYLIB_TEST_SLEEP_SECS} // 1);
 ok 1;

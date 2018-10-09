@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Bo - Package for language Tibetan
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Bo - Package for language Tibetan
 
 package Locale::CLDR::Locales::Bo;
 # This file auto generated from Data\common\main\bo.xml
-#	on Sun  5 Aug  5:52:57 pm GMT
+#	on Sun  7 Oct 10:22:38 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -659,12 +661,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{ཕྱི་དྲོ་},
 					'am' => q{སྔ་དྲོ་},
+					'pm' => q{ཕྱི་དྲོ་},
 				},
 				'wide' => {
-					'am' => q{སྔ་དྲོ་},
 					'pm' => q{ཕྱི་དྲོ་},
+					'am' => q{སྔ་དྲོ་},
 				},
 			},
 		},
@@ -738,6 +740,11 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			yMMMMd => q{G སྤྱི་ལོ་y MMMMའི་ཚེས་d},
+			yMMMd => q{G y ལོའི་MMMཚེས་d},
+			yyyyMMMd => q{G y ལོའི་MMMཚེས་d},
+		},
 		'gregorian' => {
 			GyMMM => q{G y LLLL},
 			MMMEd => q{MMMཚེས་d, E},
@@ -746,11 +753,6 @@ has 'datetime_formats_available_formats' => (
 			yMMM => q{y LLL},
 			yMMMMd => q{སྤྱི་ལོ་y MMMMའི་ཚེས་d},
 			yMMMd => q{y ལོའི་MMMཚེས་d},
-		},
-		'generic' => {
-			yMMMMd => q{G སྤྱི་ལོ་y MMMMའི་ཚེས་d},
-			yMMMd => q{G y ལོའི་MMMཚེས་d},
-			yyyyMMMd => q{G y ལོའི་MMMཚེས་d},
 		},
 	} },
 );

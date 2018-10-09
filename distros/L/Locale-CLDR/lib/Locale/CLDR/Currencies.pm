@@ -1,12 +1,12 @@
 package Locale::CLDR::Currencies;
 # This file auto generated from Data.xml
-#	on Sun  5 Aug  5:49:10 pm GMT
+#	on Sun  7 Oct 10:18:10 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -391,6 +391,12 @@ has '_currency_fractions' => (
 			'digits' => '0',
 			'rounding' => '0',
 			'cashdigits' => '0',
+			'cashrounding' => '0',
+		},
+		VEF => {
+			'digits' => '2',
+			'rounding' => '0',
+			'cashdigits' => '2',
 			'cashrounding' => '0',
 		},
 		VND => {

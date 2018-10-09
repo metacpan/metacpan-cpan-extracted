@@ -19,7 +19,7 @@ use App::BitBucketCli::Branch;
 use App::BitBucketCli::PullRequest;
 use YAML::Syck qw/Dump/;
 
-our $VERSION = 0.005;
+our $VERSION = 0.006;
 
 has url => (
     is      => 'rw',
@@ -40,6 +40,10 @@ has mech => (
 has opt => (
     is      => 'rw',
     default => sub {{}},
+);
+has max => (
+    is      => 'rw',
+    default => 100,
 );
 
 sub projects {
@@ -107,6 +111,7 @@ sub repository {
 
 sub pull_requests {
     my ($self, $project, $repository, $state) = @_;
+    $state ||= 'OPEN';
     my @pull_requests;
     my $last_page = 0;
     my $next_page_start = 0;
@@ -115,7 +120,7 @@ sub pull_requests {
     while ( ! $last_page ) {
         my $json;
         eval {
-            $json = $self->_get($self->url . "/projects/$project/repos/$repository/pull-requests?limit=$limit&start=$next_page_start");
+            $json = $self->_get($self->url . "/projects/$project/repos/$repository/pull-requests?limit=$limit&start=$next_page_start&state=$state");
             1;
         } || do {
             warn "Couldn't list pull_requests $@\n";
@@ -124,6 +129,7 @@ sub pull_requests {
         push @pull_requests, @{ $json->{values} };
         $last_page = $json->{isLastPage};
         $next_page_start = $json->{nextPageStart};
+        last if @pull_requests >= $self->max;
     }
 
     return map {App::BitBucketCli::PullRequest->new($_)} @pull_requests;
@@ -238,7 +244,7 @@ App::BitBucketCli::Core - Library for talking to BitBucket Server (or Stash)
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Core version 0.005
+This documentation refers to App::BitBucketCli::Core version 0.006
 
 
 =head1 SYNOPSIS
@@ -288,6 +294,10 @@ Gets details of a repository
 =head2 pass
 
 =head2 mech
+
+=head2 max
+
+Set the maximum number of results to collect from BitBucket Server.
 
 =head2 opt
 

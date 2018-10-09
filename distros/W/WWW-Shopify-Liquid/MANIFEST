@@ -33,11 +33,13 @@ lib/WWW/Shopify/Liquid/Dialect/Web.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Filter/EscapeCSS.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Filter/EscapeHTML.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Filter/EscapeJS.pm
+lib/WWW/Shopify/Liquid/Dialect/Web/Filter/Highlight.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Filter/LinkTo.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Filter/ScriptTag.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Filter/StylesheetTag.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Filter/UrlEscape.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Filter/UrlEscapeParam.pm
+lib/WWW/Shopify/Liquid/Dialect/Web/Tag/EscapeJS.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Tag/Form.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Tag/JavascriptString.pm
 lib/WWW/Shopify/Liquid/Dialect/Web/Tag/Tablerow.pm
@@ -82,6 +84,7 @@ lib/WWW/Shopify/Liquid/Filter/Megumin.pm
 lib/WWW/Shopify/Liquid/Filter/Min.pm
 lib/WWW/Shopify/Liquid/Filter/Minus.pm
 lib/WWW/Shopify/Liquid/Filter/NewlineToBr.pm
+lib/WWW/Shopify/Liquid/Filter/Pluck.pm
 lib/WWW/Shopify/Liquid/Filter/Pluralize.pm
 lib/WWW/Shopify/Liquid/Filter/Plus.pm
 lib/WWW/Shopify/Liquid/Filter/Prepend.pm
@@ -96,12 +99,14 @@ lib/WWW/Shopify/Liquid/Filter/Slice.pm
 lib/WWW/Shopify/Liquid/Filter/Sort.pm
 lib/WWW/Shopify/Liquid/Filter/Split.pm
 lib/WWW/Shopify/Liquid/Filter/Sprintf.pm
+lib/WWW/Shopify/Liquid/Filter/Strip.pm
 lib/WWW/Shopify/Liquid/Filter/StripHtml.pm
 lib/WWW/Shopify/Liquid/Filter/StripNewlines.pm
 lib/WWW/Shopify/Liquid/Filter/Sum.pm
 lib/WWW/Shopify/Liquid/Filter/Times.pm
 lib/WWW/Shopify/Liquid/Filter/Truncate.pm
 lib/WWW/Shopify/Liquid/Filter/Truncatewords.pm
+lib/WWW/Shopify/Liquid/Filter/Uniq.pm
 lib/WWW/Shopify/Liquid/Filter/Upcase.pm
 lib/WWW/Shopify/Liquid/Filter/Within.pm
 lib/WWW/Shopify/Liquid/Filter/WordWrap.pm
@@ -166,10 +171,12 @@ lib/WWW/Shopify/Liquid/Tag/RemoveKey.pm
 lib/WWW/Shopify/Liquid/Tag/Return.pm
 lib/WWW/Shopify/Liquid/Tag/Unless.pm
 lib/WWW/Shopify/Liquid/Tag/Whitespace.pm
+lib/WWW/Shopify/Liquid/Token.pm
 MANIFEST			This list of files
 META.json
 META.yml
 scripts/shopify-liquid-beautify.pl
+scripts/shopify-liquid-compile.pl
 scripts/shopify-liquid-verify.pl
 t/01lexer.t
 t/01lexer_lines.t
@@ -208,16 +215,4 @@ t/20eval.t
 t/21dialects.t
 t/22custom_resolution.t
 t/23pausing.t
-WWW-Shopify-Liquid-XS/Changes
-WWW-Shopify-Liquid-XS/lib/WWW/Shopify/Liquid/XS.pm
-WWW-Shopify-Liquid-XS/Makefile.PL
-WWW-Shopify-Liquid-XS/MANIFEST
-WWW-Shopify-Liquid-XS/MYMETA.json
-WWW-Shopify-Liquid-XS/MYMETA.yml
-WWW-Shopify-Liquid-XS/ppport.h
-WWW-Shopify-Liquid-XS/README
-WWW-Shopify-Liquid-XS/t/WWW-Shopify-Liquid-XS.t
-WWW-Shopify-Liquid-XS/XS.c
-WWW-Shopify-Liquid-XS/XS.o
-WWW-Shopify-Liquid-XS/XS.xs
-WWW-Shopify-Liquid-XS/XS/Element.xs
+t/24literal.t

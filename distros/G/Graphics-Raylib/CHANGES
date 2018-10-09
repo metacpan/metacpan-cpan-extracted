@@ -1,9 +1,43 @@
 ==================================================
-Changes from 2017-07-21 00:00:00 +0000 to present.
+Changes from 2017-10-07 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.022 at 2018-07-21 22:57:40 +0000
+version 0.023 at 2018-10-07 12:36:05 +0000
+------------------------------------------
+
+  Change: 6ee294b33abcc5da56636c91e6081d5c3b2ae391
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-10-07 12:11:23 +0000
+
+    examples: snake.pl: fix snake head collision with fruit
+
+    CheckCollisionRecs() returns true on edge-collision what means that
+    the snake eats the fruit when colliding with it but also when sliding
+    by one unit above or below the fruit.
+
+    Taken from raysan5/raylib#623. 
+
+  Change: cdada137066aaacbac580cfefe5c250f0e8c210f
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-10-07 11:01:06 +0000
+
+    example: snake: early-exit instead of if/else 
+
+  Change: d9dc3817c722a2591ed2af0d1a4e1a60ceee7ddd
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-10-07 10:55:32 +0000
+
+    workaround some tests not rendering on macOS Mojave 
+
+  Change: 4fd507525ff5cc1b1963b83f57691f06637f1a8e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-10-07 10:55:17 +0000
+
+    Bump to newest Alien::raylib 
+
+------------------------------------------
+version 0.022 at 2018-07-18 06:36:55 +0000
 ------------------------------------------
 
   Change: 0af53cedfba950230d339aecf78eb30ebe52b7ed
@@ -452,18 +486,6 @@ version 0.004 at 2017-10-08 00:46:01 +0000
 
     Add ':all' tag to Graphics::Raylib::Color 
 
-------------------------------------------
-version 0.003 at 2017-10-04 14:27:50 +0000
-------------------------------------------
-
-  Change: 674c794bd72a2ee07477d859cc522204347bb01f
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-10-04 16:27:50 +0000
-
-    Draw bitmap by use of textures instead of DrawPixel
-
-    Bigger bitmaps ran into size limits before. 
-
 ================================================
-Plus 2 releases after 2017-07-21 00:00:00 +0000.
+Plus 3 releases after 2017-10-07 00:00:00 +0000.
 ================================================

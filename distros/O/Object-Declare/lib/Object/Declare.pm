@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-$Object::Declare::VERSION = '0.23';
+our $VERSION = '0.24';
 
 sub import {
     my $class       = shift;
@@ -243,7 +243,7 @@ Object::Declare - Declarative object constructor
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -307,6 +307,10 @@ After the declarator block finishes execution, all helper functions are
 removed from the package.  Same-named functions (such as C<&is> and C<&are>)
 that existed before the declarator's execution are restored correctly.
 
+=head1 VERSION
+
+version 0.24
+
 =head1 NOTES
 
 If you export the declarator to another package via C<@EXPORT>, be sure
@@ -366,8 +370,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Object-Declare or by email to
-bug-object-declare@rt.cpan.org.
+L<https://github.com/shlomif/perl-Object-Declare/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -396,7 +399,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Object-Declare>
+L<https://metacpan.org/release/Object-Declare>
 
 =item *
 
@@ -432,14 +435,6 @@ L<http://cpanratings.perl.org/d/Object-Declare>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Object-Declare>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -450,7 +445,7 @@ L<http://cpants.cpanauthors.org/dist/Object-Declare>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/O/Object-Declare>
 

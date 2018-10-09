@@ -39,7 +39,7 @@ our %EXPORT_TAGS =
       'filehandles'  => [ @export_ok_vars, @EXPORT ],
       'vars'         => [ @export_ok_vars, @EXPORT ],
       'all'          => [ @EXPORT_OK, @EXPORT ] );
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 our $SOCKET_READ_TIMEOUT = 0.05;  # seconds
 our $MAIN_PID;
@@ -714,15 +714,19 @@ sub open3 {
 	    $pid, $job);
 }
 
+# pmap and pgrep perform each evaluation in a separate process.
+# This is the best thing to do for slow jobs with large variance
+# in run time but in future versions we must consider ways to
+# chunk the data.
 sub pmap (&@) {
     my ($code,@list) = @_;
+    die "Forks::Super: pmap requires Perl v5.8 or better" if $] < 5.008;
     my %opts = ();
     if (@list > 0 && ref($list[0]) eq 'HASH') {
         %opts = %{shift @list};
     }
     my @pmap = [] x @list;
-    my @jobs;
-    my %disposed = ();
+    my (@jobs, %disposed);
     for (my $i=0; $i<@list; $i++) {
         my @result;
         local $_ = $list[$i];
@@ -733,7 +737,6 @@ sub pmap (&@) {
             _pmap_id => $i,
             on_finish => sub {
                 my ($job,$pid) = @_;
-                #$job->wait;
                 $pmap[$job->{_pmap_id}] = [ @result ];
                 $job->dispose;
                 $disposed{$pid}++;
@@ -741,7 +744,7 @@ sub pmap (&@) {
         };
     }
     while ( grep {
-        $_->is_complete || $_->wait;
+        $_->wait;
         !$_->is_complete && !$disposed{$_->{pid}}
             } @jobs ) {
         Forks::Super::Sigchld::handle_bastards();
@@ -753,13 +756,12 @@ sub pmap (&@) {
 
 sub pgrep (&@) {
     my ($code,@list) = @_;
+    die "Forks::Super: pgrep requires Perl v5.8 or better" if $] < 5.008;
     my %opts = ();
     if (@list > 0 && ref($list[0]) eq 'HASH') {
         %opts = %{shift @list};
     }
-    my @pgrep;
-    my @jobs;
-    my %disposed = ();
+    my (@pgrep, @jobs, %disposed);
     for (my $i=0; $i<@list; $i++) {
         my $result;
         local $_ = $list[$i];
@@ -808,7 +810,7 @@ Forks::Super - extensions and convenience methods to manage background processes
 
 =head1 VERSION
 
-Version 0.96
+Version 0.97
 
 =head1 SYNOPSIS
 

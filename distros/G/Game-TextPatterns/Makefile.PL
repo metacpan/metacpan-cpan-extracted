@@ -17,6 +17,8 @@ my %params = (
     AUTHOR       => 'Jeremy Mates <jmates@cpan.org>',
     VERSION_FROM => 'lib/Game/TextPatterns.pm',
 
+    MIN_PERL_VERSION => '5.24.0',
+
     LICENSE  => 'bsd',
     PL_FILES => {},
 
@@ -26,8 +28,10 @@ my %params = (
     },
     BUILD_REQUIRES => {},
     TEST_REQUIRES  => {
-        'Test::Most' => 0,
-        'lib'        => 0,
+        'Algorithm::Diff' => 0,
+        'Test::More'      => '0.88',    # done_testing
+        'Test::Most'      => 0,
+        'lib'             => 0,
     },
     PREREQ_PM => {
         'Carp'             => 0,
@@ -40,14 +44,7 @@ my %params = (
     },
 
     META_MERGE => {
-        'meta-spec'         => { version => 2 },
-        'homepageresources' => {
-            repository => {
-                url  => 'git://github.com/thrig/Game-TextPatterns.git',
-                web  => 'https://github.com/thrig/Game-TextPatterns',
-                type => 'git',
-            },
-        },
+        resources => { repository => 'https://github.com/thrig/Game-TextPatterns' }
     },
 );
 

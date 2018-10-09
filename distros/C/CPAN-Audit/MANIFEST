@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/CPAN/Audit.pm
+lib/CPAN/Audit/DB.pm
+lib/CPAN/Audit/Version.pm
+minil.toml
+script/cpan-audit
+t/00_compile.t
+t/version.t
+util/generate
+META.yml
+MANIFEST

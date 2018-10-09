@@ -18,7 +18,7 @@ meta-spec:
 name: HTTP-Tiny-Patch-Cache
 requires:
   Digest::SHA: '0'
-  File::Util::Tempdir: '0.030'
+  File::Util::Tempdir: '0.032'
   HTTP::Tiny: '0.057'
   JSON::MaybeXS: '0'
   Log::ger: '0.023'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Patch-Cache
   homepage: https://metacpan.org/release/HTTP-Tiny-Patch-Cache
   repository: git://github.com/perlancar/perl-HTTP-Tiny-Patch-Cache.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -119,7 +119,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'

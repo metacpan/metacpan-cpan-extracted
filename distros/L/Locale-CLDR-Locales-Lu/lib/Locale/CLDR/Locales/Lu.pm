@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Lu - Package for language Luba-Katanga
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Lu - Package for language Luba-Katanga
 
 package Locale::CLDR::Locales::Lu;
 # This file auto generated from Data\common\main\lu.xml
-#	on Sun  5 Aug  6:10:44 pm GMT
+#	on Sun  7 Oct 10:45:01 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -867,12 +869,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'pm' => q{Dilolo},
 					'am' => q{Dinda},
+					'pm' => q{Dilolo},
 				},
 				'abbreviated' => {
-					'pm' => q{Dilolo},
 					'am' => q{Dinda},
+					'pm' => q{Dilolo},
 				},
 			},
 		},
@@ -952,7 +954,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -976,7 +978,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

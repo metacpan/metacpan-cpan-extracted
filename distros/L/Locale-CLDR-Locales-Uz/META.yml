@@ -22,28 +22,28 @@ name: Locale-CLDR-Locales-Uz
 provides:
   Locale::CLDR::Locales::Uz:
     file: lib/Locale/CLDR/Locales/Uz.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Uz::Arab:
     file: lib/Locale/CLDR/Locales/Uz/Arab.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Uz::Arab::Af:
     file: lib/Locale/CLDR/Locales/Uz/Arab/Af.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Uz::Cyrl:
     file: lib/Locale/CLDR/Locales/Uz/Cyrl.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Uz::Cyrl::Uz:
     file: lib/Locale/CLDR/Locales/Uz/Cyrl/Uz.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Uz::Latn:
     file: lib/Locale/CLDR/Locales/Uz/Latn.pm
-    version: v0.33.0
+    version: v0.33.1
   Locale::CLDR::Locales::Uz::Latn::Uz:
     file: lib/Locale/CLDR/Locales/Uz/Latn/Uz.pm
-    version: v0.33.0
+    version: v0.33.1
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.33.0
+  Locale::CLDR: v0.33.1
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -53,5 +53,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.33.0
+version: v0.33.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

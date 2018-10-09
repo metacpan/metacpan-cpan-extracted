@@ -277,6 +277,8 @@ Thoughts about a major revision. Also see the  TODO  file.
 	Like converting a CGI script to FastCGI, you may need to
 	think carefully about the way you design your background job.
 
+        The "chunking" that we're talking about is a part of this.
+
     ___ wrapper script or code that can set up job options (IPC,
         timeouts, os priority, cpu affinity, etc.) and then execute
         a block of Perl code. The goal would be to be able to run a

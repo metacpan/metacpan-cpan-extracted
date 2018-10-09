@@ -4,12 +4,14 @@ use POSIX ':sys_wait_h';
 
 # spike script to see if Forks::Super should use the poor man's
 # alarm on this system.
+#
 # exit 0 if regular alarm is sufficient
 # exit non-zero if regular alarm doesn't work for some reason
 #
 # if tests t/40a, t/40d, and t/40g don't work for you but t/40j does,
 # run this script and report the output and exit status of this script
 # to me at  mob@cpan.org .
+#
 
 if ($^O eq 'MSWin32') {
     $? = 4 << 8;

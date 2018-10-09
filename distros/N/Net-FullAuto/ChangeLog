@@ -20,6 +20,28 @@
 #######################################################################
 
 
+
+2018-10-08  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000423 released
+
+        * Updated Oracle url in Makefile.PL.
+
+
+2018-10-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000422 released
+
+	* Updated Oracle url in Makefile.PL.
+
+
+2018-10-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000421 released
+
+        * Updated Instruction Set ClipBucket_is.pm.
+
+
 2018-09-23  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000420 released

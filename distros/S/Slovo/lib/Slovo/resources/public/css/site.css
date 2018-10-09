@@ -130,10 +130,10 @@ main#content-wrapper {
   padding: 1.5rem 1rem 0 1rem;
 }
 
-@media (min-width: 70rem) {
+@media (min-width: 60rem) {
   section {
       margin:auto;
-      max-width:60rem;
+      max-width:55rem;
   }
 }
 
@@ -263,7 +263,7 @@ section.множество article.писанѥ h2 {
     overflow: hidden;
     /* top | right | bottom | left */
     margin: 0 0      .5rem   .5rem;
-    padding: 0 1.5rem 0 0      0;
+    padding: 0 1.5rem 0      0;
     border-top: 0.5rem solid #607d8b;
     border-right: 0.5rem solid #607d8b;
 }
@@ -283,15 +283,15 @@ section.множество article.писанѥ {
     max-width: 30rem;
     min-width: 15rem;
     width: 25rem;
-    margin: 0.5rem;
+    margin: auto;
     position: relative;
     background: white;
 }
 
-section.множество article.писанѥ div.ѿкѫс {
+section.множество article.писанѥ div.ѿкѫсъ {
     overflow: hidden;
     height: 8rem;
-    padding: 1rem;
+    padding: .5rem;
 }
 
 

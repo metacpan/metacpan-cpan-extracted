@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Om - Package for language Oromo
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Om - Package for language Oromo
 
 package Locale::CLDR::Locales::Om;
 # This file auto generated from Data\common\main\om.xml
-#	on Sun  5 Aug  6:16:56 pm GMT
+#	on Sun  7 Oct 10:52:47 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -595,21 +597,21 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{WD},
 					'pm' => q{WB},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{WB},
 					'am' => q{WD},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
+				'narrow' => {
 					'am' => q{WD},
 					'pm' => q{WB},
 				},
-				'narrow' => {
+				'wide' => {
 					'pm' => q{WB},
 					'am' => q{WD},
 				},

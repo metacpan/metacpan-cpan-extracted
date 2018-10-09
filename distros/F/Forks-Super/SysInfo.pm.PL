@@ -7,7 +7,7 @@
 use lib qw(lib);
 use strict;
 use warnings;
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 my $limits_file = "t/out/limits.$^O.$]";
 my $limits_file2 = "t/out/limits.$^O";

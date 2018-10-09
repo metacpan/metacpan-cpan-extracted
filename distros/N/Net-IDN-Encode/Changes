@@ -1,57 +1,62 @@
 Revision history for Perl extension Net::IDN::Encode
 
-2.401 (2018-09-20)
+2.500 2018-10-06
+	- update to Unicode 10.0.0
+	- Net::IDN::UTS46: remove workarounds for pre-9.0.0 test vectors; the
+	  module now more closely follows the written spec
+	- Net::IDN::UTS46: fix validation for some non-valid characters
+	- Net::IDN::UTS46: for perl 5.8.x/5.10.x, include workaround for bidi
+	  validation where some labels would incorrectly be marked as invalid
+	  [B1] because of a bug in perl's Unicode implementation
+	- Net::IDN::Punycode: fix for warnings under perl ≤ 5.8.7 (EXPERIMENTAL)
+
+2.401 2018-09-20
 	- FIXES: #127056: [PATCH 1/2] Fix domain_to_ascii AllowUnassigned param
 	  (report and patch by SKJM)
 	- FIXES: #127057: [PATCH 2/2] Fix domain_to_unicode AllowUnassigned
 	  param (report and patch by SKJM)
 
-2.400 (2017-01-01)
-	- new release version
+2.400 2017-01-01
+	- update to Unicode 9.0.0
+	- FIXES #119468: [PATCH] spelling fixes (reported by GREGOA)
+	- possible fix for utf8 warnings under perl 5.8.x
+	- changed generation of tests so that TODO is no longer required when
+	  the module author's perl doesn't support the newest Unicode version
 	- remove author tests
 	- more spelling fixes
 
-2.399_20161227
-	- FIXES #119468: [PATCH] spelling fixes (reported by GREGOA)
-	- possible fix for utf8 warnings under perl 5.8.x
-
-2.399_20161210
-	- update to Unicode 9.0.0
-	- changed generation of tests so that TODO is no longer required when
-	  the module author's perl doesn't support the newest Unicode version
-
-2.303 (2016-12-10)
+2.303 2016-12-10
 	- FIXES: warnings when compiling lib/Net/IDN/Punycode.xs
 	  (reported/patch provided by paul@c***-***.org)
 
-2.302 (2016-12-07)
+2.302 2016-12-07
 	- Fixes memory bug introduced by fix for #118924
 
-2.301 (2016-12-03)
+2.301 2016-12-03
 	- FIXES: #118924: encode_punycode heap overflow
 	  (reported by Alexander Bluhm)
 
-2.300 (2015-06-17)
+2.300 2015-06-17
 	- update to Unicode 8.0.0
 
-2.202 (2015-04-18)
+2.202 2015-04-18
 	- use updated IdnaTest.txt from Unicode 7.0.0 database
 	  FIXES: #96749: Fails with bleadperl
 	- documentation updates, point to perl Unicode tutorials
 	- tests for domain xn--zcaa.de;
 	  REJECTED: #103205 for Net-IDN-Encode: conversion of domain name
 
-2.201 (2014-08-30)
+2.201 2014-08-30
 	- correct handling of uppercase a-labels in
 	  domain_to_{ascii,unicode}
 	- FIXES: #98354: Capitalized ACE prefix does not work (reported
 	  by victor@*****.ru)
 
-2.200 (2014-06-21)
+2.200 2014-06-21
 	- Net::IDN::UTS46: update to Unicode® 7.0.0 and UTS #46 r13
 	- typo and metadata fixes from dstreinbrunner
 
-2.100 (2013-12-30)
+2.100 2013-12-30
 	- Net::IDN::Encode: preserve case in pure-ASCII labels (bypass
 	  en-/decoding) 
 	  FIXES: #91059: case not preserved (reported by DMUEY)
@@ -73,32 +78,32 @@ Revision history for Perl extension Net::IDN::Encode
 	  utf8_to_uvuni (perl 5.15.9 and higher; utf8_to_uvuni_buf is
 	  deprecated from perl 5.19.5)
 
-2.005 (2013-11-03)
+2.005 2013-11-03
 	- better documentation for unassigned characters,
 	  FIXES: #89750: Can't create IDN for a special domain
 	  (reported by felix.*****@*****.de)
 	- FIXES: #89270: [PATCH] fix spelling errors in the docs
 	  (reported by cstamas@*****.hu)
 
-2.004 (2013-08-12)
+2.004 2013-08-12
 	- FIXES: #85552 3 uts46 tests FAIL under perl-5.18.0	
 	  (reported by d.thomas@*****.au)
 
-2.003 (2012-01-22)
+2.003 2012-01-22
 	- FIXES required version of Unicode::Normalize in UTS46.pm
 	  (reported by CPAN testers)
 
-2.002 (2012-01-18)
+2.002 2012-01-18
 	- FIXES dependencies/required perl version
 	- FIXES: #74021 Makefile.PL bad value for
 	  version-requirement
 
-2.001 (2012-01-12)
+2.001 2012-01-12
 	- FIXES XS_VERSION mismatch
 	- FIXES depencency on Unicode::Normalize (was 1.000 or higher,
 	  but this is not needed).
 
-2.000 (2012-01-08)
+2.000 2012-01-08
 	- switch to Unicode Technical Standard #46 (previously,
 	  IDNA2003 has been used, which is now available as
 	  Net::IDN::IDNA2003):
@@ -117,11 +122,12 @@ Revision history for Perl extension Net::IDN::Encode
 	- FIXES decoding bug in Net::IDN::Punycode::PP (discovered
 	  through UTS #46 test vectors)
 
-1.101 (2011-12-08)
+1.101 2011-12-08
 	- FIXES: #72615 faulty data in Build.PL causes a lack of
 	  meta files, which breaks carton.
 
-1.100 (2010-06-08, patch by Loïc Etienne)
+1.100 2010-06-08
+	[patch by Loïc Etienne]
 	- new parameters AllowUnassigned/UseSTD3ASCIIRules for
 	  to_ascii, to_unicode (RFC 3490)
 	  domain_to_ascii, domain_to_unicode
@@ -134,37 +140,37 @@ Revision history for Perl extension Net::IDN::Encode
 	- _domain replaced by domain_to_unicode and domain_to_ascii
 	- _nameprep replaced by Net::IDN::Nameprep
 
-1.000 (2010-01-13)
+1.000 2010-01-13
 	- clean-up
 	- release
 
-0.999_20090112 (2010-01-10)
+0.999_20090112 2010-01-10
 	- add XS for decode_punycode
 
-0.999_20090110 (2010-01-10)
+0.999_20090110 2010-01-10
 	- add XS for encode_punycode
 
 	- include Net::IDN::Nameprep into Net::IDN::Encode *sigh*
 	- drop IDNA::Punycode
 
-0.99_20091231
+0.99_20091231 2009-12-31
 	- depend on perl 5.8.3
 	- optimise Net::IDN::Punycode
 
-0.99_20091226 Sat Dec 26 00:00:00 2009
+0.99_20091226 2009-12-26
 	- some clean-ups
 
-0.99_20091216 Wed Dec 16 00:00:00 2009
+0.99_20091216 2009-12-16
 	- switch to Module::Build
 	- switch to Github, remove svn:keywords, add .gitignore
 
 	- use ASCII in POD, fixes FAILs with perl 5.6.x
 	- add examples in eg/
 
-0.99_20080913 Sun Sep 13 12:00:00 2008
+0.99_20080913 2009-09-13
 	- fixed perl 5.6.x (no warnings 'utf8')
 
-0.99_20080913 Sat Sep 13 12:00:00 2008
+0.99_20080913 2009-09-13
 	- require perl version 5.6.0 instead of 5.6.6
 	- skip more tests in lower perl versions
 
@@ -173,7 +179,7 @@ Revision history for Perl extension Net::IDN::Encode
 	- renamed back to Net::IDN::Encode; without
 	  Encode::Punycode, the new name does not make sense.
 
-0.99_20071012 Fri Oct 12 12:00:00 2007
+0.99_20071012 2007-10-12
 	- renamed Net-IDN-Encode distribution to Net-IDN-tools
 
 	- includes Net::IDN::Punycode (from IDNA::Punycode v0.02)
@@ -193,8 +199,8 @@ Revision history for Perl extension Net::IDN::Encode
 	- FIXES: #28123: Undeclared dependency on Unicode::Stringprep (reported by ANDK)
 	- FIXES WARNING: v-string in use/require non-portable (Net::IDN::Nameprep[::*])
 
-0.02  Sun Jun 20 00:00:00 2004
+0.02  2004-06-20
 	- fixed handling of incomplete/empty email addresses
 
-0.01  Sun May 30 00:00:00 2004
+0.01  2004-05-30
 	- first release

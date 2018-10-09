@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Tg - Package for language Tajik
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Tg - Package for language Tajik
 
 package Locale::CLDR::Locales::Tg;
 # This file auto generated from Data\common\main\tg.xml
-#	on Sun  5 Aug  6:23:59 pm GMT
+#	on Sun  7 Oct 11:01:46 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

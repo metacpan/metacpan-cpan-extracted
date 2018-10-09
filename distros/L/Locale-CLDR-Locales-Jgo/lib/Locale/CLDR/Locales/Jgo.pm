@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Jgo - Package for language Ngomba
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Jgo - Package for language Ngomba
 
 package Locale::CLDR::Locales::Jgo;
 # This file auto generated from Data\common\main\jgo.xml
-#	on Sun  5 Aug  6:06:58 pm GMT
+#	on Sun  7 Oct 10:39:52 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -644,13 +646,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{mbaꞌmbaꞌ},
-					'pm' => q{ŋka mbɔ́t nji},
-				},
 				'wide' => {
-					'am' => q{mbaꞌmbaꞌ},
 					'pm' => q{ŋka mbɔ́t nji},
+					'am' => q{mbaꞌmbaꞌ},
+				},
+				'abbreviated' => {
+					'pm' => q{ŋka mbɔ́t nji},
+					'am' => q{mbaꞌmbaꞌ},
 				},
 			},
 		},

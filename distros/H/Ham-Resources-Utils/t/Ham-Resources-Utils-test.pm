@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ##
 ## Ham::Resources::Utils test module
-## Test 
+## Test
 ##
 ## (c) Carlos Juan Diaz <ea3hmb at gmail.com> on Nov. 2016
 ##
@@ -16,13 +16,13 @@ my $foo = Ham::Resources::Utils->new();
 my %data;
 my $separator = "\t";
 my $date = "28-6-2012";
-my $locator_dep = "JN11cj";
+my $locator_dep = "JN11cj42";
 my $locator_arr = "IE38sc";
-my %coordinates = ( lat_1 => "41N23", 
-                    long_1 => "2E12", 
-                    lat_2 => "41S54", 
+my %coordinates = ( lat_1 => "41N23",
+                    long_1 => "2E11",
+                    lat_2 => "41S54",
                     long_2 => "12W30");
- 
+
 
 
 print "DATA BY COORDINATES\n";
@@ -42,5 +42,3 @@ sub show_results {
   	print $key.$separator.": ".$data{$key},"\n" if ($data{$key});
   }
 }
-
-

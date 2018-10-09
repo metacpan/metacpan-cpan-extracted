@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Fr::Any::Ht - Package for language French
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Ht - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Ht;
 # This file auto generated from Data\common\main\fr_HT.xml
-#	on Sun  5 Aug  6:01:50 pm GMT
+#	on Sun  7 Oct 10:33:28 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -85,27 +87,27 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 0
+						&& $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 0
 						&& $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-				}
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'night1' if $time >= 0
-						&& $time < 400;
 				}
 				last SWITCH;
 				}
@@ -126,12 +128,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'noon' => q{midi},
-					'night1' => q{de la nuit},
-					'midnight' => q{minuit},
-					'evening1' => q{du soir},
 					'afternoon1' => q{de l’après-midi},
+					'evening1' => q{du soir},
+					'midnight' => q{minuit},
 					'morning1' => q{du matin},
+					'night1' => q{de la nuit},
+					'noon' => q{midi},
 				},
 			},
 		},

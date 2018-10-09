@@ -5,6 +5,24 @@ use warnings;
 
 use App::AsciiChart;
 
+if (!@ARGV) {
+    die <<"EOF"
+Usage: asciichart <x0> <x1> ... <xn>
+
+Example:
+
+    asciichart 2 5 2 7 2
+
+    7┤..╭╮.
+    6┤..││.
+    5┤╭╮││.
+    4┤││││.
+    3┤││││.
+    2┼╯╰╯╰.
+
+EOF
+}
+
 my $plot = App::AsciiChart->new->plot( \@ARGV );
 
 print $plot;

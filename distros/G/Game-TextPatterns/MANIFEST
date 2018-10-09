@@ -3,6 +3,7 @@ LICENSE
 MANIFEST
 Makefile.PL
 README
+eg/walls-and-water
 lib/Game/TextPatterns.pm
 t/00-load.t
 t/Game-TextPatterns.t

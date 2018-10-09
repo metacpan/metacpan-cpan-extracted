@@ -5,7 +5,7 @@ require Exporter;
 require DynaLoader;
 @ISA =         qw(DynaLoader Exporter);
 @EXPORT_OK   = qw(reset to scale time);
-$VERSION     = '0.53';
+$VERSION     = '0.54';
 
 __PACKAGE__->bootstrap($VERSION);
 
@@ -41,7 +41,7 @@ control over the measurement of time.
 
 The theory of relativity asserts that all physical laws are enforced
 relative to the observer.  Since the starting point of time is
-arbitrary, it is permissable to change it.  This has the effect of
+arbitrary, it is permissible to change it.  This has the effect of
 making it appear as if time is moving forwards or backward
 instanteously.  For example, on some types of operating systems time
 starts at Wed Dec 31 19:00:00 1969 (this will likely change as we

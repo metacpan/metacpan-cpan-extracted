@@ -1,5 +1,5 @@
 package Mongoose::Document;
-$Mongoose::Document::VERSION = '1.02';
+$Mongoose::Document::VERSION = '2.00';
 use strict;
 use Mongoose;
 use Mongoose::Join;
@@ -51,7 +51,7 @@ role {
     with( $p->{'-engine'} || 'Mongoose::Engine' );
 
     # attributes
-    has '_id' => ( is => 'rw', isa => 'MongoDB::OID', traits => ['DoNotMongoSerialize'] );
+    has '_id' => ( is => 'rw', isa => 'BSON::OID', traits => ['DoNotMongoSerialize'] );
 
     # aliasing
     if ( my $as = $p->{'-as'} ) {

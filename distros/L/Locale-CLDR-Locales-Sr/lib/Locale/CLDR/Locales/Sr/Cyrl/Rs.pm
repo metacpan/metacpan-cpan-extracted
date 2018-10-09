@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Sr::Cyrl::Rs - Package for language Serbian
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Sr::Cyrl::Rs - Package for language Serbian
 
 package Locale::CLDR::Locales::Sr::Cyrl::Rs;
 # This file auto generated from Data\common\main\sr_Cyrl_RS.xml
-#	on Sun  5 Aug  6:22:19 pm GMT
+#	on Sun  7 Oct 10:59:38 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

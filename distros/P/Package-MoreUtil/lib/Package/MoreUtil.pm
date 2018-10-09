@@ -1,7 +1,7 @@
 package Package::MoreUtil;
 
-our $DATE = '2014-12-05'; # DATE
-our $VERSION = '0.58'; # VERSION
+our $DATE = '2018-10-07'; # DATE
+our $VERSION = '0.590'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,6 +12,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        package_exists
                        list_package_contents
+                       list_package_subs
                        list_subpackages
                );
 
@@ -20,7 +21,9 @@ sub package_exists {
 
     my $pkg = shift;
 
-    return unless $pkg =~ /\A\w+(::\w+)*\z/;
+    # opt
+    #return unless $pkg =~ /\A\w+(::\w+)*\z/;
+
     if ($pkg =~ s/::(\w+)\z//) {
         return !!${$pkg . "::"}{$1 . "::"};
     } else {
@@ -72,6 +75,26 @@ sub list_package_contents {
     %res;
 }
 
+# XXX incomplete/improper too?
+sub list_package_subs {
+    no strict 'refs';
+
+    my $pkg = shift;
+
+    return () unless !length($pkg) || package_exists($pkg);
+    my $symtbl = \%{$pkg . "::"};
+
+    my @res;
+    while (my ($k, $v) = each %$symtbl) {
+        next if $k =~ /::$/; # subpackage
+        if (defined *$v{CODE}) {
+            push @res, $k;
+        }
+    }
+
+    @res;
+}
+
 sub list_subpackages {
     no strict 'refs';
 
@@ -112,18 +135,20 @@ Package::MoreUtil - Package-related utilities
 
 =head1 VERSION
 
-This document describes version 0.58 of Package::MoreUtil (from Perl distribution Package-MoreUtil), released on 2014-12-05.
+This document describes version 0.590 of Package::MoreUtil (from Perl distribution Package-MoreUtil), released on 2018-10-07.
 
 =head1 SYNOPSIS
 
  use Package::MoreUtil qw(
      package_exists
      list_package_contents
+     list_package_subs
      list_subpackages
  );
 
  print "Package Foo::Bar exists" if package_exists("Foo::Bar");
  my %content   = list_package_contents("Foo::Bar");
+ my @subnames  = list_package_subs("Foo::Bar");
  my @subpkg    = list_subpackages("Foo::Bar");
  my @allsubpkg = list_subpackages("Foo::Bar", 1); # recursive
 
@@ -154,6 +179,10 @@ Return a hash containing package contents. For example:
 
 This module won't list subpackages. Use list_subpackages() for that.
 
+=head2 list_package_subs($pkg) => @subnames
+
+Return a list containing subroutine names in package C<$pkg>.
+
 =head2 list_subpackages($name[, $recursive]) => @res
 
 List subpackages, e.g.:
@@ -174,12 +203,6 @@ You can recurse from the top, e.g.:
 
  list_subpackages("", 1);
 
-=head1 SEE ALSO
-
-L<perlmod>
-
-L<Package::Util> (currently empty/placeholder at the time of this writing)
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Package-MoreUtil>.
@@ -196,13 +219,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<perlmod>
+
+L<Package::Util> (currently empty/placeholder at the time of this writing)
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

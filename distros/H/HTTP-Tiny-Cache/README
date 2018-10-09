@@ -1,0 +1,61 @@
+NAME
+    HTTP::Tiny::Cache - Cache HTTP::Tiny responses
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::Cache (from Perl
+    distribution HTTP-Tiny-Cache), released on 2018-10-07.
+
+SYNOPSIS
+     use HTTP::Tiny::Cache;
+
+     my $res  = HTTP::Tiny::Cache->new->get("http://www.example.com/");
+     my $res2 = HTTP::Tiny::Cache->request(GET => "http://www.example.com/"); # cached response
+
+DESCRIPTION
+    This class is a subclass of HTTP::Tiny that cache responses.
+
+    Currently only GET requests are cached. Cache are keyed by
+    SHA256-hex(URL). Error responses are also cached. Currently no
+    cache-related HTTP request or response headers (e.g. "Cache-Control")
+    are respected.
+
+    To determine cache max age, this module will consult environment
+    variables (see "ENVIRONMENT"). If all environment variables are not set,
+    will use the default 86400 (1 day).
+
+ENVIRONMENT
+  CACHE_MAX_AGE
+    Int. Will be consulted after "HTTP_TINY_CACHE_MAX_AGE".
+
+  HTTP_TINY_CACHE_MAX_AGE
+    Int. Will be consulted before "CACHE_MAX_AGE".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Cache>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Cache>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Cache>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HTTP::Tiny
+
+    HTTP::Tiny::Patch::Cache, patch version of this module.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -3,6 +3,8 @@ package IO::Handle::Prototype;
 use strict;
 use warnings;
 
+our $VERSION = '0.02';
+
 use Carp ();
 
 use parent qw(IO::Handle::Util::Overloading);

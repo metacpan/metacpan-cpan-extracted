@@ -1,6 +1,6 @@
 package Tapper::Cmd::Scenario;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Scenario::VERSION = '5.0.9';
+$Tapper::Cmd::Scenario::VERSION = '5.0.10';
 use warnings;
 use strict;
 use 5.010;

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ak - Package for language Akan
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ak - Package for language Akan
 
 package Locale::CLDR::Locales::Ak;
 # This file auto generated from Data\common\main\ak.xml
-#	on Sun  5 Aug  5:50:14 pm GMT
+#	on Sun  7 Oct 10:19:23 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1096,8 +1098,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{AN},
 					'pm' => q{EW},
+					'am' => q{AN},
 				},
 				'abbreviated' => {
 					'pm' => q{EW},
@@ -1181,7 +1183,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -1205,7 +1207,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

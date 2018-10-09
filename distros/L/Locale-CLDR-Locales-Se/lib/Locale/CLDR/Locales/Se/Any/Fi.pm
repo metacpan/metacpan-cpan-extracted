@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Se::Any::Fi - Package for language Northern Sami
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Se::Any::Fi - Package for language Northern Sami
 
 package Locale::CLDR::Locales::Se::Any::Fi;
 # This file auto generated from Data\common\main\se_FI.xml
-#	on Sun  5 Aug  6:20:30 pm GMT
+#	on Sun  7 Oct 10:57:15 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -381,13 +383,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{eb},
-					'am' => q{ib},
-				},
 				'narrow' => {
 					'am' => q{i},
 					'pm' => q{e},
+				},
+				'wide' => {
+					'pm' => q{eb},
+					'am' => q{ib},
 				},
 				'abbreviated' => {
 					'pm' => q{eb},
@@ -396,16 +398,16 @@ has 'day_periods' => (
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{ib},
-					'pm' => q{eb},
-				},
-				'wide' => {
 					'pm' => q{eb},
 					'am' => q{ib},
 				},
 				'narrow' => {
-					'am' => q{ib},
 					'pm' => q{eb},
+					'am' => q{ib},
+				},
+				'wide' => {
+					'pm' => q{eb},
+					'am' => q{ib},
 				},
 			},
 		},

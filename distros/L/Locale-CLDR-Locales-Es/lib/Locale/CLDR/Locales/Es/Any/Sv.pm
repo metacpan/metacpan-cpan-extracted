@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Es::Any::Sv - Package for language Spanish
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Es::Any::Sv - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Sv;
 # This file auto generated from Data\common\main\es_SV.xml
-#	on Sun  5 Aug  5:59:15 pm GMT
+#	on Sun  7 Oct 10:30:15 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -82,25 +84,25 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
@@ -120,25 +122,25 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{p. m.},
 					'am' => q{a. m.},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{p. m.},
 					'am' => q{a. m.},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
+				'narrow' => {
 					'pm' => q{p. m.},
 					'am' => q{a. m.},
 				},
 				'wide' => {
-					'pm' => q{p. m.},
 					'am' => q{a. m.},
+					'pm' => q{p. m.},
 				},
-				'narrow' => {
+				'abbreviated' => {
 					'pm' => q{p. m.},
 					'am' => q{a. m.},
 				},

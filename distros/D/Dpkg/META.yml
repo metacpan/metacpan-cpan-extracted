@@ -5,8 +5,6 @@ author:
 build_requires:
   TAP::Harness: '0'
   Test::More: '0'
-  Test::Pod: '0'
-  Test::Strict: '0'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 0
@@ -187,6 +185,9 @@ provides:
   Dpkg::Source::Archive:
     file: lib/Dpkg/Source/Archive.pm
     version: '0.01'
+  Dpkg::Source::BinaryFiles:
+    file: lib/Dpkg/Source/BinaryFiles.pm
+    version: '0.01'
   Dpkg::Source::Functions:
     file: lib/Dpkg/Source/Functions.pm
     version: '0.01'
@@ -199,8 +200,6 @@ provides:
   Dpkg::Source::Package::V2:
     file: lib/Dpkg/Source/Package/V2.pm
     version: '0.01'
-  Dpkg::Source::Package::V2::BinaryFiles:
-    file: lib/Dpkg/Source/Package/V2.pm
   Dpkg::Source::Package::V3::Bzr:
     file: lib/Dpkg/Source/Package/V3/Bzr.pm
     version: '0.01'
@@ -245,10 +244,16 @@ provides:
     version: '1.02'
   Test::Dpkg:
     file: lib/Test/Dpkg.pm
+recommends:
+  Algorithm::Merge: '0'
+  File::FcntlLock: '0'
+  Locale::gettext: '0'
 requires:
   perl: v5.20.2
 resources:
+  bugtracker: https://bugs.debian.org/src:dpkg
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
-version: v1.19.1
+  repository: https://git.dpkg.org/git/dpkg/dpkg.git
+version: v1.19.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

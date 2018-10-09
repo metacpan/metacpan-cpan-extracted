@@ -1,6 +1,6 @@
 package Tapper::Cmd::Testrun;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Testrun::VERSION = '5.0.9';
+$Tapper::Cmd::Testrun::VERSION = '5.0.10';
 use Moose;
 use Tapper::Model 'model';
 use DateTime;

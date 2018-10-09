@@ -17,7 +17,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(queue_job);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 # must sync FIRST_DEFERRED_ID with Win32 code in Forks::Super::Util::isValidPid
 use constant FIRST_DEFERRED_ID => -2_100_000;
@@ -545,7 +545,7 @@ Forks::Super::Deferred - manage queue of background tasks to perform
 
 =head1 VERSION
 
-0.96
+0.97
 
 =head1 DESCRIPTION
 

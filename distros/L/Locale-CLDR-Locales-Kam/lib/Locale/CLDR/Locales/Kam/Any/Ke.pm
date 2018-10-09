@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Kam::Any::Ke - Package for language Kamba
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Kam::Any::Ke - Package for language Kamba
 
 package Locale::CLDR::Locales::Kam::Any::Ke;
 # This file auto generated from Data\common\main\kam_KE.xml
-#	on Sun  5 Aug  6:07:38 pm GMT
+#	on Sun  7 Oct 10:40:49 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

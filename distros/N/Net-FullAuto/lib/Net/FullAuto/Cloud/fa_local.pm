@@ -32,6 +32,7 @@ use warnings;
 use Data::Dump::Streamer;
 use JSON::XS;
 use Module::Load::Conditional qw[can_load];
+use Net::FullAuto::Cloud::fa_amazon;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -134,6 +135,36 @@ my $result=sub {
 };
 
 my $get_isets=sub {
+
+   my $test_aws=
+         `wget -qO- http://169.254.169.254/latest/dynamic/instance-identity/`;
+   if (-1<index $test_aws,'signature') {
+      my $out=`which aws 2>&1`;
+      if (!(-e "/usr/bin/aws") && (-1<index $out,'no aws in')) {
+         system("wget https://s3.amazonaws.com/aws-cli/awscli-bundle.zip");
+         system("sudo unzip awscli-bundle.zip");
+         {
+            $SIG{CHLD}="DEFAULT";
+            my $cmd="sudo ./awscli-bundle/install -i ".
+               "/usr/local/aws -b /usr/local/bin/aws";
+            system($cmd);
+         };
+         system("sudo rm -rf ./awscli-bundle");
+         system("wget http://s3.amazonaws.com/ec2-downloads/ec2-api-tools.zip");
+         system("sudo mkdir /usr/local/ec2");
+         system("sudo unzip ./ec2-api-tools.zip -d /usr/local/ec2");
+         system("sudo rm -rf ./ec2-api-tools.zip");
+      }
+      my $need_to_configure_aws=0;
+      my $cwd=Cwd::cwd();
+      my ($hash,$output,$error)=('','','');
+      ($hash,$output,$error)=Net::FullAuto::Cloud::fa_amazon::run_aws_cmd(
+         "aws iam list-access-keys");
+      &exit_on_error($error) if $error;
+      $need_to_configure_aws=1 if (-1<index $output,'configure credentials') ||
+         (-1<index $output,'Partial credentials found');
+      my $credentials_csv_path='.';
+   }
 
    print "\n";
    my ($output,$error)=('','');

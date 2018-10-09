@@ -1,0 +1,13 @@
+name: Catapulse::Module::Test
+version: 1
+
+Plugin::Menu:
+  Breadcrumbs:
+    links:
+     test:
+       label: Test
+       order: 99
+       url: '/test'
+       icon: 'glyphicon  glyphicon-education'
+       parent:
+       where: ^/.*

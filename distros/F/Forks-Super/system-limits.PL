@@ -17,7 +17,7 @@ use warnings;
 use Config;
 use POSIX;
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 my $limits_file = $ARGV[0] || "t/out/limits.$^O.$]";
 my $limits2 = $ARGV[1] || "t/out/limits.$^O";
@@ -602,7 +602,9 @@ sub probe_ssh_test_env {
     my $ip = eval "use Sys::HostAddr;1" 
              ? Sys::HostAddr->new->main_ip : "299.1.1.1";
 
-    foreach my $host ('$ENV_HOST', '$ip', 'localhost', '$hostname') {
+#   foreach my $host ('$ENV_HOST', '$ip', 'localhost', '$hostname') {
+# 'localhost' never works :-(    
+    foreach my $host ('$ENV_HOST', '$ip', '$hostname') {
         foreach my $user ('$ENV_USER','') {
 
             my $cmdtmp = "ssh -o BatchMode=yes";

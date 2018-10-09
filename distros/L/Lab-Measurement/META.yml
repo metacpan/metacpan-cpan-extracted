@@ -12,6 +12,7 @@ build_requires:
   File::Slurper: '0'
   File::Spec::Functions: '0'
   File::Temp: '0'
+  IO::Uncompress::Bunzip2: '0'
   PDL::Ufunc: '0'
   Test::Builder::Module: '0'
   Test::Fatal: '0'
@@ -46,6 +47,7 @@ requires:
   File::Path: '0'
   Getopt::Long: '0'
   Hook::LexWrap: '0'
+  IO::Compress::Bzip2: '0'
   IO::File: '0'
   IO::Handle: '0'
   IO::Select: '0'
@@ -99,5 +101,5 @@ resources:
   bugtracker: https://github.com/lab-measurement/lab-measurement/issues
   homepage: https://www.labmeasurement.de/
   repository: https://github.com/lab-measurement/lab-measurement.git
-version: '3.661'
+version: '3.662'
 x_serialization_backend: 'YAML::Tiny version 1.73'

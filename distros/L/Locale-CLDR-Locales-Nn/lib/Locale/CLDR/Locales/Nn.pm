@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Nn - Package for language Norwegian Nynorsk
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Nn - Package for language Norwegian Nynorsk
 
 package Locale::CLDR::Locales::Nn;
 # This file auto generated from Data\common\main\nn.xml
-#	on Sun  5 Aug  6:16:35 pm GMT
+#	on Sun  7 Oct 10:52:24 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -5844,24 +5846,24 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{formiddag},
 					'pm' => q{ettermiddag},
+					'am' => q{formiddag},
 				},
 				'narrow' => {
 					'am' => q{f.m.},
 					'pm' => q{e.m.},
 				},
 				'abbreviated' => {
-					'pm' => q{e.m.},
 					'am' => q{f.m.},
+					'pm' => q{e.m.},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{e.m.},
-					'am' => q{f.m.},
-				},
 				'narrow' => {
+					'am' => q{f.m.},
+					'pm' => q{e.m.},
+				},
+				'wide' => {
 					'pm' => q{e.m.},
 					'am' => q{f.m.},
 				},

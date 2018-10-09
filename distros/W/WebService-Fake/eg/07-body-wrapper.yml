@@ -1,0 +1,25 @@
+defaults:
+  body_wrapper: |
+    {
+      "status": "OK",
+      "timestamp": "[%= scalar localtime %]",
+      "data": [% content %]
+    }
+routes:
+  - path: '/hello/:name'
+    body: '{"greeting": "hello", "name":"[% stash.name %]"}'
+  - path: '/negate/:something'
+    body: '{"action": "negate", "what": "[% stash.something %]"}'
+  - path: '/text/hello/:name'
+    headers:
+      - Content-Type: text/plain
+    body_wrapper: ~
+    body: 'Hello, [% stash.name %]'
+  - path: '/xml/:name'
+    body_wrapper: ~
+    headers:
+      - Content-Type: text/xml
+    body: |
+       <foo>
+          <bar>[% name %]</bar>
+       </foo>

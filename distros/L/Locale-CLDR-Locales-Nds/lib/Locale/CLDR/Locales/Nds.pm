@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Nds - Package for language Low German
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Nds - Package for language Low German
 
 package Locale::CLDR::Locales::Nds;
 # This file auto generated from Data\common\main\nds.xml
-#	on Sun  5 Aug  6:14:46 pm GMT
+#	on Sun  7 Oct 10:50:10 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1870,13 +1872,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{vm},
-					'pm' => q{nm},
-				},
 				'abbreviated' => {
-					'am' => q{vm},
 					'pm' => q{nm},
+					'am' => q{vm},
+				},
+				'wide' => {
+					'pm' => q{nm},
+					'am' => q{vm},
 				},
 			},
 		},

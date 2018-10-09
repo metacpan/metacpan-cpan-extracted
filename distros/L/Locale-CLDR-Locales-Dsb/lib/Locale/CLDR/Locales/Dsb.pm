@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Dsb - Package for language Lower Sorbian
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Dsb - Package for language Lower Sorbian
 
 package Locale::CLDR::Locales::Dsb;
 # This file auto generated from Data\common\main\dsb.xml
-#	on Sun  5 Aug  5:57:04 pm GMT
+#	on Sun  7 Oct 10:27:37 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -5115,16 +5117,16 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{wótpołdnja},
 					'am' => q{dopołdnja},
-				},
-				'narrow' => {
-					'pm' => q{wótp.},
-					'am' => q{dop.},
+					'pm' => q{wótpołdnja},
 				},
 				'wide' => {
 					'am' => q{dopołdnja},
 					'pm' => q{wótpołdnja},
+				},
+				'narrow' => {
+					'pm' => q{wótp.},
+					'am' => q{dop.},
 				},
 			},
 		},

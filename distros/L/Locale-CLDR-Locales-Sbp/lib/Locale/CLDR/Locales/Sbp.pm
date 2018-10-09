@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Sbp - Package for language Sangu
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Sbp - Package for language Sangu
 
 package Locale::CLDR::Locales::Sbp;
 # This file auto generated from Data\common\main\sbp.xml
-#	on Sun  5 Aug  6:20:11 pm GMT
+#	on Sun  7 Oct 10:56:50 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -850,8 +852,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'pm' => q{Pashamihe},
 					'am' => q{Lwamilawu},
+					'pm' => q{Pashamihe},
 				},
 				'wide' => {
 					'am' => q{Lwamilawu},
@@ -935,7 +937,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -959,7 +961,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

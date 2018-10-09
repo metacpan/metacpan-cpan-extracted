@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+#
+# walls and water, or perhaps something like a terminal rug design
+
+use 5.14.0;
+use warnings;
+use Game::TextPatterns;
+use List::Util qw(min);
+
+my $cols = 8;
+my $rows = 8;
+
+my $fill = rand(0.5) + 0.05;
+my $field =
+  Game::TextPatterns->new( pattern => "." )->multiply( $cols, $rows )
+  ->white_noise( '#', $fill )->flip_four->four_up('.');
+
+# water pattern is larger to produce some irregularity that may contrast
+# with the walls
+my $water =
+  Game::TextPatterns->new( pattern => "." )->multiply( $cols + 2, $rows + 2 )
+  ->flip_four->white_noise( '~', rand() / 4 + rand() / 4 )->four_up('.');
+
+$field->mask( '.', $water );
+
+# and these operations make the new field geometric with itself
+$field->trim( min( $field->dimensions ) / 4 );
+$field = $field->clone->four_up;
+
+$field->trim( min( $field->dimensions ) / 4 );
+$field = $field->clone->four_up;
+
+$field->trim( min( $field->dimensions ) / 4 );
+$field = $field->clone->four_up;
+
+print $field->border( 1, '#' )->string;

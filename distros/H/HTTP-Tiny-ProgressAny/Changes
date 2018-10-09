@@ -1,4 +1,9 @@
-Revision history for HTTP-Tiny-ProgressAny
+0.040   2018-10-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc][bugfix] Fix module name in Synopsis.
+
 
 0.03    2015-01-23 (PERLANCAR)
 

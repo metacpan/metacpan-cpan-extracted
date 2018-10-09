@@ -1,3 +1,11 @@
+0.003   2018-10-06 (PERLANCAR)
+
+	- [Bugfix] Forgot to only cache successful (2xx and 3xx) responses.
+
+	- Observe HTTP_TINY_PATCH_CACHE_MAX_AGE before CACHE_MAX_AGE; add
+	  configuration -max_age.
+
+
 0.002   2018-09-20 (PERLANCAR)
 
 	- Use get_user_tempdir() instead of get_tempdir().

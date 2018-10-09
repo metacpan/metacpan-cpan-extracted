@@ -157,11 +157,16 @@ All dates are in ISO 8601 Format
 	Moved from using Moose to Moo
 	Removed Deprecated regions
 	Added Region bundles and distributions
-	Added some Rusian tests
+	Added some Russian tests
 	Fixed generation of day period rules
 	Transliteration now requires script identifiers rather than script names
 
 0.32.0 2018-04-14
     Now using CLDR version 32
     Updated tests to work with this version
-    Added empty Unicode properties to older versions of perl can run with the current data set
+    Added empty Unicode properties to older versions of Perl can run with the current data set
+
+0.33.1 2018-10-07
+	Now using CLDR version 33.1
+	Added basic collation
+	Added checks for Unicode properties that may not be in older versions of Perl

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ms::Any::My - Package for language Malay
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ms::Any::My - Package for language Malay
 
 package Locale::CLDR::Locales::Ms::Any::My;
 # This file auto generated from Data\common\main\ms_MY.xml
-#	on Sun  5 Aug  6:12:41 pm GMT
+#	on Sun  7 Oct 10:47:39 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

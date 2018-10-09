@@ -43,7 +43,7 @@ close $fh;
     file        => $file, type => 'columns',
     num_columns => 2
 );
-my $cols = cat(@cols);
+$cols = cat(@cols);
 $cols->slice('2:3,:') .= 42;
 $expected = pdl(
     [

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Yo::Any::Bj - Package for language Yoruba
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Yo::Any::Bj - Package for language Yoruba
 
 package Locale::CLDR::Locales::Yo::Any::Bj;
 # This file auto generated from Data\common\main\yo_BJ.xml
-#	on Sun  5 Aug  6:28:14 pm GMT
+#	on Sun  7 Oct 11:06:48 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -787,15 +789,15 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'am' => q{Àárɔ̀},
+					'pm' => q{Ɔ̀sán},
+				},
 				'wide' => {
 					'pm' => q{Ɔ̀sán},
 					'am' => q{Àárɔ̀},
 				},
 				'narrow' => {
-					'am' => q{Àárɔ̀},
-					'pm' => q{Ɔ̀sán},
-				},
-				'abbreviated' => {
 					'pm' => q{Ɔ̀sán},
 					'am' => q{Àárɔ̀},
 				},
@@ -805,11 +807,11 @@ has 'day_periods' => (
 					'pm' => q{Ɔ̀sán},
 					'am' => q{Àárɔ̀},
 				},
-				'narrow' => {
-					'pm' => q{Ɔ̀sán},
-					'am' => q{Àárɔ̀},
-				},
 				'wide' => {
+					'am' => q{Àárɔ̀},
+					'pm' => q{Ɔ̀sán},
+				},
+				'narrow' => {
 					'am' => q{Àárɔ̀},
 					'pm' => q{Ɔ̀sán},
 				},

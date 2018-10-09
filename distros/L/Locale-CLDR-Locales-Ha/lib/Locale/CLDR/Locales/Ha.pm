@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ha - Package for language Hausa
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ha - Package for language Hausa
 
 package Locale::CLDR::Locales::Ha;
 # This file auto generated from Data\common\main\ha.xml
-#	on Sun  5 Aug  6:03:38 pm GMT
+#	on Sun  7 Oct 10:35:36 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1214,27 +1216,27 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'abbreviated' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
+				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
 				'narrow' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
-				'wide' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'abbreviated' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},

@@ -7,7 +7,7 @@ use POSIX ':sys_wait_h';
 use Win32::Semaphore;
 
 our @ISA = qw(Forks::Super::Sync);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 our $NOWAIT_YIELD_DURATION = 250;
 my @RELEASE_ON_EXIT = ();
 

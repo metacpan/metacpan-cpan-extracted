@@ -1,23 +1,24 @@
-#!/usr/local/bin/perl -w
+use strict;
+use warnings;
 
-use strict ;
-use File::Slurp ;
+use File::Basename ();
+use File::Spec ();
+use lib File::Spec->catdir(File::Spec->rel2abs(File::Basename::dirname(__FILE__)), 'lib');
 
-use Carp ;
-use Socket ;
-use Symbol ;
-use Test::More tests => 6 ;
+use File::Slurp qw(read_file write_file);
+use Test::More;
+
+plan tests => 6;
 
 my $data = <<TEXT ;
 line 1
 more text
 TEXT
 
-foreach my $file ( qw( stdin STDIN stdout STDOUT stderr STDERR ) ) {
+foreach my $file ( qw(stdin STDIN stdout STDOUT stderr STDERR) ) {
+    write_file($file, $data);
+    my $read_buf = read_file($file);
+    is($read_buf, $data, 'read/write of file [$file]');
 
-	write_file( $file, $data ) ;
-	my $read_buf = read_file( $file ) ;
-	is( $read_buf, $data, 'read/write of file [$file]' ) ;
-
-	unlink $file ;
+    unlink $file;
 }

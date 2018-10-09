@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Uz::Cyrl - Package for language Uzbek
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Uz::Cyrl - Package for language Uzbek
 
 package Locale::CLDR::Locales::Uz::Cyrl;
 # This file auto generated from Data\common\main\uz_Cyrl.xml
-#	on Sun  5 Aug  6:27:38 pm GMT
+#	on Sun  7 Oct 11:06:06 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -2503,16 +2505,6 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'islamic') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1100
-						&& $time < 1800;
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
@@ -2524,20 +2516,20 @@ has 'day_period_data' => (
 						&& $time < 2200;
 					return 'afternoon1' if $time >= 1100
 						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1100
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1100
-						&& $time < 1800;
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
@@ -2549,20 +2541,20 @@ has 'day_period_data' => (
 						&& $time < 2200;
 					return 'afternoon1' if $time >= 1100
 						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1100
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2200;
-					return 'afternoon1' if $time >= 1100
-						&& $time < 1800;
-					return 'morning1' if $time >= 600
-						&& $time < 1100;
-					return 'night1' if $time >= 2200;
-					return 'night1' if $time < 600;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
@@ -2574,6 +2566,16 @@ has 'day_period_data' => (
 						&& $time < 2200;
 					return 'afternoon1' if $time >= 1100
 						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 600
+						&& $time < 1100;
+					return 'night1' if $time >= 2200;
+					return 'night1' if $time < 600;
+					return 'afternoon1' if $time >= 1100
+						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2200;
 				}
 				last SWITCH;
 				}
@@ -2594,66 +2596,66 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'night1' => q{кечаси},
-					'midnight' => q{ярим тун},
-					'pm' => q{ТК},
-					'noon' => q{туш пайти},
-					'afternoon1' => q{кундузи},
-					'evening1' => q{кечқурун},
 					'morning1' => q{эрталаб},
+					'night1' => q{кечаси},
+					'evening1' => q{кечқурун},
 					'am' => q{ТО},
+					'noon' => q{туш пайти},
+					'pm' => q{ТК},
+					'midnight' => q{ярим тун},
+					'afternoon1' => q{кундузи},
 				},
 				'wide' => {
-					'noon' => q{туш пайти},
+					'midnight' => q{ярим тун},
 					'afternoon1' => q{кундузи},
+					'pm' => q{ТК},
+					'noon' => q{туш пайти},
+					'am' => q{ТО},
 					'evening1' => q{кечқурун},
 					'morning1' => q{эрталаб},
-					'am' => q{ТО},
 					'night1' => q{кечаси},
-					'midnight' => q{ярим тун},
-					'pm' => q{ТК},
 				},
 				'narrow' => {
 					'night1' => q{кечаси},
-					'midnight' => q{ярим тун},
-					'pm' => q{ТК},
-					'noon' => q{туш пайти},
 					'morning1' => q{эрталаб},
 					'evening1' => q{кечқурун},
-					'afternoon1' => q{кундузи},
 					'am' => q{ТО},
+					'noon' => q{туш пайти},
+					'pm' => q{ТК},
+					'afternoon1' => q{кундузи},
+					'midnight' => q{ярим тун},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'night1' => q{кечаси},
-					'pm' => q{ТК},
-					'midnight' => q{ярим тун},
-					'noon' => q{туш пайти},
-					'am' => q{ТО},
-					'afternoon1' => q{кундузи},
-					'evening1' => q{кечқурун},
-					'morning1' => q{эрталаб},
-				},
 				'wide' => {
+					'morning1' => q{эрталаб},
 					'night1' => q{кечаси},
-					'midnight' => q{ярим тун},
+					'am' => q{ТО},
+					'evening1' => q{кечқурун},
 					'pm' => q{ТК},
 					'noon' => q{туш пайти},
+					'midnight' => q{ярим тун},
 					'afternoon1' => q{кундузи},
-					'evening1' => q{кечқурун},
-					'morning1' => q{эрталаб},
-					'am' => q{ТО},
 				},
 				'narrow' => {
-					'midnight' => q{ярим тун},
-					'pm' => q{ТК},
-					'night1' => q{кечаси},
-					'evening1' => q{кечқурун},
-					'afternoon1' => q{кундузи},
 					'morning1' => q{эрталаб},
+					'night1' => q{кечаси},
 					'am' => q{ТО},
+					'evening1' => q{кечқурун},
+					'pm' => q{ТК},
 					'noon' => q{туш пайти},
+					'afternoon1' => q{кундузи},
+					'midnight' => q{ярим тун},
+				},
+				'abbreviated' => {
+					'noon' => q{туш пайти},
+					'pm' => q{ТК},
+					'midnight' => q{ярим тун},
+					'afternoon1' => q{кундузи},
+					'night1' => q{кечаси},
+					'morning1' => q{эрталаб},
+					'evening1' => q{кечқурун},
+					'am' => q{ТО},
 				},
 			},
 		},

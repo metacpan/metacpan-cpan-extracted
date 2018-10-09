@@ -24,16 +24,16 @@ name: Graphics-ColorNames
 provides:
   Graphics::ColorNames:
     file: lib/Graphics/ColorNames.pm
-    version: v3.2.0
+    version: v3.2.1
   Graphics::ColorNames::HTML:
     file: lib/Graphics/ColorNames/HTML.pm
-    version: v3.2.0
+    version: v3.2.1
   Graphics::ColorNames::Windows:
     file: lib/Graphics/ColorNames/Windows.pm
-    version: v3.2.0
+    version: v3.2.1
   Graphics::ColorNames::X:
     file: lib/Graphics/ColorNames/X.pm
-    version: v3.2.0
+    version: v3.2.1
 requires:
   Exporter: '5.57'
   Module::Load: '0.10'
@@ -43,7 +43,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNames
   repository: git://github.com/robrwo/Graphics-ColorNames.git
-version: v3.2.0
+version: v3.2.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'Alan D. Salewski <alans@cji.com>'

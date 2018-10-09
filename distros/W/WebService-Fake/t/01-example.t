@@ -1,7 +1,10 @@
 use strict;
 use Test::More;
 use Test::Mojo;
+use Mojo::JSON;
 use Path::Tiny;
+
+my $true = Mojo::JSON::true();
 
 $ENV{WEBSERVICE_FAKE} =
   path(__FILE__)->parent(2)->child(qw< eg webservice-fake.yml >);
@@ -11,14 +14,14 @@ my $t = Test::Mojo->new('WebService::Fake');
 $t->get_ok('/')->status_is(200)->content_type_is('application/json')
   ->header_is(Server => 'My::Server')->header_is('X-Whatever' => 'hello')
   ->header_like('X-Hey' => qr{(?mxs:\AYou .* rock\z)})
-  ->json_is({status => \1, data => {message => 'ciao '}});
+  ->json_is({status => $true, data => {message => 'ciao '}});
 
 # get to / with a name parameter
 $t->get_ok('/?name=polettix')->status_is(200)
   ->content_type_is('application/json')->header_is(Server => 'My::Server')
   ->header_is('X-Whatever' => 'hello')
   ->header_like('X-Hey' => qr{(?mxs:\AYou .* rock\z)})
-  ->json_is({status => \1, data => {message => 'ciao polettix'}});
+  ->json_is({status => $true, data => {message => 'ciao polettix'}});
 
 # get to /simple, has custom wrapper
 $t->get_ok('/simple')->status_is(200)->content_type_is('text/plain')
@@ -32,7 +35,7 @@ $t->get_ok('/nowrap')->status_is(200)->content_type_is('text/plain')
 
 # get stuff from other part of YAML
 $t->get_ok('/somestuff')->status_is(200)
-  ->json_is({status => \1, data => {hey => 'joe'}});
+  ->json_is({status => $true, data => {hey => 'joe'}});
 
 $t->post_ok('/add')->status_is(201)->content_is("ok\n");
 

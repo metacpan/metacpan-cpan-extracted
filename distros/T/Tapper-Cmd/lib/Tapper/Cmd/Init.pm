@@ -1,7 +1,7 @@
 package Tapper::Cmd::Init;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Backend functions for initially setting up Tapper
-$Tapper::Cmd::Init::VERSION = '5.0.9';
+$Tapper::Cmd::Init::VERSION = '5.0.10';
 use 5.010;
 use strict;
 use warnings;

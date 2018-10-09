@@ -1,19 +1,25 @@
-#!/usr/local/bin/perl -w -T
+use strict;
+use warnings;
 
-use strict ;
-use File::Slurp qw( write_file slurp ) ;
+use File::Basename ();
+use File::Spec ();
+use lib File::Spec->catdir(File::Spec->rel2abs(File::Basename::dirname(__FILE__)), 'lib');
+use FileSlurpTest qw(temp_file_path);
 
-use Test::More tests => 1 ;
+use File::Slurp qw(slurp write_file);
+use Test::More;
 
-my $data = <<TEXT ;
+plan tests => 1;
+
+my $data = <<TEXT;
 line 1
 more text
 TEXT
 
-my $file = 'xxx' ;
+my $file = temp_file_path();
 
-write_file( $file, $data ) ;
-my $read_buf = slurp( $file ) ;
-is( $read_buf, $data, 'slurp alias' ) ;
+write_file($file, $data);
+my $read_buf = slurp($file);
+is($read_buf, $data, 'slurp alias');
 
 unlink $file ;

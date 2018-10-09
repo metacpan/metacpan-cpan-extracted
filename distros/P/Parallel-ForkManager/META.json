@@ -12,7 +12,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Parallel-ForkManager",
    "prereqs" : {
@@ -33,9 +33,12 @@
             "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
             "POSIX" : "0",
             "Storable" : "0",
-            "strict" : "0"
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -49,15 +52,18 @@
             "IPC::Open3" : "0",
             "Test::More" : "0.94",
             "Test::Warn" : "0",
-            "perl" : "5.006",
-            "warnings" : "0"
+            "perl" : "5.006"
          }
       }
    },
    "provides" : {
       "Parallel::ForkManager" : {
          "file" : "lib/Parallel/ForkManager.pm",
-         "version" : "1.20"
+         "version" : "2.02"
+      },
+      "Parallel::ForkManager::Child" : {
+         "file" : "lib/Parallel/ForkManager/Child.pm",
+         "version" : "2.02"
       }
    },
    "release_status" : "stable",
@@ -72,7 +78,7 @@
          "web" : "https://github.com/dluxhu/perl-parallel-forkmanager"
       }
    },
-   "version" : "1.20",
+   "version" : "2.02",
    "x_authority" : "cpan:DLUX",
    "x_contributor_covenant" : {
       "version" : 0.01
@@ -82,6 +88,6 @@
       "Ricardo Signes <rjbs@cpan.org>",
       "Shlomi Fish <shlomif@shlomifish.org>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

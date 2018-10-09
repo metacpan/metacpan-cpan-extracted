@@ -11,9 +11,10 @@ use Term::ANSIColor qw//;
 use IPC::Open3;
 use IO::Select;
 use List::Util qw/first/;
+use Scalar::Util qw/blessed/;
 use File::Temp qw/tempfile tempdir/;
+use File::Fetch;
 use File::Spec qw//;
-use Archive::Tar;
 use Getopt::Long qw//;
 
 use Exporter qw/import/;
@@ -24,13 +25,15 @@ BEGIN
     url_re git_re git_extract_re
     has_git has_updated_git min_git_ver
     logmsg info success error
-    dest_dir inflate_archive
+    dest_dir get_project_dir
+    fetch_file inflate_archive
+    humane_tmpname humane_tmpfile humane_tmpdir
     run restart_script
     /;
   our %EXPORT_TAGS = ( go => [@EXPORT_OK] );
 }
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 require App::MechaCPAN::Perl;
 require App::MechaCPAN::Install;
@@ -42,7 +45,6 @@ my $is_restarted_process = delete $ENV{$restarted_key};
 INIT
 {
   $loaded_at_compile = 1;
-  &restart_script();
 }
 
 $loaded_at_compile //= 0;
@@ -61,6 +63,7 @@ our $VERBOSE;    # Print output from sub commands to STDERR
 our $QUIET;      # Do not print any progress to STDERR
 our $LOGFH;      # File handle to send the logs to
 our $LOG_ON = 1; # Default if to log or not
+our $PROJ_DIR;   # The directory given with -d or pwd if not provided
 
 sub main
 {
@@ -121,6 +124,11 @@ sub main
     chdir $options->{directory};
   }
 
+  # Once we've established the project directory, we need to attempt to
+  # restart the script.
+  &restart_script();
+
+  local $PROJ_DIR = cwd;
   local $LOGFH;
   local $VERBOSE = $options->{verbose} // $VERBOSE;
   local $QUIET   = $options->{quiet}   // $QUIET;
@@ -156,17 +164,8 @@ sub main
     mkdir $dest_dir;
   }
 
-  unless ( $options->{'no-log'} )
-  {
-    my $log_dir = "$dest_dir/logs";
-    if ( !-d $log_dir )
-    {
-      mkdir $log_dir;
-    }
-
-    my $log_path;
-    ( $LOGFH, $log_path ) = tempfile( "$log_dir/log.$$.XXXX", UNLINK => 0 );
-  }
+  _setup_log($dest_dir)
+    unless $options->{'no-log'};
 
   my $ret = eval { $pkg->$action( $options, @argv ) || 0; };
   chdir $orig_dir;
@@ -259,6 +258,67 @@ sub git_extract_re
   ]xmsi;
 
   return $re;
+}
+
+sub humane_tmpname
+{
+  my $descr = shift;
+
+  my @localtime = localtime;
+  my $now       = sprintf(
+    "%04d%02d%02d_%02d%02d%02d",
+    $localtime[5] + 1900,
+    @localtime[ 4, 3, 2, 1, 0 ]
+  );
+
+  return "mecha_$descr.$now.XXXX";
+}
+
+sub _mktmpdir
+{
+  my $proj_dir = _get_project_dir();
+  my $tmp_dir
+    = defined $proj_dir ? "$proj_dir/local/tmp" : File::Spec->tmpdir;
+
+  mkdir $tmp_dir
+    unless -d $tmp_dir;
+
+  return $tmp_dir;
+}
+
+sub humane_tmpfile
+{
+  my $descr   = shift;
+  my $tmp_dir = _mktmpdir;
+
+  my $template = File::Spec->catdir( $tmp_dir, humane_tmpname($descr) );
+  return File::Temp->new($template);
+}
+
+sub humane_tmpdir
+{
+  my $descr   = shift;
+  my $tmp_dir = _mktmpdir;
+
+  my $template = File::Spec->catdir( $tmp_dir, humane_tmpname($descr) );
+  return tempdir(
+    TEMPLATE => $template,
+    CLEANUP  => 1,
+  );
+}
+
+sub _setup_log
+{
+  my $dest_dir = shift;
+
+  my $log_dir = "$dest_dir/logs";
+  mkdir $log_dir
+    unless -d $log_dir;
+
+  my $template = File::Spec->catdir( $log_dir, humane_tmpname('log') );
+  my $log_path;
+  ( $LOGFH, $log_path ) = tempfile( $template, UNLINK => 0 );
+  info("logging to '$log_path'...\n");
 }
 
 sub logmsg
@@ -412,6 +472,27 @@ sub status
 END  { print STDERR "\n" unless $QUIET; }
 INIT { print STDERR "\n" unless $QUIET; }
 
+sub _get_project_dir
+{
+  my $result = $PROJ_DIR;
+
+  return $result;
+}
+
+sub get_project_dir
+{
+  my $result = _get_project_dir;
+
+  if ( !defined $result )
+  {
+    $result = cwd;
+
+    $result =~ s{ / local /? $}{}xms;
+  }
+
+  return $result;
+}
+
 package MechaCPAN::DestGuard
 {
   use Cwd qw/cwd/;
@@ -424,12 +505,16 @@ package MechaCPAN::DestGuard
     my $result = $dest_dir;
     if ( !defined $result )
     {
-      my $pwd = cwd;
+      my $pwd = App::MechaCPAN::get_project_dir;
       $dest_dir = \"$pwd/local";
       bless $dest_dir;
       $result = $dest_dir;
       weaken $dest_dir;
     }
+
+    mkdir $dest_dir
+      unless -d $dest_dir;
+
     return $dest_dir;
   }
 
@@ -445,45 +530,185 @@ sub dest_dir
   return $result;
 }
 
+sub fetch_file
+{
+  my $url = shift;
+  my $to  = shift;
+
+  use File::Copy qw/copy/;
+  use Fatal qw/copy/;
+
+  my $proj_dir = &dest_dir;
+  my $slurp;
+
+  local $File::Fetch::WARN;
+  local $@;
+
+  my $ff = File::Fetch->new( uri => $url );
+  $ff->scheme('http')
+    if $ff->scheme eq 'https';
+
+  if ( ref $to eq 'SCALAR' )
+  {
+    $slurp = $to;
+    undef $to;
+  }
+
+  my ( $dst_path, $dst_file, $result );
+  if ( !defined $to )
+  {
+    $result = humane_tmpfile( $ff->file );
+
+    my @splitpath = File::Spec->splitpath( $result->filename );
+    $dst_path = File::Spec->catpath( @splitpath[ 0 .. 1 ] );
+    $dst_file = $splitpath[2];
+  }
+  else
+  {
+    if ( $to =~ m[/$] )
+    {
+      $dst_path = $to;
+      $dst_file = $ff->file;
+    }
+    else
+    {
+      my @splitpath = File::Spec->splitpath("$to");
+      $dst_path = File::Spec->catpath( @splitpath[ 0 .. 1 ] );
+      $dst_file = $splitpath[2];
+    }
+
+    $dst_path = File::Spec->rel2abs( $dst_path, "$proj_dir" )
+      unless File::Spec->file_name_is_absolute($dst_path);
+    $result = File::Spec->catdir( $dst_path, $dst_file );
+  }
+
+  mkdir $dst_path
+    unless -d $dst_path;
+
+  my $where = $ff->fetch( to => $dst_path );
+
+  if ( !defined $where )
+  {
+    my $tmpfile = File::Spec->catdir( $dst_path, $ff->file );
+    if ( -e $tmpfile && !-s )
+    {
+      unlink $tmpfile;
+    }
+    die $ff->error || "Could not download $url";
+  }
+
+  if ( $where ne $result )
+  {
+    copy( $where, $result );
+    $result->seek( 0, 0 )
+      if fileno $result;
+    unlink $where;
+  }
+
+  if ( defined $slurp )
+  {
+    open my $slurp_fh, '<', $result;
+    $$slurp = do { local $/; <$slurp_fh> };
+    $result->seek( 0, 0 )
+      if fileno $result;
+  }
+
+  return $result;
+}
+
+my @inflate = (
+
+  # System tar
+  sub
+  {
+    my $src = shift;
+
+    return
+      unless $src =~ m{ [.]tar[.] (?: gz | bz2 | xz ) $}xms;
+
+    state $tar;
+    if ( !defined $tar )
+    {
+      my $tar_version_str = eval { run(qw/tar --version/); };
+      $tar = defined $tar_version_str;
+    }
+
+    return
+      unless $tar;
+
+    my $unzip = $src =~ m/gz$/ ? 'gzip' : $src =~ m/bz2/ ? 'bzip2' : 'xz';
+
+    run("$unzip -dc $src | tar xf -");
+    return 1;
+  },
+
+  # Archive::Tar
+  sub
+  {
+    my $src = shift;
+
+    require Archive::Tar;
+    my $tar = Archive::Tar->new;
+    $tar->error(1);
+
+    my $ret = $tar->read( "$src", 1, { extract => 1 } );
+
+    die $tar->error
+      unless $ret;
+  },
+);
+
 sub inflate_archive
 {
   my $src = shift;
+  my $dir = shift;
 
   # $src can be a file path or a URL.
   if ( !-e $src )
   {
-    local $File::Fetch::WARN;
-    my $ff = File::Fetch->new( uri => $src );
-    $ff->scheme('http')
-      if $ff->scheme eq 'https';
-    my $content = '';
-    my $where = $ff->fetch( to => \$content );
-    die $ff->error || "Could not download $src"
-      if !defined $where;
-    $src = $where;
+    $src = fetch_file($src);
   }
 
-  my $dir = tempdir(
-    TEMPLATE => File::Spec->tmpdir . '/mechacpan_XXXXXXXX',
-    CLEANUP  => 1,
-  );
+  if ( !defined $dir )
+  {
+    my $descr = ( File::Spec->splitpath($src) )[2];
+    $dir = humane_tmpdir($descr);
+  }
+
+  die "Could not find destination directory: $dir"
+    if !-d $dir;
+
   my $orig = cwd;
 
-  my $error_free = eval {
-    chdir $dir;
-    my $tar = Archive::Tar->new;
-    $tar->error(1);
-    my $ret = $tar->read( "$src", 1, { extract => 1 } );
-    die $tar->error
-      unless $ret;
-    1;
-  };
-  my $err = $@;
+  my $is_complete;
+  foreach my $inflate_sub (@inflate)
+  {
+    local $@;
+    my $success;
+    my $error_free = eval {
+      chdir $dir;
+      $success = $inflate_sub->($src);
+      1;
+    };
 
-  chdir $orig;
+    my $err = $@;
 
-  die $err
-    unless $error_free;
+    chdir $orig;
+
+    logmsg $err
+      unless $error_free;
+
+    if ($success)
+    {
+      $is_complete = 1;
+      last;
+    }
+  }
+
+  if ( !$is_complete )
+  {
+    carp "Could not unpack archive: $src\n";
+  }
 
   return $dir;
 }
@@ -527,7 +752,7 @@ sub run
   my $print_output = $VERBOSE;
   my $wantoutput   = defined wantarray;
 
-  if ( ref $cmd eq 'GLOB' )
+  if ( ref $cmd eq 'GLOB' || ( blessed $cmd && $cmd->isa('IO::Handle') ) )
   {
     $dest_out_fh = $cmd;
     $cmd         = shift @args;
@@ -649,11 +874,112 @@ sub run
   return $out;
 }
 
+# Install App::MechaCPAN into a local perl, either by ::Install or copy
+sub _inc_pkg
+{
+  my $inc_name = ( shift || __PACKAGE__ ) . '.pm';
+  $inc_name =~ s{::}{/}g;
+  return $inc_name;
+}
+
+my $starting_cwd;
+BEGIN { $starting_cwd = cwd }
+
+sub _mk_starting_abs
+{
+  my $f = shift;
+
+  $f = File::Spec->rel2abs( $f, $starting_cwd )
+    unless File::Spec->file_name_is_absolute($f);
+
+  return $f;
+}
+
+sub self_install
+{
+  my $real0 = shift;
+
+  my $dest_dir = &dest_dir;
+  my $dest_lib = File::Spec->catdir( "$dest_dir", qw/lib perl5/ );
+  my $dest_app = File::Spec->catdir( "$dest_dir", qw/bin/ );
+  my $inc_name = _inc_pkg;
+
+  return
+    if !-d $dest_dir;
+
+  # Return if there's already a copy
+  return
+    if -e File::Spec->catdir( $dest_lib, $inc_name );
+
+  use File::Copy qw/copy/;
+  use File::Path qw/make_path/;
+  use Fatal qw/copy/;
+
+  make_path $dest_lib, $dest_app;
+
+  if ( defined $real0 && -e $real0 )
+  {
+    # Attempt to find the full path to this file.
+    my $mecha_path;
+
+    foreach my $lib (@INC)
+    {
+      my $mecha_file
+        = _mk_starting_abs( File::Spec->catdir( $lib, $inc_name ) );
+      if ( -e $mecha_file )
+      {
+        $mecha_path = _mk_starting_abs $lib;
+        last;
+      }
+    }
+
+    if ( defined $mecha_path )
+    {
+      $inc_name =~ s/[.]pm$//;
+      my %copy_list;
+      foreach my $k ( grep {m/$inc_name/} keys %INC )
+      {
+        my $src = File::Spec->catdir( $mecha_path, $k );
+        my $dst = File::Spec->catdir( $dest_lib,   $k );
+
+        my $dst_path
+          = File::Spec->catpath( ( File::Spec->splitpath($dst) )[ 0 .. 1 ] );
+        make_path $dst_path;
+
+        if ( !-e $src )
+        {
+          %copy_list = ();
+          last;
+        }
+        $copy_list{$src} = $dst;
+      }
+
+      if ( keys %copy_list )
+      {
+        while ( my ( $src, $dst ) = each %copy_list )
+        {
+          copy $src => $dst;
+        }
+        copy $real0 => $dest_app;
+        return;
+      }
+    }
+  }
+
+  # We don't check the result because we are going to continue even if
+  # the install fails
+  info "Installing " . __PACKAGE__;
+  App::MechaCPAN::Install->go( {}, __PACKAGE__ );
+  return;
+}
+
 sub restart_script
 {
   my $dest_dir   = &dest_dir;
   my $local_perl = File::Spec->canonpath("$dest_dir/perl/bin/perl");
   my $this_perl  = File::Spec->canonpath($^X);
+  my $cwd        = cwd;
+
   if ( $^O ne 'VMS' )
   {
     $this_perl .= $Config{_exe}
@@ -662,18 +988,23 @@ sub restart_script
       unless $local_perl =~ m/$Config{_exe}$/i;
   }
 
-  state $orig_cwd = cwd;
-  state $orig_0   = $0;
+  return
+    if $local_perl eq $this_perl;
 
-  my $current_cwd = cwd;
-  chdir $orig_cwd;
+  my $real0 = _mk_starting_abs $0;
+
+  if ( !-e -r $real0 )
+  {
+    logmsg "Could not find '$0', not in '$starting_cwd' nor pwd '$cwd'";
+    info "Could not find '$0' in order to restart script";
+    return;
+  }
 
   if (
-    $loaded_at_compile              # IF we were loaded during compile-time
-    && -e -x $local_perl            # AND the local perl is there
-    && $this_perl ne $local_perl    # AND if we're not running it
-    && -e -f -r $0                  # AND we are a readable file
-    && !$^P                         # AND we're not debugging
+    $loaded_at_compile      # IF we were loaded during compile-time
+    && -e -x $local_perl    # AND the local perl is there
+    && -e -f -r $real0      # AND we are a readable file
+    && !$^P                 # AND we're not debugging
     )
   {
     # ReExecute using the local perl
@@ -692,6 +1023,13 @@ sub restart_script
       $site_inc{"$lib/$Config{archname}"} = 1;
     }
 
+    # If we are not a self-contained script, we should call self_install to
+    # make sure we are installed, by hook or by crook
+    if ( $INC{&_inc_pkg} =~ m/MechaCPAN[.]pm/ )
+    {
+      self_install($real0);
+    }
+
     foreach my $lib (@INC)
     {
       push( @inc_add, $lib )
@@ -704,16 +1042,16 @@ sub restart_script
     undef @ENV{qw/PERL_LOCAL_LIB_ROOT PERL5LIB/};
 
     # If we've running, inform the new us that they are a restarted process
-    $ENV{$restarted_key} = 1
+    local $ENV{$restarted_key} = 1
       if ${^GLOBAL_PHASE} eq 'RUN';
 
     # Cleanup any files opened already. They arn't useful after we exec
     File::Temp::cleanup();
 
-    exec( $local_perl, map( {"-I$_"} @inc_add ), $0, @ARGV );
+    info "Restarting to local perl\n";
+    info( join( " ", $local_perl, map( {"-I$_"} @inc_add ), $real0, @ARGV ) );
+    exec( $local_perl, map( {"-I$_"} @inc_add ), $real0, @ARGV );
   }
-
-  chdir $current_cwd;
 }
 
 1;
@@ -767,7 +1105,7 @@ App::MechaCPAN focuses on the aspects of these tools needed for deploying packag
 
 =head2 Should I use App::MechaCPAN instead of <tool>
 
-Probably not, no. It can be used in place of some tools, but it's focus is not on the features a developer needs. If your needs are very simple and you don't need many options, you might be able to get away with only using C<App::MechaCPAN>. However be prepared to run into limitations quickly.
+Probably not, no. It can be used in place of some tools, but its focus is not on the features a developer needs. If your needs are very simple and you don't need many options, you might be able to get away with only using C<App::MechaCPAN>. However be prepared to run into limitations quickly.
 
 =head1 USING FOR DEPLOYMENTS
 
@@ -835,7 +1173,7 @@ A log is normally outputted into the C<local/logs> directory. This option will p
 
 =head2 --directory=<path>
 
-Changes to a specified directory before any processing is done. This allows you to specify what directory you want C<local/> to be in.
+Changes to a specified directory before any processing is done. This allows you to specify what directory you want C<local/> to be in. If this isn't provided, the current working directory is used instead.
 
 =head2 C<$ENV{MECHACPAN_TIMEOUT}>
 
@@ -843,7 +1181,7 @@ Every command that C<App::MechaCPAN> runs is given an idle timeout before it is 
 
 =head1 SCRIPT RESTART WARNING
 
-This module B<WILL> restart the running script B<IF> it's used as a module (e.g. with C<use>) and the perl that is running is not the version installed in C<local/>. It does this at two points: First right before run-time and Second right after a perl is installed into C<local/>.
+This module B<WILL> restart the running script B<IF> it's used as a module (e.g. with C<use>) and the perl that is running is not the version installed in C<local/>. It does this at two points: First right before run-time and Second right after a perl is installed into C<local/>. During restart, C<App::MechaCPAN> will attempt to install itself into C<local/> unless it was invoked as a fully-contained version of C<mechacpan>.
 
 The scripts and modules that come with C<App::MechaCPAN> are prepared to handle this. If you use C<App::MechaCPAN> as a module, you should to be prepared to handle it as well.
 

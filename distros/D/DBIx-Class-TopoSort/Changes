@@ -1,5 +1,11 @@
 Revision history for DBIx::Class::TopoSort (ordered by revision number).
 
+0.050100 Oct 05 2018 19:30:00 PDT
+    - Add support for the following options to toposort_graph:
+        - die_on_cycle
+    - Add enable_toposort_memoize() / disable_toposort_memoize() to control memoization
+        - Allow passing in a custom normalizer.
+
 0.050010 Aug 27 2017 19:30:00 PDT
     - Support multiple sources pointing to the same table (Thanks, aeruder!)
 

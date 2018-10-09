@@ -72,7 +72,7 @@ sub test_data_slurp {
 
 	my $data_seek = tell( \*DATA );
 
-# first slurp in the lines 
+# first slurp in the lines
 	my @slurp_lines = read_file( \*DATA ) ;
 
 # now seek back and read all the lines with the <> op and we make

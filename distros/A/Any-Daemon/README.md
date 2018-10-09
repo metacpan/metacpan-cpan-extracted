@@ -6,8 +6,8 @@
   * Indexed from CPAN: <http://search.cpan.org/~markov/Any-Daemon/>
     and <https://metacpan.org/release/Any-Daemon>
 
-This is a general daemon classe, optionally supporting Log-Report for
-logging.
+This is a general purpose daemon class, optionally supporting Log-Report
+for logging.
 
 Perl provides all (Unix/Linux) operating system features to create
 daemons, but it is not easy to get them in the right order.  This

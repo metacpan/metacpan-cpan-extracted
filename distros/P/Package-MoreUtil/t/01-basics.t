@@ -3,13 +3,14 @@
 use 5.010;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use Package::MoreUtil qw(
                             package_exists
                             list_package_contents
+                            list_package_subs
                             list_subpackages
                     );
-use Test::More 0.98;
 
 BEGIN { ok(!package_exists("cps61kDkaNlLTrdXC91"), "package_exists 1"); }
 
@@ -46,6 +47,11 @@ is_deeply(\%res,
               'A' => 'CODE'
           },
           "list_package_contents 1"
+      );
+
+my @subnames = list_package_subs("cps61kDkaNlLTrdXC91");
+is_deeply(\@subnames, ['A'],
+          "list_package_subs"
       );
 
 is_deeply([list_subpackages("cps61kDkaNlLTrdXC92")],

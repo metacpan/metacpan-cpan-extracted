@@ -6,7 +6,7 @@ my $build = Module::Build->new(
 	dist_author_from => 'lib/WWW/Shopify/Liquid.pm',
 	dist_version_from => 'lib/WWW/Shopify/Liquid.pm',
 	configure_requires => { 'Module::Build' => 0.38 },
-	script_files => ['scripts/shopify-liquid-verify.pl', 'scripts/shopify-liquid-beautify.pl'],
+	script_files => ['scripts/shopify-liquid-verify.pl', 'scripts/shopify-liquid-beautify.pl', 'scripts/shopify-liquid-compile.pl'],
 	requires => {
 		'perl' => '5.12.5',
 		'Scalar::Util' => 0,

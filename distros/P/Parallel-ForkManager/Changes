@@ -1,5 +1,25 @@
 Revision history for Perl extension Parallel::ForkManager.
 
+2.02 2018-10-08
+  - Promote to stable release.
+
+  [ STATISTICS ]
+    - code churn: 1 file changed, 9 insertions(+), 1 deletion(-)
+
+2.01 2018-08-23
+  [ ENHANCEMENTS ]
+    - add 'child_role' attribute for customization.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 53 insertions(+), 4 deletions(-)
+
+2.00 2018-08-22 (TRIAL)
+  [ API CHANGES ]
+    - Change the guts to be Moo-based. (GH#24)
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 240 insertions(+), 89 deletions(-)
+
 1.20 2018-07-18
   [ DOCUMENTATION ]
     - Add section about rand() and forked processes. (GH#22)

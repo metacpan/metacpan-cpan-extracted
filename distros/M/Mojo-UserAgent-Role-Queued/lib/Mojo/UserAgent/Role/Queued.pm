@@ -1,24 +1,29 @@
 package Mojo::UserAgent::Role::Queued;
 use Mojo::Base '-role';
 
-our $VERSION = "1.13";
+our $VERSION = "1.14";
 use Mojo::UserAgent::Role::Queued::Queue;
 
 has max_active => sub { shift->max_connections };
 
-has queue => sub {
+has job_queue => sub {
   Mojo::UserAgent::Role::Queued::Queue->new(max_active => shift->max_active);
 };
 
 around start => sub {
   my ($orig, $self, $tx, $cb) = @_;
-  $self->queue->callback(sub { $self->$orig(@_) })
-    unless ($self->queue->callback);
   if ($cb) {
-    weaken $self;
-    $tx->on(finish => sub { $self->queue->tx_finish(); });
-    $self->queue->on(queue_empty => sub { $self->emit('queue_empty') });
-    $self->queue->enqueue([$tx, $cb]);
+    unless ($self->job_queue->callback) {
+        my $this = $self;
+        weaken $this;
+        $self->job_queue->callback(sub { $this->$orig(@_) });
+    }
+    unless ($self->job_queue->has_subscribers('queue_empty')) {
+        my $this = $self;
+        weaken $this;
+        $self->job_queue->on(queue_empty => sub { $this->emit('queue_empty') });
+    }
+    $self->job_queue->enqueue($tx, $cb);
   }
   else {
     return $orig->($self, $tx);    # Blocking calls skip the queue

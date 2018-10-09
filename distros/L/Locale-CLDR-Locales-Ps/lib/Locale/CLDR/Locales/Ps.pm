@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ps - Package for language Pashto
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ps - Package for language Pashto
 
 package Locale::CLDR::Locales::Ps;
 # This file auto generated from Data\common\main\ps.xml
-#	on Sun  5 Aug  6:17:56 pm GMT
+#	on Sun  7 Oct 10:53:58 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4741,8 +4743,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'pm' => q{غ.و.},
 					'am' => q{غ.م.},
+					'pm' => q{غ.و.},
 				},
 				'narrow' => {
 					'am' => q{غ.م.},
@@ -4754,13 +4756,13 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{غ.و.},
-					'am' => q{غ.م.},
-				},
 				'wide' => {
 					'am' => q{غ.م.},
 					'pm' => q{غ.و.},
+				},
+				'narrow' => {
+					'pm' => q{غ.و.},
+					'am' => q{غ.م.},
 				},
 				'abbreviated' => {
 					'pm' => q{غ.و.},
@@ -4898,35 +4900,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'islamic' => {
-			E => q{ccc},
-			Ed => q{d, E},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			M => q{L},
-			MEd => q{MM-dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{d MMMM},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			y => q{G y},
-			yM => q{G y/M},
-			yMMMM => q{د G y د MMMM},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
-		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -4958,6 +4931,35 @@ has 'datetime_formats_available_formats' => (
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
 			ms => q{mm:ss},
+			y => q{G y},
+			yM => q{G y/M},
+			yMMMM => q{د G y د MMMM},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
+			yyyyMMM => q{G y MMM},
+			yyyyMMMEd => q{G y MMM d, E},
+			yyyyMMMM => q{G y MMMM},
+			yyyyMMMd => q{G y MMM d},
+			yyyyMd => q{GGGGG y-MM-dd},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
+		'islamic' => {
+			E => q{ccc},
+			Ed => q{d, E},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMd => q{d MMMM},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
 			y => q{G y},
 			yM => q{G y/M},
 			yMMMM => q{د G y د MMMM},

@@ -1,0 +1,64 @@
+# https://web.archive.org/web/20140515065053/http://www.jsbchorales.net/bwv.shtml
+
+#UCI-ID	 BWV	Key	Title
+
+000106b_ 1.6 	F_M	Wie schön leuchtet der Morgenstern
+000206b_ 2.6 	G_m	Ach Gott, vom Himmel sieh' darein
+000306b_ 3.6 	E_M	Herr Jesu Christ, meins Lebens Licht
+000408b_ 4.8	E_m	Christ lag in Todesbanden
+000507b_ 5.7 	G_m	Auf meinen lieben Gott
+000606b_ 6.6 	G_m	Erhalt uns, Herr, bei deinem Wort
+000707b_ 7.7 	E_m	Es woll uns Gott genädig sein 1
+000907b_ 9.7 	E_M	Es ist das Heil uns kommen her
+001007b_ 10.7 	G_m	Meine Seel erhebt den Herren
+001106b_ 11.6 	D_M	Ermuntre dich, mein schwacher Geist
+001207b_ 12.7 	BbM	Was Gott tut, das ist wohlgetan
+001306b_ 13.6 	BbM	O Welt, ich muß dich lassen
+001606b_ 16.6 	A_m	Helft mir Gotts Güte preisen
+001707b_ 17.7 	A_M	Nun lob, mein Seel, den Herren
+001805b_ 18.5	C_m	Durch Adams Fall ist ganz verderbt
+001907ch 19.7ch C_M	Wie nach einer Wasserquelle
+002406bs 24.6bs	F_M	O Gott, du frommer Gott
+002506b_ 25.6 	C_M	Wie nach einer Wasserquelle
+002806b_ 28.6 	A_m	Helft mir Gotts Güte preisen
+002908ch 29.8ch	D_M	Nun lob, mein Seel, den Herren
+003006b_ 30.6 	A_M	Wie nach einer Wasserquelle
+003109b_ 31.9 	C_M	Wenn mein Stündlein vorhanden ist 1
+003206b_ 32.6 	G_M	Wie nach einer Wasserquelle
+003306b_ 33.6 	A_m	Allein zu dir, Herr Jesu Christ
+003608b2 36(2).8 	B_m	Nun komm, der Heiden Heiland
+003806b_ 38.6	A_m	Aus tiefer Not schrei ich zu dir 1
+003907b_ 39.7 	BbM	Wie nach einer Wasserquelle
+003907bv 39.7bv	BbM	Freu dich sehr, o meine Seele
+004006b_ 40.6	D_m	Schwing dich auf zu deinem Gott
+004008b_ 40.8 	F_m	Freuet euch, ihr Christen alle
+005708b_ 57.8 	BbM	Hast du denn, Liebster, dein Angesicht gänzlich verborgen
+012006b_ 120.6 	D_M	Herr Gott, dich loben wir, Herr Gott, wir danken dir
+012106b_ 121.6 	B_m	Christum wir sollen loben schon
+012206b_ 122.6 	G_m	Das neugeborne Kindelein
+012306b_ 123.6 	B_m	Liebster Immanuel, Herzog der Frommen
+012406b_ 124.6 	E_M	Meinen Jesum laß ich nicht, weil er sich für mich gegeben
+012506b_ 125.6 	E_m	Mit Fried und Freud ich fahr dahin
+012606b_ 126.6 	A_m	Verleih uns Frieden gnädiglich
+012606bv 126.6bv	C_M	Verleih uns Frieden gnädlich
+012705b_ 127.5 	F_M	Wenn einer schon ein Haus aufbaut
+012805b_ 128.5 	G_M	Die Wollust dieser Welt
+013506b_ 135.6 	A_m	Herzlich tut mich verlangen
+013705ch 137.5ch	C_M	Hast du denn, Jesu, dein Angesicht gänzlich verborgen
+013906b_ 139.6 	E_M	Mach's mit mir, Gott, nach deiner Güt
+014007b_ 140.7 	EbM	Wachet auf, ruft uns die Stimme
+014403b_ 144.3 	G_M	Was Gott tut, das ist wohlgetan
+014406b_ 144.6 	B_m	Was mein Gott will, das g'scheh allzeit
+014500ba 145a	D_M	Jesus, meine Zuversicht
+014505b_ 145.5 	F#m	Am Sabbat früh Marien drei 2
+014505bv 145.5bv	D_M	 Erschienen ist der herrlich Tag
+014608b_ 146.8 	F_M	Werde munter, mein Gemüte
+014806b_ 148.6 	F#m	Auf meinen lieben Gott
+014806bv 148.6bv	A_M	Wo soll ich fliehen hin
+015105b_ 151.5 	G_M	Kommt her, ihr lieben Schwesterlein
+015301b_ 153.1 	A_m	Ach Gott, vom Himmel sieh' darein
+015305b_ 153.5 	A_m	Herzlich tut mich verlangen
+015309b_ 153.9 	C_M	Herr Jesu Christ, meins Lebens Licht
+015403b_ 154.3 	A_M	Werde munter, mein Gemüte
+015408b_ 154.8 	D_M	Meinen Jesum laß ich nicht, weil er sich für mich gegeben
+015505b_ 155.5 	F_M	Es ist das Heil uns kommen her

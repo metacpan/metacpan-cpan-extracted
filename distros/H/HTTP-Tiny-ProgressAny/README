@@ -1,20 +1,49 @@
-SYNOPSIS
+NAME
+    HTTP::Tiny::ProgressAny - See progress for your HTTP::Tiny requests
 
+VERSION
+    This document describes version 0.040 of HTTP::Tiny::ProgressAny (from
+    Perl distribution HTTP-Tiny-ProgressAny), released on 2018-10-06.
+
+SYNOPSIS
      use HTTP::Tiny::ProgressAny;
      use Progress::Any::Output;
-    
+
      Progress::Any::Output->set("TermProgressBarColor");
-     my $resp = HTTP::Tiny->new->get("http://example.com/some-big-file");
+     my $resp = HTTP::Tiny::ProgressAny->new->get("http://example.com/some-big-file");
      # you will see a progress bar in your terminal
 
 DESCRIPTION
-
     This class is a subclass of HTTP::Tiny that uses Progress::Any to let
     you see progress during HTTP requests.
 
     Sample output:
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-ProgressAny>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-ProgressAny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-ProgressAny
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     LWP::UserAgent::ProgressAny
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

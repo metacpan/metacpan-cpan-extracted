@@ -27,7 +27,7 @@ if (!&Forks::Super::Util::IS_WIN32ish) {
 #   http://msdn.microsoft.com/en-us/library/ms684847(VS.85).aspx
 
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 our ($_THREAD_API, $_THREAD_API_INITIALIZED, %SYSTEM_INFO);
 
 ##################################################################
@@ -330,7 +330,7 @@ sub get_current_thread_id {
 #             JVM1,JVM2,LWP,URG,WINCH      ==> ignore or treat like SIGZERO
 #                 send SIGZERO with CORE::kill ok
 #
-# * Windows "kill" signals are ABRT ALRM FPE HUP ILL NUMxx PIPE SEGV TERM
+# * "kill" signals in Windows are ABRT ALRM FPE HUP ILL NUMxx PIPE SEGV TERM
 
 
 # DWIM Unix-style signal to Windows processes and threads
@@ -1095,3 +1095,25 @@ sub system1_win32_process {
 }
 
 1;
+
+=head1 NAME
+
+Forks::Super::Job::OS::Win32 - Windows specific implementations of
+operating system-specific functions and options for Forks::Super::fork
+
+=head1 DESCRIPTION
+
+Subset of L<Forks::Super::Job::OS> functionality implemented for
+MSWin32 systems. Windows systems differ substantially from Unix/POSIX
+systems. This package seeks to present a common interface so that
+a script that uses L<Forks::Super> developed in Unix has a decent chance
+of running on Windows with no changes, and vice-versa.
+
+=head1 SEE ALSO
+
+L<Forks::Super::Util::isValidPid|Forks::Super::Util/"isValidPid">,
+L<< "suspend", "resume", and "terminate" in 
+C<Forks::Super::Job>|Forks::Super::Job >>
+
+=cut
+

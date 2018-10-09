@@ -2,18 +2,20 @@ NAME
     Package::MoreUtil - Package-related utilities
 
 VERSION
-    This document describes version 0.58 of Package::MoreUtil (from Perl
-    distribution Package-MoreUtil), released on 2014-12-05.
+    This document describes version 0.590 of Package::MoreUtil (from Perl
+    distribution Package-MoreUtil), released on 2018-10-07.
 
 SYNOPSIS
      use Package::MoreUtil qw(
          package_exists
          list_package_contents
+         list_package_subs
          list_subpackages
      );
 
      print "Package Foo::Bar exists" if package_exists("Foo::Bar");
      my %content   = list_package_contents("Foo::Bar");
+     my @subnames  = list_package_subs("Foo::Bar");
      my @subpkg    = list_subpackages("Foo::Bar");
      my @allsubpkg = list_subpackages("Foo::Bar", 1); # recursive
 
@@ -41,6 +43,9 @@ FUNCTIONS
 
     This module won't list subpackages. Use list_subpackages() for that.
 
+  list_package_subs($pkg) => @subnames
+    Return a list containing subroutine names in package $pkg.
+
   list_subpackages($name[, $recursive]) => @res
     List subpackages, e.g.:
 
@@ -59,11 +64,6 @@ FAQ
 
      list_subpackages("", 1);
 
-SEE ALSO
-    perlmod
-
-    Package::Util (currently empty/placeholder at the time of this writing)
-
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Package-MoreUtil>.
@@ -79,11 +79,16 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+SEE ALSO
+    perlmod
+
+    Package::Util (currently empty/placeholder at the time of this writing)
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2014, 2013 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

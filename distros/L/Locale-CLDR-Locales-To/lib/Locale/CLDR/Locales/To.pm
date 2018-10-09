@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::To - Package for language Tongan
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::To - Package for language Tongan
 
 package Locale::CLDR::Locales::To;
 # This file auto generated from Data\common\main\to.xml
-#	on Sun  5 Aug  6:24:45 pm GMT
+#	on Sun  7 Oct 11:02:46 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4960,30 +4962,30 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{AM},
 					'pm' => q{PM},
-				},
-				'wide' => {
-					'pm' => q{efiafi},
-					'am' => q{hengihengi},
+					'am' => q{AM},
 				},
 				'narrow' => {
 					'am' => q{AM},
 					'pm' => q{PM},
+				},
+				'wide' => {
+					'am' => q{hengihengi},
+					'pm' => q{efiafi},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'narrow' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
 				'wide' => {
-					'am' => q{HH},
 					'pm' => q{EA},
+					'am' => q{HH},
+				},
+				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 		},

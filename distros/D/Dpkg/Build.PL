@@ -58,14 +58,36 @@ my $class = Module::Build->subclass(
 my $build = $class->new(
     dist_name       => 'Dpkg',
     dist_abstract   => 'Debian Package Manager Perl modules',
-    dist_version    => '1.19.1',
+    dist_version    => '1.19.2',
     dist_author     => 'Dpkg Developers <debian-dpkg@lists.debian.org>',
     license         => 'GPL_2',
+
+    release_status  => 1 ? 'stable' : 'testing',
 
     # Set only to avoid warnings.
     module_name     => 'Dpkg',
 
     meta_merge => {
+        'meta-spec' => {
+            version => 2,
+        },
+        prereqs => {
+            test => {
+                recommends => {
+                    'Test::Pod'             => 0,
+                    'Test::Strict'          => 0,
+                },
+            },
+            develop => {
+                recommends => {
+                    'Test::MinimumVersion'  => 0,
+                    'Test::Perl::Critic'    => 0,
+                    'Test::Pod::Coverage'   => 0,
+                    'Test::Spelling'        => 0,
+                    'Test::Synopsis'        => 0,
+                },
+            },
+        },
         resources => {
             homepage => 'https://wiki.debian.org/Teams/Dpkg',
             repository => {
@@ -89,10 +111,8 @@ my $build = $class->new(
     test_requires => {
         'TAP::Harness'          => 0,
         'Test::More'            => 0,
-        'Test::Pod'             => 0,
-        'Test::Strict'          => 0,
     },
-    recommands => {
+    recommends => {
         'Algorithm::Merge'      => 0,
         'File::FcntlLock'       => 0,
         'Locale::gettext'       => 0,

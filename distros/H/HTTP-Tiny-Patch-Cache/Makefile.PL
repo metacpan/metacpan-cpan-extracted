@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "HTTP::Tiny::Patch::Cache",
   "PREREQ_PM" => {
     "Digest::SHA" => 0,
-    "File::Util::Tempdir" => "0.030",
+    "File::Util::Tempdir" => "0.032",
     "HTTP::Tiny" => "0.057",
     "JSON::MaybeXS" => 0,
     "Log::ger" => "0.023",
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Digest::SHA" => 0,
   "File::Spec" => 0,
-  "File::Util::Tempdir" => "0.030",
+  "File::Util::Tempdir" => "0.032",
   "HTTP::Tiny" => "0.057",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

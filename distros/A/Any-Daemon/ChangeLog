@@ -1,6 +1,18 @@
 
 == history of distribution Any-Daemon
 
+version 0.96: Mon  8 Oct 10:52:41 CEST 2018
+
+	Fixes:
+	- user/group change only happened when both user and group needed
+	  to be changed.
+
+	Improvements:
+	- add accessor pidFilename
+	- besides CODEs refs, most parameters now also support a method name
+	- support daemon which does its task directly (run_task)
+	- split setting group and user for readibility.
+
 version 0.95: Sun  4 Mar 12:00:31 CET 2018
 
 	Fixes:

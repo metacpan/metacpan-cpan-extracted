@@ -1,0 +1,8 @@
+#vim: ts=2 sw=2 expandtab
+routes:
+  - path: '/'
+    body: '{"message":"Hello, World!"}'
+    code: 203
+    headers:
+      - Server: 'WebService::Fake/0.001'
+        X-Whatever: 'whatever is whatever'

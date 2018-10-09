@@ -25,10 +25,14 @@ Music
 Thirtysecond
 dden
 ddx
+ddxn
 ddy
+ddyn
 durations
 dx
+dxn
 dy
+dyn
 gene
 lib
 nd
@@ -36,4 +40,8 @@ sixtyfourth
 th
 thirtysecond
 tx
+txn
 ty
+tyn
+xn
+yn

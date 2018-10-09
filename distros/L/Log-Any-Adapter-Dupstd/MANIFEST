@@ -11,6 +11,7 @@ lib/Log/Any/Adapter/Dupout.pm
 lib/Log/Any/Adapter/Dupstd.pm
 minil.toml
 t/00_compile.t
+t/dupstd.t
 xt/10-perltidy.t
 xt/20-perlcritic.t
 META.yml

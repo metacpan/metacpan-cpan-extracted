@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Or - Package for language Odia
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Or - Package for language Odia
 
 package Locale::CLDR::Locales::Or;
 # This file auto generated from Data\common\main\or.xml
-#	on Sun  5 Aug  6:16:58 pm GMT
+#	on Sun  7 Oct 10:52:49 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4561,6 +4563,10 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
 				'narrow' => {
 					'am' => q{ପୂ},
 					'pm' => q{ଅ},
@@ -4569,23 +4575,19 @@ has 'day_periods' => (
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{ଅପରାହ୍ନ},
-					'am' => q{ପୂର୍ବାହ୍ନ},
-				},
 				'narrow' => {
 					'am' => q{AM},
 					'pm' => q{ଅପରାହ୍ନ},
 				},
-				'abbreviated' => {
-					'am' => q{ପୂର୍ବାହ୍ନ},
+				'wide' => {
 					'pm' => q{ଅପରାହ୍ନ},
+					'am' => q{ପୂର୍ବାହ୍ନ},
+				},
+				'abbreviated' => {
+					'pm' => q{ଅପରାହ୍ନ},
+					'am' => q{ପୂର୍ବାହ୍ନ},
 				},
 			},
 		},

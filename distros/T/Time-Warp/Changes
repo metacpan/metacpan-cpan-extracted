@@ -1,5 +1,8 @@
 Revision history for Time::Warp
 
+0.54  2018.10.08 MANWAR
+      - Merged PR #4 (Pod Spelling), thanks @gregoa.
+
 0.53  2018.08.22
       - New maintainer (MANWAR)
       - Updated GitHub repo details.

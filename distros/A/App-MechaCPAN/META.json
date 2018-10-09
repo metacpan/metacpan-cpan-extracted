@@ -4,7 +4,7 @@
       "Jon Gentle <cpan@atrodo.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.16",
             "Test::Pod" : "1.41"
          }
       },
@@ -59,10 +59,12 @@
          "web" : "https://github.com/atrodo/App-MechaCPAN"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_contributors" : [
       "Greg Arnold <greg@arnoldassociates.com>",
-      "Jon Gentle <atrodo@atrodo.org>"
+      "James A. Pattie <james.pattie@gpsinsight.com>",
+      "Jon Gentle <atrodo@atrodo.org>",
+      "Tim Heaney <oylenshpeegul@gmail.com>"
    ]
 }
 

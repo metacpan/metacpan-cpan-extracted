@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -47,6 +47,7 @@ GetOptions(
 	'fullhelp' => \my $fullhelp,
 	'verbose' => \my $verbose,
 	'quiet' => \my $quiet,
+	'compress' => \my $compress,
 	'<>' => sub { push(@ARGS, $_[0]); }
 );
 
@@ -63,14 +64,18 @@ $beautifier->register_tag($_) for (@{$liquid->tags});
 
 eval {
 	sub beautify {
-		my ($text) = @_;
-		return $liquid->lexer->unparse_text($beautifier->beautify($liquid->lexer->parse_text($text)));
+		my ($text, $compress) = @_;
+		if ($compress){
+            return $liquid->lexer->unparse_text($beautifier->compress($liquid->lexer->parse_text($text)));
+        } else {
+            return $liquid->lexer->unparse_text($beautifier->beautify($liquid->lexer->parse_text($text)));
+        }
 	}
 	
 	die "One or more of those files doesn't exist or is a directory." if int(grep { !-e $_ || -d $_ } @ARGS) > 0;
 	
 	if (@ARGS) {
-		write_file($_, beautify(scalar(read_file($_)))) for (@ARGS);
+		write_file($_, beautify(scalar(read_file($_)),$compress)) for (@ARGS);
 	} else {
 		my $accumulator = '';
 		while (my $line = <STDIN>) {

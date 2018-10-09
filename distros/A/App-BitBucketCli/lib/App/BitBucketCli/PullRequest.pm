@@ -12,7 +12,7 @@ use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.005;
+our $VERSION = 0.006;
 
 extends qw/App::BitBucketCli::Base/;
 
@@ -109,7 +109,7 @@ App::BitBucketCli::PullRequest - Stores details about a pull request
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::PullRequest version 0.005
+This documentation refers to App::BitBucketCli::PullRequest version 0.006
 
 =head1 SYNOPSIS
 

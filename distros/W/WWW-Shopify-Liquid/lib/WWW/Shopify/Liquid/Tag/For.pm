@@ -52,8 +52,9 @@ sub interpret_inner_tokens {
 }
 
 sub render_loop {
-	my ($self, $renderer, $hash, $op1, $op2, $start, $end, @array) = @_;
+	my ($self, $renderer, $hash, $op1, $op2, $start, $end, $arrayRef) = @_;
 	
+	my @array = @$arrayRef;
 	my @texts = ();
 	my $all_processed = 1;
 	my $var = $op1->{core}->[0]->{core};
@@ -69,10 +70,10 @@ sub render_loop {
 		$hash->{$var} = $array[$_];
 		$hash->{forloop} = { 
 			index => ($_+1), index0 => $_, first => $_ == 0, last => $_ == $#array,
-			length => int(@array), rindex0 => (($#array - $_) + 1),	rindex => (($#array - $_)),
+			length => int(@array), rindex0 => (($#array - $_)), rindex => (($#array - $_) + 1),
 		};
 		eval {
-			$content = $self->{contents}->render($renderer, $hash);
+			$content = $self->is_processed($self->{contents}) ? $self->{contents} : $self->{contents}->render($renderer, $hash);
 		};
 		if (my $exp = $@) {
 			if (defined $exp && blessed($exp) && $exp->isa('WWW::Shopify::Liquid::Exception::Control')) {
@@ -108,8 +109,9 @@ sub expand_concatenations {
 }
 
 sub optimize_loop {
-	my ($self, $optimizer, $hash, $op1, $op2, $start, $end, @array) = @_;
+	my ($self, $optimizer, $hash, $op1, $op2, $start, $end, $arrayRef) = @_;
 	
+	my @array = @$arrayRef;
 	
 	# First step, we replace everything by a big concatenate.
 	my @texts = ();
@@ -144,7 +146,7 @@ sub optimize_loop {
 	} ($start..$end);
 	
 	return $parts[0] if int(@parts) == 1;
-	return WWW::Shopify::Liquid::Operator::Concatenate->new($self->{line}, "", @parts);
+	return $optimizer->optimize($hash, WWW::Shopify::Liquid::Operator::Concatenate->new($self->{line}, "", @parts));
 }
 
 # Called to expand the second operand in "in" argument list.
@@ -158,7 +160,6 @@ sub apply {
 sub process {
 	my ($self, $hash, $action, $pipeline) = @_;
 	my @args = @{$self->{arguments}};
-	
 	
 	my ($op1, $op2) = @{$args[0]->{operands}};
 	$op2 = $op2->$action($pipeline, $hash) if !$self->is_processed($op2);
@@ -202,7 +203,7 @@ sub process {
 	
 	my $dispatch = $action . "_loop";
 	
-	return $self->$dispatch($pipeline, $hash, $op1, $op2, $offset, min($#array, $limit+$offset-1), @array);
+	return $self->$dispatch($pipeline, $hash, $op1, $op2, $offset, min($#array, $limit+$offset-1), \@array);
 }
 
 

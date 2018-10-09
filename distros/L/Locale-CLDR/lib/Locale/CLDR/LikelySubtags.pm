@@ -1,12 +1,12 @@
 package Locale::CLDR::LikelySubtags;
 # This file auto generated from Data\common\supplemental\likelySubtags.xml
-#	on Sun  5 Aug  5:49:08 pm GMT
+#	on Sun  7 Oct 10:18:07 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -343,6 +343,7 @@ has 'likely_subtags' => (
 		'eo'	=> 'eo_Latn_001',
 		'eri'	=> 'eri_Latn_ZZ',
 		'es'	=> 'es_Latn_ES',
+		'esg'	=> 'esg_Gonm_IN',
 		'esu'	=> 'esu_Latn_US',
 		'et'	=> 'et_Latn_EE',
 		'etr'	=> 'etr_Latn_ZZ',
@@ -807,6 +808,7 @@ has 'likely_subtags' => (
 		'mif'	=> 'mif_Latn_ZZ',
 		'min'	=> 'min_Latn_ID',
 		'mis'	=> 'mis_Hatr_IQ',
+		'mis_Medf'	=> 'mis_Medf_NG',
 		'miw'	=> 'miw_Latn_ZZ',
 		'mk'	=> 'mk_Cyrl_MK',
 		'mki'	=> 'mki_Arab_ZZ',
@@ -1018,7 +1020,7 @@ has 'likely_subtags' => (
 		'rel'	=> 'rel_Latn_ZZ',
 		'res'	=> 'res_Latn_ZZ',
 		'rgn'	=> 'rgn_Latn_IT',
-		'rhg'	=> 'rhg_Arab_ZZ',
+		'rhg'	=> 'rhg_Arab_MM',
 		'ria'	=> 'ria_Latn_IN',
 		'rif'	=> 'rif_Tfng_MA',
 		'rif_NL'	=> 'rif_Latn_NL',
@@ -1111,6 +1113,7 @@ has 'likely_subtags' => (
 		'snx'	=> 'snx_Latn_ZZ',
 		'sny'	=> 'sny_Latn_ZZ',
 		'so'	=> 'so_Latn_SO',
+		'sog'	=> 'sog_Sogd_UZ',
 		'sok'	=> 'sok_Latn_ZZ',
 		'soq'	=> 'soq_Latn_ZZ',
 		'sou'	=> 'sou_Thai_TH',
@@ -1314,6 +1317,7 @@ has 'likely_subtags' => (
 		'wob'	=> 'wob_Latn_ZZ',
 		'wos'	=> 'wos_Latn_ZZ',
 		'wrs'	=> 'wrs_Latn_ZZ',
+		'wsg'	=> 'wsg_Gong_IN',
 		'wsk'	=> 'wsk_Latn_ZZ',
 		'wtm'	=> 'wtm_Deva_IN',
 		'wuu'	=> 'wuu_Hans_CN',
@@ -1644,6 +1648,7 @@ has 'likely_subtags' => (
 		'und_Arab_ID'	=> 'ms_Arab_ID',
 		'und_Arab_IN'	=> 'ur_Arab_IN',
 		'und_Arab_KH'	=> 'cja_Arab_KH',
+		'und_Arab_MM'	=> 'rhg_Arab_MM',
 		'und_Arab_MN'	=> 'kk_Arab_MN',
 		'und_Arab_MU'	=> 'ur_Arab_MU',
 		'und_Arab_NG'	=> 'ha_Arab_NG',
@@ -1689,13 +1694,15 @@ has 'likely_subtags' => (
 		'und_Deva_FJ'	=> 'hif_Deva_FJ',
 		'und_Deva_MU'	=> 'bho_Deva_MU',
 		'und_Deva_PK'	=> 'btv_Deva_PK',
+		'und_Dogr'	=> 'doi_Dogr_IN',
 		'und_Dupl'	=> 'fr_Dupl_FR',
 		'und_Egyp'	=> 'egy_Egyp_EG',
 		'und_Elba'	=> 'sq_Elba_AL',
 		'und_Ethi'	=> 'am_Ethi_ET',
 		'und_Geor'	=> 'ka_Geor_GE',
 		'und_Glag'	=> 'cu_Glag_BG',
-		'und_Gonm'	=> 'gon_Gonm_IN',
+		'und_Gong'	=> 'wsg_Gong_IN',
+		'und_Gonm'	=> 'esg_Gonm_IN',
 		'und_Goth'	=> 'got_Goth_UA',
 		'und_Gran'	=> 'sa_Gran_IN',
 		'und_Grek'	=> 'el_Grek_GR',
@@ -1760,9 +1767,11 @@ has 'likely_subtags' => (
 		'und_Lyci'	=> 'xlc_Lyci_TR',
 		'und_Lydi'	=> 'xld_Lydi_TR',
 		'und_Mahj'	=> 'hi_Mahj_IN',
+		'und_Maka'	=> 'mak_Maka_ID',
 		'und_Mand'	=> 'myz_Mand_IR',
 		'und_Mani'	=> 'xmn_Mani_CN',
 		'und_Marc'	=> 'bo_Marc_CN',
+		'und_Medf'	=> 'mis_Medf_NG',
 		'und_Mend'	=> 'men_Mend_SL',
 		'und_Merc'	=> 'xmr_Merc_SD',
 		'und_Mero'	=> 'xmr_Mero_SD',
@@ -1796,6 +1805,7 @@ has 'likely_subtags' => (
 		'und_Plrd'	=> 'hmd_Plrd_CN',
 		'und_Prti'	=> 'xpr_Prti_IR',
 		'und_Rjng'	=> 'rej_Rjng_ID',
+		'und_Rohg'	=> 'rhg_Rohg_MM',
 		'und_Runr'	=> 'non_Runr_SE',
 		'und_Samr'	=> 'smp_Samr_IL',
 		'und_Sarb'	=> 'xsa_Sarb_YE',
@@ -1806,6 +1816,8 @@ has 'likely_subtags' => (
 		'und_Sidd'	=> 'sa_Sidd_IN',
 		'und_Sind'	=> 'sd_Sind_IN',
 		'und_Sinh'	=> 'si_Sinh_LK',
+		'und_Sogd'	=> 'sog_Sogd_UZ',
+		'und_Sogo'	=> 'sog_Sogo_UZ',
 		'und_Sora'	=> 'srb_Sora_IN',
 		'und_Soyo'	=> 'cmg_Soyo_MN',
 		'und_Sund'	=> 'su_Sund_ID',

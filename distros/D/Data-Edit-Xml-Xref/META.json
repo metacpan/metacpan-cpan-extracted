@@ -1,0 +1,48 @@
+{
+   "abstract" : "Cross reference data held in the XML format.",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Edit-Xml-Xref",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Data::Edit::Xml" : "20181008",
+            "Data::Table::Text" : "20181008",
+            "Test2::API" : "0",
+            "Test::More" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Edit::Xml::Xref" : {
+         "file" : "lib/Data/Edit/Xml/Xref.pm",
+         "version" : "2011008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2011008",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

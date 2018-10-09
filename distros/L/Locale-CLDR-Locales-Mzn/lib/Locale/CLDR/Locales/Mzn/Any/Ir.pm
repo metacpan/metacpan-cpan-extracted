@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Mzn::Any::Ir - Package for language Mazanderani
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Mzn::Any::Ir - Package for language Mazanderani
 
 package Locale::CLDR::Locales::Mzn::Any::Ir;
 # This file auto generated from Data\common\main\mzn_IR.xml
-#	on Sun  5 Aug  6:13:12 pm GMT
+#	on Sun  7 Oct 10:48:17 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

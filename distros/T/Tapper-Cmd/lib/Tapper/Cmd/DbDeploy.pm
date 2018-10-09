@@ -1,7 +1,7 @@
 package Tapper::Cmd::DbDeploy;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Backend functions for DB deployment
-$Tapper::Cmd::DbDeploy::VERSION = '5.0.9';
+$Tapper::Cmd::DbDeploy::VERSION = '5.0.10';
 use 5.010;
 use strict;
 use warnings;

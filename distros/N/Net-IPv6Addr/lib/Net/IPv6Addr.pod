@@ -3,12 +3,12 @@
 
 =head1 NAME
 
-Net::IPv6Addr - Check validity of IPv6 addresses
+Net::IPv6Addr - Check and manipulate IPv6 addresses
 
 =head1 VERSION
 
-This documents version 0.93 of Net::IPv6Addr corresponding to
-L<git commit 3f1eacc60429d669fe8460913e10d994915c6063|https://github.com/benkasminbullock/net-ipv6addr/commit/3f1eacc60429d669fe8460913e10d994915c6063> released on Fri Oct 5 11:53:08 2018 +0900.
+This documents version 0.96 of Net::IPv6Addr corresponding to
+L<git commit 64f42c10634b707ccd482644a0fae855d488d5d6|https://github.com/benkasminbullock/net-ipv6addr/commit/64f42c10634b707ccd482644a0fae855d488d5d6> released on Sat Oct 6 15:05:27 2018 +0900.
 
 =head1 SYNOPSIS
 
@@ -25,37 +25,82 @@ produces output
     dead:beef:cafe:babe:0:0:0:f0ad
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/synopsis.pl> in the distribution.)
 
 
 =head1 DESCRIPTION
 
-C<Net::IPv6Addr> checks strings for valid IPv6 addresses, as specified
-in L<RFC1884|/RFCs>, and converts addresses into various formats. It
-is able to process addresses formatted in the following styles;
+C<Net::IPv6Addr> can check whether strings contain valid IPv6
+addresses, and convert them into various formats.
+
+All of L</new>, L</is_ipv6>, and L</ipv6_parse> can
+process the following formats:
 
 =over
 
-=item preferred form: x:x:x:x:x:x:x:x
+=item Preferred form: x:x:x:x:x:x:x:x
 
-=item zero-compressed form: the infamous double-colon.  
+C<2001:db8:0:0:0:ff00:42:8329>
 
-Too many pattern matches to describe in this margin.
+This is the form described as the "preferred form" in section 2.2 of
+L</RFC1884> et al. Output with L</to_string_preferred>.
 
-=item	mixed IPv4/IPv6 format: x:x:x:x:x:x:d.d.d.d
+=item Compressed form with double colon: x::x etc.
 
-=item	mixed IPv4/IPv6 with compression: ::d.d.d.d or ::FFFF:d.d.d.d
+C<2001:db8::ff00:42:8329>
 
-=item	base-85-encoded: [0-9A-Za-z!#$%&()*+;<=>?@^_`{|}~-]{20}
+This is the "canonical text representation format" of L</RFC5952>.
+Output with L</to_string_compressed>.
 
-(This encoding was given in L<RFC1924|/RFCs> as an April Fool's joke.)
+=item	Mixed IPv4/IPv6 format: x:x:x:x:x:x:d.d.d.d
+
+C<2001:db8:0:0:0:ff00:0.66.131.41>
+
+Output with L</to_string_ipv4>.
+
+=item	Mixed IPv4/IPv6 with compression: x::x:d.d.d.d, etc.
+
+C<2001:db8::ff00:0.66.131.41>
+
+Output with L</to_string_ipv4_compressed>.
+
+=item	Base-85-encoded: [0-9A-Za-z!#$%&()*+;<=>?@^_`{|}~-]{20}
+
+C<9R}vSQ9RqiCvG6zn?Zyh>
+
+This encoding was given in L</RFC1924> as an April Fool's joke. Output
+with L</to_string_base85>.
 
 =back
 
+In addition, the following formats can be output:
+
+=over
+
+=item Big integers
+
+An IPv6 can be changed to a L<Math::BigInt> object or a digit string
+using L</to_bigint>. Big integers can also be input with
+L</from_bigint>.
+
+=item Arrays
+
+An IPv6 can be processed into its component pieces with L</to_array>
+or L</to_intarray>.
+
+=item Reverse-address pointer
+
+An IPv6 can be processed into its reverse-address pointer, as defined
+by L</RFC1886>, using L</to_string_ip6_int>.
+
+=back
+
+
+
 =head1 METHODS AND FUNCTIONS
 
-Several of the following serve as both object methods and standalone
-functions.
+All of the following except L</new> serve as both object methods and
+standalone functions.
 
 =head2 new
 
@@ -140,7 +185,7 @@ produces output
 
     dead:beef:cafe:babe:0:0:0:f0ad
 
-(This example is included as L<F<preferred.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/preferred.pl> in the distribution.)
+(This example is included as L<F<preferred.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/preferred.pl> in the distribution.)
 
 
 =head3 Parameters
@@ -151,7 +196,7 @@ an IPv6 address string in any format.
 =head3 Returns
 
 The IPv6 address, formatted in the "preferred" way (as detailed by
-RFC1884).
+L</RFC1884> et al).
 
 =head3 Notes
 
@@ -168,8 +213,11 @@ produces output
 
     dead:beef::cafe:babe
 
-(This example is included as L<F<compressed.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/compressed.pl> in the distribution.)
+(This example is included as L<F<compressed.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/compressed.pl> in the distribution.)
 
+
+This provides the "canonical text representation format" of
+L</RFC5952>. 
 
 =head3 Parameters
 
@@ -178,7 +226,12 @@ an IPv6 address string in any format.
 
 =head3 Returns
 
-The IPv6 address in the "compressed" format detailed by L<RFC1884|/RFCs>.
+The IPv6 address in the "compressed" (L</RFC1884> et al.) or
+"canonical" (L</RFC5952>) format. Hexadecimal numbers are reduced to
+lower case, consecutive zero elements are reduced to double colons,
+and leading zeros are removed from strings of hexadecimal digits. All
+treatment of ambiguities is as per RFC5952. (See
+L<F<t/rfc5952.t>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/t/rfc5952.t> for tests.)
 
 =head3 Notes
 
@@ -186,6 +239,18 @@ Invalid input will generate an exception.
 
 =head2 to_string_ipv4
 
+    
+    use Net::IPv6Addr ':all';
+    print to_string_ipv4_compressed ('dead:beef:0:3:2:1:cafe:babe');
+
+
+produces output
+
+    dead:beef::3:2:1:202.254.186.190
+
+(This example is included as L<F<to-string-ipv4.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/to-string-ipv4.pl> in the distribution.)
+
+
 =head3 Parameters
 
 If used as an object method, none; if used as a subroutine,
@@ -193,14 +258,28 @@ an IPv6 address string in any format.
 
 =head3 Returns
 
-The IPv6 address in the IPv4 format detailed by L<RFC1884|/RFCs>.
+The IPv6 address in the IPv4 format detailed by L</RFC1884> et al.
 
 =head3 Notes
 
-Invalid input, such as an address that was not originally IPv4,
-will generate an exception.
+When used as a subroutine, invalid input will generate an exception.
+
+From version L</0.95>, this allows any IPv6 address to be produced, not
+just the restricted forms allowed previously.
 
 =head2 to_string_ipv4_compressed
+
+    
+    use Net::IPv6Addr ':all';
+    print to_string_ipv4_compressed ('dead:beef:0:3:2:1:cafe:babe');
+
+
+produces output
+
+    dead:beef::3:2:1:202.254.186.190
+
+(This example is included as L<F<to-string-ipv4-comp.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/to-string-ipv4-comp.pl> in the distribution.)
+
 
 =head3 Parameters
 
@@ -210,12 +289,14 @@ an IPv6 address string in any format.
 =head3 Returns
 
 The IPv6 address in the compressed IPv4 format detailed by
-L<RFC1884|/RFCs>.
+L</RFC1884> et al.
 
 =head3 Notes
 
-Invalid input (such as an address that was not originally IPv4)
-will generate an exception.
+When used as a subroutine, invalid input will generate an exception.
+
+From version L</0.95>, this allows any IPv6 address to be produced,
+not just the restricted forms allowed previously.
 
 =head2 to_string_base85
 
@@ -226,13 +307,14 @@ an IPv6 address string in any format.
 
 =head3 Returns
 
-The IPv6 address in the style detailed by L<RFC1924|/RFCs>.
+The IPv6 address in the style detailed by L</RFC1924>.
 
 =head3 Notes
 
 Invalid input will generate an exception. 
 
-The base 85 encoding described in RFC1924 was an April Fool's joke.
+The base 85 encoding described in L</RFC1924> was an April Fool's
+joke.
 
 =head2 to_bigint
 
@@ -250,10 +332,10 @@ produces output
     295986882420777848964380943247191621359
 
 
-(This example is included as L<F<bigint.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/bigint.pl> in the distribution.)
+(This example is included as L<F<bigint.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/bigint.pl> in the distribution.)
 
 
-Convert an IPv6 address into a L<Math::Bigint> object containing the
+Convert an IPv6 address into a L<Math::BigInt> object containing the
 IP address as a single number.
 
 =head3 Parameters
@@ -269,7 +351,7 @@ The BigInt representation of the given IPv6 address.
 
 Invalid input will generate an exception.
 
-See also L</to_intarray> and L</to_array>.
+See also L</from_bigint>, L</to_intarray> and L</to_array>.
 
 =head2 to_array
 
@@ -287,7 +369,7 @@ produces output
     dead 0000 0000 0000 0000 0000 0000 beef
 
 
-(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/array.pl> in the distribution.)
+(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/array.pl> in the distribution.)
 
 
 Convert an IPv6 address into an array of eight hexadecimal numbers.
@@ -323,7 +405,7 @@ produces output
     dead 0000 0000 0000 0000 0000 0000 beef
 
 
-(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/array.pl> in the distribution.)
+(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/array.pl> in the distribution.)
 
 
 Convert an IPv6 address into an array of eight integer numbers.
@@ -359,7 +441,7 @@ produces output
     f.e.e.b.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.d.a.e.d.IP6.INT.
 
 
-(This example is included as L<F<string-ip6-int.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.93/examples/string-ip6-int.pl> in the distribution.)
+(This example is included as L<F<string-ip6-int.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/string-ip6-int.pl> in the distribution.)
 
 
 =head3 Parameters
@@ -369,48 +451,78 @@ an IPv6 address string in any format.
 
 =head3 Returns
 
-The reverse-address pointer as defined by L<RFC1886|/RFCs>.
+The reverse-address pointer as defined by L</RFC1886>.
 
 =head3 Notes
 
 Invalid input will generate an exception.
 
+The reverse process of converting these into Net::IPv6Addr objects is
+not supported.
+
 =head2 in_network_of_size
 
-    my $obj = $x->in_network_of_size ($n);
+    
+    use Net::IPv6Addr 'in_network_of_size';
+    my $obj = in_network_of_size ('dead:beef:cafe:babe:dead:beef:cafe:babe', 42);
+    print $obj->to_string_compressed ();
+
+
+produces output
+
+    dead:beef:cac0::
+
+(This example is included as L<F<inos.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/inos.pl> in the distribution.)
+
 
 Given an input IPv6 address $x, this returns the C<$n>
 most-significant bits of C<$x> as a new Net::IPv6Addr object.
 
 =head3 Parameters
 
-If used as an object method, network size in bits
+If used as an object method, network size in bits:
 
     my $obj = $x->in_network_of_size (64);
 
-If used as a subroutine, an IPv6 address string in any format
-and network size in bits.
+If used as a subroutine, an IPv6 address string in any format and a
+network size in bits:
 
-    my $obj = Net::IPv6::in_network_of_size ($addr, 64);
+    my $obj = in_network_of_size ($addr, 64);
 
-Network size may be given with / notation:
+Network size may also be given with C</> notation:
 
-    my $obj = Net::IPv6::in_network_of_size ("$addr/64");
+    my $obj = in_network_of_size ("$addr/64");
 
 =head3 Returns
 
-Network IPv6Addr of given size.
+The C<$n> most-significant bits of C<$x> as a new Net::IPv6Addr object.
 
 =head3 Notes
 
 Invalid input will generate an exception. 
 
-Prior to version 0.9, this did not work correctly unless the net size
-was a multiple of sixteen.
+Prior to version L</0.9>, this did not work correctly unless the net
+size was a multiple of sixteen.
 
 =head2 in_network
 
-    my $ok = $x->in_network ("aa:bb:cc:dd::/64");
+    
+    use Net::IPv6Addr;
+    my $obj = Net::IPv6Addr->new ('dead:beef:cafe:babe:dead:beef:cafe:babe');
+    if ($obj->in_network ('dead:beef:ca0::/21')) {
+        print $obj->to_string_compressed, " is in network.\n";
+    }
+    
+    
+
+
+produces output
+
+    dead:beef:cafe:babe:dead:beef:cafe:babe is in network.
+
+
+(This example is included as L<F<inet.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/inet.pl> in the distribution.)
+
 
 =head3 Parameters
 
@@ -431,40 +543,56 @@ network address string:
 
 =head3 Returns
 
-A true value if the address is a member of the network, false otherwise.
+A true value if the address C<$x> is a member of the network given as
+the argument, or false otherwise.
 
 =head3 Notes
 
 Invalid input will generate an exception.
 
-Prior to version 0.9, this did not work correctly unless the net size
-was a multiple of sixteen.
+Prior to version L</0.9>, this did not work correctly unless the net
+size was a multiple of sixteen.
+
+=head2 from_bigint
+
+    
+    use Net::IPv6Addr 'from_bigint';
+    print from_bigint ('12345678901234567890')->to_string_compressed ();
+    
+
+
+produces output
+
+    ::ab54:a98c:eb1f:ad2
+
+(This example is included as L<F<from-bigint.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/examples/from-bigint.pl> in the distribution.)
+
+
+Given a string or a L<Math::BigInt> object containing a number, this
+converts it into a Net::IPv6Addr object.
+
+=head3 Parameters
+
+A string or a Math::BigInt object. If the input is a scalar, it's
+converted into a Math::BigInt object.
+
+=head3 Returns
+
+A Net::IPv6Addr object
+
+=head3 Notes
+
+Invalid input will generate an exception.
+
+This function was added in L</0.95>.
 
 =head1 EXPORTS
 
-As of version 0.93, L</in_network>, L</in_network_of_size>, L</ipv6_chkip>, L</ipv6_parse>, L</is_ipv6>, L</to_string_preferred>, L</to_string_compressed>, L</to_bigint>, L</to_intarray>, L</to_array>, L</to_string_ip6_int>, L</to_string_base65>, L</to_string_ipv4>, L</to_string_ipv4_compressed> may
+As of version 0.96, L</from_bigint>, L</in_network>, L</in_network_of_size>, L</ipv6_chkip>, L</ipv6_parse>, L</is_ipv6>, L</to_array>, L</to_bigint>, L</to_intarray>, L</to_string_base85>, L</to_string_compressed>, L</to_string_ip6_int>, L</to_string_ipv4>, L</to_string_ipv4_compressed>, L</to_string_preferred> may
 be exported on demand. All the exported functions may be exported
 using
 
     use Net::IPv6Addr ':all';
-
-=head1 BUGS
-
-Known deficiencies include the following.
-
-=over
-
-=item No tests
-
-Many of the routines do not have any tests. This means that
-alterations to the code may have unintentionally altered the module's
-behaviour.
-
-=back
-
-Report further bugs at
-L<https://rt.cpan.org/Dist/Display.html?Name=Net-IPv6Addr> or by email
-to C<bug-Net-IPv6Addr [at] rt.cpan.org>.
 
 =head1 DEPENDENCIES
 
@@ -476,12 +604,14 @@ This is used to parse IPv4 addresses.
 
 =item L<Math::Base85>
 
-This is used to parse RFC1924 (April Fool's) addresses.
+This is used to parse L</RFC1924> (April Fool's) addresses.
 
 =item L<Math::BigInt>
 
-This is used by the RFC1924 (April Fool's) address routines and by
-L</to_bigint>.
+This is used by the L</RFC1924> (April Fool's) address routines and by
+L</to_bigint> and L</from_bigint>.
+
+=back
 
 =head2 Reverse dependencies
 
@@ -494,10 +624,56 @@ L<Search grep.cpan.me for uses of this module|http://grep.cpan.me/?q=Net%3A%3AIP
 The following RFCs (requests for comment, internet standards
 documentation) contain information on IPv6.
 
-L<RFC1884|https://www.ietf.org/rfc/rfc1884.txt>,
-L<RFC1886|https://www.ietf.org/rfc/rfc1886.txt>,
-L<RFC1924|https://www.ietf.org/rfc/rfc1924.txt> (April Fool's joke),
-L<RFC2373|https://www.ietf.org/rfc/rfc2373.txt>
+
+
+=head3 Addressing Architecture series
+
+These are all the same standard, with updates. The most recent one is
+the active one.
+
+=over
+
+=item L<RFC1884|https://www.rfc-editor.org/rfc/rfc1884.txt>
+
+I<IPv6 Addressing Architecture> - December 1995
+
+=item L<RFC2373|https://www.rfc-editor.org/rfc/rfc2373.txt>
+
+I<IP Version 6 Addressing Architecture> - July 1998
+
+=item L<RFC3513|https://www.rfc-editor.org/rfc/rfc3513.txt>
+
+I<Internet Protocol Version 6 (IPv6) Addressing Architecture> - April 2003
+
+=item L<RFC4291|https://www.rfc-editor.org/rfc/rfc4291.txt>
+
+I<IP Version 6 Addressing Architecture> - February 2006
+
+=back
+
+=head3 Other
+
+=over
+
+=item L<RFC1886|https://www.rfc-editor.org/rfc/rfc1886.txt>
+
+I<DNS Extensions to support IP version 6> - December 1995
+
+=item L<RFC1924|https://www.rfc-editor.org/rfc/rfc1924.txt>
+
+I<A Compact Representation of IPv6 Addresses> - 1 April 1996
+
+This was an April Fool's joke.
+
+=item L<RFC5952|https://www.rfc-editor.org/rfc/rfc5952.txt>
+
+I<A Recommendation for IPv6 Address Text Representation> - August 2010
+
+This contains a "recommendation for a canonical text representation
+format of IPv6 addresses" which corresponds to the output of
+L</to_string_compressed> in this module.
+
+=back
 
 The links go to the plain text online versions of the RFCs.
 
@@ -509,24 +685,37 @@ overlap with this module, in alphabetical order.
 
 =over
 
-=item L<Data::Checker::IP>
-
-Uses L</NetAddr::IP>.
-
 =item L<Data::Validate::IP>
 
-Uses L<Socket> to validate IP addresses. Offers a number of facilities
-for special-purpose sub networks.
+This module uses L<Socket> to validate IP addresses. It offers a
+number of facilities for special-purpose sub networks, like
+C<is_discard_ipv6>, which are not offered in Net::IPv6Addr.
 
 =item L<IPv6::Address>
 
-Adds functions to manipulate addresses.
+Its description says "A pure Perl IPv6 address manipulation
+library. Emphasis on manipulation of prefixes and addresses."
+
+It insists on having a prefix with the IP address, so
+
+    my $ipv6 = IPv6::Address->new ('2001:0:0:1:0:0:0:1');
+
+actually fails, you have to use
+
+    my $ipv6 = IPv6::Address->new ('2001:0:0:1:0:0:0:1/64');
 
 =item L<Net::IP>
 
+Features binary IPs (strings like '101001'), etc.
+
 =item L<Net::IP::Minimal>
 
+It's a simplified version of L</Net::IP>.
+
 =item L<Net::IPAddress::Util>
+
+It's a "Version-agnostic representation of an IP address". I have not
+tried this module.
 
 =item L<Net::IPv6Address>
 
@@ -536,10 +725,16 @@ This module is broken and strongly not recommended.
 
 =item L<NetAddr::IP::Lite>
 
+These are two things in the same distribution. The documentation is
+quite offputting, but there are a lot of users of the module and stars
+on metacpan.
+
 =item L<Regexp::IPv6>
 
-Consists of a regex for validating IPv6s. Tests and one regex from
-C<Regexp::IPv6> are included in this module. Unlike C<Net::IPv6Addr>,
+This module consists of a regex for validating IPv6s. Because this
+module had a lot more and better tests than Net::IPv6Addr, I included
+the tests and one regex from C<Regexp::IPv6> in this module. (See
+L<F<t/Regexp-IPv6.t>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-0.96/t/Regexp-IPv6.t>) Unlike C<Net::IPv6Addr>,
 C<Regexp::IPv6> disallows C<::>, "the unspecified addresses". See the
 module's documentation for details.
 
@@ -562,16 +757,38 @@ the task of maintaining DNS records after he set himself up with
 Freenet6.
 
 In 2017 the module was adopted by Ben Bullock with the help of Neil
-Bowers as part of "CPAN day".
+Bowers as part of "CPAN day". Significant changes to the module since
+then include the following:
 
-Exporting of some functions was added in version 0.8.
+=over
 
-For version 0.91, IPv6 validating tests and an IPv4 validating regexp
-were taken from L<Regexp::IPv6> by Salvador Fandiño García.
+=item 0.8
 
-From version 0.92, the valid format consisting of a
-compressed-but-non-zero six-element IPv6 followed by an IPv4, such as
-C<fe80::204:61ff:254.157.241.86>, is accepted by the module. 
+Exporting of some functions was added. Prior to this, everything had
+to be done fully-qualified, as in
+C<Net::IPv6Addr::to_string_compressed>.
+
+=item 0.9
+
+L</in_network> and L</in_network_of_size> were fixed to allow more
+kinds of previxes.
+
+=item 0.92
+
+The valid format consisting of a compressed-but-non-zero six-element
+IPv6 followed by an IPv4, such as C<fe80::204:61ff:254.157.241.86>, is
+accepted by the module.
+
+=item 0.95
+
+The L</from_bigint> method was added and the documentation updated to
+reflect the current internet standards. 
+
+The restriction on mixed address inputs removed in L</0.92> was also
+removed in the output routines L</to_string_ipv4> and
+L</to_string_ipv4_compressed>.
+
+=back
 
 =head1 AUTHOR
 
@@ -585,7 +802,8 @@ at sonera dot comE<gt>.
 
 (*) The current module maintainer (BKB) does not have any contact
 information for Tony Monroe. Those wishing to contact him can do so
-via Neil Bowers (see his CPAN user page for contact details).
+via Neil Bowers (see L<his CPAN user page for contact
+details|https://metacpan.org/author/NEILB>).
 
 =head1 LICENSE
 

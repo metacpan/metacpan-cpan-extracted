@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Si - Package for language Sinhala
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Si - Package for language Sinhala
 
 package Locale::CLDR::Locales::Si;
 # This file auto generated from Data\common\main\si.xml
-#	on Sun  5 Aug  6:20:39 pm GMT
+#	on Sun  7 Oct 10:57:26 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4497,67 +4499,67 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1400
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning1' if $time >= 100
-						&& $time < 600;
 					return 'night2' if $time >= 0
 						&& $time < 100;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 100
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 100
+						&& $time < 600;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'night2' if $time >= 0
 						&& $time < 100;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
 					return 'evening1' if $time >= 1400
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning1' if $time >= 100
-						&& $time < 600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1400
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning1' if $time >= 100
-						&& $time < 600;
 					return 'night2' if $time >= 0
 						&& $time < 100;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'night1' if $time >= 1800
 						&& $time < 2400;
+					return 'morning1' if $time >= 100
+						&& $time < 600;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
+					return 'morning1' if $time >= 100
+						&& $time < 600;
+					return 'night1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'night2' if $time >= 0
 						&& $time < 100;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
-					return 'night1' if $time >= 1800
-						&& $time < 2400;
 					return 'evening1' if $time >= 1400
 						&& $time < 1800;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning1' if $time >= 100
-						&& $time < 600;
 				}
 				last SWITCH;
 				}
@@ -4577,79 +4579,79 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'morning2' => q{උදේ},
-					'night2' => q{මැදියමට පසු},
-					'noon' => q{මධ්‍යාහ්නය},
-					'am' => q{පෙ.ව.},
-					'afternoon1' => q{දවල්},
-					'evening1' => q{හවස},
-					'morning1' => q{පාන්දර},
-					'night1' => q{රෑ},
-					'pm' => q{ප.ව.},
-					'midnight' => q{මැදියම},
-				},
-				'wide' => {
-					'night1' => q{රෑ},
-					'midnight' => q{මැදියම},
-					'pm' => q{ප.ව.},
-					'noon' => q{මධ්‍යාහ්නය},
-					'night2' => q{මැදියමට පසු},
-					'morning2' => q{උදේ},
-					'afternoon1' => q{දවල්},
-					'evening1' => q{හවස},
-					'morning1' => q{පාන්දර},
-					'am' => q{පෙ.ව.},
-				},
 				'narrow' => {
 					'night1' => q{රෑ},
-					'midnight' => q{මැ},
-					'pm' => q{ප},
-					'noon' => q{ම},
-					'night2' => q{මැ},
-					'morning2' => q{උ},
-					'afternoon1' => q{ද},
-					'evening1' => q{හ},
 					'morning1' => q{පා},
 					'am' => q{පෙ},
+					'evening1' => q{හ},
+					'night2' => q{මැ},
+					'pm' => q{ප},
+					'noon' => q{ම},
+					'midnight' => q{මැ},
+					'morning2' => q{උ},
+					'afternoon1' => q{ද},
+				},
+				'wide' => {
+					'midnight' => q{මැදියම},
+					'afternoon1' => q{දවල්},
+					'morning2' => q{උදේ},
+					'noon' => q{මධ්‍යාහ්නය},
+					'pm' => q{ප.ව.},
+					'evening1' => q{හවස},
+					'night2' => q{මැදියමට පසු},
+					'am' => q{පෙ.ව.},
+					'morning1' => q{පාන්දර},
+					'night1' => q{රෑ},
+				},
+				'abbreviated' => {
+					'am' => q{පෙ.ව.},
+					'evening1' => q{හවස},
+					'night2' => q{මැදියමට පසු},
+					'morning1' => q{පාන්දර},
+					'night1' => q{රෑ},
+					'midnight' => q{මැදියම},
+					'morning2' => q{උදේ},
+					'afternoon1' => q{දවල්},
+					'pm' => q{ප.ව.},
+					'noon' => q{මධ්‍යාහ්නය},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'night1' => q{රෑ},
+				'abbreviated' => {
 					'pm' => q{ප.ව.},
-					'midnight' => q{මැදියම},
+					'noon' => q{මධ්‍යාහ්නය},
+					'afternoon1' => q{දවල්},
 					'morning2' => q{උදේ},
+					'midnight' => q{මැදියම},
+					'morning1' => q{පාන්දර},
+					'night1' => q{රෑ},
+					'am' => q{පෙ.ව.},
 					'night2' => q{මැදියමට පසු},
+					'evening1' => q{හවස},
+				},
+				'narrow' => {
+					'afternoon1' => q{දවල්},
+					'morning2' => q{උදේ},
+					'midnight' => q{මැදියම},
+					'pm' => q{ප.ව.},
 					'noon' => q{මධ්‍යාහ්නය},
 					'am' => q{පෙ.ව.},
+					'night2' => q{මැදියමට පසු},
 					'evening1' => q{හවස},
-					'afternoon1' => q{දවල්},
 					'morning1' => q{පාන්දර},
+					'night1' => q{රෑ},
 				},
 				'wide' => {
-					'morning2' => q{උදේ},
-					'night2' => q{මැදියමට පසු},
-					'noon' => q{මධ්‍යාහ්නය},
-					'am' => q{පෙ.ව.},
-					'afternoon1' => q{දවල්},
-					'evening1' => q{හවස},
 					'morning1' => q{පාන්දර},
 					'night1' => q{රෑ},
-					'pm' => q{ප.ව.},
-					'midnight' => q{මැදියම},
-				},
-				'abbreviated' => {
 					'am' => q{පෙ.ව.},
-					'afternoon1' => q{දවල්},
 					'evening1' => q{හවස},
-					'morning1' => q{පාන්දර},
 					'night2' => q{මැදියමට පසු},
-					'morning2' => q{උදේ},
-					'noon' => q{මධ්‍යාහ්නය},
 					'pm' => q{ප.ව.},
+					'noon' => q{මධ්‍යාහ්නය},
 					'midnight' => q{මැදියම},
-					'night1' => q{රෑ},
+					'afternoon1' => q{දවල්},
+					'morning2' => q{උදේ},
 				},
 			},
 		},

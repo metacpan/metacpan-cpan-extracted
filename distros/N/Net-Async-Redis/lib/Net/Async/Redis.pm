@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Net::Async::Redis::Commands IO::Async::Notifier);
 
-our $VERSION = '1.009';
+our $VERSION = '1.011';
 
 =head1 NAME
 
@@ -294,6 +294,15 @@ sub on_message {
     $next->[1]->done($data);
 }
 
+sub on_error_message {
+    my ($self, $data) = @_;
+    local @{$log->{context}}{qw(redis_remote redis_local)} = ($self->endpoint, $self->local_endpoint);
+    $log->tracef('Incoming error message: %s', $data);
+
+    my $next = shift @{$self->{pending}} or die "No pending handler";
+    $next->[1]->fail($data);
+}
+
 sub handle_pubsub_message {
     my ($self, $type, @details) = @_;
     $type = lc $type;
@@ -445,7 +454,7 @@ sub execute_command {
     ) if exists $self->{pubsub} and not $is_sub_command;
 
     my $f = $self->loop->new_future->set_label($self->command_label(@cmd));
-    $log->debugf("Will have to wait for %d MULTI tx", 0 + @{$self->{pending_multi}}) unless $self->{_is_multi};
+    $log->tracef("Will have to wait for %d MULTI tx", 0 + @{$self->{pending_multi}}) unless $self->{_is_multi};
     my $code = sub {
         local @{$log->{context}}{qw(redis_remote redis_local)} = ($self->endpoint, $self->local_endpoint);
         my $cmd = join ' ', @cmd;
@@ -490,7 +499,8 @@ sub protocol {
     $self->{protocol} ||= do {
         require Net::Async::Redis::Protocol;
         Net::Async::Redis::Protocol->new(
-            handler => $self->curry::weak::on_message
+            handler => $self->curry::weak::on_message,
+            error   => $self->curry::weak::on_error_message,
         )
     };
 }

@@ -48,6 +48,6 @@
          "web" : "https://github.com/xantronix/openstack-client"
       }
    },
-   "version" : "1.0003",
+   "version" : "1.0004",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Teo - Package for language Teso
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Teo - Package for language Teso
 
 package Locale::CLDR::Locales::Teo;
 # This file auto generated from Data\common\main\teo.xml
-#	on Sun  5 Aug  6:23:58 pm GMT
+#	on Sun  7 Oct 11:01:44 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -839,13 +841,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{Ebongi},
-					'am' => q{Taparachu},
-				},
 				'abbreviated' => {
 					'am' => q{Taparachu},
 					'pm' => q{Ebongi},
+				},
+				'wide' => {
+					'pm' => q{Ebongi},
+					'am' => q{Taparachu},
 				},
 			},
 		},

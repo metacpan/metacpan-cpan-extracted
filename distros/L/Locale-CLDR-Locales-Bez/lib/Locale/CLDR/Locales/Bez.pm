@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Bez - Package for language Bena
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Bez - Package for language Bena
 
 package Locale::CLDR::Locales::Bez;
 # This file auto generated from Data\common\main\bez.xml
-#	on Sun  5 Aug  5:52:15 pm GMT
+#	on Sun  7 Oct 10:21:53 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -835,13 +837,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{pamilau},
-					'pm' => q{pamunyi},
-				},
 				'wide' => {
 					'am' => q{pamilau},
 					'pm' => q{pamunyi},
+				},
+				'abbreviated' => {
+					'pm' => q{pamunyi},
+					'am' => q{pamilau},
 				},
 			},
 		},
@@ -921,7 +923,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -946,7 +948,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

@@ -14,7 +14,7 @@ use strict;
 use warnings;
 require Forks::Super::Job::OS::Win32 if &IS_WIN32 || &IS_CYGWIN;
 
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 our $CPU_AFFINITY_CALLS = 0;
 our $OS_PRIORITY_CALLS = 0;
@@ -382,3 +382,27 @@ sub poor_mans_alarm {
 1;
 
 __END__
+
+=head1 NAME
+
+Forks::Super::Job::OS - implement operating system-specific features of
+background process management
+
+=head1 DESCRIPTION
+
+The package C<Forks::Super::Job::OS> implements operating system-specific
+options of the L<Forks::Super::fork|Forks::Super/"fork"> function
+such as L<name|Forks::Super/"name">, L<os_priority|Forks::Super/"os_priority">,
+L<cpu_affinity|Forks::Super/"cpu_affinity">, and L<umask|Forks::Super/"umask">,
+and system specific functions like estimating the current load on the
+host machine's processors.
+
+Most users will not have a need to call the functions of this package
+directly.
+
+This package mainly handles these features for Unix-like systems.
+The subclasses L<Forks::Super::Job::OS::Win32> and 
+L<Forks::Super::Job::OS::Cygwin> implement some of these features for
+Windows and Cygwin, respectively.
+
+=cut

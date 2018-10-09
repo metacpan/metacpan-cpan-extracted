@@ -19,7 +19,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(CONFIG CONFIG_module);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 our (%CONFIG, $IS_TEST, $IS_TEST_CONFIG, %SIGNO, $CONFIG_FILE);
 
@@ -363,3 +363,14 @@ sub _resolve_signame {
 }
 
 1;
+
+=head1 NAME
+
+Forks::Super::Config - for discovery of installed software and system 
+capabilities for use by Forks::Super
+
+=head1 DESCRIPTION
+
+Routines to conditionally load modules and find executable programs.
+
+=cut

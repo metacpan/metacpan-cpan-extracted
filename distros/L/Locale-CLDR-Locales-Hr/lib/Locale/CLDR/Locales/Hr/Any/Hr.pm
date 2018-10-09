@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Hr::Any::Hr - Package for language Croatian
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Hr::Any::Hr - Package for language Croatian
 
 package Locale::CLDR::Locales::Hr::Any::Hr;
 # This file auto generated from Data\common\main\hr_HR.xml
-#	on Sun  5 Aug  6:04:43 pm GMT
+#	on Sun  7 Oct 10:36:55 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

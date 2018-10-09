@@ -1,32 +1,35 @@
 Revision history for Perl extension Object::Signature
 
-1.07 Thu 24 Mar 2011
+1.08      2018-10-08 00:04:32Z
+          - distribution tooling updates
+
+1.07    2011-03-24
 	- Updating to Module::Install::DSL 1.00
 	- Removing the use of prefork as the modules we use are fairly small
 	- Removed -w from test scripts to be compatible with tainting
 
-1.06 Sat  6 Jan 2007
+1.06    2007-01-06
 	- Added the specialised subclass Object::Signature::File
 
-1.05 Mon  2 Oct 2006
+1.05    2006-10-02
 	- No functional changes
 	- Upgrading to Module::Install 0.64
 	- Fixed a few minor kwalitee nigglies
 	- Upgraded tests to remove need for File::Spec dependency
 
-1.04 Thu 18 May 2005
+1.04    2005-05-18
 	- No functional changes
 	- Upgrading Module::Install to 0.62 (final)
 
-1.03 Mon 26 Dec 2005
+1.03    2005-12-26
 	- Updating version to a production version number
 	- Removing dependency on prefork
 	- Removing TO DO item that implied a bug (confirmed not the case)
 	- Moved to newer SVN repository
 	- Updaded Makefile.PL to newer Module::Install
 
-0.02 Tue 15 Feb 2005
+0.02    2005-02-15
 	- Removing braindead Build.PL
 
-0.01 Sat 13 Nov 2004
+0.01    2004-11-13
 	- Created the initial version of the file

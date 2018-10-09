@@ -40,6 +40,6 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: http://search.cpan.org/perldoc?Net-Async-Redis
   repository: git://github.com/team-at-cpan/Net-Async-Redis.git
-version: '1.009'
+version: '1.011'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

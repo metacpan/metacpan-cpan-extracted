@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::So - Package for language Somali
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::So - Package for language Somali
 
 package Locale::CLDR::Locales::So;
 # This file auto generated from Data\common\main\so.xml
-#	on Sun  5 Aug  6:21:39 pm GMT
+#	on Sun  7 Oct 10:58:48 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -824,8 +826,8 @@ has 'day_periods' => (
 					'pm' => q{gn.},
 				},
 				'narrow' => {
-					'am' => q{sn.},
 					'pm' => q{gn.},
+					'am' => q{sn.},
 				},
 				'abbreviated' => {
 					'pm' => q{gn.},
@@ -833,11 +835,11 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'am' => q{sn.},
-					'pm' => q{gn.},
-				},
 				'abbreviated' => {
+					'pm' => q{gn.},
+					'am' => q{sn.},
+				},
+				'wide' => {
 					'pm' => q{gn.},
 					'am' => q{sn.},
 				},

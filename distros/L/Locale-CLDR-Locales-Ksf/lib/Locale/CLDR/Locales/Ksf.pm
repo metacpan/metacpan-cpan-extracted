@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ksf - Package for language Bafia
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ksf - Package for language Bafia
 
 package Locale::CLDR::Locales::Ksf;
 # This file auto generated from Data\common\main\ksf.xml
-#	on Sun  5 Aug  6:09:16 pm GMT
+#	on Sun  7 Oct 10:43:06 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -841,11 +843,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{sárúwá},
-					'pm' => q{cɛɛ́nko},
-				},
 				'abbreviated' => {
+					'pm' => q{cɛɛ́nko},
+					'am' => q{sárúwá},
+				},
+				'wide' => {
 					'pm' => q{cɛɛ́nko},
 					'am' => q{sárúwá},
 				},

@@ -2,13 +2,15 @@ NAME
     HTTP::Tiny::Patch::Cache - Cache HTTP::Tiny responses
 
 VERSION
-    This document describes version 0.002 of HTTP::Tiny::Patch::Cache (from
-    Perl distribution HTTP-Tiny-Patch-Cache), released on 2018-09-20.
+    This document describes version 0.003 of HTTP::Tiny::Patch::Cache (from
+    Perl distribution HTTP-Tiny-Patch-Cache), released on 2018-10-06.
 
 SYNOPSIS
     From Perl:
 
-     use HTTP::Tiny::Patch::Cache;
+     use HTTP::Tiny::Patch::Cache
+         # -max_age => 7200, # optional, sets max age, can also be set via environment variables
+     ;
 
      my $res  = HTTP::Tiny->new->get("http://www.example.com/");
      my $res2 = HTTP::Tiny->request(GET => "http://www.example.com/"); # cached response
@@ -38,10 +40,18 @@ DESCRIPTION
     HTTP pages).
 
 CONFIGURATION
+  -max_age
+    Int. Sets maximum age for cache. If not set, will consult environment
+    variables (see "ENVIRONMENT"). If all environment variables are not set,
+    will use the default 86400.
+
 FAQ
 ENVIRONMENT
   CACHE_MAX_AGE
-    Int. Default 86400. Set period of cache.
+    Int. Will be consulted after "HTTP_TINY_PATCH_CACHE_MAX_AGE".
+
+  HTTP_TINY_PATCH_CACHE_MAX_AGE
+    Int. Will be consulted before "CACHE_MAX_AGE".
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -8,7 +8,7 @@
 
 package Any::Daemon;
 use vars '$VERSION';
-$VERSION = '0.95';
+$VERSION = '0.96';
 
 
 use warnings;
@@ -65,8 +65,15 @@ sub init($)
 #--------------------
 
 sub workdir() {shift->{AD_wd}}
+sub pidFilename() { shift->{AD_pidfn} }
 
 #--------------------
+
+sub _mkcall($)
+{   return $_[1] if ref $_[1] eq 'CODE';
+    my ($self, $what) = @_;
+    sub { $self->$what(@_) };
+}
 
 sub run(@)
 {   my ($self, %args) = @_;
@@ -97,7 +104,7 @@ sub run(@)
             or error __x"you need to have a dispatcher to send log to";
     }
 
-    my $pidfn = $self->{AD_pidfn};
+    my $pidfn = $self->pidFilename;
     if(defined $pidfn)
     {   local *PIDF;
         if(open PIDF, '>', $pidfn)
@@ -108,28 +115,63 @@ sub run(@)
 
     my $gid = $self->{AD_gid} || $EGID;
     my $uid = $self->{AD_uid} || $EUID;
-    if($gid!=$EGID && $uid!=$EUID)
-    {   chown $uid,$gid, $wd if $wd;
 
-        eval { if($] > 5.015007) { setgid $gid; setuid $uid }
-               else
-               {   # in old versions of Perl, the uid and gid gets cached
-                   $EGID = $gid;
-                   $EUID = $uid;
-               }
-             };
+    chown $uid,$gid, $wd if $wd;   # don't check success: user may have plan
 
-        $@ and error __x"cannot switch to user/group to {uid}/{gid}: {err}"
-          , uid => $uid, gid => $gid, err => $@;
+    if($gid != $EGID)
+    {   if($] > 5.015007)
+        {   setgid $gid or fault __x"cannot change to group {gid}", gid => $gid;
+        }
+        else   # in old versions of Perl, the uid and gid gets cached
+        {   eval { $EGID = $gid };
+            $@ and error __x"cannot switch to group {gid}: {err}"
+               , gid => $gid, err => $@;
+        }
     }
 
-    my $sid         = setsid;
+    if($uid != $EUID)
+    {   if($] > 5.015007)
+        {   setuid $uid or fault __x"cannot change to user {uid}", uid => $uid;
+        }
+        else
+        {   eval { $EUID = $uid };
+            $@ and error __x"cannot switch to user {uid}: {err}"
+               , uid => $uid, err => $@;
+        }
+    }
 
-    my $reconfig    = $args{reconfig}    || \&_reconfig_daemon;
-    my $kill_childs = $args{kill_childs} || \&_kill_childs;
-    my $child_died  = $args{child_died}  || \&_child_died;
+    setsid;
+
+    my $child_task  = $self->_mkcall($args{child_task});
+    my $own_task    = $self->_mkcall($args{run_task});
+
+    $child_task || $own_task
+        or panic __x"you have to run with either child_task or run_task";
+
+    $child_task && $own_task
+        or panic __x"run with only one of child_task and run_task";
+
+    if($bg)
+    {   # no standard die and warn output anymore (Log::Report)
+        dispatcher close => 'default';
+
+        # to devnull to avoid write errors in third party modules
+        open STDIN,  '<', File::Spec->devnull;
+        open STDOUT, '>', File::Spec->devnull;
+        open STDERR, '>', File::Spec->devnull;
+    }
+
+    if($child_task)
+         { $self->_run_with_childs($child_task, %args) }
+    else { $self->_run_without_childs($own_task, %args) }
+}
+
+sub _run_with_childs($%) {
+    my ($self, $child_task, %args) = @_;
+    my $reconfig    = $self->_mkcall($args{reconfig}    || 'reconfigDaemon');
+    my $kill_childs = $self->_mkcall($args{kill_childs} || 'killChilds');
+    my $child_died  = $self->_mkcall($args{child_died}  || 'childDied');
     my $max_childs  = $args{max_childs}  || 10;
-    my $child_task  = $args{child_task}  || \&_child_task; 
 
     my $run_child   = sub
       { # re-seed the random number sequence per process
@@ -155,22 +197,15 @@ sub run(@)
         $SIG{TERM} = $SIG{CHLD} = 'IGNORE';
         $max_childs = 0;
         $kill_childs->(keys %childs);
-        sleep 2;  # give childs some time to stop
-        kill TERM => -$sid;
+        sleep 2;         # give childs some time to stop
+        kill TERM => 0;  # terminate the whole process group
+
+        my $pidfn = $self->pidFilename;
         unlink $pidfn if $pidfn;
+
         my $intrnr = $signal eq 'INT' ? 2 : 9;
         exit $intrnr+128;
       };
-
-    if($bg)
-    {   # no standard die and warn output anymore (Log::Report)
-        dispatcher close => 'default';
-
-        # to devnull to avoid write errors in third party modules
-        open STDIN,  '<', File::Spec->devnull;
-        open STDOUT, '>', File::Spec->devnull;
-        open STDERR, '>', File::Spec->devnull;
-    }
 
     notice __x"daemon started; proc={proc} uid={uid} gid={gid} childs={max}"
       , proc => $PID, uid => $EUID, gid => $EGID, max => $max_childs;
@@ -181,25 +216,52 @@ sub run(@)
     sleep 60 while 1;
 }
 
-sub _reconfig_daemon(@)
-{   my @childs = @_;
+sub _run_without_childs($%) {
+    my ($self, $run_task, %args) = @_;
+    my $reconfig    = $self->_mkcall($args{reconfig}    || 'reconfigDaemon');
+
+    # unhandled errors are to be treated seriously.
+    my $rc = try { $run_task->(@_) };
+    if(my $e = $@->wasFatal) { $e->throw(reason => 'ALERT'); $rc = 1 }
+
+    $SIG{HUP}  = sub
+      { notice "daemon received signal HUP";
+        $reconfig->(keys %childs);
+      };
+
+    $SIG{TERM} = $SIG{INT} = sub
+      { my $signal = shift;
+        notice "daemon terminated by signal $signal";
+
+        my $pidfn = $self->pidFilename;
+        unlink $pidfn if $pidfn;
+
+        my $intrnr = $signal eq 'INT' ? 2 : 9;
+        exit $intrnr+128;
+      };
+
+    notice __x"daemon started; proc={proc} uid={uid} gid={gid}"
+      , proc => $PID, uid => $EUID, gid => $EGID;
+
+    $run_task->();
+}
+
+sub reconfigDaemon(@)
+{   my ($self, @childs) = @_;
     notice "HUP: reconfigure deamon not implemented";
 }
 
-sub _child_task()
-{   notice "No child_task implemented yet. I'll sleep for some time";
-    sleep SLEEP_FOR_SOME_TIME;
-}
+sub killChilds(@)
+{   my ($self, @childs) = @_;
+    @childs or return;
 
-sub _kill_childs(@)
-{   my @childs = @_;
     notice "killing ".@childs." children";
     kill TERM => @childs;
 }
 
 # standard implementation for starting new childs.
-sub _child_died($$)
-{   my ($max_childs, $run_child) = @_;
+sub childDied($$)
+{   my ($self, $max_childs, $run_child) = @_;
 
     # Clean-up zombies
 

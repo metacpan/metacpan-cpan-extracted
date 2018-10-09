@@ -25,6 +25,7 @@ sub new {
 }
 sub ast { return $_[0]->{ast}; }
 sub id { return $_[0]->{id}; }
+sub file { return $_[0]->{file}; }
 
 package WWW::Shopify::Liquid::Analyzer;
 sub new { 
@@ -39,7 +40,8 @@ sub liquid { return $_[0]->{liquid}; }
 
 sub retrieve_includes_ast {
 	my ($self, $ast) = @_;
-	return grep { defined $_ } map { $_->include_literal } grep { defined $_ && $_->isa('WWW::Shopify::Liquid::Tag::Include') } $ast->tokens;
+	return () unless $ast;
+	return grep { defined $_ && $_->isa('WWW::Shopify::Liquid::Tag::Include') } $ast->tokens;
 }
 
 sub expand_entity {
@@ -48,16 +50,23 @@ sub expand_entity {
 	return map { $used_list->{$_->id} ? () : ($_, $self->expand_entity($_, $type, $used_list)) } @{$entity->{$type}};
 }
 
+sub generate_include_entity {
+	my ($self, $include) = @_;
+	my ($path) = $include->retrieve_include({}, "render", $self->liquid->renderer, $include->include_literal);
+	my $entity = $self->generate_entity_file($path);
+	return $entity;
+	
+}
+
 use List::MoreUtils qw(uniq);
 sub populate_dependencies {
 	my ($self, @entities) = @_;
 	my %entity_list = map { $_->id => $_ } @entities;
-	
 	# Go through, and flatten out those lists.
 	for my $entity (grep { $_->ast } @entities) {
 		my @included_literals = $self->retrieve_includes_ast($entity->ast);
-		$entity_list{$_} = WWW::Shopify::Liquid::Analyzer::Entity->new({ id => $_ }) for (grep { !$entity_list{$_} } @included_literals);
-		my @included_entities = map { $entity_list{$_} } @included_literals;
+		$entity_list{$_->include_literal} = $self->generate_include_entity($_) for (grep { !$entity_list{$_->include_literal} } @included_literals);
+		my @included_entities = map { $entity_list{$_->include_literal} } @included_literals;
 		push(@{$entity->{dependencies}}, @included_entities);
 		push(@{$_->{references}}, $entity) for (@included_entities);
 	}
@@ -75,8 +84,8 @@ sub add_refresh_entity {
 	my %entity_list = map { $_->id => $_ } @entities;
 	if (!$entity_list{$entity->id}) {
 		my @included_literals = $self->retrieve_includes_ast($entity->ast);
-		$entity_list{$_} = WWW::Shopify::Liquid::Analyzer::Entity->new({ id => $_ }) for (grep { !$entity_list{$_} } @included_literals);
-		my @included_entities = map { $entity_list{$_} } @included_literals;
+		$entity_list{$_->include_literal} = $self->generate_include_entity($_) for (grep { !$entity_list{$_->include_literal} } @included_literals);
+		my @included_entities = map { $entity_list{$_->include_literal} } @included_literals;
 		push(@{$entity->{dependencies}}, @included_entities);
 		push(@{$_->{references}}, $entity) for (@included_entities);
 		$entity->{full_dependencies} = [$self->expand_entity($entity, 'dependencies')];

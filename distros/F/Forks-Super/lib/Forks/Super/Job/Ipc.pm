@@ -34,7 +34,7 @@ $| = 1;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(close_fh);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 our $NO_README = 0;
 
 our (%FILENO, %SIG_OLD, $IPC_COUNT, $IPC_DIR_DEDICATED,
@@ -353,6 +353,7 @@ sub Forks::Super::try_to_close_some_open_filehandles {
 
     # in the child, you can close file handles from unrelated jobs ...
     if ($$ != $Forks::Super::MAIN_PID) {
+        no warnings 'io';
 	use POSIX ();
 	POSIX::close($_) for 3 .. 1000; # XXX
 	return;
@@ -1311,13 +1312,14 @@ sub _END_foreground_cleanup {
     }
 
     foreach my $job (@Forks::Super::ALL_JOBS) {
+        no warnings 'io';
 	next unless ref $job;
 	$job->close_fh('all');
     }
     foreach my $fh (values %Forks::Super::CHILD_STDIN,
 		    values %Forks::Super::CHILD_STDOUT,
 		    values %Forks::Super::CHILD_STDERR) {
-	# _close($fh);
+        no warnings 'io';
 	delete $__OPEN_FH{fileno($fh) || -1};
 	$__OPEN_FH -= close($fh) || 0;
     }
@@ -3399,7 +3401,7 @@ Forks::Super::Job::Ipc - interprocess communication routines for Forks::Super
 
 =head1 VERSION
 
-0.96
+0.97
 
 =head1 DESCRIPTION
 

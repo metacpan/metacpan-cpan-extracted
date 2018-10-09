@@ -1,0 +1,80 @@
+{
+   "abstract" : "Simple and Efficient Reading/Writing/Modifying of Complete Files",
+   "author" : [
+      "Uri Guttman <uri@stemsystems.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Slurp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Errno" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "POSIX" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "1.00",
+            "Socket" : "0",
+            "Symbol" : "0",
+            "Test::More" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perhunter/slurp.git",
+         "web" : "https://github.com/perhunter/slurp"
+      }
+   },
+   "version" : "9999.21",
+   "x_contributors" : [
+      "Chase Whitener <capoeirab@cpan.org>",
+      "Graham Knop <haarg@haarg.org>",
+      "James E Keenan <jkeenan@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

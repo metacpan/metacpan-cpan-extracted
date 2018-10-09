@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Ug::Any::Cn - Package for language Uyghur
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Ug::Any::Cn - Package for language Uyghur
 
 package Locale::CLDR::Locales::Ug::Any::Cn;
 # This file auto generated from Data\common\main\ug_CN.xml
-#	on Sun  5 Aug  6:26:44 pm GMT
+#	on Sun  7 Oct 11:05:10 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

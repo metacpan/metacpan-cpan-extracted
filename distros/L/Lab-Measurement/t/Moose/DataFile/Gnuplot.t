@@ -110,7 +110,7 @@ ok(
 
 ok(
     exception {
-        my $pdl => [ 1, 2 ];
+        my $pdl = pdl [ 1, 2 ];
         $file->log_block(
             prefix => { A => 1, B => 2, C => 3 },
             block  => $pdl

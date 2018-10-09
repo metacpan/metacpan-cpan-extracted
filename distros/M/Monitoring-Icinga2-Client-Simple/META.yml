@@ -1,0 +1,37 @@
+---
+abstract: 'Simpler REST client for Icinga2'
+author:
+  - 'Matthias Bethke <matthias@towiski.de>'
+build_requires:
+  Clone: '0'
+  JSON::XS: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  open: '0'
+  perl: v5.10.1
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: 5.010_001
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Monitoring-Icinga2-Client-Simple
+requires:
+  Carp: '0'
+  List::Util: '1.33'
+  Monitoring::Icinga2::Client::REST: '2'
+  YAML::XS: '0'
+  constant: '0'
+  parent: '0'
+  perl: v5.10.1
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/mbethke/Monitoring-Icinga2-Client-Simple
+  repository: https://github.com/mbethke/Monitoring-Icinga2-Client-Simple.git
+version: '0.001000'
+x_serialization_backend: 'YAML::Tiny version 1.73'

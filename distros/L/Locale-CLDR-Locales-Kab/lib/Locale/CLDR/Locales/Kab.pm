@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Kab - Package for language Kabyle
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Kab - Package for language Kabyle
 
 package Locale::CLDR::Locales::Kab;
 # This file auto generated from Data\common\main\kab.xml
-#	on Sun  5 Aug  6:07:19 pm GMT
+#	on Sun  7 Oct 10:40:20 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4861,31 +4863,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'wide' => {
+					'am' => q{n tufat},
+					'pm' => q{n tmeddit},
+				},
+				'narrow' => {
+					'am' => q{f},
+					'pm' => q{m},
+				},
 				'abbreviated' => {
 					'am' => q{n tufat},
 					'pm' => q{n tmeddit},
-				},
-				'wide' => {
-					'pm' => q{n tmeddit},
-					'am' => q{n tufat},
-				},
-				'narrow' => {
-					'pm' => q{m},
-					'am' => q{f},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
+				'abbreviated' => {
 					'pm' => q{MD},
 					'am' => q{FT},
+				},
+				'narrow' => {
+					'am' => q{FT},
+					'pm' => q{MD},
 				},
 				'wide' => {
-					'am' => q{FT},
 					'pm' => q{MD},
-				},
-				'abbreviated' => {
 					'am' => q{FT},
-					'pm' => q{MD},
 				},
 			},
 		},

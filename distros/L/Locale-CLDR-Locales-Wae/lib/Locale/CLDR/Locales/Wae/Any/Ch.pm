@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Wae::Any::Ch - Package for language Walser
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Wae::Any::Ch - Package for language Walser
 
 package Locale::CLDR::Locales::Wae::Any::Ch;
 # This file auto generated from Data\common\main\wae_CH.xml
-#	on Sun  5 Aug  6:28:08 pm GMT
+#	on Sun  7 Oct 11:06:41 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

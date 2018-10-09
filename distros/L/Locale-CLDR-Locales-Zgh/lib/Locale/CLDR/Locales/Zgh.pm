@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Zgh - Package for language Standard Moroccan Tamazight
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Zgh - Package for language Standard Moroccan Tamazight
 
 package Locale::CLDR::Locales::Zgh;
 # This file auto generated from Data\common\main\zgh.xml
-#	on Sun  5 Aug  6:29:02 pm GMT
+#	on Sun  7 Oct 11:07:51 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1061,29 +1063,29 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
+				'abbreviated' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
 				'wide' => {
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
-				'abbreviated' => {
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+				'narrow' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+				'abbreviated' => {
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 				},
 				'narrow' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 				},
@@ -1169,6 +1171,14 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			M => q{M},
+			MMM => q{MMM},
+			MMMEd => q{E d MMM},
+			MMMd => q{d MMM},
+			Md => q{d/M},
+			y => q{y},
+		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -1211,14 +1221,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 			yw => q{'week' w 'of' Y},
-		},
-		'generic' => {
-			M => q{M},
-			MMM => q{MMM},
-			MMMEd => q{E d MMM},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			y => q{y},
 		},
 	} },
 );

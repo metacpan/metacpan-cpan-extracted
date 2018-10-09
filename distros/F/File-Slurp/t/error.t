@@ -1,125 +1,115 @@
-##!/usr/local/bin/perl -w
+use strict;
+use warnings;
 
-use lib qw(t) ;
-use strict ;
-use Test::More ;
+use File::Basename ();
+use File::Spec ();
+use lib File::Spec->catdir(File::Spec->rel2abs(File::Basename::dirname(__FILE__)), 'lib');
+use FileSlurpTestOverride qw(trap_function_override_core);
+use FileSlurpTest qw(temp_file_path trap_function);
 
-BEGIN {
-	plan skip_all => "these tests need Perl 5.5" if $] < 5.005 ;
-}
+use File::Slurp qw( :all prepend_file edit_file );
+use Test::More;
 
-use TestDriver ;
-use File::Slurp qw( :all prepend_file edit_file ) ;
+plan tests => 30;
 
 my $is_win32 = $^O =~ /cygwin|win32/i ;
+# older EUMMs turn this on. We don't want to emit warnings.
+# also, some of our CORE function overrides emit warnings. Silence those.
+local $^W;
 
-my $file_name = 'test_file' ;
-my $dir_name = 'test_dir' ;
+# write_file open error - no sysopen
+{
+    my $file = temp_file_path('gimme a bad one');
+    my ($res, $warn, $err) = trap_function_override_core('sysopen', \&write_file, $file);
+    ok(!$warn, 'write_file: open error, no sysopen - no warning!');
+    like($err, qr/open/, 'write_file: open error, no sysopen - got exception!');
+    ok(!$res, 'write_file: open error, no sysopen - no content!');
 
-my $tests = [
-	{
-		name	=> 'read_file open error',
-		sub	=> \&read_file,
-		args	=> [ $file_name ],
-		error	=> qr/open/,
-	},
-	{
-		name	=> 'write_file open error',
-		sub	=> \&write_file,
- 		args	=> [ $file_name, '' ],
- 		override => 'sysopen',
-		error	=> qr/open/,
-	},
-	{
-		name	=> 'write_file syswrite error',
-		sub	=> \&write_file,
-		args	=> [ $file_name, '' ],
-		override => 'syswrite',
-		posttest => sub { unlink( $file_name ) },
-		error	=> qr/write/,
-	},
-	{
-		name	=> 'read_file small sysread error',
-		sub	=> \&read_file,
-		args	=> [ $file_name ],
-		override => 'sysread',
-		pretest => sub { write_file( $file_name, '' ) },
-		posttest => sub { unlink( $file_name ) },
-		error	=> qr/read/,
-	},
-	{
-		name	=> 'read_file loop sysread error',
-		sub	=> \&read_file,
-		args	=> [ $file_name ],
-		override => 'sysread',
-		pretest => sub { write_file( $file_name, 'x' x 100_000 ) },
-		posttest => sub { unlink( $file_name ) },
-		error	=> qr/read/,
-	},
-	{
-		name	=> 'atomic rename error',
-# this test is meaningless on Win32
-		skip	=> $is_win32,
-		sub	=> \&write_file,
-		args	=> [ $file_name, { atomic => 1 }, '' ],
-		override => 'rename',
-		posttest => sub { "$file_name.$$" },
-		error	=> qr/rename/,
-	},
-	{
-		name	=> 'read_dir opendir error',
-		sub	=> \&read_dir,
-		args	=> [ $dir_name ],
-		error	=> qr/open/,
-	},
-	{
-		name	=> 'prepend_file read error',
-		sub	=> \&prepend_file,
-		args	=> [ $file_name ],
-		error	=> qr/read_file/,
-	},
-	{
-		name	=> 'prepend_file write error',
-		sub	=> \&prepend_file,
-		pretest	=> sub { write_file( $file_name, '' ) },
-		args	=> [ $file_name, '' ],
-		override => 'syswrite',
-		error	=> qr/write_file/,
-		posttest => sub { unlink $file_name, "$file_name.$$" },
-	},
-	{
-		name	=> 'edit_file read error',
-		sub	=> \&edit_file,
-		args	=> [ sub{}, $file_name ],
-		error	=> qr/read_file/,
-	},
-	{
-		name	=> 'edit_file write error',
-		sub	=> \&edit_file,
-		pretest	=> sub { write_file( $file_name, '' ) },
-		args	=> [ sub{}, $file_name ],
-		override => 'syswrite',
-		error	=> qr/write_file/,
-		posttest => sub { unlink $file_name, "$file_name.$$" },
-	},
-	{
-		name	=> 'edit_file_lines read error',
-		sub	=> \&edit_file_lines,
-		args	=> [ sub{}, $file_name ],
-		error	=> qr/read_file/,
-	},
-	{
-		name	=> 'edit_file_lines write error',
-		sub	=> \&edit_file_lines,
-		pretest	=> sub { write_file( $file_name, '' ) },
-		args	=> [ sub{}, $file_name ],
-		override => 'syswrite',
-		error	=> qr/write_file/,
-		posttest => sub { unlink $file_name, "$file_name.$$" },
-	},
-] ;
-
-test_driver( $tests ) ;
-
-exit ;
-
+}
+# write_file write error - no syswrite
+{
+    my $file = temp_file_path();
+    my ($res, $warn, $err) = trap_function_override_core('syswrite', \&write_file, $file, '');
+    ok(!$warn, 'write_file: write error, no syswrite - no warning!');
+    like($err, qr/write/, 'write_file: write error, no syswrite - got exception!');
+    ok(!$res, 'write_file: write error, no syswrite - no content!');
+    unlink $file;
+}
+# atomic rename error
+SKIP: {
+    skip "Atomic rename on Win32 is useless", 3 if $is_win32;
+    my $file = temp_file_path();
+    my ($res, $warn, $err) = trap_function_override_core('rename', \&write_file, $file, {atomic => 1}, '');
+    ok(!$warn, 'write_file: atomic rename error, no rename - no warning!');
+    like($err, qr/rename/, 'write_file: atomic renamed error, no rename - got exception!');
+    ok(!$res, 'write_file: atomic rename error, no rename - no content!');
+    unlink $file;
+    unlink "$file.$$";
+}
+# read_dir opendir error
+{
+    my $file = temp_file_path('gimme a bad one');
+    my ($res, $warn, $err) = trap_function(\&read_dir, $file);
+    ok(!$warn, 'read_dir: opendir error - no warning!');
+    like($err, qr/open/, 'read_dir: opendir error - got exception!');
+    ok(!$res, 'read_dir: opendir error - no content!');
+}
+# prepend_file read error
+{
+    my $file = temp_file_path('gimme a bad one');
+    my ($res, $warn, $err) = trap_function(\&prepend_file, $file);
+    ok(!$warn, 'prepend_file: read error - no warning!');
+    like($err, qr/read_file/, 'prepend_file: read error - got exception!');
+    ok(!$res, 'prepend_file: read error - no content!');
+}
+# prepend_file write error
+{
+    my $file = temp_file_path();
+    write_file($file, '');
+    my ($res, $warn, $err) = trap_function_override_core('syswrite', \&prepend_file, $file, '');
+    ok(!$warn, 'prepend_file: opendir error - no warning!');
+    like($err, qr/write_file/, 'prepend_file: opendir error - got exception!');
+    ok(!$res, 'prepend_file: opendir error - no content!');
+    unlink $file;
+    unlink "$file.$$";
+}
+# edit_file read error
+{
+    my $file = temp_file_path();
+    my ($res, $warn, $err) = trap_function(\&edit_file, sub {}, $file);
+    ok(!$warn, 'edit_file: read error - no warning!');
+    like($err, qr/read_file/, 'edit_file: read error - got exception!');
+    ok(!$res, 'edit_file: read error - no content!');
+    unlink $file;
+}
+# edit_file write error
+{
+    my $file = temp_file_path();
+    write_file($file, '');
+    my ($res, $warn, $err) = trap_function_override_core('syswrite', \&edit_file, sub {}, $file);
+    ok(!$warn, 'edit_file: write error - no warning!');
+    like($err, qr/write_file/, 'edit_file: write error - got exception!');
+    ok(!$res, 'edit_file: write error - no content!');
+    unlink $file;
+    unlink "$file.$$";
+}
+# edit_file_lines read error
+{
+    my $file = temp_file_path();
+    my ($res, $warn, $err) = trap_function(\&edit_file_lines, sub {}, $file);
+    ok(!$warn, 'edit_file_lines: read error - no warning!');
+    like($err, qr/read_file/, 'edit_file_lines: read error - got exception!');
+    ok(!$res, 'edit_file_lines: read error - no content!');
+    unlink $file;
+}
+# edit_file write error
+{
+    my $file = temp_file_path();
+    write_file($file, '');
+    my ($res, $warn, $err) = trap_function_override_core('syswrite', \&edit_file_lines, sub {}, $file);
+    ok(!$warn, 'edit_file_lines: write error - no warning!');
+    like($err, qr/write_file/, 'edit_file_lines: write error - got exception!');
+    ok(!$res, 'edit_file_lines: write error - no content!');
+    unlink $file;
+    unlink "$file.$$";
+}

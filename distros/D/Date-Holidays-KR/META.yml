@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Date::Holidays::KR:
     file: lib/Date/Holidays/KR.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Date::Korean: '0'
   DateTime: '0'
@@ -36,10 +36,12 @@ resources:
   bugtracker: https://github.com/JEEN/p5-Date-Holidays-KR/issues
   homepage: https://github.com/JEEN/p5-Date-Holidays-KR
   repository: git://github.com/JEEN/p5-Date-Holidays-KR.git
-version: '0.06'
+version: '0.07'
 x_contributors:
-  - 'Keedi Kim <keedi.k@gmail.com>'
-  - 'Jeen Lee <aiatejin@gmail.com>'
   - 'Hyungsuk Hong <aanoaa@gmail.com>'
-  - 'JEEN Lee <jeen@perl.kr>'
+  - 'Hyungsuk Hong <hs.hong@cardoc.kr>'
+  - 'Jeen Lee <aiatejin@gmail.com>'
+  - 'Jeen Lee <jeen@perl.kr>'
+  - 'Keedi Kim <keedi.k@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,3 +1,7 @@
+0.24    2018-10-07
+    * Added [MetaJSON] to dist.ini so releases include a META.json file
+    * Convert dist.ini to [@SHLOMIF]
+
 0.23    2016-02-12
     * Convert the distribution from Module-Install to Dist-Zilla.
 

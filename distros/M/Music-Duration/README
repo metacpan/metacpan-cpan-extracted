@@ -1,7 +1,7 @@
 This archive contains the distribution Music-Duration,
-version 0.0502:
+version 0.0602:
 
-  Add 32nd, 64th, fractional and tuple durations to MIDI-Perl
+  Add 32nd, 64th and tuple durations to MIDI-Perl
 
 This software is copyright (c) 2018 by Gene Boggs.
 

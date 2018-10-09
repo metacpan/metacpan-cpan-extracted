@@ -8,7 +8,7 @@ Locale::CLDR - A Module to create locale objects with localisation data from the
 
 =head1 VERSION
 
-Version 0.33.0
+Version 0.33.1
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ or
 
 use v5.10.1;
 use version;
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use open ':encoding(utf8)';
 use utf8;
@@ -64,7 +64,6 @@ use Locale::CLDR::Collator();
 use File::Spec();
 use Scalar::Util qw(blessed);
 use Unicode::Regex::Set();
-#no warnings "experimental::regex_sets";
 
 # Backwards compatibility
 BEGIN {
@@ -1202,7 +1201,7 @@ my $has_Line_Break_E_Modifier = eval '1 !~ /\p{Line_Break=E_Modifier}/';
 sub _fix_missing_unicode_properties {
 	my $regex = shift;
 	
-	return unless defined $regex;
+	return '' unless defined $regex;
 	
 	$regex =~ s/\\(p)\{emoji\}/\\${1}{IsCLDREmpty}/ig
 		unless $has_emoji;
@@ -1452,37 +1451,18 @@ after 'BUILD' => sub {
 	# Fix up extension overrides
 	my $extensions = $self->extensions;
 	
-	# Calendar
-	if (exists $extensions->{ca}) {
-		$self->_set_default_ca($extensions->{ca});
+	foreach my $extention ( qw( ca cf co cu em fw hc lb lw ms nu rg sd ss tz va ) ) {
+		if (exists $extensions->{$extention}) {
+			my $default = "_set_default_$extention";
+			$self->$default($extensions->{$extention});
+		}
 	}
-
-	# Currency format
-	if (exists $extensions->{cf}) {
-		$self->_set_default_cf($extensions->{cf});
-	}
-	
-	# Currency type
-	if (exists $extensions->{cu}) {
-		$self->_set_default_cu($extensions->{cu});
-	}
-	
-	# First day of week
-	if (exists $extensions->{fw}) {
-		$self->_set_default_fw($extensions->{fw});
-	}
-	
-	# Number type
-	if (exists $extensions->{nu}) {
-		$self->_clear_default_nu;
-		$self->_set_default_nu($extensions->{nu});
-	}
-
 };
 
-# Defaults
-# Calendar, currency format, currency type, first day of week
-foreach my $default (qw( ca cf cu fw)) {
+# Defaults get set by the -u- extension
+# Calendar, currency format, collation order, etc.
+# but not nu as that is done in the Numbering systems role
+foreach my $default (qw( ca cf co cu em fw hc lb lw ms rg sd ss tz va)) {
 	has "_default_$default" => (
 		is			=> 'ro',
 		isa			=> Str,
@@ -2076,13 +2056,13 @@ sub code_pattern {
 	my ($self, $type, $locale) = @_;
 	$type = lc $type;
 
+	return '' unless $type =~ m{ \A (?: language | script | region ) \z }x;
+	
 	# If locale is not passed in then we are using ourself
 	$locale //= $self;
 
 	# If locale is not an object then inflate it
 	$locale = __PACKAGE__->new($locale) unless blessed $locale;
-
-	return '' unless $type =~ m{ \A (?: language | script | region ) \z }xms;
 
 	my $method = $type . '_name';
 	my $substitute = $self->$method($locale);
@@ -2091,7 +2071,7 @@ sub code_pattern {
 	foreach my $bundle (@bundles) {
 		my $text = $bundle->display_name_code_patterns->{$type};
 		next unless defined $text;
-		my $match = qr{ \{ 0 \} }xms;
+		my $match = qr{ \{ 0 \} }x;
 		$text=~ s{ $match }{$substitute}gxms;
 		return $text;
 	}
@@ -2128,7 +2108,7 @@ sub _set_casing {
 	if ($casing eq 'titlecase-firstword') {
 		# Check to see whether $words[0] is white space or not
 		my $firstword_location = 0;
- 		if ($words[0] =~ m{ \A \s }msx) {
+ 		if ($words[0] =~ m{ \A \s }x) {
 			$firstword_location = 1;
 		}
 
@@ -3923,39 +3903,6 @@ sub {
 	}
 	
 	return Unicode::Regex::Set::parse($set);
-
-=begin comment
-	
-	# Fix up [abc[de]] to [[abc][de]]
-	$set =~ s/\[ ( (?>\^? \s*) [^\]]+? ) \s* \[/[[$1][/gx;
-	
-	# Fix up [[ab]cde] to [[ab][cde]]
-	$set =~ s/\[ \^?+ \s* \[ [^\]]+? \] \K \s* ( [^\[]+ ) \]/[$1]]/gx;
-	
-	# Unicode uses ^ to compliment the set where as Perl uses !
-	$set =~ s/\[ \^ \s*/[!/gx;
-	
-	# The above can leave us with empty sets. Strip them out
-	$set =~ s/\[\]//g;
-	
-	# Fixup inner sets with no operator
-	1 while $set =~ s/ \] \s* \[ /] + [/gx;
-	1 while $set =~ s/ \] \s * (\\p\{.*?\}) /] + $1/xg;
-	1 while $set =~ s/ \\p\{.*?\} \s* \K \[ / + [/xg;
-	1 while $set =~ s/ \\p\{.*?\} \s* \K (\\p\{.*?\}) / + $1/xg;
-	
-	# Unicode uses [] for grouping as well as starting an inner set
-	# Perl uses ( ) So fix that up now
-	
-	$set =~ s/. \K \[ (?> (!?) \s*) \[ /($1\[/gx;
-	$set =~ s/ \] \s* \] (.) /])$1/gx;
-	
-	return "(?$set)";
-
-=end comment
-
-=cut
-	
 }
 
 EOT
@@ -4105,7 +4052,7 @@ sub week_data_first_day {
 =item week_data_weekend_start()
 
 This method takes an optional region id and returns the three letter code of the 
-first day of the week end for that region. If no region id is passed in then it
+first day of the weekend for that region. If no region id is passed in then it
 uses the current locale's region.
 
 =cut
@@ -4120,7 +4067,7 @@ sub week_data_weekend_start {
 =item week_data_weekend_end()
 
 This method takes an optional region id and returns the three letter code of the 
-first day of the week end for that region. If no region id is passed in then it
+last day of the weekend for that region. If no region id is passed in then it
 uses the current locale's region.
 
 =cut
@@ -4858,19 +4805,19 @@ try and match the API from L<Unicode::Collate> as much as possible and add tailo
 =cut
 
 sub collation {
-	my ($self) = @_;
+	my $self = shift;
 	
-	my %params;
-	$params{type} = $self->_collation_type;
-	$params{alternate} = $self->_collation_alternate;
-	$params{backwards} = $self->_collation_backwards;
-	$params{case_level} = $self->_collation_case_level;
-	$params{case_ordering} = $self->_collation_case_ordering;
-	$params{normalization} = $self->_collation_normalization;
-	$params{numeric} = $self->_collation_numeric;
-	$params{reorder} = $self->_collation_reorder;
-	$params{strength} = $self->_collation_strength;
-	$params{max_variable} = $self->_collation_max_variable;
+	my %params = @_;
+	$params{type} //= $self->_collation_type;
+	$params{alternate} //= $self->_collation_alternate;
+	$params{backwards} //= $self->_collation_backwards;
+	$params{case_level} //= $self->_collation_case_level;
+	$params{case_ordering} //= $self->_collation_case_ordering;
+	$params{normalization} //= $self->_collation_normalization;
+	$params{numeric} //= $self->_collation_numeric;
+	$params{reorder} //= $self->_collation_reorder;
+	$params{strength} //= $self->_collation_strength;
+	$params{max_variable} //= $self->_collation_max_variable;
 	
 	return Locale::CLDR::Collator->new(locale => $self, %params);
 }

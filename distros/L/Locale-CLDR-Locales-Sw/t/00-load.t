@@ -4,7 +4,7 @@ use Test::Exception;
 use ok( 'Locale::CLDR' );
 my $locale;
 
-diag( "Testing Locale::CLDR v0.33.0, Perl $], $^X" );
+diag( "Testing Locale::CLDR v0.33.1, Perl $], $^X" );
 use ok Locale::CLDR::Locales::Sw, 'Can use locale file Locale::CLDR::Locales::Sw';
 use ok Locale::CLDR::Locales::Sw::Any::Cd, 'Can use locale file Locale::CLDR::Locales::Sw::Any::Cd';
 use ok Locale::CLDR::Locales::Sw::Any::Ke, 'Can use locale file Locale::CLDR::Locales::Sw::Any::Ke';

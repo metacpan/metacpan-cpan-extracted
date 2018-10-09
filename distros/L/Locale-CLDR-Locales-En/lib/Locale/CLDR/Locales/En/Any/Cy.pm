@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::En::Any::Cy - Package for language English
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Cy - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Cy;
 # This file auto generated from Data\common\main\en_CY.xml
-#	on Sun  5 Aug  5:58:23 pm GMT
+#	on Sun  7 Oct 10:29:12 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

@@ -26,14 +26,14 @@ no_index:
 provides:
   App::AsciiChart:
     file: lib/App/AsciiChart.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/vti/app-asciichart/issues
   homepage: https://github.com/vti/app-asciichart
   repository: git://github.com/vti/app-asciichart.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:VTI
 x_contributors:
   - 'perlancar (on netbook-zenbook-ux305) <perlancar@gmail.com>'

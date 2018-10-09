@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.9.6';
+$Git::Hooks::CheckFile::VERSION = '2.9.8';
 use 5.010;
 use utf8;
 use Carp;
@@ -518,7 +518,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.9.6
+version 2.9.8
 
 =head1 SYNOPSIS
 

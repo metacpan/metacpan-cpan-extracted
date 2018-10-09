@@ -1,5 +1,25 @@
 Revision history for Net-Async-Redis
 
+1.011     2018-10-06 20:50:12+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bug fixes:
+
+    - error handling improved, previously requests were not marked as failed
+    - protocol handling for 'undef' arrays (treated as `undef` now)
+
+    Examples:
+
+    - consumer-groups.pl example for XADD/XREADGROUP
+
+1.010     2018-10-06 15:26:00+08:00 Asia/Kuala_Lumpur
+    New commands:
+
+    - CLIENT ID
+    - CLIENT UNBLOCK
+
+    from Redis 5.0rc5.
+
 1.009     2018-10-03 19:26:59+08:00 Asia/Kuala_Lumpur
     Updated to latest Redis 5.0 commands from last RC prior to 5.0 release.
 

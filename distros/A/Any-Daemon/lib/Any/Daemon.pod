@@ -87,6 +87,8 @@ the daemon stops.
 
 =over 4
 
+=item $obj-E<gt>B<pidFilename>()
+
 =item $obj-E<gt>B<workdir>()
 
 [0.90] assigned working directory of the daemon in the file-system.
@@ -101,13 +103,21 @@ the daemon stops.
 
 The C<run> method gets the activity related parameters.
 
+You specify either C<run_task>, for the function to be called by this
+deamon itself, or C<child_task> when you wish to manage child tasks
+which run the action.
+
+[0.96] When you pass a method name, it will be called on this object.
+This is very clean when you have extended this daemon class.
+
  -Option     --Default
   background   <true>
-  child_died   spawn new childs
-  child_task   warn only
-  kill_childs  send sigterm
+  child_died   'childDied'
+  child_task   undef
+  kill_childs  'killChilds'
   max_childs   10
-  reconfigure  ignore
+  reconfigure  'reconfigDaemon'
+  run_task     undef
 
 =over 2
 
@@ -118,13 +128,13 @@ prefered to run the daemon in the foreground, to be able to stop
 the daemon with Crtl-C and to see errors directly on the screen
 in stead of only in some syslog file.
 
-=item child_died => CODE
+=item child_died => CODE|METHOD
 
 The C<child_died> routine handles dieing kids and the restart of new
 ones.  It gets two parameters: the maximum number of childs plus the
 task to perform per kid.
 
-=item child_task => CODE
+=item child_task => CODE|METHOD
 
 The CODE will be run for each child which is started, also when they
 are started later on. If the task is not specified, only a warning is
@@ -134,7 +144,7 @@ you do not need to care about the task to perform yet.
 The returned value of thise CODE is used as exit code of the child
 process, where zero means 'ok'.
 
-=item kill_childs => CODE
+=item kill_childs => CODE|METHOD
 
 The CODE terminates all running children, maybe to start new ones,
 maybe to terminate the whole daemon.
@@ -143,10 +153,15 @@ maybe to terminate the whole daemon.
 
 The maximum (is usual) number of childs to run.
 
-=item reconfigure => CODE
+=item reconfigure => CODE|METHOD
 
 The CODE is run when a SIGHUP is received; signal 1 is used by most
 daemons as trigger for reconfiguration.
+
+=item run_task => CODE|METHOD
+
+[0.96] The CODE which will be run by this process.  This implies: no
+managed children.
 
 =back
 
@@ -154,8 +169,8 @@ daemons as trigger for reconfiguration.
 
 =head1 SEE ALSO
 
-This module is part of Any-Daemon distribution version 0.95,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Any-Daemon distribution version 0.96,
+built on October 08, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

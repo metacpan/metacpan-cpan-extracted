@@ -1,9 +1,9 @@
 package Tapper::Cmd;
-# git description: v5.0.8-2-gd7fa996
+# git description: v5.0.9-2-gdd9e446
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Backend functions for CLI and Web
-$Tapper::Cmd::VERSION = '5.0.9';
+$Tapper::Cmd::VERSION = '5.0.10';
 use Moose;
 
 extends 'Tapper::Base';

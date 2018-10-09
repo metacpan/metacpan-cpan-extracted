@@ -1,0 +1,47 @@
+---
+abstract: 'Run DDL on online databases safely'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  Class::Load: '0'
+  DBIx::BatchChunker: '0.92'
+  DBIx::Class: '0'
+  ExtUtils::MakeMaker: '0'
+  Import::Into: '1.00'
+  Path::Class: '0'
+  Scalar::Util: '0'
+  Test2::Bundle::More: '0.000060'
+  Test2::Tools::Compare: '0'
+  Test2::Tools::Exception: '0'
+  Test2::Tools::Explain: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-OnlineDDL
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+requires:
+  Class::Load: '0'
+  DBI: '1.630'
+  DBIx::BatchChunker: '0.92'
+  Eval::Reversible: '0'
+  List::Util: '1.40'
+  Moo: '2.00'
+  Term::ProgressBar: '2.14'
+  Types::Standard: '1.00'
+  namespace::clean: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/DBIx-OnlineDDL/issues
+  homepage: https://github.com/GrantStreetGroup/DBIx-OnlineDDL
+  repository: https://github.com/GrantStreetGroup/DBIx-OnlineDDL.git
+version: '0.90'
+x_authority: cpan:GSG

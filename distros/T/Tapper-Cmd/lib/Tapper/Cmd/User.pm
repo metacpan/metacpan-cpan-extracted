@@ -1,6 +1,6 @@
 package Tapper::Cmd::User;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::User::VERSION = '5.0.9';
+$Tapper::Cmd::User::VERSION = '5.0.10';
 use Moose;
 
 use Tapper::Model 'model';

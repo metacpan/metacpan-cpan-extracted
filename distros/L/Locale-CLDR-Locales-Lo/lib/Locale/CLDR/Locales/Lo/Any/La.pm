@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Lo::Any::La - Package for language Lao
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Lo::Any::La - Package for language Lao
 
 package Locale::CLDR::Locales::Lo::Any::La;
 # This file auto generated from Data\common\main\lo_LA.xml
-#	on Sun  5 Aug  6:10:19 pm GMT
+#	on Sun  7 Oct 10:44:27 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

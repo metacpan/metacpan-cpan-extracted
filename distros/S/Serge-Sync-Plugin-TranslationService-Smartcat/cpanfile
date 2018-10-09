@@ -1,5 +1,5 @@
 requires 'perl', '5.008005';
-requires 'Serge', '1.3';
+requires 'Serge', '1.3.2';
 requires 'Smartcat::App';
 
 on 'develop' => sub {

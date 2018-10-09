@@ -1,6 +1,6 @@
 package Tapper::Cmd::Testplan;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Testplan::VERSION = '5.0.9';
+$Tapper::Cmd::Testplan::VERSION = '5.0.10';
 use 5.010;
 use Moose;
 

@@ -183,6 +183,7 @@ lib/Lab/Moose/Connection/Zhinst.pm
 lib/Lab/Moose/Countdown.pm
 lib/Lab/Moose/DataFile.pm
 lib/Lab/Moose/DataFile/Gnuplot.pm
+lib/Lab/Moose/DataFile/Gnuplot/Compressed.pm
 lib/Lab/Moose/DataFile/Meta.pm
 lib/Lab/Moose/DataFile/Read.pm
 lib/Lab/Moose/DataFolder.pm
@@ -301,6 +302,7 @@ t/Meta.t
 t/MockTest.pm
 t/Moose/Connection/Socket.t
 t/Moose/DataFile/Gnuplot.t
+t/Moose/DataFile/Gnuplot/Compressed.t
 t/Moose/DataFile/Read.t
 t/Moose/DataFolder.t
 t/Moose/Instrument/HP34410A.t

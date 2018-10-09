@@ -1,12 +1,12 @@
 package Locale::CLDR::ValidCodes;
 # This file auto generated from Data\common\supplemental\supplementalMetadata.xml
-#	on Sun  5 Aug  5:49:09 pm GMT
+#	on Sun  7 Oct 10:18:08 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -8631,6 +8631,7 @@ has 'valid_scripts' => (
  Cprt
  Cyrl
  Deva
+ Dogr
  Dsrt
  Dupl
  Egyp
@@ -8638,6 +8639,7 @@ has 'valid_scripts' => (
  Ethi
  Geor
  Glag
+ Gong
  Gonm
  Goth
  Gran
@@ -8680,9 +8682,11 @@ has 'valid_scripts' => (
  Lyci
  Lydi
  Mahj
+ Maka
  Mand
  Mani
  Marc
+ Medf
  Mend
  Merc
  Mero
@@ -8714,6 +8718,7 @@ has 'valid_scripts' => (
  Plrd
  Prti
  Rjng
+ Rohg
  Runr
  Samr
  Sarb
@@ -8724,6 +8729,8 @@ has 'valid_scripts' => (
  Sidd
  Sind
  Sinh
+ Sogd
+ Sogo
  Sora
  Soyo
  Sund
@@ -15400,6 +15407,7 @@ has 'valid_keys' => (
 			'finance',
 			'fullwide',
 			'geor',
+			'gong',
 			'gonm',
 			'grek',
 			'greklow',
@@ -15444,6 +15452,7 @@ has 'valid_keys' => (
 			'olck',
 			'orya',
 			'osma',
+			'rohg',
 			'roman',
 			'romanlow',
 			'saur',

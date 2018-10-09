@@ -1,5 +1,17 @@
 Revision history for App-bitbucket-cli
 
+0.006   2018-10-07
+        Updating for release of version 0.006
+        Added documentation for max attribute (Ivan Wills)
+        Actually pass max through (Ivan Wills)
+        Adding ability to set the maximum number of records (Ivan Wills)
+        Adding a refresh age of ~1 Month for the sub-commands.yml file (Ivan Wills)
+        Adding documentation to filter parameters (Ivan Wills)
+        Adding filtering logic to PRs (Ivan Wills)
+        Adding ability to pass in PR state (Ivan Wills)
+        Adding a maximum limit to the number of results returned (Ivan Wills)
+        Adding ability to set the pull request state (Ivan Wills)
+
 0.005   2018-06-24
         Updating for release of version 0.005
         Updating TODO (Ivan Wills)

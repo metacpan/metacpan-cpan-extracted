@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Hani::Latn;
 # This file auto generated from Data\common\transforms\Han-Latin.xml
-#	on Sun  5 Aug  5:49:15 pm GMT
+#	on Sun  7 Oct 10:18:15 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -196,7 +196,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([㘬㘭㜜㜩㠗㥿䐿䜒䫨䮯傲坳垇墺奡奥奧嫯岙岰嶴慠懊扷擙澳鏊隩驁骜𢕟𢳆𤺾𥑑𩑍𩕀𩟇𩼈]),
+					replace => q([㘬㘭㜜㜩㠗㥿䐿䜒䫨䮯傲坳垇墺奡奥奧嫯岙岰嶴慠懊扷擙澳鏊隩驁骜鿫𢕟𢳆𤺾𥑑𩑍𩕀𩟇𩼈]),
 					result  => q(ào),
 					revisit => 0,
 				},
@@ -1008,7 +1008,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([㥲䀼䐜䑣䠳嗔抻捵琛瞋綝縝諃謓賝郴𣞟𤝚𤟸𤡳𥞁𦁄𦁟𧡬𨻖𨼌𩅌𩇖]),
+					replace => q([㥲䀼䐜䑣䠳嗔抻捵琛瞋綝縝諃謓賝郴𣞟𤝚𤟸𤡳𥞁𦁄𦁟𧡬𨻖𨼌𩅌𩇖𬘭]),
 					result  => q(chēn),
 					revisit => 0,
 				},
@@ -4417,7 +4417,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([㤠㧜㬯㭞㭩㯿㲱㸹㼲㽟䁽䅀䉭䋑䜲䝓䟹䪉䴕儠冽列劣劽哷埒埓姴巤挒捩擸栵洌浖烈烮煭犣猎猟獵睙聗脟茢蛚裂趔躐迾颲鬛鬣鮤鱲鴷𠛱𠠗𡁓𡂏𡂩𡊻𡏵𡒏𡓍𡭣𡿩𢣓𣁷𣁻𣋲𣖊𣝚𣰌𤁯𤐱𤓿𤖺𤜓𤞊𤡕𤢪𤱃𤱛𥪂𥲁𥶢𥷨𥸸𦓤𦖩𧀨𧓐𧞕𧭌𧭞𧰠𨆍𨕜𩆣𩙑𩢾𩧆𩧮𩨐𩭌𩼭]),
+					replace => q([㤠㧜㬯㭞㭩㯿㲱㸹㼲㽟䁽䅀䉭䋑䜲䝓䟹䪉䴕儠冽列劣劽哷埒埓姴巤挒捩擸栵洌浖烈烮煭犣猎猟獵睙聗脟茢蛚裂趔躐迾颲鬛鬣鮤鱲鴷𠛱𠠗𡁓𡂏𡂩𡊻𡏵𡒏𡓍𡭣𡿩𢣓𣁷𣁻𣋲𣖊𣝚𣰌𤁯𤐱𤓿𤖺𤜓𤞊𤡕𤢪𤱃𤱛𥪂𥲁𥶢𥷨𥸸𦓤𦖩𧀨𧓐𧞕𧭌𧭞𧰠𨆍𨕜𩆣𩙑𩢾𩧆𩧮𩨐𩭌𩼭𫚭]),
 					result  => q(liè),
 					revisit => 0,
 				},
@@ -5425,7 +5425,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([㩘䕥䦵伱你儗儞孴抳拟擬旎晲柅檷狔聻苨薿鈮隬馜𡥦𡥨𢅟𢘝𢣚𣡋𤙌𥜦𥜬𥷄𦆦𦰫𧃩𨀀𩉹𩋪𩍦𩯨𩰞𪏸]),
+					replace => q([㩘䕥䦵伱你儗儞孴抳拟擬旎晲柅檷狔聻苨薿鈮隬馜鿭𡥦𡥨𢅟𢘝𢣚𣡋𤙌𥜦𥜬𥷄𦆦𦰫𧃩𨀀𩉹𩋪𩍦𩯨𩰞𪏸]),
 					result  => q(nǐ),
 					revisit => 0,
 				},
@@ -7987,7 +7987,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([㧂䑚䟧䡒䡘䥖䧃塡填屇恬搷沺湉璳甛甜田畋畑畠盷碵磌窴緂胋菾鈿闐阗鴫鷆鷏𢇶𤤦𤫞𥧑𥪧𦗀𦳇𧨸𧰊𨉾𨌈𩚣𪌩]),
+					replace => q([㧂䑚䟧䡒䡘䥖䧃塡填屇恬搷沺湉璳甛甜田畋畑畠盷碵磌窴緂胋菾鈿闐阗鴫鷆鷏鿬𢇶𤤦𤫞𥧑𥪧𦗀𦳇𧨸𧰊𨉾𨌈𩚣𪌩]),
 					result  => q(tián),
 					revisit => 0,
 				},
@@ -8225,7 +8225,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([㢈㢑㿗䀃䅪尵弚穨蘈蹪隤頹頺頽颓魋𡷜𢉭𢊮𢟴𤗴𤸉𥢢𥶐𧝋𧮓𨆨𨗞𨘃𨽟𩓬𩘺𩙬]),
+					replace => q([㢈㢑㿗䀃䅪尵弚穨蘈蹪隤頹頺頽颓魋𡷜𢉭𢊮𢟴𤗴𤸉𥢢𥶐𧝋𧮓𨆨𨗞𨘃𨽟𩓬𩘺𩙬𬓼𬯎]),
 					result  => q(tuí),
 					revisit => 0,
 				},
@@ -8624,7 +8624,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([㔾㰹㲔㷿㸝㺤㾾㿌䂅䄳䆎䉳䊱䩂䯭䯹䵌仙仚佡僊僲先嘕奾嬐屳廯忺憸掀攕暹杴枮氙珗祆秈籼繊纎纖纤苮莶薟褼襳跹蹮躚酰銛鍁铦锨韯韱馦鮮鱻鲜鶱𠏓𠏡𠫄𢒆𢕖𢖎𢫿𢹚𣑹𣔙𣞘𣮾𣰷𤈷𥑻𥟕𥬍𦒜𦧐𦸊𧫹𧱀𧸂𨁅𨇤𨚾𩈖𪄏𪄷]),
+					replace => q([㔾㰹㲔㷿㸝㺤㾾㿌䂅䄳䆎䉳䊱䩂䯭䯹䵌仙仚佡僊僲先嘕奾嬐屳廯忺憸掀攕暹杴枮氙珗祆秈籼繊纎纖纤苮莶薟褼襳跹蹮躚酰銛鍁铦锨韯韱馦鮮鱻鲜鶱𠏓𠏡𠫄𢒆𢕖𢖎𢫿𢹚𣑹𣔙𣞘𣮾𣰷𤈷𥑻𥟕𥬍𦒜𦧐𦸊𧫹𧱀𧸂𨁅𨇤𨚾𩈖𪄏𪄷𬸣]),
 					result  => q(xiān),
 					revisit => 0,
 				},
@@ -10010,7 +10010,7 @@ has 'transforms' => (
 				{
 					before  => q(),
 					after   => q(),
-					replace => q([䉵䧘僎啭囀堟撰灷瑑篆篹籑腞蒃襈譔賺赚饌馔𠊩𠨎𡢀𢐎𣂵𣚢𤂤𤩄𤪪𥛥𦁆𦧸𧂍𧸖𩔊𩳏𩻝]),
+					replace => q([䉵䧘僎啭囀堟撰灷瑑篆篹籑腞蒃襈譔賺赚饌馔𠊩𠨎𡢀𢐎𣂵𣚢𤂤𤩄𤪪𥛥𦁆𦧸𧂍𧸖𩔊𩳏𩻝𬤥]),
 					result  => q(zhuàn),
 					revisit => 0,
 				},

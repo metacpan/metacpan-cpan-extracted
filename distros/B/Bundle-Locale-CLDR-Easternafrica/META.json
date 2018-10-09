@@ -45,7 +45,7 @@
    "provides" : {
       "Bundle::Locale::CLDR::Easternafrica" : {
          "file" : "lib/Bundle/Locale/CLDR/Easternafrica.pm",
-         "version" : "v0.33.0"
+         "version" : "v0.33.1"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.33.0",
+   "version" : "v0.33.1",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

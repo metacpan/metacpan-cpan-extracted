@@ -47,7 +47,7 @@ Possible TODOs:
         ___ dependencies
         ___ interactive client/server example of IPC
         ___ run a server using Forks::Super
-        _x_ see t/forked_harness.pl
+        _X_ see t/forked_harness.pl
         _X_ load management
             _X_ block while system is busy
             _X_ suspend/resume
@@ -66,7 +66,7 @@ Possible TODOs:
 	___ share
 	___ daemon
 
-    ___ POSIX::RT::Timer as possible replacement for get/set itimer?
+    _o_ POSIX::RT::Timer as possible replacement for get/set itimer?
 
     ___ Does anything bad happen when you set $SIG{CHLD} = 'IGNORE' ?
         'DEFAULT'? sub {} ? undef ?
@@ -98,9 +98,6 @@ Possible TODOs:
             should produce the same results with and without Forks::Super
             (i.e., F::S is a drop-in replacement)
 
-        _X_ Test F::S as a drop in replacement to a program that
-            has a SIGCHLD handler. -- looks good
-
     ___ reinstate t/31? ok on Cygwin, MSWin32, Linux, FreeBSD ?
         _X_ still doesn't work on Linux? Sure it does.
 
@@ -127,12 +124,6 @@ Possible TODOs:
     ___ exercise every method of FS::Tie::IPCDupSTDIN 
         (__config_fh_child_stdin_file, $job->{fh_config}{f_in},
 	sub/natural-style)
-
-    _x_ use shared memory between processes, where supported
-        _x_ synchronization based on shared memory
-	___ process pools based on shared memory
-        _X_ IPC by shared memory
-        _o_ job queue on shared memory [see Forks::Queue]
 
     ___ encryption and other layers on IO channels
 
@@ -177,10 +168,10 @@ Possible TODOs:
 
     ___ determine in system-limits.PL if alternate alarm is needed
 
-    _X_ parallel map? on_finish code that uses data returned by the
-        child process?
-
     ___ pmap or pgrep with chunking, more like mce_grep
+        chunking reduces overhead
+        chunking increases runtime in pathological cases or when there
+        is high variance in the runtime of individual jobs
 
     _X_ is "share" the right framework to return data from a background job?
         Yeah, it's pretty good.
@@ -196,6 +187,22 @@ Possible TODOs:
 
     ___ Test <$pid> in list context, $] >= 5.018
 
-    ___ remote testing needs a lot of improvement. How can you check
+    _X_ remote testing needs a lot of improvement. How can you check
         for passwordless publickey authentication without ever needing
         to read from tty?
+
+    ___ remote use case: executing long list of tasks on a cluster.
+        ___ load balancing
+        ___ ability to enable/disable hosts in-situ
+
+    ___ more options for job "chunking" to pool background jobs.
+        This can reduce overhead and improve efficiency at the
+        expense of more complexity in managing exit codes,
+        child output streams, etc.
+        ___ equal division among available cores
+        ___ "fibonacci" chunking
+
+    ___ use hints about what kinds of jobs are run in background
+        processes. Use more chunking as the job run times become
+        shorter and less variable.
+

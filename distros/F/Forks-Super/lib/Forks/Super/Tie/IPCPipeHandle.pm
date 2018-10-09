@@ -24,7 +24,7 @@ use IO::Pipe;
 use IO::Handle;
 
 our @ISA = qw(IO::Pipe IO::Handle);
-our $VERSION = '0.96';
+our $VERSION = '0.97';
 
 sub TIEHANDLE {
     my ($class, $real_pipe, $glob) = @_;

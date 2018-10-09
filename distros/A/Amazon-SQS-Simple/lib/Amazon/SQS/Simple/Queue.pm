@@ -295,8 +295,12 @@ more details.
 Get the endpoint for the queue.
 
 =item B<Delete([%opts])>
-
+ 
 Deletes the queue. Any messages contained in the queue will be lost.
+
+=item B<Purge>
+
+Purges the queue.
 
 =item B<SendMessage($message, [%opts])>
 

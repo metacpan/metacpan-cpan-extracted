@@ -17,16 +17,17 @@ our @EXPORT_OK = qw(
 		       to_intarray
 		       to_array
 		       to_string_ip6_int
-		       to_string_base65
+		       to_string_base85
 		       to_string_ipv4
 		       to_string_ipv4_compressed
+		       from_bigint
 	       );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.93';
+our $VERSION = '0.96';
 
 use Carp;
 use Net::IPv4Addr;
-use Math::BigInt;
+use Math::BigInt '1.999813';
 use Math::Base85;
 
 #  ____       _   _                      
@@ -377,7 +378,7 @@ sub to_string_preferred
     if (ref $self ne __PACKAGE__) {
 	$self = Net::IPv6Addr->new ($self);
     }
-    return join(":", map { sprintf("%x", $_) } @$self);
+    return v6part (@$self);
 }
 
 
@@ -387,7 +388,7 @@ sub to_string_compressed
     if (ref $self ne __PACKAGE__) {
 	$self = Net::IPv6Addr->new ($self);
     }
-    my $expanded = join(":", map { sprintf("%x", $_) } @$self);
+    my $expanded = v6part (@$self);
     $expanded =~ s/^0:/:/;
     $expanded =~ s/:0/:/g;
     if ($expanded =~ s/:::::::/_/ or
@@ -405,6 +406,24 @@ sub to_string_compressed
     return $expanded;
 }
 
+sub bytes
+{
+    my ($in) = @_;
+    my $low = $in & 0xff;
+    my $high = $in >> 8;
+    return ($high, $low);
+}
+
+sub v4part
+{
+    my ($t, $b) = @_;
+    return join('.', bytes ($t), bytes ($b));
+}
+
+sub v6part
+{
+    return join(':', map { sprintf("%x", $_) } @_);
+}
 
 sub to_string_ipv4
 {
@@ -412,14 +431,8 @@ sub to_string_ipv4
     if (ref $self ne __PACKAGE__) {
 	$self = Net::IPv6Addr->new ($self);
     }
-    if ($self->[0] | $self->[1] | $self->[2] | $self->[3] | $self->[4]) {
-	mycroak "not originally an IPv4 address";
-    }
-    if (($self->[5] != 0xffff) && $self->[5]) {
-	mycroak "not originally an IPv4 address";
-    }
-    my $v6part = join(':', map { sprintf("%x", $_) } @$self[0..5]);
-    my $v4part = join('.', $self->[6] >> 8, $self->[6] & 0xff, $self->[7] >> 8,  $self->[7] & 0xff);
+    my $v6part = v6part (@$self[0..5]);
+    my $v4part = v4part (@$self[6, 7]);
     return "$v6part:$v4part";
 }
 
@@ -430,21 +443,11 @@ sub to_string_ipv4_compressed
     if (ref $self ne __PACKAGE__) {
 	$self = Net::IPv6Addr->new ($self);
     }
-    if ($self->[0] | $self->[1] | $self->[2] | $self->[3] | $self->[4]) {
-	mycroak "not originally an IPv4 address";
-    }
-    if (($self->[5] != 0xffff) && $self->[5]) {
-	mycroak "not originally an IPv4 address";
-    }
-    my $v6part;
-    if ($self->[5]) {
-	$v6part = sprintf("::%x", $self->[5]);
-    }
-    else {
-	$v6part = ":";
-    }
-    my $v4part = join('.', $self->[6] >> 8, $self->[6] & 0xff, $self->[7] >> 8,  $self->[7] & 0xff);
-    return "$v6part:$v4part";
+    my $v6part = v6part (@$self[0..5]);
+    $v6part .= ':';
+    $v6part =~ s/(^|:)(0:)+/::/;
+    my $v4part = v4part (@$self[6, 7]);
+    return "$v6part$v4part";
 }
 
 
@@ -587,6 +590,34 @@ sub in_network
 	}
     }
     return 1;
+}
+
+sub from_bigint
+{
+    my ($big) = @_;
+    # Input is a scalar or a Math::BigInt object.
+    if (! ref ($big)) {
+	$big = Math::BigInt->new ($big);
+    }
+    if (ref ($big) ne 'Math::BigInt') {
+	mycroak "Cannot process non-scalar, non-Math::BigInt input";
+    }
+    # Convert the number to a hexadecimal string
+    my $hex = $big->to_hex ();
+    # Pad if necessary for the colon placement
+    if (length ($hex) < 32) {
+	my $leading = '0' x (32 - length ($hex));
+	$hex = $leading . $hex;
+    }
+    # Reversing the string makes adding colons with a substitution
+    # operator easier.
+    my $ipr = reverse $hex;
+    $ipr =~ s/(....)/$1:/g;
+    $ipr = reverse $ipr;
+    # Remove the excess colon.
+    $ipr =~ s/^://;
+    # Should be OK now, let "new" handle any further issues.
+    return Net::IPv6Addr->new ($ipr);
 }
 
 1;

@@ -4,7 +4,7 @@
       "Jeen Lee <aiatejin {at} gmail.com>, Keedi Kim < keedi.kim {at} gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "Date::Holidays::KR" : {
          "file" : "lib/Date/Holidays/KR.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -71,12 +71,14 @@
          "web" : "https://github.com/JEEN/p5-Date-Holidays-KR"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
-      "Keedi Kim <keedi.k@gmail.com>",
-      "Jeen Lee <aiatejin@gmail.com>",
       "Hyungsuk Hong <aanoaa@gmail.com>",
-      "JEEN Lee <jeen@perl.kr>"
+      "Hyungsuk Hong <hs.hong@cardoc.kr>",
+      "Jeen Lee <aiatejin@gmail.com>",
+      "Jeen Lee <jeen@perl.kr>",
+      "Keedi Kim <keedi.k@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

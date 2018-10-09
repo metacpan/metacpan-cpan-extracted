@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Zu - Package for language Zulu
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Zu - Package for language Zulu
 
 package Locale::CLDR::Locales::Zu;
 # This file auto generated from Data\common\main\zu.xml
-#	on Sun  5 Aug  6:32:10 pm GMT
+#	on Sun  7 Oct 11:11:42 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -4479,57 +4481,57 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
+			if ($_ eq 'gregorian') {
+				if($day_period_type eq 'default') {
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1300;
+					return 'evening1' if $time >= 1300
+						&& $time < 1900;
+				}
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1300
 						&& $time < 1900;
 					return 'afternoon1' if $time >= 1000
 						&& $time < 1300;
+					return 'morning2' if $time >= 600
+						&& $time < 1000;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1000;
-				}
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1000;
-					return 'evening1' if $time >= 1300
-						&& $time < 1900;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1300;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'generic') {
+				if($day_period_type eq 'default') {
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
+					return 'morning2' if $time >= 600
+						&& $time < 1000;
+					return 'afternoon1' if $time >= 1000
+						&& $time < 1300;
+					return 'evening1' if $time >= 1300
+						&& $time < 1900;
+				}
 				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1300
 						&& $time < 1900;
 					return 'afternoon1' if $time >= 1000
 						&& $time < 1300;
+					return 'morning2' if $time >= 600
+						&& $time < 1000;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1000;
-				}
-				if($day_period_type eq 'default') {
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'morning2' if $time >= 600
-						&& $time < 1000;
-					return 'evening1' if $time >= 1300
-						&& $time < 1900;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
-					return 'afternoon1' if $time >= 1000
-						&& $time < 1300;
 				}
 				last SWITCH;
 				}
@@ -4549,61 +4551,61 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'am' => q{AM},
+					'evening1' => q{ntambama},
+					'afternoon1' => q{emini},
+					'morning2' => q{ekuseni},
+					'pm' => q{PM},
+					'night1' => q{ebusuku},
+					'morning1' => q{entathakusa},
+				},
 				'narrow' => {
 					'morning2' => q{ekuseni},
-					'night1' => q{ebusuku},
-					'evening1' => q{ntambama},
 					'afternoon1' => q{emini},
+					'evening1' => q{ntambama},
+					'am' => q{a},
+					'night1' => q{ebusuku},
 					'morning1' => q{entathakusa},
 					'pm' => q{p},
-					'am' => q{a},
 				},
 				'wide' => {
-					'evening1' => q{ntambama},
-					'morning1' => q{entathakusa},
-					'afternoon1' => q{emini},
 					'pm' => q{PM},
+					'morning1' => q{entathakusa},
+					'night1' => q{ebusuku},
 					'am' => q{AM},
 					'morning2' => q{ekuseni},
-					'night1' => q{ebusuku},
-				},
-				'abbreviated' => {
 					'afternoon1' => q{emini},
 					'evening1' => q{ntambama},
-					'morning1' => q{entathakusa},
-					'pm' => q{PM},
-					'am' => q{AM},
-					'morning2' => q{ekuseni},
-					'night1' => q{ebusuku},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-					'morning1' => q{entathakusa},
-					'evening1' => q{ntambama},
-					'afternoon1' => q{emini},
-					'night1' => q{ebusuku},
-					'morning2' => q{ekuseni},
-				},
 				'narrow' => {
+					'evening1' => q{ntambama},
+					'morning2' => q{ekuseni},
+					'afternoon1' => q{emini},
+					'am' => q{AM},
+					'morning1' => q{entathakusa},
 					'night1' => q{ebusuku},
+					'pm' => q{PM},
+				},
+				'wide' => {
+					'afternoon1' => q{emini},
 					'morning2' => q{ekuseni},
 					'evening1' => q{ntambama},
-					'afternoon1' => q{emini},
-					'morning1' => q{entathakusa},
 					'am' => q{AM},
+					'morning1' => q{entathakusa},
+					'night1' => q{ebusuku},
 					'pm' => q{PM},
 				},
 				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-					'evening1' => q{ntambama},
-					'afternoon1' => q{emini},
 					'morning1' => q{entathakusa},
 					'night1' => q{ebusuku},
+					'pm' => q{PM},
 					'morning2' => q{ekuseni},
+					'afternoon1' => q{emini},
+					'evening1' => q{ntambama},
+					'am' => q{AM},
 				},
 			},
 		},

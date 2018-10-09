@@ -5,7 +5,7 @@
 #ifdef XS_VERSION
 #undef XS_VERSION
 #endif
-#define XS_VERSION "1.102"
+#define XS_VERSION "2.500"
 
 #define BASE 36
 #define TMIN 1

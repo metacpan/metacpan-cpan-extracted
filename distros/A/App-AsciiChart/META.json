@@ -54,7 +54,7 @@
    "provides" : {
       "App::AsciiChart" : {
          "file" : "lib/App/AsciiChart.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/vti/app-asciichart"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:VTI",
    "x_contributors" : [
       "perlancar (on netbook-zenbook-ux305) <perlancar@gmail.com>"

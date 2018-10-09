@@ -17,6 +17,8 @@ all_from 'lib/DBIx/Class/TopoSort.pm';
 
 requires 'DBIx::Class';
 requires 'Graph';
+requires 'JSON::Any';
+requires 'Memoize';
  
 test_requires 'Test::Exception'   => '0.21';
 test_requires 'Test::DBIx::Class' => '0.01';

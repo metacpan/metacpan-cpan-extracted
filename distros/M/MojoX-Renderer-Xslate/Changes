@@ -1,5 +1,10 @@
 Revision history for MojoX-Renderer-Xslate
 
+0.14
+    - If other handlers where supposed to render certain templates without
+      explicitly setting the handler to use, this would fail if XSlate was
+      registered as default handler (GH #13, elcamlost)
+
 0.13
     - Ensure compatibility with Mojolicious >= 7.14 (GH #7, takkyuuplayer)
 

@@ -5,11 +5,14 @@ OpenStack::Client - A cute little client to OpenStack services
 # SYNOPSIS
 
     #
-    # First, connect to an API endpoint via the Keystone authorization service
+    # First, connect to an API endpoint via the Keystone
+    # authorization service
     #
     use OpenStack::Client::Auth ();
 
-    my $auth = OpenStack::Client::Auth->new('http://openstack.foo.bar:5000/v2.0',
+    my $endpoint = 'http://openstack.foo.bar:5000/v2.0';
+
+    my $auth = OpenStack::Client::Auth->new($endpoint,
         'tenant'   => $ENV{'OS_TENANT_NAME'},
         'username' => $ENV{'OS_USERNAME'},
         'password' => $ENV{'OS_PASSWORD'}
@@ -26,7 +29,9 @@ OpenStack::Client - A cute little client to OpenStack services
     #
     use OpenStack::Client ();
 
-    my $glance = OpenStack::Client->new('http://glance.foo.bar:9292',
+    my $endpoint = 'http://glance.foo.bar:9292';
+
+    my $glance = OpenStack::Client->new($endpoint,
         'token' => {
             'id' => 'foo'
         }
@@ -78,20 +83,94 @@ endpoint client.
 
 # PERFORMING REMOTE CALLS
 
-- `$client->call(_$method_, _$path_, _$body_)`
+- `$client->call(_$args_)`
 
-    Perform a call to the service endpoint using the HTTP method _$method_,
-    accessing the resource _$path_ (relative to the absolute endpoint URI), passing
-    an arbitrary value in _$body_ that is to be encoded to JSON as a request
-    body.  This method may return the following:
+    Perform a call to the service endpoint using named arguments in the hash.  The
+    following arguments are required:
+
+    - `method` - Request method
+    - `path` - Resource path
+
+    The following arguments are optional:
+
+    - `headers` - Request headers
+
+        Headers are case _insensitive_; if duplicate header values are declared under
+        different cases, it is undefined which headers shall take precedence.  The
+        following headers are sent by default:
+
+        - Accept
+
+            Defaults to `application/json, text/plain`.
+
+        - Accept-Encoding
+
+            Defaults to `identity, gzip, deflate, compress`.
+
+        - Content-Type
+
+            Defaults to `application/json`, although some API calls (e.g., a PATCH)
+            expect a different type; the the case of an image update, the expected
+            type is `application/openstack-images-v2.1-json-patch` or some version
+            thereof.
+
+        Except for `X-Auth-Token`, any additional token will be added to the request.
+
+    - `body` - Request body
+
+        This may be a scalar reference to a data structure to be encoded to JSON, or a
+        CODE reference to a subroutine which, when called, will return a chunk of data
+        to be supplied to the API endpoint; the stream is ended when the supplied
+        subroutine returns an empty string or undef.
+
+    - `handler` - Response body handler function
+
+        When specified, this function will be called with two arguments; the first
+        argument is a scalar value containing a chunk of data in the response body, and
+        the second is a scalar reference to a [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object representing the
+        current response.  This is useful for retrieving very large resources without
+        having to store the entire response body in memory at once for parsing.
+
+    All forms of this method may return the following:
 
     - For **application/json**: A decoded JSON object
     - For other response types: The unmodified response body
 
     In exceptional conditions (such as when the service returns a 4xx or 5xx HTTP
-    response), the client will `die()` with the raw text response from the HTTP
+    response), the client will die with the raw text response from the HTTP
     service, indicating the nature of the service-side failure to service the
     current call.
+
+- `$client->call(_$method_, _$path_, _$body_)`
+
+    Perform a call to the service endpoint using the HTTP method _$method_,
+    accessing the resource _$path_ (relative to the absolute endpoint URI),
+    passing an arbitrary value in _$body_.
+
+- `$client->call(_$method_, _$headers_, _$path_, _$body_)`
+
+    Perform a call to the service endpoint using the HTTP method _$method_,
+    accessing the resource _$path_ (relative to the absolute endpoint URI),
+    specifying the headers in _$headers_, passing an arbitrary value in _$body_.
+
+# EXAMPLES
+
+The following shows how one may update image metadata using the PATCH method
+supported by version 2 of the Image API.  `@image_updates` is an array of hash
+references of the structure defined by the PATCH RFC (6902) governing
+"JavaScript Object Notation (JSON) Patch"; i.e., operations consisting of
+`add`, `replace`, or `delete`.
+
+    my $headers = {
+        'Content-Type' => 'application/openstack-images-v2.1-json-patch'
+    };
+
+    my $response = $glance->call({
+        'method'  => 'PATCH',
+        'headers' => $headers,
+        'path'    => qq[/v2/images/$image->{id}],
+        'body'    => \@image_updates
+    );
 
 # FETCHING REMOTE RESOURCES
 
@@ -153,7 +232,11 @@ endpoint client.
 
 # AUTHOR
 
-Written by Alexandra Hrefna Hilmisdóttir &lt;xan@cpanel.net>
+Written by Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>
+
+# CONTRIBUTORS
+
+- Brett Estrade <brett@cpanel.net>
 
 # COPYRIGHT
 

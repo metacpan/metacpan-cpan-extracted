@@ -1,6 +1,6 @@
 package Tapper::Cmd::Notification;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Notification::VERSION = '5.0.9';
+$Tapper::Cmd::Notification::VERSION = '5.0.10';
 use Moose;
 
 use Tapper::Model 'model';

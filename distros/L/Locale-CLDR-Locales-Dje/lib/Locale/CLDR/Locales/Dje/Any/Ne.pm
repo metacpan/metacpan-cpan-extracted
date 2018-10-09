@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Dje::Any::Ne - Package for language Zarma
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Dje::Any::Ne - Package for language Zarma
 
 package Locale::CLDR::Locales::Dje::Any::Ne;
 # This file auto generated from Data\common\main\dje_NE.xml
-#	on Sun  5 Aug  5:57:04 pm GMT
+#	on Sun  7 Oct 10:27:36 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';

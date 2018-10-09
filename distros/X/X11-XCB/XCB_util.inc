@@ -68,7 +68,7 @@ new(self)
   PREINIT:
     X11_XCB_ICCCM_SizeHints *buf;
   CODE:
-    New(0, buf, 1, X11_XCB_ICCCM_SizeHints);
+    Newxz(buf, 1, X11_XCB_ICCCM_SizeHints);
     RETVAL = buf;
   OUTPUT:
     RETVAL

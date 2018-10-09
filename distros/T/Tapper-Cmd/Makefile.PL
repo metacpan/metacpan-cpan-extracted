@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "Test::Fixture::DBIC::Schema" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "5.0.9",
+  "VERSION" => "5.0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }

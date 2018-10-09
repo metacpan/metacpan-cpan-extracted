@@ -1,0 +1,96 @@
+{
+   "abstract" : "Run DDL on online databases safely",
+   "author" : [
+      "Grant Street Group <developers@grantstreet.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-OnlineDDL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::Metadata" : "1.00",
+            "Perl::PrereqScanner" : "1.023",
+            "Pod::Markdown::Github" : "0",
+            "Pod::Readme" : "v1.1.2",
+            "Test2::Suite" : "0.000060",
+            "Test::CPAN::Changes" : "0",
+            "Test::Pod" : "1.51",
+            "Test::Pod::Coverage" : "1.10",
+            "Test::Strict" : "0",
+            "Test::Version" : "2.00",
+            "perl" : "v5.10.1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "DBI" : "1.630",
+            "DBIx::BatchChunker" : "0.92",
+            "Eval::Reversible" : "0",
+            "List::Util" : "1.40",
+            "Moo" : "2.00",
+            "Term::ProgressBar" : "2.14",
+            "Types::Standard" : "1.00",
+            "namespace::clean" : "0",
+            "perl" : "5.010001"
+         },
+         "suggests" : {
+            "DBIx::Class" : "0",
+            "DBIx::Connector::Retry" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "DBIx::BatchChunker" : "0.92",
+            "DBIx::Class" : "0",
+            "Import::Into" : "1.00",
+            "Path::Class" : "0",
+            "Scalar::Util" : "0",
+            "Test2::Bundle::More" : "0.000060",
+            "Test2::Tools::Compare" : "0",
+            "Test2::Tools::Exception" : "0",
+            "Test2::Tools::Explain" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/GrantStreetGroup/DBIx-OnlineDDL/issues"
+      },
+      "homepage" : "https://github.com/GrantStreetGroup/DBIx-OnlineDDL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/GrantStreetGroup/DBIx-OnlineDDL.git",
+         "web" : "https://github.com/GrantStreetGroup/DBIx-OnlineDDL"
+      }
+   },
+   "version" : "0.90",
+   "x_authority" : "cpan:GSG"
+}

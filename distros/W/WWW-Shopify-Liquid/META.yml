@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: WWW-Shopify-Liquid
 provides:
   WWW::Shopify::Liquid:
     file: lib/WWW/Shopify/Liquid.pm
-    version: '0.07'
+    version: '0.08'
   WWW::Shopify::Liquid::Analyzer:
     file: lib/WWW/Shopify/Liquid/Analyzer.pm
   WWW::Shopify::Liquid::Analyzer::Entity:
@@ -86,6 +86,8 @@ provides:
     file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/EscapeHTML.pm
   WWW::Shopify::Liquid::Dialect::Web::Filter::EscapeJS:
     file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/EscapeJS.pm
+  WWW::Shopify::Liquid::Dialect::Web::Filter::Highlight:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/Highlight.pm
   WWW::Shopify::Liquid::Dialect::Web::Filter::LinkTo:
     file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/LinkTo.pm
   WWW::Shopify::Liquid::Dialect::Web::Filter::ScriptTag:
@@ -96,6 +98,8 @@ provides:
     file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/UrlEscape.pm
   WWW::Shopify::Liquid::Dialect::Web::Filter::UrlEscapeParam:
     file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/UrlEscapeParam.pm
+  WWW::Shopify::Liquid::Dialect::Web::Tag::EscapeJS:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Tag/EscapeJS.pm
   WWW::Shopify::Liquid::Dialect::Web::Tag::Form:
     file: lib/WWW/Shopify/Liquid/Dialect/Web/Tag/Form.pm
   WWW::Shopify::Liquid::Dialect::Web::Tag::JavascriptString:
@@ -244,6 +248,8 @@ provides:
     file: lib/WWW/Shopify/Liquid/Filter/Minus.pm
   WWW::Shopify::Liquid::Filter::NewlineToBr:
     file: lib/WWW/Shopify/Liquid/Filter/NewlineToBr.pm
+  WWW::Shopify::Liquid::Filter::Pluck:
+    file: lib/WWW/Shopify/Liquid/Filter/Pluck.pm
   WWW::Shopify::Liquid::Filter::Pluralize:
     file: lib/WWW/Shopify/Liquid/Filter/Pluralize.pm
   WWW::Shopify::Liquid::Filter::Plus:
@@ -272,6 +278,8 @@ provides:
     file: lib/WWW/Shopify/Liquid/Filter/Split.pm
   WWW::Shopify::Liquid::Filter::Sprintf:
     file: lib/WWW/Shopify/Liquid/Filter/Sprintf.pm
+  WWW::Shopify::Liquid::Filter::Strip:
+    file: lib/WWW/Shopify/Liquid/Filter/Strip.pm
   WWW::Shopify::Liquid::Filter::StripHtml:
     file: lib/WWW/Shopify/Liquid/Filter/StripHtml.pm
   WWW::Shopify::Liquid::Filter::StripNewlines:
@@ -284,6 +292,8 @@ provides:
     file: lib/WWW/Shopify/Liquid/Filter/Truncate.pm
   WWW::Shopify::Liquid::Filter::Truncatewords:
     file: lib/WWW/Shopify/Liquid/Filter/Truncatewords.pm
+  WWW::Shopify::Liquid::Filter::Uniq:
+    file: lib/WWW/Shopify/Liquid/Filter/Uniq.pm
   WWW::Shopify::Liquid::Filter::Unknown:
     file: lib/WWW/Shopify/Liquid/Filter.pm
   WWW::Shopify::Liquid::Filter::Upcase:
@@ -423,45 +433,45 @@ provides:
   WWW::Shopify::Liquid::Tag::Whitespace:
     file: lib/WWW/Shopify/Liquid/Tag/Whitespace.pm
   WWW::Shopify::Liquid::Token:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Array:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Bool:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::FunctionCall:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Grouping:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Grouping::Parenthetical:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Hash:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::NULL:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Number:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Operand:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Operator:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Output:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Separator:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::String:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Tag:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Text:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Text::Whitespace:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Variable:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Variable::Named:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
   WWW::Shopify::Liquid::Token::Variable::Processing:
-    file: lib/WWW/Shopify/Liquid/Lexer.pm
+    file: lib/WWW/Shopify/Liquid/Token.pm
 requires:
   Clone: '0'
   Data::Compare: '0'
@@ -483,5 +493,5 @@ requires:
   URI::Escape: '0'
   perl: v5.12.5
   re::engine::RE2: '0'
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

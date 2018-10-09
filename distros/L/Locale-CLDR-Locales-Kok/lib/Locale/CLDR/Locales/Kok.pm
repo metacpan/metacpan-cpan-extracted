@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1
 
 Locale::CLDR::Locales::Kok - Package for language Konkani
@@ -6,13 +8,13 @@ Locale::CLDR::Locales::Kok - Package for language Konkani
 
 package Locale::CLDR::Locales::Kok;
 # This file auto generated from Data\common\main\kok.xml
-#	on Sun  5 Aug  6:09:00 pm GMT
+#	on Sun  7 Oct 10:42:44 am GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.33.0');
+our $VERSION = version->declare('v0.33.1');
 
 use v5.10.1;
 use mro 'c3';
@@ -1493,7 +1495,7 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{म.नं.},
 					'am' => q{म.पू.},
 				},
@@ -1501,21 +1503,21 @@ has 'day_periods' => (
 					'pm' => q{म.नं.},
 					'am' => q{म.पू.},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{म.पू.},
 					'pm' => q{म.नं.},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{म.पू.},
-					'pm' => q{म.नं.},
-				},
 				'wide' => {
-					'pm' => q{म.नं.},
 					'am' => q{म.पू.},
+					'pm' => q{म.नं.},
 				},
 				'narrow' => {
+					'pm' => q{म.नं.},
+					'am' => q{म.पू.},
+				},
+				'abbreviated' => {
 					'am' => q{म.पू.},
 					'pm' => q{म.नं.},
 				},
