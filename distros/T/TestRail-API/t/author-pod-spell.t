@@ -45,6 +45,7 @@ Test
 TestRail
 TestSuite
 Utils
+addCaseField
 api
 apiurl
 assignedto
@@ -53,6 +54,7 @@ autoclose
 bailoutCallback
 bin
 buildStepResults
+bulkAddResults
 cPanel
 cachefile
 closePlan
@@ -78,6 +80,7 @@ findRuns
 findTests
 getCaseByID
 getCaseByName
+getCaseFields
 getCaseTypeByName
 getCaseTypes
 getCases

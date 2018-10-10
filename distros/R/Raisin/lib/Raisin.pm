@@ -25,7 +25,7 @@ use Plack::Util::Accessor qw(
     encoder
 );
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 sub new {
     my ($class, %args) = @_;
@@ -109,7 +109,8 @@ sub run {
         default_format => $self->default_format,
         format => $self->format,
         decoder => $self->decoder,
-        encoder => $self->encoder
+        encoder => $self->encoder,
+        raisin => $self,
     );
 
     # load fallback logger (Raisin::Logger)

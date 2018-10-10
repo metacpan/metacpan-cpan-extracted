@@ -1,0 +1,23 @@
+==================================================
+Changes from 2017-10-09 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.01 at 2018-10-09 17:06:48 +0000
+-----------------------------------------
+
+  Change: e2b12c956aa1ae8c5dfbc17c8e97330e793933ce
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2018-10-09 19:05:13 +0000
+
+    Added a first version of the library 
+
+  Change: 31f2a704415071429f51810055cbf39297507898
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2018-10-04 09:57:11 +0000
+
+    Initial checkin 
+
+================
+End of releases.
+================

@@ -1,4 +1,3 @@
-CONTRIBUTING
 COPYRIGHT
 CREDITS
 Changes
@@ -17,3 +16,5 @@ lib/Syntax/Feature/Maybe.pm
 t/01basic.t
 t/02maybe.t
 t/03provided.t
+t/04provided_deref.t
+t/05provided_deref_with_maybe.t

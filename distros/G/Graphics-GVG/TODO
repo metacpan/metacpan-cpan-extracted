@@ -1,8 +1,8 @@
-Version 0.7
+Version 0.91
 ===========
+* Rename 'meta' to something that doesn't conflict with an existing
+  Moose method
 * Include files
 * Arc
 * Rotate ellipses
 * Bezier curve
-* Chipmunk renderer (as its own module)
-* Callback system that will unify walking the AST across different renderers

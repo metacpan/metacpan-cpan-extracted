@@ -34,6 +34,7 @@ my @files = (
     't/00-compile.t',
     't/App-Prove-Plugin-Testrail.t',
     't/Test-Rail-Parser.t',
+    't/TestRail-API-casefields.t',
     't/TestRail-API-mockOnly.t',
     't/TestRail-API-sections.t',
     't/TestRail-API.t',

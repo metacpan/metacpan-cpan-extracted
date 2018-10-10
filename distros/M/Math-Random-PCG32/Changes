@@ -1,5 +1,9 @@
 See also the git repository.
 
+0.10    2018-10-09
+        Add decay(), dice(), irand64(), irand_in(), irand_way().
+        Algorithm::Diff as test req.
+
 0.07    2018-09-28
         Break interface, rand() now returns floats more like CORE::rand().
         Add irand() which is what the old rand() was.

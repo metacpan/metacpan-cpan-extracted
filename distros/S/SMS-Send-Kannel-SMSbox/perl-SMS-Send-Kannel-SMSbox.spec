@@ -1,5 +1,5 @@
 Name:           perl-SMS-Send-Kannel-SMSbox
-Version:        0.04
+Version:        0.05
 Release:        1%{?dist}
 Summary:        SMS::Send driver for Kannel SMSbox web service
 License:        CHECK(Distributable)
@@ -45,6 +45,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc Changes LICENSE README Todo
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
+%{_bindir}/*
+%{_mandir}/man1/*
 
 %changelog
 * Wed Oct 21 2015 Michael R. Davis <mdavis@stopllc.com> 0.01-1

@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -37,9 +37,11 @@
       },
       "runtime" : {
          "recommends" : {
+            "Exporter::Tiny" : "0",
             "PerlX::Maybe::XS" : "0"
          },
          "requires" : {
+            "Scalar::Util" : "0",
             "perl" : "5.006"
          }
       },
@@ -52,11 +54,11 @@
    "provides" : {
       "PerlX::Maybe" : {
          "file" : "lib/PerlX/Maybe.pm",
-         "version" : "1.001"
+         "version" : "1.200"
       },
       "Syntax::Feature::Maybe" : {
          "file" : "lib/Syntax/Feature/Maybe.pm",
-         "version" : "1.001"
+         "version" : "1.200"
       }
    },
    "release_status" : "stable",
@@ -75,5 +77,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/project"
    },
-   "version" : "1.001"
+   "version" : "1.200",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

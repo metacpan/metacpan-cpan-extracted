@@ -1,19 +1,20 @@
 # -*- Perl -*-
 #
-# minimal PCG random number generator
+# a minimal PCG random number generator plus some PCG related routines
 #
-# run perldoc(1) on this file for additional documentation
+# run perldoc(1) on this file for documentation
 
 package Math::Random::PCG32;
 
-use warnings;
 use strict;
+use warnings;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(irand rand rand_elm rand_idx);
+our @EXPORT_OK =
+  qw(decay dice irand irand64 irand_in irand_way rand rand_elm rand_idx);
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load( 'Math::Random::PCG32', $VERSION );
@@ -35,15 +36,18 @@ Math::Random::PCG32 - minimal PCG random number generator
   $rng->rand;
   $rng->rand(10);
   $rng->irand;
+  $rng->irand_in( 1, 100 );
   $rng->rand_idx( \@some_array );
   $rng->rand_elm( \@some_array );
 
 =head1 DESCRIPTION
 
-This is a minimal PCG random number generator with a few utility
-routines.
+This module includes a minimal PCG (Permuted Congruential Generator) for
+random numbers
 
 L<http://www.pcg-random.org/>
+
+plus utility routines for PCG (Procedural Content Generation).
 
 =head2 A RANDOM BENCHMARK
 
@@ -60,6 +64,9 @@ the L<Benchmark> module on my somehow still functional 2009 macbook.
   rand   22447322/s 10376%   743%   346%   307%     --
 
 =head1 METHODS
+
+Various methods may croak if invalid input is detected. Use B<new> to
+obtain an object and then call the others using that.
 
 =over 4
 
@@ -78,12 +85,43 @@ or for a game one might use values from L<Time::HiRes> or provided by
 the user with the caveat that C<pcg32_srandom_r> may need to be checked
 that it is okay for users to provide whatever they want.
 
+=item B<decay> I<odds> I<min> I<max>
+
+Increments I<min> while successive random values are less than I<odds>
+ending should a random value fail or I<max> be reached. I<odds> is
+treated as a C<uint32_t> value (as are I<min> and I<max>), so 50% odds
+of decay would be C<2147483648>. Returns the value I<min> is
+incremented to.
+
+=item B<dice> I<count> I<sides>
+
+Sums the result of rolling the given number of dice.
+
 =item B<irand>
 
 Returns a random number from an object constructed by B<new>. The return
 value is a 32-bit unsigned integer.
 
 Used to be called B<rand> in older versions of the module.
+
+=item B<irand64>
+
+Returns a 64-bit unsigned integer, possibly by sticking the result of
+two calls to the RNG together.
+
+=item B<irand_in> I<min> I<max>
+
+Returns a random integer in the range of I<min> to I<max>, inclusive.
+
+=item B<irand_way> I<x1> I<y1> I<x2> I<y2>
+
+Returns a new point as a list that will bring the first point (given
+by I<x1>, I<y1>) towards the second point or C<undef> if the points
+are the same.
+
+Overflows are not checked for; do not use points that will result in
+deltas or magnitudes greater than can be handled without overflow by
+32-bit values.
 
 =item B<rand> [ I<factor> ]
 
@@ -125,6 +163,11 @@ L<https://github.com/thrig/Math-Random-PCG32>
 
 New code, not many features, questionable XS. Probably needs a modern
 compiler for the C<stdint> types. Untested on older versions of Perl.
+Untested on 32-bit versions of Perl.
+
+Various tradeoffs have been made to favor speed over safety: modulo bias
+is ignored and some methods have integer overflow issues. Using numbers
+well below C<INT32_MAX> should avoid these issues.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,8 @@
 Revision history for XML::XPath
 
+1.43  2018-10-10 MANWAR
+      - Fix memory leak in XML::XPath::Parser (PR #6), Thanks @niner.
+
 1.42  2017-07-30 MANWAR
       - Fixed GitHub issue #5 (abstract is undef in meta files). Thanks @y.
 

@@ -2,8 +2,8 @@ NAME
     App::pause - A CLI for PAUSE
 
 VERSION
-    This document describes version 0.64 of App::pause (from Perl
-    distribution App-pause), released on 2017-07-24.
+    This document describes version 0.650 of App::pause (from Perl
+    distribution App-pause), released on 2018-10-09.
 
 DESCRIPTION
     See included script pause.
@@ -31,7 +31,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

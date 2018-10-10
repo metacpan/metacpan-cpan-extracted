@@ -1,0 +1,105 @@
+{
+   "abstract" : "library for looking up MTA-STS policies",
+   "author" : [
+      "Markus Benning <ich@markusbenning.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mail-STS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::ChangelogFromGit" : "0",
+            "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
+            "Dist::Zilla::Plugin::Git::NextVersion" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0",
+            "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::PruneFiles" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::PluginBundle::Basic" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Net::DNS::Resolver" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.8.5",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mail::STS" : {
+         "file" : "lib/Mail/STS.pm",
+         "version" : "0.01"
+      },
+      "Mail::STS::Domain" : {
+         "file" : "lib/Mail/STS/Domain.pm",
+         "version" : "0.01"
+      },
+      "Mail::STS::Policy" : {
+         "file" : "lib/Mail/STS/Policy.pm",
+         "version" : "0.01"
+      },
+      "Mail::STS::SSKV" : {
+         "file" : "lib/Mail/STS/SSKV.pm",
+         "version" : "0.01"
+      },
+      "Mail::STS::STSRecord" : {
+         "file" : "lib/Mail/STS/STSRecord.pm",
+         "version" : "0.01"
+      },
+      "Mail::STS::TLSRPTRecord" : {
+         "file" : "lib/Mail/STS/TLSRPTRecord.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-mail-sts@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Mail-STS"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/benningm/perl-Mail-STS",
+         "web" : "https://github.com/benningm/perl-Mail-STS.git"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

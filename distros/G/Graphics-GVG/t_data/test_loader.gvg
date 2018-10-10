@@ -1,0 +1,3 @@
+!class = "MockClass";
+
+line( #ff33ff00, 0, 0, 1, 1 );

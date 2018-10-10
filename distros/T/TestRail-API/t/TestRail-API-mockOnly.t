@@ -75,3 +75,5 @@ my $rc;
 my $oot = capture_stderr { $rc = $tr->getUsers() };
 like ($oot,qr/re-trying request/i, "Tried twice to make the call work");
 is($rc,-500,"Right code returned when re-tries run out");
+
+

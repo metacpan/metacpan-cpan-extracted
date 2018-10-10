@@ -1,4 +1,8 @@
-Revision history for Complete-Bash
+0.320   2018-10-10 (PERLANCAR)
+
+	- Observe COMPLETE_BASH_TRACE to produce more log statements for
+	  debugging.
+
 
 0.31    2016-12-28 (PERLANCAR)
 

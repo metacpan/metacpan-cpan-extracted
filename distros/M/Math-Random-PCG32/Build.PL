@@ -7,7 +7,7 @@ my $builder = Module::Build->new(
     license            => 'apache',
     dist_author        => 'Jeremy Mates <jmates@cpan.org>',
     dist_version_from  => 'lib/Math/Random/PCG32.pm',
-    dist_abstract      => 'minimal PCG random number generator',
+    dist_abstract      => 'minimal random permuted congruential generator',
     include_dirs       => [qw(. src)],
     c_source           => 'src',
     configure_requires => {
@@ -16,8 +16,10 @@ my $builder = Module::Build->new(
     },
     requires      => { 'perl' => '5.014000', },
     test_requires => {
-        'Test::Most' => 0,
-        'Test::More' => '0.88',          # done_testing
+        # http://www.cpantesters.org/cpan/report/67976f18-c32b-11e8-a869-046817727b86
+        'Algorithm::Diff' => 0,
+        'Test::Most'      => 0,
+        'Test::More'      => '0.88',     # done_testing
     },
     sign           => 1,
     create_readme  => 0,

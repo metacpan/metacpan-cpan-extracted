@@ -1,5 +1,12 @@
 Revision history for Perl module TestRail::API
 
+0.044 2018-10-9 TEODESIAN
+    - Add getCaseFields and addCaseField methods to TestRail::API
+    - Correct argument POD for createRunInPlan
+    - Add bulkAddResultsByCase
+    - Fix improper caching by project rather than by testsuite in getSections
+    - Fix broken repository links
+
 0.043 2018-6-16 TEODESIAN
     - Better error messaging when bad custom result fields are configured in Test::Rail::Parser
 

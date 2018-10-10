@@ -2,7 +2,7 @@ package Net::SMTP::Verify::ResultSet;
 
 use Moose;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 # ABSTRACT: resultset for Net::SMTP::Verify checks
 
 use Net::SMTP::Verify::Result;
@@ -132,7 +132,7 @@ Net::SMTP::Verify::ResultSet - resultset for Net::SMTP::Verify checks
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 

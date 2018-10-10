@@ -125,7 +125,7 @@ sub make_drawer
     my ($ast) = @_;
 
     my $renderer = Graphics::GVG::OpenGLRenderer->new;
-    my $drawer = $renderer->make_drawer_obj( $ast );
+    my $drawer = $renderer->make_obj( $ast );
 
     return $drawer;
 }

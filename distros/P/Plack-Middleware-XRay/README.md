@@ -73,20 +73,20 @@ See also [AWS X-Ray Segment Documents](https://docs.aws.amazon.com/xray/latest/d
 
 [metadata](https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html#api-segmentdocuments-metadata) object with any additional data that you want to store in the segment.
 
-## annotations\_buidler
+## annotations\_builder
 
 Code ref to generate an annotations hashref.
 
     enable "XRay"
       name => "myApp",
-      annotations_buidler => sub {
+      annotations_builder => sub {
           my $env = shift;
           return {
               app_id => $env->{HTTP_X_APP_ID},
           };
       },
 
-## metadata\_buidler
+## metadata\_builder
 
 Code ref to generate a metadata hashref.
 

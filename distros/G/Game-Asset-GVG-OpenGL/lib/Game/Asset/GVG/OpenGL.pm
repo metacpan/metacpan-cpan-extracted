@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Asset::GVG::OpenGL;
-$Game::Asset::GVG::OpenGL::VERSION = '0.1';
+$Game::Asset::GVG::OpenGL::VERSION = '0.2';
 # ABSTRACT: Load GVG files from a Game::Asset archive and convert to OpenGL
 use strict;
 use warnings;
@@ -49,7 +49,7 @@ sub _process_content
     my $ast = $gvg->parse( $content );
 
     my $renderer = Graphics::GVG::OpenGLRenderer->new;
-    my $obj = $renderer->make_drawer_obj( $ast );
+    my $obj = $renderer->make_obj( $ast );
     $self->_set_opengl( $obj );
 
     return;

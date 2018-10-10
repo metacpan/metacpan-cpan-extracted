@@ -1,5 +1,5 @@
 package SVG::Estimate::Path;
-$SVG::Estimate::Path::VERSION = '1.0107';
+$SVG::Estimate::Path::VERSION = '1.0108';
 use Moo;
 use Image::SVG::Path qw/extract_path_info/;
 use SVG::Estimate::Path::Moveto;
@@ -20,7 +20,7 @@ SVG::Estimate::Path - Handles estimating arbitrary vectors.
 
 =head1 VERSION
 
-version 1.0107
+version 1.0108
 
 =head1 SYNOPSIS
 
@@ -62,6 +62,9 @@ sub BUILDARGS {
     ##Upgrade to hashref
     my $args = @args % 2 ? $args[0] : { @args };
 
+    if (! exists $args->{d} || $args->{d} =~ /^\s*$/) {
+        $args->{d} = "m 0 0";
+    }
     my @path_info = extract_path_info($args->{d}, { absolute => 1, no_shortcuts=> 1, });
     my @commands = ();
 

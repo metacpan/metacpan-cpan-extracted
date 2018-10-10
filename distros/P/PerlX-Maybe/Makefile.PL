@@ -4,44 +4,45 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "return a pair only if they are both defined",
-  "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "PerlX-Maybe",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        develop   => { recommends => { "Dist::Inkt" => 0 } },
-                        runtime   => {
-                                       recommends => { "PerlX::Maybe::XS" => 0 },
-                                       requires   => { perl => 5.006 },
-                                     },
-                        test      => { requires => { "Test::More" => 0.61 } },
-                      },
-  "provides"       => {
-                        "PerlX::Maybe" => { file => "lib/PerlX/Maybe.pm", version => 1.001 },
-                        "Syntax::Feature::Maybe" => { file => "lib/Syntax/Feature/Maybe.pm", version => 1.001 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Maybe" },
-                        homepage     => "https://metacpan.org/release/PerlX-Maybe",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/tobyink/p5-perlx-maybe.git",
-                                          web  => "https://github.com/tobyink/p5-perlx-maybe",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/project",
-                      },
-  "version"        => 1.001,
+  "abstract"         => "return a pair only if they are both defined",
+  "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "PerlX-Maybe",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          develop   => { recommends => { "Dist::Inkt" => 0 } },
+                          runtime   => {
+                                         recommends => { "Exporter::Tiny" => 0, "PerlX::Maybe::XS" => 0 },
+                                         requires   => { "perl" => 5.006, "Scalar::Util" => 0 },
+                                       },
+                          test      => { requires => { "Test::More" => 0.61 } },
+                        },
+  "provides"         => {
+                          "PerlX::Maybe" => { file => "lib/PerlX/Maybe.pm", version => "1.200" },
+                          "Syntax::Feature::Maybe" => { file => "lib/Syntax/Feature/Maybe.pm", version => "1.200" },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Maybe" },
+                          homepage     => "https://metacpan.org/release/PerlX-Maybe",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/tobyink/p5-perlx-maybe.git",
+                                            web  => "https://github.com/tobyink/p5-perlx-maybe",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/project",
+                        },
+  "version"          => "1.200",
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

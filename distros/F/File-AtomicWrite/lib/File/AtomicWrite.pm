@@ -1,22 +1,25 @@
 # -*- Perl -*-
 #
-# Like IO::AtomicWrite, except uses File::Temp to create the temporary
-# file, and offers various degrees of more paranoid write handling, and
-# means to set Unix file permissions and ownerships on the resulting
-# file. Run perldoc(1) on this module for more information.
+# uses File::Temp to create the temporary file, and offers various
+# degrees of more paranoid write handling, and means to set Unix file
+# permissions and ownerships on the resulting file. note however that
+# rename() may not be safe depending on the filesystem and what
+# exactly fails. run perldoc(1) on this file for more information
 
 package File::AtomicWrite;
 
 use strict;
 use warnings;
 
-use Carp qw/croak/;
-use File::Basename qw/dirname/;
-use File::Path qw/mkpath/;
-use File::Temp qw/tempfile/;
+use Carp qw(croak);
+use Fcntl qw(:seek);
+use File::Basename qw(dirname);
+use File::Path qw(mkpath);
+use File::Temp qw(tempfile);
+# for olden versions of perl
 use IO::Handle;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 # Default options
 my %default_params = ( MKPATH => 0, template => ".tmp.XXXXXXXXXX" );
@@ -25,12 +28,11 @@ my %default_params = ( MKPATH => 0, template => ".tmp.XXXXXXXXXX" );
 #
 # Class methods
 
-# Accepts output filename, perhaps optional tmp file template, and
-# a filehandle or scalar ref, and handles all the details in a
-# single shot.
+# accepts output filename, perhaps optional tmp file template, and a
+# filehandle or scalar ref, and handles all the details in a single shot
 sub write_file {
-    my $class = shift;
-    my $user_params = shift || {};
+    my ( $class, $user_params ) = @_;
+    $user_params = {} unless defined $user_params;
 
     if ( !exists $user_params->{input} ) {
         croak "missing 'input' option";
@@ -38,7 +40,7 @@ sub write_file {
 
     my ( $tmp_fh, $tmp_filename, $params_ref, $digest ) = _init($user_params);
 
-    # Attempt cleanup if things go awry (use the OO interface and custom
+    # attempt cleanup if things go awry (use the OO interface and custom
     # signal handlers of your own if this is a problem)
     local $SIG{TERM} = sub { _cleanup( $tmp_fh, $tmp_filename ); exit };
     local $SIG{INT}  = sub { _cleanup( $tmp_fh, $tmp_filename ); exit };
@@ -60,15 +62,13 @@ sub write_file {
             and !exists $params_ref->{checksum} ) {
             $digest->add($$input);
         }
-
     } elsif ( $input_ref eq 'GLOB' ) {
-        while ( my $line = <$input> ) {
+        while ( my $line = readline $input ) {
             unless ( print $tmp_fh $line ) {
                 my $save_errstr = $!;
                 _cleanup( $tmp_fh, $tmp_filename );
                 croak "error printing to temporary file: $save_errstr";
             }
-
             if ( exists $params_ref->{CHECKSUM}
                 and !exists $params_ref->{checksum} ) {
                 $digest->add($$input);
@@ -80,12 +80,13 @@ sub write_file {
 }
 
 sub new {
-    my $class      = shift;
-    my $self       = {};
-    my $user_param = shift || {};
+    my ( $class, $user_param ) = @_;
+    $user_param = {} unless defined $user_param;
 
     croak "option 'input' only for write_file class method"
       if exists $user_param->{input};
+
+    my $self = {};
 
     @{$self}{qw/_tmp_fh _tmp_filename _params _digest/} = _init($user_param);
 
@@ -94,14 +95,14 @@ sub new {
 }
 
 sub safe_level {
-    my $class = shift;
-    my $level = shift || croak 'safe_level() requires a value';
+    my ( $class, $level ) = @_;
+    croak 'safe_level() requires a value' unless defined $level;
     File::Temp->safe_level($level);
 }
 
 sub set_template {
-    my $class = shift;
-    my $template = shift || croak 'set_template() requires a template';
+    my ( $class, $template ) = @_;
+    croak 'set_template() requires a template' unless defined $template;
     $default_params{template} = $template;
     return;
 }
@@ -110,18 +111,10 @@ sub set_template {
 #
 # Instance methods
 
-sub fh {
-    shift->{_tmp_fh};
-}
-
-sub filename {
-    shift->{_tmp_filename};
-}
-
 sub checksum {
-    my $self = shift;
-    $self->{_params}->{checksum} = shift
-      || croak 'checksum requires an argument';
+    my ( $self, $csum ) = @_;
+    croak 'checksum requires an argument' unless defined $csum;
+    $self->{_params}->{checksum} = $csum;
 
     if ( !$self->{_digest} ) {
         $self->{_params}->{CHECKSUM} = 1;
@@ -131,17 +124,15 @@ sub checksum {
     return $self;
 }
 
-sub commit {
-    my $self = shift;
-    _resolve( @{$self}{qw/_tmp_fh _tmp_filename _params _digest/} );
-}
+sub commit { _resolve( @{ $_[0] }{qw/_tmp_fh _tmp_filename _params _digest/} ) }
 
-sub DESTROY {
-    my $self = shift;
-    _cleanup( @{$self}{qw/_tmp_fh _tmp_filename/} );
-}
+sub DESTROY { _cleanup( @{ $_[0] }{qw/_tmp_fh _tmp_filename/} ) }
 
-# For when (if) things go awry
+sub fh { $_[0]->{_tmp_fh} }
+
+sub filename { $_[0]->{_tmp_filename} }
+
+# for when things go awry
 sub _cleanup {
     my ( $tmp_fh, $tmp_filename ) = @_;
     # recommended by perlport(1) prior to unlink/rename calls
@@ -150,7 +141,8 @@ sub _cleanup {
 }
 
 sub _init {
-    my $user_params = shift || {};
+    my ($user_params) = @_;
+    $user_params = {} unless defined $user_params;
     my $params_ref = { %default_params, %$user_params };
 
     if (   !exists $params_ref->{file}
@@ -204,8 +196,8 @@ sub _init {
 }
 
 sub _init_checksum {
-    my $params_ref = shift;
-    my $digest     = 0;
+    my ($params_ref) = @_;
+    my $digest = 0;
 
     if ( exists $params_ref->{CHECKSUM} and $params_ref->{CHECKSUM} ) {
         eval { require Digest::SHA1; };
@@ -222,17 +214,14 @@ sub _init_checksum {
 }
 
 sub _resolve {
-    my $tmp_fh       = shift;
-    my $tmp_filename = shift;
-    my $params_ref   = shift;
-    my $digest       = shift;
+    my ( $tmp_fh, $tmp_filename, $params_ref, $digest ) = @_;
 
     if ( exists $params_ref->{CHECKSUM}
         and !exists $params_ref->{checksum} ) {
         $params_ref->{checksum} = $digest->hexdigest;
     }
 
-    # Help the bits reach the disk
+    # help the bits reach the disk?
     $tmp_fh->flush() or die "flush() error: $!\n";
     # TODO may need eval or exclude on other platforms
     if ( $^O !~ m/Win32/ ) {
@@ -252,12 +241,12 @@ sub _resolve {
         die $@;
     }
 
-    # recommended by perlport(1) prior to unlink/rename calls.
+    # recommended by perlport(1) prior to unlink/rename calls
     #
-    # TODO I've seen false positives from close() calls, though certain
-    # file systems only report errors at close() time. If someone can
-    # document a false positive, instead create an option and let the
-    # caller decide.
+    # TODO I've seen false positives from close() calls (from a very old
+    # version of XML::LibXML) though certain file systems only report
+    # errors at close() time. if someone can document a false positive,
+    # instead create an option and let the caller decide...
     close($tmp_fh) or die "problem closing filehandle: $!\n";
 
     # spare subsequent useless close attempts, if any
@@ -319,7 +308,7 @@ sub _resolve {
             }
         }
 
-        # Make hardlink -- Haiku OS does not appear to support these;
+        # make hardlink -- Haiku OS does not appear to support these;
         # http://www.cpantesters.org/cpan/report/7c2a3994-bc30-11e8-83ca-8681f4fbe649
         # which is warned about in the perlport POD
         if ( !link( $params_ref->{file}, $backup_filename ) ) {
@@ -342,14 +331,11 @@ sub _resolve {
 }
 
 sub _mkpath {
-    my $mkpath    = shift;
-    my $directory = shift;
+    my ( $mkpath, $directory ) = @_;
 
     if ($mkpath) {
         mkpath($directory);
-        if ( !-d $directory ) {
-            croak "could not create parent directory";
-        }
+        croak "could not create parent directory" unless -d $directory;
     } else {
         croak "parent directory does not exist";
     }
@@ -358,10 +344,9 @@ sub _mkpath {
 }
 
 sub _check_checksum {
-    my $tmp_fh   = shift;
-    my $checksum = shift;
+    my ( $tmp_fh, $checksum ) = @_;
 
-    seek( $tmp_fh, 0, 0 )
+    seek( $tmp_fh, 0, SEEK_SET )
       or die("tmp fh seek() error: $!\n");
 
     my $digest = Digest::SHA1->new;
@@ -377,12 +362,11 @@ sub _check_checksum {
 }
 
 sub _check_min_size {
-    my $tmp_fh   = shift;
-    my $min_size = shift;
+    my ( $tmp_fh, $min_size ) = @_;
 
-    # Must seek, as OO method allows the fh or filename to be passed off
-    # and used by who knows what first.
-    seek( $tmp_fh, 0, 2 )
+    # must seek, as OO method allows the fh or filename to be passed off
+    # and used by who knows what first
+    seek( $tmp_fh, 0, SEEK_END )
       or die("tmp fh seek() error: $!\n");
 
     my $written = tell($tmp_fh);
@@ -395,12 +379,11 @@ sub _check_min_size {
     return 1;
 }
 
-# Accepts "0" or "user:group" type ownership details and a filename,
+# accepts "0" or "user:group" type ownership details and a filename,
 # attempts to set ownership rights on that filename. croak()s if
-# anything goes awry.
+# anything goes awry
 sub _set_ownership {
-    my $filename = shift;
-    my $owner    = shift;
+    my ( $filename, $owner ) = @_;
 
     croak 'invalid owner data' if !defined $owner or length $owner < 1;
 
@@ -411,7 +394,7 @@ sub _set_ownership {
 
     my ( $login, $pass, $user_uid, $user_gid );
 
-    # Only customize user if have something from caller
+    # only customize user if have something from caller
     if ( defined $user_name and $user_name ne '' ) {
         if ( $user_name =~ m/^([0-9]+)$/ ) {
             $uid = $1;
@@ -422,7 +405,7 @@ sub _set_ownership {
         }
     }
 
-    # Only customize group if have something from caller
+    # only customize group if have something from caller
     if ( defined $group_name and $group_name ne '' ) {
         if ( $group_name =~ m/^([0-9]+)$/ ) {
             $gid = $1;
@@ -441,7 +424,7 @@ sub _set_ownership {
     return 1;
 }
 
-42;
+1;
 __END__
 
 =head1 NAME
@@ -452,62 +435,57 @@ File::AtomicWrite - writes files atomically via rename()
 
   use File::AtomicWrite ();
 
-  # Standalone method: requires filename and
-  # input data (filehandle or scalar ref)
+  # oneshot: requires filename and all the input data
+  # (as a filehandle or scalar ref)
   File::AtomicWrite->write_file(
-    { file  => 'data.dat',
-      input => $filehandle
-    }
+      {   file  => 'data.dat',
+          input => $filehandle,
+      }
   );
-
   # how paranoid are you?
   File::AtomicWrite->write_file(
-    { file     => '/etc/passwd',
-      input    => \$scalarref,
-      CHECKSUM => 1,
-      min_size => 100
-    }
+      {   file     => '/etc/passwd',
+          input    => \$scalarref,
+          CHECKSUM => 1,
+          min_size => 100,
+      }
   );
 
-  # OO interface
+  # instance interface: use to stream data or to have
+  # custom signal handlers
+  use Digest::SHA1;
   my $aw = File::AtomicWrite->new(
-    { file     => 'name',
-      min_size => 100,
-      ...
-    }
+      {   file     => 'name',
+          min_size => 1,
+          ...
+      }
   );
-
+  my $digest   = Digest::SHA1->new;
   my $tmp_fh   = $aw->fh;
   my $tmp_file = $aw->filename;
-
-  print $tmp_fh ...
-
-  $aw->checksum($sha1_hexdigest);
-  $aw->commit;
+  print $tmp_fh ...;
+  $digest->add(...);
+  $aw->checksum( $digest->hexdigest )->commit;
 
 =head1 DESCRIPTION
 
 This module offers atomic file writes via a temporary file created in
-the same directory (and therefore, probably the same partition) as the
+the same directory (and therefore probably the same partition) as the
 specified B<file>. After data has been written to the temporary file,
-the C<rename> call is used to replace the target B<file>. The module
-optionally supports various sanity checks (B<min_size>, B<CHECKSUM>)
-that help ensure the data is written without errors.
+the C<rename> system call is used to replace the target B<file>. The
+module optionally supports various sanity checks (B<min_size>,
+B<CHECKSUM>) that help ensure the data is written without errors.
 
 Should anything go awry, the module will C<die> or C<croak>. All calls
-should be wrapped in eval blocks:
+should be wrapped in C<eval> blocks or better yet L<Try::Tiny>.
 
-  eval {
-    File::AtomicWrite->write_file(...);
-  };
-  if ($@) {
-    die "uh oh: $@";
-  }
+  eval { File::AtomicWrite->write_file(...) };
+  if ($@) { die "uh oh: $@" }
 
 The module attempts to C<flush> and C<sync> the temporary filehandle
-prior to the C<rename> call. This may cause portability problems. If
-so, please let the author know. Also notify the author if false
-positives from the C<close> call are observed.
+prior to the C<rename> call. This may cause portability problems. If so,
+please let the author know. Also notify the author if false positives
+from the C<close> call are observed.
 
 =head1 CLASS METHODS
 
@@ -518,7 +496,7 @@ positives from the C<close> call are observed.
 Requires a hash reference that must contain both the B<input> and
 B<file> options. Performs the various required steps in a single method
 call. Only if all checks pass will the B<input> data be moved to the
-B<file> file via C<rename>. If not, the module will throw an error, and
+B<file> file via C<rename>. If not, the module will throw an error and
 attempt to cleanup any temporary files created.
 
 See L</"OPTIONS"> for additional settings that can be passed to
@@ -526,8 +504,8 @@ C<write_file>.
 
 B<write_file> installs C<local> signal handlers for C<INT>, C<TERM>, and
 C<__DIE__> to try to cleanup any active temporary files if the process
-is killed or dies. If these are a problem, use the OO interface, and
-setup appropriate signal handlers for the application.
+is killed or dies. If these are a problem instead use the OO interface
+and setup signal handlers as necessary.
 
 =item B<safe_level> I<safe_level value>
 
@@ -545,35 +523,34 @@ a sufficient number of C<X> that suffix the template string, as
 otherwise L<File::Temp> will throw an error:
 
   template => "mytmp.X",          # Wrong
-  template => "mytmp.XXXXXXXX",   # better
+  template => "mytmp.XXXXXXXXXX", # better
 
 Can also be set via the B<template> option.
 
 =item B<new> I<options hash reference>
 
-Takes all the same options as C<write_file>, excepting the C<input>
-option, and returns an object. Sanity checks are deferred until the
-B<commit> method is called. See L</"OPTIONS"> for additional settings
-that can be passed to C<new>.
+Takes most of the same options as C<write_file> and returns an object,
+notably not I<input> on the presumption that the temporary file or file
+handle will be used by other code to write the file. Sanity checks are
+deferred until the B<commit> method is called. The B<checksum> method
+call with a suitable argument is required for that verification to pass.
 
-In the event a rollback is required, C<undef> the File::AtomicWrite
-object. The object destructor should then unlink the temporary file.
-However, should the process receive a TERM, INT, or other signal that
-causes the script to exit, the temporary file will not be cleaned up
-(as observed during testing on several modern *BSD and Linux
-variants). A signal handler must be installed, which then allows the
-cleanup code to run:
+If a rollback is required C<undef> the File::AtomicWrite object; the
+object destructor should then unlink the temporary file. However, should
+the process receive a TERM, INT, or other signal that causes the script
+to exit the temporary file will not be cleaned up. If this is
+undesirable, a signal handler must be installed:
 
   my $aw = File::AtomicWrite->new({file => 'somefile'});
   for my $sig_name (qw/INT TERM/) {
-    $SIG{$sig_name} = sub { exit }
+      $SIG{$sig_name} = sub { exit }
   }
   ...
 
 Consult perlipc(1) for more information on signal handling, and the
-C<eg/cleanup-test> program under this module distribution. A
-C<__DIE__> signal handler may also be necessary, consult the C<die>
-L<perlfunc> documentation for details.
+C<eg/cleanup-test> program under this module distribution. A C<__DIE__>
+signal handler may also be necessary, consult the C<die> L<perlfunc>
+documentation for details.
 
 Instances must not be reused; create a new instance instead of calling
 B<new> again on an existing instance. Reuse may cause undefined behavior
@@ -607,24 +584,23 @@ performed. If these pass, the temporary file will be renamed to the
 real filename.
 
 No subsequent use of the instance should be made after calling this
-method, as this would lead to undefined behavior (and probably many
-error messages).
+method as this would lead to undefined behavior.
 
 =back
 
 =head1 OPTIONS
 
 The B<write_file> and B<new> methods accept a number of options,
-supplied via a hash reference:
+supplied via a hash reference. Mandatory options:
 
 =over 4
 
 =item B<file> => I<filename>
 
-Mandatory. A filename in the current working directory, or a path to the
-file that will (eventually) be created. By default, the temporary file
-will be written into the parent directory of the B<file> path. This
-default can be changed by using the B<tmpdir> option.
+A filename in the current working directory, or a path to the file that
+will (eventually) be created. By default, the temporary file will be
+written into the parent directory of the B<file> path. This default can
+be changed by using the B<tmpdir> option.
 
 If the B<MKPATH> option is true, the module will attempt to create any
 missing directories. If the B<MKPATH> option is false or not set, the
@@ -633,10 +609,104 @@ not exist.
 
 =item B<input> => I<scalar ref or filehandle>
 
-Mandatory for the B<write_file> method, illegal for the B<new>
-method. Scalar reference, or otherwise some filehandle reference that
-can be looped over via C<E<lt>E<gt>>. Supplies the data to be written
-to B<file>.
+Mandatory for the B<write_file> method, illegal for the B<new> method.
+Scalar reference, or otherwise some filehandle reference that can be
+looped over via C<readline>. Supplies the data to be written to B<file>.
+
+=back
+
+Optional options:
+
+=over 4
+
+=item B<backup> => I<suffix>
+
+Make a backup with this (non-empty) suffix. The backup is always
+created, even if there was no change. If a previous backup existed, it
+is deleted first. Usual throwing of error.
+
+=item B<BINMODE> => I<true or false>
+
+If true, C<binmode> is set on the temporary filehandle prior to
+writing the B<input> data to it. Default is not to set C<binmode>.
+
+=item B<binmode_layer> => I<LAYER>
+
+Supply a C<LAYER> argument to C<binmode>. Enables B<BINMODE>.
+
+  # just binmode (binary data)
+  ...->write_file({ ..., BINMODE => 1 });
+
+  # custom binmode layer
+  ...->write_file({ ..., binmode_layer => ':utf8' });
+
+=item B<checksum> => I<sha1 hexdigest>
+
+If this option exists, and B<CHECKSUM> is true, the module will not
+create a L<Digest::SHA1> C<hexdigest> of the data being written out to
+disk, but instead will rely on the value passed by the caller.
+
+Only for the B<write_file> interface; instead call the B<checksum>
+method to supply a C<hexdigest> checksum of the data written when using
+the instance interface; see the L</SYNOPSIS> for an example of this.
+
+=item B<CHECKSUM> => I<true or false>
+
+If true, L<Digest::SHA1> will be used to checksum the data read back
+from the disk against the checksum derived from the data written out to
+the temporary file.
+
+Use the B<checksum> option (or B<checksum> method) to supply a
+L<Digest::SHA1> C<hexdigest> checksum. This will spare the module the
+task of computing the checksum on the data being written.
+
+Only for the B<write_file> interface.
+
+=item B<min_size> => I<size>
+
+Specify a minimum size (in bytes) that the data written must
+exceed. If not, the module throws an error. (It was a process that
+wrote out a zero-sized C</etc/passwd> file that prompted the
+creation of this module.)
+
+=item B<MKPATH> => I<true or false>
+
+If true, attempt to create the parent directories of B<file> should that
+directory not exist. If false (or unset), and the parent directory does
+not exist, the module throws an error. If the directory cannot be
+created, the module throws an error.
+
+If true, this option will also attempt to create the B<tmpdir>
+directory, if that option is set.
+
+=item B<mode> => I<unix mode>
+
+Accepts a Unix mode for C<chmod> to be applied to the file. Usual
+throwing of error. If the mode is a string starting with C<0>,
+C<oct> is used to convert it:
+
+  my $orig_mode = (stat $source_file)[2] & 07777;
+  ...->write_file({ ..., mode => $orig_mode });
+
+  my $mode = '0644';
+  ...->write_file({ ..., mode => $mode });
+
+The module does not change C<umask>, nor is there a means to specify
+the permissions on directories created if B<MKPATH> is set.
+
+=item B<mtime> => I<mtime>
+
+Accepts C<mtime> timestamp for C<utime> to be applied to the file.
+Usual throwing of error.
+
+=item B<owner> => I<unix ownership string>
+
+Accepts similar arguments to chown(1) to be applied via C<chown>
+to the file. Usual throwing of error.
+
+  ...->write_file({ ..., owner => '0'   });
+  ...->write_file({ ..., owner => '0:0' });
+  ...->write_file({ ..., owner => 'user:somegroup' });
 
 =item B<safe_level> => I<safe_level value>
 
@@ -655,47 +725,13 @@ L<File::Temp> will throw an error.
 
 Can also be set via the B<set_template> class method.
 
-=item B<min_size> => I<size>
-
-Specify a minimum size (in bytes) that the data written must exceed. If
-not, the module throws an error.
-
-=item B<mode> => I<unix mode>
-
-Accepts a Unix mode for C<chmod> to be applied to the file. Usual
-throwing of error. If the mode is a string starting with C<0>,
-C<oct> is used to convert it:
-
-  my $orig_mode = (stat $source_file)[2] & 07777;
-  ...->write_file({ ..., mode => $orig_mode });
-
-  my $mode = '0644';
-  ...->write_file({ ..., mode => $mode });
-
-The module does not change C<umask>, nor is there a means to specify
-the permissions on directories created if B<MKPATH> is set.
-
-=item B<owner> => I<unix ownership string>
-
-Accepts similar arguments to chown(1) to be applied via C<chown>
-to the file. Usual throwing of error.
-
-  ...->write_file({ ..., owner => '0'   });
-  ...->write_file({ ..., owner => '0:0' });
-  ...->write_file({ ..., owner => 'user:somegroup' });
-
-=item B<mtime> => I<mtime>
-
-Accepts C<mtime> timestamp for C<utime> to be applied to the file.
-Usual throwing of error.
-
 =item B<tmpdir> => I<directory>
 
 If set to a directory, the temporary file will be written to this
 directory instead of by default to the parent directory of the target
 B<file>. If the B<tmpdir> is on a different partition than the parent
 directory for B<file>, or if anything else goes awry, the module will
-throw an error, as rename(2) cannot operate across partition boundaries.
+throw an error: rename(2) does not operate across partition boundaries.
 
 This option is advisable when writing files to include directories such
 as C</etc/logrotate.d>, as the programs that read include files from
@@ -704,65 +740,13 @@ written. To avoid this (slight but non-zero) risk, use the B<tmpdir>
 option to write the configuration out in full under a different
 directory on the same partition.
 
-=item B<backup> => I<suffix>
-
-Make a backup with this (non-empty) suffix. The backup is always created,
-even if there was no change. If a previous backup existed, it is deleted
-first. Usual throwing of error.
-
-=item B<checksum> => I<sha1 hexdigest>
-
-If this option exists, and B<CHECKSUM> is true, the module will not
-create a L<Digest::SHA1> C<hexdigest> of the data being written out to
-disk, but instead will rely on the value passed by the caller.
-
-=item B<CHECKSUM> => I<true or false>
-
-If true, L<Digest::SHA1> will be used to checksum the data read back
-from the disk against the checksum derived from the data written out to
-the temporary file.
-
-Use the B<checksum> option (or B<checksum> method) to supply a
-L<Digest::SHA1> C<hexdigest> checksum. This will spare the
-module the task of computing the checksum on the data being written.
-
-=item B<BINMODE> => I<true or false>
-
-If true, C<binmode> is set on the temporary filehandle prior to
-writing the B<input> data to it. Default is not to set C<binmode>.
-
-=item B<binmode_layer> => I<LAYER>
-
-Supply a C<LAYER> argument to C<binmode>. Enables B<BINMODE>.
-
-  # just binmode (binary data)
-  ...->write_file({ ..., BINMODE => 1 });
-
-  # custom binmode layer
-  ...->write_file({ ..., binmode_layer => ':utf8' });
-
-=item B<MKPATH> => I<true or false>
-
-If true, attempt to create the parent directories of B<file> should that
-directory not exist. If false (or unset), and the parent directory does
-not exist, the module throws an error. If the directory cannot be
-created, the module throws an error.
-
-If true, this option will also attempt to create the B<tmpdir>
-directory, if that option is set.
-
 =back
 
 =head1 BUGS
 
-No known bugs.
+No known bugs (lots of potential issues, though, see below).
 
 =head2 Reporting Bugs
-
-Newer versions of this module may be available from CPAN.
-
-If the bug is in the latest version, send a report to the author.
-Patches that fix problems or add new features are welcome.
 
 L<http://github.com/thrig/File-AtomicWrite>
 
@@ -798,15 +782,13 @@ set, such as C<data=journal> or C<data=ordered> on ext3, so that any
 crashes or unexpected glitches have less chance of unanticipated
 problems (such as the file write being ordered after the rename).
 
+Renames may strip fancy ACL or selinux contexts.
+
 =head1 SEE ALSO
 
 Supporting modules:
 
-L<File::Temp>, L<File::Path>, L<File::Basename>, L<Digest::SHA1>
-
-Alternatives, depending on the need, include:
-
-L<IO::Atomic>, L<File::Transaction>, L<File::Transaction::Atomic>, L<Directory::Transactional>
+L<Digest::SHA1>, L<File::Basename>, L<File::Path>, L<File::Temp>
 
 This isn't easy:
 

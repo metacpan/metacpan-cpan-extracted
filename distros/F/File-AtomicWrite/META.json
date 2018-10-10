@@ -52,6 +52,6 @@
          "url" : "https://github.com/thrig/File-AtomicWrite"
       }
    },
-   "version" : "1.20",
+   "version" : "1.21",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

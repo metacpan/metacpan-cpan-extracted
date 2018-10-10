@@ -1,7 +1,7 @@
 package WWW::PAUSE::Simple;
 
-our $DATE = '2018-04-26'; # DATE
-our $VERSION = '0.441'; # VERSION
+our $DATE = '2018-10-09'; # DATE
+our $VERSION = '0.442'; # VERSION
 
 use 5.010001;
 use strict;
@@ -867,7 +867,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.441 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2018-04-26.
+This document describes version 0.442 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2018-10-09.
 
 =head1 SYNOPSIS
 
@@ -1475,6 +1475,9 @@ L<CPAN::Uploader> which also does uploading from CLI.
 
 L<WWW::PAUSE::CleanUpHomeDir> which can clean old releases from your PAUSE
 account (CLI script is provided in example).
+
+L<App::PAUSE::cleanup> which also cleans old releases from your PAUSE account,
+with CLI included L<pause-cleanup>.
 
 L<https://perlancar.wordpress.com/2015/03/25/interacting-with-pause-using-cli/>
 

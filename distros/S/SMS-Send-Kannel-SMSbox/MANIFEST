@@ -12,4 +12,5 @@ t/kwalitee.t
 t/pod-coverage.t
 t/pod-spell.t
 t/pod.t
+scripts/perl-SMS-Send-Kannel-SMSbox-send_sms.pl
 META.yml                                 Module meta-data (added by MakeMaker)

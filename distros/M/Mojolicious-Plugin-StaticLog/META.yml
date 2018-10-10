@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
 license: artistic_2
 meta-spec:
@@ -17,6 +17,12 @@ no_index:
   directory:
     - t
     - inc
+    - t
 requires:
-  Mojolicious: '6.44'
-version: '0.05'
+  Mojolicious: '8.02'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/frank-carnovale/Mojolicious-Plugin-StaticLog/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/frank-carnovale/Mojolicious-Plugin-StaticLog.git
+version: '0.07'

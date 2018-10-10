@@ -1,7 +1,7 @@
 package Data::Clean::JSON;
 
-our $DATE = '2017-01-15'; # DATE
-our $VERSION = '0.38'; # VERSION
+our $DATE = '2018-10-09'; # DATE
+our $VERSION = '0.391'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,6 +17,12 @@ our @EXPORT_OK = qw(
 
 sub new {
     my ($class, %opts) = @_;
+
+    # from FromJSON
+    $opts{"JSON::PP::Boolean"} //= ['one_or_zero'];
+    $opts{"JSON::XS::Boolean"} //= ['one_or_zero']; # this doesn't exist though
+    $opts{"Cpanel::JSON::XS::Boolean"} //= ['one_or_zero']; # this doesn't exist though
+
     $opts{DateTime}  //= [call_method => 'epoch'];
     $opts{'Time::Moment'} //= [call_method => 'epoch'];
     $opts{'Math::BigInt'} //= [call_method => 'bstr'];
@@ -61,7 +67,7 @@ Data::Clean::JSON - Clean data so it is safe to output to JSON
 
 =head1 VERSION
 
-This document describes version 0.38 of Data::Clean::JSON (from Perl distribution Data-Clean-JSON), released on 2017-01-15.
+This document describes version 0.391 of Data::Clean::JSON (from Perl distribution Data-Clean-JSON), released on 2018-10-09.
 
 =head1 SYNOPSIS
 
@@ -109,6 +115,19 @@ default:
 
 =item * Clone circular references
 
+With a default limit of 1, meaning that if a reference is first seen again for
+the first time, it will be cloned. But if it is seen again for the second time,
+it will be replaced with "CIRCULAR".
+
+To change the default limit, customize your cleanser object:
+
+ $cleanser = Data::Clean::JSON->new(
+     -circular => ["clone", 4],
+ );
+
+or you can perform other action for circular references, see L<Data::Clean> for
+more details.
+
 =item * Unbless other types of objects
 
 =back
@@ -129,10 +148,10 @@ invoke callback for each data item. This module, on the other hand, generates a
 cleanser code using eval(), using native Perl for() loops.
 
 If C<LOG_CLEANSER_CODE> environment is set to true, the generated cleanser code
-will be logged using L<Log::Any> at trace level. You can see it, e.g. using
-L<Log::Any::App>:
+will be logged using L<Log::get> at trace level. You can see it, e.g. using
+L<Log::ger::Output::Screen>:
 
- % LOG=1 LOG_CLEANSER_CODE=1 TRACE=1 perl -MLog::Any::App -MData::Clean::JSON \
+ % LOG_CLEANSER_CODE=1 perl -MLog::ger::Output=Screen -MLog::ger::Level::trace -MData::Clean::JSON \
    -e'$c=Data::Clean::JSON->new; ...'
 
 =head1 FUNCTIONS
@@ -228,7 +247,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Clean
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Data-Clean-JSON>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Clean-JSON>.
 
 =head1 BUGS
 
@@ -257,7 +276,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

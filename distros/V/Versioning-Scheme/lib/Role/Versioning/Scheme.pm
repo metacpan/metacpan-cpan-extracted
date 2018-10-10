@@ -24,7 +24,7 @@ Role::Versioning::Scheme - Role for Versioning::Scheme::* modules
 
 =head1 VERSION
 
-This document describes version 0.003 of Role::Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2018-10-05.
+This document describes version 0.005 of Role::Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2018-10-11.
 
 =head1 REQUIRED METHODS
 

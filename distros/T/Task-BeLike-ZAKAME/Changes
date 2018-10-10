@@ -1,5 +1,10 @@
 Revision history for Perl extension Task-BeLike-ZAKAME
 
+0.20 2018-10-10T03:07:12Z
+
+    - Add App::cpanlistchanges and Software::License to requires
+    - Add CPAN::Audit and Devel::MAT to recommends
+
 0.19 2018-06-25T01:47:32Z
 
     - Add Test2::Suite to recommends

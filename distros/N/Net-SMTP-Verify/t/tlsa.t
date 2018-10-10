@@ -3,9 +3,15 @@
 use warnings;
 use strict;
 
-use Test::More tests => 3;
+use Test::More;
 use Test::Exception;
 use Net::DNS::Resolver;
+
+unless($ENV{'INTERNET_TESTING'}) {
+  plan skip_all => 'No remote tests. (to enable set INTERNET_TESTING=1)';
+}
+
+plan tests => 3;
 
 use_ok('Net::SMTP::Verify');
 my $v = Net::SMTP::Verify->new(

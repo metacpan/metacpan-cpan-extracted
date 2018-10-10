@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-09-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-10-10'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint completer=1 for=ssh
@@ -28,11 +28,14 @@ $optspec->{'{arg}'} = {
             my $history = App::sshwrap::hostcolor::read_history_file();
             my $ans = Complete::Util::complete_array_elem(
                 array => [keys %$history], word => $args{word});
-            if ($ans && ref($ans) eq 'ARRAY' && @$ans == 1 &&
-                    $history->{$ans->[0]}) {
-                require XTerm::Util;
-                log_trace "Setting background color for $ans->[0] ($history->{$ans->[0]}) ...";
-                XTerm::Util::set_term_bgcolor($history->{$ans->[0]}, 1);
+            if ($ans && ref($ans) eq 'ARRAY') {
+                if (!@$ans) {
+                    return undef;
+                } elsif (@$ans == 1 && $history->{$ans->[0]}) {
+                    require XTerm::Util;
+                    log_trace "Setting background color for $ans->[0] ($history->{$ans->[0]}) ...";
+                    XTerm::Util::set_term_bgcolor($history->{$ans->[0]}, 1);
+                }
             }
             $ans;
         } else {
@@ -58,7 +61,7 @@ _sshwrap-hostcolor - Shell completer for ssh (sshwrap-hostcolor)
 
 =head1 VERSION
 
-This document describes version 0.005 of _sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2018-09-26.
+This document describes version 0.006 of _sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2018-10-10.
 
 =head1 SYNOPSIS
 

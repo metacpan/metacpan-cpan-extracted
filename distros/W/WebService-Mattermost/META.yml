@@ -1,0 +1,30 @@
+---
+abstract: 'a SDK for interacting with Mattermost.'
+author:
+  - 'Mike Jones <mike@netsplit.org.uk>'
+build_requires:
+  Test::Compile: '0'
+  Test::Most: '0'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Mattermost
+requires:
+  DateTime: '0'
+  Encode: '0'
+  List::MoreUtils: '0'
+  Mojolicious: '0'
+  Moo: '0'
+  MooX::HandlesVia: '0'
+  Moose: '0'
+  Readonly: '0'
+  Role::EventEmitter: '0'
+  Types::Standard: '0'
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

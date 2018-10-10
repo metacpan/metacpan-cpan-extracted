@@ -4,14 +4,14 @@
 
 my $_pci_metas = do{my$a={cleanup=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},num_keep=>{cmdline_aliases=>{n=>{}},default=>1,description=>"\n1 means to only keep the newest version, 2 means to keep the newest and the\nsecond newest, and so on.\n\n",schema=>["int",{min=>1,req=>1},{}],summary=>"Number of new versions (including newest) to keep"},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>["common"]},protect_files=>{schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Protect some files/wildcard patterns from delete/cleanup",tags=>["category:filtering"],"x.name.is_plural"=>1},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>["common"]},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>["common"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>["common"]}},description=>"\nDeveloper releases will not be deleted.\n\nTo delete developer releases, you can use `delete_files` (rm), e.g. from the\ncommand line:\n\n    % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases\n    % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore\n\n",features=>{dry_run=>1},result=>{},summary=>"Delete older versions of distributions",v=>1.1},ls=>{args=>{del=>{schema=>["bool",{},{}],summary=>"Only list files which are scheduled for deletion","summary.alt.bool.not"=>"Only list files which are not scheduled for deletion",tags=>["category:filtering"]},detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},files=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern",tags=>["category:filtering"],"x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},result=>{},summary=>"List files",v=>1.1},"ls-dists"=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},newest=>{description=>"\nDev versions will be skipped.\n\n",schema=>["bool",{},{}],summary=>"Only show newest non-dev version"},newest_n=>{description=>"\nDev versions will be skipped.\n\n",schema=>["int",{min=>1,req=>1},{}],summary=>"Only show this number of newest non-dev versions"},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nDistribution names will be extracted from tarball/zip filenames.\n\nUnknown/unparseable filenames will be skipped.\n\n",result=>{},summary=>"List distributions",v=>1.1},"ls-mods"=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},modules=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Module names/wildcard patterns","summary.alt.plurality.singular"=>"Module name/wildcard pattern",tags=>["category:filtering"],"x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},type=>{schema=>["str",{req=>1},{}],summary=>"Only list modules matching certain type",tags=>["category:filtering"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},result=>{},summary=>"List modules (permissions)",v=>1.1},reindex=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},features=>{dry_run=>1},result=>{},summary=>"Force reindexing",v=>1.1},rm=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},protect_files=>{schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Protect some files/wildcard patterns from delete/cleanup",tags=>'fix',"x.name.is_plural"=>1},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\n",features=>{dry_run=>1},result=>{},summary=>"Delete files",v=>1.1},undelete=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\n",features=>{dry_run=>1},result=>{},summary=>"Undelete files",v=>1.1},upload=>{args=>{delay=>{description=>"\nIf you upload a lot of files (e.g. 7-10 or more) at a time, the PAUSE indexer\ncurrently might choke with SQLite database locking problem and thus fail to\nindex your releases. Giving a delay of say 2-3 minutes (120-180 seconds) between\nfiles will alleviate this problem.\n\n",schema=>["duration",{req=>1},{}],summary=>"Pause a number of seconds between files"},files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},subdir=>{default=>"",schema=>["str",{req=>1},{}],summary=>"Subdirectory to put the file(s) into"},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},args_rels=>{choose_one=>["delay"]},features=>{dry_run=>1},result=>{},summary=>"Upload file(s)",v=>1.1}};$a->{ls}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{ls}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{ls}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{ls}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{"ls-dists"}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{"ls-dists"}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{"ls-dists"}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{"ls-dists"}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{"ls-mods"}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{"ls-mods"}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{"ls-mods"}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{"ls-mods"}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{reindex}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{reindex}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{reindex}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{reindex}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{rm}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{rm}{args}{protect_files}{tags}=$a->{cleanup}{args}{protect_files}{tags};$a->{rm}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{rm}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{rm}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{undelete}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{undelete}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{undelete}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{undelete}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{upload}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{upload}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{upload}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{upload}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.53 on Mon Jul 24 20:06:58 2017.
+# This script is generated by Perinci::CmdLine::Inline version 0.544 on Tue Oct  9 13:10:12 2018.
 
-# Rinci metadata taken from these modules: WWW::PAUSE::Simple 0.43
+# Rinci metadata taken from these modules: WWW::PAUSE::Simple 0.442
 
 # You probably should not manually edit this file.
 
-our $DATE = '2017-07-24'; # DATE
-our $VERSION = '0.64'; # VERSION
+our $DATE = '2018-10-09'; # DATE
+our $VERSION = '0.650'; # VERSION
 # PODNAME: pause
 # ABSTRACT: A CLI for PAUSE
 
@@ -19,6 +19,9 @@ package main;
 use 5.010001;
 use strict;
 #use warnings;
+
+# modules
+
 
 ### enable logging
 require Log::ger::Output; Log::ger::Output->set("Screen", formatter => sub { "pause: " . $_[0] },);
@@ -63,7 +66,7 @@ my $go_spec1 = {
   'config-profile=s' => sub { $_pci_r->{config_profile} = $_[1]; },
   'debug' => sub { require Log::ger::Util; Log::ger::Util::set_level("debug"); $_pci_r->{log_level} = "debug"; },
   'format=s' => sub { $_pci_r->{format} = $_[1]; },
-  'help|h|?' => sub { my $sc_name = $_pci_r->{subcommand_name}; my $first_non_opt_arg; for (@ARGV) { next if /^-/; $first_non_opt_arg = $_; last } if (!length $sc_name && defined $first_non_opt_arg) { $sc_name = $first_non_opt_arg } if (!length $sc_name) { print $help_msg } elsif ($sc_name eq "") { print "pause - A CLI for PAUSE\n\nUsage:\n  pause --help (or -h, -?)\n  pause --subcommands\n  pause --version (or -v)\n  pause [options]\n\nSubcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --cmd=s                        Select subcommand\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --subcommands                  List available subcommands\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "cleanup") { print "pause cleanup - Delete older versions of distributions\n\nUsage:\n  pause cleanup --help (or -h, -?)\n  pause cleanup --version (or -v)\n  pause cleanup [options]\n\nDeveloper releases will not be deleted.\n\nTo delete developer releases, you can use `delete_files` (rm), e.g. from the\ncommand line:\n\n    % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases\n    % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore\n\nMain options:\n  --detail, -l      Whether to return detailed records\n  --num-keep=i, -n  Number of new versions (including newest) to keep [1]\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls") { print "pause ls - List files\n\nUsage:\n  pause ls --help (or -h, -?)\n  pause ls --version (or -v)\n  pause ls [options] [files] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --del      Only list files which are scheduled for deletion\n  --file=s\@  File name/wildcard pattern (=arg[0-])\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-dists") { print "pause ls-dists - List distributions\n\nUsage:\n  pause ls-dists --help (or -h, -?)\n  pause ls-dists --version (or -v)\n  pause ls-dists [options]\n\nDistribution names will be extracted from tarball/zip filenames.\n\nUnknown/unparseable filenames will be skipped.\n\nMain options:\n  --detail, -l  Whether to return detailed records\n  --newest      Only show newest non-dev version\n  --newest-n=i  Only show this number of newest non-dev versions\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-mods") { print "pause ls-mods - List modules (permissions)\n\nUsage:\n  pause ls-mods --help (or -h, -?)\n  pause ls-mods --version (or -v)\n  pause ls-mods [options] [modules] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --module=s\@  Module name/wildcard pattern (=arg[0-])\n  --type=s     Only list modules matching certain type\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "reindex") { print "pause reindex - Force reindexing\n\nUsage:\n  pause reindex --help (or -h, -?)\n  pause reindex --version (or -v)\n  pause reindex [options] <files> ...\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "rm") { print "pause rm - Delete files\n\nUsage:\n  pause rm --help (or -h, -?)\n  pause rm --version (or -v)\n  pause rm [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "undelete") { print "pause undelete - Undelete files\n\nUsage:\n  pause undelete --help (or -h, -?)\n  pause undelete --version (or -v)\n  pause undelete [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "upload") { print "pause upload - Upload file(s)\n\nUsage:\n  pause upload --help (or -h, -?)\n  pause upload --version (or -v)\n  pause upload [options] <files> ...\n\nMain options:\n  --delay=s   Pause a number of seconds between files\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n  --subdir=s  Subdirectory to put the file(s) into [\"\"]\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } else { _pci_err([500, "Unknown subcommand2: $sc_name"]) } exit 0 },
+  'help|h|?' => sub { my $sc_name = $_pci_r->{subcommand_name}; my $first_non_opt_arg; for (@ARGV) { next if /^-/; $first_non_opt_arg = $_; last } if (!length $sc_name && defined $first_non_opt_arg) { $sc_name = $first_non_opt_arg } if (!length $sc_name) { print $help_msg } elsif ($sc_name eq "") { print "pause - A CLI for PAUSE\n\nUsage:\n  pause --help (or -h, -?)\n  pause --subcommands\n  pause --version (or -v)\n  pause [options]\n\nSubcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --cmd=s                        Select subcommand\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --subcommands                  List available subcommands\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "cleanup") { print "pause cleanup - Delete older versions of distributions\n\nUsage:\n  pause cleanup --help (or -h, -?)\n  pause cleanup --version (or -v)\n  pause cleanup [options]\n\nDeveloper releases will not be deleted.\n\nTo delete developer releases, you can use `delete_files` (rm), e.g. from the\ncommand line:\n\n    % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases\n    % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore\n\nMain options:\n  --detail, -l      Whether to return detailed records\n  --num-keep=s, -n  Number of new versions (including newest) to keep [1]\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls") { print "pause ls - List files\n\nUsage:\n  pause ls --help (or -h, -?)\n  pause ls --version (or -v)\n  pause ls [options] [files] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --del      Only list files which are scheduled for deletion\n  --file=s\@  File name/wildcard pattern (=arg[0-])\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-dists") { print "pause ls-dists - List distributions\n\nUsage:\n  pause ls-dists --help (or -h, -?)\n  pause ls-dists --version (or -v)\n  pause ls-dists [options]\n\nDistribution names will be extracted from tarball/zip filenames.\n\nUnknown/unparseable filenames will be skipped.\n\nMain options:\n  --detail, -l  Whether to return detailed records\n  --newest      Only show newest non-dev version\n  --newest-n=s  Only show this number of newest non-dev versions\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-mods") { print "pause ls-mods - List modules (permissions)\n\nUsage:\n  pause ls-mods --help (or -h, -?)\n  pause ls-mods --version (or -v)\n  pause ls-mods [options] [modules] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --module=s\@  Module name/wildcard pattern (=arg[0-])\n  --type=s     Only list modules matching certain type\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "reindex") { print "pause reindex - Force reindexing\n\nUsage:\n  pause reindex --help (or -h, -?)\n  pause reindex --version (or -v)\n  pause reindex [options] <files> ...\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "rm") { print "pause rm - Delete files\n\nUsage:\n  pause rm --help (or -h, -?)\n  pause rm --version (or -v)\n  pause rm [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "undelete") { print "pause undelete - Undelete files\n\nUsage:\n  pause undelete --help (or -h, -?)\n  pause undelete --version (or -v)\n  pause undelete [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "upload") { print "pause upload - Upload file(s)\n\nUsage:\n  pause upload --help (or -h, -?)\n  pause upload --version (or -v)\n  pause upload [options] <files> ...\n\nMain options:\n  --delay=s   Pause a number of seconds between files\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n  --subdir=s  Subdirectory to put the file(s) into [\"\"]\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=s                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } else { _pci_err([500, "Unknown subcommand2: $sc_name"]) } exit 0 },
   'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
   'log-level=s' => sub { if ($_[1] eq "trace") { require Log::ger::Util; Log::ger::Util::set_level("trace") } if ($_[1] eq "debug") { require Log::ger::Util; Log::ger::Util::set_level("debug") } if ($_[1] eq "info" ) { require Log::ger::Util; Log::ger::Util::set_level("info" ) } if ($_[1] eq "error") { require Log::ger::Util; Log::ger::Util::set_level("warn" ) } if ($_[1] eq "fatal") { require Log::ger::Util; Log::ger::Util::set_level("debug") } if ($_[1] eq "none")  { require Log::ger::Util; Log::ger::Util::set_level("off"  ) } if ($_[1] eq "off")   { require Log::ger::Util; Log::ger::Util::set_level("off"  ) } $_pci_r->{log_level} = $_[1]; },
   'naked-res' => sub { $_pci_r->{naked_res} = 1; },
@@ -74,7 +77,7 @@ my $go_spec1 = {
   'subcommands' => sub { print "Available subcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n"; exit 0 },
   'trace' => sub { require Log::ger::Util; Log::ger::Util::set_level("trace"); $_pci_r->{log_level} = "trace"; },
   'verbose' => sub { require Log::ger::Util; Log::ger::Util::set_level("info" ); $_pci_r->{log_level} = "info" ; },
-  'version|v' => sub { no warnings 'once'; require WWW::PAUSE::Simple; print "pause version ", $main::VERSION // '?', ($main::DATE ? " ($main::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.53 (2017-07-04)\n"; exit 0 },
+  'version|v' => sub { no warnings 'once'; require WWW::PAUSE::Simple; print "pause version ", $main::VERSION // '?', ($main::DATE ? " ($main::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.544 (2018-10-03)\n"; exit 0 },
 };
 my $go_spec2 = {
   options => {
@@ -139,7 +142,7 @@ my $go_spec2 = {
         'l' => {
           handler => sub { $_pci_args{'detail'} = $_[1]; },
         },
-        'n=i' => {
+        'n=s' => {
           handler => sub { $_pci_args{'num_keep'} = $_[1]; },
         },
         'no-detail' => {
@@ -148,7 +151,7 @@ my $go_spec2 = {
         'nodetail' => {
           handler => sub { $_pci_args{'detail'} = 0; },
         },
-        'num-keep=i' => {
+        'num-keep=s' => {
           handler => sub { $_pci_args{'num_keep'} = $_[1]; },
         },
         'password=s' => {
@@ -160,7 +163,7 @@ my $go_spec2 = {
         'protect-files-json=s' => {
           handler => sub { $_pci_args{'protect_files'} = _pci_json()->decode($_[1]); },
         },
-        'retries=i' => {
+        'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
         'retry-delay=s' => {
@@ -203,7 +206,7 @@ my $go_spec2 = {
         'password=s' => {
           handler => sub { $_pci_args{'password'} = $_[1]; },
         },
-        'retries=i' => {
+        'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
         'retry-delay=s' => {
@@ -225,7 +228,7 @@ my $go_spec2 = {
         'newest' => {
           handler => sub { $_pci_args{'newest'} = $_[1]; },
         },
-        'newest-n=i' => {
+        'newest-n=s' => {
           handler => sub { $_pci_args{'newest_n'} = $_[1]; },
         },
         'no-detail' => {
@@ -243,7 +246,7 @@ my $go_spec2 = {
         'password=s' => {
           handler => sub { $_pci_args{'password'} = $_[1]; },
         },
-        'retries=i' => {
+        'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
         'retry-delay=s' => {
@@ -277,7 +280,7 @@ my $go_spec2 = {
         'password=s' => {
           handler => sub { $_pci_args{'password'} = $_[1]; },
         },
-        'retries=i' => {
+        'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
         'retry-delay=s' => {
@@ -302,7 +305,7 @@ my $go_spec2 = {
         'password=s' => {
           handler => sub { $_pci_args{'password'} = $_[1]; },
         },
-        'retries=i' => {
+        'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
         'retry-delay=s' => {
@@ -330,7 +333,7 @@ my $go_spec2 = {
         'protect-files-json=s' => {
           handler => sub { $_pci_args{'protect_files'} = _pci_json()->decode($_[1]); },
         },
-        'retries=i' => {
+        'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
         'retry-delay=s' => {
@@ -352,7 +355,7 @@ my $go_spec2 = {
         'password=s' => {
           handler => sub { $_pci_args{'password'} = $_[1]; },
         },
-        'retries=i' => {
+        'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
         'retry-delay=s' => {
@@ -377,7 +380,7 @@ my $go_spec2 = {
         'password=s' => {
           handler => sub { $_pci_args{'password'} = $_[1]; },
         },
-        'retries=i' => {
+        'retries=s' => {
           handler => sub { $_pci_args{'retries'} = $_[1]; },
         },
         'retry-delay=s' => {
@@ -522,7 +525,7 @@ elsif ($is_success && $is_stream) {}
 else { require Perinci::Result::Format::Lite; $is_stream=0; $fres = Perinci::Result::Format::Lite::format($_pci_r->{res}, ($_pci_r->{format} // $_pci_r->{res}[3]{"cmdline.default_format"} // "text"), $_pci_r->{naked_res}, 0) }
 
 my $use_utf8 = $_pci_r->{res}[3]{"x.hint.result_binary"} ? 0 : 0;
-if ($use_utf8) { binmode STDOUT, ":utf8" }
+if ($use_utf8) { binmode STDOUT, ":encoding(utf8)" }
 if ($is_stream) {
     my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $l; print "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { print _pci_json()->encode($rec),"\n" } }
 } else {
@@ -551,9 +554,125 @@ sub _pci_check_args {
         # fill from cmdline_src
 
         # fill defaults from "default" property and check against schema
+        no warnings ('void');
+        require Scalar::Util::Numeric::PP;
+        require List::Util;
+        require Time::Duration::Parse::AsHash;
+        require Scalar::Util;
+        my $_sahv_dpath;
+        my $_sahv_err;
+        if (exists $args->{"detail"}) {
+            $_sahv_dpath = [];
+            # skip if undef
+            (!defined($args->{"detail"}) ? 1 : 
+            
+            (# check type 'bool'
+            ((!ref($args->{"detail"})) ? 1 : (($_sahv_err //= "Not of type boolean value"),0))))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"num_keep"} //= 1;
+        if (exists $args->{"num_keep"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"num_keep"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"num_keep"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+            
+            &&
+            
+            (# clause: min
+            (($args->{"num_keep"} >= 1) ? 1 : (($_sahv_err //= "Must be at least 1"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"password"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"password"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"protect_files"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"protect_files"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'array'
+            ((ref($args->{"protect_files"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+            
+            &&
+            
+            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ((!defined(List::Util::first(sub {!(
+                        ($_sahv_dpath->[-1] = $_),
+                        # req #0
+                        ((defined($args->{"protect_files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+                        
+                        &&
+                        
+                        # check type 'str'
+                        ((!ref($args->{"protect_files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+                        )}, 0..@{$args->{"protect_files"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retries"} //= 5;
+        if (exists $args->{"retries"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retries"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retry_delay"} //= 3;
+        if (exists $args->{"retry_delay"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
+            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
+            
+            &&
+            
+            # check type 'duration'
+            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"username"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"username"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"username"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+            
+            &&
+            
+            (# clause: match
+            (($args->{"username"} =~ qr((?:(?-)\A\w{2,9}\z))) ? 1 : (($_sahv_err //= "Must match regex pattern \\A\\w{2,9}\\z"),0)))
+            
+            &&
+            
+            (# clause: max_len
+            ((length($args->{"username"}) <= 9) ? 1 : (($_sahv_err //= "Length must be at most 9"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
 
         # check required args
         return [400, "Missing required value for argument: num_keep"] if exists($args->{"num_keep"}) && !defined($args->{"num_keep"});
@@ -573,8 +692,117 @@ sub _pci_check_args {
         # fill from cmdline_src
 
         # fill defaults from "default" property and check against schema
+        no warnings ('void');
+        require List::Util;
+        require Scalar::Util::Numeric::PP;
+        require Time::Duration::Parse::AsHash;
+        require Scalar::Util;
+        my $_sahv_dpath;
+        my $_sahv_err;
+        if (exists $args->{"del"}) {
+            $_sahv_dpath = [];
+            # skip if undef
+            (!defined($args->{"del"}) ? 1 : 
+            
+            (# check type 'bool'
+            ((!ref($args->{"del"})) ? 1 : (($_sahv_err //= "Not of type boolean value"),0))))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"detail"}) {
+            $_sahv_dpath = [];
+            # skip if undef
+            (!defined($args->{"detail"}) ? 1 : 
+            
+            (# check type 'bool'
+            ((!ref($args->{"detail"})) ? 1 : (($_sahv_err //= "Not of type boolean value"),0))))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"files"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"files"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'array'
+            ((ref($args->{"files"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+            
+            &&
+            
+            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ((!defined(List::Util::first(sub {!(
+                        ($_sahv_dpath->[-1] = $_),
+                        # req #0
+                        ((defined($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+                        
+                        &&
+                        
+                        # check type 'str'
+                        ((!ref($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+                        )}, 0..@{$args->{"files"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"password"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"password"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retries"} //= 5;
+        if (exists $args->{"retries"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retries"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retry_delay"} //= 3;
+        if (exists $args->{"retry_delay"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
+            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
+            
+            &&
+            
+            # check type 'duration'
+            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"username"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"username"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"username"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+            
+            &&
+            
+            (# clause: match
+            (($args->{"username"} =~ qr((?:(?-)\A\w{2,9}\z))) ? 1 : (($_sahv_err //= "Must match regex pattern \\A\\w{2,9}\\z"),0)))
+            
+            &&
+            
+            (# clause: max_len
+            ((length($args->{"username"}) <= 9) ? 1 : (($_sahv_err //= "Length must be at most 9"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
 
         # check required args
         return [400, "Missing required value for argument: files"] if exists($args->{"files"}) && !defined($args->{"files"});
@@ -592,8 +820,107 @@ sub _pci_check_args {
         # fill from cmdline_src
 
         # fill defaults from "default" property and check against schema
+        no warnings ('void');
+        require Scalar::Util::Numeric::PP;
+        require Time::Duration::Parse::AsHash;
+        require Scalar::Util;
+        my $_sahv_dpath;
+        my $_sahv_err;
+        if (exists $args->{"detail"}) {
+            $_sahv_dpath = [];
+            # skip if undef
+            (!defined($args->{"detail"}) ? 1 : 
+            
+            (# check type 'bool'
+            ((!ref($args->{"detail"})) ? 1 : (($_sahv_err //= "Not of type boolean value"),0))))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"newest"}) {
+            $_sahv_dpath = [];
+            # skip if undef
+            (!defined($args->{"newest"}) ? 1 : 
+            
+            (# check type 'bool'
+            ((!ref($args->{"newest"})) ? 1 : (($_sahv_err //= "Not of type boolean value"),0))))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"newest_n"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"newest_n"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"newest_n"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+            
+            &&
+            
+            (# clause: min
+            (($args->{"newest_n"} >= 1) ? 1 : (($_sahv_err //= "Must be at least 1"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"password"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"password"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retries"} //= 5;
+        if (exists $args->{"retries"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retries"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retry_delay"} //= 3;
+        if (exists $args->{"retry_delay"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
+            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
+            
+            &&
+            
+            # check type 'duration'
+            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"username"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"username"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"username"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+            
+            &&
+            
+            (# clause: match
+            (($args->{"username"} =~ qr((?:(?-)\A\w{2,9}\z))) ? 1 : (($_sahv_err //= "Must match regex pattern \\A\\w{2,9}\\z"),0)))
+            
+            &&
+            
+            (# clause: max_len
+            ((length($args->{"username"}) <= 9) ? 1 : (($_sahv_err //= "Length must be at most 9"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
 
         # check required args
         return [400, "Missing required value for argument: newest_n"] if exists($args->{"newest_n"}) && !defined($args->{"newest_n"});
@@ -612,8 +939,119 @@ sub _pci_check_args {
         # fill from cmdline_src
 
         # fill defaults from "default" property and check against schema
+        no warnings ('void');
+        require List::Util;
+        require Scalar::Util::Numeric::PP;
+        require Time::Duration::Parse::AsHash;
+        require Scalar::Util;
+        my $_sahv_dpath;
+        my $_sahv_err;
+        if (exists $args->{"detail"}) {
+            $_sahv_dpath = [];
+            # skip if undef
+            (!defined($args->{"detail"}) ? 1 : 
+            
+            (# check type 'bool'
+            ((!ref($args->{"detail"})) ? 1 : (($_sahv_err //= "Not of type boolean value"),0))))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"modules"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"modules"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'array'
+            ((ref($args->{"modules"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+            
+            &&
+            
+            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ((!defined(List::Util::first(sub {!(
+                        ($_sahv_dpath->[-1] = $_),
+                        # req #0
+                        ((defined($args->{"modules"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+                        
+                        &&
+                        
+                        # check type 'str'
+                        ((!ref($args->{"modules"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+                        )}, 0..@{$args->{"modules"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"password"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"password"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retries"} //= 5;
+        if (exists $args->{"retries"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retries"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retry_delay"} //= 3;
+        if (exists $args->{"retry_delay"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
+            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
+            
+            &&
+            
+            # check type 'duration'
+            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"type"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"type"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"type"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"username"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"username"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"username"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+            
+            &&
+            
+            (# clause: match
+            (($args->{"username"} =~ qr((?:(?-)\A\w{2,9}\z))) ? 1 : (($_sahv_err //= "Must match regex pattern \\A\\w{2,9}\\z"),0)))
+            
+            &&
+            
+            (# clause: max_len
+            ((length($args->{"username"}) <= 9) ? 1 : (($_sahv_err //= "Length must be at most 9"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
 
         # check required args
         return [400, "Missing required value for argument: modules"] if exists($args->{"modules"}) && !defined($args->{"modules"});
@@ -633,8 +1071,104 @@ sub _pci_check_args {
         # fill from cmdline_src
 
         # fill defaults from "default" property and check against schema
+        no warnings ('void');
+        require List::Util;
+        require Scalar::Util::Numeric::PP;
+        require Time::Duration::Parse::AsHash;
+        require Scalar::Util;
+        my $_sahv_dpath;
+        my $_sahv_err;
+        if (exists $args->{"files"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"files"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'array'
+            ((ref($args->{"files"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+            
+            &&
+            
+            (# clause: min_len
+            ((@{$args->{"files"}} >= 1) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Length must be at least 1"),0)))
+            
+            &&
+            
+            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ((!defined(List::Util::first(sub {!(
+                        ($_sahv_dpath->[-1] = $_),
+                        # req #0
+                        ((defined($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+                        
+                        &&
+                        
+                        # check type 'str'
+                        ((!ref($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+                        )}, 0..@{$args->{"files"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"password"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"password"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retries"} //= 5;
+        if (exists $args->{"retries"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retries"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retry_delay"} //= 3;
+        if (exists $args->{"retry_delay"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
+            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
+            
+            &&
+            
+            # check type 'duration'
+            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"username"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"username"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"username"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+            
+            &&
+            
+            (# clause: match
+            (($args->{"username"} =~ qr((?:(?-)\A\w{2,9}\z))) ? 1 : (($_sahv_err //= "Must match regex pattern \\A\\w{2,9}\\z"),0)))
+            
+            &&
+            
+            (# clause: max_len
+            ((length($args->{"username"}) <= 9) ? 1 : (($_sahv_err //= "Length must be at most 9"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
 
         # check required args
         return [400, "Missing required argument: files"] unless exists $args->{"files"};
@@ -654,8 +1188,129 @@ sub _pci_check_args {
         # fill from cmdline_src
 
         # fill defaults from "default" property and check against schema
+        no warnings ('void');
+        require List::Util;
+        require Scalar::Util::Numeric::PP;
+        require Time::Duration::Parse::AsHash;
+        require Scalar::Util;
+        my $_sahv_dpath;
+        my $_sahv_err;
+        if (exists $args->{"files"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"files"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'array'
+            ((ref($args->{"files"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+            
+            &&
+            
+            (# clause: min_len
+            ((@{$args->{"files"}} >= 1) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Length must be at least 1"),0)))
+            
+            &&
+            
+            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ((!defined(List::Util::first(sub {!(
+                        ($_sahv_dpath->[-1] = $_),
+                        # req #0
+                        ((defined($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+                        
+                        &&
+                        
+                        # check type 'str'
+                        ((!ref($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+                        )}, 0..@{$args->{"files"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"password"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"password"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"protect_files"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"protect_files"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'array'
+            ((ref($args->{"protect_files"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+            
+            &&
+            
+            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ((!defined(List::Util::first(sub {!(
+                        ($_sahv_dpath->[-1] = $_),
+                        # req #0
+                        ((defined($args->{"protect_files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+                        
+                        &&
+                        
+                        # check type 'str'
+                        ((!ref($args->{"protect_files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+                        )}, 0..@{$args->{"protect_files"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retries"} //= 5;
+        if (exists $args->{"retries"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retries"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retry_delay"} //= 3;
+        if (exists $args->{"retry_delay"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
+            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
+            
+            &&
+            
+            # check type 'duration'
+            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"username"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"username"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"username"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+            
+            &&
+            
+            (# clause: match
+            (($args->{"username"} =~ qr((?:(?-)\A\w{2,9}\z))) ? 1 : (($_sahv_err //= "Must match regex pattern \\A\\w{2,9}\\z"),0)))
+            
+            &&
+            
+            (# clause: max_len
+            ((length($args->{"username"}) <= 9) ? 1 : (($_sahv_err //= "Length must be at most 9"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
 
         # check required args
         return [400, "Missing required argument: files"] unless exists $args->{"files"};
@@ -676,8 +1331,104 @@ sub _pci_check_args {
         # fill from cmdline_src
 
         # fill defaults from "default" property and check against schema
+        no warnings ('void');
+        require List::Util;
+        require Scalar::Util::Numeric::PP;
+        require Time::Duration::Parse::AsHash;
+        require Scalar::Util;
+        my $_sahv_dpath;
+        my $_sahv_err;
+        if (exists $args->{"files"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"files"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'array'
+            ((ref($args->{"files"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+            
+            &&
+            
+            (# clause: min_len
+            ((@{$args->{"files"}} >= 1) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Length must be at least 1"),0)))
+            
+            &&
+            
+            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ((!defined(List::Util::first(sub {!(
+                        ($_sahv_dpath->[-1] = $_),
+                        # req #0
+                        ((defined($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+                        
+                        &&
+                        
+                        # check type 'str'
+                        ((!ref($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+                        )}, 0..@{$args->{"files"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"password"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"password"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retries"} //= 5;
+        if (exists $args->{"retries"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retries"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retry_delay"} //= 3;
+        if (exists $args->{"retry_delay"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
+            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
+            
+            &&
+            
+            # check type 'duration'
+            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"username"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"username"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"username"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+            
+            &&
+            
+            (# clause: match
+            (($args->{"username"} =~ qr((?:(?-)\A\w{2,9}\z))) ? 1 : (($_sahv_err //= "Must match regex pattern \\A\\w{2,9}\\z"),0)))
+            
+            &&
+            
+            (# clause: max_len
+            ((length($args->{"username"}) <= 9) ? 1 : (($_sahv_err //= "Length must be at most 9"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
 
         # check required args
         return [400, "Missing required argument: files"] unless exists $args->{"files"};
@@ -697,9 +1448,132 @@ sub _pci_check_args {
         # fill from cmdline_src
 
         # fill defaults from "default" property and check against schema
+        no warnings ('void');
+        require Time::Duration::Parse::AsHash;
+        require Scalar::Util;
+        require List::Util;
+        require Scalar::Util::Numeric::PP;
+        my $_sahv_dpath;
+        my $_sahv_err;
+        if (exists $args->{"delay"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
+            (($args->{"delay"} = (!ref($args->{"delay"}) && $args->{"delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"delay"}] : ((Scalar::Util::blessed($args->{"delay"}) && $args->{"delay"}->isa('DateTime::Duration')) ? [undef,($args->{"delay"}->years * 365.25*86400 + $args->{"delay"}->months * 30.4375*86400 + $args->{"delay"}->weeks * 7*86400 + $args->{"delay"}->days * 86400 + $args->{"delay"}->hours * 3600 + $args->{"delay"}->minutes * 60 + $args->{"delay"}->seconds + $args->{"delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"delay"}) && $args->{"delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"delay"}) && $args->{"delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"delay"}])))), defined($args->{"delay"}->[0]) ? (($_sahv_err //= $args->{"delay"}->[0]), '') : (($args->{"delay"} = $args->{"delay"}->[1]), 1))
+            
+            &&
+            
+            # check type 'duration'
+            ((!ref($args->{"delay"}) && $args->{"delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"files"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"files"})) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'array'
+            ((ref($args->{"files"}) eq 'ARRAY') ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type array"),0))
+            
+            &&
+            
+            (# clause: min_len
+            ((@{$args->{"files"}} >= 1) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Length must be at least 1"),0)))
+            
+            &&
+            
+            ([push(@{$_sahv_dpath}, undef), ~~(# clause: of
+            ((!defined(List::Util::first(sub {!(
+                        ($_sahv_dpath->[-1] = $_),
+                        # req #0
+                        ((defined($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Required but not specified"),0))
+                        
+                        &&
+                        
+                        # check type 'str'
+                        ((!ref($args->{"files"}->[$_])) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))
+                        )}, 0..@{$args->{"files"}}-1))) ? 1 : (($_sahv_err //= (@$_sahv_dpath ? '@'.join("",map {"[$_]"} @$_sahv_dpath).": " : "") . "Not of type text"),0))), pop(@{$_sahv_dpath})]->[1])
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"password"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"password"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"password"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retries"} //= 5;
+        if (exists $args->{"retries"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retries"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'int'
+            ((Scalar::Util::Numeric::PP::isint($args->{"retries"})) ? 1 : (($_sahv_err //= "Not of type integer"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"retry_delay"} //= 3;
+        if (exists $args->{"retry_delay"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"retry_delay"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # coerce rule(s): float_secs, obj_DateTimeDuration, str_iso8601, str_human # coerce to: float(secs)
+            (($args->{"retry_delay"} = (!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)\z/) ? [undef,$args->{"retry_delay"}] : ((Scalar::Util::blessed($args->{"retry_delay"}) && $args->{"retry_delay"}->isa('DateTime::Duration')) ? [undef,($args->{"retry_delay"}->years * 365.25*86400 + $args->{"retry_delay"}->months * 30.4375*86400 + $args->{"retry_delay"}->weeks * 7*86400 + $args->{"retry_delay"}->days * 86400 + $args->{"retry_delay"}->hours * 3600 + $args->{"retry_delay"}->minutes * 60 + $args->{"retry_delay"}->seconds + $args->{"retry_delay"}->nanoseconds * 1e-9)] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\AP(?:([0-9]+(?:\.[0-9]+)?)Y)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)W)? (?:([0-9]+(?:\.[0-9]+)?)D)? (?: T (?:([0-9]+(?:\.[0-9]+)?)H)? (?:([0-9]+(?:\.[0-9]+)?)M)? (?:([0-9]+(?:\.[0-9]+)?)S)? )?\z/x) ? [undef,(($1||0)*365.25*86400 + ($2||0)*30.4375*86400 + ($3||0)*7*86400 + ($4||0)*86400 + ($5||0)*3600 + ($6||0)*60 + ($7||0))] : ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\d.*[a-z]/) ? (do { my $p; eval { $p = Time::Duration::Parse::AsHash::parse_duration($args->{"retry_delay"}) }; my $err = $@; if ($err) { $err =~ s/ at .+//s; ["Invalid duration: $err"] } else { [undef, ($p->{years}||0) * 365.25*86400 + ($p->{months}||0) * 30.4375*86400 + ($p->{weeks}||0) * 7*86400 + ($p->{days}||0) * 86400 + ($p->{hours}||0) * 3600 + ($p->{minutes}||0) * 60 + ($p->{seconds}||0)] } }) : [undef,$args->{"retry_delay"}])))), defined($args->{"retry_delay"}->[0]) ? (($_sahv_err //= $args->{"retry_delay"}->[0]), '') : (($args->{"retry_delay"} = $args->{"retry_delay"}->[1]), 1))
+            
+            &&
+            
+            # check type 'duration'
+            ((!ref($args->{"retry_delay"}) && $args->{"retry_delay"} =~ /\A[0-9]+(?:.[0-9]+)?\z/) ? 1 : (($_sahv_err //= "Not of type duration"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
         $args->{"subdir"} //= "";
+        if (exists $args->{"subdir"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"subdir"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"subdir"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
+        if (exists $args->{"username"}) {
+            $_sahv_dpath = [];
+            # req #0
+            ((defined($args->{"username"})) ? 1 : (($_sahv_err //= "Required but not specified"),0))
+            
+            &&
+            
+            # check type 'str'
+            ((!ref($args->{"username"})) ? 1 : (($_sahv_err //= "Not of type text"),0))
+            
+            &&
+            
+            (# clause: match
+            (($args->{"username"} =~ qr((?:(?-)\A\w{2,9}\z))) ? 1 : (($_sahv_err //= "Must match regex pattern \\A\\w{2,9}\\z"),0)))
+            
+            &&
+            
+            (# clause: max_len
+            ((length($args->{"username"}) <= 9) ? 1 : (($_sahv_err //= "Length must be at most 9"),0)))
+             ; if ($_sahv_err) { return [400, "Argument validation failed: $_sahv_err"] }
+        } # if date arg exists
 
         # check required args
         return [400, "Missing required value for argument: delay"] if exists($args->{"delay"}) && !defined($args->{"delay"});
@@ -730,7 +1604,7 @@ pause - A CLI for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.64 of main (from Perl distribution App-pause), released on 2017-07-24.
+This document describes version 0.650 of main (from Perl distribution App-pause), released on 2018-10-09.
 
 =head1 SYNOPSIS
 
@@ -941,7 +1815,7 @@ not yet supported.
 
 Shortcut for --log-level=error.
 
-=item B<--retries>=I<i>
+=item B<--retries>=I<s>
 
 Number of retries when received 5xx HTTP error from server.
 
@@ -991,7 +1865,7 @@ Display program's version and exit.
 
 Whether to return detailed records.
 
-=item B<--num-keep>=I<i>, B<-n>
+=item B<--num-keep>=I<s>, B<-n>
 
 Number of new versions (including newest) to keep.
 
@@ -1058,7 +1932,7 @@ Only show newest non-dev version.
 Dev versions will be skipped.
 
 
-=item B<--newest-n>=I<i>
+=item B<--newest-n>=I<s>
 
 Only show this number of newest non-dev versions.
 
@@ -1334,13 +2208,18 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+To clean up, there are also: L<pause-cleanup> (from L<App::PAUSE::cleanup>),
+L<WWW::PAUSE::CleanUpHomeDir> (CLI in example).
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

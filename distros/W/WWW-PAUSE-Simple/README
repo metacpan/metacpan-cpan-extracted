@@ -2,8 +2,8 @@ NAME
     WWW::PAUSE::Simple - An API for PAUSE
 
 VERSION
-    This document describes version 0.441 of WWW::PAUSE::Simple (from Perl
-    distribution WWW-PAUSE-Simple), released on 2018-04-26.
+    This document describes version 0.442 of WWW::PAUSE::Simple (from Perl
+    distribution WWW-PAUSE-Simple), released on 2018-10-09.
 
 SYNOPSIS
 DESCRIPTION
@@ -533,6 +533,9 @@ SEE ALSO
 
     WWW::PAUSE::CleanUpHomeDir which can clean old releases from your PAUSE
     account (CLI script is provided in example).
+
+    App::PAUSE::cleanup which also cleans old releases from your PAUSE
+    account, with CLI included pause-cleanup.
 
     <https://perlancar.wordpress.com/2015/03/25/interacting-with-pause-using
     -cli/>

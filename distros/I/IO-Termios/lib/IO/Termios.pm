@@ -1,17 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2018 -- leonerd@leonerd.org.uk
 
 package IO::Termios;
 
 use strict;
 use warnings;
+use 5.010; # //
 use base qw( IO::Handle );
 
 use Carp;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Exporter 'import';
 
@@ -32,16 +33,16 @@ C<IO::Termios> - supply F<termios(3)> methods to C<IO::Handle> objects
 
 =head1 SYNOPSIS
 
- use IO::Termios;
+   use IO::Termios;
 
- my $term = IO::Termios->open( "/dev/ttyS0", "9600,8,n,1" )
-    or die "Cannot open ttyS0 - $!";
+   my $term = IO::Termios->open( "/dev/ttyS0", "9600,8,n,1" )
+      or die "Cannot open ttyS0 - $!";
 
- $term->print( "Hello world\n" ); # Still an IO::Handle
+   $term->print( "Hello world\n" ); # Still an IO::Handle
 
- while( <$term> ) {
-    print "A line from ttyS0: $_";
- }
+   while( <$term> ) {
+      print "A line from ttyS0: $_";
+   }
 
 =head1 DESCRIPTION
 
@@ -54,16 +55,16 @@ The flag-setting methods will apply to any TTY device, such as a pseudo-tty,
 and are useful for controlling such flags as the C<ECHO> flag, to disable
 local echo.
 
- my $stdin = IO::Termios->new( \*STDIN );
- $stdin->setflag_echo( 0 );
+   my $stdin = IO::Termios->new( \*STDIN );
+   $stdin->setflag_echo( 0 );
 
 When dealing with a serial port the line mode method is useful for setting the
 basic serial parameters such as baud rate, and the modem line control methods
 can be used to access the hardware handshaking lines.
 
- my $ttyS0 = IO::Termios->open( "/dev/ttyS0" );
- $ttyS0->set_mode( "19200,8,n,1" );
- $ttyS0->set_modem({ dsr => 1, cts => 1 });
+   my $ttyS0 = IO::Termios->open( "/dev/ttyS0" );
+   $ttyS0->set_mode( "19200,8,n,1" );
+   $ttyS0->set_modem({ dsr => 1, cts => 1 });
 
 =head2 Arbitrary Baud Rates on Linux
 
@@ -214,7 +215,7 @@ Accessor for the derived "mode string", which is a comma-joined concatenation
 of the baud rate, character size, parity mode, and stop size in a format such
 as
 
- 19200,8,n,1
+   19200,8,n,1
 
 When setting the mode string, trailing components may be omitted meaning their
 value will not be affected.
@@ -349,7 +350,7 @@ Returns a hash reference containing named flags corresponding to the modem
 line control bits. Any bit that is set will yield a key in the returned hash
 of the same name. The bit names are
 
- dtr dsr rts cts cd ri
+   dtr dsr rts cts cd ri
 
 =cut
 
@@ -415,25 +416,25 @@ object supports the same methods as documented here.
 The following two sections of code are therefore equivalent, though the latter
 is more efficient as it only calls C<setattr> once.
 
- $term->setbaud( 38400 );
- $term->setcsize( 8 );
- $term->setparity( 'n' );
- $term->setstop( 1 );
+   $term->setbaud( 38400 );
+   $term->setcsize( 8 );
+   $term->setparity( 'n' );
+   $term->setstop( 1 );
 
 Z<>
 
- my $attrs = $term->getattr;
- $attrs->setbaud( 38400 );
- $attrs->setcsize( 8 );
- $attrs->setparity( 'n' );
- $attrs->setstop( 1 );
- $term->setattr( $attrs );
+   my $attrs = $term->getattr;
+   $attrs->setbaud( 38400 );
+   $attrs->setcsize( 8 );
+   $attrs->setparity( 'n' );
+   $attrs->setstop( 1 );
+   $term->setattr( $attrs );
 
 However, a convenient shortcut method is provided for the common case of
 setting the baud rate, character size, parity and stop size all at the same
 time. This is C<set_mode>:
 
- $term->set_mode( "38400,8,n,1" );
+   $term->set_mode( "38400,8,n,1" );
 
 =cut
 
@@ -492,6 +493,16 @@ C<$parity> is C<n>, C<o> or C<e>.
 
 Convenience accessor for the C<CSTOPB> bit of C<c_cflag>. C<$stop> is 1 or 2.
 
+=head2 cfmakeraw
+
+   $term->cfmakeraw
+
+I<Since version 0.07.>
+
+Adjusts several bit flags to put the terminal into a "raw" mode. Input is
+available a character at a time, echo is disabled, and all special processing
+of input and output characters is disabled.
+
 =cut
 
 foreach my $name (qw( ibaud obaud csize parity stop )) {
@@ -512,12 +523,28 @@ foreach my $name (qw( ibaud obaud csize parity stop )) {
    };
 }
 
-*setbaud = sub {
-   my ( $self, $val ) = @_;
-   my $attrs = $self->getattr or croak "Cannot getattr - $!";
-   $attrs->setbaud( $val );
-   $self->setattr( $attrs ) or croak "Cannot setattr - $!";
-};
+foreach my $method (qw( setbaud cfmakeraw )) {
+   no strict 'refs';
+   *$method = sub {
+      my $self = shift;
+      my $attrs = $self->getattr or croak "Cannot getattr - $!";
+      $attrs->$method( @_ );
+      $self->setattr( $attrs ) or croak "Cannot setattr - $!";
+   };
+}
+
+=head2 getflag_opost
+
+=head2 setflag_opost
+
+   $mode = $term->getflag_opost
+
+   $term->setflag_opost( $mode )
+
+I<Since version 0.07.>
+
+Accessor for the C<OPOST> bit of the C<c_oflag>. This enables system-specific
+post-processing on output.
 
 =head2 getflag_cread
 
@@ -582,6 +609,8 @@ characters are echoed back to the terminal.
 =cut
 
 my @flags = (
+   # oflag
+   [ opost  => qw( OPOST o ) ],
    # cflag
    [ cread  => qw( CREAD  c ) ],
    [ clocal => qw( CLOCAL c ) ],
@@ -615,7 +644,10 @@ package # hide from CPAN
    IO::Termios::Attrs;
 
 use Carp;
-use POSIX qw( CSIZE CS5 CS6 CS7 CS8 PARENB PARODD CSTOPB );
+use POSIX qw(
+   CSIZE CS5 CS6 CS7 CS8 PARENB PARODD CSTOPB
+   IGNBRK BRKINT PARMRK ISTRIP INLCR IGNCR ICRNL IXON OPOST ECHO ECHONL ICANON ISIG IEXTEN
+);
 # IO::Tty has more B<\d> constants than POSIX has
 use IO::Tty;
 
@@ -759,6 +791,17 @@ sub setstop
    $self->setcflag( $cflag );
 }
 
+sub cfmakeraw
+{
+   my $self = shift;
+
+   # Coped from bit manipulations in termios(3)
+   $self->setiflag( $self->getiflag & ~( IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON ) );
+   $self->setoflag( $self->getoflag & ~( OPOST ) );
+   $self->setlflag( $self->getlflag & ~( ECHO | ECHONL | ICANON | ISIG | IEXTEN ) );
+   $self->setcflag( $self->getcflag & ~( CSIZE | PARENB ) | CS8 );
+}
+
 =head1 TODO
 
 =over 4
@@ -771,9 +814,9 @@ Adding more getflag_*/setflag_* convenience wrappers
 
 Automatically upgrading STDIN/STDOUT/STDERR if appropriate, given a flag.
 
- use IO::Termios -upgrade;
+   use IO::Termios -upgrade;
 
- STDIN->setflag_echo( 0 );
+   STDIN->setflag_echo( 0 );
 
 =back
 

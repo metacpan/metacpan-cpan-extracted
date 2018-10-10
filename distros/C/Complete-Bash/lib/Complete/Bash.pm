@@ -1,11 +1,12 @@
 package Complete::Bash;
 
-our $DATE = '2016-12-28'; # DATE
-our $VERSION = '0.31'; # VERSION
+our $DATE = '2018-10-10'; # DATE
+our $VERSION = '0.320'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -264,7 +265,8 @@ sub parse_cmdline {
     die "$0: COMP_LINE not set, make sure this script is run under ".
         "bash completion (e.g. through complete -C)\n" unless defined $line;
 
-    #say "D:line=<$line> point=<$point>";
+    log_trace "[compbash] line=<$line> point=<$point>"
+        if $ENV{COMPLETE_BASH_TRACE};
 
     my @words;
     my $cword;
@@ -338,6 +340,9 @@ sub parse_cmdline {
 
     $cword //= @words;
     $words[$cword] //= '';
+
+    log_trace "[compbash] words=%s, cword=%s", \@words, $cword
+        if $ENV{COMPLETE_BASH_TRACE};
 
     [\@words, $cword];
 }
@@ -551,7 +556,7 @@ Complete::Bash - Completion routines for bash shell
 
 =head1 VERSION
 
-This document describes version 0.31 of Complete::Bash (from Perl distribution Complete-Bash), released on 2016-12-28.
+This document describes version 0.320 of Complete::Bash (from Perl distribution Complete-Bash), released on 2018-10-10.
 
 =head1 DESCRIPTION
 
@@ -614,7 +619,11 @@ bash.
 =head1 FUNCTIONS
 
 
-=head2 format_completion($completion, $opts) -> str|array
+=head2 format_completion
+
+Usage:
+
+ format_completion($completion, $opts) -> str|array
 
 Format completion for output (for shell).
 
@@ -685,7 +694,11 @@ Either an array or hash. See function description for more details.
 Return value: Formatted string (or array, if `as` is set to `array`) (str|array)
 
 
-=head2 join_wordbreak_words() -> [status, msg, result, meta]
+=head2 join_wordbreak_words
+
+Usage:
+
+ join_wordbreak_words() -> [status, msg, result, meta]
 
 Post-process parse_cmdline() result by joining some words.
 
@@ -723,7 +736,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 parse_cmdline($cmdline, $point, $opts) -> array
+=head2 parse_cmdline
+
+Usage:
+
+ parse_cmdline($cmdline, $point, $opts) -> array
 
 Parse shell command-line for processing by completion routines.
 
@@ -857,7 +874,11 @@ arguments only (like in C<@ARGV>), you need to strip the first element from
 C<$words> and reduce C<$cword> by 1.
 
 
-=head2 point($cmdline, $marker) -> any
+=head2 point
+
+Usage:
+
+ point($cmdline, $marker) -> any
 
 Return line with point marked by a marker.
 
@@ -889,13 +910,19 @@ Marker character.
 
 Return value:  (any)
 
+=head1 ENVIRONMENT
+
+=head2 COMPLETE_BASH_TRACE
+
+Bool. If set to true, will produce more log statements to L<Log::ger>.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Complete-Bash>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Complete-Bash>.
+Source repository is at L<https://github.com/perlancar/perl-Complete-Bash>.
 
 =head1 BUGS
 
@@ -926,7 +953,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -23,13 +23,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 package Graphics::GVG;
-$Graphics::GVG::VERSION = '0.7';
+$Graphics::GVG::VERSION = '0.9';
 # ABSTRACT: Game Vector Graphics
 use strict;
 use warnings;
 use Moose;
 use namespace::autoclean;
 use Marpa::R2;
+use Graphics::GVG::Args;
 use Graphics::GVG::AST::Command;
 use Graphics::GVG::AST::Effect;
 use Graphics::GVG::AST;
@@ -71,42 +72,10 @@ my $DSL = <<'END_DSL';
 
     Functions ::= Function+ action => _do_arg_list_ref
 
-    Function ::= LineFunc SemiColon
-        | CircleFunc SemiColon
-        | EllipseFunc SemiColon
-        | RectFunc SemiColon
-        | PointFunc SemiColon
-        | PolyFunc SemiColon
+    Function ::= GenericFunc SemiColon
 
-    LineFunc ::= 
-        'line' OpenParen
-            ColorValue Comma NumberValue Comma NumberValue Comma NumberValue Comma NumberValue
-            CloseParen action => _do_line_func
-
-    CircleFunc ::=
-        'circle' OpenParen
-            ColorValue Comma NumberValue Comma NumberValue Comma NumberValue
-            CloseParen action => _do_circle_func
-
-    EllipseFunc ::=
-        'ellipse' OpenParen
-            ColorValue Comma NumberValue Comma NumberValue Comma NumberValue
-            Comma NumberValue CloseParen action => _do_ellipse_func
-
-    RectFunc ::= 
-        'rect' OpenParen
-            ColorValue Comma NumberValue Comma NumberValue Comma NumberValue Comma NumberValue
-            CloseParen action => _do_rect_func
-
-    PointFunc ::= 
-        'point' OpenParen
-            ColorValue Comma NumberValue Comma NumberValue Comma NumberValue 
-            CloseParen action => _do_point_func
-
-    PolyFunc ::= 
-        'poly' OpenParen
-            ColorValue Comma NumberValue Comma NumberValue Comma NumberValue Comma IntegerValue Comma NumberValue
-            CloseParen action => _do_poly_func
+    GenericFunc ::= FuncName OpenParen ParamList CloseParen
+        action => _do_generic_func
 
     NumberVariableSet ::= '$' VarName '=' Number SemiColon
         action => _set_num_var
@@ -131,6 +100,29 @@ my $DSL = <<'END_DSL';
     ColorLookup ::= '%' VarName action => _do_color_lookup
 
     IntegerLookup ::= '&' VarName action => _do_int_lookup
+
+    FuncName ::= VarName
+
+    ParamList ::= NamedArgs | Args
+
+    Args ::= Arg action => _do_args
+        | Arg Comma Args action => _do_args
+        | Arg Comma Args Comma action => _do_args
+
+    NamedArgs ::= OpenCurly NameValues CloseCurly action => _do_named_args
+
+    NameValues ::= NameValue action => _do_name_values
+        | NameValue Comma NameValues action => _do_name_values
+        | NameValue Comma NameValues Comma action => _do_name_values
+
+    NameValue ::= ArgName Colon Arg action => _do_name_value
+        | ArgName Colon Arg Comma action => _do_name_value
+
+    ArgName ::= VarName
+
+    Arg ::= NumberValue
+        | ColorValue
+        | IntegerValue
 
     # TODO
     #Include ::= '^include<' FileName '>'
@@ -171,6 +163,8 @@ my $DSL = <<'END_DSL';
 
     CloseCurly ~ '}'
 
+    Colon ~ ':'
+
     SemiColon ~ ';'
 
     VarName ~ [\w]+
@@ -187,6 +181,11 @@ my $GRAMMAR = Marpa::R2::Scanless::G->new({
     source => \$DSL,
 });
 
+has 'funcs' => (
+    is => 'ro',
+    isa => 'HashRef[Str]',
+    builder => '_buildFuncs',
+);
 has 'include_paths' => (
     is => 'ro',
     isa => 'ArrayRef[Str]',
@@ -196,6 +195,7 @@ has '_meta' => (
     is => 'ro',
     isa => 'HashRef[Str]',
     default => sub {{}},
+    writer => '_set_meta',
 );
 has '_num_vars' => (
     is => 'ro',
@@ -221,6 +221,9 @@ sub parse
         grammar => $GRAMMAR,
     });
 
+    # Make sure any old meta data is cleared out
+    $self->_set_meta({});
+
     $recce->read( \$text );
     my $ast = $recce->value( $self );
     return $$ast;
@@ -230,20 +233,153 @@ sub parse
 #
 # Parse action callbacks
 #
-sub _do_line_func
+
+sub _do_args
 {
-    # 'line' OpenParen Color Comma Number Comma Number Comma Number Comma Number
-    my ($self, undef, undef, $color, undef, $x1, undef, $y1, undef,
-        $x2, undef, $y2) = @_;
-    $color = $self->_color_hex_to_int( $color );
-    my $line = Graphics::GVG::AST::Line->new({
-        x1 => $x1,
-        y1 => $y1,
-        x2 => $x2,
-        y2 => $y2,
-        color => $color,
+    # Arg
+    # Arg Comma Args
+    # Arg Comma Args Comma
+    my ($self, $first_arg, undef, $remaining_args, undef) = @_;
+    my @args = ($first_arg);
+    push @args, @{ $remaining_args->positional_args }
+        if defined $remaining_args;
+
+    my $arg_obj = Graphics::GVG::Args->new({
+        positional_args => \@args,
     });
-    return $line;
+    return $arg_obj;
+}
+
+sub _do_named_args
+{
+    # '{' NameValues '}'
+    my ($self, undef, $args, undef) = @_;
+    return $args;
+}
+
+sub _do_name_values
+{
+    # NameValue
+    # NameValues Comma NameValue
+    # NameValues Comma NameValue
+    my ($self, $first_arg, undef, $remaining_args, undef) = @_;
+
+    my %args = (
+        @$first_arg,
+        (defined $remaining_args
+            ? %{ $remaining_args->named_args }
+            : ()),
+    );
+
+    my $arg_obj = Graphics::GVG::Args->new({
+        named_args => \%args,
+    });
+    return $arg_obj;
+}
+
+sub _do_name_value
+{
+    # ArgName ':' Arg
+    # ArgName ':' Arg Comma
+    my ($self, $name, undef, $value, undef) = @_;
+    return [ $name, $value ];
+}
+
+sub _do_generic_func
+{
+    # FuncName OpenParen Args CloseParen
+    my ($self, $name, undef, $args, undef) = @_;
+    die "Could not find function named '$name'\n"
+        unless exists $self->funcs->{$name};
+
+    my $func = $self->funcs->{$name};
+    return $self->$func( $args );
+}
+
+{
+    my %FUNCS = (
+        '_do_line_func' => {
+            '_order' => [qw{ color x1 y1 x2 y2 }],
+            '_class' => 'Graphics::GVG::AST::Line',
+            x1 => Graphics::GVG::Args->NUMBER,
+            y1 => Graphics::GVG::Args->NUMBER,
+            x2 => Graphics::GVG::Args->NUMBER,
+            y2 => Graphics::GVG::Args->NUMBER,
+            color => Graphics::GVG::Args->COLOR,
+        },
+        '_do_circle_func' => {
+            '_order' => [qw{ color cx cy r }],
+            '_class' => 'Graphics::GVG::AST::Circle',
+            cx => Graphics::GVG::Args->NUMBER,
+            cy => Graphics::GVG::Args->NUMBER,
+            r => Graphics::GVG::Args->NUMBER,
+            color => Graphics::GVG::Args->COLOR,
+        },
+        '_do_ellipse_func' => {
+            '_order' => [qw{ color cx cy rx ry }],
+            '_class' => 'Graphics::GVG::AST::Ellipse',
+            cx => Graphics::GVG::Args->NUMBER,
+            cy => Graphics::GVG::Args->NUMBER,
+            rx => Graphics::GVG::Args->NUMBER,
+            ry => Graphics::GVG::Args->NUMBER,
+            color => Graphics::GVG::Args->COLOR,
+        },
+        '_do_rect_func' => {
+            '_order' => [qw{ color x y width height }],
+            '_class' => 'Graphics::GVG::AST::Rect',
+            x => Graphics::GVG::Args->NUMBER,
+            y => Graphics::GVG::Args->NUMBER,
+            width => Graphics::GVG::Args->NUMBER,
+            height => Graphics::GVG::Args->NUMBER,
+            color => Graphics::GVG::Args->COLOR,
+        },
+        '_do_point_func' => {
+            '_order' => [qw{ color x y size }],
+            '_class' => 'Graphics::GVG::AST::Point',
+            x => Graphics::GVG::Args->NUMBER,
+            y => Graphics::GVG::Args->NUMBER,
+            size => Graphics::GVG::Args->NUMBER,
+            color => Graphics::GVG::Args->COLOR,
+        },
+        '_do_poly_func' => {
+            '_order' => [qw{ color cx cy r sides rotate }],
+            '_class' => 'Graphics::GVG::AST::Polygon',
+            cx => Graphics::GVG::Args->NUMBER,
+            cy => Graphics::GVG::Args->NUMBER,
+            r => Graphics::GVG::Args->NUMBER,
+            sides => Graphics::GVG::Args->NUMBER,
+            rotate => Graphics::GVG::Args->NUMBER,
+            color => Graphics::GVG::Args->COLOR,
+        },
+    );
+    my %SHORT_FUNCS;
+
+    foreach my $func_name (keys %FUNCS) {
+        no strict 'refs';
+        my %arg_def = %{ $FUNCS{$func_name} };
+        my @order = @{ $arg_def{'_order'} };
+        my $class = $arg_def{'_class'};
+
+        my ($short_func_name) = $func_name =~ /\A _do_ (.+) _func \z/x;
+        $SHORT_FUNCS{$short_func_name} = $func_name;
+
+        *$func_name = sub {
+            my ($self, $args) = @_;
+            $args->names( @order );
+            my $obj = $class->new({
+                map {
+                    $_ => $args->arg( $_, $arg_def{$_} )
+                } @order
+            });
+
+            return $obj;
+        };
+    }
+
+    sub _buildFuncs
+    {
+        return \%SHORT_FUNCS;
+    }
 }
 
 sub _set_meta_var
@@ -256,82 +392,6 @@ sub _set_meta_var
     $self->_meta->{$name} = $value;
 
     return undef;
-}
-
-sub _do_circle_func
-{
-    # 'circle' OpenParen Color Comma Number Comma Number Comma Number
-    my ($self, undef, undef, $color, undef, $cx, undef, $cy, undef, $r) = @_;
-    $color = $self->_color_hex_to_int( $color );
-    my $circle = Graphics::GVG::AST::Circle->new({
-        cx => $cx,
-        cy => $cy,
-        r => $r,
-        color => $color,
-    });
-    return $circle;
-}
-
-sub _do_ellipse_func
-{
-    # 'ellipse' OpenParen ColorValue Comma NumberValue Comma NumberValue Comma NumberValue Comma NumberValue
-    my ($self, undef, undef, $color, undef, $cx, undef, $cy, undef, $rx, undef, $ry) = @_;
-    $color = $self->_color_hex_to_int( $color );
-    my $ellipse = Graphics::GVG::AST::Ellipse->new({
-        cx => $cx,
-        cy => $cy,
-        rx => $rx,
-        ry => $ry,
-        color => $color,
-    });
-    return $ellipse;
-}
-
-sub _do_rect_func
-{
-    # 'rect' OpenParen Color Comma Number Comma Number Comma Number Comma Number
-    my ($self, undef, undef, $color, undef, $x, undef, $y, undef,
-        $width, undef, $height) = @_;
-    $color = $self->_color_hex_to_int( $color );
-    my $cmd = Graphics::GVG::AST::Rect->new({
-        x => $x,
-        y => $y,
-        width => $width,
-        height => $height,
-        color => $color,
-    });
-    return $cmd;
-}
-
-sub _do_point_func
-{
-    # 'point' OpenParen ColorValue Comma NumberValue Comma NumberValue Comma NumberValue 
-    my ($self, undef, undef, $color, undef, $x, undef, $y, undef, $size) = @_;
-    $color = $self->_color_hex_to_int( $color );
-    my $line = Graphics::GVG::AST::Point->new({
-        x => $x,
-        y => $y,
-        size => $size,
-        color => $color,
-    });
-    return $line;
-}
-
-sub _do_poly_func
-{
-    # 'poly' OpenParen ColorValue Comma NumberValue Comma NumberValue Comma NumberValue Comma IntegerValue Comma NumberValue
-    my ($self, undef, undef, $color, undef, $cx, undef, $cy, undef,
-        $radius, undef, $sides, undef, $rotate) = @_;
-    $color = $self->_color_hex_to_int( $color );
-    my $cmd = Graphics::GVG::AST::Polygon->new({
-        cx => $cx,
-        cy => $cy,
-        r => $radius,
-        sides => $sides,
-        rotate => $rotate,
-        color => $color,
-    });
-    return $cmd;
 }
 
 sub _do_blocks
@@ -375,7 +435,7 @@ sub _do_build_ast_obj
 
     my $ast = Graphics::GVG::AST->new({
         commands => \@ast_list,
-        meta => $self->_meta,
+        meta_data => $self->_meta,
     });
     return $ast;
 }

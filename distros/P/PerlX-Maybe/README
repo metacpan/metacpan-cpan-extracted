@@ -11,6 +11,8 @@ SYNOPSIS
 
     Now you can write:
 
+     use PerlX::Maybe;
+ 
      my $bob = Person->new(
         maybe name => $name,
         maybe age  => $age,
@@ -43,6 +45,8 @@ DESCRIPTION
      );
 
     or:
+
+     use PerlX::Maybe;
 
      my $bob = Person->new(
         (name => $name) x!!(defined $name),
@@ -85,6 +89,49 @@ DESCRIPTION
 
         This function is not exported by default.
 
+    `provided_deref $condition, $r, @rest`
+        Like `provided` but dereferences the second argument into list
+        context:
+
+         my $bob = Person->new(
+                                     name        => $name,
+                                     address     => $addr,
+           provided length($tel),    phone       => $tel,
+           provided $email =~ /\@/,  email       => $email,
+           provided_deref $employee, {
+                                     employee_id => $employee->employee_id,
+                               maybe department  => $employee->department,
+                                   },
+                                     unique_id   => $id,
+         );
+
+        The second argument may be a HASH or ARRAY reference. It may also be a
+        CODE reference, which will be called in list context. If it is a
+        blessed object, it will be treated as if it were a HASH reference
+        (internally it could be another type of reference with overloading).
+
+        This function is not exported by default.
+
+    `provided_deref_with_maybe $condition, $r, @rest`
+        Like `provide_deref` but will perform `maybe` on each key-value pair
+        in the dereferenced values.
+
+         my $bob = Person->new(
+                                     name        => $name,
+                                     address     => $addr,
+           provided length($tel),    phone       => $tel,
+           provided $email =~ /\@/,  email       => $email,
+           provided_deref_with_maybe $employee, $employee,
+                                     unique_id   => $id,
+         );
+
+        Also, if the second argument is a blessed object, it will also skip
+        any 'private' attributes (keys starting with an underscore).
+
+        It not only "just works", it "DWIM"s!
+
+        This function is not exported by default.
+
     `PerlX::Maybe::IMPLEMENTATION`
         Indicates whether the XS backend PerlX::Maybe::XS was loaded.
 
@@ -93,9 +140,26 @@ DESCRIPTION
     used instead of the pure Perl functions. My basic benchmarking experiments
     seem to show this to be around 30% faster.
 
+    Currently there are no XS implementations of the `provided_deref` and
+    `provided_deref_with_maybe` functions. Contributions welcome.
+
   Environment
     The environment variable `PERLX_MAYBE_IMPLEMENTATION` may be set to "PP"
     to prevent the XS backend from loading.
+
+  Exporting
+    Only `maybe` is exported by default. You can request other functions by
+    name:
+
+      use PerlX::Maybe "maybe", "provided";
+
+    Or to export everything:
+
+      use PerlX::Maybe ":all";
+
+    If Exporter::Tiny is installed, you can rename imports:
+
+      use PerlX::Maybe "maybe" => { -as => "perhaps" };
 
 BUGS
     Please report any bugs to
@@ -109,8 +173,10 @@ SEE ALSO
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
+    `provided_deref` and `provided_deref_with_maybe` by Theo van Hoesel.
+
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2012-2013 by Toby Inkster.
+    This software is copyright (c) 2012-2013, 2018 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

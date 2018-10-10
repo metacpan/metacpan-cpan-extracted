@@ -1,0 +1,9 @@
+0.002000 Wed Oct 10 15:15:19 2018 +0700
+ - Enhancement: add query_hosts method
+ - Enhancement: add query_parent_hosts method
+ - Enhancement: incur sorting overhead in set_app_attr() only in case of
+   error
+ - Bugfix: remove debug code and dependency on YAML::XS
+
+0.001000 Sat Oct 6 10:56:10 2018 +0700
+ - Initial release

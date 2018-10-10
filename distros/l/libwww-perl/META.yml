@@ -30,74 +30,74 @@ no_index:
 provides:
   LWP:
     file: lib/LWP.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Authen::Basic:
     file: lib/LWP/Authen/Basic.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Authen::Digest:
     file: lib/LWP/Authen/Digest.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Authen::Ntlm:
     file: lib/LWP/Authen/Ntlm.pm
-    version: '6.35'
+    version: '6.36'
   LWP::ConnCache:
     file: lib/LWP/ConnCache.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Debug:
     file: lib/LWP/Debug.pm
-    version: '6.35'
+    version: '6.36'
     x_deprecated: 1
   LWP::Debug::TraceHTTP:
     file: lib/LWP/Debug/TraceHTTP.pm
-    version: '6.35'
+    version: '6.36'
   LWP::DebugFile:
     file: lib/LWP/DebugFile.pm
-    version: '6.35'
+    version: '6.36'
   LWP::MemberMixin:
     file: lib/LWP/MemberMixin.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol:
     file: lib/LWP/Protocol.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::cpan:
     file: lib/LWP/Protocol/cpan.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::data:
     file: lib/LWP/Protocol/data.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::file:
     file: lib/LWP/Protocol/file.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::ftp:
     file: lib/LWP/Protocol/ftp.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::gopher:
     file: lib/LWP/Protocol/gopher.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::http:
     file: lib/LWP/Protocol/http.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::loopback:
     file: lib/LWP/Protocol/loopback.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::mailto:
     file: lib/LWP/Protocol/mailto.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::nntp:
     file: lib/LWP/Protocol/nntp.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Protocol::nogo:
     file: lib/LWP/Protocol/nogo.pm
-    version: '6.35'
+    version: '6.36'
   LWP::RobotUA:
     file: lib/LWP/RobotUA.pm
-    version: '6.35'
+    version: '6.36'
   LWP::Simple:
     file: lib/LWP/Simple.pm
-    version: '6.35'
+    version: '6.36'
   LWP::UserAgent:
     file: lib/LWP/UserAgent.pm
-    version: '6.35'
+    version: '6.36'
 requires:
   Digest::MD5: '0'
   Encode: '2.12'
@@ -134,10 +134,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/libwww-perl/issues
   homepage: https://github.com/libwww-perl/libwww-perl
   repository: https://github.com/libwww-perl/libwww-perl.git
-version: '6.35'
+version: '6.36'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.029003'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -177,7 +177,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000034'
           version: '0.006'
       name: MetaProvides::Package
       version: '2.004003'
@@ -216,7 +216,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
@@ -234,6 +234,10 @@ x_Dist_Zilla:
       name: License
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: InstallGuide
+      version: '1.200011'
+    -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
       version: '6.012'
@@ -245,7 +249,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000034'
           version: '0.006'
       name: DynamicPrereqs
       version: '0.034'
@@ -256,9 +260,10 @@ x_Dist_Zilla:
           make_path: make
           version: '6.012'
         Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
           version: '6.012'
       name: MakeMaker::Awesome
-      version: '0.46'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: MojibakeTests
@@ -575,7 +580,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.35
+          tag: v6.36
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -778,5 +783,5 @@ x_contributors:
   - 'Yuri Karaban <tech@askold.net>'
   - 'Yury Zavarin <yury.zavarin@gmail.com>'
   - 'Zefram <zefram@fysh.org>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.29.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

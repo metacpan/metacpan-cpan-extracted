@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.17';
+our $VERSION = '3.18';
 
 use vars qw(@ALL_TESTS);
 
@@ -186,6 +186,7 @@ our @ROBOT_TESTS = (
     [ 'quora link preview',                 'quora-link-preview' ],
     [ 'Qwantify',                           'qwantify' ],
     [ 'redditbot',                          'reddit', ],
+    [ 'researchscan',                       'researchscan' ],
     [ 'rogerbot',                           'rogerbot' ],
     [ 'ShowyouBot',                         'showyou' ],
     [ 'SkypeUriPreview',                    'skype-uri-preview' ],
@@ -270,6 +271,7 @@ my %ROBOT_NAMES = (
     puf                   => 'puf',
     'quora-link-preview'  => 'Quora Link Preview',
     qwantify              => 'Qwantify',
+    researchscan          => 'Researchscan RWTH Aachen',
     reddit                => 'Reddit',
     robot                 => 'robot',
     rogerbot              => 'Moz',
@@ -330,6 +332,7 @@ my %ROBOT_IDS = (
     puf             => 'puf',
     robot           => 'robot',
     rubylib         => 'ruby-http-library',
+    researchscan    => 'researchscan',
     slurp           => 'yahoo-slurp',
     specialarchiver => 'archive-org',
     wget            => 'wget',
@@ -1006,6 +1009,10 @@ my @ROBOT_FRAGMENTS = qw(
     zyborg
 );
 
+my %ROBOT_FRAGMENT_EXCEPTIONS = (
+    bot => ['cubot'],
+);
+
 sub _init_robots {
     my $self = shift;
 
@@ -1213,6 +1220,9 @@ sub _init_robots {
         $robot_tests->{lib} = 1;
         $robot_fragment     = 'google';
     }
+    elsif ( index( $ua, 'researchscan.comsys.rwth-aachen.de' ) != -1 ) {
+        $r = 'researchscan';
+    }
 
     # These @ROBOT_TESTS were added in 3.15.  Some of them may need more
     # individualized treatment, but get them identified as bots for now.
@@ -1277,7 +1287,17 @@ sub _init_robots {
     }
     else {
         # See if we have a simple fragment
+    FRAGMENT:
         for my $fragment (@ROBOT_FRAGMENTS) {
+            if ( $ROBOT_FRAGMENT_EXCEPTIONS{$fragment} ) {
+                for my $exception (
+                    @{ $ROBOT_FRAGMENT_EXCEPTIONS{$fragment} || [] } ) {
+                    if ( index( $ua, $exception ) != -1 ) {
+                        next FRAGMENT;
+                    }
+                }
+            }
+
             if ( index( $ua, $fragment ) != -1 ) {
                 $robot_fragment = $fragment;
                 $robot_tests->{robot} = 'unknown';
@@ -2935,7 +2955,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.17
+version 3.18
 
 =head1 SYNOPSIS
 

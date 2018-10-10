@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000423';
+our $VERSION='1.0000424';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -4414,6 +4414,232 @@ END
 }
 
 sub download_berkeleydb {
+
+   my $source=$last_known_good_location;
+   FA::LWP::UserAgent->config;
+   print "Fetching with LWP:\n  $source\n";
+   my $Ua;
+   eval {
+      local $SIG{__DIE__}; # No sigdie handler;
+      $Ua = FA::LWP::UserAgent->new(
+            timeout=>300,show_progress=>1)
+   };
+   if ($@) {
+      $CPAN::Frontend->mywarn(
+         "ERROR: FA::LWP::UserAgent->new dies with $@\n");
+   } else {
+      my($var);
+      $Ua->proxy('http', $var)
+         if $var = $CPAN::Config->{http_proxy} ||
+         $ENV{http_proxy};
+      $Ua->no_proxy($var)
+         if $var = $CPAN::Config->{no_proxy} || $ENV{no_proxy};
+   }
+   my %errors = ('500'=>'Bad hostname supplied',
+                 '404'=>'URL not found',
+                 '403'=>'URL forbidden',
+                 '401'=>'Authorization failed',
+                 '400'=>'Bad request found',
+                 '302'=>'Redirected URL'
+   );
+   my $md5filename='';my $req='';my $res='';
+   my $already_downloaded=0;
+   my $site='download.oracle.com';
+   $source=~
+      s/^.*?(http:\/\/$site\/)(?:otn\/)*(b.*?\d.tar.gz).*$/$1$2/s;
+   my $file=$2;
+   my $file=substr($file,(index $file,'/')+1,-7);
+   my $fh='';my $filename='';my $suffix='.tar.gz';
+   if (grep  { /BDB/ } @ARGV) {
+      $already_downloaded=1;
+      $filename=$ARGV[$#ARGV];
+   } else {
+      $req = HTTP::Request->new(GET => $source);
+      $req->header('Accept-Encoding' => 'gzip, compress');
+      $res = $Ua->request($req);
+      my $fh='';my $suffix='.tar.gz';
+      ($fh,$filename)=get_temp_file($file,$suffix);
+      if ($res->is_success) {
+         print " + request successful.\n"
+            if $CPAN::DEBUG;
+         print $fh $res->content;
+         close $fh;
+      } else {
+         my $status_line=$res->status_line;
+         ($status_line) = ($status_line =~ /(\d+)/);
+         if (defined($errors{$status_line})) {
+            print(
+               "LWP failed (1) with code $status_line, ",
+               "message $errors{$status_line}\n".
+               "Please check your connection to the Internet!\n",
+               $status_line,
+               $res->message,
+            );
+         } else {
+            print(
+               "LWP failed (2) with an Unknown Error\n".
+               "Please check your connection to the Internet!\n",
+            );
+         }
+         fa_die();
+      }
+      print(qq{ + saved content to $filename \n})
+         if $CPAN::DEBUG;
+      my $md5fh='';
+      ($md5fh,$md5filename)=get_temp_file($file,$suffix.'.md5');
+      $req = HTTP::Request->new(GET => $source.'.md5');
+      $req->header('Accept-Encoding' => 'gzip, compress');
+      $res = $Ua->request($req);
+      if ($res->is_success) {
+         print " + request successful.\n"
+            if $CPAN::DEBUG;
+         print $md5fh $res->content;
+         close $md5fh;
+      } else {
+         my $status_line=$res->status_line;
+         ($status_line) = ($status_line =~ /(\d+)/);
+         if (defined($errors{$status_line})) {
+            print(
+               "LWP failed (3) with code $status_line, ",
+               "message $errors{$status_line}\n".
+               "Please check your connection to the Internet!\n",
+               $status_line,
+               $res->message,
+            );
+         } else {
+            print(
+               "LWP failed (4) with an Unknown Error\n".
+               "Please check your connection to the Internet!\n",
+            );
+         }
+         fa_die();
+      }
+      print(qq{ + saved md5 content to $md5filename \n})
+         if $CPAN::DEBUG;
+      open(MH,"<$md5filename") || fa_die($!);
+      my $mhf=<MH>;
+      close(MH);
+      my $checksum=$mhf;
+      $checksum=~s/^\s*(\S+)\s+.*$/$1/s;
+      open(FILE, $filename) or fa_die("Can't open '$file': $!");
+      binmode(FILE);
+      require Digest::MD5;
+      import Digest::MD5;
+      my $digestmd5=Digest::MD5->new->addfile(*FILE)->hexdigest;
+      if ($checksum eq $digestmd5) {
+         print(qq{ + CHECKSUM Test for $filename *PASSED* \n})
+            if $CPAN::DEBUG;
+      } else {
+         print "CHECKSUM test for $filename *FAILED*\n";
+         print "CALCULATED=$digestmd5 and ",
+               "DOWNLOADED=$checksum\n";
+         print "\nPress ANY key to terminate FullAuto ",
+               "installation ...\n";
+         <STDIN>;
+         fa_die("FATAL ERROR! : ".
+             "CHECKSUM Test for $filename *FAILED*\n");
+      }
+      close(FILE);
+      if (grep { /-*add[-_]?dependencies/i } @ARGV) {
+         Term::ReadKey::ReadMode(0);
+         return $filename,$md5filename,$file;
+      } else {
+         cpan_gunzip_and_untar();
+         unless (keys %amazon) {
+            my $so=fa_system($CPAN::Config->{gzip}." -d $filename");
+            if ($so==-1) {
+               fa_die("Cannot gunzip $filename: $!\n");
+            }
+            $filename=~s/\.gz$//;
+         }
+      }
+   }
+   if (keys %amazon) {
+      unless (exists $amazon{'freebsd'}) {
+         unless ($already_downloaded) {
+            select STDOUT;
+            $log->close() if $log && -1<index $log,'*';
+            if (grep { /-*add[-_]?dependencies/i } @ARGV) {
+               exec 'sudo',$^X,'Makefile.PL','add_dependencies',
+                    'BDB',$filename;
+            } else {
+               exec 'sudo',$^X,'Makefile.PL','BDB',$filename;
+            }
+         }
+         my $so=fa_system($CPAN::Config->{gzip}." -d $filename");
+         if ($so==-1) {
+            fa_die("Cannot gunzip $filename: $!\n");
+         } else {
+            $filename=~s/\.gz$//;
+         }
+         print "***** Untar1: sudo ",
+            $CPAN::Config->{tar}," xvf $filename\n";
+         fa_system("sudo ".$CPAN::Config->{tar}." xvf $filename");
+      } else {
+         unless ($already_downloaded) {
+            select STDOUT;
+            $log->close() if $log && -1<index $log,'*';
+            if (grep { /-*add[-_]?dependencies/i } @ARGV) {
+               exec 'sudo',$^X,'Makefile.PL','add_dependencies',
+                    'BDB',$filename;
+            } else {
+               exec 'sudo',$^X,'Makefile.PL','BDB',
+                    $filename;
+            }
+         }
+         my $so=fa_system($CPAN::Config->{gzip}." -d $filename");
+         if ($so==-1) {
+            fa_die("Cannot gunzip $filename: $!\n");
+         }  else {
+            $filename=~s/\.gz$//;
+         }
+         print "***** Untar2: ",
+            $CPAN::Config->{tar}," xvf $filename\n";
+         fa_system($CPAN::Config->{tar}." xvf $filename");
+      }
+   } else {
+      print "***** Untar3: ",
+         $CPAN::Config->{tar}," xvf $filename\n";
+      fa_system($CPAN::Config->{tar}." xvf $filename");
+   }
+   $filename=~/^.*\/(.*)_(.*).tar$/;
+   $filename=$1;
+   my $uniq=$2;
+   #File::Copy::move("$filename","${filename}_$uniq");
+   File::Copy::move("$filename","$filename.NC_$uniq");
+   my $ver=$file;
+   $ver=~s/_.*$//;
+   $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
+   my $pre="/usr/local/BerkeleyDB.$ver";
+   $pre=$PREFIX."BerkeleyDB$ver" if $PREFIX;
+   build_berkeleydb($filename,$uniq,$pre,$PREFIX,'');
+   unless (exists $ENV{'BERKELEYDB_INCLUDE'} &&
+         $ENV{'BERKELEYDB_INCLUDE'}) {
+      my $BerkDownload='https://www.oracle.com/technetwork/database/'.
+                       'database-technologies/berkeleydb/downloads/'.
+                       'index.html';
+      my $PackManagers='https://en.wikipedia.org/wiki/'.
+                       'List_of_software_package_management_systems';
+      my $w='      ';
+      my $die="\n$w ".
+         "FATAL ERROR! : Cannot locate 'Berkeley DB'. This C Library".
+         " \n$w                is required to install FullAuto".
+         "\n$w                (Hint: goto\n".
+         "\n$w $BerkDownload\n".
+         "\n$w                 for Berkeley DB Source Code. Binary".
+         " versions".
+         "\n$w                 of the Library are widely available via".
+         "\n$w                 package managers such as yum and apt-get".
+         "\n$w                 See:\n".
+         "\n$w $PackManagers).".
+         "\n\n";
+      fa_die($die);
+   }
+
+}
+
+
+sub download_berkeleydb_BAK {
 
    my $url=
       'https://www.oracle.com/technetwork/database/'.

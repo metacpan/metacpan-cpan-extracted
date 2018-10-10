@@ -6,6 +6,8 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
+use lib '.';
+
 use Test::More 'tests' => 9;
 use Test::Fatal;
 use Capture::Tiny qw{capture};

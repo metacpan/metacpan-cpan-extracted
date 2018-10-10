@@ -1,7 +1,7 @@
 package Versioning::Scheme::Dotted;
 
-our $DATE = '2018-10-05'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-10-11'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +10,7 @@ use warnings;
 use Role::Tiny;
 use Role::Versioning::Scheme;
 
-my $re = qr/\A[0-9]+(?:\.[0-9]+)*\z/;
+our $re = qr/\A[0-9]+(?:\.[0-9]+)*\z/;
 
 sub is_valid_version {
     my ($self, $v) = @_;
@@ -95,7 +95,7 @@ Versioning::Scheme::Dotted - Version as dotted numbers
 
 =head1 VERSION
 
-This document describes version 0.003 of Versioning::Scheme::Dotted (from Perl distribution Versioning-Scheme), released on 2018-10-05.
+This document describes version 0.005 of Versioning::Scheme::Dotted (from Perl distribution Versioning-Scheme), released on 2018-10-11.
 
 =head1 SYNOPSIS
 
@@ -179,6 +179,8 @@ feature.
 =head1 SEE ALSO
 
 L<Versioning::Scheme>, L<Role::Versioning::Scheme>
+
+L<Versioning::Scheme::Semantic>
 
 =head1 AUTHOR
 

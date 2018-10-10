@@ -43,31 +43,31 @@
    "provides" : {
       "Address::PostCode::UK" : {
          "file" : "lib/Address/PostCode/UK.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Address::PostCode::UK::Location" : {
          "file" : "lib/Address/PostCode/UK/Location.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Address::PostCode::UK::Place" : {
          "file" : "lib/Address/PostCode/UK/Place.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Address::PostCode::UK::Place::Constituency" : {
          "file" : "lib/Address/PostCode/UK/Place/Constituency.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Address::PostCode::UK::Place::Council" : {
          "file" : "lib/Address/PostCode/UK/Place/Council.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Address::PostCode::UK::Place::Geo" : {
          "file" : "lib/Address/PostCode/UK/Place/Geo.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Address::PostCode::UK::Place::Ward" : {
          "file" : "lib/Address/PostCode/UK/Place/Ward.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -78,6 +78,6 @@
          "web" : "https://github.com/manwar/Address-PostCode-UK"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

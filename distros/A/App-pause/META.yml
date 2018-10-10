@@ -18,18 +18,19 @@ meta-spec:
 name: App-pause
 requires:
   Complete::Bash: '0.27'
-  Getopt::Long::EvenLess: '0.10'
-  Getopt::Long::Subcommand: '0.09'
+  Getopt::Long::EvenLess: '0.111'
+  Getopt::Long::Subcommand: '0.102'
   JSON::PP: '0'
-  List::Util: '0'
-  Log::ger: '0.019'
+  List::Util: '1.45'
+  Log::ger: '0.023'
   Log::ger::Output: '0.005'
-  Log::ger::Output::Screen: '0.004'
+  Log::ger::Output::Screen: '0.007'
   Log::ger::Util: '0.008'
-  Perinci::CmdLine::Util::Config: '1.71'
-  Perinci::Result::Format::Lite: '0.22'
+  Perinci::CmdLine::Util::Config: '1.721'
+  Perinci::Result::Format::Lite: '0.273'
   Scalar::Util: '0'
   Scalar::Util::Numeric: '0'
+  Scalar::Util::Numeric::PP: '0'
   Time::Duration::Parse::AsHash: '0'
   WWW::PAUSE::Simple: '0.41'
   perl: '5.010001'
@@ -39,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-pause
   homepage: https://metacpan.org/release/App-pause
   repository: git://github.com/perlancar/perl-App-pause.git
-version: '0.64'
+version: '0.650'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -115,7 +116,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.58'
+      version: '0.593'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -127,19 +128,30 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
-      version: '0.04'
+      version: '0.05'
     -
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CheckSelfDependency
+      config:
+        Dist::Zilla::Plugin::CheckSelfDependency:
+          finder:
+            - ':InstallModules'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
+      name: '@Author::PERLANCAR/CheckSelfDependency'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
@@ -297,7 +309,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.13'
+      version: '0.142'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
@@ -329,6 +341,10 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.056'
     -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@Author::PERLANCAR/Test::Perl::Critic'
+      version: '3.001'
+    -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
       version: '0.03'
@@ -345,17 +361,17 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'
       version: '0.03'
     -
-      class: Dist::Zilla::Plugin::Acme::CPANLists::Blacklist
-      name: '@Author::PERLANCAR/Acme::CPANLists::Blacklist'
-      version: '0.03'
+      class: Dist::Zilla::Plugin::Acme::CPANModules::Blacklist
+      name: '@Author::PERLANCAR/Acme::CPANModules::Blacklist'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.03'
+      version: '0.050'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.005'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'

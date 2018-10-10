@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/jlouder/garmin-connect-perl/issues
   homepage: https://github.com/jlouder/garmin-connect-perl
   repository: https://github.com/jlouder/garmin-connect-perl.git
-version: 1.0.6
+version: 1.0.7
 x_serialization_backend: 'YAML::Tiny version 1.70'

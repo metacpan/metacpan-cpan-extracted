@@ -10,3 +10,4 @@
 ^pod2htm
 ^_build/
 ^.git/
+.travis.yml

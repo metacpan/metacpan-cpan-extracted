@@ -1,3 +1,6 @@
+1.0107 2018-10-09
+ * Handle the edge case of an empty path
+
 1.0107 2017-01-23
  * Prevent SVG lengths from having units, for now.
 

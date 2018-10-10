@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               SMS-Send-Kannel-SMSbox
-version:            0.04
+version:            0.05
 abstract:           SMS::Send driver for Kannel SMSbox web service
 author:
     - Michael R. Davis (mdavis@stopllc.com)

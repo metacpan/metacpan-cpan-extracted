@@ -1,5 +1,5 @@
 {
-   "abstract" : "minimal PCG random number generator",
+   "abstract" : "minimal random permuted congruential generator",
    "author" : [
       "Jeremy Mates <jmates@cpan.org>"
    ],
@@ -32,6 +32,7 @@
       },
       "test" : {
          "requires" : {
+            "Algorithm::Diff" : "0",
             "Test::More" : "0.88",
             "Test::Most" : "0"
          }
@@ -40,7 +41,7 @@
    "provides" : {
       "Math::Random::PCG32" : {
          "file" : "lib/Math/Random/PCG32.pm",
-         "version" : "0.07"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -52,6 +53,6 @@
          "url" : "https://github.com/thrig/Math-Random-PCG32"
       }
    },
-   "version" : "0.07",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

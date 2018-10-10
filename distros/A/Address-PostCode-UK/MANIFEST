@@ -11,6 +11,7 @@ LICENSE
 MANIFEST
 MANIFEST.SKIP
 README
+CONTRIBUTING.md
 t/00-load.t
 t/01-address-postcode-uk.t
 t/02-address-postcode-uk-place.t

@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Finance::SE::IDX",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
-    "HTTP::Tiny" => "0.057",
+    "HTTP::Tiny::Cache" => 0,
     "JSON::MaybeXS" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "File::Spec" => 0,
-  "HTTP::Tiny" => "0.057",
+  "HTTP::Tiny::Cache" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,

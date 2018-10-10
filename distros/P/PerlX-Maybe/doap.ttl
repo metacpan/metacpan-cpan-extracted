@@ -12,8 +12,8 @@
 <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/project>
 	a                    doap:Project;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt"^^doap-deps:CpanId ];
-	doap-deps:runtime-recommendation [ doap-deps:on "PerlX::Maybe::XS"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "PerlX::Maybe::XS"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
 	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Maybe>;
 	doap:created         "2012-02-15"^^xsd:date;
@@ -24,7 +24,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "PerlX-Maybe";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-001>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-002>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-003>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-004>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_01>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_02>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-000>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-001>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-002>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-003>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-004>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_01>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_02>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-000>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-001>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-200>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-perlx-maybe>;
@@ -128,6 +128,36 @@
 	];
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-1.001.tar.gz>;
 	doap:revision        "1.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-200>
+	a                    doap:Version;
+	rdfs:label           "Big new features time!"@en;
+	dc:issued            "2018-10-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Package using newer version of Dist::Inkt."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Require Scalar::Util."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add `provided_deref` and `provided_deref_with_maybe` functions."@en;
+			doap-changeset:thanks [
+				foaf:name "Theo van Hoesel";
+				foaf:nick "VANHOESEL";
+			];
+		], [
+			a doap-changeset:Documentaion;
+			rdfs:label "Add `use` line to SYNOPSIS."@en;
+			doap-changeset:thanks [ foaf:name "Ivan Baidakou"; foaf:nick "DMOL" ];
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Progressively load exporters, choosing Exporter.pm or Exporter::Tiny as needed."@en;
+		];
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-1.200.tar.gz>;
+	doap:revision        "1.200"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

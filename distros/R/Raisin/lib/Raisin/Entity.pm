@@ -69,12 +69,16 @@ sub compile {
         while (my $i = $data->next) {
             push @$result, _compile_column($entity, $i, \@expose);
         }
+
+        $result = [] unless $result;
     }
     # Array
     elsif (ref($data) eq 'ARRAY') {
         for my $i (@$data) {
             push @$result, _compile_column($entity, $i, \@expose);
         }
+
+        $result = [] unless $result;
     }
     # Hash, Rose::DB::Object, DBIx::Class::Core
     elsif (ref($data) eq 'HASH'

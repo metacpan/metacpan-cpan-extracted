@@ -1,4 +1,10 @@
-See the git repository.
+See mostly the git repository.
+
+ * 1.21 - change shift to (...) = @_ form. update docs to better show
+   how to use the interface.
+
+ * 1.20 - BSD license, don't support Haiku OS (no link()), more web
+   pages on how various filesystems make rename() problematic.
 
  * 1.18 - Changes from stdweird: octal mode support, :group support for
    _set_ownership, backup suffix, mtime modifiction.

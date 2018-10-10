@@ -1,0 +1,8 @@
+Revision history for JSON-Patch
+
+0.02    2018-10-10
+        - External tests run fixed (do not confuse CPAN testers)
+
+0.01    2018-10-09
+        - Initial release.
+

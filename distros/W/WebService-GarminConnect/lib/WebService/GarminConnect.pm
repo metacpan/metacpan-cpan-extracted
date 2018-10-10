@@ -9,7 +9,7 @@ use URI;
 use JSON;
 use Data::Dumper;
 
-our $VERSION = '1.0.6'; # VERSION
+our $VERSION = '1.0.7'; # VERSION
 
 =head1 NAME
 
@@ -17,7 +17,7 @@ WebService::GarminConnect - Access data from Garmin Connect
 
 =head1 VERSION
 
-version 1.0.6
+version 1.0.7
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ sub _login {
   # Bail out if we're already logged in.
   return if defined $self->{is_logged_in};
 
-  my $ua = LWP::UserAgent->new();
+  my $ua = LWP::UserAgent->new(agent => 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko');
   $ua->cookie_jar( {} );
   push @{ $ua->requests_redirectable }, 'POST';
 
@@ -130,7 +130,7 @@ sub _login {
   my $ticket=$1;
 
   #$uri = URI->new('https://connect.garmin.com/post-auth/login?ticket=$1');
-  $uri = URI->new('https://connect.garmin.com/modern/?ticket=$1');
+  $uri = URI->new("https://connect.garmin.com/modern/?ticket=$ticket");
   $response = $ua->get($uri);
   croak "Can't retrieve post-auth page: " . $response->status_line
     unless $response->is_success;

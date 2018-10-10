@@ -1,5 +1,13 @@
 Revision history for IO-Termios
 
+0.07    2018-10-09 22:18:32
+        [CHANGES]
+         * Added support for OPOST flag
+         * Added cfmakeraw()
+
+        [BUGFIXES]
+         * Declare dependency on perl 5.10+ because of // operator (RT125619)
+
 0.06    2018-06-04 23:04:40
         [CHANGES]
          * Support additional `sysopen()` flags to IO::Termios->open()

@@ -2,7 +2,7 @@
 # PODNAME: TestRail::Utils::Lock
 
 package TestRail::Utils::Lock;
-$TestRail::Utils::Lock::VERSION = '0.043';
+$TestRail::Utils::Lock::VERSION = '0.044';
 use 5.010;
 
 use strict;
@@ -143,7 +143,7 @@ TestRail::Utils::Lock - Pick high priority cases for execution and lock them via
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 DESCRIPTION
 
@@ -203,8 +203,8 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/teodesian/TestRail-Perl>
-and may be cloned from L<git://https://github.com/teodesian/TestRail-Perl.git>
+The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 

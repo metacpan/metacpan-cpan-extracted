@@ -2,7 +2,7 @@ package Net::SMTP::Verify;
 
 use Moose;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 # ABSTRACT: verify SMTP recipient addresses
 
 use Net::SMTP::Verify::ResultSet;
@@ -162,7 +162,7 @@ sub check_openpgpkey {
 sub check_smtp {
   my ( $self, $rs, $host, $size, $sender, @rcpts ) = @_;
 
-  $self->log('connecting to '.$host.'...');
+  $self->log('connecting to '.$host.' on port '.$self->port.'...');
   my $smtp = Net::SMTP->new( $host,
     Port => $self->port,
     Hello => $self->helo_name,
@@ -314,7 +314,7 @@ Net::SMTP::Verify - verify SMTP recipient addresses
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 

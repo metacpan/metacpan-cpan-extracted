@@ -1,65 +1,49 @@
 ==================================================
-Changes from 2014-09-03 00:00:00 +0000 to present.
+Changes from 2017-10-10 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 1.03 at 2015-09-03 08:14:48 +0000
+version 1.04 at 2018-10-10 16:29:53 +0000
 -----------------------------------------
 
-  Change: 35f5bf49af8a7bbbcfae5b58adfe0376c345144a
+  Change: 733fdf204a571479cfda1adaa29e9d647228f821
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-09-03 10:11:24 +0000
+  Date : 2018-10-10 18:28:39 +0000
 
-    improved SMTP test case and small bug fixes
+    Run remote tests only with internet connection
 
-    * use Test::Mock::Mail::Server::Mail to test module
+    This run remote tests only if $ENV{INTERNET_TESTING} is set. 
 
-    * bug fix: the port parameter was not used
-
-    * turn some accessors from ro -> rw 
-
-  Change: aace46ba0b82194aeddab399a4c4b7fed9fb9372
+  Change: b9113846dd4ce165c51d3f0322e0be8f234c4aa6
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-08-31 08:59:21 +0000
+  Date : 2018-10-10 18:20:16 +0000
 
-    add minimum perl version 
+    Update MX record name in resolv test 
 
------------------------------------------
-version 1.02 at 2015-08-30 15:26:52 +0000
------------------------------------------
-
-  Change: eae3ad53dc34d3da7632dce64c0e361559a61148
+  Change: 2eadca46e2414862dc0ec6ab696607052fe50fab
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-08-30 17:26:52 +0000
+  Date : 2015-09-22 11:32:23 +0000
 
-    added support for OPENPGPKEYs 
+    add dependency on latest Net::SMTP version 
 
------------------------------------------
-version 1.01 at 2015-08-30 12:46:49 +0000
------------------------------------------
-
-  Change: e833439938e7dde5f257607a0d13dad3317f9d18
+  Change: a24d06ceef3fbd01275e928c17c9eb095c257785
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-08-30 14:46:49 +0000
+  Date : 2015-09-04 10:23:55 +0000
 
-    added class documentation 
+    include port number in log message 
 
------------------------------------------
-version 1.00 at 2015-08-29 18:16:52 +0000
------------------------------------------
-
-  Change: 790acb2d71b7f3343236b0163f20e51be83e368b
+  Change: b81d085c5dd2746a80ae6d223c745e42c0a09d11
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-08-29 20:16:52 +0000
+  Date : 2015-09-04 09:49:27 +0000
 
-    added travis CI file 
+    generate new .travis.yml 
 
-  Change: 4127c6fa2e3f74cfef5d52b577708fba47b45238
+  Change: 62e73c4d600c84e6bce8a46c3ae5d6b1b06ee90f
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-08-29 20:15:14 +0000
+  Date : 2015-09-04 09:09:02 +0000
 
-    initial commit 
+    use --notest for cpanm in travis 
 
-================
-End of releases.
-================
+================================================
+Plus 4 releases after 2017-10-10 00:00:00 +0000.
+================================================

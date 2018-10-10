@@ -49,6 +49,7 @@ t/author-pod-syntax.t
 t/behaviour/app-deserialize.t
 t/behaviour/app-hooks.t
 t/behaviour/app-routes.t
+t/behaviour/app-serialize-provides.t
 t/behaviour/app-serialize.t
 t/behaviour/plugin-openapi.t
 t/unit/api.t

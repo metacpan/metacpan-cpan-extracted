@@ -4,13 +4,13 @@
       "Timm Murray <tmurray@wumpus-cave.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Game-Asset-GVG-OpenGL",
    "prereqs" : {
@@ -38,7 +38,7 @@
    "provides" : {
       "Game::Asset::GVG::OpenGL" : {
          "file" : "lib/Game/Asset/GVG/OpenGL.pm",
-         "version" : "0.1"
+         "version" : "0.2"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,7 @@
          "web" : "https://github.com/frezik/Game-Asset-GVG-OpenGL"
       }
    },
-   "version" : "0.1"
+   "version" : "0.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

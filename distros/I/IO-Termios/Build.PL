@@ -10,6 +10,7 @@ my $build = Module::Build->new(
    },
    requires => {
       'IO::Tty' => 0,
+      'perl' => '5.010', # //
    },
    test_requires => {
       'IO::Tty' => 0,

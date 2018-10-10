@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.17'
+version: '3.18'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -71,7 +71,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.13'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -303,7 +303,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.045'
@@ -311,7 +311,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.19.0
+          git_version: 2.19.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -394,7 +394,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -407,11 +407,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.17
+          tag: v3.18
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -448,7 +448,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -462,7 +462,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.045'
@@ -533,6 +533,7 @@ x_contributors:
   - 'Paul Findlay <paul@findlay.net.nz>'
   - 'Perlover <perlover@perlover.com>'
   - 'Ramanan Balakrishnan <ramanan90@gmail.com>'
+  - 'reneeb <info@perl-services.de>'
   - 'Robin Smidsrød <robin@smidsrod.no>'
   - 'Ronald J Kimball <rkimball@pangeamedia.com>'
   - 'Surikov Alexey <surikov@alexey-pc.kiteventures.local>'
@@ -541,4 +542,4 @@ x_contributors:
   - 'vti <viacheslav.t@gmail.com>'
   - 'yeahoffline <frank.gasser@gmail.com>'
 x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.70'

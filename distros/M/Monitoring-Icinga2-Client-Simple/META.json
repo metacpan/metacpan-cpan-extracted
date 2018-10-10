@@ -31,7 +31,6 @@
             "Carp" : "0",
             "List::Util" : "1.33",
             "Monitoring::Icinga2::Client::REST" : "2",
-            "YAML::XS" : "0",
             "constant" : "0",
             "parent" : "0",
             "perl" : "v5.10.1",
@@ -60,7 +59,7 @@
          "web" : "https://github.com/mbethke/Monitoring-Icinga2-Client-Simple"
       }
    },
-   "version" : "0.001000",
+   "version" : "0.002000",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

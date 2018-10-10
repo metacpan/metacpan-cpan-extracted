@@ -4,16 +4,16 @@ NAME
 
 SYNOPSIS
 
-     use IO::Termios;
+       use IO::Termios;
     
-     my $term = IO::Termios->open( "/dev/ttyS0", "9600,8,n,1" )
-        or die "Cannot open ttyS0 - $!";
+       my $term = IO::Termios->open( "/dev/ttyS0", "9600,8,n,1" )
+          or die "Cannot open ttyS0 - $!";
     
-     $term->print( "Hello world\n" ); # Still an IO::Handle
+       $term->print( "Hello world\n" ); # Still an IO::Handle
     
-     while( <$term> ) {
-        print "A line from ttyS0: $_";
-     }
+       while( <$term> ) {
+          print "A line from ttyS0: $_";
+       }
 
 DESCRIPTION
 
@@ -26,17 +26,17 @@ DESCRIPTION
     pseudo-tty, and are useful for controlling such flags as the ECHO flag,
     to disable local echo.
 
-     my $stdin = IO::Termios->new( \*STDIN );
-     $stdin->setflag_echo( 0 );
+       my $stdin = IO::Termios->new( \*STDIN );
+       $stdin->setflag_echo( 0 );
 
     When dealing with a serial port the line mode method is useful for
     setting the basic serial parameters such as baud rate, and the modem
     line control methods can be used to access the hardware handshaking
     lines.
 
-     my $ttyS0 = IO::Termios->open( "/dev/ttyS0" );
-     $ttyS0->set_mode( "19200,8,n,1" );
-     $ttyS0->set_modem({ dsr => 1, cts => 1 });
+       my $ttyS0 = IO::Termios->open( "/dev/ttyS0" );
+       $ttyS0->set_mode( "19200,8,n,1" );
+       $ttyS0->set_modem({ dsr => 1, cts => 1 });
 
  Arbitrary Baud Rates on Linux
 
@@ -120,7 +120,7 @@ METHODS
     concatenation of the baud rate, character size, parity mode, and stop
     size in a format such as
 
-     19200,8,n,1
+       19200,8,n,1
 
     When setting the mode string, trailing components may be omitted
     meaning their value will not be affected.
@@ -156,7 +156,7 @@ METHODS
     modem line control bits. Any bit that is set will yield a key in the
     returned hash of the same name. The bit names are
 
-     dtr dsr rts cts cd ri
+       dtr dsr rts cts cd ri
 
  set_modem
 
@@ -193,24 +193,24 @@ FLAG-ACCESSOR METHODS
     The following two sections of code are therefore equivalent, though the
     latter is more efficient as it only calls setattr once.
 
-     $term->setbaud( 38400 );
-     $term->setcsize( 8 );
-     $term->setparity( 'n' );
-     $term->setstop( 1 );
+       $term->setbaud( 38400 );
+       $term->setcsize( 8 );
+       $term->setparity( 'n' );
+       $term->setstop( 1 );
 
 
-     my $attrs = $term->getattr;
-     $attrs->setbaud( 38400 );
-     $attrs->setcsize( 8 );
-     $attrs->setparity( 'n' );
-     $attrs->setstop( 1 );
-     $term->setattr( $attrs );
+       my $attrs = $term->getattr;
+       $attrs->setbaud( 38400 );
+       $attrs->setcsize( 8 );
+       $attrs->setparity( 'n' );
+       $attrs->setstop( 1 );
+       $term->setattr( $attrs );
 
     However, a convenient shortcut method is provided for the common case
     of setting the baud rate, character size, parity and stop size all at
     the same time. This is set_mode:
 
-     $term->set_mode( "38400,8,n,1" );
+       $term->set_mode( "38400,8,n,1" );
 
  getibaud
 
@@ -266,6 +266,29 @@ FLAG-ACCESSOR METHODS
        $term->setstop( $stop )
 
     Convenience accessor for the CSTOPB bit of c_cflag. $stop is 1 or 2.
+
+ cfmakeraw
+
+       $term->cfmakeraw
+
+    Since version 0.07.
+
+    Adjusts several bit flags to put the terminal into a "raw" mode. Input
+    is available a character at a time, echo is disabled, and all special
+    processing of input and output characters is disabled.
+
+ getflag_opost
+
+ setflag_opost
+
+       $mode = $term->getflag_opost
+    
+       $term->setflag_opost( $mode )
+
+    Since version 0.07.
+
+    Accessor for the OPOST bit of the c_oflag. This enables system-specific
+    post-processing on output.
 
  getflag_cread
 
@@ -330,9 +353,9 @@ TODO
       * Automatically upgrading STDIN/STDOUT/STDERR if appropriate, given a
       flag.
 
-       use IO::Termios -upgrade;
+         use IO::Termios -upgrade;
       
-       STDIN->setflag_echo( 0 );
+         STDIN->setflag_echo( 0 );
 
 SEE ALSO
 

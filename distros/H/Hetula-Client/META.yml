@@ -37,6 +37,6 @@ resources:
   bugtracker: https://github.com/kivilahtio/libhetula-client-perl/issues
   homepage: https://github.com/kivilahtio/libhetula-client-perl
   repository: https://github.com/kivilahtio/libhetula-client-perl.git
-version: '0.006'
+version: '0.007'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

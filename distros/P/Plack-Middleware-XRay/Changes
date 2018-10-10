@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack-Middleware-XRay
 
+0.06 2018-10-10T03:35:00Z
+    - Fix typo in POD
+
 0.05 2018-07-05T08:11:10Z
     - Add response_filter
     - follow to AWS::XRay 0.06

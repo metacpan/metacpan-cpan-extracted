@@ -1,5 +1,8 @@
 Revision history for Address::PostCode::UK
 
+0.14  2018-10-09T12:40:00+01:00
+      - Merged pull request #1 from lancew/master (Travis + CONTRIBUTING.md).
+
 0.13  2017-04-01T02:55:00+01:00
       - Added test scripts (t/meta-json.t and t/meta-yml.t).
       - Fixed typo in the package version.

@@ -1,3 +1,10 @@
+0.006   2018-10-10 (PERLANCAR)
+
+	- [bugfix] completion: when argv[0] doesn't match any host in
+	  .sshwrap-hostcolor.history, return undef so completion can try
+	  other things.
+
+
 0.005   2018-09-26 (PERLANCAR)
 
 	- No functional changes.

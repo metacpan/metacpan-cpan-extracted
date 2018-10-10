@@ -13,6 +13,8 @@ Guide information is embedded in the main POD text.
 Building a distribution
 -----------------------
 ```
+rm *StaticLog*tar.gz
+# bump VERSION in (source).pm
 perl Makefile.PL
 make test
 make manifest

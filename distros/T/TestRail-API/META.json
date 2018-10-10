@@ -101,35 +101,35 @@
    "provides" : {
       "App::Prove::Plugin::TestRail" : {
          "file" : "lib/App/Prove/Plugin/TestRail.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       },
       "Test::Rail::Harness" : {
          "file" : "lib/Test/Rail/Harness.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       },
       "Test::Rail::Parser" : {
          "file" : "lib/Test/Rail/Parser.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       },
       "TestRail::API" : {
          "file" : "lib/TestRail/API.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       },
       "TestRail::Utils" : {
          "file" : "lib/TestRail/Utils.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       },
       "TestRail::Utils::Find" : {
          "file" : "lib/TestRail/Utils/Find.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       },
       "TestRail::Utils::Lock" : {
          "file" : "lib/TestRail/Utils/Lock.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       },
       "TestRail::Utils::Results" : {
          "file" : "lib/TestRail/Utils/Results.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       }
    },
    "release_status" : "stable",
@@ -140,11 +140,11 @@
       "homepage" : "https://github.com/teodesian/TestRail-Perl",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/teodesian/TestRail-Perl.git",
+         "url" : "git://github.com/teodesian/TestRail-Perl.git",
          "web" : "https://github.com/teodesian/TestRail-Perl"
       }
    },
-   "version" : "0.043",
+   "version" : "0.044",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Neil Bowers <neil@bowers.com>",

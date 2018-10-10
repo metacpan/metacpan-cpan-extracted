@@ -1,7 +1,7 @@
 package App::sshwrap::hostcolor;
 
-our $DATE = '2018-09-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-10-10'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -71,7 +71,7 @@ App::sshwrap::hostcolor - SSH wrapper script to remember the terminal background
 
 =head1 VERSION
 
-This document describes version 0.005 of App::sshwrap::hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2018-09-26.
+This document describes version 0.006 of App::sshwrap::hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2018-10-10.
 
 =head1 SYNOPSIS
 

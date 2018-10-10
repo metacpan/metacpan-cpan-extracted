@@ -1,5 +1,8 @@
 Revision history for Perl module SMS::Send::Kannel::SMSbox
 
+0.05 2018-10-09
+  - Added example script to distribution perl-SMS-Send-Kannel-SMSbox-send_sms.pl
+  
 0.04 2015-11-29
   - Updated Documentation
 

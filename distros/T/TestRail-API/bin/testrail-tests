@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Tests
 
 package TestRail::Bin::Tests;
-$TestRail::Bin::Tests::VERSION = '0.043';
+$TestRail::Bin::Tests::VERSION = '0.044';
 use strict;
 use warnings;
 use utf8;
@@ -82,7 +82,7 @@ TestRail::Bin::Tests - List tests in a TestRail run matching the provided filter
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 SYNOPSIS
 
@@ -176,8 +176,8 @@ George S. Baugh <teodesian@cpan.org>
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/teodesian/TestRail-Perl>
-and may be cloned from L<git://https://github.com/teodesian/TestRail-Perl.git>
+The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 

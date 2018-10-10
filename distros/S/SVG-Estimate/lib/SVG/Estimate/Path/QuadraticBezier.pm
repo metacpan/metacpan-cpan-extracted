@@ -1,5 +1,5 @@
 package SVG::Estimate::Path::QuadraticBezier;
-$SVG::Estimate::Path::QuadraticBezier::VERSION = '1.0107';
+$SVG::Estimate::Path::QuadraticBezier::VERSION = '1.0108';
 use Moo;
 use List::Util qw/min max/;
 use Clone qw/clone/;
@@ -13,7 +13,7 @@ SVG::Estimate::Path::QuadraticBezier - Handles estimating quadratic bezier curve
 
 =head1 VERSION
 
-version 1.0107
+version 1.0108
 
 =head1 SYNOPSIS
 

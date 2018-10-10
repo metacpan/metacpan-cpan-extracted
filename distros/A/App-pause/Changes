@@ -1,3 +1,10 @@
+0.650   2018-10-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention pause-cleanup and WWW::PAUSE::CleanUpHomeDir.
+
+
 0.64    2017-07-24 (PERLANCAR)
 
         - No functional changes.

@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Graphics::GVG::AST::Command;
-$Graphics::GVG::AST::Command::VERSION = '0.7';
+$Graphics::GVG::AST::Command::VERSION = '0.9';
 use strict;
 use warnings;
 use Moose::Role;

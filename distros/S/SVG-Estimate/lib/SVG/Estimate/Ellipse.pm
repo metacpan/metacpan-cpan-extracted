@@ -1,5 +1,5 @@
 package SVG::Estimate::Ellipse;
-$SVG::Estimate::Ellipse::VERSION = '1.0107';
+$SVG::Estimate::Ellipse::VERSION = '1.0108';
 use Moo;
 use Math::Trig qw/pi/;
 
@@ -13,7 +13,7 @@ SVG::Estimate::Ellipse - Handles estimating ellipses.
 
 =head1 VERSION
 
-version 1.0107
+version 1.0108
 
 =head1 SYNOPSIS
 

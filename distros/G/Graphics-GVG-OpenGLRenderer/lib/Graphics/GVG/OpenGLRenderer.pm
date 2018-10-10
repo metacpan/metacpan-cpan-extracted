@@ -1,4 +1,4 @@
-# Copyright (c) 2016  Timm Murray
+# Copyright (c) 2017  Timm Murray
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without 
@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Graphics::GVG::OpenGLRenderer;
-$Graphics::GVG::OpenGLRenderer::VERSION = '0.2';
+$Graphics::GVG::OpenGLRenderer::VERSION = '0.3';
 # ABSTRACT: Turn a GVG file into OpenGL code
 use strict;
 use warnings;
@@ -32,43 +32,16 @@ use Data::UUID;
 use Imager::Color;
 use Math::Trig 'pi';
 
+with 'Graphics::GVG::Renderer';
+
 has [qw{ circle_segments ellipse_segments }] => (
     is => 'rw',
     isa => 'Int',
     default => 40,
 );
-has '_glow_count' => (
-    traits => ['Counter'],
-    is => 'ro',
-    isa => 'Int',
-    default => 0,
-    handles => {
-        '_increment_glow' => 'inc',
-        '_decrement_glow' => 'dec',
-    },
-);
 
 
-sub make_drawer_obj
-{
-    my ($self, $ast) = @_;
-
-    my ($code, $drawer_pack) = $self->make_code( $ast );
-    eval $code or die $@;
-
-    my $obj = $drawer_pack->new;
-    return $obj;
-}
-
-sub make_code
-{
-    my ($self, $ast) = @_;
-    my $drawer_pack = $self->_make_pack;
-    my $code = $self->_make_pack_code( $drawer_pack, $ast );
-    return ($code, $drawer_pack);
-}
-
-sub _make_pack
+sub make_pack
 {
     my ($self) = @_;
     my $uuid = Data::UUID->new->create_hex;
@@ -76,17 +49,16 @@ sub _make_pack
     return $pack;
 }
 
-sub _make_pack_code
+sub make_opening_code
 {
-    my ($self, $pack, $ast) = @_;
+    my ($self, $pack) = @_;
 
     my $code = 'package ' . $pack . ';';
     $code .= q!
         use strict;
         use warnings;
         use OpenGL qw(:all);
-    !;
-    $code .= q!
+
         sub new
         {
             my ($class) = @_;
@@ -94,54 +66,21 @@ sub _make_pack_code
             bless $self => $class;
             return $self;
         }
+
+        sub draw {
     !;
+    return $code;
+}
 
-    $code .= 'sub draw {';
-    $code .= $self->_make_draw_code( $ast );
-    $code .= 'return; }';
-
+sub make_closing_code
+{
+    my ($self, $pack) = @_;
+    my $code = 'return; }';
     $code .= '1;';
     return $code;
 }
 
-sub _make_draw_code
-{
-    my ($self, $ast) = @_;
-    my $code = join( "\n", map {
-        my $ret = '';
-        if(! ref $_ ) {
-            warn "Not a ref, don't know what to do with '$_'\n";
-        }
-        elsif( $_->isa( 'Graphics::GVG::AST::Line' ) ) {
-            $ret = $self->_make_code_line( $_ );
-        }
-        elsif( $_->isa( 'Graphics::GVG::AST::Rect' ) ) {
-            $ret = $self->_make_code_rect( $_ );
-        }
-        elsif( $_->isa( 'Graphics::GVG::AST::Polygon' ) ) {
-            $ret = $self->_make_code_poly( $_ );
-        }
-        elsif( $_->isa( 'Graphics::GVG::AST::Circle' ) ) {
-            $ret = $self->_make_code_circle( $_ );
-        }
-        elsif( $_->isa( 'Graphics::GVG::AST::Ellipse' ) ) {
-            $ret = $self->_make_code_ellipse( $_ );
-        }
-        elsif( $_->isa( 'Graphics::GVG::AST::Glow' ) ) {
-            $self->_increment_glow;
-            $ret = $self->_make_draw_code( $_ );
-            $self->_decrement_glow;
-        }
-        else {
-            warn "Don't know what to do with " . ref($_) . "\n";
-        }
-
-        $ret;
-    } @{ $ast->commands });
-    return $code;
-}
-
-sub _make_code_line
+sub make_line
 {
     my ($self, $cmd) = @_;
     my $x1 = $cmd->x1;
@@ -165,7 +104,7 @@ sub _make_code_line
     };
 
     my $code = '';
-    if( $self->_glow_count > 0 ) {
+    if( $self->glow_count > 0 ) {
         # TODO not really getting the effect I was hoping for. Play around 
         # with it later.
         my @colors1 = $self->_brighten( 2.0, $red, $green, $blue, $alpha );
@@ -182,7 +121,7 @@ sub _make_code_line
     return $code;
 }
 
-sub _make_code_rect
+sub make_rect
 {
     my ($self, $cmd) = @_;
     my $x = $cmd->x;
@@ -217,7 +156,7 @@ sub _make_code_rect
     };
 
     my $code = '';
-    if( $self->_glow_count > 0 ) {
+    if( $self->glow_count > 0 ) {
         # TODO
         $code = $make_rect_sub->( 1.0, $red, $green, $blue, $alpha );
     }
@@ -228,7 +167,7 @@ sub _make_code_rect
     return $code;
 }
 
-sub _make_code_circle
+sub make_circle
 {
     my ($self, $cmd) = @_;
     my $cx = $cmd->cx;
@@ -245,10 +184,10 @@ sub _make_code_circle
         color => $cmd->color,
     });
 
-    return $self->_make_code_poly( $poly );
+    return $self->make_poly( $poly );
 }
 
-sub _make_code_ellipse
+sub make_ellipse
 {
     my ($self, $cmd) = @_;
     my $cx = $cmd->cx;
@@ -295,7 +234,7 @@ sub _make_code_ellipse
     };
 
     my $code = '';
-    if( $self->_glow_count > 0 ) {
+    if( $self->glow_count > 0 ) {
         # TODO
         $code = $make_cmd_sub->( 1.0, $red, $green, $blue, $alpha );
     }
@@ -305,7 +244,7 @@ sub _make_code_ellipse
     return $code;
 }
 
-sub _make_code_poly
+sub make_poly
 {
     my ($self, $cmd) = @_;
     my @coords = @{ $cmd->coords };
@@ -340,7 +279,7 @@ sub _make_code_poly
     };
 
     my $code = '';
-    if( $self->_glow_count > 0 ) {
+    if( $self->glow_count > 0 ) {
         # TODO
         $code = $make_code_sub->( 1.0, $red, $green, $blue, $alpha );
     }

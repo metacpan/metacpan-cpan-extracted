@@ -2,7 +2,7 @@
 # PODNAME: TestRail::API
 
 package TestRail::API;
-$TestRail::API::VERSION = '0.043';
+$TestRail::API::VERSION = '0.044';
 
 use 5.010;
 
@@ -455,12 +455,11 @@ sub getSections {
     my ( $self, $project_id, $suite_id ) = $check->(@_);
 
     #Cache sections to reduce requests in tight loops
-    return $self->{'sections'}->{$project_id}
-      if $self->{'sections'}->{$project_id};
-    $self->{'sections'}->{$project_id} = $self->_doRequest(
+    return $self->{'sections'}->{$suite_id} if $self->{'sections'}->{$suite_id};
+    $self->{'sections'}->{$suite_id} = $self->_doRequest(
         "index.php?/api/v2/get_sections/$project_id&suite_id=$suite_id");
 
-    return $self->{'sections'}->{$project_id};
+    return $self->{'sections'}->{$suite_id};
 }
 
 sub getSectionByID {
@@ -634,6 +633,24 @@ sub getCaseByID {
     my ( $self, $case_id ) = $check->(@_);
 
     return $self->_doRequest("index.php?/api/v2/get_case/$case_id");
+}
+
+sub getCaseFields {
+    state $check = compile(Object);
+    my ($self) = $check->(@_);
+    return $self->{case_fields} if $self->{case_fields};
+
+    $self->{case_fields} =
+      $self->_doRequest("index.php?/api/v2/get_case_fields");
+    return $self->{case_fields};
+}
+
+sub addCaseField {
+    state $check = compile( Object, slurpy HashRef );
+    my ( $self, $options ) = $check->(@_);
+    $self->{case_fields} = undef;
+    return $self->_doRequest( "index.php?/api/v2/add_case_field", 'POST',
+        $options );
 }
 
 #If you pass an array of case ids, it implies include_all is false
@@ -1266,6 +1283,14 @@ sub bulkAddResults {
         'POST', { 'results' => $results } );
 }
 
+sub bulkAddResultsByCase {
+    state $check = compile( Object, Int, ArrayRef [HashRef] );
+    my ( $self, $run_id, $results ) = $check->(@_);
+
+    return $self->_doRequest( "index.php?/api/v2/add_results_for_cases/$run_id",
+        'POST', { 'results' => $results } );
+}
+
 sub getTestResults {
     state $check = compile( Object, Int, Optional [ Maybe [Int] ],
         Optional [ Maybe [Int] ] );
@@ -1391,7 +1416,7 @@ TestRail::API - Provides an interface to TestRail's REST api via HTTP
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 SYNOPSIS
 
@@ -1937,6 +1962,20 @@ Returns test case definition HASHREF.
 
     $tr->getCaseByID(1345);
 
+=head2 getCaseFields
+
+Returns ARRAYREF of available test case custom fields.
+
+    $tr->getCaseFields();
+
+Output is cached in the case_fields parameter.  Cache is invalidated when addCaseField is called.
+
+=head2 addCaseField(%options)
+
+Returns HASHREF describing the case field you just added.
+
+    $tr->addCaseField(%options)
+
 =head1 RUN METHODS
 
 =head2 B<createRun (project_id,suite_id,name,description,milestone_id,assigned_to_id,case_ids)>
@@ -2265,7 +2304,7 @@ The 'percentages' key has the same, but as a percentage of the total.
 
     $tr->getPlanSummary($plan_id);
 
-=head2 B<createRunInPlan (plan_id,suite_id,name,milestone_id,assigned_to_id,config_ids,case_ids)>
+=head2 B<createRunInPlan (plan_id,suite_id,name,assigned_to_id,config_ids,case_ids)>
 
 Create a run in a plan.
 
@@ -2554,6 +2593,10 @@ Add multiple results to a run, where each result is a HASHREF with keys as outli
 
 Returns ARRAYREF of result definition HASHREFs.
 
+=head2 bulkAddResultsByCase(run_id,results)
+
+Basically the same as bulkAddResults, but instead of a test_id for each entry you use a case_id.
+
 =head2 B<getTestResults(test_id,limit,offset)>
 
 Get the recorded results for desired test, limiting output to 'limit' entries.
@@ -2768,8 +2811,8 @@ Ryan Sherer <ryan.sherer@cpanel.net>
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/teodesian/TestRail-Perl>
-and may be cloned from L<git://https://github.com/teodesian/TestRail-Perl.git>
+The development version is on github at L<http://github.com/teodesian/TestRail-Perl>
+and may be cloned from L<git://github.com/teodesian/TestRail-Perl.git>
 
 =head1 COPYRIGHT AND LICENSE
 

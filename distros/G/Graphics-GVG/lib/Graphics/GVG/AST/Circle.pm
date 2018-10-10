@@ -1,4 +1,4 @@
-# Copyright (c) 2016  Timm Murray
+# Copyright (c) 2017  Timm Murray
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without 
@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Graphics::GVG::AST::Circle;
-$Graphics::GVG::AST::Circle::VERSION = '0.7';
+$Graphics::GVG::AST::Circle::VERSION = '0.9';
 use strict;
 use warnings;
 use Moose;

@@ -8686,6 +8686,34 @@
       "os_version" : "5.0",
       "robot" : null
    },
+   "Mozilla/5.0 (Linux; Android 5.1; CUBOT_NOTE_S Build/LMY47I) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.93 Mobile Safari/537.36" : {
+      "browser" : "chrome",
+      "browser_beta" : ".2357.93",
+      "browser_major" : "43",
+      "browser_minor" : ".0",
+      "browser_string" : "Chrome",
+      "device" : "android",
+      "device_string" : "Android (CUBOT_NOTE_S)",
+      "engine" : "webkit",
+      "engine_beta" : "",
+      "engine_major" : "537",
+      "engine_minor" : ".36",
+      "engine_string" : "WebKit",
+      "engine_version" : "537.36",
+      "match" : [
+         "device",
+         "android",
+         "mobile",
+         "chrome",
+         "webkit"
+      ],
+      "os" : "android",
+      "os_major" : "5",
+      "os_minor" : ".1",
+      "os_string" : "Android",
+      "os_version" : "5.1",
+      "robot" : null
+   },
    "Mozilla/5.0 (Linux; Android 5.1; Nexus 5 Build/LMY47D) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36" : {
       "browser" : "chrome",
       "browser_beta" : ".2272.96",
@@ -10682,6 +10710,20 @@
       "os_string" : "Mac OS X",
       "os_version" : "10.10",
       "robot" : null
+   },
+   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36 Scanning for research (researchscan.comsys.rwth-aachen.de)" : {
+      "browser_major" : "5",
+      "browser_minor" : ".0",
+      "match" : [
+         "chrome",
+         "mac",
+         "macosx",
+         "researchscan",
+         "robot",
+         "webkit"
+      ],
+      "robot" : "researchscan",
+      "robot_name" : "Researchscan RWTH Aachen"
    },
    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) brave/0.7.9 Chrome/47.0.2526.73 Electron/0.36.2 Safari/537.36" : {
       "browser" : "brave",
@@ -17447,6 +17489,19 @@
       "robot_string" : "Seznam screenshot-generator 2.1"
    },
    "Mozilla/5.0 (compatible; SeznamBot/3.2; +http://fulltext.sblog.cz/)" : {
+      "browser_major" : "3",
+      "browser_minor" : ".2",
+      "match" : [
+         "robot"
+      ],
+      "robot" : "unknown",
+      "robot_beta" : "",
+      "robot_major" : "3",
+      "robot_minor" : ".2",
+      "robot_name" : "SeznamBot",
+      "robot_version" : "3.2"
+   },
+   "Mozilla/5.0 (compatible; SeznamBot/3.2; +http://napoveda.seznam.cz/en/seznambot-intro/)" : {
       "browser_major" : "3",
       "browser_minor" : ".2",
       "match" : [

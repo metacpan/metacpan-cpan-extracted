@@ -1,3 +1,10 @@
+0.442   2018-10-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention App::PAUSE::cleanup.
+
+
 0.441   2018-04-26 (PERLANCAR)
 
 	- [Bugfix] Previous release didn't fix the broken

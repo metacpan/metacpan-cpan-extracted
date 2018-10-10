@@ -2,8 +2,8 @@ NAME
     Finance::SE::IDX - Get information from Indonesian Stock Exchange
 
 VERSION
-    This document describes version 0.003 of Finance::SE::IDX (from Perl
-    distribution Finance-SE-IDX), released on 2018-09-07.
+    This document describes version 0.004 of Finance::SE::IDX (from Perl
+    distribution Finance-SE-IDX), released on 2018-10-09.
 
 FUNCTIONS
   list_idx_boards
@@ -12,6 +12,9 @@ FUNCTIONS
      list_idx_boards() -> [status, msg, result, meta]
 
     List boards.
+
+    By default caches results for 8 hours (by locally setting
+    CACHE_MAX_AGE). Can be overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
     This function is not exported by default, but exportable.
 
@@ -34,6 +37,9 @@ FUNCTIONS
      list_idx_firms(%args) -> [status, msg, result, meta]
 
     List firms.
+
+    By default caches results for 8 hours (by locally setting
+    CACHE_MAX_AGE). Can be overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
     This function is not exported by default, but exportable.
 
@@ -60,6 +66,9 @@ FUNCTIONS
      list_idx_sectors() -> [status, msg, result, meta]
 
     List sectors.
+
+    By default caches results for 8 hours (by locally setting
+    CACHE_MAX_AGE). Can be overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
     This function is not exported by default, but exportable.
 

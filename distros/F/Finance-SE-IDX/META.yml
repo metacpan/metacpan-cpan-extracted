@@ -18,7 +18,7 @@ meta-spec:
 name: Finance-SE-IDX
 requires:
   Exporter: '5.57'
-  HTTP::Tiny: '0.057'
+  HTTP::Tiny::Cache: '0'
   JSON::MaybeXS: '0'
   perl: '5.010001'
   strict: '0'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-SE-IDX
   homepage: https://metacpan.org/release/Finance-SE-IDX
   repository: git://github.com/perlancar/perl-Finance-SE-IDX.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -115,11 +115,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'

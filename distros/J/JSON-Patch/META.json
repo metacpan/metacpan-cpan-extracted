@@ -1,0 +1,50 @@
+{
+   "abstract" : "JSON Patch (L<rfc6902|https://tools.ietf.org/html/rfc6902>) for",
+   "author" : [
+      "Michael Samoglyadov <mixas@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-Patch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Struct::Diff" : "0.96",
+            "Struct::Path" : "0.82",
+            "Struct::Path::JsonPointer" : "0.04",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/mr-mixas/JSON-Patch.pm"
+      }
+   },
+   "version" : "0.02"
+}

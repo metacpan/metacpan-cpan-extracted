@@ -21,7 +21,8 @@
       },
       "runtime" : {
          "requires" : {
-            "IO::Tty" : "0"
+            "IO::Tty" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -36,7 +37,7 @@
    "provides" : {
       "IO::Termios" : {
          "file" : "lib/IO/Termios.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -45,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

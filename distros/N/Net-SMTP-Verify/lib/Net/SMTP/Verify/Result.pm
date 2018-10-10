@@ -2,7 +2,7 @@ package Net::SMTP::Verify::Result;
 
 use Moose;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 # ABSTRACT: address verification result for a recipient
 
 
@@ -57,7 +57,7 @@ Net::SMTP::Verify::Result - address verification result for a recipient
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 

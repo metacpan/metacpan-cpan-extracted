@@ -8,4 +8,9 @@ WriteMakefile(
                      'Test::Simple'                  => 0.44,
                      'SMS::Send::Driver::WebService' => 0,
                     },
+    EXE_FILES    => [
+                    qw{
+                       scripts/perl-SMS-Send-Kannel-SMSbox-send_sms.pl
+                      }
+                    ],
 );

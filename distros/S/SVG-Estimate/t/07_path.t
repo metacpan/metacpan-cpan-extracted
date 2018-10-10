@@ -38,4 +38,14 @@ cmp_ok $path2->round($path2->shape_length),  '==', 1.414, 'two moves, simple pat
 cmp_ok $path2->round($path2->travel_length), '==', 2.828, '... path travel length';
 is_deeply $path2->draw_end, [3, 3], 'checking end point of a path';
 
+my $path3 = SVG::Estimate::Path->new(
+    transformer => $transform,
+    start_point => [0,0],
+    d => '',
+);
+
+cmp_ok $path3->round($path3->shape_length),  '==', 0, 'empty path: no shape length';
+cmp_ok $path3->round($path3->travel_length), '==', 0, '... no travel length';
+is_deeply $path3->draw_end, [0, 0], 'checking end point after empty path';
+
 done_testing();

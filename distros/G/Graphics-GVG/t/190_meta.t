@@ -49,6 +49,6 @@ my $line_ast = Graphics::GVG::AST::Line->new({
     color => 0xff33ff00,
 });
 $expect_ast->push_command( $line_ast );
-$expect_ast->meta->{size} = 'small';
+$expect_ast->meta_data->{size} = 'small';
 
 is_deeply( $ast, $expect_ast );

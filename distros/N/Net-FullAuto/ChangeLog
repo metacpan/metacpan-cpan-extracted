@@ -20,6 +20,12 @@
 #######################################################################
 
 
+2018-10-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000424 released
+
+        * Updated Oracle berkeley_download() in Makefile.PL.
+
 
 2018-10-08  Brian M. Kelly <Brian.Kelly@fullauto.com>
 

@@ -1,5 +1,5 @@
 package SVG::Estimate::Role::ArgsWithUnits;
-$SVG::Estimate::Role::ArgsWithUnits::VERSION = '1.0107';
+$SVG::Estimate::Role::ArgsWithUnits::VERSION = '1.0108';
 use strict;
 use Moo::Role;
 use Ouch;
@@ -10,7 +10,7 @@ SVG::Estimate::Role::ArgsWithUnits - Validate a list of arguments that could con
 
 =head1 VERSION
 
-version 1.0107
+version 1.0108
 
 =head1 METHODS
 

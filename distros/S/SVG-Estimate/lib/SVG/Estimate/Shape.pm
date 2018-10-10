@@ -1,5 +1,5 @@
 package SVG::Estimate::Shape;
-$SVG::Estimate::Shape::VERSION = '1.0107';
+$SVG::Estimate::Shape::VERSION = '1.0108';
 use Moo;
 
 =head1 NAME
@@ -8,7 +8,7 @@ SVG::Estimate::Shape - Base class for all other shape calculations.
 
 =head1 VERSION
 
-version 1.0107
+version 1.0108
 
 =head1 DESCRIPTION
 

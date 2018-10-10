@@ -1,0 +1,22 @@
+0.004   2018-10-10 (PERLANCAR)
+
+	- repo-exists: set exit code.
+
+
+0.003   2018-10-09 (PERLANCAR)
+
+	- [bugfix] Fix passing arguments to repos->create().
+
+	- [doc] Add more examples in Synopsis.
+
+
+0.002   2018-10-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add more examples in Synopsis.
+
+
+0.001   2018-10-09 (PERLANCAR)
+
+        - First release.

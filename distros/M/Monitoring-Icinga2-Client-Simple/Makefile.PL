@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "List::Util" => "1.33",
     "Monitoring::Icinga2::Client::REST" => 2,
-    "YAML::XS" => 0,
     "constant" => 0,
     "parent" => 0,
     "strict" => 0,
@@ -34,7 +33,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.001000",
+  "VERSION" => "0.002000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +48,6 @@ my %FallbackPrereqs = (
   "Monitoring::Icinga2::Client::REST" => 2,
   "Test::Fatal" => 0,
   "Test::More" => 0,
-  "YAML::XS" => 0,
   "constant" => 0,
   "open" => 0,
   "parent" => 0,

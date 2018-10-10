@@ -1,7 +1,7 @@
 package Data::Clean::FromJSON;
 
-our $DATE = '2017-01-15'; # DATE
-our $VERSION = '0.38'; # VERSION
+our $DATE = '2018-10-09'; # DATE
+our $VERSION = '0.391'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,12 +12,8 @@ use parent qw(Data::Clean);
 sub new {
     my ($class, %opts) = @_;
     $opts{"JSON::PP::Boolean"} //= ['one_or_zero'];
-
-    # this does not exist though
-    $opts{"JSON::XS::Boolean"} //= ['one_or_zero'];
-
-    # this does not exist though
-    $opts{"Cpanel::JSON::XS::Boolean"} //= ['one_or_zero'];
+    $opts{"JSON::XS::Boolean"} //= ['one_or_zero']; # this does not exist though
+    $opts{"Cpanel::JSON::XS::Boolean"} //= ['one_or_zero']; # this does not exist though
 
     $class->SUPER::new(%opts);
 }
@@ -43,7 +39,7 @@ Data::Clean::FromJSON - Clean data from JSON decoder
 
 =head1 VERSION
 
-This document describes version 0.38 of Data::Clean::FromJSON (from Perl distribution Data-Clean-JSON), released on 2017-01-15.
+This document describes version 0.391 of Data::Clean::FromJSON (from Perl distribution Data-Clean-JSON), released on 2018-10-09.
 
 =head1 SYNOPSIS
 
@@ -93,7 +89,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Clean
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Data-Clean-JSON>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Clean-JSON>.
 
 =head1 BUGS
 
@@ -109,7 +105,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

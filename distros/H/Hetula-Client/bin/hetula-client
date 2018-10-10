@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 # Copyright 2018 National Library of Finland
 # This file is part of Hetula.

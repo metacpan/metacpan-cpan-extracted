@@ -4,13 +4,13 @@
       "Timm Murray <tmurray@wumpus-cave.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Graphics-GVG",
    "prereqs" : {
@@ -43,6 +43,7 @@
          "web" : "https://github.com/frezik/Graphics-GVG"
       }
    },
-   "version" : "0.7"
+   "version" : "0.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

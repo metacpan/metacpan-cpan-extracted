@@ -2,7 +2,7 @@ package Net::SMTP::Verify::App;
 
 use Moose;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 # ABSTRACT: commandline wrapper class for Net::SMTP::Verify
 
 extends 'Net::SMTP::Verify';
@@ -100,7 +100,7 @@ Net::SMTP::Verify::App - commandline wrapper class for Net::SMTP::Verify
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 AUTHOR
 

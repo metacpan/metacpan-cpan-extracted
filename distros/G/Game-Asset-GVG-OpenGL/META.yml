@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Game-Asset-GVG-OpenGL
 provides:
   Game::Asset::GVG::OpenGL:
     file: lib/Game/Asset/GVG/OpenGL.pm
-    version: '0.1'
+    version: '0.2'
 requires:
   Graphics::GVG: '0.4'
   Graphics::GVG::OpenGLRenderer: '0.2'
@@ -27,4 +27,5 @@ requires:
 resources:
   homepage: http://www.wumpus-cave.net
   repository: https://github.com/frezik/Game-Asset-GVG-OpenGL
-version: '0.1'
+version: '0.2'
+x_serialization_backend: 'YAML::Tiny version 1.70'
