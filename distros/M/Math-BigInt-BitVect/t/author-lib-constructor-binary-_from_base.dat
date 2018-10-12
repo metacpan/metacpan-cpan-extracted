@@ -1,0 +1,54 @@
+# Base 2
+
+11111010:2:250
+11111010:2:01:250
+
+# Base 8
+
+372:8:250
+372:8:01234567:250
+
+# Base 10 (in the last case, use a truncted collation sequence that does not
+# include unused characters)
+
+250:10:250
+250:10:0123456789:250
+250:10:012345:250
+
+# Base 16
+
+fa:16:250
+FA:16:250
+fa:16:0123456789abcdef:250
+
+# Base 3
+
+100021:3:250
+100021:3:012:250
+
+/|-:3:-/|:15
+
+# Base 4
+
+3322:4:250
+3322:4:0123:250
+
+# Base 5
+
+2000:5:250
+2000:5:01234:250
+caaa:5:abcde:250
+
+# when base is less than or equal to 36, case is ignored
+
+6Y:36:250
+6y:36:250
+
+6S:37:250
+7H:37:276
+
+121:3:16
+
+XYZ:36:44027
+
+Why:62:125734

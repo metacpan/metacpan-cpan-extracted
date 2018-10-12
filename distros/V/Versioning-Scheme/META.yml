@@ -19,14 +19,16 @@ meta-spec:
 name: Versioning-Scheme
 requires:
   Role::Tiny: '0'
+  Role::Tiny::With: '0'
   perl: '5.010001'
   strict: '0'
+  version: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Versioning-Scheme
   homepage: https://metacpan.org/release/Versioning-Scheme
   repository: git://github.com/perlancar/perl-Versioning-Scheme.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

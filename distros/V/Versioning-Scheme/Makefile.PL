@@ -18,7 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Versioning::Scheme",
   "PREREQ_PM" => {
     "Role::Tiny" => 0,
+    "Role::Tiny::With" => 0,
     "strict" => 0,
+    "version" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -28,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,9 +42,11 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Role::Tiny" => 0,
+  "Role::Tiny::With" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",
   "strict" => 0,
+  "version" => 0,
   "warnings" => 0
 );
 

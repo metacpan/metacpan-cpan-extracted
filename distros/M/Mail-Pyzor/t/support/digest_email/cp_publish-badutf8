@@ -1,0 +1,74 @@
+Return-Path: <dev-bounces@cpanel.net>
+Delivered-To: felipe@cpanel.net
+Received: from mx1.cpanel.net
+	by mx1.cpanel.net with LMTP id ICf2IXV+tVszEAAA6kPjFA
+	for <felipe@cpanel.net>; Wed, 03 Oct 2018 21:44:05 -0500
+Return-path: <dev-bounces@cpanel.net>
+Envelope-to: felipe@cpanel.net
+Delivery-date: Wed, 03 Oct 2018 21:44:05 -0500
+Received: from [::1] (port=53404 helo=mx1.cpanel.net)
+	by mx1.cpanel.net with esmtp (Exim 4.91)
+	(envelope-from <dev-bounces@cpanel.net>)
+	id 1g7tcO-0000u2-J4; Wed, 03 Oct 2018 21:44:00 -0500
+Received: from [208.74.121.106] (port=58108 helo=localhost)
+	by mx1.cpanel.net with esmtpsa (TLSv1:ECDHE-RSA-AES256-SHA:256)
+	(Exim 4.91) (envelope-from <buildbox@cpanel.net>)
+	id 1g7tcN-0000tk-W6; Wed, 03 Oct 2018 21:44:00 -0500
+To: dev@cpanel.net, qa@cpanel.net, ui@cpanel.net
+From: buildbox@cpanel.net
+Date: Wed, 3 Oct 2018 21:43:59 -0500
+X-Priority: 1 (Highest)
+X-Mailer: Perl script "4.email_build_info.pl"
+	using Mail::Sender 0.903 by Jenda Krynicky, Czechlands
+	running on localhost (127.0.0.1) under account "root"
+Message-ID: <20181004_024359_062836.buildbox@cpanel.net>
+X-Mailer: use SimpleMood; - Sent via the email() function or easy() method of
+	Mail/Sender/Easy.pm and/or SimpleMood.pm both by Daniel Muey.
+X-Mailer: Sent via /usr/local/cpanel/build-tools/4.email_build_info.pl
+	(/usr/local/cpanel/build-tools/4.email_build_info.pl) on
+	perlcc-autobuild-dev-bbc-3.dev.cpanel.net by uid 0 (root) /
+	euid 0 (root) at 1538621039 (unix epoch)
+X-Mailer: SMTP Auth provided by (hashref arg) buildbox@cpanel.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Subject: [dev] [cPanel & WHM] v11.77.9999.18 has been published
+X-BeenThere: dev@cpanel.net
+X-Mailman-Version: 2.1.27
+Precedence: list
+List-Id: "Dev@cPanel" <dev.cpanel.net>
+List-Unsubscribe: <http://mail.cpanel.net/mailman/options/dev_cpanel.net>,
+	<mailto:dev-request@cpanel.net?subject=unsubscribe>
+List-Archive: <http://mail.cpanel.net/mailman/private/dev_cpanel.net/>
+List-Post: <mailto:dev@cpanel.net>
+List-Help: <mailto:dev-request@cpanel.net?subject=help>
+List-Subscribe: <http://mail.cpanel.net/mailman/listinfo/dev_cpanel.net>,
+	<mailto:dev-request@cpanel.net?subject=subscribe>
+Errors-To: dev-bounces@cpanel.net
+Sender: "Dev" <dev-bounces@cpanel.net>
+
+ÿÿÿÿÿÿÿÿÿÿÿÂ  has Â  been published to branch-build.dev.cpanel.net
+
+The build logs are available at this link: https://vmware-manager.dev.cpanel.net/log.html?file=20181003-213146.nightly-11.78_log.txt
+
+The build'sÂ  Â  Â memory statistics are available at this link: http://build-profiler.dev.cpanel.net/?prefix=11.77.9999.18&binaries=rss_avg
+The following cases were referenced in logs: 
+
+These can be seen in JIRA via this link: https://jira.cpanel.net/issues/?jql=labels%3D11.77.9999.18
+
+________________________________________________________________________________________________________________________
+File changes from 11.77.9999.17 to 11.77.9999.18.
+
+Added:
+    cpanel/Cpanel/Config/Crontab.pm.xz
+
+________________________________________________________________________________________________________________________
+Commit log for cPanel
+
+No changes local to the project happened during this run.
+
+Commit log for Security Advisor
+
+No changes local to the project happened during this run.
+
+
+

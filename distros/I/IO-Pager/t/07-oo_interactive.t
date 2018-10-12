@@ -10,16 +10,18 @@ SKIP: {
   skip_interactive();
 
   require IO::Pager;
+  require IO::Pager::Buffered;
   {
-    my $BOB = new IO::Pager undef, 'Buffered' or die "Failed to create PAGER FH $!";
+#   my $BOB = new IO::Pager::Buffered or die "Failed to create PAGER FH $!";
+    my $BOB = new IO::Pager local *STDOUT, 'Buffered' or die "Failed to create PAGER FH $!";
 
-    isa_ok $BOB, 'IO::Pager::Buffered'; #non-fully qualified sub-class test
-
-    $BOB->print("OO factory filehandle\n");
+    isa_ok $BOB, 'IO::Pager::Buffered';
+    
+    $BOB->print("OO factory filehandle\n") foreach 1..25;
     $BOB->print("\nEnd of text, try pressing 'Q' to exit.\n");
-    $BOB->close();
   }
 
+  select STDERR;
   my $A1 = prompt("\nDid you see 'OO factory filehandle' in your pager? [Yn]");
   ok is_yes($A1), 'OO, factory instantiation';
 
@@ -30,8 +32,8 @@ SKIP: {
 
     isa_ok $BOB, 'IO::Pager::Unbuffered';
 
-    $BOB->say("OO subclass filehandle\n");
-    $BOB->say("\nEnd of text, try pressing 'Q' to exit.\n");
+    $BOB->say("OO subclass filehandle") foreach 1..25;
+    $BOB->say("\nEnd of text, try pressing 'Q' to exit.");
     #XXX Close required because pager is not terminated on DESTROY
     $BOB->close();
   }

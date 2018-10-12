@@ -21,25 +21,27 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.58"
          }
       },
       "runtime" : {
          "requires" : {
             "Math::BigInt" : "1.999812",
             "Math::Pari" : "2.010709",
-            "Test::More" : "0.88",
             "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.82"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.3004",
+   "version" : "1.3005",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -4,9 +4,10 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
 # podDocumentation
+# Handle relative files in hrefs, conrefs etc.
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 2011008;
+our $VERSION = 20181010;
 use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;
@@ -22,31 +23,35 @@ our $attributes = genHash(q(Data::Edit::Xml::Xref),                             
   badImages=>[],                                                                # [file, href]   Missing images
   badXml1=>[],                                                                  # Files with a bad xml encoding header on line 1
   badXml2=>[],                                                                  # Files with a bad xml doc type on line 2
-  badXrefs=>[],                                                                 # [file, href]   Invalid xrefs
+  badXRefs=>[],                                                                 # [file, href]   Invalid xrefs
   badTopicRefs=>[],                                                             # [file, href]   Invalid topic refs
+  badConRefs=>[],                                                               # [file, href]   Invalid conrefs
+  conRefs=>{},                                                                  # {file}{id}++   Conref definitions
   duplicateIds=>[],                                                             # [file, id]     Duplicate id definitions within a file
   ids=>{},                                                                      # {file}{id}++   Id definitions across all files
   images=>{},                                                                   # {file}{href}++ Images references
-  inputFiles=>[],                                                               # Input files
+  inputFiles=>[],                                                               # Input files from L<inputFolder|/inputFolder>.
   inputFolder=>undef,                                                           # A folder containing the dita and ditamap files to be cross referenced.
   topicRefs=>{},                                                                # {file}{href}++ Topic refs
-  xrefs=>{},                                                                    # {file}{href}++ Xrefs references
-  reports=>q(reports),                                                          # Reports folder
+  xRefs=>{},                                                                    # {file}{href}++ Xrefs references
+  reports=>q(reports),                                                          # Reports folder, use this to receive reports from the cross reference.
   statusLine=>undef,                                                            # Status line
   summary=>1,                                                                   # Print a summary line
   topicIds=>{},                                                                 # {file} = topic id
  );
 
-#D1 Cross reference                                                             # Check the cross references in a set of Dita files and report the results
+#D1 Cross reference                                                             # Check the cross references in a set of Dita files and report the results.
 
-sub xref(%)                                                                     # Check the cross references in a set of Dita files held in B<inputFolder=>>B<folder>and report the results.
+sub xref(%)                                                                     # Check the cross references in a set of Dita files held in B<inputFolder=>>B<folder> and report the results.
  {my (%attributes) = @_;                                                        # Attributes
-  my $xref = bless {};
-  loadHash($xref, %$attributes, @_) if @_;
+  my $xref = genHash(__PACKAGE__, %$attributes, @_);
+
+  $xref->inputFolder = absFromAbsPlusRel(currentDirectory, $xref->inputFolder)  # Make input folder absolute
+    if $xref->inputFolder !~ m(\A/);
 
   my @phases = qw(loadInputFiles analyze reportBadXml1 reportBadXml2
                   reportDuplicateIds reportBadXrefs reportBadTopicRefs
-                  reportBadImages);
+                  reportBadConrefs reportBadImages);
   for my $phase(@phases)                                                        # Perform analysis phases
    {$xref->$phase;
    }
@@ -54,23 +59,26 @@ sub xref(%)                                                                     
   if (1)                                                                        # Summarize
    {my $i = @{$xref->badImages};
     my $t = @{$xref->badTopicRefs};
-    my $x = @{$xref->badXrefs};
+    my $x = @{$xref->badXRefs};
+    my $c = @{$xref->badConRefs};
     my $d = @{$xref->duplicateIds};
     my $b = @{$xref->badXml1};
     my $B = @{$xref->badXml2};
     my @o;
-    push @o, "$x bad xrefs"      if $x >  1;
-    push @o, "$x bad xref"       if $x == 1;
-    push @o, "$t bad topicrefs"  if $t >  1;
-    push @o, "$t bad topicref"   if $t == 1;
-    push @o, "$i missing images" if $i >  1;
-    push @o, "$i missing image"  if $i == 1;
-    push @o, "$d duplicate ids"  if $d >  1;
-    push @o, "$d duplicate id"   if $d == 1;
-    push @o, "$b bad lines 1"    if $b >  1;
-    push @o, "$b bad line 1"     if $b == 1;
-    push @o, "$B bad lines 2"    if $B >  1;
-    push @o, "$B bad line 2"     if $B == 1;
+    push @o, "$x bad xrefs"           if $x >  1;
+    push @o, "$x bad xref"            if $x == 1;
+    push @o, "$c bad conrefs"         if $c >  1;
+    push @o, "$c bad conref"          if $c == 1;
+    push @o, "$t bad topicrefs"       if $t >  1;
+    push @o, "$t bad topicref"        if $t == 1;
+    push @o, "$i missing images"      if $i >  1;
+    push @o, "$i missing image"       if $i == 1;
+    push @o, "$d duplicate ids"       if $d >  1;
+    push @o, "$d duplicate id"        if $d == 1;
+    push @o, "$b bad first lines"     if $b >  1;
+    push @o, "$b bad first line"      if $b == 1;
+    push @o, "$B bad second lines"    if $B >  1;
+    push @o, "$B bad second line"     if $B == 1;
     $xref->statusLine = undef;
     if (@o)
      {my $m = "Xref Errors: ". join q(, ), @o;
@@ -91,10 +99,8 @@ sub loadInputFiles($)                                                           
 sub analyze($)                                                                  #P Analyze the input files
  {my ($xref) = @_;                                                              # Cross referencer
 
-  for my $file(@{$xref->inputFiles})                                            # Each input file
-   {#say STDERR "Load: $file";
-    my $x = Data::Edit::Xml::new($file);                                        # Parse xml
-    my $iFile = $file;
+  for my $iFile(@{$xref->inputFiles})                                           # Each input file
+   {my $x = Data::Edit::Xml::new($iFile);                                       # Parse xml
 
     $x->by(sub                                                                  # Each node
      {my ($o) = @_;
@@ -104,7 +110,7 @@ sub analyze($)                                                                  
       if ($o->at_xref)                                                          # Xrefs but not to the web
        {if (my $h = $o->href)
          {if ($h !~ m(\A(https?://|mailto:))s)
-           {$xref->xrefs->{$iFile}{$h}++;
+           {$xref->xRefs->{$iFile}{$h}++;
            }
          }
        }
@@ -118,18 +124,21 @@ sub analyze($)                                                                  
          {$xref->images->{$iFile}{$h}++;
          }
        }
+      if (my $conref = $o->attr_conref)                                         # Conref
+       {$xref->conRefs->{$iFile}{$conref}++;
+       }
      });
 
     $xref->topicIds->{$iFile} = $x->id;                                         # Topic Id
 
     if (1)                                                                      # Check xml headers
-     {my @h = split /\n/, readFile($file);
+     {my @h = split /\n/, readFile($iFile);
       if (!$h[0] or $h[0] !~ m(\A<\?xml version=\"1.0\" encoding=\"UTF-8\"\?>\Z))
-       {push @{$xref->badXml1}, $file;
+       {push @{$xref->badXml1}, $iFile;
        }
       my $tag = $x->tag;
       if (!$h[1] or $h[1] !~ m(\A<!DOCTYPE $tag PUBLIC "-//))
-       {push @{$xref->badXml2}, $file;
+       {push @{$xref->badXml2}, $iFile;
        }
      }
    }
@@ -155,40 +164,28 @@ sub reportDuplicateIds($)                                                       
     file=>(my $f = fpe($xref->reports, qw(duplicateIdDefinitions txt))));
  }
 
-sub inputFile($$)                                                               #P FFile relative to current directory
- {my ($xref, $file) = @_;                                                       # Cross referencer, short file name
+sub reportBadRefs($$)                                                           #P Report bad references found in xrefs or conrefs as they have the same structure
+ {my ($xref, $type) = @_;                                                       # Cross referencer, type of reference to be processed
 
-  fpf($xref->inputFolder, $file);
- }
-
-sub absInputFile($$)                                                            #P Fully qualified file from file relative to input folder
- {my ($xref, $file) = @_;                                                       # Cross referencer, short file name
-
-  fpf(currentDirectory, $file);
- }
-
-sub reportBadXrefs($)                                                           #P Report bad xrefs
- {my ($xref) = @_;                                                              # Cross referencer
-
-  my @bad;                                                                      # Bad xrefs
-  for my $file(sort keys %{$xref->xrefs})                                       # Each input file
-   {for my $href(sort keys %{$xref->xrefs->{$file}})                            # Each href in the file
+  my @bad; my @good;                                                            # Bad xrefs
+  for   my $file(sort keys %{$xref->{${type}.q(Refs)}})                         # Each input file which will be absolute
+   {for my $href(sort keys %{$xref->{${type}.q(Refs)}->{$file}})                # Each href in the file which will be relative
      {if ($href =~ m(#))                                                        # Href with #
        {my ($hFile, $hId) = split m(#), $href;                                  # File, topicId components
         my ($topic, $id)  = split m(/), $hId;                                   # Topic, id
                     $id //= '';
-        my $iFile = $xref->inputFile(fne($hFile||$file));                       # Target file relative to in
-        my $fFile = $xref->absInputFile($iFile);                                # Target file absolute
-
+        my $fFile = $hFile ? absFromAbsPlusRel($file, $hFile) : $file;          # Target file absolute
         if ($hFile and !-e $fFile)                                              # Check target file
          {push @bad, [qq(No such file),
            $hFile, $topic, $id, q(), $href, $fFile];
          }
 
-        if (my $t = $xref->topicIds->{$iFile})                                  # Check topic id
+        if (my $t = $xref->topicIds->{$fFile})                                  # Check topic id
          {if ($t eq $topic)
-           {if (my $i = $xref->ids->{$iFile}{$id})
-             {if ($i == 1) {}
+           {if (my $i = $xref->ids->{$fFile}{$id})
+             {if ($i == 1)
+               {push @good,[$fFile, $href, $fFile];
+               }
               else
                {push @bad, [qq(Duplicate id in topic),
                  $hFile, $topic, $id, $t, $href, $fFile];
@@ -198,6 +195,9 @@ sub reportBadXrefs($)                                                           
              {push @bad, [qq(No such id in topic),
                 $hFile, $topic, $id, $t, $href, $fFile];
 
+             }
+            else
+             {push @good,[$fFile, $href, $fFile];
              }
            }
           else
@@ -209,33 +209,59 @@ sub reportBadXrefs($)                                                           
          {push @bad, [qq(No topic id on topic in target file),
            $hFile, $topic, $id, $t, $href, $fFile];
          }
+        else
+         {push @good,[$fFile, $href, $fFile];
+         }
        }
       else                                                                      # No # in href
-       {my $fFile = $xref->absInputFile($href);
+       {my $fFile = absFromAbsPlusRel($file, $href);
         if (!-e $fFile)
          {push @bad, [qq(No such file),
            $fFile, q(), q(), q(), $href, $fFile];
+         }
+        else
+         {push @good,[$fFile, $href, $fFile];
          }
        }
      }
    }
 
-  $xref->badXrefs = \@bad;                                                      # Bad references
+  my $Type = ucfirst $type;
+  $xref->{my $t = q(bad).$Type.q(Refs)} = \@bad;                                # Bad references
 
+  my $in = $xref->inputFolder//'';
   formatTable(\@bad, [qw(Reason hrefFile hrefTopic HrefId TopicId Source File)],
-    head=>qq(NNNN Bad xrefs on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(badXrefs txt))));
+    head=><<END,
+NNNN Bad $type refs relative to folder $in on DDDD
+END
+    file=>(my $f = fpe($xref->reports, qq(bad${Type}Refs), q(txt))));
+
+  formatTable(\@good, [qw(FullFileName Href Source)],
+    head=><<END,
+NNNN Good $type refs relative to folder $in on DDDD
+END
+    file=>(fpe($xref->reports, qq(good${Type}Refs), q(txt))));
+ }
+
+sub reportBadXrefs($)                                                           #P Report bad xrefs
+ {my ($xref) = @_;                                                              # Cross referencer
+  reportBadRefs($xref, q(x));
  }
 
 sub reportBadTopicRefs($)                                                       #P Report bad topic refs
  {my ($xref) = @_;                                                              # Cross referencer
 
-  my @bad;                                                                      # Bad xrefs
+  my @bad; my @good;                                                            # Bad xrefs
   for my $file(sort keys %{$xref->topicRefs})                                   # Each input file
    {for my $href(sort keys %{$xref->topicRefs->{$file}})                        # Each topic ref in the file
      {my $f = absFromAbsPlusRel(fullFileName($file), $href);                    # Target file absolute
-      if ($f and !-e $f)                                                        # Check target file
-       {push @bad, [qq(No such file), $f, $href, $file];
+      if ($f)
+       {if (!-e $f)                                                             # Check target file
+         {push @bad, [qq(No such file), $f, $href, $file];
+         }
+        else
+         {push @good, [$f, $href, $file];
+         }
        }
      }
    }
@@ -246,7 +272,18 @@ sub reportBadTopicRefs($)                                                       
     head=><<END,
 NNNN Bad topicrefs on DDDD relative to folder $in
 END
-    file=>(my $f = fpe($xref->reports, qw(badTopicRefs txt))));
+    file=>(fpe($xref->reports, qw(badTopicRefs txt))));
+
+  formatTable(\@good, [qw(FullFileName Href Source)],
+    head=><<END,
+NNNN Good topicrefs on DDDD relative to folder $in
+END
+    file=>(fpe($xref->reports, qw(goodTopicRefs txt))));
+ }
+
+sub reportBadConrefs($)                                                         #P Report bad conrefs refs
+ {my ($xref) = @_;                                                              # Cross referencer
+  reportBadRefs($xref, q(con));
  }
 
 sub reportBadImages($)                                                          #P Report bad images
@@ -255,7 +292,7 @@ sub reportBadImages($)                                                          
   my @bad;                                                                      # Bad images
   for my $file(sort keys %{$xref->images})                                      # Each input file
    {for my $href(sort keys %{$xref->images->{$file}})                           # Each image in the file
-     {my $image = $xref->absInputFile($href);                                   # Image relative to input folder
+     {my $image = absFromAbsPlusRel($file, $href);                              # Image relative to current file
       next if -e $image;
       push @bad, [$href, $file];                                                # Missing image
      }
@@ -303,6 +340,8 @@ sub createSampleInputFiles($)                                                   
      <xref id="g1$n" href="$o.dita#c$o">Good 1</xref>
      <xref id="g2$n" href="#c$o/x$o">Good 2</xref>
      <xref id="g3$n" href="#c$o">Good 3</xref>
+     <p conref="#c$n">Good conref</p>
+     <p conref="#b$n">Bad conref</p>
      <image href="a$n.png"/>
   </conbody>
 </concept>
@@ -351,9 +390,10 @@ Check the references in a set of XML documents held in a folder:
 
   use Data::Edit::Xml::Xref;
 
-  my $x = xref(inputFolder=>"in");
-  ok $x->statusLine =~ m(\AXref Errors: 56 bad xrefs, 2 bad topicrefs, 8 missing images, 8 duplicate ids, 11 bad lines 1, 11 bad lines 2\Z);
+  my $x = xref(inputFolder=>q(in));
+  ok $x->statusLine =~ m(\AXref Errors: 56 bad xrefs, 8 bad conrefs, 2 bad topicrefs, 8 missing images, 8 duplicate ids, 11 bad first lines, 11 bad second lines\Z);
 
+         {push @bad, [qq(No topic id on topic in target file),
 More detailed reports are produced in the:
 
   $x->reports
@@ -375,11 +415,11 @@ Create a cross referencer.
 
 =head1 Cross reference
 
-Check the cross references in a set of Dita files and report the results
+Check the cross references in a set of Dita files and report the results.
 
 =head2 xref(%)
 
-Check the cross references in a set of Dita files held in B<inputFolder=>>B<folder>and report the results.
+Check the cross references in a set of Dita files held in B<inputFolder=>>B<folder> and report the results.
 
      Parameter    Description
   1  %attributes  Attributes
@@ -387,8 +427,8 @@ Check the cross references in a set of Dita files held in B<inputFolder=>>B<fold
 B<Example:>
 
 
-    my $x = 𝘅𝗿𝗲𝗳(inputFolder=>"in");
-
+    my $x = 𝘅𝗿𝗲𝗳(inputFolder=>q(in));                                             
+  
 
 
 =head1 Hash Definitions
@@ -402,15 +442,19 @@ B<Example:>
 Attributes used by a cross referencer
 
 
+B<badConRefs> - [file, href]   Invalid conrefs
+
 B<badImages> - [file, href]   Missing images
 
 B<badTopicRefs> - [file, href]   Invalid topic refs
+
+B<badXRefs> - [file, href]   Invalid xrefs
 
 B<badXml1> - Files with a bad xml encoding header on line 1
 
 B<badXml2> - Files with a bad xml doc type on line 2
 
-B<badXrefs> - [file, href]   Invalid xrefs
+B<conRefs> - {file}{id}++   Conref definitions
 
 B<duplicateIds> - [file, id]     Duplicate id definitions within a file
 
@@ -418,11 +462,11 @@ B<ids> - {file}{id}++   Id definitions across all files
 
 B<images> - {file}{href}++ Images references
 
-B<inputFiles> - Input files
+B<inputFiles> - Input files from L<inputFolder|/inputFolder>.
 
 B<inputFolder> - A folder containing the dita and ditamap files to be cross referenced.
 
-B<reports> - Reports folder
+B<reports> - Reports folder, use this to receive reports from the cross reference.
 
 B<statusLine> - Status line
 
@@ -432,7 +476,7 @@ B<topicIds> - {file} = topic id
 
 B<topicRefs> - {file}{href}++ Topic refs
 
-B<xrefs> - {file}{href}++ Xrefs references
+B<xRefs> - {file}{href}++ Xrefs references
 
 
 
@@ -459,21 +503,13 @@ Report duplicate ids
      Parameter  Description
   1  $xref      Cross referencer
 
-=head2 inputFile($$)
+=head2 reportBadRefs($$)
 
-FFile relative to current directory
-
-     Parameter  Description
-  1  $xref      Cross referencer
-  2  $file      Short file name
-
-=head2 absInputFile($$)
-
-Fully qualified file from file relative to input folder
+Report bad references found in xrefs or conrefs as they have the same structure
 
      Parameter  Description
   1  $xref      Cross referencer
-  2  $file      Short file name
+  2  $type      Type of reference to be processed
 
 =head2 reportBadXrefs($)
 
@@ -485,6 +521,13 @@ Report bad xrefs
 =head2 reportBadTopicRefs($)
 
 Report bad topic refs
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportBadConrefs($)
+
+Report bad conrefs refs
 
      Parameter  Description
   1  $xref      Cross referencer
@@ -521,17 +564,17 @@ Create sample input files for testing. The attribute B<inputFolder> supplies the
 =head1 Index
 
 
-1 L<absInputFile|/absInputFile> - Fully qualified file from file relative to input folder
+1 L<analyze|/analyze> - Analyze the input files
 
-2 L<analyze|/analyze> - Analyze the input files
+2 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
 
-3 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
+3 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
 
-4 L<inputFile|/inputFile> - FFile relative to current directory
+4 L<reportBadConrefs|/reportBadConrefs> - Report bad conrefs refs
 
-5 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
+5 L<reportBadImages|/reportBadImages> - Report bad images
 
-6 L<reportBadImages|/reportBadImages> - Report bad images
+6 L<reportBadRefs|/reportBadRefs> - Report bad references found in xrefs or conrefs as they have the same structure
 
 7 L<reportBadTopicRefs|/reportBadTopicRefs> - Report bad topic refs
 
@@ -543,7 +586,7 @@ Create sample input files for testing. The attribute B<inputFolder> supplies the
 
 11 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
 
-12 L<xref|/xref> - Check the cross references in a set of Dita files held in B<inputFolder=>>B<folder>and report the results.
+12 L<xref|/xref> - Check the cross references in a set of Dita files held in B<inputFolder=>>B<folder> and report the results.
 
 =head1 Installation
 
@@ -600,8 +643,8 @@ Test::More->builder->output("/dev/null")                                        
 if (1)
  {my $N = 8;
   createSampleInputFiles($N);
-  my $x = xref(inputFolder=>"in");                                              #Txref
-  ok $x->statusLine =~ m(\AXref Errors: 56 bad xrefs, 2 bad topicrefs, 8 missing images, 8 duplicate ids, 11 bad lines 1, 11 bad lines 2\Z);
+  my $x = xref(inputFolder=>q(in));                                             #Txref
+  ok $x->statusLine =~ m(\AXref Errors: 56 bad xrefs, 8 bad conrefs, 2 bad topicrefs, 8 missing images, 8 duplicate ids, 11 bad first lines, 11 bad second lines\Z);
  }
 
 1

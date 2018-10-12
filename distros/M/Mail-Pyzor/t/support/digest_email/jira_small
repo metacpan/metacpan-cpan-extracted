@@ -1,0 +1,172 @@
+Return-Path: <jira@cpanel.net>
+Delivered-To: felipe@cpanel.net
+Received: from mx1.cpanel.net
+	by mx1.cpanel.net with LMTP id AOefKNwhtVvVkQAA6kPjFA
+	for <felipe@cpanel.net>; Wed, 03 Oct 2018 15:09:00 -0500
+Return-path: <jira@cpanel.net>
+Envelope-to: felipe@cpanel.net
+Delivery-date: Wed, 03 Oct 2018 15:09:00 -0500
+Received: from [208.74.121.106] (port=7930 helo=10.1.110.104)
+	by mx1.cpanel.net with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-SHA256:128)
+	(Exim 4.91)
+	(envelope-from <jira@cpanel.net>)
+	id 1g7nS8-000AZc-ID
+	for felipe@cpanel.net; Wed, 03 Oct 2018 15:09:00 -0500
+Date: Wed, 3 Oct 2018 15:09:00 -0500 (CDT)
+From: "Craig Dial (JIRA)" <jira@cpanel.net>
+To: felipe@cpanel.net
+Message-ID: <JIRA.180916.1535587776000.24547.1538597340459@Atlassian.JIRA>
+In-Reply-To: <JIRA.180916.1535587776000@Atlassian.JIRA>
+References: <JIRA.180916.1535587776000@Atlassian.JIRA> <JIRA.180916.1535587776569@jira.cpanel.net>
+Subject: [JIRA] (COBRA-8189) Unable to renew AutoSSL certificates if proxy
+ subdomains exist in userdata_SSL files - Clone
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_25581_1828019859.1538597340123"
+X-JIRA-FingerPrint: af48d09e084ff1d1386256e9008ec0a6
+Auto-Submitted: auto-generated
+Precedence: bulk
+
+------=_Part_25581_1828019859.1538597340123
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head> 
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"> 
+        <base href="https://jira.cpanel.net"> 
+        <title>Message Title</title> 
+    </head> 
+    <body class="jira" style="color: #333333; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.429"> 
+        <table id="background-table" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #f5f5f5; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt" bgcolor="#f5f5f5"> 
+            <!-- header here --> 
+            <tbody>
+                <tr> 
+                    <td id="header-pattern-container" style="padding: 0px; border-collapse: collapse; padding: 10px 20px"> 
+                        <table id="header-pattern" cellspacing="0" cellpadding="0" border="0" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt"> 
+                            <tbody>
+                                <tr> 
+                                    <td id="header-avatar-image-container" valign="top" style="padding: 0px; border-collapse: collapse; vertical-align: top; width: 32px; padding-right: 8px" width="32"> <img id="header-avatar-image" class="image_fix" src="https://www.gravatar.com/avatar/968ed011038d5f6b5afa97a693a6b8ca?d=mm&amp;s=48" height="32" width="32" border="0" style="border-radius: 3px; vertical-align: top"> </td> 
+                                    <td id="header-text-container" valign="middle" style="padding: 0px; border-collapse: collapse; vertical-align: middle; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px; mso-line-height-rule: exactly; mso-text-raise: 1px"> <a class="user-hover" rel="craig.dial@cpanel.net" id="email_craig.dial@cpanel.net" href="https://jira.cpanel.net/secure/ViewProfile.jspa?name=craig.dial%40cpanel.net" style="color:#1a63c9;; color: #3b73af; text-decoration: none">Craig Dial</a> <strong>updated</strong> an issue </td> 
+                                </tr> 
+                            </tbody>
+                        </table> </td> 
+                </tr> 
+                <tr> 
+                    <td id="email-content-container" style="padding: 0px; border-collapse: collapse; padding: 0 20px"> 
+                        <table id="email-content-table" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; border-collapse: separate"> 
+                            <tbody>
+                                <tr> 
+                                    <!-- there needs to be content in the cell for it to render in some clients --> 
+                                    <td class="email-content-rounded-top mobile-expand" style="padding: 0px; border-collapse: collapse; color: #ffffff; padding: 0 15px 0 16px; height: 15px; background-color: #ffffff; border-left: 1px solid #cccccc; border-top: 1px solid #cccccc; border-right: 1px solid #cccccc; border-bottom: 0; border-top-right-radius: 5px; border-top-left-radius: 5px; height: 10px; line-height: 10px; padding: 0 15px 0 16px; mso-line-height-rule: exactly" height="10" bgcolor="#ffffff">&nbsp;</td> 
+                                </tr> 
+                                <tr> 
+                                    <td class="email-content-main mobile-expand " style="padding: 0px; border-collapse: collapse; border-left: 1px solid #cccccc; border-right: 1px solid #cccccc; border-top: 0; border-bottom: 0; padding: 0 15px 0 16px; background-color: #ffffff" bgcolor="#ffffff"> 
+                                        <table class="page-title-pattern" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt"> 
+                                            <tbody>
+                                                <tr> 
+                                                    <td class="page-title-pattern-first-line " style="padding: 0px; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; padding-top: 10px"> <a href="https://jira.cpanel.net/browse/COBRA" style="color: #3b73af; text-decoration: none">Cobra</a> / <a href="https://jira.cpanel.net/browse/COBRA-8189" style="color: #3b73af; text-decoration: none"><img src="cid:jira-generated-image-avatar-49794124-74c9-4f6d-9a85-7f8b9b5a75e6" height="16" width="16" border="0" align="absmiddle" alt="Sub-task" style="vertical-align: text-bottom"></a> <a href="https://jira.cpanel.net/browse/COBRA-8189" style="color: #3b73af; text-decoration: none">COBRA-8189</a> </td> 
+                                                </tr> 
+                                                <tr> 
+                                                    <td style="vertical-align: top;; padding: 0px; border-collapse: collapse; padding-right: 5px; font-size: 20px; line-height: 30px; mso-line-height-rule: exactly" class="page-title-pattern-header-container"> <span class="page-title-pattern-header" style="font-family: Arial, sans-serif; padding: 0; font-size: 20px; line-height: 30px; mso-text-raise: 2px; mso-line-height-rule: exactly; vertical-align: middle"> <a href="https://jira.cpanel.net/browse/COBRA-8189" style="color: #3b73af; text-decoration: none">Unable to renew AutoSSL certificates if proxy subdomains exist in userdata_SSL files - Clone</a> </span> </td> 
+                                                </tr> 
+                                            </tbody>
+                                        </table> </td> 
+                                </tr> 
+                                <tr> 
+                                    <td class="email-content-main mobile-expand  wrapper-special-margin" style="padding: 0px; border-collapse: collapse; border-left: 1px solid #cccccc; border-right: 1px solid #cccccc; border-top: 0; border-bottom: 0; padding: 0 15px 0 16px; background-color: #ffffff; padding-top: 10px; padding-bottom: 5px" bgcolor="#ffffff"> 
+                                        <table class="keyvalue-table" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt"> 
+                                            <tbody>
+                                                <tr> 
+                                                    <th style="color: #707070; font: normal 14px/20px Arial, sans-serif; text-align: left; vertical-align: top; padding: 2px 0">Change By:</th> 
+                                                    <td style="padding: 0px; border-collapse: collapse; font: normal 14px/20px Arial, sans-serif; padding: 2px 0 2px 5px; vertical-align: top"> <a class="user-hover" rel="craig.dial@cpanel.net" id="email_craig.dial@cpanel.net" href="https://jira.cpanel.net/secure/ViewProfile.jspa?name=craig.dial%40cpanel.net" style="color:#1a63c9;; color: #3b73af; text-decoration: none">Craig Dial</a> </td> 
+                                                </tr> 
+                                                <tr> 
+                                                    <th style="color: #707070; font: normal 14px/20px Arial, sans-serif; text-align: left; vertical-align: top; padding: 2px 0">Parent Issue:</th> 
+                                                    <td style="padding: 0px; border-collapse: collapse; font: normal 14px/20px Arial, sans-serif; padding: 2px 0 2px 5px; vertical-align: top"> <span class="diffcontext">COBRA-</span> <span class="diffremovedchars" style="background-color:#ffe7e7;text-decoration:line-through;">8153</span> <span class="diffaddedchars" style="background-color:#ddfade;">8154</span> </td> 
+                                                </tr> 
+                                            </tbody>
+                                        </table> </td> 
+                                </tr> 
+                                <tr> 
+                                    <td class="email-content-main mobile-expand " style="padding: 0px; border-collapse: collapse; border-left: 1px solid #cccccc; border-right: 1px solid #cccccc; border-top: 0; border-bottom: 0; padding: 0 15px 0 16px; background-color: #ffffff" bgcolor="#ffffff"> 
+                                        <table id="actions-pattern" cellspacing="0" cellpadding="0" border="0" width="100%" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px; mso-line-height-rule: exactly; mso-text-raise: 1px"> 
+                                            <tbody>
+                                                <tr> 
+                                                    <td id="actions-pattern-container" valign="middle" style="padding: 0px; border-collapse: collapse; padding: 10px 0 10px 24px; vertical-align: middle; padding-left: 0"> 
+                                                        <table align="left" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt"> 
+                                                            <tbody>
+                                                                <tr> 
+                                                                    <td class="actions-pattern-action-icon-container" style="padding: 0px; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px; mso-line-height-rule: exactly; mso-text-raise: 0; vertical-align: middle"> <a href="https://jira.cpanel.net/browse/COBRA-8189#add-comment" target="_blank" title="Add Comment" style="color: #3b73af; text-decoration: none"> <img class="actions-pattern-action-icon-image" src="cid:jira-generated-image-static-comment-icon-a5b05485-1315-4787-8be2-32346ce5b8a1" alt="Add Comment" title="Add Comment" height="16" width="16" border="0" style="vertical-align: middle"> </a> </td> 
+                                                                    <td class="actions-pattern-action-text-container" style="padding: 0px; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px; mso-line-height-rule: exactly; mso-text-raise: 4px; padding-left: 5px"> <a href="https://jira.cpanel.net/browse/COBRA-8189#add-comment" target="_blank" title="Add Comment" style="color: #3b73af; text-decoration: none">Add Comment</a> </td> 
+                                                                </tr> 
+                                                            </tbody>
+                                                        </table> </td> 
+                                                </tr> 
+                                            </tbody>
+                                        </table> </td> 
+                                </tr> 
+                                <!-- there needs to be content in the cell for it to render in some clients --> 
+                                <tr> 
+                                    <td class="email-content-rounded-bottom mobile-expand" style="padding: 0px; border-collapse: collapse; color: #ffffff; padding: 0 15px 0 16px; height: 5px; line-height: 5px; background-color: #ffffff; border-top: 0; border-left: 1px solid #cccccc; border-bottom: 1px solid #cccccc; border-right: 1px solid #cccccc; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px; mso-line-height-rule: exactly" height="5" bgcolor="#ffffff">&nbsp;</td> 
+                                </tr> 
+                            </tbody>
+                        </table> </td> 
+                </tr> 
+                <tr> 
+                    <td id="footer-pattern" style="padding: 0px; border-collapse: collapse; padding: 12px 20px"> 
+                        <table id="footer-pattern-container" cellspacing="0" cellpadding="0" border="0" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt"> 
+                            <tbody>
+                                <tr> 
+                                    <td id="footer-pattern-text" class="mobile-resize-text" width="100%" style="padding: 0px; border-collapse: collapse; color: #999999; font-size: 12px; line-height: 18px; font-family: Arial, sans-serif; mso-line-height-rule: exactly; mso-text-raise: 2px"> This message was sent by Atlassian Jira <span id="footer-build-information">(v7.11.0#711000-<span title="ff06e53002015cff4210a5b9546311566760ca3e" data-commit-id="ff06e53002015cff4210a5b9546311566760ca3e}">sha1:ff06e53</span>)</span> </td> 
+                                </tr> 
+                            </tbody>
+                        </table> </td> 
+                </tr> 
+            </tbody>
+        </table>   
+    </body>
+</html>
+------=_Part_25581_1828019859.1538597340123
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+Content-ID: <jira-generated-image-avatar-49794124-74c9-4f6d-9a85-7f8b9b5a75e6>
+
+iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAHXRFWHRqaXJhLXN5c3RlbS1pbWFn
+ZS10eXBlAGF2YXRhcuQCGmEAAAERSURBVHjaY2AYBUjAa/0rA+91z7d7r3vxHIj/Uxm/B+L9Xmue
+meCx/MVnGliMjn97rn1hgeEA7/UvdtPBcih+fhjTAbQJdpzRgc0B/+mJiXZAz+kP/5de/4IXL7jy
++X/67jfUdwDIclJA56kP1HUAyHcgcPXNL7whAJIHARCbJg4gZDCx6kYdQFUHIOeOS68haQBEE5s7
+KHIANXIHRQ6AiRMLsIXg0HDA3MufsJYDsDinuQNSdr7+Tw1AtgNAGJSA0Es+uoUAoXw/6gBiAahA
+oqoDYLmDEPj9F0IXH3hLXQeQkjtmXfpEWYuIlNyBXg8U7H9LUmU0wI3SgW6WD3jHBO4ISEi8pk3X
+7PlhnJaPWAAAW8WVGlxRSUQAAAAASUVORK5CYII=
+------=_Part_25581_1828019859.1538597340123
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+Content-ID: <jira-generated-image-static-comment-icon-a5b05485-1315-4787-8be2-32346ce5b8a1>
+
+iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAADAFBMVEX///+1tbWzs7OysrKrq6um
+pqalpaWdnZ2ZmZn///+VlZWPj4/7+/vu7u7p6enn5+fl5eXk5OTh4eHW1tbT09PMzMzJycm6urq5
+ubm1tbWzs7OysrKrq6upqamlpaWKioqFhYWRkZGKioqHh4eDg4OAgIB/f398fHx6enp4eHh2dnZ0
+dHRycnJwcHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAIFWMjAAAAIXRSTlMAIiIzZoiZu8zd3d3u7u7u7u7u7u7u7u7u7u7u7u7u7u6n
+leogAAAAG3RFWHRqaXJhLXN5c3RlbS1pbWFnZS10eXBlAGljb266KjlFAAAAo0lEQVR42l2P2wrC
+MAyG09Pa1SqKzIk3QwTf/3G8UByKyK4EcV0POqzDaTUQwv+R/EkA/gKFJGyuQrFH/+iAWJnGOCCp
+THcmALms6ne7ykpNeFHpft75xZWsL/XX0bMppj7eUXNseQykI7eZu3+0GpfYuVz1ephriwAnxdkD
+QVwIsTVAoTUswZNBuPRkw6X01cqzZtMbdWB0aFqIANqb349ZLJ5XFjQIuveaPQAAAABJRU5ErkJg
+gg==
+------=_Part_25581_1828019859.1538597340123--
+

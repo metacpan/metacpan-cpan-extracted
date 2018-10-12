@@ -135,4 +135,24 @@ my $UTF_8_bytes = "UTF\xe2\x80\x908";
    is( $bytes, $UTF_8_bytes, 'content of binary frame' );
 }
 
+# custom req
+{
+   my $client = Net::Async::WebSocket::Client->new();
+   $loop->add( $client );
+
+   my $f = $client->connect_handle( $clientsock,
+      url => "ws://localhost/test",
+      req => Protocol::WebSocket::Request->new( headers => [ "X-Custom" => "value" ] ),
+   );
+   $f->on_fail( sub { $f->get } );
+
+   my $h = Protocol::WebSocket::Handshake::Server->new;
+
+   my $stream = "";
+   wait_for_stream { $h->parse( $stream ); $stream = ""; $h->is_done } $serversock => $stream;
+
+   is( $h->req->field( "X-Custom" ), "value",
+      'request header contains custom field' );
+}
+
 done_testing;

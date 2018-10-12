@@ -20,5 +20,5 @@ no_index:
 requires:
   Mojolicious: '5.01'
   perl: '5.006'
-version: '0.00004'
+version: '0.00007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

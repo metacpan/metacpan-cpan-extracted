@@ -32,5 +32,5 @@ requires:
 resources:
   homepage: https://github.com/mbethke/Monitoring-Icinga2-Client-Simple
   repository: https://github.com/mbethke/Monitoring-Icinga2-Client-Simple.git
-version: '0.002000'
+version: '0.002001'
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -22,7 +22,7 @@ subtest list_idx_boards => sub {
 subtest list_idx_firms => sub {
     $res = list_idx_firms();
     is($res->[0], 200);
-    is(scalar(@{ $res->[2] }), 598);
+    is(scalar(@{ $res->[2] }), 607);
 
     $res = list_idx_firms(sector => "AGRI", board => "PENGEMBANGAN");
     is($res->[0], 200);

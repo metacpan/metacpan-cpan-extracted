@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.9.8';
+$Git::Hooks::VERSION = '2.9.9';
 use 5.010;
 use utf8;
 use Carp;
@@ -116,7 +116,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.9.8
+version 2.9.9
 
 =head1 SYNOPSIS
 
@@ -321,7 +321,7 @@ For example:
         my $errors = 0;
 
         foreach ($git->run(qw/ls-files -s/, @changed)) {
-            my ($mode, $sha, $n, $name) = split / /;
+            my ($mode, $sha, $n, $name) = split ' ';
             my $size = $git->file_size(":0:$name");
             if ($size > $LIMIT) {
                 $git->fault("File '$name' has $size bytes, more than our limit of $LIMIT",
@@ -343,7 +343,7 @@ For example:
         my @changed = grep {/\.p[lm]$/} $git->filter_files_in_index('AM');
 
         foreach ($git->run(qw/ls-files -s/, @changed)) {
-            my ($mode, $sha, $n, $name) = split / /;
+            my ($mode, $sha, $n, $name) = split ' ';
             require Perl::Critic;
             state $critic = Perl::Critic->new(-severity => 'stern', -top => 10);
             my $contents = $git->run('cat-file', $sha);
@@ -474,7 +474,7 @@ import the PRE_COMMIT directive, like this:
         my $errors = 0;
 
         foreach ($git->run(qw/ls-files -s/, @changed)) {
-            my ($mode, $sha, $n, $name) = split / /;
+            my ($mode, $sha, $n, $name) = split ' ';
             my $size = $git->file_size(":0:$name");
             if ($size > $LIMIT) {
                 $git->fault("File '$name' has $size bytes, more than our limit of $LIMIT",
@@ -510,7 +510,7 @@ make this check work for other hooks as well:
         my $errors = 0;
 
         foreach ($git->run(qw/ls-files -s/, @files)) {
-            my ($mode, $sha, $n, $name) = split / /;
+            my ($mode, $sha, $n, $name) = split ' ';
             my $size = $git->file_size(":0:$name");
             if ($size > $LIMIT) {
                 $git->fault("File '$name' has $size bytes, more than our limit of $LIMIT",
@@ -572,7 +572,7 @@ We just have to change the check_new_files function:
         my $errors = 0;
 
         foreach ($git->run(qw/ls-files -s/, @files)) {
-            my ($mode, $sha, $n, $name) = split / /;
+            my ($mode, $sha, $n, $name) = split ' ';
             my $size = $git->file_size(":0:$name");
             if ($size > $limit) {
                 $git->fault("File '$name' has $size bytes, more than our limit of $limit",

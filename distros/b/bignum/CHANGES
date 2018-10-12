@@ -1,3 +1,9 @@
+0.51 2018-10-08
+
+ * Better way to catch warnings (CPAN RT #126900).
+
+ * Better Makefile.PL.
+
 0.50 2018-04-17
 
  * Fix t/option_l.t to match changes in Math::BigInt.

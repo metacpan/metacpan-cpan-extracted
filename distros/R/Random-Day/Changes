@@ -1,3 +1,8 @@
+0.08 2018-10-11T16:53:50+02:00
+ - Code optimalization - to simple quotes.
+ - Remove verbatim from POD doc.
+ - Update copyright years.
+
 0.07 2018-02-07T07:48:16+01:00
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
 

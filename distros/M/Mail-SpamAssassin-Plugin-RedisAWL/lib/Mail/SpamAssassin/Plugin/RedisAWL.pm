@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: redis support for spamassassin AWL/TxRep
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.002'; # VERSION
 
 use vars qw(@ISA);
 @ISA = qw(Mail::SpamAssassin::Plugin);
@@ -41,6 +41,11 @@ sub new {
             type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC,
             default => 0,
         }, {
+            setting => 'auto_whitelist_redis_expire',
+            is_admin => 1,
+            type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC,
+            default => 0,
+        }, {
             setting => 'auto_whitelist_redis_debug',
             is_admin => 1,
             type => $Mail::SpamAssassin::Conf::CONF_TYPE_BOOL,
@@ -65,7 +70,7 @@ Mail::SpamAssassin::Plugin::RedisAWL - redis support for spamassassin AWL/TxRep
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 DESCRIPTION
 
@@ -120,7 +125,17 @@ Will call SELECT to switch database after connect if set to a non-zero value.
 
 Database 0 is the default in redis.
 
-=head2 timing_redis_debug (default: 0)
+=head2 auto_whitelist_redis_expire (default: 0)
+
+Add an expire timeout to entries in redis.
+
+The default 0 means that no expire timeout is set.
+
+Timeout must be set in seconds.
+
+An entries expiration timeout will be updated whenever a new score is applied to it.
+
+=head2 auto_whitelist_redis_debug (default: 0)
 
 Turn on/off debug on the Redis connection.
 

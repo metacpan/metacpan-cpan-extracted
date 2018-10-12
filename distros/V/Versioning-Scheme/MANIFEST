@@ -11,6 +11,7 @@ lib/Role/Versioning/Scheme.pm
 lib/Versioning/Scheme.pm
 lib/Versioning/Scheme/Dotted.pm
 lib/Versioning/Scheme/Monotonic.pm
+lib/Versioning/Scheme/Perl.pm
 lib/Versioning/Scheme/Semantic.pm
 t/00-compile.t
 t/author-critic.t
@@ -18,5 +19,6 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/dotted.t
 t/monotonic.t
+t/perl.t
 t/semantic.t
 weaver.ini

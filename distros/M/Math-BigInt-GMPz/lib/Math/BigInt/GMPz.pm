@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '0.0002';
+our $VERSION = '0.0003';
 
 use Math::GMPz qw< :mpz >;
 
@@ -68,6 +68,23 @@ sub _from_bytes {
     my ($order, $size, $endian, $nails) = (1, 1, 0, 0);
     Rmpz_import($rop, $len, $order, $size, $endian, $nails, $bstr);
     return $rop;
+}
+
+sub _from_base {
+    my $class = shift;
+
+    # If a collation sequence is given, pass everything to parent.
+    return $class -> SUPER::_from_base(@_) if @_ == 3;
+
+    # If base > 36, pass everything to parent.
+    my $str   = $_[0];
+    my $base  = $_[1];
+    $base = $class -> _new($base) unless ref($base);
+    if ($class -> _acmp($base, $class -> _new("36")) > 0) {
+        return $class -> SUPER::_from_base($str, $base);
+    } else {
+        return Rmpz_init_set_str($str, $base);
+    }
 }
 
 sub _1ex  {
@@ -280,6 +297,23 @@ sub _to_bytes {
 
 *_as_bytes = \&_to_bytes;
 
+sub _to_base {
+    my $class = shift;
+
+    # If a collation sequence is given, pass everything to parent.
+    return $class -> SUPER::_to_base(@_) if @_ == 3;
+
+    # If base > 36, pass everything to parent.
+    my $str   = $_[0];
+    my $base  = $_[1];
+    $base = $class -> _new($base) unless ref($base);
+    if ($class -> _acmp($base, $class -> _new("36")) > 0) {
+        return $class -> SUPER::_to_base($str, $base);
+    } else {
+        return uc Rmpz_get_str($str, $base);
+    }
+}
+
 sub _num {
     0 + Rmpz_get_str($_[1], 10);
 }
@@ -375,6 +409,128 @@ Math::BigInt::GMPz uses Math::GMPz objects for the calculations. Math::GMPz is
 an XS layer on top of the very fast gmplib library. See https://gmplib.org/
 
 Math::BigInt::GMPz inherits from Math::BigInt::Lib.
+
+=head1 METHODS
+
+The following methods are implemented.
+
+=over
+
+=item _new()
+
+=item _zero()
+
+=item _one()
+
+=item _two()
+
+=item _ten()
+
+=item _from_bin()
+
+=item _from_oct()
+
+=item _from_hex()
+
+=item _from_bytes()
+
+=item _from_base()
+
+=item _1ex()
+
+=item _add()
+
+=item _mul()
+
+=item _div()
+
+=item _sub()
+
+=item _dec()
+
+=item _inc()
+
+=item _mod()
+
+=item _sqrt()
+
+=item _root()
+
+=item _fac()
+
+=item _dfac()
+
+=item _pow()
+
+=item _modinv()
+
+=item _modpow()
+
+=item _rsft()
+
+=item _lsft()
+
+=item _gcd()
+
+=item _lcm()
+
+=item _and()
+
+=item _or()
+
+=item _xor()
+
+=item _is_zero()
+
+=item _is_one()
+
+=item _is_two()
+
+=item _is_ten()
+
+=item _is_even()
+
+=item _is_odd()
+
+=item _acmp()
+
+=item _str()
+
+=item _as_bin()
+
+=item _as_oct()
+
+=item _as_hex()
+
+=item _to_bin()
+
+=item _to_oct()
+
+=item _to_hex()
+
+=item _to_bytes()
+
+=item _to_base()
+
+=item _num()
+
+=item _copy()
+
+=item _len()
+
+=item _zeros()
+
+=item _digit()
+
+=item _check()
+
+=item _nok()
+
+=item _alen()
+
+=item _set()
+
+=back
 
 =head1 BUGS
 

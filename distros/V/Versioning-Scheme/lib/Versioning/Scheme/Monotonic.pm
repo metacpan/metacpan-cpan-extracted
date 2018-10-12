@@ -1,20 +1,38 @@
 package Versioning::Scheme::Monotonic;
 
 our $DATE = '2018-10-11'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Role::Tiny;
-use Role::Versioning::Scheme;
+use Role::Tiny::With;
+with 'Role::Versioning::Scheme';
 
-our $re = qr/\A([1-9][0-9]*)\.([1-9][0-9]*)(\.0)?(\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?\z/;
+our $re = qr/
+                \A
+                ([1-9][0-9]*)\.                             # 1=compatibility
+                ([1-9][0-9]*)                               # 2=release
+                (?:\.(0))?                                  # 3=semver_marker
+                (?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?  # 4=metadata
+                \z
+            /x;
 
 sub is_valid_version {
     my ($self, $v) = @_;
     $v =~ $re ? 1:0;
+}
+
+sub parse_version {
+    my ($self, $v) = @_;
+    return undef unless my ($c, $r, $mark, $meta) = $v =~ $re;
+    return {
+        compatibility => $1,
+        release => $2,
+        semver_marker => $3,
+        metadata => $4,
+    };
 }
 
 sub normalize_version {
@@ -23,7 +41,7 @@ sub normalize_version {
 
     die "Invalid version '$v'" unless $v =~ $re;
 
-    "$1.$2" . ($4 || '');
+    "$1.$2" . (defined $4 ? ".$4" : "");
 }
 
 sub cmp_version {
@@ -41,7 +59,7 @@ sub bump_version {
     $opts->{num} //= 1;
     $opts->{part} //= 1;
 
-    die "Invalid version '$v'" unless my ($c, $r, $z, $m) = $v =~ $re;
+    die "Invalid version '$v'" unless my ($c, $r, $mark, $meta) = $v =~ $re;
     die "Invalid 'num', must be non-zero" unless $opts->{num} != 0;
     die "Invalid 'part', must be 0|1" unless $opts->{part} =~ /\A(0|1)\z/;
 
@@ -60,7 +78,12 @@ sub bump_version {
         }
         $r = $r + $opts->{num};
     }
-    join("", $c, ".", $r, ($z||''), ($m||''));
+    join(
+        "",
+        $c, ".", $r,
+        (defined $mark ? ".$mark" : ""),
+        (defined $meta ? ".$meta" : ""),
+    );
 }
 
 1;
@@ -78,34 +101,38 @@ Versioning::Scheme::Monotonic - Monotonic versioning
 
 =head1 VERSION
 
-This document describes version 0.005 of Versioning::Scheme::Monotonic (from Perl distribution Versioning-Scheme), released on 2018-10-11.
+This document describes version 0.007 of Versioning::Scheme::Monotonic (from Perl distribution Versioning-Scheme), released on 2018-10-11.
 
 =head1 SYNOPSIS
 
  use Versioning::Scheme::Monotonic;
 
  # checking validity
- Versioning::Scheme::Monotonic->is_valid('1.2');   # 1
- Versioning::Scheme::Monotonic->is_valid('1.02');  # 0
- Versioning::Scheme::Monotonic->is_valid('1.2.0'); # 1
- Versioning::Scheme::Monotonic->is_valid('1.2.1'); # 0
- Versioning::Scheme::Monotonic->is_valid('1.2+foo.123'); # 1
+ Versioning::Scheme::Monotonic->is_valid_version('1.2');   # 1
+ Versioning::Scheme::Monotonic->is_valid_version('1.02');  # 0
+ Versioning::Scheme::Monotonic->is_valid_version('1.2.0'); # 1
+ Versioning::Scheme::Monotonic->is_valid_version('1.2.1'); # 0
+ Versioning::Scheme::Monotonic->is_valid_version('1.2+foo.123'); # 1
+
+ # parsing
+ Versioning::Scheme::Monotonic->parse_version('1.02');        # => undef
+ Versioning::Scheme::Monotonic->parse_version('1.2+foo.123'); # {compatibility=>1, release=>2, metadata=>'foo.123'}
 
  # normalizing
- Versioning::Scheme::Monotonic->normalize('1.2.0'); # => '1.2'
- Versioning::Scheme::Monotonic->normalize('1.2.0+foo.123'); # => '1.2+foo.123'
+ Versioning::Scheme::Monotonic->normalize_version('1.2.0'); # => '1.2'
+ Versioning::Scheme::Monotonic->normalize_version('1.2.0+foo.123'); # => '1.2+foo.123'
 
  # comparing
- Versioning::Scheme::Monotonic->compare('1.2', '1.2.0'); # 0
- Versioning::Scheme::Monotonic->compare('1.2', '1.13');  # -1
- Versioning::Scheme::Monotonic->compare('2.2', '1.13');  # 1
- Versioning::Scheme::Monotonic->compare('2.2+alpha', '2.2+beta');  # -1
+ Versioning::Scheme::Monotonic->cmp_version('1.2', '1.2.0'); # 0
+ Versioning::Scheme::Monotonic->cmp_version('1.2', '1.13');  # -1
+ Versioning::Scheme::Monotonic->cmp_version('2.2', '1.13');  # 1
+ Versioning::Scheme::Monotonic->cmp_version('2.2+alpha', '2.2+beta');  # -1
 
  # bumping
- Versioning::Scheme::Monotonic->bump('1.2');            # => '1.3'
- Versioning::Scheme::Monotonic->bump('1.2', {num=>2});  # => '1.4'
- Versioning::Scheme::Monotonic->bump('1.2', {part=>0}); # => '2.3'
- Versioning::Scheme::Monotonic->bump('2.2', {num=>-1, part=>0}); # => '1.1'
+ Versioning::Scheme::Monotonic->bump_version('1.2');            # => '1.3'
+ Versioning::Scheme::Monotonic->bump_version('1.2', {num=>2});  # => '1.4'
+ Versioning::Scheme::Monotonic->bump_version('1.2', {part=>0}); # => '2.3'
+ Versioning::Scheme::Monotonic->bump_version('2.2', {num=>-1, part=>0}); # => '1.1'
 
 You can also mix this role into your class.
 
@@ -142,6 +169,8 @@ increase COMPATIBILITY instead; but in that case RELEASE will still be bumped by
 =head1 METHODS
 
 =head2 is_valid_version
+
+=head2 parse_version
 
 =head2 normalize_version
 

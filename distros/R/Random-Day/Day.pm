@@ -10,7 +10,7 @@ use DateTime::Event::Recurrence;
 use English;
 use Error::Pure qw(err);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -206,7 +206,7 @@ sub _check_day {
 		err "Day isn't positive number.";
 	}
 	if ($day == 0) {
-		err "Day cannot be a zero.";
+		err 'Day cannot be a zero.';
 	}
 	return;
 }
@@ -251,76 +251,89 @@ Random::Day - Class for random day generation.
 
 =item C<new(%params)>
 
- Constructor.
+Constructor.
 
 =over 8
 
 =item * C<day>
 
- Day.
- Default value is undef.
+Day.
+
+Default value is undef.
 
 =item * C<dt_from>
 
- DateTime object from.
- Default value is DateTime object for 1900 year.
+DateTime object from.
+
+Default value is DateTime object for 1900 year.
 
 =item * C<dt_to>
 
- DateTime object to.
- Default value is DateTime object for 2050 year.
+DateTime object to.
+
+Default value is DateTime object for 2050 year.
 
 =item * C<month>
 
- Month.
- Default value is undef.
+Month.
+
+Default value is undef.
 
 =item * C<year>
 
- Year.
- Default value is undef.
+Year.
+
+Default value is undef.
 
 =back
 
 =item C<get()>
 
- Get random date defined by constructor parameters.
- Returns DateTime object for date.
+Get random date defined by constructor parameters.
+
+Returns DateTime object for date.
 
 =item C<random()>
 
- Get random date.
- Returns DateTime object for date.
+Get random date.
+
+Returns DateTime object for date.
 
 =item C<random_day($day)>
 
- Get random date defined by day.
- Returns DateTime object for date.
+Get random date defined by day.
+
+Returns DateTime object for date.
 
 =item C<random_day_month($day, $month)>
 
- Get random date defined by day and month.
- Returns DateTime object for date.
+Get random date defined by day and month.
+
+Returns DateTime object for date.
 
 =item C<random_day_month_year($day, $month, $year)>
 
- Get date defined by day, month and year
- Returns DateTime object for date.
+Get date defined by day, month and year.
+
+Returns DateTime object for date.
 
 =item C<random_month($month)>
 
- Get random date defined by month.
- Returns DateTime object for date.
+Get random date defined by month.
+
+Returns DateTime object for date.
 
 =item C<random_month_year($month, $year)>
 
- Get random date defined by month and year.
- Returns DateTime object for date.
+Get random date defined by month and year.
+
+Returns DateTime object for date.
 
 =item C<random_year($year)>
 
- Get random date defined by year.
- Returns DateTime object for date.
+Get random date defined by year.
+
+Returns DateTime object for date.
 
 =back
 
@@ -403,11 +416,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Josef Špaček 2013-2017
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2018
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

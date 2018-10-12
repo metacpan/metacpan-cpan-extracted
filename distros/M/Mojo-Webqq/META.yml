@@ -23,12 +23,12 @@ requires:
   Digest::SHA: '0'
   Encode::Locale: '0'
   IO::Compress::Gzip: '0'
-  IO::Socket::SSL: '1.94'
-  Mojolicious: '7.69'
+  IO::Socket::SSL: '2.009'
+  Mojolicious: '7.83'
   Time::HiRes: '0'
   Time::Piece: '0'
   Time::Seconds: '0'
 resources:
   repository: git://github.com/sjdy521/Mojo-Webqq.git
-version: v2.2.3
+version: v2.2.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -38,7 +38,7 @@ use warnings::unused;
 
 our @EXPORT = qw( retrieve report newretrieve newreport get_files );
 
-$VERSION = '0.59'; # our $VERSION = '';
+$VERSION = '0.61'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -103,19 +103,20 @@ sub newretrieve
 
   my %d = %{ $_[0] };
   my @instances = @{ $d{instances} };
-  my $countcase = $d{countcase};
-  my $countblock = $d{countblock};
+  my $countcase = $d{countcase}; say $tee "IN RETRIEVE \$countcase " . dump( $countcase );
+  my $countblock = $d{countblock}; say $tee "IN RETRIEVE \$countblock " . dump( $countblock );
   my $countinstance = $d{countinstance};
   my %datastruc = %{ $d{datastruc} }; ######
   my %dirfiles = %{ $d{dirfiles} };
+
 
   my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN ENTRY NEWRETRIEVE \@varnumbers : " . dump( @varnumbers );
   @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "IN ENTRY NEWRETRIEVE \@varnumbers : " . dump( @varnumbers );
   my @miditers = @{ $d{miditers} }; #say $tee "IN ENTRY NEWRETRIEVE \@miditers : " . dump( @miditers );
   @miditers = Sim::OPT::washn( @miditers ); #say $tee "IN ENTRY NEWRETRIEVE \@miditers : " . dump( @miditers );
-  my @sweeps = @{ $d{sweeps} }; say $tee "IN ENTRY NEWRETRIEVE \@sweeps : " . dump( @sweeps );
+  my @sweeps = @{ $d{sweeps} }; #say $tee "IN ENTRY NEWRETRIEVE \@sweeps : " . dump( @sweeps );
 
-  if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
+  if ( $countcase > $#varnumbers )# NUMBER OF CASES OF THE CURRENT PROBLEM
   {
     exit(say $tee "#END RUN.");
   }
@@ -150,7 +151,7 @@ sub newretrieve
   my $repblock = $dirfiles{repblock};
   my $descendlist = $dirfiles{descendlist};
   my $descendblock = $dirfiles{descendblock};
-  my $repfile = $dirfiles{repfile}; say $tee "IN REPORT \$repfile: " . dump($repfile);
+  my $repfile = $dirfiles{repfile}; say $tee "IN RETRIEVE \$repfile: " . dump($repfile);
 
   my $skipfile = $vals{skipfile};
   my $skipsim = $vals{skipsim};
@@ -166,11 +167,12 @@ sub newretrieve
   my $instance = $instances[$countinstance];  #say $tee "\$instance: " . dump($instance);
 
   my %dat = %{$instance};
-  my @winneritems = @{ $dat{winneritems} }; #say $tee  "dumpIN( \@winneritems) " . dump(@winneritems);
-  my $countvar = $dat{countvar}; #say $tee "dump(\$countvar): " . dump($countvar );
-  my $countstep = $dat{countstep}; #say $tee "dump(\$countstep): " . dump($countstep);
-  my $to = $dat{to}; #say $tee "dump(\$to): " . dump($to);
-  my $origin = $dat{origin}; #say $tee "dump(\$origin): " . dump($origin);
+  my @winneritems = @{ $dat{winneritems} }; say $tee  "IN RETRIEVE( \@winneritems) " . dump(@winneritems);
+  my $countvar = $dat{countvar}; say $tee "IN RETRIEVE(\$countvar): " . dump($countvar );
+  my $countstep = $dat{countstep}; say $tee "IN RETRIEVE(\$countstep): " . dump($countstep);
+  my $to = $dat{to}; say $tee "IN RETRIEVE (\$to): " . dump($to);
+  my $origin = $dat{origin}; say $tee "IN RETRIEVE(\$origin): " . dump($origin);
+  my $c = $dat{c}; say $tee "IN RETRIEVE( \$c ): " . dump( $c );
 
   #eval($getparshere);
 
@@ -894,14 +896,16 @@ sub newreport # This function retrieves the results of interest from the texts f
 
   my %d = %{ $_[0] };
   my @instances = @{ $d{instances} };
-  my $countcase = $d{countcase};
-  my $countblock = $d{countblock};
+  my $countcase = $d{countcase}; say $tee "IN RETRIEVE \$countcase " . dump( $countcase );
+  my $countblock = $d{countblock}; say $tee "IN REPORT \$countblock " . dump( $countblock );
   my $countinstance = $d{countinstance};
   my %datastruc = %{ $d{datastruc} }; ######
-  my %dirfiles = %{ $d{dirfiles} };
+  my %dirfiles = %{ $d{dirfiles} }; #say $tee "IN REPORT \%dirfiles " . dump( %dirfiles );
+  #say $tee "IN RETRIEVE \$dirfiles{c} " . dump( $dirfiles{c} );
   my @simcases = @{ $d{simcases} }; ######
   my @simstruct = @{ $d{simstruct} }; ######
   my @varnumbers = @{ $d{varnumbers} }; ######
+  my $c = $d{c};
 
   my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN ENTRY NEWREPORT \@varnumbers : " . dump( @varnumbers );
   @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "IN ENTRY NEWREPORT \@varnumbers : " . dump( @varnumbers );
@@ -931,8 +935,6 @@ sub newreport # This function retrieves the results of interest from the texts f
     @precomputeds = <PRECOMPUTED>;
     close PRECOMPUTED;
   }
-
-
 
   my @simcases = @{ $dirfiles{simcases} };
   my @simstruct = @{ $dirfiles{simstruct} };
@@ -971,9 +973,10 @@ sub newreport # This function retrieves the results of interest from the texts f
   my @winneritems = @{ $dat{winneritems} };
   my $countvar = $dat{countvar}; #say $tee "IN REPORT \$countvar " . dump( $countvar );
   my $countstep = $dat{countstep}; #say $tee "IN REPORT \$countstep " . dump( $countstep );
-  my $to = $dat{to};
+  my $to = $dat{to}; #say $tee "IN REPORT1 \$to " . dump( $to );
   my $origin = $dat{origin};
   my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase);
+  my $c = $dat{c}; #say $tee "IN REPORT1 \$c " . dump( $c );
 
   ( my $blockelts_ref ) = Sim::OPT::getblockelts(\@sweeps, $countcase, $countblock );
 	my @blockelts = @{ $blockelts_ref }; #say $tee "IN REPORT \@blockelts : " . dump( @blockelts );
@@ -981,7 +984,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   my @blocks = Sim::OPT::getblocks(\@sweeps, $countcase);
   my $toitem = Sim::OPT::getitem(\@winneritems, $countcase, $countblock);
   my $from = Sim::OPT::getline($toitem);
-  my %varnums = Sim::OPT::getcase( \@varnumbers, $countcase ); #say $tee "IN CALLCASE \%varnums" . dump( %varnums );
+  my %varnums = Sim::OPT::getcase( \@varnumbers, $countcase ); #say $tee "IN REPORT \%varnums" . dump( %varnums );
 	my %mids = Sim::OPT::getcase( \@miditers, $countcase );
 
   my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varnumbers );
@@ -989,9 +992,8 @@ sub newreport # This function retrieves the results of interest from the texts f
 
   say $tee "#Processing reports for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1);
 
-  open( REPLIST, ">$replist" ) or die( "$!" );
+  open( REPLIST, ">>$replist" ) or die( "$!" );
   open( REPBLOCK, ">>$repblock" ) or die( "$!" );
-
 
   open( REPFILE, ">>$repfile") or die "Can't open $repfile $!"; #say $tee "#OPENED $repfile";
   @repcases = uniq( @repcases );
@@ -1012,7 +1014,6 @@ sub newreport # This function retrieves the results of interest from the texts f
 
   if ( $precomputed eq "" ) #NEW, TAKE CARE.###########################àà
   {
-
     my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
     #my @mergestruct;
     my $counttool = 1;
@@ -1241,7 +1242,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   {
     #say $tee "LOOKING.";
     my $touse = $to;
-    $touse =~ s/$mypath\///;
+    $touse =~ s/$mypath\///; #say $tee "IN REPORT1 \$touse " . dump($touse);
     #say $tee "TOUSE: $touse\n";
     foreach my $line ( @precomputeds )
     {

@@ -41,7 +41,7 @@
    "provides" : {
       "Math::Random::PCG32" : {
          "file" : "lib/Math/Random/PCG32.pm",
-         "version" : "0.10"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/thrig/Math-Random-PCG32"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

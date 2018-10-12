@@ -18,6 +18,11 @@ subtest is_valid => sub {
     ok(!Versioning::Scheme::Dotted->is_valid_version('1.1beta'));
 };
 
+subtest parse => sub {
+    is_deeply(Versioning::Scheme::Dotted->parse_version('1.0beta'), undef);
+    is_deeply(Versioning::Scheme::Dotted->parse_version('1.2.3'), {parts=>[1,2,3]});
+};
+
 subtest normalize => sub {
     dies_ok { Versioning::Scheme::Dotted->normalize_version('1.1beta') } 'invalid -> dies';
 

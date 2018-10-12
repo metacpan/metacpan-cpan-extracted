@@ -103,16 +103,14 @@ struct SPVM_runtime {
   // Memory blocks count
   int32_t memory_blocks_count;
   
+  // Variable allocation max length
+  int32_t vars_alloc_length_max;
+  
   SPVM_PORTABLE* portable;
 };
 
-SPVM_RUNTIME* SPVM_RUNTIME_new();
+SPVM_ENV* SPVM_RUNTIME_create_env(SPVM_RUNTIME* runtime);
+SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable);
 void SPVM_RUNTIME_free(SPVM_ENV* env);
-SPVM_ENV* SPVM_RUNTIME_new_env(SPVM_RUNTIME* runtime);
-
-int32_t SPVM_RUNTIME_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack);
-int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack);
-int32_t SPVM_RUNTIME_call_sub_native(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack);
-int32_t SPVM_RUNTIME_call_sub_precompile(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack);
 
 #endif

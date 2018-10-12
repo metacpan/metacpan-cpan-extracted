@@ -1,0 +1,31 @@
+---
+abstract: 'command-line processing for piflash script to flash SD card for Raspberry Pi'
+author:
+  - 'Ian Kluft <cpan-dev@iankluft.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PiFlash
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::LibMagic: '0'
+  File::Slurp: '0'
+  Getopt::Long: '0'
+  IO::Handle: '0'
+  IO::Poll: '0'
+  Moose: '0'
+  POSIX: '0'
+  autodie: '0'
+  perl: v5.18.0
+  strict: '0'
+  warnings: '0'
+version: 0.0.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

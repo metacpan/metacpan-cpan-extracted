@@ -1,0 +1,40 @@
+NAME
+
+    Net::Prometheus::PerlCollector - obtain statistics about the perl
+    interpreter
+
+SYNOPSIS
+
+       use Net::Prometheus;
+       use Net::Prometheus::PerlCollector;
+    
+       my $client = Net::Prometheus->new;
+       $client->register( Net::Prometheus::PerlCollector->new );
+
+DESCRIPTION
+
+    This module provides a class that collects metrics about the perl
+    interpreter itself.
+
+ Metrics
+
+    The following metrics are collected:
+
+      * perl_heap_arenas
+
+      A gauge giving the number of arenas the heap is split into.
+
+      * perl_heap_svs
+
+      A gauge giving the total number of SVs allocated on the heap.
+
+    Note that the way these metrics are collected requires counting them
+    all every time. While this code is relatively efficient, it is still a
+    linear scan, and may itself cause some slowdown of the process at the
+    time it is collected, if the heap has grown very large, containing a
+    great number of SVs.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

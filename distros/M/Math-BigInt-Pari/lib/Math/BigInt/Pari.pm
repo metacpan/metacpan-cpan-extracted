@@ -8,7 +8,7 @@ use Math::BigInt::Lib 1.999801;
 
 our @ISA = qw< Math::BigInt::Lib >;
 
-our $VERSION = '1.3004';
+our $VERSION = '1.3005';
 
 use Math::Pari qw(PARI pari2pv gdivent bittest
                   gcmp gcmp0 gcmp1 gcd ifact gpui gmul

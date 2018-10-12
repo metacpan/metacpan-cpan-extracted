@@ -1,6 +1,13 @@
 use strict;
 use warnings;
+use Config;
 use Module::Build;
+
+# for irand64 and probably also to feed 64-bit seed values into ->new
+if ( !$Config{use64bitint} ) {
+    print "need perl compiled with use64bitint=define\n";
+    exit(0);
+}
 
 my $builder = Module::Build->new(
     module_name        => 'Math::Random::PCG32',

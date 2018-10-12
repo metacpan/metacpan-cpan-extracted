@@ -25,9 +25,13 @@ sub ansi256_number {
     if ($code =~ /^([0-5])([0-5])([0-5])$/) {
 	($r, $g, $b) = ($1, $2, $3);
     }
-    elsif ($code =~ /^L(\d+)/i) {
-	$1 > 23 and die "Color spec error: $code";
-	$grey = 0 + $1;
+    elsif (my($n) = $code =~ /^L(\d+)/i) {
+	$n > 25 and die "Color spec error: $code";
+	if ($n == 0 or $n == 25) {
+	    $r = $g = $b = $n / 5;
+	} else {
+	    $grey = $n - 1;
+	}
     }
     elsif ($code =~ m{^(?| \# ([0-9a-f])([0-9a-f])([0-9a-f])
 			 | \#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2}) )$}xi) {
@@ -121,7 +125,7 @@ sub ansi_numbers {
 	     | (?<h12>  \# [0-9a-f]{3} )		# 12bit hex
 	     | (?<rgb>  \(\d+,\d+,\d+\) )		# 24bit decimal
 	     | (?<c256>   [0-5][0-5][0-5]		# 216 (6x6x6) colors
-		      | L(?:[01][0-9]|[2][0-3]) )	# 24 grey levels
+		      | L(?:[01][0-9]|[2][0-5]) )	# 24 grey levels + B/W
 	     | (?<c16>  [KRGYBMCW] )			# 16 colors
 	     | (?<efct> [;XNZDPIUFQSVJ] )		# effects
 	     | (?<csi>  { (?<csi_name>[A-Z]+)		# other CSI
@@ -423,7 +427,7 @@ terminal :
     #000000 .. #FFFFFF : 24bit hex RGB colors
     #000    .. #FFF    : 12bit hex RGB 4096 colors
     000 .. 555         : 6x6x6 RGB 216 colors
-    L00 .. L23         : 24 grey levels
+    L00 .. L25         : Black (L00), 24 grey levels, White (L25)
 
 =over 4
 
@@ -431,6 +435,10 @@ Begining # can be omitted in 24bit RGB notation.
 
 When values are all same in 24bit or 12bit RGB, it is converted to 24
 grey level, otherwise 6x6x6 216 color.
+
+Until version v1.9.0, grey levels were assigned to L00-L23.  In this
+version, L00 and L25 represent black and white, and 24 grey levels are
+assigned to L01-L24.
 
 =back
 
@@ -545,9 +553,9 @@ violet wheat white whitesmoke yellow yellowgreen
 
 =back
 
-Put colon (:) mark before each color names to use, like:
+Enclose them by angle bracket to use, like:
 
-    :deeppink/:lightyellow
+    <deeppink>/<lightyellow>
 
 Although these colors are defined in 24bit value, they are mapped to
 6x6x6 216 colors by default.  Set C<$COLOR_RGB24> module variable to

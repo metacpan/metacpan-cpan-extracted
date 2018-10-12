@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.18';
+our $VERSION = '3.19';
 
 use vars qw(@ALL_TESTS);
 
@@ -177,6 +177,7 @@ our @ROBOT_TESTS = (
     [ 'facebookexternalhit',                'facebook' ],
     [ 'flipboard',                          'flipboard' ],
     [ 'Google Page Speed',                  'google-page-speed' ],
+    [ 'ltx71',                              'ltx71' ],
     [ 'linkedinbot',                        'linkedin' ],
     [ 'nuzzel',                             'nuzzel' ],
     [ 'outbrain',                           'outbrain' ],
@@ -256,6 +257,7 @@ my %ROBOT_NAMES = (
     linkchecker           => 'LinkChecker',
     linkedin              => 'LinkedIn',
     linkexchange          => 'LinkExchange',
+    ltx71                 => 'ltx71',
     lycos                 => 'Lycos',
     malware               => 'Malware / hack attempt',
     'microsoft-office'    => 'Microsoft Office',
@@ -320,6 +322,7 @@ my %ROBOT_IDS = (
     java            => 'java',
     linkchecker     => 'linkchecker',
     linkexchange    => 'linkexchange',
+    ltx71           => 'ltx71',
     lwp             => 'libwww-perl',
     lycos           => 'lycos',
     malware         => 'malware',
@@ -2955,7 +2958,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.18
+version 3.19
 
 =head1 SYNOPSIS
 
@@ -3205,7 +3208,7 @@ ids will also be frozen.
 
 =head3 all_robot_ids()
 
-This method returns an c<ArrayRef> of all possible C<robot_id> values.
+This method returns an C<ArrayRef> of all possible C<robot_id> values.
 
 =head2 robot_version(), robot_major(), robot_minor(), robot_beta()
 

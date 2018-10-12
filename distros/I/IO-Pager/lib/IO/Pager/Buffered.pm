@@ -1,5 +1,5 @@
 package IO::Pager::Buffered;
-our $VERSION = 0.30;
+our $VERSION = 0.40;
 
 use strict;
 use base qw( IO::Pager );
@@ -71,6 +71,8 @@ sub flush(;*) {
 
 __END__
 
+=pod
+
 =head1 NAME
 
 IO::Pager::Buffered - Pipe deferred output to PAGER if destination is a TTY
@@ -79,7 +81,7 @@ IO::Pager::Buffered - Pipe deferred output to PAGER if destination is a TTY
 
   use IO::Pager::Buffered;
   {
-    local $token = IO::Pager::Buffered::open *STDOUT;
+    local $token = IO::Pager::Buffered::open local *STDOUT;
     print <<"  HEREDOC" ;
     ...
     A bunch of text later
@@ -105,12 +107,13 @@ IO::Pager subclasses are designed to programmatically decide whether
 or not to pipe a filehandle's output to a program specified in I<PAGER>;
 determined and set by IO::Pager at runtime if not yet defined.
 
-This subclass buffers all output for display upon exiting the current scope.
-If this is not what you want look at another subclass such as
-L<IO::Pager::Unbuffered>. While probably not common, this may be useful in
-some cases,such as buffering all output to STDOUT while the process occurs,
-showing only warnings on STDERR, then displaying the output to STDOUT after.
-Or alternately letting output to STDOUT slide by and defer warnings for later
+This subclass buffers all output for display until execution returns to the
+parent scope or a manual L</flush> occurs.L<*|/close> If this is not what
+you want look at another subclass such as L<IO::Pager::Unbuffered>. While
+probably not common, this may be useful in some cases, such as buffering all
+output to STDOUT while the process occurs so that warnings on STDERR are more
+visible, then displaying the less urgent output from STDOUT after. Or,
+alternately, letting output to STDOUT slide by and defer warnings for later
 perusal.
 
 =head1 METHODS
@@ -121,13 +124,24 @@ Class-specific method specifics below, others are inherited from IO::Pager.
 
 Instantiate a new IO::Pager to paginate FILEHANDLE if necessary.
 I<Assign the return value to a scoped variable>. Output does not
-occur until all references to this variable are destroyed eg;
-upon leaving the current scope. See L</DESCRIPTION>.
+occur until the filehandle is L</flush>ed or L</close>d.
 
 =head2 new( [FILEHANDLE] )
 
 Almost identical to open, except that you will get an L<IO::Handle>
 back if there's no TTY to allow for IO::Pager agnostic programming.
+
+=head2 close( FILEHANDLE )
+
+Flushes the buffer to the pager and closes the filehandle for writing.
+Normally, when using a lexically or locally scoped variable to hold the
+token supplied by L</open>, explicit calls to close are unnecessary.
+However, if you are using IO::Pager::Buffered with an unlocalized STDOUT
+or STDERR you close the filehandle to display the buffered content or
+wait for global garbage cleaning upon program termination.
+
+Alternatively, you might prefer to use a non-core filehandle with IO::Pager,
+and call L<perlfunc/select> to make it the default for output.
 
 =head2 tell( FILEHANDLE )
 

@@ -11,7 +11,7 @@ SKIP: {
   my $A;
 
   PAUSE: {
-    my $token = new IO::Pager undef, 'Buffered';
+    my $token = new IO::Pager local *RIBBIT, 'Buffered';
     isa_ok $token, 'IO::Pager::Buffered';
 
     my $PID = $token->PID;

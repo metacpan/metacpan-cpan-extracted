@@ -1,3 +1,11 @@
+0.5008 2018-10-09
+
+ * Update MANIFEST.SKIP.
+
+ * Sync test files with Math-BigInt.
+
+ * Better Makefile.PL.
+
 0.5007 2018-04-17
 
  * The tests now require Test::More version 0.88 or newer.

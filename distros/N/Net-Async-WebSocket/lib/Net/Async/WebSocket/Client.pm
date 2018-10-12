@@ -41,7 +41,7 @@ BEGIN {
    } unless URI::wss->can( "resource_name" );
 }
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Protocol::WebSocket::Handshake::Client;
 
@@ -103,6 +103,7 @@ sub _do_handshake
 
    my $hs = Protocol::WebSocket::Handshake::Client->new(
       url => $params{url},
+      req => $params{req},
    );
 
    $self->debug_printf( "HANDSHAKE start" );
@@ -139,6 +140,11 @@ Connect to a WebSocket server. Takes the following named parameters:
 
 URL to provide to WebSocket handshake. This is also used to infer the host and
 service name (port number) if not otherwise supplied.
+
+=item req => Protocol::WebSocket::Request
+
+Optional. If provided, gives the L<Protocol::WebSocket::Request> instance used
+for performing the handshake.
 
 =back
 

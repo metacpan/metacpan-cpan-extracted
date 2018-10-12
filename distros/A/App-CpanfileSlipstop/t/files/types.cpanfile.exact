@@ -1,0 +1,4 @@
+requires 'DateTime', '== 1.50';
+recommends 'JSON::XS';
+suggests 'Data::Printer';
+requires 'Test::More', '== 0.99';

@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.9.8';
+$Git::Hooks::Notify::VERSION = '2.9.9';
 use 5.010;
 use utf8;
 use Git::Hooks;
@@ -62,7 +62,7 @@ sub get_transport {
 
     return unless $transport;
 
-    my @args = split / /, $transport;
+    my @args = split ' ', $transport;
 
     $transport = shift @args;
 
@@ -208,8 +208,8 @@ sub grok_rules {
         my ($recipients, $paths) = split /\s*--\s*/, $rule;
 
         push @rules, {
-            recipients => [split / /, $recipients],
-            paths      => [defined $paths ? split / /, $paths : ()],
+            recipients => [split ' ', $recipients],
+            paths      => [defined $paths ? split ' ', $paths : ()],
         };
     }
 
@@ -279,7 +279,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.9.8
+version 2.9.9
 
 =head1 SYNOPSIS
 

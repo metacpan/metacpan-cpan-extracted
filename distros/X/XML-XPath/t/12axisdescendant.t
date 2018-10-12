@@ -1,5 +1,5 @@
 use Test;
-BEGIN { plan tests => 6 }
+BEGIN { plan tests => 7 }
 
 use XML::XPath;
 ok(1);
@@ -10,6 +10,9 @@ ok($xp);
 my @nodes;
 @nodes = $xp->findnodes('/descendant::*');
 ok(@nodes, 11);
+
+@nodes = $xp->findnodes('/AAA/descendant::*');
+ok(@nodes, 10);
 
 @nodes = $xp->findnodes('/AAA/BBB/descendant::*');
 ok(@nodes, 4);

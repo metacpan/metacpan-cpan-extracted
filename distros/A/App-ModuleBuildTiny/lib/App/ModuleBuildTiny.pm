@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -200,7 +200,7 @@ my %actions = (
 
 		my $dist = App::ModuleBuildTiny::Dist->new(regenerate => \%files);
 		for my $filename ($dist->files) {
-			write_text($filename, $dist->get_file($filename)) if $dist->is_generated($filename);
+			write_binary($filename, $dist->get_file($filename)) if $dist->is_generated($filename);
 		}
 		return 0;
 	},
@@ -282,7 +282,7 @@ App::ModuleBuildTiny - A standalone authoring tool for Module::Build::Tiny
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 DESCRIPTION
 
@@ -314,7 +314,7 @@ A tool to automatically generate a L<cpanfile> for you.
 
 A program that facilitates upload the tarball as produced by C<mbtiny>.
 
-=item * L<perl-reversion|perl-reversion>
+=item * L<perl-reversion|https://metacpan.org/pod/distribution/Perl-Version/examples/perl-reversion>
 
 A tool to bump the version in your modules.
 

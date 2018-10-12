@@ -1,5 +1,9 @@
 Revision history for IO-Async-Loop-Epoll
 
+0.20    2018-10-11 18:24:55
+        [BUGFIXES]
+         * Don't crash at shutdown when cleaning up signals (RT126282)
+
 0.19    2018-06-25 17:07:14
         [BUGFIXES]
          * Handle post-fork() situations correctly (RT119835)

@@ -1,0 +1,87 @@
+NAME
+    MooX::Role::Parameterized::With::Keyword - DSL to apply roles with
+    composition parameters
+
+VERSION
+    This document describes version 0.001 of
+    MooX::Role::Parameterized::With::Keyword (from Perl distribution
+    MooX-Role-Parameterized-With-Keyword), released on 2018-10-11.
+
+DESCRIPTION
+    This module is a temporary alternative to
+    MooX::Role::Parameterized::With and provides "with" keyword. In addition
+    to that, this module can include Role::Tiny and regular non-parametric
+    Moo::Role roles.
+
+SYNOPSYS
+    In MyRole1.pm:
+
+        package Role1; # a Role::Tiny role
+        use Role::Tiny;
+        sub meth1 { ... }
+        1;
+
+    In MyRole2.pm:
+
+        package Role2; # a Moo::Role role
+        use Moo::Role;
+        sub meth2 { ... }
+        1;
+
+    In MyRole3.pm:
+
+        package MyRole3; # a parameterized Moo::Role role
+        use MooX::Role::Parameterized;
+        role {
+            my ($params, $mop) = @_;
+            $mop->method($params->{name} => sub {...});
+        };
+        1;
+
+    In MyClass.pm, which uses the roles:
+
+        package MyClass;
+        use MooX::Role::Parameterized::With::Keyword;
+        with 'MyRole1', 'MyRole2', 'MyRole3' => {name => 'meth3_blah'};
+
+    In script.pl, which uses the class:
+
+        use MyClass;
+        my $obj = MyClass->new;
+        $obj->meth1;
+        $obj->meth2;
+        $obj->meth3_blah;
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/MooX-Role-Parameterized-With-Keyword>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-MooX-Role-Parameterized-With-Keyword>
+    .
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Role-Parameteriz
+    ed-With-Keyword>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    MooX::Role::Parameterized
+
+    <https://github.com/peczenyj/MooX-Role-Parameterized/pull/6>
+
+    <https://github.com/peczenyj/MooX-Role-Parameterized/pull/7>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

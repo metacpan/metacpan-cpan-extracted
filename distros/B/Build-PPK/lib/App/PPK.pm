@@ -1,6 +1,6 @@
 package App::PPK;
 
-# Copyright (c) 2012, cPanel, Inc.
+# Copyright (c) 2018, cPanel, Inc.
 # All rights reserved.
 # http://cpanel.net/
 #

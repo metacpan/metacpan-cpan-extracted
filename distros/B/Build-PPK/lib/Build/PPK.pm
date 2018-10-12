@@ -1,6 +1,6 @@
 package Build::PPK;
 
-# Copyright (c) 2013, cPanel, Inc.
+# Copyright (c) 2018, cPanel, Inc.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -25,7 +25,7 @@ BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-    our $VERSION = '0.03';
+    our $VERSION = '0.06';
     our @ISA     = qw(Exporter);
 
     our @EXPORT      = ();

@@ -1,3 +1,15 @@
+1.999814 2018-10-01
+
+ * Add to_base() and from_base() to Math::BigInt and corresponding library
+   methods _to_base() and _from_base() to Math::BigInt::Lib. This was inspired
+   by CPAN RT #122681.
+
+ * Fix Makefile.PL to reflect that Test::More is only needed for testing, not
+   for building.
+
+ * In the documentation for each of the to_(bin|hex|oct|bytes) methods, add a
+   reference to the corresponding from_(bin|hex|oct|bytes) method.
+
 1.999813 2018-04-18
 
  * Fix CPAN RT #125108. Remove test files try.pl, t/author-bpi-big-mbf.t, and

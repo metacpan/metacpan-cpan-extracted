@@ -1,0 +1,92 @@
+{
+   "abstract" : "write installed module versions back to cpanfile",
+   "author" : [
+      "pokutuna <popopopopokutuna@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-CpanfileSlipstop",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta::Requirements" : "0",
+            "Carton" : "0",
+            "Getopt::Long" : "0",
+            "Module::CPANfile" : "0",
+            "PPI" : "0",
+            "Pod::Find" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Class" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::CpanfileSlipstop" : {
+         "file" : "lib/App/CpanfileSlipstop.pm",
+         "version" : "0.02"
+      },
+      "App::CpanfileSlipstop::CLI" : {
+         "file" : "lib/App/CpanfileSlipstop/CLI.pm"
+      },
+      "App::CpanfileSlipstop::Resolver" : {
+         "file" : "lib/App/CpanfileSlipstop/Resolver.pm"
+      },
+      "App::CpanfileSlipstop::Writer" : {
+         "file" : "lib/App/CpanfileSlipstop/Writer.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pokutuna/p5-App-CpanfileSlipstop/issues"
+      },
+      "homepage" : "https://github.com/pokutuna/p5-App-CpanfileSlipstop",
+      "repository" : {
+         "url" : "git://github.com/pokutuna/p5-App-CpanfileSlipstop.git",
+         "web" : "https://github.com/pokutuna/p5-App-CpanfileSlipstop"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:POKUTUNA",
+   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_static_install" : 1
+}

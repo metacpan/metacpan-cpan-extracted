@@ -851,7 +851,7 @@ sub color_table {
 	print $painter->("$grey/$grey", sprintf(" %-19s", $grey));
     }
     print "\n";
-    for ('000', 'L00' .. 'L23', '555') {
+    for ('L00' .. 'L25') {
 	print $painter->("$_/$_", " $_");
     }
     print "\n";

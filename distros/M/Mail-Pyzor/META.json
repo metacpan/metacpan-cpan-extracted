@@ -1,0 +1,73 @@
+{
+   "abstract" : "Pyzor spam filtering in Perl",
+   "author" : [
+      "cPanel, LLC (CPANEL)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mail-Pyzor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "Email::MIME" : "0",
+            "Email::MIME::ContentType" : "0",
+            "Encode" : "0",
+            "HTML::Parser" : "0",
+            "IO::SigGuard" : "0.12",
+            "IPC::Run" : "0",
+            "X::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Slurp" : "0",
+            "File::Which" : "0",
+            "IO::Pty" : "0",
+            "JSON" : "0",
+            "Test::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/CpanelInc/p5-Mail-Pyzor.git",
+         "web" : "https://github.com/CpanelInc/p5-Mail-Pyzor"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

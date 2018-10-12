@@ -36,6 +36,11 @@ is( $rng->rand_elm( \@letters ), 'b', 'rand_elm' );
 is( sprintf( "%.2f", $rng->rand ),       '0.90',   'rand' );
 is( sprintf( "%.2f", $rng->rand(1000) ), '973.52', 'rand x1000' );
 
+#   % perl -e 'printf "%064b\n", 3664671147774981625' | fold -w 32
+#   00110010110110111000011011111110
+#   00011101110000000011010111111001
+# so depending on what goes wrong the result might be 499135993 or less
+# likely 853247742, possibly due to use64bitint=undef being set
 is( $rng->irand64, 3664671147774981625, 'irand64' );
 
 # floating point should be converted to int via truncate; if not, test

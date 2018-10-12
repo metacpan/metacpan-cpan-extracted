@@ -21,13 +21,11 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "6.64"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64"
+            "ExtUtils::MakeMaker" : "6.58"
          }
       },
       "runtime" : {
@@ -44,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.50",
+   "version" : "0.51",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,7 +1,7 @@
 # ABSTRACT: Simpler REST client for Icinga2
 
 package Monitoring::Icinga2::Client::Simple;
-$Monitoring::Icinga2::Client::Simple::VERSION = '0.002000';
+$Monitoring::Icinga2::Client::Simple::VERSION = '0.002001';
 use strict;
 use warnings;
 use 5.010_001;
@@ -26,10 +26,10 @@ sub new {
         defined $self->{ua} or croak( 'Monitoring::Icinga2::Client::REST seems to have changed internals; '. 'passing `useragent\' does not work. Please notify mbethke@cpan.org');
         $ua->default_header( 'Accept' => 'application/json' );
         $self->{ua} = $ua;
-        # uncoverable condition false
-        # uncoverable branch right
-        $self->{_mics_author} = getlogin || getpwuid($<);
     }
+    # uncoverable condition false
+    # uncoverable branch right
+    $self->{_mics_author} = getlogin || getpwuid($<);
     return $self;
 }
 
@@ -303,7 +303,7 @@ Monitoring::Icinga2::Client::Simple - Simpler REST client for Icinga2
 
 =head1 VERSION
 
-version 0.002000
+version 0.002001
 
 =head1 SYNOPSIS
 

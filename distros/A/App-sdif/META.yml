@@ -38,7 +38,7 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: v4.5.4
+    version: v4.5.6
   App::sdif::LabelStack:
     file: lib/App/sdif/LabelStack.pm
   App::sdif::autocolor:
@@ -52,7 +52,7 @@ provides:
   App::sdif::default:
     file: lib/App/sdif/default.pm
 requires:
-  Getopt::EX: v1.7.1
+  Getopt::EX: v1.10.0
   List::Util: '1.45'
   Text::ANSI::Fold: '0.02'
   Text::VisualWidth::PP: '0.05'
@@ -62,7 +62,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: git://github.com/kaz-utashiro/sdif-tools.git
-version: 4.5.4
+version: 4.5.6
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

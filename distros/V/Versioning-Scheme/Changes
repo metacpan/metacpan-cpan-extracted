@@ -1,3 +1,22 @@
+0.007   2018-10-11 (PERLANCAR)
+
+	- Add parse_version().
+
+	- Semantic: support pre-release identifier & metadata.
+
+        - [bugfix] Fix role mixing syntax.
+
+        - [doc][bugfix] Fix/update examples in Synopses.
+
+
+0.006   2018-10-11 (PERLANCAR)
+
+	- Add Versioning::Scheme::Perl.
+
+	- [doc] Role::Versioning::Scheme: Change wording and default for
+          bump_version().
+
+
 0.005   2018-10-11 (PERLANCAR)
 
 	- Add Versioning::Scheme::Semantic.

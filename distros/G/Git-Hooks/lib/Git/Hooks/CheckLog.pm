@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckLog;
 # ABSTRACT: Git::Hooks plugin to enforce commit log policies
-$Git::Hooks::CheckLog::VERSION = '2.9.8';
+$Git::Hooks::CheckLog::VERSION = '2.9.9';
 use 5.010;
 use utf8;
 use Git::Hooks;
@@ -421,7 +421,7 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 VERSION
 
-version 2.9.8
+version 2.9.9
 
 =head1 SYNOPSIS
 

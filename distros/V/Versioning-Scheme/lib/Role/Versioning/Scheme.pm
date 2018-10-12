@@ -7,6 +7,7 @@ requires qw(
                normalize_version
                cmp_version
                bump_version
+               parse_version
        );
 
 1;
@@ -24,7 +25,7 @@ Role::Versioning::Scheme - Role for Versioning::Scheme::* modules
 
 =head1 VERSION
 
-This document describes version 0.005 of Role::Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2018-10-11.
+This document describes version 0.007 of Role::Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2018-10-11.
 
 =head1 REQUIRED METHODS
 
@@ -36,6 +37,15 @@ Usage:
 
 Must return true when a string is a valid version number for the associated
 scheme, or false otherwise.
+
+=head2 parse_version
+
+Usage:
+
+ my $hash = $vs->parse_version('1.2.3'); # => {major=>1, minor=>2, patch=>3}
+
+Parse version number into elements. Should return hashref, or undef if version
+number is invalid.
 
 =head2 normalize_version
 
@@ -70,9 +80,14 @@ Bump a version number string and return a bumped version number string.
 
 Must die when C<$v> is invalid.
 
-By default it must bump the smallest part by one. Example:
+By default it must bump the bumpable least significant part by one. Example in
+dotted scheme:
 
  my $v2 = $vs->bump_version('1.2.3'); # => '1.2.4'
+
+In monotonic scheme:
+
+ my $v2 = $vs->bump_version('1.2+foo'); # => '1.3+foo'
 
 Some options this method can accept:
 
@@ -93,11 +108,13 @@ It must die when an ambiguous number is specified:
 
  my $v2 = $vs->bump_version('1.2.3', {num=>-4}); # dies
 
-=item * part => int (default: -1)
+=item * part => int
 
-Specify which part to bump, where 0 means the biggest part, 1 means the second
-biggest part, and so on. It can also be negative (-1 means the smallest part, -2
-the second smallest part, and so on). For example in dotted version:
+Specify which part to bump, where 0 means the most significant part, 1 means the
+second most significant part, and so on. It can also be negative (-1 means the
+least significant part, -2 the second least significant part, and so on). The
+default should be the bumpable least significant part. For example in dotted
+version:
 
  my $v2 = $vs->bump_version('1.2.3', {part=>-2}); # => '1.3.0'
 

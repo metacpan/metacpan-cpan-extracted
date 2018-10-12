@@ -478,7 +478,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           }
                         }
                         // String
-                        else if (type->dimension == 1 && type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+                        else if (SPVM_TYPE_is_string_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
                           add_constant = 1;
                           
                           if (sub->info_string_constants->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
@@ -1912,10 +1912,8 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       }
                       case SPVM_OP_C_ID_CROAK: {
                         SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
-                        if (first_type->dimension == 1 && first_type->basic_type->id != SPVM_BASIC_TYPE_C_ID_BYTE) {
+                        if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
                           SPVM_yyerror_format(compiler, "croak argument must be string at %s line %d\n", op_cur->file, op_cur->line);
-                          
-                          return;
                         }
                         break;
                       }
@@ -2753,8 +2751,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           {
             int32_t my_index;
             int32_t my_var_id = 0;
-            int32_t my_numeric_var_id = 0;
-            int32_t my_address_var_id = 0;
             int32_t my_byte_var_id = 0;
             int32_t my_short_var_id = 0;
             int32_t my_int_var_id = 0;
@@ -2779,51 +2775,43 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 SPVM_TYPE* numeric_type = SPVM_OP_get_type(compiler, my->op_my);
                 switch(numeric_type->basic_type->id) {
                   case SPVM_BASIC_TYPE_C_ID_BYTE: {
-                    my->byte_var_id = my_byte_var_id;
+                    my->var_id = my_byte_var_id;
                     my_byte_var_id++;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_SHORT: {
-                    my->short_var_id = my_short_var_id;
+                    my->var_id = my_short_var_id;
                     my_short_var_id++;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_INT: {
-                    my->int_var_id = my_int_var_id;
+                    my->var_id = my_int_var_id;
                     my_int_var_id++;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_LONG: {
-                    my->long_var_id = my_long_var_id;
+                    my->var_id = my_long_var_id;
                     my_long_var_id++;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-                    my->float_var_id = my_float_var_id;
+                    my->var_id = my_float_var_id;
                     my_float_var_id++;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-                    my->double_var_id = my_double_var_id;
+                    my->var_id = my_double_var_id;
                     my_double_var_id++;
                     break;
                   }
                 }
-                my->numeric_var_id = my_numeric_var_id;
-                my_numeric_var_id += width;
               }
               else if (SPVM_TYPE_is_object_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-                my->address_var_id = my_address_var_id;
-                my_address_var_id += width;
-
-                my->object_var_id = my_object_var_id;
+                my->var_id = my_object_var_id;
                 my_object_var_id += width;
               }
               else if (SPVM_TYPE_is_ref_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-                my->address_var_id = my_address_var_id;
-                my_address_var_id += width;
-
-                my->ref_var_id = my_ref_var_id;
+                my->var_id = my_ref_var_id;
                 my_ref_var_id += width;
               }
               else if (SPVM_TYPE_is_value_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
@@ -2840,40 +2828,38 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 
                 switch (field_type->basic_type->id) {
                   case SPVM_BASIC_TYPE_C_ID_BYTE: {
-                    my->byte_var_id = my_byte_var_id;
+                    my->var_id = my_byte_var_id;
                     my_byte_var_id += width;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_SHORT: {
-                    my->short_var_id = my_short_var_id;
+                    my->var_id = my_short_var_id;
                     my_short_var_id += width;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_INT: {
-                    my->int_var_id = my_int_var_id;
+                    my->var_id = my_int_var_id;
                     my_int_var_id += width;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_LONG: {
-                    my->long_var_id = my_long_var_id;
+                    my->var_id = my_long_var_id;
                     my_long_var_id += width;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-                    my->float_var_id = my_float_var_id;
+                    my->var_id = my_float_var_id;
                     my_float_var_id += width;
                     break;
                   }
                   case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-                    my->double_var_id = my_double_var_id;
+                    my->var_id = my_double_var_id;
                     my_double_var_id += width;
                     break;
                   }
                   default:
                     assert(0);
                 }
-                my->numeric_var_id = my_numeric_var_id;
-                my_numeric_var_id += width;
               }
               else {
                 assert(0);
@@ -2882,10 +2868,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
 
             int32_t args_alloc_length = SPVM_SUB_get_arg_alloc_length(compiler, sub);
             sub->args_alloc_length = args_alloc_length;
-
-            sub->vars_alloc_length = my_var_id;
-            sub->numeric_vars_alloc_length = my_numeric_var_id;
-            sub->address_vars_alloc_length = my_address_var_id;
 
             sub->byte_vars_alloc_length = my_byte_var_id;
             sub->short_vars_alloc_length = my_short_var_id;

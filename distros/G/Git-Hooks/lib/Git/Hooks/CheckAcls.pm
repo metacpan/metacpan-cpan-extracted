@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: [DEPRECATED] Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.9.8';
+$Git::Hooks::CheckAcls::VERSION = '2.9.9';
 use 5.010;
 use utf8;
 use Git::Hooks;
@@ -20,7 +20,7 @@ sub grok_acls {
     foreach my $acl ($git->get_config($CFG => 'acl')) {
         # Interpolate environment variables embedded as "{VAR}".
         $acl =~ s/{(\w+)}/$ENV{$1}/ige;
-        push @acls, [split / /, $acl, 3];
+        push @acls, [split ' ', $acl, 3];
     }
 
     return @acls;
@@ -135,7 +135,7 @@ Git::Hooks::CheckAcls - [DEPRECATED] Git::Hooks plugin for branch/tag access con
 
 =head1 VERSION
 
-version 2.9.8
+version 2.9.9
 
 =head1 SYNOPSIS
 

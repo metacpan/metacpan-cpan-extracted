@@ -15,45 +15,44 @@ use XML::Feed;
 my $src = shift;
 
 die "Usage: $0 FILE|URL\n" if not $src;
-binmode STDOUT, 'utf8';
-binmode STDERR, 'utf8';
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
 
 my $source = $src;
 if ($src =~ m{^https?://}) {
-	$source = URI->new($src);
+  $source = URI->new($src);
 } else {
-	if (not -f $source) {
-		die "'$source' does not look like a URL and it does not exist on the file-system either.\n";
-	}
+  if (not -f $source) {
+    die "'$source' does not look like a URL and it does not exist on the file-system either.\n";
+  }
 }
 
+my @feed_attrs  = qw[Title Tagline Format Author Link Base
+                     Language Copyright Modified Generator];
+
+my @entry_attrs = qw[Link Author Title Category Id Issued Modified
+                     Lat Long Format Tags Enclosure Summary Content];
+
 my $feed = XML::Feed->parse( $source ) or die XML::Feed->errstr;
-say 'Title:     ' . ($feed->title     // '');
-say 'Tagline:   ' . ($feed->tagline   // '');
-say 'Format:    ' . ($feed->format    // '');
-say 'Author:    ' . ($feed->author    // '');
-say 'Link:      ' . ($feed->link      // '');
-say 'Base:      ' . ($feed->base      // '');
-say 'Language:  ' . ($feed->language  // '');
-say 'Copyright: ' . ($feed->copyright // '');
-say 'Modified:  ' . ($feed->modified  // ''); # DateTime object
-say 'Generator: ' . ($feed->generator // '');
+
+for (@feed_attrs) {
+  my $method = lc $_;
+  printf "%-11s %s\n", "$_:", ($feed->$method // '');
+}
 
 for my $entry ($feed->entries) {
-	say '';
-	say '    Link:      ' . ($entry->link          // '');
-	say '    Author:    ' . ($entry->author        // '');
-	say '    Title:     ' . ($entry->title         // '');
-	say '    Caregory:  ' . ($entry->category      // '');
-	say '    Id:        ' . ($entry->id            // '');
-	say '    Issued:    ' . ($entry->issued        // ''); # DateTime object
-	say '    Modified:  ' . ($entry->modified      // ''); # DateTime object
-	say '    Lat:       ' . ($entry->lat           // '');
-	say '    Long:      ' . ($entry->long          // '');
-	say '    Format:    ' . ($entry->format        // '');
-	say '    Tags:      ' . ($entry->tags          // '');
-	say '    Enclosure: ' . ($entry->enclosure     // '');
-	say '    Summary:   ' . ($entry->summary->body // '');
-	say '    Content:   ' . ($entry->content->body // '');
+  say '';
+
+  for (@entry_attrs) {
+    my $method = lc $_;
+    my $data;
+    if (/^(Summary|Content)$/) {
+      $data = $entry->$method->body // '';
+    } else {
+      $data = $entry->$method // '';
+    }
+
+    printf(" * %-11s %s\n", "$_:", $data);
+  }
 }
 

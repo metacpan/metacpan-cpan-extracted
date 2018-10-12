@@ -1,6 +1,7 @@
 #!/home/ben/software/install/bin/perl
 use warnings;
 use strict;
+use FindBin '$Bin';
 use Cairo;
 use Image::CairoSVG;
 my $cairosvg = Image::CairoSVG->new ();

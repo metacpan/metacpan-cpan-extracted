@@ -28,6 +28,8 @@ $Data::Dumper::Sortkeys = 1;
 use App::sdif;
 my $version = $App::sdif::VERSION;
 
+use App::cdif::Command::Mecab;
+
 sub read_until (&$) {
     my($sub, $fh) = @_;
     my @lines;
@@ -137,6 +139,8 @@ for my $opt_d (@opt_d) {
     map { $opt_d{$_}++ } split //, $opt_d;
 }
 
+$App::cdif::Command::Mecab::debug = 1 if $opt_d{m};
+
 $rcs++ if @rcsopt;
 $diff = $rcs ? 'rcsdiff' : 'diff' unless $diff;
 
@@ -224,7 +228,7 @@ my %func = do {
 
 my $w_pattern = do {
     if ($opt_B) {
-	qr/./s;
+	qr/\X/s;
     } else {
 	qr{
 	    \p{Han} | \p{InHiragana}+ | \p{InKatakana}+ |
@@ -611,8 +615,6 @@ sub normal_words {
     }
     @words;
 }
-
-use App::cdif::Command::Mecab;
 
 sub mecab_words {
     my $text = shift;

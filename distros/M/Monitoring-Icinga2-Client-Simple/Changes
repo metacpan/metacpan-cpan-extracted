@@ -1,3 +1,7 @@
+0.002001 Thu Oct 11 11:19:38 2018 +0700
+ - Bugfix: schedule_downtime() wouldn't automatically add an `author' field
+   unless a custom useragent was used
+
 0.002000 Wed Oct 10 15:15:19 2018 +0700
  - Enhancement: add query_hosts method
  - Enhancement: add query_parent_hosts method

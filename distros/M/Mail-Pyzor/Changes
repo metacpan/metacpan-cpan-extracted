@@ -1,0 +1,7 @@
+Revision history for Perl module Mail::Pyzor
+
+0.01    Thu 11 Oct 2018
+- Initial release
+
+0.02    Fri 12 Oct 2018
+- Fix warnings in tests when the system has no python binary.

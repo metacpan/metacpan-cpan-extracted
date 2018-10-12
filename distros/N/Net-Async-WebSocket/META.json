@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -43,19 +43,19 @@
    "provides" : {
       "Net::Async::WebSocket" : {
          "file" : "lib/Net/Async/WebSocket.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Net::Async::WebSocket::Client" : {
          "file" : "lib/Net/Async/WebSocket/Client.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Net::Async::WebSocket::Protocol" : {
          "file" : "lib/Net/Async/WebSocket/Protocol.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Net::Async::WebSocket::Server" : {
          "file" : "lib/Net/Async/WebSocket/Server.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

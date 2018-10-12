@@ -1,9 +1,44 @@
 ==================================================
-Changes from 1742-07-17 00:00:00 +0000 to present.
+Changes from 1744-12-27 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.010 at 2016-04-30 01:27:33 +0000
+version 0.011 at 2018-10-11 20:21:18 +0000
+------------------------------------------
+
+  Change: bf1302a790067b1bcf2b1bf07ecd1fa538deedab
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2018-10-11 22:21:07 +0000
+
+    Added new travis.yml 
+
+  Change: dec57cf053bbe71724600f71f3c9126730b0b6b9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2018-10-11 22:15:57 +0000
+
+    Added perl versions 
+
+  Change: f91119ed966d50c8efc944e5e89b13fbf024e30d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2017-10-14 21:05:29 +0000
+
+    Remove own tests for 5.10 and 5.12 
+
+  Change: 5c4b382d935912dcaaafd0e19f5d9c43608c55e8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2017-10-14 20:53:52 +0000
+
+    Merge branch 'master' of
+    github.com:Getty/p5-dist-zilla-plugin-travisci 
+
+  Change: 58b2e2d60f3bc4e6bd6d65294499988fbf886b50
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2017-10-14 20:53:36 +0000
+
+    Added 5.24 to the versions 
+
+------------------------------------------
+version 0.010 at 2016-04-30 01:13:11 +0000
 ------------------------------------------
 
   Change: 1bcfb672803e1fc00d84e8adec2ffcddb46737fa

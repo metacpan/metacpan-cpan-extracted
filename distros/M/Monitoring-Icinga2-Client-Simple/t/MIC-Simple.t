@@ -260,6 +260,10 @@ req_ok(
     "query services (synonymous arg)"
 );
 
+# Check that _mic_author is always set
+is( newob()->{_mics_author}, $LOGIN, "_mics_author set with useragent" );
+is( Monitoring::Icinga2::Client::Simple->new( server => 'localhost' )->{_mics_author}, $LOGIN, "_mics_author set w/o useragent" );
+
 done_testing;
 
 # Check that a request succeeds and has both the right URI and the

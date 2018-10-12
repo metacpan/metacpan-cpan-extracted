@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,12 +21,12 @@ requires:
   Dist::Zilla: '4.300034'
   YAML: '1.14'
 resources:
-  homepage: https://github.com/kentfredric/p5-dist-zilla-plugin-travisci
-  repository: https://github.com/kentfredric/p5-dist-zilla-plugin-travisci.git
-version: '0.010'
+  homepage: https://github.com/Getty/p5-dist-zilla-plugin-travisci
+  repository: https://github.com/Getty/p5-dist-zilla-plugin-travisci.git
+version: '0.011'
 x_Dist_Zilla:
   perl:
-    version: '5.022001'
+    version: '5.020000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Bootstrap::lib
@@ -53,58 +53,58 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::GETTY/@Filter/PruneCruft'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::GETTY/@Filter/ManifestSkip'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::GETTY/@Filter/MetaYAML'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::GETTY/@Filter/License'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Author::GETTY/@Filter/Readme'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::GETTY/@Filter/ExtraTests'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::GETTY/@Filter/ExecDir'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::GETTY/@Filter/ShareDir'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::GETTY/@Filter/MakeMaker'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::GETTY/@Filter/Manifest'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::GETTY/@Filter/TestRelease'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::GETTY/@Filter/ConfirmRelease'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -119,19 +119,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Author::GETTY/PkgVersion'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::GETTY/MetaJSON'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
@@ -287,7 +287,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.010'
+          tag: '0.011'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -314,7 +314,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -322,50 +322,56 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: tests
-      version: '5.043'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::TravisCI
+      name: TravisCI
+      version: ~
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '5.043'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '5.043'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '5.043'
+    version: '6.012'
 x_authority: cpan:GETTY
+x_generated_by_perl: v5.20.0
+x_serialization_backend: 'YAML::Tiny version 1.69'

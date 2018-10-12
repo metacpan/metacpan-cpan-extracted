@@ -1,7 +1,7 @@
 package Perinci::Sub::To::FuncBase;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.863'; # VERSION
+our $DATE = '2018-10-12'; # DATE
+our $VERSION = '0.864'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -202,7 +202,7 @@ sub gen_doc_section_result {
     if ($orig_result_naked) {
         $dres->{human_ret} = $dres->{human_res};
     } else {
-        $dres->{human_ret} = '[status, msg, result, meta]';
+        $dres->{human_ret} = '[status, msg, payload, meta]';
     }
 
     $dres->{res_summary}     = $riresmeta->langprop("summary");
@@ -228,7 +228,7 @@ Perinci::Sub::To::FuncBase - Base class for Perinci::Sub::To::* function documen
 
 =head1 VERSION
 
-This document describes version 0.863 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2018-09-10.
+This document describes version 0.864 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2018-10-12.
 
 =for Pod::Coverage .+
 

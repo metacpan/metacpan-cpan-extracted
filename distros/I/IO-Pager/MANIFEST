@@ -26,6 +26,8 @@ t/11-redirect-oo.pl
 t/11-redirect-oo.t
 t/12-preservelayers_interactive.t
 t/13-eof_interactive.t
+t/14-tee_interactive.t
+t/15-log_interactive.t
 t/TestUtils.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

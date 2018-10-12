@@ -1,5 +1,9 @@
 Revision history for Net-Async-WebSocket
 
+0.13    2018-10-11 18:54:29
+        [CHANGES]
+         * Allow a custom request object at client handshake time (RT124118)
+
 0.12    2017-12-08 17:50:04
         [CHANGES]
          * Fix documentation of ->send_TYPE_frame methods, noting they return

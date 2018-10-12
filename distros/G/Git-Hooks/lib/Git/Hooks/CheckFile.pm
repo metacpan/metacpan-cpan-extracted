@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.9.8';
+$Git::Hooks::CheckFile::VERSION = '2.9.9';
 use 5.010;
 use utf8;
 use Carp;
@@ -100,7 +100,7 @@ sub check_new_files {           ## no critic (ProhibitExcessComplexity)
     # pair containing a regex and a command specification.
     my @name_checks;
     foreach my $check ($git->get_config($CFG => 'name')) {
-        my ($pattern, $command) = split / /, $check, 2;
+        my ($pattern, $command) = split ' ', $check, 2;
         if ($pattern =~ m/^qr(.)(.*)\g{1}/) {
             $pattern = qr/$2/;
         } else {
@@ -518,7 +518,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.9.8
+version 2.9.9
 
 =head1 SYNOPSIS
 

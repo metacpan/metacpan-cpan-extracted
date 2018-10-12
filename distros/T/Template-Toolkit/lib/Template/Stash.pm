@@ -75,13 +75,13 @@ sub define_vmethod {
     my $op;
     $type = lc $type;
 
-    if ($type =~ /^scalar|item$/) {
+    if ($type =~ /^(scalar|item)$/) {
         $op = $SCALAR_OPS;
     }
     elsif ($type eq 'hash') {
         $op = $HASH_OPS;
     }
-    elsif ($type =~ /^list|array$/) {
+    elsif ($type =~ /^(list|array)$/) {
         $op = $LIST_OPS;
     }
     else {
@@ -497,7 +497,9 @@ sub _dotop {
             # real throwing
 
             my $class = ref($root) || $root;
-            die $@ if ref($@) || ($@ !~ /Can't locate object method "\Q$item\E" via package "\Q$class\E"/);
+
+            # Fail only if the function exists
+            die $@ if ( ref($@) || $root->can($item) );
 
             # failed to call object method, so try some fallbacks
             if (reftype $root eq 'HASH') {

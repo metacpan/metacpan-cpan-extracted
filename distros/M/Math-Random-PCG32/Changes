@@ -1,5 +1,8 @@
 See also the git repository.
 
+0.12    2018-10-11
+        Require use64bitint=define as need 64-bit ints.
+
 0.10    2018-10-09
         Add decay(), dice(), irand64(), irand_in(), irand_way().
         Algorithm::Diff as test req.

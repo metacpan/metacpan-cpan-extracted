@@ -23,6 +23,8 @@ sub import {
 
 __END__
 
+=pod
+
 =head1 NAME
 
 IO::Pager::Page - Emulate IO::Page, pipe STDOUT to a pager if STDOUT is a TTY

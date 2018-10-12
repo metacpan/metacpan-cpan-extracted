@@ -1,6 +1,6 @@
 package Build::PPK::Bundle;
 
-# Copyright (c) 2013, cPanel, Inc.
+# Copyright (c) 2018, cPanel, Inc.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -91,7 +91,7 @@ sub check {
     my @dirs = @INC;
     push @dirs, $self->libdirs;
 
-    local $ENV{'PERLLIB'} = join( ':', @dirs );
+    local $ENV{'PERL5LIB'} = join( ':', @dirs );
 
     confess("Main entry point $self->{'main'} not found") unless -f $self->{'main'};
 

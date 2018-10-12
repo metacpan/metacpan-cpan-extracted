@@ -1,0 +1,527 @@
+Return-Path: <jira@cpanel.net>
+Delivered-To: felipe@cpanel.net
+Received: from mx1.cpanel.net
+	by mx1.cpanel.net with LMTP id 6MgtNSjJtlvaOwAA6kPjFA
+	for <felipe@cpanel.net>; Thu, 04 Oct 2018 21:15:04 -0500
+Return-path: <jira@cpanel.net>
+Envelope-to: felipe@cpanel.net
+Delivery-date: Thu, 04 Oct 2018 21:15:04 -0500
+Received: from [208.74.121.106] (port=32536 helo=10.1.110.104)
+	by mx1.cpanel.net with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-SHA256:128)
+	(Exim 4.91)
+	(envelope-from <jira@cpanel.net>)
+	id 1g8Fdw-0004PO-Kl
+	for felipe@cpanel.net; Thu, 04 Oct 2018 21:15:04 -0500
+Date: Thu, 4 Oct 2018 21:15:04 -0500 (CDT)
+From: "Trevor Bordner (JIRA)" <jira@cpanel.net>
+To: felipe@cpanel.net
+Message-ID: <JIRA.180916.1535587776000.27766.1538705704526@Atlassian.JIRA>
+In-Reply-To: <JIRA.180916.1535587776000@Atlassian.JIRA>
+References: <JIRA.180916.1535587776000@Atlassian.JIRA> <JIRA.180916.1535587776569@jira.cpanel.net>
+Subject: [JIRA] (COBRA-8189) Unable to renew AutoSSL certificates if proxy
+ subdomains exist in userdata_SSL files - Clone
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_29244_2055761486.1538705700190"
+X-JIRA-FingerPrint: af48d09e084ff1d1386256e9008ec0a6
+Auto-Submitted: auto-generated
+Precedence: bulk
+
+------=_Part_29244_2055761486.1538705700190
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org=
+/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns=3D"http://www.w3.org/1999/xhtml">
+    <head>=20
+        <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Du=
+tf-8">=20
+        <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-sc=
+ale=3D1.0, maximum-scale=3D1.0">=20
+        <base href=3D"https://jira.cpanel.net">=20
+        <title>Message Title</title>=20
+    </head>=20
+    <body class=3D"jira" style=3D"color: #333333; font-family: Arial, sans-=
+serif; font-size: 14px; line-height: 1.429">=20
+        <table id=3D"background-table" cellpadding=3D"0" cellspacing=3D"0" =
+width=3D"100%" style=3D"border-collapse: collapse; mso-table-lspace: 0pt; m=
+so-table-rspace: 0pt; background-color: #f5f5f5; border-collapse: collapse;=
+ mso-table-lspace: 0pt; mso-table-rspace: 0pt" bgcolor=3D"#f5f5f5">=20
+            <!-- header here -->=20
+            <tbody>
+                <tr>=20
+                    <td id=3D"header-pattern-container" style=3D"padding: 0=
+px; border-collapse: collapse; padding: 10px 20px">=20
+                        <table id=3D"header-pattern" cellspacing=3D"0" cell=
+padding=3D"0" border=3D"0" style=3D"border-collapse: collapse; mso-table-ls=
+pace: 0pt; mso-table-rspace: 0pt">=20
+                            <tbody>
+                                <tr>=20
+                                    <td id=3D"header-avatar-image-container=
+" valign=3D"top" style=3D"padding: 0px; border-collapse: collapse; vertical=
+-align: top; width: 32px; padding-right: 8px" width=3D"32"> <img id=3D"head=
+er-avatar-image" class=3D"image_fix" src=3D"cid:jira-generated-image-avatar=
+-5328aea2-00c7-4a01-895e-3ab323bd5a13" height=3D"32" width=3D"32" border=3D=
+"0" style=3D"border-radius: 3px; vertical-align: top"> </td>=20
+                                    <td id=3D"header-text-container" valign=
+=3D"middle" style=3D"padding: 0px; border-collapse: collapse; vertical-alig=
+n: middle; font-family: Arial, sans-serif; font-size: 14px; line-height: 20=
+px; mso-line-height-rule: exactly; mso-text-raise: 1px"> <a class=3D"user-h=
+over" rel=3D"trevor.bordner@cpanel.net" id=3D"email_trevor.bordner@cpanel.n=
+et" href=3D"https://jira.cpanel.net/secure/ViewProfile.jspa?name=3Dtrevor.b=
+ordner%40cpanel.net" style=3D"color:#1a63c9;; color: #3b73af; text-decorati=
+on: none">Trevor Bordner</a> <strong>updated</strong> an issue </td>=20
+                                </tr>=20
+                            </tbody>
+                        </table> </td>=20
+                </tr>=20
+                <tr>=20
+                    <td id=3D"email-content-container" style=3D"padding: 0p=
+x; border-collapse: collapse; padding: 0 20px">=20
+                        <table id=3D"email-content-table" cellspacing=3D"0"=
+ cellpadding=3D"0" border=3D"0" width=3D"100%" style=3D"border-collapse: co=
+llapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0; bo=
+rder-collapse: separate">=20
+                            <tbody>
+                                <tr>=20
+                                    <!-- there needs to be content in the c=
+ell for it to render in some clients -->=20
+                                    <td class=3D"email-content-rounded-top =
+mobile-expand" style=3D"padding: 0px; border-collapse: collapse; color: #ff=
+ffff; padding: 0 15px 0 16px; height: 15px; background-color: #ffffff; bord=
+er-left: 1px solid #cccccc; border-top: 1px solid #cccccc; border-right: 1p=
+x solid #cccccc; border-bottom: 0; border-top-right-radius: 5px; border-top=
+-left-radius: 5px; height: 10px; line-height: 10px; padding: 0 15px 0 16px;=
+ mso-line-height-rule: exactly" height=3D"10" bgcolor=3D"#ffffff">&nbsp;</t=
+d>=20
+                                </tr>=20
+                                <tr>=20
+                                    <td class=3D"email-content-main mobile-=
+expand " style=3D"padding: 0px; border-collapse: collapse; border-left: 1px=
+ solid #cccccc; border-right: 1px solid #cccccc; border-top: 0; border-bott=
+om: 0; padding: 0 15px 0 16px; background-color: #ffffff" bgcolor=3D"#fffff=
+f">=20
+                                        <table class=3D"page-title-pattern"=
+ cellspacing=3D"0" cellpadding=3D"0" border=3D"0" width=3D"100%" style=3D"b=
+order-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt">=20
+                                            <tbody>
+                                                <tr>=20
+                                                    <td class=3D"page-title=
+-pattern-first-line " style=3D"padding: 0px; border-collapse: collapse; fon=
+t-family: Arial, sans-serif; font-size: 14px; padding-top: 10px"> <a href=
+=3D"https://jira.cpanel.net/browse/COBRA" style=3D"color: #3b73af; text-dec=
+oration: none">Cobra</a> / <a href=3D"https://jira.cpanel.net/browse/COBRA-=
+8189" style=3D"color: #3b73af; text-decoration: none"><img src=3D"cid:jira-=
+generated-image-avatar-965cfce4-42d0-4b00-9282-47a2e2ce4f3c" height=3D"16" =
+width=3D"16" border=3D"0" align=3D"absmiddle" alt=3D"Sub-task" style=3D"ver=
+tical-align: text-bottom"></a> <a href=3D"https://jira.cpanel.net/browse/CO=
+BRA-8189" style=3D"color: #3b73af; text-decoration: none">COBRA-8189</a> </=
+td>=20
+                                                </tr>=20
+                                                <tr>=20
+                                                    <td style=3D"vertical-a=
+lign: top;; padding: 0px; border-collapse: collapse; padding-right: 5px; fo=
+nt-size: 20px; line-height: 30px; mso-line-height-rule: exactly" class=3D"p=
+age-title-pattern-header-container"> <span class=3D"page-title-pattern-head=
+er" style=3D"font-family: Arial, sans-serif; padding: 0; font-size: 20px; l=
+ine-height: 30px; mso-text-raise: 2px; mso-line-height-rule: exactly; verti=
+cal-align: middle"> <a href=3D"https://jira.cpanel.net/browse/COBRA-8189" s=
+tyle=3D"color: #3b73af; text-decoration: none">Unable to renew AutoSSL cert=
+ificates if proxy subdomains exist in userdata_SSL files - Clone</a> </span=
+> </td>=20
+                                                </tr>=20
+                                            </tbody>
+                                        </table> </td>=20
+                                </tr>=20
+                                <tr>=20
+                                    <td class=3D"email-content-main mobile-=
+expand  wrapper-special-margin" style=3D"padding: 0px; border-collapse: col=
+lapse; border-left: 1px solid #cccccc; border-right: 1px solid #cccccc; bor=
+der-top: 0; border-bottom: 0; padding: 0 15px 0 16px; background-color: #ff=
+ffff; padding-top: 10px; padding-bottom: 5px" bgcolor=3D"#ffffff">=20
+                                        <table class=3D"keyvalue-table" sty=
+le=3D"border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0=
+pt">=20
+                                            <tbody>
+                                                <tr>=20
+                                                    <th style=3D"color: #70=
+7070; font: normal 14px/20px Arial, sans-serif; text-align: left; vertical-=
+align: top; padding: 2px 0">Change By:</th>=20
+                                                    <td style=3D"padding: 0=
+px; border-collapse: collapse; font: normal 14px/20px Arial, sans-serif; pa=
+dding: 2px 0 2px 5px; vertical-align: top"> <a class=3D"user-hover" rel=3D"=
+trevor.bordner@cpanel.net" id=3D"email_trevor.bordner@cpanel.net" href=3D"h=
+ttps://jira.cpanel.net/secure/ViewProfile.jspa?name=3Dtrevor.bordner%40cpan=
+el.net" style=3D"color:#1a63c9;; color: #3b73af; text-decoration: none">Tre=
+vor Bordner</a> </td>=20
+                                                </tr>=20
+                                            </tbody>
+                                        </table> </td>=20
+                                </tr>=20
+                                <tr>=20
+                                    <td class=3D"email-content-main mobile-=
+expand  issue-description-container" style=3D"padding: 0px; border-collapse=
+: collapse; border-left: 1px solid #cccccc; border-right: 1px solid #cccccc=
+; border-top: 0; border-bottom: 0; padding: 0 15px 0 16px; background-color=
+: #ffffff; padding-top: 5px; padding-bottom: 10px" bgcolor=3D"#ffffff">=20
+                                        <table class=3D"text-paragraph-patt=
+ern" cellspacing=3D"0" cellpadding=3D"0" border=3D"0" width=3D"100%" style=
+=3D"border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt=
+; font-family: Arial, sans-serif; font-size: 14px; line-height: 20px; mso-l=
+ine-height-rule: exactly; mso-text-raise: 2px">=20
+                                            <tbody>
+                                                <tr>=20
+                                                    <td class=3D"text-parag=
+raph-pattern-container mobile-resize-text " style=3D"padding: 0px; border-c=
+ollapse: collapse; padding: 0 0 10px 0"> <span class=3D"diffcontext">BRANCH=
+: COBRA-8189_apache_conf_distiller<br></span> <span class=3D"diffaddedchars=
+" style=3D"background-color:#ddfade;">BINARY: v11.75.9045.5</span> <span cl=
+ass=3D"diffcontext"><br></span> <span class=3D"diffaddedchars" style=3D"bac=
+kground-color:#ddfade;"><br></span> <span class=3D"diffcontext">{panel:titl=
+e=3DDetails}<br>(i)<br>If proxy sudomains exist in a userdata_SSL file but =
+proxy subdomains are disabled then the AutoSSL renewal will fail without sh=
+owing any helpful errors.<br><br>The Apache distiller is what is adding the=
+ proxy subdomains on the userdata_SSL file and this will only occur while p=
+roxy subdomains are enabled in /var/cpanel/cpanel.config.<br><br>Note: Migr=
+ating from EA3 to EA4 does not remove the proxy domains in the userdata fil=
+es.<br>{panel}<br>----<br>{panel:title=3DStep-by-Step Instructions}<br>(+)<=
+br>1. Create a cPanel / WHM Server with 11.74.0.6 and EA3.<br><br>2. Create=
+ a user account.<br>{code:collapse=3Dtrue}[root@ea3 ~]# whmapi1 createacct =
+user=3Dcptest domain=3Dcptest.space<br>---<br>data:<br>&nbsp;&nbsp;ip: 104.=
+248.64.52<br>&nbsp;&nbsp;nameserver: ns1.cptest.space<br>&nbsp;&nbsp;namese=
+rver2: ns2.cptest.space<br>&nbsp;&nbsp;nameserver3: ''<br>&nbsp;&nbsp;names=
+erver4: ''<br>&nbsp;&nbsp;nameservera: 104.248.64.52<br>&nbsp;&nbsp;nameser=
+vera2: 104.248.64.58<br>&nbsp;&nbsp;nameservera3: ~<br>&nbsp;&nbsp;nameserv=
+era4: ~<br>&nbsp;&nbsp;nameserverentry: ns1.cptest.space<br>&nbsp;&nbsp;nam=
+eserverentry2: ns2.cptest.space<br>&nbsp;&nbsp;nameserverentry3: ~<br>&nbsp=
+;&nbsp;nameserverentry4: ~<br>&nbsp;&nbsp;package: default<br>metadata:<br>=
+&nbsp;&nbsp;command: createacct<br>&nbsp;&nbsp;output:<br>&nbsp;&nbsp;&nbsp=
+;&nbsp;raw: "Checking input data...Dns Zone check is enabled.\nValidating U=
+sername......Done\nValidating IP......Done\nValidating Contact Email......D=
+one\n...Done\nValidating system setup......Done\nChecking for database conf=
+licts......Done\nWWWAcct 12.6.0 (c) 2018 cPanel, Inc....\n\n+=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D+\n| New Account Info&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|\n=
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+\n| Domain: cptest.space\n| Ip: 104.248.6=
+4.52 (n)\n| HasCgi: y\n| UserName: cptest\n| PassWord: h0XrqwyYaRQRwD\n| Cp=
+anelMod: paper_lantern\n| HomeRoot: /home\n| Quota: unlimited\n| NameServer=
+1: ns1.cptest.space\n| NameServer2: ns2.cptest.space\n| NameServer3: \n| Na=
+meServer4: \n| Contact Email: \n| Package: default\n| Feature List: default=
+\n| Language: en\n+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+\n...Done\nCustom Accou=
+nt Data Provided: no\nRunning pre creation script (/usr/local/cpanel/script=
+s/prewwwacct)......Done\nAdding User...Removing Shell Access (n)\nSuccess..=
+.Done\nAdding Entries to userdata......Done\nSetting up Mail &amp; Local Do=
+mains...localdomains...valiases ...vdomainaliases ...vfilters ......Done\nC=
+onfiguring DNS...Zone cptest.space has been successfully added\n...Done\nVe=
+rifying MX Records and Setting up Databases...Reconfiguring Mail Routing:\n=
+LOCAL MAIL EXCHANGER: This server will serve as a primary mail exchanger fo=
+r cptest.space's mail.:\n This configuration has been manually selected.\n\=
+n...Done\nBind reloading on ea3 using rndc zone: [cptest.space]\nUpdating A=
+uthentication Databases......Done\nAdding Entries to httpd.conf......Done\n=
+Setting passwords......Done\nUpdating the userdata cache......Done\nSetting=
+ up Horde database in the background.......Done\nCreating bandwidth datasto=
+re......Done\nUpdating the dedicated IP address usage cache......Done\nGene=
+rating and installing DKIM keys......Done\nEnabling Apache SpamAssassin=E2=
+=84=A2......Done\nSending Account Information......Done\nRunning post creat=
+ion scripts (/usr/local/cpanel/scripts/legacypostwwwacct, /usr/local/cpanel=
+/scripts/postwwwacct, /usr/local/cpanel/scripts/postwwwacctuser)......Done\=
+nwwwacct creation finished\nSetting up Domain Pointers......Done\nSetting R=
+eseller Privs......Done\nAccount Creation Complete!!!...Account Creation Ok=
+...Done\n"<br>&nbsp;&nbsp;reason: Account Creation Ok<br>&nbsp;&nbsp;result=
+: 1<br>&nbsp;&nbsp;version: 1<br>{code}<br>3. Ensure proxy subdomains are e=
+nabled.<br>{code:collapse=3Dtrue}[root@ea3 ~]# grep -w 'proxysubdomains' /v=
+ar/cpanel/cpanel.config<br>proxysubdomains=3D1<br>{code}<br>4. Run AutoSSL =
+for the user and ensure its successful.<br>{code:collapse=3Dtrue}[root@ea3 =
+~]# /usr/local/cpanel/bin/autossl_check --all<br>AutoSSL=E2=80=99s configur=
+ed provider is =E2=80=9CcPanel (powered by Comodo)=E2=80=9D.<br>This AutoSS=
+L provider does not poll for certificate availability immediately after a c=
+ertificate request submission. Instead, it submits certificate requests the=
+n periodically polls the cPanel Store for each requested certificate and in=
+stalls it after a successful retrieval. The system will record all requests=
+, retrievals, and installations for the current AutoSSL run in this log.<br=
+>Checking websites for =E2=80=9Ccptest=E2=80=9D =E2=80=A6<br>&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Analyzing =E2=80=9Ccptest.space=E2=80=9D =
+=E2=80=A6<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TLS Status: Incomplete<br>&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;Certificate expiry: 11/28/18, 12:00 AM UTC (90.04 days from now)<br>&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Performing DCV (Domain Contr=
+ol Validation) =E2=80=A6<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;Local HTTP DCV OK: cptest.space<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;Local HTTP DCV OK: www.cptest.space (via cptest.space)<br>&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Local HTTP DCV OK: mail.cptest.spac=
+e (via cptest.space)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loc=
+al HTTP DCV OK: cpanel.cptest.space (via cptest.space)<br>&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Local HTTP DCV OK: webdisk.cptest.space (via=
+ cptest.space)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Local HTT=
+P DCV OK: webmail.cptest.space (via cptest.space)<br>&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;Analyzing =E2=80=9Ccptest.space=E2=80=9D=E2=80=99=
+s DCV results =E2=80=A6<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number of domains: 6<br>&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;Number of secured domains: 3<br>&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Auto=
+SSL will request a new certificate.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;The system will attempt to renew the SSL certificate for the we=
+bsite (cptest.space: cptest.space www.cptest.space mail.cptest.space webmai=
+l.cptest.space cpanel.cptest.space webdisk.cptest.space).<br>&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The cPanel Store received =E2=80=9Ccptest=
+.space=E2=80=9D=E2=80=99s certificate order. (Order Item ID: 466239409) The=
+ system will periodically poll the cPanel Store for the issued certificate =
+and then install it after a successful retrieval.<br>The system has complet=
+ed the AutoSSL check for =E2=80=9Ccptest=E2=80=9D.<br><br>The system has fi=
+nished checking 1 user.<br>{code}<br>{code:collapse=3Dtrue}[root@ea3 ~]# /u=
+sr/local/cpanel/bin/autossl_check_cpstore_queue --force<br>Polling for =E2=
+=80=9Ccptest=E2=80=9D=E2=80=99s new certificate for =E2=80=9Ccptest.space=
+=E2=80=9D (order item ID =E2=80=9C466239409=E2=80=9D) =E2=80=A6<br>The cert=
+ificate is available. The system will now attempt to install it.<br>The cer=
+tificate is now installed!<br>{code}<br>5. Ensure that the SSL Vhost has th=
+e correct ServerAlias.<br>{code:collapse=3Dtrue}&lt;VirtualHost 104.248.64.=
+52:443&gt;<br>&nbsp;&nbsp;ServerName cptest.space<br>&nbsp;&nbsp;ServerAlia=
+s mail.cptest.space www.cptest.space webdisk.cptest.space cpanel.cptest.spa=
+ce webmail.cptest.space<br>&nbsp;&nbsp;DocumentRoot /home/cptest/public_htm=
+l<br>&nbsp;&nbsp;ServerAdmin webmaster@cptest.space<br>{code}<br>6. Ensure =
+that the proxy subdomains aren't created in the userdata file.<br>{code:col=
+lapse=3Dtrue}[root@ea3 ~]# grep serveralias /var/cpanel/userdata/cptest/*SS=
+L<br>serveralias: mail.cptest.space www.cptest.space<br>{code}<br>6. Run th=
+e Apache distiller.<br>{code:collapse=3Dtrue}[root@ea3 ~]# /usr/local/cpane=
+l/bin/apache_conf_distiller --update<br>Distilled successfully<br>{code}<br=
+>7. Observe the proxy subdomains being added to the userdata file.<br>{code=
+:collapse=3Dtrue}[root@ea3 ~]# grep serveralias /var/cpanel/userdata/cptest=
+/*SSL<br>serveralias: mail.cptest.space www.cptest.space webdisk.cptest.spa=
+ce cpanel.cptest.space webmail.cptest.space<br>{code}<br>8. Disable proxy s=
+ubdomains, rebuild the Apache configuration and observe that the proxy subd=
+omains are no longer present in the VirtualHost but still remain in the use=
+rdata_SSL file.<br>{code:collapse=3Dtrue}[root@ea3 ~]# grep -w 'proxysubdom=
+ains' /var/cpanel/cpanel.config<br>proxysubdomains=3D0<br>{code}<br>{code:c=
+ollapse=3Dtrue}[root@ea3 ~]# /scripts/rebuildhttpdconf<br>Built /usr/local/=
+apache/conf/httpd.conf OK<br>{code}<br>{code:collapse=3Dtrue}[root@ea3 ~]# =
+grep -B1 -A3 'ServerName cptest.space' /usr/local/apache/conf/httpd.conf<br=
+>&lt;VirtualHost 104.248.64.52:80&gt;<br>&nbsp;&nbsp;ServerName cptest.spac=
+e<br>&nbsp;&nbsp;ServerAlias mail.cptest.space www.cptest.space<br>&nbsp;&n=
+bsp;DocumentRoot /home/cptest/public_html<br>&nbsp;&nbsp;ServerAdmin webmas=
+ter@cptest.space<br>--<br>&lt;VirtualHost 104.248.64.52:443&gt;<br>&nbsp;&n=
+bsp;ServerName cptest.space<br>&nbsp;&nbsp;ServerAlias mail.cptest.space ww=
+w.cptest.space<br>&nbsp;&nbsp;DocumentRoot /home/cptest/public_html<br>&nbs=
+p;&nbsp;ServerAdmin webmaster@cptest.space<br>{code}<br>{code:collapse=3Dtr=
+ue}[root@ea3 ~]# grep serveralias /var/cpanel/userdata/cptest/*SSL<br>serve=
+ralias: mail.cptest.space www.cptest.space webdisk.cptest.space cpanel.cpte=
+st.space webmail.cptest.space<br>{code}<br>10. In order to be able to repro=
+duce the same behavior the customer had which was with renewing the certifi=
+cate, you'll need to set the server time past the SSL expiration date.<br>{=
+code:collapse=3Dtrue}[root@ea3 ~]# echo | openssl s_client -servername cpte=
+st.space -connect cptest.space:443 2&gt;/dev/null | openssl x509 -noout -da=
+tes<br>notBefore=3DAug 29 00:00:00 2018 GMT<br>notAfter=3DNov 27 23:59:59 2=
+018 GMT<br>{code}<br>{code:collapse=3Dtrue}[root@ea3 ~]# date --set '30 Nov=
+ 2018'<br>Fri Nov 30 00:00:00 UTC 2018<br>{code}<br>11. Re-run the AutoSSL =
+process and observe.<br>{code:collapse=3Dtrue}[root@ea3 ~]# /usr/local/cpan=
+el/bin/autossl_check --all<br>AutoSSL=E2=80=99s configured provider is =E2=
+=80=9CcPanel (powered by Comodo)=E2=80=9D.<br>This AutoSSL provider does no=
+t poll for certificate availability immediately after a certificate request=
+ submission. Instead, it submits certificate requests then periodically pol=
+ls the cPanel Store for each requested certificate and installs it after a =
+successful retrieval. The system will record all requests, retrievals, and =
+installations for the current AutoSSL run in this log.<br>Checking websites=
+ for =E2=80=9Ccptest=E2=80=9D =E2=80=A6<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;Analyzing =E2=80=9Ccptest.space=E2=80=9D =E2=80=A6<br>&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;TLS Status: Defective<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Certificate e=
+xpiry: 11/28/18, 12:00 AM UTC (2 days ago)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Defect: =
+OPENSSL_VERIFY: The certificate chain failed OpenSSL=E2=80=99s verification=
+ (0:10:CERT_HAS_EXPIRED).<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;Performing DCV (Domain Control Validation) =E2=80=A6<br>&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Local HTTP DCV OK: cptest.space<br>&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Local HTTP DCV OK: www.cptest.space =
+(via cptest.space)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Local=
+ HTTP DCV OK: mail.cptest.space (via cptest.space)<br>&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;Local HTTP DCV OK: cpanel.cptest.space (via cpte=
+st.space)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Local HTTP DCV=
+ OK: webdisk.cptest.space (via cptest.space)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;Local HTTP DCV OK: webmail.cptest.space (via cptest.sp=
+ace)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Analyzing =E2=80=9C=
+cptest.space=E2=80=9D=E2=80=99s DCV results =E2=80=A6<br>&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;Cpanel::Exception/(XID 2krf8x) =E2=80=9Ccptest=E2=80=9D does not own a d=
+omain named =E2=80=9Cwebdisk.cptest.space=E2=80=9D on this server.<br>The s=
+ystem has completed the AutoSSL check for =E2=80=9Ccptest=E2=80=9D.<br><br>=
+The system has finished checking 1 user.<br>{code}{panel}<br>----<br>{panel=
+:title=3DSuggested Resolution / Expected Behavior}<br>(?)<br>The AutoSSL re=
+newal process should renew what's present in the VirtualHost and not in the=
+ userdata files.<br>{panel}<br>----<br>{panel:title=3DKnown work around(s)}=
+<br>(/)<br>Remove the proxy subdomains from the userdata_SSL file by either=
+ running the distiller with proxy subdomains disabled or using the workarou=
+nd from case CPANEL-20665<br>{panel}</span> </td>=20
+                                                </tr>=20
+                                            </tbody>
+                                        </table> </td>=20
+                                </tr>=20
+                                <tr>=20
+                                    <td class=3D"email-content-main mobile-=
+expand " style=3D"padding: 0px; border-collapse: collapse; border-left: 1px=
+ solid #cccccc; border-right: 1px solid #cccccc; border-top: 0; border-bott=
+om: 0; padding: 0 15px 0 16px; background-color: #ffffff" bgcolor=3D"#fffff=
+f">=20
+                                        <table id=3D"actions-pattern" cells=
+pacing=3D"0" cellpadding=3D"0" border=3D"0" width=3D"100%" style=3D"border-=
+collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-fami=
+ly: Arial, sans-serif; font-size: 14px; line-height: 20px; mso-line-height-=
+rule: exactly; mso-text-raise: 1px">=20
+                                            <tbody>
+                                                <tr>=20
+                                                    <td id=3D"actions-patte=
+rn-container" valign=3D"middle" style=3D"padding: 0px; border-collapse: col=
+lapse; padding: 10px 0 10px 24px; vertical-align: middle; padding-left: 0">=
+=20
+                                                        <table align=3D"lef=
+t" style=3D"border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rsp=
+ace: 0pt">=20
+                                                            <tbody>
+                                                                <tr>=20
+                                                                    <td cla=
+ss=3D"actions-pattern-action-icon-container" style=3D"padding: 0px; border-=
+collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; line-h=
+eight: 20px; mso-line-height-rule: exactly; mso-text-raise: 0; vertical-ali=
+gn: middle"> <a href=3D"https://jira.cpanel.net/browse/COBRA-8189#add-comme=
+nt" target=3D"_blank" title=3D"Add Comment" style=3D"color: #3b73af; text-d=
+ecoration: none"> <img class=3D"actions-pattern-action-icon-image" src=3D"c=
+id:jira-generated-image-static-comment-icon-64314fde-a663-4c66-a9b5-9d6474c=
+3e220" alt=3D"Add Comment" title=3D"Add Comment" height=3D"16" width=3D"16"=
+ border=3D"0" style=3D"vertical-align: middle"> </a> </td>=20
+                                                                    <td cla=
+ss=3D"actions-pattern-action-text-container" style=3D"padding: 0px; border-=
+collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; line-h=
+eight: 20px; mso-line-height-rule: exactly; mso-text-raise: 4px; padding-le=
+ft: 5px"> <a href=3D"https://jira.cpanel.net/browse/COBRA-8189#add-comment"=
+ target=3D"_blank" title=3D"Add Comment" style=3D"color: #3b73af; text-deco=
+ration: none">Add Comment</a> </td>=20
+                                                                </tr>=20
+                                                            </tbody>
+                                                        </table> </td>=20
+                                                </tr>=20
+                                            </tbody>
+                                        </table> </td>=20
+                                </tr>=20
+                                <!-- there needs to be content in the cell =
+for it to render in some clients -->=20
+                                <tr>=20
+                                    <td class=3D"email-content-rounded-bott=
+om mobile-expand" style=3D"padding: 0px; border-collapse: collapse; color: =
+#ffffff; padding: 0 15px 0 16px; height: 5px; line-height: 5px; background-=
+color: #ffffff; border-top: 0; border-left: 1px solid #cccccc; border-botto=
+m: 1px solid #cccccc; border-right: 1px solid #cccccc; border-bottom-right-=
+radius: 5px; border-bottom-left-radius: 5px; mso-line-height-rule: exactly"=
+ height=3D"5" bgcolor=3D"#ffffff">&nbsp;</td>=20
+                                </tr>=20
+                            </tbody>
+                        </table> </td>=20
+                </tr>=20
+                <tr>=20
+                    <td id=3D"footer-pattern" style=3D"padding: 0px; border=
+-collapse: collapse; padding: 12px 20px">=20
+                        <table id=3D"footer-pattern-container" cellspacing=
+=3D"0" cellpadding=3D"0" border=3D"0" style=3D"border-collapse: collapse; m=
+so-table-lspace: 0pt; mso-table-rspace: 0pt">=20
+                            <tbody>
+                                <tr>=20
+                                    <td id=3D"footer-pattern-text" class=3D=
+"mobile-resize-text" width=3D"100%" style=3D"padding: 0px; border-collapse:=
+ collapse; color: #999999; font-size: 12px; line-height: 18px; font-family:=
+ Arial, sans-serif; mso-line-height-rule: exactly; mso-text-raise: 2px"> Th=
+is message was sent by Atlassian Jira <span id=3D"footer-build-information"=
+>(v7.11.0#711000-<span title=3D"ff06e53002015cff4210a5b9546311566760ca3e" d=
+ata-commit-id=3D"ff06e53002015cff4210a5b9546311566760ca3e}">sha1:ff06e53</s=
+pan>)</span> </td>=20
+                                </tr>=20
+                            </tbody>
+                        </table> </td>=20
+                </tr>=20
+            </tbody>
+        </table>  =20
+    </body>
+</html>
+------=_Part_29244_2055761486.1538705700190
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+Content-ID: <jira-generated-image-avatar-5328aea2-00c7-4a01-895e-3ab323bd5a13>
+
+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
+K7RXZd//AMaQGgJRA/Y/AAAAAElFTkSuQmCC
+------=_Part_29244_2055761486.1538705700190
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+Content-ID: <jira-generated-image-avatar-965cfce4-42d0-4b00-9282-47a2e2ce4f3c>
+
+iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAHXRFWHRqaXJhLXN5c3RlbS1pbWFn
+ZS10eXBlAGF2YXRhcuQCGmEAAAERSURBVHjaY2AYBUjAa/0rA+91z7d7r3vxHIj/Uxm/B+L9Xmue
+meCx/MVnGliMjn97rn1hgeEA7/UvdtPBcih+fhjTAbQJdpzRgc0B/+mJiXZAz+kP/5de/4IXL7jy
++X/67jfUdwDIclJA56kP1HUAyHcgcPXNL7whAJIHARCbJg4gZDCx6kYdQFUHIOeOS68haQBEE5s7
+KHIANXIHRQ6AiRMLsIXg0HDA3MufsJYDsDinuQNSdr7+Tw1AtgNAGJSA0Es+uoUAoXw/6gBiAahA
+oqoDYLmDEPj9F0IXH3hLXQeQkjtmXfpEWYuIlNyBXg8U7H9LUmU0wI3SgW6WD3jHBO4ISEi8pk3X
+7PlhnJaPWAAAW8WVGlxRSUQAAAAASUVORK5CYII=
+------=_Part_29244_2055761486.1538705700190
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+Content-ID: <jira-generated-image-static-comment-icon-64314fde-a663-4c66-a9b5-9d6474c3e220>
+
+iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAADAFBMVEX///+1tbWzs7OysrKrq6um
+pqalpaWdnZ2ZmZn///+VlZWPj4/7+/vu7u7p6enn5+fl5eXk5OTh4eHW1tbT09PMzMzJycm6urq5
+ubm1tbWzs7OysrKrq6upqamlpaWKioqFhYWRkZGKioqHh4eDg4OAgIB/f398fHx6enp4eHh2dnZ0
+dHRycnJwcHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAIFWMjAAAAIXRSTlMAIiIzZoiZu8zd3d3u7u7u7u7u7u7u7u7u7u7u7u7u7u6n
+leogAAAAG3RFWHRqaXJhLXN5c3RlbS1pbWFnZS10eXBlAGljb266KjlFAAAAo0lEQVR42l2P2wrC
+MAyG09Pa1SqKzIk3QwTf/3G8UByKyK4EcV0POqzDaTUQwv+R/EkA/gKFJGyuQrFH/+iAWJnGOCCp
+THcmALms6ne7ykpNeFHpft75xZWsL/XX0bMppj7eUXNseQykI7eZu3+0GpfYuVz1ephriwAnxdkD
+QVwIsTVAoTUswZNBuPRkw6X01cqzZtMbdWB0aFqIANqb349ZLJ5XFjQIuveaPQAAAABJRU5ErkJg
+gg==
+------=_Part_29244_2055761486.1538705700190--

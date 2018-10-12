@@ -1,71 +1,62 @@
 ==================================================
-Changes from 2015-02-05 00:00:00 +0000 to present.
+Changes from 2017-10-11 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.001 at 2016-02-05 14:15:33 +0000
+version 1.002 at 2018-10-11 17:35:00 +0000
 ------------------------------------------
 
-  Change: cde220fe4403e6a2dfd88f211e415c2625692132
+  Change: 0e42afaffc729a73955276b3aebaa40ae36e2029
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2016-02-05 15:15:00 +0000
+  Date : 2018-10-11 19:26:14 +0000
 
-    fix remove redis_prefix line 
+    Merge pull request #3 from tomsommer/patch-1
 
-  Change: 4f7138e4823379f7728bcca005611d2a6640cf93
+    Correctly name debug variable 
+
+  Change: be86a8544da3c0d57eb9227465619d7a63e8a09a
+  Author: Tom Sommer <tomsommer@users.noreply.github.com>
+  Date : 2018-10-11 15:10:31 +0000
+
+    Correctly name debug variable 
+
+  Change: 003683cca47150ce593353987723c3adbeb62d46
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2016-02-05 15:11:45 +0000
+  Date : 2017-11-26 19:43:40 +0000
 
-    Additional redis connection parameters
+    Merge branch 'issue-1-expire-entries' 
 
-    The followin configuration parameters have been added:
-
-    * auto_whitelist_redis_password
-
-    * auto_whitelist_redis_database
-
-    * auto_whitelist_redis_debug 
-
-  Change: c78fe2e7d186eee6b30a55b8aa13d0bf840cd847
+  Change: cef687d068301650935c7e6b65ba805a36a56716
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-08-31 16:59:18 +0000
+  Date : 2017-11-26 19:41:15 +0000
 
-    build with system perl and apt-get packages 
+    Fix assignment of regex results
 
-  Change: 36e05bb6381e9038d3745c904a403e8beb0c42b7
+    Assignment must be a list assignment.
+
+    fixes #2 
+
+  Change: 5bc1860821e073d33c2203b2f796ac31a4e0e8d5
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-08-31 14:50:29 +0000
+  Date : 2017-10-11 09:13:56 +0000
 
-    apt-get update and sudo in travis 
+    Fixed $addr -> $entry->{addr} 
 
-  Change: 64c910d369deed26def50a0774c60e83da881d3f
+  Change: f2448583ce1bdd700cfacc51e22984be8295a67d
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-08-31 10:11:06 +0000
+  Date : 2017-09-24 10:58:02 +0000
 
-    install spamassassin before build in travis 
+    Add support for entry expiration
 
-  Change: 840224d5321a2dc260252f8f8c89ce4cdda834da
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-08-31 09:18:58 +0000
+    This adds a new option
 
-    updated build env 
+    auto_whitelist_redis_expire
 
-------------------------------------------
-version 1.000 at 2015-06-08 18:37:48 +0000
-------------------------------------------
+    If this new configuration option is set to a non-zero value and
+    timeout using redis EXPIRE is applied to all entries.
 
-  Change: 8cf0bb84d318ab015e4ecc3f0f2bc93cda365771
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-06-08 20:37:48 +0000
+    related #1 
 
-    add abstract 
-
-  Change: f31d22526cd5c5a7687df5bf05bf073fb29a131e
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-06-08 20:32:22 +0000
-
-    initial checkin 
-
-================
-End of releases.
-================
+================================================
+Plus 2 releases after 2017-10-11 00:00:00 +0000.
+================================================

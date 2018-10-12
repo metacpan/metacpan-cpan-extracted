@@ -46,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-To-Doc
   homepage: https://metacpan.org/release/Perinci-To-Doc
   repository: git://github.com/perlancar/perl-Perinci-To-Doc.git
-version: '0.863'
+version: '0.864'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -134,7 +134,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'

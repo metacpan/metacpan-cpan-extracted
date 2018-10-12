@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "FindBin" => 0,
+    "Hash::Merge" => 0,
     "JSON::PP" => 0,
     "List::Util" => "1.49",
     "Path::Tiny" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::NoWarnings" => 0
   },
-  "VERSION" => "3.18",
+  "VERSION" => "3.19",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,
+  "Hash::Merge" => 0,
   "JSON::PP" => 0,
   "List::Util" => "1.49",
   "Path::Tiny" => 0,

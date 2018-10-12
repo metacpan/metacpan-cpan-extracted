@@ -1,0 +1,1145 @@
+Return-Path: <bounce-5056_HTML-251157870-46020-7213602-615023@bounce.s7.exacttarget.com>
+Delivered-To: felipe@cpanel.net
+Received: from mx1.cpanel.net
+	by mx1.cpanel.net with LMTP id 0O/2FtcFtVtbNQAA6kPjFA
+	for <felipe@cpanel.net>; Wed, 03 Oct 2018 13:09:27 -0500
+Return-path: <bounce-5056_HTML-251157870-46020-7213602-615023@bounce.s7.exacttarget.com>
+Envelope-to: felipe@cpanel.net
+Delivery-date: Wed, 03 Oct 2018 13:09:27 -0500
+Received: from mx2-dal.cpanel.net ([208.74.123.210]:51750 helo=mx2.cpanel.net)
+	by mx1.cpanel.net with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+	(Exim 4.91)
+	(envelope-from <bounce-5056_HTML-251157870-46020-7213602-615023@bounce.s7.exacttarget.com>)
+	id 1g7laR-0006Ow-7P
+	for felipe@cpanel.net; Wed, 03 Oct 2018 13:09:27 -0500
+Received: from db146.mta.exacttarget.com ([13.111.0.146]:38185)
+	by mx2.cpanel.net with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+	(Exim 4.91)
+	(envelope-from <bounce-5056_HTML-251157870-46020-7213602-615023@bounce.s7.exacttarget.com>)
+	id 1g7laO-0012Ev-KU
+	for felipe@cpanel.net; Wed, 03 Oct 2018 13:09:27 -0500
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=200608; d=engage.linuxfoundation.org;
+ h=Message-ID:Date:Subject:From:To:MIME-Version:Content-Type:List-Unsubscribe; i=no-reply@engage.linuxfoundation.org;
+ bh=kzAEDjMTdwDUKWLy+QOw7K1B5lc=;
+ b=GPkVRt8ox2QjNeJSG5XtGuBzECrMCHZQH2kz4LSNK0PXkBHW/tI6FJgSoezmao4gkASughyBHNdB
+   Nyicb1a0tI4FskoKKqyN6rvokBbwQppbddmih0llnsbiOWAwh20pJ3GRmQC1Dy6pEZ0K2N28r5XW
+   ZI+HjNoVWGrXZK89SPY=
+Received: by db146.mta.exacttarget.com id hmk2t8163hsd for <felipe@cpanel.net>; Wed, 3 Oct 2018 18:09:23 +0000 (envelope-from <bounce-5056_HTML-251157870-46020-7213602-615023@bounce.s7.exacttarget.com>)
+X-Virus-Scanned: amavisd-new at orionsmtp-245.s7.exacttarget.com
+Message-ID: <bade16ee-bace-49d9-8d90-17b6960328f0@xtgap4s7mta1571.xt.local>
+Date: Wed, 03 Oct 2018 12:09:23 -0600
+Subject: Last Chance to Connect with Finance CIOs at Open FinTech Forum, NYC,
+ Oct. 10 & 11 - Register Now
+From: Linux Foundation Events <no-reply@engage.linuxfoundation.org>
+To: felipe@cpanel.net
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="_=_swift_v4_1538589892_917eb2c4dcb35d6d85622213dd7db5a0_=_"
+X-Source-Ref-Id: 919463637
+List-Unsubscribe: <https://www2.thelinuxfoundation.org/unsubscribe/u/6342/8934f3106ce17589806a45d3601ebdf3f4c20e699dc3c1b5541b89c4e984c740/919463637>
+X-Report-Abuse-To: abuse@pd25.com
+x-job: 7213602_46020
+X-Spam-Status: No, score=0.3
+X-Spam-Score: 3
+X-Spam-Bar: /
+X-Ham-Report: Spam detection software, running on the system "mx2.cpanel.net",
+ has NOT identified this incoming email as spam.  The original
+ message has been attached to this so you can view it or label
+ similar future email.  If you have any questions, see
+ root\@localhost for details.
+ 
+ Content preview:  Open FinTech Forum | October 10 - 11, 2018 | New York City,
+    NY Last Chance to Connect with Finance CIOs at Open FinTech Forum, NYC, Oct.
+    10 & 11 - Register Now Join Fellow Financial Services CIOs and Senior Technologists
+    to Share Best Practices and Learn How to Best Utilize & Implement Open Source.
+    
+ 
+ Content analysis details:   (0.3 points, 5.0 required)
+ 
+  pts rule name              description
+ ---- ---------------------- --------------------------------------------------
+ -1.0 SPF_PASS               SPF: sender matches SPF record
+  0.1 DKIM_SIGNED            Message has a DKIM or DK signature, not necessarily
+                             valid
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+                             author's domain
+ -0.1 DKIM_VALID             Message has at least one valid DKIM or DK signature
+  0.2 HEADER_FROM_DIFFERENT_DOMAINS From and EnvelopeFrom 2nd level
+                             mail domains are different
+  0.5 DICT_DUMP_CUSTOM01     BODY: Text in non-English syntax-4X7
+  0.0 HTML_MESSAGE           BODY: HTML included in message
+  0.6 HTML_IMAGE_RATIO_04    BODY: HTML has a low ratio of text to image
+                             area
+  0.0 T_KAM_HTML_FONT_INVALID BODY: Test for Invalidly Named or
+                             Formatted Colors in HTML
+X-Spam-Flag: NO
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - mx2.cpanel.net
+X-AntiAbuse: Original Domain - cpanel.net
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - bounce.s7.exacttarget.com
+X-Get-Message-Sender-Via: mx2.cpanel.net: mailgid no entry from get_recent_authed_mail_ips_entry
+X-Authenticated-Sender: mx2.cpanel.net: 
+
+--_=_swift_v4_1538589892_917eb2c4dcb35d6d85622213dd7db5a0_=_
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Open FinTech Forum | October 10 - 11, 2018 | New York City, NY
+Last Chanc=
+e to Connect with Finance CIOs at Open FinTech Forum, NYC, Oct. 10 & 11 - R=
+egister Now
+
+Join Fellow Financial Services CIOs and Senior Technologis=
+ts to Share Best Practices and Learn How to Best Utilize & Implement Open S=
+ource.
+
+Open FinTech Forum is THE place to learn about the open technol=
+ogies driving digital transformation, and how to best utilize an open sourc=
+e strategy and implementation to:=20
+*Enable new products, services and cap=
+abilities
+*Increase IT efficiencies
+*Establish and strengthen internal =
+license compliance programs
+*Attract top-level talent and train existing =
+talent on the latest disruptive technologies
+
+Why is open source import=
+ant for financial services firms? Open source technologies enable:
+*Faste=
+r time to market=20
+*The ability for IT departments to do more with less
+=
+*An enormous technical talent pool without additional spend
+*A plethora o=
+f added benefits including flexibility, reliability, and stability
+
+Thi=
+s is your last chance to attend Open FinTech Forum next week! Learn how to =
+build internal open source programs, and get guidance from the top experts =
+in deep dive sessions.
+events.linuxfoundation.org/events/open-fintech-for=
+um-2018/program/schedule/?utm_source=3Devent-promo&utm_medium=3Demail&utm_c=
+ampaign=3Doftf18
+
+View the Full Schedule >>
+events.linuxfoundation.or=
+g/events/open-fintech-forum-2018/program/schedule/?utm_source=3Devent-promo=
+&utm_medium=3Demail&utm_campaign=3Doftf18
+
+Register Now >>
+https://ww=
+w2.thelinuxfoundation.org/e/6342/dium-email-utm-campaign-oftf18/41mhpg/9194=
+63637
+
+FinTech CIOs and senior technologists receive a 50% discount on =
+registration fees. Email events@linuxfoundation.org for more information.=
+
+
+Linux Foundation members and LF project members receive a 20% discoun=
+t on registration pricing. Email events@linuxfoundation.org for discount co=
+des (Discounts may not be combined).=20
+https://www2.thelinuxfoundation.org=
+/e/6342/membership-members-/41mhpj/919463637
+https://www2.thelinuxfoundat=
+ion.org/e/6342/projects-/41mhpl/919463637
+
+Thank You To Our Sponsors
+=
+
+Gold
+Cloud Native Computing Foundation - https://www2.thelinuxfoundati=
+on.org/e/6342/2018-10-03/41mhpn/919463637
+Hyperledger - www.hyperledger.o=
+rg/
+
+Silver
+Blackduck - https://www2.thelinuxfoundation.org/e/6342/20=
+18-10-03/41mhpq/919463637=20
+Cryptoenter https://www2.thelinuxfoundation.or=
+g/e/6342/2018-10-03/41mhps/919463637=20
+GitLab - https://www2.thelinuxfound=
+ation.org/e/6342/2018-10-03/41mhpv/919463637=20
+Mesosphere - https://www2.t=
+helinuxfoundation.org/e/6342/2018-10-03/41mhpx/919463637
+Sensu - https://=
+www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhpz/919463637
+VMware - h=
+ttps://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhq2/919463637
+
+=
+Community Partners
+Cloud Foundry - https://www2.thelinuxfoundation.org/e/=
+6342/2018-10-03/41mhq4/919463637=20
+JS Foundation - https://www2.thelinuxfo=
+undation.org/e/6342/2018-10-03/41mhq6/919463637=20
+LF Networking - https://=
+www2.thelinuxfoundation.org/e/6342/projects-networking-/41mhq8/919463637 =
+
+OpenHPC - https://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhqb/9=
+19463637=20
+Open Mainframe Project - https://www2.thelinuxfoundation.org/e/=
+6342/2018-10-03/41mhqd/919463637=20
+OpenAPI Initiative - https://www2.theli=
+nuxfoundation.org/e/6342/2018-10-03/41mhqg/919463637=20
+
+Media Partners =
+
+CIO Applications - https://www2.thelinuxfoundation.org/e/6342/2018-10-03=
+/41mhqj/919463637=20
+CIO Review - https://www2.thelinuxfoundation.org/e/634=
+2/2018-10-03/41mhql/919463637=20
+=E2=80=98D=E2=80=99 of Things - https://ww=
+w2.thelinuxfoundation.org/e/6342/2018-10-03/41mhqn/919463637=20
+Virtual Str=
+ategy Magazine - https://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mh=
+qq/919463637=20
+
+View all Sponsors >>
+https://www2.thelinuxfoundation.o=
+rg/e/6342/dium-email-utm-campaign-oftf18/41mhqs/919463637
+
+Interested i=
+n Sponsoring?
+Showcase your thought leadership among a vibrant open sourc=
+e community and connect with top influencers driving today's technology pur=
+chasing decisions.
+Learn How to Become a Sponsor>>=20
+https://www2.thelin=
+uxfoundation.org/e/6342/dium-email-utm-campaign-oftf18/41mhqv/919463637=20
+=
+
+Twitter=20
+https://www2.thelinuxfoundation.org/e/6342/EventsLF/41mhqx/91=
+9463637
+
+Facebook=20
+https://www2.thelinuxfoundation.org/e/6342/linuxfo=
+undationevents/41mhqz/919463637
+
+Youtube=20
+https://www2.thelinuxfounda=
+tion.org/e/6342/user-TheLinuxFoundation/41mhr2/919463637
+
+Slack=20
+http=
+s://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhr4/919463637
+
+htt=
+ps://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhr6/919463637
+CREAT=
+ING THE LARGEST SHARED
+TECHNOLOGY INVESTMENT IN HISTORY
+
+View in brow=
+ser
+https://www2.thelinuxfoundation.org/webmail/6342/919463637/8934f3106c=
+e17589806a45d3601ebdf3f4c20e699dc3c1b5541b89c4e984c740
+
+Manage your ema=
+il preferences
+https://www2.thelinuxfoundation.org/set-email-preferences?=
+ehash=3D8934f3106ce17589806a45d3601ebdf3f4c20e699dc3c1b5541b89c4e984c740&em=
+ail_id=3D919463637
+
+The Linux Foundation
+One Letterman Drive Building=
+ D
+Suite D4700
+San Francisco, CA 94129
+
+--_=_swift_v4_1538589892_917eb2c4dcb35d6d85622213dd7db5a0_=_
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.=
+w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns=3D"http://www.w3.org/1999/xhtml"><head>
+    <meta content=3D"text/html; charset=3Dutf-8" http-equiv=3D"Content-Type=
+" />
+   =20
+    <!-- Facebook sharing information tags -->
+    <meta property=3D"og:title" content=3D"Last Chance to Connect with Fina=
+nce CIOs at Open FinTech Forum, NYC, Oct. 10 & 11 - Register Now" />
+    <meta charset=3D"utf-8">
+    <title>Last Chance to Connect with Finance CIOs at Open FinTech Forum, =
+NYC, Oct. 10 & 11 - Register Now</title>
+
+    <meta name=3D"viewport" content=3D"width=3Ddevice-width, initial-scale=
+=3D1">
+
+        <!--[if mso]><style>body,table tr,table td,a,span,table.MsoNormalTa=
+ble {font-family:'Helvetica Neue', Helvetica, Arial, sans-serif !important;=
+}</style><!--<![endif]-->
+        <style type=3D"text/css">@import url(http://fonts.googleapis.com/cs=
+s?family=3DOpen+Sans:300italic,400italic,600italic,700italic,800italic,400,=
+300,600,700,800);.ExternalClass,.ExternalClass div,.ExternalClass font,.Ext=
+ernalClass p,.ExternalClass span,.ExternalClass td,img{line-height:100%}.ap=
+pleLinks a,img{text-decoration:none}#outlook
+a{padding:0}.ExternalClass,.=
+ReadMsgBody{width:100%}a,blockquote,body,li,p,table,td{-webkit-text-size-ad=
+just:100%;-ms-text-size-adjust:100%}table,td{mso-table-lspace:0;mso-table-r=
+space:0}img{-ms-interpolation-mode:bicubic;border:0;height:auto;outline:0}t=
+able{border-collapse:collapse!important}#bodyCell,#bodyTable,body{height:10=
+0%!important;margin:0;padding:0;width:100%!important}table[class=3Dresponsi=
+ve-table]{width:640px!important}table[class=3Dmaster-table]{width:640px!imp=
+ortant}table[class=3Dcopy-table]{width:85%!important}table[class=3Dstory-4]=
+{width:85%!important}.appleLinks a{color:#c2c2c2!important}span.preheader{d=
+isplay:none!important}</style>
+</head>
+
+<body>
+<center>
+<table align=3D"center" bgcolor=3D"#f6f7f8" border=3D"0=
+" cellpadding=3D"0" cellspacing=3D"0" style=3D"height:100%; width:100%">
+=
+=09<tbody>
+=09=09<tr height=3D"30">
+=09=09=09<td align=3D"center" valig=
+n=3D"bottom">
+=09=09=09<table class=3D"master-table" style=3D"width:600px=
+">
+=09=09=09=09<tbody>
+=09=09=09=09=09<tr>
+=09=09=09=09=09=09<td alig=
+n=3D"center" valign=3D"bottom">
+=09=09=09=09=09=09<table border=3D"0" cel=
+lpadding=3D"0" cellspacing=3D"0" class=3D"responsive-table" style=3D"width:=
+640px" valign=3D"top">
+=09=09=09=09=09=09=09<tbody>
+=09=09=09=09=09=09=
+=09=09<tr style=3D"">
+=09=09=09=09=09=09=09=09=09<td align=3D"center" par=
+dot-region=3D"" style=3D"font-family:'Open Sans', Helvetica, Arial, sans-se=
+rif !important;font-size:12px;line-height:30px !important;font-weight:400 !=
+important;color:#252b33 !important;padding-top: 10px;" valign=3D"bottom">Re=
+gister Now to Attend Open FinTech Forum &amp; Share Best Practices with Fin=
+Tech CIOs and Senior Technologists.</td>
+=09=09=09=09=09=09=09=09</tr>
+=
+=09=09=09=09=09=09=09</tbody>
+=09=09=09=09=09=09</table>
+=09=09=09=09=
+=09=09</td>
+=09=09=09=09=09</tr>
+=09=09=09=09</tbody>
+=09=09=09</tabl=
+e>
+=09=09=09</td>
+=09=09</tr>
+=09=09<tr height=3D"8" style=3D"font-si=
+ze: 0; line-height: 0;">
+=09=09=09<td>&nbsp;</td>
+=09=09</tr>
+=09=09<=
+tr>
+=09=09=09<td align=3D"center" valign=3D"top">
+=09=09=09<table class=
+=3D"master-table" style=3D"width:640px">
+=09=09=09=09<tbody>
+=09=09=09=
+=09=09<tr>
+=09=09=09=09=09=09<td align=3D"center">
+=09=09=09=09=09=09<t=
+able border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"responsive-t=
+able" style=3D"width:570px" valign=3D"top">
+=09=09=09=09=09=09=09<tbody>=
+
+=09=09=09=09=09=09=09=09<tr>
+=09=09=09=09=09=09=09=09=09<td style=3D"t=
+ext-align: center; width: 117px;" width=3D"59"><a href=3D"https://www2.thel=
+inuxfoundation.org/e/6342/2018-10-03/41mhr8/919463637"><img alt=3D"The Linu=
+x Foundation" border=3D"0" src=3D"http://go.linuxfoundation.org/l/6342/2016=
+-02-22/322kr6/6342/142589/logo_tlf_2016_color.png" style=3D"border-style:so=
+lid; border-width:0px; height:40px; padding-right:10px; width:120px"></a></=
+td>
+=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09</tbody>
+=09=
+=09=09=09=09=09</table>
+=09=09=09=09=09=09</td>
+=09=09=09=09=09</tr>
+=
+=09=09=09=09=09<tr height=3D"10">
+=09=09=09=09=09=09<td>&nbsp;</td>
+=09=
+=09=09=09=09</tr>
+=09=09=09=09=09<tr>
+=09=09=09=09=09=09<td align=3D"ce=
+nter" valign=3D"top"><!--top spacing content + image and bottom spacing !--=
+>
+=09=09=09=09=09=09<table bgcolor=3D"#ffffff" border=3D"0" cellpadding=
+=3D"0" cellspacing=3D"0" class=3D"responsive-table" style=3D"border-radius:=
+3px; overflow:hidden !important; width:640px" valign=3D"top">
+=09=09=09=
+=09=09=09=09<tbody>
+=09=09=09=09=09=09=09=09<tr>
+=09=09=09=09=09=09=09=
+=09=09<td height=3D"auto" pardot-data=3D"" pardot-region=3D"" style=3D"back=
+ground: rgb(255, 255, 255);" valign=3D"top" width=3D"640"><a href=3D"https:=
+//www2.thelinuxfoundation.org/e/6342/dium-email-utm-campaign-oftf18/41mhrb/=
+919463637"><img alt=3D"" border=3D"0" height=3D"240" src=3D"https://www2.th=
+elinuxfoundation.org/l/6342/2018-10-01/41m6q6/6342/223967/Open_FinTech_Foru=
+m_Last_Chance_to_Attend_Email.jpg" style=3D"width: 640px; height: 240px; bo=
+rder-width: 0px; border-style: solid;" width=3D"640"></a></td>
+=09=09=09=
+=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09<tr height=3D"25">
+=09=09=
+=09=09=09=09=09=09=09<td>&nbsp;</td>
+=09=09=09=09=09=09=09=09</tr>
+=09=
+=09=09=09=09=09=09=09<tr pardot-repeatable=3D"" style=3D"">
+=09=09=09=09=
+=09=09=09=09=09<td align=3D"center">
+=09=09=09=09=09=09=09=09=09<table bo=
+rder=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"story-4" style=3D"w=
+idth:85%">
+=09=09=09=09=09=09=09=09=09=09<tbody>
+=09=09=09=09=09=09=09=
+=09=09=09=09<tr style=3D"">
+=09=09=09=09=09=09=09=09=09=09=09=09<td align=
+=3D"left" pardot-data=3D"" pardot-region=3D"" style=3D"color: rgb(37, 43, 5=
+1); font-family: &quot;Open Sans&quot;, Helvetica, Arial, sans-serif !impor=
+tant; font-size: 16px !important; line-height: 24px !important; font-weight=
+: 400 !important;">
+=09=09=09=09=09=09=09=09=09=09=09=09<h2 style=3D"marg=
+in: 0px !important; font-family: &quot;Open Sans&quot;, Helvetica, Arial, s=
+ans-serif !important; font-size: 24px !important; line-height: 36px !import=
+ant; font-weight: 200 !important; color: rgb(37, 43, 51) !important;">Join =
+Fellow Financial Services CIOs and Senior Technologists to Share Best Pract=
+ices and Learn How to Best Utilize &amp; Implement Open Source.</h2>
+
+=
+=09=09=09=09=09=09=09=09=09=09=09=09<div>
+=09=09=09=09=09=09=09=09=09=09=
+=09=09<p dir=3D"ltr">Open FinTech Forum is THE place to learn about the ope=
+n technologies driving digital transformation, and how to best utilize an o=
+pen source strategy and implementation to:</p>
+
+=09=09=09=09=09=09=09=
+=09=09=09=09=09<ul dir=3D"ltr">
+=09=09=09=09=09=09=09=09=09=09=09=09=09<l=
+i>Enable new products, services and capabilities</li>
+=09=09=09=09=09=09=
+=09=09=09=09=09=09=09<li>Increase IT efficiencies</li>
+=09=09=09=09=09=09=
+=09=09=09=09=09=09=09<li>Establish and strengthen internal license complian=
+ce programs</li>
+=09=09=09=09=09=09=09=09=09=09=09=09=09<li>Attract top-l=
+evel talent and train existing talent on the latest disruptive technologies=
+</li>
+=09=09=09=09=09=09=09=09=09=09=09=09</ul>
+
+=09=09=09=09=09=09=
+=09=09=09=09=09=09<p dir=3D"ltr">Why is open source important for financial=
+ services firms? Open source technologies enable:</p>
+
+=09=09=09=09=09=
+=09=09=09=09=09=09=09<ul>
+=09=09=09=09=09=09=09=09=09=09=09=09=09<li>Fast=
+er time to market</li>
+=09=09=09=09=09=09=09=09=09=09=09=09=09<li>The abi=
+lity for IT departments to do more with less</li>
+=09=09=09=09=09=09=09=
+=09=09=09=09=09=09<li>An enormous technical talent pool without additional =
+spend</li>
+=09=09=09=09=09=09=09=09=09=09=09=09=09<li>A plethora of added=
+ benefits including flexibility, reliability, and stability</li>
+=09=09=
+=09=09=09=09=09=09=09=09=09=09</ul>
+
+=09=09=09=09=09=09=09=09=09=09=09=
+=09<p dir=3D"ltr">This is your last chance to attend Open FinTech Forum nex=
+t week! Learn how to build internal open source programs, and get guidance =
+from the top experts in <a href=3D"https://www2.thelinuxfoundation.org/e/63=
+42/dium-email-utm-campaign-oftf18/41mhrd/919463637" style=3D"color:#249d61;=
+">deep dive sessions</a>.</p>
+=09=09=09=09=09=09=09=09=09=09=09=09</div>=
+
+=09=09=09=09=09=09=09=09=09=09=09=09</td>
+=09=09=09=09=09=09=09=09=09=
+=09=09</tr>
+=09=09=09=09=09=09=09=09=09=09</tbody>
+=09=09=09=09=09=09=
+=09=09=09=09<tbody>
+=09=09=09=09=09=09=09=09=09=09=09<tr style=3D"">
+=
+=09=09=09=09=09=09=09=09=09=09=09=09<td align=3D"center" pardot-region=3D""=
+ valign=3D"top"><a data-hs-link-id=3D"1" href=3D"https://www2.thelinuxfound=
+ation.org/e/6342/dium-email-utm-campaign-oftf18/41mhrd/919463637" style=3D"=
+background-color: #229d60; padding: 14px 28px 14px 28px; -webkit-border-rad=
+ius: 3px; border-radius: 3px; line-height: 18px !important; letter-spacing:=
+ 0.125em; text-transform: uppercase; font-size: 13px; font-family: 'Open Sa=
+ns', Arial, sans-serif; font-weight: 400; color: #ffffff; text-decoration: =
+none; display: inline-block; line-height: 18px !important;-webkit-text-size=
+-adjust:none;mso-hide:all;">View the Full Schedule =C2=BB </a></td>
+=09=
+=09=09=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09=09=09=09<tr>=
+
+=09=09=09=09=09=09=09=09=09=09=09=09<td>&nbsp;</td>
+=09=09=09=09=09=09=
+=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09=09=09</tbody>
+=09=09=09=
+=09=09=09=09=09=09=09<tbody>
+=09=09=09=09=09=09=09=09=09=09=09<tr style=
+=3D"">
+=09=09=09=09=09=09=09=09=09=09=09=09<td align=3D"center" pardot-re=
+gion=3D"" valign=3D"top"><a data-hs-link-id=3D"1" href=3D"https://www2.thel=
+inuxfoundation.org/e/6342/dium-email-utm-campaign-oftf18/41mhrg/919463637" =
+style=3D"background-color: #229d60; padding: 14px 28px 14px 28px; -webkit-b=
+order-radius: 3px; border-radius: 3px; line-height: 18px !important; letter=
+-spacing: 0.125em; text-transform: uppercase; font-size: 13px; font-family:=
+ 'Open Sans', Arial, sans-serif; font-weight: 400; color: #ffffff; text-dec=
+oration: none; display: inline-block; line-height: 18px !important;-webkit-=
+text-size-adjust:none;mso-hide:all;">Register Now =C2=BB </a></td>
+=09=09=
+=09=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09=09=09</tbody>=
+
+=09=09=09=09=09=09=09=09=09=09<tbody>
+=09=09=09=09=09=09=09=09=09=09</=
+tbody>
+=09=09=09=09=09=09=09=09=09</table>
+=09=09=09=09=09=09=09=09=09<=
+/td>
+=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09<tr pardot-r=
+epeatable=3D"" style=3D"">
+=09=09=09=09=09=09=09=09=09<td align=3D"center=
+">
+=09=09=09=09=09=09=09=09=09<table border=3D"0" cellpadding=3D"0" cells=
+pacing=3D"0" class=3D"story-4" style=3D"width:85%">
+=09=09=09=09=09=09=09=
+=09=09=09<tbody>
+=09=09=09=09=09=09=09=09=09=09=09<tr style=3D"">
+=09=
+=09=09=09=09=09=09=09=09=09=09=09<td align=3D"left" pardot-data=3D"" pardot=
+-region=3D"" style=3D"color: rgb(37, 43, 51); font-family: &quot;Open Sans&=
+quot;, Helvetica, Arial, sans-serif !important; font-size: 16px !important;=
+ line-height: 24px !important; font-weight: 400 !important;">
+=09=09=09=
+=09=09=09=09=09=09=09=09=09<p dir=3D"ltr">FinTech CIOs and senior technolog=
+ists receive a 50% discount on registration fees. Email <a href=3D"mailto:e=
+vents@linuxfoundation.org" style=3D"color:#249d61;">events@linuxfoundation.=
+org</a> for more information.<br>
+=09=09=09=09=09=09=09=09=09=09=09=09<br=
+>
+=09=09=09=09=09=09=09=09=09=09=09=09Linux Foundation <a href=3D"https:/=
+/www2.thelinuxfoundation.org/e/6342/membership-members-/41mhpj/919463637" s=
+tyle=3D"color:#249d61;">members</a> and <a href=3D"https://www2.thelinuxfou=
+ndation.org/e/6342/projects-/41mhpl/919463637" style=3D"color:#249d61;">LF =
+project members</a> receive a 20% discount on registration pricing. Email <=
+a href=3D"mailto:events@linuxfoundation.org" style=3D"color:#249d61;">event=
+s@linuxfoundation.org</a> for discount codes (Discounts may not be combined=
+).&nbsp;</p>
+=09=09=09=09=09=09=09=09=09=09=09=09</td>
+=09=09=09=09=09=
+=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09=09=09</tbody>
+=09=09=
+=09=09=09=09=09=09=09</table>
+=09=09=09=09=09=09=09=09=09</td>
+=09=09=
+=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09<!-- END SPACER REQUIRED =
+!--><!-- START SPONSOR SECTION -->
+=09=09=09=09=09=09=09=09<tr class=3D"l=
+ast-tr-height" height=3D"40">
+=09=09=09=09=09=09=09=09=09<td>&nbsp;</td>=
+
+=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09</tbody>
+=09=09=
+=09=09=09=09</table>
+=09=09=09=09=09=09</td>
+=09=09=09=09=09</tr>
+=09=
+=09=09=09=09<!-- END SPACER REQUIRED !--><!-- START SPONSOR SECTION -->
+=
+=09=09=09=09=09<tr height=3D"10">
+=09=09=09=09=09=09<td>&nbsp;</td>
+=09=
+=09=09=09=09</tr>
+=09=09=09=09=09<tr>
+=09=09=09=09=09=09<td align=3D"ce=
+nter" valign=3D"top">
+=09=09=09=09=09=09<table bgcolor=3D"#ffffff" border=
+=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"responsive-table" style=
+=3D"-webkit-border-radius:3px !important; border-radius:3px !important; ove=
+rflow:hidden !important; width:640px" valign=3D"top">
+=09=09=09=09=09=09=
+=09<tbody>
+=09=09=09=09=09=09=09=09<tr height=3D"35">
+=09=09=09=09=09=
+=09=09=09=09<td>&nbsp;</td>
+=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=
+=09=09=09=09<tr style=3D"">
+=09=09=09=09=09=09=09=09=09<td align=3D"cente=
+r" pardot-data=3D"" pardot-region=3D"" style=3D"font-family: &quot;Open San=
+s&quot;, Helvetica, Arial, sans-serif !important; font-size: 28px !importan=
+t; line-height: 38px !important; font-weight: 200 !important; color: rgb(89=
+, 93, 99); padding: 0px 5px !important;">Thank You To Our Sponsors</td>
+=
+=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09<tr height=3D"35">=
+
+=09=09=09=09=09=09=09=09=09<td>&nbsp;</td>
+=09=09=09=09=09=09=09=09</t=
+r>
+=09=09=09=09=09=09=09=09<tr>
+=09=09=09=09=09=09=09=09=09<td align=3D=
+"center">
+=09=09=09=09=09=09=09=09=09<table border=3D"0" cellpadding=3D"0=
+" cellspacing=3D"0" class=3D"copy-table" style=3D"width:95%!important;">
+=
+=09=09=09=09=09=09=09=09=09=09<tbody>
+=09=09=09=09=09=09=09=09=09=09=09<t=
+r style=3D"">
+=09=09=09=09=09=09=09=09=09=09=09=09<td align=3D"left" pard=
+ot-region=3D"" style=3D"font-family:'Open Sans', Helvetica, Arial, sans-ser=
+if !important;font-size:16px !important;line-height:30px !important;font-we=
+ight:400 !important;color:#7e8890 !important;">
+=09=09=09=09=09=09=09=09=
+=09=09=09=09<div style=3D"text-align: center;"><font color=3D"#808080"><spa=
+n style=3D"font-size: 12px;"><b>GOLD</b></span></font><br>
+=09=09=09=09=
+=09=09=09=09=09=09=09=09&nbsp; &nbsp;&nbsp;<font color=3D"#808080"><span st=
+yle=3D"font-size: 12px;"><b><a href=3D"https://www2.thelinuxfoundation.org/=
+e/6342/2018-10-03/41mhpn/919463637"><img alt=3D"" border=3D"0" height=3D"14=
+4" src=3D"https://events.linuxfoundation.org/wp-content/uploads/2018/02/cnc=
+f-logo.png" style=3D"width: 235px; height: 144px; border-width: 0px; border=
+-style: solid;" width=3D"235"></a>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;</b></span=
+></font><a href=3D"https://www2.thelinuxfoundation.org/e/6342/2018-10-03/41=
+mhrj/919463637"><img alt=3D"Hyperledger" height=3D"153" src=3D"https://even=
+ts.linuxfoundation.org/wp-content/uploads/2018/07/hyperledger.png" style=3D=
+"height: 153px; width: 250px;" width=3D"250"></a><br>
+=09=09=09=09=09=09=
+=09=09=09=09=09=09<font color=3D"#808080"><span style=3D"font-size: 12px;">=
+<b>SILVER</b></span></font><br>
+=09=09=09=09=09=09=09=09=09=09=09=09&nbsp=
+; &nbsp; &nbsp;<a href=3D"https://www2.thelinuxfoundation.org/e/6342/2018-1=
+0-03/41mhrl/919463637"><img alt=3D"Intel" border=3D"0" height=3D"116" src=
+=3D"https://events.linuxfoundation.org/wp-content/uploads/2017/04/logoblack=
+duck.png" style=3D"height: 116px; margin-left: 5px; margin-right: 5px; widt=
+h: 190px; border-width: 0px; border-style: solid;" width=3D"190"></a>&nbsp;=
+ &nbsp; &nbsp; &nbsp;&nbsp;<a href=3D"https://www2.thelinuxfoundation.org/e=
+/6342/2018-10-03/41mhps/919463637"><img alt=3D"" border=3D"0" height=3D"123=
+" src=3D"https://www2.thelinuxfoundation.org/l/6342/2018-10-02/41mc42/6342/=
+224123/CRYPTOENTER_01.png" style=3D"width: 200px; height: 123px; border-wid=
+th: 0px; border-style: solid;" width=3D"200"></a>&nbsp; &nbsp; &nbsp; &nbsp=
+;<a href=3D"https://www2.thelinuxfoundation.org/e/6342/AmNwdF/41mhrn/919463=
+637"><img alt=3D"Microsoft" border=3D"0" height=3D"119"
+src=3D"https://ev=
+ents.linuxfoundation.org/wp-content/uploads/2018/01/logo_gitlab.png" style=
+=3D"height: 119px; margin: 20px 5px; width: 195px; border-width: 0px; borde=
+r-style: solid;" width=3D"195"></a>&nbsp;<a href=3D"https://www2.thelinuxfo=
+undation.org/e/6342/2018-10-03/41mhpx/919463637"><img alt=3D"Mesosphere" bo=
+rder=3D"0" height=3D"160" src=3D"https://www2.thelinuxfoundation.org/l/6342=
+/2018-09-26/41l6m8/6342/223487/mesosphere_logo.png" style=3D"width: 160px; =
+height: 160px; margin-top: 0px; margin-bottom: 0px; border-width: 0px; bord=
+er-style: solid;" width=3D"160"></a>&nbsp; &nbsp; &nbsp;&nbsp;<a href=3D"ht=
+tps://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhpz/919463637"><img =
+alt=3D"Sensu" border=3D"0" height=3D"104" src=3D"https://events.linuxfounda=
+tion.org/wp-content/uploads/2018/07/sensu.png" style=3D"width: 170px; heigh=
+t: 104px; margin-top: 20px; margin-bottom: 20px; border-width: 0px; border-=
+style: solid;"
+width=3D"170"></a>&nbsp;&nbsp;<a href=3D"https://www2.thel=
+inuxfoundation.org/e/6342/2018-10-03/41mhq2/919463637"><img alt=3D"VMware" =
+height=3D"110" src=3D"https://www2.thelinuxfoundation.org/l/6342/2018-10-02=
+/41mc4s/6342/224125/vmware_01.png" style=3D"width: 180px; height: 110px;" w=
+idth=3D"180"></a><br>
+=09=09=09=09=09=09=09=09=09=09=09=09<strong style=
+=3D"font-size:12px; text-align:center"><span style=3D"color:rgb(128, 128, 1=
+28)">COMMUNITY PARTNERS</span></strong><br>
+=09=09=09=09=09=09=09=09=09=
+=09=09=09<a href=3D"https://www2.thelinuxfoundation.org/e/6342/2018-10-03/4=
+1mhq4/919463637"><img alt=3D"Cloud Foundry" border=3D"0" height=3D"77" src=
+=3D"https://events.linuxfoundation.org/wp-content/uploads/2018/02/cloud_fou=
+ndry-1.png" style=3D"width: 126px; height: 77px; margin-left: 10px; margin-=
+right: 10px; border-width: 0px; border-style: solid;" width=3D"126"></a>&nb=
+sp;<a href=3D"https://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhq6/=
+919463637"><img alt=3D"JS Foundation" border=3D"0" height=3D"77" src=3D"htt=
+ps://events.linuxfoundation.org/wp-content/uploads/2018/01/jsfoundation_log=
+o.png" style=3D"width: 125px; height: 77px; margin-left: 10px; margin-right=
+: 10px; border-width: 0px; border-style: solid;" width=3D"125"></a><a href=
+=3D"https://www2.thelinuxfoundation.org/e/6342/projects-networking-/41mhq8/=
+919463637"><img alt=3D"LF Networking" border=3D"0" height=3D"92"
+src=3D"h=
+ttps://events.linuxfoundation.org/wp-content/uploads/2018/01/logo_lfn.png" =
+style=3D"width: 150px; height: 92px; margin-left: 10px; margin-right: 10px;=
+ border-width: 0px; border-style: solid;" width=3D"150"></a>&nbsp;<a href=
+=3D"https://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhqg/919463637"=
+><img alt=3D"OpenAPI" border=3D"0" height=3D"80" src=3D"https://events.linu=
+xfoundation.org/wp-content/uploads/2018/02/logo_oai_stacked.png" style=3D"w=
+idth: 130px; height: 80px; border-width: 0px; border-style: solid;" width=
+=3D"130"></a>&nbsp;<a href=3D"https://www2.thelinuxfoundation.org/e/6342/20=
+18-10-03/41mhqb/919463637"><img alt=3D"OpenHPC" border=3D"0" height=3D"74" =
+src=3D"https://events.linuxfoundation.org/wp-content/uploads/2018/03/openhp=
+c-1.png" style=3D"width: 120px; height: 74px; margin-left: 10px; margin-rig=
+ht: 10px; border-width: 0px; border-style: solid;" width=3D"120"></a>&nbsp;=
+<a
+href=3D"https://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhqd/9=
+19463637"><img alt=3D"Open MainFrame Project" border=3D"0" height=3D"92" sr=
+c=3D"https://events.linuxfoundation.org/wp-content/uploads/2018/01/omp_logo=
+.png" style=3D"width: 150px; height: 92px; margin-left: 10px; margin-right:=
+ 10px; border-width: 0px; border-style: solid;" width=3D"150"></a><br>
+=
+=09=09=09=09=09=09=09=09=09=09=09=09<br>
+=09=09=09=09=09=09=09=09=09=09=
+=09=09<strong style=3D"font-size:12px; text-align:center"><span style=3D"co=
+lor:rgb(128, 128, 128)">MEDIA PARTNERS</span></strong><br>
+=09=09=09=09=
+=09=09=09=09=09=09=09=09<br>
+=09=09=09=09=09=09=09=09=09=09=09=09<a href=
+=3D"https://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhqj/919463637"=
+><img alt=3D"CIO Applications" border=3D"0" height=3D"61" src=3D"https://ev=
+ents.linuxfoundation.org/wp-content/uploads/2018/01/CIO_applicationlogo.png=
+" style=3D"width: 95px; height: 61px; margin-left: 10px; margin-right: 10px=
+; border-width: 0px; border-style: solid;" width=3D"95"></a><a href=3D"http=
+s://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhql/919463637"><img al=
+t=3D"CIO Review" border=3D"0" height=3D"53" src=3D"https://events.linuxfoun=
+dation.org/wp-content/uploads/2018/01/CIOreview-logo-PNG.png" style=3D"widt=
+h: 115px; margin-left: 10px; margin-right: 10px; height: 53px; border-width=
+: 0px; border-style: solid;" width=3D"115"></a><a href=3D"https://www2.thel=
+inuxfoundation.org/e/6342/2018-10-03/41mhqn/919463637"><img alt=3D"'D' of T=
+hings" border=3D"0" height=3D"82"
+src=3D"https://events.linuxfoundation.o=
+rg/wp-content/uploads/2018/05/20160906_DoT_Logo_Vertical_Final_300x245.png"=
+ style=3D"width: 100px; height: 82px; margin-left: 10px; margin-right: 10px=
+; border-width: 0px; border-style: solid;" width=3D"100"></a>&nbsp;&nbsp;<a=
+ href=3D"https://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhqq/91946=
+3637"><img alt=3D"Virtual Strategy Magazine" border=3D"0" height=3D"79" src=
+=3D"https://events.linuxfoundation.org/wp-content/uploads/2018/01/logo_virt=
+ualstrategy.png" style=3D"width: 115px; height: 79px; margin-left: 10px; ma=
+rgin-right: 10px; border-width: 0px; border-style: solid;" width=3D"115"></=
+a>&nbsp;&nbsp;</div>
+=09=09=09=09=09=09=09=09=09=09=09=09</td>
+=09=09=
+=09=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09=09=09=09<tr hei=
+ght=3D"35">
+=09=09=09=09=09=09=09=09=09=09=09=09<td>&nbsp;</td>
+=09=09=
+=09=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09=09=09=09<tr>
+=
+=09=09=09=09=09=09=09=09=09=09=09=09<td align=3D"center" valign=3D"top">
+=
+=09=09=09=09=09=09=09=09=09=09=09=09<table border=3D"0" cellpadding=3D"0" c=
+ellspacing=3D"0">
+=09=09=09=09=09=09=09=09=09=09=09=09=09<tbody>
+=09=09=
+=09=09=09=09=09=09=09=09=09=09=09=09<tr style=3D"">
+=09=09=09=09=09=09=09=
+=09=09=09=09=09=09=09=09<td align=3D"center" pardot-region=3D"" valign=3D"t=
+op"><!--[if mso]><v:roundrect xmlns:v=3D"urn:schemas-microsoft-com:vml" xml=
+ns:w=3D"urn:schemas-microsoft-com:office:word" href=3Dhttps://www2.thelinux=
+foundation.org/e/6342/ium-email-utm-campaign-osseu18/41mhrq/919463637" styl=
+e=3D"height:46px;v-text-anchor:middle;width:240px;" arcsize=3D"3%" strokeco=
+lor=3D"#229d60" fillcolor=3D"#229d60"><w:anchorlock></w:anchorlock><center =
+style=3D"color:#ffffff;font-family:Helvetica, Arial,sans-serif;font-size:13=
+px;text-transform: uppercase;">View All Sponsors =C2=BB</center></v:roundre=
+ct><![endif]--><a data-hs-link-id=3D"1" href=3D"https://events.linuxfoundat=
+ion.org/events/open-fintech-forum-2018/sponsors/?utm_source=3Devent-promo&a=
+mp;utm_medium=3Demail&amp;utm_campaign=3Doftf18" style=3D"background-color:=
+ #229d60; padding: 14px 28px 14px 28px; -webkit-border-radius: 3px; border-=
+radius: 3px; line-height: 18px !important;
+letter-spacing: 0.125em; text-=
+transform: uppercase; font-size: 13px; font-family: 'Open Sans', Arial, san=
+s-serif; font-weight: 400; color: #ffffff; text-decoration: none; display: =
+inline-block; line-height: 18px !important;-webkit-text-size-adjust:none;ms=
+o-hide:all;">View All SPONSORS =C2=BB </a><br>
+=09=09=09=09=09=09=09=09=
+=09=09=09=09=09=09=09<!--[if mso]><v:roundrect xmlns:v=3D"urn:schemas-micro=
+soft-com:vml" xmlns:w=3D"urn:schemas-microsoft-com:office:word" href=3Dhttp=
+s://www2.thelinuxfoundation.org/e/6342/ium-email-utm-campaign-elceu18/41mhr=
+s/919463637" style=3D"height:46px;v-text-anchor:middle;width:240px;" arcsiz=
+e=3D"3%" strokecolor=3D"#199ad6" fillcolor=3D"#199ad6"><w:anchorlock></w:an=
+chorlock><center style=3D"color:#ffffff;font-family:Helvetica, Arial,sans-s=
+erif;font-size:13px;text-transform: uppercase;">View All Sponsors =C2=BB</c=
+enter></v:roundrect><![endif]--></td>
+=09=09=09=09=09=09=09=09=09=09=09=
+=09=09=09</tr>
+=09=09=09=09=09=09=09=09=09=09=09=09=09</tbody>
+=09=09=
+=09=09=09=09=09=09=09=09=09=09</table>
+=09=09=09=09=09=09=09=09=09=09=09=
+=09</td>
+=09=09=09=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=
+=09=09=09</tbody>
+=09=09=09=09=09=09=09=09=09</table>
+=09=09=09=09=09=
+=09=09=09=09</td>
+=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=
+=09<tr height=3D"40">
+=09=09=09=09=09=09=09=09=09<td>&nbsp;</td>
+=09=09=
+=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09</tbody>
+=09=09=09=09=09=
+=09</table>
+=09=09=09=09=09=09</td>
+=09=09=09=09=09</tr>
+=09=09=09=09=
+=09<!-- END SPONSOR SECTION -->
+=09=09=09=09</tbody>
+=09=09=09</table>=
+
+=09=09=09&nbsp; <!-- START SPONSOR SECTION --> &nbsp;
+
+=09=09=09<tab=
+le bgcolor=3D"#ffffff" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" cla=
+ss=3D"responsive-table" style=3D"-webkit-border-radius:3px !important; bord=
+er-radius:3px !important; overflow:hidden !important; width:640px" valign=
+=3D"top">
+=09=09=09=09<tbody>
+=09=09=09=09=09<tr height=3D"35">
+=09=
+=09=09=09=09=09<td>&nbsp;</td>
+=09=09=09=09=09</tr>
+=09=09=09=09=09<tr =
+style=3D"">
+=09=09=09=09=09=09<td align=3D"center" pardot-data=3D"" pardo=
+t-region=3D"" style=3D"color: rgb(37, 43, 51); font-family: &quot;Open Sans=
+&quot;, Helvetica, Arial, sans-serif !important; font-size: 28px !important=
+; line-height: 38px !important; font-weight: 200 !important; padding: 0px 5=
+px !important;">Interested in Sponsoring?</td>
+=09=09=09=09=09</tr>
+=09=
+=09=09=09=09<tr height=3D"35">
+=09=09=09=09=09=09<td>&nbsp;</td>
+=09=09=
+=09=09=09</tr>
+=09=09=09=09=09<tr>
+=09=09=09=09=09=09<td align=3D"cente=
+r">
+=09=09=09=09=09=09<table border=3D"0" cellpadding=3D"0" cellspacing=
+=3D"0" class=3D"copy-table" style=3D"width:85%">
+=09=09=09=09=09=09=09<tb=
+ody>
+=09=09=09=09=09=09=09=09<tr style=3D"">
+=09=09=09=09=09=09=09=09=
+=09<td align=3D"left" pardot-data=3D"" pardot-region=3D"" style=3D"color: r=
+gb(37, 43, 51); font-family: &quot;Open Sans&quot;, Helvetica, Arial, sans-=
+serif !important; font-size: 16px !important; line-height: 24px !important;=
+ font-weight: 400 !important;">
+=09=09=09=09=09=09=09=09=09<div>Showcase =
+your thought leadership among a vibrant open source community and connect w=
+ith top influencers driving today's technology purchasing decisions.</div>=
+
+=09=09=09=09=09=09=09=09=09</td>
+=09=09=09=09=09=09=09=09</tr>
+=09=
+=09=09=09=09=09=09=09<tr height=3D"35">
+=09=09=09=09=09=09=09=09=09<td>&n=
+bsp;</td>
+=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09=09<tr>
+=
+=09=09=09=09=09=09=09=09=09<td align=3D"center" valign=3D"top">
+=09=09=09=
+=09=09=09=09=09=09<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0">=
+
+=09=09=09=09=09=09=09=09=09=09<tbody>
+=09=09=09=09=09=09=09=09=09=09=
+=09<tr style=3D"">
+=09=09=09=09=09=09=09=09=09=09=09=09<td align=3D"cente=
+r" pardot-region=3D"" valign=3D"top"><a data-hs-link-id=3D"1" href=3D"https=
+://www2.thelinuxfoundation.org/e/6342/dium-email-utm-campaign-oftf18/41mhqv=
+/919463637" style=3D"background-color: #229d60; padding: 14px 28px 14px 28p=
+x; -webkit-border-radius: 3px; border-radius: 3px; line-height: 18px !impor=
+tant; letter-spacing: 0.125em; text-transform: uppercase; font-size: 13px; =
+font-family: 'Open Sans', Arial, sans-serif; font-weight: 400; color: #ffff=
+ff; text-decoration: none; display: inline-block; line-height: 18px !import=
+ant;-webkit-text-size-adjust:none;mso-hide:all;">Learn HOW TO BECOME A SPON=
+SOR =C2=BB </a></td>
+=09=09=09=09=09=09=09=09=09=09=09</tr>
+=09=09=09=
+=09=09=09=09=09=09=09</tbody>
+=09=09=09=09=09=09=09=09=09</table>
+=09=
+=09=09=09=09=09=09=09=09</td>
+=09=09=09=09=09=09=09=09</tr>
+=09=09=09=
+=09=09=09=09</tbody>
+=09=09=09=09=09=09</table>
+=09=09=09=09=09=09</td>=
+
+=09=09=09=09=09</tr>
+=09=09=09=09=09<tr height=3D"40">
+=09=09=09=09=
+=09=09<td>&nbsp;</td>
+=09=09=09=09=09</tr>
+=09=09=09=09</tbody>
+=09=
+=09=09</table>
+=09=09=09<!-- END SPONSOR SECTION -->
+
+=09=09=09<table=
+ border=3D"0" cellpadding=3D"0" cellspacing=3D"0" class=3D"responsive-table=
+" style=3D"width:640px">
+=09=09=09=09<tbody>
+=09=09=09=09=09<tr>
+=09=
+=09=09=09=09=09<td>
+=09=09=09=09=09=09<div class=3D"social-spacer" style=
+=3D"width: 3.5%; height: 50px; float: left;display: inline;">&nbsp;</div>=
+
+
+=09=09=09=09=09=09<div class=3D"social-cell" style=3D"width: 22%; flo=
+at: left;display: inline;">
+=09=09=09=09=09=09<table bgcolor=3D"#46a9e3" =
+border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"border-radius:3px=
+ !important; height:50px; width:100%">
+=09=09=09=09=09=09=09<tbody>
+=09=
+=09=09=09=09=09=09=09<tr>
+=09=09=09=09=09=09=09=09=09<td align=3D"center"=
+ class=3D"hover-me-1" valign=3D"middle"><!--[if mso]><v:roundrect xmlns:v=
+=3D"urn:schemas-microsoft-com:vml" xmlns:w=3D"urn:schemas-microsoft-com:off=
+ice:word" href=3D"http://twitter.com/EventsLF" style=3D"height:50px;v-text-=
+anchor:middle;width:179px;text-transform:uppercase;" arcsize=3D"5%" stroke=
+=3D"f" fillcolor=3D"#46A9E3"><w:anchorlock></w:anchorlock><center style=3D"=
+color:#ffffff;font-family:Helvetica, Arial,sans-serif;font-size:10px;text-t=
+ransform:uppercase;">Twitter</center></v:roundrect><![endif]--><a data-hs-l=
+ink-id=3D"0" href=3D"http://twitter.com/EventsLF" style=3D"line-height:50px=
+; display:block; text-decoration: none !important; width: 100%;-webkit-text=
+-size-adjust:none;mso-hide:all;"><span style=3D"text-decoration:none">&nbsp=
+;</span><span style=3D"border-radius:3px !important; color:#fefefe !importa=
+nt; font-family:open sans,helvetica,arial,sans-serif !important; font-size:=
+10px
+!important; font-weight:400 !important; text-decoration:none !import=
+ant; text-transform:uppercase !important">Twitter</span> </a></td>
+=09=09=
+=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09</tbody>
+=09=09=09=09=09=
+=09</table>
+=09=09=09=09=09=09</div>
+
+=09=09=09=09=09=09<div class=3D=
+"social-spacer" style=3D"width: 2%; height: 50px; float: left;display: inli=
+ne;">&nbsp;</div>
+
+=09=09=09=09=09=09<div class=3D"social-cell" style=
+=3D"width: 22%; float: left;display: inline;">
+=09=09=09=09=09=09<table b=
+gcolor=3D"#36549d" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=
+=3D"border-radius:3px !important; height:50px; width:100%">
+=09=09=09=09=
+=09=09=09<tbody>
+=09=09=09=09=09=09=09=09<tr>
+=09=09=09=09=09=09=09=09=
+=09<td align=3D"center" class=3D"hover-me-2" valign=3D"middle"><!--[if mso]=
+><v:roundrect xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:w=3D"urn:sche=
+mas-microsoft-com:office:word" href=3D"https://www.facebook.com/linuxfounda=
+tionevents" style=3D"height:50px;v-text-anchor:middle;width:179px;text-tran=
+sform:uppercase;" arcsize=3D"5%" stroke=3D"f" fillcolor=3D"#36549D"><w:anch=
+orlock></w:anchorlock><center style=3D"color:#ffffff;font-family:Helvetica,=
+ Arial,sans-serif;font-size:10px;text-transform:uppercase;"> Facebook</cent=
+er></v:roundrect><![endif]--><a data-hs-link-id=3D"0" href=3D"https://www.f=
+acebook.com/linuxfoundationevents" style=3D"line-height:50px; display:block=
+; text-decoration: none !important; width: 100%;-webkit-text-size-adjust:no=
+ne;mso-hide:all;"><span style=3D"text-decoration:none">&nbsp;</span><span s=
+tyle=3D"border-radius:3px !important; color:#fefefe !important; font-family=
+:open
+sans,helvetica,arial,sans-serif !important; font-size:10px !importa=
+nt; font-weight:400 !important; text-decoration:none !important; text-trans=
+form:uppercase !important">Facebook</span> </a></td>
+=09=09=09=09=09=09=
+=09=09</tr>
+=09=09=09=09=09=09=09</tbody>
+=09=09=09=09=09=09</table>
+=
+=09=09=09=09=09=09</div>
+
+=09=09=09=09=09=09<div class=3D"social-spacer=
+" style=3D"width: 2%; height: 50px; float: left;display: inline;">&nbsp;</d=
+iv>
+
+=09=09=09=09=09=09<div class=3D"social-cell" style=3D"width: 22%; =
+float: left;display: inline;">
+=09=09=09=09=09=09<table bgcolor=3D"#b3121=
+7" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"border-radius:=
+3px !important; height:50px; width:100%">
+=09=09=09=09=09=09=09<tbody>
+=
+=09=09=09=09=09=09=09=09<tr>
+=09=09=09=09=09=09=09=09=09<td align=3D"cent=
+er" class=3D"hover-me-3" valign=3D"middle"><!--[if mso]><v:roundrect xmlns:=
+v=3D"urn:schemas-microsoft-com:vml" xmlns:w=3D"urn:schemas-microsoft-com:of=
+fice:word" href=3D"https://www.youtube.com/user/TheLinuxFoundation" style=
+=3D"height:50px;v-text-anchor:middle;width:179px;text-transform:uppercase;"=
+ arcsize=3D"5%" stroke=3D"f" fillcolor=3D"#b31217"><w:anchorlock></w:anchor=
+lock><center style=3D"color:#ffffff;font-family:Helvetica, Arial,sans-serif=
+;font-size:10px;text-transform:uppercase;"> Youtube</center></v:roundrect><=
+![endif]--><a data-hs-link-id=3D"0" href=3D"https://www.youtube.com/user/Th=
+eLinuxFoundation" style=3D"line-height:50px; display:block; text-decoration=
+: none !important; width: 100%;-webkit-text-size-adjust:none;mso-hide:all;"=
+><span style=3D"text-decoration:none">&nbsp;</span><span style=3D"border-ra=
+dius:3px !important; color:#fefefe !important; font-family:open
+sans,helv=
+etica,arial,sans-serif !important; font-size:10px !important; font-weight:4=
+00 !important; text-decoration:none !important; text-transform:uppercase !i=
+mportant"> Youtube</span> </a></td>
+=09=09=09=09=09=09=09=09</tr>
+=09=
+=09=09=09=09=09=09</tbody>
+=09=09=09=09=09=09</table>
+=09=09=09=09=09=
+=09</div>
+
+=09=09=09=09=09=09<div class=3D"social-spacer" style=3D"widt=
+h: 2%; height: 50px; float: left;display: inline;">&nbsp;</div>
+
+=09=09=
+=09=09=09=09<div class=3D"social-cell" style=3D"width: 22%; float: left;dis=
+play: inline;">
+=09=09=09=09=09=09<table bgcolor=3D"#3eb991" border=3D"0"=
+ cellpadding=3D"0" cellspacing=3D"0" style=3D"border-radius:3px !important;=
+ height:50px; width:100%">
+=09=09=09=09=09=09=09<tbody>
+=09=09=09=09=09=
+=09=09=09<tr>
+=09=09=09=09=09=09=09=09=09<td align=3D"center" class=3D"ho=
+ver-me-4" valign=3D"middle"><!--[if mso]><v:roundrect xmlns:v=3D"urn:schema=
+s-microsoft-com:vml" xmlns:w=3D"urn:schemas-microsoft-com:office:word" href=
+=3D"https://events-slackin.linuxfoundation.org/" style=3D"height:50px;v-tex=
+t-anchor:middle;width:179px;text-transform:uppercase;" arcsize=3D"5%" strok=
+e=3D"f" fillcolor=3D"#36549D"><w:anchorlock></w:anchorlock><center style=3D=
+"color:#ffffff;font-family:Helvetica, Arial,sans-serif;font-size:10px;text-=
+transform:uppercase;"> Slack</center></v:roundrect><![endif]--><a data-hs-l=
+ink-id=3D"0" href=3D"https://events-slackin.linuxfoundation.org/" style=3D"=
+line-height:50px; display:block; text-decoration: none !important; width: 1=
+00%;-webkit-text-size-adjust:none;mso-hide:all;"><span style=3D"text-decora=
+tion:none">&nbsp;</span><span style=3D"border-radius:3px !important; color:=
+#fefefe !important; font-family:open
+sans,helvetica,arial,sans-serif !imp=
+ortant; font-size:10px !important; font-weight:400 !important; text-decorat=
+ion:none !important; text-transform:uppercase !important">Slack</span> </a>=
+</td>
+=09=09=09=09=09=09=09=09</tr>
+=09=09=09=09=09=09=09</tbody>
+=09=
+=09=09=09=09=09</table>
+=09=09=09=09=09=09</div>
+=09=09=09=09=09=09</td=
+>
+=09=09=09=09=09</tr>
+=09=09=09=09</tbody>
+=09=09=09</table>
+=09=
+=09=09<!--end social buttons !-->&nbsp;
+
+=09=09=09<table border=3D"0" c=
+ellpadding=3D"0" cellspacing=3D"0" class=3D"responsive-table" style=3D"widt=
+h:640px" valign=3D"top">
+=09=09=09=09<tbody>
+=09=09=09=09=09<tr>
+=09=
+=09=09=09=09=09<td align=3D"center" valign=3D"top"><a data-hs-link-id=3D"0"=
+ href=3D"https://www2.thelinuxfoundation.org/e/6342/2018-10-03/41mhr6/91946=
+3637"><img alt=3D"The Linux Foundation" src=3D"http://go.linuxfoundation.or=
+g/l/6342/2016-10-07/3jd6h1/6342/158800/logo_tlf_mark_only_60x60png.png" sty=
+le=3D"border:0; height:60px; width:60px"></a></td>
+=09=09=09=09=09</tr>=
+
+=09=09=09=09=09<tr height=3D"21">
+=09=09=09=09=09=09<td>&nbsp;</td>
+=
+=09=09=09=09=09</tr>
+=09=09=09=09=09<tr>
+=09=09=09=09=09=09<td align=3D=
+"center" style=3D"font-family:'Open Sans', Helvetica, Arial, sans-serif !im=
+portant;font-weight:400 !important;color:#7e8890 !important;font-size:12px =
+!important;text-transform:uppercase !important;letter-spacing:.045em !impor=
+tant;" valign=3D"top">CREATING THE LARGEST SHARED<br>
+=09=09=09=09=09=09T=
+ECHNOLOGY INVESTMENT IN HISTORY</td>
+=09=09=09=09=09</tr>
+=09=09=09=09=
+=09<tr height=3D"20" style=3D"padding: 0; margin: 0; font-size: 0; line-hei=
+ght: 0;">
+=09=09=09=09=09=09<td>&nbsp;</td>
+=09=09=09=09=09</tr>
+=09=
+=09=09=09=09<tr>
+=09=09=09=09=09=09<td align=3D"center"><a href=3D"https:=
+//www2.thelinuxfoundation.org/webmail/6342/919463637/8934f3106ce17589806a45=
+d3601ebdf3f4c20e699dc3c1b5541b89c4e984c740" style=3D"font-family:'Open Sans=
+', Helvetica, Arial, sans-serif !important;font-weight:200 !important; font=
+-size:12px; color:#989ca5 !important; padding: 1px 0; border-bottom: 1px so=
+lid #bfc4c8; text-decoration: none !important;">View in browser</a><br>
+=
+=09=09=09=09=09=09<br>
+=09=09=09=09=09=09<a href=3D"https://www2.thelinux=
+foundation.org/set-email-preferences?ehash=3D8934f3106ce17589806a45d3601ebd=
+f3f4c20e699dc3c1b5541b89c4e984c740&email_id=3D919463637" style=3D"font-fami=
+ly:'Open Sans', Helvetica, Arial, sans-serif !important;font-size:12px !imp=
+ortant;color:#7e8890 !important;">Manage your email preferences</a></td>
+=
+=09=09=09=09=09</tr>
+=09=09=09=09=09<tr height=3D"21" style=3D"padding: 0=
+; margin: 0; font-size: 0; line-height: 0;">
+=09=09=09=09=09=09<td>&nbsp;=
+</td>
+=09=09=09=09=09</tr>
+=09=09=09=09=09<tr>
+=09=09=09=09=09=09<td =
+align=3D"center" valign=3D"top">
+=09=09=09=09=09=09<p style=3D"margin-bot=
+tom: 1em; font-family:'Open Sans', Helvetica, Arial, sans-serif !important;=
+padding:0 !important;margin:0 !important;color:#7e8890 !important;font-size=
+:12px !important;font-weight:300 !important;"><br>
+=09=09=09=09=09=09<spa=
+n class=3D"appleLinks">The Linux Foundation<br>
+=09=09=09=09=09=09One Let=
+terman Drive Building D<br>
+=09=09=09=09=09=09Suite D4700<br>
+=09=09=09=
+=09=09=09San Francisco, CA 94129</span></p>
+=09=09=09=09=09=09</td>
+=09=
+=09=09=09=09</tr>
+=09=09=09=09=09<tr height=3D"38">
+=09=09=09=09=09=09<=
+td>&nbsp;</td>
+=09=09=09=09=09</tr>
+=09=09=09=09</tbody>
+=09=09=09</t=
+able>
+
+=09=09=09<div style=3D"display:none; white-space:nowrap; font:15=
+px courier; line-height:0;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp=
+; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nb=
+sp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &=
+nbsp; &nbsp;</div>
+=09=09=09</td>
+=09=09</tr>
+=09</tbody>
+</table>=
+
+</center>
+<img alt=3D"" src=3D"https://www2.thelinuxfoundation.org/r/6=
+342/1/919463637/open/1" /><style>@media print{ #_t { background-image: url(=
+'https://a5rm3cnh.emltrk.com/a5rm3cnh?p');}} div.OutlookMessageHeader {back=
+ground-image:url('https://a5rm3cnh.emltrk.com/a5rm3cnh?f')} table.moz-email=
+-headers-table {background-image:url('https://a5rm3cnh.emltrk.com/a5rm3cnh?=
+f')} blockquote #_t {background-image:url('https://a5rm3cnh.emltrk.com/a5rm=
+3cnh?f')} #MailContainerBody #_t {background-image:url('https://a5rm3cnh.em=
+ltrk.com/a5rm3cnh?f')}</style><div id=3D"_t"></div>
+<img src=3D"https://a=
+5rm3cnh.emltrk.com/a5rm3cnh" width=3D"1" height=3D"1" border=3D"0" /></body=
+></html>
+
+--_=_swift_v4_1538589892_917eb2c4dcb35d6d85622213dd7db5a0_=_--
+
+
+

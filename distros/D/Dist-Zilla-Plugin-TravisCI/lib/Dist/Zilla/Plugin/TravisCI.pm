@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::TravisCI;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Integrating the generation of .travis.yml into your dzil
-$Dist::Zilla::Plugin::TravisCI::VERSION = '0.010';
+$Dist::Zilla::Plugin::TravisCI::VERSION = '0.011';
 use Moose;
 use Path::Tiny qw( path );
 use Dist::Zilla::File::FromCode;
@@ -22,6 +22,9 @@ has irc_template  => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [
 ] } );
 
 has perl_version  => ( is => 'ro', isa => 'ArrayRef[Str]', default => sub { [
+   "5.28",
+   "5.26",
+   "5.24",
    "5.22",
    "5.20",
    "5.18",
@@ -212,7 +215,7 @@ Dist::Zilla::Plugin::TravisCI - Integrating the generation of .travis.yml into y
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 

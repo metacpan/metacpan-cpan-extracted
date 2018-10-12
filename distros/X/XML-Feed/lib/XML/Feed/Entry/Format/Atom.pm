@@ -1,12 +1,14 @@
 package XML::Feed::Entry::Format::Atom;
 use strict;
 use warnings;
+use v5.10;
 
-our $VERSION = '0.53';
+our $VERSION = '0.55';
 
 use base qw( XML::Feed::Entry );
 use XML::Atom::Util qw( iso2dt );
 use XML::Feed::Content;
+use XML::Feed::Util qw( format_W3CDTF );
 use XML::Atom::Entry;
 use List::Util qw( first );
 
@@ -70,46 +72,58 @@ my %types = (
 sub content {
     my $entry = shift;
     if (@_) {
-        my %param;
-        my $base;
-        my $orig_body;
-        if (ref($_[0]) eq 'XML::Feed::Content') {
-            $orig_body = $_[0]->body;
-            if (defined $_[0]->type && defined $types{$_[0]->type}) {
-                %param = (Body => $orig_body, Type => $types{$_[0]->type});
-
-                if ($param{'Type'} eq "html") {
-                    $param{'Body'} = HTML::Entities::encode_entities($param{'Body'});
-                }
-            } else {
-            }
-            $base = $_[0]->base if defined $_[0]->base;
-        } else {
-            $orig_body = $_[0];
-        }
-        if (!exists($param{Body}))
-        {
-            $param{Body} = $orig_body;
-        }
-        $entry->{entry}->content(XML::Atom::Content->new(%param, Version => 1.0));
-        # Assigning again so the type will be normalized. This seems to be
-        # an XML-Atom do-what-I-don't-meannery.
-        $entry->{entry}->content->body($orig_body);
-        $entry->{entry}->content->base($base) if defined $base;
+        return $entry->set_content(@_);
     } else {
-        my $c = $entry->{entry}->content;
-
-        # map Atom types to MIME types
-        my $type = $c ? $c->type : undef;
-        if ($type) {
-            $type = 'text/html'  if $type eq 'xhtml' || $type eq 'html';
-            $type = 'text/plain' if $type eq 'text';
-        }
-
-        XML::Feed::Content->wrap({ type => $type,
-                                   base => $c ? $c->base : undef,
-                                   body => $c ? $c->body : undef });
+	return $entry->get_content;
     }
+}
+
+sub set_content {
+    my $entry = shift;
+
+    my %param;
+    my $base;
+    my $orig_body;
+    if (ref($_[0]) eq 'XML::Feed::Content') {
+        $orig_body = $_[0]->body;
+        if (defined $_[0]->type && defined $types{$_[0]->type}) {
+            %param = (Body => $orig_body, Type => $types{$_[0]->type});
+
+            if ($param{'Type'} eq "html") {
+                $param{'Body'} = HTML::Entities::encode_entities($param{'Body'});
+            }
+        } else {
+        }
+        $base = $_[0]->base if defined $_[0]->base;
+    } else {
+        $orig_body = $_[0];
+    }
+    if (!exists($param{Body}))
+    {
+        $param{Body} = $orig_body;
+    }
+    $entry->{entry}->content(XML::Atom::Content->new(%param, Version => 1.0));
+    # Assigning again so the type will be normalized. This seems to be
+    # an XML-Atom do-what-I-don't-meannery.
+    $entry->{entry}->content->body($orig_body);
+    $entry->{entry}->content->base($base) if defined $base;
+}
+
+sub get_content {
+    my $entry = shift;
+
+    my $c = $entry->{entry}->content;
+
+    # map Atom types to MIME types
+    my $type = $c ? $c->type : undef;
+    if ($type) {
+        $type = 'text/html'  if $type eq 'xhtml' || $type eq 'html';
+        $type = 'text/plain' if $type eq 'text';
+    }
+
+    XML::Feed::Content->wrap({ type => $type,
+                               base => $c ? $c->base : undef,
+                               body => $c ? $c->body : undef });
 }
 
 sub category {
@@ -123,7 +137,7 @@ sub category {
 
         my @category = ($entry->{entry}->can('categories')) ? $entry->{entry}->categories : $entry->{entry}->category;
         my @return = @category
-            ? (map { $_->label || $_->term } @category)
+            ? (map { $_->label // $_->term } @category)
             : $entry->{entry}->getlist($ns, 'subject');
 
         return wantarray? @return : $return[0];
@@ -146,7 +160,7 @@ sub id { shift->{entry}->id(@_) }
 sub issued {
     my $entry = shift;
     if (@_) {
-        $entry->{entry}->issued(DateTime::Format::W3CDTF->format_datetime($_[0])) if $_[0];
+        $entry->{entry}->issued(format_W3CDTF($_[0])) if $_[0];
     } else {
         return iso2dt($entry->{entry}->issued)
             if $entry->{entry}->issued;
@@ -159,7 +173,7 @@ sub issued {
 sub modified {
     my $entry = shift;
     if (@_) {
-        $entry->{entry}->modified(DateTime::Format::W3CDTF->format_datetime($_[0])) if $_[0];
+        $entry->{entry}->modified(format_W3CDTF($_[0])) if $_[0];
     } else {
         return iso2dt($entry->{entry}->modified) if $entry->{entry}->modified;
         return iso2dt($entry->{entry}->updated)  if $entry->{entry}->updated;

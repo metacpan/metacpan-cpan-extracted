@@ -1,7 +1,7 @@
 package Perinci::Sub::To::Text;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.863'; # VERSION
+our $DATE = '2018-10-12'; # DATE
+our $VERSION = '0.864'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -80,7 +80,7 @@ sub after_gen_doc {
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information."))
         unless $orig_result_naked;
@@ -106,7 +106,7 @@ Perinci::Sub::To::Text - Generate text documentation from Rinci function metadat
 
 =head1 VERSION
 
-This document describes version 0.863 of Perinci::Sub::To::Text (from Perl distribution Perinci-To-Doc), released on 2018-09-10.
+This document describes version 0.864 of Perinci::Sub::To::Text (from Perl distribution Perinci-To-Doc), released on 2018-10-12.
 
 =head1 SYNOPSIS
 

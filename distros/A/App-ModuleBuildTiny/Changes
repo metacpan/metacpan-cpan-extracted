@@ -1,5 +1,9 @@
 Revision history for App-ModuleBuildTiny
 
+0.024
+          - Write generated files as binary
+          - Decode author names when POD is encoded
+
 0.023
           - Work around older CPAN.pm metadata confusion
           - Try taking author list from "AUTHORS" section too.

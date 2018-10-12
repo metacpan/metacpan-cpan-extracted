@@ -31,18 +31,18 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart );
 
-$VERSION = '0.015';
+$VERSION = '0.023';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of gradients weighted proportionally to multidimensional distances.';
 
 #######################################################################
 # Interlinear
-#######################################################################
+#############################################$tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ##########################
 
-
+$tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
 my $maxloops= 1000;
 my $sourcefile = "/home/luca/int/starcloud_micro.csv";
 my $newfile = $sourcefile . "_meta.csv";
-my $report = $newfile . "_report.txt";
+my $report = $newfile . "_reprt.txt";
 my @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
 #my @mode = ( "near" ); # "nea" means "nearest neighbour"
 #@mode = ( ""mix" ); # "mix" means sequentially mixed in each loop.
@@ -73,6 +73,7 @@ my $minreq_formerge = 0; # THIS VALUE SPECIFIES A STRENGTH VALUE (LEVEL OF RELIA
 my $minimumcertain = 0; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED TO USE A DATUM TO BUILD UPON IT. IT DEPENDS ON THE DISTANCE FROM THE ORIGINS OF THE DATUM. THE LONGER THE DISTANCE, THE SMALLER THE STRENGTH (WHICH IS INDEED INVERSELY PROPORTIONAL). A STENGTH VALUE OF 1 IS OF A SIMULATED DATUM, NOT OF A DERIVED DATUM. If 0, no entry barrier.
 my $minimumhold = 1; # WHAT IS THE MINIMUM LEVEL OF STRENGTH (LEVEL OF RELIABILITY) REQUIRED FOR NOT AVERAGING A DATUM WITH ANOTHER, DERIVED DATUM. USUALLY IT HAS TO BE KEPT EQUAL TO $minimimcertain.  If 1, ONLY THE MODEL DATA ARE NOT SUBSTITUTABLE IN THE METAMODEL.
 my $condweight = "yes"; # THIS CONDITIONS TELLS IF THE STRENGTH (LEVEL OF RELIABILITY) OF THE GRADIENTS HAS TO BE CUMULATIVELY TAKEN INTO ACCOUNT IN THE WEIGHTING CALCULATIONS.
+my $tee = new IO::Tee(\*STDOUT, ">>$report");
 
 #######################################################################
 
@@ -93,11 +94,18 @@ sub odd
 
 sub tellstepsize
 {
-  my ( $flev_ref ) = @_;
-  my %factlevels =  %{ $flev_ref }; #say $tee "FACTLEVELS0: " . dump( %factlevels ); say $tee "\$factlevels{pairs}: " . dump( $factlevels{pairs} );
+  my %factlevels = %{ $_[0] }; #say $tee "FACTLEVELS IN tellstepsize: " . dump( %factlevels ); say $tee "\$factlevels{pairs}: " . dump( $factlevels{pairs} );
   foreach my $fact ( sort {$a <=> $b} ( keys %{ $factlevels{pairs} } ) )
   { #say $tee "\$fact: " . dump( $fact );
-    my $stepsize = ( 1 / ( $factlevels{pairs}{$fact} - 1 ) ); #say $tee "\$stepsize: " . dump( $stepsize );
+    my $stepsize;
+    if ( not( $factlevels{pairs}{$fact} == 1 ) )
+    {
+      $stepsize = ( 1 / ( $factlevels{pairs}{$fact} - 1 ) ); #say $tee "\$stepsize: " . dump( $stepsize );
+    }
+    else
+    {
+      $stepsize = 0; #say $tee "\$stepsize: " . dump( $stepsize );
+    }
     $factlevels{stepsizes}{$fact} = $stepsize ;
   } #say $tee "FACTLEVELS1: " . dump( %factlevels );
   return( \%factlevels );
@@ -115,7 +123,7 @@ sub union
   return @union;
 }
 
-sub diff__
+sub diff_old
 {
   my $aref = shift;
   my $bref = shift;
@@ -135,7 +143,7 @@ sub diff__
 }
 
 
-sub diff_old
+sub diff_
 {
   my $aref = shift;
   my $bref = shift;
@@ -325,7 +333,7 @@ sub weightvals1
 
       if ( ( $strength ne "" ) and ( $sum_strengths ne "" ) )
       {
-        $soughtgrad = ( $soughtgrad + ( $grad * ( $strength / $sum_strengths ) ) ); say $tee "887 SAYY \$soughtgrad: " . dump( $soughtgrad );
+        $soughtgrad = ( $soughtgrad + ( $grad * ( $strength / $sum_strengths ) ) ); #say $tee "887 SAYY \$soughtgrad: " . dump( $soughtgrad );
         #say $tee "577 produced \$soughtgrad: " . dump( $soughtgrad );
       }
       $in++;
@@ -489,26 +497,29 @@ sub calcdist
 
 sub calcdistgrad
 {
-  my ( $el1, $elt1, $factlevels_ref, $minreq, $maxdist, $el3, $elt3, $condweight ) = @_; #say $tee "777c\$el1: " . dump( $el1 ); say $tee "777c\$elt1: " . dump( $elt1 ); say $tee "777c\$minreq: " . dump( $minreq );
+  my ( $el1, $elt1, $factlevels_ref, $minreq, $maxdist, $el3, $elt3, $condweight, $el, $elt ) = @_; #say $tee "777c\$el1: " . dump( $el1 ); say $tee "777c\$elt1: " . dump( $elt1 ); say $tee "777c\$minreq: " . dump( $minreq );
   my %factlevels = %{ $factlevels_ref };
-  my @diff1 = diff( \@{ $el1 }, \@{ $elt1 } ); #say $tee "777\@diff1: " . dump( @diff1 );
+  #say $tee "IN CALCDISTGRAD \$el1: " . dump( $el1 );
+  #say $tee "IN CALCDISTGRAD \$elt1: " . dump( $elt1 );
+  my @diff1 = diff( \@{ $el1 }, \@{ $elt1 } ); #say $tee "IN CALCDISTGRAD \@diff1: " . dump( @diff1 );
   my $dist;
   my ( @factbag, @levbag, @stepbag, @da1, @da1par, @da2, @da2par, @diff2 );
   #say $tee "777\scalar( \@diff1 ): " . dump( scalar( @diff1 ) ); say $tee "777\$minreq: " . dump( $minreq );
+  #say $tee "\$minreq->[0]: " . dump( $minreq->[0] );
   if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= $minreq->[0] ) )
   {
-    @diff2 = diff( \@{ $elt1 } , \@{ $el1 } ); #say $tee "777b \@diff2: " . dump( @diff2 ); say $tee "777\@diff1: " . dump( @diff1 );
+    @diff2 = diff( \@{ $elt1 } , \@{ $el1 } ); #say $tee "IN CALCDISTGRAD \@diff2: " . dump( @diff2 );
 
-    my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "THEN \%h1: " . dump( %h1 );
-    @da1 = keys %h1; #say $tee "THEN \@da1: " . dump( @da1 );
-    @da1par = values %h1; #say $tee "\@da1par: " . dump( @da1par );
-    my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "THEN \%h2: " . dump( %h2 );
-    @da2 = keys %h2; #say $tee "THEN \@da2: " . dump( @da2 );
-    @da2par = values %h2; #say $tee "\@da2par: " . dump( @da2par );
+    my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "IN CALCDISTGRAD \%h1: " . dump( \%h1 );
+    @da1 = keys %h1; #say $tee "IN CALCDISTGRAD \@da1: " . dump( @da1 );
+    @da1par = values %h1; #say $tee "IN CALCDISTGRAD \@da1par: " . dump( @da1par );
+    my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "IN CALCDISTGRAD \%h2: " . dump( \%h2 );
+    @da2 = keys %h2; #say $tee "IN CALCDISTGRAD \@da2: " . dump( @da2 );
+    @da2par = values %h2; #say $tee "IN CALCDISTGRAD \@da2par: " . dump( @da2par );
 
     my $c = 0;
     foreach my $lev1 ( @da1par )
-    { #say $tee "\$e: " . dump( $e );
+    {
       my $da1 = $da1[$c];
       my $i = 0;
       foreach my $lev2 ( @da2par )
@@ -530,11 +541,15 @@ sub calcdistgrad
       $c++;
     }
   }
+  else
+  {
+
+  }
 
   unless ( ( scalar( @levbag ) == 0 ) or ( scalar( @factbag ) == 0 ) or ( scalar( @stepbag ) == 0 ) )
   {
-    my $ordist = scalar( @levbag ); #say $tee "777b \$ordist: " . dump( $ordist );
-    my $rawdist = pythagoras( \@factbag, \@levbag, \@stepbag ); #say $tee "777b \$rawdist: " . dump( $rawdist );
+    my $ordist = scalar( @levbag ); #say $tee "IN CALCDISTGRAD \$ordist: " . dump( $ordist );
+    my $rawdist = pythagoras( \@factbag, \@levbag, \@stepbag ); #say $tee "IN CALCDISTGRAD \$rawdist: " . dump( $rawdist );
     my ( $dist, $strength );
 
     if ( $maxdist ne "" )
@@ -585,29 +600,17 @@ sub wei
   { #say $tee "NOW IN FILLBANK.";
     my %bank;
     foreach my $el ( @arr )
-    { #say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
+    { #say $tee "SO IN FIRST ARR CHECK" ;  say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
       my $key =  $el->[0] ; #say $tee "\$key: " . dump( $key );
       if ( ( $el->[2] ne "" ) and ( $el->[3] >= $minimumcertain ) )
-      { #say $tee "\nTRYING \$el->[1]: " . dump( $el->[1] );
+      { #say $tee "SO IN SECOND ARR CHECK" ; say $tee "\nTRYING \$el->[1]: " . dump( $el->[1] );
         foreach my $elt ( @arr )
-        { #say $tee "SO, ELT: " . dump( $elt ); #say $tee "IN WHICH, ELT0: " . dump( @{ $elt->[0] } );
+        { #say $tee "SO, ELT: " . dump( $elt ); say $tee "IN WHICH, ELT0: " . dump( @{ $elt->[0] } );
           if ( ( $elt->[2] ne "" ) and ( $elt->[0] ne $el->[0] ) and ( $el->[3] >= $minimumcertain ) )
           { #say $tee "NOW CHECKING .";
 
-            #my $d_ref; say $tee "\$el->[1] : " . dump( $el->[1] ); say $tee "\$elt->[1]: " . dump( $elt->[1] );
-            my ( $res_ref ) = calcdistgrad( $el->[1], $elt->[1], \%factlevels, $minreq_forgrad, $maxdist, $el->[3], $elt->[3], $condweight );
-            #say $tee "\OBTAINED11 \$res_ref: " . dump( $res_ref );
-            #if ( $res_ref ne "" )
-            unless ( !keys %{ $res_ref } )
-            {
-              $d_ref = $res_ref; #say $tee "FOUND \$d_ref: " . dump( $d_ref );
-              #say $tee "\$el->[1]: " . dump( $el->[1] );
-              #say $tee "\$elt->[1]: " . dump( $elt->[1] );
-            }
-            #else
-            #{
-            #  say $tee "NULL!";
-            #} #say $tee "D_REF: " . dump( $d_ref );
+            my ( $res_ref ) = calcdistgrad( $el->[1], $elt->[1], \%factlevels, $minreq_forgrad, $maxdist, $el->[3], $elt->[3], $condweight, $el, $elt );
+            #say $tee "\OBTAINED DIST \$res_ref: " . dump( $res_ref );
 
             my %d;
             my ( @diff1, @diff2, @da1, @da2, @da1par, @da2par );
@@ -615,16 +618,16 @@ sub wei
 
             unless ( !keys %{ $res_ref } )
             {
-              %d = %{ $d_ref }; #say $tee "\%d: " . dump( %d );
-              @diff1 = @{$d{diff1}};
-              @diff2 = @{$d{diff2}};
-              @da1 = @{$d{da1}};
-              @da2 = @{$d{da2}};
-              @da1par = @{$d{da1par}};
-              @da2par = @{$d{da2par}};
-              $ordist = $d{ordist}; #say $tee "\$ordist: " . dump ( $ordist ); #say $tee "D: " . dump ( %d );
-              $dist = $d{dist};
-              $strength = $d{strength};
+              %d = %{ $res_ref }; #say $tee "FOUND \%d: " . dump( \%d );
+              @diff1 = @{$d{diff1}}; #say $tee "FOUND \@diff1: " . dump( @diff1 );
+              @diff2 = @{$d{diff2}}; #say $tee "FOUND \@diff2: " . dump( @diff2 );
+              @da1 = @{$d{da1}}; #say $tee "FOUND \@da1: " . dump( @da1 );
+              @da2 = @{$d{da2}}; #say $tee "FOUND \@da2: " . dump( @da2 );
+              @da1par = @{$d{da1par}}; #say $tee "FOUND \@da1par: " . dump( @da1par );
+              @da2par = @{$d{da2par}}; #say $tee "FOUND \@da2par: " . dump( @da2par );
+              $ordist = $d{ordist}; #say $tee "FOUND \$ordist: " . dump ( $ordist ); #say $tee "D: " . dump ( %d );
+              $dist = $d{dist}; #say $tee "FOUND \$dist: " . dump( $dist );
+              $strength = $d{strength}; #say $tee "FOUND \$strength: " . dump( $strength );
             }
             #else
             #{
@@ -645,8 +648,8 @@ sub wei
                 { #say $tee "WORKING \$d20: " . dump( $d20 );
 
                   if ( $d10 == $d20 )
-                  {
-                    my $stepsize = $factlevels{stepsizes}{$d20}; #say $tee "454\$stepsize: " . dump( $stepsize );
+                  { #say $tee "THIS: d10 AND d20: " . dump( $d20 );
+                    my $stepsize = $factlevels{stepsizes}{$d20}; #say $tee "$stepsize: " . dump( $stepsize );
                     my $d21 = $da2par[$co]; #say $tee "WORKING \$d21: " . dump( $d21 );
                     #if ( ( $d10 eq $d20 ) and ( abs( $d11 - $d21 ) == 1 ) and ( $d11 > 0 ) and ( $d21 > 0 ) and ( $d11 ne "" ) and ( $d21 ne "" )
                     #  and ( $d11 ne $d21 ) ) #### if ( ( $d10 eq $d20 ) and ( $d11 ne $d21 ) ) ###  THE SECOND CONDITION COULD BE LOGICALLY REDUNDANT. CHECK. ####
@@ -689,7 +692,7 @@ sub wei
                         my $grad;
                         if ( ( $diffpos ne "" ) and ( $diffpos != 0 ) )
                         {
-                          $grad = ( $diffval / $diffpos ); #say $tee "WORKING \$grad: " . dump( $grad );
+                          $grad = ( $diffval / $diffpos ); #say $tee "DEFINING \$grad: " . dump( $grad );
                         }
 
                         if ( $grad ne "" )
@@ -837,7 +840,7 @@ sub wei
                           {
                             if ( $da1[$c] == $da2[$i] )
                             {
-                              my $diffpar = abs( $e - $ei ); say $tee "335 \$diffpar: " . dump( $diffpar );
+                              my $diffpar = abs( $e - $ei ); #say $tee "335 \$diffpar: " . dump( $diffpar );
                               #if ( ( $diffpar >= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) )
                               if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ############################à
                               {
@@ -1317,7 +1320,7 @@ sub mixlimbo
 
 sub prepfactlev
 {
-  my @aarr = @_;
+  my @aarr = @{ $_[0] };
   my %hsh;
   foreach my $el ( @aarr )
   {
@@ -1325,6 +1328,34 @@ sub prepfactlev
     {
       my ( $head, $tail ) = split( /-/ , $bit );
       $hsh{pairs}{$head} = $tail;
+    }
+  }
+  return( \%hsh );
+}
+
+
+sub prepfactlev_delete
+{
+  my ( $aarr_r, $blockelts_r ) = @_;
+  my @aarr = @{ $aarr_r };
+  my @blockelts = @{ $blockelts_r };
+  my %hsh;
+  foreach my $el ( @aarr )
+  {
+    foreach my $bit ( @{ $el->[1] } )
+    {
+      my ( $head, $tail ) = split( /-/ , $bit );
+      if ( $blockelts_r eq "" )
+      {
+        $hsh{pairs}{$head} = $tail;
+      }
+      else
+      {
+        if ( $head ~~ @blockelts )
+        {
+          $hsh{pairs}{$head} = $tail;
+        }
+      }
     }
   }
   return( %hsh );
@@ -1337,9 +1368,9 @@ say "
 This is Interlinear.
 Name of a configuration file (Unix path):
 ";
-	my $configfile = <STDIN>;
-	chomp $configfile;
-	if (-e $configfile )
+	my $confile = <STDIN>;
+	chomp $confile;
+	if (-e $confile )
   {
     say "\
     Now the name of a csv file:
@@ -1353,7 +1384,7 @@ Name of a configuration file (Unix path):
     It may be specified in the configuration file.
     ";
   }
-  @arr = interlinear( $configfile, $sourcefile );
+  @arr = interlinear( $confile, $sourcefile );
 }
 
 
@@ -1364,13 +1395,21 @@ my @arr;
 
 sub interlinear
 {
-  my ( $configf, $sourcef ) = @_;
-  if ( $sourcef ne "" ){ $sourcefile = $sourcef; }
-  if ( $configf ne "" ){ $configfile = $configf; }
+  my ( $configf, $sourcef, $metafile, $blockelts_r, $reportf ) = @_;
+  if ( $reportf ne "" ){ $report = $reportf; } #say $tee "CHECK5 \$report: " . dump( $report );
+  $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
 
-  $tee = new IO::Tee(\*STDOUT, ">$report");
+  if ( $configf ne "" ){ $confile = $configf; }; #say $tee "CHECK5 \$confile: " . dump( $confile );
 
-  my @mode = adjustmode( $maxloops, \@mode ); say $tee
+  #require $confile; ############## FIX THIS!
+
+  if ( $sourcef ne "" ){ $sourcefile = $sourcef; } #say $tee "CHECK5 \$sourcefile: " . dump( $sourcefile );
+  if ( $metafile ne "" ){ $newfile = $metafile; } say $tee "CHECK5 \$newfile: " . dump( $newfile );
+
+  my @blockelts;
+  if ( $blockelts_r ne "" ){ @blockelts = @{ $blockelts_r }; } #say $tee "CHECK5 \@blockelts: " . dump( @blockelts );
+
+  my @mode = adjustmode( $maxloops, \@mode );
   open( SOURCEFILE, "$sourcefile" ) or die;
   my @lines = <SOURCEFILE>;
   close SOURCEFILE;
@@ -1379,13 +1418,13 @@ sub interlinear
   my $aarr_ref;
   ( $aarr_ref, $optformat ) = preparearr( \@lines );
 
-  my @aarr = @{ $aarr_ref };
+  my @aarr = @{ $aarr_ref }; #say $tee "REALLY \@aarr: " . dump( @aarr );
 
   say $tee "Checking factors and levels.";
-  my %factlevels = prepfactlev( @aarr );
+  my %factlevels = %{ prepfactlev( \@aarr ) }; #say $tee "REALLY \%factlevels: " . dump( \%factlevels );
 
   my ( $factlev_ref ) = tellstepsize( \%factlevels );
-  my %factlev = %{ $factlev_ref }; #say $tee "\%factlev: " . dump( %factlev );
+  my %factlev = %{ $factlev_ref }; #say $tee "REALLY \%factlev: " . dump( %factlev );
 
   my $maxdist = calcmaxdist( \@aarr, \%factlev ); #say $tee "001\$maxdist: " . dump( $maxdist );
 
@@ -1414,6 +1453,27 @@ sub interlinear
     #}
     #say $tee "OBTAINED limbo_vault: " . dump( @limbo_vault );
     #say $tee "THERE ARE " . scalar( @limbo_vault ) . " ITEMS IN THIS LOOP , NUMBER " . ( $count + 1 ). ", 1, FOR GLOBALLY WEIGHTED GRADIENT INTERPOLATION.";
+
+
+    sub checkstop
+    {
+      my @arr = @_;
+      my $t = 0;
+      foreach my $e ( @arr )
+      {
+        if ( $e->[2] eq "" )
+        {
+          $t++;
+        }
+      }
+      if ( $t == 0)
+      {
+        say $tee "EXITING. DONE.";
+        printend( \@arr, $newfile, $optformat );
+        last;
+      }
+    }
+    checkstop( @arr );
 
 
     if ( ( $mode__ eq "wei" ) or ( $mode__ eq "mix" ) )
@@ -1454,7 +1514,7 @@ sub interlinear
       @limbo = @limbo_near;
     }
 
-    #if ( $mode__ eq "mix" )
+    #if ( $mode__ eq "mix" )printend( \@arr, $newfile, $optformat );
     #{
     #  my @limbo_prov = mixlimbo( \@limbo_wei, \@limbo_purelin, $presence, $linearprecedence, \@weights );
     #  @limbo = mixlimbo( \@limbo_prov, \@limbo_near, $presence, $linearprecedence, \@weights );
@@ -1465,10 +1525,11 @@ sub interlinear
     say $tee "THERE ARE " . scalar( @limbo ) . " ITEMS COMING OUT FROM THIS MIX " . ( $count + 1 );
 
 
-
     if ( ( scalar( @limbo ) == 0 ) )
     {
       #say $tee "ARR END: " . dump( @arr );
+      say $tee "EXITING.";
+      printend( \@arr, $newfile, $optformat );
       last;
     }
 
@@ -1514,9 +1575,8 @@ sub interlinear
 }
 
 
-
 if ( @ARGV )
-{my $maxloops= 1000;
+{
   my $first = $_[0];
   if ( $first eq "interstart" )
   {
@@ -1532,29 +1592,37 @@ if ( @ARGV )
   }
 }
 
-open( NEWFILE, ">$newfile" ) or die;
 
-foreach my $entry ( @arr )
+sub printend
 {
-  if ( $optformat eq "yes" )
+  my ( $arr_r, $newfile, $optformat ) = @_;
+  my @arr = @{ $arr_r };
+
+  open( NEWFILE, ">$newfile" ) or die;
+  foreach my $entry ( @arr )
   {
-    print NEWFILE "$entry->[0],$entry->[2]\n";
-  }
-  elsif ( $optformat eq "no" )
-  {
-    my $coun = 0;
-    foreach my $item ( @{ $entry->[1] } )
+    if ( $optformat eq "yes" )
     {
-      my $response = odd( $coun );
-      if ( $response eq "odd" )
-      {
-        print NEWFILE "$item,";
-      }
-      $coun++;
+      print NEWFILE "$entry->[0],$entry->[2]\n";
     }
-    print NEWFILE "$entry->[2]\n";
+    elsif ( $optformat eq "no" )
+    {
+      my $coun = 0;
+      foreach my $item ( @{ $entry->[1] } )
+      {
+        my $response = odd( $coun );
+        if ( $response eq "odd" )
+        {
+          print NEWFILE "$item,";
+        }
+        $coun++;
+      }
+      print NEWFILE "$entry->[2]\n";
+    }
   }
 }
+
+printend( \@arr, $newfile, $optformat );
 
 
 close NEWFILE;
@@ -1564,24 +1632,23 @@ close NEWFILE;
 1;
 
 __END__
-
+$metafile
 =head1 NAME
 
 
 Sim::OPT::Interlinear
 
 
-=head1 SYNOPSIS
+=head1 SYNOPSISdata series
 
 
-  From Perl (via "re.pl" or in a Perl program):
-  interlinear( "/path/to/a/pre-prepared-configfile.pl", "/path/to/a/pre-prepared-sourcefile.csv" );
-  or from the command line:
+  interlinear( "/path/to/a-pre-prepared-configfile.pl", "/path/to/a-pre-prepared-sourcefile.csv", "/path/to/the-metamodel-file-to-be-obtained" );
+  #or from the command line:
   interlinear .
-  (note the dot at the end), to use the file as a script and include the location of the source file directly in the configuration file;
-  or, again, from the command line:
+  #(note the dot at the end), to use the file as a script and include the location of the source file directly in the configuration file;
+  #or again from the command line:
   interlinear interstart
-  to begin with a dialogue question.
+  #to begin with a dialogue question.
 
 
 =head1 DESCRIPTION
@@ -1589,12 +1656,16 @@ Sim::OPT::Interlinear
 
 Interlinear is a program for computing the missing values in multivariate datasieries pre-prepared in csv format.
 The program can adopt the following algorithmic strategies and intermix their result:
-
+$metafile
 a) a propagating distance-weighted gradient-based strategy (by far the best one so far, keeping into account that the behaviour of factors is often not linear and there are curvatures all aroung the design space);
 
 b) pure linear interpolation (one may want to use this in some occasions: for example, on factorials);
 
 c) nearest neighbour (a strategy of last resort. One may want to use it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
+
+Strategy a) works for cases which are adjacent in the design space. For example, it cannot work with the gradient between a certain iteration 1 and the corresponding iteration 3. It can only work with the gradient between iterations 1 and 2, or 2 and 3.
+For that reason, it does not w$metafileork well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from coordinate descent sampling strategies.
+To work well with a latin hypercube sampling, it is necessary to include a pass of strategy b) before calling strategy a). Then strategy a) will charge itself of reducing the gradient errors created by the initial pass of strategy b).
 
 A configuration file should be prepared following the example in the "examples" folder in this distribution.
 If the configuration file is incomplete or missing, the program adopts its own defaults, exploiting the distance-weighted gradient-based strategy.
@@ -1655,7 +1726,7 @@ After some computations, Interlinear will output a new dataseries, with the miss
 
 =head2 EXPORT
 
-
+$metafile
 interlinear, interstart.
 
 

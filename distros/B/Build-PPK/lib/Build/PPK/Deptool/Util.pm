@@ -1,6 +1,6 @@
 package Build::PPK::Deptool::Util;
 
-# Copyright (c) 2012, cPanel, Inc.
+# Copyright (c) 2018, cPanel, Inc.
 # All rights reserved.
 # http://cpanel.net/
 #

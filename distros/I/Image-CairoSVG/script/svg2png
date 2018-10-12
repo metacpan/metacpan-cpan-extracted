@@ -2,8 +2,19 @@
 use warnings;
 use strict;
 use Image::CairoSVG;
+use Getopt::Long;
+
+my $ok = GetOptions (
+    verbose => \my $verbose,
+);
+if (! $ok) {
+    print <<EOF;
+--verbose  - print debugging messages
+EOF
+    exit;
+}
 for my $file (@ARGV) {
-    my $cairosvg = Image::CairoSVG->new ();
+    my $cairosvg = Image::CairoSVG->new (verbose => $verbose);
     my $outfile = $file;
     $outfile =~ s/\.svg$/\.png/i;
     if ($outfile eq $file) {

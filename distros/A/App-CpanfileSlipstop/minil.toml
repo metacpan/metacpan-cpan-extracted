@@ -1,0 +1,7 @@
+name = "App-CpanfileSlipstop"
+badges = ["travis", "coveralls", "metacpan"]
+authority="cpan:POKUTUNA"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+script_files = ['script/cpanfile-slipstop']

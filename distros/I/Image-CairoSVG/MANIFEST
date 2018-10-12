@@ -1,4 +1,5 @@
 Changes
+clean.pl
 examples/locust.png
 examples/locust.svg
 examples/synopsis.pl
@@ -9,10 +10,13 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 script/svg2png
+t/Church-nosurf.png
 t/Church.png
 t/Church.svg
+t/from-scalar.png
 t/image-cairosvg.t
 t/image-similar.t
+t/Technical_college-nosurf.png
 t/Technical_college.png
 t/Technical_college.svg
 META.yml                                 Module YAML meta-data (added by MakeMaker)

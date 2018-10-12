@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright (c) 2013, cPanel, Inc.
+# Copyright (c) 2018, cPanel, Inc.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -147,6 +147,6 @@ __END__
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013, cPanel, Inc.  All rights reserved.  This is free software;
+Copyright (c) 2018, cPanel, Inc.  All rights reserved.  This is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
 See L<perlartistic> for further details.

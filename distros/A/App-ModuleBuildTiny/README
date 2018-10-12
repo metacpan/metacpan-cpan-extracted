@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.023
+    version 0.024
 
 DESCRIPTION
 
@@ -34,6 +34,7 @@ SEE ALSO
       A program that facilitates upload the tarball as produced by mbtiny.
 
       * perl-reversion
+      <https://metacpan.org/pod/distribution/Perl-Version/examples/perl-reversion>
 
       A tool to bump the version in your modules.
 

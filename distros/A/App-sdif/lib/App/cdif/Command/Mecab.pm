@@ -22,7 +22,7 @@ sub wordlist {
     do {
 	map  { $_ eq $eos ? "\n" : $_ }
 	grep { length }
-	$result =~ /^(\s*)(\S+)\n/mg;
+	$result =~ /^(\s*)(\S+)\n/amg;
     };
 }
 

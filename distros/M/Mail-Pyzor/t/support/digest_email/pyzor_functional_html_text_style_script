@@ -1,0 +1,28 @@
+MIME-Version: 1.0
+Sender: chirila@gapps.spamexperts.com
+Received: by 10.216.157.70 with HTTP; Thu, 16 Jan 2014 00:43:31 -0800 (PST)
+Date: Thu, 16 Jan 2014 10:43:31 +0200
+Delivered-To: chirila@gapps.spamexperts.com
+X-Google-Sender-Auth: ybCmONS9U9D6ZUfjx-9_tY-hF2Q
+Message-ID: <CAK-mJS8sE-V6qtspzzZ+bZ1eSUE_FNMt3K-5kBOG-z3NMgU_Rg@mail.gmail.com>
+Subject: Test
+From: Alexandru Chirila <chirila@spamexperts.com>
+To: Alexandru Chirila <chirila@gapps.spamexperts.com>
+Content-Type: multipart/alternative; boundary=001a11c25ff293069304f0126bfd
+
+--001a11c25ff293069304f0126bfd
+Content-Type: text/plain; charset=ISO-8859-1
+
+This is a test.
+
+--001a11c25ff293069304f0126bfd
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">
+<style> This is my style.</style>
+<script> This is my script.</script>
+<div>This is a test.</div>
+</div>
+
+--001a11c25ff293069304f0126bfd--

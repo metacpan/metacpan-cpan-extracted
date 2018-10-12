@@ -11,7 +11,7 @@ use base qw( IO::Async::Stream );
 
 use Carp;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Protocol::WebSocket::Frame;
 use Sub::Util 1.40 qw( set_subname );

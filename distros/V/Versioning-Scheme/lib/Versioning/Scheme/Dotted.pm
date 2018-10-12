@@ -1,20 +1,27 @@
 package Versioning::Scheme::Dotted;
 
 our $DATE = '2018-10-11'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Role::Tiny;
-use Role::Versioning::Scheme;
+use Role::Tiny::With;
+with 'Role::Versioning::Scheme';
 
 our $re = qr/\A[0-9]+(?:\.[0-9]+)*\z/;
 
 sub is_valid_version {
     my ($self, $v) = @_;
     $v =~ $re ? 1:0;
+}
+
+sub parse_version {
+    my ($self, $v) = @_;
+    $v =~ $re or return undef;
+    {parts => [split /\./, $v]};
 }
 
 sub normalize_version {
@@ -95,36 +102,40 @@ Versioning::Scheme::Dotted - Version as dotted numbers
 
 =head1 VERSION
 
-This document describes version 0.005 of Versioning::Scheme::Dotted (from Perl distribution Versioning-Scheme), released on 2018-10-11.
+This document describes version 0.007 of Versioning::Scheme::Dotted (from Perl distribution Versioning-Scheme), released on 2018-10-11.
 
 =head1 SYNOPSIS
 
  use Versioning::Scheme::Dotted;
 
  # checking validity
- Versioning::Scheme::Dotted->is_valid('0.001.2.0');  # 1
- Versioning::Scheme::Dotted->is_valid('v0.001.2.0'); # 0
- Versioning::Scheme::Dotted->is_valid('1.2beta');    # 0
+ Versioning::Scheme::Dotted->is_valid_version('0.001.2.0');  # 1
+ Versioning::Scheme::Dotted->is_valid_version('v0.001.2.0'); # 0
+ Versioning::Scheme::Dotted->is_valid_version('1.2beta');    # 0
+
+ # parsing
+ $parsed = Versioning::Scheme::Dotted->parse_version('1.2beta'); # => undef
+ $parsed = Versioning::Scheme::Dotted->parse_version('1.2.3');   # => {parts=>[1, 2, 3]}
 
  # normalizing
- Versioning::Scheme::Dotted->normalize('0.001.2.0');             # => '0.001.2.0'
- Versioning::Scheme::Dotted->normalize('0.001.2.0', {parts=>3}); # => '0.001.2'
- Versioning::Scheme::Dotted->normalize('0.001.2.0', {parts=>5}); # => '0.001.2.0.0'
+ Versioning::Scheme::Dotted->normalize_version('0.001.2.0');             # => '0.001.2.0'
+ Versioning::Scheme::Dotted->normalize_version('0.001.2.0', {parts=>3}); # => '0.001.2'
+ Versioning::Scheme::Dotted->normalize_version('0.001.2.0', {parts=>5}); # => '0.001.2.0.0'
 
  # comparing
- Versioning::Scheme::Dotted->compare('1.2.3', '1.2.3.0'); # 0
- Versioning::Scheme::Dotted->compare('1.2.3', '1.2.4');   # -1
- Versioning::Scheme::Dotted->compare('1.3.1', '1.2.4');   # 1
+ Versioning::Scheme::Dotted->cmp_version('1.2.3', '1.2.3.0'); # 0
+ Versioning::Scheme::Dotted->cmp_version('1.2.3', '1.2.4');   # -1
+ Versioning::Scheme::Dotted->cmp_version('1.3.1', '1.2.4');   # 1
 
  # bumping
- Versioning::Scheme::Dotted->bump('1.2.3');                               # => '1.2.4'
- Versioning::Scheme::Dotted->bump('1.2.009');                             # => '1.2.010'
- Versioning::Scheme::Dotted->bump('1.2.999');                             # => '1.2.1000'
- Versioning::Scheme::Dotted->bump('1.2.3', {num=>2});                     # => '1.2.5'
- Versioning::Scheme::Dotted->bump('1.2.3', {num=>-1});                    # => '1.2.2'
- Versioning::Scheme::Dotted->bump('1.2.3', {part=>-2});                   # => '1.3.0'
- Versioning::Scheme::Dotted->bump('1.2.3', {part=>0});                    # => '2.0.0'
- Versioning::Scheme::Dotted->bump('1.2.3', {part=>-2, reset_smaller=>0}); # => '1.3.3'
+ Versioning::Scheme::Dotted->bump_version('1.2.3');                               # => '1.2.4'
+ Versioning::Scheme::Dotted->bump_version('1.2.009');                             # => '1.2.010'
+ Versioning::Scheme::Dotted->bump_version('1.2.999');                             # => '1.2.1000'
+ Versioning::Scheme::Dotted->bump_version('1.2.3', {num=>2});                     # => '1.2.5'
+ Versioning::Scheme::Dotted->bump_version('1.2.3', {num=>-1});                    # => '1.2.2'
+ Versioning::Scheme::Dotted->bump_version('1.2.3', {part=>-2});                   # => '1.3.0'
+ Versioning::Scheme::Dotted->bump_version('1.2.3', {part=>0});                    # => '2.0.0'
+ Versioning::Scheme::Dotted->bump_version('1.2.3', {part=>-2, reset_smaller=>0}); # => '1.3.3'
 
 You can also mix this role into your class.
 
@@ -153,6 +164,8 @@ L<Role::Versioning::Scheme>.
 =head1 METHODS
 
 =head2 is_valid_version
+
+=head2 parse_version
 
 =head2 normalize_version
 

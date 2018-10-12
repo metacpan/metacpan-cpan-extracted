@@ -1,0 +1,604 @@
+Return-Path: <107-FMS-070.0.8745.0.0.4169.9.2430864@em.oreilly.com>
+Delivered-To: felipe@cpanel.net
+Received: from mx1.cpanel.net
+	by mx1.cpanel.net with LMTP id eEyhIbk9tVuTDgAA6kPjFA
+	for <felipe@cpanel.net>; Wed, 03 Oct 2018 17:07:53 -0500
+Return-path: <107-FMS-070.0.8745.0.0.4169.9.2430864@em.oreilly.com>
+Envelope-to: felipe@cpanel.net
+Delivery-date: Wed, 03 Oct 2018 17:07:53 -0500
+Received: from mx2-dal.cpanel.net ([208.74.123.210]:49046 helo=mx2.cpanel.net)
+	by mx1.cpanel.net with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+	(Exim 4.91)
+	(envelope-from <107-FMS-070.0.8745.0.0.4169.9.2430864@em.oreilly.com>)
+	id 1g7pJB-00016U-D7
+	for felipe@cpanel.net; Wed, 03 Oct 2018 17:07:53 -0500
+Received: from em.oreilly.com ([192.28.152.137]:43760)
+	by mx2.cpanel.net with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+	(Exim 4.91)
+	(envelope-from <107-FMS-070.0.8745.0.0.4169.9.2430864@em.oreilly.com>)
+	id 1g7pJA-001Q1N-96
+	for felipe@cpanel.net; Wed, 03 Oct 2018 17:07:53 -0500
+X-MSFBL: ZmVsaXBlQGNwYW5lbC5uZXRAZHZwLTE5Mi0yOC0xNTItMTM3QGJnLWFiZC02MjJA
+	MTA3LUZNUy0wNzA6MjczMjo2NDUxOjIwMjM3OjA6NDE2OTo5Ojg3NDU6MjQzMDg2
+	NA==
+Received: from [10.1.87.249] ([10.1.87.249:37491] helo=abmas01.marketo.org)
+	by abmta29.marketo.org (envelope-from <reply@oreilly.com>)
+	(ecelerity 3.6.8.47404 r(Core:3.6.8.0)) with ESMTP
+	id 73/E6-29024-7BD35BB5; Wed, 03 Oct 2018 17:07:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1538604471;
+	s=m1; d=oreilly.com; i=@oreilly.com;
+	h=Date:From:To:Subject:MIME-Version:Content-Type;
+	bh=oSxaJTyIZs4u9/tdrqYT1qYaJsjTV7zFCS3sg3c3t4M=;
+	b=L4klTp//Usl1Rs3DeMUTo8vOEYOwrYpVpwqMMwOA2DvdirnklUzIsfFTOzZMBlwI
+	nBgmDhzrRCvkUUi4unMT3Dqu5nONCUEqAj7tCXZoDubwYfy9ljAnh+eJmTX1rlW3fZM
+	R3w/VwMJtvwB+g3YUmGLNpcYcXtXejrjAtfsLX1s=
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1538604471;
+	s=m1; d=mktdns.com; i=@mktdns.com;
+	h=Date:From:To:Subject:MIME-Version:Content-Type;
+	bh=oSxaJTyIZs4u9/tdrqYT1qYaJsjTV7zFCS3sg3c3t4M=;
+	b=Agr83MFrZ2b5v05vo1BnDwcivAF+fMGaWD/sDnqQ39lK1PzXwUWlsgZoU4NAL9fc
+	6hurJnUCpboiFtkE4VjZvC0bdh44iPIc5AR5xiivq+CaAzZaSXiBH7GWVhnlnPQalA3
+	IOY9EAj3GQPfX+MiD1K9b+j799dDmL86M0dc149w=
+Date: Wed, 3 Oct 2018 17:07:51 -0500 (CDT)
+From: O'Reilly Web Newsletter <reply@oreilly.com>
+Reply-To: reply@oreilly.com
+To: felipe@cpanel.net
+Message-ID: <693813349.-1130089427.1538604471424.JavaMail.root@abmas01.marketo.org>
+Subject: Hard choices with JavaScript, Cloudflare's bold move, Wasm risks +
+ more
+MIME-Version: 1.0
+Content-Type: multipart/alternative; 
+	boundary="----=_Part_-1130089428_373374829.1538604471423"
+X-Binding: bg-abd-622
+X-MarketoID: 107-FMS-070:2732:6451:20237:0:4169:9:8745:2430864
+X-MktArchive: false
+List-Unsubscribe: <mailto:JNUDQSLENN2E2TLTII3TALJUINIXE43ULJTT2PI.8745.4169.9@unsub-ab.mktomail.com>
+X-Mailfrom: 107-FMS-070.0.8745.0.0.4169.9.2430864@em.oreilly.com
+X-MSYS-API: {"options":{"open_tracking":false,"click_tracking":false}}
+X-MktMailDKIM: true
+X-Spam-Status: No, score=0.5
+X-Spam-Score: 5
+X-Spam-Bar: /
+X-Ham-Report: Spam detection software, running on the system "mx2.cpanel.net",
+ has NOT identified this incoming email as spam.  The original
+ message has been attached to this so you can view it or label
+ similar future email.  If you have any questions, see
+ root\@localhost for details.
+ 
+ Content preview:  O'Reilly Web Newsletter 10/03/2018 -- In This Issue: * With
+    JavaScript, more choices mean hard choices * Google introduces TensorFlow.js
+    * Cloudflare just disrupted domain registration * Cache event listeners to
+    improve performance in React * The risky [...] 
+ 
+ Content analysis details:   (0.5 points, 5.0 required)
+ 
+  pts rule name              description
+ ---- ---------------------- --------------------------------------------------
+ -1.0 SPF_PASS               SPF: sender matches SPF record
+ -1.0 SPF_HELO_PASS          SPF: HELO matches SPF record
+  0.1 DKIM_SIGNED            Message has a DKIM or DK signature, not necessarily
+                             valid
+ -0.1 DKIM_VALID_AU          Message has a valid DKIM or DK signature from
+                             author's domain
+ -0.1 DKIM_VALID             Message has at least one valid DKIM or DK signature
+ -0.1 DKIM_VALID_EF          Message has a valid DKIM or DK signature from
+                             envelope-from domain
+  1.6 REMOVE_BEFORE_LINK     BODY: Removal phrase right before a link
+  1.1 URI_TRY_3LD            URI: "Try it" URI, suspicious hostname
+  0.0 HTML_MESSAGE           BODY: HTML included in message
+  0.0 T_KAM_HTML_FONT_INVALID BODY: Test for Invalidly Named or
+                             Formatted Colors in HTML
+X-Spam-Flag: NO
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - mx2.cpanel.net
+X-AntiAbuse: Original Domain - cpanel.net
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - em.oreilly.com
+X-Get-Message-Sender-Via: mx2.cpanel.net: mailgid no entry from get_recent_authed_mail_ips_entry
+X-Authenticated-Sender: mx2.cpanel.net: 
+
+------=_Part_-1130089428_373374829.1538604471423
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+O'Reilly Web Newsletter
+
+10/03/2018 -- In This Issue:
+
+* With JavaScript, more choices mean hard choices
+* Google introduces TensorFlow.js
+* Cloudflare just disrupted domain registration
+* Cache event listeners to improve performance in React
+* The risky business of WebAssembly
+* Free webcast: Bot or human? Combat the bot epidemic with machine learning
+* The EU just made the internet worse for everyone
+* 10 thoughts on the making of a good frontend developer
+* Let bylines be bygones...
+
+
+View this information in your browser: https://get.oreilly.com/index.php/email/emailWebview?mkt_tok=eyJpIjoiWmpaa05HWTRaamhrTldNMiIsInQiOiIyVjRWYjNYWlhtZVN0UTZnb1NOQnNxL1UzN0liOW15eEJmUFcxRTFEQTV1Y1FPK1h4Uy90S0MrRy96SWdKN1M2cEV1aDFSVEs0c0kyRERlVnc2cmJRbXlyWmJLU3VOclZLYWZ0WmZSVG1sak9yV0E0WE0rU0MyeStEdy94bXhlVCJ9
+
+--------------------------------------------------------------
+
+This message was sent to felipe@cpanel.net. You are receiving this because you're a customer of O'Reilly Media, or you've signed up to receive email from us. We hope you found this message to be useful. However, if you'd rather not receive future emails of this type from O'Reilly, please manage your preferences or unsubscribe here: http://get.oreilly.com/Manage_My_Subscriptions.html?utm_medium=email&utm_source=topic+optin&utm_campaign=awareness&utm_content=20181003+web+nl
+
+Please read our Privacy Policy: https://www.oreilly.com/privacy.html
+
+O'Reilly Media, Inc. 1005 Gravenstein Highway North, Sebastopol, CA 95472 (707) 827-7019 / (800) 889-8969
+
+------------------------------------------------------
+
+
+.
+
+------=_Part_-1130089428_373374829.1538604471423
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.=
+w3.org/TR/html4/loose.dtd">
+<html xmlns=3D"http://www.w3.org/1999/xhtml" xml:lang=3D"en" lang=3D"en">
+<head>=20
+<meta http-equiv=3D"Content-type" content=3D"text/html;charset=3DUTF-8">=20
+<style type=3D"text/css">
+@media only screen and (max-width:655px) {
+.fullwidth {
+width:100% !important;
+}
+}
+
+@media only screen and (max-width:475px) {
+.mobile {
+width:100% !important;
+text-align:left !important;
+padding-top:15px !important;
+align:left !important;
+}
+
+.header-spacing {
+padding-bottom:24px !important;
+}
+
+.logos {
+padding-left:20px !important;
+}
+
+.share {
+text-align:left !important;
+}
+}
+</style>=20
+</head>=20
+<body class=3D"fullwidth" style=3D"padding:0; margin:0; background-color:#f=
+ff;"><style type=3D"text/css">div#emailPreHeader{ display: none !important;=
+ }</style><div id=3D"emailPreHeader" style=3D"mso-hide:all; visibility:hidd=
+en; opacity:0; color:transparent; mso-line-height-rule:exactly; line-height=
+:0; font-size:0px; overflow:hidden; border-width:0; display:none !important=
+;">Let bylines be bygones</div>=20
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%">=20
+<tbody>
+<tr>=20
+<td bgcolor=3D"#ffffff" style=3D"font-family:'Open Sans',HelveticaNeue-Ligh=
+t,'Helvetica Neue Light',Helvetica,sans-serif; background-color:#fff; font-=
+size:16px; color:#444; line-height:22px; margin:0 0 12px 0; padding:30px 0 =
+0 0;">=20
+<table border=3D"0" class=3D"fullwidth" cellpadding=3D"0" cellspacing=3D"0"=
+ width=3D"640" align=3D"center">=20
+<tbody>
+<tr>=20
+<td style=3D"padding:0 20px 30px 20px;">=20
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%">=20
+<tbody>
+<tr>=20
+<td class=3D"header-spacing" style=3D"border-bottom:1px solid #ddd; padding=
+-bottom:30px;">=20
+<table align=3D"left" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" styl=
+e=3D"width:107px; height:30px; margin:0; padding:0 10px 0 0;">=20
+<tbody>
+<tr>=20
+<td style=3D"width:107px; height:30px; padding:0; font-size:0; margin:0;"><=
+a href=3D
+"http://link.oreilly.com/p0a00F087S0c0HQMrW0unz0" target=3D"_blank"
+><img src=3D"https://cdn.oreillystatic.com/oreilly/email/logos/2018/oreilly=
+-logo-web-107x30@2x.png" alt=3D"O'Reilly Media Logo" width=3D"107" height=
+=3D"30" border=3D"0"></a> </td>=20
+</tr>=20
+</tbody>
+</table>=20
+<table align=3D"right" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" wid=
+th=3D"70%" class=3D"mobile" style=3D"width:70%; max-width:420px; height:30p=
+x; vertical-align:top; padding:0; color:#666; font-family:'Open Sans',Helve=
+ticaNeue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300=
+; font-size:14px; line-height:14px; text-align:right;">=20
+<tbody>
+<tr>=20
+<td><a href=3D
+"http://link.oreilly.com/F8nMW00I80F0u0zc000SrQa" target=3D"_blank" style=
+=3D"font-weight:300; text-decoration:none; color:#666;"
+>Learning Platform</a> =C2=B7 <a href=3D
+"http://link.oreilly.com/o00JQ009z008uF0anSMrcW0" target=3D"_blank" style=
+=3D"font-weight:300; text-decoration:none; color:#666;"
+>Conferences</a> =C2=B7 <a href=3D
+"http://link.oreilly.com/hWu8KaM00F000crzQ000San" target=3D"_blank" style=
+=3D"font-weight:300; text-decoration:none; color:#666;"
+>Ideas</a> </td>=20
+</tr>=20
+</tbody>
+</table> </td>=20
+</tr>=20
+</tbody>
+</table>=20
+<!-- /end logo -->=20
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" bgco=
+lor=3D"#ffffff">=20
+<tbody>
+<tr>=20
+<td bgcolor=3D"#ffffff" width=3D"59%" align=3D"left" valign=3D"bottom" styl=
+e=3D"padding:30px 30px 0 2px; margin:0; font-size:0; line-height:0;"><img s=
+rc=3D"http://cdn.oreillystatic.com/oreilly/email/web/web-header-128.png" al=
+t=3D"Web" style=3D"width:100%; max-width:128px;"> </td>=20
+<td bgcolor=3D"#ffffff" align=3D"right" valign=3D"bottom" style=3D"padding:=
+0;"><img src=3D"https://cdn.oreillystatic.com/oreilly/email/logos/2018/data=
+-nl-newsletter-178x31.png" alt=3D"Newsletter" border=3D"0" style=3D"width:1=
+00%; max-width:178px;" align=3D"right"> </td>=20
+</tr>=20
+</tbody>
+</table>=20
+<!-- /end newsletter header -->=20
+<!-- Begin: Body -->=20
+<table cellpadding=3D"0" cellspacing=3D"0" border=3D"0" style=3D"font-size:=
+16px; line-height:22px; font-family:'Open Sans',HelveticaNeue-Light,'Helvet=
+ica Neue Light',Helvetica,sans-serif; font-weight:400; padding:0; margin:0;=
+ border-spacing:0; width:100%;">=20
+<tbody>
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; padding:25px 0 25px 0; margin:0;">=20
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" width=3D"100%" bgco=
+lor=3D"#ffffff">=20
+<!-- Begin: Automated Entry -->=20
+<tbody>
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; padding:25px 0 10px 0; margin:0;"> <h2 style=3D"color:#00b7b7 =
+!important; font-family:'Open Sans',HelveticaNeue-Light,'Helvetica Neue Lig=
+ht',Helvetica,sans-serif; font-weight:400; font-size:24px; line-height:30px=
+; padding:0; margin:0;">1. With JavaScript, more choices mean hard choices =
+</h2> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300; font=
+-size:16px; line-height:24px; margin:0; padding:0;">The proliferation of to=
+ols designed to make life easier for frontend developers is a mixed blessin=
+g; having more options is good, but tools can fall in and out of favor quic=
+kly. <a href=3D
+"http://link.oreilly.com/WF08bQMaW0L0Sru00c0nz00" target=3D"_blank" style=
+=3D"font-weight:normal; text-decoration:none; color:#0000ee;"
+><em>Wired</em> assesses the challenge</a>. </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; margin:0; padding:40px 0 10px 0;"> <h2 style=3D"color:#00b7b7 =
+!important; font-family:'Open Sans',HelveticaNeue-Light,'Helvetica Neue Lig=
+ht',Helvetica,sans-serif; font-weight:400; font-size:24px; line-height:30px=
+; padding:0; margin:0;">2. Google introduces TensorFlow.js </h2> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300; font=
+-size:16px; line-height:24px; margin:0; padding:0;">The new WebGL-accelerat=
+ed library works with the Node.js server-side JavaScript runtime. <a href=
+=3D
+"http://link.oreilly.com/uMQ000nMaW0r0c00zucFS80" target=3D"_blank" style=
+=3D"font-weight:normal; text-decoration:none; color:#0000ee;"
+>It puts machine learning in the browser</a>, but it's not on par with Tens=
+orFlow's Python API. </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; margin:0; padding:40px 0 10px 0;"> <h2 style=3D"color:#00b7b7 =
+!important; font-family:'Open Sans',HelveticaNeue-Light,'Helvetica Neue Lig=
+ht',Helvetica,sans-serif; font-weight:400; font-size:24px; line-height:30px=
+; padding:0; margin:0;">3. Cloudflare just disrupted domain registration </=
+h2> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300; font=
+-size:16px; line-height:24px; margin:0; padding:0;">"Many registrars thrive=
+ by raising renewal rates or adding fees for services you can find for free=
+. However, no registrar has a better method for connecting to a registry. T=
+hey all follow a standard established twenty years ago. If a company can't =
+deliver unique value in a space, you shouldn't have to pay above market rat=
+e for those services. Cloudflare Registrar will only charge you what the re=
+gistries charge us. In a marketplace built on upsell and bait-and-switch, <=
+a href=3D
+"http://link.oreilly.com/m000Qd00a0cr8WunMzN0FS0" target=3D"_blank" style=
+=3D"font-weight:normal; text-decoration:none; color:#0000ee;"
+>we're selling domain registration at the wholesale price."</a> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; margin:0; padding:40px 0 10px 0;"> <h2 style=3D"color:#00b7b7 =
+!important; font-family:'Open Sans',HelveticaNeue-Light,'Helvetica Neue Lig=
+ht',Helvetica,sans-serif; font-weight:400; font-size:24px; line-height:30px=
+; padding:0; margin:0;">4. Cache event listeners to improve performance in =
+React </h2> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300; font=
+-size:16px; line-height:24px; margin:0; padding:0;">React has an intelligen=
+t way of saving processing time to boost performance; it renders on an as-n=
+eeded basis. Senior full stack JavaScript developer Charles Stover explains=
+ <a href=3D
+"http://link.oreilly.com/p0a00F08eS0c0OQMrW0unz0" target=3D"_blank" style=
+=3D"font-weight:normal; text-decoration:none; color:#0000ee;"
+>how to leverage this feature</a>. </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; margin:0; padding:40px 0 10px 0;"> <h2 style=3D"color:#00b7b7 =
+!important; font-family:'Open Sans',HelveticaNeue-Light,'Helvetica Neue Lig=
+ht',Helvetica,sans-serif; font-weight:400; font-size:24px; line-height:30px=
+; padding:0; margin:0;">5. The risky business of WebAssembly </h2> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300; font=
+-size:16px; line-height:24px; margin:0; padding:0;">While WebAssembly offer=
+s developers both better performance and better security, it also creates a=
+ new risk for native exploits in the browser. <a href=3D
+"http://link.oreilly.com/c0a00cuF0WQM08rSf0nPz00" target=3D"_blank" style=
+=3D"font-weight:normal; text-decoration:none; color:#0000ee;"
+>Find out more in this video from <em>DARKReading</em></a>. </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; padding:40px 0 10px 0; margin:0; width:100%;">=20
+<div style=3D"color:#999999; font-weight:300; font-size:14px; line-height:1=
+8px; padding:20px 0 0 0; margin:0; border-top:1px solid #ddd;">
+IN COLLABORATION WITH ORACLE DYN=20
+</div> <h2 style=3D"color:#00b7b7 !important; font-family:'Open Sans',Helve=
+ticaNeue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:400=
+; font-size:24px; line-height:30px; padding:0; margin:0;">Free webcast: Bot=
+ or human? Combat the bot epidemic with machine learning </h2> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300; font=
+-size:16px; line-height:24px; padding:0 0 20px 0; margin:0; border-bottom:1=
+px solid #ddd;"> <a href=3D
+"http://link.oreilly.com/P000Q0rFWM0uQa0z0ngS8c0" target=3D"_blank"
+><img class=3D"image" align=3D"right" style=3D"border:0; padding:5px 0 5px =
+10px;" width=3D"150" src=3D"http://cdn.oreillystatic.com/oreilly/email/web/=
+nl-web-20181003-1.jpg" alt=3D"Laurent Gil"></a> With bots now making up mor=
+e than half of all website traffic, the ability of bad actors to disguise b=
+ot traffic as legitimate via simulated human behavior presents a major secu=
+rity challenge. Learn how to allow "good" bot and human traffic while block=
+ing the "bad" traffic in this <strong>free webcast on October 15</strong>. =
+Laurent Gil, product strategy architect for internet security at Oracle Dyn=
+, will explain what you need to know about bot traffic as you explore the t=
+ypes of bots=E2=80=94from simple to sophisticated. You'll also learn about =
+three real-world applications of machine learning and artificial intelligen=
+ce to identify and defeat malicious bots.=20
+<table border=3D"0" cellspacing=3D"0" cellpadding=3D"0">=20
+<tbody>
+<tr>=20
+<td align=3D"center" style=3D"padding:15px 0 0 0;"><a href=3D
+"http://link.oreilly.com/P000Q0rFWM0uQa0z0ngS8c0" target=3D"_blank" style=
+=3D"font-size:16px; line-height:16px; font-family:'Open Sans',HelveticaNeue=
+-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:500; text-d=
+ecoration:none; color:#fff; background-color:#d3002d; border-width:22px 30p=
+x; border-style:solid; border-color:#d3002d; border-radius:2px; display:blo=
+ck;"
+>Register now=E2=80=94space is limited</a> </td>=20
+</tr>=20
+</tbody>
+</table> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; margin:0; padding:40px 0 10px 0;"> <h2 style=3D"color:#00b7b7 =
+!important; font-family:'Open Sans',HelveticaNeue-Light,'Helvetica Neue Lig=
+ht',Helvetica,sans-serif; font-weight:400; font-size:24px; line-height:30px=
+; padding:0; margin:0;">6. The EU just made the internet worse for everyone=
+ </h2> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300; font=
+-size:16px; line-height:24px; margin:0; padding:0;">While meant to rein in =
+the tech giants, some believe <a href=3D
+"http://link.oreilly.com/eQ0nRS00000MFz0ca8hWu0r" target=3D"_blank" style=
+=3D"font-weight:normal; text-decoration:none; color:#0000ee;"
+>the EU's new regulations could make searches more difficult and impede com=
+petition</a>. </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; margin:0; padding:40px 0 10px 0;"> <h2 style=3D"color:#00b7b7 =
+!important; font-family:'Open Sans',HelveticaNeue-Light,'Helvetica Neue Lig=
+ht',Helvetica,sans-serif; font-weight:400; font-size:24px; line-height:30px=
+; padding:0; margin:0;">7. 10 thoughts on the making of a good frontend dev=
+eloper </h2> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300; font=
+-size:16px; line-height:24px; margin:0; padding:0;">Ten experts weigh in on=
+ <a href=3D
+"http://link.oreilly.com/q8SF0r0nWi0Qaz00M0uS00c" target=3D"_blank" style=
+=3D"font-weight:normal; text-decoration:none; color:#0000ee;"
+>the skills and characteristics of a good frontend developer</a>. </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:16px; line-=
+height:22px; margin:0; padding:40px 0 10px 0;"> <h2 style=3D"color:#00b7b7 =
+!important; font-family:'Open Sans',HelveticaNeue-Light,'Helvetica Neue Lig=
+ht',Helvetica,sans-serif; font-weight:400; font-size:24px; line-height:30px=
+; padding:0; margin:0;">8. Let bylines be bygones...or not </h2> </td>=20
+</tr>=20
+<tr>=20
+<td align=3D"left" style=3D"color:#444; font-family:'Open Sans',HelveticaNe=
+ue-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-weight:300; font=
+-size:16px; line-height:24px; margin:0; padding:0;"> <a href=3D
+"http://link.oreilly.com/E0r0F0ujMTn0Q0cS0z0aW08" target=3D"_blank"
+><img style=3D"display:block; width:100%; max-width:425px; border:none; pad=
+ding:22px 0 5px 0;" src=3D"http://cdn.oreillystatic.com/oreilly/email/web/n=
+l-web-20181003-2.jpg" alt=3D"New York Times byline restorer"></a> </td>=20
+</tr>=20
+</tbody>
+</table> </td>=20
+</tr>=20
+</tbody>
+</table>=20
+<!--End: Body-->=20
+<table class=3D"fullwidth" align=3D"center" border=3D"0" cellpadding=3D"0" =
+cellspacing=3D"0" width=3D"600" bgcolor=3D"#ffffff" style=3D"text-align:cen=
+ter; margin:0; padding:0;">=20
+<tbody>
+<tr>=20
+<td style=3D"padding:25px 0 55px 0; border-top:0; color:#444; margin:0;">=
+=20
+<table align=3D"center" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" st=
+yle=3D"margin:0; text-align:center; width:100%;">=20
+<tbody>
+<tr>=20
+<td class=3D"share" style=3D"vertical-align:middle; padding:0 0 30px 0; mar=
+gin:0; width:40%; text-align:center; font-weight:400; text-decoration:none;=
+ color:#666; font-size:14px; line-height:20px;">Share this newsletter <a hr=
+ef=3D
+"http://link.oreilly.com/v0an0QzU0rWSFuk8M00c000" target=3D"_blank"
+><img style=3D"width:56px; border:0; padding:0 0 0 15px; margin:0; vertical=
+-align:middle;" src=3D"https://cdn.oreillystatic.com/oreilly/email/social-b=
+uttons/tweet-button.png" alt=3D"Tweet"></a> <a href=3D
+"http://link.oreilly.com/DFVa00l0SMn00z08WQ0u0rc" target=3D"_blank"
+><img style=3D"max-width:56px; border:0; padding:0 0 0 15px; margin:0; vert=
+ical-align:middle;" src=3D"https://cdn.oreillystatic.com/oreilly/email/soci=
+al-buttons/share-button.png" alt=3D"Share"></a> </td>=20
+</tr>=20
+</tbody>
+</table>=20
+<table align=3D"center" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" st=
+yle=3D"margin:0; padding:0; width:100%; background-color:#fff; color:#fff; =
+text-align:center;">=20
+<tbody>
+<tr>=20
+<td style=3D"margin:0; padding:20px 5px 20px 5px; width:100%; background-co=
+lor:#d3002d; color:#fff; text-align:center; border-radius:2px;"><a target=
+=3D"_blank" href=3D
+"http://link.oreilly.com/lzMcm000W8nu0S0ra0Q0W0F" style=3D"font-family:'Ope=
+n Sans',HelveticaNeue-Light,'Helvetica Neue Light',Helvetica,sans-serif; fo=
+nt-size:16px; line-height:22px; color:#ffffff; text-decoration:none; font-w=
+eight:400;"
+>Read more about web programming at oreilly.com</a> </td>=20
+</tr>=20
+</tbody>
+</table>=20
+<table align=3D"center" border=3D"0" cellpadding=3D"0" cellspacing=3D"0" st=
+yle=3D"margin:0; text-align:center; width:100%;">=20
+<tbody>
+<tr>=20
+<td class=3D"share" style=3D"margin:0; padding:26px 0 0 0; width:100%; back=
+ground-color:#ffffff; color:#fff; text-align:center;"><a target=3D"_blank" =
+href=3D
+"http://link.oreilly.com/uXQ000nMaW0r0n00zucFS80" style=3D"font-family:'Ope=
+n Sans',HelveticaNeue-Light,'Helvetica Neue Light',Helvetica,sans-serif; fo=
+nt-size:14px; line-height:20px; color:#0000ee; text-decoration:none; font-w=
+eight:400;"
+>Want your own copy of this newsletter? Sign&nbsp;up&nbsp;here.</a> </td>=
+=20
+</tr>=20
+</tbody>
+</table> </td>=20
+</tr>=20
+</tbody>
+</table>=20
+<!--Begin Footer-->=20
+<table class=3D"fullwidth" align=3D"center" border=3D"0" cellpadding=3D"0" =
+cellspacing=3D"0" width=3D"600" bgcolor=3D"#ffffff" style=3D"margin:0; padd=
+ing:0;">=20
+<tbody>
+<tr>=20
+<td style=3D"padding:30px 0 0 0; border-top:1px solid #ddd; color:#444; mar=
+gin:0;">=20
+<table border=3D"0" cellpadding=3D"0" cellspacing=3D"0" style=3D"margin:0; =
+padding:0; height:30px;">=20
+<tbody>
+<tr>=20
+<td style=3D"vertical-align:middle; padding:0; text-align:left;"><a href=3D
+"http://link.oreilly.com/p0a00F087S0c0HQMrW0unz0" target=3D"_blank"
+><img src=3D"https://cdn.oreillystatic.com/oreilly/email/logos/2018/oreilly=
+-logo-web-107x30@2x.png" alt=3D"O'Reilly Media Logo" width=3D"107" height=
+=3D"30" border=3D"0"></a> </td>=20
+<td class=3D"logos" style=3D"vertical-align:middle; padding:0 0 0 35px; tex=
+t-align:left;"><a href=3D
+"http://link.oreilly.com/ToQFz0u08000nMY00WacrS0" target=3D"_blank"
+><img src=3D"https://cdn.oreillystatic.com/oreilly/email/logos/2018/twitter=
+-20171204-30x24_360.png" alt=3D"Twitter Logo" width=3D"30" border=3D"0"></a=
+> </td>=20
+<td class=3D"logos" style=3D"vertical-align:middle; padding:0 0 0 30px; tex=
+t-align:left;"><a href=3D
+"http://link.oreilly.com/s0Zz0W80nMQp0F0cau00r0S" target=3D"_blank"
+><img src=3D"https://cdn.oreillystatic.com/oreilly/email/logos/2018/faceboo=
+k-20171204-14x24_360.png" alt=3D"Facebook Logo" width=3D"14" border=3D"0"><=
+/a> </td>=20
+<td class=3D"logos" style=3D"vertical-align:middle; padding:0 0 0 30px;"><a=
+ href=3D
+"http://link.oreilly.com/s00A0W80nMQr0F0cau00r0S" target=3D"_blank"
+><img src=3D"https://cdn.oreillystatic.com/oreilly/email/logos/2018/linkedi=
+n-20171204-24x24_360.png" alt=3D"LinkedIn Logo" width=3D"24" border=3D"0"><=
+/a> </td>=20
+</tr>=20
+</tbody>
+</table> <p style=3D"font-family:'Open Sans',HelveticaNeue-Light,'Helvetica=
+ Neue Light',Helvetica,sans-serif; font-size:14px; line-height:22px; font-w=
+eight:300; color:#666; padding:0; margin:25px 0 0 0;">This message was sent=
+ to felipe@cpanel.net. You are receiving this because you're a customer of =
+O'Reilly Media, or you've signed up to receive email from us. We hope you f=
+ound this message to be useful. However, if you'd rather not receive future=
+ emails of this type from O'Reilly, please <a target=3D"_blank" href=3D
+"http://link.oreilly.com/wMnSQarFW0000u8s00c010A" style=3D"font-weight:norm=
+al; color:#666;"
+>manage your preferences or unsubscribe here</a>. </p> <p style=3D"font-fam=
+ily:'Open Sans',HelveticaNeue-Light,'Helvetica Neue Light',Helvetica,sans-s=
+erif; font-size:14px; line-height:22px; font-weight:300; color:#666; paddin=
+g:0; margin:15px 0 0 0;">Please read our <a target=3D"_blank" href=3D
+"http://link.oreilly.com/n0Fu02t00cQW0SM0n800rAa" style=3D"font-weight:norm=
+al; color:#666;"
+>Privacy Policy</a>. </p> <p style=3D"font-family:'Open Sans',HelveticaNeue=
+-Light,'Helvetica Neue Light',Helvetica,sans-serif; font-size:14px; line-he=
+ight:22px; font-weight:300; color:#666; padding:0; margin:15px 0 0 0;">O'Re=
+illy Media, Inc. 1005 Gravenstein Highway North, Sebastopol, CA 95472 (707)=
+ 827-7000 </p> </td>=20
+</tr>=20
+</tbody>
+</table> </td>=20
+</tr>=20
+</tbody>
+</table> </td>=20
+</tr>=20
+</tbody>
+</table>=20
+
+<img src=3D"http://link.oreilly.com/trk?t=3D1&mid=3DMTA3LUZNUy0wNzA6MjczMjo=
+2NDUxOjIwMjM3OjA6NDE2OTo5Ojg3NDU6MjQzMDg2NDpmZWxpcGVAY3BhbmVsLm5ldA%3D%3D" =
+width=3D"1" height=3D"1" style=3D"display:none !important;" alt=3D"" />
+
+<!--This is a comment -->
+</body>
+</html>
+------=_Part_-1130089428_373374829.1538604471423--
+

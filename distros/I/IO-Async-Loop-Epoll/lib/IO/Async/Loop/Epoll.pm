@@ -8,7 +8,7 @@ package IO::Async::Loop::Epoll;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 use constant API_VERSION => '0.49';
 
 # Only Linux is known always to be able to report EOF conditions on
@@ -412,7 +412,7 @@ sub unwatch_signal
 
    # When we saved the original value, we might have got an undef. But %SIG
    # doesn't like having undef assigned back in, so we need to translate
-   $SIG{$signal} = $self->{signals}{$signal}->orig || 'DEFAULT';
+   $SIG{$signal} = ( $self->{signals}{$signal} && $self->{signals}{$signal}->orig ) || 'DEFAULT';
 
    delete $self->{signals}{$signal};
    

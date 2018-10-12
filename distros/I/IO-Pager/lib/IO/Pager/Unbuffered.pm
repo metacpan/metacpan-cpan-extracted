@@ -40,6 +40,8 @@ sub open(;$) { # [FH]
 
 __END__
 
+=pod
+
 =head1 NAME
 
 IO::Pager::Unbuffered - Pipe output to PAGER if destination is a TTY

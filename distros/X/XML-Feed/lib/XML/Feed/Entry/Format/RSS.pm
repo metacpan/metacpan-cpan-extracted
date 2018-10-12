@@ -1,12 +1,14 @@
 package XML::Feed::Entry::Format::RSS;
 use strict;
 use warnings;
+use v5.10;
 
-our $VERSION = '0.53';
+our $VERSION = '0.55';
 
 sub format { 'RSS ' . $_[0]->{'_version'} }
 
 use XML::Feed::Content;
+use XML::Feed::Util qw( format_W3CDTF );
 
 use base qw( XML::Feed::Entry );
 
@@ -29,8 +31,8 @@ sub link {
         ## For RSS 2.0 output from XML::RSS. Sigh.
         $entry->{entry}{permaLink} = $_[0];
     } else {
-        my $link = $entry->{entry}{link} ||
-            $entry->{entry}{permaLink} ||
+        my $link = $entry->{entry}{link} //
+            $entry->{entry}{permaLink} //
             $entry->{entry}{guid};
         if (defined $link) {
             $link =~ s/^\s+//;
@@ -41,17 +43,12 @@ sub link {
 }
 
 sub summary {
-    my $item = shift->{entry};
+    my $entry = shift;
+    my $item  = $entry->{entry};
     if (@_) {
         $item->{description} = ref($_[0]) eq 'XML::Feed::Content' ?
             $_[0]->body : $_[0];
-        ## Because of the logic below, we need to add some dummy content,
-        ## so that we'll properly recognize the description we enter as
-        ## the summary.
-        if (!$item->{content}{encoded} &&
-            !$item->{'http://www.w3.org/1999/xhtml'}{body}) {
-            $item->{content}{encoded} = ' ';
-        }
+        $entry->{description_is_summary} = 1;
     } else {
         ## Some RSS feeds use <description> for a summary, and some use it
         ## for the full content. Pretty gross. We don't want to return the
@@ -60,7 +57,8 @@ sub summary {
         ## typically used for the full content, use <description> as summary.
         my $txt;
         if ($item->{description} &&
-            ($item->{content}{encoded} ||
+            ($entry->{description_is_summary} ||
+             $entry->_content //
              $item->{'http://www.w3.org/1999/xhtml'}{body})) {
             $txt = $item->{description};
         ## Blogspot's 'short' RSS feeds do this in the Atom namespace
@@ -72,8 +70,16 @@ sub summary {
     }
 }
 
+# Get contentfrom HASH ref or scalar.
+sub _content {
+    my $entry = shift;
+    my $content = $entry->{entry}{content};
+    return ref $content ? $content->{encoded} : $content;
+}
+
 sub content {
-    my $item = shift->{entry};
+    my $entry = shift;
+    my $item = $entry->{entry};
     if (@_) {
         my $c;
         if (ref($_[0]) eq 'XML::Feed::Content') {
@@ -85,12 +91,13 @@ sub content {
         } else {
             $c = $_[0];
         }
+        $item->{content} = {} unless ref $item->{content};
         $item->{content}{encoded} = $c;
     } else {
         my $base;
         my $body =
-            (ref $item->{content}? $item->{content}{encoded} : $item->{content}) ||
-            $item->{'http://www.w3.org/1999/xhtml'}{body} ||
+            $entry->_content //
+            $item->{'http://www.w3.org/1999/xhtml'}{body} //
             $item->{description};
         if ('HASH' eq ref($body)) {
             $base = $body->{'xml:base'};
@@ -108,7 +115,7 @@ sub category {
         $item->{category}    = [@tmp];
         $item->{dc}{subject} = [@tmp];
     } else {
-        my $r = $item->{category} || $item->{dc}{subject};
+        my $r = $item->{category} // $item->{dc}{subject};
         my @r = ref($r) eq 'ARRAY' ? @$r : defined $r? ($r) : ();
         return wantarray? @r : $r[0];
     }
@@ -119,7 +126,7 @@ sub author {
     if (@_) {
         $item->{author} = $item->{dc}{creator} = $_[0];
     } else {
-        $item->{author} || $item->{dc}{creator};
+        $item->{author} // $item->{dc}{creator};
     }
 }
 
@@ -130,14 +137,14 @@ sub id {
     if (@_) {
         $item->{guid} = $_[0];
     } else {
-        $item->{guid} || $item->{link};
+        $item->{guid} // $item->{permaLink} // $item->{link};
     }
 }
 
 sub issued {
     my $item = shift->{entry};
     if (@_) {
-        $item->{dc}{date} = DateTime::Format::W3CDTF->format_datetime($_[0]);
+        $item->{dc}{date} = format_W3CDTF($_[0]);
         $item->{pubDate} = DateTime::Format::Mail->format_datetime($_[0]);
     } else {
         ## Either of these could die if the format is invalid.
@@ -162,10 +169,9 @@ sub issued {
 sub modified {
     my $item = shift->{entry};
     if (@_) {
-        $item->{dcterms}{modified} =
-            DateTime::Format::W3CDTF->format_datetime($_[0]);
+        $item->{dcterms}{modified} = format_W3CDTF($_[0]);
     } else {
-        if (my $ts = $item->{dcterms}{modified} ||
+        if (my $ts = $item->{dcterms}{modified} //
                 $item->{'http://www.w3.org/2005/Atom'}{updated}) {
             $ts =~ s/^\s+//;
             $ts =~ s/\s+$//;

@@ -10,12 +10,32 @@ my %WriteMakefileArgs =
    'VERSION_FROM'       => 'lib/Math/BigInt/FastCalc.pm',
    'AUTHOR'             => 'Peter John Acklam <pjacklam@gmail.com>',
    'MIN_PERL_VERSION'   => 5.006001,
-   'PREREQ_PM'          => {
-                            #'ExtUtils::MakeMaker' => 6.58,
-                            'XSLoader'            => 0,
-                            'Test::More'          => 0.88,
-                            'Math::BigInt'        => 1.999812,
+
+   # A hash of modules that are required to run Makefile.PL itself, but not to
+   # run the distribution.
+
+   'CONFIGURE_REQUIRES' => {
+                            'ExtUtils::MakeMaker' => 6.58,
                            },
+
+   # A hash of modules that are needed to build the module but not run it.
+
+   'BUILD_REQUIRES'     => {},
+
+   # A hash of modules that are needed to run the module.
+
+   'PREREQ_PM'          => {
+                            'Math::BigInt'        => 1.999812,
+                            'XSLoader'            => 0,
+                           },
+
+   # A hash of modules that are needed to test the module but not run or build
+   # it.
+
+   'TEST_REQUIRES'      => {
+                            'Test::More'          => 0.82,
+                           },
+
    'LICENSE'            => 'perl_5',
    'LIBS'               => [''],        # e.g., '-lm'
    'DEFINE'             => '',          # e.g., '-DHAVE_SOMETHING'

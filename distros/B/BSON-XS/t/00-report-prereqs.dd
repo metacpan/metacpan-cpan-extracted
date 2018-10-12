@@ -40,7 +40,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'BSON' => '1.008000',
+                                      'BSON' => '1.008001',
                                       'XSLoader' => '0',
                                       'boolean' => '0',
                                       'perl' => '5.010001',
@@ -55,7 +55,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'B' => '0',
-                                   'BSON' => '1.008000',
+                                   'BSON' => '1.008001',
                                    'BSON::Types' => '0',
                                    'Carp' => '0',
                                    'Data::Dumper' => '0',

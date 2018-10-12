@@ -33,27 +33,27 @@ Devel::Trace::trace('on');  # Enable
 #$Data::Dumper::Terse  = 1;
 use Data::Dump qw(dump);
 use feature 'say';
- 
-no strict; 
+
+no strict;
 no warnings;
 #use diagnostics;
 #use diagnostics -verbose;
 #enable  diagnostics;
 #disable diagnostics;
 use warnings::unused;
-@ISA = qw( Exporter ); 
+@ISA = qw( Exporter );
 #%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our @EXPORT = qw( 
-morph translate translate_surfaces_simple translate_surfaces rotate_surface translate_vertices shift_vertices rotate 
-rotatez make_generic_change reassign_construction change_thickness  
-recalculateish daylightcalc daylightcalc_other change_config checkfile change_climate recalculatenet apply_constraints 
-reshape_windows warp use_modish export_toenergyplus genchange genprop change_groundreflectance constrain_geometry 
-read_geometry read_geo_constraints apply_geo_constraints vary_controls  
-calc_newctl checkfile constrain_controls read_controls read_control_constraints apply_loopcontrol_changes 
-apply_flowcontrol_changes constrain_obstructions read_obstructions read_obs_constraints apply_obs_constraints 
-vary_net read_net apply_node_changes readobsfile obs_modify 
+our @EXPORT = qw(
+morph translate translate_surfaces_simple translate_surfaces rotate_surface translate_vertices shift_vertices rotate
+rotatez make_generic_change reassign_construction change_thickness
+recalculateish daylightcalc daylightcalc_other change_config checkfile change_climate recalculatenet apply_constraints
+reshape_windows warp use_modish export_toenergyplus genchange genprop change_groundreflectance constrain_geometry
+read_geometry read_geo_constraints apply_geo_constraints vary_controls
+calc_newctl checkfile constrain_controls read_controls read_control_constraints apply_loopcontrol_changes
+apply_flowcontrol_changes constrain_obstructions read_obstructions read_obs_constraints apply_obs_constraints
+vary_net read_net apply_node_changes readobsfile obs_modify
 decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rotate3d fixlength purifydata
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
@@ -61,50 +61,50 @@ gatherseparators supercleanarray modish $max_processes
 $VERSION = '0.69'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
-################################################# MORPH          
+################################################# MORPH
 
 sub morph
 {
-	my $swap = shift; 
+	my $swap = shift;
 	my %dat = %$swap;
-	my @instances = @{ $dat{instances} }; 
-	my $countcase = $dat{countcase}; 
-	my $countblock = $dat{countblock}; 
+	my @instances = @{ $dat{instances} };
+	my $countcase = $dat{countcase};
+	my $countblock = $dat{countblock};
 	my %datastruc = %{ $dat{datastruc} }; ######
 	my @rescontainer = @{ $dat{rescontainer} }; ######
-	
+
 	#my @sweeps = @{ $dat{sweeps} }; say $tee "IN MORPH dump(\@sweeps): " . dump(@sweeps);
-	#my @sourcesweeps = @{ $dat{sourcesweeps} }; say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);  
-	my %dirfiles = %{ $dat{dirfiles} }; 
-	my $configfile = %{ $dat{configfile} }; 
-		
-	$configfile = $main::configfile; 
-	@varinumbers = @main::varinumbers; 
+	#my @sourcesweeps = @{ $dat{sourcesweeps} }; say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
+	my %dirfiles = %{ $dat{dirfiles} };
+	my $configfile = %{ $dat{configfile} };
+
+	$configfile = $main::configfile;
+	@varinumbers = @main::varinumbers;
 	@mediumiters = @main::mediumiters;
-	@rootnames = @main::rootnames; 
-	%vals = %main::vals; 
-	
-	$mypath = $main::mypath;  
-	$exeonfiles = $main::exeonfiles; 
-	$generatechance = $main::generatechance; 
+	@rootnames = @main::rootnames;
+	%vals = %main::vals;
+
+	$mypath = $main::mypath;
+	$exeonfiles = $main::exeonfiles;
+	$generatechance = $main::generatechance;
 	$file = $main::file;
 	$preventsim = $main::preventsim;
-	$fileconfig = $main::fileconfig; 
+	$fileconfig = $main::fileconfig;
 	$outfile = $main::outfile;
 	$tofile = $main::tofile;
 	$report = $main::report;
 	$simnetwork = $main::simnetwork;
 	$max_processes = $main::max_processes;
-	
+
 	$tee = new IO::Tee( \*STDOUT, ">>$tofile" ); # GLOBAL ZZZ
-	
-	#open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-#	open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
+
+	#open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!";
+#	open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";
 	say $tee "\n# Now in Sim::OPT::Morph.\n";
-	
-	%dowhat = %main::dowhat; 
-	
-	%simtitles = %main::simtitles; 
+
+	%dowhat = %main::dowhat;
+
+	%simtitles = %main::simtitles;
 	%retrievedata = %main::retrievedata;
 	@keepcolumns = @main::keepcolumns;
 	@weights = @main::weights;
@@ -121,11 +121,11 @@ sub morph
 	@maketabledata = @main::maketabledata;
 	@filter_columns = @main::filter_columns;
 	%vals = %main::vals;
-	
+
 	require $configfile;
-	
-	my @simcases = @{ $dirfiles{simcases} }; 
-	my @simstruct = @{ $dirfiles{simstruct} }; 
+
+	my @simcases = @{ $dirfiles{simcases} };
+	my @simstruct = @{ $dirfiles{simstruct} };
 	my @morphcases = @{ $dirfiles{morphcases} };
 	my @morphstruct = @{ $dirfiles{morphstruct} };
 	my @retcases = @{ $dirfiles{retcases} };
@@ -136,10 +136,10 @@ sub morph
 	my @mergestruct = @{ $dirfiles{mergestruct} };
 	my @descendcases = @{ $dirfiles{descendcases} };
 	my @descendstruct = @{ $dirfiles{descendstruct} };
-	
-	my $morphlist = $dirfiles{morphlist}; 
+
+	my $morphlist = $dirfiles{morphlist};
 	my $morphblock = $dirfiles{morphblock};
-	my $simlist = $dirfiles{simlist}; 
+	my $simlist = $dirfiles{simlist};
 	my $simblock = $dirfiles{simblock};
 	my $retlist = $dirfiles{retlist};
 	my $retblock = $dirfiles{retblock};
@@ -148,217 +148,217 @@ sub morph
 	my $descendlist = $dirfiles{descendlist};
 	my $descendblock = $dirfiles{descendblock};
 
-	my $skipfile = $vals{skipfile}; 
-	my $skipsim = $vals{skipsim}; 
-	my $skipreport = $vals{skipreport}; 
-	
+	my $skipfile = $vals{skipfile};
+	my $skipsim = $vals{skipsim};
+	my $skipreport = $vals{skipreport};
+
 	if ( not ( $exeonfiles ) ) { $exeonfiles = "y"; }
 	if ( not ( $preventsim ) ) { $preventsim = "n"; }
 	if ( not ( $report ) ) { $report = "$mypath/$file-report.txt"; }
-	
+
 	#my $getpars = shift;
 	#eval( $getpars );
-	#if ( fileno (MORPHLIST) 
+	#if ( fileno (MORPHLIST)
 	my ( %numvertmenu, %vertnummenu );
 
 	if ( ( $dowhat{menus} eq "shortb" ) or ( not ( defined ( $dowhat{menus} ) ) ) )
 	{
-		%numvertmenu = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
-		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
-		13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "0\nq", 18 => "0\nr", 19 => "0\ns", 
-		20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
-		26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
-		32 => "0\n0\nb\nf", 33 => "0\n0\nb\ng", 34 => "0\n0\nb\nh", 35 => "0\n0\nb\ni", 36 => "0\n0\nb\nj", 
-		37 => "0\n0\nb\nk", 38 => "0\n0\nb\nl", 39 => "0\n0\nb\nm", 40 => "0\n0\nb\nn", 41 => "0\n0\nb\no", 
-		42 => "0\n0\nb\np", 43 => "0\n0\nb\nq", 44 => "0\n0\nb\nr", 45 => "0\n0\nb\ns", 46 => "0\n0\nb\nt", 
-		47 => "0\n0\nb\n0\nb\nu", 48 => "0\n0\nb\n0\nb\nv", 49 => "0\n0\nb\n0\nb\nw", 50 => "0\n0\nb\n0\nb\nx", 
-		51 => "0\n0\nb\n0\nb\ny", 52 => "0\n0\nb\n0\nb\nz", 
-		53 => "0\n0\nc\n0\nc\na", 54 => "0\n0\nc\n0\nc\nb", 55 => "0\n0\nc\n0\nc\nc", 56 => "0\n0\nc\n0\nc\nd", 
-		57 => "0\n0\nb\n0\nb\ne", 58 => "0\n0\nb\n0\nb\nf", 
-		59 => "0\n0\nb\n0\nb\ng", 60 => "0\n0\nb\n0\nb\nh", 61 => "0\n0\nb\n0\nb\ni", 
-		62 => "0\n0\nb\n0\nb\n0\nb\nj", 63 => "0\n0\nb\n0\nb\n0\nb\nk", 64 => "0\n0\nb\n0\nb\n0\nb\nl", 
-		65 => "0\n0\nb\n0\nb\n0\nb\nm", 66 => "0\n0\nb\n0\nb\n0\nb\nn", 
-		67 => "0\n0\nb\n0\nb\n0\nb\no", 68 => "0\n0\nb\n0\nb\n0\nb\np", 69 => "0\n0\nb\n0\nb\n0\nb\nq", 
-		70 => "0\n0\nb\n0\nb\n0\nb\nr", 71 => "0\n0\nb\n0\nb\n0\nb\ns", 
-		72 => "0\n0\nb\n0\nb\n0\nb\nt", 73 => "0\n0\nb\n0\nb\n0\nb\nu", 74 => "0\n0\nb\n0\nb\n0\nb\nv", 
-		75 => "0\n0\nb\n0\nb\n0\nb\nw", 76 => "0\n0\nb\n0\nb\n0\nb\nx", 
-		77 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ny", 78 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nz", 79 => "0\n0\nb\n0\nb\n0\nb\n0\nb\na", 
-		80 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nb", 81 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nc", 82 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nd", 
-		83 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ne", 84 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nf", 85 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ng", 
-		86 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nh", 87 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ni", 88 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nj", 
-		89 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nk", 90 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nl", 91 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nm", 
-		92 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn", 93 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no", 
-		94 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np", 95 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq", 
-		96 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr", 97 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns", 
-		98 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt", 99 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu", 
-		100 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv", 101 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw", 
+		%numvertmenu = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g",
+		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l",
+		13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "0\nq", 18 => "0\nr", 19 => "0\ns",
+		20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny",
+		26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne",
+		32 => "0\n0\nb\nf", 33 => "0\n0\nb\ng", 34 => "0\n0\nb\nh", 35 => "0\n0\nb\ni", 36 => "0\n0\nb\nj",
+		37 => "0\n0\nb\nk", 38 => "0\n0\nb\nl", 39 => "0\n0\nb\nm", 40 => "0\n0\nb\nn", 41 => "0\n0\nb\no",
+		42 => "0\n0\nb\np", 43 => "0\n0\nb\nq", 44 => "0\n0\nb\nr", 45 => "0\n0\nb\ns", 46 => "0\n0\nb\nt",
+		47 => "0\n0\nb\n0\nb\nu", 48 => "0\n0\nb\n0\nb\nv", 49 => "0\n0\nb\n0\nb\nw", 50 => "0\n0\nb\n0\nb\nx",
+		51 => "0\n0\nb\n0\nb\ny", 52 => "0\n0\nb\n0\nb\nz",
+		53 => "0\n0\nc\n0\nc\na", 54 => "0\n0\nc\n0\nc\nb", 55 => "0\n0\nc\n0\nc\nc", 56 => "0\n0\nc\n0\nc\nd",
+		57 => "0\n0\nb\n0\nb\ne", 58 => "0\n0\nb\n0\nb\nf",
+		59 => "0\n0\nb\n0\nb\ng", 60 => "0\n0\nb\n0\nb\nh", 61 => "0\n0\nb\n0\nb\ni",
+		62 => "0\n0\nb\n0\nb\n0\nb\nj", 63 => "0\n0\nb\n0\nb\n0\nb\nk", 64 => "0\n0\nb\n0\nb\n0\nb\nl",
+		65 => "0\n0\nb\n0\nb\n0\nb\nm", 66 => "0\n0\nb\n0\nb\n0\nb\nn",
+		67 => "0\n0\nb\n0\nb\n0\nb\no", 68 => "0\n0\nb\n0\nb\n0\nb\np", 69 => "0\n0\nb\n0\nb\n0\nb\nq",
+		70 => "0\n0\nb\n0\nb\n0\nb\nr", 71 => "0\n0\nb\n0\nb\n0\nb\ns",
+		72 => "0\n0\nb\n0\nb\n0\nb\nt", 73 => "0\n0\nb\n0\nb\n0\nb\nu", 74 => "0\n0\nb\n0\nb\n0\nb\nv",
+		75 => "0\n0\nb\n0\nb\n0\nb\nw", 76 => "0\n0\nb\n0\nb\n0\nb\nx",
+		77 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ny", 78 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nz", 79 => "0\n0\nb\n0\nb\n0\nb\n0\nb\na",
+		80 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nb", 81 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nc", 82 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nd",
+		83 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ne", 84 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nf", 85 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ng",
+		86 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nh", 87 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ni", 88 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nj",
+		89 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nk", 90 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nl", 91 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nm",
+		92 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn", 93 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no",
+		94 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np", 95 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq",
+		96 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr", 97 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns",
+		98 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt", 99 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu",
+		100 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv", 101 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw",
 		102 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nx", 103 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ny", );
 
-		%vertnummenu = ( "a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5, "f" => 6, "g" => 7, "h" => 8, "i" => 9, "j" => 10, "k" => 11, "l" => 12, 
-	"m" => 13, "n" => 14, "o" => 15, "p" => 16, 
-	"0\nq" => 17, "0\nr" => 18, "0\ns" => 19, "0\nt" => 20, "0\nu" => 21, "0\nv" => 22, "0\nw" => 23, "0\nx" => 24, "0\ny" => 25, "0\nz" => 26, 
-	"0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31, 
-	"0\n0\nb\nf" => 32, "0\n0\nb\ng" => 33, "0\n0\nb\nh" => 34, "0\n0\nb\ni" => 35, "0\n0\nb\nj" => 36, "0\n0\nb\nk" => 37, "0\n0\nb\nl" => 38, 
-	"0\n0\nb\nm" => 39, "0\n0\nb\nn" => 40, "0\n0\nb\no" => 41, "0\n0\nb\np" => 42, "0\n0\nb\nq" => 43, "0\n0\nb\nr" => 44, "0\n0\nb\ns" => 45, 
-	"0\n0\nb\nt" => 46, 
-	"0\n0\nb\n0\nb\nu" => 47, "0\n0\nb\n0\nb\nv" => 48, "0\n0\nb\n0\nb\nw" => 49, "0\n0\nb\n0\nb\nx" => 50, "0\n0\nb\n0\nb\ny" => 51, "0\n0\nc0\nc\nz" => 52, 
-	"0\n0\nb\n0\nb\na" => 53, "0\n0\nb\n0\nb\nb" => 54, "0\n0\nb\n0\nb\nc" => 55, "0\n0\nb\n0\nb\nd" => 56, "0\n0\nb\n0\nb\ne" => 57, "0\n0\nb0\nb\nf" => 58, 
-	"0\n0\nb\n0\nb\ng" => 59, "0\n0\nb\n0\nb\nh" => 60, "0\n0\nb\n0\nb\ni" => 61, 
-	"0\n0\nb\n0\nb\n0\nb\nj" => 62, "0\n0\nb\n0\nb\n0\nb\nk" => 63, "0\n0\nb\n0\nb\n0\nb\nl" => 64, "0\n0\nb\n0\nb\n0\nb\nm" => 65, "0\n0\nb\n0\nb\n0\nb\nn" => 66, 
-	"0\n0\nb\n0\nb\n0\nb\no" => 67, "0\n0\nb\n0\nb\n0\nb\np" => 68, "0\n0\nb\n0\nb\n0\nb\nq" => 69, "0\n0\nb\n0\nb\n0\nb\nr" => 70, "0\n0\nb\n0\nb\n0\nb\ns" => 71, 
-	"0\n0\nb\n0\nb\n0\nb\nt" => 72, "0\n0\nb\n0\nb\n0\nb\nu" => 73, "0\n0\nb\n0\nb\n0\nb\nv" => 74, "0\n0\nb\n0\nb\n0\nb\nw" => 75, "0\n0\nb\n0\nb\n0\nb\nx" => 76, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\ny" => 77, "0\n0\nb\n0\nb\n0\nb\n0\nb\nz" => 78, "0\n0\nb\n0\nb\n0\nb\n0\nb\na" => 79, "0\n0\nb\n0\nb\n0\nb\n0\nb\nb" => 80, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\nc" => 81, "0\n0\nb\n0\nb\n0\nb\n0\nb\nd" => 82, "0\n0\nb\n0\nb\n0\nb\n0\nb\ne" => 83, "0\n0\nb\n0\nb\n0\nb\n0\nb\nf" => 84, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\ng" => 85, "0\n0\nb\n0\nb\n0\nb\n0\nb\nh" => 86, "0\n0\nb\n0\nb\n0\nb\n0\nb\ni" => 87, "0\n0\nb\n0\nb\n0\nb\n0\nb\nj" => 88, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\nk" => 89, "0\n0\nb\n0\nb\n0\nb\n0\nb\nl" => 90, "0\n0\nb\n0\nb\n0\nb\n0\nb\nm" => 91, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn" => 92, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no" => 93, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np" => 94, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq" => 95, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr" => 96, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns" => 97, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt" => 98, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu" => 99, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv" => 100, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw" => 101, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nx" => 102, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ny" => 103, 
+		%vertnummenu = ( "a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5, "f" => 6, "g" => 7, "h" => 8, "i" => 9, "j" => 10, "k" => 11, "l" => 12,
+	"m" => 13, "n" => 14, "o" => 15, "p" => 16,
+	"0\nq" => 17, "0\nr" => 18, "0\ns" => 19, "0\nt" => 20, "0\nu" => 21, "0\nv" => 22, "0\nw" => 23, "0\nx" => 24, "0\ny" => 25, "0\nz" => 26,
+	"0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31,
+	"0\n0\nb\nf" => 32, "0\n0\nb\ng" => 33, "0\n0\nb\nh" => 34, "0\n0\nb\ni" => 35, "0\n0\nb\nj" => 36, "0\n0\nb\nk" => 37, "0\n0\nb\nl" => 38,
+	"0\n0\nb\nm" => 39, "0\n0\nb\nn" => 40, "0\n0\nb\no" => 41, "0\n0\nb\np" => 42, "0\n0\nb\nq" => 43, "0\n0\nb\nr" => 44, "0\n0\nb\ns" => 45,
+	"0\n0\nb\nt" => 46,
+	"0\n0\nb\n0\nb\nu" => 47, "0\n0\nb\n0\nb\nv" => 48, "0\n0\nb\n0\nb\nw" => 49, "0\n0\nb\n0\nb\nx" => 50, "0\n0\nb\n0\nb\ny" => 51, "0\n0\nc0\nc\nz" => 52,
+	"0\n0\nb\n0\nb\na" => 53, "0\n0\nb\n0\nb\nb" => 54, "0\n0\nb\n0\nb\nc" => 55, "0\n0\nb\n0\nb\nd" => 56, "0\n0\nb\n0\nb\ne" => 57, "0\n0\nb0\nb\nf" => 58,
+	"0\n0\nb\n0\nb\ng" => 59, "0\n0\nb\n0\nb\nh" => 60, "0\n0\nb\n0\nb\ni" => 61,
+	"0\n0\nb\n0\nb\n0\nb\nj" => 62, "0\n0\nb\n0\nb\n0\nb\nk" => 63, "0\n0\nb\n0\nb\n0\nb\nl" => 64, "0\n0\nb\n0\nb\n0\nb\nm" => 65, "0\n0\nb\n0\nb\n0\nb\nn" => 66,
+	"0\n0\nb\n0\nb\n0\nb\no" => 67, "0\n0\nb\n0\nb\n0\nb\np" => 68, "0\n0\nb\n0\nb\n0\nb\nq" => 69, "0\n0\nb\n0\nb\n0\nb\nr" => 70, "0\n0\nb\n0\nb\n0\nb\ns" => 71,
+	"0\n0\nb\n0\nb\n0\nb\nt" => 72, "0\n0\nb\n0\nb\n0\nb\nu" => 73, "0\n0\nb\n0\nb\n0\nb\nv" => 74, "0\n0\nb\n0\nb\n0\nb\nw" => 75, "0\n0\nb\n0\nb\n0\nb\nx" => 76,
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\ny" => 77, "0\n0\nb\n0\nb\n0\nb\n0\nb\nz" => 78, "0\n0\nb\n0\nb\n0\nb\n0\nb\na" => 79, "0\n0\nb\n0\nb\n0\nb\n0\nb\nb" => 80,
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\nc" => 81, "0\n0\nb\n0\nb\n0\nb\n0\nb\nd" => 82, "0\n0\nb\n0\nb\n0\nb\n0\nb\ne" => 83, "0\n0\nb\n0\nb\n0\nb\n0\nb\nf" => 84,
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\ng" => 85, "0\n0\nb\n0\nb\n0\nb\n0\nb\nh" => 86, "0\n0\nb\n0\nb\n0\nb\n0\nb\ni" => 87, "0\n0\nb\n0\nb\n0\nb\n0\nb\nj" => 88,
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\nk" => 89, "0\n0\nb\n0\nb\n0\nb\n0\nb\nl" => 90, "0\n0\nb\n0\nb\n0\nb\n0\nb\nm" => 91,
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn" => 92, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no" => 93, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np" => 94, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq" => 95,
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr" => 96, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns" => 97, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt" => 98, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu" => 99,
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv" => 100, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw" => 101, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nx" => 102, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ny" => 103,
 	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nz" => 104 );
 	}
 	elsif ( $dowhat{menus} eq "shortc" )
 	{
-		%numvertmenu = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
-		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
-		13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "0\nq", 18 => "0\nr", 19 => "0\ns", 
-		20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
-		26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
-		32 => "0\n0\nc\nf", 33 => "0\n0\nc\ng", 34 => "0\n0\nc\nh", 35 => "0\n0\nc\ni", 36 => "0\n0\nc\nj", 
-		37 => "0\n0\nc\nk", 38 => "0\n0\nc\nl", 39 => "0\n0\nc\nm", 40 => "0\n0\nc\nn", 41 => "0\n0\nc\no", 
-		42 => "0\n0\nc\np", 43 => "0\n0\nc\nq", 44 => "0\n0\nc\nr", 45 => "0\n0\nc\ns", 46 => "0\n0\nc\nt", 
-		47 => "0\n0\nc\n0\nc\nu", 48 => "0\n0\nc\n0\nc\nv", 49 => "0\n0\nc\n0\nc\nw", 50 => "0\n0\nc\n0\nc\nx", 
-		51 => "0\n0\nc\n0\nc\ny", 52 => "0\n0\nc\n0\nc\nz", 
-		53 => "0\n0\nc\n0\nc\na", 54 => "0\n0\nc\n0\nc\nb", 55 => "0\n0\nc\n0\nc\nc", 56 => "0\n0\nc\n0\nc\nd", 
-		57 => "0\n0\nc\n0\nc\ne", 58 => "0\n0\nc\n0\nc\nf", 
-		59 => "0\n0\nc\n0\nc\ng", 60 => "0\n0\nc\n0\nc\nh", 61 => "0\n0\nc\n0\nc\ni", 
-		62 => "0\n0\nc\n0\nc\n0\nc\nj", 63 => "0\n0\nc\n0\nc\n0\nc\nk", 64 => "0\n0\nc\n0\nc\n0\nc\nl", 
-		65 => "0\n0\nc\n0\nc\n0\nc\nm", 66 => "0\n0\nc\n0\nc\n0\nc\nn", 
-		67 => "0\n0\nc\n0\nc\n0\nc\no", 68 => "0\n0\nc\n0\nc\n0\nc\np", 69 => "0\n0\nc\n0\nc\n0\nc\nq", 
-		70 => "0\n0\nc\n0\nc\n0\nc\nr", 71 => "0\n0\nc\n0\nc\n0\nc\ns", 
-		72 => "0\n0\nc\n0\nc\n0\nc\nt", 73 => "0\n0\nc\n0\nc\n0\nc\nu", 74 => "0\n0\nc\n0\nc\n0\nc\nv", 
-		75 => "0\n0\nc\n0\nc\n0\nc\nw", 76 => "0\n0\nc\n0\nc\n0\nc\nx", 
-		77 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ny", 78 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nz", 79 => "0\n0\nc\n0\nc\n0\nc\n0\nc\na", 
-		80 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nb", 81 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nc", 82 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nd", 
-		83 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ne", 84 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nf", 85 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ng", 
-		86 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nh", 87 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ni", 88 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nj", 
-		89 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nk", 90 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nl", 91 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nm", 
-		92 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nn", 93 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\no", 
-		94 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\np", 95 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nq", 
-		96 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nr", 97 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ns", 
-		98 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nt", 99 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nu", 
-		100 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nv", 101 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nw", 
+		%numvertmenu = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g",
+		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l",
+		13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "0\nq", 18 => "0\nr", 19 => "0\ns",
+		20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny",
+		26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne",
+		32 => "0\n0\nc\nf", 33 => "0\n0\nc\ng", 34 => "0\n0\nc\nh", 35 => "0\n0\nc\ni", 36 => "0\n0\nc\nj",
+		37 => "0\n0\nc\nk", 38 => "0\n0\nc\nl", 39 => "0\n0\nc\nm", 40 => "0\n0\nc\nn", 41 => "0\n0\nc\no",
+		42 => "0\n0\nc\np", 43 => "0\n0\nc\nq", 44 => "0\n0\nc\nr", 45 => "0\n0\nc\ns", 46 => "0\n0\nc\nt",
+		47 => "0\n0\nc\n0\nc\nu", 48 => "0\n0\nc\n0\nc\nv", 49 => "0\n0\nc\n0\nc\nw", 50 => "0\n0\nc\n0\nc\nx",
+		51 => "0\n0\nc\n0\nc\ny", 52 => "0\n0\nc\n0\nc\nz",
+		53 => "0\n0\nc\n0\nc\na", 54 => "0\n0\nc\n0\nc\nb", 55 => "0\n0\nc\n0\nc\nc", 56 => "0\n0\nc\n0\nc\nd",
+		57 => "0\n0\nc\n0\nc\ne", 58 => "0\n0\nc\n0\nc\nf",
+		59 => "0\n0\nc\n0\nc\ng", 60 => "0\n0\nc\n0\nc\nh", 61 => "0\n0\nc\n0\nc\ni",
+		62 => "0\n0\nc\n0\nc\n0\nc\nj", 63 => "0\n0\nc\n0\nc\n0\nc\nk", 64 => "0\n0\nc\n0\nc\n0\nc\nl",
+		65 => "0\n0\nc\n0\nc\n0\nc\nm", 66 => "0\n0\nc\n0\nc\n0\nc\nn",
+		67 => "0\n0\nc\n0\nc\n0\nc\no", 68 => "0\n0\nc\n0\nc\n0\nc\np", 69 => "0\n0\nc\n0\nc\n0\nc\nq",
+		70 => "0\n0\nc\n0\nc\n0\nc\nr", 71 => "0\n0\nc\n0\nc\n0\nc\ns",
+		72 => "0\n0\nc\n0\nc\n0\nc\nt", 73 => "0\n0\nc\n0\nc\n0\nc\nu", 74 => "0\n0\nc\n0\nc\n0\nc\nv",
+		75 => "0\n0\nc\n0\nc\n0\nc\nw", 76 => "0\n0\nc\n0\nc\n0\nc\nx",
+		77 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ny", 78 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nz", 79 => "0\n0\nc\n0\nc\n0\nc\n0\nc\na",
+		80 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nb", 81 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nc", 82 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nd",
+		83 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ne", 84 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nf", 85 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ng",
+		86 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nh", 87 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ni", 88 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nj",
+		89 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nk", 90 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nl", 91 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nm",
+		92 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nn", 93 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\no",
+		94 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\np", 95 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nq",
+		96 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nr", 97 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ns",
+		98 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nt", 99 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nu",
+		100 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nv", 101 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nw",
 		102 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nx", 103 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ny", );
 
-		%vertnummenu = ( "a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5, "f" => 6, "g" => 7, "h" => 8, "i" => 9, "j" => 10, "k" => 11, "l" => 12, 
-			"m" => 13, "n" => 14, "o" => 15, "p" => 16, 
-		"0\nq" => 17, "0\nr" => 18, "0\ns" => 19, "0\nt" => 20, "0\nu" => 21, "0\nv" => 22, "0\nw" => 23, "0\nx" => 24, "0\ny" => 25, "0\nz" => 26, 
-		"0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31, 
-		"0\n0\nc\nf" => 32, "0\n0\nc\ng" => 33, "0\n0\nc\nh" => 34, "0\n0\nc\ni" => 35, "0\n0\nc\nj" => 36, "0\n0\nc\nk" => 37, "0\n0\nc\nl" => 38, 
-		"0\n0\nc\nm" => 39, "0\n0\nc\nn" => 40, "0\n0\nc\no" => 41, "0\n0\nc\np" => 42, "0\n0\nc\nq" => 43, "0\n0\nc\nr" => 44, "0\n0\nc\ns" => 45, 
-		"0\n0\nc\nt" => 46, 
-		"0\n0\nc\n0\nc\nu" => 47, "0\n0\nc\n0\nc\nv" => 48, "0\n0\nc\n0\nc\nw" => 49, "0\n0\nc\n0\nc\nx" => 50, "0\n0\nc\n0\nc\ny" => 51, "0\n0\nc0\nc\nz" => 52, 
-		"0\n0\nc\n0\nc\na" => 53, "0\n0\nc\n0\nc\nb" => 54, "0\n0\nc\n0\nc\nc" => 55, "0\n0\nc\n0\nc\nd" => 56, "0\n0\nc\n0\nc\ne" => 57, "0\n0\nc0\nc\nf" => 58, 
-		"0\n0\nc\n0\nc\ng" => 59, "0\n0\nc\n0\nc\nh" => 60, "0\n0\nc\n0\nc\ni" => 61, 
-		"0\n0\nc\n0\nc\n0\nc\nj" => 62, "0\n0\nc\n0\nc\n0\nc\nk" => 63, "0\n0\nc\n0\nc\n0\nc\nl" => 64, "0\n0\nc\n0\nc\n0\nc\nm" => 65, "0\n0\nc\n0\nc\n0\nc\nn" => 66, 
-		"0\n0\nc\n0\nc\n0\nc\no" => 67, "0\n0\nc\n0\nc\n0\nc\np" => 68, "0\n0\nc\n0\nc\n0\nc\nq" => 69, "0\n0\nc\n0\nc\n0\nc\nr" => 70, "0\n0\nc\n0\nc\n0\nc\ns" => 71, 
-		"0\n0\nc\n0\nc\n0\nc\nt" => 72, "0\n0\nc\n0\nc\n0\nc\nu" => 73, "0\n0\nc\n0\nc\n0\nc\nv" => 74, "0\n0\nc\n0\nc\n0\nc\nw" => 75, "0\n0\nc\n0\nc\n0\nc\nx" => 76, 
-		"0\n0\nc\n0\nc\n0\nc\n0\nc\ny" => 77, "0\n0\nc\n0\nc\n0\nc\n0\nc\nz" => 78, "0\n0\nc\n0\nc\n0\nc\n0\nc\na" => 79, "0\n0\nc\n0\nc\n0\nc\n0\nc\nb" => 80, 
-		"0\n0\nc\n0\nc\n0\nc\n0\nc\nc" => 81, "0\n0\nc\n0\nc\n0\nc\n0\nc\nd" => 82, "0\n0\nc\n0\nc\n0\nc\n0\nc\ne" => 83, "0\n0\nc\n0\nc\n0\nc\n0\nc\nf" => 84, 
-		"0\n0\nc\n0\nc\n0\nc\n0\nc\ng" => 85, "0\n0\nc\n0\nc\n0\nc\n0\nc\nh" => 86, "0\n0\nc\n0\nc\n0\nc\n0\nc\ni" => 87, "0\n0\nc\n0\nc\n0\nc\n0\nc\nj" => 88, 
-		"0\n0\nc\n0\nc\n0\nc\n0\nc\nk" => 89, "0\n0\nc\n0\nc\n0\nc\n0\nc\nl" => 90, "0\n0\nc\n0\nc\n0\nc\n0\nc\nm" => 91, 
-		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nn" => 92, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\no" => 93, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\np" => 94, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nq" => 95, 
-		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nr" => 96, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ns" => 97, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nt" => 98, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nu" => 99, 
-		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nv" => 100, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nw" => 101, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nx" => 102, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ny" => 103, 
+		%vertnummenu = ( "a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5, "f" => 6, "g" => 7, "h" => 8, "i" => 9, "j" => 10, "k" => 11, "l" => 12,
+			"m" => 13, "n" => 14, "o" => 15, "p" => 16,
+		"0\nq" => 17, "0\nr" => 18, "0\ns" => 19, "0\nt" => 20, "0\nu" => 21, "0\nv" => 22, "0\nw" => 23, "0\nx" => 24, "0\ny" => 25, "0\nz" => 26,
+		"0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31,
+		"0\n0\nc\nf" => 32, "0\n0\nc\ng" => 33, "0\n0\nc\nh" => 34, "0\n0\nc\ni" => 35, "0\n0\nc\nj" => 36, "0\n0\nc\nk" => 37, "0\n0\nc\nl" => 38,
+		"0\n0\nc\nm" => 39, "0\n0\nc\nn" => 40, "0\n0\nc\no" => 41, "0\n0\nc\np" => 42, "0\n0\nc\nq" => 43, "0\n0\nc\nr" => 44, "0\n0\nc\ns" => 45,
+		"0\n0\nc\nt" => 46,
+		"0\n0\nc\n0\nc\nu" => 47, "0\n0\nc\n0\nc\nv" => 48, "0\n0\nc\n0\nc\nw" => 49, "0\n0\nc\n0\nc\nx" => 50, "0\n0\nc\n0\nc\ny" => 51, "0\n0\nc0\nc\nz" => 52,
+		"0\n0\nc\n0\nc\na" => 53, "0\n0\nc\n0\nc\nb" => 54, "0\n0\nc\n0\nc\nc" => 55, "0\n0\nc\n0\nc\nd" => 56, "0\n0\nc\n0\nc\ne" => 57, "0\n0\nc0\nc\nf" => 58,
+		"0\n0\nc\n0\nc\ng" => 59, "0\n0\nc\n0\nc\nh" => 60, "0\n0\nc\n0\nc\ni" => 61,
+		"0\n0\nc\n0\nc\n0\nc\nj" => 62, "0\n0\nc\n0\nc\n0\nc\nk" => 63, "0\n0\nc\n0\nc\n0\nc\nl" => 64, "0\n0\nc\n0\nc\n0\nc\nm" => 65, "0\n0\nc\n0\nc\n0\nc\nn" => 66,
+		"0\n0\nc\n0\nc\n0\nc\no" => 67, "0\n0\nc\n0\nc\n0\nc\np" => 68, "0\n0\nc\n0\nc\n0\nc\nq" => 69, "0\n0\nc\n0\nc\n0\nc\nr" => 70, "0\n0\nc\n0\nc\n0\nc\ns" => 71,
+		"0\n0\nc\n0\nc\n0\nc\nt" => 72, "0\n0\nc\n0\nc\n0\nc\nu" => 73, "0\n0\nc\n0\nc\n0\nc\nv" => 74, "0\n0\nc\n0\nc\n0\nc\nw" => 75, "0\n0\nc\n0\nc\n0\nc\nx" => 76,
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\ny" => 77, "0\n0\nc\n0\nc\n0\nc\n0\nc\nz" => 78, "0\n0\nc\n0\nc\n0\nc\n0\nc\na" => 79, "0\n0\nc\n0\nc\n0\nc\n0\nc\nb" => 80,
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\nc" => 81, "0\n0\nc\n0\nc\n0\nc\n0\nc\nd" => 82, "0\n0\nc\n0\nc\n0\nc\n0\nc\ne" => 83, "0\n0\nc\n0\nc\n0\nc\n0\nc\nf" => 84,
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\ng" => 85, "0\n0\nc\n0\nc\n0\nc\n0\nc\nh" => 86, "0\n0\nc\n0\nc\n0\nc\n0\nc\ni" => 87, "0\n0\nc\n0\nc\n0\nc\n0\nc\nj" => 88,
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\nk" => 89, "0\n0\nc\n0\nc\n0\nc\n0\nc\nl" => 90, "0\n0\nc\n0\nc\n0\nc\n0\nc\nm" => 91,
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nn" => 92, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\no" => 93, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\np" => 94, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nq" => 95,
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nr" => 96, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ns" => 97, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nt" => 98, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nu" => 99,
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nv" => 100, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nw" => 101, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nx" => 102, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ny" => 103,
 		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nz" => 104 );
 	}
-	
+
 	my @menus = ( \%numvertmenu, \%vertnummenu );
-	
-	my $numberof_morphings = scalar ( keys %{ $dowhat{simtools} } ); 
+
+	my $numberof_morphings = scalar ( keys %{ $dowhat{simtools} } );
 	my ( @done_instances, @done_tos );
-	
+
 	$countinstance = 1;
 	foreach my $instance ( sort { ${ $a }{to} <=> ${ $b }{to} } @instances )
-	{  
-		
-		my $instance_after = $instances[ $countinstance ];  
-		my %d = %{ $instance }; 
-		my %d_after = %{ $instance_after }; 
+	{
 
-		my $countcase = $d{countcase}; 
-		my $countblock = $d{countblock}; 
+		my $instance_after = $instances[ $countinstance ];
+		my %d = %{ $instance };
+		my %d_after = %{ $instance_after };
+
+		my $countcase = $d{countcase};
+		my $countblock = $d{countblock};
 		my %datastruc = %{ $d{datastruc} }; ######
 		my @rescontainer = @{ $d{rescontainer} }; ######
-		my @miditers = @{ $d{miditers} }; 
-		my @winneritems = @{ $d{winneritems} }; 
-		my $countvar = $d{countvar}; 
-		my $countvar_after = $d_after{countvar}; 
-		my $countstep = $d{countstep}; 
-		my $to = $d{to}; 
-		my $origin = $d{origin}; 
-		my @uplift = @{ $d{uplift} }; 
-		my @backvalues = @{ $d{backvalues} }; 
-		my @sweeps = @{ $d{sweeps} }; 
-		my @sourcesweeps = @{ $d{sourcesweeps} }; 
+		my @miditers = @{ $d{miditers} };
+		my @winneritems = @{ $d{winneritems} };
+		my $countvar = $d{countvar};
+		my $countvar_after = $d_after{countvar};
+		my $countstep = $d{countstep};
+		my $to = $d{to};
+		my $origin = $d{origin};
+		my @uplift = @{ $d{uplift} };
+		my @backvalues = @{ $d{backvalues} };
+		my @sweeps = @{ $d{sweeps} };
+		my @sourcesweeps = @{ $d{sourcesweeps} };
 		#eval($getparshere);
-		
-		my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase); 
-		my @blockelts = Sim::OPT::getblockelts(\@sweeps, $countcase, $countblock); 
-		my @blocks = Sim::OPT::getblocks(\@sweeps, $countcase);  
-		my $toitem = Sim::OPT::getitem(\@winneritems, $countcase, $countblock); 
-		my $from = Sim::OPT::getline($toitem); 
-		my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase); 
-		my %mids = Sim::OPT::getcase(\@miditers, $countcase); 
+
+		my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase);
+		my @blockelts = Sim::OPT::getblockelts(\@sweeps, $countcase, $countblock);
+		my @blocks = Sim::OPT::getblocks(\@sweeps, $countcase);
+		my $toitem = Sim::OPT::getitem(\@winneritems, $countcase, $countblock);
+		my $from = Sim::OPT::getline($toitem);
+		my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase);
+		my %mids = Sim::OPT::getcase(\@miditers, $countcase);
 		#eval($getfly);
-		
-		my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varinumbers); 
-		my $varnumber = $countvar; 
-		
+
+		my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varinumbers);
+		my $varnumber = $countvar;
+
 		my $countcaseplus1 = ( $countcase + 1);
 		my $countblockplus1 = ( $countblock + 1);
-		
+
 		#@totblockelts = (@totblockelts, @blockelts); # @blockelts
 		#@totblockelts = uniq(@totblockelts);
 		#@totblockelts = sort(@totblockelts);
 		#if ( $countvar == $#blockelts )
 		#{
 		#  $$general_variables[0] = "n";
-		#} # THIS TELLS THAT IF THE SEARCH IS ENDING (LAST SUBSEARCH CYCLE) GENERATION OF CASES HAS TO BE TURNED OFF  
+		#} # THIS TELLS THAT IF THE SEARCH IS ENDING (LAST SUBSEARCH CYCLE) GENERATION OF CASES HAS TO BE TURNED OFF
 		####### OLD. $stepsvar = ${ "varnums{$countvar}" . "$varnumber" };
-		
+
 		my $countmorphing = 1;
-		my $numberof_morphings = scalar ( keys %{ $dowhat{simtools} } ); 
-		
+		my $numberof_morphings = scalar ( keys %{ $dowhat{simtools} } );
+
 		while ( $countmorphing <= $numberof_morphings )
-		{  
-			if ( not (defined ( $vals{$countmorphing}{$countvar}{general_variables} ) ) ) 
-			{ 
-				$vals{$countmorphing}{$countvar}{general_variables} = 
+		{
+			if ( not (defined ( $vals{$countmorphing}{$countvar}{general_variables} ) ) )
+			{
+				$vals{$countmorphing}{$countvar}{general_variables} =
 								[
 								"y", # $generate(n) eq "n" # (if the models deriving from this runs will not be generating new models) or y (if they will be generating new models).
 								"n" #if $sequencer eq "y", or "last" (of a sequence) iteration between non-continuous cases wanted.  The first gets appended to the middle(s) and to he last. Otherwise, "n".
 								];
 			}
-			
-			if ( not ( defined( $dowhat{actonexisting_models}->{$countmorphing} ) ) ) 
+
+			if ( not ( defined( $dowhat{actonexisting_models}->{$countmorphing} ) ) )
 			{
 				$dowhat{actonexisting_models}->{$countmorphing} = "y";
 			}
 
-			my @applytype = @{ $vals{$countmorphing}{$countvar}{applytype} }; 
-			my $general_variables = $vals{$countmorphing}{$countvar}{general_variables}; 
-			my @generic_change = @{$vals{$countmorphing}{$countvar}{generic_change} }; 
-			my $rotate = $vals{$countmorphing}{$countvar}{rotate}; 
+			my @applytype = @{ $vals{$countmorphing}{$countvar}{applytype} };
+			my $general_variables = $vals{$countmorphing}{$countvar}{general_variables};
+			my @generic_change = @{$vals{$countmorphing}{$countvar}{generic_change} };
+			my $rotate = $vals{$countmorphing}{$countvar}{rotate};
 			my $rotatez = $vals{$countmorphing}{$countvar}{rotatez};
-			my $translate = $vals{$countmorphing}{$countvar}{translate}; 
+			my $translate = $vals{$countmorphing}{$countvar}{translate};
 			my $translate_surface = $vals{$countmorphing}{$countvar}{translate_surface};
 			my $keep_obstructions = $vals{$countmorphing}{$countvar}{keep_obstructions};
 			my $shift_vertices = $vals{$countmorphing}{$countvar}{shift_vertices};
 			my $construction_reassignment = $vals{$countmorphing}{$countvar}{construction_reassignment};
 			my $change_thickness = $vals{$countmorphing}{$countvar}{change_thickness};
-			my $recalculateish = $vals{$countmorphing}{$countvar}{recalculateish};  
+			my $recalculateish = $vals{$countmorphing}{$countvar}{recalculateish};
 			my @recalculatenet = @{ $vals{$countmorphing}{$countvar}{recalculatenet} };
-			my $obs_modify = $vals{$countmorphing}{$countvar}{obs_modify}; 
+			my $obs_modify = $vals{$countmorphing}{$countvar}{obs_modify};
 			my $netcomponentchange = $vals{$countmorphing}{$countvar}{netcomponentchange};
 			my $changecontrol = $vals{$countmorphing}{$countvar}{changecontrol};
 			my @apply_constraints = @{ $vals{$countmorphing}{$countvar}{apply_constraints} };
@@ -375,13 +375,13 @@ sub morph
 			my $checkfile = $vals{$countmorphing}{$countvar}{checkfile};
 			my @change_climate = @{ $vals{$countmorphing}{$countvar}{change_climate} };
 			my $pin_obstructions = $vals{$countmorphing}{$countvar}{pin_obstructions};
-			my $use_modish = $vals{$countmorphing}{$countvar}{use_modish};  
+			my $use_modish = $vals{$countmorphing}{$countvar}{use_modish};
 			my $export_toradiance = $vals{$countmorphing}{$countvar}{export_toradiance};
-			my $genchange = $vals{$countmorphing}{$countvar}{genchange}; 
+			my $genchange = $vals{$countmorphing}{$countvar}{genchange};
 			my $genprop = $vals{$countmorphing}{$countvar}{genprop};
 			my $change_groundreflectance = $vals{$countmorphing}{$countvar}{change_groundreflectance};
-			my $export_toenergyplus = $vals{$countmorphing}{$countvar}{export_toenergyplus}; 
-			my $skipop = $vals{$countmorphing}{$countvar}{skipop}; 
+			my $export_toenergyplus = $vals{$countmorphing}{$countvar}{export_toenergyplus};
+			my $skipop = $vals{$countmorphing}{$countvar}{skipop};
 			my $todos = $vals{$countmorphing}{$countvar}{todos};
 			# genchange
 			my ( @cases_to_sim, @files_to_convert );
@@ -394,34 +394,34 @@ sub morph
 			my $generate  = $$general_variables[0];
 			my $sequencer = $$general_variables[1];
 			my $dffile = "df-$file.txt";
-			
+
 			#my $tofilemorph = "$tofile" . "-1morph.txt";
 			#my $outfilemorph = "$outfile" . "-1morph.txt";
-			
+
 			#open( $tee, ">>$tofilemorph" );
 			#open( OUTFILE, ">>$outfilemorph" );
-		
-			
-			
-			
+
+
+
+
 			if ( ( $countblock == 0 ) and ( $countstep == 1 ) )
-			{  
+			{
 				unless ( $dowhat{inactivatemorph} eq "y" )
 				{
 					if (not ( -e "$origin" ) )
 					{
-						unless ($exeonfiles eq "n") 
-						{ 
-							unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+						unless ($exeonfiles eq "n")
+						{
+							unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 							{
-								`cp -R $mypath/$file $from`; 
+								`cp -R $mypath/$file $from`;
 							}
 							else
 							{
-								`xcopy  /e /c /r /y $mypath\\$file $from`; 
+								`xcopy  /e /c /r /y $mypath\\$file $from`;
 							}
 						}
-						unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+						unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 						{
 							say $tee "cp -R $mypath/$file $from\n";
 						}
@@ -433,7 +433,7 @@ sub morph
 				}
 			}
 			unless ( $dowhat{inactivatemorph} eq "y" )
-			{  
+			{
 				#if ( fileno (RETLIST) )
 				#if (not (-e $morphlist ) )
 				#{
@@ -441,12 +441,12 @@ sub morph
 				#  {
 						open( MORPHLIST, ">>$morphlist") or die( "$!" ); # or die;
 				#  }
-				#  else 
+				#  else
 				#  {
 				#    open( MORPHLIST, ">>$morphlist") or die;
 				#  }
 				#}
-				
+
 				#if ( fileno (MORPHBLOCK) )
 				#if (not (-e $morphblock ) )
 				#{
@@ -457,27 +457,27 @@ sub morph
 				#  else
 				#  {
 				#    open( MORPHBLOCK, ">>$morphblock");# or die;
-				#  }    
-				#}  
+				#  }
+				#}
 				#if ( ( $to eq $origin ) or ( not ( eval ( $skip) ) ) )
 				#if  ( not ( eval ( $skip) ) )
 				#{
 					push ( @{ $morphstruct[$countcase][$countblock] }, $to );
 					print MORPHBLOCK "$to\n";
 				#}
-				
-				
+
+
 				#if ( ( not ( $to ~~ @morphcases ) ) and ( ( $to eq $origin ) or ( not ( eval ( $skip) ) ) ) )
 				#if ( ( ( ( $to eq $origin ) or ( not ( $to ~~ @morphcases ) ) ) ) and ( ( $to eq $origin ) or ( not ( eval ( $skip) ) ) ) )
-				
-				
+
+
 				if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonexisting_models}->{$countmorphing} eq "y" ) )
-				#if  ( not ( eval ( $skip) ) ) 
-				{  
-					
+				#if  ( not ( eval ( $skip) ) )
+				{
+
 					if ( not ( $to ~~ @morphcases ) )
 					{
-						
+
 						push ( @morphcases, $to );
 						print MORPHLIST "$to\n";
 						say $tee "from: $from, origin: $origin, to: $to";
@@ -494,7 +494,7 @@ sub morph
 						#    #$to = "$case_to_sim$varnumber-$countstep§";
 						#    $to = "$almost_to" . "§";
 						#  }
-						#} 
+						#}
 						#elsif ( ( $generate eq "y" ) and ( $sequencer eq "n" ) )
 						#{
 						#  if ( $almost_to =~ m/_$/ ) { $to = "$almost_to" ; }
@@ -508,12 +508,12 @@ sub morph
 						#      print $tee "chmod -R 777 $from\n\n";
 						#    }
 						#  }
-						#} 
+						#}
 						#elsif ( ( $generate eq "y" ) and ( $sequencer eq "y" ) )
 						#{
 						#  #$to = "$case_to_sim$varnumber-$countstep" . "£";
 						#  $to = "$almost_to" . "£";
-						#} 
+						#}
 						#elsif ( ( $generate eq "y" ) and ( $sequencer eq "last" ) )
 						#{
 						#  if ( $almost_to =~ m/£$/ ) { $to = "$almost_to" ; }
@@ -527,42 +527,42 @@ sub morph
 						#    #  print $tee "chmod -R 777 $from\n\n";
 						#    #}
 						#  }
-						#} 
+						#}
 						#elsif ( ( $generate eq "n" ) and ( $sequencer eq "n" ) )
 						#{
 						#   $almost_to =~ s/[_|£]$// ;
 						#  #$to = "$case_to_sim$varnumber-$countstep";
 						#  $to = "$almost_to";
 						#}
-						
-						
-								
-						if 
-						#( 
+
+
+
+						if
+						#(
 						#( $generate eq "y" )
 						#and ( $countstep == $stepsvar )
-						#and ( ( $sequencer eq "n" ) or ( $sequencer eq "last" ) ) 
+						#and ( ( $sequencer eq "n" ) or ( $sequencer eq "last" ) )
 						#and ( ($skip ne "")  and ($skipask ne "yes") )
-						#and 
+						#and
 
 						( ( not (-e $to ) ) or ( not ($to ~~ @morphcases) ) or ( $dowhat{overwrite_models}->{$countmorphing} eq "y" ) )
 						#)
-						{ 
+						{
 
-							
-							
-							unless ($exeonfiles eq "n") 
-							{ 
-								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+
+
+							unless ($exeonfiles eq "n")
+							{
+								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 								{
-									`cp -R $origin $to\n`; 
+									`cp -R $origin $to\n`;
 								}
 								else
 								{
-									`xcopy  /e /c /r /y $origin $to\n`; 
+									`xcopy  /e /c /r /y $origin $to\n`;
 								}
 							}
-							unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+							unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 							{
 								print $tee "cp -R $origin $to\n\n";
 							}
@@ -570,11 +570,11 @@ sub morph
 							{
 								print $tee "xcopy  /e /c /r /y $origin $to\n\n";
 							}
-							
+
 							#}
-							
+
 							#my $passmorph;
-							
+
 							#if ( $dowhat{actonexisting_models}->{$countmorphing} eq "y" )
 							#{
 							#  $passmorph = "pass";
@@ -583,43 +583,43 @@ sub morph
 							#( $passmorph ) ? ( eval( $evalthis ) ) : ( "nothing" );
 						}
 					}
-					
-					
+
+
 					#if ( not ( $todos ~~ @dones ) )
 					#{
 					#  push ( @dones, $todos );
 					#}
-					
+
 					if ( ( $dowhat{actonexisting_models}->{$countmorphing} eq "y" ) )
-					{  
+					{
 						#if ( $passmorph eq "pass" )
 						#{
 						#  eval( $evalthis ); say $tee "EVALED";
 						#}
-						
-						# $passmorph ? eval( $evalthis ) : " " ;    
-						
-						#{        
+
+						# $passmorph ? eval( $evalthis ) : " " ;
+
+						#{
 						my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
 						foreach my $op (@applytype) # "$op" MEANS OPERATION
-						{  
-							
+						{
+
 							my $skip = $skipop->[ $countop ];
-							my $modification_type = $applytype[$countop][0]; #say $tee "\$modification_type: $modification_type"; # 
+							my $modification_type = $applytype[$countop][0]; #say $tee "\$modification_type: $modification_type"; #
 							if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type ne "changeconfig" ) )
 							{
-								unless ($exeonfiles eq "n") 
-								{  
-									unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+								unless ($exeonfiles eq "n")
+								{
+									unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 									{
-										`cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n`; 
+										`cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n`;
 									}
 									else
 									{
-										`xcopy  /e /c /r /y $to\\zones\\$applytype[$countop][1] $to\\zones\\$applytype[$countop][2]\n`; 
+										`xcopy  /e /c /r /y $to\\zones\\$applytype[$countop][1] $to\\zones\\$applytype[$countop][2]\n`;
 									}
 								}
-								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 								{
 									print $tee "cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
 								}
@@ -627,56 +627,56 @@ sub morph
 								{
 									print $tee "xcopy /e /c /r /y $to\\zones\\$applytype[$countop][1] $to\\zones\\$applytype[$countop][2]\n\n";
 								}
-								unless ($exeonfiles eq "n") 
-								{  
-									unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+								unless ($exeonfiles eq "n")
+								{
+									unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 									{
-										`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`; 
+										`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 									}
 									else
 									{
-										`xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n`; 
+										`xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n`;
 									}
 								}    # ORDINARILY, THIS PART CAN BE REMOVED
-								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 								{
-									print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n"; 
+									print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 								}
 								else
 								{
-									print $tee "xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n"; 
+									print $tee "xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n";
 								}
 							}
-							
+
 							if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type eq "changeconfig" ) )
 							{
-								unless ($exeonfiles eq "n") 
-								{ 
-									unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+								unless ($exeonfiles eq "n")
+								{
+									unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 									{
-										`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`; 
+										`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 									}
 									else
 									{
-										`xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n`; 
+										`xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n`;
 									}
 								}
-								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 								{
-									print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n"; 
+									print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 								}
 								else
 								{
-									print $tee "xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n"; 
+									print $tee "xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n";
 								}
 							} # ORDINARILY, THIS PART CAN BE REMOVED
 
-							
+
 							print `cd $to`;
 							print $tee "cd $to\n\n";
-							
+
 							my $launchline;
-							unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+							unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 							{
 								$launchline = " -file $to/cfg/$fileconfig -mode script";
 							}
@@ -684,25 +684,25 @@ sub morph
 							{
 								$launchline = " -file $to\\cfg\\$fileconfig -mode script";
 							}
-							
-							
+
+
 							if ( ( $stepsvar > 1) and ( not ( eval ( $skip ) ) ) )
-							{  
-								
+							{
+
 
 								if ( $modification_type eq "change_groundreflectance" )#
 								{
-									
+
 									change_groundreflectance
 									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus   );
-								} 
+								}
 								elsif ( $modification_type eq "genchange" )#
-								{  
+								{
 									( $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = genchange
 									( $to, $stepsvar, $countop, $countstep,
-										\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file, 
-										$countmorphing, "vary", $names_ref, $nums_ref, 
+										\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file,
+										$countmorphing, "vary", $names_ref, $nums_ref,
 										$newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, \@menus );
 									%names = %$names_ref;
 									%nums = %$nums_ref;
@@ -718,148 +718,148 @@ sub morph
 								} #
 								elsif ( $modification_type eq "translate_surface" )
 								{
-									translate_surfaces 
-									($to, $stepsvar, $countop, $countstep, 
+									translate_surfaces
+									($to, $stepsvar, $countop, $countstep,
 										\@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-								} 
+								}
 								elsif ( $modification_type eq "rotate_surface" )              #
 								{
 									rotate_surface
-									($to, $stepsvar, $countop, $countstep, 
+									($to, $stepsvar, $countop, $countstep,
 										\@applytype, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-								} 
+								}
 								elsif ( $modification_type eq "shift_vertices" )
 								{
 									shift_vertices
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
 								elsif ( $modification_type eq "translate_vertices" )
 								{
 									translate_vertices
-									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );                         
-								}  
+									( $to, $stepsvar, $countop, $countstep,
+										\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+								}
 								elsif ( $modification_type eq "construction_reassign" )
 								{
 									reassign_construction
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-								} 
+								}
 								elsif ( $modification_type eq "rotate" )
 								{
 									rotate
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-								} 
+								}
 								elsif ( $modification_type eq "translate" )
 								{
-									
+
 									translate
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-								} 
+								}
 								elsif ( $modification_type eq "apply_constraints" )
 								{
-									
+
 									apply_constraints
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-								} 
+								}
 								elsif ( $modification_type eq "change_thickness" )
 								{
 									change_thickness
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, $change_thickness, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-								} 
+								}
 								elsif ( $modification_type eq "rotatez" )
 								{
 									rotatez
-									($to, $stepsvar, $countop, $countstep, 
+									($to, $stepsvar, $countop, $countstep,
 										\@applytype, $rotatez, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-								} 
+								}
 								elsif ( $modification_type eq "change_config" )
 								{
 									change_config
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, \@change_config, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
-								elsif ( $modification_type eq "reshape_windows" ) 
+								elsif ( $modification_type eq "reshape_windows" )
 								{
 									reshape_windows
-									($to, $stepsvar, $countop, $countstep, 
-										\@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );          
+									($to, $stepsvar, $countop, $countstep,
+										\@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
-								elsif ( $modification_type eq "obs_modify" ) 
-								{  
+								elsif ( $modification_type eq "obs_modify" )
+								{
 									obs_modify
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, $obs_modify, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-									
+
 								}
 								elsif ( $modification_type eq "warping" )
 								{
 									warp
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
 								elsif ( $modification_type eq "vary_controls" )
 								{
 									vary_controls
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, \@vary_controls, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
 								elsif ( $modification_type eq "vary_net" )
 								{
 									vary_net
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, \@vary_net, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
 								elsif ( $modification_type eq "change_climate" )
 								{
 									change_climate
-									( $to, $stepsvar, $countop, $countstep, 
+									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, \@change_climate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $countmorphing, $launchline, \@menus );
 								}
-								else 
-								{ 
+								else
+								{
 									say "Can't recognize the modification type. So quitting.";
 									die( "$!" );
 								}
-								
-								push ( @{ $done_instances[ $countvar ] }, $instance ); 
-								push ( @{ $done_tos[ $countvar ] }, $to ); 
-								
-								
-								
-								
-								my @todolist = @{ $todos->[ $countop ] }; 
+
+								push ( @{ $done_instances[ $countvar ] }, $instance );
+								push ( @{ $done_tos[ $countvar ] }, $to );
+
+
+
+
+								my @todolist = @{ $todos->[ $countop ] };
 								my ( @expectedinsts, @expectedtos );
 								foreach my $todo ( @todolist )
-								{  
-									my @listtodo = @{ $todo->{actions} }; 
+								{
+									my @listtodo = @{ $todo->{actions} };
 									foreach my $action ( @listtodo )
-									{   
-										
+									{
+
 										if ( not ( eval ( $skip ) ) )
 										{
-											
+
 											if ( ( defined( $constrain_geometry[$countop] ) ) and ( ( $action eq "read_geo" ) or ( $action eq "write_geo" ) ) )
-											{ 
-												
+											{
+
 												my ( $v_ref ) = constrain_geometry
-												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $launchline, \@menus ); 
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $launchline, \@menus );
 												@v = @$v_ref;
 												@v_ = @$v__ref;
 											}
-											
+
 											if ( ( defined( $genprop[$countop] ) ) and ( ( $action eq "read_gen" ) or ( $action eq "write_gen" ) ) )
-											{ 
-												( $names_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = 
+											{
+												( $names_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) =
 													genprop ( $to, $stepsvar, $countop, $countstep,
-														\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $action,  
-														$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, 
+														\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $action,
+														$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref,
 														$newfilecontents_ref, $launchline );
 														%nums = %$nums_ref;
 														%names = %$names_ref;
@@ -867,75 +867,75 @@ sub morph
 														@filecontents = @$filecontents_ref;
 														@newfilecontents = @$newfilecontents_ref;
 											}
-											
+
 											if ( defined ( $constrain_obstructions[$countop] ) and ( ( $action eq "read_obs" ) or ( $action eq "write_obs" ) ) )
-											{   
+											{
 												my ( $obs_ref, $obs__ref ) = constrain_obstructions
-												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $launchline, \@menus ); 
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $launchline, \@menus );
 													@obs = @$obs_ref;
 													@obs_ = @$obs__ref;
 											}
-											
+
 											if ( defined( $constrain_net[$countop] ) and ( ( $action eq "read_net" ) or ( $action eq "write_net" ) ) )
-											{ 
-												my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop, 
+											{
+												my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop,
 													$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-													$node_ref, $component_ref, $donode_ref, $docomponent_ref, $launchline, \@menus ); 
+													$node_ref, $component_ref, $donode_ref, $docomponent_ref, $launchline, \@menus );
 													@node = @$node_ref;
 													@component = @$component_ref;
 													@donode = @$donode_ref;
 													@docomponent = @$docomponent_ref;
 											}
-											
+
 											if ( defined( $constrain_controls[$countop] ) and ( ( $action eq "read_ctl" ) or ( $action eq "write_ctl" ) ) )
-											{ 
+											{
 												my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
-												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action, 
-													$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, \@menus ); 
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
+													$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, \@menus );
 													@loopcontrol = @$loopcontrol_ref;
 													@flowcontrol = @$flowcontrol_ref;
 													@new_loopcontrol = @$new_loopcontrol_ref;
 													@new_flowcontrol = @$new_flowcontrol_ref;
 											}
-											
-											if ( defined( $apply_constraints[$countop] ) and ( $action eq "apply_constraints" ) ) 
-											{ 
+
+											if ( defined( $apply_constraints[$countop] ) and ( $action eq "apply_constraints" ) )
+											{
 												apply_constraints
-												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $launchline, \@menus ); 
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $launchline, \@menus );
 											}
-											
+
 											if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
-											{   
+											{
 												pin_obstructions
-												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus ); 
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 											}
-											
-											if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) ) 
-											{ 
+
+											if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) )
+											{
 												recalculatenet
-												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $launchline, \@menus ); 
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $launchline, \@menus );
 											}
-											
-											if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) ) 
-											{   
+
+											if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
+											{
 												recalculateish
-												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus ); 
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 											}
-											
-											if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) ) 
-											{   
+
+											if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
+											{
 												daylightcalc
-												( $to, $stepsvar, $countop,  
-													$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $launchline, \@menus ); 
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $launchline, \@menus );
 											}
-											if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) ) 
-											{ 
+											if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
+											{
 
 
 
@@ -943,44 +943,44 @@ sub morph
 
 
 												use_modish
-												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus ); 
-											
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+
 
 
 
 											}
-											if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) ) 
-											{ 
+											if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) )
+											{
 												export_toenergyplus
-												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus ); 
+												( $to, $stepsvar, $countop,
+													$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 											}
 										}
 									}
 								}
-								
-								
-								
-								
+
+
+
+
 								if ( ( $countvar_after > $countvar ) or ( defined( $countvar ) and ( not ( defined( $countvar_after ) ) ) and ( not( scalar( @todolist ) == 0 ) ) ) )
 								{
 									my ( @expected_instances, @expected_tos );
-									
+
 									foreach my $todo ( @todolist )
-									{  
-										my @listtodo = @{ $todo->{actions} }; 
-										my @parameters =  @{ $todo->{parameters} }; 
+									{
+										my @listtodo = @{ $todo->{actions} };
+										my @parameters =  @{ $todo->{parameters} };
 										foreach my $parameter ( @parameters )
 										{
 											foreach my $inst ( @instances )
 											{
-												my %d = %{ $inst }; 
-												my $countcase_ = $d{countcase}; 
-												my $countblock_ = $d{countblock}; 
-												my $countvar_ = $d{countvar}; 
-												my $countstep_ = $d{countstep}; 
-												my $to_ = $d{to}; 
+												my %d = %{ $inst };
+												my $countcase_ = $d{countcase};
+												my $countblock_ = $d{countblock};
+												my $countvar_ = $d{countvar};
+												my $countstep_ = $d{countstep};
+												my $to_ = $d{to};
 
 												if ( $parameter == $countvar )
 												{
@@ -989,22 +989,22 @@ sub morph
 												}
 											}
 										}
-										
-										
-										
-										
+
+
+
+
 										my ( @nondone_tos, @nondone_instances );
 										my $countinst = 0;
 										foreach ( @expected_tos )
-										{  
-											my $expected_instance = $expected_instances[ $countinst ]; 
-											my $expected_to = $expected_tos[ $countinst ]; 
-											
-											
+										{
+											my $expected_instance = $expected_instances[ $countinst ];
+											my $expected_to = $expected_tos[ $countinst ];
+
+
 											if ( not ( $expected_to ~~ @{ $done_tos[ $countvar ] } ) )
 											{
-												push ( @nondone_tos, $expected_to ); 
-												push ( @nondone_instances, $expected_instance ); 
+												push ( @nondone_tos, $expected_to );
+												push ( @nondone_instances, $expected_instance );
 											}
 											$countinst++;
 										}
@@ -1012,38 +1012,38 @@ sub morph
 										@nondone_instances = uniq( @nondone_instances );
 										#say $tee "COMPLETED THE FOLLOWING CASES : " . dump( @{ $done_tos[ $countvar ] } ) . " ";
 										#say $tee "SO ABOUT TO FIX EX-POST THE REMAINING CASES : " . dump( @nondone_tos ) . " ";
-										
-										
+
+
 										my $numberof = scalar( @nondone_instances );
 										my $cou = 0;
 										my $countt = 1;
 										foreach my $inst ( @nondone_instances )
-										{ 
+										{
 											#say $tee "FINALLY ACTING ON \@nondone_instances : " . dump( @nondone_instances ) .  "BY LOOPING THROUGH \@todolist : " . dump( @todolist );;
 											#say $tee "FINALLY ACTING ON \@nondone_instances BY LOOPING THROUGH \@todolist : " . dump( @todolist );
-											
-											
+
+
 											$countt++;
 											my $numberdone = ( $cou + 1 );
-											my %d = %{ $inst }; 
-											my $countcase = $d{countcase}; 
-											my $countblock = $d{countblock}; 
-											my @miditers = @{ $d{miditers} }; 
-											my @winneritems = @{ $d{winneritems} }; 
-											my $countvar = $d{countvar}; 
-											my $countstep = $d{countstep}; 
-											my $to = $d{to}; 
-											my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varinumbers); 
-											
+											my %d = %{ $inst };
+											my $countcase = $d{countcase};
+											my $countblock = $d{countblock};
+											my @miditers = @{ $d{miditers} };
+											my @winneritems = @{ $d{winneritems} };
+											my $countvar = $d{countvar};
+											my $countstep = $d{countstep};
+											my $to = $d{to};
+											my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varinumbers);
+
 											foreach my $todo ( @todolist )
-											{  
-												my @listtodo = @{ $todo->{actions} };   
+											{
+												my @listtodo = @{ $todo->{actions} };
 												foreach my $action ( @listtodo )
-												{  
+												{
 													if ( not ( eval ( $skip ) ) )
-													{  
+													{
 														my $newlaunchline;
-														unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+														unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 														{
 															$newlaunchline = " -file $to/cfg/$fileconfig -mode script";
 														}
@@ -1051,26 +1051,26 @@ sub morph
 														{
 															$newlaunchline = " -file $to\\cfg\\$fileconfig -mode script";
 														}
-														
-														
+
+
 														if ( ( defined( $constrain_geometry[$countop] ) ) and ( ( $action eq "read_geo" ) or ( $action_ eq "write_geo" ) ) )
-														{ 
-															
+														{
+
 															my ( $v_ref ) = constrain_geometry
-															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $newlaunchline, \@menus ); 
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $newlaunchline, \@menus );
 															@v = @$v_ref;
 															@v_ = @$v__ref;
 														}
-														
+
 														if ( ( defined( $genprop[$countop] ) ) and ( ( $action eq "read_gen" ) or ( $action eq "write_gen" ) ) )
-														{   
-															
+														{
+
 															#say $tee "WORKING EX-POST ON NON-YET-UPDATED INSTANCES AFTER LAST MORPHED INSTANCE. NOw INSTANCE $numberdone OF $numberof.";
-															( $names_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = 
+															( $names_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) =
 																genprop ( $to_, $stepsvar_, $countop, $countstep_,
-																	\@applytype, $genchange, $countvar_, $fileconfig, $mypath, $file, $countmorphing, $action_,  
-																	$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, 
+																	\@applytype, $genchange, $countvar_, $fileconfig, $mypath, $file, $countmorphing, $action_,
+																	$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref,
 																	$newfilecontents_ref, $newlaunchline, \@menus );
 																	%nums = %$nums_ref;
 																	%names = %$names_ref;
@@ -1078,89 +1078,89 @@ sub morph
 																	@filecontents = @$filecontents_ref;
 																	@newfilecontents = @$newfilecontents_ref;
 														}
-														
+
 														if ( defined ( $constrain_obstructions[$countop] ) and ( ( $action eq "read_obs" ) or ( $action eq "write_obs" ) ) )
-														{   
+														{
 															my ( $obs_ref, $obs__ref ) = constrain_obstructions
-															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $newlaunchline, \@menus ); 
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $newlaunchline, \@menus );
 																@obs = @$obs_ref;
 																@obs_ = @$obs__ref;
 														}
-														
+
 														if ( defined( $constrain_net[$countop] ) and ( ( $action eq "read_net" ) or ( $action eq "write_net" ) ) )
-														{ 
-															my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop, 
+														{
+															my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop,
 																$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-																$node_ref, $component_ref, $donode_ref, $docomponent_ref, $newlaunchline, \@menus ); 
+																$node_ref, $component_ref, $donode_ref, $docomponent_ref, $newlaunchline, \@menus );
 																@node = @$node_ref;
 																@component = @$component_ref;
 																@donode = @$donode_ref;
 																@docomponent = @$docomponent_ref;
 														}
-														
+
 														if ( defined( $constrain_controls[$countop] ) and ( ( $action eq "read_ctl" ) or ( $action eq "write_ctl" ) ) )
-														{ 
+														{
 															my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
-															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action, 
-																$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $newlaunchline, \@menus  ); 
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
+																$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $newlaunchline, \@menus  );
 																@loopcontrol = @$loopcontrol_ref;
 																@flowcontrol = @$flowcontrol_ref;
 																@new_loopcontrol = @$new_loopcontrol_ref;
 																@new_flowcontrol = @$new_flowcontrol_ref;
 														}
-														
-														if ( defined( $apply_constraints[$countop] ) and ( $action eq "apply_constraints" ) ) 
-														{ 
+
+														if ( defined( $apply_constraints[$countop] ) and ( $action eq "apply_constraints" ) )
+														{
 															apply_constraints
-															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus ); 
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus );
 														}
-														
+
 														if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
-														{   
+														{
 															pin_obstructions
-															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus ); 
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
 														}
-														
-														if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) ) 
-														{ 
+
+														if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) )
+														{
 															recalculatenet
-															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus ); 
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus );
 														}
-														
-														if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) ) 
+
+														if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
 														{   say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
 															recalculateish
-															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus ); 
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
 														}
-														
-														if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) ) 
-														{   
-															daylightcalc
-															( $to, $stepsvar, $countop,  
-																$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus ); 
-														}
-														
 
-														if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) ) 
+														if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
+														{
+															daylightcalc
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus );
+														}
+
+
+														if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
 														{   say $tee "FOR $to CALLED \$use_modish EX-POST " . dump( $use_modish );
 															use_modish
-															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus ); 
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
 														}
-														if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) ) 
-														{ 
+														if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) )
+														{
 															export_toenergyplus
-															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus ); 
+															( $to, $stepsvar, $countop,
+																$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
 														}
-														
-													}                          
+
+													}
 												}
 											}
 											$cou++;
@@ -1203,23 +1203,23 @@ sub decreasearray
 	foreach ( @arr )
 	{
 		push ( @newarr, ( $_ - 1 ) );
-	} 
+	}
 	return ( @newarr );
 }
 
-sub deg2rad_ 
+sub deg2rad_
 {
 	my $degrees = shift;
 	return ( ( $degrees / 180 ) * 3.14159265358979 );
 }
 
-sub rad2deg_ 
+sub rad2deg_
 {
 	my $radians = shift;
 	return ( ( $radians / 3.14159265358979 ) * 180 );
 }
-		
-		
+
+
 sub purifyarray
 {
 	my @elts = @_;
@@ -1250,9 +1250,9 @@ sub supercleanarray
 
 sub replace_nth
 {
-	my ( $row, $nposition, $string, $newstring ) = @_; 
-	$row =~ s/((?:$string.*?){$nposition})$string/${1}$newstring/; 
-	return ( $row ); 
+	my ( $row, $nposition, $string, $newstring ) = @_;
+	$row =~ s/((?:$string.*?){$nposition})$string/${1}$newstring/;
+	return ( $row );
 }
 
 sub rotate2dabs # CHECK! ZZZ
@@ -1285,7 +1285,7 @@ sub rotate3d # CHECK! ZZZ
 	print "centre_x; $centre_x \n"; print "centre_y; $centre_y \n"; print "centre_z; $centre_z \n";
 
 	my @newbag;
-	
+
 	foreach $vertex_ref ( @vertices )
 	{
 		( $x, $y, $z ) = ( $vertex_ref->[0], $vertex_ref->[1], $vertex_ref->[2]); print "x; $x \n"; print "y; $y \n"; print "z; $z \n";
@@ -1295,7 +1295,7 @@ sub rotate3d # CHECK! ZZZ
 			$newx = sprintf( "%.3f", $newx );
 			$newy = sprintf( "%.3f", $newy );
 			if ( $flatten eq "" )
-			{ 
+			{
 				push ( @newbag, [ $newx, $newy, $z ] );
 			}
 			elsif ( $flatten eq "x")
@@ -1313,7 +1313,7 @@ sub rotate3d # CHECK! ZZZ
 			$newx = sprintf( "%.3f", $newx );
 			$newz = sprintf( "%.3f", $newz );
 			if ( $flatten eq "" )
-			{ 
+			{
 				push ( @newbag, [ $newx, $y, $newz ] );
 			}
 			elsif ( $flatten eq "z")
@@ -1331,7 +1331,7 @@ sub rotate3d # CHECK! ZZZ
 			$newy = sprintf( "%.3f", $newy );
 			$newz = sprintf( "%.3f", $newz );
 			if ( $flatten eq "" )
-			{ 
+			{
 				push ( @newbag, [ $x, $newy, $newz ] );
 			}
 			elsif ( $flatten eq "z")
@@ -1349,23 +1349,23 @@ sub rotate3d # CHECK! ZZZ
 
 
 
-sub fixlength 
+sub fixlength
 {
-	my ( $el, $newel, $adjustanswer ) = @_; 
-	
-	my $length = length( $el ); 
-	
+	my ( $el, $newel, $adjustanswer ) = @_;
+
+	my $length = length( $el );
+
 	my $truenewel;
 	if ( ( $el < 0 ) and ( $adjustanswer eq "y" ) )
 	{
 		if ( not ( $el =~ /\./ ) )
 		{
-			
+
 			my $thisel = "$el" . ".000";
 		}
 		else
 		{
-			$truenewel = substr( $newel, 0, $length ); 
+			$truenewel = substr( $newel, 0, $length );
 		}
 	}
 	elsif ( ( $el >= 0 ) and ( $newel < 0 ) and ( $adjustanswer eq "y" ) )
@@ -1375,7 +1375,7 @@ sub fixlength
 		{
 			my $thisel = "$el" . ".000";
 			$adjustedlength = length( $thisel ); #ay "\$length !: " . dump( $length );
-			$truenewel = substr( $newel, 0, $adjustedlength); 
+			$truenewel = substr( $newel, 0, $adjustedlength);
 		}
 		$truenewel = " " . "$truenewel";
 	}
@@ -1385,7 +1385,7 @@ sub fixlength
 		{
 			my $thisel = "$el" . "000";
 			$adjustedlength = length( $thisel ); #say "\$length !: " . dump( $length );
-			$truenewel = substr( $newel, 0, $adjustedlength); 
+			$truenewel = substr( $newel, 0, $adjustedlength);
 		}
 	}
 	elsif ( ( $el >= 0 ) and ( $newel >= 0 ) and ( $adjustanswer eq "y" ) )
@@ -1394,61 +1394,61 @@ sub fixlength
 		if ( not ( $el =~ /\./ ) )
 		{
 			my $thisel = "$el" . ".000";
-			$adjustedlength = length( $thisel ); 
-			$truenewel = substr( $newel, 0, $adjustedlength); 
+			$adjustedlength = length( $thisel );
+			$truenewel = substr( $newel, 0, $adjustedlength);
 		}
 		$truenewel = " " . "$truenewel";
 	}
-	
-	$truenewel = sprintf( "%.3f", $truenewel ); 
-	
+
+	$truenewel = sprintf( "%.3f", $truenewel );
+
 	if ( ( $el >= 0 ) and ( $newel => 0 ) and ( $adjustanswer eq "n" ) )
 	{
 		if ( $el =~ /\./ )
 		{
-			$newel = $newel . "000";  
-		}  
-		$truenewel = substr( $newel, 0, $length); 
+			$newel = $newel . "000";
+		}
+		$truenewel = substr( $newel, 0, $length);
 	}
-	
-	return ( "$el", "$truenewel" ); 
+
+	return ( "$el", "$truenewel" );
 }
 
 sub purifydata
 {  # IT BRINGS ALL THE NUMBERS IN A LIST OF LIST (LIKE: VERTEXES) IN A FILE AT THE SAME LENGTH OF ANOTHER SPECIFIED LIST
 	my ( $modelarr_ref, $newarr_ref ) = @_;
-	@modelarr = @$modelarr_ref;  
-	@newarr = @$newarr_ref; 
-	
+	@modelarr = @$modelarr_ref;
+	@newarr = @$newarr_ref;
+
 	my $countout = 0;
 	foreach my $row ( @modelarr )
-	{   
-		my $rownew = $newarr[ $countout ]; 
+	{
+		my $rownew = $newarr[ $countout ];
 		my $countin = 0;
 		foreach my $elt ( @$row )
-		{   
-			my $newelt = $rownew->[ $countin ] ; 
+		{
+			my $newelt = $rownew->[ $countin ] ;
 			if ( ( $newelt ne $elt ) or ( $newelt =! $elt ) )
-			{   
-				$newarr_ref->[ $countout ][ $countin ] = fixlength( "$elt", "$newelt" ); 
+			{
+				$newarr_ref->[ $countout ][ $countin ] = fixlength( "$elt", "$newelt" );
 			}
 			$countin++;
 		}
 		$countout++;
-	} 
+	}
 	return( $newarr_ref );
 }
 
 sub gatherseparators
 {
 	my ( $string ) = @_;
-	
+
 	my @chars = split( "", $string );
-	
+
 	my @bag;
 	foreach my $char ( @chars )
 	{
-		
+
 		if ( $char =~ /(,|;)/ )
 		{
 			push ( @bag, $char );
@@ -1458,7 +1458,7 @@ sub gatherseparators
 }
 
 
-############################################ END OF GENERAL FUNCTIONS  
+############################################ END OF GENERAL FUNCTIONS
 
 
 sub translate
@@ -1475,14 +1475,14 @@ sub translate
 
 	if ( $stepsvar > 1 )
 	{
-		my $yes_or_no_translate_obstructions = "$$translate[$countop][0]"; 
-		my $yes_or_no_update_radiation =  $$translate[$countop][1]; 
-		my $configfile =  $$translate[$countop][3]; 
-		
+		my $yes_or_no_translate_obstructions = "$$translate[$countop][0]";
+		my $yes_or_no_update_radiation =  $$translate[$countop][1];
+		my $configfile =  $$translate[$countop][3];
+
 		if ( $yes_or_no_update_radiation eq "y" )
 		{
 			$yes_or_no_update_radiation = "a";
-		} 
+		}
 		else
 		{
 			$yes_or_no_update_radiation = "c";
@@ -1491,53 +1491,53 @@ sub translate
 		my @coordinates_for_movement = @{ $$translate[$countop][1] };
 		my ( $x_begin, $y_begin, $z_begin, $x_end, $y_end, $z_end, $x_swing, $y_swing, $z_swing, $x_value, $y_value, $z_value );
 		my ( @coord2, @coord1 );
-			
+
 		if ( ref( $coordinates_for_movement[0] ) )
 		{
-			@coord1 = @{ $coordinates_for_movement[0] }; 
-			@coord2 = @{ $coordinates_for_movement[1] }; 
-			( $x_begin, $y_begin, $z_begin ) = @coord1; 
-			( $x_end, $y_end, $z_end ) = @coord2; 
-			
-			$x_swing = ( $x_end - $x_begin ); 
-			$y_swing = ( $y_end - $y_begin ); 
-			$z_swing = ( $z_end - $z_begin ); 
-			
-			$x_pace = ( $x_swing / ( $stepsvar - 1 ) ); 
-			$y_pace = ( $y_swing / ( $stepsvar - 1 ) ); 
-			$z_pace = ( $z_swing / ( $stepsvar - 1 ) ); 
-			
-			$x_value = ( $x_begin + ( $x_pace * ( $countstep - 1) ) ); 
-			$y_value = ( $y_begin + ( $y_pace * ( $countstep - 1) ) ); 
-			$z_value = ( $z_begin + ( $z_pace * ( $countstep - 1) ) ); 
-			
+			@coord1 = @{ $coordinates_for_movement[0] };
+			@coord2 = @{ $coordinates_for_movement[1] };
+			( $x_begin, $y_begin, $z_begin ) = @coord1;
+			( $x_end, $y_end, $z_end ) = @coord2;
+
+			$x_swing = ( $x_end - $x_begin );
+			$y_swing = ( $y_end - $y_begin );
+			$z_swing = ( $z_end - $z_begin );
+
+			$x_pace = ( $x_swing / ( $stepsvar - 1 ) );
+			$y_pace = ( $y_swing / ( $stepsvar - 1 ) );
+			$z_pace = ( $z_swing / ( $stepsvar - 1 ) );
+
+			$x_value = ( $x_begin + ( $x_pace * ( $countstep - 1) ) );
+			$y_value = ( $y_begin + ( $y_pace * ( $countstep - 1) ) );
+			$z_value = ( $z_begin + ( $z_pace * ( $countstep - 1) ) );
+
 		}
 		else
 		{
-			$x_end = $coordinates_for_movement[0]; 
-			$x_swing = ( 2 * $x_end ); 
-			$x_base = $base[0]; 
-			
-			$y_end = $coordinates_for_movement[1]; 
-			$y_swing = ( 2 * $y_end ); 
-			$y_base = $base[1]; 
-			
-			$z_end = $coordinates_for_movement[2]; 
-			$z_swing = ( 2 * $z_end ); 
-			$z_base = $base[2]; 
+			$x_end = $coordinates_for_movement[0];
+			$x_swing = ( 2 * $x_end );
+			$x_base = $base[0];
 
-			$x_pace = ( $x_swing / ( $stepsvar - 1 ) ); 
-			$x_value = ($x_base + ( $x_end - ( $x_pace * ( $countstep - 1 ) ) )); 
-			$y_pace = ( $y_swing / ( $stepsvar - 1 ) ); 
-			$y_value = ($y_base + ( $y_end - ( $y_pace * ( $countstep - 1 ) ) )); 
-			$z_pace = ( $z_swing / ( $stepsvar - 1 ) ); 
-			$z_value = ($z_base + ( $z_end - ( $z_pace * ( $countstep - 1 ) ) )); 
+			$y_end = $coordinates_for_movement[1];
+			$y_swing = ( 2 * $y_end );
+			$y_base = $base[1];
+
+			$z_end = $coordinates_for_movement[2];
+			$z_swing = ( 2 * $z_end );
+			$z_base = $base[2];
+
+			$x_pace = ( $x_swing / ( $stepsvar - 1 ) );
+			$x_value = ($x_base + ( $x_end - ( $x_pace * ( $countstep - 1 ) ) ));
+			$y_pace = ( $y_swing / ( $stepsvar - 1 ) );
+			$y_value = ($y_base + ( $y_end - ( $y_pace * ( $countstep - 1 ) ) ));
+			$z_pace = ( $z_swing / ( $stepsvar - 1 ) );
+			$z_value = ($z_base + ( $z_end - ( $z_pace * ( $countstep - 1 ) ) ));
 		}
-		
-		$x_value = sprintf( "%.3f", $x_value ); 
+
+		$x_value = sprintf( "%.3f", $x_value );
 		$y_value = sprintf( "%.3f", $y_value );
 		$z_value = sprintf( "%.3f", $z_value );
-		
+
 my $printthis =
 "prj $launchline<<YYY
 b
@@ -1565,11 +1565,11 @@ c
 YYY
 ";
 
-		unless ($exeonfiles eq "n") 
-		{ 
+		unless ($exeonfiles eq "n")
+		{
 			print `$printthis`;
 		}
-		print $tee 
+		print $tee
 		"#Translating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\"
 $printthis
 ";
@@ -1579,53 +1579,53 @@ $printthis
 
 sub translate_surfaces
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_; 
-	
-	
-	my @applytype = @$swap; 
-	my $zone_letter = $applytype[$countop][3]; 
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+
+
+	my @applytype = @$swap;
+	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say "Translating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
-	my $transform_type = $$translate_surface[$countop][0]; 
-	my @surfs_to_transl = @{ $translate_surface->[$countop][1] }; 
-	my @ends_movs = @{ $translate_surface->[$countop][2] };  
-	my $yes_or_no_update_radiation = $$translate_surface[$countop][3]; 
-	my @transform_coordinates = @{ $translate_surface->[$countop][2] };   
+	my $transform_type = $$translate_surface[$countop][0];
+	my @surfs_to_transl = @{ $translate_surface->[$countop][1] };
+	my @ends_movs = @{ $translate_surface->[$countop][2] };
+	my $yes_or_no_update_radiation = $$translate_surface[$countop][3];
+	my @transform_coordinates = @{ $translate_surface->[$countop][2] };
 	my $countsurface = 0;
 	my ( $end_mov, $mov_surf, $pace, $movement, $surface_letter_constrainedarea, $movement_constrainedarea, $pace, $swing_surf, $movement, $base );
 
 	foreach my $surface_letter (@surfs_to_transl)
-	{   
-		
+	{
+
 		if ( $stepsvar > 1 )
 		{
-			
+
 			if ($transform_type eq "a")
 			{
-				$end_mov = $ends_movs[$countsurface]; 
+				$end_mov = $ends_movs[$countsurface];
 				if ( ref ( $end_mov ) )
 				{
-					my $min = $end_mov->[0]; 
-					my $max = $end_mov->[1]; 
-					$swing_surf = ( $max - $min ); 
+					my $min = $end_mov->[0];
+					my $max = $end_mov->[1];
+					$swing_surf = ( $max - $min );
 					$base = $min;
 				}
 				else
 				{
-					$swing_surf = ( $end_mov * 2 ); 
+					$swing_surf = ( $end_mov * 2 );
 					$base = - ( $swing_surf / 2 );
 				}
-				
-				$pace = ( $swing_surf / ( $stepsvar - 1 ) ); 
-				$movement = ( $base + ( $pace * ( $countstep - 1) ) ); 
-				
-				
-					
+
+				$pace = ( $swing_surf / ( $stepsvar - 1 ) );
+				$movement = ( $base + ( $pace * ( $countstep - 1) ) );
+
+
+
 				my $printthis =
 "prj $launchline<<YYY
 b
@@ -1653,8 +1653,8 @@ c
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
-				{ 
+				unless ($exeonfiles eq "n")
+				{
 					print `$printthis`;
 				}
 				print $tee "
@@ -1669,54 +1669,54 @@ $printthis";
 				my @coordinates_for_movement = @{ $transform_coordinates[$countsurface] };
 				my ( $x_begin, $y_begin, $z_begin, $x_end, $y_end, $z_end, $x_swing, $y_swing, $z_swing, $x_value, $y_value, $z_value );
 				my ( @coord2, @coord1 );
-					
+
 				if ( ref( $coordinates_for_movement[0] ) )
 				{
-					@coord1 = @{ $coordinates_for_movement[0] }; 
-					@coord2 = @{ $coordinates_for_movement[1] }; 
-					( $x_begin, $y_begin, $z_begin ) = @coord1; 
-					( $x_end, $y_end, $z_end ) = @coord2; 
-					
-					$x_swing = ( $x_end - $x_begin ); 
-					$y_swing = ( $y_end - $y_begin ); 
-					$z_swing = ( $z_end - $z_begin ); 
-					
-					$x_pace = ( $x_swing / ( $stepsvar - 1 ) ); 
-					$y_pace = ( $y_swing / ( $stepsvar - 1 ) ); 
-					$z_pace = ( $z_swing / ( $stepsvar - 1 ) ); 
-					
-					$x_value = ( $x_begin + ( $x_pace * ( $countstep - 1) ) ); 
-					$y_value = ( $y_begin + ( $y_pace * ( $countstep - 1) ) ); 
-					$z_value = ( $z_begin + ( $z_pace * ( $countstep - 1) ) ); 
-					
+					@coord1 = @{ $coordinates_for_movement[0] };
+					@coord2 = @{ $coordinates_for_movement[1] };
+					( $x_begin, $y_begin, $z_begin ) = @coord1;
+					( $x_end, $y_end, $z_end ) = @coord2;
+
+					$x_swing = ( $x_end - $x_begin );
+					$y_swing = ( $y_end - $y_begin );
+					$z_swing = ( $z_end - $z_begin );
+
+					$x_pace = ( $x_swing / ( $stepsvar - 1 ) );
+					$y_pace = ( $y_swing / ( $stepsvar - 1 ) );
+					$z_pace = ( $z_swing / ( $stepsvar - 1 ) );
+
+					$x_value = ( $x_begin + ( $x_pace * ( $countstep - 1) ) );
+					$y_value = ( $y_begin + ( $y_pace * ( $countstep - 1) ) );
+					$z_value = ( $z_begin + ( $z_pace * ( $countstep - 1) ) );
+
 				}
 				else
 				{
-					$x_end = $coordinates_for_movement[0]; 
-					$x_swing = ( 2 * $x_end ); 
-					$x_base = $base[0]; 
-					
-					$y_end = $coordinates_for_movement[1]; 
-					$y_swing = ( 2 * $y_end ); 
-					$y_base = $base[1]; 
-					
-					$z_end = $coordinates_for_movement[2]; 
-					$z_swing = ( 2 * $z_end ); 
-					$z_base = $base[2]; 
+					$x_end = $coordinates_for_movement[0];
+					$x_swing = ( 2 * $x_end );
+					$x_base = $base[0];
 
-					$x_pace = ( $x_swing / ( $stepsvar - 1 ) ); 
-					$x_value = ($x_base + ( $x_end - ( $x_pace * ( $countstep - 1 ) ) )); 
-					$y_pace = ( $y_swing / ( $stepsvar - 1 ) ); 
-					$y_value = ($y_base + ( $y_end - ( $y_pace * ( $countstep - 1 ) ) )); 
-					$z_pace = ( $z_swing / ( $stepsvar - 1 ) ); 
-					$z_value = ($z_base + ( $z_end - ( $z_pace * ( $countstep - 1 ) ) )); 
+					$y_end = $coordinates_for_movement[1];
+					$y_swing = ( 2 * $y_end );
+					$y_base = $base[1];
+
+					$z_end = $coordinates_for_movement[2];
+					$z_swing = ( 2 * $z_end );
+					$z_base = $base[2];
+
+					$x_pace = ( $x_swing / ( $stepsvar - 1 ) );
+					$x_value = ($x_base + ( $x_end - ( $x_pace * ( $countstep - 1 ) ) ));
+					$y_pace = ( $y_swing / ( $stepsvar - 1 ) );
+					$y_value = ($y_base + ( $y_end - ( $y_pace * ( $countstep - 1 ) ) ));
+					$z_pace = ( $z_swing / ( $stepsvar - 1 ) );
+					$z_value = ($z_base + ( $z_end - ( $z_pace * ( $countstep - 1 ) ) ));
 				}
-				
-				$x_value = sprintf( "%.3f", $x_value ); 
+
+				$x_value = sprintf( "%.3f", $x_value );
 				$y_value = sprintf( "%.3f", $y_value );
 				$z_value = sprintf( "%.3f", $z_value );
 
-				my $printthis = 
+				my $printthis =
 "prj $launchline<<YYY
 b
 m
@@ -1744,8 +1744,8 @@ c
 YYY
 ";
 
-				unless ($exeonfiles eq "n") 
-				{ 
+				unless ($exeonfiles eq "n")
+				{
 					print `$printthis`;
 				}
 
@@ -1757,25 +1757,25 @@ $printthis";
 				$countcycles_transl_surfs++;
 			}
 		}
-	}            
+	}
 }    # END SUB translate_surfaces
 
 
 sub rotate_surface
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytyperef, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$applytyperef;
 	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say "Rotating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-	
+
 	my @surfs_to_rotate =  @{ $rotate_surface->[$countop][0] };
-	my @vertices_numbers =  @{ $rotate_surface->[$countop][1] };   
+	my @vertices_numbers =  @{ $rotate_surface->[$countop][1] };
 	my @swingrotations = @{ $rotate_surface->[$countop][2] };
 	my @yes_or_no_apply_to_others = @{ $rotate_surface->[$countop][3] };
 	my $configfile = $$rotate_surface[$countop][4];
@@ -1784,31 +1784,31 @@ sub rotate_surface
 	my $countrotate = 0;
 	foreach my $surface_letter (@surfs_to_rotate)
 	{
-		$swingrotate = $swingrotations[$countrotate]; 
+		$swingrotate = $swingrotations[$countrotate];
 
 		if ( ref ( $swingrotate ) )
 		{
-			my $min = $swingrotate->[0]; 
-			my $max = $swingrotate->[1]; 
-			$swingrotate = ( $max - $min ); 
-			$base = $min; 
+			my $min = $swingrotate->[0];
+			my $max = $swingrotate->[1];
+			$swingrotate = ( $max - $min );
+			$base = $min;
 		}
 		else
 		{
 			$swingrotate = ( 2 * $swingrotate );
-			$base = - ( $swingrotate / 2 ); 
+			$base = - ( $swingrotate / 2 );
 		}
 
-		$pacerotate = ( $swingrotate / ( $stepsvar - 1 ) ); 
-		$rotation_degrees = $base + ( $pacerotate * ( $countstep - 1 ) ) ; 
+		$pacerotate = ( $swingrotate / ( $stepsvar - 1 ) );
+		$rotation_degrees = $base + ( $pacerotate * ( $countstep - 1 ) ) ;
 		$vertex_number = $vertices_numbers[$countrotate];
 		$yes_or_no_apply = $yes_or_no_apply_to_others[$countrotate];
-		
+
 		if ( $rotation_degrees < -100 )
 		{
 			$rotation_degrees = ( $rotation_degrees + 360 );
 		}
-		
+
 		if (  ( $swingrotate != 0 ) and ( $stepsvar > 1 ) )
 		{
 			my $printthis =
@@ -1839,8 +1839,8 @@ c
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 
@@ -1856,9 +1856,9 @@ $printthis";
 sub translate_vertices
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $translate_vertices_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$applytype_ref;
-	my @translate_vertices = @$translate_vertices_ref; 
+	my @translate_vertices = @$translate_vertices_ref;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -1866,20 +1866,20 @@ sub translate_vertices
 
 	say "Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my @v;
-	my @verts_to_transl = @{ $translate_vertices[$countop][0] }; 
+	my @verts_to_transl = @{ $translate_vertices[$countop][0] };
 	#say $tee "VERTS_TO_TRANSL: " . dump( @verts_to_transl );
 	#say TOFILE "TO: " . dump( $to );
-	my @transform_coordinates = @{ $translate_vertices[$countop][1] }; 
-	my @sourcefiles = @{ $translate_vertices[$countop][2] }; 
-	
-	my $sourcefile = $sourcefiles[ 0 ]; 
-	my $sourceaddress = "$to$sourcefile"; 
-	my $zone_letter = $sourcefiles[ 1 ]; 
-	
+	my @transform_coordinates = @{ $translate_vertices[$countop][1] };
+	my @sourcefiles = @{ $translate_vertices[$countop][2] };
+
+	my $sourcefile = $sourcefiles[ 0 ];
+	my $sourceaddress = "$to$sourcefile";
+	my $zone_letter = $sourcefiles[ 1 ];
+
 	open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress 2: $!\n";
 	my @lines = <SOURCEFILE>;
 	close SOURCEFILE;
-		
+
 	my $countlines = 0;
 	my $countvert = 0;
 
@@ -1889,12 +1889,12 @@ sub translate_vertices
 		{
 		foreach my $line ( @lines )
 		{
-			$line =~ s/^\s+//; 
+			$line =~ s/^\s+//;
 			my @rowelts = split(/\s+|,/, $line);
-			if   ($rowelts[0] eq "*vertex" ) 
+			if   ($rowelts[0] eq "*vertex" )
 			{
-				
-				if ( $rowelts[5] eq $verts{$vert} ) 
+
+				if ( $rowelts[5] eq $verts{$vert} )
 				{
 					push (@v, [ $rowelts[1], $rowelts[2], $rowelts[3], $vert ] );
 				}
@@ -1904,29 +1904,29 @@ sub translate_vertices
 
 	#say $tee "RECEIVED VERTS: " . dump( @v );
 	#say $tee "SOURCEADDRESS: " . dump( $sourceaddress );
- 
-	my $countvertex = 0;    
+
+	my $countvertex = 0;
 	foreach my $base_coordinates_ref ( @transform_coordinates )
 	{
 		( $x_swing, $y_swing, $z_swing, $x_base, $y_base, $z_base );
-		my $vertex_letter = $verts{ $verts_to_transl[ $countvertex ] }; 
+		my $vertex_letter = $verts{ $verts_to_transl[ $countvertex ] };
 		my @basevs = @{ $v[ $countvertex ] }; say $tee "\@basevs: " . dump( @basevs );
-		my ( $x_base, $y_base, $z_base, $vertexletter ) = ( $basevs[0], $basevs[1], $basevs[2], $basevs[3] ); 
-		
-		my @base_coordinates = @{ $base_coordinates_ref }; 
-		
-		my $x_end = $base_coordinates[0]; 
+		my ( $x_base, $y_base, $z_base, $vertexletter ) = ( $basevs[0], $basevs[1], $basevs[2], $basevs[3] );
+
+		my @base_coordinates = @{ $base_coordinates_ref };
+
+		my $x_end = $base_coordinates[0];
 		if ( ref ( $x_end ) )
 		{
-			my $min = $base_coordinates[0][0]; 
-			my $max = $base_coordinates[1][0]; 
-			$x_swing = ( $max - $min ); 
-			$x_base = $x_base - $min; 
+			my $min = $base_coordinates[0][0];
+			my $max = $base_coordinates[1][0];
+			$x_swing = ( $max - $min );
+			$x_base = $x_base - $min;
 		}
 		else
 		{
-			$x_swing = ( 2 * $x_end ); 
-			$x_base = $x_base - ( $x_swing / 2 ); 
+			$x_swing = ( 2 * $x_end );
+			$x_base = $x_base - ( $x_swing / 2 );
 		}
 
 		my $y_end = $base_coordinates[1];
@@ -1942,7 +1942,7 @@ sub translate_vertices
 			$y_swing = ( 2 * $y_end );
 			$y_base = $y_base - ( $y_swing / 2 );
 		}
-		
+
 		my $z_end = $base_coordinates[2];
 		if ( ref ( $z_end ) )
 		{
@@ -1956,7 +1956,7 @@ sub translate_vertices
 			$z_swing = ( 2 * $z_end );
 			$z_base = $z_base - ( $z_swing / 2 );
 		}
-		
+
 		my $x_pace = ( $x_swing / ( $stepsvar - 1 ) );
 		my $x_new = ( $x_base + ( $x_pace * ( $countstep - 1 ) ) );
 
@@ -1965,11 +1965,11 @@ sub translate_vertices
 
 		my $z_pace = ( $z_swing / ( $stepsvar - 1 ) );
 		my $z_new = ( $z_base + ( $z_pace * ( $countstep - 1 ) ) );
-		
-		$x_new = sprintf( "%.3f", $x_new ); 
-		$y_new = sprintf( "%.3f", $y_new ); 
-		$z_new = sprintf( "%.3f", $z_new ); 
-		
+
+		$x_new = sprintf( "%.3f", $x_new );
+		$y_new = sprintf( "%.3f", $y_new );
+		$z_new = sprintf( "%.3f", $z_new );
+
 		my $printthis =
 "prj $launchline<<YYY
 b
@@ -1995,13 +1995,13 @@ c
 -
 YYY
 ";
-		unless ($exeonfiles eq "n") 
-		{ 
+		unless ($exeonfiles eq "n")
+		{
 			print `$printthis`;
 		}
 
 		print $tee "
-#Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.      
+#Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 		$countvertex++;
 	}
@@ -2011,14 +2011,14 @@ $printthis";
 sub shift_vertices
 {
 	my ( $to, $stepsvar, $countop, $countstep, $swap, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say "Shifting vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my ( $pace, $movement );
@@ -2028,7 +2028,7 @@ sub shift_vertices
 	my $yes_or_no_radiation_update = $$shift_vertices[$countop][3];
 	my $configfile = $$shift_vertices[$countop][4];
 	my ( $base );
-	
+
 	if ( $stepsvar > 1 )
 	{
 		my $countthis = 0;
@@ -2036,7 +2036,7 @@ sub shift_vertices
 		{
 		foreach my $shift_swing (@shift_swings)
 			{
-				
+
 				if ( ref ( $shift_swing ) )
 				{
 					my $min = $shift_swing->[0];
@@ -2044,17 +2044,17 @@ sub shift_vertices
 					$base = $min;
 					$shift_swing = ( $max - $min );
 				}
-				else 
+				else
 				{
 					$shift_swing = ( $shift_swing * 2 );
 					$base = - ( $shift_swing / 2 );
 				}
-				
+
 				$pace = ( $shift_swing / ( $stepsvar - 1 ) );
 				$movement_or_vertex = ( $base + ( $pace * ( $countstep - 1 ) ) );
 				$vertex1 = ( $pairs_of_vertices[ 0 + ( 2 * $countthis ) ] );
 				$vertex2 = ( $pairs_of_vertices[ 1 + ( 2 * $countthis ) ] );
-				
+
 				my $printthis =
 "prj $launchline<<YYY
 b
@@ -2084,8 +2084,8 @@ y
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
-				{ 
+				unless ($exeonfiles eq "n")
+				{
 					print `$printthis`;
 				}
 				print $tee "
@@ -2099,7 +2099,7 @@ $printthis";
 		{
 			foreach my $shift_swing (@shift_swings)
 			{
-				my $printthis = 
+				my $printthis =
 "prj $launchline<<YYY
 b
 m
@@ -2132,8 +2132,8 @@ y
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
-				{ 
+				unless ($exeonfiles eq "n")
+				{
 					print `$printthis`;
 				}
 				print $tee "
@@ -2149,48 +2149,48 @@ sub rotate    # generic zone rotation
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 
-	my @applytype = @$applytype_ref; 
-	my $zone_letter = $applytype[$countop][3]; 
+	my @applytype = @$applytype_ref;
+	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say "Rotating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
-	my ( $rotation_degrees, $pacerotate, $base ); 
-	my $swingrotate = $$rotate[$countop][1]; 
-	my $yes_or_no_rotate_obstructions = $$rotate[$countop][0]; 
-	my $yes_or_no_update_radiation = $$rotate[$countop][2]; 
-	my $base_vertex = $$rotate[$countop][3]; 
-	
+	my ( $rotation_degrees, $pacerotate, $base );
+	my $swingrotate = $$rotate[$countop][1];
+	my $yes_or_no_rotate_obstructions = $$rotate[$countop][0];
+	my $yes_or_no_update_radiation = $$rotate[$countop][2];
+	my $base_vertex = $$rotate[$countop][3];
+
 	if ( ref ( $swingrotate ) )
 	{
-		my $begin = $swingrotate->[0]; 
-		my $end = $swingrotate->[1]; 
-		$swingrotate = ( $end - $begin ); 
-		$base = $begin; 
+		my $begin = $swingrotate->[0];
+		my $end = $swingrotate->[1];
+		$swingrotate = ( $end - $begin );
+		$base = $begin;
 	}
 	else
 	{
 		$swingrotate = ( $swingrotate * 2 );
 		$base = - ( $swingrotate / 2 );
 	}
-	
-	$pacerotate = ( $swingrotate / ( $stepsvar - 1 ) ); 
-	$rotation_degrees = ( $base + ( $pacerotate * ( $countstep - 1 ) ) ); 
+
+	$pacerotate = ( $swingrotate / ( $stepsvar - 1 ) );
+	$rotation_degrees = ( $base + ( $pacerotate * ( $countstep - 1 ) ) );
 
 	my $count_rotate = 0;
-	
+
 	if ( $rotation_degrees < -100 )
 	{
 		$rotation_degrees = ( $rotation_degrees + 360 );
 	}
-	
+
 	if ( ( $swingrotate != 0 ) and ( $stepsvar > 1 ) )
 	{
-		
-		my $printthis = 
+
+		my $printthis =
 "prj $launchline<<YYY
 b
 m
@@ -2217,13 +2217,13 @@ y
 -
 -
 YYY
-"; 
+";
 
-		unless ($exeonfiles eq "n") 
-		{ 
+		unless ($exeonfiles eq "n")
+		{
 			print `$printthis`;
 		}
-		print $tee 
+		print $tee
 		"
 #Rotating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis
@@ -2233,16 +2233,16 @@ $printthis
 
 
 sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE FUNCTION GENERIC ENOUGH.
-{  
+{
 	my ( $to, $stepsvar, $countop, $countstep, $swap, $rotatez, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say "Rotating zones on the vertical plane for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @centerpoints = @{$$rotatez[0]};
@@ -2265,27 +2265,27 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 	my $alreadyrotation = $$rotatez[3];
 	my $rotatexy = $$rotatez[4];
 	my $swingrotatexy = $$rotatez[5];
-	
+
 	if ( ref ( $swingrotate ) )
 	{
 		my $min = $swingrotate->[0];
 		my $max = $swingrotate->[1];
 		$swingrotatexy = ( $max - $min );
 	}
-	
+
 	if ( ref ( $swingrotate ) )
 	{
 		my $min = $swingrotate->[0];
 		my $max = $swingrotate->[1];
 		$swingrotatexy = ( $max - $min );
 	}
-	
+
 	my ( $pacerotate, $linenew, $linenew2 );
 	my $count_rotate = 0;
 	my ( @rowprovv, @rowprovv2, @row, @row2 );
 	if ( $stepsvar > 1 )
 	{
-		foreach my $line (@lines) 
+		foreach my $line (@lines)
 		{#
 			{
 				$linenew = $line;
@@ -2293,7 +2293,7 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 				@rowprovv = split(/\s+/, $linenew);
 				$rowprovv[0] =~ s/\:\,/\:/g ;
 				@row = split(/\,/, $rowprovv[0]);
-				if ($row[0] eq "*vertex") 
+				if ($row[0] eq "*vertex")
 				{ push (@vertices, [$row[1], $row[2], $row[3]] ) }
 			}
 			$countline = $countline +1;
@@ -2305,11 +2305,11 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 		}
 		foreach $vertex (@vertices)
 		{
-			${$vertex}[0] = (${$vertex}[0] - $centerpointsx); 
+			${$vertex}[0] = (${$vertex}[0] - $centerpointsx);
 			${$vertex}[0] = sprintf("%.5f", ${$vertex}[0]);
-			${$vertex}[1] = (${$vertex}[1] - $centerpointsy); 
+			${$vertex}[1] = (${$vertex}[1] - $centerpointsy);
 			${$vertex}[1] = sprintf("%.5f", ${$vertex}[1]);
-			${$vertex}[2] = (${$vertex}[2] - $centerpointsz); 
+			${$vertex}[2] = (${$vertex}[2] - $centerpointsz);
 			${$vertex}[2] = sprintf("%.5f", ${$vertex}[2]);
 			print $_outfile_ "aftersum ${$vertex}[0], ${$vertex}[1], ${$vertex}[2]\n";
 		}
@@ -2317,7 +2317,7 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 		my $anglealready = deg2rad_(-$alreadyrotation);
 		foreach $vertex (@vertices)
 		{
-			my $x_new = cos($anglealready)*${$vertex}[0] - sin($anglealready)*${$vertex}[1]; 
+			my $x_new = cos($anglealready)*${$vertex}[0] - sin($anglealready)*${$vertex}[1];
 			my $y_new = sin($anglealready)*${$vertex}[0] + cos($anglealready)*${$vertex}[1];
 			${$vertex}[0] = $x_new; ${$vertex}[0] = sprintf("%.5f", ${$vertex}[0]);
 			${$vertex}[1] = $y_new; ${$vertex}[1] = sprintf("%.5f", ${$vertex}[1]);
@@ -2329,7 +2329,7 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 		my $angle = deg2rad_($rotation_degrees);
 		foreach $vertex (@vertices)
 		{
-			my $y_new = cos($angle)*${$vertex}[1] - sin($angle)*${$vertex}[2]; 
+			my $y_new = cos($angle)*${$vertex}[1] - sin($angle)*${$vertex}[2];
 			my $z_new = sin($angle)*${$vertex}[1] + cos($angle)*${$vertex}[2];
 			${$vertex}[1] = $y_new; ${$vertex}[1] = sprintf("%.5f", ${$vertex}[1]);
 			${$vertex}[2] = $z_new; ${$vertex}[2] = sprintf("%.5f", ${$vertex}[2]);
@@ -2340,7 +2340,7 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 		my $angleback = deg2rad_($alreadyrotation);
 		foreach $vertex (@vertices)
 			{
-			my $x_new = cos($angleback)*${$vertex}[0] - sin($angleback)*${$vertex}[1]; 
+			my $x_new = cos($angleback)*${$vertex}[0] - sin($angleback)*${$vertex}[1];
 			my $y_new = sin($angleback)*${$vertex}[0] + cos($angleback)*${$vertex}[1];
 			${$vertex}[0] = $x_new; ${$vertex}[0] = sprintf("%.5f", ${$vertex}[0]);
 			${$vertex}[1] = $y_new; ${$vertex}[1] = sprintf("%.5f", ${$vertex}[1]);
@@ -2357,8 +2357,8 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 
 		my $countwrite = -1;
 		my $countwriteand1;
-		foreach $line (@lines) 
-		{#  
+		foreach $line (@lines)
+		{#
 
 				$linenew2 = $line;
 				$linenew2 =~ s/\:\s/\:/g ;
@@ -2366,14 +2366,14 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 				$rowprovv2[0] =~ s/\:\,/\:/g ;
 				@row2 = split(/\,/, $rowprovv2[0]);
 				$countwriteright = ($countwrite - 5);
-				$countwriteand1 = ($countwrite + 1);      
-				if ($row2[0] eq "*vertex")    
+				$countwriteand1 = ($countwrite + 1);
+				if ($row2[0] eq "*vertex")
 				{
-					if ( $countwrite == - 1) { $countwrite = 0 }  
-					print $_outfile_2 
+					if ( $countwrite == - 1) { $countwrite = 0 }
+					print $_outfile_2
 					"*vertex"."\,"."${$vertices[$countwrite]}[0]"."\,"."${$vertices[$countwrite]}[1]"."\,"."${$vertices[$countwrite]}[2]"."  #   "."$countwriteand1\n";
 				}
-				else 
+				else
 				{
 					print $_outfile_2 "$line";
 				}
@@ -2400,14 +2400,14 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 sub reassign_construction
 {
 	my ( $to, $stepsvar, $countop, $countstep, $swap, $construction_reassignment, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say "Reassign construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @surfaces_to_reassign = @{ $construction_reassignment->[$countop][0] };
@@ -2420,7 +2420,7 @@ sub reassign_construction
 	foreach $surface_to_reassign (@surfaces_to_reassign)
 	{
 		$construction_to_choose =  $constructions_to_choose[$count][$countstep];
-		
+
 		my $printthis =
 "prj $launchline<<YYY
 b
@@ -2450,8 +2450,8 @@ y
 -
 YYY
 ";
-		unless ($exeonfiles eq "n") 
-		{ 
+		unless ($exeonfiles eq "n")
+		{
 			print `$printthis`;
 		}
         say $tee "$printthis";
@@ -2463,11 +2463,11 @@ $printthis";
 
 }    # END SUB reassign_construction
 
-					
+
 sub change_thickness
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $thickness_change, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	my @applytype = @$applytype_ref; 
+	my @applytype = @$applytype_ref;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -2475,27 +2475,27 @@ sub change_thickness
 
 	say "Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
-	my @entries_to_change = @{ $$thickness_change[$countop][0] }; #say $tee "\@entries_to_change: " . dump( @entries_to_change ) ; 
-	my @groups_of_strata_to_change = @{ $$thickness_change[$countop][1] }; #say $tee "\@groups_of_strata_to_change: " . dump( @groups_of_strata_to_change ) ; 
-	my @groups_of_couples_of_min_max_values = @{ $$thickness_change[$countop][2] }; #say $tee "\@groups_of_couples_of_min_max_values: " . dump( @groups_of_couples_of_min_max_values ) ; 
-	
+	my @entries_to_change = @{ $$thickness_change[$countop][0] }; #say $tee "\@entries_to_change: " . dump( @entries_to_change ) ;
+	my @groups_of_strata_to_change = @{ $$thickness_change[$countop][1] }; #say $tee "\@groups_of_strata_to_change: " . dump( @groups_of_strata_to_change ) ;
+	my @groups_of_couples_of_min_max_values = @{ $$thickness_change[$countop][2] }; #say $tee "\@groups_of_couples_of_min_max_values: " . dump( @groups_of_couples_of_min_max_values ) ;
+
 	my $thiscount = 0;
 	my ( $entry_to_change, $countstrata, $stratum_to_change, $min, $max, $change_stratum, $enter_change_entry, $swing, $pace, $thickness );
 	my ( @strata_to_change, @min_max_values , @change_strata, @change_entries, @change_entries_with_thicknesses );
 	if ( $stepsvar > 1 )
 	{
 		foreach $entry_to_change ( @entries_to_change )
-		{   say $tee "\$entry_to_change: " . dump( $entry_to_change ) ; say $tee "\$countstep: " . dump( $countstep ) ; say $tee "\$stepsvar: " . dump( $stepsvar ) ;  
-			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] }; #say $tee "\@strata_to_change: " . dump( @strata_to_change ) ; 
+		{   say $tee "\$entry_to_change: " . dump( $entry_to_change ) ; say $tee "\$countstep: " . dump( $countstep ) ; say $tee "\$stepsvar: " . dump( $stepsvar ) ;
+			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] }; #say $tee "\@strata_to_change: " . dump( @strata_to_change ) ;
 			$countstrata = 0;
 			foreach $stratum_to_change ( @strata_to_change )
-			{   say $tee "\$stratum_to_change: " . dump( $stratum_to_change ) ; 
-				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] }; say $tee "\@min_max_values: " . dump( @min_max_values ) ; 
-				my $min   = $min_max_values[0]; say $tee "\$min: " . dump( $min ) ;  
-				my $max   = $min_max_values[1]; say $tee "\$max: " . dump( $max ) ; 
-				my $swing = $max - $min; say $tee "\$swing: " . dump( $swing ) ; 
-				my $pace  = ( $swing / ( $stepsvar - 1 ) ); say $tee "\$pace: " . dump( $pace ) ; 
-				my $thickness = $min + ( $pace * ( $countstep - 1 ) ); say $tee "\$thickness: " . dump( $thickness ) ; 
+			{   say $tee "\$stratum_to_change: " . dump( $stratum_to_change ) ;
+				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] }; say $tee "\@min_max_values: " . dump( @min_max_values ) ;
+				my $min   = $min_max_values[0]; say $tee "\$min: " . dump( $min ) ;
+				my $max   = $min_max_values[1]; say $tee "\$max: " . dump( $max ) ;
+				my $swing = $max - $min; say $tee "\$swing: " . dump( $swing ) ;
+				my $pace  = ( $swing / ( $stepsvar - 1 ) ); say $tee "\$pace: " . dump( $pace ) ;
+				my $thickness = $min + ( $pace * ( $countstep - 1 ) ); say $tee "\$thickness: " . dump( $thickness ) ;
 				my $layers = ( i => 1, j => 2, k => 3, l => 4, m => 5, n => 6, o => 7, p => 8, q => 9, r => 10, s => 11, t => 12, u => 13, v => 14, w => 15 );
 
 
@@ -2521,8 +2521,8 @@ y
 YYY
 ";
 
-				unless ($exeonfiles eq "n") 
-				{ 
+				unless ($exeonfiles eq "n")
+				{
 					print `$printthis`;
 				}
 				say $tee "$printthis";
@@ -2543,18 +2543,18 @@ YYY
 
 sub readobsfile
 {    # THIS READS A GEO FILE TO GET THE DATA OF THE REQUESTED OBSTRUCTIONS
-	my ( $fullgeopath ) = @_; 
-	
+	my ( $fullgeopath ) = @_;
+
 	#my @lines = `cat $fullgeopath`;
 	open( GEOF, "<$fullgeopath" );
 	my @lines = <GEOF>;
 	close GEOF;
-	
+
 
 	my $countelt = 0;
-	my %obs_letter = ( 
+	my %obs_letter = (
 				1 => "e", 2 => "f", 3 => "g", 4 => "h", 5 => "i", 6 => "j", 7 => "k", 8 => "l", 9 => "m", 10 => "n", 11 => "o" ); # RE-CHECK
-		
+
 	my %obsts;
 
 	foreach my $line (@lines)
@@ -2563,14 +2563,14 @@ sub readobsfile
 		{
 			my @elts = split(/\s+|,/, $line);
 			my $obsnum = $elts[13];
-			my $obsletter = $obs_letter{$obsnum}; 
-			$obsts{$obsletter}{obsnum} = $obsnum; 
-			$obsts{$obsletter}{origin} = [ @elts[ 1..3 ] ]; 
-			$obsts{$obsletter}{dimensions} = [ @elts[ 4..6 ] ]; 
-			$obsts{$obsletter}{z_rotation} = $elts[7]; 
-			$obsts{$obsletter}{y_rotation} = $elts[8]; 
-			$obsts{$obsletter}{name} = $elts[9]; 
-			$obsts{$obsletter}{construction} = $elts[10]; 
+			my $obsletter = $obs_letter{$obsnum};
+			$obsts{$obsletter}{obsnum} = $obsnum;
+			$obsts{$obsletter}{origin} = [ @elts[ 1..3 ] ];
+			$obsts{$obsletter}{dimensions} = [ @elts[ 4..6 ] ];
+			$obsts{$obsletter}{z_rotation} = $elts[7];
+			$obsts{$obsletter}{y_rotation} = $elts[8];
+			$obsts{$obsletter}{name} = $elts[9];
+			$obsts{$obsletter}{construction} = $elts[10];
 		}
 	}
 	return( %obsts );
@@ -2579,7 +2579,7 @@ sub readobsfile
 
 sub obs_modify
 {
-	
+
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $obs_modify_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	my @applytype = @$applytype_ref; #say $tee "\@applytype : " . dump( @applytype );
 	my $zone_letter = $applytype[$countop][3]; #say $tee "\$zone_letter : " . dump( $zone_letter );
@@ -2588,7 +2588,7 @@ sub obs_modify
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	say $tee "Modifying obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";    
+	say $tee "Modifying obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my $case_cycle_ref = $obs_modify_ref->[$countop]; #say $tee "\$case_cycle_ref : " . dump( $case_cycle_ref );
 	my @case_cycle = @$case_cycle_ref; #say $tee "\@case_cycle : " . dump( @case_cycle );
 	my $geofile = shift( @case_cycle ); #say $tee "\$geofile : $geofile" ;
@@ -2597,104 +2597,104 @@ sub obs_modify
 	my @obsrefs = @case_cycle; #say $tee "\@obsrefs : " . dump( @obsrefs );
 
 	my %obsts = readobsfile( $fullgeopath ); #say $tee "\%obsts : " . dump( %obsts );
-	
+
 	my $countobs = 0;
 	foreach my $obs ( @obsrefs )
 	{
-		my $obsletter = $obs->[0]; 
-		my $modification_type = $obs->[1]; 
-		my $values_ref = $obs->[2]; 
-		
-		my $xz_resolution = $obs->[3]; 
-		my ( $value, $basevalue, $swing, $low, $high );          
-		my ( $x_end, $y_end, $z_end, $zory_end, $x_base, $base, $y_base, $z_base, $end_value, $base_value, $swing, $x_swing, 
+		my $obsletter = $obs->[0];
+		my $modification_type = $obs->[1];
+		my $values_ref = $obs->[2];
+
+		my $xz_resolution = $obs->[3];
+		my ( $value, $basevalue, $swing, $low, $high );
+		my ( $x_end, $y_end, $z_end, $zory_end, $x_base, $base, $y_base, $z_base, $end_value, $base_value, $swing, $x_swing,
 		$y_swing, $z_swing, $pace, $value, $x_pace, $x_value, $y_pace, $y_value, $z_pace, $z_value,
 		$x_begin, $y_begin, $z_begin, $x_newbase, $y_newbase, $z_newbase );
 		my ( @base, @values, @coord1, @coord2 );
-		
-		my $nofspaces = ( $stepsvar - 1 ); 
+
+		my $nofspaces = ( $stepsvar - 1 );
 
 		if ( $modification_type eq "a" )
 		{
-			@base = @{ $obsts{$obsletter}{origin} }; 
-		}          
+			@base = @{ $obsts{$obsletter}{origin} };
+		}
 		elsif ( $modification_type eq "b" )
 		{
-			@base = @{ $obsts{$obsletter}{dimensions} }; 
+			@base = @{ $obsts{$obsletter}{dimensions} };
 		}
 		elsif ( $modification_type eq "c" )
 		{
-			$base = $obsts{$obsletter}{z_rotation}; 
+			$base = $obsts{$obsletter}{z_rotation};
 		}
 		elsif ( $modification_type eq "d" )
 		{
-			$base = $obsts{$obsletter}{y_rotation}; 
+			$base = $obsts{$obsletter}{y_rotation};
 		}
 		elsif ( $modification_type eq "f" )
 		{
-			$base = $obsts{$obsletter}{name}; 
+			$base = $obsts{$obsletter}{name};
 		}
 		elsif ( $modification_type eq "g" )
 		{
 			$base = $obsts{$obsletter}{construction}; #say $tee "IT IS. CONSTR \$base : " . dump( $base );
 		}
-		
+
 		if ( ( $modification_type eq "a" ) or ( $modification_type eq "b" ) )
-		{        
+		{
 			my ( $x_base, $y_base, $z_base ) = @base;
-					
+
 			if ( ref( $values_ref->[0] ) )
 			{
-				
-				@coord1 = @{ $values_ref->[0] }; 
-				@coord2 = @{ $values_ref->[1] }; 
-				( $x_begin, $y_begin, $z_begin ) = @coord1; 
-				( $x_end, $y_end, $z_end ) = @coord2; 
-				
-				$x_swing = ( $x_end - $x_begin ); 
-				$y_swing = ( $y_end - $y_begin ); 
-				$z_swing = ( $z_end - $z_begin ); 
-				
-				$x_newbase = ( $x_base + $x_begin ); 
-				$y_newbase = ( $y_base + $y_begin ); 
-				$z_newbase = ( $z_base + $z_begin ); 
-				
-				$x_pace = ( $x_swing / $nofspaces ); 
-				$y_pace = ( $y_swing / $nofspaces ); 
-				$z_pace = ( $z_swing / $nofspaces ); 
-				
-				$x_value = ( $x_newbase + ( $x_pace * ( $countstep - 1) ) ); 
-				$y_value = ( $y_newbase + ( $y_pace * ( $countstep - 1) ) ); 
-				$z_value = ( $z_newbase + ( $z_pace * ( $countstep - 1) ) ); 
-				
+
+				@coord1 = @{ $values_ref->[0] };
+				@coord2 = @{ $values_ref->[1] };
+				( $x_begin, $y_begin, $z_begin ) = @coord1;
+				( $x_end, $y_end, $z_end ) = @coord2;
+
+				$x_swing = ( $x_end - $x_begin );
+				$y_swing = ( $y_end - $y_begin );
+				$z_swing = ( $z_end - $z_begin );
+
+				$x_newbase = ( $x_base + $x_begin );
+				$y_newbase = ( $y_base + $y_begin );
+				$z_newbase = ( $z_base + $z_begin );
+
+				$x_pace = ( $x_swing / $nofspaces );
+				$y_pace = ( $y_swing / $nofspaces );
+				$z_pace = ( $z_swing / $nofspaces );
+
+				$x_value = ( $x_newbase + ( $x_pace * ( $countstep - 1) ) );
+				$y_value = ( $y_newbase + ( $y_pace * ( $countstep - 1) ) );
+				$z_value = ( $z_newbase + ( $z_pace * ( $countstep - 1) ) );
+
 			}
 			else
 			{
 				$values = $values_ref;
-				$x_end = $values->[0]; 
-				$x_swing = ( 2 * $x_end ); 
-				$x_base = $base[0]; 
-				
-				$y_end = $values->[1]; 
-				$y_swing = ( 2 * $y_end ); 
-				$y_base = $base[1]; 
-				
-				$z_end = $values->[2]; 
-				$z_swing = ( 2 * $z_end ); 
-				$z_base = $base[2]; 
+				$x_end = $values->[0];
+				$x_swing = ( 2 * $x_end );
+				$x_base = $base[0];
 
-				$x_pace = ( $x_swing / $nofspaces ); 
-				$x_value = ($x_base + ( $x_end - ( $x_pace * ( $countstep - 1 ) ) )); 
-				$y_pace = ( $y_swing / $nofspaces ); 
-				$y_value = ($y_base + ( $y_end - ( $y_pace * ( $countstep - 1 ) ) )); 
-				$z_pace = ( $z_swing / $nofspaces ); 
-				$z_value = ($z_base + ( $z_end - ( $z_pace * ( $countstep - 1 ) ) )); 
+				$y_end = $values->[1];
+				$y_swing = ( 2 * $y_end );
+				$y_base = $base[1];
+
+				$z_end = $values->[2];
+				$z_swing = ( 2 * $z_end );
+				$z_base = $base[2];
+
+				$x_pace = ( $x_swing / $nofspaces );
+				$x_value = ($x_base + ( $x_end - ( $x_pace * ( $countstep - 1 ) ) ));
+				$y_pace = ( $y_swing / $nofspaces );
+				$y_value = ($y_base + ( $y_end - ( $y_pace * ( $countstep - 1 ) ) ));
+				$z_pace = ( $z_swing / $nofspaces );
+				$z_value = ($z_base + ( $z_end - ( $z_pace * ( $countstep - 1 ) ) ));
 			}
-			
+
 			$x_value = sprintf( "%.3f", $x_value );
 			$y_value = sprintf( "%.3f", $y_value );
 			$z_value = sprintf( "%.3f", $z_value );
-			
+
 			my $printthis =
 "prj $launchline<<YYY
 b
@@ -2725,10 +2725,10 @@ YYY
 ";
 
 			say $tee "\$printthis : " . dump( $printthis );
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
-			} 
+			}
 			print $tee "
 #Modifying obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis"; say  "\$printthis : " . dump( $printthis );
@@ -2736,25 +2736,25 @@ $printthis"; say  "\$printthis : " . dump( $printthis );
 
 
 		if ( ($modification_type eq "c") or ($modification_type eq "d"))
-		{                      
+		{
 			$zory_end = $value;
-			
+
 			if ( ref ( $zory_end ) )
 			{
 				my $min = $zory_end->[0];
 				my $max = $zory_end->[1];
 				$swingtranslate = ( $max - $min );
 			}
-			else 
-			{ 
-				$swingtranslate = ( 2 * $zory_end ); 
+			else
+			{
+				$swingtranslate = ( 2 * $zory_end );
 			}
-		
+
 			my $zory_base = $base;
 			my $zory_pace = ( $swingtranslate / ( $stepsvar - 1 ) );
 			my $zory_value = ($zory_base + ( $zory_end - ( $zory_pace * ( $countstep - 1 ) ) ));
 
-			my $printthis = 
+			my $printthis =
 "prj $launchline<<YYY
 b
 m
@@ -2781,8 +2781,8 @@ c
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
-				{ 
+				unless ($exeonfiles eq "n")
+				{
 					print `$printthis`;
 				}
 				print $tee "
@@ -2791,9 +2791,9 @@ $printthis";
 		}
 
 		if ($modification_type eq "f")
-		{        
+		{
 			my @alternatives = @{ $values_ref };
-			my $alternative = $alternatives[ $countstep - 1 ];          
+			my $alternative = $alternatives[ $countstep - 1 ];
 			my $printthis =
 "prj $launchline<<YYY
 b
@@ -2822,8 +2822,8 @@ $alternative
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 			print $tee "
@@ -2832,10 +2832,10 @@ $printthis";
 		}
 
 		if ($modification_type eq "g")
-		{                      
+		{
 			my @constrs = @{ $values_ref }; #say $tee "HERE. \@constrs : " . dump( @constrs );
 			my $constr = $constrs[ $countstep - 1 ]; #say $tee "\$constr : " . dump( $constr );
-			
+
 			my $printthis =
 "prj $launchline<<YYY
 b
@@ -2866,50 +2866,50 @@ YYY
 ";
 			print $tee $printthis;
 			unless ($exeonfiles eq "n")
-			{ 
+			{
 				print `$printthis`;
 			}
 		}
 
 		if ($modification_type eq "t")
-		{                      
+		{
 			$x_end = $values[0];
 			$y_end = $values[1];
 			$z_end = $values[2];
-			
+
 			if ( ref ( $x_end ) )
 			{
 				my $min = $x_end->[0];
 				my $max = $x_end->[1];
 				$x_swingtranslate = ( $max - $min );
 			}
-			else 
-			{ 
-				$x_swingtranslate = ( 2 * $x_end );; 
+			else
+			{
+				$x_swingtranslate = ( 2 * $x_end );;
 			}
-			
+
 			if ( ref ( $y_end ) )
 			{
 				my $min = $y_end->[0];
 				my $max = $y_end->[1];
 				$y_swingtranslate = ( $max - $min );
 			}
-			else 
-			{ 
-				$y_swingtranslate = ( 2 * $y_end ); 
+			else
+			{
+				$y_swingtranslate = ( 2 * $y_end );
 			}
-			
+
 			if ( ref ( $z_end ) )
 			{
 				my $min = $z_end->[0];
 				my $max = $z_end->[1];
 				$z_swingtranslate = ( $max - $min );
 			}
-			else 
-			{ 
-				$z_swingtranslate = ( 2 * $z_end );; 
+			else
+			{
+				$z_swingtranslate = ( 2 * $z_end );;
 			}
-			
+
 			$x_pace = ( $x_swingtranslate / ( $stepsvar - 1 ) );
 			$x_value = ( $x_end - ( $x_pace * ( $countstep - 1 ) ) );
 			$y_pace = ( $y_swingtranslate / ( $stepsvar - 1 ) );
@@ -2945,8 +2945,8 @@ c
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 			print $tee "
@@ -2956,7 +2956,7 @@ $printthis";
 
 		if ( $xy_resolution ) # CUT THIS
 		{
-												
+
 			my $printthis = #THIS IS WHAT HAPPEN INSIDE SUB KEEP_SOME_OBSTRUCTIONS
 "prj $launchline<<YYY
 b
@@ -2981,8 +2981,8 @@ c
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 		}
@@ -2995,20 +2995,20 @@ $printthis";
 
 
 sub recalculateish
-{   
+{
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculateish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$applytype_ref;
-	my $zone_letter = $applytype[$countop][3]; 
-	my $recalculateish = $recalculateish_ref->[ $countop ]; 
+	my $zone_letter = $applytype[$countop][3];
+	my $recalculateish = $recalculateish_ref->[ $countop ];
 	my @things = @$recalculateish;
 	my $whatto = shift( @things );
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
-	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+
+	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 	{
 		$launchline = " -file $to/cfg/$fileconfig -mode script";
 	}
@@ -3016,9 +3016,9 @@ sub recalculateish
 	{
 		$launchline = " -file $to\\cfg\\$fileconfig -mode script";
 	}
-	
+
 	say $tee "Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-	
+
 	my $printthis;
 	if ( $whatto eq "y" )
 	{
@@ -3068,13 +3068,13 @@ y
 -
 YYY
 ";
-	    
+
 	  }
 	}
 
 
-	unless ($exeonfiles eq "n") 
-	{ 
+	unless ($exeonfiles eq "n")
+	{
       print `$printthis`;
 	}
 
@@ -3082,20 +3082,20 @@ YYY
 #Updating the insolation calculations for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 } #END SUB RECALCULATEISH
-				
 
-sub ifempty 
+
+sub ifempty
 {
 		my ( $dir, $d ) = @_;
 		opendir($d, $dir) or die( "$!" );
 		return ( scalar( grep{ $_ ne "." and $_ ne ".." } readdir($d)) == 0 );
 }
 
-										
+
 sub daylightcalc # IT WORKS ONLY IF THE "RAD" DIRECTORY IS EMPTY
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $filedf, $swap2, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my @daylightcalc = @$swap2;
@@ -3103,7 +3103,7 @@ sub daylightcalc # IT WORKS ONLY IF THE "RAD" DIRECTORY IS EMPTY
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say $tee "Performing daylight calculations through Radiance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $zone = $daylightcalc[0];
@@ -3114,9 +3114,9 @@ sub daylightcalc # IT WORKS ONLY IF THE "RAD" DIRECTORY IS EMPTY
 	my $density = $daylightcalc[5];
 	my $accuracy = $daylightcalc[6];
 	my $filedf = $daylightcalc[7];
-	
+
 	my $pathdf;
-	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 	{
 		$pathdf = "$to/rad/$filedf";
 	}
@@ -3124,11 +3124,11 @@ sub daylightcalc # IT WORKS ONLY IF THE "RAD" DIRECTORY IS EMPTY
 	{
 		$pathdf = "$to\\rad\\$filedf";
 	}
-	
+
 	my $printthis;
-	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 	{
-		
+
 		if ( ifempty ( "$to/rad/" ) )
 		{
 			$printthis =
@@ -3169,9 +3169,9 @@ a
 YYY
 \n\n
 cd $mypath
-";  
+";
 		}
-		
+
 		else
 		{
 			$printthis =
@@ -3247,9 +3247,9 @@ a
 YYY
 \n\n
 cd $mypath
-";  
+";
 		}
-		
+
 		else
 		{
 			$printthis =
@@ -3283,10 +3283,10 @@ cd $mypath
 ";
 		}
 	}
-		
-	
-	unless ($exeonfiles eq "n") 
-	{ 
+
+
+	unless ($exeonfiles eq "n")
+	{
 		print `$printthis`;
 	}
 
@@ -3296,13 +3296,13 @@ $printthis";
 
 	open( RADFILE, $pathdf) or die "Can't open $pathdf: $!\n";
 	my @linesrad = <RADFILE>;
-	close RADFILE;                      
+	close RADFILE;
 	my @dfs;
 	my $dfaverage;
 	my $sum = 0;
 	foreach my $linerad (@linesrad)
 	{
-		$linerad =~ s/^\s+//; 
+		$linerad =~ s/^\s+//;
 		my @rowelements = split(/\s+|,/, $linerad);
 		push (@dfs, $rowelements[-1]);
 	}
@@ -3316,13 +3316,13 @@ $printthis";
 	print DFFILE "$dfaverage\n";
 	close DFFILE;
 
-} # END SUB daylightcalc 
+} # END SUB daylightcalc
 
 
 sub change_config
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_config_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my @change_config = @$change_config_ref;
@@ -3330,7 +3330,7 @@ sub change_config
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say $tee "Substituting a configuration file for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @change_conf = @{$change_config[ $countop ]};
@@ -3341,24 +3341,24 @@ sub change_config
 	my $new_configfile = $new_configfiles[ $countstep - 1 ];
 	if (  $new_configfile ne $original_configfile )
 	{
-		unless ($exeonfiles eq "n") 
-		{ 
-			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+		unless ($exeonfiles eq "n")
+		{
+			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 			{
-				`cp -f $to/$new_configfile $to/$original_configfile\n`; 
+				`cp -f $to/$new_configfile $to/$original_configfile\n`;
 			}
 			else
 			{
-				`xcopy  /e /c /r /y $to\\$new_configfile $to\\$original_configfile\n`; 
+				`xcopy  /e /c /r /y $to\\$new_configfile $to\\$original_configfile\n`;
 			}
 		}
-		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 		{
-			print $tee "cp -f $to/$new_configfile $to/$original_configfile\n"; 
+			print $tee "cp -f $to/$new_configfile $to/$original_configfile\n";
 		}
 		else
 		{
-			print $tee "xcopy  /e /c /r /y $to\\$new_configfile $to\\$original_configfile\n"; 
+			print $tee "xcopy  /e /c /r /y $to\\$new_configfile $to\\$original_configfile\n";
 		}
 	}
 $countconfig++;
@@ -3366,7 +3366,7 @@ $countconfig++;
 
 
 sub checkfile # THIS CHECKS IF A SOURCE FILE MUST BE SUBSTITUTED BY ANOTHER ONE.
-{  
+{
 	my ( $sourceaddress, $targetaddress ) = @_;
 
 	unless ( ( $sourceaddress eq "" ) or ( $targetaddress eq "" ) or ( ( $sourceaddress eq $targetaddress ) ) )
@@ -3374,76 +3374,76 @@ sub checkfile # THIS CHECKS IF A SOURCE FILE MUST BE SUBSTITUTED BY ANOTHER ONE.
 		print $tee "TARGETFILE IN FUNCTION: $targetaddress\n";
 		if ( $sourceaddress ne $targetaddress )
 		{
-			unless ($exeonfiles eq "n") 
-			{ 
-				unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+			unless ($exeonfiles eq "n")
+			{
+				unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 				{
-					`cp -f $sourceaddress $targetaddress\n`; 
+					`cp -f $sourceaddress $targetaddress\n`;
 				}
 				else
 				{
-					`xcopy  /e /c /r /y $sourceaddress $targetaddress\n`; 
+					`xcopy  /e /c /r /y $sourceaddress $targetaddress\n`;
 				}
 			}
-			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 			{
-				print $tee "cp -f $sourceaddress $targetaddress\n"; 
+				print $tee "cp -f $sourceaddress $targetaddress\n";
 			}
 			else
 			{
-				print $tee "xcopy  /e /c /r /y $sourceaddress $targetaddress\n"; 
+				print $tee "xcopy  /e /c /r /y $sourceaddress $targetaddress\n";
 			}
 		}
 	}
-} # END SUB checkfile  
+} # END SUB checkfile
 
 
 sub change_climate ### THIS SIMPLE SCRIPT HAS TO BE DEBUGGED. WHY DOES IT BLOCK ITSELF IF PRINTED TO THE SHELL?
-{  # THIS FUNCTION CHANGES THE CLIMATE FILES. 
+{  # THIS FUNCTION CHANGES THE CLIMATE FILES.
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_climate_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 
-	
-	
-	my @applytype = @{ $applytype_ref }; 
-	my $zone_letter = $applytype[$countop][3]; 
+
+
+	my @applytype = @{ $applytype_ref };
+	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
-	my @change_climates = @{ $change_climate_ref }; 
-	
-	
+
+	my @change_climates = @{ $change_climate_ref };
+
+
 	say "Substituting climate database for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
-	my @climates = @{ $change_climates[ $countop ] }; 
-	my $newclimate = $climates[ $countstep - 1 ]; 
-	
+	my @climates = @{ $change_climates[ $countop ] };
+	my $newclimate = $climates[ $countstep - 1 ];
+
 	my $myfile;
-	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 	{
-		$myfile = $to . "/cfg/" . $fileconfig;  
+		$myfile = $to . "/cfg/" . $fileconfig;
 	}
 	else
 	{
-		$myfile = $to . "\\cfg\\" . $fileconfig;  
+		$myfile = $to . "\\cfg\\" . $fileconfig;
 	}
-	
+
 	open( FILECONFIG, $myfile ) or die( "$!" );
-	
+
 	my @lines = <FILECONFIG>;
-	
-	my $tempfileconfig = $myfile . ".temp";  
+
+	my $tempfileconfig = $myfile . ".temp";
 	open( TEMPFILECONFIG, ">$tempfileconfig" ) or die( "$!" );
-		
+
 	my ( $oldfile, $climatefolder );
 	foreach my $line ( @lines )
 	{
 		if ( $line =~ /^\*clm/ )
 		{
-			my @row = split ( /\s+/ , $line ); 
-			$climatefile = $row[1]; 
-			$line =~ s/$climatefile/$newclimate/; 
+			my @row = split ( /\s+/ , $line );
+			$climatefile = $row[1];
+			$line =~ s/$climatefile/$newclimate/;
 			print TEMPFILECONFIG $line;
 		}
 		else
@@ -3453,9 +3453,9 @@ sub change_climate ### THIS SIMPLE SCRIPT HAS TO BE DEBUGGED. WHY DOES IT BLOCK 
 	}
 	close FILECONFIG;
 	close TEMPFILECONFIG;
-	unless ( $exeonfiles eq "n" ) 
-	{ 
-		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+	unless ( $exeonfiles eq "n" )
+	{
+		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 		{
 			`cp -R -f $tempfileconfig $myfile` ;
 		}
@@ -3464,7 +3464,7 @@ sub change_climate ### THIS SIMPLE SCRIPT HAS TO BE DEBUGGED. WHY DOES IT BLOCK 
 			`xcopy  /e /c /r /y $tempfileconfig $myfile` ;
 		}
 	}
-	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 	{
 		print $tee "cp -R -f $tempfileconfig $myfile" ;
 	}
@@ -3476,13 +3476,13 @@ sub change_climate ### THIS SIMPLE SCRIPT HAS TO BE DEBUGGED. WHY DOES IT BLOCK 
 	print $tee "
 #Substituting a configuration file with climate updated for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
-}  
+}
 
-	
+
 sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING THE NETS, BELOW, BUT WORKS AND IS SIMPLER
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculatenet_ref, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my @recalculatenet = @{ $recalculatenet_ref->[ $countop ] };
@@ -3490,13 +3490,13 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 	 my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say $tee "Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-	
+
 	my $filenet = $recalculatenet[0];
-	
+
 	my $infilenet;
-	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 	{
 		$infilenet = "$mypath/$file/nets/$filenet";
 	}
@@ -3504,7 +3504,7 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 	{
 		$infilenet = "$mypath\\$file\\nets\\$filenet";
 	}
-	
+
 	my @nodezone_data_tot = @{$recalculatenet[1]}; ################
 	my @nodesdata_tot = @{$recalculatenet[2]}; ###############
 	my $geosourcefilesref = $recalculatenet[3]; ###################
@@ -3512,15 +3512,15 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 	my $y_or_n_reassign_cp = $recalculatenet[5];
 	my $y_or_n_detect_obs = $recalculatenet[6];
 	my @crackwidths = @{$recalculatenet[8]};
-	
+
 	my @geosourcefiles = @$geosourcefilesref; ##################
-	
+
 	my ( @geos, @genobs, @genobspoints );
-	
+
 	my $countgeo = 0;
 	foreach my $nodezone_dataref ( @nodezone_data_tot )
 	{
-		
+
 		my ( @obstaclesdata, @differences, @ratios );
 		my $countlines = 0;
 		my $countnode = 0;
@@ -3533,29 +3533,29 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 		my $countobs = 0;
 		my ( $zone, $line, $xlenght, $ylenght, $truedistance, $heightdifference );
 		my ( @rowelements, @node, @component, @v, @obs, @obspoints, @obstructionpoint );
-		
+
 		foreach my $line (@linesgeo)
 		{
-			$line =~ s/^\s+//; 
+			$line =~ s/^\s+//;
 
 			my @rowelements = split(/\s+|,/, $line);
-			if   ($rowelements[0] eq "*vertex" ) 
+			if   ($rowelements[0] eq "*vertex" )
 			{
-				if ($countvert == 0) 
+				if ($countvert == 0)
 				{
 					push (@v, [ "vertices_of_$sourceaddress" ]);
 					push (@v, [ $rowelements[1], $rowelements[2], $rowelements[3] ] );
 				}
 
-				if ($countvert > 0) 
+				if ($countvert > 0)
 				{
 					push (@v, [ $rowelements[1], $rowelements[2], $rowelements[3] ] );
 				}
 				$countvert++;
 			}
-			elsif   ($rowelements[0] eq "*obs" ) 
+			elsif   ($rowelements[0] eq "*obs" )
 			{
-				push (@obs, [ $rowelements[1], $rowelements[2], $rowelements[3], $rowelements[4], 
+				push (@obs, [ $rowelements[1], $rowelements[2], $rowelements[3], $rowelements[4],
 				$rowelements[5], $rowelements[6], $rowelements[7], $rowelements[8], $rowelements[9], $rowelements[10] ] );
 				$countobs++;
 			}
@@ -3571,32 +3571,32 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 		#    push (@obspoints , [ ($$ob[0] + $$ob[3]), ( $$ob[1] + $$ob[4] ) , $$ob[5] ] );
 		#  }
 		#}
-		#else 
-		#{ 
-			@obspoints = @{$recalculatenet[7]}; 
+		#else
+		#{
+			@obspoints = @{$recalculatenet[7]};
 		#}
 		push ( @geos, [ @v ] );
 		push ( @genobs, [ @obs ] );
 		push ( @genobspoints, [ @genobs ] );
 		$countgeo++;
 	}
-	
+
 	my ( @winpoints, @windowpoints, @windimsfront, @windimseast, @windimsback, @windimswest, @windsims, @windareas, @jointlenghts );
-	my ( $jointfront, $jointeast, $jointback, $jointwest, $windimxfront, $windimyfront, 
+	my ( $jointfront, $jointeast, $jointback, $jointwest, $windimxfront, $windimyfront,
 		$windimxback, $windimyback, $windimxeast, $windimyeast, $windimxwest, $windimywest );
 
 	if ($constrain) { eval ($constrain); } # HERE THE INSTRUCTION WRITTEN IN THE OPT CONFIGURATION FILE CAN BE SPEFICIED
 	# FOR PROPAGATION OF CONSTRAINTS
 
 	if ($y_or_n_reassign_cp == "y")
-	{                    
-		eval `cat $configaddress`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS 
-		# IS EVALUATED, AND HERE BELOW CONSTRAINTS ARE PROPAGATED. 
+	{
+		eval `cat $configaddress`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS
+		# IS EVALUATED, AND HERE BELOW CONSTRAINTS ARE PROPAGATED.
 		# vertices CAN BE CALLED BY NAME with $geo[ $zonenumber ][ ]
 		#  x, y or z CAN BE CALLED WITH THE NUMBERS 0, 1 or 2: EXAMPLE: $genobs[ $zonenumber ][ $vertexnumber ][ 0, 1 or 2 ]
 		# ZONENUMBER DERIVES FROM $countop.
 		# OBSTRUCTION CAN BE CALLED WITH $genobs[ $zonenumber ][ $obstruction_number ]
-		# REMEMBER TO ASSIGN THE $height IN THE CONFIGURATION FILE. 
+		# REMEMBER TO ASSIGN THE $height IN THE CONFIGURATION FILE.
 		# UNLESS, ESP-r WILL ASSIGN THAT FOR YOU AND THIS IS NOT ALWAYS WHAT YOU WANT.
 	}
 
@@ -3605,17 +3605,17 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 	my @linesnet = <INFILENET>;
 	close INFILENET;
 
-	my @letters = ( 
-	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", 
-	"0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\nz", "0\na", "0\nb", "0\nc", "0\nd", "0\ne", "0\nf",  "0\ng", "0\nh", 
-	"0\n0\nc\nh", "0\n0\nc\ni", "0\n0\nc\nj", "0\n0\nc\nk", "0\n0\nc\nl", "0\n0\nc\nm", "0\n0\nc\nn", "0\n0\nc\no", "0\n0\nc\np", "0\n0\nc\nq", "0\n0\nc\nr", 
+	my @letters = (
+	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r",
+	"0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\nz", "0\na", "0\nb", "0\nc", "0\nd", "0\ne", "0\nf",  "0\ng", "0\nh",
+	"0\n0\nc\nh", "0\n0\nc\ni", "0\n0\nc\nj", "0\n0\nc\nk", "0\n0\nc\nl", "0\n0\nc\nm", "0\n0\nc\nn", "0\n0\nc\no", "0\n0\nc\np", "0\n0\nc\nq", "0\n0\nc\nr",
 	"0\n0\nc\ns", "0\n0\nc\nt", "0\n0\nc\nu", "0\n0\nc\nv", "0\n0\nc\nw", "0\n0\nc\nx", "0\n0\nc\ny",
-	"0\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\na", "0\n0\nc\n0\nc\nb", "0\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\ng", "0\n0\nc\n0\nc\nh", "0\n0\nc\n0\nc\ni", "0\n0\nc\n0\nc\nj", 
-	"0\n0\nc\n0\nc\nk", "0\n0\nc\n0\nc\nl", "0\n0\nc\n0\nc\nm", "0\n0\nc\n0\nc\nn", "0\n0\nc\n0\nc\no", "0\n0\nc\n0\nc\np", 
-	"0\n0\nc\n0\nc\n0\nc\np", "0\n0\nc\n0\nc\n0\nc\nq", "0\n0\nc\n0\nc\n0\nc\nr", "0\n0\nc\n0\nc\n0\nc\ns", "0\n0\nc\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\n0\nc\nx", "0\n0\nc\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\n0\nc\na", "0\n0\nc\n0\nc\n0\nc\nb", 
+	"0\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\na", "0\n0\nc\n0\nc\nb", "0\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\ng", "0\n0\nc\n0\nc\nh", "0\n0\nc\n0\nc\ni", "0\n0\nc\n0\nc\nj",
+	"0\n0\nc\n0\nc\nk", "0\n0\nc\n0\nc\nl", "0\n0\nc\n0\nc\nm", "0\n0\nc\n0\nc\nn", "0\n0\nc\n0\nc\no", "0\n0\nc\n0\nc\np",
+	"0\n0\nc\n0\nc\n0\nc\np", "0\n0\nc\n0\nc\n0\nc\nq", "0\n0\nc\n0\nc\n0\nc\nr", "0\n0\nc\n0\nc\n0\nc\ns", "0\n0\nc\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\n0\nc\nx", "0\n0\nc\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\n0\nc\na", "0\n0\nc\n0\nc\n0\nc\nb",
 	"0\n0\nc\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\n0\nc\ng"
 	); # RE-CHECK
-	
+
 	my $countnode = 0;
 	my ( $interfaceletter, $calcpressurecoefficient, $nodetype, $nodeletter, $mode );
 	my $countlines = 0;
@@ -3632,7 +3632,7 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 		if ($rowelements[0] eq "Component") { $mode = "componentmode"; }
 		if ( ( $mode eq "nodemode" ) and ($countlines > 1) and ($countlines < (2 + scalar(@nodesdata) ) ) )
 		{
-			$countnode = ($countlines - 2); 
+			$countnode = ($countlines - 2);
 			$zone = $nodesdata[$countnode][0];
 			$interfaceletter = $nodesdata[$countnode][1];
 			$calcpressurecoefficient = $nodesdata[$countnode][2];
@@ -3675,8 +3675,8 @@ y
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
-				{ 
+				unless ($exeonfiles eq "n")
+				{
 					print `$printthis`;
 				}
 
@@ -3685,8 +3685,8 @@ YYY
 $printthis";
 				$countnode++;
 			}
-			elsif ( $nodetype eq "3")              
-			{  
+			elsif ( $nodetype eq "3")
+			{
 				if ($y_or_n_reassign_cp == "y")
 				{
 					my $printthis =
@@ -3723,8 +3723,8 @@ y
 -
 YYY
 ";
-					unless ($exeonfiles eq "n") 
-					{ 
+					unless ($exeonfiles eq "n")
+					{
 						print `printthis`;
 					}
 
@@ -3736,7 +3736,7 @@ $printthis";
 			}
 		}
 
-		my @node_letters = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", 
+		my @node_letters = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
 		"q", "r", "s", "t", "u", "v", "w", "x", "y", "z");
 		if ( ($mode eq "componentmode") and ( $line =~ "opening"))
 		{
@@ -3768,8 +3768,8 @@ y
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 
@@ -3810,8 +3810,8 @@ y
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 
@@ -3832,44 +3832,44 @@ sub pin_obstructions
 	#use strict; use warnings;
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $pin_obstructions_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	my @applytype = @$applytype_ref;
-	my $zone_letter = $applytype[$countop][3]; 
+	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
 
-	my @pin_obstructions = @{ $pin_obstructions_ref->[ $countop ] }; 
-	my $sourcefile = shift( @pin_obstructions ); 
-	my $sourcepath = $mypath . "/" . $file . $sourcefile; 
+	my @pin_obstructions = @{ $pin_obstructions_ref->[ $countop ] };
+	my $sourcefile = shift( @pin_obstructions );
+	my $sourcepath = $mypath . "/" . $file . $sourcefile;
 	my %keeplines ;
 	my @newlines;
 	open ( SOURCEFILE, $sourcepath ) or die( "$!" );
 	my @sourcelines = <SOURCEFILE>;
 	close SOURCEFILE;
-	
+
 	foreach my $obs ( @pin_obstructions )
 	{
 		foreach my $line ( @sourcelines )
 		{
-			if  ( ( $line =~ /^\*obs/ ) and ( $line =~ /$obs$/ ) ) 
+			if  ( ( $line =~ /^\*obs/ ) and ( $line =~ /$obs$/ ) )
 			{
-				$keeplines{$obs} = $line ; 
+				$keeplines{$obs} = $line ;
 			}
 		}
 	}
-	my $targetpath = $to . $sourcefile; 
-	my $oldfile = $targetpath . ".old"; 
+	my $targetpath = $to . $sourcefile;
+	my $oldfile = $targetpath . ".old";
 	print $tee "mv -f $targetpath $oldfile\n";
 	if ( $exeonfiles eq "y" )
 	{
 		print `mv -f $targetpath $oldfile`;
 	}
-	
+
 	open( OLDFILE, $oldfile ) or die( "$!" );
 	my @oldlines = <OLDFILE>;
 	close OLDFILE;
 	open ( NEWFILE, ">$targetpath" ) or die( "$!" );
-	
+
 	foreach my $line ( @oldlines )
 	{
 		if ( $line =~ /^\*obs/ )
@@ -3878,8 +3878,8 @@ sub pin_obstructions
 			{
 				if  ( $line =~ /$obs$/ )
 				{
-					$line = $keeplines{$obs}; 
-					
+					$line = $keeplines{$obs};
+
 				}
 			}
 		}
@@ -3887,10 +3887,10 @@ sub pin_obstructions
 		{
 			print NEWFILE $line;
 		}
-		
-		
+
+
 	}
-	close NEWFILE;  
+	close NEWFILE;
 	#no strict; no warnings;
 } # END SUB pin_obstructions
 
@@ -3899,9 +3899,9 @@ sub apply_constraints
 { #DDD
 
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $apply_constraints_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$applytype_ref;
-	my @apply_constraints = @$apply_constraints_ref; 
+	my @apply_constraints = @$apply_constraints_ref;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -3921,72 +3921,72 @@ sub apply_constraints
 	my %verts = %numvertmenu;
 
 
-	my %zones = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
-		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
-	13 => "m", 14 => "n", 15 => "o", 16 => "p", 
-	17 => "q", 18 => "r", 19 => "0\ns", 20 => "0\nt", 21 => "0\nu", 22 => "0\nv", 
-	23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 26 => "0\nz", 
-	27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
-	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\n0\ncj", 
-	37 => "0\n0\nck", 38 => "0\n0\ncl", 39 => "0\n0\ncm", 40 => "0\n0\ncn", 41 => "0\n0\nco", 
-	42 => "0\n0\ncp", 43 => "0\n0\ncq", 44 => "0\n0\ncr", 45 => "0\n0\ncs", 46 => "0\n0\nct", 
+	my %zones = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g",
+		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l",
+	13 => "m", 14 => "n", 15 => "o", 16 => "p",
+	17 => "q", 18 => "r", 19 => "0\ns", 20 => "0\nt", 21 => "0\nu", 22 => "0\nv",
+	23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 26 => "0\nz",
+	27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne",
+	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\n0\ncj",
+	37 => "0\n0\nck", 38 => "0\n0\ncl", 39 => "0\n0\ncm", 40 => "0\n0\ncn", 41 => "0\n0\nco",
+	42 => "0\n0\ncp", 43 => "0\n0\ncq", 44 => "0\n0\ncr", 45 => "0\n0\ncs", 46 => "0\n0\nct",
 	47 => "0\n0\nc0\ncu", 48 => "0\n0\nc0\ncv", 49 => "0\n0\nc0\ncw", 50 => "0\n0\nc0\ncx" );
 
 
-	my %obss = ( 1 => "e", 2 => "f", 3 => "g", 4 => "h", 5 => "i", 6 => "j", 7 => "k", 
-	8 => "l", 9 => "m", 10 => "n", 11 => "o", 12 => "0\no", 13 => "0\np", 
-	14 => "0\nq", 15 => "0\nr", 16 => "0\ns", 
-	17 => "0\nt", 18 => "0\nu", 19 => "0\nv", 20 => "0\nw", 21 => "0\nx", 22 => "0\ny", 
-	23 => "0\n0\nc\ny", 24 => "0\n0\nc\nz", 25 => "0\n0\nc\na", 26 => "0\n0\nc\nb", 
-	27 => "0\n0\nc\nc", 28 => "0\n0\nc\nd", 29 => "0\n0\nc\ne", 30 => "0\n0\nc\nf", 
+	my %obss = ( 1 => "e", 2 => "f", 3 => "g", 4 => "h", 5 => "i", 6 => "j", 7 => "k",
+	8 => "l", 9 => "m", 10 => "n", 11 => "o", 12 => "0\no", 13 => "0\np",
+	14 => "0\nq", 15 => "0\nr", 16 => "0\ns",
+	17 => "0\nt", 18 => "0\nu", 19 => "0\nv", 20 => "0\nw", 21 => "0\nx", 22 => "0\ny",
+	23 => "0\n0\nc\ny", 24 => "0\n0\nc\nz", 25 => "0\n0\nc\na", 26 => "0\n0\nc\nb",
+	27 => "0\n0\nc\nc", 28 => "0\n0\nc\nd", 29 => "0\n0\nc\ne", 30 => "0\n0\nc\nf",
 	31 => "0\n0\nc\ng", 32 => "0\n0\nc\nh", 33 => "0\n0\nc\ni",
-	34 => "0\n0\nc\n0\nc\ni", 35 => "0\n0\nc\n0\nc\nj", 36 => "0\n0\nc\n0\nc\nk", 
-	37 => "0\n0\nc\n0\nc\nl", 38 => "0\n0\nc\n0\nc\nm", 39 => "0\n0\nc\n0\nc\nn", 
-	40 => "0\n0\nc\n0\nc\no", 41 => "0\n0\nc\n0\nc\np", 42 => "0\n0\nc\n0\nc\nq", 
-	43 => "0\n0\nc\n0\nc\nr", 44 => "0\n0\nc\n0\nc\ns", 
-	45 => "0\n0\nc\n0\nc\n0\nc\ns", 46 => "0\n0\nc\n0\nc\n0\nc\nt", 47 => "0\n0\nc\n0\nc\n0\nc\nu", 
-	48 => "0\n0\nc\n0\nc\n0\nc\nvs", 49 => "0\n0\nc\n0\nc\n0\nc\nw", 50 => "0\n0\nc\n0\nc\n0\nc\nx", 
-	51 => "0\n0\nc\n0\nc\n0\nc\ny", 52 => "0\n0\nc\n0\nc\n0\nc\nz", 53 => "0\n0\nc\n0\nc\n0\nc\na", 
+	34 => "0\n0\nc\n0\nc\ni", 35 => "0\n0\nc\n0\nc\nj", 36 => "0\n0\nc\n0\nc\nk",
+	37 => "0\n0\nc\n0\nc\nl", 38 => "0\n0\nc\n0\nc\nm", 39 => "0\n0\nc\n0\nc\nn",
+	40 => "0\n0\nc\n0\nc\no", 41 => "0\n0\nc\n0\nc\np", 42 => "0\n0\nc\n0\nc\nq",
+	43 => "0\n0\nc\n0\nc\nr", 44 => "0\n0\nc\n0\nc\ns",
+	45 => "0\n0\nc\n0\nc\n0\nc\ns", 46 => "0\n0\nc\n0\nc\n0\nc\nt", 47 => "0\n0\nc\n0\nc\n0\nc\nu",
+	48 => "0\n0\nc\n0\nc\n0\nc\nvs", 49 => "0\n0\nc\n0\nc\n0\nc\nw", 50 => "0\n0\nc\n0\nc\n0\nc\nx",
+	51 => "0\n0\nc\n0\nc\n0\nc\ny", 52 => "0\n0\nc\n0\nc\n0\nc\nz", 53 => "0\n0\nc\n0\nc\n0\nc\na",
 	54 => "0\n0\nc\n0\nc\n0\nc\nb", 55 => "0\n0\nc\n0\nc\n0\nc\nc" );
 
-	my %nodes = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
-	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
-	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "q", 18 => "r", 19 => "0\ns", 
-	20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
-	26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
-	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\n0\ncj", 
-	37 => "0\n0\nck", 38 => "0\n0\ncl", 39 => "0\n0\ncm", 40 => "0\n0\ncn", 41 => "0\n0\nco", 
-	42 => "0\n0\ncp", 43 => "0\n0\ncq", 44 => "0\n0\ncr", 45 => "0\n0\ncs", 46 => "0\n0\nct", 
-	47 => "0\n0\ncu", 48 => "0\n0\ncv", 49 => "0\n0\ncw", 50 => "0\n0\ncx", 
-	51 => "0\n0\nc0\ncy", 52 => "0\n0\nc0\ncz", 
-	53 => "0\n0\nca", 54 => "0\n0\ncb", 55 => "0\n0\nc0\ncc", 56 => "0\n0\nc0\ncd", 
-	57 => "0\n0\nc0\nce", 58 => "0\n0\nc0\ncf", 
-	59 => "0\n0\nc0\ncg", 60 => "0\n0\nc0\nch", 61 => "0\n0\nc0\nci", 
-	62 => "0\n0\nc0\nc0\ncj", 63 => 63, 64 => "0\n0\nc0\nc0\ncl", 
-	65 => "0\n0\nc0\nc0\ncm", 66 => "0\n0\nc0\nc0\ncn", 
-	67 => "0\n0\nc0\nc0\nco", 68 => "0\n0\nc0\nc0\ncp", 69 => "0\n0\nc0\nc0\ncq", 
-	70 => "0\n0\nc0\nc0\ncr", 71 => "0\n0\nc0\nc0\ncs", 
-	72 => "0\n0\nc0\nc0\nct", 73 => "0\n0\nc0\nc0\ncu", 74 => "0\n0\nc0\nc0\ncv", 
+	my %nodes = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g",
+	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l",
+	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "q", 18 => "r", 19 => "0\ns",
+	20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny",
+	26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne",
+	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\n0\ncj",
+	37 => "0\n0\nck", 38 => "0\n0\ncl", 39 => "0\n0\ncm", 40 => "0\n0\ncn", 41 => "0\n0\nco",
+	42 => "0\n0\ncp", 43 => "0\n0\ncq", 44 => "0\n0\ncr", 45 => "0\n0\ncs", 46 => "0\n0\nct",
+	47 => "0\n0\ncu", 48 => "0\n0\ncv", 49 => "0\n0\ncw", 50 => "0\n0\ncx",
+	51 => "0\n0\nc0\ncy", 52 => "0\n0\nc0\ncz",
+	53 => "0\n0\nca", 54 => "0\n0\ncb", 55 => "0\n0\nc0\ncc", 56 => "0\n0\nc0\ncd",
+	57 => "0\n0\nc0\nce", 58 => "0\n0\nc0\ncf",
+	59 => "0\n0\nc0\ncg", 60 => "0\n0\nc0\nch", 61 => "0\n0\nc0\nci",
+	62 => "0\n0\nc0\nc0\ncj", 63 => 63, 64 => "0\n0\nc0\nc0\ncl",
+	65 => "0\n0\nc0\nc0\ncm", 66 => "0\n0\nc0\nc0\ncn",
+	67 => "0\n0\nc0\nc0\nco", 68 => "0\n0\nc0\nc0\ncp", 69 => "0\n0\nc0\nc0\ncq",
+	70 => "0\n0\nc0\nc0\ncr", 71 => "0\n0\nc0\nc0\ncs",
+	72 => "0\n0\nc0\nc0\nct", 73 => "0\n0\nc0\nc0\ncu", 74 => "0\n0\nc0\nc0\ncv",
 	75 => "0\n0\nc0\nc0\ncw", 76 => "0\n0\nc0\nc0\ncx" );
 
-	my %components = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
-	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
-	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "q", 18 => "r", 19 => "0\ns", 
-	20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
-	26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
-	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\n0\ncj", 
-	37 => "0\n0\nck", 38 => "0\n0\ncl", 39 => "0\n0\ncm", 40 => "0\n0\ncn", 41 => "0\n0\nco", 
-	42 => "0\n0\ncp", 43 => "0\n0\ncq", 44 => "0\n0\ncr", 45 => "0\n0\ncs", 46 => "0\n0\nct", 
-	47 => "0\n0\ncu", 48 => "0\n0\ncv", 49 => "0\n0\ncw", 50 => "0\n0\ncx", 
-	51 => "0\n0\nc0\ncy", 52 => "0\n0\nc0\ncz", 
-	53 => "0\n0\nca", 54 => "0\n0\ncb", 55 => "0\n0\nc0\ncc", 56 => "0\n0\nc0\ncd", 
-	57 => "0\n0\nc0\nce", 58 => "0\n0\nc0\ncf", 
-	59 => "0\n0\nc0\ncg", 60 => "0\n0\nc0\nch", 61 => "0\n0\nc0\nci", 
-	62 => "0\n0\nc0\nc0\ncj", 63 => 63, 64 => "0\n0\nc0\nc0\ncl", 
-	65 => "0\n0\nc0\nc0\ncm", 66 => "0\n0\nc0\nc0\ncn", 
-	67 => "0\n0\nc0\nc0\nco", 68 => "0\n0\nc0\nc0\ncp", 69 => "0\n0\nc0\nc0\ncq", 
-	70 => "0\n0\nc0\nc0\ncr", 71 => "0\n0\nc0\nc0\ncs", 
-	72 => "0\n0\nc0\nc0\nct", 73 => "0\n0\nc0\nc0\ncu", 74 => "0\n0\nc0\nc0\ncv", 
+	my %components = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g",
+	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l",
+	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "q", 18 => "r", 19 => "0\ns",
+	20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny",
+	26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne",
+	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\n0\ncj",
+	37 => "0\n0\nck", 38 => "0\n0\ncl", 39 => "0\n0\ncm", 40 => "0\n0\ncn", 41 => "0\n0\nco",
+	42 => "0\n0\ncp", 43 => "0\n0\ncq", 44 => "0\n0\ncr", 45 => "0\n0\ncs", 46 => "0\n0\nct",
+	47 => "0\n0\ncu", 48 => "0\n0\ncv", 49 => "0\n0\ncw", 50 => "0\n0\ncx",
+	51 => "0\n0\nc0\ncy", 52 => "0\n0\nc0\ncz",
+	53 => "0\n0\nca", 54 => "0\n0\ncb", 55 => "0\n0\nc0\ncc", 56 => "0\n0\nc0\ncd",
+	57 => "0\n0\nc0\nce", 58 => "0\n0\nc0\ncf",
+	59 => "0\n0\nc0\ncg", 60 => "0\n0\nc0\nch", 61 => "0\n0\nc0\nci",
+	62 => "0\n0\nc0\nc0\ncj", 63 => 63, 64 => "0\n0\nc0\nc0\ncl",
+	65 => "0\n0\nc0\nc0\ncm", 66 => "0\n0\nc0\nc0\ncn",
+	67 => "0\n0\nc0\nc0\nco", 68 => "0\n0\nc0\nc0\ncp", 69 => "0\n0\nc0\nc0\ncq",
+	70 => "0\n0\nc0\nc0\ncr", 71 => "0\n0\nc0\nc0\ncs",
+	72 => "0\n0\nc0\nc0\nct", 73 => "0\n0\nc0\nc0\ncu", 74 => "0\n0\nc0\nc0\ncv",
 	75 => "0\n0\nc0\nc0\ncw", 76 => "0\n0\nc0\nc0\ncx" );
 
     my $countfile = 0;
@@ -3994,30 +3994,30 @@ sub apply_constraints
     {
 
 		my $sourceaddress = "$to$sourcefile";  #say $tee "\$sourceaddress: " . dump( $sourceaddress );
-		
+
 		open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress 2: $!\n";
 		my @lines = <SOURCEFILE>;
 		close SOURCEFILE;
-			
+
 		my $countlines = 0;
 
 		foreach my $line ( @lines )
 		{
-			$line =~ s/^\s+//; 
+			$line =~ s/^\s+//;
 			my @rowelts = split(/\s+|,/, $line);
 			if ( $sourcefile =~ /\.geo$/ )
 			{
 
-				if   ($rowelts[0] eq "*vertex" ) 
+				if   ($rowelts[0] eq "*vertex" )
 				{
 					my $vertnum = $rowelts[5];
 					@{ $ver{$numberfiles[$countfile]}{$vertnum} } = ( $rowelts[1], $rowelts[2], $rowelts[3] );
 				}
-	            
-	            if   ($rowelts[0] eq "*obs" ) 
+
+	            if   ($rowelts[0] eq "*obs" )
 				{
 					my $obsnum = $rowelts[13];
-					@{ $obs{$numberfiles[$countfile]}{$obsnum} } = ( $rowelts[1], $rowelts[2], $rowelts[3], 
+					@{ $obs{$numberfiles[$countfile]}{$obsnum} } = ( $rowelts[1], $rowelts[2], $rowelts[3],
 	                $rowelts[4], $rowelts[5], $rowelts[6], $rowelts[7], $rowelts[8], $rowelts[9], $rowelts[10] ) ;
 				}
 			}
@@ -4074,8 +4074,8 @@ sub apply_constraints
 
 					if ( ($semaphore_component eq "yes") and ( $semaphore_connection eq "no" ) and ( $countcomponent > 0))
 					{
-						if ($countcomponent % 2 == 1) # $number is odd 
-						{ 
+						if ($countcomponent % 2 == 1) # $number is odd
+						{
 							$component_letter = $components[$countnode];
 							$fluid = $row[0];
 							$type = $row[1];
@@ -4084,8 +4084,8 @@ sub apply_constraints
 							if ($type eq "130") { $type = "m";}
 							$countcomp++;
 						}
-						else # $number is even 
-						{ 
+						else # $number is even
+						{
 							$data_1 = $row[1];
 							$data_2 = $row[2];
 							$data_3 = $row[3];
@@ -4107,48 +4107,48 @@ sub apply_constraints
 	#say $tee "\%obs BEFORE: " . dump( %obs );
 	#say $tee "\%nod BEFORE: " . dump( %nod );
 	#say $tee "\%comp BEFORE: " . dump( %comp );
- 
+
  	my ( $swing, $base, $pace, $val );
  	my $count = 0;
     foreach $incr ( @incrs )
     {
 		if ( ref ( $incr ) )
 		{
-			my $min = $incr->[0]; 
-			my $max = $incr->[0]; 
+			my $min = $incr->[0];
+			my $max = $incr->[0];
 			$swing->[$count] = ( $max - $min );
 			$base->[$count] = ( 0 - $min );
 		}
 		else
 		{
-			$swing->[$count] = ( 2 * $incr ); 
+			$swing->[$count] = ( 2 * $incr );
 			$base->[$count] = ( 0 - $incr );
 		} #say $tee "\$swing->[$count]: " . dump( $swing->[$count] );
-		
+
 		$pace->[$count] = ( $swing->[$count] / ( $stepsvar - 1 ) ); #say $tee "\$pace->[$count]: " . dump( $pace->[$count] );
 		$val->[$count] = ( $base->[$count] + ( $pace->[$count] * ( $countstep - 1 ) ) ); #say $tee "\$val->[$count]: " . dump( $val->[$count] ); # THIS IS WHAT YOU WANT TO USE IN THE INSTRUCTIONS FOR PROPAGATING CONSTRAINTS
 		$count++;
 	}
     #say $tee "\$swing : " . dump( $swing ); say $tee "\$base : " . dump( $base ); say $tee "\$pace : " . dump( $pace ); say $tee "\$val : " . dump( $val );
 
-    
+
     my @tooutputs;
-    #my $tooutput = "( " ; 
-    #$tooutput =~ s/\\// ; say $tee "\$tooutput: " . dump( $tooutput ); 
+    #my $tooutput = "( " ;
+    #$tooutput =~ s/\\// ; say $tee "\$tooutput: " . dump( $tooutput );
     foreach my $configfile ( @configfiles )
     {
     	my $configaddress = "$to$configfile"; #say $tee "\$configaddress: " . dump( $configaddress );
 	    if ( defined ( $configaddress ) )
 		{
 			if ( -e $configaddress )
-			{  
+			{
 				eval `cat $configaddress`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS IS EVALUATED.
 
 				#open( CONFIGFILE, $configaddress ) or die;
 				#my @readlines = <CONFIGFILE>;
 				#close(CONFIGFILE);
                 #foreach my $readline ( @readlines )
-                #{   
+                #{
 	            #    if ( $readline =~ /^(.+)=/ )
 	            #    {
 	            #    	$1 =~ s/my// ;
@@ -4157,7 +4157,7 @@ sub apply_constraints
 	            #}
 	            #$tooutput = $tooutput . " )";
 			}
-			else 
+			else
 			{
 				say $tee "\$configaddress does not exist. Exiting." and die;
 			}
@@ -4173,9 +4173,9 @@ sub apply_constraints
     #$tooutput =~ s/} }/}/g ; say $tee "\$tooutput: " . dump( $tooutput );
     #$tooutput =~ s/\$//g ; say $tee "\$tooutput: " . dump( $tooutput );
     #my @tooutputs = eval( $tooutput ) ; say $tee "\@tooutputs: " . dump( @tooutputs );
-            
+
     foreach my $output ( @tooutputs )
-    {   
+    {
         if ( $output =~ /^ver/ )
         {
         	$output =~ /^ver{(\d+)}{(\d+)}/; #say $tee "DING. \$output : " . dump( $output );
@@ -4184,7 +4184,7 @@ sub apply_constraints
         	my $vnum = $2; #say $tee "\$vnum : " . dump( $vnum );
         	my $vertex_letter = $verts{$vnum}; #say $tee "\$vertex_letter : " . dump( $vertex_letter );
         	my ( $x, $y, $z ) = ( $ver{$zone_number}{$vnum}->[0], $ver{$zone_number}{$vnum}->[1], $ver{$zone_number}{$vnum}->[2] );
-	
+
 			my $printthis =
 "prj $launchline<<YYY
 b
@@ -4194,7 +4194,7 @@ a
 $zone_letter
 d
 $vertex_letter
-$x $y $z 
+$x $y $z
 -
 -
 y
@@ -4210,8 +4210,8 @@ c
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 			say $tee "$printthis";
@@ -4236,7 +4236,7 @@ YYY
 			my $opacity = $ob_->[9]; #say $tee "\$opacity : " . dump( $opacity );
 			my $name = $ob_->[10]; #say $tee "\$name : " . dump( $name );
 			my $material = $ob_->[11]; #say $tee "\$material : " . dump( $material );
-	
+
 			my $printthis =
 "prj $launchline<<YYY
 b
@@ -4293,8 +4293,8 @@ c
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 			say $tee "$printthis";
@@ -4305,7 +4305,7 @@ YYY
         	my $nodnum = $2; #say $tee "\$nodnum : " . dump( $nodnum );
         	my $node_letter = $nodes{$nodnum}; #say $tee "\$node_letter : " . dump( $node_letter );
             my @nods = @{ $nod{$nodnum} }; #say $tee "\@nods : " . dump( @nods );
-    		
+
             my $new_node_letter = $nods[0];
 			my $new_fluid = $nods[1];
 			my $new_type = $nods[2];
@@ -4346,7 +4346,7 @@ y
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
+				unless ($exeonfiles eq "n")
 				{
 					print `$printthis`;
 				}
@@ -4383,14 +4383,14 @@ y
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
+				unless ($exeonfiles eq "n")
 				{
 					print `$printthis`;
 				}
 				say $tee "$printthis";
 			}
         }
-        
+
         elsif ( $output =~ /^comp/ )
         {
         	$output =~ /comp{(.+)}/; #say $tee "DING. \$output : " . dump( $output );
@@ -4431,7 +4431,7 @@ y
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
+				unless ($exeonfiles eq "n")
 				{
 					print `$printthis`;
 				}
@@ -4463,7 +4463,7 @@ y
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
+				unless ($exeonfiles eq "n")
 				{
 					print `$printthis`;
 				}
@@ -4495,7 +4495,7 @@ y
 -
 YYY
 ";
-				unless ($exeonfiles eq "n") 
+				unless ($exeonfiles eq "n")
 				{
 					print `$printthis`;
 				}
@@ -4504,7 +4504,7 @@ YYY
 		}
 
 		print $tee "
-#Propagating constraints " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.      
+#Propagating constraints " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
 $printthis";
 	}
 } # END SUB APPLY_CONSTRAINTS
@@ -4514,7 +4514,7 @@ $printthis";
 sub reshape_windows # IT APPLIES CONSTRAINTS
 {
 	my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
 	my @reshape_windows = @$swap2;
@@ -4522,10 +4522,10 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say $tee "Reshaping windows for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
-	my ( @work_letters, @v );            
+	my ( @work_letters, @v );
 
 	foreach my $group_operations ( @{$reshape_windows[$countop]} )
 	{
@@ -4535,11 +4535,11 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 		my @configfiles = @{$group[2]};
 		my @basevalues = @{$group[3]};
 		my @swingvalues = @{$group[4]};
-		my @work_letters = @{$group[5]}; 
+		my @work_letters = @{$group[5]};
 
 		my $countops = 0;
 		foreach $sourcefile ( @sourcefiles )
-		{ 
+		{
 			my $basevalue = $basevalues[$countops];
 			my $sourcefile = $sourcefiles[$countops];
 			my $targetfile = $targetfiles[$countops];
@@ -4547,9 +4547,9 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 			my $swingvalue = $swingvalues[$countops];
 			my $sourceaddress = "$to$sourcefile";
 			my $targetaddress = "$to$targetfile";
-			
+
 			my $configaddress;
-			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 			{
 				$configaddress = "$to/opts/$configfile";
 			}
@@ -4557,23 +4557,23 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 			{
 				$configaddress = "$to\\opts\\$configfile";
 			}
-			
+
 			my $totalswing;
 			unless ( ref ( $swingvalue ) )
 			{
 				$totalswing = ( 2 * $swingvalue );
 			}
-			
+
 			if ( ref ( $swingvalue ) )
 			{
 				my $min = $swingvalue->[0];
 				my $max = $swingvalue->[1];
 				$totalswing = ( $max - $min );
 			}
-					
+
 			my $pace = ( $totalswing / ( $stepsvar - 1 ) );
 			checkfile($sourceaddress, $targetaddress);
-			
+
 			open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourcefile 2: $!\n";
 			my @lines = <SOURCEFILE>;
 			close SOURCEFILE;
@@ -4582,18 +4582,18 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 			my $countvert = 0;
 			foreach my $line (@lines)
 			{
-				$line =~ s/^\s+//; 
+				$line =~ s/^\s+//;
 
 				my @rowelements = split(/\s+|,/, $line);
-				if   ($rowelements[0] eq "*vertex" ) 
+				if   ($rowelements[0] eq "*vertex" )
 				{
-					if ($countvert == 0) 
+					if ($countvert == 0)
 					{
 						push (@v, [ "vertices of  $sourceaddress", [], [] ]);
 						push (@v, [ $rowelements[1], $rowelements[2], $rowelements[3] ] );
 					}
 
-					if ($countvert > 0) 
+					if ($countvert > 0)
 					{
 						push (@v, [ $rowelements[1], $rowelements[2], $rowelements[3] ] );
 					}
@@ -4604,26 +4604,26 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 			}
 
 			my @vertexletters = (
-			"a",   "b",   "c",   "d",   "e",   "f",   "g",   "h",   "i",   "j",   "k",   "l",   "m",   "n",   "o",   "p", 
+			"a",   "b",   "c",   "d",   "e",   "f",   "g",   "h",   "i",   "j",   "k",   "l",   "m",   "n",   "o",   "p",
 			"0\np", "0\nq", "0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\na", "0\nb",  "0\nc",  "0\nd",  "0\ne",
-			"0\n0\nc\ne", "0\n0\nc\nf", "0\n0\nc\ng", "0\n0\nc\nh", "0\n0\nc\ni", "0\n0\nc\nj", "0\n0\nc\nk", "0\n0\nc\nl", 
-			"0\n0\nc\nm", "0\n0\nc\nn", "0\n0\nc\no", "0\n0\nc\np", "0\n0\nc\nq", "0\n0\nc\nr", "0\n0\nc\ns", "0\n0\nc\nt", 
-			"0\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\nx", "0\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\na", 
-			"0\n0\nc\n0\nc\nb", "0\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\ng", "0\n0\nc\n0\nc\nh", "0\n0\nc\n0\nc\ni", 
-			"0\n0\nc\n0\nc\n0\nc\ni", "0\n0\nc\n0\nc\n0\nc\nj", "0\n0\nc\n0\nc\n0\nc\nk", "0\n0\nc\n0\nc\n0\nc\nl", "0\n0\nc\n0\nc\n0\nc\nm", "0\n0\nc\n0\nc\n0\nc\nn", "0\n0\nc\n0\nc\n0\nc\no", "0\n0\nc\n0\nc\n0\nc\np", 
+			"0\n0\nc\ne", "0\n0\nc\nf", "0\n0\nc\ng", "0\n0\nc\nh", "0\n0\nc\ni", "0\n0\nc\nj", "0\n0\nc\nk", "0\n0\nc\nl",
+			"0\n0\nc\nm", "0\n0\nc\nn", "0\n0\nc\no", "0\n0\nc\np", "0\n0\nc\nq", "0\n0\nc\nr", "0\n0\nc\ns", "0\n0\nc\nt",
+			"0\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\nx", "0\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\na",
+			"0\n0\nc\n0\nc\nb", "0\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\ng", "0\n0\nc\n0\nc\nh", "0\n0\nc\n0\nc\ni",
+			"0\n0\nc\n0\nc\n0\nc\ni", "0\n0\nc\n0\nc\n0\nc\nj", "0\n0\nc\n0\nc\n0\nc\nk", "0\n0\nc\n0\nc\n0\nc\nl", "0\n0\nc\n0\nc\n0\nc\nm", "0\n0\nc\n0\nc\n0\nc\nn", "0\n0\nc\n0\nc\n0\nc\no", "0\n0\nc\n0\nc\n0\nc\np",
 			"0\n0\nc\n0\nc\n0\nc\nq", "0\n0\nc\n0\nc\n0\nc\nr", "0\n0\nc\n0\nc\n0\nc\ns", "0\n0\nc\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\n0\nc\nx"
-			);      
+			);
 
 			$value_reshape_window =  ( ( $basevalue - $swingvalue) + ( $pace * ( $countstep - 1 )) );
 
 			if (-e $configaddress)
-			{        
+			{
 
-				eval `cat $configaddress`;  # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS 
+				eval `cat $configaddress`;  # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS
 				# IS EVALUATED, AND HERE BELOW CONSTRAINTS ARE PROPAGATED.
 
 				if (-e $constrain) { eval ($constrain); } # HERE THE INSTRUCTION WRITTEN IN THE OPT CONFIGURATION FILE CAN BE SPEFICIED
-				# FOR PROPAGATION OF CONSTRAINTS          
+				# FOR PROPAGATION OF CONSTRAINTS
 
 				my $countvertex = 0;
 
@@ -4660,8 +4660,8 @@ c
 -
 YYY
 ";
-							unless ($exeonfiles eq "n") 
-							{ 
+							unless ($exeonfiles eq "n")
+							{
 								print `$printthis`;
 							}
 
@@ -4683,32 +4683,32 @@ $printthis";
 sub warp #
 {
 	my ( $to, $stepsvar, $countop, $countstep, $swap, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say "Warping zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @surfs_to_warp =  @{ $warp->[$countop][0] };
-	my @vertices_numbers =  @{ $warp->[$countop][1] };   
+	my @vertices_numbers =  @{ $warp->[$countop][1] };
 	my @swingrotations = @{ $warp->[$countop][2] };
 	my @yes_or_no_apply_to_others = @{ $warp->[$countop][3] };
 	my $configfilename = $$warp[$countop][4];
-	
+
 	my $configfile;
-	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
-	{ 
+	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
+	{
 		$configfile = $to."/opts/".$configfilename;
 	}
 	else
-	{ 
+	{
 		$configfile = $to."\\opts\\".$configfilename;
 	}
-	
+
 	my @pairs_of_vertices = @{ $warp->[$countop][5] }; # @pairs_of_vertices defining axes
 	my @windows_to_reallign = @{ $warp->[$countop][6] };
 	my $sourcefilename = $$warp[$countop][7];
@@ -4717,14 +4717,14 @@ sub warp #
 	foreach my $surface_letter (@surfs_to_warp)
 	{
 		$swingrotate = $swingrotations[$countrotate];
-		
+
 		if ( ref ( $swingrotate ) )
 		{
 			my $min = $swingrotate->[0];
 			my $max = $swingrotate->[1];
 			$swingrotate = ( $max - $min );
 		}
-		
+
 		$pacerotate = ( $swingrotate / ( $stepsvar - 1 ) );
 		$rotation_degrees = ( ( $swingrotate / 2 ) - ( $pacerotate * ( $countstep - 1 ) )) ;
 		$vertex_number = $vertices_numbers[$countrotate];
@@ -4759,8 +4759,8 @@ c
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 			print  $tee "
@@ -4778,18 +4778,18 @@ $printthis";
 	my $countvert = 0;
 	foreach my $line (@lines)
 	{
-		$line =~ s/^\s+//; 
-			
+		$line =~ s/^\s+//;
+
 		my @rowelements = split(/\s+|,/, $line);
-		if   ($rowelements[0] eq "*vertex" ) 
+		if   ($rowelements[0] eq "*vertex" )
 		{
-			if ($countvert == 0) 
+			if ($countvert == 0)
 			{
 				push (@v, [ "vertices of  $sourceaddress" ]);
 				push (@v, [ $rowelements[1], $rowelements[2], $rowelements[3] ] );
 			}
 
-			if ($countvert > 0) 
+			if ($countvert > 0)
 			{
 				push (@v, [ $rowelements[1], $rowelements[2], $rowelements[3] ] );
 			}
@@ -4800,19 +4800,19 @@ $printthis";
 
 
 	my @vertexletters = (
-	"a",   "b",   "c",   "d",   "e",   "f",   "g",   "h",   "i",   "j",   "k",   "l",   "m",   "n",   "o",   "p", 
+	"a",   "b",   "c",   "d",   "e",   "f",   "g",   "h",   "i",   "j",   "k",   "l",   "m",   "n",   "o",   "p",
 	"0\np", "0\nq", "0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\na", "0\nb",  "0\nc",  "0\nd",  "0\ne",
-	"0\n0\nc\ne", "0\n0\nc\nf", "0\n0\nc\ng", "0\n0\nc\nh", "0\n0\nc\ni", "0\n0\nc\nj", "0\n0\nc\nk", "0\n0\nc\nl", 
-	"0\n0\nc\nm", "0\n0\nc\nn", "0\n0\nc\no", "0\n0\nc\np", "0\n0\nc\nq", "0\n0\nc\nr", "0\n0\nc\ns", "0\n0\nc\nt", 
-	"0\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\nx", "0\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\na", 
-	"0\n0\nc\n0\nc\nb", "0\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\ng", "0\n0\nc\n0\nc\nh", "0\n0\nc\n0\nc\ni", 
-	"0\n0\nc\n0\nc\n0\nc\ni", "0\n0\nc\n0\nc\n0\nc\nj", "0\n0\nc\n0\nc\n0\nc\nk", "0\n0\nc\n0\nc\n0\nc\nl", "0\n0\nc\n0\nc\n0\nc\nm", "0\n0\nc\n0\nc\n0\nc\nn", "0\n0\nc\n0\nc\n0\nc\no", "0\n0\nc\n0\nc\n0\nc\np", 
+	"0\n0\nc\ne", "0\n0\nc\nf", "0\n0\nc\ng", "0\n0\nc\nh", "0\n0\nc\ni", "0\n0\nc\nj", "0\n0\nc\nk", "0\n0\nc\nl",
+	"0\n0\nc\nm", "0\n0\nc\nn", "0\n0\nc\no", "0\n0\nc\np", "0\n0\nc\nq", "0\n0\nc\nr", "0\n0\nc\ns", "0\n0\nc\nt",
+	"0\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\nx", "0\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\na",
+	"0\n0\nc\n0\nc\nb", "0\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\ng", "0\n0\nc\n0\nc\nh", "0\n0\nc\n0\nc\ni",
+	"0\n0\nc\n0\nc\n0\nc\ni", "0\n0\nc\n0\nc\n0\nc\nj", "0\n0\nc\n0\nc\n0\nc\nk", "0\n0\nc\n0\nc\n0\nc\nl", "0\n0\nc\n0\nc\n0\nc\nm", "0\n0\nc\n0\nc\n0\nc\nn", "0\n0\nc\n0\nc\n0\nc\no", "0\n0\nc\n0\nc\n0\nc\np",
 	"0\n0\nc\n0\nc\n0\nc\nq", "0\n0\nc\n0\nc\n0\nc\nr", "0\n0\nc\n0\nc\n0\nc\ns", "0\n0\nc\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\n0\nc\nx"
 	);
-		
+
 	if (-e $configfile)
-	{        
-		eval `cat $configfile`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS IS EVALUATED 
+	{
+		eval `cat $configfile`; # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS IS EVALUATED
 		# AND PROPAGATED.
 
 		if (-e $constrain) { eval ($constrain); } # HERE THE INSTRUCTION WRITTEN IN THE OPT CONFIGURATION FILE CAN BE SPEFICIED
@@ -4859,8 +4859,8 @@ y
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n")
+			{
 				print `$printthis\n`;
 			}
 			print $tee "
@@ -4875,35 +4875,35 @@ $printthis";
 sub export_toenergyplus
 {
 				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $export_toenergyplus_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-				
-				
-				
-				my @applytype = @{ $applytype_ref->[ $countop ] }; 
-				my @export_toenergypluses = @{ $export_toenergyplus_ref->[ $countop ] }; 
+
+
+
+				my @applytype = @{ $applytype_ref->[ $countop ] };
+				my @export_toenergypluses = @{ $export_toenergyplus_ref->[ $countop ] };
 
 				my @menus = @$menus_ref;
 				my %numvertmenu = %{ $menus[0] };
 				my %vertnummenu = %{ $menus[1] };
 
 				shift( @export_toenergypluses );
-				my $sim = shift( @export_toenergypluses ); 
-				my $retrieve = shift( @export_toenergypluses ); 
-				my $epw = shift( @export_toenergypluses ); 
-			 
+				my $sim = shift( @export_toenergypluses );
+				my $retrieve = shift( @export_toenergypluses );
+				my $epw = shift( @export_toenergypluses );
+
 				my $epwfile;
-				unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
-				{ 
-					$epwfile = $mypath . "/" . $epw; 
+				unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
+				{
+					$epwfile = $mypath . "/" . $epw;
 				}
 				else
-				{ 
-					$epwfile = $mypath . "\\" . $epw; 
+				{
+					$epwfile = $mypath . "\\" . $epw;
 				}
-				
+
 				say $tee "Exporting to EnergyPlus for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $file_eplus = "$to.idf";
-	
+
 	my $printthis =
 "prj $launchline<<YYY
 b
@@ -4919,21 +4919,21 @@ $file_eplus
 -
 YYY
 ";
-	unless ($exeonfiles eq "n") 
-	{ 
+	unless ($exeonfiles eq "n")
+	{
 		`$printthis\n`;
 	}
-	print $tee 
+	print $tee
 	"#EXPORTING FILE $file_eplus TO ENERGYPLUS.\n
 $printthis
 ";
-	my $oldfile = $file_eplus; 
-	$oldfile =~ s/\.idx//; 
-	$oldfile = $oldfile . ".old.idx"; 
-	
-	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
-	{ 
-		unless ( $exeonfiles eq "n" ) 
+	my $oldfile = $file_eplus;
+	$oldfile =~ s/\.idx//;
+	$oldfile = $oldfile . ".old.idx";
+
+	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
+	{
+		unless ( $exeonfiles eq "n" )
 		{
 			`mv -f $file_eplus $oldfile`;
 		}
@@ -4941,19 +4941,19 @@ $printthis
 	}
 	else
 	{
-		unless ( $exeonfiles eq "n" ) 
+		unless ( $exeonfiles eq "n" )
 		{
 			`move /y $file_eplus $oldfile`;
 		}
 		print $tee "move /y $file_eplus $oldfile\n";
 	}
-	
+
 	open ( OLDFILEEPLUS, $oldfile ) or die( "$!" );
 	my @oldlines = <OLDFILEEPLUS>;
 	close OLDFILEEPLUS;
-	
+
 	open ( NEWFILEEPLUS, ">$file_eplus" ) or die( "$!" );
-	
+
 	foreach my $line ( @oldlines )
 	{
 		foreach my $elt ( @export_toenergypluses )
@@ -4965,11 +4965,11 @@ $printthis
 		print NEWFILEEPLUS $line;
 	}
 	close NEWFILEEPLUS;
-	
+
 	if ( $sim )
 	{
-		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
-		{ 
+		unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
+		{
 			unless ( $exeonfiles eq "n" )
 			{
 				`runenergyplus $file_eplus $epwfile`;
@@ -4985,7 +4985,7 @@ $printthis
 			print $tee "runeplus $file_eplus $epwfile\n"; # EPW FILE, FOR INSTANCE: /usr/local/EnergyPlus-7-2-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw
 		}
 	}
-	
+
 	if ( $retrieve )
 	{
 		#retrieveepw( $TO_DO );
@@ -4997,13 +4997,13 @@ sub use_modish
 {
 	#use strict;
 	#use warnings;
-	
+
 				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $use_modish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $dowhat_ref ) = @_;
-				
-				
-				my @applytype = @$applytype_ref; 
-				my @use_modish = @{ $use_modish_ref->[ $countop ] }; 
-				my $pathhere = "$to/cfg/$fileconfig"; 
+
+
+				my @applytype = @$applytype_ref;
+				my @use_modish = @{ $use_modish_ref->[ $countop ] };
+				my $pathhere = "$to/cfg/$fileconfig";
 				say $tee "Executing modish.pl for calculating the effect of solar reflections on obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 				my @menus = @$menus_ref;
@@ -5011,7 +5011,7 @@ sub use_modish
 
 				my %numvertmenu = %{ $menus[0] };
 				my %vertnummenu = %{ $menus[1] };
-				
+
 				my %numletter = %numvertmenu;
 
 				if ( @use_modish )
@@ -5019,7 +5019,7 @@ sub use_modish
 					foreach $cycle_ref ( @use_modish )
 					{
 						my @cycle = @$cycle_ref; #say $tee "\@cycle " . dump( @cycle );
-						
+
 						my $shortmodishdefpath;
 						if ( ref $cycle[0] )
 						{
@@ -5035,13 +5035,13 @@ sub use_modish
 			my $oldshdaname = $shdaname . ".old"; #say $tee "\$oldshdaname " . dump( $oldshdaname );
 			my $tempname = $shdname;
 			my $tempname2 = $tempname;
-			$tempname =~ s/.shd//; 
+			$tempname =~ s/.shd//;
 			my $modshdaname = $tempname . ".mod.shda"; #say $tee "\$modshdaname " . dump( $modshdaname );
 			my $testshdaname = $tempname2 . "test.shda";
 			$" = " ";
 			#$" = ",";
-			
-			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
+
+			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 			{
 				print $tee "rm -f $to/rad/*\n";
 				`rm -f $to/rad/*`;
@@ -5049,7 +5049,7 @@ sub use_modish
 				`perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces `;
 				#print $tee "modish(\"$to/cfg/$fileconfig\", $zonenumber, @surfaces);\r\n";
 				#modish("$to/cfg/$fileconfig", $zonenumber, @surfaces);
-				
+
 				`cp -f $shdname $oldshdname`;
 				print $tee "cp -f $shdname $oldshdname\n";
 				`cp -f $shdaname $oldshdaname`;
@@ -5063,7 +5063,7 @@ sub use_modish
 				`rm -f $to/rad/*`;
 				print $tee "modish(\"$to/cfg/$fileconfig\", $zonenumber, @surfaces)\r\n";
 				modish("$to/cfg/$fileconfig", $zonenumber, @surfaces);
-				
+
 				`xcopy  /e /c /r /y $shdname $oldshdname`;
 				print $tee "xcopy  /e /c /r /y $shdname $oldshdname\r\n";
 				`xcopy  /e /c /r /y $shdaname $oldshdname`;
@@ -5090,12 +5090,12 @@ y
 -
 YYY
 ";
-				print $tee 
+				print $tee
 				"SETTING UP THINGS AFTER RUNNING modish.pl.\n
 	$printthis
 ";
-				unless ($exeonfiles eq "n") 
-				{ 
+				unless ($exeonfiles eq "n")
+				{
 					print `$printthis`;
 				}
 			}
@@ -5111,48 +5111,48 @@ YYY
 
 sub genchange
 {  # TO DO: POSSIBILITY TO SPECIFY TEXT STRINGS IN PLACE OF ELEMENTS
-	
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, 
-	$countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref, 
+
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file,
+	$countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref,
 	$filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref ) = @_;
-	
-	
-	
-	my @applytype = @$applytype_ref; 
+
+
+
+	my @applytype = @$applytype_ref;
 	#my %names = %$names_ref; #
 	#my %nums = %$nums_ref;
 	#my %newcontents = %$newcontents_ref;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
-	my %vertnummenu = %{ $menus[1] };	
-	
+	my %vertnummenu = %{ $menus[1] };
+
 	say $tee "Executing genchange for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
-	my $this_cycledata = $genchange->[$countop]; 
-	my @filequestions = @{ $this_cycledata->[1] }; 
+	my $this_cycledata = $genchange->[$countop];
+	my @filequestions = @{ $this_cycledata->[1] };
 	my ( @plaincontents, @filecontents, @newfilecontents );
 	my ( %names, %nums, %newcontents );
 
 	sub read_gen
-	{  
-		my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, 
-			$countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref, 
+	{
+		my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file,
+			$countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref,
 			$filecontents_ref, $newfilecontents_ref, $launchline, $fullfilepath, $new_fullfilepath, $filequestions_ref ) = @_;
-		my @filequestions = @$filequestions_ref; 
+		my @filequestions = @$filequestions_ref;
 		my $countunique = 1;
-		my $countfile = 0;    
+		my $countfile = 0;
 		foreach my $filequests ( @filequestions )
-		{  
-			my @truequests = @$filequests; 
+		{
+			my @truequests = @$filequests;
 			my $constrainfiles_ref = shift( @truequest );
-			my @constrainfiles = @{ $constrainfiles_ref }; 
-			my $thisfile = shift( @truequests );  
+			my @constrainfiles = @{ $constrainfiles_ref };
+			my $thisfile = shift( @truequests );
 			$thisfile =~ /\.(\d+)?/ ;
 			$afterdot = $1 ;
 			#say $tee "AFTERDOT:\ $afterdot";
-			my $fullfilepath = $to . $thisfile ; 
-			my $new_fullfilepath = $fullfilepath . ".$afterdot" ; 
-			
+			my $fullfilepath = $to . $thisfile ;
+			my $new_fullfilepath = $fullfilepath . ".$afterdot" ;
+
 			say "fullfilepath: $fullfilepath";
 			open( FULLFILEPATH, "$fullfilepath" ) or die ( "$!" );
 			my @filerows = <FULLFILEPATH>;
@@ -5160,22 +5160,22 @@ sub genchange
 			close FULLFILEPATH;
 			@{ $plaincontents[ $countfile ] } = @filerows;
 
-			
-			
 
-			
+
+
+
 			my $countro = 0;
 			foreach my $row ( @filerows )
-			{  
+			{
 				my $newrow = "";
 				$row =~ s/^\s+//; # CLEAR WHITE SPACES AT THE BEGINNING OF THE LINE
 				$row =~ s/\s+/ /g; # MAKE SEQUENCES OF WHITE SPACES ONE SPACE
 				#$" = " ";
-				my @row_elts = split( /\s+|,|;/, $row ); 
+				my @row_elts = split( /\s+|,|;/, $row );
 				my @rowelts = supercleanarray( @row_elts );
 				@{ $filecontents[ $countfile ][ $countro ] } = @rowelts ;
 				#$plaincontents[ $countfile ][ $countro ] = $row;
-				
+
 				#my $count = 0;
 				#foreach my $el ( @rowelts )
 				#{
@@ -5183,208 +5183,208 @@ sub genchange
 				#  $count++;
 				#}
 				$countro++;
-			} 
+			}
 			#@newfilecontents = @filecontents;
-			
+
 			$countrow = 0;
 			foreach my $row ( @filerows )
-			{  
-				
+			{
+
 				my $countquest = 0;
 				my $countcoord = 0;
-				
+
 				foreach my $quest ( @truequests )
 				{
-					
+
 					if ( scalar( @{ $quest } ) > 0 )
-					{  
-						my @row_numbers_plus1 = @{ $quest->[0] }; 
-						my @row_numbers = decreasearray( @row_numbers_plus1 ); 
+					{
+						my @row_numbers_plus1 = @{ $quest->[0] };
+						my @row_numbers = decreasearray( @row_numbers_plus1 );
 						my $countrownum = 0;
 						foreach my $row_number ( @row_numbers )
-						{  
+						{
 							#if ( $row_number == $countrow )
 							#{
 							#  say $tee "YES HERE \$row_number $row_number eq \$countrow $countrow";
 							#}
-							my @elts_pos_plus1 = @{ $quest->[1] }; 
-							my @elts_pos = decreasearray( @elts_pos_plus1 ); 
-										
-							my $range = $quest->[2]; 
-							my @nicknames = @{ $quest->[3] }; 
+							my @elts_pos_plus1 = @{ $quest->[1] };
+							my @elts_pos = decreasearray( @elts_pos_plus1 );
+
+							my $range = $quest->[2];
+							my @nicknames = @{ $quest->[3] };
 							#if ( scalar( @nicknames ) == 0 )
 							#{
 							#  @nicknames = @row_numbers_plus1;
 							#}
-							my $operation_type = $quest->[4]; 
-							my $separator =  $quest->[5]; 
-							my $precision =  $quest->[6]; 
-							my @centrexyz = @{ $quest->[7] }; 
-							my $centrex = $centrexyz[0]; 
-							my $centrey = $centrexyz[1]; 
-							my $centrez = $centrexyz[2]; 
-							
-							my @rowelts = @{ $filecontents[ $countfile ][ $countrow ] }; 
-							
-							my $countpos = 0;            
+							my $operation_type = $quest->[4];
+							my $separator =  $quest->[5];
+							my $precision =  $quest->[6];
+							my @centrexyz = @{ $quest->[7] };
+							my $centrex = $centrexyz[0];
+							my $centrey = $centrexyz[1];
+							my $centrez = $centrexyz[2];
+
+							my @rowelts = @{ $filecontents[ $countfile ][ $countrow ] };
+
+							my $countpos = 0;
 							foreach $elt_position ( @elts_pos )
-							{   
+							{
 								my $countelt = 0;
-								
+
 								foreach my $rowelt ( @rowelts )
-								{  
+								{
 									#if ( $elt_position == $countelt )
 									#{
-										
+
 									#}
 									my ( $truerange, $low, $high, $pace, $value, $base, $newvalue, $newangle );
 									#if ( ( $rowelt ne "" ) and  ( $rowelt ne " " ) )
-									{   
-										
+									{
+
 										my @coords;
 										if ( ( $row_number == $countrow ) and ( $elt_position == $countelt ) )
-										{  
-											
-											
-											
-											
-											
-											my $next_elt_position = $elts_pos[ $countpos + 1 ]; 
-											my $prev_elt_position = $elts_pos[ $countpos - 1 ]; 
-											
-											
-			
+										{
+
+
+
+
+
+											my $next_elt_position = $elts_pos[ $countpos + 1 ];
+											my $prev_elt_position = $elts_pos[ $countpos - 1 ];
+
+
+
 											if ( defined( $range ) and ( $range ne "" ) )
 											{
 												if ( not ( defined( $operation_type ) ) )
 												{
 													$operation_type = "linear"; #LINEAR TRANSFORMATION.
 												}
-												
+
 												if ( $operation_type eq "linear" )
 												{
 													if ( not ( ref( $range ) ) )
 													{
-														$truerange = ( 2 * $range ); 
-														$base = ( $rowelt - $range ); 
+														$truerange = ( 2 * $range );
+														$base = ( $rowelt - $range );
 													}
 													else
 													{
 														( $low, $high ) = ( $range->[0], $range->[1] );
-														$truerange = ( $high - $low ); 
-														$base = ( $rowelt + $low ); 
+														$truerange = ( $high - $low );
+														$base = ( $rowelt + $low );
 													}
-													
-													$pace = ( $truerange / ( $stepsvar - 1 ) ); 
-													$newvalue = ( $base + ( $pace * ( $countstep - 1 ) ) ); 
+
+													$pace = ( $truerange / ( $stepsvar - 1 ) );
+													$newvalue = ( $base + ( $pace * ( $countstep - 1 ) ) );
 												} # INSERT HERE WHAT HAPPENS IF THE TRANSFORMATION IS NOT LINEAR.
-												
+
 												if ( $operation_type eq "rotation2d" )
-												{  
-													$countcoord++;          
+												{
+													$countcoord++;
 													if ( not ( ref( $range ) ) )
 													{
-														$truerange = ( 2 * $range ); 
-														$base = - $range; 
+														$truerange = ( 2 * $range );
+														$base = - $range;
 													}
 													else
 													{
 														( $low, $high ) = ( $range->[0], $range->[1] );
-														$truerange = ( $high - $low ); 
-														$base = $low; 
+														$truerange = ( $high - $low );
+														$base = $low;
 													}
-													
-													$pace = ( $truerange / ( $stepsvar - 1 ) ); 
-													$newangle = ( $base + ( $pace * ( $countstep - 1 ) ) ); 
-													
-													my $next_elt_position = $elts_pos[ $countelt + 1  ]; 
-													my $prev_elt_position = $elts_pos[ $countelt - 1  ] ; 
-							
+
+													$pace = ( $truerange / ( $stepsvar - 1 ) );
+													$newangle = ( $base + ( $pace * ( $countstep - 1 ) ) );
+
+													my $next_elt_position = $elts_pos[ $countelt + 1  ];
+													my $prev_elt_position = $elts_pos[ $countelt - 1  ] ;
+
 													if ( $countcoord == 1 )
-													{  
-														
-														
-														
-														#my @obtained = rotate2d( $rowelt, $filecontents[ $countfile ][ $row_number ][ $next_elt_position ]  , $newangle, $centrex, $centrey );  say $tee "DERIVED \@obtained " . dump( @obtained );
-														my @obtained = rotate2d( $rowelt, $rowelts[ $next_elt_position ] , $newangle, $centrex, $centrey );  
-														$newvalue = $obtained[0]; 
-														#if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ){ $newvalue = 0; } ; say $tee "DERIVED1 \$newvalue " . dump( $newvalue );
-														
-													}
-													elsif ( $countcoord == 2 ) 
 													{
-														
-														
-														
+
+
+
+														#my @obtained = rotate2d( $rowelt, $filecontents[ $countfile ][ $row_number ][ $next_elt_position ]  , $newangle, $centrex, $centrey );  say $tee "DERIVED \@obtained " . dump( @obtained );
+														my @obtained = rotate2d( $rowelt, $rowelts[ $next_elt_position ] , $newangle, $centrex, $centrey );
+														$newvalue = $obtained[0];
+														#if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ){ $newvalue = 0; } ; say $tee "DERIVED1 \$newvalue " . dump( $newvalue );
+
+													}
+													elsif ( $countcoord == 2 )
+													{
+
+
+
 														#my @obtained = rotate2d ( $filecontents[ $countfile ][ $row_number ][ $prev_elt_position ] , $rowelt, $newangle, $centrex, $centrey ); say $tee "DERIVED \@obtained " . dump( @obtained );
-														my @obtained = rotate2d ( $rowelts[ $prev_elt_position ], $rowelt, $newangle, $centrex, $centrey ); 
-														$newvalue = $obtained[1]; 
-														#if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ) { $newvalue = 0; } ; 
+														my @obtained = rotate2d ( $rowelts[ $prev_elt_position ], $rowelt, $newangle, $centrex, $centrey );
+														$newvalue = $obtained[1];
+														#if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ) { $newvalue = 0; } ;
 														$countcoord = 0;
 													}
 												}
-												
+
 												if ( $operation_type eq "wordchange" )
 												{
-													my @newwords = @$range; 
-													$newvalue = $newwords[ $countstep - 1 ]; 
-													 
-												} 
-												
+													my @newwords = @$range;
+													$newvalue = $newwords[ $countstep - 1 ];
+
+												}
+
 												if ( $operation_type eq "rotation2d_multiline" ) #TO BE CHECKED
-												{  
-													$countcoord++;          
+												{
+													$countcoord++;
 													if ( not ( ref( $range ) ) )
 													{
-														$truerange = ( 2 * $range ); 
-														$base = - $range; 
+														$truerange = ( 2 * $range );
+														$base = - $range;
 													}
 													else
 													{
 														( $low, $high ) = ( $range->[0], $range->[1] );
-														$truerange = ( $high + $low ); 
-														$base = - $low; 
+														$truerange = ( $high + $low );
+														$base = - $low;
 													}
-													
-													$pace = ( $truerange / ( $stepsvar - 1 ) ); 
-													$newangle = ( $base + ( $pace * ( $countstep - 1 ) ) ); 
-													
+
+													$pace = ( $truerange / ( $stepsvar - 1 ) );
+													$newangle = ( $base + ( $pace * ( $countstep - 1 ) ) );
+
 													if ( $countcoord == 1 )
-													{  
-														
-														
-														
-														
-														#my @obtained = rotate2d( $rowelt, $filecontents[ $countfile ][ $next_row_number ][ $elt_position ]  , $newangle, $centrex, $centrey );  
-														$newvalue = $obtained[0]; 
-														if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ){ $newvalue = 0; } ; 
-													}
-													elsif ( $countcoord == 2 ) 
 													{
-														
-														
-														
-														#my @obtained = rotate2d ( $filecontents[ $countfile ][ $prev_row_number ][ $elt_position ] , $rowelt, $newangle, $centrex, $centrey ); 
-														my @obtained = rotate2d ( $filecontents[ $countfile ][ $prev_row_number ][ $elt_position ], $rowelt, $newangle, $centrex, $centrey ); 
-														$newvalue = $obtained[1]; 
-														#if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ) { $newvalue = 0; } ; 
+
+
+
+
+														#my @obtained = rotate2d( $rowelt, $filecontents[ $countfile ][ $next_row_number ][ $elt_position ]  , $newangle, $centrex, $centrey );
+														$newvalue = $obtained[0];
+														if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ){ $newvalue = 0; } ;
+													}
+													elsif ( $countcoord == 2 )
+													{
+
+
+
+														#my @obtained = rotate2d ( $filecontents[ $countfile ][ $prev_row_number ][ $elt_position ] , $rowelt, $newangle, $centrex, $centrey );
+														my @obtained = rotate2d ( $filecontents[ $countfile ][ $prev_row_number ][ $elt_position ], $rowelt, $newangle, $centrex, $centrey );
+														$newvalue = $obtained[1];
+														#if ( ( $newvalue < 0.00001 ) and ( $newvalue > - 0.00001 ) ) { $newvalue = 0; } ;
 														$countcoord = 0;
 													}
-												}  
-																					
+												}
+
 											}
 											elsif ( ( $range ne "" ) and ( $operation_type eq "" ) )
 											{
-												$newvalue = $rowelt; 
+												$newvalue = $rowelt;
 											}
-											
-											
+
+
 											my $nickname;
 											if ( scalar( @nicknames ) == 0 )
 											{
 												$nickname = $countvar . "-" . ( $countrow + 1) . "-" . ( $countelt + 1 );
 											}
-											
+
 											my $thisline = $passrows[$countrows];
 											$names{$nickname} =
 											{
@@ -5401,7 +5401,7 @@ sub genchange
 												precision => $precision,
 												operation_type => $operation_type,
 											};
-											 
+
 											$nums{$countunique} =
 											{
 												oldvalue => $rowelt,
@@ -5417,10 +5417,10 @@ sub genchange
 												precision => $precision,
 												operation_type => $operation_type,
 											};
-											$countunique++;  
+											$countunique++;
 										}
 									}
-									$countelt++;  
+									$countelt++;
 								}
 								$countpos++;
 							}
@@ -5435,22 +5435,22 @@ sub genchange
 		}
 		return (  \%names, \%nums, \%newcontents, \@newfilecontents, \@plaincontents, \@filecontents );
 	}
-	
+
 	if ( ( $todo eq "read_gen" ) or ( $todo eq "vary" ) )
-	{  
-		( $names_ref, $nums_ref, $newcontents_ref, $newfilecontents_ref, $plaincontents_ref, $filecontents_ref ) = 
-		read_gen( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, 
-				$countmorphing, $todo,  $names_ref, $nums_ref, $newcontents_ref, 
+	{
+		( $names_ref, $nums_ref, $newcontents_ref, $newfilecontents_ref, $plaincontents_ref, $filecontents_ref ) =
+		read_gen( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file,
+				$countmorphing, $todo,  $names_ref, $nums_ref, $newcontents_ref,
 				$filecontents_ref, $newfilecontents_ref, $launchline, , $fullfilepath, $new_fullfilepath, \@filequestions );
-		%names = %$names_ref; 
-		%nums = %$nums_ref; 
-		%newcontents = %$newcontents_ref; 
-		@newfilecontents = @$newfilecontents_ref; 
-		@plaincontents = @$plaincontents_ref; 
-		@filecontents = @$filecontents_ref; 
+		%names = %$names_ref;
+		%nums = %$nums_ref;
+		%newcontents = %$newcontents_ref;
+		@newfilecontents = @$newfilecontents_ref;
+		@plaincontents = @$plaincontents_ref;
+		@filecontents = @$filecontents_ref;
 	}
 	sub read_gen_constraints
-	{  
+	{
 		my ( $constrainfiles_ref, $names_ref, $newcontents_ref ) = @_;
 		my @constrainfiles = @$constrainfiles_ref;
 		my %names = %$names_ref;
@@ -5458,12 +5458,12 @@ sub genchange
 		foreach my $constrainfile ( @constrainfiles )
 		{
 			if ( ( -e $constrainfile ) and ( defined( $constrainfile ) ) )
-			{  
-				eval `cat $constrainfile`; 
+			{
+				eval `cat $constrainfile`;
 			}
 		}
 
-		
+
 		foreach my $nickname ( sort {$a <=> $b} ( keys %names ) )
 		{
 			if ( defined( $nickname ) )
@@ -5473,14 +5473,14 @@ sub genchange
 		}
 		return ( \%names, \%newcontents );
 	}
-	
+
 	if ( ( $todo eq "read_gen" ) or ( $todo eq "vary" ) )
 	{
 		( $names_ref, $newcontents_ref ) = read_gen_constraints ( \@constrainfiles, \%names, \%newcontents );
-		%names = %$names_ref; 
-		%newcontents = %$newcontents_ref; 
+		%names = %$names_ref;
+		%newcontents = %$newcontents_ref;
 	}
-		
+
 	if ( ( $todo eq "read_gen" ) or ( $todo eq "vary" ) )
 	{
 		foreach my $uniqnum ( sort { $a <=> $b } keys %nums )
@@ -5493,58 +5493,58 @@ sub genchange
 					{
 						if ( ( $nums{$uniqnum}{newvalue} ne $names{$nickname}{newvalue} ) and ( $nums{$uniqnum}{newvalue} != $names{$nickname}{newvalue} ) )
 						{
-							$nums{$uniqnum}{newvalue} = $names{$nickname}{newvalue} ; 
+							$nums{$uniqnum}{newvalue} = $names{$nickname}{newvalue} ;
 						}
 					}
 				}
 			}
 		}
-	} 
-		
-	
-		
+	}
+
+
+
 	sub foreachcontentsref
-	{  
+	{
 		my ( $plaincontents_ref, $names_ref, $nums_ref, $filecontents_ref ) = @_;
 		my @plaincontents = @$plaincontents_ref;
-		my %names = %$names_ref; 
-		my %nums = %$nums_ref; 
+		my %names = %$names_ref;
+		my %nums = %$nums_ref;
 		my @filecontents = @$filecontents_ref;
 		my $countfile = 0;
 		foreach my $fil ( @plaincontents )
 		{
 			my $countline = 0;
-			
-			
+
+
 			foreach my $newrow ( @$fil )
-			{  
+			{
 				my $thisnewrow;
 				foreach my $countunique ( sort { $a <=> $b } keys ( %nums ) )
-				{        
-					my $nickname = $nums{$countunique}{nickname}; 
-					
-					my $el = $nums{$countunique}{oldvalue}; 
-					my $newel = $nums{$countunique}{newvalue}; 
-					my $countrow = $nums{$countunique}{countrow}; 
-					my $countelt = $nums{$countunique}{countelt}; 
-					my $fullfilepath = $nums{$countunique}{fullfilepath}; 
-					my $separator = $nums{$countunique}{separator}; 
-					my $precision = $nums{$countunique}{precision}; 
-					my $operation_type = $nums{$countunique}{operation_type}; 
+				{
+					my $nickname = $nums{$countunique}{nickname};
+
+					my $el = $nums{$countunique}{oldvalue};
+					my $newel = $nums{$countunique}{newvalue};
+					my $countrow = $nums{$countunique}{countrow};
+					my $countelt = $nums{$countunique}{countelt};
+					my $fullfilepath = $nums{$countunique}{fullfilepath};
+					my $separator = $nums{$countunique}{separator};
+					my $precision = $nums{$countunique}{precision};
+					my $operation_type = $nums{$countunique}{operation_type};
 					my $counteltminus1 = ( $countelt - 1 );
 					if ( defined( $newel ) and ( $newel ne "" ) and  defined( $el ) and ( $el ne "" ) and defined( $el ) and ( $el ne " " ) )
-					{  
+					{
 						if ( $countrow == $countline )
-						{  
+						{
 							my $alternewrow = $newrow;
 							my @seps = gatherseparators( $newrow );
 							$alternewrow =~ s/^\s+//; # CLEAR WHITE SPACES AT THE BEGINNING OF THE LINE
-							$alternewrow =~ s/\s+//g; 
-							my @rowelts = split( /\s+|,|;/, $alternewrow ); 
+							$alternewrow =~ s/\s+//g;
+							my @rowelts = split( /\s+|,|;/, $alternewrow );
 							#my @rowelts = @{ $filecontents[ $countfile ][ $countline ] };
 							#@rowelts = purifyarray( @rowelts );
-							my $thiselt = $rowelts[ $countelt ]; 
-							my @previouselts = @rowelts[ 0..$counteltminus1 ]; 
+							my $thiselt = $rowelts[ $countelt ];
+							my @previouselts = @rowelts[ 0..$counteltminus1 ];
 							my $countscore = 0;
 							foreach my $elem ( @previouselts )
 							{
@@ -5560,39 +5560,39 @@ sub genchange
 								}
 								if ( $elemcomma eq $thiselt )
 								{
-									$countscore++; 
+									$countscore++;
 								}
 							}
-							
+
 							my ( $retel, $truenewel );
 							if ( $tooltype eq "esp-r" )
 							{
 								if ( not ( $operation_type eq "wordchange" ) )
 								{
-									( $retel, $truenewel ) = fixlength( $thiselt, $newel, "n" ); #ORIGINARY NUMBER, NEW NUMBER, "y" FOR ADJUSTING THE LENGTH DO THAT WHEN NEGATIVE IT OCCUPIES ONE CHARACTER MORE, or nothing 
-									$newrow = replace_nth( "$newrow", $countscore, "$retel,", "$truenewel," ); 
+									( $retel, $truenewel ) = fixlength( $thiselt, $newel, "n" ); #ORIGINARY NUMBER, NEW NUMBER, "y" FOR ADJUSTING THE LENGTH DO THAT WHEN NEGATIVE IT OCCUPIES ONE CHARACTER MORE, or nothing
+									$newrow = replace_nth( "$newrow", $countscore, "$retel,", "$truenewel," );
 								}
 								else
 								{
-									$newrow = replace_nth( "$newrow", $countscore, "$el,", "$newel," ); 
+									$newrow = replace_nth( "$newrow", $countscore, "$el,", "$newel," );
 								}
-								
-								
-								
+
+
+
 							}
 							else
-							{  
+							{
 								#$newel = sprintf( "%.3f", $newel ); say $tee "\$newel " . dump( $newel );
-								
-								#$newrow = replace_nth( "$newrow", $countscore, "$thiselt,", "$newel," ); 
-								
-								
+
+								#$newrow = replace_nth( "$newrow", $countscore, "$thiselt,", "$newel," );
+
+
 								my $smallpiece;
 								if ( not ( $operation_type eq "wordchange" ) )
 								{
 									$smallpiece = "%." . $precision . "f";
-									$newel = sprintf( $smallpiece, $newel ); 
-									$rowelts[ $countelt ] = $newel; 
+									$newel = sprintf( $smallpiece, $newel );
+									$rowelts[ $countelt ] = $newel;
 									my $begin = "  ";
 									my $count = 0;
 									foreach ( @rowelts )
@@ -5601,69 +5601,69 @@ sub genchange
 										$begin = "$begin" . "$_" . "$sep ";
 										$count++;
 									}
-									$newrow = "$begin\n"; 
+									$newrow = "$begin\n";
 								}
 								else
 								{
-									
-									
-									
-									
-									$newrow = replace_nth( "$newrow", $countscore, $el, $newel ); 
+
+
+
+
+									$newrow = replace_nth( "$newrow", $countscore, $el, $newel );
 								}
 							}
 						}
 					}
-				}  
-				$newfilecontents[ $countfile ][ $countline ] = $newrow ; 
+				}
+				$newfilecontents[ $countfile ][ $countline ] = $newrow ;
 				$countline++;
 			}
 			$countfile++;
 		}
 		return ( \@newfilecontents );
 	}
-	
+
 	if ( ( $todo eq "read_gen" ) or ( $todo eq "vary" ) )
 	{
-		$newfilecontents_ref = foreachcontentsref ( \@plaincontents, \%names, \%nums, \@filecontents ); 
-		
-		@newfilecontents = @$newfilecontents_ref; 
+		$newfilecontents_ref = foreachcontentsref ( \@plaincontents, \%names, \%nums, \@filecontents );
+
+		@newfilecontents = @$newfilecontents_ref;
 	}
-				
+
 
 	sub foreachfilerequest
-	{  
+	{
 		my ( $filequestions_ref, $to, $newfilecontents_ref ) = @_;
-		my @filequestions = @$filequestions_ref; 
-		
-		my @newfilecontents = @$newfilecontents_ref; 
+		my @filequestions = @$filequestions_ref;
+
+		my @newfilecontents = @$newfilecontents_ref;
 		my $countfile = 0;
 		foreach my $filequests ( @filequestions )
-		{  
-			my @truequests = @$filequests; 
+		{
+			my @truequests = @$filequests;
 			my $constrainfiles_ref = shift( @truequest );
-			my @constrainfiles = @{ $constrainfiles_ref }; 
-			my $thisfile = shift( @truequests );  
-			my $fullfilepath = $to . $thisfile ; 
-			my $new_fullfilepath = $fullfilepath . ".new" ; 
-		
-			my $oldfile = $fullfilepath . ".bac"; 
-			my $newfile = $fullfilepath . ".new"; 
-			my $newfile_ = $to . ".idf"; 
-			
+			my @constrainfiles = @{ $constrainfiles_ref };
+			my $thisfile = shift( @truequests );
+			my $fullfilepath = $to . $thisfile ;
+			my $new_fullfilepath = $fullfilepath . ".new" ;
+
+			my $oldfile = $fullfilepath . ".bac";
+			my $newfile = $fullfilepath . ".new";
+			my $newfile_ = $to . ".idf";
+
 			open( NEWFILECONTENTS, ">$newfile" ) or die( "$!" );
-			
+
 			foreach my $my_row ( @{ $newfilecontents[ $countfile ] } )
 			{
 				if ( not ( ref( $my_row ) ) )
 				{
-					print NEWFILECONTENTS $my_row; 
+					print NEWFILECONTENTS $my_row;
 				}
 			}
 			close NEWFILECONTENTS;
-			
-			
-			
+
+
+
 			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
 			{
 				say $tee "cp -f $fullfilepath $oldfile";
@@ -5685,7 +5685,7 @@ sub genchange
 			$countfile++;
 		}
 	}
-	
+
 	if ( ( $todo eq "write_gen" ) or ( $todo eq "vary" ) )
 	{
 		foreachfilerequest( \@filequestions, $to, \@newfilecontents  );
@@ -5697,14 +5697,14 @@ sub genchange
 
 sub genprop
 {  # TO DO: POSSIBILITY TO SPECIFY TEXT STRING IN PLACE OF ELEMENT
-	#use strict; 
+	#use strict;
 	#use warnings;
-	
-	my ($to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $todo, 
+
+	my ($to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $todo,
 		$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref ) = @_;
-	( $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = genchange ($to, $stepsvar, $countop, $countstep, 
+	( $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = genchange ($to, $stepsvar, $countop, $countstep,
 												$applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $to_do,
-												$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, 
+												$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref,
 												$launchline );
 	%names = %$names_ref;
 	%newcontents = %$newcontents_ref;
@@ -5720,10 +5720,10 @@ sub genprop
 
 sub change_groundreflectance
 {
-	#use strict; 
+	#use strict;
 	#use warnings;
 	( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	my @applytype = @$applytype_ref; 
+	my @applytype = @$applytype_ref;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -5731,26 +5731,26 @@ sub change_groundreflectance
 
 	say $tee "Changing ground reflectance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my ( $low, $high, $swing, $pace, $newvalue );
-	
+
 	if ( $change_groundreflectance )
 	{
-		my @this_cycledata = @{ $change_groundreflectance->[ $countop ] }; 
-		my $basevalue = $this_cycledata[0]; 
-		my $swingcontent = $this_cycledata[1]; 
+		my @this_cycledata = @{ $change_groundreflectance->[ $countop ] };
+		my $basevalue = $this_cycledata[0];
+		my $swingcontent = $this_cycledata[1];
 		if ( ref( $swingcontent ) )
 		{
-			$low = $swingcontent->[0]; 
-			$high = $swingcontent->[1]; 
-			$swing = ( $high - $low ); 
+			$low = $swingcontent->[0];
+			$high = $swingcontent->[1];
+			$swing = ( $high - $low );
 		}
 		else
 		{
-			$swing = ( $swingcontent * 2 ); 
+			$swing = ( $swingcontent * 2 );
 		}
-		$pace = ( $swing / ( $stepsvar - 1 ) ); 
-		$newvalue = ( $basevalue + ( $pace * ( $countstep - 1 ) ) ); 
+		$pace = ( $swing / ( $stepsvar - 1 ) );
+		$newvalue = ( $basevalue + ( $pace * ( $countstep - 1 ) ) );
 	}
-	
+
 	my $printthis =
 "prj $launchline<<YYY
 b
@@ -5765,14 +5765,14 @@ $newvalue
 YYY
 ";
 
-	unless ($exeonfiles eq "n") 
-	{ 
+	unless ($exeonfiles eq "n")
+	{
 		print `$printthis`;
 	}
 	print $tee "CHANGING GROUND REFLECTANCE.\n
 $printthis
 ";
-	#no strict; 
+	#no strict;
 	#no warnings;
 }
 
@@ -5780,7 +5780,7 @@ $printthis
 sub vary_controls
 {    # IT IS CALLED FROM THE MAIN FILE
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $vary_controls_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
-	
+
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my @vary_controls = @{ $vary_controls_ref[ $countop ] } ;
@@ -5788,7 +5788,7 @@ sub vary_controls
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say "Variating controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my ( $semaphore_zone, $semaphore_dataloop, $semaphore_massflow, $semaphore_setpoint, $doline );
@@ -5796,7 +5796,7 @@ sub vary_controls
 	my $countline = 0;
 	my @letters = ("e", "f", "g", "h", "i", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "z"); # CHECK IF THE LAST LETTERS ARE CORRECT, ZZZ
 	my @period_letters = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "m", "n", "o", "p", "q", "r", "s"); # CHECK IF THE LAST LETTERS ARE CORRECT, ZZZ
-	my $loop_hour = 2; # NOTE: THE FOLLOWING VARIABLE NAMES ARE SHADOWED IN THE FOREACH LOOP BELOW, 
+	my $loop_hour = 2; # NOTE: THE FOLLOWING VARIABLE NAMES ARE SHADOWED IN THE FOREACH LOOP BELOW,
 	# BUT ARE THE ONES USED IN THE OPT CONSTRAINTS FILES.
 	my $max_heating_power = 3;
 	my $min_heating_power = 4;
@@ -5817,14 +5817,14 @@ sub vary_controls
 	my $configfile = $group[2];
 	my @buildbulk = @{$group[3]};
 	my @flowbulk = @{$group[4]};
-	
+
 	my $countbuild = 0;
 	my $countflow = 0;
 
 	my $countcontrol = 0;
 	my $sourceaddress = "$to$sourcefile";
 	my $targetaddress = "$to$targetfile";
-	my $configaddress = "$to$configfile";  
+	my $configaddress = "$to$configfile";
 
 	#@loopcontrol; # DON'T PUT "my" HERE.
 	#@flowcontrol; # DON'T PUT "my" HERE.
@@ -5844,7 +5844,7 @@ sub vary_controls
 	{  # TO BE CALLED WITH: calc_newcontrols($to, $fileconfig, $stepsvar, $countop, $countstep, \@buildbulk, \@flowbulk, \@loopcontrol, \@flowcontrol);
 		# THIS COMPUTES CHANGES TO BE MADE TO CONTROLS BEFORE PROPAGATION OF CONSTRAINTS
 		my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $swap3, $swap4, $countvar, $fileconfig, $countmorphing ) = @_;
-		
+
 		my @buildbulk = @$swap;
 		my @flowbulk = @$swap2;
 		my @loopcontrol = @$swap3;
@@ -5855,7 +5855,7 @@ sub vary_controls
 
 		# HERE THE MODIFICATIONS TO BE EXECUTED ON EACH PARAMETERS ARE CALCULATED.
 		if ($stepsvar == 0) {$stepsvar = 1;}
-		if ($stepsvar > 1) 
+		if ($stepsvar > 1)
 		{
 			foreach $each_buildbulk (@buildbulk)
 			{
@@ -5884,7 +5884,7 @@ sub vary_controls
 						$loopcontrol_letter = $loopcontrol[$countloop][$countcontrol][1];
 						if ( ( $new_loop_letter eq $loop_letter ) and ($new_loopcontrol_letter eq $loopcontrol_letter ) )
 						{
-							
+
 							$loop_hour__ = $loopcontrol[$countloop][$countcontrol][$loop_hour];
 							$max_heating_power__ = $loopcontrol[$countloop][$countcontrol][$max_heating_power];
 							$min_heating_power__ = $loopcontrol[$countloop][$countcontrol][$min_heating_power];
@@ -5934,9 +5934,9 @@ sub vary_controls
 				$new_heating_setpoint = sprintf("%.2f", $new_heating_setpoint);
 				$new_cooling_setpoint = sprintf("%.2f", $new_cooling_setpoint);
 
-				push(@new_loopcontrols, 
-				[ $new_loop_letter, $new_loopcontrol_letter, $new_loop_hour, 
-				$new_max_heating_power, $new_min_heating_power, $new_max_cooling_power, 
+				push(@new_loopcontrols,
+				[ $new_loop_letter, $new_loopcontrol_letter, $new_loop_hour,
+				$new_max_heating_power, $new_min_heating_power, $new_max_cooling_power,
 				$new_min_cooling_power, $new_heating_setpoint, $new_cooling_setpoint ] );
 			}
 
@@ -5979,7 +5979,7 @@ sub vary_controls
 					}
 					$countflow++;
 				}
-	
+
 				my $pace_flow_hour =  ( $swing_flow_hour / ($stepsvar - 1) );
 				my $floorvalue_flow_hour = ($flow_hour__ - ($swing_flow_hour / 2) );
 				my $new_flow_hour = $floorvalue_flow_hour + ($countstep * $pace_flow_hour);
@@ -6001,15 +6001,15 @@ sub vary_controls
 				$new_flow_onoff = sprintf("%.2f", $new_flow_onoff);
 				$new_flow_fraction = sprintf("%.2f", $new_flow_fraction);
 
-				push(@new_flowcontrols, 
+				push(@new_flowcontrols,
 				[ $new_flow_letter, $new_flowcontrol_letter, $new_flow_hour,  $new_flow_setpoint, $new_flow_onoff, $new_flow_fraction ] );
 			}
 			# HERE THE MODIFICATIONS TO BE EXECUTED ON EACH PARAMETERS ARE APPLIED TO THE MODELS THROUGH ESP-r.
 			# FIRST, HERE THEY ARE APPLIED TO THE ZONE CONTROLS, THEN TO THE FLOW CONTROLS
 		}
 	} # END SUB calc_newcontrols
-	
-	calc_newctl($to, $stepsvar, $countop, $countstep, \@buildbulk, 
+
+	calc_newctl($to, $stepsvar, $countop, $countstep, \@buildbulk,
 	\@flowbulk, \@loopcontrol, \@flowcontrol, $countvar, $fileconfig );
 
 	print $_outfile_ "\@new_loopcontrols: " . Dumper(@new_loopcontrols) . "\n\n";
@@ -6023,15 +6023,15 @@ sub vary_controls
 ##############################################################################
 # BEGINNING OF SECTION DEDICATED TO FUNCTIONS FOR CONSTRAINING CONTROLS
 
-sub constrain_controls 
+sub constrain_controls
 {  # IT READS CONTROL USER-IMPOSED CONSTRAINTS
-	my ( $to, $filecon, $countop, $countstep, $applytype_ref, $constrain_controls_ref, $countvar, $fileconfig, $countmorphing, $todo, 
+	my ( $to, $filecon, $countop, $countstep, $applytype_ref, $constrain_controls_ref, $countvar, $fileconfig, $countmorphing, $todo,
 		$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, $menus_ref ) = @_;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
 	my %vertnummenu = %{ $menus[1] };
-	
+
 	say "Constraining controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $zone_letter = $applytype[$countop][3];
@@ -6041,7 +6041,7 @@ sub constrain_controls
 	my @flowcontrol = @$flowcontrol_ref;
 	my @new_loopcontrol = @$new_loopcontrol_ref;
 	my @new_flowcontrol = @$new_flowcontrol_ref;
-											
+
 	my $elm = $constrain_controls[$countop];
 	my @group = @{$elm};
 	my $sourcefile = $group[0];
@@ -6049,7 +6049,7 @@ sub constrain_controls
 	my $configfile = $group[2];
 	my @sentletters = @{ $group[3] };
 	my @sentperiod_letters = @{ $group[4] };
-	
+
 	my $sourceaddress = "$to$sourcefile";
 	my $targetaddress = "$to$targetfile";
 	my $configaddress = "$to$configfile";
@@ -6057,22 +6057,22 @@ sub constrain_controls
 	my ( $semaphore_zone, $semaphore_dataloop, $semaphore_massflow, $semaphore_setpoint, $doline );
 	my $count_controlmass = -1;
 	my $countline = 0;
-	
+
 	my @letters;
 	if (@sentletters) { @letters = @sentletters; }
-	else 
+	else
 	{
 		@letters = ("e", "f", "g", "h", "i", "l", "m" ); # RE-CHECK
 	}
-	
+
 	my @period_letters;
 	if (@sentperiod_letters) { @period_letters = @sentperiod_letters; }
-	else 
+	else
 	{
 		@period_letters = ( "a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "m", "n", "o", "p", "q", "r", "s" ); # CHECK IF THE LAST LETTERS ARE CORRECT
 	}
-	
-	my $loop_hour = 2; # NOTE: THE FOLLOWING VARIABLE NAMES ARE SHADOWED IN THE FOREACH LOOP BELOW, 
+
+	my $loop_hour = 2; # NOTE: THE FOLLOWING VARIABLE NAMES ARE SHADOWED IN THE FOREACH LOOP BELOW,
 	# BUT ARE THE ONES USED IN THE OPT CONSTRAINTS FILES.
 	my $max_heating_power = 3;
 	my $min_heating_power = 4;
@@ -6087,12 +6087,12 @@ sub constrain_controls
 	my ( $loop_letter, $loopcontrol_letter );
 	my $countbuild = 0;
 	my $countflow = 0;
-	my $countcontrol = 0;  
+	my $countcontrol = 0;
 	my ( $new_loopcontrol_ref, $new_flowcontrol_ref );
 
-	my ( 
+	my (
 	@groupzone_letters, @zone_period_letters, @flow_letters, @fileloopbulk, @fileflowbulk,
-	 @temploopcontrol, @tempflowcontrol 
+	 @temploopcontrol, @tempflowcontrol
 	);
 
 	if ($todo eq "read_ctl")
@@ -6102,11 +6102,11 @@ sub constrain_controls
 			print $_outfile_ "THIS\n";
 			checkfile($sourceaddress, $targetaddress);
 			@flowcontrol = read_controls($sourceaddress, $targetaddress, \@letters, \@period_letters);
-			$new_loopcontrol_ref, $new_flowcontrol_ref = read_control_constraints( $to, $stepsvar, 
+			$new_loopcontrol_ref, $new_flowcontrol_ref = read_control_constraints( $to, $stepsvar,
 			$countop, $countstep, $configaddress, \@loopcontrol, \@flowcontrol, \@temploopcontrol, \@tempflowcontrol, $countvar, $fileconfig );
 		}
 	}
-	
+
 	@new_loopcontrol = @$new_loopcontrol_ref;
 	@new_flowcontrol = @$new_flowcontrol_ref;
 
@@ -6160,12 +6160,12 @@ sub read_controls
 			$loopcontrol_letter = $period_letters[$countloopcontrol];
 		}
 
-		if ( ($semaphore_loop eq "yes") and ($semaphore_loopcontrol eq "yes") and ($line =~ /No. of data items/ ) ) 
-		{  
+		if ( ($semaphore_loop eq "yes") and ($semaphore_loopcontrol eq "yes") and ($line =~ /No. of data items/ ) )
+		{
 			$doline = $countlines + 1;
 		}
 
-		if ( ($semaphore_loop eq "yes" ) and ($semaphore_loopcontrol eq "yes") and ($countlines == $doline) ) 
+		if ( ($semaphore_loop eq "yes" ) and ($semaphore_loopcontrol eq "yes") and ($countlines == $doline) )
 		{
 			my @row = split(/\s+/, $line);
 			my $max_heating_power = $row[1];
@@ -6175,9 +6175,9 @@ sub read_controls
 			my $heating_setpoint = $row[5];
 			my $cooling_setpoint = $row[6];
 
-			push(@{$loopcontrol[$countloop][$countloopcontrol]}, 
-			$loop_letter, $loopcontrol_letter, $loop_hour, 
-			$max_heating_power, $min_heating_power, $max_cooling_power, 
+			push(@{$loopcontrol[$countloop][$countloopcontrol]},
+			$loop_letter, $loopcontrol_letter, $loop_hour,
+			$max_heating_power, $min_heating_power, $max_cooling_power,
 			$min_cooling_power, $heating_setpoint, $cooling_setpoint );
 
 			$semaphore_loopcontrol = "no";
@@ -6200,12 +6200,12 @@ sub read_controls
 			$flowcontrol_letter = $period_letters[$countflowcontrol];
 		}
 
-		if ( ($semaphore_flow eq "yes") and ($semaphore_flowcontrol eq "yes") and ($line =~ /No. of data items/ ) ) 
-		{  
+		if ( ($semaphore_flow eq "yes") and ($semaphore_flowcontrol eq "yes") and ($line =~ /No. of data items/ ) )
+		{
 			$doline = $countlines + 1;
 		}
 
-		if ( ($semaphore_flow eq "yes" ) and ($semaphore_flowcontrol eq "yes") and ($countlines == $doline) ) 
+		if ( ($semaphore_flow eq "yes" ) and ($semaphore_flowcontrol eq "yes") and ($countlines == $doline) )
 		{
 			my @row = split(/\s+/, $line);
 			my $flow_setpoint = $row[1];
@@ -6217,7 +6217,7 @@ sub read_controls
 		}
 		$countlines++;
 	}
-	return ( @flowcontrol );      
+	return ( @flowcontrol );
 } # END SUB read_controls.
 
 
@@ -6225,9 +6225,9 @@ sub read_control_constraints
 {
 	#  #!/usr/bin/perl
 	# THIS FILE CAN CONTAIN USER-IMPOSED CONSTRAINTS FOR CONTROLS TO BE READ BY OPT.
-	# THE FOLLOWING VALUES CAN BE ADDRESSED IN THE OPT CONSTRAINTS CONFIGURATION FILE, 
+	# THE FOLLOWING VALUES CAN BE ADDRESSED IN THE OPT CONSTRAINTS CONFIGURATION FILE,
 	# SET BY THE PRESENT FUNCTION:
-	# 1) $loopcontrol[$countop][$countloop][$countloopcontrol][$loop_hour] 
+	# 1) $loopcontrol[$countop][$countloop][$countloopcontrol][$loop_hour]
 	# Where $countloop and  $countloopcontrol has to be set to a specified number in the OPT file for constraints.
 	# 2) $loopcontrol[$countop][$countloop][$countloopcontrol][$max_heating_power] # Same as above.
 	# 3) $loopcontrol[$countop][$countloop][$countloopcontrol][$min_heating_power] # Same as above.
@@ -6235,28 +6235,28 @@ sub read_control_constraints
 	# 5) $loopcontrol[$countop][$countloop][$countloopcontrol][$min_cooling_power] # Same as above.
 	# 6) $loopcontrol[$countop][$countloop][$countloopcontrol][heating_setpoint] # Same as above.
 	# 7) $loopcontrol[$countop][$countloop][$countloopcontrol][cooling_setpoint] # Same as above.
-	# 8) $flowcontrol[$countop][$countflow][$countflowcontrol][$flow_hour] 
+	# 8) $flowcontrol[$countop][$countflow][$countflowcontrol][$flow_hour]
 	# Where $countflow and  $countflowcontrol has to be set to a specified number in the OPT file for constraints.
 	# 9) $flowcontrol[$countop][$countflow][$countflowcontrol][$flow_setpoint] # Same as above.
 	# 10) $flowcontrol[$countop][$countflow][$countflowcontrol][$flow_onoff] # Same as above.
 	# 11) $flowcontrol[$countop][$countflow][$countflowcontrol][$flow_fraction] # Same as above.
 	# EXAMPLE : $flowcontrol[0][1][2][$flow_fraction] = 0.7
 	# OTHER EXAMPLE: $flowcontrol[2][1][2][$flow_fraction] = $flowcontrol[0][2][1][$flow_fraction]
-	# The $countop that is actuated is always the last, the one which is active. 
+	# The $countop that is actuated is always the last, the one which is active.
 	# It would have therefore no sense writing $flowcontrol[1][1][2][$flow_fraction] = $flowcontrol[3][2][1][$flow_fraction].
 	# Differentent $countops can be referred to the same zone. Different $countops just number mutations in series.
-	# ALSO, THIS MAKES AVAILABLE TO THE USER INFORMATIONS ABOUT THE MORPHING STEP OF THE MODELS 
-	# AND THE STEPS THE MODEL HAS TO FOLLOW. 
-	# THIS ALLOWS TO IMPOSE EQUALITY CONSTRAINTS TO THESE VARIABLES, 
-	# WHICH COULD ALSO BE COMBINED WITH THE FOLLOWING ONES: 
+	# ALSO, THIS MAKES AVAILABLE TO THE USER INFORMATIONS ABOUT THE MORPHING STEP OF THE MODELS
+	# AND THE STEPS THE MODEL HAS TO FOLLOW.
+	# THIS ALLOWS TO IMPOSE EQUALITY CONSTRAINTS TO THESE VARIABLES,
+	# WHICH COULD ALSO BE COMBINED WITH THE FOLLOWING ONES:
 	# $stepsvar, WHICH TELLS THE PROGRAM HOW MANY ITERATION STEPS IT HAS TO DO IN THE CURRENT MORPHING PHASE.
 	# $countop, WHICH TELLS THE PROGRAM WHAT OPERATION IS BEING EXECUTED IN THE CHAIN OF OPERATIONS.
 	# THAT MAY BE EXECUTES AT EACH MORPHING PHASE. EACH $countop WILL CONTAIN ONE OR MORE ITERATION STEPS.
-	# TYPICALLY, IT WILL BE USED FOR A ZONE, BUT NOTHING PREVENTS THAT SEVERAL OF THEM CHAINED ONE AFTER 
+	# TYPICALLY, IT WILL BE USED FOR A ZONE, BUT NOTHING PREVENTS THAT SEVERAL OF THEM CHAINED ONE AFTER
 	# THE OTHER ARE APPLIED TO THE SAME ZONE. THE NUMBER COUNT STARTS FROM 0.
 	# $countstep, WHICH TELLS THE PROGRAM WHAT THE CURRENT ITERATION STEP IS.
 	# $countvar, WHICH TELLS THE PROGRAM WHAT NUMBER OF DESIGN PARAMETER THE PROGRAM IS WORKING AT.
-	
+
 	my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $swap3, $swap4, $countvar, $fileconfig, $countmorphing ) = @_;
 	say "Reading controls constraints for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -6271,8 +6271,8 @@ sub read_control_constraints
 		push (@loopcontrol, [@myloopcontrol]); #
 		push (@flowcontrol, [@myflowcontrol]); #
 
-		eval `cat $configaddress`;  # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS 
-		# IS EVALUATED, AND HERE BELOW CONSTRAINTS ARE PROPAGATED.  
+		eval `cat $configaddress`;  # HERE AN EXTERNAL FILE FOR PROPAGATION OF CONSTRAINTS
+		# IS EVALUATED, AND HERE BELOW CONSTRAINTS ARE PROPAGATED.
 
 		if (-e $constrain) { eval ($constrain); } # HERE THE INSTRUCTION WRITTEN IN THE OPT CONFIGURATION FILE CAN BE SPEFICIED
 		# FOR PROPAGATION OF CONSTRAINTS
@@ -6326,10 +6326,10 @@ sub apply_loopcontrol_changes
 {   # TO BE CALLED WITH: apply_loopcontrol_changes($exeonfiles, \@new_loopcontrol);
 	# THIS APPLIES CHANGES TO LOOPS IN CONTROLS (ZONES)
 	my ( $swap, $swap2, $countvar ) = @_;
-	
+
 	my @new_loop_ctls = @$swap;
 	my @temploopcontrol = @$swap2;
-	
+
 	my $countloop = 0;
 
 	foreach my $elm (@new_loop_ctls)
@@ -6384,7 +6384,7 @@ y
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") 
+			unless ($exeonfiles eq "n")
 			{
 				print `$printthis`;
 			}
@@ -6437,8 +6437,8 @@ y
 -
 YYY
 ";
-			unless ($exeonfiles eq "n") # unless ($exeonfiles eq "n") 
-			{ 
+			unless ($exeonfiles eq "n") # unless ($exeonfiles eq "n")
+			{
 				print `$printthis`;
 			}
 
@@ -6455,11 +6455,11 @@ YYY
 sub vary_net
 {    # IT IS CALLED FROM THE MAIN FILE
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $vary_net_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing ) = @_;
-	
+
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my @vary_net = @{ $vary_net_ref[ $countop ] };
-	
+
 	say "Executing variations on networks for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $activezone = $applytype[$countop][3];
@@ -6468,7 +6468,7 @@ sub vary_net
 	my $countline = 0;
 	my @node_letters = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "m", "n", "o", "p", "q", "r", "s"); # ZZZ THESE LETTERS HAVE TO BE CHECKED WITH REGARDS TO THE CHANGE OF PAGES!
 	my @component_letters = ("a", "b", "c", "d", "e", "f", "g", "h", "i", "l", "m", "n", "o", "p", "q", "r", "s"); # ZZZ THESE LETTERS HAVE TO BE CHECKED WITH REGARDS TO THE CHANGE OF PAGES!
-	# NOTE: THE FOLLOWING VARIABLE NAMES ARE SHADOWED IN THE FOREACH LOOP BELOW, 
+	# NOTE: THE FOLLOWING VARIABLE NAMES ARE SHADOWED IN THE FOREACH LOOP BELOW,
 	# BUT ARE THE ONES USED IN THE OPT CONSTRAINTS FILES.
 
 	my @group = @{$vary_net[$countop]};
@@ -6482,7 +6482,7 @@ sub vary_net
 
 	my $sourceaddress = "$to$sourcefile";
 	my $targetaddress = "$to$targetfile";
-	my $configaddress = "$to$configfile";  
+	my $configaddress = "$to$configfile";
 
 	#@node; @component; # PLURAL. DON'T PUT "my" HERE!
 	#@new_nodes; @new_components; # DON'T PUT "my" HERE.
@@ -6500,17 +6500,17 @@ sub vary_net
 	{  # TO BE CALLED WITH: calc_newnet($to, $fileconfig, $stepsvar, $countop, $countstep, \@nodebulk, \@componentbulk, \@node_, \@component);
 		# THIS COMPUTES CHANGES TO BE MADE TO CONTROLS BEFORE PROPAGATION OF CONSTRAINTS
 		my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $swap3, $swap4, $countvar, $fileconfig, $countmorphing ) = @_;
-		
+
 		my @nodebulk = @$swap;
 		my @componentbulk = @$swap2;
 		my @node = @$swap3; # PLURAL
 		my @component = @$swap4; # PLURAL
-		
+
 		my ( @new_volumes_or_surfaces, @node_heights_or_cps, @new_azimuths, @boundary_heights );
 
 		# HERE THE MODIFICATIONS TO BE EXECUTED ON EACH PARAMETERS ARE CALCULATED.
 		if ($stepsvar == 0) {$stepsvar = 1;}
-		if ($stepsvar > 1) 
+		if ($stepsvar > 1)
 		{
 			foreach $each_nodebulk (@nodebulk)
 			{
@@ -6523,13 +6523,13 @@ sub vary_net
 				my $swing_data_2 = $asknode[4];
 				my $new_surface = $asknode[5];
 				my @askcp = @{$asknode[6]};
-				my ($height__, $data_2__, $data_1__, $new_cp);          
+				my ($height__, $data_2__, $data_1__, $new_cp);
 				my $countnode = 0; #IT IS FOR THE FOLLOWING FOREACH. LEAVE IT ATTACHED TO IT.
 				foreach $each_node (@node)
 				{
 					@node_ = @{$each_node};
-					my $node_letter = $node_[0]; 
-					if ( $new_node_letter eq $node_letter ) 
+					my $node_letter = $node_[0];
+					if ( $new_node_letter eq $node_letter )
 					{
 						$height__ = $node_[3];
 						$data_2__ = $node_[4];
@@ -6556,7 +6556,7 @@ sub vary_net
 				$new_data_1  = sprintf("%.3f", $new_data_1);
 				if ($swing_data_1 == 0) { $new_data_1 = ""; }
 
-				push(@new_nodes, 
+				push(@new_nodes,
 				[ $new_node_letter, $new_fluid, $new_type, $new_zone, $new_height, $new_data_2, $new_surface, $new_cp ] );
 			}
 
@@ -6568,16 +6568,16 @@ sub vary_net
 				my $new_type = $askcomponent[1];
 				my $swing_data_1 = $askcomponent[2];
 				my $swing_data_2 = $askcomponent[3];
-				my $swing_data_3 = $askcomponent[4];  
+				my $swing_data_3 = $askcomponent[4];
 				my $swing_data_4 = $askcomponent[5];
-				my $component_letter;        
+				my $component_letter;
 				my $countcomponent = 0;    #IT IS FOR THE FOLLOWING FOREACH.
 				my ($new_type, $data_1__, $data_2__, $data_3__, $data_4__ );
 				foreach $each_component (@component) # PLURAL
 				{
 					@component_ = @{$each_component};
-					$component_letter = $component_letters[$countcomponent]; 
-					if ( $new_component_letter eq $component_letter ) 
+					$component_letter = $component_letters[$countcomponent];
+					if ( $new_component_letter eq $component_letter )
 					{
 						$new_component_letter = $component_[0];
 						$new_fluid = $component_[1];
@@ -6590,7 +6590,7 @@ sub vary_net
 					$countcomponent++;
 				}
 
-				my $pace_data_1 =  ( $swing_data_1 / ($stepsvar - 1) ); 
+				my $pace_data_1 =  ( $swing_data_1 / ($stepsvar - 1) );
 				my $floorvalue_data_1 = ($data_1__ - ($swing_data_1 / 2) );
 				my $new_data_1 = $floorvalue_data_1 + ($countstep * $pace_data_1);
 				if ($swing_data_1 == 0) { $new_data_1 = ""; }
@@ -6600,12 +6600,12 @@ sub vary_net
 				my $new_data_2 = $floorvalue_data_2 + ($countstep * $pace_data_2);
 				if ($swing_data_2 == 0) { $new_data_2 = ""; }
 
-				my $pace_data_3 =  ( $swing_data_3 / ($stepsvar - 1) ); 
+				my $pace_data_3 =  ( $swing_data_3 / ($stepsvar - 1) );
 				my $floorvalue_data_3 = ($data_3__ - ($swing_data_3 / 2) );
 				my $new_data_3 = $floorvalue_data_3 + ($countstep * $pace_data_3 );
 				if ($swing_data_3 == 0) { $new_data_3 = ""; }
 
-				my $pace_data_4 =  ( $swing_data_4 / ($stepsvar - 1) ); 
+				my $pace_data_4 =  ( $swing_data_4 / ($stepsvar - 1) );
 				my $floorvalue_data_4 = ($data_4__ - ($swing_data_4 / 2) );
 				my $new_data_4 = $floorvalue_data_4 + ($countstep * $pace_data_4 );
 				if ($swing_data_4 == 0) { $new_data_4 = ""; }
@@ -6645,15 +6645,15 @@ Sim::OPT::Morph.
 
 =head1 DESCRIPTION
 
-Sim::OPT::Morph is morphing program for preparing model instances (in text format) to be given to simulation programs in design-aimed explorations. Sim::OPT::Morph is controlled by the Sim::OPT module, which manages the structure of searches. 
+Sim::OPT::Morph is morphing program for preparing model instances (in text format) to be given to simulation programs in design-aimed explorations. Sim::OPT::Morph is controlled by the Sim::OPT module, which manages the structure of searches.
 
-More specifically, Sim::OPT::Morph can manipulate the text files constituting the description of models for simulation programs. The general function dedicated to that aim recognizes variables by position on the page (determined by row number and position of the list element in that row - no embedding of markers in files) and modifies them through linear variations - so to perform translations ("linear" option), or rotations ("2drotation" option), or text substitution ("wordchange" option) -, and possibly propagation of constraint with user-defined rules. 
+More specifically, Sim::OPT::Morph can manipulate the text files constituting the description of models for simulation programs. The general function dedicated to that aim recognizes variables by position on the page (determined by row number and position of the list element in that row - no embedding of markers in files) and modifies them through linear variations - so to perform translations ("linear" option), or rotations ("2drotation" option), or text substitution ("wordchange" option) -, and possibly propagation of constraint with user-defined rules.
 
-Additionally, Sim::OPT::Morph features several specialized functions which are specific to the ESP-r building performance simulation platform; those functions can manage the simulation program directly, through the shell, or by manipulating model configuration files. Some of these functionalities involve operations in which the Radiance lighting performance simulation platform is called through ESP-r. 
+Additionally, Sim::OPT::Morph features several specialized functions which are specific to the ESP-r building performance simulation platform; those functions can manage the simulation program directly, through the shell, or by manipulating model configuration files. Some of these functionalities involve operations in which the Radiance lighting performance simulation platform is called through ESP-r.
 
 The morphing instructions must be written in a configuration file whose name will be asked at the launch of Sim::OPT. This distribution includes two examples of such files: an OPT's configuration file for an ESP-r model and an OPT's configuration for an EnergyPlus model for the same building and the same morphing operations. (EnergyPlus is another building simulation platform.)
 
-Configuration files for propagation of constraints may be specified in addition to a configuration file. Propagation of constraints can be used to direct the morphing of models and give to the morphing operations greater flexibility. Propagation of constraints can target the model configuration files and/or, in the case of ESP-r, trigger modification operations performed through the shell and regarding geometry, solar shadings, mass/flow network and controls. 
+Configuration files for propagation of constraints may be specified in addition to a configuration file. Propagation of constraints can be used to direct the morphing of models and give to the morphing operations greater flexibility. Propagation of constraints can target the model configuration files and/or, in the case of ESP-r, trigger modification operations performed through the shell and regarding geometry, solar shadings, mass/flow network and controls.
 
 =head2 EXPORT
 

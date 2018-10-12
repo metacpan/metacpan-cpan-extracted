@@ -212,7 +212,7 @@ sub load {
           foreach my $dir (@$paths) {
               $path = File::Spec->catfile($dir, $name);
               last INCPATH
-                  if $self->_template_modified($path);
+                  if defined $self->_template_modified($path);
           }
           undef $path;      # not found
       }
@@ -562,13 +562,29 @@ sub _compiled_filename {
 
 sub _load_compiled {
     my ($self, $file) = @_;
+
+    # Implicitly Relative paths are not supported
+    # by "require" and invoke @INC traversal, where relative
+    # paths only traditionally worked prior to Perl 5.26
+    # due to the presence of '.' in @INC
+    #
+    # Given load_compiled never wants to traverse @INC, forcing
+    # an absolute path for the loaded file and the INC key is
+    # sensible.
+    #
+    # NB: %INC Keys are always identical to their respective
+    # "require" invocations regardless of OS, and the only time
+    # one needs to care about slash direction is when dealing
+    # with Module::Name -> Module/Name.pm translation.
+    my $fpath = File::Spec->rel2abs( $file );
+
     my $compiled;
 
     # load compiled template via require();  we zap any
     # %INC entry to ensure it is reloaded (we don't
     # want 1 returned by require() to say it's in memory)
-    delete $INC{ $file };
-    eval { $compiled = require $file; };
+    delete $INC{ $fpath };
+    eval { $compiled = require $fpath; };
     return $@
         ? $self->error("compiled template $compiled: $@")
         : $compiled;
@@ -627,7 +643,7 @@ sub _load {
     }
 
     # Otherwise, it's the name of the template
-    if ( $self->_template_modified( $name ) ) {  # does template exist?
+    if ( defined $self->_template_modified( $name ) ) {  # does template exist?
         my ($text, $error, $mtime ) = $self->_template_content( $name );
         unless ( $error )  {
             $text = $self->_decode_unicode($text) if $self->{ UNICODE };
@@ -845,7 +861,7 @@ sub _compile {
 
         $parsedoc->{ METADATA } = {
             'name'    => $data->{ name },
-            'modtime' => $data->{ time },
+            'modtime' => $data->{ 'time' },
             %{ $parsedoc->{ METADATA } },
         };
 
@@ -871,13 +887,13 @@ sub _compile {
 
             # set atime and mtime of newly compiled file, don't bother
             # if time is undef
-            if (!defined($error) && defined $data->{ time }) {
+            if (!defined($error) && defined $data->{ 'time' }) {
                 my ($cfile) = $compfile =~ /^(.+)$/s or do {
                     return("invalid filename: $compfile",
                            Template::Constants::STATUS_ERROR);
                 };
 
-                my ($ctime) = $data->{ time } =~ /^(\d+)$/;
+                my ($ctime) = $data->{ 'time' } =~ /^(\d+)$/;
                 unless ($ctime || $ctime eq 0) {
                     return("invalid time: $ctime",
                            Template::Constants::STATUS_ERROR);
@@ -915,9 +931,15 @@ sub _compile {
 
 sub _compiled_is_current {
     my ( $self, $template_name ) = @_;
-    my $compiled_name   = $self->_compiled_filename($template_name) || return;
-    my $compiled_mtime  = (stat($compiled_name))[9] || return;
-    my $template_mtime  = $self->_template_modified( $template_name ) || return;
+
+    my $compiled_name   = $self->_compiled_filename($template_name);
+    return unless defined $compiled_name;
+
+    my $compiled_mtime  = (stat($compiled_name))[9];
+    return unless defined $compiled_mtime;
+
+    my $template_mtime  = $self->_template_modified( $template_name );
+    return unless defined $template_mtime;
 
     # This was >= in the 2.15, but meant that downgrading
     # a source template would not get picked up.
@@ -992,8 +1014,8 @@ sub _template_content {
 
 sub _modified {
     my ($self, $name, $time) = @_;
-    my $load = $self->_template_modified($name)
-        || return $time ? 1 : 0;
+    my $load = $self->_template_modified($name);
+    return $time ? 1 : 0 unless defined $load;
 
     return $time
          ? $load > $time

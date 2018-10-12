@@ -1,7 +1,7 @@
 package Versioning::Scheme;
 
 our $DATE = '2018-10-11'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Deal with various versioning schemes
@@ -18,7 +18,7 @@ Versioning::Scheme - Deal with various versioning schemes
 
 =head1 VERSION
 
-This document describes version 0.005 of Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2018-10-11.
+This document describes version 0.007 of Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2018-10-11.
 
 =head1 DESCRIPTION
 

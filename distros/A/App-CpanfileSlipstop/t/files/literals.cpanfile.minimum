@@ -1,0 +1,11 @@
+# single quote
+requires 'DateTime', '1.50';
+
+# double quote
+requires "JSON::XS", "3.04";
+
+# q
+requires q{Data::Printer}, '0.40';
+
+# qq
+requires qq{Test::More}, '0.99';

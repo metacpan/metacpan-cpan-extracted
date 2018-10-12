@@ -8,6 +8,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   FindBin: '0'
+  Hash::Merge: '0'
   JSON::PP: '0'
   List::Util: '1.49'
   Path::Tiny: '0'
@@ -38,7 +39,7 @@ resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.18'
+version: '3.19'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -71,7 +72,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.83'
+      version: '0.13'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -407,7 +408,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.18
+          tag: v3.19
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -512,6 +513,7 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.012'
 x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Andrew Moise <andrew.moise@gmail.com>'
   - 'Aran Deltac <bluefeet@gmail.com>'
   - 'ben hengst <notbenh@cpan.org>'
@@ -527,6 +529,7 @@ x_contributors:
   - 'lsaunders <lsaunders@dev05.backbone.i5invest.com>'
   - 'Marco Fontani <MFONTANI@cpan.org>'
   - 'Maros Kollar <maros@k-1.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Nicolas Doye <nic@worldofnic.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Olivier Bilodeau <olivier@bottomlesspit.org>'
@@ -542,4 +545,4 @@ x_contributors:
   - 'vti <viacheslav.t@gmail.com>'
   - 'yeahoffline <frank.gasser@gmail.com>'
 x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -86,6 +86,8 @@ t/author-lib-boolean-_is_ten.t
 t/author-lib-boolean-_is_two.t
 t/author-lib-boolean-_is_zero.t
 t/author-lib-comparison-_acmp.t
+t/author-lib-constructor-binary-_from_base.dat
+t/author-lib-constructor-binary-_from_base.t
 t/author-lib-constructor-nullary-_one.t
 t/author-lib-constructor-nullary-_ten.t
 t/author-lib-constructor-nullary-_two.t
@@ -110,6 +112,8 @@ t/author-lib-convert-string-_as_hex.t
 t/author-lib-convert-string-_as_oct.dat
 t/author-lib-convert-string-_as_oct.t
 t/author-lib-convert-string-_str.t
+t/author-lib-convert-string-_to_base.dat
+t/author-lib-convert-string-_to_base.t
 t/author-lib-convert-string-_to_bin.dat
 t/author-lib-convert-string-_to_bin.t
 t/author-lib-convert-string-_to_bytes.dat
@@ -162,6 +166,7 @@ t/dparts-mbf.t
 t/dparts-mbi.t
 t/eparts-mbf.t
 t/eparts-mbi.t
+t/from_base-mbi.t
 t/from_bin-mbf.t
 t/from_bin-mbi.t
 t/from_hex-mbf.t
@@ -209,6 +214,7 @@ t/sub_ali.t
 t/sub_mbf.t
 t/sub_mbi.t
 t/sub_mif.t
+t/to_base-mbi.t
 t/trap.t
 t/upgrade.inc
 t/upgrade.t

@@ -3,9 +3,9 @@ abstract: unknown
 author:
   - 'Peter John Acklam <pjacklam@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.94'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.58'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,7 +19,6 @@ no_index:
     - inc
 requires:
   Math::Complex: '1.39'
-  Test::More: '0.94'
   perl: '5.006001'
-version: '1.999813'
+version: '1.999814'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

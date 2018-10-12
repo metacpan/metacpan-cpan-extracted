@@ -1,6 +1,7 @@
 package XML::Feed;
 use strict;
 use warnings;
+use v5.10;
 
 use base qw( Class::ErrorHandler );
 use Feed::Find;
@@ -12,7 +13,7 @@ use Module::Pluggable search_path => "XML::Feed::Format",
                       require     => 1,
                       sub_name    => 'formatters';
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 our $MULTIPLE_ENCLOSURES = 0;
 our @formatters;
 BEGIN {
@@ -21,7 +22,7 @@ BEGIN {
 
 sub new {
     my $class = shift;
-    my $format = shift || 'Atom';
+    my $format = shift // 'Atom';
     my $format_class = 'XML::Feed::Format::' . $format;
     eval "use $format_class";
     Carp::croak("Unsupported format $format: $@") if $@;
@@ -39,14 +40,7 @@ sub parse {
     my $feed = bless {}, $class;
     my $xml = '';
     if (blessed($stream) and $stream->isa('URI')) {
-        my $ua  = LWP::UserAgent->new;
-        $ua->agent(__PACKAGE__ . "/$VERSION");
-        $ua->env_proxy; # force allowing of proxies
-        my $res = URI::Fetch->fetch($stream, UserAgent => $ua)
-            or return $class->error(URI::Fetch->errstr);
-        return $class->error("This feed has been permanently removed")
-            if $res->status == URI::Fetch::URI_GONE();
-        $xml = $res->content;
+	$xml = $class->get_uri($stream);
     } elsif (ref($stream) eq 'SCALAR') {
         $xml = $$stream;
     } elsif (ref($stream)) {
@@ -76,6 +70,20 @@ sub parse {
     bless $feed, $format_class;
     $feed->init_string(\$xml) or return $class->error($feed->errstr);
     $feed;
+}
+
+sub get_uri {
+    my $class = shift;
+    my ($stream) = @_;
+
+    my $ua  = LWP::UserAgent->new;
+    $ua->agent(__PACKAGE__ . "/$VERSION");
+    $ua->env_proxy; # force allowing of proxies
+    my $res = URI::Fetch->fetch($stream, UserAgent => $ua)
+        or return $class->error(URI::Fetch->errstr);
+    return $class->error("This feed has been permanently removed")
+        if $res->status == URI::Fetch::URI_GONE();
+    return $res->content;
 }
 
 sub identify_format {
@@ -269,6 +277,10 @@ A URI from which the feed XML will be retrieved.
 
 I<$format> allows you to override format guessing.
 
+=head2 XML::Feed->get_uri($uri)
+
+Gets a feed from a URI.
+
 =head2 XML::Feed->find_feeds($uri)
 
 Given a URI I<$uri>, use auto-discovery to find all of the feeds linked
@@ -440,7 +452,7 @@ For reference, this cgi script will create valid, albeit nonsensical feeds
     use XML::Feed;
 
     my $cgi  = CGI->new;
-    my @args = ( $cgi->param('format') || "Atom" );
+    my @args = ( $cgi->param('format') // "Atom" );
     push @args, ( version => $cgi->param('version') ) if $cgi->param('version');
 
     my $feed = XML::Feed->new(@args);

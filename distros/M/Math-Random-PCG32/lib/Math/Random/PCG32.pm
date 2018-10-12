@@ -14,7 +14,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK =
   qw(decay dice irand irand64 irand_in irand_way rand rand_elm rand_idx);
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 require XSLoader;
 XSLoader::load( 'Math::Random::PCG32', $VERSION );
@@ -163,7 +163,8 @@ L<https://github.com/thrig/Math-Random-PCG32>
 
 New code, not many features, questionable XS. Probably needs a modern
 compiler for the C<stdint> types. Untested on older versions of Perl.
-Untested on 32-bit versions of Perl.
+Untested (by me) on 32-bit versions of Perl; C<use64bitint=define> is
+now required.
 
 Various tradeoffs have been made to favor speed over safety: modulo bias
 is ignored and some methods have integer overflow issues. Using numbers
@@ -178,8 +179,8 @@ L<Math::Random::Secure> for good seed choice.
 L<http://xoshiro.di.unimi.it> for a different PRNG and tips on compiler
 flags for use during benchmarks.
 
-  "though I must say, those PRNG writers, it feels like they are in a
-  small scale war with each other at times" -- random chat comment
+I<though I must say, those PRNG writers, it feels like they are in a
+small scale war with each other at times> -- random chat comment
 
 =head1 AUTHOR
 

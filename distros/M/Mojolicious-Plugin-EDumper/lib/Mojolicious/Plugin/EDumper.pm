@@ -1,21 +1,21 @@
 package Mojolicious::Plugin::EDumper;
 
 use Mojo::Base 'Mojolicious::Plugin';
-#~ use Encode qw(decode);
-#~ use Data::Recursive::Encode;
 
-our $VERSION = '0.00004';
+our $VERSION = '0.00007';
 
 =pod
 
 =encoding utf8
 
 
-
 =head1 ¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
 
 Доброго всем, соответственно
 
+=head1 VERSION
+
+0.00007
 
 =head1 NAME
 
@@ -25,21 +25,16 @@ Mojolicious::Plugin::EDumper - pretty dumps encoded data.
 
     $app->plugin('EDumper');
     $app->plugin('EDumper', helper=>'dumper');
-    $app->plugin('EDumper', helper=>'dumper', enc=>'cp777');
     
     $c->dumper( +{'Вася' => 'Пупкин'} );
+    
 
 =head1 OPTIONS
 
-=over 4
-
-=item * B<helper>
+=head2 helper
 
 Name of the helper. Default - 'edumper'.
 
-=item * B<enc>
-
-Encoding. Default - 'utf8'.
 
 =head1 SEE ALSO
 
@@ -66,7 +61,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016 Mikhail Che.
+Copyright 2016+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -75,31 +70,23 @@ it under the same terms as Perl itself.
 
 sub register {
   my ($self, $app, $conf)  = @_;
-  my $enc = delete $conf->{enc} || 'utf8';
+  #~ my $enc = delete $conf->{enc} || 'utf8';
   my $helper = delete $conf->{helper} || 'edumper';
   $app->helper($helper => sub {
     shift;
-    #~ decode $enc,
-      #~ Data::Dumper->new(Data::Recursive::Encode->encode($enc, \@_),)
-      #~ ->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(0)->Dump;
       
-      Data::Dumper->new(\@_)
-        ->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(0)->Dump
-        =~ s/(\\x\{[\da-f]+\})/eval '"'.$1.'"'/eigr;
+      #~ my $dump = eval 'qq★'.
+        Data::Dumper->new(\@_)->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(0)->Dump
+          #~ .'★';
+        =~ s/((?:\\x\{[\da-f]+\})+)/eval '"'.$1.'"'/eigr;
+      
+      #~ die __PACKAGE__." error: $@"
+        #~ if $@;
+      
+      #~ return $dump;
       
   });
   return $self;
 }
-
-#~ sub _decode_utf8 {
-    #~ my ($self, $val) = @_;
- 
-    #~ if (Encode::is_utf8($val)) {
-        #~ return $val;
-    #~ }
-    #~ else {
-        #~ return Encode::decode(utf8 => $val);
-    #~ }
-#~ }
 
 1;

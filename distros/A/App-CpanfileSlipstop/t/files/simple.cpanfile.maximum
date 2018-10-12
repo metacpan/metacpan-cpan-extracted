@@ -1,0 +1,4 @@
+requires 'DateTime', '<= 1.50';
+requires 'JSON::XS', '<= 3.04';
+requires 'Data::Printer', '<= 0.40';
+requires 'Test::More';

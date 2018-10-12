@@ -1,5 +1,5 @@
 package IO::Pager;
-our $VERSION = 0.39; #Really 0.36
+our $VERSION = 0.40; #Untouched since 0.40
 
 use 5.008; #At least, for decent perlio, and other modernisms
 use strict;
@@ -144,7 +144,11 @@ sub TIEHANDLE {
   unless ( $PAGER ){
     die "The PAGER environment variable is not defined, you may need to set it manually.";
   }
-  my($real_fh, $child);
+  my($real_fh, $child, $dupe_fh);
+# XXX What about localized GLOBs?!
+#  if( $tied_fh =~ /\*(?:\w+::)?STD(?:OUT|ERR)$/ ){
+#      open($dupe_fh, '>&', $tied_fh) or warn "Unable to dupe $tied_fh";
+#  }
   if ( $child = CORE::open($real_fh, '|-', $PAGER) ){
     my @oLayers = PerlIO::get_layers($tied_fh, details=>1, output=>1);
     my $layers = '';
@@ -162,6 +166,8 @@ sub TIEHANDLE {
   }
   return bless {
                 'real_fh' => $real_fh,
+#		'dupe_fh' => $dupe_fh,
+		'tied_fh' => "$tied_fh", #Avoid self-reference leak
                 'child'   => $child,
 		'pager'   => $PAGER,
                }, $class;
@@ -170,7 +176,12 @@ sub TIEHANDLE {
 
 sub BINMODE {
   my ($self, $layer) = @_;
-  CORE::binmode($self->{real_fh}, $layer||':raw');
+  if( $layer =~ /^:LOG\((>{0,2})(.*)\)$/ ){
+    open($self->{LOG}, $1||'>', $2||"$$.log") or die $!;
+  }
+  else{
+    CORE::binmode($self->{real_fh}, $layer||':raw');
+  }
 }
 
 sub WNOHANG();
@@ -185,13 +196,17 @@ sub EOF {
   $SIG{PIPE} = sub { $SIGPIPE = 1 unless $ENV{IP_EOF};
 		     CORE::close($self->{real_fh});
 		     waitpid($self->{child}, WNOHANG);
-		     CORE::open($self->{real_fh}, '>&1'); };
+		     CORE::open($self->{real_fh}, '>&1');
+
+		     close($self->{LOG});
+		   };
   return $SIGPIPE;
 }
 
 
 sub PRINT {
   my ($self, @args) = @_;
+  CORE::print {$self->{LOG}} @args if exists($self->{LOG});
   CORE::print {$self->{real_fh}} @args or die "Could not print to PAGER: $!\n";
 }
 
@@ -218,9 +233,15 @@ sub TELL {
 }
 
 
+sub FILENO {
+  CORE::fileno($_[0]->{real_fh});
+}
+
 sub CLOSE {
   my ($self) = @_;
   CORE::close($self->{real_fh});
+#  untie($self->{tied_fh});
+#  *{$self->{tied_fh}} = *{$self->{dupe_fh}};
 }
 
 *DESTROY = \&CLOSE;
@@ -243,6 +264,7 @@ foreach my $method ( qw(BINMODE CLOSE EOF PRINT PRINTF TELL WRITE PID) ){
 1;
 
 __END__
+=pod
 
 =head1 NAME
 
@@ -388,6 +410,27 @@ as they pass out of scope e.g;
 Used to set the I/O layer a.k.a. discipline of a filehandle,
 such as C<':utf8'> for UTF-8 encoding.
 
+=head3 :LOG([>>FILE])
+
+IO::Pager implements a pseudo-IO-layer for capturing output and sending it
+to a file, similar to L<tee(1)>. Although it is limited to one file, this
+feature is pure-perl and adds no dependencies.
+
+You may indicate what file to store in parentheses, otherwise the default is
+C<$$.log>. You may also use an implicit (no indicator) or explicit (I<E<gt>>)
+indicator to overwrite an existing file, or an explicit (I<E<gt>E<gt>>) for
+appending to a log file. For example:
+
+    binmode(*STDOUT, ':LOG(clobber.log)');
+    ...
+    $STDOUT->binmode(':LOG(>>noclobber.log)');
+
+For full tee-style support, use L<PerlIO::Util> like so:
+
+    binmode(*STDOUT, ":tee(TH)");
+    #OR
+    $STDOUT->binmode(':tee(TH)');
+
 =head2 eof( FILEHANDLE )
 
 Used in the eval-until-eof idiom below, I<IO::Pager> will handle broken pipes
@@ -408,6 +451,10 @@ more accurately, the filehandle is reopened to file descriptor 1.
 If using eof() with L<less>, especially when IP_EOF is set, you may want to
 use the I<--no-init> option by setting I<$ENV{IP_EOF}='X'> to prevent the
 paged output from being erased when the pager exits.
+
+=head2 fileno( FILEHANDLE )
+
+Return the filehandle number of the write-only pipe to the pager.
 
 =head2 print( FILEHANDLE LIST )
 

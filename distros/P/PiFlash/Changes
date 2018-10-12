@@ -1,0 +1,17 @@
+Change log for PiFlash
+
+0.0.3 2018-10-11T16:47:42-07:00 America/Los_Angeles
+ - update installation instructions to reflect piflash's move on GitHub
+   from ikluft-tools to new piflash repo
+ - add CONTRIBUTING.md for instructions on contributing to the project
+
+0.0.2 2018-10-11T13:18:36-07:00 America/Los_Angeles
+ - split 1000+ line piflash script into modules: PiFlash, PiFlash::Command,
+   PiFlash::Inspector, PiFlash::State
+ - add test directory and basic tests
+ - add build/PiFlash.spec for building RPM packages - piflash script uses
+   the modules, user doesn't need to know Perl
+
+0.0.1 March 2017
+ - release piflash script with "Using Perl on the Raspberry Pi" article by
+   Ian Kluft on OpenSource.com

@@ -16,28 +16,31 @@ name: XML-Feed
 provides:
   XML::Feed:
     file: lib/XML/Feed.pm
-    version: '0.54'
+    version: '0.55'
   XML::Feed::Content:
     file: lib/XML/Feed/Content.pm
-    version: '0.53'
+    version: '0.55'
   XML::Feed::Enclosure:
     file: lib/XML/Feed/Enclosure.pm
-    version: '0.53'
+    version: '0.55'
   XML::Feed::Entry:
     file: lib/XML/Feed/Entry.pm
-    version: '0.53'
+    version: '0.55'
   XML::Feed::Entry::Format::Atom:
     file: lib/XML/Feed/Entry/Format/Atom.pm
-    version: '0.53'
+    version: '0.55'
   XML::Feed::Entry::Format::RSS:
     file: lib/XML/Feed/Entry/Format/RSS.pm
-    version: '0.53'
+    version: '0.55'
   XML::Feed::Format::Atom:
     file: lib/XML/Feed/Format/Atom.pm
-    version: '0.53'
+    version: '0.55'
   XML::Feed::Format::RSS:
     file: lib/XML/Feed/Format/RSS.pm
-    version: '0.53'
+    version: '0.55'
+  XML::Feed::Util:
+    file: lib/XML/Feed/Util.pm
+    version: '0.55'
 requires:
   Class::ErrorHandler: '0'
   DateTime: '0'
@@ -55,11 +58,11 @@ requires:
   XML::Atom: '0.38'
   XML::LibXML: '1.66'
   XML::RSS: '1.47'
-  perl: '5.008001'
+  perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg/xml-feed
-version: '0.54'
+version: '0.55'
 x_contributors:
   - 'Dave Cross <davecross@cpan.org>'
   - 'Jakob Voss <voss@gbv.de>'
@@ -69,4 +72,5 @@ x_contributors:
   - 'Minty Walker <mintywalker@gmail.com>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Gerard Ribugent Navarro <ribugent@cpan.org>'
+  - 'Matthew D. Miller <matthew.miller@okbu.edu>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

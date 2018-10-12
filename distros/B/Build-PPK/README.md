@@ -24,21 +24,21 @@ to unarchived dists, which contain a MANIFEST in either case.
     constructed.  All arguments passed to the wrapper script will be passed to this
     main script.
 
-- __--dists__ _dists ..._
-- __-d__ _dists ..._
+- **--dists** _dists ..._
+- **-d** _dists ..._
 
     A single instance of the `--dists` flag, followed by the paths of any number
     of Perl dists (tarballs or directories) can be passed.  All files in the
     `lib/` directory listed in `MANIFEST` will be copied into the standalone
     script.
 
-- __--modules__ _file=module::name ..._
+- **--modules** _file=module::name ..._
 
     A single instance of the `--modules` flag, followed by the paths and Perl
     module names as pairs separated by an equals (=) sign allow the user to archive
     only specific modules in disparate locations, into the standalone script.
 
-- __--deps-from__ _depsfile_
+- **--deps-from** _depsfile_
 
     Specifies a file from which dependencies are read.  If _depsfile_ is listed as
     a single dash ('-') character, then standard input will be read from.
@@ -47,12 +47,12 @@ to unarchived dists, which contain a MANIFEST in either case.
     with empty lines, lines containing whitespace, or comments denoted with the '#'
     character.  Dependencies assume the following syntax:
 
-    - __module__ _module::name_ _file_
+    - **module** _module::name_ _file_
 
         The file named for _file_ should be packaged as _module::name_ in the static
         script built.
 
-    - __dist__ _dist_
+    - **dist** _dist_
 
         The file or directory referred to by _dist_ will be included in the static
         script built.
@@ -67,29 +67,29 @@ to unarchived dists, which contain a MANIFEST in either case.
         module Foo::Bar::Baz arbitrary/location/Foo/Bar/Baz.pm
         module Foo::Bar::Baz/Boo arbitrary/location/Foo/Bar/Baz/Boo.pm
 
-- __--output__ _script_
-- __-o__ _script_
+- **--output** _script_
+- **-o** _script_
 
     This flag specifies the name of the output standalone script file to be created
     or overwritten.
 
-- __--check__
-- __-c__
+- **--check**
+- **-c**
 
     This flag causes the given main entry point script to be checked against any
     extracted dists, or modules specified, in a temporary directory.
 
-- __--header__ _file_
-- __-H__ _file_
+- **--header** _file_
+- **-H** _file_
 
     Allows the specification of a header file to be inserted at the top of the
     output file directly after the Perl shebang.
 
-- __--desc__ _string_
-- __-D__ _string_
+- **--desc** _string_
+- **-D** _string_
 
     Specifies a value to insert into any instance of the `$Desc$` template that
-    may occur in a header.  Requires __--header__ or __-h__ to be passed.
+    may occur in a header.  Requires **--header** or **-h** to be passed.
 
 # RATIONALE
 
@@ -114,6 +114,6 @@ that is to be removed upon natural or forced program termination.
 
 # COPYRIGHT
 
-Copyright (c) 2013, cPanel, Inc.  All rights reserved.  This is free software;
+Copyright (c) 2018, cPanel, Inc.  All rights reserved.  This is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
 See [perlartistic](https://metacpan.org/pod/perlartistic) for further details.

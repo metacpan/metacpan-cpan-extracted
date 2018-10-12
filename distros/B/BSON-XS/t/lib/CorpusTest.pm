@@ -59,6 +59,7 @@ do {
 my $JSON = JSON::PP
     ->new
     ->ascii
+    ->allow_bignum
     ->allow_blessed
     ->convert_blessed;
 

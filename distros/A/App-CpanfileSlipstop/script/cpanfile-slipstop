@@ -1,0 +1,8 @@
+#!perl
+use strict;
+use warnings;
+no lib '.';
+
+use App::CpanfileSlipstop::CLI;
+
+exit App::CpanfileSlipstop::CLI->new->run(@ARGV);

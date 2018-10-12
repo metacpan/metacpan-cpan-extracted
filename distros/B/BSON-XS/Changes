@@ -1,5 +1,26 @@
 Revision history for BSON-XS
 
+v0.4.6    2018-10-12 11:50:05-04:00 America/New_York
+
+    [Bug fixes]
+
+    - PERL-1016 Fix BSON timestamp decoding on 32-bit perls.
+
+v0.4.5    2018-10-11 21:38:03-04:00 America/New_York
+
+    [Bug fixes]
+
+    - PERL-1013 Fix binary subtype 2 and Decimal128 encoding
+      on big-endian platforms.
+
+    [Testing]
+
+    - Synchronize tests with BSON.pm
+
+    [Prereqs]
+
+    - Requires BSON.pm v1.8.1
+
 v0.4.4    2018-09-12 23:14:04-04:00 America/New_York
 
     [Bug fixes]
