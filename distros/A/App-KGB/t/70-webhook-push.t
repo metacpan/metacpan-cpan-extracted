@@ -117,8 +117,8 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test 03Test User',
-        '05master b9b5587 06test-repo',
+        'dummy/#test 03test-repo 05master',
+        'b9b5587 06Test User',
         '10mod-one 03file-one 04rm-one',
         '* Commit three files (add, mod, rm)',
         '* 14http://git/b9b5587' )
@@ -126,8 +126,8 @@ TestBot->expect(
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test 03Test User',
-        '05master 284ffdd 06test-repo',
+        'dummy/#test 03test-repo 05master',
+        '284ffdd 06Test User',
         '10(6 files)',
         '* Commit six files (2×(add, mod, rm))',
         '* 14http://git/284ffdd' )
@@ -149,8 +149,8 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test 03Test User',
-        '05old_branch 284ffdd 06test-repo',
+        'dummy/#test 03test-repo 05old_branch',
+        '284ffdd 06Test User',
         '04.',
         '* branch deleted' )
 );

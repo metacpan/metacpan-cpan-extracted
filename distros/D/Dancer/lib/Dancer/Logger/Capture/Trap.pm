@@ -1,6 +1,6 @@
 package Dancer::Logger::Capture::Trap;
 our $AUTHORITY = 'cpan:SUKRIA';
-$Dancer::Logger::Capture::Trap::VERSION = '1.3400';
+$Dancer::Logger::Capture::Trap::VERSION = '1.3500';
 # ABSTRACT: a place to store captured Dancer logs
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ Dancer::Logger::Capture::Trap - a place to store captured Dancer logs
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 SYNOPSIS
 

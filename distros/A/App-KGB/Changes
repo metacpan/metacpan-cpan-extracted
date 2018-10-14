@@ -1,3 +1,24 @@
+1.53 (2018-10-2)
+  [ Damyan Ivanov ]
+  * drop port: option from default config
+  * add port to the test server IRC config now that 6697 us the default
+  * encode/decode Git directory name when passing it to Git or when reading it
+    from the environment
+    this matters when the directory name is not plain ASCII (Closes: #822375)
+  * auto join: increase NickServ delay to 60 seconds (default is 5)
+    this helps joining +r channels on freenode, where nick server identification
+    takes more than 5 seconds
+  * fix path to scripts in t/critic.t
+  * reorder default notification order, keeping the order of colours
+    the new order is project/module, branch, commit, author, log
+  * Client::Git: strip leading whitespace when parsing the output of
+    'git status'
+
+  [ gregor herrmann ]
+  * kgb-bot: human_duration(): also handle case where there are exactly
+    two time parts. Thanks to Mattia Rizzolo for the bug report on IRC.
+  * Declare compliance with Debian Policy 4.2.1.
+
 1.52 (2018-09-13)
  [ gregor herrmann ]
  * Add some documentation about the webhook configuration to kgb.conf(5).

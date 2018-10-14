@@ -7,11 +7,11 @@ Sidef::Types::Array::Array
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Array.new(...);
+var obj = Array(...)
 
 
 =head1 INHERITS
@@ -63,14 +63,6 @@ Aliases: I<add>, I<concat>
 
 =cut
 
-=head2 ++
-
-I<Obj> B<++> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 -
 
 I<Obj> B<-> I<Obj> -> I<Obj>
@@ -78,14 +70,6 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<sub>
-
-=cut
-
-=head2 --
-
-I<Obj> B<--> I<Obj> -> I<Obj>
-
-Return the
 
 =cut
 
@@ -345,6 +329,14 @@ Return the
 
 =cut
 
+=head2 clear
+
+Array.clear() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 collapse
 
 Array.collapse() -> I<Obj>
@@ -364,6 +356,14 @@ Return the
 =head2 combinations_with_repetition
 
 Array.combinations_with_repetition() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 combine
+
+Array.combine() -> I<Obj>
 
 Return the
 
@@ -419,21 +419,19 @@ Return the
 
 =cut
 
-=head2 copy
-
-Array.copy() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 count
 
 Array.count() -> I<Obj>
 
 Return the
 
-Aliases: I<count_by>
+=cut
+
+=head2 count_by
+
+Array.count_by() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -745,6 +743,22 @@ Return the
 
 =cut
 
+=head2 gcd
+
+Array.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gcd_by
+
+Array.gcd_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 getopt
 
 Array.getopt() -> I<Obj>
@@ -955,6 +969,22 @@ Aliases: I<last_unique_by>
 
 =cut
 
+=head2 lcm
+
+Array.lcm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lcm_by
+
+Array.lcm_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 len
 
 Array.len() -> I<Obj>
@@ -1052,6 +1082,16 @@ Return the
 Array.max_by() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 mdiv
+
+Array.mdiv() -> I<Obj>
+
+Return the
+
+Aliases: I<matrix_div>
 
 =cut
 
@@ -1525,6 +1565,14 @@ Aliases: I<to_array>
 
 =cut
 
+=head2 to_bag
+
+Array.to_bag() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_h
 
 Array.to_h() -> I<Obj>
@@ -1535,13 +1583,29 @@ Aliases: I<to_hash>
 
 =cut
 
+=head2 to_matrix
+
+Array.to_matrix() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_s
 
 Array.to_s() -> I<Obj>
 
 Return the
 
-Aliases: I<dump>
+Aliases: I<dump>, I<to_str>
+
+=cut
+
+=head2 to_set
+
+Array.to_set() -> I<Obj>
+
+Return the
 
 =cut
 

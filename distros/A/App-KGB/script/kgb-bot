@@ -322,9 +322,9 @@ sub read_conf ($) {
     $conf->{colors}             ||= {};
     $conf->{colors}{revision}   //= '';
     $conf->{colors}{path}       //= 'teal';
-    $conf->{colors}{author}     //= 'green';
+    $conf->{colors}{author}     //= 'purple';
     $conf->{colors}{branch}     //= 'brown';
-    $conf->{colors}{module}     //= 'purple';
+    $conf->{colors}{module}     //= 'green';
     $conf->{colors}{web}        //= 'silver';
     $conf->{colors}{separator}  //= '';
 
@@ -624,11 +624,11 @@ sub do_commit_msg {
 
     my @info;
 
-    push @info, colorize( author => $author ) if $author ne '';
+    push @info, colorize( module => $module ) if $module ne '';
     push @info, colorize( branch => $branch ) if $branch ne '';
     push @info, "$rev_prefix" . colorize( revision => $commit_id )
         if defined $commit_id;
-    push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( author => $author ) if $author ne '';
     push @info, colorize( path => "$common_dir/" ) if $common_dir ne '';
 
     if ( $changed_files > $MAGIC_MAX_FILES ) {
@@ -1000,6 +1000,7 @@ sub irc_registered {
     $irc_object->plugin_add( $KGB::const{AJsvc},
         POE::Component::IRC::Plugin::AutoJoin->new(
             Channels => $opts->{channels},
+            NickServ_delay => 60,
         )
     ) if ( $opts->{channels} );
 
@@ -1921,14 +1922,14 @@ sub gitlab_webhook_push {
     if ( $body->{after} =~ /^0+$/ ) {
         # branch deleted
         my @info;
-        push @info, colorize( author => $body->{user_name} )
-            if $body->{user_name};
+        push @info, colorize( module => $module ) if $module ne '';
         push @info, colorize( branch => $branch ) if $branch;
         push @info,
             "$rev_prefix"
             . colorize( revision => substr( $body->{before}, 0, 7 ) )
             if $body->{before};
-        push @info, colorize( module => $module ) if $module ne '';
+        push @info, colorize( author => $body->{user_name} )
+            if $body->{user_name};
         push @info, colorize( deletion => '.' );
         push @info, colorize( separator => '*' ), 'branch deleted';
 
@@ -1973,14 +1974,14 @@ sub gitlab_webhook_push {
     if ( $to_show_count != $commit_count ) {
         # not all commits will be shown, prepend a summary of the push
         my @info;
-        push @info, colorize( author => $body->{user_name} )
-            if $body->{user_name};
+        push @info, colorize( module => $module ) if $module ne '';
         push @info, colorize( branch => $branch ) if $branch;
         push @info,
             "$rev_prefix"
             . colorize( revision => substr( $body->{checkout_sha}, 0, 7 ) )
             if $body->{checkout_sha};
-        push @info, colorize( module => $module ) if $module ne '';
+        push @info, colorize( author => $body->{user_name} )
+            if $body->{user_name};
         push @info, colorize( separator => '*' ),
             sprintf( 'pushed %d commits', $commit_count );
         push @info, sprintf( '(first %d follow)', $to_show_count )
@@ -2060,12 +2061,12 @@ sub gitlab_webhook_push {
 
         my @info;
 
-        push @info, colorize( author => $author ) if $author ne '';
-        push @info, '(via ' . colorize( author => $via ) . ')' if $via;
+        push @info, colorize( module => $module ) if $module ne '';
         push @info, colorize( branch => $branch ) if $branch ne '';
         push @info, "$rev_prefix" . colorize( revision => $commit_id )
             if defined $commit_id;
-        push @info, colorize( module => $module )        if $module ne '';
+        push @info, colorize( author => $author ) if $author ne '';
+        push @info, '(via ' . colorize( author => $via ) . ')' if $via;
         push @info, colorize( path   => "$common_dir/" ) if $common_dir ne '';
 
         if ( $changed_files > $MAGIC_MAX_FILES ) {
@@ -2131,10 +2132,10 @@ sub gitlab_webhook_push {
 
     if ($number_of_hidden_commits) {
         my @info;
+        push @info, colorize( module => $module ) if $module ne '';
+        push @info, colorize( branch => $branch ) if $branch;
         push @info, colorize( author => $body->{user_name} )
             if $body->{user_name};
-        push @info, colorize( branch => $branch ) if $branch;
-        push @info, colorize( module => $module ) if $module ne '';
         push @info, colorize( separator => '*' ),
             sprintf(
             '%d commit%s touching only files outside monitored directories omitted',
@@ -2178,9 +2179,9 @@ sub gitlab_webhook_wiki_page {
 
     my @info;
 
-    push @info, colorize( author => $body->{user}{name} );
-    push @info, colorize( branch => 'wiki' );
     push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( branch => 'wiki' );
+    push @info, colorize( author => $body->{user}{name} );
     push @info, colorize( $action => $page ) if $page ne '';
 
     my @string = join( ' ', @info );
@@ -2262,11 +2263,11 @@ sub gitlab_webhook_tag_push {
 
     my @info;
 
-    push @info, colorize( author => $body->{user_name} );
+    push @info, colorize( module => $module ) if $module ne '';
     push @info, colorize( branch => $branch );
     push @info,
         $rev_prefix . colorize( revision => substr( $rev, 0, 7 ) );
-    push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( author => $body->{user_name} );
     push @info, colorize( $action => $tag ) if $tag ne '';
 
     my @string = join( ' ', @info );
@@ -2327,10 +2328,10 @@ sub gitlab_webhook_issue {
 
     my @info;
 
-    push @info, colorize( author   => $body->{user}{name} );
-    push @info, colorize( branch   => 'issues' );
     push @info, colorize( module   => $module ) if $module ne '';
+    push @info, colorize( branch   => 'issues' );
     push @info, colorize( revision => '#' . $body->{object_attributes}{iid} );
+    push @info, colorize( author   => $body->{user}{name} );
     push @info, colorize( $action => $body->{object_attributes}{title} );
 
     my @string = join( ' ', @info );
@@ -2410,8 +2411,8 @@ sub gitlab_webhook_note {
 
     my @info;
 
-    push @info, colorize( author   => $body->{user}{name} );
     push @info, colorize( module   => $module ) if $module ne '';
+    push @info, colorize( author   => $body->{user}{name} );
     push @info, colorize( revision => $body->{object_attributes}{id} )
         if $body->{object_attributes}{id};
     push @info, colorize( separator => '*' ) . ' ' . $log;
@@ -2456,10 +2457,10 @@ sub gitlab_webhook_merge_request {
 
     my @info;
 
-    push @info, colorize( author => $body->{user}{name} );
+    push @info, colorize( module => $module ) if $module ne '';
     push @info, colorize( branch => $body->{object_attributes}{target_branch} )
         if $body->{object_attributes}{target_branch};
-    push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( author => $body->{user}{name} );
     push @info, colorize( separator => '*' ) . ' ' . $log;
 
     my @string = join( ' ', @info );
@@ -2498,7 +2499,7 @@ sub human_duration {
     push @items, "$seconds seconds" if $seconds > 1;
     push @items, "1 second"         if $seconds == 1;
 
-    if ( @items > 2 ) {
+    if ( @items >= 2 ) {
         my $last = pop @items;
         $human_duration = join( ', ', @items ) . ' and ' . $last;
     }
@@ -2549,9 +2550,9 @@ sub gitlab_webhook_pipeline {
 
     my @info;
 
-    push @info, colorize( author => $body->{user}{name} );
-    push @info, colorize( branch => 'pipeline' );
     push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( branch => 'pipeline' );
+    push @info, colorize( author => $body->{user}{name} );
     push @info, colorize( revision => $id ) if $id;
     push @info, colorize( separator => '*' ) . ' ' . $log;
 
@@ -2588,9 +2589,9 @@ sub gitlab_webhook_build {
 
     my @info;
 
-    push @info, colorize( author => $body->{user}{name} );
-    push @info, colorize( branch => 'builds' );
     push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( branch => 'builds' );
+    push @info, colorize( author => $body->{user}{name} );
     push @info, colorize( revision => substr( $body->{sha}, 0, 7 ) )
         if $body->{object_attributes}{id};
     push @info, colorize( separator => '*' ) . ' ' . $log;

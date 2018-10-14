@@ -160,9 +160,9 @@ $commit = $c->describe_commit;
 ok( defined($commit), 'initial import commit' );
 is( $c->describe_commit, undef, 'no more commits' );
 
-TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 12test/03there 05master '
         . $commit->id
-        . ' 12test/06there 03old import old content * 14http://scm.host.org/there/master/?commit='
+        . ' 06Test U. Ser (06ser) 03old import old content * 14http://scm.host.org/there/master/?commit='
         . $commit->id
         . '' );
 
@@ -176,11 +176,10 @@ $commit = $c->describe_commit;
 is( $commit->branch, $b1 );
 is( $commit->log, 'branch created' );
 
-TestBot->expect( "dummy/#test"
-        . " 05develop "
+TestBot->expect( "dummy/#test 12test/03there "
+        . "05develop "
         . $commit->id
-        . " 12test/06there "
-        . "branch created "
+        . " branch created "
         . "* 14http://scm.host.org/there/develop/?commit="
         . $commit->id
         . '' );
@@ -200,12 +199,12 @@ $commit = $c->describe_commit;
 is( $commit->branch, 'master' );
 is( $commit->log,    'created new content' );
 
-TestBot->expect( "dummy/#test "
-        . "03Test U. Ser (03ser)"
+TestBot->expect( "dummy/#test"
+        . " 12test/03there"
         . " 05master "
         . $commit->id
-        . " 12test/06there "
-        . "03new "
+        . " 06Test U. Ser (06ser)"
+        . " 03new "
         . "created new content "
         . "* 14http://scm.host.org/there/master/?commit="
         . $commit->id
@@ -215,12 +214,13 @@ $commit = $c->describe_commit;
 is( $commit->branch, $b1 );
 is( $commit->log,    'fast forward' );
 
-TestBot->expect( "dummy/#test "
-        . ${TestBot::COMMIT_USER}
+TestBot->expect( "dummy/#test"
+        . " 12test/03there"
         . " 05develop "
         . $commit->id
-        . " 12test/06there "
-        . "fast forward "
+        . " "
+        . ${TestBot::COMMIT_USER}
+        . " fast forward "
         . "* 14http://scm.host.org/there/develop/?commit="
         . $commit->id
         . '' );

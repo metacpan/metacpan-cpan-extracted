@@ -7,11 +7,11 @@ Sidef::Types::Number::Number
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Number.new(...);
+var obj = Number(...)
 
 
 =head1 INHERITS
@@ -587,6 +587,22 @@ Aliases: I<getbit>, I<testbit>
 
 =cut
 
+=head2 bit_scan0
+
+Number.bit_scan0() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bit_scan1
+
+Number.bit_scan1() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bsearch
 
 Number.bsearch() -> I<Obj>
@@ -951,6 +967,14 @@ Return the
 
 =cut
 
+=head2 ecm_factor
+
+Number.ecm_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ei
 
 Number.ei() -> I<Obj>
@@ -1073,6 +1097,16 @@ Return the
 
 =cut
 
+=head2 factorial_sum
+
+Number.factorial_sum() -> I<Obj>
+
+Return the
+
+Aliases: I<left_factorial>
+
+=cut
+
 =head2 falling_factorial
 
 Number.falling_factorial() -> I<Obj>
@@ -1119,14 +1153,6 @@ Return the
 
 =cut
 
-=head2 float
-
-Number.float() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 floor
 
 Number.floor() -> I<Obj>
@@ -1154,6 +1180,14 @@ Return the
 =head2 geometric_sum
 
 Number.geometric_sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 hamdist
+
+Number.hamdist() -> I<Obj>
 
 Return the
 
@@ -1194,6 +1228,16 @@ Number.hermite_He() -> I<Obj>
 Return the
 
 Aliases: I<hermiteHe>, I<hermite_polynomial_He>, I<hermite_polynomialHe>
+
+=cut
+
+=head2 holf_factor
+
+Number.holf_factor() -> I<Obj>
+
+Return the
+
+Aliases: I<fermat_factor>
 
 =cut
 
@@ -1311,7 +1355,7 @@ Number.int() -> I<Obj>
 
 Return the
 
-Aliases: I<trunc>
+Aliases: I<to_i>, I<to_int>, I<trunc>
 
 =cut
 
@@ -1417,6 +1461,22 @@ Return the
 
 =cut
 
+=head2 is_aks_prime
+
+Number.is_aks_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_bpsw_prime
+
+Number.is_bpsw_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_carmichael
 
 Number.is_carmichael() -> I<Obj>
@@ -1449,6 +1509,14 @@ Return the
 
 =cut
 
+=head2 is_ecpp_prime
+
+Number.is_ecpp_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 iseed
 
 Number.iseed() -> I<Obj>
@@ -1457,9 +1525,33 @@ Return the
 
 =cut
 
+=head2 is_euler_pseudoprime
+
+Number.is_euler_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_even
 
 Number.is_even() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_fermat_pseudoprime
+
+Number.is_fermat_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_frobenius_pseudoprime
+
+Number.is_frobenius_pseudoprime() -> I<Obj>
 
 Return the
 
@@ -1492,6 +1584,24 @@ Return the
 =head2 is_int
 
 Number.is_int() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_khashin_pseudoprime
+
+Number.is_khashin_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_frobenius_khashin_pseudoprime>
+
+=cut
+
+=head2 is_lucas_pseudoprime
+
+Number.is_lucas_pseudoprime() -> I<Obj>
 
 Return the
 
@@ -1539,6 +1649,22 @@ Return the
 
 =cut
 
+=head2 is_nminus1_prime
+
+Number.is_nminus1_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_nplus1_prime
+
+Number.is_nplus1_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_odd
 
 Number.is_odd() -> I<Obj>
@@ -1552,6 +1678,16 @@ Return the
 Number.is_one() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 is_plumb_pseudoprime
+
+Number.is_plumb_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_euler_plumb_pseudoprime>
 
 =cut
 
@@ -1637,6 +1773,8 @@ Number.is_prov_prime() -> I<Obj>
 
 Return the
 
+Aliases: I<is_provable_prime>
+
 =cut
 
 =head2 isqrt
@@ -1707,6 +1845,40 @@ Aliases: I<is_squarefree>
 
 =cut
 
+=head2 is_stronger_lucas_pseudoprime
+
+Number.is_stronger_lucas_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_extra_strong_lucas_pseudoprime>
+
+=cut
+
+=head2 is_strongish_lucas_pseudoprime
+
+Number.is_strongish_lucas_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_strong_lucas_pseudoprime
+
+Number.is_strong_lucas_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_strong_pseudoprime
+
+Number.is_strong_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_totient
 
 Number.is_totient() -> I<Obj>
@@ -1720,6 +1892,16 @@ Return the
 Number.isub() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 is_underwood_pseudoprime
+
+Number.is_underwood_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_frobenius_underwood_pseudoprime>
 
 =cut
 
@@ -1965,6 +2147,26 @@ Aliases: I<lucasu>, I<lucasU>
 
 =cut
 
+=head2 lucasumod
+
+Number.lucasumod() -> I<Obj>
+
+Return the
+
+Aliases: I<lucasUmod>
+
+=cut
+
+=head2 lucasuvmod
+
+Number.lucasuvmod() -> I<Obj>
+
+Return the
+
+Aliases: I<lucasUVmod>
+
+=cut
+
 =head2 lucas_V
 
 Number.lucas_V() -> I<Obj>
@@ -1975,9 +2177,27 @@ Aliases: I<lucasv>, I<lucasV>
 
 =cut
 
+=head2 lucasvmod
+
+Number.lucasvmod() -> I<Obj>
+
+Return the
+
+Aliases: I<lucasVmod>
+
+=cut
+
 =head2 make_coprime
 
 Number.make_coprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 mangoldt
+
+Number.mangoldt() -> I<Obj>
 
 Return the
 
@@ -1997,7 +2217,15 @@ Number.mfac() -> I<Obj>
 
 Return the
 
-Aliases: I<mfactorial>
+Aliases: I<mfactorial>, I<multi_factorial>
+
+=cut
+
+=head2 miller_rabin_random
+
+Number.miller_rabin_random() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -2165,6 +2393,14 @@ Aliases: I<number_of_partitions>
 
 =cut
 
+=head2 pbrent_factor
+
+Number.pbrent_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 perfect_power
 
 Number.perfect_power() -> I<Obj>
@@ -2200,6 +2436,14 @@ Return the
 =head2 pi
 
 Number.pi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pminus1_factor
+
+Number.pminus1_factor() -> I<Obj>
 
 Return the
 
@@ -2251,11 +2495,29 @@ Number.popcount() -> I<Obj>
 
 Return the
 
+Aliases: I<hammingweight>
+
+=cut
+
+=head2 pplus1_factor
+
+Number.pplus1_factor() -> I<Obj>
+
+Return the
+
 =cut
 
 =head2 prev_prime
 
 Number.prev_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prho_factor
+
+Number.prho_factor() -> I<Obj>
 
 Return the
 
@@ -2286,6 +2548,26 @@ Number.primepi() -> I<Obj>
 Return the
 
 Aliases: I<prime_count>
+
+=cut
+
+=head2 primepi_lower
+
+Number.primepi_lower() -> I<Obj>
+
+Return the
+
+Aliases: I<prime_count_lower>
+
+=cut
+
+=head2 primepi_upper
+
+Number.primepi_upper() -> I<Obj>
+
+Return the
+
+Aliases: I<prime_count_upper>
 
 =cut
 
@@ -2389,6 +2671,14 @@ Return the
 
 =cut
 
+=head2 qs_factor
+
+Number.qs_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 quadratic_formula
 
 Number.quadratic_formula() -> I<Obj>
@@ -2445,11 +2735,31 @@ Return the
 
 =cut
 
+=head2 random_maurer_nbit_prime
+
+Number.random_maurer_nbit_prime() -> I<Obj>
+
+Return the
+
+Aliases: I<random_nbit_maurer_prime>
+
+=cut
+
 =head2 random_nbit_prime
 
 Number.random_nbit_prime() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 random_nbit_strong_prime
+
+Number.random_nbit_strong_prime() -> I<Obj>
+
+Return the
+
+Aliases: I<random_strong_nbit_prime>
 
 =cut
 
@@ -2490,6 +2800,8 @@ Return the
 Number.rat() -> I<Obj>
 
 Return the
+
+Aliases: I<to_r>, I<to_rat>
 
 =cut
 
@@ -2787,6 +3099,14 @@ Return the
 
 =cut
 
+=head2 squfof_factor
+
+Number.squfof_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 stirling
 
 Number.stirling() -> I<Obj>
@@ -2872,6 +3192,44 @@ Return the
 =head2 times
 
 Number.times() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_f
+
+Number.to_f() -> I<Obj>
+
+Return the
+
+Aliases: I<float>, I<to_float>
+
+=cut
+
+=head2 to_n
+
+Number.to_n() -> I<Obj>
+
+Return the
+
+Aliases: I<to_num>
+
+=cut
+
+=head2 to_s
+
+Number.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<to_str>
+
+=cut
+
+=head2 trial_factor
+
+Number.trial_factor() -> I<Obj>
 
 Return the
 

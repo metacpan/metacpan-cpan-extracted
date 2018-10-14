@@ -12,6 +12,7 @@ pod_spelling_system:
     - systempath
     - grinnz
     - DBOOK
+    - ILUX
 
 pod_coverage:
   skip: 0

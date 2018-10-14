@@ -101,4 +101,22 @@ subtest '_cmp' => sub {
 
 };
 
+subtest 'case insensitive' => sub {
+
+  local $FFI::CheckLib::system_path = [ 'corpus/windows/bincase' ];
+
+  subtest 'no prefix' => sub {
+    my($path) = find_lib( lib => 'foo' );
+    ok $path;
+    note "path = @{[ defined $path ? $path : 'undef' ]}";
+  };
+
+  subtest 'with lib prefix' => sub {
+    my($path) = find_lib( lib => 'bar' );
+    ok $path;
+    note "path = @{[ defined $path ? $path : 'undef' ]}";
+  };
+
+};
+
 done_testing;

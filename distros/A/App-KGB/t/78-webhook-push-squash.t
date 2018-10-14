@@ -92,16 +92,16 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'master checkou test-repo',
+        'dummy/#test test-repo',
+        'master checkou Test User',
         '* pushed 2 commits (first 1 follow)',
         '* http://git/test/compare/before...after' )
 );
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'master b9b5587 test-repo',
+        'dummy/#test test-repo',
+        'master b9b5587 Test User',
         'mod-one file-one rm-one',
         '* Commit three files (add, mod, rm)',
         '* http://git/b9b5587' )
@@ -145,16 +145,16 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'master checkou test-repo',
+        'dummy/#test test-repo',
+        'master checkou Test User',
         '* pushed 6 commits (first 1 follow)',
         '* http://git/test/compare/before...after6' )
 );
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'master b9b5587 test-repo',
+        'dummy/#test test-repo',
+        'master b9b5587 Test User',
         'mod-one file-one rm-one',
         '* Commit three files (add, mod, rm)',
         '* http://git/b9b5587' )
@@ -198,8 +198,8 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'upstream checkou test-repo',
+        'dummy/#test test-repo',
+        'upstream checkou Test User',
         '* pushed 6 commits',
         '* http://git/test/compare/before...after6' )
 );
@@ -252,8 +252,8 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'master test-repo',
+        'dummy/#test test-repo',
+        'master Test User',
         '* 2 commits touching only files outside monitored directories omitted',
     )
 );
@@ -304,16 +304,16 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'master b9b5587 test-repo',
+        'dummy/#test test-repo',
+        'master b9b5587 Test User',
         'dir/ mod-one file-one rm-one * Commit three files (add, mod, rm)',
         '* http://git/b9b5587' )
 );
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'master 284ffdd test-repo',
+        'dummy/#test test-repo',
+        'master 284ffdd Test User',
         '(6 files in 2 dirs)',
         '* Commit six files in dir/ (2×(add, mod, rm))',
         '* http://git/284ffdd',
@@ -322,8 +322,8 @@ TestBot->expect(
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'master test-repo',
+        'dummy/#test test-repo',
+        'master Test User',
         '* 1 commit touching only files outside monitored directories omitted',
     )
 );

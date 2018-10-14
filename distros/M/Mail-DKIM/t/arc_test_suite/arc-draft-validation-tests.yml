@@ -7347,7 +7347,7 @@ tests:
       <div dir="ltr">This is a test message</div>
 
       --001a113e15fcdd0f9e0545366e8f--
-    cv:          Fail
+    cv:          Pass
   as_fields_t_empty:
     spec:        12/16
     description: as t= empty

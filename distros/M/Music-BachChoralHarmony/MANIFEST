@@ -8,9 +8,12 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/analyze_chords
 eg/by_key
+eg/key_count
 eg/network
 eg/note_count
+eg/roman
 eg/shannon
 eg/to_midi
 lib/Music/BachChoralHarmony.pm

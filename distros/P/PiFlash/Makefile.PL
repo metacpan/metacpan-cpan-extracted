@@ -7,7 +7,7 @@ use 5.018000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "command-line processing for piflash script to flash SD card for Raspberry Pi",
+  "ABSTRACT" => "Raspberry Pi SD-flashing script with safety checks to avoid erasing the wrong device",
   "AUTHOR" => "Ian Kluft <cpan-dev\@iankluft.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.0.3",
+  "VERSION" => "0.0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

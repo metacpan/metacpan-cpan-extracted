@@ -1,5 +1,9 @@
 Revision history for Authorization-RBAC
 
+0.12 2018-10-14
+  - replace Config::JFDI by Config::ZOMG
+  - add some tests
+  
 0.11 2018-06-09
   - add cache
 

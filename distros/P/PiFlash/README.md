@@ -114,7 +114,7 @@ distribution's installer can be run.  They can be found under the
 PiFlash documentation is available as POD.
 You can run `perldoc` from a shell to read the documentation:
  
-    % perldoc PiFlash
+    % perldoc piflash
  
 For more information on installing Perl modules via CPAN, please see:
 https://www.cpan.org/modules/INSTALL.html

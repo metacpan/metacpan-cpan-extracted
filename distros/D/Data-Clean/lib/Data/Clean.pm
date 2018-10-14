@@ -1,7 +1,7 @@
 package Data::Clean;
 
-our $DATE = '2018-10-09'; # DATE
-our $VERSION = '0.501'; # VERSION
+our $DATE = '2018-10-14'; # DATE
+our $VERSION = '0.502'; # VERSION
 
 use 5.010001;
 use strict;
@@ -119,12 +119,7 @@ sub _generate_cleanser_code {
     $cd->{modules}{'Scalar::Util'} //= 0;
 
     if (!$cd->{clone_func}) {
-        if (eval { require Sereal::Dclone; 1 }) {
-            $cd->{clone_func} = 'Sereal::Dclone::dclone';
-        } else {
-            # require Clone::PP; done by new()
-            $cd->{clone_func} = 'Clone::PP::clone';
-        }
+        $cd->{clone_func} = 'Clone::PP::clone';
     }
     {
         last unless $cd->{clone_func} =~ /(.+)::(.+)/;
@@ -292,7 +287,7 @@ Data::Clean - Clean data structure
 
 =head1 VERSION
 
-This document describes version 0.501 of Data::Clean (from Perl distribution Data-Clean), released on 2018-10-09.
+This document describes version 0.502 of Data::Clean (from Perl distribution Data-Clean), released on 2018-10-14.
 
 =head1 SYNOPSIS
 
@@ -368,7 +363,7 @@ array-based objects because they will be recursed instead.
 =item * !clone_func (str)
 
 Set fully qualified name of clone function to use. The default is to use
-C<Sereal::Dclone::dclone> if available, or fallback to C<Clone::PP::clone>.
+C<Clone::PP::clone>.
 
 The clone module (all but the last part of the C<!clone_func> value) will
 automatically be loaded using C<require()>.

@@ -13,7 +13,7 @@ Dancer::Development - guide for developers interested in contributing
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 DESCRIPTION
 
@@ -304,7 +304,7 @@ However, you can run tests directly using the 'prove' tool:
     $ prove -lv t/some_test_file.t
     $ prove -lvr t/
 
-In most cases, 'prove' is entirely sufficent for you to test any
+In most cases, 'prove' is entirely sufficient for you to test any
 patches you have.
 
 You may need to satisfy some dependencies. The easiest way to satisfy

@@ -51,7 +51,10 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Bool::Bool            Sidef::Types::Bool::Bool
                   Sidef::DataTypes::Array::Array          Sidef::Types::Array::Array
                   Sidef::DataTypes::Array::Pair           Sidef::Types::Array::Pair
+                  Sidef::DataTypes::Array::Matrix         Sidef::Types::Array::Matrix
                   Sidef::DataTypes::Hash::Hash            Sidef::Types::Hash::Hash
+                  Sidef::DataTypes::Set::Set              Sidef::Types::Set::Set
+                  Sidef::DataTypes::Set::Bag              Sidef::Types::Set::Bag
                   Sidef::DataTypes::Regex::Regex          Sidef::Types::Regex::Regex
                   Sidef::DataTypes::String::String        Sidef::Types::String::String
                   Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number

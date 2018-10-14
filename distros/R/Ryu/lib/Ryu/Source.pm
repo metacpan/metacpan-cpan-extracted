@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.028'; # VERSION
 
 =head1 NAME
 
@@ -1505,6 +1505,7 @@ Examples:
 
 sub filter {
     use Scalar::Util qw(blessed);
+    use List::Util qw(any);
     use namespace::clean qw(blessed);
     my $self = shift;
 
@@ -1519,14 +1520,17 @@ sub filter {
             my ($k, $v) = @_;
             if(my $ref = ref $args{$k}) {
                 if($ref eq 'Regexp') {
-                    return 0 unless $v =~ $args{$k};
+                    return 0 unless defined($v) && $v =~ $args{$k};
+                } elsif($ref eq 'ARRAY') {
+                    return 0 unless defined($v) && any { $v eq $_ } @{$args{$k}};
                 } elsif($ref eq 'CODE') {
                     return 0 for grep !$args{$k}->($_), $v;
                 } else {
                     die "Unsure what to do with $args{$k} which seems to be a $ref";
                 }
             } else {
-                return 0 unless $v eq $args{$k};
+                return !defined($args{$k}) if !defined($v);
+                return defined($args{$k}) && $v eq $args{$k};
             }
             return 1;
         };

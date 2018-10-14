@@ -63,7 +63,10 @@ package Sidef::Parser {
                      | File\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::File') })
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
                      | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
+                     | Matrix\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Matrix') })
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
+                     | Set\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Set') })
+                     | Bag\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Bag') })
                      | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
                      | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
                      | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
@@ -189,8 +192,11 @@ package Sidef::Parser {
                   DirHandle
                   Arr Array
                   Pair
+                  Matrix
                   Enumerator
                   Hash
+                  Set
+                  Bag
                   Str String
                   Num Number
                   Range
@@ -2624,6 +2630,29 @@ package Sidef::Parser {
         $parsed;
     }
 
+    sub backtrack_whitespace {
+        my ($self, %opt) = @_;
+
+        local *_ = $opt{code};
+
+        # Backtrack the removal of whitespace
+        while (1) {
+            my $s = substr($_, pos($_) - 1, 1);
+
+            if ($s =~ /\R/) {
+                $self->{line} -= 1;
+                pos($_) -= 1;
+                last;
+            }
+            elsif ($s =~ /\h/) {
+                pos($_) -= 1;
+            }
+            else {
+                last;
+            }
+        }
+    }
+
     sub parse_obj {
         my ($self, %opt) = @_;
 
@@ -2825,31 +2854,31 @@ package Sidef::Parser {
                             push @{$obj->{if}}, {expr => $arg, block => $block};
 
                           ELSIF: {
-                                if (/\G(?=\s*elsif\h*\()/) {
-                                    $self->parse_whitespace(code => $opt{code});
-                                    while (/\G\h*elsif\h*(?=\()/gc) {
-                                        my $arg = $self->parse_arg(code => $opt{code});
-                                        $self->parse_whitespace(code => $opt{code});
 
-                                        my $block = $self->parse_block(code => $opt{code}) // $self->fatal_error(
+                                $self->parse_whitespace(code => $opt{code});
+
+                                if (/\Gelsif\h*(?=\()/gc) {
+                                    my $arg = $self->parse_arg(code => $opt{code});
+                                    $self->parse_whitespace(code => $opt{code});
+
+                                    my $block = $self->parse_block(code => $opt{code}) // $self->fatal_error(
                                                                           code  => $_,
                                                                           pos   => pos($_) - 1,
                                                                           error => "invalid declaration of the `if` statement",
                                                                           reason => "expected a block after `elsif(...)`",
-                                        );
+                                    );
 
-                                        push @{$obj->{if}}, {expr => $arg, block => $block};
-                                        redo ELSIF;
-                                    }
+                                    push @{$obj->{if}}, {expr => $arg, block => $block};
+                                    redo ELSIF;
                                 }
                             }
 
-                            if (/\G(?=\s*else\h*\{)/) {
-                                $self->parse_whitespace(code => $opt{code});
-                                /\Gelse\h*/gc;
+                            if (/\Gelse\h*(?=\{)/gc) {
                                 my $block = $self->parse_block(code => $opt{code});
                                 $obj->{else}{block} = $block;
                             }
+
+                            $self->backtrack_whitespace(code => $opt{code});
                         }
                         else {
                             $self->fatal_error(
@@ -2867,32 +2896,31 @@ package Sidef::Parser {
                             push @{$obj->{with}}, {expr => $arg, block => $block};
 
                           ORWITH: {
-                                if (/\G(?=\s*orwith\h*\()/) {
+
+                                $self->parse_whitespace(code => $opt{code});
+
+                                if (/\Gorwith\h*(?=\()/gc) {
+                                    my $arg = $self->parse_arg(code => $opt{code});
                                     $self->parse_whitespace(code => $opt{code});
-                                    while (/\G\h*orwith\h*(?=\()/gc) {
-                                        my $arg = $self->parse_arg(code => $opt{code});
-                                        $self->parse_whitespace(code => $opt{code});
 
-                                        my $block = $self->parse_block(code => $opt{code}, topic_var => 1)
-                                          // $self->fatal_error(
-                                                                code   => $_,
-                                                                pos    => pos($_) - 1,
-                                                                error  => "invalid declaration of the `with` statement",
-                                                                reason => "expected a block after `orwith(...)`",
-                                                               );
+                                    my $block = $self->parse_block(code => $opt{code}, topic_var => 1) // $self->fatal_error(
+                                                                        code  => $_,
+                                                                        pos   => pos($_) - 1,
+                                                                        error => "invalid declaration of the `with` statement",
+                                                                        reason => "expected a block after `orwith(...)`",
+                                    );
 
-                                        push @{$obj->{with}}, {expr => $arg, block => $block};
-                                        redo ORWITH;
-                                    }
+                                    push @{$obj->{with}}, {expr => $arg, block => $block};
+                                    redo ORWITH;
                                 }
                             }
 
-                            if (/\G(?=\s*else\h*\{)/) {
-                                $self->parse_whitespace(code => $opt{code});
-                                /\Gelse\h*/gc;
+                            if (/\Gelse\h*(?=\{)/gc) {
                                 my $block = $self->parse_block(code => $opt{code});
                                 $obj->{else}{block} = $block;
                             }
+
+                            $self->backtrack_whitespace(code => $opt{code});
                         }
                         else {
                             $self->fatal_error(

@@ -7,11 +7,11 @@ Sidef::Types::Range::Range
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Range.new(...);
+var obj = Range(...)
 
 =head1 METHODS
 
@@ -359,14 +359,6 @@ Range.to_a() -> I<Obj>
 Return the
 
 Aliases: I<to_array>
-
-=cut
-
-=head2 to_s
-
-Range.to_s() -> I<Obj>
-
-Return the
 
 =cut
 

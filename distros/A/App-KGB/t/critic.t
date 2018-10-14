@@ -15,4 +15,4 @@ use File::Spec;
 my $rcfile = File::Spec->catfile( 't', 'perlcriticrc' );
 Test::Perl::Critic->import( -profile => $rcfile );
 
-all_critic_ok( 'scripts', 'lib' );
+all_critic_ok( 'script', 'lib' );

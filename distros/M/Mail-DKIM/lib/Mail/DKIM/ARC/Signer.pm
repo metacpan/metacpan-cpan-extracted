@@ -157,7 +157,7 @@ The list of headers signed by default is as follows
 package Mail::DKIM::ARC::Signer;
 use base 'Mail::DKIM::Common';
 use Carp;
-our $VERSION = 0.53;
+our $VERSION = 0.54;
 
 # PROPERTIES
 #

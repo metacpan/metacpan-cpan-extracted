@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Compare the chord defined by the notes to the chord of the events.
+
+use Algorithm::Combinatorics 'variations';
+use Music::BachChoralHarmony;
+use Music::Chord::Namer 'chordname';
+use Music::Chord::Note;
+
+my $bach = Music::BachChoralHarmony->new;
+my $songs = $bach->parse();
+
+my $cn = Music::Chord::Note->new();
+
+my @scale = qw( C C# D D# E F F# G G# A A# B );
+my %enharmonics = (
+    'C#' => 'Db',
+    'Db' => 'C#',
+    'D#' => 'Eb',
+    'Eb' => 'D#',
+    'F#' => 'Gb',
+    'Gb' => 'F#',
+    'G#' => 'Ab',
+    'Ab' => 'G#',
+    'A#' => 'Bb',
+    'Bb' => 'A#',
+);
+#my @scale = qw( C Db D Eb E F Gb G Ab A Bb B );
+
+for my $song ( sort keys %$songs ) {
+    for my $event ( @{ $songs->{$song}{events} } ) {
+#        my $note = $event->{bass};
+#        $note =~ s/b/f/;
+#        $note =~ s/#/s/;
+
+        my @notes;
+        my $i = 0;
+        for my $bit ( split //, $event->{notes} ) {
+            push @notes, $scale[$i]
+                if $bit;
+            $i++;
+        }
+
+        my $chord = $event->{chord};
+        $chord =~ s/M//;
+        $chord =~ s/_//;
+        $chord =~ s/4/add4/;
+        my @tone = eval { $cn->chord($chord) };
+
+        my @names;
+        my @items = variations( \@notes, scalar(@notes) );
+        for my $item ( @items ) {
+            my $chordname = chordname(@$item);
+            if ( !grep { $chordname eq $_ } @names ) {
+                push @names, $chordname;
+            }
+        }
+
+        my $name;
+        if ( grep { $chord eq $_ } @names ) {
+            $name = $chord;
+        }
+        elsif ( exists $enharmonics{$chord} && grep { $enharmonics{$chord} eq $_ } @names ) {
+            $name = $enharmonics{$chord};
+        }
+        else {
+            $name = join ', ', @names;
+        }
+
+        print "Given notes: @notes, Computed name(s): $name\n\tGiven chord: $chord, Computed notes: @tone\n";
+    }
+}

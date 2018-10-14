@@ -13,7 +13,7 @@ Dancer::Plugins - interesting plugins to add to Dancer's capabilities
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 DESCRIPTION
 

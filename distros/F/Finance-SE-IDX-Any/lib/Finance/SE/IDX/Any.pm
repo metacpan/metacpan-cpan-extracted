@@ -1,7 +1,7 @@
 package Finance::SE::IDX::Any;
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-10-14'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -75,7 +75,7 @@ Finance::SE::IDX::Any - Get information from Indonesian Stock Exchange
 
 =head1 VERSION
 
-This document describes version 0.001 of Finance::SE::IDX::Any (from Perl distribution Finance-SE-IDX-Any), released on 2018-09-08.
+This document describes version 0.002 of Finance::SE::IDX::Any (from Perl distribution Finance-SE-IDX-Any), released on 2018-10-14.
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ Use like you would use L<Finance::SE::IDX>.
 =head1 DESCRIPTION
 
 This module provides the same functions as L<Finance::SE::IDX>, e.g.
-C<list_idx_firms> and will call the Finance::SE::IDX version but will fallback
+C<list_idx_firms>, and will call the Finance::SE::IDX version but will fallback
 for a while (default: 4 hours) to the L<Finance::SE::IDX::Static> version when
 the functions fail.
 
@@ -105,6 +105,9 @@ Usage:
  list_idx_boards() -> [status, msg, result, meta]
 
 List boards.
+
+By default caches results for 8 hours (by locally setting CACHE_MAX_AGE). Can be
+overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
 This function is not exported by default, but exportable.
 
@@ -129,6 +132,9 @@ Usage:
  list_idx_firms(%args) -> [status, msg, result, meta]
 
 List firms.
+
+By default caches results for 8 hours (by locally setting CACHE_MAX_AGE). Can be
+overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
 This function is not exported by default, but exportable.
 
@@ -161,6 +167,9 @@ Usage:
  list_idx_sectors() -> [status, msg, result, meta]
 
 List sectors.
+
+By default caches results for 8 hours (by locally setting CACHE_MAX_AGE). Can be
+overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
 This function is not exported by default, but exportable.
 

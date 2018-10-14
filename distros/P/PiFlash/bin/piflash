@@ -26,7 +26,7 @@ piflash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ distribution's installer can be run.  They can be found under the
 PiFlash documentation is available as POD.
 You can run `perldoc` from a shell to read the documentation:
 
-    % perldoc PiFlash
+    % perldoc piflash
 
 For more information on installing Perl modules via CPAN, please see:
 L<https://www.cpan.org/modules/INSTALL.html>

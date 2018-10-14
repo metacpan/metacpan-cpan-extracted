@@ -32,7 +32,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-BachChoralHarmony
   repository: https://github.com/ology/Music-BachChoralHarmony
-version: '0.0102'
+version: '0.0103'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

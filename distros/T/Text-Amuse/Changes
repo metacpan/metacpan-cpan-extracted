@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.25 2018-10-13
+
+ - Adjustment to French punctuation in HTML
+
 1.24 2018-09-29
 
  - Implement French punctuation rules in HTML output

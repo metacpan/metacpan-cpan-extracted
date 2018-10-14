@@ -7,11 +7,11 @@ Sidef::Types::String::String
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = String.new(...);
+var obj = String(...)
 
 
 =head1 INHERITS
@@ -1016,6 +1016,26 @@ String.tclc() -> I<Obj>
 Return the
 
 Aliases: I<capitalize>
+
+=cut
+
+=head2 to_i
+
+String.to_i() -> I<Obj>
+
+Return the
+
+Aliases: I<to_int>
+
+=cut
+
+=head2 to_n
+
+String.to_n() -> I<Obj>
+
+Return the
+
+Aliases: I<to_num>
 
 =cut
 

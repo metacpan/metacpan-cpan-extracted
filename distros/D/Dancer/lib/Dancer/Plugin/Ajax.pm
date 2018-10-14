@@ -1,7 +1,7 @@
 package Dancer::Plugin::Ajax;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: a plugin for adding Ajax route handlers
-$Dancer::Plugin::Ajax::VERSION = '1.3400';
+$Dancer::Plugin::Ajax::VERSION = '1.3500';
 use strict;
 use warnings;
 
@@ -72,7 +72,7 @@ Dancer::Plugin::Ajax - a plugin for adding Ajax route handlers
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ The route handler code will be compiled to behave like the following:
 
 =item *
 
-Pass if the request header X-Requested-With doesnt equal XMLHttpRequest
+Pass if the request header X-Requested-With doesn't equal XMLHttpRequest
 
 =item *
 

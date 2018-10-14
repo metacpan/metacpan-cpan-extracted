@@ -1,3 +1,9 @@
+0.002   2018-10-14 (PERLANCAR)
+
+	- Bump requirement version: Finance::SE::IDX::Static ->
+	  20181012.0.0 [RT#127360].
+
+
 0.001   2018-09-08 (PERLANCAR)
 
         - First release.

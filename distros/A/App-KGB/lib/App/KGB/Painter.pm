@@ -45,10 +45,10 @@ our %color_codes = (
 our %item_colors = (
     revision  => undef,
     path      => 'teal',
-    author    => 'green',
+    author    => 'purple',
     branch    => 'brown',
     project   => 'blue',
-    module    => 'purple',
+    module    => 'green',
     web       => 'silver',
     separator => undef,
 

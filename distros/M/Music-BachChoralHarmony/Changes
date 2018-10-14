@@ -1,5 +1,8 @@
 Revision history for Music-BachChoralHarmony
 
+0.0103 2018-10-13 15:51:20
+    - Add and improve eq/ programs.
+
 0.0102 2018-10-08 16:32:30
     - Improve documentation.
     - Add event tests.

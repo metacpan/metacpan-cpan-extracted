@@ -1,5 +1,10 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.36  2018-09-29T12:00:00+00:00
+      - Removed dependency on Graphics::ColorNames.
+      - Upgraded dependency on Map::Tube::Exception v3.18.
+      - Added color name validation.
+
 0.35  2018-09-28T21:25:00+00:00
       - Upgraded dependency on Map::Tube v3.57.
 

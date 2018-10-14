@@ -1,7 +1,7 @@
 package Dancer::Request;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: interface for accessing incoming requests
-$Dancer::Request::VERSION = '1.3400';
+$Dancer::Request::VERSION = '1.3500';
 use strict;
 use warnings;
 use Carp;
@@ -54,7 +54,11 @@ sub new {
 sub agent                 { $_[0]->user_agent }
 sub remote_address        { $_[0]->address }
 sub forwarded_for_address { $_[0]->env->{'X_FORWARDED_FOR'} || $_[0]->env->{'HTTP_X_FORWARDED_FOR'} }
-sub address               { $_[0]->env->{REMOTE_ADDR} }
+sub address {
+    setting('behind_proxy')
+        ? $_[0]->forwarded_for_address()
+        : $_[0]->env->{REMOTE_ADDR}
+}
 sub host {
     if (@_==2) {
         $_[0]->{host} = $_[1];
@@ -643,7 +647,7 @@ Dancer::Request - interface for accessing incoming requests
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 DESCRIPTION
 

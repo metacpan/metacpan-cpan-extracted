@@ -5,7 +5,10 @@ use utf8;
 use Encode;
 use Test::More import => ['!pass'];
 use Dancer::ModuleLoader;
-use HTTP::Tiny;
+use HTTP::Tiny::NoProxy;
+
+use FindBin qw($Bin);
+use lib "$Bin/../../";
 
 plan skip_all => "skip test with Test::TCP in win32/cygwin" if ($^O eq 'MSWin32' or $^O eq 'cygwin');
 plan skip_all => "Test::TCP is needed for this test"
@@ -60,7 +63,7 @@ sub d {
 sub _get_http_response {
     my ($method, $path, $port) = @_;
 
-    my $ua = HTTP::Tiny->new;
+    my $ua = HTTP::Tiny::NoProxy->new;
     return $ua->request($method => "http://127.0.0.1:$port${path}");
 }
 

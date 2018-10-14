@@ -1,7 +1,7 @@
 package Dancer::Serializer::YAML;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: serializer for handling YAML data
-$Dancer::Serializer::YAML::VERSION = '1.3400';
+$Dancer::Serializer::YAML::VERSION = '1.3500';
 use strict;
 use warnings;
 use Carp;
@@ -43,6 +43,7 @@ sub init {
 
 sub serialize {
     my ($self, $entity) = @_;
+    return unless $entity;
     my $module = Dancer::Config::settings->{engines}{YAML}{module} || 'YAML';
     {
         no strict 'refs';
@@ -53,6 +54,7 @@ sub serialize {
 sub deserialize {
     my ($self, $content) = @_;
     my $module = Dancer::Config::settings->{engines}{YAML}{module} || 'YAML';
+    return unless $content;
     {
         no strict 'refs';
         &{ $module . '::Load' }($content);
@@ -75,7 +77,7 @@ Dancer::Serializer::YAML - serializer for handling YAML data
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 SYNOPSIS
 

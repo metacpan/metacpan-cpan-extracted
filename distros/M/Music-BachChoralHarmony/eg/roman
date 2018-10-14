@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Roman numeral analysis
+
+use GraphViz2;
+use List::MoreUtils 'first_index';
+use Music::BachChoralHarmony;
+use Music::Scales;
+
+my $in_key = shift || 'G_M';
+
+my @roman = qw( I ii iii IV V vi vii );
+
+my $bach = Music::BachChoralHarmony->new;
+my $songs = $bach->parse();
+# Show all keys:
+#use Data::Dumper;warn(Dumper[map{$songs->{$_}{key}}keys%$songs]);exit;
+
+my %score;
+
+# Process each song for key and chord
+for my $song ( sort keys %$songs ) {
+    my $key = $songs->{$song}{key};
+
+    # Skip unless we are in the right key
+    next unless $key eq $in_key;
+#    print "SONG: $song\n";
+
+    # Get the scale name
+    my $name = $key =~ /M/ ? 'major' : 'minor';
+    $key =~ s/_?M//i;
+
+    # Get the scale notes
+    my @notes = get_scale_notes( $key, $name );
+#    print "KEY: $key, SCALE: $name, NOTES: @notes\n";
+
+    # The last seen roman
+    my $last;
+
+    # Turn the chord into a roman representation
+    for my $event ( @{ $songs->{$song}{events} } ) {
+        my $chord = $event->{chord};
+
+        # Get just the note part of the chord name
+        ( my $note = $chord ) =~ s/^(\w[#b]?)\w*$/$1/;
+
+        # Get the roman representation based on the scale position
+        my $position = first_index { $_ eq $note } @notes;
+        my $roman = $roman[$position] || '?';
+
+        # Get everything but the note part
+        ( my $decorator = $chord ) =~ s/^\w[#b]?(\w*)$/$1/;
+        $decorator =~ s/_//;
+
+        # Are we minor or major?
+        my $minor = $decorator =~ /m/ ? 1 : 0;
+
+        # Convert the case of the roman representation based on minor or major
+        $roman = $minor ? lc($roman) : uc($roman);
+
+        # Drop the minor and major part of the chord name
+        $decorator =~ s/M//i;
+
+        # Append the remaining decorator to the roman representation
+        $roman .= $decorator;
+#        print "CHORD: $chord, ROMAN: $roman\n";
+
+        # Tally the bigram
+        $score{ $last . ' ' . $roman }++ if $last;
+        $last = $roman;
+    }
+}
+
+my $g = GraphViz2->new(
+    global => { directed => 1 },
+    node   => { shape => 'oval' },
+    edge   => { color => 'grey' },
+);
+
+my %nodes;
+my %edges;
+
+for my $bigram ( keys %score ) {
+    my ( $i, $j ) = split ' ', $bigram;
+
+    $g->add_node( name => $i )
+        unless $nodes{$i}++;
+
+    $g->add_node( name => $j )
+        unless $nodes{$j}++;
+
+    $g->add_edge( from => $i, to => $j, label => $score{$bigram} )
+        unless $edges{$bigram}++;
+}
+
+$g->run( format => 'png', output_file => $0 . '.png' );

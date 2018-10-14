@@ -7,11 +7,11 @@ Sidef::Types::Glob::Pipe
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Pipe.new(...);
+var obj = Pipe(...)
 
 
 =head1 INHERITS
@@ -26,14 +26,6 @@ Inherits methods from:
 =head2 command
 
 Pipe.command() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 dump
-
-Pipe.dump() -> I<Obj>
 
 Return the
 
@@ -74,5 +66,15 @@ Pipe.open_w() -> I<Obj>
 Return the
 
 Aliases: I<open_write>
+
+=cut
+
+=head2 to_s
+
+Pipe.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut

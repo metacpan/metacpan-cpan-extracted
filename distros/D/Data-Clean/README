@@ -2,8 +2,8 @@ NAME
     Data::Clean - Clean data structure
 
 VERSION
-    This document describes version 0.501 of Data::Clean (from Perl
-    distribution Data-Clean), released on 2018-10-09.
+    This document describes version 0.502 of Data::Clean (from Perl
+    distribution Data-Clean), released on 2018-10-14.
 
 SYNOPSIS
      use Data::Clean;
@@ -73,8 +73,7 @@ METHODS
     *   !clone_func (str)
 
         Set fully qualified name of clone function to use. The default is to
-        use "Sereal::Dclone::dclone" if available, or fallback to
-        "Clone::PP::clone".
+        use "Clone::PP::clone".
 
         The clone module (all but the last part of the "!clone_func" value)
         will automatically be loaded using "require()".

@@ -67,8 +67,7 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'tags 27d8835 test-repo',
+        'dummy/#test test-repo tags 27d8835 Test User',
         'v5.6-plus',
     )
 );
@@ -90,8 +89,7 @@ EOT
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'signed tags 470fc2f test-repo',
+        'dummy/#test test-repo signed tags 470fc2f Test User',
         'v5.8-plus',
         '* Tagging v5.8-plus',
         '* http://git/project/tags/v5.8-plus',
@@ -112,8 +110,7 @@ $resp = webhook_post(
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'tags 470fc2f test-repo',
+        'dummy/#test test-repo tags 470fc2f Test User',
         'v5.8-plus',
         '* tag deleted',
     )

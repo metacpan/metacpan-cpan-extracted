@@ -2,15 +2,15 @@ NAME
     Finance::SE::IDX::Any - Get information from Indonesian Stock Exchange
 
 VERSION
-    This document describes version 0.001 of Finance::SE::IDX::Any (from
-    Perl distribution Finance-SE-IDX-Any), released on 2018-09-08.
+    This document describes version 0.002 of Finance::SE::IDX::Any (from
+    Perl distribution Finance-SE-IDX-Any), released on 2018-10-14.
 
 SYNOPSIS
     Use like you would use Finance::SE::IDX.
 
 DESCRIPTION
     This module provides the same functions as Finance::SE::IDX, e.g.
-    "list_idx_firms" and will call the Finance::SE::IDX version but will
+    "list_idx_firms", and will call the Finance::SE::IDX version but will
     fallback for a while (default: 4 hours) to the Finance::SE::IDX::Static
     version when the functions fail.
 
@@ -26,6 +26,9 @@ FUNCTIONS
      list_idx_boards() -> [status, msg, result, meta]
 
     List boards.
+
+    By default caches results for 8 hours (by locally setting
+    CACHE_MAX_AGE). Can be overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
     This function is not exported by default, but exportable.
 
@@ -48,6 +51,9 @@ FUNCTIONS
      list_idx_firms(%args) -> [status, msg, result, meta]
 
     List firms.
+
+    By default caches results for 8 hours (by locally setting
+    CACHE_MAX_AGE). Can be overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
     This function is not exported by default, but exportable.
 
@@ -74,6 +80,9 @@ FUNCTIONS
      list_idx_sectors() -> [status, msg, result, meta]
 
     List sectors.
+
+    By default caches results for 8 hours (by locally setting
+    CACHE_MAX_AGE). Can be overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
     This function is not exported by default, but exportable.
 

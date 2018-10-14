@@ -7,11 +7,11 @@ Sidef::Types::Regex::Regex
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Regex.new(...);
+var obj = Regex(...)
 
 
 =head1 INHERITS
@@ -105,7 +105,7 @@ Regex.to_s() -> I<Obj>
 
 Return the
 
-Aliases: I<dump>
+Aliases: I<dump>, I<to_str>
 
 =cut
 

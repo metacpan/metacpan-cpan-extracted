@@ -86,9 +86,9 @@ is( $resp->code, 202, 'pipeline event response status is 202' )
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
+        'dummy/#test test-repo',
         'pipeline',
-        'test-repo',
+        'Test User',
         '42',
         '* [1 hour, 1 minute and 5 seconds] success',
     )
@@ -111,9 +111,9 @@ is( $resp->code, 202, 'pipeline event response status is 202' ) or diag $resp->a
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
+        'dummy/#test test-rep',
         'pipeline',
-        'test-rep',
+        'Test User',
         '43',
         '* [1 hour, 1 minute and 6 seconds] success (staging: created; build-image: success)',
     )
@@ -132,9 +132,9 @@ is( $resp->code, 202, 'pipeline event response status is 202' ) or diag $resp->a
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
+        'dummy/#test test-rep',
         'pipeline',
-        'test-rep',
+        'Test User',
         '43',
         '* failure',
     )

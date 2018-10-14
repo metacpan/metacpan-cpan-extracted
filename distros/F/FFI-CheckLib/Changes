@@ -1,5 +1,12 @@
 Revision history for FFI-CheckLib
 
+0.22      2018-10-13 22:24:46 -0400
+  - Production version identical to 0.21_01
+
+0.21_01   2018-10-11 22:53:43 -0400
+  - Documentation fixes
+  - Handle DLLs with upper-case characters in extension on MSWin32 (gh#9)
+
 0.20      2018-06-04 18:18:09 -0400
   - Add system_path function.
 

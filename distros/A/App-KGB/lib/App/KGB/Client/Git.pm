@@ -39,6 +39,7 @@ __PACKAGE__->mk_accessors(
 use App::KGB::Change;
 use App::KGB::Commit;
 use App::KGB::Commit::Tag;
+use Encode qw(decode_utf8 encode_utf8 FB_CROAK LEAVE_SRC);
 use IPC::Run;
 
 =head1 NAME
@@ -147,7 +148,7 @@ The default value is C<20>.
 A template for construction of squashed messages. See
 L<App::KGB::Client/message-template> for details.
 
-The default is C<${{author-name}}${ {branch}}${ {commit}}${ {module}}${ {log}}>.
+The default is C<${{module} }${{branch} }${{commit} }${{author-name} }${{log}}>.
 
 =item tag-squash-threshold I<number>
 
@@ -163,7 +164,7 @@ The default value is C<5>.
 A template for construction of squashed tags messages. See
 L<App::KGB::Client/message-template> for details.
 
-The default is C<${{author-name}}${ {module}}${ {log}}>.
+The default is C<${{module} }${{author-name} }${{log}}>.
 
 =item enable-branch-ff-notification I<bool>
 
@@ -189,7 +190,8 @@ sub new {
         "'git_dir' is mandatory; either supply it or define GIT_DIR in the environment";
 
 
-    $self->_git( Git->repository( Repository => $self->git_dir ) );
+    $self->_git(
+        Git->repository( Repository => encode_utf8( $self->git_dir ) ) );
 
     unless ( $self->module ) {
         require Cwd;
@@ -197,6 +199,8 @@ sub new {
         pop @dirs if @dirs and $dirs[-1] eq '.git';
         my $module = $dirs[-1];
         $module =~ s/\.git$// if $module;
+        $module =
+            eval { decode_utf8( $module, FB_CROAK | LEAVE_SRC ) } // $module;
         $self->module($module);
     }
 
@@ -219,15 +223,15 @@ sub new {
     if ( my $smt = $self->_git->config('kgb.squash-message-template') ) {
         $self->squash_msg_template($smt);
     }
-    $self->squash_msg_template('${{author-name}}${ {branch}}${ {commit}}${ {module}}${ {log}}')
+    $self->squash_msg_template('${{module} }${{branch} }${{commit} }${{author-name} }${{log}}')
         unless $self->squash_msg_template;
     if ( my $tsmt = $self->_git->config('kgb.tag-squash-message-template') ) {
         $self->tag_squash_msg_template($tsmt);
     }
     $self->tag_squash_msg_template(
-        '${{author-name} }${{module}}${ {log}}'
+        '${{module} }${{author-name}}${ {log}}'
     ) unless $self->tag_squash_msg_template;
-    $self->branch_ff_msg_template('${{author-name}}${ {branch}}${ {commit}}${ {module}} fast-forward')
+    $self->branch_ff_msg_template('${{module} }${{branch} }${{commit} }${{author-name}} fast-forward')
         unless $self->branch_ff_msg_template;
 
     my $ebfn = $self->_git->config('kgb.enable-branch-ff-notification');
@@ -590,15 +594,15 @@ sub format_git_stat {
 
     while ( length($text) ) {
         warn "$text" if 0;
-        if ( $text =~ s/(.*?)(\d+ files? changed)// ) {
+        if ( $text =~ s/\s*(.*?)(\d+ files? changed)// ) {
             $result .= $1 . $self->colorize( modification => $2 );
             next;
         }
-        if ( $text =~ s/(.*?)(\d+) insertions?\(\++\)// ) {
+        if ( $text =~ s/\s*(.*?)(\d+) insertions?\(\++\)// ) {
             $result .= $1 . $self->colorize( addition => "$2(+)" );
             next;
         }
-        if ( $text =~ s/(.*?)(\d+) deletions?\(-+\)// ) {
+        if ( $text =~ s/\s*(.*?)(\d+) deletions?\(-+\)// ) {
             $result .= $1 . $self->colorize( deletion => "$2(-)" );
             next;
         }

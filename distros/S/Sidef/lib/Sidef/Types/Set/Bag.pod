@@ -1,0 +1,500 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Set::Bag
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+var obj = Bag(...)
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Set::Set
+
+=head1 METHODS
+
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<∩>, I<and>, I<intersection>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<concat>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<∖>, I<diff>, I<difference>
+
+=cut
+
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<to_list>
+
+=cut
+
+=head2 <<
+
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>, I<push>, I<append>
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
+
+=cut
+
+=head2 add_pair
+
+Bag.add_pair() -> I<Obj>
+
+Return the
+
+Aliases: I<push_pair>, I<append_pair>
+
+=cut
+
+=head2 add_pairs
+
+Bag.add_pairs() -> I<Obj>
+
+Return the
+
+Aliases: I<push_pairs>, I<append_pairs>
+
+=cut
+
+=head2 clone
+
+Bag.clone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 collect
+
+Bag.collect() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contains_all
+
+Bag.contains_all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 count
+
+Bag.count() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 count_by
+
+Bag.count_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 delete
+
+Bag.delete() -> I<Obj>
+
+Return the
+
+Aliases: I<remove>, I<discard>
+
+=cut
+
+=head2 delete_all
+
+Bag.delete_all() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_all>, I<discard_all>
+
+=cut
+
+=head2 delete_first_if
+
+Bag.delete_first_if() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 delete_if
+
+Bag.delete_if() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 delete_key
+
+Bag.delete_key() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_key>, I<discard_key>
+
+=cut
+
+=head2 dump
+
+Bag.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each
+
+Bag.each() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_kv
+
+Bag.each_kv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 elems
+
+Bag.elems() -> I<Obj>
+
+Return the
+
+Aliases: I<keys_len>
+
+=cut
+
+=head2 freq
+
+Bag.freq() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grep
+
+Bag.grep() -> I<Obj>
+
+Return the
+
+Aliases: I<select>
+
+=cut
+
+=head2 has
+
+Bag.has() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iter
+
+Bag.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 join
+
+Bag.join() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 keys
+
+Bag.keys() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 kv
+
+Bag.kv() -> I<Obj>
+
+Return the
+
+Aliases: I<pairs>
+
+=cut
+
+=head2 len
+
+Bag.len() -> I<Obj>
+
+Return the
+
+Aliases: I<size>, I<length>
+
+=cut
+
+=head2 map
+
+Bag.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+Bag.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max_by
+
+Bag.max_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Bag.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min_by
+
+Bag.min_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Bag.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 pop
+
+Bag.pop() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 shift
+
+Bag.shift() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sort
+
+Bag.sort() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sort_by
+
+Bag.sort_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_a
+
+Bag.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<expand>, I<to_array>
+
+=cut
+
+=head2 to_bag
+
+Bag.to_bag() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 top
+
+Bag.top() -> I<Obj>
+
+Return the
+
+Aliases: I<most_common>
+
+=cut
+
+=head2 to_set
+
+Bag.to_set() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 uniq
+
+Bag.uniq() -> I<Obj>
+
+Return the
+
+Aliases: I<unique>
+
+=cut
+
+=head2 update_pair
+
+Bag.update_pair() -> I<Obj>
+
+Return the
+
+Aliases: I<replace_pair>
+
+=cut
+
+=head2 update_pairs
+
+Bag.update_pairs() -> I<Obj>
+
+Return the
+
+Aliases: I<replace_pairs>
+
+=cut
+
+=head2 values
+
+Bag.values() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<∪>, I<or>, I<union>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≡
+
+I<Obj> B<≡> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<==>, I<eq>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<⊆>, I<E<lt>=>, I<is_subset>, I<contained_in>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<⊇>, I<E<gt>=>, I<contain>, I<include>, I<contains>, I<includes>, I<is_superset>
+
+=cut

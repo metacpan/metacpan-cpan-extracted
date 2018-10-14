@@ -77,8 +77,8 @@ is( $resp->code, 202, 'commit note event response status is 202' ) or diag $resp
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'nevermore test-repo',
+        'dummy/#test test-repo',
+        'nevermore Test User',
         '* [open] merge request !42:',
         'nope nope',
         '* http://git/merge_requests/42',

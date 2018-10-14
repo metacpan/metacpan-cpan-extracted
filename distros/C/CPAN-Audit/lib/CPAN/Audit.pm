@@ -2,11 +2,13 @@ package CPAN::Audit;
 use 5.008001;
 use strict;
 use warnings;
-use Module::CPANfile;
+use CPAN::Audit::Installed;
+use CPAN::Audit::Discover;
 use CPAN::Audit::Version;
+use CPAN::Audit::Query;
 use CPAN::Audit::DB;
 
-our $VERSION = "0.02";
+our $VERSION = "0.04";
 
 sub new {
     my $class = shift;
@@ -25,6 +27,10 @@ sub new {
         $self->{no_color} = 1;
     }
 
+    $self->{db}       = CPAN::Audit::DB->db;
+    $self->{query}    = CPAN::Audit::Query->new( db => $self->{db} );
+    $self->{discover} = CPAN::Audit::Discover->new( db => $self->{db} );
+
     return $self;
 }
 
@@ -32,34 +38,32 @@ sub command {
     my $self = shift;
     my ( $command, @args ) = @_;
 
-    my @dists;
+    my %dists;
 
     if ( $command eq 'module' ) {
         my ( $module, $version_range ) = @args;
         $self->error("Usage: module <module> [version-range]") unless $module;
 
-        my $release = CPAN::Audit::DB->db->{module2dist}->{$module};
-        my $dist = $release ? CPAN::Audit::DB->db->{dists}->{$release} : undef;
+        my $distname = $self->{db}->{module2dist}->{$module};
 
-        if ( !$dist ) {
-            $self->output("__GREEN__$module is not in database");
-            return;
+        if ( !$distname ) {
+            $self->stdout("__GREEN__Module '$module' is not in database");
+            return 0;
         }
 
-        $self->query( $dist, $version_range );
+        $dists{$distname} = $version_range || '';
     }
-    elsif ( $command eq 'release' ) {
-        my ( $release, $version_range ) = @args;
-        $self->error("Usage: release <module> [version-range]") unless $release;
+    elsif ( $command eq 'release' || $command eq 'dist' ) {
+        my ( $distname, $version_range ) = @args;
+        $self->error("Usage: dist|release <module> [version-range]")
+          unless $distname;
 
-        my $dist = CPAN::Audit::DB->db->{dists}->{$release};
-
-        if ( !$dist ) {
-            $self->output("$release is not in database");
-            return;
+        if ( !$self->{db}->{dists}->{$distname} ) {
+            $self->stdout("__GREEN__Distribution '$distname' is not in database");
+            return 0;
         }
 
-        $self->query( $dist, $version_range );
+        $dists{$distname} = $version_range || '';
     }
     elsif ( $command eq 'show' ) {
         my ($advisory_id) = @args;
@@ -68,7 +72,7 @@ sub command {
         my ($release) = $advisory_id =~ m/^CPANSA-(.*?)-(\d+)-(\d+)$/;
         $self->error("Invalid advisory id") unless $release;
 
-        my $dist = CPAN::Audit::DB->db->{dists}->{$release};
+        my $dist = $self->{db}->{dists}->{$release};
         $self->error("Unknown advisory id") unless $dist;
 
         my ($advisory) =
@@ -77,6 +81,8 @@ sub command {
 
         local $self->{verbose} = 1;
         $self->print_advisory($advisory);
+
+        return 0;
     }
     elsif ( $command eq 'dependencies' || $command eq 'deps' ) {
         my ($path) = @args;
@@ -84,45 +90,70 @@ sub command {
 
         $self->error("Usage: deps <path>") unless -d $path;
 
-        if (-f "$path/cpanfile") {
-            my $cpanfile = Module::CPANfile->load("$path/cpanfile");
+        my @deps = $self->{discover}->discover($path);
 
-            my $prereqs = $cpanfile->prereqs->as_string_hash;
+        $self->stdout( 'Discovered %d dependencies', scalar(@deps) );
 
-            my @deps;
-            foreach my $phase (keys %$prereqs) {
-                foreach my $type (keys %{ $prereqs->{$phase} }) {
-                    foreach my $module (keys %{ $prereqs->{$phase}->{$type} }) {
-                        my $version = $prereqs->{$phase}->{$type}->{$module};
+        foreach my $dep (@deps) {
+            my $dist = $dep->{dist}
+              || $self->{db}->{module2dist}->{ $dep->{module} };
+            next unless $dist;
 
-                        next if $module eq 'perl';
+            $dists{$dist} = $dep->{version};
+        }
+    }
+    elsif ( $command eq 'installed' ) {
+        $self->stdout('Collecting all installed modules. This can take a while...');
 
-                        push @deps,
-                          {
-                            module       => $module,
-                            version      => $version,
-                            phase        => $phase,
-                            relationship => $type,
-                          };
-                    }
-                }
-            }
+        my @deps = CPAN::Audit::Installed->new( db => $self->{db} )->find(@ARGV);
 
-            $self->output('Analyzed %d deps', scalar(@deps));
+        foreach my $dep (@deps) {
+            my $dist = $dep->{dist}
+              || $self->{db}->{module2dist}->{ $dep->{module} };
+            next unless $dist;
 
-            foreach my $dep (@deps) {
-                my $release = CPAN::Audit::DB->db->{module2dist}->{$dep->{module}};
-                next unless $release;
-
-                my $dist = CPAN::Audit::DB->db->{dists}->{$release};
-                next unless $dist;
-
-                $self->query( $dist, $dep->{version} );
-            }
+            $dists{ $dep->{dist} } = $dep->{version};
         }
     }
     else {
         $self->error("Error: unknown command: $command. See -h");
+    }
+
+    my $total_advisories = 0;
+
+    if (%dists) {
+        my $query = $self->{query};
+
+        foreach my $distname ( sort keys %dists ) {
+            my $version_range = $dists{$distname};
+
+            my @advisories = $query->advisories_for( $distname, $version_range );
+
+            $version_range = 'Any'
+              if $version_range eq '' || $version_range eq '0';
+
+            if (@advisories) {
+                $self->stdout( '__RED__%s (requires %s) has %d advisories__RESET__',
+                    $distname, $version_range, scalar(@advisories) );
+
+                foreach my $advisory (@advisories) {
+                    $self->print_advisory($advisory);
+                }
+            }
+
+            $total_advisories += @advisories;
+        }
+    }
+
+    if ($total_advisories) {
+        $self->stdout( '__RED__Total advisories found: %d__RESET__', $total_advisories );
+
+        return $total_advisories;
+    }
+    else {
+        $self->stdout('__GREEN__No advisories found__RESET__');
+
+        return 0;
     }
 }
 
@@ -130,13 +161,57 @@ sub error {
     my $self = shift;
     my ( $msg, @args ) = @_;
 
-    $self->output( "Error: $msg", @args );
+    $self->stderr( "Error: $msg", @args );
     exit 255;
 }
 
-sub output {
+sub stdout {
     my $self = shift;
-    my ( $format, @params ) = @_;
+
+    $self->_print( *STDOUT, @_ );
+}
+
+sub stderr {
+    my $self = shift;
+
+    $self->_print( *STDERR, @_ );
+}
+
+sub print_advisory {
+    my $self = shift;
+    my ($advisory) = @_;
+
+    $self->stdout("  __BOLD__* $advisory->{id}");
+
+    print "    $advisory->{description}\n";
+
+    if ( $advisory->{affected_versions} ) {
+        print "    Affected range: $advisory->{affected_versions}\n";
+    }
+
+    if ( $advisory->{fixed_versions} ) {
+        print "    Fixed range: $advisory->{fixed_versions}\n";
+    }
+
+    if ( $advisory->{cves} ) {
+        print "\n    CVEs: ";
+        print join ', ', @{ $advisory->{cves} };
+        print "\n";
+    }
+
+    if ( $advisory->{references} ) {
+        print "\n    References:\n";
+        foreach my $reference ( @{ $advisory->{references} || [] } ) {
+            print "    $reference\n";
+        }
+    }
+
+    print "\n";
+}
+
+sub _print {
+    my $self = shift;
+    my ( $fh, $format, @params ) = @_;
 
     my $msg = @params ? ( sprintf( $format, @params ) ) : ($format);
 
@@ -155,99 +230,7 @@ sub output {
         $msg .= "\e[0m";
     }
 
-    print "$msg\n";
-}
-
-sub query {
-    my $self = shift;
-    my ( $dist, $version_range ) = @_;
-
-    my @advisories = @{ $dist->{advisories} };
-    my @versions   = @{ $dist->{versions} };
-
-    if ( !$version_range ) {
-        $self->output( "__RED__[!] Available %d %s\n",
-            scalar(@advisories), @advisories > 1 ? 'advisories' : 'advisory' );
-
-        foreach my $advisory (@advisories) {
-            $self->print_advisory($advisory);
-        }
-
-        return;
-    }
-
-    my $version_checker = CPAN::Audit::Version->new;
-
-    my @all_versions = map { $_->{version} } @versions;
-    my @selected_versions;
-
-    foreach my $version (@all_versions) {
-        if ( $version_checker->in_range( $version, $version_range ) ) {
-            push @selected_versions, $version;
-        }
-    }
-
-    if ( !@selected_versions ) {
-        $self->output("Not versions available for this range");
-        return;
-    }
-
-    my @matched_advisories;
-    foreach my $advisory (@advisories) {
-        my @affected_versions = $version_checker->affected_versions(
-            [ map { $_->{version} } @versions ],
-            $advisory->{affected_versions}
-        );
-        next unless @affected_versions;
-
-        foreach my $affected_version ( reverse @affected_versions ) {
-            if ( $version_checker->in_range( $affected_version, $version_range )
-              )
-            {
-                push @matched_advisories, $advisory;
-                last;
-            }
-        }
-    }
-
-    if ( !@matched_advisories ) {
-        $self->output("No advisories for this version range");
-        return;
-    }
-
-    if ( $self->{verbose} ) {
-        $self->output(
-            "Selected %d versions: %s\n",
-            scalar(@selected_versions),
-            join( ', ', @selected_versions )
-        );
-    }
-    else {
-        $self->output( "Selected %d versions\n", scalar(@selected_versions) );
-    }
-
-    $self->output(
-        "__RED__[!]__RESET__ Found %d %s:\n",
-        scalar(@matched_advisories),
-        @matched_advisories > 1 ? 'advisories' : 'advisory'
-    );
-
-    foreach my $matched_advisory (@matched_advisories) {
-        $self->print_advisory($matched_advisory);
-    }
-}
-
-sub print_advisory {
-    my $self = shift;
-    my ($advisory) = @_;
-
-    $self->output("  __BOLD__* $advisory->{id}");
-
-    if ( $self->{verbose} ) {
-        print "    $advisory->{description}\n";
-        print "    Affected range: $advisory->{affected_versions}\n";
-        print "\n";
-    }
+    print $fh "$msg\n";
 }
 
 1;
@@ -278,5 +261,9 @@ it under the same terms as Perl itself.
 =head1 AUTHOR
 
 Viacheslav Tykhanovskyi E<lt>viacheslav.t@gmail.comE<gt>
+
+=head1 CREDITS
+
+Takumi Akiyama (github.com/akiym)
 
 =cut

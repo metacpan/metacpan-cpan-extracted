@@ -7,11 +7,11 @@ Sidef::Time::Gmtime
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Gmtime.new(...);
+var obj = Gmtime(...)
 
 
 =head1 INHERITS
@@ -22,14 +22,6 @@ Inherits methods from:
 
 =head1 METHODS
 
-
-=head2 ctime
-
-Gmtime.ctime() -> I<Obj>
-
-Return the
-
-=cut
 
 =head2 day
 
@@ -86,6 +78,16 @@ Gmtime.strf() -> I<Obj>
 Return the
 
 Aliases: I<format>, I<strftime>
+
+=cut
+
+=head2 to_s
+
+Gmtime.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<ctime>, I<to_str>
 
 =cut
 

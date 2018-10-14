@@ -70,8 +70,8 @@ is( $resp->code, 202, 'build event response status is 202' ) or diag $resp->as_s
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'builds test-repo',
+        'dummy/#test test-repo',
+        'builds Test User',
         '* Build #42 (Marvin) stage: final, status: created',
     )
 );

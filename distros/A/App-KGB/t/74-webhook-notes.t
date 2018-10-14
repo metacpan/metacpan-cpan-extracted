@@ -78,8 +78,8 @@ is( $resp->code, 202, 'commit note event response status is 202' ) or diag $resp
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'test-repo',
+        'dummy/#test test-repo',
+        'Test User',
         '42',
         '* commented commit 4242424',
         '* http://git/commits/424242424242#note42',
@@ -104,8 +104,8 @@ is( $resp->code, 202, 'merge request note event response status is 202' ) or dia
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'test-repo',
+        'dummy/#test test-repo',
+        'Test User',
         '42',
         '* commented merge request !4242',
         '* http://git/merge_requests/4242#note42',
@@ -130,8 +130,8 @@ is( $resp->code, 202, 'issue note event response status is 202' ) or diag $resp-
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'test-repo',
+        'dummy/#test test-repo',
+        'Test User',
         '42',
         '* commented issue #4242',
         '* http://git/issues/4242#note42',
@@ -156,8 +156,8 @@ is( $resp->code, 202, 'code snippet note event response status is 202' ) or diag
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test User',
-        'test-repo',
+        'dummy/#test test-repo',
+        'Test User',
         '42',
         '* commented snippet #4242',
         '* http://git/snippets/4242#note42',

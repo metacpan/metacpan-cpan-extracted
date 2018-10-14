@@ -36,7 +36,7 @@
    "provides" : {
       "Math::GComplex" : {
          "file" : "lib/Math/GComplex.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "url" : "https://github.com/trizen/Math-GComplex"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

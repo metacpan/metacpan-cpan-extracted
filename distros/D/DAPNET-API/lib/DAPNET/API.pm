@@ -41,7 +41,7 @@ Simon (G7RZU) <simon@gb7fr.org.uk>
 
 use vars qw($VERSION);
 #Define version
-$VERSION = '0.5';
+$VERSION = '0.8';
 
 =head1 METHODS
 
@@ -55,6 +55,7 @@ my($dapnetobj) = DAPNET::API->new({
     DAPNET_USERNAME => '<username>',
     DAPNET_PW       => '<password>',
     CALLSIGN        => '<your callsign>'
+    DEBUG           => [0|1]
 });
 
 returns an object if sucessful or false if not sucessful
@@ -80,6 +81,7 @@ sub _build_request {
     my($username) = $self->{DAPNET_USERNAME};
     my($pw) = $self->{DAPNET_PW};
     my($uri) = 'http://www.hampager.de:8080/'.$type;
+    print("Building HTTP request\n") if($self->{DEBUG});
     my($req) = HTTP::Request->new(
                 POST => $uri
 	             );
@@ -96,19 +98,21 @@ sub _json_individual_call {
     my($self) = shift;
     my($text,$to,$txgroup,$emergency) = @_;
     my($jsonobj) = JSON->new;
-
+    print("Building JSON for individual call\n") if($self->{DEBUG});
     my $json = $jsonobj->encode ({
                     'text' => $text,
                     'callSignNames' => [$to],
                     'transmitterGroupNames' => [$txgroup],
                     'emergency' => $emergency
             });
+    print("JSON:\n\n$json\n") if($self->{DEBUG});    
     return($json);
 };
 
 sub _json_rubric_content {
     my($self) = shift;
     my($text,$rubric,$number) = @_;
+print("Building JSON for rubric\n") if($self->{DEBUG}); 
     my($jsonobj) = JSON->new;
 
     my $json = $jsonobj->encode ({
@@ -116,6 +120,7 @@ sub _json_rubric_content {
                     'rubricName'=> $rubric,
                     'number'    => $number
             });
+    print("JSON:\n\n$json\n")if($self->{DEBUG});   
     return($json);
 };
 
@@ -129,6 +134,7 @@ sub _json_rubric_content {
 
 sub json_response {
     my($self) = shift;
+    print("Return JSON response\n") if($self->{DEBUG});
     return($self->{_JSONRESPONSEREF});
 };
 
@@ -146,33 +152,40 @@ sub send_individual_call {
 
     my $self = shift;
     my($text,$to,$txgroup,$emergency) = @_;
-    
+    print("Send individual call\n") if($self->{DEBUG});
     my($ua) = LWP::UserAgent->new;
     my($jsonresobj) = JSON->new;
     my($i) = 1;
     my($json);
-    
-    if (length($text) <= (80 - $self->{_CALL_LEN})) { 
+    print("substr length: ".length($text)."\n") if($self->{DEBUG});
+    if (length($text) <= (79 - $self->{_CALL_LEN})) { 
         my($json) = $self->_json_individual_call($self->{CALLSIGN}.':'.$text,$to,$txgroup,$emergency);
         my($req) = $self->_build_request($json,'calls');    
         my($res) = $ua->request($req);
-        $self->{_JSONRESPONSEREF} = $jsonresobj->decode($res->decoded_content);
+        print('Request status line: '.$res->status_line."\n") if($self->{DEBUG}) ;
         if (!$res->is_success) {
             return($res->status_line);
         };
+        print('JSON Response: '.$res->decoded_content."\n") if($self->{DEBUG});
+        $self->{_JSONRESPONSEREF} = $jsonresobj->decode($res->decoded_content);
     } else {
-        while (my $substr = substr($text,0,(80 - $self->{_CALL_LEN}),'')) {
+        while (my $substr = substr($text,0,(76 - $self->{_CALL_LEN}),'')) {
             if ($i == 1) {
+                print("substr begining: $substr \n") if($self->{DEBUG});
                 $json = $self->_json_individual_call($self->{CALLSIGN}.':'.$substr.'...',$to,$txgroup,$emergency);
             } else {
+                print("substr next: $substr \n") if($self->{DEBUG});
                 $json = $self->_json_individual_call($self->{CALLSIGN}.':'.'...'.$substr,$to,$txgroup,$emergency);
             };
-            my($req) = $self->_build_request($json);    
-           my($res) = $ua->request($req);
-           $self->{_JSONRESPONSEREF} = $jsonresobj->decode($res->decoded_content);
-           if (!$res->is_success) {
+            my($req) = $self->_build_request($json,'calls');    
+            my($res) = $ua->request($req);
+            print('Request status line: '.$res->status_line."\n") if($self->{DEBUG});
+            if (!$res->is_success) {
                return($res->status_line);
            };
+           print('JSON Response: '.$res->decoded_content."\n") if($self->{DEBUG});
+           $self->{_JSONRESPONSEREF} = $jsonresobj->decode($res->decoded_content);
+    
             $i++;
         };
     
@@ -197,32 +210,42 @@ Returns 0 on sucess or the HTTP error string on error.
 sub send_rubric_content {
    my $self = shift;
     my($text,$rubric,$number) = @_;
+    print("Send rubric\n") if($self->{DEBUG});
     my($jsonresobj) = JSON->new;
     my($ua) = LWP::UserAgent->new;
+    $ua->timeout(20);
     my($i) = 1;
     my($json);
-    
-    if (length($text) <= (80 - $self->{_CALL_LEN})) { 
+    print("substr length: ".length($text)."\n") if($self->{DEBUG});
+    if (length($text) <= (79 - $self->{_CALL_LEN})) { 
         my($json) = $self->_json_rubric_content($self->{CALLSIGN}.':'.$text,$rubric,$number);
         my($req) = $self->_build_request($json,'news');    
         my($res) = $ua->request($req);
-        $self->{_JSONRESPONSEREF} = $jsonresobj->decode($res->decoded_content);
+        print('Request status line: '.$res->status_line."\n") if($self->{DEBUG});
         if (!$res->is_success) {
             return($res->status_line);
         };
+        print('JSON Response: '.$res->decoded_content."\n") if($self->{DEBUG});
+        $self->{_JSONRESPONSEREF} = $jsonresobj->decode($res->decoded_content);
+        
     } else {
-        while (my $substr = substr($text,0,(80 - $self->{_CALL_LEN}),'')) {
+        while (my $substr = substr($text,0,(76 - $self->{_CALL_LEN}),'')) {
             if ($i == 1) {
-                $json = $self->_json_rubrik_content($self->{CALLSIGN}.':'.$substr.'...',$rubric,$number);
+                print("substr begining: $substr \n") if($self->{DEBUG});
+                $json = $self->_json_rubric_content($self->{CALLSIGN}.':'.$substr.'...',$rubric,$number);
             } else {
-                $json = $self->_json_rubrik_content($self->{CALLSIGN}.':'.'...'.$substr,$rubric,$number);
+                print("substr next: $substr \n") if($self->{DEBUG});
+                $json = $self->_json_rubric_content($self->{CALLSIGN}.':'.'...'.$substr,$rubric,$number);
             };
-            my($req) = $self->_build_request($json);    
+            my($req) = $self->_build_request($json,'news');    
             my($res) = $ua->request($req);
-            $self->{_JSONRESPONSEREF} = $jsonresobj->decode($res->decoded_content);
+            print('Request status line: '.$res->status_line."\n") if($self->{DEBUG});
             if (!$res->is_success) {
                return($res->status_line);
            };
+            print('JSON Response: '.$res->decoded_content."\n") if($self->{DEBUG});
+            $self->{_JSONRESPONSEREF} = $jsonresobj->decode($res->decoded_content);
+
             $i++;
         };
     

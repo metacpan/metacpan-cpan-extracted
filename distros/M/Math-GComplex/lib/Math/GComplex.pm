@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use overload
   '""' => \&stringify,
@@ -184,6 +184,24 @@ use overload
     }
 }
 
+#
+## Be somewhat compatible with Math::Complex
+#
+
+sub _cartesian {
+    my ($self) = @_;
+    $self->{cartesian} //= [$self->{a}, $self->{b}];
+}
+
+sub _polar {
+    my ($self) = @_;
+    $self->{polar} //= [CORE::sqrt($self->{a} * $self->{a} + $self->{b} * $self->{b}), CORE::atan2($self->{b}, $self->{a})];
+}
+
+#
+## Create a new Math::GComplex object
+#
+
 sub new {
     my ($class, $x, $y) = @_;
 
@@ -192,6 +210,8 @@ sub new {
            b => $y // 0,
           }, $class;
 }
+
+*make = \&new;
 
 #
 ## cplx(a, b) = a + b*i
@@ -203,6 +223,29 @@ sub cplx {
     bless {
            a => $x // 0,
            b => $y // 0,
+          },
+      __PACKAGE__;
+}
+
+sub emake {
+    my ($class, $r, $theta) = @_;
+
+    bless {
+           a => ($r // 0) * CORE::cos($theta // 0),
+           b => ($r // 0) * CORE::sin($theta // 0),
+          }, $class;
+}
+
+#
+## cplxe(r, theta) = r*cos(theta) + r*sin(theta)*i
+#
+
+sub cplxe {
+    my ($r, $theta) = @_;
+
+    bless {
+           a => ($r // 0) * CORE::cos($theta // 0),
+           b => ($r // 0) * CORE::sin($theta // 0),
           },
       __PACKAGE__;
 }

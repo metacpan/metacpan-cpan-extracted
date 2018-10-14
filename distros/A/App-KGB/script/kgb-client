@@ -222,7 +222,7 @@ my ($conf_file,      $uri,        $proxy,
 # defaults
 $single_line_commits = 'auto';
 $use_color           = 1;
-$msg_template = '${{author-name} }${{branch} }${{commit} }${{module}}${ {changes}}${ {log-first-line}}${ * {web-link}}';
+$msg_template = '${{module}} ${{branch} }${{commit} }${{author-name} }${{changes}}${ {log-first-line}}${ * {web-link}}';
 # multi-line notifications
 # $msg_template = '${{author-name} }${{branch} }${{commit} }${{module}}${ {changes}}${ * {web-link}}
 # ${{log}}';

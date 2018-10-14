@@ -86,14 +86,14 @@ in_wd "svn add $tf";
 in_wd "svn ci -m 'add file'";
 
 TestBot->expect(
-    "dummy/#test ${TestBot::COMMIT_USER} 1 12test/ 03/file add file * 14http://scm.host.org///?commit=1"
+    "dummy/#test 12test/ 1 ${TestBot::COMMIT_USER} 03/file add file * 14http://scm.host.org///?commit=1"
 );
 
 poke('two');
 in_wd "svn ci -m 'modify file'";
 
 TestBot->expect(
-    "dummy/#test ${TestBot::COMMIT_USER} 2 12test/ 10/file modify file * 14http://scm.host.org///?commit=2"
+    "dummy/#test 12test/ 2 ${TestBot::COMMIT_USER} 10/file modify file * 14http://scm.host.org///?commit=2"
 );
 
 in_wd "svn rm file";
@@ -102,7 +102,7 @@ in_wd "svn add file";
 in_wd "svn ci -m 'replace file'";
 
 TestBot->expect(
-    "dummy/#test ${TestBot::COMMIT_USER} 3 12test/ 05/file replace file * 14http://scm.host.org///?commit=3"
+    "dummy/#test 12test/ 3 ${TestBot::COMMIT_USER} 05/file replace file * 14http://scm.host.org///?commit=3"
 );
 
 ok( 1, "Test repository prepared" );
@@ -183,9 +183,11 @@ SKIP: {
     in_wd "svn rm file";
     in_wd "svn ci -m 'remove file. Über cool with cyrillics: здрасти'";
 
-    TestBot->expect( "dummy/#test "
+    TestBot->expect( "dummy/#test"
+        ." 12test/ "
+        . "4 "
         . ${TestBot::COMMIT_USER}
-        . " 4 12test/ 04/file "
+        . " 04/file "
         . "remove file. Über cool with cyrillics: здрасти "
         . "* 14http://scm.host.org///?commit=4");
 

@@ -1,7 +1,7 @@
 package Dancer::Serializer::Abstract;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Base serialiser class for Dancer
-$Dancer::Serializer::Abstract::VERSION = '1.3400';
+$Dancer::Serializer::Abstract::VERSION = '1.3500';
 use strict;
 use warnings;
 use Carp;
@@ -41,7 +41,7 @@ Dancer::Serializer::Abstract - Base serialiser class for Dancer
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 AUTHOR
 

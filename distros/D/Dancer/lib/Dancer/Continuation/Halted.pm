@@ -1,7 +1,7 @@
 package Dancer::Continuation::Halted;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Halted internal exception class for Dancer
-$Dancer::Continuation::Halted::VERSION = '1.3400';
+$Dancer::Continuation::Halted::VERSION = '1.3500';
 use strict;
 use warnings;
 use Carp;
@@ -22,7 +22,7 @@ Dancer::Continuation::Halted - Halted internal exception class for Dancer
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
 package Dancer::Session::YAML;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: YAML-file-based session backend for Dancer
-$Dancer::Session::YAML::VERSION = '1.3400';
+$Dancer::Session::YAML::VERSION = '1.3500';
 use strict;
 use warnings;
 use Carp;
@@ -69,7 +69,7 @@ sub retrieve {
 
     my $session_file = yaml_file($id);
 
-    return unless -f $session_file;
+    return unless defined $session_file && -f $session_file;
 
     open my $fh, '+<', $session_file or die "Can't open '$session_file': $!\n";
     my $content = YAML::LoadFile($fh);
@@ -86,6 +86,7 @@ sub yaml_file {
     # Untaint Session ID before using it in file actions
     # required when running under Perl Taint mode
     $id =~ m/^([\d]*)$/;
+    return unless $1;
     my $yaml_file = "$1.yml";
 
     return path(setting('session_dir'), $yaml_file);
@@ -122,7 +123,7 @@ Dancer::Session::YAML - YAML-file-based session backend for Dancer
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 DESCRIPTION
 

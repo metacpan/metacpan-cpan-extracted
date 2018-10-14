@@ -139,6 +139,7 @@ sub stringify {
                 $string = $self->_html_french_punctuation($string);
                 $string = $self->escape_all_html($string);
                 $string =~ s/\x{a0}/&#160;/g; # make them visible
+                $string =~ s/\x{202f}/&#8239;/g; # ditto
                 return $string;
             }
             else {
@@ -372,19 +373,20 @@ sub _ltx_replace_slash {
 sub _html_french_punctuation {
     my ($self, $string) = @_;
 
-    # here we could use \x{202f}, but seems buggy, plus on readers is
-    # unclear how it will rendered. However, keep them separate for now
+    # try the #
 
     # optional space, punct, and then either space or end of line
-    $string =~ s/[\x{20}\x{a0}]*([;!?])(?=[\x{20}])/\x{a0}$1/gs;
-    $string =~ s/[\x{20}\x{a0}]*([;!?])$/\x{a0}$1/gms;
+    my $chars = qr{[\x{20}\x{a0}\x{202f}\(\)\[\]\.\,\:«»\;\!\?]};
+    my $ws = qr{[\x{20}\x{a0}\x{202f}]};
+    $string =~ s/$ws*([;!?])(?=$chars)/\x{202f}$1/gs;
+    $string =~ s/$ws*([;!?])$/\x{202f}$1/gms;
 
     # ditto
-    $string =~ s/[\x{20}\x{a0}]*([:»])(?=[\x{20}])/\x{a0}$1/gs;
-    $string =~ s/[\x{20}\x{a0}]*([:»])$/\x{a0}$1/gms;
+    $string =~ s/$ws*([:»])(?=$chars)/\x{a0}$1/gs;
+    $string =~ s/$ws*([:»])$/\x{a0}$1/gms;
 
-    # easy: always add
-    $string =~ s/«[\x{20}\x{a0}]*/«\x{a0}/gs;
+    $string =~ s/^«$ws*/«\x{a0}/gms;
+    $string =~ s/(?<=$chars)«$ws*/«\x{a0}/gs;
     return $string;
 }
 

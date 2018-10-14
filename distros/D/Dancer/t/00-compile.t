@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 71 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 72 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Dancer.pm',
@@ -78,7 +78,8 @@ my @module_files = (
     'Dancer/Template/Simple.pm',
     'Dancer/Template/TemplateToolkit.pm',
     'Dancer/Test.pm',
-    'Dancer/Timer.pm'
+    'Dancer/Timer.pm',
+    'HTTP/Tiny/NoProxy.pm'
 );
 
 my @scripts = (

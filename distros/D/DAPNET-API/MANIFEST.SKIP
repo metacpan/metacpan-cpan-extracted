@@ -2,6 +2,3 @@
 .svn/$
 .bak$
 .old$
-lib/DAPNET/Metoffice.pm
-send-rubrik-test.pl
-warnings_test.pl

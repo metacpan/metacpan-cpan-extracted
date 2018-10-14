@@ -3,6 +3,7 @@ abstract: 'Audit CPAN distributions for known vulnerabilities'
 author:
   - 'Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>'
 build_requires:
+  Capture::Tiny: '0'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,16 +27,30 @@ no_index:
 provides:
   CPAN::Audit:
     file: lib/CPAN/Audit.pm
-    version: '0.02'
+    version: '0.04'
+  CPAN::Audit::Discover:
+    file: lib/CPAN/Audit/Discover.pm
+  CPAN::Audit::Discover::Cpanfile:
+    file: lib/CPAN/Audit/Discover/Cpanfile.pm
+  CPAN::Audit::Discover::CpanfileSnapshot:
+    file: lib/CPAN/Audit/Discover/CpanfileSnapshot.pm
+  CPAN::Audit::Installed:
+    file: lib/CPAN/Audit/Installed.pm
+  CPAN::Audit::Query:
+    file: lib/CPAN/Audit/Query.pm
   CPAN::Audit::Version:
     file: lib/CPAN/Audit/Version.pm
 requires:
+  CPAN::DistnameInfo: '0'
   Module::CPANfile: '0'
   perl: '5.008001'
+  version: '0'
 resources:
   bugtracker: https://github.com/vti/cpan-audit/issues
   homepage: https://github.com/vti/cpan-audit
   repository: git://github.com/vti/cpan-audit.git
-version: '0.02'
+version: '0.04'
 x_authority: cpan:VTI
+x_contributors:
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

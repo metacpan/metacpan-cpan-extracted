@@ -1,0 +1,55 @@
+{
+   "abstract" : "Log DBI::Profile data into Log::Any or Log4perl",
+   "author" : [
+      "Bjoern Hoehrmann <bjoern@hoehrmann.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-LogProfile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      },
+      "test" : {
+         "requires" : {
+            "DBI::Profile" : "0",
+            "Log::Any" : "1.050",
+            "Sub::Util" : "1.40",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hoehrmann/DBIx-LogProfile.git",
+         "web" : "https://github.com/hoehrmann/DBIx-LogProfile"
+      }
+   },
+   "version" : 0.02,
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

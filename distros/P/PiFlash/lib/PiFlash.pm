@@ -13,11 +13,11 @@ use File::Basename; # included with perl
 use File::LibMagic; # rpm: "dnf install perl-File-LibMagic", deb: "apt-get install libfile-libmagic-perl"
 
 package PiFlash;
-$PiFlash::VERSION = '0.0.3';
+$PiFlash::VERSION = '0.0.4';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Getopt::Long; # included with perl
 
-# ABSTRACT: command-line processing for piflash script to flash SD card for Raspberry Pi
+# ABSTRACT: Raspberry Pi SD-flashing script with safety checks to avoid erasing the wrong device
 
 
 # print program usage message
@@ -272,11 +272,11 @@ __END__
 
 =head1 NAME
 
-PiFlash - command-line processing for piflash script to flash SD card for Raspberry Pi
+PiFlash - Raspberry Pi SD-flashing script with safety checks to avoid erasing the wrong device
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 

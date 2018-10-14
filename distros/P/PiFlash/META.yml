@@ -1,5 +1,5 @@
 ---
-abstract: 'command-line processing for piflash script to flash SD card for Raspberry Pi'
+abstract: 'Raspberry Pi SD-flashing script with safety checks to avoid erasing the wrong device'
 author:
   - 'Ian Kluft <cpan-dev@iankluft.com>'
 build_requires:
@@ -27,5 +27,8 @@ requires:
   perl: v5.18.0
   strict: '0'
   warnings: '0'
-version: 0.0.3
+resources:
+  homepage: https://github.com/ikluft/piflash
+  repository: https://github.com/ikluft/piflash.git
+version: 0.0.4
 x_serialization_backend: 'YAML::Tiny version 1.73'

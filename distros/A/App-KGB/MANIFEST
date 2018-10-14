@@ -56,6 +56,7 @@ t/54-client-git-squash.t
 t/55-client-git-merges-ff.t
 t/56-client-git-ff-merge-2.t
 t/57-client-git-squash-tags.t
+t/58-client-git-unicode.t
 t/70-webhook-push.t
 t/71-webhook-push_tag.t
 t/72-webhook-wiki_page.t

@@ -22,7 +22,7 @@ our @EXPORT_OK = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
 our $system_path = [];
@@ -61,7 +61,7 @@ elsif($os eq 'msys')
 }
 elsif($os eq 'MSWin32')
 {
-  $pattern = [ qr{^(?:lib)?(.*?)(?:-([0-9])+)?\.dll$} ];
+  $pattern = [ qr{^(?:lib)?(.*?)(?:-([0-9])+)?\.dll$}i ];
 }
 elsif($os eq 'darwin')
 {
@@ -344,7 +344,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.20
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -431,7 +431,7 @@ Example:
  use FFI::Platypus;
  
  my($lib) = find_lib(
-   name => 'foo',
+   lib => 'foo',
    verify => sub {
      my($name, $libpath) = @_;
      
@@ -566,6 +566,8 @@ Contributors:
 Bakkiaraj Murugesan (bakkiaraj)
 
 Dan Book (grinnz, DBOOK)
+
+Ilya Pavlov (Ilya, ILUX)
 
 =head1 COPYRIGHT AND LICENSE
 

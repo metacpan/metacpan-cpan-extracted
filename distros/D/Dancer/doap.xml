@@ -301,6 +301,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Damyan Ivanov</foaf:name>
+      <foaf:mbox rdf:resource="mailto:dmn@debian.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Dan Book</foaf:name>
       <foaf:mbox rdf:resource="mailto:grinnz@gmail.com" />
     </foaf:Person>
@@ -916,6 +922,12 @@
     <foaf:Person>
       <foaf:name>Perlover</foaf:name>
       <foaf:mbox rdf:resource="mailto:perlover@perlover.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Phil Carmody</foaf:name>
+      <foaf:mbox rdf:resource="mailto:pc+github@asdf.org" />
     </foaf:Person>
   </helper>
   <helper>
@@ -2061,6 +2073,30 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3301</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-02-16</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3400</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-06-15T23:08:34+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3401</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-10-01T12:49:53+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3402</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-10-10T11:42:07+01:00</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.3403</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-10-11T23:41:11+01:00</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

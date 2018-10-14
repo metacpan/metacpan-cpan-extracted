@@ -24,8 +24,8 @@ our $USER = $info[0];
 
 our $COMMIT_USER
     = $USER_NAME
-    ? "03${USER_NAME} (03${USER})"
-    : "03${USER} (03${USER})";
+    ? "06${USER_NAME} (06${USER})"
+    : "06${USER} (06${USER})";
 
 sub start {
     my $class = shift;
@@ -149,7 +149,7 @@ password: "truely secret"
 timeout: 15
 servers:
  - uri: http://$addr:$port/
-message-template: "\${{author-name} }\${({author-login})}\${ {branch}}\${ {commit}}\${ {project}/}\${{module}}\${ {changes}}\${ {log-first-line}}\${ * {web-link}}"
+message-template: "\${{project}/}\${{module}}\${ {branch}}\${ {commit}}\${ {author-name}}\${ ({author-login})}\${ {changes}}\${ {log-first-line}}\${ * {web-link}}"
 status-dir: $dir
 batch-messages: 1
 EOF

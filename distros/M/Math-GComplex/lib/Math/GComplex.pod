@@ -6,7 +6,7 @@ Math::GComplex - Generic complex number library.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -83,17 +83,30 @@ Nothing is exported by default.
 
 =head1 INITIALIZATION
 
-=head2 new
+=head2 new / make
 
     my $z = Math::GComplex->new($real, $imag);
+    my $z = Math::GComplex->make($real, $imag);
 
-Creates and returns a new B<Math::GComplex> object.
+Create a new complex number, given its Cartesian coordinate form.
 
 =head2 cplx
 
     my $z = cplx($real, $imag);
 
-Creates and returns a new B<Math::GComplex> object.
+Create a new complex number, given its Cartesian coordinate form.
+
+=head2 emake
+
+    my $z = Math::GComplex->emake($r, $theta);
+
+Create a new complex number, given its polar form.
+
+=head2 cplxe
+
+    my $z = cplxe($r, $theta);
+
+Create a new complex number, given its polar form.
 
 =head2 i
 

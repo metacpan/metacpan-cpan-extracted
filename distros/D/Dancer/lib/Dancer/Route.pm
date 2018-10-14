@@ -1,7 +1,7 @@
 package Dancer::Route;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Class to represent a route in Dancer
-$Dancer::Route::VERSION = '1.3400';
+$Dancer::Route::VERSION = '1.3500';
 use strict;
 use warnings;
 use Carp;
@@ -378,7 +378,7 @@ Dancer::Route - Class to represent a route in Dancer
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 AUTHOR
 

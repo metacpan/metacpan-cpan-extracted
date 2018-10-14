@@ -1,21 +1,21 @@
 package Authorization::RBAC;
-$Authorization::RBAC::VERSION = '0.11';
+$Authorization::RBAC::VERSION = '0.12';
 use utf8;
 use Moose;
 with 'MooseX::Object::Pluggable';
 
 use Moose::Util::TypeConstraints;
-use Config::JFDI;
+use Config::ZOMG;
 use Carp qw/croak/;
 
 subtype MyConf => as 'HashRef';
 coerce 'MyConf'
   => from 'Str' => via {
     my $conf = shift;
-    my ($jfdi_h, $jfdi) = Config::JFDI->open($conf)
+    my ($jfdi_h, $jfdi) = Config::ZOMG->open($conf)
       or croak "Error (conf: $conf) : $!\n";
-    return $jfdi->get;
-  };
+    return $jfdi_h;
+};
 
 has conf => ( is => 'rw',
               isa => 'MyConf',
@@ -118,12 +118,13 @@ sub can_access {
 
         my $typeobj2 = ref($obj2);
         $typeobj2 =~ s/.*:://;
-        $self->_log("> Search if we can access to ${typeobj2}_" . $obj2->id);
+        my $msg = "> Search if we can access to ${typeobj2}_" . $obj2->id;
+        $msg .= " " . $obj2->name if $obj2->can('name');
+        $self->_log( $msg );
 
         if ( $obj2 eq $obj ) {
             $ops = $additional_operations;
-        }
-        else {
+        } else {
             $ops = [];
         }
         if ( ! $self->check_permission( $roles, $obj2, $ops )){
@@ -205,7 +206,7 @@ sub _get_cache {
   my ( $self, $key ) = @_;
   if ( defined $self->cache ){
       my $res =  $self->cache->get($key);
-      my $ret = $res || '';
+      my $ret = defined $res ? $res : '';
       $self->_log("get cache $key : $ret");
       return $res;
   }
@@ -243,7 +244,7 @@ Authorization::RBAC - Role-Based Access Control system
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ use PiFlash::State;
 use IO::Handle; # rpm: "dnf install perl-IO", deb: included with perl
 
 package PiFlash::Command;
-$PiFlash::Command::VERSION = '0.0.3';
+$PiFlash::Command::VERSION = '0.0.4';
 use autodie;
 use IO::Poll qw(POLLIN POLLHUP); # same as IO::Handle
 
@@ -267,7 +267,7 @@ PiFlash::Command - process/command running utilities for piflash
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 

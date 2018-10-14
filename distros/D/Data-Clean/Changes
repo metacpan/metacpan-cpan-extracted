@@ -1,3 +1,9 @@
+0.502   2018-10-14 (PERLANCAR)
+
+	- Revert the decision to use Sereal::Dclone because of problem with
+	  cloning coderefs, defaults to Clone::PP for now.
+
+
 0.501   2018-10-09 (PERLANCAR)
 
 	- No functional changes.

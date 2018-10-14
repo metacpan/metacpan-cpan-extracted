@@ -1,7 +1,7 @@
 package Dancer::Session::Abstract;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: abstract class for session engine
-$Dancer::Session::Abstract::VERSION = '1.3400';
+$Dancer::Session::Abstract::VERSION = '1.3500';
 use strict;
 use warnings;
 use Carp;
@@ -160,7 +160,7 @@ Dancer::Session::Abstract - abstract class for session engine
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 DESCRIPTION
 

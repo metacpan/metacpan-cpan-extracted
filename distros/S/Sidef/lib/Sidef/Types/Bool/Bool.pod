@@ -7,11 +7,11 @@ Sidef::Types::Bool::Bool
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Bool.new(...);
+var obj = Bool(...)
 
 
 =head1 INHERITS
@@ -34,14 +34,6 @@ Return the
 =head2 ^
 
 I<Obj> B<^> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 dump
-
-Bool.dump() -> I<Obj>
 
 Return the
 
@@ -100,6 +92,16 @@ Bool.to_b() -> I<Obj>
 Return the
 
 Aliases: I<to_bool>
+
+=cut
+
+=head2 to_s
+
+Bool.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut
 

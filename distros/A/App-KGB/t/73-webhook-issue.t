@@ -68,9 +68,8 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test 03Test User',
-        '05issues 06test-repo',
-        '#42',
+        'dummy/#test 03test-repo',
+        '05issues #42 06Test User',
         '03Issue title goes here',
         '* 14http://git/issues/42',
     )

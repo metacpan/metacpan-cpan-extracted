@@ -1,0 +1,11 @@
+eg/example.pl
+MANIFEST
+t/99podcov.t
+t/98podsyn.t
+t/01basic.t
+lib/DBIx/LogProfile.pm
+README
+Changes
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

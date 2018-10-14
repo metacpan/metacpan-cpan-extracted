@@ -117,7 +117,7 @@ use Mail::DKIM::ARC::MessageSignature;
 use Mail::DKIM::ARC::Seal;
 use Mail::Address;
 use Carp;
-our $VERSION                   = 0.53;
+our $VERSION                   = 0.54;
 our $MAX_SIGNATURES_TO_PROCESS = 50;
 
 sub init {
@@ -495,13 +495,7 @@ sub _check_and_verify_signature {
         return ( 'fail', $self->{signature_reject_reason} );
     }
 
-    if ( $signature->isa('Mail::DKIM::ARC::Seal') ) {    # AMS tests
-        unless ( $signature->get_tag('t') ) {    # ADMS must have a T tag
-            $self->{signature_reject_reason} = 'missing T tag';
-            return ( 'fail', $self->{signature_reject_reason} );
-        }
-    }
-    else {                                       # AMS tests
+    if ( not $signature->isa('Mail::DKIM::ARC::Seal') ) {    # AMS tests
         unless ( $signature->get_tag('bh') ) {    # AMS must have a BH tag
             $self->{signature_reject_reason} = 'missing BH tag';
             return ( 'fail', $self->{signature_reject_reason} );

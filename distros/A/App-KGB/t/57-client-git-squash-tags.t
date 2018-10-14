@@ -63,7 +63,7 @@ $ENV{GIT_DIR} = $remote;
 system 'git', 'init', '--bare';
 
 system( 'git', 'config', 'kgb.tag-squash-message-template',
-    '${{author-name}}${ ({author-login})}${ {project}/}${{module}}${ {log}}'
+    '${{project}/}${{module}}${ {author-name}}${ ({author-login})}${ {log}}'
 );
 
 use Cwd;
@@ -168,9 +168,9 @@ ok( defined($commit), 'first commit exists' );
 is( $commit->branch, 'master' );
 is( $commit->log,    "import old content" );
 
-TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 12test/03there 05master '
         . $commit->id
-        . ' 12test/06there 03old import old content * 14http://scm.host.org/there/master/?commit='
+        . ' 06Test U. Ser (06ser) 03old import old content * 14http://scm.host.org/there/master/?commit='
         . $commit->id
         . '' );
 
@@ -184,8 +184,8 @@ push_ok;
 $commit = $c->describe_commit;
 
 TestBot->expect( "dummy/#test "
+    . '12test/03there '
     . ${TestBot::COMMIT_USER}
-    . ' 12test/06there'
     . ' Pushed 05tag-1, 05tag-2, 6 other tags and 05tag-9' );
 
 $commit = $c->describe_commit;

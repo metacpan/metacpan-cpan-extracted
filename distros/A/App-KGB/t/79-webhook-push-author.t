@@ -80,8 +80,8 @@ is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
 
 TestBot->expect(
     join( ' ',
-        'dummy/#test Test Author (via Test User)',
-        'master b9b5587 test-repo',
+        'dummy/#test test-repo',
+        'master b9b5587 Test Author (via Test User)',
         'mod-one file-one rm-one',
         '* Commit three files (add, mod, rm)',
         '* http://l.nk/0' )

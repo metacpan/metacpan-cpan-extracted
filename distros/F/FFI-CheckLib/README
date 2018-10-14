@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.20
+    version 0.22
 
 SYNOPSIS
 
@@ -90,7 +90,7 @@ FUNCTIONS
        use FFI::Platypus;
        
        my($lib) = find_lib(
-         name => 'foo',
+         lib => 'foo',
          verify => sub {
            my($name, $libpath) = @_;
            
@@ -215,6 +215,8 @@ AUTHOR
     Bakkiaraj Murugesan (bakkiaraj)
 
     Dan Book (grinnz, DBOOK)
+
+    Ilya Pavlov (Ilya, ILUX)
 
 COPYRIGHT AND LICENSE
 

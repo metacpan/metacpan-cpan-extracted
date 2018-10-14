@@ -7,11 +7,11 @@ Sidef::Types::Array::Pair
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Pair.new(...);
+var obj = Pair(...)
 
 
 =head1 INHERITS
@@ -22,14 +22,6 @@ Inherits methods from:
 
 =head1 METHODS
 
-
-=head2 dump
-
-Pair.dump() -> I<Obj>
-
-Return the
-
-=cut
 
 =head2 key
 
@@ -76,6 +68,16 @@ Pair.to_h() -> I<Obj>
 Return the
 
 Aliases: I<to_hash>
+
+=cut
+
+=head2 to_s
+
+Pair.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut
 

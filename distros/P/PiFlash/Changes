@@ -1,5 +1,9 @@
 Change log for PiFlash
 
+0.0.4 2018-10-14T00:34:33-07:00 America/Los_Angeles
+ - experiment with automatic generation of RPM and Debian Dpkg files on
+   release
+
 0.0.3 2018-10-11T16:47:42-07:00 America/Los_Angeles
  - update installation instructions to reflect piflash's move on GitHub
    from ikluft-tools to new piflash repo

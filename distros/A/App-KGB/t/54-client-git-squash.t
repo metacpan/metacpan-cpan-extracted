@@ -69,7 +69,7 @@ my $hook_log = "$dir/hook.log";
 my $hook = "$dir/there.git/hooks/post-receive";
 
 system( 'git', 'config', 'kgb.squash-message-template',
-    '${{author-name}}${ ({author-login})}${ {branch}}${ {commit}}${ {project}/}${{module}}${ {log}}'
+    '${{project}/}${{module}} ${{branch}}${ {commit}}${ {author-name}}${ ({author-login})}${ {log}}'
 );
 
 my $client_script = $ENV{KGB_CLIENT_SCRIPT} || "$R/script/kgb-client";
@@ -169,9 +169,9 @@ is( $commit->branch, 'master' );
 is( $commit->log,    "import old content" );
 is( $commit->id,     shift @{ $commits{master} } );
 
-TestBot->expect( 'dummy/#test 03Test U. Ser (03ser) 05master '
+TestBot->expect( 'dummy/#test 12test/03there 05master '
         . $commit->id
-        . ' 12test/06there 03old import old content * 14http://scm.host.org/there/master/?commit='
+        . ' 06Test U. Ser (06ser) 03old import old content * 14http://scm.host.org/there/master/?commit='
         . $commit->id
         . '' );
 
@@ -191,10 +191,10 @@ ok( !ref($commit), 'squashed commit is a plain string' ) or BAIL_OUT 'will fail 
 
 my $commit_id = shift @{ $commits{master} };
 
-TestBot->expect( "dummy/#test "
+TestBot->expect( "dummy/#test 12test/03there 05master"
+        . " $commit_id "
         . ${TestBot::COMMIT_USER}
-        . " 05master $commit_id "
-        . "12test/06there 3 commits pushed, "
+        . " 3 commits pushed,"
         . " 101 file changed, 032(+)" );
 
 ### multiple commits in a new branch
@@ -212,11 +212,11 @@ ok( defined($commit), 'squashed new branch commit exists' ) or BAIL_OUT "prematu
 ok( !ref($commit), 'squashed commit is a plain string' )
     or BAIL_OUT "will fail with $commit anyway";
 
-TestBot->expect( "dummy/#test "
-        . ${TestBot::COMMIT_USER}
-        . " 05feature "
+TestBot->expect( "dummy/#test 12test/03there 05feature "
         . $commit_id
-        . " 12test/06there New branch with 2 commits pushed, "
+        . " "
+        . ${TestBot::COMMIT_USER}
+        . " New branch with 2 commits pushed,"
         . " 101 file changed, 032(+) since master/"
         . $last_commit_id );
 

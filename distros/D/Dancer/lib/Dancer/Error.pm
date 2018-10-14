@@ -1,7 +1,7 @@
 package Dancer::Error;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: class for representing fatal errors
-$Dancer::Error::VERSION = '1.3400';
+$Dancer::Error::VERSION = '1.3500';
 use strict;
 use warnings;
 use Carp;
@@ -166,7 +166,7 @@ sub _censor {
         if (ref $hash->{$key} eq 'HASH') {
             $censored += _censor( $hash->{$key}, $recursecount );
         }
-        elsif ($key =~ /(pass|card?num|pan|cvv|cvv2|ccv|secret|private_key)/i) {
+        elsif ($key =~ /(pass|card?num|pan|cvv2?|ccv|secret|private_key|cookie_key)/i) {
             $hash->{$key} = "Hidden (looks potentially sensitive)";
             $censored++;
         }
@@ -327,7 +327,7 @@ Dancer::Error - class for representing fatal errors
 
 =head1 VERSION
 
-version 1.3400
+version 1.3500
 
 =head1 SYNOPSIS
 

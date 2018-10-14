@@ -14,7 +14,7 @@ use Carp;
 # State class to hold program state, and print it all out in case of errors
 # this is a low-level package - it stores state data but at this level has no knowledge of what is being stored in it
 package PiFlash::State;
-$PiFlash::State::VERSION = '0.0.3';
+$PiFlash::State::VERSION = '0.0.4';
 # ABSTRACT: PiFlash::State class to store configuration, device info and program state
 
 
@@ -156,7 +156,7 @@ PiFlash::State - PiFlash::State class to store configuration, device info and pr
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 SYNOPSIS
 

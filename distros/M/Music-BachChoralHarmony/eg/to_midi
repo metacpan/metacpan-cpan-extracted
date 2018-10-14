@@ -7,6 +7,7 @@ use warnings;
 use List::Util 'shuffle';
 use MIDI::Simple;
 use Music::BachChoralHarmony;
+use Music::Chord::Note;
 use Music::Duration;
 use Music::Tempo;
 
@@ -22,8 +23,11 @@ $song = $song->{$id};
 
 my $bassline;
 my $melodyline;
+my $chordline;
 
 my @scale = qw( C Cs D Ds E F Fs G Gs A As B );
+
+my $cn = Music::Chord::Note->new();
 
 my $score = MIDI::Simple->new_score();
 $score->set_tempo( bpm_to_ms(90) * 1000 );
@@ -48,11 +52,26 @@ for my $event ( @{ $song->{events} } ) {
         $i++;
     }
     push @$melodyline, shuffle @notes;
+
+    my $chord = $event->{chord};
+    $chord =~ s/M//;
+    $chord =~ s/_//;
+    $chord =~ s/d/dim/;
+    $chord =~ s/dim6/dim/; # dim6 chord unknown to Music::Chord::Note
+    $chord =~ s/4/add4/;
+    $chord =~ s/madd4/m/;  # madd4 chord unknown to Music::Chord::Note
+    my @tone = $cn->chord($chord);
+    for ( @tone ) {
+        s/#/s/;
+        s/b/f/;
+    }
+    push @$chordline, \@tone;
 }
 
 $score->synch(
     \&bass,
-    \&melody
+    \&melody,
+    \&chords,
 );
 $score->write_score("$0.mid");
 
@@ -76,4 +95,12 @@ sub melody {
     $score->patch_change( 1, 73 );
     $score->Octave(5);
     $score->n( @$_ ) for @$melodyline;
+}
+
+sub chords {
+    $score->Volume(90);
+    $score->Channel(2);
+    $score->patch_change( 2, 4 );
+    $score->Octave(4);
+    $score->n( 'wn', @$_ ) for @$chordline;
 }
