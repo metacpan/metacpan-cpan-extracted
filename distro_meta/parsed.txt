@@ -50191,3 +50191,12 @@ I/IK/IKLUFT/PiFlash-0.0.4.tar.gz
 T/TE/TEAM/Ryu-0.028.tar.gz
 T/TR/TRIZEN/Sidef-3.50.tar.gz
 M/ME/MELMOTHX/Text-Amuse-1.25.tar.gz
+S/SE/SEKIA/Algorithm-LibLinear-0.19.tar.gz
+H/HM/HMBRAND/App-ccdiff-0.26.tgz
+P/PR/PRBRENAN/Data-Edit-Xml-20181014.tar.gz
+P/PR/PRBRENAN/Data-Table-Text-20181014.tar.gz
+M/MI/MIKKOI/Git-MoreHooks-0.007.tar.gz
+V/VA/VANHOESEL/HTTP-Method-0.03.tar.gz
+V/VA/VANHOESEL/Set-Hash-Keys-0.03.tar.gz
+F/FB/FBARRIOS/Term-VT102-Boundless-0.05.tar.gz
+E/EB/EBHANSSEN/Test-Trap-v0.3.4.tar.gz

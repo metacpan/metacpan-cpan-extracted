@@ -75,23 +75,23 @@
    "provides" : {
       "Git::MoreHooks" : {
          "file" : "lib/Git/MoreHooks.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Git::MoreHooks::CheckCommitAuthorFromMailmap" : {
          "file" : "lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Git::MoreHooks::CheckCommitBase" : {
          "file" : "lib/Git/MoreHooks/CheckCommitBase.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Git::MoreHooks::CheckIndent" : {
          "file" : "lib/Git/MoreHooks/CheckIndent.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Git::MoreHooks::TriggerJenkins" : {
          "file" : "lib/Git/MoreHooks/TriggerJenkins.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -106,7 +106,7 @@
          "web" : "https://github.com/mikkoi/git-morehooks.git"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_contributors" : [
       "Gustavo L. de M. Chaves <gnustavo@cpan.org>"
    ],

@@ -1,6 +1,10 @@
 ccdiff
 ChangeLog
 CONTRIBUTING.md
+Files/01_1.txt
+Files/01_2.txt
+Files/01_3.txt
+Files/01_4.txt
 Files/git-ccdiff
 lib/App/ccdiff.pm
 LICENSE
@@ -9,3 +13,4 @@ MANIFEST
 META.json
 META.yml
 README.md
+t/01-no-color.t

@@ -95,8 +95,15 @@ sub check_cannot_commit {
 
 setup_repos();
 
+# Normal config
 $repo->run(qw/config --local user.name My Self/);
 $repo->run(qw/config --local user.email myself@example.com/);
+
+# Overriding variables (because you never know...)
+$ENV{'GIT_AUTHOR_NAME'}     = 'My Self';
+$ENV{'GIT_AUTHOR_EMAIL'}    = 'myself@example.com';
+$ENV{'GIT_COMMITTER_NAME'}  = 'My Self';
+$ENV{'GIT_COMMITTER_EMAIL'} = 'myself@example.com';
 
 check_can_commit( 'commit sans configuration', 'file.txt' );
 
@@ -108,6 +115,10 @@ check_cannot_commit( 'fail commit file', undef, 'file.txt' );
 
 $repo->run(qw/config --local user.name MeIMyself/);
 $repo->run(qw/config --local user.email me.myself@comp.xx/);
+$ENV{'GIT_AUTHOR_NAME'}     = 'MeIMyself';
+$ENV{'GIT_AUTHOR_EMAIL'}    = 'me.myself@comp.xx';
+$ENV{'GIT_COMMITTER_NAME'}  = 'MeIMyself';
+$ENV{'GIT_COMMITTER_EMAIL'} = 'me.myself@comp.xx';
 
 check_can_commit( 'commit file', 'file.txt' );
 

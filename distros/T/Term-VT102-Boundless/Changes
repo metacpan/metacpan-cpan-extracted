@@ -1,2 +1,5 @@
+0.05
+	- Fix "Negative repeat count does nothing" warning (Harrie Huzen, Federico Barrios)
+
 0.04
 	- Update for changed Term::VT102 internals (Jesse Luehrs)

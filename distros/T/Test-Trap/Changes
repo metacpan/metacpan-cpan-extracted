@@ -1,5 +1,14 @@
 Revision history for Test-Trap
 
+0.3.4	Sun Oct 14 20:39:41 CEST 2018
+	For this release, many thanks go to Todd Rinaldo, who found
+        that my fix for the $^E clobbering wound up clobbering $! in
+        every basic test.
+        - Declared some required and optional dependencies.
+        - RT #127112 is addressed, using the patch from TODDR@cpan.org
+          augmented wtih a comment.
+        - A regression test has been added for this. 
+
 0.3.3   Tue Aug 22 02:06:09 CEST 2017
 	For this release, many thanks go to Slaven Rezic, who found
         that Test::More::is() (or Test2::Formatter::TAP::write())

@@ -3,29 +3,30 @@ require 5.006002;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'NAME' => 'Test::Trap',
   'VERSION_FROM' => 'lib/Test/Trap.pm',
+  'PREREQ_PM' => {
+                   'Carp' => 0,
+                   'Config' => 0,
+                   'Data::Dump' => 0,
+                   'Exporter' => 0,
+                   'File::Temp' => 0,
+                   'IO::Handle' => 0,
+                   'Test::Builder' => 0,
+                   'Test::More' => 0,
+                   'Test::Tester' => '0.107',
+                   'base' => 0,
+                   'constant' => 0,
+                   'lib' => 0,
+                   'strict' => 0,
+                   'version' => 0,
+                   'warnings' => 0
+                 },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],
-  'PREREQ_PM' => {
-                   'version' => 0,
-                   'File::Temp' => 0,
-                   'Test::Tester' => '0.107',
-                   'warnings' => 0,
-                   'Exporter' => 0,
-                   'lib' => 0,
-                   'Test::Builder' => 0,
-                   'base' => 0,
-                   'Test::More' => 0,
-                   'constant' => 0,
-                   'Carp' => 0,
-                   'strict' => 0,
-                   'IO::Handle' => 0,
-                   'Data::Dump' => 0
-                 },
   'PL_FILES' => {
                   't/08-fork.PL' => 't/08-fork.t',
                   't/11-systemsafe-basic.PL' => 't/11-systemsafe-basic.t'
-                },
-  'NAME' => 'Test::Trap'
+                }
 )
 ;

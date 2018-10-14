@@ -9,7 +9,7 @@ use Algorithm::Diff;
 use Term::ANSIColor qw(:constants color);
 use Getopt::Long    qw(:config bundling);
 
-our $VERSION = "0.25";
+our $VERSION = "0.26";
 our $CMD     = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -22,8 +22,9 @@ sub usage {
     say "  Diff options:";
     say "   -U    --utf-8                 Input is in UTF-8";
     say "   -u[3] --unified=3             Show a unified diff";
-    say "   -I    --index        Add indices to the change chunks";
-    say "   -I n  --index=4      Only show chunk n";
+    say "         --no-header             Skip header with file names/stamps";
+    say "   -I    --index                 Add indices to the change chunks";
+    say "   -I n  --index=4               Only show chunk n";
     say "   -w    --ignore-all-space      Ignore all whitespace";
     say "   -b    --ignore-space-change   Ignore horizontal whitespace changes";
     say "   -Z    --ignore-trailing-space Ignore whitespace at line ending";
@@ -42,6 +43,7 @@ sub usage {
     say "         --bg=white     Background color for colored indicators";
     say "   -p    --pink         Shortcut for --old=magenta";
     say "   -r    --reverse      Reverse/invert the colors of the indicators";
+    say "         --settings     Show default settings (after reading rc)";
     exit $err;
     } # usage
 
@@ -57,6 +59,7 @@ my %rc = (
     chr_old	=> "\x{25bc}",
     ellipsis	=> 0,
     emacs	=> 0,
+    header	=> 1,
     heuristics	=> 0,
     index	=> 0,
     markers	=> 0,
@@ -75,6 +78,7 @@ my $opt_B;
 #y $opt_c;
 my $opt_E;
 my $opt_h = $rc{heuristics};
+my $opt_H = $rc{header};
 my $opt_i;
 my $opt_I = $rc{index};
 my $opt_m = $rc{markers};
@@ -110,6 +114,7 @@ unless (caller) {
 	"u|unified:3"		=> \$opt_u,
 	"I|idx|index:-1"	=> \$opt_I,
 	"t|threshold=i"		=> \$opt_t,
+	"H|header!"		=> \$opt_H,
 	"h|heuristics=i"	=> \$opt_h,
 	"e|ellipsis=i"		=> \$opt_e,
 	  "emacs!"		=> \$emacs,
@@ -131,6 +136,11 @@ unless (caller) {
 	  "bg=s"		=> \$rev_color,
 	  "no-colors"		=> \$no_colors,
 	  "list-colors!"	=> \$list_colors,
+	  "settings|defaults"	=> sub {
+		binmode STDOUT, ":encoding(utf-8)";
+		printf "%-10s : %s\n", $_, $rc{$_} // "<undef>" for sort keys %rc;
+		exit 0;
+		},
 
 	"v|verbose:1"	=> \$opt_v,
 	) or usage (1);
@@ -215,6 +225,7 @@ sub ccdiff {
 #	    $o eq "context"			and $opt_c = $v;
 	    $o eq "ellipsis"			and $opt_e = $v;
 	    $o eq "emacs"			and $emacs = $v;
+	    $o eq "header"			and $opt_H = $v;
 	    $o eq "heuristics"			and $opt_h = $v;
 	    $o eq "ignore-all-space"		and $opt_w = $v;
 	    $o eq "ignore-blank-lines"		and $opt_B = $v;
@@ -260,7 +271,8 @@ sub ccdiff {
 	$opt_U and binmode $fh, ":encoding(utf-8)";
 	<$fh>;
 	};
-    if ($opt_u) {
+    if ($opt_H and defined $opt_u) {
+	# diff -c also provides (ugly) headers, but opt_c is NYI
 	for ([ "---", $f1 ], [ "+++", $f2 ]) {
 	    if (-f $_->[1]) {
 		say $_->[0], " $_->[1]\t", scalar localtime ((stat $_->[1])[9]);
@@ -432,10 +444,11 @@ sub subdiff {
     } # subdiff
 
 sub read_rc {
+    my $home = $ENV{HOME} || $ENV{USERPROFILE} || $ENV{HOMEPATH};
     foreach my $rcf (
-	    "$ENV{HOME}/ccdiff.rc",
-	    "$ENV{HOME}/.ccdiffrc",
-	    "$ENV{HOME}/.config/ccdiff",
+	    "$home/ccdiff.rc",
+	    "$home/.ccdiffrc",
+	    "$home/.config/ccdiff",
 	    ) {
 	-s $rcf or next;
 	(stat $rcf)[2] & 022 and next;
@@ -1070,19 +1083,14 @@ You can use ccdiff to show diffs in git. It may work like this:
  $ git config --global difftool.prompt false
  $ git config --global difftool.ccdiff.cmd 'ccdiff --utf-8 -u -r $LOCAL $REMOTE'
  $ git difftool SHA~..SHA
- $ cat >~/bin/git-ccdiff <<EOF
- #!/bin/sh
-
- commit=$1
- shift
- if [ "$commit" = "" ]; then
-     git difftool
- else
-     git difftool $commit~1..$commit
-     fi
- EOF
+ $ wget https://github.com/Tux/App-ccdiff/blob/master/Files/git-ccdiff \
+    -O ~/bin/git-ccdiff
+ $ perl -pi -e 's{/pro/bin/perl}{/usr/bin/env perl}' ~/bin/git-ccdiff
  $ chmod 755 ~/bin/git-ccdiff
  $ git ccdiff SHA
+
+Of course you can use C<curl> instead of C<wget> and you can choose your own
+(fixed) path to C<perl> instead of using C</usr/bin/env>.
 
 From then on you can do
 

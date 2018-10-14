@@ -91,7 +91,7 @@ public:
 	void Hv(double *s, double *Hs);
 
 	int get_nr_variable(void);
-	void get_diagH(double *M);
+	void get_diag_preconditioner(double *M);
 
 private:
 	void Xv(double *v, double *Xv);
@@ -170,6 +170,27 @@ int l2r_lr_fun::get_nr_variable(void)
 	return prob->n;
 }
 
+void l2r_lr_fun::get_diag_preconditioner(double *M)
+{
+	int i;
+	int l = prob->l;
+	int w_size=get_nr_variable();
+	feature_node **x = prob->x;
+
+	for (i=0; i<w_size; i++)
+		M[i] = 1;
+
+	for (i=0; i<l; i++)
+	{
+		feature_node *s = x[i];
+		while (s->index!=-1)
+		{
+			M[s->index-1] += s->value*s->value*C[i]*D[i];
+			s++;
+		}
+	}
+}
+
 void l2r_lr_fun::Hv(double *s, double *Hs)
 {
 	int i;
@@ -190,27 +211,6 @@ void l2r_lr_fun::Hv(double *s, double *Hs)
 	}
 	for(i=0;i<w_size;i++)
 		Hs[i] = s[i] + Hs[i];
-}
-
-void l2r_lr_fun::get_diagH(double *M)
-{
-	int i;
-	int l = prob->l;
-	int w_size=get_nr_variable();
-	feature_node **x = prob->x;
-
-	for (i=0; i<w_size; i++)
-		M[i] = 1;
-
-	for (i=0; i<l; i++)
-	{
-		feature_node *s = x[i];
-		while (s->index!=-1)
-		{
-			M[s->index-1] += s->value*s->value*C[i]*D[i];
-			s++;
-		}
-	}
 }
 
 void l2r_lr_fun::Xv(double *v, double *Xv)
@@ -247,7 +247,7 @@ public:
 	void Hv(double *s, double *Hs);
 
 	int get_nr_variable(void);
-	void get_diagH(double *M);
+	void get_diag_preconditioner(double *M);
 
 protected:
 	void Xv(double *v, double *Xv);
@@ -327,7 +327,7 @@ int l2r_l2_svc_fun::get_nr_variable(void)
 	return prob->n;
 }
 
-void l2r_l2_svc_fun::get_diagH(double *M)
+void l2r_l2_svc_fun::get_diag_preconditioner(double *M)
 {
 	int i;
 	int w_size=get_nr_variable();
@@ -2792,14 +2792,14 @@ int save_model(const char *model_file_name, const struct model *model_)
 
 	fprintf(fp, "nr_feature %d\n", nr_feature);
 
-	fprintf(fp, "bias %.16g\n", model_->bias);
+	fprintf(fp, "bias %.17g\n", model_->bias);
 
 	fprintf(fp, "w\n");
 	for(i=0; i<w_size; i++)
 	{
 		int j;
 		for(j=0; j<nr_w; j++)
-			fprintf(fp, "%.16g ", model_->w[i*nr_w+j]);
+			fprintf(fp, "%.17g ", model_->w[i*nr_w+j]);
 		fprintf(fp, "\n");
 	}
 

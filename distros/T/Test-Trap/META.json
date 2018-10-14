@@ -22,6 +22,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Config" : "0",
             "Data::Dump" : "0",
             "Exporter" : "0",
             "File::Temp" : "0",
@@ -42,23 +43,23 @@
    "provides" : {
       "Test::Trap" : {
          "file" : "lib/Test/Trap.pm",
-         "version" : "v0.3.3"
+         "version" : "v0.3.4"
       },
       "Test::Trap::Builder" : {
          "file" : "lib/Test/Trap/Builder.pm",
-         "version" : "v0.3.3"
+         "version" : "v0.3.4"
       },
       "Test::Trap::Builder::PerlIO" : {
          "file" : "lib/Test/Trap/Builder/PerlIO.pm",
-         "version" : "v0.3.3"
+         "version" : "v0.3.4"
       },
       "Test::Trap::Builder::SystemSafe" : {
          "file" : "lib/Test/Trap/Builder/SystemSafe.pm",
-         "version" : "v0.3.3"
+         "version" : "v0.3.4"
       },
       "Test::Trap::Builder::TempFile" : {
          "file" : "lib/Test/Trap/Builder/TempFile.pm",
-         "version" : "v0.3.3"
+         "version" : "v0.3.4"
       }
    },
    "release_status" : "stable",
@@ -67,6 +68,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v0.3.3",
+   "version" : "v0.3.4",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

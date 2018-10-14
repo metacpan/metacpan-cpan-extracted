@@ -6,11 +6,11 @@ HTTP::Method - HTTP Request Method and Common Properties according to RFC 7231
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
 use warnings;
@@ -344,7 +344,11 @@ the source!)
 
 =head1 AUTHOR
 
-Th. J. van Hoesel
+Th. J. van Hoesel L<Th.J.v.Hoesel@THEMA-MEDIA.nl>
+
+=head1 CONTRIBUTORS
+
+Mohammad S. Anwar L<mohammad.anwar@yahoo.com>
 
 =head1 SEE ALSO
 

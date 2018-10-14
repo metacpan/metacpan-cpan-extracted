@@ -30,8 +30,8 @@
             "File::Temp" : "0",
             "JSON" : "0",
             "POSIX" : "0",
+            "Scalar::Util" : "0",
             "Storable" : "0",
-            "String::Numeric" : "0",
             "Test2::API" : "0",
             "Test::More" : "0",
             "Time::HiRes" : "0",
@@ -42,7 +42,7 @@
    "provides" : {
       "Data::Table::Text" : {
          "file" : "lib/Data/Table/Text.pm",
-         "version" : "20181006"
+         "version" : "20181014"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20181006",
+   "version" : "20181014",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

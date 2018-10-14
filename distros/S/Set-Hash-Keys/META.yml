@@ -4,11 +4,11 @@ author:
   - 'Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>'
 build_requires: {}
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Set-Hash-Keys
 no_index:
   directory:
@@ -16,4 +16,5 @@ no_index:
     - inc
 resources:
   repository: https://github.com/THEMA-MEDIA/Set-Hash-Keys.git
-version: 0.02
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

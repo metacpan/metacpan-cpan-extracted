@@ -77,10 +77,10 @@ sub as_string {
     args
         my $self;
     my $acc =
-        sprintf "x\n%.16g %.16g\n", $self->lower_bound, $self->upper_bound;
+        sprintf "x\n%.17g %.17g\n", $self->lower_bound, $self->upper_bound;
     my $index = 0;
     for my $min_max_value (@{ $self->min_max_values }) {
-        $acc .= sprintf "\%d %.16g %.16g\n", ++$index, @$min_max_value;
+        $acc .= sprintf "\%d %.17g %.17g\n", ++$index, @$min_max_value;
     }
     return $acc;
 }

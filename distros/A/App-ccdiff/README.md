@@ -29,7 +29,10 @@ will get Unicode characters.
 # Installation
 
 Change the first line of `ccdiff` to start your favorite perl interpreter
-and then move the file to a folder in your `$PATH`.
+and then move the file to a folder in your `$PATH`, or install from CPAN:
+```
+$ cpan App::ccdiff
+```
 
 # Alternatives
 
@@ -41,6 +44,8 @@ and then move the file to a folder in your `$PATH`.
 
  * `colordiff`
 
+ * `klondiff`
+
  * `git`
 
    This however requires a long command:
@@ -51,6 +56,8 @@ $ git -c color.diff.new='bold reverse green' \
               --word-diff=color --word-diff-regex=. \
              <file1> <file2>
 ```
+   An alternative for integration with git is `diff-so-fancy`
+
 ## ASCII
 
  * `vimdiff`
@@ -80,6 +87,26 @@ changes in lines visually outstanding:
 
  * `tkdiff` (Tcl/Tk)
 
+## Other (not checked yet)
+
+Reasons for not checking include Windows and emacs.
+
+ * araxis
+ * bc
+ * bc3
+ * codecompare
+ * deltaworker
+ * diffmerge
+ * ecmerge
+ * emerge
+ * examdiff
+ * guiffy
+ * gvimdiff2
+ * gvimdiff3
+ * opendiff
+ * p4merge
+ * winmerge
+
 # Dependencies
 
 This tool will run on recent perl distributions that have
@@ -104,27 +131,24 @@ $ git config --global diff.tool ccdiff
 $ git config --global difftool.prompt false
 $ git config --global difftool.ccdiff.cmd 'ccdiff --utf-8 -u -r $LOCAL $REMOTE'
 $ git difftool SHA~..SHA
-$ cat >~/bin/git-ccdiff <<EOF
-#!/bin/sh
-
-commit=$1
-shift
-git difftool $commit~1..$commit $@
-EOF
+$ wget https://github.com/Tux/App-ccdiff/blob/master/Files/git-ccdiff \
+    -O ~/bin/git-ccdiff
+$ perl -pi -e 's{/pro/bin/perl}{/usr/bin/env perl}' ~/bin/git-ccdiff
 $ chmod 755 ~/bin/git-ccdiff
 $ git ccdiff SHA
 ```
 
-## LIMITATIONS
+Of course you can use `curl` instead of `wget` and you can choose your own
+(fixed) path to `perl` instead of using `/usr/bin/env`.
 
-There is no provision yet for showing zero-width unicode "characters", like
-U+200b (ZERO WIDTH SPACE), U+200c (ZERO WITDH NON_JOINER), U+200D (ZERO WIDTH
-JOINER), and U+feff (ZERO WIDTH NO-BREAK SPACE) will not show (yet) in normal
-output and might cause displacement of other indicators.
+## LIMITATIONS
 
 There is no provision (yet) for coping with double-width characters.
 
 Large datasets may consume all available memory, causing the diff to fail.
+
+Not all that can be set from the configuration files can be overruled by
+comman-line options.
 
 ## LICENSE
 

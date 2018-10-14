@@ -7,11 +7,11 @@ use warnings;
 
 Set::Hash::Keys - Treat Hashes as Sets, based on the keys only
 
-=head1 VERSION 0.02
+=head1 VERSION 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use List::Util 'reduce';
 
@@ -399,6 +399,10 @@ sub symmetrical {
 =head1 AUTHOR
 
 Theo J. van Hoesel L<Th.J.v.Hoesel@THEMA-MEDIA.nl>
+
+=head1 CONTRIBUTORS
+
+Mohammad S. Anwar L<mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 

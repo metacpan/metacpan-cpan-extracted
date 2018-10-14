@@ -17,6 +17,7 @@ my $builder = $class->new
     { 'base'              => 0, # core ...
       'constant'          => 0, # core ...
       'Carp'              => 0,
+      'Config'            => 0,
       'Data::Dump'        => 0,
       'Exporter'          => 0,
       'File::Temp'        => 0,

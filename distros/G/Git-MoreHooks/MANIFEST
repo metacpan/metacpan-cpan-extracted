@@ -15,7 +15,6 @@ lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm
 lib/Git/MoreHooks/CheckCommitBase.pm
 lib/Git/MoreHooks/CheckIndent.pm
 lib/Git/MoreHooks/TriggerJenkins.pm
-session.vim
 t/CheckCommitAuthorFromMailmap-hooks.t
 t/CheckCommitAuthorFromMailmap-load.t
 t/CheckIndent-functions.t
