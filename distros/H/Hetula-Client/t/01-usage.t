@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-
-use Modern::Perl '2018';
+use Modern::Perl '2015';
 #use feature qw(signatures);
 #no warnings qw(experimental::signatures);
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
 use Test::Most tests => 15;
 

@@ -1,6 +1,6 @@
 package Parallel::Loops;
 
-our $VERSION='0.08';
+our $VERSION='0.09';
 
 # For Tie::ExtraHash - This was the earliest perl version in which I found this
 # class
@@ -433,7 +433,7 @@ sub share {
 
 sub in_child {
     my ($self) = @_;
-    return $$self{forkManager} && $$self{forkManager}{in_child};
+    return $$self{forkManager} && $$self{forkManager}->is_child;
 }
 
 sub readChangesFromChild {

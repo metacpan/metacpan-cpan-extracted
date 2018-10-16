@@ -314,6 +314,10 @@ when you want to do custom exception handling.
 
     Converts object into a hash reference, including all preloaded objects.
 
+# CREDITS
+
+kitt-vl (github/kitt-vl)
+
 # AUTHOR
 
 Viacheslav Tykhanovskyi

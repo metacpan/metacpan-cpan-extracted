@@ -8,8 +8,10 @@ extern "C" {
 
 Byte     map_stdcolorref    [ 256];
 Byte     div51              [ 256];
+Byte     div51f             [ 256];
 Byte     div17              [ 256];
 Byte     mod51              [ 256];
+int8_t   mod51f             [ 256];
 Byte     mod17mul3          [ 256];
 RGBColor cubic_palette      [ 256];
 RGBColor cubic_palette8     [   8];
@@ -35,7 +37,7 @@ Byte     map_halftone8x8_51 [  64] = {
 };
 Byte     map_halftone8x8_64 [  64] = {
 	0, 47, 12, 59,  3, 50, 15, 62,
-	32, 16, 43, 28, 34, 19, 46, 31,
+	31, 16, 43, 28, 34, 19, 46, 31,
 	8, 55,  4, 51, 11, 58,  7, 54,
 	39, 24, 35, 20, 42, 27, 38, 23,
 	2, 49, 14, 61,  1, 48, 13, 60,
@@ -52,6 +54,8 @@ cm_init_colormap( void)
 	{
 		map_RGB_gray[ i * 3] = map_RGB_gray[ i * 3 + 1] = map_RGB_gray[ i * 3 + 2] = i;
 		map_stdcolorref[ i] = i;
+		div51f[ i] = (float) i / 51.0 + .5;
+		mod51f[ i] = (i + 25) % 51 - 25;
 		div51[ i] = i / 51;
 		div17[ i] = i / 17;
 		mod51[ i] = i % 51;
@@ -370,6 +374,66 @@ void
 cm_sort_palette( RGBColor * palette, int size)
 {
 	qsort( palette, size, sizeof(RGBColor), sort_palette);
+}
+
+void
+cm_reduce_palette4( Byte * srcData, int srcLine, int width, int height, RGBColor * srcPalette, int srcPalSize, RGBColor * dstPalette, int * dstPalSize)
+{
+	Byte hist[16];
+	int i, j, tail, w;
+
+	w = width / 2;
+	tail = width % 2;
+
+	memset( hist, 0, sizeof( hist));
+	*dstPalSize = 0;
+	for ( i = 0; i < height; i++) {
+		Byte * d = srcData;
+		srcData += srcLine;
+		for ( j = 0; j < w; j++, d++) {
+			Byte c = *d >> 4;
+			if ( hist[c] == 0) {
+				hist[c] = 1;
+				dstPalette[(*dstPalSize)++] = srcPalette[c];
+				if ( *dstPalSize >= srcPalSize) return;
+			}
+			c = *d & 0x0f;
+			if ( hist[c] == 0) {
+				hist[c] = 1;
+				dstPalette[(*dstPalSize)++] = srcPalette[c];
+				if ( *dstPalSize >= srcPalSize) return;
+			}
+		}
+		if (tail) {
+			Byte c = *d >> 4;
+			if ( hist[c] == 0) {
+				hist[c] = 1;
+				dstPalette[(*dstPalSize)++] = srcPalette[c];
+				if ( *dstPalSize >= srcPalSize) return;
+			}
+		}
+	}
+}
+
+void
+cm_reduce_palette8( Byte * srcData, int srcLine, int width, int height, RGBColor * srcPalette, int srcPalSize, RGBColor * dstPalette, int * dstPalSize)
+{
+	Byte hist[256];
+	int i, j;
+
+	memset( hist, 0, sizeof( hist));
+	*dstPalSize = 0;
+	for ( i = 0; i < height; i++) {
+		Byte * d = srcData;
+		srcData += srcLine;
+		for ( j = 0; j < width; j++, d++) {
+			if ( hist[*d] == 0) {
+				hist[*d] = 1;
+				dstPalette[(*dstPalSize)++] = srcPalette[*d];
+				if ( *dstPalSize >= srcPalSize) return;
+			}
+		}
+	}
 }
 
 /*

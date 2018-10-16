@@ -26,28 +26,6 @@ static void iterate_record_entry(MMDB_s *mmdb, SV *data_callback,
                                  uint8_t record_type,
                                  MMDB_entry_s *record_entry);
 
-static int has_highbyte(const U8 * ptr, int size)
-{
-    while (--size >= 0) {
-        if (*ptr++ > 127) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-static SV *decode_utf8_string(MMDB_entry_data_s *entry_data)
-{
-    int size = entry_data->data_size;
-    char *data = (char *)entry_data->utf8_string;
-    SV *sv = newSVpvn(data, size);
-    if (has_highbyte((const U8 *)data, size)) {
-        SvUTF8_on(sv);
-    }
-    return sv;
-}
-
 static SV *decode_bytes(MMDB_entry_data_s *entry_data)
 {
     return newSVpvn((char *)entry_data->bytes, entry_data->data_size);
@@ -58,7 +36,7 @@ static SV *decode_simple_value(MMDB_entry_data_list_s **current)
     MMDB_entry_data_s entry_data = (*current)->entry_data;
     switch (entry_data.type) {
     case MMDB_DATA_TYPE_UTF8_STRING:
-        return decode_utf8_string(&entry_data);
+        return newSVpvn_utf8((char *)entry_data.utf8_string, entry_data.data_size, 1);
     case MMDB_DATA_TYPE_DOUBLE:
         return newSVnv(entry_data.double_value);
     case MMDB_DATA_TYPE_BYTES:
@@ -101,6 +79,7 @@ static SV *decode_array(MMDB_entry_data_list_s **current)
     int size = (*current)->entry_data.data_size;
 
     AV *av = newAV();
+    av_extend(av, size);
     for (uint i = 0; i < size; i++) {
         *current = (*current)->next;
         av_push(av, decode_entry_data_list(current));
@@ -114,6 +93,7 @@ static SV *decode_map(MMDB_entry_data_list_s **current)
     int size = (*current)->entry_data.data_size;
 
     HV *hv = newHV();
+    hv_ksplit(hv, size);
     for (uint i = 0; i < size; i++) {
         *current = (*current)->next;
         char *key = (char *)(*current)->entry_data.utf8_string;
@@ -352,13 +332,15 @@ __data_for_address(self, mmdb, ip_address)
         MMDB_lookup_result_s result;
         MMDB_entry_data_list_s *entry_data_list;
     CODE:
+        if (!ip_address || *ip_address == '\0') {
+            croak("You must provide an IP address to look up");
+        }
+
         result = MMDB_lookup_string(mmdb, ip_address, &gai_status, &mmdb_status);
         if (0 != gai_status) {
-            const char *gai_error = gai_strerror(gai_status);
             croak(
-                "MaxMind::DB::Reader::XS - Lookup on invalid IP address \"%s\": %s",
-                ip_address, gai_error
-                );
+                "The IP address you provided (%s) is not a valid IPv4 or IPv6 address",
+                ip_address);
         }
 
         if (MMDB_SUCCESS != mmdb_status) {

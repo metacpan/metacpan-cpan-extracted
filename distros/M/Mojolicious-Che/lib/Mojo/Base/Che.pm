@@ -1,46 +1,94 @@
 package Mojo::Base::Che;
-# ABSTRACT: some patch for Mojo::Base(current 7.61)
+# ABSTRACT: some patch for Mojo::Base(current 8.02)
 
 use Mojo::Base -strict;
 
 # copy-paste sub Mojo::Base::attr + patch 1 line
 sub Mojo::Base::attr {
-  my ($self, $attrs, $value) = @_;
+my ($self, $attrs, $value, %kv) = @_;
   return unless (my $class = ref $self || $self) && $attrs;
 
   Carp::croak 'Default has to be a code reference or constant value'
     if ref $value && ref $value ne 'CODE';
+
+  # Weaken
+  if ($kv{weak}) {
+    our %weak_names;
+    my $w = $weak_names{$class};
+    unless ($w) {
+      $w = $weak_names{$class} = [];
+      my $sub = sub {
+        my $class = shift;
+        my $self  = $class->next::method(@_);
+        ref $self->{$_} and Scalar::Util::weaken $self->{$_} for @$w;
+        return $self;
+      };
+      Mojo::Util::monkey_patch(my $base = $class . '::_Base', 'new', $sub);
+      no strict 'refs';
+      unshift @{"${class}::ISA"}, $base;
+    }
+    push @$w, ref($attrs) eq 'ARRAY' ? @$attrs : $attrs;
+  }
 
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
     # patch
     #~ Carp::croak qq{Attribute "$attr" invalid} unless $attr =~ /^[a-zA-Z_]\w*$/;
 
     # Very performance-sensitive code with lots of micro-optimizations
-    if (ref $value) {
-      my $sub = sub {
-        return
-          exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
-          if @_ == 1;
-        $_[0]{$attr} = $_[1];
-        $_[0];
-      };
-      Mojo::Util::monkey_patch($class, $attr, $sub);
-    }
-    elsif (defined $value) {
-      my $sub = sub {
-        return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
-          if @_ == 1;
-        $_[0]{$attr} = $_[1];
-        $_[0];
-      };
-      Mojo::Util::monkey_patch($class, $attr, $sub);
+    if ($kv{weak}) {
+      if (ref $value) {
+        my $sub = sub {
+          return exists $_[0]{$attr}
+            ? $_[0]{$attr}
+            : (
+            ref($_[0]{$attr} = $value->($_[0]))
+              && Scalar::Util::weaken($_[0]{$attr}),
+            $_[0]{$attr}
+            ) if @_ == 1;
+          ref($_[0]{$attr} = $_[1]) and Scalar::Util::weaken($_[0]{$attr});
+          $_[0];
+        };
+        Mojo::Util::monkey_patch($class, $attr, $sub);
+      }
+      else {
+        my $sub = sub {
+          return $_[0]{$attr} if @_ == 1;
+          ref($_[0]{$attr} = $_[1]) and Scalar::Util::weaken($_[0]{$attr});
+          $_[0];
+        };
+        Mojo::Util::monkey_patch($class, $attr, $sub);
+      }
     }
     else {
-      Mojo::Util::monkey_patch($class, $attr,
-        sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
+      if (ref $value) {
+        my $sub = sub {
+          return
+            exists $_[0]{$attr}
+            ? $_[0]{$attr}
+            : ($_[0]{$attr} = $value->($_[0]))
+            if @_ == 1;
+          $_[0]{$attr} = $_[1];
+          $_[0];
+        };
+        Mojo::Util::monkey_patch($class, $attr, $sub);
+      }
+      elsif (defined $value) {
+        my $sub = sub {
+          return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
+            if @_ == 1;
+          $_[0]{$attr} = $_[1];
+          $_[0];
+        };
+        Mojo::Util::monkey_patch($class, $attr, $sub);
+      }
+      else {
+        Mojo::Util::monkey_patch($class, $attr,
+          sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
+      }
     }
   }
 }
+
 
 
 #~ sub import {

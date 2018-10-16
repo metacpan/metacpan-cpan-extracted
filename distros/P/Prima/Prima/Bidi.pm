@@ -436,8 +436,13 @@ Prima::Bidi - helper routines for bi-directional text input and output
 
 =head1 SYNOPSIS
 
+=encoding utf-8
+
    use Prima::Bidi qw(:enable is_bidi);
+   $bidi_text = "'אפס123'";
    say Prima::Bidi::visual( $bidi_text ) if is_bidi($bidi_text);
+
+   '123ספא'
 
 or same, for classes
 

@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckRewrite;
 # ABSTRACT: Git::Hooks plugin for checking against unsafe rewrites
-$Git::Hooks::CheckRewrite::VERSION = '2.9.9';
+$Git::Hooks::CheckRewrite::VERSION = '2.9.10';
 use 5.010;
 use utf8;
 use Path::Tiny;
@@ -173,7 +173,7 @@ Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrite
 
 =head1 VERSION
 
-version 2.9.9
+version 2.9.10
 
 =head1 SYNOPSIS
 

@@ -151,7 +151,6 @@ xft_debug( const char *format, ...)
 void
 prima_xft_init(void)
 {
-	CharSetInfo *csi;
 	int i;
 	FcCharSet * fcs_ascii;
 #ifdef HAVE_ICONV_H
@@ -181,7 +180,6 @@ prima_xft_init(void)
 	if ( !guts. use_xft) return;
 	XFTdebug("XFT ok");
 
-	csi = std_charsets;
 	fcs_ascii = FcCharSetCreate();
 	for ( i = 32; i < 127; i++)  FcCharSetAddChar( fcs_ascii, i);
 
@@ -331,9 +329,8 @@ fcpattern2fontnames( FcPattern * pattern, Font * font)
 static void
 fcpattern2font( FcPattern * pattern, PFont font)
 {
-	FcChar8 * s;
 	int i, j;
-	double d = 1.0, ds;
+	double d = 1.0;
 	FcCharSet *c = NULL;
 
 	/* FcPatternPrint( pattern); */
@@ -452,7 +449,6 @@ xft_build_font_key( PFontKey key, PFont f, Bool bySize)
 static XftFont *
 try_size( Handle self, Font f, double size)
 {
-	FontKey key;
 	XftFont * xft = NULL;
 	bzero( &f.undef, sizeof(f.undef));
 	f. undef. height = f. undef. width = 1;
@@ -472,11 +468,10 @@ find_good_font_by_family( Font * f, int fc_spacing )
 
 	if ( !initialized ) {
 		/* iterate over all monospace and proportional font, build family->name (i.e best default match) hash */
-		int i,j;
+		int i;
 		FcFontSet * s;
 		FcPattern   *pat, **ppat;
 		FcObjectSet *os;
-		CharSetInfo *csi;
 
 		initialized = 1;
 
@@ -492,13 +487,10 @@ find_good_font_by_family( Font * f, int fc_spacing )
 		FcObjectSetDestroy( os);
 		FcPatternDestroy( pat);
 		if ( !s) return NULL;
-	
-		csi = ( CharSetInfo*) hash_fetch( encodings, std_charsets[0].name, strlen(std_charsets[0].name));
 
 		ppat = s-> fonts; 
 		for ( i = 0; i < s->nfont; i++, ppat++) {
 			Font f;
-			FcCharSet *c = NULL;
 			int spacing = FC_PROPORTIONAL, slant, len, weight;
 			PHash font_hash;
 
@@ -506,7 +498,7 @@ find_good_font_by_family( Font * f, int fc_spacing )
 			if (
 				( FcPatternGetInteger( *ppat, FC_SLANT, 0, &slant) != FcResultMatch) ||
 				( slant == FC_SLANT_ITALIC || slant == FC_SLANT_OBLIQUE)
-			)            
+			)
 				continue;
 			if (
 				( FcPatternGetInteger( *ppat, FC_WEIGHT, 0, &weight) != FcResultMatch) ||
@@ -535,8 +527,7 @@ find_good_font_by_family( Font * f, int fc_spacing )
 	/* try to find same family and same 1st word in font name */
 	{
 		char *c, *w, word1[255], word2[255];
-		int p;
-		PHash font_hash = (fc_spacing == FC_MONO) ? mono_fonts : prop_fonts;            
+		PHash font_hash = (fc_spacing == FC_MONO) ? mono_fonts : prop_fonts;
 		c = hash_fetch( font_hash, f->family, strlen(f->family));
 		if ( !c ) return NULL;
 		if ( strcmp( c, f->name) == 0) return NULL; /* same font */
@@ -570,6 +561,7 @@ xft_store_font(Font * k, Font * v, Bool by_size, XftFont * xft, XftFont * xft_ba
 }
 
 static int force_xft_monospace_emulation = 0;
+static int try_xft_monospace_emulation_by_name = 0;
 
 Bool
 prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, XftFont ** xft_result)
@@ -753,12 +745,16 @@ prima_xft_font_pick( Handle self, Font * source, Font * dest, double * size, Xft
 			fcpattern2fontnames(match, &font_with_family);
 			FcPatternDestroy( match);
 
-			if (( monospace_font = find_good_font_by_family(&font_with_family, FC_MONO))) {
+			if (!try_xft_monospace_emulation_by_name && ( monospace_font = find_good_font_by_family(&font_with_family, FC_MONO))) {
 				/* try a good mono font, again */
+				Bool ret;
 				Font s = *source;
 				strcpy(s.name, monospace_font);
 				XFTdebug("try fixed pitch");
-				return prima_xft_font_pick( self, &s, dest, size, xft_result);
+				try_xft_monospace_emulation_by_name++;
+				ret = prima_xft_font_pick( self, &s, dest, size, xft_result);
+				try_xft_monospace_emulation_by_name--;
+				return ret;
 			} else {
 				Bool ret;
 				XFTdebug("force ugly monospace");
@@ -1311,7 +1307,6 @@ static void
 XftDrawGlyph_layered( PDrawableSysData selfxx, _Xconst XftColor *color, int x, int y, _Xconst FT_UInt glyph)
 {
 	XftColor black;
-	XGCValues gcv;
 	XGlyphInfo extents;
 
 	XftGlyphExtents( DISP, XX-> font-> xft, &glyph, 1, &extents);
@@ -1496,7 +1491,6 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, Bool 
 	} else {
 		xftcolor.color.alpha = 0xffff;
 	}
-
 	/* paint background if opaque */
 	if ( XX-> flags. paint_opaque) {
 		int i;
@@ -1539,10 +1533,9 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, Bool 
 		if ( XX-> type. bitmap) 
 			XX-> xft_drawable = XftDrawCreateBitmap( DISP, XX-> gdrawable ); 
 		else
-			XX-> xft_drawable = XftDrawCreate( DISP, XX-> gdrawable, 
-													XX->visual->visual, XX->colormap);
+			XX-> xft_drawable = XftDrawCreate( DISP, XX-> gdrawable, XX->visual->visual, XX->colormap);
 		XftDrawSetSubwindowMode( XX-> xft_drawable, 
-			( self == application) ? IncludeInferiors : ClipByChildren);
+			XX-> flags.clip_by_children ? ClipByChildren : IncludeInferiors);
 		XCHECKPOINT;
 	}
 	if ( !XX-> flags. xft_clip) {
@@ -1584,8 +1577,7 @@ prima_xft_text_out( Handle self, const char * text, int x, int y, int len, Bool 
 		width  = rc. right  - rc. left   + 1;
 		height = rc. top    - rc. bottom + 1;
 
-		canvas = XCreatePixmap( DISP, guts. root, width, height, 
-												XX-> type. bitmap ? 1 : guts. depth);
+		canvas = XCreatePixmap( DISP, guts. root, width, height, XX-> type. bitmap ? 1 : guts. depth);
 		if ( !canvas) goto COPY_PUT;
 		dx = -rc. left;
 		dy = -rc. bottom;

@@ -13,7 +13,7 @@ use Scalar::Util 'weaken';
 use POSIX ':errno_h';
 
 # ABSTRACT: Template Toolkit renderer for Mojolicious
-our $VERSION = '1.59'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 __PACKAGE__->attr('tt');
 
@@ -179,7 +179,7 @@ sub options       { @_ > 1 ? $_[0]->{options}       = $_[1] : $_[0]->{options} }
 
 sub _template_modified {
     my($self, $template) = @_;
-    $self->SUPER::_template_modified($template) || $template =~ /^templates(?:\/|\\)/;
+    $self->SUPER::_template_modified($template) || $template =~ /^templates(?:\/|\\)/ || undef;
 }
 
 sub _template_content {
@@ -230,7 +230,7 @@ Mojolicious::Plugin::TtRenderer::Engine - Template Toolkit renderer for Mojolici
 
 =head1 VERSION
 
-version 1.59
+version 1.60
 
 =head1 SYNOPSIS
 
@@ -377,7 +377,7 @@ jay mortensen (GMORTEN)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ask Bjørn Hansen.
+This software is copyright (c) 2009-2018 by Ask Bjørn Hansen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

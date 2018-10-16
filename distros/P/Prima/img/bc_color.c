@@ -370,6 +370,70 @@ bc_nibble_cr( register Byte * source, register Byte * dest, register int count, 
 	}
 }
 
+/* 16-> 16 cubic halftoned */
+void
+bc_nibble_nibble_ht( register Byte * source, Byte * dest, register int count, register PRGBColor palette, int lineSeqNo)
+{
+#define b8cmp (                                      \
+					(((r. b >> 2) > cmp))      +  \
+					(((r. g >> 2) > cmp) << 1) +  \
+					(((r. r >> 2) > cmp) << 2)    \
+					)
+	Byte tail = count & 1;
+	lineSeqNo = ( lineSeqNo & 7) << 3;
+	count = count >> 1;
+	while ( count--)
+	{
+		register Byte index = lineSeqNo + (( count & 3) << 1);
+		register Byte dst;
+		register RGBColor r;
+		register Byte cmp;
+
+		r = palette[ *source >> 4 ];
+		cmp = map_halftone8x8_64[ index++];
+		dst = b8cmp << 4;
+		r = palette[ *source++ & 0x0F];
+		cmp = map_halftone8x8_64[ index];
+		*dest++ = dst + b8cmp;
+	}
+	if ( tail)
+	{
+		register RGBColor r = palette[ *source >> 4];
+		register Byte cmp   = map_halftone8x8_64[ lineSeqNo + 1];
+		*dest = b8cmp << 4;
+	}
+#undef b8cmp
+}
+
+/* 16-> 16 cubic, error diffusion */
+void
+bc_nibble_nibble_ed( Byte * source, Byte * dest, int count, PRGBColor palette, int * err_buf)
+{
+	dEDIFF_ARGS;
+	Byte tail = count & 1;
+	count = count >> 1;
+	EDIFF_INIT;
+	while ( count--)
+	{
+		Byte dst, c;
+		c = *source >> 4;
+		EDIFF_BEGIN_PIXEL(palette[c].r, palette[c].g, palette[c].b);
+		dst = (( r > 127) * 4 + (g > 127) * 2 + (b > 127)) << 4;
+		EDIFF_END_PIXEL(( r > 127) ? 255 : 0, ( g > 127) ? 255 : 0, ( b > 127) ? 255 : 0);
+		c = *source++ & 0x0f;
+		EDIFF_BEGIN_PIXEL(palette[c].r, palette[c].g, palette[c].b);
+		*dest++ = dst | (( r > 127) * 4 + (g > 127) * 2 + (b > 127));
+		EDIFF_END_PIXEL(( r > 127) ? 255 : 0, ( g > 127) ? 255 : 0, ( b > 127) ? 255 : 0);
+	}
+	if ( tail)
+	{
+		Byte c = *source >> 4; 
+		EDIFF_BEGIN_PIXEL(palette[c].r, palette[c].g, palette[c].b);
+		*dest = (( r > 127) * 4 + (g > 127) * 2 + (b > 127)) << 4;
+		EDIFF_END_PIXEL(( r > 127) ? 255 : 0, ( g > 127) ? 255 : 0, ( b > 127) ? 255 : 0);
+	}
+}
+
 /*  16 -> 256 */
 void
 bc_nibble_byte( register Byte * source, register Byte * dest, register int count)
@@ -568,9 +632,9 @@ void
 bc_byte_nibble_ht( register Byte * source, Byte * dest, register int count, register PRGBColor palette, int lineSeqNo)
 {
 #define b8cmp (                                      \
-					(((( r. b+1) >> 2) > cmp))      +  \
-					(((( r. g+1) >> 2) > cmp) << 1) +  \
-					(((( r. r+1) >> 2) > cmp) << 2)    \
+					(((r. b >> 2) > cmp))      +  \
+					(((r. g >> 2) > cmp) << 1) +  \
+					(((r. r >> 2) > cmp) << 2)    \
 					)
 	Byte tail = count & 1;
 	lineSeqNo = ( lineSeqNo & 7) << 3;
@@ -595,6 +659,7 @@ bc_byte_nibble_ht( register Byte * source, Byte * dest, register int count, regi
 		register Byte cmp   = map_halftone8x8_64[ lineSeqNo + 1];
 		*dest = b8cmp << 4;
 	}
+#undef b8cmp
 }
 
 /* 256-> 16 cubic, error diffusion */
@@ -626,6 +691,39 @@ bc_byte_nibble_ed( Byte * source, Byte * dest, int count, PRGBColor palette, int
 	}
 }
 
+/* 256-> 256 cubic halftoned */
+void
+bc_byte_byte_ht( register Byte * source, Byte * dest, register int count, register PRGBColor palette, int lineSeqNo)
+{
+	lineSeqNo = ( lineSeqNo & 7) << 3;
+	while ( count--)
+	{
+		register Byte cmp = map_halftone8x8_51[( count & 7) + lineSeqNo];
+		register RGBColor r;
+
+		r = palette[ *source++];
+#define COL(x) (div51[x] + (mod51[x] > cmp))
+		*dest++ = COL(r.b) + COL(r.g)*6 + COL(r.r)*36;
+#undef COL
+	}
+}
+
+/* 256-> 256 cubic, error diffusion */
+void
+bc_byte_byte_ed( Byte * source, Byte * dest, int count, PRGBColor palette, int * err_buf)
+{
+	dEDIFF_ARGS;
+	EDIFF_INIT;
+	while ( count--)
+	{
+		Byte c;
+		c = *source++;
+		EDIFF_BEGIN_PIXEL(palette[c].r, palette[c].g, palette[c].b);
+		*(dest++) = div51f[r] * 36 + div51f[g] * 6 + div51f[b];
+		EDIFF_END_PIXEL_EX( mod51f[r], mod51f[g], mod51f[b]);
+	}
+}
+
 /* map 256 */
 void
 bc_byte_cr( register Byte * source, register Byte * dest, register int count, register Byte * colorref)
@@ -634,7 +732,7 @@ bc_byte_cr( register Byte * source, register Byte * dest, register int count, re
 	source += count - 1;
 	while ( count--) *dest-- = colorref[ *source--];
 }
-	
+
 /* 256, remap one palette to another */
 void
 bc_byte_op( Byte * source, Byte * dest, int count, U16 * tree, 
@@ -648,14 +746,36 @@ bc_byte_op( Byte * source, Byte * dest, int count, U16 * tree,
 		EDIFF_BEGIN_PIXEL(src_pal->r,src_pal->g,src_pal->b);
 		while ( 1) {
 			index = (((r >> shift) & 3) << 4) + 
-					(((g >> shift) & 3) << 2) +
-						((b >> shift) & 3);
+				(((g >> shift) & 3) << 2) +
+				((b >> shift) & 3);
 			if ( tree[ table + index] & PAL_REF) {
 				table = (tree[ table + index] & ~PAL_REF) * CELL_SIZE;
 				shift -= 2;
 			} else {
 				PRGBColor dst_pal = dst_palette + (*(dest++) = tree[ table + index]);
 				EDIFF_END_PIXEL( dst_pal->r, dst_pal->g, dst_pal->b);
+				break;
+			}
+		}
+	} 
+}
+
+/* 256, remap one palette to another, not dithered */
+void
+bc_byte_nop( Byte * source, Byte * dest, int count, U16 * tree, PRGBColor src_palette, PRGBColor dst_palette)
+{
+	while ( count--) {
+		int table = 0, shift = 6, index;
+		PRGBColor src_pal = src_palette + *(source++);
+		while ( 1) {
+			index = (((src_pal->r >> shift) & 3) << 4) + 
+				(((src_pal->g >> shift) & 3) << 2) +
+				((src_pal->b >> shift) & 3);
+			if ( tree[ table + index] & PAL_REF) {
+				table = (tree[ table + index] & ~PAL_REF) * CELL_SIZE;
+				shift -= 2;
+			} else {
+				*(dest++) = tree[ table + index];
 				break;
 			}
 		}
@@ -688,7 +808,7 @@ bc_byte_rgb( register Byte * source, Byte * dest, register int count, register P
 void
 bc_graybyte_mono_ht( register Byte * source, register Byte * dest, register int count, int lineSeqNo)
 {
-#define gb64cmp  (((*source+++1) >> 2) > map_halftone8x8_64[ index++])
+#define gb64cmp  ((*source++ >> 2) > map_halftone8x8_64[ index++])
 	int count8 = count & 7;
 	lineSeqNo = ( lineSeqNo & 7) << 3;
 	count >>= 3;
@@ -755,24 +875,26 @@ bc_graybyte_nibble_ed( Byte * source, Byte * dest, int count, int * err_buf)
 	EDIFF_INIT;
 	while ( count--)
 	{
-		Byte dst, c, rm;
+		Byte dst, c;
+		int rm;
 		c = *source++;
 		EDIFF_BEGIN_PIXEL(c,c,c);
-		dst = div17[r] << 4;
-		rm = r % 17;
+		rm = (r & 0x0f) - (r >> 4);
+		dst = r & 0xf0;
 		EDIFF_END_PIXEL_EX(rm,rm,rm);
 		c = *source++;
 		EDIFF_BEGIN_PIXEL(c,c,c);
-		rm = r % 17;
-		*dest++ = dst | div17[r];
+		rm = (r & 0x0f) - (r >> 4);
+		*dest++ = dst | (r >> 4);
 		EDIFF_END_PIXEL_EX(rm,rm,rm);
 	}
 	if ( tail)
 	{
-		Byte c = *source++, rm; 
+		Byte c = *source++;
+		int rm;
 		EDIFF_BEGIN_PIXEL(c,c,c);
-		rm = r % 17;
-		*dest = div17[r] << 4;
+		rm = (r & 0x0f) - (r >> 4);
+		*dest = r & 0xf0;
 		EDIFF_END_PIXEL_EX(rm,rm,rm);
 	}
 }   
@@ -925,9 +1047,9 @@ void
 bc_rgb_nibble_ht( register Byte * source, Byte * dest, register int count, int lineSeqNo)
 {
 #define tc8cmp  ( source+=3,                          \
-					(((( source[-3]+1) >>2) > cmp))      +  \
-					(((( source[-2]+1) >>2) > cmp) << 1) +  \
-					(((( source[-1]+1) >>2) > cmp) << 2)    \
+					(((source[-3]>>2) > cmp))      +  \
+					(((source[-2]>>2) > cmp) << 1) +  \
+					(((source[-1]>>2) > cmp) << 2)    \
 					)
 	Byte tail = count & 1;
 	lineSeqNo = ( lineSeqNo & 7) << 3;
@@ -979,12 +1101,11 @@ bc_rgb_byte( Byte * source, register Byte * dest, register int count)
 {
 	while ( count--)
 	{
-		register Byte dst = ( div51 [ *source++]);
-		dst += ( div51[ *source++]) * 6;
-		*dest++ = dst + div51[ *source++] * 36;
+		register Byte dst = ( div51f[ *source++]);
+		dst += ( div51f[ *source++]) * 6;
+		*dest++ = dst + div51f[ *source++] * 36;
 	}
 }
-
 
 /* rgb-> 256 cubic, halftoned */
 void
@@ -1014,10 +1135,10 @@ bc_rgb_byte_ed( Byte * source, Byte * dest, int count, int * err_buf)
 	EDIFF_INIT;
 	while ( count--) {
 		EDIFF_BEGIN_PIXEL(*(source++), *(source++), *(source++));
-		*(dest++) = div51[r] * 36 + div51[g] * 6 + div51[b];
-		EDIFF_END_PIXEL_EX( mod51[r], mod51[g], mod51[b]);
-	}   
-}   
+		*(dest++) = div51f[r] * 36 + div51f[g] * 6 + div51f[b];
+		EDIFF_END_PIXEL_EX( mod51f[r], mod51f[g], mod51f[b]);
+	}
+}
 
 /* rgb -> 8bit optimized */
 void
@@ -1031,8 +1152,8 @@ bc_rgb_byte_op( RGBColor * src, Byte * dest, int count, U16 * tree, RGBColor * p
 		src++;
 		while ( 1) {
 			index = (((r >> shift) & 3) << 4) + 
-					(((g >> shift) & 3) << 2) +
-						((b >> shift) & 3);
+				(((g >> shift) & 3) << 2) +
+				 ((b >> shift) & 3);
 			if ( tree[ table + index] & PAL_REF) {
 				table = (tree[ table + index] & ~PAL_REF) * CELL_SIZE;
 				shift -= 2;
@@ -1045,7 +1166,29 @@ bc_rgb_byte_op( RGBColor * src, Byte * dest, int count, U16 * tree, RGBColor * p
 		}
 	} 
 }
-	
+
+/* rgb -> 8bit optimized not dithered */
+void
+bc_rgb_byte_nop( RGBColor * src, Byte * dest, int count, U16 * tree, RGBColor * palette)
+{
+	while ( count--) {
+		int table = 0, shift = 6, index;
+		while ( 1) {
+			index = (((src->r >> shift) & 3) << 4) +
+				(((src->g >> shift) & 3) << 2) +
+				 ((src->b >> shift) & 3);
+			if ( tree[ table + index] & PAL_REF) {
+				table = (tree[ table + index] & ~PAL_REF) * CELL_SIZE;
+				shift -= 2;
+			} else {
+				*(dest++) = tree[ table + index];
+				break;
+			}
+		}
+		src++;
+	}
+}
+
 /* bitstroke copiers */
 void
 bc_nibble_copy( Byte * source, Byte * dest, unsigned int from, unsigned int width)

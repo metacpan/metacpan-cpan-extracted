@@ -11,10 +11,16 @@ use_ok('Data::Context::Finder::File');
 use_ok('Data::Context::Instance');
 use_ok('Data::Context::Loader');
 use_ok('Data::Context::Loader::File');
-use_ok('Data::Context::Loader::File::XML');
-use_ok('Data::Context::Loader::File::JSON');
-use_ok('Data::Context::Loader::File::JS');
-use_ok('Data::Context::Loader::File::YAML');
+if ( eval { require XML::Simple } ) {
+    use_ok('Data::Context::Loader::File::XML');
+}
+if ( eval { require JSON::XS } ) {
+    use_ok('Data::Context::Loader::File::JSON');
+    use_ok('Data::Context::Loader::File::JS');
+}
+if ( eval { require YAML::XS } ) {
+    use_ok('Data::Context::Loader::File::YAML');
+}
 use_ok('Data::Context::Log');
 use_ok('Data::Context::Util');
 

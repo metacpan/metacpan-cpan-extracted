@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -74,7 +74,7 @@
          "web" : "https://github.com/plicease/Mojolicious-Plugin-TtRenderer"
       }
    },
-   "version" : "1.59",
+   "version" : "1.60",
    "x_contributors" : [
       "Ask Bj\u00f8rn Hansen",
       "Graham Ollis <plicease@cpan.org>",
@@ -96,6 +96,8 @@
       "Dinis Lage",
       "jay mortensen (GMORTEN)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_generated_by_perl" : "v5.29.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
+   "x_use_unsafe_inc" : 0
 }
 

@@ -1,3 +1,10 @@
+## name perl version
+## failures 0
+## cut
+
+use v5.18;
+print 42;
+
 ## name File::Spec
 ## failures 1
 ## cut
@@ -49,5 +56,72 @@ print File::Spec->catfile("answer" => 42);
 ## cut
 
 use Try::Lite;
-use Something;
 print localtime();
+
+## name Generic: use Foobar -- but we do not know how to verify if it is used.
+## failures 0
+## cut
+
+use Foobar;
+print 42;
+
+## name Generic: use Something objectively.
+## failures 0
+## cut
+
+use Foobar;
+use Something;
+Something->process( localtime() );
+
+## name Generic: use Something functionally.
+## failures 0
+## cut
+
+use Foobar;
+use Something;
+Something::process( localtime() );
+
+## name Hijk (unused)
+## failures 1
+## cut
+
+use Hijk;
+print something();
+
+## name Hijk::request
+## failures 0
+## cut
+
+use Hijk;
+Hijk::request($req);
+
+## name Moo
+## failures 0
+## cut
+
+use Moo;
+has zzz => ( is => "rw" );
+
+## name self;
+## failures 0
+## cut
+
+use self;
+sub fnord {
+    print $self->darf;
+}
+
+## name Generic: with imported symbols.
+## failures 0
+## cut
+
+use Foo qw(bar);
+my $a = 42;
+bar($a);
+
+## name Pragmatism
+## failures 0
+## cut
+
+use Test::NoWarnings;
+print 42;

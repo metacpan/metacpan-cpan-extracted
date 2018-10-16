@@ -17,7 +17,7 @@ Region_init( Handle self, HV * profile)
 {
 	dPROFILE;
 	RegionRec r;
-	char *t;
+	char *t = NULL;
 	Bool free_image = false, ok;
 
 	r.type = rgnEmpty;
@@ -118,7 +118,7 @@ SV *
 Region_get_handle( Handle self)
 {
 	char buf[ 256];
-	snprintf( buf, 256, "0x%08lx", apc_region_get_handle( self));
+	snprintf( buf, 256, PR_HANDLE_FMT, apc_region_get_handle( self));
 	return newSVpv( buf, 0);
 }
 

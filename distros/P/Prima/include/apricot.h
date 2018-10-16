@@ -293,18 +293,27 @@ prima_mallocz( size_t sz);
 typedef I32 Bool;
 #if PTRSIZE==LONGSIZE
 typedef unsigned long Handle;
+#define PR_HANDLE "lu"
 #elif PTRSIZE==INTSIZE
 typedef unsigned int Handle;
+#define PR_HANDLE "u"
 #elif PTRSIZE==SHORTSIZE
 typedef unsigned short Handle;
+#define PR_HANDLE "hu"
 #elif defined(HAS_LONG_LONG) && PTRSIZE==LONGLONGSIZE
 typedef unsigned long long Handle;
+#define PR_HANDLE "llu"
 #elif defined(HAS_QUAD) && PTRSIZE==8
 typedef Uquad_t Handle;
+#define PR_HANDLE "U64d"
 #else
 #error "Cannot find adequate integer type"
 #endif
 typedef Handle ApiHandle;
+
+#define __xstr1(x) #x
+#define __xstr2(x) __xstr1(x)
+#define PR_HANDLE_FMT "0x%0" __xstr2(PTRSIZE) PR_HANDLE
 
 #include "Types.h"
 
@@ -1499,8 +1508,10 @@ GUI(PM)
 GUI(Windows)
 #define guiXLib                 3
 GUI(XLib)
-#define guiGTK2                 4
+#define guiGTK2                 4 /* back-compat */
+#define guiGTK                  4
 GUI(GTK2)
+GUI(GTK)
 END_TABLE(gui,UV)
 #undef GUI
 
@@ -2929,16 +2940,46 @@ IS(MaxIndex)
 END_TABLE(is,UV)
 #undef IS
 
+/* Image conversion types: dithering */
+#define ICTD(const_name) CONSTANT(ictd,const_name)
+START_TABLE(ictd,UV)
+#define    ictdNone               0
+ICTD(None)
+#define    ictdOrdered            1
+ICTD(Ordered)
+#define    ictdErrorDiffusion     2
+ICTD(ErrorDiffusion)
+#define    ictdMask               0x0f
+ICTD(Mask)
+END_TABLE(ictd,UV)
+#undef ICTD
+
+/* Image conversion types: palette optimization */
+#define ICTP(const_name) CONSTANT(ictp,const_name)
+START_TABLE(ictp,UV)
+#define    ictpUnoptimized        0
+ICTP(Unoptimized)
+#define    ictpCubic              0x10
+ICTP(Cubic)
+#define    ictpOptimized          0x20
+ICTP(Optimized)
+#define    ictpMask               0xf0
+ICTP(Mask)
+END_TABLE(ictp,UV)
+#undef ICTP
+
 /* Image conversion types */
 #define ICT(const_name) CONSTANT(ict,const_name)
 START_TABLE(ict,UV)
-#define    ictNone               0
+#define    ictNone               (ictdNone|ictpUnoptimized)
 ICT(None)
-#define    ictOrdered            1
+#define    ictPosterization      (ictdNone|ictpOptimized)
+ICT(Posterization)
+#define    ictOrdered            (ictdOrdered|ictpCubic)
 ICT(Ordered)
-#define    ictErrorDiffusion     2
+#define    ictErrorDiffusion     (ictdErrorDiffusion|ictpCubic)
 ICT(ErrorDiffusion)
-#define    ictOptimized          3
+#define    ictOptimized          (ictdErrorDiffusion|ictpOptimized)
 ICT(Optimized)
 END_TABLE(ict,UV)
 #undef ICT

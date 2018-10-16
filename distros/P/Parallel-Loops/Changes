@@ -1,3 +1,6 @@
+Version 0.09 on Oct 16 2018:
+    - Fix Bug #127362 for Parallel-Loops: Fails with recent versions of
+      Parallel::ForkManager
 Version 0.08 on Mar 6 2016:
     - Introduce $finishSub for while() to make it easy/possible to report
       progress in the parent.

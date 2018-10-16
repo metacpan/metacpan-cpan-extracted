@@ -12,7 +12,7 @@
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = q(20181014);                                                     # Version
+our $VERSION = q(20181016);                                                     # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -447,7 +447,7 @@ sub absFromAbsPlusRel($$)                                                       
   q(/)
  }
 
-sub relFromAbsAgainstAbs($$)                                                    #I Derive a relative file name for the first absolute file name relative to the second absolute file name.
+sub relFromAbsAgainstAbs($$)                                                    # Derive a relative file name for the first absolute file name relative to the second absolute file name.
  {my ($f, $a) = @_;                                                             # Absolute file to be made relative, absolute file name to make relative to.
   my $m = q(Specify an absolute file name for the);
   defined $f or confess "$m first parameter\n";
@@ -465,14 +465,14 @@ sub relFromAbsAgainstAbs($$)                                                    
   my @l = (q(..)) x scalar(@a);
   pop @l if $fp && $fp eq "/";
   push @l, q(..) if $ap && $ap eq "/" and defined $af;
-  return fpe(@l, @f, grep{$_ and m/\S/} $ff, $fx) if  defined($fx);
-  return fpf(@l, @f, grep{$_ and m/\S/} $ff) if !defined($fx) and defined($ff);
+  return  fpe(@l, @f, grep{$_ and m/\S/} $ff, $fx) if  defined($fx);
+  return  fpf(@l, @f, grep{$_ and m/\S/} $ff)      if !defined($fx) and defined($ff);
   my $s = fpd(@l, @f, grep{$_ and m/\S/} $ff);
   return "./" unless $s;
   $s;
  }
 
-sub sumAbsAndRel(@)                                                             # Combine zero or more absolute and relative file names
+sub sumAbsAndRel(@)                                                             #I Combine zero or more absolute and relative file names
  {my (@f) = @_;                                                                 # Absolute and relative file names
   return undef unless @f;
   return $f[0] unless @f > 1;
@@ -1506,7 +1506,7 @@ sub loadHash($%)                                                                
  }
 
 sub reloadHashes2($$)                                                           #P Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
- {my ($d, $progress) = @_               ;                                       # Data structure, progress
+ {my ($d, $progress) = @_;                                                      # Data structure, progress
   return unless my $r = reftype($d);
   return if $$progress{$d};
   if ($d =~ m(array)is)
@@ -1526,6 +1526,31 @@ sub reloadHashes($)                                                             
  {my ($d) = @_;                                                                 # Data structure
   reloadHashes2($d, {});
   $d
+ }
+
+sub showHashes2($$$)                                                            #P Create a map of all the keys within all the hashes within a tower of data structures.
+ {my ($d, $keys, $progress) = @_;                                               # Data structure, keys found progress
+  return unless my $r = reftype($d);
+  return if $$progress{$d};
+  if ($d =~ m(array)is)
+   {$$progress{$d}++;
+    &showHashes2($_, $keys, $progress) for @$d;
+   }
+  elsif ($d =~ m(hash)is)
+   {$$progress{$d}++;
+    &showHashes2($_, $keys, $progress) for values %$d;
+    if (my $b = blessed($d))
+     {for my $k(keys %$d)
+       {$keys->{$b}{$k}++
+       }
+     }
+   }
+ }
+
+sub showHashes($)                                                               #P Create a map of all the keys within all the hashes within a tower of data structures.
+ {my ($d) = @_;                                                                 # Data structure
+  showHashes2($d, my $keys = {}, {});
+  $keys
  }
 
 sub adopt($)                                                                    # Make each of the caller's subs appear in the package to which B<$data> has been blessed unless there is already a corresponding entry.
@@ -1620,7 +1645,7 @@ sub nws($;$)                                                                    
   firstNChars($s, $length)                                                      # Apply maximum length if requested
  }
 
-sub stringsAreNotEqual($$)                                                      # Return the common start followwe by the two non equal tails of two non equal strings or an empty list if the strings are equal.
+sub stringsAreNotEqual($$)                                                      # Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
  {my ($a, $b) = @_;                                                             # First string, second string
   my @a = split //, $a;
   my @b = split //, $b;
@@ -6500,9 +6525,10 @@ __DATA__
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 388;
+use Test::More tests => 390;
 my $windows = $^O =~ m(MSWin32)is;
 my $mac     = $^O =~ m(darwin)is;
+my $freeBsd = $^O =~ m(freebsd)is;
 
 if (1)                                                                          # Unicode to local file
  {use utf8;
@@ -7765,23 +7791,21 @@ if (1) {                                                                        
   writeFiles($h);
   my $a = readFiles(q(aaa));
   is_deeply $h, $a;
-  qx(rsync -v 2>&1 1>/dev/null);
-  if ($!)
-   {ok 1;
+  if ($freeBsd or $windows)
+   {ok 1 for 1..2;
    }
   else
    {copyFolder(q(aaa), q(bbb));
-   }
-  my $b = readFiles(q(bbb));
-  is_deeply [sort values %$a],[sort values %$b];
+    my $b = readFiles(q(bbb));
+    is_deeply [sort values %$a],[sort values %$b];
 
-  copyFile(q(aaa/1.txt), q(aaa/2.txt));
-  my $A = readFiles(q(aaa));
-  is_deeply(values %$A);
+    copyFile(q(aaa/1.txt), q(aaa/2.txt));
+    my $A = readFiles(q(aaa));
+    is_deeply(values %$A);
+   }
   clearFolder(q(aaa), 3);
   clearFolder(q(bbb), 3);
  }
-
 
 if (1)                                                                          #Tadopt
  {package AAAA;
@@ -7806,6 +7830,26 @@ if (1)                                                                          
   sub BBBB::bbbb{q(BBBB)}
   ok $b->bbbb    eq q(BBBB);
   ok &BBBB::bbbb eq q(BBBB);
+ }
+
+if (1)
+ {my $d = bless
+   {a=>1,
+    b=>
+     [bless({A=>1, B=>2, C=>3}, q(BBBB)),
+      bless({A=>5, B=>6, C=>7}, q(BBBB)),
+     ],
+    c=>bless({A=>1, B=>2, C=>3}, q(CCCC)),
+   }, q(AAAA);
+
+  is_deeply showHashes($d),
+   {AAAA => { a => 1, b => 1, c => 1 },
+    BBBB => { A => 2, B => 2, C => 2 },
+    CCCC => { A => 1, B => 1, C => 1 },
+   };
+
+  reloadHashes($d);
+  ok $d->c->C == 3;
  }
 
 #tttt

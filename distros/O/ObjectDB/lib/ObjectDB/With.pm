@@ -3,7 +3,7 @@ package ObjectDB::With;
 use strict;
 use warnings;
 
-our $VERSION = '3.27';
+our $VERSION = '3.28';
 
 sub new {
     my $class = shift;
@@ -19,8 +19,11 @@ sub new {
 
     my $joins = { join => [] };
 
+    my @with = sort { (ref $a eq 'HASH' ? $a->{name} : $a) cmp (ref $b eq 'HASH' ? $b->{name} : $b) }
+      grep { defined } @{ $self->{with} || [] };
+
     my %seen;
-    if (my @with = sort grep { defined } @{ $self->{with} || [] }) {
+    if (@with) {
         foreach my $with (@with) {
             my $meta = $self->{meta};
 

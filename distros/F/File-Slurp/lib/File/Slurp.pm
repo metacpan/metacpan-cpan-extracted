@@ -3,18 +3,15 @@ package File::Slurp;
 use strict;
 use warnings ;
 
-our $VERSION = '9999.21';
+our $VERSION = '9999.22';
 $VERSION = eval $VERSION;
 
 use Carp ;
-use Exporter ;
+use Exporter qw(import);
 use Fcntl qw( :DEFAULT ) ;
+use File::Spec;
 use POSIX qw( :fcntl_h ) ;
 use Errno ;
-#use Symbol ;
-
-use vars qw( @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS  ) ;
-@ISA = qw( Exporter ) ;
 
 my @std_export = qw(
 	read_file
@@ -29,9 +26,6 @@ my @edit_export = qw(
 	edit_file_lines
 ) ;
 
-my @ok_export = qw(
-) ;
-
 my @abbrev_export = qw(
 	rf
 	wf
@@ -39,7 +33,7 @@ my @abbrev_export = qw(
 	efl
 ) ;
 
-@EXPORT_OK = (
+our @EXPORT_OK = (
 	@edit_export,
 	@abbrev_export,
 	qw(
@@ -48,67 +42,18 @@ my @abbrev_export = qw(
 	),
 ) ;
 
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
 	'all'	=> [ @std_export, @edit_export, @abbrev_export, @EXPORT_OK ],
 	'edit'	=> [ @edit_export ],
 	'std'	=> [ @std_export ],
 	'abr'	=> [ @abbrev_export ],
 ) ;
 
-@EXPORT = @std_export ;
+our @EXPORT = @std_export ;
 
 my $max_fast_slurp_size = 1024 * 100 ;
 
 my $is_win32 = $^O =~ /win32/i ;
-
-# Install subs for various constants that aren't set in older perls
-# (< 5.005).  Fcntl on old perls uses Exporter to define subs without a
-# () prototype These can't be overridden with the constant pragma or
-# we get a prototype mismatch.  Hence this less than aesthetically
-# appealing BEGIN block:
-
-BEGIN {
-	unless( defined &SEEK_SET ) {
-		*SEEK_SET = sub { 0 };
-		*SEEK_CUR = sub { 1 };
-		*SEEK_END = sub { 2 };
-	}
-
-	unless( defined &O_BINARY ) {
-		*O_BINARY = sub { 0 };
-		*O_RDONLY = sub { 0 };
-		*O_WRONLY = sub { 1 };
-	}
-
-	unless ( defined &O_APPEND ) {
-
-		if ( $^O =~ /olaris/ ) {
-			*O_APPEND = sub { 8 };
-			*O_CREAT = sub { 256 };
-			*O_EXCL = sub { 1024 };
-		}
-		elsif ( $^O =~ /inux/ ) {
-			*O_APPEND = sub { 1024 };
-			*O_CREAT = sub { 64 };
-			*O_EXCL = sub { 128 };
-		}
-		elsif ( $^O =~ /BSD/i ) {
-			*O_APPEND = sub { 8 };
-			*O_CREAT = sub { 512 };
-			*O_EXCL = sub { 2048 };
-		}
-	}
-}
-
-# print "OS [$^O]\n" ;
-
-# print "O_BINARY = ", O_BINARY(), "\n" ;
-# print "O_RDONLY = ", O_RDONLY(), "\n" ;
-# print "O_WRONLY = ", O_WRONLY(), "\n" ;
-# print "O_APPEND = ", O_APPEND(), "\n" ;
-# print "O_CREAT   ", O_CREAT(), "\n" ;
-# print "O_EXCL   ", O_EXCL(), "\n" ;
-
 
 *slurp = \&read_file ;
 *rf = \&read_file ;
@@ -778,7 +723,7 @@ sub read_dir {
 
 	if ( $opts->{'prefix'} ) {
 
-		substr( $_, 0, 0, "$dir/" ) for @dir_entries ;
+		$_ = File::Spec->catfile($dir, $_) for @dir_entries;
 	}
 
 	return @dir_entries if wantarray ;
@@ -833,33 +778,33 @@ File::Slurp - Simple and Efficient Reading/Writing/Modifying of Complete Files
 
   use File::Slurp;
 
-# read in a whole file into a scalar
+  # read in a whole file into a scalar
   my $text = read_file( 'filename' ) ;
 
-# read in a whole file into an array of lines
+  # read in a whole file into an array of lines
   my @lines = read_file( 'filename' ) ;
 
-# write out a whole file from a scalar
+  # write out a whole file from a scalar
   write_file( 'filename', $text ) ;
 
-# write out a whole file from an array of lines
+  # write out a whole file from an array of lines
   write_file( 'filename', @lines ) ;
 
-# Here is a simple and fast way to load and save a simple config file
-# made of key=value lines.
+  # Here is a simple and fast way to load and save a simple config file
+  # made of key=value lines.
   my %conf = read_file( $file_name ) =~ /^(\w+)=(.*)$/mg ;
   write_file( $file_name, {atomic => 1}, map "$_=$conf{$_}\n", keys %conf ) ;
 
-# insert text at the beginning of a file
+  # insert text at the beginning of a file
   prepend_file( 'filename', $text ) ;
 
-# in-place edit to replace all 'foo' with 'bar' in file
+  # in-place edit to replace all 'foo' with 'bar' in file
   edit_file { s/foo/bar/g } 'filename' ;
 
-# in-place edit to delete all lines with 'foo' from file
+  # in-place edit to delete all lines with 'foo' from file
   edit_file_lines sub { $_ = '' if /foo/ }, 'filename' ;
 
-# read in a whole directory of file names (skipping . and ..)
+  # read in a whole directory of file names (skipping . and ..)
   my @files = read_dir( '/path/to/dir' ) ;
 
 =head1 DESCRIPTION
@@ -868,404 +813,451 @@ This module provides subs that allow you to read or write entire files
 with one simple call. They are designed to be simple to use, have
 flexible ways to pass in or get the file contents and to be very
 efficient.  There is also a sub to read in all the files in a
-directory other than C<.> and C<..>
+directory.
 
 These slurp/spew subs work for files, pipes and sockets, stdio,
-pseudo-files, and the DATA handle. Read more about why slurping files is
-a good thing in the file 'slurp_article.pod' in the extras/ directory.
+pseudo-files, and the C<DATA> handle.
 
-If you are interested in how fast these calls work, check out the
-slurp_bench.pl program in the extras/ directory. It compares many
-different forms of slurping. You can select the I/O direction, context
-and file sizes. Use the --help option to see how to run it.
+=head1 FUNCTIONS
 
-=head2 B<read_file>
-
-This sub reads in an entire file and returns its contents to the
-caller.  In scalar context it returns the entire file as a single
-scalar. In list context it will return a list of lines (using the
-current value of $/ as the separator including support for paragraph
-mode when it is set to '').
-
-  my $text = read_file( 'filename' ) ;
-  my $bin = read_file( 'filename', { binmode => ':raw' } ) ;
-  my @lines = read_file( 'filename' ) ;
-  my $lines = read_file( 'filename', array_ref => 1 ) ;
-
-The first argument is the file to slurp in. If the next argument is a
-hash reference, then it is used as the options. Otherwise the rest of
-the argument list are is used as key/value options.
-
-If the file argument is a handle (if it is a ref and is an IO or GLOB
-object), then that handle is slurped in. This mode is supported so you
-slurp handles such as C<DATA> and C<STDIN>. See the test handle.t for
-an example that does C<open( '-|' )> and the child process spews data
-to the parent which slurps it in.  All of the options that control how
-the data is returned to the caller still work in this case.
-
-If the first argument is an overloaded object then its stringified value
-is used for the filename and that file is opened.  This is a new feature
-in 9999.14. See the stringify.t test for an example.
-
-By default C<read_file> returns an undef in scalar context or a single
-undef in list context if it encounters an error. Those are both
-impossible to get with a clean read_file call which means you can check
-the return value and always know if you had an error. You can change how
-errors are handled with the C<err_mode> option.
-
-Speed Note: If you call read_file and just get a scalar return value
-it is now optimized to handle shorter files. This is only used if no
-options are used, the file is shorter then 100k bytes, the filename is
-a plain scalar and a scalar file is returned. If you want the fastest
-slurping, use the C<buf_ref> or C<scalar_ref> options (see below)
-
-NOTE: as of version 9999.06, read_file works correctly on the C<DATA>
-handle. It used to need a sysseek workaround but that is now handled
-when needed by the module itself.
-
-You can optionally request that C<slurp()> is exported to your code. This
-is an alias for read_file and is meant to be forward compatible with
-Perl 6 (which will have slurp() built-in).
-
-The options for C<read_file> are:
-
-=head3 binmode
-
-If you set the binmode option, then its value is passed to a call to
-binmode on the opened handle. You can use this to set the file to be
-read in binary mode, utf8, etc. See perldoc -f binmode for more.
-
-	my $bin_data = read_file( $bin_file, binmode => ':raw' ) ;
-	my $utf_text = read_file( $bin_file, binmode => ':utf8' ) ;
-
-=head3 array_ref
-
-If this boolean option is set, the return value (only in scalar
-context) will be an array reference which contains the lines of the
-slurped file. The following two calls are equivalent:
-
-	my $lines_ref = read_file( $bin_file, array_ref => 1 ) ;
-	my $lines_ref = [ read_file( $bin_file ) ] ;
-
-=head3 chomp
-
-If this boolean option is set, the lines are chomped. This only
-happens if you are slurping in a list context or using the
-C<array_ref> option.
-
-=head3 scalar_ref
-
-If this boolean option is set, the return value (only in scalar
-context) will be an scalar reference to a string which is the contents
-of the slurped file. This will usually be faster than returning the
-plain scalar. It will also save memory as it will not make a copy of
-the file to return. Run the extras/slurp_bench.pl script to see speed
-comparisons.
-
-	my $text_ref = read_file( $bin_file, scalar_ref => 1 ) ;
-
-=head3 buf_ref
-
-You can use this option to pass in a scalar reference and the slurped
-file contents will be stored in the scalar. This can be used in
-conjunction with any of the other options. This saves an extra copy of
-the slurped file and can lower ram usage vs returning the file. It is
-usually the fastest way to read a file into a scalar. Run the
-extras/slurp_bench.pl script to see speed comparisons.
-
-
-	read_file( $bin_file, buf_ref => \$buffer ) ;
-
-=head3 blk_size
-
-You can use this option to set the block size used when slurping from
-an already open handle (like \*STDIN). It defaults to 1MB.
-
-	my $text_ref = read_file( $bin_file, blk_size => 10_000_000,
-					     array_ref => 1 ) ;
-
-=head3 err_mode
-
-You can use this option to control how read_file behaves when an error
-occurs. This option defaults to 'croak'. You can set it to 'carp' or to
-'quiet' to have no special error handling. This code wants to carp and
-then read another file if it fails.
-
-	my $text_ref = read_file( $file, err_mode => 'carp' ) ;
-	unless ( $text_ref ) {
-
-		# read a different file but croak if not found
-		$text_ref = read_file( $another_file ) ;
-	}
-
-	# process ${$text_ref}
-
-=head2 B<write_file>
-
-This sub writes out an entire file in one call.
-
-  write_file( 'filename', @data ) ;
-
-The first argument to C<write_file> is the filename. The next argument
-is an optional hash reference and it contains key/values that can
-modify the behavior of C<write_file>. The rest of the argument list is
-the data to be written to the file.
-
-  write_file( 'filename', {append => 1 }, @data ) ;
-  write_file( 'filename', {binmode => ':raw'}, $buffer ) ;
-
-As a shortcut if the first data argument is a scalar or array reference,
-it is used as the only data to be written to the file. Any following
-arguments in @_ are ignored. This is a faster way to pass in the output
-to be written to the file and is equivalent to the C<buf_ref> option of
-C<read_file>. These following pairs are equivalent but the pass by
-reference call will be faster in most cases (especially with larger
-files).
-
-  write_file( 'filename', \$buffer ) ;
-  write_file( 'filename', $buffer ) ;
-
-  write_file( 'filename', \@lines ) ;
-  write_file( 'filename', @lines ) ;
-
-If the first argument is a handle (if it is a ref and is an IO or GLOB
-object), then that handle is written to. This mode is supported so you
-spew to handles such as \*STDOUT. See the test handle.t for an example
-that does C<open( '-|' )> and child process spews data to the parent
-which slurps it in.  All of the options that control how the data are
-passed into C<write_file> still work in this case.
-
-If the first argument is an overloaded object then its stringified value
-is used for the filename and that file is opened.  This is new feature
-in 9999.14. See the stringify.t test for an example.
-
-By default C<write_file> returns 1 upon successfully writing the file or
-undef if it encountered an error. You can change how errors are handled
-with the C<err_mode> option.
-
-The options are:
-
-=head3 binmode
-
-If you set the binmode option, then its value is passed to a call to
-binmode on the opened handle. You can use this to set the file to be
-read in binary mode, utf8, etc. See perldoc -f binmode for more.
-
-	write_file( $bin_file, {binmode => ':raw'}, @data ) ;
-	write_file( $bin_file, {binmode => ':utf8'}, $utf_text ) ;
-
-=head3 perms
-
-The perms option sets the permissions of newly-created files. This value
-is modified by your process's umask and defaults to 0666 (same as
-sysopen).
-
-NOTE: this option is new as of File::Slurp version 9999.14;
-
-=head3 buf_ref
-
-You can use this option to pass in a scalar reference which has the
-data to be written. If this is set then any data arguments (including
-the scalar reference shortcut) in @_ will be ignored. These are
-equivalent:
-
-	write_file( $bin_file, { buf_ref => \$buffer } ) ;
-	write_file( $bin_file, \$buffer ) ;
-	write_file( $bin_file, $buffer ) ;
-
-=head3 atomic
-
-If you set this boolean option, the file will be written to in an
-atomic fashion. A temporary file name is created by appending the pid
-($$) to the file name argument and that file is spewed to. After the
-file is closed it is renamed to the original file name (and rename is
-an atomic operation on most OS's). If the program using this were to
-crash in the middle of this, then the file with the pid suffix could
-be left behind.
-
-=head3 append
-
-If you set this boolean option, the data will be written at the end of
-the current file. Internally this sets the sysopen mode flag O_APPEND.
-
-	write_file( $file, {append => 1}, @data ) ;
-
- You
-can import append_file and it does the same thing.
-
-=head3 no_clobber
-
-If you set this boolean option, an existing file will not be overwritten.
-
-	write_file( $file, {no_clobber => 1}, @data ) ;
-
-=head3 err_mode
-
-You can use this option to control how C<write_file> behaves when an
-error occurs. This option defaults to 'croak'. You can set it to
-'carp' or to 'quiet' to have no error handling other than the return
-value. If the first call to C<write_file> fails it will carp and then
-write to another file. If the second call to C<write_file> fails, it
-will croak.
-
-	unless ( write_file( $file, { err_mode => 'carp', \$data ) ;
-
-		# write a different file but croak if not found
-		write_file( $other_file, \$data ) ;
-	}
-
-=head2 overwrite_file
-
-This sub is just a typeglob alias to write_file since write_file
-always overwrites an existing file. This sub is supported for
-backwards compatibility with the original version of this module. See
-write_file for its API and behavior.
+L<File::Slurp> implements the following functions.
 
 =head2 append_file
 
-This sub will write its data to the end of the file. It is a wrapper
-around write_file and it has the same API so see that for the full
-documentation. These calls are equivalent:
+	use File::Spec qw(append_file write_file);
+	my $res = append_file('/path/to/file', "Some text");
+	# same as
+	my $res = write_file('/path/to/file', {append => 1}, "Some text");
 
-	append_file( $file, @data ) ;
-	write_file( $file, {append => 1}, @data ) ;
+The C<append_file> function is simply a synonym for the
+L<File::Slurp/"write_file"> function, but ensures that the C<append> option is
+set.
 
+=head2 edit_file
+
+	use File::Slurp qw(edit_file);
+	# perl -0777 -pi -e 's/foo/bar/g' filename
+	edit_file { s/foo/bar/g } 'filename';
+	edit_file sub { s/foo/bar/g }, 'filename';
+	sub replace_foo { s/foo/bar/g }
+	edit_file \&replace_foo, 'filename';
+
+The C<edit_file> function reads in a file into C<$_>, executes a code block that
+should modify C<$_>, and then writes C<$_> back to the file. The C<edit_file>
+function reads in the entire file and calls the code block one time. It is
+equivalent to the C<-pi> command line options of Perl but you can call it from
+inside your program and not have to fork out a process.
+
+The first argument to C<edit_file> is a code block or a code reference. The
+code block is not followed by a comma (as with C<grep> and C<map>) but a code
+reference is followed by a comma.
+
+The next argument is the filename.
+
+The next argument(s) is either a hash reference or a flattened hash,
+C<< key => value >> pairs. The options are passed through to the
+L<File::Slurp/"write_file"> function. All options are described there.
+Only the C<binmode> and C<err_mode> options are supported. The call to
+L<File::Slurp/"write_file"> has the C<atomic> option set so you will always
+have a consistent file.
+
+=head2 edit_file_lines
+
+	use File::Slurp qw(edit_file_lines);
+	# perl -pi -e '$_ = "" if /foo/' filename
+	edit_file_lines { $_ = '' if /foo/ } 'filename';
+	edit_file_lines sub { $_ = '' if /foo/ }, 'filename';
+	sub delete_foo { $_ = '' if /foo/ }
+	edit_file \&delete_foo, 'filename';
+
+The C<edit_file_lines> function reads each line of a file into C<$_>, and
+executes a code block that should modify C<$_>. It will then write C<$_> back
+to the file. It is equivalent to the C<-pi> command line options of Perl but
+you can call it from inside your program and not have to fork out a process.
+
+The first argument to C<edit_file_lines> is a code block or a code reference.
+The code block is not followed by a comma (as with C<grep> and C<map>) but a
+code reference is followed by a comma.
+
+The next argument is the filename.
+
+The next argument(s) is either a hash reference or a flattened hash,
+C<< key => value >> pairs. The options are passed through to the
+L<File::Slurp/"write_file"> function. All options are described there.
+Only the C<binmode> and C<err_mode> options are supported. The call to
+L<File::Slurp/"write_file"> has the C<atomic> option set so you will always
+have a consistent file.
+
+=head2 ef
+
+	use File::Slurp qw(ef);
+	# perl -0777 -pi -e 's/foo/bar/g' filename
+	ef { s/foo/bar/g } 'filename';
+	ef sub { s/foo/bar/g }, 'filename';
+	sub replace_foo { s/foo/bar/g }
+	ef \&replace_foo, 'filename';
+
+The C<ef> function is simply a synonym for the L<File::Slurp/"edit_file">
+function.
+
+=head2 efl
+
+	use File::Slurp qw(efl);
+	# perl -pi -e '$_ = "" if /foo/' filename
+	efl { $_ = '' if /foo/ } 'filename';
+	efl sub { $_ = '' if /foo/ }, 'filename';
+	sub delete_foo { $_ = '' if /foo/ }
+	efl \&delete_foo, 'filename';
+
+The C<efl> function is simply a synonym for the L<File::Slurp/"edit_file_lines">
+function.
+
+=head2 overwrite_file
+
+	use File::Spec qw(overwrite_file);
+	my $res = overwrite_file('/path/to/file', "Some text");
+
+The C<overwrite_file> function is simply a synonym for the
+L<File::Slurp/"write_file"> function.
 
 =head2 prepend_file
 
-This sub writes data to the beginning of a file. The previously existing
-data is written after that so the effect is prepending data in front of
-a file. It is a counterpart to the append_file sub in this module. It
+	use File::Slurp qw(prepend_file);
+	prepend_file($file, $header);
+	prepend_file($file, \@lines);
+	prepend_file($file, { binmode => 'raw:'}, $bin_data);
+
+	# equivalent to:
+	use File::Slurp qw(read_file write_file);
+	my $content = read_file('file_name');
+	my $new_content = "hahahaha";
+	write_file('file_name', $new_content . $content);
+
+The C<prepend_file> function is the opposite of L<File::Slurp/"append_file"> as
+it writes new contents to the beginning of the file instead of the end. It is a
+combination of L<File::Slurp/"read_file"> and L<File::Slurp/"write_file">. It
 works by first using C<read_file> to slurp in the file and then calling
 C<write_file> with the new data and the existing file data.
 
-The first argument to C<prepend_file> is the filename. The next argument
-is an optional hash reference and it contains key/values that can modify
-the behavior of C<prepend_file>. The rest of the argument list is the
-data to be written to the file and that is passed to C<write_file> as is
-(see that for allowed data).
+The first argument to C<prepend_file> is the filename.
+
+The next argument(s) is either a hash reference or a flattened hash,
+C<< key => value >> pairs. The options are passed through to the
+L<File::Slurp/"write_file"> function. All options are described there.
 
 Only the C<binmode> and C<err_mode> options are supported. The
 C<write_file> call has the C<atomic> option set so you will always have
-a consistent file. See above for more about those options.
-
-C<prepend_file> is not exported by default, you need to import it
-explicitly.
-
-	use File::Slurp qw( prepend_file ) ;
-	prepend_file( $file, $header ) ;
-	prepend_file( $file, \@lines ) ;
-	prepend_file( $file, { binmode => 'raw:'}, $bin_data ) ;
-
-
-=head2 edit_file, edit_file_lines
-
-These subs read in a file into $_, execute a code block which should
-modify $_ and then write $_ back to the file. The difference between
-them is that C<edit_file> reads the whole file into $_ and calls the
-code block one time. With C<edit_file_lines> each line is read into $_
-and the code is called for each line. In both cases the code should
-modify $_ if desired and it will be written back out. These subs are
-the equivalent of the -pi command line options of Perl but you can
-call them from inside your program and not fork out a process. They
-are in @EXPORT_OK so you need to request them to be imported on the
-use line or you can import both of them with:
-
-	use File::Slurp qw( :edit ) ;
-
-The first argument to C<edit_file> and C<edit_file_lines> is a code
-block or a code reference. The code block is not followed by a comma
-(as with grep and map) but a code reference is followed by a
-comma. See the examples below for both styles. The next argument is
-the filename. The last argument is an optional hash reference and it
-contains key/values that can modify the behavior of
-C<prepend_file>.
-
-Only the C<binmode> and C<err_mode> options are supported. The
-C<write_file> call has the C<atomic> option set so you will always
-have a consistent file. See above for more about those options.
-
-Each group of calls below show a Perl command line instance and the
-equivalent calls to C<edit_file> and C<edit_file_lines>.
-
-	perl -0777 -pi -e 's/foo/bar/g' filename
-	use File::Slurp qw( edit_file ) ;
-	edit_file { s/foo/bar/g } 'filename' ;
-	edit_file sub { s/foo/bar/g }, 'filename' ;
-	edit_file \&replace_foo, 'filename' ;
-	sub replace_foo { s/foo/bar/g }
-
-	perl -pi -e '$_ = "" if /foo/' filename
-	use File::Slurp qw( edit_file_lines ) ;
-	use File::Slurp ;
-	edit_file_lines { $_ = '' if /foo/ } 'filename' ;
-	edit_file_lines sub { $_ = '' if /foo/ }, 'filename' ;
-	edit_file \&delete_foo, 'filename' ;
-	sub delete_foo { $_ = '' if /foo/ }
+a consistent file.
 
 =head2 read_dir
 
-This sub reads all the file names from directory and returns them to
-the caller but C<.> and C<..> are removed by default.
+	use File::Spec qw(read_dir);
+	my @files = read_dir('/path/to/dir');
+	# all files, even the dots
+	my @files = read_dir('/path/to/dir', keep_dot_dot => 1);
+	# keep the full file path
+	my @paths = read_dir('/path/to/dir', prefix => 1);
+	# scalar context
+	my $files_ref = read_dir('/path/to/dir');
 
-	my @files = read_dir( '/path/to/dir' ) ;
+This function returns a list of the filenames in the supplied directory. In
+list context, an array is returned, in scalar context, an array reference is
+returned.
 
-The first argument is the path to the directory to read.  If the next
-argument is a hash reference, then it is used as the options.
-Otherwise the rest of the argument list are is used as key/value
-options.
+The first argument is the path to the directory to read.
 
-In list context C<read_dir> returns a list of the entries in the
-directory. In a scalar context it returns an array reference which has
-the entries.
+The next argument(s) is either a hash reference or a flattened hash,
+C<< key => value >> pairs. The following options are available:
 
-=head3 err_mode
+=over
 
-If the C<err_mode> option is set, it selects how errors are handled (see
-C<err_mode> in C<read_file> or C<write_file>).
+=item
 
-=head3 keep_dot_dot
+err_mode
 
-If this boolean option is set, C<.> and C<..> are not removed from the
-list of files.
+The C<err_mode> option has three possible values: C<quiet>, C<carp>, or the
+default, C<croak>. In C<quiet> mode, all errors will be silent. In C<carp> mode,
+all errors will be emitted as warnings. And, in C<croak> mode, all errors will
+be emitted as exceptions. Take a look at L<Try::Tiny> or
+L<Syntax::Keyword::Try> to see how to catch exceptions.
 
-	my @all_files = read_dir( '/path/to/dir', keep_dot_dot => 1 ) ;
+=item
 
-=head3 prefix
+keep_dot_dot
 
-If this boolean option is set, the string "$dir/" is prefixed to each
-dir entry. This means you can directly use the results to open
-files. A common newbie mistake is not putting the directory in front
-of entries when opening them.
+The C<keep_dot_dot> option is a boolean option, defaulted to false (C<0>).
+Setting this option to true (C<1>) will also return the C<.> and C<..> files
+that are removed from the file list by default.
 
-	my @paths = read_dir( '/path/to/dir', prefix => 1 ) ;
+=item
 
-=head2 EXPORT
+prefix
 
-  These are exported by default or with
-	use File::Slurp qw( :std ) ;
+The C<prefix> option is a boolean option, defaulted to false (C<0>).
+Setting this option to true (C<1>) add the directory as a prefix to the file.
+The directory and the filename are joined using C<< File::Spec->catfile() >> to
+ensure the proper directory separator is used for your OS. See L<File::Spec>.
 
-  read_file write_file overwrite_file append_file read_dir
+=back
 
-  These are exported with
-	use File::Slurp qw( :edit ) ;
+=head2 read_file
 
-  edit_file edit_file_lines
+	use File::Slurp qw(read_file);
+	my $text = read_file('filename');
+	my $bin = read_file('filename', { binmode => ':raw' });
+	my @lines = read_file('filename');
+	my $lines_ref = read_file('file_name', array_ref => 1);
+	my $lines_ref = [ read_file('file_name') ];
 
-  You can get all subs in the module exported with
-	use File::Slurp qw( :all ) ;
+	# or we can read into a buffer:
+	my $buffer;
+	read_file('file_name', buf_ref => \$buffer);
 
-=head2 LICENSE
+	# or we can set the block size for the read
+	my $text_ref = read_file(\*STDIN, blk_size => 10_000_000, array_ref => 1);
 
-  Same as Perl.
+	# or we can get a scalar reference
+	my $text_ref = read_file('file_name', scalar_ref => 1);
 
-=head2 SEE ALSO
+This function reads in an entire file and returns its contents to the
+caller. In scalar context it returns the entire file as a single
+scalar. In list context it will return a list of lines (using the
+current value of C<$/> as the separator, including support for paragraph
+mode when it is set to C<''>).
 
-An article on file slurping in extras/slurp_article.pod. There is
-also a benchmarking script in extras/slurp_bench.pl.
+The first argument is the file to be slurped in. It can be a path to a file, an
+open file handle (C<\*DATA>, C<\*STDIN>). Overloaded objects use the stringified
+file path.
+
+The next argument(s) is either a hash reference or a flattened hash,
+C<< key => value >> pairs. The following options are available:
+
+=over
+
+=item
+
+array_ref
+
+The C<array_ref> option is a boolean option, defaulted to false (C<0>). Setting
+this option to true (C<1>) will only have relevance if the C<read_file> function
+is called in scalar context. When true, the C<read_file> function will return
+a reference to an array of the lines in the file.
+
+=item
+
+binmode
+
+The C<binmode> option is a string option, defaulted to empty (C<''>). If you
+set the C<binmode> option, then its value is passed to a call to C<binmode> on
+the opened handle. You can use this to set the file to be read in binary mode,
+utf8, etc. See C<perldoc -f binmode> for more.
+
+=item
+
+blk_size
+
+You can use this option to set the block size used when slurping from
+an already open handle (like C<\*STDIN>). It defaults to 1MB.
+
+=item
+
+buf_ref
+
+The C<buf_ref> option can be used in conjunction with any of the other options.
+You can use this option to pass in a scalar reference and the slurped
+file contents will be stored in the scalar. This saves an extra copy of
+the slurped file and can lower RAM usage vs returning the file. It is
+usually the fastest way to read a file into a scalar.
+
+=item
+
+chomp
+
+The C<chomp> option is a boolean option, defaulted to false (C<0>). Setting
+this option to true (C<1>) will cause each line to have its contents C<chomp>ed.
+This option works in list context or in scalar context with the C<array_ref>
+option.
+
+=item
+
+err_mode
+
+The C<err_mode> option has three possible values: C<quiet>, C<carp>, or the
+default, C<croak>. In C<quiet> mode, all errors will be silent. In C<carp> mode,
+all errors will be emitted as warnings. And, in C<croak> mode, all errors will
+be emitted as exceptions. Take a look at L<Try::Tiny> or
+L<Syntax::Keyword::Try> to see how to catch exceptions.
+
+=item
+
+scalar_ref
+
+The C<scalar_ref> option is a boolean option, defaulted to false (C<0>). It only
+has meaning in scalar context. The return value will be a scalar reference to a
+string which is the contents of the slurped file. This will usually be faster
+than returning the plain scalar. It will also save memory as it will not make a
+copy of the file to return.
+
+=back
+
+=head2 rf
+
+	use File::Spec qw(rf);
+	my $text = rf('/path/to/file');
+
+The C<rf> function is simply a synonym for the L<File::Slurp/"read_file">
+function.
+
+=head2 slurp
+
+	use File::Spec qw(slurp);
+	my $text = slurp('/path/to/file');
+
+The C<slurp> function is simply a synonym for the L<File::Slurp/"read_file">
+function.
+
+=head2 wf
+
+	use File::Spec qw(wf);
+	my $res = wf('/path/to/file', "Some text");
+
+
+The C<wf> function is simply a synonym for the
+L<File::Slurp/"write_file"> function.
+
+=head2 write_file
+
+	use File::Slurp qw(write_file);
+	write_file('filename', @data);
+	write_file('filename', {append => 1}, @data);
+	write_file('filename', {binmode => ':raw'}, $buffer);
+	write_file('filename', \$buffer);
+	write_file('filename', $buffer);
+	write_file('filename', \@lines);
+	write_file('filename', @lines);
+
+	# binmode
+	write_file($bin_file, {binmode => ':raw'}, @data);
+	write_file($bin_file, {binmode => ':utf8'}, $utf_text);
+
+	# buffered
+	write_file($bin_file, {buf_ref => \$buffer});
+	write_file($bin_file, \$buffer);
+	write_file($bin_file, $buffer);
+
+	# append
+	write_file($file, {append => 1}, @data);
+
+	# no clobbering
+	write_file($file, {no_clobber => 1}, @data);
+
+This function writes out an entire file in one call. By default C<write_file>
+returns C<1> upon successfully writing the file or C<undef> if it encountered
+an error. You can change how errors are handled with the C<err_mode> option.
+
+The first argument to C<write_file> is the filename.
+
+The next argument(s) is either a hash reference or a flattened hash,
+C<< key => value >> pairs. The following options are available:
+
+=over
+
+=item
+
+append
+
+The C<append> option is a boolean option, defaulted to false (C<0>). Setting
+this option to true (C<1>) will cause the data to be be written at the end of
+the current file. Internally this sets the C<sysopen> mode flag C<O_APPEND>.
+
+The L<File::Slurp/"append_file"> function sets this option by default.
+
+=item
+
+atomic
+
+The C<atomic> option is a boolean option, defaulted to false (C<0>). Setting
+this option to true (C<1>) will cause the file to be be written to in an
+atomic fashion. A temporary file name is created by appending the pid
+(C<$$>) to the file name argument and that file is spewed to. After the
+file is closed it is renamed to the original file name (and C<rename> is
+an atomic operation on most OSes). If the program using this were to
+crash in the middle of this, then the file with the pid suffix could
+be left behind.
+
+=item
+
+binmode
+
+The C<binmode> option is a string option, defaulted to empty (C<''>). If you
+set the C<binmode> option, then its value is passed to a call to C<binmode> on
+the opened handle. You can use this to set the file to be read in binary mode,
+utf8, etc. See C<perldoc -f binmode> for more.
+
+=item
+
+buf_ref
+
+The C<buf_ref> option is used to pass in a scalar reference which has the
+data to be written. If this is set then any data arguments (including
+the scalar reference shortcut) in C<@_> will be ignored.
+
+=item
+
+err_mode
+
+The C<err_mode> option has three possible values: C<quiet>, C<carp>, or the
+default, C<croak>. In C<quiet> mode, all errors will be silent. In C<carp> mode,
+all errors will be emitted as warnings. And, in C<croak> mode, all errors will
+be emitted as exceptions. Take a look at L<Try::Tiny> or
+L<Syntax::Keyword::Try> to see how to catch exceptions.
+
+
+=item
+
+no_clobber
+
+The C<no_clobber> option is a boolean option, defaulted to false (C<0>). Setting
+this option to true (C<1>) will ensure an that existing file will not be
+overwritten.
+
+=item
+
+perms
+
+The C<perms> option sets the permissions of newly-created files. This value
+is modified by your process's C<umask> and defaults to C<0666> (same as
+C<sysopen>).
+
+NOTE: this option is new as of File::Slurp version 9999.14;
+
+=back
+
+=head1 EXPORT
+
+These are exported by default or with
+
+	use File::Slurp qw(:std);
+	# read_file write_file overwrite_file append_file read_dir
+
+These are exported with
+
+	use File::Slurp qw(:edit);
+	# edit_file edit_file_lines
+
+You can get all subs in the module exported with
+
+	use File::Slurp qw(:all);
 
 =head1 AUTHOR
 
-Uri Guttman, E<lt>uri AT stemsystems DOT comE<gt>
+Uri Guttman, <F<uri@stemsystems.com>>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2003 Uri Guttman. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut

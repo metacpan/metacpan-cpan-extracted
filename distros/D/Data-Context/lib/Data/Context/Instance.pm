@@ -22,7 +22,7 @@ use Data::Context::Util qw/lol_path lol_iterate do_require/;
 use Class::Inspector;
 use Moose::Util::TypeConstraints qw/duck_type/;
 
-our $VERSION = version->new('0.2');
+our $VERSION = version->new('0.3');
 
 has path => (
     is       => 'rw',
@@ -205,7 +205,7 @@ Data::Context::Instance - The in memory instance of a data context config file
 
 =head1 VERSION
 
-This documentation refers to Data::Context::Instance version 0.2.
+This documentation refers to Data::Context::Instance version 0.3.
 
 =head1 SYNOPSIS
 

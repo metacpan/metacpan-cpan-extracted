@@ -1071,17 +1071,6 @@ sub add
 		my $m = $p;
 		my @ids = ( [-2, 'Z', 2], [ length($m), 'z', 1]);
 		while ( $maxnest--) {
-			while ( $m =~ m/([A-Z])<([^<>]*)>/gcs) {
-				if ( $1 eq 'X') {
-					my $d = length($2) + length($1) + 2;
-					substr( $m, pos($m) - $d, $d, '');
-				} else {
-					push @ids,
-						[ pos($m) - length($2) - 3, $1, 2],
-						[ pos($m) - 1, lc $1, 1];
-					substr $m, $ids[$_][0], $ids[$_][2], '_' x $ids[$_][2] for -2,-1;
-				}
-			}
 			while ( $m =~ m/([A-Z])(<<+) /gcs) {
 				my ( $pos, $cmd, $left, $right) = ( pos($m), $1, $2, ('>' x ( length($2))));
 				if ( $m =~ m/\G.*? $right(?!>)/gcs) {
@@ -1101,6 +1090,17 @@ sub add
 						substr $m, $ids[$_][0], $ids[$_][2], '_' x $ids[$_][2]
 							for -2,-1;
 					}
+				}
+			}
+			while ( $m =~ m/([A-Z])<([^<>]*)>/gcs) {
+				if ( $1 eq 'X') {
+					my $d = length($2) + length($1) + 2;
+					substr( $m, pos($m) - $d, $d, '');
+				} else {
+					push @ids,
+						[ pos($m) - length($2) - 3, $1, 2],
+						[ pos($m) - 1, lc $1, 1];
+					substr $m, $ids[$_][0], $ids[$_][2], '_' x $ids[$_][2] for -2,-1;
 				}
 			}
 			last unless $m =~ m/[A-Z]</;
@@ -1706,8 +1706,7 @@ Prima::PodView - POD browser widget
 
 =head1 SYNOPSIS
 
-	use Prima qw(Application);
-	use Prima::PodView;
+	use Prima qw(Application PodView);
 
 	my $window = Prima::MainWindow-> create;
 	my $podview = $window-> insert( 'Prima::PodView',
@@ -1718,6 +1717,10 @@ Prima::PodView - POD browser widget
 	$podview-> close_read;
 
 	run Prima;
+
+=for podview <img src="podview.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/podview.gif">
 
 =head1 DESCRIPTION
 

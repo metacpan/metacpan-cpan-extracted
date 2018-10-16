@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,71 +27,71 @@ no_index:
 provides:
   ObjectDB:
     file: lib/ObjectDB.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::DBHPool:
     file: lib/ObjectDB/DBHPool.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::DBHPool::Connection:
     file: lib/ObjectDB/DBHPool/Connection.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Factory:
     file: lib/ObjectDB/Factory.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Iterator:
     file: lib/ObjectDB/Iterator.pm
   ObjectDB::Meta:
     file: lib/ObjectDB/Meta.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Meta::Relationship:
     file: lib/ObjectDB/Meta/Relationship.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Meta::Relationship::ManyToMany:
     file: lib/ObjectDB/Meta/Relationship/ManyToMany.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Meta::Relationship::ManyToOne:
     file: lib/ObjectDB/Meta/Relationship/ManyToOne.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Meta::Relationship::OneToMany:
     file: lib/ObjectDB/Meta/Relationship/OneToMany.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Meta::Relationship::OneToOne:
     file: lib/ObjectDB/Meta/Relationship/OneToOne.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Meta::RelationshipFactory:
     file: lib/ObjectDB/Meta/RelationshipFactory.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Quoter:
     file: lib/ObjectDB/Quoter.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Related:
     file: lib/ObjectDB/Related.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Related::ManyToMany:
     file: lib/ObjectDB/Related/ManyToMany.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Related::ManyToOne:
     file: lib/ObjectDB/Related/ManyToOne.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Related::OneToMany:
     file: lib/ObjectDB/Related/OneToMany.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Related::OneToOne:
     file: lib/ObjectDB/Related/OneToOne.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::RelatedFactory:
     file: lib/ObjectDB/RelatedFactory.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Stmt:
     file: lib/ObjectDB/Stmt.pm
   ObjectDB::Table:
     file: lib/ObjectDB/Table.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::Util:
     file: lib/ObjectDB/Util.pm
-    version: '3.27'
+    version: '3.28'
   ObjectDB::With:
     file: lib/ObjectDB/With.pm
-    version: '3.27'
+    version: '3.28'
 recommends:
   DBIx::Inspector: '0'
 requires:
@@ -104,8 +104,10 @@ resources:
   bugtracker: https://github.com/vti/object-db/issues
   homepage: https://github.com/vti/object-db
   repository: git://github.com/vti/object-db.git
-version: '3.27'
+version: '3.28'
 x_contributors:
+  - 'kitt [office] <kitt-vl@ya.ru>'
   - 'vti <viacheslav.t@gmail.com>'
   - 'vti <vti@clarive.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -42,8 +42,15 @@ Image_init( Handle self, HV * profile)
 	Image_reset_notifications( self);
 	var->w = pget_i( width);
 	var->h = pget_i( height);
-	var->conversion = pget_i( conversion);
+	if ( !iconvtype_supported( var->conversion = pget_i( conversion) )) {
+		warn("Invalid conversion: %d\n", var->conversion);
+		var->conversion = ictNone;
+	}
 	var->scaling = pget_i( scaling);
+	if ( var->scaling < istNone || var-> scaling > istMax) {
+		warn("Invalid scaling: %d\n", var->scaling);
+		var-> scaling = istNone;
+	}
 	if ( !itype_supported( var-> type = pget_i( type))) 
 		if ( !itype_importable( var-> type, &var-> type, nil, nil)) {
 			warn( "Image::init: cannot set type %08x", var-> type);
@@ -126,7 +133,7 @@ Image_reset( Handle self, int new_type, RGBColor * palette, int palSize)
 	RGBColor new_palette[256];
 	Byte * new_data = nil;
 	int new_pal_size = 0, new_line_size, new_data_size, want_only_palette_colors = 0;
-	
+
 	if ( var->stage > csFrozen) return;
 
 	want_palette = (!( new_type & imGrayScale)) && ( new_type != imRGB) && (palSize > 0);
@@ -150,6 +157,8 @@ Image_reset( Handle self, int new_type, RGBColor * palette, int palSize)
 		var->type = new_type;
 		return;
 	}
+	if (( var->conversion & ictpMask) == ictpCubic)
+		want_palette = true;
 	if ( var-> type == new_type && (
 		((new_type != imbpp8 && new_type != imbpp4 && new_type != imbpp1) || !want_palette)
 		)) return;
@@ -369,7 +378,7 @@ SV *
 Image_get_handle( Handle self)
 {
 	char buf[ 256];
-	snprintf( buf, 256, "0x%08lx", apc_image_get_handle( self));
+	snprintf( buf, 256, PR_HANDLE_FMT, apc_image_get_handle( self));
 	return newSVpv( buf, 0);
 }
 
@@ -975,6 +984,8 @@ int
 Image_conversion( Handle self, Bool set, int conversion)
 {
 	if ( !set)
+		return var-> conversion;
+	if ( !iconvtype_supported(conversion))
 		return var-> conversion;
 	return var-> conversion = conversion;
 }
@@ -1620,7 +1631,7 @@ Image_bar( Handle self, int x1, int y1, int x2, int y2)
 void
 Image_rotate( Handle self, int degrees)
 {
-	Byte * new_data;
+	Byte * new_data = NULL;
 	int new_line_size = 0;
 
 	switch (degrees) {
@@ -1648,7 +1659,6 @@ Image_rotate( Handle self, int degrees)
 	switch (degrees) {
 	case 90:
 	case 270:
-		new_data = NULL;
 		new_line_size = LINE_SIZE( var-> h , var->type);
 		if (( new_data = allocb( new_line_size * var->w )) == NULL )
 			croak("Image::rotate: cannot allocate %d bytes", new_line_size * var->w);

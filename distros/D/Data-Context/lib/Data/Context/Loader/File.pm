@@ -16,7 +16,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use Data::Context::Util qw/do_require/;
 
-our $VERSION = version->new('0.2');
+our $VERSION = version->new('0.3');
 
 extends 'Data::Context::Loader';
 
@@ -92,7 +92,7 @@ Data::Context::Loader::File - Loads a config file from disk
 
 =head1 VERSION
 
-This documentation refers to Data::Context::Loader::File version 0.2
+This documentation refers to Data::Context::Loader::File version 0.3
 
 =head1 SYNOPSIS
 

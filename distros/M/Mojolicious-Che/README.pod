@@ -1,8 +1,9 @@
 package Mojolicious::Che;
 use Mojo::Base::Che; # один патч для хазов
-use Mojo::Base  'Mojolicious';#::Che
+use Mojo::Base  'Mojolicious';
 use Mojo::Log::Che;
 use Mojo::Loader qw(load_class);
+#~ use Mojo::Util qw(url_unescape);
 #~ use Scalar::Util 'weaken';
 
 sub new {
@@ -243,17 +244,17 @@ sub задачи {
   #~ $app->minion->reset;
 }
 
-# overide only on my $path   = $req->url->path->to_route;# to_abs_string;
+# overide only on my $path   = $req->url->path->to_abs_string;
 sub Mojolicious::dispatch {
   my ($self, $c) = @_;
- 
+
   my $plugins = $self->plugins->emit_hook(before_dispatch => $c);
- 
+
   # Try to find a static file
   my $tx = $c->tx;
   $self->static->dispatch($c) and $plugins->emit_hook(after_static => $c)
     unless $tx->res->code;
- 
+
   # Start timer (ignore static files)
   my $stash = $c->stash;
   unless ($stash->{'mojo.static'} || $stash->{'mojo.started'}) {
@@ -264,7 +265,7 @@ sub Mojolicious::dispatch {
     $self->log->debug(qq{$method "$path" ($id)});
     $c->helpers->timing->begin('mojo.timer');
   }
- 
+
   # Routes
   $plugins->emit_hook(before_routes => $c);
   $c->helpers->reply->not_found
@@ -272,7 +273,7 @@ sub Mojolicious::dispatch {
 }
 
 
-our $VERSION = '0.040';
+our $VERSION = '0.0802';# as to Mojolicious 8.02
 
 =pod
 
@@ -286,7 +287,7 @@ our $VERSION = '0.040';
 
 =head1 VERSION
 
-0.040
+0.0802
 
 =head1 NAME
 
@@ -424,23 +425,42 @@ Session object config apply
 
 =head2 хазы()
 
-Apply has's
+Apply the has's. UTF names allow.
 
 =head2 плугины()
 
-Apply plugins
+Apply the plugins
 
 =head2 хуки()
 
-Apply hooks
+Apply the hooks
 
 =head2 спейсы()
 
-Apply namespases
+Apply the namespases
 
 =head2 маршруты()
 
-Apply routes
+Apply the routes
+
+  #~ 'маршруты' => [
+  'routes'=>[
+    [get=>'/', to=> {cb=>sub{shift->render(format=>'txt', text=>'Welcome!');},}],
+  ],
+
+=head2 задачи()
+
+Apply the jobs
+
+  #~ 'задачи'=> {#first enable plugin Minion
+  'jobs'=> { # or tasks
+    slow_log => sub {
+      my ($job, $msg) = @_;
+      sleep 5;
+      $job->app->log->error(qq{slow_log "$msg"});
+    },
+    
+  },
 
 =head1 SEE ALSO
 
@@ -458,7 +478,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016-2017+ Mikhail Che.
+Copyright 2016+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,5 +1,12 @@
 Revision history for EPFL-Sciper-List
 
+1.02    2018-10-15
+        Criticise code in tests
+        Test against Perl 5.28
+        Clean README and CONTRIBUTING
+        Update dependencies
+        Update copyright (transfer from EPFL DevRun)
+
 1.01    2018-04-18
         Set Module::Build version
 

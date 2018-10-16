@@ -431,6 +431,8 @@ apc_dbm_create( Handle self, int type)
 		XX-> type.pixmap = 1;
 		depth = guts.depth;
 		break;
+	default:
+		return false;
 	}
 	XX-> type.dbm = true;
 	XX-> type.drawable = true;
@@ -1132,7 +1134,6 @@ create_rgb_to_alpha_xpixel_lut( int ncolors, const Byte * alpha, XPixel *lut)
 static Bool
 create_argb_cache(PIcon img, ImageCache * cache, int type)
 {
-	PDrawableSysData IMG = X((Handle)img);
 	static XPixel lur[NPalEntries8], lub[NPalEntries8], lug[NPalEntries8], lua[NPalEntries8];
 	static Bool initialize = true;
 	RGBColor pal[NPalEntries8];
@@ -1703,12 +1704,10 @@ static Bool
 img_put_argb_on_bitmap( Handle self, Handle image, PutImageRequest * req)
 {
 	DEFXX;
-	Bool ok;
 	ImageCache *cache;
 	int rop = req->rop;
 	
 	PImage img = (PImage) image;
-	PDrawableSysData YY = X(image);
 
 	if (!(cache = prima_create_image_cache(img, nilHandle, CACHE_BITMAP)))
 		return false;
@@ -1854,7 +1853,6 @@ img_put_image_on_widget( Handle self, Handle image, PutImageRequest * req)
 
 	if (( img->type & imBPP ) == 1) {
 		unsigned int fore, back;
-		RGBColor * p = img->palette;
 
 		if ( guts. palSize > 0) {
 			fore = prima_color_find( self,
@@ -1949,7 +1947,6 @@ img_put_argb_on_pixmap_or_widget( Handle self, Handle image, PutImageRequest * r
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
 	DEFXX;
 	ImageCache *cache;
-	PIcon img = (PIcon) image;
 	Pixmap pixmap;
 	GC gc;
 	XGCValues gcv;
@@ -2031,7 +2028,6 @@ img_put_a8_on_layered( Handle self, Handle image, PutImageRequest * req)
 	DEFXX;
 	Bool ok;
 	ImageCache *cache;
-	PDrawableSysData YY = X(image);
 	if (!(cache = prima_create_image_cache((PImage) image, nilHandle, CACHE_A8)))
 		return false;
 	XSetPlaneMask( DISP, XX-> gc, guts. argb_bits. alpha_mask);
@@ -2047,7 +2043,6 @@ img_put_argb_on_layered( Handle self, Handle image, PutImageRequest * req)
 #ifdef HAVE_X11_EXTENSIONS_XRENDER_H
 	DEFXX;
 	ImageCache *cache;
-	PIcon img = (PIcon) image;
 	Pixmap pixmap;
 	GC gc;
 	XGCValues gcv;
@@ -2410,12 +2405,11 @@ convert_32_to_24( XImage *i, PImage img, RGBABitDescription * bits)
 static void
 convert_equal_paletted( XImage *i, PImage img)
 {
-	int y, w, h;
+	int y, h;
 	Pixel8 *d, *line;
 	XColor xc[256];
 	
 	h = img-> h;
-	w = ( img-> lineSize < i-> bytes_per_line) ? img-> lineSize : i-> bytes_per_line;
 	d = ( Pixel8*)(i-> data + (h-1) * i-> bytes_per_line);
 	line = (Pixel8*)img-> data;
 	bzero( line, img-> dataSize);
@@ -2605,7 +2599,6 @@ Bool
 prima_query_argb_rect( Handle self, Pixmap px, int x, int y, int w, int h)
 {
 	XImage * i;
-	Bool mono = PImage(self)-> type == imBW || guts. depth == 1;
 	PIcon img = (PIcon) self;
 
 	if (!( i = XGetImage( DISP, px, x, y, w, h,
@@ -2629,7 +2622,6 @@ prima_query_argb_rect( Handle self, Pixmap px, int x, int y, int w, int h)
 		convert_32_to_24( i, (PImage)img, &guts. argb_bits);
 		convert_32_to_mask( i, img);
 		break;
-slurp_image_unsupported_depth:
 	default:
 		warn("UAI_023: unsupported backing image conversion from %d to %d\n", guts. argb_depth, guts. qdepth);
 		return false;
@@ -2774,7 +2766,7 @@ apc_gp_stretch_image( Handle self, Handle image,
 			return false;
 
 		if ( XT_IS_ICON(YY)) {
-			int height = src_w, width = src_h;
+			int height = src_w;
 			PIcon isrc = (PIcon) image, idst;
 			obj = ( Handle) create_object("Prima::Icon", "");
 			idst = (PIcon) obj;
@@ -2832,7 +2824,7 @@ apc_gp_stretch_image( Handle self, Handle image,
 		CImage(obj)-> stretch( obj, dst_w, dst_h );
 		ok  = apc_gp_put_image( self, obj, dst_x, dst_y, 0, 0, dst_w, dst_h, rop);
 	} else {
-		return apc_gp_put_image( self, obj, dst_x, dst_y, 0, 0, dst_w, dst_h, rop);
+		return apc_gp_put_image( self, image, dst_x, dst_y, 0, 0, dst_w, dst_h, rop);
 	}
 
 	Object_destroy( obj );

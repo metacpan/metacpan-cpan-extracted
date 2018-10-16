@@ -20,7 +20,7 @@ use Path::Tiny;
 use Data::Context::Instance;
 use Data::Context::Finder::File;
 
-our $VERSION = version->new('0.2');
+our $VERSION = version->new('0.3');
 
 has fallback => (
     is      => 'rw',
@@ -162,7 +162,7 @@ Data::Context - Configuration data with context
 
 =head1 VERSION
 
-This documentation refers to Data::Context version 0.2.
+This documentation refers to Data::Context version 0.3.
 
 =head1 SYNOPSIS
 
@@ -245,8 +245,8 @@ Data::Context Configuration
     action_class
               Allows the using of an action class other than Data::Context::Actions. Although it is suggested that the alt class should inherit from Data::Context::Actions
     file_suffixes HASHREF
-             json => '.dc.json' : JSON
-             js   => '.dc.js'   : JSON->relaxed
+             json => '.dc.json' : JSON::XS
+             js   => '.dc.js'   : JSON::XS->relaxed
              yaml => '.dc.yml'  : YAML or YAML::XS
              xml  => '.dc.xml'  : XML::Simple
     log      logging object, creates own object that just writes to STDERR if not specified

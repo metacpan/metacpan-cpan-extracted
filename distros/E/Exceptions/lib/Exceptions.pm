@@ -1,5 +1,7 @@
 package Exceptions;
-$Exceptions::VERSION = '0.102';
+
+our $VERSION = '0.103';
+
 use strict;
 use warnings;
 
@@ -95,7 +97,8 @@ die in an C<eval> block. This sounds simple enough, but there are some gotchas
 that lead many developers to do this incorrectly.
 
 The correct way to handle an exception requires that you understand how to
-preserve the global C<$@> variable. Please see L<Try::Tiny/BACKGROUND> for a
+preserve the global C<$@> variable and that its value cannot be relied upon to
+determine whether an exception occurred. Please see L<Try::Tiny/BACKGROUND> for a
 great explanation of this problem.
 
 Let's look at our previous simple application with error handling using C<eval>.
@@ -106,32 +109,30 @@ Let's look at our previous simple application with error handling using C<eval>.
 
     # 1
     my $value;
-    my $error = do { # catch block
+    my $error;
+    { # catch block
         local $@;
-        eval { $value = increment(0) }; # try
-        $@;
-    };
-    print "0 plus 1 = ", ($error ? "error": $value), "\n";
+        $error = $@ || 'Error' unless eval { $value = increment(0); 1 }; # try
+    }
+    print "0 plus 1 = ", (defined $error ? "error": $value), "\n";
 
     # error
     $value = undef;
     $error = undef;
-    $error = do { # catch block
+    { # catch block
         local $@;
-        eval { $value = increment('zero') }; # try
-        $@;
-    };
-    print "zero plus 1 = ", ($error ? "error": $value), "\n";
+        $error = $@ || 'Error' unless eval { $value = increment('zero'); 1 }; # try
+    }
+    print "zero plus 1 = ", (defined $error ? "error": $value), "\n";
 
     # 1
     $value = undef;
     $error = undef;
-    $error = do { # catch block
+    { # catch block
         local $@;
-        eval { $value = increment(0) }; # try
-        $@;
-    };
-    print "0 plus 1 = ", ($error ? "error": $value), "\n";
+        $error = $@ || 'Error' unless eval { $value = increment(0); 1 }; # try
+    }
+    print "0 plus 1 = ", (defined $error ? "error": $value), "\n";
 
     sub increment {
         my $int = shift;

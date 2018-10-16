@@ -4,25 +4,29 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.000005';
+our $VERSION = '1.000006';
 
 use 5.010000;
 
-use Math::Int128 qw( uint128 );
 use MaxMind::DB::Metadata 0.040001;
-use MaxMind::DB::Reader 1.000012;
-use MaxMind::DB::Types qw( Int );
+use MaxMind::DB::Types qw( Int Str );
 
 use Moo;
 
-with 'MaxMind::DB::Reader::Role::Reader',
-    'MaxMind::DB::Reader::Role::HasMetadata';
+with 'MaxMind::DB::Reader::Role::HasMetadata';
 
 use XSLoader;
 
 ## no critic (Subroutines::ProhibitCallsToUnexportedSubs)
 XSLoader::load( __PACKAGE__, $VERSION );
 ## use critic
+
+has file => (
+    is       => 'ro',
+    isa      => Str,
+    coerce   => sub { "$_[0]" },
+    required => 1,
+);
 
 has _mmdb => (
     is        => 'ro',
@@ -44,10 +48,8 @@ has _flags => (
 sub BUILD { $_[0]->_mmdb }
 
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
-sub _data_for_address {
-    my $self = shift;
-
-    return $self->__data_for_address( $self->_mmdb(), @_ );
+sub record_for_address {
+    return $_[0]->__data_for_address( $_[0]->_mmdb, $_[1] );
 }
 
 sub iterate_search_tree {
@@ -64,49 +66,35 @@ sub iterate_search_tree {
 sub _build_mmdb {
     my $self = shift;
 
-    return $self->_open_mmdb( $self->file(), $self->_flags() );
+    return $self->_open_mmdb( $self->file, $self->_flags );
 }
 
 sub _build_metadata {
     my $self = shift;
 
-    my $raw = $self->_raw_metadata( $self->_mmdb() );
+    my $raw = $self->_raw_metadata( $self->_mmdb );
 
-    return MaxMind::DB::Metadata->new($raw);
+    my $metadata = MaxMind::DB::Metadata->new($raw);
+
+    return $metadata unless $ENV{MAXMIND_DB_READER_DEBUG};
+
+    $metadata->debug_dump;
+
+    return $metadata;
 }
 
-sub _decode_bigint {
-    my $buffer = shift;
-
-    my $int = uint128(0);
-
-    my @unpacked = unpack( 'NNNN', _zero_pad_left( $buffer, 16 ) );
-    for my $piece (@unpacked) {
-        $int = ( $int << 32 ) | $piece;
-    }
-
-    return $int;
-}
 ## use critic
-
-# Copied from MaxMind::DB::Reader::Decoder
-sub _zero_pad_left {
-    my $content        = shift;
-    my $desired_length = shift;
-
-    return ( "\x00" x ( $desired_length - length($content) ) ) . $content;
-}
 
 sub DEMOLISH {
     my $self = shift;
 
-    $self->_close_mmdb( $self->_mmdb() )
-        if $self->_has_mmdb();
+    $self->_close_mmdb( $self->_mmdb )
+        if $self->_has_mmdb;
 
     return;
 }
 
-__PACKAGE__->meta()->make_immutable();
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -124,7 +112,7 @@ MaxMind::DB::Reader::XS - Fast XS implementation of MaxMind DB reader
 
 =head1 VERSION
 
-version 1.000005
+version 1.000006
 
 =head1 SYNOPSIS
 

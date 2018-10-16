@@ -230,10 +230,10 @@ init_x11( char * error_buf )
 
 	{
 		struct sockaddr name;
-		unsigned int l = sizeof( name);
+		socklen_t l = sizeof( name);
 		guts. local_connection = getsockname( guts.connection, &name, &l) >= 0 && l == 0;
 	}
-	
+
 #ifdef HAVE_X11_EXTENSIONS_SHAPE_H
 	if ( XShapeQueryExtension( DISP, &guts.shape_event, &guts.shape_error)) {
 		guts. shape_extension = true;
@@ -379,7 +379,7 @@ init_x11( char * error_buf )
 	if ( !prima_init_clipboard_subsystem( error_buf)) return false;
 	if ( !prima_init_color_subsystem( error_buf)) return false;
 	if ( !prima_init_font_subsystem( error_buf)) return false;
-#ifdef WITH_GTK2
+#ifdef WITH_GTK
 	guts. use_gtk = do_no_gtk ? false : ( prima_gtk_init() != NULL );
 #endif
 	bzero( &guts. cursor_gcv, sizeof( guts. cursor_gcv));
@@ -454,8 +454,8 @@ window_subsystem_get_options( int * argc, char *** argv)
 	"no-aa",         "do not anti-alias XFT fonts",
 	"font-priority", "match unknown fonts against: 'xft' (default) or 'core'",
 #endif
-#ifdef WITH_GTK2
-	"no-gtk",        "do not use GTK2",
+#ifdef WITH_GTK
+	"no-gtk",        "do not use GTK",
 #endif
 	"font", 
 #ifdef USE_XFT
@@ -558,7 +558,7 @@ window_subsystem_cleanup( void)
 	if ( !DISP) return;
 	/*XXX*/
 	prima_end_menu();
-#ifdef WITH_GTK2
+#ifdef WITH_GTK
 	if ( guts. use_gtk) prima_gtk_done();
 #endif
 }
@@ -721,17 +721,20 @@ apc_application_end_paint_info( Handle self)
 int
 apc_application_get_gui_info( char * description, int len)
 {
-#ifdef WITH_GTK2
+#ifdef WITH_GTK
 	if ( guts. use_gtk ) {
 		if ( description) {
 #ifdef WITH_GTK_NONX11
-			strncpy( description, "X Window System + GTK2", len);
+			strncpy( description, "X Window System + GTK", len);
 #else
-			strncpy( description, "X Window System + XQuartz + GTK2", len);
+			strncpy( description, "X Window System + XQuartz + GTK", len);
 #endif
+#define _xstr(s) #s
+			strncpy( description, _xstr(WITH_GTK), len);
+#undef _xstr
 			description[len-1] = 0;
 		}
-		return guiGTK2;
+		return guiGTK;
 	}
 #endif
 	if ( description) {
@@ -835,22 +838,14 @@ apc_application_get_os_info( char *system, int slen,
 	static struct utsname name;
 	static Bool fetched = false;
 
-#ifndef SYS_NMLN
-#ifdef _SYS_NAMELEN
-#define SYS_NMLN _SYS_NAMELEN
-#else
-#define SYS_NMLN 64
-#endif
-#endif   
-
 	if (!fetched) {
 		if ( uname(&name)!=0) {
-			strncpy( name. sysname, "Some UNIX", SYS_NMLN);
-			name. sysname[ SYS_NMLN-1] = 0;
-			strncpy( name. release, "Unknown version of UNIX", SYS_NMLN);
-			name. release[ SYS_NMLN-1] = 0;
-			strncpy( name. machine, "Unknown architecture", SYS_NMLN);
-			name. machine[ SYS_NMLN-1] = 0;
+			strncpy( name. sysname, "Some UNIX", sizeof(name.sysname));
+			name. sysname[ sizeof(name.sysname)-1] = 0;
+			strncpy( name. release, "Unknown version of UNIX", sizeof(name.release));
+			name. release[ sizeof(name.release)-1] = 0;
+			strncpy( name. machine, "Unknown architecture", sizeof(name.machine));
+			name. machine[ sizeof(name.machine)-1] = 0;
 		}
 		fetched = true;
 	}

@@ -30,7 +30,7 @@ sub profile_default
 		closedGlyphs   => 1,
 		openedIcon     => undef,
 		closedIcon     => undef,
-		indent         => 12,
+		indent         => 12 * $::application->uiScaling,
 		multiSelect    => 0,
 		showDotDirs    => 1,
 	}
@@ -164,7 +164,7 @@ sub on_drawitem
 		int(($top + $bottom - $iconHeight) / 2+0.5),
 		0, 0,
 		$iconWidth, $iconHeight,
-		$iconWidth, $iconHeight, rop::CopyPut);
+		$iconWidth, $iconHeight, rop::CopyPut) if 1;
 
 	$canvas-> text_out_bidi( $text,
 		$left + 2 + $indent + $self-> {oneSpaceWidth} + $iconWidth,
@@ -690,13 +690,13 @@ sub profile_check_in
 
 my $unix  = ($^O =~ /cygwin/) || (Prima::Application-> get_system_info-> {apc} == apc::Unix);
 my $win32 = (Prima::Application-> get_system_info-> {apc} == apc::Win32);
-my $gtk2  = (Prima::Utils::get_gui == gui::GTK2);
+my $gtk   = (Prima::Utils::get_gui == gui::GTK);
 
 sub create
 {
 	my ( $class, %params) = @_;
-	if ( $params{system} && ( $win32 || $gtk2))  {
-		my $sys = $win32 ? 'win32' : 'gtk2';
+	if ( $params{system} && ( $win32 || $gtk))  {
+		my $sys = $win32 ? 'win32' : 'gtk';
 		if ( $class =~ /^Prima::(Open|Save|File)Dialog$/) {
 			undef $@;
 			eval "use Prima::sys::${sys}::FileDialog";
@@ -1651,8 +1651,7 @@ Prima::FileDialog - File system related widgets and dialogs.
 =head1 SYNOPSIS
 
 # open a file
-	use Prima qw(Application);
-	use Prima::StdDlg;
+	use Prima qw(Application StdDlg);
 
 	my $open = Prima::OpenDialog-> new(
 		filter => [
@@ -1671,6 +1670,10 @@ Prima::FileDialog - File system related widgets and dialogs.
 	# open several files
 	$open-> multiSelect(1);
 	print $open-> fileName, " are to be opened\n" if $open-> execute;
+
+=for podview <img src="filedlg.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/filedlg.gif">
 
 =head1 DESCRIPTION 
 

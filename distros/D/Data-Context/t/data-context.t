@@ -9,8 +9,8 @@ use Test::Warn;
 
 use Data::Context;
 
-eval { require JSON; require XML::Simple; require YAML::XS; };
-plan skip_all => 'This test requires JSON, XML::Simple and YAML::XS to be installed to run' if $@;
+eval { require JSON::XS; require XML::Simple; require YAML::XS; };
+plan skip_all => 'This test requires JSON::XS, XML::Simple and YAML::XS to be installed to run' if $@;
 
 my $path = path($0)->parent->child('dc');
 

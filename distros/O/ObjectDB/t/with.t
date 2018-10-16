@@ -28,7 +28,10 @@ subtest 'convert with to joins' => sub {
 };
 
 subtest 'convert with to joins with custom columns' => sub {
-    my $with = ObjectDB::With->new(meta => Book->meta, with => [ { name => 'parent_author', columns => [qw/id/] } ]);
+    my $with = ObjectDB::With->new(
+        meta => Book->meta,
+        with => [ { name => 'parent_author', columns => [qw/id/] } ]
+    );
 
     is_deeply $with->to_joins,
       [
@@ -109,7 +112,88 @@ subtest 'autoload intermediate joins' => sub {
 };
 
 subtest 'throw when unknown relationship' => sub {
-    like exception { ObjectDB::With->new(meta => Book->meta, with => ['unknown']) }, qr/Unknown relationship 'unknown'/;
+    like exception {
+        ObjectDB::With->new(meta => Book->meta, with => ['unknown'])
+    }, qr/Unknown relationship 'unknown'/;
+};
+
+subtest 'convert with to joins with custom columns correct order' => sub {
+    for (1 .. 100) {
+        my $with = ObjectDB::With->new(
+            meta => Book->meta,
+            with => [
+                { name => 'parent_author', columns => [qw/name/] },
+                {
+                    name    => 'description.parent_book',
+                    columns => [qw/id title/]
+                },
+                'parent_author.books',
+                { name => 'description', columns => [qw/id description/] }
+            ]
+        );
+
+        is_deeply $with->to_joins,
+          [
+            {
+                'columns' => [ 'id', 'description' ],
+                'op'      => 'left',
+                'join'    => [
+                    {
+                        'on' => [
+                            'description.book_id',
+                            {
+                                '-col' => 'description_parent_book.id'
+                            }
+                        ],
+                        'rel_name' => 'parent_book',
+                        'source'   => 'book',
+                        'op'       => 'left',
+                        'join'     => [],
+                        'as'       => 'description_parent_book',
+                        'columns'  => [ 'id', 'title' ]
+                    }
+                ],
+                'as'       => 'description',
+                'source'   => 'book_description',
+                'rel_name' => 'description',
+                'on'       => [
+                    'book.id',
+                    {
+                        '-col' => 'description.book_id'
+                    }
+                ]
+            },
+            {
+                'source' => 'author',
+                'on'     => [
+                    'book.author_id',
+                    {
+                        '-col' => 'parent_author.id'
+                    }
+                ],
+                'rel_name' => 'parent_author',
+                'columns'  => ['name'],
+                'op'       => 'left',
+                'as'       => 'parent_author',
+                'join'     => [
+                    {
+                        'columns'  => [ 'id', 'author_id', 'title' ],
+                        'op'       => 'left',
+                        'join'     => [],
+                        'as'       => 'parent_author_books',
+                        'rel_name' => 'books',
+                        'on'       => [
+                            'author.id',
+                            {
+                                '-col' => 'books.author_id'
+                            }
+                        ],
+                        'source' => 'book'
+                    }
+                ]
+            }
+          ];
+    }
 };
 
 done_testing;

@@ -1,3 +1,5 @@
+#ifndef _IMG_IMG_CONV_H_
+#define _IMG_IMG_CONV_H_
 #include "Image.h"
 #include <sys/types.h>
 #include <limits.h>
@@ -26,6 +28,7 @@ extern Bool ic_stretch_filtered( int type, Byte * oldData, int oldW, int oldH, B
 extern void ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int * palSize, Bool palSize_only);
 extern Bool itype_supported( int type);
 extern Bool itype_importable( int type, int *newtype, void **from_proc, void **to_proc);
+extern Bool iconvtype_supported( int conv);
 
 /* palette routines */
 extern void cm_init_colormap( void);
@@ -35,6 +38,8 @@ extern Byte cm_nearest_color( RGBColor color, int palSize, PRGBColor palette);
 extern void cm_fill_colorref( PRGBColor fromPalette, int fromColorCount, PRGBColor toPalette, int toColorCount, Byte * colorref);
 extern U16* cm_study_palette( RGBColor * palette, int pal_size);
 extern Bool cm_optimized_palette( Byte * data, int lineSize, int width, int height, RGBColor * palette, int * max_pal_size);
+extern void cm_reduce_palette4( Byte * srcData, int srcLine, int width, int height, RGBColor * srcPalette, int srcPalSize, RGBColor * dstPalette, int * dstPalSize);
+extern void cm_reduce_palette8( Byte * srcData, int srcLine, int width, int height, RGBColor * srcPalette, int srcPalSize, RGBColor * dstPalette, int * dstPalSize);
 
 /* bitstroke conversion routines */
 extern void bc_mono_nibble( register Byte * source, register Byte * dest, register int count);
@@ -47,6 +52,8 @@ extern void bc_nibble_mono_cr( register Byte * source, register Byte * dest, reg
 extern void bc_nibble_mono_ht( register Byte * source, register Byte * dest, register int count, register PRGBColor palette, int lineSeqNo);
 extern void bc_nibble_mono_ed( Byte * source, Byte * dest, int count, PRGBColor palette, int * err_buf);
 extern void bc_nibble_cr( register Byte * source, register Byte * dest, register int count, register Byte * colorref);
+extern void bc_nibble_nibble_ht( register Byte * source, register Byte * dest, register int count, register PRGBColor palette, int lineSeqNo);
+extern void bc_nibble_nibble_ed( Byte * source, Byte * dest, int count, PRGBColor palette, int * err_buf);
 extern void bc_nibble_byte( register Byte * source, register Byte * dest, register int count);
 extern void bc_nibble_graybyte( register Byte * source, register Byte * dest, register int count, register PRGBColor palette);
 extern void bc_nibble_byte_cr( register Byte * source, register Byte * dest, register int count, register Byte * colorref);
@@ -57,8 +64,11 @@ extern void bc_byte_mono_ed( Byte * source, Byte * dest, int count, PRGBColor pa
 extern void bc_byte_nibble_cr( register Byte * source, Byte * dest, register int count, register Byte * colorref);
 extern void bc_byte_nibble_ht( register Byte * source, Byte * dest, register int count, register PRGBColor palette, int lineSeqNo);
 extern void bc_byte_nibble_ed( Byte * source, Byte * dest, int count, PRGBColor palette, int * err_buf);
+extern void bc_byte_byte_ht( register Byte * source, Byte * dest, register int count, register PRGBColor palette, int lineSeqNo);
+extern void bc_byte_byte_ed( Byte * source, Byte * dest, int count, PRGBColor palette, int * err_buf);
 extern void bc_byte_cr( register Byte * source, register Byte * dest, register int count, register Byte * colorref);
 extern void bc_byte_op( Byte * source, Byte * dest, int count, U16 * tree, PRGBColor src_palette, PRGBColor dst_palette, int * err_buf);
+extern void bc_byte_nop( Byte * source, Byte * dest, int count, U16 * tree, PRGBColor src_palette, PRGBColor dst_palette);
 extern void bc_byte_graybyte( register Byte * source, register Byte * dest, register int count, register PRGBColor palette);
 extern void bc_byte_rgb( register Byte * source, Byte * dest, register int count, register PRGBColor palette);
 extern void bc_graybyte_mono_ht( register Byte * source, register Byte * dest, register int count, int lineSeqNo);
@@ -75,6 +85,7 @@ extern void bc_rgb_byte( Byte * source, register Byte * dest, register int count
 extern void bc_rgb_byte_ht( Byte * source, register Byte * dest, register int count, int lineSeqNo);
 extern void bc_rgb_byte_ed( Byte * source, Byte * dest, int count, int * err_buf);
 extern void bc_rgb_byte_op( RGBColor * src, Byte * dest, int count, U16 * tree, RGBColor * palette, int * err_buf);
+extern void bc_rgb_byte_nop( RGBColor * src, Byte * dest, int count, U16 * tree, RGBColor * palette);
 extern void bc_rgb_graybyte( Byte * source, register Byte * dest, register int count);
 
 /* bitstroke stretching types */
@@ -146,6 +157,9 @@ extern BC(nibble,mono,Ordered);
 extern BC(nibble,mono,ErrorDiffusion);
 extern BC(nibble,mono,Optimized);
 extern BC(nibble,nibble,None);
+extern BC(nibble,nibble,Posterization);
+extern BC(nibble,nibble,Ordered);
+extern BC(nibble,nibble,ErrorDiffusion);
 extern BC(nibble,nibble,Optimized);
 extern BC(nibble,byte,None);
 extern BC(nibble,graybyte,None);
@@ -155,10 +169,14 @@ extern BC(byte,mono,Ordered);
 extern BC(byte,mono,ErrorDiffusion);
 extern BC(byte,mono,Optimized);
 extern BC(byte,nibble,None);
+extern BC(byte,nibble,Posterization);
 extern BC(byte,nibble,Ordered);
 extern BC(byte,nibble,ErrorDiffusion);
 extern BC(byte,nibble,Optimized);
 extern BC(byte,byte,None);
+extern BC(byte,byte,Ordered);
+extern BC(byte,byte,Posterization);
+extern BC(byte,byte,ErrorDiffusion);
 extern BC(byte,graybyte,None);
 extern BC(byte,rgb,None);
 extern BC(graybyte,mono,Ordered);
@@ -167,14 +185,17 @@ extern BC(graybyte,nibble,Ordered);
 extern BC(graybyte,nibble,ErrorDiffusion);
 extern BC(graybyte,rgb,None);
 extern BC(rgb,mono,None);
+extern BC(rgb,mono,Posterization);
 extern BC(rgb,mono,Ordered);
 extern BC(rgb,mono,ErrorDiffusion);
 extern BC(rgb,mono,Optimized);
 extern BC(rgb,nibble,None);
+extern BC(rgb,nibble,Posterization);
 extern BC(rgb,nibble,Ordered);
 extern BC(rgb,nibble,ErrorDiffusion);
 extern BC(rgb,nibble,Optimized);
 extern BC(rgb,byte,None);
+extern BC(rgb,byte,Posterization);
 extern BC(rgb,byte,Ordered);
 extern BC(rgb,byte,ErrorDiffusion);
 extern BC(rgb,byte,Optimized);
@@ -265,8 +286,10 @@ extern void img_premultiply_alpha_map( Handle self, Handle alpha);
 /* internal maps */
 extern Byte     map_stdcolorref    [ 256];
 extern Byte     div51              [ 256];
+extern Byte     div51f             [ 256];
 extern Byte     div17              [ 256];
 extern Byte     mod51              [ 256];
+extern int8_t   mod51f             [ 256];
 extern Byte     mod17mul3          [ 256];
 extern RGBColor cubic_palette      [ 256];
 extern RGBColor cubic_palette8     [   8];
@@ -314,4 +337,6 @@ extern Byte     map_halftone8x8_64 [  64];
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

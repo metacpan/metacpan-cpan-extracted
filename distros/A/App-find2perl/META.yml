@@ -29,7 +29,7 @@ name: App-find2perl
 provides:
   App::find2perl:
     file: lib/App/find2perl.pm
-    version: '1.004'
+    version: '1.005'
 requires:
   File::Spec::Functions: '0'
   strict: '0'
@@ -37,7 +37,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-find2perl
   repository: git://github.com/Leont/app-find2perl.git
-version: '1.004'
+version: '1.005'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -154,7 +154,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.19.0
           repo_root: .
       name: Git::NextVersion
       version: '2.042'
@@ -174,7 +174,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.19.0
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -191,7 +191,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.19.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -204,11 +204,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.004
+          tag: v1.005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.19.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -222,7 +222,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.2
+          git_version: 2.19.0
           repo_root: .
       name: '@Git/Push'
       version: '2.042'

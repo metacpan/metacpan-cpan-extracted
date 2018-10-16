@@ -1,0 +1,24 @@
+# Version control files and dirs.
+\B\.git\b
+^xt/
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount metadata files
+\B\._
+
+# Development files
+\bimportpix.cfg
+^.importpix
+^.gitignore
+^.gitattributes
+
+# Other files
+\bignore.txt
+\bREADME.md
+
+# Author tests
+t/pod.t
+t/pod-coverage.t
+t/manifest.t

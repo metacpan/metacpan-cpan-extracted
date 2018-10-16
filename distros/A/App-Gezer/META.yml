@@ -20,7 +20,7 @@ name: App-Gezer
 provides:
   App::Gezer:
     file: lib/App/Gezer.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   CHI: '0'
   Carp::Always: '0'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/shlomif/app-gezer/issues
   homepage: http://metacpan.org/release/App-Gezer
   repository: https://github.com/shlomif/perl-App-Gezer.git
-version: 0.0.1
+version: 0.0.2
 x_Dist_Zilla:
   perl:
     version: '5.028000'

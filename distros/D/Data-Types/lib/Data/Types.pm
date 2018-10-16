@@ -4,7 +4,7 @@ use strict;
 require Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 @ISA = qw(Exporter);
 
@@ -35,52 +35,52 @@ use constant DEF_PRECISION => 5;
 
 sub is_whole ($) {
     return unless defined $_[0];
-    return unless $_[0] =~ /^\d+$/;
+    return unless $_[0] =~ /^[0-9]+$/;
     return 1;
 }
 
 sub to_whole ($) {
     return unless defined $_[0];
-    my ($num) = $_[0] =~ /([+-]?(?:\d+(?:\.\d*)?|\.\d+))/;
+    my ($num) = $_[0] =~ /([+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+))/;
     return unless defined $num && $num >= 0;
     sprintf "%.0f", $num;
 }
 
 sub is_count ($) {
     return unless $_[0];
-    return unless $_[0] =~ /^\d+$/;
+    return unless $_[0] =~ /^[0-9]+$/;
     return 1;
 }
 
 sub to_count ($) {
     return unless $_[0];
-    my ($num) = $_[0] =~ /([+-]?(?:\d+(?:\.\d*)?|\.\d+))/;
+    my ($num) = $_[0] =~ /([+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+))/;
     return unless $num && $num > .5;
     sprintf "%.0f", $num;
 }
 
 sub is_int ($) {
     return unless defined $_[0] && $_[0] ne '';
-    return unless $_[0] =~ /^[+-]?\d+$/;
+    return unless $_[0] =~ /^[+-]?[0-9]+$/;
     return 1;
 }
 
 sub to_int ($) {
     return unless defined $_[0] && $_[0] ne '';
-    my ($num) = $_[0] =~ /([+-]?(?:\d+(?:\.\d*)?|\.\d+))/;
+    my ($num) = $_[0] =~ /([+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+))/;
     return unless defined $num;
     sprintf "%.0f", $num;
 }
 
 sub is_decimal ($) {
     return unless defined $_[0] && $_[0] ne '';
-    return unless $_[0] =~ /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/;
+    return unless $_[0] =~ /^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)$/;
     return 1;
 }
 
 sub to_decimal ($;$) {
     return unless defined $_[0] && $_[0] ne '';
-    my ($num) = $_[0] =~ /([+-]?(?:\d+(?:\.\d*)?|\.\d+))/;
+    my ($num) = $_[0] =~ /([+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+))/;
     return unless defined $num;
     $_[1] ||= DEF_PRECISION;
     sprintf "%.$_[1]f", $num;
@@ -104,13 +104,13 @@ sub to_decimal ($;$) {
 
 sub is_float ($) {
     return unless defined $_[0] && $_[0] ne '';
-    return unless $_[0] =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/;
+    return unless $_[0] =~ /^([+-]?)(?=[0-9]|\.[0-9])[0-9]*(\.[0-9]*)?([Ee]([+-]?[0-9]+))?$/;
     return 1;
 }
 
 sub to_float ($;$) {
     return unless defined $_[0] && $_[0] ne '';
-    my ($num) = $_[0] =~ /(([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?)/;
+    my ($num) = $_[0] =~ /(([+-]?)(?=[0-9]|\.[0-9])[0-9]*(\.[0-9]*)?([Ee]([+-]?[0-9]+))?)/;
     return unless defined $num;
     my $type = $num =~ /e|E/ ? 'e' : 'f';
     $_[1] ||= DEF_PRECISION;

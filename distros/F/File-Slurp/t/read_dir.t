@@ -9,7 +9,7 @@ use FileSlurpTest qw(temp_file_path);
 use File::Slurp qw(read_dir write_file);
 use Test::More;
 
-plan tests => 8;
+plan tests => 9;
 
 # try to honor possible tempdirs
 my $test_dir = temp_file_path(); # a good temporary filename
@@ -47,11 +47,20 @@ my $dir_entries_ref = read_dir($test_dir);
 
 is_deeply($dir_entries_ref, \@expected_entries, "dir in array ref");
 
-my @prefixed_entries = read_dir($test_dir, {prefix => 1});
-@prefixed_entries = sort @prefixed_entries ;
-# this should be fixed in the future to use File::Spec->catfile()
-# is_deeply(\@prefixed_entries, [map File::Spec->catfile($test_dir, $_), @dir_entries], 'prefix option');
-is_deeply(\@prefixed_entries, [map {"$test_dir/$_"} @dir_entries], 'prefix option');
+my @prefixed_entries;
+@prefixed_entries = read_dir( $test_dir, { prefix => 1 } ) ;
+is_deeply(
+    [ sort @prefixed_entries ],
+    [ map File::Spec->catfile($test_dir, $_), @dir_entries ],
+	'prefix option in hash ref'
+);
+
+@prefixed_entries = read_dir( $test_dir, prefix => 1 ) ;
+is_deeply(
+    [ sort @prefixed_entries ],
+    [ map File::Spec->catfile($test_dir, $_), @dir_entries ],
+	'prefix option as key-value pair'
+);
 
 # clean up
 

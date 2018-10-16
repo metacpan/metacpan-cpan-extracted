@@ -1,5 +1,9 @@
 Revision history for Exceptions
 
+0.103     2018-10-15
+    - Show the correct way to test eval success. (Dan Book)
+    - Add explanation for not relying on value of $@ (Dan Book)
+
 0.102     2017-08-14
     - Update the eval-ed code to be somewhat more readable
     - Reorganized the writeup a bit to hopefully read more smoothly

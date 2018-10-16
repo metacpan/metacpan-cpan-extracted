@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.9.9';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.9.10';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -1399,7 +1399,7 @@ sub _grok_groups_spec {
         my ($groupname, $members) = ($1, $2);
         exists $groups->{"\@$groupname"}
             and croak __PACKAGE__, ": redefinition of group ($groupname) in '$source': $_\n";
-        foreach my $member (split / /, $members) {
+        foreach my $member (split ' ', $members) {
             if ($member =~ /^\@/) {
                 # group member
                 $groups->{"\@$groupname"}{$member} = $groups->{$member}
@@ -1532,7 +1532,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.9.9
+version 2.9.10
 
 =head1 SYNOPSIS
 

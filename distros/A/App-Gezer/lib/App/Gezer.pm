@@ -1,5 +1,5 @@
 package App::Gezer;
-$App::Gezer::VERSION = '0.0.1';
+$App::Gezer::VERSION = '0.0.2';
 # ABSTRACT: HTML Postprocessor and frontend to html-minifier
 
 use strict;
@@ -238,7 +238,7 @@ App::Gezer - HTML Postprocessor and frontend to html-minifier
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =begin removed
 

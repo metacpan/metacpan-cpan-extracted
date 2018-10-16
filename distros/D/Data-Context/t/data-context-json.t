@@ -8,8 +8,8 @@ use Test::Warn;
 
 use Data::Context;
 
-eval { require JSON };
-plan skip_all => 'This test requires JSON, XML::Simple to be installed to run' if $@;
+my $json = eval { require JSON::XS };
+plan skip_all => 'This test requires JSON::XS, XML::Simple to be installed to run' if !$json || $@;
 
 my $path = path($0)->parent->child('dc-json');
 

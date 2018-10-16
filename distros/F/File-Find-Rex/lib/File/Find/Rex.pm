@@ -9,7 +9,7 @@ package File::Find::Rex;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 # import modules
 use Carp;
@@ -59,6 +59,16 @@ sub is_ignore_hidden {
     return
         defined $self->{_options}->{ignore_hidden}
       ? $self->{_options}->{ignore_hidden} > 0
+          ? 1
+          : 0
+      : 0;
+}
+
+sub is_ignore_symlink {
+    my $self = shift;
+    return
+        defined $self->{_options}->{ignore_symlink}
+      ? $self->{_options}->{ignore_symlink} > 0
           ? 1
           : 0
       : 0;
@@ -170,6 +180,11 @@ sub _callback {
                     $is_visible = ( $filename !~ /^[.]/gxs );
                 }
                 $is_visible or last NEXT;
+            }
+
+            # ignore if file is symbolic link and option set to ignore
+            if ( $self->is_ignore_symlink ) {
+              ! -l $file or last NEXT;
             }
 
             # handle regex pattern rule if set
@@ -382,6 +397,13 @@ or do not create a hash entry for it when passing options to construtor.
 =head2 ignore_hidden (default: disabled)
 
 If set, this option suppresses listing hidden files in results.
+
+To enable this option, set its value to 1. To disable, set to 0 or undef,
+or do not create a hash entry for it when passing options to construtor.
+
+=head2 ignore_symlink (default: disabled)
+
+If set, this option suppresses listing symbolic linked files in results.
 
 To enable this option, set its value to 1. To disable, set to 0 or undef,
 or do not create a hash entry for it when passing options to construtor.

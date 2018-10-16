@@ -7,8 +7,8 @@ lib/File/Slurp.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-META.yml			Module meta-data (added by MakeMaker)
-README
+META.json			Module meta-data (added by MakeMaker)
+README.md
 t/00-report-prereqs.t
 t/01-error_edit_file.t
 t/01-error_edit_file_lines.t
@@ -46,4 +46,4 @@ xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/pod_coverage.t
 xt/author/test-version.t
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)

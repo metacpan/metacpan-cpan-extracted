@@ -6,7 +6,7 @@
                                                
 
 
-This is the README for IP::China version 20180905.
+This is the README for IP::China version 20181002.
 
 IP::China is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -33,12 +33,11 @@ Decide whether an IP address originates from China.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?IP::China
     * http://metacpan.org/release/IP-China
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -59,11 +58,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm IP::China
 
-To install the module from the source file, IP-China-20180905.tar.gz,
+To install the module from the source file, IP-China-20181002.tar.gz,
 follow this sequence of commands:
 
-    tar xfz IP-China-20180905.tar.gz
-    cd IP-China-20180905
+    tar xfz IP-China-20181002.tar.gz
+    cd IP-China-20181002
     perl Makefile.PL
     make
     make install
@@ -88,6 +87,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Sep 10 05:57:03 2018.
+This README was written on Tue Oct 16 09:21:13 2018.
 
 -----------------------------------------------------------------------------

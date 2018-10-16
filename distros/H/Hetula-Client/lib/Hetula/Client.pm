@@ -1,6 +1,8 @@
 package Hetula::Client;
 
-our $VERSION = '0.007';
+use Modern::Perl '2015';
+
+our $VERSION = '0.008';
 
 # ABSTRACT: Interface with Hetula
 #

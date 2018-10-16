@@ -1,5 +1,5 @@
 package Devel::FindPerl;
-$Devel::FindPerl::VERSION = '0.014';
+$Devel::FindPerl::VERSION = '0.015';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ use Carp q/carp/;
 use Config;
 use Cwd q/realpath/;
 use File::Basename qw/basename dirname/;
-use File::Spec::Functions qw/catfile catdir rel2abs file_name_is_absolute updir curdir path/;
+use File::Spec::Functions qw/catfile catdir rel2abs file_name_is_absolute updir curdir path splitpath/;
 use Scalar::Util 'tainted';
 use IPC::Open2 qw/open2/;
 
@@ -145,7 +145,7 @@ Devel::FindPerl - Find the path to your perl
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

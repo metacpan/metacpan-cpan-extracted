@@ -13,7 +13,7 @@ Git::Hooks Tutorial - Gentle introduction to Git::Hooks
 
 =head1 VERSION
 
-version 2.9.9
+version 2.9.10
 
 =head1 NAME
 

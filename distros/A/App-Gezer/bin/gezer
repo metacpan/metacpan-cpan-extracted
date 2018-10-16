@@ -20,7 +20,7 @@ gezer
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -33,18 +33,52 @@ version 0.0.1
         --dest-dir=dest/post-incs/t2 \
         --
 
+=head1 DESCRIPTION
+
+gezer performs HTML postprocessing and caches the output of C<html-minifier>
+for subsequent speedups.
+
 =head1 NAME
 
 gezer - HTML Postprocessor and frontend to html-minifier
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 REQUIREMENTS
 
 L<https://github.com/kangax/html-minifier> (written in Node.js) must be
 in the path.
+
+=head1 FLAGS
+
+=head2 --mode=minify
+
+The run mode - currently must be B<minify>
+
+=head2 --minifier-conf=[path]
+
+Path to html-minifier 's configuration file - may be relative.
+
+=head2 --source-dir=[path]
+
+Path to the directory with the source files.
+
+=head2 --dist-dir=[path]
+
+Path to the output directory with the source files.
+
+=head2 --texts-dir=[path]
+
+Directory containing a file with the basename of C<texts-lists.txt>, that
+contains one file basename per line inside the C<texts> sub-directory that
+will be replaced with its contents verbatim after minification, given a
+C<<< <div id="id">Placeholder</div> >>> tag in the text.
+
+=head2 -- [relative file paths]
+
+The relative file paths to process.
 
 =head1 COPYRIGHT & LICENSE
 

@@ -4,7 +4,7 @@
       "Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "CPAN::Audit" : {
          "file" : "lib/CPAN/Audit.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "CPAN::Audit::Discover" : {
          "file" : "lib/CPAN/Audit/Discover.pm"
@@ -90,10 +90,11 @@
          "web" : "https://github.com/vti/cpan-audit"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:VTI",
    "x_contributors" : [
       "Takumi Akiyama <t.akiym@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

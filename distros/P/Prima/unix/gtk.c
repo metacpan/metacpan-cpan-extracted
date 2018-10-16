@@ -6,7 +6,7 @@
 
 #include "unix/guts.h"
 
-#ifdef WITH_GTK2
+#ifdef WITH_GTK
 
 #undef GT
 
@@ -14,7 +14,7 @@
 
 #define Window  XWindow
 
-#ifndef WITH_GTK2_NONX11
+#ifndef WITH_GTK_NONX11
 #include <gdk/gdkx.h>
 #endif
 #include <gtk/gtk.h>
@@ -40,6 +40,7 @@ gdk_color(GdkColor * c)
 		return ((c->red >> 8) << 16) | ((c->green >> 8) << 8) | (c->blue >> 8);
 }
 
+
 typedef struct {
 		GType (*func)(void);
 		char * name;
@@ -50,8 +51,6 @@ typedef struct {
 
 #define GT(x) gtk_##x##_get_type, #x
 
-static GType gtf_type_null(void) { return G_TYPE_NONE; }
-
 static GTFStruct widget_types[] = {
 		{ GT(button),       "GtkButton",         wcButton      , NULL },  
 		{ GT(check_button), "GtkCheckButton",    wcCheckBox    , NULL },  
@@ -60,17 +59,38 @@ static GTFStruct widget_types[] = {
 		{ GT(entry),        "GtkEditable",       wcEdit        , NULL },  
 		{ GT(entry),        "GtkEntry",          wcInputLine   , NULL },  
 		{ GT(label),        "GtkLabel",          wcLabel       , &guts. default_msg_font },  
-		{ GT(list),         "GtkList",           wcListBox     , NULL },  
 		{ GT(menu),         "GtkMenuItem",       wcMenu        , &guts. default_menu_font },  
 		{ GT(menu_item),    "GtkMenuItem",       wcPopup       , NULL },  
 		{ GT(check_button), "GtkRadioButton",    wcRadio       , NULL },  
 		{ GT(scrollbar),    "GtkScrollBar",      wcScrollBar   , NULL },  
-		{ GT(ruler),        "GtkRuler",          wcSlider      , NULL },  
 		{ GT(widget),       "GtkWidget",         wcWidget      , &guts. default_widget_font },
 		{ GT(window),       "GtkWindow",         wcWindow      , &guts. default_caption_font },  
 		{ GT(widget),       "GtkWidget",         wcApplication , &guts. default_font },  
+#if GTK_MAJOR_VERSION == 2 
+		{ GT(list),         "GtkList",           wcListBox     , NULL },
+		{ GT(ruler),        "GtkRuler",          wcSlider      , NULL },  
+#else
+		{ GT(list_box),     "GtkListBox",        wcListBox     , NULL },
+		{ GT(spin_button),  "GtkSpinButton",     wcSlider      , NULL },  
+#endif
 };
 #undef GT
+
+#if GTK_MAJOR_VERSION == 3
+GdkDisplay *
+my_gdk_display_open_default (void)
+{
+  GdkDisplay *display;
+
+  display = gdk_display_get_default ();
+  if (display)
+    return display;
+
+  display = gdk_display_open (gdk_get_display_arg_name ());
+
+  return display;
+}
+#endif
 
 Display*
 prima_gtk_init(void)
@@ -80,13 +100,12 @@ prima_gtk_init(void)
 	GtkSettings * settings;
 	Color ** stdcolors;
 	PangoWeight weight;
-	PangoStyle style;
 
 	switch ( gtk_initialized) {
 	case -1:
 		return NULL;
 	case 1:
-#ifdef WITH_GTK2_NONX11
+#ifdef WITH_GTK_NONX11
 		{
 		}
 		return (void*)1;
@@ -95,7 +114,7 @@ prima_gtk_init(void)
 #endif
 	}
 
-#ifdef WITH_GTK2_NONX11
+#ifdef WITH_GTK_NONX11
 	{
 		char * display_str = getenv("DISPLAY");
 		if ( display_str ) {
@@ -110,13 +129,20 @@ prima_gtk_init(void)
 /* perl bug in 5.20.0, see more at https://rt.perl.org/Ticket/Display.html?id=122105 */
 	gtk_disable_setlocale();
 #endif
-	if ( !gtk_parse_args (&argc, NULL) || (display = gdk_display_open_default_libgtk_only()) == NULL) {
+	if ( !gtk_parse_args (&argc, NULL) || (
+		display = 
+#if GTK_MAJOR_VERSION == 2 
+			gdk_display_open_default_libgtk_only()
+#else
+			my_gdk_display_open_default()
+#endif
+		) == NULL) {
 		gtk_initialized = -1;
 		return false;
 	} else {
 		gtk_initialized = 1;
 		XSetErrorHandler( guts.main_error_handler );
-#ifdef WITH_GTK2_NONX11
+#ifdef WITH_GTK_NONX11
 		ret = (void*)1;
 #else
 		ret = gdk_x11_display_get_xdisplay(display);
@@ -125,6 +151,7 @@ prima_gtk_init(void)
 
 	settings  = gtk_settings_get_default();
 	stdcolors = prima_standard_colors();
+#if GTK_MAJOR_VERSION == 2 
 	for ( i = 0; i < sizeof(widget_types)/sizeof(GTFStruct); i++) {
 		GTFStruct * s = widget_types + i;
 		Color     * c = stdcolors[ s-> prima_class >> 16 ]; 
@@ -192,7 +219,7 @@ prima_gtk_init(void)
 #define DEBUG_FONT(font) f->height,f->width,f->size,f->name,f->encoding
 		Fdebug("gtk-font (%s): %d.[w=%d,s=%d].%s.%s\n", s->name, DEBUG_FONT(f));
 	}
-
+#endif
 	return ret;
 }
 
@@ -210,22 +237,21 @@ prima_gtk_done(void)
 	return true;
 }
 
-#ifndef WITH_GTK2_NONX11
+#ifndef WITH_GTK_NONX11
 static void
 set_transient_for(void)
 {
-	static GdkWindow * gdk_toplevel = NULL;
 	Handle toplevel = prima_find_toplevel_window(nilHandle);
 	if ( toplevel ) {
 		GdkWindow * g = NULL;
 
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 14
+#if GTK_MAJOR_VERSION == 3 || (GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION >= 14)
 		g = gtk_widget_get_window(GTK_WIDGET(gtk_dialog));
 #else
 		g = gtk_dialog->window;
 #endif
 		if ( g ) {
-			Window w = gdk_x11_drawable_get_xid(g);
+			Window w = GDK_WINDOW_XID(g);
 			if ( w )
 				XSetTransientForHint( DISP, w, PWidget(toplevel)-> handle);
 		}
@@ -238,15 +264,19 @@ static gboolean
 do_events(gpointer data)
 {
 	int* stage = ( int*) data;
+	static struct timeval last_event = {0,0}, t;
 	if ( gtk_dialog != NULL && !*stage ) {
 		*stage = 1;
-#ifdef WITH_GTK2_NONX11
+#ifdef WITH_GTK_NONX11
 		gtk_window_present(GTK_WINDOW(gtk_dialog));
 #else
 		set_transient_for();
 #endif
 	}
-	prima_one_loop_round( WAIT_NEVER, true);
+	if (( t.tv_sec - last_event.tv_sec) * 1000000 + t.tv_usec - last_event.tv_usec > 10000) {
+		last_event = t;
+		prima_one_loop_round( WAIT_NEVER, true);
+	}
 	return gtk_dialog != NULL;
 }
 
@@ -265,10 +295,20 @@ gtk_openfile( Bool open)
 			( open ? "Open File" : "Save File"),
 		NULL,
 		open ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SAVE,
-		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-		GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+#if GTK_MAJOR_VERSION == 3
+		"_Cancel",
+#else
+		GTK_STOCK_CANCEL, 
+#endif		
+		GTK_RESPONSE_CANCEL,
+#if GTK_MAJOR_VERSION == 3
+		"_Open",
+#else
+		GTK_STOCK_OPEN, 
+#endif
+		GTK_RESPONSE_ACCEPT,
 		NULL);
-#ifdef WITH_GTK2_NONX11
+#ifdef WITH_GTK_NONX11
 	gtk_window_set_position( GTK_WINDOW(gtk_dialog), GTK_WIN_POS_CENTER);
 #endif
 
@@ -276,7 +316,7 @@ gtk_openfile( Bool open)
 	if (open)
 		gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER (gtk_dialog), gtk_select_multiple);
 
-#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 8
+#if GTK_MAJOR_VERSION == 3 || (GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION >= 8)
 	gtk_file_chooser_set_do_overwrite_confirmation( GTK_FILE_CHOOSER (gtk_dialog), gtk_overwrite_prompt);
 	gtk_file_chooser_set_show_hidden( GTK_FILE_CHOOSER (gtk_dialog), gtk_show_hidden_files);
 #endif
@@ -499,7 +539,7 @@ prima_gtk_openfile( char * params)
 			gtk_dialog_title[255] = 0;
 		}
 	} else {
-		warn("gtk2.OpenFile: Unknown function %s", params);
+		warn("gtk.OpenFile: Unknown function %s", params);
 	}
 
 	return NULL;

@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckReference;
 # ABSTRACT: Git::Hooks plugin for checking references
-$Git::Hooks::CheckReference::VERSION = '2.9.9';
+$Git::Hooks::CheckReference::VERSION = '2.9.10';
 use 5.010;
 use utf8;
 use Git::Hooks;
@@ -128,7 +128,7 @@ Git::Hooks::CheckReference - Git::Hooks plugin for checking references
 
 =head1 VERSION
 
-version 2.9.9
+version 2.9.10
 
 =head1 SYNOPSIS
 

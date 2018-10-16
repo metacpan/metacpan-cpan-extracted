@@ -116,6 +116,12 @@ while (@ARGV) {
         $out .= tab . n('int(-M _)', shift);
     } elsif ($_ eq 'ctime') {
         $out .= tab . n('int(-C _)', shift);
+    } elsif ($_ eq 'amin') {
+        $out .= tab . n('int(1440 * -A _)', shift);
+    } elsif ($_ eq 'mmin') {
+        $out .= tab . n('int(1440 * -M _)', shift);
+    } elsif ($_ eq 'cmin') {
+        $out .= tab . n('int(1440 * -C _)', shift);
     } elsif ($_ eq 'exec') {
         my @cmd = ();
         while (@ARGV && $ARGV[0] ne ';')

@@ -15,7 +15,7 @@ use ObjectDB::Table;
 use ObjectDB::With;
 use ObjectDB::Util qw(execute filter_columns);
 
-our $VERSION = '3.27';
+our $VERSION = '3.28';
 
 $Carp::Internal{ (__PACKAGE__) }++;
 $Carp::Internal{"ObjectDB::$_"}++ for qw/
@@ -1016,6 +1016,10 @@ Clones object preserving all columns except primary or unique keys.
 Converts object into a hash reference, including all preloaded objects.
 
 =back
+
+=head1 CREDITS
+
+kitt-vl (github/kitt-vl)
 
 =head1 AUTHOR
 

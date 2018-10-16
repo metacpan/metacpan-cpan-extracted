@@ -36,7 +36,7 @@
             "B" : "0",
             "Carp" : "0",
             "Errno" : "0",
-            "Exporter" : "0",
+            "Exporter" : "5.57",
             "Fcntl" : "0",
             "POSIX" : "0",
             "strict" : "0",
@@ -46,7 +46,8 @@
       "test" : {
          "requires" : {
             "Carp" : "0",
-            "Exporter" : "0",
+            "Exporter" : "5.57",
+            "Fcntl" : "0",
             "File::Basename" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -70,9 +71,11 @@
          "web" : "https://github.com/perhunter/slurp"
       }
    },
-   "version" : "9999.21",
+   "version" : "9999.22",
    "x_contributors" : [
+      "Aristotle Pagaltzis <ARISTOTLE@cpan.org>",
       "Chase Whitener <capoeirab@cpan.org>",
+      "Dan Book <grinnz@gmail.com>",
       "Graham Knop <haarg@haarg.org>",
       "James E Keenan <jkeenan@cpan.org>"
    ],

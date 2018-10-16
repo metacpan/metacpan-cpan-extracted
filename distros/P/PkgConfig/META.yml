@@ -20,7 +20,7 @@ no_index:
 provides:
   PkgConfig:
     file: lib/PkgConfig.pm
-    version: '0.22026'
+    version: '0.23026'
 requires:
   Test::More: '0.94'
   perl: '5.006000'
@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/PerlPkgConfig/perl-PkgConfig/issues
   homepage: https://metacpan.org/pod/PkgConfig
   repository: https://github.com/PerlPkgConfig/perl-PkgConfig.git
-version: '0.22026'
+version: '0.23026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

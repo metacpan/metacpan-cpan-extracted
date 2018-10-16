@@ -46,7 +46,8 @@ static void
 ic_raize_palette( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int * dstPalSize, Bool palSize_only)
 {
 	Byte * odata = var-> data;
-	int otype = var-> type, dummy_pal_size = 0;
+	int otype = var-> type, dummy_pal_size = 0, oconv = var->conversion;
+	var->conversion = ictNone;
 	ic_type_convert( self, dstData, var-> palette, dstType, &dummy_pal_size, false);
 	var-> palSize = dummy_pal_size;
 	var-> type = dstType;
@@ -54,6 +55,7 @@ ic_raize_palette( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, in
 	ic_type_convert( self, dstData, dstPal, dstType, dstPalSize, palSize_only);
 	var-> data = odata;
 	var-> type = otype;
+	var-> conversion = oconv;
 }
 
 void
@@ -82,33 +84,82 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 	}
 
 	/* fill grayscale palette, if any */
-	if ( orgDstType & imGrayScale) 
+	if ( orgDstType & imGrayScale) {
+		/* XXX check ictpUnoptimized on dst grayscales */
 		switch( orgDstType & imBPP) {
-		case imbpp1: 
-			memcpy( dstPal, stdmono_palette, sizeof( stdmono_palette)); 
+		case imbpp1:
+			memcpy( dstPal, stdmono_palette, sizeof( stdmono_palette));
 			*dstPalSize = 2;
 			break;
-		case imbpp4: 
-			memcpy( dstPal, std16gray_palette, sizeof( std16gray_palette)); 
+		case imbpp4:
+			memcpy( dstPal, std16gray_palette, sizeof( std16gray_palette));
 			*dstPalSize = 16;
 			break;
-		case imbpp8: 
-			memcpy( dstPal, std256gray_palette, sizeof( std256gray_palette)); 
+		case imbpp8:
+			memcpy( dstPal, std256gray_palette, sizeof( std256gray_palette));
 			*dstPalSize = 256;
 			break;
 		}
+	} else if ( 
+		(( var->conversion & ictpMask ) == ictpCubic) &&
+		(( orgDstType & imBPP) <= (srcType & imBPP)) &&
+		(*dstPalSize == 0 || palSize_only)
+	) {
+		palSize_only = false;
+		switch( orgDstType & imBPP) {
+		case imbpp1:
+			memcpy( dstPal, stdmono_palette, sizeof( stdmono_palette));
+			*dstPalSize = 2;
+			break;
+		case imbpp4:
+			memcpy( dstPal, cubic_palette16, sizeof( cubic_palette16));
+			*dstPalSize = 16;
+			break;
+		case imbpp8:
+			memcpy( dstPal, cubic_palette, sizeof( cubic_palette));
+			*dstPalSize = 216;
+			break;
+		}
+	}
 
 	/* no palette conversion, same type, - out */
-	if ( srcType == dstType && (*dstPalSize == 0 || (
-		(srcType != imbpp1) && (srcType != imbpp4) && (srcType != imbpp8) 
-	))) {
+	if (
+		srcType == dstType && (
+			*dstPalSize == 0 || (
+				(srcType != imbpp1) &&
+				(srcType != imbpp4) &&
+				(srcType != imbpp8)
+			)
+		)
+	) {
 		memcpy( dstData, var->data, var->dataSize);
 		if (( orgDstType & imGrayScale) == 0) {
-			memcpy( dstPal, var->palette, var->palSize);
+			memcpy( dstPal, var->palette, var->palSize * 3);
 			*dstPalSize = var-> palSize;
 		}
 		return;
 	}
+
+#define CASE_CONVERSION(src,dst,ictc) \
+	case ict##ictc: \
+		ic_##src##_##dst##_ict##ictc(BCPARMS); \
+		break
+#define CASE_COLOR_BYTE_CONVERT \
+	case imMono:\
+	case im16:\
+	case im256:\
+	case imRGB:\
+		ic_Byte_convert( BCPARMS, true);\
+		break
+#define CASE_NUMERIC_BYTE_CONVERT \
+	case imShort: \
+	case imLong: \
+	case imFloat: \
+	case imDouble: \
+	case imComplex: \
+	case imDComplex: \
+		ic_Byte_convert( BCPARMS, false); \
+		break;
 
 	switch( srcType)
 	{
@@ -117,22 +168,23 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 			case imMono:
 				switch ( var->conversion)
 				{
-					case ictOrdered:
-					case ictErrorDiffusion:
-						if ( palSize_only || *dstPalSize != 0) {
-							palSize_only = false;
-							*dstPalSize = 0;
+					case ictPosterization:
+						if ( palSize_only || *dstPalSize == 0) {
+							if ( dstData != var->data)    memcpy( dstData, var->data, var->dataSize);
+							if ( dstPal  != var->palette) memcpy( dstPal, var->palette, var->palSize * 3);
+							*dstPalSize = var-> palSize;
+							return;
 						}
 					case ictNone:
-						ic_mono_mono_ictNone(BCPARMS); 
+					case ictOrdered:
+					case ictErrorDiffusion:
+						ic_mono_mono_ictNone(BCPARMS);
 						break;
-					case ictOptimized:
-						ic_mono_mono_ictOptimized(BCPARMS); 
-						break;
+					CASE_CONVERSION(mono,mono,Optimized);
 				}
 				break;
-			case im16:      
-				if ( *dstPalSize > 0) 
+			case im16:
+				if ( *dstPalSize > 0)
 					ic_raize_palette(BCPARMS);
 				else
 					ic_mono_nibble_ictNone(BCPARMS);
@@ -140,15 +192,16 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 			case im256:
 				if ( *dstPalSize > 0)
 					ic_raize_palette(BCPARMS);
-				else 
+				else
 					ic_mono_byte_ictNone(BCPARMS);
 				break;
-			case imByte:    ic_mono_graybyte_ictNone(BCPARMS);  break;
-			case imRGB:     ic_mono_rgb_ictNone(BCPARMS);       break;
-			case imShort: case imLong: case imFloat: 
-			case imDouble: case imComplex: case imDComplex:
-				ic_Byte_convert( BCPARMS, false);
+			case imByte:
+				ic_mono_graybyte_ictNone(BCPARMS);
 				break;
+			case imRGB:
+				ic_mono_rgb_ictNone(BCPARMS);
+				break;
+			CASE_NUMERIC_BYTE_CONVERT;
 		}
 		break; /* imMono */
 
@@ -157,53 +210,38 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 			case imMono:
 				switch ( var->conversion)
 				{
-					case ictNone:
-						ic_nibble_mono_ictNone(BCPARMS);     
+					case ictPosterization:
+						ic_nibble_mono_ictNone(BCPARMS);
 						break;
-					case ictOrdered:
-						ic_nibble_mono_ictOrdered(BCPARMS); 
-						break;
-					case ictOptimized:
-						if ( *dstPalSize > 0) {
-							ic_nibble_mono_ictOptimized(BCPARMS); break;
-							break;
-						}
-					case ictErrorDiffusion:
-						ic_nibble_mono_ictErrorDiffusion(BCPARMS); 
-						break;   
+					CASE_CONVERSION(nibble, mono, None);
+					CASE_CONVERSION(nibble, mono, Optimized);
+					CASE_CONVERSION(nibble, mono, Ordered);
+					CASE_CONVERSION(nibble, mono, ErrorDiffusion);
 				}
 				break;
 			case im16:
 				switch ( var->conversion)
 				{
-					case ictOrdered:
-					case ictErrorDiffusion:
-						if ( palSize_only || *dstPalSize != 0) {
-							palSize_only = false;
-							*dstPalSize = 0;
-						}
-					case ictNone:
-						ic_nibble_nibble_ictNone(BCPARMS); 
-						break;
-					case ictOptimized:
-						ic_nibble_nibble_ictOptimized(BCPARMS); 
-						break;
+					CASE_CONVERSION(nibble, nibble, None);
+					CASE_CONVERSION(nibble, nibble, Posterization);
+					CASE_CONVERSION(nibble, nibble, Optimized);
+					CASE_CONVERSION(nibble, nibble, Ordered);
+					CASE_CONVERSION(nibble, nibble, ErrorDiffusion);
 				}
 				break;
 			case im256:
-				if ( *dstPalSize > 0) 
+				if ( *dstPalSize > 0)
 					ic_raize_palette(BCPARMS);
-				else 
+				else
 					ic_nibble_byte_ictNone(BCPARMS);
 				break;
 			case imByte:
-				ic_nibble_graybyte_ictNone(BCPARMS);       break;
-			case imRGB:
-				ic_nibble_rgb_ictNone(BCPARMS);            break;
-			case imShort: case imLong: case imFloat: 
-			case imDouble: case imComplex: case imDComplex:
-				ic_Byte_convert( BCPARMS, false);
+				ic_nibble_graybyte_ictNone(BCPARMS);
 				break;
+			case imRGB:
+				ic_nibble_rgb_ictNone(BCPARMS);
+				break;
+			CASE_NUMERIC_BYTE_CONVERT;
 		}
 		break; /* im16 */
 
@@ -212,61 +250,42 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 			case imMono:
 				switch ( var->conversion)
 				{
-					case ictNone:
-						ic_byte_mono_ictNone(BCPARMS);       
+					case ictPosterization:
+						ic_byte_mono_ictNone(BCPARMS);
 						break;
-					case ictOrdered:
-						ic_byte_mono_ictOrdered(BCPARMS);   
-						break;
-					case ictOptimized:
-						if ( *dstPalSize > 0) {
-							ic_byte_mono_ictOptimized(BCPARMS); break;
-							break;
-						}
-					case ictErrorDiffusion:
-						ic_byte_mono_ictErrorDiffusion(BCPARMS); 
-						break;
+					CASE_CONVERSION(byte, mono, None);
+					CASE_CONVERSION(byte, mono, Optimized);
+					CASE_CONVERSION(byte, mono, Ordered);
+					CASE_CONVERSION(byte, mono, ErrorDiffusion);
 				}
 				break;
 			case im16:
 				switch ( var->conversion)
 				{
-					case ictNone:
-						ic_byte_nibble_ictNone(BCPARMS);     
-						break;
-					case ictOrdered:
-						ic_byte_nibble_ictOrdered(BCPARMS); break;
-					case ictErrorDiffusion:
-						ic_byte_nibble_ictErrorDiffusion(BCPARMS); break;    
-					case ictOptimized:
-						ic_byte_nibble_ictOptimized(BCPARMS); break;    
+					CASE_CONVERSION(byte, nibble, None);
+					CASE_CONVERSION(byte, nibble, Posterization);
+					CASE_CONVERSION(byte, nibble, Optimized);
+					CASE_CONVERSION(byte, nibble, Ordered);
+					CASE_CONVERSION(byte, nibble, ErrorDiffusion);
 				}
 				break;
 			case im256:
 				switch ( var->conversion)
 				{
-					case ictOrdered:
-					case ictErrorDiffusion:
-						if ( palSize_only || *dstPalSize != 0) {
-							palSize_only = false;
-							*dstPalSize = 0;
-						}
-					case ictNone:
-						ic_byte_byte_ictNone(BCPARMS); 
-						break;
-					case ictOptimized:
-						ic_byte_byte_ictOptimized(BCPARMS); 
-						break;
+					CASE_CONVERSION(byte, byte, None);
+					CASE_CONVERSION(byte, byte, Posterization);
+					CASE_CONVERSION(byte, byte, Optimized);
+					CASE_CONVERSION(byte, byte, Ordered);
+					CASE_CONVERSION(byte, byte, ErrorDiffusion);
 				}
 				break;
 			case imByte:
-				ic_byte_graybyte_ictNone(BCPARMS);          break;
-			case imRGB:
-				ic_byte_rgb_ictNone(BCPARMS); break;
-			case imShort: case imLong: case imFloat: 
-			case imDouble: case imComplex: case imDComplex:
-				ic_Byte_convert( BCPARMS, false);
+				ic_byte_graybyte_ictNone(BCPARMS);
 				break;
+			case imRGB:
+				ic_byte_rgb_ictNone(BCPARMS);
+				break;
+			CASE_NUMERIC_BYTE_CONVERT;
 		}
 		break; /* im256 */
 
@@ -275,78 +294,61 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 			case imMono:
 				switch ( var->conversion)
 				{
-					case ictNone:
-						ic_byte_mono_ictNone(BCPARMS); 
+					case ictPosterization:
+						ic_byte_mono_ictNone(BCPARMS);
 						break;
-					case ictOrdered:
-						ic_graybyte_mono_ictOrdered(BCPARMS); break;
-					case ictOptimized:
-						if ( *dstPalSize > 0) {
-							ic_byte_mono_ictOptimized(BCPARMS); break;
-							break;
-						}
-					case ictErrorDiffusion:
-						ic_graybyte_mono_ictErrorDiffusion(BCPARMS); break;   
+					CASE_CONVERSION(byte, mono, None);
+					CASE_CONVERSION(byte, mono, Optimized);
+					CASE_CONVERSION(graybyte, mono, Ordered);
+					CASE_CONVERSION(graybyte, mono, ErrorDiffusion);
 				}
 				break;
 			case im16:
 				switch ( var->conversion)
 				{
-					case ictNone:
-						ic_byte_nibble_ictNone(BCPARMS); 
-						break;
-					case ictOrdered:
-						ic_graybyte_nibble_ictOrdered(BCPARMS); 
-						break;
-					case ictOptimized:
-						if ( *dstPalSize > 0) {
-							ic_byte_nibble_ictOptimized(BCPARMS); 
-							break;    
-						}
-					case ictErrorDiffusion:
-						ic_graybyte_nibble_ictErrorDiffusion(BCPARMS); 
-						break;    
+					CASE_CONVERSION(byte, nibble, None);
+					CASE_CONVERSION(byte, nibble, Posterization);
+					CASE_CONVERSION(byte, nibble, Optimized);
+					CASE_CONVERSION(graybyte, nibble, Ordered);
+					CASE_CONVERSION(graybyte, nibble, ErrorDiffusion);
 				}
 				break;
 			case im256:
 				switch ( var->conversion)
 				{
-					case ictOrdered:
-					case ictErrorDiffusion:
-						if ( palSize_only || *dstPalSize != 0) {
-							palSize_only = false;
-							*dstPalSize = 0;
-						}
-					case ictNone:
-						ic_byte_byte_ictNone(BCPARMS); 
-						break;
-					case ictOptimized:
-						ic_byte_byte_ictOptimized(BCPARMS); 
-						break;
+					CASE_CONVERSION(byte, byte, None);
+					CASE_CONVERSION(byte, byte, Posterization);
+					CASE_CONVERSION(byte, byte, Optimized);
+					CASE_CONVERSION(byte, byte, Ordered);
+					CASE_CONVERSION(byte, byte, ErrorDiffusion);
 				}
 				break;
 			case imRGB:
-				ic_graybyte_rgb_ictNone(BCPARMS); break;
-			case imShort  : ic_Byte_Short( BCPARMS);  break;
-			case imLong   : ic_Byte_Long( BCPARMS);   break;
-			case imFloat  : ic_Byte_float( BCPARMS);  break;
-			case imDouble : ic_Byte_double( BCPARMS); break;
-			case imComplex: ic_Byte_float_complex(BCPARMS); break;
-			case imDComplex: ic_Byte_double_complex(BCPARMS); break;
-			break;         
+				ic_graybyte_rgb_ictNone(BCPARMS);
+				break;
+			case imShort:
+				ic_Byte_Short( BCPARMS);
+				break;
+			case imLong:
+				ic_Byte_Long( BCPARMS);
+				break;
+			case imFloat:
+				ic_Byte_float( BCPARMS);
+				break;
+			case imDouble:
+				ic_Byte_double( BCPARMS);
+				break;
+			case imComplex:
+				ic_Byte_float_complex(BCPARMS);
+				break;
+			case imDComplex:ic_Byte_double_complex(BCPARMS);
+				break;
 		}
 		break; /* imByte */
 
 		case imShort:  switch ( dstType)
 		{
-			case imMono: case im16: case imRGB:
-				ic_Byte_convert( BCPARMS, true);
-				break;
-			case im256:
-				if ( *dstPalSize > 0) {
-					ic_Byte_convert( BCPARMS, true);
-					break;
-				}
+			CASE_COLOR_BYTE_CONVERT;
 			case imByte   : ic_Short_Byte( BCPARMS);   break;
 			case imLong   : ic_Short_Long( BCPARMS);   break;
 			case imFloat  : ic_Short_float( BCPARMS);  break;
@@ -359,14 +361,7 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 
 		case imLong:  switch ( dstType)
 		{
-			case imMono: case im16: case imRGB:
-				ic_Byte_convert( BCPARMS, true);
-				break;
-			case im256:
-				if ( *dstPalSize > 0) {
-					ic_Byte_convert( BCPARMS, true);
-					break;
-				}
+			CASE_COLOR_BYTE_CONVERT;
 			case imByte   : ic_Long_Byte( BCPARMS);   break;
 			case imShort  : ic_Long_Short( BCPARMS);  break;
 			case imFloat  : ic_Long_float( BCPARMS);  break;
@@ -379,14 +374,7 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 
 		case imFloat:  switch ( dstType)
 		{
-			case imMono: case im16: case imRGB:
-				ic_Byte_convert( BCPARMS, true);
-				break;
-			case im256:
-				if ( *dstPalSize > 0) {
-					ic_Byte_convert( BCPARMS, true);
-					break;
-				}
+			CASE_COLOR_BYTE_CONVERT;
 			case imByte   : ic_float_Byte( BCPARMS);   break;
 			case imShort  : ic_float_Short( BCPARMS);  break;
 			case imLong   : ic_float_Long( BCPARMS);   break;
@@ -400,14 +388,7 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 
 		case imDouble:  switch ( dstType)
 		{
-			case imMono: case im16: case imRGB:
-				ic_Byte_convert( BCPARMS, true);
-				break;
-			case im256:
-				if ( *dstPalSize > 0) {
-					ic_Byte_convert( BCPARMS, true);
-					break;
-				}
+			CASE_COLOR_BYTE_CONVERT;
 			case imByte   : ic_double_Byte( BCPARMS);   break;
 			case imShort  : ic_double_Short( BCPARMS);  break;
 			case imLong   : ic_double_Long( BCPARMS);   break;
@@ -423,64 +404,43 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 			case imMono:
 				switch ( var->conversion)
 				{
-					case ictNone:
-						ic_rgb_mono_ictNone(BCPARMS); break;
-					case ictOrdered:
-						ic_rgb_mono_ictOrdered(BCPARMS); break;
-					case ictOptimized:
-						if ( *dstPalSize > 0) {
-							ic_rgb_mono_ictOptimized(BCPARMS); break;
-							break;
-						}
-					case ictErrorDiffusion:
-						ic_rgb_mono_ictErrorDiffusion(BCPARMS); break;
+					CASE_CONVERSION(rgb, mono, None);
+					CASE_CONVERSION(rgb, mono, Posterization);
+					CASE_CONVERSION(rgb, mono, Optimized);
+					CASE_CONVERSION(rgb, mono, Ordered);
+					CASE_CONVERSION(rgb, mono, ErrorDiffusion);
 				}
 				break;
 			case im16:
 				switch ( var->conversion)
 				{
-					case ictNone:
-						ic_rgb_nibble_ictNone(BCPARMS); break;
-					case ictOrdered:
-						ic_rgb_nibble_ictOrdered(BCPARMS); break;
-					case ictErrorDiffusion:
-						ic_rgb_nibble_ictErrorDiffusion(BCPARMS); break;   
-					case ictOptimized:
-						ic_rgb_nibble_ictOptimized(BCPARMS); break;
+					CASE_CONVERSION(rgb, nibble, None);
+					CASE_CONVERSION(rgb, nibble, Posterization);
+					CASE_CONVERSION(rgb, nibble, Optimized);
+					CASE_CONVERSION(rgb, nibble, Ordered);
+					CASE_CONVERSION(rgb, nibble, ErrorDiffusion);
 				}
 				break;
 			case im256:
 				switch ( var->conversion)
 				{
-				case ictNone:
-					ic_rgb_byte_ictNone(BCPARMS); break;
-				case ictOrdered:
-					ic_rgb_byte_ictOrdered(BCPARMS); break;
-				case ictErrorDiffusion:
-					ic_rgb_byte_ictErrorDiffusion(BCPARMS); break;
-				case ictOptimized:
-					ic_rgb_byte_ictOptimized(BCPARMS); break;
+					CASE_CONVERSION(rgb, byte, None);
+					CASE_CONVERSION(rgb, byte, Posterization);
+					CASE_CONVERSION(rgb, byte, Optimized);
+					CASE_CONVERSION(rgb, byte, Ordered);
+					CASE_CONVERSION(rgb, byte, ErrorDiffusion);
+					break;
 				}
 				break;
 			case imByte:
-				ic_rgb_graybyte_ictNone(BCPARMS); 
+				ic_rgb_graybyte_ictNone(BCPARMS);
 				break;
-			case imShort: case imLong: case imFloat: 
-			case imDouble: case imComplex: case imDComplex:
-				ic_Byte_convert( BCPARMS, false);
-				break;
+			CASE_NUMERIC_BYTE_CONVERT;
 		}
 		break; /* imRGB */
 
 		case imComplex: switch( dstType) {
-			case imMono: case im16: case imRGB:
-				ic_Byte_convert( BCPARMS, true);
-				break;
-			case im256:   
-				if ( *dstPalSize > 0) {
-					ic_Byte_convert( BCPARMS, true);
-					break;
-				}
+			CASE_COLOR_BYTE_CONVERT;
 			case imByte:    ic_float_complex_Byte(BCPARMS); break;
 			case imShort:   ic_float_complex_Short(BCPARMS); break;
 			case imLong:    ic_float_complex_Long(BCPARMS); break;
@@ -491,20 +451,13 @@ ic_type_convert( Handle self, Byte * dstData, PRGBColor dstPal, int dstType, int
 		/* imComplex */
 
 		case imDComplex: switch( dstType) {
-			case imMono: case im16: case imRGB:
-				ic_Byte_convert( BCPARMS, true);
-				break;
-			case im256:
-				if ( *dstPalSize > 0) {
-					ic_Byte_convert( BCPARMS, true);
-					break;
-				}
+			CASE_COLOR_BYTE_CONVERT;
 			case imByte:    ic_double_complex_Byte(BCPARMS); break;
 			case imShort:   ic_double_complex_Short(BCPARMS); break;
 			case imLong:    ic_double_complex_Long(BCPARMS); break;
 			case imDouble:  ic_double_complex_double(BCPARMS); break;
 			case imFloat:   ic_double_complex_float( BCPARMS); break;
-		}     
+		}
 		break;
 		/* imDComplex */
 	}
@@ -526,6 +479,23 @@ itype_supported( int type)
 	int i = 0;
 	while( imTypes[i] != type && imTypes[i] != -1) i++;
 	return imTypes[i] != -1;
+}   
+
+static int imConversions[] = {
+	ictNone,
+	ictPosterization,
+	ictOrdered,
+	ictErrorDiffusion,
+	ictOptimized,
+	-1
+};
+
+Bool
+iconvtype_supported( int conv)
+{
+	int i = 0;
+	while( imConversions[i] != conv && imConversions[i] != -1) i++;
+	return imConversions[i] != -1;
 }   
 
 void

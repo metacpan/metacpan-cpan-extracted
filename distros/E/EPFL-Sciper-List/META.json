@@ -10,17 +10,17 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "EPFL-Sciper-List",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Copy::Recursive" : "0.40",
+            "File::Copy::Recursive" : "0.44",
             "File::Find::Rule" : "0.34",
             "IO::All" : "0.87",
             "Test::JSON" : "0.11",
-            "Test::MockModule" : "0.13",
+            "Test::MockModule" : "0.170000",
             "Test::More" : "0"
          }
       },
@@ -33,7 +33,7 @@
          "requires" : {
             "JSON" : "2.97",
             "LWP::Protocol::https" : "6.07",
-            "LWP::UserAgent" : "6.33",
+            "LWP::UserAgent" : "6.35",
             "Readonly" : "2.05"
          }
       }
@@ -41,15 +41,15 @@
    "provides" : {
       "EPFL::Sciper::List" : {
          "file" : "lib/EPFL/Sciper/List.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/epfl-devrun/epfl-sciper-list"
+         "url" : "https://github.com/innovativeinnovation/epfl-sciper-list"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

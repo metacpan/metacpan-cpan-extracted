@@ -7,11 +7,11 @@ build_requires:
   AnyEvent::HTTP: '0'
   Test::More: '0.88'
   Test::Warn: '0'
-  Test::Warnings: '0'
+  Test::Warnings: '0.026'
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,45 +20,44 @@ name: Data-Context
 provides:
   Data::Context:
     file: lib/Data/Context.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Actions:
     file: lib/Data/Context/Actions.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Finder:
     file: lib/Data/Context/Finder.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Finder::File:
     file: lib/Data/Context/Finder/File.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Instance:
     file: lib/Data/Context/Instance.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Loader:
     file: lib/Data/Context/Loader.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Loader::File:
     file: lib/Data/Context/Loader/File.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Loader::File::JS:
     file: lib/Data/Context/Loader/File/JS.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Loader::File::JSON:
     file: lib/Data/Context/Loader/File/JSON.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Loader::File::XML:
     file: lib/Data/Context/Loader/File/XML.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Loader::File::YAML:
     file: lib/Data/Context/Loader/File/YAML.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Log:
     file: lib/Data/Context/Log.pm
-    version: '0.2'
+    version: '0.3'
   Data::Context::Util:
     file: lib/Data/Context/Util.pm
-    version: '0.2'
+    version: '0.3'
 recommends:
-  JSON: '0'
   JSON::XS: '0'
   Pod::Coverage: '0'
   Test::Kwalitee: '0'
@@ -78,11 +77,11 @@ requires:
   Path::Tiny: '0'
   Scalar::Util: '0'
   namespace::autoclean: '0'
-  perl: '5.008'
+  perl: '5.01'
   version: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data::Context
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/Data-Context.git
-version: '0.2'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.3'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

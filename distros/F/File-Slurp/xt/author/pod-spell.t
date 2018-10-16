@@ -13,3 +13,7 @@ __DATA__
 Guttman
 dir
 stemsystems
+rf
+wf
+ef
+efl

@@ -12,6 +12,7 @@ t/01-mocksite.t
 t/02-check-ua.t
 t/03-retrieve-sciper.t
 t/boilerplate.t
+t/critic.t
 t/manifest.t
 t/MockSite.pm
 t/pod-coverage.t

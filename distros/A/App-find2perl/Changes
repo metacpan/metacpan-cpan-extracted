@@ -1,5 +1,8 @@
 Revision history for App-find2perl
 
+1.005     2018-10-15 15:03:45+02:00 Europe/Amsterdam
+          Add -amin, -cmin and -mmin switches
+
 1.004     2018-03-19 19:36:16+01:00 Europe/Amsterdam
           Add dummy module App::find2perl
 

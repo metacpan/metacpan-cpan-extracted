@@ -18,10 +18,10 @@ IP::China - decide whether an internet address is from China
 
 =head1 VERSION
 
-This documents IP::China version 20180905
-corresponding to git commit L<a1274b43a88f37e522db6c8e0af96f4ef7160855|https://github.com/benkasminbullock/chinese-ip/commit/a1274b43a88f37e522db6c8e0af96f4ef7160855> released on Mon Sep 10 05:56:29 2018 +0900. 
+This documents IP::China version 20181002
+corresponding to git commit L<eaa98f2a850c419df39f2ea06fd3f191697cf668|https://github.com/benkasminbullock/chinese-ip/commit/eaa98f2a850c419df39f2ea06fd3f191697cf668> released on Tue Oct 16 09:20:58 2018 +0900. 
 
-This module incorporates the MaxMind GeoLite data of date 20180905 (YYYYMMDD).
+This module incorporates the MaxMind GeoLite data of date 20181002 (YYYYMMDD).
 
 =head1 DESCRIPTION
 

@@ -11,7 +11,7 @@ my $dc = Data::Context->new(
     path => path($0)->parent->child('dc') . '',
 );
 
-my $have_json = eval {require JSON        };
+my $have_json = eval {require JSON::XS    };
 my $have_yaml = eval {require YAML::XS    };
 my $have_xml  = eval {require XML::Simple };
 

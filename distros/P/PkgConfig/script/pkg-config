@@ -20,7 +20,7 @@ package
 package PkgConfig;
 
 #First two digits are Perl version, second two are pkg-config version
-our $VERSION = '0.22026';
+our $VERSION = '0.23026';
 
 $VERSION =~ /([0-9]{2})$/;
 my $compat_version = $1;
@@ -516,6 +516,7 @@ sub _pc_var {
     $vname =~ s,\.,DOT,g;
     no strict 'refs';
     $vname = $self->_get_pc_varname($vname);
+    no warnings qw(once);
     my $glob = *{$vname};
     $glob ? $$glob : ();
 }
@@ -1772,6 +1773,8 @@ Other contributors include:
 =item Ilya Pavlov (ILUX, Ilya33)
 
 =item Shawn Laffan (SLAFFAN, shawnlaffan)
+
+=item Ari Jolma (AJOLMA)
 
 =back
 

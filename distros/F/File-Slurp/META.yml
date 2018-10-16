@@ -4,8 +4,9 @@ author:
   - 'Uri Guttman <uri@stemsystems.com>'
 build_requires:
   Carp: '0'
-  Exporter: '0'
+  Exporter: '5.57'
   ExtUtils::MakeMaker: '0'
+  Fcntl: '0'
   File::Basename: '0'
   File::Spec: '0'
   File::Temp: '0'
@@ -36,16 +37,18 @@ requires:
   B: '0'
   Carp: '0'
   Errno: '0'
-  Exporter: '0'
+  Exporter: '5.57'
   Fcntl: '0'
   POSIX: '0'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/perhunter/slurp.git
-version: '9999.21'
+version: '9999.22'
 x_contributors:
+  - 'Aristotle Pagaltzis <ARISTOTLE@cpan.org>'
   - 'Chase Whitener <capoeirab@cpan.org>'
+  - 'Dan Book <grinnz@gmail.com>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'James E Keenan <jkeenan@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

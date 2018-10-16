@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
 
-our $VERSION = version->new('0.2');
+our $VERSION = version->new('0.3');
 
 has raw => (
     is  => 'rw',
@@ -39,7 +39,7 @@ Data::Context::Loader - Base class for Data::Context Loader modules
 
 =head1 VERSION
 
-This documentation refers to Data::Context::Loader version 0.2
+This documentation refers to Data::Context::Loader version 0.3
 
 
 =head1 SYNOPSIS
@@ -60,7 +60,7 @@ an example/default data loader.
 
 =head2 C<changed ()>
 
-Implemented by child classes, checkes if the configuration has changed.
+Implemented by child classes, checks if the configuration has changed.
 
 =head2 C<loader ($str)>
 

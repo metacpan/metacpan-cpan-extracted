@@ -23,7 +23,8 @@ my %TestReqs = (
     "strict" => 0,
     "warnings" => 0,
     "Carp" => 0,
-    'Exporter' => 0,
+    'Exporter' => '5.57',
+    'Fcntl' => 0,
     "File::Basename" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
@@ -37,7 +38,7 @@ my %TestReqs = (
 my %prereqs = (
     'B' => 0,
     'Carp' => 0,
-    'Exporter' => 0,
+    'Exporter' => '5.57',
     'Errno' => 0,
     'Fcntl' => 0,
     'POSIX' => 0,
@@ -48,7 +49,7 @@ my %prereqs = (
 my %WriteMakefileArgs = (
     'NAME' => 'File::Slurp',
     "DISTNAME" => "File-Slurp",
-    'LICENSE' => 'perl',
+    'LICENSE' => 'perl_5',
     'AUTHOR' => 'Uri Guttman <uri@stemsystems.com>',
     'VERSION_FROM' => 'lib/File/Slurp.pm',
     'ABSTRACT_FROM' => 'lib/File/Slurp.pm',
@@ -64,7 +65,9 @@ my %WriteMakefileArgs = (
             },
         },
         'x_contributors' => [
+            'Aristotle Pagaltzis <ARISTOTLE@cpan.org>',
             'Chase Whitener <capoeirab@cpan.org>',
+            'Dan Book <grinnz@gmail.com>',
             'Graham Knop <haarg@haarg.org>',
             'James E Keenan <jkeenan@cpan.org>',
         ],
@@ -87,5 +90,11 @@ unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION('6.52') };
+
+delete $WriteMakefileArgs{META_MERGE}
+  unless eval { ExtUtils::MakeMaker->VERSION('6.46') };
+
+delete $WriteMakefileArgs{LICENSE}
+  unless eval { ExtUtils::MakeMaker->VERSION('6.31') };
 
 WriteMakefile(%WriteMakefileArgs);

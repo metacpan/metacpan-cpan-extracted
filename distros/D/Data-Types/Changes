@@ -1,5 +1,8 @@
 Revision history for Perl extension Data::Types.
 
+0.14  2018-10-15T11:10:00
+      - Addressed issue #5, raised by @icklekitten.
+
 0.13  2018-05-26T09:00:00
       - Fixed warning "Can't stat bin: No such file or directory". (MANWAR)
 

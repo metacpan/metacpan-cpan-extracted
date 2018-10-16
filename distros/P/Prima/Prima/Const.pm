@@ -68,6 +68,10 @@ package
 package 
     im; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# image types
 package 
+    ictp; *AUTOLOAD = \&Prima::Const::AUTOLOAD;	# Image conversion types: dithering
+package 
+    ictd; *AUTOLOAD = \&Prima::Const::AUTOLOAD;	# Image conversion types: palette optimization
+package 
     ict; *AUTOLOAD = \&Prima::Const::AUTOLOAD;	# Image conversion types
 package 
     is; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# Image statistics types
@@ -496,7 +500,7 @@ See L<Prima::Application/get_system_info>
 	gui::PM  
 	gui::Windows
 	gui::XLib 
-	gui::GTK2
+	gui::GTK
 
 =head2 le::  - line end styles
 
@@ -594,11 +598,35 @@ See L<Prima::Image/type>.
 
 See L<Prima::Image/conversion>.
 
-	ict::None            - no dithering
+	ict::None            - no dithering, with static palette or palette optimized by source palette
+	ict::Posterization   - no dithering, with optimized palette by source pixels
 	ict::Ordered         - 8x8 ordered halftone dithering
 	ict::ErrorDiffusion  - error diffusion dithering with static palette
 	ict::Optimized       - error diffusion dithering with optimized palette
 
+Their values are combinations of C<ictp::> and C<ictd::> constants, see below.
+
+=head2 ictd:: - image conversion types, dithering
+
+These constants select color correction (dithering) algorithm when downsampling
+an image
+
+	ictd::None            - no dithering, pure colors only
+	ictd::Ordered         - 8x8 ordered halftone dithering (checkerboard)
+	ictd::ErrorDiffusion  - error diffusion dithering (2/5 down, 2/5 right, 1/5 down/right)
+
+=head2 ictp:: - image conversion types, palette optimization
+
+These constants select how the target palette is made up when downsampling an image.
+
+	ictp::Unoptimized  - use whatever color mapping method is fastest,
+	                     image quality can be severely compromized
+	ictp::Cubic        - use static cubic palette; a bit slower,
+	                     guaranteed mediocre quality
+	ictp::Optimized    - collect available colors in the image;
+	                     slowest, gives best results
+
+Not all combination of ictp and ictd constants are valid
 
 =head2 is::  - image statistics indices
 
@@ -921,7 +949,7 @@ See also L<Prima::Application/get_system_value>
 
 =head2 ta::  - alignment constants
 
-Used in: L<Prima::InputLine>, L<Prima::ImageViewer>, L<Prima::Label>, L<Prima::Terminals>.
+Used in: L<Prima::InputLine>, L<Prima::ImageViewer>, L<Prima::Label>.
 
 	ta::Left
 	ta::Right

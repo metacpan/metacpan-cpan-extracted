@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.020;
 
 use ExtUtils::MakeMaker;
 
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
     "bin/hetula-client"
   ],
   "LICENSE" => "gpl",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "Hetula::Client",
   "PREREQ_PM" => {
     "Carp::Always" => 0,
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }

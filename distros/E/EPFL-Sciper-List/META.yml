@@ -3,11 +3,11 @@ abstract: 'Retrieve a list of all public active sciper from EPFL.'
 author:
   - 'William Belle <william.belle@gmail.com>'
 build_requires:
-  File::Copy::Recursive: '0.40'
+  File::Copy::Recursive: '0.44'
   File::Find::Rule: '0.34'
   IO::All: '0.87'
   Test::JSON: '0.11'
-  Test::MockModule: '0.13'
+  Test::MockModule: '0.170000'
   Test::More: '0'
 configure_requires:
   Module::Build: '0.4224'
@@ -21,13 +21,13 @@ name: EPFL-Sciper-List
 provides:
   EPFL::Sciper::List:
     file: lib/EPFL/Sciper/List.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   JSON: '2.97'
   LWP::Protocol::https: '6.07'
-  LWP::UserAgent: '6.33'
+  LWP::UserAgent: '6.35'
   Readonly: '2.05'
 resources:
-  repository: https://github.com/epfl-devrun/epfl-sciper-list
-version: '1.01'
+  repository: https://github.com/innovativeinnovation/epfl-sciper-list
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

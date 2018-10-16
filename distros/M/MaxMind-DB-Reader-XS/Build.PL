@@ -50,16 +50,13 @@ sub _mb_args {
     "Ran Eilam <reilam\@maxmind.com>"
   ],
   "dist_name" => "MaxMind-DB-Reader-XS",
-  "dist_version" => "1.000005",
+  "dist_version" => "1.000006",
   "license" => "artistic_2",
   "module_name" => "MaxMind::DB::Reader::XS",
   "recursive_test_files" => 1,
   "requires" => {
-    "Math::Int128" => 0,
     "MaxMind::DB::Metadata" => "0.040001",
-    "MaxMind::DB::Reader" => "1.000012",
     "MaxMind::DB::Reader::Role::HasMetadata" => 0,
-    "MaxMind::DB::Reader::Role::Reader" => 0,
     "MaxMind::DB::Types" => 0,
     "Moo" => 0,
     "XSLoader" => 0,
@@ -71,6 +68,8 @@ sub _mb_args {
   "test_requires" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Math::Int128" => 0,
+    "MaxMind::DB::Reader" => 0,
     "Module::Implementation" => 0,
     "Net::Works::Network" => "0.21",
     "Path::Class" => "0.27",

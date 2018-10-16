@@ -1,5 +1,29 @@
 Revision history for Data-Context
 
+0.3   2018-10-15
+        Updating for release of version 0.3
+        Added prodection against missing optional dependencies (Ivan Wills)
+
+0.2.3   2018-09-30
+        Updating for release of version 0.2.3
+        Moving everything to JSON::XS (Ivan Wills)
+        Update date (Ivan Wills)
+        Updated perl version (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
+0.2.2   2017-04-17
+        Updating for release of version 0.2.2
+        Updated date (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Fixed config (Ivan Wills)
+        Updated config to build/test (Ivan Wills)
+
+v0.2.1   2016-04-10
+        Updating for release of version v0.2.1
+        Fixed typo (Ivan Wills)
+        VTide and editor configs (Ivan Wills)
+        VTide config (Ivan Wills)
+
 0.2   2016-02-07
         Updating for release of version 0.2
         Updated date (Ivan Wills)

@@ -633,7 +633,7 @@ load( PImgCodec instance, PImgLoadFileInstance fi)
 		if ( trns_t) {
 			if ( blending ) {
 				PRGBColor p = PIcon( fi-> object)-> palette;
-				int i, min_ix = 0, min_val = 255;
+				int i;
 				/* transparency values per pixel table is present */
 				for ( i = 0; i < trns_n; i++) {
 					p[i]. r = ((uint16_t) p[i]. r * trns_t[i]) >> 8;
@@ -938,6 +938,7 @@ save( PImgCodec instance, PImgSaveFileInstance fi)
 				snprintf( fi-> errbuf, 256, "Unknown render_intent option '%s'", c);
 				return false;
 			}
+			png_set_sRGB( l-> png_ptr, l-> info_ptr, i);
 		}
 	}
 #endif   

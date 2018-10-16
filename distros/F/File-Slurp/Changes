@@ -1,5 +1,18 @@
 Revision history File::Slurp
 
+9999.22     2018-10-15
+	- Update the SYNOPSIS documentation. (Graham Knop)
+	- Fix some EUMM metadata depending on version. (Dan Book)
+	- Fix Windows path concatenation on read_dir. (James Keenan)
+	- Document each function with proper POD heads and re-order in alphabetical
+	- Dump the POD to GH markdown for a README.md
+	- Remove the README file
+	- Remove some work-arounds for older Perls < 5.6
+	- Do not inherit from Exporter (requires Exporter 5.57)
+	- Fix perms.t to run on all platforms (Aristotle Pagaltzis, Linda Walsh
+	  via RT #92401)
+	- Clean up handle.t (we no longer use the -w flag anywhere)
+
 9999.21    2018-10-08
 	- Unset $^W in a few strategic places to silence warnings when Test::Harness
 	  or ExtUtils::MakeMaker turn them on. (Thanks, Graham Knop).

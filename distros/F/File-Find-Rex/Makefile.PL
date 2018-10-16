@@ -2,6 +2,13 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::MY;
+
+sub MY::libscan {
+  my( $mm, $file ) = @_;
+  return if $file =~ /\.DS_Store/;
+  return $file;
+}
 
 WriteMakefile(
     NAME             => 'File::Find::Rex',

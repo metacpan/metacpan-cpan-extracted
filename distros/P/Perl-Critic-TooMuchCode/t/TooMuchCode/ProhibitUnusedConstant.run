@@ -37,7 +37,6 @@ use constant B => A + 42;
 say B;
 
 ## name constant in HashRef with a preceeding plus sign.
-## TODO requires fixes in PPIx::Utils
 ## failures 2
 ## cut
 

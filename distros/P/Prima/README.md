@@ -80,14 +80,14 @@ If some of the required libraries or include files can not be found,
 INC=-I/some/include and LIBS=-L/some/lib semantics should be used to tell
 Makefile.PL about these. Check ExtUtils::MakeMaker for more.
 
-GTK2
-----
+GTK3/GTK2
+---------
 
-It is recommended to build Prima with GTK2 on X11 installations,
+It is recommended to build Prima with GTK3/GTK2 on X11 installations,
 because in that case Prima will use standard GTK fonts, colors, and file dialogs.
 By default Prima tries to build with it, but if you don't want it, run
 
-    perl Makefile.PL WITH_GTK2=0
+    perl Makefile.PL WITH_GTK2=0 WITH_GTK3=0
 
 BINARY DISTRIBUTION INSTALLATION
 ================================
@@ -144,7 +144,7 @@ programming interfaces.  Run 'podview Prima' or 'perldoc Prima' command to
 start with the main manual page.
 
 Visit http://www.prima.eu.org/ for the recent versions of the toolkit. You can
-use cvs update feature to keep in touch. The mailing list on the toolkit is
+use github.com/dk/Prima to keep in touch. The mailing list on the toolkit is
 available, you can ask questions there. See the Prima homepage for details.
 
 COPYRIGHT
@@ -175,7 +175,6 @@ CREDITS
  - Waldemar Biernacki
  - Andreas Hernitscheck
  - David Mertens
- - Teo Sankaro
  - Gabor Szabo
  - Fabio D'Alfonso
  - Rob "Sisyphus"
@@ -194,3 +193,4 @@ CREDITS
  - Maximilian Lika
  - kmx
  - Mario Roy
+

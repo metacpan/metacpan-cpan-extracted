@@ -1,5 +1,8 @@
 Revision history for Devel-FindPerl
 
+0.015     2018-10-15 13:00:25+02:00 Europe/Amsterdam
+          Import splitpath before using it
+
 0.014     2015-06-15 23:53:25+02:00 Europe/Amsterdam
           Properly quote exe_ext in regexp
 

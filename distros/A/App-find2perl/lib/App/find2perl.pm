@@ -1,5 +1,5 @@
 package App::find2perl;
-$App::find2perl::VERSION = '1.004';
+$App::find2perl::VERSION = '1.005';
 1;
 
 __END__

@@ -16,7 +16,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use Data::Context::Util qw/lol_path lol_iterate/;
 
-our $VERSION = version->new('0.2');
+our $VERSION = version->new('0.3');
 
 sub expand_vars {
     my ( $self, $value, $vars, $path, $dci ) = @_;
@@ -45,7 +45,7 @@ Data::Context::Actions - Contains all the default actions available to a config
 
 =head1 VERSION
 
-This documentation refers to Data::Context::Actions version 0.2.
+This documentation refers to Data::Context::Actions version 0.3.
 =head1 SYNOPSIS
 
    use Data::Context::Actions;

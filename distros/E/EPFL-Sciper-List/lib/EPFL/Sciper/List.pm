@@ -14,11 +14,11 @@ EPFL::Sciper::List - Retrieve a list of all public active sciper from EPFL.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 SYNOPSIS
 
@@ -168,7 +168,7 @@ William Belle, C<< <william.belle at gmail.com> >>
 
 =head1 BUGS AND LIMITATIONS
 
-Please report any bugs or feature requests here L<https://github.com/epfl-devrun/epfl-sciper-list/issues>.
+Please report any bugs or feature requests here L<https://github.com/innovativeinnovation/epfl-sciper-list/issues>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
@@ -198,8 +198,10 @@ L<http://search.cpan.org/dist/EPFL-Sciper-List/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE,
+Original work Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE,
 Switzerland, VPSI, 2017-2018.
+
+Modified work Copyright William Belle, 2018.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
