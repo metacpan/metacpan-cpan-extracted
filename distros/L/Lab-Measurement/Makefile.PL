@@ -32,7 +32,6 @@ my %WriteMakefileArgs = (
     "File::Path" => 0,
     "Getopt::Long" => 0,
     "Hook::LexWrap" => 0,
-    "IO::Compress::Bzip2" => 0,
     "IO::File" => 0,
     "IO::Handle" => 0,
     "IO::Select" => 0,
@@ -97,7 +96,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.662",
+  "VERSION" => "3.663",
   "test" => {
     "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/DataFile/Gnuplot/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }
@@ -125,7 +124,6 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "Getopt::Long" => 0,
   "Hook::LexWrap" => 0,
-  "IO::Compress::Bzip2" => 0,
   "IO::File" => 0,
   "IO::Handle" => 0,
   "IO::Select" => 0,

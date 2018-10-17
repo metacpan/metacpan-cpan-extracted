@@ -34,7 +34,7 @@ push @extras,
             repository  => 'https://github.com/rurban/Net-Ping',
             license     => 'http://dev.perl.org/licenses/',
         },
-        release_status => 'stable',
+        #release_status => 'stable',
   }
   if $EUMM_VER gt '6.46';
 

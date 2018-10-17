@@ -36,6 +36,7 @@
          "requires" : {
             "IO::Socket::IP" : "0.37",
             "JSON::PP" : "2.27103",
+            "List::Util" : "1.41",
             "Pod::Simple" : "3.09",
             "Time::Local" : "1.2",
             "perl" : "5.010001"
@@ -58,6 +59,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "8.02",
+   "version" : "8.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

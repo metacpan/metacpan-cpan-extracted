@@ -16,8 +16,8 @@ $app->renderer->default_handler('tt2');
 is $c->render_to_string(inline => '[% foo %]', foo => 'bar'), 'bar', 'stash variable is passed';
 
 # Helper
-is $c->render_to_string(inline => '[% stash("foo") %]', foo => 'bar'), 'bar', 'helper works';
-like $c->render_to_string(inline => "[% link_to('some link', 'http://www.example.com') %]"),
+is $c->render_to_string(inline => '[% c.helpers.stash("foo") %]', foo => 'bar'), 'bar', 'helper works';
+like $c->render_to_string(inline => "[% c.link_to('some link', 'http://www.example.com') %]"),
 	qr(href.+http://www\.example\.com.+some link), 'helper works';
 
 # Controller

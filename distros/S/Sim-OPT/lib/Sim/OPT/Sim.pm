@@ -75,10 +75,10 @@ sub sim    # This function launch the simulations in ESP-r
   $simnetwork = $main::simnetwork;
   $max_processes = $main::max_processes;
 
-  $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
+  $tee = new IO::Tee(\*STDOUT, ">>$tofile" ); # GLOBAL ZZZ
 
   #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!";
-#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";
+  #open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";
   say $tee "\nNow in Sim::OPT::Sim.\n";
 
   %simtitles = %main::simtitles;
@@ -99,27 +99,9 @@ sub sim    # This function launch the simulations in ESP-r
   @filter_columns = @main::filter_columns;
   %vals = %main::vals;
 
-  my %d = %{ $_[0] };
-  my @instances = @{ $d{instances} };
-  my $countcase = $d{countcase}; say $tee "IN SIM \$countcase : " . dump( $countcase );
-  my $countblock = $d{countblock}; say $tee "IN SIM \$countblock : " . dump( $countblock );
-  my %datastruc = %{ $d{datastruc} }; ######
-  my %dirfiles = %{ $d{dirfiles} };
-  #say $tee "IN SIM \$dirfiles{c} " . dump( $dirfiles{c} );
-
-  my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN ENTRY SIM \@varnumbers : " . dump( @varnumbers );
-  @varnumbers = Sim::OPT::washn( @varnumbers ); #say $tee "IN ENTRY SIM \@varnumbers : " . dump( @varnumbers );
-  my @miditers = @{ $d{miditers} }; #say $tee "IN ENTRY SIM \@miditers : " . dump( @miditers );
-  @miditers = Sim::OPT::washn( @miditers ); #say $tee "IN ENTRY SIM \@miditers : " . dump( @miditers );
-  my @sweeps = @{ $d{sweeps} }; #say $tee "IN ENTRY SIMsay $tee "IN exe \$dirfiles{c} " . dump( $dirfiles{c} ); \@sweeps : " . dump( @sweeps );
-
-  if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
-  {
-    exit(say $tee "#END RUN.");
-  }
-
-  my @rootnames = @{ $d{rootnames} };
-  my %dowhat = %{ $d{dowhat} }; #say $tee "DOWHAT IN SIM " . dump( \%dowhat );
+  my %dat = %{ $_[0] };
+  my @instances = @{ $dat{instances} }; #say $tee "IN SIM \@instances " . dump( @instances );
+  my %dirfiles = %{ $dat{dirfiles} };
 
   my @simcases = @{ $dirfiles{simcases} };
   my @simstruct = @{ $dirfiles{simstruct} };
@@ -145,9 +127,27 @@ sub sim    # This function launch the simulations in ESP-r
   my $repblock = $dirfiles{repblock};
   my $descendlist = $dirfiles{descendlist};
   my $descendblock = $dirfiles{descendblock};
-  my $skipfile = $vals{skipfile};
-  my $skipsim = $vals{skipsim};
-  my $skipreport = $vals{skipreport};
+
+  my %d = %{ $instances[0] }; #say $tee "IN SIM \%d!!! : " . dump( %d );
+
+  my $countcase = $d{countcase}; #say $tee "IN SIM \$countcase : " . dump( $countcase );
+  my $countblock = $d{countblock}; #say $tee "IN SIM \$countblock : " . dump( $countblock );
+  my %datastruc = %{ $d{datastruc} }; ######
+  my @varnumbers = @{ $d{varnumbers} }; #say $tee "IN ENTRY SIM \@varnumbers : " . dump( @varnumbers );
+  my @miditers = @{ $d{miditers} }; #say $tee "IN ENTRY SIM \@miditers : " . dump( @miditers );
+  my @sweeps = @{ $d{sweeps} };
+
+
+  if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
+  {
+    exit(say $tee "#END RUN.");
+  }
+
+  my %dowhat = %{ $d{dowhat} }; #say $tee "DOWHAT IN SIM " . dump( \%dowhat );
+  my $skipfile = $dowhat{skipfile};
+  my $skipsim = $dowhat{skipsim};
+  my $skipreport = $dowhat{skipreport};
+
   my %notecases;
 
   #my $getpars = shift;
@@ -157,33 +157,27 @@ sub sim    # This function launch the simulations in ESP-r
 
 
   my @container;
-  my $countinstance = 0;
   #my $pm = new Parallel::ForkManager( $max_processes ); #Sets up the possibility of opening child processes
   foreach my $instance (@instances)
   { #say $tee "IN SIM \$instance : " . dump( $instance );
     #my $pid = $pm->start and next; # Begins the child process
-    my %dat = %{$instance};
-    my @winneritems = @{ $dat{winneritems} }; #say $tee "\@winneritems : " . dump( @winneritems );
-    my $countvar = $dat{countvar}; #say $tee "IN SIM \$countvar : " . dump( $countvar );
-    my $countstep = $dat{countstep}; #say $tee "IN SIM \$countstep : " . dump( $countstep );
-    my $to = $dat{to}; #say $tee "\$to : " . dump( $to );
-    my $origin = $dat{origin}; #say $tee "\$origin : " . dump( $origin );
-    my $c = $dat{c}; #say $tee "IN SIM1 \$c : " . dump( $c );
+    my %dt = %{$instance};
+    my @winneritems = @{ $dt{winneritems} }; #say $tee "IN SIM \@winneritems : " . dump( @winneritems );
+    my $countvar = $dt{countvar}; #say $tee "IN SIM \$countvar : " . dump( $countvar );
+    my $countstep = $dt{countstep}; #say $tee "IN SIM \$countstep : " . dump( $countstep );
+    my $to = $dt{to}; #say $tee "\$to : " . dump( $to );
+    my $c = $dt{c}; #say $tee "IN SIM1 \$c : " . dump( $c );
     #eval($getparshere);
-
-    my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase);
-
-    ( my $blockelts_ref ) = Sim::OPT::getblockelts(\@sweeps, $countcase, $countblock );
-  	my @blockelts = @{ $blockelts_ref }; #say $tee "IN SIM \@blockelts : " . dump( @blockelts );
-
-    my @blocks = Sim::OPT::getblocks(\@sweeps, $countcase);
-    my $toitem = Sim::OPT::getitem(\@winneritems, $countcase, $countblock);
-    my $from = Sim::OPT::getline($toitem);
-    my %varnums = Sim::OPT::getcase( \@varnumbers, $countcase ); #say $tee "\%varnums" . dump( %varnums );
-  	my %mids = Sim::OPT::getcase( \@miditers, $countcase );
+		my $toitem = $dt{toitem};
+    my $from = $dt{from};
+    my @blockelts =$dt{blockelts};
+    my @blocks = $dt{blocks};
+    my %varnums = $dt{varnums};
+    my %mids = $dt{mids};
+    my $countinstance = $dt{countinstance}; say $tee "IN SIM1 \$countinstance : " . dump( $countinstance );
 
 
-    my $skip = $vals{$countvar}{skip}; #########################################
+    my $skip = $dowhat{$countvar}{skip}; #########################################
     my ( $resfile, $flfile );
     #eval($getfly);
 
@@ -540,14 +534,7 @@ $printthis
     {
       #say $tee "INSIM1: countinstance: $countinstance";
       my @resultretrieve = Sim::OPT::Report::newretrieve(
-      {
-        instances => \@instances, countcase => $countcase, countblock => $countblock,
-        dirfiles => \%dirfiles, datastruc => \%datastruc, sweeps => \@sweeps,
-        countinstance => $countinstance, dowhat => \%dowhat,
-        simcases => \@simcases, simstruct => \@simstruct, resfile => $resfile,
-        miditers => \@miditers, varnumbers => \@varnumbers,
-				rootnames => \@rootnames, c => $c,
-      } );
+      { instances => \@instances, dirfiles => \%dirfiles, countinstance => $countinstance } );
       $dirfiles{retcases} = $resultretrieve[0];
       $dirfiles{retstruct} = $resultretrieve[1];
       $dirfiles{notecases} = $resultretrieve[2];
@@ -557,28 +544,19 @@ $printthis
     {
       #say $tee "INSIM2: countinstance: $countinstance";
       my @resultreport = Sim::OPT::Report::newreport(
-      {
-        instances => \@instances, countcase => $countcase, countblock => $countblock,
-        dirfiles => \%dirfiles, datastruc => \%datastruc, sweeps => \@sweeps,
-        countinstance => $countinstance, simcases => \@simcases, simstruct => \@simstruct,
-        resfile => $resfile, miditers => \@miditers, varnumbers => \@varnumbers,
-				rootnames => \@rootnames, dowhat => \%dowhat, c => $c,
-      } );
+      { instances => \@instances, dirfiles => \%dirfiles, countinstance => $countinstance  } );
 
       $dirfiles{repcases} = $resultreport[0];
       $dirfiles{repstruct} = $resultreport[1];
       $dirfiles{mergestruct} = $resultreport[3];
       $dirfiles{mergecases} = $resultreport[4];
     }
-
-
-    $countinstance++;
   }
   close SIMLIST;
   close SIMBLOCK;
 
   return( \@simcases, \@simstruct, $dirfiles{repcases}, $dirfiles{repstruct},
-    $dirfiles{mergestruct}, $dirfiles{mergecases}, $c );
+    $dirfiles{mergestruct}, $dirfiles{mergecases} );
   close TOFILE;
   close OUTFILE;
 

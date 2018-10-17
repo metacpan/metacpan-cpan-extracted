@@ -1,0 +1,42 @@
+---
+abstract: 'Google API Services Client.'
+author:
+  - 'Peter Scott <localshop@cpan.org>'
+build_requires:
+  Cwd: '0'
+  Email::Simple: '0'
+  MIME::Base64: '0'
+  Test::More: '0'
+  Test::Needs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-GoogleAPI-Client
+requires:
+  CHI: '0'
+  Carp: '0'
+  Config::JSON: '0'
+  Crypt::JWT: '0'
+  Data::Dumper: '0'
+  Hash::Slice: '0'
+  List::Util: '0'
+  Mojo::UserAgent: '0'
+  Mojolicious::Lite: '0'
+  Moo: '0'
+  MooX::Singleton: '0'
+  Moose: '0'
+  Net::EmptyPort: '0'
+  Tie::File: '0'
+  feature: '0'
+  perl: '5.014'
+  strict: '0'
+  strictures: '0'
+  warnings: '0'
+version: '0.10'
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

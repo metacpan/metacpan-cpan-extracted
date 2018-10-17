@@ -1,5 +1,5 @@
 package XML::Grammar::Screenplay::FromProto;
-$XML::Grammar::Screenplay::FromProto::VERSION = 'v0.15.0';
+$XML::Grammar::Screenplay::FromProto::VERSION = 'v0.16.0';
 use strict;
 use warnings;
 use autodie;
@@ -10,31 +10,31 @@ use MooX 'late';
 
 extends("XML::Grammar::FictionBase::TagsTree2XML");
 
-my $screenplay_ns = q{http://web-cpan.berlios.de/modules/XML-Grammar-Screenplay/screenplay-xml-0.2/};
-
+my $screenplay_ns =
+q{http://web-cpan.berlios.de/modules/XML-Grammar-Screenplay/screenplay-xml-0.2/};
 
 
 sub _write_Element_Text
 {
-    my ($self, $elem) = @_;
+    my ( $self, $elem ) = @_;
 
-    if ($elem->_short_isa("Saying"))
+    if ( $elem->_short_isa("Saying") )
     {
         $self->_output_tag_with_childs(
             {
-                start => ["saying", 'character' => $elem->character()],
-                elem => $elem,
+                start => [ "saying", 'character' => $elem->character() ],
+                elem  => $elem,
             },
         );
 
         return;
     }
-    elsif ($elem->_short_isa("Description"))
+    elsif ( $elem->_short_isa("Description") )
     {
         $self->_output_tag_with_childs(
             {
                 start => ["description"],
-                elem => $elem,
+                elem  => $elem,
             },
         );
 
@@ -55,14 +55,14 @@ sub _paragraph_tag
 
 sub _handle_elem_of_name_img
 {
-    my ($self, $elem) = @_;
+    my ( $self, $elem ) = @_;
 
     $self->_output_tag_with_childs(
         {
             start => [
                 "image",
-                "url" => $elem->lookup_attr("src"),
-                "alt" => $elem->lookup_attr("alt"),
+                "url"   => $elem->lookup_attr("src"),
+                "alt"   => $elem->lookup_attr("alt"),
                 "title" => $elem->lookup_attr("title"),
             ],
             elem => $elem,
@@ -74,12 +74,12 @@ sub _handle_elem_of_name_img
 
 sub _handle_elem_of_name_a
 {
-    my ($self, $elem) = @_;
+    my ( $self, $elem ) = @_;
 
     $self->_output_tag_with_childs(
         {
-            start => ["ulink", "url" => $elem->lookup_attr("href")],
-            elem => $elem,
+            start => [ "ulink", "url" => $elem->lookup_attr("href") ],
+            elem  => $elem,
         }
     );
 
@@ -88,7 +88,7 @@ sub _handle_elem_of_name_a
 
 sub _handle_elem_of_name_section
 {
-    my ($self, $elem) = @_;
+    my ( $self, $elem ) = @_;
 
     return $self->_handle_elem_of_name_s($elem);
 }
@@ -105,22 +105,27 @@ sub _italics_tag_name
 
 sub _write_scene_main
 {
-    my ($self, $scene) = @_;
+    my ( $self, $scene ) = @_;
 
     my $id = $scene->lookup_attr("id");
 
-    if (!defined($id))
+    if ( !defined($id) )
     {
         Carp::confess("Unspecified id for scene!");
     }
 
     my $title = $scene->lookup_attr("title");
-    my @t = (defined($title) ? (title => $title) : ());
+    my $lang  = $scene->lookup_attr("lang");
+    my @t     = ( defined($title) ? ( title => $title ) : () );
+    if ( defined($lang) )
+    {
+        push @t, ( [ $self->_get_xml_xml_ns, 'lang' ] => $lang );
+    }
 
     $self->_output_tag_with_childs(
         {
-            'start' => ["scene", id => $id, @t],
-            elem => $scene,
+            'start' => [ "scene", id => $id, @t ],
+            elem    => $scene,
         }
     );
 
@@ -134,16 +139,16 @@ sub _get_default_xml_ns
 
 sub _convert_write_content
 {
-    my ($self, $tree) = @_;
+    my ( $self, $tree ) = @_;
 
     my $writer = $self->_writer;
 
-    $writer->startTag([$screenplay_ns, "document"]);
-    $writer->startTag([$screenplay_ns, "head"]);
+    $writer->startTag( [ $screenplay_ns, "document" ] );
+    $writer->startTag( [ $screenplay_ns, "head" ] );
     $writer->endTag();
-    $writer->startTag([$screenplay_ns, "body"], "id" => "index",);
+    $writer->startTag( [ $screenplay_ns, "body" ], "id" => "index", );
 
-    $self->_write_scene({scene => $tree});
+    $self->_write_scene( { scene => $tree } );
 
     # Ending the body
     $writer->endTag();
@@ -163,16 +168,20 @@ __END__
 
 =head1 NAME
 
+XML::Grammar::Screenplay::FromProto
+
+=head1 VERSION
+
+version v0.16.0
+
+=head1 NAME
+
 XML::Grammar::Screenplay::FromProto - module that converts well-formed
 text representing a screenplay to an XML format.
 
 =head1 VERSION
 
-version v0.15.0
-
-=head1 VERSION
-
-version v0.15.0
+version v0.16.0
 
 =head2 new()
 
@@ -187,38 +196,9 @@ Internal - (to settle pod-coverage.).
 
 Converts the file $path_to_file to XML and returns it.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2007 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Fiction> or by email
-to
-L<bug-xml-grammar-fiction@rt.cpan.org|mailto:bug-xml-grammar-fiction@rt.cpan.org>.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc XML::Grammar::Screenplay::FromProto
 
 =head2 Websites
 
@@ -316,5 +296,28 @@ from your repository :)
 L<http://bitbucket.org/shlomif/perl-XML-Grammar-Fiction>
 
   hg clone ssh://hg@bitbucket.org/shlomif/perl-XML-Grammar-Fiction
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Fiction> or by email
+to
+L<bug-xml-grammar-fiction@rt.cpan.org|mailto:bug-xml-grammar-fiction@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2007 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

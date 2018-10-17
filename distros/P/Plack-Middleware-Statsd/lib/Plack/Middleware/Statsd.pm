@@ -17,7 +17,7 @@ use Plack::Util::Accessor qw/ client sample_rate /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.3.5';
+our $VERSION = 'v0.3.6';
 
 sub call {
     my ( $self, $env ) = @_;
@@ -155,7 +155,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.3.5
+version v0.3.6
 
 =head1 SYNOPSIS
 
@@ -230,8 +230,9 @@ Other statsd client modules may be used via a wrapper class.
 
 =head2 sample_rate
 
-The default sampling rate to used, which should be a value between 0 and 1.
-This will override the default rate of the L</client>, if there is one.
+The default sampling rate to be used, which should be a value between
+0 and 1.  This will override the default rate of the L</client>, if
+there is one.
 
 The default is C<1>.
 

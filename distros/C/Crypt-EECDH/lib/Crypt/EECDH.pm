@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
 # Crypt::EECDH - Simple ephemeral ECDH + AES hybrid cryptosystem
-# Copyright (c) 2017 Ashish Gulhati <crypt-eecdh at hash.neo.tc>
+# Copyright (c) Ashish Gulhati <crypt-eecdh at hash.neo.tc>
 #
-# $Id: lib/Crypt/EECDH.pm v1.005 Sat Jun 10 10:46:49 PDT 2017 $
+# $Id: lib/Crypt/EECDH.pm v1.007 Tue Oct 16 23:45:54 PDT 2018 $
 
 package Crypt::EECDH;
 
@@ -18,7 +18,7 @@ use Crypt::Rijndael;
 use Digest::SHA qw/sha256 hmac_sha256/;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.005 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.007 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -141,12 +141,10 @@ Crypt::EECDH - Simple ephemeral ECDH + AES hybrid cryptosystem
 
 =head1 VERSION
 
- $Revision: 1.005 $
- $Date: Sat Jun 10 10:46:49 PDT 2017 $
+ $Revision: 1.007 $
+ $Date: Tue Oct 16 23:45:54 PDT 2018 $
 
 =head1 SYNOPSIS
-
-A simple ephemeral ECDH + AES hybrid cryptosystem.
 
     use Crypt::EECDH;
 
@@ -162,20 +160,20 @@ A simple ephemeral ECDH + AES hybrid cryptosystem.
     my $msg = "Testing";
 
     # Encrypt a message to server
-    my ($clientsec, $encrypted) = $eecdh->encrypt( PublicKey => $pubkey,
+    my ($encrypted, $clientsec) = $eecdh->encrypt( PublicKey => $pubkey,
       Message => $msg, SigningKey => $pub_signkey, Signature => $signature );
 
     # Server decrypts message
-    my ($clientpub, $decrypted) =
+    my ($decrypted, $clientpub) =
       $eecdh->decrypt( Key => $seckey, Ciphertext => $encrypted );
     print "OK\n" if $decrypted eq $msg;
 
     # Server encrypts response (using a fresh ephemeral keypair)
-    my ($newsec, $encrypted2) =
+    my ($encrypted2, $newsec) =
       $eecdh->encrypt( PublicKey => $clientpub, Message => $msg );
 
     # Client decrypts the response
-    my ($newpub, $decrypted2) =
+    my ($decrypted2, $newpub) =
       $eecdh->decrypt( Key => $clientsec, Ciphertext => $encrypted2);
 
     # Now client can use $newpub to encrypt another message and the
@@ -183,8 +181,8 @@ A simple ephemeral ECDH + AES hybrid cryptosystem.
     # to $newsec in order to decrypt the response.
 
     # Alternately the client can use server's $pubkey for all messages
-    # it sends, which frees server from having to keep track of client
-    # keys.
+    # it sends, which frees server from having to keep track of new
+    # ephemeral keys.
 
 =head1 DESCRIPTION
 
@@ -201,10 +199,10 @@ is hashed and used to encrypt the plaintext using AES in CBC mode
 adds a HMAC, with the key derived from the same shared secret as the
 encryption key.
 
-Some of the code of this module (and most of the previous paragraph)
-is borrowed from the L<Crypt::ECDH_ES> module, which provides one-way
-communication functionality in an ephemeral-static mode, where one
-side (the decoder or "server") uses a static key.
+Some of the code in this module (and most of the text of the previous
+paragraph) is from the L<Crypt::ECDH_ES> module, which provides
+one-way communication functionality in an ephemeral-static mode, where
+one side (the decoder or "server") uses a static key.
 
 Crypt::EECDH provides full two-way encryption capability with
 ephemeral keys on both sides. Instead of a static messaging key, the
@@ -338,15 +336,17 @@ L<http://search.cpan.org/dist/Crypt-EECDH/>
 
 =head1 ACKNOWLEDGEMENTS
 
-Some of the code in this module is borrowed from L<Crypt::ECDH_ES> by
-Leon Timmermans <leont@cpan.org>
+Some of the code in this module is from L<Crypt::ECDH_ES> by Leon
+Timmermans <leont@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See L<http://www.perlfoundation.org/artistic_license_2_0> for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

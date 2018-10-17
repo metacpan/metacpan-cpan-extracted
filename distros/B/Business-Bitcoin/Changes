@@ -1,31 +1,37 @@
 Revision history for Business-Bitcoin
 
-1.007   Thu Dec 29 11:03:49 2016 -0500
-        First release
+1.051   Tue Oct 16 22:26:58 2018 -0700
+    	Change license to OAL 2.0
 
-1.008   Thu Dec 29 13:16:17 2016 -0500
-        Add findreq method
+1.049   Sat Jul 14 20:32:07 2018 -0700
+    	Rename refid db field to reference
 
-1.011   Thu Dec 29 13:40:35 2016 -0500
-        Add index creation for address and refid fields
-
-1.021	Thu Jan 19 12:17:31 2017 -0800
-        Add Bitcoin HD Key / Address generation
-
-1.029   Sat Feb 4 00:48:25 2017 -0800
-        Fix bug in _decompress
-
-1.030   Fri Mar 17 23:24:43 2017 -0700
-        Add 'processed' and 'status' fields, commit method for Requests
-
-1.037   Tue Apr 18 23:19:11 2017 -0700
-        Change key derivation to use penultimate public key, fix bug in _compress
-
-1.041   Tue May 9 19:56:27 2017 -0700
-        Add PATH property, make verify return amount received
+1.047   Thu Aug 17 01:01:54 2017 -0700
+        Add missing WHERE clause in commit
 
 1.043   Tue May 9 22:54:03 2017 -0700
         Fix address generation bug
 
-1.047   Thu Aug 17 01:01:54 2017 -0700
-        Add missing WHERE clause in commit
+1.041   Tue May 9 19:56:27 2017 -0700
+        Add PATH property, make verify return amount received
+
+1.037   Tue Apr 18 23:19:11 2017 -0700
+        Change key derivation to use penultimate public key, fix bug in _compress
+
+1.030   Fri Mar 17 23:24:43 2017 -0700
+        Add 'processed' and 'status' fields, commit method for Requests
+
+1.029   Sat Feb 4 00:48:25 2017 -0800
+        Fix bug in _decompress
+
+1.021	Thu Jan 19 12:17:31 2017 -0800
+        Add Bitcoin HD Key / Address generation
+
+1.011   Thu Dec 29 13:40:35 2016 -0500
+        Add index creation for address and refid fields
+
+1.008   Thu Dec 29 13:16:17 2016 -0500
+        Add findreq method
+
+1.007   Thu Dec 29 11:03:49 2016 -0500
+        First release

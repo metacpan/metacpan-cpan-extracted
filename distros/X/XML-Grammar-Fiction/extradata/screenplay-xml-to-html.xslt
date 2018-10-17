@@ -14,6 +14,9 @@
 
 <xsl:template match="sp:body">
     <html>
+        <xsl:attribute name="xml:lang">
+            <xsl:value-of select="@xml:lang|./sp:scene/@xml:lang" />
+        </xsl:attribute>
         <head>
             <title>My Screenplay</title>
             <meta charset="utf-8" />
@@ -31,6 +34,9 @@
 
 <xsl:template match="sp:scene">
     <section class="scene" id="scene-{@id}">
+        <xsl:if test="@xml:lang">
+            <xsl:copy-of select="@xml:lang" />
+        </xsl:if>
         <header>
             <!-- Make the title the title attribute or "ID" if does not exist. -->
             <xsl:element name="h{count(ancestor-or-self::sp:scene)}">

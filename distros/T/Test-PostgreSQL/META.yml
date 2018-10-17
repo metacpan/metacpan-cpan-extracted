@@ -1,15 +1,14 @@
 ---
 abstract: 'PostgreSQL runner for tests'
 author:
-  - 'Toby Corkindale, Kazuho Oku, Peter Mottram, plus various contributors.'
+  - 'Toby Corkindale, Kazuho Oku, Peter Mottram, Alex Tokarev, plus various contributors.'
 build_requires:
   DBD::Pg: '0'
-  ExtUtils::MakeMaker: '6.59'
   Test::SharedFork: '0.06'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,8 +16,18 @@ meta-spec:
 name: Test-PostgreSQL
 no_index:
   directory:
-    - inc
     - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::PostgreSQL:
+    file: lib/Test/PostgreSQL.pm
+    version: '1.27'
 requires:
   DBD::Pg: '0'
   DBI: '0'
@@ -33,7 +42,25 @@ requires:
   User::pwent: '0'
   perl: '5.014'
 resources:
-  license: http://opensource.org/licenses/artistic-license-2.0.php
-  repository: https://github.com/TJC/Test-postgresql
-version: '1.26'
+  homepage: https://github.com/TJC/Test-postgresql
+  repository: git://github.com/TJC/Test-postgresql.git
+version: '1.27'
+x_contributors:
+  - 'Alex Tokarev <nohuhu@users.noreply.github.com>'
+  - 'Alex Tokarev <tokarev@cpan.org>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Don Armstrong <don@donarmstrong.com>'
+  - 'Eric Radman <ericshane@eradman.com>'
+  - 'Matthew Somerville <matthew-github@dracos.co.uk>'
+  - 'Michal Sedlák <sedlakmichal@gmail.com>'
+  - 'Paul Williams <kwakwaversal@gmail.com>'
+  - 'Peter Mottram <peter@sysnix.com>'
+  - 'Russell Jenkins <russell.jenkins@strategicdata.com.au>'
+  - 'Russell Jenkins <russellj@strategicdata.com.au>'
+  - 'Toby <tobyc@strategicdata.com.au>'
+  - 'Toby Corkindale <tjc@wintrmute.net>'
+  - 'root <root@altar.int.qindel.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

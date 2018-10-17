@@ -7,6 +7,7 @@ use DBI;
 use File::Spec;
 use Test::PostgreSQL;
 use Try::Tiny;
+use POSIX qw(getuid setuid);
 
 my $pg = try { Test::PostgreSQL->new() }
          catch { plan skip_all => $_ };
@@ -18,18 +19,14 @@ ok defined($pg), "test instance 1 created";
 my $datadir = File::Spec->catfile($pg->base_dir, 'data');
 my $conf_file = File::Spec->catfile($datadir, 'postgresql.conf');
 
-my $ver_cmd = join' ', (
-    $pg->postmaster,
-    '--version'
-);
-
-my ($ver) = qx{$ver_cmd} =~ /(\d+(?:\.\d+)?)/;
-
 # By default postgresql.conf is truncated
 is -s $conf_file, 0, "test 1 postgresql.conf size 0";
 
+my $ver = $pg->pg_version;
+
 SKIP: {
     skip "No -C switch on PostgreSQL $ver (9.2 required)", 1 if $ver < 9.2;
+    skip "Can't run postgres as root", 1 if (getuid == 0);
     my $cmd = join ' ', (
         $pg->postmaster,
         '-D', $datadir,
@@ -70,6 +67,7 @@ $conf_file = File::Spec->catfile($datadir, 'postgresql.conf');
 
 SKIP: {
     skip "No -C switch on PostgreSQL $ver (9.2 required)", 1 if $ver < 9.2;
+    skip "Can't run postgres as root", 1 if (getuid == 0);
     my $cmd = join ' ', (
         $pg->postmaster,
         '-D', $datadir,

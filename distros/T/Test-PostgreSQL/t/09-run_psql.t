@@ -14,13 +14,22 @@ plan tests => 3;
 
 ok defined($pg), "new instance created";
 
-eval {
-    $pg->run_psql(
+my @psql_command;
+
+# psql 9.6+ supports multiple -c commands
+if ( $pg->pg_version >= 9.6 ) {
+    @psql_command = (
         '-c', q|'CREATE TABLE foo (bar int)'|,
         '-c', q|'INSERT INTO foo (bar) VALUES (42)'|,
-    )
-};
+    );
+}
+else {
+    @psql_command = (
+        '-c', q|'CREATE TABLE foo (bar int); INSERT INTO foo (bar) VALUES (42);'|,
+    );
+}
 
+eval { $pg->run_psql(@psql_command) };
 is $@, '', "run_psql no exception" . ($@ ? ": $@" : "");
 
 

@@ -1,6 +1,6 @@
 package Lab::Instrument::SignalRecovery726x;
 #ABSTRACT: Signal Recovery 7260 / 7265 Lock-in Amplifier
-$Lab::Instrument::SignalRecovery726x::VERSION = '3.662';
+$Lab::Instrument::SignalRecovery726x::VERSION = '3.663';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Lab::Instrument;
@@ -1223,7 +1223,7 @@ Lab::Instrument::SignalRecovery726x - Signal Recovery 7260 / 7265 Lock-in Amplif
 
 =head1 VERSION
 
-version 3.662
+version 3.663
 
 =head1 SYNOPSIS
 

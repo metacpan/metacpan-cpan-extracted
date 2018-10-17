@@ -6,17 +6,13 @@ use warnings;
 use IO::All;
 
 my ($version) =
-    (map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-    io->file("./lib/App/XML/DocBook/Docmake.pm")->getlines()
-    )
-    ;
+    ( map { m{\Aversion * = *(\S+)} ? ($1) : () }
+        io->file("./dist.ini")->getlines() );
 
-if (!defined ($version))
+if ( !defined($version) )
 {
     die "Version is undefined!";
 }
-
-my $mini_repos_url = "https://svn.berlios.de/svnroot/repos/web-cpan/App-XML-DocBook-Docmake/";
 
 my @cmd = (
     "hg", "tag", "-m",
@@ -24,5 +20,5 @@ my @cmd = (
     "cpan-releases/$version",
 );
 
-print join(" ", map { /\s/ ? qq{"$_"} : $_ } @cmd), "\n";
+print join( " ", map { /\s/ ? qq{"$_"} : $_ } @cmd ), "\n";
 exec(@cmd);

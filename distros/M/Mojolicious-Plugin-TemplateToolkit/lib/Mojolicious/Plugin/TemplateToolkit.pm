@@ -1,11 +1,12 @@
 package Mojolicious::Plugin::TemplateToolkit;
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Carp;
 use Mojo::Util qw(encode md5_sum);
 use Template;
 use Template::Provider::Mojo;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub register {
 	my ($self, $app, $conf) = @_;
@@ -27,7 +28,7 @@ sub register {
 		# Helpers
 		foreach my $method (grep { m/^\w+\z/ } keys %{$renderer->helpers}) {
 			my $sub = $renderer->helpers->{$method};
-			$params{$method} = sub { $c->$sub(@_) };
+			$params{$method} = sub { carp "Calling helpers directly in templates is deprecated. Use c.$method or c.helpers.$method"; $c->$sub(@_) };
 		}
 		
 		# Stash values
@@ -92,11 +93,26 @@ C<Template Toolkit> templates. See L<Template> and L<Template::Manual> for
 details on the C<Template Toolkit> format, and L<Mojolicious::Guides::Rendering>
 for general information on rendering in L<Mojolicious>.
 
-L<Mojolicious> helpers and stash values will be exposed directly as
+Along with standard template files, inline and data section templates can be
+rendered in the standard way. Template files and data sections will be
+retrieved using L<Mojolicious::Renderer> via L<Template::Provider::Mojo> for
+both standard rendering and directives such as C<INCLUDE>. This means that
+instead of specifying L<INCLUDE_PATH|Template::Manual::Config/"INCLUDE_PATH">,
+you should set L<Mojolicious::Renderer/"paths"> to the appropriate paths.
+
+ $app->renderer->paths(['/path/to/templates']);
+ push @{$app->renderer->paths}, '/path/to/more/templates';
+
+L<Mojolicious> stash values will be exposed directly as
 L<variables|Template::Manual::Variables> in the templates, and the current
 controller object will be available as C<c> or C<self>, similar to
-L<Mojolicious::Plugin::EPRenderer>. See L<Mojolicious::Plugin::DefaultHelpers>
-and L<Mojolicious::Plugin::TagHelpers> for a list of all built-in helpers.
+L<Mojolicious::Plugin::EPRenderer>. Helper methods can be called on the
+controller object directly or via the C<helpers> method. See
+L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>
+for a list of all built-in helpers.
+
+Accessing helper methods directly as variables rather than via the controller
+object is deprecated and may be removed in a future release.
 
  $c->stash(description => 'template engine');
  $c->stash(engines => [qw(Template::Toolkit Text::Template)]);
@@ -105,17 +121,10 @@ and L<Mojolicious::Plugin::TagHelpers> for a list of all built-in helpers.
    [% engine %] is a [% description %].
  [% END %]
  
- [% link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
+ [% c.helpers.link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
  
  [% c.param('foo') %]
 
-
-Along with standard template files, inline and data section templates can be
-rendered in the standard way. Template files and data sections will be
-retrieved using L<Mojolicious::Renderer> via L<Template::Provider::Mojo> for
-both standard rendering and directives such as C<INCLUDE>. This means that
-instead of specifying L<INCLUDE_PATH|Template::Manual::Config/"INCLUDE_PATH">,
-you should set L<Mojolicious::Renderer/"paths"> to the appropriate paths.
 
 =head1 OPTIONS
 
@@ -134,6 +143,9 @@ Handler name, defaults to C<tt2>.
  plugin TemplateToolkit => {template => {INTERPOLATE => 1}};
 
 Configuration values passed to L<Template> object used to render templates.
+Note that L<Template::Provider::Mojo> will use L<Mojolicious::Renderer/"paths">
+to find templates, not L<INCLUDE_PATH|Template::Manual::Config/"INCLUDE_PATH">
+specified here.
 
 =head1 METHODS
 

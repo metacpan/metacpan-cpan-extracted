@@ -1,12 +1,11 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More;
-use Capture::Tiny qw(capture);
+use TestCommand;
 
 subtest 'command: installed' => sub {
-    my ( $stdout, $stderr, $exit ) = capture {
-        system 'perl', 'script/cpan-audit', 'installed', 'lib';
-    };
+    my ( $stdout, $stderr, $exit ) = TestCommand->command( 'installed', 'lib' );
 
     like $stdout, qr/Collecting all installed modules/;
     is $stderr,   '';

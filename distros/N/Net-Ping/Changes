@@ -1,6 +1,17 @@
 CHANGES
 -------
 
+2.71  Tue Oct 16 18:41:51 CEST 2018 (rurban)
+       Features
+       - Allow data_size > 1024, up to 65535, i.e. fragmented packets.
+         It is recommended to stay below 1472 though for the typical 1500 MTU.
+         Many simple devices do not allow fragmented ICMP packets (> 1472).
+         RT #17409
+       Bugfixes
+       - Fix the max_datasize documentation
+       Test fixes
+       - The 2 sudo tests on PERL_CORE with a shared perl lib
+
 2.70  Tue Aug  7 10:33:24 CEST 2018 (rurban)
        Test fixes
        - Fix broken skip count on 510_ping_udp.t (windows only)

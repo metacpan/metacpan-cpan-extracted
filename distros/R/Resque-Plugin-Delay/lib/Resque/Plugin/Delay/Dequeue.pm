@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Moose::Role;
-use JSON::XS qw/decode_json/;
+use JSON qw/decode_json/;
 
 around pop => sub {
     my ( $orig, $self, $queue ) = @_;

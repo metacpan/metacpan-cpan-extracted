@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 26;
 use Test::Trap
     qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn );
 
@@ -406,4 +406,43 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         [], "Testing that no commands were run on pdf without the -o flag",
     );
 
+}
+
+{
+    my $docmake = MyTest::DocmakeAppDebug->new(
+        {
+            argv => [
+                "-v",           "--stringparam",
+                "empty.param=", "--trailing-slash=0",
+                "-o",           "my-output-dir/notneeded.xhtml",
+                "xhtml5",       "input.xml",
+            ]
+        }
+    );
+
+    # TEST
+    ok( $docmake, "xhtml5 docmake was constructed successfully" );
+
+    $docmake->run();
+
+    # TEST
+    ok(scalar(! -e "my-output-dir/notneeded.xhtml"), "not created.");
+
+    # TEST
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
+        [
+            [
+                "xsltproc",
+                "-o",
+                "my-output-dir/notneeded.xhtml",
+                "--stringparam",
+                "empty.param",
+                "",
+"http://docbook.sourceforge.net/release/xsl/current/xhtml5/docbook.xsl",
+                "input.xml",
+            ]
+        ],
+        "Testing xhtml5 trailing slash",
+    );
 }

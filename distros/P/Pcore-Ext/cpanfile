@@ -1,3 +1,4 @@
 requires 'Pcore',                  v0.24.5;
+requires 'Pcore::Resources',       v0.1.0;
 requires 'JavaScript::Packer',     v2.3.0;
 requires 'JavaScript::Beautifier', v0.20.0;

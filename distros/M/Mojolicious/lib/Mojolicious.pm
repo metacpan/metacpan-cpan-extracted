@@ -19,11 +19,7 @@ use Mojolicious::Types;
 use Mojolicious::Validator;
 use Scalar::Util ();
 
-has commands => sub {
-  my $commands = Mojolicious::Commands->new(app => shift);
-  Scalar::Util::weaken $commands->{app};
-  return $commands;
-};
+has commands         => sub { Mojolicious::Commands->new(app => shift) };
 has controller_class => 'Mojolicious::Controller';
 has home             => sub { Mojo::Home->new->detect(ref shift) };
 has log              => sub {
@@ -55,18 +51,14 @@ has secrets  => sub {
   # Default to moniker
   return [$self->moniker];
 };
-has sessions => sub { Mojolicious::Sessions->new };
-has static   => sub { Mojolicious::Static->new };
-has types    => sub { Mojolicious::Types->new };
-has ua       => sub {
-  my $ua = Mojo::UserAgent->new;
-  Scalar::Util::weaken $ua->server->app(shift)->{app};
-  return $ua;
-};
+has sessions  => sub { Mojolicious::Sessions->new };
+has static    => sub { Mojolicious::Static->new };
+has types     => sub { Mojolicious::Types->new };
+has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.02';
+our $VERSION  = '8.03';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -83,18 +75,19 @@ sub AUTOLOAD {
 
 sub build_controller {
   my ($self, $tx) = @_;
-  $tx ||= $self->build_tx;
 
   # Embedded application
   my $stash = {};
-  if (my $sub = $tx->can('stash')) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
+  if ($tx && (my $sub = $tx->can('stash'))) {
+    ($stash, $tx) = ($tx->$sub, $tx->tx);
+  }
 
   # Build default controller
   my $defaults = $self->defaults;
   @$stash{keys %$defaults} = values %$defaults;
   my $c
     = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
-  Scalar::Util::weaken $c->{app};
+  $c->{tx} ||= $self->build_tx;
 
   return $c;
 }
@@ -151,7 +144,6 @@ sub handler {
 
   # Process with chain
   my $c = $self->build_controller(@_);
-  Scalar::Util::weaken $c->{tx};
   $self->plugins->emit_chain(around_dispatch => $c);
 
   # Delayed response

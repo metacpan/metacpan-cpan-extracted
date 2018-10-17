@@ -9,7 +9,9 @@ use Cwd;
 use File::Basename;
 use File::Spec::Functions;
 
-our $VERSION = '0.261';
+our $VERSION;
+
+BEGIN { $VERSION = '0.262' }
 
 =encoding utf8
 

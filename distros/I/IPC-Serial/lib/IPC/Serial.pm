@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
 # IPC::Serial - Simple message passing over serial ports
-# Copyright (c) 2016-2017 Ashish Gulhati <ipc-serial at hash.neo.tc>
+# Copyright (c) Ashish Gulhati <ipc-serial at hash.neo.tc>
 #
-# $Id: lib/IPC/Serial.pm v1.006 Sun Jun 11 12:42:55 PDT 2017 $
+# $Id: lib/IPC/Serial.pm v1.007 Tue Oct 16 22:52:29 PDT 2018 $
 
 use strict;
 
@@ -18,7 +18,7 @@ use Digest::MD5 qw(md5_hex);
 
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.006 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.007 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my $class = shift;
@@ -148,8 +148,8 @@ IPC::Serial - Simple message passing over serial ports
 
 =head1 VERSION
 
- $Revision: 1.006 $
- $Date: Sun Jun 11 12:42:55 PDT 2017 $
+ $Revision: 1.007 $
+ $Date: Tue Oct 16 22:52:29 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -213,10 +213,12 @@ L<http://search.cpan.org/dist/IPC-Serial/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See L<http://www.perlfoundation.org/artistic_license_2_0> for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

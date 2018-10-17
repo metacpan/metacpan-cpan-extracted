@@ -53,8 +53,8 @@ JS
         _loadCharts => func [], <<"JS",
             var urls = [],
                 chartConfig = this.getChartConfig(),
-                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts3')->[0] ]}";
-                mapBaseUrl = "@{[ $cdn->get_resources('ammap3')->[0] ]}";
+                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts3_base') ]}";
+                mapBaseUrl = "@{[ $cdn->get_resources('ammap3_base') ]}";
 
             if (typeof AmCharts == 'undefined') {
                 urls.push( chartsBaseUrl + 'amcharts.js');

@@ -1,5 +1,5 @@
 package Test::PostgreSQL;
-use 5.14.0;
+use 5.014;
 use strict;
 use warnings;
 use Moo;
@@ -13,7 +13,7 @@ use File::Which;
 use POSIX qw(SIGQUIT SIGKILL WNOHANG getuid setuid);
 use User::pwent;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 our $errstr;
 
 # Deprecate use of %Defaults as we want to remove this package global
@@ -147,6 +147,25 @@ has unix_socket => (
   default => 0,
 );
 
+has pg_version => (
+    is => 'ro',
+    isa => Str,
+    lazy => 1,
+    predicate => 1,
+    builder => "_pg_version_builder",
+);
+
+method _pg_version_builder() {
+    my $ver_cmd = join ' ', (
+        $self->postmaster,
+        '--version'
+    );
+    
+    my ($ver) = qx{$ver_cmd} =~ /(\d+(?:\.\d+)?)/;
+    
+    return $ver;
+}
+
 has pg_ctl => (
   is => "ro",
   isa => Maybe[Str],
@@ -201,9 +220,23 @@ has extra_psql_args => (
 has run_psql_args => (
     is => 'ro',
     isa => Str,
-    # Single transaction, skip .psqlrc, be quiet, echo errors, stop on first error
-    default => '-1Xqb -v ON_ERROR_STOP=1',
+    lazy => 1,
+    builder => "_build_run_psql_args",
 );
+
+method _build_run_psql_args() {
+    my @args = (
+        '-1', # Single transaction
+        '-X', # Ignore .psqlrc
+        '-q', # Quiet
+        '-v ON_ERROR_STOP=1', # Stop on first error
+    );
+    
+    # Echo errors, available in psql 9.5+
+    push @args, '-b' if $self->pg_version >= 9.5;
+    
+    return join ' ', @args;
+}
 
 has seed_scripts => (
     is => 'ro',
@@ -664,9 +697,19 @@ method run_psql(@psql_args) {
 }
 
 method run_psql_scripts(@script_paths) {
-    my $psql_args = join ' ', map {; "-f $_" } @script_paths;
+    my @psql_commands;
     
-    $self->run_psql($psql_args);
+    # psql 9.6+ supports multiple -c and -f commands invoked at once,
+    # older psql does not. Executing psql multiple times breaks single
+    # transaction semantics but is unlikely to cause problems in real world.
+    if ( $self->pg_version > 9.6 ) {
+        push @psql_commands, join ' ', map {; "-f $_" } @script_paths;
+    }
+    else {
+        @psql_commands = map {; "-f $_" } @script_paths;
+    }
+    
+    $self->run_psql($_) for @psql_commands;
 }
 
 1;
@@ -860,7 +903,7 @@ q: Run quietly, print only notices and errors on stderr (if any)
 
 =item *
 
-b: Echo SQL statements that cause PostgreSQL exceptions
+b: Echo SQL statements that cause PostgreSQL exceptions (version 9.5+)
 
 =item *
 
@@ -872,6 +915,11 @@ b: Echo SQL statements that cause PostgreSQL exceptions
 
 Arrayref with the list of SQL scripts to run after the database was instanced
 and set up. Default is C<[]>.
+
+B<NOTE> that C<psql> older than 9.6 does not support multiple C<-c> and C<-f>
+switches in arguments so C<seed_scripts> will be executed one by one. This
+implies multiple transactions instead of just one; if you need all seed statements
+to apply within a single transaction, combine them into one seed script.
 
 =head2 auto_start
 
@@ -956,10 +1004,14 @@ to escape them manually like shown above. C<run_psql> will not quote them for yo
 The actual command line to execute C<psql> will be concatenated from L</psql_args>,
 L</extra_psql_args>, and L</run_psql_args>.
 
+B<NOTE> that C<psql> older than 9.6 does not support multiple C<-c> and/or C<-f>
+switches in arguments.
+
 =head2 run_psql_scripts
 
 Given a list of script file paths, invoke L</run_psql> once with C<-f 'script'>
-for every path.
+for every path in PostgreSQL 9.6+, or once per C<-f 'script'> for older PostgreSQL
+versions.
 
 =head1 ENVIRONMENT
 

@@ -13,6 +13,11 @@
                 <attribute name="id">
                     <data type="ID"/>
                 </attribute>
+                <optional>
+                    <attribute name="xml:lang">
+                        <data type="NCName" />
+                    </attribute>
+                </optional>
                 <oneOrMore>
                     <ref name="scene" />
                 </oneOrMore>
@@ -38,6 +43,11 @@
             <attribute name="id">
                 <data type="ID"/>
             </attribute>
+            <optional>
+                <attribute name="xml:lang">
+                    <data type="NCName" />
+                </attribute>
+            </optional>
             <optional>
                 <attribute name="title">
                     <text/>

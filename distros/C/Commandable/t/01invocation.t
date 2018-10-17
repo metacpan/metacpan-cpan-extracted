@@ -78,4 +78,13 @@ use Commandable::Invocation;
    is( $inv->remaining, q(foo "bar splot"), '->remaining after putback' );
 }
 
+# new_from_tokens
+{
+   my $inv = Commandable::Invocation->new_from_tokens( "one", "two", "three four" );
+
+   is( $inv->pull_token, "one",        '->pull_token from new_from_tokens' );
+   is( $inv->pull_token, "two",        '->pull_token from new_from_tokens' );
+   is( $inv->pull_token, "three four", '->pull_token from new_from_tokens' );
+}
+
 done_testing;

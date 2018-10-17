@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
-license: artistic_2
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -20,7 +20,7 @@ no_index:
     - inc
 requires:
   Bytes::Random::Secure: '0'
-  Digest::SHA: '0'
-  Math::EllipticCurve::Prime: '0'
-version: '1.008'
+  Digest::SHA: '5.95'
+  Math::EllipticCurve::Prime: '0.003'
+version: '1.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

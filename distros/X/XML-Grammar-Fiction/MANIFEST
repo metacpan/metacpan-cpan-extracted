@@ -19,7 +19,6 @@ extradata/screenplay-xml-to-tei.xslt
 extradata/screenplay-xml-to-xsl-fo.xslt
 extradata/screenplay-xml.dtd
 extradata/screenplay-xml.rng
-f.txt
 inc/Test/Run/Builder.pm
 inc/XML/Grammar/Builder.pm
 inc/XML/Grammar/Fiction/Builder.pm
@@ -136,6 +135,7 @@ t/screenplay/data/proto-text-invalid/inner-desc-inside-char-addressing.txt
 t/screenplay/data/proto-text-invalid/non-terminated-desc.txt
 t/screenplay/data/proto-text/dialogue-with-several-paragraphs.txt
 t/screenplay/data/proto-text/nested-s.txt
+t/screenplay/data/proto-text/scenes-with-langs.txt
 t/screenplay/data/proto-text/scenes-with-titles.txt
 t/screenplay/data/proto-text/two-nested-s.txt
 t/screenplay/data/proto-text/with-brs.txt
@@ -172,6 +172,7 @@ t/screenplay/data/tei/with-numeric-entities.tei.xml
 t/screenplay/data/tei/with-tags-inside-paragraphs.tei.xml
 t/screenplay/data/xml/dialogue-with-several-paragraphs.xml
 t/screenplay/data/xml/nested-s.xml
+t/screenplay/data/xml/scenes-with-langs.xml
 t/screenplay/data/xml/scenes-with-titles.xml
 t/screenplay/data/xml/two-nested-s.xml
 t/screenplay/data/xml/with-brs.xml

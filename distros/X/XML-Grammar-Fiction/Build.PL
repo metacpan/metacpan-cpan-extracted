@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "XML-Grammar-Fiction",
-  "dist_version" => "v0.15.0",
+  "dist_version" => "v0.16.0",
   "license" => "mit",
   "module_name" => "XML::Grammar::Fiction",
   "recursive_test_files" => 1,

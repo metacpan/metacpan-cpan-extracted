@@ -1,4 +1,4 @@
-package Pcore::Ext v0.18.3;
+package Pcore::Ext v0.18.4;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Base;
@@ -7,7 +7,47 @@ use Pcore::Util::Scalar qw[is_ref];
 use Package::Stash::XS qw[];
 
 our ( $APP, $EXT );
-my $SCANNED;
+our $SCANNED;
+
+sub load_class ( $self, $module_path, $full_path, $reload ) {
+    my $namespace = ( $module_path =~ s/[.]pm\z//smr ) =~ s[/][::]smgr;
+
+    # reload
+    if ( exists $INC{$module_path} ) {
+        return if !$reload;
+
+        my $code = P->file->read_bin($full_path);
+
+        $code->$* =~ s/^use Pcore.+?$//smg;
+
+        no warnings qw[redefine];
+
+        *{"$namespace\::const"} = sub : prototype(\[$@%]@) { };
+
+        eval $code->$*;    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
+    }
+
+    # load
+    else {
+
+        # configure namespace
+        push @{"$namespace\::ISA"}, 'Pcore::Ext::Base';
+        *{"$namespace\::raw"}  = sub : prototype($) {die};
+        *{"$namespace\::func"} = sub                {die};
+        *{"$namespace\::cdn"}  = \undef;
+        *{"$namespace\::api"}  = \undef;
+        *{"$namespace\::class"} = \undef;
+        *{"$namespace\::type"}  = \undef;
+
+        do $full_path;
+    }
+
+    die $@ if $@;
+
+    $INC{$module_path} = $full_path;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+
+    return;
+}
 
 sub scan ( $self, $app, @namespaces ) {
     return if $SCANNED;
@@ -21,78 +61,65 @@ sub scan ( $self, $app, @namespaces ) {
         my $root_namespace_path = $root_namespace =~ s[::][/]smgr;
 
         for my $inc_path ( grep { !is_ref $_ } @INC ) {
-            P->file->find(
-                "$inc_path/$root_namespace_path/",
-                abs => 0,
-                dir => 0,
-                sub ($path) {
-                    if ( $path->suffix eq 'pm' ) {
+            next if !-d "$inc_path/$root_namespace_path";
 
-                        my $namespace = ( "$root_namespace_path/" . $path =~ s/[.]pm\z//smr ) =~ s[/][::]smgr;
+            my $modules = P->path1("$inc_path/$root_namespace_path")->read_dir( abs => 0, is_dir => 0, scan_depth => 0 );
 
-                        # load class
-                        my $context_cfg = do {
+            next if !$modules;
 
-                            # configure namespace
-                            push @{"$namespace\::ISA"}, 'Pcore::Ext::Base';
-                            *{"$namespace\::raw"}  = sub : prototype($) {die};
-                            *{"$namespace\::func"} = sub                {die};
-                            *{"$namespace\::cdn"}  = \undef;
-                            *{"$namespace\::api"}  = \undef;
-                            *{"$namespace\::class"} = \undef;
-                            *{"$namespace\::type"}  = \undef;
+            for my $module ( $modules->@* ) {
+                next if $module !~ s/[.]pm\z//sm;
 
-                            P->class->load($namespace);
+                my $namespace = "$root_namespace_path/$module" =~ s[/][::]smgr;
 
-                            {   ext_type    => ${"$namespace\::EXT_TYPE"},
-                                ext_ver     => ${"$namespace\::EXT_VER"},
-                                ext_api_ver => ${"$namespace\::EXT_API_VER"},
-                                ext_map     => ${"$namespace\::_EXT_MAP"},
-                            };
-                        };
+                # load class
+                my $context_cfg = do {
+                    $self->load_class( "$root_namespace_path/$module.pm", "$inc_path/$root_namespace_path/$module.pm", 0 );
 
-                        my $context_path = "$root_namespace_path/" . $path =~ s/[.]pm\z//smr;
+                    {   ext_type    => ${"$namespace\::EXT_TYPE"},
+                        ext_ver     => ${"$namespace\::EXT_VER"},
+                        ext_api_ver => ${"$namespace\::EXT_API_VER"},
+                        ext_map     => ${"$namespace\::_EXT_MAP"},
+                    };
+                };
 
-                        for my $name ( grep {/\AEXT_/sm} Package::Stash::XS->new($namespace)->list_all_symbols('CODE') ) {
-                            my $ref = *{"$namespace\::$name"}{CODE};
+                my $context_path = "$root_namespace_path/$module";
 
-                            $name =~ s/\AEXT_//sm;
+                for my $name ( grep {/\AEXT_/sm} Package::Stash::XS->new($namespace)->list_all_symbols('CODE') ) {
+                    my $ref = *{"$namespace\::$name"}{CODE};
 
-                            $tree->{"/$context_path/$name"} = {
-                                namespace       => $namespace,
-                                generator       => $name,
-                                class_path      => "/$context_path/$name",
-                                context_path    => "/$context_path/",
-                                extend          => $context_cfg->{ext_map}->{$ref}->{extend},
-                                override        => $context_cfg->{ext_map}->{$ref}->{override},
-                                api_ver         => $context_cfg->{ext_api_ver},
-                                ext_class_name  => $context_cfg->{ext_map}->{$ref}->{define} // "$context_path/$name" =~ s[/][.]smgr,
-                                alias_namespace => $context_cfg->{ext_map}->{$ref}->{type},
-                                ext_framework   => $context_cfg->{ext_map}->{$ref}->{ext},
-                            };
-                        }
+                    $name =~ s/\AEXT_//sm;
 
-                        # detect application
-                        if ( ( my $app_name ) = $context_path =~ m[\A$root_namespace_path/([^/]+)\z]sm ) {
-                            die qq[Ext app "/$context_path" requires \$EXT_TYPE to be defined] if !$context_cfg->{ext_type};
-                            die qq[Ext app "/$context_path" requires \$EXT_VER to be defined]  if !$context_cfg->{ext_ver};
-                            die qq[Viewport is not defined]                                    if !$tree->{"/$context_path/viewport"};
-
-                            $APP->{$app_name} = {
-                                name         => $app_name,
-                                context_path => "/$context_path/",
-                                ext_type     => $context_cfg->{ext_type},
-                                ext_ver      => $context_cfg->{ext_ver},
-                                api_ver      => $context_cfg->{ext_api_ver},
-                                viewport     => "$context_path/viewport" =~ s[/][.]smgr,
-                            };
-                        }
-                    }
-
-                    return;
+                    $tree->{"/$context_path/$name"} = {
+                        namespace       => $namespace,
+                        generator       => $name,
+                        class_path      => "/$context_path/$name",
+                        context_path    => "/$context_path/",
+                        extend          => $context_cfg->{ext_map}->{$ref}->{extend},
+                        override        => $context_cfg->{ext_map}->{$ref}->{override},
+                        api_ver         => $context_cfg->{ext_api_ver},
+                        ext_class_name  => $context_cfg->{ext_map}->{$ref}->{define} // "$context_path/$name" =~ s[/][.]smgr,
+                        alias_namespace => $context_cfg->{ext_map}->{$ref}->{type},
+                        ext_framework   => $context_cfg->{ext_map}->{$ref}->{ext},
+                    };
                 }
-            );
 
+                # detect application
+                if ( ( my $app_name ) = $context_path =~ m[\A$root_namespace_path/([^/]+)\z]sm ) {
+                    die qq[Ext app "/$context_path" requires \$EXT_TYPE to be defined] if !$context_cfg->{ext_type};
+                    die qq[Ext app "/$context_path" requires \$EXT_VER to be defined]  if !$context_cfg->{ext_ver};
+                    die qq[Viewport is not defined]                                    if !$tree->{"/$context_path/viewport"};
+
+                    $APP->{$app_name} = {
+                        name         => $app_name,
+                        context_path => "/$context_path/",
+                        ext_type     => $context_cfg->{ext_type},
+                        ext_ver      => $context_cfg->{ext_ver},
+                        api_ver      => $context_cfg->{ext_api_ver},
+                        viewport     => "$context_path/viewport" =~ s[/][.]smgr,
+                    };
+                }
+            }
         }
     }
 
@@ -286,7 +313,13 @@ sub _build_ext ( $self, $tree ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 79                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 12                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 27                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 111                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 25                   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

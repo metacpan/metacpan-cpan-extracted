@@ -7,9 +7,6 @@ WriteMakefile(
 	      AUTHOR              => q{Ashish Gulhati <crypt-eecdh at hash.neo.tc>},
 	      VERSION_FROM        => 'lib/Crypt/EECDH.pm',
 	      ABSTRACT_FROM       => 'lib/Crypt/EECDH.pm',
-	      ($ExtUtils::MakeMaker::VERSION >= 6.64
-	       ? ('LICENSE'=> 'perl')
-	       : ()),
 	      PL_FILES            => {},
 	      TEST_REQUIRES       => {
 				      'Test::More' => 0,

@@ -1,5 +1,14 @@
 Revision history for Perl extension CPAN-Audit
 
+0.07 2018-10-16T21:37:20Z
+
+    - test fixes
+
+0.06 2018-10-16T19:19:22Z
+
+    - use name instead of fullname
+    - fix installed modules discovery
+
 0.05 2018-10-15T19:36:39Z
 
     [ADVISORIES]

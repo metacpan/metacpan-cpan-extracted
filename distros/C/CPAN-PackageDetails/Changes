@@ -1,5 +1,8 @@
 Revision history for Perl module CPAN::PackageDetails
 
+0.261 2018-06-12T13:48:14Z
+	* Change to Artistic License 2.0
+
 0.26 - 2014-01-03
 	* Get rid of MYMETA
 

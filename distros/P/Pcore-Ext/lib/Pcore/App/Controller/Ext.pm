@@ -7,8 +7,6 @@ use Pcore::Util::Scalar qw[is_plain_arrayref];
 use JavaScript::Packer qw[];
 use JavaScript::Beautifier qw[];
 
-with qw[Pcore::App::Controller];
-
 has ext_app   => undef;                 # name of the linked application, required
 has ext_title => 'ExtJS Application';
 has ext_theme => ();
@@ -57,19 +55,6 @@ around run => sub ( $orig, $self, $req ) {
 
     return;
 };
-
-sub run ( $self, $req ) {
-    if ( $req->{path_tail} && $req->{path_tail}->is_file ) {
-
-        # try to return static content
-        $self->return_static($req);
-    }
-    else {
-        $req->(404)->finish;
-    }
-
-    return;
-}
 
 sub _return_html ( $self, $req ) {
     my $app = $Pcore::Ext::APP->{ $self->{ext_app} };

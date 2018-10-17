@@ -1,5 +1,13 @@
 Revision history for Perl extension Test::PostgreSQL.
 
+1.27 2018-10-17T02:06:08Z
+    - Use pg_version attribute to better handle -b and -f psql switches
+      depending on installed PostgreSQL version
+    - Updated docs to reflect the changes
+    - Tests are passing with PostgreSQL 9.3+
+    - pg_version attribute holds PostgreSQL version detected at startup
+    - Improved test diagnostics
+
 1.26
     - Fix postgresql.conf test on PostgreSQL prior to 9.2
 

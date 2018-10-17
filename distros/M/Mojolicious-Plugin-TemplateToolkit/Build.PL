@@ -84,11 +84,12 @@ EOW
         "Dan Book <dbook\@cpan.org>"
       ],
       "dist_name" => "Mojolicious-Plugin-TemplateToolkit",
-      "dist_version" => "0.003",
+      "dist_version" => "0.004",
       "license" => "artistic_2",
       "module_name" => "Mojolicious::Plugin::TemplateToolkit",
       "recursive_test_files" => 1,
       "requires" => {
+        "Carp" => 0,
         "Class::Method::Modifiers" => 0,
         "Mojolicious" => "6.51",
         "Scalar::Util" => 0,

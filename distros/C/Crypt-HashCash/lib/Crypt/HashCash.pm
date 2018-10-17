@@ -3,7 +3,7 @@
 # Crypt::HashCash - HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash.pm v1.127 Sat Sep 16 18:48:09 PDT 2017 $
+# $Id: lib/Crypt/HashCash.pm v1.129 Tue Oct 16 16:56:37 PDT 2018 $
 
 package Crypt::HashCash;
 
@@ -12,12 +12,13 @@ use strict;
 use Exporter;
 use Compress::Zlib;
 use Math::BaseCnv qw (cnv dig diginit);
+use Math::Prime::Util qw(fromdigits todigitstring);
 use vars qw($VERSION @ISA @EXPORT_OK);
 
 @ISA = qw(Exporter);
-@EXPORT_OK = qw(breakamt changecoin _hex _dec _squish _unsquish _dectob85 _b85todec);
+@EXPORT_OK = qw(breakamt changecoin _hex _dec __dec _squish _unsquish _dectob85 _b85todec);
 
-our ( $VERSION ) = '$Revision: 1.127 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.129 $' =~ /\s+([\d\.]+)/;
 
 sub breakamt {          # Return denominations of lowest number of coins to make an amount
   my $amt = shift; my %d;
@@ -68,19 +69,20 @@ sub changecoin {        # Return denominations of change for a specific coin
   return (\%d, $count);
 }
 
-sub _hex {
-  my $dec = shift;
-  local $SIG{'__WARN__'} = sub { };
-  my $hex = Math::BaseCnv::heX($dec);
-  $hex =~ tr/A-F/a-f/; $hex =~ s/^ff//;
-  $hex;
-}
-
 sub _dec {
   my $hex = shift;
   $hex = 'ff' . $hex;     # So we don't lose leading 0s
-  local $SIG{'__WARN__'} = sub { };
-  Math::BaseCnv::dec($hex);
+  fromdigits($hex, 16);
+}
+
+sub __dec {
+  fromdigits(shift, 16);
+}
+
+sub _hex {
+  my $hex = todigitstring(shift, 16);
+  $hex =~ s/^ff//;
+  $hex;
 }
 
 sub _squish {
@@ -140,8 +142,8 @@ Crypt::HashCash - HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.127 $
- $Date: Sat Sep 16 18:48:09 PDT 2017 $
+ $Revision: 1.129 $
+ $Date: Tue Oct 16 16:56:37 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -296,10 +298,12 @@ L<http://search.cpan.org/dist/Crypt-HashCash/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2001-2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See L<http://www.perlfoundation.org/artistic_license_2_0> for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

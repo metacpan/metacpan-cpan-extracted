@@ -2,9 +2,9 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.321 of Calendar::Indonesia::Holiday
+    This document describes version 0.322 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2018-06-26.
+    2018-10-17.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
@@ -83,7 +83,7 @@ FUNCTIONS
   count_id_workdays
     Usage:
 
-     count_id_workdays(%args) -> [status, msg, result, meta]
+     count_id_workdays(%args) -> [status, msg, payload, meta]
 
     Count working days for a certain period.
 
@@ -92,7 +92,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 2002 to 2018 (joint leave days until 2018).
+    Contains data from years 2002 to 2019 (joint leave days until 2018).
 
     This function is not exported by default, but exportable.
 
@@ -125,7 +125,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -134,7 +134,7 @@ FUNCTIONS
   enum_id_workdays
     Usage:
 
-     enum_id_workdays(%args) -> [status, msg, result, meta]
+     enum_id_workdays(%args) -> [status, msg, payload, meta]
 
     Enumerate working days for a certain period.
 
@@ -143,7 +143,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 2002 to 2018 (joint leave days until 2018).
+    Contains data from years 2002 to 2019 (joint leave days until 2018).
 
     This function is not exported by default, but exportable.
 
@@ -176,7 +176,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -185,13 +185,13 @@ FUNCTIONS
   list_id_holidays
     Usage:
 
-     list_id_holidays(%args) -> [status, msg, result, meta]
+     list_id_holidays(%args) -> [status, msg, payload, meta]
 
     List Indonesian holidays in calendar.
 
     List holidays and joint leave days ("cuti bersama").
 
-    Contains data from years 2002 to 2018 (joint leave days until 2018).
+    Contains data from years 2002 to 2019 (joint leave days until 2018).
 
     This function is not exported by default, but exportable.
 
@@ -674,7 +674,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -683,7 +683,7 @@ FUNCTIONS
   list_id_workdays
     Usage:
 
-     list_id_workdays(%args) -> [status, msg, result, meta]
+     list_id_workdays(%args) -> [status, msg, payload, meta]
 
     This function is not exported.
 
@@ -702,7 +702,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

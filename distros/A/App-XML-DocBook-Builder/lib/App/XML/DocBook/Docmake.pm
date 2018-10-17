@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.0500';
+$App::XML::DocBook::Docmake::VERSION = '0.0601';
 use strict;
 use warnings;
 
@@ -21,6 +21,7 @@ __PACKAGE__->mk_accessors(
         _mode
         _output_path
         _stylesheet
+        _trailing_slash
         _verbose
         _real_mode
         _xslt_mode
@@ -74,17 +75,19 @@ sub _init
     my $base_path;
     my $make_like = 0;
     my ( $help, $man );
+    my $trailing_slash = 1;
 
     my $ret = GetOptionsFromArray(
         $argv,
-        "o=s"            => \$output_path,
-        "v|verbose"      => \$verbose,
-        "x|stylesheet=s" => \$stylesheet,
-        "stringparam=s"  => \@in_stringparams,
-        "basepath=s"     => \$base_path,
-        "make"           => \$make_like,
-        'help|h'         => \$help,
-        'man'            => \$man,
+        "o=s"              => \$output_path,
+        "v|verbose"        => \$verbose,
+        "x|stylesheet=s"   => \$stylesheet,
+        "stringparam=s"    => \@in_stringparams,
+        "basepath=s"       => \$base_path,
+        "make"             => \$make_like,
+        'help|h'           => \$help,
+        'man'              => \$man,
+        'trailing-slash=i' => \$trailing_slash,
     );
 
     if ( !$ret )
@@ -120,6 +123,7 @@ sub _init
     $self->_xslt_stringparams( \@stringparams );
     $self->_make_like($make_like);
     $self->_base_path($base_path);
+    $self->_trailing_slash($trailing_slash);
 
     my $mode = shift(@$argv);
 
@@ -255,7 +259,10 @@ sub _run_mode_xhtml
     my $self = shift;
 
     # Create the directory, because xsltproc requires it.
-    $self->_mkdir( $self->_output_path() );
+    if ( $self->_trailing_slash )
+    {
+        $self->_mkdir( $self->_output_path() );
+    }
 
     return $self->_run_xslt();
 }
@@ -299,9 +306,12 @@ sub _calc_output_param_for_xslt
     # it will have a trailing slash.
     if ( $self->_is_xhtml )
     {
-        if ( $output_path !~ m{/\z} )
+        if ( $self->_trailing_slash )
         {
-            $output_path .= "/";
+            if ( $output_path !~ m{/\z} )
+            {
+                $output_path .= "/";
+            }
         }
     }
 
@@ -524,7 +534,7 @@ sub _output_cmd_comp
 }
 
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0500';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0601';
 use base 'Class::Accessor';
 
 __PACKAGE__->mk_accessors(
@@ -547,11 +557,11 @@ __END__
 
 =head1 NAME
 
-App::XML::DocBook::Docmake - translate DocBook/XML to other formats
+App::XML::DocBook::Docmake
 
 =head1 VERSION
 
-version 0.0500
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -561,9 +571,13 @@ version 0.0500
 
     $docmake->run()
 
+=head1 NAME
+
+App::XML::DocBook::Docmake - translate DocBook/XML to other formats
+
 =head1 VERSION
 
-version 0.0500
+version 0.0601
 
 =head1 FUNCTIONS
 
@@ -624,38 +638,9 @@ Copyright 2008 Shlomi Fish.
 This program is released under the following license: MIT/X11 License.
 ( L<http://www.opensource.org/licenses/mit-license.php> ).
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
-or by email to
-L<bug-app-xml-docbook-builder@rt.cpan.org|mailto:bug-app-xml-docbook-builder@rt.cpan.org>.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc App::XML::DocBook::Docmake
 
 =head2 Websites
 
@@ -753,5 +738,28 @@ from your repository :)
 L<https://github.com/shlomif/app-xml-docbook-builder>
 
   git clone http://bitbucket.org/shlomif/docmake
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
+or by email to
+L<bug-app-xml-docbook-builder@rt.cpan.org|mailto:bug-app-xml-docbook-builder@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

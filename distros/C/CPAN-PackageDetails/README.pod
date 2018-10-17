@@ -10,7 +10,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/cpan-packagedetails/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/CPAN-PackageDetails.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/CPAN::PackageDetails"><img src="https://img.shields.io/cpan/v/CPAN-PackageDetails.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/CPAN::PackageDetails"><img src="https://img.shields.io/cpan/v/CPAN-PackageDetails.svg" /></A>
 
 =head1 The CPAN::PackageDetails module
 
@@ -23,7 +23,7 @@ for any Perl module.
 
 To read about L<CPAN::PackageDetails>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|http://perldoc.perl.org/perldoc.html>:
+with L<perldoc|https://perldoc.perl.orgperldoc.html>:
 
 	% perldoc lib/CPAN/PackageDetails.pm
 
@@ -33,7 +33,7 @@ name instead of the file location:
 	% perldoc CPAN::PackageDetails
 
 You can read the documentation and inspect the meta data on
-L<MetaCPAN|http://www.metacpan.org/module/CPAN::PackageDetails>.
+L<MetaCPAN|https://metacpan.org/pod/CPAN::PackageDetails>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's

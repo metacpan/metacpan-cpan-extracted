@@ -1,3 +1,6 @@
+Version 0.10 on Oct 17 2018:
+    - Version 0.09 actually requires Parallel::ForkManager 1.15. Declare that
+      explicity
 Version 0.09 on Oct 16 2018:
     - Fix Bug #127362 for Parallel-Loops: Fails with recent versions of
       Parallel::ForkManager

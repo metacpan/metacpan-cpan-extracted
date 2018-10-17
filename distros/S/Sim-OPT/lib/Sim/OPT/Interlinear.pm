@@ -1620,19 +1620,20 @@ sub printend
       print NEWFILE "$entry->[2]\n";
     }
   }
+  close NEWFILE;
 }
 
 printend( \@arr, $newfile, $optformat );
 
 
-close NEWFILE;
+
 
 #############################################################################
 
 1;
 
 __END__
-$metafile
+
 =head1 NAME
 
 
@@ -1656,7 +1657,7 @@ Sim::OPT::Interlinear
 
 Interlinear is a program for computing the missing values in multivariate datasieries pre-prepared in csv format.
 The program can adopt the following algorithmic strategies and intermix their result:
-$metafile
+
 a) a propagating distance-weighted gradient-based strategy (by far the best one so far, keeping into account that the behaviour of factors is often not linear and there are curvatures all aroung the design space);
 
 b) pure linear interpolation (one may want to use this in some occasions: for example, on factorials);
@@ -1664,7 +1665,7 @@ b) pure linear interpolation (one may want to use this in some occasions: for ex
 c) nearest neighbour (a strategy of last resort. One may want to use it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
 
 Strategy a) works for cases which are adjacent in the design space. For example, it cannot work with the gradient between a certain iteration 1 and the corresponding iteration 3. It can only work with the gradient between iterations 1 and 2, or 2 and 3.
-For that reason, it does not w$metafileork well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from coordinate descent sampling strategies.
+For that reason, it does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from coordinate descent sampling strategies.
 To work well with a latin hypercube sampling, it is necessary to include a pass of strategy b) before calling strategy a). Then strategy a) will charge itself of reducing the gradient errors created by the initial pass of strategy b).
 
 A configuration file should be prepared following the example in the "examples" folder in this distribution.
@@ -1726,7 +1727,7 @@ After some computations, Interlinear will output a new dataseries, with the miss
 
 =head2 EXPORT
 
-$metafile
+
 interlinear, interstart.
 
 

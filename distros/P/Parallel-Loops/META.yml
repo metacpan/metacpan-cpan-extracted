@@ -20,9 +20,9 @@ no_index:
     - inc
     - t
 requires:
-  Parallel::ForkManager: 0.7.9
+  Parallel::ForkManager: '1.15'
   perl: 5.8.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/pmorch/perl-Parallel-Loops
-version: '0.09'
+version: '0.10'

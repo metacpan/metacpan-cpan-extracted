@@ -41,7 +41,7 @@ Simon (G7RZU) <simon@gb7fr.org.uk>
 
 use vars qw($VERSION);
 #Define version
-$VERSION = '0.8';
+$VERSION = '0.9';
 
 =head1 METHODS
 
@@ -200,7 +200,7 @@ sub send_individual_call {
 
 Sends a message to a rubric
 
-$ret = $dapnetobj->send_rubric_content(<text to send>,<rubric name>.<transmitter group name>,<sequence number 1 - 10>);
+$ret = $dapnetobj->send_rubric_content(<text to send>,<rubric name>.<transmitter group name>,<sequence number 1 - 10>,<send call? [0|1]>);
 
 Returns 0 on sucess or the HTTP error string on error. 
 
@@ -209,7 +209,7 @@ Returns 0 on sucess or the HTTP error string on error.
 
 sub send_rubric_content {
    my $self = shift;
-    my($text,$rubric,$number) = @_;
+    my($text,$rubric,$number,$sendcall) = @_;
     print("Send rubric\n") if($self->{DEBUG});
     my($jsonresobj) = JSON->new;
     my($ua) = LWP::UserAgent->new;
@@ -218,7 +218,11 @@ sub send_rubric_content {
     my($json);
     print("substr length: ".length($text)."\n") if($self->{DEBUG});
     if (length($text) <= (79 - $self->{_CALL_LEN})) { 
-        my($json) = $self->_json_rubric_content($self->{CALLSIGN}.':'.$text,$rubric,$number);
+        if ($sendcall) {
+            $json = $self->_json_rubric_content($self->{CALLSIGN}.':'.$text,$rubric,$number);
+        } else {
+            $json = $self->_json_rubric_content($text,$rubric,$number);
+        };
         my($req) = $self->_build_request($json,'news');    
         my($res) = $ua->request($req);
         print('Request status line: '.$res->status_line."\n") if($self->{DEBUG});
@@ -232,10 +236,18 @@ sub send_rubric_content {
         while (my $substr = substr($text,0,(76 - $self->{_CALL_LEN}),'')) {
             if ($i == 1) {
                 print("substr begining: $substr \n") if($self->{DEBUG});
-                $json = $self->_json_rubric_content($self->{CALLSIGN}.':'.$substr.'...',$rubric,$number);
+                if ($sendcall) {
+                    $json = $self->_json_rubric_content($self->{CALLSIGN}.':'.$substr.'...',$rubric,$number);
+                } else {
+                    $json = $self->_json_rubric_content($substr.'...',$rubric,$number);
+                };
             } else {
                 print("substr next: $substr \n") if($self->{DEBUG});
-                $json = $self->_json_rubric_content($self->{CALLSIGN}.':'.'...'.$substr,$rubric,$number);
+                if ($sendcall) {
+                    $json = $self->_json_rubric_content($self->{CALLSIGN}.':'.'...'.$substr,$rubric,$number);
+                } else {
+                    $json = $self->_json_rubric_content('...'.$substr,$rubric,$number);
+                };
             };
             my($req) = $self->_build_request($json,'news');    
             my($res) = $ua->request($req);

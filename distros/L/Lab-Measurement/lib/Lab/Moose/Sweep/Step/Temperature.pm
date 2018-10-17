@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Temperature;
-$Lab::Moose::Sweep::Step::Temperature::VERSION = '3.662';
+$Lab::Moose::Sweep::Step::Temperature::VERSION = '3.663';
 #ABSTRACT: Step/list sweep of temperature
 
 
@@ -63,7 +63,7 @@ Lab::Moose::Sweep::Step::Temperature - Step/list sweep of temperature
 
 =head1 VERSION
 
-version 3.662
+version 3.663
 
 =head1 SYNOPSIS
 

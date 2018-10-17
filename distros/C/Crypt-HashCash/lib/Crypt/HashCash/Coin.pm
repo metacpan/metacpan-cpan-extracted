@@ -3,17 +3,17 @@
 # Crypt::HashCash::Coin - HashCash Digital Cash Coin
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Coin.pm v1.127 Sat Sep 16 18:48:10 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Coin.pm v1.129 Tue Oct 16 16:56:37 PDT 2018 $
 
 package Crypt::HashCash::Coin;
 
 use warnings;
 use strict;
 
-use Crypt::HashCash qw (_squish _unsquish _hex _dec);
+use Crypt::HashCash qw (_squish _unsquish _hex _dec __dec);
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.127 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.129 $' =~ /\s+([\d\.]+)/;
 
 sub as_string {
   my $self = shift;
@@ -58,14 +58,14 @@ sub from_hex {
   if (length($hex) == 170) {       # ECDSA Coin
     return unless $hex =~ /^([0-9a-f]{8})([0-9a-f]{32})([0-9a-f]{64})([0-9a-f]{66})$/;
     local $SIG{'__WARN__'} = sub { };
-    $coin = bless { D => Math::BaseCnv::dec($1), X => Math::BaseCnv::dec($2),
+    $coin = bless { D => __dec($1), X => __dec($2),
 		    Z => bless { s => $3, R => $4 }, 'Crypt::ECDSA::Blind::Signature' },
 		      'Crypt::HashCash::Coin';
   }
   elsif (length($hex) == 296) {    # 1024-bit RSA Coin
     return unless $hex =~ /^([0-9a-f]{8})([0-9a-f]{32})([0-9a-f]{256})$/;
     local $SIG{'__WARN__'} = sub { };
-    $coin = bless { D => Math::BaseCnv::dec($1), X => Math::BaseCnv::dec($2), Z => Math::BaseCnv::dec($3) },
+    $coin = bless { D => __dec($1), X => __dec($2), Z => __dec($3) },
       'Crypt::HashCash::Coin';
   }
   $coin;
@@ -107,8 +107,8 @@ Crypt::HashCash::Coin - HashCash Digital Cash Coin
 
 =head1 VERSION
 
- $Revision: 1.127 $
- $Date: Sat Sep 16 18:48:10 PDT 2017 $
+ $Revision: 1.129 $
+ $Date: Tue Oct 16 16:56:37 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -205,10 +205,12 @@ L<http://search.cpan.org/dist/Crypt-HashCash/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2001-2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See http://www.perlfoundation.org/artistic_license_2_0 for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

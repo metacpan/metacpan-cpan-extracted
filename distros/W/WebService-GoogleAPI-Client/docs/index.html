@@ -1,0 +1,202 @@
+<html>
+<head>
+<title>WebService::GoogleAPI::Client - Non CPAN / Official - By Peter Scott </title>
+<style>
+body{
+  margin: 0px; 
+}
+
+.circle {
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  font-size: 18px;
+  color: #fff;
+  line-height: 500px;
+  text-align: center;
+  background: #009688;
+  font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+  padding: 20px;
+}
+
+
+
+</style>
+
+<script src='https://jeromeetienne.github.io/threex.terrain/examples/vendor/three.js/build/three-min.js'></script>
+<script src='https://jeromeetienne.github.io/threex.terrain/examples/vendor/three.js/examples/js/SimplexNoise.js'></script>
+<script src='https://jeromeetienne.github.io/threex.terrain/threex.terrain.js'></script>
+
+
+</head>
+<!-- available at https://pscott-au.github.io/WebService-GoogleAPI-Client/ -->
+<body>
+<!-- Using Threejs & Jerome Etienne's Threex -->
+
+<div style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.9;
+    z-index: -100;" ><!-- style="padding-bottom: 450px;" -->
+<div id='animcont' style=" background-color: #828291; ">
+        <svg width="130" height="130">
+                <circle cx="75" cy="75" r="50" fill="#009688" stroke="black" stroke-width="3"/>
+                <text x="50%" y="50%" text-anchor="middle" fill="white" font-size="40px" font-family='"Lato","Helvetica Neue",Helvetica,Arial,sans-serif' dx=".2em" dy=".6em">Perl</text>
+              Sorry, your browser does not support inline SVG.
+              </svg>
+    <h1 style="padding-top: 75px;padding-left: 100px;font-family: 'DejaVu Sans',sans-serif;">sudo cpanm https://dev.pscott.com.au/WebService-Google-Client-0.01.01.tar.gz</h1>
+
+</div>
+<div>
+<p>
+<img src="perl-google-apis-client-library.png" />
+    This is my Private Version of WebService::GoogleAPI::Client and is in no way related to the cpan module in the same namespace
+To chat about WebService::GoogleAPI::Client join me on <a href="https://gitter.im/WebService-Google/Lobby">Gitter</a></p>
+<h2>NB - This is not production ready - contact me if you'd like to contribute</h2>
+<p>Subscribe to <a href="https://calendar.google.com/calendar/embed?src=shotgundriver.com_8ejfk543736dp8vjqehtafflks%40group.calendar.google.com&ctz=Australia%2FBrisbane">my Google Calendar </a>for events and release dates.
+<span class="circle2"    ><svg height="80" width="80"><circle cx="50" cy="50" r="25" stroke="black" stroke-width="3" fill="red" /><text rx="0" ry="40" fill="black">Perl</text></svg></span>
+<svg width="250" height="250">
+        <circle cx="125" cy="125" r="100" fill="#009688" stroke="black" stroke-width="3"/>
+        <text x="50%" y="50%" text-anchor="middle" fill="white" font-size="85px" font-family='"Lato","Helvetica Neue",Helvetica,Arial,sans-serif' dy=".3em">Perl</text>
+      Sorry, your browser does not support inline SVG.
+      </svg>
+
+
+
+    </p>
+
+<h2>Discussion</h2>
+
+<p style="color:red; font-weight: heavy">If you do take parts of this code for your own module please do me the common courtesy of attributing it</p>
+<p>Don't be a <abbr title="Many Users Prefer Political Posturing|oPinion over Evidenced Truth">MUPP/ET</abbr> - <span style="first-letter {font-weight: bold;color: red;}">Many Users Prefer Political Posturing over Evidenced Truth</span><br/>
+Differeing opinions on everything welcome but please make an effort to respect and understand others and treat communication efficiency as a priority.
+</p>
+<p>
+I suspect that this module has some fundamental architectural design issues that may make it non-maintainable. 
+While using the Google API discovery services to dynamically construct subclasses for services might sound great in reality it may prove a dead end.
+</p>
+<p>
+    NB - this library is for managing OAUTH'd user access services server-side on behalf of the authenticated user. 
+    You 'can' use this for your own API use only, but this is for other people who are granting you 
+    permission to use their Google Services; such as accessing their emails or executing queries that have costs involved against their billing account etc. 
+    If you are wanting to only access your own account you should also consider  <a href="https://cloud.google.com/iam/docs/understanding-service-accounts">Service Accounts</a> and JWT's as per <a href="https://metacpan.org/pod/Mojo::JWT::Google">Mojo::JWT::Google</a> and related/similar modules.
+</p>
+<p>
+    You can see who you have provided OAUTH'd access for your account at <a href="https://myaccount.google.com/permissions">Google Security - Apps with Account Access</a>
+</p>
+<p>
+This module features parsing the Google API Discovery data - and doesn't do that comprehesively - A better/alternate approach may be to build a simple Swagger based client. 
+</p>
+<p>
+There are other issues with the WebService::GoogleAPI::Client implementation both in cpan and my version that need to be thrashed out before it is ready for real widespread usage. 
+</p>
+<p>
+That said there are some parts of this library that may be useful. There's a nice little <pre>goauth</pre> CLI to generate your tokens with an embedded local webserver which makes it easier to explore the Google API.
+There is also enough around the discovery stuff to be of interest and there's a low level method that you can use to quickly get started with OAUTH'd access to the Google API Endpoints. 
+</p>
+<p>
+On the downside 
+the code is pretty poor generally with the base code looking more like a learning excercise than the work of a subject matter expert. The cpan namespace owner is himself mostly interested in learning 
+to use some of the supporting tools above introducing code improvements. The library makes excessive use of the discovery services and the autoclassing fails for anything other than the top level methods. 
+There are parts of the code base that are skeleton and not implemented and the limitations of the code are not made clear. 
+</p>
+<p>
+If none of that scares you away - feel free to reach out and I will be happy to 
+advise on how I use and am trying to improve it. My initial use case was to access the GMAIL services to send an email which I have struggled to do previously through the API. I have examples of how I 
+did this in my source which may be of use. I can also point you to other modules that I have had success with for other services such as updating google sheets etc with examples if required.
+</p>
+
+<h3>Alternative approaches</h3>
+<ul>
+    <li><li><a href="https://metacpan.org/pod/Mojolicious::Plugin::Google::Cloud::UserAgent"> Mojolicious::Plugin::Google::Cloud::UserAgent</a></li></li>
+    <li><a href="https://metacpan.org/pod/Net::Google::Spreadsheets::V4">Net::Google::Spreadsheets::V4</a> - works as advertised</li>
+    <li><a href="https://metacpan.org/pod/Net::Google::OAuth">Net::Google::OAuth</a> fresh update from Pavel</li>
+    <li><a href="https://metacpan.org/pod/Google::API::Client">Google::API::Client for autodiscovery stuff</a></li>
+</ul>
+
+<h3>Links Worth Reviewing if considering Swagger based approaches</h3>
+<p>
+<ul>
+<li><a href="http://www.jebriggs.com/perl-20170706/index2.html">REST API Server Programming With Perl, Swagger And The Mojolicious Framework</a></li>
+<li><a href="https://github.com/APIs-guru/google-discovery-to-swagger">google-discovery-to-swagger</a></li>
+</ul>
+</p>
+<p>
+Many thanks - hopefully this saves someone from the hours of frustration I've had trying to use my fave language to leverage Google API services.</br>
+<a href="mailto:peter@pscott.com.au">Peter Scott <peter@pscott.com.au></a>
+</p>
+
+<!-- <img src="uml.png" alt="a quick hacked image for UML autodigram using umlclass.pl"> -->
+<div style="font-size:small;font-weight: heavy; "></div>
+<iframe src="https://calendar.google.com/calendar/embed?src=shotgundriver.com_8ejfk543736dp8vjqehtafflks%40group.calendar.google.com&ctz=Australia%2FBrisbane" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+<br/>Last udpated 6th October 2018</div>
+</div>
+</div>
+
+<!-- https://codepen.io/marctannous/pen/RNGjmz -->
+<script>
+        var renderer	= new THREE.WebGLRenderer({
+                antialias	: true
+            });
+        /* Fullscreen */
+            // renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.setSize( window.innerWidth, 400 );
+        /* Append to HTML */
+            //document.body.appendChild( renderer.domElement );
+            var container = document.getElementById('animcont');
+            container.appendChild( renderer.domElement );
+            var onRenderFcts= [];
+            var scene	= new THREE.Scene();
+            var camera	= new THREE.PerspectiveCamera(25, window.innerWidth /    window.innerHeight, 0.01, 1000);
+        /* Play around with camera positioning */
+            camera.position.z = 15; 
+          camera.position.y = 2;
+        /* Fog provides depth to the landscape*/
+          scene.fog = new THREE.Fog(0x000, 0, 45);
+            ;(function(){
+                var light	= new THREE.AmbientLight( 0x202020 )
+                scene.add( light )
+                var light	= new THREE.DirectionalLight('white', 5)
+                light.position.set(0.5, 0.0, 2)
+                scene.add( light )
+                var light	= new THREE.DirectionalLight('white', 0.75*2)
+                light.position.set(-0.5, -0.5, -2)
+                scene.add( light )		
+            })()
+            var heightMap	= THREEx.Terrain.allocateHeightMap(256,256)
+            THREEx.Terrain.simplexHeightMap(heightMap)	
+            var geometry	= THREEx.Terrain.heightMapToPlaneGeometry(heightMap)
+            THREEx.Terrain.heightMapToVertexColor(heightMap, geometry)
+        /* Wireframe built-in color is white, no need to change that */
+            var material	= new THREE.MeshBasicMaterial({
+                wireframe: true
+            });
+            var mesh	= new THREE.Mesh( geometry, material );
+            scene.add( mesh );
+            mesh.lookAt(new THREE.Vector3(0,1,0));
+        /* Play around with the scaling */
+            mesh.scale.y	= 3.5;
+            mesh.scale.x	= 3;
+            mesh.scale.z	= 0.20;
+            mesh.scale.multiplyScalar(10);
+        /* Play around with the camera */
+            onRenderFcts.push(function(delta, now){
+                mesh.rotation.z += 0.2 * delta;	
+            })
+            onRenderFcts.push(function(){
+                renderer.render( scene, camera );		
+            })
+            var lastTimeMsec= null
+            requestAnimationFrame(function animate(nowMsec){
+                requestAnimationFrame( animate );
+                lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+                var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+                lastTimeMsec	= nowMsec
+                onRenderFcts.forEach(function(onRenderFct){
+                    onRenderFct(deltaMsec/1000, nowMsec/1000)
+                })
+            })
+        </script>
+</body>
+</html>

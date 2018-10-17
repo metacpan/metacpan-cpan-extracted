@@ -34,7 +34,7 @@ name: Plack-Middleware-Statsd
 provides:
   Plack::Middleware::Statsd:
     file: lib/Plack/Middleware/Statsd.pm
-    version: v0.3.5
+    version: v0.3.6
 recommends:
   HTTP::Status: '6.16'
   Net::Statsd::Tiny: v0.3.0
@@ -47,6 +47,6 @@ resources:
   bugtracker: https://github.com/robrwo/Plack-Middleware-Statsd/issues
   homepage: https://metacpan.org/pod/Plack::Middleware::Statsd
   repository: git://github.com/robrwo/Plack-Middleware-Statsd.git
-version: v0.3.5
+version: v0.3.6
 x_authority: cpan:RRWO
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
 # Crypt::EC_DSA - Elliptic Curve Digital Signature Algorithm (ECDSA)
-# Copyright (c) 2017 Ashish Gulhati <crypt-ecdsa at hash.neo.tc>
+# Copyright (c) Ashish Gulhati <crypt-ecdsa at hash.neo.tc>
 #
-# $Id: lib/Crypt/EC_DSA.pm v1.008 Thu Jun  8 22:19:29 PDT 2017 $
+# $Id: lib/Crypt/EC_DSA.pm v1.009 Tue Oct 16 23:22:27 PDT 2018 $
 
 package Crypt::EC_DSA;
 
@@ -14,7 +14,7 @@ use Math::EllipticCurve::Prime;
 use Digest::SHA qw(sha256_hex);
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.008 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.009 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -101,8 +101,8 @@ Crypt::EC_DSA - Elliptic Curve Digital Signature Algorithm (ECDSA)
 
 =head1 VERSION
 
- $Revision: 1.008 $
- $Date: Thu Jun  8 22:19:29 PDT 2017 $
+ $Revision: 1.009 $
+ $Date: Tue Oct 16 23:22:27 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -185,7 +185,7 @@ otherwise. Default is false.
 
 =head2 curve
 
-The elliptic curve to use (a B<Math::EllipticCurve::Prime> object).
+The elliptic curve to use (a L<Math::EllipticCurve::Prime> object).
 
 =head1 SEE ALSO
 
@@ -237,10 +237,12 @@ L<http://search.cpan.org/dist/Crypt-EC_DSA/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See L<http://www.perlfoundation.org/artistic_license_2_0> for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

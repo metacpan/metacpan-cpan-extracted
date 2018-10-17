@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.662
+version 3.663
 
 =head1 OVERVIEW
 
@@ -633,6 +633,16 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =item * L<Lab::Bus::MODBUS_RS232>
 
 =back
+
+=head1 CITING Lab::Measurement
+
+If you use Lab::Measurement in your work, we would appreciate very much a
+citation in the resulting publications. Please cite us as follows:
+
+"Lab::Measurement — a portable and extensible framework for controlling lab
+equipment and conducting measurements", S. Reinhardt, C. Butschkow, S. Geissler,
+A. Dirnaichner, F. Olbrich, C. Lane, D. Schröer, and A. K. Hüttel,
+Computer Physics Communications 234, 216 (2019); doi:10.1016/j.cpc.2018.07.024
 
 =head1 COPYRIGHT AND LICENSE
 

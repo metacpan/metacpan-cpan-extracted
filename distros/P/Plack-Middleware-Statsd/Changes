@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.3.6    2018-10-16 22:38:04+01:00 Europe/London
+  [Documentation]
+  - Corrected minor typo.
+
 v0.3.5    2018-05-31 21:19:21+01:00 Europe/London
   [Documentation]
   - Documented a known issue about non-standard status codes, #2.

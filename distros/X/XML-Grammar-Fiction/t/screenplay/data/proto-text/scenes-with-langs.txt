@@ -1,0 +1,17 @@
+<s id="top" lang="en">
+
+<s id="a-better-scene" title="A Better Scene">
+</s>
+
+<s id="another-scene">
+</s>
+
+<s id="exodus" title="The Exodus" lang="fr">
+
+Moses: let us get out of here!
+
+Joshua: amen!
+
+</s>
+
+</s>

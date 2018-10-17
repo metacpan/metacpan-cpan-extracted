@@ -26,11 +26,12 @@ no_index:
 provides:
   Mojolicious::Plugin::TemplateToolkit:
     file: lib/Mojolicious/Plugin/TemplateToolkit.pm
-    version: '0.003'
+    version: '0.004'
   Template::Provider::Mojo:
     file: lib/Template/Provider/Mojo.pm
-    version: '0.003'
+    version: '0.004'
 requires:
+  Carp: '0'
   Class::Method::Modifiers: '0'
   Mojolicious: '6.51'
   Scalar::Util: '0'
@@ -39,14 +40,14 @@ requires:
   parent: '0'
   perl: '5.010001'
 resources:
-  IRC: irc://irc.perl.org/#mojo
+  IRC: irc://irc.freenode.net/#mojo
   bugtracker: https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit/issues
   homepage: https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit
   repository: https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.028000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GithubMeta
@@ -101,7 +102,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: '@Author::DBOOK/Git::Contributors'
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::DBOOK/MetaNoIndex'
@@ -166,7 +167,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in:
             - /
-          commit_msg: v%v%n%n%c
+          commit_msg: '%v%n%n%c'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Build.PL
@@ -193,9 +194,9 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.003
-          tag_format: v%v
-          tag_message: v%v
+          tag: '0.004'
+          tag_format: '%v'
+          tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.14.4
           repo_root: .
@@ -225,7 +226,7 @@ x_Dist_Zilla:
             - Changes
             - dist.ini
           allow_dirty_match:
-            - (?^:^(?:lib|script|bin)/)
+            - (?^:^)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.14.4
@@ -364,7 +365,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::DBOOK/InstallGuide'
-      version: '1.200009'
+      version: '1.200011'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::DBOOK/Manifest'
@@ -432,5 +433,5 @@ x_Dist_Zilla:
     version: '6.012'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

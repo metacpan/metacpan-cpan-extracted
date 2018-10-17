@@ -1,4 +1,5 @@
 requires 'perl' => '5.010001';
+requires 'Carp';
 requires 'Class::Method::Modifiers';
 requires 'Mojolicious' => '6.51';
 requires 'parent';

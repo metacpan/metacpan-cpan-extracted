@@ -4,7 +4,7 @@
 # server.pl - Queueing server for IPC::Serial
 # Copyright (c) 2017 Ashish Gulhati <ipc-serial at hash.neo.tc>
 #
-# $Id: bin/server.pl v1.006 Sun Jun 11 12:42:55 PDT 2017 $
+# $Id: bin/server.pl v1.007 Tue Oct 16 22:52:29 PDT 2018 $
 
 use warnings;
 

@@ -34,11 +34,11 @@
    "provides" : {
       "Commandable" : {
          "file" : "lib/Commandable.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Commandable::Invocation" : {
          "file" : "lib/Commandable/Invocation.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

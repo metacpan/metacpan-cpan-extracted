@@ -1,0 +1,56 @@
+NAME
+
+    OData::QueryParams::DBIC - parse OData style query params and provide
+    info for DBIC queries.
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+        use OData::QueryParams::DBIC;
+        
+        my $query_string = 'orderby=username asc, userid';
+        my $opts         = params_to_dbic( $query_string );
+        
+        # { order_by => [ {-asc => 'username'}, {-asc => 'userid'} ] }
+        # can be used in
+        # $schema->resultset('users')->search( undef, $opts );
+
+DESCRIPTION
+
+    The OData <https://www.odata.org> protocol defines the behaviour of
+    Query String Options
+    <https://www.odata.org/documentation/odata-version-2-0/uri-conventions/#QueryStringOptions>.
+    This module aims to help you when you want to use the OData query
+    string options with an application that uses DBIx::Class
+    <https://metacpan.org/pod/DBIx::Class>.
+
+    It parses the query parameters and creates a hash of DBIx::Class
+    options that can be used in the search method.
+
+EXPORTED FUNCTION
+
+ params_to_dbic
+
+    This function returns a hash reference of options that can be used as
+    options for the search method in DBIx::Class.
+
+        use OData::QueryParams::DBIC;
+        
+        my $query_string = 'orderby=username asc, userid';
+        my $opts         = params_to_dbic( $query_string );
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

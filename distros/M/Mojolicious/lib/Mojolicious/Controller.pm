@@ -9,7 +9,7 @@ use Mojo::Util;
 use Mojolicious::Routes::Match;
 use Scalar::Util ();
 
-has [qw(app tx)];
+has [qw(app tx)] => undef, weak => 1;
 has match =>
   sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
 
@@ -401,7 +401,7 @@ L<Mojolicious::Controller> implements the following attributes.
   $c      = $c->app(Mojolicious->new);
 
 A reference back to the application that dispatched to this controller, usually
-a L<Mojolicious> object.
+a L<Mojolicious> object. Note that this attribute is weakened.
 
   # Use application logger
   $c->app->log->debug('Hello Mojo');
@@ -429,10 +429,9 @@ L<Mojolicious::Routes::Match> object.
 
 The transaction that is currently being processed, usually a
 L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Note that
-this reference is usually weakened to protect you from hard to detect memory
-leaks. So the object needs to be referenced elsewhere as well when you're
-performing non-blocking operations and the underlying connection might get
-closed early.
+this attribute is weakened. So the object needs to be referenced elsewhere as
+well when you're performing non-blocking operations and the underlying
+connection might get closed early.
 
   # Check peer information
   my $address = $c->tx->remote_address;

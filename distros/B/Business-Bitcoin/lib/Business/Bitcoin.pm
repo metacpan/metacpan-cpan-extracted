@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
 # Business::Bitcoin - Easy and secure way to accept Bitcoin payments online
-# Copyright (c) 2016-2017 Ashish Gulhati <biz-btc at hash.neo.tc>
+# Copyright (c) Ashish Gulhati <biz-btc at hash.neo.tc>
 #
-# $Id: lib/Business/Bitcoin.pm v1.047 Thu Aug 17 01:01:54 PDT 2017 $
+# $Id: lib/Business/Bitcoin.pm v1.051 Tue Oct 16 22:26:58 PDT 2018 $
 
 use strict;
 
@@ -18,7 +18,7 @@ use Business::Bitcoin::Request;
 
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.047 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.051 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my $class = shift;
@@ -34,13 +34,13 @@ sub new {
 		                                         reqid INTEGER PRIMARY KEY AUTOINCREMENT,
 		                                         amount int NOT NULL,
                                                          address text,
-                                                         refid text UNIQUE,
+                                                         reference text UNIQUE,
 		                                         created int NOT NULL,
                                                          processed int,
                                                          status text
 		                                        );');
       return undef unless $db->do('CREATE INDEX idx_requests_address ON requests(address);');
-      return undef unless $db->do('CREATE INDEX idx_requests_refid ON requests(refid);');
+      return undef unless $db->do('CREATE INDEX idx_requests_reference ON requests(reference);');
       my $startindex = $arg{StartIndex} || 0;
       $startindex--;
       return unless $db->do("INSERT INTO SQLITE_SEQUENCE values ('requests',$startindex);");
@@ -92,8 +92,8 @@ Business::Bitcoin - Easy and secure way to accept Bitcoin payments online
 
 =head1 VERSION
 
- $Revision: 1.047 $
- $Date: Thu Aug 17 01:01:54 PDT 2017 $
+ $Revision: 1.051 $
+ $Date: Tue Oct 16 22:26:58 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -341,10 +341,12 @@ L<http://search.cpan.org/dist/Business-Bitcoin/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2016-2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See L<http://www.perlfoundation.org/artistic_license_2_0> for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

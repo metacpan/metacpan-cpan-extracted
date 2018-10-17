@@ -1,7 +1,7 @@
 package Calendar::Indonesia::Holiday;
 
-our $DATE = '2018-06-26'; # DATE
-our $VERSION = '0.321'; # VERSION
+our $DATE = '2018-10-17'; # DATE
+our $VERSION = '0.322'; # VERSION
 
 use 5.010001;
 use strict;
@@ -756,15 +756,43 @@ my %year_holidays;
 
         # - christmas
 
-        # note: this is currently just a wild guess because i'm having
-        # difficulty finding sources
-        _make_tentative(
-            _jointlv     ({_expand_dm("13-06")}, {holiday=>$eidulf2018}),
-            _jointlv     ({_expand_dm("14-06")}, {holiday=>$eidulf2018}),
-            _jointlv     ({_expand_dm("18-06")}, {holiday=>$eidulf2018}),
-            _jointlv     ({_expand_dm("19-06")}, {holiday=>$eidulf2018}),
-            _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
-        ),
+        _jointlv     ({_expand_dm("11-06")}, {holiday=>$eidulf2018}),
+        _jointlv     ({_expand_dm("12-06")}, {holiday=>$eidulf2018}),
+        _jointlv     ({_expand_dm("13-06")}, {holiday=>$eidulf2018}),
+        _jointlv     ({_expand_dm("14-06")}, {holiday=>$eidulf2018}),
+        _jointlv     ({_expand_dm("18-06")}, {holiday=>$eidulf2018}),
+        _jointlv     ({_expand_dm("19-06")}, {holiday=>$eidulf2018}),
+        _jointlv     ({_expand_dm("20-06")}, {holiday=>$eidulf2018}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+    ];
+}
+
+# tentative
+#
+# ref:
+# - https://kalender.web.id/2019.html
+{
+    my $eidulf2019;
+    $year_holidays{2019} = [
+        # - new year
+        _h_chnewyear ({_expand_dm("05-02")}, {hyear=>2570}),
+        _h_nyepi     ({_expand_dm("07-03")}, {hyear=>1941}),
+        _h_isramiraj ({_expand_dm("03-04")}, {hyear=>1440}),
+        _h_goodfri   ({_expand_dm("19-04")}),
+        # - labor day
+        _h_vesakha   ({_expand_dm("19-05")}, {hyear=>2563}),
+        _h_ascension ({_expand_dm("30-05")}),
+        # - pancasila day
+        ($eidulf2019 =
+        _h_eidulf    ({_expand_dm("05-06")}, {hyear=>1440, day=>1})),
+        _h_eidulf    ({_expand_dm("06-06")}, {hyear=>1439, day=>2}),
+        _h_eidula    ({_expand_dm("11-08")}, {hyear=>1440}),
+        # - independence day
+        _h_hijra     ({_expand_dm("01-09")}, {hyear=>1441}),
+        _h_mawlid    ({_expand_dm("09-11")}, {hyear=>1441}),
+        # - christmas
+
+        # XXX joint leave
     ];
 }
 
@@ -1092,7 +1120,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.321 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2018-06-26.
+This document describes version 0.322 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2018-10-17.
 
 =head1 SYNOPSIS
 
@@ -1175,7 +1203,7 @@ There is a command-line script interface for this module: L<list-id-holidays>.
 
 Usage:
 
- count_id_workdays(%args) -> [status, msg, result, meta]
+ count_id_workdays(%args) -> [status, msg, payload, meta]
 
 Count working days for a certain period.
 
@@ -1184,7 +1212,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 2002 to 2018 (joint leave days until
+Contains data from years 2002 to 2019 (joint leave days until
 2018).
 
 This function is not exported by default, but exportable.
@@ -1222,7 +1250,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1233,7 +1261,7 @@ Return value:  (any)
 
 Usage:
 
- enum_id_workdays(%args) -> [status, msg, result, meta]
+ enum_id_workdays(%args) -> [status, msg, payload, meta]
 
 Enumerate working days for a certain period.
 
@@ -1242,7 +1270,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 2002 to 2018 (joint leave days until
+Contains data from years 2002 to 2019 (joint leave days until
 2018).
 
 This function is not exported by default, but exportable.
@@ -1280,7 +1308,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1291,13 +1319,13 @@ Return value:  (any)
 
 Usage:
 
- list_id_holidays(%args) -> [status, msg, result, meta]
+ list_id_holidays(%args) -> [status, msg, payload, meta]
 
 List Indonesian holidays in calendar.
 
 List holidays and joint leave days ("cuti bersama").
 
-Contains data from years 2002 to 2018 (joint leave days until
+Contains data from years 2002 to 2019 (joint leave days until
 2018).
 
 This function is not exported by default, but exportable.
@@ -1710,7 +1738,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1721,7 +1749,7 @@ Return value:  (any)
 
 Usage:
 
- list_id_workdays(%args) -> [status, msg, result, meta]
+ list_id_workdays(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -1744,7 +1772,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<document xmlns="http://web-cpan.berlios.de/modules/XML-Grammar-Screenplay/screenplay-xml-0.2/">
+    <head>
+    </head>
+    <body id="index">
+        <scene id="top" xml:lang="en">
+            <scene id="a-better-scene" title="A Better Scene">
+            </scene>
+            <scene id="another-scene">
+            </scene>
+            <scene id="exodus" title="The Exodus" xml:lang="fr">
+                <saying character="Moses">
+                    <para>
+                        let us get out of here!
+                    </para>
+                </saying>
+                <saying character="Joshua">
+                    <para>
+                        amen!
+                    </para>
+                </saying>
+            </scene>
+        </scene>
+    </body>
+</document>

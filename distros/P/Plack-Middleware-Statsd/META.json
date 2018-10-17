@@ -78,7 +78,7 @@
    "provides" : {
       "Plack::Middleware::Statsd" : {
          "file" : "lib/Plack/Middleware/Statsd.pm",
-         "version" : "v0.3.5"
+         "version" : "v0.3.6"
       }
    },
    "release_status" : "stable",
@@ -93,7 +93,7 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-Statsd"
       }
    },
-   "version" : "v0.3.5",
+   "version" : "v0.3.6",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

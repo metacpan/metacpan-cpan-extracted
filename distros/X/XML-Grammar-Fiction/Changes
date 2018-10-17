@@ -1,5 +1,8 @@
 Revision history for XML-Grammar-Fiction.
 
+v0.16.0     2018-10-16
+    * Add a lang attribute to scenes in the screenplays.
+
 v0.15.0     2018-09-28
     * Convert dist.ini to @SHLOMIF .
     * Convert extradata/screenplay-xml-to-html.xslt to emit XHTML5.

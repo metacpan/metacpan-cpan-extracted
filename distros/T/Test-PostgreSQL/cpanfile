@@ -1,0 +1,15 @@
+requires 'perl' => '5.014';
+requires 'File::Spec';
+requires 'File::Which';
+requires 'DBI';
+requires 'DBD::Pg';
+requires 'Try::Tiny';
+requires 'Function::Parameters';
+requires 'Types::Standard';
+requires 'Moo';
+requires 'POSIX';
+requires 'User::pwent';
+requires 'Tie::Hash::Method';
+test_requires 'DBD::Pg';
+test_requires 'Test::SharedFork' => 0.06;
+author_requires 'Software::License';

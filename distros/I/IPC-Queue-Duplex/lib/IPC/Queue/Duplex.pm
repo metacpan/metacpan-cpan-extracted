@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
 # IPC::Queue::Duplex - Filesystem based request / response queue
-# Copyright (c) 2017 Ashish Gulhati <ipc-qd at hash.neo.tc>
+# Copyright (c) Ashish Gulhati <ipc-qd at hash.neo.tc>
 #
-# $Id: lib/IPC/Queue/Duplex.pm v1.008 Mon Mar 12 22:18:20 PDT 2018 $
+# $Id: lib/IPC/Queue/Duplex.pm v1.009 Tue Oct 16 21:48:32 PDT 2018 $
 
 package IPC::Queue::Duplex;
 
@@ -14,7 +14,7 @@ use File::Copy qw(cp);
 use IPC::Queue::Duplex::Job;
 use Fcntl qw(:flock);
 
-our ( $VERSION ) = '$Revision: 1.008 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.009 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %args) = @_;
@@ -106,8 +106,8 @@ IPC::Queue::Duplex - Filesystem based request / response queue
 
 =head1 VERSION
 
- $Revision: 1.008 $
- $Date: Mon Mar 12 22:18:20 PDT 2018 $
+ $Revision: 1.009 $
+ $Date: Tue Oct 16 21:48:32 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -208,10 +208,12 @@ L<http://search.cpan.org/dist/IPC-Queue-Duplex/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See L<http://www.perlfoundation.org/artistic_license_2_0> for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

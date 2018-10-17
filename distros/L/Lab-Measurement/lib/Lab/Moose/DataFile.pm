@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile;
-$Lab::Moose::DataFile::VERSION = '3.662';
+$Lab::Moose::DataFile::VERSION = '3.663';
 #ABSTRACT: Base class for data file types
 
 use 5.010;
@@ -69,6 +69,24 @@ sub BUILD {
     $self->_open_file();
 }
 
+# Subclass this to use fancy stuff like IO::Compress
+sub _open_filehandle {
+    my $self = shift;
+    my $path = shift;
+
+    open my $fh, $self->mode(), $path
+        or croak "cannot open '$path': $!";
+
+    return $fh;
+}
+
+# Let subclasses add suffixes
+sub _modify_file_path {
+    my $self = shift;
+    my $path = shift;
+    return $path;
+}
+
 sub _open_file {
     my $self = shift;
 
@@ -85,14 +103,15 @@ sub _open_file {
 
     my $path = our_catfile( $folder, $filename );
 
+    $path = $self->_modify_file_path($path);
+
     $self->_path($path);
 
     if ( -e $path ) {
         croak "path '$path' does already exist";
     }
 
-    open my $fh, $self->mode(), $path
-        or croak "cannot open '$path': $!";
+    my $fh = $self->_open_filehandle($path);
 
     # Do not use crlf line endings on ms-w32.
     binmode $fh
@@ -122,7 +141,7 @@ Lab::Moose::DataFile - Base class for data file types
 
 =head1 VERSION
 
-version 3.662
+version 3.663
 
 =head1 METHODS
 

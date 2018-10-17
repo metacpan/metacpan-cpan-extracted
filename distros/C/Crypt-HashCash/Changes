@@ -1,11 +1,16 @@
 Revision history for Crypt-HashCash
 
-1.115   Sat Jun 10 01:44:28 2017 -0700
-        First release
+1.129   Tue Oct 16 16:56:36 2018 -0700
+    	Change license to OAL 2.0
 
-1.126   Sat Jun 24 02:05:11 2017 -0700
-        Update vault-worker.pl, vault-queuer.pl
+1.128   Sun Mar 11 20:57:18 2018 -0700
+    	Change _hex and _dec to use Math::Prime::Util
 
 1.127   Sat Sep 16 18:43:05 2017 -0700
         Fix error propagation bugs, dependencies, electrum args
 
+1.126   Sat Jun 24 02:05:11 2017 -0700
+        Update vault-worker.pl, vault-queuer.pl
+
+1.115   Sat Jun 10 01:44:28 2017 -0700
+        First release

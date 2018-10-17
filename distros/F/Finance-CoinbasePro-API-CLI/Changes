@@ -1,0 +1,14 @@
+Revision history for Finance-CoinbasePro-API-CLI
+
+0.003    2018-10-17
+        Changes for tests
+
+0.002    2018-10-17
+        Fix git tagging
+
+0.001    2018-10-17
+        First version, released on an unsuspecting world.
+        Basic command line access to GDAX.
+        Use Dist::Zilla
+        Test on Travis-CI
+

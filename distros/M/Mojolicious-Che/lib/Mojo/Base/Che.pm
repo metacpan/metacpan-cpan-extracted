@@ -5,7 +5,7 @@ use Mojo::Base -strict;
 
 # copy-paste sub Mojo::Base::attr + patch 1 line
 sub Mojo::Base::attr {
-my ($self, $attrs, $value, %kv) = @_;
+  my ($self, $attrs, $value, %kv) = @_;
   return unless (my $class = ref $self || $self) && $attrs;
 
   Carp::croak 'Default has to be a code reference or constant value'
@@ -13,22 +13,20 @@ my ($self, $attrs, $value, %kv) = @_;
 
   # Weaken
   if ($kv{weak}) {
-    our %weak_names;
-    my $w = $weak_names{$class};
-    unless ($w) {
-      $w = $weak_names{$class} = [];
+    state %weak_names;
+    unless ($weak_names{$class}) {
+      my $names = $weak_names{$class} = [];
       my $sub = sub {
-        my $class = shift;
-        my $self  = $class->next::method(@_);
-        ref $self->{$_} and Scalar::Util::weaken $self->{$_} for @$w;
+        my $self = shift->next::method(@_);
+        ref $self->{$_} and Scalar::Util::weaken $self->{$_} for @$names;
         return $self;
       };
       Mojo::Util::monkey_patch(my $base = $class . '::_Base', 'new', $sub);
       no strict 'refs';
       unshift @{"${class}::ISA"}, $base;
     }
-    push @$w, ref($attrs) eq 'ARRAY' ? @$attrs : $attrs;
-  }
+    push @{$weak_names{$class}}, ref $attrs eq 'ARRAY' ? @$attrs : $attrs;
+}
 
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
     # patch

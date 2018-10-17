@@ -33,7 +33,8 @@
          "requires" : {
             "JavaScript::Beautifier" : "v0.20.0",
             "JavaScript::Packer" : "v2.3.0",
-            "Pcore" : "v0.24.5"
+            "Pcore" : "v0.24.5",
+            "Pcore::Resources" : "v0.1.0"
          }
       }
    },
@@ -49,6 +50,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-ext/overview"
       }
    },
-   "version" : "v0.18.3",
+   "version" : "v0.18.4",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

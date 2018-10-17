@@ -54,8 +54,8 @@ JS
         _loadCharts => func [], <<"JS",
             var urls = [],
                 chartConfig = this.getChartConfig(),
-                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts4')->[0] ]}";
-                geoDataBaseUrl = "@{[ $cdn->get_resources('amcharts4_geodata')->[0] ]}";
+                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts4_base') ]}";
+                geoDataBaseUrl = "@{[ $cdn->get_resources('amcharts4_geodata_base') ]}";
 
             urls.push( chartsBaseUrl + 'core.js');
             urls.push( chartsBaseUrl + 'charts.js');

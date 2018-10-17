@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,20 +30,20 @@ no_index:
 provides:
   Resque::Plugin::Delay:
     file: lib/Resque/Plugin/Delay.pm
-    version: '0.03'
+    version: '0.04'
   Resque::Plugin::Delay::Dequeue:
     file: lib/Resque/Plugin/Delay/Dequeue.pm
   Resque::Plugin::Delay::Job:
     file: lib/Resque/Plugin/Delay/Job.pm
 requires:
-  JSON::XS: '0'
+  JSON: '0'
   Moose: '0'
   Resque: '0.31'
-  perl: '5.008001'
 resources:
   bugtracker: https://github.com/meru-akimbo/resque-delay-perl/issues
   homepage: https://github.com/meru-akimbo/resque-delay-perl
   repository: git://github.com/meru-akimbo/resque-delay-perl.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:MERU
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

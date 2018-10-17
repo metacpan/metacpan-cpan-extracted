@@ -3,7 +3,7 @@
 # Crypt::HashCash::Mint - Mint for HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Mint.pm v1.127 Sat Sep 16 18:48:10 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Mint.pm v1.129 Tue Oct 16 16:56:37 PDT 2018 $
 
 package Crypt::HashCash::Mint;
 
@@ -18,7 +18,7 @@ use Persistence::Object::Simple;
 use vars qw( $VERSION $AUTOLOAD );
 use DBI;
 
-our ( $VERSION ) = '$Revision: 1.127 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.129 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my $class = shift;
@@ -179,8 +179,8 @@ Crypt::HashCash::Mint - Mint for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.127 $
- $Date: Sat Sep 16 18:48:10 PDT 2017 $
+ $Revision: 1.129 $
+ $Date: Tue Oct 16 16:56:37 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -298,10 +298,12 @@ L<http://search.cpan.org/dist/Crypt-HashCash/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2001-2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See http://www.perlfoundation.org/artistic_license_2_0 for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

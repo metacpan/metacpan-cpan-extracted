@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test::Trap" => 0,
     "vars" => 0
   },
-  "VERSION" => "0.0500",
+  "VERSION" => "0.0601",
   "test" => {
     "TESTS" => "t/*.t"
   }

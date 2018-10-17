@@ -1,5 +1,5 @@
 package App::XML::DocBook::Builder;
-$App::XML::DocBook::Builder::VERSION = '0.0500';
+$App::XML::DocBook::Builder::VERSION = '0.0601';
 use warnings;
 use strict;
 
@@ -48,11 +48,11 @@ __END__
 
 =head1 NAME
 
-App::XML::DocBook::Builder - Build DocBook/XML files.
+App::XML::DocBook::Builder
 
 =head1 VERSION
 
-version 0.0500
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -60,9 +60,13 @@ version 0.0500
 
     my $foo = App::XML::DocBook::Builder->new();
 
+=head1 NAME
+
+App::XML::DocBook::Builder - Build DocBook/XML files.
+
 =head1 VERSION
 
-version 0.0500
+version 0.0601
 
 =head1 FUNCTIONS
 
@@ -122,38 +126,9 @@ This program is released under the following license: MIT/X11
 
 L<http://www.opensource.org/licenses/mit-license.php>
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
-or by email to
-L<bug-app-xml-docbook-builder@rt.cpan.org|mailto:bug-app-xml-docbook-builder@rt.cpan.org>.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc App::XML::DocBook::Builder
 
 =head2 Websites
 
@@ -251,5 +226,28 @@ from your repository :)
 L<https://github.com/shlomif/app-xml-docbook-builder>
 
   git clone http://bitbucket.org/shlomif/docmake
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
+or by email to
+L<bug-app-xml-docbook-builder@rt.cpan.org|mailto:bug-app-xml-docbook-builder@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

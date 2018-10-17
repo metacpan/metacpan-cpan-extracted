@@ -1,4 +1,13 @@
 
+8.03  2018-10-16
+  - Added support for weak reference accessors to Mojo::Base. (mst)
+  - Updated List::Util requirement to 1.41 for set_subname support.
+  - Fixed a small bug in Mojo::UserAgent where request timeouts could be created
+    twice.
+  - Improved Mojo::Exception to include a stack trace in verbose output.
+  - Improved Mojolicious::Types to use the correct MIME types for woff and
+    woff2 files.
+
 8.02  2018-10-01
   - Deprecated Mojo::Transaction::success in favor of Mojo::Transaction::result
     and Mojo::Transaction::error. Unfortunately this method is used a lot in

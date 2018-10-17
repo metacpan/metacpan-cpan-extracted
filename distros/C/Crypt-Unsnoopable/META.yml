@@ -27,5 +27,5 @@ requires:
   GD::Barcode::QRcode: '0'
   Math::Prime::Util: '0'
   Persistence::Object::Simple: '0'
-version: '1.008'
+version: '1.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

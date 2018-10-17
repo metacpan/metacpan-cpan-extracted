@@ -1,0 +1,6 @@
+name="Test-PostgreSQL"
+module_maker="ModuleBuildTiny"
+tag_format="release-%v"
+license="artistic_2"
+no_github_issues=true
+badges = ['circleci']

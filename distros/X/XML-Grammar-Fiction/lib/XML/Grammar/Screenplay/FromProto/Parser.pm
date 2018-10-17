@@ -1,5 +1,5 @@
 package XML::Grammar::Screenplay::FromProto::Parser;
-$XML::Grammar::Screenplay::FromProto::Parser::VERSION = 'v0.15.0';
+$XML::Grammar::Screenplay::FromProto::Parser::VERSION = 'v0.16.0';
 use strict;
 use warnings;
 
@@ -15,51 +15,26 @@ __END__
 
 =head1 NAME
 
+XML::Grammar::Screenplay::FromProto::Parser
+
+=head1 VERSION
+
+version v0.16.0
+
+=head1 NAME
+
 XML::Grammar::Screenplay::FromProto::Parser - base class for parsers of the
 ScreenplayXML proto-text.
 
 =head1 VERSION
 
-version v0.15.0
-
-=head1 VERSION
-
-version v0.15.0
+version v0.16.0
 
 B<For internal use only>.
-
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2007 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Fiction> or by email
-to
-L<bug-xml-grammar-fiction@rt.cpan.org|mailto:bug-xml-grammar-fiction@rt.cpan.org>.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc XML::Grammar::Screenplay::FromProto::Parser
 
 =head2 Websites
 
@@ -157,5 +132,28 @@ from your repository :)
 L<http://bitbucket.org/shlomif/perl-XML-Grammar-Fiction>
 
   hg clone ssh://hg@bitbucket.org/shlomif/perl-XML-Grammar-Fiction
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Grammar-Fiction> or by email
+to
+L<bug-xml-grammar-fiction@rt.cpan.org|mailto:bug-xml-grammar-fiction@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2007 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

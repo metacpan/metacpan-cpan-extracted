@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VISA;
-$Lab::Moose::Connection::VISA::VERSION = '3.662';
+$Lab::Moose::Connection::VISA::VERSION = '3.663';
 #ABSTRACT: Connection back end to National Instruments' VISA library.
 
 
@@ -204,7 +204,7 @@ Lab::Moose::Connection::VISA - Connection back end to National Instruments' VISA
 
 =head1 VERSION
 
-version 3.662
+version 3.663
 
 =head1 SYNOPSIS
 

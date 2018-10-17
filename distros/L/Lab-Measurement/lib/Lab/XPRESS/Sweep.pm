@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep;
-$Lab::XPRESS::Sweep::VERSION = '3.662';
+$Lab::XPRESS::Sweep::VERSION = '3.663';
 #ABSTRACT: Base sweep class
 
 use Role::Tiny::With;
@@ -1443,7 +1443,7 @@ Lab::XPRESS::Sweep - Base sweep class
 
 =head1 VERSION
 
-version 3.662
+version 3.663
 
 =head1 SYNOPSIS
 

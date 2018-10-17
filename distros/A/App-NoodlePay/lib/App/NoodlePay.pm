@@ -4,7 +4,7 @@
 # App::NoodlePay - Convenient way to securely send Bitcoin from cold storage
 # Copyright (c) Ashish Gulhati <noodlepay at hash.neo.tc>
 #
-# $Id: lib/App/NoodlePay.pm v1.006 Tue Jun 19 01:28:57 PDT 2018 $
+# $Id: lib/App/NoodlePay.pm v1.007 Tue Oct 16 22:06:51 PDT 2018 $
 
 package App::NoodlePay;
 
@@ -17,7 +17,7 @@ use GD::Barcode::QRcode;
 use Math::Prime::Util qw(fromdigits todigitstring);
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.006 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.007 $' =~ /\s+([\d\.]+)/;
 
 1;
 
@@ -29,8 +29,8 @@ App::NoodlePay - Convenient way to securely send Bitcoin from cold storage
 
 =head1 VERSION
 
- $Revision: 1.006 $
- $Date: Tue Jun 19 01:28:57 PDT 2018 $
+ $Revision: 1.007 $
+ $Date: Tue Oct 16 22:06:51 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -161,8 +161,10 @@ L<http://search.cpan.org/dist/App-NoodlePay/>
 
 Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See http://www.perlfoundation.org/artistic_license_2_0 for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

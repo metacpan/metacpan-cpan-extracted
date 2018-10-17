@@ -52,7 +52,6 @@
             "File::Path" : "0",
             "Getopt::Long" : "0",
             "Hook::LexWrap" : "0",
-            "IO::Compress::Bzip2" : "0",
             "IO::File" : "0",
             "IO::Handle" : "0",
             "IO::Select" : "0",
@@ -136,7 +135,7 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.662",
+   "version" : "3.663",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

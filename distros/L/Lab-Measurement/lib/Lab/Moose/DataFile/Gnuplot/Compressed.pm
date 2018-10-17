@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot::Compressed;
-$Lab::Moose::DataFile::Gnuplot::Compressed::VERSION = '3.662';
+$Lab::Moose::DataFile::Gnuplot::Compressed::VERSION = '3.663';
 #ABSTRACT: Text based data file ('Gnuplot style'), auto-compressed
 
 use 5.010;
@@ -7,9 +7,9 @@ use warnings;
 use strict;
 
 use Moose;
-use IO::Compress::Bzip2;
 use File::Basename qw/dirname basename/;
 use Lab::Moose::Catfile 'our_catfile';
+use Module::Load;
 use Carp;
 
 extends 'Lab::Moose::DataFile::Gnuplot';
@@ -21,43 +21,54 @@ has compression => (
 );
 
 
-sub _open_file {
+sub _suffix {
+    my %suffixtable=(
+        None  => '',
+        Gzip  => '.gz',
+        Bzip2 => '.bz2',
+        Lzf   => '.lzf',
+        Xz    => '.xz'
+    );
+
+    my $module = shift;
+    if (defined $suffixtable{$module}) {
+        return $suffixtable{$module};
+    } else {
+        croak "Unsupported compression module $module";
+    };
+}
+
+sub _modify_file_path {
     my $self = shift;
+    my $path = shift;
+    return $path . _suffix($self->compression());
+}
 
-    my $folder   = $self->folder->path();
-    my $filename = $self->filename();
+sub _open_filehandle {
+    my $self = shift;
+    my $path = shift;
 
-    my $dirname = dirname($filename);
-    my $dirpath = our_catfile( $folder, $dirname );
+    my $fh;
 
-    if ( not -e $dirpath ) {
-        make_path($dirpath)
-            or croak "cannot make directory '$dirname'";
+    if ($self->compression() eq 'None') {
+
+        $fh = super();
+
+    } else {
+
+	my $modulename = "IO::Compress::" . $self->compression();
+        load $modulename;
+
+        $fh   = ("IO::Compress::".$self->compression())->new($path)
+            or croak "cannot open '$path': $!";
+
     }
 
-    my $path = our_catfile( $folder, $filename );
-
-    $self->_path($path);
-
-    if ( -e $path ) {
-        croak "path '$path' does already exist";
-    }
-
-    my $fh = new IO::Compress::Bzip2 $path
-        or croak "cannot open '$path': $!";
-
-    binmode $fh
-        or croak "cannot set binmode for '$path'";
-
-    if ( $self->autoflush() ) {
-        $fh->autoflush();
-    }
-
-    $self->_filehandle($fh);
+    return $fh;
 }
 
 sub add_plot {
-   croak("Compressed data files do not (yet) support plots.");
+    croak("Compressed data files do not (yet) support plots.");
 }
 
 sub refresh_plots {
@@ -77,7 +88,7 @@ Lab::Moose::DataFile::Gnuplot::Compressed - Text based data file ('Gnuplot style
 
 =head1 VERSION
 
-version 3.662
+version 3.663
 
 =head1 SYNOPSIS
 
@@ -105,18 +116,28 @@ L<Lab::Moose::DataFile::Gnuplot> requirements:
 
 =item * compression
 
-Compression type; defaults to 'Bzip2' (which is also the only supported value 
-right now).
+Compression type; defaults to 'Bzip2', which is also the only value
+that has been tested so far. The following values are possible:
+
+  None
+  Gzip
+  Bzip2
+  Lzf
+  Xz
+
+Note that (except for None) this requires the corresponding
+IO::Compress:: modules to be available; only Gzip and Bzip2 are
+part of core perl.
 
 =back
 
-Note: this datafile type does not (yet) support any plots.
+This datafile type does not support any plots.
 
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2018       Andreas K. Huettel
+  Copyright 2018       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
 # Business::Bitcoin::Request - Bitcoin payment request
-# Copyright (c) 2016-2017 Ashish Gulhati <biz-btc at hash dot neomailbox.ch>
+# Copyright (c) Ashish Gulhati <biz-btc at hash dot neomailbox.ch>
 #
-# $Id: lib/Business/Bitcoin/Request.pm v1.047 Thu Aug 17 01:01:54 PDT 2017 $
+# $Id: lib/Business/Bitcoin/Request.pm v1.051 Tue Oct 16 22:26:58 PDT 2018 $
 
 use warnings;
 use strict;
@@ -21,7 +21,7 @@ use Crypt::RIPEMD160;
 
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.047 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.051 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %args) = @_;
@@ -61,8 +61,8 @@ sub _find {
   return if defined $args{Address} and defined $args{Reference};
   return unless defined $args{_BizBTC} and $args{_BizBTC}->db->ping;
 
-  my $query = 'SELECT reqid,address,amount,refid,created,processed,status from requests WHERE ' .
-    (defined $args{Address} ? "address='$args{Address}';" : "refid='$args{Reference}';");
+  my $query = 'SELECT reqid,address,amount,reference,created,processed,status from requests WHERE ' .
+    (defined $args{Address} ? "address='$args{Address}';" : "reference='$args{Reference}';");
   my ($reqid, $address, $amount, $refid, $created, $processed, $status) = $args{_BizBTC}->db->selectrow_array($query);
   bless { Address => $address,
 	  Amount => $amount,
@@ -80,10 +80,14 @@ sub commit {
   my $self = shift;
   my $processed = $self->processed;
   my $status = $self->status;
+  my $amount = $self->amount;
+  my $refid = $self->reference;
   my $address = $self->address;
   my @updates;
   push @updates, "processed = '" . $processed . "'" if $processed;
+  push @updates, "reference = '" . $refid . "'" if $refid;
   push @updates, "status = '" . $status . "'" if $status;
+  push @updates, "amount = '" . $amount . "'" if $amount;
   return 1 unless my $updates = join ',',@updates;
   return undef unless $self->db->do("UPDATE requests SET $updates where address='$address';");
   return 1;
@@ -164,7 +168,7 @@ sub _encode58 {
 sub AUTOLOAD {
   my $self = shift; (my $auto = $AUTOLOAD) =~ s/.*:://;
   return if $auto eq 'DESTROY';
-  if ($auto =~ /^(confirmations|processed|status|error)$/x and defined $_[0]) {
+  if ($auto =~ /^(confirmations|processed|status|amount|reference|error)$/x and defined $_[0]) {
     $self->{"\u$auto"} = shift;
   }
   if ($auto =~ /^(reqid|amount|address|reference|version|created|confirmations|processed|status|error)$/x) {
@@ -184,8 +188,8 @@ Business::Bitcoin::Request - Bitcoin payment request
 
 =head1 VERSION
 
- $Revision: 1.047 $
- $Date: Thu Aug 17 01:01:54 PDT 2017 $
+ $Revision: 1.051 $
+ $Date: Tue Oct 16 22:26:58 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -312,10 +316,12 @@ L<http://search.cpan.org/dist/Business-Bitcoin/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2016-2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See L<http://www.perlfoundation.org/artistic_license_2_0> for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

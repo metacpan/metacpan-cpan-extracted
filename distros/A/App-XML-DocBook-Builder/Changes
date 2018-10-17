@@ -1,3 +1,9 @@
+0.0601  2018-10-17
+        - Fix --trailing-slash=0 to avoid mkpath.
+
+0.0600  2018-10-17
+        - Add the --trailing-slash=0 option.
+
 0.0500  2018-09-12
         - Add support for the "xhtml5" mode.
 

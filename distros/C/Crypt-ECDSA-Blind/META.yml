@@ -24,5 +24,5 @@ requires:
   DBI: '0'
   Digest::SHA: '5.95'
   Math::EllipticCurve::Prime: '0.003'
-version: '1.014'
+version: '1.015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

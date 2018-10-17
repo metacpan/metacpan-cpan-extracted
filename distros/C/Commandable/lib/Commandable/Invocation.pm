@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010; # //
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -67,6 +67,30 @@ sub new
    return bless {
       text => $text,
    }, $class;
+}
+
+=head2 new_from_tokens
+
+   $inv = Commandable::Invocation->new_from_tokens( @tokens )
+
+I<Since version 0.03.>
+
+Constructs a new instance, initialised to contain text from the given tokens,
+such that subsequent calls to L</pull_token> will yield the given list of
+tokens. This may be handy for constructing instances from C<@ARGV> or similar
+cases where text has already been parsed and split into tokens.
+
+=cut
+
+sub new_from_tokens
+{
+   my $class = shift;
+   my ( @tokens ) = @_;
+
+   my $self = $class->new( "" );
+   $self->putback_tokens( @tokens );
+
+   return $self;
 }
 
 =head1 METHODS

@@ -1,4 +1,4 @@
-package Pcore::PDF v0.5.6;
+package Pcore::PDF v0.5.7;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
@@ -159,7 +159,6 @@ sub _run_thread ($self) {
         my $proc;
 
         while () {
-          REDO:
             return if !defined $self;
 
             if ( my $task = shift $self->{_queue}->@* ) {
@@ -169,7 +168,7 @@ sub _run_thread ($self) {
 
                 $task->[1]->( $self->_run_task( $task, $proc ) );
 
-                goto REDO;
+                next;
             }
 
             $self->{_signal}->wait;
@@ -267,9 +266,9 @@ sub _run_task ( $self, $task, $proc ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 277                  | * Link L<Pcore::Util::Result> on line 334 does not specify text                                                |
-## |      | 277                  | * Link L<Pcore::Util::Result> on line 344 does not specify text                                                |
-## |      | 277                  | * Link L<Pcore> on line 342 does not specify text                                                              |
+## |      | 276                  | * Link L<Pcore::Util::Result> on line 333 does not specify text                                                |
+## |      | 276                  | * Link L<Pcore::Util::Result> on line 343 does not specify text                                                |
+## |      | 276                  | * Link L<Pcore> on line 341 does not specify text                                                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

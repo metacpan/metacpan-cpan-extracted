@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
 # IPC::Queue::Duplex::Job - An IPC::Queue::Duplex job
-# Copyright (c) 2017 Ashish Gulhati <ipc-qd at hash.neo.tc>
+# Copyright (c) Ashish Gulhati <ipc-qd at hash.neo.tc>
 #
-# $Id$
+# $Id: lib/IPC/Queue/Duplex/Job.pm v1.009 Tue Oct 16 21:48:32 PDT 2018 $
 
 package IPC::Queue::Duplex::Job;
 
@@ -54,8 +54,8 @@ IPC::Queue::Duplex::Job - An IPC::Queue::Duplex job
 
 =head1 VERSION
 
- $Revision: 1.003 $
- $Date: Sat May  6 17:13:44 PDT 2017 $
+ $Revision: 1.009 $
+ $Date: Tue Oct 16 21:48:32 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -138,10 +138,12 @@ L<http://search.cpan.org/dist/IPC-Queue-Duplex/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 2.0.
 
-See L<http://www.perlfoundation.org/artistic_license_2_0> for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal20.txt> for the full license
+terms, and ensure that the license grant applies to you before using
+or modifying this software. By using or modifying this software, you
+indicate your agreement with the license terms.

@@ -78,155 +78,155 @@
    "provides" : {
       "XML::Grammar::Fiction" : {
          "file" : "lib/XML/Grammar/Fiction.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::App::FromProto" : {
          "file" : "lib/XML/Grammar/Fiction/App/FromProto.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::App::ToDocBook" : {
          "file" : "lib/XML/Grammar/Fiction/App/ToDocBook.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::App::ToHTML" : {
          "file" : "lib/XML/Grammar/Fiction/App/ToHTML.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::Err" : {
          "file" : "lib/XML/Grammar/Fiction/Err.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node::Comment" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node/Comment.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node::Description" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node/Description.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node::Element" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node/Element.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node::InnerDesc" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node/InnerDesc.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node::List" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node/List.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node::Paragraph" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node/Paragraph.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node::Saying" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node/Saying.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node::Text" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node/Text.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Node::WithContent" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Node/WithContent.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Parser" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Parser.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::FromProto::Parser::QnD" : {
          "file" : "lib/XML/Grammar/Fiction/FromProto/Parser/QnD.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::Struct::Tag" : {
          "file" : "lib/XML/Grammar/Fiction/Struct/Tag.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::Struct::Tag::Para" : {
          "file" : "lib/XML/Grammar/Fiction/Struct/Tag.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::ToDocBook" : {
          "file" : "lib/XML/Grammar/Fiction/ToDocBook.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Fiction::ToHTML" : {
          "file" : "lib/XML/Grammar/Fiction/ToHTML.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::FictionBase::Event" : {
          "file" : "lib/XML/Grammar/FictionBase/Event.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::FictionBase::FromProto::Parser::LineIterator" : {
          "file" : "lib/XML/Grammar/FictionBase/FromProto/Parser/LineIterator.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::FictionBase::FromProto::Parser::XmlIterator" : {
          "file" : "lib/XML/Grammar/FictionBase/FromProto/Parser/XmlIterator.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::FictionBase::TagsTree2XML" : {
          "file" : "lib/XML/Grammar/FictionBase/TagsTree2XML.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::FictionBase::XSLT::Converter" : {
          "file" : "lib/XML/Grammar/FictionBase/XSLT/Converter.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay" : {
          "file" : "lib/XML/Grammar/Screenplay.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::App::FromProto" : {
          "file" : "lib/XML/Grammar/Screenplay/App/FromProto.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::App::ToDocBook" : {
          "file" : "lib/XML/Grammar/Screenplay/App/ToDocBook.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::App::ToHTML" : {
          "file" : "lib/XML/Grammar/Screenplay/App/ToHTML.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::Base" : {
          "file" : "lib/XML/Grammar/Screenplay/Base.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::FromProto" : {
          "file" : "lib/XML/Grammar/Screenplay/FromProto.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::FromProto::Parser" : {
          "file" : "lib/XML/Grammar/Screenplay/FromProto/Parser.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::FromProto::Parser::QnD" : {
          "file" : "lib/XML/Grammar/Screenplay/FromProto/Parser/QnD.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::ToDocBook" : {
          "file" : "lib/XML/Grammar/Screenplay/ToDocBook.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::ToHTML" : {
          "file" : "lib/XML/Grammar/Screenplay/ToHTML.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       },
       "XML::Grammar::Screenplay::ToTEI" : {
          "file" : "lib/XML/Grammar/Screenplay/ToTEI.pm",
-         "version" : "v0.15.0"
+         "version" : "v0.16.0"
       }
    },
    "release_status" : "stable",
@@ -242,7 +242,7 @@
          "web" : "http://bitbucket.org/shlomif/perl-XML-Grammar-Fiction"
       }
    },
-   "version" : "v0.15.0",
+   "version" : "v0.16.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -486,6 +486,16 @@
                   ],
                   "plugins" : [
                      {
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@SHLOMIF/SingleEncoding",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::WikiDoc",
+                        "name" : "@SHLOMIF/WikiDoc",
+                        "version" : "0.093004"
+                     },
+                     {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
                         "version" : "4.015"
@@ -496,79 +506,109 @@
                         "version" : "4.015"
                      },
                      {
-                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
-                        "name" : "-SingleEncoding",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "NAME",
+                        "class" : "Pod::Weaver::Section::Name",
+                        "name" : "@SHLOMIF/Name",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
-                        "name" : "Version",
+                        "name" : "@SHLOMIF/Version",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "prelude",
+                        "name" : "@SHLOMIF/Prelude",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "SYNOPSIS",
+                        "name" : "@SHLOMIF/Synopsis",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "DESCRIPTION",
+                        "name" : "@SHLOMIF/Description",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
-                        "name" : "OVERVIEW",
+                        "name" : "@SHLOMIF/Usage",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Overview",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@SHLOMIF/Stability",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "ATTRIBUTES",
+                        "name" : "Requirements",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
-                        "name" : "METHODS",
+                        "name" : "Attributes",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Constructors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Methods",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "Functions",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
-                        "name" : "Leftovers",
+                        "name" : "@SHLOMIF/Leftovers",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
-                        "name" : "postlude",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Authors",
-                        "name" : "Authors",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Legal",
-                        "name" : "Legal",
-                        "version" : "4.015"
-                     },
-                     {
-                        "class" : "Pod::Weaver::Section::Bugs",
-                        "name" : "Bugs",
+                        "name" : "@SHLOMIF/postlude",
                         "version" : "4.015"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Support",
-                        "name" : "Support",
+                        "name" : "@SHLOMIF/Support",
                         "version" : "1.010"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@SHLOMIF/Authors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Bugs",
+                        "name" : "@SHLOMIF/Bugs",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Contributors",
+                        "name" : "@SHLOMIF/Contributors",
+                        "version" : "0.009"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "@SHLOMIF/Legal",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@SHLOMIF/List",
+                        "version" : "4.015"
                      }
                   ]
                }

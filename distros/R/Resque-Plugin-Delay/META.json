@@ -4,7 +4,7 @@
       "meru_akimbo <merukatoruayu0@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.2",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "perl_5"
    ],
@@ -42,10 +42,9 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::XS" : "0",
+            "JSON" : "0",
             "Moose" : "0",
-            "Resque" : "0.31",
-            "perl" : "5.008001"
+            "Resque" : "0.31"
          }
       },
       "test" : {
@@ -61,7 +60,7 @@
    "provides" : {
       "Resque::Plugin::Delay" : {
          "file" : "lib/Resque/Plugin/Delay.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Resque::Plugin::Delay::Dequeue" : {
          "file" : "lib/Resque/Plugin/Delay/Dequeue.pm"
@@ -81,7 +80,8 @@
          "web" : "https://github.com/meru-akimbo/resque-delay-perl"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:MERU",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }
