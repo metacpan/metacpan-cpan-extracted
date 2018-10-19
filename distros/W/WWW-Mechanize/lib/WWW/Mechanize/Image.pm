@@ -3,7 +3,7 @@ package WWW::Mechanize::Image;
 use strict;
 use warnings;
 
-our $VERSION = '1.88';
+our $VERSION = '1.89';
 
 #ABSTRACT: Image object for WWW::Mechanize
 
@@ -14,7 +14,7 @@ sub new {
 
     my $self = bless {}, $class;
 
-    for my $parm ( qw( url base tag height width alt name ) ) {
+    for my $parm ( qw( url base tag height width alt name attrs ) ) {
         # Check for what we passed in, not whether it's defined
         $self->{$parm} = $parms->{$parm} if exists $parms->{$parm};
     }
@@ -35,6 +35,7 @@ sub tag     { return ($_[0])->{tag}; }
 sub height  { return ($_[0])->{height}; }
 sub width   { return ($_[0])->{width}; }
 sub alt     { return ($_[0])->{alt}; }
+sub attrs   { return ($_[0])->{attrs}; }
 
 
 sub URI {
@@ -68,7 +69,7 @@ WWW::Mechanize::Image - Image object for WWW::Mechanize
 
 =head1 VERSION
 
-version 1.88
+version 1.89
 
 =head1 SYNOPSIS
 
@@ -84,10 +85,11 @@ Creates and returns a new C<WWW::Mechanize::Image> object.
         url    => $url,
         base   => $base,
         tag    => $tag,
-        name   => $name,    # From the INPUT tag
-        height => $height,  # optional
-        width  => $width,   # optional
-        alt    => $alt,     # optional
+        name   => $name,     # From the INPUT tag
+        height => $height,   # optional
+        width  => $width,    # optional
+        alt    => $alt,      # optional
+        attrs  => $attr_ref, # optional
     } );
 
 =head1 Accessors
@@ -119,6 +121,10 @@ Image width
 =head2 $link->alt()
 
 ALT attribute from the source tag, if any.
+
+=head2 $link->attrs()
+
+Hash ref of all the attributes and attribute values in the tag.
 
 =head2 $link->URI()
 

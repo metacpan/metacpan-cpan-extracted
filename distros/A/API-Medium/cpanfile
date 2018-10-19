@@ -4,3 +4,4 @@ requires 'Log::Any';
 requires 'IO::Socket::SSL';
 requires 'Cpanel::JSON::XS';
 requires 'JSON::MaybeXS';
+requires 'Module::Runtime';

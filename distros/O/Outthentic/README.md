@@ -6,9 +6,11 @@ Outthentic - Multipurpose scenarios framework.
 
 Multipurpose scenarios framework.
 
-# Build status
+# Build statuses
 
 [![Build Status](https://travis-ci.org/melezhik/outthentic.svg)](https://travis-ci.org/melezhik/outthentic)
+
+[![Build status](https://ci.appveyor.com/api/projects/status/pkn4rerw4g27mqfx?svg=true)](https://ci.appveyor.com/project/melezhik/outthentic)
 
 
 # Install
@@ -517,11 +519,11 @@ Here is the list of function one can use _inside hooks_:
 
 * `cache_dir()` - storie's cache directory ( containing story's compiled files )
 
-* `story_dir()` - the directory containing story data.
+* `story_dir()` - relate path to the directory containing story data, so the full path to the story is `project_root_dir()/story_dir()`
 
 * `config()` - returns suite configuration hash object. See also [suite configuration](#suite-configuration).
 
-* os() - return a mnemonic ID of operation system where story is executed.
+* `os()` - return a mnemonic ID of operation system where story is executed.
 
 
 (*) You need to `from outthentic import *` in Python to import os() function.
@@ -541,6 +543,7 @@ Here is the list of function one can use _inside hooks_:
 * ubuntu
 * funtoo
 * darwin
+* windows
 
 # Story meta headers
 
@@ -586,6 +589,48 @@ Examples:
 
     $ nano hook.bash
       ignore_story_err 1
+
+# Immediate exit/die
+
+You can cause strun exits immediate with code 0, using `quit()` function.
+
+Examples:
+
+
+    # Python
+
+    $ nano hook.py
+      from outthentic import *
+      quit("this script is temporarily disabled")
+
+
+    # Ruby
+
+    $ nano hook.rb
+      if os != "windows"
+        quit("windows system is not supported")
+      end
+
+    # Perl
+
+    $ nano hook.pl
+      unless (os() eq "ubuntu"){
+        quit("runs on ubuntu system only")
+      }
+
+    # Bash
+
+    $ nano hook.bash
+      which /bin/curl || quit "curl not found, skip"
+
+Alternately you can ask strun to abort straight away ( with none zero exit code ), using `outthentic_die()` function.
+
+Examples:
+
+    $ nano hook.bash
+    if [ "$EUID" -ne 0 ]
+      then outthentic_die "Please run as root"
+    fi
 
 # Story libraries
 
@@ -718,6 +763,9 @@ Examples:
     --story foo/story # runs foo/story.pl
     --story foo/bar/ # runs foo/bar/ stories
 
+* `--recurse` 
+
+Runs all the stories recursively.
 
 * `--ini`  
 

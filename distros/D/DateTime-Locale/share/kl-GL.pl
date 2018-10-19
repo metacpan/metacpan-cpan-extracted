@@ -67,7 +67,7 @@
     "sis",
     "tal",
     "arf",
-    "sab",
+    "sap",
   ],
   day_format_narrow => [
     "M",
@@ -85,7 +85,7 @@
     "sisamanngorneq",
     "tallimanngorneq",
     "arfininngorneq",
-    "sabaat",
+    "sapaat",
   ],
   day_stand_alone_abbreviated => [
     "ata",
@@ -94,7 +94,7 @@
     "sis",
     "tal",
     "arf",
-    "sab",
+    "sap",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -112,7 +112,7 @@
     "sisamanngorneq",
     "tallimanngorneq",
     "arfininngorneq",
-    "sabaat",
+    "sapaat",
   ],
   era_abbreviated => [
     "BCE",
@@ -266,5 +266,5 @@
   time_format_medium => "HH.mm.ss",
   time_format_short => "HH.mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

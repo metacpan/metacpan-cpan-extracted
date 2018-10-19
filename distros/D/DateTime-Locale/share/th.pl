@@ -32,7 +32,7 @@
     MMMEd => "E d MMM",
     MMMMEEEEd => "EEEE\N{U+0e17}\N{U+0e35}\N{U+0e48} d MMMM",
     MMMMEd => "E d MMMM",
-    "MMMMW-count-other" => "\N{U+0e2a}\N{U+0e31}\N{U+0e1b}\N{U+0e14}\N{U+0e32}\N{U+0e2b}\N{U+0e4c}\N{U+0e17}\N{U+0e35}\N{U+0e48} W \N{U+0e02}\N{U+0e2d}\N{U+0e07} MMM",
+    "MMMMW-count-other" => "\N{U+0e2a}\N{U+0e31}\N{U+0e1b}\N{U+0e14}\N{U+0e32}\N{U+0e2b}\N{U+0e4c}\N{U+0e17}\N{U+0e35}\N{U+0e48} W \N{U+0e02}\N{U+0e2d}\N{U+0e07}\N{U+0e40}\N{U+0e14}\N{U+0e37}\N{U+0e2d}\N{U+0e19}MMMM",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     Md => "d/M",
@@ -58,7 +58,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ G y",
-    "yw-count-other" => "\N{U+0e2a}\N{U+0e31}\N{U+0e1b}\N{U+0e14}\N{U+0e32}\N{U+0e2b}\N{U+0e4c}\N{U+0e17}\N{U+0e35}\N{U+0e48} w \N{U+0e02}\N{U+0e2d}\N{U+0e07} Y",
+    "yw-count-other" => "\N{U+0e2a}\N{U+0e31}\N{U+0e1b}\N{U+0e14}\N{U+0e32}\N{U+0e2b}\N{U+0e4c}\N{U+0e17}\N{U+0e35}\N{U+0e48} w \N{U+0e02}\N{U+0e2d}\N{U+0e07}\N{U+0e1b}\N{U+0e35} Y",
   },
   code => "th",
   date_format_full => "EEEE\N{U+0e17}\N{U+0e35}\N{U+0e48} d MMMM G y",
@@ -124,7 +124,7 @@
     "\N{U+0e27}\N{U+0e31}\N{U+0e19}\N{U+0e2d}\N{U+0e32}\N{U+0e17}\N{U+0e34}\N{U+0e15}\N{U+0e22}\N{U+0e4c}",
   ],
   era_abbreviated => [
-    "\N{U+0e1b}\N{U+0e35}\N{U+0e01}\N{U+0e48}\N{U+0e2d}\N{U+0e19} \N{U+0e04}.\N{U+0e28}.",
+    "\N{U+0e01}\N{U+0e48}\N{U+0e2d}\N{U+0e19} \N{U+0e04}.\N{U+0e28}.",
     "\N{U+0e04}.\N{U+0e28}.",
   ],
   era_narrow => [
@@ -132,7 +132,7 @@
     "\N{U+0e04}.\N{U+0e28}.",
   ],
   era_wide => [
-    "\N{U+0e1b}\N{U+0e35}\N{U+0e01}\N{U+0e48}\N{U+0e2d}\N{U+0e19}\N{U+0e04}\N{U+0e23}\N{U+0e34}\N{U+0e2a}\N{U+0e15}\N{U+0e4c}\N{U+0e28}\N{U+0e31}\N{U+0e01}\N{U+0e23}\N{U+0e32}\N{U+0e0a}",
+    "\N{U+0e1b}\N{U+0e35}\N{U+0e01}\N{U+0e48}\N{U+0e2d}\N{U+0e19}\N{U+0e04}\N{U+0e23}\N{U+0e34}\N{U+0e2a}\N{U+0e15}\N{U+0e01}\N{U+0e32}\N{U+0e25}",
     "\N{U+0e04}\N{U+0e23}\N{U+0e34}\N{U+0e2a}\N{U+0e15}\N{U+0e4c}\N{U+0e28}\N{U+0e31}\N{U+0e01}\N{U+0e23}\N{U+0e32}\N{U+0e0a}",
   ],
   first_day_of_week => 1,
@@ -275,5 +275,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

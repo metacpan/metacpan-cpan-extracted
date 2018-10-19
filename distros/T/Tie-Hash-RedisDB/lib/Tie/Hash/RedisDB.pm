@@ -2,13 +2,15 @@ package Tie::Hash::RedisDB;
 
 use strict;
 use warnings;
-our $VERSION = '1.00';
+our $VERSION = '1.03';
 
 use Carp qw(croak);
-use JSON qw(decode_json encode_json);
+use JSON;
 use Scalar::Util qw(reftype);
 use RedisDB;
 use Try::Tiny;
+
+my $json = JSON->new->utf8->allow_nonref;
 
 sub TIEHASH {
     my ($self, $addr, $args) = @_;
@@ -38,24 +40,21 @@ sub TIEHASH {
 sub FETCH {
     my ($self, $key) = @_;
 
-    my $rval = $self->{REDIS}->hget($self->{WHERE}, $key);
+    my $val = $self->{REDIS}->hget($self->{WHERE}, $key);
 
-    return try { decode_json($rval) } catch { $rval }
+    return $val && $json->decode($val);
 }
 
 sub STORE {
     my ($self, $key, $val) = @_;
 
-    if (reftype($val)) {
-        $val = try { encode_json($val) } catch { $val };
-    }
-
     my $redis = $self->{REDIS};
 
-    $redis->hset($self->{WHERE}, $key, $val);
+    $redis->hset($self->{WHERE}, $key, $json->encode($val));
     if (my $expiry = $self->{EXP_SECONDS}) {
         $redis->expire($self->{WHERE}, $expiry);
     }
+
     return 1;
 }
 
@@ -121,6 +120,10 @@ Tie::Hash::RedisDB - A very thin Tie around a RedisDB Hash
 =head1 SYNOPSIS
 
   use Tie::Hash::RedisDB;
+  my $redis_key = 'scrub';
+  my %bucket;
+  tie %bucket, 'Tie::Hash::RedisDB', $redis_key,
+   { expiry => 60, namespace => 'buckets', redis_uri => 'redis://localhost'};
 
 =head1 DESCRIPTION
 
@@ -128,7 +131,7 @@ Tie::Hash::RedisDB is Redis hashes refied into perl hashes.
 
 =head1 AUTHOR
 
-Inspire.com
+ClinicaHealth, Inc. dba Inspire
 
 =head1 COPYRIGHT
 

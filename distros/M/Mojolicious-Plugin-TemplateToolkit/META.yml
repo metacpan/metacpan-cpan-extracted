@@ -26,10 +26,10 @@ no_index:
 provides:
   Mojolicious::Plugin::TemplateToolkit:
     file: lib/Mojolicious/Plugin/TemplateToolkit.pm
-    version: '0.004'
+    version: '0.005'
   Template::Provider::Mojo:
     file: lib/Template/Provider/Mojo.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit/issues
   homepage: https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit
   repository: https://github.com/Grinnz/Mojolicious-Plugin-TemplateToolkit.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -194,7 +194,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.004'
+          tag: '0.005'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

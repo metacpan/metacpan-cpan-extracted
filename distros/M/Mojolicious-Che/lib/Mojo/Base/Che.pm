@@ -2,6 +2,7 @@ package Mojo::Base::Che;
 # ABSTRACT: some patch for Mojo::Base(current 8.02)
 
 use Mojo::Base -strict;
+use mro;
 
 # copy-paste sub Mojo::Base::attr + patch 1 line
 sub Mojo::Base::attr {

@@ -26,12 +26,18 @@ my @optionals = (
       objects from the SIMBAD database. If you do not intend to use
       this functionality, Astro::SIMBAD::Client is not needed.
 EOD
-    __any( 'Astro::SpaceTrack'	=> <<'EOD' ),
+    __any( 'Astro::SpaceTrack=0.105'	=> <<'EOD' ),
       This module is required for the Astro::App::Satpass2 spacetrack()
       method, which retrieves satellite TLE data from Space Track and
-      other web sites.  If you intend to get your TLEs externally to
-      this package (say, with a web browser or curl), Astro::SpaceTrack
-      is not needed.
+      other web sites. Version 0.105 is needed because of a change in
+      the way help is displayed. If you intend to get your TLEs
+      externally to this package (say, with a web browser or curl),
+      Astro::SpaceTrack is not needed.
+EOD
+    __any( 'Browser::Open'		=> <<'EOD' ),
+      This module is being phased in as the only supported way to
+      display web-based help. If you intend to leave the 'webcmd'
+      attribute false, this module is not needed.
 EOD
     __any( 'Date::Manip'		=> <<'EOD' .
       This module is not required, but the alternative to installing it

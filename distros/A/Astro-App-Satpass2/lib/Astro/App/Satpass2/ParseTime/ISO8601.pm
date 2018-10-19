@@ -5,13 +5,14 @@ use warnings;
 
 use Astro::App::Satpass2::Utils qw{
     back_end __back_end_class_name_of_record __parse_class_and_args
+    @CARP_NOT
 };
 use Astro::Coord::ECI::Utils 0.077 qw{
     looks_like_number SECSPERDAY time_gm time_local };
 
 use parent qw{ Astro::App::Satpass2::ParseTime };
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 my $package = __PACKAGE__;
 
@@ -37,7 +38,7 @@ sub class_name_of_record {
 }
 
 my $zone_re = qr{ (?i: ( Z | UT | GMT ) |
-    ( [+-] ) ( \d{1,2} ) :? ( \d{1,2} )? ) }smx;
+    ( [+-] ) ( [0-9]{1,2} ) :? ( [0-9]{1,2} )? ) }smx;
 
 sub delegate {
     return __PACKAGE__;

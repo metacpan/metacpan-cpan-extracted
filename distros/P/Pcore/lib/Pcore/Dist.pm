@@ -3,25 +3,25 @@ package Pcore::Dist;
 use Pcore -class;
 use Config;
 
-has root         => ( is => 'ro', isa => Maybe [Str], required => 1 );    # absolute path to the dist root
-has is_cpan_dist => ( is => 'ro', isa => Bool,        required => 1 );    # dist is installed as CPAN module, root is undefined
-has share_dir    => ( is => 'ro', isa => Str,         required => 1 );    # absolute path to the dist share dir
+has root         => ( is => 'ro', required => 1 );                      # Maybe [Str], absolute path to the dist root
+has is_cpan_dist => ( is => 'ro', isa      => Bool, required => 1 );    # dist is installed as CPAN module, root is undefined
+has share_dir    => ( is => 'ro', isa      => Str, required => 1 );     # absolute path to the dist share dir
 
-has module => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::Perl::Module'] );
+has module => ( is => 'lazy' );                                         # InstanceOf ['Pcore::Util::Perl::Module']
 
-has cfg => ( is => 'lazy', isa => HashRef, init_arg => undef );           # dist cfg
-has docker_cfg => ( is => 'lazy', isa => Maybe [HashRef], init_arg => undef );    # docker.json
-has par_cfg    => ( is => 'lazy', isa => Maybe [HashRef], init_arg => undef );    # par.ini
-has name     => ( is => 'lazy', isa => Str,  init_arg => undef );                 # Dist-Name
-has is_pcore => ( is => 'lazy', isa => Bool, init_arg => undef );
-has is_main  => ( is => 'ro',   isa => Bool, default  => 0, init_arg => undef );  # main process dist
-has scm => ( is => 'lazy', isa => Maybe [ ConsumerOf ['Pcore::API::SCM'] ], init_arg => undef );
-has build => ( is => 'lazy', isa => InstanceOf ['Pcore::Dist::Build'], init_arg => undef );
-has id      => ( is => 'lazy', isa => HashRef, init_arg => undef );
-has version => ( is => 'lazy', isa => Object,  init_arg => undef );
-has is_commited => ( is => 'lazy', isa => Maybe [Bool],     init_arg => undef );
-has releases    => ( is => 'lazy', isa => Maybe [ArrayRef], init_arg => undef );
-has docker      => ( is => 'lazy', isa => Maybe [HashRef],  init_arg => undef );
+has cfg         => ( is => 'lazy', isa      => HashRef, init_arg => undef );               # dist cfg
+has docker_cfg  => ( is => 'lazy', init_arg => undef );                                    # Maybe [HashRef], docker.json
+has par_cfg     => ( is => 'lazy', init_arg => undef );                                    # Maybe [HashRef], par.ini
+has name        => ( is => 'lazy', isa      => Str, init_arg => undef );                   # Dist-Name
+has is_pcore    => ( is => 'lazy', isa      => Bool, init_arg => undef );
+has is_main     => ( is => 'ro',   isa      => Bool, default => 0, init_arg => undef );    # main process dist
+has scm         => ( is => 'lazy', init_arg => undef );                                    # Maybe [ ConsumerOf ['Pcore::API::SCM'] ]
+has build       => ( is => 'lazy', init_arg => undef );                                    # InstanceOf ['Pcore::Dist::Build']
+has id          => ( is => 'lazy', isa      => HashRef, init_arg => undef );
+has version     => ( is => 'lazy', isa      => Object, init_arg => undef );
+has is_commited => ( is => 'lazy', init_arg => undef );                                    # Maybe [Bool]
+has releases    => ( is => 'lazy', init_arg => undef );                                    # Maybe [ArrayRef]
+has docker      => ( is => 'lazy', init_arg => undef );                                    # Maybe [HashRef]
 
 around new => sub ( $orig, $self, $dist ) {
 

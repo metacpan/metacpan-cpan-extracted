@@ -1,3 +1,28 @@
+v0.75.1 2018-10-18T05:58:51Z
+ - CA updated
+ - src is_binary fixed for zero file size
+
+v0.75.0 2018-10-18T05:17:32Z
+ - scandeps cli removed
+ - scandeps improved
+ - par crypt
+ - reload classes
+ - path1 prototype
+ - comments
+ - jquery3
+ - digitalocean cdn added
+ - tmpl refactored
+ - crg read with tmpl
+ - OOP BUILD args
+ - cdn
+ - cdn nginx cfg
+ - app controllers
+ - cdn upload async
+ - cdn sync
+ - read dir refactored
+ - tree find_file removed
+ - file->find removed
+
 v0.74.2 2018-09-22T11:12:27Z
  - cdn resources updated
 

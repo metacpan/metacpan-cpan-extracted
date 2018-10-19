@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.10
+    version 0.11
 
 SYNOPSIS
 
@@ -25,13 +25,12 @@ SYNOPSIS
 
  OAUTH CREDENTIALS FILE TO ACCESS SERVCICES
 
-    While I personally find the goauth tool useful to create local auth
-    credentials and can work with the code, you may find it more useful to
-    do it all yourself using an approach like at
-    https://blog.ludin.org/2017/01/15/using-google-apis-with-perl-part-3-si
-    mplicity/
+    TODO
 
-    This code still retains a lot of the bad smells of the parents.
+ BUILD
+
+    WebService::GoogleAPI::Client->new( user => 'useremail@sdf.com',
+    gapi_json => '/fullpath/gapi.json' );
 
  api_query
 
@@ -121,6 +120,9 @@ SYNOPSIS
     Discovery Resource that is either fetched or cached in CHI locally for
     30 days.
 
+    WHen called in a scalar context returns the list as a comma joined
+    string.
+
     DELEGATED FROM WebService::GoogleAPI::Client::Discovery
 
 FUNCTIONAL CLASS PROPERTIES
@@ -186,9 +188,8 @@ SEE ALSO
       https:
 
       * Moo::Google - The original code base later forked into
-      WebService::Google by Steve Dondley. This is where this code started
-      believing that I could clean it up. In hindisght it would have been
-      much easier to start from scratch.
+      WebService::Google::Client by Steve Dondley. Some shadows of the
+      original design remain
 
       * "/github.com/APIs-guru/google-discovery-to-swagger" in Google
       Swagger API https:
@@ -201,8 +202,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2017-2018 by Pavel Serikov, Peter Scott
-    and others.
+    This software is Copyright (c) 2017-2018 by Peter Scott and others.
 
     This is free software, licensed under:
 

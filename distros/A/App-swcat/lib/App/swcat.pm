@@ -1,13 +1,14 @@
 package App::swcat;
 
-our $DATE = '2018-09-21'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-10-18'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
 
+use Perinci::Object;
 use PerlX::Maybe;
 
 use vars '%Config';
@@ -46,6 +47,8 @@ our $db_schema_spec = {
     ], # install
 }; # db_schema_spec
 
+our $re_software = qr/\A[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)*\z/;
+
 our %args_common = (
     db_path => {
         summary => 'Location of SQLite database (for caching), '.
@@ -68,7 +71,7 @@ our %args_common = (
 
 our %arg0_software = (
     software => {
-        schema => ['str*', match=>qr/\A[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)*\z/],
+        schema => ['str*', match=>$re_software],
         req => 1,
         pos => 0,
         completion => sub {
@@ -82,6 +85,31 @@ our %arg0_software = (
         },
     },
 );
+
+our %argopt0_softwares_or_patterns = (
+    softwares_or_patterns => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'software_or_pattern',
+        schema => ['array*', of=>['str*', min_len=>1], min_len=>1],
+        pos => 0,
+        greedy => 1,
+        element_completion => sub {
+            require Complete::Module;
+            my %args = @_;
+            Complete::Module::complete_module(
+                word => $args{word},
+                ns_prefix => 'Software::Catalog::SW',
+                path_sep => '-',
+            );
+        },
+    },
+);
+
+our %arg0_softwares_or_patterns;
+$arg0_softwares_or_patterns{softwares_or_patterns} = {
+    %{$argopt0_softwares_or_patterns{softwares_or_patterns}},
+    req => 1,
+};
 
 our %argopt_arch = (
     arch => {
@@ -162,8 +190,8 @@ sub _set_args_default {
 sub _init {
     my ($args, $mode) = @_;
 
+    _set_args_default($args);
     unless ($App::swcat::state) {
-        _set_args_default($args);
         my $state = {
             dbh => _connect_db($mode, $args->{db_path}),
             db_path => $args->{db_path},
@@ -200,6 +228,7 @@ sub _cache_result {
         }
 
         my @row = $args{dbh}->selectrow_array("SELECT $args{column}, $args{mtime_column} FROM $args{table} WHERE $sqlwhere", {}, @bind);
+        #log_trace "row=%s, now=%s, cache_period=%s", \@row, $now, $args{cache_period};
         if (!@row) {
             log_trace "Cache doesn't exist yet";
         } elsif ($row[1] < $now - $args{cache_period}) {
@@ -214,7 +243,7 @@ sub _cache_result {
         if ($res->[0] == 200) {
             log_trace "Updating cache ...";
             if ($cache_exists) {
-                $args{dbh}->do("UPDATE $args{table} SET $args{column}=?, $args{mtime_column}=? WHERE $sqlwhere", {}, $res->[2], $now, $args{pk}, @bind);
+                $args{dbh}->do("UPDATE $args{table} SET $args{column}=?, $args{mtime_column}=? WHERE $sqlwhere", {}, $res->[2], $now, @bind);
             } else {
                 $args{dbh}->do("INSERT INTO $args{table} ($sqlcolumns, $args{column}, $args{mtime_column}) VALUES ($sqlbinds, ?,?)", {}, @bind, $res->[2], $now);
             }
@@ -262,37 +291,110 @@ sub list {
     [200, "OK", \@rows];
 }
 
+sub _get_arg_softwares_or_patterns {
+    my $args = shift;
+
+    my $sws = $args->{softwares_or_patterns} // [];
+    my $is_single_software;
+  RESOLVE_PATTERN:
+    {
+        if (@$sws && !(grep {$_ !~ $re_software} @$sws)) {
+            # user specifies all software, no patterns. so we need not match
+            # against list of known software
+            $is_single_software = 1 if @$sws == 1;
+            last;
+        }
+        my $res = list();
+        die "Can't list known software: $res->[0] - $res->[1]"
+            unless $res->[0] == 200;
+        my $known = $res->[2];
+        if (!@$sws) {
+            $sws = $known;
+            last;
+        }
+        my $sws_pat_resolved = [];
+        for my $e (@$sws) {
+            if ($e =~ $re_software) {
+                push @$sws_pat_resolved, $e;
+            } elsif ($e =~ m!\A/(.*)/\z!) {
+                my $re = qr/$1/;
+                for my $sw (@$known) {
+                    push @$sws_pat_resolved, $sw
+                        if $sw =~ $re && !(grep {$sw eq $_} @$sws_pat_resolved);
+                }
+            } else {
+                die "Invalid software name/pattern '$e'";
+            }
+        }
+        $sws = $sws_pat_resolved;
+    } # RESOLVE_PATTERN
+    ($sws, $is_single_software);
+}
+
 $SPEC{latest_version} = {
     v => 1.1,
-    summary => 'Get latest version of a software',
+    summary => 'Get latest version of one or more software',
+    description => <<'_',
+
+Will return the version number in the payload if given a single software name.
+Will return an array of {software=>..., version=>...} in the payload if given
+multiple software names or one or more patterns.
+
+_
     args => {
         %args_common,
-        %arg0_software,
+        %argopt0_softwares_or_patterns,
     },
 };
 sub latest_version {
     my %args = @_;
     my $state = _init(\%args, 'rw');
 
-    my $mod = _load_swcat_mod($args{software});
-    _cache_result(
-        code => sub { $mod->get_latest_version(arch => $args{arch}) },
-        dbh => $state->{dbh},
-        cache_period => $args{cache_period},
-        table => 'sw_cache',
-        pk_column => ['software', 'name'],
-        pk => [$args{software}, "latest_version.$args{arch}"],
-        column => 'value',
-        mtime_column => 'mtime',
-    );
+    my ($sws, $is_single_software) = _get_arg_softwares_or_patterns(\%args);
+    #log_trace "sws=%s", $sws;
+
+    my $envres = envresmulti();
+    my @rows;
+    for my $sw (@$sws) {
+        my $mod = _load_swcat_mod($sw);
+        my $res = _cache_result(
+            code => sub { $mod->get_latest_version(arch => $args{arch}) },
+            dbh => $state->{dbh},
+            cache_period => $args{cache_period},
+            table => 'sw_cache',
+            pk_column => ['software', 'name'],
+            pk => [$sw, "latest_version.$args{arch}"],
+            column => 'value',
+            mtime_column => 'mtime',
+        );
+        $envres->add_result($res->[0], $res->[1], {item_id=>$sw});
+        push @rows, {
+            software=>$sw,
+            version=>$res->[0] == 200 ? $res->[2] : undef,
+        };
+    }
+    my $res = $envres->as_struct;
+    if ($is_single_software) {
+        $res->[2] = $rows[0]{version};
+    } else {
+        $res->[2] = \@rows;
+    }
+    $res;
 }
 
 $SPEC{download_url} = {
     v => 1.1,
     summary => 'Get download URL(s) of a software',
+    description => <<'_',
+
+Will return the version number in the payload if given a single software name.
+Will return an array of {software=>..., version=>...} in the payload if given
+multiple software names or one or more patterns.
+
+_
     args => {
         %args_common,
-        %arg0_software,
+        %argopt0_softwares_or_patterns,
         #%arg_version,
         %argopt_arch,
     },
@@ -301,10 +403,28 @@ sub download_url {
     my %args = @_;
     my $state = _init(\%args, 'ro');
 
-    my $mod = _load_swcat_mod($args{software});
-    my $res = $mod->get_download_url(
-        maybe arch => $args{arch},
-    );
+    my ($sws, $is_single_software) = _get_arg_softwares_or_patterns(\%args);
+
+    my $envres = envresmulti();
+    my @rows;
+    for my $sw (@$sws) {
+        my $mod = _load_swcat_mod($sw);
+        my $res = $mod->get_download_url(
+            maybe arch => $args{arch},
+        );
+        $envres->add_result($res->[0], $res->[1], {item_id=>$sw});
+        push @rows, {
+            software => $sw,
+            url => $res->[2],
+        };
+    }
+    my $res = $envres->as_struct;
+    if ($is_single_software) {
+        $res->[2] = $rows[0]{url};
+    } else {
+        $res->[2] = \@rows;
+    }
+    $res;
 }
 
 1;
@@ -322,7 +442,7 @@ App::swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.003 of App::swcat (from Perl distribution App-swcat), released on 2018-09-21.
+This document describes version 0.007 of App::swcat (from Perl distribution App-swcat), released on 2018-10-18.
 
 =head1 SYNOPSIS
 
@@ -339,9 +459,13 @@ L<swcat> is a CLI for L<Software::Catalog>.
 
 Usage:
 
- download_url(%args) -> [status, msg, result, meta]
+ download_url(%args) -> [status, msg, payload, meta]
 
 Get download URL(s) of a software.
+
+Will return the version number in the payload if given a single software name.
+Will return an array of {software=>..., version=>...} in the payload if given
+multiple software names or one or more patterns.
 
 This function is not exported.
 
@@ -357,7 +481,7 @@ Arguments ('*' denotes required arguments):
 
 Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
 
-=item * B<software>* => I<str>
+=item * B<softwares_or_patterns> => I<array[str]>
 
 =back
 
@@ -366,7 +490,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -377,9 +501,13 @@ Return value:  (any)
 
 Usage:
 
- latest_version(%args) -> [status, msg, result, meta]
+ latest_version(%args) -> [status, msg, payload, meta]
 
-Get latest version of a software.
+Get latest version of one or more software.
+
+Will return the version number in the payload if given a single software name.
+Will return an array of {software=>..., version=>...} in the payload if given
+multiple software names or one or more patterns.
 
 This function is not exported.
 
@@ -395,7 +523,7 @@ Arguments ('*' denotes required arguments):
 
 Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
 
-=item * B<software>* => I<str>
+=item * B<softwares_or_patterns> => I<array[str]>
 
 =back
 
@@ -404,7 +532,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -415,7 +543,7 @@ Return value:  (any)
 
 Usage:
 
- list(%args) -> [status, msg, result, meta]
+ list(%args) -> [status, msg, payload, meta]
 
 List known software in the catalog.
 
@@ -442,7 +570,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

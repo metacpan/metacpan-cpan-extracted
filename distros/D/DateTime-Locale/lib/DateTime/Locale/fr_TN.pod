@@ -624,7 +624,7 @@ No
 
 =head3 Local first day of the week
 
-7 (dimanche)
+1 (lundi)
 
 =head1 SUPPORT
 

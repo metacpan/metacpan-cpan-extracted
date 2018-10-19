@@ -321,11 +321,11 @@ sub check_en_GB {
 
     my %formats = (
         Bh                  => 'h B',
-        Bhm                 => 'h.mm B',
-        Bhms                => 'h.mm.ss B',
+        Bhm                 => 'h:mm B',
+        Bhms                => 'h:mm:ss B',
         E                   => 'ccc',
-        EBhm                => 'E, h.mm B',
-        EBhms               => 'E, h.mm.ss B',
+        EBhm                => 'E, h:mm B',
+        EBhms               => 'E, h:mm:ss B',
         EHm                 => 'E HH:mm',
         EHms                => 'E HH:mm:ss',
         Ed                  => 'E d',
@@ -341,9 +341,9 @@ sub check_en_GB {
         Hmsv                => 'HH:mm:ss v',
         Hmv                 => 'HH:mm v',
         M                   => 'L',
-        MEd                 => 'E dd/MM',
+        MEd                 => 'E, dd/MM',
         MMM                 => 'LLL',
-        MMMEd               => 'E d MMM',
+        MMMEd               => 'E, d MMM',
         'MMMMW-count-one'   => q{'week' W 'of' MMMM},
         'MMMMW-count-other' => q{'week' W 'of' MMMM},
         MMMMd               => 'd MMMM',
@@ -444,7 +444,7 @@ sub test_formats {
     my $locale  = shift;
     my %formats = @_;
 
-    for my $name ( keys %formats ) {
+    for my $name ( sort keys %formats ) {
         is(
             $locale->format_for($name), $formats{$name},
             "Format for $name with " . $locale->code

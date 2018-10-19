@@ -1,14 +1,47 @@
 Revision history for Finance-CoinbasePro-API-CLI
 
+0.013    2018-10-19
+        Move coinbasepro.pl to script/.
+
+0.012    2018-10-18
+        Add dependency.t
+
+0.011    2018-10-18
+        Fix for testing in UTC on Win32.
+
+0.010    2018-10-18
+        Remove method/attribute with same name in Account.pm.
+
+0.009    2018-10-18
+        Fix testing in C Locale on Win32.
+
+0.008    2018-10-17
+        Fix testing in UTC on Win32.
+
+0.007    2018-10-17
+        Fix tests of number formatting under non-US locales.
+
+0.006    2018-10-17
+        Add META.json and cpanfile to dist.
+
+0.005    2018-10-17
+        Code fixes.
+        Add CONTRIBUTING.md and TODO.
+        Add 'use warnings' to non-Mouse modules. 
+        Changes for perlcritic. Run perltidy on code.
+
+0.004    2018-10-17
+        Add META.yml to dist.
+
 0.003    2018-10-17
-        Changes for tests
+        Changes for tests.
 
 0.002    2018-10-17
-        Fix git tagging
+        Fix git tagging.
 
 0.001    2018-10-17
         First version, released on an unsuspecting world.
         Basic command line access to GDAX.
-        Use Dist::Zilla
-        Test on Travis-CI
+        Use Dist::Zilla.
+        Test on Travis-CI.
 

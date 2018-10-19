@@ -5,5 +5,5 @@ requires 'Try::Tiny';
 
 on test => sub {
     requires 'Test::Most', '0.34';
-    requires 'Test::RedisDB';
+    requires 'Test::RedisDB', '2.49';
 };

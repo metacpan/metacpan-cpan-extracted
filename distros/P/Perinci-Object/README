@@ -1,11 +1,17 @@
-SYNOPSIS
+NAME
+    Perinci::Object - Object-oriented interface for Rinci metadata
 
+VERSION
+    This document describes version 0.310 of Perinci::Object (from Perl
+    distribution Perinci-Object), released on 2018-10-18.
+
+SYNOPSIS
      use Perinci::Object; # automatically exports risub(), rivar(), ripkg(),
                           # envres(), envresmulti(), envrestable(), riresmeta()
      use Data::Dump; # for dd()
-    
+
      # OO interface to function metadata.
-    
+
      my $risub = risub {
          v => 1.1,
          summary => 'Calculate foo and bar',
@@ -21,53 +27,53 @@ SYNOPSIS
         $risub->feature('foo'),                       # undef
         $risub->langprop('summary'),                  # 'Calculate foo and bar'
         $risub->langprop({lang=>'id_ID'}, 'summary'), # 'Menghitung foo dan bar'
-    
+
      # setting arg and property
      $risub->arg('a3', 'array');  # will actually fail for 1.0 metadata
      $risub->feature('foo', 2);   # ditto
-    
+
      # OO interface to variable metadata
-    
+
      my $rivar = rivar { ... };
-    
+
      # OO interface to package metadata
-    
+
      my $ripkg = ripkg { ... };
-    
+
      # OO interface to enveloped result
-    
+
      my $envres = envres [200, "OK", [1, 2, 3]];
      dd $envres->is_success, # 1
         $envres->status,     # 200
         $envres->message,    # "OK"
         $envres->result,     # [1, 2, 3]
         $envres->meta;       # undef
-    
+
      # setting status, message, result, extra
      $envres->status(404);
      $envres->message('Not found');
      $envres->result(undef);
      $envres->meta({errno=>-100});
-    
+
      # OO interface to function/method result metadata
      my $riresmeta = riresmeta { ... };
-    
+
      # an example of using envresmulti()
      sub myfunc {
          ...
-    
+
          my $envres = envresmulti();
-    
+
          # add result for each item
          $envres->add_result(200, "OK", {item_id=>1});
          $envres->add_result(202, "OK", {item_id=>2, note=>"blah"});
          $envres->add_result(404, "Not found", {item_id=>3});
          ...
-    
+
          # finally, return the result
          return $envres->as_struct;
      }
-    
+
      # an example of using envrestable()
      sub myfunc {
          ...
@@ -79,54 +85,67 @@ SYNOPSIS
      }
 
 DESCRIPTION
-
-    Rinci works using pure data structures, but sometimes it's convenient
-    to have an object-oriented interface (wrapper) for those data. This
-    module provides just that.
+    Rinci works using pure data structures, but sometimes it's convenient to
+    have an object-oriented interface (wrapper) for those data. This module
+    provides just that.
 
 FUNCTIONS
-
- rimeta $meta => OBJECT
-
+  rimeta $meta => OBJECT
     Exported by default. A shortcut for
     Perinci::Object::Metadata->new($meta).
 
- risub $meta => OBJECT
-
+  risub $meta => OBJECT
     Exported by default. A shortcut for
     Perinci::Object::Function->new($meta).
 
- rivar $meta => OBJECT
-
+  rivar $meta => OBJECT
     Exported by default. A shortcut for
     Perinci::Object::Variable->new($meta).
 
- ripkg $meta => OBJECT
-
+  ripkg $meta => OBJECT
     Exported by default. A shortcut for
     Perinci::Object::Package->new($meta).
 
- envres $res => OBJECT
-
+  envres $res => OBJECT
     Exported by default. A shortcut for
     Perinci::Object::EnvResult->new($res).
 
- envresmulti $res => OBJECT
-
+  envresmulti $res => OBJECT
     Exported by default. A shortcut for
     Perinci::Object::EnvResultMulti->new($res).
 
- envrestable $res => OBJECT
-
+  envrestable $res => OBJECT
     Exported by default. A shortcut for
     Perinci::Object::EnvResultTable->new($res).
 
- riresmeta $resmeta => OBJECT
+  riresmeta $resmeta => OBJECT
+    Exported by default. A shortcut for Perinci::Object::ResMeta->new($res).
 
-    Exported by default. A shortcut for
-    Perinci::Object::ResMeta->new($res).
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Object>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Object>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Object>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Rinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012,
+    2011 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

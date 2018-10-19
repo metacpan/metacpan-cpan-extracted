@@ -1,3 +1,11 @@
+0.036		2018-10-17	T. R. Wyant
+    Support alternate Sun and Moon classes, and other bodies that
+    contain built-in models (e.g. Astro::Coord::ECI::VSOP87D::*).
+
+    Add sky() settings to the output of save().
+
+    Proper display of formatter template names.
+
 0.035		2018-01-26	T. R. Wyant
     TODO test because of changed equinox algorithm.
 
@@ -5,7 +13,6 @@
     is just that it appears to cause RT to think I will not accept bug
     reports from them.
 
-0.034_01	2017-10-04	T. R. Wyant
     Support for decayed Iridium satellites.
 
 0.034		2017-04-01	T. R. Wyant

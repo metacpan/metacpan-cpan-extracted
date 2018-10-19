@@ -1,10 +1,8 @@
 # NAME
 
-Sparrow
+Sparrow - multipurpose scenarios manager.
  
 # SYNOPSIS
-
-Sparrow - multipurpose scenarios manager.
 
 # Install
 
@@ -12,9 +10,10 @@ Sparrow - multipurpose scenarios manager.
     $ sudo yum install curl
     $ cpanm Sparrow
 
-# Build status
+# Build statuses
 
 [![Build Status](https://travis-ci.org/melezhik/sparrow.svg)](https://travis-ci.org/melezhik/sparrow)
+[![Build status](https://ci.appveyor.com/api/projects/status/hdowsd2jvmy0x3ae?svg=true)](https://ci.appveyor.com/project/melezhik/sparrow)
 
 # Sparrow plugins
 
@@ -489,7 +488,9 @@ Use this command to run task box
 
 **sparrow box run $path [opts]**
 
-Where $path sets the file path to task box json file. A structure of the file:
+Where $path sets the file path to task box json file. 
+
+## The structure of the file for outthentic plugins:
 
     [
 
@@ -509,7 +510,7 @@ Where $path sets the file path to task box json file. A structure of the file:
     ]
 
 
-Command example:
+Command example
 
     $ sparrow box run /var/sparrow/boxes/nginx.json
 
@@ -537,6 +538,29 @@ Thus task box files should hold a list of sparrow tasks. Here is example:
 
     ]
 
+
+## The structure of the file for swat plugins:
+
+
+    [
+
+      {
+        "task" : "task_name",
+        "plugin" : "plugin_name",
+        "type" : "swat",
+        "host" : "http host"
+      },
+      {
+        // another task
+      },
+
+      ...
+
+    ]
+
+
+
+## Sparrow box run parameters
 
 To suppress some extra message from this command use `--mode quiet`:
 
@@ -804,6 +828,17 @@ Also see "Disable color output" section.
 
 If set defines an alternative location for sparrow configuration file.
 
+## sparrow_hub_api_url
+
+
+Sets alternative location of SparrowHub API. If not set Sparrow client uses https://sparrowhub.org as API URL.
+
+Primarily used  for internal testing and development. But also see [offline mode support](#offline-mode-support) section.
+
+## SPARROW_UNSECURE
+
+Disable ssl verification during `sparrow plg upload, sparrow remote task run` commands. Use this option on your risk.
+
 # Remote Tasks
 
 ***WARNING!*** This feature is quite experimental and should be tested.
@@ -894,6 +929,31 @@ To get a list of available public remote tasks say this:
 And finally you can remove remote task:
 
     $ sparrow remote task remove app/old-stuff
+
+# Offline mode support
+
+
+For servers with limited or no access to internet, there is offline mode support.
+
+## Create local repository of Sparrow plugins
+
+
+    $ mkdir -p sparrow-local-repo/api/v1
+    $ mkidr -p sparrow-local-repo/plugins
+
+
+## Copy index file and plugins
+
+    $ curl https://sparrowhub.org/api/v1/index -o sparrow-local-repo/api/v1/index
+    $ curl https://sparrowhub.org/plugins/python-echo-script-v0.001000.tar.gz -o sparrow-local-repo/plugins/python-echo-script-v0.001000.tar.gz
+    $ # so on
+
+## Set sparrow_hub_api_url
+
+    $ export sparrow_hub_api_url=$PWD/sparrow-local-repo
+
+Now Sparrow client will be looking for local repository instead of making requests to internet.
+
 
 # AUTHOR
 

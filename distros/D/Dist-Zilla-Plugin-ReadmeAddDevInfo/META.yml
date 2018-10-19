@@ -15,7 +15,7 @@ name: Dist-Zilla-Plugin-ReadmeAddDevInfo
 provides:
   Dist::Zilla::Plugin::ReadmeAddDevInfo:
     file: lib/Dist/Zilla/Plugin/ReadmeAddDevInfo.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Dist::Zilla: '0'
   perl: '5.010'
@@ -23,5 +23,5 @@ resources:
   bugtracker: http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo/issues
   homepage: http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo
   repository: http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'YAML::Tiny version 1.69'

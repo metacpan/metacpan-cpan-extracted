@@ -223,19 +223,13 @@ sub _source_dir ($self) {
     # index files, calculate max_path_len
     my @paths_to_process;
 
-    P->file->find(
-        $self->path,
-        dir => 0,
-        sub ($path) {
-            my $type = Pcore::Src::File->detect_filetype($path);
+    for my $path ( ( P->path1( $self->path )->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
+        my $type = Pcore::Src::File->detect_filetype($path);
 
-            return if !$type || lc $type->{type} ne $self->type;    # skip file, if file type isn't supported
+        return if !$type || lc $type->{type} ne $self->type;    # skip file, if file type isn't supported
 
-            push @paths_to_process, $path;
-
-            return;
-        }
-    );
+        push @paths_to_process, $path;
+    }
 
     # process indexed files
     $self->_process_files(
@@ -441,9 +435,9 @@ sub _set_exit_code ( $self, $exit_code ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 309                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 303                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 281                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 275                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

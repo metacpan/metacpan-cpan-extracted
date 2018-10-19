@@ -9,7 +9,8 @@ use Net::Prometheus;
 use Net::Prometheus::Types qw( MetricSamples Sample );
 
 my $client = Net::Prometheus->new(
-   disable_process_collector => 1
+   disable_process_collector => 1,
+   disable_perl_collector    => 1,
 );
 
 {

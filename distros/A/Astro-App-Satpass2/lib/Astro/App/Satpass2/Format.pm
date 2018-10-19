@@ -10,9 +10,10 @@ use Astro::App::Satpass2::FormatTime;
 use Astro::App::Satpass2::Utils qw{
     load_package __parse_class_and_args
     CODE_REF
+    @CARP_NOT
 };
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 use constant DEFAULT_LOCAL_COORD => 'azel_rng';
 

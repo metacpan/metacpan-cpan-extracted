@@ -3,7 +3,7 @@ package WWW::Mechanize::Link;
 use strict;
 use warnings;
 
-our $VERSION = '1.88';
+our $VERSION = '1.89';
 
 #ABSTRACT: Link object for WWW::Mechanize
 
@@ -65,7 +65,7 @@ WWW::Mechanize::Link - Link object for WWW::Mechanize
 
 =head1 VERSION
 
-version 1.88
+version 1.89
 
 =head1 SYNOPSIS
 

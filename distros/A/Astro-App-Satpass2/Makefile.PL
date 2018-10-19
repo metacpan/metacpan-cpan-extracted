@@ -19,7 +19,7 @@ my %attr = (
     VERSION_FROM => 'lib/Astro/App/Satpass2.pm',
     PREREQ_PM => $meta->requires(),
     PL_FILES => {},	# Prevent old MakeMaker from running Build.PL
-    EXE_FILES => [qw{bin/satpass2}],
+    EXE_FILES => [ qw{ script/satpass2 } ],
     'dist' => {COMPRESS => 'gzip', SUFFIX => 'gz'},
     AUTHOR => 'Tom Wyant (wyant at cpan dot org)',
     ABSTRACT => 'Predict satellite visibility using Astro::Coord::ECI',

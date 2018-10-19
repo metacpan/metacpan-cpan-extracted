@@ -612,7 +612,7 @@ Yes
 
 =head3 Local first day of the week
 
-6 (ⴰⵙⵉⴹⵢⴰⵙ)
+1 (ⴰⵢⵏⴰⵙ)
 
 =head1 SUPPORT
 

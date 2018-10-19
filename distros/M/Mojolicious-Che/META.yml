@@ -23,5 +23,5 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/mche/Mojolicious-Che.git
-version: '0.0803'
+version: '0.08031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

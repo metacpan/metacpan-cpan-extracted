@@ -1,4 +1,4 @@
-bin/satpass2
+script/satpass2
 Build.PL
 Changes
 eg/almanac
@@ -86,6 +86,7 @@ t/tokenize.t
 t/whole_app.t
 t/whole_app_file
 xt/author/basic.t
+xt/author/carp_not.t
 xt/author/changes.t
 xt/author/critic.t
 xt/author/dependencies.t

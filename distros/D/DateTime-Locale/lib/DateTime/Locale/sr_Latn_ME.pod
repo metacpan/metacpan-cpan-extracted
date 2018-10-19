@@ -639,19 +639,19 @@ Serbian Montenegro Latin locale.
    1995-12-22T09:05:02 = četvrti kvartal 1995.
   -0010-09-15T04:44:23 = treći kvartal -10.
 
-=head3 yw-count-few (w. 'sjedmica' 'u' y.)
+=head3 yw-count-few (w. 'sjedmica' 'u' Y.)
 
    2008-02-05T18:30:30 = 6. sjedmica u 2008.
    1995-12-22T09:05:02 = 51. sjedmica u 1995.
   -0010-09-15T04:44:23 = 37. sjedmica u -10.
 
-=head3 yw-count-one (w. 'sjedmica' 'u' y.)
+=head3 yw-count-one (w. 'sjedmica' 'u' Y.)
 
    2008-02-05T18:30:30 = 6. sjedmica u 2008.
    1995-12-22T09:05:02 = 51. sjedmica u 1995.
   -0010-09-15T04:44:23 = 37. sjedmica u -10.
 
-=head3 yw-count-other (w. 'sjedmica' 'u' y.)
+=head3 yw-count-other (w. 'sjedmica' 'u' Y.)
 
    2008-02-05T18:30:30 = 6. sjedmica u 2008.
    1995-12-22T09:05:02 = 51. sjedmica u 1995.

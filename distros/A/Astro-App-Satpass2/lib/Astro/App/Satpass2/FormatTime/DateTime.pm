@@ -12,12 +12,14 @@ use parent qw{
 use Astro::App::Satpass2::Utils qw{
     back_end __back_end_class_name_of_record
     has_method load_package
-    __parse_class_and_args };
+    __parse_class_and_args
+    @CARP_NOT
+};
 use Astro::App::Satpass2::Locale qw{ __preferred };
 use DateTime;
 use DateTime::TimeZone;
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 sub attribute_names {
     my ( $self ) = @_;

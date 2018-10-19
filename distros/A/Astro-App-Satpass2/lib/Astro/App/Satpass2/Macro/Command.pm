@@ -7,9 +7,9 @@ use warnings;
 
 use parent qw{ Astro::App::Satpass2::Macro };
 
-use Astro::App::Satpass2::Utils qw{ quoter ARRAY_REF };
+use Astro::App::Satpass2::Utils qw{ quoter ARRAY_REF @CARP_NOT };
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 sub execute {
     my ( $self, $name ) = @_;

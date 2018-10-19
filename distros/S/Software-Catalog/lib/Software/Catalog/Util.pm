@@ -1,11 +1,12 @@
 package Software::Catalog::Util;
 
-our $DATE = '2018-10-05'; # DATE
-our $VERSION = '1.0.3'; # VERSION
+our $DATE = '2018-10-18'; # DATE
+our $VERSION = '1.0.4'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 our %SPEC;
 
@@ -46,16 +47,22 @@ sub extract_from_url {
             $lwp_res->message ? ": " . $lwp_res->message : "")];
     }
 
+    my $res;
     if ($args{re}) {
-        unless ($lwp_res->content =~ $args{re}) {
-            return [543, "Couldn't match pattern $args{re} against ".
+        log_trace "Finding version from $args{url} using regex $args{re} ...";
+        if ($lwp_res->content =~ $args{re}) {
+            $res = [200, "OK", $1];
+        } else {
+            $res = [543, "Couldn't match pattern $args{re} against ".
                         "content of URL '$args{url}'"];
         }
-        return [200, "OK", $1];
     } else {
-        return $args{code}->(
+        log_trace "Finding version from $args{url} using code ...";
+        $res = $args{code}->(
             content => $lwp_res->content, _lwp_res => $lwp_res);
     }
+    log_trace "Result: %s", $res;
+    $res;
 }
 
 1;
@@ -73,7 +80,7 @@ Software::Catalog::Util - Utility routines
 
 =head1 VERSION
 
-This document describes version 1.0.3 of Software::Catalog::Util (from Perl distribution Software-Catalog), released on 2018-10-05.
+This document describes version 1.0.4 of Software::Catalog::Util (from Perl distribution Software-Catalog), released on 2018-10-18.
 
 =head1 FUNCTIONS
 
@@ -82,7 +89,7 @@ This document describes version 1.0.3 of Software::Catalog::Util (from Perl dist
 
 Usage:
 
- extract_from_url(%args) -> [status, msg, result, meta]
+ extract_from_url(%args) -> [status, msg, payload, meta]
 
 This function is not exported by default, but exportable.
 
@@ -103,7 +110,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

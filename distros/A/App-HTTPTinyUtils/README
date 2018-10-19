@@ -2,8 +2,8 @@ NAME
     App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 VERSION
-    This document describes version 0.002 of App::HTTPTinyUtils (from Perl
-    distribution App-HTTPTinyUtils), released on 2018-10-06.
+    This document describes version 0.003 of App::HTTPTinyUtils (from Perl
+    distribution App-HTTPTinyUtils), released on 2018-10-18.
 
 SYNOPSIS
 DESCRIPTION
@@ -11,11 +11,13 @@ DESCRIPTION
 
     *   http-tiny
 
+    *   http-tiny-cache
+
 FUNCTIONS
   http_tiny
     Usage:
 
-     http_tiny(%args) -> [status, msg, result, meta]
+     http_tiny(%args) -> [status, msg, payload, meta]
 
     Perform request with HTTP::Tiny.
 
@@ -38,7 +40,42 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  http_tiny_cache
+    Usage:
+
+     http_tiny_cache(%args) -> [status, msg, payload, meta]
+
+    Perform request with HTTP::Tiny::Cache.
+
+    Like "http_tiny", but uses HTTP::Tiny::Cache instead of HTTP::Tiny. See
+    the documentation of HTTP::Tiny::Cache on how to set cache period.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   content => *str*
+
+    *   headers => *hash*
+
+    *   method => *str* (default: "GET")
+
+    *   raw => *bool*
+
+    *   url* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

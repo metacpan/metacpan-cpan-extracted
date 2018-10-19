@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "vorm.",
-    "nachm.",
+    "AM",
+    "PM",
   ],
   available_formats => {
     Bh => "h B",
@@ -273,5 +273,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

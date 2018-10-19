@@ -59,6 +59,7 @@ CN
 CX
 Caicos
 Catalog
+Cawe
 Ceuta
 Chakma
 Chiga
@@ -227,6 +228,7 @@ LK
 LLL
 LLLL
 LLLL'n
+LLLLL
 LY
 Lakota
 Langi
@@ -268,6 +270,7 @@ MMMM'ren
 MMMMEEEEd
 MMMMEEEd
 MMMMEd
+MMMMM
 MMMMW
 MMMMd
 MMMMdd
@@ -364,6 +367,7 @@ Rundi
 Rwa
 Ryley
 Réunion
+Rāhina
 SAR
 SX
 SY
@@ -434,6 +438,7 @@ UA
 UMsombuluko
 UY
 Uhr
+Usbuuca
 Util
 Uyghur
 VC
@@ -778,10 +783,19 @@ fa_IR
 feira
 fera
 ff
-ff_CM
-ff_GN
-ff_MR
-ff_SN
+ff_Latn
+ff_Latn_BF
+ff_Latn_CM
+ff_Latn_GH
+ff_Latn_GM
+ff_Latn_GN
+ff_Latn_GW
+ff_Latn_LR
+ff_Latn_MR
+ff_Latn_NE
+ff_Latn_NG
+ff_Latn_SL
+ff_Latn_SN
 fi
 fi_FI
 fil
@@ -859,6 +873,7 @@ guz_KE
 gv
 gv_IM
 gwà
+hB
 ha
 ha_GH
 ha_NE
@@ -893,6 +908,8 @@ hy
 hy_AM
 hétfő
 hënë
+ia
+ia_001
 id
 id_ID
 ig
@@ -917,6 +934,8 @@ jimweri
 jmc
 jmc_TZ
 jumwa
+jv
+jv_ID
 ka
 ka_GE
 kab
@@ -958,6 +977,8 @@ ksf
 ksf_CM
 ksh
 ksh_DE
+ku
+ku_TR
 kuni
 kvartal
 kw
@@ -1028,6 +1049,8 @@ mgh
 mgh_MZ
 mgo
 mgo_CM
+mi
+mi_NZ
 minggu
 mk
 mk_MK
@@ -1117,6 +1140,7 @@ pa_Arab
 pa_Arab_PK
 pa_Guru
 pa_Guru_IN
+pekan
 pirmadienis
 pirmdiena
 pl
@@ -1162,6 +1186,7 @@ ro_MD
 ro_RO
 rof
 rof_TZ
+roka
 roku
 root
 ru
@@ -1178,6 +1203,7 @@ rwk_TZ
 sabaat
 sah
 sah_RU
+saka
 samedi
 saq
 saq_KE
@@ -1347,6 +1373,8 @@ wike
 wo
 wo_SN
 wythnos
+xh
+xh_ZA
 xog
 xog_UG
 yG
@@ -1419,5 +1447,6 @@ zu
 zu_ZA
 Åland
 ûse
+ġimgħa
 ži
 Ọjọ

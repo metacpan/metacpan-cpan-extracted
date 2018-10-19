@@ -11,7 +11,13 @@ require_ok('Tk::PerlInheritanceTree') ;
 
 use strict;
 use warnings;
-my $mw = tkinit();
+my $mw;
+eval{$mw = MainWindow->new;};
+
+SKIP: {
+    diag "Could not create MainWindow. Please check, if your X-server is running: $@\n" if ($@);
+    skip "MainWindow instantiation failed: $@", 7 if ($@);
+    
 my $w;
 eval{$w = $mw->PerlInheritanceTree};
 ok( !$@,"instance creation: $@");
@@ -33,3 +39,4 @@ is ($tknode->text, 'Tk', "Display node for 'Tk'");
 $w->node_clicked($tknode);
 ok ($w->{m_list}, 'm_list is set')
 
+}#SKIP

@@ -8,9 +8,8 @@ use warnings;
 no warnings;
 
 use subs qw();
-use vars qw($VERSION);
 
-$VERSION = '1.021';
+our $VERSION = '1.022';
 
 =encoding utf8
 

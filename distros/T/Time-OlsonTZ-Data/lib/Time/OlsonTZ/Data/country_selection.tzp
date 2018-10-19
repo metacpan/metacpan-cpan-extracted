@@ -2108,7 +2108,7 @@ use strict;
 		olson_name => "Macau",
 		regions => {
 			"" => {
-				location_coords => "+2214+11335",
+				location_coords => "+221150+1133230",
 				olson_description => "",
 				timezone_name => "Asia/Macau",
 			},

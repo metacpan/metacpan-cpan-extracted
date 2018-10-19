@@ -28,31 +28,30 @@ sub run ($self) {
     my $toc = {};
 
     # scan lib/ for .pm files
-    P->file->find(
-        './lib/',
-        dir => 0,
-        sub ($path) {
-            if ( $path->suffix eq 'pm' ) {
-                my $parser = Pod::Markdown->new(
-                    perldoc_url_prefix       => $base_url,
-                    perldoc_fragment_format  => 'pod_simple_html',    # CodeRef ( $self, $text )
-                    markdown_fragment_format => 'pod_simple_html',    # CodeRef ( $self, $text )
-                    include_meta_tags        => 0,
-                );
+    for my $path ( ( P->path1('lib')->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
+        $path = P->path($path);
 
-                my $module = P->perl->module($path);
+        if ( $path->suffix eq 'pm' ) {
+            my $parser = Pod::Markdown->new(
+                perldoc_url_prefix       => $base_url,
+                perldoc_fragment_format  => 'pod_simple_html',    # CodeRef ( $self, $text )
+                markdown_fragment_format => 'pod_simple_html',    # CodeRef ( $self, $text )
+                include_meta_tags        => 0,
+            );
 
-                my $pod_markdown;
+            my $module = P->perl->module($path);
 
-                $parser->output_string( \$pod_markdown );
+            my $pod_markdown;
 
-                # generate markdown document
-                $parser->parse_string_document( $module->content->$* );
+            $parser->output_string( \$pod_markdown );
 
-                $pod_markdown =~ s/\n+\z//smg;
+            # generate markdown document
+            $parser->parse_string_document( $module->content->$* );
 
-                if ($pod_markdown) {
-                    my $markdown = <<"MD";
+            $pod_markdown =~ s/\n+\z//smg;
+
+            if ($pod_markdown) {
+                my $markdown = <<"MD";
 **!!! DO NOT EDIT. This document is generated automatically. !!!**
 
 back to **[INDEX](${base_url}POD)**
@@ -64,16 +63,15 @@ back to **[INDEX](${base_url}POD)**
 $pod_markdown
 MD
 
-                    # write markdown to the file
-                    P->file->mkpath( $wiki_path . 'POD/' . $path->dirname );
+                # write markdown to the file
+                P->file->mkpath( $wiki_path . 'POD/' . $path->dirname );
 
-                    $toc->{ $path->dirname . $path->filename_base } = $module->abstract;
+                $toc->{ $path->dirname . $path->filename_base } = $module->abstract;
 
-                    P->file->write_text( $wiki_path . 'POD/' . $path->dirname . $path->filename_base . q[.md], { crlf => 0 }, \$markdown );
-                }
+                P->file->write_text( $wiki_path . 'POD/' . $path->dirname . $path->filename_base . q[.md], { crlf => 0 }, \$markdown );
             }
         }
-    );
+    }
 
     # generate POD.md
     my $toc_md = <<'MD';
@@ -127,7 +125,7 @@ MD
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 97                   | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
+## |    3 | 95                   | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

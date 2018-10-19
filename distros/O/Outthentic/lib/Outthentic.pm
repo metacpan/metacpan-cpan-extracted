@@ -1,6 +1,6 @@
 package Outthentic;
 
-our $VERSION = '0.3.17';
+our $VERSION = '0.4.0';
 
 1;
 
@@ -304,15 +304,20 @@ sub run_story_file {
         if ( -f "$story_dir/story.pl" ){
 
           if (-f project_root_dir()."/cpanfile" ){
-            $story_command  = "PATH=\$PATH:".project_root_dir()."/local/bin/ perl -I ".story_cache_dir().
-            " -I ".project_root_dir()."/local/lib/perl5 -I".project_root_dir()."/lib " ."-MOutthentic::Glue::Perl $story_dir/story.pl";
+			      if ( $^O  =~ 'MSWin'  ){
+				      $story_command  = "set PATH=%PATH%;".project_root_dir()."/local/bin/ && perl -I ".story_cache_dir().
+		          " -I ".project_root_dir()."/local/lib/perl5 -I".project_root_dir()."/lib " ."-MOutthentic::Glue::Perl $story_dir/story.pl";						
+			      } else {
+	            $story_command  = "PATH=\$PATH:".project_root_dir()."/local/bin/ perl -I ".story_cache_dir().
+		        " -I ".project_root_dir()."/local/lib/perl5 -I".project_root_dir()."/lib " ."-MOutthentic::Glue::Perl $story_dir/story.pl";	
+			      }
           } else {
-            $story_command = "perl -I ".story_cache_dir()." -I ".project_root_dir()."/lib"." -MOutthentic::Glue::Perl $story_dir/story.pl";
+              $story_command = "perl -I ".story_cache_dir()." -I ".project_root_dir()."/lib"." -MOutthentic::Glue::Perl $story_dir/story.pl";
           }
 
           print_story_header();
 
-        }elsif(-f "$story_dir/story.rb") {
+        } elsif(-f "$story_dir/story.rb") {
 
             my $story_file = "$story_dir/story.rb";
 
@@ -324,7 +329,7 @@ sub run_story_file {
               $story_command = "ruby -I $ruby_lib_dir -r outthentic -I ".story_cache_dir()." $story_file";
             }
 
-          print_story_header();
+            print_story_header();
 
         }elsif(-f "$story_dir/story.py") {
 
@@ -338,7 +343,7 @@ sub run_story_file {
 
             my $bash_lib_dir = File::ShareDir::dist_dir('Outthentic');
             $story_command = "bash -c 'source ".story_cache_dir()."/glue.bash";
-            $story_command.= " && source $bash_lib_dir/outthentic.bash";
+            $story_command.= " && source ".$bash_lib_dir."/outthentic.bash";
             $story_command.= " && source $story_dir/story.bash'";
 
             print_story_header();
@@ -349,6 +354,8 @@ sub run_story_file {
 
           return;
         }
+
+        print "run story: $story_command ...\n" if debug_mod12;
 
         my ($ex_code, $out) = execute_cmd2($story_command);
 

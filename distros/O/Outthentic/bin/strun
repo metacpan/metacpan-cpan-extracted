@@ -24,8 +24,13 @@ my $yaml_file_path;
 my $json_file_path;
 my @runtime_params;
 my $args_file;
+my $recurse_mod = 0;
+my @stories;
 
 our $cli_args;
+
+my $sparrow_root = safe_env($ENV{SPARROW_ROOT});
+
 
 BEGIN { 
   my $i=0;  
@@ -42,21 +47,22 @@ BEGIN {
 
 GetOptions (
 
-        "cwd=s"         => \$cwd,               # string
-        "format=s"      => \$format,            # string
-        "purge-cache"   => \$purge_cache,       # boolean
-        "nocolor"       => \$nocolor,           # boolean
-        "debug=i"       => \$debug_mod,         # numeric
-        "match_l=i"     => \$match_l,           # numeric
-        "root=s"        => \$project_root_dir,  # string
-        "story=s"       => \$story_path,        # string
-        "task=s"        => \$task_name,         # string
-        "ini=s"         => \$ini_file_path,     # string
-        "yaml=s"        => \$yaml_file_path,    # string
-        "json=s"        => \$json_file_path,    # string
-        "param=s"       => \@runtime_params,    # string
-        "args-file=s"   => \$args_file,         # string
-        "dump-config"   => \$dump_config,       # boolean
+        "cwd=s"           => \$cwd,               # string
+        "format=s"        => \$format,            # string
+        "purge-cache"     => \$purge_cache,       # boolean
+        "nocolor"         => \$nocolor,           # boolean
+        "debug=i"         => \$debug_mod,         # numeric
+        "match_l=i"       => \$match_l,           # numeric
+        "root=s"          => \$project_root_dir,  # string
+        "story=s"         => \$story_path,        # string
+        "task=s"          => \$task_name,         # string
+        "ini=s"           => \$ini_file_path,     # string
+        "yaml=s"          => \$yaml_file_path,    # string
+        "json=s"          => \$json_file_path,    # string
+        "param=s"         => \@runtime_params,    # string
+        "args-file=s"     => \$args_file,         # string
+        "dump-config"     => \$dump_config,       # boolean
+        "recurse"         => \$recurse_mod,      # boolean
 
 
 ) or die("Error in command line arguments\n");
@@ -64,7 +70,13 @@ GetOptions (
 
 $nocolor ||= $ENV{SPARROW_NO_COLOR};
 
-my $cache_root_dir = $ENV{SPARROW_ROOT} ? "$ENV{SPARROW_ROOT}/tmp/".$$ : "$ENV{HOME}/.outthentic/tmp/".$$;
+my $cache_root_dir;
+
+if ( $^O  =~ 'MSWin' ) {
+	$cache_root_dir = $sparrow_root ? "$sparrow_root/tmp/".$$ :  "C:/Users/".getlogin()."/tmp/".$$
+} else {
+	$cache_root_dir = $sparrow_root ? "$sparrow_root/tmp/".$$ : "$ENV{HOME}/.outthentic/tmp/".$$;
+}
 
 remove_tree($cache_root_dir);
 make_path($cache_root_dir);
@@ -77,6 +89,11 @@ finddepth(\&wanted_downstreams, $project_root_dir."/modules" );
 
 finddepth(\&wanted_upstreams, $project_root_dir );
 
+sub safe_env {
+	my $v = shift;
+	$v=~s/\s//g if $^O  =~ 'MSWin'; 
+	$v;
+}
 
 sub wanted_upstreams {
     wanted($_,'upstream');
@@ -92,26 +109,37 @@ sub wanted {
 
     my $story_type = shift;
 
+    my $story_dir = $File::Find::dir;
+
     if ($file =~ /^story\.(bash|pl|pm|rb|py)$/ or $file =~ /^hook\.(bash|pl|rb|py)$/ ) {
 
-        return if $file=~/^hook\./ and -e "$File::Find::dir/story.pl";
-        return if $file=~/^hook\./ and -e "$File::Find::dir/story.bash";
-        return if $file=~/^hook\./ and -e "$File::Find::dir/story.rb";
-        return if $file=~/^hook\./ and -e "$File::Find::dir/story.py";
+        return if $file=~/^hook\./ and -e "$story_dir/story.pl";
+        return if $file=~/^hook\./ and -e "$story_dir/story.bash";
+        return if $file=~/^hook\./ and -e "$story_dir/story.rb";
+        return if $file=~/^hook\./ and -e "$story_dir/story.py";
 
-        return if $file eq 'story.pm' and -e "$File::Find::dir/story.pl";
-        return if $file eq 'story.pm' and -e "$File::Find::dir/story.bash";
-        return if $file eq 'story.pm' and -e "$File::Find::dir/story.rb";
-        return if $file eq 'story.pm' and -e "$File::Find::dir/story.py";
+        return if $file eq 'story.pm' and -e "$story_dir/story.pl";
+        return if $file eq 'story.pm' and -e "$story_dir/story.bash";
+        return if $file eq 'story.pm' and -e "$story_dir/story.rb";
+        return if $file eq 'story.pm' and -e "$story_dir/story.py";
 
         return if $seen{$File::Find::name};
 
-        my $story_dir = $File::Find::dir;
 
-        make_path("$cache_root_dir/$story_dir");
+        my $story_local_dir;
 
-        my $tfile = "$cache_root_dir/$story_dir/sparrow.pl";
+        my $l = length($project_root_dir);
 
+        $story_local_dir = substr(File::Spec->rel2abs($story_dir),$l);
+
+        print "$story_local_dir added ok ...\n" if $debug_mod;
+
+        make_path("$cache_root_dir/$story_local_dir");
+
+        my $tfile = "$cache_root_dir/$story_local_dir/story.outth";
+
+        print "generate story file: $tfile ... \n" if $debug_mod > 0;
+        
         open F, ">", $tfile or die $!;
     
         print F "package main;\n\n";
@@ -126,15 +154,15 @@ sub wanted {
     
         print F "set_prop( cwd => q{$cwd} );\n";
         print F "set_prop( project_root_dir => q{$project_root_dir} );\n";
-        print F "set_prop( cache_root_dir    => q{$cache_root_dir} );\n";
+        print F "set_prop( cache_root_dir   => q{$cache_root_dir} );\n";
         print F "set_prop( ini_file_path    => q{$ini_file_path} );\n"    if $ini_file_path;
         print F "set_prop( yaml_file_path   => q{$yaml_file_path} );\n"  if $yaml_file_path;
         print F "set_prop( json_file_path   => q{$json_file_path} );\n"  if $json_file_path;
     
-        print F "set_prop( story => q{$File::Find::dir} );\n";
-        print F "set_prop( story_dir => q{$File::Find::dir} );\n";
-        if (-e "$File::Find::dir/story.check"){
-          print F "set_prop( story_check_file => q{$File::Find::dir/story.check} );\n";
+        print F "set_prop( story => q{$project_root_dir/$story_local_dir} );\n";
+        print F "set_prop( story_dir => q{$project_root_dir/$story_local_dir} );\n";
+        if (-e "$story_dir/story.check"){
+          print F "set_prop( story_check_file => q{$story_dir/story.check} );\n";
         } else {
           print F "set_prop( story_check_file => '' );\n";
         }
@@ -161,24 +189,24 @@ sub wanted {
             print F "apply_story_vars();\n";
         }
 
-        if (-e "$File::Find::dir/meta.txt"){
+        if (-e "$story_dir/meta.txt"){
           print F "print_meta();\n\n" unless $format eq 'concise' or $format eq 'production';
         }
 
-        if ( -e "$File::Find::dir/story.pm" ){
-            print F "eval { do_perl_hook('$File::Find::dir/story.pm') }; our \$STATUS=0, die \"perl hook error: \$@\" if \$@ ;\n\n";
-        }elsif ( -e "$File::Find::dir/hook.pl" ){
-            print F "eval { do_perl_hook('$File::Find::dir/hook.pl') };  our \$STATUS=0, die \"perl hook error: \$@\" if \$@ ;\n\n";
-        }elsif ( -e "$File::Find::dir/hook.rb" ){
-            print F "eval { do_ruby_hook('$File::Find::dir/hook.rb') };  our \$STATUS=0, die \"ruby hook error: \$@\" if \$@ ;\n\n";
-        }elsif ( -e "$File::Find::dir/hook.py" ){
-            print F "eval { do_python_hook('$File::Find::dir/hook.py') };  our \$STATUS=0, die \"python hook error: \$@\" if \$@ ;\n\n";
-        }elsif ( -e "$File::Find::dir/hook.bash" ){
-            print F "eval { do_bash_hook('$File::Find::dir/hook.bash') }; our \$STATUS=0, die \"bash hook error: \$@\" if \$@ ;\n\n";
+        if ( -e "$story_dir/story.pm" ){
+            print F "eval { do_perl_hook('$story_dir/story.pm') }; our \$STATUS=0, die \"perl hook error: \$@\" if \$@ ;\n\n";
+        }elsif ( -e "$story_dir/hook.pl" ){
+            print F "eval { do_perl_hook('$story_dir/hook.pl') };  our \$STATUS=0, die \"perl hook error: \$@\" if \$@ ;\n\n";
+        }elsif ( -e "$story_dir/hook.rb" ){
+            print F "eval { do_ruby_hook('$story_dir/hook.rb') };  our \$STATUS=0, die \"ruby hook error: \$@\" if \$@ ;\n\n";
+        }elsif ( -e "$story_dir/hook.py" ){
+            print F "eval { do_python_hook('$story_dir/hook.py') };  our \$STATUS=0, die \"python hook error: \$@\" if \$@ ;\n\n";
+        }elsif ( -e "$story_dir/hook.bash" ){
+            print F "eval { do_bash_hook('$story_dir/hook.bash') }; our \$STATUS=0, die \"bash hook error: \$@\" if \$@ ;\n\n";
         }
 
-        if (-e "$File::Find::dir/story.check"){
-          print F "eval { run_and_check(q{$File::Find::dir/story.check}) }; die \"asserts error: \$@\" if \$@ ;\n\n";
+        if (-e "$story_dir/story.check"){
+          print F "eval { run_and_check(q{$story_dir/story.check}) }; die \"asserts error: \$@\" if \$@ ;\n\n";
         } else {
           print F "eval { run_and_check() }; die \"asserts error: \$@\" if \$@ ;\n\n";
         }
@@ -189,6 +217,12 @@ sub wanted {
 
         close F;
 
+        if ($recurse_mod and $story_type eq 'upstream'){
+          push @stories , {
+            story_dir => $story_local_dir
+          }
+        }
+
         $seen{$File::Find::name}=1;
 
    }
@@ -196,31 +230,61 @@ sub wanted {
 }
 
 my $st;
+
 my $exit_code;
 
 if ($story_path){
 
-    my $strun_cmd = "perl $cache_root_dir$project_root_dir/$story_path/sparrow.pl";
+    my $strun_cmd = "perl $cache_root_dir/$story_path/story.outth";
+
     $st = (system($strun_cmd)==0);
+
     $exit_code = sprintf "%d", $? >> 8;
-}else{
-    my $strun_cmd = "perl $cache_root_dir$project_root_dir/sparrow.pl";
+
+}elsif ($recurse_mod) {
+    $st = 1;
+    for my $s ( sort { $a->{story_dir} <=> $b->{story_dir} } @stories) {
+          my $strun_cmd = "perl $cache_root_dir/$s->{story_dir}/story.outth";
+          my $st_i = (system($strun_cmd)==0);
+          my $exit_code_i = sprintf "%d", $? >> 8;
+          $s->{st} = $st_i;
+          $s->{exit_code} = $exit_code_i;
+          $st = 0 unless $st_i;
+          $exit_code = 254;
+          if ($st_i) {
+            print $nocolor ? "STATUS\tSUCCEED\n" : colored(["green"],"STATUS\tSUCCEED\n")
+              unless $format eq 'concise' or $format eq 'production';
+          }else{
+            print $nocolor ? "STATUS\tFAILED ($exit_code)\n" :  colored(["red"],"STATUS\tFAILED ($exit_code_i)\n")
+              unless $format eq 'concise';
+          }
+    }
+    
+} else {
+
+    my $strun_cmd = "perl $cache_root_dir/story.outth";
+
     $st = (system($strun_cmd)==0);
+
     $exit_code = sprintf "%d", $? >> 8;
 }
 
-system("rm -rf $cache_root_dir") if $purge_cache;
+remove_tree($cache_root_dir) if $purge_cache and $st;
 
 unless ( $dump_config ) { # do not check story status in case we only dump config data
-  #warn "state: $st";
-  #warn "exit code: $exit_code";
   if ($st) {
-    print $nocolor ? "STATUS\tSUCCEED\n" : colored(["green"],"STATUS\tSUCCEED\n")
-      unless $format eq 'concise' or $format eq 'production';
+    unless ($format eq 'concise' or $format eq 'production'){
+      print $nocolor ? "STATUS\tSUCCEED\n" : colored(["green"],"STATUS\tSUCCEED\n");
+    }
   }else{
-    print $nocolor ? "STATUS\tFAILED ($exit_code)\n" :  colored(["red"],"STATUS\tFAILED ($exit_code)\n")
-      unless $format eq 'concise';
+    unless ($format eq 'concise'){
+        print $nocolor ? "STATUS\tFAILED ($exit_code)\n" :  colored(["red"],"STATUS\tFAILED ($exit_code)\n");
+        if ($recurse_mod){
+          my $sf = join ",", map {$_->{story_dir}} grep { ! $_->{st}} @stories;
+          print $nocolor ? "stories failed:\t$sf\n" :  colored(["red"],"stories failed:\t$sf\n");
+        }
+    }
     exit($exit_code);
   }
-  
 }
+

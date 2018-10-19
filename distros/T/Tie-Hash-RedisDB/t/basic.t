@@ -30,6 +30,7 @@ SKIP: {
     subtest 'in and out' => sub {
         my $nonsense = {
             string  => 'a string',
+            undef   => undef,
             integer => 128,
             float   => 3.1415926,
             unicode => '‽',
@@ -41,6 +42,7 @@ SKIP: {
         %test_hash = %$nonsense;
 
         eq_or_diff({%test_hash}, $nonsense, 'Multivalue in and out works');
+        is($test_hash{missing}, undef, 'Missing values return undef');
     };
 };    # Test server SKIP block
 

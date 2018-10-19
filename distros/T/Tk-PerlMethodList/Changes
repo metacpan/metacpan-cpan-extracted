@@ -14,3 +14,5 @@ Revision history for Perl extension Tk::PerlMethodList.
 0.05  Use B module to get more filenames. 
 
 0.06  Added NumEntry to control fontsize / increased fontsize range
+
+0.08  Skip tests when display is not available

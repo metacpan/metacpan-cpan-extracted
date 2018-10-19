@@ -1,4 +1,10 @@
 Revision history for Dist-Zilla-Plugin-ReadmeAddDevInfo
+=======================================================
+
+0.02  2018-10-18 11:29:00
+        - Add config option to create CONTRIBUTING.md
+        - Improved documentation
+        - Added more tests
 
 0.01  2018-04-20 07:56:00
         - Initial release

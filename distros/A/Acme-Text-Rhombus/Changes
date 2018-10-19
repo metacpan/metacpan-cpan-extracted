@@ -1,5 +1,32 @@
 Revision history for Perl extension Acme::Text::Rhombus.
 
+0.20  2018-10-17  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.19_02  2018-10-16  <schubiger@cpan.org>
+
+ - Amend reverse letter enumeration test to cover resetting
+   letter.
+
+0.19_01  2018-10-14  <schubiger@cpan.org>
+
+ - Make letter enumeration configurable.
+
+ - Document forward option.
+
+ - Add forward option to example script invocation of rhombus().
+
+ - Test reverse letter enumeration of rhombus().
+
+ - Skip documentation tests for non-release testing.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Add metadata repository link.
+
+ - Purge orphaned whitespace.
+
 0.19  2010-05-02  <schubiger@cpan.org>
 
  - Merged development version to stable.

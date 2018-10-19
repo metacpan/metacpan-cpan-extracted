@@ -17,14 +17,14 @@ $| = 1;	## no critic (RequireLocalizedPunctuationVars)
 
 use Astro::App::Satpass2;
 
-class   'Astro::App::Satpass2';
+klass   'Astro::App::Satpass2';
 
-method  new => INSTANTIATE, 'Instantiate app';
+call_m  new => INSTANTIATE, 'Instantiate app';
 
-method  set => autoheight => undef, stdout => undef, undef,
+call_m  set => autoheight => undef, stdout => undef, undef,
     q{Clear autoheight and stdout};
 
-method  formatter => gmt => 0, TRUE, q{Set formatter gmt false};
+call_m  formatter => gmt => 0, TRUE, q{Set formatter gmt false};
 
 # NOTICE
 #
@@ -39,7 +39,7 @@ method  formatter => gmt => 0, TRUE, q{Set formatter gmt false};
 #
 # YOU HAVE BEEN WARNED.
 
-method  set => execute_filter => sub {
+call_m  set => execute_filter => sub {
 	my ( undef, $args ) = @_;	# Invocant unused
 	@{ $args } > 2
 	    and $args->[0] eq 'formatter'
@@ -53,19 +53,19 @@ my $can_filter = 1;
 execute 'formatter gmt 1', undef,
     'Attempt to set gmt with filter in place';
 
-method  formatter => gmt => 0, 'Confirm gmt still false'
+call_m  formatter => gmt => 0, 'Confirm gmt still false'
     or $can_filter = 0;
 
 # NOTICE
 # The execute_filter attribute is undocumented and unsupported.
 
-method  set => execute_filter => sub { return 1 }, undef,
+call_m  set => execute_filter => sub { return 1 }, undef,
     'Turn off the execute filter';
 
 execute 'formatter gmt 1', undef,
     'Attempt to set gmt with no filter in place';
 
-method formatter => gmt => 1, 'Confirm gmt now true';
+call_m formatter => gmt => 1, 'Confirm gmt now true';
 
 SKIP: {
 
@@ -99,7 +99,7 @@ SKIP: {
 
     my $got;
 
-    method  set => stdout => \$got, undef, 'Set output to scalar ref';
+    call_m  set => stdout => \$got, undef, 'Set output to scalar ref';
 
     execute 'echo There was a young lady named Bright', undef,
 	'Echo to the scalar ref';
@@ -113,7 +113,7 @@ SKIP: {
 {
     my $got;
 
-    method set => stdout => sub { $got .= $_[0] }, undef,
+    call_m set => stdout => sub { $got .= $_[0] }, undef,
 	'Set output to subroutine';
 
     execute 'echo Who could travel much faster than light.', undef,
@@ -127,7 +127,7 @@ SKIP: {
 {
     my @output;
 
-    method  set => stdout => \@output, undef, 'Set output to array ref';
+    call_m  set => stdout => \@output, undef, 'Set output to array ref';
 
     execute 'echo She set out one day', undef, 'Echo to array ref';
 
@@ -137,7 +137,7 @@ SKIP: {
     is $got, 'She set out one day', 'Confirm output to array ref';
 }
 
-method  set => stdout => undef, undef, 'Clear output attribute';
+call_m  set => stdout => undef, undef, 'Clear output attribute';
 
 execute 'echo In a relative way', 'In a relative way',
     'Output is returned';
@@ -309,7 +309,7 @@ execute 'show horizon', 'set horizon 20', 'Confirm horizon setting';
 
 execute 'show twilight', 'set twilight civil', 'Confirm twilight setting';
 
-method   __TEST__raw_attr => _twilight => '%.6f', '-0.104720',
+call_m   __TEST__raw_attr => _twilight => '%.6f', '-0.104720',
     'Confirm civil twilight in radians';
 
 execute 'localize horizon twilight', undef, 'Localize horizon and twilight';
@@ -333,7 +333,7 @@ execute 'set twilight astronomical', undef, 'Set twilight to astronomical';
 execute 'show twilight', 'set twilight astronomical',
     'Confirm that twilight was set';
 
-method  __TEST__raw_attr => _twilight => '%.6f', '-0.314159',
+call_m  __TEST__raw_attr => _twilight => '%.6f', '-0.314159',
     'Confirm astronomical twilight in radians' ;
 
 execute 'end', undef, 'End local block';
@@ -346,7 +346,7 @@ execute q<system perl t/printenv.pl horizon>, 'horizon=20',
 execute 'show twilight', 'set twilight civil',
     'Confirm twilight back at civil';
 
-method  __TEST__raw_attr => _twilight => '%.6f', '-0.104720',
+call_m  __TEST__raw_attr => _twilight => '%.6f', '-0.104720',
     'Confirm back at civil twilight in radians' ;
 
 execute 'export BOGUS', 'You must specify a value',
@@ -566,17 +566,17 @@ execute 'say', 'Cheezburger Cheezburger', 'Execute doubletalk with default';
 
 execute 'export fubar cheese', undef, 'Export a value for fubar';
 
-method  __TEST__is_exported => 'fubar', 1, 'Fubar is exported';
+call_m  __TEST__is_exported => 'fubar', 1, 'Fubar is exported';
 
 execute 'say cheese', 'cheese cheese', 'Execute doubletalk macro';
 
 execute  'unexport fubar', undef, 'Undo the export';
 
-method  __TEST__is_exported => 'fubar', 0, 'Fubar is no longer exported';
+call_m  __TEST__is_exported => 'fubar', 0, 'Fubar is no longer exported';
 
 execute 'say', 'Cheezburger Cheezburger', 'Execute doubletalk with default';
 
-method  __TEST__is_exported => 'fubar', 0, 'Fubar is no longer exported';
+call_m  __TEST__is_exported => 'fubar', 0, 'Fubar is no longer exported';
 
 {
 
@@ -665,7 +665,7 @@ execute 'pass 19801012T000000Z', <<'EOD',
 EOD
     'Calculate passes over Greenwich';
 
-method  set => pass_threshold => 60, undef,
+call_m  set => pass_threshold => 60, undef,
     q{Set pass_threshold to 60 degrees};
 
 execute 'pass 19801012T000000Z', <<'EOD',
@@ -684,7 +684,7 @@ execute 'pass 19801012T000000Z', <<'EOD',
 EOD
     'Calculate passes over Greenwich which are over 60 degrees';
 
-method  set => pass_threshold => undef, undef,
+call_m  set => pass_threshold => undef, undef,
     q{Set pass_threshold to undef};
 
 execute 'pass -noillumination 19801015T000000Z +1', <<'EOD',
@@ -1066,7 +1066,7 @@ SKIP: {
 chdir $dist_dir
     or BAIL_OUT "Can not get back to directory '$dist_dir': $!";
 
-method clear => undef, 'Clear the observing list';
+call_m clear => undef, 'Clear the observing list';
 
 {
     my $tle = Astro::Coord::ECI::TLE->new(
@@ -1074,9 +1074,9 @@ method clear => undef, 'Clear the observing list';
 	id	=> 666,
     )->geodetic( deg2rad( 40 ), deg2rad( -75 ), 200 );
 
-    method add => $tle, TRUE, 'Add a TLE';
+    call_m add => $tle, TRUE, 'Add a TLE';
 
-    method list => <<'EOD', 'Our object is in the list';
+    call_m list => <<'EOD', 'Our object is in the list';
    OID Name                     Epoch               Period
    666 Dummy                     40.0000  -75.0000   200.0
 EOD
@@ -1087,7 +1087,7 @@ execute 'perl -eval Fubar', '"Fubar"', 'perl -eval';
 
 execute 'perl t/whole_app_file', 'OK', 'perl -noeval';
 
-method __TEST__frame_stack_depth => 1, 'Object frame stack is clean';
+call_m __TEST__frame_stack_depth => 1, 'Object frame stack is clean';
 
 done_testing;
 

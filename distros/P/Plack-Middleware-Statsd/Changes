@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.3.7    2018-10-19 16:06:50+01:00 Europe/London
+  [Toolchain]
+  - Added MANIFEST.SKIP to distribution.
+
 v0.3.6    2018-10-16 22:38:04+01:00 Europe/London
   [Documentation]
   - Corrected minor typo.

@@ -13,6 +13,7 @@ use overload    #
   fallback => undef;
 
 has win32_alive_timeout => 0.5;
+has kill_on_destroy     => 1;
 
 has stdin  => ();
 has stdout => ();
@@ -38,28 +39,32 @@ const our $STATUS_REASON => {
 };
 
 sub DESTROY ( $self ) {
+    return if !$self->{kill_on_destroy};
+
     if ( !$self->{status} && $self->{pid} ) {
+
+        # NOTE https://metacpan . org / source /MOB/ Forks-Super- 0.80 / lib / Forks / Super / Job / OS / Win32 . pm    #L261
         if ($MSWIN) {
 
-            # https://perldoc.perl.org/perlport.html#DOS-and-Derivatives
-            #
+            # NOTE https://perldoc.perl.org/perlport.html#DOS-and-Derivatives
+
             # (Win32) kill doesn't send a signal to the identified process like it does on Unix platforms.
             # Instead kill($sig, $pid) terminates the process identified by $pid , and makes it exit immediately with exit status $sig.
             # As in Unix, if $sig is 0 and the specified process exists, it returns true without actually terminating it.
-            #
+
             # (Win32) kill(-9, $pid) will terminate the process specified by $pid and recursively all child processes owned by it.
             # This is different from the Unix semantics, where the signal will be delivered to all processes in the same process group as the process specified by $pid.
 
             # kill process group, eg.: windows console subprocess
-            kill '-KILL', $self->{pid};    ## no critic qw[InputOutput::RequireCheckedSyscalls]
+            CORE::kill '-KILL', $self->{pid};
 
             # kill process, because -SIG is ignored by process itself
-            kill 'KILL', $self->{pid};     ## no critic qw[InputOutput::RequireCheckedSyscalls]
+            CORE::kill 'KILL', $self->{pid};
         }
         else {
 
             # term process
-            kill 'TERM', $self->{pid};     ## no critic qw[InputOutput::RequireCheckedSyscalls]
+            CORE::kill 'TERM', $self->{pid};
         }
     }
 
@@ -69,7 +74,7 @@ sub DESTROY ( $self ) {
 around new => sub ( $orig, $self, $cmd, %args ) {
     $cmd = [$cmd] if !is_ref $cmd;
 
-    $self = $self->$orig();
+    $self = $self->$orig( kill_on_destroy => $args{kill_on_destroy} // 1 );
 
     if ($MSWIN) {
         $self->{win32_alive_timeout} = $args{win32_alive_timeout} if defined $args{win32_alive_timeout};

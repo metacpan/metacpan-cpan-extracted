@@ -11,10 +11,11 @@ use Astro::App::Satpass2::FormatTime;
 use Astro::App::Satpass2::Utils qw{
     load_package
     ARRAY_REF CODE_REF SCALAR_REF
+    @CARP_NOT
 };
 use Astro::Coord::ECI::Utils 0.059 qw{ looks_like_number };
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 my %static = (
     perltime	=> 0,
@@ -191,7 +192,7 @@ sub delegate {	## no critic (RequireFinalReturn)
 	    return ( $self->{absolute} = $dt + $self->{absolute} );
 
 	} elsif ( $string =~
-	    m/ \A epoch \s* ( \d+ (?: [.] \d* )? ) \z /smx ) {
+	    m/ \A epoch \s* ( [0-9]+ (?: [.] [0-9]* )? ) \z /smx ) {
 
 	    my $time = $1 + 0;
 	    $self->base( $self->{absolute} = $time );

@@ -5,7 +5,8 @@ use warnings;
 use base 'Pegex::Receiver';
 
 sub gotrule {
-  my ($self, $param) = @_;
+  my $self = shift;
+  my $param = (@_ == 1) ? $_[0] : [ @_ ];
   return unless defined $param;
   my $parser = $self->{parser};
   my $rule = $parser->{rule};

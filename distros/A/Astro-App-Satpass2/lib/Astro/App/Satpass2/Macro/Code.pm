@@ -7,10 +7,15 @@ use warnings;
 
 use parent qw{ Astro::App::Satpass2::Macro };
 
-use Astro::App::Satpass2::Utils qw{ expand_tilde load_package quoter };
+use Astro::App::Satpass2::Utils qw{
+    expand_tilde
+    load_package
+    quoter
+    @CARP_NOT
+};
 use File::Spec;
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 sub init {
     my ( $self ) = @_;

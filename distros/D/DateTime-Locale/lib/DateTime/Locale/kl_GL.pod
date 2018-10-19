@@ -36,7 +36,7 @@ Kalaallisut Greenland locale.
   sisamanngorneq
   tallimanngorneq
   arfininngorneq
-  sabaat
+  sapaat
 
 =head3 Abbreviated (format)
 
@@ -46,7 +46,7 @@ Kalaallisut Greenland locale.
   sis
   tal
   arf
-  sab
+  sap
 
 =head3 Narrow (format)
 
@@ -67,7 +67,7 @@ Kalaallisut Greenland locale.
   sisamanngorneq
   tallimanngorneq
   arfininngorneq
-  sabaat
+  sapaat
 
 =head3 Abbreviated (stand-alone)
 
@@ -77,7 +77,7 @@ Kalaallisut Greenland locale.
   sis
   tal
   arf
-  sab
+  sap
 
 =head3 Narrow (stand-alone)
 

@@ -20,7 +20,7 @@ sub BUILD ( $self, $args ) {
     # init template
     $self->{_tmpl} = P->tmpl;
 
-    $self->{_tmpl}->cache_string_tmpl( message => \"$self->{tmpl}$LF" );
+    $self->{_tmpl}->add_tmpl( message => "$self->{tmpl}$LF" );
 
     # check ansi support
     $self->{_is_ansi} //= -t *STDERR ? 1 : 0;    ## no critic qw[InputOutput::ProhibitInteractiveTest]

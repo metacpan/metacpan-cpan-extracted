@@ -114,7 +114,7 @@
     "\N{U+09b8}\N{U+09cb}\N{U+09ae}\N{U+09ac}\N{U+09be}\N{U+09b0}",
     "\N{U+09ae}\N{U+0999}\N{U+09cd}\N{U+0997}\N{U+09b2}\N{U+09ac}\N{U+09be}\N{U+09b0}",
     "\N{U+09ac}\N{U+09c1}\N{U+09a7}\N{U+09ac}\N{U+09be}\N{U+09b0}",
-    "\N{U+09ac}\N{U+09c3}\N{U+09b9}\N{U+09b7}\N{U+09cd}\N{U+09aa}\N{U+09a4}\N{U+09bf}\N{U+09ac}\N{U+09be}\N{U+09b0}",
+    "\N{U+09ac}\N{U+09c3}\N{U+09b9}\N{U+09b8}\N{U+09cd}\N{U+09aa}\N{U+09a4}\N{U+09bf}\N{U+09ac}\N{U+09be}\N{U+09b0}",
     "\N{U+09b6}\N{U+09c1}\N{U+0995}\N{U+09cd}\N{U+09b0}\N{U+09ac}\N{U+09be}\N{U+09b0}",
     "\N{U+09b6}\N{U+09a8}\N{U+09bf}\N{U+09ac}\N{U+09be}\N{U+09b0}",
     "\N{U+09b0}\N{U+09ac}\N{U+09bf}\N{U+09ac}\N{U+09be}\N{U+09b0}",
@@ -229,10 +229,10 @@
   native_territory => "\N{U+09ac}\N{U+09be}\N{U+0982}\N{U+09b2}\N{U+09be}\N{U+09a6}\N{U+09c7}\N{U+09b6}",
   native_variant => undef,
   quarter_format_abbreviated => [
-    "Q1",
-    "Q2",
-    "Q3",
-    "Q4",
+    "\N{U+09a4}\N{U+09cd}\N{U+09b0}\N{U+09c8}\N{U+09ae}\N{U+09be}\N{U+09b8}\N{U+09bf}\N{U+0995}",
+    "\N{U+09a6}\N{U+09cd}\N{U+09ac}\N{U+09bf}\N{U+09a4}\N{U+09c0}\N{U+09af}\N{U+09bc} \N{U+09a4}\N{U+09cd}\N{U+09b0}\N{U+09c8}\N{U+09ae}\N{U+09be}\N{U+09b8}\N{U+09bf}\N{U+0995}",
+    "\N{U+09a4}\N{U+09c3}\N{U+09a4}\N{U+09c0}\N{U+09af}\N{U+09bc} \N{U+09a4}\N{U+09cd}\N{U+09b0}\N{U+09c8}\N{U+09ae}\N{U+09be}\N{U+09b8}\N{U+09bf}\N{U+0995}",
+    "\N{U+099a}\N{U+09a4}\N{U+09c1}\N{U+09b0}\N{U+09cd}\N{U+09a5} \N{U+09a4}\N{U+09cd}\N{U+09b0}\N{U+09c8}\N{U+09ae}\N{U+09be}\N{U+09b8}\N{U+09bf}\N{U+0995}",
   ],
   quarter_format_narrow => [
     "\N{U+09e7}",
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 33,
+  version => 34,
 }

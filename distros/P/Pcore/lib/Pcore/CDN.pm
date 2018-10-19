@@ -1,24 +1,51 @@
 package Pcore::CDN;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_plain_arrayref is_plain_coderef];
 use overload '&{}' => sub ( $self, @ ) {
-    sub { $self->{bucket}->{ $self->{default} }->get_url(@_) }
+    sub { $self->get_url(@_) }
   },
   fallback => 1;
 
 has bucket => ( init_arg => undef );
-has default => ();
+has resources => ();    # HashRef[CodeRef]
 
 around new => sub ( $orig, $self, $args ) {
     $self = $self->$orig;
 
-    $self->{default} = delete $args->{default};
+    # load resources
+    if ( my $resources = delete $args->{resources} ) {
+        for my $lib ( $resources->@* ) {
+            P->class->load( $lib =~ s/-/::/smgr );
 
+            my $cdn_resources_path = $ENV->dist($lib)->{share_dir} . '/cdn-resources.perl';
+
+            if ( -f $cdn_resources_path ) {
+                my $cdn_resources = P->cfg->read($cdn_resources_path);
+
+                $self->{resources}->@{ keys $cdn_resources->%* } = values $cdn_resources->%*;
+            }
+        }
+    }
+
+    # create buckets
     while ( my ( $name, $cfg ) = each $args->%* ) {
+
+        # skip aliases
+        next if !is_ref $cfg;
+
         $self->{bucket}->{$name} = P->class->load( $cfg->{type}, ns => 'Pcore::CDN::Bucket' )->new($cfg);
 
-        $self->{default} //= $name;
+        $self->{bucket}->{default} //= $name;
+    }
+
+    # assign buckets aliases
+    while ( my ( $name, $target ) = each $args->%* ) {
+
+        # skip buckets
+        next if is_ref $target;
+
+        $self->{bucket}->{$name} = $self->{bucket}->{$target};
     }
 
     return $self;
@@ -26,97 +53,84 @@ around new => sub ( $orig, $self, $args ) {
 
 sub bucket ( $self, $name ) { return $self->{bucket}->{$name} }
 
-sub get_nginx_cfg($self) {
-    my @buf;
+# $cdn->get_url($path);
+# $cdn->get_url( $bucket_name, $path );
+sub get_url ( $self, @ ) {
+    my ( $bucket_name, $path ) = @_ == 2 ? ( 'default', $_[1] ) : ( $_[1], $_[2] );
 
-    for my $buck ( $self->{bucket}->%* ) {
-        next if !$buck->{is_local};
-
-        push @buf, $buck->get_nginx_cfg;
-    }
-
-    return join $LF, @buf;
+    return $self->{bucket}->{ $bucket_name // 'default' }->get_url($path);
 }
 
-# RESOURCES
+sub get_script_tag ( $self, @args ) { return qq[<script src="@{[ $self->get_url(@args) ]}" integrity="" crossorigin="anonymous"></script>] }
+
+sub get_css_tag ( $self, @args ) { return qq[<link rel="stylesheet" href="@{[ $self->get_url(@args) ]}" integrity="" crossorigin="anonymous" />] }
+
 sub get_resources ( $self, @resources ) {
     my @res;
 
-    for my $args (@resources) {
-        if ( is_plain_arrayref $args) {
-            my $method = '_get_res_' . shift $args->@*;
-
-            push @res, $self->$method( $args->@* )->@*;
+    for my $name (@resources) {
+        if ( is_plain_arrayref $name) {
+            push @res, $self->{resources}->{ $name->[0] }->( $self, $name->@[ 1 .. $name->$#* ] )->@*;
         }
         else {
-            my $method = '_get_res_' . $args;
-
-            push @res, $self->$method->@*;
+            push @res, $self->{resources}->{$name}->($self)->@*;
         }
     }
 
     return \@res;
 }
 
-# TODO
-sub _get_res_fa ( $self, $ver = 'v5.3.1' ) {
-    return [qq[<link rel="stylesheet" href="@{[ $self->("/static/fa-$ver/css/all.min.css") ]}" integrity="" crossorigin="anonymous" />]];
-}
+# $cdn->upload( $path, $data, %args );
+# $cdn->upload( $bucket_name, $path, $data, %args );
+sub upload ( $self, @ ) {
+    my ( $bucket_name, $path, $data, @args );
 
-# TODO
-sub _get_res_ext ( $self, $ver, $type, $theme, $default_theme, $debug = undef ) {
-    $ver ||= 'v6.6.0';
+    my $cb = is_plain_coderef $_[-1] ? pop : ();
 
-    $debug = $debug ? '-debug' : q[];
-
-    my $resources;
-
-    # framework
-    if ( $type eq 'classic' ) {
-        push $resources->@*, qq[<script src="@{[ $self->("/static/ext-$ver/ext-all$debug.js") ]}" integrity="" crossorigin="anonymous"></script>];
+    if ( @_ % 2 ) {
+        ( $bucket_name, $path, $data, @args ) = ( 'default', @_[ 1 .. $#_ ] );
     }
     else {
-        push $resources->@*, qq[<script src="@{[ $self->("/static/ext-$ver/ext-modern-all$debug.js") ]}" integrity="" crossorigin="anonymous"></script>];
+        ( $bucket_name, $path, $data, @args ) = @_[ 1 .. $#_ ];
     }
 
-    # ux
-    # push $resources->@*, qq[<script src="/static/ext-$ver/packages/ux/${framework}/ux${debug}.js" integrity="" crossorigin="anonymous"></script>];
-
-    # theme
-
-    # TODO default theme
-    $theme = $default_theme if 0;
-
-    push $resources->@*, qq[<link rel="stylesheet" href="@{[ $self->("/static/ext-$ver/$type/theme-$theme/resources/theme-$theme-all$debug.css") ]}" integrity="" crossorigin="anonymous" />];
-    push $resources->@*, qq[<script src="@{[ $self->("/static/ext-$ver/$type/theme-$theme/theme-${theme}$debug.js") ]}" integrity="" crossorigin="anonymous"></script>];
-
-    # fashion, only for modern material theme
-    push $resources->@*, qq[<script src="@{[ $self->("/static/ext-$ver/css-vars.js") ]}" integrity="" crossorigin="anonymous"></script>] if $theme eq 'material';
-
-    return $resources;
+    return $self->{bucket}->{ $bucket_name // 'default' }->upload( $path, $data, @args, $cb || () );
 }
 
-# TODO
-sub _get_res_amcharts3 ( $self, $ver = 'v3.21.13' ) {
-    return [ $self->("/static/amcharts-$ver/") ];
+sub sync ( $self, $local, $remote, @locations ) {
+    $local = $self->{bucket}->{$local};
+
+    my $local_locations = $local->{locations};
+
+    my $locations;
+
+    for my $location (@locations) {
+        my $match = '';
+
+        for my $loc_cache ( keys $local_locations->%* ) {
+            $match = $loc_cache if length $loc_cache > length $match && index( $location, $loc_cache ) == 0;
+        }
+
+        $locations->{$location} = $match ? $local_locations->{$match} : undef;
+    }
+
+    return $self->{bucket}->{$remote}->sync( $local->{libs}, $locations );
 }
 
-# TODO
-sub _get_res_ammap3 ( $self, $ver = 'v3.21.13' ) {
-    return [ $self->("/static/ammap-$ver/") ];
-}
+sub get_nginx_cfg($self) {
+    my @buf;
 
-# TODO
-sub _get_res_amcharts4 ( $self, $ver = 'v4.0.0.b51' ) {
-    return [ $self->("/static/amcharts-$ver/") ];
-}
+    my $processed;
 
-sub _get_res_amcharts4_geodata ( $self, $ver = 'v4.0.11' ) {
-    return [ $self->("/static/amcharts-geodata-$ver/") ];
-}
+    for my $bucket ( $self->{bucket}->%* ) {
+        next if !$bucket->{is_local} || exists $processed->{ $bucket->{id} };
 
-sub _get_res_jquery ( $self, $ver = 'v3.3.1' ) {
-    return [qq[<script src="@{[ $self->("/static/jquery-$ver.min.js") ]}" integrity="" crossorigin="anonymous"></script>]];
+        $processed->{ $bucket->{id} } = 1;
+
+        push @buf, $bucket->get_nginx_cfg;
+    }
+
+    return join $LF, @buf;
 }
 
 1;
@@ -126,16 +140,7 @@ sub _get_res_jquery ( $self, $ver = 'v3.3.1' ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 62                   | * Private subroutine/method '_get_res_fa' declared but not used                                                |
-## |      | 67                   | * Private subroutine/method '_get_res_ext' declared but not used                                               |
-## |      | 100                  | * Private subroutine/method '_get_res_amcharts3' declared but not used                                         |
-## |      | 105                  | * Private subroutine/method '_get_res_ammap3' declared but not used                                            |
-## |      | 110                  | * Private subroutine/method '_get_res_amcharts4' declared but not used                                         |
-## |      | 114                  | * Private subroutine/method '_get_res_amcharts4_geodata' declared but not used                                 |
-## |      | 118                  | * Private subroutine/method '_get_res_jquery' declared but not used                                            |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 67                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    2 | 108                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

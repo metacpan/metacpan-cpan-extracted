@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::DeclaredMinimumPerl
 
+1.022 2018-10-18T13:21:52Z
+	* Fix the tests which were testing the wrong module!
+
 1.021 2018-06-19T14:49:00Z
 	* Change to Artistic License 2.0
 	* various other non-code distro cleanups

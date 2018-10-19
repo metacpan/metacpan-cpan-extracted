@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 use Cwd 3;
 use Try::Tiny;
@@ -283,7 +283,7 @@ DateTime::TimeZone::Local::Unix - Determine the local system's time zone on Unix
 
 =head1 VERSION
 
-version 2.19
+version 2.20
 
 =head1 SYNOPSIS
 
@@ -342,6 +342,25 @@ If this file exists, it is opened and we look for a line starting like
 "TZ=...". If this is found, it should indicate a time zone name.
 
 =back
+
+B<Note:> Some systems such as virtual machine boxes may lack any of these
+files. You can confirm that this is case by running:
+
+    $ ls -l /etc/localtime /etc/timezone /etc/TIMEZONE \
+        /etc/sysconfig/clock /etc/default/init
+
+If this is the case, then when checking for timezone handling you are
+likely to get an exception:
+
+    $ perl -wle 'use DateTime; DateTime->now( time_zone => "local" )'
+    Cannot determine local time zone
+
+In that case, you should consult your system F<man> pages for details on how
+to address that problem. In one such case reported to us, a FreeBSD virtual
+machine had been built without any of these files. The user was able to run
+the FreeBSD F<tzsetup> utility. That installed F</etc/localtime>, after which
+the above timezone diagnostic ran silently, I<i.e.>, without throwing an
+exception.
 
 =head1 SUPPORT
 

@@ -1,6 +1,6 @@
 package Catmandu::FileBag::Index;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Catmandu::Sane;
 use Moo::Role;

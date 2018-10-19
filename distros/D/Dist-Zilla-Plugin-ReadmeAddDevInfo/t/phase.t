@@ -5,7 +5,7 @@ use warnings;
 use lib 't/lib';
 use TestInfo;
 
-my $info = qr/\#\#\s+Development.*?--release\n```\n/s;
+my $info = qr/\#\s+Development.*?--release\n```\n/s;
 
 subtest 'after build' => sub {
   my $test = build_dist({}, {
@@ -23,7 +23,7 @@ subtest 'after build' => sub {
 
   like $test->{readme}->slurp_raw,
     qr/$info\n+release\z/m,
-    'badges added between build and release';
+    'info added between build and release';
 };
 
 subtest 'after release' => sub {
@@ -33,13 +33,13 @@ subtest 'after release' => sub {
   });
 
   unlike $test->{readme}->slurp_raw, $info,
-    'dist built, badges not yet added';
+    'dist built, info not yet added';
 
   $test->{zilla}->release;
 
   like $test->{readme}->slurp_raw,
     qr/$info\z/,
-    'badges added after release';
+    'info added after release';
 };
 
 done_testing;

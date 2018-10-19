@@ -248,9 +248,9 @@ Afrikaans South Africa locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Dinsdag, 05 Februarie 2008
-   1995-12-22T09:05:02 = Vrydag, 22 Desember 1995
-  -0010-09-15T04:44:23 = Saterdag, 15 September -10
+   2008-02-05T18:30:30 = Dinsdag 05 Februarie 2008
+   1995-12-22T09:05:02 = Vrydag 22 Desember 1995
+  -0010-09-15T04:44:23 = Saterdag 15 September -10
 
 =head3 Long
 
@@ -302,9 +302,9 @@ Afrikaans South Africa locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Dinsdag, 05 Februarie 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = Vrydag, 22 Desember 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = Saterdag, 15 September -10 04:44:23 UTC
+   2008-02-05T18:30:30 = Dinsdag 05 Februarie 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = Vrydag 22 Desember 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = Saterdag 15 September -10 04:44:23 UTC
 
 =head3 Long
 
@@ -405,11 +405,11 @@ Afrikaans South Africa locale.
    1995-12-22T09:05:02 = Des. 1995 n.C.
   -0010-09-15T04:44:23 = Sep. -10 v.C.
 
-=head3 GyMMMEd (E, dd MMM y G)
+=head3 GyMMMEd (E dd MMM y G)
 
-   2008-02-05T18:30:30 = Di., 05 Feb. 2008 n.C.
-   1995-12-22T09:05:02 = Vr., 22 Des. 1995 n.C.
-  -0010-09-15T04:44:23 = Sa., 15 Sep. -10 v.C.
+   2008-02-05T18:30:30 = Di. 05 Feb. 2008 n.C.
+   1995-12-22T09:05:02 = Vr. 22 Des. 1995 n.C.
+  -0010-09-15T04:44:23 = Sa. 15 Sep. -10 v.C.
 
 =head3 GyMMMd (dd MMM y G)
 
@@ -453,11 +453,11 @@ Afrikaans South Africa locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (E, d/M)
+=head3 MEd (E d/M)
 
-   2008-02-05T18:30:30 = Di., 5/2
-   1995-12-22T09:05:02 = Vr., 22/12
-  -0010-09-15T04:44:23 = Sa., 15/9
+   2008-02-05T18:30:30 = Di. 5/2
+   1995-12-22T09:05:02 = Vr. 22/12
+  -0010-09-15T04:44:23 = Sa. 15/9
 
 =head3 MMM (LLL)
 
@@ -573,11 +573,11 @@ Afrikaans South Africa locale.
    1995-12-22T09:05:02 = Des. 1995
   -0010-09-15T04:44:23 = Sep. -10
 
-=head3 yMMMEd (E, d MMM y)
+=head3 yMMMEd (E d MMM y)
 
-   2008-02-05T18:30:30 = Di., 5 Feb. 2008
-   1995-12-22T09:05:02 = Vr., 22 Des. 1995
-  -0010-09-15T04:44:23 = Sa., 15 Sep. -10
+   2008-02-05T18:30:30 = Di. 5 Feb. 2008
+   1995-12-22T09:05:02 = Vr. 22 Des. 1995
+  -0010-09-15T04:44:23 = Sa. 15 Sep. -10
 
 =head3 yMMMM (MMMM y)
 

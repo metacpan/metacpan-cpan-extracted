@@ -10,6 +10,47 @@ use Moose;
 
 extends 'Dist::Zilla::PluginBundle::DROLSKY';
 
+use Dist::Zilla::Plugin::OSPrereqs;
+if ( Dist::Zilla::Plugin::OSPrereqs->VERSION <= 0.011 ) {
+
+    # This fixes https://github.com/dagolden/Dist-Zilla-Plugin-OSPrereqs/issues/16
+
+## no critic (BuiltinFunctions::ProhibitStringyEval, ErrorHandling::RequireCheckingReturnValueOfEval)
+    eval <<'EOF';
+{
+package Dist::Zilla::Plugin::OSPrereqs;
+no warnings 'redefine';
+sub BUILDARGS {
+    my ( $class, @arg ) = @_;
+    my %copy = ref $arg[0] ? %{ $arg[0] } : @arg;
+
+    my $zilla = delete $copy{zilla};
+    my $name  = delete $copy{plugin_name};
+    my $os    = delete $copy{prereq_os};
+
+    my @dashed = grep { /^-/ } keys %copy;
+
+    my %other;
+    for my $dkey (@dashed) {
+        ( my $key = $dkey ) =~ s/^-//;
+
+        $other{$key} = delete $copy{$dkey};
+    }
+
+    Carp::confess "don't try to pass -_prereq as a build arg!" if $other{_prereq};
+
+    return {
+        zilla       => $zilla,
+        plugin_name => $name,
+        ( defined $os ? ( prereq_os => $os ) : () ),
+        _prereq     => \%copy,
+        %other,
+    };
+}
+}
+EOF
+}
+
 my $FallbackVersion = '1.94';
 override configure => sub {
     my $self = shift;
@@ -33,6 +74,7 @@ override configure => sub {
     $self->add_plugins(
         [
             'OSPrereqs' => 'MSWin32' => {
+                prereq_os                          => 'MSWin32',
                 'DateTime::TimeZone::Local::Win32' => $version,
             }
         ],

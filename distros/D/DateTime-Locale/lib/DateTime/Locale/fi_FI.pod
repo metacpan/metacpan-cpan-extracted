@@ -411,6 +411,18 @@ Finnish Finland locale.
    1995-12-22T09:05:02 = pe 22. jouluk. 1995 jKr.
   -0010-09-15T04:44:23 = la 15. syysk. -10 eKr.
 
+=head3 GyMMMMEd (E d. MMMM y G)
+
+   2008-02-05T18:30:30 = ti 5. helmikuuta 2008 jKr.
+   1995-12-22T09:05:02 = pe 22. joulukuuta 1995 jKr.
+  -0010-09-15T04:44:23 = la 15. syyskuuta -10 eKr.
+
+=head3 GyMMMMd (d. MMMM y G)
+
+   2008-02-05T18:30:30 = 5. helmikuuta 2008 jKr.
+   1995-12-22T09:05:02 = 22. joulukuuta 1995 jKr.
+  -0010-09-15T04:44:23 = 15. syyskuuta -10 eKr.
+
 =head3 GyMMMd (d. MMM y G)
 
    2008-02-05T18:30:30 = 5. helmik. 2008 jKr.
@@ -470,6 +482,12 @@ Finnish Finland locale.
    2008-02-05T18:30:30 = ti 5. helmik.
    1995-12-22T09:05:02 = pe 22. jouluk.
   -0010-09-15T04:44:23 = la 15. syysk.
+
+=head3 MMMMEd (ccc d. MMMM)
+
+   2008-02-05T18:30:30 = ti 5. helmikuuta
+   1995-12-22T09:05:02 = pe 22. joulukuuta
+  -0010-09-15T04:44:23 = la 15. syyskuuta
 
 =head3 MMMMW-count-one (LLLL'n' W. 'viikko')
 
@@ -585,11 +603,23 @@ Finnish Finland locale.
    1995-12-22T09:05:02 = joulukuu 1995
   -0010-09-15T04:44:23 = syyskuu -10
 
+=head3 yMMMMEd (E d. MMMM y)
+
+   2008-02-05T18:30:30 = ti 5. helmikuuta 2008
+   1995-12-22T09:05:02 = pe 22. joulukuuta 1995
+  -0010-09-15T04:44:23 = la 15. syyskuuta -10
+
 =head3 yMMMMccccd (cccc d. MMMM y)
 
    2008-02-05T18:30:30 = tiistai 5. helmikuuta 2008
    1995-12-22T09:05:02 = perjantai 22. joulukuuta 1995
   -0010-09-15T04:44:23 = lauantai 15. syyskuuta -10
+
+=head3 yMMMMd (d. MMMM y)
+
+   2008-02-05T18:30:30 = 5. helmikuuta 2008
+   1995-12-22T09:05:02 = 22. joulukuuta 1995
+  -0010-09-15T04:44:23 = 15. syyskuuta -10
 
 =head3 yMMMd (d. MMM y)
 

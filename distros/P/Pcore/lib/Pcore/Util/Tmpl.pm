@@ -1,10 +1,21 @@
 package Pcore::Util::Tmpl;
 
-use Pcore -class;
+use Pcore -class, -export;
+use Pcore::Util::Scalar qw[is_ref];
 use Text::Xslate qw[];
 
-has _renderer => ( is => 'ro', isa => InstanceOf ['Text::Xslate'], required => 1 );
-has _string_tmpl => ( is => 'ro', isa => HashRef, required => 1 );
+use overload '&{}' => sub ( $self, @ ) {
+    sub { $self->render(@_) }
+  },
+  fallback => 1;
+
+our $EXPORT = [qw[mark_raw unmark_raw]];
+
+has _renderer    => ( required => 1 );    # InstanceOf ['Text::Xslate']
+has _string_tmpl => ( required => 1 );    # HashRef
+
+sub mark_raw : prototype($)   { return Text::Xslate::mark_raw @_ }
+sub unmark_raw : prototype($) { return Text::Xslate::unmark_raw @_ }
 
 # cache => 0 - don't use cache at all
 #
@@ -27,45 +38,49 @@ around new => sub ( $orig, $self, %args ) {
     my $args_def = {
         path        => $path,
         cache       => 1,
-        cache_dir   => $ENV->{TEMP_DIR} . '.xslate',
-        input_layer => q[:encoding(UTF-8)],
+        cache_dir   => "$ENV->{TEMP_DIR}/.xslate",
+        input_layer => ':encoding(UTF-8)',
         type        => 'html',                                                              # html, text}
         syntax      => 'Kolon',                                                             # Kolon, TTerse
         module      => [ 'Text::Xslate::Bridge::TT2Like', 'Text::Xslate::Bridge::Star' ],
-        function    => {
-            l10n => sub {
-                return l10n( \@_ );
-            },
-        },
+        function    => { l10n => sub { return l10n( \@_ ) }, },
     };
 
-    return $self->$orig( { _renderer => Text::Xslate->new( P->hash->merge( $args_def, \%args )->%* ), _string_tmpl => $string_tmpl_cache } );
+    return bless {
+        _renderer    => Text::Xslate->new( P->hash->merge( $args_def, \%args )->%* ),
+        _string_tmpl => $string_tmpl_cache
+    }, $self;
 };
 
-sub cache_string_tmpl ( $self, %args ) {
+# name1 => $tmpl1, ...
+sub add_tmpl ( $self, %args ) {
     for my $name ( keys %args ) {
-        $self->_string_tmpl->{$name} = $args{$name}->$*;
+        my $exists = exists $self->{_string_tmpl}->{$name};
 
-        $self->reload_tmpl($name);
+        $self->{_string_tmpl}->{$name} = $args{$name};
+
+        $self->{_renderer}->load_file($name) if $exists;
     }
 
     return;
 }
 
-sub reload_tmpl ( $self, @args ) {
-    for (@args) {
-        $self->_renderer->load_file($_);
-    }
+sub reload_tmpl ( $self, @names ) {
+    for (@names) { $self->{_renderer}->load_file($_) }
 
     return;
 }
 
 sub render ( $self, $tmpl, $params = undef ) {
-    if ( ref $tmpl eq 'SCALAR' ) {
-        return \$self->_renderer->render_string( $tmpl->$*, $params );
+
+    # anon. template
+    if ( is_ref $tmpl ) {
+        return \$self->{_renderer}->render_string( $tmpl->$*, $params );
     }
+
+    # named template
     else {
-        return \$self->_renderer->render( $tmpl, $params );
+        return \$self->{_renderer}->render( $tmpl, $params );
     }
 }
 

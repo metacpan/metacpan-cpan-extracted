@@ -28,13 +28,12 @@ DESCRIPTION
     Template Toolkit format, and Mojolicious::Guides::Rendering for general
     information on rendering in Mojolicious.
 
-    Along with standard template files, inline and data section templates
-    can be rendered in the standard way. Template files and data sections
-    will be retrieved using Mojolicious::Renderer via
-    Template::Provider::Mojo for both standard rendering and directives
-    such as INCLUDE. This means that instead of specifying INCLUDE_PATH,
-    you should set "paths" in Mojolicious::Renderer to the appropriate
-    paths.
+    Along with template files, inline and data section templates can be
+    rendered in the standard Mojolicious fashion. Template files and data
+    sections will be retrieved using Mojolicious::Renderer via
+    Template::Provider::Mojo for both direct rendering and directives such
+    as INCLUDE. This means that instead of specifying INCLUDE_PATH, you
+    should set "paths" in Mojolicious::Renderer to the appropriate paths.
 
      $app->renderer->paths(['/path/to/templates']);
      push @{$app->renderer->paths}, '/path/to/more/templates';
@@ -42,12 +41,13 @@ DESCRIPTION
     Mojolicious stash values will be exposed directly as variables in the
     templates, and the current controller object will be available as c or
     self, similar to Mojolicious::Plugin::EPRenderer. Helper methods can be
-    called on the controller object directly or via the helpers method. See
-    Mojolicious::Plugin::DefaultHelpers and Mojolicious::Plugin::TagHelpers
-    for a list of all built-in helpers.
+    called on the controller object or a more efficient proxy object
+    available as h. See Mojolicious::Plugin::DefaultHelpers and
+    Mojolicious::Plugin::TagHelpers for a list of all built-in helpers.
 
-    Accessing helper methods directly as variables rather than via the
-    controller object is deprecated and may be removed in a future release.
+    Accessing helper methods directly as variables, rather than via the
+    controller or proxy object, is deprecated and may be removed in a
+    future release.
 
      $c->stash(description => 'template engine');
      $c->stash(engines => [qw(Template::Toolkit Text::Template)]);
@@ -56,7 +56,7 @@ DESCRIPTION
        [% engine %] is a [% description %].
      [% END %]
      
-     [% c.helpers.link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
+     [% h.link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
      
      [% c.param('foo') %]
 

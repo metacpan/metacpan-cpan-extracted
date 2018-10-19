@@ -1,7 +1,12 @@
 Changes for lib::projectroot
 
+1.006   2018-10-18T15:43:25
+    - doc fix: missing $ sign in SYNOPSIS (David Schmidt)
+
+
 1.005   2016-02-17T11:02:19
     - new options extra_with_local
+
 
 1.004   2015-07-07T13:52:26
     - $ROOT is now a package global, so we can read it from the outside

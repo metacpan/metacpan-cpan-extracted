@@ -7,6 +7,8 @@ use Carp;
 use YAML qw{LoadFile};
 
 use File::Path qw(make_path remove_tree);
+use File::Touch;
+use HTTP::Tiny;
 
 use Sparrow::Constants;
 
@@ -15,6 +17,7 @@ our @EXPORT = qw {
     usage
     init_sparrow_env
     sparrow_config
+    get_http_resource    
 };
 
 my $sparrow_config;
@@ -93,19 +96,17 @@ sub usage {
 
 sub init_sparrow_env {
 
-    make_path(sparrow_root);
-    make_path(sparrow_root.'/plugins/private');
-    make_path(sparrow_root.'/plugins/public');
-    make_path(sparrow_root.'/projects');
+    make_path(sparrow_root());
+	print "sparrow root: [", sparrow_root(),"]\n";
+	make_path(sparrow_root().'/plugins', { verbose => 1 } ); #
+    make_path(sparrow_root().'/plugins/private');
+    make_path(sparrow_root().'/plugins/public');
+    make_path(sparrow_root().'/projects');
     #remove_tree(sparrow_root.'/cache');
 
     make_path(sparrow_root.'/cache');
 
-    execute_shell_command('touch '.spi_file()) unless -f spi_file();
-
-    execute_shell_command('touch '.spl_file()) unless -f spl_file();
-
-    execute_shell_command('touch '.spci_file()) unless -f spci_file();
+    touch( spi_file(), spl_file(), spci_file() );
 
     if (-f sparrow_conf_file()){
       ($sparrow_config) = LoadFile(sparrow_conf_file());
@@ -114,6 +115,26 @@ sub init_sparrow_env {
 
 sub sparrow_config {
     $sparrow_config||{};
+}
+
+sub get_http_resource {
+
+  my $url = shift;
+  my %opts = @_;
+
+  my $agent = $opts{agent} || 'http-tiny';
+  my $res;	
+
+  if ( -f $url ) {
+		open my $fh1, $url or die "can't open $url to read: $!";
+		$res = join "", <$fh1>;
+		close $fh1;	
+  } else {
+		my $response = HTTP::Tiny->new( agent => $agent )->get($url);
+		die "Failed to fetch $url: $response->{status} $response->{reason}\n" unless $response->{success};
+		$res = $response->{content};		
+  }
+  return $res;
 }
 
 1;

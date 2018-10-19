@@ -1,72 +1,112 @@
 package Pcore::CDN::Bucket::local;
 
-use Pcore -class;
+use Pcore -class, -res;
+use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_coderef];
 
 with qw[Pcore::CDN::Bucket];
 
-has lib => ();
+has locations => ();         # HashRef
+has prefix    => ('/cdn');
 
+has libs       => ( init_arg => undef );    # ArrayRef
+has write_path => ( init_arg => undef );
 has is_local => ( 1, init_arg => undef );
 
 sub BUILD ( $self, $args ) {
-    $self->{prefix} = '';
 
     # load libs
-    for my $lib ( $self->{lib}->@* ) { P->class->load( $lib =~ s/-/::/smgr ) }
+    for my $path ( $args->{libs}->@* ) {
+
+        # $path is absolute
+        if ( $path =~ m[\A/]sm ) {
+            P->file->mkpath( $path, mode => 'rwxr-xr-x' ) || die qq[Can't create CDN path "$path", $!] if !-d $path;
+
+            $self->{write_path} //= $path;
+        }
+
+        # $path is dist name
+        else {
+            P->class->load( $path =~ s/-/::/smgr );
+
+            $path = $ENV->{share}->get_storage( $path, 'cdn' );
+
+            next if !$path;
+        }
+
+        push $self->{libs}->@*, "$path";
+    }
 
     return;
 }
 
-# TODO maybe create local temp bucket automatically
-# P->file->mkpath( "$ENV->{DATA_DIR}share", mode => 'rwxr-xr-x' ) if !-e "$ENV->{DATA_DIR}share/";
-# $ENV->{share}->register_lib( 'autostars', "$ENV->{DATA_DIR}share/" );
 sub get_nginx_cfg ($self) {
-    my @buf;
+    my $tmpl = <<'TMPL';
+    # cdn
+    location <: $prefix :>/ {
+        error_page 418 = @<: $libs[0] :>;
+        set $cache_control "<: $locations["/"] :>";
+        return 418;
+: for $locations.keys().sort() -> $location {
+: next if $location == "/"
 
-    my $locations;
-
-    for my $lib ( $self->{lib}->@* ) {
-        my $storage = $ENV->{share}->get_storage( $lib, 'www' );
-
-        next if !$storage || !-d "$storage/static";
-
-        push $locations->@*, $storage;
+        location <: $prefix :><: $location :> {
+            set $cache_control "<: $locations[$location] :>";
+            return 418;
+        }
+: }
     }
+:for $libs -> $path {
 
-    # add_header    Cache-Control "public, private, must-revalidate, proxy-revalidate";
-
-    for ( my $i = 0; $i <= $locations->$#*; $i++ ) {
-        my $location = $i == 0 ? '/static/' : "\@$locations->[$i]";
-
-        my $next = $i < $locations->$#* ? "\@$locations->[$i + 1]" : '=404';
-
-        push @buf, <<"TXT";
-    location $location {
-        add_header    Cache-Control "public, max-age=30672000";
-        root          $locations->[$i];
-        try_files     \$uri $next;
+    location @<: $path :> {
+        root          <: $path :>;
+        add_header    Cache-Control $cache_control;
+: if ( $~path.is_last ) {
+        try_files     /../$uri =404;
+: }
+: else {
+        try_files     /../$uri @<: $~path.peek_next :>;
+: }
     }
-TXT
-    }
+: }
+TMPL
 
-    return <<"TXT";
-@{[join $LF, @buf]}
-TXT
+    return P->tmpl->(
+        \$tmpl,
+        {   prefix    => $self->{prefix},
+            locations => $self->{locations},
+            libs      => $self->{libs},
+        }
+    )->$*;
+}
+
+# TODO check path
+sub upload ( $self, $path, $data, @args ) {
+    my $cb = is_plain_coderef $_[-1] ? pop @args : ();
+
+    die q[Bucket has no default write path] if !$self->{write_path};
+
+    state $on_finish = sub ( $cb, $res ) {
+        if ($cb) {
+            return $cb->($res);
+        }
+        else {
+            return $res;
+        }
+    };
+
+    $path = P->path("$self->{write_path}/$path");
+
+    # TODO check, that path is child
+    # return $on_finish->( $cb, res 404 );
+
+    P->file->mkpath( $path->dirname, mode => 'rwxr-xr-x' ) || return res [ 500, qq[Can't create CDN path "$path", $!] ] if !-d $path->dirname;
+
+    P->file->write_bin( $path, { mode => 'rw-r--r--' }, $data );    # TODO or return res [ 500, qq[Can't write "$path", $!] ];
+
+    return $on_finish->( $cb, res 200 );
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 12                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 38                   | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

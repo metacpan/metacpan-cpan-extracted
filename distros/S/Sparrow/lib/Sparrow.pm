@@ -1,6 +1,6 @@
 package Sparrow;
 
-our $VERSION = '0.2.53';
+our $VERSION = '0.3.2';
 
 1;
 
@@ -14,13 +14,9 @@ __END__
 
 =head1 NAME
 
-Sparrow
-
-
-=head1 SYNOPSIS
-
 Sparrow - multipurpose scenarios manager.
 
+=head1 SYNOPSIS
 
 =head1 Install
 

@@ -36,29 +36,16 @@ sub init ($self) {
 
     # scan filesystem namespace, find and preload controllers
     for my $inc ( grep { !ref } @INC ) {
-        if ( -d "$inc/$ns_path" ) {
-            my $guard = P->file->chdir("$inc/$ns_path");
+        for my $file ( ( P->path1("$inc/$ns_path")->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
 
-            P->file->find(
-                "$inc/$ns_path",
-                abs => 0,
-                dir => 0,
-                sub ($path) {
+            # .pm file
+            if ( $file =~ s/[.]pm\z//sm ) {
 
-                    # .pm file
-                    if ( $path->suffix eq 'pm' ) {
+                # API class must be located in V\d+ directory
+                return if $file !~ m[\Av\d+/]sm;
 
-                        # API class must be located in V\d+ directory
-                        return if $path !~ m[\Av\d+/]sm;
-
-                        my $route = $path->dirname . $path->filename_base;
-
-                        $class->{$route} = "$ns_path/$route" =~ s[/][::]smgr;
-                    }
-
-                    return;
-                }
-            );
+                $class->{$file} = "$ns_path/$file" =~ s[/][::]smgr;
+            }
         }
     }
 
@@ -187,7 +174,7 @@ sub get_method ( $self, $method_id ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 13                   | Subroutines::ProhibitExcessComplexity - Subroutine "init" with high complexity score (22)                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 157, 163             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 144, 150             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

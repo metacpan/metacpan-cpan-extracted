@@ -1,0 +1,23 @@
+environment:
+  PERL_USE_UNSAFE_INC: 1
+  HOME: C:/Users/appveyor
+  USER: appveyor
+
+cache:
+  - C:\strawberry
+
+install:
+  - if not exist "C:\strawberry" choco install strawberryperl -y
+  - set PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - cpanm --quiet --installdeps --with-develop --notest .
+
+build_script:
+  - perl Makefile.PL
+  - gmake
+  - gmake test
+  - gmake install
+
+test_script:
+  - gmake test
+  - perl run-test.pl

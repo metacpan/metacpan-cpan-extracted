@@ -37,7 +37,7 @@ subtest 'attr Async=>1' => sub {
   my @cb = ();
   for (1..5) {
     my $rand = rand;
-    push @cb, [(my $cb = $pg->selectrow_hashref('select now() as now, pg_sleep(?), ?::numeric as rand', {Async=>1}, ($_,$rand))), $rand];
+    push @cb, [(my $cb = $pg->selectrow_hashref('select now() as now, pg_sleep(?), ?::numeric as rand', {Async=>1}, (10-$_,$rand))), $rand];
   }
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
   for (@cb) {

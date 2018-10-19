@@ -135,27 +135,20 @@ sub tgz ($self) {
 
     my $tgz = Archive::Tar->new;
 
-    my $base_dir = $self->dist->name . q[-] . $self->dist->version . q[/];
+    my $base_dir = $self->dist->name . q[-] . $self->dist->version;
 
-    P->file->find(
-        $temp,
-        abs => 0,
-        dir => 0,
-        sub ($path) {
-            my $mode;
+    for my $path ( P->path1($temp)->read_dir( max_depth => 0, is_dir => 0 )->@* ) {
+        my $mode;
 
-            if ( $path =~ m[\A(script|t)/]sm ) {
-                $mode = P->file->calc_chmod('rwxr-xr-x');
-            }
-            else {
-                $mode = P->file->calc_chmod('rw-r--r--');
-            }
-
-            $tgz->add_data( $base_dir . $path, P->file->read_bin($path)->$*, { mode => $mode } );
-
-            return;
+        if ( $path =~ m[\A(script|t)/]sm ) {
+            $mode = P->file->calc_chmod('rwxr-xr-x');
         }
-    );
+        else {
+            $mode = P->file->calc_chmod('rw-r--r--');
+        }
+
+        $tgz->add_data( "$base_dir/$path", P->file->read_bin("$temp/$path")->$*, { mode => $mode } );
+    }
 
     my $path = $ENV->{PCORE_SYS_DIR} . 'build/' . $self->dist->name . q[-] . $self->dist->version . '.tar.gz';
 

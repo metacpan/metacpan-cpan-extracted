@@ -50,8 +50,8 @@
     yMd => "y-d-M",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "y\N{U+060c} w-\N{U+06be}\N{U+06d5}\N{U+067e}\N{U+062a}\N{U+06d5}",
-    "yw-count-other" => "y\N{U+060c} w-\N{U+06be}\N{U+06d5}\N{U+067e}\N{U+062a}\N{U+06d5}",
+    "yw-count-one" => "Y\N{U+060c} w-\N{U+06be}\N{U+06d5}\N{U+067e}\N{U+062a}\N{U+06d5}",
+    "yw-count-other" => "Y\N{U+060c} w-\N{U+06be}\N{U+06d5}\N{U+067e}\N{U+062a}\N{U+06d5}",
   },
   code => "ug-CN",
   date_format_full => "y d-MMMM\N{U+060c} EEEE",
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 33,
+  version => 34,
 }

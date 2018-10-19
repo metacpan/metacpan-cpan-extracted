@@ -11,11 +11,11 @@ Git repository.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 =head1 SYNOPSIS
 
@@ -52,10 +52,6 @@ my %REPOSITORY_LIST = (
   'science-cruise-data-management' => 'https://scdm.epfl.ch',
   'site-diffusion-mediatheque'     => 'https://mediatheque.epfl.ch',
   'web2010'                        => 'https://www.epfl.ch',
-
-  # DevRun
-  'epfl-devrun.github.io' => 'https://epfl-devrun.github.io/',
-  'epfl-news-reader'      => 'https://epfl-devrun.github.io/epfl-news-reader/',
 );
 
 use base 'Exporter';
@@ -123,7 +119,10 @@ L<http://search.cpan.org/dist/EPFL-Service-Open/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, VPSI, 2018.
+Original work Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE,
+Switzerland, VPSI, 2018.
+
+Modified work Copyright William Belle, 2018.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

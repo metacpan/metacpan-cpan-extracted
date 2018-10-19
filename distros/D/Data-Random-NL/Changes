@@ -1,6 +1,12 @@
 Revision history for Data-Random-NL
 
-1.4       2018-06-08 12:38:59Z
+1.6       2018-10-18 09:51:33Z
+
+1.5       2018-10-18 09:38:16Z
+
+    * Add generate_vestiginsnummer
+
+1.4       2018-06-08 13:25:00Z
 
     * POD fixes in the command line scripts
 

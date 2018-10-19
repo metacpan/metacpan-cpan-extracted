@@ -8,9 +8,9 @@ use Astro::Coord::ECI::Utils 0.077 qw{
 
 use parent qw{ Astro::App::Satpass2::ParseTime::Date::Manip };
 
-use Astro::App::Satpass2::Utils qw{ load_package };
+use Astro::App::Satpass2::Utils qw{ load_package @CARP_NOT };
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 my $invalid;
 

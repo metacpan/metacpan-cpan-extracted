@@ -10,7 +10,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/module-extract-declaredversion/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Module-Extract-DeclaredVersion.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/Module::Extract::DeclaredVersion"><img src="https://img.shields.io/cpan/v/Module-Extract-DeclaredVersion.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/Module::Extract::DeclaredVersion"><img src="https://img.shields.io/cpan/v/Module-Extract-DeclaredVersion.svg" /></A>
 
 =head1 The Module::Extract::DeclaredVersion module
 
@@ -33,7 +33,7 @@ name instead of the file location:
 	% perldoc Module::Extract::DeclaredVersion
 
 You can read the documentation and inspect the meta data on
-L<MetaCPAN|https://www.metacpan.org/module/Module::Extract::DeclaredVersion>.
+L<MetaCPAN|https://metacpan.org/pod/Module::Extract::DeclaredVersion>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's

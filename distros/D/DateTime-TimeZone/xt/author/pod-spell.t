@@ -171,6 +171,7 @@ El
 El_Aaiun
 El_Salvador
 Enderbury
+Eswatini
 Etheridge
 Eucla
 Europe
@@ -244,6 +245,7 @@ Jakarta
 Jakub
 Jamahiriya
 Jamaica
+James
 Jayapura
 Jerusalem
 Johannesburg
@@ -262,6 +264,7 @@ Kamchatka
 Karachi
 Karen
 Kathmandu
+Keenan
 Kentucky
 Kerguelen
 Khandyga
@@ -572,6 +575,7 @@ drolsky
 env
 ether
 jhoblitt
+jkeenan
 jwilk
 karupa
 karupanerura

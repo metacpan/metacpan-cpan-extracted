@@ -12,19 +12,19 @@ use My::Module::Test::App;
 
 use Astro::App::Satpass2;
 
-class   'Astro::App::Satpass2';
+klass   'Astro::App::Satpass2';
 
-method  new => INSTANTIATE, 'Instantiate';
+call_m  new => INSTANTIATE, 'Instantiate';
 
 my @commands;
 
-method  set => execute_filter => sub {
+call_m  set => execute_filter => sub {
     my ( undef, $args ) = @_;		# Invocant unused
     push @commands, $args;
     return 0;
 }, undef, 'Disable execution and capture tokenized command';
 
-method  source => { level1 => 1 }, [ 'almanac' ], undef,
+call_m  source => { level1 => 1 }, [ 'almanac' ], undef,
     q{Rewrite 'almanac'};
 
 is      scalar @commands, 2, q{Expect two commands from 'almanac'};
@@ -35,7 +35,7 @@ is_deeply $commands[1], [ 'almanac' ], q{Second command is 'almanac'};
 
 @commands = ();
 
-method  source => { level1 => 1 }, [ 'flare -am "today noon" \\', '+1' ],
+call_m  source => { level1 => 1 }, [ 'flare -am "today noon" \\', '+1' ],
     undef, q{Rewrite 'flare -am "today noon" +1'};
 
 is      scalar @commands, 1, q{Expect one command from 'flare ...'};
@@ -45,7 +45,7 @@ is_deeply $commands[0], [ 'flare', '-noam', 'today noon', '+1' ],
 
 @commands = ();
 
-method  source => { level1 => 1 }, [ 'pass "today noon" +2' ], undef,
+call_m  source => { level1 => 1 }, [ 'pass "today noon" +2' ], undef,
 q{Rewrite 'pass "today noon" +1'};
 
 is      scalar @commands, 2, q{Expect two commands from 'pass ...'};
@@ -55,12 +55,12 @@ is_deeply $commands[0], [ 'location' ], q{First command is 'location'};
 is_deeply $commands[1], [ 'pass', 'today noon', '+2' ],
     q{Second command is 'pass ...'};
 
-method  set => execute_filter => sub { return 1 }, undef,
+call_m  set => execute_filter => sub { return 1 }, undef,
     'Enable execution';
 
-method  set => stdout => undef, undef, 'Disable output';
+call_m  set => stdout => undef, undef, 'Disable output';
 
-method  source => { level1 => 1 }, 't/rewrite_macros',
+call_m  source => { level1 => 1 }, 't/rewrite_macros',
     undef, 'Load satpass-format macros';
 
 execute 'macro list farmers', <<'EOD', 'Rewrite almanac';

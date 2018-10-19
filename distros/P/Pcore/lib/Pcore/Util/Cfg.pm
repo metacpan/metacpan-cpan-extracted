@@ -16,7 +16,8 @@ const our $EXT_TYPE_MAP => {
 
 sub read ( $cfg, @ ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     my %args = (
-        type => undef,
+        type   => undef,
+        params => undef,
         splice @_, 1,
     );
 
@@ -31,6 +32,12 @@ sub read ( $cfg, @ ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     }
     else {
         encode_utf8 $cfg->$*;
+    }
+
+    if ( defined $args{params} ) {
+        state $tmpl = P->tmpl;
+
+        $cfg = $tmpl->( $cfg, $args{params} );
     }
 
     $type //= $DATA_TYPE_PERL;
@@ -62,7 +69,7 @@ sub write ( $path, $cfg, @ ) {    ## no critic qw[Subroutines::ProhibitBuiltinHo
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 49                   | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 56                   | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-09-21'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-10-18'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010;
 use strict;
@@ -38,7 +38,7 @@ swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.003 of swcat (from Perl distribution App-swcat), released on 2018-09-21.
+This document describes version 0.007 of swcat (from Perl distribution App-swcat), released on 2018-10-18.
 
 =head1 SYNOPSIS
 
@@ -50,6 +50,15 @@ This document describes version 0.003 of swcat (from Perl distribution App-swcat
  % swcat latest-version firefox  ;# by default will be cached for a day
  % swcat latest-version firefox --no-cache
 
+ # get latest version of a few software
+ % swcat latest-version firefox seamonkey
+
+ # get latest version of all known software
+ % swcat latest-version
+
+ # get latest version of known software matching a regex
+ % swcat latest-version /fire|sea/
+
  # get download URL(s) of a software
  % swcat download-url firefox
  % swcat download-url firefox --arch win32
@@ -60,9 +69,19 @@ This document describes version 0.003 of swcat (from Perl distribution App-swcat
 
 Get download URL(s) of a software.
 
+Will return the version number in the payload if given a single software name.
+Will return an array of {software=>..., version=>...} in the payload if given
+multiple software names or one or more patterns.
+
+
 =head2 B<latest-version>
 
-Get latest version of a software.
+Get latest version of one or more software.
+
+Will return the version number in the payload if given a single software name.
+Will return an array of {software=>..., version=>...} in the payload if given
+multiple software names or one or more patterns.
+
 
 =head2 B<list>
 
@@ -177,7 +196,13 @@ Display program's version and exit.
 
 =item B<--arch>=I<s>
 
-=item B<--software>=I<s>*
+=item B<--software-or-pattern>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--softwares-or-patterns-json>=I<s>
+
+See C<--software-or-pattern>.
 
 =back
 
@@ -185,7 +210,13 @@ Display program's version and exit.
 
 =over
 
-=item B<--software>=I<s>*
+=item B<--software-or-pattern>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--softwares-or-patterns-json>=I<s>
+
+See C<--software-or-pattern>.
 
 =back
 
@@ -262,11 +293,11 @@ List of available configuration parameters:
 =head2 Configuration for subcommand download-url
 
  arch (see --arch)
- software (see --software)
+ softwares_or_patterns (see --software-or-pattern)
 
 =head2 Configuration for subcommand latest-version
 
- software (see --software)
+ softwares_or_patterns (see --software-or-pattern)
 
 =head2 Configuration for subcommand list
 

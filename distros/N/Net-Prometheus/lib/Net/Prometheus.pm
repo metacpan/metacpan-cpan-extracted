@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
 package Net::Prometheus;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 
@@ -22,6 +22,8 @@ use Net::Prometheus::Histogram;
 use Net::Prometheus::ProcessCollector;
 
 use Net::Prometheus::Types qw( MetricSamples );
+
+use constant HAVE_PERLCOLLECTOR => defined eval { require Net::Prometheus::PerlCollector };
 
 =head1 NAME
 
@@ -82,7 +84,17 @@ Takes the following named arguments:
 
 If present and true, this instance will not load the default process collector
 from L<Net::Prometheus::ProcessCollector>. If absent or false, such a
-collector will be loaded by default. This is usually what you want.
+collector will be loaded by default.
+
+=item disable_perl_collector => BOOL
+
+If present and true, this instance will not load perl-specific collector from
+L<Net::Prometheus::PerlCollector>. If absent or false this collector is loaded
+if the module is installed and useable.
+
+These two options are provided for testing purposes, or for specific use-cases
+where such features are not required. Usually it's best just to leave these
+enabled.
 
 =back
 
@@ -100,6 +112,10 @@ sub new
    if( not $args{disable_process_collector} and
        my $process_collector = Net::Prometheus::ProcessCollector->new ) {
       $self->register( $process_collector );
+   }
+
+   if( not $args{disable_perl_collector} and HAVE_PERLCOLLECTOR ) {
+      $self->register( Net::Prometheus::PerlCollector->new );
    }
 
    return $self;
@@ -330,7 +346,11 @@ sub render
 
       my $fullname = $metricsamples->fullname;
 
-      "# HELP $fullname " . $metricsamples->help . "\n",
+      my $help = $metricsamples->help;
+      $help =~ s/\\/\\\\/g;
+      $help =~ s/\n/\\n/g;
+
+      "# HELP $fullname $help\n",
       "# TYPE $fullname " . $metricsamples->type . "\n",
       map {
          my $sample = $_;
@@ -371,7 +391,7 @@ sub psgi_app
 
       return [
          200,
-         [ "Content-Type" => "text/plain" ],
+         [ "Content-Type" => "text/plain; version=0.0.4; charset=utf-8" ],
          [ $self->render ],
       ];
    };
@@ -425,10 +445,6 @@ information to be exported.
 =head1 TODO
 
 =over 8
-
-=item *
-
-Perl-specific variable collector - arena stats?
 
 =item *
 

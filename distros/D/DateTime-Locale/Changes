@@ -1,6 +1,11 @@
+1.23     2018-10-17
+
+- Rebuilt all locale data with CLDR 34, released on 2018-10-15.
+
+
 1.22     2018-06-08
 
-- Update the glibc source data to the data from glibc 2.27.
+- Rebuilt all locale date with the glibc data from glibc 2.27.
 
 - Added documentation for this glibc data.
 

@@ -2,7 +2,7 @@ package Catmandu::Store::File::BagIt::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.232';
+our $VERSION = '0.233';
 
 use Moo;
 use Carp;
@@ -98,11 +98,17 @@ sub get {
 
                 my $n = $out->syswrite($buffer);
 
-                unless (defined($n)) {
-                    $self->log->error("syswrite on io failed : disk full or not available?");
-                    return $bytes;
-                }
-                
+                if (!defined($n) && $!{EAGAIN}) {
+        		    # would block
+        		    $n = 0;
+        		}
+        		elsif ($n != length $buffer) {
+        		    $self->log->error("incomplete write");
+        		}
+        		else {
+        		    # all is ok
+        		}
+
                 $bytes += $n;
             }
 

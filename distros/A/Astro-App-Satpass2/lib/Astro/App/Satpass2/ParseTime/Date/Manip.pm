@@ -5,9 +5,13 @@ use warnings;
 
 use parent qw{ Astro::App::Satpass2::ParseTime };
 
-use Astro::App::Satpass2::Utils qw{ load_package __date_manip_backend };
+use Astro::App::Satpass2::Utils qw{
+    load_package
+    __date_manip_backend
+    @CARP_NOT
+};
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 sub __class_name {
     return __PACKAGE__;

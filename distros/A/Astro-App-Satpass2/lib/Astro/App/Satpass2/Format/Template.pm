@@ -8,7 +8,13 @@ use parent qw{ Astro::App::Satpass2::Format };
 use Astro::App::Satpass2::Locale qw{ __localize };
 # use Astro::App::Satpass2::FormatValue;
 use Astro::App::Satpass2::FormatValue::Formatter;
-use Astro::App::Satpass2::Utils qw{ instance ARRAY_REF HASH_REF SCALAR_REF };
+use Astro::App::Satpass2::Utils qw{
+    instance
+    ARRAY_REF
+    HASH_REF
+    SCALAR_REF
+    @CARP_NOT
+};
 use Astro::App::Satpass2::Wrap::Array;
 use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
 use Astro::Coord::ECI::Utils 0.059 qw{
@@ -21,7 +27,7 @@ use Template::Provider;
 use Text::Abbrev;
 use Text::Wrap qw{ wrap };
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 sub new {
     my ($class, @args) = @_;
@@ -115,6 +121,36 @@ sub __list_templates {
 		text	=> '+template',
 		default	=> {},
 	    ) ) );
+}
+
+{
+    my %decoder = (
+	template	=> sub {
+	    my ( $self, $method, @args ) = @_;
+
+=begin comment
+
+	    1 == @args
+		and return ( @args, $self->$method( @args ) );
+	    $self->$method( @args );
+	    return $self;
+
+=end comment
+
+=cut
+
+	    1 == @args
+		or return $self->$method( @args );
+	    return ( @args, $self->$method( @args ) );
+	},
+    );
+
+    sub decode {
+	my ( $self, $method, @args ) = @_;
+	my $dcdr = $decoder{$method}
+	    or return $self->SUPER::decode( $method, @args );
+	goto $dcdr;
+    }
 }
 
 sub __default {

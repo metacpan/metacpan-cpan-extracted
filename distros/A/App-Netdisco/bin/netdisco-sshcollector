@@ -83,6 +83,10 @@ exit main();
 sub main {
     my @input = @{ setting('sshcollector') };
 
+    #one-line Fisher-Yates from https://www.perlmonks.org/index.pl?node=Array%20One-Liners
+    my ($i,$j) = (0);
+    @input[-$i,$j] = @input[$j,-$i] while $j = rand(@input - $i), ++$i < @input;
+
     my @mce_result = mce_loop {
         my ($mce, $chunk_ref, $chunk_id) = @_;
         my $host = $chunk_ref->[0];
@@ -253,7 +257,11 @@ Depending on the target system, it can be queried using simple methods like
 or automated via Expect - this is mostly useful for non-Linux appliances which
 don't support command execution via ssh:
 
- my ($pty, $pid) = $ssh->open2pty or die "unable to run remote command";
+ my ($pty, $pid) = $ssh->open2pty;
+ unless ($pty) {
+   debug "unable to run remote command [$hostlabel] " . $ssh->error;
+   return ();
+ }
  my $expect = Expect->init($pty);
  my $prompt = qr/#/;
  my ($pos, $error, $match, $before, $after) = $expect->expect(10, -re, $prompt);

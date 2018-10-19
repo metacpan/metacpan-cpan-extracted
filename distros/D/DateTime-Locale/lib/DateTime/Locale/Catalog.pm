@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 DESCRIPTION
 
@@ -327,10 +327,19 @@ The available locales are:
  fa-AF            Persian Afghanistan                         فارسی افغانستان
  fa-IR            Persian Iran                                فارسی ایران
  ff               Fulah                                       Pulaar
- ff-CM            Fulah Cameroon                              Pulaar Kameruun
- ff-GN            Fulah Guinea                                Pulaar Gine
- ff-MR            Fulah Mauritania                            Pulaar Muritani
- ff-SN            Fulah Senegal                               Pulaar Senegaal
+ ff-Latn          Fulah Latin                                 Pulaar Latn
+ ff-Latn-BF       Fulah Burkina Faso Latin                    Pulaar Burkibaa Faaso Latn
+ ff-Latn-CM       Fulah Cameroon Latin                        Pulaar Kameruun Latn
+ ff-Latn-GH       Fulah Ghana Latin                           Pulaar Ganaa Latn
+ ff-Latn-GM       Fulah Gambia Latin                          Pulaar Gammbi Latn
+ ff-Latn-GN       Fulah Guinea Latin                          Pulaar Gine Latn
+ ff-Latn-GW       Fulah Guinea-Bissau Latin                   Pulaar Gine-Bisaawo Latn
+ ff-Latn-LR       Fulah Liberia Latin                         Pulaar Liberiyaa Latn
+ ff-Latn-MR       Fulah Mauritania Latin                      Pulaar Muritani Latn
+ ff-Latn-NE       Fulah Niger Latin                           Pulaar Nijeer Latn
+ ff-Latn-NG       Fulah Nigeria Latin                         Pulaar Nijeriyaa Latn
+ ff-Latn-SL       Fulah Sierra Leone Latin                    Pulaar Seraa liyon Latn
+ ff-Latn-SN       Fulah Senegal Latin                         Pulaar Senegaal Latn
  fi               Finnish                                     suomi
  fi-FI            Finnish Finland                             suomi Suomi
  fil              Filipino                                    Filipino
@@ -424,6 +433,8 @@ The available locales are:
  hu-HU            Hungarian Hungary                           magyar Magyarország
  hy               Armenian                                    հայերեն
  hy-AM            Armenian Armenia                            հայերեն Հայաստան
+ ia               Interlingua                                 interlingua
+ ia-001           Interlingua World                           interlingua Mundo
  id               Indonesian                                  Indonesia
  id-ID            Indonesian Indonesia                        Indonesia Indonesia
  ig               Igbo                                        Igbo
@@ -443,6 +454,8 @@ The available locales are:
  jgo-CM           Ngomba Cameroon                             Ndaꞌa Kamɛlûn
  jmc              Machame                                     Kimachame
  jmc-TZ           Machame Tanzania                            Kimachame Tanzania
+ jv               Javanese                                    Jawa
+ jv-ID            Javanese Indonesia                          Jawa Indonésia
  ka               Georgian                                    ქართული
  ka-GE            Georgian Georgia                            ქართული საქართველო
  kab              Kabyle                                      Taqbaylit
@@ -482,6 +495,8 @@ The available locales are:
  ksf-CM           Bafia Cameroon                              rikpa kamɛrún
  ksh              Colognian                                   Kölsch
  ksh-DE           Colognian Germany                           Kölsch Doütschland
+ ku               Kurdish                                     kurdî
+ ku-TR            Kurdish Turkey                              kurdî Tirkiye
  kw               Cornish                                     kernewek
  kw-GB            Cornish United Kingdom                      kernewek Rywvaneth Unys
  ky               Kyrgyz                                      кыргызча
@@ -527,6 +542,8 @@ The available locales are:
  mgh-MZ           Makhuwa-Meetto Mozambique                   Makua Umozambiki
  mgo              Metaʼ                                       metaʼ
  mgo-CM           Metaʼ Cameroon                              metaʼ Kamalun
+ mi               Maori                                       Māori
+ mi-NZ            Maori New Zealand                           Māori Aotearoa
  mk               Macedonian                                  македонски
  mk-MK            Macedonian Macedonia                        македонски Македонија
  ml               Malayalam                                   മലയാളം
@@ -554,9 +571,9 @@ The available locales are:
  nb-SJ            Norwegian Bokmål Svalbard & Jan Mayen       norsk bokmål Svalbard og Jan Mayen
  nd               North Ndebele                               isiNdebele
  nd-ZW            North Ndebele Zimbabwe                      isiNdebele Zimbabwe
- nds              Low German
- nds-DE           Low German Germany                          DE
- nds-NL           Low German Netherlands                      NL
+ nds              Low German                                  nds
+ nds-DE           Low German Germany                          nds DE
+ nds-NL           Low German Netherlands                      nds NL
  ne               Nepali                                      नेपाली
  ne-IN            Nepali India                                नेपाली भारत
  ne-NP            Nepali Nepal                                नेपाली नेपाल
@@ -671,7 +688,7 @@ The available locales are:
  so               Somali                                      Soomaali
  so-DJ            Somali Djibouti                             Soomaali Jabuuti
  so-ET            Somali Ethiopia                             Soomaali Itoobiya
- so-KE            Somali Kenya                                Soomaali Kiiniya
+ so-KE            Somali Kenya                                Soomaali Kenya
  so-SO            Somali Somalia                              Soomaali Soomaaliya
  sq               Albanian                                    shqip
  sq-AL            Albanian Albania                            shqip Shqipëri
@@ -756,6 +773,8 @@ The available locales are:
  wae-CH           Walser Switzerland                          Walser Schwiz
  wo               Wolof                                       Wolof
  wo-SN            Wolof Senegal                               Wolof Senegaal
+ xh               Xhosa                                       isiXhosa
+ xh-ZA            Xhosa South Africa                          isiXhosa eMzantsi Afrika
  xog              Soga                                        Olusoga
  xog-UG           Soga Uganda                                 Olusoga Yuganda
  yav              Yangben                                     nuasue

@@ -6,12 +6,13 @@ use DBD::Pg ':async';
 use Mojo::IOLoop;
 use Mojo::Pg::Che::Results;
 use Mojo::Pg::Transaction;
-use Scalar::Util 'weaken';
+#~ use Scalar::Util 'weaken';
 
 my $handler_err = sub {$_[0] = shortmess $_[0]; 0;};
 has handler_err => sub {$handler_err};
 
-has [qw(dbh pg)];
+has [qw(dbh)];
+has pg => undef, weak => 1;
 
 has results_class => 'Mojo::Pg::Che::Results';
 
@@ -103,21 +104,21 @@ sub execute_string {
   
   my $dbh = $self->dbh;
   
-  my $sth = $self->prepare($query, $attrs, 3);
+  my $sth = $self->prepare($query, $attrs,);
   
   return $self->execute_sth($sth, @_);
   
 }
 
 sub prepare {
-  my ($self, $query, $attrs, $flag,)  = @_;
+  my ($self, $query, $attrs,)  = @_;
   
   my $dbh = $self->dbh;
   
   $attrs->{pg_async} = PG_ASYNC
     if delete $attrs->{Async};
   
-  return $dbh->prepare_cached($query, $attrs, $flag)
+  return $dbh->prepare_cached($query, $attrs, 3)
     if delete $attrs->{Cached};
   
   return $dbh->prepare($query, $attrs);
@@ -133,7 +134,7 @@ sub begin {
     if $self->{tx};
   
   my $tx = $self->{tx} = Mojo::Pg::Transaction->new(db => $self);
-  weaken $tx->{db};
+  #~ weaken $tx->{db};
   return $tx;
 
 }
@@ -201,7 +202,7 @@ sub _DBH_METHOD {
   $sth->{pg_async} = PG_ASYNC
     if $sth && $attrs->{pg_async};
 
-  $sth ||= $self->prepare($query, $attrs, 3,);
+  $sth ||= $self->prepare($query, $attrs);
   
   $cb ||= $self->_async_cb()
     if $attrs->{pg_async};

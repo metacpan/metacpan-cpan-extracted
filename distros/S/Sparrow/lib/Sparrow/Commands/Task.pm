@@ -76,8 +76,8 @@ sub task_add {
 
     confess "unknown project" unless  -d sparrow_root."/projects/$project";
 
-
     $project=~/^[\w\d-\._]+$/ or confess 'project parameter does not meet naming requirements - /^[\w\d-\._]+$/';
+
     $tid=~/^[\w\d-\._]+$/ or confess 'task parameter does not meet naming requirements - /^[\w\d-\._]+$/';
 
     if  (-d sparrow_root."/projects/$project/tasks/$tid") {
@@ -280,11 +280,24 @@ sub task_run {
 
     my $spj = plugin_meta($pdir);
     
-    my $cmd = "cd $pdir && export PATH=\$PATH:\$PWD/local/bin && export PERL5LIB=\$PWD/local/lib/perl5:\$PERL5LIB && export PYTHONPATH=\$PWD/python-lib:\$PYTHONPATH && ";
+    my $cmd;
+
+    if ($^O  =~ 'MSWin') {
+      $cmd = "cd $pdir && set PATH=%PATH%;%cd%/local/bin && set PERL5LIB=%cd%/local/lib/perl5;\%PERL5LIB% && set PYTHONPATH=%cd%/python-lib;%PYTHONPATH% && ";
+    } else {
+      $cmd = "cd $pdir && export PATH=\$PATH:\$PWD/local/bin && export PERL5LIB=\$PWD/local/lib/perl5:\$PERL5LIB && export PYTHONPATH=\$PWD/python-lib:\$PYTHONPATH && ";
+    }
 
     if ($spj->{plugin_type} eq 'outthentic'){
-      $cmd.="  strun --root ./ --task '[task] ".($task_set->{task_desc})."'"
+
+      if ($^O  =~ 'MSWin') {
+        $cmd.="  strun --root ./ --task \"[task] ".($task_set->{task_desc})."\""
+      } else {
+        $cmd.="  strun --root ./ --task '[task] ".($task_set->{task_desc})."'"
+      }
+
     } elsif ( $spj->{plugin_type} eq 'swat' ) {
+      #warn $task_set->{host};
       $cmd.="  swat ./ ". ($task_set->{host}).' ';
     } else {
       confess "unsupported plugin type: $spj->{plugin_type}"
@@ -341,8 +354,9 @@ sub task_run {
     $cmd.= " --nocolor" if $nocolor_arg;
     $cmd.= " --dump-config" if $dump_config_arg;
     $cmd.= " --purge-cache" if $purge_cache_arg;
-
-    $cmd.= " --format $format_arg" if $format_arg;
+    unless ( $spj->{plugin_type} eq 'swat' ){
+      $cmd.= " --format $format_arg" if $format_arg;
+    }
     $cmd.= " --debug $debug_arg" if $debug_arg;
     $cmd.= " --match_l $match_l_arg" if $match_l_arg;
 

@@ -8,12 +8,13 @@ use warnings;
 use Astro::App::Satpass2::Utils qw{
     expand_tilde instance
     ARRAY_REF CODE_REF HASH_REF
+    @CARP_NOT
 };
 use Exporter qw{ import };
 use I18N::LangTags ();
 use I18N::LangTags::Detect ();
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 our @EXPORT_OK = qw{ __localize __message __preferred };
 

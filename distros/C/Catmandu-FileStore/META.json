@@ -75,7 +75,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-FileStore"
       }
    },
-   "version" : "1.12",
+   "version" : "1.13",
    "x_contributors" : [
       "Nicolas Franck <nicolas.franck@ugent.be>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"

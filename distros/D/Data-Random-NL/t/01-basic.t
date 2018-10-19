@@ -28,37 +28,52 @@ if ($@) {
 {
     note("generate_bsn");
     my $bsn = generate_bsn();
-    ok(elfproef($bsn, 1), "generate_bsn ($bsn) is BSN elfproef") if $elfproef;
     is(length($bsn), 9, "$bsn is 9 chars long");
+    ok(elfproef($bsn, 1), ".. and is elfproef") if $elfproef;
 
     my $start = int(rand(10));
     $bsn = generate_bsn($start);
     ok(elfproef($bsn, 1), "generate_bsn ($bsn) is BSN elfproef") if $elfproef;
-    like($bsn, qr/^$start/, "$bsn starts with a $start");
+    like($bsn, qr/^$start/, ".. and starts with '$start'");
+    ok(elfproef($bsn, 1), ".. and is elfproef") if $elfproef;
 }
 
 {
     note("generate_rsin");
     my $rsin = generate_rsin();
-    ok(elfproef($rsin), "generate_rsin ($rsin) is elfproef") if $elfproef;
     is(length($rsin), 9, "$rsin is 9 chars long");
+    ok(elfproef($rsin), ".. and is elfproef") if $elfproef;
 
     my $start = int(rand(10));
     $rsin = generate_rsin($start);
-    ok(elfproef($rsin), "generate_rsin ($rsin) is elfproef") if $elfproef;
-    like($rsin, qr/^$start/, "$rsin starts with a $start");
+    is(length($rsin), 9, "$rsin is 9 chars long");
+    ok(elfproef($rsin), ".. and is elfproef") if $elfproef;
+    like($rsin, qr/^$start/, ".. and starts with '$start'");
 }
 
 {
     note("generate_kvk");
     my $kvk = generate_kvk();
-    ok(elfproef($kvk), "generate_kvk ($kvk) is elfproef") if $elfproef;
-    is(length($kvk), 8, "$kvk is 9 chars long");
+    is(length($kvk), 8, "$kvk is 8 chars long");
+    ok(elfproef($kvk), "and is elfproef") if $elfproef;
 
     my $start = int(rand(10));
     $kvk = generate_kvk($start);
-    ok(elfproef($kvk), "generate_kvk ($kvk) is elfproef") if $elfproef;
-    like($kvk, qr/^$start/, "$kvk starts with a $start");
+    is(length($kvk), 8, "$kvk is 8 chars long");
+    ok(elfproef($kvk), "and is elfproef") if $elfproef;
+    like($kvk, qr/^$start/, ".. and starts with '$start'");
+}
+
+{
+    note("generate_vestigingsnummer");
+    my $vestigingsnummer = generate_vestigingsnummer();
+    is(length($vestigingsnummer), 12, "$vestigingsnummer is 12 chars long");
+
+    my $start = int(rand(10));
+    $vestigingsnummer = generate_vestigingsnummer($start);
+    like($vestigingsnummer, qr/^$start/,
+        "$vestigingsnummer starts with a $start");
+    is(length($vestigingsnummer), 12, ".. and is 12 chars long");
 }
 
 {

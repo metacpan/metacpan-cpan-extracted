@@ -84,7 +84,7 @@ EOW
         "Dan Book <dbook\@cpan.org>"
       ],
       "dist_name" => "Mojolicious-Plugin-TemplateToolkit",
-      "dist_version" => "0.004",
+      "dist_version" => "0.005",
       "license" => "artistic_2",
       "module_name" => "Mojolicious::Plugin::TemplateToolkit",
       "recursive_test_files" => 1,

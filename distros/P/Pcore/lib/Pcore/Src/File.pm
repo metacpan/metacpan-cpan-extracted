@@ -113,11 +113,13 @@ sub _build_in_buffer ($self) {
 }
 
 sub _build_is_binary ($self) {
-    if ( !$self->path ) {
+    if ( !$self->{path} ) {
         return 0;
     }
     else {
-        return -B $self->path ? 1 : 0;
+        return 0 if -z $self->{path};
+
+        return -B _ ? 1 : 0;
     }
 }
 
@@ -257,7 +259,7 @@ sub run ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 98, 181              | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 98, 183              | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

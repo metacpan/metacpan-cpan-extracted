@@ -20,9 +20,11 @@ our @EXPORT = qw{
 
 sub update_index {
 
-    print 'get index updates from SparrowHub ... ';
-    execute_shell_command("curl -s -k -L -f  -o ".spi_file.' '.sparrow_hub_api_url.'/api/v1/index'." && echo OK")
-
+	my $data = get_http_resource(sparrow_hub_api_url().'/api/v1/index');
+	open my $fh, ">", spi_file() or die "can't open ".(spci_file())." to write";
+	print $fh $data;
+	close $fh;
+	print  spi_file()." updated OK from ".sparrow_hub_api_url()."\n";
 };
 
 sub update_custom_index {
@@ -31,7 +33,11 @@ sub update_custom_index {
 
     if ($repo){
       print "get index updates from custom repo $repo ... ";
-      execute_shell_command("curl -s -k -L -f  -o ".spci_file.' '.$repo." && echo OK")
+      my $data = get_http_resource($repo);
+      open my $fh, ">", spci_file() or die "can't open ".(spci_file())." to write";
+      print $fh $data;
+      close $fh;
+      print "OK\n";
     }
 
 };

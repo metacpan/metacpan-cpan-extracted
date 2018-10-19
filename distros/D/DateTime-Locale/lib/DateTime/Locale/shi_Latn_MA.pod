@@ -630,7 +630,7 @@ Yes
 
 =head3 Local first day of the week
 
-6 (asiḍyas)
+1 (aynas)
 
 =head1 SUPPORT
 

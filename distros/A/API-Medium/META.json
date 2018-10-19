@@ -4,13 +4,13 @@
       "Thomas Klausner <domm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "API-Medium",
    "prereqs" : {
@@ -31,6 +31,7 @@
             "IO::Socket::SSL" : "0",
             "JSON::MaybeXS" : "0",
             "Log::Any" : "0",
+            "Module::Runtime" : "0",
             "Moose" : "0"
          }
       }
@@ -43,7 +44,7 @@
          "web" : "https://github.com/domm/API-Medium"
       }
    },
-   "version" : "0.900",
-   "x_serialization_backend" : "JSON::XS version 3.02"
+   "version" : "0.901",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

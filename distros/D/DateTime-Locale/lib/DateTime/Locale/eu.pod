@@ -61,13 +61,13 @@ Basque locale.
 
 =head3 Wide (stand-alone)
 
-  Astelehena
-  Asteartea
-  Asteazkena
-  Osteguna
-  Ostirala
-  Larunbata
-  Igandea
+  astelehena
+  asteartea
+  asteazkena
+  osteguna
+  ostirala
+  larunbata
+  igandea
 
 =head3 Abbreviated (stand-alone)
 
@@ -140,17 +140,17 @@ Basque locale.
 =head3 Wide (stand-alone)
 
   urtarrila
-  Otsaila
-  Martxoa
-  Apirila
-  Maiatza
-  Ekaina
-  Uztaila
-  Abuztua
-  Iraila
-  Urria
-  Azaroa
-  Abendua
+  otsaila
+  martxoa
+  apirila
+  maiatza
+  ekaina
+  uztaila
+  abuztua
+  iraila
+  urria
+  azaroa
+  abendua
 
 =head3 Abbreviated (stand-alone)
 
@@ -260,9 +260,9 @@ Basque locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 ots. 5
-   1995-12-22T09:05:02 = 1995 abe. 22
-  -0010-09-15T04:44:23 = -10 ira. 15
+   2008-02-05T18:30:30 = 2008(e)ko ots. 5(a)
+   1995-12-22T09:05:02 = 1995(e)ko abe. 22(a)
+  -0010-09-15T04:44:23 = -10(e)ko ira. 15(a)
 
 =head3 Short
 
@@ -314,9 +314,9 @@ Basque locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 ots. 5 18:30:30
-   1995-12-22T09:05:02 = 1995 abe. 22 09:05:02
-  -0010-09-15T04:44:23 = -10 ira. 15 04:44:23
+   2008-02-05T18:30:30 = 2008(e)ko ots. 5(a) 18:30:30
+   1995-12-22T09:05:02 = 1995(e)ko abe. 22(a) 09:05:02
+  -0010-09-15T04:44:23 = -10(e)ko ira. 15(a) 04:44:23
 
 =head3 Short
 
@@ -636,7 +636,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (Astelehena)
+1 (astelehena)
 
 =head1 SUPPORT
 

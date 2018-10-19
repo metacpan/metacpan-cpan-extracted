@@ -1,3 +1,28 @@
+0.007   2018-10-18 (PERLANCAR)
+
+	- [Bugfix] Don't only set argument default once, but every time.
+
+
+0.006   2018-10-18 (PERLANCAR)
+
+	- Rename internal subroutine for consistency.
+
+	- [logging] Remove extraneous logging.
+
+
+0.005   2018-10-18 (PERLANCAR)
+
+	- Define %arg0_softwares_or_patterns.
+
+
+0.004   2018-10-18 (PERLANCAR)
+
+	- list-version & download-url: Accept multiple software
+	  names/patterns.
+
+	- [bugfix] Fix updating sw_cache record.
+
+
 0.003   2018-09-21 (PERLANCAR)
 
 	- latest-version: Supply 'arch' to get_latest_version.

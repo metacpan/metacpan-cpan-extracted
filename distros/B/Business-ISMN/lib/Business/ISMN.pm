@@ -21,7 +21,7 @@ my $debug = 0;
 our @EXPORT_OK = qw(is_valid_checksum ean_to_ismn ismn_to_ean
 	INVALID_PUBLISHER_CODE BAD_CHECKSUM GOOD_ISMN BAD_ISMN);
 
-our $VERSION = '1.132';
+our $VERSION = '1.201';
 
 sub INVALID_PUBLISHER_CODE { -3 };
 sub BAD_CHECKSUM           { -1 };
@@ -69,7 +69,7 @@ sub new {
 
 	$self->{'positions'}[1] = $code_end;
 
-	return $self unless $self->is_valid_publisher_code;
+	return $self unless $self->is_valid_country_code;
 
 	# we have a good publisher code, so
 	# assume we have a bad checksum until we check
@@ -88,7 +88,8 @@ sub new {
 # none of these take arguments
 sub ismn ()             { my $self = shift; return $self->{'ismn'} }
 sub is_valid ()         { my $self = shift; return $self->{'valid'} }
-sub publisher ()        { my $self = shift; return $self->{'publisher'} }
+sub country ()          { my $self = shift; return $self->{'country'} }
+sub publisher ()        { carp "publisher is deprecated. Use country instead."; &country }
 sub publisher_code ()   { my $self = shift; return $self->{'publisher_code'} }
 sub article_code ()     { my $self = shift; return $self->{'article_code'} }
 sub checksum ()         { my $self = shift; return $self->{'checksum'} }
@@ -155,7 +156,7 @@ sub as_ean {
 	return $ean;
 	}
 
-sub is_valid_publisher_code {
+sub is_valid_country_code {
 	my $self = shift;
 	my $code = $self->publisher_code;
 
@@ -167,12 +168,17 @@ sub is_valid_publisher_code {
 		last if $code < $tuple->[1];
 		if( $code >= $tuple->[1] and $code <= $tuple->[2] ) {
 			$success = 1;
-			$self->{'publisher'} = $tuple->[0];
+			$self->{'country'} = $tuple->[0];
 			last;
 			}
 		}
 
 	return $success;
+	}
+
+sub is_valid_publisher_code {
+	carp "is_valid_publisher_code is deprecated. Use is_valid_country_code";
+	&is_valid_country_code
 	}
 
 sub is_valid_checksum {
@@ -312,9 +318,9 @@ Business::ISMN - work with International Standard Music Numbers
 	#this not does affect the default positions
 	print $ismn_object->as_string([]);
 
-	#print the publisher or publisher code
-	print $ismn->publisher;
-	print $ismn->publisher_code;
+	#print the publication country or publisher code
+	print $ismn->country;         # two letter country string
+	print $ismn->publisher_code;  # digits
 
 	#check to see if the ISMN is valid
 	$ismn_object->is_valid;
@@ -393,14 +399,17 @@ does not even come close to looking like an ISMN.
 
 Returns the ISMN as a string
 
+=item country
+
 =item publisher
 
-Returns the country associated with the publisher code.
+Returns the country associated with the publisher code. This method was
+formerly called C<publisher> (and that still works), but it's really
+returns a two letter country code.
 
 =item publisher_code
 
-Returns the publisher code or C<undef> if no publisher
-code was found.
+Returns the publisher code or C<undef> if no publisher code was found.
 
 =item article_code
 
@@ -455,9 +464,14 @@ Returns C<Business::ISMN::BAD_ISMN> if the string has no hope of ever
 looking like a valid ISMN.  This might include strings such as C<"abc">,
 C<"123456">, and so on.
 
+=item is_valid_country_code
+
 =item is_valid_publisher_code
 
-Returns true if the publisher code is valid, and false otherwise.
+Returns true if the country code is valid, and false otherwise.
+
+This method was formerly called C<is_valid_publisher_code>. That's
+deprecated but still there.
 
 =item  fix_checksum()
 

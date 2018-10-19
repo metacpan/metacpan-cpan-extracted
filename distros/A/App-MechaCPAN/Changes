@@ -1,5 +1,10 @@
 Revision history for App-MechaCPAN
 
+0.25  2018-10-17 22:45:47 EDT
+  - Add fixes for fetch_file that was preventing successful testing on
+    cpantesters, including the difference with BSD's tar that an empty input
+    is not an error.
+
 0.24  2018-10-08 23:12:15 EDT
   - Display the path to the log file (GH#8)
   - Add the --shared-lib option (GH#8)

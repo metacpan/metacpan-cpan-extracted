@@ -51,21 +51,19 @@ sub run ( $self, $keep = 0 ) {
 sub _gather_files ($self) {
     my $tree = Pcore::Util::File::Tree->new;
 
-    for (qw[bin/ lib/ share/ t/ xt/]) {
-        next if !-d $self->dist->root . $_;
-
-        $tree->add_dir( $self->dist->root . $_, $_ );
+    for my $dir (qw[bin/ lib/ share/ t/ xt/]) {
+        $tree->add_dir( $self->dist->root . $dir, $dir );
     }
 
     # relocate files, apply cpan_manifest_skip
     my $cpan_manifest_skip = $self->dist->cfg->{cpan} && $self->dist->cfg->{cpan_manifest_skip} && $self->dist->cfg->{cpan_manifest_skip}->@* ? $self->dist->cfg->{cpan_manifest_skip} : undef;
 
-    $tree->find_file( sub ($file) {
+    for my $file ( values $tree->{files}->%* ) {
         if ($cpan_manifest_skip) {
             my $skipped;
 
             for my $skip_re ( $cpan_manifest_skip->@* ) {
-                if ( $file->path =~ $skip_re ) {
+                if ( $file->{path} =~ $skip_re ) {
                     $skipped = 1;
 
                     $file->remove;
@@ -74,30 +72,30 @@ sub _gather_files ($self) {
                 }
             }
 
-            return if $skipped;
+            last if $skipped;
         }
 
-        if ( $file->path =~ m[\Abin/(.+)\z]sm ) {
+        if ( $file->{path} =~ m[\Abin/(.+)\z]sm ) {
 
             # relocate scripts from the /bin/ to /script/
             my $name = $1;
 
-            if ( $file->path !~ m[[.].+\z]sm ) {    # no extension
+            if ( $file->{path} !~ m[[.].+\z]sm ) {    # no extension
                 $file->move( 'script/' . $name );
             }
-            elsif ( $file->path =~ m[[.](?:pl|sh|cmd|bat)\z]sm ) {    # allowed extensions
+            elsif ( $file->{path} =~ m[[.](?:pl|sh|cmd|bat)\z]sm ) {    # allowed extensions
                 $file->move( 'script/' . $name );
             }
             else {
                 $file->remove;
             }
         }
-        elsif ( $file->path =~ m[\At/(.+)\z]sm && $file->path !~ m[[.]t\z]sm ) {
+        elsif ( $file->{path} =~ m[\At/(.+)\z]sm && $file->{path} !~ m[[.]t\z]sm ) {
 
             # olny *.t files are allowed in /t/ dir
             $file->remove;
         }
-        elsif ( $file->path =~ m[\Axt/(author|release|smoke)/(.+)\z]sm ) {
+        elsif ( $file->{path} =~ m[\Axt/(author|release|smoke)/(.+)\z]sm ) {
 
             # patch /xt/*/.t files and relocate to the /t/ dir
             my $test = $1;
@@ -105,7 +103,7 @@ sub _gather_files ($self) {
             my $name = $2;
 
             # add common header to /xt/*.t file
-            if ( $file->path =~ m[[.]t\z]sm ) {
+            if ( $file->{path} =~ m[[.]t\z]sm ) {
                 $file->move("t/$test-$name");
 
                 $self->_patch_xt( $file, $test );
@@ -114,12 +112,10 @@ sub _gather_files ($self) {
                 $file->remove;
             }
         }
+    }
 
-        return;
-    } );
-
-    for (qw[CHANGES cpanfile LICENSE README.md]) {
-        $tree->add_file( $_, $self->dist->root . $_ );
+    for my $file (qw[CHANGES cpanfile LICENSE README.md]) {
+        $tree->add_file( $file, $self->dist->root . $file );
     }
 
     # add dist-id.json
@@ -143,11 +139,9 @@ PERL
     $self->_patch_xt( $tree->add_file( 't/author-pod-syntax.t', \$t ), 'author' );
 
     # remove /bin, /xt
-    $tree->find_file( sub ($file) {
-        $file->remove if $file->path =~ m[\A(?:bin|xt)/]sm;
-
-        return;
-    } );
+    for my $file ( values $tree->{files}->%* ) {
+        $file->remove if $file->{path} =~ m[\A(?:bin|xt)/]sm;
+    }
 
     return $tree;
 }
@@ -277,9 +271,9 @@ PERL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 51                   | Subroutines::ProhibitExcessComplexity - Subroutine "_gather_files" with high complexity score (21)             |
+## |    3 | 51                   | Subroutines::ProhibitExcessComplexity - Subroutine "_gather_files" with high complexity score (22)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 199                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |    2 | 193                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

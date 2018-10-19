@@ -134,7 +134,7 @@
     "antes de Cristo",
     "depois de Cristo",
   ],
-  first_day_of_week => 1,
+  first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%d-%m-%Y",
   glibc_datetime_format => "%a %d %b %Y %T %Z",
@@ -274,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

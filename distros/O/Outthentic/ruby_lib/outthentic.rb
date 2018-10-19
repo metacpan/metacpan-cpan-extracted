@@ -39,6 +39,16 @@ def ignore_story_err val
   puts "ignore_story_err: #{val}"
 end
 
+def quit msg
+  puts "quit: #{msg}"
+  exit
+end
+
+def outthentic_die msg
+  puts "outthentic_die: #{msg}"
+  exit
+end
+
 def captures
    @captures ||= JSON.parse(File.read("#{cache_dir}/captures.json"))  
 end

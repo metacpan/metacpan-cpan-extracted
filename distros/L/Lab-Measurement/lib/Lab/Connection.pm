@@ -1,6 +1,6 @@
 package Lab::Connection;
 #ABSTRACT: Connection base class
-$Lab::Connection::VERSION = '3.663';
+$Lab::Connection::VERSION = '3.664';
 use strict;
 
 #use POSIX; # added for int() function
@@ -338,7 +338,7 @@ Lab::Connection - Connection base class
 
 =head1 VERSION
 
-version 3.663
+version 3.664
 
 =head1 SYNOPSIS
 

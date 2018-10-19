@@ -106,10 +106,8 @@ my $user              = $aref_token_emails->[0]; ## default to the first user
 $gapi_agent->user( $user );
 
 say "Running tests with default user email = $user";
-
 say 'Root cache folder: ' .  $gapi_agent->discovery->chi->root_dir(); ## cached content temporary directory 
-
-say "USer Agent Name = " . $gapi_agent->ua->transactor->name();exit;
+say "User Agent Name = " . $gapi_agent->ua->transactor->name();
 
 if ( 1 == 0 )
 {

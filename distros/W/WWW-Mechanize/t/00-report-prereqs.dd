@@ -9,9 +9,10 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Encode' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::Code::TidyAll' => '0.50',

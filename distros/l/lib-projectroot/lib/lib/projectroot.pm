@@ -6,7 +6,7 @@ use warnings;
 use 5.010;
 
 # ABSTRACT: easier loading of a project's local libs
-our $VERSION = "1.005";
+our $VERSION = "1.006";
 
 use FindBin qw();
 use Carp qw(carp);
@@ -127,7 +127,7 @@ lib::projectroot - easier loading of a project's local libs
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ version 1.005
   use lib::projectroot qw(lib local::lib=local extra=Your-OtherModule,Dark-PAN);
 
   # if you want to know where the project-root is:
-  say lib::projectroot::ROOT;  # /home/domm/jobs/Some-Project
+  say $lib::projectroot::ROOT;  # /home/domm/jobs/Some-Project
 
   # also load local::libs installed in extras
   use lib::projectroot qw(lib local::lib=local extra_with_local=Your-OtherModule,Dark-PAN);

@@ -218,8 +218,8 @@
     "M12",
   ],
   name => "Low German Netherlands",
-  native_language => undef,
-  native_name => "NL",
+  native_language => "nds",
+  native_name => "nds NL",
   native_script => undef,
   native_territory => "NL",
   native_variant => undef,
@@ -266,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

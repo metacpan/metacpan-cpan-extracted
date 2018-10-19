@@ -18,7 +18,21 @@ has cli           => ( is => 'ro',   isa => HashRef, init_arg => undef );       
 has user_cfg_path => ( is => 'lazy', isa => Str,     init_arg => undef );
 has user_cfg      => ( is => 'lazy', isa => HashRef, init_arg => undef );                                # $HOME/.pcore/pcore.ini config
 
-has can_scan_deps => ( is => 'lazy', isa => Bool, init_arg => undef );
+has SYS_USER_DIR   => ();                                                                                # OS user profile dir
+has PCORE_USER_DIR => ();                                                                                # SYS_USER_DIR/.pcore, pcore profile dir
+has INLINE_DIR     => ();
+has START_DIR      => ();
+has SCRIPT_DIR     => ();
+has SCRIPT_NAME    => ();
+has SYS_TEMP_DIR   => ();                                                                                # OS temp dir
+has TEMP_DIR       => ();                                                                                # SYS_TEMP_DIR/temp-xxxx, random temp dir, created in SYS_TEMP_DIR
+has PCORE_SYS_DIR  => ();                                                                                # SYS_TEMP_DIR/.pcore
+has DATA_DIR       => ();
+
+has SCANDEPS  => ();
+has DAEMONIZE => ();
+has UID       => ();
+has GID       => ();
 
 # create $ENV object
 $ENV = __PACKAGE__->new;                                                                                 ## no critic qw[Variables::RequireLocalizedPunctuationVars]
@@ -151,9 +165,9 @@ sub _init_inline ($self) {
 sub BUILD ( $self, $args ) {
     $self->{is_par} = $ENV{PAR_TEMP} ? 1 : 0;
 
-    $self->{USER_DIR} = $ENV{HOME} || $ENV{USERPROFILE};
+    $self->{SYS_USER_DIR} = $ENV{HOME} || $ENV{USERPROFILE};
 
-    $self->{PCORE_USER_DIR} = "$self->{USER_DIR}/.pcore/";
+    $self->{PCORE_USER_DIR} = "$self->{SYS_USER_DIR}/.pcore/";
     mkdir $self->{PCORE_USER_DIR} || die qq[Error creating user dir "$self->{PCORE_USER_DIR}"] if !-d $self->{PCORE_USER_DIR};
     if ( !$self->{is_par} ) {
         $self->{INLINE_DIR} = "$self->{PCORE_USER_DIR}inline/$Config{version}-$Config{archname}/";
@@ -168,7 +182,7 @@ sub BUILD ( $self, $args ) {
 
 sub BUILD1 ($self) {
 
-    $self->{USER_DIR}       = P->path( $self->{USER_DIR},       is_dir => 1 );
+    $self->{SYS_USER_DIR}   = P->path( $self->{SYS_USER_DIR},   is_dir => 1 );
     $self->{PCORE_USER_DIR} = P->path( $self->{PCORE_USER_DIR}, is_dir => 1 );
     $self->{INLINE_DIR}     = P->path( $self->{INLINE_DIR},     is_dir => 1 ) if $self->{INLINE_DIR};
 
@@ -195,12 +209,6 @@ sub BUILD1 ($self) {
     $self->{SYS_TEMP_DIR} = P->path( File::Spec->tmpdir, is_dir => 1 )->to_string;
     $self->{TEMP_DIR} = P->file->tempdir( base => $self->{SYS_TEMP_DIR}, lazy => 1 );
     $self->{PCORE_SYS_DIR} = P->path( $self->{SYS_TEMP_DIR} . '.pcore/', is_dir => 1, lazy => 1 );
-
-    # CLI options
-    $self->{SCAN_DEPS} = 0;
-    $self->{DAEMONIZE} = 0;
-    $self->{UID}       = undef;
-    $self->{GID}       = undef;
 
     # find main dist
     if ( $self->{is_par} ) {
@@ -239,6 +247,24 @@ sub BUILD1 ($self) {
 
         $self->register_dist( $self->{pcore} );
     }
+
+    # scan deps
+    if ( !$self->{is_par} && defined( my $dist = $self->{main_dist} ) ) {
+        if ( $dist->par_cfg && exists $dist->par_cfg->{ $self->{SCRIPT_NAME} } ) {
+            $self->set_scandeps( $dist->share_dir . "pardeps-$self->{SCRIPT_NAME}-@{[$^V->normal]}-$Config{archname}.json" );
+        }
+    }
+
+    return;
+}
+
+sub set_scandeps ( $self, $path ) {
+    $self->{SCANDEPS} = $path;
+
+    return if !$path;
+
+    # eval common modules
+    require Cpanel::JSON::XS;    ## no critic qw[Modules::ProhibitEvilModules]
 
     return;
 }
@@ -285,31 +311,12 @@ sub dist ( $self, $dist_name = undef ) {
     }
 }
 
-# SCAN DEPS
-sub _build_can_scan_deps ($self) {
-    return !$self->{is_par} && $self->dist && $self->dist->par_cfg && exists $self->dist->par_cfg->{ $self->{SCRIPT_NAME} };
-}
-
-sub scan_deps ($self) {
-    return if !$self->can_scan_deps;
-
-    $self->{SCAN_DEPS} = $self->dist->share_dir . "pardeps-$self->{SCRIPT_NAME}-@{[$^V->normal]}-$Config{archname}.json";
-
-    # eval TypeTiny Error
-    eval { Int->('error') };
-
-    # eval common modules
-    require Cpanel::JSON::XS;    ## no critic qw[Modules::ProhibitEvilModules]
-
-    return;
-}
-
 sub DESTROY ( $self ) {
-    if ( $self->{SCAN_DEPS} ) {
+    if ( $self->{SCANDEPS} ) {
         my ( $fh, $index );
 
-        if ( -f $self->{SCAN_DEPS} ) {
-            open $fh, '+<:raw', $self->{SCAN_DEPS} or die;    ## no critic qw[InputOutput::RequireBriefOpen]
+        if ( -f $self->{SCANDEPS} ) {
+            open $fh, '+<:raw', $self->{SCANDEPS} or die;    ## no critic qw[InputOutput::RequireBriefOpen]
 
             flock $fh, LOCK_EX or die;
 
@@ -320,7 +327,7 @@ sub DESTROY ( $self ) {
             $index->@{ $deps->@* } = ();
         }
         else {
-            open $fh, '>:raw', $self->{SCAN_DEPS} or die;     ## no critic qw[InputOutput::RequireBriefOpen]
+            open $fh, '>:raw', $self->{SCANDEPS} or die;     ## no critic qw[InputOutput::RequireBriefOpen]
 
             flock $fh, LOCK_EX or die;
         }
@@ -337,7 +344,7 @@ sub DESTROY ( $self ) {
 
                     $index->{$module} = undef;
 
-                    say qq[new deps found: $module];
+                    say "new dependency found: $module";
                 }
             }
         }
@@ -394,17 +401,15 @@ sub DESTROY ( $self ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 299                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 314                  | Subroutines::ProhibitExcessComplexity - Subroutine "DESTROY" with high complexity score (22)                   |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 307                  | Subroutines::ProhibitExcessComplexity - Subroutine "DESTROY" with high complexity score (22)                   |
+## |    3 | 323                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 316                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 361                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 354                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    2 | 388                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 381                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 102                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 116                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,6 +1,8 @@
 package Pcore::App;
 
 use Pcore -role;
+use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Util::Path1::Poll qw[:POLL];
 use Pcore::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
@@ -102,6 +104,8 @@ around run => sub ( $orig, $self ) {
         say qq[Listen: $self->{app_cfg}->{server}->{listen}];
     }
 
+    $self->_init_reload if $self->{devel};
+
     say qq[App "@{[ref $self]}" started];
 
     return;
@@ -147,13 +151,13 @@ sub nginx_cfg ($self) {
         push $params->{host}->{$host_name}->{location}->@*, $self->{cdn}->get_nginx_cfg if defined $self->{cdn};
     }
 
-    return P->tmpl->new->render( $self->{app_cfg}->{server}->{ssl} ? 'nginx/host_conf.nginx' : 'nginx/host_conf_no_ssl.nginx', $params );
+    return P->tmpl->( $self->{app_cfg}->{server}->{ssl} ? 'nginx/host_conf.nginx' : 'nginx/host_conf_no_ssl.nginx', $params );
 }
 
 sub start_nginx ($self) {
     $self->{nginx} = Pcore::Nginx->new;
 
-    $self->{nginx}->add_vhost( 'vhost', $self->nginx_cfg ) if !$self->{nginx}->is_vhost_exists('vhost');
+    $self->{nginx}->add_vhost( 'vhost', $self->nginx_cfg );    # if !$self->{nginx}->is_vhost_exists('vhost');
 
     # SIGNUP -> nginx reload
     $SIG->{HUP} = AE::signal HUP => sub {
@@ -167,7 +171,90 @@ sub start_nginx ($self) {
     return;
 }
 
+sub _init_reload ($self) {
+    my $ext_ns = ref($self) . '::Ext' =~ s[::][/]smgr;
+
+    for my $inc_path ( grep { !is_ref $_ } @INC ) {
+
+        # Ext reloader
+        P->path1("$inc_path/$ext_ns")->poll(
+            scan_root => 0,
+            scan_tree => 1,
+            abs       => 0,
+            is_dir    => 0,
+            max_depth => 0,
+            sub ($changes) {
+                my $error;
+
+                for my $change ( $changes->@* ) {
+                    next if $change->[1] == $POLL_REMOVED;
+
+                    my $module_path = "$ext_ns/$change->[0]";
+                    my $full_path   = "$inc_path/$module_path";
+
+                    print "reloading ext module: $module_path ... ";
+
+                    eval { Pcore::Ext->load_class( $module_path, $full_path, 1 ) };
+
+                    if ($@) {
+                        $error = 1;
+
+                        say 'ERROR';
+
+                        $@->sendlog;
+                    }
+                    else {
+                        say 'OK';
+                    }
+                }
+
+                if ( !$error ) {
+                    no warnings qw[once];
+
+                    $Pcore::Ext::EXT     = undef;
+                    $Pcore::Ext::APP     = undef;
+                    $Pcore::Ext::SCANNED = 0;
+
+                    print 'rebuilding ext apps ... ';
+
+                    eval { Pcore::Ext->scan( $self, ref($self) . '::Ext' ) };
+
+                    if ($@) {
+                        say 'ERROR';
+
+                        $@->sendlog;
+                    }
+                    else {
+                        say 'OK';
+
+                        # clear app cache
+                        for my $class ( values $self->{router}->{_class_instance_cache}->%* ) {
+                            if ( $class->does('Pcore::App::Controller::Ext') ) {
+                                $class->{_cache} = undef;
+                            }
+                        }
+                    }
+                }
+
+                return;
+            }
+        );
+    }
+
+    return;
+}
+
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 197, 220             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

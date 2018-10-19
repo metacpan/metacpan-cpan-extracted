@@ -22,11 +22,11 @@ See L<Mojo::Pg>
 
 =head1 VERSION
 
-Version 0.850
+Version 0.852
 
 =cut
 
-our $VERSION = '0.850';
+our $VERSION = '0.852';
 
 
 =head1 SYNOPSIS
@@ -239,16 +239,17 @@ use DBI;
 use Carp qw(croak);
 use Mojo::Pg::Che::Database;
 use Mojo::URL;
-use Scalar::Util 'weaken';
+use Scalar::Util 'blessed';
 
 has database_class => 'Mojo::Pg::Che::Database';
 has dsn             => 'dbi:Pg:';
 has max_connections => 5;
 has [qw(password username)] => '';
+has [qw(parent)];
 has pubsub => sub {
   require Mojo::Pg::PubSub;
   my $pubsub = Mojo::Pg::PubSub->new(pg => shift);
-  weaken $pubsub->{pg};#???
+  #~ weaken $pubsub->{pg};#???
 #Mojo::Reactor::EV: Timer failed: Can't call method "db" on an undefined value at t/06-pubsub.t line 21.
 #EV: error in callback (ignoring): Can't call method "db" on an undefined value at Mojo/Pg/PubSub.pm line 44.
   return $pubsub;
@@ -263,6 +264,10 @@ my $PKG = __PACKAGE__;
 
 sub from_string {# copy/paste Mojo::Pg
   my ($self, $str) = @_;
+  
+  # Parent
+  return $self unless $str;
+  return $self->parent($str) if blessed $str && $str->isa('Mojo::Pg');
 
   # Protocol
   return $self unless $str;

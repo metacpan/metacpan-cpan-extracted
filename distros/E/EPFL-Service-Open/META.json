@@ -34,15 +34,15 @@
    "provides" : {
       "EPFL::Service::Open" : {
          "file" : "lib/EPFL/Service/Open.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/epfl-devrun/epfl-service-open"
+         "url" : "https://github.com/innovativeinnovation/epfl-service-open"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

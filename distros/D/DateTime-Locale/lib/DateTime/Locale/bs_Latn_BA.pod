@@ -100,7 +100,7 @@ Bosnian Bosnia & Herzegovina Latin locale.
   maj
   juni
   juli
-  avgust
+  august
   septembar
   oktobar
   novembar
@@ -115,7 +115,7 @@ Bosnian Bosnia & Herzegovina Latin locale.
   maj
   jun
   jul
-  avg
+  aug
   sep
   okt
   nov
@@ -146,7 +146,7 @@ Bosnian Bosnia & Herzegovina Latin locale.
   maj
   juni
   juli
-  avgust
+  august
   septembar
   oktobar
   novembar
@@ -161,7 +161,7 @@ Bosnian Bosnia & Herzegovina Latin locale.
   maj
   jun
   jul
-  avg
+  aug
   sep
   okt
   nov
@@ -266,9 +266,9 @@ Bosnian Bosnia & Herzegovina Latin locale.
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 5.2.08.
-   1995-12-22T09:05:02 = 22.12.95.
-  -0010-09-15T04:44:23 = 15.9.-10.
+   2008-02-05T18:30:30 = 5. 2. 2008.
+   1995-12-22T09:05:02 = 22. 12. 1995.
+  -0010-09-15T04:44:23 = 15. 9. -10.
 
 
 =head2 Time Formats
@@ -320,9 +320,9 @@ Bosnian Bosnia & Herzegovina Latin locale.
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 5.2.08. 18:30
-   1995-12-22T09:05:02 = 22.12.95. 09:05
-  -0010-09-15T04:44:23 = 15.9.-10. 04:44
+   2008-02-05T18:30:30 = 5. 2. 2008. 18:30
+   1995-12-22T09:05:02 = 22. 12. 1995. 09:05
+  -0010-09-15T04:44:23 = 15. 9. -10. 04:44
 
 
 =head2 Available Formats
@@ -383,15 +383,15 @@ Bosnian Bosnia & Herzegovina Latin locale.
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = uto 6:30 popodne
-   1995-12-22T09:05:02 = pet 9:05 prijepodne
-  -0010-09-15T04:44:23 = sub 4:44 prijepodne
+   2008-02-05T18:30:30 = uto 6:30 PM
+   1995-12-22T09:05:02 = pet 9:05 AM
+  -0010-09-15T04:44:23 = sub 4:44 AM
 
 =head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = uto 6:30:30 popodne
-   1995-12-22T09:05:02 = pet 9:05:02 prijepodne
-  -0010-09-15T04:44:23 = sub 4:44:23 prijepodne
+   2008-02-05T18:30:30 = uto 6:30:30 PM
+   1995-12-22T09:05:02 = pet 9:05:02 AM
+  -0010-09-15T04:44:23 = sub 4:44:23 AM
 
 =head3 Gy (y. G)
 
@@ -527,33 +527,33 @@ Bosnian Bosnia & Herzegovina Latin locale.
 
 =head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 popodne
-   1995-12-22T09:05:02 = 9 prijepodne
-  -0010-09-15T04:44:23 = 4 prijepodne
+   2008-02-05T18:30:30 = 6 PM
+   1995-12-22T09:05:02 = 9 AM
+  -0010-09-15T04:44:23 = 4 AM
 
 =head3 hm (hh:mm a)
 
-   2008-02-05T18:30:30 = 06:30 popodne
-   1995-12-22T09:05:02 = 09:05 prijepodne
-  -0010-09-15T04:44:23 = 04:44 prijepodne
+   2008-02-05T18:30:30 = 06:30 PM
+   1995-12-22T09:05:02 = 09:05 AM
+  -0010-09-15T04:44:23 = 04:44 AM
 
 =head3 hms (hh:mm:ss a)
 
-   2008-02-05T18:30:30 = 06:30:30 popodne
-   1995-12-22T09:05:02 = 09:05:02 prijepodne
-  -0010-09-15T04:44:23 = 04:44:23 prijepodne
+   2008-02-05T18:30:30 = 06:30:30 PM
+   1995-12-22T09:05:02 = 09:05:02 AM
+  -0010-09-15T04:44:23 = 04:44:23 AM
 
 =head3 hmsv (h:mm:ss a (v))
 
-   2008-02-05T18:30:30 = 6:30:30 popodne (UTC)
-   1995-12-22T09:05:02 = 9:05:02 prijepodne (UTC)
-  -0010-09-15T04:44:23 = 4:44:23 prijepodne (UTC)
+   2008-02-05T18:30:30 = 6:30:30 PM (UTC)
+   1995-12-22T09:05:02 = 9:05:02 AM (UTC)
+  -0010-09-15T04:44:23 = 4:44:23 AM (UTC)
 
 =head3 hmv (h:mm a (v))
 
-   2008-02-05T18:30:30 = 6:30 popodne (UTC)
-   1995-12-22T09:05:02 = 9:05 prijepodne (UTC)
-  -0010-09-15T04:44:23 = 4:44 prijepodne (UTC)
+   2008-02-05T18:30:30 = 6:30 PM (UTC)
+   1995-12-22T09:05:02 = 9:05 AM (UTC)
+  -0010-09-15T04:44:23 = 4:44 AM (UTC)
 
 =head3 ms (mm:ss)
 
@@ -627,19 +627,19 @@ Bosnian Bosnia & Herzegovina Latin locale.
    1995-12-22T09:05:02 = Četvrti kvartal 1995.
   -0010-09-15T04:44:23 = Treći kvartal -10.
 
-=head3 yw-count-few (w. 'sedmica' 'u' y.)
+=head3 yw-count-few (w. 'sedmica' 'u' Y.)
 
    2008-02-05T18:30:30 = 6. sedmica u 2008.
    1995-12-22T09:05:02 = 51. sedmica u 1995.
   -0010-09-15T04:44:23 = 37. sedmica u -10.
 
-=head3 yw-count-one (w. 'sedmica' 'u' y.)
+=head3 yw-count-one (w. 'sedmica' 'u' Y.)
 
    2008-02-05T18:30:30 = 6. sedmica u 2008.
    1995-12-22T09:05:02 = 51. sedmica u 1995.
   -0010-09-15T04:44:23 = 37. sedmica u -10.
 
-=head3 yw-count-other (w. 'sedmica' 'u' y.)
+=head3 yw-count-other (w. 'sedmica' 'u' Y.)
 
    2008-02-05T18:30:30 = 6. sedmica u 2008.
    1995-12-22T09:05:02 = 51. sedmica u 1995.

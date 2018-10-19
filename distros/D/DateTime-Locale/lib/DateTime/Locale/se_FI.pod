@@ -471,23 +471,23 @@ Northern Sami Finland locale.
    1995-12-22T09:05:02 = be 22 juov
   -0010-09-15T04:44:23 = lá 15 čakč
 
-=head3 MMMMW-count-one (MMMM:a 'vahkku' W)
+=head3 MMMMW-count-one (MMMM':a vahkku' W)
 
-   2008-02-05T18:30:30 = guovvamánnu:eb vahkku 1
-   1995-12-22T09:05:02 = juovlamánnu:ib vahkku 3
-  -0010-09-15T04:44:23 = čakčamánnu:ib vahkku 2
+   2008-02-05T18:30:30 = guovvamánnu:a vahkku 1
+   1995-12-22T09:05:02 = juovlamánnu:a vahkku 3
+  -0010-09-15T04:44:23 = čakčamánnu:a vahkku 2
 
-=head3 MMMMW-count-other (MMM:a 'vahkku' W)
+=head3 MMMMW-count-other (MMMM':a vahkku' W)
 
-   2008-02-05T18:30:30 = guov:eb vahkku 1
-   1995-12-22T09:05:02 = juov:ib vahkku 3
-  -0010-09-15T04:44:23 = čakč:ib vahkku 2
+   2008-02-05T18:30:30 = guovvamánnu:a vahkku 1
+   1995-12-22T09:05:02 = juovlamánnu:a vahkku 3
+  -0010-09-15T04:44:23 = čakčamánnu:a vahkku 2
 
-=head3 MMMMW-count-two (MMMM:a 'vahkku' W)
+=head3 MMMMW-count-two (MMMM':a vahkku' W)
 
-   2008-02-05T18:30:30 = guovvamánnu:eb vahkku 1
-   1995-12-22T09:05:02 = juovlamánnu:ib vahkku 3
-  -0010-09-15T04:44:23 = čakčamánnu:ib vahkku 2
+   2008-02-05T18:30:30 = guovvamánnu:a vahkku 1
+   1995-12-22T09:05:02 = juovlamánnu:a vahkku 3
+  -0010-09-15T04:44:23 = čakčamánnu:a vahkku 2
 
 =head3 MMMMd (d MMMM)
 

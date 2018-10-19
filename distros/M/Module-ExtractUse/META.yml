@@ -27,5 +27,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/domm/Module-ExtractUse.git
-version: '0.342'
+version: '0.343'
 x_serialization_backend: 'YAML::Tiny version 1.69'

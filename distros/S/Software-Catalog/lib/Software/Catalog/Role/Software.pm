@@ -1,7 +1,7 @@
 package Software::Catalog::Role::Software;
 
-our $DATE = '2018-10-05'; # DATE
-our $VERSION = '1.0.3'; # VERSION
+our $DATE = '2018-10-18'; # DATE
+our $VERSION = '1.0.4'; # VERSION
 
 use Role::Tiny;
 
@@ -56,7 +56,7 @@ Software::Catalog::Role::Software - Role for software
 
 =head1 VERSION
 
-This document describes version 1.0.3 of Software::Catalog::Role::Software (from Perl distribution Software-Catalog), released on 2018-10-05.
+This document describes version 1.0.4 of Software::Catalog::Role::Software (from Perl distribution Software-Catalog), released on 2018-10-18.
 
 =head1 HOMEPAGE
 

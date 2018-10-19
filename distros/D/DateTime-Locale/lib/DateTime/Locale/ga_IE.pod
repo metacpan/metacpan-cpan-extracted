@@ -660,7 +660,7 @@ Yes
 
 =head3 Local first day of the week
 
-7 (Dé Domhnaigh)
+1 (Dé Luain)
 
 =head1 SUPPORT
 

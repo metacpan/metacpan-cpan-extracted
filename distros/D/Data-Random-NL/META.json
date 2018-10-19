@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -21,14 +21,11 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
+         },
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : "0.004",
-            "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
-            "Dist::Zilla::Plugin::Git::Commit" : "2.020",
-            "Dist::Zilla::Plugin::Git::Tag" : "0",
-            "Dist::Zilla::Plugin::NextRelease" : "5.033",
-            "Dist::Zilla::Plugin::RewriteVersion::Transitional" : "0.004",
             "Dist::Zilla::PluginBundle::Author::WATERKIP" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::BSD" : "0",
@@ -56,9 +53,7 @@
             "Exporter" : "0",
             "Getopt::Long" : "0",
             "Pod::Usage" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -72,6 +67,12 @@
          }
       }
    },
+   "provides" : {
+      "Data::Random::NL" : {
+         "file" : "lib/Data/Random/NL.pm",
+         "version" : "1.6"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -80,7 +81,11 @@
          "web" : "https://gitlab.com/waterkip/data-random-nl"
       }
    },
-   "version" : "1.4",
+   "version" : "1.6",
+   "x_contributors" : [
+      "Wesley Schwengle <wesley@schwengle.net>"
+   ],
+   "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

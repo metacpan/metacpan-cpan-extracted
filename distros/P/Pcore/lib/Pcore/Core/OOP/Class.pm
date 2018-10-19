@@ -338,6 +338,14 @@ PERL
 PERL
     }
 
+    my @build = grep { defined *{"$_\::BUILD"} && *{"$_\::BUILD"}{CODE} } reverse mro::get_linear_isa($self)->@*;
+
+    if (@build) {
+        $new .= <<'PERL';
+    my $args_orig = { $args->%* };
+PERL
+    }
+
     # attributes
     my $init_arg;
     my $required;
@@ -405,9 +413,9 @@ PERL
     $new .= $default if $default;
 
     # build
-    for ( grep { defined *{"$_\::BUILD"} && *{"$_\::BUILD"}{CODE} } reverse mro::get_linear_isa($self)->@* ) {
+    for (@build) {
         $new .= <<"PERL";
-    \$self->$_\::BUILD(\$args);
+    \$self->$_\::BUILD(\$args_orig);
 
 PERL
     }
@@ -430,7 +438,7 @@ PERL
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 157, 237, 250, 264,  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## |      | 286, 422             |                                                                                                                |
+## |      | 286, 430             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 164                  | Subroutines::ProhibitExcessComplexity - Subroutine "add_attribute" with high complexity score (24)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|

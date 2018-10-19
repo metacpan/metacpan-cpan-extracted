@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/HTTPTinyUtils/http_tiny
 # and generated automatically using Perinci::CmdLine::Gen version 0.486
 
-our $DATE = '2018-10-06'; # DATE
+our $DATE = '2018-10-18'; # DATE
 our $DIST = 'App-HTTPTinyUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ http-tiny - Perform request with HTTP::Tiny
 
 =head1 VERSION
 
-This document describes version 0.002 of http-tiny (from Perl distribution App-HTTPTinyUtils), released on 2018-10-06.
+This document describes version 0.003 of http-tiny (from Perl distribution App-HTTPTinyUtils), released on 2018-10-18.
 
 =head1 SYNOPSIS
 

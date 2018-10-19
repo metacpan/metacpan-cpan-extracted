@@ -11,10 +11,11 @@ use Astro::App::Satpass2::Macro::Command;
 use Astro::App::Satpass2::Macro::Code;
 use Astro::App::Satpass2::ParseTime;
 use Astro::App::Satpass2::Utils qw{
-    __arguments expand_tilde has_method instance load_package
+    :ref
+    __arguments expand_tilde find_package_pod
+    has_method instance load_package
     my_dist_config quoter
     __parse_class_and_args
-    ARRAY_REF CODE_REF HASH_REF SCALAR_REF
 };
 
 use Astro::Coord::ECI 0.077;			# This needs at least 0.049.
@@ -24,7 +25,8 @@ use Astro::Coord::ECI::Sun 0.077;
 use Astro::Coord::ECI::TLE 0.077 qw{:constants}; # This needs at least 0.059.
 use Astro::Coord::ECI::TLE::Iridium 0.077;	# This needs at least 0.049.
 use Astro::Coord::ECI::TLE::Set 0.077;
-use Astro::Coord::ECI::Utils 0.077 qw{:all};	# This needs at least 0.077.
+# The following includes @CARP_NOT.
+use Astro::Coord::ECI::Utils 0.077 qw{ :all };	# This needs at least 0.077.
 
 use Clone ();
 use Cwd ();
@@ -40,7 +42,7 @@ use Scalar::Util 1.26 qw{ blessed isdual openhandle };
 use Text::Abbrev;
 use Text::ParseWords ();	# Used only for {level1} stuff.
 
-use constant ASTRO_SPACETRACK_VERSION => 0.074;
+use constant ASTRO_SPACETRACK_VERSION => 0.105;
 
 BEGIN {
     eval {
@@ -62,7 +64,9 @@ use constant NULL	=> bless \( my $x = undef ), 'Null';
 # NULL_REF eq ref $rslt
 use constant NULL_REF	=> ref NULL;
 
-our $VERSION = '0.035';
+use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
+
+our $VERSION = '0.036';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -197,7 +201,6 @@ my %twilight_abbr = abbrev (keys %twilight_def);
 	    },
 	    Verb	=> $list,
 	);
-##	%want = map {$_ => 1} qw{Configure Verb};
     }
 
     sub FETCH_CODE_ATTRIBUTES {
@@ -261,6 +264,7 @@ my %mutator = (
     gmt => \&_set_formatter_attribute,
     height => \&_set_distance_meters,
     horizon => \&_set_angle,
+    illum	=> \&_set_illum_class,
     latitude => \&_set_angle,
     local_coord => \&_set_formatter_attribute,
     location => \&_set_unmodified,
@@ -275,6 +279,7 @@ my %mutator = (
     singleton => \&_set_unmodified,
     spacetrack => \&_set_spacetrack,
     stdout => \&_set_stdout,
+    sun	=> \&_set_sun_class,		# Only in {level1}
     time_format => \&_set_formatter_attribute,
     time_formatter => \&_set_formatter_attribute,
     time_parser => \&_set_time_parser,
@@ -321,6 +326,7 @@ my %shower = (
     gmt => \&_show_formatter_attribute,
     local_coord => \&_show_formatter_attribute,
     pass_variant	=> \&_show_pass_variant,
+    sun		=> \&_show_sun_class,	# only in {level1}
     time_parser => \&_show_copyable,
     time_format => \&_show_formatter_attribute,
     time_formatter	=> \&_show_formatter_attribute,
@@ -345,7 +351,6 @@ my %static = (
     background => 1,
     backdate => 0,
     continuation_prompt => '> ',
-##  country => 'us',				# Deprecated
     date_format => '%a %d-%b-%Y',
     debug => 0,
     echo => 0,
@@ -365,6 +370,7 @@ my %static = (
     height => undef,		# meters
 #   initfile => undef,		# Set by init()
     horizon => 20,		# degrees
+    illum	=> SUN_CLASS_DEFAULT,
     latitude => undef,		# degrees
     longitude => undef,		# degrees
     max_mirror_angle => rad2deg(
@@ -388,6 +394,17 @@ my %static = (
     webcmd => ''
 );
 
+my %sky_class = (
+    fold_case( 'Sun' ) => [ SUN_CLASS_DEFAULT, name => 'Sun' ],
+    fold_case( 'Moon' ) => [ 'Astro::Coord::ECI::Moon', name => 'Moon' ],
+#    # The shape of things to come -- maybe
+#    # but commented out because Astro-App-Satpass2 does not depend on
+#    # these
+#    ( map { fold_case( $_ ) =>
+#	"Astro::Coord::ECI::VSOP87D::$_" } qw{ Mercury Venus
+#	Mars Jupiter Saturn Uranus Neptune } ),
+);
+
 sub new {
     my ( $class, %args ) = @_;
     ref $class and $class = ref $class;
@@ -395,9 +412,22 @@ sub new {
     $self->{bodies} = [];
     $self->{macro} = {};
     $self->{sky} = [
-	Astro::Coord::ECI::Sun->new (),
+	SUN_CLASS_DEFAULT->new (),
 	Astro::Coord::ECI::Moon->new (),
     ];
+    $self->{sky_class} = { %sky_class };
+    $self->{_help_module} = {
+	''	=> __PACKAGE__,
+	eci => 'Astro::Coord::ECI',
+	iridium => 'Astro::Coord::ECI::TLE::Iridium',
+	moon => 'Astro::Coord::ECI::Moon',
+	set => 'Astro::Coord::ECI::TLE::Set',
+	sun => SUN_CLASS_DEFAULT,
+	spacetrack => 'Astro::SpaceTrack',
+	star => 'Astro::Coord::ECI::Star',
+	tle => 'Astro::Coord::ECI::TLE',
+	utils => 'Astro::Coord::ECI::Utils',
+    };
     bless $self, $class;
     $self->_frame_push(initial => []);
     $self->set(stdout => select());
@@ -510,10 +540,21 @@ sub almanac : Verb( choose=s@ dump! horizon|rise|set! transit! twilight! quarter
 }
 
 sub begin : Verb() Tweak( -unsatisfied ) {
-    my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
+    my ( $self, $opt, @args ) = __arguments( @_ );
     $self->_frame_push(
 	begin => @args ? \@args : $self->{frame}[-1]{args});
+    $self->{frame}[-1]{level1} = $opt->{level1};
     return;
+}
+
+# -level1 is UNSUPPORTED and may be removed without warning. It is only
+# there for me to screw around with.
+BEGIN {
+    $ENV{SATPASS2_LEVEL1}
+	and __PACKAGE__->MODIFY_CODE_ATTRIBUTES(
+	\&begin,
+	'Verb( level1! )',
+    );
 }
 
 sub cd : Verb() {
@@ -573,9 +614,6 @@ sub dispatch {
 	and $self->__get_attr($code, 'Verb')
 	or $self->wail("Unknown interactive method '$verb'");
 
-##    $self->{_interactive} = \$verb;	# Any local variable will do.
-##    weaken ($self->{_interactive});	# Goes away when $verb does.
-
     my $rslt;
     $unsatisfied
 	and not $self->__get_attr( $code, Tweak => {} )->{unsatisfied}
@@ -633,19 +671,24 @@ sub drop : Verb() {
 }
 
 sub dump : method Verb() {	## no critic (ProhibitBuiltInHomonyms)
-    my ( $self, undef, $arg ) = __arguments( @_ );	# $opt unused
-    if ( defined $arg && 'twilight' eq $arg ) {
-	return <<"EOD";
-twilight => @{[ $self->{twilight} ]}
-_twilight => @{[ $self->{_twilight} ]}
-EOD
-    } else {
-	my $tp = delete $self->{time_parser};
-	$self->{time_parser} = ref $tp;
-	my $dump = $self->_get_dumper()->( $self );
-	$self->{time_parser} = $tp;
-	return $dump;
+    my ( $self, undef, @arg ) = __arguments( @_ );	# $opt unused
+    my @dump;
+    @arg
+	or push @dump, $self;
+    local $self->{time_parser} = ref $self->{time_parser};
+    foreach ( @arg ) {
+	if ( ref ) {
+	    push @dump, $_;
+	} elsif ( 'twilight' eq $_ ) {
+	    push @dump, { map { $_ => $self->{$_} } qw{ twilight _twilight } };
+	} else {
+	    push @dump, $self->__choose( [ $_ ], $self->{bodies} );
+	    if ( defined( my $inx = $self->_find_in_sky( $_ ) ) ) {
+		push @dump, $self->{sky}[$inx];
+	    }
+	}
     }
+    return $self->_get_dumper()->( @dump );
 }
 
 sub echo : Verb( n! ) {
@@ -721,7 +764,6 @@ sub execute {
 
 	my $frame_depth = $#{$self->{frame}};
 	$self->{frame}[-1]{localout} = $stdout;
-##	ref $stdout and weaken ($self->{frame}[-1]{localout});
 
 	my $output = $self->dispatch( @$args );
 
@@ -970,53 +1012,44 @@ sub _height_us {
     return $output;
 }
 
-{
-    my %help_module = (
-	'' => 'Astro::App::Satpass2',
-	eci => 'Astro::Coord::ECI',
-	iridium => 'Astro::Coord::ECI::TLE::Iridium',
-	moon => 'Astro::Coord::ECI::Moon',
-	set => 'Astro::Coord::ECI::TLE::Set',
-	sun => 'Astro::Coord::ECI::Sun',
-	spacetrack => 'Astro::SpaceTrack',
-	star => 'Astro::Coord::ECI::Star',
-	tle => 'Astro::Coord::ECI::TLE',
-	utils => 'Astro::Coord::ECI::Utils',
-    );
-    sub help : Verb() {
-	my ( $self, undef, $arg ) = __arguments( @_ );	# $opt unused
-	if ( my $cmd = $self->get( 'webcmd' ) ) {
-	    $self->system( $cmd,
-		"http://search.cpan.org/~wyant/Astro-App-Satpass2-$VERSION/");
-	} else {
-	    $arg = $arg ? lc $arg : '';
+sub help : Verb() {
+    my ( $self, undef, $arg ) = __arguments( @_ );	# $opt unused
+    defined $arg
+	or $arg = '';
+    defined $self->{_help_module}{$arg}
+	and $arg = $self->{_help_module}{$arg};
+    if ( my $cmd = $self->_get_browser_command() ) {
+	my $kind = $arg =~ m/ - /smx ? 'release' : 'pod';
+	$self->system( $cmd,
+	    "https://metacpan.org/$kind/$arg" );
+    } else {
+
+	my $os_specific = "_help_$^O";
+	if (__PACKAGE__->can ($os_specific)) {
+	    return __PACKAGE__->$os_specific ();
+	} elsif ( load_package( 'Pod::Usage' ) ) {
 	    my @ha;
-	    if (my $fn = $help_module{$arg}) {
-		$self->_load_module($fn);
-		$fn =~ s{ :: }{/}smxg;
-		$fn .= '.pm';
-		@ha = ('-input' => $INC{$fn});
-
+	    if ( defined( my $path = find_package_pod( $arg ) ) ) {
+		push @ha, '-input' => $path;
 	    }
-
-	    my $os_specific = "_help_$^O";
-	    if (__PACKAGE__->can ($os_specific)) {
-		return __PACKAGE__->$os_specific ();
-	    } elsif ( load_package( 'Pod::Usage' ) ) {
-		my $stdout = $self->{frame}[-1]{localout};
-		if (openhandle $stdout && !-t $stdout) {
-		    push @ha, -output => $stdout;
-		}
-		Pod::Usage::pod2usage (
-		    -verbose => 2, -exitval => 'NOEXIT', @ha);
-	    } else {
-		return <<'EOD'
+	    my $stdout = $self->{frame}[-1]{localout};
+	    if (openhandle $stdout && !-t $stdout) {
+		push @ha, -output => $stdout;
+	    }
+	    Pod::Usage::pod2usage (
+		-verbose => 2, -exitval => 'NOEXIT', @ha);
+	} else {
+	    # This should never happen, since Pod::Usage is core
+	    # since 5.6. On the other hand we have not declared it
+	    # as a dependency, and some downstream packagers seem to
+	    # think they know more than the author what should be in
+	    # a package.
+	    return <<'EOD'
 No help available; Pod::Usage can not be loaded.
 EOD
-	    }
 	}
-	return;
     }
+    return;
 }
 
 # The call to this is generated dynamically above, and there is no way
@@ -1028,7 +1061,7 @@ Normally, we would display the documentation for the satpass2
 script here. But unfortunately this depends on the ability to
 spawn the perldoc command, and we do not have this ability under
 Mac OS 9 and earlier. You can find the same thing online at
-http://search.cpan.org/dist/Astro-App-Satpass2/
+https://metacpan.org/release/Astro-App-Satpass2
 
 EOD
 }
@@ -1380,47 +1413,20 @@ sub list : Verb( choose=s@ ) {
     return;
 }
 
-=begin comment
-
-sub _glob_files {
-    my @arg = @_;
-    my @rslt;
-    foreach ( @arg ) {
-	if ( openhandle( $_ ) || ref $_ ) {
-	    push @rslt, $_;
-	} else {
-	    push @rslt, bsd_glob( $_, GLOB_NOSORT | GLOB_BRACE |
-		GLOB_QUOTE | GLOB_NOCHECK );
-	}
-    }
-    return @rslt;
-}
-
-=end comment
-
-=cut
-
 sub load : Verb( verbose! ) {
     my ( $self, $opt, @names ) = __arguments( @_ );
     @names or $self->wail( 'No file names specified' );
 
-=begin comment
+    my $attrs = {
+	illum	=> $self->get( 'illum' ),
+	sun	=> $self->_sky_object( 'sun' ),
+    };
 
-    @names = map {
-	bsd_glob( $_, GLOB_NOSORT | GLOB_BRACE | GLOB_QUOTE )
-    } @names;
-    @names = _glob_files( @names );
-
-=end comment
-
-=cut
-
-    @names or $self->wail( 'No files found' );
     foreach my $fn ( @names ) {
 	$opt->{verbose} and warn "Loading $fn\n";
 	my $data = $self->_file_reader( $fn, { glob => 1 } );
 	$self->__add_to_observing_list(
-	    Astro::Coord::ECI::TLE->parse( $data ) );
+	    Astro::Coord::ECI::TLE->parse( $attrs, $data ) );
     }
     return;
 }
@@ -1778,19 +1784,6 @@ sub pass : Verb( choose=s@ appulse! brightest|magnitude! chronological! dump! ev
 	my ( undef, $opt, @passes ) = @_;	# Invocant unused
 	my @rslt;
 	foreach my $pass ( @passes ) {
-
-=begin comment
-
-	    @{ $pass->{events} } = grep {
-		    ! isdual( $_->{event} )
-		    || $_->{event} == PASS_EVENT_NONE
-		    || $opt->{ $selector[ $_->{event} ] }
-		} @{ $pass->{events} }
-		and push @rslt, $pass;
-
-=end comment
-
-=cut
 	    @{ $pass->{events} } = grep {
 		_pass_select_event_code( $opt, $_->{event} )
 		} @{ $pass->{events} }
@@ -2117,12 +2110,57 @@ EOD
 	( $self->$attribute( $opt, 'config' ) || "# none\n" );
     }
 
+    $output .= $self->_save_sky( $opt );
+
     if ($fn ne '-') {
-	my $fh = IO::File->new($fn, '>')
+	my $fh = IO::File->new( $fn, '>:encoding(utf-8)')
 	    or $self->wail("Unable to open $fn: $!");
-	print {$fh} $output;
+	print { $fh } $output;
 	$output = "$fn\n";
     }
+    return $output;
+}
+
+# Formats the commands to reconstitute the sky. This is only called from
+# save(), but it is a subroutine for organizational reasons.
+sub _save_sky {
+    my ( $self, $opt ) = @_;
+
+    my $output = <<'EOD';
+
+# Astro::App::Satpass2 sky
+
+EOD
+
+    foreach my $body ( sort keys %{ $self->{sky_class} } ) {
+	$opt->{changes}
+	    and $sky_class{$body}
+	    and $sky_class{$body} eq $self->{sky_class}{$body}
+	    and next;
+	$output .= $self->_sky_class_components( $body ) . "\n";
+    }
+    foreach my $body ( sort keys ( %sky_class ) ) {
+	$self->{sky_class}{$body}
+	    or $output .= $self->_sky_class_components( $body ) . "\n";
+    }
+
+    my %exclude;
+    if ( $opt->{changes} ) {
+	%exclude = map { $_ => 1 }
+	    SUN_CLASS_DEFAULT, 'Astro::Coord::ECI::Moon';
+	foreach my $name ( qw{ sun moon } ) {
+	    defined $self->_find_in_sky( $name )
+		or $output .= "sky drop $name\n";
+	}
+    } else {
+	$output .= "sky clear\n";
+    }
+    foreach my $body ( @{ $self->{sky} } ) {
+	$exclude{ ref $body }
+	    and next;
+	$output .= _sky_list_body( $body );
+    }
+
     return $output;
 }
 
@@ -2285,9 +2323,24 @@ sub _set_geocoder {
     );
 }
 
-#sub _set_lowercase {
-#    return ($_[0]{$_[1]} = lc $_[2]);
-#}
+sub _set_illum_class {
+    my ( $self, $name, $class ) = @_;
+    my $want_class = 'Astro::Coord::ECI';
+    ref $class and $self->wail( "$name must not be a reference" );
+    if ( defined $class ) {
+	$self->load_package( { fatal => 'wail' }, $class );
+	$class->isa( $want_class )
+	    or $self->wail( "$name must be an $want_class" );
+    } else {
+	$class = $want_class;
+    }
+    $self->{$name} = $class;
+    $self->{_help_module}{$name} = $class;
+    foreach my $body ( @{ $self->{bodies} } ) {
+	$body->set( $name => $class );
+    }
+    return;
+}
 
 sub _set_model {
     my ( $self, $name, $val ) = @_;
@@ -2390,6 +2443,12 @@ sub _set_stdout {
     return ($self->{$name} = $val);
 }
 
+sub _set_sun_class {
+    my ( $self, $name, $val ) = @_;
+    $self->_attribute_exists( $name );
+    return $self->sky( class => $name, $val );
+}
+
 sub _set_time_parser {
     my ( $self, $name, $val ) = @_;
 
@@ -2466,9 +2525,11 @@ sub _set_warner_attribute {
 
 sub _set_webcmd {
     my ($self, $name, $val) = @_;
-    my $st;
-    $st = $self->get( 'spacetrack' )
-	and $st->set( webcmd => $val );
+    # TODO warn if $val is true but not '1'.
+    if ( my $st = $self->get( 'spacetrack' ) ) {
+	# TODO once spacetrack supports '1', just pass $val.
+	$st->set( webcmd => $self->_get_browser_command( $val ) );
+    }
     return ($self->{$name} = $val);
 }
 
@@ -2482,6 +2543,8 @@ sub show : Verb( changes! deprecated! readonly! ) {
 
     unless ( @args ) {
 	foreach my $name ( sort keys %accessor ) {
+	    $self->_attribute_exists( $name, query => 1 )
+		or next;
 	    $nointeractive{$name}
 		and next;
 	    exists $mutator{$name}
@@ -2525,6 +2588,12 @@ sub _show_formatter_attribute {
     return ( qw{ formatter }, $name, $val );
 }
 
+sub _show_sun_class {
+    my ( $self, $name ) = @_;
+    $self->_attribute_exists( $name );
+    return $self->_sky_class_components( $name );
+}
+
 sub _show_unmodified {
     my ($self, $name) = @_;
     my $val = $self->get( $name );
@@ -2538,16 +2607,28 @@ sub _show_unmodified {
 
 use constant SPY2DPS => 3600 * 365.24219 * SECSPERDAY;
 
-{
+# Given a body in the sky, encodes it in 'sky add' format
+sub _sky_list_body {
+    my ( $body ) = @_;
+    if ( embodies( $body, 'Astro::Coord::ECI::TLE' ) ) {
+	return sprintf "sky tle %s\n", quoter(
+	    $body->get( 'tle' ) );
+    } elsif ( $body->isa( 'Astro::Coord::ECI::Star' ) ) {
+	my ( $ra, $dec, $rng, $pmra, $pmdec, $vr ) = $body->position();
+	$rng /= PARSEC;
+	$pmra = rad2deg( $pmra / 24 * 360 * cos( $ra ) ) * SPY2DPS;
+	$pmdec = rad2deg( $pmdec ) * SPY2DPS;
+	return sprintf
+	    "sky add %s %s %7.3f %.2f %.4f %.5f %s\n",
+	    quoter( $body->get( 'name' ) ), _rad2hms( $ra ),
+	    rad2deg( $dec ), $rng, $pmra, $pmdec, $vr;
+    } else {
+	return sprintf "sky add %s\n", quoter( $body->get( 'name' ) );
+    }
+}
 
-    my %planet_class = (
-	( map { fold_case( $_ ) => "Astro::Coord::ECI::$_" } qw{ Sun
-	    Moon } ),
-	# The shape of things to come -- maybe
-	( map { fold_case( $_ ) =>
-	    "Astro::Coord::ECI::Heliocentric::$_" } qw{ Mercury Venus
-	    Mars Jupiter Saturn Uranus Neptune } ),
-    );
+{
+    my %go;
 
     my %handler = (
 	list	=> sub {
@@ -2559,22 +2640,7 @@ use constant SPY2DPS => 3600 * 365.24219 * SECSPERDAY;
 		map { [ lc( $_->get( 'name' ) || $_->get( 'id' ) ), $_ ] }
 		@{$self->{sky}}
 	    ) {
-		if ( embodies( $body, 'Astro::Coord::ECI::TLE' ) ) {
-		    $output .= sprintf "sky tle %s\n", quoter(
-			$body->get( 'tle' ) );
-		} elsif ($body->isa ('Astro::Coord::ECI::Star')) {
-		    my ($ra, $dec, $rng, $pmra, $pmdec, $vr) = $body->position ();
-		    $rng /= PARSEC;
-		    $pmra = rad2deg ($pmra / 24 * 360 * cos ($ra)) * SPY2DPS;
-		    $pmdec = rad2deg ($pmdec) * SPY2DPS;
-		    $output .= sprintf (
-			"sky add %s %s %7.3f %.2f %.4f %.5f %s\n",
-			quoter ($body->get ('name')), _rad2hms ($ra),
-			rad2deg ($dec), $rng, $pmra, $pmdec, $vr);
-		} else {
-		    $output .= 'sky add ' . quoter (
-			$body->get ('name')) . "\n";
-		}
+		$output .= _sky_list_body( $body );
 	    }
 	    unless (@{$self->{sky}}) {
 		$self->{warn_on_empty}
@@ -2586,22 +2652,11 @@ use constant SPY2DPS => 3600 * 365.24219 * SECSPERDAY;
 	    my ( $self, @args ) = @_;
 	    my $name = shift @args
 		or $self->wail( 'You did not specify what to add' );
-	    my $fcn = fold_case( $name );
-	    if ( my $class = $planet_class{$fcn} ) {
-		foreach my $body ( @{ $self->{sky} } ) {
-		    $body->isa( $class )
-			and return;
-		}
-		load_package( $class );
-		push @{ $self->{sky} }, $class->new(
-		    debug	=> $self->{debug},
-		);
+	    defined $self->_find_in_sky( $name )
+		and return;
+	    if ( my $obj = $self->_sky_object( $name, fatal => 0 ) ) {
+		push @{ $self->{sky} }, $obj;
 	    } else {
-		foreach my $body ( @{ $self->{sky} } ) {
-		    $body->isa( 'Astro::Coord::ECI::Star' )
-			and $fcn eq fold_case( $body->get( 'name' ) )
-			and return;
-		}
 		@args >= 2
 		    or $self->wail(
 		    'You must give at least right ascension and declination' );
@@ -2621,8 +2676,74 @@ use constant SPY2DPS => 3600 * 365.24219 * SECSPERDAY;
 		push @{ $self->{sky} }, Astro::Coord::ECI::Star->new(
 		    debug	=> $self->{debug},
 		    name	=> $name,
+		    sun		=> $self->_sky_object( 'sun' ),
 		)->position( $ra, $dec, $rng, $pmra, $pmdec, $pmrec );
 	    }
+	    return;
+	},
+	class	=> sub {
+	    my ( $self, @arg ) = @_;
+	    $go{class} ||= Getopt::Long::Parser->new(
+#		config	=> [ qw{ require_order } ],
+	    );
+	    my %opt;
+	    if ( HASH_REF eq ref $arg[0] ) {
+		%opt = %{ shift @arg };
+	    } else {
+		$go{class}->getoptionsfromarray(
+		    \@arg, \%opt, qw{ add! delete! } )
+		    or $self->wail( 'Invalid option' );
+	    };
+	    $opt{add}
+		and $opt{delete}
+		and $self->wail( 'May not specify both add and delete' );
+
+	    if ( $opt{delete} ) {
+		foreach my $name ( @arg ) {
+		    $name =~ m/ \A sun \z /smxi
+			and $self->wail( 'Can not remove Sun class' );
+		    defined $self->_find_in_sky( $name )
+			and $self->wail( 'Can not remove in-use class' );
+		    delete $self->{sky_class}{ fold_case( $name ) };
+		}
+	    } elsif ( @arg < 2 ) {
+		@arg
+		    or @arg = sort keys %{ $self->{sky_class} };
+		return join '', map {
+		    $self->_sky_class_components( $_ ) . "\n" }
+		    @arg;
+	    } else {
+		my ( $name, $class, @attr ) = @arg;
+		$self->load_package( { fatal => 'wail' }, $class );
+		my $want_class = $name =~ m/ \A sun \z /smxi ?
+		    SUN_CLASS_DEFAULT :
+		    'Astro::Coord::ECI';
+		embodies( $class, $want_class )
+		    or $self->wail(
+		    "Must be a subclass of $want_class" );
+		+{ @attr }->{name}
+		    and $self->wail( 'May not specify name explicitly' );
+		# name must be last, because _sky_class_components()
+		# needs to recover it.
+		push @attr, name => $name;
+		my $obj = $class->new( @attr );	# To validate @attr
+		my $folded_name = fold_case( $name );
+		$self->{sky_class}{$folded_name} = [ $class, @attr ];
+		$self->_replace_in_sky( $folded_name )
+		    or $opt{add}
+		    and push @{ $self->{sky} }, $obj;
+		$self->{_help_module}{$folded_name} = $class;
+		if ( $name =~ m/ \A sun \z /smxi ) {
+		    foreach my $body (
+			@{ $self->{bodies} }, @{ $self->{sky} }
+		    ) {
+			$body->set(
+			    sun => $self->_sky_object( 'sun' ),
+			);
+		    }
+		}
+	    }
+
 	    return;
 	},
 	clear	=> sub {
@@ -2634,9 +2755,9 @@ use constant SPY2DPS => 3600 * 365.24219 * SECSPERDAY;
 	    my ( $self, @args ) = @_;
 	    @args or $self->wail(
 		'You must specify at least one name to drop' );
-	    my $match = qr< @{[ join '|', map {quotemeta $_} @args ]} >smxi;
-	    @{$self->{sky}} = grep {
-		$_->get ('name') !~ m/ $match /smx } @{$self->{sky}};
+	    foreach my $name ( @args ) {
+		$self->_drop_from_sky( $name );
+	    }
 	    return;
 	},
 	load	=> sub {	# Undocumented. That means I can revoke
@@ -2658,19 +2779,18 @@ use constant SPY2DPS => 3600 * 365.24219 * SECSPERDAY;
 	    my ( $self, @args ) = @_;
 	    my $output;
 	    my $name = shift @args;
-	    my $lcn = lc $name;
-	    foreach my $body (@{$self->{sky}}) {
-		next unless $body->isa ('Astro::Coord::ECI::Star') &&
-			$lcn eq lc $body->get ('name');
-		$self->wail( "Duplicate sky entry '$name'" );
-	    }
+	    defined $self->_find_in_sky( $name )
+		and $self->wail( "Duplicate sky entry '$name'" );
 	    my ($ra, $dec, $rng, $pmra, $pmdec, $pmrec) =
 		$self->_simbad4 ($name);
 	    $rng = sprintf '%.2f', $rng;
 	    $output .= 'sky add ' . quoter ($name) .
 		" $ra $dec $rng $pmra $pmdec $pmrec\n";
 	    $ra = deg2rad ($self->__parse_angle ($ra));
-	    my $body = Astro::Coord::ECI::Star->new (name => $name);
+	    my $body = Astro::Coord::ECI::Star->new(
+		name	=> $name,
+		sun	=> $self->_sky_object( 'sun' ),
+	      );
 	    $body->position ($ra, deg2rad ($self->__parse_angle ($dec)),
 		$rng * PARSEC, deg2rad ($pmra * 24 / 360 / cos ($ra) / SPY2DPS),
 		deg2rad ($pmdec / SPY2DPS), $pmrec);
@@ -2696,6 +2816,40 @@ use constant SPY2DPS => 3600 * 365.24219 * SECSPERDAY;
 	return;	# We can't get here, but Perl::Critic does not know this.
     }
 
+}
+
+# Given the name of a potential background object, return its
+# definition. This is an array in list context, or a quoted string in
+# scalar context.
+sub _sky_class_components {
+    my ( $self, $name ) = @_;
+    my $info = $self->{sky_class}{ fold_case( $name ) }
+	or $self->weep( "No class defined for $name" );
+    my ( $class, @attr ) = @{ $info };
+    # We rely on sky( class => $name, $class, ... ) keeping the name
+    # last.
+    $name = pop @attr;
+    pop @attr;	# 'name';
+    my @parts = ( qw{ sky class }, $name, $class, @attr );
+    wantarray
+	and return @parts;
+    return join ' ', map { quoter( $_ ) } @parts;
+}
+
+# Given the name of a potential sky object, instantiate it. Named
+# arguments are optional; the following are supported:
+#   fatal = Whether failure to find the name is fatal. Default is true.
+sub _sky_object {
+    my ( $self, $name, %opt ) = @_;
+    defined $opt{fatal}
+	or $opt{fatal} = 1;
+    if ( my $info = $self->{sky_class}{ fold_case( $name ) } ) {
+	my ( $class, @attr ) = @{ $info };
+	return $class->new( @attr );
+    } elsif ( $opt{fatal} ) {
+	$self->weep( "No class defined for $name" );
+    }
+    return;
 }
 
 sub _sky_tle {
@@ -3148,16 +3302,26 @@ sub _apply_boolean_default {
     return;
 }
 
-#	$self->_attribute_exists( $name );
+#	$self->_attribute_exists( $name, %arg );
 #
 #	This method returns true if an accessor for the given attribute
 #	exists, and croaks otherwise.
+#	Attributes in the %level1_attr hash fail unless in level1 mode
+#	Named arguments:
+#	  query: if true, returns false if attribute does not exist
 
-sub _attribute_exists {
-    my ( $self, $name ) = @_;
-    exists $accessor{$name}
-	or $self->wail("No such attribute as '$name'");
-    return $accessor{$name};
+{
+    my %level1_attr = map { $_ => 1 } qw{ sun };
+
+    sub _attribute_exists {
+	my ( $self, $name, %arg ) = @_;
+	exists $accessor{$name}
+	    and ( ! $level1_attr{$name} || $self->{frame}[-1]{level1} )
+	    and return $accessor{$name};
+	$arg{query}
+	    or $self->wail("No such attribute as '$name'");
+	return;
+    }
 }
 
 {
@@ -3242,7 +3406,7 @@ sub _attribute_exists {
 	    my ( $sel ) = @_;
 	    return $sel;
 	},
-	Regexp	=> sub {
+	REGEXP_REF()	=> sub {
 	    my ( $sel ) = @_;
 	    return sub {
 	        my ( $tle, $context ) = @_;
@@ -3365,6 +3529,16 @@ sub _attribute_exists {
 
 }
 
+# my ( $obj ) = $self->_drop_from_sky( $name );
+# The return is an array containing the dropped body, or nothing if the
+# body was not found.
+sub _drop_from_sky {
+    my ( $self, $name ) = @_;
+    defined( my $inx = $self->_find_in_sky( $name ) )
+	or return;
+    return splice @{ $self->{sky} }, $inx, 1;
+}
+
 #	$code = $self->_file_reader( $file, \%opt );
 #
 #	This method returns a code snippet that returns the contents of
@@ -3380,6 +3554,14 @@ sub _attribute_exists {
 #	The code snippet will return undef at end-of-file.
 #
 #	The following keys in %opt are recognized:
+#	{encoding} specifies the encoding of the file. How this is used
+#	    on the $file argument as follows:
+#	    * An open handle -- unused
+#	    * A URL ----------- unused (encoding taken from HTTP::Response)
+#	    * A file name ----- used (default is utf-8)
+#	    * A scalar ref ---- used (default is un-encoded)
+#	    * An array ref ---- unused
+#	    * A code ref ------ unused
 #	{glob} causes the contents of the file to be returned, rather
 #	    than a reader.
 #	{optional} causes the code to simply return on an error, rather
@@ -3426,12 +3608,17 @@ sub _file_reader_ {	## no critic (ProhibitUnusedPrivateSubroutines)
 	    $self->wail( "Failed to retrieve $file: ",
 		$resp->status_line() );
 	};
-	$opt->{glob} and return $resp->content();
-	return $self->_file_reader( \( scalar $resp->content() ), $opt );
+	$opt->{glob} and return $resp->decoded_content();
+	$opt = { %{ $opt }, encoding => $resp->content_charset() };
+	return $self->_file_reader(
+	    \( scalar $resp->content() ),
+	    $opt,
+	);
     } else {
+	my $encoding = $opt->{encoding} || 'utf-8';
 	my $fh = IO::File->new(
 	    $self->expand_tilde( $file ),
-	    '<:encoding(utf-8)',
+	    "<:encoding($encoding)",
 	) or do {
 	    $opt->{optional} and return;
 	    $self->wail( "Failed to open $file: $!" );
@@ -3502,11 +3689,27 @@ sub _file_reader_SCALAR {	## no critic (ProhibitUnusedPrivateSubroutines)
 
     $opt->{glob}
 	and return ${ $file };
+    my $mode = $opt->{encoding} ? "<:encoding($opt->{encoding})" : '<';
 
-    my $fh = IO::File->new( $file, '<' )	# Needs IO::File 1.14.
+    my $fh = IO::File->new( $file, $mode )	# Needs IO::File 1.14.
 	or $self->wail( "Failed to open SCALAR ref: $!" );
 
     return sub { return scalar <$fh> };
+}
+
+# $inx = $self->_find_in_sky( $name )
+# The return is the index of the named body in @{ $self->{sky} }, or
+# undef if it is not present. 'Sun' and 'Moon' are special cases;
+# everything else is presumed to be found by name.
+sub _find_in_sky {
+    my ( $self, $name ) = @_;
+
+    my $re = qr/ \A \Q$name\E \z /smxi;
+    foreach my $inx ( 0 .. $#{ $self->{sky} } ) {
+	$self->{sky}[$inx]->get( 'name' ) =~ $re
+	    and return $inx;
+    }
+    return;
 }
 
 # Documented in POD
@@ -3617,6 +3820,19 @@ sub _frame_push {
 	}
 	return;
     }
+}
+
+sub _get_browser_command {
+    my ( $self, $val ) = @_;
+    defined $val
+	or $val = $self->{webcmd};
+    defined $val
+	and '' ne $val
+	or return $val;
+    '1' eq $val
+	or return $val;
+    require Browser::Open;
+    return Browser::Open::open_browser_cmd();
 }
 
 #	$dumper = $self->_get_dumper();
@@ -3892,11 +4108,11 @@ sub _helper_get_object {
 	    and @args = $parse_input{$name}{$method}->( $self, $opt, @args );
 	delete $opt->{raw}
 	    and return $object->$method( @args );
-	my $rslt = $object->decode( $method, @args );
+	my @rslt = $object->decode( $method, @args );
 
-	instance( $rslt, ref $object ) and return;
-	ref $rslt and return $rslt;
-	return quoter( $name, $method, $rslt ) . "\n";
+	instance( $rslt[0], ref $object ) and return;
+	ref $rslt[0] and return $rslt[0];
+	return quoter( $name, $method, @rslt ) . "\n";
     }
 }
 
@@ -4072,7 +4288,7 @@ sub _parse_angle_parts {
 	defined $part or last;
 	$circle *= $size;
 	$angle = $angle * $size + $part;
-	$places = $part =~ m/ [.] ( \d+ ) /smx ? length $1 : 0;
+	$places = $part =~ m/ [.] ( [0-9]+ ) /smx ? length $1 : 0;
     }
     $angle *= 360 / $circle;
     if ( my $mag = sprintf '%d', $circle / 360 ) {
@@ -4099,9 +4315,9 @@ sub __parse_angle {
 	);
 
     } elsif ( $angle =~
-	m{ \A ( [-+] )? (\d*) d
-	    ( \d* (?: [.] \d*)? ) (?: m
-	    ( \d* (?: [.] \d* )? ) s? )? \z
+	m{ \A ( [-+] )? ( [0-9]* ) d
+	    ( [0-9]* (?: [.] [0-9]* )? ) (?: m
+	    ( [0-9]* (?: [.] [0-9]* )? ) s? )? \z
 	}smxi ) {
 	my ( $sgn, $deg, $min, $sec ) = ( $1, $2, $3, $4 );
 	$angle = _parse_angle_parts(
@@ -4208,6 +4424,20 @@ sub _read_continuation {
     $self->{echo} and $self->whinge( $prompt, $more );
     $more =~ m/ \n \z /smx or $more .= "\n";
     return $more;
+}
+
+# my ( $obj ) = $self->_replace_in_sky( $name );
+# This is restricted to objects constructed via {sky_class}.
+# The return is an array containing the replaced body, or nothing if
+# the body was not found.
+sub _replace_in_sky {
+    my ( $self, $name, $class ) = @_;
+    ( $class ||= $self->{sky_class}{ fold_case( $name ) } )
+	or $self->weep( "Can not replace $name; no class defined" );
+    defined( my $inx = $self->_find_in_sky( $name ) )
+	or return;
+    return splice @{ $self->{sky} }, $inx, $inx + 1, $self->_sky_object(
+	$name );
 }
 
 #	$self->_rewrite_level1_command( $buffer, $context );
@@ -4853,7 +5083,7 @@ sub _unescape {
 				and $self->wail(
 				'Substring expansion has extra arguments' );
 			    foreach ( @pos ) {
-				m/ \A [-+]? \d+ \z /smx
+				m/ \A [-+]? [0-9]+ \z /smx
 				    or $self->wail(
 				    'Substring expansion argument non-numeric'
 				);
@@ -5911,8 +6141,9 @@ module can not be loaded.
 
 This interactive method can be used to get usage help. Without
 arguments, it displays the documentation for this class (hint: you are
-reading this now). You can get documentation for related Perl modules by
-specifying the appropriate arguments, as follows:
+reading this now). You can get documentation for other Perl modules by
+specifying their names. For convenience, there are abbreviations for
+some modules, as follows:
 
  eci -------- Astro::Coord::ECI
  iridium ---- Astro::Coord::ECI::TLE::Iridium
@@ -5929,8 +6160,8 @@ Under Mac OS 9 or below, this method simply returns an apology, since
 L<Pod::Usage|Pod::Usage> appears not to work there.
 
 If you set the L<webcmd|/webcmd> attribute properly, this method will
-launch the L<http://search.cpan.org/> page for this package, and
-arguments will be ignored.
+launch a web browser displaying the desired documentation from
+L<https://metacpan.org>.
 
 In any case, nothing is returned.
 
@@ -5954,7 +6185,7 @@ nothing called interactively will be executed until after the
 corresponding interactive call to L<end()|/end> (or whenever the frame
 created by the C<begin()> is popped off the stack, which may be the end
 of a macro or source file.) Non-interactive methods will still be
-executed. See L<METHODS|/METHODS> above fore what it means to be called
+executed. See L<METHODS|/METHODS> above for what it means to be called
 interactively.
 
 For example (assuming OID 99999 is not loaded)
@@ -6670,32 +6901,85 @@ subcommand is given, 'list' is assumed.
 
 The possible subcommands are:
 
-'Add' adds an object to the background. The first argument is the name
-of the object. 'Sun' and 'Moon' (not case-sensitive) are special cases,
-and cause the Sun or Moon to be added. Anything else is assumed to be
-the name of a star, and its coordinates must be given, in the following
-order: right ascension (in either degrees or hours, minutes, and
-seconds), declination (in degrees), range (optionally with units of
-meters ('m'), kilometers ('km'), astronomical units ('au'), light years
-('ly'), or parsecs ('pc', the default) appended), proper motion in right
-ascension and declination (in degrees per year) and in recession (in
-kilometers per second). All but right ascension and declination may be
-omitted. It is an error to attempt to add an object which is already
-listed among the background objects. Nothing is returned.
+=head3 add
 
-'Clear' clears all background objects. It takes no arguments. Nothing is
-returned.
+This subcommand adds an object to the background. The first argument is
+the name of the object. If the case-insensitive name of the object
+appears in the sky class list (see below) it is instantiated and added.
+Otherwise the name is assumed to be the name of a star, and its
+coordinates must be given, in the following order: right ascension (in
+either degrees or hours, minutes, and seconds), declination (in
+degrees), range (optionally with units of meters ('m'), kilometers
+('km'), astronomical units ('au'), light years ('ly'), or parsecs ('pc',
+the default) appended), proper motion in right ascension and declination
+(in degrees per year) and in recession (in kilometers per second). All
+but right ascension and declination may be omitted. It is an error to
+attempt to add an object which is already listed among the background
+objects. Nothing is returned.
 
-'Drop' removes background objects. The arguments are the names of the
-background objects to be removed, or portions thereof. They are made
-into a case-insensitive regular expression to perform the removal.
+=head3 class
+
+This subcommand maintains the classes of background objects. It takes
+the following subcommand-specific options:
+
+=over
+
+=item -add
+
+If this Boolean option is asserted, the object is added to the sky once
+it is successfully defined.
+
+You may not specify both C<-add> and C<-delete> on the same command.
+
+=item -delete
+
+If this Boolean option is asserted, the arguments are the
+case-insensitive names of class definitions to remove. The definition
+for the Sun can not be removed, and any class actually instantiated in
+the sky can not be removed. Nothing is returned.
+
+You may not specify both C<-add> and C<-delete> on the same command.
+
+=back
+
+Options can be specified either command-line style (with leading dashes
+or double dashes, as documented above) or as an optional hash reference
+appearing immediately after the subcommand name. In the latter case
+option names must be specified in full.
+
+Unless the C<-delete> option is specified (see above), the arguments are
+the case-preserved name of the object being defined, the name of the
+class that implements it, and optional attribute values (specified as
+name/value pairs). You may not specify the C<name> attribute, because
+this is derived from the first argument. This information is added to
+the known object definitions, replacing the previous definition if any.
 Nothing is returned.
 
-'List' returns a string containing a list of the background objects, in
-the format of the 'sky add' commands needed to re-create them. If no
-subcommand at all is given, 'list' is assumed.
+If only a name is specified, the definition of that name is returned,
+formatted as a C<'sky class'> command. If no arguments at all are
+specified, all defined classes are returned.
 
-'Lookup' takes as its argument a name, looks that name up in the
+=head3 clear
+
+This subcommand clears all background objects. It takes no arguments.
+Nothing is returned.
+
+=head3 drop
+
+This subcommand removes background objects. The arguments are the names
+of the background objects to be removed, or portions thereof. They are
+made into a case-insensitive regular expression to perform the removal.
+Nothing is returned.
+
+=head3 list
+
+This subcommand returns a string containing a list of the background
+objects, in the format of the 'sky add' commands needed to re-create
+them. If no subcommand at all is given, 'list' is assumed.
+
+=head3 lookup
+
+This subcommand takes as its argument a name, looks that name up in the
 University of Strasbourg's SIMBAD database, and adds the object to the
 background. An error occurs if the object can not be found. This
 subcommand will fail if the
@@ -7580,6 +7864,19 @@ This attribute may not be set.
 
 The default is C<undef>.
 
+=head2 illum
+
+This string specifies the name of the class to be used for the
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<illum> attribute. If
+you specify C<undef> you get the default.
+
+The default is L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun>.
+
+Note: I am less than happy about the implementation of this attribute.
+Be alert for changes.  If I decide to revoke the above implementation
+completely there will be notice, and if at all possible a deprecation
+process.
+
 =head2 latitude
 
 This numeric attribute specifies the latitude of the observer in degrees
@@ -7931,14 +8228,34 @@ The default is 1 (i.e. true).
 
 This string attribute specifies the system command to spawn to display a
 web page. If not the empty string, the L<help|/help> method uses it to
-display the help for this package on L<http://search.cpan.org/>. Mac OS
+display L<https://metacpan.org/release/Astro-App-Satpass2>. Mac OS
 X users will find C<'open'> a useful setting, and Windows users will
 find C<'start'> useful.
 
 This functionality was added on speculation, since there is no good way
 to test it in the initial release of the package.
 
-The default is '' (i.e. the empty string), which leaves the
+As of version 0.035_01, a value of C<'1'> causes
+L<Browser::Open|Browser::Open> to be loaded, and the web command is
+taken from it. All other true values are deprecated, on the following
+schedule:
+
+=over
+
+=item 2018-11-01: First use of deprecated value will warn;
+
+=item 2019-05-01: All uses of deprecated value will warn;
+
+=item 2019-11-01: Any use of deprecated value is fatal;
+
+=item 2020-05-01: Attribute is treated as Boolean.
+
+=back
+
+The above schedule may be extended based on what other changes are
+needed, but will not be compressed.
+
+The default is C<''> (i.e. the empty string), which leaves the
 functionality disabled.
 
 =head1 SPECIFYING ANGLES

@@ -29,7 +29,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::ReadmeAddDevInfo" : {
          "file" : "lib/Dist/Zilla/Plugin/ReadmeAddDevInfo.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -44,7 +44,7 @@
          "web" : "http://github.com/reneeb/Dist-Zilla-Plugin-ReadmeAddDevInfo"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

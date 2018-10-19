@@ -1,13 +1,18 @@
 use Test::More;
+use POSIX qw(setlocale);
+use Time::Piece;     # for _tzset()
 
-#$ENV{TIMEZONE} = "EST";
-$ENV{TZ} = "UTC";
+$ENV{TZ} = "UTC";       # testing occurs in UTC
+Time::Piece::_tzset();  # see Time::Piece perldocs on TZ in Win32
+
+my $loc = setlocale( LC_ALL, "C" );
+# testing occurs in 'C' english, see https://rt.cpan.org/Public/Bug/Display.html?id=127400
 
 {
     use_ok( 'Finance::CoinbasePro::API::CLI::Account' );
     my $client= Finance::CoinbasePro::API::CLI::Account->new( 
       available => "3468.65944081011515", balance => "3468.6594408101151500", currency => "USD", hold => "0.0000000000000000",
-      id => "2b81d28b-249b-416d-9ade-720301443d82", #  profile_id => "18f975e3-6d43-4127-aca5-7d2c13b2ea31",
+      id => "2b81d28b-249b-416d-9ade-111111111112", #  profile_id => "18f975e3-6d43-4127-aca5-711111111111",
     );
     is( $client->balance(), "3468.6594408101151500", 'account balance' );
     is( $client->to_str(), '$3,469', 'account as string' );

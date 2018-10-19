@@ -69,7 +69,7 @@
   date_format_full => "EEEE, d 'de' MMMM 'de' y",
   date_format_long => "d 'de' MMMM 'de' y",
   date_format_medium => "d MMM y",
-  date_format_short => "d/M/yy",
+  date_format_short => "d/M/y",
   datetime_format_full => "{1}, {0}",
   datetime_format_long => "{1}, {0}",
   datetime_format_medium => "{1} {0}",
@@ -250,9 +250,9 @@
     4,
   ],
   quarter_format_wide => [
-    "1.\N{U+00ba} trimestre",
+    "1.er trimestre",
     "2.\N{U+00ba} trimestre",
-    "3.\N{U+00ba} trimestre",
+    "3.er trimestre",
     "4.\N{U+00ba} trimestre",
   ],
   quarter_stand_alone_abbreviated => [
@@ -268,9 +268,9 @@
     4,
   ],
   quarter_stand_alone_wide => [
-    "1.\N{U+00ba} trimestre",
+    "1.er trimestre",
     "2.\N{U+00ba} trimestre",
-    "3.\N{U+00ba} trimestre",
+    "3.er trimestre",
     "4.\N{U+00ba} trimestre",
   ],
   script => undef,
@@ -280,5 +280,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 33,
+  version => 34,
 }

@@ -4,7 +4,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 # VERSION
 
-version 2.19
+version 2.20
 
 # SYNOPSIS
 
@@ -83,10 +83,23 @@ the appropriate module for details of how we check for the local time
 zone.
 
 - [DateTime::TimeZone::Local::Unix](https://metacpan.org/pod/DateTime::TimeZone::Local::Unix)
+- [DateTime::TimeZone::Local::Android](https://metacpan.org/pod/DateTime::TimeZone::Local::Android)
+- [DateTime::TimeZone::Local::hpux](https://metacpan.org/pod/DateTime::TimeZone::Local::hpux)
 - [DateTime::TimeZone::Local::Win32](https://metacpan.org/pod/DateTime::TimeZone::Local::Win32)
 - [DateTime::TimeZone::Local::VMS](https://metacpan.org/pod/DateTime::TimeZone::Local::VMS)
 
-If a local time zone is not found, then an exception will be thrown.
+If a local time zone is not found, then an exception will be thrown. This
+exception will always stringify to something containing the text `"Cannot
+determine local time zone"`.
+
+If you are writing code for users to run on systems you do not control, you
+should try to account for the possibility that this exception may be
+thrown. Falling back to UTC might be a reasonable alternative.
+
+When writing tests for your modules that might be run on others' systems, you
+are strongly encouraged to either not use `local` when creating [DateTime](https://metacpan.org/pod/DateTime)
+objects or to set `$ENV{TZ}` to a known value in your test code. All of the
+per-OS classes check this environment variable.
 
 ## $tz->offset\_for\_datetime( $dt )
 
@@ -324,6 +337,7 @@ Dave Rolsky <autarch@urth.org>
 - David Pinkowitz <dave@pinkowitz.com>
 - Iain Truskett &lt;deceased>
 - Jakub Wilk <jwilk@jwilk.net>
+- James E Keenan <jkeenan@cpan.org>
 - Joshua Hoblitt <jhoblitt@cpan.org>
 - Karen Etheridge <ether@cpan.org>
 - karupanerura <karupa@cpan.org>

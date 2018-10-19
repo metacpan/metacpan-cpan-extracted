@@ -7,10 +7,10 @@ use warnings;
 
 use parent qw{ Astro::App::Satpass2::Geocode };
 
-use Astro::App::Satpass2::Utils qw{ instance };
+use Astro::App::Satpass2::Utils qw{ instance @CARP_NOT };
 use List::Util ();
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 use constant GEOCODER_CLASS => 'Geo::Coder::OSM';
 
@@ -75,7 +75,7 @@ sub geocode {
 	} else {
 	    my $desc = $info->{display_name};
 	    $desc =~ s/ [^,]+ , \s* //smx;
-	    $desc =~ s/ \A ( \d+ ) , /$1/smx;	# Oh, for 5.10 and \K
+	    $desc =~ s/ \A ( [0-9]+ ) , /$1/smx;	# Oh, for 5.10 and \K
 	    return $desc;
 	}
     }

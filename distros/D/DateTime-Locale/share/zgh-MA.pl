@@ -126,7 +126,7 @@
     "\N{U+2d37}\N{U+2d30}\N{U+2d5c} \N{U+2d4f} \N{U+2d44}\N{U+2d49}\N{U+2d59}\N{U+2d30}",
     "\N{U+2d37}\N{U+2d3c}\N{U+2d3c}\N{U+2d49}\N{U+2d54} \N{U+2d4f} \N{U+2d44}\N{U+2d49}\N{U+2d59}\N{U+2d30}",
   ],
-  first_day_of_week => 6,
+  first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%m/%d/%y",
   glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
@@ -266,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

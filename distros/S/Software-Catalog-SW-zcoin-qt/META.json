@@ -29,6 +29,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Log::ger" : "0.023",
             "PerlX::Maybe" : "0",
             "Role::Tiny::With" : "0",
             "Software::Catalog::Role::Software" : "v1.0.3",
@@ -60,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Software-Catalog-SW-zcoin-qt"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

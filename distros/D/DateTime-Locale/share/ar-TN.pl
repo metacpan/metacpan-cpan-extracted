@@ -139,7 +139,7 @@
     "\N{U+0642}\N{U+0628}\N{U+0644} \N{U+0627}\N{U+0644}\N{U+0645}\N{U+064a}\N{U+0644}\N{U+0627}\N{U+062f}",
     "\N{U+0645}\N{U+064a}\N{U+0644}\N{U+0627}\N{U+062f}\N{U+064a}",
   ],
-  first_day_of_week => 7,
+  first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%d %b, %Y",
   glibc_datetime_format => "%d %b, %Y %Z %I:%M:%S %p",
@@ -279,5 +279,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 33,
+  version => 34,
 }

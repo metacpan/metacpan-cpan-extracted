@@ -8,21 +8,25 @@ use strict;
 use warnings;
 
 use Moose;
-use Moose::Util::TypeConstraints qw(enum);
+use Moose::Util::TypeConstraints qw(enum role_type);
 use namespace::autoclean;
 use Dist::Zilla::File::OnDisk;
+use Dist::Zilla::File::InMemory;
 use Path::Tiny;
 
-our $VERSION = 0.01;
+our $VERSION = '0.02';
 
 # same as Dist::Zilla::Plugin::ReadmeAnyFromPod
 with qw(
   Dist::Zilla::Role::AfterBuild
   Dist::Zilla::Role::AfterRelease
   Dist::Zilla::Role::FileMunger
+  Dist::Zilla::Role::FileInjector
 );
 
-sub mvp_multivalue_args { ('badges') }
+has _file_obj => (
+  is => 'rw', isa => role_type('Dist::Zilla::Role::File'),
+);
 
 has phase => (
     is      => 'ro',
@@ -35,13 +39,17 @@ has before => (
     isa => 'Str',
 );
 
-has readme_file => (
+has add_contribution_file => (
+    is  => 'ro',
+    isa => 'Str',
+);
+
+has contribution_file => (
     is      => 'ro',
     lazy    => 1,
     default => sub {
         my $self = shift;
-        my @candidates = qw/ README.md README.mkdn README.markdown /;
-
+        my @candidates = qw/ CONTRIBUTING.md CONTRIBUTING /;
 
         # only for the filemunge phase do we look
         # in the slurped files
@@ -61,7 +69,45 @@ has readme_file => (
             ) for grep { -f $_ } map { $root->child($_) } @candidates 
         }
 
-        $self->log_fatal('README file not found');
+        if ( $self->add_contribution_file ) {
+            my $file = Dist::Zilla::File::InMemory->new(
+                content => '',
+                name    => 'CONTRIBUTING.md',
+            );
+
+            $self->add_file( $self->_file_obj( $file ) );
+
+            return $file;
+        }
+    },
+);
+
+has readme_file => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        my @candidates = qw/ README.md README.mkdn README.markdown /;
+
+        # only for the filemunge phase do we look
+        # in the slurped files
+        if( $self->phase eq 'filemunge' ) {
+            for my $file ( @{ $self->zilla->files } ) {
+                return $file if grep { $file->name eq $_ } @candidates;
+            }
+        }
+        else {
+            # for the other phases we look on disk
+            my $root = path($self->zilla->root);
+
+            return Dist::Zilla::File::OnDisk->new( 
+                name    => "$_",
+                content => $_->slurp_raw,
+                encoding => 'bytes',
+            ) for grep { -f $_ } map { $root->child($_) } @candidates 
+        }
+
+        $self->log_fatal('README file not found') if !$self->{contributing_file_only};
     },
 );
 
@@ -96,7 +142,7 @@ sub add_info {
     }
 
     my $info = qq~
-## Development
+# Development
 
 The distribution is contained in a Git repository, so simply clone the
 repository
@@ -141,6 +187,14 @@ add the `--author` and `--release` options:
 ```
 ~;
 
+    if ( $self->add_contribution_file ) {
+        my $contribution_file = $self->contribution_file;
+        $contribution_file->content( $info );
+
+        path( $contribution_file->name )->spew_raw( $contribution_file->encoded_content )
+            if $self->phase ne 'filemunge';
+    }
+
     my $readme  = $self->readme_file;
     my $content = $readme->encoded_content;
 
@@ -174,7 +228,7 @@ Dist::Zilla::Plugin::ReadmeAddDevInfo - Dist::Zilla::Plugin::ReadmeAddDevInfo - 
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -195,6 +249,23 @@ be modified, whereas for the C<filemunge> it's the internal zilla version of
 the README that will be modified.
 
 The default is C<build>.
+
+=head2 before
+
+    [ReadmeAddDevInfo]
+    before = # AUTHOR
+
+Where to put the info in. In this example the info is added before the
+"AUTHOR" section.
+
+=head2 add_contribution_file
+
+    [ReadmeAddDevInfo]
+    add_contribution_file = 1
+
+Also add the info as I<CONTRIBUTING.md>. The information from this file
+is shown in L<MetaCPAN|https://metacpan.org> under the "How to contribute" link.
+E.g. for this dist: L<How to contribute|https://metacpan.org/contributing-to/Dist-Zilla-Plugin-ReadmeAddDevInfo>.
 
 =head1 SEE ALSO
 

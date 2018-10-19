@@ -139,19 +139,10 @@ sub _add_modules ($self) {
 
     # add full unicore database
     for my $lib ( reverse @INC ) {
-        if ( -d "$lib/unicore/" ) {
-            P->file->find(
-                "$lib/unicore/",
-                abs => 1,
-                dir => 0,
-                sub ($path) {
-                    return if $path !~ /[.]p[lm]\z/sm;
+        for my $path ( ( P->path1("$lib/unicore")->read_dir( max_depth => 0, abs => 1, is_dir => 0 ) // [] )->@* ) {
+            next if $path !~ /[.]p[lm]\z/sm;
 
-                    $self->_add_module($path);
-
-                    return;
-                }
-            );
+            $self->_add_module($path);
         }
     }
 
@@ -536,17 +527,17 @@ sub _error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 185                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 176                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 317                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 308                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 396                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_repack_parl' declared but not used |
+## |    3 | 387                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_repack_parl' declared but not used |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 407                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 398                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 491, 494             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 482, 485             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 424, 430             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 415, 421             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

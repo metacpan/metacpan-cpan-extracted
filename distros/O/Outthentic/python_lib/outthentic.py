@@ -37,6 +37,13 @@ def run_story( path, params = [] ):
 def ignore_story_err(val):
   print "ignore_story_err: " + str(val)
 
+def quit(msg):
+  print "quit: " + str(msg)
+  sys.exit
+
+def outthentic_die(msg):
+  print "outthentic_die: " + str(msg)
+  sys.exit
 
 def story_variables():
 

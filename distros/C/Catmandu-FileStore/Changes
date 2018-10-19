@@ -1,5 +1,8 @@
 Revision history for Catmandu-FileStore
 
+1.13  2018-10-18 14:09:14 CEST
+    - Fixing EAGAIN bug
+    
 1.12  2018-08-29 14:22:03 CEST
     - Replacing writes with syswrites and better checks on number of bytes written
 

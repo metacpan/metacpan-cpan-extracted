@@ -57,7 +57,7 @@
   date_format_full => "EEEE d MMMM y",
   date_format_long => "d MMMM y",
   date_format_medium => "d MMM y",
-  date_format_short => "dd-MM-yy",
+  date_format_short => "dd-MM-y",
   datetime_format_full => "{1} 'om' {0}",
   datetime_format_long => "{1} 'om' {0}",
   datetime_format_medium => "{1} {0}",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

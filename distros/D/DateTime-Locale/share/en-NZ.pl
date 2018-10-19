@@ -1,15 +1,15 @@
 {
   am_pm_abbreviated => [
-    "AM",
-    "PM",
+    "am",
+    "pm",
   ],
   available_formats => {
     Bh => "h B",
     Bhm => "h:mm B",
     Bhms => "h:mm:ss B",
     E => "ccc",
-    EBhm => "E h:mm B",
-    EBhms => "E h:mm:ss B",
+    EBhm => "E, h:mm B",
+    EBhms => "E, h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -51,8 +51,8 @@
     yMd => "d/MM/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y",
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "en-NZ",
   date_format_full => "EEEE, d MMMM y",
@@ -269,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 33,
+  version => 34,
 }

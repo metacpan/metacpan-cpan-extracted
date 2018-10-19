@@ -4,7 +4,7 @@ Catalyst::Plugin::Statsd - log Catalyst stats to statsd
 
 # VERSION
 
-version v0.1.1
+version v0.2.0
 
 # SYNOPSIS
 
@@ -29,6 +29,39 @@ __PACKAGE__->config(
 # DESCRIPTION
 
 This plugin will log [Catalyst](https://metacpan.org/pod/Catalyst) timing statistics to statsd.
+
+# METHODS
+
+## `statsd_metric_name_filter`
+
+```
+$c->statsd_metric_name_filter( $stat_or_name );
+```
+
+This method returns the name to be used for logging stats, or `undef`
+if the metric should be ignored.
+
+If it is passed a non-arrayref, then it will stringify the argument
+and return that.
+
+If it is passed an array reference, then it assumes the argument comes
+from [Catalyst::Stats](https://metacpan.org/pod/Catalyst::Stats) report and is converted into a suitable metric
+name.
+
+You can override or modify this method to filter out which metrics you
+want logged, or to change the names of the metrics.
+
+# METRICS
+
+## `catalyst.response.time`
+
+This logs the Catalyst reponse time that is normally reported by
+Catalyst.  However, it is probably unnecessary since
+[Plack::Middleware::Statsd](https://metacpan.org/pod/Plack::Middleware::Statsd) also logs response times.
+
+## `catalyst.stats.*.time`
+
+These are metrics generated from [Catalyst::Stats](https://metacpan.org/pod/Catalyst::Stats).
 
 # KNOWN ISSUES
 

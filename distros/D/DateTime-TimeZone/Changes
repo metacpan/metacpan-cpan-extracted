@@ -1,3 +1,13 @@
+2.20    2018-10-18
+
+- Added more documentation on how local time zones work, and a warning to set
+  $ENV{TZ} if you're writing tests for code that tries to use the local time
+  zone.
+
+- This release is based on version 2018f of the Olson database. This release
+  includes contemporary changes for Russia (Volograd), Fiji, and Chile.
+
+
 2.19    2018-05-13
 
 - This release is based on version 2018e of the Olson database. This release

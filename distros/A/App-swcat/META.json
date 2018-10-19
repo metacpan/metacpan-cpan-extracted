@@ -38,6 +38,7 @@
             "DBD::SQLite" : "0",
             "DBI" : "0",
             "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" : "0",
+            "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::int" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
@@ -45,6 +46,7 @@
             "PERLANCAR::File::HomeDir" : "0",
             "PERLANCAR::Module::List" : "0",
             "Perinci::CmdLine::Any" : "0",
+            "Perinci::Object" : "0.26",
             "PerlX::Maybe" : "0",
             "SQL::Schema::Versioned" : "0.234",
             "Sah::Schema::filename" : "0",
@@ -78,7 +80,7 @@
          "web" : "https://github.com/perlancar/perl-App-swcat"
       }
    },
-   "version" : "0.003",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -188,12 +190,12 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.05"
+            "version" : "0.060"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.03"
+            "version" : "0.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",

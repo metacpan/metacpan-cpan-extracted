@@ -276,5 +276,5 @@
   time_format_medium => "H:mm:ss '\N{U+0447}'.",
   time_format_short => "H:mm '\N{U+0447}'.",
   variant => undef,
-  version => 33,
+  version => 34,
 }

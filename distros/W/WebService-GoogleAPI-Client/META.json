@@ -21,8 +21,6 @@
       },
       "develop" : {
          "requires" : {
-            "Data::Printer" : "0",
-            "Test::More" : "0",
             "Test::Perl::Critic" : "0"
          }
       },
@@ -60,7 +58,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.10",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pscott-au/WebService-GoogleAPI-Client/issues"
+      },
+      "homepage" : "https://pscott-au.github.io/WebService-GoogleAPI-Client/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pscott-au/WebService-GoogleAPI-Client.git",
+         "web" : "https://github.com/pscott-au/WebService-GoogleAPI-Client"
+      }
+   },
+   "version" : "0.11",
    "x_generated_by_perl" : "v5.18.2",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }

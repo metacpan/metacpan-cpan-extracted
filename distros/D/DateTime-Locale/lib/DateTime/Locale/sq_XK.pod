@@ -50,44 +50,44 @@ Albanian Kosovo locale.
 
 =head3 Narrow (format)
 
-  H
-  M
-  M
-  E
-  P
-  Sh
-  D
+  h
+  m
+  m
+  e
+  p
+  sh
+  d
 
 
 =head3 Wide (stand-alone)
 
-  E hënë
-  E martë
-  E mërkurë
-  E enjte
-  E premte
-  E shtunë
-  E diel
+  e hënë
+  e martë
+  e mërkurë
+  e enjte
+  e premte
+  e shtunë
+  e diel
 
 =head3 Abbreviated (stand-alone)
 
-  Hën
-  Mar
-  Mër
-  Enj
-  Pre
-  Sht
-  Die
+  hën
+  mar
+  mër
+  enj
+  pre
+  sht
+  die
 
 =head3 Narrow (stand-alone)
 
-  H
-  M
-  M
-  E
-  P
-  Sh
-  D
+  h
+  m
+  m
+  e
+  p
+  sh
+  d
 
 =head2 Months
 
@@ -139,48 +139,48 @@ Albanian Kosovo locale.
 
 =head3 Wide (stand-alone)
 
-  Janar
-  Shkurt
-  Mars
-  Prill
-  Maj
-  Qershor
-  Korrik
-  Gusht
-  Shtator
-  Tetor
-  Nëntor
-  Dhjetor
+  janar
+  shkurt
+  mars
+  prill
+  maj
+  qershor
+  korrik
+  gusht
+  shtator
+  tetor
+  nëntor
+  dhjetor
 
 =head3 Abbreviated (stand-alone)
 
-  Jan
-  Shk
-  Mar
-  Pri
-  Maj
-  Qer
-  Korr
-  Gush
-  Sht
-  Tet
-  Nën
-  Dhj
+  jan
+  shk
+  mar
+  pri
+  maj
+  qer
+  korr
+  gush
+  sht
+  tet
+  nën
+  dhj
 
 =head3 Narrow (stand-alone)
 
-  J
-  Sh
-  M
-  P
-  M
-  Q
-  K
-  G
-  Sh
-  T
-  N
-  Dh
+  j
+  sh
+  m
+  p
+  m
+  q
+  k
+  g
+  sh
+  t
+  n
+  dh
 
 =head2 Quarters
 
@@ -347,9 +347,9 @@ Albanian Kosovo locale.
 
 =head3 E (ccc)
 
-   2008-02-05T18:30:30 = Mar
-   1995-12-22T09:05:02 = Pre
-  -0010-09-15T04:44:23 = Sht
+   2008-02-05T18:30:30 = mar
+   1995-12-22T09:05:02 = pre
+  -0010-09-15T04:44:23 = sht
 
 =head3 EBhm (E h:mm B)
 
@@ -383,15 +383,15 @@ Albanian Kosovo locale.
 
 =head3 Ehm (E, h:mm a)
 
-   2008-02-05T18:30:30 = Mar, 6:30 e pasdites
-   1995-12-22T09:05:02 = Pre, 9:05 e paradites
-  -0010-09-15T04:44:23 = Sht, 4:44 e paradites
+   2008-02-05T18:30:30 = Mar, 6:30 m.d.
+   1995-12-22T09:05:02 = Pre, 9:05 p.d.
+  -0010-09-15T04:44:23 = Sht, 4:44 p.d.
 
 =head3 Ehms (E, h:mm:ss a)
 
-   2008-02-05T18:30:30 = Mar, 6:30:30 e pasdites
-   1995-12-22T09:05:02 = Pre, 9:05:02 e paradites
-  -0010-09-15T04:44:23 = Sht, 4:44:23 e paradites
+   2008-02-05T18:30:30 = Mar, 6:30:30 m.d.
+   1995-12-22T09:05:02 = Pre, 9:05:02 p.d.
+  -0010-09-15T04:44:23 = Sht, 4:44:23 p.d.
 
 =head3 Gy (y G)
 
@@ -461,9 +461,9 @@ Albanian Kosovo locale.
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = Shk
-   1995-12-22T09:05:02 = Dhj
-  -0010-09-15T04:44:23 = Sht
+   2008-02-05T18:30:30 = shk
+   1995-12-22T09:05:02 = dhj
+  -0010-09-15T04:44:23 = sht
 
 =head3 MMMEd (E, d MMM)
 
@@ -521,33 +521,33 @@ Albanian Kosovo locale.
 
 =head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 e pasdites
-   1995-12-22T09:05:02 = 9 e paradites
-  -0010-09-15T04:44:23 = 4 e paradites
+   2008-02-05T18:30:30 = 6 m.d.
+   1995-12-22T09:05:02 = 9 p.d.
+  -0010-09-15T04:44:23 = 4 p.d.
 
 =head3 hm (h:mm a)
 
-   2008-02-05T18:30:30 = 6:30 e pasdites
-   1995-12-22T09:05:02 = 9:05 e paradites
-  -0010-09-15T04:44:23 = 4:44 e paradites
+   2008-02-05T18:30:30 = 6:30 m.d.
+   1995-12-22T09:05:02 = 9:05 p.d.
+  -0010-09-15T04:44:23 = 4:44 p.d.
 
 =head3 hms (h:mm:ss a)
 
-   2008-02-05T18:30:30 = 6:30:30 e pasdites
-   1995-12-22T09:05:02 = 9:05:02 e paradites
-  -0010-09-15T04:44:23 = 4:44:23 e paradites
+   2008-02-05T18:30:30 = 6:30:30 m.d.
+   1995-12-22T09:05:02 = 9:05:02 p.d.
+  -0010-09-15T04:44:23 = 4:44:23 p.d.
 
 =head3 hmsv (h:mm:ss a, v)
 
-   2008-02-05T18:30:30 = 6:30:30 e pasdites, UTC
-   1995-12-22T09:05:02 = 9:05:02 e paradites, UTC
-  -0010-09-15T04:44:23 = 4:44:23 e paradites, UTC
+   2008-02-05T18:30:30 = 6:30:30 m.d., UTC
+   1995-12-22T09:05:02 = 9:05:02 p.d., UTC
+  -0010-09-15T04:44:23 = 4:44:23 p.d., UTC
 
 =head3 hmv (h:mm a, v)
 
-   2008-02-05T18:30:30 = 6:30 e pasdites, UTC
-   1995-12-22T09:05:02 = 9:05 e paradites, UTC
-  -0010-09-15T04:44:23 = 4:44 e paradites, UTC
+   2008-02-05T18:30:30 = 6:30 m.d., UTC
+   1995-12-22T09:05:02 = 9:05 p.d., UTC
+  -0010-09-15T04:44:23 = 4:44 p.d., UTC
 
 =head3 ms (mm:ss)
 
@@ -636,7 +636,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (E hënë)
+1 (e hënë)
 
 =head1 SUPPORT
 

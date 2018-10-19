@@ -21,9 +21,9 @@ use My::Module::Test::App;
 
 use Astro::App::Satpass2::Format::Dump;
 
-class 'Astro::App::Satpass2::Format::Dump';
+klass 'Astro::App::Satpass2::Format::Dump';
 
-method 'new', INSTANTIATE, 'Instantiate';
+call_m 'new', INSTANTIATE, 'Instantiate';
 
 done_testing;
 

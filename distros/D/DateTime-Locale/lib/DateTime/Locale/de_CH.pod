@@ -116,7 +116,7 @@ German Switzerland locale.
   Juni
   Juli
   Aug.
-  Sep.
+  Sept.
   Okt.
   Nov.
   Dez.
@@ -383,15 +383,15 @@ German Switzerland locale.
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = Di. 6:30 nachm.
-   1995-12-22T09:05:02 = Fr. 9:05 vorm.
-  -0010-09-15T04:44:23 = Sa. 4:44 vorm.
+   2008-02-05T18:30:30 = Di. 6:30 PM
+   1995-12-22T09:05:02 = Fr. 9:05 AM
+  -0010-09-15T04:44:23 = Sa. 4:44 AM
 
 =head3 Ehms (E, h:mm:ss a)
 
-   2008-02-05T18:30:30 = Di., 6:30:30 nachm.
-   1995-12-22T09:05:02 = Fr., 9:05:02 vorm.
-  -0010-09-15T04:44:23 = Sa., 4:44:23 vorm.
+   2008-02-05T18:30:30 = Di., 6:30:30 PM
+   1995-12-22T09:05:02 = Fr., 9:05:02 AM
+  -0010-09-15T04:44:23 = Sa., 4:44:23 AM
 
 =head3 Gy (y G)
 
@@ -403,19 +403,19 @@ German Switzerland locale.
 
    2008-02-05T18:30:30 = Feb. 2008 n. Chr.
    1995-12-22T09:05:02 = Dez. 1995 n. Chr.
-  -0010-09-15T04:44:23 = Sep. -10 v. Chr.
+  -0010-09-15T04:44:23 = Sept. -10 v. Chr.
 
 =head3 GyMMMEd (E, d. MMM y G)
 
    2008-02-05T18:30:30 = Di., 5. Feb. 2008 n. Chr.
    1995-12-22T09:05:02 = Fr., 22. Dez. 1995 n. Chr.
-  -0010-09-15T04:44:23 = Sa., 15. Sep. -10 v. Chr.
+  -0010-09-15T04:44:23 = Sa., 15. Sept. -10 v. Chr.
 
 =head3 GyMMMd (d. MMM y G)
 
    2008-02-05T18:30:30 = 5. Feb. 2008 n. Chr.
    1995-12-22T09:05:02 = 22. Dez. 1995 n. Chr.
-  -0010-09-15T04:44:23 = 15. Sep. -10 v. Chr.
+  -0010-09-15T04:44:23 = 15. Sept. -10 v. Chr.
 
 =head3 H (HH 'Uhr')
 
@@ -469,7 +469,7 @@ German Switzerland locale.
 
    2008-02-05T18:30:30 = Di., 5. Feb.
    1995-12-22T09:05:02 = Fr., 22. Dez.
-  -0010-09-15T04:44:23 = Sa., 15. Sep.
+  -0010-09-15T04:44:23 = Sa., 15. Sept.
 
 =head3 MMMMEd (E, d. MMMM)
 
@@ -481,13 +481,13 @@ German Switzerland locale.
 
    2008-02-05T18:30:30 = Woche 1 im Feb.
    1995-12-22T09:05:02 = Woche 3 im Dez.
-  -0010-09-15T04:44:23 = Woche 2 im Sep.
+  -0010-09-15T04:44:23 = Woche 2 im Sept.
 
 =head3 MMMMW-count-other ('Woche' W 'im' MMM)
 
    2008-02-05T18:30:30 = Woche 1 im Feb.
    1995-12-22T09:05:02 = Woche 3 im Dez.
-  -0010-09-15T04:44:23 = Woche 2 im Sep.
+  -0010-09-15T04:44:23 = Woche 2 im Sept.
 
 =head3 MMMMd (d. MMMM)
 
@@ -499,7 +499,7 @@ German Switzerland locale.
 
    2008-02-05T18:30:30 = 5. Feb.
    1995-12-22T09:05:02 = 22. Dez.
-  -0010-09-15T04:44:23 = 15. Sep.
+  -0010-09-15T04:44:23 = 15. Sept.
 
 =head3 MMd (d.MM.)
 
@@ -527,33 +527,33 @@ German Switzerland locale.
 
 =head3 h (h 'Uhr' a)
 
-   2008-02-05T18:30:30 = 6 Uhr nachm.
-   1995-12-22T09:05:02 = 9 Uhr vorm.
-  -0010-09-15T04:44:23 = 4 Uhr vorm.
+   2008-02-05T18:30:30 = 6 Uhr PM
+   1995-12-22T09:05:02 = 9 Uhr AM
+  -0010-09-15T04:44:23 = 4 Uhr AM
 
 =head3 hm (h:mm a)
 
-   2008-02-05T18:30:30 = 6:30 nachm.
-   1995-12-22T09:05:02 = 9:05 vorm.
-  -0010-09-15T04:44:23 = 4:44 vorm.
+   2008-02-05T18:30:30 = 6:30 PM
+   1995-12-22T09:05:02 = 9:05 AM
+  -0010-09-15T04:44:23 = 4:44 AM
 
 =head3 hms (h:mm:ss a)
 
-   2008-02-05T18:30:30 = 6:30:30 nachm.
-   1995-12-22T09:05:02 = 9:05:02 vorm.
-  -0010-09-15T04:44:23 = 4:44:23 vorm.
+   2008-02-05T18:30:30 = 6:30:30 PM
+   1995-12-22T09:05:02 = 9:05:02 AM
+  -0010-09-15T04:44:23 = 4:44:23 AM
 
 =head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 nachm. UTC
-   1995-12-22T09:05:02 = 9:05:02 vorm. UTC
-  -0010-09-15T04:44:23 = 4:44:23 vorm. UTC
+   2008-02-05T18:30:30 = 6:30:30 PM UTC
+   1995-12-22T09:05:02 = 9:05:02 AM UTC
+  -0010-09-15T04:44:23 = 4:44:23 AM UTC
 
 =head3 hmv (h:mm a v)
 
-   2008-02-05T18:30:30 = 6:30 nachm. UTC
-   1995-12-22T09:05:02 = 9:05 vorm. UTC
-  -0010-09-15T04:44:23 = 4:44 vorm. UTC
+   2008-02-05T18:30:30 = 6:30 PM UTC
+   1995-12-22T09:05:02 = 9:05 AM UTC
+  -0010-09-15T04:44:23 = 4:44 AM UTC
 
 =head3 ms (mm:ss)
 
@@ -589,13 +589,13 @@ German Switzerland locale.
 
    2008-02-05T18:30:30 = Feb. 2008
    1995-12-22T09:05:02 = Dez. 1995
-  -0010-09-15T04:44:23 = Sep. -10
+  -0010-09-15T04:44:23 = Sept. -10
 
 =head3 yMMMEd (E, d. MMM y)
 
    2008-02-05T18:30:30 = Di., 5. Feb. 2008
    1995-12-22T09:05:02 = Fr., 22. Dez. 1995
-  -0010-09-15T04:44:23 = Sa., 15. Sep. -10
+  -0010-09-15T04:44:23 = Sa., 15. Sept. -10
 
 =head3 yMMMM (MMMM y)
 
@@ -607,7 +607,7 @@ German Switzerland locale.
 
    2008-02-05T18:30:30 = 5. Feb. 2008
    1995-12-22T09:05:02 = 22. Dez. 1995
-  -0010-09-15T04:44:23 = 15. Sep. -10
+  -0010-09-15T04:44:23 = 15. Sept. -10
 
 =head3 yMMdd (dd.MM.y)
 

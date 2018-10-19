@@ -75,11 +75,10 @@ sub _build_opt ($self) {
     my $opt = {};
 
     my $index = {
-        help      => undef,
-        h         => undef,
-        q[?]      => undef,
-        version   => undef,
-        scan_deps => undef,
+        help    => undef,
+        h       => undef,
+        q[?]    => undef,
+        version => undef,
     };
 
     if ( my $cli_opt = $self->spec->{opt} ) {
@@ -199,7 +198,6 @@ sub _parse_cmd ( $self, $argv ) {
         $res->{opt},
         'help|h|?',
         'version',
-        ( $ENV->can_scan_deps ? 'scan-deps' : () ),
         '<>' => sub ($arg) {
             if ( !$res->{cmd} && substr( $arg, 0, 1 ) ne q[-] ) {
                 $res->{cmd} = $arg;
@@ -213,9 +211,6 @@ sub _parse_cmd ( $self, $argv ) {
     );
 
     push $res->{rest}->@*, $argv->@* if defined $argv && $argv->@*;
-
-    # process --scan-deps option
-    $ENV->scan_deps if $ENV->can_scan_deps && $res->{opt}->{'scan-deps'};
 
     if ( $res->{opt}->{version} ) {
         return $self->help_version;
@@ -302,7 +297,6 @@ sub _parse_opt ( $self, $argv ) {
             $cli_spec->@*,
             'version',
             'help|h|?',
-            ( $ENV->can_scan_deps ? 'scan-deps' : () ),
             '<>' => sub ($arg) {
                 push $parsed_args->@*, $arg;
 
@@ -312,9 +306,6 @@ sub _parse_opt ( $self, $argv ) {
 
         push $res->{rest}->@*, $argv->@* if defined $argv && $argv->@*;
     }
-
-    # process --scan-deps option
-    $ENV->scan_deps if $ENV->can_scan_deps && $res->{opt}->{'scan-deps'};
 
     if ( $res->{opt}->{version} ) {
         return $self->help_version;
@@ -491,11 +482,7 @@ sub _help_usage ($self) {
 }
 
 sub _help_footer ($self) {
-    my @opt = qw[--help -h -? --version];
-
-    push @opt, '--scan-deps' if $ENV->can_scan_deps;
-
-    return '(global options: ' . join( q[, ], @opt ) . q[)];
+    return '(global options: --help, -h, -?, --version)';
 }
 
 sub help ($self) {
@@ -578,11 +565,11 @@ sub help_error ( $self, $msg ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 45                   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 343                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 334                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 508, 536             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "abstract"                              |
+## |    3 | 495, 523             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "abstract"                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 112                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 111                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

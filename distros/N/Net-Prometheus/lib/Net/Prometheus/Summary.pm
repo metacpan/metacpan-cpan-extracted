@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Net::Prometheus::Metric );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 use List::Util 1.33 qw( any );

@@ -7,13 +7,13 @@ use warnings;
 use strict;
 use Getopt::Long;
 use Pod::Usage;
-use Data::Random::NL qw(generate_kvk generate_rsin);
+use Data::Random::NL qw(:company);
 
-my %opts = (help => 0, n => 10);
+my %opts = (help => 0, n => 10, rsin => 0);
 
 {
     local $SIG{__WARN__};
-    my $ok = eval { GetOptions(\%opts, qw(help n=i start-kvk=i start-rsin=i)); };
+    my $ok = eval { GetOptions(\%opts, qw(help n=i start-kvk=i start-rsin=i start-vestigingsnummer=i rsin!)); };
     if (!$ok) {
         die($@);
     }
@@ -21,10 +21,16 @@ my %opts = (help => 0, n => 10);
 
 pod2usage(0) if ($opts{help});
 
+my $pattern = "%-10s %s$/";
+
+printf($pattern, "KvK", $opts{rsin} ? "RSIN" : "Vestigingsnummer");
 for (1 ... $opts{n}) {
-    printf("%s - %s $/",
-        generate_kvk($opts{'start-kvk'}),
-        generate_rsin($opts{'start-rsin'})),
+    printf($pattern,
+            generate_kvk($opts{'start-kvk'}),
+            $opts{rsin}
+                ? generate_rsin($opts{'start-rsin'})
+                : generate_vestigingsnummer($opts{'start-vestigingsnummer'})
+    );
 }
 
 __END__
@@ -39,7 +45,7 @@ generate_kvk - Generate KvK and RSIN numbers from the command line
 
 =head1 VERSION
 
-version 1.4
+version 1.6
 
 =head1 SYNOPSIS
 
@@ -66,6 +72,18 @@ The first number of your KVK number(s).
 =head2 start-rsin
 
 The first number of your RSIN number(s).
+
+=head2 start-vestigingsnummer
+
+The first number of your vestigings number(s).
+
+=head2 start-vestigingsnummer
+
+The first number of your vestigings number(s).
+
+=head2 rsin
+
+Print out RSIN numbers instead of vestigings numbers
 
 =head1 AUTHOR
 

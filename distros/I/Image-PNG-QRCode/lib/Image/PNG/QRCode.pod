@@ -13,13 +13,13 @@ Image::PNG::QRCode - make a PNG image containing a QR code from text
     
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.09/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.10/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Image::PNG::QRCode version 0.09
-corresponding to git commit L<9a919172a83344ec6a3a3fb2f4bb770a7d3c8ad2|https://github.com/benkasminbullock/image-png-qrcode/commit/9a919172a83344ec6a3a3fb2f4bb770a7d3c8ad2> released on Sat Jul 1 10:30:36 2017 +0900.
+This documents Image::PNG::QRCode version 0.10
+corresponding to git commit L<f2b7e71f95a93a455dcffd4677a7487f3c086f22|https://github.com/benkasminbullock/image-png-qrcode/commit/f2b7e71f95a93a455dcffd4677a7487f3c086f22> released on Thu Oct 18 13:16:51 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -212,7 +212,7 @@ This example makes a data URL QR code:
     print "<img src='$u'>\n";
 
 
-(This example is included as L<F<qrpng-data.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.09/examples/qrpng-data.pl> in the distribution.)
+(This example is included as L<F<qrpng-data.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.10/examples/qrpng-data.pl> in the distribution.)
 
 
 =head2 qrpng CGI script
@@ -276,7 +276,7 @@ user's input.
     }
 
 
-(This example is included as L<F<qrpng.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.09/examples/qrpng.pl> in the distribution.)
+(This example is included as L<F<qrpng.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.10/examples/qrpng.pl> in the distribution.)
 
 
 =head1 SEE ALSO
@@ -404,14 +404,14 @@ pass through it OK. It doesn't use a BOM for the UTF-8.
 
 The QR codes have only been checked by using two Android smartphones.
 
-=head1 COPYRIGHT AND LICENCE
+=head1 COPYRIGHT AND LICENSE
 
 The QR code creation part (the contents of F<qrencode.c> in the
 distribution) is copyright 2010, Tom Zerucha,
 L<https://github.com/tz1>. The rest of the module is copyright by Ben
 Bullock 2015-2017.
 
-This Perl module is licensed under the Gnu General Public Licence
+This Perl module is licensed under the GNU General Public License
 version 3.
 
 =cut

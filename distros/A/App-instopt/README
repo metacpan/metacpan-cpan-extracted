@@ -2,8 +2,8 @@ NAME
     App::instopt - Download and install software
 
 VERSION
-    This document describes version 0.004 of App::instopt (from Perl
-    distribution App-instopt), released on 2018-10-05.
+    This document describes version 0.005 of App::instopt (from Perl
+    distribution App-instopt), released on 2018-10-18.
 
 SYNOPSIS
     See instopt script.
@@ -12,7 +12,7 @@ FUNCTIONS
   cleanup_download_dir
     Usage:
 
-     cleanup_download_dir(%args) -> [status, msg, result, meta]
+     cleanup_download_dir(%args) -> [status, msg, payload, meta]
 
     Remove older versions of downloaded software.
 
@@ -39,7 +39,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -48,7 +48,7 @@ FUNCTIONS
   cleanup_install_dir
     Usage:
 
-     cleanup_install_dir(%args) -> [status, msg, result, meta]
+     cleanup_install_dir(%args) -> [status, msg, payload, meta]
 
     Remove inactive versions of installed software.
 
@@ -75,7 +75,36 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  compare_versions
+    Usage:
+
+     compare_versions(%args) -> [status, msg, payload, meta]
+
+    Compare installed vs downloaded vs latest versions of installed
+    software.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   download_dir => *dirname*
+
+    *   install_dir => *dirname*
+
+    *   program_dir => *dirname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -84,9 +113,9 @@ FUNCTIONS
   download
     Usage:
 
-     download(%args) -> [status, msg, result, meta]
+     download(%args) -> [status, msg, payload, meta]
 
-    Download latest version of all software.
+    Download latest version of one or more software.
 
     This function is not exported.
 
@@ -100,14 +129,14 @@ FUNCTIONS
 
     *   program_dir => *dirname*
 
-    *   software* => *str*
+    *   softwares_or_patterns* => *array[str]*
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -116,7 +145,7 @@ FUNCTIONS
   download_all
     Usage:
 
-     download_all(%args) -> [status, msg, result, meta]
+     download_all(%args) -> [status, msg, payload, meta]
 
     Download latest version of all known software.
 
@@ -137,7 +166,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -146,7 +175,7 @@ FUNCTIONS
   list_downloaded
     Usage:
 
-     list_downloaded(%args) -> [status, msg, result, meta]
+     list_downloaded(%args) -> [status, msg, payload, meta]
 
     List all downloaded software.
 
@@ -167,7 +196,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -176,7 +205,7 @@ FUNCTIONS
   list_downloaded_versions
     Usage:
 
-     list_downloaded_versions(%args) -> [status, msg, result, meta]
+     list_downloaded_versions(%args) -> [status, msg, payload, meta]
 
     List all downloaded versions of a software.
 
@@ -197,7 +226,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -206,7 +235,7 @@ FUNCTIONS
   list_installed
     Usage:
 
-     list_installed(%args) -> [status, msg, result, meta]
+     list_installed(%args) -> [status, msg, payload, meta]
 
     List all installed software.
 
@@ -227,7 +256,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -236,7 +265,7 @@ FUNCTIONS
   list_installed_versions
     Usage:
 
-     list_installed_versions(%args) -> [status, msg, result, meta]
+     list_installed_versions(%args) -> [status, msg, payload, meta]
 
     List all installed versions of a software.
 
@@ -257,7 +286,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -266,7 +295,7 @@ FUNCTIONS
   update
     Usage:
 
-     update(%args) -> [status, msg, result, meta]
+     update(%args) -> [status, msg, payload, meta]
 
     Update a software to the latest version.
 
@@ -285,14 +314,14 @@ FUNCTIONS
 
     *   program_dir => *dirname*
 
-    *   software* => *str*
+    *   softwares_or_patterns* => *array[str]*
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -301,7 +330,7 @@ FUNCTIONS
   update_all
     Usage:
 
-     update_all(%args) -> [status, msg, result, meta]
+     update_all(%args) -> [status, msg, payload, meta]
 
     Update all installed software.
 
@@ -320,7 +349,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

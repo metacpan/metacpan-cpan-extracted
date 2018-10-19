@@ -9,7 +9,6 @@ use Symbol;
 # TODO not working under windows if parent process killed in task manager
 # TODO "on_status" currently is not called from BUILD method, because $node is not defined
 sub run ( $type, $args ) {
-    $ENV->scan_deps if $args->{scandeps};
 
     # ignore SIGINT
     $SIG->{INT} = AE::signal INT => sub { };
@@ -104,7 +103,7 @@ sub run ( $type, $args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 52                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 51                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

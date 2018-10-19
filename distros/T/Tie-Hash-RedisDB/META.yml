@@ -1,10 +1,10 @@
 ---
 abstract: 'A very thin Tie around a RedisDB Hash'
 author:
-  - Inspire.com
+  - 'ClinicaHealth, Inc. dba Inspire'
 build_requires:
   Test::Most: '0.34'
-  Test::RedisDB: '0'
+  Test::RedisDB: '2.49'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
@@ -31,9 +31,10 @@ resources:
   bugtracker: https://github.com/Inspire-com/perl-Tie-Hash-RedisDB/issues
   homepage: https://github.com/Inspire-com/perl-Tie-Hash-RedisDB
   repository: https://github.com/Inspire-com/perl-Tie-Hash-RedisDB.git
-version: '1.00'
+version: '1.03'
 x_contributors:
   - 'Matt Miller <matt@inspire.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

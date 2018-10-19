@@ -7,12 +7,14 @@ use warnings;
 
 use parent qw{ Astro::App::Satpass2::Copier };
 
-use Astro::App::Satpass2::Utils qw{ instance load_package };
+use Astro::App::Satpass2::Utils qw{
+    instance
+    load_package
+    @CARP_NOT
+};
 use Astro::App::Satpass2::Warner;
 
-our @CARP_NOT = qw{ Astro::App::Satpass2 };
-
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 sub new {
     my ( $class, %args ) = @_;

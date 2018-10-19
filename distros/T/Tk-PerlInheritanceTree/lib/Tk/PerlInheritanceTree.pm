@@ -96,7 +96,7 @@ at your option, any later version of Perl 5 you may have available.
 
 =cut
 package Tk::PerlInheritanceTree;
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 use warnings;
 use strict;
 require Class::Inspector;

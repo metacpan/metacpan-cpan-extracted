@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/pine/p5-Mac-OSVersion-Lite.svg?branch=master)](https://travis-ci.org/pine/p5-Mac-OSVersion-Lite) [![Build Status](https://img.shields.io/appveyor/ci/pine/p5-Mac-OSVersion-Lite/master.svg)](https://ci.appveyor.com/project/pine/p5-Mac-OSVersion-Lite/branch/master) [![Coverage Status](http://codecov.io/github/pine/p5-Mac-OSVersion-Lite/coverage.svg?branch=master)](https://codecov.io/github/pine/p5-Mac-OSVersion-Lite?branch=master)
+[![Build Status](https://travis-ci.org/pine/p5-Mac-OSVersion-Lite.svg?branch=master)](https://travis-ci.org/pine/p5-Mac-OSVersion-Lite) [![Build Status](https://img.shields.io/appveyor/ci/pine/p5-Mac-OSVersion-Lite/master.svg?logo=appveyor)](https://ci.appveyor.com/project/pine/p5-Mac-OSVersion-Lite/branch/master) [![Coverage Status](http://codecov.io/github/pine/p5-Mac-OSVersion-Lite/coverage.svg?branch=master)](https://codecov.io/github/pine/p5-Mac-OSVersion-Lite?branch=master)
 # NAME
 
 Mac::OSVersion::Lite - It's the lightweight version object for Mac OS X

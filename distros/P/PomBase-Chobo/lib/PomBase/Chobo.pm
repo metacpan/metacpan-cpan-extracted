@@ -29,7 +29,7 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use 5.020;
 

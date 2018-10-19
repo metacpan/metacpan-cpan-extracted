@@ -9,6 +9,7 @@ SYNOPSIS
          letter  =>      'c',
          case    =>  'upper',
          fillup  =>      '+',
+         forward =>        1,
      );
 
      __OUTPUT__
@@ -30,7 +31,6 @@ SYNOPSIS
 
 FUNCTIONS
   rhombus
-
     Draws a rhombus with letters and returns it as a string.
 
     If no option value is supplied or if it is invalid, then a default will
@@ -42,23 +42,30 @@ FUNCTIONS
 
     Options:
 
-    * `lines'
+    *   "lines"
+
         Number of lines to be printed. Defaults to 25.
 
-    * `letter'
-        Letter to start with. Defaults to `a'.
+    *   "letter"
 
-    * `case'
+        Letter to start with. Defaults to "a".
+
+    *   "case"
+
         Lower/upper case of the letters within the rhombus. Defaults to
-        `upper'.
+        "upper".
 
-    * `fillup'
-        The fillup character. Defaults to `+'.
+    *   "fillup"
+
+        The fillup character. Defaults to "+".
+
+    *   "forward"
+
+        Forward letter enumeration. Defaults to boolean 1.
 
 EXPORT
   Functions
-
-    `rhombus()' is exportable.
+    "rhombus()" is exportable.
 
 AUTHOR
     Steven Schubiger <schubiger@cpan.org>
@@ -67,5 +74,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

@@ -266,5 +266,5 @@
   time_format_medium => "\N{U+0f46}\N{U+0f74}\N{U+0f0b}\N{U+0f5a}\N{U+0f7c}\N{U+0f51}\N{U+0f0b}h:mm:ss a",
   time_format_short => "\N{U+0f46}\N{U+0f74}\N{U+0f0b}\N{U+0f5a}\N{U+0f7c}\N{U+0f51}\N{U+0f0b} h \N{U+0f66}\N{U+0f90}\N{U+0f62}\N{U+0f0b}\N{U+0f58}\N{U+0f0b} mm a",
   variant => undef,
-  version => 33,
+  version => 34,
 }

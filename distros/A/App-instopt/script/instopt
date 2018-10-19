@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-10-05'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-10-18'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010;
 use strict;
@@ -26,6 +26,7 @@ my $cli = Perinci::CmdLine::Any->new(
         'cleanup-install-dir'      => {url=>"${prefix}cleanup_install_dir"},
         'cleanup-download-dir'     => {url=>"${prefix}cleanup_download_dir"},
         'update-all'               => {url=>"${prefix}update_all"},
+        'compare-versions'         => {url=>"${prefix}compare_versions"},
     },
 );
 $cli->run;
@@ -45,7 +46,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.004 of instopt (from Perl distribution App-instopt), released on 2018-10-05.
+This document describes version 0.005 of instopt (from Perl distribution App-instopt), released on 2018-10-18.
 
 =head1 SYNOPSIS
 
@@ -68,6 +69,9 @@ Then:
 
  # List installed versions of a software in /opt
  % instopt list-installed-versions firefox
+
+ # Compare installed versions vs downloaded vs latest, for all installed software
+ % instopt compare-versions
 
  # Download a software (e.g. firefox), will be put in $ARCHIVE/f/firefox/<VERSION>/<ARCH>/
  % instopt download firefox
@@ -201,9 +205,13 @@ Remove older versions of downloaded software.
 
 Remove inactive versions of installed software.
 
+=head2 B<compare-versions>
+
+Compare installed vs downloaded vs latest versions of installed software.
+
 =head2 B<download>
 
-Download latest version of all software.
+Download latest version of one or more software.
 
 =head2 B<download-all>
 
@@ -336,7 +344,13 @@ Display program's version and exit.
 
 =item B<--arch>=I<s>
 
-=item B<--software>=I<s>*
+=item B<--software-or-pattern>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--softwares-or-patterns-json>=I<s>
+
+See C<--software-or-pattern>.
 
 =back
 
@@ -386,7 +400,13 @@ Display program's version and exit.
 
 =item B<--no-download>
 
-=item B<--software>=I<s>*
+=item B<--software-or-pattern>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--softwares-or-patterns-json>=I<s>
+
+See C<--software-or-pattern>.
 
 =item B<-D>
 
@@ -465,10 +485,13 @@ List of available configuration parameters:
 =head2 Configuration for subcommand cleanup-install-dir
 
 
+=head2 Configuration for subcommand compare-versions
+
+
 =head2 Configuration for subcommand download
 
  arch (see --arch)
- software (see --software)
+ softwares_or_patterns (see --software-or-pattern)
 
 =head2 Configuration for subcommand download-all
 
@@ -493,7 +516,7 @@ List of available configuration parameters:
 =head2 Configuration for subcommand update
 
  download (see --no-download)
- software (see --software)
+ softwares_or_patterns (see --software-or-pattern)
 
 =head2 Configuration for subcommand update-all
 

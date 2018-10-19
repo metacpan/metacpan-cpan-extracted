@@ -32,7 +32,7 @@ sub init ($self) {
 sub _get_host_map ( $self, $host, $ns ) {
     my $index_class = "${ns}::Index";
 
-    my $index_path = ( $index_class =~ s[::][/]smgr ) . q[/];
+    my $index_path = $index_class =~ s[::][/]smgr;
 
     my $index_module = ( $index_class =~ s[::][/]smgr ) . '.pm';
 
@@ -49,7 +49,7 @@ sub _get_host_map ( $self, $host, $ns ) {
         }
 
         # non-index controller
-        elsif ( index( $module, $index_path ) == 0 ) {
+        elsif ( index( $module, "$index_path/" ) == 0 ) {
             $modules->{$module} = undef;
         }
     }
@@ -62,17 +62,8 @@ sub _get_host_map ( $self, $host, $ns ) {
             $modules->{$index_module} = undef;
         }
 
-        if ( -d "$path/$index_path" ) {
-            P->file->find(
-                "$path/$index_path",
-                abs => 0,
-                dir => 0,
-                sub ($path) {
-                    $modules->{"${index_path}${path}"} = undef if $path->suffix eq 'pm';
-
-                    return;
-                }
-            );
+        for my $file ( ( P->path1("$path/$index_path")->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
+            $modules->{"$index_path/$file"} = undef if $file =~ /[.]pm\z/sm;
         }
     }
 

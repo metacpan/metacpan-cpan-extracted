@@ -9,12 +9,13 @@ our @ISA = qw{ Module::Build };
 use Carp;
 # use lib 'inc';	# Already done because this module is running.
 use My::Module::Recommend;
-use My::Module::Test ();
 
 
 sub ACTION_authortest {
 ##  my ( $self, @args ) = @_;
     my ( $self ) = @_;		# Arguments not used
+
+    require My::Module::Test;
 
     local $ENV{AUTHOR_TESTING} = 1;
     local $ENV{SPACETRACK_IDENTITY} = undef;

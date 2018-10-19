@@ -50,8 +50,8 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ 'de' y",
-    "yw-count-one" => "'selmana' w 'de' y",
-    "yw-count-other" => "'selmana' w 'de' y",
+    "yw-count-one" => "'selmana' w 'de' Y",
+    "yw-count-other" => "'selmana' w 'de' Y",
   },
   code => "ast",
   date_format_full => "EEEE, d MMMM 'de' y",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

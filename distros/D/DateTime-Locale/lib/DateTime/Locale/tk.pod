@@ -156,7 +156,7 @@ Turkmen locale.
 
   Ýan
   Few
-  Mart
+  Mar
   Apr
   Maý
   Iýun
@@ -218,7 +218,7 @@ Turkmen locale.
   1Ç
   2Ç
   3Ç
-  Q4
+  4Ç
 
 =head3 Narrow (stand-alone)
 

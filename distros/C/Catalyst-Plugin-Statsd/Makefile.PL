@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "Catalyst::Runtime" => 0,
     "Moose::Role" => 0,
     "Plack::Middleware::Statsd" => 0,
+    "Ref::Util" => 0,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
@@ -30,13 +31,13 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => 0,
     "Moo" => 0,
     "Moose" => 0,
-    "Net::Statsd::Tiny" => 0,
+    "Net::Statsd::Tiny" => "0.3.0",
     "Test::Log::Dispatch" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,8 +54,9 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
-  "Net::Statsd::Tiny" => 0,
+  "Net::Statsd::Tiny" => "0.3.0",
   "Plack::Middleware::Statsd" => 0,
+  "Ref::Util" => 0,
   "Test::Log::Dispatch" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,

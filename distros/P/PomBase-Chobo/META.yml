@@ -4,6 +4,7 @@ author:
   - 'Kim Rutherford <kim@pombase.org>'
 build_requires:
   Capture::Tiny: '0'
+  Data::Dumper: '0'
   Test::Deep: '0'
   Test::More: '0'
   strict: '0'
@@ -21,7 +22,6 @@ requires:
   Clone: '0'
   DBI: '0'
   Data::Compare: '0'
-  Data::Dumper: '0'
   FileHandle: '0'
   Getopt::Long: '0'
   List::Compare: '0'
@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/pombase/chobo/issues
   homepage: https://github.com/pombase/chobo
   repository: https://github.com/pombase/chobo.git
-version: '0.021'
+version: '0.022'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,16 @@
+TODO:
+
+* flesh out actions in coinbasepro.pl
+
+* Consider using App::Cmd
+
+* Fix for CPANTS:  
+    (SEE https://cpants.cpanauthors.org/release/JOSHR/Finance-CoinbasePro-API-CLI-0.004)
+
+    meta_yml_declares_perl_version
+
+    If you are using Build.PL define the {requires}{perl} = VERSION field. 
+    If you are using MakeMaker (Makefile.PL) you should upgrade ExtUtils::MakeMaker 
+    to 6.48 and use MIN_PERL_VERSION parameter. Perl::MinimumVersion can help you 
+    determine which version of Perl your module needs.
+

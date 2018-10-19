@@ -5,9 +5,13 @@ use warnings;
 
 use parent qw{ Astro::App::Satpass2::Format };
 
-use Astro::App::Satpass2::Utils qw{ load_package CODE_REF };
+use Astro::App::Satpass2::Utils qw{
+    load_package
+    CODE_REF
+    @CARP_NOT
+};
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 my %dumper_hash = (
     'YAML' => 'Dump',

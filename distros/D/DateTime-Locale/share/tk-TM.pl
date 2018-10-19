@@ -182,7 +182,7 @@
   month_stand_alone_abbreviated => [
     "\N{U+00dd}an",
     "Few",
-    "Mart",
+    "Mar",
     "Apr",
     "Ma\N{U+00fd}",
     "I\N{U+00fd}un",
@@ -249,7 +249,7 @@
     "1\N{U+00c7}",
     "2\N{U+00c7}",
     "3\N{U+00c7}",
-    "Q4",
+    "4\N{U+00c7}",
   ],
   quarter_stand_alone_narrow => [
     1,
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

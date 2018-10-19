@@ -1,5 +1,9 @@
 Revision history for Perl module Business::ISMN
 
+1.201 2018-10-18T15:27:35Z
+	* Change publisher() to country() (because that's what it is).
+	The old method names are still there but carp.
+
 1.132 2018-07-14T00:59:12Z
 	* Clarify that it's the Artistic License 2.0
 

@@ -8,3 +8,5 @@ Revision history for Perl extension Tk::PerlInheritanceTree.
 0.03  Added a NumEntry to change gridsize
 
 0.05  Added c/p example for stand alone usage (suggested by Slaven Rezic)
+
+0.06  Skip tests when display is not available

@@ -50,7 +50,7 @@
     yMd => "dd-MM-y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "y \N{U+1001}\N{U+102f} w \N{U+1015}\N{U+1010}\N{U+103a}\N{U+1019}\N{U+103c}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}",
+    "yw-count-other" => "Y \N{U+1001}\N{U+102f} w \N{U+1015}\N{U+1010}\N{U+103a}\N{U+1019}\N{U+103c}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}",
   },
   code => "my",
   date_format_full => "y\N{U+104a} MMMM d\N{U+104a} EEEE",
@@ -117,11 +117,11 @@
   ],
   era_abbreviated => [
     "\N{U+1018}\N{U+102e}\N{U+1005}\N{U+102e}",
-    "\N{U+1021}\N{U+1031}\N{U+1012}\N{U+102e}",
+    "\N{U+1021}\N{U+1012}\N{U+1031}\N{U+102e}",
   ],
   era_narrow => [
     "\N{U+1018}\N{U+102e}\N{U+1005}\N{U+102e}",
-    "\N{U+1021}\N{U+1031}\N{U+1012}\N{U+102e}",
+    "\N{U+1021}\N{U+1012}\N{U+1031}\N{U+102e}",
   ],
   era_wide => [
     "\N{U+1001}\N{U+101b}\N{U+1005}\N{U+103a}\N{U+1010}\N{U+1031}\N{U+102c}\N{U+103a} \N{U+1019}\N{U+1015}\N{U+1031}\N{U+102b}\N{U+103a}\N{U+1019}\N{U+102e}\N{U+1014}\N{U+103e}\N{U+1005}\N{U+103a}",
@@ -267,5 +267,5 @@
   time_format_medium => "B HH:mm:ss",
   time_format_short => "B H:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

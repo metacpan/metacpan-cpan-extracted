@@ -8,11 +8,12 @@ use warnings;
 use parent qw{ Astro::App::Satpass2::FormatTime::DateTime };
 
 use Astro::App::Satpass2::FormatTime::Cldr;
+use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use DateTime;
 use DateTime::TimeZone;
 use POSIX ();
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 # So superclass can ducktype the object that does the real work.
 use constant METHOD_USED => 'format_cldr';

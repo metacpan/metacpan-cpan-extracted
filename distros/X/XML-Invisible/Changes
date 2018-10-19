@@ -1,5 +1,8 @@
 Revision history for XML::Invisible
 
+0.04 Fri 19 Oct 03:45:53 BST 2018
+ - make flatten work right on single rule with +
+
 0.03 Mon 24 Sep 06:03:10 BST 2018
  - attributes hash not array
 

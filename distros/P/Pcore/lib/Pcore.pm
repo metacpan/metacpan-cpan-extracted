@@ -1,4 +1,4 @@
-package Pcore v0.74.2;
+package Pcore v0.75.1;
 
 use v5.28.0;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -274,7 +274,9 @@ sub config_stdout ($h) {
     return;
 }
 
+# TODO remove $B::VERSION = undef, after Type::Tiny will be removed from Core, test with par crypted
 sub _CORE_RUN {
+    $B::VERSION = undef;
 
     # EMBEDDED mode, if run not from INIT block or -embedded pragma specified:
     # CLI not parsed / processed;
@@ -453,9 +455,9 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 191, 220, 223, 227,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
 ## |      | 259, 262, 267, 270,  |                                                                                                                |
-## |      | 295, 426             |                                                                                                                |
+## |      | 297, 428             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 277                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
+## |    3 | 278                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 195                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

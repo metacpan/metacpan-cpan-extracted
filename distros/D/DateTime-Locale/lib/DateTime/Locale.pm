@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 use DateTime::Locale::Data;
 use DateTime::Locale::FromData;
@@ -380,7 +380,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 SYNOPSIS
 

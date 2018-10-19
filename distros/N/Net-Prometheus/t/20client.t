@@ -8,7 +8,8 @@ use Test::More;
 use Net::Prometheus;
 
 my $client = Net::Prometheus->new(
-   disable_process_collector => 1
+   disable_process_collector => 1,
+   disable_perl_collector    => 1,
 );
 
 ok( defined $client, 'defined $client' );
@@ -35,6 +36,25 @@ counter 1
 # HELP gauge A gauge metric
 # TYPE gauge gauge
 gauge 123
+EOF
+}
+
+# HELP escaping
+{
+   my $client = Net::Prometheus->new(
+      disable_process_collector => 1,
+      disable_perl_collector    => 1,
+   );
+
+   $client->new_gauge(
+      name => "gauge",
+      help => "with\nlinefeed",
+   )->set( 0 );
+
+   is( $client->render, <<'EOF', '$client->render escapes HELP text' );
+# HELP gauge with\nlinefeed
+# TYPE gauge gauge
+gauge 0
 EOF
 }
 

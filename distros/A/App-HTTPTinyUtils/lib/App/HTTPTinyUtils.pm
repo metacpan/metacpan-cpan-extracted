@@ -1,13 +1,42 @@
 package App::HTTPTinyUtils;
 
-our $DATE = '2018-10-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-10-18'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
+use Perinci::Sub::Util qw(gen_modified_sub);
+
 our %SPEC;
+
+sub _http_tiny {
+    my ($class, %args) = @_;
+
+    (my $class_pm = "$class.pm") =~ s!::!/!g;
+    require $class_pm;
+
+    my $url = $args{url};
+    my $method = $args{method} // 'GET';
+
+    my %opts;
+
+    if (defined $args{content}) {
+        $opts{content} = $args{content};
+    } elsif (!(-t STDIN)) {
+        local $/;
+        $opts{content} = <STDIN>;
+    }
+
+    my $res = $class->new->request($method, $url, \%opts);
+
+    if ($args{raw}) {
+        [200, "OK", $res];
+    } else {
+        [$res->{status}, $res->{reason}, $res->{content}];
+    }
+}
 
 $SPEC{http_tiny} = {
     v => 1.1,
@@ -46,29 +75,21 @@ $SPEC{http_tiny} = {
     },
 };
 sub http_tiny {
-    require HTTP::Tiny;
-
-    my %args = @_;
-    my $url = $args{url};
-    my $method = $args{method} // 'GET';
-
-    my %opts;
-
-    if (defined $args{content}) {
-        $opts{content} = $args{content};
-    } elsif (!(-t STDIN)) {
-        local $/;
-        $opts{content} = <STDIN>;
-    }
-
-    my $res = HTTP::Tiny->new->request($method, $url, \%opts);
-
-    if ($args{raw}) {
-        [200, "OK", $res];
-    } else {
-        [$res->{status}, $res->{reason}, $res->{content}];
-    }
+    _http_tiny('HTTP::Tiny', @_);
 }
+
+gen_modified_sub(
+    output_name => 'http_tiny_cache',
+    base_name   => 'http_tiny',
+    summary => 'Perform request with HTTP::Tiny::Cache',
+    description => <<'_',
+
+Like `http_tiny`, but uses <pm:HTTP::Tiny::Cache> instead of <pm:HTTP::Tiny>.
+See the documentation of HTTP::Tiny::Cache on how to set cache period.
+
+_
+    output_code => sub { _http_tiny('HTTP::Tiny::Cache', @_) },
+);
 
 1;
 # ABSTRACT: Command-line utilities related to HTTP::Tiny
@@ -85,7 +106,7 @@ App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 =head1 VERSION
 
-This document describes version 0.002 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2018-10-06.
+This document describes version 0.003 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2018-10-18.
 
 =head1 SYNOPSIS
 
@@ -97,6 +118,8 @@ This distribution includes several utilities related to L<HTTP::Tiny>:
 
 =item * L<http-tiny>
 
+=item * L<http-tiny-cache>
+
 =back
 
 =head1 FUNCTIONS
@@ -106,7 +129,7 @@ This distribution includes several utilities related to L<HTTP::Tiny>:
 
 Usage:
 
- http_tiny(%args) -> [status, msg, result, meta]
+ http_tiny(%args) -> [status, msg, payload, meta]
 
 Perform request with HTTP::Tiny.
 
@@ -133,7 +156,48 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 http_tiny_cache
+
+Usage:
+
+ http_tiny_cache(%args) -> [status, msg, payload, meta]
+
+Perform request with HTTP::Tiny::Cache.
+
+Like C<http_tiny>, but uses L<HTTP::Tiny::Cache> instead of L<HTTP::Tiny>.
+See the documentation of HTTP::Tiny::Cache on how to set cache period.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<content> => I<str>
+
+=item * B<headers> => I<hash>
+
+=item * B<method> => I<str> (default: "GET")
+
+=item * B<raw> => I<bool>
+
+=item * B<url>* => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

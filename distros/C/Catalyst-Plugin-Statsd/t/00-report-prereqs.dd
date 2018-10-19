@@ -23,10 +23,14 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'Ref::Util::XS' => '0'
+                                      },
                       'requires' => {
                                       'Catalyst::Runtime' => '0',
                                       'Moose::Role' => '0',
                                       'Plack::Middleware::Statsd' => '0',
+                                      'Ref::Util' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.8.0'
                                     }
@@ -43,7 +47,7 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Moo' => '0',
                                    'Moose' => '0',
-                                   'Net::Statsd::Tiny' => '0',
+                                   'Net::Statsd::Tiny' => 'v0.3.0',
                                    'Test::Log::Dispatch' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',

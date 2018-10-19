@@ -8,7 +8,7 @@ use Pod::Strip;
 use Parse::RecDescent 1.967009;
 use Module::ExtractUse::Grammar;
 use Carp;
-our $VERSION = '0.342';
+our $VERSION = '0.343';
 
 # ABSTRACT: Find out what modules are used
 
@@ -349,7 +349,7 @@ Module::ExtractUse - Find out what modules are used
 
 =head1 VERSION
 
-version 0.342
+version 0.343
 
 =head1 SYNOPSIS
 
@@ -544,7 +544,7 @@ Nothing.
 
 =head1 SEE ALSO
 
-L<Parse::RecDescent>, L<Module::Extract::Use>, L<Module::ScanDeps>, L<Module::Info>, L<Module::CPANTS::Analyse>
+L<Parse::RecDescent>, L<Module::Extract::Use>, L<Module::ScanDeps>, L<Module::Info>, L<Module::CPANTS::Analyse>, L<Perl::PrereqScanner>, L<Perl::PrereqScanner::Lite>, L<Perl::PrereqScanner::NotQuiteLite>
 
 =head1 CONTRIBUTORS
 

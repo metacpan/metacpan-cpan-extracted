@@ -19,6 +19,7 @@ name: Software-Catalog
 requires:
   Exporter: '5.57'
   LWP::UserAgent: '0'
+  Log::ger: '0.023'
   Role::Tiny: '0'
   perl: '5.010001'
   strict: '0'
@@ -27,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Software-Catalog
   homepage: https://metacpan.org/release/Software-Catalog
   repository: git://github.com/perlancar/perl-Software-Catalog.git
-version: 1.0.3
+version: 1.0.4
 x_Dist_Zilla:
   perl:
     version: '5.026000'

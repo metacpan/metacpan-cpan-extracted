@@ -1,37 +1,174 @@
 package Hash::Match;
 
+# ABSTRACT: match contents of a hash against rules
+
 use v5.10.0;
 
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('v0.6.2');
+our $VERSION = 'v0.7.0';
 
 use Carp qw/ croak /;
 use List::AllUtils qw/ natatime /;
+use Ref::Util qw/ is_coderef is_hashref is_ref is_regexpref /;
+
+# RECOMMEND PREREQ: Ref::Util::XS
 
 use namespace::autoclean;
+
+
+sub new {
+    my ($class, %args) = @_;
+
+    if (my $rules = $args{rules}) {
+
+        my $root = is_hashref($rules) ? '-all' : '-any';
+        my $self = _compile_rule( $root => $rules, $class );
+        bless $self, $class;
+
+    } else {
+
+        croak "Missing 'rules' attribute";
+
+    }
+}
+
+sub _compile_match {
+    my ($value) = @_;
+
+    if ( is_ref($value) ) {
+
+        return sub { ($_[0] // '') =~ $value } if is_regexpref($value);
+
+        return sub { $value->($_[0]) } if is_coderef($value);
+
+        croak sprintf('Unsupported type: \'%s\'', ref $value);
+
+    } else {
+
+        return sub { ($_[0] // '') eq $value } if (defined $value);
+
+        return sub { !defined $_[0] };
+
+    }
+}
+
+my %KEY2FN = (
+    '-all'	=> List::AllUtils->can('all'),
+    '-and'	=> List::AllUtils->can('all'),
+    '-any'	=> List::AllUtils->can('any'),
+    '-notall'	=> List::AllUtils->can('notall'),
+    '-notany'	=> List::AllUtils->can('none'),
+    '-or'	=> List::AllUtils->can('any'),
+);
+
+sub _key2fn {
+    my ($key, $ctx) = @_;
+
+    # TODO: eventually add a warning message about -not being
+    # deprecated.
+
+    if ($key eq '-not') {
+	$ctx //= '';
+	$key = ($ctx eq 'HASH') ? '-notall' : '-notany';
+    }
+
+    $KEY2FN{$key} or croak "Unsupported key: '${key}'";
+}
+
+sub _compile_rule {
+    my ( $key, $value, $ctx ) = @_;
+
+    if ( my $key_ref = ( ref $key ) ) {
+
+        if (is_regexpref($key)) {
+
+            my $match = _compile_match($value);
+
+            my $fn = _key2fn($ctx);
+
+            return sub {
+                my $hash = $_[0];
+                $fn->( sub { $match->( $hash->{$_} ) },
+                       grep { $_ =~ $key } (keys %{$hash}) );
+            };
+
+        } elsif (is_coderef($key)) {
+
+            my $match = _compile_match($value);
+
+            my $fn = _key2fn($ctx);
+
+            return sub {
+                my $hash = $_[0];
+                $fn->( sub { $match->( $hash->{$_} ) },
+                       grep { $key->($_) } (keys %{$hash}) );
+            };
+
+        } else {
+
+            croak "Unsupported key type: '${key_ref}'";
+
+        }
+
+    } else {
+
+        my $match_ref = ref $value;
+
+	if ( $match_ref =~ /^(?:ARRAY|HASH)$/ ) {
+
+            my $it = ( $match_ref eq 'ARRAY' )
+		? natatime 2, @{$value}
+	        : sub { each %{$value} };
+
+            my @codes;
+            while ( my ( $k, $v ) = $it->() ) {
+                push @codes, _compile_rule( $k, $v, $key );
+            }
+
+            my $fn = _key2fn($key, $match_ref);
+
+            return sub {
+                my $hash = $_[0];
+                $fn->( sub { $_->($hash) }, @codes );
+            };
+
+        } elsif ( $match_ref =~ /^(?:Regexp|CODE|)$/ ) {
+
+            my $match = _compile_match($value);
+
+            return sub {
+                my $hash = $_[0];
+                (exists $hash->{$key}) ? $match->($hash->{$key}) : 0;
+            };
+
+        } else {
+
+            croak "Unsupported type: '${match_ref}'";
+
+        }
+
+    }
+
+    croak "Unhandled condition";
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Hash::Match - match contents of a hash against rules
 
-=begin readme
+=head1 VERSION
 
-=head1 REQUIREMENTS
-
-This module requires Perl v5.10 or newer, and the following non-core
-modules:
-
-=over
-
-=item L<List::AllUtils>
-
-=item L<namespace::autoclean>
-
-=back
-
-=end readme
+version v0.7.0
 
 =head1 SYNOPSIS
 
@@ -121,8 +258,6 @@ fail).
 
 None of the C<$rules> can match.
 
-=for readme stop
-
 =item C<-and>
 
 This is a (deprecated) synonym for C<-all>.
@@ -135,8 +270,6 @@ This is a (deprecated) synonym for C<-any>.
 
 This is a (deprecated) synonym for C<-notall> and C<-notany>,
 depending on the context.
-
-=for readme continue
 
 =back
 
@@ -157,8 +290,6 @@ or
        -any => [ ... ],
     ],
   }
-
-=for readme stop
 
 The values for special keys can be either a hash or array
 reference. But note that hash references only allow strings as keys,
@@ -188,148 +319,6 @@ You can also use functions to match keys. For example,
     sub { $_[0] > 10 } => $rule,
   ]
 
-=for readme continue
-
-=cut
-
-sub new {
-    my ($class, %args) = @_;
-
-    if (my $rules = $args{rules}) {
-
-        my $root = ((ref $rules) eq 'HASH') ? '-all' : '-any';
-        my $self = _compile_rule( $root => $args{rules}, $class );
-        bless $self, $class;
-
-    } else {
-
-        croak "Missing 'rules' attribute";
-
-    }
-}
-
-sub _compile_match {
-    my ($value) = @_;
-
-    if ( my $match_ref = ( ref $value ) ) {
-
-        return sub { ($_[0] // '') =~ $value } if ( $match_ref eq 'Regexp' );
-
-        return sub { $value->($_[0]) } if ( $match_ref eq 'CODE' );
-
-        croak "Unsupported type: '${match_ref}'";
-
-    } else {
-
-        return sub { ($_[0] // '') eq $value } if (defined $value);
-
-        return sub { !defined $_[0] };
-
-    }
-}
-
-my %KEY2FN = (
-    '-all'	=> List::AllUtils->can('all'),
-    '-and'	=> List::AllUtils->can('all'),
-    '-any'	=> List::AllUtils->can('any'),
-    '-notall'	=> List::AllUtils->can('notall'),
-    '-notany'	=> List::AllUtils->can('none'),
-    '-or'	=> List::AllUtils->can('any'),
-);
-
-sub _key2fn {
-    my ($key, $ctx) = @_;
-
-    # TODO: eventually add a warning message about -not being
-    # deprecated.
-
-    if ($key eq '-not') {
-	$ctx //= '';
-	$key = ($ctx eq 'HASH') ? '-notall' : '-notany';
-    }
-
-    $KEY2FN{$key} or croak "Unsupported key: '${key}'";
-}
-
-sub _compile_rule {
-    my ( $key, $value, $ctx ) = @_;
-
-    if ( my $key_ref = ( ref $key ) ) {
-
-        if ( $key_ref eq 'Regexp' ) {
-
-            my $match = _compile_match($value);
-
-            my $fn = _key2fn($ctx);
-
-            return sub {
-                my $hash = $_[0];
-                $fn->( sub { $match->( $hash->{$_} ) },
-                       grep { $_ =~ $key } (keys %{$hash}) );
-            };
-
-        } elsif ( $key_ref eq 'CODE' ) {
-
-            my $match = _compile_match($value);
-
-            my $fn = _key2fn($ctx);
-
-            return sub {
-                my $hash = $_[0];
-                $fn->( sub { $match->( $hash->{$_} ) },
-                       grep { $key->($_) } (keys %{$hash}) );
-            };
-
-        } else {
-
-            croak "Unsupported key type: '${key_ref}'";
-
-        }
-
-    } else {
-
-        my $match_ref = ref $value;
-
-	if ( $match_ref =~ /^(?:ARRAY|HASH)$/ ) {
-
-            my $it = ( $match_ref eq 'ARRAY' )
-		? natatime 2, @{$value}
-	        : sub { each %{$value} };
-
-            my @codes;
-            while ( my ( $k, $v ) = $it->() ) {
-                push @codes, _compile_rule( $k, $v, $key );
-            }
-
-            my $fn = _key2fn($key, $match_ref);
-
-            return sub {
-                my $hash = $_[0];
-                $fn->( sub { $_->($hash) }, @codes );
-            };
-
-        } elsif ( $match_ref =~ /^(?:Regexp|CODE|)$/ ) {
-
-            my $match = _compile_match($value);
-
-            return sub {
-                my $hash = $_[0];
-                (exists $hash->{$key}) ? $match->($hash->{$key}) : 0;
-            };
-
-        } else {
-
-            croak "Unsupported type: '${match_ref}'";
-
-        }
-
-    }
-
-    croak "Unhandled condition";
-}
-
-1;
-
 =head1 SEE ALSO
 
 The following modules have similar functionality:
@@ -342,64 +331,39 @@ The following modules have similar functionality:
 
 =back
 
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/Hash-Match>
+and may be cloned from L<git://github.com/robrwo/Hash-Match.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/robrwo/Hash-Match/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
-Robert Rothenberg, C<< <rrwo at cpan.org> >>
+Robert Rothenberg <rrwo@cpan.org>
 
-=head2 Contributors
+Some development of this module was based on work for
+Foxtons L<http://www.foxtons.co.uk>.
 
-Mohammad S Anwar
+=head1 CONTRIBUTOR
 
-=head1 ACKNOWLEDGEMENTS
+=for stopwords Mohammad S Anwar
 
-=over
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
-=item Foxtons, Ltd.
+=head1 COPYRIGHT AND LICENSE
 
-=back
+This software is Copyright (c) 2018 by Robert Rothenberg.
 
-=head1 LICENSE AND COPYRIGHT
+This is free software, licensed under:
 
-Copyright 2017 Robert Rothenberg.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
-
-=for readme stop
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=for readme continue
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

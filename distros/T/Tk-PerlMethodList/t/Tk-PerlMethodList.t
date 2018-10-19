@@ -18,9 +18,13 @@ sub testmethod2{};
 
 package main;
 
-warn "test running\n";
+my $mw;
+eval{$mw = MainWindow->new};
 
-my $mw = tkinit();
+SKIP: {
+    diag "Could not create MainWindow. Please check, if your X-server is running: $@\n" if ($@);
+    skip "MainWindow instantiation failed: $@", 7 if ($@);
+    
 my $w;
 eval{$w = $mw->PerlMethodList};
 ok( !$@,"instance creation: $@");
@@ -93,3 +97,5 @@ $w->update;
     ok(($line =~ /D .*E .*Z /s),
          q/test C3  mro/);
 }
+
+}# SKIP

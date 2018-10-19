@@ -709,51 +709,6 @@ sub move ( $from, $to, @ ) {
     return;
 }
 
-# FIND
-sub find ( $path, @ ) {
-    my %args = (
-        abs  => 0,    # return absolute path
-        dir  => 1,    # return found dirs
-        file => 1,    # return found files
-        splice @_, 1, -1,
-    );
-
-    $path = P->path( $path, is_dir => 1 )->realpath or return;
-
-    my $cb = $_[-1];
-
-    my $chdir_guard;
-
-    $chdir_guard = &chdir($path) if !$args{abs};    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
-
-    my $read_dir;
-
-    $read_dir = sub ($dirpath) {
-        for my $file ( read_dir($dirpath)->@* ) {
-            $file = $dirpath . q[/] . Encode::decode( $Pcore::WIN_ENC, $file, Encode::FB_CROAK );
-
-            if ( -d $file ) {
-                $file = P->path( $file, is_dir => 1 );
-
-                $cb->($file) if $args{dir};
-
-                $read_dir->($file);
-            }
-            else {
-                $file = P->path( $file, is_dir => 0 );
-
-                $cb->($file) if $args{file};
-            }
-        }
-
-        return;
-    };
-
-    $read_dir->( $args{abs} ? $path : q[./] );
-
-    return;
-}
-
 # WHERE
 sub where ( $filename ) {
     my $wantarray = wantarray;
@@ -855,7 +810,7 @@ sub untar ( $tar, $target, @ ) {
 ## |      | 124                  | * Subroutine "calc_chmod" with high complexity score (25)                                                      |
 ## |      | 250                  | * Subroutine "read_lines" with high complexity score (27)                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 825                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 780                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

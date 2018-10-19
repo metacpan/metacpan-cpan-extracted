@@ -1,5 +1,8 @@
 Revision history for App-opan
 
+0.003001 - 2018-10-18
+  - Serve 02packages for all pans for easier introspection
+
 0.003000 - 2018-09-02
   - Use gzip instead of zcat because Mac OS X's zcat is bizarre
   - Refactor to use more Mojo::File

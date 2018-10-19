@@ -33,7 +33,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use warnings;
 use Carp;
@@ -60,7 +60,7 @@ our %field_conf = (
 
         my @dbxrefs =
           grep {
-            !m|^http:| && /^\S+:\S+$/;
+            !m|^(?:url:)?https?\\?:| && /^\S+:\S+$/;
           } split /\s*,\s/, $dbxrefs;
 
         return {

@@ -37,10 +37,10 @@ lib/Pcore/App/API/Remote.pm
 lib/Pcore/App/Controller.pm
 lib/Pcore/App/Controller/API.pm
 lib/Pcore/App/Controller/Index.pm
-lib/Pcore/App/Controller/Static.pm
 lib/Pcore/App/Router.pm
 lib/Pcore/CDN.pm
 lib/Pcore/CDN/Bucket.pm
+lib/Pcore/CDN/Bucket/digitalocean.pm
 lib/Pcore/CDN/Bucket/local.pm
 lib/Pcore/CDN/Bucket/s3.pm
 lib/Pcore/Core/CLI.pm
@@ -163,6 +163,9 @@ lib/Pcore/Util/IDN.pm
 lib/Pcore/Util/List.pm
 lib/Pcore/Util/Net.pm
 lib/Pcore/Util/Path.pm
+lib/Pcore/Util/Path1.pm
+lib/Pcore/Util/Path1/Dir.pm
+lib/Pcore/Util/Path1/Poll.pm
 lib/Pcore/Util/Perl.pm
 lib/Pcore/Util/Perl/Module.pm
 lib/Pcore/Util/Random.pm
@@ -206,13 +209,10 @@ lib/pod/pgsql.pod
 lib/pod/sqlite.pod
 lib/pod/ssh.pod
 lib/pod/utf8.pod
-script/pcore
-script/pcore-vim-rpc.pl
-script/src
-script/update-pcore-share.pl
 share/data/ca_file.pem
 share/data/mime.json
 share/data/par.ico
+share/data/pub_suffix.dat
 share/data/src.perl
 share/dist-id.json
 share/dist-tmpl/cfg.ini
@@ -268,6 +268,3 @@ t/p-http-cookies.t
 t/p-util-path.t
 t/p-util-uri-host.t
 t/p-util-uri.t
-t/release-002-util-text.t
-t/release-003-pcore-dist.t
-t/release-004-api-test.t

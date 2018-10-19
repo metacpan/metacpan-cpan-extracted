@@ -23,7 +23,7 @@ my %attr = (
         'perl'	=> $meta->requires_perl(),
     ),
     build_requires => $meta->build_requires(),
-    script_files => [ qw{ bin/satpass2 } ],
+    script_files => [ qw{ script/satpass2 } ],
     add_to_cleanup => [ qw{ cover_db xt/author/optionals } ],
 );
 

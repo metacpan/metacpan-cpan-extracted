@@ -327,23 +327,23 @@ Scottish Gaelic United Kingdom locale.
 
 =head2 Available Formats
 
-=head3 Bh (h B)
+=head3 Bh (hB)
 
-   2008-02-05T18:30:30 = 6 B
-   1995-12-22T09:05:02 = 9 B
-  -0010-09-15T04:44:23 = 4 B
+   2008-02-05T18:30:30 = 6B
+   1995-12-22T09:05:02 = 9B
+  -0010-09-15T04:44:23 = 4B
 
-=head3 Bhm (h:mm B)
+=head3 Bhm (h:mmB)
 
-   2008-02-05T18:30:30 = 6:30 B
-   1995-12-22T09:05:02 = 9:05 B
-  -0010-09-15T04:44:23 = 4:44 B
+   2008-02-05T18:30:30 = 6:30B
+   1995-12-22T09:05:02 = 9:05B
+  -0010-09-15T04:44:23 = 4:44B
 
-=head3 Bhms (h:mm:ss B)
+=head3 Bhms (h:mm:ssB)
 
-   2008-02-05T18:30:30 = 6:30:30 B
-   1995-12-22T09:05:02 = 9:05:02 B
-  -0010-09-15T04:44:23 = 4:44:23 B
+   2008-02-05T18:30:30 = 6:30:30B
+   1995-12-22T09:05:02 = 9:05:02B
+  -0010-09-15T04:44:23 = 4:44:23B
 
 =head3 E (ccc)
 
@@ -351,17 +351,17 @@ Scottish Gaelic United Kingdom locale.
    1995-12-22T09:05:02 = Dih
   -0010-09-15T04:44:23 = DiS
 
-=head3 EBhm (E h:mm B)
+=head3 EBhm (E h:mmB)
 
-   2008-02-05T18:30:30 = DiM 6:30 B
-   1995-12-22T09:05:02 = Dih 9:05 B
-  -0010-09-15T04:44:23 = DiS 4:44 B
+   2008-02-05T18:30:30 = DiM 6:30B
+   1995-12-22T09:05:02 = Dih 9:05B
+  -0010-09-15T04:44:23 = DiS 4:44B
 
-=head3 EBhms (E h:mm:ss B)
+=head3 EBhms (E h:mm:ssB)
 
-   2008-02-05T18:30:30 = DiM 6:30:30 B
-   1995-12-22T09:05:02 = Dih 9:05:02 B
-  -0010-09-15T04:44:23 = DiS 4:44:23 B
+   2008-02-05T18:30:30 = DiM 6:30:30B
+   1995-12-22T09:05:02 = Dih 9:05:02B
+  -0010-09-15T04:44:23 = DiS 4:44:23B
 
 =head3 EHm (E HH:mm)
 
@@ -399,7 +399,7 @@ Scottish Gaelic United Kingdom locale.
    1995-12-22T09:05:02 = 1995 AD
   -0010-09-15T04:44:23 = -10 RC
 
-=head3 GyMMM (MMM y G)
+=head3 GyMMM (LLL y G)
 
    2008-02-05T18:30:30 = Gearr 2008 AD
    1995-12-22T09:05:02 = Dùbh 1995 AD
@@ -567,7 +567,7 @@ Scottish Gaelic United Kingdom locale.
    1995-12-22T09:05:02 = 1995
   -0010-09-15T04:44:23 = -10
 
-=head3 yM (M/y)
+=head3 yM (L/y)
 
    2008-02-05T18:30:30 = 2/2008
    1995-12-22T09:05:02 = 12/1995
@@ -579,13 +579,13 @@ Scottish Gaelic United Kingdom locale.
    1995-12-22T09:05:02 = Dih, 22/12/1995
   -0010-09-15T04:44:23 = DiS, 15/9/-10
 
-=head3 yMM (MM/y)
+=head3 yMM (LL/y)
 
    2008-02-05T18:30:30 = 02/2008
    1995-12-22T09:05:02 = 12/1995
   -0010-09-15T04:44:23 = 09/-10
 
-=head3 yMMM (MMM y)
+=head3 yMMM (LLL Y)
 
    2008-02-05T18:30:30 = Gearr 2008
    1995-12-22T09:05:02 = Dùbh 1995
@@ -609,11 +609,11 @@ Scottish Gaelic United Kingdom locale.
    1995-12-22T09:05:02 = 22 Dùbh 1995
   -0010-09-15T04:44:23 = 15 Sult -10
 
-=head3 yMd (M/d/y)
+=head3 yMd (d/M/y)
 
-   2008-02-05T18:30:30 = 2/5/2008
-   1995-12-22T09:05:02 = 12/22/1995
-  -0010-09-15T04:44:23 = 9/15/-10
+   2008-02-05T18:30:30 = 5/2/2008
+   1995-12-22T09:05:02 = 22/12/1995
+  -0010-09-15T04:44:23 = 15/9/-10
 
 =head3 yQQQ (QQQ y)
 
@@ -627,25 +627,25 @@ Scottish Gaelic United Kingdom locale.
    1995-12-22T09:05:02 = 4mh cairteal 1995
   -0010-09-15T04:44:23 = 3s cairteal -10
 
-=head3 yw-count-few ('seachdain' w 'dhe' y)
+=head3 yw-count-few ('seachdain' w 'dhe' Y)
 
    2008-02-05T18:30:30 = seachdain 6 dhe 2008
    1995-12-22T09:05:02 = seachdain 51 dhe 1995
   -0010-09-15T04:44:23 = seachdain 37 dhe -10
 
-=head3 yw-count-one ('seachdain' w 'dhe' y)
+=head3 yw-count-one ('seachdain' w 'dhe' Y)
 
    2008-02-05T18:30:30 = seachdain 6 dhe 2008
    1995-12-22T09:05:02 = seachdain 51 dhe 1995
   -0010-09-15T04:44:23 = seachdain 37 dhe -10
 
-=head3 yw-count-other ('seachdain' w 'dhe' y)
+=head3 yw-count-other ('seachdain' w 'dhe' Y)
 
    2008-02-05T18:30:30 = seachdain 6 dhe 2008
    1995-12-22T09:05:02 = seachdain 51 dhe 1995
   -0010-09-15T04:44:23 = seachdain 37 dhe -10
 
-=head3 yw-count-two ('seachdain' w 'dhe' y)
+=head3 yw-count-two ('seachdain' w 'dhe' Y)
 
    2008-02-05T18:30:30 = seachdain 6 dhe 2008
    1995-12-22T09:05:02 = seachdain 51 dhe 1995

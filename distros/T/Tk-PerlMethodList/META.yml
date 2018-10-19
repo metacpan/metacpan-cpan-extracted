@@ -1,22 +1,31 @@
---- #YAML:1.0
-name:                Tk-PerlMethodList
-version:             0.07
-abstract:            query the Symbol-table for methods (subroutines) defined in a class (package) and its parents.
-license:             perl
-author:              
-    - Christoph Lamprecht <lamprecht@cpan.org>
-generated_by:        ExtUtils::MakeMaker version 6.44
-distribution_type:   module
-requires:     
-    B:                             1.01
-    Class::Inspector:              1.17
-    Devel::Peek:                   0.96
-    File::Slurp:                   9999.08
-    MRO::Compat:                   0.02
-    Tk:                            8.4
-    Tk::LabEntry:                  4.006
-    Tk::NumEntry:                  2.06
-    Tk::ROText:                    4.010
+---
+abstract: 'query the Symbol-table for methods (subroutines) defined in a class (package) and its parents.'
+author:
+  - 'Christoph Lamprecht <lamprecht@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-PerlMethodList
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B: '1.01'
+  Class::Inspector: '1.17'
+  Devel::Peek: '0.96'
+  File::Slurp: '9999.08'
+  MRO::Compat: '0.02'
+  Tk: '8.4'
+  Tk::LabEntry: '4.006'
+  Tk::NumEntry: '2.06'
+  Tk::ROText: '4.010'
+version: 0.08
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

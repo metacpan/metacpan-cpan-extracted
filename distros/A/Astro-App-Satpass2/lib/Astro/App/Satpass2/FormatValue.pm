@@ -11,6 +11,7 @@ use Astro::App::Satpass2::Locale qw{ __localize };
 use Astro::App::Satpass2::Utils qw{
     has_method instance merge_hashes
     ARRAY_REF CODE_REF HASH_REF
+    @CARP_NOT
 };
 use Astro::App::Satpass2::Warner;
 use Astro::Coord::ECI::Sun 0.059;
@@ -22,9 +23,10 @@ use POSIX qw{ floor };
 use Scalar::Util 1.26 qw{ isdual reftype };
 use Text::Wrap ();
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 use constant NONE => undef;
+use constant RE_ALL_DIGITS	=> qr{ \A [0-9]+ \z }smx;
 use constant TITLE_GRAVITY_BOTTOM	=> 'bottom';
 use constant TITLE_GRAVITY_TOP		=> 'top';
 
@@ -178,7 +180,6 @@ sub bodies {
 
     my $questionable = $self->_get( data => 'questionable' );
     my $sta = $self->_get( data => 'station' );
-    my $sun = Astro::Coord::ECI::Sun->new();
     my $time = $self->_get( data => 'time' );
     my $twilight = $self->_get( data => 'twilight' );
     defined $twilight
@@ -195,7 +196,6 @@ sub bodies {
 		body	=> $body,
 		station	=> $sta,
 		time	=> $time,
-		sun	=> $sun,
 		twilight => $twilight,
 	    ),
 	    questionable	=> $questionable,
@@ -223,7 +223,7 @@ sub _illumination {
 	or $arg{time} = $arg{body}->universal();
 
     embodies( $arg{sun}, 'Astro::Coord::ECI' )
-	or $arg{sun} = $arg{body}->get( 'illum' );
+	or $arg{sun} = $arg{body}->get( 'sun' );
     embodies( $arg{sun}, 'Astro::Coord::ECI' )
 	or $arg{sun} = Astro::Coord::ECI::Sun->new();
 
@@ -1249,7 +1249,7 @@ my %formatter_data = (	# For generating formatters
 	    defined( my $value = $body->get( 'id' ) )
 		or return NONE;
 	    not defined $arg->{align_left}
-		and $arg->{align_left} = $value !~ m/ \A \d+ \z /sxm;
+		and $arg->{align_left} = $value !~ RE_ALL_DIGITS;
 	    return $value;
 	},
     },
@@ -1933,7 +1933,7 @@ sub _do_title_wrap {
 sub __chain_bearing {
     my ( undef, undef, $value, $arg ) = @_;	# Invocant, $name unused
     $arg->{bearing}
-	and $arg->{bearing} =~ m/ \A \d+ \z /sxm
+	and $arg->{bearing} =~ RE_ALL_DIGITS
 	or $arg->{bearing} = 0;
 
     $arg->{bearing} or return $arg;
@@ -2145,7 +2145,7 @@ sub _format_integer {	## no critic (ProhibitUnusedPrivateSubroutines)
 	or goto &_format_undef;
 
     $arg->{width}
-	and $arg->{width} =~ m/ \A \d+ \z /sxm
+	and $arg->{width} =~ RE_ALL_DIGITS
 	or return sprintf '%d', $value;
 
     my $buffer = sprintf '%*d', $arg->{width}, $value;
@@ -2173,11 +2173,11 @@ sub _format_number {	## no critic (ProhibitUnusedPrivateSubroutines)
 	and $value ne ''
 	or goto &_format_undef;
 
-    my $width = ( $arg->{width} && $arg->{width} =~ m/ \A \d+ \z /sxm )
+    my $width = ( $arg->{width} && $arg->{width} =~ RE_ALL_DIGITS )
 	? $arg->{width} : '';
     my $tplt = "%$width";
     defined $arg->{places}
-	and $arg->{places} =~ m/ \A \d+ \z /sxm
+	and $arg->{places} =~ RE_ALL_DIGITS
 	and $tplt .= ".$arg->{places}";
 
     '%' eq $tplt
@@ -2210,16 +2210,16 @@ sub _format_number_scientific {
 	and $value ne ''
 	or goto &_format_undef;
 
-    my $width = ( $arg->{width} && $arg->{width} =~ m/ \A \d+ \z /sxm )
+    my $width = ( $arg->{width} && $arg->{width} =~ RE_ALL_DIGITS )
 	? $arg->{width} : '';
     my $tplt = "%$width";
     defined $arg->{places}
-	and $arg->{places} =~ m/ \A \d+ \z /sxm
+	and $arg->{places} =~ RE_ALL_DIGITS
 	and $tplt .= ".$arg->{places}";
     $tplt .= 'e';
 
     my $buffer = sprintf $tplt, $value;
-    $buffer =~ s/ e ( [-+]? ) 0 (\d\d) \z /e$1$2/smx	# Normalize
+    $buffer =~ s/ e ( [-+]? ) 0 ( [0-9]{2} ) \z /e$1$2/smx	# Normalize
 	and $width
 	and $width > length $buffer
 	and $buffer = ' ' . $buffer;	# Preserve width after normalize
@@ -2269,7 +2269,7 @@ sub _format_right_ascension {	## no critic (ProhibitUnusedPrivateSubroutines)
     my $min = floor($sec);
     $sec = ($sec - $min) * 60;
     my ( $ps, $wid );
-    if ( defined $arg->{places} && $arg->{places} =~ m/ \A \d+ \z /sxm )
+    if ( defined $arg->{places} && $arg->{places} =~ RE_ALL_DIGITS )
     {
 	$ps = ".$arg->{places}";
 	$wid = $arg->{places} ? 3 + $arg->{places} : 2;
@@ -2291,7 +2291,7 @@ sub _format_string {
 	or goto &_format_undef;
 
     defined $arg->{width}
-	and $arg->{width} =~ m/ \A \d+ \z /sxm
+	and $arg->{width} =~ RE_ALL_DIGITS
 	or return "$value";
 
     my $left = defined $arg->{align_left} ? $arg->{align_left} : 1;
@@ -2347,7 +2347,7 @@ sub _format_undef {
 	and return $self->_format_string( $arg->{missing}, $arg, $fmtr );
 
     defined $arg->{width}
-	and $arg->{width} =~ m/ \A \d+ \z /sxm
+	and $arg->{width} =~ RE_ALL_DIGITS
 	and $arg->{width}
 	or return '';
 

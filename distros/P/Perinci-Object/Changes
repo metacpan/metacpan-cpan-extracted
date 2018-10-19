@@ -1,3 +1,9 @@
+0.310   2018-10-18 (PERLANCAR)
+
+	- [Bugfix] envresmulti(): If all statuses are 304, return final
+	  status as 304 instead of 200.
+
+
 0.30    2017-02-03 (PERLANCAR)
 
 	- EnvResultMulti: Allow add_result() to override status/message

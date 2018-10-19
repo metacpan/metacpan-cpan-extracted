@@ -1,4 +1,3 @@
-
 package Outthentic::Story;
 
 use strict;
@@ -9,6 +8,7 @@ use File::ShareDir;
 use JSON;
 use Carp;
 
+use File::Path::Tiny;
 
 our @EXPORT = qw{ 
 
@@ -33,6 +33,10 @@ our @EXPORT = qw{
     do_bash_hook
 
     ignore_story_err
+
+    quit
+
+    outthentic_die
 
     project_root_dir
 
@@ -220,8 +224,8 @@ sub _make_cache_dir {
   if (debug_mod12()){
     main::note("make cache dir: $cache_dir");
   }
-  system("rm -rf $cache_dir");
-  system("mkdir -p $cache_dir");
+  File::Path::Tiny::mk($cache_dir) or die "can't create $cache_dir, error: $!";
+  File::Path::Tiny::empty_dir($cache_dir) or die "can't empty $cache_dir, error: $!";
 }
 
 sub story_cache_dir {
@@ -281,7 +285,7 @@ sub run_story {
 
     my $project_root_dir = get_prop('project_root_dir');
 
-    my $story_module = "$cache_root_dir/$project_root_dir/modules/$path/sparrow.pl";
+    my $story_module = "$cache_root_dir/modules/$path/story.outth";
 
     die "story module file $story_module does not exist" unless -e $story_module;
 
@@ -318,6 +322,22 @@ sub do_perl_hook {
     return 1;
 }
 
+sub quit {
+  my $msg = shift;
+  chomp($msg);
+  main::print_story_header();
+  main::note("? forcefully exit: $msg"); 
+  exit(0);
+}
+
+sub outthentic_die {
+  my $msg = shift;
+  chomp($msg);
+  main::print_story_header();
+  main::note("!! forcefully die: $msg");
+  $main::STATUS = 0;
+  exit(1);
+}
 
 sub _mk_perl_glue_file {
 
@@ -544,6 +564,9 @@ sub do_ruby_hook {
 
       next if $l=~/#/;
 
+      quit($1) if $l=~/quit:(.*)/;
+      outthentic_die($1) if $l=~/outthentic_die:(.*)/;
+
       ignore_story_err($1) if $l=~/ignore_story_err:\s+(\d)/;
       
       if ($l=~s/story_var_json_begin.*// .. $l=~s/story_var_json_end.*//){
@@ -603,6 +626,9 @@ sub do_python_hook {
     for my $l (@out) {
 
       next if $l=~/#/;
+
+      quit($1) if $l=~/quit:(.*)/;
+      outthentic_die($1) if $l=~/outthentic_die:(.*)/;
 
       ignore_story_err($1) if $l=~/ignore_story_err:\s+(\d)/;
       
@@ -668,6 +694,9 @@ sub do_bash_hook {
     for my $l (@out) {
 
       next if $l=~/#/;
+      
+      quit($1) if $l=~/quit:(.*)/;
+      outthentic_die($1) if $l=~/outthentic_die:(.*)/;
 
       ignore_story_err($1) if $l=~/ignore_story_err:\s+(\d)/;
       
@@ -731,6 +760,8 @@ sub story_vars_pretty {
 }
 
 sub dump_os {
+
+return $^O if $^O  =~ 'MSWin';
 
 my $cmd = <<'HERE';
 #! /usr/bin/env sh
@@ -799,6 +830,7 @@ sub _resolve_os {
           $data=~/ubuntu/i and $OS = 'ubuntu' and last DONE;
           $data=~/debian/i and $OS = 'debian' and last DONE;
           $data=~/darwin/i and $OS = 'darwin' and last DONE;
+          $data=~/MSWin/i and $OS = 'windows' and last DONE;
           warn "unknown os: $data";
           last DONE;
       }

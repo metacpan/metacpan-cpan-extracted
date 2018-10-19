@@ -10,4 +10,5 @@ print rhombus(
     letter  =>      'c',
     case    =>  'upper',
     fillup  =>      '+',
+    forward =>        1,
 );

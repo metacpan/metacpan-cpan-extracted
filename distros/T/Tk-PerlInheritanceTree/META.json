@@ -1,0 +1,47 @@
+{
+   "abstract" : "Display a graphical representation of the inheritance tree for a given class-name.",
+   "author" : [
+      "Christoph Lamprecht <lamprecht@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-PerlInheritanceTree",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Inspector" : "1.17",
+            "Tk" : "804.027",
+            "Tk::GraphItems::Connector" : "0.01",
+            "Tk::GraphItems::TextBox" : "0.01",
+            "Tk::NumEntry" : "2.06",
+            "Tk::PerlMethodList" : "0.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.06,
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

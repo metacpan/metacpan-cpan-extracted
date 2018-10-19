@@ -660,7 +660,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (segunda-feira)
+7 (domingo)
 
 =head1 SUPPORT
 

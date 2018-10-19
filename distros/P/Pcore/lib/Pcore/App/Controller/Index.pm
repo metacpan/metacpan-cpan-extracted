@@ -4,16 +4,36 @@ use Pcore -role;
 
 with qw[Pcore::App::Controller];
 
-sub run ( $self, $req ) {
-    if ( $req->{path_tail}->is_file ) {
-        $self->return_static($req);
+# around run => sub ( $orig, $self, $req ) {
+#     if ( $req->{path_tail}->is_file ) {
+#         $self->return_static($req);
 
-        return;
-    }
-    else {
-        return $self->SUPER::run($req);
-    }
-}
+#         return;
+#     }
+#     else {
+#         return $self->$orig($req);
+#     }
+# };
+
+# sub return_static ( $self, $req ) {
+#     if ( $req->{path_tail} && $req->{path_tail}->is_file ) {
+#         if ( my $path = $ENV->{share}->get( 'www', $req->{path} . $req->{path_tail} ) ) {
+#             my $data = P->file->read_bin($path);
+
+#             $path = P->path($path);
+
+#             $req->( 200, [ 'Content-Type' => $path->mime_type ], $data )->finish;
+#         }
+#         else {
+#             $req->(404)->finish;    # not found
+#         }
+#     }
+#     else {
+#         $req->(403)->finish;        # forbidden
+#     }
+
+#     return;
+# }
 
 sub get_nginx_cfg ($self) {
     return <<"TXT";
@@ -23,6 +43,9 @@ sub get_nginx_cfg ($self) {
     }
 
     location / {
+        rewrite ^/favicon.ico\$ /cdn/favicon.ico last;
+        rewrite ^/robots.txt\$ /cdn/robots.txt last;
+
         error_page 418 = \@backend;
         return 418;
     }

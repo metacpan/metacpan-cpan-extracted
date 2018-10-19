@@ -6,7 +6,7 @@ use base qw(Exporter);
 
 our ($VERSION, @EXPORT_OK);
 
-$VERSION = '0.19';
+$VERSION = '0.20';
 @EXPORT_OK = qw(rhombus);
 
 sub rhombus
@@ -15,16 +15,17 @@ sub rhombus
 
     my $get_opt = sub
     {
-        my ($opt, $regex) = @_;
+        my ($opt, $regex, $default) = @_;
         return (exists $opts{$opt}
             && defined $opts{$opt}
-                   and $opts{$opt} =~ $regex) ? $opts{$opt} : undef;
+                   and $opts{$opt} =~ $regex) ? $opts{$opt} : $default;
     };
 
-    my $lines  = $get_opt->('lines',  qr/^\d+$/)           ||      25;
-    my $letter = $get_opt->('letter', qr/^[a-zA-Z]$/)      ||     'a';
-    my $case   = $get_opt->('case',   qr/^(?:low|upp)er$/) || 'upper';
-    my $fillup = $get_opt->('fillup', qr/^\S$/)            ||     '+';
+    my $lines   = $get_opt->('lines',   qr/^\d+$/,                25);
+    my $letter  = $get_opt->('letter',  qr/^[a-zA-Z]$/,          'a');
+    my $case    = $get_opt->('case',    qr/^(?:low|upp)er$/, 'upper');
+    my $fillup  = $get_opt->('fillup',  qr/^\S$/,                '+');
+    my $forward = $get_opt->('forward', qr/^[01]$/,                1);
 
     my %alter = (
         lower => sub { lc $_[0] },
@@ -45,10 +46,10 @@ sub rhombus
         $rhombus .= "\n";
 
         $repeat = $line < ($lines / 2) ? $repeat + 2 : $repeat - 2;
-        $letter = chr(ord($letter) + 1);
+        $letter = $forward ? chr(ord($letter) + 1) : chr(ord($letter) - 1);
 
         if ($letter !~ /[a-zA-Z]/) {
-            $letter = $alter{$case}->('a');
+            $letter = $alter{$case}->($forward ? 'a' : 'z');
         }
     }
 
@@ -71,6 +72,7 @@ Acme::Text::Rhombus - Draw a rhombus with letters
      letter  =>      'c',
      case    =>  'upper',
      fillup  =>      '+',
+     forward =>        1,
  );
 
  __OUTPUT__
@@ -122,6 +124,10 @@ Lower/upper case of the letters within the rhombus. Defaults to C<upper>.
 =item * C<fillup>
 
 The fillup character. Defaults to C<+>.
+
+=item * C<forward>
+
+Forward letter enumeration. Defaults to boolean C<1>.
 
 =back
 

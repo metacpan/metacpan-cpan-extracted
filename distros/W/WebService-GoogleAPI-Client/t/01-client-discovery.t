@@ -48,6 +48,27 @@ subtest 'WebService::GoogleAPI::Client::Discovery class properties' => sub {
 ## NB - should probably skip tests that will fail when a dependent test fails
 subtest 'Naked instance method tests (without Client parent container)' => sub {
 
+  ok( ref( WebService::GoogleAPI::Client->new->api_query() ) eq 'Mojo::Message::Response', "WebService::GoogleAPI::Client->new->api_query() is a 'Mojo::Message::Response'" );
+  ok(
+    WebService::GoogleAPI::Client::Discovery->new->list_of_available_google_api_ids() =~ /gmail/xm,
+    'WebService::GoogleAPI::Client::Discovery->new->list_of_available_google_api_ids()'
+  );
+
+  ok( ref( WebService::GoogleAPI::Client::Discovery->new->discover_all() ) eq 'HASH', 'WebService::GoogleAPI::Client::Discovery->new->discover_all() return HASREF' );
+  ok(
+    ref( WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api() ) eq 'HASH',
+    ' WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api() returns HASHREF'
+  );
+  ok(
+    length( WebService::GoogleAPI::Client::Discovery->new->supported_as_text ) > 100,
+    'WebService::GoogleAPI::Client::Discovery->new->supported_as_text() returns string > 100 chars'
+  );
+
+  ok( ref( WebService::GoogleAPI::Client::AuthStorage->new ) eq 'WebService::GoogleAPI::Client::AuthStorage', 'WebService::GoogleAPI::Client::AuthStorage->new' );
+  ok( ref( WebService::GoogleAPI::Client::Discovery->new->api_verson_urls ) eq 'HASH', 'WebService::GoogleAPI::Client::Discovery->new->api_verson_url returns HASHREF' );
+
+# supported_as_text
+
 ## not currently caching when running a sudo test so removing - restore for production
 
 =pod
@@ -219,10 +240,8 @@ subtest 'Discovery methods with User Configuration' => sub {
       'Client->discover_all returns HASHREF with keys of discoveryVersion,items,kind' );
 
     ## list_of_available_google_api_ids - when just need a list not the entire top level discovery structure
-    ok( scalar( $gapi->list_of_available_google_api_ids() ) > 120,
-      'WebService::GoogleAPI::Client->list_of_available_google_api_ids() returned an ARRAY with more than 120 Google Service API IDs' );
-    ok( scalar( grep {/^gmail$/xmg} $gapi->list_of_available_google_api_ids() ) == 1,
-      'WebService::GoogleAPI::Client->list_of_available_google_api_ids() returned ARRAY includes "gmail"' );
+#  ok ( my @list =  $gapi->list_of_available_google_api_ids() > 120, 'WebService::GoogleAPI::Client->list_of_available_google_api_ids() returned an ARRAY with more than 120 Google Service API IDs');
+#  ok ( scalar( grep {/^gmail$/xmg} $gapi->list_of_available_google_api_ids() ) ==1, 'WebService::GoogleAPI::Client->list_of_available_google_api_ids() returned ARRAY includes "gmail"');
 
 
     ok( $gapi->discovery->get_api_discovery_for_api_id( 'gmail' ), "WebService::GoogleAPI::Client->discovery->get_api_discovery_for_api_id('gmail') returns something" );

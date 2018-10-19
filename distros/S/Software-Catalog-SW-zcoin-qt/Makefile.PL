@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Software::Catalog::SW::zcoin::qt",
   "PREREQ_PM" => {
+    "Log::ger" => "0.023",
     "PerlX::Maybe" => 0,
     "Role::Tiny::With" => 0,
     "Software::Catalog::Role::Software" => "1.0.3",
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.023",
   "PerlX::Maybe" => 0,
   "Role::Tiny::With" => 0,
   "Software::Catalog::Role::Software" => "1.0.3",

@@ -41,42 +41,38 @@ sub _chmod ($self) {
     print 'chmod ... ';
 
     if ( !$MSWIN ) {
-        P->file->find(
-            q[.],
-            sub ($path) {
+        for my $path ( ( P->path1('.')->read_dir( max_depth => 0 ) // [] )->@* ) {
+            $path = P->path($path);
 
-                # directory
-                if ( -d $path ) {
+            # directory
+            if ( -d $path ) {
+                P->file->chmod( 'rwxr-xr-x', $path ) or say qq[$!: $path];
+            }
+
+            # file
+            else {
+                my $is_exe;
+
+                if ( ( $path->dirname eq 'bin/' || $path->dirname eq 'script/' ) && !$path->suffix ) {
+                    $is_exe = 1;
+                }
+                elsif ( $path->suffix eq 'sh' || $path->suffix eq 'pl' || $path->suffix eq 't' ) {
+                    $is_exe = 1;
+                }
+
+                # executable script
+                if ($is_exe) {
                     P->file->chmod( 'rwxr-xr-x', $path ) or say qq[$!: $path];
                 }
 
-                # file
+                # non-executable file
                 else {
-                    my $is_exe;
-
-                    if ( ( $path->dirname eq 'bin/' || $path->dirname eq 'script/' ) && !$path->suffix ) {
-                        $is_exe = 1;
-                    }
-                    elsif ( $path->suffix eq 'sh' || $path->suffix eq 'pl' || $path->suffix eq 't' ) {
-                        $is_exe = 1;
-                    }
-
-                    # executable script
-                    if ($is_exe) {
-                        P->file->chmod( 'rwxr-xr-x', $path ) or say qq[$!: $path];
-                    }
-
-                    # non-executable file
-                    else {
-                        P->file->chmod( 'rw-r--r--', $path ) or say qq[$!: $path];
-                    }
+                    P->file->chmod( 'rw-r--r--', $path ) or say qq[$!: $path];
                 }
-
-                chown $>, $), $path or say qq[$!: $path];    # EUID, EGID
-
-                return;
             }
-        );
+
+            chown $>, $), $path or say qq[$!: $path];    # EUID, EGID
+        }
     }
 
     say 'done';
@@ -86,7 +82,7 @@ sub _chmod ($self) {
 
 sub _deps ($self) {
     if ( -f 'cpanfile' ) {
-        my @args = (    #
+        my @args = (                                     #
             'cpanm',
             '--with-feature', ( $MSWIN ? 'windows' : 'linux' ),
             ( $self->devel      ? '--with-develop'    : () ),
@@ -106,22 +102,17 @@ sub _deps ($self) {
 
 sub _build ($self) {
     eval {
-        P->file->find(
-            $self->dist->root . 'lib/',
-            abs => 1,
-            dir => 0,
-            sub ($file) {
-                if ( $file->suffix eq 'PL' ) {
-                    my $res = P->sys->run_proc( [ $^X, $file, $file->dirname . $file->filename_base ] );
+        for my $file ( ( P->path1( $self->dist->root . 'lib' )->read_dir( max_depth => 0, abs => 1, is_dir => 0 ) // [] )->@* ) {
+            if ( $file =~ /[.]PL\z/sm ) {
+                my $res = P->sys->run_proc( [ $^X, $file, $file =~ s/[.]PL\z//smr ] );
 
-                    if ( !$res ) {
-                        say qq["$file" return ] . $res;
+                if ( !$res ) {
+                    say qq["$file" return ] . $res;
 
-                        die;
-                    }
+                    die;
                 }
             }
-        );
+        }
     };
 
     return $@ ? 0 : 1;
@@ -204,11 +195,11 @@ SH
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 108                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 104                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 132, 149, 154, 175   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 123, 140, 145, 166   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 163                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 154                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

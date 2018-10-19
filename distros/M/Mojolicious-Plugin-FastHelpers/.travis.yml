@@ -1,0 +1,16 @@
+language: perl
+sudo: false
+perl:
+  - "5.26"
+  - "5.20"
+  - "5.14"
+  - "5.10"
+services:
+  - redis-server
+env:
+  - "HARNESS_OPTIONS=j3"
+install:
+  - "cpanm -n Test::Pod Test::Pod::Coverage"
+  - "cpanm -n --installdeps ."
+notifications:
+  email: false

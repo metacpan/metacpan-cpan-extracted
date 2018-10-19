@@ -1,26 +1,26 @@
 ---
-name: Acme-Text-Rhombus
-version: 0.19
+abstract: 'Draw a rhombus with letters'
 author:
   - 'Steven Schubiger <schubiger@cpan.org>'
-abstract: Draw a rhombus with letters
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
 build_requires:
-  Test::More: 0
-requires:
-  Exporter: 0
-recommends:
-  Test::Pod: 1.14
-  Test::Pod::Coverage: 1.04
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.34
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Text-Rhombus
 provides:
   Acme::Text::Rhombus:
     file: lib/Acme/Text/Rhombus.pm
-    version: 0.19
-generated_by: Module::Build version 0.34
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+    version: '0.20'
+requires:
+  Exporter: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/stsc/Acme-Text-Rhombus
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

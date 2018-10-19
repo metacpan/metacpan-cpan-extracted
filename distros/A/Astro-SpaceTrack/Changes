@@ -1,3 +1,21 @@
+0.120		2018-10-17	T. R. Wyant
+    RT 127371 Dependency problem when bulding with Module::Build.
+    Thanks to Slaven Rezic for finding this (unlike many dependency
+    problems it does NOT manifest when run against a base Perl
+    installation) and reporting it in such detail that all I had to do
+    was pick an implementation. CPAN TESTERS RULE!
+
+    Add Celestrak catalogs 'active' and 'analyst'. 'Active' seems to be
+    satellites actually in service, based on correlating this list with
+    the Iridium status list. 'Analyst' seems not to be real satellites,
+    and may be pathological test cases.
+
+    Update canned status table for decay of
+
+    - Iridium 15
+    - Iridium 56
+    - Iridium 70
+
 0.119		2018-10-08	T. R. Wyant
     Update canned status table for decay of
 

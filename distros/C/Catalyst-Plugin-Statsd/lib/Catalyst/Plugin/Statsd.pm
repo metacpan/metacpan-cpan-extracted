@@ -7,10 +7,27 @@ use v5.8;
 use Moose::Role;
 
 use POSIX qw/ ceil /;
+use Ref::Util qw/ is_plain_arrayref /;
+
+# RECOMMEND PREREQ: Ref::Util::XS
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.1';
+requires 'finalize';
+
+our $VERSION = 'v0.2.0';
+
+
+sub statsd_metric_name_filter {
+    my ($c, $stat) = @_;
+
+    return "$stat" unless is_plain_arrayref($stat);
+
+    my $metric = "catalyst.stats." . $stat->[1] . ".time";
+    $metric =~ s/\W+/./g;
+
+    return $metric;
+}
 
 around finalize => sub {
     my ( $next, $c ) = @_;
@@ -18,17 +35,16 @@ around finalize => sub {
     if ( my $client = $c->req->env->{'psgix.monitor.statsd'} ) {
         if ( $c->use_stats ) {
 
-            my $elapsed = $c->stats->elapsed;
+            my $stat = [ -1, "catalyst.response.time", $c->stats->elapsed ];
+            my $metric = $c->statsd_metric_name_filter($stat) or next;
 
             $client->timing_ms( "catalyst.response.time",
-                ceil( $elapsed * 1000 ) );
+                ceil( $stat->[2] * 1000 ) );
 
             foreach my $stat ( $c->stats->report ) {
 
-                my $metric = "catalyst.stats." . $stat->[1] . ".time";
+                my $metric = $c->statsd_metric_name_filter($stat) or next;
                 my $timing = ceil( $stat->[2] * 1000 );
-
-                $metric =~ s/\W+/./g;
 
                 $client->timing_ms( $metric, $timing );
 
@@ -56,7 +72,7 @@ Catalyst::Plugin::Statsd - log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.1.1
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -79,6 +95,37 @@ version v0.1.1
 =head1 DESCRIPTION
 
 This plugin will log L<Catalyst> timing statistics to statsd.
+
+=head1 METHODS
+
+=head2 C<statsd_metric_name_filter>
+
+  $c->statsd_metric_name_filter( $stat_or_name );
+
+This method returns the name to be used for logging stats, or C<undef>
+if the metric should be ignored.
+
+If it is passed a non-arrayref, then it will stringify the argument
+and return that.
+
+If it is passed an array reference, then it assumes the argument comes
+from L<Catalyst::Stats> report and is converted into a suitable metric
+name.
+
+You can override or modify this method to filter out which metrics you
+want logged, or to change the names of the metrics.
+
+=head1 METRICS
+
+=head2 C<catalyst.response.time>
+
+This logs the Catalyst reponse time that is normally reported by
+Catalyst.  However, it is probably unnecessary since
+L<Plack::Middleware::Statsd> also logs response times.
+
+=head2 C<catalyst.stats.*.time>
+
+These are metrics generated from L<Catalyst::Stats>.
 
 =head1 KNOWN ISSUES
 

@@ -6,7 +6,10 @@
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
-      "StatsD"
+      "Catalyst",
+      "StatsD",
+      "metrics",
+      "monitoring"
    ],
    "license" : [
       "artistic_2"
@@ -41,10 +44,14 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Ref::Util::XS" : "0"
+         },
          "requires" : {
             "Catalyst::Runtime" : "0",
             "Moose::Role" : "0",
             "Plack::Middleware::Statsd" : "0",
+            "Ref::Util" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.8.0"
          }
@@ -61,7 +68,7 @@
             "Module::Metadata" : "0",
             "Moo" : "0",
             "Moose" : "0",
-            "Net::Statsd::Tiny" : "0",
+            "Net::Statsd::Tiny" : "v0.3.0",
             "Test::Log::Dispatch" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
@@ -72,7 +79,7 @@
    "provides" : {
       "Catalyst::Plugin::Statsd" : {
          "file" : "lib/Catalyst/Plugin/Statsd.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -86,7 +93,7 @@
          "web" : "https://github.com/robrwo/CatalystX-Statsd"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.2.0",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

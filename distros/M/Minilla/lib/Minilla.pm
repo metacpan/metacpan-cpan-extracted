@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.1.2");
+use version; our $VERSION = version->declare("v3.1.3");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -13,7 +13,7 @@ sub auto_install { $AUTO_INSTALL }
 1;
 __END__
 
-=for stopwords MINILLA .mailmap mimick XSUtil travis XSUtil.needs_compiler_cpp XSUtil.generate_xshelper_h XSUtil.cc_warnings DarkPAN minilla untracked UploadToCPAN circleci appveyor codecov gitter metacpan MBTiny
+=for stopwords MINILLA .mailmap mimick XSUtil travis XSUtil.needs_compiler_cpp XSUtil.generate_xshelper_h XSUtil.cc_warnings DarkPAN minilla untracked UploadToCPAN circleci appveyor codecov gitter metacpan MBTiny kritika
 
 =encoding utf8
 
@@ -255,9 +255,9 @@ See L<CPAN::Meta::Spec>.
 
 =item badges
 
-    badges = ['travis', 'circleci', 'appveyor', 'coveralls', 'codecov', 'gitter', 'metacpan']
+    badges = ['travis', 'circleci', 'appveyor', 'coveralls', 'codecov', 'gitter', 'metacpan', 'kritika']
 
-Embed badges image (e.g. Travis-CI) to README.md. It ought to be array and each elements must be service name. Now, supported services are only 'travis', 'circleci', 'appveyor', 'coveralls', 'codecov', 'gitter' and 'metacpan'.
+Embed badges image (e.g. Travis-CI) to README.md. It ought to be array and each elements must be service name. Now, supported services are only 'travis', 'circleci', 'appveyor', 'coveralls', 'codecov', 'gitter', 'metacpan' and 'kritika'.
 
 You can send additional parameters as required by your CI provider by including a
 query string along with your service name: e.g. C<travis?token=[YOUR_TOKEN_GOES_HERE]&branch=dev>

@@ -1,15 +1,15 @@
 {
   am_pm_abbreviated => [
-    "AM",
-    "PM",
+    "am",
+    "pm",
   ],
   available_formats => {
     Bh => "h B",
     Bhm => "h:mm B",
     Bhms => "h:mm:ss B",
     E => "ccc",
-    EBhm => "E h:mm B",
-    EBhms => "E h:mm:ss B",
+    EBhm => "E, h:mm B",
+    EBhms => "E, h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -129,7 +129,7 @@
     "Before Christ",
     "Anno Domini",
   ],
-  first_day_of_week => 7,
+  first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%d/%m/%y",
   glibc_datetime_format => "%a %d %b %Y %T %Z",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

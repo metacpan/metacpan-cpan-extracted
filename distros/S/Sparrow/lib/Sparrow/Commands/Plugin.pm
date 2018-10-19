@@ -10,8 +10,13 @@ use Sparrow::Misc;
 use Carp;
 use File::Basename;
 use JSON;
+
 use version;
+
 use Getopt::Long qw(GetOptionsFromArray);
+
+use Archive::Extract;
+use File::Path qw(rmtree);
 
 our @EXPORT = qw{
 
@@ -122,16 +127,22 @@ to overcome this ambiguity";
             if ($plg_v > $inst_v){
 
                 print "upgrading public\@$pid from version $inst_v to version $plg_v ...\n";
+                if ( -d sparrow_root()."/plugins/public/$pid" ){
+                  rmtree(sparrow_root()."/plugins/public/$pid") or die "can't remove dir: ".sparrow_root()."/plugins/public/$pid, error: $!";
+                }
+                mkdir(sparrow_root()."/plugins/public/$pid") or die "can't create dir: ".sparrow_root()."/plugins/public/$pid, error: $!";
 
-                execute_shell_command("rm -rf ".sparrow_root."/plugins/public/$pid");
+                my $data = get_http_resource( sparrow_hub_api_url()."/plugins/$pid-v$plg_v.tar.gz", agent => 'sparrow' );
+                my $plg_file = sparrow_root."/plugins/public/$pid/$pid-v$plg_v.tar.gz";
 
-                execute_shell_command("mkdir ".sparrow_root."/plugins/public/$pid");
+                open my $fh, ">:raw", $plg_file or die "can't open $plg_file to write";
+                print $fh $data;
+                close $fh;
 
-                execute_shell_command("curl -H 'Agent: sparrow' -k -s -w 'Download %{url_effective} --- %{http_code}' -f -o ".
-                sparrow_root."/plugins/public/$pid/$pid-v$plg_v.tar.gz ".
-                sparrow_hub_api_url()."/plugins/$pid-v$plg_v.tar.gz && echo");
-
-                execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && tar -xzf $pid-v$plg_v.tar.gz");
+                print "\n";
+          
+                Archive::Extract->new( archive => $plg_file )->extract( to => sparrow_root()."/plugins/public/$pid" ) 
+                or die "can't extract file $plg_file to ".sparrow_root()."/plugins/public/$pid, error: $!";
 
                 if ( -f sparrow_root."/plugins/public/$pid/cpanfile" ){
                   execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && carton install");
@@ -182,15 +193,22 @@ to overcome this ambiguity";
             
             print "installing public\@$pid version $v ...\n";
 
-            execute_shell_command("rm -rf ".sparrow_root."/plugins/public/$pid");
+            if ( -d sparrow_root()."/plugins/public/$pid" ){
+              rmtree(sparrow_root()."/plugins/public/$pid") or die "can't remove dir: ".sparrow_root()."/plugins/public/$pid, error: $!";
+            }
+            mkdir(sparrow_root()."/plugins/public/$pid") or die "can't create dir: ".sparrow_root()."/plugins/public/$pid, error: $!";
 
-            execute_shell_command("mkdir ".sparrow_root."/plugins/public/$pid");
+            my $data = get_http_resource( sparrow_hub_api_url()."/plugins/$pid-v$vn.tar.gz", agent => 'sparrow' );
+            my $plg_file = sparrow_root."/plugins/public/$pid/$pid-v$vn.tar.gz";
 
-            execute_shell_command("curl -H 'Agent: sparrow' -k -s -w 'Download %{url_effective} --- %{http_code}' -f -o".
-            sparrow_root."/plugins/public/$pid/$pid-v$vn.tar.gz ".
-            sparrow_hub_api_url()."/plugins/$pid-v$vn.tar.gz && echo");
+            open my $fh, ">:raw", $plg_file or die "can't open $plg_file to write";
+            print $fh $data;
+            close $fh;
 
-            execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && tar -xzf $pid-v$vn.tar.gz");
+            print "\n";
+
+            Archive::Extract->new( archive => $plg_file )->extract( to => sparrow_root()."/plugins/public/$pid" )
+            or die "can't extract file $plg_file to ".sparrow_root()."/plugins/public/$pid, error: $!";
 
             if ( -f sparrow_root."/plugins/public/$pid/cpanfile" ){
                 execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && carton install");
@@ -221,7 +239,7 @@ to overcome this ambiguity";
         if ( -d sparrow_root."/plugins/private/$pid" ){
 
             execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && git pull");
-            execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && git config credential.helper 'cache --timeout=3000000'");                
+            execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && git config credential.helper 'cache --timeout=3000000'");
 
             if ( -f sparrow_root."/plugins/private/$pid/cpanfile" ){
                 execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && carton install");
@@ -373,10 +391,23 @@ to overcome this ambiguity";
       };
 
     }
-    my $cmd = "cd $pdir && export PATH=\$PATH:\$PWD/local/bin && export PERL5LIB=\$PWD/local/lib/perl5:\$PERL5LIB && export PYTHONPATH=\$PWD/python-lib:\$PYTHONPATH && ";
+
+    my $cmd;
+
+	  if ($^O  =~ 'MSWin') {
+      $cmd = "cd $pdir && set PATH=%PATH%;%cd%/local/bin && set PERL5LIB=%cd%/local/lib/perl5;\%PERL5LIB% && set PYTHONPATH=%cd%/python-lib;%PYTHONPATH% && ";
+    } else {
+      $cmd = "cd $pdir && export PATH=\$PATH:\$PWD/local/bin && export PERL5LIB=\$PWD/local/lib/perl5:\$PERL5LIB && export PYTHONPATH=\$PWD/python-lib:\$PYTHONPATH && ";
+    }
 
     if ($spj->{plugin_type} eq 'outthentic'){
-      $cmd.="  strun --root ./ --task '[plg] $pid'";
+
+  	  if ($^O  =~ 'MSWin') {
+        $cmd.="  strun --root ./ --task \"[plg] $pid\"";
+      } else {
+        $cmd.="  strun --root ./ --task '[plg] $pid'";
+      }
+
     }elsif ( $spj->{plugin_type} eq 'swat' ) {
       $cmd.="  swat ./ ";
     }else{
@@ -413,7 +444,12 @@ to overcome this ambiguity";
       print "\n";
     }
 
-    exec $cmd;
+	if ($^O  =~ 'MSWin') {
+		system($cmd) == 0 or "die $!";
+	} else {
+		exec $cmd;
+	}	
+    
 }
 
 sub show_plugin {
@@ -514,13 +550,13 @@ sub remove_plugin {
 
     if (-d sparrow_root."/plugins/public/$pid" and $ptype ne 'private' ){
         print "removing public\@$pid ...\n";
-        execute_shell_command("rm -rf ".sparrow_root."/plugins/public/$pid/");
+        rmtree(sparrow_root()."/plugins/public/$pid") or die "can't remove dir: ".sparrow_root()."/plugins/public/$pid, error: $!";
         $rm_cnt++;
     }
 
     if (-d sparrow_root."/plugins/private/$pid" and $ptype ne 'public' ){
         print "removing private\@$pid ...\n";
-        execute_shell_command("rm -rf ".sparrow_root."/plugins/private/$pid/");
+        rmtree(sparrow_root()."/plugins/private/$pid") or die "can't remove dir: ".sparrow_root()."/plugins/private/$pid, error: $!";
         $rm_cnt++;
     }
 
@@ -627,8 +663,9 @@ sub upload_plugin {
     print "sparrow.json file validated ... \n";
 
     execute_shell_command('tar --exclude=local --exclude=*.log  --exclude=log --exclude Gemfile.lock --exclude local/  --exclude-vcs -zcf /tmp/archive.tar.gz .' );
+    my $unsecure_flag = $ENV{SPARROW_UNSECURE} ? "-k" : "";
     execute_shell_command(
-        "curl -H 'sparrow-user: $cred->{user}' " .
+        "curl $unsecure_flag -H 'sparrow-user: $cred->{user}' " .
         "-H 'sparrow-token: $cred->{token}' " .
         '-f -X POST '.sparrow_hub_api_url().'/api/v1/upload -F archive=@/tmp/archive.tar.gz',
         silent => 1,

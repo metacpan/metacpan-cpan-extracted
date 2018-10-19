@@ -1,7 +1,30 @@
 Revision history for Catalyst-Plugin-Statsd.
 
+v0.2.0    2018-10-18 23:14:52+01:00 Europe/London
+  [Enhancements]
+  - Added statsd_metric_name_filter method to filter/munge metric
+    names.
+
+  [Documentation]
+  - Added note about metrics logged.
+
+  - Reorganised POD within the module.
+
+  [Other]
+  - Explicitly require finalze method.
+
+v0.1.2    2018-10-18 21:06:39+01:00 Europe/London
+  [Documentation]
+  - Amended Changes file.
+
+  [Tests]
+  - Specify a minimum version of Net::Statsd::Tiny.
+
+  [Other]
+  - Updated metadata keywords.
+
 v0.1.1    2018-10-17 09:55:46+01:00 Europe/London
   - Renamed distribution to make PAUSE happy.
 
 v0.1.0    2018-10-16 22:36:52+01:00 Europe/London
-  - Initial release.
+  - Initial release as CatalystX-Statsd.

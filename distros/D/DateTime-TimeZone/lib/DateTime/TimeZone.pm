@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 use DateTime::TimeZone::Catalog;
 use DateTime::TimeZone::Floating;
@@ -602,7 +602,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.19
+version 2.20
 
 =head1 SYNOPSIS
 
@@ -684,13 +684,28 @@ zone.
 
 =item * L<DateTime::TimeZone::Local::Unix>
 
+=item * L<DateTime::TimeZone::Local::Android>
+
+=item * L<DateTime::TimeZone::Local::hpux>
+
 =item * L<DateTime::TimeZone::Local::Win32>
 
 =item * L<DateTime::TimeZone::Local::VMS>
 
 =back
 
-If a local time zone is not found, then an exception will be thrown.
+If a local time zone is not found, then an exception will be thrown. This
+exception will always stringify to something containing the text C<"Cannot
+determine local time zone">.
+
+If you are writing code for users to run on systems you do not control, you
+should try to account for the possibility that this exception may be
+thrown. Falling back to UTC might be a reasonable alternative.
+
+When writing tests for your modules that might be run on others' systems, you
+are strongly encouraged to either not use C<local> when creating L<DateTime>
+objects or to set C<$ENV{TZ}> to a known value in your test code. All of the
+per-OS classes check this environment variable.
 
 =head2 $tz->offset_for_datetime( $dt )
 
@@ -921,7 +936,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Molchanov Alfie John Bron Gondwana Daisuke Maki David Pinkowitz Iain Truskett Jakub Wilk Joshua Hoblitt Karen Etheridge karupanerura Olaf Alders Peter Rabbitson Tom Wyant
+=for stopwords Alexey Molchanov Alfie John Bron Gondwana Daisuke Maki David Pinkowitz Iain Truskett Jakub Wilk James E Keenan Joshua Hoblitt Karen Etheridge karupanerura Olaf Alders Peter Rabbitson Tom Wyant
 
 =over 4
 
@@ -952,6 +967,10 @@ Iain Truskett <deceased>
 =item *
 
 Jakub Wilk <jwilk@jwilk.net>
+
+=item *
+
+James E Keenan <jkeenan@cpan.org>
 
 =item *
 

@@ -8,10 +8,10 @@ use warnings;
 use parent qw{ Astro::App::Satpass2::FormatTime };
 
 use Astro::App::Satpass2::FormatTime::Strftime;
-use Astro::App::Satpass2::Utils qw{ ARRAY_REF };
+use Astro::App::Satpass2::Utils qw{ ARRAY_REF @CARP_NOT };
 use POSIX ();
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 sub format_datetime {
     my ( $self, $tplt, $time, $gmt ) = @_;

@@ -26,7 +26,7 @@ sub forward_event ( $self, $ev ) {
         # init template
         $self->{_tmpl} = P->tmpl;
 
-        $self->{_tmpl}->cache_string_tmpl( message => \"$self->{tmpl}$LF" );
+        $self->{_tmpl}->add_tmpl( message => "$self->{tmpl}$LF" );
 
         # init path
         if ( $self->{uri}->path->is_abs ) {

@@ -128,7 +128,7 @@
     "avant J\N{U+00e9}sus-Christ",
     "apr\N{U+00e8}s J\N{U+00e9}sus-Christ",
   ],
-  first_day_of_week => 6,
+  first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%m/%d/%y",
   glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 33,
+  version => 34,
 }

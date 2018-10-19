@@ -83,7 +83,6 @@ sub _run_thread ($self) {
 
     my $coro = Coro::async_pool {
         while () {
-          REDO:
             last if !defined $self;
 
             if ( my $task = shift $self->{_queue}->@* ) {
@@ -91,7 +90,7 @@ sub _run_thread ($self) {
 
                 $task->{cb}->($res) if $task->{cb};
 
-                goto REDO;
+                next;
             }
 
             $self->{_signal}->wait;
@@ -494,28 +493,42 @@ XML
     return $self->_req($args);
 }
 
-sub sync ( $self, $libs, @args ) {
-    my %args = (
-        prefix => undef,    # must be relative
-        @args
-    );
-
-    $args{prefix} //= '';
-
+sub sync ( $self, $roots, $locations ) {
     my $tree = Pcore::Util::File::Tree->new;
 
-    my ( $error, $stat );
-
     # load libs, add files
-    for my $lib ( $libs->@* ) {
-        P->class->load( $lib =~ s/-/::/smgr );
+    for my $path ( $roots->@* ) {
+        for my $location ( sort { length $a <=> length $b } keys $locations->%* ) {
 
-        my $storage = $ENV->{share}->get_storage( $lib, 'www' );
-
-        $tree->add_dir( "$storage/$args{prefix}", "/$args{prefix}" ) if -d "$storage/$args{prefix}";
+            $tree->add_dir( "$path/$location", $location, $locations->{$location} ? { 'Cache-Control' => $locations->{$location} } : () ) if -d "$path/$location";
+        }
     }
 
-    my $remote_files = $self->get_all_bucket_content( prefix => $args{prefix} )->{data};
+    my $remote_files;
+
+    # get remote files
+    {
+        my $cv = P->cv->begin;
+
+        for my $location ( keys $locations->%* ) {
+            $cv->begin;
+
+            $self->get_all_bucket_content(
+                prefix => $location =~ s[\A/][]smr,
+                sub ($res) {
+                    $remote_files->@{ keys $res->{data}->%* } = values $res->{data}->%*;
+
+                    $cv->end;
+
+                    return;
+                }
+            );
+        }
+
+        $cv->end->recv;
+    }
+
+    my ( $error, $stat );
 
     # upload
     if ( $tree->{files}->%* ) {
@@ -532,7 +545,7 @@ sub sync ( $self, $libs, @args ) {
             $self->upload(
                 $file->{path},
                 $file->content,
-                cache => 'public, max-age=30672000',
+                cache => $file->{meta}->{'Cache-Control'},
                 etag  => exists $remote_files->{ $file->{path} } ? $remote_files->{ $file->{path} }->{etag} : undef,
                 sub ($res) {
                     $error++ if !$res && $res != 304;
@@ -591,8 +604,8 @@ sub sync ( $self, $libs, @args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 115, 242, 243, 244,  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |      | 245, 503             |                                                                                                                |
+## |    2 | 114, 241, 242, 243,  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |      | 244                  |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

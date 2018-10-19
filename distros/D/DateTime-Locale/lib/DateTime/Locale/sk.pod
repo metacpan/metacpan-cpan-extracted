@@ -639,29 +639,29 @@ Slovak locale.
    1995-12-22T09:05:02 = 4. štvrťrok 1995
   -0010-09-15T04:44:23 = 3. štvrťrok -10
 
-=head3 yw-count-few (w. 'týždeň' 'v' 'roku' Y)
+=head3 yw-count-few (w. 'týždeň' 'roka' Y)
 
-   2008-02-05T18:30:30 = 6. týždeň v roku 2008
-   1995-12-22T09:05:02 = 51. týždeň v roku 1995
-  -0010-09-15T04:44:23 = 37. týždeň v roku -10
+   2008-02-05T18:30:30 = 6. týždeň roka 2008
+   1995-12-22T09:05:02 = 51. týždeň roka 1995
+  -0010-09-15T04:44:23 = 37. týždeň roka -10
 
-=head3 yw-count-many (w. 'týždeň' 'v' 'roku' Y)
+=head3 yw-count-many (w. 'týždeň' 'roka' Y)
 
-   2008-02-05T18:30:30 = 6. týždeň v roku 2008
-   1995-12-22T09:05:02 = 51. týždeň v roku 1995
-  -0010-09-15T04:44:23 = 37. týždeň v roku -10
+   2008-02-05T18:30:30 = 6. týždeň roka 2008
+   1995-12-22T09:05:02 = 51. týždeň roka 1995
+  -0010-09-15T04:44:23 = 37. týždeň roka -10
 
-=head3 yw-count-one (w. 'týždeň' 'v' 'roku' Y)
+=head3 yw-count-one (w. 'týždeň' 'roka' Y)
 
-   2008-02-05T18:30:30 = 6. týždeň v roku 2008
-   1995-12-22T09:05:02 = 51. týždeň v roku 1995
-  -0010-09-15T04:44:23 = 37. týždeň v roku -10
+   2008-02-05T18:30:30 = 6. týždeň roka 2008
+   1995-12-22T09:05:02 = 51. týždeň roka 1995
+  -0010-09-15T04:44:23 = 37. týždeň roka -10
 
-=head3 yw-count-other (w. 'týždeň' 'v' 'roku' Y)
+=head3 yw-count-other (w. 'týždeň' 'roka' Y)
 
-   2008-02-05T18:30:30 = 6. týždeň v roku 2008
-   1995-12-22T09:05:02 = 51. týždeň v roku 1995
-  -0010-09-15T04:44:23 = 37. týždeň v roku -10
+   2008-02-05T18:30:30 = 6. týždeň roka 2008
+   1995-12-22T09:05:02 = 51. týždeň roka 1995
+  -0010-09-15T04:44:23 = 37. týždeň roka -10
 
 
 =head2 Miscellaneous

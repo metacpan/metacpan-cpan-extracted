@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.56",
+            "Mojolicious" : "8.03",
             "perl" : "5.010001"
          }
       }
@@ -54,6 +54,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "9.06",
+   "version" : "9.07",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

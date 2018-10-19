@@ -1,0 +1,22 @@
+.*~$
+.*\.(bak|old)$
+\.git/.*
+\.gitignore
+
+^Makefile$
+
+^blib/
+^pm_to_blib$
+
+Plack-Middleware-Statsd-.*\.tar\.gz
+Plack-Middleware-Statsd-v\d+\.\d+\.\d+/
+
+^MYMETA\.*
+
+# Travis-CI
+
+\.travis\.yml
+
+# Distzilla etc
+
+\.build/

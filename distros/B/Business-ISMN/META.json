@@ -54,6 +54,6 @@
          "web" : "https://github.com/briandfoy/business-ismn"
       }
    },
-   "version" : "1.132",
+   "version" : "1.201",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

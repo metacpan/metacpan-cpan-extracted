@@ -1,7 +1,7 @@
 package Perinci::Object::Function;
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '0.30'; # VERSION
+our $DATE = '2018-10-18'; # DATE
+our $VERSION = '0.310'; # VERSION
 
 use 5.010;
 use strict;
@@ -77,7 +77,7 @@ Perinci::Object::Function - Represent function metadata
 
 =head1 VERSION
 
-This document describes version 0.30 of Perinci::Object::Function (from Perl distribution Perinci-Object), released on 2017-02-03.
+This document describes version 0.310 of Perinci::Object::Function (from Perl distribution Perinci-Object), released on 2018-10-18.
 
 =head1 SYNOPSIS
 
@@ -159,7 +159,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,10 @@
 Revision history for API::Medium
 
-0.900     2016-06-26T16:18:00+0200
+0.901   2018-10-18T15:22:51
+    - Added missing prereq Module::Runtime as suggested by CPANTS. (Mohammad S Anwar)
+
+
+0.900   2016-06-26T16:18:00+0200
     - inital release from the Europen Perl Conference 2016
 
 

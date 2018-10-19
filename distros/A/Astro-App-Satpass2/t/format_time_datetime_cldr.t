@@ -22,37 +22,37 @@ BEGIN {
 
 use constant DATE_TIME_FORMAT => 'yyyy/MM/dd HH:mm:ss';
 
-class 'Astro::App::Satpass2::FormatTime::DateTime::Cldr';
+klass 'Astro::App::Satpass2::FormatTime::DateTime::Cldr';
 
-method 'new', INSTANTIATE, 'Instantiate';
+call_m 'new', INSTANTIATE, 'Instantiate';
 
-method gmt => 1, TRUE, 'Turn on gmt attribute';
+call_m gmt => 1, TRUE, 'Turn on gmt attribute';
 
-method 'gmt', 1, 'The gmt attribute is on';
+call_m 'gmt', 1, 'The gmt attribute is on';
 
 my $time = time_gm( 50, 0, 0, 1, 3, 2011 );	# 1-Apr-2011 00:00:50
 
-method format_datetime => DATE_TIME_FORMAT, $time,
+call_m format_datetime => DATE_TIME_FORMAT, $time,
     '2011/04/01 00:00:50', 'Implicit GMT time';
 
-method format_datetime_width => DATE_TIME_FORMAT, 19,
+call_m format_datetime_width => DATE_TIME_FORMAT, 19,
     'Compute width required for format';
 
-method gmt => 0, TRUE, 'Turn off gmt';
+call_m gmt => 0, TRUE, 'Turn off gmt';
 
-method format_datetime => DATE_TIME_FORMAT, $time, 1,
+call_m format_datetime => DATE_TIME_FORMAT, $time, 1,
     '2011/04/01 00:00:50', 'Explicit GMT time';
 
-method round_time => 60, TRUE, 'Round to nearest minute';
+call_m round_time => 60, TRUE, 'Round to nearest minute';
 
-method format_datetime => DATE_TIME_FORMAT, $time, 1,
+call_m format_datetime => DATE_TIME_FORMAT, $time, 1,
     '2011/04/01 00:01:00', 'Explicit GMT time, rounded to minute';
 
 SKIP: {
     check_datetime_timezone_local
 	or skip 'Cannot determine local time zone', 1;
 
-    method format_datetime => q<'%{calendar_name}'>, 1,
+    call_m format_datetime => q<'%{calendar_name}'>, 1,
 	'Gregorian', 'Calendar name';
 }
 
@@ -63,7 +63,7 @@ SKIP: {
 
     load_or_skip $back_end, $tests;
 
-    method 'new', back_end => $back_end, gmt => 1, INSTANTIATE, 'Instantiate';
+    call_m 'new', back_end => $back_end, gmt => 1, INSTANTIATE, 'Instantiate';
 
     SKIP: {
 
@@ -77,7 +77,7 @@ SKIP: {
 	$dt->is_julian()
 	    or skip 'DateTime::Calendar::Christian thinks date is not Julian', $tests;
 
-	method format_datetime =>
+	call_m format_datetime =>
 	    q<'%{year_with_christian_era:06}'-MM-dd '%{calendar_name:t3}'>,
 	    $dt->epoch(), '0044BC-03-15 Jul',
 	    'Method and Julian calendar name';

@@ -1,0 +1,50 @@
+{
+   "abstract" : "query the Symbol-table for methods (subroutines) defined in a class (package) and its parents.",
+   "author" : [
+      "Christoph Lamprecht <lamprecht@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-PerlMethodList",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "1.01",
+            "Class::Inspector" : "1.17",
+            "Devel::Peek" : "0.96",
+            "File::Slurp" : "9999.08",
+            "MRO::Compat" : "0.02",
+            "Tk" : "8.4",
+            "Tk::LabEntry" : "4.006",
+            "Tk::NumEntry" : "2.06",
+            "Tk::ROText" : "4.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.08,
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

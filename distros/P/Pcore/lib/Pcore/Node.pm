@@ -754,23 +754,24 @@ sub import {
         my ( $self, $type ) = @_;
 
         # read and unpack boot args from STDIN
-        my $RPC_BOOT_ARGS = <>;
+        my $BOOT_ARGS = <>;
 
-        chomp $RPC_BOOT_ARGS;
+        chomp $BOOT_ARGS;
 
         require CBOR::XS;
 
-        $RPC_BOOT_ARGS = CBOR::XS::decode_cbor( pack 'H*', $RPC_BOOT_ARGS );
+        $BOOT_ARGS = CBOR::XS::decode_cbor( pack 'H*', $BOOT_ARGS );
 
         # init RPC environment
-        $Pcore::SCRIPT_PATH = $RPC_BOOT_ARGS->{script_path};
-        $main::VERSION      = version->new( $RPC_BOOT_ARGS->{version} );
+        $Pcore::SCRIPT_PATH = $BOOT_ARGS->{script_path};
+        $main::VERSION      = version->new( $BOOT_ARGS->{version} );
+        $ENV->set_scandeps( $BOOT_ARGS->{scandeps} );
 
         require Pcore::Node::Node;
 
         require $type =~ s[::][/]smgr . '.pm';
 
-        Pcore::Node::Node::run( $type, $RPC_BOOT_ARGS );
+        Pcore::Node::Node::run( $type, $BOOT_ARGS );
 
         exit;
     }

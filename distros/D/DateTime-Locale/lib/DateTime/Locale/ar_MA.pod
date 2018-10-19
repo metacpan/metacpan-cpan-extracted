@@ -690,7 +690,7 @@ Yes
 
 =head3 Local first day of the week
 
-6 (السبت)
+1 (الاثنين)
 
 =head1 SUPPORT
 

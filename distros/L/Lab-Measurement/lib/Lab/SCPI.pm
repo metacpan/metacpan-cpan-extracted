@@ -1,6 +1,6 @@
 package Lab::SCPI;
 #ABSTRACT: Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and parameters against keywords
-$Lab::SCPI::VERSION = '3.663';
+$Lab::SCPI::VERSION = '3.664';
 use 5.010;
 use warnings;
 no warnings 'recursion';
@@ -570,7 +570,7 @@ Lab::SCPI - Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and paramet
 
 =head1 VERSION
 
-version 3.663
+version 3.664
 
 =head1 Interface
 

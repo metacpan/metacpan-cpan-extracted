@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use Mouse::Role;
 use Text::CSV::Encoded;
@@ -251,15 +251,13 @@ my %row_makers = (
         my $dbxref_details = $chado_data->get_dbxref_by_termid($id);
 
         if (!defined $dbxref_details) {
-          use Data::Dumper;
-          die "$id: ", Dumper([$dbxref_details]);
+          die "no dbxref details for $id";
         }
 
         my $dbxref_id = $dbxref_details->{dbxref_id};
 
         my $key = "$cvterm_id - $dbxref_id";
         if (exists $seen_cvterm_dbxrefs{$key}) {
-          use Data::Dumper;
           warn "not storing duplicate cvterm_dbxref for ", $dbxref_details->{termid};
           ()
         } else {

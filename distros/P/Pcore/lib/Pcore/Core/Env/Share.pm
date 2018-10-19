@@ -3,8 +3,8 @@ package Pcore::Core::Env::Share;
 use Pcore -class;
 use Pcore::Util::Scalar qw[is_plain_scalarref is_plain_arrayref is_plain_hashref];
 
-has _lib_idx  => ( is => 'ro', isa => HashRef,  init_arg => undef );
-has _lib_path => ( is => 'ro', isa => ArrayRef, init_arg => undef );
+has _lib_idx  => ( init_arg => undef );    # HashRef
+has _lib_path => ( init_arg => undef );    # ArrayRef
 
 sub register_lib ( $self, $name, $path ) {
     die qq[share lib "$name" already exists] if exists $self->{_lib_idx}->{$name};

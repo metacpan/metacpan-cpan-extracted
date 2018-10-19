@@ -27,9 +27,10 @@ my %WriteMakefileArgs = (
     "Mouse" => 0,
     "Number::Format" => "1.75",
     "Pod::Autopod" => "1.215",
-    "Time::Moment" => "0.44"
+    "Time::Moment" => "0.44",
+    "Time::Piece" => "1.33"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +49,8 @@ my %FallbackPrereqs = (
   "Mouse" => 0,
   "Number::Format" => "1.75",
   "Pod::Autopod" => "1.215",
-  "Time::Moment" => "0.44"
+  "Time::Moment" => "0.44",
+  "Time::Piece" => "1.33"
 );
 
 

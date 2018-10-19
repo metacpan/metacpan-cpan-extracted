@@ -1,0 +1,24 @@
+requires "Config::INI" => "0.025";
+requires "Data::Dump" => "1.23";
+requires "Date::Parse" => "2.30";
+requires "Dist::Zilla" => "6.012";
+requires "File::HomeDir" => "1.004";
+requires "Finance::GDAX::API" => "0.09";
+requires "FindBin" => "0";
+requires "List::Util" => "0";
+requires "Mouse" => "0";
+requires "Number::Format" => "1.75";
+requires "Pod::Autopod" => "1.215";
+requires "Time::Moment" => "0.44";
+requires "Time::Piece" => "1.33";
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Pod::Coverage::TrustPod" => "0";
+  requires "Test::Perl::Critic" => "0";
+  requires "Test::Pod" => "1.41";
+  requires "Test::Pod::Coverage" => "1.08";
+};

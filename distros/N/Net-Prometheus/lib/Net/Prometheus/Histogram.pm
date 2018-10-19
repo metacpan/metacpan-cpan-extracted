@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
 package Net::Prometheus::Histogram;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Net::Prometheus::Metric );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 use List::Util 1.33 qw( any );
@@ -73,7 +73,7 @@ L<Net::Prometheus::Metric>, and additionally the following:
 
 =item buckets => ARRAY
 
-A reference to an ARRAY containing numerical lower bounds for the buckets.
+A reference to an ARRAY containing numerical upper bounds for the buckets.
 
 =back
 
@@ -114,7 +114,7 @@ sub new
    $child->observe( $value )
 
 Increment the histogram sum by the given value, and each bucket count by 1
-where the value is less than or equal to the bucket lower bound.
+where the value is less than or equal to the bucket upper bound.
 
 =cut
 

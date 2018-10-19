@@ -1,0 +1,15 @@
+# config-file-type: JSON 1
+
+{
+   "gapi" : {
+      "client_id" : "569010884348-rjhbviv3j648hknil7vbjpttor8u3pmf.apps.googleusercontent.com",
+      "client_secret" : "gAz6d16c-JC32TMlFXr2tDPr",
+      "scopes" : "email profile https://www.googleapis.com/auth/plus.profile.emails.read https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/contacts.readonly https://mail.google.com https://www.googleapis.com/auth/plus.business.manage https://www.googleapis.com/auth/cloud-platform",
+      "tokens" : {
+         "peter@shotgundriver.com" : {
+            "access_token" : "ya29.Gls5BvSBVHFJZYnhfZXNmAlxkrN7wxUvenfc4IRo-4ii4nNTA1ao8DcaC8lIpLq_ZxcAw0O160jn3JFtVc9MF3nTiNtAhokSwMn95YRIhghLRixt44vS8ztYgTib",
+            "refresh_token" : "1/EOcItHSrb-R92x_hJYPjFrI_E2gf7dWCMfyqzrZmGdt_F7iBxau85nYj0i36URlm"
+         }
+      }
+   }
+}

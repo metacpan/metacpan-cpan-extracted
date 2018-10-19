@@ -96,7 +96,8 @@ sub go
     my @files = glob('*');
     if ( @files != 1 )
     {
-      die 'Could not find perl to configure';
+      die qq{Could not find perl to configure.}
+        . qq{Inflated to "$src_dir" extracted from $src_tz};
     }
     chdir $files[0];
   }

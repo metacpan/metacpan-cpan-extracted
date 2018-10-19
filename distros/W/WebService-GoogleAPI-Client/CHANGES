@@ -1,10 +1,81 @@
 ==================================================
-Changes from 2018-10-03 00:00:00 +0000 to present.
+Changes from 2018-10-04 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.10 at 2018-10-17 11:38:26 +0000
+version 0.11 at 2018-10-18 11:13:47 +0000
 -----------------------------------------
+
+  Change: b6e9fd8a63cc7e22df33e40e0f51848e740bcbce
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-18 21:09:07 +0000
+
+    version bump 0.11 and greater test coverage 
+
+  Change: e3947a77999e1f8ec7493e788a18044242950acc
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-18 17:21:12 +0000
+
+    cleanup generation of build tarball content 
+
+  Change: 4ececf8ad3ded34d512f55c14e511167edae318d
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-18 12:24:00 +0000
+
+    travis add perl versions 5.24 and 5.26 
+
+  Change: c949c6b8684007ba2466d5ed683e180d9e762b64
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-18 12:04:42 +0000
+
+    Bugfix on error seen in cpantesters - Experimental keys on scalar is
+    now forbidden
+
+    https://www.cpantesters.org/cpan/report/734db572-d205-11e8-9996-c50d7
+    3fb9d4e
+
+    Error: Experimental keys on scalar is now forbidden at
+    /tmp/loop_over_bdir-27006-2ErzFj/WebService-GoogleAPI-Client-0.10-0/b
+    lib/lib/WebService/GoogleAPI/Client.pm line 249. 
+
+  Change: 540be87192cdc2a58834aefb5c5569c503811baf
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-18 04:29:18 +0000
+
+    delete template.t as breaks travis 
+
+  Change: d60086093d61eddc17aedd407e72c05b052a76ed
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-18 04:22:49 +0000
+
+    coveralls badge
+
+    travis build is failing - not sure why as cannot see the log? 
+
+  Change: a8df615a2ba6d458850d143273c8f6d136914300
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-18 03:59:09 +0000
+
+    fix travis error in test template.t 
+
+  Change: e572f841db81d68cab5a3f3d6ae6c73216bf2418
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-18 03:52:59 +0000
+
+    Add travis.yml and badge to README.md 
+
+  Change: 866847427017fcae59e665d50b2b64c152bfd5f1
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-17 22:30:00 +0000
+
+    First source commit
+
+    I was developing this privately in the WebService::Google::Client
+    namespace but gave up trying to collaborate with the holder of the
+    cpan package space. Retaining it privately seemed like a waste and
+    was in some cases problematic so I settled on the new namespace and
+    pushed to cpan. I will clean up over the coming days and continue to
+    work on refining. 
 
   Change: 688706a43b97ee71bc2b1be9f3dd239db9cf479b
   Author: Peter Scott <peter@pscott.com.au>

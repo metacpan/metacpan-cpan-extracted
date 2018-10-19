@@ -4,7 +4,7 @@ package App::opan;
 
 use strictures 2;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.003001';
 
 use Dist::Metadata;
 use File::Open qw(fopen);
@@ -311,7 +311,7 @@ my $base_static = Mojolicious::Static->new(
   paths => [ 'pans' ]
 );
 
-foreach my $pan (qw(upstream nopin combined)) {
+foreach my $pan (qw(upstream nopin combined pinset custom)) {
   get "/${pan}/modules/02packages.details.txt" => sub {
     $base_static->dispatch($_[0]->stash(path => "${pan}/index"));
   };

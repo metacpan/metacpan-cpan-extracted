@@ -1,3 +1,12 @@
+0.005   2018-10-18 (PERLANCAR)
+
+	- Add subcommand: compare-versions.
+
+	- download & update: accept multiple software names/patterns.
+
+	- [Bugfix] Fix argument passing.
+
+
 0.004   2018-10-05 (PERLANCAR)
 
 	- Add subcommand: download-all.

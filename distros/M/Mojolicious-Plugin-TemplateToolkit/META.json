@@ -62,11 +62,11 @@
    "provides" : {
       "Mojolicious::Plugin::TemplateToolkit" : {
          "file" : "lib/Mojolicious/Plugin/TemplateToolkit.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Template::Provider::Mojo" : {
          "file" : "lib/Template/Provider/Mojo.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -276,7 +276,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.004",
+                  "tag" : "0.005",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },

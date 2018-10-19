@@ -14,18 +14,56 @@ use Getopt::Long 2.33;
 use Scalar::Util 1.26 qw{ blessed looks_like_number };
 use Text::ParseWords ();
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
+
+our @CARP_NOT = qw{
+    Astro::App::Satpass2
+    Astro::App::Satpass2::Copier
+    Astro::App::Satpass2::Format
+    Astro::App::Satpass2::Format::Dump
+    Astro::App::Satpass2::Format::Template
+    Astro::App::Satpass2::FormatTime
+    Astro::App::Satpass2::FormatTime::Cldr
+    Astro::App::Satpass2::FormatTime::DateTime
+    Astro::App::Satpass2::FormatTime::DateTime::Cldr
+    Astro::App::Satpass2::FormatTime::DateTime::Strftime
+    Astro::App::Satpass2::FormatTime::POSIX::Strftime
+    Astro::App::Satpass2::FormatTime::Strftime
+    Astro::App::Satpass2::FormatValue
+    Astro::App::Satpass2::FormatValue::Formatter
+    Astro::App::Satpass2::Geocode
+    Astro::App::Satpass2::Geocode::OSM
+    Astro::App::Satpass2::Locale
+    Astro::App::Satpass2::Locale::C
+    Astro::App::Satpass2::Macro
+    Astro::App::Satpass2::Macro::Code
+    Astro::App::Satpass2::Macro::Command
+    Astro::App::Satpass2::ParseTime
+    Astro::App::Satpass2::ParseTime::Code
+    Astro::App::Satpass2::ParseTime::Date::Manip
+    Astro::App::Satpass2::ParseTime::Date::Manip::v5
+    Astro::App::Satpass2::ParseTime::Date::Manip::v6
+    Astro::App::Satpass2::ParseTime::ISO8601
+    Astro::App::Satpass2::Utils
+    Astro::App::Satpass2::Warner
+    Astro::App::Satpass2::Wrap::Array
+};
 
 our @EXPORT_OK = qw{
     __arguments
     back_end
     __back_end_class_name_of_record
-    expand_tilde
+    expand_tilde find_package_pod
     has_method instance load_package merge_hashes my_dist_config quoter
     __date_manip_backend
     __parse_class_and_args
     ARRAY_REF CODE_REF HASH_REF REGEXP_REF SCALAR_REF
+    @CARP_NOT
 };
+
+our %EXPORT_TAGS = (
+    ref	=> [ grep { m/ _REF \z /smx } @EXPORT_OK ],
+);
 
 use constant ARRAY_REF	=> ref [];
 use constant CODE_REF	=> ref sub {};
@@ -176,6 +214,25 @@ sub expand_tilde {
 	    return $home_dir;
 	}
     }
+}
+
+sub find_package_pod {
+    my ( $pkg ) = @_;
+    ( my $fn = $pkg ) =~ s{ :: }{/}smxg;
+    foreach my $dir ( @INC ) {
+	defined $dir
+	    and not ref $dir
+	    and -d $dir
+	    and -x _
+	    or next;
+	foreach my $sfx ( qw{ pod pm } ) {
+	    my $path = "$dir/$fn.$sfx";
+	    -r $path
+		or next;
+	    return Cwd::abs_path( $path );
+	}
+    }
+    return;
 }
 
 sub _wail {
@@ -450,6 +507,18 @@ exception if the configuration directory does not exist.
 All that is required of the invocant is that it support the package's
 suite of error-reporting methods C<whinge()>, C<wail()>, and C<weep()>.
 
+=head2 find_package_pod
+
+ my $path = find_package_pod( $package_name );
+
+This subroutine finds the given package in C<@INC> and returns the path
+to its POD file. C<@INC> entries which are references are ignored.
+
+The code for this subroutine borrows heavily from Neil Bowers'
+L<Module::Path|Module::Path>. In fact, I would probably have used that
+module except for the need to find the F<.pod> file if it was separate
+from the F<.pm> file.
+
 =head2 has_method
 
  has_method( $object, $method );
@@ -627,29 +696,38 @@ L<Getopt::Long|Getopt::Long> encounters an error an exception is thrown.
 This is done using the invocant's C<wail()> method if it has one,
 otherwise C<Carp> is loaded and C<Carp::croak()> is called.
 
-=head2 CONSTANTS
+=head1 CONSTANTS
 
-This module supports the following exportable constants:
+This module supports the following exportable constants. You can export
+them all using tag C<':ref'>.
 
 =head2 ARRAY_REF
 
-This constant is simply C<ref []>, i.e. C<'ARRAY'>.
+This constant is simply C<ref []>.
 
 =head2 CODE_REF
 
-This constant is simply C<ref sub {}>, i.e. C<'CODE'>.
+This constant is simply C<ref sub {}>.
 
 =head2 HASH_REF
 
-This constant is simply C<ref {}>, i.e. C<'HASH'>.
+This constant is simply C<ref {}>.
 
 =head2 REGEXP_REF
 
-This constant is simply C<ref qr{}>, i.e. C<'Regexp'>.
+This constant is simply C<ref qr{}>.
 
 =head2 SCALAR_REF
 
-This constant is simply C<ref \1>, i.e. C<'SCALAR'>.
+This constant is simply C<ref \1>.
+
+=head1 GLOBALS
+
+This module exports the following globals:
+
+=head2 @CARP_NOT
+
+This global contains all modules in this package.
 
 =head1 SUPPORT
 

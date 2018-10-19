@@ -10,20 +10,20 @@ use My::Module::Test::App;
 
 use Astro::App::Satpass2::FormatTime;
 
-class 'Astro::App::Satpass2::FormatTime';
+klass 'Astro::App::Satpass2::FormatTime';
 
-method 'new', INSTANTIATE, 'Instantiate Astro::App::Satpass2::FormatTime';
+call_m 'new', INSTANTIATE, 'Instantiate Astro::App::Satpass2::FormatTime';
 
-method gmt => 1, TRUE, 'Turn on gmt';
+call_m gmt => 1, TRUE, 'Turn on gmt';
 
-method 'gmt', 1, 'Confirm gmt is on';
+call_m 'gmt', 1, 'Confirm gmt is on';
 
-method format_datetime_width => '', 0, 'Width of null template';
+call_m format_datetime_width => '', 0, 'Width of null template';
 
-method format_datetime_width => 'foo', 3,
+call_m format_datetime_width => 'foo', 3,
     'Width of constant template';
 
-method format_datetime_width => 'foo%%bar', 7,
+call_m format_datetime_width => 'foo%%bar', 7,
     'Width of template with literal percent';
 
 done_testing;

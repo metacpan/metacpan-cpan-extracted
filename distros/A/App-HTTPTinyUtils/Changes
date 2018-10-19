@@ -1,3 +1,8 @@
+0.003   2018-10-18 (PERLANCAR)
+
+	- Add utility: http-tiny-cache.
+
+
 0.002   2018-10-06 (PERLANCAR)
 
 	- http-tiny: Add summary (Abstract), enable logging.

@@ -24,7 +24,6 @@ my %WriteMakefileArgs = (
     "Clone" => 0,
     "DBI" => 0,
     "Data::Compare" => 0,
-    "Data::Dumper" => 0,
     "FileHandle" => 0,
     "Getopt::Long" => 0,
     "List::Compare" => 0,
@@ -39,11 +38,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
+    "Data::Dumper" => 0,
     "Test::Deep" => 0,
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.021",
+  "VERSION" => "0.022",
   "test" => {
     "TESTS" => "t/*.t"
   }

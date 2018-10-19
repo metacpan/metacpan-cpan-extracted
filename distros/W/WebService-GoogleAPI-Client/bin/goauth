@@ -4,7 +4,7 @@ use strict;
 use warnings;    ## required because I can't work out how to get percritic to use my modern config
 
 package goauth;
-$goauth::VERSION = '0.10';
+$goauth::VERSION = '0.11';
 
 # ABSTRACT: CLI tool with mini http server for negotiating Google OAuth2 Authorisation access tokens that allow offline access to Google API Services on behalf of the user.
 
@@ -230,7 +230,7 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head2 SUMMARY
 
@@ -279,7 +279,7 @@ If users exist across multiple gapi.json files for the same project then (I beli
 
 The user can revoke permissions granted to a project ( Application ) by visiting https://myaccount.google.com/permissions
 
-This file can be used to access Google API Services using the WebServices::Google::Client Google API Client Library.
+This file can be used to access Google API Services using the WebService::Google:API:Client Google API Client Library.
 
 =head2 References
 
@@ -303,7 +303,7 @@ Peter Scott <localshop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Pavel Serikov, Peter Scott and others.
+This software is Copyright (c) 2017-2018 by Peter Scott and others.
 
 This is free software, licensed under:
 

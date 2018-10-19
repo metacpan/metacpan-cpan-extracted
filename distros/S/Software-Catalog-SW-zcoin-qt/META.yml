@@ -17,6 +17,7 @@ meta-spec:
   version: '1.4'
 name: Software-Catalog-SW-zcoin-qt
 requires:
+  Log::ger: '0.023'
   PerlX::Maybe: '0'
   Role::Tiny::With: '0'
   Software::Catalog::Role::Software: v1.0.3
@@ -29,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Software-Catalog-SW-zcoin-qt
   homepage: https://metacpan.org/release/Software-Catalog-SW-zcoin-qt
   repository: git://github.com/perlancar/perl-Software-Catalog-SW-zcoin-qt.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

@@ -115,7 +115,7 @@ Indonesian locale.
   Mei
   Jun
   Jul
-  Agt
+  Agu
   Sep
   Okt
   Nov
@@ -161,7 +161,7 @@ Indonesian locale.
   Mei
   Jun
   Jul
-  Agt
+  Agu
   Sep
   Okt
   Nov

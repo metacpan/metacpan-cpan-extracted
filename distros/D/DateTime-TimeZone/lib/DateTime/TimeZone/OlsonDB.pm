@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 use DateTime::TimeZone::OlsonDB::Rule;
 use DateTime::TimeZone::OlsonDB::Zone;
@@ -243,8 +243,8 @@ sub utc_datetime_for_time_spec {
     $second = 0 unless defined $second;
 
     my $add_day = 0;
-    if ( $hour == 24 ) {
-        $hour    = 0;
+    if ( $hour >= 24 ) {
+        $hour    = $hour - 24;
         $add_day = 1;
     }
 
@@ -300,7 +300,7 @@ DateTime::TimeZone::OlsonDB - An object to represent an Olson time zone database
 
 =head1 VERSION
 
-version 2.19
+version 2.20
 
 =head1 SYNOPSIS
 

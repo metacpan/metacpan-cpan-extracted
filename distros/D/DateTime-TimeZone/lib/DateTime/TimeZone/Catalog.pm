@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 our @ALL =
 qw(
@@ -1897,7 +1897,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2018e' }
+sub OlsonVersion { '2018f' }
 
 
 1;
@@ -2245,10 +2245,10 @@ so that applications can easily present a list of timezones.
 
 =head3 Indian
 
-  Indian/Kerguelen
   Indian/Mahe
   Indian/Mauritius
   Indian/Reunion
+  Indian/Kerguelen
   Indian/Christmas
   Indian/Cocos
   Indian/Chagos
@@ -2650,6 +2650,10 @@ so that applications can easily present a list of timezones.
 =head3 Estonia (EE)
 
   Europe/Tallinn
+
+=head3 Eswatini (SZ)
+
+  Africa/Mbabane
 
 =head3 Ethiopia (ET)
 
@@ -3283,10 +3287,6 @@ so that applications can easily present a list of timezones.
 =head3 Svalbard and Jan Mayen (SJ)
 
   Arctic/Longyearbyen
-
-=head3 Swaziland (SZ)
-
-  Africa/Mbabane
 
 =head3 Sweden (SE)
 

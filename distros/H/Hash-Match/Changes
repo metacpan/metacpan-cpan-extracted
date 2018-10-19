@@ -1,5 +1,24 @@
 Revision history for Hash::Match
 
+v0.7.0    2018-10-19 17:16:55+01:00 Europe/London
+  [Enhancements]
+  - Uses Ref::Util for improved performance.
+
+  [Documentation]
+  - The POD is build with Pod::Weaver.
+
+  - Added INSTALL file to the distribution.
+
+  [Toolchain]
+  - Reorganised dist.ini to improve build process.
+
+  - Includes cpanfile for development.
+
+  [Other]
+  - Changed README to Markdown format.
+
+  - Removed dependency on version.
+
 v0.6.2    2017-12-08 08:49:54+00:00 Europe/London
 
         - Added missing test prereqs.

@@ -51,8 +51,17 @@ CONSTRUCTOR
 
       If present and true, this instance will not load the default process
       collector from Net::Prometheus::ProcessCollector. If absent or false,
-      such a collector will be loaded by default. This is usually what you
-      want.
+      such a collector will be loaded by default.
+
+    disable_perl_collector => BOOL
+
+      If present and true, this instance will not load perl-specific
+      collector from Net::Prometheus::PerlCollector. If absent or false
+      this collector is loaded if the module is installed and useable.
+
+      These two options are provided for testing purposes, or for specific
+      use-cases where such features are not required. Usually it's best
+      just to leave these enabled.
 
 METHODS
 
@@ -166,8 +175,6 @@ COLLECTORS
     more directly collect information to be exported.
 
 TODO
-
-      * Perl-specific variable collector - arena stats?
 
       * Split Registry out from toplevel instance.
 

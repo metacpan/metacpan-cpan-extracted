@@ -21,10 +21,6 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
-sub get_nginx_cfg ($self) {
-    return;
-}
-
 sub s3 ($self) {
     if ( !exists $self->{s3} ) {
         $self->{s3} = Pcore::API::S3->new( $self->%{qw[key secret bucket region endpoint service]} );
@@ -33,8 +29,12 @@ sub s3 ($self) {
     return $self->{s3};
 }
 
-sub write ( $self, $path, $data, @args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+sub upload ( $self, $path, $data, @args ) {
     return $self->s3->upload( $path, $data, @args );
+}
+
+sub sync ( $self, @args ) {
+    return $self->s3->sync(@args);
 }
 
 1;

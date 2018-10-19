@@ -6,7 +6,7 @@ use Mojo::Util qw(encode md5_sum);
 use Template;
 use Template::Provider::Mojo;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 sub register {
 	my ($self, $app, $conf) = @_;
@@ -28,12 +28,13 @@ sub register {
 		# Helpers
 		foreach my $method (grep { m/^\w+\z/ } keys %{$renderer->helpers}) {
 			my $sub = $renderer->helpers->{$method};
-			$params{$method} = sub { carp "Calling helpers directly in templates is deprecated. Use c.$method or c.helpers.$method"; $c->$sub(@_) };
+			$params{$method} = sub { carp "Calling helpers directly in templates is deprecated. Use c.$method or h.$method"; $c->$sub(@_) };
 		}
 		
 		# Stash values
 		$params{$_} = $c->stash->{$_} for grep { m/^\w+\z/ } keys %{$c->stash};
 		$params{self} = $params{c} = $c;
+		$params{h} = $c->helpers;
 		
 		# Inline
 		if (defined $inline) {
@@ -93,10 +94,10 @@ C<Template Toolkit> templates. See L<Template> and L<Template::Manual> for
 details on the C<Template Toolkit> format, and L<Mojolicious::Guides::Rendering>
 for general information on rendering in L<Mojolicious>.
 
-Along with standard template files, inline and data section templates can be
-rendered in the standard way. Template files and data sections will be
+Along with template files, inline and data section templates can be rendered in
+the standard Mojolicious fashion. Template files and data sections will be
 retrieved using L<Mojolicious::Renderer> via L<Template::Provider::Mojo> for
-both standard rendering and directives such as C<INCLUDE>. This means that
+both direct rendering and directives such as C<INCLUDE>. This means that
 instead of specifying L<INCLUDE_PATH|Template::Manual::Config/"INCLUDE_PATH">,
 you should set L<Mojolicious::Renderer/"paths"> to the appropriate paths.
 
@@ -107,12 +108,13 @@ L<Mojolicious> stash values will be exposed directly as
 L<variables|Template::Manual::Variables> in the templates, and the current
 controller object will be available as C<c> or C<self>, similar to
 L<Mojolicious::Plugin::EPRenderer>. Helper methods can be called on the
-controller object directly or via the C<helpers> method. See
+L<controller object|Mojolicious::Controller/"AUTOLOAD"> or a more efficient
+L<proxy object|Mojolicious::Controller/"helpers"> available as C<h>. See
 L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>
 for a list of all built-in helpers.
 
-Accessing helper methods directly as variables rather than via the controller
-object is deprecated and may be removed in a future release.
+Accessing helper methods directly as variables, rather than via the controller
+or proxy object, is deprecated and may be removed in a future release.
 
  $c->stash(description => 'template engine');
  $c->stash(engines => [qw(Template::Toolkit Text::Template)]);
@@ -121,7 +123,7 @@ object is deprecated and may be removed in a future release.
    [% engine %] is a [% description %].
  [% END %]
  
- [% c.helpers.link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
+ [% h.link_to('Template Toolkit', 'http://www.template-toolkit.org') %]
  
  [% c.param('foo') %]
 
