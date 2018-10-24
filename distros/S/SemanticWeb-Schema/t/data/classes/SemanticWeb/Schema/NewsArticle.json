@@ -1,18 +1,18 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources2:TP-draws",
-         "schemadotorgsources:source_rNews"
+         "schemadotorgsources2:source_rNews",
+         "schemadotorgsources:TP-draws"
       ],
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A NewsArticle is an article whose content reports news, or provides background context and supporting materials for understanding the news.</p>\n\n<p>A more detailed overview of <a href=\"/docs/news.html\">schema.org News markup</a> is also available.",
+      "rdfs:comment" : "A NewsArticle is an article whose content reports news, or provides background context and supporting materials for understanding the news.<br/><br/>\n\nA more detailed overview of <a href=\"/docs/news.html\">schema.org News markup</a> is also available.",
       "rdfs:label" : "NewsArticle",
       "rdfs:subClassOf" : "schema:Article"
    },
    "properties" : {
       "schema:dateline" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A <a href=\"https://en.wikipedia.org/wiki/Dateline\">dateline</a> is a brief piece of text included in news articles that describes where and when the story was written or filed though the date is often omitted. Sometimes only a placename is provided.",
+         "rdfs:comment" : "A <a href=\"https://en.wikipedia.org/wiki/Dateline\">dateline</a> is a brief piece of text included in news articles that describes where and when the story was written or filed though the date is often omitted. Sometimes only a placename is provided.<br/><br/>\n\nStructured representations of dateline-related information can also be expressed more explicitly using <a class=\"localLink\" href=\"http://schema.org/locationCreated\">locationCreated</a> (which represents where a work was created e.g. where a news report was written).  For location depicted or described in the content, use <a class=\"localLink\" href=\"http://schema.org/contentLocation\">contentLocation</a>.<br/><br/>\n\nDateline summaries are oriented more towards human readers than towards automated processing, and can vary substantially. Some examples: \"BEIRUT, Lebanon, June 2.\", \"Paris, France\", \"December 19, 2017 11:43AM Reporting from Washington\", \"Beijing/Moscow\", \"QUEZON CITY, Philippines\".",
          "rdfs:label" : "dateline",
          "schema:domainIncludes" : "schema:NewsArticle",
          "schema:rangeIncludes" : "schema:Text"

@@ -3,8 +3,10 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
+use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Option;
 use Prty::Math;
@@ -64,6 +66,11 @@ der Sekundenanteil kann Nachkommastellen haben
 
 =back
 
+Bei der Instantiierung kann die Zeitdauer auch in Doppelpunkt-Notation
+übergeben werden:
+
+    D:H:M:S.X
+
 =head1 METHODS
 
 =head2 Konstruktor
@@ -79,7 +86,8 @@ der Sekundenanteil kann Nachkommastellen haben
 
 Instantiiere ein Zeitdauer-Objekt und liefere einen Referenz auf
 dieses Objekt zurück. Die Zeitdauer kann als numerischer Wert $sec
-oder als Zeichenkette $str angegeben werden.
+oder als Zeichenkette $str angegeben werden. Die Zeichenkette
+kann auch in Doppelpunkt-Notation (D:H:M:S.X) angegeben sein.
 
 =cut
 
@@ -89,7 +97,16 @@ sub new {
     my $class = shift;
     my $sec = shift || 0;
 
-    if ($sec =~ tr/a-z//) {
+    # Schlägt unerwünschterweise bei Zahl mit Exponentialdarstellung zu
+    #
+    #if ($sec !~ /^[0-9.:dhms]+$/) {
+    #    $class->throw(
+    #        q~DURATION-00002: Illegal duration~,
+    #        Duration => $sec,
+    #    );
+    #}
+
+    if ($sec =~ tr/:dhms//) {
         $sec = $class->stringToSeconds($sec);
     }
 
@@ -318,11 +335,16 @@ sub asFFmpegString {
 Wandele Zeichenkette zur Bezeichnung einer Zeitdauer in die Anzahl
 Sekunden.
 
-=head4 Example
+=head4 Examples
 
 Zeitdauer-Zeichenkette bestehend aus Tagen, Stunden, Mintuten, Sekunden:
 
     $sec = Prty::Duration->stringToSeconds('152d5h25m3.457s');
+    # 13152303.457
+
+Dasselbe mit Doppelpunkt-Notation:
+
+    $sec = Prty::Duration->stringToSeconds('152:5:25:3.457');
     # 13152303.457
 
 =cut
@@ -331,6 +353,17 @@ Zeitdauer-Zeichenkette bestehend aus Tagen, Stunden, Mintuten, Sekunden:
 
 sub stringToSeconds {
     my ($class,$str) = @_;
+
+    if ($str =~ tr/://) {
+        # Repräsentation D:H:M:S.X nach DdHhMmS.Xs wandeln
+
+        my @unit = qw/s m h d/;
+        my @arr = reverse split /:/,$str;
+        for (my $i = 0; $i < @arr; $i++) {
+            $arr[$i] .= $unit[$i];
+        }
+        $str = join '',reverse @arr;
+    }
 
     my $sec = 0;
     my @arr = split /([dhms])/,$str;
@@ -475,7 +508,7 @@ sub secondsToString {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

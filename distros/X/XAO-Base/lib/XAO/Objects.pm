@@ -83,15 +83,15 @@ own namespace, so these are functions, not methods.
 ###############################################################################
 package XAO::Objects;
 use strict;
+use warnings;
+use feature qw(state);
 use XAO::Base qw($homedir $projectsdir);
 use XAO::Utils qw(:args :debug);
 use XAO::Errors qw(XAO::Objects);
 use XAO::Projects;
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: Objects.pm,v 2.1 2005/01/13 22:34:34 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION=(2.001);
 
-##
 # Prototypes
 #
 sub load (@);
@@ -115,96 +115,155 @@ Arguments:
  baseobj  => ignore site specific objects even if they exist (optional)
  sitename => should only be used to load Config object
 
+When called from an established site context that context is checked for
+an optional configuration value /xao/objects/include that may contain a
+list of "library" projects that are checked for object implementations.
+
+Given an objname equal "Foo::Bar" the logic is this:
+
+  1. If there a current site, or a sitename is given, check that site
+     for objects/Foo/Bar.pm and load if it exists.
+  2. If there is a /xao/objects/include configuration, then check
+     that list of sites for their objects/Foo/Bar.pm implementations,
+     returning first found if any.
+  3. Default to the system XAO::DO::Foo::Bar implementation if none
+     are found in site context.
+
+If there is a 'baseobj' argument then the first step is skipped and the
+search is started with included sites defaulting to the system object.
+
 =cut
 
-use vars qw(%objref_cache);
 sub load (@) {
     my $class=(scalar(@_)%2 || ref($_[1]) ? shift(@_) : 'XAO::Objects');
     my $args=get_args(\@_);
-    my $objname=$args->{objname} ||
-        throw XAO::E::Objects "load - no objname given";
 
-    ##
+    my $objname=$args->{'objname'} ||
+        throw XAO::E::Objects "- no objname given";
+
+    my $baseobj=$args->{'baseobj'};
+
     # Config object is a special case. When we load it we do not have
     # site configuration yet and so we have to rely on supplied site
     # name.
     #
-    my $sitename;
-    if($args->{baseobj}) {
-        # No site name for base object
-    }
-    elsif($objname eq 'Config') {
-        $sitename=$args->{sitename} ||
-            throw XAO::E::Objects "load - no sitename given for Config object";
-    }
-    else {
-        $sitename=$args->{sitename} ||
-                  XAO::Projects::get_current_project_name() ||
-                  '';
+    my $current_sitename=XAO::Projects::get_current_project_name();
+    my $sitename=$args->{'sitename'} || $current_sitename || '';
+
+    if($objname eq 'Config') {
+        $baseobj || $sitename ||
+            throw XAO::E::Objects "- no sitename given for Config object";
     }
 
-    ##
-    # Checking cache first
+    # Checking the cache first
     #
-    my $tref;
-    if($sitename && ($tref=$objref_cache{$sitename})) {
-        return $tref->{$objname} if exists $tref->{$objname};
-    }
-    elsif(!$sitename && ($tref=$objref_cache{'/'})) {
-        return $tref->{$objname} if exists $tref->{$objname};
-    }
+    state %objref_cache;
 
-    ##
-    # Checking project directory
+    my $cache_key=($baseobj ? '^' : '') . $sitename . '/' . $objname;
+    my $objref=$objref_cache{$cache_key};
+
+    return $objref if $objref;
+
+    # There might be an inheritance chain configured for library
+    # projects.
     #
-    my $objref;
-    my $system;
-    if($sitename) {
-        (my $objfile=$objname) =~ s/::/\//sg;
-        $objfile="$projectsdir/$sitename/objects/$objfile.pm";
-        if(-f $objfile && open(F,$objfile)) {
+    my @siteinc;
+    if($sitename && !$baseobj) {
+        push(@siteinc,$sitename);
+    }
 
-            ##
-            # Changing $/ can affect module initialization below, so
-            # making it in as small scope as possible (bug fix by Eugene
-            # Karpachov).
-            #
-            my $text=do { local $/; <F> };
-            close(F);
-
-            $text=~s{^\s*(package\s+(XAO::DO|Symphero::Objects))::($objname\s*;)}
-                    {${1}::${sitename}::${3}}m;
-            $1 || throw XAO::E::Objects
-                  "load - package name is not XAO::DO::$objname in $objfile";
-            $2 eq 'XAO::DO' ||
-                eprint "Old style package name in $objfile - change to XAO::DO::$objname";
-
-            eval "\n#line 1 \"$objfile\"\n" . $text;
-            throw XAO::E::Objects
-                  "load - error loading $objname ($objfile) -- $@" if $@;
-
-            $objref="XAO::DO::${sitename}::${objname}";
+    if($current_sitename && $current_sitename eq $sitename) {
+        my $config=XAO::Projects::get_current_project();
+        if($config && $config->is_embedded('hash') && (my $include=$config->get('/xao/objects/include'))) {
+            push(@siteinc,@$include);
         }
-        $system=0;
     }
+
+    ### dprint "----$sitename:$objname: SITEINC: (".join('|',@siteinc).")";
+
+    if(@siteinc) {
+        (my $objfile=$objname) =~ s/::/\//sg;
+        $objfile.='.pm';
+
+        foreach my $sn (@siteinc) {
+            my $objpath="$projectsdir/$sn/objects/$objfile";
+
+            next unless -f $objpath;
+
+            ### dprint "----$sitename:$objname: Have $objname in $objpath";
+
+            # %INC has package names converted to file notation.
+            # In our case there is no real file for
+            # XAO/DO/sitename/Foo.pm, but the convention is
+            # still kept.
+            #
+            my $pkg="XAO::DO::${sn}::${objname}";
+            (my $pkgfile=$pkg)=~s/::/\//sg;
+            $pkgfile.='.pm';
+
+            # It is possible we already loaded this before
+            #
+            if(!$INC{$pkgfile}) {
+                open(F,$objpath) ||
+                    throw XAO::E::Objects "- unable to open $objpath: $!";
+
+                # Changing $/ can affect module initialization below, so
+                # making it in as small scope as possible (bug fix by
+                # Eugene Karpachov).
+                #
+                my $text=do { local $/; <F> };
+
+                close(F);
+
+                $text=~s{^\s*(package\s+)XAO::DO::$objname(\s*;)}
+                        {$1$pkg$2}m;
+                $1 ||
+                    throw XAO::E::Objects "- package name is not XAO::DO::$objname in $objpath";
+
+                ### dprint "----$sitename:$objname: (((".($text=~/^(.*?)\n/s ? $1 : '').")))";
+
+                eval "\n#line 1 \"$objpath\"\n" . $text;
+
+                !$@ ||
+                    throw XAO::E::Objects "- error loading $objname ($objpath) -- $@";
+
+                $INC{$pkgfile}=$objpath;
+
+                ### dprint "----$sitename:$objname: INC{$pkgfile}=",$INC{$pkgfile};
+                ### if(1) {
+                ###     no strict 'refs';
+                ###     my $scope=$pkg.'::';
+                ###     foreach my $k (sort keys %$scope) {
+                ###         dprint "------${scope}{$k}=$scope->{$k}";
+                ###     }
+                ### }
+            }
+
+            $objref=$pkg;
+
+            last;
+        }
+    }
+
+    # System installed package is the default
+    #
     if(! $objref) {
         $objref="XAO::DO::${objname}";
         eval "require $objref";
-        throw XAO::E::Objects
-              "load - error loading $objname ($objref) -- $@" if $@;
-        $system=1;
+        !$@ ||
+            throw XAO::E::Objects "- error loading $objname ($objref) -- $@";
     }
 
-    ##
     # In case no object was found.
     #
-    $objref || throw XAO::E::Objects
-                     "load - no object file found for sitename='$sitename', objname='$objname'";
+    $objref ||
+        throw XAO::E::Objects "- no object file found for sitename='$sitename', objname='$objname'";
 
-    ##
+    ### dprint "----$sitename:$objname: ============ load($objname) cache{$cache_key}=$objref";
+
     # Returning class name and storing into cache
     #
-    $objref_cache{$sitename ? $sitename : '/'}->{$objname}=$objref;
+    return $objref_cache{$cache_key}=$objref;
 }
 
 ###############################################################################
@@ -221,22 +280,20 @@ sub new ($%) {
     my $class=(scalar(@_)%2 || ref($_[1]) ? shift(@_) : 'XAO::Objects');
     my $args=get_args(\@_);
 
-    my $objname=$args->{objname} ||
-        throw XAO::E::Objects "new - no 'objname' given";
+    my $objname=$args->{'objname'} ||
+        throw XAO::E::Objects "- no 'objname' given";
 
-    ##
     # Looking up what is real object reference for that objname.
     #
     my $objref=$class->load($args) ||
-        throw XAO::E::Objects "new - can't load object ($args->{objname})";
+        throw XAO::E::Objects "- can't load object ($objname)";
 
-    ##
     # Creating instance of that object
     #
     my $obj=$objref->new($args) ||
-        throw XAO::E::Objects "new - error creating instance of $objref ($@)";
+        throw XAO::E::Objects "- error creating instance of $objref ($@)";
 
-    $obj;
+    return $obj;
 }
 
 ###############################################################################
@@ -250,7 +307,7 @@ __END__
 
 Copyright (c) 2000-2002 XAO Inc.
 
-Andrew Maltsev <am@xao.com>.
+Andrew Maltsev <am@ejelta.com>.
 
 =head1 SEE ALSO
 

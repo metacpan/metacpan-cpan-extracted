@@ -622,7 +622,7 @@ sub test_val_type {
     isa_ok($kv->[0], SILK_IPV4ADDR_CLASS);
   }
   SKIP: {
-    skip("ipv6 not enabled", 4) unless SILK_IPV6_ENABLED;
+    skip("ipv6 not enabled", 7) unless SILK_IPV6_ENABLED;
     $b = simple_ipv6_bag();
     for my $kv (<$b>) {
       isa_ok($kv->[0], SILK_IPV6ADDR_CLASS);

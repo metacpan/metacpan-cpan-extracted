@@ -1,6 +1,6 @@
 package Crypt::Image;
 
-$Crypt::Image::VERSION   = '0.12';
+$Crypt::Image::VERSION   = '0.13';
 $Crypt::Image::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Image - Interface to hide text into an image.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -24,7 +24,7 @@ use Types::Standard qw(Int);
 use Crypt::Image::Params qw(FileType FilePath);
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 =head1 DESCRIPTION
 

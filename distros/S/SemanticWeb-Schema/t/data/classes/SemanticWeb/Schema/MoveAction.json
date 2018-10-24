@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of an agent relocating to a place.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/TransferAction\">TransferAction</a>: Unlike TransferAction, the subject of the move is a living Person or Organization rather than an inanimate object.</li>\n</ul>\n",
+      "rdfs:comment" : "The act of an agent relocating to a place.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/TransferAction\">TransferAction</a>: Unlike TransferAction, the subject of the move is a living Person or Organization rather than an inanimate object.</li>\n</ul>\n",
       "rdfs:label" : "MoveAction",
       "rdfs:subClassOf" : "schema:Action"
    },
@@ -13,8 +13,8 @@
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
             "schema:MoveAction",
-            "schema:TransferAction",
-            "schema:ExerciseAction"
+            "schema:ExerciseAction",
+            "schema:TransferAction"
          ],
          "schema:rangeIncludes" : "schema:Place"
       },
@@ -24,10 +24,10 @@
          "rdfs:label" : "toLocation",
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
-            "schema:InsertAction",
-            "schema:ExerciseAction",
             "schema:TransferAction",
-            "schema:MoveAction"
+            "schema:InsertAction",
+            "schema:MoveAction",
+            "schema:ExerciseAction"
          ],
          "schema:rangeIncludes" : "schema:Place"
       }

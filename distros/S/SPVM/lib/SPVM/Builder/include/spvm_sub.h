@@ -35,17 +35,6 @@ struct SPVM_sub {
   int32_t eval_stack_max_length;
   int32_t mortal_stack_length;
   int32_t call_type_id;
-  
-  SPVM_LIST* info_package_var_ids;
-  SPVM_LIST* info_sub_ids;
-  SPVM_LIST* info_field_ids;
-  SPVM_LIST* info_types;
-  SPVM_LIST* info_constants;
-  SPVM_LIST* info_switch_infos;
-  SPVM_LIST* info_long_constants;
-  SPVM_LIST* info_double_constants;
-  SPVM_LIST* info_string_constants;
-  
   int32_t id;
   void* precompile_address;
   void* native_address;

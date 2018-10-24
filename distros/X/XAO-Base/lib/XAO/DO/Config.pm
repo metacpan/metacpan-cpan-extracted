@@ -59,6 +59,7 @@ sub cache ($%);
 sub cleanup ($;@);
 sub embed ($%);
 sub embedded ($$);
+sub is_embedded ($$);
 sub new ($);
 
 ###############################################################################
@@ -231,7 +232,8 @@ sub embed ($%) {
 =item embedded ($)
 
 Returns a reference to a previously embedded object by name. Can be used
-to call non-embedded method on that object.
+to call non-embedded method on that object. Throws an error if there is
+no such embedded object.
 
 =cut
 
@@ -242,6 +244,20 @@ sub embedded ($$) {
     my $desc=$self->{names}->{$name} ||
         throw $self "embedded - no configuration with such name ($name)";
     $desc->{obj};
+}
+
+###############################################################################
+
+=item is_embedded ($)
+
+Check if a named object is embedded.
+
+=cut
+
+sub is_embedded ($$) {
+    my $self=shift;
+    my $name=shift;
+    return $self->{'names'}->{$name} ? 1 : 0;
 }
 
 ###############################################################################
@@ -297,4 +313,4 @@ __END__
 
 Copyright (c) 2001 XAO Inc.
 
-Author is Andrew Maltsev <am@xao.com>.
+Author is Andrew Maltsev <am@ejelta.com>.

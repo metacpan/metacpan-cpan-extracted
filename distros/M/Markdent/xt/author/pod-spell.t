@@ -50,6 +50,7 @@ Event
 EventAsText
 EventsAsMethods
 FilterHandler
+Fish
 Fragment
 GitHub
 Gruber
@@ -87,6 +88,7 @@ Role
 Rolsky
 Rolsky's
 SHAs
+Shlomi
 Shubina
 Simple
 SpanParser
@@ -137,6 +139,7 @@ parameterized
 parser's
 parsers
 preformatted
+shlomif
 tom
 unordered
 uri

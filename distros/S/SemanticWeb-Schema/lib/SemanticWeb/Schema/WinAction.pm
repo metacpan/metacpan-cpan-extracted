@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::WinAction;
 
 # ABSTRACT: The act of achieving victory in a competitive activity.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has loser => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::WinAction - The act of achieving victory in a competitive a
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

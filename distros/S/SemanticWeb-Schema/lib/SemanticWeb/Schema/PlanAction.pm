@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::PlanAction;
 
 # ABSTRACT: The act of planning the execution of an event/task/action/reservation/plan to a future date.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has scheduled_time => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::PlanAction - The act of planning the execution of an event/
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

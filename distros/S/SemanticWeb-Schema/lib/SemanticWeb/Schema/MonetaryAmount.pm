@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::MonetaryAmount;
 
 # ABSTRACT: A monetary value or range
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has currency => (
@@ -80,14 +82,14 @@ SemanticWeb::Schema::MonetaryAmount - A monetary value or range
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
 =for html A monetary value or range. This type can be used to describe an amount of
 money such as $50 USD, or a range as in describing a bank account being
-suitable for a balance between £1,000 and £1,000,000 GBP, or the value of
-a salary, etc. It is recommended to use <a class="localLink"
+suitable for a balance between £1,000 and £1,000,000 GBP, or the value of a
+salary, etc. It is recommended to use <a class="localLink"
 href="http://schema.org/PriceSpecification">PriceSpecification</a> Types to
 describe the price of an Offer, Invoice, etc.
 
@@ -95,8 +97,14 @@ describe the price of an Offer, Invoice, etc.
 
 =head2 C<currency>
 
-=for html The currency in which the monetary amount is expressed (in 3-letter <a
-href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a> format).
+=for html The currency in which the monetary amount is expressed.<br/><br/> Use
+standard formats: <a href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217
+currency format</a> e.g. "USD"; <a
+href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">Ticker
+symbol</a> for cryptocurrencies e.g. "BTC"; well known names for <a
+href="https://en.wikipedia.org/wiki/Local_exchange_trading_system">Local
+Exchange Tradings Systems</a> (LETS) and other currency types e.g. "Ithaca
+HOUR".
 
 A currency should be one of the following types:
 
@@ -165,7 +173,7 @@ A valid_through should be one of the following types:
 
 =head2 C<value>
 
-=for html <p>The value of the quantitative value or property value node.</p> <ul>
+=for html The value of the quantitative value or property value node.<br/><br/> <ul>
 <li>For <a class="localLink"
 href="http://schema.org/QuantitativeValue">QuantitativeValue</a> and <a
 class="localLink"
@@ -178,13 +186,13 @@ A value should be one of the following types:
 
 =over
 
-=item C<Bool>
-
 =item C<Num>
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
+
+=item C<Bool>
+
+=item C<Str>
 
 =back
 

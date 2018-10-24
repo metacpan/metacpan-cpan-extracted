@@ -3,9 +3,10 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use POSIX ();
 use Time::Local ();
@@ -465,24 +466,41 @@ Liefere Monatsnamen (Januar, Februar, ..., Dezember).
 
 # -----------------------------------------------------------------------------
 
-our @MonthName = qw(
-    Januar
-    Februar
-    März
-    April
-    Mai
-    Juni
-    Juli
-    August
-    September
-    Oktober
-    November
-    Dezember
+our %MonthName = (
+    english => [qw/
+        January
+        February
+        March
+        April
+        May
+        June
+        July
+        August
+        September
+        October
+        November
+        December
+    /],
+    german => [qw/
+        Januar
+        Februar
+        März
+        April
+        Mai
+        Juni
+        Juli
+        August
+        September
+        Oktober
+        November
+        Dezember
+    /],
 );
 
 sub monthName {
     my $self = shift;
-    return $MonthName[$self->month-1];
+    my $lang = shift // 'german';
+    return $MonthName{$lang}->[$self->month-1];
 }
 
 # -----------------------------------------------------------------------------
@@ -1426,7 +1444,7 @@ sub monthAbbrToNum {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

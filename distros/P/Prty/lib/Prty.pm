@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 =encoding utf8
 
@@ -24,7 +24,7 @@ sich unter kontinuierlicher Weiterentwicklung.
 
 =item *
 
-L<Prty::AnsiColor> - Erzeuge Text mit ANSI Colorcodes
+L<Prty::AnsiColor> - Erzeuge Text mit/ohne ANSI Colorcodes
 
 =item *
 
@@ -37,6 +37,10 @@ L<Prty::Array> - Operationen auf Arrays
 =item *
 
 L<Prty::AsciiTable> - ASCII-Tabelle parsen
+
+=item *
+
+L<Prty::Assert> - Zusicherungen
 
 =item *
 
@@ -104,7 +108,7 @@ L<Prty::Converter> - Konvertierung von Werten
 
 =item *
 
-L<Prty::Css> - Generierung von CSS Code
+L<Prty::Css> - Generiere CSS Code
 
 =item *
 
@@ -244,6 +248,10 @@ L<Prty::Html::Fragment> - Fragment aus HTML-, CSS- und JavaScript-Code
 
 =item *
 
+L<Prty::Html::Image> - Image-Block in HTML
+
+=item *
+
 L<Prty::Html::List> - HTML-Aufzählungsliste
 
 =item *
@@ -253,6 +261,10 @@ L<Prty::Html::Listing> - Programm-Listing in HTML
 =item *
 
 L<Prty::Html::Page> - HTML-Seite
+
+=item *
+
+L<Prty::Html::Pygments> - Syntax Highlighting in HTML
 
 =item *
 
@@ -273,6 +285,10 @@ L<Prty::Html::Tag> - Generierung von HTML-Tags
 =item *
 
 L<Prty::Html::Util> - Hilfsmethoden für die HTML-Generierung
+
+=item *
+
+L<Prty::Html::Verbatim> - Verbatim-Block in HTML
 
 =item *
 
@@ -424,6 +440,18 @@ L<Prty::Math> - Mathematische Funktionen
 
 =item *
 
+L<Prty::MediaWiki::Client> - MediaWiki Client
+
+=item *
+
+L<Prty::MediaWiki::Markup> - MediaWiki Code Generator
+
+=item *
+
+L<Prty::MediaWiki::Page> - MediaWiki Seite
+
+=item *
+
 L<Prty::ModelCache> - Verwaltung/Caching von Modell-Objekten
 
 =item *
@@ -445,6 +473,10 @@ L<Prty::OrderedHash> - Hash mit geordneten Elementen
 =item *
 
 L<Prty::Parallel> - Parallele Verarbeitung
+
+=item *
+
+L<Prty::Parameters> - Verarbeitung von Programm- und Methodenparametern
 
 =item *
 
@@ -608,6 +640,10 @@ L<Prty::Stacktrace> - Generiere und visualisiere einen Stacktrace
 
 =item *
 
+L<Prty::Stopwatch> - Zeitmesser
+
+=item *
+
 L<Prty::Storable> - Persistenz für Perl-Datenstrukturen
 
 =item *
@@ -702,7 +738,7 @@ L<Prty::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

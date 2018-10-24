@@ -1,9 +1,48 @@
 ==================================================
-Changes from 2017-10-11 00:00:00 +0000 to present.
+Changes from 2017-10-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.002 at 2018-10-11 17:35:00 +0000
+version 1.004 at 2018-10-23 08:25:04 +0000
+------------------------------------------
+
+  Change: 2f7e00d081c4fb5d160d41adba7b0c34840f992f
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2018-10-23 10:23:56 +0000
+
+    Add missing prereqs on strict/vars/warnings 
+
+------------------------------------------
+version 1.003 at 2018-10-21 08:36:38 +0000
+------------------------------------------
+
+  Change: 7086453ed284536a98ba5a8f44e1651dfea3f411
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2018-10-21 10:36:38 +0000
+
+    Add test case and fix remove_entry pattern
+
+    This fixes the wildcard pattern for removing entries with ip=none.
+
+    closes #5 
+
+  Change: 100f0308c3d7885cdf1ae05b193c4f36e34f5d2e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2018-10-19 10:08:27 +0000
+
+    Convert distribution to using Carton
+
+    This changes the module structure to use cpanfile/Carton for
+    dependencies. 
+
+  Change: 5247724b4f991baf72b8927eb447ed2cb9300487
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2018-10-19 09:45:44 +0000
+
+    Remove Travis CI 
+
+------------------------------------------
+version 1.002 at 2018-10-11 17:26:14 +0000
 ------------------------------------------
 
   Change: 0e42afaffc729a73955276b3aebaa40ae36e2029
@@ -58,5 +97,5 @@ version 1.002 at 2018-10-11 17:35:00 +0000
     related #1 
 
 ================================================
-Plus 2 releases after 2017-10-11 00:00:00 +0000.
+Plus 2 releases after 2017-10-23 00:00:00 +0000.
 ================================================

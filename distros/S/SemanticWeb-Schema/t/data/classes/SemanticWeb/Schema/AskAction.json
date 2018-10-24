@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of posing a question / favor to someone.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/ReplyAction\">ReplyAction</a>: Appears generally as a response to AskAction.</li>\n</ul>\n",
+      "rdfs:comment" : "The act of posing a question / favor to someone.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/ReplyAction\">ReplyAction</a>: Appears generally as a response to AskAction.</li>\n</ul>\n",
       "rdfs:label" : "AskAction",
       "rdfs:subClassOf" : "schema:CommunicateAction"
    },

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::CreativeWork;
 
 # ABSTRACT: The most generic kind of creative work
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has about => (
@@ -292,6 +294,14 @@ has encoding => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'encoding',
+);
+
+
+
+has encoding_format => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'encodingFormat',
 );
 
 
@@ -688,7 +698,7 @@ SemanticWeb::Schema::CreativeWork - The most generic kind of creative work
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -1029,6 +1039,8 @@ A content_rating should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::Rating']>
+
 =item C<Str>
 
 =back
@@ -1041,9 +1053,9 @@ A contributor should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -1087,9 +1099,9 @@ A creator should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -1205,6 +1217,34 @@ A encoding should be one of the following types:
 
 =back
 
+=head2 C<encoding_format>
+
+C<encodingFormat>
+
+=for html Media type typically expressed using a MIME format (see <a
+href="http://www.iana.org/assignments/media-types/media-types.xhtml">IANA
+site</a> and <a
+href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME
+_types">MDN reference</a>) e.g. application/zip for a SoftwareApplication
+binary, audio/mpeg for .mp3 etc.).<br/><br/> In cases where a <a
+class="localLink" href="http://schema.org/CreativeWork">CreativeWork</a>
+has several media type representations, <a class="localLink"
+href="http://schema.org/encoding">encoding</a> can be used to indicate each
+<a class="localLink" href="http://schema.org/MediaObject">MediaObject</a>
+alongside particular <a class="localLink"
+href="http://schema.org/encodingFormat">encodingFormat</a>
+information.<br/><br/> Unregistered or niche encoding and file formats can
+be indicated instead via the most appropriate URL, e.g. defining Web page
+or a Wikipedia/Wikidata entry.
+
+A encoding_format should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
 =head2 C<encodings>
 
 A media object that encodes this CreativeWork.
@@ -1303,8 +1343,8 @@ A genre should be one of the following types:
 
 C<hasPart>
 
-Indicates a CreativeWork that is (in some sense) a part of this
-CreativeWork.
+Indicates an item or CreativeWork that is part of this item, or
+CreativeWork (in some sense).
 
 A has_part should be one of the following types:
 
@@ -1340,9 +1380,9 @@ A in_language should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Language']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Language']>
 
 =back
 
@@ -1403,9 +1443,9 @@ A is_based_on should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=item C<Str>
 
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
 
@@ -1423,11 +1463,11 @@ A is_based_on_url should be one of the following types:
 
 =over
 
+=item C<Str>
+
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
 
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
-
-=item C<Str>
 
 =back
 
@@ -1449,7 +1489,8 @@ A is_family_friendly should be one of the following types:
 
 C<isPartOf>
 
-Indicates a CreativeWork that this CreativeWork is (in some sense) part of.
+Indicates an item or CreativeWork that this item, or CreativeWork (in some
+sense), is part of.
 
 A is_part_of should be one of the following types:
 
@@ -1580,9 +1621,9 @@ A position should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=item C<Str>
 
 =back
 
@@ -1611,9 +1652,9 @@ A provider should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -1637,9 +1678,9 @@ A publisher should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -1658,8 +1699,8 @@ href="http://schema.org/CreativeWork">CreativeWork</a> (e.g. <a
 class="localLink" href="http://schema.org/NewsArticle">NewsArticle</a>) the
 principles are those of the party primarily responsible for the creation of
 the <a class="localLink"
-href="http://schema.org/CreativeWork">CreativeWork</a>.</p> <p>While such
-policies are most typically expressed in natural language, sometimes
+href="http://schema.org/CreativeWork">CreativeWork</a>.<br/><br/> While
+such policies are most typically expressed in natural language, sometimes
 related information (e.g. indicating a <a class="localLink"
 href="http://schema.org/funder">funder</a>) can be expressed using
 schema.org terminology.
@@ -1869,9 +1910,9 @@ A translator should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -1897,9 +1938,9 @@ A version should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<Str>
+
+=item C<Num>
 
 =back
 

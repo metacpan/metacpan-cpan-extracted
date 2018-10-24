@@ -13,7 +13,7 @@ use Types::Standard qw/ Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 # RECOMMEND PREREQ: aliased
 # RECOMMEND PREREQ: Ref::Util::XS
@@ -45,7 +45,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 SYNOPSIS
 
@@ -66,9 +66,9 @@ were generated automatically from the following sources:
 
 =over
 
-=item L<http://schema.org/version/3.3/ext-meta.rdf>
+=item L<http://schema.org/version/3.4/ext-meta.rdf>
 
-=item L<http://schema.org/version/3.3/schema.rdf>
+=item L<http://schema.org/version/3.4/schema.rdf>
 
 =back
 

@@ -1,0 +1,163 @@
+= Windows (Active Perl) Installation Instructions =
+
+[http://www.activestate.com/]
+
+Once you have installed Active Perl you need to configure an additional PPM
+repositor and then you can install Padre using the ppm packaging system.
+Let's see how to do it in the Command Shell:
+
+{{{
+Start/Run/cmd ENTER
+ppm rep add wxperl http://www.wxperl.co.uk/repository  
+
+ppm install Alien-wxWidgets
+ppm install Wx
+ppm install Padre
+}}}
+
+You might have to install Alien-wxWidgets-gcc. If this conflicts with Alien-wxWidgets - you can try use --force: 
+{{{
+ppm install  Alien-wxWidgets-gcc  --force
+}}}
+
+Once that's done you can start Padre by typing
+{{{
+perl c:\perl\site\bin\padre
+}}}
+or
+{{{
+wperl c:\perl\site\bin\padre
+}}}
+
+Replace "c:\perl" with the path, where Active Perl is installed.
+
+==== Older Active Perl details ====
+
+The manual installation is still a bit rough but we are working on improving it.
+
+ 1) (A) Most of the modules - can be taken from the main  ActiveState Package Repository. 
+
+ (B) For Active Perl there are prebuilt PPM versions of Alien::wxWidgets and Wx (aka. wxPerl)
+ and can be installed from [http://wxperl.co.uk/]. 
+
+ So add the wxperl repository to the PPM: http://www.wxperl.co.uk/repository
+ (for detailed instructions see http://wxperl.co.uk/ppm.html )
+ (and even more info here http://docs.activestate.com/activeperl/5.10/faq/ActivePerl-faq2.html )
+
+ Adding the repository to your PPM repository list:  
+ In PPM4 (ActivePerl 820+) this is most easily done via the GUI menu option:  Edit -> Preferences. 
+   
+ If you use PPM3 - or used to command line (==DOS , still usable for PPM4) - you can do: 
+   {{{
+ppm rep add wxperl http://www.wxperl.co.uk/repository 
+   }}}
+
+
+
+
+ 2) Install all the packages (except of course perl) listed as "requires" on
+    http://svn.perlide.org/padre/trunk/Padre/Makefile.PL  - by using ppm. 
+  Don't worry about the order of installation and report us any problem you encounter.
+
+  You can do in by searching the "requires" packages listed in the above link - 
+  either by using the PPM4 GUI, or searching PPM command line (==DOS):
+  {{{
+ppm search App::Ack
+  }}}
+ The result may look like this:
+   {{{
+C:\Documents and Settings\orenm>ppm search App::Ack
+Downloading ActiveState Package Repository packlist...not modified
+1: ack
+   A grep-like program specifically for large source trees
+   Version: 1.86
+   Released: 2008-07-09
+   Author: Andy Lester <andy@petdance.com>
+   Provide: App::Ack version 1.86
+   Require: File::Basename
+   Require: File::Next version 0.4 or better
+   Require: Getopt::Long
+   Require: Term::ANSIColor
+   Require: Test::Harness version 2.5 or better
+   Require: Test::More
+   Repo: ActiveState Package Repository
+   CPAN: http://search.cpan.org/dist/ack-1.86/
+
+C:\Documents and Settings\orenm>
+    }}}
+  So now you shall do: 
+    {{{
+ppm install ack
+    }}}
+
+
+ 3) then open the cpan client and install Padre:
+{{{
+  c:> perl -MCPAN -eshell
+  cpan> install Padre
+}}}
+
+Oren Maurer reported that you might need to force it:
+{{{
+  cpan> force install Padre
+}}}
+
+
+at some point you might encounter an error like this:
+
+{{{
+ Running install for module 'Padre'
+ Running make for S/SZ/SZABGAB/Padre-0.06.tar.gz
+ CPAN: Digest::SHA loaded ok (v5.45)
+ Fetching with LWP:
+  http://ppm.activestate.com/CPAN/authors/id/S/SZ/SZABGAB/CHECKSUMS
+ Alert: While trying to 'parse' YAML file
+  'D:\ActiveState\Perl\cpan\FTPstats.yml'
+ with 'YAML::XS' the following error was encountered:
+  Usage: YAML::XS::LibYAML::Load(yaml_str) at
+ D:\ActiveState\Perl\lib/YAML/XS.pm
+  line 70.
+}}}
+
+
+The reported solution was this:
+{{{
+  [reach the cpan shell:]
+  C:\>cpan
+  cpan> o conf yaml_module ''
+  cpan> o conf commit
+  commit: wrote 'C:\Perl\lib/CPAN/Config.pm'
+  cpan> q
+}}}
+(See: [http://groups.google.com/group/de.comp.lang.perl.misc/browse_thread/thread/3a347d02a1ebf464] and
+[http://perl.org.il/pipermail/perl/2008-September/009779.html] )
+
+Other things that to do and can help:
+
+   1. upgrading last version of Encode - using ppm , 
+
+   Note: 
+      For upgrading all PPM packages, do this (Windows command line, a.k.a Dos)
+{{{
+    ppm upgrade --install 
+}}}
+   2. upgrade of Wx - also by using ppm ,
+   3. installing Alien-wxWidgets (the same way... ppm),
+   4. And now - do (again with ppm):
+{{{
+    ppm install  --force Alien-wxWidgets-dev
+}}}
+(See: [http://meorero.wordpress.com/2009/02/02/padre-on-ms-windows-with-activeperl-5100-build-1004/])
+
+For more info about "ppm - Perl Package Manager, version 4" - see the ActivePerl 5.10 Documentation: 
+http://docs.activestate.com/activeperl/5.10/bin/ppm.html
+
+== Still Not Working? ==
+Following the instructions on this page did not lead to a successful installation?
+
+[http://padre.perlide.org/contact.html Contact us].
+
+We will do our best to help you.
+By letting us know that something does not work you will help us, too.
+When we know about it, we can improve this documentation and Padre itself.
+

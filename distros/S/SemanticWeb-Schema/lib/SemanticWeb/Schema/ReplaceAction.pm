@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::ReplaceAction;
 
 # ABSTRACT: The act of editing a recipient by replacing an old object with a new object.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has replacee => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::ReplaceAction - The act of editing a recipient by replacing
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

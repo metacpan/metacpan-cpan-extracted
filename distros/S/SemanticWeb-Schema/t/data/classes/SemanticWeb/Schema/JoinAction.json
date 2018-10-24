@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>An agent joins an event/group with participants/friends at a location.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/RegisterAction\">RegisterAction</a>: Unlike RegisterAction, JoinAction refers to joining a group/team of people.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/SubscribeAction\">SubscribeAction</a>: Unlike SubscribeAction, JoinAction does not imply that you'll be receiving updates.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/FollowAction\">FollowAction</a>: Unlike FollowAction, JoinAction does not imply that you'll be polling for updates.</li>\n</ul>\n",
+      "rdfs:comment" : "An agent joins an event/group with participants/friends at a location.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/RegisterAction\">RegisterAction</a>: Unlike RegisterAction, JoinAction refers to joining a group/team of people.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/SubscribeAction\">SubscribeAction</a>: Unlike SubscribeAction, JoinAction does not imply that you'll be receiving updates.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/FollowAction\">FollowAction</a>: Unlike FollowAction, JoinAction does not imply that you'll be polling for updates.</li>\n</ul>\n",
       "rdfs:label" : "JoinAction",
       "rdfs:subClassOf" : "schema:InteractAction"
    },
@@ -12,12 +12,12 @@
          "rdfs:label" : "event",
          "schema:domainIncludes" : [
             "schema:JoinAction",
-            "schema:PlayAction",
-            "schema:InformAction",
-            "schema:Organization",
             "schema:Place",
+            "schema:Organization",
+            "schema:PlayAction",
+            "schema:InviteAction",
             "schema:LeaveAction",
-            "schema:InviteAction"
+            "schema:InformAction"
          ],
          "schema:rangeIncludes" : "schema:Event"
       }

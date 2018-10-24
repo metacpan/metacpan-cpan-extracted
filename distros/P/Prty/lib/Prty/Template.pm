@@ -3,11 +3,13 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Path;
+use Prty::Option;
 use Scalar::Util ();
 use Prty::Reference;
 
@@ -22,18 +24,6 @@ Prty::Template - Klasse für HTML/XML/Text-Generierung
 =head1 BASE CLASS
 
 L<Prty::Hash>
-
-=head1 ATTRIBUTES
-
-=over 4
-
-=item singleReplace => $bool (Default: 0)
-
-Ersetze bei replace() immer nur den ersten von mehreren identischen
-Platzhaltern. Dies ist z.B. in HTML bei Ersetzung von mehreren
-Checkboxen mit gleichem Namen nützlich.
-
-=back
 
 =head1 EXAMPLE
 
@@ -77,8 +67,46 @@ Resultat C<$str>:
 
 =head4 Synopsis
 
-    $tpl = Prty::Template->new($type,$file);
-    $tpl = Prty::Template->new($type,\$str);
+    $tpl = Prty::Template->new($type,$file,@opt);
+    $tpl = Prty::Template->new($type,\$str,@opt);
+
+=head4 Options
+
+=over 4
+
+=item --lineContinuation => $type (Default: undef)
+
+Art der Zeilenfortsetzung. Mögliche Werte:
+
+=over 4
+
+=item undef
+
+Keine Zeilenfortsetzung.
+
+=item 'backslash'
+
+Endet eine Zeile mit einem Backslash, entferne Whitespace am
+Anfang der Folgezeile und füge den Rest zur Zeile hinzu.
+
+Dies kann für eine Zeile unterdrückt werden, indem der Backslash am
+Ende der Zeile durch einen davorgestellten Backslash maskiert wird.
+In dem Fall wird statt einer Fortsetzung der Zeile der maskierende
+Backslash entfernt.
+
+Diese Option ist nützlich, wenn ein Template-Text im Editor auf
+eine bestimmte Breite (z.B. 80 Zeichen/Zeile) begrenzt sein soll,
+aber der generierte Text breiter sein darf.
+
+=back
+
+=item -singleReplace => $bool (Default: 0)
+
+Ersetze bei replace() immer nur den ersten von mehreren identischen
+Platzhaltern. Dies ist z.B. in HTML bei Ersetzung von mehreren
+Checkboxen mit gleichem Namen nützlich.
+
+=back
 
 =head4 Description
 
@@ -113,16 +141,40 @@ sub new {
     my $class = shift;
     my $type = shift;
     my $arg = shift;
-    # @_: @keyVal
+    # @_: @opt
+
+    # Optionen
+
+    my $lineContinuation = undef;
+    my $singleReplace = 0;
+
+    Prty::Option->extract(\@_,
+        -lineContinuation => \$lineContinuation,
+        -singleReplace => \$singleReplace,
+    );
+
+    # Operation ausführen
 
     my $str = ref $arg? $$arg: Prty::Path->read($arg);
     $str =~ s/\s+$//; # WS am Ende entfernen
 
+    if ($lineContinuation) {
+        if ($lineContinuation eq 'backslash') {
+            $str =~ s/(?<!\\)\\\n[ \t]*//g;
+        }
+        else {
+            $class->throw(
+                q~TEMPLATE-00001: Ungüliger Wert für Option -lineContinuation~,
+                Value => $lineContinuation,
+            );
+        }
+    }
+
     my $self = $class->SUPER::new(
-        type=>$type,
-        string=>$str,
-        protect=>1,
-        singleReplace=>0,
+        type => $type,
+        string => $str,
+        protect => 1,
+        singleReplace => $singleReplace,
     );
     $self->set(@_);
 
@@ -451,6 +503,10 @@ sub value {
         # Subroutine-Referenz -> Wert berechnen
         return $self->value($arg->());
     }
+    else {
+        # Stringreferenz: Wir liefern den Wert unverändert
+        return $$arg
+    }
 
     $self->throw;
 }
@@ -747,7 +803,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

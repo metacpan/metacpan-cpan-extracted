@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::CreditCard;
 
-# ABSTRACT: <p>A card payment method of a particular brand or name
+# ABSTRACT: A card payment method of a particular brand or name
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::PaymentCard SemanticWeb::Schema::LoanOrCredit /;
+extends qw/ SemanticWeb::Schema::LoanOrCredit SemanticWeb::Schema::PaymentCard /;
 
 
 use MooX::JSON_LD 'CreditCard';
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,17 +30,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::CreditCard - <p>A card payment method of a particular brand or name
+SemanticWeb::Schema::CreditCard - A card payment method of a particular brand or name
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>A card payment method of a particular brand or name. Used to mark up a
+=for html A card payment method of a particular brand or name. Used to mark up a
 particular payment method and/or the financial product/service that
-supplies the card account.</p> <p>Commonly used values:</p> <ul>
+supplies the card account.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#AmericanExpress</li>
 <li>http://purl.org/goodrelations/v1#DinersClub</li>
 <li>http://purl.org/goodrelations/v1#Discover</li>
@@ -48,7 +50,7 @@ supplies the card account.</p> <p>Commonly used values:</p> <ul>
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::LoanOrCredit>
+L<SemanticWeb::Schema::PaymentCard>
 
 =head1 AUTHOR
 

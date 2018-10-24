@@ -42,6 +42,7 @@ sub test_project {
     my $self=shift;
 
     my $config=XAO::Objects->new(objname => 'Config', sitename => 'test');
+
     $self->assert(ref($config),
                   "Can't get config");
 
@@ -111,7 +112,6 @@ sub test_cache {
     $self->assert(ref($config),
                   "Can't get config");
 
-    ##
     # Define cache
     #
     $config->cache(
@@ -123,7 +123,6 @@ sub test_cache {
         },
     );
 
-    ##
     # Now pretend that it is called someplace else with different
     # parameters. They should be ignored.
     #
@@ -139,7 +138,6 @@ sub test_cache {
     $self->assert($got eq $expect,
                   "Got wrong data from the cache ($got), expected $expect");
 
-    ##
     # Now just giving the name
     #
     $cache=$config->cache(name => 'test');

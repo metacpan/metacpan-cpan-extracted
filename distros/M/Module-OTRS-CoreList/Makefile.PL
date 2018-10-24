@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,16 +14,30 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Module-OTRS-CoreList",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Module::OTRS::CoreList",
   "PREREQ_PM" => {},
-  "VERSION" => "0.13",
+  "TEST_REQUIRES" => {
+    "File::Copy" => 0,
+    "File::Path" => 0,
+    "FindBin" => 0,
+    "Pod::Coverage::TrustPod" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "0.14",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "File::Copy" => 0,
+  "File::Path" => 0,
+  "FindBin" => 0,
+  "Pod::Coverage::TrustPod" => 0,
+  "Test::More" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

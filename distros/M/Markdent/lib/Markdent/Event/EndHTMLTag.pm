@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Markdent::Types;
 
@@ -37,7 +37,7 @@ Markdent::Event::EndHTMLTag - An event for the end of an inline HTML tag
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 

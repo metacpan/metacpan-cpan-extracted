@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:FIBO",
+      "dc:source" : "schemadotorgsources2:FIBO",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A payment method using a credit, debit, store or other card to associate the payment with an account.",
       "rdfs:label" : "PaymentCard",

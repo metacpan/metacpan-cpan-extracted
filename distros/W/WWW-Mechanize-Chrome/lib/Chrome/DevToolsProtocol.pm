@@ -15,7 +15,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 our @CARP_NOT;
 
 =head1 NAME
@@ -152,6 +152,11 @@ has 'listener' => (
     default => sub { {} },
 );
 
+has 'sequence_number' => (
+    is => 'rw',
+    default => sub { 1 },
+);
+
 =item B<transport>
 
 The event-loop specific transport backend
@@ -230,11 +235,13 @@ Explicitly remove a listener.
 =cut
 
 sub remove_listener( $self, $listener ) {
-    my $event = $listener->{event};
-    $self->listener->{ $event } ||= [];
-    @{$self->listener->{ $event }} = grep { $_ != $listener }
-                                     grep { defined $_ }
-                                     @{$self->listener->{ $event }};
+    # $listener->{event} can be undef during global destruction
+    if( my $event = $listener->{event} ) {
+        $self->listener->{ $event } ||= [];
+        @{$self->listener->{ $event }} = grep { $_ != $listener }
+                                         grep { defined $_ }
+                                         @{$self->listener->{ $event }};
+    };
 }
 
 =head2 C<< ->log >>
@@ -526,11 +533,13 @@ sub on_response( $self, $connection, $message ) {
 }
 
 sub next_sequence( $self ) {
-    $self->{sequence_number}++
+    my( $val ) = $self->current_sequence;
+    $self->sequence_number( $val+1 );
+    $val
 };
 
 sub current_sequence( $self ) {
-    $self->{sequence_number}
+    $self->sequence_number
 };
 
 sub build_url( $self, %options ) {

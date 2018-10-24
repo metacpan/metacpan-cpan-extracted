@@ -1,3 +1,8 @@
+1.125 2018-?-??
+================
+[Prty::Test::Class]
+Umlaute in Ausgabe von skipTest(), skipAllTests() konvertiert
+
 1.124 2018-03-02
 ================
 Zahlreiche Erweiterungen.

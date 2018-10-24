@@ -1,6 +1,6 @@
 package DBIx::Class::InflateColumn::ClassTypeEnum;
 # ABSTRACT: Inflate enum-like columns to your Class::Type::Enum classes
-$DBIx::Class::InflateColumn::ClassTypeEnum::VERSION = '0.011';
+$DBIx::Class::InflateColumn::ClassTypeEnum::VERSION = '0.013';
 
 use warnings;
 use strict;
@@ -11,7 +11,7 @@ use Carp ();
 
 sub register_column {
   my ($self, $column, $info) = @_;
-  $self->next::method(@_);
+  $self->next::method($column, $info);
 
   return unless $info->{extra} and my $class = $info->{extra}{enum_class};
 
@@ -73,7 +73,7 @@ DBIx::Class::InflateColumn::ClassTypeEnum - Inflate enum-like columns to your Cl
 
 =head1 VERSION
 
-version 0.011
+version 0.013
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::NewsArticle;
 
 # ABSTRACT: A NewsArticle is an article whose content reports news
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has dateline => (
@@ -72,14 +74,14 @@ SemanticWeb::Schema::NewsArticle - A NewsArticle is an article whose content rep
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
 =for html A NewsArticle is an article whose content reports news, or provides
-background context and supporting materials for understanding the news.</p>
-<p>A more detailed overview of <a href="/docs/news.html">schema.org News
-markup</a> is also available.
+background context and supporting materials for understanding the
+news.<br/><br/> A more detailed overview of <a
+href="/docs/news.html">schema.org News markup</a> is also available.
 
 =head1 ATTRIBUTES
 
@@ -88,7 +90,17 @@ markup</a> is also available.
 =for html A <a href="https://en.wikipedia.org/wiki/Dateline">dateline</a> is a brief
 piece of text included in news articles that describes where and when the
 story was written or filed though the date is often omitted. Sometimes only
-a placename is provided.
+a placename is provided.<br/><br/> Structured representations of
+dateline-related information can also be expressed more explicitly using <a
+class="localLink"
+href="http://schema.org/locationCreated">locationCreated</a> (which
+represents where a work was created e.g. where a news report was written).
+For location depicted or described in the content, use <a class="localLink"
+href="http://schema.org/contentLocation">contentLocation</a>.<br/><br/>
+Dateline summaries are oriented more towards human readers than towards
+automated processing, and can vary substantially. Some examples: "BEIRUT,
+Lebanon, June 2.", "Paris, France", "December 19, 2017 11:43AM Reporting
+from Washington", "Beijing/Moscow", "QUEZON CITY, Philippines".
 
 A dateline should be one of the following types:
 

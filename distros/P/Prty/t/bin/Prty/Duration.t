@@ -5,6 +5,7 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
 # -----------------------------------------------------------------------------
 
@@ -46,6 +47,28 @@ sub test_new_str : Test(6) {
     $self->is($$dur,21_904.321);
 
     $dur = Prty::Duration->new('7d6h5m4.321s');
+    $self->is($$dur,626_704.321);
+}
+
+sub test_new_dot : Test(6) {
+    my $self = shift;
+
+    my $dur = Prty::Duration->new('0');
+    $self->is($$dur,0);
+
+    $dur = Prty::Duration->new('1234');
+    $self->is($$dur,1234);
+
+    $dur = Prty::Duration->new('4.321');
+    $self->is($$dur,4.321);
+
+    $dur = Prty::Duration->new('5:4.321');
+    $self->is($$dur,304.321);
+
+    $dur = Prty::Duration->new('6:5:4.321');
+    $self->is($$dur,21_904.321);
+
+    $dur = Prty::Duration->new('7:6:5:4.321');
     $self->is($$dur,626_704.321);
 }
 
@@ -148,11 +171,14 @@ sub test_asFFmpegString : Test(6) {
 
 # -----------------------------------------------------------------------------
 
-sub test_stringToSeconds : Test(7) {
+sub test_stringToSeconds : Test(8) {
     my $self = shift;
 
-    my $sec = Prty::Duration->stringToSeconds('0s');
-    $self->is($sec,0);
+    my $sec = Prty::Duration->stringToSeconds('3');
+    $self->is($sec,3);
+
+    $sec = Prty::Duration->stringToSeconds('3s');
+    $self->is($sec,3);
 
     $sec = Prty::Duration->stringToSeconds('1234s');
     $self->is($sec,1234);
@@ -170,6 +196,30 @@ sub test_stringToSeconds : Test(7) {
     $self->is($sec,626_704.321);
 
     $sec = Prty::Duration->stringToSeconds('152d5h25m3.457s');    
+    $self->is($sec,13152303.457);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_stringToSeconds_dotNotation : Test(6) {
+    my $self = shift;
+
+    my $sec = Prty::Duration->stringToSeconds('1234');
+    $self->is($sec,1234);
+
+    $sec = Prty::Duration->stringToSeconds('4.321');
+    $self->is($sec,4.321);
+
+    $sec = Prty::Duration->stringToSeconds('5:4.321');
+    $self->is($sec,304.321);
+
+    $sec = Prty::Duration->stringToSeconds('6:5:4.321');
+    $self->is($sec,21_904.321);
+
+    $sec = Prty::Duration->stringToSeconds('7:6:5:4.321');
+    $self->is($sec,626_704.321);
+
+    $sec = Prty::Duration->stringToSeconds('152:5:25:3.457');    
     $self->is($sec,13152303.457);
 }
 

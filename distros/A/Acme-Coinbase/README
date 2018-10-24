@@ -1,6 +1,6 @@
+This archive contains the distribution Acme-Coinbase.
 
-This archive contains the distribution Acme-Coinbase,
-version 0.001:
+DEPRECATED - use Finance::GDAX::API or WebService::Coinbase
 
   Simple Coinbase API Test using docs at  
   https://www.coinbase.com/docs/api/authentication
@@ -11,7 +11,7 @@ version 0.001:
 
     Connects to a test coinbase account.
 
-This software is copyright (c) 2014 by joshr.
+This software is copyright (c) 2018 by joshr.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

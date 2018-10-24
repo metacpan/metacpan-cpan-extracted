@@ -1,7 +1,7 @@
 #!/usr/bin/perl -wT
 # this is a short example that illustrates use of Proc::NiceSleep
 
-# Copyright (c) 2002-2004 Josh Rabinowitz, All rights reserved
+# Copyright (c) 2002-2018 Josh Rabinowitz, All rights reserved
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 

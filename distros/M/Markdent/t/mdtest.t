@@ -7,7 +7,7 @@ use lib 't/lib';
 
 use File::Basename qw( basename );
 use File::Find qw( find );
-use File::Slurp qw( read_file );
+use File::Slurper qw( read_text );
 use Test::Markdent;
 
 my @files;
@@ -34,8 +34,8 @@ find(
 for my $pair ( sort { $a->[0] cmp $b->[0] } @files ) {
     my ( $md_file, $html_file ) = @{$pair};
 
-    my $markdown    = read_file($md_file);
-    my $expect_html = read_file($html_file);
+    my $markdown    = read_text($md_file);
+    my $expect_html = read_text($html_file);
 
     my $desc = basename($md_file);
     $desc =~ s/\.text$//;

@@ -1,0 +1,51 @@
+{
+  'children' => [
+    {
+      'children' => [
+        {
+          'nodename' => 'jsonPointer',
+          'type' => 'element'
+        },
+        {
+          'attributes' => {
+            'opFrom' => '<%'
+          },
+          'children' => [
+            {
+              'children' => [
+                {
+                  'children' => [
+                    'K'
+                  ],
+                  'nodename' => 'variableSystem',
+                  'type' => 'element'
+                },
+                {
+                  'children' => [
+                    {
+                      'children' => [
+                        'V'
+                      ],
+                      'nodename' => 'variableSystem',
+                      'type' => 'element'
+                    }
+                  ],
+                  'nodename' => 'exprSingleValue',
+                  'type' => 'element'
+                }
+              ],
+              'nodename' => 'exprObjectMapping',
+              'type' => 'element'
+            }
+          ],
+          'nodename' => 'exprMapping',
+          'type' => 'element'
+        }
+      ],
+      'nodename' => 'transformImpliedDest',
+      'type' => 'element'
+    }
+  ],
+  'nodename' => 'transforms',
+  'type' => 'element'
+}

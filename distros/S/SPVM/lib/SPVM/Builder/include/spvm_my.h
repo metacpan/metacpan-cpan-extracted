@@ -8,9 +8,10 @@ struct SPVM_my {
   SPVM_TYPE* type;
   SPVM_OP* op_name;
   int32_t index;
-  int32_t is_tmp;
   int32_t var_id;
-  int32_t value_field_basic_type_id;
+  int32_t runtime_type;
+  int32_t type_width;
+  int8_t is_tmp;
 };
 
 SPVM_MY* SPVM_MY_new();

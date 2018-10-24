@@ -13,6 +13,9 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Finance-CoinbasePro-API-CLI",
+  "EXE_FILES" => [
+    "bin/coinbasepro.pl"
+  ],
   "LICENSE" => "perl",
   "NAME" => "Finance::CoinbasePro::API::CLI",
   "PREREQ_PM" => {
@@ -25,12 +28,11 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "List::Util" => 0,
     "Mouse" => 0,
-    "Number::Format" => "1.75",
     "Pod::Autopod" => "1.215",
     "Time::Moment" => "0.44",
     "Time::Piece" => "1.33"
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.024",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +49,6 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "List::Util" => 0,
   "Mouse" => 0,
-  "Number::Format" => "1.75",
   "Pod::Autopod" => "1.215",
   "Time::Moment" => "0.44",
   "Time::Piece" => "1.33"

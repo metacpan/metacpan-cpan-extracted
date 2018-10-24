@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Suite;
 
 # ABSTRACT: A suite in a hotel or other public accommodation
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has bed => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::Suite - A suite in a hotel or other public accommodation
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -81,9 +83,9 @@ A bed should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::BedDetails']>
+
+=item C<Str>
 
 =back
 
@@ -91,7 +93,7 @@ A bed should be one of the following types:
 
 C<numberOfRooms>
 
-The number of rooms (excluding bathrooms and closets) of the acccommodation
+The number of rooms (excluding bathrooms and closets) of the accommodation
 or lodging business. Typical unit code(s): ROM for room or C62 for no unit.
 The type of room can be put in the unitText property of the
 QuantitativeValue.

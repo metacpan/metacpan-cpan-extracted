@@ -1,0 +1,40 @@
+---
+abstract: 'render fields using templates'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  HTML::FormHandler: '0'
+  HTML::FormHandler::Moose: '0'
+  Module::Metadata: '0'
+  Template: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-FormHandlerX-Widget-Field-Template
+provides:
+  HTML::FormHandlerX::Widget::Field::Template:
+    file: lib/HTML/FormHandlerX/Widget/Field/Template.pm
+    version: v0.1.1
+requires:
+  Moose::Role: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/robrwo/HTML-FormHandlerX-Widget-Field-Template/issues
+  repository: git://github.com/robrwo/HTML-FormHandlerX-Widget-Field-Template.git
+version: v0.1.1
+x_authority: cpan:RRWO
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::PaymentChargeSpecification;
 
 # ABSTRACT: The costs of settling the payment using a particular payment method.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has applies_to_delivery_method => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::PaymentChargeSpecification - The costs of settling the paym
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

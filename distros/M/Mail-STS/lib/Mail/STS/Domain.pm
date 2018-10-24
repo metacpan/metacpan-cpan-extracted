@@ -2,8 +2,11 @@ package Mail::STS::Domain;
 
 use Moose;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 # ABSTRACT: class for MTA-STS domain lookups
+
+use Time::Piece;
+use Time::Seconds;
 
 use Mail::STS::STSRecord;
 use Mail::STS::TLSRPTRecord;
@@ -83,6 +86,7 @@ foreach my $record (keys %$RECORDS) {
       my $domainname = $name->($self->$from);
       return $self->resolver->query($domainname, $type);
     },
+    clearer => "_reset_${accessor}",
   );
 }
 
@@ -205,14 +209,40 @@ has 'sts' => (
     }
     return;
   },
+  clearer => '_reset_sts',
 );
 
+
+has 'policy_id' => ( is => 'rw', isa => 'Maybe[Str]');
+has 'policy_expires_at' => ( is => 'rw', isa => 'Maybe[Time::Piece]');
+
+sub set_policy_expire {
+  my ($self, $max_age) = @_;
+  return Time::Piece->new + Time::Seconds->new($max_age)
+}
+
+sub is_policy_expired {
+  my $self = shift;
+  return 1 if Time::Piece->new > $self->policy_expires_at;
+  return 0;
+}
 
 has 'policy' => (
   is => 'ro',
   isa => 'Mail::STS::Policy',
   lazy => 1,
   default => sub {
+    my $self = shift;
+    die('could not retrieve _mta_sts record') unless defined $self->sts;
+    $self->policy_id( $self->sts->id );
+    my $policy = $self->retrieve_policy();
+    $self->set_policy_expire($policy->max_age);
+    return $policy;
+  },
+  clearer => '_reset_policy',
+);
+
+sub retrieve_policy {
     my $self = shift;
     my $url = 'https://mta-sts.'.$self->domain.'/.well-known/mta-sts.txt';
     my $response = $self->agent->get($url);
@@ -222,8 +252,26 @@ has 'policy' => (
     }
     die('could not retrieve policy: '.$response->status_line) unless $response->is_success;
     return Mail::STS::Policy->new_from_string($content);
-  },
-);
+}
+
+
+sub check_policy_update {
+  my $self = shift;
+  return 0 unless $self->is_policy_expired;
+
+  $self->_reset__sts;
+  $self->_reset_sts;
+  die('could not retrieve _mta_sts record') unless $self->sts;
+  my $new_id = $self->sts->id;
+  if($self->policy_id eq $new_id) {
+    $self->set_policy_expire($self->policy->max_age);
+    return 0;
+  }
+
+  $self->_reset_policy;
+  return 1;
+}
+
 
 
 1;
@@ -240,7 +288,7 @@ Mail::STS::Domain - class for MTA-STS domain lookups
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -360,6 +408,18 @@ Returns a Mail::STS::Policy object if a policy for the domain
 could be retrieved by the well known URL.
 
 Otherwise will die with an error.
+
+=head2 check_policy_update()
+
+Checks if a new version of the policy is available.
+
+First checks if the policy max_age has expired.
+Then checks if the _mta_sts record lists a new policy version.
+
+If there is a new policy the current policy will be resettet
+so the next call to ->policy() will return the new policy.
+
+Returns 1 if new policy was found otherwise 0.
 
 =head2 is_mx_secure()
 =head2 is_a_secure()

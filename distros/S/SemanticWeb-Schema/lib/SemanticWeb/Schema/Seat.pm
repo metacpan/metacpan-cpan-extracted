@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Seat;
 
 # ABSTRACT: Used to describe a seat
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has seat_number => (
@@ -64,7 +66,7 @@ SemanticWeb::Schema::Seat - Used to describe a seat
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

@@ -32,8 +32,6 @@ ok (!is_voiced ('か'));
 
 my $styles = romaji_vowel_styles;
 ok (ref $styles eq 'ARRAY');
-my @kana_order = kana_order ();
-ok (@kana_order);
 my $katakana = kana2katakana ('あいうえおｱｲｳｴｵ');
 ok ($katakana eq 'アイウエオアイウエオ');
 my $nr = normalize_romaji ('syuutsuju');

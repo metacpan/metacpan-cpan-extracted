@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::DigitalDocumentPermission;
 
 # ABSTRACT: A permission for a particular person or group to access a particular file.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has grantee => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::DigitalDocumentPermission - A permission for a particular p
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -67,11 +69,11 @@ A grantee should be one of the following types:
 
 =item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
 
+=item C<InstanceOf['SemanticWeb::Schema::Audience']>
+
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
-=item C<InstanceOf['SemanticWeb::Schema::Audience']>
 
 =back
 

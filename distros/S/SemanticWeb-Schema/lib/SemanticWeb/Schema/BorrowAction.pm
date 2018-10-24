@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::BorrowAction;
 
-# ABSTRACT: <p>The act of obtaining an object under an agreement to return it at a later date
+# ABSTRACT: The act of obtaining an object under an agreement to return it at a later date
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has lender => (
@@ -36,16 +38,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::BorrowAction - <p>The act of obtaining an object under an agreement to return it at a later date
+SemanticWeb::Schema::BorrowAction - The act of obtaining an object under an agreement to return it at a later date
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of obtaining an object under an agreement to return it at a
-later date. Reciprocal of LendAction.</p> <p>Related actions:</p> <ul>
+=for html The act of obtaining an object under an agreement to return it at a later
+date. Reciprocal of LendAction.<br/><br/> Related actions:<br/><br/> <ul>
 <li><a class="localLink"
 href="http://schema.org/LendAction">LendAction</a>: Reciprocal of
 BorrowAction.</li> </ul> 
@@ -61,9 +63,9 @@ A lender should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 

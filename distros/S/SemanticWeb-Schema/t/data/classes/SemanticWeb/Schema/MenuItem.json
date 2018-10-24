@@ -21,12 +21,13 @@
          "rdfs:comment" : "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event.",
          "rdfs:label" : "offers",
          "schema:domainIncludes" : [
-            "schema:Product",
-            "schema:MenuItem",
-            "schema:CreativeWork",
-            "schema:AggregateOffer",
             "schema:Event",
-            "schema:Service"
+            "schema:Trip",
+            "schema:MenuItem",
+            "schema:AggregateOffer",
+            "schema:Product",
+            "schema:Service",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:Offer"
       },
@@ -35,8 +36,8 @@
          "rdfs:comment" : "Indicates a dietary restriction or guideline for which this recipe or menu item is suitable, e.g. diabetic, halal etc.",
          "rdfs:label" : "suitableForDiet",
          "schema:domainIncludes" : [
-            "schema:Recipe",
-            "schema:MenuItem"
+            "schema:MenuItem",
+            "schema:Recipe"
          ],
          "schema:rangeIncludes" : "schema:RestrictedDiet"
       }

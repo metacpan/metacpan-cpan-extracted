@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::PublicationVolume;
 
-# ABSTRACT: <p>A part of a successively published publication such as a periodical or multi-volume work
+# ABSTRACT: A part of a successively published publication such as a periodical or multi-volume work
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has page_end => (
@@ -60,17 +62,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::PublicationVolume - <p>A part of a successively published publication such as a periodical or multi-volume work
+SemanticWeb::Schema::PublicationVolume - A part of a successively published publication such as a periodical or multi-volume work
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>A part of a successively published publication such as a periodical or
+=for html A part of a successively published publication such as a periodical or
 multi-volume work, often numbered. It may represent a time span, such as a
-year.</p> <pre><code> &lt;br/&gt;&lt;br/&gt;See also &lt;a
+year.<br/><br/> <pre><code> &lt;br/&gt;&lt;br/&gt;See also &lt;a
 href="http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.
 html"&gt;blog post&lt;/a&gt;. </code></pre> 
 
@@ -102,9 +104,9 @@ A page_start should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Integer']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
 

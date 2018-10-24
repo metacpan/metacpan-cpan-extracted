@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::TipAction;
 
 # ABSTRACT: The act of giving money voluntarily to a beneficiary in recognition of services rendered.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has recipient => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::TipAction - The act of giving money voluntarily to a benefi
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -58,11 +60,11 @@ A recipient should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::Audience']>
+
 =item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
-=item C<InstanceOf['SemanticWeb::Schema::Audience']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 

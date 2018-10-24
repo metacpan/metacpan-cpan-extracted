@@ -3,8 +3,9 @@ use base qw/Prty::Process Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Perl;
 use Encode ();
@@ -479,6 +480,11 @@ sub encode {
 
     ($error,$optH,$argA) = $prg->options(@keyVal);
 
+=head4 Description
+
+FIXME: Veraltete Methode. Alle Stellen, wo die Methode options()
+genutzt wird, auf parameters() portieren.
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -766,7 +772,7 @@ sub new {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

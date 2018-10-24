@@ -1,7 +1,6 @@
 #!/opt/bin/perl
 
-use utf8;
-use strict qw(vars subs);
+use common::sense;
 
 use Deliantra;
 use IO::AIO;

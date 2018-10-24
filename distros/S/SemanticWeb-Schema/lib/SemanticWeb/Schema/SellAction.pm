@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::SellAction;
 
 # ABSTRACT: The act of taking money from a buyer in exchange for goods or services rendered
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has buyer => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::SellAction - The act of taking money from a buyer in exchan
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

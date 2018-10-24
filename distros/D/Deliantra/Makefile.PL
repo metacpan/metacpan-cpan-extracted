@@ -12,11 +12,12 @@ my $mm = MM->new({
        AnyEvent      => 4,
        JSON::XS      => 2.01,
        Compress::LZF => 3.11,
+       Digest::SHA   => 5,
     },
     NAME         => "Deliantra",
     VERSION_FROM => "Deliantra.pm",
     EXE_FILES    => [qw(bin/cfarch-normalize bin/cfmap-normalize bin/cfarch-normalize bin/cfmap-plushify
-                        bin/cfmap-cavehify bin/cfmap-tagify bin/cfxmlrender bin/cf-slotutil)],
+                        bin/cfmap-cavehify bin/cfmap-tagify bin/cfxmlrender bin/cf-slotutil bin/cfmap-set)],
 });
 
 $mm->flush;

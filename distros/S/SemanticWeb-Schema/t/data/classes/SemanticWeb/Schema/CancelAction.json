@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of asserting that a future event/action is no longer going to happen.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/ConfirmAction\">ConfirmAction</a>: The antonym of CancelAction.</li>\n</ul>\n",
+      "rdfs:comment" : "The act of asserting that a future event/action is no longer going to happen.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/ConfirmAction\">ConfirmAction</a>: The antonym of CancelAction.</li>\n</ul>\n",
       "rdfs:label" : "CancelAction",
       "rdfs:subClassOf" : "schema:PlanAction"
    },

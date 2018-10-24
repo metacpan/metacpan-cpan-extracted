@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::StructuredValue;
 
 # ABSTRACT: Structured values are used when the value of a property has a more complex structure than simply being a textual value or a reference to another thing.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::StructuredValue - Structured values are used when the value
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

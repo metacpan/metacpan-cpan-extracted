@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::SomeProducts;
 
 # ABSTRACT: A placeholder for multiple similar products of the same kind.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has inventory_level => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::SomeProducts - A placeholder for multiple similar products 
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

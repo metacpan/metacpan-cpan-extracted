@@ -3,8 +3,96 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Markdent::CLI;
 
 Markdent::CLI->new_with_options()->run();
+
+# PODNAME: markdent-html
+
+# ABSTRACT: Turn Markdown into HTML with Markdent
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+markdent-html - Turn Markdown into HTML with Markdent
+
+=head1 VERSION
+
+version 0.32
+
+=head1 SYNOPSIS
+
+    $> markdent-html --file ./path/to/text.md
+
+=head1 DESCRIPTION
+
+This tool turns Markdown into HTML using L<Markdent>.
+
+=head1 OPTIONS
+
+This tool accepts the following command line options:
+
+=head2 --file
+
+The file containing the Markdown to process. You must provide this or
+C<--text>, but not both.
+
+=head2 --text
+
+The Markdown text to process. You must provide this or C<--file>, but not
+both.
+
+=head2 --title
+
+If you pass then the output will be a full HTML document containing this as
+the C<< <title> >> tag. If this isn't passed then the output will be a HTML
+fragment with no C<< <html> >> or C<< <body> >> tags.
+
+=head2 --charset
+
+If you pass with a C<--title> it will be used to populate a C<< <meta
+charset="..."> >> tag for the document.
+
+=head2 --language
+
+If you pass with a C<--title> it will be used to set the C<lang> attribute for
+the document's C<< <html> >> tag.
+
+=head2 --dialects
+
+You can add one or more dialects to the standard parser with this option. This
+can either be a full class name like C<Markdent::Dialect::GitHub> or just a
+short name like C<GitHub>.
+
+=head1 SUPPORT
+
+Bugs may be submitted at L<https://github.com/houseabsolute/Markdent/issues>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Markdent can be found at L<https://github.com/houseabsolute/Markdent>.
+
+=head1 AUTHOR
+
+Dave Rolsky <autarch@urth.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dave Rolsky.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
+
+=cut

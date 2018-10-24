@@ -20,7 +20,7 @@ use warnings;
 
 use Carp qw< carp croak >;
 
-our $VERSION = '1.999814';
+our $VERSION = '1.999815';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -233,7 +233,6 @@ my $LIB = 'Math::BigInt::Calc';        # module to do the low level math
 my $IMPORT = 0;                         # was import() called yet?
                                         # used to make require work
 my %WARN;                               # warn only once for low-level libs
-my %CAN;                                # cache for $LIB->can(...)
 my %CALLBACKS;                          # callbacks to notify on lib loads
 my $EMU_LIB = 'Math/BigInt/CalcEmu.pm'; # emulate low-level math
 
@@ -2991,21 +2990,13 @@ sub band {
 
     return $x->bnan() if ($x->{sign} !~ /^[+-]$/ || $y->{sign} !~ /^[+-]$/);
 
-    my $sx = $x->{sign} eq '+' ? 1 : -1;
-    my $sy = $y->{sign} eq '+' ? 1 : -1;
-
-    if ($sx == 1 && $sy == 1) {
+    if ($x->{sign} eq '+' && $y->{sign} eq '+') {
         $x->{value} = $LIB->_and($x->{value}, $y->{value});
-        return $x->round(@r);
+    } else {
+        ($x->{value}, $x->{sign}) = $LIB->_sand($x->{value}, $x->{sign},
+                                                $y->{value}, $y->{sign});
     }
-
-    if ($CAN{signed_and}) {
-        $x->{value} = $LIB->_signed_and($x->{value}, $y->{value}, $sx, $sy);
-        return $x->round(@r);
-    }
-
-    require $EMU_LIB;
-    __emu_band($class, $x, $y, $sx, $sy, @r);
+    return $x->round(@r);
 }
 
 sub bior {
@@ -3020,29 +3011,18 @@ sub bior {
     }
 
     return $x if $x->modify('bior');
+
     $r[3] = $y;                 # no push!
 
     return $x->bnan() if ($x->{sign} !~ /^[+-]$/ || $y->{sign} !~ /^[+-]$/);
 
-    my $sx = $x->{sign} eq '+' ? 1 : -1;
-    my $sy = $y->{sign} eq '+' ? 1 : -1;
-
-    # the sign of X follows the sign of X, e.g. sign of Y irrelevant for bior()
-
-    # don't use lib for negative values
-    if ($sx == 1 && $sy == 1) {
+    if ($x->{sign} eq '+' && $y->{sign} eq '+') {
         $x->{value} = $LIB->_or($x->{value}, $y->{value});
-        return $x->round(@r);
+    } else {
+        ($x->{value}, $x->{sign}) = $LIB->_sor($x->{value}, $x->{sign},
+                                               $y->{value}, $y->{sign});
     }
-
-    # if lib can do negative values, let it handle this
-    if ($CAN{signed_or}) {
-        $x->{value} = $LIB->_signed_or($x->{value}, $y->{value}, $sx, $sy);
-        return $x->round(@r);
-    }
-
-    require $EMU_LIB;
-    __emu_bior($class, $x, $y, $sx, $sy, @r);
+    return $x->round(@r);
 }
 
 sub bxor {
@@ -3057,27 +3037,18 @@ sub bxor {
     }
 
     return $x if $x->modify('bxor');
+
     $r[3] = $y;                 # no push!
 
     return $x->bnan() if ($x->{sign} !~ /^[+-]$/ || $y->{sign} !~ /^[+-]$/);
 
-    my $sx = $x->{sign} eq '+' ? 1 : -1;
-    my $sy = $y->{sign} eq '+' ? 1 : -1;
-
-    # don't use lib for negative values
-    if ($sx == 1 && $sy == 1) {
+    if ($x->{sign} eq '+' && $y->{sign} eq '+') {
         $x->{value} = $LIB->_xor($x->{value}, $y->{value});
-        return $x->round(@r);
+    } else {
+        ($x->{value}, $x->{sign}) = $LIB->_sxor($x->{value}, $x->{sign},
+                                               $y->{value}, $y->{sign});
     }
-
-    # if lib can do negative values, let it handle this
-    if ($CAN{signed_xor}) {
-        $x->{value} = $LIB->_signed_xor($x->{value}, $y->{value}, $sx, $sy);
-        return $x->round(@r);
-    }
-
-    require $EMU_LIB;
-    __emu_bxor($class, $x, $y, $sx, $sy, @r);
+    return $x->round(@r);
 }
 
 sub bnot {
@@ -4071,14 +4042,6 @@ sub import {
     # notify callbacks
     foreach my $class (keys %CALLBACKS) {
         &{$CALLBACKS{$class}}($LIB);
-    }
-
-    # Fill $CAN with the results of $LIB->can(...) for emulating lower math lib
-    # functions
-
-    %CAN = ();
-    for my $method (qw/ signed_and signed_or signed_xor /) {
-        $CAN{$method} = $LIB->can("_$method") ? 1 : 0;
     }
 
     # import done

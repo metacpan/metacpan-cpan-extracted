@@ -1,6 +1,41 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 0a6923fda1dc15fe2a50b36ccbd5ea327b11a5b5
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Oct 19 17:34:23 2018 -0700
+
+    1.72 Dependency on XAO::Base 1.22
+    
+    No functional changes in XAO::Web, just a dependency on XAO::Base 1.22
+    for library projects support.
+
+commit fe589b38d58fee94d8b50954d80a3572e62516bc
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Sep 14 17:13:20 2018 -0700
+
+    Updated Dockerfile for DBD::MariaDB and MariaDB 10.3
+
+commit e14e7878f43e18d77b3198f2595046801de1d93f
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sat Aug 25 07:44:01 2018 -0700
+
+    Force ExtUtils::MakeMaker 6.64
+
+commit 542690459f31d9bbcaf2b656cfe37f8495d1e294
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Jul 30 07:03:17 2018 -0700
+
+    Better compatibility with Perl 5.10.1
+
+commit b4eb5ad7f99ce64ebc4649eed23b1ea2a43f2409
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Jul 30 06:28:03 2018 -0700
+
+    Added Vars() method proxy to XAO::DO::CGI
+    
+    Now calls to Vars are also charset aware.
+
 commit 5707134fce103e393d48a57b07b10de7146cbcd8
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Sat Jul 7 10:30:15 2018 -0700
@@ -38,39 +73,4 @@ Date:   Fri Jul 6 17:36:28 2018 -0700
     1.68 CPAN release updates
     
     No functional changes. Just tests reorganized, etc.
-
-commit f1007aa0e85811d7a3a515410ed3920859a6e11b
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Thu Jul 5 12:50:21 2018 -0700
-
-    Docker image adjustments
-    
-    Added Carton, inlined MariaDB repo.
-
-commit 69fc29fef8a63683bca1caf120fabc1fd6843c8d
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Jul 4 18:14:20 2018 -0700
-
-    'make docker-image' fix
-
-commit 31a1aa327a5fb0a2ff84aedec724d13e4e40c620
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Jul 4 18:01:18 2018 -0700
-
-    Dockerfile fix
-    
-    Did not realize that ARG's before FROM are not overridable in the build
-    stage...
-
-commit 834a028b8a81e3bb26b0465e0dce489c3bdfce14
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Jul 4 17:40:39 2018 -0700
-
-    Removed obsolete $VERSION vars
-
-commit 5890f7391e29f549223dc29cdcade90989596518
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Jul 4 17:40:09 2018 -0700
-
-    1.67: Fixed PSGI no cookies issue
 

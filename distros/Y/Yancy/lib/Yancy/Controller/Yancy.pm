@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -297,6 +297,12 @@ sub get {
 #pod
 #pod Forwarding will not happen for JSON requests.
 #pod
+#pod =item properties
+#pod
+#pod Restrict this route to only setting the given properties. An array
+#pod reference of properties to allow. Trying to set additional properties
+#pod will result in an error.
+#pod
 #pod =back
 #pod
 #pod The following stash values are set by this method:
@@ -383,6 +389,7 @@ sub set {
     if ( $c->req->method eq 'GET' ) {
         if ( $id ) {
             my $item = $c->yancy->get( $coll_name => $id );
+            $c->stash( item => $item );
             for my $key ( keys %$item ) {
                 # Mojolicious TagHelpers take current values through the
                 # params, but also we allow pre-filling values through the
@@ -421,9 +428,17 @@ sub set {
 
     my $data = $c->req->params->to_hash;
     delete $data->{csrf_token};
+    #; use Data::Dumper;
+    #; $c->app->log->debug( Dumper $data );
+
+    my %opt;
+    if ( my $props = $c->stash( 'properties' ) ) {
+        $opt{ properties } = $props;
+    }
+
     my $update = $id ? 1 : 0;
     if ( $update ) {
-        eval { $c->yancy->set( $coll_name, $id, $data ) };
+        eval { $c->yancy->set( $coll_name, $id, $data, %opt ) };
     }
     else {
         $id = eval { $c->yancy->create( $coll_name, $data ) };
@@ -580,7 +595,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -778,6 +793,12 @@ route placeholders that match item field names will be filled in.
     # forward_to => '/1/first-post'
 
 Forwarding will not happen for JSON requests.
+
+=item properties
+
+Restrict this route to only setting the given properties. An array
+reference of properties to allow. Trying to set additional properties
+will result in an error.
 
 =back
 

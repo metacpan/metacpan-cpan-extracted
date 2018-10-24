@@ -8,7 +8,7 @@ use UNIVERSAL::require;
 use Text::Trac::LinkResolver;
 use HTML::Entities qw();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 tie my %token_table, 'Tie::IxHash';
 
@@ -295,10 +295,11 @@ sub _make_ext_link {
 	$title ||= $text;
 
 	my $local = $self->{context}->{local} || '';
-	my $class_link = $self->{context}->{class} ? q{class="ext-link"} : '';
-	my $class_icon = $self->{context}->{class} ? q{class="icon"}     : '';
+	my $class_link = $self->{context}->{class} ? q{class="ext-link"}           : '';
+	my $class_icon = $self->{context}->{class} ? q{class="icon"}               : '';
+	my $span       = $self->{context}{span}    ? qq{<span $class_icon></span>} : '';
 	if ( $url !~ /^$local/ or !$local ) {
-		return qq{<a $class_link href="$url"$title_attr><span $class_icon></span>$text</a>};
+		return qq{<a $class_link href="$url"$title_attr>$span$text</a>};
 	}
 }
 

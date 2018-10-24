@@ -1,0 +1,87 @@
+<p>
+[[PageOutline(1-2)]]
+</p>
+<h2>Is Padre for Perl only?</h2>
+<p>
+While the main focus of Padre is to provide excellent support for both beginner and advanced Perl developers 
+it is not restricted to Perl development only.
+It provides syntax highlighting to most of the languages out there and if you are missing something just ask on the mailing list or open a ticket.
+It is also planned to be integrated with <a  href="http://www.parrot.org/">Parrot</a> that will allow writing plug-ins in any language running on Parrot.
+</p>
+<h2>Why not just reuse an existing Editor?</h2>
+<p>
+We hope that by writing it in Perl we will make it easy for any user of Padre to contribute back to the project and/or to add plug-ins.
+</p>
+<ul><li>vi and emacs -- while being excellent tools -- are not very beginner-friendly.
+</li><li>Komodo costs money and is not Free/Open Source software.
+</li><li>Eclipse is huge and you need to know Java to extend it.
+</li><li>Various editors such as Ultra-Edit, Notepad++ etc. are Windows-only</li></ul>
+<h2>Why does Padre use wxWidgets and not ...?</h2>
+<p>
+wxWidgets uses the native windowing widgets of each operating system and in theory that should be the nicest
+and most &quot;native looking&quot; on all operating systems. So while it has it own problems and it is not the easiest
+to write in it, it might have the best potential.
+</p>
+<h2>Why using Subversion when Git is so much better?</h2>
+<p>
+We started to use SVN as Gabor did not know Git. 
+We keep it as it works well for us and a lot more people know SVN than Git.
+</p>
+<p>
+With that said if someone implements an awesome and simple-to-use
+plugin for Padre to integrate with Git that works well on both Windows 
+and Linux then we can consider switching.
+</p>
+<h2>Why using ithreads when forks/coro is so much better?</h2>
+<p>
+Threads are the only Perl concurrency system that is portable and actually runs things in parallel and makes use of multiple cores. We needed something portable that does real concurrency (i.e. no cooperative multi-threading or event loop), so fork was out of the loop due to portability and POE/Coro due to cooperative multithreading.
+</p>
+<h2>I have trouble installing Padre. Where can I find help?</h2>
+<p>
+See <a  href="/wiki/Download">Download</a> and the pages linked there for installation instructions.
+If this does not bring you any further, <a  href="http://padre.perlide.org/contact.html">contact us</a>, we will see how we can help us.
+</p>
+<h2>I have found a bug. What do I do now?</h2>
+<p>
+Report it. Either by <a  href="http://padre.perlide.org/contact.html">contacting us</a>, or by <a  href="/wiki/Tickets">creating a new ticket in Trac</a>.
+</p>
+<h2>Padre lacks feature XY. What can I do about it?</h2>
+<p>
+Tell us. Either by <a  href="http://padre.perlide.org/contact.html">contacting us</a>, or by <a  href="/wiki/Tickets">creating a new ticket in Trac</a>.
+</p>
+<p>
+Or even better: Implement it yourself. Hacking Padre isn't that hard if you know some Perl. And the developer community is very open and welcoming towards new developers.
+See <a  href="/wiki/Howto">Howto</a> and <a  href="http://padre.perlide.org/getting_involved.html">Getting Involved</a> for more information.
+</p>
+<h2>How do I checkout a trunk version of padre?</h2>
+<p>
+This is described on the <a  href="/wiki/Howto">Howto</a> page.
+</p>
+<h2>My Perl script expects user input from STDIN, but I cannot enter anything when executing it inside Padre. What can I do?</h2>
+<p>
+There is a setting in the Preferences dialog, under &quot;Run parameters&quot; (or under &quot;Language Perl 5&quot;, depending on your version of Perl, called
+&quot;Use external window for execution&quot;.
+</p>
+<p>
+If you activate that setting, you can make inputs to STDIN.
+</p>
+<p>
+See also ticket <a  href="/ticket/743">#743</a>.
+</p>
+<h2>I am not getting output console when I Run a script (press F5)</h2>
+<p>
+There is a setting in the Preferences dialog, under &quot;Run parameters&quot; (or under &quot;Language Perl 5&quot;, depending on your version of Perl, called
+&quot;Use external window for execution&quot;.
+</p>
+<p>
+Try to check / uncheck that.
+</p>
+<h2>Can I edit remote files on an FTP server with Padre?</h2>
+<p>
+Yes, just use &quot;File&quot;-&gt;&quot;Open ...&quot;-&gt;&quot;Open URL ...&quot; and enter your file's URL.
+HTTP and HTTPS are also supported, by the way.
+</p>
+<h2>How can I add/modify keyboard shortcuts?</h2>
+<p>
+There is a keyboard shortcut editor in the menu under &quot;Tools&quot; -&gt; &quot;Key Bindings&quot;.
+</p>

@@ -8,7 +8,7 @@ The main development of Padre is in the trunk <a  href="http://svn.perlide.org/p
 additional projects and almost all the plugins of Padre also live in the same repository so the best if you check 
 out the whole trunk <a  href="http://svn.perlide.org/padre/trunk"><span ></span>http://svn.perlide.org/padre/trunk</a>
 </p>
-<pre >
+<pre>
 $ svn co http://svn.perlide.org/padre/trunk padre
 </pre>
 <p>
@@ -17,7 +17,7 @@ Then you can run the standard CPAN module process:
 <p>
 Make sure you have all of the needed prerequisites. See <a  href="http://padre.perlide.org/trac/wiki/Download"><span ></span>http://padre.perlide.org/trac/wiki/Download</a>
 </p>
-<pre >
+<pre>
 $ cd padre/Padre
 $ perl Makefile.PL      # which will tell about all the missing dependencies of Padre
                         # this may fail if you don't have Module::Install
@@ -88,7 +88,7 @@ Create a branch and work on it:
 <p>
 Assuming you have already checked out <a  href="http://svn.perlide.org/padre/trunk/"><span ></span>http://svn.perlide.org/padre/trunk/</a> to /path/to/padre
 </p>
-<pre >
+<pre>
 $ svn cp http://svn.perlide.org/padre/trunk/Padre http://svn.perlide.org/padre/branches/My-branch -m'some messages'
 $ cd /path/to/padre/Padre
 $ svn switch http://svn.perlide.org/padre/branches/My-branch .
@@ -111,7 +111,7 @@ When done and you would like to merge your changes
 <p>
 1. Make sure everything is committed
 </p>
-<pre >
+<pre>
 $ cd /path/to/padre/Padre
 $ svn switch http://svn.perlide.org/padre/trunk/Padre
 $ svn log --stop-on-copy http://svn.perlide.org/padre/branches/My-branch

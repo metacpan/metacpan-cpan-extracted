@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::PlayAction;
 
-# ABSTRACT: <p>The act of playing/exercising/training/performing for enjoyment
+# ABSTRACT: The act of playing/exercising/training/performing for enjoyment
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has audience => (
@@ -44,16 +46,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::PlayAction - <p>The act of playing/exercising/training/performing for enjoyment
+SemanticWeb::Schema::PlayAction - The act of playing/exercising/training/performing for enjoyment
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of playing/exercising/training/performing for enjoyment,
-leisure, recreation, Competition or exercise.</p> <p>Related actions:</p>
+=for html The act of playing/exercising/training/performing for enjoyment, leisure,
+recreation, Competition or exercise.<br/><br/> Related actions:<br/><br/>
 <ul> <li><a class="localLink"
 href="http://schema.org/ListenAction">ListenAction</a>: Unlike ListenAction
 (which is under ConsumeAction), PlayAction refers to performing for an

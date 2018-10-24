@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Organization;
 
 # ABSTRACT: An organization such as a school
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has address => (
@@ -424,7 +426,7 @@ SemanticWeb::Schema::Organization - An organization such as a school
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -483,11 +485,11 @@ A area_served should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
+
 =item C<Str>
 
 =item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
-
-=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
@@ -843,9 +845,9 @@ A location should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
+
+=item C<Str>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
@@ -888,9 +890,9 @@ A member should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -996,8 +998,8 @@ href="http://schema.org/CreativeWork">CreativeWork</a> (e.g. <a
 class="localLink" href="http://schema.org/NewsArticle">NewsArticle</a>) the
 principles are those of the party primarily responsible for the creation of
 the <a class="localLink"
-href="http://schema.org/CreativeWork">CreativeWork</a>.</p> <p>While such
-policies are most typically expressed in natural language, sometimes
+href="http://schema.org/CreativeWork">CreativeWork</a>.<br/><br/> While
+such policies are most typically expressed in natural language, sometimes
 related information (e.g. indicating a <a class="localLink"
 href="http://schema.org/funder">funder</a>) can be expressed using
 schema.org terminology.
@@ -1059,11 +1061,11 @@ A service_area should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Place']>
+=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
 
 =item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
-=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
 

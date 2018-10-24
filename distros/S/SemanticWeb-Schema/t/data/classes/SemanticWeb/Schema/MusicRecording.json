@@ -11,8 +11,8 @@
          "rdfs:comment" : "The artist that performed this album or recording.",
          "rdfs:label" : "byArtist",
          "schema:domainIncludes" : [
-            "schema:MusicAlbum",
-            "schema:MusicRecording"
+            "schema:MusicRecording",
+            "schema:MusicAlbum"
          ],
          "schema:rangeIncludes" : "schema:MusicGroup"
       },
@@ -21,10 +21,10 @@
          "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
          "rdfs:label" : "duration",
          "schema:domainIncludes" : [
-            "schema:Event",
             "schema:MediaObject",
-            "schema:MusicRelease",
             "schema:Movie",
+            "schema:Event",
+            "schema:MusicRelease",
             "schema:MusicRecording"
          ],
          "schema:rangeIncludes" : "schema:Duration"
@@ -44,7 +44,7 @@
          "schema:rangeIncludes" : "schema:MusicPlaylist"
       },
       "schema:isrcCode" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Recording Code for the recording.",
          "rdfs:label" : "isrcCode",
@@ -52,7 +52,7 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:recordingOf" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The composition this track is a recording of.",
          "rdfs:label" : "recordingOf",

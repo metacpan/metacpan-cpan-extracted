@@ -1,0 +1,72 @@
+<h1>CPAN Installation Instructions</h1>
+<p>
+Padre is released as a CPAN package. You can download and install it using <tt>cpan</tt>, <tt>cpanm</tt> or CPANPLUS.
+The released versions can be seen here <a  href="http://search.cpan.org/dist/Padre/">http://search.cpan.org/dist/Padre/</a> here <a  href="http://kobesearch.cpan.org/dist/Padre">http://kobesearch.cpan.org/dist/Padre</a>
+and here <a  href="https://metacpan.org/release/Padre">https://metacpan.org/release/Padre</a> depending on your preferences.
+</p>
+<p>
+As Padre has many dependencies probably the easiest is to install the binary distribution
+where available from the vendor (Mandriva, Fedora, Debian, FreeBSD) and then use <tt>cpanm</tt> to upgrade.
+</p>
+<p>
+If this is not possible read on.
+</p>
+<h2>Install from CPAN</h2>
+<h3>Strawberry Perl on Windows</h3>
+<p>
+On Strawberry Perl you should be able to install/upgrade Padre by just opening the &quot;cmd&quot; 
+and typing
+</p>
+<pre>
+c:&gt; cpan Padre
+</pre>
+<h3>Active Perl in Windows</h3>
+<p>
+Probably the same as for Strawberry Perl but you might first need to install the C compiler they supply.
+</p>
+<h3>Linux</h3>
+<p>
+On Linux you should probably start by installing from the binary repository of your distribution
+(see below) and then upgrading from CPAN using local::lib.
+</p>
+<p>
+That part starts by installing local::lib using the <a  href="https://metacpan.org/module/local::lib#The-bootstrapping-technique">Bootstrapping technique</a>
+and once that's done type
+</p>
+<pre>
+$ cpan Padre
+</pre>
+<h2>Common Problems</h2>
+<h3>Corporate Proxy</h3>
+<p>
+People behind a (corporate) proxy will not be able to access the CPAN servers directly. 
+First they need to tell the CPAN client which proxy to use.
+For this, launch the cpan client by typing <strong>cpan</strong> on the command line. 
+You should get a cpan&gt; prompt and in there type the following: (obviously replace
+the address of the proxy server with the one you have in your company).
+</p>
+<pre>
+cpan&gt; o conf http_proxy http://proxy.corporate.com:8080
+cpan&gt; o conf commit
+cpan&gt; q
+</pre>
+<p>
+Once you did this the cpan command should work.
+</p>
+<h3><a  href="/wiki/WxWidgets">WxWidgets</a> and <a  href="/wiki/WxPerl">WxPerl</a></h3>
+<p>
+The difficult part is sometimes to install some of the prerequisites:
+</p>
+<ul><li>Installing wxWidgets (that <a  href="http://search.cpan.org/dist/Alien-wxWidgets/">Alien::wxWidgets</a> tries to solve)
+</li><li>Installing wxPerl (the <a  href="http://search.cpan.org/dist/Wx/">Wx</a> distro) from CPAN.</li></ul>
+<p>
+Mattia Barbon did a great job with them but they still may be difficult to install in some cases. 
+</p>
+<h2>Platform-specific Instructions</h2>
+<ul><li><a  href="/wiki/DownloadDebian#Installation_from_CPAN">Debian</a>
+</li><li><a  href="/wiki/DownloadFedora#Installation_from_CPAN">Fedora</a>
+</li><li><a  href="/wiki/DownloadFreeBSD#Installation_from_CPAN">FreeBSD</a>
+</li><li><a  href="/wiki/DownloadMandriva#Installation_from_CPAN">Mandriva</a>
+</li><li><a  href="/wiki/DownloadNetBSD#Installation_from_CPAN">NetBSD</a>
+</li><li><a  href="/wiki/DownloadUbuntu#Installation_from_CPAN">Ubuntu</a>
+</li><li><a  href="/wiki/DownloadWindows#Installation_from_CPAN">Windows</a></li></ul>

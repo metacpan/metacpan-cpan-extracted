@@ -1,3 +1,15 @@
+Revision history for Dancer2-Plugin-Passphrase
+
+3.3.3 Mon 22 Oct 15:00:50 CEST 2018
+
+    * Fix typos in documentation (Mohammad S Anwar)
+
+3.3.2 Sun 21 Oct 13:40:45 CEST 2018
+
+    * Fix typos in documentation (GH#12 Nuno Carvalho)
+    * reduce min Perl requirement to 5.8.1 from 5.10.1
+    * Fix documentation for optional args for generate (thanks to Tom Adams)
+
 3.3.0   2016-10-04
 
     [ D2P2 ]

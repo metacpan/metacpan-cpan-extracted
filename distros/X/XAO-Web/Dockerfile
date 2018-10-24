@@ -25,11 +25,9 @@ ARG XAO_WEB_VERSION=master
 
 # MariaDB repository.
 #
-# TODO: Update to 10.3 when DBD::mysql is working.
-#
 RUN echo "[mariadb]" > /etc/yum.repos.d/MariaDB.repo && \
     echo "name=MariaDB" >> /etc/yum.repos.d/MariaDB.repo && \
-    echo "baseurl=http://yum.mariadb.org/10.1/centos7-amd64" >> /etc/yum.repos.d/MariaDB.repo && \
+    echo "baseurl=http://yum.mariadb.org/10.3/centos7-amd64" >> /etc/yum.repos.d/MariaDB.repo && \
     echo "gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB" >> /etc/yum.repos.d/MariaDB.repo && \
     echo "gpgcheck=1" >> /etc/yum.repos.d/MariaDB.repo && \
     rpm --import https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
@@ -45,6 +43,7 @@ RUN yum upgrade -y              \
         perl-LWP-Protocol-https \
         openssl-devel           \
         MariaDB-devel           \
+        MariaDB-shared          \
     && \
     rm -rf /var/cache/yum
 
@@ -57,7 +56,7 @@ RUN   cpanm -n \
         Plack \
         Plack::Middleware::Debug \
         Starman \
-        https://api.github.com/repos/amaltsev/perl-Test-Unit/tarball/0.29 \
+        DBD::MariaDB \
         https://api.github.com/repos/amaltsev/XAO-Base/tarball/$XAO_BASE_VERSION \
         https://api.github.com/repos/amaltsev/XAO-FS/tarball/$XAO_FS_VERSION \
         https://api.github.com/repos/amaltsev/XAO-Web/tarball/$XAO_WEB_VERSION \
@@ -82,7 +81,7 @@ ENV XAO_SITE_NAME="app"
 #   docker run --publish 8080:80 amaltsev/xao-web
 #
 #   docker run --publish 8080:80 --env PSGI_RUNNER=starman amaltsev/xao-web
-
+#
 #   docker run -p 8080:80 -v $(pwd):/opt/xao/projects/app amaltsev/xao-web
 #
 #   docker run -p 8080:80 -v $(pwd):/opt/xao/projects/mysite --env XAO_SITE_NAME=mysite amaltsev/xao-web

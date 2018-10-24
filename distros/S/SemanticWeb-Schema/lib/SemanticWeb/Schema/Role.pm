@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Role;
 
 # ABSTRACT: Represents additional information about a relationship or property
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has end_date => (
@@ -64,7 +66,7 @@ SemanticWeb::Schema::Role - Represents additional information about a relationsh
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -74,7 +76,7 @@ SportsTeam to a player occurred during a particular time period. Or that a
 Person's 'actor' role in a Movie was for some particular characterName.
 Such properties can be attached to a Role entity, which is then associated
 with the main entities using ordinary properties like 'member' or
-'actor'.</p> <p>See also <a
+'actor'.<br/><br/> See also <a
 href="http://blog.schema.org/2014/06/introducing-role.html">blog post</a>.
 
 =head1 ATTRIBUTES

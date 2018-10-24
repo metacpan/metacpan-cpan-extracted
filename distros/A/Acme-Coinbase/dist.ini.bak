@@ -1,0 +1,36 @@
+name    = Acme-Coinbase
+author  = joshr <joshr>
+license = Perl_5
+copyright_holder = joshr
+copyright_year   = 2014
+
+version = 0.007
+; [@Basic]
+;  is the same as...
+[GatherDir]
+[PruneCruft]
+[ManifestSkip]
+[MetaYAML]
+[License]
+; [Readme]
+[ExtraTests]
+[ExecDir]
+[ShareDir]
+[MakeMaker]
+[Manifest]
+[TestRelease]
+[ConfirmRelease]
+[UploadToCPAN]
+
+; PodWeaver added based upon http://dzil.org/tutorial/writing-docs.html
+; [PodWeaver]
+
+
+[Test::Perl::Critic]
+[PodCoverageTests]
+[PodSyntaxTests]
+
+[Deprecated]
+
+[Prereqs]
+Config::IniFiles = 0

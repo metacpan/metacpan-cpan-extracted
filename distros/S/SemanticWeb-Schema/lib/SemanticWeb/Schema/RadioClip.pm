@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::RadioClip;
 
 # ABSTRACT: A short radio program or a segment/part of a radio program.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::RadioClip - A short radio program or a segment/part of a ra
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

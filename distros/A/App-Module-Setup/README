@@ -25,22 +25,19 @@ To install this module, run the following commands:
 
 SUPPORT AND DOCUMENTATION
 
-After installing, you can find documentation for this module with the
-perldoc command.
+Development of this module takes place on GitHub:
+https://github.com/sciurius/perl-module-starter.
+
+You can find documentation for this module with the perldoc command.
 
     perldoc App::Module::Setup
 
-You can also look for information at:
-
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Module-Setup
-
-    Search CPAN
-        http://search.cpan.org/dist/App-Module-Setup
+Please report any bugs or feature requests using the issue tracker on
+GitHub.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013 Johan Vromans
+Copyright (C) 2013,2018 Johan Vromans
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

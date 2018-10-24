@@ -7,7 +7,7 @@
    },
    "properties" : {
       "schema:feesAndCommissionsSpecification" : {
-         "dc:source" : "schemadotorgsources:FIBO",
+         "dc:source" : "schemadotorgsources2:FIBO",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Description of fees, commissions, and other terms applied either to a class of financial product, or by a financial service organization.",
          "rdfs:label" : "feesAndCommissionsSpecification",

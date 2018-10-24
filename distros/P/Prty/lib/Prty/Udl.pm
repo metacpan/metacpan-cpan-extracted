@@ -3,9 +3,10 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Hash;
 use Prty::Option;
@@ -653,13 +654,13 @@ sub udl {
         if ($udl =~ s|;(.*)||) {
             $self->options($1);
         }
-        if ($udl =~ s|\@(.*)||) {
+        if ($udl =~ s|\@([^%]+)||) {
             my ($host,$port) = split(/:/,$1,2);
             $self->host($host);
             $self->port($port);
         }
         my ($dbms,$db,$user,$password);
-        if ($udl =~ s|%(.*)||) {
+        if ($udl =~ s|%([^@]+)||) {
             ($user,$password) = split(/:/,$1,2);
         }
         ($dbms,$db) = split(/:/,$udl,2);
@@ -692,7 +693,7 @@ sub udl {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

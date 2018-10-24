@@ -1,6 +1,6 @@
 package Map::Tube::Madrid::Line::L3;
 
-$Map::Tube::Madrid::Line::L3::VERSION   = '0.26';
+$Map::Tube::Madrid::Line::L3::VERSION   = '0.27';
 $Map::Tube::Madrid::Line::L3::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::Madrid::Line::L3 - Madrid Metro Map: L3 Line.
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =encoding utf8
 
@@ -46,14 +46,12 @@ Madrid Metro Map: L3 Line.
 
 =over 2
 
-=item * The station "Legazpi" is also part of L6.
-
-=item * The station "Sol" is also part of L1 | L2.
-
 =item * The station "Callao" is also part of
-          L<L5 Line|Map::Tube::Madrid::Line::L5>.
+          L<L5 Line|Map::Tube::Madrid::Line::L5>
 
-=item * The station "Argüelles" is also part of L4.
+=item * The station "Sol" is also part of
+          L<L2 Line|Map::Tube::Madrid::Line::L2>
+        | L<L1 Line|Map::Tube::Madrid::Line::L1>
 
 =back
 

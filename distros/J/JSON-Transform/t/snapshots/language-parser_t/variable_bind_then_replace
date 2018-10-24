@@ -1,0 +1,49 @@
+{
+  'children' => [
+    {
+      'children' => [
+        {
+          'children' => [
+            'defs'
+          ],
+          'nodename' => 'variableUser',
+          'type' => 'element'
+        },
+        {
+          'children' => [
+            {
+              'children' => [
+                '/definitions'
+              ],
+              'nodename' => 'jsonOtherNotDouble',
+              'type' => 'element'
+            }
+          ],
+          'nodename' => 'jsonPointer',
+          'type' => 'element'
+        }
+      ],
+      'nodename' => 'transformCopy',
+      'type' => 'element'
+    },
+    {
+      'children' => [
+        {
+          'nodename' => 'jsonPointer',
+          'type' => 'element'
+        },
+        {
+          'children' => [
+            'defs'
+          ],
+          'nodename' => 'variableUser',
+          'type' => 'element'
+        }
+      ],
+      'nodename' => 'transformCopy',
+      'type' => 'element'
+    }
+  ],
+  'nodename' => 'transforms',
+  'type' => 'element'
+}

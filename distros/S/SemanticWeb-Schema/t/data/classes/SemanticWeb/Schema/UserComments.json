@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_rNews",
+      "dc:source" : "schemadotorgsources2:source_rNews",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use <a class=\"localLink\" href=\"http://schema.org/Action\">Action</a>-based vocabulary, alongside types such as <a class=\"localLink\" href=\"http://schema.org/Comment\">Comment</a>.",
       "rdfs:label" : "UserComments",
@@ -21,8 +21,8 @@
          "rdfs:label" : "commentTime",
          "schema:domainIncludes" : "schema:UserComments",
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:creator" : {
@@ -30,12 +30,12 @@
          "rdfs:comment" : "The creator/author of this CreativeWork. This is the same as the Author property for CreativeWork.",
          "rdfs:label" : "creator",
          "schema:domainIncludes" : [
-            "schema:UserComments",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:UserComments"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:discusses" : {

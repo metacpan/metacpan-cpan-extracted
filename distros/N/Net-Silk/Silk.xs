@@ -1,6 +1,6 @@
 /*
 **
-** Copyright (C) 2011-2014 by Carnegie Mellon University
+** Copyright (C) 2011-2018 by Carnegie Mellon University
 **
 ** Use of the Net-Silk library and related source code is subject to the
 ** terms of the following licenses:
@@ -802,12 +802,6 @@ newSvIPADDR(pTHX_ skipaddr_t *addr) {
         return sv_setref_pvn(newSV(0), SILK_IPV6ADDR_CLASS,
                              (char *)addr, sizeof(*addr));
     } else
-#else
-    if (skipaddrIsV6(addr)) {
-        int rv = skipaddrV6toV4(addr, addr);
-        if (rv < 0)
-            croak("invalid ipv4 address (ipv6 too large)");
-    }
 #endif
     {
         return sv_setref_pvn(newSV(0), SILK_IPV4ADDR_CLASS,
@@ -830,10 +824,14 @@ newSvIPV4ADDR(pTHX_ skipaddr_t *addr) {
 
 static SV *
 newSvIPV6ADDR(pTHX_ skipaddr_t *addr) {
+#if SK_ENABLE_IPV6
     if (!skipaddrIsV6(addr))
         skipaddrV4toV6(addr, addr);
     return sv_setref_pvn(newSV(0), SILK_IPV6ADDR_CLASS,
                          (char *)addr, sizeof(*addr));
+#else
+    croak("SiLK IPv6 support not enabled");
+#endif
 }
 
 static skIPWildcard_t
@@ -1269,11 +1267,13 @@ new(CLASS, spec)
     CODE:
     PERL_UNUSED_VAR(CLASS);
     RETVAL = spec;
+#if SK_ENABLE_IPV6
     if (skipaddrIsV6(&RETVAL)) {
         int rv = skipaddrV6toV4(&RETVAL, &RETVAL);
         if (rv < 0)
             croak("invalid ipv6 address");
     }
+#endif
     OUTPUT:
     RETVAL
 
@@ -1289,11 +1289,13 @@ from_str(CLASS, spec)
     if (rv != SKUTILS_OK)
         croak("invalid ipv4 (error %d parsing string: %s)",
               rv, skStringParseStrerror(rv));
+#if SK_ENABLE_IPV6
     if (skipaddrIsV6(&RETVAL)) {
         int rv = skipaddrV6toV4(&RETVAL, &RETVAL);
         if (rv < 0)
             croak("invalid ipv4 address");
     }
+#endif
     OUTPUT:
     RETVAL
 
@@ -1304,11 +1306,13 @@ from_int(CLASS, val)
     CODE:
     PERL_UNUSED_VAR(CLASS);
     RETVAL = SvNumIPV4ADDR(aTHX_ val);
+#if SK_ENABLE_IPV6
     if (skipaddrIsV6(&RETVAL)) {
         int rv = skipaddrV6toV4(&RETVAL, &RETVAL);
         if (rv < 0)
             croak("invalid ipv4 numeric address");
     }
+#endif
     OUTPUT:
     RETVAL
 
@@ -3921,13 +3925,14 @@ invocations(THIS)
     sk_file_header_t     *hdr;
     sk_header_entry_t    *entry;
     sk_hentry_iterator_t  iter;
-    char                 *invoc;
+    const char           *invoc;
     PPCODE:
     hdr = skStreamGetSilkHeader(THIS);
     if (hdr != NULL) {
         skHeaderIteratorBindType(&iter, hdr, SK_HENTRY_INVOCATION_ID);
         while ((entry = skHeaderIteratorNext(&iter)) != NULL) {
-            invoc = ((sk_hentry_invocation_t*)entry)->command_line;
+            //invoc = ((sk_hentry_invocation_t*)entry)->command_line;
+            invoc = skHentryInvocationGetInvocation(entry);
             mXPUSHs(newSVpvn(invoc, strlen(invoc)));
         }
     }
@@ -3939,13 +3944,14 @@ notes(THIS)
     sk_file_header_t     *hdr;
     sk_header_entry_t    *entry;
     sk_hentry_iterator_t  iter;
-    char                 *annot;
+    const char           *annot;
     PPCODE:
     hdr = skStreamGetSilkHeader(THIS);
     if (hdr != NULL) {
         skHeaderIteratorBindType(&iter, hdr, SK_HENTRY_ANNOTATION_ID);
         while ((entry = skHeaderIteratorNext(&iter)) != NULL) {
-            annot = ((sk_hentry_annotation_t*)entry)->annotation;
+            //annot = ((sk_hentry_annotation_t*)entry)->annotation;
+            annot = skHentryAnnotationGetNote(entry);
             mXPUSHs(newSVpvn(annot, strlen(annot)));
         }
     }

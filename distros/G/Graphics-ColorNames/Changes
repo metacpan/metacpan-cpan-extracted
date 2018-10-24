@@ -1,5 +1,30 @@
 Revision history for Graphics-ColorNames:
 
+v3.3.0    2018-10-23 21:29:56+01:00 Europe/London
+  [Incompatabilities]
+  - The GCN::HTML and GCN::Windows schemes have been removed and
+    released as separate modules.
+
+  - The prefix is now ignored for hex method for invalid color names.
+
+  [Bug Fixes]
+  - Removed undef warning for unknown color names in hex and rgb methods.
+
+  [Documentation]
+  - Reorganized the documentation.
+
+  - Documented handling of unknown color names in hex and rgb methods.
+
+  - Added INSTALL file to the distribution.
+
+  [Tests]
+  - Reorganized and improved tests.
+
+  [Other]
+  - The tied and autoloading interfaces are deprecated.
+
+  - Added contributor to module metadata.
+
 v3.2.1    2018-10-06 10:59:36+01:00 Europe/London
   [Bug Fixes]
   - Fix VERSION, RT 127301.

@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "dc:source" : "schemadotorgsources2:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A single, identifiable product instance (e.g. a laptop with a particular serial number).",
       "rdfs:label" : "IndividualProduct",
@@ -8,15 +8,15 @@
    },
    "properties" : {
       "schema:serialNumber" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The serial number or any alphanumeric identifier of a particular product. When attached to an offer, it is a shortcut for the serial number of the product included in the offer.",
          "rdfs:label" : "serialNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:Demand",
             "schema:Offer",
-            "schema:IndividualProduct"
+            "schema:IndividualProduct",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

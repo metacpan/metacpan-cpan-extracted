@@ -1,5 +1,8 @@
 Revision history for Crypt::Image
 
+0.13  2018-10-23T19:50:00+01:00
+      - Used namespace::autoclean instead.
+
 0.12  2017-09-06T12:00:00+01:00
       - Updated copyright year information.
 

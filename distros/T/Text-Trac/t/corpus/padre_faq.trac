@@ -1,0 +1,79 @@
+[[PageOutline(1-2)]]
+
+== Is Padre for Perl only? ==
+
+While the main focus of Padre is to provide excellent support for both beginner and advanced Perl developers 
+it is not restricted to Perl development only.
+It provides syntax highlighting to most of the languages out there and if you are missing something just ask on the mailing list or open a ticket.
+It is also planned to be integrated with [http://www.parrot.org/ Parrot] that will allow writing plug-ins in any language running on Parrot.
+
+== Why not just reuse an existing Editor? ==
+
+We hope that by writing it in Perl we will make it easy for any user of Padre to contribute back to the project and/or to add plug-ins.
+
+ * vi and emacs -- while being excellent tools -- are not very beginner-friendly.
+ * Komodo costs money and is not Free/Open Source software.
+ * Eclipse is huge and you need to know Java to extend it.
+ * Various editors such as Ultra-Edit, Notepad++ etc. are Windows-only
+
+== Why does Padre use wxWidgets and not ...? ==
+
+wxWidgets uses the native windowing widgets of each operating system and in theory that should be the nicest
+and most "native looking" on all operating systems. So while it has it own problems and it is not the easiest
+to write in it, it might have the best potential.
+
+== Why using Subversion when Git is so much better? ==
+
+We started to use SVN as Gabor did not know Git. 
+We keep it as it works well for us and a lot more people know SVN than Git.
+
+With that said if someone implements an awesome and simple-to-use
+plugin for Padre to integrate with Git that works well on both Windows 
+and Linux then we can consider switching.
+
+== Why using ithreads when forks/coro is so much better? ==
+
+Threads are the only Perl concurrency system that is portable and actually runs things in parallel and makes use of multiple cores. We needed something portable that does real concurrency (i.e. no cooperative multi-threading or event loop), so fork was out of the loop due to portability and POE/Coro due to cooperative multithreading.
+
+== I have trouble installing Padre. Where can I find help? ==
+See [wiki:Download] and the pages linked there for installation instructions.
+If this does not bring you any further, [http://padre.perlide.org/contact.html contact us], we will see how we can help us.
+
+== I have found a bug. What do I do now? ==
+Report it. Either by [http://padre.perlide.org/contact.html contacting us], or by [wiki:Tickets creating a new ticket in Trac].
+
+== Padre lacks feature XY. What can I do about it? ==
+Tell us. Either by [http://padre.perlide.org/contact.html contacting us], or by [wiki:Tickets creating a new ticket in Trac].
+
+Or even better: Implement it yourself. Hacking Padre isn't that hard if you know some Perl. And the developer community is very open and welcoming towards new developers.
+See [wiki:Howto] and [http://padre.perlide.org/getting_involved.html Getting Involved] for more information.
+
+== How do I checkout a trunk version of padre? ==
+This is described on the [wiki:Howto] page.
+
+== My Perl script expects user input from STDIN, but I cannot enter anything when executing it inside Padre. What can I do? ==
+
+There is a setting in the Preferences dialog, under "Run parameters" (or under "Language Perl 5", depending on your version of Perl, called
+"Use external window for execution".
+
+If you activate that setting, you can make inputs to STDIN.
+
+See also ticket #743.
+
+== I am not getting output console when I Run a script (press F5) ==
+
+There is a setting in the Preferences dialog, under "Run parameters" (or under "Language Perl 5", depending on your version of Perl, called
+"Use external window for execution".
+
+Try to check / uncheck that.
+
+
+== Can I edit remote files on an FTP server with Padre? ==
+
+Yes, just use "File"->"Open ..."->"Open URL ..." and enter your file's URL.
+HTTP and HTTPS are also supported, by the way.
+
+== How can I add/modify keyboard shortcuts? ==
+
+There is a keyboard shortcut editor in the menu under "Tools" -> "Key Bindings".
+

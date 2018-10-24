@@ -30,3 +30,16 @@ on develop => sub {
     requires 'Local::Theta';
     requires 'Local::Theta::DoesNotExist';
 };
+feature 'omega', 'Omega' => sub {
+on build => sub {
+        requires 'Local::Psi::DoesNotExist';
+};
+
+on test => sub {
+        requires 'Local::Chi::DoesNotExist';
+};
+
+on develop => sub {
+        requires 'Local::Omega::DoesNotExist';
+};
+};

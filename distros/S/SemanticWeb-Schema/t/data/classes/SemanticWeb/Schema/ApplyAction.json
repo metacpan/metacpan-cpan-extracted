@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of registering to an organization/service without the guarantee to receive it.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/RegisterAction\">RegisterAction</a>: Unlike RegisterAction, ApplyAction has no guarantees that the application will be accepted.</li>\n</ul>\n",
+      "rdfs:comment" : "The act of registering to an organization/service without the guarantee to receive it.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/RegisterAction\">RegisterAction</a>: Unlike RegisterAction, ApplyAction has no guarantees that the application will be accepted.</li>\n</ul>\n",
       "rdfs:label" : "ApplyAction",
       "rdfs:subClassOf" : "schema:OrganizeAction"
    },

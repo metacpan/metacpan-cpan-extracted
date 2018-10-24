@@ -54,7 +54,7 @@ PRE
 {
     my $file = temp_file_path();
     write_file($file, $existing_data);
-    my ($res, $warn, $err) = trap_function(\&edit_file, sub {s/([0-9])/${1}000/g}, $file, {foo=>1,bar=>2, binmode=>1});
+    my ($res, $warn, $err) = trap_function(\&edit_file, sub {s/([0-9])/${1}000/g}, $file, {foo=>1,bar=>2, binmode=>':raw'});
     ok($res, 'edit_file: edit line, invalid options, binmode: got response!');
     # this should get fixed
     SKIP: {

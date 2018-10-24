@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 use ExtUtils::Manifest;
 
 my %d;
@@ -85,15 +85,16 @@ use XAO::Base qw($homedir);
 
 WriteMakefile(
     'ABSTRACT'          => 'XAO Web Framework',
-    'AUTHOR'            => 'Andrew Maltsev, http://ejelta.com/xao/',
+    'AUTHOR'            => 'Andrew Maltsev, https://ejelta.com/xao/',
     'NAME'              => 'XAO::Web',
     'VERSION_FROM'      => 'Web.pm',
     'MIN_PERL_VERSION'  => '5.10.1',
     'CONFIGURE_REQUIRES'=> {
-        'XAO::Base'                 => 1.21,
+        'XAO::Base'                 => 1.22,
+        'ExtUtils::MakeMaker'       => 6.64,
     },
     'TEST_REQUIRES'     => {
-        'XAO::Base'                 => 1.21,
+        'XAO::Base'                 => 1.22,
     },
     'PREREQ_PM'     => {
         'Authen::SASL::SASLprep'    => 1.1,
@@ -118,7 +119,7 @@ WriteMakefile(
         'Text::FormatTable'         => 0.01,
         'Time::HiRes'               => 1.9719,
         'Unicode::Normalize'        => 1.18,
-        'XAO::Base'                 => 1.21,
+        'XAO::Base'                 => 1.22,
         'XAO::FS'                   => 1.21,
     },
 );
@@ -167,10 +168,19 @@ install_handlers:
 docker-image:
 \tdocker build --build-arg "XAO_WEB_VERSION=\$(VERSION)" -t xao-web .
 \t\@echo ""
-\t\@echo "=== Docker image built, tag and push it:"
-\t\@echo "===    docker tag xao-web:latest amaltsev/xao-web:\$(VERSION)"
-\t\@echo "===    docker push amaltsev/xao-web:\$(VERSION)"
-\t\@echo "===    docker tag xao-web:latest amaltsev/xao-web:latest"
-\t\@echo "===    docker push amaltsev/xao-web:latest"
+\t\@docker image ls xao-web
+\t\@echo ""
+\t\@echo "=== Docker image built. Tag and push it with 'make docker-push'"
+
+docker-image-master:
+\tdocker build -t xao-web .
+\t\@echo ""
+\t\@docker image ls xao-web
+
+docker-push:
+\t\@docker tag xao-web:latest amaltsev/xao-web:\$(VERSION)
+\t\@docker push amaltsev/xao-web:\$(VERSION)
+\t\@docker tag xao-web:latest amaltsev/xao-web:latest
+\t\@docker push amaltsev/xao-web:latest
 EOT
 }

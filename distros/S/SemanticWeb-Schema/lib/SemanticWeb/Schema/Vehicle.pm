@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Vehicle;
 
 # ABSTRACT: A vehicle is a device that is designed or used to transport people or cargo over land
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has cargo_volume => (
@@ -232,7 +234,7 @@ SemanticWeb::Schema::Vehicle - A vehicle is a device that is designed or used to
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -246,8 +248,8 @@ over land, water, air, or through space.
 C<cargoVolume>
 
 =for html The available volume for cargo or luggage. For automobiles, this is usually
-the trunk volume.</p> <p>Typical unit code(s): LTR for liters, FTQ for
-cubic foot/feet</p> <p>Note: You can use <a class="localLink"
+the trunk volume.<br/><br/> Typical unit code(s): LTR for liters, FTQ for
+cubic foot/feet<br/><br/> Note: You can use <a class="localLink"
 href="http://schema.org/minValue">minValue</a> and <a class="localLink"
 href="http://schema.org/maxValue">maxValue</a> to indicate ranges.
 
@@ -295,8 +297,8 @@ A drive_wheel_configuration should be one of the following types:
 
 C<fuelConsumption>
 
-=for html <p>The amount of fuel consumed for traveling a particular distance or
-temporal duration with the given vehicle (e.g. liters per 100 km).</p> <ul>
+=for html The amount of fuel consumed for traveling a particular distance or temporal
+duration with the given vehicle (e.g. liters per 100 km).<br/><br/> <ul>
 <li>Note 1: There are unfortunately no standard unit codes for liters per
 100 km. Use <a class="localLink"
 href="http://schema.org/unitText">unitText</a> to indicate the unit of
@@ -323,8 +325,8 @@ A fuel_consumption should be one of the following types:
 
 C<fuelEfficiency>
 
-=for html <p>The distance traveled per unit of fuel used; most commonly miles per
-gallon (mpg) or kilometers per liter (km/L).</p> <ul> <li>Note 1: There are
+=for html The distance traveled per unit of fuel used; most commonly miles per gallon
+(mpg) or kilometers per liter (km/L).<br/><br/> <ul> <li>Note 1: There are
 unfortunately no standard unit codes for miles per gallon or kilometers per
 liter. Use <a class="localLink"
 href="http://schema.org/unitText">unitText</a> to indicate the unit of
@@ -359,9 +361,9 @@ A fuel_type should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
+
+=item C<Str>
 
 =back
 
@@ -384,8 +386,8 @@ A known_vehicle_damages should be one of the following types:
 C<mileageFromOdometer>
 
 =for html The total distance travelled by the particular vehicle since its initial
-production, as read from its odometer.</p> <p>Typical unit code(s): KMT for
-kilometers, SMI for statute miles
+production, as read from its odometer.<br/><br/> Typical unit code(s): KMT
+for kilometers, SMI for statute miles
 
 A mileage_from_odometer should be one of the following types:
 
@@ -415,15 +417,15 @@ A number_of_airbags should be one of the following types:
 
 C<numberOfAxles>
 
-=for html The number of axles.</p> <p>Typical unit code(s): C62
+=for html The number of axles.<br/><br/> Typical unit code(s): C62
 
 A number_of_axles should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<Num>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 
@@ -431,7 +433,7 @@ A number_of_axles should be one of the following types:
 
 C<numberOfDoors>
 
-=for html The number of doors.</p> <p>Typical unit code(s): C62
+=for html The number of doors.<br/><br/> Typical unit code(s): C62
 
 A number_of_doors should be one of the following types:
 
@@ -448,15 +450,15 @@ A number_of_doors should be one of the following types:
 C<numberOfForwardGears>
 
 =for html The total number of forward gears available for the transmission system of
-the vehicle.</p> <p>Typical unit code(s): C62
+the vehicle.<br/><br/> Typical unit code(s): C62
 
 A number_of_forward_gears should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<Num>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 
@@ -464,8 +466,8 @@ A number_of_forward_gears should be one of the following types:
 
 C<numberOfPreviousOwners>
 
-=for html The number of owners of the vehicle, including the current one.</p>
-<p>Typical unit code(s): C62
+=for html The number of owners of the vehicle, including the current one.<br/><br/>
+Typical unit code(s): C62
 
 A number_of_previous_owners should be one of the following types:
 
@@ -615,7 +617,7 @@ C<vehicleSeatingCapacity>
 
 =for html The number of passengers that can be seated in the vehicle, both in terms
 of the physical space available, and in terms of limitations set by
-law.</p> <p>Typical unit code(s): C62 for persons.
+law.<br/><br/> Typical unit code(s): C62 for persons.
 
 A vehicle_seating_capacity should be one of the following types:
 

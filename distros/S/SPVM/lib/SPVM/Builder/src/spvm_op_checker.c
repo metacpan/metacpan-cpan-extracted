@@ -167,7 +167,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
   char tmp_buffer2[UINT16_MAX];
   
   // Check trees
-  int32_t sub_id = 0;
   {
     int32_t package_index;
     for (package_index = 0; package_index < compiler->packages->length; package_index++) {
@@ -180,10 +179,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           SPVM_SUB* sub = SPVM_LIST_fetch(subs, sub_index);
           SPVM_PACKAGE* package = sub->package;
           SPVM_TYPE* package_type = package->op_type->uv.type;
-          
-          // Set subroutine id
-          sub->id = sub_id++;
-          
           
           // Destructor must receive own package object
           if (sub->flag & SPVM_SUB_C_FLAG_IS_DESTRUCTOR) {
@@ -360,11 +355,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                               }
                               
                               if (!SPVM_TYPE_is_numeric_type(compiler, op_type_element->uv.type->basic_type->id,op_type_element->uv.type->dimension, op_type_element->uv.type->flag)) {
-                                if (sub->info_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                                  SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_type_element->file, op_type_element->line);
+                                {
+                                  SPVM_OP* op_type_tmp = op_type_element;
+                                  op_type_tmp->uv.type->info_constant_id = package->info_types->length;
+                                  SPVM_LIST_push(package->info_types, op_type_tmp->uv.type);
+                                  if (package->info_types->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                                    SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_type_tmp->file, op_type_tmp->line);
+                                  }
                                 }
-                                op_type_element->uv.type->sub_rel_id = sub->info_types->length;
-                                SPVM_LIST_push(sub->info_types, op_type_element->uv.type);
                               }
                                                       
                               // Create array type
@@ -379,11 +377,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                               }
 
                               if (!SPVM_TYPE_is_numeric_type(compiler, op_type_new->uv.type->basic_type->id, op_type_new->uv.type->dimension, op_type_new->uv.type->flag)) {
-                                if (sub->info_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                                  SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_type_element->file, op_type_element->line);
+                                {
+                                  SPVM_OP* op_type_tmp = op_type_new;
+                                  op_type_tmp->uv.type->info_constant_id = package->info_types->length;
+                                  SPVM_LIST_push(package->info_types, op_type_tmp->uv.type);
+                                  if (package->info_types->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                                    SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_type_tmp->file, op_type_tmp->line);
+                                  }
                                 }
-                                op_type_new->uv.type->sub_rel_id = sub->info_types->length;
-                                SPVM_LIST_push(sub->info_types, op_type_new->uv.type);
                               }
                               
                               op_var_tmp_new->uv.var->my->type = op_type_new->uv.type;
@@ -461,19 +462,43 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                             case SPVM_BASIC_TYPE_C_ID_LONG: {
                               add_constant = 1;
 
-                              if (sub->info_long_constants->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                                SPVM_yyerror_format(compiler, "Too many long constants at %s line %d\n", op_cur->file, op_cur->line);
+                              // Add long constant
+                              char long_value_string[sizeof(int64_t)];
+                              memcpy(long_value_string, &op_cur->uv.constant->value.lval, sizeof(int64_t));
+                              int32_t found_long_constant_id_plus1 = (intptr_t)SPVM_HASH_fetch(package->info_long_constant_symtable, long_value_string, sizeof(int64_t));
+                              if (found_long_constant_id_plus1 > 0) {
+                                op_cur->uv.constant->info_long_constant_id = found_long_constant_id_plus1 - 1;
                               }
-                              op_cur->uv.constant->sub_rel_info_long_id = sub->info_long_constants->length;
-                              SPVM_LIST_push(sub->info_long_constants, op_cur->uv.constant);
+                              else {
+                                op_cur->uv.constant->info_long_constant_id = package->info_long_constants->length;
+                                SPVM_LIST_push(package->info_long_constants, (void*)(intptr_t)op_cur->uv.constant);
+                                int32_t info_long_constant_id_plus1 = op_cur->uv.constant->info_long_constant_id + 1;
+                                SPVM_HASH_insert(package->info_long_constant_symtable, long_value_string, sizeof(int64_t), (void*)(intptr_t)info_long_constant_id_plus1);
+                              }
+                              if (package->info_long_constants->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                                SPVM_yyerror_format(compiler, "Too many package variable access at %s line %d\n", op_cur->file, op_cur->line);
+                              }
+                              
                             }
                             case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
                               add_constant = 1;
-                              if (sub->info_double_constants->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                                SPVM_yyerror_format(compiler, "Too many double constants at %s line %d\n", op_cur->file, op_cur->line);
+                              
+                              // Add double constant
+                              char double_value_string[sizeof(double)];
+                              memcpy(double_value_string, &op_cur->uv.constant->value.lval, sizeof(double));
+                              int32_t found_double_constant_id_plus1 = (intptr_t)SPVM_HASH_fetch(package->info_double_constant_symtable, double_value_string, sizeof(double));
+                              if (found_double_constant_id_plus1 > 0) {
+                                op_cur->uv.constant->info_double_constant_id = found_double_constant_id_plus1 - 1;
                               }
-                              op_cur->uv.constant->sub_rel_info_double_id = sub->info_double_constants->length;
-                              SPVM_LIST_push(sub->info_double_constants, op_cur->uv.constant);
+                              else {
+                                op_cur->uv.constant->info_double_constant_id = package->info_double_constants->length;
+                                SPVM_LIST_push(package->info_double_constants, (void*)(intptr_t)op_cur->uv.constant);
+                                int32_t info_double_constant_id_plus1 = op_cur->uv.constant->info_double_constant_id + 1;
+                                SPVM_HASH_insert(package->info_double_constant_symtable, double_value_string, sizeof(double), (void*)(intptr_t)info_double_constant_id_plus1);
+                              }
+                              if (package->info_double_constants->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                                SPVM_yyerror_format(compiler, "Too many package variable access at %s line %d\n", op_cur->file, op_cur->line);
+                              }
                             }
                           }
                         }
@@ -481,19 +506,21 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         else if (SPVM_TYPE_is_string_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
                           add_constant = 1;
                           
-                          if (sub->info_string_constants->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                            SPVM_yyerror_format(compiler, "Too many string constants at %s line %d\n", op_cur->file, op_cur->line);
+                          char* string_value_string = op_cur->uv.constant->value.oval;
+                          int32_t string_length = op_cur->uv.constant->string_length;
+                          int32_t found_string_constant_id_plus1 = (intptr_t)SPVM_HASH_fetch(package->info_string_constant_symtable, string_value_string, string_length);
+                          if (found_string_constant_id_plus1 > 0) {
+                            op_cur->uv.constant->info_string_constant_id = found_string_constant_id_plus1 - 1;
                           }
-                          op_cur->uv.constant->sub_rel_info_string_id = sub->info_string_constants->length;
-                          SPVM_LIST_push(sub->info_string_constants, op_cur->uv.constant);
-                        }
-                        
-                        if (add_constant) {
-                          if (sub->info_constants->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                            SPVM_yyerror_format(compiler, "Too many constant at %s line %d\n", op_cur->file, op_cur->line);
+                          else {
+                            op_cur->uv.constant->info_string_constant_id = package->info_string_constants->length;
+                            SPVM_LIST_push(package->info_string_constants, (void*)(intptr_t)op_cur->uv.constant);
+                            int32_t info_string_constant_id_plus1 = op_cur->uv.constant->info_string_constant_id + 1;
+                            SPVM_HASH_insert(package->info_string_constant_symtable, string_value_string, string_length, (void*)(intptr_t)info_string_constant_id_plus1);
                           }
-                          op_cur->uv.constant->sub_rel_id = sub->info_constants->length;
-                          SPVM_LIST_push(sub->info_constants, op_cur->uv.constant);
+                          if (package->info_string_constants->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                            SPVM_yyerror_format(compiler, "Too many package variable access at %s line %d\n", op_cur->file, op_cur->line);
+                          }
                         }
                         
                         break;
@@ -539,12 +566,12 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         
                         SPVM_LIST_pop(op_switch_stack);
 
-                        if (sub->info_switch_infos->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                        if (package->info_switch_infos->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
                           SPVM_yyerror_format(compiler, "Too many switch at %s line %d\n", op_cur->file, op_cur->line);
                         }
-                        op_cur->uv.switch_info->sub_rel_id = sub->info_switch_infos->length;
-                        SPVM_LIST_push(sub->info_switch_infos, op_cur->uv.switch_info);
-                      
+                        op_cur->uv.switch_info->info_constant_id = package->info_switch_infos->length;
+                        SPVM_LIST_push(package->info_switch_infos, op_cur->uv.switch_info);
+                        
                         break;
                       }
                       case SPVM_OP_C_ID_CASE: {
@@ -922,11 +949,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           }
                           
                           if (!SPVM_TYPE_is_numeric_type(compiler, op_type->uv.type->basic_type->id, op_type->uv.type->dimension, op_type->uv.type->flag)) {
-                            if (sub->info_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                              SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_cur->file, op_cur->line);
+                            {
+                              SPVM_OP* op_type_tmp = op_type;
+                              op_type_tmp->uv.type->info_constant_id = package->info_types->length;
+                              SPVM_LIST_push(package->info_types, op_type_tmp->uv.type);
+                              if (package->info_types->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                                SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_type_tmp->file, op_type_tmp->line);
+                              }
                             }
-                            op_type->uv.type->sub_rel_id = sub->info_types->length;
-                            SPVM_LIST_push(sub->info_types, op_type->uv.type);
                           }
                         }
                         else if (op_cur->first->id == SPVM_OP_C_ID_CONSTANT) {
@@ -1008,11 +1038,15 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         }
 
                         if (!SPVM_TYPE_is_numeric_type(compiler, op_type->uv.type->basic_type->id, op_type->uv.type->dimension, op_type->uv.type->flag)) {
-                          if (sub->info_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                            SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_cur->file, op_cur->line);
+
+                          {
+                            SPVM_OP* op_type_tmp = op_type;
+                            op_type_tmp->uv.type->info_constant_id = package->info_types->length;
+                            SPVM_LIST_push(package->info_types, op_type_tmp->uv.type);
+                            if (package->info_types->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                              SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_type_tmp->file, op_type_tmp->line);
+                            }
                           }
-                          op_type->uv.type->sub_rel_id = sub->info_types->length;
-                          SPVM_LIST_push(sub->info_types, op_type->uv.type);
                         }
                         
                         break;
@@ -2124,11 +2158,22 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           sub->call_sub_arg_stack_max = call_sub_args_count;
                         }
 
-                        if (sub->info_sub_ids->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                          SPVM_yyerror_format(compiler, "Too many call sub at %s line %d\n", op_cur->file, op_cur->line);
+                        // Add info sub id
+                        char sub_id_string[sizeof(int32_t)];
+                        memcpy(sub_id_string, &op_cur->uv.call_sub->sub->id, sizeof(int32_t));
+                        int32_t found_sub_id_plus1 = (intptr_t)SPVM_HASH_fetch(package->info_sub_id_symtable, sub_id_string, sizeof(int32_t));
+                        if (found_sub_id_plus1 > 0) {
+                          op_cur->uv.call_sub->info_constant_id = found_sub_id_plus1 - 1;
                         }
-                        op_cur->uv.call_sub->sub_rel_id = sub->info_sub_ids->length;
-                        SPVM_LIST_push(sub->info_sub_ids, (void*)(intptr_t)op_cur->uv.call_sub->sub->id);
+                        else {
+                          op_cur->uv.call_sub->info_constant_id = package->info_sub_ids->length;
+                          SPVM_LIST_push(package->info_sub_ids, (void*)(intptr_t)op_cur->uv.call_sub->sub->id);
+                          int32_t info_sub_id_plus1 = op_cur->uv.call_sub->info_constant_id + 1;
+                          SPVM_HASH_insert(package->info_sub_id_symtable, sub_id_string, sizeof(int32_t), (void*)(intptr_t)info_sub_id_plus1);
+                        }
+                        if (package->info_sub_ids->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                          SPVM_yyerror_format(compiler, "Too many package variable access at %s line %d\n", op_cur->file, op_cur->line);
+                        }
                         
                         if (call_sub->sub->flag & SPVM_SUB_C_FLAG_IS_DESTRUCTOR) {
                           SPVM_yyerror_format(compiler, "Can't call DESTROY in yourself at %s line %d\n", op_cur->file, op_cur->line);
@@ -2147,12 +2192,23 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           return;
                         }
                         
-                        if (sub->info_package_var_ids->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                          SPVM_yyerror_format(compiler, "Too many package variable access at %s line %d\n", op_cur->file, op_cur->line);
+                        // Add info package var id
+                        char package_var_id_string[sizeof(int32_t)];
+                        memcpy(package_var_id_string, &op_cur->uv.package_var_access->package_var->id, sizeof(int32_t));
+                        const char* package_var_name = op_cur->uv.package_var_access->package_var->name;
+                        int32_t found_package_var_id_plus1 = (intptr_t)SPVM_HASH_fetch(package->info_package_var_id_symtable, package_var_id_string, sizeof(int32_t));
+                        if (found_package_var_id_plus1 > 0) {
+                          op_cur->uv.package_var_access->info_package_var_id = found_package_var_id_plus1 - 1;
                         }
-                        op_cur->uv.package_var_access->sub_rel_id = sub->info_package_var_ids->length;
-                        SPVM_LIST_push(sub->info_package_var_ids, (void*)(intptr_t)op_cur->uv.package_var_access->package_var->id);
-                        
+                        else {
+                          op_cur->uv.package_var_access->info_package_var_id = package->info_package_var_ids->length;
+                          SPVM_LIST_push(package->info_package_var_ids, (void*)(intptr_t)op_cur->uv.package_var_access->package_var->id);
+                          int32_t info_package_var_id_plus1 = op_cur->uv.package_var_access->info_package_var_id + 1;
+                          SPVM_HASH_insert(package->info_package_var_id_symtable, package_var_id_string, sizeof(int32_t), (void*)(intptr_t)info_package_var_id_plus1);
+                        }
+                        if (package->info_package_var_ids->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                          SPVM_yyerror_format(compiler, "Too many package variable access at %s line %d\n", op_cur->file, op_cur->line);
+                        }                        
                         break;
                       }
                       case SPVM_OP_C_ID_ARRAY_ACCESS: {
@@ -2238,9 +2294,9 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         }
                         
                         SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_term_invocker);
-                        SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, type->basic_type->name, strlen(type->basic_type->name));
+                        SPVM_PACKAGE* invocant_package = SPVM_HASH_fetch(compiler->package_symtable, type->basic_type->name, strlen(type->basic_type->name));
                         
-                        if (!(type && package)) {
+                        if (!(type && invocant_package)) {
                           SPVM_yyerror_format(compiler, "Can't access field at %s line %d\n", op_cur->file, op_cur->line);
                           return;
                         }
@@ -2267,11 +2323,23 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           }
                         }
                         
-                        if (sub->info_field_ids->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                          SPVM_yyerror_format(compiler, "Too many field access at %s line %d\n", op_cur->file, op_cur->line);
+                        // Add info field id
+                        char field_id_string[sizeof(int32_t)];
+                        memcpy(field_id_string, &op_cur->uv.field_access->field->id, sizeof(int32_t));
+                        const char* field_name = op_cur->uv.field_access->field->name;
+                        int32_t found_field_id_plus1 = (intptr_t)SPVM_HASH_fetch(package->info_field_id_symtable, field_id_string, sizeof(int32_t));
+                        if (found_field_id_plus1 > 0) {
+                          op_cur->uv.field_access->info_field_id = found_field_id_plus1 - 1;
                         }
-                        op_cur->uv.field_access->sub_rel_id = sub->info_field_ids->length;
-                        SPVM_LIST_push(sub->info_field_ids, (void*)(intptr_t)op_cur->uv.field_access->field->id);
+                        else {
+                          op_cur->uv.field_access->info_field_id = package->info_field_ids->length;
+                          SPVM_LIST_push(package->info_field_ids, (void*)(intptr_t)op_cur->uv.field_access->field->id);
+                          int32_t info_field_id_plus1 = op_cur->uv.field_access->info_field_id + 1;
+                          SPVM_HASH_insert(package->info_field_id_symtable, field_id_string, sizeof(int32_t), (void*)(intptr_t)info_field_id_plus1);
+                        }
+                        if (package->info_field_ids->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                          SPVM_yyerror_format(compiler, "Too many package variable access at %s line %d\n", op_cur->file, op_cur->line);
+                        }
                         
                         // If invocker is array access and array access object is value_t, this op become array field access
                         if (op_term_invocker->id == SPVM_OP_C_ID_ARRAY_ACCESS) {
@@ -2517,11 +2585,15 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         }
                         
                         if (SPVM_TYPE_is_object_type(compiler, op_dist->uv.type->basic_type->id, op_dist->uv.type->dimension, op_dist->uv.type->flag)) {
-                          if (sub->info_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                            SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_cur->file, op_cur->line);
+
+                          {
+                            SPVM_OP* op_type_tmp = op_dist;
+                            op_type_tmp->uv.type->info_constant_id = package->info_types->length;
+                            SPVM_LIST_push(package->info_types, op_type_tmp->uv.type);
+                            if (package->info_types->length > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                              SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_type_tmp->file, op_type_tmp->line);
+                            }
                           }
-                          op_dist->uv.type->sub_rel_id = sub->info_types->length;
-                          SPVM_LIST_push(sub->info_types, op_dist->uv.type);
                           break;
                         }
                       }
@@ -2824,8 +2896,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 SPVM_TYPE* field_type = SPVM_OP_get_type(compiler, first_field->op_field);
                 assert(SPVM_TYPE_is_numeric_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag));
                 
-                my->value_field_basic_type_id = field_type->basic_type->id;
-                
                 switch (field_type->basic_type->id) {
                   case SPVM_BASIC_TYPE_C_ID_BYTE: {
                     my->var_id = my_byte_var_id;
@@ -2878,7 +2948,176 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
 
             sub->object_vars_alloc_length = my_object_var_id;
             sub->ref_vars_alloc_length = my_ref_var_id;
-            
+
+            // Resolve my runtime type and width
+            int32_t type_width;
+            int32_t runtime_type;
+            for (int32_t my_index = 0; my_index < sub->mys->length; my_index++) {
+              SPVM_MY* my = SPVM_LIST_fetch(sub->mys, my_index);
+              SPVM_TYPE* my_type = SPVM_OP_get_type(compiler, my->op_my);
+              
+              if (SPVM_TYPE_is_numeric_type(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag)) {
+                type_width = 1;
+                switch (my_type->basic_type->id) {
+                  case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_BYTE;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_SHORT;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_INT: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_INT;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_LONG: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_LONG;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_FLOAT;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_DOUBLE;
+                    break;
+                  }
+                  default: {
+                    assert(0);
+                    break;
+                  }
+                }
+              }
+              else if (SPVM_TYPE_is_value_type(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag)) {
+                SPVM_PACKAGE* value_package =  my_type->basic_type->package;
+                assert(package);
+                
+                SPVM_FIELD* first_field = SPVM_LIST_fetch(value_package->fields, 0);
+                assert(first_field);
+                
+                SPVM_TYPE* field_type = SPVM_OP_get_type(compiler, first_field->op_field);
+                assert(SPVM_TYPE_is_numeric_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag));
+
+                type_width = value_package->fields->length;
+                switch (field_type->basic_type->id) {
+                  case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_VALUE_BYTE;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_VALUE_SHORT;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_INT: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_VALUE_INT;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_LONG: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_VALUE_LONG;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_VALUE_FLOAT;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_VALUE_DOUBLE;
+                    break;
+                  }
+                  default: {
+                    assert(0);
+                  }
+                }
+              }
+              else if (SPVM_TYPE_is_object_type(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag)) {
+                type_width = 1;
+                runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_OBJECT;
+              }
+              else if (SPVM_TYPE_is_ref_type(compiler, my_type->basic_type->id, my_type->dimension, my_type->flag)) {
+                switch (my_type->basic_type->id) {
+                  case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                    type_width = 1;
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_BYTE;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                    type_width = 1;
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_SHORT;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_INT: {
+                    type_width = 1;
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_INT;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_LONG: {
+                    type_width = 1;
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_LONG;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                    type_width = 1;
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_FLOAT;
+                    break;
+                  }
+                  case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                    type_width = 1;
+                    runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_DOUBLE;
+                    break;
+                  }
+                  default: {
+                    SPVM_PACKAGE* value_package =  my_type->basic_type->package;
+                    assert(package);
+                    
+                    SPVM_FIELD* first_field = SPVM_LIST_fetch(value_package->fields, 0);
+                    assert(first_field);
+                    
+                    SPVM_TYPE* field_type = SPVM_OP_get_type(compiler, first_field->op_field);
+                    assert(SPVM_TYPE_is_numeric_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag));
+
+                    type_width = 1;
+
+                    switch (field_type->basic_type->id) {
+                      case SPVM_BASIC_TYPE_C_ID_BYTE: {
+                        runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_BYTE;
+                        break;
+                      }
+                      case SPVM_BASIC_TYPE_C_ID_SHORT: {
+                        runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_SHORT;
+                        break;
+                      }
+                      case SPVM_BASIC_TYPE_C_ID_INT: {
+                        runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_INT;
+                        break;
+                      }
+                      case SPVM_BASIC_TYPE_C_ID_LONG: {
+                        runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_LONG;
+                        break;
+                      }
+                      case SPVM_BASIC_TYPE_C_ID_FLOAT: {
+                        runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_FLOAT;
+                        break;
+                      }
+                      case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
+                        runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_DOUBLE;
+                        break;
+                      }
+                      default: {
+                        assert(0);
+                      }
+                    }
+                    break;
+                  }
+                }
+              }
+              else {
+                assert(0);
+              }
+              
+              my->runtime_type = runtime_type;
+              my->type_width = type_width;
+            }
           }
 
           // Add more information for opcode building - Fourth tree traversal
@@ -2982,6 +3221,8 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
       constant->id = constant_index;
     }
   }
+
+
 #ifdef SPVM_DEBUG_DUMP
 #include "spvm_dumper.h"
   if (compiler->error_count == 0) {
@@ -3461,8 +3702,30 @@ void SPVM_OP_CHECKER_resolve_basic_types(SPVM_COMPILER* compiler) {
 }
 
 void SPVM_OP_CHECKER_resolve_packages(SPVM_COMPILER* compiler) {
-  int32_t package_index;
-  for (package_index = 0; package_index < compiler->packages->length; package_index++) {
+  
+  // Sort package by package name
+  for (int32_t i = 0; i < (compiler->packages->length - 1); i++) {
+    for (int32_t j = (compiler->packages->length - 1); j > i; j--) {
+      SPVM_PACKAGE* package1 = SPVM_LIST_fetch(compiler->packages, j-1);
+      SPVM_PACKAGE* package2 = SPVM_LIST_fetch(compiler->packages, j);
+      
+      void** values = compiler->packages->values;
+
+      if (strcmp(package1->name, package2->name) > 0) {
+        SPVM_PACKAGE* temp = values[j-1];
+        values[j-1] = values[j];
+        values[j] = temp;
+      }
+    }
+  }
+  
+  // Set package id
+  for (int32_t package_index = 0; package_index < compiler->packages->length; package_index++) {
+    SPVM_PACKAGE* package = SPVM_LIST_fetch(compiler->packages, package_index);
+    package->id = package_index + 1;
+  }
+  
+  for (int32_t package_index = 0; package_index < compiler->packages->length; package_index++) {
     SPVM_PACKAGE* package = SPVM_LIST_fetch(compiler->packages, package_index);
     
     const char* package_name = package->op_name->uv.name;

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Clip;
 
 # ABSTRACT: A short TV or radio program or a segment/part of a program.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has actor => (
@@ -104,7 +106,7 @@ SemanticWeb::Schema::Clip - A short TV or radio program or a segment/part of a p
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -192,9 +194,9 @@ A music_by should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
 
 =back
 

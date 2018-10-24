@@ -457,14 +457,14 @@ my $configure_aws2=sub {
    | (__| '_/ -_) _` |  _/ -_)   / _ \/ _/ _/ -_|_-<_-<  | ' </ -_) || (_-<
     \___|_| \___\__,_|\__\___|  /_/ \_\__\__\___/__/__/  |_|\_\___|\_, /__/
                                                                    |__/
-
-   Click 'Create Access Key' button in the lower part of the popup page.
-
-   Click 'Show User Security Credentials' and the Access key ID and Secret
+                   ___________________ 
+   When you click | Create access key | and the Access key ID and Secret
+                   -------------------
    access key strings will be displayed. You will not have access to the
    secret access key again after the dialog box closes.
 
    Copy and Paste or type the Access key ID and Secret access key here:
+
 
    Access key ID                    Use [TAB] key to switch
                       ]I[{1,'',30}  focus of input boxes
@@ -498,18 +498,19 @@ our $configure_aws1=sub {
 
    1. Sign in to the AWS Management Console and open the IAM console at:
 
-      https://console.aws.amazon.com/iam/home#/users/admin?section=security_credentials
+      https://console.aws.amazon.com/iam/home#/users
 
-   2. Click the blue checkbox of the name of the user you want to create
-      an access key for:
+   2. Click the username next to the gray checkbox of the name of the
+         user you want to create an access key for:
        _
-      |_| username     (If you are a new AWS user, use 'admin')
-
-   3. Look for the big gray box just above the section you clicked that
-      is labeled 'User Actions':
-       ________________
-      | User Actions v |  Click on it and select 'Manage Access Keys'
-       ----------------
+      |_| username     (If you are a new AWS user, you can use 'admin')
+                    ______________________
+   3. Click on the | Security credentials | tab
+                    ----------------------
+                    ___________________
+   4. Click on the | Create access key | button
+                    -------------------
+         (Delete old key if button grayed out and limit exceeded.)
 END
 
    my %configure_aws1=(
@@ -1196,7 +1197,8 @@ sub new_user_amazon {
    FullAuto will now check the current system to determine if the ec2 API
    is installed and available for use.
 END
-   if ($iset_amazon && $iset_amazon!~/^\d*$/) {
+   if ($iset_amazon && $iset_amazon!~/^\d*$/ &&
+         $iset_amazon!~/iset_local/) {
       open(FH,"<$iset_amazon") || do {
          print "   FATAL ERROR!: Cannot open Amazon Instruction Set ".
                "\"$iset_amazon\"\n                 $!\n";
@@ -1204,6 +1206,7 @@ END
       };
       close FH;
       Net::FullAuto::FA_Core::Menu($get_ec2_api->($iset_amazon));
+   } elsif ($iset_amazon && $iset_amazon=~/iset_local/) {
    } else {
       my %welcome_fa_amazon=(
 

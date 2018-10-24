@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of playing/exercising/training/performing for enjoyment, leisure, recreation, Competition or exercise.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/ListenAction\">ListenAction</a>: Unlike ListenAction (which is under ConsumeAction), PlayAction refers to performing for an audience or at an event, rather than consuming music.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/WatchAction\">WatchAction</a>: Unlike WatchAction (which is under ConsumeAction), PlayAction refers to showing/displaying for an audience or at an event, rather than consuming visual content.</li>\n</ul>\n",
+      "rdfs:comment" : "The act of playing/exercising/training/performing for enjoyment, leisure, recreation, Competition or exercise.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/ListenAction\">ListenAction</a>: Unlike ListenAction (which is under ConsumeAction), PlayAction refers to performing for an audience or at an event, rather than consuming music.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/WatchAction\">WatchAction</a>: Unlike WatchAction (which is under ConsumeAction), PlayAction refers to showing/displaying for an audience or at an event, rather than consuming visual content.</li>\n</ul>\n",
       "rdfs:label" : "PlayAction",
       "rdfs:subClassOf" : "schema:Action"
    },
@@ -11,12 +11,12 @@
          "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
          "rdfs:label" : "audience",
          "schema:domainIncludes" : [
-            "schema:Product",
             "schema:Service",
             "schema:LodgingBusiness",
+            "schema:Product",
             "schema:Event",
-            "schema:CreativeWork",
-            "schema:PlayAction"
+            "schema:PlayAction",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:Audience"
       },
@@ -26,12 +26,12 @@
          "rdfs:label" : "event",
          "schema:domainIncludes" : [
             "schema:JoinAction",
-            "schema:PlayAction",
-            "schema:InformAction",
-            "schema:Organization",
             "schema:Place",
+            "schema:Organization",
+            "schema:PlayAction",
+            "schema:InviteAction",
             "schema:LeaveAction",
-            "schema:InviteAction"
+            "schema:InformAction"
          ],
          "schema:rangeIncludes" : "schema:Event"
       }

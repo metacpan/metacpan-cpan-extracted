@@ -22,7 +22,7 @@ do { my $x = {
                                       'Exporter' => '5.57',
                                       'Module::Load' => '0.10',
                                       'Module::Loaded' => '0',
-                                      'perl' => '5.006',
+                                      'perl' => 'v5.6.0',
                                       'version' => '0'
                                     }
                     },
@@ -37,7 +37,10 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Test::Exception' => '0',
                                    'Test::More' => '0',
-                                   'constant' => '0'
+                                   'Test::Most' => '0',
+                                   'constant' => '0',
+                                   'lib' => '0',
+                                   'perl' => 'v5.6.0'
                                  }
                  }
      };

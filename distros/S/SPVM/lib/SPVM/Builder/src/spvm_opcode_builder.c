@@ -703,7 +703,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           }
 
                           opcode.operand0 = var_id_out;
-                          opcode.operand1 = call_sub->sub_rel_id;
+                          opcode.operand1 = call_sub->info_constant_id;
                           opcode.operand2 = first_arg_var_id;
                         }
                         else {
@@ -800,7 +800,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             assert(0);
                           }
                           opcode.operand0 = var_id_out;
-                          opcode.operand1 = call_sub->sub_rel_id;
+                          opcode.operand1 = call_sub->info_constant_id;
                         }
                         
                         int32_t call_sub_return_type_width = SPVM_TYPE_get_width(compiler, call_sub_return_type->basic_type->id, call_sub_return_type->dimension, call_sub_return_type->flag);
@@ -1043,7 +1043,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           
                           opcode.operand0 = var_id_out;
                           opcode.operand1 = var_id_invocant;
-                          opcode.operand2 = field_access->sub_rel_id;
+                          opcode.operand2 = field_access->info_field_id;
 
                           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
 
@@ -1208,7 +1208,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         }
                         
                         opcode.operand0 = var_id_out;
-                        opcode.operand1 = package_var_access->sub_rel_id;
+                        opcode.operand1 = package_var_access->info_package_var_id;
                         
                         SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                       }
@@ -1964,8 +1964,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             break;
                           case SPVM_BASIC_TYPE_C_ID_LONG:
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_CONSTANT_LONG);
-                            opcode.operand1 = constant->sub_rel_id;
-                            opcode.operand2 = constant->sub_rel_info_long_id;
+                            opcode.operand1 = constant->info_long_constant_id;
                             var_id_out = SPVM_OP_get_var_id(compiler, op_assign_dist);
                             break;
                           case SPVM_BASIC_TYPE_C_ID_FLOAT:
@@ -1975,8 +1974,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             break;
                           case SPVM_BASIC_TYPE_C_ID_DOUBLE:
                             SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_GET_CONSTANT_DOUBLE);
-                            opcode.operand1 = constant->sub_rel_id;
-                            opcode.operand2 = constant->sub_rel_info_double_id;
+                            opcode.operand1 = constant->info_double_constant_id;
                             var_id_out = SPVM_OP_get_var_id(compiler, op_assign_dist);
                             break;
                           default:
@@ -2501,7 +2499,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               var_id_out = SPVM_OP_get_var_id(compiler, op_dist_term);
                               var_id_in = SPVM_OP_get_var_id(compiler, op_src_term);
                             }
-                            opcode.operand2 = op_dist_type->uv.type->sub_rel_id;
+                            opcode.operand2 = op_dist_type->uv.type->info_constant_id;
 
                             opcode.operand0 = var_id_out;
                             opcode.operand1 = var_id_in;
@@ -2527,8 +2525,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           SPVM_CONSTANT* constant = op_assign_src->first->uv.constant;
 
                           opcode.operand0 = var_id_out;
-                          opcode.operand1 = constant->sub_rel_id;
-                          opcode.operand2 = constant->sub_rel_info_string_id;
+                          opcode.operand1 = constant->info_string_constant_id;
 
                           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                         }
@@ -2667,7 +2664,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                     int32_t var_id_index = SPVM_OP_get_var_id(compiler, op_assign_src->first->last);
 
                                     opcode.operand0 = var_id_out;
-                                    opcode.operand1 = op_type->uv.type->sub_rel_id;
+                                    opcode.operand1 = op_type->uv.type->info_constant_id;
                                     opcode.operand2 = var_id_index;
 
                                     SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
@@ -2686,7 +2683,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                     int32_t var_id_index = SPVM_OP_get_var_id(compiler, op_assign_src->first->last);
 
                                     opcode.operand0 = var_id_out;
-                                    opcode.operand1 = op_type->uv.type->sub_rel_id;
+                                    opcode.operand1 = op_type->uv.type->info_constant_id;
                                     opcode.operand2 = var_id_index;
 
                                     SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
@@ -2707,7 +2704,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               int32_t var_id_index = SPVM_OP_get_var_id(compiler, op_assign_src->first->last);
                               
                               opcode.operand0 = var_id_out;
-                              opcode.operand1 = op_type->uv.type->sub_rel_id;
+                              opcode.operand1 = op_type->uv.type->info_constant_id;
                               opcode.operand2 = var_id_index;
 
                               SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
@@ -2724,7 +2721,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             int32_t var_id_out = SPVM_OP_get_var_id(compiler, op_assign_dist);
                             
                             opcode.operand0 = var_id_out;
-                            opcode.operand1 = type->sub_rel_id;
+                            opcode.operand1 = type->info_constant_id;
                             SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                           }
                         }
@@ -2889,7 +2886,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         memset(&opcode, 0, sizeof(SPVM_OPCODE));
                         int32_t package_var_access_id = package_var_access->package_var->id;
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_UNDEF);
-                        opcode.operand0 = package_var_access->sub_rel_id;
+                        opcode.operand0 = package_var_access->info_package_var_id;
                         SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                       }
                       // PACKAGE_VAR_ACCESS = VAR
@@ -2936,7 +2933,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                           
                         int32_t package_var_access_id = package_var_access->package_var->id;
                         
-                        opcode.operand0 = package_var_access->sub_rel_id;
+                        opcode.operand0 = package_var_access->info_package_var_id;
                         opcode.operand1 = var_id_in;
                         SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                       }
@@ -3256,7 +3253,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t var_id_invocant = SPVM_OP_get_var_id(compiler, op_term_invocant);
 
                           opcode.operand0 = var_id_invocant;
-                          opcode.operand1 = field_access->sub_rel_id;
+                          opcode.operand1 = field_access->info_field_id;
                           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
 
                           SPVM_OPCODE_BUILDER_push_if_croak(compiler, opcode_array, push_eval_opcode_rel_index_stack, if_croak_catch_goto_opcode_rel_index_stack, if_croak_return_goto_opcode_rel_index_stack, sub->op_sub, op_cur->line);
@@ -3306,7 +3303,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           int32_t var_id_invocant = SPVM_OP_get_var_id(compiler, op_term_invocant);
                           
                           opcode.operand0 = var_id_invocant;
-                          opcode.operand1 = field_access->sub_rel_id;
+                          opcode.operand1 = field_access->info_field_id;
                           opcode.operand2 = var_id_in;
                           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
 
@@ -3403,7 +3400,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                     
                     // Case count
                     int32_t cases_length = switch_info->cases->length;
-                    opcode_switch_info.operand2 = switch_info->sub_rel_id;
+                    opcode_switch_info.operand2 = switch_info->info_constant_id;
 
                     SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode_switch_info);
                     
@@ -3486,7 +3483,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       int32_t var_id_invocant = SPVM_OP_get_var_id(compiler, op_term_invocant);
 
                       opcode.operand0 = var_id_invocant;
-                      opcode.operand1 = op_cur->uv.field_access->sub_rel_id;
+                      opcode.operand1 = op_cur->uv.field_access->info_field_id;
                       SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
 
                       SPVM_OPCODE_BUILDER_push_if_croak(compiler, opcode_array, push_eval_opcode_rel_index_stack, if_croak_catch_goto_opcode_rel_index_stack, if_croak_return_goto_opcode_rel_index_stack, sub->op_sub, op_cur->line);
@@ -4064,7 +4061,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                     }
                     
                     opcode.operand0 = var_id_in1;
-                    opcode.operand1 = op_type->uv.type->sub_rel_id;
+                    opcode.operand1 = op_type->uv.type->info_constant_id;
                     
                     SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                     
@@ -4319,12 +4316,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       
                       if (sub_call_sub->package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CALL_METHOD_VOID);
-                        opcode.operand1 = call_sub->sub_rel_id;
+                        opcode.operand1 = call_sub->info_constant_id;
                         opcode.operand2 = first_arg_var_id;
                       }
                       else {
                         SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CALL_SUB_VOID);
-                        opcode.operand1 = call_sub->sub_rel_id;
+                        opcode.operand1 = call_sub->info_constant_id;
                       }
                       
                       SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);

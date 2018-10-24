@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart );
 
-$VERSION = '0.023';
+$VERSION = '0.033';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of gradients weighted proportionally to multidimensional distances.';
 
 #######################################################################
@@ -190,16 +190,16 @@ sub adjustmode
 
 sub preparearr
 {
-  my ( $lines_ref ) = @_;
+  my @lines = @_;
   my $optformat = "yes";
-  my @lines = @{ $lines_ref };
+  my @arr;
   if ( $lines[1] =~ /_/ )
   {
     foreach my $line ( @lines )
     {
       chomp( $line );
-      my @row = split( /,/ , $line );
-      @pars = split( /_/ , $row[0] );
+      my @row = split( /,/ , $line ); #say $tee "IN PREPAREARR \@row " . dump( @row );
+      @pars = split( /_/ , $row[0] ); #say $tee "IN PREPAREARR \@pars " . dump( @pars );
       if ( $row[1] eq undef )
       {
         push ( @arr, [ $row[0], [ @pars ] ] );
@@ -511,7 +511,7 @@ sub calcdistgrad
     @diff2 = diff( \@{ $elt1 } , \@{ $el1 } ); #say $tee "IN CALCDISTGRAD \@diff2: " . dump( @diff2 );
 
     my %h1 = map { split( /-/ , $_ ) } @diff1; #say $tee "IN CALCDISTGRAD \%h1: " . dump( \%h1 );
-    @da1 = keys %h1; #say $tee "IN CALCDISTGRAD \@da1: " . dump( @da1 );
+    @da1 = keys %h1; # $tee "IN CALCDISTGRAD \@da1: " . dump( @da1 );
     @da1par = values %h1; #say $tee "IN CALCDISTGRAD \@da1par: " . dump( @da1par );
     my %h2 = map { split( /-/ , $_ ) } @diff2; #say $tee "IN CALCDISTGRAD \%h2: " . dump( \%h2 );
     @da2 = keys %h2; #say $tee "IN CALCDISTGRAD \@da2: " . dump( @da2 );
@@ -581,7 +581,7 @@ sub calcmaxdist
       my %hash = %{ $hash_ref }; #say $tee "00\%hash: " . dump( %hash );
       push ( @rawdists, $hash{rawdist} );
     }
-  }  #say $tee "00\@rawdists: " . dump( @rawdists );
+  } #say $tee "00\@rawdists: " . dump( @rawdists );
   my $maxdist = max( @rawdists ); #say $tee "00\$maxdist: " . dump( $maxdist );
   return( $maxdist );
 }
@@ -596,8 +596,12 @@ sub wei
   my %factlevels = %{ $factlevels_ref };  #say $tee "AND \%factlevels: " . dump( %factlevels );
   # my ( %magic, %wand, %spell, %bank );
 
+
   sub fillbank
   { #say $tee "NOW IN FILLBANK.";
+    my ( $arr_r, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, $factlevels_r ) = @_;
+    my @arr = @{ $arr_r };
+    my %factlevels = %{ $factlevels_r };
     my %bank;
     foreach my $el ( @arr )
     { #say $tee "SO IN FIRST ARR CHECK" ;  say $tee "\$el->[1]: " . dump( $el->[1] ); #say $tee "EL: " . dump( $el );
@@ -619,7 +623,7 @@ sub wei
             unless ( !keys %{ $res_ref } )
             {
               %d = %{ $res_ref }; #say $tee "FOUND \%d: " . dump( \%d );
-              @diff1 = @{$d{diff1}}; #say $tee "FOUND \@diff1: " . dump( @diff1 );
+              my @diff1 = @{$d{diff1}}; #say $tee "FOUND \@diff1: " . dump( @diff1 );
               @diff2 = @{$d{diff2}}; #say $tee "FOUND \@diff2: " . dump( @diff2 );
               @da1 = @{$d{da1}}; #say $tee "FOUND \@da1: " . dump( @da1 );
               @da2 = @{$d{da2}}; #say $tee "FOUND \@da2: " . dump( @da2 );
@@ -658,7 +662,7 @@ sub wei
                       my @sorted = sort( $d11, $d21 );
                       my $orderedpair = join( "-", @sorted );
                       my $trio = join( "-", $d10, $pair );
-                      my $orderedtrio = join( "-", $d10, $orderedpair );
+                      my $orderedtrio = join( "-", $d10, $orderedpair ); #say $tee "\$orderedtrio: " . dump( $orderedtrio );
 
                       unless ( $trio eq "" )
                       {
@@ -722,35 +726,41 @@ sub wei
     return ( \%bank );
   }
 
-
-  my $bank_ref = fillbank;
-  my %bank =  %{ $bank_ref }; #say $tee "\%bank: " . dump( %bank );
+  my %bank = %{ fillbank( \@arr, $minimumcertain, $minreq_forgrad, $maxdist, $condweight, \%factlevels ) };
+  #say $tee "IN WEI \%bank: " . dump( %bank );
 
   sub clean
   {
-    my %bank = @_;
+    %bank = @_;
     foreach my $trio ( keys ( %bank ) )
     {
       my ( @grads, @ordists, @dists, @strengths );
       unless( ( $bank{$trio}{grad} eq "" ) or ( $bank{$trio}{ordists} eq "" )
         or ( $bank{$trio}{dists} eq "" ) or ( $bank{$trio}{strengths} eq "" ) )
       {
-        push ( @grads,$bank{$trio}{grad} );
-        push ( @ordists,$bank{$trio}{ordists} );
-        push ( @dists,$bank{$trio}{dists} );
-        push ( @strengths,$bank{$trio}{strengths} );
+        push ( @grads, $bank{$trio}{grad} );
+        push ( @ordists, $bank{$trio}{ordists} );
+        push ( @dists, $bank{$trio}{dists} );
+        push ( @strengths, $bank{$trio}{strengths} );
         $bank{$trio}{grad} = [ @grads ];
         $bank{$trio}{ordists} = [ @ordists ];
         $bank{$trio}{dists} = [ @dists ];
         $bank{$trio}{strengths} = [ @strengths ];
       }
     }
+    return( \%bank );
   }
-  my %bank = clean( %bank );
-  my %bank =  %{ $bank_ref }; #say $tee "CLEANED \%bank: " . dump( %bank );
+  %bank = %{ clean( %bank ) }; say $tee "IN WEI CLEANED \%bank: " . dump( %bank ) ;
+  #my %bank =  %{ $bank_ref }; say $tee "CLEANED \%bank: " . dump( %bank );
 
   sub cyclearr
-  { #say $tee "NTH ARR: " . dump( @arr );
+  {
+    my ( $arr_r, $minreq_forinclusion, $minreq_forgrad, $bank_r, $factlevels ) = @_;
+    my @arr = @{ $arr_r };
+    my %bank = %{ $bank_r };
+    my %factlevels = %{ $factlevels };
+    say $tee "IN cyclearr ARR: " . dump( @arr );
+
     my %wand;
     my $coun = 0;
     foreach my $el ( @arr )
@@ -907,8 +917,7 @@ sub wei
     return( \%wand );
   }
 
-  my $wand_ref = cyclearr;
-  my %wand = %{ $wand_ref }; #say $tee "\%wand OUT: " . dump( %wand );
+  my %wand = %{ cyclearr( \@arr, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels ) }; say $tee "\%wand OUT: " . dump( %wand );
 
 
   my @limb0;
@@ -922,7 +931,7 @@ sub wei
       push ( @limb0, [ $wand{$ke}{name}, $wand{$ke}{bulk}, $soughtval, $totstrength ] ); #say $tee "\$avg: $avg"; say $tee "\${ \$magic{\$ke}{\$dee} }->[1] : ${ $magic{$ke}{$dee} }->[1] ";
     }
   }
-  #say $tee "LIMBO_WEI: " . dump( @limbo_wei );
+  say $tee "LIMBO_WEI: " . dump( @limbo_wei );
   return( @limb0 )
 } ##### END SUB wei
 
@@ -1395,7 +1404,14 @@ my @arr;
 
 sub interlinear
 {
-  my ( $configf, $sourcef, $metafile, $blockelts_r, $reportf ) = @_;
+  my ( $configf, $sourcef, $metafile, $blockelts_r, $reportf, $countblock ) = @_;
+  say $tee "ARRIVED IN INTERLINEAR \$configf $configf";
+  say $tee "ARRIVED IN INTERLINEAR \$sourcef $sourcef";
+  say $tee "ARRIVED IN INTERLINEAR \$metafile $metafile";
+  say $tee "ARRIVED IN INTERLINEAR \$blockelts_r ". dump( $blockelts_r );
+  say $tee "ARRIVED IN INTERLINEAR \$reportf $reportf";
+  say $tee "ARRIVED IN INTERLINEAR \$countblock $countblock";
+
   if ( $reportf ne "" ){ $report = $reportf; } #say $tee "CHECK5 \$report: " . dump( $report );
   $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
 
@@ -1404,29 +1420,29 @@ sub interlinear
   #require $confile; ############## FIX THIS!
 
   if ( $sourcef ne "" ){ $sourcefile = $sourcef; } #say $tee "CHECK5 \$sourcefile: " . dump( $sourcefile );
-  if ( $metafile ne "" ){ $newfile = $metafile; } say $tee "CHECK5 \$newfile: " . dump( $newfile );
+  if ( $metafile ne "" ){ $newfile = $metafile; } #say $tee "CHECK5 \$newfile: " . dump( $newfile );
 
   my @blockelts;
   if ( $blockelts_r ne "" ){ @blockelts = @{ $blockelts_r }; } #say $tee "CHECK5 \@blockelts: " . dump( @blockelts );
 
   my @mode = adjustmode( $maxloops, \@mode );
   open( SOURCEFILE, "$sourcefile" ) or die;
-  my @lines = <SOURCEFILE>;
+  my @lines = <SOURCEFILE>; #say $tee "REALLY \@lines: " . dump( @lines );
   close SOURCEFILE;
 
-  say $tee "Preparing the dataseries.";
+  say $tee "Preparing the dataseries, IN INTERLINEAR: \$countblock $countblock";
   my $aarr_ref;
-  ( $aarr_ref, $optformat ) = preparearr( \@lines );
+  ( $aarr_ref, $optformat ) = preparearr( @lines );
 
   my @aarr = @{ $aarr_ref }; #say $tee "REALLY \@aarr: " . dump( @aarr );
 
   say $tee "Checking factors and levels.";
-  my %factlevels = %{ prepfactlev( \@aarr ) }; #say $tee "REALLY \%factlevels: " . dump( \%factlevels );
+  my %factlevels = %{ prepfactlev( \@aarr ) }; #say $tee "IN INTERLINEAR REALLY \%factlevels: " . dump( \%factlevels );
 
   my ( $factlev_ref ) = tellstepsize( \%factlevels );
-  my %factlev = %{ $factlev_ref }; #say $tee "REALLY \%factlev: " . dump( %factlev );
+  my %factlev = %{ $factlev_ref }; say $tee "REALLY \%factlev: " . dump( %factlev );
 
-  my $maxdist = calcmaxdist( \@aarr, \%factlev ); #say $tee "001\$maxdist: " . dump( $maxdist );
+  my $maxdist = calcmaxdist( \@aarr, \%factlev ); say $tee "001\$maxdist: " . dump( $maxdist );
 
   my $count = 0;
   while ( $count < $maxloops )
@@ -1441,7 +1457,7 @@ sub interlinear
       @arr = @arr2;
     }
 
-    say $tee "COUNT: " . dump( $count + 1 );
+    #say $tee "COUNT: " . dump( $count + 1 );
     my $mode__ = $mode[$count] ;
 
     my ( @limbo_wei, @limbo_purelin, @limbo_near, @limbo, %bank, %wand );
@@ -1520,7 +1536,7 @@ sub interlinear
     #  @limbo = mixlimbo( \@limbo_prov, \@limbo_near, $presence, $linearprecedence, \@weights );
     #}
 
-    say $tee "OBTAINED LIMBO: " . dump( @limbo );
+    #say $tee "OBTAINED LIMBO: " . dump( @limbo );
     say $tee "MIXING THE ARRAY UPDATES " . ( $count + 1 ) . " for $sourcefile";
     say $tee "THERE ARE " . scalar( @limbo ) . " ITEMS COMING OUT FROM THIS MIX " . ( $count + 1 );
 
@@ -1644,12 +1660,11 @@ Sim::OPT::Interlinear
 
 
   interlinear( "/path/to/a-pre-prepared-configfile.pl", "/path/to/a-pre-prepared-sourcefile.csv", "/path/to/the-metamodel-file-to-be-obtained" );
-  #or from the command line:
+  # Or from the command line:
   interlinear .
-  #(note the dot at the end), to use the file as a script and include the location of the source file directly in the configuration file;
-  #or again from the command line:
+  # (note the dot at the end), to use the file as a script and include the location of the source file directly in the configuration file.
+  # Or again from the command line, for beginning with a dialogue question:
   interlinear interstart
-  #to begin with a dialogue question.
 
 
 =head1 DESCRIPTION
@@ -1677,52 +1692,38 @@ The source file has to be prepared by listing in each column the values (levels)
 
 The parameter number is given by the position of the column (i.e. column 4 host parameter 4).
 
-Here below is shown an example of multivatiate dataseries of 3 parameters assuming 3 levels each. having with missing objecive function entries.
+Here below is shown an example of multivatiate dataseries of 3 parameters assuming 3 levels each. having with missing objecive function entries. The numbers preceding the objective function (which is in the last colum) are the indices of the multidimensional matrix (tensor).
 
 
 1,1,1,1.234
-
 1,2,3,2,1.500
-
 1,3,3,3
-
 2,1,3,1,1.534
-
 2,2,3,2,0.000
-
 2,3,3,0.550
-
 3,1,3,1
-
 3,2,3,2,0.670
-
 3,3,3,3
 
 
 Note that the parameter listings cannot be incomplete. Just the objective function entries can be.
-The program converts this format into the one liked by Sim::OPTS, which is the following:
+The program converts this format into the one liked by Sim::OPTS, which is the following, in which the indices of the tensor are expressed more clearly:
 
 
 1-1_2-1_3-1,9.234
-
 1-1_2-2_3-2,4.500
-
 1-1_2-3_3-3
-
 1-2_2-1_3-1,7.534
-
 1-2_2-2_3-2,0.000
-
 1-2_2-3_3-3,0.550
-
 1-3_2-1_3-1
-
 1-3_2-2_3-2,0.670
-
 1-3_2-3_3-3
 
 
 After some computations, Interlinear will output a new dataseries, with the missing values filled in.
+This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful for saving computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
+
 
 
 =head2 EXPORT

@@ -23,8 +23,8 @@
          ],
          "schema:inverseOf" : "schema:memberOf",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:members" : {

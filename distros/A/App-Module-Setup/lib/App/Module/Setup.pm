@@ -4,7 +4,7 @@ package App::Module::Setup;
 
 ### Please use this module via the command line module-setup tool.
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use warnings;
 use strict;
@@ -24,10 +24,12 @@ sub main {
     my $vars =
       { "module.name"    => $mod,	# Foo::Bar
 	"module.version" => "0.01",
-	"current.year"   => 1900 + (localtime)[5],
+	"module.license" => $options->{license} || "perl_5",
+	"current.year"   => $options->{year} || 1900 + (localtime)[5],
 	"author.name"    => $options->{author} || (getpwuid($<))[6],
 	"author.email"   => $options->{email},
-	"author.cpanid"  => $options->{"cpanid"},
+	"author.cpanid"  => $options->{cpanid},
+	"perl.minversion"  => $options->{minperl} || '5.008000',
       };
 
     my $dir;
@@ -202,6 +204,8 @@ It takes a reference to a hash of params, as follows:
     template     # template set to use
     postcmd	 # array ref of commands to execute after creating
     install-templates # bool: just install the selected templates
+    minperl	 # minimal perl version, e.g. 5.010000
+    license	 # e.g. perl_5
 
 =cut
 

@@ -3,8 +3,9 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Path;
 use Prty::Option;
@@ -620,17 +621,26 @@ sub load {
     
         $self->msg(1,'%T ==find==');
 
-        if (!@paths) {
-            # Wir laden die Dateien aus dem Storage,
-            # wenn kein Pfad angegeben ist
-            push @paths,$self->storage('def');
-        }
-
-        # Ermittele die zu verarbeitenden Dateien
-
         my @files;
-        for my $path (@paths) {
-            push @files,-d $path? $self->findFiles($path): $path;
+        if (@paths) {
+            # Wir laden die Dateien aus den angegebenen Pfaden. (Sub)Pfade,
+            # die mit einem Punkt beginnen (.PATH) ignorieren wir in
+            # diesem Fall, damit .yeah, .cotedo nicht konsultiert werden.
+
+            for my $path (@paths) {
+                if (-d $path) {
+                    push @files,$self->findFiles($path,-noDotPaths=>1);
+                }
+                else {
+                    push @files,$path;
+                }
+            }
+        }
+        else {
+            # Wir laden die Dateien aus dem Storage, wenn kein Pfad
+            # angegeben ist
+
+            push @files,$self->findFiles($self->storage('def'));
         }
 
         my $n = scalar @files;
@@ -744,12 +754,17 @@ sub fetch {
         }
     }
     
-    my $dt = Prty::DestinationTree->new($dir,
+    my $dt = Prty::DestinationTree->new(
+        # FIXME: Hartcodierte Pfade vermeiden
+        "$dir/Export",
+        "$dir/Language",
+        "$dir/Library",
+        "$dir/Package",
         -quiet=>0,
         -language=>'en',
         -outHandle=>\*STDERR,
     );
-    $dt->addDir($dir);
+    # $dt->addDir($dir);
 
     for my $e ($self->filesToFetch($layout)) {
         # eof-Marker ergänzen
@@ -896,7 +911,7 @@ sub extensionRegex {
 
 =head4 Synopsis
 
-    @files | $fileA = $cop->findFiles($dir);
+    @files | $fileA = $cop->findFiles($dir,@opt);
 
 =head4 Arguments
 
@@ -904,7 +919,19 @@ sub extensionRegex {
 
 =item $dir
 
-Das Verzeichnis, das nach Dateien durchsucht wird.
+Verzeichnis, das nach Dateien durchsucht wird.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -noDotPaths => $bool (Default: 0)
+
+Lasse Pfade, deren letzte
+Komponente mit einem Punkt beginnt, aus. Auf diese Weise
+verhindern wir, dass Dot-Verzeichnissse durchsucht werden.
 
 =back
 
@@ -924,11 +951,24 @@ des Regex, der von L</extensionRegex>() geliefert wird.
 
 sub findFiles {
     my ($self,$dir) = @_;
+    # @_: @opt
+
+    # Optionen
+
+    my $noDotPaths = 0;
+
+    Prty::Option->extract(\@_,
+        -noDotPaths => \$noDotPaths,
+    );
+
+    # Operation ausführen
 
     my @files = Prty::Path->find($dir,
         -type=>'f',
-        -pattern=>$self->extensionRegex,
-        -sloppy=>1,
+        -pattern => $self->extensionRegex,
+        # FIMXE: ../PATH zulassen
+        -exclude => $noDotPaths? qr{(^|/)\.[^/]+$}: undef,
+        -sloppy => 1,
     );
     
     return wantarray? @files: \@files;
@@ -1352,7 +1392,7 @@ sub msg {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -3,9 +3,10 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Unindent;
 
@@ -324,7 +325,7 @@ sub code {
         elsif ($key eq '-title') {
              push @opts,'title='.shift;
         }
-    	else {
+        else {
              $self->throw(
                  q~CONFLUENCE-00001: Unknown code macro option~,
                  Option=>$key,
@@ -405,7 +406,7 @@ sub noFormat {
                  push @opts,'nopanel=true';
              }
         }
-    	else {
+        else {
              $self->throw(
                  q~CONFLUENCE-00001: Unknown noformat macro option~,
                  Option=>$key,
@@ -505,7 +506,7 @@ sub panel {
         elsif ($key eq '-titleColor') {
              push @opts,'titleColor='.shift;
         }
-	else {
+        else {
              $self->throw(
                  q~CONFLUENCE-00001: Unknown panel option~,
                  Option=>$key,
@@ -647,7 +648,7 @@ sub tableOfContents {
         elsif ($key eq '-absoluteUrl') {
              push @opts,'absoluteUrl='.shift;
         }
-	else {
+        else {
              $self->throw(
                  q~CONFLUENCE-00001: Unknown panel option~,
                  Option=>$key,
@@ -948,7 +949,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

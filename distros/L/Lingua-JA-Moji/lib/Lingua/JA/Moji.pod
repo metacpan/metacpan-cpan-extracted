@@ -17,8 +17,8 @@ Convert various types of Japanese characters into one another.
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.53
-corresponding to git commit L<4d331013d110c3c316c352bd2409a6b609e6e214|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/4d331013d110c3c316c352bd2409a6b609e6e214> made on Wed Oct 3 15:41:13 2018 +0900.
+This document describes Lingua::JA::Moji version 0.54
+corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/79035f5895111c7bd0d2da461ebf78cee8c1d517> made on Mon Oct 22 20:28:13 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -369,6 +369,9 @@ IME, but which do not look like Japanese words.
 The "true" value returned is the output of the round-trip conversion,
 converted into wapuro format.
 
+This was added to the module in version L</0.27>.
+
+
 
 
 
@@ -548,7 +551,13 @@ Convert small-sized kana such as 「ぁ」 into full-sized kana such as
 
 
 Given a list of kana, add all the possible versions of the words with
-the first kana with either a dakuten or a handakuten added.
+the first kana with either a L</dakuten> or a L</handakuten> added.
+
+This was intended for a search for a particular kanji in a
+dictionary. It is not actually in use anywhere at the moment.
+
+This was added to the module in version L</0.36>.
+
 
 
 
@@ -684,25 +693,6 @@ cannot include punctuation marks or L</chouon>.
 
 
 
-=head2 kana_order 
-
-
-
-    use Lingua::JA::Moji 'kana_order';
-
-    $kana_order = kana_order ();
-
-
-
-Returns an array reference containing an ordering of the kana. This is
-useful for looping over the kana or sorting.
-
-
-
-
-
-
-
 =head2 katakana2syllable 
 
 
@@ -725,6 +715,9 @@ broken up into four syllables, フ, ラ, ナ, ガン.
 This routine is used as the basis of this L<Change your name to kanji
 web application|https://www.sljfaq.org/cgi/name-kanji.cgi>.
 
+This was added to the module in version L</0.24>.
+
+
 
 
 
@@ -745,7 +738,8 @@ web application|https://www.sljfaq.org/cgi/name-kanji.cgi>.
 A character class for use in regular expressions which matches all
 kana characters. This class catches meaningful combinations of
 hiragana, katakana, halfwidth katakana, circled katakana, and katakana
-combined words. As of [% info.version %], it does not match hentaigana.
+combined words. It does not match the hentaigana characters of
+Unicode.
 
 This is a combination of the existing Perl character classes
 C<Katakana>, C<InKatakana>, and C<InHiragana>, minus unassigned
@@ -820,7 +814,8 @@ large kanas used for youon or sokuon into smaller kana. If the
 conversion succeeds, return the converted value, otherwise return the
 undefined value. This function is experimental.
 
-This was added to the module in version 0.46.
+This was added to the module in version L</0.46>.
+
 
 
 
@@ -836,10 +831,12 @@ This was added to the module in version 0.46.
 
 
 
-Clean up mixed kana and romaji inputs into katakana, and convert stray
-"one" kanjis into chouons. This function is experimental.
+This function converts any of hiragana, halfwidth katakana, or romaji
+input into katakana. It also converts various confusable kanji
+characters into kana. For example the "one" kanji is converted into
+chouons.
 
-This was added to the module in version 0.46.
+This was added to the module in version L</0.46>.
 
 
 
@@ -861,7 +858,7 @@ This was added to the module in version 0.46.
 Join dakuten and handakuten (Unicode U+3099-U+309C) to kana where
 possible. Where they cannot be joined, strip them out.
 
-This was added to the module in version 0.53.
+This was added to the module in version L</0.53>.
 
 
 
@@ -880,13 +877,14 @@ This was added to the module in version 0.53.
 
 
 
-Split dakuten and handakuten from kana where possible. U+309B and
-U+309C are chosen rather than U+3099 and U+309A. (This choice was
+Split L</dakuten> and L</handakuten> from kana where possible. U+309B
+and U+309C are chosen rather than U+3099 and U+309A. (This choice was
 somewhat arbitrary. I'm not sure which of the pairs should be used. I
 chose these because they were the ones already in use internally in
 the module in L</kana2braille> and L</kana2morse>.)
 
-This was added to the module in version 0.53.
+This was added to the module in version L</0.53>.
+
 
 
 
@@ -916,7 +914,8 @@ Convert hentaigana into hiragana. Hentaigana with multiple
 interpretations are converted into a list of kana separated by a
 middle dot character.
 
-This was added to the module in version 0.43.
+This was added to the module in version L</0.43>.
+
 
 
 
@@ -937,7 +936,8 @@ This was added to the module in version 0.43.
 
 Convert hentaigana into their equivalent kanji.
 
-This was added to the module in version 0.43.
+This was added to the module in version L</0.43>.
+
 
 
 
@@ -958,7 +958,8 @@ This was added to the module in version 0.43.
 
 Convert kanji to equivalent hentaigana, where they exist.
 
-This was added to the module in version 0.43.
+This was added to the module in version L</0.43>.
+
 
 
 
@@ -982,7 +983,8 @@ exists, they are returned joined with a middle dot. Dakuten and
 handakuten are split out of the kana using L</split_sound_marks>
 before the conversion.
 
-This was added to the module in version 0.43.
+This was added to the module in version L</0.43>.
+
 
 
 
@@ -1347,6 +1349,9 @@ actually exist but were mistakenly included in a computer
 standard. See L<https://www.sljfaq.org/afaq/yuureimoji.html> for more
 information.
 
+This was added to the module in version L</0.47>.
+
+
 
 
 
@@ -1365,6 +1370,9 @@ my @bad_kanji = bad_kanji ();
 
 Returns a list of kanji with negative meanings. See also
 L<https://www.lemoda.net/japanese/offensive-kanji/index.html>.
+
+This was added to the module in version L</0.47>.
+
 
 
 
@@ -1557,12 +1565,33 @@ terminology used elsewhere in the documentation. The headers in this
 section are in lower case for the benefit of internal documentation
 links.
 
-=head2 chouon
+=over
+
+=item chouon
 
 The long vowel marker, "ー", or I<chōon>, which is used in Japanese
 katakana to indicate a lengthened vowel. See L<What is the long line symbol used in katakana?|http://www.sljfaq.org/afaq/chouon.html>
 
-=head2 wide ASCII
+=item dakuten
+
+=item handakuten
+
+Dakuten, 濁点, literally "voicing mark", and handakuten, 半濁点,
+literally "half voicing mark", are diacritic marks which appear on
+some kana to convert them to a voiced consonant.
+
+=item halfwidth katakana
+
+Halfwidth katakana, I<hankaku katakana> (半角かたかな) is a legacy
+encoding of katakana based on an eight-bit encoding. See
+L<What is half-width katakana?|http://www.sljfaq.org/afaq/half-width-katakana.html>
+for full details.
+
+=item syllabic n
+
+In this document, "syllabic n" means the kana ん or ン. See L<What is syllabic n?|http://www.sljfaq.org/afaq/syllabic-n.html> for full details.
+
+=item wide ASCII
 
 Wide ASCII, fullwidth ASCII, or I<zenkaku eisūji> (全角英数字) are a
 legacy of bitmapped fonts which has survived into the present
@@ -1572,16 +1601,7 @@ character. The name for normal ASCII characters in Japanese is
 I<hankaku eisūji> (半角英数字), literally "half width English letters
 and numerals". See L<What is "wide ASCII"?|http://www.sljfaq.org/afaq/wide-ascii.html> for full details.
 
-=head2 halfwidth katakana
-
-Halfwidth katakana, I<hankaku katakana> (半角かたかな) is a legacy
-encoding of katakana based on an eight-bit encoding. See
-L<What is half-width katakana?|http://www.sljfaq.org/afaq/half-width-katakana.html>
-for full details.
-
-=head2 syllabic n
-
-In this document, "syllabic n" means the kana ん or ン. See L<What is syllabic n?|http://www.sljfaq.org/afaq/syllabic-n.html> for full details.
+=back
 
 
 
@@ -1639,23 +1659,63 @@ strange, but since it was described in Naoki Tomita's book, and some
 people may be using it as is, I'm not very keen to change it in
 incompatible ways.
 
-0.43 added support for
+=over
+
+=item 0.24
+
+This version added L</katakana2syllable>.
+
+=item 0.27
+
+This version added L</is_romaji_strict>.
+
+=item 0.36
+
+This version added the L</nigori_first> function.
+
+=item 0.37
+
+This version added L</is_romaji_semistrict>.
+
+=item 0.43 
+
+This version added support for
 L<hentaigana|http://www.sljfaq.org/afaq/hentaigana.html>. This is
 based on copy and paste of the Unicode 10.0 standard draft
 documents. See the directory L<F<data>|https://github.com/benkasminbullock/Lingua-JA-Moji/tree/master/data> in the github repository for the files used to
 generate this data.
 
-0.46 disallowed hyphens as the first character of a romaji string and
-added L</smallize_kana> and L</cleanup_kana>.
+=item 0.46
 
-0.47 added a list of the "Yūrei moji" (幽霊文字), false kanji, and
+This version disallowed hyphens as the first character of a romaji
+string and added L</smallize_kana> and L</cleanup_kana>.
+
+=item 0.47
+
+This version added a list of the "Yūrei moji" (幽霊文字), false kanji, and
 changed romanisation somewhat.
 
-0.48 changed kana2romaji to be consistent with the documentation for
-long vowel options wapuro and none.
+=item 0.48
 
-0.53 added L</join_sound_marks> and L</split_sound_marks> to the
-module.
+This version changed L</kana2romaji> to be consistent with the
+documentation for the long vowel options C<wapuro> and C<none>.
+
+=item 0.53
+
+This version added L</join_sound_marks> and L</split_sound_marks> to
+the module.
+
+=item 0.54
+
+This version removed the nonsensical C<kana_order> function from the
+module. It improved the behaviour of L</is_romaji_strict> after
+comparing its negatives and positives with a large number of English
+and nonsense words. It improved the behaviour of L</smallize_kana>
+with regard to the "tsu" kana. L</cleanup_kana> was improved to deal
+with stray dakuten and handakuten and some other odd kanji/kana
+confusions.
+
+=back
 
 
 

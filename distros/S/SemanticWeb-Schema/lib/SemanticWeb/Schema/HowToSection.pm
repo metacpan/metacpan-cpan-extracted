@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::HowToSection;
 
 # ABSTRACT: A sub-grouping of steps in the instructions for how to achieve a result (e
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::ItemList /;
+extends qw/ SemanticWeb::Schema::CreativeWork SemanticWeb::Schema::ItemList SemanticWeb::Schema::ListItem /;
 
 
 use MooX::JSON_LD 'HowToSection';
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has steps => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::HowToSection - A sub-grouping of steps in the instructions 
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -51,24 +53,24 @@ A sub-grouping of steps in the instructions for how to achieve a result
 
 =head2 C<steps>
 
-The steps in the form of a single item (text, document, video, etc.) or an
-ordered list with HowToStep and/or HowToSection items.
+A single step item (as HowToStep, text, document, video, etc.) or a
+HowToSection (originally misnamed 'steps'; 'step' is preferred).
 
 A steps should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::ItemList']>
+
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =item C<Str>
-
-=item C<InstanceOf['SemanticWeb::Schema::ItemList']>
 
 =back
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::ItemList>
+L<SemanticWeb::Schema::ListItem>
 
 =head1 AUTHOR
 

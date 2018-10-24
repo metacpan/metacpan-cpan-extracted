@@ -1,6 +1,6 @@
 use utf8;
 package CatalystX::InjectModule::MI;
-$CatalystX::InjectModule::MI::VERSION = '0.17';
+$CatalystX::InjectModule::MI::VERSION = '0.19';
 # This plugin is inspired by :
 # - CatalystX::InjectComponent
 # - Catalyst::Plugin::AutoCRUD
@@ -13,7 +13,6 @@ use File::Find;
 use File::Basename qw( dirname );
 use File::Path qw( make_path );
 use Dependency::Resolver;
-use Devel::InnerPackage qw/list_packages/;
 use Moose;
 use Moose::Util qw/find_meta apply_all_roles/;
 use Catalyst::Utils;
@@ -21,7 +20,6 @@ use YAML qw(Dump DumpFile LoadFile);
 use Term::ANSIColor qw(:constants);
 use Path::Tiny;
 use Path::Class qw( file );
-use ExtUtils::Installed;
 
 has debug => (
               is       => 'rw',
@@ -55,6 +53,12 @@ has modules_loaded => (
               default  => sub { [] },
           );
 
+has modules_injected => (
+              is       => 'rw',
+              isa      => 'HashRef',
+              default  => sub { {} },
+          );
+
 has _view_files => (
               is       => 'rw',
               isa      => 'ArrayRef',
@@ -72,6 +76,12 @@ has libs => (
              isa      => 'ArrayRef',
              default  => sub { [] },
             );
+
+has packlists => (
+             is       => 'rw',
+             isa      => 'HashRef',
+                  default  => sub { {} },
+                 );
 
 
 sub log {
@@ -131,14 +141,16 @@ sub load {
         }
         $self->_load_modules_path($dir, $conf_filename);
     }
+
     # Search modules in @INC
     if ( ! $search_localy_only ){
         for my $dir ( @INC ) {
             next if ( $dir eq '.');
             $self->_load_modules_path($dir, $conf_filename, 1);
+            $self->_add_packlists($dir);
         }
     }
-    
+
     # Merge config resolved modules ----------------
     $self->_merge_resolved_configs;
 
@@ -156,9 +168,6 @@ sub modules_to_inject {
         my $resolved = $self->resolv($m);
 
         foreach my $M ( @$resolved ) {
-            if ( $M->{_injected} ){
-                next;
-            }
             push(@$modules,$M);
         }
     }
@@ -168,6 +177,10 @@ sub modules_to_inject {
 sub inject {
     my $self         = shift;
     my $modules_name = shift;
+
+    foreach my $m (@$modules_name){
+        $self->modules_injected->{$m} = 1;
+    }
     my $modules = $self->modules_to_inject($modules_name);
 
     $self->_add_to_modules_loaded($modules);
@@ -175,6 +188,40 @@ sub inject {
     for my $m ( @$modules) {
         $self->_inject($m);
     }
+}
+
+sub _add_packlists{
+    my $self = shift;
+    my $dir  = shift;
+
+    my @packlists = @{$self->_search_in_path($dir, '\.packlist')};
+    foreach my $pl (@packlists){
+        my $module = $pl;
+        $module =~ s/\.packlist$//;
+        $module =~ s|.*/auto/||;
+        $module =~ s|/$||;
+        $module =~ s|/|::|g;
+
+        $self->packlists->{$module} = $pl;
+    }
+}
+
+
+sub module_files {
+    my $self   = shift;
+    my $module = shift;
+
+    my $packlist = $self->packlists->{$module};
+
+    open(F, $packlist) or die "Can not open $packlist for $module module\n";
+    my (@packlist_files);
+
+    foreach my $file (<F>) {
+        chomp($file);
+        push(@packlist_files, $file)
+    }
+    close F;
+    return (@packlist_files);
 }
 
 sub _add_to_modules_loaded {
@@ -222,6 +269,9 @@ sub _load_modules_path{
                 next CONFIG;
             }
             ;
+
+            die "The module should not be named with Model|View|Controller|TraitFor" if ( grep {/\/Model\/|\/View\/|\/Controller\//} $mod_config->{name} );
+
         }
 
         my $msg = "    - find module ". $mod_config->{name};
@@ -229,8 +279,8 @@ sub _load_modules_path{
         $msg .= " from INC"  if $from_inc;
         $self->log($msg);
 
-        # for local module (cxim_config is in share/)
-        $path =~ s|/share$||;
+        # cxim_config is in share/
+        $path =~ s|/?share$||;
         $mod_config->{path} = $path;
 
         my $all_libs = [];
@@ -244,8 +294,10 @@ sub _load_modules_path{
             my $module_file = $mod_config->{name};
             $module_file =~ s|::|/|g;
             $module_file .= ".pm";
-            my ($inst) = ExtUtils::Installed->new( skip_cwd => 1 );
-            my @all_module_files = $inst->files($mod_config->{name});
+
+            # Rechercher dans le packlist du module le fichier $module_file
+            my @all_module_files = $self->module_files($mod_config->{name});
+
             foreach my $f ( @all_module_files ) {
                 push(@$all_libs,$f) if ( $f =~ /\.pm$/ ); 
                 if ( $f =~ s/$module_file$// ) {
@@ -308,8 +360,7 @@ sub _merge_resolved_configs {
 sub _build_local_config_file{
     my $self  = shift;
 
-    my ($local_file) = grep $_ =~ /local/, $self->ctx->find_files;
-
+    my ($local_file) = grep $_ =~ /local\.yml/, $self->ctx->find_files;
     my $conf_path   = file( File::Spec->rel2abs($local_file) );
     my $config_file = path($conf_path->relative);
 
@@ -338,6 +389,11 @@ sub _load_lib {
     foreach my $file (@$all_libs) {
 
         next if grep {/TraitFor/} $file;
+
+        my $app_name = $self->ctx->config->{name};
+        die "A file of the module " . $module->{name} ." contains the name of the application ($app_name), which is to be avoided otherwise the components can be loaded without this being desired\nfile: $file\n"
+          if ( grep {/$app_name\/Model\/|$app_name\/View\/|$app_name\/Controller\//} $file );
+
         $self->_load_component( $module, $file )
           if ( grep {/\/Model\/|\/View\/|\/Controller\//} $file );
 
@@ -434,82 +490,84 @@ sub _persist_file_name {
 }
 
 sub _load_catalyst_plugins {
-	my ( $self, $module ) = @_;
+    my ( $self, $module ) = @_;
 
-	my $plugins = $module->{catalyst_plugins};
-	foreach my $p (@$plugins) {
+    my $plugins = $module->{catalyst_plugins};
+    foreach my $p (@$plugins) {
 
-		# If plugin is not already loaded
-		if ( !$self->catalyst_plugins->{$p} ) {
-			$self->_load_catalyst_plugin($p);
-			$self->catalyst_plugins->{$p} = 1;
-		} else {
-			$self->log(" - Catalyst plugin $p already loaded !", 2);
-		}
-	}
+        # If plugin is not already loaded
+        if ( !$self->catalyst_plugins->{$p} ) {
+            $self->_load_catalyst_plugin($p);
+            $self->catalyst_plugins->{$p} = 1;
+        } else {
+            $self->log(" - Catalyst plugin $p already loaded !", 2);
+        }
+    }
 }
 
 sub _load_catalyst_plugin {
-	my ( $self, $plugin ) = @_;
+    my ( $self, $plugin ) = @_;
 
-	$self->log("  - Add Catalyst plugin $plugin\n");
+    $self->log("  - Add Catalyst plugin $plugin\n");
 
-	my $isa = do { no strict 'refs'; \@{ $self->ctx . '::ISA' } };
-	my $isa_idx = 0;
-	$isa_idx++ while $isa->[$isa_idx] ne 'Catalyst'; #__PACKAGE__;
+    my $isa = do { no strict 'refs'; \@{ $self->ctx . '::ISA' } };
+    my $isa_idx = 0;
+    $isa_idx++ while $isa->[$isa_idx] ne 'Catalyst'; #__PACKAGE__;
 
 
-	if ( $plugin !~ s/^\+(.*)/$1/ ) { $plugin = 'Catalyst::Plugin::' . $plugin }
+    if ( $plugin !~ s/^\+(.*)/$1/ ) {
+        $plugin = 'Catalyst::Plugin::' . $plugin;
+    }
 
-	Catalyst::Utils::ensure_class_loaded($plugin);
-	$self->ctx->_plugins->{$plugin} = 1;
+    Catalyst::Utils::ensure_class_loaded($plugin);
+    $self->ctx->_plugins->{$plugin} = 1;
 
-	my $meta = find_meta($plugin);
+    my $meta = find_meta($plugin);
 
-	if ( $meta && blessed $meta && $meta->isa('Moose::Meta::Role') ) {
-		apply_all_roles( $self->ctx => $plugin );
-	} else {
-		splice @$isa, ++$isa_idx, 0, $plugin;
-	}
+    if ( $meta && blessed $meta && $meta->isa('Moose::Meta::Role') ) {
+        apply_all_roles( $self->ctx => $plugin );
+    } else {
+        splice @$isa, ++$isa_idx, 0, $plugin;
+    }
 
-	unshift @$isa, shift @$isa; # necessary to tell perl that @ISA changed
-	mro::invalidate_all_method_caches();
+    unshift @$isa, shift @$isa; # necessary to tell perl that @ISA changed
+    mro::invalidate_all_method_caches();
 
-	{
+    {
 
-		# ->next::method won't work anymore, we have to do it ourselves
-		my @precedence_list = $self->ctx->meta->class_precedence_list;
+        # ->next::method won't work anymore, we have to do it ourselves
+        my @precedence_list = $self->ctx->meta->class_precedence_list;
 
-		1 while shift @precedence_list ne 'Catalyst'; #__PACKAGE__;
+        1 while shift @precedence_list ne 'Catalyst'; #__PACKAGE__;
 
-		my $old_next_method = \&maybe::next::method;
+        my $old_next_method = \&maybe::next::method;
 
-		my $next_method = sub {
-			if ( ( caller(1) )[3] !~ /::setup\z/ ) {
-				goto &$old_next_method;
-			}
+        my $next_method = sub {
+            if ( ( caller(1) )[3] !~ /::setup\z/ ) {
+                goto &$old_next_method;
+            }
 
-			my $code;
-			while ( my $next_class = shift @precedence_list ) {
-				$code = $next_class->can('setup');
-				last if $code;
-			}
-			return unless $code;
+            my $code;
+            while ( my $next_class = shift @precedence_list ) {
+                $code = $next_class->can('setup');
+                last if $code;
+            }
+            return unless $code;
 
-			goto &$code;
-		};
+            goto &$code;
+        };
 
-		no warnings 'redefine';
-		local *next::method        = $next_method;
-		local *maybe::next::method = $next_method;
+        no warnings 'redefine';
+        local *next::method        = $next_method;
+        local *maybe::next::method = $next_method;
 
-		return $self->ctx->next::method(@_);
-	}
+        return $self->ctx->next::method(@_);
+    }
 }
 
 
 sub _load_template {
-	my ( $self, $module ) = @_;
+    my ( $self, $module ) = @_;
 
     foreach my $dir ( 'share/root/src', 'share/root/lib', 'root/src', 'root/lib') {
 
@@ -541,40 +599,40 @@ sub _load_static {
 }
 
 sub _load_component {
-        my ( $self, $module, $file ) = @_;
+    my ( $self, $module, $file ) = @_;
          
-        my $libpath = $module->{libpath};
-        my $comp    = $file;
-        $comp =~ s|$libpath/?||;
-            $comp =~ s|\.pm$||;
-        $comp =~ s|/|::|g;
+    my $libpath = $module->{libpath};
+    my $comp    = $file;
+    $comp =~ s|$libpath/?||;
+    $comp =~ s|\.pm$||;
+    $comp =~ s|/|::|g;
          
-        my $into = $self->ctx;
-        my $as  = $comp;
-        $as =~ s/.*(Model|View|Controller):://;
-        $self->log("  - Add Component into: $into comp:$comp as:$as");
+    my $into = $self->ctx;
+    my $as  = $comp;
+    $as =~ s/.*(Model|View|Controller):://;
+    $self->log("  - Add Component into: $into comp:$comp as:$as");
          
-        Catalyst::Utils::inject_component( into => $into,
-                                               component => $comp,
-                                               as => $as );
-    }
+    Catalyst::Utils::inject_component( into => $into,
+                                       component => $comp,
+                                       as => $as );
+}
 
 sub _search_in_path {
-	my $self  = shift;
-        my $path  = shift;
-	my $regex = shift;
+    my $self  = shift;
+    my $path  = shift;
+    my $regex = shift;
 
-	my @files;
-	my $tf_finder = sub {
-		return if !-f;
-		return if !/$regex/;
+    my @files;
+    my $tf_finder = sub {
+        return if !-f;
+        return if !/$regex/;
 
-		my $file = $File::Find::name;
-                push @files, $file;
-            };
+        my $file = $File::Find::name;
+        push @files, $file;
+    };
 
     find( $tf_finder, $path  );
-	return \@files;
+    return \@files;
 }
 
 
@@ -584,7 +642,7 @@ CatalystX::InjectModule::MI Catalyst Module injector
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -593,6 +651,8 @@ version 0.17
 =head2 resolv
 
 =head2 get_module
+
+=head2 module_files
 
 =head2 load
 
@@ -614,4 +674,4 @@ Daniel Brosseau, C<< <dabd at catapulse.org> >>
 
 =cut
 
-1;
+      1;

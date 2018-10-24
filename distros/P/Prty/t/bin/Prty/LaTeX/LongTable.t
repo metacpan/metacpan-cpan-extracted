@@ -5,6 +5,8 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
+use utf8;
 
 use Prty::LaTeX::Code;
 use Prty::Unindent;
@@ -57,7 +59,7 @@ sub test_unitTest_1 : Test(1) {
         Links & Rechts & Zentriert \\\\ \hline
         \endhead
         \hline
-        \multicolumn{3}{r}{\emph{weiter}} \\\\
+        \multicolumn{3}{r}{\emph{weiter nächste Seite}} \\\\
         \endfoot
         \caption{Ein Test}
         \endlastfoot

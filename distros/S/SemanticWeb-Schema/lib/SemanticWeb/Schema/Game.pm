@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Game;
 
 # ABSTRACT: The Game type represents things which are games
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has character_attribute => (
@@ -72,7 +74,7 @@ SemanticWeb::Schema::Game - The Game type represents things which are games
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -122,9 +124,9 @@ A game_location should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<Str>
 
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::PublicationEvent;
 
 # ABSTRACT: A PublicationEvent corresponds indifferently to the event of publication for a CreativeWork of any type e
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has free => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::PublicationEvent - A PublicationEvent corresponds indiffere
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::AuthStorage;
-$WebService::GoogleAPI::Client::AuthStorage::VERSION = '0.11';
+$WebService::GoogleAPI::Client::AuthStorage::VERSION = '0.13';
 
 # ABSTRACT: JSON File Persistence for Google OAUTH Project and User Access Tokens
 
@@ -10,7 +10,6 @@ $WebService::GoogleAPI::Client::AuthStorage::VERSION = '0.11';
 
 ## or is UserAgent->credentials
 
-use 5.014;
 use Moo;
 use Carp;
 use WebService::GoogleAPI::Client::AuthStorage::ConfigJSON;
@@ -80,7 +79,7 @@ WebService::GoogleAPI::Client::AuthStorage - JSON File Persistence for Google OA
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
 =head1 METHODS
 

@@ -22,10 +22,9 @@ requires:
   FindBin: '0'
   List::Util: '0'
   Mouse: '0'
-  Number::Format: '1.75'
   Pod::Autopod: '1.215'
   Time::Moment: '0.44'
   Time::Piece: '1.33'
-version: '0.013'
+version: '0.024'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

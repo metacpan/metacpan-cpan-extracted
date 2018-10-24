@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "dc:source" : "schemadotorgsources2:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The price for the delivery of an offer using a particular delivery method.",
       "rdfs:label" : "DeliveryChargeSpecification",
@@ -8,7 +8,7 @@
    },
    "properties" : {
       "schema:appliesToDeliveryMethod" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The delivery method(s) to which the delivery charge or payment charge specification applies.",
          "rdfs:label" : "appliesToDeliveryMethod",
@@ -23,40 +23,40 @@
          "rdfs:comment" : "The geographic area where a service or offered item is provided.",
          "rdfs:label" : "areaServed",
          "schema:domainIncludes" : [
+            "schema:Service",
             "schema:Organization",
-            "schema:DeliveryChargeSpecification",
-            "schema:ContactPoint",
             "schema:Offer",
+            "schema:ContactPoint",
             "schema:Demand",
-            "schema:Service"
+            "schema:DeliveryChargeSpecification"
          ],
          "schema:rangeIncludes" : [
+            "schema:AdministrativeArea",
             "schema:Text",
             "schema:GeoShape",
-            "schema:AdministrativeArea",
             "schema:Place"
          ]
       },
       "schema:eligibleRegion" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is valid.</p>\n\n<p>See also <a class=\"localLink\" href=\"http://schema.org/ineligibleRegion\">ineligibleRegion</a>.",
+         "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is valid.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/ineligibleRegion\">ineligibleRegion</a>.",
          "rdfs:label" : "eligibleRegion",
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:domainIncludes" : [
-            "schema:Offer",
+            "schema:Demand",
             "schema:DeliveryChargeSpecification",
-            "schema:Demand"
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:GeoShape",
             "schema:Text",
-            "schema:Place"
+            "schema:Place",
+            "schema:GeoShape"
          ]
       },
       "schema:ineligibleRegion" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is not valid, e.g. a region where the transaction is not allowed.</p>\n\n<p>See also <a class=\"localLink\" href=\"http://schema.org/eligibleRegion\">eligibleRegion</a>.",
+         "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is not valid, e.g. a region where the transaction is not allowed.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/eligibleRegion\">eligibleRegion</a>.",
          "rdfs:label" : "ineligibleRegion",
          "schema:domainIncludes" : [
             "schema:Offer",
@@ -64,9 +64,9 @@
             "schema:Demand"
          ],
          "schema:rangeIncludes" : [
+            "schema:GeoShape",
             "schema:Text",
-            "schema:Place",
-            "schema:GeoShape"
+            "schema:Place"
          ]
       }
    }

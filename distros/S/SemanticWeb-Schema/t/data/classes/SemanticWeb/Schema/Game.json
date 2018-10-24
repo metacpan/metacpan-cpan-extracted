@@ -31,12 +31,12 @@
          "rdfs:comment" : "Real or fictional location of the game (or part of game).",
          "rdfs:label" : "gameLocation",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:Game"
+            "schema:Game",
+            "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
             "schema:Place",
+            "schema:URL",
             "schema:PostalAddress"
          ]
       },
@@ -55,8 +55,8 @@
          "rdfs:comment" : "The task that a player-controlled character, or group of characters may complete in order to gain a reward.",
          "rdfs:label" : "quest",
          "schema:domainIncludes" : [
-            "schema:Game",
-            "schema:VideoGameSeries"
+            "schema:VideoGameSeries",
+            "schema:Game"
          ],
          "schema:rangeIncludes" : "schema:Thing"
       }

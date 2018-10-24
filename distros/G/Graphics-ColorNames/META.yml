@@ -9,11 +9,14 @@ build_requires:
   Module::Metadata: '0'
   Test::Exception: '0'
   Test::More: '0'
+  Test::Most: '0'
   constant: '0'
+  lib: '0'
+  perl: v5.6.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 keywords:
   - color
 license: artistic_2
@@ -24,26 +27,20 @@ name: Graphics-ColorNames
 provides:
   Graphics::ColorNames:
     file: lib/Graphics/ColorNames.pm
-    version: v3.2.1
-  Graphics::ColorNames::HTML:
-    file: lib/Graphics/ColorNames/HTML.pm
-    version: v3.2.1
-  Graphics::ColorNames::Windows:
-    file: lib/Graphics/ColorNames/Windows.pm
-    version: v3.2.1
+    version: v3.3.0
   Graphics::ColorNames::X:
     file: lib/Graphics/ColorNames/X.pm
-    version: v3.2.1
+    version: v3.3.0
 requires:
   Exporter: '5.57'
   Module::Load: '0.10'
   Module::Loaded: '0'
-  perl: '5.006'
+  perl: v5.6.0
   version: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNames
   repository: git://github.com/robrwo/Graphics-ColorNames.git
-version: v3.2.1
+version: v3.3.0
 x_authority: cpan:RRWO
 x_contributors:
   - 'Alan D. Salewski <alans@cji.com>'
@@ -52,4 +49,6 @@ x_contributors:
   - 'Magnus Cedergren <magnus@mbox604.swipnet.se>'
   - 'Gary Vollink <gary@vollink.com>'
   - 'Claus Färber <cfaerber@cpan.org>'
+  - 'Andreas J. König <andk@cpan.org>'
+x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

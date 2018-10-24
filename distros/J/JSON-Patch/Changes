@@ -1,5 +1,10 @@
 Revision history for JSON-Patch
 
+0.03    2018-10-21
+        - Throw errors for wrong patch and patch item's types
+        - Struct::Diff diff conversion supported in diff()
+        - Tests refactored
+
 0.02    2018-10-10
         - External tests run fixed (do not confuse CPAN testers)
 

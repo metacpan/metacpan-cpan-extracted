@@ -1,0 +1,12 @@
+Revision history for Graphics-ColorNames-Windows:
+
+v3.3.1    2018-10-22 11:04:17+01:00 Europe/London
+  [Tests]
+  - Fix tests.
+
+v3.3.0    2018-10-21 17:25:34+01:00 Europe/London
+  [Incompatabilities]
+  - Split into separate distribution from Graphics-ColorNames
+
+  [Documentation]
+  - Update SEE ALSO section.

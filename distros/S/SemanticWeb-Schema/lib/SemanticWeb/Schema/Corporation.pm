@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Corporation;
 
 # ABSTRACT: Organization: A business corporation.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has ticker_symbol => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::Corporation - Organization: A business corporation.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -55,7 +57,7 @@ C<tickerSymbol>
 The exchange traded instrument associated with a Corporation object. The
 tickerSymbol is expressed as an exchange and an instrument name separated
 by a space character. For the exchange component of the tickerSymbol
-attribute, we reccommend using the controlled vocaulary of Market
+attribute, we recommend using the controlled vocabulary of Market
 Identifier Codes (MIC) specified in ISO15022.
 
 A ticker_symbol should be one of the following types:

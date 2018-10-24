@@ -7,10 +7,14 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
+use B q{svref_2object};
+
 my $has_data_dumper;
+
 BEGIN {
   $| = 1;
-  my $tests = 9;
+  my $tests = 10;
+  $tests += 2 if $] > 5.0219;
   eval q[use Data::Dumper];
   if (!$@) {
     $has_data_dumper = 1;
@@ -50,8 +54,20 @@ sub DESTROY
 
 package main;
                                                 
-sub ok     { print "ok $test\n"; $test++ }
-sub not_ok { print "not ok $test\n"; $test++ }
+sub ok     {
+  my ( $check, $msg ) = @_;
+
+  $msg = '' unless defined $msg;
+  if ( $check ) {
+    print "ok $test $msg\n";
+  } else {
+    print "not ok $test $msg\n";
+  }
+
+  $test++;
+
+  return;
+}
 
 $^W = 0;
 $test = 2;
@@ -59,37 +75,48 @@ $test = 2;
 my $a = Test::Scalar->new(1.0);
 my $b = $a->clone(1);
 
-$$a == $$b ? ok : not_ok;
-$a != $b ? ok : not_ok;
+ok( $$a == $$b, '$$a == $$b' );
+ok( $a != $b, '$a != $b' );
 
 my $c = \"test 2 scalar";
 my $d = Clone::clone($c, 2);
 
-$$c == $$d ? ok : not_ok;
-$c != $d ? ok : not_ok;
+ok( $$c == $$d, 'test 2 scalar content' );
+ok( $c != $d, 'SV are differents SVs' );
+
+
+if ( $] > 5.0219 ) {
+  my $sv_c = svref_2object( $c );
+  my $sv_d = svref_2object( $d );
+  ok( $sv_c->FLAGS & B::SVf_IsCOW, 'COW flag set on c' );
+  ok( $sv_d->FLAGS & B::SVf_IsCOW, 'COW flag set on d' );
+}
+
+$$d .= 'abcd';
+ok( $$c ne $$d, 'only one scalar changed' );
 
 my $circ = undef;
 $circ = \$circ;
 $aref = clone($circ);
 if ($has_data_dumper) {
-  Dumper($circ) eq Dumper($aref) ? ok : not_ok;
+  ok( Dumper($circ) eq Dumper($aref) );
 }
 
 # the following used to produce a segfault, rt.cpan.org id=2264
 undef $a;
 $b = clone($a);
-$$a == $$b ? ok : not_ok;
+ok( $$a == $$b );
 
 # used to get a segfault cloning a ref to a qr data type.
 my $str = 'abcdefg';
 my $qr = qr/$str/;
 my $qc = clone( $qr );
-$qr eq $qc ? ok : not_ok;
-$str =~ /$qc/ ? ok : not_ok;
+ok( $qr eq $qc );
+ok( $str =~ /$qc/ );
 
 # test for unicode support
 {
   my $a = \( chr(256) );
   my $b = clone( $a );
-  ord($$a) == ord($$b) ? ok : not_ok;
+  ok( ord($$a) == ord($$b) );
 }

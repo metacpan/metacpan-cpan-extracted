@@ -22,8 +22,6 @@ lib/XAO/testcases/base.pm
 misc/cache-benchmark
 misc/cache-benchmark.res-chain
 misc/cache-benchmark.res-hash
-test.pl
-t/testcases/base.pm
 t/testcases/Cache.pm
 t/testcases/DOConfig.pm
 t/testcases/Errors.pm
@@ -32,12 +30,23 @@ t/testcases/Projects.pm
 t/testcases/SimpleHash.pm
 t/testcases/Utils.pm
 t/testcases/XAOBase.pm
+t/testcases/base.pm
 t/xao/XAO/DO/Test1.pm
 t/xao/XAO/DO/Test2.pm
 t/xao/projects/test/objects/Config.pm
+t/xao/projects/test/objects/DepBase.pm
+t/xao/projects/test/objects/DepOver.pm
 t/xao/projects/test/objects/EmbeddableTest.pm
 t/xao/projects/test/objects/LocalConf.pm
 t/xao/projects/test/objects/Test1.pm
 t/xao/projects/test/objects/Thrower.pm
+t/xao/projects/testlib/objects/DepBase.pm
+t/xao/projects/testlib/objects/DepLib.pm
+t/xao/projects/testlib/objects/DepOver.pm
+t/xao/projects/testuse/objects/Config.pm
+t/xao/projects/testuse/objects/DepBase.pm
+t/xao/projects/testuse/objects/DepUse.pm
+t/xao/projects/testuse/objects/Local.pm
+test.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

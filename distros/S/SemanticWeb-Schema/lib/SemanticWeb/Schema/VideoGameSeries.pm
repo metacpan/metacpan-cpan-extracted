@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::VideoGameSeries;
 
 # ABSTRACT: A video game series.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has actor => (
@@ -208,7 +210,7 @@ SemanticWeb::Schema::VideoGameSeries - A video game series.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -362,9 +364,9 @@ A game_location should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<Str>
 
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
 
@@ -382,9 +384,9 @@ A game_platform should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=item C<Str>
 
 =back
 
@@ -398,9 +400,9 @@ A music_by should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
 
 =back
 

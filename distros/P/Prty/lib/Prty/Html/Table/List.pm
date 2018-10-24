@@ -3,8 +3,9 @@ use base qw/Prty::Html::Table::Base/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 # -----------------------------------------------------------------------------
 
@@ -25,12 +26,13 @@ Objekten. Jedes Objekt wird durch eine Zeile dargestellt. Alle
 Zeilen- (tr-Elemente) und Zellenattribute (td-Elemente) können
 gesetzt werden. Die Klasse ist daher sehr flexibel.
 
-Für jedes Objekt wird die Methode $e->rowCallback() gerufen.
-Die Methode bekommt das Objekt und seine (0-basierte) Position in der
+Für jedes Objekt wird die Methode $e->rowCallback() gerufen (falls
+nicht angegeben, werden die Daten ohne Verarbeitung kopiert).  Die
+Methode bekommt das Objekt und seine (0-basierte) Position in der
 Liste der Objekte (Attribut "rows") übergeben. Die Methode liefert
 die Spezifikation für die Zeile (tr) und ihre Zellen (td) zurück,
-wobei jede Spezifikation ein Array ist, das unmittelbar an
-die Methode tag() übergeben wird.
+wobei jede Spezifikation ein Array ist, das unmittelbar an die
+Methode tag() übergeben wird.
 
 =head1 ATTRIBUTES
 
@@ -59,6 +61,8 @@ wird kein Body angezeigt.
 
 Referenz auf eine Subroutine, die für jedes Element die
 darzustellende Zeileninformation (für tr- und td-Tag) liefert.
+Ist kein rowCallback definiert, werden die Row-Daten
+unverändert verwendet.
 
 =item rowCallbackArguments => \@args (Default: [])
 
@@ -192,12 +196,6 @@ sub html {
 
     return '' if !@$titleA && !@$rowA;
 
-    if (@$rowA && !$rowCallback) {
-        $self->throw(
-            q~HTML-00001: Keine Callback-Methode (rowCallback) definiert~
-        );
-    }
-
     my %allowHtml;
     @allowHtml{@$titleA} = (0) x @$titleA;
     if (ref $allowHtml) {
@@ -236,7 +234,13 @@ sub html {
     my $trs;
     my $i = 0;
     for my $row (@$rowA) {
-        my ($trA,@tds) = $rowCallback->($row,$i++,@$rowCallbackArgumentA);
+        my ($trA,@tds);
+        if ($rowCallback) {
+            ($trA,@tds) = $rowCallback->($row,$i++,@$rowCallbackArgumentA);
+        }
+        else {
+            @tds = @$row;
+        }
         if (!@tds) {
             # Werden keine Kolumnen geliefert, erzeugen wir keine
             # Tabellenzeile. Auf diese Weise kann in der Callback-Methode
@@ -247,7 +251,7 @@ sub html {
         my $j = 0;
         for my $tdA (@tds) {
             $tds .= $h->tag('td',
-                -text=>!$allowHtml{$titleA->[$j]},
+                -text=>!(@$titleA? $allowHtml{$titleA->[$j]}: $allowHtml),
                 align=>$align->[$j++],
                 ref $tdA? @$tdA: $tdA # Array oder skalarer Wert
             );
@@ -280,7 +284,7 @@ sub html {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

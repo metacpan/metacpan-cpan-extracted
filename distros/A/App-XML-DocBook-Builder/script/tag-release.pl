@@ -15,7 +15,7 @@ if ( !defined($version) )
 }
 
 my @cmd = (
-    "hg", "tag", "-m",
+    "git", "tag", "-m",
     "Tagging the App-XML-DocBook-Docmake release as $version",
     "cpan-releases/$version",
 );

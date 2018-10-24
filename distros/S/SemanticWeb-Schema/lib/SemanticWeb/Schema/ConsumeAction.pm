@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::ConsumeAction;
 
 # ABSTRACT: The act of ingesting information/resources/food.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has expects_acceptance_of => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::ConsumeAction - The act of ingesting information/resources/
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

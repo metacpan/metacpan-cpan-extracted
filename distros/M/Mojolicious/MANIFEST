@@ -25,6 +25,7 @@ lib/Mojo/Date.pm
 lib/Mojo/DOM.pm
 lib/Mojo/DOM/CSS.pm
 lib/Mojo/DOM/HTML.pm
+lib/Mojo/DynamicMethods.pm
 lib/Mojo/EventEmitter.pm
 lib/Mojo/Exception.pm
 lib/Mojo/File.pm
@@ -179,6 +180,7 @@ t/mojo/daemon_ipv6_tls.t
 t/mojo/date.t
 t/mojo/delay.t
 t/mojo/dom.t
+t/mojo/dynamic_methods.t
 t/mojo/eventemitter.t
 t/mojo/exception.t
 t/mojo/exception/non_utf8.txt

@@ -1,0 +1,392 @@
+<h1>Translation manual of style</h1>
+<p>
+These are all real shortcomings found around <a  href="/changeset/6000">r6000</a> (July 2009).
+</p>
+<p>
+Also see:
+ * <a  href="http://msdn.microsoft.com/en-us/library/aa511440.aspx">http://msdn.microsoft.com/en-us/library/aa511440.aspx</a>
+ * <a  href="http://developer.kde.org/documentation/design/ui/">http://developer.kde.org/documentation/design/ui/</a>
+ * <a  href="http://developer.gnome.org/projects/gup/hig/">http://developer.gnome.org/projects/gup/hig/</a>
+ * <a  href="http://wiki.openusability.org/guidelines/">http://wiki.openusability.org/guidelines/</a>
+ * <a  href="http://developer.apple.com/documentation/UserExperience/Conceptual/AppleHIGuidelines/">http://developer.apple.com/documentation/UserExperience/Conceptual/AppleHIGuidelines/</a>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    We found several new plugins.
+    In order to configure and enable them go to
+    Plugins -&gt; Plugin Manager
+</p>
+</blockquote>
+<blockquote>
+<p>
+    List of new plugins:
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Avoid the words 'we' or 'I' in dialog. Do not attempt to speak on behalf of the program or computer. State the situation as a matter of fact.
+</li><li>Do not make the user remember a navigation path. Offer a direct shortcut to the referenced dialog.
+</li><li>Avoid primitive ASCII approximate representation of symbols. Use proper characters: →
+</li><li>Remove superfluous words. It is obvious to the user that this is a list.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    New plugins were found.
+    <sup>
+    [Plugin B                   #]
+    [Plugin C                   #]
+    [Plugin D                   #]
+    [Plugin E                   v]
+                    [Configure...]
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    $plugin-&gt;errstr( Wx::gettext(&quot;Error when calling menu for plugin&quot;) . &quot;'$name': $@&quot; );
+    Plugin:%s - Not compatible with Padre::Plugin API. Need to be subclass of Padre::Plugin
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Do not concatenate strings in code. Use sprintf-style gettext templates.
+</li><li>Do not write messages in newspaper headline style. Write full sentences in proper English.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    &quot;An error occured when calling the menu for the plugin %s: %s&quot;, $name, $@
+    The plugin %s is not compatible with the Padre::Plugin API. It needs to be a subclass of Padre::Plugin.
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    <a  href="/wiki/GoTo">GoTo</a> Bookmark
+    <a  href="/wiki/GoTo">GoTo</a> Element
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>EnglishIsNotWrittenLikeThat</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    Go to Bookmark
+    Go to Element
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    &amp;Close\tCtrl+W
+    Select all\tCtrl-A
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Do not invent a different notation for key combinations. Use consistently the symbol + to join keys.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    &amp;Close\tCtrl+W
+    Select all\tCtrl+A
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    Could not locate project dir
+    Cannot build regex for '%s'
+    Chars without spaces: %s
+    Convert EOL
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Do not use abbreviations. Use consistently the formal wording.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    Could not locate project directory
+    Cannot build regular expression for '%s'
+    Characters without spaces: %s
+    Convert line endings
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    The bookmark '%s' no longer exists
+    %s occurences were replaced
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Do not omit punctuation. Complete sentences with a full stop.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    The bookmark '%s' no longer exists.
+    %s occurences were replaced.
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    No diagnostics available for this error!
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Avoid excitement or shouting. Whereever possible, use mere statements of fact.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    No diagnostics are available for this error.
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    First character of selection does not seem to point at a token.
+    Selection not part of a Perl statement?
+    All braces appear to be matched
+    %s apparantly created. Do you want to open it now?
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Avoid vagueness. If the computer is not sure, the user certainly can't be, either. Whereever possible, use mere statements of fact. If you really cannot be sure, give the user more context or partial results so he can make an informed decision.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    The first character of the selection does not point at a token.
+    The selection is not part of a Perl statement.
+    All braces are matched.
+    %s was created. Do you want to open it now?
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    No declaration could be found for the specified (lexical?) variable
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Avoid overloading several circumstances into a single message. Split them off into several messages and match them according to the relevant situation.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    No declaration could be found for the specified package variable.
+    No declaration could be found for the specified lexical variable.
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    File changed on disk since last saved. Do you want to overwrite it?
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Avoid being overly specific in technical details. In this instance, there might not be a disk involved.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    The file has changed since the last save. Do you want to overwrite it?
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    Install Remote Distribution
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Avoid using words that have multiple similar meanings. Clarify with more or different wording.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    Install Distribution from the Web
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    TAB display size (in spaces):
+    Next File\tCtrl-TAB
+    Encode document to utf-8
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Use proper capitalisation. Be aware of what is an acronym and what is not.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    Tabulator display size (in spaces):
+    Next File\tCtrl+Tab
+    Encode document to UTF-8
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<hr />
+<p>
+Bad:
+<tt>
+</p>
+<blockquote>
+<p>
+    &amp;Open\tCtrl+O
+</p>
+</blockquote>
+<p>
+<tt>
+</p>
+<ul><ul><li>Menu items and buttons that open a dialog or require further user action end in an ellipsis… Menu items and buttons that result in immediate action do not end in an ellipsis.</li></ul></li></ul>
+<p>
+Better:
+<tt>
+</p>
+<blockquote>
+<p>
+    &amp;Open…\tCtrl+O
+</p>
+</blockquote>
+<p>
+<tt>
+</p>

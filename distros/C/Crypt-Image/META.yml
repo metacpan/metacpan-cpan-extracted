@@ -20,16 +20,16 @@ no_index:
 provides:
   Crypt::Image:
     file: lib/Crypt/Image.pm
-    version: '0.12'
+    version: '0.13'
   Crypt::Image::Axis:
     file: lib/Crypt/Image/Axis.pm
-    version: '0.12'
+    version: '0.13'
   Crypt::Image::Params:
     file: lib/Crypt/Image/Params.pm
-    version: '0.12'
+    version: '0.13'
   Crypt::Image::Util:
     file: lib/Crypt/Image/Util.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   GD::Image: '2.38'
   Math::Random: '0.71'
@@ -37,9 +37,9 @@ requires:
   POSIX: '1.09'
   Type::Tiny: '1.000005'
   autodie: '0'
-  namespace::clean: '0.24'
+  namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Crypt-Image.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,10 +11,10 @@
          "rdfs:comment" : "Physical address of the item.",
          "rdfs:label" : "address",
          "schema:domainIncludes" : [
-            "schema:GeoShape",
-            "schema:Organization",
             "schema:Place",
             "schema:GeoCoordinates",
+            "schema:GeoShape",
+            "schema:Organization",
             "schema:Person"
          ],
          "schema:rangeIncludes" : [
@@ -28,8 +28,8 @@
          "rdfs:label" : "addressCountry",
          "schema:domainIncludes" : [
             "schema:GeoCoordinates",
-            "schema:GeoShape",
-            "schema:PostalAddress"
+            "schema:PostalAddress",
+            "schema:GeoShape"
          ],
          "schema:rangeIncludes" : [
             "schema:Country",
@@ -41,12 +41,12 @@
          "rdfs:comment" : "The elevation of a location (<a href=\"https://en.wikipedia.org/wiki/World_Geodetic_System\">WGS 84</a>).",
          "rdfs:label" : "elevation",
          "schema:domainIncludes" : [
-            "schema:GeoShape",
-            "schema:GeoCoordinates"
+            "schema:GeoCoordinates",
+            "schema:GeoShape"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:latitude" : {
@@ -65,8 +65,8 @@
          "rdfs:label" : "longitude",
          "schema:domainIncludes" : "schema:GeoCoordinates",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:postalCode" : {

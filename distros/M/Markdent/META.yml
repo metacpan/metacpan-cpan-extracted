@@ -28,258 +28,258 @@ name: Markdent
 provides:
   Markdent:
     file: lib/Markdent.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::CLI:
     file: lib/Markdent/CLI.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::CapturedEvents:
     file: lib/Markdent/CapturedEvents.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::CheckedOutput:
     file: lib/Markdent/CheckedOutput.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Dialect::GitHub::BlockParser:
     file: lib/Markdent/Dialect/GitHub/BlockParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Dialect::GitHub::SpanParser:
     file: lib/Markdent/Dialect/GitHub/SpanParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Dialect::Theory::BlockParser:
     file: lib/Markdent/Dialect/Theory/BlockParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Dialect::Theory::SpanParser:
     file: lib/Markdent/Dialect/Theory/SpanParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::AutoLink:
     file: lib/Markdent/Event/AutoLink.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::CodeBlock:
     file: lib/Markdent/Event/CodeBlock.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndBlockquote:
     file: lib/Markdent/Event/EndBlockquote.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndCode:
     file: lib/Markdent/Event/EndCode.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndDocument:
     file: lib/Markdent/Event/EndDocument.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndEmphasis:
     file: lib/Markdent/Event/EndEmphasis.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndHTMLTag:
     file: lib/Markdent/Event/EndHTMLTag.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndHeader:
     file: lib/Markdent/Event/EndHeader.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndLink:
     file: lib/Markdent/Event/EndLink.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndListItem:
     file: lib/Markdent/Event/EndListItem.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndOrderedList:
     file: lib/Markdent/Event/EndOrderedList.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndParagraph:
     file: lib/Markdent/Event/EndParagraph.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndStrong:
     file: lib/Markdent/Event/EndStrong.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndTable:
     file: lib/Markdent/Event/EndTable.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndTableBody:
     file: lib/Markdent/Event/EndTableBody.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndTableCell:
     file: lib/Markdent/Event/EndTableCell.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndTableHeader:
     file: lib/Markdent/Event/EndTableHeader.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndTableRow:
     file: lib/Markdent/Event/EndTableRow.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::EndUnorderedList:
     file: lib/Markdent/Event/EndUnorderedList.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::HTMLBlock:
     file: lib/Markdent/Event/HTMLBlock.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::HTMLComment:
     file: lib/Markdent/Event/HTMLComment.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::HTMLCommentBlock:
     file: lib/Markdent/Event/HTMLCommentBlock.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::HTMLEntity:
     file: lib/Markdent/Event/HTMLEntity.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::HTMLTag:
     file: lib/Markdent/Event/HTMLTag.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::HorizontalRule:
     file: lib/Markdent/Event/HorizontalRule.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::Image:
     file: lib/Markdent/Event/Image.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::LineBreak:
     file: lib/Markdent/Event/LineBreak.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::Preformatted:
     file: lib/Markdent/Event/Preformatted.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartBlockquote:
     file: lib/Markdent/Event/StartBlockquote.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartCode:
     file: lib/Markdent/Event/StartCode.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartDocument:
     file: lib/Markdent/Event/StartDocument.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartEmphasis:
     file: lib/Markdent/Event/StartEmphasis.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartHTMLTag:
     file: lib/Markdent/Event/StartHTMLTag.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartHeader:
     file: lib/Markdent/Event/StartHeader.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartLink:
     file: lib/Markdent/Event/StartLink.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartListItem:
     file: lib/Markdent/Event/StartListItem.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartOrderedList:
     file: lib/Markdent/Event/StartOrderedList.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartParagraph:
     file: lib/Markdent/Event/StartParagraph.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartStrong:
     file: lib/Markdent/Event/StartStrong.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartTable:
     file: lib/Markdent/Event/StartTable.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartTableBody:
     file: lib/Markdent/Event/StartTableBody.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartTableCell:
     file: lib/Markdent/Event/StartTableCell.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartTableHeader:
     file: lib/Markdent/Event/StartTableHeader.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartTableRow:
     file: lib/Markdent/Event/StartTableRow.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::StartUnorderedList:
     file: lib/Markdent/Event/StartUnorderedList.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Event::Text:
     file: lib/Markdent/Event/Text.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Handler::CaptureEvents:
     file: lib/Markdent/Handler/CaptureEvents.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Handler::HTMLFilter:
     file: lib/Markdent/Handler/HTMLFilter.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Handler::HTMLStream::Document:
     file: lib/Markdent/Handler/HTMLStream/Document.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Handler::HTMLStream::Fragment:
     file: lib/Markdent/Handler/HTMLStream/Fragment.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Handler::MinimalTree:
     file: lib/Markdent/Handler/MinimalTree.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Handler::Multiplexer:
     file: lib/Markdent/Handler/Multiplexer.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Handler::Null:
     file: lib/Markdent/Handler/Null.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Parser:
     file: lib/Markdent/Parser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Parser::BlockParser:
     file: lib/Markdent/Parser/BlockParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Parser::SpanParser:
     file: lib/Markdent/Parser/SpanParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Regexes:
     file: lib/Markdent/Regexes.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::AnyParser:
     file: lib/Markdent/Role/AnyParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::BalancedEvent:
     file: lib/Markdent/Role/BalancedEvent.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::BlockParser:
     file: lib/Markdent/Role/BlockParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::DebugPrinter:
     file: lib/Markdent/Role/DebugPrinter.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::Dialect::BlockParser:
     file: lib/Markdent/Role/Dialect/BlockParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::Dialect::SpanParser:
     file: lib/Markdent/Role/Dialect/SpanParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::Event:
     file: lib/Markdent/Role/Event.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::EventAsText:
     file: lib/Markdent/Role/EventAsText.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::EventsAsMethods:
     file: lib/Markdent/Role/EventsAsMethods.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::FilterHandler:
     file: lib/Markdent/Role/FilterHandler.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::HTMLStream:
     file: lib/Markdent/Role/HTMLStream.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::Handler:
     file: lib/Markdent/Role/Handler.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::Simple:
     file: lib/Markdent/Role/Simple.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Role::SpanParser:
     file: lib/Markdent/Role/SpanParser.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Simple::Document:
     file: lib/Markdent/Simple/Document.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Simple::Fragment:
     file: lib/Markdent/Simple/Fragment.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Types:
     file: lib/Markdent/Types.pm
-    version: '0.31'
+    version: '0.32'
   Markdent::Types::Internal:
     file: lib/Markdent/Types/Internal.pm
-    version: '0.31'
+    version: '0.32'
 requires:
   Digest::SHA1: '0'
   Encode: '0'
   Exporter: '0'
-  File::Slurp: '0'
+  File::Slurper: '0'
   Getopt::Long::Descriptive: '0'
   HTML::Entities: '0'
   IO::Handle: '0'
@@ -312,29 +312,17 @@ resources:
   bugtracker: https://github.com/houseabsolute/Markdent/issues
   homepage: http://metacpan.org/release/Markdent
   repository: git://github.com/houseabsolute/Markdent.git
-version: '0.31'
+version: '0.32'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
   plugins:
     -
-      class: Dist::Zilla::Plugin::DROLSKY::MakeMaker
-      config:
-        Dist::Zilla::Plugin::MakeMaker:
-          make_path: make
-          version: '6.012'
-        Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.42'
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 24
-          version: '6.012'
-      name: '@DROLSKY/DROLSKY::MakeMaker'
-      version: '0.97'
-    -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - CODE_OF_CONDUCT.md
             - CONTRIBUTING.md
             - LICENSE
             - Makefile.PL
@@ -409,14 +397,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@DROLSKY/GitHub::Meta'
-      version: '0.45'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@DROLSKY/GitHub::Update'
-      version: '0.45'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
@@ -581,7 +569,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 24
       name: '@DROLSKY/DROLSKY::RunExtraTests'
-      version: '0.97'
+      version: '1.01'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: '@DROLSKY/MojibakeTests'
@@ -639,18 +627,18 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
-      version: '0.97'
+      version: '1.01'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.17.1
+          git_version: 2.19.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -770,7 +758,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::WeaverConfig
       name: '@DROLSKY/DROLSKY::WeaverConfig'
-      version: '0.97'
+      version: '1.01'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -795,9 +783,25 @@ x_Dist_Zilla:
       name: '@DROLSKY/Generate CONTRIBUTING.md'
       version: '0.014'
     -
+      class: Dist::Zilla::Plugin::GenerateFile::FromShareDir
+      config:
+        Dist::Zilla::Plugin::GenerateFile::FromShareDir:
+          destination_filename: CODE_OF_CONDUCT.md
+          dist: Dist-Zilla-PluginBundle-DROLSKY
+          encoding: UTF-8
+          has_xs: '0'
+          location: build
+          source_filename: CODE_OF_CONDUCT.md
+        Dist::Zilla::Role::RepoFileInjector:
+          allow_overwrite: 1
+          repo_root: .
+          version: '0.009'
+      name: '@DROLSKY/Generate CODE_OF_CONDUCT.md'
+      version: '0.014'
+    -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@DROLSKY/InstallGuide'
-      version: '1.200009'
+      version: '1.200011'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
@@ -805,7 +809,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
-      version: '0.97'
+      version: '1.01'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@DROLSKY/CheckStrictVersion'
@@ -829,10 +833,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.19.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
-      version: '0.97'
+      version: '1.01'
     -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: '@DROLSKY/EnsureChangesHasContent'
@@ -840,7 +844,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::TidyAll
       name: '@DROLSKY/DROLSKY::TidyAll'
-      version: '0.97'
+      version: '1.01'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -848,6 +852,7 @@ x_Dist_Zilla:
           untracked_files: die
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - CODE_OF_CONDUCT.md
             - CONTRIBUTING.md
             - Changes
             - LICENSE
@@ -858,7 +863,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.19.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.045'
@@ -870,6 +875,7 @@ x_Dist_Zilla:
           commit_msg: v%v%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - CODE_OF_CONDUCT.md
             - CONTRIBUTING.md
             - Changes
             - LICENSE
@@ -880,7 +886,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -893,11 +899,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.31
+          tag: v0.32
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -911,7 +917,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.19.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.045'
@@ -940,7 +946,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -954,10 +960,23 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.19.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.045'
+    -
+      class: Dist::Zilla::Plugin::DROLSKY::MakeMaker
+      config:
+        Dist::Zilla::Plugin::MakeMaker:
+          make_path: make
+          version: '6.012'
+        Dist::Zilla::Plugin::MakeMaker::Awesome:
+          version: '0.42'
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 24
+          version: '6.012'
+      name: '@DROLSKY/DROLSKY::MakeMaker'
+      version: '1.01'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -1021,6 +1040,7 @@ x_contributors:
   - 'Denis Ibaev <dionys@gmail.com>'
   - 'Jason McIntosh <jmac@appleseed-sc.com>'
   - 'Polina Shubina <925043@mai.com>'
+  - 'Shlomi Fish <shlomif@shlomifish.org>'
   - 'Tom Hukins <tom@eborcom.com>'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

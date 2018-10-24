@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::JoinAction;
 
-# ABSTRACT: <p>An agent joins an event/group with participants/friends at a location
+# ABSTRACT: An agent joins an event/group with participants/friends at a location
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has event => (
@@ -36,16 +38,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::JoinAction - <p>An agent joins an event/group with participants/friends at a location
+SemanticWeb::Schema::JoinAction - An agent joins an event/group with participants/friends at a location
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>An agent joins an event/group with participants/friends at a
-location.</p> <p>Related actions:</p> <ul> <li><a class="localLink"
+=for html An agent joins an event/group with participants/friends at a
+location.<br/><br/> Related actions:<br/><br/> <ul> <li><a
+class="localLink"
 href="http://schema.org/RegisterAction">RegisterAction</a>: Unlike
 RegisterAction, JoinAction refers to joining a group/team of people.</li>
 <li><a class="localLink"

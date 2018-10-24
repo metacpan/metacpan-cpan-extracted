@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::ScreeningEvent;
 
 # ABSTRACT: A screening of a movie or other video.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has subtitle_language => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::ScreeningEvent - A screening of a movie or other video.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -75,9 +77,9 @@ A subtitle_language should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Language']>
+
+=item C<Str>
 
 =back
 

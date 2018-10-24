@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Ref::Util qw(is_plain_hashref);
 use Storable qw(nfreeze thaw);
 with 'Dancer2::Core::Role::SessionFactory';
-our $VERSION=1.0009;
+our $VERSION="1.0010";
 
 our $HANDLE_SQL_STRING=\&stub_function;
 our $HANDLE_EXECUTE=\&handle_execute;
@@ -22,6 +22,8 @@ sub handle_execute {
 
 our $CACHE={};
 
+our $FREEZE=\&nfreeze;
+our $THAW=\&thaw;
 has cache_sth=>(
   isa=>Bool,
   is=>'ro',
@@ -290,7 +292,7 @@ sub _retrieve {
   croak "Invalid session ID: $id"
     if !defined $s;
 
-  return thaw($s);
+  return $THAW->($s);
 }
 
 sub _change_id {
@@ -310,7 +312,7 @@ sub _flush {
   $data={} unless is_plain_hashref $data;
    
   my $s=$self->find_session($id);
-  my $string=nfreeze($data);
+  my $string=$FREEZE->($data);
     
   if(defined($s)) {
     my $sth=$self->get_sth('create_update_query');$HANDLE_EXECUTE->('create_update_query',$sth,$string,$id);
@@ -404,6 +406,22 @@ Sometimes you may want to replace the query created with something entierly new.
       $_[1]='some new sql statement';
     }
   };
+
+=head2 Changing the freeze and thaw functions
+
+Your database may not support globs or glob syntax, when this is the it is possible to set a new subrouteens in place that handle the freezing and thawing of data.
+
+=head3 Freeze
+
+The nfreeze code reference is stored here
+
+  $Dancer2::Session::DatabasePlugin::FREEZE
+
+=head3 Thaw
+
+The thaw code reference is stored here
+
+  $Dancer2::Session::DatabasePlugin::THAW
 
 =head1 See Also
 

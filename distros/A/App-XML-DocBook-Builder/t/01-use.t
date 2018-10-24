@@ -426,7 +426,7 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
     $docmake->run();
 
     # TEST
-    ok(scalar(! -e "my-output-dir/notneeded.xhtml"), "not created.");
+    ok( scalar( !-e "my-output-dir/notneeded.xhtml" ), "not created." );
 
     # TEST
     is_deeply(

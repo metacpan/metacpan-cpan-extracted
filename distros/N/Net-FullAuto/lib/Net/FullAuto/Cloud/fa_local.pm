@@ -38,87 +38,6 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(iset);
 
-sub cmd_raw {
-
-   return Net::FullAuto::FA_Core::cmd_raw(@_);
-
-}
-
-my $configure_aws2=sub {
-
-   my $banner=<<'END';
-
-     ___              _            _                      _  __
-    / __|_ _ ___ __ _| |_ ___     /_\  __ __ ___ ______  | |/ /___ _  _ ___
-   | (__| '_/ -_) _` |  _/ -_)   / _ \/ _/ _/ -_|_-<_-<  | ' </ -_) || (_-<
-    \___|_| \___\__,_|\__\___|  /_/ \_\__\__\___/__/__/  |_|\_\___|\_, /__/
-                                                                   |__/
-
-   Click 'Create Access Key' button in the lower part of the popup page.
-
-   Click 'Show User Security Credentials' and the Access key ID and Secret
-   access key strings will be displayed. You will not have access to the
-   secret access key again after the dialog box closes.
-
-   Copy and Paste or type the Access key ID and Secret access key here:
-
-   Access key ID                    Use [TAB] key to switch
-                      ]I[{1,'',30}  focus of input boxes
-
-   Secret access key
-                      ]I[{2,'',55}
-
-END
-
-   my %configure_aws2=(
-
-      Name => 'configure_aws2',
-      Input  => 1,
-      Banner => $banner,
-      Result => sub {},
-
-   );
-   return \%configure_aws2;
-
-};
-
-our $configure_aws1=sub {
-
-   my $banner=<<'END';
-
-     ___           __ _                        ___      _____
-    / __|___ _ _  / _(_)__ _ _  _ _ _ ___     /_\ \    / / __|
-   | (__/ _ \ ' \|  _| / _` | || | '_/ -_)   / _ \ \/\/ /\__ \
-    \___\___/_||_|_| |_\__, |\_,_|_| \___|  /_/ \_\_/\_/ |___/
-                        |___/
-
-   1. Sign in to the AWS Management Console and open the IAM console at:
-
-      https://console.aws.amazon.com/iam/#users
-
-   2. Click the blue checkbox of the name of the user you want to create
-      an access key for:
-       _
-      |_| username     (If you are a new AWS user, use 'admin')
-
-   3. Look for the big gray box just above the section you clicked that
-      is labeled 'User Actions':
-       ________________
-      | User Actions v |  Click on it and select 'Manage Access Keys'
-       ----------------
-END
-
-   my %configure_aws1=(
-
-      Name => 'configure_aws1',
-      Result => $configure_aws2,
-      Banner => $banner,
-
-   );
-   Net::FullAuto::FA_Core::Menu(\%configure_aws1);
-
-};
-
 my $result=sub {
 
    my $iset_choice=']P[{choose_iset_setup}';
@@ -164,6 +83,11 @@ my $get_isets=sub {
       $need_to_configure_aws=1 if (-1<index $output,'configure credentials') ||
          (-1<index $output,'Partial credentials found');
       my $credentials_csv_path='.';
+      if ($need_to_configure_aws) {
+         Net::FullAuto::Cloud::fa_amazon::new_user_amazon(
+            '','','','','iset_local');
+         $Net::FullAuto::Cloud::fa_amazon::configure_aws1->();
+      }
    }
 
    print "\n";

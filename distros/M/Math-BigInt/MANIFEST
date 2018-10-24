@@ -9,7 +9,6 @@ HISTORY
 lib/Math/BigFloat.pm
 lib/Math/BigInt.pm
 lib/Math/BigInt/Calc.pm
-lib/Math/BigInt/CalcEmu.pm
 lib/Math/BigInt/Lib.pm
 LICENSE
 Makefile.PL
@@ -77,6 +76,12 @@ t/author-lib-bitwise-_and.dat
 t/author-lib-bitwise-_and.t
 t/author-lib-bitwise-_or.dat
 t/author-lib-bitwise-_or.t
+t/author-lib-bitwise-_sand.dat
+t/author-lib-bitwise-_sand.t
+t/author-lib-bitwise-_sor.dat
+t/author-lib-bitwise-_sor.t
+t/author-lib-bitwise-_sxor.dat
+t/author-lib-bitwise-_sxor.t
 t/author-lib-bitwise-_xor.dat
 t/author-lib-bitwise-_xor.t
 t/author-lib-boolean-_is_even.t

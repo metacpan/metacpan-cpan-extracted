@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::ProductModel;
 
 # ABSTRACT: A datasheet or vendor specification of a product (in the sense of a prototypical description).
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has is_variant_of => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::ProductModel - A datasheet or vendor specification of a pro
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::DigitalDocument;
 
 # ABSTRACT: An electronic file or document.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has has_digital_document_permission => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::DigitalDocument - An electronic file or document.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

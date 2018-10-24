@@ -22,7 +22,7 @@
 # ABSTRACT: Extract Strings To PO Files
 
 package Locale::XGettext;
-$Locale::XGettext::VERSION = '0.3';
+$Locale::XGettext::VERSION = '0.6';
 use strict;
 
 use Locale::TextDomain 1.20 qw(Locale-XGettext);
@@ -109,7 +109,8 @@ sub new {
     
     $self->__readFilesFrom($options->{files_from});
     if ($self->needInputFiles) {
-        $self->__usageError(__"no input file given") if !@{$self->{__files}};
+        $self->__usageError(__"no input file given")
+            if !@{$self->{__files}} && !@{$options->{files_from}};
     }
     
     $self->{__keywords} = $self->__setKeywords($options->{keyword});

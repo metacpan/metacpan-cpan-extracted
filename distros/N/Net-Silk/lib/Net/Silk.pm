@@ -59,7 +59,7 @@ use base qw( Exporter DynaLoader );
 sub dl_load_flags { 0x01 } # global option
 
 BEGIN {
-  $VERSION = '2.05';
+  $VERSION = '2.07';
   bootstrap Net::Silk $VERSION;
 }
 
@@ -270,7 +270,7 @@ L<Net::Silk::RWRec>, L<Net::Silk::IPSet>, L<Net::Silk::Bag>, L<Net::Silk::Pmap>,
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (C) 2011-2016 by Carnegie Mellon University
+Copyright (C) 2011-2018 by Carnegie Mellon University
 
 Use of the Net-Silk library and related source code is subject to the
 terms of the following licenses:

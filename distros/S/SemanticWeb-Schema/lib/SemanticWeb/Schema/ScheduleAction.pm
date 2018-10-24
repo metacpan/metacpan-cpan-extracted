@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::ScheduleAction;
 
-# ABSTRACT: <p>Scheduling future actions
+# ABSTRACT: Scheduling future actions, events, or tasks
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,16 +30,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::ScheduleAction - <p>Scheduling future actions
+SemanticWeb::Schema::ScheduleAction - Scheduling future actions, events, or tasks
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>Scheduling future actions, events, or tasks.</p> <p>Related actions:</p>
-<ul> <li><a class="localLink"
+=for html Scheduling future actions, events, or tasks.<br/><br/> Related
+actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/ReserveAction">ReserveAction</a>: Unlike
 ReserveAction, ScheduleAction allocates future actions (e.g. an event, a
 task, etc) towards a time slot / spatial allocation.</li> </ul> 

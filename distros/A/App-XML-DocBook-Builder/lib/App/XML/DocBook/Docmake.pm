@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.0601';
+$App::XML::DocBook::Docmake::VERSION = '0.0603';
 use strict;
 use warnings;
 
@@ -534,7 +534,7 @@ sub _output_cmd_comp
 }
 
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0601';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.0603';
 use base 'Class::Accessor';
 
 __PACKAGE__->mk_accessors(
@@ -561,7 +561,7 @@ App::XML::DocBook::Docmake
 
 =head1 VERSION
 
-version 0.0601
+version 0.0603
 
 =head1 SYNOPSIS
 
@@ -577,7 +577,7 @@ App::XML::DocBook::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.0601
+version 0.0603
 
 =head1 FUNCTIONS
 
@@ -735,9 +735,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/app-xml-docbook-builder>
+L<https://github.com/shlomif/docmake>
 
-  git clone http://bitbucket.org/shlomif/docmake
+  git clone git://github.com/shlomif/docmake.git
 
 =head1 AUTHOR
 
@@ -746,9 +746,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
-or by email to
-L<bug-app-xml-docbook-builder@rt.cpan.org|mailto:bug-app-xml-docbook-builder@rt.cpan.org>.
+L<https://github.com/shlomif/docmake/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

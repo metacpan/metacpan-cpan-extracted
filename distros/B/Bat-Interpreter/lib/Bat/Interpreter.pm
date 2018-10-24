@@ -12,7 +12,7 @@ use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.014';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -290,6 +290,8 @@ sub _handle_condition {
             die "Operator: $operator not implemented";
         }
 
+    } else {
+        die "Condition type $type not implemented";
     }
     return 0;
 }
@@ -400,13 +402,13 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
  #!/usr/bin/env perl -w
  
- use 5.0101;
+ use 5.014;
  use Bat::Interpreter;
  
  my $interpreter = Bat::Interpreter->new;
@@ -443,7 +445,7 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords eva.dominguez Eva Dominguez pablo.rodriguez ricardo.gomez Toby Inkster
+=for stopwords eva.dominguez Eva Dominguez juanradiego pablo.rodriguez ricardo.gomez Toby Inkster
 
 =over 4
 
@@ -454,6 +456,10 @@ eva.dominguez <eva.dominguez@meteologica.com>
 =item *
 
 Eva Dominguez <meloncego@gmail.com>
+
+=item *
+
+juanradiego <kilaweo@gmail.com>
 
 =item *
 

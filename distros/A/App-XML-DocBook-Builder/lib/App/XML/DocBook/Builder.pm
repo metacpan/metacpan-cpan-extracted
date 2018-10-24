@@ -1,5 +1,5 @@
 package App::XML::DocBook::Builder;
-$App::XML::DocBook::Builder::VERSION = '0.0601';
+$App::XML::DocBook::Builder::VERSION = '0.0603';
 use warnings;
 use strict;
 
@@ -19,8 +19,8 @@ sub initialize_makefiles
 
     my $redirect_makefile = "docmake.mak";
 
-    open my $docbook_mak, ">", $redirect_makefile or
-        die "Could not open Makefile for writing";
+    open my $docbook_mak, ">", $redirect_makefile
+        or die "Could not open Makefile for writing";
 
     print $docbook_mak <<"EOF";
 DOCBOOK_MAK_PATH = $inst_dir
@@ -30,15 +30,17 @@ DOCBOOK_MAK_MAKEFILES_PATH = \$(DOCBOOK_MAK_PATH)/share/make/
 include \$(DOCBOOK_MAK_MAKEFILES_PATH)/main-docbook.mak
 EOF
 
-    close ($docbook_mak);
+    close($docbook_mak);
 
     open my $main_mak, ">", "Makefile.main";
-    print $main_mak "DOC = " . $args->{doc_base} . "\n\ninclude $redirect_makefile\n\n";
-    close ($main_mak);
+    print $main_mak "DOC = "
+        . $args->{doc_base}
+        . "\n\ninclude $redirect_makefile\n\n";
+    close($main_mak);
 }
 
 
-1; # End of App::XML::DocBook::Builder
+1;    # End of App::XML::DocBook::Builder
 
 __END__
 
@@ -52,7 +54,7 @@ App::XML::DocBook::Builder
 
 =head1 VERSION
 
-version 0.0601
+version 0.0603
 
 =head1 SYNOPSIS
 
@@ -66,7 +68,7 @@ App::XML::DocBook::Builder - Build DocBook/XML files.
 
 =head1 VERSION
 
-version 0.0601
+version 0.0603
 
 =head1 FUNCTIONS
 
@@ -223,9 +225,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/app-xml-docbook-builder>
+L<https://github.com/shlomif/docmake>
 
-  git clone http://bitbucket.org/shlomif/docmake
+  git clone git://github.com/shlomif/docmake.git
 
 =head1 AUTHOR
 
@@ -234,9 +236,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
-or by email to
-L<bug-app-xml-docbook-builder@rt.cpan.org|mailto:bug-app-xml-docbook-builder@rt.cpan.org>.
+L<https://github.com/shlomif/docmake/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

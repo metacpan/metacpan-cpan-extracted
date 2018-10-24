@@ -1,0 +1,114 @@
+#!/opt/bin/perl
+
+# deliantra faceinfo filter, needs to be run in the arch directory
+# works a bit like a lint and creates a new default.faceinfo in the current directory
+# works only after cfutil --install-arch --cache
+
+{
+   no utf8; # == values are utf-8 encoded
+
+   our @WALL_SUFFIX = ("⬤⬤", "╹ ", " ╺", "┗━", "╻ ", "┃ ", "┏━", "┣━", "━╸", "┛ ", "━━", "┻━", "┓ ", "┫ ", "┳━", "╋━");
+
+   # used to create crude text glyphs for text-based clients
+   sub autoglyph {
+      my ($stem, $face) = @_;
+
+      if ($stem =~ /^wall\/|Nimwall/) {
+         return $WALL_SUFFIX[hex $1]
+            if $stem =~ /(_[0-9A-F]).x11/;
+
+         "██"
+
+      } elsif ($stem =~ /^traps\//) {
+         "☠ "
+
+      } elsif ($stem =~ /^armour\/shield/) {
+         "Ø "
+
+      } elsif ($stem =~ /^armour\//) {
+         "A "
+
+      } elsif ($stem =~ /^weapon\//) {
+         "† "
+
+      } elsif ($stem =~ /^readable\//) {
+         "✉ "
+
+      } elsif ($stem =~ /^river\//) {
+         "~ "
+
+      } elsif ($stem =~ /^^ground\/|Nimfloor/) {
+         "· "
+
+      } elsif ($stem =~ /^floor\//) {
+         "░░"
+
+      } elsif ($stem =~ /^spells\//) {
+         "! "
+
+      } elsif ($stem =~ /^exit\//) {
+         "⎆⎆"
+
+      } elsif ($stem =~ /^construct\//) {
+         "⌂⌂"
+
+      } elsif ($stem =~ /^player\//) {
+         "\@"
+
+      } elsif ($stem =~ /^misc.*\/(.)/) {
+         " $1"
+
+      } elsif ($stem =~ /^(?:monster|misc|class|connect|gods|indoor|inorganic|mining|music|skills).*\/(.)/) {
+         (substr $stem, 0, 1) . uc $1
+
+      } else {
+         substr $stem, 0, 1
+      }
+   }
+}
+
+our %PNG;
+
+open my $fiin, "<:raw", "default.faceinfo"
+   or die "default.faceinfo: $!\n";
+
+# make an inventory of all faces
+{
+   open my $ts, "-|:raw", "treescan -f */ | sort"
+      or die "treescan: $!";
+
+   while (<$ts>) {
+      chomp;
+      if (/^(.*)\/([^\/]+\....).64x64.png~?$/) { # normal
+         $PNG{$2} = "$1/$2";
+      } elsif (/^(.*)\/([^\/]+\....).64x64.png~?(\+\d+\+\d+)~$/) { # split
+         $PNG{"$2$3"} = "$1/$2";
+#         delete $PNG{$2}; used for +0+0
+      }
+   }
+}
+
+open my $fiout, "|-:raw", "sort | unexpand -a >default.faceinfo~"
+   or die "default.faceinfo~: $!";
+
+while (<$fiin>) {
+   my ($face, $visibility, $fg, $bg, $glyph) = split /\s+/;
+   (my $xf = $face) =~ s/\+\d+\+\d+$//;
+
+   $fg =~ y/A-Z_\-/a-z/d;
+   $bg =~ y/A-Z_\-/a-z/d;
+
+   my $stem = delete $PNG{$face};
+
+   $glyph = "?" . autoglyph $stem, $v
+      if $glyph =~ /^\?./;
+
+   printf $fiout
+          "%-39s %3d\t%-15s %-15s %s\n",
+          $face,
+          $visibility || 0,
+          $fg // "none",
+          $bg // "none",
+          $glyph;
+}
+

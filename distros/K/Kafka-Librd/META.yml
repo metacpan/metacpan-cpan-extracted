@@ -27,7 +27,7 @@ resources:
   homepage: https://github.com/trinitum/perl-Kafka-Librd
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trinitum/perl-Kafka-Librd
-version: '0.08'
+version: '0.09'
 x_contributors:
   - 'Pavel Shaydo <zwon@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

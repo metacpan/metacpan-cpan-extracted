@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::HowToStep;
 
 # ABSTRACT: A step in the instructions for how to achieve a result
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::ItemList /;
+extends qw/ SemanticWeb::Schema::ListItem SemanticWeb::Schema::CreativeWork SemanticWeb::Schema::ItemList /;
 
 
 use MooX::JSON_LD 'HowToStep';
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::HowToStep - A step in the instructions for how to achieve a
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

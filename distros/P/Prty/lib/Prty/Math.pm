@@ -3,8 +3,9 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use 5.010;
 use Prty::Formatter;
@@ -251,7 +252,7 @@ sub radToDegree {
 
 Array von Geo-Koordinaten. Eine einzelne Geo-Koordinate ist ein
 Tipel [$latitude,$logitude,$weight], wobei die Gewichtung $weight
-optial ist. Wenn die Gewichtung fehlt, wird als Wert 1 angenommen.
+optional ist. Fehlt die Gewichtung, wird als Wert 1 angenommen.
 
 =back
 
@@ -377,18 +378,6 @@ Der Berechnung liegt die Formel zugrunde:
         cos($lat1*pi/180)*cos($lat2*pi/180)*cos(($lon2-$lon1)*pi/180)
     )
 
-=head4 Examples
-
-Abstand zw. zwei Längengraden (359. und 360.) am Äquator:
-
-    sprintf '%.2f',Prty::Math->geoDistance(0,359,0,360);
-    # -> 111.12
-
-Abstand zw. zwei Längengraden am Pol:
-
-    Prty::Math->geoDistance(90,359,90,360);
-    # -> 0
-
 =head4 See Also
 
 =over 2
@@ -402,6 +391,18 @@ L<Prof. Dirk Reichhardt - Hinweise zur Berechnung von Abständen|http://wwwlehre
 L<Blog Martin Kompf - Entfernungsberechnung|http://www.kompf.de/gps/distcalc.html>
 
 =back
+
+=head4 Examples
+
+Abstand zw. zwei Längengraden (359. und 360.) am Äquator:
+
+    sprintf '%.2f',Prty::Math->geoDistance(0,359,0,360);
+    # -> 111.12
+
+Abstand zw. zwei Längengraden am Pol:
+
+    Prty::Math->geoDistance(90,359,90,360);
+    # -> 0
 
 =cut
 
@@ -438,7 +439,8 @@ sub geoDistance {
 
 Liefere den Abstand zwischen zwei Längengraden bei Breitengrad $lat.
 Die Methode ist eigentlich nicht nötig, da sie einen Spezialfall der
-Mehode geoDistance() behandelt. Die Formel stammt von Herrn Petersen.
+Mehode geoDistance() behandelt. Die Formel stammt von
+Wilhelm Petersen.
 
 =cut
 
@@ -646,7 +648,7 @@ sub spikeValue {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -157,6 +157,10 @@ function as well as **new** and **configure** method.
 
 # SEE ALSO
 
+- [App::ansifold](https://metacpan.org/pod/App::ansifold)
+
+    Command line utility using [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold).
+
 - [App::sdif](https://metacpan.org/pod/App::sdif)
 
     [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) was originally implemented in **sdif** command for

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -278,9 +278,14 @@ sub register {
         # Render some unauthorized result
         if ( grep { $_ eq 'api' } @{ $c->req->url->path } ) {
             # Render JSON unauthorized response
-            $c->render( status => 401, openapi => {
-                message => 'You are not authorized to view this page. Please log in.',
-            } );
+            $c->render(
+                handler => 'openapi', # XXX This started being necessary after Mojolicious::Plugin::OpenAPI 2.0
+                status => 401,
+                openapi => {
+                    message => 'You are not authorized to view this page. Please log in.',
+                    errors => [],
+                },
+            );
             return;
         }
         else {
@@ -375,7 +380,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 DESCRIPTION
 

@@ -2,6 +2,7 @@ package Mojolicious::Renderer;
 use Mojo::Base -base;
 
 use Mojo::Cache;
+use Mojo::DynamicMethods;
 use Mojo::File 'path';
 use Mojo::JSON 'encode_json';
 use Mojo::Home;
@@ -41,8 +42,13 @@ sub add_handler { $_[0]->handlers->{$_[1]} = $_[2] and return $_[0] }
 
 sub add_helper {
   my ($self, $name, $cb) = @_;
+
   $self->helpers->{$name} = $cb;
   delete $self->{proxy};
+  $cb = $self->get_helper($name) if $name =~ s/\..*$//;
+  Mojo::DynamicMethods::register $_, $self, $name, $cb
+    for qw(Mojolicious Mojolicious::Controller);
+
   return $self;
 }
 

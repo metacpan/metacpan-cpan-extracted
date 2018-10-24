@@ -3,9 +3,10 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -114,7 +115,7 @@ werden alle Werte auf C<undef> gesetzt.
 
 =item [5]
 
-Blesse den Hash %hash auf Klasse Prty::Hash.
+Blesse den Hash %hash auf Klasse $class.
 
 =back
 
@@ -1434,7 +1435,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

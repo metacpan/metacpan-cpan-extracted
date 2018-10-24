@@ -19,13 +19,14 @@ use Storable qw(dclone);
 use File::Copy qw( move copy );
 use Data::Dumper;
 use Parallel::ForkManager;
+
 use Sim::OPT;
 use Sim::OPT::Sim;
 use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Devel::Trace;
-Devel::Trace::trace('on');  # Enable
+#Devel::Trace::trace('on');  # Enable
 #use Parallel::ForkManager;
 #use Scalar::Utils qw( looks_like_number );
 #$Data::Dumper::Indent = 0;
@@ -42,8 +43,7 @@ no warnings;
 #disable diagnostics;
 use warnings::unused;
 @ISA = qw( Exporter );
-#%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
-#@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
 
 our @EXPORT = qw(
 morph translate translate_surfaces_simple translate_surfaces rotate_surface translate_vertices shift_vertices rotate
@@ -58,32 +58,13 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.69'; # our $VERSION = '';
+$VERSION = '0.75'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH
 
 sub morph
 {
-	my $swap = shift;
-	my %dat = %$swap;
-	my @instances = @{ $dat{instances} };
-	my $countcase = $dat{countcase};
-	my $countblock = $dat{countblock};
-	my %datastruc = %{ $dat{datastruc} }; ######
-	my @rescontainer = @{ $dat{rescontainer} }; ######
-
-	#my @sweeps = @{ $dat{sweeps} }; say $tee "IN MORPH dump(\@sweeps): " . dump(@sweeps);
-	#my @sourcesweeps = @{ $dat{sourcesweeps} }; say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
-	my %dirfiles = %{ $dat{dirfiles} };
-	my $configfile = %{ $dat{configfile} };
-
-	$configfile = $main::configfile;
-	@varinumbers = @main::varinumbers;
-	@mediumiters = @main::mediumiters;
-	@rootnames = @main::rootnames;
-	%vals = %main::vals;
-
 	$mypath = $main::mypath;
 	$exeonfiles = $main::exeonfiles;
 	$generatechance = $main::generatechance;
@@ -95,14 +76,6 @@ sub morph
 	$report = $main::report;
 	$simnetwork = $main::simnetwork;
 	$max_processes = $main::max_processes;
-
-	$tee = new IO::Tee( \*STDOUT, ">>$tofile" ); # GLOBAL ZZZ
-
-	#open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!";
-#	open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";
-	say $tee "\n# Now in Sim::OPT::Morph.\n";
-
-	%dowhat = %main::dowhat;
 
 	%simtitles = %main::simtitles;
 	%retrievedata = %main::retrievedata;
@@ -120,9 +93,23 @@ sub morph
 	@base_columns = @main::base_columns;
 	@maketabledata = @main::maketabledata;
 	@filter_columns = @main::filter_columns;
-	%vals = %main::vals;
+
+	$tee = new IO::Tee( \*STDOUT, ">>$tofile" ); # GLOBAL ZZZ
+
+	my ( $configfile, $instances_r, $dirfiles_r, $dowhat_r ) = @_;
 
 	require $configfile;
+
+	my @instances = @{ $instances_r }; #say $tee "IN MORPH \@instances " . dump( \@instances );
+	my %dirfiles = %{ $dirfiles_r }; #say $tee "IN MORPH \%dirfiles " . dump( \%dowhat );
+	my %dowhat = %{ $dowhat_r }; say $tee "IN MORPH \%dowhat " . dump( \%dowhat );
+
+
+	say $tee "\n# Now in Sim::OPT::Morph.\n";
+
+	if ( not ( $exeonfiles ) ) { $exeonfiles = "y"; }
+	if ( not ( $preventsim ) ) { $preventsim = "n"; }
+	if ( not ( $report ) ) { $report = "$mypath/$file-report.txt"; }
 
 	my @simcases = @{ $dirfiles{simcases} };
 	my @simstruct = @{ $dirfiles{simstruct} };
@@ -148,17 +135,10 @@ sub morph
 	my $descendlist = $dirfiles{descendlist};
 	my $descendblock = $dirfiles{descendblock};
 
-	my $skipfile = $vals{skipfile};
-	my $skipsim = $vals{skipsim};
-	my $skipreport = $vals{skipreport};
+	my $skipfile = $dowhat{skipfile};
+	my $skipsim = $dowhat{skipsim};
+	my $skipreport = $dowhat{skipreport};
 
-	if ( not ( $exeonfiles ) ) { $exeonfiles = "y"; }
-	if ( not ( $preventsim ) ) { $preventsim = "n"; }
-	if ( not ( $report ) ) { $report = "$mypath/$file-report.txt"; }
-
-	#my $getpars = shift;
-	#eval( $getpars );
-	#if ( fileno (MORPHLIST)
 	my ( %numvertmenu, %vertnummenu );
 
 	if ( ( $dowhat{menus} eq "shortb" ) or ( not ( defined ( $dowhat{menus} ) ) ) )
@@ -270,7 +250,7 @@ sub morph
 		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nr" => 96, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ns" => 97, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nt" => 98, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nu" => 99,
 		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nv" => 100, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nw" => 101, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nx" => 102, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ny" => 103,
 		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nz" => 104 );
-	}
+	};
 
 	my @menus = ( \%numvertmenu, \%vertnummenu );
 
@@ -280,9 +260,10 @@ sub morph
 	$countinstance = 1;
 	foreach my $instance ( sort { ${ $a }{to} <=> ${ $b }{to} } @instances )
 	{
-
-		my $instance_after = $instances[ $countinstance ];
-		my %d = %{ $instance };
+		my %d = %{ $instance }; #say $tee "IN MORPH dump(\%d): " . dump(%d);
+		say $tee "\$countinstance: " . dump( $countinstance );
+		#my $countinstance = ( $d{countinstance} + 1 );
+		my $instance_after = $instances[ $countinstance + 1];
 		my %d_after = %{ $instance_after };
 
 		my $countcase = $d{countcase};
@@ -294,37 +275,34 @@ sub morph
 		my $countvar = $d{countvar};
 		my $countvar_after = $d_after{countvar};
 		my $countstep = $d{countstep};
-		my $to = $d{to};
-		my $origin = $d{origin};
+
+
 		my @uplift = @{ $d{uplift} };
 		my @backvalues = @{ $d{backvalues} };
 		my @sweeps = @{ $d{sweeps} };
 		my @sourcesweeps = @{ $d{sourcesweeps} };
-		#eval($getparshere);
+		my @blockelts = @{ $d{blockelts} };
+		my @blocks = @{ $d{blocks} };
 
+		my $origin = $d{origin}; #say $tee " IN MORPH \$origin $origin ";
+		$origin = "$mypath/$file" . "_" . "$origin"; say $tee " IN MORPH \$origin $origin ";
+		my $to = $d{to}; #say $tee " IN MORPH \$to $to ";
+		$to = "$mypath/$file" . "_" . "$to"; say $tee " IN MORPH \$to $to ";
+		my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
+		$from = "$mypath/$file" . "_" . "$from"; say $tee " IN MORPH \$from $from ";
+		my $toitem = $d{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
+		$toitem = "$mypath/$file" . "_" . "$toitem"; say $tee " IN MORPH \$toitem $toitem ";
+
+		my %varnums = %{ $d{varnums} };
+		my %mids = %{ $d{mids} };
 		my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase);
-		my @blockelts = Sim::OPT::getblockelts(\@sweeps, $countcase, $countblock);
-		my @blocks = Sim::OPT::getblocks(\@sweeps, $countcase);
-		my $toitem = Sim::OPT::getitem(\@winneritems, $countcase, $countblock);
-		my $from = Sim::OPT::getline($toitem);
-		my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase);
-		my %mids = Sim::OPT::getcase(\@miditers, $countcase);
-		#eval($getfly);
 
-		my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varinumbers);
+		my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varnumbers);
 		my $varnumber = $countvar;
 
 		my $countcaseplus1 = ( $countcase + 1);
 		my $countblockplus1 = ( $countblock + 1);
 
-		#@totblockelts = (@totblockelts, @blockelts); # @blockelts
-		#@totblockelts = uniq(@totblockelts);
-		#@totblockelts = sort(@totblockelts);
-		#if ( $countvar == $#blockelts )
-		#{
-		#  $$general_variables[0] = "n";
-		#} # THIS TELLS THAT IF THE SEARCH IS ENDING (LAST SUBSEARCH CYCLE) GENERATION OF CASES HAS TO BE TURNED OFF
-		####### OLD. $stepsvar = ${ "varnums{$countvar}" . "$varnumber" };
 
 		my $countmorphing = 1;
 		my $numberof_morphings = scalar ( keys %{ $dowhat{simtools} } );
@@ -395,13 +373,6 @@ sub morph
 			my $sequencer = $$general_variables[1];
 			my $dffile = "df-$file.txt";
 
-			#my $tofilemorph = "$tofile" . "-1morph.txt";
-			#my $outfilemorph = "$outfile" . "-1morph.txt";
-
-			#open( $tee, ">>$tofilemorph" );
-			#open( OUTFILE, ">>$outfilemorph" );
-
-
 
 
 			if ( ( $countblock == 0 ) and ( $countstep == 1 ) )
@@ -412,194 +383,38 @@ sub morph
 					{
 						unless ($exeonfiles eq "n")
 						{
-							unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-							{
-								`cp -R $mypath/$file $from`;
-							}
-							else
-							{
-								`xcopy  /e /c /r /y $mypath\\$file $from`;
-							}
+							`cp -R $mypath/$file $from`;
 						}
-						unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-						{
-							say $tee "cp -R $mypath/$file $from\n";
-						}
-						else
-						{
-							say $tee "xcopy  /e /c /r /y $mypath\\$file $from\n";
-						}
+						say $tee "cp -R $mypath/$file $from\n";
 					}
 				}
 			}
+
 			unless ( $dowhat{inactivatemorph} eq "y" )
 			{
-				#if ( fileno (RETLIST) )
-				#if (not (-e $morphlist ) )
-				#{
-				#  if ( $countblock == 0 )
-				#  {
-						open( MORPHLIST, ">>$morphlist") or die( "$!" ); # or die;
-				#  }
-				#  else
-				#  {
-				#    open( MORPHLIST, ">>$morphlist") or die;
-				#  }
-				#}
-
-				#if ( fileno (MORPHBLOCK) )
-				#if (not (-e $morphblock ) )
-				#{
-				#  if ( $countblock == 0 )
-				#  {
-						open( MORPHBLOCK, ">>$morphblock") or die( "$!" );# or die;
-				#  }
-				#  else
-				#  {
-				#    open( MORPHBLOCK, ">>$morphblock");# or die;
-				#  }
-				#}
-				#if ( ( $to eq $origin ) or ( not ( eval ( $skip) ) ) )
-				#if  ( not ( eval ( $skip) ) )
-				#{
-					push ( @{ $morphstruct[$countcase][$countblock] }, $to );
-					print MORPHBLOCK "$to\n";
-				#}
+				open( MORPHBLOCK, ">>$morphblock") or die( "$!" );# or die;
+				push ( @{ $morphstruct[$countcase][$countblock] }, $to );
 
 
-				#if ( ( not ( $to ~~ @morphcases ) ) and ( ( $to eq $origin ) or ( not ( eval ( $skip) ) ) ) )
-				#if ( ( ( ( $to eq $origin ) or ( not ( $to ~~ @morphcases ) ) ) ) and ( ( $to eq $origin ) or ( not ( eval ( $skip) ) ) ) )
-
-
-				if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonexisting_models}->{$countmorphing} eq "y" ) )
-				#if  ( not ( eval ( $skip) ) )
+				#	if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonexisting_models}->{$countmorphing} eq "y" ) )
+				if ( not ( $to ~~ @morphcases ) )
 				{
 
-					if ( not ( $to ~~ @morphcases ) )
+					push ( @morphcases, $to );
+					print MORPHLIST "$to\n";
+					say $tee "from: $from, origin: $origin, to: $to";
+
+					if ( ( not (-e $to ) ) or ( not ($to ~~ @morphcases) ) or ( $dowhat{overwrite_models}->{$countmorphing} eq "y" ) )
 					{
-
-						push ( @morphcases, $to );
-						print MORPHLIST "$to\n";
-						say $tee "from: $from, origin: $origin, to: $to";
-
-						#my $from = "$case_to_sim";
-						#my $almost_to = $from;
-						#$almost_to =~ s/$varnumber-\d+/$varnumber-$countstep/ ;
-						#if (     ( $generate eq "n" )
-						#   and ( ( $sequencer eq "y" ) or ( $sequencer eq "last" ) ) )
-						#{
-						#  if ( $almost_to =~ m/§$/ ) { $to = "$almost_to" ; }
-						#  else
-						#  {
-						#    #$to = "$case_to_sim$varnumber-$countstep§";
-						#    $to = "$almost_to" . "§";
-						#  }
-						#}
-						#elsif ( ( $generate eq "y" ) and ( $sequencer eq "n" ) )
-						#{
-						#  if ( $almost_to =~ m/_$/ ) { $to = "$almost_to" ; }
-						#  else
-						#  {
-						#    $to = "$case_to_sim$varnumber-$countstep" . "_";
-						#    $to = "$almost_to" . "_";
-						#    if ( $countstep == $stepsvar )
-						#    {
-						#      unless ($exeonfiles eq "n") { print `chmod -R 777 $from\n`; }
-						#      print $tee "chmod -R 777 $from\n\n";
-						#    }
-						#  }
-						#}
-						#elsif ( ( $generate eq "y" ) and ( $sequencer eq "y" ) )
-						#{
-						#  #$to = "$case_to_sim$varnumber-$countstep" . "£";
-						#  $to = "$almost_to" . "£";
-						#}
-						#elsif ( ( $generate eq "y" ) and ( $sequencer eq "last" ) )
-						#{
-						#  if ( $almost_to =~ m/£$/ ) { $to = "$almost_to" ; }
-						#  else
-						#  {
-						#    #$to = "$case_to_sim$varnumber-$countstep" . "£";
-						#    $to = "$almost_to" . "£";
-						#    #if ( $countstep == $stepsvar )
-						#    #{
-						#    #  unless ($exeonfiles eq "n") { print `chmod -R 777 $from\n`; }
-						#    #  print $tee "chmod -R 777 $from\n\n";
-						#    #}
-						#  }
-						#}
-						#elsif ( ( $generate eq "n" ) and ( $sequencer eq "n" ) )
-						#{
-						#   $almost_to =~ s/[_|£]$// ;
-						#  #$to = "$case_to_sim$varnumber-$countstep";
-						#  $to = "$almost_to";
-						#}
-
-
-
-						if
-						#(
-						#( $generate eq "y" )
-						#and ( $countstep == $stepsvar )
-						#and ( ( $sequencer eq "n" ) or ( $sequencer eq "last" ) )
-						#and ( ($skip ne "")  and ($skipask ne "yes") )
-						#and
-
-						( ( not (-e $to ) ) or ( not ($to ~~ @morphcases) ) or ( $dowhat{overwrite_models}->{$countmorphing} eq "y" ) )
-						#)
+						unless ($exeonfiles eq "n")
 						{
-
-
-
-							unless ($exeonfiles eq "n")
-							{
-								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-								{
-									`cp -R $origin $to\n`;
-								}
-								else
-								{
-									`xcopy  /e /c /r /y $origin $to\n`;
-								}
-							}
-							unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-							{
-								print $tee "cp -R $origin $to\n\n";
-							}
-							else
-							{
-								print $tee "xcopy  /e /c /r /y $origin $to\n\n";
-							}
-
-							#}
-
-							#my $passmorph;
-
-							#if ( $dowhat{actonexisting_models}->{$countmorphing} eq "y" )
-							#{
-							#  $passmorph = "pass";
-							#}
-							#
-							#( $passmorph ) ? ( eval( $evalthis ) ) : ( "nothing" );
+							`cp -R $origin $to\n`;
+							print $tee "cp -R $origin $to\n\n";
 						}
 					}
 
-
-					#if ( not ( $todos ~~ @dones ) )
-					#{
-					#  push ( @dones, $todos );
-					#}
-
 					if ( ( $dowhat{actonexisting_models}->{$countmorphing} eq "y" ) )
 					{
-						#if ( $passmorph eq "pass" )
-						#{
-						#  eval( $evalthis ); say $tee "EVALED";
-						#}
-
-						# $passmorph ? eval( $evalthis ) : " " ;
-
-						#{
 						my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
 						foreach my $op (@applytype) # "$op" MEANS OPERATION
 						{
@@ -608,87 +423,36 @@ sub morph
 							my $modification_type = $applytype[$countop][0]; #say $tee "\$modification_type: $modification_type"; #
 							if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type ne "changeconfig" ) )
 							{
+
 								unless ($exeonfiles eq "n")
 								{
-									unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-									{
 										`cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n`;
-									}
-									else
-									{
-										`xcopy  /e /c /r /y $to\\zones\\$applytype[$countop][1] $to\\zones\\$applytype[$countop][2]\n`;
-									}
-								}
-								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-								{
-									print $tee "cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
-								}
-								else
-								{
-									print $tee "xcopy /e /c /r /y $to\\zones\\$applytype[$countop][1] $to\\zones\\$applytype[$countop][2]\n\n";
-								}
-								unless ($exeonfiles eq "n")
-								{
-									unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-									{
+
 										`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
-									}
-									else
-									{
-										`xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n`;
-									}
-								}    # ORDINARILY, THIS PART CAN BE REMOVED
-								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-								{
-									print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 								}
-								else
-								{
-									print $tee "xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n";
-								}
+								print $tee "cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
+								print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 							}
 
 							if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type eq "changeconfig" ) )
 							{
 								unless ($exeonfiles eq "n")
 								{
-									unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-									{
-										`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
-									}
-									else
-									{
-										`xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n`;
-									}
+									`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 								}
-								unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-								{
-									print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
-								}
-								else
-								{
-									print $tee "xcopy /e /c /r /y $to\\cfg\\$applytype[$countop][1] $to\\cfg\\$applytype[$countop][2]\n";
-								}
-							} # ORDINARILY, THIS PART CAN BE REMOVED
+								print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+							}
 
 
 							print `cd $to`;
 							print $tee "cd $to\n\n";
 
 							my $launchline;
-							unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-							{
-								$launchline = " -file $to/cfg/$fileconfig -mode script";
-							}
-							else
-							{
-								$launchline = " -file $to\\cfg\\$fileconfig -mode script";
-							}
+							$launchline = " -file $to/cfg/$fileconfig -mode script";
 
 
 							if ( ( $stepsvar > 1) and ( not ( eval ( $skip ) ) ) )
 							{
-
 
 								if ( $modification_type eq "change_groundreflectance" )#
 								{

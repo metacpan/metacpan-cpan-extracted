@@ -3,8 +3,9 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Term::ANSIColor ();
 
@@ -14,7 +15,7 @@ use Term::ANSIColor ();
 
 =head1 NAME
 
-Prty::AnsiColor - Erzeuge Text mit ANSI Colorcodes
+Prty::AnsiColor - Erzeuge Text mit/ohne ANSI Colorcodes
 
 =head1 BASE CLASS
 
@@ -167,7 +168,7 @@ sub str {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_ActionCollabClass",
+      "dc:source" : "schemadotorgsources2:source_ActionCollabClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A Property value specification.",
       "rdfs:label" : "PropertyValueSpecification",
@@ -18,28 +18,28 @@
          ]
       },
       "schema:maxValue" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
+            "schema:QuantitativeValue",
             "schema:MonetaryAmount",
             "schema:PropertyValue",
-            "schema:QuantitativeValue",
             "schema:PropertyValueSpecification"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },
       "schema:minValue" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The lower value of some characteristic or property.",
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
-            "schema:PropertyValueSpecification",
+            "schema:PropertyValue",
             "schema:MonetaryAmount",
-            "schema:QuantitativeValue",
-            "schema:PropertyValue"
+            "schema:PropertyValueSpecification",
+            "schema:QuantitativeValue"
          ],
          "schema:rangeIncludes" : "schema:Number"
       },

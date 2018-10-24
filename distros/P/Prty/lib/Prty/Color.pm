@@ -3,8 +3,9 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Reference;
 
@@ -132,12 +133,6 @@ Die Helligkeitsberechnung erfolgt auf Grundlage der Heuristik:
 
     $brightness = sqrt 0.299*$r**2 + 0.587*$g**2 + 0.114*$b**2;
 
-=head4 Example
-
-    $col = Prty::Color->new('ff0000');
-    $brightness = $col->brightness;
-    -> 139.44
-
 =head4 See Also
 
 =over 2
@@ -147,6 +142,12 @@ Die Helligkeitsberechnung erfolgt auf Grundlage der Heuristik:
 L<http://fseitz.de/blog/index.php?/archives/112-Helligkeit-von-Farben-des-RGB-Farbraums-berechnen.html>
 
 =back
+
+=head4 Example
+
+    $col = Prty::Color->new('ff0000');
+    $brightness = $col->brightness;
+    -> 139.44
 
 =cut
 
@@ -259,7 +260,7 @@ sub rgb {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -1,0 +1,74 @@
+= CPAN Installation Instructions =
+
+Padre is released as a CPAN package. You can download and install it using {{{cpan}}}, {{{cpanm}}} or CPANPLUS.
+The released versions can be seen here [http://search.cpan.org/dist/Padre/] here [http://kobesearch.cpan.org/dist/Padre]
+and here [https://metacpan.org/release/Padre] depending on your preferences.
+
+As Padre has many dependencies probably the easiest is to install the binary distribution
+where available from the vendor (Mandriva, Fedora, Debian, FreeBSD) and then use {{{cpanm}}} to upgrade.
+
+If this is not possible read on.
+
+== Install from CPAN ==
+
+=== Strawberry Perl on Windows ===
+
+On Strawberry Perl you should be able to install/upgrade Padre by just opening the "cmd" 
+and typing
+
+{{{
+c:> cpan Padre
+}}}
+
+=== Active Perl in Windows ===
+
+Probably the same as for Strawberry Perl but you might first need to install the C compiler they supply.
+
+=== Linux ===
+
+On Linux you should probably start by installing from the binary repository of your distribution
+(see below) and then upgrading from CPAN using local::lib.
+
+That part starts by installing local::lib using the [https://metacpan.org/module/local::lib#The-bootstrapping-technique  Bootstrapping technique]
+and once that's done type
+
+{{{
+$ cpan Padre
+}}}
+
+
+== Common Problems ==
+
+=== Corporate Proxy ===
+
+People behind a (corporate) proxy will not be able to access the CPAN servers directly. 
+First they need to tell the CPAN client which proxy to use.
+For this, launch the cpan client by typing '''cpan''' on the command line. 
+You should get a cpan> prompt and in there type the following: (obviously replace
+the address of the proxy server with the one you have in your company).
+
+{{{
+cpan> o conf http_proxy http://proxy.corporate.com:8080
+cpan> o conf commit
+cpan> q
+}}}
+
+Once you did this the cpan command should work.
+
+=== WxWidgets and WxPerl ===
+The difficult part is sometimes to install some of the prerequisites:
+
+ * Installing wxWidgets (that [http://search.cpan.org/dist/Alien-wxWidgets/ Alien::wxWidgets] tries to solve)
+ * Installing wxPerl (the [http://search.cpan.org/dist/Wx/ Wx] distro) from CPAN.
+
+Mattia Barbon did a great job with them but they still may be difficult to install in some cases. 
+
+
+== Platform-specific Instructions ==
+ * [wiki:DownloadDebian#Installation_from_CPAN Debian]
+ * [wiki:DownloadFedora#Installation_from_CPAN Fedora]
+ * [wiki:DownloadFreeBSD#Installation_from_CPAN FreeBSD]
+ * [wiki:DownloadMandriva#Installation_from_CPAN Mandriva]
+ * [wiki:DownloadNetBSD#Installation_from_CPAN NetBSD]
+ * [wiki:DownloadUbuntu#Installation_from_CPAN Ubuntu]
+ * [wiki:DownloadWindows#Installation_from_CPAN Windows]

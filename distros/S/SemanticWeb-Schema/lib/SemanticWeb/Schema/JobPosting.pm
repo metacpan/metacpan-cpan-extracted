@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::JobPosting;
 
 # ABSTRACT: A listing that describes a job opening in a certain organization.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has base_salary => (
@@ -200,7 +202,7 @@ SemanticWeb::Schema::JobPosting - A listing that describes a job opening in a ce
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -218,11 +220,11 @@ A base_salary should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
-
 =item C<Num>
 
 =item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
 
 =back
 

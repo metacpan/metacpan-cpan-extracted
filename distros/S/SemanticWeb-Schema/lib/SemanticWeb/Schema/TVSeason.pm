@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::TVSeason;
 
 # ABSTRACT: Season dedicated to TV broadcast and associated online delivery.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has country_of_origin => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::TVSeason - Season dedicated to TV broadcast and associated 
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

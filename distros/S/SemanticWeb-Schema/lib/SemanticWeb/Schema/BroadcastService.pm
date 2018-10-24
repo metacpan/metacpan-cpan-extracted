@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::BroadcastService;
 
 # ABSTRACT: A delivery service through which content is provided via broadcast over the air or online.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has area => (
@@ -88,7 +90,7 @@ SemanticWeb::Schema::BroadcastService - A delivery service through which content
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

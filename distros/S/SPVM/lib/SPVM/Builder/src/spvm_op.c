@@ -1583,7 +1583,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         SPVM_yyerror_format(compiler, "Too many field declarations at %s line %d\n", field->op_field->file, field->op_field->line);
       }
       else {
-        field->id = compiler->fields->length;
+        field->id = compiler->fields->length + 1;
         field->rel_id = i;
         SPVM_LIST_push(compiler->fields, field);
         SPVM_HASH_insert(compiler->field_symtable, field_abs_name, strlen(field_abs_name), field);
@@ -1617,7 +1617,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       }
       else {
         const char* package_var_access_abs_name = SPVM_OP_create_package_var_access_abs_name(compiler, package_name, package_var_name);
-        package_var->id = compiler->package_vars->length;
+        package_var->id = compiler->package_vars->length + 1;
         SPVM_LIST_push(compiler->package_vars, package_var);
         SPVM_HASH_insert(compiler->package_var_symtable, package_var_access_abs_name, strlen(package_var_access_abs_name), package_var);
 
@@ -1692,7 +1692,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         
         assert(sub->op_sub->file);
         
-        sub->id = compiler->subs->length;
+        sub->id = compiler->subs->length + 1;
         
         SPVM_LIST_push(compiler->subs, sub);
         SPVM_HASH_insert(compiler->sub_symtable, sub_abs_name, strlen(sub_abs_name), sub);
@@ -1715,7 +1715,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   package->op_package = op_package;
   
   // Add package
-  package->id = compiler->packages->length;
   SPVM_LIST_push(compiler->packages, package);
   SPVM_HASH_insert(compiler->package_symtable, package_name, strlen(package_name), package);
 

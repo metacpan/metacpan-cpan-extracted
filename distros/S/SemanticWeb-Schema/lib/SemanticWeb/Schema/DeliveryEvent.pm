@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::DeliveryEvent;
 
 # ABSTRACT: An event involving the delivery of an item.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has access_code => (
@@ -64,7 +66,7 @@ SemanticWeb::Schema::DeliveryEvent - An event involving the delivery of an item.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::MenuSection;
 
 # ABSTRACT: A sub-grouping of food or drink items in a menu
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has has_menu_item => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::MenuSection - A sub-grouping of food or drink items in a me
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

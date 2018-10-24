@@ -3,9 +3,10 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Unindent;
 use Prty::Hash;
@@ -569,7 +570,7 @@ sub instantiate {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

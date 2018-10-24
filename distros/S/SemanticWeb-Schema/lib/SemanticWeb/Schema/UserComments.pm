@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::UserComments;
 
 # ABSTRACT: UserInteraction and its subtypes is an old way of talking about users interacting with pages
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has comment_text => (
@@ -72,7 +74,7 @@ SemanticWeb::Schema::UserComments - UserInteraction and its subtypes is an old w
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -121,9 +123,9 @@ A creator should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 

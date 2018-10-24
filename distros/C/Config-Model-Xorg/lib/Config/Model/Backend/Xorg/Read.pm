@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-Xorg
 #
-# This software is Copyright (c) 2007-2016 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Xorg::Read ;
-$Config::Model::Backend::Xorg::Read::VERSION = '1.113';
+$Config::Model::Backend::Xorg::Read::VERSION = '1.115';
 use Mouse::Role;
 
 use Carp ;

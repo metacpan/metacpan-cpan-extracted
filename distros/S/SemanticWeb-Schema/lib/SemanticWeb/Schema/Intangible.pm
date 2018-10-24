@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Intangible;
 
 # ABSTRACT: A utility class that serves as the umbrella for a number of 'intangible' things such as quantities
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::Intangible - A utility class that serves as the umbrella fo
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

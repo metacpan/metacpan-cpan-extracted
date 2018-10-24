@@ -81,7 +81,7 @@ PRE
     my $file = temp_file_path();
     write_file($file, $existing_data);
     my $prepend_data = "line 0\n";
-    my ($res, $warn, $err) = trap_function(\&prepend_file, $file, {foo=>1,bar=>2,binmode=>1}, $prepend_data);
+    my ($res, $warn, $err) = trap_function(\&prepend_file, $file, {foo=>1,bar=>2,binmode=>':raw'}, $prepend_data);
     ok($res, 'prepend_file: add line, invalid opts, binmode: got response!');
     # this should get fixed
     SKIP: {

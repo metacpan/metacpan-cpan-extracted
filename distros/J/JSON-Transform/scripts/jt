@@ -1,0 +1,31 @@
+#!perl
+
+use strict;
+use warnings;
+use JSON::Transform qw(parse_transform);
+use JSON::MaybeXS;
+
+my $transform;
+BEGIN { $transform = shift @ARGV or die "Usage: $0 transform [inputs]\n" }
+
+print encode_json(parse_transform($transform)->(decode_json(join '', <>)));
+
+__END__
+
+=head1 NAME
+
+jt - script for arbitrary transformation of JSON data
+
+=head1 SYNOPSIS
+
+  $ echo '{"a": 1, "b": 2}' | jt '"" <% [ $K ]' 
+  # prints: ["a","b"]
+
+=head1 DESCRIPTION
+
+Small script using L<JSON::Transform> to apply given transformations to
+JSON data.
+
+=head1 SEE ALSO
+
+L<JSON::Transform>

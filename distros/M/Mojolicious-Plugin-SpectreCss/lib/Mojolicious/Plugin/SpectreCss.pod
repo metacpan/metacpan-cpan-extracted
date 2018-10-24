@@ -1,0 +1,42 @@
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Plugin::SpectreCss - Mojolicious Plugin
+
+=head1 SYNOPSIS
+
+  # Mojolicious
+  $self->plugin('SpectreCss');
+
+  # Mojolicious::Lite
+  plugin 'SpectreCss';
+
+  # in template
+  %= stylesheet '/spectre/0.5.3/core.min.css'
+  %= stylesheet '/spectre/0.5.3/icons.min.css'
+  %= stylesheet '/spectre/0.5.3/exp.min.css'
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Plugin::SpectreCss> is a L<Mojolicious> plugin which provides
+access to the L<Spectre CSS framework|https://picturepan2.github.io/spectre/>.
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::SpectreCss> inherits all methods from
+L<Mojolicious::Plugin> and implements the following new ones.
+
+=head2 register
+
+  $plugin->register(Mojolicious->new);
+
+Register plugin in L<Mojolicious> application. This adds the CSS files to the
+static file search path.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>,
+L<Spectre CSS framework|https://picturepan2.github.io/spectre/>.
+
+=cut

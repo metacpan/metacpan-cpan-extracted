@@ -1,0 +1,76 @@
+{
+  'children' => [
+    {
+      'children' => [
+        {
+          'nodename' => 'jsonPointer',
+          'type' => 'element'
+        },
+        {
+          'attributes' => {
+            'opFrom' => '<%'
+          },
+          'children' => [
+            {
+              'children' => [
+                {
+                  'children' => [
+                    {
+                      'children' => [
+                        'V'
+                      ],
+                      'nodename' => 'variableSystem',
+                      'type' => 'element'
+                    },
+                    {
+                      'children' => [
+                        {
+                          'children' => [
+                            {
+                              'children' => [
+                                'id'
+                              ],
+                              'nodename' => 'jsonOtherNotGrave',
+                              'type' => 'element'
+                            }
+                          ],
+                          'nodename' => 'exprStringQuoted',
+                          'type' => 'element'
+                        },
+                        {
+                          'children' => [
+                            {
+                              'children' => [
+                                'K'
+                              ],
+                              'nodename' => 'variableSystem',
+                              'type' => 'element'
+                            }
+                          ],
+                          'nodename' => 'exprSingleValue',
+                          'type' => 'element'
+                        }
+                      ],
+                      'nodename' => 'exprKeyAdd',
+                      'type' => 'element'
+                    }
+                  ],
+                  'nodename' => 'exprSingleValue',
+                  'type' => 'element'
+                }
+              ],
+              'nodename' => 'exprArrayMapping',
+              'type' => 'element'
+            }
+          ],
+          'nodename' => 'exprMapping',
+          'type' => 'element'
+        }
+      ],
+      'nodename' => 'transformImpliedDest',
+      'type' => 'element'
+    }
+  ],
+  'nodename' => 'transforms',
+  'type' => 'element'
+}

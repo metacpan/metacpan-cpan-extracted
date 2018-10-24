@@ -1,0 +1,2298 @@
+echo @`sh  cflags "optimize='-O2'" opmini.o`  -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB opmini.c
+@g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB opmini.c
+op.c: In function ‘OP* S_fold_constants(OP*)’:
+op.c:5468:34: warning: argument ‘o’ might be clobbered by ‘longjmp’ or ‘vfork’ [-Wclobbered]
+ S_fold_constants(pTHX_ OP *const o)
+                        ~~~~~~~~~~^
+echo @`sh  cflags "optimize='-O2'" perlmini.o`  -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB perlmini.c
+@g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB perlmini.c
+In file included from perl.c:37:
+perl.c: In function ‘void Perl_sys_init(int*, char***)’:
+perl.h:2656:88: warning: cast between incompatible function types from ‘__sighandler_t’ {aka ‘void (*)(int)’} to ‘Sighandler_t’ {aka ‘void (*)(int, siginfo_t*, void*)’} [-Wcast-function-type]
+ #    define PERL_FPU_INIT       PL_sigfpe_saved = (Sighandler_t) signal(SIGFPE, SIG_IGN)
+                                                                                        ^
+unixish.h:150:29: note: in expansion of macro ‘PERL_FPU_INIT’
+  MALLOC_CHECK_TAINT2(*c,*v) PERL_FPU_INIT; PERLIO_INIT; MALLOC_INIT
+                             ^~~~~~~~~~~~~
+perl.c:124:5: note: in expansion of macro ‘PERL_SYS_INIT_BODY’
+     PERL_SYS_INIT_BODY(argc, argv);
+     ^~~~~~~~~~~~~~~~~~
+perl.c: In function ‘void Perl_sys_init3(int*, char***, char***)’:
+perl.h:2656:88: warning: cast between incompatible function types from ‘__sighandler_t’ {aka ‘void (*)(int)’} to ‘Sighandler_t’ {aka ‘void (*)(int, siginfo_t*, void*)’} [-Wcast-function-type]
+ #    define PERL_FPU_INIT       PL_sigfpe_saved = (Sighandler_t) signal(SIGFPE, SIG_IGN)
+                                                                                        ^
+unixish.h:150:29: note: in expansion of macro ‘PERL_FPU_INIT’
+  MALLOC_CHECK_TAINT2(*c,*v) PERL_FPU_INIT; PERLIO_INIT; MALLOC_INIT
+                             ^~~~~~~~~~~~~
+perl.h:2706:49: note: in expansion of macro ‘PERL_SYS_INIT_BODY’
+ #  define PERL_SYS_INIT3_BODY(argvp,argcp,envp) PERL_SYS_INIT_BODY(argvp,argcp)
+                                                 ^~~~~~~~~~~~~~~~~~
+perl.c:137:5: note: in expansion of macro ‘PERL_SYS_INIT3_BODY’
+     PERL_SYS_INIT3_BODY(argc, argv, env);
+     ^~~~~~~~~~~~~~~~~~~
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings gv.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings toke.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings perly.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings pad.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings regcomp.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings dump.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings util.c
+util.c: In function ‘void (* Perl_rsignal(int, Sighandler_t))(int, siginfo_t*, void*)’:
+util.c:2698:36: warning: cast between incompatible function types from ‘Sighandler_t’ {aka ‘void (*)(int, siginfo_t*, void*)’} to ‘void (*)(int)’ [-Wcast-function-type]
+     act.sa_handler = (void(*)(int))handler;
+                                    ^~~~~~~
+util.c: In function ‘int Perl_rsignal_save(int, Sighandler_t, Sigsave_t*)’:
+util.c:2743:36: warning: cast between incompatible function types from ‘Sighandler_t’ {aka ‘void (*)(int, siginfo_t*, void*)’} to ‘void (*)(int)’ [-Wcast-function-type]
+     act.sa_handler = (void(*)(int))handler;
+                                    ^~~~~~~
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings mg.c
+In file included from perl.h:3648,
+                 from mg.c:43:
+mg.c: In function ‘int Perl_magic_set(SV*, MAGIC*)’:
+mg.c:2770:50: warning: type qualifiers ignored on cast result type [-Wignored-qualifiers]
+             CALLREG_NUMBUF_STORE((REGEXP * const)rx,paren,sv);
+                                                  ^~
+regexp.h:528:43: note: in definition of macro ‘RXp_ENGINE’
+ #define RXp_ENGINE(prog)                ((prog)->engine)
+                                           ^~~~
+regexp.h:529:53: note: in expansion of macro ‘ReANY’
+ #define RX_ENGINE(rx_sv)                (RXp_ENGINE(ReANY(rx_sv)))
+                                                     ^~~~~
+perl.h:255:5: note: in expansion of macro ‘RX_ENGINE’
+     RX_ENGINE(rx)->numbered_buff_STORE(aTHX_ (rx),(paren),(value))
+     ^~~~~~~~~
+mg.c:2770:13: note: in expansion of macro ‘CALLREG_NUMBUF_STORE’
+             CALLREG_NUMBUF_STORE((REGEXP * const)rx,paren,sv);
+             ^~~~~~~~~~~~~~~~~~~~
+In file included from mg.c:43:
+mg.c:2770:50: warning: type qualifiers ignored on cast result type [-Wignored-qualifiers]
+             CALLREG_NUMBUF_STORE((REGEXP * const)rx,paren,sv);
+                                                  ^~
+perl.h:255:47: note: in definition of macro ‘CALLREG_NUMBUF_STORE’
+     RX_ENGINE(rx)->numbered_buff_STORE(aTHX_ (rx),(paren),(value))
+                                               ^~
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings reentr.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings mro_core.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings keywords.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings hv.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings av.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings run.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings pp_hot.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings sv.c
+In file included from sv.c:32:
+sv.c: In function ‘void Perl_sv_vcatpvfn_flags(SV*, const char*, STRLEN, __va_list_tag (*)[1], SV**, size_t, bool*, U32)’:
+config.h:915:39: warning: ‘%.*g’ directive writing between 1 and 133 bytes into a region of size 127 [-Wformat-overflow=]
+ #define Gconvert(x,n,t,b) sprintf((b),"%.*g",(n),(x))
+                                       ^~~~~~
+perl.h:392:67: note: in definition of macro ‘PERL_UNUSED_RESULT’
+ #    define PERL_UNUSED_RESULT(v) STMT_START { __typeof__(v) z = (v); (void)sizeof(z); } STMT_END
+                                                                   ^
+sv.c:48:24: note: in expansion of macro ‘Gconvert’
+     PERL_UNUSED_RESULT(Gconvert((NV)(nv), (int)ndig, 0, buffer))
+                        ^~~~~~~~
+sv.c:13003:17: note: in expansion of macro ‘SNPRINTF_G’
+                 SNPRINTF_G(fv, ebuf, sizeof(ebuf), precis);
+                 ^~~~~~~~~~
+config.h:915:39: note: assuming directive output of 132 bytes
+ #define Gconvert(x,n,t,b) sprintf((b),"%.*g",(n),(x))
+                                       ^~~~~~
+perl.h:392:67: note: in definition of macro ‘PERL_UNUSED_RESULT’
+ #    define PERL_UNUSED_RESULT(v) STMT_START { __typeof__(v) z = (v); (void)sizeof(z); } STMT_END
+                                                                   ^
+sv.c:48:24: note: in expansion of macro ‘Gconvert’
+     PERL_UNUSED_RESULT(Gconvert((NV)(nv), (int)ndig, 0, buffer))
+                        ^~~~~~~~
+sv.c:13003:17: note: in expansion of macro ‘SNPRINTF_G’
+                 SNPRINTF_G(fv, ebuf, sizeof(ebuf), precis);
+                 ^~~~~~~~~~
+In file included from /usr/include/stdio.h:862,
+                 from perlio.h:41,
+                 from iperlsys.h:51,
+                 from perl.h:3614,
+                 from sv.c:32:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:33:34: note: ‘__builtin___sprintf_chk’ output between 2 and 134 bytes into a destination of size 127
+   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       __bos (__s), __fmt, __va_arg_pack ());
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings pp.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings scope.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings pp_ctl.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings pp_sys.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings doop.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings doio.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings regexec.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings utf8.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings taint.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings deb.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings universal.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings globals.c
+In file included from globals.c:32:
+perl.h:7174:34: warning: option ‘-Wc++-compat’ is valid for C/ObjC but not for C++ [-Wpragmas]
+ GCC_DIAG_IGNORE_DECL(-Wc++-compat);
+                                  ^
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings perlio.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings perlapi.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings numeric.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings mathoms.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings locale.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings pp_pack.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings pp_sort.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings caretx.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings dquote.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings time64.c
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings miniperlmain.c
+g++-8 -fstack-protector-strong -L/usr/local/lib -o miniperl \
+    opmini.o perlmini.o  gv.o toke.o perly.o pad.o regcomp.o dump.o util.o mg.o reentr.o mro_core.o keywords.o hv.o av.o run.o pp_hot.o sv.o pp.o scope.o pp_ctl.o pp_sys.o doop.o doio.o regexec.o utf8.o taint.o deb.o universal.o globals.o perlio.o perlapi.o numeric.o mathoms.o locale.o pp_pack.o pp_sort.o caretx.o dquote.o time64.o  miniperlmain.o  -lpthread -lnsl -ldl -lm -lcrypt -lutil -lc 
+./miniperl -w -Ilib -Idist/Exporter/lib -MExporter -e '<?>' || sh -c 'echo >&2 Failed to build miniperl.  Please run make minitest; exit 1'
+./miniperl -Ilib -f write_buildcustomize.pl
+./miniperl -Ilib make_patchnum.pl
+Updating 'git_version.h' and 'lib/Config_git.pl'
+./miniperl -Ilib configpm
+written lib/Config.pod
+updated lib/Config.pm
+updated lib/Config_heavy.pl
+./miniperl -Ilib utils/Makefile.PL
+Extracting utils/Makefile (with variable substitutions)
+./miniperl -Ilib make_ext.pl cpan/Archive-Tar/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Archive::Tar
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Archive-Tar'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Archive-Tar'
+./miniperl -Ilib make_ext.pl dist/Attribute-Handlers/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Attribute-Handlers directly
+./miniperl -Ilib make_ext.pl cpan/autodie/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/autodie directly
+./miniperl -Ilib make_ext.pl cpan/AutoLoader/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/AutoLoader directly
+./miniperl -Ilib make_ext.pl dist/autouse/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/autouse directly
+./miniperl -Ilib make_ext.pl dist/base/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for base
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/base'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/base'
+./miniperl -Ilib make_ext.pl cpan/bignum/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/bignum directly
+./miniperl -Ilib make_ext.pl dist/Carp/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Carp directly
+./miniperl -Ilib make_ext.pl cpan/Config-Perl-V/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Config-Perl-V directly
+./miniperl -Ilib make_ext.pl dist/constant/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/constant directly
+./miniperl -Ilib make_ext.pl cpan/CPAN/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for CPAN
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/CPAN'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/CPAN'
+./miniperl -Ilib make_ext.pl cpan/CPAN-Meta/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for CPAN::Meta
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/CPAN-Meta'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/CPAN-Meta'
+./miniperl -Ilib make_ext.pl cpan/CPAN-Meta-Requirements/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/CPAN-Meta-Requirements directly
+./miniperl -Ilib make_ext.pl cpan/CPAN-Meta-YAML/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/CPAN-Meta-YAML directly
+./miniperl -Ilib make_ext.pl dist/Devel-SelfStubber/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Devel-SelfStubber directly
+./miniperl -Ilib make_ext.pl cpan/Digest/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Digest directly
+./miniperl -Ilib make_ext.pl dist/Dumpvalue/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Dumpvalue directly
+./miniperl -Ilib make_ext.pl dist/encoding-warnings/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/encoding-warnings directly
+./miniperl -Ilib make_ext.pl dist/Env/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Env directly
+./miniperl -Ilib make_ext.pl ext/Errno/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Errno
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Errno'
+"../../miniperl" "-I../../lib" Errno_pm.PL Errno.pm
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Errno'
+./miniperl -Ilib make_ext.pl cpan/experimental/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/experimental directly
+./miniperl -Ilib make_ext.pl dist/Exporter/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Exporter directly
+./miniperl -Ilib make_ext.pl dist/ExtUtils-CBuilder/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/ExtUtils-CBuilder directly
+./miniperl -Ilib make_ext.pl cpan/ExtUtils-Constant/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/ExtUtils-Constant directly
+./miniperl -Ilib make_ext.pl cpan/ExtUtils-Install/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/ExtUtils-Install directly
+./miniperl -Ilib make_ext.pl cpan/ExtUtils-MakeMaker/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for ExtUtils::MakeMaker
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/ExtUtils-MakeMaker'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/ExtUtils-MakeMaker'
+./miniperl -Ilib make_ext.pl cpan/ExtUtils-Manifest/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/ExtUtils-Manifest directly
+Generating a Unix-style Makefile
+Writing Makefile for ExtUtils::Manifest
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/ExtUtils-Manifest'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/ExtUtils-Manifest'
+./miniperl -Ilib make_ext.pl ext/ExtUtils-Miniperl/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for ext/ExtUtils-Miniperl directly
+./miniperl -Ilib make_ext.pl dist/ExtUtils-ParseXS/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/ExtUtils-ParseXS directly
+Generating a Unix-style Makefile
+Writing Makefile for ExtUtils::ParseXS
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/ExtUtils-ParseXS'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/ExtUtils-ParseXS'
+./miniperl -Ilib make_ext.pl ext/FileCache/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for ext/FileCache directly
+./miniperl -Ilib make_ext.pl cpan/File-Fetch/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/File-Fetch directly
+./miniperl -Ilib make_ext.pl ext/File-Find/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for ext/File-Find directly
+./miniperl -Ilib make_ext.pl cpan/File-Path/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/File-Path directly
+./miniperl -Ilib make_ext.pl cpan/File-Temp/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/File-Temp directly
+./miniperl -Ilib make_ext.pl dist/Filter-Simple/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Filter-Simple directly
+./miniperl -Ilib make_ext.pl cpan/Getopt-Long/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Getopt-Long directly
+./miniperl -Ilib make_ext.pl cpan/HTTP-Tiny/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for HTTP::Tiny
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/HTTP-Tiny'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/HTTP-Tiny'
+./miniperl -Ilib make_ext.pl dist/I18N-Collate/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/I18N-Collate directly
+./miniperl -Ilib make_ext.pl dist/I18N-LangTags/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/I18N-LangTags directly
+./miniperl -Ilib make_ext.pl dist/if/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for if
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/if'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/if'
+./miniperl -Ilib make_ext.pl dist/lib/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for lib
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/lib'
+"../../miniperl" "-I../../lib" lib_pm.PL lib.pm
+Extracting lib.pm (with variable substitutions)
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/lib'
+./miniperl -Ilib make_ext.pl cpan/IO-Compress/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for IO::Compress
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/IO-Compress'
+cp bin/zipdetails blib/script/zipdetails
+/home/jkeenan/gitwork/perl/cpan/IO-Compress/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/zipdetails
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/IO-Compress'
+./miniperl -Ilib make_ext.pl cpan/IO-Socket-IP/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/IO-Socket-IP directly
+./miniperl -Ilib make_ext.pl cpan/IO-Zlib/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/IO-Zlib directly
+./miniperl -Ilib make_ext.pl cpan/IPC-Cmd/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/IPC-Cmd directly
+./miniperl -Ilib make_ext.pl ext/IPC-Open3/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for ext/IPC-Open3 directly
+./miniperl -Ilib make_ext.pl cpan/JSON-PP/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for JSON::PP
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/JSON-PP'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/JSON-PP'
+./miniperl -Ilib make_ext.pl cpan/libnet/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Net
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/libnet'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/libnet'
+./miniperl -Ilib make_ext.pl dist/Locale-Maketext/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Locale-Maketext directly
+./miniperl -Ilib make_ext.pl cpan/Locale-Maketext-Simple/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Locale-Maketext-Simple directly
+./miniperl -Ilib make_ext.pl cpan/Math-BigInt/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Math-BigInt directly
+./miniperl -Ilib make_ext.pl cpan/Math-BigRat/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Math-BigRat directly
+./miniperl -Ilib make_ext.pl cpan/Math-Complex/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Math-Complex directly
+./miniperl -Ilib make_ext.pl cpan/Memoize/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Memoize directly
+./miniperl -Ilib make_ext.pl dist/Module-CoreList/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Module::CoreList
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/Module-CoreList'
+cp corelist blib/script/corelist
+/home/jkeenan/gitwork/perl/dist/Module-CoreList/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/corelist
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/Module-CoreList'
+./miniperl -Ilib make_ext.pl cpan/Module-Load/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Module-Load directly
+./miniperl -Ilib make_ext.pl cpan/Module-Load-Conditional/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Module-Load-Conditional directly
+./miniperl -Ilib make_ext.pl cpan/Module-Loaded/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Module-Loaded directly
+./miniperl -Ilib make_ext.pl cpan/Module-Metadata/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Module::Metadata
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Module-Metadata'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Module-Metadata'
+./miniperl -Ilib make_ext.pl dist/Net-Ping/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Net-Ping directly
+./miniperl -Ilib make_ext.pl cpan/NEXT/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/NEXT directly
+./miniperl -Ilib make_ext.pl cpan/Params-Check/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Params-Check directly
+./miniperl -Ilib make_ext.pl cpan/parent/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/parent directly
+./miniperl -Ilib make_ext.pl cpan/perlfaq/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/perlfaq directly
+./miniperl -Ilib make_ext.pl cpan/PerlIO-via-QuotedPrint/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/PerlIO-via-QuotedPrint directly
+./miniperl -Ilib make_ext.pl cpan/Perl-OSType/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Perl-OSType directly
+./miniperl -Ilib make_ext.pl cpan/Pod-Checker/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Pod::Checker
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Pod-Checker'
+"../../miniperl" "-I../../lib" "-I../../lib" podchecker.PL podchecker
+Extracting podchecker (with variable substitutions)
+cp podchecker blib/script/podchecker
+/home/jkeenan/gitwork/perl/cpan/Pod-Checker/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/podchecker
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Pod-Checker'
+./miniperl -Ilib make_ext.pl cpan/Pod-Escapes/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Pod-Escapes directly
+./miniperl -Ilib make_ext.pl cpan/Pod-Simple/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Pod-Simple directly
+./miniperl -Ilib make_ext.pl ext/Pod-Functions/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Pod::Functions
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Pod-Functions'
+"../../miniperl" "-I../../lib" Functions_pm.PL ../../pod/perlfunc.pod
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Pod-Functions'
+./miniperl -Ilib make_ext.pl ext/Pod-Html/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Pod::Html
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Pod-Html'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Pod-Html'
+./miniperl -Ilib make_ext.pl cpan/podlators/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Pod
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/podlators'
+"../../miniperl" "-I../../lib" "-I../../lib" scripts/pod2man.PL scripts/pod2man
+Extracting pod2man (with variable substitutions)
+"../../miniperl" "-I../../lib" "-I../../lib" scripts/pod2text.PL scripts/pod2text
+Extracting pod2text (with variable substitutions)
+cp scripts/pod2man blib/script/pod2man
+/home/jkeenan/gitwork/perl/cpan/podlators/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/pod2man
+cp scripts/pod2text blib/script/pod2text
+/home/jkeenan/gitwork/perl/cpan/podlators/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/pod2text
+Manifying 2 pod documents
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/podlators'
+./miniperl -Ilib make_ext.pl cpan/Pod-Parser/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Pod::Parser
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Pod-Parser'
+"../../miniperl" "-I../../lib" "-I../../lib" podselect.PL podselect
+Extracting podselect (with variable substitutions)
+cp podselect blib/script/podselect
+/home/jkeenan/gitwork/perl/cpan/Pod-Parser/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/podselect
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Pod-Parser'
+./miniperl -Ilib make_ext.pl cpan/Pod-Perldoc/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Pod::Perldoc
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Pod-Perldoc'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Pod-Perldoc'
+./miniperl -Ilib make_ext.pl cpan/Pod-Usage/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Pod::Usage
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Pod-Usage'
+"../../miniperl" "-I../../lib" "-I../../lib" pod2usage.PL pod2usage
+Extracting pod2usage (with variable substitutions)
+cp pod2usage blib/script/pod2usage
+/home/jkeenan/gitwork/perl/cpan/Pod-Usage/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/pod2usage
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Pod-Usage'
+./miniperl -Ilib make_ext.pl dist/Safe/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Safe directly
+./miniperl -Ilib make_ext.pl dist/Search-Dict/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Search-Dict directly
+./miniperl -Ilib make_ext.pl dist/SelfLoader/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/SelfLoader directly
+./miniperl -Ilib make_ext.pl cpan/Term-ANSIColor/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Term-ANSIColor directly
+./miniperl -Ilib make_ext.pl cpan/Term-Cap/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Term::Cap
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Term-Cap'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Term-Cap'
+./miniperl -Ilib make_ext.pl dist/Term-Complete/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Term-Complete directly
+./miniperl -Ilib make_ext.pl dist/Term-ReadLine/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Term-ReadLine directly
+./miniperl -Ilib make_ext.pl dist/Test/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Test directly
+./miniperl -Ilib make_ext.pl cpan/Test-Harness/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for Test::Harness
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Test-Harness'
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Test-Harness'
+./miniperl -Ilib make_ext.pl cpan/Test-Simple/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Test-Simple directly
+./miniperl -Ilib make_ext.pl dist/Text-Abbrev/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Text-Abbrev directly
+./miniperl -Ilib make_ext.pl cpan/Text-Balanced/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Text-Balanced directly
+./miniperl -Ilib make_ext.pl cpan/Text-ParseWords/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Text-ParseWords directly
+./miniperl -Ilib make_ext.pl cpan/Text-Tabs/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Text-Tabs directly
+./miniperl -Ilib make_ext.pl dist/Thread-Queue/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Thread-Queue directly
+./miniperl -Ilib make_ext.pl dist/Thread-Semaphore/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Thread-Semaphore directly
+./miniperl -Ilib make_ext.pl dist/Tie-File/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for dist/Tie-File directly
+./miniperl -Ilib make_ext.pl ext/Tie-Memoize/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for ext/Tie-Memoize directly
+./miniperl -Ilib make_ext.pl cpan/Tie-RefHash/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Tie-RefHash directly
+./miniperl -Ilib make_ext.pl cpan/Time-Local/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/Time-Local directly
+./miniperl -Ilib make_ext.pl cpan/version/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Running pm_to_blib for cpan/version directly
+./miniperl -Ilib make_ext.pl dist/XSLoader/pm_to_blib  MAKE="make" LIBPERL_A=libperl.a
+Generating a Unix-style Makefile
+Writing Makefile for XSLoader
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/XSLoader'
+"../../miniperl" "-I../../lib" XSLoader_pm.PL XSLoader.pm
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/XSLoader'
+./miniperl -Ilib mkppport
+running "/home/jkeenan/gitwork/perl/miniperl" -I../../lib PPPort_pm.PL
+parts/inc/mess provides vmess, which is still marked todo for 5.6.0
+including ppphdoc
+including ppphbin
+including version
+including threads
+including limits
+including uv
+including memory
+including magic_defs
+including misc
+including mess
+including variables
+including mPUSH
+including call
+including newRV
+including newCONSTSUB
+including MY_CXT
+including format
+including SvREFCNT
+including newSV_type
+including newSVpv
+including SvPV
+including Sv_set
+including sv_xpvf
+including shared_pv
+including HvNAME
+including gv
+including warn
+including pvs
+including magic
+including cop
+including grok
+including snprintf
+including sprintf
+including exception
+including strlfuncs
+including pv_tools
+running "/home/jkeenan/gitwork/perl/miniperl" -I../../lib ppport_h.PL
+installing ppport.h for cpan/DB_File
+installing ppport.h for cpan/IPC-SysV
+installing ppport.h for cpan/Win32API-File
+installing ppport.h for dist/IO
+installing ppport.h for dist/Storable
+removing temporary file PPPort.pm
+removing temporary file ppport.h
+./miniperl -Ilib make_ext.pl DynaLoader.o  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=static CCCDLFLAGS=
+Generating a Unix-style Makefile
+Writing Makefile for DynaLoader
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/DynaLoader'
+"../../miniperl" "-I../../lib" DynaLoader_pm.PL DynaLoader.pm
+rm -f DynaLoader.xs
+cp dl_dlopen.xs DynaLoader.xs
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp" -noprototypes -typemap '/home/jkeenan/gitwork/perl/ext/DynaLoader/../../lib/ExtUtils/typemap'  DynaLoader.xs > DynaLoader.xsc
+mv DynaLoader.xsc DynaLoader.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.45\" -DXS_VERSION=\"1.45\"  "-I../.."  -DLIBC="libc-2.27.so" DynaLoader.c
+rm -rf ../../DynaLoader.o
+cp DynaLoader.o ../../DynaLoader.o
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/DynaLoader'
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings op.c
+op.c: In function ‘OP* S_fold_constants(OP*)’:
+op.c:5468:34: warning: argument ‘o’ might be clobbered by ‘longjmp’ or ‘vfork’ [-Wclobbered]
+ S_fold_constants(pTHX_ OP *const o)
+                        ~~~~~~~~~~^
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings perl.c
+In file included from perl.c:37:
+perl.c: In function ‘void Perl_sys_init(int*, char***)’:
+perl.h:2656:88: warning: cast between incompatible function types from ‘__sighandler_t’ {aka ‘void (*)(int)’} to ‘Sighandler_t’ {aka ‘void (*)(int, siginfo_t*, void*)’} [-Wcast-function-type]
+ #    define PERL_FPU_INIT       PL_sigfpe_saved = (Sighandler_t) signal(SIGFPE, SIG_IGN)
+                                                                                        ^
+unixish.h:150:29: note: in expansion of macro ‘PERL_FPU_INIT’
+  MALLOC_CHECK_TAINT2(*c,*v) PERL_FPU_INIT; PERLIO_INIT; MALLOC_INIT
+                             ^~~~~~~~~~~~~
+perl.c:124:5: note: in expansion of macro ‘PERL_SYS_INIT_BODY’
+     PERL_SYS_INIT_BODY(argc, argv);
+     ^~~~~~~~~~~~~~~~~~
+perl.c: In function ‘void Perl_sys_init3(int*, char***, char***)’:
+perl.h:2656:88: warning: cast between incompatible function types from ‘__sighandler_t’ {aka ‘void (*)(int)’} to ‘Sighandler_t’ {aka ‘void (*)(int, siginfo_t*, void*)’} [-Wcast-function-type]
+ #    define PERL_FPU_INIT       PL_sigfpe_saved = (Sighandler_t) signal(SIGFPE, SIG_IGN)
+                                                                                        ^
+unixish.h:150:29: note: in expansion of macro ‘PERL_FPU_INIT’
+  MALLOC_CHECK_TAINT2(*c,*v) PERL_FPU_INIT; PERLIO_INIT; MALLOC_INIT
+                             ^~~~~~~~~~~~~
+perl.h:2706:49: note: in expansion of macro ‘PERL_SYS_INIT_BODY’
+ #  define PERL_SYS_INIT3_BODY(argvp,argcp,envp) PERL_SYS_INIT_BODY(argvp,argcp)
+                                                 ^~~~~~~~~~~~~~~~~~
+perl.c:137:5: note: in expansion of macro ‘PERL_SYS_INIT3_BODY’
+     PERL_SYS_INIT3_BODY(argc, argv, env);
+     ^~~~~~~~~~~~~~~~~~~
+rm -f libperl.a
+/usr/bin/ar rc libperl.a op.o     perl.o  gv.o toke.o perly.o pad.o regcomp.o dump.o util.o mg.o reentr.o mro_core.o keywords.o hv.o av.o run.o pp_hot.o sv.o pp.o scope.o pp_ctl.o pp_sys.o doop.o doio.o regexec.o utf8.o taint.o deb.o universal.o globals.o perlio.o perlapi.o numeric.o mathoms.o locale.o pp_pack.o pp_sort.o caretx.o dquote.o time64.o   DynaLoader.o
+./miniperl -Ilib make_ext.pl lib/auto/Cwd/Cwd.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Cwd
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/PathTools'
+Running Mkbootstrap for Cwd ()
+chmod 644 "Cwd.bs"
+/home/jkeenan/gitwork/perl/dist/PathTools/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Cwd.bs ../../lib/auto/Cwd/Cwd.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/dist/PathTools/../../lib/ExtUtils/typemap'  Cwd.xs > Cwd.xsc
+mv Cwd.xsc Cwd.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"3.75\" -DXS_VERSION=\"3.75\" -fPIC "-I../.."  -DDOUBLE_SLASHES_SPECIAL=0 -DNO_PPPORT_H Cwd.c
+rm -f ../../lib/auto/Cwd/Cwd.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Cwd.o  -o ../../lib/auto/Cwd/Cwd.so  \
+      \
+  
+chmod 755 ../../lib/auto/Cwd/Cwd.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/PathTools'
+ 
+	Making utilities
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/utils'
+../miniperl -I../lib corelist.PL
+Extracting corelist (with variable substitutions)
+../miniperl -I../lib cpan.PL
+Extracting cpan (with variable substitutions)
+../miniperl -I../lib h2ph.PL
+Extracting h2ph (with variable substitutions)
+../miniperl -I../lib h2xs.PL
+Extracting h2xs (with variable substitutions)
+../miniperl -I../lib instmodsh.PL
+Extracting instmodsh (with variable substitutions)
+../miniperl -I../lib json_pp.PL
+Extracting json_pp (with variable substitutions)
+../miniperl -I../lib perlbug.PL
+Extracting perlbug (with variable substitutions)
+../miniperl -I../lib perldoc.PL
+Extracting "perldoc" (with variable substitutions)
+../miniperl -I../lib perlivp.PL
+Extracting perlivp (with variable substitutions)
+../miniperl -I../lib pl2pm.PL
+Extracting pl2pm (with variable substitutions)
+../miniperl -I../lib prove.PL
+Extracting prove (with variable substitutions)
+../miniperl -I../lib ptar.PL
+Extracting ptar (with variable substitutions)
+../miniperl -I../lib ptardiff.PL
+Extracting ptardiff (with variable substitutions)
+../miniperl -I../lib ptargrep.PL
+Extracting ptargrep (with variable substitutions)
+../miniperl -I../lib shasum.PL
+Extracting shasum (with variable substitutions)
+../miniperl -I../lib splain.PL
+Extracting splain (with variable substitutions)
+../miniperl -I../lib libnetcfg.PL
+Extracting libnetcfg (with variable substitutions)
+../miniperl -I../lib piconv.PL
+Extracting piconv (with variable substitutions)
+../miniperl -I../lib enc2xs.PL
+Extracting enc2xs (with variable substitutions)
+../miniperl -I../lib encguess.PL
+Extracting encguess (with variable substitutions)
+../miniperl -I../lib xsubpp.PL
+Extracting xsubpp (with variable substitutions)
+../miniperl -I../lib pod2html.PL
+Extracting pod2html (with variable substitutions)
+../miniperl -I../lib zipdetails.PL
+Extracting zipdetails (with variable substitutions)
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/utils'
+./miniperl -Ilib lib/unicore/mktables -C lib/unicore -P pod -maketest -makelist -p
+Processing PropertyAliases.txt
+Finishing property setup
+Processing PropValueAliases.txt
+Processing extracted/DGeneralCategory.txt
+Processing extracted/DCombiningClass.txt
+Processing extracted/DNumType.txt
+Processing extracted/DEastAsianWidth.txt
+Processing extracted/DLineBreak.txt
+Processing extracted/DBidiClass.txt
+Processing extracted/DDecompositionType.txt
+Processing extracted/DBinaryProperties.txt
+Processing extracted/DNumValues.txt
+Processing extracted/DJoinGroup.txt
+Processing extracted/DJoinType.txt
+Processing Jamo.txt
+Processing UnicodeData.txt
+Processing ArabicShaping.txt
+Processing Blocks.txt
+Processing PropList.txt
+Processing SpecialCasing.txt
+Processing LineBreak.txt
+Processing EastAsianWidth.txt
+Processing CompositionExclusions.txt
+Processing BidiMirroring.txt
+Processing CaseFolding.txt
+Processing DCoreProperties.txt
+Processing Scripts.txt
+Processing DNormalizationProps.txt
+Processing DAge.txt
+Processing HangulSyllableType.txt
+Processing auxiliary/WordBreakProperty.txt
+Processing auxiliary/GraphemeBreakProperty.txt
+Processing auxiliary/GCBTest.txt
+Processing auxiliary/SBTest.txt
+Processing auxiliary/WBTest.txt
+Processing auxiliary/SentenceBreakProperty.txt
+Processing NamedSequences.txt
+Processing NameAliases.txt
+Processing auxiliary/LBTest.txt
+Processing ScriptExtensions.txt
+Processing IndicSyllabicCategory.txt
+Processing BidiBrackets.txt
+Processing IndicPositionalCategory.txt
+Processing VerticalOrientation.txt
+Processing EquivalentUnifiedIdeograph.txt
+Processing EmojiData.txt
+Finishing processing Unicode properties
+Compiling Perl properties
+Creating Perl synonyms
+Writing tables
+Making pod file
+Making test script
+Updating 'mktables.lst'
+./miniperl -Ilib -MExtUtils::Miniperl -e 'writemain(\"perlmain.c", @ARGV)' DynaLoader 
+g++-8 -c -DPERL_CORE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -ansi -O2 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings perlmain.c
+g++-8 -o perl -fstack-protector-strong -L/usr/local/lib -Wl,-E perlmain.o   libperl.a `cat ext.libs` -lpthread -lnsl -ldl -lm -lcrypt -lutil -lc 
+./miniperl -Ilib make_ext.pl lib/auto/attributes/attributes.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for attributes
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/attributes'
+Running Mkbootstrap for attributes ()
+chmod 644 "attributes.bs"
+/home/jkeenan/gitwork/perl/ext/attributes/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- attributes.bs ../../lib/auto/attributes/attributes.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/attributes/../../lib/ExtUtils/typemap'  attributes.xs > attributes.xsc
+mv attributes.xsc attributes.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.33\" -DXS_VERSION=\"0.33\" -fPIC "-I../.."   attributes.c
+rm -f ../../lib/auto/attributes/attributes.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  attributes.o  -o ../../lib/auto/attributes/attributes.so  \
+      \
+  
+chmod 755 ../../lib/auto/attributes/attributes.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/attributes'
+./miniperl -Ilib make_ext.pl lib/auto/B/B.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for B
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/B'
+Running Mkbootstrap for B ()
+chmod 644 "B.bs"
+/home/jkeenan/gitwork/perl/ext/B/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- B.bs ../../lib/auto/B/B.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/B/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/ext/B/typemap'  B.xs > B.xsc
+mv B.xsc B.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.75\" -DXS_VERSION=\"1.75\" -fPIC "-I../.."   B.c
+rm -f ../../lib/auto/B/B.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  B.o  -o ../../lib/auto/B/B.so  \
+      \
+  
+chmod 755 ../../lib/auto/B/B.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/B'
+./miniperl -Ilib make_ext.pl lib/auto/Compress/Raw/Bzip2/Bzip2.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Compress::Raw::Bzip2
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Bzip2'
+Running Mkbootstrap for Bzip2 ()
+chmod 644 "Bzip2.bs"
+/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Bzip2/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Bzip2.bs ../../lib/auto/Compress/Raw/Bzip2/Bzip2.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Bzip2/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Bzip2/typemap'  Bzip2.xs > Bzip2.xsc
+mv Bzip2.xsc Bzip2.c
+g++-8 -c  -I. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DBZ_NO_STDIO  Bzip2.c
+g++-8 -c  -I. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DBZ_NO_STDIO  blocksort.c
+g++-8 -c  -I. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DBZ_NO_STDIO  bzlib.c
+g++-8 -c  -I. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DBZ_NO_STDIO  compress.c
+g++-8 -c  -I. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DBZ_NO_STDIO  crctable.c
+g++-8 -c  -I. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DBZ_NO_STDIO  decompress.c
+decompress.c: In function ‘Int32 BZ2_decompress(DState*)’:
+decompress.c:198:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != BZ_HDR_B) RETURN(BZ_DATA_ERROR_MAGIC);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:200:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_MAGIC_2, uc);
+       ^~~~~~~~~
+decompress.c:201:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != BZ_HDR_Z) RETURN(BZ_DATA_ERROR_MAGIC);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:203:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_MAGIC_3, uc)
+       ^~~~~~~~~
+decompress.c:204:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != BZ_HDR_h) RETURN(BZ_DATA_ERROR_MAGIC);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:206:7: note: in expansion of macro ‘GET_BITS’
+       GET_BITS(BZ_X_MAGIC_4, s->blockSize100k, 8)
+       ^~~~~~~~
+decompress.c:211:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (s->smallDecompress) {
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:222:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BLKHDR_1, uc);
+       ^~~~~~~~~
+decompress.c:225:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != 0x31) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:226:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BLKHDR_2, uc);
+       ^~~~~~~~~
+decompress.c:227:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != 0x41) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:228:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BLKHDR_3, uc);
+       ^~~~~~~~~
+decompress.c:229:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != 0x59) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:230:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BLKHDR_4, uc);
+       ^~~~~~~~~
+decompress.c:231:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != 0x26) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:232:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BLKHDR_5, uc);
+       ^~~~~~~~~
+decompress.c:233:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != 0x53) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:234:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BLKHDR_6, uc);
+       ^~~~~~~~~
+decompress.c:241:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->storedBlockCRC = 0;
+       ~~~~~~~~~~~~~~~~~~^~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:242:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BCRC_1, uc);
+       ^~~~~~~~~
+decompress.c:243:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->storedBlockCRC = (s->storedBlockCRC << 8) | ((UInt32)uc);
+       ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:244:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BCRC_2, uc);
+       ^~~~~~~~~
+decompress.c:245:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->storedBlockCRC = (s->storedBlockCRC << 8) | ((UInt32)uc);
+       ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:246:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BCRC_3, uc);
+       ^~~~~~~~~
+decompress.c:247:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->storedBlockCRC = (s->storedBlockCRC << 8) | ((UInt32)uc);
+       ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:248:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_BCRC_4, uc);
+       ^~~~~~~~~
+decompress.c:249:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->storedBlockCRC = (s->storedBlockCRC << 8) | ((UInt32)uc);
+       ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:251:7: note: in expansion of macro ‘GET_BITS’
+       GET_BITS(BZ_X_RANDBIT, s->blockRandomised, 1);
+       ^~~~~~~~
+decompress.c:253:18: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->origPtr = 0;
+       ~~~~~~~~~~~^~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:254:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_ORIGPTR_1, uc);
+       ^~~~~~~~~
+decompress.c:255:18: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->origPtr = (s->origPtr << 8) | ((Int32)uc);
+       ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:256:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_ORIGPTR_2, uc);
+       ^~~~~~~~~
+decompress.c:257:18: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->origPtr = (s->origPtr << 8) | ((Int32)uc);
+       ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:258:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_ORIGPTR_3, uc);
+       ^~~~~~~~~
+decompress.c:284:17: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       alphaSize = s->nInUse+2;
+       ~~~~~~~~~~^~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:287:7: note: in expansion of macro ‘GET_BITS’
+       GET_BITS(BZ_X_SELECTOR_1, nGroups, 3);
+       ^~~~~~~~
+decompress.c:288:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (nGroups < 2 || nGroups > 6) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:289:7: note: in expansion of macro ‘GET_BITS’
+       GET_BITS(BZ_X_SELECTOR_2, nSelectors, 15);
+       ^~~~~~~~
+decompress.c:585:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != 0x72) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:586:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_ENDHDR_3, uc);
+       ^~~~~~~~~
+decompress.c:587:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != 0x45) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:588:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_ENDHDR_4, uc);
+       ^~~~~~~~~
+decompress.c:589:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != 0x38) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:590:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_ENDHDR_5, uc);
+       ^~~~~~~~~
+decompress.c:591:7: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       if (uc != 0x50) RETURN(BZ_DATA_ERROR);
+       ^~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:592:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_ENDHDR_6, uc);
+       ^~~~~~~~~
+decompress.c:595:28: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->storedCombinedCRC = 0;
+       ~~~~~~~~~~~~~~~~~~~~~^~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:596:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_CCRC_1, uc);
+       ^~~~~~~~~
+decompress.c:597:28: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->storedCombinedCRC = (s->storedCombinedCRC << 8) | ((UInt32)uc);
+       ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:598:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_CCRC_2, uc);
+       ^~~~~~~~~
+decompress.c:599:28: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->storedCombinedCRC = (s->storedCombinedCRC << 8) | ((UInt32)uc);
+       ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:600:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_CCRC_3, uc);
+       ^~~~~~~~~
+decompress.c:601:28: warning: this statement may fall through [-Wimplicit-fallthrough=]
+       s->storedCombinedCRC = (s->storedCombinedCRC << 8) | ((UInt32)uc);
+       ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+decompress.c:44:4: note: here
+    case lll: s->state = lll;                      \
+    ^~~~
+decompress.c:68:4: note: in expansion of macro ‘GET_BITS’
+    GET_BITS(lll,uuu,8)
+    ^~~~~~~~
+decompress.c:602:7: note: in expansion of macro ‘GET_UCHAR’
+       GET_UCHAR(BZ_X_CCRC_4, uc);
+       ^~~~~~~~~
+g++-8 -c  -I. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DBZ_NO_STDIO  huffman.c
+g++-8 -c  -I. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DBZ_NO_STDIO  randtable.c
+rm -f ../../lib/auto/Compress/Raw/Bzip2/Bzip2.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Bzip2.o blocksort.o bzlib.o compress.o crctable.o decompress.o huffman.o randtable.o   -o ../../lib/auto/Compress/Raw/Bzip2/Bzip2.so  \
+      \
+  
+chmod 755 ../../lib/auto/Compress/Raw/Bzip2/Bzip2.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Bzip2'
+./miniperl -Ilib make_ext.pl lib/auto/Compress/Raw/Zlib/Zlib.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Parsing config.in...
+Building Zlib enabled
+Auto Detect Gzip OS Code..
+Setting Gzip OS Code to 3 [Unix/Default]
+Looks Good.
+Generating a Unix-style Makefile
+Writing Makefile for Compress::Raw::Zlib
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Zlib'
+Running Mkbootstrap for Zlib ()
+chmod 644 "Zlib.bs"
+/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Zlib/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Zlib.bs ../../lib/auto/Compress/Raw/Zlib/Zlib.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Zlib/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Zlib/typemap'  Zlib.xs > Zlib.xsc
+mv Zlib.xsc Zlib.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  Zlib.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  adler32.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  compress.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  crc32.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  deflate.c
+deflate.c: In function ‘int deflateParams(z_streamp, int, int)’:
+deflate.c:602:28: warning: macro expands to multiple statements [-Wmultistatement-macros]
+                 CLEAR_HASH(s);
+                            ^
+deflate.c:193:5: note: in definition of macro ‘CLEAR_HASH’
+     s->head[s->hash_size-1] = NIL; \
+     ^
+deflate.c:601:13: note: some parts of macro expansion are not guarded by this ‘else’ clause
+             else
+             ^~~~
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  infback.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  inffast.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  inflate.c
+inflate.c: In function ‘int inflate(z_streamp, int)’:
+inflate.c:724:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+             state->mode = TIME;
+             ~~~~~~~~~~~~^~~~~~
+inflate.c:725:9: note: here
+         case TIME:
+         ^~~~
+inflate.c:732:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+             state->mode = OS;
+             ~~~~~~~~~~~~^~~~
+inflate.c:733:9: note: here
+         case OS:
+         ^~~~
+inflate.c:947:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+             state->mode = LENLENS;
+             ~~~~~~~~~~~~^~~~~~~~~
+inflate.c:948:9: note: here
+         case LENLENS:
+         ^~~~
+inflate.c:968:25: warning: this statement may fall through [-Wimplicit-fallthrough=]
+             state->mode = CODELENS;
+             ~~~~~~~~~~~~^~~~~~~~~~
+inflate.c:969:9: note: here
+         case CODELENS:
+         ^~~~
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  inftrees.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  trees.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  uncompr.c
+g++-8 -c  -I./zlib-src -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.081\" -DXS_VERSION=\"2.081\" -fPIC "-I../.."  -DNO_VIZ -DZ_SOLO   -DGZIP_OS_CODE=3  zutil.c
+rm -f ../../lib/auto/Compress/Raw/Zlib/Zlib.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Zlib.o adler32.o compress.o crc32.o deflate.o infback.o inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o   -o ../../lib/auto/Compress/Raw/Zlib/Zlib.so  \
+      \
+  
+chmod 755 ../../lib/auto/Compress/Raw/Zlib/Zlib.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Compress-Raw-Zlib'
+./miniperl -Ilib make_ext.pl lib/auto/Data/Dumper/Dumper.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Data::Dumper
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/Data-Dumper'
+Running Mkbootstrap for Dumper ()
+chmod 644 "Dumper.bs"
+/home/jkeenan/gitwork/perl/dist/Data-Dumper/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Dumper.bs ../../lib/auto/Data/Dumper/Dumper.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/dist/Data-Dumper/../../lib/ExtUtils/typemap'  Dumper.xs > Dumper.xsc
+mv Dumper.xsc Dumper.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.172\" -DXS_VERSION=\"2.172\" -fPIC "-I../.."   Dumper.c
+rm -f ../../lib/auto/Data/Dumper/Dumper.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Dumper.o  -o ../../lib/auto/Data/Dumper/Dumper.so  \
+      \
+  
+chmod 755 ../../lib/auto/Data/Dumper/Dumper.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/Data-Dumper'
+./miniperl -Ilib make_ext.pl lib/auto/DB_File/DB_File.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Parsing config.in...
+Looks Good.
+Generating a Unix-style Makefile
+Writing Makefile for DB_File
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/DB_File'
+Running Mkbootstrap for DB_File ()
+chmod 644 "DB_File.bs"
+/home/jkeenan/gitwork/perl/cpan/DB_File/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- DB_File.bs ../../lib/auto/DB_File/DB_File.bs 644
+g++-8 -c  -I/usr/local/BerkeleyDB/include -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.842\" -DXS_VERSION=\"1.842\" -fPIC "-I../.."  -DmDB_Prefix_t=size_t -DmDB_Hash_t=u_int32_t   version.c
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp" -noprototypes -typemap '/home/jkeenan/gitwork/perl/cpan/DB_File/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/cpan/DB_File/typemap'  DB_File.xs > DB_File.xsc
+mv DB_File.xsc DB_File.c
+g++-8 -c  -I/usr/local/BerkeleyDB/include -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.842\" -DXS_VERSION=\"1.842\" -fPIC "-I../.."  -DmDB_Prefix_t=size_t -DmDB_Hash_t=u_int32_t   DB_File.c
+rm -f ../../lib/auto/DB_File/DB_File.so
+LD_RUN_PATH="/usr/lib/x86_64-linux-gnu" g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  version.o DB_File.o  -o ../../lib/auto/DB_File/DB_File.so  \
+   -ldb   \
+  
+chmod 755 ../../lib/auto/DB_File/DB_File.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/DB_File'
+./miniperl -Ilib make_ext.pl lib/auto/Devel/Peek/Peek.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Devel::Peek
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Devel-Peek'
+Running Mkbootstrap for Peek ()
+chmod 644 "Peek.bs"
+/home/jkeenan/gitwork/perl/ext/Devel-Peek/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Peek.bs ../../lib/auto/Devel/Peek/Peek.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/Devel-Peek/../../lib/ExtUtils/typemap'  Peek.xs > Peek.xsc
+mv Peek.xsc Peek.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.27\" -DXS_VERSION=\"1.27\" -fPIC "-I../.."   Peek.c
+rm -f ../../lib/auto/Devel/Peek/Peek.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Peek.o  -o ../../lib/auto/Devel/Peek/Peek.so  \
+      \
+  
+chmod 755 ../../lib/auto/Devel/Peek/Peek.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Devel-Peek'
+./miniperl -Ilib make_ext.pl lib/auto/Devel/PPPort/PPPort.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Setting license tag...
+Generating a Unix-style Makefile
+Writing Makefile for Devel::PPPort
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/Devel-PPPort'
+"../../miniperl" "-I../../lib" PPPort_pm.PL PPPort.pm
+parts/inc/mess provides vmess, which is still marked todo for 5.6.0
+including ppphdoc
+including ppphbin
+including version
+including threads
+including limits
+including uv
+including memory
+including magic_defs
+including misc
+including mess
+including variables
+including mPUSH
+including call
+including newRV
+including newCONSTSUB
+including MY_CXT
+including format
+including SvREFCNT
+including newSV_type
+including newSVpv
+including SvPV
+including Sv_set
+including sv_xpvf
+including shared_pv
+including HvNAME
+including gv
+including warn
+including pvs
+including magic
+including cop
+including grok
+including snprintf
+including sprintf
+including exception
+including strlfuncs
+including pv_tools
+Running Mkbootstrap for PPPort ()
+chmod 644 "PPPort.bs"
+/home/jkeenan/gitwork/perl/dist/Devel-PPPort/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- PPPort.bs ../../lib/auto/Devel/PPPort/PPPort.bs 644
+"../../miniperl" "-I../../lib" "-I../../lib" PPPort_xs.PL RealPPPort.xs
+adding XS code from parts/inc/HvNAME
+adding XS code from parts/inc/MY_CXT
+adding XS code from parts/inc/SvPV
+adding XS code from parts/inc/SvREFCNT
+adding XS code from parts/inc/Sv_set
+adding XS code from parts/inc/call
+adding XS code from parts/inc/cop
+adding XS code from parts/inc/exception
+adding XS code from parts/inc/format
+adding XS code from parts/inc/grok
+adding XS code from parts/inc/gv
+adding XS code from parts/inc/limits
+adding XS code from parts/inc/mPUSH
+adding XS code from parts/inc/magic
+adding XS code from parts/inc/memory
+adding XS code from parts/inc/mess
+adding XS code from parts/inc/misc
+adding XS code from parts/inc/newCONSTSUB
+adding XS code from parts/inc/newRV
+adding XS code from parts/inc/newSV_type
+adding XS code from parts/inc/newSVpv
+adding XS code from parts/inc/pv_tools
+adding XS code from parts/inc/pvs
+adding XS code from parts/inc/shared_pv
+adding XS code from parts/inc/snprintf
+adding XS code from parts/inc/sprintf
+adding XS code from parts/inc/strlfuncs
+adding XS code from parts/inc/sv_xpvf
+adding XS code from parts/inc/threads
+adding XS code from parts/inc/uv
+adding XS code from parts/inc/variables
+adding XS code from parts/inc/warn
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp" -noprototypes -typemap '/home/jkeenan/gitwork/perl/dist/Devel-PPPort/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/dist/Devel-PPPort/typemap'  RealPPPort.xs > RealPPPort.xsc
+mv RealPPPort.xsc RealPPPort.c
+"../../miniperl" "-I../../lib" "-I../../lib" ppport_h.PL ppport.h
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"3.43\" -DXS_VERSION=\"3.43\" -fPIC "-I../.."   RealPPPort.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"3.43\" -DXS_VERSION=\"3.43\" -fPIC "-I../.."   module2.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"3.43\" -DXS_VERSION=\"3.43\" -fPIC "-I../.."   module3.c
+rm -f ../../lib/auto/Devel/PPPort/PPPort.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  RealPPPort.o module2.o module3.o  -o ../../lib/auto/Devel/PPPort/PPPort.so  \
+      \
+  
+chmod 755 ../../lib/auto/Devel/PPPort/PPPort.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/Devel-PPPort'
+./miniperl -Ilib make_ext.pl lib/auto/Digest/MD5/MD5.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Perl's config says that U32 access must be aligned.
+Generating a Unix-style Makefile
+Writing Makefile for Digest::MD5
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Digest-MD5'
+Running Mkbootstrap for MD5 ()
+chmod 644 "MD5.bs"
+/home/jkeenan/gitwork/perl/cpan/Digest-MD5/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- MD5.bs ../../lib/auto/Digest/MD5/MD5.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Digest-MD5/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/cpan/Digest-MD5/typemap'  MD5.xs > MD5.xsc
+mv MD5.xsc MD5.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.55\" -DXS_VERSION=\"2.55\" -fPIC "-I../.."  -DU32_ALIGNMENT_REQUIRED MD5.c
+MD5.xs: In function ‘MD5_CTX* get_md5_ctx(SV*)’:
+MD5.xs:510:50: warning: type qualifiers ignored on cast result type [-Wignored-qualifiers]
+      && mg->mg_virtual == (const MGVTBL * const)&vtbl_md5) {
+                                                  ^~~~~~~~
+In file included from ../../perl.h:5323,
+                 from MD5.xs:40:
+MD5.xs: In function ‘SV* new_md5_ctx(MD5_CTX*, const char*)’:
+MD5.xs:532:63: warning: type qualifiers ignored on cast result type [-Wignored-qualifiers]
+  sv_magicext(sv, NULL, PERL_MAGIC_ext, (const MGVTBL * const)&vtbl_md5, (const char *)context, 0);
+                                                               ^~~~~~~~
+../../embed.h:775:63: note: in definition of macro ‘sv_magicext’
+ #define sv_magicext(a,b,c,d,e,f) Perl_sv_magicext(aTHX_ a,b,c,d,e,f)
+                                                               ^
+rm -f ../../lib/auto/Digest/MD5/MD5.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  MD5.o  -o ../../lib/auto/Digest/MD5/MD5.so  \
+      \
+  
+chmod 755 ../../lib/auto/Digest/MD5/MD5.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Digest-MD5'
+./miniperl -Ilib make_ext.pl lib/auto/Digest/SHA/SHA.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Digest::SHA
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Digest-SHA'
+Running Mkbootstrap for SHA ()
+chmod 644 "SHA.bs"
+/home/jkeenan/gitwork/perl/cpan/Digest-SHA/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- SHA.bs ../../lib/auto/Digest/SHA/SHA.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Digest-SHA/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/cpan/Digest-SHA/typemap'  SHA.xs > SHA.xsc
+mv SHA.xsc SHA.c
+g++-8 -c  -I. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"6.02\" -DXS_VERSION=\"6.02\" -fPIC "-I../.."   SHA.c
+rm -f ../../lib/auto/Digest/SHA/SHA.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  SHA.o  -o ../../lib/auto/Digest/SHA/SHA.so  \
+      \
+  
+chmod 755 ../../lib/auto/Digest/SHA/SHA.so
+cp shasum blib/script/shasum
+/home/jkeenan/gitwork/perl/cpan/Digest-SHA/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/shasum
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Digest-SHA'
+./miniperl -Ilib make_ext.pl lib/auto/Encode/Encode.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Encode
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Encode'
+make[2]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Encode/Byte'
+Running Mkbootstrap for Byte ()
+chmod 644 "Byte.bs"
+/home/jkeenan/gitwork/perl/cpan/Encode/Byte/../../../miniperl "-I../../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Byte.bs ../../../lib/auto/Encode/Byte/Byte.bs 644
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -"O" -o byte_t.c -f byte_t.fnm
+Reading iso-8859-2 (iso-8859-2)
+Reading iso-8859-3 (iso-8859-3)
+Reading iso-8859-4 (iso-8859-4)
+Reading iso-8859-5 (iso-8859-5)
+Reading iso-8859-6 (iso-8859-6)
+Reading iso-8859-7 (iso-8859-7)
+Reading iso-8859-8 (iso-8859-8)
+Reading iso-8859-9 (iso-8859-9)
+Reading iso-8859-10 (iso-8859-10)
+Reading iso-8859-11 (iso-8859-11)
+Reading iso-8859-13 (iso-8859-13)
+Reading iso-8859-14 (iso-8859-14)
+Reading iso-8859-15 (iso-8859-15)
+Reading iso-8859-16 (iso-8859-16)
+Reading AdobeStandardEncoding (AdobeStandardEncoding)
+Reading cp1006 (cp1006)
+Reading cp1250 (cp1250)
+Reading cp1251 (cp1251)
+Reading cp1253 (cp1253)
+Reading cp1254 (cp1254)
+Reading cp1255 (cp1255)
+Reading cp1256 (cp1256)
+Reading cp1257 (cp1257)
+Reading cp1258 (cp1258)
+Reading cp424 (cp424)
+Reading cp437 (cp437)
+Reading cp737 (cp737)
+Reading cp775 (cp775)
+Reading cp850 (cp850)
+Reading cp852 (cp852)
+Reading cp855 (cp855)
+Reading cp856 (cp856)
+Reading cp857 (cp857)
+Reading cp858 (cp858)
+Reading cp860 (cp860)
+Reading cp861 (cp861)
+Reading cp862 (cp862)
+Reading cp863 (cp863)
+Reading cp864 (cp864)
+Reading cp865 (cp865)
+Reading cp866 (cp866)
+Reading cp869 (cp869)
+Reading cp874 (cp874)
+Reading hp-roman8 (hp-roman8)
+Reading koi8-f (koi8-f)
+Reading koi8-r (koi8-r)
+Reading koi8-u (koi8-u)
+Reading MacArabic (MacArabic)
+Reading MacCentralEurRoman (MacCentralEurRoman)
+Reading MacCroatian (MacCroatian)
+Reading MacCyrillic (MacCyrillic)
+Reading MacFarsi (MacFarsi)
+Reading MacGreek (MacGreek)
+Reading MacHebrew (MacHebrew)
+Reading MacIcelandic (MacIcelandic)
+Reading MacRomanian (MacRomanian)
+Reading MacRumanian (MacRumanian)
+Reading MacRoman (MacRoman)
+Reading MacSami (MacSami)
+Reading MacThai (MacThai)
+Reading MacTurkish (MacTurkish)
+Reading MacUkrainian (MacUkrainian)
+Reading nextstep (nextstep)
+Reading viscii (viscii)
+"../../../miniperl" "-I../../../lib" "../../../lib/ExtUtils/xsubpp"  -nolinenumbers -typemap '/home/jkeenan/gitwork/perl/cpan/Encode/Byte/../../../lib/ExtUtils/typemap'  Byte.xs > Byte.xsc
+mv Byte.xsc Byte.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   Byte.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   byte_t.c
+rm -f ../../../lib/auto/Encode/Byte/Byte.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Byte.o byte_t.o  -o ../../../lib/auto/Encode/Byte/Byte.so  \
+      \
+  
+chmod 755 ../../../lib/auto/Encode/Byte/Byte.so
+make[2]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Encode/Byte'
+make[2]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Encode/CN'
+Running Mkbootstrap for CN ()
+chmod 644 "CN.bs"
+/home/jkeenan/gitwork/perl/cpan/Encode/CN/../../../miniperl "-I../../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- CN.bs ../../../lib/auto/Encode/CN/CN.bs 644
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o cp_00_t.c -f cp_00_t.fnm
+Reading cp936 (cp936)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o eu_01_t.c -f eu_01_t.fnm
+Reading euc-cn (euc-cn)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o gb_02_t.c -f gb_02_t.fnm
+Reading gb12345-raw (gb12345-raw)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o gb_03_t.c -f gb_03_t.fnm
+Reading gb2312-raw (gb2312-raw)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o ir_04_t.c -f ir_04_t.fnm
+Reading iso-ir-165 (iso-ir-165)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o ma_05_t.c -f ma_05_t.fnm
+Reading MacChineseSimp (MacChineseSimp)
+"../../../miniperl" "-I../../../lib" "../../../lib/ExtUtils/xsubpp" -noprototypes -nolinenumbers -typemap '/home/jkeenan/gitwork/perl/cpan/Encode/CN/../../../lib/ExtUtils/typemap'  CN.xs > CN.xsc
+mv CN.xsc CN.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   CN.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   cp_00_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   eu_01_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   gb_02_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   gb_03_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   ir_04_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   ma_05_t.c
+rm -f ../../../lib/auto/Encode/CN/CN.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  CN.o cp_00_t.o eu_01_t.o gb_02_t.o gb_03_t.o ir_04_t.o ma_05_t.o  -o ../../../lib/auto/Encode/CN/CN.so  \
+      \
+  
+chmod 755 ../../../lib/auto/Encode/CN/CN.so
+make[2]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Encode/CN'
+make[2]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Encode/EBCDIC'
+Running Mkbootstrap for EBCDIC ()
+chmod 644 "EBCDIC.bs"
+/home/jkeenan/gitwork/perl/cpan/Encode/EBCDIC/../../../miniperl "-I../../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- EBCDIC.bs ../../../lib/auto/Encode/EBCDIC/EBCDIC.bs 644
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -"O" -o ebcdic_t.c -f ebcdic_t.fnm
+Reading cp37 (cp37)
+Reading cp1026 (cp1026)
+Reading cp1047 (cp1047)
+Reading cp500 (cp500)
+Reading cp875 (cp875)
+Reading posix-bc (posix-bc)
+"../../../miniperl" "-I../../../lib" "../../../lib/ExtUtils/xsubpp"  -nolinenumbers -typemap '/home/jkeenan/gitwork/perl/cpan/Encode/EBCDIC/../../../lib/ExtUtils/typemap'  EBCDIC.xs > EBCDIC.xsc
+mv EBCDIC.xsc EBCDIC.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.02\" -DXS_VERSION=\"2.02\" -fPIC "-I../../.."   EBCDIC.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.02\" -DXS_VERSION=\"2.02\" -fPIC "-I../../.."   ebcdic_t.c
+rm -f ../../../lib/auto/Encode/EBCDIC/EBCDIC.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  EBCDIC.o ebcdic_t.o  -o ../../../lib/auto/Encode/EBCDIC/EBCDIC.so  \
+      \
+  
+chmod 755 ../../../lib/auto/Encode/EBCDIC/EBCDIC.so
+make[2]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Encode/EBCDIC'
+make[2]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Encode/JP'
+Running Mkbootstrap for JP ()
+chmod 644 "JP.bs"
+/home/jkeenan/gitwork/perl/cpan/Encode/JP/../../../miniperl "-I../../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- JP.bs ../../../lib/auto/Encode/JP/JP.bs 644
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o cp_00_t.c -f cp_00_t.fnm
+Reading cp932 (cp932)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o eu_01_t.c -f eu_01_t.fnm
+Reading euc-jp (euc-jp)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o ji_02_t.c -f ji_02_t.fnm
+Reading jis0201-raw (jis0201-raw)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o ji_03_t.c -f ji_03_t.fnm
+Reading jis0208-raw (jis0208-raw)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o ji_04_t.c -f ji_04_t.fnm
+Reading jis0212-raw (jis0212-raw)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o ma_05_t.c -f ma_05_t.fnm
+Reading MacJapanese (MacJapanese)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o sh_06_t.c -f sh_06_t.fnm
+Reading shiftjis (shiftjis)
+"../../../miniperl" "-I../../../lib" "../../../lib/ExtUtils/xsubpp"  -nolinenumbers -typemap '/home/jkeenan/gitwork/perl/cpan/Encode/JP/../../../lib/ExtUtils/typemap'  JP.xs > JP.xsc
+mv JP.xsc JP.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   JP.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   cp_00_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   eu_01_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   ji_02_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   ji_03_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   ji_04_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   ma_05_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.04\" -DXS_VERSION=\"2.04\" -fPIC "-I../../.."   sh_06_t.c
+rm -f ../../../lib/auto/Encode/JP/JP.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  JP.o cp_00_t.o eu_01_t.o ji_02_t.o ji_03_t.o ji_04_t.o ma_05_t.o sh_06_t.o  -o ../../../lib/auto/Encode/JP/JP.so  \
+      \
+  
+chmod 755 ../../../lib/auto/Encode/JP/JP.so
+make[2]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Encode/JP'
+make[2]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Encode/KR'
+Running Mkbootstrap for KR ()
+chmod 644 "KR.bs"
+/home/jkeenan/gitwork/perl/cpan/Encode/KR/../../../miniperl "-I../../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- KR.bs ../../../lib/auto/Encode/KR/KR.bs 644
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o cp_00_t.c -f cp_00_t.fnm
+Reading cp949 (cp949)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o eu_01_t.c -f eu_01_t.fnm
+Reading euc-kr (euc-kr)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o jo_02_t.c -f jo_02_t.fnm
+Reading johab (johab)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o ks_03_t.c -f ks_03_t.fnm
+Reading ksc5601-raw (ksc5601-raw)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o ma_04_t.c -f ma_04_t.fnm
+Reading MacKorean (MacKorean)
+"../../../miniperl" "-I../../../lib" "../../../lib/ExtUtils/xsubpp"  -nolinenumbers -typemap '/home/jkeenan/gitwork/perl/cpan/Encode/KR/../../../lib/ExtUtils/typemap'  KR.xs > KR.xsc
+mv KR.xsc KR.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   KR.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   cp_00_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   eu_01_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   jo_02_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   ks_03_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   ma_04_t.c
+rm -f ../../../lib/auto/Encode/KR/KR.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  KR.o cp_00_t.o eu_01_t.o jo_02_t.o ks_03_t.o ma_04_t.o  -o ../../../lib/auto/Encode/KR/KR.so  \
+      \
+  
+chmod 755 ../../../lib/auto/Encode/KR/KR.so
+make[2]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Encode/KR'
+make[2]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Encode/Symbol'
+Running Mkbootstrap for Symbol ()
+chmod 644 "Symbol.bs"
+/home/jkeenan/gitwork/perl/cpan/Encode/Symbol/../../../miniperl "-I../../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Symbol.bs ../../../lib/auto/Encode/Symbol/Symbol.bs 644
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -"O" -o symbol_t.c -f symbol_t.fnm
+Reading AdobeSymbol (AdobeSymbol)
+Reading AdobeZdingbat (AdobeZdingbat)
+Reading dingbats (dingbats)
+Reading MacDingbats (MacDingbats)
+Reading MacSymbol (MacSymbol)
+Reading symbol (symbol)
+"../../../miniperl" "-I../../../lib" "../../../lib/ExtUtils/xsubpp"  -nolinenumbers -typemap '/home/jkeenan/gitwork/perl/cpan/Encode/Symbol/../../../lib/ExtUtils/typemap'  Symbol.xs > Symbol.xsc
+mv Symbol.xsc Symbol.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.02\" -DXS_VERSION=\"2.02\" -fPIC "-I../../.."   Symbol.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.02\" -DXS_VERSION=\"2.02\" -fPIC "-I../../.."   symbol_t.c
+rm -f ../../../lib/auto/Encode/Symbol/Symbol.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Symbol.o symbol_t.o  -o ../../../lib/auto/Encode/Symbol/Symbol.so  \
+      \
+  
+chmod 755 ../../../lib/auto/Encode/Symbol/Symbol.so
+make[2]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Encode/Symbol'
+make[2]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Encode/TW'
+Running Mkbootstrap for TW ()
+chmod 644 "TW.bs"
+/home/jkeenan/gitwork/perl/cpan/Encode/TW/../../../miniperl "-I../../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- TW.bs ../../../lib/auto/Encode/TW/TW.bs 644
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o bi_00_t.c -f bi_00_t.fnm
+Reading big5-eten (big5-eten)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o bi_01_t.c -f bi_01_t.fnm
+Reading big5-hkscs (big5-hkscs)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o cp_02_t.c -f cp_02_t.fnm
+Reading cp950 (cp950)
+"../../../miniperl" "-I../../../lib" ../bin/enc2xs -"Q" -o ma_03_t.c -f ma_03_t.fnm
+Reading MacChineseTrad (MacChineseTrad)
+"../../../miniperl" "-I../../../lib" "../../../lib/ExtUtils/xsubpp"  -nolinenumbers -typemap '/home/jkeenan/gitwork/perl/cpan/Encode/TW/../../../lib/ExtUtils/typemap'  TW.xs > TW.xsc
+mv TW.xsc TW.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   TW.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   bi_00_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   bi_01_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   cp_02_t.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.03\" -DXS_VERSION=\"2.03\" -fPIC "-I../../.."   ma_03_t.c
+rm -f ../../../lib/auto/Encode/TW/TW.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  TW.o bi_00_t.o bi_01_t.o cp_02_t.o ma_03_t.o  -o ../../../lib/auto/Encode/TW/TW.so  \
+      \
+  
+chmod 755 ../../../lib/auto/Encode/TW/TW.so
+make[2]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Encode/TW'
+make[2]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Encode/Unicode'
+Running Mkbootstrap for Unicode ()
+chmod 644 "Unicode.bs"
+/home/jkeenan/gitwork/perl/cpan/Encode/Unicode/../../../miniperl "-I../../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Unicode.bs ../../../lib/auto/Encode/Unicode/Unicode.bs 644
+"../../../miniperl" "-I../../../lib" "../../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Encode/Unicode/../../../lib/ExtUtils/typemap'  Unicode.xs > Unicode.xsc
+mv Unicode.xsc Unicode.c
+g++-8 -c -I./Encode  -I../Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.17\" -DXS_VERSION=\"2.17\" -fPIC "-I../../.."   Unicode.c
+Unicode.xs: In function ‘UV enc_unpack(U8**, U8*, STRLEN, U8)’:
+Unicode.xs:70:4: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  v = (v << 8) | *s++;
+  ~~^~~~~~~~~~~~~~~~~
+Unicode.xs:71:5: note: here
+     case 'n':
+     ^~~~
+rm -f ../../../lib/auto/Encode/Unicode/Unicode.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Unicode.o  -o ../../../lib/auto/Encode/Unicode/Unicode.so  \
+      \
+  
+chmod 755 ../../../lib/auto/Encode/Unicode/Unicode.so
+make[2]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Encode/Unicode'
+Running Mkbootstrap for Encode ()
+chmod 644 "Encode.bs"
+/home/jkeenan/gitwork/perl/cpan/Encode/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Encode.bs ../../lib/auto/Encode/Encode.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Encode/../../lib/ExtUtils/typemap'  Encode.xs > Encode.xsc
+mv Encode.xsc Encode.c
+"../../miniperl" "-I../../lib" bin/enc2xs -"Q" -"O" -o def_t.c -f def_t.fnm
+Reading iso-8859-1 (iso-8859-1)
+Reading ascii (ascii)
+Reading cp1252 (cp1252)
+Reading ascii-ctrl (ascii-ctrl)
+Reading null (null)
+g++-8 -c  -I./Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.97\" -DXS_VERSION=\"2.97\" -fPIC "-I../.."   Encode.c
+g++-8 -c  -I./Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.97\" -DXS_VERSION=\"2.97\" -fPIC "-I../.."   def_t.c
+g++-8 -c  -I./Encode -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.97\" -DXS_VERSION=\"2.97\" -fPIC "-I../.."   encengine.c
+rm -f ../../lib/auto/Encode/Encode.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Encode.o def_t.o encengine.o  -o ../../lib/auto/Encode/Encode.so  \
+      \
+  
+chmod 755 ../../lib/auto/Encode/Encode.so
+cp bin/enc2xs blib/script/enc2xs
+/home/jkeenan/gitwork/perl/cpan/Encode/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/enc2xs
+cp bin/encguess blib/script/encguess
+/home/jkeenan/gitwork/perl/cpan/Encode/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/encguess
+cp bin/piconv blib/script/piconv
+/home/jkeenan/gitwork/perl/cpan/Encode/../../miniperl "-I../../lib" -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/piconv
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Encode'
+./miniperl -Ilib make_ext.pl lib/auto/Fcntl/Fcntl.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Fcntl
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Fcntl'
+Running Mkbootstrap for Fcntl ()
+chmod 644 "Fcntl.bs"
+/home/jkeenan/gitwork/perl/ext/Fcntl/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Fcntl.bs ../../lib/auto/Fcntl/Fcntl.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp" -noprototypes -typemap '/home/jkeenan/gitwork/perl/ext/Fcntl/../../lib/ExtUtils/typemap'  Fcntl.xs > Fcntl.xsc
+mv Fcntl.xsc Fcntl.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.13\" -DXS_VERSION=\"1.13\" -fPIC "-I../.."   Fcntl.c
+rm -f ../../lib/auto/Fcntl/Fcntl.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Fcntl.o  -o ../../lib/auto/Fcntl/Fcntl.so  \
+      \
+  
+chmod 755 ../../lib/auto/Fcntl/Fcntl.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Fcntl'
+./miniperl -Ilib make_ext.pl lib/auto/File/DosGlob/DosGlob.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for File::DosGlob
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/File-DosGlob'
+Running Mkbootstrap for DosGlob ()
+chmod 644 "DosGlob.bs"
+/home/jkeenan/gitwork/perl/ext/File-DosGlob/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- DosGlob.bs ../../lib/auto/File/DosGlob/DosGlob.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/File-DosGlob/../../lib/ExtUtils/typemap'  DosGlob.xs > DosGlob.xsc
+mv DosGlob.xsc DosGlob.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.12\" -DXS_VERSION=\"1.12\" -fPIC "-I../.."   DosGlob.c
+rm -f ../../lib/auto/File/DosGlob/DosGlob.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  DosGlob.o  -o ../../lib/auto/File/DosGlob/DosGlob.so  \
+      \
+  
+chmod 755 ../../lib/auto/File/DosGlob/DosGlob.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/File-DosGlob'
+./miniperl -Ilib make_ext.pl lib/auto/File/Glob/Glob.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for File::Glob
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/File-Glob'
+Running Mkbootstrap for Glob ()
+chmod 644 "Glob.bs"
+/home/jkeenan/gitwork/perl/ext/File-Glob/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Glob.bs ../../lib/auto/File/Glob/Glob.bs 644
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.31\" -DXS_VERSION=\"1.31\" -fPIC "-I../.."   bsd_glob.c
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/File-Glob/../../lib/ExtUtils/typemap'  Glob.xs > Glob.xsc
+mv Glob.xsc Glob.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.31\" -DXS_VERSION=\"1.31\" -fPIC "-I../.."   Glob.c
+rm -f ../../lib/auto/File/Glob/Glob.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  bsd_glob.o Glob.o  -o ../../lib/auto/File/Glob/Glob.so  \
+      \
+  
+chmod 755 ../../lib/auto/File/Glob/Glob.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/File-Glob'
+./miniperl -Ilib make_ext.pl lib/auto/Filter/Util/Call/Call.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Filter::Util::Call
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Filter-Util-Call'
+Running Mkbootstrap for Call ()
+chmod 644 "Call.bs"
+/home/jkeenan/gitwork/perl/cpan/Filter-Util-Call/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Call.bs ../../lib/auto/Filter/Util/Call/Call.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Filter-Util-Call/../../lib/ExtUtils/typemap'  Call.xs > Call.xsc
+mv Call.xsc Call.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.59\" -DXS_VERSION=\"1.59\" -fPIC "-I../.."   Call.c
+rm -f ../../lib/auto/Filter/Util/Call/Call.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Call.o  -o ../../lib/auto/Filter/Util/Call/Call.so  \
+      \
+  
+chmod 755 ../../lib/auto/Filter/Util/Call/Call.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Filter-Util-Call'
+./miniperl -Ilib make_ext.pl lib/auto/GDBM_File/GDBM_File.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for GDBM_File
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/GDBM_File'
+Running Mkbootstrap for GDBM_File ()
+chmod 644 "GDBM_File.bs"
+/home/jkeenan/gitwork/perl/ext/GDBM_File/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- GDBM_File.bs ../../lib/auto/GDBM_File/GDBM_File.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp" -noprototypes -typemap '/home/jkeenan/gitwork/perl/ext/GDBM_File/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/ext/GDBM_File/typemap'  GDBM_File.xs > GDBM_File.xsc
+mv GDBM_File.xsc GDBM_File.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.17\" -DXS_VERSION=\"1.17\" -fPIC "-I../.."   GDBM_File.c
+rm -f ../../lib/auto/GDBM_File/GDBM_File.so
+LD_RUN_PATH="/usr/lib/x86_64-linux-gnu" g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  GDBM_File.o  -o ../../lib/auto/GDBM_File/GDBM_File.so  \
+   -lgdbm   \
+  
+chmod 755 ../../lib/auto/GDBM_File/GDBM_File.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/GDBM_File'
+./miniperl -Ilib make_ext.pl lib/auto/Hash/Util/Util.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Hash::Util
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Hash-Util'
+Running Mkbootstrap for Util ()
+chmod 644 "Util.bs"
+/home/jkeenan/gitwork/perl/ext/Hash-Util/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Util.bs ../../lib/auto/Hash/Util/Util.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/Hash-Util/../../lib/ExtUtils/typemap'  Util.xs > Util.xsc
+mv Util.xsc Util.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.22\" -DXS_VERSION=\"0.22\" -fPIC "-I../.."  -DPERL_EXT Util.c
+rm -f ../../lib/auto/Hash/Util/Util.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Util.o  -o ../../lib/auto/Hash/Util/Util.so  \
+      \
+  
+chmod 755 ../../lib/auto/Hash/Util/Util.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Hash-Util'
+./miniperl -Ilib make_ext.pl lib/auto/Hash/Util/FieldHash/FieldHash.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Hash::Util::FieldHash
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Hash-Util-FieldHash'
+Running Mkbootstrap for FieldHash ()
+chmod 644 "FieldHash.bs"
+/home/jkeenan/gitwork/perl/ext/Hash-Util-FieldHash/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- FieldHash.bs ../../lib/auto/Hash/Util/FieldHash/FieldHash.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/Hash-Util-FieldHash/../../lib/ExtUtils/typemap'  FieldHash.xs > FieldHash.xsc
+mv FieldHash.xsc FieldHash.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.20\" -DXS_VERSION=\"1.20\" -fPIC "-I../.."   FieldHash.c
+rm -f ../../lib/auto/Hash/Util/FieldHash/FieldHash.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  FieldHash.o  -o ../../lib/auto/Hash/Util/FieldHash/FieldHash.so  \
+      \
+  
+chmod 755 ../../lib/auto/Hash/Util/FieldHash/FieldHash.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Hash-Util-FieldHash'
+./miniperl -Ilib make_ext.pl lib/auto/I18N/Langinfo/Langinfo.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for I18N::Langinfo
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/I18N-Langinfo'
+Running Mkbootstrap for Langinfo ()
+chmod 644 "Langinfo.bs"
+/home/jkeenan/gitwork/perl/ext/I18N-Langinfo/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Langinfo.bs ../../lib/auto/I18N/Langinfo/Langinfo.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/I18N-Langinfo/../../lib/ExtUtils/typemap'  Langinfo.xs > Langinfo.xsc
+mv Langinfo.xsc Langinfo.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.17\" -DXS_VERSION=\"0.17\" -fPIC "-I../.."   Langinfo.c
+rm -f ../../lib/auto/I18N/Langinfo/Langinfo.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Langinfo.o  -o ../../lib/auto/I18N/Langinfo/Langinfo.so  \
+      \
+  
+chmod 755 ../../lib/auto/I18N/Langinfo/Langinfo.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/I18N-Langinfo'
+./miniperl -Ilib make_ext.pl lib/auto/IO/IO.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for IO
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/IO'
+Running Mkbootstrap for IO ()
+chmod 644 "IO.bs"
+/home/jkeenan/gitwork/perl/dist/IO/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- IO.bs ../../lib/auto/IO/IO.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/dist/IO/../../lib/ExtUtils/typemap'  IO.xs > IO.xsc
+mv IO.xsc IO.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.39\" -DXS_VERSION=\"1.39\" -fPIC "-I../.."   IO.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.39\" -DXS_VERSION=\"1.39\" -fPIC "-I../.."   poll.c
+rm -f ../../lib/auto/IO/IO.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  IO.o poll.o  -o ../../lib/auto/IO/IO.so  \
+      \
+  
+chmod 755 ../../lib/auto/IO/IO.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/IO'
+./miniperl -Ilib make_ext.pl lib/auto/IPC/SysV/SysV.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Setting license tag...
+Generating a Unix-style Makefile
+Writing Makefile for IPC::SysV
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/IPC-SysV'
+Running Mkbootstrap for SysV ()
+chmod 644 "SysV.bs"
+/home/jkeenan/gitwork/perl/cpan/IPC-SysV/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- SysV.bs ../../lib/auto/IPC/SysV/SysV.bs 644
+make[2]: Entering directory '/home/jkeenan/gitwork/perl/cpan/IPC-SysV'
+"../../miniperl" -I../../lib -I../../lib regen.pl
+Writing const-xs.inc
+Writing const-c.inc
+make[2]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/IPC-SysV'
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/IPC-SysV/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/cpan/IPC-SysV/typemap'  SysV.xs > SysV.xsc
+mv SysV.xsc SysV.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.07\" -DXS_VERSION=\"2.07\" -fPIC "-I../.."   SysV.c
+rm -f ../../lib/auto/IPC/SysV/SysV.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  SysV.o  -o ../../lib/auto/IPC/SysV/SysV.so  \
+      \
+  
+chmod 755 ../../lib/auto/IPC/SysV/SysV.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/IPC-SysV'
+./miniperl -Ilib make_ext.pl lib/auto/List/Util/Util.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for List::Util
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Scalar-List-Utils'
+Running Mkbootstrap for Util ()
+chmod 644 "Util.bs"
+/home/jkeenan/gitwork/perl/cpan/Scalar-List-Utils/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Util.bs ../../lib/auto/List/Util/Util.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Scalar-List-Utils/../../lib/ExtUtils/typemap'  ListUtil.xs > ListUtil.xsc
+mv ListUtil.xsc ListUtil.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.50\" -DXS_VERSION=\"1.50\" -fPIC "-I../.."  -DPERL_EXT ListUtil.c
+rm -f ../../lib/auto/List/Util/Util.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  ListUtil.o  -o ../../lib/auto/List/Util/Util.so  \
+      \
+  
+chmod 755 ../../lib/auto/List/Util/Util.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Scalar-List-Utils'
+./miniperl -Ilib make_ext.pl lib/auto/Math/BigInt/FastCalc/FastCalc.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Math::BigInt::FastCalc
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Math-BigInt-FastCalc'
+Running Mkbootstrap for FastCalc ()
+chmod 644 "FastCalc.bs"
+/home/jkeenan/gitwork/perl/cpan/Math-BigInt-FastCalc/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- FastCalc.bs ../../lib/auto/Math/BigInt/FastCalc/FastCalc.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Math-BigInt-FastCalc/../../lib/ExtUtils/typemap'  FastCalc.xs > FastCalc.xsc
+mv FastCalc.xsc FastCalc.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.5007\" -DXS_VERSION=\"0.5007\" -fPIC "-I../.."   FastCalc.c
+rm -f ../../lib/auto/Math/BigInt/FastCalc/FastCalc.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  FastCalc.o  -o ../../lib/auto/Math/BigInt/FastCalc/FastCalc.so  \
+      \
+  
+chmod 755 ../../lib/auto/Math/BigInt/FastCalc/FastCalc.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Math-BigInt-FastCalc'
+./miniperl -Ilib make_ext.pl lib/auto/MIME/Base64/Base64.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for MIME::Base64
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/MIME-Base64'
+Running Mkbootstrap for Base64 ()
+chmod 644 "Base64.bs"
+/home/jkeenan/gitwork/perl/cpan/MIME-Base64/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Base64.bs ../../lib/auto/MIME/Base64/Base64.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/MIME-Base64/../../lib/ExtUtils/typemap'  Base64.xs > Base64.xsc
+mv Base64.xsc Base64.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"3.15\" -DXS_VERSION=\"3.15\" -fPIC "-I../.."   Base64.c
+rm -f ../../lib/auto/MIME/Base64/Base64.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Base64.o  -o ../../lib/auto/MIME/Base64/Base64.so  \
+      \
+  
+chmod 755 ../../lib/auto/MIME/Base64/Base64.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/MIME-Base64'
+./miniperl -Ilib make_ext.pl lib/auto/mro/mro.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for mro
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/mro'
+Running Mkbootstrap for mro ()
+chmod 644 "mro.bs"
+/home/jkeenan/gitwork/perl/ext/mro/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- mro.bs ../../lib/auto/mro/mro.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/mro/../../lib/ExtUtils/typemap'  mro.xs > mro.xsc
+mv mro.xsc mro.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.22\" -DXS_VERSION=\"1.22\" -fPIC "-I../.."   mro.c
+rm -f ../../lib/auto/mro/mro.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  mro.o  -o ../../lib/auto/mro/mro.so  \
+      \
+  
+chmod 755 ../../lib/auto/mro/mro.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/mro'
+./miniperl -Ilib make_ext.pl lib/auto/Opcode/Opcode.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Opcode
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Opcode'
+Running Mkbootstrap for Opcode ()
+chmod 644 "Opcode.bs"
+/home/jkeenan/gitwork/perl/ext/Opcode/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Opcode.bs ../../lib/auto/Opcode/Opcode.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/Opcode/../../lib/ExtUtils/typemap'  Opcode.xs > Opcode.xsc
+mv Opcode.xsc Opcode.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.43\" -DXS_VERSION=\"1.43\" -fPIC "-I../.."   Opcode.c
+rm -f ../../lib/auto/Opcode/Opcode.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Opcode.o  -o ../../lib/auto/Opcode/Opcode.so  \
+      \
+  
+chmod 755 ../../lib/auto/Opcode/Opcode.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Opcode'
+./miniperl -Ilib make_ext.pl lib/auto/PerlIO/encoding/encoding.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for PerlIO::encoding
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/PerlIO-encoding'
+Running Mkbootstrap for encoding ()
+chmod 644 "encoding.bs"
+/home/jkeenan/gitwork/perl/ext/PerlIO-encoding/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- encoding.bs ../../lib/auto/PerlIO/encoding/encoding.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/PerlIO-encoding/../../lib/ExtUtils/typemap'  encoding.xs > encoding.xsc
+mv encoding.xsc encoding.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.26\" -DXS_VERSION=\"0.26\" -fPIC "-I../.."   encoding.c
+rm -f ../../lib/auto/PerlIO/encoding/encoding.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  encoding.o  -o ../../lib/auto/PerlIO/encoding/encoding.so  \
+      \
+  
+chmod 755 ../../lib/auto/PerlIO/encoding/encoding.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/PerlIO-encoding'
+./miniperl -Ilib make_ext.pl lib/auto/PerlIO/mmap/mmap.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for PerlIO::mmap
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/PerlIO-mmap'
+Running Mkbootstrap for mmap ()
+chmod 644 "mmap.bs"
+/home/jkeenan/gitwork/perl/ext/PerlIO-mmap/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- mmap.bs ../../lib/auto/PerlIO/mmap/mmap.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/PerlIO-mmap/../../lib/ExtUtils/typemap'  mmap.xs > mmap.xsc
+mv mmap.xsc mmap.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.016\" -DXS_VERSION=\"0.016\" -fPIC "-I../.."   mmap.c
+rm -f ../../lib/auto/PerlIO/mmap/mmap.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  mmap.o  -o ../../lib/auto/PerlIO/mmap/mmap.so  \
+      \
+  
+chmod 755 ../../lib/auto/PerlIO/mmap/mmap.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/PerlIO-mmap'
+./miniperl -Ilib make_ext.pl lib/auto/PerlIO/scalar/scalar.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for PerlIO::scalar
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/PerlIO-scalar'
+Running Mkbootstrap for scalar ()
+chmod 644 "scalar.bs"
+/home/jkeenan/gitwork/perl/ext/PerlIO-scalar/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- scalar.bs ../../lib/auto/PerlIO/scalar/scalar.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/PerlIO-scalar/../../lib/ExtUtils/typemap'  scalar.xs > scalar.xsc
+mv scalar.xsc scalar.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.30\" -DXS_VERSION=\"0.30\" -fPIC "-I../.."   scalar.c
+rm -f ../../lib/auto/PerlIO/scalar/scalar.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  scalar.o  -o ../../lib/auto/PerlIO/scalar/scalar.so  \
+      \
+  
+chmod 755 ../../lib/auto/PerlIO/scalar/scalar.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/PerlIO-scalar'
+./miniperl -Ilib make_ext.pl lib/auto/PerlIO/via/via.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for PerlIO::via
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/PerlIO-via'
+Running Mkbootstrap for via ()
+chmod 644 "via.bs"
+/home/jkeenan/gitwork/perl/ext/PerlIO-via/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- via.bs ../../lib/auto/PerlIO/via/via.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/PerlIO-via/../../lib/ExtUtils/typemap'  via.xs > via.xsc
+mv via.xsc via.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.17\" -DXS_VERSION=\"0.17\" -fPIC "-I../.."   via.c
+rm -f ../../lib/auto/PerlIO/via/via.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  via.o  -o ../../lib/auto/PerlIO/via/via.so  \
+      \
+  
+chmod 755 ../../lib/auto/PerlIO/via/via.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/PerlIO-via'
+./miniperl -Ilib make_ext.pl lib/auto/POSIX/POSIX.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Warning (mostly harmless): No library found for -lposix
+Warning (mostly harmless): No library found for -lcposix
+Generating a Unix-style Makefile
+Writing Makefile for POSIX
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/POSIX'
+Running Mkbootstrap for POSIX ()
+chmod 644 "POSIX.bs"
+/home/jkeenan/gitwork/perl/ext/POSIX/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- POSIX.bs ../../lib/auto/POSIX/POSIX.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp" -noprototypes -typemap '/home/jkeenan/gitwork/perl/ext/POSIX/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/ext/POSIX/typemap'  POSIX.xs > POSIX.xsc
+mv POSIX.xsc POSIX.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DSTRUCT_TM_HASZONE -DHINT_SC_EXIST -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.85\" -DXS_VERSION=\"1.85\" -fPIC "-I../.."   POSIX.c
+rm -f ../../lib/auto/POSIX/POSIX.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  POSIX.o  -o ../../lib/auto/POSIX/POSIX.so  \
+   -lm   \
+  
+chmod 755 ../../lib/auto/POSIX/POSIX.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/POSIX'
+./miniperl -Ilib make_ext.pl lib/auto/re/re.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for re
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/re'
+Running Mkbootstrap for re ()
+chmod 644 "re.bs"
+/home/jkeenan/gitwork/perl/ext/re/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- re.bs ../../lib/auto/re/re.bs 644
+rm -f re_exec.c
+cp ../../regexec.c re_exec.c
+rm -f invlist_inline.h
+cp ../../invlist_inline.h invlist_inline.h
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.36\" -DXS_VERSION=\"0.36\" -fPIC "-I../.."  -DPERL_EXT_RE_BUILD -DPERL_EXT_RE_DEBUG -DPERL_EXT re_exec.c
+rm -f re_comp.c
+cp ../../regcomp.c re_comp.c
+rm -f dquote.c
+cp ../../dquote.c dquote.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.36\" -DXS_VERSION=\"0.36\" -fPIC "-I../.."  -DPERL_EXT_RE_BUILD -DPERL_EXT_RE_DEBUG -DPERL_EXT re_comp.c
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp" -noprototypes -typemap '/home/jkeenan/gitwork/perl/ext/re/../../lib/ExtUtils/typemap'  re.xs > re.xsc
+mv re.xsc re.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.36\" -DXS_VERSION=\"0.36\" -fPIC "-I../.."  -DPERL_EXT_RE_BUILD -DPERL_EXT_RE_DEBUG -DPERL_EXT re.c
+rm -f ../../lib/auto/re/re.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  re_exec.o re_comp.o re.o  -o ../../lib/auto/re/re.so  \
+      \
+  
+chmod 755 ../../lib/auto/re/re.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/re'
+./miniperl -Ilib make_ext.pl lib/auto/SDBM_File/SDBM_File.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for SDBM_File
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/SDBM_File'
+Running Mkbootstrap for SDBM_File ()
+chmod 644 "SDBM_File.bs"
+/home/jkeenan/gitwork/perl/ext/SDBM_File/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- SDBM_File.bs ../../lib/auto/SDBM_File/SDBM_File.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/SDBM_File/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/ext/SDBM_File/typemap'  SDBM_File.xs > SDBM_File.xsc
+mv SDBM_File.xsc SDBM_File.c
+g++-8 -c  -I../.. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.14\" -DXS_VERSION=\"1.14\" -fPIC "-I../.."  -DSDBM -DDUFF SDBM_File.c
+g++-8 -c  -I../.. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.14\" -DXS_VERSION=\"1.14\" -fPIC "-I../.."  -DSDBM -DDUFF hash.c
+g++-8 -c  -I../.. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.14\" -DXS_VERSION=\"1.14\" -fPIC "-I../.."  -DSDBM -DDUFF pair.c
+g++-8 -c  -I../.. -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.14\" -DXS_VERSION=\"1.14\" -fPIC "-I../.."  -DSDBM -DDUFF sdbm.c
+rm -f ../../lib/auto/SDBM_File/SDBM_File.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  SDBM_File.o hash.o pair.o sdbm.o  -o ../../lib/auto/SDBM_File/SDBM_File.so  \
+      \
+  
+chmod 755 ../../lib/auto/SDBM_File/SDBM_File.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/SDBM_File'
+./miniperl -Ilib make_ext.pl lib/auto/Socket/Socket.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Socket
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Socket'
+Running Mkbootstrap for Socket ()
+chmod 644 "Socket.bs"
+/home/jkeenan/gitwork/perl/cpan/Socket/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Socket.bs ../../lib/auto/Socket/Socket.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp" -noprototypes -typemap '/home/jkeenan/gitwork/perl/cpan/Socket/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/cpan/Socket/typemap'  Socket.xs > Socket.xsc
+mv Socket.xsc Socket.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.027\" -DXS_VERSION=\"2.027\" -fPIC "-I../.."   Socket.c
+rm -f ../../lib/auto/Socket/Socket.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Socket.o  -o ../../lib/auto/Socket/Socket.so  \
+      \
+  
+chmod 755 ../../lib/auto/Socket/Socket.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Socket'
+./miniperl -Ilib make_ext.pl lib/auto/Storable/Storable.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Storable
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/Storable'
+"../../miniperl" "-I../../lib" Storable.pm.PL
+Running Mkbootstrap for Storable ()
+chmod 644 "Storable.bs"
+/home/jkeenan/gitwork/perl/dist/Storable/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Storable.bs ../../lib/auto/Storable/Storable.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/dist/Storable/../../lib/ExtUtils/typemap'  Storable.xs > Storable.xsc
+mv Storable.xsc Storable.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"3.13\" -DXS_VERSION=\"3.13\" -fPIC "-I../.."   Storable.c
+rm -f ../../lib/auto/Storable/Storable.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Storable.o  -o ../../lib/auto/Storable/Storable.so  \
+      \
+  
+chmod 755 ../../lib/auto/Storable/Storable.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/Storable'
+./miniperl -Ilib make_ext.pl lib/auto/Sys/Hostname/Hostname.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Sys::Hostname
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Sys-Hostname'
+Running Mkbootstrap for Hostname ()
+chmod 644 "Hostname.bs"
+/home/jkeenan/gitwork/perl/ext/Sys-Hostname/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Hostname.bs ../../lib/auto/Sys/Hostname/Hostname.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/Sys-Hostname/../../lib/ExtUtils/typemap'  Hostname.xs > Hostname.xsc
+mv Hostname.xsc Hostname.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.22\" -DXS_VERSION=\"1.22\" -fPIC "-I../.."   Hostname.c
+rm -f ../../lib/auto/Sys/Hostname/Hostname.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Hostname.o  -o ../../lib/auto/Sys/Hostname/Hostname.so  \
+      \
+  
+chmod 755 ../../lib/auto/Sys/Hostname/Hostname.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Sys-Hostname'
+./miniperl -Ilib make_ext.pl lib/auto/Sys/Syslog/Syslog.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Sys::Syslog
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Sys-Syslog'
+Running Mkbootstrap for Syslog ()
+chmod 644 "Syslog.bs"
+/home/jkeenan/gitwork/perl/cpan/Sys-Syslog/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Syslog.bs ../../lib/auto/Sys/Syslog/Syslog.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp" -noprototypes -typemap '/home/jkeenan/gitwork/perl/cpan/Sys-Syslog/../../lib/ExtUtils/typemap'  Syslog.xs > Syslog.xsc
+mv Syslog.xsc Syslog.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.35\" -DXS_VERSION=\"0.35\" -fPIC "-I../.."   Syslog.c
+rm -f ../../lib/auto/Sys/Syslog/Syslog.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Syslog.o  -o ../../lib/auto/Sys/Syslog/Syslog.so  \
+      \
+  
+chmod 755 ../../lib/auto/Sys/Syslog/Syslog.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Sys-Syslog'
+./miniperl -Ilib make_ext.pl lib/auto/threads/threads.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for threads
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/threads'
+Running Mkbootstrap for threads ()
+chmod 644 "threads.bs"
+/home/jkeenan/gitwork/perl/dist/threads/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- threads.bs ../../lib/auto/threads/threads.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/dist/threads/../../lib/ExtUtils/typemap'  threads.xs > threads.xsc
+mv threads.xsc threads.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"2.22\" -DXS_VERSION=\"2.22\" -fPIC "-I../.."   threads.c
+rm -f ../../lib/auto/threads/threads.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  threads.o  -o ../../lib/auto/threads/threads.so  \
+   -lpthread   \
+  
+chmod 755 ../../lib/auto/threads/threads.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/threads'
+./miniperl -Ilib make_ext.pl lib/auto/threads/shared/shared.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for threads::shared
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/threads-shared'
+Running Mkbootstrap for shared ()
+chmod 644 "shared.bs"
+/home/jkeenan/gitwork/perl/dist/threads-shared/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- shared.bs ../../lib/auto/threads/shared/shared.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/dist/threads-shared/../../lib/ExtUtils/typemap'  shared.xs > shared.xsc
+mv shared.xsc shared.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.58\" -DXS_VERSION=\"1.58\" -fPIC "-I../.."   shared.c
+rm -f ../../lib/auto/threads/shared/shared.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  shared.o  -o ../../lib/auto/threads/shared/shared.so  \
+   -lpthread   \
+  
+chmod 755 ../../lib/auto/threads/shared/shared.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/threads-shared'
+./miniperl -Ilib make_ext.pl lib/auto/Tie/Hash/NamedCapture/NamedCapture.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Tie::Hash::NamedCapture
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/Tie-Hash-NamedCapture'
+Running Mkbootstrap for NamedCapture ()
+chmod 644 "NamedCapture.bs"
+/home/jkeenan/gitwork/perl/ext/Tie-Hash-NamedCapture/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- NamedCapture.bs ../../lib/auto/Tie/Hash/NamedCapture/NamedCapture.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/Tie-Hash-NamedCapture/../../lib/ExtUtils/typemap'  NamedCapture.xs > NamedCapture.xsc
+mv NamedCapture.xsc NamedCapture.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.10\" -DXS_VERSION=\"0.10\" -fPIC "-I../.."   NamedCapture.c
+rm -f ../../lib/auto/Tie/Hash/NamedCapture/NamedCapture.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  NamedCapture.o  -o ../../lib/auto/Tie/Hash/NamedCapture/NamedCapture.so  \
+      \
+  
+chmod 755 ../../lib/auto/Tie/Hash/NamedCapture/NamedCapture.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/Tie-Hash-NamedCapture'
+./miniperl -Ilib make_ext.pl lib/auto/Time/HiRes/HiRes.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Configuring Time::HiRes...
+Using hints hints/linux.pl...
+Extra libraries: -lrt...
+Have syscall()... looking for syscall.h... found <syscall.h>.
+Looking for gettimeofday()... found.
+Looking for setitimer()... found.
+Looking for getitimer()... found.
+You have interval timers (both setitimer and getitimer).
+Looking for ualarm()... found.
+Looking for usleep()... found.
+Looking for nanosleep()... believing $Config{d_nanosleep}... found.
+You can mix subsecond sleeps with signals, if you want to.
+(It's still not portable, though.)
+Looking for clockid_t... found.
+Looking for clock_gettime()... found.
+Looking for clock_getres()... found.
+Looking for clock_nanosleep()... found.
+Looking for clock()... found.
+Looking for working futimens()... found.
+Looking for working utimensat()... found.
+You seem to have subsecond timestamp setting.
+Looking for stat() subsecond timestamps...
+Trying struct stat st_atimespec.tv_nsec...NOT found.
+Trying struct stat st_atimensec...NOT found.
+Trying struct stat st_atime_n...NOT found.
+Trying struct stat st_atim.tv_nsec...found.
+Trying struct stat st_uatime...NOT found.
+You seem to have subsecond timestamp reading.
+(Your struct stat has them, but the filesystems must help.)
+Generating a Unix-style Makefile
+Writing Makefile for Time::HiRes
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/Time-HiRes'
+Running Mkbootstrap for HiRes ()
+chmod 644 "HiRes.bs"
+/home/jkeenan/gitwork/perl/dist/Time-HiRes/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- HiRes.bs ../../lib/auto/Time/HiRes/HiRes.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/dist/Time-HiRes/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/dist/Time-HiRes/typemap'  HiRes.xs > HiRes.xsc
+mv HiRes.xsc HiRes.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.9760\" -DXS_VERSION=\"1.9760\" -fPIC "-I../.."  -DTIME_HIRES_NANOSLEEP -DTIME_HIRES_CLOCKID_T -DTIME_HIRES_CLOCK_GETTIME -DTIME_HIRES_CLOCK_GETRES -DTIME_HIRES_CLOCK_NANOSLEEP -DTIME_HIRES_CLOCK -DHAS_FUTIMENS -DHAS_UTIMENSAT -DTIME_HIRES_UTIME -DTIME_HIRES_STAT_XTIM -DTIME_HIRES_STAT=4 -DATLEASTFIVEOHOHFIVE HiRes.c
+HiRes.xs: In function ‘void XS_Time__HiRes_setitimer(CV*)’:
+HiRes.xs:1386:42: warning: option ‘-Wc++-compat’ is valid for C/ObjC but not for C++ [-Wpragmas]
+         GCC_DIAG_IGNORE_STMT(-Wc++-compat);
+                                          ^
+HiRes.xs: In function ‘void XS_Time__HiRes_getitimer(CV*)’:
+HiRes.xs:1406:42: warning: option ‘-Wc++-compat’ is valid for C/ObjC but not for C++ [-Wpragmas]
+         GCC_DIAG_IGNORE_STMT(-Wc++-compat);
+                                          ^
+rm -f ../../lib/auto/Time/HiRes/HiRes.so
+LD_RUN_PATH="/lib/x86_64-linux-gnu" g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  HiRes.o  -o ../../lib/auto/Time/HiRes/HiRes.so  \
+   -lrt   \
+  
+chmod 755 ../../lib/auto/Time/HiRes/HiRes.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/Time-HiRes'
+./miniperl -Ilib make_ext.pl lib/auto/Time/Piece/Piece.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for Time::Piece
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Time-Piece'
+Running Mkbootstrap for Piece ()
+chmod 644 "Piece.bs"
+/home/jkeenan/gitwork/perl/cpan/Time-Piece/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Piece.bs ../../lib/auto/Time/Piece/Piece.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Time-Piece/../../lib/ExtUtils/typemap'  Piece.xs > Piece.xsc
+mv Piece.xsc Piece.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.33\" -DXS_VERSION=\"1.33\" -fPIC "-I../.."   Piece.c
+rm -f ../../lib/auto/Time/Piece/Piece.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Piece.o  -o ../../lib/auto/Time/Piece/Piece.so  \
+      \
+  
+chmod 755 ../../lib/auto/Time/Piece/Piece.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Time-Piece'
+./miniperl -Ilib make_ext.pl lib/auto/Unicode/Collate/Collate.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Making header files for XS...
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/cpan/Unicode-Collate'
+Running Mkbootstrap for Collate ()
+chmod 644 "Collate.bs"
+/home/jkeenan/gitwork/perl/cpan/Unicode-Collate/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Collate.bs ../../lib/auto/Unicode/Collate/Collate.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/cpan/Unicode-Collate/../../lib/ExtUtils/typemap'  Collate.xs > Collate.xsc
+mv Collate.xsc Collate.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.25\" -DXS_VERSION=\"1.25\" -fPIC "-I../.."   Collate.c
+rm -f ../../lib/auto/Unicode/Collate/Collate.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Collate.o  -o ../../lib/auto/Unicode/Collate/Collate.so  \
+      \
+  
+chmod 755 ../../lib/auto/Unicode/Collate/Collate.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/cpan/Unicode-Collate'
+./miniperl -Ilib make_ext.pl lib/auto/Unicode/Normalize/Normalize.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Making header files for XS...
+Generating a Unix-style Makefile
+Writing Makefile for Unicode::Normalize
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/Unicode-Normalize'
+Running Mkbootstrap for Normalize ()
+chmod 644 "Normalize.bs"
+/home/jkeenan/gitwork/perl/dist/Unicode-Normalize/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Normalize.bs ../../lib/auto/Unicode/Normalize/Normalize.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/dist/Unicode-Normalize/../../lib/ExtUtils/typemap'  Normalize.xs > Normalize.xsc
+mv Normalize.xsc Normalize.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"1.26\" -DXS_VERSION=\"1.26\" -fPIC "-I../.."   Normalize.c
+rm -f ../../lib/auto/Unicode/Normalize/Normalize.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  Normalize.o  -o ../../lib/auto/Unicode/Normalize/Normalize.so  \
+      \
+  
+chmod 755 ../../lib/auto/Unicode/Normalize/Normalize.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/Unicode-Normalize'
+./miniperl -Ilib make_ext.pl lib/auto/XS/APItest/APItest.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for XS::APItest
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/XS-APItest'
+Running Mkbootstrap for APItest ()
+Writing APItest.bs
+chmod 644 "APItest.bs"
+/home/jkeenan/gitwork/perl/ext/XS-APItest/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- APItest.bs ../../lib/auto/XS/APItest/APItest.bs 644
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/XS-APItest/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/ext/XS-APItest/typemap'  APItest.xs > APItest.xsc
+mv APItest.xsc APItest.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-deprecated-declarations -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.99\" -DXS_VERSION=\"0.99\" -fPIC "-I../.."   APItest.c
+In file included from APItest.xs:10:
+APItest.xs: In function ‘void XS_XS__APItest__Magic_test_Gconvert(CV*)’:
+../../config.h:915:39: warning: ‘%.*g’ directive writing between 1 and 106 bytes into a region of size 100 [-Wformat-overflow=]
+ #define Gconvert(x,n,t,b) sprintf((b),"%.*g",(n),(x))
+                                       ^~~~~~
+../../perl.h:392:67: note: in definition of macro ‘PERL_UNUSED_RESULT’
+ #    define PERL_UNUSED_RESULT(v) STMT_START { __typeof__(v) z = (v); (void)sizeof(z); } STMT_END
+                                                                   ^
+APItest.xs:6725:28: note: in expansion of macro ‘Gconvert’
+         PERL_UNUSED_RESULT(Gconvert(SvNV(number), len,
+                            ^~~~~~~~
+../../config.h:915:39: note: assuming directive output of 105 bytes
+ #define Gconvert(x,n,t,b) sprintf((b),"%.*g",(n),(x))
+                                       ^~~~~~
+../../perl.h:392:67: note: in definition of macro ‘PERL_UNUSED_RESULT’
+ #    define PERL_UNUSED_RESULT(v) STMT_START { __typeof__(v) z = (v); (void)sizeof(z); } STMT_END
+                                                                   ^
+APItest.xs:6725:28: note: in expansion of macro ‘Gconvert’
+         PERL_UNUSED_RESULT(Gconvert(SvNV(number), len,
+                            ^~~~~~~~
+In file included from /usr/include/stdio.h:862,
+                 from ../../perlio.h:41,
+                 from ../../iperlsys.h:51,
+                 from ../../perl.h:3614,
+                 from APItest.xs:10:
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:33:34: note: ‘__builtin___sprintf_chk’ output between 2 and 107 bytes into a destination of size 100
+   return __builtin___sprintf_chk (__s, __USE_FORTIFY_LEVEL - 1,
+          ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       __bos (__s), __fmt, __va_arg_pack ());
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/XS-APItest/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/ext/XS-APItest/typemap'  XSUB-undef-XS_VERSION.xs > XSUB-undef-XS_VERSION.xsc
+mv XSUB-undef-XS_VERSION.xsc XSUB-undef-XS_VERSION.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-deprecated-declarations -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.99\" -DXS_VERSION=\"0.99\" -fPIC "-I../.."   XSUB-undef-XS_VERSION.c
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/XS-APItest/../../lib/ExtUtils/typemap' -typemap '/home/jkeenan/gitwork/perl/ext/XS-APItest/typemap'  XSUB-redefined-macros.xs > XSUB-redefined-macros.xsc
+mv XSUB-redefined-macros.xsc XSUB-redefined-macros.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-deprecated-declarations -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.99\" -DXS_VERSION=\"0.99\" -fPIC "-I../.."   XSUB-redefined-macros.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-deprecated-declarations -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.99\" -DXS_VERSION=\"0.99\" -fPIC "-I../.."   core.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-deprecated-declarations -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.99\" -DXS_VERSION=\"0.99\" -fPIC "-I../.."   exception.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wno-deprecated-declarations -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.99\" -DXS_VERSION=\"0.99\" -fPIC "-I../.."   notcore.c
+rm -f ../../lib/auto/XS/APItest/APItest.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  APItest.o XSUB-undef-XS_VERSION.o XSUB-redefined-macros.o core.o exception.o notcore.o  -o ../../lib/auto/XS/APItest/APItest.so  \
+      \
+  
+chmod 755 ../../lib/auto/XS/APItest/APItest.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/XS-APItest'
+./miniperl -Ilib make_ext.pl lib/auto/XS/Typemap/Typemap.so  MAKE="make" LIBPERL_A=libperl.a LINKTYPE=dynamic
+Generating a Unix-style Makefile
+Writing Makefile for XS::Typemap
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/ext/XS-Typemap'
+Running Mkbootstrap for Typemap ()
+chmod 644 "Typemap.bs"
+/home/jkeenan/gitwork/perl/ext/XS-Typemap/../../miniperl "-I../../lib" -MExtUtils::Command::MM -e 'cp_nonempty' -- Typemap.bs ../../lib/auto/XS/Typemap/Typemap.bs 644
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.16\" -DXS_VERSION=\"0.16\" -fPIC "-I../.."   stdio.c
+"../../miniperl" "-I../../lib" "../../lib/ExtUtils/xsubpp"  -typemap '/home/jkeenan/gitwork/perl/ext/XS-Typemap/../../lib/ExtUtils/typemap'  Typemap.xs > Typemap.xsc
+mv Typemap.xsc Typemap.c
+g++-8 -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Werror=declaration-after-statement -Werror=pointer-arith -Wextra -Wwrite-strings -O2   -DVERSION=\"0.16\" -DXS_VERSION=\"0.16\" -fPIC "-I../.."   Typemap.c
+rm -f ../../lib/auto/XS/Typemap/Typemap.so
+g++-8  -shared -O2 -L/usr/local/lib -fstack-protector-strong  stdio.o  Typemap.o  -o ../../lib/auto/XS/Typemap/Typemap.so  \
+      \
+  
+chmod 755 ../../lib/auto/XS/Typemap/Typemap.so
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/ext/XS-Typemap'
+rm -f pod/perl5294delta.pod
+/bin/ln -s perldelta.pod pod/perl5294delta.pod
+./miniperl -Ilib autodoc.pl
+./miniperl -Ilib pod/perlmodlib.PL -q
+./perl -Ilib -I. -f pod/buildtoc -q
+cd dist/Storable ;  make lib/Storable/Limit.pm
+make[1]: Entering directory '/home/jkeenan/gitwork/perl/dist/Storable'
+/home/jkeenan/gitwork/perl/dist/Storable/../../miniperl "-I../../lib" -MExtUtils::Command -e 'mkpath' -- ../../lib
+"../../perl" "-I../../lib" "-I../../lib" stacksize --core
+probe for max. stack sizes...
+Storable: determining recursion limit: 65000 too big, try less 32550 ...
+Storable: determining recursion limit: 32550 too big, try less 16325 ...
+Storable: determining recursion limit: 16325 passed, try more 24437 ...
+Storable: determining recursion limit: 24437 passed, try more 28493 ...
+Storable: determining recursion limit: 28493 too big, try less 26465 ...
+Storable: determining recursion limit: 26465 too big, try less 25451 ...
+Storable: determining recursion limit: 25451 too big, try less 24944 ...
+Storable: determining recursion limit: 24944 too big, try less 24691 ...
+Storable: determining recursion limit: 24691 passed, try more 24817 ...
+Storable: determining recursion limit: 24817 passed, try more 24880 ...
+Storable: determining recursion limit: 24880 passed, try more 24912 ...
+Storable: determining recursion limit: 24912 passed, try more 24928 ...
+Storable: determining recursion limit: 24928 too big, try less 24920 ...
+Storable: determining recursion limit: 24920 passed, try more 24924 ...
+Storable: determining recursion limit: 24924 passed, try more 24926 ...
+Storable: determining recursion limit: 24926 passed, try more 24927 ...
+Storable: determining recursion limit: 24927 too big, try less 24927 ...
+MAX_DEPTH = 24926
+Storable: determining recursion limit: 12463 too big, try less 6257 ...
+Storable: determining recursion limit: 6257 too big, try less 3154 ...
+Storable: determining recursion limit: 3154 too big, try less 1602 ...
+Storable: determining recursion limit: 1602 too big, try less 826 ...
+Storable: determining recursion limit: 826 too big, try less 438 ...
+Storable: determining recursion limit: 438 passed, try more 632 ...
+Storable: determining recursion limit: 632 too big, try less 535 ...
+Storable: determining recursion limit: 535 too big, try less 487 ...
+Storable: determining recursion limit: 487 passed, try more 511 ...
+Storable: determining recursion limit: 511 passed, try more 523 ...
+Storable: determining recursion limit: 523 too big, try less 517 ...
+Storable: determining recursion limit: 517 too big, try less 514 ...
+Storable: determining recursion limit: 514 too big, try less 513 ...
+Storable: determining recursion limit: 513 passed, try more 513 ...
+MAX_DEPTH_HASH = 513
+make[1]: Leaving directory '/home/jkeenan/gitwork/perl/dist/Storable'
+test -d lib/Storable || mkdir lib/Storable
+cp dist/Storable/lib/Storable/Limit.pm lib/Storable/Limit.pm
+cd t && (rm -f perl; /bin/ln -s ../perl perl)

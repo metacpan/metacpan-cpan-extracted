@@ -3,16 +3,17 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Test::Builder ();
 use Prty::Option;
 use Prty::Path;
 use Prty::Object;
-use Test::More ();
 use Prty::Converter;
+use Test::More ();
 use Prty::System;
 use Prty::Test::Class::Method;
 
@@ -635,7 +636,9 @@ sub skipAllTests {
     my $self = shift;
     my $msg = shift;
 
-    $self->[3] = $msg;
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $self->[3] = Prty::Converter->umlautToAscii($msg);
+
     return;
 }
 
@@ -665,9 +668,10 @@ liefert keinen Wert zurück.
 sub skipTest {
     my $self = shift;
     # @_: $n,$msg -or- $msg
-    
+
     if ($_[0] =~ /^\d+$/) {
-        $self->[5] = shift;
+        # Um Warnungen à la "does not map to ascii" zu verhindern
+        $self->[5] = Prty::Converter->umlautToAscii(shift);
     }
     $self->[4] = shift;
 
@@ -1150,7 +1154,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

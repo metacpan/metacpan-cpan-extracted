@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::UpdateAction;
 
 # ABSTRACT: The act of managing by changing/editing the state of the object.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has collection => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::UpdateAction - The act of managing by changing/editing the 
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

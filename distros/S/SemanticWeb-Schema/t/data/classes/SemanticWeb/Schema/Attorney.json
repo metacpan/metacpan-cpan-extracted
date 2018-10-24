@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "Professional service: Attorney. </p>\n\n<p>This type is deprecated - <a class=\"localLink\" href=\"http://schema.org/LegalService\">LegalService</a> is more inclusive and less ambiguous.",
+      "rdfs:comment" : "Professional service: Attorney. <br/><br/>\n\nThis type is deprecated - <a class=\"localLink\" href=\"http://schema.org/LegalService\">LegalService</a> is more inclusive and less ambiguous.",
       "rdfs:label" : "Attorney",
       "rdfs:subClassOf" : "schema:LegalService"
    },

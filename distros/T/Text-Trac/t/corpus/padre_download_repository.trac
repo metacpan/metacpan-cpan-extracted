@@ -1,0 +1,17 @@
+= Instructions for the Installation from the Repository =
+ 1. Make sure your cpan works - make, gcc, etc.
+ 1. Make sure you remove all traces of wxWidgets 2.6 from your system
+ 1. Install [wiki:wxWidgets] 2.8 or later - {{{cpan Alien::wxWidgets}}} will download and compile and install it for you
+ 1. install (or upgrade) Wx - {{{cpan Wx}}}
+ 1. install Module::Install (if its not already there)
+ 1. add the following settings to cpan:
+   * {{{conf build_requires_install_policy yes}}}
+   * {{{conf prerequisites_policy follow }}}
+   * {{{ o conf commit}}}
+ 1. {{{svn co  http://svn.perlide.org/padre/trunk/Padre Padre}}}
+ 1. {{{cd Padre}}}
+ 1. {{{sudo cpan}}}
+ 1. {{{perl dev}}}
+
+For a complete checkout including all Padre plugins, branches and supporting stuff, use  {{{http://svn.perlide.org/padre/trunk}}} but be warned - this is a huge amount of source! If you're using git-svn , you can use the {{{--revision argument}}} to limit from where git-svn starts fetching revisions.
+

@@ -25,14 +25,14 @@
          "rdfs:comment" : "An entity that arranges for an exchange between a buyer and a seller.  In most cases a broker never acquires or releases ownership of a product or service involved in an exchange.  If it is not clear whether an entity is a broker, seller, or buyer, the latter two terms are preferred.",
          "rdfs:label" : "broker",
          "schema:domainIncludes" : [
-            "schema:Service",
             "schema:Invoice",
             "schema:Reservation",
+            "schema:Service",
             "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:confirmationNumber" : {
@@ -65,8 +65,8 @@
          "rdfs:label" : "discount",
          "schema:domainIncludes" : "schema:Order",
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:Text"
+            "schema:Text",
+            "schema:Number"
          ]
       },
       "schema:discountCode" : {
@@ -78,7 +78,7 @@
       },
       "schema:discountCurrency" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The currency (in 3-letter ISO 4217 format) of the discount.",
+         "rdfs:comment" : "The currency of the discount.<br/><br/>\n\nUse standard formats: <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217 currency format</a> e.g. \"USD\"; <a href=\"https://en.wikipedia.org/wiki/List_of_cryptocurrencies\">Ticker symbol</a> for cryptocurrencies e.g. \"BTC\"; well known names for <a href=\"https://en.wikipedia.org/wiki/Local_exchange_trading_system\">Local Exchange Tradings Systems</a> (LETS) and other currency types e.g. \"Ithaca HOUR\".",
          "rdfs:label" : "discountCurrency",
          "schema:domainIncludes" : "schema:Order",
          "schema:rangeIncludes" : "schema:Text"
@@ -96,8 +96,8 @@
          "rdfs:label" : "merchant",
          "schema:domainIncludes" : "schema:Order",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ],
          "schema:supersededBy" : "schema:seller"
       },
@@ -113,8 +113,8 @@
          "rdfs:comment" : "The delivery of the parcel related to this order or order item.",
          "rdfs:label" : "orderDelivery",
          "schema:domainIncludes" : [
-            "schema:OrderItem",
-            "schema:Order"
+            "schema:Order",
+            "schema:OrderItem"
          ],
          "schema:rangeIncludes" : "schema:ParcelDelivery"
       },
@@ -169,8 +169,8 @@
          "rdfs:comment" : "The date that payment is due.",
          "rdfs:label" : "paymentDueDate",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },
@@ -207,11 +207,11 @@
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:Order",
             "schema:BuyAction",
             "schema:Demand",
-            "schema:Flight",
-            "schema:Order",
-            "schema:Offer"
+            "schema:Flight"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

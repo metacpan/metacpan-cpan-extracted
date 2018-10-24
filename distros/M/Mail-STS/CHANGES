@@ -1,9 +1,37 @@
 ==================================================
-Changes from 2017-10-09 00:00:00 +0000 to present.
+Changes from 2017-10-23 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.01 at 2018-10-09 17:06:48 +0000
+version 0.03 at 2018-10-23 08:23:06 +0000
+-----------------------------------------
+
+  Change: b9902f0b5541dfd9fcf7983954ef3092e5889641
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2018-10-23 10:21:09 +0000
+
+    Merge pull request #1 from manwar/add-missing-prereqs
+
+    Added prereqs Time::Piece and Time::Seconds as suggested by CPANTS. 
+
+  Change: e78f644996069f6d8b51054409cabd8533a30f41
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2018-10-22 18:39:24 +0000
+
+    Added prereqs Time::Piece and Time::Seconds as suggested by CPANTS. 
+
+-----------------------------------------
+version 0.02 at 2018-10-21 09:07:26 +0000
+-----------------------------------------
+
+  Change: 33f8691bfa3871258f0b0cc7d6b55016bbc5e7ca
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2018-10-21 11:07:26 +0000
+
+    Add expiration/update check for policy 
+
+-----------------------------------------
+version 0.01 at 2018-10-09 17:05:13 +0000
 -----------------------------------------
 
   Change: e2b12c956aa1ae8c5dfbc17c8e97330e793933ce

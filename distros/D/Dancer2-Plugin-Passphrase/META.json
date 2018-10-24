@@ -4,7 +4,7 @@
       "Henk van Oers <hvo.pm@xs4all.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -37,20 +37,20 @@
             "Digest::Bcrypt" : "0",
             "Digest::SHA" : "5.74",
             "Test::More" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.008001"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/hvoers/Dancer2-Plugin-Passphrase/issues"
+         "web" : "https://github.com/SysPete/Dancer2-Plugin-Passphrase/issues"
       },
-      "homepage" : "https://github.com/hvoers/Dancer2-Plugin-Passphrase/",
+      "homepage" : "https://github.com/SysPete/Dancer2-Plugin-Passphrase/",
       "repository" : {
-         "url" : "https://github.com/hvoers/Dancer2-Plugin-Passphrase"
+         "url" : "https://github.com/SysPete/Dancer2-Plugin-Passphrase"
       }
    },
-   "version" : "v3.3.0",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "v3.3.3",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

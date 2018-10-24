@@ -3,8 +3,9 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Hash;
 use Prty::Html::List;
@@ -183,7 +184,7 @@ sub html {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 SEE ALSO
 

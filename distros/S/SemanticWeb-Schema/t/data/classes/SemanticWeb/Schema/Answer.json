@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_QAStackExchange",
+      "dc:source" : "schemadotorgsources2:source_QAStackExchange",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An answer offered to a question; perhaps correct, perhaps opinionated or wrong.",
       "rdfs:label" : "Answer",

@@ -1,8 +1,11 @@
 Revision history for Perl module Proc::NiceSleep.
+0.91 Fri Oct 19 2018
+    - fix typo in Changes
+    
 0.90 Sun Dev 23 2012
     - change to use Dist::Zilla
     - update copyrights
-0.88 
+0.89 
     - no such version
 0.88 
     - no such version

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Specialty;
 
 # ABSTRACT: Any branch of a field in which people typically develop specific expertise
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::Specialty - Any branch of a field in which people typically
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

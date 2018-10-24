@@ -1,0 +1,17 @@
+<h1>Instructions for the Installation from the Repository</h1>
+<ol><li>Make sure your cpan works - make, gcc, etc.
+</li><li>Make sure you remove all traces of wxWidgets 2.6 from your system
+</li><li>Install <a  href="/wiki/wxWidgets">wxWidgets</a> 2.8 or later - <tt>cpan Alien::wxWidgets</tt> will download and compile and install it for you
+</li><li>install (or upgrade) Wx - <tt>cpan Wx</tt>
+</li><li>install Module::Install (if its not already there)
+</li><li>add the following settings to cpan:</li></ol>
+<ul><ul><li><tt>conf build_requires_install_policy yes</tt>
+</li><li><tt>conf prerequisites_policy follow </tt>
+</li><li><tt> o conf commit</tt></li></ul></li></ul>
+<ol><li><tt>svn co  <a  href="http://svn.perlide.org/padre/trunk/Padre">http://svn.perlide.org/padre/trunk/Padre</a> Padre</tt>
+</li><li><tt>cd Padre</tt>
+</li><li><tt>sudo cpan</tt>
+</li><li><tt>perl dev</tt></li></ol>
+<p>
+For a complete checkout including all Padre plugins, branches and supporting stuff, use  <tt><a  href="http://svn.perlide.org/padre/trunk">http://svn.perlide.org/padre/trunk</a></tt> but be warned - this is a huge amount of source! If you're using git-svn , you can use the <tt>--revision argument</tt> to limit from where git-svn starts fetching revisions.
+</p>

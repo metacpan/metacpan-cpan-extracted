@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
-use File::Slurp qw( read_file );
+use File::Slurper qw( read_text );
 
 # We need to make this a prereq so we have --help
 use Getopt::Long::Descriptive;
@@ -84,7 +84,7 @@ sub run {
 
     my $markdown
         = $self->has_file()
-        ? read_file( $self->file() )
+        ? read_text( $self->file() )
         : $self->text();
 
     my ( $class, %p ) = $self->_has_title()

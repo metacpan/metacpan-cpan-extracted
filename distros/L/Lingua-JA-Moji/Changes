@@ -1,5 +1,11 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.54 2018-10-22
+
+* The function "kana_order" has been removed.
+* "is_romaji_strict" is even stricter.
+* "smallize_kana" is better-behaved with regards to the tsu kana.
+
 0.53 2018-10-03
 
 * Functions to join and split daku, handaku now exported

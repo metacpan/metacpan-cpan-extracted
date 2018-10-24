@@ -38,6 +38,9 @@ sub new_from_archlist {
       my ($x, $y) = (delete $_->{x}, delete $_->{y});
 
       if ($_->{_name} eq "map") {
+         $_->{enter_x} = $_->{hp} if $_->{hp} && !$_->{enter_x}; delete $_->{hp};
+         $_->{enter_y} = $_->{sp} if $_->{sp} && !$_->{enter_y}; delete $_->{sp};
+
          $meta{info} = $_;
 
          $mapx = $_->{width}  || $x;

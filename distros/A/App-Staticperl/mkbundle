@@ -1028,6 +1028,10 @@ for (@static_ext) {
 }
 
 print $fh <<EOF;
+  Safefree (PL_origfilename);
+  PL_origfilename = savepv (PL_origargv [0]);
+  sv_setpv (GvSV (gv_fetchpvs ("0", GV_ADD|GV_NOTQUAL, SVt_PV)), PL_origfilename);
+
   #ifdef _WIN32
     /* windows perls usually trail behind unix perls 8-10 years in exporting symbols */
 

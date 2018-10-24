@@ -7,7 +7,6 @@ requires "Finance::GDAX::API" => "0.09";
 requires "FindBin" => "0";
 requires "List::Util" => "0";
 requires "Mouse" => "0";
-requires "Number::Format" => "1.75";
 requires "Pod::Autopod" => "1.215";
 requires "Time::Moment" => "0.44";
 requires "Time::Piece" => "1.33";

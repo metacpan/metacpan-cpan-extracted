@@ -20,7 +20,7 @@
 # USA.
 
 package Locale::XGettext::Text;
-$Locale::XGettext::Text::VERSION = '0.3';
+$Locale::XGettext::Text::VERSION = '0.6';
 use strict;
 
 use Locale::TextDomain qw(Locale-XGettext);

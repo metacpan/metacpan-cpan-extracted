@@ -5,6 +5,7 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
 # -----------------------------------------------------------------------------
 
@@ -102,6 +103,17 @@ sub test_modifyLength : Test(1) {
 
     my $val = $l->modifyLength('1.5ex','*1.5');
     $self->is($val,'2.25ex');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_toLength : Test(1) {
+    my $self = shift;
+
+    my $l = Prty::TeX::Code->new;
+
+    my $val = $l->toLength(100);
+    $self->is($val,'75pt');
 }
 
 # -----------------------------------------------------------------------------

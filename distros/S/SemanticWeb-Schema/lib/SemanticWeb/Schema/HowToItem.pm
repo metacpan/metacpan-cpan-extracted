@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::HowToItem;
 
 # ABSTRACT: An item used as either a tool or supply when performing the instructions for how to to achieve a result.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has required_quantity => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::HowToItem - An item used as either a tool or supply when pe
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -59,11 +61,11 @@ A required_quantity should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<Str>
 
 =item C<Num>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 

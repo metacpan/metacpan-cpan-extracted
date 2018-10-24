@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Xorg
 #
-# This software is Copyright (c) 2007-2016 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,10 @@
 #
 
 package Config::Model::Xorg ;
-$Config::Model::Xorg::VERSION = '1.113';
+$Config::Model::Xorg::VERSION = '1.115';
+use 5.10.1;
+use Config::Model 2.123;
+
 # dummy package so CPAN can collect information regarding this module
 
 
@@ -19,7 +22,7 @@ Config::Model::Xorg - Xorg configuration model for Config::Model
 
 =head1 VERSION
 
-version 1.113
+version 1.115
 
 =head1 SYNOPSIS
 

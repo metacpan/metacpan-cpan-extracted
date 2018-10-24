@@ -3,8 +3,9 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Storable ();
 
@@ -85,7 +86,7 @@ sub thaw {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

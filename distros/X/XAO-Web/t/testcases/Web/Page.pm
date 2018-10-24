@@ -721,7 +721,7 @@ sub test_unicode_transparency {
     my $self=shift;
 
     use utf8;
-    STDERR->binmode(':utf8');
+    binmode STDERR, ':utf8';
 
     # By default, mainly for backwards compatibility, the template
     # engine operates on bytes, not characters. Thus we expect bytes

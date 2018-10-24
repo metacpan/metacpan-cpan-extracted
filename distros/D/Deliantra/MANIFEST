@@ -10,6 +10,7 @@ Deliantra/MoveType.pm
 Deliantra/Protocol/Constants.pm
 Deliantra/Protocol/Base.pm
 Deliantra/Protocol.pm
+Deliantra/Util.pm
 bin/cfarch-normalize
 bin/cfmap-normalize
 bin/cfmap-plushify
@@ -17,6 +18,7 @@ bin/cfmap-tagify
 bin/cfmap-cavehify
 bin/cfxmlrender
 bin/cf-slotutil
+bin/cffi-filter
 res2pm
 res/README
 res/autojoin.txt
@@ -24,4 +26,5 @@ res/spells.xml
 res/typenumbers.xml
 res/types.xml
 eg/mapread
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

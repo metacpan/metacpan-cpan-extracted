@@ -15,8 +15,10 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
-        'JSON'          => 0,
-        'Test::More'    => 0,
+        'File::Spec::Functions'         => 0,
+        'HTTP::Tiny'                    => 0,
+        'JSON'                          => 0,
+        'Test::More'                    => 0,
     },
     META_MERGE => {
         resources => {
@@ -30,5 +32,6 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'JSON-Patch-* cover_db' },
+    test  => { TESTS => 't/*.t xt/*.t'},
 );
 

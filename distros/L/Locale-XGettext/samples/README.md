@@ -15,7 +15,7 @@ In order to use the example scanners you usually have to do the following:
     perl -Ilib samples/LANGUAGE/xgettext-lines.pl README.md
 
 Replace LANGUAGE with the language you want to test.  In the case of
-Java you have to run the command "sudo cpan install Inline::Java::Class"
+Java you may have to run the command "sudo cpan install Inline::Java::Class"
 (not just "Inline::Java").
 
 If your package manager already has a prebuilt package for the

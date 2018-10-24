@@ -17119,25 +17119,27 @@ print $Net::FullAuto::FA_Core::LOG "SCRUBBINGTHISKEY=$key<==\n"
       my ($dbenv,$bdb)=
          Net::FullAuto::FA_Core::connect_berkeleydb('Passwds');
       my $href='';
-      my $status=$bdb->db_get($passlabel,$href);
-      $href=~s/\$HASH\d*\s*=\s*//s;
-      $href=eval $href;
       my $successflag=0;
-      foreach my $ky (keys %{$href}) {
-         if ($ky eq $key) {
-            while (delete $href->{$key}) {}
-            $successflag=1;
-         } elsif ($ky=~/gatekeep_$username/) {
-            while (delete $href->{$ky}) {}
-            $successflag=1;
-         } elsif ($ky=~/_X_\d+_X_(\d+)$/ && $1+604800<$invoked[0]) {
-            while (delete $href->{$ky}) {}
-            $successflag=1;
+      if ($bdb) {
+         my $status=$bdb->db_get($passlabel,$href);
+         $href=~s/\$HASH\d*\s*=\s*//s;
+         $href=eval $href;
+         foreach my $ky (keys %{$href}) {
+            if ($ky eq $key) {
+               while (delete $href->{$key}) {}
+               $successflag=1;
+            } elsif ($ky=~/gatekeep_$username/) {
+               while (delete $href->{$ky}) {}
+               $successflag=1;
+            } elsif ($ky=~/_X_\d+_X_(\d+)$/ && $1+604800<$invoked[0]) {
+               while (delete $href->{$ky}) {}
+               $successflag=1;
+            }
          }
+         my $put_href=Data::Dump::Streamer::Dump($href)->Out();
+         $status=$bdb->db_put($passlabel,$put_href);
+         $bdb->db_close();
       }
-      my $put_href=Data::Dump::Streamer::Dump($href)->Out();
-      $status=$bdb->db_put($passlabel,$put_href);
-      $bdb->db_close();
       undef $bdb;
       $dbenv->close();
       undef $dbenv;

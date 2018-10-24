@@ -26,14 +26,14 @@
          "rdfs:comment" : "An entity that arranges for an exchange between a buyer and a seller.  In most cases a broker never acquires or releases ownership of a product or service involved in an exchange.  If it is not clear whether an entity is a broker, seller, or buyer, the latter two terms are preferred.",
          "rdfs:label" : "broker",
          "schema:domainIncludes" : [
-            "schema:Service",
             "schema:Invoice",
             "schema:Reservation",
+            "schema:Service",
             "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:category" : {
@@ -41,12 +41,10 @@
          "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
          "rdfs:label" : "category",
          "schema:domainIncludes" : [
-            "schema:Property",
-            "schema:Class",
+            "schema:Invoice",
             "schema:Service",
-            "schema:Product",
             "schema:Offer",
-            "schema:Invoice"
+            "schema:Product"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -83,8 +81,8 @@
          "rdfs:label" : "minimumPaymentDue",
          "schema:domainIncludes" : "schema:Invoice",
          "schema:rangeIncludes" : [
-            "schema:PriceSpecification",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:PriceSpecification"
          ]
       },
       "schema:paymentDue" : {
@@ -103,8 +101,8 @@
          "rdfs:comment" : "The date that payment is due.",
          "rdfs:label" : "paymentDueDate",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },
@@ -134,8 +132,8 @@
          "rdfs:label" : "paymentStatus",
          "schema:domainIncludes" : "schema:Invoice",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:PaymentStatusType"
+            "schema:PaymentStatusType",
+            "schema:Text"
          ]
       },
       "schema:provider" : {
@@ -143,18 +141,16 @@
          "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
          "rdfs:label" : "provider",
          "schema:domainIncludes" : [
-            "schema:ParcelDelivery",
-            "schema:BusTrip",
-            "schema:CreativeWork",
             "schema:Service",
-            "schema:TrainTrip",
-            "schema:Reservation",
-            "schema:Flight",
-            "schema:Invoice"
+            "schema:Trip",
+            "schema:ParcelDelivery",
+            "schema:CreativeWork",
+            "schema:Invoice",
+            "schema:Reservation"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:referencesOrder" : {

@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::Flight;
 
 # ABSTRACT: An airline flight.
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::Intangible /;
+extends qw/ SemanticWeb::Schema::Trip /;
 
 
 use MooX::JSON_LD 'Flight';
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has aircraft => (
@@ -44,14 +46,6 @@ has arrival_terminal => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'arrivalTerminal',
-);
-
-
-
-has arrival_time => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'arrivalTime',
 );
 
 
@@ -96,14 +90,6 @@ has departure_terminal => (
 
 
 
-has departure_time => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'departureTime',
-);
-
-
-
 has estimated_flight_duration => (
     is        => 'rw',
     predicate => 1,
@@ -132,14 +118,6 @@ has meal_service => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'mealService',
-);
-
-
-
-has provider => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'provider',
 );
 
 
@@ -176,7 +154,7 @@ SemanticWeb::Schema::Flight - An airline flight.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -233,20 +211,6 @@ C<arrivalTerminal>
 Identifier of the flight's arrival terminal.
 
 A arrival_terminal should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<arrival_time>
-
-C<arrivalTime>
-
-The expected arrival time.
-
-A arrival_time should be one of the following types:
 
 =over
 
@@ -324,20 +288,6 @@ A departure_terminal should be one of the following types:
 
 =back
 
-=head2 C<departure_time>
-
-C<departureTime>
-
-The expected departure time.
-
-A departure_time should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
 =head2 C<estimated_flight_duration>
 
 C<estimatedFlightDuration>
@@ -348,9 +298,9 @@ A estimated_flight_duration should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Duration']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Duration']>
 
 =back
 
@@ -400,22 +350,6 @@ A meal_service should be one of the following types:
 
 =back
 
-=head2 C<provider>
-
-The service provider, service operator, or service performer; the goods
-producer. Another party (a seller) may offer those services or goods on
-behalf of the provider. A provider may also serve as the seller.
-
-A provider should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
-=back
-
 =head2 C<seller>
 
 An entity which offers (sells / leases / lends / loans) the services /
@@ -447,7 +381,7 @@ A web_checkin_time should be one of the following types:
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::Intangible>
+L<SemanticWeb::Schema::Trip>
 
 =head1 AUTHOR
 

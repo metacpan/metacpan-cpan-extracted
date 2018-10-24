@@ -3,8 +3,9 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 # -----------------------------------------------------------------------------
 
@@ -298,11 +299,15 @@ sub addOption {
 
 # -----------------------------------------------------------------------------
 
-=head3 addLongOption() - Ergänze Option und ihre Werte
+=head3 addEqOption() - Ergänze Option und ihre Werte
 
 =head4 Synopsis
 
-    $cmd->addLongOption(@optVal);
+    $cmd->addEqOption(@optVal);
+
+=head4 Alias
+
+addLongOption()
 
 =head4 Arguments
 
@@ -327,7 +332,7 @@ Gleichheitszeichen (=) getrennt.
 
 =head4 Example
 
-    $c->addLongOption(
+    $c->addEqOption(
         '--columns' => 2,
         '--font' => 'Courier10',
         '--margins' => '0:0:0:0',
@@ -341,7 +346,7 @@ ergänzt die Kommandozeile um die Optionen
 
 # -----------------------------------------------------------------------------
 
-sub addLongOption {
+sub addEqOption {
     my $self = shift;
     # @_: @optVal
 
@@ -363,6 +368,11 @@ sub addLongOption {
     }    
 
     return;
+}
+
+{
+    no warnings 'once';
+    *addLongOption = \&addEqOption;
 }
 
 # -----------------------------------------------------------------------------
@@ -505,7 +515,7 @@ Zeichenkette ohne Whitespace oder Shell-Metazeichen:
     =>
     /tmp/test.pdf
 
-Zeichenkette mit Whitespace:
+Zeichenkette mit Whitespace und/oder Shell-Metazeichen:
 
     $c->value("Dies ist ein Test");
     =>
@@ -529,7 +539,7 @@ sub value {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

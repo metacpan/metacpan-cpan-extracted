@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::BedDetails;
 
 # ABSTRACT: An entity holding detailed information about the available bed types
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has number_of_beds => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::BedDetails - An entity holding detailed information about t
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

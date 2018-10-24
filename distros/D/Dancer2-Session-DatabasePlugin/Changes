@@ -23,3 +23,5 @@
   -- pod examples to support this.
 1.009
   -- added feature to disable db statement handle caching
+1.010
+  -- Moved freeze and thaw functions to global variables that can be accessed and overwritten

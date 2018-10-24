@@ -1,0 +1,72 @@
+# PODNAME: CoreList.pod
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+CoreList.pod
+
+=head1 VERSION
+
+version 0.14
+
+=head1 SYNOPSIS
+
+ use Module::OTRS::CoreList;
+
+ my @otrs_versions = Module::OTRS::CoreList->shipped(
+    '2.4.x',
+    'Kernel::System::DB',
+ );
+ 
+ # returns (2.4.0, 2.4.1, 2.4.2,...)
+ 
+ my @modules = Module::OTRS::CoreList->modules( '2.4.8' );
+ my @modules = Module::OTRS::CoreList->modules( '2.4.x' );
+ 
+ # methods to check for CPAN modules shipped with OTRS
+ 
+ my @cpan_modules = Module::OTRS::CoreList->cpan_modules( '2.4.x' );
+
+ my @otrs_versions = Module::OTRS::CoreList->shipped(
+    '3.0.x',
+    'CGI',
+ );
+
+=head1 NAME
+
+Module::OTRS::CoreList - what modules shipped with versions of OTRS (>= 2.3.x)
+
+=head1 VERSION
+
+version 0.14
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

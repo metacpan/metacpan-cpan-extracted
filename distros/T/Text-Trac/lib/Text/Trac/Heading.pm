@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw(Text::Trac::BlockNode);
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 sub init {
 	my $self = shift;
@@ -18,7 +18,8 @@ sub parse {
 	my $level = length($1) + $c->min_heading_level - 1;
 
 	my $id = $self->_strip($2);
-	$l = qq(<h$level id="$id">) . $self->replace($2) . qq(</h$level>);
+	my $attr = $c->{id} ? qq{ id="$id"} : '';
+	$l = qq(<h$level$attr>) . $self->replace($2) . qq(</h$level>);
 
 	$c->htmllines($l);
 }

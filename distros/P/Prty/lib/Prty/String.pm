@@ -3,9 +3,10 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Encode::Guess ();
 use Encode ();
@@ -33,6 +34,7 @@ L<Prty::Object>
 =head4 Synopsis
 
     $str = $class->autoDecode($str);
+    $str = $class->autoDecode($str,$otherEncoding);
 
 =head4 Description
 
@@ -53,21 +55,19 @@ UTF-8
 
 UTF-16/32 mit BOM
 
-=item *
-
-ISO-8859-1
-
 =back
 
-Weitere Encodings werden I<nicht> erkannt und als ISO-8859-1
-angesehen.
+und $otherEncoding. Ist $otherEncoding nicht angegeben, wird
+ISO-8859-1 angenommen.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub autoDecode {
-    my ($class,$str) = @_;
+    my $class = shift;
+    my $str = shift;
+    my $otherEncoding = shift || 'iso-8859-1';
 
     # Encoding ermitteln und Text dekodieren
 
@@ -78,8 +78,8 @@ sub autoDecode {
         $str = $dec->decode($str);
     }
     elsif ($dec =~ /No appropriate encodings found/i) {
-        # Wir dekodieren ISO-8859-1
-        $str = Encode::decode('iso-8859-1',$str);
+        # Wir dekodieren $otherEncoding
+        $str = Encode::decode($otherEncoding,$str);
     }
     else {
         # Unerwarteter Fehler
@@ -706,7 +706,7 @@ sub wrap {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

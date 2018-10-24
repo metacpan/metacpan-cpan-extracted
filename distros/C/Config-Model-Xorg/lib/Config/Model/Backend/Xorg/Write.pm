@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Xorg
 #
-# This software is Copyright (c) 2007-2016 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,7 +9,7 @@
 #
 
 package Config::Model::Backend::Xorg::Write ;
-$Config::Model::Backend::Xorg::Write::VERSION = '1.113';
+$Config::Model::Backend::Xorg::Write::VERSION = '1.115';
 use Mouse::Role ;
 
 use Carp ;

@@ -4,7 +4,7 @@
 # tags that point to one of the maps given on the commandline
 # (which must be relative paths starting at .!)
 
-use strict;
+use common::sense;
 
 use Deliantra;
 use Deliantra::Map;

@@ -1,78 +1,87 @@
-Revision history for Text-Trac
+Revision history for Text::Trac
 
-0.18 2015.04.05
-    Remove auto_include from Makefile.PL to limit inc/ to the Module::Install code.
+0.19  2018.10.20 MANWAR
+      Fixed SEE ALSO broken links
+      Tidied up Changes file
+      Updated link to GitHub repo.
+      Add --span flag
+      Add --id flag to include ids in the html files. Default to noid.
+      Add --force flag to the command line script to overwrite exisiting file.
+      Default of script/trac2html is to exclude class=""
 
-0.17 2015.04.05
-    Add lots of full html tests.
-    Add command line script script/trac2html
-    Enable excluding class="" from the HTML
-    run Perl::Tidy
-    run Perl::Critic
-    Escape { in regex RT #100712
+0.18  2015.04.05
+      Remove auto_include from Makefile.PL to limit inc/ to the Module::Install code.
 
-0.16 2014.09.13
-    New maintainer.
-    Link to Github.
-    License in META files.
+0.17  2015.04.05
+      Add lots of full html tests.
+      Add command line script script/trac2html
+      Enable excluding class="" from the HTML
+      run Perl::Tidy
+      run Perl::Critic
+      Escape { in regex RT #100712
 
-0.15    Sun Mar 8
-    Fix for RT#43894.Updated Module::Install in this module.
-    Thanks for ANDK!
+0.16  2014.09.13
+      New maintainer.
+      Link to Github.
+      License in META files.
 
-0.14    Mon Feb 23
-    Fix for RT#43337.Image URLs are not converted into
-    embedded images anymore.Thanks for cmcosse!
+0.15  Sun Mar 8
+      Fix for RT#43894.Updated Module::Install in this module.
+      Thanks for ANDK!
 
-0.13    Tue Jul 29
-    Revert inline_parsers in Text::Trac::BlockNode.
-    Thanks for yappo!
+0.14  Mon Feb 23
+      Fix for RT#43337.Image URLs are not converted into
+      embedded images anymore.Thanks for cmcosse!
 
-0.12    Tue Apr 15
-    Support comment link.
-    See http://rt.cpan.org/Ticket/Display.html?id=34805.
-    Thanks for CLSUNG!
+0.13  Tue Jul 29
+      Revert inline_parsers in Text::Trac::BlockNode.
+      Thanks for yappo!
 
-0.11    Thu Mar 6
-    Fix for http://rt.cpan.org/Ticket/Display.html?id=33670#txn-430322
-    Thanks for David Wheeler!
+0.12  Tue Apr 15
+      Support comment link.
+      See http://rt.cpan.org/Ticket/Display.html?id=34805.
+      Thanks for CLSUNG!
 
-0.10    Fri Feb 29
-    Fix for http://rt.cpan.org/Ticket/Display.html?id=33670
-    Thanks for David Wheeler!
+0.11  Thu Mar 6
+      Fix for http://rt.cpan.org/Ticket/Display.html?id=33670#txn-430322
+      Thanks for David Wheeler!
 
-0.09    Thu Feb 28
-    Fix for http://rt.cpan.org/Ticket/Display.html?id=33575
-    and http://rt.cpan.org/Ticket/Display.html?id=33576.
-    Thanks for David Wheeler!
+0.10  Fri Feb 29
+      Fix for http://rt.cpan.org/Ticket/Display.html?id=33670
+      Thanks for David Wheeler!
 
-0.08    Tue Nov 20
-    Apply a patch of https://rt.cpan.org/Ticket/Display.html?id=30816.
-    Thanks to Kazuyoshi KATO!
-    
-0.07    Sun Mar 25
-    Tiny fix for Ul.pm and Ol.pm
+0.09  Thu Feb 28
+      Fix for http://rt.cpan.org/Ticket/Display.html?id=33575
+      and http://rt.cpan.org/Ticket/Display.html?id=33576.
+      Thanks for David Wheeler!
 
-0.06    Wed Nov 9
-    Fix list handling(Ul.pm and Ol.pm).
-    Refactor inline node parsers wholly.
-    Add supports for TracLinks and WikiMacros.
-   
-0.05    Fri Oct 27
-    Using Test::Base instead of Test::More in 01-text-trac.t.
-    Fix the bug reported on rt.cpan.org ticket #21431.
-    http://rt.cpan.org/Ticket/Display.html?id=21431
-    Thanks to Andrew Sterling Hanenkamp and Graham TerMarsch.
+0.08  Tue Nov 20
+      Apply a patch of https://rt.cpan.org/Ticket/Display.html?id=30816.
+      Thanks to Kazuyoshi KATO!
 
-0.04    Wed Jul 19
-    Fix autolink handling, again.
+0.07  Sun Mar 25
+      Tiny fix for Ul.pm and Ol.pm
 
-0.03    Wed Jul 19
-    Fix autolink handling.
+0.06  Wed Nov 9
+      Fix list handling(Ul.pm and Ol.pm).
+      Refactor inline node parsers wholly.
+      Add supports for TracLinks and WikiMacros.
 
-0.02    Tue Jun 20
-    Fix the link pattern of AutoLinkHttp.pm.
+0.05  Fri Oct 27
+      Using Test::Base instead of Test::More in 01-text-trac.t.
+      Fix the bug reported on rt.cpan.org ticket #21431.
+      http://rt.cpan.org/Ticket/Display.html?id=21431
+      Thanks to Andrew Sterling Hanenkamp and Graham TerMarsch.
 
-0.01    Tue Jun 20
-    First version, released on an unsuspecting world.
+0.04  Wed Jul 19
+      Fix autolink handling, again.
+
+0.03  Wed Jul 19
+      Fix autolink handling.
+
+0.02  Tue Jun 20
+      Fix the link pattern of AutoLinkHttp.pm.
+
+0.01  Tue Jun 20
+      First version, released on an unsuspecting world.
 

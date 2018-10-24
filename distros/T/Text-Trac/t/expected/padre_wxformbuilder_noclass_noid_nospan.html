@@ -1,0 +1,26 @@
+<h1>Building GUI for Padre</h1>
+<p>
+Building GUI for Padre can be done either manually as we did earlier or using the wxFormBuilder.
+</p>
+<blockquote>
+<p>
+ 1.
+   a. For Windows download wxFormBuilder from <a  href="http://sourceforge.net/projects/wxformbuilder/">http://sourceforge.net/projects/wxformbuilder/</a>
+   b. For Ubuntu visit <a  href="https://launchpad.net/ubuntu/+source/wxformbuilder">https://launchpad.net/ubuntu/+source/wxformbuilder</a> or better yet <a  href="https://launchpad.net/~rjmyst3/+ppa-packages">https://launchpad.net/~rjmyst3/+ppa-packages</a>
+ 2. Use Padre::Plugin::<a  href="/wiki/FormBuilder">FormBuilder</a>. It is not released on CPAN so you need to install it from our repository.
+ 3. Please follow this discussion <a  href="http://irclog.perlgeek.de/padre/2010-12-10#i_3072846">http://irclog.perlgeek.de/padre/2010-12-10#i_3072846</a> 
+</p>
+</blockquote>
+<p>
+The actual process is
+</p>
+<ol><li>Using wxFormBuilder open the appropriate file in the project fbp directory.
+</li><li>Install <a  href="/wiki/FormBuilder">FormBuilder</a> plugin from SVN (it's not good enough to release)
+<ol><li>NOTE: you need to install the <a  href="/wiki/FormBuilder">FormBuilder</a> plugin (not just run it with 'dev -a') as it uses File::<a  href="/wiki/ShareDir">ShareDir</a>, which only seems to work fro installed files.
+</li></ol></li><li>Use the <a  href="/wiki/FormBuilder">FormBuilder</a> plugin to generate the code for the dialog.
+</li><li>Save the code over the top of the existing .pm module in the Padre::Wx::FBP namespace with no modifications. The ::FBP:: namespace is designed specifically for this purpose, to hold unmodified generated files.
+</li><li>Open the Padre::Wx::Dialog:: module, which inherits from the ::FBP:: module. Edit to apply any custom changes needed to match the generated code.</li></ol>
+<h1>Building GUI application</h1>
+<p>
+TBD.
+</p>

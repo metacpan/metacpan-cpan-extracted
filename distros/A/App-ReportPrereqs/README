@@ -4,11 +4,11 @@ NAME
 
 VERSION
 
-    Version 0.001
+    Version 0.003
 
 SYNOPSIS
 
-    report-prereqs [--with-develop]
+    report-prereqs [--with-{develop,feature=id}] [URL]
 
 DESCRIPTION
 
@@ -17,6 +17,9 @@ DESCRIPTION
     prerequisites (including 'recommends', 'suggests', etc.). However, any
     'develop' prerequisites are not reported, unless they show up in
     another category or the --with-develop option is used.
+
+    Option --with-feature enables optional features provided by a CPAN
+    distribution. Option may be used more than once.
 
     Versions are reported based on the result of parse_version from
     ExtUtils::MakeMaker, which means prerequisite modules are not actually
@@ -32,12 +35,66 @@ OPTIONS
 
       Also report develop prerequisites.
 
+    --with-feature String: Name
+
+      Specify optional feature to enable. Option may be used more than
+      once.
+
 EXIT STATUS
 
     The report-prereqs utility exits 0 on success, 1 if an error occurs,
     and 2 if invalid command line options were specified.
 
     The state of the prerequisites does have no effect on the exist status.
+
+EXAMPLES
+
+ Example 1 Using this on Travis CI with AUTHOR_TESTING
+
+    Add the following lines to .travis.yml right before your tests are run,
+    after all your dependencies are installed.
+
+        - cpanm --verbose --notest --skip-satisfied App::ReportPrereqs
+        - report-prereqs --with-develop
+
+ Example 2 Using this on Travis CI without AUTHOR_TESTING
+
+    Add the following lines to .travis.yml right before your tests are run,
+    after all your dependencies are installed.
+
+        - cpanm --verbose --notest --skip-satisfied App::ReportPrereqs
+        - report-prereqs
+
+ Example 3 Using this on AppVeyor with AUTHOR_TESTING
+
+    Add the following lines to .appveyor.yml right before your tests are
+    run, after all your dependencies are installed.
+
+        - perl -S cpanm --verbose --notest --skip-satisfied App::ReportPrereqs
+        - perl -S report-prereqs --with-develop
+
+ Example 4 Using this on AppVeyor without AUTHOR_TESTING
+
+    Add the following lines to .appveyor.yml right before your tests are
+    run, after all your dependencies are installed.
+
+        - perl -S cpanm --verbose --notest --skip-satisfied App::ReportPrereqs
+        - perl -S report-prereqs
+
+ Example 5 Show prerequistes from a cpanfile url
+
+        report-prereqs https://raw.githubusercontent.com/skirmess/App-ReportPrereqs/master/cpanfile
+
+RATIONALE
+
+ Why this instead of Dist::Zilla::Plugin::Test::ReportPrereqs
+
+    The Test::ReportPrereqs Dist::Zilla plugin adds a test to your
+    distribution that prints all the prerequisites version during testing
+    of your distribution.
+
+    The goal of this module is to produce the same output on Travis CI and
+    AppVeyor without including an additional file to the distribution.
 
 SEE ALSO
 
@@ -63,6 +120,10 @@ SUPPORT
 AUTHOR
 
     Sven Kirmess <sven.kirmess@kzone.ch>
+
+CONTRIBUTORS
+
+      * Stephan Sachse <ste.sachse@gmail.com>
 
 COPYRIGHT AND LICENSE
 

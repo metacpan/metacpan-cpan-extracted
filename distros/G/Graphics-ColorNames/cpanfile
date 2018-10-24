@@ -1,7 +1,7 @@
 requires "Exporter" => "5.57";
 requires "Module::Load" => "0.10";
 requires "Module::Loaded" => "0";
-requires "perl" => "5.006";
+requires "perl" => "v5.6.0";
 requires "version" => "0";
 
 on 'test' => sub {
@@ -11,7 +11,10 @@ on 'test' => sub {
   requires "Module::Metadata" => "0";
   requires "Test::Exception" => "0";
   requires "Test::More" => "0";
+  requires "Test::Most" => "0";
   requires "constant" => "0";
+  requires "lib" => "0";
+  requires "perl" => "v5.6.0";
 };
 
 on 'test' => sub {

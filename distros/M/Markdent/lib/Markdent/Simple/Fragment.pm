@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Markdent::Handler::HTMLStream::Fragment;
 use Markdent::Parser;
@@ -66,7 +66,7 @@ Markdent::Simple::Fragment - Convert Markdown to an HTML Fragment
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 SYNOPSIS
 

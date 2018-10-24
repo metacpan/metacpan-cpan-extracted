@@ -3,9 +3,10 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Sql;
 use Prty::Object;
@@ -73,6 +74,10 @@ Logdatei. Wenn nicht angegeben oder '-' wird auf STDOUT gelogged.
 =item -sqlClass => $class (Default: 'Prty::Sql')
 
 Name der Sql-Klasse zur Statementgenerierung.
+
+=item -strict => $bool (Default: undef)
+
+Aktiviere oder deaktiviere automatische Fehlerbehandlung.
 
 =item -utf8 => $bool (Default: 0)
 
@@ -613,6 +618,24 @@ sub isAccess {
 
 # -----------------------------------------------------------------------------
 
+=head2 Handle
+
+=head3 handle() - Lowlevel (DBI-)Handle
+
+=head4 Synopsis
+
+    $dbh = $db->handle;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub handle {
+    return shift->get('apiObj')->get('dbh');
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Information
 
 =head3 defaultRowClass() - Liefere Namen der Default-Rowklasse
@@ -732,6 +755,9 @@ sub writeLog {
         my $fh;
         if ($file eq '-') {
             $fh = *STDOUT;
+        }
+        elsif (ref($file) eq 'GLOB') {
+            $fh = $file;
         }
         else {
             $fh = Prty::FileHandle->new('>>',$file);
@@ -1266,7 +1292,7 @@ sub sql {
         -log=>\$log,
     );
 
-    my $stmt = shift || ''; # Leeres Statement ergibt Pseudocursor
+    (my $stmt) = (my $origStmt) = shift || ''; # Leeres Statement ergibt Pseudocursor
     Prty::String->removeIndentation(\$stmt);
 
     if ($log) {
@@ -1312,7 +1338,8 @@ sub sql {
     # FIXME: Fetch-Zeit auch loggen
 
     if ($log) {
-        $self->timeToLog(sprintf '%.6f sec%s',$execTime,$@? ' ERROR': '');
+        $self->timeToLog(sprintf '%.6f sec, %s rows%s',$execTime,
+            $apiCur? $apiCur->hits: 0,$@? ' ERROR': '');
     }
 
     # Exception nach Log-Protokollierung werfen
@@ -1338,7 +1365,7 @@ sub sql {
         apiCur=>$apiCur,
         bindVars=>$bindVars,
         db=>$self, # schwache Referenz, siehe Cursor-Konstruktor
-        stmt=>$stmt,
+        stmt=>$origStmt,
         hits=>$hits,
         id=>$id,
         rowClass=>$rowClass,
@@ -1372,8 +1399,8 @@ Statement fehl, wird ein ROLLBACK ausgeführt.
 Dieses Verhalten ist insbesondere im Falle von PostgreSQL wichtig,
 da bei PostgreSQL praktisch alles einer Transaktionskontrolle unterliegt.
 Z.B. können erzeugte Objekte nicht zugriffen werden, solange
-ihre Erzeugung nicht abgeschlossen ist, der Zugriff auf die erzeugten
-Objekt wird blockiert. Oder das Setzen von Session-Einstellungen
+ihre Erzeugung nicht abgeschlossen ist, d.h. der Zugriff auf die erzeugten
+Objekte wird blockiert. Oder das Setzen von Session-Einstellungen
 verfällt mit einem ROLLBACK. usw.
 
 =cut
@@ -4175,7 +4202,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

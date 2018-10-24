@@ -911,9 +911,17 @@ again. The default is empty, which means there is no cache.
 
 =item C<PERL_VERSION>
 
-The perl version to install - default is currently C<5.12.3>, but C<5.8.9>
-is also a good choice (5.8.9 is much smaller than 5.12.3, while 5.10.1 is
-about as big as 5.12.3).
+The perl version to install - C<5.12.5> is a good choice for small builds,
+but C<5.8.9> is also a good choice (5.8.9 is much smaller than 5.12.5), if
+it builds on your system.
+
+You can also set this variable to the absolute URL of a tarball (F<.tar>,
+F<.tar.gz>, F<.tar.bz2>, F<.tar.lzma> or F<.tar.xz>), or to the absolute
+path of an unpacked perl source tree, which will be copied.
+
+The default is currently
+F<http://stableperl.schmorp.de/dist/latest.tar.gz>, i.e. the latest
+stableperl release.
 
 =item C<PERL_MM_USE_DEFAULT>, C<EV_EXTRA_DEFS>, ...
 
@@ -1161,8 +1169,8 @@ Binaries created with C<mkbundle>/C<mkperl> contain extra functionality,
 mostly related to the extra files bundled in the binary (the virtual
 filesystem). All of this data is statically compiled into the binary, and
 accessing means copying it from a read-only section of your binary. Data
-pages in this way is usually freed by the operating system, as it isn't
-use more the onace.
+pages in this way are usually freed by the operating system, as they aren't
+used more then once.
 
 =head2 VIRTUAL FILESYSTEM
 

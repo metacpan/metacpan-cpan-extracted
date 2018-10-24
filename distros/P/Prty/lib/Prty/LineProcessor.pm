@@ -3,9 +3,10 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Option;
 use Prty::FileHandle;
@@ -73,7 +74,7 @@ Klasse, auf die die Zeilen des Dokuments geblesst werden.
 
 =item -lineContinuation => $type (Default: undef)
 
-Art der Zeilenfortsetzung. Mögliche Werte
+Art der Zeilenfortsetzung. Mögliche Werte:
 
 =over 4
 
@@ -392,7 +393,7 @@ sub dump {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

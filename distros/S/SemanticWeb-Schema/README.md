@@ -4,7 +4,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 # VERSION
 
-version v0.0.1
+version v0.0.2
 
 # SYNOPSIS
 
@@ -25,8 +25,8 @@ print $person->json_ld;
 This is a base class for the `SemanticWeb::Schema` classes, which
 were generated automatically from the following sources:
 
-- [http://schema.org/version/3.3/ext-meta.rdf](http://schema.org/version/3.3/ext-meta.rdf)
-- [http://schema.org/version/3.3/schema.rdf](http://schema.org/version/3.3/schema.rdf)
+- [http://schema.org/version/3.4/ext-meta.rdf](http://schema.org/version/3.4/ext-meta.rdf)
+- [http://schema.org/version/3.4/schema.rdf](http://schema.org/version/3.4/schema.rdf)
 
 # ATTRIBUTES
 

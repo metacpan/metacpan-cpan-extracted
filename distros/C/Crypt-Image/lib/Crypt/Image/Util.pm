@@ -1,6 +1,6 @@
 package Crypt::Image::Util;
 
-$Crypt::Image::Util::VERSION   = '0.12';
+$Crypt::Image::Util::VERSION   = '0.13';
 $Crypt::Image::Util::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Image::Util - Helper for Crypt::Image module.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

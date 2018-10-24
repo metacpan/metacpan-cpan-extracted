@@ -1,0 +1,38 @@
+{
+  'children' => [
+    {
+      'children' => [
+        {
+          'children' => [
+            {
+              'children' => [
+                '/destination'
+              ],
+              'nodename' => 'jsonOtherNotDouble',
+              'type' => 'element'
+            }
+          ],
+          'nodename' => 'jsonPointer',
+          'type' => 'element'
+        },
+        {
+          'children' => [
+            {
+              'children' => [
+                '/source'
+              ],
+              'nodename' => 'jsonOtherNotDouble',
+              'type' => 'element'
+            }
+          ],
+          'nodename' => 'jsonPointer',
+          'type' => 'element'
+        }
+      ],
+      'nodename' => 'transformMove',
+      'type' => 'element'
+    }
+  ],
+  'nodename' => 'transforms',
+  'type' => 'element'
+}

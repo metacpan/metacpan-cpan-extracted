@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::BreadcrumbList;
 
 # ABSTRACT: A BreadcrumbList is an ItemList consisting of a chain of linked Web pages
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,13 +34,13 @@ SemanticWeb::Schema::BreadcrumbList - A BreadcrumbList is an ItemList consisting
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
 =for html A BreadcrumbList is an ItemList consisting of a chain of linked Web pages,
 typically described using at least their URL and their name, and typically
-ending with the current page.</p> <p>The <a class="localLink"
+ending with the current page.<br/><br/> The <a class="localLink"
 href="http://schema.org/position">position</a> property is used to
 reconstruct the order of the items in a BreadcrumbList The convention is
 that a breadcrumb list has an <a class="localLink"

@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:MBZ",
+      "dc:source" : "schemadotorgsources2:MBZ",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The kind of release which this album is: single, EP or album.",
       "rdfs:label" : "MusicAlbumReleaseType",

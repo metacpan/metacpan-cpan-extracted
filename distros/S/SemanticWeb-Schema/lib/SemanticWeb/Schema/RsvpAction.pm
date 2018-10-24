@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::RsvpAction;
 
 # ABSTRACT: The act of notifying an event organizer as to whether you expect to attend the event.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has additional_number_of_guests => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::RsvpAction - The act of notifying an event organizer as to 
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

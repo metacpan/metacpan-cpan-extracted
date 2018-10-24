@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::BusTrip;
 
 # ABSTRACT: A trip on a commercial bus line.
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::Intangible /;
+extends qw/ SemanticWeb::Schema::Trip /;
 
 
 use MooX::JSON_LD 'BusTrip';
@@ -13,21 +15,13 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has arrival_bus_stop => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'arrivalBusStop',
-);
-
-
-
-has arrival_time => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'arrivalTime',
 );
 
 
@@ -56,22 +50,6 @@ has departure_bus_stop => (
 
 
 
-has departure_time => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'departureTime',
-);
-
-
-
-has provider => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'provider',
-);
-
-
-
 
 
 1;
@@ -88,7 +66,7 @@ SemanticWeb::Schema::BusTrip - A trip on a commercial bus line.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -106,23 +84,9 @@ A arrival_bus_stop should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::BusStop']>
-
 =item C<InstanceOf['SemanticWeb::Schema::BusStation']>
 
-=back
-
-=head2 C<arrival_time>
-
-C<arrivalTime>
-
-The expected arrival time.
-
-A arrival_time should be one of the following types:
-
-=over
-
-=item C<Str>
+=item C<InstanceOf['SemanticWeb::Schema::BusStop']>
 
 =back
 
@@ -170,39 +134,9 @@ A departure_bus_stop should be one of the following types:
 
 =back
 
-=head2 C<departure_time>
-
-C<departureTime>
-
-The expected departure time.
-
-A departure_time should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<provider>
-
-The service provider, service operator, or service performer; the goods
-producer. Another party (a seller) may offer those services or goods on
-behalf of the provider. A provider may also serve as the seller.
-
-A provider should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
-=back
-
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::Intangible>
+L<SemanticWeb::Schema::Trip>
 
 =head1 AUTHOR
 

@@ -36,6 +36,19 @@ my $collections = {
                 'x-order' => 3,
                 pattern => '^[^@]+@[^@]+$',
             },
+            age => {
+                'x-order' => 4,
+                type => 'integer',
+            },
+            contact => {
+                'x-order' => 5,
+                type => 'boolean',
+            },
+            birthdate => {
+                'x-order' => 6,
+                type => 'string',
+                format => 'date',
+            },
         },
     },
     user => {
@@ -144,6 +157,71 @@ subtest 'set' => sub {
         like $t->app->log->history->[-1][2], qr{Error validating item with ID "$set_id" in collection "people": $message \($path\)},
             'error message is logged with JSON validation error';
     };
+
+    subtest 'set numeric field with string containing number' => sub {
+        my $set_id = $items{people}[0]{id};
+        my $new_person = { name => 'foobar', email => 'doug@example.com', age => "20" };
+        eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
+        ok !$@, 'set() lives'
+            or diag "Errors: \n" . join "\n", map { "\t$_" } @{ $@ };
+        $new_person->{id} = $set_id;
+        is_deeply $backend->get( people => $set_id ), $new_person;
+    };
+
+    subtest 'set boolean field with "1" as true' => sub {
+        my $set_id = $items{people}[0]{id};
+        my $new_person = { name => 'foobar', email => 'doug@example.com', contact => 1 };
+        eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
+        ok !$@, 'set() lives'
+            or diag "Errors: \n" . join "\n", map { "\t$_" } @{ $@ };
+        $new_person->{id} = $set_id;
+        $new_person->{age} = 20;
+        is_deeply $backend->get( people => $set_id ), $new_person;
+    };
+
+    subtest 'set date field with "" is an error' => sub {
+        my $set_id = $items{people}[0]{id};
+        my $new_person = { name => 'foobar', email => 'doug@example.com', birthdate => '' };
+        eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
+        ok $@, 'set() dies';
+        like $@->[0]{path}, qr{/birthdate}, 'birthdate is invalid';
+        like $@->[0]{message}, qr{Does not match date format}, 'format error correct';
+    };
+
+    subtest 'set partial (assume required fields are already set)' => sub {
+        my $set_id = $items{people}[0]{id};
+        my $new_email = { email => 'doug@example.com' };
+        eval {
+            $t->app->yancy->set(
+                people => $set_id => { %{ $new_email } },
+                properties => [qw( email )],
+            );
+        };
+        ok !$@, 'set() lives'
+            or diag "Errors: \n" . join "\n", map { "\t$_" } @{ $@ };
+        my $new_person = {
+            id => $set_id,
+            name => 'foobar',
+            email => 'doug@example.com',
+            contact => 1,
+            age => 20,
+            %$new_email,
+        };
+        is_deeply $backend->get( people => $set_id ), $new_person;
+
+        subtest 'required fields are still required' => sub {
+            eval {
+                $t->app->yancy->set(
+                    people => $set_id => {},
+                    properties => [qw( name )],
+                );
+            };
+            ok $@, 'set() dies';
+            like $@->[0]{path}, qr{/name}, 'name is missing';
+            like $@->[0]{message}, qr{Missing}, 'missing error correct';
+        };
+    };
+
 };
 
 my $added_id;
@@ -198,6 +276,26 @@ subtest 'openapi' => sub {
     } );
     my $openapi = $t->app->yancy->openapi;
     ok $openapi->validator, 'openapi helper returned meaningful object';
+};
+
+subtest 'schema' => sub {
+    my $t = Test::Mojo->new( Mojolicious->new );
+    $t->app->plugin( 'Yancy', {
+        backend => $backend_url,
+        collections => $collections,
+        read_schema => 1,
+    } );
+
+    subtest 'collection schema' => sub {
+        is_deeply $t->app->yancy->schema( 'user' ), $collections->{user},
+            'schema( $coll ) is correct';
+    };
+
+    subtest 'field schema' => sub {
+        is_deeply $t->app->yancy->schema( 'user', 'email' ),
+            $collections->{user}{properties}{email},
+            'schema( $coll, $field ) is correct';
+    };
 };
 
 done_testing;

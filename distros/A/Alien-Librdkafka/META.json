@@ -35,7 +35,7 @@
    "provides" : {
       "Alien::Librdkafka" : {
          "file" : "lib/Alien/Librdkafka.pm",
-         "version" : "v0.9.5"
+         "version" : "v0.11.6"
       }
    },
    "release_status" : "stable",
@@ -48,7 +48,7 @@
          "url" : "git://github.com/trinitum/perl-Alien-Librdkafka"
       }
    },
-   "version" : "v0.9.5",
+   "version" : "v0.11.6",
    "x_contributors" : [
       "Pavel Shaydo <zwon@cpan.org>"
    ],

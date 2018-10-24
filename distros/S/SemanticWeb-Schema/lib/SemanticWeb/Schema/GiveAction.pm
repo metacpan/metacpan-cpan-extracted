@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::GiveAction;
 
-# ABSTRACT: <p>The act of transferring ownership of an object to a destination
+# ABSTRACT: The act of transferring ownership of an object to a destination
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has recipient => (
@@ -36,16 +38,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::GiveAction - <p>The act of transferring ownership of an object to a destination
+SemanticWeb::Schema::GiveAction - The act of transferring ownership of an object to a destination
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of transferring ownership of an object to a destination.
-Reciprocal of TakeAction.</p> <p>Related actions:</p> <ul> <li><a
+=for html The act of transferring ownership of an object to a destination. Reciprocal
+of TakeAction.<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/TakeAction">TakeAction</a>:
 Reciprocal of GiveAction.</li> <li><a class="localLink"
 href="http://schema.org/SendAction">SendAction</a>: Unlike SendAction,
@@ -63,11 +65,11 @@ A recipient should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::Audience']>
+
 =item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
-=item C<InstanceOf['SemanticWeb::Schema::Audience']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::TVClip;
 
 # ABSTRACT: A short TV program or a segment/part of a TV program.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has part_of_tv_series => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::TVClip - A short TV program or a segment/part of a TV progr
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

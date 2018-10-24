@@ -1,5 +1,12 @@
 Revision history for Net::Silk
 
+2.07  Tue Oct 23 12:50:51 EDT 2018
+    - Fixed compilation/tests for when IPv6 isn't enabled
+
+2.06  Tue Oct 23 11:26:38 EDT 2018
+    - Updated for compatibility with changes to invocations
+      and annotations in SiLK file headers
+
 2.05  Thu Dec  1 13:02:29 EST 2016
     - streamlined ipv4 bag support
 

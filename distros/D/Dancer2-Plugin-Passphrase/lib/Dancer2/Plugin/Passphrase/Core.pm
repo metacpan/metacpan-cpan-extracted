@@ -45,13 +45,17 @@ sub _merge_options {
     # if we got options
     if ($options) {
         $algorithm = delete $options->{'algorithm'};
-        $settings  = $options->{$algorithm} // $self->{$algorithm};
+        $settings =
+          defined $options->{$algorithm}
+          ? $options->{$algorithm}
+          : $self->{$algorithm};
     }
 
     # Specify empty string to get an unsalted hash
     # Leaving it undefs results in 128 random bits being used as salt
     # bcrypt requires this amount, and is reasonable for other algorithms
-    $settings->{'salt'} //= rand_bits(128);
+    $settings->{'salt'} = rand_bits(128)
+      unless defined $settings->{'salt'};
 
     # RFC 2307 scheme is based on the algorithm, with a prefixed 'S' for salted
     $settings->{'scheme'} = join '', $algorithm =~ /[\w]+/g;
@@ -68,7 +72,8 @@ sub _merge_options {
     if ( $algorithm eq 'Bcrypt' ) {
         $settings->{'scheme'} = 'CRYPT';
         $settings->{'type'}   = '2a';
-        $settings->{'cost'}   = $settings->{'cost'} // 4;
+        $settings->{'cost'} =
+          defined $settings->{'cost'} ? $settings->{'cost'} : 4;
         $settings->{'cost'}   = 31 if $settings->{'cost'} > 31;
         $settings->{'cost'}   = sprintf '%02d', $settings->{'cost'};
     }

@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/pscott-au/WebService-GoogleAPI-Client.svg?branch=master)](https://travis-ci.org/pscott-au//WebService-GoogleAPI-Client)
+[![Build Status](https://travis-ci.org/pscott-au/WebService-GoogleAPI-Client.svg?branch=master)](https://travis-ci.org/pscott-au/WebService-GoogleAPI-Client)
 [![Coverage Status](https://coveralls.io/repos/github/pscott-au/WebService-GoogleAPI-Client/badge.svg?branch=master)](https://coveralls.io/github/pscott-au/WebService-GoogleAPI-Client?branch=master)
 [![CPAN Version](https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.svg)](http://search.cpan.org/~localshop/WebService-GoogleAPI-Client/lib/WebService/GoogleAPI/Client.pm)
 
 
-![Perl Google APIs Client Library](https://pscott-au.github.io/WebService-Google-Client/perl-google-apis-client-library.png)
+![Perl Google APIs Client Library](https://pscott-au.github.io/WebService-GoogleAPI-Client/perl-google-apis-client-library.png)
 
 # NAME
 
@@ -11,16 +11,20 @@ WebService::GoogleAPI::Client - Perl Google API Services OAUTH Client.
 
 # VERSION
 
-version 0.10
+version 0.13
 
 # SYNOPSIS
 
-Provides client access to All [Google API V.1](https://developers.google.com/discovery/v1) Services using a user-agent that handles OAUTH2 authentication and access control and provides helpers to exploit locally cached API Discovery specifications.
+Provides client access to [Google API V.1](https://developers.google.com/discovery/v1) Service End-Points using a user-agent that handles OAUTH2 authentication and access control and provides helpers to cache API Discovery specifications.
 
 The guiding principal is to minimise the conceptual load when using the Client agent for users who want to make calls directly, but also make available functions to help explore unfamiliar API endpoints by offering optional validation etc against the latest published Google API Discovery specifications.
 
 
-NB: To create or modify an authorization configuration file with scope and user tokens in current folder run _goauth_ CLI tool to interactively create the JSON configuration and launch a local HTTP server to acquire authenticated access permissions with a Google email account. See ````perldoc goauth```` for more detail.
+NB: To create or modify an authorization configuration file with scope and user tokens in current folder run _goauth_ CLI tool to interactively create the JSON configuration and launch a local HTTP server to acquire authenticated access permissions with a Google email account. 
+
+![goauth screen capture](https://pscott-au.github.io/WebService-GoogleAPI-Client/goauth-login-cap.gif)
+
+See ````perldoc goauth```` for more detail.
 
 
 ````perl
@@ -32,8 +36,13 @@ NB: To create or modify an authorization configuration file with scope and user 
     
     my $gapi_client = WebService::GoogleAPI::Client->new( debug => 1, gapi_json => './gapi.json', user=> 'peter@pscott.com.au' );
 
+
     ## Completely manually constructed API End-Point Request to obtain Perl Data Structure converted from JSON response.
-    print Dumper $gapi_client->api_get(  userId => 'me'   )->json;
+    my $res = $gapi_client->api_query(
+          method => 'get',
+          path => 'https://www.googleapis.com/calendar/users/me/calendarList',
+        )->json;
+
 
     ## using dotted API Endpoint id to invoke helper validation and default value interpolations etc to send email to self
     use Email::Simple;    ## RFC2822 formatted messages
@@ -54,7 +63,7 @@ NB: To create or modify an authorization configuration file with scope and user 
                         );
 
 
-
+    ## TEXT TO SPEECH EXAMPLE
     my $text_to_speech_request_options =  {
             'input' => {
             'text' => 'Using the Web-Services-Google-Client Perl module, it is now a simple matter to access all of the Google API Resources in a consistent manner.'
@@ -136,30 +145,18 @@ NB: To create or modify an authorization configuration file with scope and user 
 The code in this repository uses [Dist::Zilla](http://dzil.org/) Build System to assist package building and creation of Tarball and CPAN distribution. Curiously the [Github Repo](https://github.com/rjbs/dist-zilla/) describes itself as '*scary tools for building CPAN distributions*'
 
 ````shell
-sudo dzil install
-````
-
-## Install from Tarball
-
-````
-    ## Quickest
-    sudo cpanm https://dev.pscott.com.au/WebService-Google-Client-latest.tar.gz
-
-    ## Safest
-    wget https://dev.pscott.com.au/WebService-Google-Client-latest.tar.gz
-    tar -zxvf WebService-Google-Client-latest.tar.gz
-    rm WebService-Google-Client-latest.tar.gz
-    cd   WebService-Google-Client-*
-    perl Makefile.PL
-    make test
-    sudo make install
-
-    
+    sudo dzil install
 ````
 
 ## Install from CPAN
 
   sudo cpanm WebService::GoogleAPI::Client
+
+### Windows Strawberry Perl Notes
+
+At the time of writing I had issues installing [Config::Json V1.5202](https://metacpan.org/pod/Config::JSON) due to [an issue with the tests](https://github.com/plainblack/config-json/issues/5). Until [the patch](https://github.com/plainblack/config-json/pull/4) is applied it is OK to force the install in cpan to get things working. 
+
+I was unable to get the [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) packages installed under Windows but installing without the dzil build layer through _cpanm_ or _cpan_ should now work as of V0.13
 
 
 ## TYPICAL USAGE QUICKSTART
@@ -170,11 +167,14 @@ sudo dzil install
 * Requires a local project configuration file that can be generated with the included *goauth* CLI Tool (perldoc goauth for more detail )
 
 ````perl
+    use strict;
+    use warnings;
+    ue Data::Dumper;
+
     use feature 'say';
     use WebService::GoogleAPI::Client;
 
     my $gapi = WebService::GoogleAPI::Client->new(debug => 0);
-    $gapi->auth_storage->setup( { type => 'jsonfile', path => './gapi.json' } );
 
     ## This idiom selects the first authorised user from gapi.json 
     my $aref_token_emails = $gapi->auth_storage->storage->get_token_emails_from_storage;
@@ -214,7 +214,7 @@ sudo dzil install
 
 # SEE ALSO
 
-- [Moo::Google](https://metacpan.org/pod/Moo::Google) - The original code base later forked into [WebService::Google](https://metacpan.org/pod/WebService::Google) but is heading in a different path
+- [Moo::Google](https://metacpan.org/pod/Moo::Google) - The original code base later forked into [WebService::Google](https://metacpan.org/pod/WebService::Google) but is heading in a different direction
 - [Google Swagger API https:](https:///github.com/APIs-guru/google-discovery-to-swagger) 
 
 # AUTHORS

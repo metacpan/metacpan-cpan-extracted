@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,10 +23,10 @@ requires:
   Digest::Bcrypt: '0'
   Digest::SHA: '5.74'
   Test::More: '0'
-  perl: '5.010001'
+  perl: '5.008001'
 resources:
-  bugtracker: https://github.com/hvoers/Dancer2-Plugin-Passphrase/issues
-  homepage: https://github.com/hvoers/Dancer2-Plugin-Passphrase/
-  repository: https://github.com/hvoers/Dancer2-Plugin-Passphrase
-version: v3.3.0
+  bugtracker: https://github.com/SysPete/Dancer2-Plugin-Passphrase/issues
+  homepage: https://github.com/SysPete/Dancer2-Plugin-Passphrase/
+  repository: https://github.com/SysPete/Dancer2-Plugin-Passphrase
+version: v3.3.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

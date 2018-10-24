@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+      "dc:source" : "schemadotorgsources:STI_Accommodation_Ontology",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A hotel room is a single room in a hotel.\n<br /><br />\nSee also the <a href=\"/docs/hotels.html\">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.",
       "rdfs:label" : "HotelRoom",
@@ -8,7 +8,7 @@
    },
    "properties" : {
       "schema:bed" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "dc:source" : "schemadotorgsources:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The type of bed or beds included in the accommodation. For the single case of just one bed of a certain type, you use bed directly with a text.\n      If you want to indicate the quantity of a certain kind of bed, use an instance of BedDetails. For more detailed information, use the amenityFeature property.",
          "rdfs:label" : "bed",
@@ -17,19 +17,19 @@
             "schema:Suite"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:BedDetails"
+            "schema:BedDetails",
+            "schema:Text"
          ]
       },
       "schema:occupancy" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "dc:source" : "schemadotorgsources:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The allowed total occupancy for the accommodation in persons (including infants etc). For individual accommodations, this is not necessarily the legal maximum but defines the permitted usage as per the contractual agreement (e.g. a double room used by a single person).\nTypical unit code(s): C62 for person",
          "rdfs:label" : "occupancy",
          "schema:domainIncludes" : [
-            "schema:Suite",
             "schema:SingleFamilyResidence",
             "schema:Apartment",
+            "schema:Suite",
             "schema:HotelRoom"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"

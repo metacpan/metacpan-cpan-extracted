@@ -10,7 +10,7 @@ use warnings;
 
 # RECOMMEND PREREQ: Graphics::ColorNames
 
-our $VERSION = 'v3.1.2';
+our $VERSION = 'v3.1.3';
 
 sub NamesRgbTable() {
     use integer;
@@ -132,7 +132,7 @@ Graphics::ColorNames::Netscape - Netscape 1.1 Color Names
 
 =head1 VERSION
 
-version v3.1.2
+version v3.1.3
 
 =head1 SYNOPSIS
 

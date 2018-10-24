@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: redis address list for spamassassin auto-whitelist
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.004'; # VERSION
 
 use Mail::SpamAssassin::PersistentAddrList;
 use Mail::SpamAssassin::Util qw(untaint_var);
@@ -138,9 +138,10 @@ sub remove_entry {
     # try to delete any per-IP entries for this addr as well.
     # could be slow...
 
-    $mailaddr =~ s/\*//g;
-    my @keys = $self->{'redis'}->keys($self->{'prefix'}.$mailaddr.'*');
-    $self->{'redis'}->del( @keys );
+    # make sure wildcard characters are escaped
+    $mailaddr =~ s/([\*\[\]\?])/\\$1/g;
+    my @keys = $self->{'redis'}->keys($self->{'prefix'}.$mailaddr.'|ip=*');
+    $self->{'redis'}->del( @keys ) if @keys;
   }
 
   return;
@@ -160,7 +161,7 @@ Mail::SpamAssassin::RedisAddrList - redis address list for spamassassin auto-whi
 
 =head1 VERSION
 
-version 1.002
+version 1.004
 
 =head1 AUTHOR
 

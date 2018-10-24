@@ -1,6 +1,6 @@
 #!/usr/bin/env perl -w
 
-use 5.0101;
+use 5.014;
 use Bat::Interpreter;
 
 my $interpreter = Bat::Interpreter->new;

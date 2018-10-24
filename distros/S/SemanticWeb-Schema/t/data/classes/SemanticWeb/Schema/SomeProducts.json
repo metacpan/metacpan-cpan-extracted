@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "dc:source" : "schemadotorgsources2:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A placeholder for multiple similar products of the same kind.",
       "rdfs:label" : "SomeProducts",
@@ -8,7 +8,7 @@
    },
    "properties" : {
       "schema:inventoryLevel" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The current approximate inventory level for the item or items.",
          "rdfs:label" : "inventoryLevel",

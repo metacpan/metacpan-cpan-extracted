@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::InteractionCounter;
 
 # ABSTRACT: A summary of how users have interacted with this CreativeWork
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has interaction_service => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::InteractionCounter - A summary of how users have interacted
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -76,9 +78,9 @@ A interaction_service should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::SoftwareApplication']>
-
 =item C<InstanceOf['SemanticWeb::Schema::WebSite']>
+
+=item C<InstanceOf['SemanticWeb::Schema::SoftwareApplication']>
 
 =back
 

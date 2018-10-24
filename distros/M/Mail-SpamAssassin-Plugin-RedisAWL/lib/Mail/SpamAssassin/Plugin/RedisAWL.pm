@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: redis support for spamassassin AWL/TxRep
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.004'; # VERSION
 
 use vars qw(@ISA);
 @ISA = qw(Mail::SpamAssassin::Plugin);
@@ -70,7 +70,7 @@ Mail::SpamAssassin::Plugin::RedisAWL - redis support for spamassassin AWL/TxRep
 
 =head1 VERSION
 
-version 1.002
+version 1.004
 
 =head1 DESCRIPTION
 

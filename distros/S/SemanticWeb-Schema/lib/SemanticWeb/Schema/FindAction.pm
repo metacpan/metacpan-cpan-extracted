@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::FindAction;
 
-# ABSTRACT: <p>The act of finding an object
+# ABSTRACT: The act of finding an object
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,18 +30,18 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::FindAction - <p>The act of finding an object
+SemanticWeb::Schema::FindAction - The act of finding an object
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of finding an object.</p> <p>Related actions:</p> <ul> <li><a
-class="localLink" href="http://schema.org/SearchAction">SearchAction</a>:
-FindAction is generally lead by a SearchAction, but not necessarily.</li>
-</ul> 
+=for html The act of finding an object.<br/><br/> Related actions:<br/><br/> <ul>
+<li><a class="localLink"
+href="http://schema.org/SearchAction">SearchAction</a>: FindAction is
+generally lead by a SearchAction, but not necessarily.</li> </ul> 
 
 =head1 SEE ALSO
 

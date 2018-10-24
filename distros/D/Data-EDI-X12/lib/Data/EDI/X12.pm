@@ -3,8 +3,9 @@ use strict;
 
 use YAML qw(LoadFile Load);
 use IO::File;
+use Data::Dumper;
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 =head1 NAME
 
@@ -14,7 +15,7 @@ Data::EDI::X12 - EDI X12 Processing for Perl
 
 =head1 SYNOPSIS
 
- my $x12 = Data::EDI::X12->new({ spec_file => 'edi.yaml', new_lines => 1, truncate_null => 1, hide_empty_sections => 1 });
+ my $x12 = Data::EDI::X12->new({ spec_file => 'edi.yaml', new_lines => 1, truncate_null => 1 });
  my $data = $x12->read_record(...);
  print $x12->write_record($data);
  
@@ -280,20 +281,19 @@ sub new
     $config_truncate_null = $spec->{config}{truncate_null}
         if $spec->{config} and exists($spec->{config}{truncate_null});
 
-    my $config_hide_empty_sections = $args->{hide_empty_sections};
-    $config_hide_empty_sections = $spec->{config}{hide_empty_sections}
-        if $spec->{config} and exists($spec->{config}{hide_empty_sections});
-    
+    my $auto_configure = $args->{auto_configure};
+    $auto_configure = $spec->{config}{auto_configure}
+        if $spec->{config} and exists($spec->{config}{auto_configure});
 
     my $self = {
         spec                => $spec,
         debug               => $args->{debug},
         terminator          => $config_terminator || $args->{terminator} || '~',
         separator           => $config_separator  || $args->{separator}  || '*',
+        auto_configure      => $auto_configure,
         error               => '',
         new_lines           => $args->{new_lines},
         truncate_null       => $config_truncate_null       || 0,
-        hide_empty_sections => $config_hide_empty_sections || 0,
         strict_ascii        => $config_strict_ascii        || 0,
     };
     bless($self);
@@ -312,6 +312,14 @@ sub read_record
     my ($self, $string) = @_;
 
     my $record = { };
+
+    if ($self->{auto_configure})
+    {
+        my $term_info = $self->_get_autoconfigure_info({ string => $string });
+
+        $self->{terminator} = $term_info->{terminator};
+        $self->{separator}  = $term_info->{separator};
+    }
 
     # strip newlines if applicable
     $string =~ s/[\r\n]//g
@@ -386,6 +394,22 @@ sub _parse_definition
     return $record;
 }
 
+
+sub _get_autoconfigure_info
+{
+    my ($self, $params) = @_;
+
+    my $string         = "$params->{string}";
+    $string =~ s/^\s+//g;
+
+    my @isa_chars = split(//, $string);
+
+    return {
+        separator  => $isa_chars[3],
+        terminator => $isa_chars[105],
+    };
+}
+
 sub _parse_edi
 {
     my ($self, $params) = @_;
@@ -401,9 +425,9 @@ sub _parse_edi
     my $IN_DETAIL = 0;
     my $IN_FOOTER = 0;
 
-    my $IN_LOOP;
     my $LOOP_SECTION;
     my %LOOP_SEGMENTS;
+    my @LOOP_PARENTS;
 
     my ($current_group, $current_set, $current_record);
 
@@ -421,11 +445,12 @@ sub _parse_edi
                 segments   => $segments,
                 type       => $type,
             });
+
             $IN_ISA = 1;
 
             %LOOP_SEGMENTS = ();
             $LOOP_SECTION = undef;
-            $IN_LOOP = undef;
+            @LOOP_PARENTS = ();
 
             $IN_DETAIL = 0;
             $IN_FOOTER = 0;
@@ -436,7 +461,7 @@ sub _parse_edi
 
             %LOOP_SEGMENTS = ();
             $LOOP_SECTION = undef;
-            $IN_LOOP = undef;
+            @LOOP_PARENTS = ();
 
             $IN_DETAIL = 0;
             $IN_FOOTER = 0;
@@ -455,7 +480,7 @@ sub _parse_edi
 
             %LOOP_SEGMENTS = ();
             $LOOP_SECTION = undef;
-            $IN_LOOP = undef;
+            @LOOP_PARENTS = ();
 
             $IN_DETAIL = 0;
             $IN_FOOTER = 0;
@@ -468,7 +493,7 @@ sub _parse_edi
 
             %LOOP_SEGMENTS = ();
             $LOOP_SECTION = undef;
-            $IN_LOOP = undef;
+            @LOOP_PARENTS = ();
 
             $IN_DETAIL = 0;
             $IN_FOOTER = 0;
@@ -487,7 +512,7 @@ sub _parse_edi
 
             %LOOP_SEGMENTS = ();
             $LOOP_SECTION = undef;
-            $IN_LOOP = undef;
+            @LOOP_PARENTS = ();
 
             $IN_DETAIL = 0;
             $IN_FOOTER = 0;
@@ -501,7 +526,7 @@ sub _parse_edi
 
             %LOOP_SEGMENTS = ();
             $LOOP_SECTION = undef;
-            $IN_LOOP = undef;
+            @LOOP_PARENTS = ();
 
             $IN_GS = 0;
             $IN_DETAIL = 0;
@@ -518,13 +543,14 @@ sub _parse_edi
 
             for my $section (qw(footer detail header))
             {
+                $loop_def{$section} = {} unless exists $loop_def{$section};
                 for my $segment (@{ $spec->{structure}{$section} || [ ] })
                 {
                     if (ref($segment) and ref($segment) eq 'HASH')
                     {
                         for my $key (keys(%$segment))
                         {
-                            $loop_def{$key} = $segment->{$key};
+                            $loop_def{uc($section)}{$key} = $segment->{$key};
                             $segment_to_section{$key} = uc($section);
                         }
                     }
@@ -559,105 +585,153 @@ sub _parse_edi
 
             # track tree depth
             # and dump results in loop portion?
+            if (my $type_def = $spec->{segments}{uc($type)})
             {
-               if (my $type_def = $spec->{segments}{uc($type)})
-               {
-                   if ($section eq 'DETAIL' or $LOOP_SECTION eq 'DETAIL')
-                   {
-                       $current_record->{DETAIL} = [{}]
-                           unless exists $current_record->{DETAIL};
+                # CREATE THIS SECTION, IF IT DOES NOT EXIST
 
-                       # START THE LOOPING
-                       if ($loop_def{$type} and not $IN_LOOP)
-                       {
-                           $IN_LOOP = $type;
-                           $LOOP_SECTION = $section;
-                           %LOOP_SEGMENTS = map { $_ => 1 } @{ $loop_def{$type} || [] };
-                       }
+                if ($section eq 'DETAIL')
+                {
+                    $current_record->{$section} = [{}]
+                       unless exists $current_record->{$section};
+                }
+                else
+                {
+                    $current_record->{$section} = {}
+                       unless exists $current_record->{$section};
+                }
 
-                       # END THE LOOPING
-                       if ($IN_LOOP and not $LOOP_SEGMENTS{$type})
-                       {
-                           %LOOP_SEGMENTS = ();
-                           $LOOP_SECTION = undef;
-                           $IN_LOOP = undef;
-                       }
+                # HAVE WE LEFT A LOOP YET?
+                if (@LOOP_PARENTS)
+                {
+                    while (@LOOP_PARENTS)
+                    {
+                        # if the current type falls within a loop, then ok..
+                        # otherwise, back one level down
+                        if ($LOOP_PARENTS[-1]->{segments}->{$type})
+                        {
+                            last;
+                        }
+                        else
+                        {
+                            pop @LOOP_PARENTS;
+                        }
+                    }
+                }
 
-                       if ($IN_LOOP)
-                       {
-                           $current_record->{DETAIL}->[-1]->{$IN_LOOP} = [{}]
-                               unless exists $current_record->{DETAIL}->[-1]->{$IN_LOOP};
+                # START THE LOOPING (FIRST LEVEL)
+                if (not @LOOP_PARENTS and $loop_def{$section}{$type})
+                {
+                    $LOOP_SECTION = $section;
 
-                           push @{ $current_record->{DETAIL}->[-1]->{$IN_LOOP} }, {}
-                               if exists($current_record->{DETAIL}->[-1]->{$IN_LOOP}->[-1]->{$type});
+                    my @segments;
+                    my $next_loop_segments = {};
+                    for my $ld ( @{ $loop_def{$section}{$type} || [] })
+                    {
+                        if (ref($ld) eq 'HASH')
+                        {
+                            my ($name) = keys(%$ld);
 
-                           $current_record->{DETAIL}->[-1]->{$IN_LOOP}->[-1]->{$type} = $self->_parse_definition({
-                               definition => $type_def->{definition},
-                               segments   => $segments,
-                               type       => $type,
-                           });
-                       }
-                       else
-                       {
-                           push @{ $current_record->{DETAIL} }, {}
-                               if exists($current_record->{DETAIL}->[-1]->{$type});
+                            $next_loop_segments->{$name} = $ld->{$name};
 
-                           $current_record->{DETAIL}->[-1]->{$type} = $self->_parse_definition({
-                               definition => $type_def->{definition},
-                               segments   => $segments,
-                               type       => $type,
-                           });
-                       }
-                   }
-                   else
-                   {
-                       $current_record->{$section} = {}
-                           unless exists $current_record->{$section};
+                            push @segments, (keys(%$ld));
+                        }
+                        else
+                        {
+                            push @segments, $ld;
+                        }
+                    }
 
-                       my $structure = $spec->{structure}{lc($section)};
+                    push @LOOP_PARENTS, {
+                        type               => $type,
+                        section            => $section,
+                        segments           => {  map { $_ => 1 } @segments },
+                        next_loop_segments => $next_loop_segments,
+                        loop_def           => $loop_def{$section}{$type},
+                        record_part        => $section eq 'DETAIL' ? $current_record->{$section}->[-1] : $current_record->{$section},
+                    };
+                }
+                elsif (@LOOP_PARENTS and $LOOP_PARENTS[-1]->{next_loop_segments}->{$type})
+                {
+                    my $record_part = $LOOP_PARENTS[-1]->{record_part}->{ $LOOP_PARENTS[-1]->{type} }->[-1];
 
-                       # END THE LOOPING
-                       if ($IN_LOOP and not $LOOP_SEGMENTS{$type})
-                       {
-                           %LOOP_SEGMENTS = ();
-                           $LOOP_SECTION = undef;
-                           $IN_LOOP = undef;
-                       }
+                    # this is a new loop within a loop!
+                    $record_part->{$type} = [{}]
+                        unless exists $record_part->{$type};
 
-                       # START THE LOOPING
-                       if ($loop_def{$type} and not $IN_LOOP)
-                       {
-                           $IN_LOOP = $type;
-                           $LOOP_SECTION = $section;
-                           %LOOP_SEGMENTS = map { $_ => 1 } @{ $loop_def{$type} || [] };
+                    my @segments;
+                    my $next_loop_segments = {};
+                    for my $ld ( @{ $LOOP_PARENTS[-1]->{next_loop_segments}->{$type} || [] })
+                    {
+                        if (ref($ld) eq 'HASH')
+                        {
+                            my ($name) = keys(%$ld);
+                            $next_loop_segments->{$name} = $ld->{$name};
 
-                       }
+                            push @segments, (keys(%$ld));
+                        }
+                        else
+                        {
+                            push @segments, $ld;
+                        }
+                    }
 
-                       if ($IN_LOOP)
-                       {
-                           $current_record->{$LOOP_SECTION}->{$IN_LOOP} = [{}]
-                               unless exists $current_record->{$LOOP_SECTION}->{$IN_LOOP};
+                    push @LOOP_PARENTS, {
+                        type               => $type,
+                        section            => $section,
+                        segments           => {  map { $_ => 1 } @segments },
+                        next_loop_segments => $next_loop_segments,
+                        loop_def           => $LOOP_PARENTS[-1]->{next_loop_segments}->{$type},
+                        record_part        =>  $record_part,
+                    };
+                }
 
-                           push @{ $current_record->{$LOOP_SECTION}{$IN_LOOP} }, {}
-                               if exists($current_record->{$LOOP_SECTION}->{$IN_LOOP}->[-1]->{$type});
+                $LOOP_SECTION = undef
+                    unless @LOOP_PARENTS;
+                
+                # NOW, WE'RE IN A LOOP
+                if (@LOOP_PARENTS)
+                {
+                    # section is the loop section, if section is unmapped and there's a loop
+                    $section = $LOOP_SECTION unless $section;
+                    
+                    my $LOOP_PARENT = $LOOP_PARENTS[-1];
+                    my $RECORD_PART = $LOOP_PARENT->{record_part};
 
-                           $current_record->{$LOOP_SECTION}->{$IN_LOOP}->[-1]->{$type} = $self->_parse_definition({
-                               definition => $type_def->{definition},
-                               segments   => $segments,
-                               type       => $type,
-                           });
-                       }
-                       else
-                       {
-                           $current_record->{$section}->{$type} = $self->_parse_definition({
-                               definition => $type_def->{definition},
-                               segments   => $segments,
-                               type       => $type,
-                           });
-                       }
-                   }
-               }
-           }
+                    $RECORD_PART->{$LOOP_PARENT->{type}} = [{}]
+                        unless exists $RECORD_PART->{$LOOP_PARENT->{type}};
+
+                    push @{ $RECORD_PART->{$LOOP_PARENT->{type}} }, {}
+                        if exists($RECORD_PART->{$LOOP_PARENT->{type}}->[-1]->{$type});
+                           
+                    $RECORD_PART->{$LOOP_PARENT->{type}}->[-1]->{$type} = $self->_parse_definition({
+                        definition => $type_def->{definition},
+                        segments   => $segments,
+                        type       => $type,
+                    });
+                }
+                else
+                {
+                    if ($section eq 'DETAIL')
+                    {
+                        push @{ $current_record->{$section} }, {}
+                            if exists($current_record->{$section}->[-1]->{$type});
+
+                        $current_record->{$section}->[-1]->{$type} = $self->_parse_definition({
+                            definition => $type_def->{definition},
+                            segments   => $segments,
+                            type       => $type,
+                        });
+                    }
+                    else
+                    {
+                        $current_record->{$section}{$type} = $self->_parse_definition({
+                            definition => $type_def->{definition},
+                            segments   => $segments,
+                            type       => $type,
+                        });
+                    }
+                }
+            }
         }
     }
 }
@@ -723,6 +797,45 @@ sub _write_spec
     return $string;
 }
 
+sub _write_section
+{
+    my ($self, $args) = @_;
+
+    my $fh           = $args->{fh};
+    my $spec         = $args->{spec};
+    my $section      = $args->{section};
+    my $record_part  = $args->{record_part};
+    my $record_count = $args->{record_count};
+
+    if (ref($section) and ref($section) eq 'HASH')
+    {
+        my ($loop_name) = keys(%$section);
+        my $loop_structure = $section->{$loop_name};
+        
+        for my $record (@{ $record_part->{$loop_name} || [] })
+        {
+            for my $structure (@{ $loop_structure || []})
+            {
+                $args->{record_part} = $record;
+                $args->{section}     = $structure;
+                $self->_write_section($args);
+            }
+        }
+    }
+    else
+    {
+        next unless exists $record_part->{$section};
+
+        $args->{record_count}++;
+
+        print $fh $self->_write_spec(
+            type     => $section,
+            type_def => $spec->{segments}{$section},
+            record   => $record_part->{$section},
+        );
+    }                
+}
+
 sub _write_edi
 {
     my ($self, $params) = @_;
@@ -736,8 +849,6 @@ sub _write_edi
 
     my $term_val = $self->{terminator};
     my $sep_val  = $self->{separator};
-
-    my $hide_empty_sections = $self->{hide_empty_sections};
 
     $record->{ISA}{control_number} = 1
         unless exists $record->{ISA}{control_number};
@@ -768,14 +879,6 @@ sub _write_edi
 
         for my $set (@{ $group->{SETS} || [ ] })
         {
-            my $record_count = 1;
-
-            # you don't want to know why this exists...
-            if ($self->{spec}->{RECORD_OFFSET_COUNT})
-            {
-                $record_count = $record_count + $self->{spec}->{RECORD_OFFSET_COUNT};
-            }
-
             $set_count++;
 
             $set->{control_number} = $set_count
@@ -796,41 +899,19 @@ sub _write_edi
             die "cannot find spec for $doc_id"
                 unless $spec;
 
+
+            my $section_args = {
+                record_count => 1,
+                fh          => $fh,
+                spec        => $spec,
+            };
+
             # process set header
             for my $section (@{ $spec->{structure}{header} || [ ] })
             {
-                if (ref($section) and ref($section) eq 'HASH')
-                {
-                    my ($loop_name) = keys(%$section);
-                    my $loop_structure = $section->{$loop_name};
-
-                    for my $record (@{ $set->{HEADER}{$loop_name} || [] })
-                    {
-                        for my $structure (@{ $loop_structure || []})
-                        {
-                            next if $hide_empty_sections and not exists $record->{$structure};
-
-                            $record_count++;
-
-                            print $fh $self->_write_spec(
-                                type     => $structure,
-                                type_def => $spec->{segments}{$structure},
-                                record   => $record->{$structure},
-                            );
-                        }
-                    }
-                }
-                else
-                {
-                    next if $hide_empty_sections and not exists $set->{HEADER}{$section};
-
-                    $record_count++;
-                    print $fh $self->_write_spec(
-                        type     => $section,
-                        type_def => $spec->{segments}{$section},
-                        record   => $set->{HEADER}{$section},
-                    );
-                }
+                $section_args->{section}     = $section;
+                $section_args->{record_part} = $set->{HEADER};
+                $self->_write_section($section_args);
             }
 
             # process set details
@@ -838,86 +919,36 @@ sub _write_edi
             {
                 for my $section (@{ $spec->{structure}{detail} || [ ] })
                 {
-                    if (ref($section) and ref($section) eq 'HASH')
-                    {
-                        my ($loop_name) = keys(%$section);
-                        my $loop_structure = $section->{$loop_name};
-
-                        for my $sub_record (@{ $detail->{$loop_name} || [] })
-                        {
-                            for my $structure (@{ $loop_structure || []})
-                            {
-                                next if $hide_empty_sections and not exists $sub_record->{$structure};
-
-                                $record_count++;
-                                print $fh $self->_write_spec(
-                                    type     => $structure,
-                                    type_def => $spec->{segments}{$structure},
-                                    record   => $sub_record->{$structure},
-                                );
-                            }
-                        }
-                    }
-                    else
-                    {
-                        next if $hide_empty_sections and not exists $detail->{$section};
-
-                        $record_count++;
-                        print $fh $self->_write_spec(
-                            type     => $section,
-                            type_def => $spec->{segments}{$section},
-                            record   => $detail->{$section},
-                        );
-                    }
+                    $section_args->{section}     = $section;
+                    $section_args->{record_part} = $detail;
+                    $self->_write_section($section_args);
                 }
             }
-            
 
             # process set footer
             for my $section (@{ $spec->{structure}{footer} || [ ] })
             {
-                if (ref($section) and ref($section) eq 'HASH')
-                {
-                    my ($loop_name) = keys(%$section);
-                    my $loop_structure = $section->{$loop_name};
-
-                    for my $record (@{ $set->{FOOTER}{$loop_name} || [] })
-                    {
-                        for my $structure (@{ $loop_structure || []})
-                        {
-                            next if $hide_empty_sections and not exists $record->{$structure};
-
-                            $record_count++;
-                            print $fh $self->_write_spec(
-                                type     => $structure,
-                                type_def => $spec->{segments}{$structure},
-                                record   => $record->{$structure},
-                            );
-                        }
-                    }
-                }
-                else
-                {
-                    next if $hide_empty_sections and not exists $set->{FOOTER}{$section};
-
-                    $record_count++;
-                    print $fh $self->_write_spec(
-                        type     => $section,
-                        type_def => $spec->{segments}{$section},
-                        record   => $set->{FOOTER}{$section},
-                    );
-                }
+                $section_args->{section}     = $section;
+                $section_args->{record_part} = $set->{FOOTER};
+                $self->_write_section($section_args);
             }
 
-            ######
-
             # process SE line
-            $record_count++;
+            $section_args->{record_count}++;
+
+            # you don't want to know why this exists...
+            if ($self->{spec}->{RECORD_OFFSET_COUNT})
+            {
+                $section_args->{record_count} =
+                    $section_args->{record_count} + 
+                    $self->{spec}->{RECORD_OFFSET_COUNT};
+            }
+
             print $fh $self->_write_spec(
                 type     => 'SE',
                 type_def => $self->{spec}->{SE},
                 record   => {
-                    total          => $record_count,
+                    total          => $section_args->{record_count},
                     control_number => $set->{control_number},
                 },
             );

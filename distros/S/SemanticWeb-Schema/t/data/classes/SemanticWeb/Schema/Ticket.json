@@ -18,20 +18,20 @@
          "rdfs:comment" : "The organization issuing the ticket or permit.",
          "rdfs:label" : "issuedBy",
          "schema:domainIncludes" : [
-            "schema:Ticket",
-            "schema:Permit"
+            "schema:Permit",
+            "schema:Ticket"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
       "schema:priceCurrency" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The currency (in 3-letter ISO 4217 format) of the price or a price component, when attached to <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> and its subtypes.",
+         "rdfs:comment" : "The currency of the price, or a price component when attached to <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> and its subtypes.<br/><br/>\n\nUse standard formats: <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217 currency format</a> e.g. \"USD\"; <a href=\"https://en.wikipedia.org/wiki/List_of_cryptocurrencies\">Ticker symbol</a> for cryptocurrencies e.g. \"BTC\"; well known names for <a href=\"https://en.wikipedia.org/wiki/Local_exchange_trading_system\">Local Exchange Tradings Systems</a> (LETS) and other currency types e.g. \"Ithaca HOUR\".",
          "rdfs:label" : "priceCurrency",
          "schema:domainIncludes" : [
-            "schema:PriceSpecification",
             "schema:Reservation",
+            "schema:Offer",
             "schema:Ticket",
-            "schema:Offer"
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -64,13 +64,13 @@
          "rdfs:comment" : "The total price for the reservation or ticket, including applicable taxes, shipping, etc.",
          "rdfs:label" : "totalPrice",
          "schema:domainIncludes" : [
-            "schema:Ticket",
-            "schema:Reservation"
+            "schema:Reservation",
+            "schema:Ticket"
          ],
          "schema:rangeIncludes" : [
             "schema:Number",
-            "schema:PriceSpecification",
-            "schema:Text"
+            "schema:Text",
+            "schema:PriceSpecification"
          ]
       },
       "schema:underName" : {

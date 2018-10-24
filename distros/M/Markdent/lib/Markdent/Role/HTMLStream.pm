@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use HTML::Entities qw( encode_entities );
 use Markdent::CheckedOutput;
@@ -656,7 +656,7 @@ Markdent::Role::HTMLStream - A role for handlers which generate HTML
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 

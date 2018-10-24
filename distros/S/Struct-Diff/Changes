@@ -1,5 +1,9 @@
 Revision history for Struct-Diff
 
+0.97    2018-10-23
+        - patch: croak if passed structure doesn't match
+        - dist and docs corrected
+
 0.96    2018-04-08
         - 'I' indexes now related to first structure
         - 'I' indexes fixed for cases when U op enabled only

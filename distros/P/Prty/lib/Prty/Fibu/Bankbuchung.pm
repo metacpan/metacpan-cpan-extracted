@@ -3,9 +3,10 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Fibu::Buchung;
 
@@ -93,26 +94,47 @@ sub toBuchungen {
     # Miete
 
     if ($self->isDauerauftrag && $self->buchungsdetails =~ /^MIETE/i) {
-        if ($self->betragZahl ne '-970.00') {
+        if ($self->betragZahl eq '-1070.00') {
+            push @arr,
+                Prty::Fibu::Buchung->new(
+                    vorgang => 'Grundstückskosten / Miete',
+                    betrag => '-102,12',
+                    text => 'Büro Miete',
+                ),
+                Prty::Fibu::Buchung->new(
+                    vorgang => 'Grundstückskosten / Gas, Wasser, Strom',
+                    betrag => '-50,32',
+                    text => 'Büro Nebenkosten',
+                ),
+                Prty::Fibu::Buchung->new(
+                    vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                    betrag => '-917,56',
+                    text => 'Miete Privat',
+                ),
+            ;
+        }
+        elsif ($self->betragZahl eq '-970.00') {
+            push @arr,
+                Prty::Fibu::Buchung->new(
+                    vorgang => 'Grundstückskosten / Miete',
+                    betrag => '-102,12',
+                    text => 'Büro Miete',
+                ),
+                Prty::Fibu::Buchung->new(
+                    vorgang => 'Grundstückskosten / Gas, Wasser, Strom',
+                    betrag => '-35,52',
+                    text => 'Büro Nebenkosten',
+                ),
+                Prty::Fibu::Buchung->new(
+                    vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                    betrag => '-832,36',
+                    text => 'Miete Privat',
+                ),
+            ;
+        }
+        else {
             die "ERROR: Miete hat sich geändert\n";
         }
-        push @arr,
-            Prty::Fibu::Buchung->new(
-                vorgang => 'Grundstückskosten / Miete',
-                betrag => '-102,12',
-                text => 'Büro Miete',
-            ),
-            Prty::Fibu::Buchung->new(
-                vorgang => 'Grundstückskosten / Gas, Wasser, Strom',
-                betrag => '-35,52',
-                text => 'Büro Nebenkosten',
-            ),
-            Prty::Fibu::Buchung->new(
-                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
-                betrag => '-832,36',
-                text => 'Miete Privat',
-            ),
-        ;
     }
     elsif ($self->empfaenger =~ /Techniker Krankenkasse/i &&
             $self->umsatzart eq 'Lastschrift') {
@@ -121,6 +143,16 @@ sub toBuchungen {
             Prty::Fibu::Buchung->new(
                 vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
                 text => "Krankenkasse ($monat)",
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /PRIVATHAFTPF/i) {
+        my ($datum) = $self->buchungsdetails =~ /(\d\d.\d\d.\d\d)/;
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                text => "Privathaftpflicht ($datum)",
+                beleg => 1,
             ),
         ;
     }
@@ -159,11 +191,36 @@ sub toBuchungen {
             ),
         ;
     }
+    elsif ($self->buchungshinweis =~ m|ERSTATT\.31/075/60059 UMS.ST (\S+)|) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Betriebseinnahmen'.
+                    ' / Umsatzsteuervorauszahlung',
+                text => "Umsatzsteuer Erstattung ($1)",
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ m|ERSTATT.31/075/60766 EINK.ST (\S+)|) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldzugänge / Einlage von Privat',
+                text => "Einkommensteuer Erstattung ($1)",
+            ),
+        ;
+    }
     elsif ($self->buchungshinweis =~ m|Rundfunk (\S+)|) {
         push @arr,
             Prty::Fibu::Buchung->new(
                 vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
                 text => 'Rundfunkbeitrag',
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ m|Rechnung 70069042 Markisen Paradies|) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                text => 'Markisen Paradies',
             ),
         ;
     }
@@ -211,8 +268,7 @@ sub toBuchungen {
             ),
         ;
     }
-    elsif ($self->empfaenger =~ /Seitz, Frank/
-            && $self->buchungsdetails =~ /DE81250100300915689309/) {
+    elsif ($self->empfaenger =~ /Seitz, Frank/) {
         push @arr,
             Prty::Fibu::Buchung->new(
                 vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
@@ -250,6 +306,180 @@ sub toBuchungen {
 
     # *** Einmalige Buchungen ***
 
+    elsif ($self->buchungsdatum eq '27.08.2018' &&
+            $self->empfaenger =~ /dubaro.de/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Rechner',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->empfaenger =~ /Borgert-Bühren/ &&
+            $self->buchungsdetails =~ /Nebenkosten/i &&
+            $self->betrag =~ /1\.720,07/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Grundstückskosten / Gas, Wasser, Strom',
+                betrag => '-254,57',
+                text => 'Büro Nebenkosten Nachzahlung',
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                betrag => '-1465,50',
+                text => 'Nebenkosten Nachzahlung',
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /23.08.18 VISA CARD/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-6,13',
+                text => 'github.com (2018-07-30)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,68',
+                text => 'Amazon Server (2018-08-06)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                betrag => '-329,00',
+                text => 'Privat',
+                beleg => 0,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /24.07.18 VISA CARD/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-6,18',
+                text => 'github.com (2018-06-28)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,55',
+                text => 'Amazon Server (2018-07-04)',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /25.06.18 VISA CARD/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Kontoführungsgebühren',
+                betrag => '-29,00',
+                text => 'VISA Jahresgebühr (2018-06-18)',
+                beleg => 0,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,72',
+                text => 'Amazon Server (2018-06-05)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,19',
+                text => 'Amazon Server (2018-06-07)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-54,73',
+                text => 'Visitenkarten',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /28.05.18 VISA CARD/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-5,92',
+                text => 'github.com (2018-04-27)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgnge / Entnahme nach Privat',
+                betrag => '-10,00',
+                text => 'Privat',
+                beleg => 0,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,30',
+                text => 'Amazon Server (2018-05-03)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-6,12',
+                text => 'github.com (2018-05-27)',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /25.04.18 VISA CARD/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-5,76',
+                text => 'github.com (2018-03-28)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,19',
+                text => 'Amazon Server (2018-04-04)',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /23.03.18 VISA CARD/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-5,84',
+                text => 'github.com (2018-02-28)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-8,71',
+                text => 'Amazon Server (2018-03-05)',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /23.02.18 VISA CARD/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgnge / Entnahme nach Privat',
+                betrag => '-18,70',
+                text => 'Privat',
+                beleg => 0,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-5,76',
+                text => 'github.com (2018-01-27)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,07',
+                text => 'Amazon Server (2018-02-04)',
+                beleg => 1,
+            ),
+        ;
+    }
     elsif ($self->buchungshinweis =~ /22.12.17 VISA CARD/) {
         push @arr,
             Prty::Fibu::Buchung->new(
@@ -376,6 +606,52 @@ sub toBuchungen {
             ),
         ;
     }
+    elsif ($self->buchungshinweis =~ /24.01.18 VISA/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-6,02',
+                text => 'github.com (2017-12-28)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,39',
+                text => 'Amazon Server (2018-01-04)',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->auftraggeber =~ m|Helmholtz-Zentrum Geesth|i &&
+             $self->buchungshinweis =~ m|5166|i) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Betriebseinnahmen / Erlöse',
+                text => "Rechnung 5166",
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->empfaenger =~ /Wieland Direkt Steuerberatung/i &&
+            $self->buchungshinweis =~ m|Referenz 1801051139-0000005|i) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Rechts- und Beratungskosten',
+                text => "Jahresabschluss 2016",
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /Rechnung Rogosch/
+            && $self->auftraggeber =~ m|SBIT|) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldzugänge / Einlage von Privat',
+                text => 'Rückzahlung von SBIT',
+                beleg => 0,
+            ),
+        ;
+    }
     elsif ($self->empfaenger =~ /Buhl Rogosch Buckentin/
             && $self->buchungshinweis =~ m|FE5A6P/DE34200505501228123210|) {
         push @arr,
@@ -443,6 +719,79 @@ sub toBuchungen {
             ),
         ;
     }
+    elsif ($self->buchungshinweis =~
+            /DE94ZZZ00000561653305-6681488-1906758 AMZN/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Hülle Mobiltel',
+                betrag => '-7,49',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Ladegerät',
+                betrag => '-21,98',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /302-1954185-1444359 Amazon/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Telefonzubehör',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /028-1339995-9721122 Amazon/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Tastaturreiniger',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /028-6935362-2887511 Amazon/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Monitor',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /028-2053102-8236345 Amazon/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Monitor-Anschlusskabel',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /306-6879328-9464324 Amazon/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Bürobedarf',
+                text => 'Kopierpapier',
+                betrag => '-18,13',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /306-4609505-0810703 Amazon/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Audiosplitter',
+                betrag => '-13,99',
+                beleg => 1,
+            ),
+        ;
+    }
     elsif ($self->buchungshinweis =~ /305-9225928-4491519 Amazon/) {
         push @arr,
             Prty::Fibu::Buchung->new(
@@ -485,6 +834,24 @@ sub toBuchungen {
                 vorgang => 'Sonstige Kosten / Sonstige Kosten',
                 text => 'Ladegerät',
                 betrag => '-20,98',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /Referenz 1002997473072/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Fachliteratur',
+                text => 'Fraktale Geometrie',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /305-0775021-4254764 Amazon/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Fachliteratur',
+                text => 'LaTeX Hacks',
                 beleg => 1,
             ),
         ;
@@ -537,6 +904,26 @@ sub toBuchungen {
                 vorgang => 'Sonstige Kosten / Sonstige Kosten',
                 text => 'JETech USB-Maus',
                 betrag => '-6,99',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /306-2084539-8666714 Amazon/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Monitor',
+                betrag => '-134,47',
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /306-4293199-5411517 Amazon/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                text => 'Monitorhalterung',
+                betrag => '-79,99',
                 beleg => 1,
             ),
         ;
@@ -654,6 +1041,32 @@ sub betragZahl {
     $betrag =~ s/,/./;
 
     return $betrag;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 buchungstag() - Liefere das Buchungsdatum
+
+=head4 Synopsis
+
+    $str = $bbu->buchungstag;
+
+=head4 Returns
+
+String
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub buchungstag {
+    my $self = shift;
+
+    if ($self->exists('buchungstag')) {
+        return $self->get('buchungstag');
+    }
+
+    return $self->buchungsdatum;
 }
 
 # -----------------------------------------------------------------------------
@@ -785,7 +1198,7 @@ sub saldoZahl {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

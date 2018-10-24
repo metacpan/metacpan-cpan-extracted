@@ -1,7 +1,7 @@
 package Kafka::Librd;
 use strict;
 use warnings;
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 my $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -17,7 +17,12 @@ Kafka::Librd - bindings for librdkafka
 
 =head1 VERSION
 
-This document describes Kafka::Librd version 0.08
+This document describes Kafka::Librd version 0.09
+
+=head1 SUPPORT
+
+Please note that this module is not actively developed and maintained, if you
+are interested in taking it over, please contact the author
 
 =head1 SYNOPSIS
 
@@ -244,8 +249,6 @@ return message payload
 __END__
 
 =head1 CAVEATS
-
-Module is in early stage of development, only basic functionality is implemented.
 
 Message offset is truncated to 32 bit if perl compiled without support for 64 bit integers.
 

@@ -1,9 +1,9 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A Series in schema.org is a group of related items, typically but not necessarily of the same kind.",
+      "rdfs:comment" : "A Series in schema.org is a group of related items, typically but not necessarily of the same kind. See also <a class=\"localLink\" href=\"http://schema.org/CreativeWorkSeries\">CreativeWorkSeries</a>, <a class=\"localLink\" href=\"http://schema.org/EventSeries\">EventSeries</a>.",
       "rdfs:label" : "Series",
-      "rdfs:subClassOf" : "schema:CreativeWork"
+      "rdfs:subClassOf" : "schema:Intangible"
    },
    "properties" : {}
 }

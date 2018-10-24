@@ -5,6 +5,7 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
 # -----------------------------------------------------------------------------

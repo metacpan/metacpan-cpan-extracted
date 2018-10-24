@@ -8,13 +8,13 @@
    "properties" : {
       "schema:additionalProperty" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.</p>\n\n<p>Note: Publishers should be aware that applications designed to use specific schema.org properties (e.g. http://schema.org/width, http://schema.org/color, http://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
+         "rdfs:comment" : "A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.<br/><br/>\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. http://schema.org/width, http://schema.org/color, http://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
          "rdfs:label" : "additionalProperty",
          "schema:domainIncludes" : [
-            "schema:QualitativeValue",
-            "schema:QuantitativeValue",
             "schema:Product",
-            "schema:Place"
+            "schema:Place",
+            "schema:QuantitativeValue",
+            "schema:QualitativeValue"
          ],
          "schema:rangeIncludes" : "schema:PropertyValue"
       },
@@ -23,10 +23,10 @@
          "rdfs:comment" : "Physical address of the item.",
          "rdfs:label" : "address",
          "schema:domainIncludes" : [
-            "schema:GeoShape",
-            "schema:Organization",
             "schema:Place",
             "schema:GeoCoordinates",
+            "schema:GeoShape",
+            "schema:Organization",
             "schema:Person"
          ],
          "schema:rangeIncludes" : [
@@ -39,19 +39,19 @@
          "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
          "rdfs:label" : "aggregateRating",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:Event",
-            "schema:Place",
-            "schema:Brand",
-            "schema:Product",
-            "schema:CreativeWork",
             "schema:Offer",
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:Product",
+            "schema:Organization",
+            "schema:Brand",
+            "schema:Place",
             "schema:Service"
          ],
          "schema:rangeIncludes" : "schema:AggregateRating"
       },
       "schema:amenityFeature" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "dc:source" : "schemadotorgsources:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
@@ -64,7 +64,7 @@
       },
       "schema:branchCode" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A short textual code (also called \"store code\") that uniquely identifies a place of business. The code is typically assigned by the parentOrganization and used in structured URLs.</p>\n\n<p>For example, in the URL http://www.starbucks.co.uk/store-locator/etc/detail/3047 the code \"3047\" is a branchCode for a particular branch.",
+         "rdfs:comment" : "A short textual code (also called \"store code\") that uniquely identifies a place of business. The code is typically assigned by the parentOrganization and used in structured URLs.<br/><br/>\n\nFor example, in the URL http://www.starbucks.co.uk/store-locator/etc/detail/3047 the code \"3047\" is a branchCode for a particular branch.",
          "rdfs:label" : "branchCode",
          "schema:domainIncludes" : "schema:Place",
          "schema:rangeIncludes" : "schema:Text"
@@ -99,12 +99,12 @@
          "rdfs:label" : "event",
          "schema:domainIncludes" : [
             "schema:JoinAction",
-            "schema:PlayAction",
-            "schema:InformAction",
-            "schema:Organization",
             "schema:Place",
+            "schema:Organization",
+            "schema:PlayAction",
+            "schema:InviteAction",
             "schema:LeaveAction",
-            "schema:InviteAction"
+            "schema:InformAction"
          ],
          "schema:rangeIncludes" : "schema:Event"
       },
@@ -113,8 +113,8 @@
          "rdfs:comment" : "Upcoming or past events associated with this place or organization.",
          "rdfs:label" : "events",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:Place"
+            "schema:Place",
+            "schema:Organization"
          ],
          "schema:rangeIncludes" : "schema:Event",
          "schema:supersededBy" : "schema:event"
@@ -124,10 +124,10 @@
          "rdfs:comment" : "The fax number.",
          "rdfs:label" : "faxNumber",
          "schema:domainIncludes" : [
-            "schema:ContactPoint",
+            "schema:Person",
             "schema:Organization",
             "schema:Place",
-            "schema:Person"
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -137,20 +137,20 @@
          "rdfs:label" : "geo",
          "schema:domainIncludes" : "schema:Place",
          "schema:rangeIncludes" : [
-            "schema:GeoShape",
-            "schema:GeoCoordinates"
+            "schema:GeoCoordinates",
+            "schema:GeoShape"
          ]
       },
       "schema:globalLocationNumber" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The <a href=\"http://www.gs1.org/gln\">Global Location Number</a> (GLN, sometimes also referred to as International Location Number or ILN) of the respective organization, person, or place. The GLN is a 13-digit number used to identify parties and physical locations.",
          "rdfs:label" : "globalLocationNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:Place",
+            "schema:Organization",
             "schema:Person",
-            "schema:Organization"
+            "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -160,8 +160,8 @@
          "rdfs:label" : "hasMap",
          "schema:domainIncludes" : "schema:Place",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Map"
+            "schema:Map",
+            "schema:URL"
          ]
       },
       "schema:isAccessibleForFree" : {
@@ -170,35 +170,35 @@
          "rdfs:label" : "isAccessibleForFree",
          "schema:domainIncludes" : [
             "schema:CreativeWork",
+            "schema:Event",
             "schema:PublicationEvent",
-            "schema:Place",
-            "schema:Event"
+            "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:Boolean"
       },
       "schema:isicV4" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard of Industrial Classification of All Economic Activities (ISIC), Revision 4 code for a particular organization, business person, or place.",
          "rdfs:label" : "isicV4",
          "schema:domainIncludes" : [
-            "schema:Person",
             "schema:Place",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:logo" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An associated logo.",
          "rdfs:label" : "logo",
          "rdfs:subPropertyOf" : "schema:image",
          "schema:domainIncludes" : [
             "schema:Brand",
+            "schema:Product",
             "schema:Service",
             "schema:Place",
-            "schema:Product",
             "schema:Organization"
          ],
          "schema:rangeIncludes" : [
@@ -233,7 +233,7 @@
          "schema:rangeIncludes" : "schema:Integer"
       },
       "schema:openingHoursSpecification" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The opening hours of a certain place.",
          "rdfs:label" : "openingHoursSpecification",
@@ -247,8 +247,8 @@
          "rdfs:subPropertyOf" : "schema:image",
          "schema:domainIncludes" : "schema:Place",
          "schema:rangeIncludes" : [
-            "schema:ImageObject",
-            "schema:Photograph"
+            "schema:Photograph",
+            "schema:ImageObject"
          ]
       },
       "schema:photos" : {
@@ -257,8 +257,8 @@
          "rdfs:label" : "photos",
          "schema:domainIncludes" : "schema:Place",
          "schema:rangeIncludes" : [
-            "schema:Photograph",
-            "schema:ImageObject"
+            "schema:ImageObject",
+            "schema:Photograph"
          ],
          "schema:supersededBy" : "schema:photo"
       },
@@ -275,13 +275,13 @@
          "rdfs:label" : "review",
          "schema:domainIncludes" : [
             "schema:CreativeWork",
-            "schema:Brand",
             "schema:Offer",
-            "schema:Event",
+            "schema:Brand",
             "schema:Service",
-            "schema:Place",
             "schema:Organization",
-            "schema:Product"
+            "schema:Product",
+            "schema:Place",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Review"
       },
@@ -290,17 +290,17 @@
          "rdfs:comment" : "Review of the item.",
          "rdfs:label" : "reviews",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:Offer",
             "schema:Product",
             "schema:Place",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:Organization",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : "schema:Review",
          "schema:supersededBy" : "schema:review"
       },
       "schema:smokingAllowed" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "dc:source" : "schemadotorgsources:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates whether it is allowed to smoke in the place, e.g. in the restaurant, hotel or hotel room.",
          "rdfs:label" : "smokingAllowed",
@@ -309,7 +309,7 @@
       },
       "schema:specialOpeningHoursSpecification" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The special opening hours of a certain place.</p>\n\n<p>Use this to explicitly override general opening hours brought in scope by <a class=\"localLink\" href=\"http://schema.org/openingHoursSpecification\">openingHoursSpecification</a> or <a class=\"localLink\" href=\"http://schema.org/openingHours\">openingHours</a>.",
+         "rdfs:comment" : "The special opening hours of a certain place.<br/><br/>\n\nUse this to explicitly override general opening hours brought in scope by <a class=\"localLink\" href=\"http://schema.org/openingHoursSpecification\">openingHoursSpecification</a> or <a class=\"localLink\" href=\"http://schema.org/openingHours\">openingHours</a>.",
          "rdfs:label" : "specialOpeningHoursSpecification",
          "schema:domainIncludes" : "schema:Place",
          "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
@@ -319,8 +319,8 @@
          "rdfs:comment" : "The telephone number.",
          "rdfs:label" : "telephone",
          "schema:domainIncludes" : [
-            "schema:Person",
             "schema:ContactPoint",
+            "schema:Person",
             "schema:Organization",
             "schema:Place"
          ],

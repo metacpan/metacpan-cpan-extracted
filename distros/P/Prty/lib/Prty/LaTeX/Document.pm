@@ -3,8 +3,9 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Reference;
 use Prty::Unindent;
@@ -29,21 +30,24 @@ Der Code
     use Prty::LaTeX::Document;
     use Prty::LaTeX::Code;
     
+    my $l = Prty::LaTeX::Code->new;
+    
     my $doc = Prty::LaTeX::Document->new(
         body => 'Hallo Welt',
     );
     
-    my $l = Prty::LaTeX::Code->new;
-    my $code = $tab->latex($l);
+    my $code = $doc->latex($l);
 
 produziert
 
     \documentclass[ngerman,a4paper]{scrartcl}
     \usepackage[T1]{fontenc}
-    \usepackage[utf8]{inputenc}
     \usepackage{lmodern}
+    \usepackage[utf8]{inputenc}
     \usepackage{babel}
     \usepackage{geometry}
+    \usepackage{microtype}
+    \geometry{height=22.5cm,bottom=3.8cm}
     \setlength{\parindent}{0em}
     \setlength{\parskip}{0.5ex}
     \begin{document}
@@ -163,6 +167,12 @@ LaTeX: 3. -2 schaltet die Numerierung ab.
 Der Titel des Dokuments. Wenn gesetzt, wird eine Titelseite bzw.
 ein Titelabschnitt erzeugt.
 
+=item titlePageStyle => $pageStyle
+
+Seitenstil der ersten Seite. Mögliche Werte: 'empty' (Kopf-
+und Fußzeile leer), 'plain' (nur Fuß mit Seitennummer), 'headings'
+(Kopf mit Abschnittstiteln, Fuß mit Seitennummer).
+
 =item tocDepth => $n
 
 Tiefe, bis zu der Abschnitte in das Inhaltsverzeichnis aufgenommen
@@ -200,6 +210,7 @@ sub new {
         language => 'ngerman',
         options => undef,
         packages => [],
+        titlePageStyle => undef,
         paperSize => 'a4paper',
         parIndent => '0em',
         parSkip => '0.5ex',
@@ -243,11 +254,11 @@ sub latex {
 
     my ($author,$body,$compactCode,$date,$documentClass,$encoding,
         $fontEncoding,$fontSize,$geometry,$language,$options,$packageA,
-        $paperSize,$parIndent,$parSkip,$preamble,$preComment,$secNumDepth,
-        $title,$tocDepth) = $self->get(qw/author body compactCode date
-        documentClass encoding fontEncoding fontSize geometry language
-        options packages paperSize parIndent parSkip preamble preComment
-        secNumDepth title tocDepth/);
+        $titlePageStyle,$paperSize,$parIndent,$parSkip,$preamble,$preComment,
+        $secNumDepth,$title,$tocDepth) = $self->get(qw/author body
+        compactCode date documentClass encoding fontEncoding fontSize
+        geometry language options packages titlePageStyle paperSize parIndent
+        parSkip preamble preComment secNumDepth title tocDepth/);
 
     my @pnl = $compactCode? (): (-pnl=>1);
 
@@ -350,10 +361,10 @@ sub latex {
     # Abschnittskonfiguration
 
     if (defined $secNumDepth) {
-        $code .= $l->c('\setcounter{secnumdepth}{%s}',$secNumDepth);
+        $code .= $l->c('\setcounter{secnumdepth}{%s}','--',$secNumDepth);
     }
     if (defined $tocDepth) {
-        $code .= $l->c('\setcounter{tocdepth}{%s}',$tocDepth);
+        $code .= $l->c('\setcounter{tocdepth}{%s}','--',$tocDepth);
     }
 
     # Paragraph-Eigenschaften
@@ -399,8 +410,9 @@ sub latex {
         $tmp .= $l->c('\author{%s}',$author // '');
         $tmp .= $l->c('\date{%s}',$date // '');
         $tmp .= $l->c('\maketitle');
-        # Keine Zeilennummer auf Titelseite
-        $tmp .= $l->c('\thispagestyle{empty}');
+        if ($titlePageStyle) {
+            $tmp .= $l->c('\thispagestyle{%s}',$titlePageStyle);
+        }
         $body = $tmp.$body;
     }
     $body = Prty::Unindent->trimNl($body);
@@ -421,7 +433,7 @@ sub latex {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

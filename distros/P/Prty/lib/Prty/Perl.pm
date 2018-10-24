@@ -3,9 +3,10 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Object;
 use Cwd ();
@@ -54,13 +55,13 @@ Der Aufruf ist äquivalent zu
     $| = $bool;
     select $oldFh;
 
-=head4 Example
-
-    Prty::Perl->autoFlush(*STDOUT);
-
 =head4 See Also
 
 perldoc -f select
+
+=head4 Example
+
+    Prty::Perl->autoFlush(*STDOUT);
 
 =cut
 
@@ -93,13 +94,13 @@ Schalte Filehandle $fh in Binärmodus oder setze Layer $layer.
 Die Methode ist eine Überdeckung der Perl-Funktion binmode und prüft
 deren Returnwert. Im Fehlerfall wirft die Methode eine Exception.
 
-=head4 Example
-
-    Prty::Perl->binmode(*STDOUT,':encoding(utf-8)');
-
 =head4 See Also
 
 perldoc -f binmode
+
+=head4 Example
+
+    Prty::Perl->binmode(*STDOUT,':encoding(utf-8)');
 
 =cut
 
@@ -135,13 +136,13 @@ Schreibe Daten @data auf Dateihandle $fh. Die Methode ist eine
 Überdeckung der Perl-Funktion print und prüft deren Returnwert.
 Im Fehlerfall wirft die Methode eine Exception.
 
-=head4 Example
-
-    Prty::Perl->print($fh,"Hello world\n");
-
 =head4 See Also
 
 perldoc -f print
+
+=head4 Example
+
+    Prty::Perl->print($fh,"Hello world\n");
 
 =cut
 
@@ -1525,20 +1526,6 @@ Die Liste entspricht dem Ergebnis des Aufrufs
 
     $ PERLLIB= PERL5LIB= perl -le 'print join "\n",@INC'
 
-=head4 Example
-
-    Prty::Perl->basicIncPaths;
-    ==>
-    /etc/perl
-    /usr/local/lib/x86_64-linux-gnu/perl/5.20.2
-    /usr/local/share/perl/5.20.2
-    /usr/lib/x86_64-linux-gnu/perl5/5.20
-    /usr/share/perl5
-    /usr/lib/x86_64-linux-gnu/perl/5.20
-    /usr/share/perl/5.20
-    /usr/local/lib/site_perl
-    .
-
 =head4 See Also
 
 =over 2
@@ -1552,6 +1539,20 @@ L</additionalIncPaths>()
 L</incPaths>()
 
 =back
+
+=head4 Example
+
+    Prty::Perl->basicIncPaths;
+    ==>
+    /etc/perl
+    /usr/local/lib/x86_64-linux-gnu/perl/5.20.2
+    /usr/local/share/perl/5.20.2
+    /usr/lib/x86_64-linux-gnu/perl5/5.20
+    /usr/share/perl5
+    /usr/lib/x86_64-linux-gnu/perl/5.20
+    /usr/share/perl/5.20
+    /usr/local/lib/site_perl
+    .
 
 =cut
 
@@ -1775,7 +1776,7 @@ sub removePod {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

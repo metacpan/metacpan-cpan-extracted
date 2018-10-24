@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::HowToDirection;
 
 # ABSTRACT: A direction indicating a single action to do in the instructions for how to achieve a result.
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::ListItem /;
+extends qw/ SemanticWeb::Schema::CreativeWork SemanticWeb::Schema::ListItem /;
 
 
 use MooX::JSON_LD 'HowToDirection';
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has after_media => (
@@ -96,7 +98,7 @@ SemanticWeb::Schema::HowToDirection - A direction indicating a single action to 
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -116,6 +118,8 @@ A after_media should be one of the following types:
 
 =over
 
+=item C<Str>
+
 =item C<InstanceOf['SemanticWeb::Schema::MediaObject']>
 
 =back
@@ -133,6 +137,8 @@ A before_media should be one of the following types:
 
 =item C<InstanceOf['SemanticWeb::Schema::MediaObject']>
 
+=item C<Str>
+
 =back
 
 =head2 C<during_media>
@@ -147,6 +153,8 @@ A during_media should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::MediaObject']>
+
+=item C<Str>
 
 =back
 
@@ -206,9 +214,9 @@ A tool should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::HowToTool']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::HowToTool']>
 
 =back
 

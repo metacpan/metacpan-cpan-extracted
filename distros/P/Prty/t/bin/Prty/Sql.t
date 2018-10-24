@@ -5,6 +5,7 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
 # -----------------------------------------------------------------------------
@@ -340,6 +341,23 @@ sub test_dropSchema : Test(1) {
     my $sql = Prty::Sql->new('PostgreSQL');
     my $stmt = $sql->dropSchema('xxx');
     $self->is($stmt,'DROP SCHEMA xxx CASCADE');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_splitTableName : Test(5) {
+    my $self = shift;
+
+    my ($schema,$table) = Prty::Sql->splitTableName('aaa.bbb');
+    $self->is($schema,'aaa');
+    $self->is($table,'bbb');
+
+    ($schema,$table) = eval {Prty::Sql->splitTableName('bbb')};
+    $self->ok($@);
+
+    ($schema,$table) = Prty::Sql->splitTableName('bbb',1);
+    $self->is($schema,undef);
+    $self->is($table,'bbb');
 }
 
 # -----------------------------------------------------------------------------

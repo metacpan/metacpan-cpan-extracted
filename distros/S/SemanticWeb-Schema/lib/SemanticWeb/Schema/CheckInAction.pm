@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::CheckInAction;
 
-# ABSTRACT: <p>The act of an agent communicating (service provider
+# ABSTRACT: The act of an agent communicating (service provider
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,19 +30,19 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::CheckInAction - <p>The act of an agent communicating (service provider
+SemanticWeb::Schema::CheckInAction - The act of an agent communicating (service provider
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of an agent communicating (service provider, social media, etc)
+=for html The act of an agent communicating (service provider, social media, etc)
 their arrival by registering/confirming for a previously reserved service
 (e.g. flight check in) or at a place (e.g. hotel), possibly resulting in a
-result (boarding pass, etc).</p> <p>Related actions:</p> <ul> <li><a
-class="localLink"
+result (boarding pass, etc).<br/><br/> Related actions:<br/><br/> <ul>
+<li><a class="localLink"
 href="http://schema.org/CheckOutAction">CheckOutAction</a>: The antonym of
 CheckInAction.</li> <li><a class="localLink"
 href="http://schema.org/ArriveAction">ArriveAction</a>: Unlike

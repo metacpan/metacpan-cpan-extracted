@@ -7,6 +7,8 @@ requires 'Net::DNS::Resolver';
 requires 'LWP::UserAgent';
 requires 'namespace::autoclean';
 requires 'strict';
+requires 'Time::Piece';
+requires 'Time::Seconds';
 
 on 'test' => sub {
   requires 'Test::Exception';

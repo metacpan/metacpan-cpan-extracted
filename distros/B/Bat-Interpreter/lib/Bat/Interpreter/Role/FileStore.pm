@@ -5,7 +5,7 @@ use utf8;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.013';    # VERSION
+our $VERSION = '0.014';    # VERSION
 
 requires 'get_contents';
 
@@ -23,7 +23,7 @@ Bat::Interpreter::Role::FileStore
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

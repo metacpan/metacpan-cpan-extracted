@@ -67,16 +67,12 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ cleanitem
 );
 
-$VERSION = '0.133';
+$VERSION = '0.155';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
 # Sim::OPT
 #################################################################################
-
-# FUNCTIONS' SPACE
-###########################################################
-###########################################################
 
 
 sub checkdone
@@ -529,6 +525,7 @@ sub getrootname
 }
 
 
+
 sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 {
 	my ( $transfile, $carrier_r, $file, $blockelts_r ) = @_;
@@ -536,17 +533,18 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 	#say $tee "In extractcase; \$carrier_r: " . dump( $carrier_r) ;
 	#say $tee "In extractcase; \$file: " . dump( $file) ;
 	my %carrier = %{ $carrier_r };
-	my $num = keys( %carrier ); #say $tee "In extractcase; \$num: " . dump( $num) ;
 	my @blockelts = @{ $blockelts_r };
+	my $num = scalar( @blockelts ); #ay $tee "In extractcase; \$num: " . dump( $num) ;
 
 	my $counter = 0;
 	my %provhash;
-	while ($counter < $num)
+	while ( $counter < $num )
 	{
 		$transfile =~ s/^$file//; #say $tee "In extractcase1; \$transfile: " . dump( $transfile) ;
 		$transfile =~ s/^_//; #say $tee "In extractcase2; \$transfile: " . dump( $transfile) ;
 
 		$transfile =~ /^(\d+)-(\d+)/;
+
 		if ( ($1) and ($2) )
 		{
 			$provhash{$1} = $2; #say $tee "In extractcase3; \$transfile: " . dump( $transfile) ;
@@ -572,9 +570,9 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 			$carrier{$key} = $provhash{$key};
 		}
 	}
-	#say $tee "In extractcase; \%carrier: " . dump( \%carrier ) ;
+	#say $tee "In extractcase, OBTAINED \%carrier: " . dump( \%carrier ) ;
 	my $to = makefilename( %carrier ); #say $tee "In extractcase, RESULT1:; \$to: " . dump( $to) ;
-	$to = Sim::OPT::cleanitem( $to, $mypath, $file ); #say $tee "In extractcase, RESULT2:; \$to: " . dump( $to) ;
+	$to = Sim::OPT::cleanitem( $to, $mypath, $file ); #say $tee "In extractcase, NAME:; \$to: " . dump( $to) ;
 	return( $to );
 }
 
@@ -778,20 +776,20 @@ sub flattenbox
 
 sub integratebox
 {
-	my @arrelts = @{ $_[0] };
-	my %carrier = %{ $_[1] };
+	my @arrelts = @{ $_[0] }; #say $tee "IN INTEGRATEBOX \@arrelts " . dump( @arrelts ) ;
+	my %carrier = %{ $_[1] }; #say $tee "IN INTEGRATEBOX \%carrier " . dump( \%carrier ) ;
 	my $file = $_[2];
-	my @blockelts = @{ $_[3] };
+	my @blockelts = @{ $_[3] }; #say $tee "IN INTEGRATEBOX \@blockelts @blockelts" ;
 	my @newbox;
 	foreach my $eltref ( @arrelts )
 	{
 		my @elts = @{ $eltref };
 		my $target = $elts[0]; #say $tee "IN INTEGRATEBOX Target $target" ;
-		my $righttarget = extractcase( $target, \%carrier, $file, \@blockelts ); #say $tee "IN INTEGRATEBOX Target $target" ;
-		my $lasttarget = $elts[3]; #say $tee "IN INTEGRATEBOX lasttarget $lasttarget" ;
-		my $pasttarget = extractcase( $lasttarget, \%carrier, $file, @blockelts ); #say $tee "IN INTEGRATEBOX pasttarget $pasttarget" ;; #say $tee "IN INTEGRATEBOX Target $target" ;
-		push (@newbox, [ $righttarget, $elts[1], $elts[2], $pasttarget, $elts[2] ] );
-	}
+		my $righttarget = extractcase( $target, \%carrier, $file, \@blockelts ); #say $tee "IN INTEGRATEBOX \$righttarget $righttarget" ;
+		my $origin = $elts[3]; #say $tee "IN INTEGRATEBOX \$origin $origin" ;
+		my $rightorigin = extractcase( $origin, \%carrier, $file, \@blockelts ); #say $tee "IN INTEGRATEBOX \$rightorigin $rightorigin";
+		push (@newbox, [ $righttarget, $elts[1], $elts[2], $rightorigin, $elts[4] ] );
+	} #say $tee "IN INTEGRATEBOX \@newbox " . dump( @newbox ) ;
 	return ( \@newbox );
 }
 
@@ -1240,38 +1238,38 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 
 		%dirfiles = %{ solvestar( { dirfiles => \%dirfiles, dowhat => \%dowhat, varnumbers => \@varnumbers, blockelts => \@blockelts, carrier => \%carrier } ) };
 
-		my @newmiditers = @{ $dirfiles{starpositions} }; #say $tee "IN2 callblock \@newmiditers " . dump( @newmiditers );
+		my @newmiditers = @{ $dirfiles{starpositions} }; say $tee "IN2 callblock \@newmiditers " . dump( @newmiditers );
 		# IT CORRECTS THE PART OF @miditers OUTSIDE THE BLOCKS
 
 		$dirfiles{miditershold} = dclone( \@miditers ); say $tee "IN2 BEFORE callblock  \$dirfiles{miditershold} " . dump( $dirfiles{miditershold} );
 
-		sub checkmids
-		{
-			my ( $newmiditers_r, $miditershold ) = @_;
-			my @newmiditers = @{ $newmiditers_r };
-			my @oldmiditers = @{ $miditershold };
-			my $oldmids_r = $oldmiditers[0];
-			my %oldmids = %{ $oldmids_r };
-			my @news;
-			foreach my $mids_r ( @newmiditers )
-			{
-				my %mids = %{ $mids_r };
-				foreach my $key ( keys %mids )
-				{
-					if ( not ( $key ~~ @blockelts ) )
-					{
-						$mids{$key} = $oldmids{$key};
-					}
-				}
-				push( @news, \%mids );
-			}
-			return( \@news );
-		}
+		#sub checkmids
+		#{
+		#	my ( $newmiditers_r, $miditershold ) = @_;
+		#	my @newmiditers = @{ $newmiditers_r };
+		#	my @oldmiditers = @{ $miditershold };
+		#	my $oldmids_r = $oldmiditers[0];
+		#	my %oldmids = %{ $oldmids_r };
+		#	my @news;
+		#	foreach my $mids_r ( @newmiditers )
+		#	{
+		#		my %mids = %{ $mids_r };
+		#		foreach my $key ( keys %mids )
+		#		{
+		#			if ( not ( $key ~~ @blockelts ) )
+		#			{
+		#				$mids{$key} = $oldmids{$key};
+		#			}
+		#		}
+		#		push( @news, \%mids );
+		#	}
+		#	return( \@news );
+		#}
+		#
+		#@newmiditers = @{ checkmids( \@newmiditers, $dirfiles{miditershold} ) }; #say $tee "IN2 callblock POST-PROCESSED \@newmiditers " . dump( @newmiditers );
 
-		@newmiditers = @{ checkmids( \@newmiditers, $dirfiles{miditershold} ) }; #say $tee "IN2 callblock POST-PROCESSED \@newmiditers " . dump( @newmiditers );
-
-		@miditers = @{ dclone( \@newmiditers ) };
-	  @miditers = Sim::OPT::washn( @miditers ); #say $tee "IN2 AFTER callblock dcloned \@miditers " . dump( @miditers );
+		@miditers = @{ dclone( \@newmiditers ) }; say $tee "IN2 AFTER callblock dcloned \@miditers " . dump( @miditers );
+	  #@miditers = Sim::OPT::washn( @miditers ); say $tee "IN2 AFTER callblock dcloned \@miditers " . dump( @miditers );
 		#say $tee "IN2 callblock  \$dirfiles{starpositions} " . dump( $dirfiles{starpositions} );
 	}
 
@@ -1320,7 +1318,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
   my $countblock = $d{countblock}; #say $tee "IN DEFFILES \$countblock : " . dump( $countblock );
 	my @sweeps = @{ $d{sweeps} }; #say $tee "IN DEFFILES \@sweeps : " . dump( @sweeps );
 	my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "IN DEFFILES \@sourcesweeps : " . dump( @sourcesweeps );
-	my @miditers = @{ $d{miditers} }; #say $tee "IN DEFFILES \@miditers : " . dump( @miditers );
+	my @miditers = @{ $d{miditers} }; say $tee "IN DEFFILES \@miditers : " . dump( @miditers );
 	my @winneritems = @{ $d{winneritems} }; #say $tee "\@winneritems : " . dump( @winneritems );
 	my %dirfiles = %{ $d{dirfiles} }; #say $tee "IN deffiles \%dirfiles " . dump( %dirfiles );
 	#say $tee "IN DEFFILES \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
@@ -1333,9 +1331,9 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 	my @blocks = @{ $d{blocks} }; #say $tee "IN DEFFILES \@blocks : " . dump( @blocks );
 	my $toitem = $d{toitem}; #say $tee "IN12 DEFFILES12 \$toitem : " . dump( $toitem );
 	my $from = $d{from}; #say $tee "IN DEFFILES \$from " . dump( $from );
-	my %varnums = %{ $d{varnums} }; #say $tee "IN DEFFILES \%varnums " . dump( \%varnums );
-	my %mids = %{ $d{mids} }; #say $tee "IN DEFFILES \%mids " . dump( \%mids );
-	my %carrier = %{ $d{carrier} }; #say $tee "IN DEFFILES \%carrier " . dump( \%carrier );
+	my %varnums = %{ $d{varnums} }; say $tee "IN DEFFILES \%varnums " . dump( \%varnums );
+	my %mids = %{ $d{mids} }; say $tee "IN DEFFILES \%mids " . dump( \%mids );
+	my %carrier = %{ $d{carrier} }; say $tee "IN DEFFILES \%carrier " . dump( \%carrier );
 
 	say $tee "IN IN DEFFILES  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 	my $file = $dowhat{file}; #say $tee "IN DEFFILES \$file " . dump( $file );
@@ -1369,15 +1367,17 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			foreach my $elt ( @basket )
 			{
 				my $root = $elt->[0]; #say $tee "IN TOIL \$root : " . dump( $root );
+				my @bag;
 				my $item;
 				my $cnstep = 1;
 				while ( $cnstep <= $maxvalue)
 				{	#say $tee "IN TOIL \$countblock : " . duvernummp( $countblock );
 					my $olditem = $root; #say $tee "IN TOIL \$olditem : " . dump( $olditem );
 					$item = "$root" . "$var" . "-" . "$cnstep" . "_" ;  #say $tee "IN TOIL \$item : " . dump( $item );
-					push ( @bucket, [ $item, $var, $cnstep, $olditem, $c ] ); #say $tee "IN TOIL \@bucket: " . dump( @bucket );
+					push ( @bag, [ $item, $var, $cnstep, $olditem, $c ] ); #say $tee "IN TOIL \@bucket: " . dump( @bucket );
 					$cnstep++; #say $tee "IN TOIL \$cnstep : " . dump( $cnstep );
 				}
+				push ( @bucket, @bag );
 				#push ( @bucket, [ $item, $var, $cnstep, $olditem, $c ] ); #say $tee "IN TOIL \@bucket: " . dump( @bucket );
 			}
 			@basket = ();
@@ -1404,39 +1404,42 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		{
 			my @dummys = ( $elt );
 			my @bix = @{ toil( \@dummys, \%varnums, \@basket, $c ) };
-			@bix = @{ $bix[0] };
-			push( @bux, @bix );
+			#@bix = @{ $bix[0] };
+			my @bark = @{ flattenbox( @bix ) };
+			push( @bux, @bark );
 			$c++;
 		}
 	}
 	else
 	{
-		#say $tee "DOING BOX \$dirfiles{starsign} : " . dump( $dirfiles{starsign} );
+		say $tee "IN DEFFFILES RIGHT \$dirfiles{starsign} : " . dump( $dirfiles{starsign} );
 		@bux = @{ toil( \@blockelts, \%varnums, \@basket ) };
-		@bux = @{ $bux[-1] };
-	} #say $tee "IN DEFFILES2 \@bux: " . dump( @bux );
+	} say $tee "IN DEFFILES2 \@bux: " . dump( @bux );
 	#say $tee "IN DEFFILES2 \$countblock : " . dump( $countblock );
 	#say $tee "IN DEFFILES \@blockelts : " . dump( @blockelts );
 
-	#my $flattened_r = flattenbox( \@bux ); 	say $tee "IN DEFFILES2 \$flattened_r: " . dump( $flattened_r );
-
+	#############my $flattened_r = flattenbox( \@bux ); 	say $tee "IN DEFFILES2 \$flattened_r: " . dump( $flattened_r );
+	say $tee "In DEFFILES5 \%mids!: " . dump ( %mids );
 	my ( @finalbox );
 	if ( $dirfiles{starsign} eq "yes" )
 	{
 		my @bag;
-		foreach my $mids_r ( @miditers )
+		foreach my $midsurrs_r ( @miditers )
 		{
-			my %mids = %{ $mids_r }; #say $tee "IN DEFFILES \%mids" . dump( \%mids );
-	 		@bag = @{ integratebox( \@bux, \%mids, $file, \@blockelts ) };
+			say $tee "MIDITERS FOR MIDSURRS!: " . dump ( @miditers );
+			my %midsurrs = %{ $midsurrs_r }; #say $tee "IN DEFFILES \%midsurrs" . dump( \%midsurrs );
+	 		@bag = uniq( @{ integratebox( \@bux, \%midsurrs, $file, \@blockelts ) } );
 			push( @finalbox, @bag );
 		}
 	}
 	else
 	{
-		@finalbox = @{ integratebox( \@bux, \%carrier, $file, \@blockelts ) };
+		say $tee "IN DEFFILES RIGHT AFTER " ;
+		my @bark = @{ flattenbox( \@bux ) };
+		@finalbox = uniq( @{ integratebox( \@bark, \%carrier, $file, \@blockelts ) } );
 	}
 
-	@finalbox = sort { $a->[0] <=> $b->[0] } @finalbox;
+	@finalbox = sort { $a->[0] <=> $b->[0] } @finalbox; say $tee "In DEFFILES5 \@finalbox!: " . dump ( @finalbox );
 
 
 	setlaunch( {
@@ -1475,7 +1478,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 	my %varnums = %{ $d{varnums} }; #say $tee "IN SETLAUNCH \%varnums " . dump( %varnums );
 	my %mids = %{ $d{mids} }; #say $tee "IN SETLAUNCH \%mids" . dump( \%mids ); ### DDD
 	my %carrier = %{ $d{carrier} }; #say $tee "IN SETLAUNCH \%carrier" . dump( \%carrier ); ### DDD
-	say $tee "IN IN SETLAUNCH  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
+	#say $tee "IN IN SETLAUNCH  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 
 	my ( @instances );
 
@@ -1487,8 +1490,8 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 		my $countvar = $$elt[1];
 		my $countstep = $$elt[2];
 		my $oldpars = $$elt[3];
-		my $to = extractcase( $newpars, \%carrier );
-		my $origin = extractcase( $oldpars, \%carrier );
+		my $to = extractcase( $newpars, \%carrier, $file, \@blockelts );
+		my $origin = extractcase( $oldpars, \%carrier, $file, \@blockelts );
 		my $c = $$elt[4];
 
 		push ( @instances,
@@ -1501,7 +1504,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 			sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
 			varnumbers => \@varnumbers, blocks => \@blocks,
 			blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
-			countinstance => $count, carrier => \%carrier,
+			countinstance => $count, carrier => \%carrier, origin => $origin
 		} );
 		$count++;
 
@@ -1512,10 +1515,10 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 sub exe
 {
 	my %dat = %{ $_[0] };
-	my @instances = @{ $dat{instances} }; #say $tee "IN EXE \@instances " . dump( @instances );
+	my @instances = @{ $dat{instances} }; say $tee "IN EXE \@instances " . dump( @instances );
 	my %dirfiles = %{ $dat{dirfiles} }; #say $tee "IN EXE \%dirfiles " . dump( %dfromirfiles );
 
-	my %d = %{ $instances[0] }; say $tee "IN EXE \%d!!! " . dump( \%d );
+	my %d = %{ $instances[0] }; #say $tee "IN EXE \%d!!! " . dump( \%d );
 	my $countcase = $d{countcase}; say $tee "IN EXE \$countcase " . dump( $countcase );
 	my $countblock = $d{countblock}; say $tee "IN EXE \$countblock " . dump( $countblock );
 	my @varnumbers = @{ $d{varnumbers} }; say $tee "IN EXE \@varnumbers " . dump( @varnumbers );
@@ -1524,7 +1527,7 @@ sub exe
 	my @sourcesweeps = @{ $d{sourcesweeps} }; say $tee "IN EXE \@sourcesweeps " . dump( @sourcesweeps );
 	my @winneritems =  @{ $d{winneritems} }; say $tee "IN EXE \@winneritems " . dump( @winneritems );
 
-	my %datastruc = %{ $d{datastruc} }; say $tee "IN EXE \%datastruc " . dump( %datastruc );
+	my %datastruc = %{ $d{datastruc} }; #say $tee "IN EXE \%datastruc " . dump( %datastruc );
 	my %dowhat = %{ $d{dowhat} }; #say $tee "IN EXE \%dowhat " . dump( %dowhat );
 	my $toitem = $d{toitem}; say $tee "IN12 EXE \$toitem : " . dump( $toitem );
 	my $from = $d{from}; say $tee "IN12 EXE \$from : " . dump( $from );
@@ -1532,22 +1535,6 @@ sub exe
 	my $countvar = $d{countvar}; say $tee "IN12 EXE \$countvar : " . dump( $countvar );
 	my $countstep = $d{countstep}; say $tee "IN12 EXE \$countstep : " . dump( $countstep );
 	say $tee "IN EXE  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
-
-	#my ( $direction, $starorder );
-	#if ( $dowhat{outstarmode} eq "yes" )
-	#{
-	#	$direction = ${$dowhat{direction}}[$countcase][$countblock]; #say $tee "IN EXE \$direction " . dump( $direction ); #NEW
-	#	$starorder = ${$dowhat{starorder}}[$countcase][$countblock]; #say $tee "IN EXE \$starorder " . dump( $starorder ); #NEW
-	#}
-	#else
-	#{
-	#	$direction = $dirfiles{direction}; #say $tee "IN EXE \$direction " . dump( $direction ); #NEW
-	#	$starorder = $dirfiles{starorder}; #say $tee "IN EXE \$starorder " . dump( $starorder ); #NEW
-	#	if ( $direction eq "" ){ $direction = ${$dowhat{direction}}[$countcase][$countblock]; }
-	#	if ( $starorder eq "" ){ $starorder = ${$docarrierwhat{starorder}}[$countcase][$countblock]; }
-	#}
-	#say $tee "IN EXE \$direction " . dump( $direction ); #NEW
-	#say $tee "IN EXE \$starorder " . dump( $starorder ); #NEW
 
 	my $precomputed = $dowhat{precomputed}; say $tee "IN EXE \$precomputed " . dump( $precomputed ); #NEW
   my @takecolumns = @{ $dowhat{takecolumns} }; say $tee "IN EXE \@takecolumns " . dump( @takecolumns ); #NEW
@@ -1558,7 +1545,7 @@ sub exe
 	{
 		say $tee "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
-		my @result = Sim::OPT::Morph::morph( { configfile => $configfile, instances => \@instances, dirfiles => \%dirfiles } );
+		my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat );
 		$dirfiles{morphcases} = $result[0];
 		$dirfiles{morphstruct} = $result[1];
 	}
@@ -1648,6 +1635,7 @@ sub genstar
 		}
 		push( @starpositions, @genpoints );
 	}
+	say $tee "IN genstar STARPOSITIONS BEFORE: " . dump( @starpositions );
 
 	my @bag;
 	if ( scalar( @blockelts > 0) )
@@ -1666,6 +1654,7 @@ sub genstar
 		}
 		@starpositions = @bag;
 	}
+	say $tee "IN genstar STARPOSITIONS AFTER: " . dump( @starpositions );
 
 	return( \@starpositions );
 }
@@ -2101,11 +2090,10 @@ If the search has to start from more than one block in parallel, the first block
 
 The possibility of articulating a mix of parallel and sequential searches is of absolute importance, because it makes possible to design search structures with a depth, embodying precedence, and therefore procedural time, in them. Deriving from this, there is the fact that the representation tools in question are sufficient for describing directed graphs.
 
-With the aid of Sim::OPT::Interlinear, Sim::OPT can perform block coordinate descent on metamodels in place of all or some of the ordinary blocks of a block search. In that case, a configuration file for Interlinear should also be prepared.
+Sim::OPT can perform one or more star (Jacoby) searches within a block in place of a multilevel full-factorial search. To ask for that in a configuration file, the first number in that block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in that block. A block, in that case, may turn out, for example, to be declared like this: ( "2>1", 2, 3).
 
-Where Sim::OPT may be fit for a task? Where a certain exploration is complex and/or when it is to be confronted through decomposition, by dividing a problem in overlapping subproblems; when there aren't slick tools suitable to decomposition-based, simulation-based optimization; when spednding a day, or two, or three setting up a model may spare months of work.
+To sayi in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from the star searches and not by the means of a multilevel full-factorial search is (once asked for one or more star searches in the block) to give to the < %dowhat > instance < $dowhat{metamodel} > the value "yes".
 
-Where it may not be suitable for the task? Due to the investment which is necessary for getting acquainted with its raw interface, for quick shots at small explorations.
 
 The program works under Linux.
 

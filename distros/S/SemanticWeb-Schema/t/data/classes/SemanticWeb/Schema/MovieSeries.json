@@ -11,17 +11,17 @@
          "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "actor",
          "schema:domainIncludes" : [
-            "schema:TVSeries",
-            "schema:Event",
-            "schema:VideoGameSeries",
             "schema:Clip",
-            "schema:VideoObject",
             "schema:RadioSeries",
-            "schema:Movie",
-            "schema:Episode",
-            "schema:CreativeWorkSeason",
             "schema:MovieSeries",
-            "schema:VideoGame"
+            "schema:CreativeWorkSeason",
+            "schema:VideoObject",
+            "schema:Episode",
+            "schema:VideoGameSeries",
+            "schema:Event",
+            "schema:VideoGame",
+            "schema:Movie",
+            "schema:TVSeries"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
@@ -30,15 +30,15 @@
          "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc. Actors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "actors",
          "schema:domainIncludes" : [
-            "schema:TVSeries",
-            "schema:VideoGameSeries",
-            "schema:Clip",
+            "schema:Episode",
             "schema:VideoGame",
             "schema:RadioSeries",
-            "schema:Movie",
             "schema:VideoObject",
-            "schema:Episode",
-            "schema:MovieSeries"
+            "schema:Clip",
+            "schema:VideoGameSeries",
+            "schema:Movie",
+            "schema:MovieSeries",
+            "schema:TVSeries"
          ],
          "schema:rangeIncludes" : "schema:Person",
          "schema:supersededBy" : "schema:actor"
@@ -48,17 +48,17 @@
          "rdfs:comment" : "A director of e.g. tv, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "director",
          "schema:domainIncludes" : [
-            "schema:Movie",
-            "schema:VideoGameSeries",
-            "schema:Clip",
-            "schema:VideoObject",
             "schema:TVSeries",
+            "schema:VideoGameSeries",
+            "schema:VideoObject",
+            "schema:Movie",
+            "schema:VideoGame",
+            "schema:Event",
             "schema:Episode",
             "schema:MovieSeries",
-            "schema:RadioSeries",
-            "schema:Event",
             "schema:CreativeWorkSeason",
-            "schema:VideoGame"
+            "schema:RadioSeries",
+            "schema:Clip"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
@@ -67,15 +67,15 @@
          "rdfs:comment" : "A director of e.g. tv, radio, movie, video games etc. content. Directors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "directors",
          "schema:domainIncludes" : [
-            "schema:Clip",
-            "schema:VideoGameSeries",
-            "schema:VideoObject",
             "schema:VideoGame",
-            "schema:Movie",
             "schema:RadioSeries",
             "schema:MovieSeries",
+            "schema:Movie",
             "schema:Episode",
-            "schema:TVSeries"
+            "schema:TVSeries",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:VideoObject"
          ],
          "schema:rangeIncludes" : "schema:Person",
          "schema:supersededBy" : "schema:director"
@@ -85,19 +85,19 @@
          "rdfs:comment" : "The composer of the soundtrack.",
          "rdfs:label" : "musicBy",
          "schema:domainIncludes" : [
-            "schema:Clip",
-            "schema:Movie",
-            "schema:TVSeries",
-            "schema:VideoGame",
-            "schema:RadioSeries",
-            "schema:VideoObject",
-            "schema:VideoGameSeries",
             "schema:Episode",
-            "schema:MovieSeries"
+            "schema:MovieSeries",
+            "schema:VideoGameSeries",
+            "schema:VideoObject",
+            "schema:VideoGame",
+            "schema:Movie",
+            "schema:Clip",
+            "schema:RadioSeries",
+            "schema:TVSeries"
          ],
          "schema:rangeIncludes" : [
-            "schema:MusicGroup",
-            "schema:Person"
+            "schema:Person",
+            "schema:MusicGroup"
          ]
       },
       "schema:productionCompany" : {
@@ -105,14 +105,14 @@
          "rdfs:comment" : "The production company or studio responsible for the item e.g. series, video game, episode etc.",
          "rdfs:label" : "productionCompany",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
+            "schema:Movie",
             "schema:MediaObject",
-            "schema:RadioSeries",
+            "schema:VideoGameSeries",
+            "schema:CreativeWorkSeason",
             "schema:MovieSeries",
             "schema:Episode",
-            "schema:VideoGameSeries",
-            "schema:Movie",
-            "schema:TVSeries"
+            "schema:TVSeries",
+            "schema:RadioSeries"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -122,12 +122,12 @@
          "rdfs:label" : "trailer",
          "schema:domainIncludes" : [
             "schema:Episode",
-            "schema:VideoGame",
-            "schema:Movie",
-            "schema:RadioSeries",
             "schema:CreativeWorkSeason",
-            "schema:TVSeries",
             "schema:MovieSeries",
+            "schema:RadioSeries",
+            "schema:TVSeries",
+            "schema:Movie",
+            "schema:VideoGame",
             "schema:VideoGameSeries"
          ],
          "schema:rangeIncludes" : "schema:VideoObject"

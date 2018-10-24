@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::TouristAttraction;
 
 # ABSTRACT: A tourist attraction
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has available_language => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::TouristAttraction - A tourist attraction
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -60,8 +62,8 @@ href="http://schema.org/LandmarksOrHistoricalBuildings">LandmarksOrHistoric
 alBuildings</a> to a <a class="localLink"
 href="http://schema.org/LocalBusiness">LocalBusiness</a>. This Type can be
 used on its own to describe a general <a class="localLink"
-href="http://schema.org/TourstAttraction">TourstAttraction</a>, or be used
-as an <a class="localLink"
+href="http://schema.org/TouristAttraction">TouristAttraction</a>, or be
+used as an <a class="localLink"
 href="http://schema.org/additionalType">additionalType</a> to add tourist
 attraction properties to any other type. (See examples below)
 
@@ -97,9 +99,9 @@ A tourist_type should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Audience']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Audience']>
 
 =back
 

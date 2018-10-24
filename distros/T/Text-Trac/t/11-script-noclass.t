@@ -32,7 +32,7 @@ my @cases = qw(
 subtest full_html => sub {
 	plan tests => 2 * @cases;
 	foreach my $case (@cases) {
-		my $out = qx{$^X script/trac2html --infile t/corpus/$case.trac --outfile $dir/$case.html --noclass};
+		my $out = qx{$^X script/trac2html --infile t/corpus/$case.trac --outfile $dir/$case.html --id --span};
 		is $out, '', 'out';
 		my $html_generated = path("$dir/$case.html")->slurp_utf8;
 		my $html_expected  = path("t/expected/${case}_noclass.html")->slurp_utf8;

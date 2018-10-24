@@ -10,7 +10,7 @@ WriteMakefile(
     ($ExtUtils::MakeMaker::VERSION >= 6.48
       ? ('LICENSE'=> 'perl')
       : ()),
-    MIN_PERL_VERSION => 5.010001,
+    MIN_PERL_VERSION => 5.008001,
     PL_FILES         => {},
     PREREQ_PM => {
         'Test::More' => 0,
@@ -23,9 +23,9 @@ WriteMakefile(
     clean => { FILES => 'Dancer2-Plugin-Passphrase-*' },
     META_MERGE => {
         resources => {
-            repository => 'https://github.com/hvoers/Dancer2-Plugin-Passphrase',
-            bugtracker => 'https://github.com/hvoers/Dancer2-Plugin-Passphrase/issues',
-            homepage   => 'https://github.com/hvoers/Dancer2-Plugin-Passphrase/',
+            repository => 'https://github.com/SysPete/Dancer2-Plugin-Passphrase',
+            bugtracker => 'https://github.com/SysPete/Dancer2-Plugin-Passphrase/issues',
+            homepage   => 'https://github.com/SysPete/Dancer2-Plugin-Passphrase/',
         },
     },
 );

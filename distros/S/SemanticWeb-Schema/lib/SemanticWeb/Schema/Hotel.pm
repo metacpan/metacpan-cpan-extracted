@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Hotel;
 
 # ABSTRACT: A hotel is an establishment that provides lodging paid on a short-term basis (Source: Wikipedia
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::Hotel - A hotel is an establishment that provides lodging p
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

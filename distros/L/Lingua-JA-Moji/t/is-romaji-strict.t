@@ -27,6 +27,27 @@ ok (is_romaji_strict ('AREKKUSU'), "'AREKKUSU' is romaji");
 ok (is_romaji_semistrict ('AREKKUSU'), "'AREKKUSU' is romaji");
 ok (! is_romaji_strict ('-romaji'), "hyphen as first character rejected");
 ok (! is_romaji_semistrict ('-romaji'), "hyphen as first character rejected");
+#TODO: {
+#    local $TODO = 'Fails from e2k';
+    my @fails = qw!
+		      zathura
+		      tanggono
+		      ridzuan
+		      chathuranga
+		      jorunn
+		      nmichi
+		      waqoo
+		      akeqi
+		      akisaiqin
+		      awwa
+		      bihho
+		      ffun
+		      bicyanide
+		  !;
+    for (@fails) {
+	ok (! is_romaji_strict ($_), "$_ is not Japanese");
+    }
+#};
 
 # List of romanizations we don't want to allow.
 

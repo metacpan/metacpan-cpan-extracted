@@ -1219,6 +1219,7 @@ sub newreport # This function retrieves the results of interest from the texts f
     my $touse = $to;
     $touse =~ s/$mypath\///; #say $tee "IN REPORT1 \$touse " . dump($touse);
     #say $tee "TOUSE: $touse\n";
+    my @box;
     foreach my $line ( @precomputeds )
     {
       if ( $line =~ /$touse/ )
@@ -1227,12 +1228,17 @@ sub newreport # This function retrieves the results of interest from the texts f
         #say $tee "HIT!!! for $repfile\n";
         #say $tee "LINE! $line";
         #say $tee "TOUSE: $touse\n";
-        $line =~ s/\s+/ /g ;
-        $line =~ s/ ,/,/g ;
-        $line =~ s/, /,/g ;
-        $line =~ s/ /,/g ;
-        say REPFILE "$line";
+        $line =~ s/\s+/ / ;
+        $line =~ s/ ,/,/ ;
+        $line =~ s/, /,/ ;
+        $line =~ s/ /,/ ;
+        push( @box, $line );
       }
+    }
+    @box = uniq( sort( @box ) );
+    foreach my $el ( @box )
+    {
+      say REPFILE $el;
     }
   }
   close REPFILE;

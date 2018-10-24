@@ -4,27 +4,22 @@ Graphics::ColorNames - defines RGB values for common color names
 
 # VERSION
 
-version v3.2.1
+version v3.3.0
 
 # SYNOPSIS
 
 ```perl
-use Graphics::ColorNames 2.10;
+use Graphics::ColorNames;
+use Graphics::ColorNames::WWW;
 
-$po = Graphics::ColorNames->new( qw[ X ] );
+$pal = Graphics::ColorNames->new( qw[ X WWW ] );
 
-$rgb = $po->hex('green');          # returns '00ff00'
-$rgb = $po->hex('green', '0x');    # returns '0x00ff00'
-$rgb = $po->hex('green', '#');     # returns '#00ff00'
+$rgb = $pal->hex('green');          # returns '00ff00'
+$rgb = $pal->hex('green', '0x');    # returns '0x00ff00'
+$rgb = $pal->hex('green', '#');     # returns '#00ff00'
 
-$rgb = $po->rgb('green');          # returns '0,255,0'
-@rgb = $po->rgb('green');          # returns (0, 255, 0)
-
-$rgb = $po->green;                 # same as $po->hex('green');
-
-tie %ph, 'Graphics::ColorNames', (qw[ X ]);
-
-$rgb = $ph{green};                 # same as $po->hex('green');
+$rgb = $pal->rgb('green');          # returns '0,255,0'
+@rgb = $pal->rgb('green');          # returns (0, 255, 0)
 ```
 
 # DESCRIPTION
@@ -36,93 +31,65 @@ name; and (2) free module authors from having to "re-invent the wheel"
 whenever they decide to give the users the option of specifying a
 color by name rather than RGB value.
 
-For example,
+# METHODS
+
+## `new`
+
+The constructor is as follows:
 
 ```perl
-use Graphics::ColorNames 2.10;
-
-use GD;
-
-$pal = Graphics::ColorNames->new;
-
-$img = new GD::Image(100, 100);
-
-$bgColor = $img->colorAllocate( $pal->rgb('CadetBlue3') );
+my $pal = Graphics::ColorNames->new( @schemes );
 ```
 
-Although this is a little "bureaucratic", the meaning of this code is clear:
-`$bgColor` (or background color) is 'CadetBlue3' (which is easier to for one
-to understand than `0x7A, 0xC5, 0xCD`). The variable is named for its
-function, not form (ie, `$CadetBlue3`) so that if the author later changes
-the background color, the variable name need not be changed.
-
-You can also define ["Custom Color Schemes"](#custom-color-schemes) for specialised palettes
-for websites or institutional publications:
-
-```
-$color = $pal->hex('MenuBackground');
-```
-
-As an added feature, a hexidecimal RGB value in the form of #RRGGBB,
-0xRRGGBB or RRGGBB will return itself:
-
-```
-$color = $pal->hex('#123abc');         # returns '123abc'
-```
-
-## Tied Interface
-
-The standard interface (prior to version 0.40) is through a tied hash:
-
-```
-tie %pal, 'Graphics::ColorNames', @schemes;
-```
-
-where `%pal` is the tied hash and `@schemes` is a list of
-[color schemes](#color-schemes).
+where `@schemes` is an array of color schemes (palettes, dictionaries).
 
 A valid color scheme may be the name of a color scheme (such as `X`
 or a full module name such as `Graphics::ColorNames::X`), a reference
 to a color scheme hash or subroutine, or to the path or open
 filehandle for a `rgb.txt` file.
 
-As of version 2.1002, one can also use [Color::Library](https://metacpan.org/pod/Color::Library) dictionaries:
+If none are specified, it uses the default `X` color scheme, which
+corresponds to the X-Windows `rgb.txt` colors.  For most purposes,
+this is good enough.  Since v3.2.0, it was updated to use the
+2014-07-06 colors, so includes the standard CSS colors as well.
 
-```
-tie %pal, 'Graphics::ColorNames', qw(Color::Library::Dictionary::HTML);
-```
+Other color schemes are available on CPAN,
+e.g. [Graphics::ColorNames::WWW](https://metacpan.org/pod/Graphics::ColorNames::WWW).
 
-This is an experimental feature which may change in later versions (see
-["SEE ALSO"](#see-also) for a discussion of the differences between modules).
-
-Multiple schemes can be used:
-
-```
-tie %pal, 'Graphics::ColorNames', qw(HTML X);
-```
-
-In this case, if the name is not a valid HTML color, the X-windows
-name will be used.
-
-One can load all available schemes in the Graphics::ColorNames namespace
-(as of version 2.0):
+Since version 2.1002, [Color::Library](https://metacpan.org/pod/Color::Library) dictionaries can be used as
+well:
 
 ```perl
-use Graphics::ColorNames 2.0, 'all_schemes';
-tie %NameTable, 'Graphics::ColorNames', all_schemes();
+my $pal = Graphics::ColorNames->new( 'Color::Library::Dictionary::HTML' );
 ```
 
-When multiple color schemes define the same name, then the earlier one
-listed has priority (however, hash-based color schemes always have
-priority over code-based color schemes).
+## `rgb`
 
-When no color scheme is specified, the X-Windows scheme is assumed.
+```
+@rgb = $pal->rgb($name);
 
-Color names are case insensitive, and spaces or punctuation
-are ignored.  So "Alice Blue" returns the same
-value as "aliceblue", "ALICE-BLUE" and "a\*lICEbl-ue".  (If you are
-using color names based on user input, you may want to add additional
-validation of the color names.)
+$rgb = $pal->rgb($name, $separator);
+```
+
+If called in a list context, returns a triplet.
+
+If called in a scalar context, returns a string separated by an
+optional separator (which defauls to a comma).  For example,
+
+```
+@rgb = $pal->rgb('blue');      # returns (0, 0, 255)
+
+$rgb = $pal->rgb('blue', ','); # returns "0,0,255"
+```
+
+Unknown color names return empty lists or strings, depending on the
+context.
+
+Color names are case insensitive, and spaces or punctuation are
+ignored. So "Alice Blue" returns the same value as "aliceblue",
+"ALICE-BLUE" and "a\*lICEbl-ue".  (If you are using color names based
+on user input, you should add additional validation of the color
+names.)
 
 The value returned is in the six-digit hexidecimal format used in HTML and
 CSS (without the initial '#'). To convert it to separate red, green, and
@@ -131,143 +98,83 @@ blue values (between 0 and 255), use the ["hex2tuple"](#hex2tuple) function.
 You may also specify an absolute filename as a color scheme, if the file
 is in the same format as the standard `rgb.txt` file.
 
-## Object-Oriented Interface
-
-If you prefer, an object-oriented interface is available:
-
-```perl
-use Graphics::ColorNames 0.40;
-
-$obj = Graphics::ColorNames->new('/etc/rgb.txt');
-
-$hex = $obj->hex('skyblue'); # returns "87ceeb"
-@rgb = $obj->rgb('skyblue'); # returns (0x87, 0xce, 0xeb)
-```
-
-The interface is similar to the [Color::Rgb](https://metacpan.org/pod/Color::Rgb) module:
-
-- new
-
-    ```
-    $obj = Graphics::ColorNames->new( @SCHEMES );
-    ```
-
-    Creates the object, using the default [color schemes](#color-schemes).
-    If none are specified, it uses the `X` scheme.
-
-- load\_scheme
-
-    ```
-    $obj->load_scheme( $scheme );
-    ```
-
-    Loads a scheme dynamically.  The scheme may be any hash or code reference.
-
-- hex
-
-    ```
-    $hex = $obj->hex($name, $prefix);
-    ```
-
-    Returns a 6-digit hexidecimal RGB code for the color.  If an optional
-    prefix is specified, it will prefix the code with that string.  For
-    example,
-
-    ```
-    $hex = $obj->hex('blue', '#'); # returns "#0000ff"
-    ```
-
-- rgb
-
-    ```
-    @rgb = $obj->rgb($name);
-
-    $rgb = $obj->rgb($name, $separator);
-    ```
-
-    If called in a list context, returns a triplet.
-
-    If called in a scalar context, returns a string separated by an
-    optional separator (which defauls to a comma).  For example,
-
-    ```
-    @rgb = $obj->rgb('blue');      # returns (0, 0, 255)
-
-    $rgb = $obj->rgb('blue', ','); # returns "0,0,255"
-    ```
-
-Since version 2.10\_02, the interface will assume method names
-are color names and return the hex value,
+## `hex`
 
 ```
-$obj->black eq $obj->hex("black")
+$hex = $pal->hex($name, $prefix);
+```
+
+Returns a 6-digit hexidecimal RGB code for the color.  If an optional
+prefix is specified, it will prefix the code with that string.  For
+example,
+
+```
+$hex = $pal->hex('blue', '#'); # returns "#0000ff"
+```
+
+If the color does not exist, it will return an empty string.
+
+A hexidecimal RGB value in the form of `#RRGGBB`, `0xRRGGBB` or
+`RRGGBB` will return itself:
+
+```
+$color = $pal->hex('#123abc');         # returns '123abc'
+```
+
+## autoloaded color name methods
+
+An autoloading interface was added in v2.11:
+
+```
+$po->green; # same as $po->rgb('green');
 ```
 
 Method names are case-insensitive, and underscores are ignored.
 
-## Utility Functions
+This is deprecated, and will be removed in a future version.
 
-These functions are not exported by default, so much be specified to
-be used:
+## `load_scheme`
 
-```perl
-use Graphics::ColorNames qw( all_schemes hex2tuple tuple2hex );
+```
+$pal->load_scheme( $scheme );
 ```
 
-- all\_schemes
+This dynamically loads a color scheme, which can be either a hash
+reference or code reference.
 
-    ```
-    @schemes = all_schemes();
-    ```
+# EXPORTS
 
-    Returns a list of all available color schemes installed on the machine
-    in the `Graphics::ColorNames` namespace.
+## `all_schemes`
 
-    The order has no significance.
+```perl
+my @schemes = all_schemes();
+```
 
-- hex2tuple
+Returns a list of all available color schemes installed on the machine
+in the `Graphics::ColorNames` namespace.
 
-    ```
-    ($red, $green, $blue) = hex2tuple( $colors{'AliceBlue'});
-    ```
+The order has no significance.
 
-- tuple2hex
+## `hex2tuple`
 
-    ```
-    $rgb = tuple2hex( $red, $green, $blue );
-    ```
+Converts a hexidecimal string to a tuple.
 
-## Color Schemes
+## `tuple2hex`
 
-The following schemes are available by default:
+Converts a tuple to a hexidecimal string.
 
-- X
+# TIED INTERFACE
 
-    About 750 color names used in X-Windows (although about 90+ of them are
-    duplicate names with spaces).
+The standard interface (prior to version 0.40) was through a tied hash:
 
-- HTML
+```
+tie %pal, 'Graphics::ColorNames', qw[ X WWW ];
+```
 
-    16 common color names defined in the HTML 4.0 specification. These
-    names are also used with older CSS and SVG specifications. (You may
-    want to see [Graphics::ColorNames::SVG](https://metacpan.org/pod/Graphics::ColorNames::SVG) for a complete list.)
+This interface is deprecated, and will be moved to a separate module
+in the future.
 
-- Windows
-
-    16 commom color names used with Microsoft Windows and related
-    products.  These are actually the same colors as the ["HTML"](#html) scheme,
-    although with different names.
-
-Note that the [Graphics::ColorNames::Netscape](https://metacpan.org/pod/Graphics::ColorNames::Netscape) scheme is no longer
-included with this distribution. If you need it, you should install it
-separately.
-
-Rather than a color scheme, the path or open filehandle for a
-`rgb.txt` file may be specified.
-
-Additional color schemes are available on CPAN.
-
-## Custom Color Schemes
+# CUSTOM COLOR SCHEMES
 
 You can add naming scheme files by creating a Perl module is the name
 `Graphics::ColorNames::SCHEMENAME` which has a subroutine named
@@ -310,7 +217,7 @@ duplicate entrieswith spaces and punctuation, then the minimum
 version of [Graphics::ColorNames](https://metacpan.org/pod/Graphics::ColorNames) should be 2.10 in your requirements.)
 
 An example of an additional module is the [Graphics::ColorNames::Mozilla](https://metacpan.org/pod/Graphics::ColorNames::Mozilla)
-module by Steve Pomeroy.
+module.
 
 Since version 1.03, `NamesRgbTable` may also return a code reference:
 
@@ -376,6 +283,7 @@ Robert Rothenberg <rrwo@cpan.org>
 - Magnus Cedergren <magnus@mbox604.swipnet.se>
 - Gary Vollink <gary@vollink.com>
 - Claus Färber <cfaerber@cpan.org>
+- Andreas J. König <andk@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

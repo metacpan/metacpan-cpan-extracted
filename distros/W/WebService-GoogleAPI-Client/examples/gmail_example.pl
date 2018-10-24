@@ -97,16 +97,18 @@ use warnings;
 my $DEBUG = 001;
 
 
-      ##    BASIC CLIENT CONFIGURATION 
+##    BASIC CLIENT CONFIGURATION
 
-if ( -e './gapi.json')  { say "auth file exists" } else { croak('I only work if gapi.json is here'); }; ## prolly better to fail on setup ?
-my $gapi_agent = WebService::GoogleAPI::Client->new( debug => $DEBUG, gapi_json =>'./gapi.json'  );
+if   ( -e './gapi.json' ) { say "auth file exists" }
+else                      { croak( 'I only work if gapi.json is here' ); }
+;    ## prolly better to fail on setup ?
+my $gapi_agent        = WebService::GoogleAPI::Client->new( debug => $DEBUG, gapi_json => './gapi.json' );
 my $aref_token_emails = $gapi_agent->auth_storage->storage->get_token_emails_from_storage;
-my $user              = $aref_token_emails->[0]; ## default to the first user
+my $user              = $aref_token_emails->[0];                                                             ## default to the first user
 $gapi_agent->user( $user );
 
 say "Running tests with default user email = $user";
-say 'Root cache folder: ' .  $gapi_agent->discovery->chi->root_dir(); ## cached content temporary directory 
+say 'Root cache folder: ' . $gapi_agent->discovery->chi->root_dir();                                         ## cached content temporary directory
 say "User Agent Name = " . $gapi_agent->ua->transactor->name();
 
 if ( 1 == 0 )
@@ -114,23 +116,25 @@ if ( 1 == 0 )
   #my $api_spec = $gapi_agent->get_api_discovery_for_api_id('gmail:v1');
   #my $api_spec = $gapi_agent->get_api_discovery_for_api_id('gmail.users.messages.list');
   #my $api_spec = $gapi_agent->get_api_discovery_for_api_id('gmail:v1.users.messages.list');
-  my $api_spec = $gapi_agent->get_api_discovery_for_api_id('gmail');
+  my $api_spec = $gapi_agent->get_api_discovery_for_api_id( 'gmail' );
   ## keys = auth, basePath, baseUrl, batchPath, description, discoveryVersion, documentationLink, etag, icons, id, kind, name, ownerDomain, ownerName, parameters, protocol, resources, revision, rootUrl, schemas, servicePath, title, version
-  say join(', ', sort keys %{$api_spec} );
-  foreach my $k (qw/schemas resources auth /) { $api_spec->{$k} = 'removed to simplify';  } ## SIMPLIFY OUTPUT
+  say join( ', ', sort keys %{ $api_spec } );
+  foreach my $k ( qw/schemas resources auth / ) { $api_spec->{ $k } = 'removed to simplify'; }    ## SIMPLIFY OUTPUT
   say Dumper $api_spec;
-  
-  my $meths_by_id = $gapi_agent->methods_available_for_google_api_id('gmail');
-  foreach my $meth ( keys %{$meths_by_id} )
+
+  my $meths_by_id = $gapi_agent->methods_available_for_google_api_id( 'gmail' );
+  foreach my $meth ( keys %{ $meths_by_id } )
   {
-    say "$meth"
+    say "$meth";
   }
+
   # say $gapi_agent->api_query( api_endpoint_id => 'gmail.users.getProfile')->to_string;
   # say $gapi_agent->api_query( api_endpoint_id => 'gmail.users.messages.list')->to_string;
-  foreach my $meth (qw/ gmail.users.messages.list gmail:v1.users.messages.list /) ##  gmail.users.settings.getVacation  gmail.users.settings.getImap gmail.users.settings.filters.list    -- FAILERS - gmail.users.messages.get gmail.users.settings.sendAs.smimeInfo.get gmail.users.threads.get
+  foreach my $meth ( qw/ gmail.users.messages.list gmail:v1.users.messages.list /
+    ) ##  gmail.users.settings.getVacation  gmail.users.settings.getImap gmail.users.settings.filters.list    -- FAILERS - gmail.users.messages.get gmail.users.settings.sendAs.smimeInfo.get gmail.users.threads.get
   {
     say "Testing endpoint '$meth' with no additional options";
-    my $r = $gapi_agent->api_query( api_endpoint_id => $meth, options => {});
+    my $r = $gapi_agent->api_query( api_endpoint_id => $meth, options => {} );
     say $r->to_string;
     say $r->body;
   }
@@ -139,25 +143,25 @@ if ( 1 == 0 )
 }
 
 
-if ( 1==1 )  ## Simplified use Cases
+if ( 1 == 1 )    ## Simplified use Cases
 {
-    say $gapi_agent->api_query(
-        api_endpoint_id => 'gmail.users.messages.send',
-        options    => { raw => encode_base64( 
-                                              Email::Simple->create( header => [To => $user, From => $user, Subject =>"Test email from $user",], 
-                                                                      body   => "This is the body of email from $user to $user", )->as_string 
-                                            ), 
-                      },
-    )->to_string; ##
+  say $gapi_agent->api_query(
+    api_endpoint_id => 'gmail.users.messages.send',
+    options         => {
+      raw => encode_base64(
+        Email::Simple->create( header => [To => $user, From => $user, Subject => "Test email from $user",], body => "This is the body of email from $user to $user", )->as_string
+      ),
+    },
+  )->to_string;    ##
 
-    print  $gapi_agent->api_query(
-              api_endpoint_id => 'gmail.users.messages.list', ## auto sets method to GET, path to 
-            )->to_string;
-    #print Dumper $r;
-    exit;
+  print $gapi_agent->api_query(
+    api_endpoint_id => 'gmail.users.messages.list',    ## auto sets method to GET, path to
+  )->to_string;
+
+  #print Dumper $r;
+  exit;
 
 }
-
 
 
 #exit;
@@ -171,6 +175,7 @@ if ( 1==1 )  ## Simplified use Cases
 #croak('croak exiting early because DEBUG set') if $DEBUG;
 ## Comment out / Uncomment to enable/disable test the Gmail API functions
 send_email_to_self_using_client( $gapi_agent );
+
 #review_emails_from_last_month_using_agent( $gapi_agent );
 
 
@@ -220,8 +225,6 @@ sub review_emails_from_last_month_using_agent
 #######################################################
 
 
-
-
 =pod
 
 =head2 get_email_content_from_id_using_agent( $id, $gapi )
@@ -232,19 +235,13 @@ Get a single email and extract content
 TODO: extract the attachments
 
 =cut
+
 #######################################################
 sub get_email_content_from_id_using_agent
 {
   my ( $id, $gapi ) = @_;
 
-  my $retval = {
-    id                        => $id,
-    Subject                   => undef,
-    From                      => undef,
-    'Delivered-To'            => undef,
-    snippet                   => undef,
-    decoded_parts_by_mimetype => { 'text/html' => [] }
-  };
+  my $retval = { id => $id, Subject => undef, From => undef, 'Delivered-To' => undef, snippet => undef, decoded_parts_by_mimetype => { 'text/html' => [] } };
 
   my $cl = $gapi->api_query( { httpMethod => 'get', path => 'https://www.googleapis.com/gmail/v1/users/me/messages/' . $id, } );
   ## TODO - what is the simplified version ?
@@ -275,7 +272,7 @@ sub get_email_content_from_id_using_agent
         print "$header->{ name }  = $header->{ value }\n";
       }
     }
-    print $cl->json->{ snippet } . "\n";# if $DEBUG;
+    print $cl->json->{ snippet } . "\n";    # if $DEBUG;
     print Dumper $headers if $DEBUG;
 
     ## process each of the email MIME multiparts
@@ -304,6 +301,7 @@ sub get_email_content_from_id_using_agent
   {
     croak Dumper $cl;
   }
+
   #print 'x' x 80 . "\n" if $DEBUG;
   return $retval;
 }
@@ -325,11 +323,11 @@ sub send_email_to_self_using_client
 {
   my ( $gapi ) = @_;
   my $cl = $gapi->api_query( {
-    httpMethod => 'post', ## method as key should also work fine
+    httpMethod => 'post',                                                                                                                ## method as key should also work fine
     path       => 'https://www.googleapis.com/gmail/v1/users/me/messages/send',
     options    => { raw => construct_base64_email( $user, "Test email from $user", "This is the body of email from $user to $user" ) }
   } );
-  if ( $cl->code eq '200' )    ## Mojo::Message::Response
+  if ( $cl->code eq '200' )                                                                                                              ## Mojo::Message::Response
   {
     say $cl->to_string;
   }
@@ -350,7 +348,6 @@ sub construct_base64_email
   return encode_base64( $email->as_string );
 }
 #######################################################
-
 
 
 =pod

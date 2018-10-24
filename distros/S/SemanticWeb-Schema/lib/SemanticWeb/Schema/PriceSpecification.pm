@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::PriceSpecification;
 
 # ABSTRACT: A structured value representing a price or price range
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has eligible_quantity => (
@@ -104,7 +106,7 @@ SemanticWeb::Schema::PriceSpecification - A structured value representing a pric
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -179,12 +181,17 @@ A min_price should be one of the following types:
 
 =head2 C<price>
 
-=for html <p>The offer price of a product, or of a price component when attached to
-PriceSpecification and its subtypes.</p> <p>Usage guidelines:</p> <ul>
-<li>Use the <a class="localLink"
-href="http://schema.org/priceCurrency">priceCurrency</a> property (with <a
-href="http://en.wikipedia.org/wiki/ISO_4217#Active_codes">ISO 4217
-codes</a> e.g. "USD") instead of including <a
+=for html The offer price of a product, or of a price component when attached to
+PriceSpecification and its subtypes.<br/><br/> Usage guidelines:<br/><br/>
+<ul> <li>Use the <a class="localLink"
+href="http://schema.org/priceCurrency">priceCurrency</a> property (with
+standard formats: <a href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217
+currency format</a> e.g. "USD"; <a
+href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">Ticker
+symbol</a> for cryptocurrencies e.g. "BTC"; well known names for <a
+href="https://en.wikipedia.org/wiki/Local_exchange_trading_system">Local
+Exchange Tradings Systems</a> (LETS) and other currency types e.g. "Ithaca
+HOUR") instead of including <a
 href="http://en.wikipedia.org/wiki/Dollar_sign#Currencies_that_use_the_doll
 ar_or_peso_sign">ambiguous symbols</a> such as '$' in the value.</li>
 <li>Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a
@@ -201,9 +208,9 @@ A price should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<Str>
+
+=item C<Num>
 
 =back
 
@@ -211,10 +218,17 @@ A price should be one of the following types:
 
 C<priceCurrency>
 
-=for html The currency (in 3-letter ISO 4217 format) of the price or a price
-component, when attached to <a class="localLink"
+=for html The currency of the price, or a price component when attached to <a
+class="localLink"
 href="http://schema.org/PriceSpecification">PriceSpecification</a> and its
-subtypes.
+subtypes.<br/><br/> Use standard formats: <a
+href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217 currency format</a>
+e.g. "USD"; <a
+href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">Ticker
+symbol</a> for cryptocurrencies e.g. "BTC"; well known names for <a
+href="https://en.wikipedia.org/wiki/Local_exchange_trading_system">Local
+Exchange Tradings Systems</a> (LETS) and other currency types e.g. "Ithaca
+HOUR".
 
 A price_currency should be one of the following types:
 

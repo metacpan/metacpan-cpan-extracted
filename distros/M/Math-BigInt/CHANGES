@@ -1,3 +1,9 @@
+1.999815 2018-10-19
+
+ * Move bitwise operators signed and, signed or, and signed xor from
+   lib/Math/BigInt/CalcEmu.pm into lib/Math/BigInt/Lib.pm. The file
+   lib/Math/BigInt/CalcEmu.pm is no longer needed and thus removed.
+
 1.999814 2018-10-01
 
  * Add to_base() and from_base() to Math::BigInt and corresponding library

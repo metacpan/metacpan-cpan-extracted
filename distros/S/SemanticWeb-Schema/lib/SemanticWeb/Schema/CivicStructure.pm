@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::CivicStructure;
 
 # ABSTRACT: A public structure
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has opening_hours => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::CivicStructure - A public structure
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -52,11 +54,11 @@ A public structure, such as a town hall or concert hall.
 
 C<openingHours>
 
-=for html <p>The general opening hours for a business. Opening hours can be specified
-as a weekly time range, starting with days, then times per day. Multiple
-days can be listed with commas ',' separating each day. Day or time ranges
-are specified using a hyphen '-'.</p> <ul> <li>Days are specified using the
-following two-letter combinations: <code>Mo</code>, <code>Tu</code>,
+=for html The general opening hours for a business. Opening hours can be specified as
+a weekly time range, starting with days, then times per day. Multiple days
+can be listed with commas ',' separating each day. Day or time ranges are
+specified using a hyphen '-'.<br/><br/> <ul> <li>Days are specified using
+the following two-letter combinations: <code>Mo</code>, <code>Tu</code>,
 <code>We</code>, <code>Th</code>, <code>Fr</code>, <code>Sa</code>,
 <code>Su</code>.</li> <li>Times are specified using 24:00 time. For
 example, 3pm is specified as <code>15:00</code>. </li> <li>Here is an

@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A reservation for lodging at a hotel, motel, inn, etc.</p>\n\n<p>Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.",
+      "rdfs:comment" : "A reservation for lodging at a hotel, motel, inn, etc.<br/><br/>\n\nNote: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.",
       "rdfs:label" : "LodgingReservation",
       "rdfs:subClassOf" : "schema:Reservation"
    },
@@ -21,8 +21,8 @@
          "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
          "rdfs:label" : "checkoutTime",
          "schema:domainIncludes" : [
-            "schema:LodgingReservation",
-            "schema:LodgingBusiness"
+            "schema:LodgingBusiness",
+            "schema:LodgingReservation"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },
@@ -39,8 +39,8 @@
          "rdfs:label" : "lodgingUnitType",
          "schema:domainIncludes" : "schema:LodgingReservation",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:QualitativeValue"
          ]
       },
       "schema:numAdults" : {
@@ -49,8 +49,8 @@
          "rdfs:label" : "numAdults",
          "schema:domainIncludes" : "schema:LodgingReservation",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Integer"
+            "schema:Integer",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:numChildren" : {
@@ -59,8 +59,8 @@
          "rdfs:label" : "numChildren",
          "schema:domainIncludes" : "schema:LodgingReservation",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Integer"
+            "schema:Integer",
+            "schema:QuantitativeValue"
          ]
       }
    }

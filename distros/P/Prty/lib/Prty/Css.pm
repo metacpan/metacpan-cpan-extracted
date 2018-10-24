@@ -1,11 +1,12 @@
 package Prty::Css;
+use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
-use Prty::Html::Tag;
 use Prty::Path;
 use Prty::String;
 
@@ -15,32 +16,181 @@ use Prty::String;
 
 =head1 NAME
 
-Prty::Css - Generierung von CSS Code
+Prty::Css - Generiere CSS Code
+
+=head1 BASE CLASS
+
+L<Prty::Hash>
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item format => 'normal', 'flat' (Default: 'normal')
+
+Format des generierten CSS-Code.
+
+=back
 
 =head1 METHODS
 
-=head2 Klassenmethoden
+=head2 Konstruktor
+
+=head3 new() - Instantiiere CSS-Generator
+
+=head4 Synopsis
+
+    $css = $class->new($format);
+
+=head4 Arguments
+
+=over 4
+
+=item $format (Default: 'normal')
+
+Format des generierten CSS-Code. Zulässige Werte:
+
+=over 4
+
+=item 'normal'
+
+=back
+
+Der CSS-Code wird mehrzeilig generiert:
+
+    .comment {
+        color: #408080;
+        font-style: italic;
+    }
+
+=over 4
+
+=item 'flat'
+
+=back
+
+Der CSS-Code wird einzeilig generiert:
+
+    .comment { color: #408080; font-style: italic; }
+
+=back
+
+=head4 Returns
+
+Referenz auf CSS-Generator-Objekt.
+
+=head4 Description
+
+Instantiiere ein CSS-Generator-Objekt und liefere eine Referenz
+auf dieses Objekt zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub new {
+    my ($class,$format) = @_;
+
+    my $self = $class->SUPER::new(
+        format => $format // 'normal',
+    );
+
+    return $self;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Objektmethoden
+
+=head3 properties() - Zeichenkette aus CSS Properties
+
+=head4 Synopsis
+
+    $properties = $this->properties(@properties);
+    $properties = $this->properties(\@properties);
+
+=head4 Description
+
+Generiere aus den Property/Wert-Paaren @properties eine
+Zeichenkette aus CSS Properties. Ist die Liste der
+Property/Wert-Paare leer oder haben alle Schlüssel keinen Wert
+(C<undef> oder Leerstring) liefere C<undef> (keinen Leerstring,
+damit von der Methode tag() kein style-Attribut mit Leerstring
+erzeugt wird!).
+
+Diese Methode ist nützlich, wenn der Wert eines HTML
+style-Attributs erzeugt werden soll. Wenn als Wert des Attributs
+C<style> eines Prty::Html::Tag eine Array-Referenz angegeben
+wird, wird diese Methode gerufen.
+
+=head4 Example
+
+Erzeuge Properties für HTML style-Attribut:
+
+    $properties = Prty::Css->properties(
+        fontStyle => 'italic',
+        marginLeft => '0.5cm',
+        marginRight => '0.5cm',
+    );
+
+liefert
+
+    font-style: italic; margin-left: 0.5cm; margin-right: 0.5cm;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub properties {
+    my $this = shift;
+    my $propertyA = ref $_[0]? shift: \@_;
+
+    my $self = ref $this? $this: $this->new('flat');
+    my $sep = $self->{'format'} eq 'flat'? ' ': "\n";
+
+    my $code;
+    for (my $i = 0; $i < @$propertyA; $i += 2) {
+        my $key = $propertyA->[$i];
+        my $val = $propertyA->[$i+1];
+
+        $key =~ s/([a-z])([A-Z])/$1-\L$2/g;
+
+        if (defined $val && $val ne '') {
+            if ($code) {
+                $code .= $sep;
+            }
+            $code .= "$key: $val;";
+        }
+    }
+
+    return $code;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 rule() - Generiere CSS Style Rule
 
 =head4 Synopsis
 
-    $rule = Prty::Css->rule($selector,@propVal);
+    $rule = $this->rule($selector,\@properties);
+    $rule = $this->rule($selector,@properties);
 
 =head4 Description
 
 Generiere eine CSS Style Rule, bestehend aus Selector $selector
-und den Property/Value-Paaren @propVal und liefere
-diese als Zeichenkette zurück.
+und den Property/Value-Paaren @properties und liefere diese als
+Zeichenkette zurück. Ist die Liste der Properties leer oder haben
+alle Schlüssel keinen Wert (C<undef> oder Leerstring) liefere
+einen Leerstring ('').
 
 =head4 Example
 
 Erzeuge eine einfache Style Rule:
 
     $rule = Prty::Css->rule('p.abstract',
-        fontStyle=>'italic',
-        marginLeft=>'0.5cm',
-        marginRight=>'0.5cm',
+        fontStyle => 'italic',
+        marginLeft => '0.5cm',
+        marginRight => '0.5cm',
     );
 
 liefert
@@ -56,24 +206,287 @@ liefert
 # -----------------------------------------------------------------------------
 
 sub rule {
-    my $class = shift;
+    my $this = shift;
     my $selector = shift;
-    # @_: @propVal
+    my $propertyA = ref $_[0]? shift: \@_;
 
-    my $str = "$selector {\n";
-    while (@_) {
-        my $prop = shift; 
-        my $val = shift;
-
-        $prop =~ s/([a-z])([A-Z])/$1-\L$2/g;
-
-        if (defined $val && $val ne '') {
-            $str .= "    $prop: $val;\n";
+    my $self = ref $this? $this: $this->new;
+    
+    my $rule = $self->properties($propertyA) // '';
+    if ($rule) {
+        if ($self->{'format'} eq 'flat') {
+            $rule = "$selector { $rule }\n";
+        }
+        else {
+            $rule =~ s/^/    /mg;
+            $rule = "$selector {\n$rule\n}\n";
         }
     }
-    $str .= "}\n";
 
-    return $str;
+    return $rule;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 rules() - Generiere mehrere CSS Style Rules
+
+=head4 Synopsis
+
+    $rules = $css->rules($selector=>\@properties,...);
+
+=head4 Arguments
+
+=over 4
+
+=item $selector
+
+CSS-Selector. Z.B. 'p.abstract'.
+
+=item \@properties
+
+Liste von Property/Wert-Paaren. Z.B. [color=>'red',fontStyle=>'italic'].
+
+=back
+
+=head4 Returns
+
+CSS-Regeln (String)
+
+=head4 Description
+
+Wie $css->rule(), nur für mehrere CSS-Regeln auf einmal.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub rules {
+    my $self = shift;
+    # @_: $selector=>\@properties,...
+
+    my $rules = '';
+    while (@_) {
+        $rules .= $self->rule(shift,shift);
+    }
+
+    return $rules;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 restrictedRules() - Generiere lokale CSS Style Rules
+
+=head4 Synopsis
+
+    $rules = $css->restrictedRules($localSelector,
+        $selector => \@properties,
+        ...
+    );
+
+=head4 Arguments
+
+=over 4
+
+=item $localSelector
+
+Selector, der allen folgenden Selektoren vorangestellt wird.
+Z.B. '#table01'.
+
+=item $selector
+
+Sub-Selector, der dem $localSelector mit einem Leerzeichen
+getrennt, nachgestellt wird. Wenn Leerstring (''), wird der
+Sub-Selector fortgelassen, die @properties also direkt dem
+$localSelector zugeordnet. Beginnt $selector mit einem
+Kaufmanns-Und (&), werden $localSelector und $selector ohne
+trennendes Leerzeichen konkateniert (gleiche Logik wie bei Sass).
+
+=item \@properties
+
+Liste von Property/Wert-Paaren. Z.B. [color=>'red',fontStyle=>'italic'].
+
+=back
+
+=head4 Returns
+
+CSS-Regeln (String)
+
+=head4 Description
+
+Wie $css->rules(), nur mit zusätzlicher Einschränkung auf einen
+lokalen Selektor.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub restrictedRules {
+    my $self = shift;
+    my $localSelector = shift;
+    # @_: $selector=>\@properties,...
+
+    my $rules = '';
+    while (@_) {
+        my $selector = shift;
+        if (substr($selector,0,1) eq '&') {
+            substr($selector,0,1) = '';
+            $selector = $localSelector.$selector;
+        }
+        elsif ($selector eq '') {
+            $selector = $localSelector;
+        }
+        else {
+            $selector = "$localSelector $selector";
+        }
+        $rules .= $self->rule($selector,shift);
+    }
+
+    return $rules;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 rulesFromObject() - Generiere CSS Style Rules aus Objekt-Attributen
+
+=head4 Synopsis
+
+    $rules = $css->rulesFromObject($obj,
+        $key => [$selector,@properties],
+        ...
+    );
+
+=head4 Arguments
+
+=over 4
+
+=item $obj
+
+Das Objekt, aus dessen Objektattributen $key, ... die
+CSS-Regeln generiert werden.
+
+=item $key => [$selector,@properties], ...
+
+Liste der Objekt-Attribute $key, ..., ihre entsprechenden
+Selektoren und Default-Properties.
+
+=back
+
+=head4 Returns
+
+CSS-Regeln (String)
+
+=head4 Description
+
+Die Methode erzeugt CSS-Regeln auf Basis von Objekt-Attributen.
+Jedes Attribut entspricht einem CSS-Selektor und definiert dessen
+Properties. Es können Default-Properties hinterlegt werden, die
+der Aufrufer ergänzen ('+' als erstes Element der Property-Liste)
+oder ersetzen oder löschen kann (siehe Example).
+
+=head4 Example
+
+B<< Beispiel aus Prty::Html::Verbatim >>
+
+Im Konstruktor werden die Objekt-Attribute vereinbart. Diese
+können bei der Instantiierung des Objektes gesetzt werden.
+
+    my $self = $class->SUPER::new(
+        cssTableProperties => undef,
+        cssLnProperties => undef,
+        cssMarginProperties => undef,
+        cssTextProperties => undef,
+        ...
+    );
+
+In der Methode, die die CSS-Regeln erzeugt, werden die zugehörigen
+Selektoren und Default-Properties vereinbart.
+
+    $rules .= $css->rulesFromObject($self,
+        cssTableProperties => [".xxx-table"],
+        cssLnProperties => [".xxx-ln",color=>'#808080'],
+        cssMarginProperties => [".xxx-margin",width=>'0.6em'],
+        cssTextProperties => [".xxx-text"],
+    );
+
+Beim Konstruktor-Aufruf können die Default-Properties ergänzt ('+'
+als erstes Element in der Property-Liste) oder ersetzt (keine
+Angabe) oder gelöscht werden (leere Liste).
+
+    my $obj = Prty::Hash->new(
+        cssTableProperties => [backgroundColor=>'#f0f0f0'],  # ersetzen
+        cssLnProperties => ['>',color=>'black'],             # ersetzen
+        cssMarginProperties => ['+',backgroundColor=>'red'], # ergänzen
+        cssTextProperties => [],                             # löschen
+    );
+
+Resultierende CSS-Regeln:
+
+    .xxx-table { background-color: #f0f0f0; }
+    .xxx-ln { color: black; }
+    .xxx-margin { width: 0.6em; background-color: red; }
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub rulesFromObject {
+    my $self = shift;
+    my $obj = shift;
+    # @_: $key => [$selector,@properties], ...
+
+    my $rules = '';
+    for (my $i = 0; $i < @_; $i += 2) {
+        my $key = $_[$i];
+        my ($selector,@defaults) = @{$_[$i+1]};
+        my $propA = $obj->get($key);
+
+        my (@prop,$op);
+        if ($propA) {
+            @prop = @$propA;
+            if (@prop % 2 == 1) {
+                $op = shift @prop;
+            }
+        }
+        if (!$propA || defined($op) && $op eq '+') {
+            unshift @prop,@defaults;
+        }
+        $rules .= $self->rule($selector,@prop);
+    }
+
+    return $rules;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Klassenmethoden
+
+=head3 makeFlat() - Mache CSS-Regeln einzeilig
+
+=head4 Synopsis
+
+    $rules = $this->makeFlat($rules);
+
+=head4 Arguments
+
+=over 4
+
+=item $rules
+
+CSS-Regeln (String)
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub makeFlat {
+    my ($this,$rules) = @_;
+
+    $rules =~ s/\s+/ /g;
+    $rules =~ s/\} /}\n/g;
+
+    return $rules;
 }
 
 # -----------------------------------------------------------------------------
@@ -221,7 +634,7 @@ sub style {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    Dist::Util::Debian - Utilities related to Perl distribution and Debian
 
+VERSION
+    This document describes version 0.007 of Dist::Util::Debian (from Perl
+    distribution Dist-Util-Debian), released on 2018-10-23.
+
+SYNOPSIS
      use Dist::Util::Debian qw(
          dist2deb
          deb_exists
@@ -7,33 +13,29 @@ SYNOPSIS
          deb_ver
          dist_deb_ver
      );
-    
+
      say dist2deb("HTTP-Tiny"); # -> libhttp-tiny-perl
-    
+
      say dist_has_deb("HTTP-Tiny"); # -> 1
      say dist_has_deb("Foo");       # -> 0
      say dist_has_deb({use_allpackages=>1}, "HTTP-Tiny", "Foo"); # -> (1, 0)
-    
+
      say dist_deb_ver("HTTP-Tiny"); # -> "0.070-1"
      say dist_deb_ver("Foo");       # -> undef
      say dist_deb_ver({use_allpackages=>1}, "HTTP-Tiny", "Foo"); # -> ("0.070-1", undef)
 
 DESCRIPTION
-
 FUNCTIONS
-
- dist2deb($dist, ...) => list
-
+  dist2deb($dist, ...) => list
     It uses the simple rule of turning $dist to lowercase and adds "lib" +
     "-perl" prefix and suffix. A small percentage of distributions do not
     follow this rule.
 
- dist_has_deb([ \%opts, ] $dist, ...) => bool|list[bool]
-
+  dist_has_deb([ \%opts, ] $dist, ...) => bool|list[bool]
     Return true if distribution named $dist has a corresponding Debian
     package. Currently the way the routine checks this is rather naive: it
     checks the corresponding Debian package against this URL:
-    https://packages.debian.org/sid/$package.
+    <https://packages.debian.org/sid/$package>.
 
     Will warn and return undef on error, e.g. the URL cannot be checked or
     does not contain negative/positive indicator of existence.
@@ -42,23 +44,44 @@ FUNCTIONS
 
     Known options:
 
-      * use_allpackages => bool
+    *   use_allpackages => bool
 
-      If you need to check a lot of distributions (hundreds or more) then
-      the default way of checking each distribution against a URL might be
-      too slow. An alternative way, enabled if you set this option to true,
-      is to download
-      https://packages.debian.org/unstable/allpackages?format=txt.gz (at
-      the time of this writing, Jan 2017, the size is about 1.7M) then
-      parse it locally. The file will be cached to a temporary file and
-      reused for a day.
+        If you need to check a lot of distributions (hundreds or more) then
+        the default way of checking each distribution against a URL might be
+        too slow. An alternative way, enabled if you set this option to
+        true, is to download
+        <https://packages.debian.org/unstable/allpackages?format=txt.gz> (at
+        the time of this writing, Jan 2017, the size is about 1.7M) then
+        parse it locally. The file will be cached to a temporary file and
+        reused for a day.
 
-      Function will return undef if the allpackages index cannot be
-      donwloaded.
+        Function will return undef if the allpackages index cannot be
+        donwloaded.
 
- deb_exists([ \%opts, ] $deb, ...) => bool|list[bool]
+  deb_exists([ \%opts, ] $deb, ...) => bool|list[bool]
+  deb_ver([ \%opts, ] $deb, ...) => str|list[str]
+  dist_deb_ver([ \%opts, ] $deb, ...) => str|list[str]
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Util-Debian>.
 
- deb_ver([ \%opts, ] $deb, ...) => str|list[str]
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Util-Debian>.
 
- dist_deb_ver([ \%opts, ] $deb, ...) => str|list[str]
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Util-Debian>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

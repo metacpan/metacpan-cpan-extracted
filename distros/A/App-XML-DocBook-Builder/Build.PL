@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "App-XML-DocBook-Builder",
-  "dist_version" => "0.0601",
+  "dist_version" => "0.0603",
   "license" => "mit",
   "module_name" => "App::XML::DocBook::Builder",
   "recursive_test_files" => 1,

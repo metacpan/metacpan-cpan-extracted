@@ -44,8 +44,8 @@
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : [
             "schema:Text",
-            "schema:URL",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:URL"
          ]
       },
       "schema:image" : {
@@ -65,14 +65,16 @@
          "schema:domainIncludes" : "schema:Thing",
          "schema:inverseOf" : "schema:mainEntity",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:URL"
          ]
       },
       "schema:name" : {
+         "owl:equivalentProperty" : "dc:title",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The name of the item.",
          "rdfs:label" : "name",
+         "rdfs:subPropertyOf" : "ns:label",
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : "schema:Text"
       },

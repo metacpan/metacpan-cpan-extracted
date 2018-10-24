@@ -918,8 +918,38 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_add_get_field(SPVM_ENV* env, SPVM_STRING_BU
   SPVM_RUNTIME_PACKAGE* field_package = &runtime->packages[field->package_id];
   const char* field_package_name = runtime->symbols[field_package->name_id];
   const char* field_name = runtime->symbols[field->name_id];
+  const char* field_signature = runtime->symbols[field->signature_id];
 
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+  SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(");
+  SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "      ");
+  SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_id(env, \"");
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+  SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+  SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+  SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Field not found ");
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " ");
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+  SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "      ");
+  SPVM_STRING_BUFFER_add_field_index_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_index(env, ");
+  SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, ");\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "    };\n");
+
   SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
   SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, object_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -946,8 +976,38 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_add_set_field(SPVM_ENV* env, SPVM_STRING_BU
   SPVM_RUNTIME_PACKAGE* field_package = &runtime->packages[field->package_id];
   const char* field_package_name = runtime->symbols[field_package->name_id];
   const char* field_name = runtime->symbols[field->name_id];
+  const char* field_signature = runtime->symbols[field->signature_id];
 
   SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+  SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(");
+  SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "      ");
+  SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_id(env, \"");
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+  SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+  SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+  SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Field not found ");
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " ");
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+  SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "      ");
+  SPVM_STRING_BUFFER_add_field_index_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_index(env, ");
+  SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+  SPVM_STRING_BUFFER_add(string_buffer, ");\n");
+  SPVM_STRING_BUFFER_add(string_buffer, "    };\n");
+
   SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
   SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, object_index);
   SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -975,6 +1035,71 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_package_csource(SPVM_ENV* env, SPVM_S
   
   // Head part - include and define
   SPVM_CSOURCE_BUILDER_PRECOMPILE_build_head(env, string_buffer);
+
+  // Package variable id declarations
+  SPVM_STRING_BUFFER_add(string_buffer, "// Package variable id declarations\n");
+  {
+    for (int32_t info_package_var_ids_index = 0; info_package_var_ids_index < package->info_package_var_ids_length; info_package_var_ids_index++) {
+      int32_t package_var_id = runtime->info_package_var_ids[package->info_package_var_ids_base + info_package_var_ids_index];
+      SPVM_RUNTIME_PACKAGE_VAR* package_var = &runtime->package_vars[package_var_id];
+      SPVM_RUNTIME_PACKAGE* package_var_package = &runtime->packages[package_var->package_id];
+      const char* package_var_package_name = runtime->symbols[package_var_package->name_id];
+      const char* package_var_name = runtime->symbols[package_var->name_id];
+      
+      SPVM_STRING_BUFFER_add(string_buffer, "int32_t ");
+      SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+      SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+    }
+  }
+
+  // Field id and index declarations
+  SPVM_STRING_BUFFER_add(string_buffer, "// Field id and index declarations\n");
+  {
+    for (int32_t info_field_ids_index = 0; info_field_ids_index < package->info_field_ids_length; info_field_ids_index++) {
+      int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_ids_index];
+      SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
+      SPVM_RUNTIME_PACKAGE* field_package = &runtime->packages[field->package_id];
+      const char* field_package_name = runtime->symbols[field_package->name_id];
+      const char* field_name = runtime->symbols[field->name_id];
+      
+      SPVM_STRING_BUFFER_add(string_buffer, "int32_t ");
+      SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+      SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+      SPVM_STRING_BUFFER_add(string_buffer, "int32_t ");
+      SPVM_STRING_BUFFER_add_field_index_name(string_buffer, field_package_name, field_name);
+      SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+    }
+  }
+
+  // Sub id declarations
+  SPVM_STRING_BUFFER_add(string_buffer, "// Sub id declarations\n");
+  {
+    for (int32_t info_sub_ids_index = 0; info_sub_ids_index < package->info_sub_ids_length; info_sub_ids_index++) {
+      int32_t sub_id = runtime->info_sub_ids[package->info_sub_ids_base + info_sub_ids_index];
+      SPVM_RUNTIME_SUB* sub = &runtime->subs[sub_id];
+      SPVM_RUNTIME_PACKAGE* sub_package = &runtime->packages[sub->package_id];
+      const char* sub_package_name = runtime->symbols[sub_package->name_id];
+      const char* sub_name = runtime->symbols[sub->name_id];
+      
+      SPVM_STRING_BUFFER_add(string_buffer, "int32_t ");
+      SPVM_STRING_BUFFER_add_sub_id_name(string_buffer, sub_package_name, sub_name);
+      SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+    }
+  }
+
+  // Basic type id declarations
+  SPVM_STRING_BUFFER_add(string_buffer, "// Basic type id declarations\n");
+  {
+    for (int32_t info_types_index = 0; info_types_index < package->info_types_length; info_types_index++) {
+      SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[package->info_types_base + info_types_index];
+      SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[type->basic_type_id];
+      const char* basic_type_name = runtime->symbols[basic_type->name_id];
+      
+      SPVM_STRING_BUFFER_add(string_buffer, "int32_t ");
+      SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+      SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+    }
+  }
   
   // Subroutine decrations
   SPVM_STRING_BUFFER_add(string_buffer, "// Function Declarations\n");
@@ -1064,6 +1189,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_head(SPVM_ENV* env, SPVM_STRING_BUFFE
   SPVM_STRING_BUFFER_add(string_buffer, "} while (0)\\\n");
   SPVM_STRING_BUFFER_add(string_buffer, "\n");
   SPVM_STRING_BUFFER_add(string_buffer, "#endif\n");
+
 }
 
 void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_declaration(SPVM_ENV* env, SPVM_STRING_BUFFER* string_buffer, const char* package_name, const char* sub_name) {
@@ -1074,17 +1200,16 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_declaration(SPVM_ENV* env, SPVM_S
 
   assert(sub->flag & SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC);
   
-  // Subroutine name
-  const char* sub_abs_name = runtime->symbols[sub->abs_name_id];
-  
   // Return type
   SPVM_STRING_BUFFER_add(string_buffer, "int32_t ");
         
   // Subroutine name. Replace : to _
   SPVM_STRING_BUFFER_add(string_buffer, "SPVM_PRECOMPILE_");
-  SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_abs_name);
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)package_name);
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)"__");
+  SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_name);
   {
-    int32_t index = string_buffer->length - strlen(sub_abs_name);
+    int32_t index = string_buffer->length - (strlen(package_name) + 2 + strlen(sub_name));
     
     while (index < string_buffer->length) {
       if (string_buffer->buffer[index] == ':') {
@@ -1208,337 +1333,175 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
   {
     int32_t stack_index = 0;
     for (int32_t arg_index = 0; arg_index < sub->arg_ids_length; arg_index++) {
-      SPVM_RUNTIME_MY* runtime_arg = &runtime->args[sub->arg_ids_base + arg_index];
+      SPVM_RUNTIME_MY* arg = &runtime->args[sub->arg_ids_base + arg_index];
 
-      int32_t arg_type_is_value_t = SPVM_RUNTIME_API_is_value_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
-      int32_t arg_type_is_object_type = SPVM_RUNTIME_API_is_object_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
-      int32_t arg_type_is_ref = SPVM_RUNTIME_API_is_ref_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag);
-      
-      // Ref type
-      if (arg_type_is_ref) {
-      
-        SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_REF, runtime_arg->var_id);
-        SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_REF, stack_index);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        stack_index++;
-      }
-      // Value type
-      else if (arg_type_is_value_t) {
-        int32_t runtime_arg_basic_type_id = runtime_arg->basic_type_id;
-        SPVM_RUNTIME_BASIC_TYPE* runtime_arg_basic_type = &runtime->basic_types[runtime_arg_basic_type_id];
-        SPVM_RUNTIME_PACKAGE* runtime_arg_package = &runtime->packages[runtime_arg_basic_type->package_id];
-        
-        SPVM_RUNTIME_FIELD* runtime_first_field = SPVM_LIST_fetch(runtime_arg_package->fields, 0);
-        assert(runtime_first_field);
-
-        for (int32_t field_index = 0; field_index < runtime_arg_package->fields->length; field_index++) {
-          switch (runtime_first_field->basic_type_id) {
-            case SPVM_BASIC_TYPE_C_ID_BYTE: {
-              SPVM_STRING_BUFFER_add(string_buffer, "  ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, runtime_arg->var_id + field_index);
-              SPVM_STRING_BUFFER_add(string_buffer, " = ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, stack_index);
-              SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-              
-              break;
-            }
-            case SPVM_BASIC_TYPE_C_ID_SHORT: {
-              SPVM_STRING_BUFFER_add(string_buffer, "  ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, runtime_arg->var_id + field_index);
-              SPVM_STRING_BUFFER_add(string_buffer, " = ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, stack_index);
-              SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-              break;
-            }
-            case SPVM_BASIC_TYPE_C_ID_INT: {
-              SPVM_STRING_BUFFER_add(string_buffer, "  ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, runtime_arg->var_id + field_index);
-              SPVM_STRING_BUFFER_add(string_buffer, " = ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, stack_index);
-              SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-              break;
-            }
-            case SPVM_BASIC_TYPE_C_ID_LONG: {
-              SPVM_STRING_BUFFER_add(string_buffer, "  ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, runtime_arg->var_id + field_index);
-              SPVM_STRING_BUFFER_add(string_buffer, " = ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, stack_index);
-              SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-              break;
-            }
-            case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-              SPVM_STRING_BUFFER_add(string_buffer, "  ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, runtime_arg->var_id + field_index);
-              SPVM_STRING_BUFFER_add(string_buffer, " = ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, stack_index);
-              SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-              break;
-            }
-            case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-              SPVM_STRING_BUFFER_add(string_buffer, "  ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, runtime_arg->var_id + field_index);
-              SPVM_STRING_BUFFER_add(string_buffer, " = ");
-              SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, stack_index);
-              SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-              break;
-            }
-            default:
-              assert(0);
-          }
-          stack_index++;
-        }
-      }
-      // Object type
-      else if (arg_type_is_object_type) {
-        SPVM_STRING_BUFFER_add(string_buffer, "  ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, runtime_arg->var_id);
-        SPVM_STRING_BUFFER_add(string_buffer, " = ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, stack_index);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        stack_index++;
-      }
       // Numeric type
-      else if (SPVM_RUNTIME_API_is_numeric_type(env, runtime_arg->basic_type_id, runtime_arg->type_dimension, runtime_arg->type_flag)) {
-        switch (runtime_arg->basic_type_id) {
-          case SPVM_BASIC_TYPE_C_ID_BYTE: {
-            SPVM_STRING_BUFFER_add(string_buffer, "  ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, runtime_arg->var_id);
-            SPVM_STRING_BUFFER_add(string_buffer, " = ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, stack_index);
-            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-            
-            break;
-          }
-          case SPVM_BASIC_TYPE_C_ID_SHORT: {
-            SPVM_STRING_BUFFER_add(string_buffer, "  ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, runtime_arg->var_id);
-            SPVM_STRING_BUFFER_add(string_buffer, " = ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, stack_index);
-            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-            break;
-          }
-          case SPVM_BASIC_TYPE_C_ID_INT: {
-            SPVM_STRING_BUFFER_add(string_buffer, "  ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, runtime_arg->var_id);
-            SPVM_STRING_BUFFER_add(string_buffer, " = ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, stack_index);
-            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-            break;
-          }
-          case SPVM_BASIC_TYPE_C_ID_LONG: {
-            SPVM_STRING_BUFFER_add(string_buffer, "  ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, runtime_arg->var_id);
-            SPVM_STRING_BUFFER_add(string_buffer, " = ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, stack_index);
-            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-            break;
-          }
-          case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-            SPVM_STRING_BUFFER_add(string_buffer, "  ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, runtime_arg->var_id);
-            SPVM_STRING_BUFFER_add(string_buffer, " = ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, stack_index);
-            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-            break;
-          }
-          case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-            SPVM_STRING_BUFFER_add(string_buffer, "  ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, runtime_arg->var_id);
-            SPVM_STRING_BUFFER_add(string_buffer, " = ");
-            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, stack_index);
-            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-            break;
-          }
-          default:
-            assert(0);
+      int32_t type_width = arg->type_width;
+      switch (arg->runtime_type) {
+        case SPVM_TYPE_C_RUNTIME_TYPE_BYTE: {
+          SPVM_STRING_BUFFER_add(string_buffer, "  ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, " = ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, stack_index);
+          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          stack_index++;
+          break;
         }
-        stack_index++;
-      }
-      else {
-        assert(0);
+        case SPVM_TYPE_C_RUNTIME_TYPE_SHORT: {
+          SPVM_STRING_BUFFER_add(string_buffer, "  ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, " = ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, stack_index);
+          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          stack_index++;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_INT: {
+          SPVM_STRING_BUFFER_add(string_buffer, "  ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, " = ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, stack_index);
+          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          stack_index++;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_LONG: {
+          SPVM_STRING_BUFFER_add(string_buffer, "  ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, " = ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, stack_index);
+          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          stack_index++;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_FLOAT: {
+          SPVM_STRING_BUFFER_add(string_buffer, "  ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, " = ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, stack_index);
+          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          stack_index++;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_DOUBLE: {
+          SPVM_STRING_BUFFER_add(string_buffer, "  ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, " = ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, stack_index);
+          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          stack_index++;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_BYTE: {
+          for (int32_t field_index = 0; field_index < type_width; field_index++) {
+            SPVM_STRING_BUFFER_add(string_buffer, "  ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, arg->var_id + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, " = ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, stack_index + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          }
+          stack_index += type_width;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_SHORT: {
+          for (int32_t field_index = 0; field_index < type_width; field_index++) {
+            SPVM_STRING_BUFFER_add(string_buffer, "  ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, arg->var_id + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, " = ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, stack_index + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          }
+          stack_index += type_width;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_INT: {
+          for (int32_t field_index = 0; field_index < type_width; field_index++) {
+            SPVM_STRING_BUFFER_add(string_buffer, "  ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, arg->var_id + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, " = ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, stack_index + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          }
+          stack_index += type_width;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_LONG: {
+          for (int32_t field_index = 0; field_index < type_width; field_index++) {
+            SPVM_STRING_BUFFER_add(string_buffer, "  ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, arg->var_id + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, " = ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, stack_index + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          }
+          stack_index += type_width;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_FLOAT: {
+          for (int32_t field_index = 0; field_index < type_width; field_index++) {
+            SPVM_STRING_BUFFER_add(string_buffer, "  ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, arg->var_id + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, " = ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, stack_index + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          }
+          stack_index += type_width;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_DOUBLE: {
+          for (int32_t field_index = 0; field_index < type_width; field_index++) {
+            SPVM_STRING_BUFFER_add(string_buffer, "  ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, arg->var_id + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, " = ");
+            SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, stack_index + field_index);
+            SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          }
+          stack_index += type_width;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT: {
+          SPVM_STRING_BUFFER_add(string_buffer, "  ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, " = ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, stack_index);
+          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+
+          SPVM_STRING_BUFFER_add(string_buffer, "  if (");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, " != NULL) { SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, "); }\n");
+          stack_index++;
+          break;
+        }
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_BYTE:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_SHORT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_INT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_LONG:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_FLOAT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_DOUBLE:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_BYTE:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_SHORT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_INT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_LONG:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_FLOAT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_DOUBLE:
+        {
+          SPVM_STRING_BUFFER_add(string_buffer, "  ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_REF, arg->var_id);
+          SPVM_STRING_BUFFER_add(string_buffer, " = ");
+          SPVM_CSOURCE_BUILDER_PRECOMPILE_add_stack(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_REF, stack_index);
+          SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+          stack_index++;
+          break;
+        }
+        default : {
+          assert(0);
+        }
       }
     }
     SPVM_STRING_BUFFER_add(string_buffer, "\n");
   }
-  
-  // If arg is object, increment reference count
-  {
-    for (int32_t arg_index = sub->arg_ids_base; arg_index < sub->arg_ids_base + sub->arg_ids_length; arg_index++) {
-      SPVM_RUNTIME_MY* arg = &runtime->args[arg_index];
-      if (SPVM_RUNTIME_API_is_object_type(env, arg->basic_type_id, arg->type_dimension, arg->type_flag)) {
-        SPVM_STRING_BUFFER_add(string_buffer, "  if (");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, arg->var_id);
-        SPVM_STRING_BUFFER_add(string_buffer, " != NULL) { SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, arg->var_id);
-        SPVM_STRING_BUFFER_add(string_buffer, "); }\n");
-      }
-    }
-    SPVM_STRING_BUFFER_add(string_buffer, "\n");
-  }
-  
-  // Get field index
-  if (sub->info_field_ids_length > 0) {
-    SPVM_STRING_BUFFER_add(string_buffer, "  // Get field index\n");
-  }
-  {
-    SPVM_HASH* field_abs_name_symtable = SPVM_HASH_new(1);
-    for (int32_t info_field_ids_index = 0; info_field_ids_index < sub->info_field_ids_length; info_field_ids_index++) {
-      int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + info_field_ids_index];
-      SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
-      SPVM_RUNTIME_PACKAGE* field_package = &runtime->packages[field->package_id];
-      const char* field_package_name = runtime->symbols[field_package->name_id];
-      const char* field_name = runtime->symbols[field->name_id];
-      const char* field_abs_name = runtime->symbols[field->abs_name_id];
-      const char* field_signature = runtime->symbols[field->signature_id];
-      
-      SPVM_FIELD* found_field = SPVM_HASH_fetch(field_abs_name_symtable, field_abs_name, strlen(field_abs_name));
-      if (!found_field) {
-        SPVM_STRING_BUFFER_add(string_buffer, "  int32_t ");
-        SPVM_STRING_BUFFER_add_field_index_name(string_buffer, field_package_name, field_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_index(env, \"");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
-        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
-        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  if (");
-        SPVM_STRING_BUFFER_add_field_index_name(string_buffer, field_package_name, field_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    void* exception = env->new_string_raw(env, \"Field not found ");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " ");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
-        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    return SPVM_EXCEPTION;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
-        
-        SPVM_HASH_insert(field_abs_name_symtable, field_abs_name, strlen(field_abs_name), field);
-      }
-    }
-    SPVM_HASH_free(field_abs_name_symtable);
-  }
-  
-  // Get package variable id
-  if (sub->info_package_var_ids_length > 0) {
-    SPVM_STRING_BUFFER_add(string_buffer, "  // Get package variable id\n");
-  }
-  {
-    SPVM_HASH* package_var_abs_name_symtable = SPVM_HASH_new(1);
-    for (int32_t info_package_var_ids_index = 0; info_package_var_ids_index < sub->info_package_var_ids_length; info_package_var_ids_index++) {
-      int32_t package_var_id = runtime->info_package_var_ids[sub->info_package_var_ids_base + info_package_var_ids_index];
-      SPVM_RUNTIME_PACKAGE_VAR* package_var = &runtime->package_vars[package_var_id];
-      SPVM_RUNTIME_PACKAGE* package_var_package = &runtime->packages[package_var->package_id];
-      const char* package_var_package_name = runtime->symbols[package_var_package->name_id];
-      const char* package_var_name = runtime->symbols[package_var->name_id];
-      const char* package_var_abs_name = runtime->symbols[package_var->abs_name_id];
-      const char* package_var_signature = runtime->symbols[package_var->signature_id];
-      
-      SPVM_PACKAGE_VAR* found_package_var = SPVM_HASH_fetch(package_var_abs_name_symtable, package_var_abs_name, strlen(package_var_abs_name));
-      if (!found_package_var) {
-        SPVM_STRING_BUFFER_add(string_buffer, "  int32_t ");
-        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_package_var_id(env, \"");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
-        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
-        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  if (");
-        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    void* exception = env->new_string_raw(env, \"Package variable not found ");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " ");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
-        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    return SPVM_EXCEPTION;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
-        
-        SPVM_HASH_insert(package_var_abs_name_symtable, package_var_abs_name, strlen(package_var_abs_name), package_var);
-      }
-    }
-    SPVM_HASH_free(package_var_abs_name_symtable);
-  }
 
-  // Get sub id
-  if (sub->info_sub_ids_length > 0) {
-    SPVM_STRING_BUFFER_add(string_buffer, "  // Get sub id\n");
-  }
-  {
-    SPVM_HASH* sub_abs_name_symtable = SPVM_HASH_new(1);
-    for (int32_t info_sub_ids_index = 0; info_sub_ids_index < sub->info_sub_ids_length; info_sub_ids_index++) {
-      int32_t sub_id = runtime->info_sub_ids[sub->info_sub_ids_base + info_sub_ids_index];
-      SPVM_RUNTIME_SUB* sub = &runtime->subs[sub_id];
-      SPVM_RUNTIME_PACKAGE* sub_package = &runtime->packages[sub->package_id];
-      const char* sub_package_name = runtime->symbols[sub_package->name_id];
-      const char* sub_signature = runtime->symbols[sub->signature_id];
-      const char* sub_name = runtime->symbols[sub->name_id];
-      const char* sub_abs_name = runtime->symbols[sub->abs_name_id];
-      
-      SPVM_FIELD* found_sub = SPVM_HASH_fetch(sub_abs_name_symtable, sub_abs_name, strlen(sub_abs_name));
-      if (!found_sub) {
-        SPVM_STRING_BUFFER_add(string_buffer, "  int32_t ");
-        SPVM_STRING_BUFFER_add_sub_id_name(string_buffer, sub_package_name, sub_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_sub_id(env, \"");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_package_name);
-        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_signature);
-        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  if (");
-        SPVM_STRING_BUFFER_add_sub_id_name(string_buffer, sub_package_name, sub_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    void* exception = env->new_string_raw(env, \"Subroutine not found ");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_package_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " ");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)sub_signature);
-        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    return SPVM_EXCEPTION;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
-        
-        SPVM_HASH_insert(sub_abs_name_symtable, sub_abs_name, strlen(sub_abs_name), sub);
-      }
-    }
-    SPVM_HASH_free(sub_abs_name_symtable);
-  }
-
-  // Get basic type id
-  if (sub->info_types_length > 0) {
-    SPVM_STRING_BUFFER_add(string_buffer, "  // Get basic type id\n");
-  }
-  {
-    SPVM_HASH* basic_type_symtable = SPVM_HASH_new(1);
-    int32_t type_index;
-    for (type_index = 0; type_index < sub->info_types_length; type_index++) {
-      SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + type_index];
-      SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[type->basic_type_id];
-      const char* basic_type_name = runtime->symbols[basic_type->name_id];
-      
-      SPVM_RUNTIME_BASIC_TYPE* found_basic_type = SPVM_HASH_fetch(basic_type_symtable, basic_type_name, strlen(basic_type_name));
-      if (!found_basic_type) {
-        SPVM_STRING_BUFFER_add(string_buffer, "  int32_t ");
-        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_basic_type_id(env, \"");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
-        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  if (");
-        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
-        SPVM_STRING_BUFFER_add(string_buffer, " < 0) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    void* exception = env->new_string_raw(env, \"Basic type not found ");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
-        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    env->set_exception(env, exception);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    return SPVM_EXCEPTION;\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
-        
-        SPVM_HASH_insert(basic_type_symtable, basic_type_name, strlen(basic_type_name), basic_type);
-      }
-    }
-    SPVM_HASH_free(basic_type_symtable);
-  }
-  
   SPVM_OPCODE* opcodes = runtime->opcodes;
   int32_t sub_opcodes_base = sub->opcodes_base;
   int32_t opcodes_length = sub->opcodes_length;
@@ -1667,8 +1630,8 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       case SPVM_OPCODE_C_ID_ISA_OBJECT:
       {
-        int32_t rel_id = opcode->operand1;
-        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
+        int32_t info_constant_id = opcode->operand1;
+        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[package->info_types_base + info_constant_id];
         int32_t basic_type_id = type->basic_type_id;
         int32_t type_dimension = type->dimension;
         SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
@@ -1676,6 +1639,26 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         int32_t dimension = type->dimension;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_basic_type_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Basic type not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t check_basic_type_id = ");
         SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -1700,8 +1683,8 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
       }
       case SPVM_OPCODE_C_ID_ISA_INTERFACE:
       {
-        int32_t rel_id = opcode->operand1;
-        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
+        int32_t info_constant_id = opcode->operand1;
+        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[package->info_types_base + info_constant_id];
         int32_t basic_type_id = type->basic_type_id;
         int32_t type_dimension = type->dimension;
         SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
@@ -1709,6 +1692,25 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         int32_t dimension = type->dimension;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_basic_type_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Basic type not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+        
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t check_basic_type_id = ");
         SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -2079,8 +2081,8 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_GET_CONSTANT_LONG: {
-        int32_t rel_id = opcode->operand2;
-        int64_t long_value = runtime->info_long_values[sub->info_long_values_base + rel_id];
+        int32_t info_constant_id = opcode->operand1;
+        int64_t long_value = runtime->info_long_values[package->info_long_values_base + info_constant_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0);
@@ -2098,8 +2100,8 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_GET_CONSTANT_DOUBLE: {
-        int32_t rel_id = opcode->operand2;
-        double double_value = runtime->info_double_values[sub->info_double_values_base + rel_id];
+        int32_t info_constant_id = opcode->operand1;
+        double double_value = runtime->info_double_values[package->info_double_values_base + info_constant_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  ");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0);
@@ -2593,14 +2595,33 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_OBJECT: {
-        int32_t rel_id = opcode->operand1;
-        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
+        int32_t info_constant_id = opcode->operand1;
+        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[package->info_types_base + info_constant_id];
         int32_t basic_type_id = type->basic_type_id;
         int32_t type_dimension = type->dimension;
         SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
         const char* basic_type_name = runtime->symbols[basic_type->name_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_basic_type_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Basic type not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t basic_type_id = ");
         SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -2722,21 +2743,43 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
         break;
       case SPVM_OPCODE_C_ID_NEW_OBJECT_ARRAY: {
-        int32_t rel_id = opcode->operand1;
-        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
+        int32_t info_constant_id = opcode->operand1;
+        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[package->info_types_base + info_constant_id];
         int32_t basic_type_id = type->basic_type_id;
         int32_t type_dimension = type->dimension;
         SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
         const char* basic_type_name = runtime->symbols[basic_type->name_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+        
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_basic_type_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Basic type not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t basic_type_id = ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t length = *(SPVM_VALUE_int*)&");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_var(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    if (length >= 0) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      void* object = env->new_object_array_raw(env, ");
-        SPVM_STRING_BUFFER_add_int(string_buffer, basic_type_id);
-        SPVM_STRING_BUFFER_add(string_buffer, ", length);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      void* object = env->new_object_array_raw(env, basic_type_id, length);\n");
         SPVM_STRING_BUFFER_add(string_buffer, "      SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_var(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n");
@@ -2750,8 +2793,8 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_MULTI_ARRAY: {
-        int32_t rel_id = opcode->operand1;
-        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
+        int32_t info_constant_id = opcode->operand1;
+        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[package->info_types_base + info_constant_id];
         int32_t basic_type_id = type->basic_type_id;
         int32_t type_dimension = type->dimension;
         SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
@@ -2759,13 +2802,35 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         int32_t element_dimension = type->dimension - 1;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_basic_type_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Basic type not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t basic_type_id = ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t length = *(SPVM_VALUE_int*)&");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_var(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    if (length >= 0) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      void* object = env->new_multi_array_raw(env, ");
-        SPVM_STRING_BUFFER_add_int(string_buffer, basic_type_id);
-        SPVM_STRING_BUFFER_add(string_buffer, ", ");
+        SPVM_STRING_BUFFER_add(string_buffer, "      void* object = env->new_multi_array_raw(env, basic_type_id, ");
         SPVM_STRING_BUFFER_add_int(string_buffer, element_dimension);
         SPVM_STRING_BUFFER_add(string_buffer, ", length);\n");
         SPVM_STRING_BUFFER_add(string_buffer, "      SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&");
@@ -2782,21 +2847,43 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_VALUE_ARRAY: {
-        int32_t rel_id = opcode->operand1;
-        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
+        int32_t info_constant_id = opcode->operand1;
+        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[package->info_types_base + info_constant_id];
         int32_t basic_type_id = type->basic_type_id;
         int32_t type_dimension = type->dimension;
         SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
         const char* basic_type_name = runtime->symbols[basic_type->name_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_basic_type_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Basic type not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t basic_type_id = ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t length = *(SPVM_VALUE_int*)&");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_var(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    if (length >= 0) {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "      void* object = env->new_value_t_array_raw(env, ");
-        SPVM_STRING_BUFFER_add_int(string_buffer, basic_type_id);
-        SPVM_STRING_BUFFER_add(string_buffer, ", length);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      void* object = env->new_value_t_array_raw(env, basic_type_id, length);\n");
         SPVM_STRING_BUFFER_add(string_buffer, "      SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_var(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object);\n");
@@ -2811,9 +2898,9 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_NEW_STRING: {
-        int32_t rel_id = opcode->operand2;
-        const char* string_value = runtime->info_string_values[sub->info_string_values_base + rel_id];
-        int32_t string_length = runtime->info_string_lengths[sub->info_string_values_base + rel_id];
+        int32_t info_constant_id = opcode->operand1;
+        const char* string_value = runtime->info_string_values[package->info_string_values_base + info_constant_id];
+        int32_t string_length = runtime->info_string_lengths[package->info_string_values_base + info_constant_id];
         
         SPVM_STRING_BUFFER_add(string_buffer, "  SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(&");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
@@ -2849,15 +2936,42 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_WEAKEN_FIELD: {
-        int32_t rel_id = opcode->operand1;
+        int32_t info_field_id = opcode->operand1;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
         SPVM_RUNTIME_PACKAGE* field_package = &runtime->packages[field->package_id];
         const char* field_package_name = runtime->symbols[field_package->name_id];
         const char* field_name = runtime->symbols[field->name_id];
+        const char* field_signature = runtime->symbols[field->signature_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t ");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      void* exception = env->new_string_raw(env, \"Field not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t ");
+        SPVM_STRING_BUFFER_add_field_index_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_index(env, ");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, ");\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -2903,15 +3017,6 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
         
-        break;
-      }
-      case SPVM_OPCODE_C_ID_WEAKEN_SCALAR: {
-        SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
-        SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
-        SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    env->weaken(env, &object);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "  }\n");
         break;
       }
       case SPVM_OPCODE_C_ID_CONCAT:
@@ -3123,15 +3228,35 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_CHECK_OBJECT_TYPE: {
-        int32_t rel_id = opcode->operand2;
+        int32_t info_constant_id = opcode->operand2;
 
-        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
+        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[package->info_types_base + info_constant_id];
         int32_t cast_basic_type_id = type->basic_type_id;
         int32_t cast_type_dimension = type->dimension;
         SPVM_RUNTIME_BASIC_TYPE* cast_basic_type = &runtime->basic_types[cast_basic_type_id];
         const char* cast_basic_type_name = runtime->symbols[cast_basic_type->name_id];
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+        
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_basic_type_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Basic type not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t check_basic_type_id = ");
         SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, cast_basic_type_name);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -3164,15 +3289,35 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_CHECK_INTERFACE_TYPE: {
-        int32_t rel_id = opcode->operand2;
+        int32_t info_constant_id = opcode->operand2;
 
-        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[sub->info_types_base + rel_id];
+        SPVM_RUNTIME_INFO_TYPE* type = &runtime->info_types[package->info_types_base + info_constant_id];
         int32_t cast_basic_type_id = type->basic_type_id;
         int32_t cast_type_dimension = type->dimension;
         SPVM_RUNTIME_BASIC_TYPE* cast_basic_type = &runtime->basic_types[cast_basic_type_id];
         const char* cast_basic_type_name = runtime->symbols[cast_basic_type->name_id];
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_basic_type_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Basic type not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)cast_basic_type_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    int32_t check_basic_type_id = ");
         SPVM_STRING_BUFFER_add_basic_type_id_name(string_buffer, cast_basic_type_name);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -3272,36 +3417,50 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         }
         
         int32_t var_id = opcode->operand0;
-        int32_t rel_id = opcode->operand1;
-        int32_t decl_sub_id = runtime->info_sub_ids[sub->info_sub_ids_base + rel_id];
+        int32_t constant_pool_id = opcode->operand1;
+        int32_t decl_sub_id = runtime->info_sub_ids[package->info_sub_ids_base + constant_pool_id];
 
         SPVM_RUNTIME_SUB* decl_sub = &runtime->subs[decl_sub_id];
 
-        int32_t decl_sub_return_basic_type_id = decl_sub->return_basic_type_id;
-        int32_t decl_sub_return_type_dimension = decl_sub->return_type_dimension;
-        int32_t decl_sub_return_type_flag = decl_sub->return_type_flag;
-        
         SPVM_RUNTIME_PACKAGE* decl_sub_package = &runtime->packages[decl_sub->package_id];
-        const char* decl_sub_abs_name = runtime->symbols[decl_sub->abs_name_id];
         const char* decl_sub_name = runtime->symbols[decl_sub->name_id];
         const char* decl_sub_signature = runtime->symbols[decl_sub->signature_id];
         const char* decl_sub_package_name = runtime->symbols[decl_sub_package->name_id];
-        
-        // Declare subroutine return type
-        int32_t decl_sub_return_type_is_object = SPVM_RUNTIME_API_is_object_type(env, decl_sub_return_basic_type_id, decl_sub_return_type_dimension, decl_sub_return_type_flag);
-        int32_t decl_sub_return_type_is_value_type = SPVM_RUNTIME_API_is_value_type(env, decl_sub_return_basic_type_id, decl_sub_return_type_dimension, decl_sub_return_type_flag);
-
         
         // Declare subroutine argument length
         int32_t decl_sub_args_length = decl_sub->arg_ids_length;
 
         SPVM_STRING_BUFFER_add(string_buffer, "  // ");
-        SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_abs_name);
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "->");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_name);
         SPVM_STRING_BUFFER_add(string_buffer, "\n");
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
         
         // Call subroutine
         if (is_sub) {
+          SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+          SPVM_STRING_BUFFER_add_sub_id_name(string_buffer, decl_sub_package_name, decl_sub_name);
+          SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "      ");
+          SPVM_STRING_BUFFER_add_sub_id_name(string_buffer, decl_sub_package_name, decl_sub_name);
+          SPVM_STRING_BUFFER_add(string_buffer, " = env->get_sub_id(env, \"");
+          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_package_name);
+          SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_signature);
+          SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+          SPVM_STRING_BUFFER_add_sub_id_name(string_buffer, decl_sub_package_name, decl_sub_name);
+          SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Subroutine not found ");
+          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_package_name);
+          SPVM_STRING_BUFFER_add(string_buffer, " ");
+          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_signature);
+          SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
           SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_sub_id = ");
           SPVM_STRING_BUFFER_add_sub_id_name(string_buffer, decl_sub_package_name, decl_sub_name);
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -3314,7 +3473,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
           SPVM_STRING_BUFFER_add(string_buffer, "    int32_t call_sub_id = env->get_sub_id_method_call(env, object, \"");
           SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_signature);
           SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
-          SPVM_STRING_BUFFER_add(string_buffer, "    if (call_sub_id < 0) {\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "    if (call_sub_id == 0) {\n");
           SPVM_STRING_BUFFER_add(string_buffer, "      void* exception = env->new_string_raw(env, \"Subroutine not found ");
           SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_package_name);
           SPVM_STRING_BUFFER_add(string_buffer, " ");
@@ -3328,9 +3487,11 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         // Subroutine inline expantion in same package
         if (decl_sub->package_id == sub->package_id && decl_sub->flag & SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC) {
           SPVM_STRING_BUFFER_add(string_buffer, "    exception_flag = SPVM_PRECOMPILE_");
-          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_abs_name);
+          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_package_name);
+          SPVM_STRING_BUFFER_add(string_buffer, (char*)"__");
+          SPVM_STRING_BUFFER_add(string_buffer, (char*)decl_sub_name);
           {
-            int32_t index = string_buffer->length - strlen(decl_sub_abs_name);
+            int32_t index = string_buffer->length - (strlen(decl_sub_package_name) + 2 + strlen(decl_sub_name));
             
             while (index < string_buffer->length) {
               if (string_buffer->buffer[index] == ':') {
@@ -3414,9 +3575,9 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
           }
           case SPVM_OPCODE_C_ID_CALL_SUB_OBJECT:
           case SPVM_OPCODE_C_ID_CALL_METHOD_OBJECT: {
-            SPVM_STRING_BUFFER_add(string_buffer, " SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(&");
+            SPVM_STRING_BUFFER_add(string_buffer, "      SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(&");
             SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, var_id);
-            SPVM_STRING_BUFFER_add(string_buffer, ", stack[0].oval);");
+            SPVM_STRING_BUFFER_add(string_buffer, ", stack[0].oval);\n");
             break;
           }
           case SPVM_OPCODE_C_ID_CALL_SUB_VALUE_BYTE:
@@ -3793,8 +3954,8 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_LOOKUP_SWITCH: {
-        int32_t rel_id = opcode->operand2;
-        SPVM_RUNTIME_INFO_SWITCH_INFO* switch_info = SPVM_LIST_fetch(runtime->info_switch_infos, sub->info_switch_infos_base + rel_id);
+        int32_t info_constant_id = opcode->operand2;
+        SPVM_RUNTIME_INFO_SWITCH_INFO* switch_info = SPVM_LIST_fetch(runtime->info_switch_infos, package->info_switch_infos_base + info_constant_id);
         SPVM_LIST* case_infos = switch_info->case_infos;
 
         // default field_index
@@ -3959,62 +4120,92 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_BYTE: {
-        int32_t rel_id = opcode->operand2;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand2;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_get_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, opcode->operand1, field);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_SHORT: {
-        int32_t rel_id = opcode->operand2;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand2;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_get_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, opcode->operand1, field);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_INT: {
-        int32_t rel_id = opcode->operand2;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand2;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_get_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1, field);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_LONG: {
-        int32_t rel_id = opcode->operand2;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand2;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_get_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1, field);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_FLOAT: {
-        int32_t rel_id = opcode->operand2;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand2;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_get_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, opcode->operand1, field);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_DOUBLE: {
-        int32_t rel_id = opcode->operand2;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand2;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_get_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1, field);
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_OBJECT: {
-        int32_t rel_id = opcode->operand2;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand2;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
         SPVM_RUNTIME_PACKAGE* field_package = &runtime->packages[field->package_id];
         const char* field_package_name = runtime->symbols[field_package->name_id];
         const char* field_name = runtime->symbols[field->name_id];
+        const char* field_signature = runtime->symbols[field->signature_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Field not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_field_index_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_index(env, ");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, ");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    };\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
@@ -4035,48 +4226,48 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_BYTE: {
-        int32_t rel_id = opcode->operand1;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand1;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_set_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_BYTE, opcode->operand0, field, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_SHORT: {
-        int32_t rel_id = opcode->operand1;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand1;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_set_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_SHORT, opcode->operand0, field, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_INT: {
-        int32_t rel_id = opcode->operand1;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand1;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
         
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_set_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, field, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_LONG: {
-        int32_t rel_id = opcode->operand1;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand1;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_set_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, field, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_FLOAT: {
-        int32_t rel_id = opcode->operand1;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand1;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_set_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_FLOAT, opcode->operand0, field, opcode->operand2);
         break;
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_DOUBLE: {
-        int32_t rel_id = opcode->operand1;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand1;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
 
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_set_field(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, field, opcode->operand2);
@@ -4084,14 +4275,44 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_OBJECT:
       {
-        int32_t rel_id = opcode->operand1;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand1;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
         SPVM_RUNTIME_PACKAGE* field_package = &runtime->packages[field->package_id];
         const char* field_package_name = runtime->symbols[field_package->name_id];
         const char* field_name = runtime->symbols[field->name_id];
+        const char* field_signature = runtime->symbols[field->signature_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Field not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_field_index_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_index(env, ");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, ");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    };\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";");
@@ -4115,14 +4336,44 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
       }
       case SPVM_OPCODE_C_ID_SET_FIELD_UNDEF:
       {
-        int32_t rel_id = opcode->operand1;
-        int32_t field_id = runtime->info_field_ids[sub->info_field_ids_base + rel_id];
+        int32_t info_field_id = opcode->operand1;
+        int32_t field_id = runtime->info_field_ids[package->info_field_ids_base + info_field_id];
         SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
         SPVM_RUNTIME_PACKAGE* field_package = &runtime->packages[field->package_id];
         const char* field_package_name = runtime->symbols[field_package->name_id];
         const char* field_name = runtime->symbols[field->name_id];
+        const char* field_signature = runtime->symbols[field->signature_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (__builtin_expect(");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Field not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)field_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_field_index_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_field_index(env, ");
+        SPVM_STRING_BUFFER_add_field_id_name(string_buffer, field_package_name, field_name);
+        SPVM_STRING_BUFFER_add(string_buffer, ");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    };\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ";");
@@ -4196,12 +4447,13 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_FLOAT:
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_DOUBLE:
       {
-        int32_t rel_id = opcode->operand1;
-        int32_t package_var_id = runtime->info_package_var_ids[sub->info_package_var_ids_base + rel_id];
+        int32_t info_package_var_id = opcode->operand1;
+        int32_t package_var_id = runtime->info_package_var_ids[package->info_package_var_ids_base + info_package_var_id];
         SPVM_RUNTIME_PACKAGE_VAR* package_var = &runtime->package_vars[package_var_id];
         SPVM_RUNTIME_PACKAGE* package_var_package = &runtime->packages[package_var->package_id];
         const char* package_var_package_name = runtime->symbols[package_var_package->name_id];
         const char* package_var_name = runtime->symbols[package_var->name_id];
+        const char* package_var_signature = runtime->symbols[package_var->signature_id];
 
         int32_t package_var_access_ctype_id;
         switch (opcode_id) {
@@ -4228,6 +4480,30 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         }
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+        
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_package_var_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Package variable not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    ");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, package_var_access_ctype_id, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, " = *(");
@@ -4242,14 +4518,39 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_OBJECT: {
-        int32_t rel_id = opcode->operand1;
-        int32_t package_var_id = runtime->info_package_var_ids[sub->info_package_var_ids_base + rel_id];
+        int32_t info_package_var_id = opcode->operand1;
+        int32_t package_var_id = runtime->info_package_var_ids[package->info_package_var_ids_base + info_package_var_id];
         SPVM_RUNTIME_PACKAGE_VAR* package_var = &runtime->package_vars[package_var_id];
         SPVM_RUNTIME_PACKAGE* package_var_package = &runtime->packages[package_var->package_id];
         const char* package_var_package_name = runtime->symbols[package_var_package->name_id];
         const char* package_var_name = runtime->symbols[package_var->name_id];
+        const char* package_var_signature = runtime->symbols[package_var->signature_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+        
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_package_var_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Package variable not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(&");
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_operand(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_OBJECT, opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", *(void**)");
@@ -4267,12 +4568,13 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_FLOAT:
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_DOUBLE:
       {
-        int32_t rel_id = opcode->operand0;
-        int32_t package_var_id = runtime->info_package_var_ids[sub->info_package_var_ids_base + rel_id];
+        int32_t info_package_var_id = opcode->operand0;
+        int32_t package_var_id = runtime->info_package_var_ids[package->info_package_var_ids_base + info_package_var_id];
         SPVM_RUNTIME_PACKAGE_VAR* package_var = &runtime->package_vars[package_var_id];
         SPVM_RUNTIME_PACKAGE* package_var_package = &runtime->packages[package_var->package_id];
         const char* package_var_package_name = runtime->symbols[package_var_package->name_id];
         const char* package_var_name = runtime->symbols[package_var->name_id];
+        const char* package_var_signature = runtime->symbols[package_var->signature_id];
 
         int32_t package_var_access_ctype_id;
         switch (opcode_id) {
@@ -4299,6 +4601,30 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         }
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+        
+        SPVM_STRING_BUFFER_add(string_buffer, "    if ( __builtin_expect(");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_package_var_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Package variable not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    *(");
         SPVM_STRING_BUFFER_add(string_buffer, (char*)SPVM_CSOURCE_BUILDER_PRECOMPILE_get_ctype_name(env, package_var_access_ctype_id));
         SPVM_STRING_BUFFER_add(string_buffer, "*)");
@@ -4313,14 +4639,39 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_OBJECT: {
-        int32_t rel_id = opcode->operand0;
-        int32_t package_var_id = runtime->info_package_var_ids[sub->info_package_var_ids_base + rel_id];
+        int32_t info_package_var_id = opcode->operand0;
+        int32_t package_var_id = runtime->info_package_var_ids[package->info_package_var_ids_base + info_package_var_id];
         SPVM_RUNTIME_PACKAGE_VAR* package_var = &runtime->package_vars[package_var_id];
         SPVM_RUNTIME_PACKAGE* package_var_package = &runtime->packages[package_var->package_id];
         const char* package_var_package_name = runtime->symbols[package_var_package->name_id];
         const char* package_var_name = runtime->symbols[package_var->name_id];
+        const char* package_var_signature = runtime->symbols[package_var->signature_id];
 
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+        
+        SPVM_STRING_BUFFER_add(string_buffer, "    if ( __builtin_expect(");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_package_var_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Package variable not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&(*(SPVM_VALUE**)(env->runtime + (intptr_t)env->runtime_package_vars_heap_byte_offset))[");
         SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
         SPVM_STRING_BUFFER_add(string_buffer, "],\n");
@@ -4331,14 +4682,39 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_UNDEF: {
-        int32_t rel_id = opcode->operand0;
-        int32_t package_var_id = runtime->info_package_var_ids[sub->info_package_var_ids_base + rel_id];
+        int32_t info_package_var_id = opcode->operand0;
+        int32_t package_var_id = runtime->info_package_var_ids[package->info_package_var_ids_base + info_package_var_id];
         SPVM_RUNTIME_PACKAGE_VAR* package_var = &runtime->package_vars[package_var_id];
         SPVM_RUNTIME_PACKAGE* package_var_package = &runtime->packages[package_var->package_id];
         const char* package_var_package_name = runtime->symbols[package_var_package->name_id];
         const char* package_var_name = runtime->symbols[package_var->name_id];
+        const char* package_var_signature = runtime->symbols[package_var->signature_id];
         
         SPVM_STRING_BUFFER_add(string_buffer, "  {\n");
+        
+        SPVM_STRING_BUFFER_add(string_buffer, "    if ( __builtin_expect(");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0, 0)) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      ");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " = env->get_package_var_id(env, \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", \"");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\");\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      if (");
+        SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " == 0) {\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        void* exception = env->new_string_raw(env, \"Package variable not found ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_package_name);
+        SPVM_STRING_BUFFER_add(string_buffer, " ");
+        SPVM_STRING_BUFFER_add(string_buffer, (char*)package_var_signature);
+        SPVM_STRING_BUFFER_add(string_buffer, "\", 0);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        env->set_exception(env, exception);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "        return SPVM_EXCEPTION;\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "      }\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    }\n");
+
         SPVM_STRING_BUFFER_add(string_buffer, "    SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&(*(SPVM_VALUE**)(env->runtime + (intptr_t)env->runtime_package_vars_heap_byte_offset))[");
         SPVM_STRING_BUFFER_add_package_var_id_name(string_buffer, package_var_package_name, package_var_name);
         SPVM_STRING_BUFFER_add(string_buffer, "], NULL);\n");

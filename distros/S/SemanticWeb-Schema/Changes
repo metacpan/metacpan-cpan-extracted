@@ -1,4 +1,17 @@
 Revision history for SemanticWeb-Schema:
 
+v0.0.2    2018-10-19 18:07:44+01:00 Europe/London
+  [Enhancements]
+  - Updated classes to Version 3.4 of the schema.
+
+  [Bug Fixes]
+  - Handle UTF-8 issues.
+
+  [Documentation]
+  - Added INSTALL file to the distribution.
+
+  [Toolchain]
+  - Update MANIFEST.SKIP.
+
 v0.0.1    2018-07-30 23:54:07+01:00 Europe/London
 - Initial release.

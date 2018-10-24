@@ -1,0 +1,30 @@
+---
+abstract: 'Dancer 2 session storage with CHI backend'
+author:
+  - 'Jason A. Crome <cromedome@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Session-CHI
+requires:
+  CHI: '0'
+  Dancer2: '0'
+  JSON: '0'
+  Moo: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+resources:
+  IRC: irc://irc.perl.org/#dancer
+  WebIRC: https://chat.mibbit.com/#dancer@irc.perl.org
+  bugtracker: https://github.com/cromedome/Dancer2-Session-CHI/issues
+  homepage: http://perldancer.org/
+  repository: git://github.com/cromedome/Dancer2-Session-CHI.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.69'

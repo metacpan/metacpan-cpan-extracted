@@ -5,6 +5,8 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
+use utf8;
 
 # -----------------------------------------------------------------------------
 
@@ -69,6 +71,30 @@ sub test_compare : Test(12) {
     $self->ok($a1->eq($arr1_res));
     $self->ok($a2->eq($arr2_res));
     $self->ok($a->eq($arr_res));
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_decode : Test(2) {
+    my $self = shift;
+
+    my $encoding = 'utf-8';
+    my @arr = do {
+        no utf8;
+        qw/Ä Ö Ü/;
+    };
+    my $expected = [qw/Ä Ö Ü/];
+
+    Prty::Array->decode(\@arr,$encoding);
+    $self->isDeeply(\@arr,$expected);
+
+    @arr = do {
+        no utf8;
+        qw/Ä Ö Ü/;
+    };
+    my $arr = Prty::Array->new(\@arr);
+    $arr->decode($encoding);
+    $self->isDeeply($arr,$expected);
 }
 
 # -----------------------------------------------------------------------------

@@ -5,6 +5,7 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
 # -----------------------------------------------------------------------------
@@ -297,6 +298,18 @@ sub test_expandTilde : Test(2) {
 
 # -----------------------------------------------------------------------------
 
+sub test_filename : Test(2) {
+    my $self = shift;
+
+    my $file = Prty::Path->filename('datei');
+    $self->is($file,'datei');
+
+    $file = Prty::Path->filename('/ein/pfad/datei');
+    $self->is($file,'datei');
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_glob : Test(5) {
     my $self = shift;
 
@@ -423,6 +436,21 @@ sub test_newer : Test(2) {
 
     Prty::Path->delete($file1);
     Prty::Path->delete($file2);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_removeExtension : Test(3) {
+    my $self = shift;
+
+    my $base = Prty::Path->removeExtension('datei');
+    $self->is($base,'datei');
+
+    $base = Prty::Path->removeExtension('datei.ext');
+    $self->is($base,'datei');
+
+    $base = Prty::Path->removeExtension('/ein/pfad/datei.ext');
+    $self->is($base,'/ein/pfad/datei');
 }
 
 # -----------------------------------------------------------------------------

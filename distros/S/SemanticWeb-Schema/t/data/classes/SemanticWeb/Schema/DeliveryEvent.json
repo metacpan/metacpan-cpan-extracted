@@ -32,8 +32,8 @@
          "rdfs:comment" : "Method used for delivery or shipping.",
          "rdfs:label" : "hasDeliveryMethod",
          "schema:domainIncludes" : [
-            "schema:ParcelDelivery",
-            "schema:DeliveryEvent"
+            "schema:DeliveryEvent",
+            "schema:ParcelDelivery"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       }

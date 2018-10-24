@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::PaymentMethod;
 
-# ABSTRACT: <p>A payment method is a standardized procedure for transferring the monetary amount for a purchase
+# ABSTRACT: A payment method is a standardized procedure for transferring the monetary amount for a purchase
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,18 +30,18 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::PaymentMethod - <p>A payment method is a standardized procedure for transferring the monetary amount for a purchase
+SemanticWeb::Schema::PaymentMethod - A payment method is a standardized procedure for transferring the monetary amount for a purchase
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>A payment method is a standardized procedure for transferring the
-monetary amount for a purchase. Payment methods are characterized by the
-legal and technical structures used, and by the organization or group
-carrying out the transaction.</p> <p>Commonly used values:</p> <ul>
+=for html A payment method is a standardized procedure for transferring the monetary
+amount for a purchase. Payment methods are characterized by the legal and
+technical structures used, and by the organization or group carrying out
+the transaction.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#ByBankTransferInAdvance</li>
 <li>http://purl.org/goodrelations/v1#ByInvoice</li>
 <li>http://purl.org/goodrelations/v1#Cash</li>

@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of physically/electronically taking delivery of an object thathas been transferred from an origin to a destination. Reciprocal of SendAction.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/SendAction\">SendAction</a>: The reciprocal of ReceiveAction.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/TakeAction\">TakeAction</a>: Unlike TakeAction, ReceiveAction does not imply that the ownership has been transfered (e.g. I can receive a package, but it does not mean the package is now mine).</li>\n</ul>\n",
+      "rdfs:comment" : "The act of physically/electronically taking delivery of an object thathas been transferred from an origin to a destination. Reciprocal of SendAction.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/SendAction\">SendAction</a>: The reciprocal of ReceiveAction.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/TakeAction\">TakeAction</a>: Unlike TakeAction, ReceiveAction does not imply that the ownership has been transfered (e.g. I can receive a package, but it does not mean the package is now mine).</li>\n</ul>\n",
       "rdfs:label" : "ReceiveAction",
       "rdfs:subClassOf" : "schema:TransferAction"
    },
@@ -12,10 +12,10 @@
          "rdfs:label" : "deliveryMethod",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
+            "schema:SendAction",
             "schema:OrderAction",
             "schema:ReceiveAction",
-            "schema:TrackAction",
-            "schema:SendAction"
+            "schema:TrackAction"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       },
@@ -25,8 +25,8 @@
          "rdfs:label" : "sender",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:ReceiveAction",
-            "schema:Message"
+            "schema:Message",
+            "schema:ReceiveAction"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",

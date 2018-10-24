@@ -1,5 +1,32 @@
 Revision history for Deliantra
 
+2.0  Tue Oct 23 00:45:23 CEST 2018
+	- update tilecache loader to new faceinfo/facedata format. this
+          saves a lot of ram when creating the tilecache, and makes it
+          faster, too, as only about 20mb instead of 130mb have to be read.
+        - ix with nonzero offset but zero data aborts a running ix.
+        - remove ncom support, which was disabeld forever.
+        - require Digest::SHA and SHA3 modules for secure authentication.
+        - new module Deliantra::Util.
+        - remove lots of cruft not needed for deliantra server >3.0.
+        - support $face->{cache} slot for protocol users.
+        - use spellmon v2 protocol (no message).
+
+1.31  Sun Nov  4 02:33:38 CET 2012
+	- normalise hp/sp in map header to enter_x/enter_y now.
+	- added bin/cfmap-set command to modify map headers
+          (e.g. for music, region...).
+        - add %Deliantra::WALLDIR.
+        - add support for glyph field.
+        - do not depend on IO::Socket::INET.
+        - remember the last ix offset per face, to allow progress displays.
+        - remove requestinfo spell_paths/skill_info - clients should
+          use the exti resource/fxix mechanism.
+        - support a generic addme delay mechanism using guards.
+        - remove the max_outstanding mechanism (and the send queue)
+          as they are not needed for deliantra.
+        - use JSON syntax for setup command.
+
 1.30  Sat Apr 24 10:08:05 CEST 2010
         - changed the order of overrides in Deliantra.pm of Data.pm.
           Keep an eye on the gde/editor attributes!

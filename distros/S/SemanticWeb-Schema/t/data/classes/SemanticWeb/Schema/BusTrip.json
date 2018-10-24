@@ -3,7 +3,7 @@
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A trip on a commercial bus line.",
       "rdfs:label" : "BusTrip",
-      "rdfs:subClassOf" : "schema:Intangible"
+      "rdfs:subClassOf" : "schema:Trip"
    },
    "properties" : {
       "schema:arrivalBusStop" : {
@@ -12,20 +12,9 @@
          "rdfs:label" : "arrivalBusStop",
          "schema:domainIncludes" : "schema:BusTrip",
          "schema:rangeIncludes" : [
-            "schema:BusStop",
-            "schema:BusStation"
+            "schema:BusStation",
+            "schema:BusStop"
          ]
-      },
-      "schema:arrivalTime" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The expected arrival time.",
-         "rdfs:label" : "arrivalTime",
-         "schema:domainIncludes" : [
-            "schema:TrainTrip",
-            "schema:Flight",
-            "schema:BusTrip"
-         ],
-         "schema:rangeIncludes" : "schema:DateTime"
       },
       "schema:busName" : {
          "rdf:type" : "rdf:Property",
@@ -49,36 +38,6 @@
          "schema:rangeIncludes" : [
             "schema:BusStation",
             "schema:BusStop"
-         ]
-      },
-      "schema:departureTime" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The expected departure time.",
-         "rdfs:label" : "departureTime",
-         "schema:domainIncludes" : [
-            "schema:BusTrip",
-            "schema:Flight",
-            "schema:TrainTrip"
-         ],
-         "schema:rangeIncludes" : "schema:DateTime"
-      },
-      "schema:provider" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
-         "rdfs:label" : "provider",
-         "schema:domainIncludes" : [
-            "schema:ParcelDelivery",
-            "schema:BusTrip",
-            "schema:CreativeWork",
-            "schema:Service",
-            "schema:TrainTrip",
-            "schema:Reservation",
-            "schema:Flight",
-            "schema:Invoice"
-         ],
-         "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
          ]
       }
    }

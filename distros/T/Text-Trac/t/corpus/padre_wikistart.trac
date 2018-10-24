@@ -1,0 +1,82 @@
+== Padre - Perl Application Development and Refactoring Environment ==
+
+Take a look at the current state of Padre on our [http://padre.perlide.org/trac/wiki/Screenshots Screenshots] page.
+
+[wiki:Features]
+
+[wiki:Tickets] To create a New Ticket for Padre, you will need to Login (if you are new here, please Register first).
+
+== Project Objectives ==
+
+Some of the objectives of the project:
+
+ * Make it very easy to start using it, especially for Perl development.
+  * Easy installation on Windows, Linux and other operating systems
+  * By default work like notepad, hide most of the options.
+ * Make it very Perl beginner friendly
+  * Out of the box allow running Perl scripts, have Perl documentation.
+  * Provide a variety of assistance options to help with learning Perl.
+  * Auto-detect as much as possible, to provide a Do What I Mean working style.
+ * Support for development of large cross language applications
+  * Project-specific editor configuration.
+  * Boilerplate creation for CPAN modules, Catalyst applications, and more.
+  * Extend Padre with [wiki:Plugins plugins] to add new interfaces and functionality.
+  * Support for languages that are often used with Perl (SQL, Javascript, HTML, XML)
+  * Support for other programming languages (Python, PHP, Ruby etc.)
+  * Support for Parrot and Perl 6
+  * Support for Moose, Mouse and MooseX::Declare
+
+== How do I try it? ==
+
+See [wiki:Download] for installation instructions. And be sure to check out the [wiki:Documentation] for additional info.
+
+ * Videos
+  * Gabor [http://www.youtube.com/user/gabor529/videos youtube] various
+  * Adam at [http://www.youtube.com/watch?v=qu8-NzHZsXY Padre - The Perl IDE for Normal People] YAPC::Asia Tokyo 2012
+
+== Getting involved - How can I participate? ==
+
+See also http://padre.perlide.org/getting_involved.html
+
+=== Setting up a development environment ===
+
+See [wiki:Howto]
+ * SvnMimeTypes
+  * Guide to setting mime types to enable pygments to display formatted code in trac. 
+ * [wiki:PadrePluginDialog Padre::Plugin::Cookbook]
+  * Series of Cookbooks to aid in Gui Plug-in development
+
+== Mailing lists ==
+ * Padre development mailing list http://mail.perlide.org/mailman/listinfo/padre-dev
+ * SVN commit mailing list http://mail.perlide.org/mailman/listinfo/padre-commit
+ * Trac changes mailing list http://mail.perlide.org/mailman/listinfo/padre-trac
+ * Padre news mailing list http://mail.perlide.org/mailman/listinfo/padre-news
+
+== IRC ==
+Padre's IRC channel is very active, and the best first point of call for
+questions or assistance.
+
+We hang out on [irc://irc.perl.org/%23padre #padre] on irc.perl.org
+
+It is being logged here: http://irclog.perlgeek.de/padre/today
+
+You can also use the web-based IRC client on Mibbit from our [http://padre.perlide.org/irc.html IRC] page
+
+
+== Support ==
+You can try our mailing list or IRC, but I am sure the [http://www.perlmonks.org/ PerlMonks] will be glad to help you as well.
+
+== History ==
+
+Before 7 August 2008 the source code was kept in a different SVN repository under various names. There was no easy way to transfer it so I started this repository from scratch. That pre-history can be found here:
+
+ `http://svn1.hostlocal.com/szabgab/trunk/Wx-Tutorial -r 941`
+
+ `http://svn1.hostlocal.com/szabgab/trunk/App-Editor -r 1080`
+
+The [http://padre.perlide.org/about.html About] page has links to related blog posts from before Padre was released.
+
+[http://padre.perlide.org/trac/wiki/Release_History Release History]
+
+Padre is written in Perl 5 using [http://padre.perlide.org/trac/wiki/wxWidgets wxWidgets]
+

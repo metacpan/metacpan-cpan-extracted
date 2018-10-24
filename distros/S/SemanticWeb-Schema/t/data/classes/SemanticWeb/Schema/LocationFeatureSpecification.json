@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+      "dc:source" : "schemadotorgsources:STI_Accommodation_Ontology",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "Specifies a location feature by providing a structured value representing a feature of an accommodation as a property-value pair of varying degrees of formality.",
       "rdfs:label" : "LocationFeatureSpecification",
@@ -12,41 +12,41 @@
          "rdfs:comment" : "The hours during which this service or contact is available.",
          "rdfs:label" : "hoursAvailable",
          "schema:domainIncludes" : [
-            "schema:ContactPoint",
             "schema:Service",
+            "schema:ContactPoint",
             "schema:LocationFeatureSpecification"
          ],
          "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
       },
       "schema:validFrom" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
+            "schema:Offer",
             "schema:MonetaryAmount",
-            "schema:Permit",
-            "schema:Demand",
+            "schema:LocationFeatureSpecification",
             "schema:PriceSpecification",
             "schema:OpeningHoursSpecification",
-            "schema:LocationFeatureSpecification",
-            "schema:Offer"
+            "schema:Demand",
+            "schema:Permit"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },
       "schema:validThrough" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:LocationFeatureSpecification",
-            "schema:OpeningHoursSpecification",
-            "schema:JobPosting",
             "schema:PriceSpecification",
+            "schema:LocationFeatureSpecification",
             "schema:MonetaryAmount",
-            "schema:Demand"
+            "schema:Offer",
+            "schema:JobPosting",
+            "schema:Demand",
+            "schema:OpeningHoursSpecification"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       }

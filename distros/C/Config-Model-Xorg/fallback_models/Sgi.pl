@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Xorg
 #
-# This software is Copyright (c) 2007-2016 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #

@@ -5,6 +5,7 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
 # -----------------------------------------------------------------------------
 
@@ -33,6 +34,25 @@ sub test_new_string : Test(9) {
     my $self = shift;
 
     my $udlStr = 'dbi#oracle:xyz%xyz_admin:koala3@pluto.gaga.de;'.
+        'file=/tmp/xyz;name=gaga';
+    my $obj = Prty::Udl->new($udlStr);
+    $self->is(ref($obj),'Prty::Udl');
+    $self->is($obj->api,'dbi');
+    $self->is($obj->dbms,'oracle');
+    $self->is($obj->db,'xyz');
+    $self->is($obj->user,'xyz_admin');
+    $self->is($obj->password,'koala3');
+    $self->is($obj->host,'pluto.gaga.de');
+    $self->is($obj->port,'');
+    $self->isDeeply($obj->options,{file=>'/tmp/xyz',name=>'gaga'});
+}
+
+sub test_new_string_order : Test(9) {
+    my $self = shift;
+
+    # % und @ vertauscht
+
+    my $udlStr = 'dbi#oracle:xyz@pluto.gaga.de%xyz_admin:koala3;'.
         'file=/tmp/xyz;name=gaga';
     my $obj = Prty::Udl->new($udlStr);
     $self->is(ref($obj),'Prty::Udl');

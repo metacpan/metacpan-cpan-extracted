@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::TaxiReservation;
 
 # ABSTRACT: A reservation for a taxi
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has party_size => (
@@ -56,12 +58,12 @@ SemanticWeb::Schema::TaxiReservation - A reservation for a taxi
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html A reservation for a taxi.</p> <p>Note: This type is for information about
-actual reservations, e.g. in confirmation emails or HTML pages with
+=for html A reservation for a taxi.<br/><br/> Note: This type is for information
+about actual reservations, e.g. in confirmation emails or HTML pages with
 individual confirmations of reservations. For offers of tickets, use <a
 class="localLink" href="http://schema.org/Offer">Offer</a>.
 

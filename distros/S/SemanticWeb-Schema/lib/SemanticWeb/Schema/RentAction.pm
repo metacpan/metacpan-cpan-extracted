@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::RentAction;
 
 # ABSTRACT: The act of giving money in return for temporary use
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has landlord => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::RentAction - The act of giving money in return for temporar
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -66,9 +68,9 @@ A landlord should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 

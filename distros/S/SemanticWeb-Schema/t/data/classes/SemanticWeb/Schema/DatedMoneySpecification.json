@@ -12,18 +12,18 @@
          "rdfs:comment" : "The amount of money.",
          "rdfs:label" : "amount",
          "schema:domainIncludes" : [
-            "schema:DatedMoneySpecification",
+            "schema:LoanOrCredit",
             "schema:InvestmentOrDeposit",
-            "schema:LoanOrCredit"
+            "schema:DatedMoneySpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:Number"
          ]
       },
       "schema:currency" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The currency in which the monetary amount is expressed (in 3-letter <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217</a> format).",
+         "rdfs:comment" : "The currency in which the monetary amount is expressed.<br/><br/>\n\nUse standard formats: <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217 currency format</a> e.g. \"USD\"; <a href=\"https://en.wikipedia.org/wiki/List_of_cryptocurrencies\">Ticker symbol</a> for cryptocurrencies e.g. \"BTC\"; well known names for <a href=\"https://en.wikipedia.org/wiki/Local_exchange_trading_system\">Local Exchange Tradings Systems</a> (LETS) and other currency types e.g. \"Ithaca HOUR\".",
          "rdfs:label" : "currency",
          "schema:domainIncludes" : [
             "schema:DatedMoneySpecification",
@@ -36,15 +36,15 @@
          "rdfs:comment" : "The end date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "endDate",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeries",
             "schema:CreativeWorkSeason",
-            "schema:Role",
+            "schema:CreativeWorkSeries",
+            "schema:DatedMoneySpecification",
             "schema:Event",
-            "schema:DatedMoneySpecification"
+            "schema:Role"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:startDate" : {
@@ -52,11 +52,11 @@
          "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "startDate",
          "schema:domainIncludes" : [
+            "schema:CreativeWorkSeason",
+            "schema:Role",
             "schema:Event",
             "schema:DatedMoneySpecification",
-            "schema:CreativeWorkSeries",
-            "schema:Role",
-            "schema:CreativeWorkSeason"
+            "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",

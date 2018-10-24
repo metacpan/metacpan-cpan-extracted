@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::TransferAction;
 
 # ABSTRACT: The act of transferring/moving (abstract or concrete) animate or inanimate objects from one place to another.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has from_location => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::TransferAction - The act of transferring/moving (abstract o
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

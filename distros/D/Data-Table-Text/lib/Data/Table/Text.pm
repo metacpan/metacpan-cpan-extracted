@@ -5,14 +5,11 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 # To escape an open parenthesis in a regular expression use: \x28, for close use: \x29
-# evalFile should reload the genlvalue subs as well
-# copyFile() copyFolder()
-# Print version in documentation
 # perl Build.PL && perl Build test && sudo perl Build install
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = q(20181017);                                                     # Version
+our $VERSION = q(20181019);                                                     # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -72,7 +69,7 @@ sub xxx(@)                                                                      
   pop @cmd if $check;                                                           # Remove check from command
   my $cmd = join ' ', @cmd;                                                     # Command to execute
   say STDERR timeStamp, " ", $cmd unless $check;                                # Print the command unless there is a check in place
-  my $response = qx($cmd 2>&1);                                                 # Execute command
+  my $response = eval {qx($cmd 2>&1)};                                          # Execute command
   $response =~ s/\s+\Z//s;                                                      # Remove trailing white space from response
   say STDERR $response if $response and !$check;                                # Print non blank error message
   confess $response if $response and $check and $response !~ m/$success/;       # Error check if an error checking regular expression has been supplied
@@ -1561,37 +1558,58 @@ sub showHashes($)                                                               
 
 my %packageSearchOrder;                                                         # Method to package map
 
-sub setPackageSearchOrder(@)                                                    # Set a package search order for methods requested in the current package via AUTOLOAD.
- {my (@search) = @_;                                                            # Package names in search order
-  my ($in) = caller;                                                            # Caller's package
+sub setPackageSearchOrder($@)                                                   # Set a package search order for methods requested in the current package via AUTOLOAD.
+ {my ($set, @search) = @_;                                                      # Package to set, package names in search order.
   %packageSearchOrder = ();                                                     # Reset method to package map
-  our $AUTOLOAD;                                                                # Method requested
 
   my $c  = <<'END';
-BEGIN{undef &AUTOLOAD};                                                         # Replace autoload
-sub AUTOLOAD
- {my $s = $AUTOLOAD;
-  return if $s =~ m(Destroy)is;
-  if (my $t = $packageSearchOrder{$s})                                          # Reuse a cached method if possible
-   {goto &$t;
-   }
-  else                                                                          # Search for the first package that can provide the requested method
-   {for my $package(@search)
-     {my $t = $s =~ s(\A.+::) (${package}::)grs;
-      if (defined &$t)
-       {$packageSearchOrder{$s} = $t;
-        goto &$t;
-       }
+if (1)
+ {package $set;
+  our $AUTOLOAD;                                                                # Method requested
+  BEGIN{undef &AUTOLOAD};                                                       # Replace autoload
+  sub AUTOLOAD
+   {my $s = $AUTOLOAD;
+    return if $s =~ m(Destroy)is;
+    if (my $t = $packageSearchOrder{$s})                                        # Reuse a cached method if possible
+     {goto &$t;
      }
-    confess "Cannot find a method implementing $s";                             # No package supports the requested method
+    else                                                                        # Search for the first package that can provide the requested method
+     {for my $package(@search)
+       {my $t = $s =~ s(\A.+::) (${package}::)grs;
+        if (defined &$t)
+         {$packageSearchOrder{$s} = $t;
+          goto &$t;
+         }
+       }
+      confess "Cannot find a method implementing $s";                           # No package supports the requested method
+     }
    }
  }
 END
   my $search = q/qw(/.join(' ', @search).q/)/;                                  # Set search order
+  $c =~ s(\$set)    ($set)gs;
   $c =~ s(\@search) ($search)gs;
-
   eval $c;
   confess "$c\n$@\n" if $@;
+ }
+
+sub mergePackageMethods($$@)                                                    # Import each of the named B<@method>s that exist in package B<$from> from package B<$from> to package B<$to> if they do not already exist in package B<$to>, otherwise export them from package B<$to> back to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved of favour of package B<$from>.
+ {my ($from, $to, @methods) = @_;                                               # Name of package from which to import methods, package into which to import the methods, list of methods to try importing.
+  my @s;
+  for my $method(@methods)                                                      # Replaceable methods
+   {push @s, <<"END";
+if (defined &${from}::$method)
+ {undef &${to}::$method;
+  *${to}::$method = *${from}::$method;
+ }
+else
+ {*${from}::$method = *${to}::$method;
+ }
+END
+   }
+  my $s = join "\n", @s;                                                        # Replace methods
+  eval $s;
+  confess $@ if $@;
  }
 
 sub assertPackageRefs($@)                                                       # Confirm that the specified references are to the specified package
@@ -2077,14 +2095,14 @@ sub updateDocumentation(;$)                                                     
    {my $s = $1;
     $s =~ s(\A\s*-\s*) ();                                                      # Remove optional leading -
     $s =~ s(\s+\Z)     ();                                                      # Remove any trailing spaces
-    $oneLineDescription = "\n$s";                                               # Save description
+    $oneLineDescription = "\n$s\n";                                             # Save description
    }
 
   if (1)                                                                        # Document description
-   {my $v = $version ? " version $version" : "";
+   {my $v = $version ? "\n\nVersion $version.\n" : "";
     push @doc, <<"END";
 `head1 Description
-$oneLineDescription$v.
+$oneLineDescription$v
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
@@ -2219,7 +2237,6 @@ END
     elsif ($level and $line =~                                                  # Documentation for a generated lvalue * method = sub name comment
      /\Asub\s*(\w+)\s*{.*}\s*#(\w*)\s+(.*)\Z/)
      {my ($name, $flags, $description) = ($1, $2, $3);                          # Name of attribute, flags, description from comment
-say STDERR "AAAA $1  $2  $3";
       $attributes{$name}           = $flags;
       $attributeDescription{$name} = $description;
      }
@@ -2343,15 +2360,25 @@ END
          }
        }
 
-      push @method,                                                             # Optionally replaceable
-       "\nYou can provide an implementation of this method as ".
-       "B<${package}::$name> if you wish to override the default processing."
-        if $replace;
+      push @method, <<END if $replace;                                          # Optionally replaceable
 
-      push @method,                                                             # Required replaceable
-       "\nYou must supply an implementation of this method as ".
-       "B<${package}::$name>."
-        if $Replace;
+You can provide you own implementation of this method in your calling package
+via:
+
+  sub $name {...}
+
+if you wish to override the default processing supplied by this method.
+
+END
+
+
+      push @method, <<END if $Replace;                                          # Required replaceable
+
+You must supply an implementation of this method in your package via:
+
+  sub $name {...}
+
+END
 
       push @method,                                                             # Add a note about the availability of an X method
        "\nUse B<${name}X> to execute L<$name|/$name> but B<die> '$name'".
@@ -2397,6 +2424,42 @@ END
        }
      }
     push @doc, @d;
+   }
+
+  if (my @a = sort keys %attributes)
+   {push my @d, qq(\n), qq(=head1 Attributes\n\n);
+    push @d, <<"END";
+The following is a list of all the attributes in this package.  A method coded
+with the same name in your package will over ride the method of the same name
+in this package and thus provide your value for the attribute in place of the
+default value supplied for this attribute by this package.
+
+`head2 Replaceable Attribute List
+
+END
+    push @d, join ' ', @a, "\n\n";
+    for my $name(@a)
+     {my $d = $attributeDescription{$name};
+      push @d, qq(=head2 $name\n\n$d\n\n);
+     }
+    push @doc, @d;
+   }
+
+  if (my @r = sort keys %replace)
+   {push @doc, qq(\n), <<END;
+`head1 Optional Replace Methods
+
+The following is a list of all the optionally replaceable methods in this
+package.  A method coded with the same name in your package will over ride the
+method of the same name in this package providing your preferred processing for
+the replaced method in place of the default processing supplied by this
+package. If you do not supply such an over riding method, the existing method
+in this package will be used instead.
+
+`head2 Replaceable Method List
+
+END
+    push @doc, join ' ', @r, "\n\n";
    }
 
   if (1)                                                                        # Alphabetic listing of methods that still need examples
@@ -2637,7 +2700,7 @@ genClass genHash
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
 hostName htmlToc
-imageSize indentString ipAddressViaArp isBlank
+imageSize mergePackageMethods indentString ipAddressViaArp isBlank
 javaPackage javaPackageAsFileName
 keyCount
 loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines
@@ -2652,7 +2715,8 @@ quoteFile
 readBinaryFile readFile readGZipFile readUtf16File relFromAbsAgainstAbs reloadHashes removeBOM removeFilePrefix
 retrieveFile
 saveCodeToS3 saveSourceToS3 searchDirectoryTreesForMatchingFiles
-setIntersectionOfTwoArraysOfWords setUnionOfTwoArraysOfWords startProcess
+setIntersectionOfTwoArraysOfWords setPackageSearchOrder
+setUnionOfTwoArraysOfWords startProcess
 storeFile stringsAreNotEqual
 superScriptString superScriptStringUndo subScriptString subScriptStringUndo
 swapFilePrefix
@@ -2831,7 +2895,11 @@ Data::Table::Text - Write data in tabular text format.
 
 =head1 Description
 
-Write data in tabular text format. version q(20181017).
+Write data in tabular text format.
+
+
+Version q(20181018).
+
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
@@ -3546,6 +3614,12 @@ Combine zero or more absolute and relative file names
      Parameter  Description
   1  @f         Absolute and relative file names
 
+B<Example:>
+
+
+  ok "aaa/bbb/ccc/ddd.txt"    eq 𝘀𝘂𝗺𝗔𝗯𝘀𝗔𝗻𝗱𝗥𝗲𝗹(qw(aaa/AAA/ ../bbb/bbb/BBB/ ../../ccc/ddd.txt));
+
+
 =head2 Temporary
 
 Temporary files and folders
@@ -4035,18 +4109,14 @@ B<Example:>
     𝘄𝗿𝗶𝘁𝗲𝗙𝗶𝗹𝗲𝘀($h);
     my $a = readFiles(q(aaa));
     is_deeply $h, $a;
-    if ($freeBsd or $windows)
-     {ok 1 for 1..2;
-     }
-    else
-     {copyFolder(q(aaa), q(bbb));
-      my $b = readFiles(q(bbb));
-      is_deeply [sort values %$a],[sort values %$b];
+    copyFolder(q(aaa), q(bbb));
+    my $b = readFiles(q(bbb));
+    is_deeply [sort values %$a],[sort values %$b];
 
-      copyFile(q(aaa/1.txt), q(aaa/2.txt));
-      my $A = readFiles(q(aaa));
-      is_deeply(values %$A);
-     }
+    copyFile(q(aaa/1.txt), q(aaa/2.txt));
+    my $A = readFiles(q(aaa));
+    is_deeply(values %$A);
+
     clearFolder(q(aaa), 3);
     clearFolder(q(bbb), 3);
    }
@@ -4072,18 +4142,14 @@ B<Example:>
     writeFiles($h);
     my $a = 𝗿𝗲𝗮𝗱𝗙𝗶𝗹𝗲𝘀(q(aaa));
     is_deeply $h, $a;
-    if ($freeBsd or $windows)
-     {ok 1 for 1..2;
-     }
-    else
-     {copyFolder(q(aaa), q(bbb));
-      my $b = 𝗿𝗲𝗮𝗱𝗙𝗶𝗹𝗲𝘀(q(bbb));
-      is_deeply [sort values %$a],[sort values %$b];
+    copyFolder(q(aaa), q(bbb));
+    my $b = 𝗿𝗲𝗮𝗱𝗙𝗶𝗹𝗲𝘀(q(bbb));
+    is_deeply [sort values %$a],[sort values %$b];
 
-      copyFile(q(aaa/1.txt), q(aaa/2.txt));
-      my $A = 𝗿𝗲𝗮𝗱𝗙𝗶𝗹𝗲𝘀(q(aaa));
-      is_deeply(values %$A);
-     }
+    copyFile(q(aaa/1.txt), q(aaa/2.txt));
+    my $A = 𝗿𝗲𝗮𝗱𝗙𝗶𝗹𝗲𝘀(q(aaa));
+    is_deeply(values %$A);
+
     clearFolder(q(aaa), 3);
     clearFolder(q(bbb), 3);
    }
@@ -4192,18 +4258,14 @@ B<Example:>
     writeFiles($h);
     my $a = readFiles(q(aaa));
     is_deeply $h, $a;
-    if ($freeBsd or $windows)
-     {ok 1 for 1..2;
-     }
-    else
-     {copyFolder(q(aaa), q(bbb));
-      my $b = readFiles(q(bbb));
-      is_deeply [sort values %$a],[sort values %$b];
+    copyFolder(q(aaa), q(bbb));
+    my $b = readFiles(q(bbb));
+    is_deeply [sort values %$a],[sort values %$b];
 
-      𝗰𝗼𝗽𝘆𝗙𝗶𝗹𝗲(q(aaa/1.txt), q(aaa/2.txt));
-      my $A = readFiles(q(aaa));
-      is_deeply(values %$A);
-     }
+    𝗰𝗼𝗽𝘆𝗙𝗶𝗹𝗲(q(aaa/1.txt), q(aaa/2.txt));
+    my $A = readFiles(q(aaa));
+    is_deeply(values %$A);
+
     clearFolder(q(aaa), 3);
     clearFolder(q(bbb), 3);
    }
@@ -4230,18 +4292,14 @@ B<Example:>
     writeFiles($h);
     my $a = readFiles(q(aaa));
     is_deeply $h, $a;
-    if ($freeBsd or $windows)
-     {ok 1 for 1..2;
-     }
-    else
-     {𝗰𝗼𝗽𝘆𝗙𝗼𝗹𝗱𝗲𝗿(q(aaa), q(bbb));
-      my $b = readFiles(q(bbb));
-      is_deeply [sort values %$a],[sort values %$b];
+    𝗰𝗼𝗽𝘆𝗙𝗼𝗹𝗱𝗲𝗿(q(aaa), q(bbb));
+    my $b = readFiles(q(bbb));
+    is_deeply [sort values %$a],[sort values %$b];
 
-      copyFile(q(aaa/1.txt), q(aaa/2.txt));
-      my $A = readFiles(q(aaa));
-      is_deeply(values %$A);
-     }
+    copyFile(q(aaa/1.txt), q(aaa/2.txt));
+    my $A = readFiles(q(aaa));
+    is_deeply(values %$A);
+
     clearFolder(q(aaa), 3);
     clearFolder(q(bbb), 3);
    }
@@ -5122,12 +5180,13 @@ B<Example:>
    }
 
 
-=head2 setPackageSearchOrder(@)
+=head2 setPackageSearchOrder($@)
 
 Set a package search order for methods requested in the current package via AUTOLOAD.
 
      Parameter  Description
-  1  @search    Package names in search order
+  1  $set       Package to set
+  2  @search    Package names in search order.
 
 B<Example:>
 
@@ -5155,7 +5214,7 @@ B<Example:>
       sub eeee{q(CCCCeeee)}
      }
 
-    𝘀𝗲𝘁𝗣𝗮𝗰𝗸𝗮𝗴𝗲𝗦𝗲𝗮𝗿𝗰𝗵𝗢𝗿𝗱𝗲𝗿(qw(CCCC BBBB AAAA));
+    𝘀𝗲𝘁𝗣𝗮𝗰𝗸𝗮𝗴𝗲𝗦𝗲𝗮𝗿𝗰𝗵𝗢𝗿𝗱𝗲𝗿(__PACKAGE__, qw(CCCC BBBB AAAA));
 
     ok &aaaa eq q(CCCCaaaa);
     ok &bbbb eq q(BBBBbbbb);
@@ -5168,7 +5227,7 @@ B<Example:>
     ok &dddd eq q(CCCCdddd);
     ok &eeee eq q(CCCCeeee);
 
-    𝘀𝗲𝘁𝗣𝗮𝗰𝗸𝗮𝗴𝗲𝗦𝗲𝗮𝗿𝗰𝗵𝗢𝗿𝗱𝗲𝗿(qw(AAAA BBBB CCCC));
+    𝘀𝗲𝘁𝗣𝗮𝗰𝗸𝗮𝗴𝗲𝗦𝗲𝗮𝗿𝗰𝗵𝗢𝗿𝗱𝗲𝗿(__PACKAGE__, qw(AAAA BBBB CCCC));
 
     ok &aaaa eq q(AAAAaaaa);
     ok &bbbb eq q(AAAAbbbb);
@@ -5180,6 +5239,42 @@ B<Example:>
 
     ok &dddd eq q(BBBBdddd);
     ok &eeee eq q(CCCCeeee);
+   }
+
+
+=head2 mergePackageMethods($$@)
+
+Import each of the named B<@method>s that exist in package B<$from> from package B<$from> to package B<$to> if they do not already exist in package B<$to>, otherwise export them from package B<$to> back to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved of favour of package B<$from>.
+
+     Parameter  Description
+  1  $from      Name of package from which to import methods
+  2  $to        Package into which to import the methods
+  3  @methods   List of methods to try importing.
+
+B<Example:>
+
+
+  if (1)
+   {sub AAAA::Call {q(AAAA)}
+
+    sub BBBB::Call {q(BBBB)}
+    sub BBBB::call {q(bbbb)}
+
+    if (1)
+     {package BBBB;
+      use Test::More;
+      *ok = *Test::More::ok;
+      ok Call eq q(BBBB);
+      ok call eq q(bbbb);
+      &Data::Table::Text::𝗺𝗲𝗿𝗴𝗲𝗣𝗮𝗰𝗸𝗮𝗴𝗲𝗠𝗲𝘁𝗵𝗼𝗱𝘀(qw(AAAA BBBB Call call));
+      ok Call eq q(AAAA);
+      ok call eq q(bbbb);
+      package AAAA;
+      use Test::More;
+      *ok = *Test::More::ok;
+      ok  Call eq q(AAAA);
+      ok &call eq q(bbbb);
+     }
    }
 
 
@@ -6425,135 +6520,137 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 101 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
 
-102 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+102 L<mergePackageMethods|/mergePackageMethods> - Import each of the named B<@method>s that exist in package B<$from> from package B<$from> to package B<$to> if they do not already exist in package B<$to>, otherwise export them from package B<$to> back to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved of favour of package B<$from>.
 
-103 L<min|/min> - Find the minimum number in a list.
+103 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-104 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
+104 L<min|/min> - Find the minimum number in a list.
 
-105 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+105 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
 
-106 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
+106 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
 
-107 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
+107 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
 
-108 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+108 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-109 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+109 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-110 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
+110 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-111 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
+111 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
 
-112 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
+112 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
 
-113 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+113 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
 
-114 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
+114 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-115 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
+115 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
 
-116 L<printQw|/printQw> - Print an array of words in qw() format.
+116 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
 
-117 L<quoteFile|/quoteFile> - Quote a file name.
+117 L<printQw|/printQw> - Print an array of words in qw() format.
 
-118 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
+118 L<quoteFile|/quoteFile> - Quote a file name.
 
-119 L<readFile|/readFile> - Read a file containing unicode in utf8.
+119 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
 
-120 L<readFiles|/readFiles> - Read all the files in a folder into a hash
+120 L<readFile|/readFile> - Read a file containing unicode in utf8.
 
-121 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
+121 L<readFiles|/readFiles> - Read all the files in a folder into a hash
 
-122 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
+122 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
 
-123 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
+123 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
 
-124 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+124 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
 
-125 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+125 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-126 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
+126 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-127 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
+127 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
 
-128 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
+128 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
 
-129 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
+129 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
 
-130 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+130 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
 
-131 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
+131 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-132 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
+132 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-133 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
+133 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
 
-134 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
+134 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
 
-135 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
+135 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
 
-136 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
+136 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-137 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+137 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-138 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
+138 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-139 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
+139 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
 
-140 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
+140 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
 
-141 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
+141 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
 
-142 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
+142 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
 
-143 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
+143 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
 
-144 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
+144 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
 
-145 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a known name to a new one,
+145 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
 
-146 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
+146 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a known name to a new one,
 
-147 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
+147 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
 
-148 L<timeStamp|/timeStamp> - hours:minute:seconds
+148 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
-149 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
+149 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-150 L<trackFiles|/trackFiles> - Track the existence of files.
+150 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
 
-151 L<trim|/trim> - Remove any white space from the front and end of a string.
+151 L<trackFiles|/trackFiles> - Track the existence of files.
 
-152 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
+152 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-153 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
+153 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
 
-154 L<userId|/userId> - The userid we are currently running under.
+154 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
 
-155 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+155 L<userId|/userId> - The userid we are currently running under.
 
-156 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+156 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
 
-157 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+157 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
 
-158 L<writeBinaryFile|/writeBinaryFile> - Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
+158 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
 
-159 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+159 L<writeBinaryFile|/writeBinaryFile> - Write a non unicode string to a file in after creating a path to the file if necessary and return the name of the file on success else confess.
 
-160 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+160 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
 
-161 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+161 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
 
-162 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
+162 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
 
-163 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+163 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
 
-164 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+164 L<xxx|/xxx> - Execute a shell command optionally checking its response.
 
-165 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+165 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
 
-166 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
+166 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+
+167 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
 
 =head1 Installation
 
@@ -6616,7 +6713,7 @@ __DATA__
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 400;
+use Test::More tests => 406;
 my $windows = $^O =~ m(MSWin32)is;
 my $mac     = $^O =~ m(darwin)is;
 my $freeBsd = $^O =~ m(freebsd)is;
@@ -7919,7 +8016,7 @@ if (1)                                                                          
     sub eeee{q(CCCCeeee)}
    }
 
-  setPackageSearchOrder(qw(CCCC BBBB AAAA));
+  setPackageSearchOrder(__PACKAGE__, qw(CCCC BBBB AAAA));
 
   ok &aaaa eq q(CCCCaaaa);
   ok &bbbb eq q(BBBBbbbb);
@@ -7932,7 +8029,7 @@ if (1)                                                                          
   ok &dddd eq q(CCCCdddd);
   ok &eeee eq q(CCCCeeee);
 
-  setPackageSearchOrder(qw(AAAA BBBB CCCC));
+  setPackageSearchOrder(__PACKAGE__, qw(AAAA BBBB CCCC));
 
   ok &aaaa eq q(AAAAaaaa);
   ok &bbbb eq q(AAAAbbbb);
@@ -7967,6 +8064,30 @@ if (1)
  }
 
 ok swapFilePrefix(q(/aaa/bbb.txt), q(/aaa/), q(/AAA/)) eq q(/AAA/bbb.txt);      #TswapFilePrefix
+
+if (1)                                                                          #TmergePackageMethods
+ {sub AAAA::Call {q(AAAA)}
+
+  sub BBBB::Call {q(BBBB)}
+  sub BBBB::call {q(bbbb)}
+
+  if (1)
+   {package BBBB;
+    use Test::More;
+    *ok = *Test::More::ok;
+    ok Call eq q(BBBB);
+    ok call eq q(bbbb);
+    &Data::Table::Text::mergePackageMethods(qw(AAAA BBBB Call call));
+    ok Call eq q(AAAA);
+    ok call eq q(bbbb);
+    package AAAA;
+    use Test::More;
+    *ok = *Test::More::ok;
+    ok  Call eq q(AAAA);
+    ok &call eq q(bbbb);
+   }
+ }
+
 
 #tttt
 

@@ -391,7 +391,7 @@ my @TESTS = (
     {
         a       => [ qw(a b c e h j l m n p) ],
         b       => [ qw(b c d e f j k l m r s t) ],
-        name    => 'lists_LCS_complex',
+        name    => 'nested_lists_LCS',
         diff    => {
             D => [
                 {R => 'a'},
@@ -413,7 +413,7 @@ my @TESTS = (
     {
         a       => [ qw(a b c e h j l m n p) ],
         b       => [ qw(b c d e f j k l m r s t) ],
-        name    => 'lists_LCS_complex_noU',
+        name    => 'nested_lists_LCS_noU',
         diff    => {
             D => [
                 {R => 'a'},
@@ -430,7 +430,7 @@ my @TESTS = (
     {
         a       => [ qw(a b c e h j l m n p) ],
         b       => [ qw(b c d e f j k l m r s t) ],
-        name    => 'lists_LCS_complex_onlyU',
+        name    => 'nested_lists_LCS_onlyU',
         diff    => {
             D => [
                 {I => 1,U => 'b'},
@@ -453,7 +453,7 @@ my @TESTS = (
     {
         a       => [ 0, [[ 100 ]], [ 20, '30' ], 4 ],
         b       => [ 0, [[ 100 ]], [ 20, '31' ], 5 ],
-        name    => 'complex_lists',
+        name    => 'nested_lists',
         diff    => {
             D => [
                 {U => 0},
@@ -471,7 +471,7 @@ my @TESTS = (
     {
         a       => [ 0, [[ 100 ]], [ 20, '30' ], 4 ],
         b       => [ 0, [[ 100 ]], [ 20, '31' ], 5 ],
-        name    => 'complex_lists_noU',
+        name    => 'nested_lists_noU',
         diff    => {
             D => [
                 {

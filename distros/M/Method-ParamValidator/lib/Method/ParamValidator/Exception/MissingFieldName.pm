@@ -1,6 +1,6 @@
 package Method::ParamValidator::Exception::MissingFieldName;
 
-$Method::ParamValidator::Exception::MissingFieldName::VERSION   = '0.11';
+$Method::ParamValidator::Exception::MissingFieldName::VERSION   = '0.12';
 $Method::ParamValidator::Exception::MissingFieldName::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Exception::MissingFieldName - Handles 'missing field nam
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has status => (is => 'ro', default => sub { 101 });
 has reason => (is => 'ro', default => sub { 'Missing field name.' });

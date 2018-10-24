@@ -5,6 +5,7 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
 # -----------------------------------------------------------------------------
 
@@ -123,6 +124,16 @@ sub test_append : Test(1) {
     $str1 .= $str2;
     $ln->append($str2);
     $self->is($ln->text,$str1);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_trim : Test(1) {
+    my $self = shift;
+
+    my $ln = Prty::LineProcessor::Line->new('    Ein Test.   ',1,\'[testfile]');
+    $ln->trim;
+    $self->is($ln->text,'Ein Test.');
 }
 
 # -----------------------------------------------------------------------------

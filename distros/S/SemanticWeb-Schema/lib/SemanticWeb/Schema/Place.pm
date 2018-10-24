@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Place;
 
 # ABSTRACT: Entities that have a somewhat fixed
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has additional_property => (
@@ -264,7 +266,7 @@ SemanticWeb::Schema::Place - Entities that have a somewhat fixed
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -278,7 +280,7 @@ C<additionalProperty>
 
 =for html A property-value pair representing an additional characteristics of the
 entitity, e.g. a product feature or another characteristic for which there
-is no matching property in schema.org.</p> <p>Note: Publishers should be
+is no matching property in schema.org.<br/><br/> Note: Publishers should be
 aware that applications designed to use specific schema.org properties
 (e.g. http://schema.org/width, http://schema.org/color,
 http://schema.org/gtin13, ...) will typically expect such data to be
@@ -345,7 +347,7 @@ C<branchCode>
 
 =for html A short textual code (also called "store code") that uniquely identifies a
 place of business. The code is typically assigned by the parentOrganization
-and used in structured URLs.</p> <p>For example, in the URL
+and used in structured URLs.<br/><br/> For example, in the URL
 http://www.starbucks.co.uk/store-locator/etc/detail/3047 the code "3047" is
 a branchCode for a particular branch.
 
@@ -446,9 +448,9 @@ A geo should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
-
 =item C<InstanceOf['SemanticWeb::Schema::GeoCoordinates']>
+
+=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
 =back
 
@@ -479,9 +481,9 @@ A has_map should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Map']>
+
+=item C<Str>
 
 =back
 
@@ -589,9 +591,9 @@ A photo should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Photograph']>
+
+=item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
 
 =back
 
@@ -603,9 +605,9 @@ A photos should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Photograph']>
-
 =item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Photograph']>
 
 =back
 
@@ -668,8 +670,9 @@ A smoking_allowed should be one of the following types:
 
 C<specialOpeningHoursSpecification>
 
-=for html The special opening hours of a certain place.</p> <p>Use this to explicitly
-override general opening hours brought in scope by <a class="localLink"
+=for html The special opening hours of a certain place.<br/><br/> Use this to
+explicitly override general opening hours brought in scope by <a
+class="localLink"
 href="http://schema.org/openingHoursSpecification">openingHoursSpecificatio
 n</a> or <a class="localLink"
 href="http://schema.org/openingHours">openingHours</a>.

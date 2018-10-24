@@ -8,17 +8,23 @@ use Path::Tiny qw(path);
 
 my ($infile, $outfile);
 my $url = '';
-my $class = 1;
+my $class;
+my $span;
+my $id;
+my $force;
 
 GetOptions(
 	'infile=s'  => \$infile,
 	'outfile=s' => \$outfile,
 	'url=s'     => \$url,
-	'class!'    => \$class,
+	'class'     => \$class,
+	'span'      => \$span,
+	'id'        => \$id,
+	'force'     => \$force,
 ) or usage();
 usage() if not $infile or not $outfile;
 die "Infile '$infile' does not exist.\n" if not -e $infile;
-die "Outfile '$outfile' already exists.\n" if -e $outfile;
+die "Outfile '$outfile' already exists.\n" if -e $outfile and not $force;
 
 main();
 exit;
@@ -28,6 +34,8 @@ sub main {
 	my $parser = Text::Trac->new(
 		trac_url      => $url,
 		class         => $class,
+		span          => $span,
+		id            => $id,
 	#	disable_links => [ qw( changeset ticket ) ],
 	);
 	$parser->parse( path($infile)->slurp_utf8 );
@@ -42,7 +50,10 @@ Usage: $0
     --outfile filename    (The html file to generate)
 
     --url http://...      ()
-    --noclass             Don't include class="" in the HTML tags.
+    --class               Include class="" in the HTML tags.
+	--span                Include <span></span>
+    --id                  Include id="" in the HTML tags.
+    --force               Overwrite exisiting html file.
 END_USAGE
 	exit;
 }

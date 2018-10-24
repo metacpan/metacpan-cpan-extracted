@@ -1,5 +1,9 @@
 Revision history for App-Module-Setup
 
+0.07	2018-10-21
+	Add minimal perl version, defaults to 5.008.
+	Add license, defaults to perl_5.
+
 0.06	2013-07-04
 	Some changes for older Perl versions. Should run under 5.8,
 	maybe even 5.6.

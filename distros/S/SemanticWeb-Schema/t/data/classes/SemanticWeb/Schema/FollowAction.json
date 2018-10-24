@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of forming a personal connection with someone/something (object) unidirectionally/asymmetrically to get updates polled from.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/BefriendAction\">BefriendAction</a>: Unlike BefriendAction, FollowAction implies that the connection is <em>not</em> necessarily reciprocal.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/SubscribeAction\">SubscribeAction</a>: Unlike SubscribeAction, FollowAction implies that the follower acts as an active agent constantly/actively polling for updates.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/RegisterAction\">RegisterAction</a>: Unlike RegisterAction, FollowAction implies that the agent is interested in continuing receiving updates from the object.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/JoinAction\">JoinAction</a>: Unlike JoinAction, FollowAction implies that the agent is interested in getting updates from the object.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/TrackAction\">TrackAction</a>: Unlike TrackAction, FollowAction refers to the polling of updates of all aspects of animate objects rather than the location of inanimate objects (e.g. you track a package, but you don't follow it).</li>\n</ul>\n",
+      "rdfs:comment" : "The act of forming a personal connection with someone/something (object) unidirectionally/asymmetrically to get updates polled from.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/BefriendAction\">BefriendAction</a>: Unlike BefriendAction, FollowAction implies that the connection is <em>not</em> necessarily reciprocal.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/SubscribeAction\">SubscribeAction</a>: Unlike SubscribeAction, FollowAction implies that the follower acts as an active agent constantly/actively polling for updates.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/RegisterAction\">RegisterAction</a>: Unlike RegisterAction, FollowAction implies that the agent is interested in continuing receiving updates from the object.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/JoinAction\">JoinAction</a>: Unlike JoinAction, FollowAction implies that the agent is interested in getting updates from the object.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/TrackAction\">TrackAction</a>: Unlike TrackAction, FollowAction refers to the polling of updates of all aspects of animate objects rather than the location of inanimate objects (e.g. you track a package, but you don't follow it).</li>\n</ul>\n",
       "rdfs:label" : "FollowAction",
       "rdfs:subClassOf" : "schema:InteractAction"
    },
@@ -13,8 +13,8 @@
          "rdfs:subPropertyOf" : "schema:object",
          "schema:domainIncludes" : "schema:FollowAction",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       }
    }

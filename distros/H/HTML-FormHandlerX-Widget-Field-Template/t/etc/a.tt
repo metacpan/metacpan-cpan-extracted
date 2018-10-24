@@ -1,0 +1,1 @@
+<input name="[% field.name %]" type="[% field.type_attr %]" value="[% field.default %]" x-field-method="[% field_method %]" x-form-method="[% form_method %]" x-form-method-a="[% form_method_a %]">

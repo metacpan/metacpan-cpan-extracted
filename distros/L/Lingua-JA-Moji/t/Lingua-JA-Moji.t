@@ -139,11 +139,21 @@ is (smallize_kana ('シヤツター'), 'シャッター',
 
 is (smallize_kana ('ケンブリツジ'), 'ケンブリッジ');
 
+is (smallize_kana ('ツプ'), undef, "Cannot smallize tsu kana at start");
+is (smallize_kana ('感ツプ'), undef, "Cannot smallize tsu kana after non-kana");
+is (smallize_kana ('サンゼンツプ'), undef, "Cannot smallize tsu kana after n");
+is (smallize_kana ('サツプ'), 'サップ', "Can smallize kana after 'sa'");
+
 # Test the cleanup of badly-input kana
 
 is (cleanup_kana ('kaｋｉｸけコ一'), 'カキクケコー', "Clean up kana");
 is (cleanup_kana ('ファ二ガ'), 'ファニガ',
     "Convert 'two' kanji to 'ni' kana");
+
+# The input here is roku-ku-hachi-chi-ni (number)" with three
+# kanjis. The output is all katakana.
+
+is (cleanup_kana ('口ク八チ二'), 'ロクハチニ', "Cleanup of funny kanji");
 
 # Tests of bad_kanji
 

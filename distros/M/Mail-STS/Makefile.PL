@@ -20,6 +20,8 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "Moose" => 0,
     "Net::DNS::Resolver" => 0,
+    "Time::Piece" => 0,
+    "Time::Seconds" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0
   },
@@ -29,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +46,8 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Pod" => 0,
+  "Time::Piece" => 0,
+  "Time::Seconds" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0
 );

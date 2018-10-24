@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Reservation;
 
 # ABSTRACT: Describes a reservation for travel
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has booking_agent => (
@@ -136,12 +138,12 @@ SemanticWeb::Schema::Reservation - Describes a reservation for travel
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
 =for html Describes a reservation for travel, dining or an event. Some reservations
-require tickets. </p> <p>Note: This type is for information about actual
+require tickets. <br/><br/> Note: This type is for information about actual
 reservations, e.g. in confirmation emails or HTML pages with individual
 confirmations of reservations. For offers of tickets, restaurant
 reservations, flights, or rental cars, use <a class="localLink"
@@ -160,9 +162,9 @@ A booking_agent should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -191,9 +193,9 @@ A broker should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -215,10 +217,17 @@ A modified_time should be one of the following types:
 
 C<priceCurrency>
 
-=for html The currency (in 3-letter ISO 4217 format) of the price or a price
-component, when attached to <a class="localLink"
+=for html The currency of the price, or a price component when attached to <a
+class="localLink"
 href="http://schema.org/PriceSpecification">PriceSpecification</a> and its
-subtypes.
+subtypes.<br/><br/> Use standard formats: <a
+href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217 currency format</a>
+e.g. "USD"; <a
+href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">Ticker
+symbol</a> for cryptocurrencies e.g. "BTC"; well known names for <a
+href="https://en.wikipedia.org/wiki/Local_exchange_trading_system">Local
+Exchange Tradings Systems</a> (LETS) and other currency types e.g. "Ithaca
+HOUR".
 
 A price_currency should be one of the following types:
 
@@ -253,9 +262,9 @@ A provider should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -328,9 +337,9 @@ A total_price should be one of the following types:
 
 =item C<Num>
 
-=item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
 
 =back
 

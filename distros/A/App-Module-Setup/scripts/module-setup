@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Jun 30 21:15:32 2013
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jul  3 18:25:41 2013
-# Update Count    : 56
+# Last Modified On: Sun Oct 21 16:16:54 2018
+# Update Count    : 59
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -88,6 +88,8 @@ sub app_setup {
 	  'module=s',
 	  'template=s',
 	  'postcmd=s@',
+	  'license=s',
+	  'minperl=s',
 	  'install-templates',
 
 	  'git' => sub { push( @{ $options->{postcmd} }, "git init" ) },
@@ -144,6 +146,8 @@ Usage: $0 [options] [ module ]
     --template=XXX	select a set of templates*
     --postcmd=XXX	command(s) to execute after creating*
     --git		set up a git repo after creating
+    --minperl=N.NNNN	minimal perl version, e.g. 5.010000
+    --license=XXX	e.g. perl_5
     --install-templates	install the default templates
     --config=CFG	load options from config file
     --help		this message
@@ -396,9 +400,17 @@ Same, but all lowercase. E.g., C<foo-bar>.
 
 The file name for the module, e.g., C<Foo/Bar.pm>.
 
+=item module.license
+
+The license for this module. Defaults to C<perl_5>,
+
 =item current.year
 
 The current year, for copyrights and such. E.g., C<2013>.
+
+=item perl.minversion
+
+The minimal version of perl required for this module. Defaults to C<5.008>.
 
 =back
 

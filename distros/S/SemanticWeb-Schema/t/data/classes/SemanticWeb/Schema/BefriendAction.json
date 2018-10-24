@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of forming a personal connection with someone (object) mutually/bidirectionally/symmetrically.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/FollowAction\">FollowAction</a>: Unlike FollowAction, BefriendAction implies that the connection is reciprocal.</li>\n</ul>\n",
+      "rdfs:comment" : "The act of forming a personal connection with someone (object) mutually/bidirectionally/symmetrically.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/FollowAction\">FollowAction</a>: Unlike FollowAction, BefriendAction implies that the connection is reciprocal.</li>\n</ul>\n",
       "rdfs:label" : "BefriendAction",
       "rdfs:subClassOf" : "schema:InteractAction"
    },

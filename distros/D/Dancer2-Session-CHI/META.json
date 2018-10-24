@@ -1,0 +1,55 @@
+{
+   "abstract" : "Dancer 2 session storage with CHI backend",
+   "author" : [
+      "Jason A. Crome <cromedome@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Session-CHI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0",
+            "Dancer2" : "0",
+            "JSON" : "0",
+            "Moo" : "0",
+            "Type::Tiny" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cromedome/Dancer2-Session-CHI/issues"
+      },
+      "homepage" : "http://perldancer.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cromedome/Dancer2-Session-CHI.git",
+         "web" : "https://github.com/cromedome/Dancer2-Session-CHI"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dancer",
+      "x_WebIRC" : "https://chat.mibbit.com/#dancer@irc.perl.org"
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0223"
+}
+

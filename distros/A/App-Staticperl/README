@@ -823,9 +823,17 @@ THE STATICPERL SCRIPT
         again. The default is empty, which means there is no cache.
 
     "PERL_VERSION"
-        The perl version to install - default is currently 5.12.3, but 5.8.9
-        is also a good choice (5.8.9 is much smaller than 5.12.3, while
-        5.10.1 is about as big as 5.12.3).
+        The perl version to install - 5.12.5 is a good choice for small
+        builds, but 5.8.9 is also a good choice (5.8.9 is much smaller than
+        5.12.5), if it builds on your system.
+
+        You can also set this variable to the absolute URL of a tarball
+        (.tar, .tar.gz, .tar.bz2, .tar.lzma or .tar.xz), or to the absolute
+        path of an unpacked perl source tree, which will be copied.
+
+        The default is currently
+        http://stableperl.schmorp.de/dist/latest.tar.gz, i.e. the latest
+        stableperl release.
 
     "PERL_MM_USE_DEFAULT", "EV_EXTRA_DEFS", ...
         Usually set to 1 to make modules "less inquisitive" during their
@@ -1035,8 +1043,8 @@ RUNTIME FUNCTIONALITY
     mostly related to the extra files bundled in the binary (the virtual
     filesystem). All of this data is statically compiled into the binary,
     and accessing means copying it from a read-only section of your binary.
-    Data pages in this way is usually freed by the operating system, as it
-    isn't use more the onace.
+    Data pages in this way are usually freed by the operating system, as
+    they aren't used more then once.
 
   VIRTUAL FILESYSTEM
     Every bundle has a virtual filesystem. The only information stored in it

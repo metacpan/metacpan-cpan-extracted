@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::LoanOrCredit;
 
 # ABSTRACT: A financial product for the loaning of an amount of money under agreed terms and charges.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has amount => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::LoanOrCredit - A financial product for the loaning of an am
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -73,9 +75,9 @@ A amount should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=item C<Num>
 
 =back
 

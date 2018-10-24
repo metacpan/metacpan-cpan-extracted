@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::VoteAction;
 
 # ABSTRACT: The act of expressing a preference from a fixed/finite/structured set of choices/options.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has candidate => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::VoteAction - The act of expressing a preference from a fixe
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

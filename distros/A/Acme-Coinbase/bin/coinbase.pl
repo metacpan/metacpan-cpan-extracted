@@ -113,9 +113,9 @@ sub perform_request {
         if ($verbose) {
             # a handler to dump out the request for debugging
             $ua->add_handler( request_send => sub { 
-                    print "$prog: verbose mode: BEGIN dump of request object: ***********\n";
-                    shift->dump; 
-                    print "$prog: verbose mode: END dump of request object: *************\n";
+                    #print "$prog: verbose mode: BEGIN dump of request object: ***********\n";
+                    #shift->dump; 
+                    #print "$prog: verbose mode: END dump of request object: *************\n";
                     return 
                 });
         }
@@ -138,19 +138,11 @@ sub perform_request {
 # Connection: close
 # Host: coinbase.com
 
-__END__
-
 =pod
-
-=encoding UTF-8
 
 =head1 NAME
 
-coinbase.pl 
-
-=head1 VERSION
-
-version 0.007
+coinbase.pl -- Tests checking a balance using the coinbase api
 
 =head1 SYNOPSIS
 
@@ -162,15 +154,12 @@ or
 
       perl -Ilib bin/coinbase.pl --use-curl
 
+
 both with and without curl the script outputs some debug info
 
 =head1 DESCRIPTION
 
 Tests checking a balance using the coinbase api
-
-=head1 NAME
-
-coinbase.pl -- Tests checking a balance using the coinbase api
 
 =head1 OPTIONS
 
@@ -210,21 +199,11 @@ Hard code the nonce to a particular number. For testing.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014 Josh Rabinowitz, All Rights Reserved.
+Copyright (c) 2018 Josh Rabinowitz, All Rights Reserved.
 
 =head1 AUTHORS
 
 Josh Rabinowitz
 
-=head1 AUTHOR
+=cut    
 
-joshr <joshr>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by joshr.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

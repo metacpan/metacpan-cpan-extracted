@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/String/Interpolate/Named.pm
+t/00-load.t
+t/10-basic.dat
+t/10-basic.t
+t/11-arrays.t
+t/20-multi.dat
+t/20-multi.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

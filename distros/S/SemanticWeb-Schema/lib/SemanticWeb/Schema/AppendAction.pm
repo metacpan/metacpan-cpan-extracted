@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::AppendAction;
 
 # ABSTRACT: The act of inserting at the end if an ordered collection.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::AppendAction - The act of inserting at the end if an ordere
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

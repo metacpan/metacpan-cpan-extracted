@@ -1,0 +1,13 @@
+Changes
+lib/Mojolicious/Plugin/SpectreCss.pm
+lib/Mojolicious/Plugin/SpectreCss.pod
+lib/Mojolicious/Plugin/SpectreCss/asset/public/spectre/0.5.3/core.min.css
+lib/Mojolicious/Plugin/SpectreCss/asset/public/spectre/0.5.3/exp.min.css
+lib/Mojolicious/Plugin/SpectreCss/asset/public/spectre/0.5.3/icons.min.css
+Makefile.PL
+MANIFEST			This list of files
+Mojolicious-Plugin-SpectreCss-0.01/META.json
+Mojolicious-Plugin-SpectreCss-0.01/META.yml
+t/basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

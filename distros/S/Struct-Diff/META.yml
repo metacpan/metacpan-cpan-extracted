@@ -21,6 +21,7 @@ no_index:
     - inc
 requires:
   Algorithm::Diff: 1.19
+  Carp: 0
   Exporter: 0
   Scalar::Util: 0
   Storable: 2.05
@@ -30,4 +31,4 @@ requires:
   warnings: 0
 resources:
   repository: https://github.com/mr-mixas/Struct-Diff.pm
-version: 0.96
+version: 0.97

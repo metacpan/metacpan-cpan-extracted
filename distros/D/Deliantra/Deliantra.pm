@@ -8,7 +8,7 @@ Deliantra - Deliantra suppport module to read/write archetypes, maps etc.
 
 package Deliantra;
 
-our $VERSION = '1.30';
+our $VERSION = '2.0';
 
 use common::sense;
 
@@ -58,7 +58,8 @@ our %FIELD_MOVEMENT = map +($_ => undef),
 # to the other editors.
 our @FIELD_ORDER_MAP = (qw(
    file_format_version
-   name attach swap_time reset_timeout fixed_resettime difficulty region
+   name attach swap_time reset_timeout fixed_resettime difficulty
+   region music
    shopitems shopgreed shopmin shopmax shoprace
    darkness width height enter_x enter_y msg maplore
    unique template
@@ -74,7 +75,7 @@ our @FIELD_ORDER = (qw(
    name name_pl custom_name attach title race
    slaying skill msg lore other_arch
    sound sound_destroy face animation is_animated
-   magicmap smoothlevel smoothface
+   magicmap glyph smoothlevel smoothface
    str dex con wis pow cha int
    hp maxhp sp maxsp grace maxgrace
    exp perm_exp expmul
@@ -132,6 +133,26 @@ our %EVENT_TYPE = (
    trigger => 10,
    close   => 11,
    timer   => 12,
+);
+
+# 1 up 2 right 4 down 8 left
+our %WALLDIR = (
+  0     =>  0,
+  1_2   =>  1,
+  1_4   =>  2,
+  2_2_1 =>  3,
+  1_1   =>  4,
+  2_1_1 =>  5,
+  2_2_2 =>  6,
+  3_2   =>  7,
+  1_3   =>  8,
+  2_2_4 =>  9,
+  2_1_2 => 10,
+  3_1   => 11,
+  2_2_3 => 12,
+  3_4   => 13,
+  3_3   => 14,
+  4     => 15,
 );
 
 sub MOVE_WALK      (){ 0x01 }
@@ -991,7 +1012,10 @@ sub load_tilecache() {
    cache_file "$LIB/facedata", "$VARDIR/tilecache.pst", \&use_tilecache,
       sub {
          my %cache;
-         my $facedata = Storable::retrieve "$LIB/facedata";
+         my $facedata = Storable::retrieve "$LIB/faceinfo";
+
+         open my $fh, "<", "$LIB/facedata"
+            or die "$LIB/facedata: $!";
 
          $facedata->{version} == 2
             or die "$LIB/facedata: version mismatch, cannot proceed.";
@@ -1003,7 +1027,14 @@ sub load_tilecache() {
             my ($face, $info) = ($_, $faces->{$_});
 
             my $pb = new Gtk2::Gdk::PixbufLoader;
-            $pb->write ($info->{data32});
+
+            if (exists $info->{data32}) {
+               $pb->write ($info->{data32});
+            } else {
+               sysseek $fh, $info->{fofs32}, 0;
+               sysread $fh, my $buf, $info->{size32};
+               $pb->write ($buf);
+            }
             $pb->close;
             my $pb = $pb->get_pixbuf;
 

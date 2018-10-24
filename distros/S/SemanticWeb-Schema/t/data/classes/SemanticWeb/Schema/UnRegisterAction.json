@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of un-registering from a service.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/RegisterAction\">RegisterAction</a>: antonym of UnRegisterAction.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/Leave\">Leave</a>: Unlike LeaveAction, UnRegisterAction implies that you are unregistering from a service you werer previously registered, rather than leaving a team/group of people.</li>\n</ul>\n",
+      "rdfs:comment" : "The act of un-registering from a service.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/RegisterAction\">RegisterAction</a>: antonym of UnRegisterAction.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/LeaveAction\">LeaveAction</a>: Unlike LeaveAction, UnRegisterAction implies that you are unregistering from a service you werer previously registered, rather than leaving a team/group of people.</li>\n</ul>\n",
       "rdfs:label" : "UnRegisterAction",
       "rdfs:subClassOf" : "schema:InteractAction"
    },

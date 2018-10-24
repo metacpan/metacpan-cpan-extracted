@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::WarrantyPromise;
 
 # ABSTRACT: A structured value representing the duration and scope of services that will be provided to a customer free of charge in case of a defect or malfunction of a product.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has duration_of_warranty => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::WarrantyPromise - A structured value representing the durat
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

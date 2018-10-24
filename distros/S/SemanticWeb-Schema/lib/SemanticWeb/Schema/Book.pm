@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Book;
 
 # ABSTRACT: A book.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has book_edition => (
@@ -72,7 +74,7 @@ SemanticWeb::Schema::Book - A book.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

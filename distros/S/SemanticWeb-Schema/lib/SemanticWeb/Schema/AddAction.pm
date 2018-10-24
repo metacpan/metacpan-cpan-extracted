@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::AddAction;
 
 # ABSTRACT: The act of editing by adding an object to a collection.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::AddAction - The act of editing by adding an object to a col
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

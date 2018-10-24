@@ -7,7 +7,7 @@ build_requires:
   Test::Harness: '3.35'
   Test::Unit::Lite: '0.1202'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
 license: unknown
@@ -28,4 +28,4 @@ requires:
   JSON: '2.94'
   Storable: '2.53'
   perl: '5.010001'
-version: '1.21'
+version: '1.22'

@@ -8,7 +8,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Fcntl: '0'
   File::Basename: '0'
-  File::Spec: '0'
+  File::Spec: '3.01'
   File::Temp: '0'
   IO::Handle: '0'
   POSIX: '0'
@@ -44,7 +44,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/perhunter/slurp.git
-version: '9999.22'
+version: '9999.23'
 x_contributors:
   - 'Aristotle Pagaltzis <ARISTOTLE@cpan.org>'
   - 'Chase Whitener <capoeirab@cpan.org>'

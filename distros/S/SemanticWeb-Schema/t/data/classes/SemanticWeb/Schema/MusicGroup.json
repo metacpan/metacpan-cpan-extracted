@@ -27,8 +27,8 @@
          "rdfs:label" : "genre",
          "schema:domainIncludes" : [
             "schema:MusicGroup",
-            "schema:CreativeWork",
-            "schema:BroadcastChannel"
+            "schema:BroadcastChannel",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
             "schema:URL",
@@ -44,7 +44,7 @@
          "schema:supersededBy" : "schema:member"
       },
       "schema:track" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A music recording (track)&#x2014;usually a single song. If an ItemList is given, the list should contain items of type MusicRecording.",
          "rdfs:label" : "track",
@@ -53,8 +53,8 @@
             "schema:MusicPlaylist"
          ],
          "schema:rangeIncludes" : [
-            "schema:MusicRecording",
-            "schema:ItemList"
+            "schema:ItemList",
+            "schema:MusicRecording"
          ]
       },
       "schema:tracks" : {
@@ -62,8 +62,8 @@
          "rdfs:comment" : "A music recording (track)&#x2014;usually a single song.",
          "rdfs:label" : "tracks",
          "schema:domainIncludes" : [
-            "schema:MusicGroup",
-            "schema:MusicPlaylist"
+            "schema:MusicPlaylist",
+            "schema:MusicGroup"
          ],
          "schema:rangeIncludes" : "schema:MusicRecording",
          "schema:supersededBy" : "schema:track"

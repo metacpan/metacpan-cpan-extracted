@@ -22,7 +22,7 @@ docmake
 
 =head1 VERSION
 
-version 0.0601
+version 0.0603
 
 =head1 SYNOPSIS
 
@@ -31,6 +31,9 @@ version 0.0601
 
     # Same with more verbose output
     docmake -v -o output.xhtml xhtml input.xml
+
+    # Avoid trailing slash when emitting to a dummy file in a dir
+    docmake --trailing-slash=0 -o output/notneeded.xhtml xhtml5 input.xml
 
     # Render into pdf
     docmake -v -o output.pdf pdf input.xml
@@ -124,6 +127,11 @@ Specify the string parameter of B<KEY> as B<VALUE>. Note that as opposed to
 xsltproc, B<KEY> and B<VALUE> cannot be specified as different command line
 arguments, but rather should be on the same one, delimited by an equal sign ("C<=>").
 
+=item * --trailing-slash=0
+
+Disable adding a trailing slash when building into an HTML file, to emit
+an unneeded file there. B<Note> the C<=0> argument.
+
 =item * --make
 
 Behave like make in building files only if their dependencies are newer.
@@ -140,7 +148,7 @@ docmake - a tool to render DocBook/XML into various output formats.
 
 =head1 VERSION
 
-version 0.0601
+version 0.0603
 
 =head1 SUPPORT
 
@@ -288,9 +296,9 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<https://github.com/shlomif/app-xml-docbook-builder>
+L<https://github.com/shlomif/docmake>
 
-  git clone http://bitbucket.org/shlomif/docmake
+  git clone git://github.com/shlomif/docmake.git
 
 =head1 AUTHOR
 
@@ -299,9 +307,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<http://rt.cpan.org/Public/Dist/Display.html?Name=App-XML-DocBook-Builder>
-or by email to
-L<bug-app-xml-docbook-builder@rt.cpan.org|mailto:bug-app-xml-docbook-builder@rt.cpan.org>.
+L<https://github.com/shlomif/docmake/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

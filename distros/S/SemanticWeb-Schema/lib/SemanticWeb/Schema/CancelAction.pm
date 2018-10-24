@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::CancelAction;
 
-# ABSTRACT: <p>The act of asserting that a future event/action is no longer going to happen
+# ABSTRACT: The act of asserting that a future event/action is no longer going to happen
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,16 +30,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::CancelAction - <p>The act of asserting that a future event/action is no longer going to happen
+SemanticWeb::Schema::CancelAction - The act of asserting that a future event/action is no longer going to happen
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of asserting that a future event/action is no longer going to
-happen.</p> <p>Related actions:</p> <ul> <li><a class="localLink"
+=for html The act of asserting that a future event/action is no longer going to
+happen.<br/><br/> Related actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/ConfirmAction">ConfirmAction</a>: The antonym of
 CancelAction.</li> </ul> 
 

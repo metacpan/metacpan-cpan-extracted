@@ -9,12 +9,8 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "enable all of the features of Modern Perl with one import",
   "AUTHOR" => "chromatic",
-  "BUILD_REQUIRES" => {
-    "Module::Build" => "0.28"
-  },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "Module::Build" => "0.28"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Modern-Perl",
   "LICENSE" => "perl",
@@ -32,7 +28,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.98"
   },
-  "VERSION" => "1.20180928",
+  "VERSION" => "1.20181021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +38,6 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "IO::File" => 0,
   "IO::Handle" => 0,
-  "Module::Build" => "0.28",
   "Test::More" => "0.98",
   "autodie" => "2.22",
   "feature" => 0,

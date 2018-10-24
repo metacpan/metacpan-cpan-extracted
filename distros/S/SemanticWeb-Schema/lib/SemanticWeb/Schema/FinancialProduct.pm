@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::FinancialProduct;
 
 # ABSTRACT: A product provided to consumers and businesses by financial institutions such as banks
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has annual_percentage_rate => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::FinancialProduct - A product provided to consumers and busi
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

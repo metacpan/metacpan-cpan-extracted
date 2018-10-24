@@ -1,0 +1,202 @@
+[[PageOutline(1-5, Table of Contents, floated)]]
+= DMG Betas =
+
+As a beta release, Padre is available as a packaged Application for OsX.
+
+See this page for the latest DMG: http://wildperl.com/padreonosx/
+
+This is a beta and we could really use your help. We need more OSX testers, and any help you can give us, even saying it runs fine for you, is important.
+
+Open tickets can be found here: [wiki:osxbugs], and [http://widget.mibbit.com/?server=irc.perl.org&channel=%23padre hop on to IRC] as the best way to report any issues and give feedback.
+
+= Installation from source =
+
+There are several methods of installing Padre from source. As such, they require some familiarity with command-line usage of OsX.
+
+**System Perl vs User Perl:** Padre requires a 32bit version of Perl and wxWidgets 2.8.12. These are not the default on OsX. Additionally, the default "system" perl on OsX may be altered or changed in the course of software updates from Apple. Consequently, building Padre requires creating a self-contained perl, wxWidgets, and Padre.
+
+**Xcode:** On OsX most of the common development utilities that are referenced by perl (gcc, make, etc) are provided by installing Xcode. The instruction sets below assume that you have installed these or reasonable substitutes on your system, that they are properly in your path, etc. 
+
+**Wx Tests:** There will be a point where you are compiling Wx. The tests for Wx involve generating many window primitives. These tests will fail if they are run inside of a gnu-screen or ssh session. (The error message might be a bit strange: stating issues creating the clipboard because of permissions.) Additionally, during the test cycle many of the tests will grab focus on the UI. This will make your system unusable for a short period of time. Let the tests run. If you try to quit out of them, you will cause the tests to fail and it will halt the compile.
+
+== Option 1 - Installation with Citrus Perl ==
+
+Cirtus Perl is a portable distribution of perl that has pre-built Wx binaries and integration. A shortened form of installation instructions is below. Refer to the installation instructions on the download page below if you want full details.
+
+- Download Citrus Perl from http://www.citrusperl.com/platform/macosx.html
+- Unpack Citrus Perl into your favorite dev location:
+{{{#!sh
+  cd ~/dev
+  tar xzvf ~/Downloads/citrusperl-standard-51402-20903-osx-i32-014.tar.gz
+}}}
+- This has created a "`CitrusPerl`" directory that has a fully isolated install of perl, including Wx. You can also use CPAN to add to this perl without polluting your system's install of perl with additional modules. (Also meaning that an apple update will not break your version of perl if you use this.)
+- Configure Cirtus Perl to work in its new location
+{{{#!sh
+  ./CitrusPerl/bin/relocateperl
+  ./CitrusPerl/bin/citrusvars.sh
+}}}
+- At this point you can put Citrus Perl in your path. Set it ahead of other entries by putting the line below as the last line in your `.bash_profile`. That will make any command line invocation of `perl` or `cpan` use Citrus Perl and not your system perl. Substitute `/Users/joe/dev` below with your chosen installation directory.
+{{{#!sh
+  export PATH=/Users/joe/dev/CitrusPerl/bin:$PATH
+}}}
+- Reload your `.bash_profile` to use the new path
+{{{#!sh
+  source ~/.bash_profile
+}}}
+- To install Padre, use `cpan` and run the command `install Padre`. This will build all required dependencies along the way, so it will take some time.
+{{{#!sh
+  cpan
+  > install Padre
+  > exit
+}}}
+- Padre should now be in your path and usable on the command line
+{{{#!sh
+  padre
+}}}
+
+== Option 2 - Installation with Mac Ports ==
+
+Mac Ports is a project to provide many GNU and Open Source utilities to OsX. It packages and installs them in `/opt/local`.
+
+- Mac Ports can be downloaded and installed as a package from http://www.macports.org/install.php and configured:
+{{{#!sh
+ sudo port -f selfupdate
+}}}
+- Remember to follow the instructions to put Mac Ports first in your path so the Ports version of perl will execute when called on the command line:
+{{{#!sh
+  export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+}}}
+- Install Perl and Wx (This will include many dependencies and take some time to compile and complete.)
+{{{#!sh
+ sudo port install perl5 +threads
+ sudo port install wxWidgets
+}}}
+- Install Padre via CPAN
+{{{#!sh
+  sudo /opt/local/bin/cpan
+  > install Padre
+}}}
+- Padre should now be in your path and usable on the command line
+{{{#!sh
+  padre
+}}}
+
+== Option 3 - Compiling a Perl with Perl Brew ==
+
+We are attempting to automate the process using the bin/padre-brew.pl [http://bit.ly/oiME1I available here].
+
+If you want to build on your own you should note the environment settings and build parameters used on [http://wildperl.com/2011/07/padre-on-osx-dmg-now-on-leopard-snow-leopard-and-lion/ OSX Lion], or refer to the bin/padre-brew.pl source for other OSX levels.
+
+= Installing on top of the system Perl =
+
+//As stated above, this is not recommended. You are manipulating portions of the system OS which may be changed in the future by Apple and/or you may cause unintended side-effects in your OS.//
+
+Pre-Lion versions of OsX had varying levels of Perl, Wx and sometimes wxPerl installed. Sometimes with a minimum of effort, a functioning wxPerl and Padre could be made to work. 
+(OS X 10.4 has wxPerl 0.22, 10.5 has a more recent version (0.6x for some x))
+
+Generally, you do not use the system 'perl' executable, but build a 'wxPerl' executable (see this [http://www.nntp.perl.org/group/perl.wxperl.users/2008/07/msg5978.html thread regarding wxPerl invocation]).
+
+Reading up on installation using [wiki:DownloadNetBSD pkgsrc] may also help.
+
+=== Checking what versions you currently have ===
+
+If you have trouble you can check which version of wxWidgets you have:
+{{{#!perl
+$ perl -MWx -le'print  "Wx Version: $Wx::VERSION " . Wx::wxVERSION_STRING()'
+}}}
+and on Mac: 
+{{{#!perl
+$ wxPerl -MWx -le'print  "Wx Version: $Wx::VERSION " . Wx::wxVERSION_STRING()'
+}}}
+We use Wx 0.87 and wxWidgets 2.8.8 so you probably should have those (or newer) too.
+
+== Installation from CPAN ==
+
+The most straightforward method is to install everything from source. This will ignore any existing wxWidgets installation.
+
+ 1. $ wxPerl -MCPAN -eshell
+ 1. [cpan] $ install Alien::wxWidgets [choose install from source, which is NOT the default]
+ 1. Go do something else while it compiles wxWidgets.
+ 1. [cpan] $ install Wx
+ 1. [cpan] $ install Padre
+
+Padre has a LOT of prerequisites. You're likely to run into some problems with tests failing. IPC::Run3 was a particular problem due to its prerequisites, but a later individual install worked fine. Just make your way through them all, and 'force notest install $module' as needed. Once you've got padre installed you start it by running /usr/local/bin/padre.
+
+=== Notes on building wxWdigets from source ===
+
+When installing Alien::wxWidgets it will ask if you want to compile wxWidgets. 
+'''Do you want to fetch and build wxWidgets from sources?'''
+If you don't have any installed or if you have an old version (< 2.8.8) then you should answer yes.
+It will try to download the source code of wxWidgets which is big and the download often fails.
+
+To get around that you can download the file manually and put it in the extracted directory of
+Alien::wxWidgets.
+
+Something like this:
+{{{#!sh
+ $ cd /tmp
+ $ wget http://prdownloads.sourceforge.net/wxwindows/wxWidgets-2.8.8.tar.gz
+ $ cpan
+ cpan> look Alien::wxWidgets
+ $ cp /tmp/wxWidgets-2.8.8.tar.gz .
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ $ make install
+ $ exit
+ cpan>quit
+ $
+}}}
+
+== Variation 1 - Taking the lazy way ==
+
+If you're lazy and enjoy taking risks... the easiest way to install on OSX may be (there will be some test failures - which you'll have to force install, including Padre itself, due to wxPerl issues): 
+
+{{{#!sh
+cpan Alien::wxWidgets
+wxPerl -MCPAN -eshell
+ $ install Padre
+}}}
+and then replace the /usr/local/bin/padre script with the updated version at http://padre.perlide.org/trac/browser/trunk/Padre/script/padre
+
+After installing Alien::wxWidget there are new versions of wx-config and wxrc somewhere in your Perl Library Path, (mine went under  site_perl/darwin-thread-multi-2level/Alien/wxWidgets/mac_2_8_10_uni/bin), which need to be first in your PATH, otherwise Wx might build against the wrong Library. As an alternative you can set an environment variable WX_CONFIG which has to point to the new wx-config executable. See the Wx docs for more info.
+
+== Variation 2 - Using a package manager for the Wx portion ==
+
+Aside from building from source, you can also install newer versions of Wx on OS X using a package manager:
+
+[http://www.finkproject.org/ Fink]
+{{{#!sh
+fink install wxmac28
+}}}
+
+[http://www.macports.org/ Mac Ports]
+{{{#!sh
+port install wxWidgets
+}}}
+
+= Creating an App Icon for your command-line Padre =
+
+It is possible to create an Application icon to launch your command-line version of Padre. You can create an Applescript application to do this.
+
+Launch the Applescript Editor from the Utilities folder in the Applications folder.
+
+You will enter a line to launch padre which which uses the full path of your preferred perl and padre. 
+
+For Mac ports:
+{{{#!sh
+  do shell script "/opt/local/bin/perl /opt/local/bin/padre"
+}}}
+
+For Citrus Perl: (change `/Users/joe/dev/` to your path for Citrus Perl)
+{{{#!sh
+  do shell script "/Users/joe/dev/CitrusPerl/i32/5-12/bin/perl /Users/joe/dev/CitrusPerl/i32/5-12/site/bin/padre"
+}}}
+
+Select "Save As" under the file menu. Select the format of "Application." Name it what you'd like and install it where you'd like it to be. (IE: the Applications folder)
+
+Clicking on this icon should now launch Padre.
+----
+= Links
+* http://www.perlmonks.org/?node_id=910271
+

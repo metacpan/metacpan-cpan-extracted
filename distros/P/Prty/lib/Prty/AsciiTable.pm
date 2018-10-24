@@ -3,8 +3,9 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Unindent;
 use Prty::FileHandle;
@@ -25,7 +26,7 @@ L<Prty::Hash>
 
 Ein Objekt der Klasse repräsentiert eine Tabelle, die in Form
 eines ASCII-Texts gegeben ist. Diese Darstellung wird an den
-Konstruktor übergeben, von der Klasse geparst und inhaltlich
+Konstruktor übergeben, von diesem geparst und inhaltlich
 analysiert. Die Klasse stellt Methoden zur Verfügung, um die
 Eigenschaften der Tabelle abzufragen.
 
@@ -357,6 +358,29 @@ sub new {
 =head4 Synopsis
 
     @align | $alignA = $tab->alignments;
+    @align | $alignA = $tab->alignments($domain);
+
+=head4 Arguments
+
+=over 4
+
+=item $domain (Default: 'latex')
+
+Legt die gelieferte Wertemenge fest.
+
+=over 4
+
+=item 'latex'
+
+Gelieferte Werte: 'l', 'r', 'c'.
+
+=item 'html'
+
+Gelieferte Werte: 'left', 'right', 'center'.
+
+=back
+
+=back
 
 =head4 Returns
 
@@ -365,20 +389,20 @@ Referenz auf die Liste.
 
 =head4 Description
 
-Liefere die Liste der Kolumnenausrichtungen. Für jede Kolumne ist
-dies einer der Werte
+Liefere die Liste der Kolumnenausrichtungen der Domäne $domain.
+Mögliche Ausrichtungen:
 
-=over 4
+=over 2
 
-=item 'c'
+=item *
 
 Zentriert (centered).
 
-=item 'r'
+=item *
 
 Rechtsbündig (right aligned).
 
-=item 'l'
+=item *
 
 Linksbündig (left aligned).
 
@@ -407,7 +431,13 @@ Resultat:
 
 sub alignments {
     my $self = shift;
+    my $domain = shift // 'latex';
+
     my $alignA = $self->{'alignA'};
+    if ($domain eq 'html') {
+        $alignA = [map {{l=>'left',r=>'right',c=>'center'}->{$_}} @$alignA];
+    }
+
     return wantarray? @$alignA: $alignA;
 }
 
@@ -591,7 +621,7 @@ sub asText {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

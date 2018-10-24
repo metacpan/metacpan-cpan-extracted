@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::AskAction;
 
-# ABSTRACT: <p>The act of posing a question / favor to someone
+# ABSTRACT: The act of posing a question / favor to someone
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has question => (
@@ -36,16 +38,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::AskAction - <p>The act of posing a question / favor to someone
+SemanticWeb::Schema::AskAction - The act of posing a question / favor to someone
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of posing a question / favor to someone.</p> <p>Related
-actions:</p> <ul> <li><a class="localLink"
+=for html The act of posing a question / favor to someone.<br/><br/> Related
+actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/ReplyAction">ReplyAction</a>: Appears generally as
 a response to AskAction.</li> </ul> 
 

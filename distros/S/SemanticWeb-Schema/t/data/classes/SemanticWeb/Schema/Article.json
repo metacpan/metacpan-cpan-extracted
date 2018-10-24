@@ -1,8 +1,8 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_rNews",
+      "dc:source" : "schemadotorgsources2:source_rNews",
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "An article, such as a news article or piece of investigative report. Newspapers and magazines have articles of many different types and this is intended to cover them all.</p>\n\n<p>See also <a href=\"http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.html\">blog post</a>.",
+      "rdfs:comment" : "An article, such as a news article or piece of investigative report. Newspapers and magazines have articles of many different types and this is intended to cover them all.<br/><br/>\n\nSee also <a href=\"http://blog.schema.org/2014/09/schemaorg-support-for-bibliographic_2.html\">blog post</a>.",
       "rdfs:label" : "Article",
       "rdfs:subClassOf" : "schema:CreativeWork"
    },
@@ -22,15 +22,15 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:pageEnd" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
+         "dc:source" : "schemadotorgsources2:source_bibex",
          "owl:equivalentProperty" : "bibo:pageEnd",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The page on which the work ends; for example \"138\" or \"xvi\".",
          "rdfs:label" : "pageEnd",
          "schema:domainIncludes" : [
-            "schema:Article",
             "schema:PublicationIssue",
-            "schema:PublicationVolume"
+            "schema:PublicationVolume",
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -38,31 +38,31 @@
          ]
       },
       "schema:pageStart" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
+         "dc:source" : "schemadotorgsources2:source_bibex",
          "owl:equivalentProperty" : "bibo:pageStart",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The page on which the work starts; for example \"135\" or \"xiii\".",
          "rdfs:label" : "pageStart",
          "schema:domainIncludes" : [
-            "schema:Article",
             "schema:PublicationVolume",
-            "schema:PublicationIssue"
+            "schema:PublicationIssue",
+            "schema:Article"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
+            "schema:Text",
+            "schema:Integer"
          ]
       },
       "schema:pagination" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
+         "dc:source" : "schemadotorgsources2:source_bibex",
          "owl:equivalentProperty" : "bibo:pages",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Any description of pages that is not separated into pageStart and pageEnd; for example, \"1-6, 9, 55\" or \"10-12, 46-49\".",
          "rdfs:label" : "pagination",
          "schema:domainIncludes" : [
-            "schema:PublicationVolume",
+            "schema:PublicationIssue",
             "schema:Article",
-            "schema:PublicationIssue"
+            "schema:PublicationVolume"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

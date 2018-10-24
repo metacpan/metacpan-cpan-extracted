@@ -4,13 +4,15 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 package App::ReportPrereqs;
 
 use ExtUtils::MakeMaker ();
 use File::Basename qw(fileparse);
+use File::Temp ();
 use Getopt::Long qw(GetOptions);
+use HTTP::Tiny 0.014 ();
 use List::Util qw(max);
 use Module::CPANfile ();
 use Module::Path qw(module_path);
@@ -25,15 +27,34 @@ if ( !caller ) {
 
 sub _main {
     my $with_develop = 0;
-    if ( !GetOptions( 'with-develop' => \$with_develop ) ) {
-        my $basename = fileparse($0);
+    my @features;
+    return _usage() if !GetOptions( 'with-develop' => \$with_develop, 'with-feature=s@' => \@features );
 
-        print {*STDERR} "usage: $basename [--with-develop]\n";
-        return 2;
+    my $temp;
+    my $cpanfile     = 'cpanfile';
+    my $cpanfile_src = $cpanfile;
+
+    if ( @ARGV == 1 ) {
+        $cpanfile_src = $ARGV[0];
+
+        my $res = HTTP::Tiny->new->get($cpanfile_src);
+        if ( !$res->{success} ) {
+            print {*STDERR} $res->{content};
+            return 1;
+        }
+
+        $temp     = File::Temp->new;
+        $cpanfile = $temp->filename;
+
+        $temp->print( $res->{content} ) or die "Unable to write file '$cpanfile': $!";
+        $temp->flush;
+    }
+    elsif (@ARGV) {
+        return _usage();
     }
 
     my $prereqs;
-    if ( !eval { $prereqs = Module::CPANfile->load('cpanfile')->prereqs; 1; } ) {
+    if ( !eval { $prereqs = Module::CPANfile->load($cpanfile)->prereqs_with(@features); 1; } ) {
         my $error = $@;
         print {*STDERR} "\n$error\n";
         return 1;
@@ -118,7 +139,7 @@ sub _main {
     }
 
     if (@full_reports) {
-        print "Versions for all modules listed in cpanfile:\n\n", @full_reports;
+        print "Versions for all modules listed in $cpanfile_src:\n\n", @full_reports;
     }
 
     if (@dep_errors) {
@@ -131,6 +152,13 @@ sub _main {
     }
 
     return;
+}
+
+sub _usage {
+    my $basename = fileparse($0);
+
+    print {*STDERR} "usage: $basename [--with-{develop,feature=id}] [URL]\n";
+    return 2;
 }
 
 1;
@@ -147,13 +175,13 @@ report-prereqs - report prerequisite versions
 
 =head1 VERSION
 
-Version 0.001
+Version 0.003
 
 =head1 SYNOPSIS
 
 =over
 
-=item B<report-prereqs> [B<--with-develop>]
+=item B<report-prereqs> [B<--with-{develop,feature=id}>] [URL]
 
 =back
 
@@ -164,6 +192,9 @@ L<Module::CPANfile|Module::CPANfile>. It reports the version of all modules
 listed as prerequisites (including 'recommends', 'suggests', etc.). However,
 any 'develop' prerequisites are not reported, unless they show up in another
 category or the C<--with-develop> option is used.
+
+Option C<--with-feature> enables optional features provided by a CPAN
+distribution. Option may be used more than once.
 
 Versions are reported based on the result of C<parse_version> from
 L<ExtUtils::MakeMaker|ExtUtils::MakeMaker>, which means prerequisite modules
@@ -181,6 +212,10 @@ of all versions.
 
 Also report develop prerequisites.
 
+=item B<--with-feature> String: Name
+
+Specify optional feature to enable. Option may be used more than once.
+
 =back
 
 =head1 EXIT STATUS
@@ -189,6 +224,55 @@ The report-prereqs utility exits 0 on success, 1 if an error occurs, and 2 if
 invalid command line options were specified.
 
 The state of the prerequisites does have no effect on the exist status.
+
+=head1 EXAMPLES
+
+=head2 Example 1 Using this on Travis CI with C<AUTHOR_TESTING>
+
+Add the following lines to F<.travis.yml> right before your tests are run,
+after all your dependencies are installed.
+
+    - cpanm --verbose --notest --skip-satisfied App::ReportPrereqs
+    - report-prereqs --with-develop
+
+=head2 Example 2 Using this on Travis CI without C<AUTHOR_TESTING>
+
+Add the following lines to F<.travis.yml> right before your tests are run,
+after all your dependencies are installed.
+
+    - cpanm --verbose --notest --skip-satisfied App::ReportPrereqs
+    - report-prereqs
+
+=head2 Example 3 Using this on AppVeyor with C<AUTHOR_TESTING>
+
+Add the following lines to F<.appveyor.yml> right before your tests are run,
+after all your dependencies are installed.
+
+    - perl -S cpanm --verbose --notest --skip-satisfied App::ReportPrereqs
+    - perl -S report-prereqs --with-develop
+
+=head2 Example 4 Using this on AppVeyor without C<AUTHOR_TESTING>
+
+Add the following lines to F<.appveyor.yml> right before your tests are run,
+after all your dependencies are installed.
+
+    - perl -S cpanm --verbose --notest --skip-satisfied App::ReportPrereqs
+    - perl -S report-prereqs
+
+=head2 Example 5 Show prerequistes from a cpanfile url
+
+    report-prereqs https://raw.githubusercontent.com/skirmess/App-ReportPrereqs/master/cpanfile
+
+=head1 RATIONALE
+
+=head2 Why this instead of L<Dist::Zilla::Plugin::Test::ReportPrereqs|Dist::Zilla::Plugin::Test::ReportPrereqs>
+
+The L<Test::ReportPrereqs|Dist::Zilla::Plugin::Test::ReportPrereqs>
+L<Dist::Zilla|Dist::Zilla> plugin adds a test to your distribution that
+prints all the prerequisites version during testing of your distribution.
+
+The goal of this module is to produce the same output on Travis CI and
+AppVeyor without including an additional file to the distribution.
 
 =head1 SEE ALSO
 
@@ -214,6 +298,16 @@ L<https://github.com/skirmess/App-ReportPrereqs>
 =head1 AUTHOR
 
 Sven Kirmess <sven.kirmess@kzone.ch>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Stephan Sachse <ste.sachse@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

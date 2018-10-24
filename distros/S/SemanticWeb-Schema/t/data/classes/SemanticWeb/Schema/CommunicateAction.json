@@ -24,12 +24,12 @@
          "schema:domainIncludes" : [
             "schema:CommunicateAction",
             "schema:CreativeWork",
-            "schema:WriteAction",
-            "schema:Event"
+            "schema:Event",
+            "schema:WriteAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Language",
-            "schema:Text"
+            "schema:Text",
+            "schema:Language"
          ]
       },
       "schema:language" : {
@@ -38,8 +38,8 @@
          "rdfs:label" : "language",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
-            "schema:CommunicateAction",
-            "schema:WriteAction"
+            "schema:WriteAction",
+            "schema:CommunicateAction"
          ],
          "schema:rangeIncludes" : "schema:Language",
          "schema:supersededBy" : "schema:inLanguage"
@@ -50,20 +50,20 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:TipAction",
-            "schema:GiveAction",
-            "schema:CommunicateAction",
             "schema:PayAction",
+            "schema:TipAction",
+            "schema:CommunicateAction",
             "schema:SendAction",
-            "schema:Message",
+            "schema:DonateAction",
             "schema:ReturnAction",
+            "schema:Message",
             "schema:AuthorizeAction",
-            "schema:DonateAction"
+            "schema:GiveAction"
          ],
          "schema:rangeIncludes" : [
+            "schema:Audience",
             "schema:ContactPoint",
             "schema:Organization",
-            "schema:Audience",
             "schema:Person"
          ]
       }

@@ -1,0 +1,57 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources2:Tourism",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A trip or journey. An itinerary of visits to one or more places.",
+      "rdfs:label" : "Trip",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:arrivalTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The expected arrival time.",
+         "rdfs:label" : "arrivalTime",
+         "schema:domainIncludes" : "schema:Trip",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:departureTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The expected departure time.",
+         "rdfs:label" : "departureTime",
+         "schema:domainIncludes" : "schema:Trip",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:offers" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event.",
+         "rdfs:label" : "offers",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:Trip",
+            "schema:MenuItem",
+            "schema:AggregateOffer",
+            "schema:Product",
+            "schema:Service",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : "schema:Offer"
+      },
+      "schema:provider" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
+         "rdfs:label" : "provider",
+         "schema:domainIncludes" : [
+            "schema:Service",
+            "schema:Trip",
+            "schema:ParcelDelivery",
+            "schema:CreativeWork",
+            "schema:Invoice",
+            "schema:Reservation"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      }
+   }
+}

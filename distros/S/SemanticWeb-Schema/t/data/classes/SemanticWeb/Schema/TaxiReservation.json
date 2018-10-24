@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A reservation for a taxi.</p>\n\n<p>Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, use <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a>.",
+      "rdfs:comment" : "A reservation for a taxi.<br/><br/>\n\nNote: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, use <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a>.",
       "rdfs:label" : "TaxiReservation",
       "rdfs:subClassOf" : "schema:Reservation"
    },
@@ -11,8 +11,8 @@
          "rdfs:comment" : "Number of people the reservation should accommodate.",
          "rdfs:label" : "partySize",
          "schema:domainIncludes" : [
-            "schema:TaxiReservation",
-            "schema:FoodEstablishmentReservation"
+            "schema:FoodEstablishmentReservation",
+            "schema:TaxiReservation"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
@@ -24,8 +24,8 @@
          "rdfs:comment" : "Where a taxi will pick up a passenger or a rental car can be picked up.",
          "rdfs:label" : "pickupLocation",
          "schema:domainIncludes" : [
-            "schema:TaxiReservation",
-            "schema:RentalCarReservation"
+            "schema:RentalCarReservation",
+            "schema:TaxiReservation"
          ],
          "schema:rangeIncludes" : "schema:Place"
       },
@@ -34,8 +34,8 @@
          "rdfs:comment" : "When a taxi will pickup a passenger or a rental car can be picked up.",
          "rdfs:label" : "pickupTime",
          "schema:domainIncludes" : [
-            "schema:RentalCarReservation",
-            "schema:TaxiReservation"
+            "schema:TaxiReservation",
+            "schema:RentalCarReservation"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       }

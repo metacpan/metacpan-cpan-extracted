@@ -3,7 +3,7 @@ use warnings;
 
 use Test2::V0;
 
-use File::Slurp qw( read_file );
+use File::Slurper qw( read_text );
 
 use Markdent::Handler::MinimalTree;
 use Markdent::Parser;
@@ -16,7 +16,7 @@ use Test::Markdent;
 # in our use of /g matches in the parser.
 
 my $markdown
-    = read_file('t/mdtest-data/Markdown Documentation - Basics.text');
+    = read_text('t/mdtest-data/Markdown Documentation - Basics.text');
 
 my $th1 = Markdent::Handler::MinimalTree->new();
 my $th2 = Markdent::Handler::MinimalTree->new();

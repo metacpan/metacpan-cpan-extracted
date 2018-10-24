@@ -16,21 +16,23 @@ Base class to implement a crossfire client.
 
 package Deliantra::Protocol::Base;
 
-our $VERSION = '1.22';
+our $VERSION = '1.31';
 
 use common::sense;
 
 use AnyEvent;
 use AnyEvent::Socket ();
+use AnyEvent::Util ();
 use Compress::LZF;
+use Scalar::Util ();
 
-use IO::Socket::INET;
+use Socket ();
 
 use Deliantra::Protocol::Constants;
 
 use JSON::XS ();
 
-=item new Deliantra::Protocol::Base host => ..., port => ...
+=item new Deliantra::Protocol::Base host => ..., port => ..., user => ..., pass => ...
 
 =cut
 
@@ -41,9 +43,7 @@ sub new {
       port            => "deliantra=13327",
       mapw            => 13,
       maph            => 13,
-      max_outstanding => 2,
       token           => "a",
-      ncom            => [0..255],
       s_version       => { },
 
       tilesize        => 32,
@@ -82,26 +82,17 @@ sub new {
          $self->_drain_wbuf;
 
       } else {
-         $self->feed_eof;
-
          $self->{on_connect}->(0) if $self->{on_connect};
+
+         $self->feed_eof;
       }
    };
 
    $self->{setup} = {
-      #sound             => 0,
-      exp64             => 1,
       map1acmd          => 1,
       itemcmd           => 2,
-      darkness          => 1,
-      facecache         => 1,
-      newmapcmd         => 1,
       mapinfocmd        => 1,
-      extcmd            => 2,
-      spellmon          => 1,
-      fxix              => 3,
-      excmd             => 1,
-      msg               => 2,
+      spellmon          => 2,
       lzf               => 1, # supports lzf packet
       frag              => 1, # support fragmented packets
       %{$self->{setup_req} || {} },
@@ -117,17 +108,86 @@ sub new {
       %{ $self->{c_version} },
    }));
 
-   # send initial setup req
-   ++$self->{setup_outstanding};
-   $self->send (join " ", "setup",
-      %{$self->{setup}},
-      mapsize => "$self->{mapw}x$self->{maph}",
-   );
+   $self->addme_wait; # for ext_nonces
 
-   $self->send ("requestinfo skill_info");
-   $self->send ("requestinfo spell_paths");
+   # send initial setup req
+   $self->setup_req (mapsize => "$self->{mapw}x$self->{maph}");
+   $self->setup_req (%{$self->{setup}});
 
    $self
+}
+
+=item my $guard = $con->addme_guard
+
+Delays an C<addme> until thre guard is destroyed.
+
+=cut
+
+sub ext_nonces {
+   my ($self, @nonces) = @_;
+
+   $self->{nonces} = \@nonces;
+   $self->addme_ok;
+}
+
+sub addme_wait {
+   ++$_[0]{addme_wait}
+}
+
+sub addme_ok {
+   my ($self) = @_;
+
+   return if --$self->{addme_wait};
+
+   # done with negotiation
+
+   my $done_cb = sub {
+      my ($ok, $msg) = @_;
+
+      $self->{on_addme}($ok, $msg)
+         if $self->{on_addme};
+
+      # server is supposed to close the connection on error
+   };
+
+   $self->setup ($self->{setup});
+
+   if ($self->{create_login}) {
+      $self->send_exti_req (create_login => $self->{user}, $self->{pass}, $done_cb);
+   } else {
+      my ($n1, $n2) = @{ $self->{nonces} };
+
+      if (
+         $n1 eq $n2
+         or length $n1 < 32
+         or length $n2 < 32
+      ) {
+         # crypto error, avoid playing oracle
+         return $self->feed_eof;
+      }
+
+      my $pass = Deliantra::Util::auth_pw $self->{pass}, $n1, $n2;
+      $self->send_exti_req (login => $self->{user}, $pass, $done_cb);
+   }
+
+   $self->{addme_success} = 1;
+   $self->addme;
+
+   $self->feed_newmap;
+}
+
+# not documented, maybe not so useful
+sub addme { }
+
+sub addme_guard {
+   my ($self) = @_;
+
+   $self->addme_wait;
+
+   Scalar::Util::weaken $self;
+   AnyEvent::Util::guard {
+      $self->addme_ok if $self;
+   }
 }
 
 sub token {
@@ -217,7 +277,7 @@ sub _drain_wbuf {
 
 =over 4
 
-=item $self->setup_req (key => value)
+=item $self->setup_req (key => value, ...)
 
 Send a setup request for the given setting.
 
@@ -235,12 +295,14 @@ request is sent.
 sub setup { }
 
 sub setup_req {
-   my ($self, $k, $v) = @_;
+   my ($self, %kv) = @_;
 
-   $self->{setup_req}{$k} = $v;
+   while (my ($k, $v) = each %kv) {
+      $self->{setup_req}{$k} = $v;
+   }
 
-   ++$self->{setup_outstanding};
-   $self->send ("setup $k $v");
+   $self->addme_wait;
+   $self->send ("setup " . JSON::XS::encode_json \%kv);
 }
 
 sub setup_chk {
@@ -253,40 +315,19 @@ sub setup_chk {
    if (exists $setup->{mapsize}) {
       my ($mapw, $maph) = split /x/, $setup->{mapsize};
 
-      if ($mapw != $self->{mapw} || $maph != $self->{maph}) {
-         ($self->{mapw}, $self->{maph}) = ($mapw, $maph);
-
-         # TRT servers do not suffer from the stupid
-         # mapsize-returns-two-things semantics anymore
-         $self->setup_req (mapsize => "$self->{mapw}x$self->{maph}")
-            unless $self->{setup}{extcmd} > 0;
-      }
+      ($self->{mapw}, $self->{maph}) = ($mapw, $maph);
    }
-
-   $self->{setup}{extcmd} = 0 if $self->{setup}{extcmd} != 2;
 }
 
 sub feed_setup {
    my ($self, $data) = @_;
 
-   $data =~ s/^ +//;
+   $data = $self->{json_coder}->decode ($data);
 
-   my $changed = { split / +/, $data };
+   $self->{setup} = { %{ $self->{setup} }, %$data };
+   $self->setup_chk ($data);
 
-   $self->{setup} = { %{ $self->{setup} }, %$changed };
-   $self->setup_chk ($changed);
-
-   unless (--$self->{setup_outstanding}) {
-      # done with negotiation
-
-      $self->setup ($self->{setup});
-
-      # servers supporting exticmd do sensible bandwidth management
-      $self->{max_outstanding} = 4096 if $self->{setup}{extcmd} > 0;
-
-      $self->send ("addme");
-      $self->feed_newmap;
-   }
+   $self->addme_ok;
 }
 
 sub feed_eof {
@@ -306,16 +347,10 @@ sub feed_eof {
    $self->eof;
 }
 
-sub feed_addme_success {
-   my ($self, $data) = @_;
+sub feed_goodbye {
+   my ($self) = @_;
 
-   $self->addme_success ($data);
-}
-
-sub feed_addme_failure {
-   my ($self, $data) = @_;
-
-   $self->addme_failure ($data);
+   $self->feed_eof;
 }
 
 sub logout {
@@ -334,17 +369,11 @@ sub destroy {
    %$self = ();
 }
 
-=item $self->addme_success
-
-=item $self->addme_failure
-
 =item $self->eof
 
 =cut
 
-sub addme_success { }
-sub addme_failure { }
-sub eof           { }
+sub eof { }
 
 sub feed_face1 {
    my ($self, $data) = @_;
@@ -410,7 +439,7 @@ sub need_face {
          $face->{data} = $data;
          $self->face_update ($num, $face, 0);
       } else {
-         $self->send_queue ("askface $num");
+         $self->send ("askface $num");
       }
    });
 }
@@ -425,7 +454,7 @@ sub ask_face {
    $self->{ask_face}{$num} = [$data_cb || undef, $finish_cb || sub { }]
       if $data_cb || $finish_cb;
 
-   $self->send_queue ($pri ? "askface $num $pri" : "askface $num");
+   $self->send ($pri ? "askface $num $pri" : "askface $num");
 }
 
 =item $conn->anim_update ($num) [OVERWRITE]
@@ -468,93 +497,19 @@ sub feed_query {
 
    my ($flags, $prompt) = split /\s+/, $data, 2;
 
-   if ($flags == 0 && $prompt =~ /What is your name\?/ && length $self->{user}) {
-      if ($self->{sent_login}) {
-         delete $self->{user};
-         delete $self->{pass};
-         $self->query ($flags, $prompt);
-      } else {
-         $self->send ("reply $self->{user}");
-         $self->{sent_login} = 1;
-      }
-   } elsif ($flags == 4 && $prompt =~ /What is your password\?/ && length $self->{pass}) {
-      $self->send ("reply $self->{pass}");
-   } elsif ($flags == 4 && $prompt =~ /Please type your password again\./ && length $self->{pass}) {
-      $self->send ("reply $self->{pass}");
-   } else {
-      $self->query ($flags, $prompt);
-   }
+   $self->query ($flags, $prompt);
 }
-
-=item $conn->drawextinfo ($color, $type, $subtype, $message)
-
-default implementation calls msg
-
-=item $conn->drawinfo ($color, $text)
-
-default implementation calls msg
 
 =item $conn->msg ($default_color, $type, $text, @extra)
 
 =cut
 
-sub drawextinfo {
-   my ($self, $color, $type, $subtype, $message) = @_;
-
-   for ($message) {
-      s/&/&amp;/g; s/</&lt;/g; s/>/&gt;/g;
-
-      1 while s{ \[b\] (.*?) \[/b\] }{<b>$1</b>}igx;
-      1 while s{ \[i\] (.*?) \[/i\] }{<i>$1</i>}igx;
-      1 while s{ \[ul\](.*?) \[/ul\]}{<u>$1</u>}igx;
-      1 while s{ \[fixed\](.*?)\[/fixed\]}{<tt>$1</tt>}igx;
-      1 while s{ \[color=(.*?)\] (.*?) \[/color\]}{<fg name='$1'>$2</fg>}igx;
-
-      #TODO: arcance, hand, strange, print font tags
-      1 while s{ \[arcane\]  (.*?) \[/arcane\]  }{<i>$1</i>}igx;
-      1 while s{ \[hand\]    (.*?) \[/hand\]    }{<i>$1</i>}igx;
-      1 while s{ \[strange\] (.*?) \[/strange\] }{<i>$1</i>}igx;
-      1 while s{ \[print\]   (.*?) \[/print\]   }{$1}igx;
-   }
-
-   $self->msg ($color, $type, $message, $subtype);
-}
-
-sub drawinfo {
-   my ($self, $color, $text) = @_;
-
-   for ($text) {
-      s/&/&amp;/g; s/</&lt;/g; s/>/&gt;/g;
-   }
-
-   $self->msg ($color, 0, $text);
-}
-
 sub msg { }
-
-sub feed_drawextinfo {
-   my ($self, $data) = @_;
-
-   my ($color, $type, $subtype, $text) = split /\s+/, $data, 4;
-
-   utf8::decode $text;
-   $self->drawextinfo ($color, $type, $subtype, $text);
-}
-
-sub feed_drawinfo {
-   my ($self, $data) = @_;
-
-   my ($flags, $text) = split / /, $data, 2;
-
-   utf8::decode $text;
-
-   $self->drawinfo ($flags, $text);
-}
 
 sub feed_msg {
    my ($self, $data) = @_;
 
-   if ($data =~ /^\s*\[/) {
+   if ("[" eq substr $data, 0, 1) {
       $self->msg (@{ $self->{json_coder}->decode ($data) });
    } else {
       utf8::decode $data;
@@ -579,8 +534,6 @@ sub feed_ex {
 
 sub ex {
    my ($self, $tag, $cb) = @_;
-
-   return unless $self->{setup}{excmd} > 0;
 
    my $q = $self->{cb_ex}{$tag} ||= [];
    push @$q, $cb;
@@ -814,7 +767,6 @@ sub feed_upditem {
          path         => ...,
          face         => ...,
          name         => ...,
-         message      => ...,
       };
 
 =item $conn->spell_update ($spell)
@@ -839,7 +791,7 @@ sub spell_delete { }
 sub feed_addspell {
    my ($self, $data) = @_;
 
-   my @data = unpack "(NnnnnnCNN C/a n/a)*", $data;
+   my @data = unpack "(NnnnnnCNN C/a)*", $data;
 
    while (@data) {
       my $spell = {
@@ -853,7 +805,6 @@ sub feed_addspell {
          path         => (shift @data),
          face         => (shift @data),
          name         => (shift @data),
-         message      => (shift @data),
       };
 
       $self->spell_add ($self->{spell}{$spell->{tag}} = $spell);
@@ -942,19 +893,14 @@ sub send_mapinfo {
 
    my $token = $self->token;
 
-   $self->{mapinfo_cb}{$token} = sub {
-      $self->send_queue;
-      $cb->(@_);
-   };
-   $self->send_queue ("mapinfo $token $data");
+   $self->{mapinfo_cb}{$token} = $cb;
+   $self->send ("mapinfo $token $data");
 }
 
 sub feed_image {
    my ($self, $data) = @_;
 
    my ($num, $len, $data) = unpack "NNa*", $data;
-
-   $self->send_queue;
 
    my $face = $self->{face}[$num];
 
@@ -974,15 +920,19 @@ sub feed_ix {
 
    if (my $cb = $cbs && $cbs->[0]) {
       $cb->($num, $ofs, $data);
-   } else {
+   } elsif (!$ofs || length $data) {
       # avoid stupid substr out of range error
-      $self->{ix_recv_buf}{$num} = " " x $ofs
-         unless exists $self->{ix_recv_buf}{$num};
+      $self->{ix_recv_buf}{$num} //= " " x $ofs;
       substr $self->{ix_recv_buf}{$num}, $ofs, (length $data), $data;
+      $self->{ix_recv_ofs}{$num} = $ofs;
+   } else {
+      # ix with empty data but nonzero offset means to abort the current ix
+      delete $self->{ix_recv_buf}{$num};
+      delete $self->{ix_recv_ofs}{$num};
    }
 
    unless ($ofs) {
-      $self->send_queue;
+      delete $self->{ix_recv_ofs}{$num};
 
       if ($cbs) {
          $cbs->[1]->($num, delete $self->{ix_recv_buf}{$num});
@@ -990,27 +940,11 @@ sub feed_ix {
          my $face = $self->{face}[$num];
 
          delete $face->{loading};
+         delete $face->{cache}; # cache cna be used by the application
          $face->{data} = delete $self->{ix_recv_buf}{$num};
          $self->face_update ($num, $face, 1);
 
          $self->map_update;
-      }
-   }
-}
-
-sub feed_replyinfo {
-   my ($self, $data) = @_;
-
-   if ($data =~ s/^skill_info\s+//) {
-      for (split /\012/, $data) {
-         my ($id, $name) = split /:/, $_, 2;
-         $self->{skill_info}{$id} = $name;
-      }
-
-   } elsif ($data =~ s/^spell_paths\s+//) {
-      for (split /\012/, $data) {
-         my ($id, $name) = split /:/, $_, 2;
-         $self->{spell_paths}{$id} = $name;
       }
    }
 }
@@ -1094,45 +1028,19 @@ sub send_utf8 {
    $self->send ($data);
 }
 
-=item $conn->send_command ($command[, $cb1[, $cb2]])
+=item $conn->send_command ($command])
 
-Uses either command or ncom to send a user-level command to the
-server. Encodes the command to UTF-8.
-
-If the server supports a fixed version of the ncom command and this is
-detected by this module, the following is also supported:
-
-If the callback C<$cb1> is given, calls it with the absolute time when
-this command has finished processing, as soon as this information is
-available.
-
-If the callback C<$cb2> is given it will be called when the command has
-finished processing, to the best knowledge of this module :)
+Uses command to send a user-level command to the server. Encodes the
+command to UTF-8.
 
 =cut
-
-sub feed_comc {
-   my ($self, $data) = @_;
-
-   my ($tag, $time) = unpack "nN", $data;
-
-   push @{ $self->{ncom} }, $tag;
-}
 
 sub send_command {
    my ($self, $command, $cb1, $cb2) = @_;
 
    utf8::encode $command;
 
-   if (0 && (my $tag = pop @{ $self->{ncom} })) {
-      $self->send (pack "A* n N a*", "ncom ", $tag, 1, $command);
-      $cb1->(0) if $cb1;
-      $cb2->()  if $cb2;
-   } else {
-      $self->send ("command $command");
-      $cb1->(0) if $cb1;
-      $cb2->()  if $cb2;
-   }
+   $self->send ("command $command");
 }
 
 =item $conn->send_pickup ($pickup)
@@ -1145,21 +1053,6 @@ sub send_pickup {
    my ($self, $pickup) = @_;
 
    $self->send_command ("pickup " . ($pickup | PICKUP_NEWMODE));
-}
-
-sub send_queue {
-   my ($self, $cmd) = @_;
-
-   if (defined $cmd) {
-      push @{ $self->{send_queue} }, $cmd;
-   } else {
-      --$self->{outstanding};
-   }
-
-   if ($self->{outstanding} < $self->{max_outstanding} && @{ $self->{send_queue} }) {
-      ++$self->{outstanding};
-      $self->send (shift @{ $self->{send_queue} });
-   }
 }
 
 sub connect_ext {
@@ -1204,26 +1097,18 @@ sub send_ext_req {
    my $cb = pop; # callback is last
    my ($self, $type, @msg) = @_;
 
-   if ($self->{setup}{extcmd} == 2) {
-      my $id = $self->token;
-      $self->{extcmd_cb_id}{"reply-$id"} = $cb;
-      $self->send ("ext " . $self->{json_coder}->encode ([$type, $id, @msg]));
-   } else {
-      $cb->(); # == not supported by server
-   }
+   my $id = $self->token;
+   $self->{extcmd_cb_id}{"reply-$id"} = $cb;
+   $self->send ("ext " . $self->{json_coder}->encode ([$type, $id, @msg]));
 }
 
 sub send_exti_req {
    my $cb = pop; # callback is last
    my ($self, $type, @msg) = @_;
 
-   if ($self->{setup}{extcmd} == 2) {
-      my $id = $self->token;
-      $self->{extcmd_cb_id}{"reply-$id"} = $cb;
-      $self->send ("exti " . $self->{json_coder}->encode ([$type, $id, @msg]));
-   } else {
-      $cb->(); # == not supported by server
-   }
+   my $id = $self->token;
+   $self->{extcmd_cb_id}{"reply-$id"} = $cb;
+   $self->send ("exti " . $self->{json_coder}->encode ([$type, $id, @msg]));
 }
 
 =back

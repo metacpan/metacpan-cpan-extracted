@@ -23,6 +23,6 @@ install_script 'script/trac2html';
 
 auto_install;
 
-repository 'https://github.com/szabgab/Text-Trac';
+repository 'https://github.com/manwar/Text-Trac';
 
 WriteAll;

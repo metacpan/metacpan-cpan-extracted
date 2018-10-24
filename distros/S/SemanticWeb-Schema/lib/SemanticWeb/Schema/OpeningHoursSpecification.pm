@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::OpeningHoursSpecification;
 
 # ABSTRACT: A structured value providing information about the opening hours of a place or a certain service inside a place
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has closes => (
@@ -72,15 +74,15 @@ SemanticWeb::Schema::OpeningHoursSpecification - A structured value providing in
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
 =for html A structured value providing information about the opening hours of a place
-or a certain service inside a place.</p> <p>The place is
+or a certain service inside a place.<br/><br/> The place is
 <strong>open</strong> if the <a class="localLink"
 href="http://schema.org/opens">opens</a> property is specified, and
-<strong>closed</strong> otherwise.</p> <p>If the value for the <a
+<strong>closed</strong> otherwise.<br/><br/> If the value for the <a
 class="localLink" href="http://schema.org/closes">closes</a> property is
 less than the value for the <a class="localLink"
 href="http://schema.org/opens">opens</a> property then the hour range is

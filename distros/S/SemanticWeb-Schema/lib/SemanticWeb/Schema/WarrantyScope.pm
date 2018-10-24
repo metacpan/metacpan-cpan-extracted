@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::WarrantyScope;
 
-# ABSTRACT: <p>A range of of services that will be provided to a customer free of charge in case of a defect or malfunction of a product
+# ABSTRACT: A range of of services that will be provided to a customer free of charge in case of a defect or malfunction of a product
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,17 +30,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::WarrantyScope - <p>A range of of services that will be provided to a customer free of charge in case of a defect or malfunction of a product
+SemanticWeb::Schema::WarrantyScope - A range of of services that will be provided to a customer free of charge in case of a defect or malfunction of a product
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>A range of of services that will be provided to a customer free of
-charge in case of a defect or malfunction of a product.</p> <p>Commonly
-used values:</p> <ul>
+=for html A range of of services that will be provided to a customer free of charge
+in case of a defect or malfunction of a product.<br/><br/> Commonly used
+values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#Labor-BringIn</li>
 <li>http://purl.org/goodrelations/v1#PartsAndLabor-BringIn</li>
 <li>http://purl.org/goodrelations/v1#PartsAndLabor-PickUp</li> </ul> 

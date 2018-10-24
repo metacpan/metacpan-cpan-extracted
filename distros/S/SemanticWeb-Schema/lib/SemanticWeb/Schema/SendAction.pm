@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::SendAction;
 
-# ABSTRACT: <p>The act of physically/electronically dispatching an object for transfer from an origin to a destination
+# ABSTRACT: The act of physically/electronically dispatching an object for transfer from an origin to a destination
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has delivery_method => (
@@ -44,16 +46,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::SendAction - <p>The act of physically/electronically dispatching an object for transfer from an origin to a destination
+SemanticWeb::Schema::SendAction - The act of physically/electronically dispatching an object for transfer from an origin to a destination
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of physically/electronically dispatching an object for transfer
-from an origin to a destination.Related actions:</p> <ul> <li><a
+=for html The act of physically/electronically dispatching an object for transfer
+from an origin to a destination.Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/ReceiveAction">ReceiveAction</a>:
 The reciprocal of SendAction.</li> <li><a class="localLink"
 href="http://schema.org/GiveAction">GiveAction</a>: Unlike GiveAction,
@@ -85,11 +87,11 @@ A recipient should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::Audience']>
+
 =item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
-=item C<InstanceOf['SemanticWeb::Schema::Audience']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
 

@@ -1,6 +1,6 @@
 package Method::ParamValidator;
 
-$Method::ParamValidator::VERSION   = '0.11';
+$Method::ParamValidator::VERSION   = '0.12';
 $Method::ParamValidator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator - Configurable method parameter validator.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -29,7 +29,7 @@ use Method::ParamValidator::Exception::UndefinedRequiredParameter;
 use Method::ParamValidator::Exception::FailedParameterCheckConstraint;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has [ qw(fields methods) ] => (is => 'rw');
 has 'config' => (is => 'ro', predicate => 1);
@@ -181,7 +181,7 @@ Lets start with a basic Moo package PlayMath.
     package PlayMath;
 
     use Moo;
-    use namespace::clean;
+    use namespace::autoclean;
 
     sub do {
         my ($self, $param) = @_;

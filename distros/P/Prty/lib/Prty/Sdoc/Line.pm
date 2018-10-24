@@ -3,8 +3,9 @@ use base qw/Prty::LineProcessor::Line/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 # -----------------------------------------------------------------------------
 
@@ -292,7 +293,7 @@ sub item {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::LodgingReservation;
 
 # ABSTRACT: A reservation for lodging at a hotel
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has checkin_time => (
@@ -80,11 +82,11 @@ SemanticWeb::Schema::LodgingReservation - A reservation for lodging at a hotel
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html A reservation for lodging at a hotel, motel, inn, etc.</p> <p>Note: This
+=for html A reservation for lodging at a hotel, motel, inn, etc.<br/><br/> Note: This
 type is for information about actual reservations, e.g. in confirmation
 emails or HTML pages with individual confirmations of reservations.
 
@@ -143,9 +145,9 @@ A lodging_unit_type should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
 
 =back
 
@@ -159,9 +161,9 @@ A num_adults should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 
@@ -175,9 +177,9 @@ A num_children should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 

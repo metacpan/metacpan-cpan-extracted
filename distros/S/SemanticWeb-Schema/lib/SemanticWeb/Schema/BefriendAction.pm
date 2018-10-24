@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::BefriendAction;
 
-# ABSTRACT: <p>The act of forming a personal connection with someone (object) mutually/bidirectionally/symmetrically
+# ABSTRACT: The act of forming a personal connection with someone (object) mutually/bidirectionally/symmetrically
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,17 +30,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::BefriendAction - <p>The act of forming a personal connection with someone (object) mutually/bidirectionally/symmetrically
+SemanticWeb::Schema::BefriendAction - The act of forming a personal connection with someone (object) mutually/bidirectionally/symmetrically
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of forming a personal connection with someone (object)
-mutually/bidirectionally/symmetrically.</p> <p>Related actions:</p> <ul>
-<li><a class="localLink"
+=for html The act of forming a personal connection with someone (object)
+mutually/bidirectionally/symmetrically.<br/><br/> Related
+actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/FollowAction">FollowAction</a>: Unlike
 FollowAction, BefriendAction implies that the connection is
 reciprocal.</li> </ul> 

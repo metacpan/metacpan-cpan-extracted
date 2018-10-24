@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::ParcelService;
 
-# ABSTRACT: <p>A private parcel service as the delivery mode available for a certain offer
+# ABSTRACT: A private parcel service as the delivery mode available for a certain offer
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,16 +30,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::ParcelService - <p>A private parcel service as the delivery mode available for a certain offer
+SemanticWeb::Schema::ParcelService - A private parcel service as the delivery mode available for a certain offer
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>A private parcel service as the delivery mode available for a certain
-offer.</p> <p>Commonly used values:</p> <ul>
+=for html A private parcel service as the delivery mode available for a certain
+offer.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#DHL</li>
 <li>http://purl.org/goodrelations/v1#FederalExpress</li>
 <li>http://purl.org/goodrelations/v1#UPS</li> </ul> 

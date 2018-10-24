@@ -11,13 +11,13 @@
          "rdfs:comment" : "The base salary of the job or of an employee in an EmployeeRole.",
          "rdfs:label" : "baseSalary",
          "schema:domainIncludes" : [
-            "schema:JobPosting",
-            "schema:EmployeeRole"
+            "schema:EmployeeRole",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:MonetaryAmount",
             "schema:Number",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount"
          ]
       },
       "schema:benefits" : {
@@ -152,18 +152,18 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:validThrough" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:LocationFeatureSpecification",
-            "schema:OpeningHoursSpecification",
-            "schema:JobPosting",
             "schema:PriceSpecification",
+            "schema:LocationFeatureSpecification",
             "schema:MonetaryAmount",
-            "schema:Demand"
+            "schema:Offer",
+            "schema:JobPosting",
+            "schema:Demand",
+            "schema:OpeningHoursSpecification"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },

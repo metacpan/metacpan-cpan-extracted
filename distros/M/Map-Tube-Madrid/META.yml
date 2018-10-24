@@ -21,22 +21,22 @@ no_index:
 provides:
   Map::Tube::Madrid:
     file: lib/Map/Tube/Madrid.pm
-    version: '0.26'
+    version: '0.27'
   Map::Tube::Madrid::Line::L1:
     file: lib/Map/Tube/Madrid/Line/L1.pm
-    version: '0.26'
+    version: '0.27'
   Map::Tube::Madrid::Line::L11:
     file: lib/Map/Tube/Madrid/Line/L11.pm
-    version: '0.26'
+    version: '0.27'
   Map::Tube::Madrid::Line::L2:
     file: lib/Map/Tube/Madrid/Line/L2.pm
-    version: '0.26'
+    version: '0.27'
   Map::Tube::Madrid::Line::L3:
     file: lib/Map/Tube/Madrid/Line/L3.pm
-    version: '0.26'
+    version: '0.27'
   Map::Tube::Madrid::Line::L5:
     file: lib/Map/Tube/Madrid/Line/L5.pm
-    version: '0.26'
+    version: '0.27'
 requires:
   File::ShareDir: '1.114'
   Map::Tube: '3.57'
@@ -45,5 +45,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Map-Tube-Madrid.git
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

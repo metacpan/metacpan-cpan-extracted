@@ -10,7 +10,7 @@ DLCACHE=
 
 # perl build variables
 MAKE=make
-PERL_VERSION=5.12.4 # 5.8.9 is also a good choice
+PERL_VERSION=http://stableperl.schmorp.de/dist/latest.tar.gz # 5.12.5 and 5.8.9 are good choices for small builds
 PERL_CC=cc
 PERL_CONFIGURE="" # additional Configure arguments
 PERL_CCFLAGS="-g -DPERL_DISABLE_PMC -DPERL_ARENA_SIZE=16376 -DNO_PERL_MALLOC_ENV -D_GNU_SOURCE -DNDEBUG"
@@ -88,10 +88,7 @@ PATH="$PERL_PREFIX/perl/bin:$PATH"
 
 # set version in a way that Makefile.PL can extract
 VERSION=VERSION; eval \
-$VERSION="1.44"
-
-BZ2=bz2
-BZIP2=bzip2
+$VERSION="1.45"
 
 fatal() {
    printf -- "\nFATAL: %s\n\n" "$*" >&2
@@ -147,38 +144,60 @@ clean() {
 realclean() {
    rm -f "$PERL_PREFIX/staticstamp.postinstall"
    rm -f "$PERL_PREFIX/staticstamp.install"
-   rm -f "$STATICPERL/src/perl-"*"/staticstamp.configure"
+   rm -f "$STATICPERL/src/perl/staticstamp.configure"
 }
 
 fetch() {
+(
    rcd "$STATICPERL"
 
    mkdir -p src
    rcd src
 
-   if ! [ -d "perl-$PERL_VERSION" ]; then
-      PERLTAR=perl-$PERL_VERSION.tar.$BZ2
+   if ! [ -d "perl" ]; then
+      rm -rf unpack
+      mkdir -p unpack
 
-      if ! [ -e $PERLTAR ]; then
-         URL="$CPAN/src/5.0/$PERLTAR"
+      case "$PERL_VERSION" in
+         *:* )
+            # url
+            PERLURL="$PERL_VERSION"
+            PERLTAR="$(basename "$PERL_VERSION")"
+            ;;
+         /* )
+            # directory
+            verbose "copying $PERL_VERSION"
+            cp -Rp "$PERL_VERSION/." unpack/.
+            chmod -R u+w unpack
+            mv unpack perl
+            return
+            ;;
+         * )
+            PERLURL="$CPAN/src/5.0/perl-$PERL_VERSION.tar.bz2"
+            PERLTAR=perl-$PERL_VERSION.tar.bz2
+            ;;
+      esac
 
+      if ! [ -e "$PERLTAR" ]; then
          verblock <<EOF
 downloading perl
-to manually download perl yourself, place
-perl-$PERL_VERSION.tar.$BZ2 in $STATICPERL
-trying $URL
 
-either curl or wget is required for automatic download.
-curl is tried first, then wget.
+trying to download from $PERLURL
 
 you can configure a download cache directory via DLCACHE
 in your .staticperlrc to avoid repeated downloads.
+
+to manually download perl yourself, place a suitable tarball in
+$DLCACHE/$PERLTAR
+
+either curl or wget is required for automatic download.
+curl is tried first, then wget.
 EOF
 
          rm -f $PERLTAR~ # just to be on the safe side
          { [ "$DLCACHE" ] && cp "$DLCACHE"/$PERLTAR $PERLTAR~ >/dev/null 2>&1; } \
-            || wget -O $PERLTAR~ "$URL" \
-            || curl -f >$PERLTAR~ "$URL" \
+            || wget -O $PERLTAR~ "$PERLURL" \
+            || curl -f >$PERLTAR~ "$PERLURL" \
             || fatal "$URL: unable to download"
          rm -f $PERLTAR
          mv $PERLTAR~ $PERLTAR
@@ -193,14 +212,32 @@ EOF
 unpacking perl
 EOF
 
-      mkdir -p unpack
-      rm -rf unpack/perl-$PERL_VERSION
-      $BZIP2 -d <$PERLTAR | ( cd unpack && tar xf - ) \
+      case "$PERLTAR" in
+         *.xz   ) UNCOMPRESS="xz -d"    ;;
+         *.lzma ) UNCOMPRESS="lzma -d"  ;;
+         *.bz2  ) UNCOMPRESS="bzip2 -d" ;;
+         *.gz   ) UNCOMPRESS="gzip -d"  ;;
+         *.tar  ) UNCOMPRESS="cat"      ;;
+         * )
+            fatal "don't know hot to uncompress $PERL_TAR,\nonly tar, tar.gz, tar.bz2, tar.lzma and tar.xz are supported."
+            exit 1
+            ;;
+      esac
+
+      <"$PERLTAR" $UNCOMPRESS -d | ( cd unpack && tar xf - ) \
          || fatal "$PERLTAR: error during unpacking"
-      chmod -R u+w unpack/perl-$PERL_VERSION
-      mv unpack/perl-$PERL_VERSION perl-$PERL_VERSION
-      rmdir -p unpack
+
+      if [ -d unpack/*/ ]; then
+         chmod -R u+w unpack/*/
+         mv unpack/*/ perl
+         rmdir -p unpack
+      else
+         fatal "unpacking $PERLTAR did not result in a single directory, don't know how to handle this"
+      fi
+
+      rm "$PERLTAR"
    fi
+) || exit
 }
 
 # similar to GNU-sed -i or perl -pi
@@ -237,14 +274,15 @@ EOF
 }
 
 configure() {
+(
    fetch
 
-   rcd "$STATICPERL/src/perl-$PERL_VERSION"
+   rcd "$STATICPERL/src/perl"
 
    [ -e staticstamp.configure ] && return
 
    verblock <<EOF
-configuring $STATICPERL/src/perl-$PERL_VERSION
+configuring $STATICPERL/src/perl
 EOF
 
    rm -f "$PERL_PREFIX/staticstamp.install"
@@ -296,6 +334,7 @@ EOF
                 -Dcf_by="$EMAIL" \
                 $PERL_CONFIGURE \
                 -Duseperlio \
+                -Uversiononly \
                 -dE || configure_failure
 
    sedreplace '
@@ -310,6 +349,7 @@ EOF
    postconfigure || fatal "postconfigure hook failed"
 
    : > staticstamp.configure
+) || exit
 }
 
 write_shellscript() {
@@ -324,12 +364,13 @@ write_shellscript() {
 }
 
 build() {
+(
    configure
 
-   rcd "$STATICPERL/src/perl-$PERL_VERSION"
+   rcd "$STATICPERL/src/perl"
 
    verblock <<EOF
-building $STATICPERL/src/perl-$PERL_VERSION
+building $STATICPERL/src/perl
 EOF
 
    rm -f "$PERL_PREFIX/staticstamp.install"
@@ -337,6 +378,7 @@ EOF
    "$MAKE" || fatal "make: error while building perl"
 
    postbuild || fatal "postbuild hook failed"
+) || exit
 }
 
 _postinstall() {
@@ -352,11 +394,12 @@ _postinstall() {
 }
 
 install() {
+(
    if ! [ -e "$PERL_PREFIX/staticstamp.install" ]; then
       build
 
       verblock <<EOF
-installing $STATICPERL/src/perl-$PERL_VERSION
+installing $STATICPERL/src/perl
 to $PERL_PREFIX
 EOF
 
@@ -368,19 +411,26 @@ EOF
       ln -sf "$PERL_PREFIX" "$STATICPERL/perl" # might get overwritten
       rm -rf "$PERL_PREFIX"                    # by this rm -rf
 
+      rcd "$STATICPERL/src/perl"
+
       "$MAKE" install || fatal "make install: error while installing"
 
       rcd "$PERL_PREFIX"
 
       # create a "make install" replacement for CPAN
-      write_shellscript SP-make-install-make <<'EOF'
+      write_shellscript SP-make-make <<'end_of_make'
+#CAT make-make.sh
+end_of_make
+
+      # create a "make install" replacement for CPAN
+      write_shellscript SP-make-install-make <<'end_of_make_install_make'
 #CAT make-install-make.sh
-EOF
+end_of_make_install_make
 
       # create a "patch modules" helper
-      write_shellscript SP-patch-postinstall <<'EOF'
+      write_shellscript SP-patch-postinstall <<'end_of_patch_postinstall'
 #CAT patch-postinstall.sh
-EOF
+end_of_patch_postinstall
 
       # immediately use it
       "$PERL_PREFIX/bin/SP-patch-postinstall"
@@ -401,6 +451,7 @@ EOF
          CPAN::Shell->o (conf => q<histfile> , "'"$STATICPERL"'/cpan/histfile");
          CPAN::Shell->o (conf => q<keep_source_where>, "'"$STATICPERL"'/cpan/sources");
          CPAN::Shell->o (conf => q<makepl_arg>, "MAP_TARGET=perl");
+         CPAN::Shell->o (conf => q<make>, "'"$PERL_PREFIX"'/bin/SP-make-make");
          CPAN::Shell->o (conf => q<make_install_make_command>, "'"$PERL_PREFIX"'/bin/SP-make-install-make");
          CPAN::Shell->o (conf => q<prerequisites_policy>, q<follow>);
          CPAN::Shell->o (conf => q<build_requires_install_policy>, q<yes>);
@@ -412,9 +463,11 @@ EOF
    fi
 
    _postinstall
+) || exit
 }
 
 import() {
+(
    IMPORT="$1"
 
    rcd "$STATICPERL"
@@ -435,6 +488,7 @@ EOF
    fi
 
    _postinstall
+) || exit
 }
 
 #############################################################################
@@ -515,9 +569,9 @@ catmkbundle() {
       read dummy
       echo "#!$PERL_PREFIX/bin/perl"
       cat
-   } <<'MKBUNDLE'
+   } <<'end_of_mkbundle'
 #CAT mkbundle
-MKBUNDLE
+end_of_mkbundle
 }
 
 bundle() {

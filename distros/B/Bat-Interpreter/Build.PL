@@ -18,7 +18,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Bat-Interpreter",
-  "dist_version" => "0.013",
+  "dist_version" => "0.014",
   "license" => "mit",
   "module_name" => "Bat::Interpreter",
   "recursive_test_files" => 1,
@@ -36,6 +36,7 @@ my %module_build_args = (
   },
   "test_requires" => {
     "English" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
     "strict" => 0,
@@ -47,6 +48,7 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "English" => 0,
   "Module::Build" => "0.28",
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "strict" => 0,

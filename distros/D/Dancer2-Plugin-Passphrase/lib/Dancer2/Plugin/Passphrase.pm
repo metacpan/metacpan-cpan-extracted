@@ -1,13 +1,12 @@
 package Dancer2::Plugin::Passphrase;
 
-use 5.010001;
 use strict;
 use warnings;
 use Dancer2::Plugin::Passphrase::Core;
 use Dancer2::Plugin::Passphrase::Hashed;
 use Dancer2::Plugin;
 
-our $VERSION = '3.3.0';
+our $VERSION = '3.3.3';
 
 plugin_keywords 'passphrase';
 
@@ -101,7 +100,9 @@ that is suitable for storage in a database.
 
     my $phrase = passphrase('my passphrase')->generate;
 
-You should store C<$phrase->rfc_2307()> in your database.
+It returns a Dancer2::Plugin::Passphrase::Hashed object.
+
+You should store C<< $phrase->rfc_2307() >> in your database.
 
 Accepts a hashref of options to specify what kind of hash should be 
 generated. All options settable in the config file are valid.
@@ -109,16 +110,30 @@ generated. All options settable in the config file are valid.
 If you specify only the algorithm, the default settings for that algorithm will be used.
 
 A cryptographically random salt is used if salt is not defined.
-Only if you specify the empty string will an empty salt be used
-This is not recommended, and should only be used to upgrade old insecure hashes
+Only if you specify the empty string will an empty salt be used.
+This is not recommended, and should only be used to upgrade old insecure hashes.
 
-    my $phrase = passphrase('my password')->generate({
-        algorithm  => '',   # What algorithm is used to generate the hash
-        cost       => '',   # Cost / Work Factor if using bcrypt
-        salt       => '',   # Manually specify salt if using a salted digest
-    });
+    my $phrase = passphrase('my password')->generate(
+        {
+            algorithm  => $algo_name,   # override algo from config
+            $algo_name => {
+                # override options for this algorithm
+                $opt1 => $value1,
+            },
+        }
+    );
 
-It returns a Dancer2::Plugin::Passphrase::Hashed object.
+So for Bcrypt this might be:
+
+
+    my $phrase = passphrase('my password')->generate(
+        {
+            algorithm => 'Bcrypt',
+            Bcrypt   => {
+                cost => 14,
+            }
+        }
+    );
 
 =head2 matches
 
@@ -152,7 +167,7 @@ This is the format created by L<generate()|/"passphrase__generate">
 =head2 generate_random
 
 Generates and returns any number of cryptographically random
-characters from the url-safe base64 charater set.
+characters from the url-safe base64 character set.
 
     my $rand_pass = passphrase->generate_random;
 
@@ -199,7 +214,7 @@ The scheme name can be any of the following, and will always be capitalized
 
 Returns the algorithm name from a C<Dancer2::Plugin::Passphrase> object.
 
-The algorithm name can be anything that is accepted by C<Digest->new($alg)>
+The algorithm name can be anything that is accepted by C<< Digest->new($alg) >>
 This includes any modules in the C<Digest::> Namespace
 
     passphrase('my password')->generate->algorithm;
@@ -400,7 +415,7 @@ the correct MD5 hash without using the correct password.
 SHA isn't quite as broken as MD5, but it shares the same theoretical 
 weaknesses. Even without hash collisions, it is vulnerable to brute forcing.
 Modern hardware is so powerful it can try around a billion hashes a second. 
-That means every 7 chracter password in the range [A-Za-z0-9] can be cracked 
+That means every 7 character password in the range [A-Za-z0-9] can be cracked 
 in one hour on your average desktop computer.
 
 =item If the only way to break the hash is to brute-force it, it's secure enough
@@ -423,7 +438,7 @@ or
 
     Input must contain only octets
 
-The C<MD5>, C<bcrypt>, and C<SHA> algorithms can't handle chracters with an ordinal
+The C<MD5>, C<bcrypt>, and C<SHA> algorithms can't handle characters with an ordinal
 value above 255, producing errors like this if they encounter them.
 It is not possible for this plugin to automagically work out the correct
 encoding for a given string.
@@ -447,10 +462,6 @@ see L<http://training.perl.com/OSCON2011/index.html>
 L<Dancer2>, L<Digest>, L<Crypt::Eksblowfish::Bcrypt>
 
 
-=head1 AUTHOR
-
-Maintainer: Henk van Oers <hvoers@cpan.org>
-
 =head1 ACKNOWLEDGMENTS
 
 =over
@@ -459,11 +470,23 @@ Maintainer: Henk van Oers <hvoers@cpan.org>
 
 =item Sawyer X for his D2 magic.
 
+=item Mohammad S Anwar (GH#4, typo fixes)
+
+=item Jim Davis (GH#5)
+
+=item Peter Mottram (GH#11)
+
+=item Nuno Carvalho (GH#12)
+
+=item Tom Adams (fix generate docs)
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2016 by James Aitken.
+Copyright (c) 2016-2018 Peter Mottram <peter@sysnix.com>.
+Copyright (c) 2016 Henk van Oers <hvo.pm@xs4all.nl>.
+Copyright (c) 2012-2016 James Aitken.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

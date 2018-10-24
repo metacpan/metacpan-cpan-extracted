@@ -3,10 +3,12 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
+use Prty::Css;
 use Prty::Template;
 use Prty::String;
 use Scalar::Util ();
@@ -498,7 +500,8 @@ my %Default = (
     checkLevel=>1,            # Umfang der Element- und Attribut-Prüfungen
     compact=>0,               # Einzeilig, Whitespace komprimiert
     embedImages=>0,           # Einbettung von Bildern
-    htmlVersion=>'xhtml-1.0', # XHTML vs. HTML, Versionsnr. für DOCTYPE
+    # htmlVersion=>'xhtml-1.0', # XHTML vs. HTML, Versionsnr. für DOCTYPE
+    htmlVersion=>'html-5',    # XHTML vs. HTML, Versionsnr. für DOCTYPE
     indentation=>undef,       # forcierte Einrückung
     uppercase=>0,             # wandele Elem.- und Att.-Namen in Großschr.
 );
@@ -589,6 +592,13 @@ my %Element = (
     tt=>'i',         # Schreibmaschinenschrift
     ul=>'m',         # Ungeordnete Liste
     var=>'i',        # Text ist Variablenname
+);
+
+# Default-Optionen
+
+my %DefaultOptions = (
+    p => [-ignoreIfNull=>1],
+    span => [-ignoreIfNull=>1],
 );
 
 # Default-Attribute von Elementen allgemein
@@ -1001,7 +1011,13 @@ Liefere Leerstring, wenn Bedingung $bool erfüllt ist.
 
 =item -ignoreIfNull => $bool (Default: 0)
 
-Liefere Leerstring, wenn $content null (Leerstring oder undef) ist.
+Liefere Leerstring, wenn $content null (Leerstring oder undef)
+ist. Für verschiedene Tags ist C<< -ignoreIfNull=>1 >> der
+Default. Siehe Hash C<%DefaultOptions>. MEMO: Dieser Hash ist
+nicht vollständig erstellt und kann (soll) nach Bedarf ergänzt
+werden, insbesondere hinsichtlich der Option C<-ignoreIfNull>.
+Für zahlreiche weitere Tags dürfte dies ein sinnvoller Default
+sein (aber nicht für alle).
 
 =item -ignoreTagIf => $bool (Default: 0)
 
@@ -1087,6 +1103,12 @@ und dem Inhalt $content und liefere das Resultat zurück [2].
 Der Inhalt kann auch fehlen [1] oder sich über mehrere Argumente
 erstrecken [3].
 
+B<Attribut C{style}>
+
+Als Wert des Attributs C<style> kann eine Array-Referenz mit
+CSS-Regeln angegeben werden. Diese werden von der
+Methode Prty::Css->rules() aufgelöst.
+
 B<Boolsche Attribute>
 
 Boolsche Attribute werden in HTML ohne Wert und in XHTML mit sich
@@ -1129,6 +1151,8 @@ explizit gesetzt werden müssen.
 # -----------------------------------------------------------------------------
 
 # Setze Formatiereigenschaften
+# FIXME: Das Bündel *aller* Eigenschaften setzen, da eine Umschaltung
+# zwischen beliebigen Status vorkommen kann.
 
 my $setFmtDefaults = sub {
     my ($fmt,$fmtR,$indR,$endTagR,$nlR) = @_;
@@ -1139,6 +1163,7 @@ my $setFmtDefaults = sub {
     }
     elsif ($fmt eq 'e') {
         $$endTagR = 0;
+        $$nlR = 1;
     }
     elsif ($fmt eq 'E') {
         $$fmtR = 'e';
@@ -1148,6 +1173,9 @@ my $setFmtDefaults = sub {
     elsif ($fmt eq 'M') {
         $$fmtR = 'm';
         $$indR = 0;
+    }
+    elsif ($fmt eq 'v') {
+        $$nlR = 1;
     }
 
     return;
@@ -1159,8 +1187,16 @@ sub tag {
 
     # Defaults
 
-    my $xhtml = $self->{'htmlVersion'} =~ /^xhtml/;
-    my $uppercase = !$xhtml && $self->{'uppercase'};
+    my ($xhtml,$html5);
+    my $htmlVersion = $self->{'htmlVersion'};
+    if ($htmlVersion =~ /^html-5/) {
+        $html5 = 1;
+    }
+    elsif ($htmlVersion =~ /^xhtml/) {
+        $xhtml = 1;
+    }
+
+    my $uppercase = $self->{'uppercase'} && !($xhtml || $html5);
     my $embedImage = $self->{'embedImages'};
     my $checkLevel = $self->{'checkLevel'};
     my $compact = $self->{'compact'};
@@ -1223,6 +1259,10 @@ sub tag {
     my $str = '';
 
     # Optionen und Attribute verarbeiten
+
+    if (my $arr = $DefaultOptions{$tag}) {
+        unshift @_,@$arr;
+    }
 
     while (@_) {
         if (@_ == 1) {
@@ -1351,6 +1391,10 @@ sub tag {
 
         # Attribut/Wert-Paar
 
+        if ($key eq 'style' && ref($val)) {
+            # liefert undef, wenn Array leer ist
+            $val = Prty::Css->rules(@$val);
+        }
         if (defined $val) {
             if ($checkLevel >= 2) {
                 $self->checkValue($dom,$val);
@@ -1367,7 +1411,7 @@ sub tag {
 
             if ($dom eq 'bool') {
                 if ($val) {
-                    $str .= $xhtml? qq| $key="$key"|: " $key";
+                    $str .= $xhtml || $html5? qq| $key="$key"|: " $key";
                 }
             }
             else {
@@ -1535,7 +1579,7 @@ sub tag {
         $str .= "$content</$tagStr>";
     }
     else {
-        $str .= $xhtml? ' />': '>';
+        $str .= $xhtml || $html5? ' />': '>';
     }
 
     if ($indPos) {
@@ -1918,6 +1962,35 @@ sub comment {
 
 # -----------------------------------------------------------------------------
 
+=head3 protect() - Schütze HTML Metazeichen
+
+=head4 Synopsis
+
+    $html = $h->protect($text);
+
+=head4 Description
+
+Schütze alle Metazeichen in Text $text, so dass das Resultat
+gefahrlos in den Content eines HTML-Tag eingesetzt werden kann.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub protect {
+    my ($self,$text) = @_;
+
+    if (defined $text) {
+        $text =~ s/&/&amp;/g;
+        $text =~ s/</&lt;/g;
+        $text =~ s/>/&gt;/g;
+    }
+    
+    return $text;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 optional() - Optional-Klammer: <!--optional-->...<!--/optional-->
 
 =head4 Synopsis
@@ -2101,7 +2174,7 @@ sub import {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

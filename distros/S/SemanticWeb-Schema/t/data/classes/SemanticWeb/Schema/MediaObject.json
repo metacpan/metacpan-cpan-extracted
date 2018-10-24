@@ -39,10 +39,10 @@
          "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
          "rdfs:label" : "duration",
          "schema:domainIncludes" : [
-            "schema:Event",
             "schema:MediaObject",
-            "schema:MusicRelease",
             "schema:Movie",
+            "schema:Event",
+            "schema:MusicRelease",
             "schema:MusicRecording"
          ],
          "schema:rangeIncludes" : "schema:Duration"
@@ -63,10 +63,16 @@
       },
       "schema:encodingFormat" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "mp3, mpeg4, etc.",
+         "rdfs:comment" : "Media type typically expressed using a MIME format (see <a href=\"http://www.iana.org/assignments/media-types/media-types.xhtml\">IANA site</a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types\">MDN reference</a>) e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.).<br/><br/>\n\nIn cases where a <a class=\"localLink\" href=\"http://schema.org/CreativeWork\">CreativeWork</a> has several media type representations, <a class=\"localLink\" href=\"http://schema.org/encoding\">encoding</a> can be used to indicate each <a class=\"localLink\" href=\"http://schema.org/MediaObject\">MediaObject</a> alongside particular <a class=\"localLink\" href=\"http://schema.org/encodingFormat\">encodingFormat</a> information.<br/><br/>\n\nUnregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry.",
          "rdfs:label" : "encodingFormat",
-         "schema:domainIncludes" : "schema:MediaObject",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:domainIncludes" : [
+            "schema:MediaObject",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
       },
       "schema:height" : {
          "rdf:type" : "rdf:Property",
@@ -74,13 +80,13 @@
          "rdfs:label" : "height",
          "schema:domainIncludes" : [
             "schema:Person",
-            "schema:Product",
+            "schema:MediaObject",
             "schema:VisualArtwork",
-            "schema:MediaObject"
+            "schema:Product"
          ],
          "schema:rangeIncludes" : [
-            "schema:Distance",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Distance"
          ]
       },
       "schema:playerType" : {
@@ -95,14 +101,14 @@
          "rdfs:comment" : "The production company or studio responsible for the item e.g. series, video game, episode etc.",
          "rdfs:label" : "productionCompany",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
+            "schema:Movie",
             "schema:MediaObject",
-            "schema:RadioSeries",
+            "schema:VideoGameSeries",
+            "schema:CreativeWorkSeason",
             "schema:MovieSeries",
             "schema:Episode",
-            "schema:VideoGameSeries",
-            "schema:Movie",
-            "schema:TVSeries"
+            "schema:TVSeries",
+            "schema:RadioSeries"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -132,13 +138,13 @@
          "rdfs:comment" : "The width of the item.",
          "rdfs:label" : "width",
          "schema:domainIncludes" : [
-            "schema:VisualArtwork",
             "schema:Product",
-            "schema:MediaObject"
+            "schema:MediaObject",
+            "schema:VisualArtwork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Distance",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:Distance"
          ]
       }
    }

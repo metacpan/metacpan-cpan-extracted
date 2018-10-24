@@ -1,0 +1,233 @@
+= Translation manual of style =
+
+These are all real shortcomings found around r6000 (July 2009).
+
+Also see:
+ * [http://msdn.microsoft.com/en-us/library/aa511440.aspx]
+ * [http://developer.kde.org/documentation/design/ui/]
+ * [http://developer.gnome.org/projects/gup/hig/]
+ * [http://wiki.openusability.org/guidelines/]
+ * [http://developer.apple.com/documentation/UserExperience/Conceptual/AppleHIGuidelines/]
+
+----
+
+Bad:
+{{{
+    We found several new plugins.
+    In order to configure and enable them go to
+    Plugins -> Plugin Manager
+
+    List of new plugins:
+}}}
+
+    * Avoid the words 'we' or 'I' in dialog. Do not attempt to speak on behalf of the program or computer. State the situation as a matter of fact.
+    * Do not make the user remember a navigation path. Offer a direct shortcut to the referenced dialog.
+    * Avoid primitive ASCII approximate representation of symbols. Use proper characters: →
+    * Remove superfluous words. It is obvious to the user that this is a list.
+
+Better:
+{{{
+    New plugins were found.
+    [Plugin A                   ^]
+    [Plugin B                   #]
+    [Plugin C                   #]
+    [Plugin D                   #]
+    [Plugin E                   v]
+                    [Configure...]
+}}}
+
+----
+
+
+Bad:
+{{{
+    $plugin->errstr( Wx::gettext("Error when calling menu for plugin") . "'$name': $@" );
+    Plugin:%s - Not compatible with Padre::Plugin API. Need to be subclass of Padre::Plugin
+}}}
+
+    * Do not concatenate strings in code. Use sprintf-style gettext templates.
+    * Do not write messages in newspaper headline style. Write full sentences in proper English.
+
+Better:
+{{{
+    "An error occured when calling the menu for the plugin %s: %s", $name, $@
+    The plugin %s is not compatible with the Padre::Plugin API. It needs to be a subclass of Padre::Plugin.
+}}}
+
+----
+
+Bad:
+{{{
+    GoTo Bookmark
+    GoTo Element
+}}}
+
+    * !EnglishIsNotWrittenLikeThat
+
+Better:
+{{{
+    Go to Bookmark
+    Go to Element
+}}}
+
+----
+
+Bad:
+{{{
+    &Close\tCtrl+W
+    Select all\tCtrl-A
+}}}
+
+    * Do not invent a different notation for key combinations. Use consistently the symbol + to join keys.
+
+Better:
+{{{
+    &Close\tCtrl+W
+    Select all\tCtrl+A
+}}}
+
+----
+
+Bad:
+{{{
+    Could not locate project dir
+    Cannot build regex for '%s'
+    Chars without spaces: %s
+    Convert EOL
+}}}
+
+    * Do not use abbreviations. Use consistently the formal wording.
+
+Better:
+{{{
+    Could not locate project directory
+    Cannot build regular expression for '%s'
+    Characters without spaces: %s
+    Convert line endings
+}}}
+
+----
+
+Bad:
+{{{
+    The bookmark '%s' no longer exists
+    %s occurences were replaced
+}}}
+
+    * Do not omit punctuation. Complete sentences with a full stop.
+
+Better:
+{{{
+    The bookmark '%s' no longer exists.
+    %s occurences were replaced.
+}}}
+
+----
+
+Bad:
+{{{
+    No diagnostics available for this error!
+}}}
+
+    * Avoid excitement or shouting. Whereever possible, use mere statements of fact.
+
+Better:
+{{{
+    No diagnostics are available for this error.
+}}}
+
+----
+
+Bad:
+{{{
+    First character of selection does not seem to point at a token.
+    Selection not part of a Perl statement?
+    All braces appear to be matched
+    %s apparantly created. Do you want to open it now?
+}}}
+
+    * Avoid vagueness. If the computer is not sure, the user certainly can't be, either. Whereever possible, use mere statements of fact. If you really cannot be sure, give the user more context or partial results so he can make an informed decision.
+
+Better:
+{{{
+    The first character of the selection does not point at a token.
+    The selection is not part of a Perl statement.
+    All braces are matched.
+    %s was created. Do you want to open it now?
+}}}
+
+----
+
+Bad:
+{{{
+    No declaration could be found for the specified (lexical?) variable
+}}}
+
+    * Avoid overloading several circumstances into a single message. Split them off into several messages and match them according to the relevant situation.
+
+Better:
+{{{
+    No declaration could be found for the specified package variable.
+    No declaration could be found for the specified lexical variable.
+}}}
+
+----
+
+Bad:
+{{{
+    File changed on disk since last saved. Do you want to overwrite it?
+}}}
+
+    * Avoid being overly specific in technical details. In this instance, there might not be a disk involved.
+
+Better:
+{{{
+    The file has changed since the last save. Do you want to overwrite it?
+}}}
+
+----
+
+Bad:
+{{{
+    Install Remote Distribution
+}}}
+
+    * Avoid using words that have multiple similar meanings. Clarify with more or different wording.
+
+Better:
+{{{
+    Install Distribution from the Web
+}}}
+
+----
+
+Bad:
+{{{
+    TAB display size (in spaces):
+    Next File\tCtrl-TAB
+    Encode document to utf-8
+}}}
+
+    * Use proper capitalisation. Be aware of what is an acronym and what is not.
+
+Better:
+{{{
+    Tabulator display size (in spaces):
+    Next File\tCtrl+Tab
+    Encode document to UTF-8
+}}}
+
+----
+
+Bad:
+{{{
+    &Open\tCtrl+O
+}}}
+
+    * Menu items and buttons that open a dialog or require further user action end in an ellipsis… Menu items and buttons that result in immediate action do not end in an ellipsis.
+
+Better:
+{{{
+    &Open…\tCtrl+O
+}}}
+

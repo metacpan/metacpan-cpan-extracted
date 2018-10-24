@@ -8,6 +8,7 @@ t/_load.t
 t/arrays.t
 t/blessed.t
 t/coderefs.t
+t/errors.t
 t/hashes.t
 t/list_diff.t
 t/manifest.t

@@ -15,7 +15,7 @@ Markdent::Dialect::GitHub - Markdown extensions implemented on GitHub
 =head1 DESCRIPTION
 
 The GitHub roles add parsing for some of the Markdown extensions used on
-GitHub. See http://github.github.com/github-flavored-markdown/ for details.
+GitHub. See L<http://github.github.com/github-flavored-markdown/> for details.
 
 =head2 DEVIATIONS
 

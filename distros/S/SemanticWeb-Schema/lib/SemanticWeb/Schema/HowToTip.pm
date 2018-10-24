@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::HowToTip;
 
 # ABSTRACT: An explanation in the instructions for how to achieve a result
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::ListItem /;
+extends qw/ SemanticWeb::Schema::CreativeWork SemanticWeb::Schema::ListItem /;
 
 
 use MooX::JSON_LD 'HowToTip';
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::HowToTip - An explanation in the instructions for how to ac
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

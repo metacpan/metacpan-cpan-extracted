@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::MensClothingStore;
 
 # ABSTRACT: A men's clothing store.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::MensClothingStore - A men's clothing store.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

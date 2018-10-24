@@ -25,8 +25,8 @@
          "rdfs:label" : "bestRating",
          "schema:domainIncludes" : "schema:Rating",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Number"
+            "schema:Number",
+            "schema:Text"
          ]
       },
       "schema:ratingValue" : {

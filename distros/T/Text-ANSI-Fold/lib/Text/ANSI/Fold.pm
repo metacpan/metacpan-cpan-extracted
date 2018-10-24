@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -192,17 +192,21 @@ sub simple_fold {
     my $width = shift;
     $width <= 0 and croak "parameter error";
 
-    my($s1, $s2) = $orig =~ m/^(\X{0,$width})(.*)/ or die;
+    my($left, $right) = $orig =~ m/^(\X{0,$width}+)(.*)/ or die;
 
-    my $w = vwidth($s1);
+    my $w = vwidth($left);
     while ($w > $width) {
-	my $trim = int(($w - $width) / 2 + 0.5) || 1;
-	$s1 =~ s/\X \K ( \X{$trim} ) \z//x or last;
-	$s2 = $1 . $s2;
+	my $trim = do {
+	    # use POSIX qw(ceil);
+	    # ceil(($w - $width) / 2) || 1;
+	    int(($w - $width) / 2 + 0.5) || 1;
+	};
+	$left =~ s/\X \K ( \X{$trim} ) \z//x or last;
+	$right = $1 . $right;
 	$w -= vwidth($1);
     }
 
-    ($s1, $s2, $w);
+    ($left, $right, $w);
 }
 
 ######################################################################
@@ -401,6 +405,10 @@ to treat them as wide character.
 =head1 SEE ALSO
 
 =over 7
+
+=item L<App::ansifold>
+
+Command line utility using L<Text::ANSI::Fold>.
 
 =item L<App::sdif>
 

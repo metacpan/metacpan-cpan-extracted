@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw( Class::Accessor::Fast );
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 sub init {
 	my $self = shift;

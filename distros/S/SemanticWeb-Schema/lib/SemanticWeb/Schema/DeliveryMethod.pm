@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::DeliveryMethod;
 
-# ABSTRACT: <p>A delivery method is a standardized procedure for transferring the product or service to the destination of fulfillment chosen by the customer
+# ABSTRACT: A delivery method is a standardized procedure for transferring the product or service to the destination of fulfillment chosen by the customer
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,19 +30,19 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::DeliveryMethod - <p>A delivery method is a standardized procedure for transferring the product or service to the destination of fulfillment chosen by the customer
+SemanticWeb::Schema::DeliveryMethod - A delivery method is a standardized procedure for transferring the product or service to the destination of fulfillment chosen by the customer
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>A delivery method is a standardized procedure for transferring the
-product or service to the destination of fulfillment chosen by the
-customer. Delivery methods are characterized by the means of transportation
-used, and by the organization or group that is the contracting party for
-the sending organization or person.</p> <p>Commonly used values:</p> <ul>
+=for html A delivery method is a standardized procedure for transferring the product
+or service to the destination of fulfillment chosen by the customer.
+Delivery methods are characterized by the means of transportation used, and
+by the organization or group that is the contracting party for the sending
+organization or person.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#DeliveryModeDirectDownload</li>
 <li>http://purl.org/goodrelations/v1#DeliveryModeFreight</li>
 <li>http://purl.org/goodrelations/v1#DeliveryModeMail</li>

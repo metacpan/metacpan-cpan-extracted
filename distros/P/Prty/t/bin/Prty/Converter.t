@@ -5,12 +5,34 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {
     shift->useOk('Prty::Converter');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_snakeCaseToCamelCase : Test(2) {
+    my $self = shift;
+
+    my $camel = Prty::Converter->snakeCaseToCamelCase('ims-apply-delta-row-by-row');
+    $self->is($camel,'imsApplyDeltaRowByRow');
+
+    $camel = Prty::Converter->snakeCaseToCamelCase('ims_apply_delta_row_by_row');
+    $self->is($camel,'imsApplyDeltaRowByRow');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_strToHex : Test(1) {
+    my $self = shift;
+
+    my $val = Prty::Converter->strToHex('Franz Strauß');
+    $self->is($val,'46 72 61 6e 7a 20 53 74 72 61 75 df');
 }
 
 # -----------------------------------------------------------------------------
@@ -41,6 +63,24 @@ sub test_germanToProgramNumber : Test(2) {
 
     $x = Prty::Converter->germanToProgramNumber('12.345,67');
     $self->is($x,'12345.67');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_ptToPx : Test(1) {
+    my $self = shift;
+
+    my $px = Prty::Converter->ptToPx(75);
+    $self->is($px,100);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_pxToPt : Test(1) {
+    my $self = shift;
+
+    my $pt = Prty::Converter->pxToPt(100);
+    $self->is($pt,75);
 }
 
 # -----------------------------------------------------------------------------

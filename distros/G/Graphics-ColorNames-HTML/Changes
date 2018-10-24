@@ -1,0 +1,9 @@
+Revision history for Graphics-ColorNames-HTML:
+
+v3.3.1    2018-10-21 17:08:19+01:00 Europe/London
+  [Documentation]
+  - Updated note about deprecation.
+
+v3.3.0    2018-10-21 17:04:05+01:00 Europe/London
+  [Incompatabilities]
+  - Split into separate distribution from Graphics-ColorNames

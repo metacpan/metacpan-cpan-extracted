@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "dc:source" : "schemadotorgsources2:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A predefined value for a product characteristic, e.g. the power cord plug type 'US' or the garment sizes 'S', 'M', 'L', and 'XL'.",
       "rdfs:label" : "QualitativeValue",
@@ -9,18 +9,18 @@
    "properties" : {
       "schema:additionalProperty" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.</p>\n\n<p>Note: Publishers should be aware that applications designed to use specific schema.org properties (e.g. http://schema.org/width, http://schema.org/color, http://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
+         "rdfs:comment" : "A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.<br/><br/>\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. http://schema.org/width, http://schema.org/color, http://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
          "rdfs:label" : "additionalProperty",
          "schema:domainIncludes" : [
-            "schema:QualitativeValue",
-            "schema:QuantitativeValue",
             "schema:Product",
-            "schema:Place"
+            "schema:Place",
+            "schema:QuantitativeValue",
+            "schema:QualitativeValue"
          ],
          "schema:rangeIncludes" : "schema:PropertyValue"
       },
       "schema:equal" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "This ordering relation for qualitative values indicates that the subject is equal to the object.",
          "rdfs:label" : "equal",
@@ -28,7 +28,7 @@
          "schema:rangeIncludes" : "schema:QualitativeValue"
       },
       "schema:greater" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "This ordering relation for qualitative values indicates that the subject is greater than the object.",
          "rdfs:label" : "greater",
@@ -36,7 +36,7 @@
          "schema:rangeIncludes" : "schema:QualitativeValue"
       },
       "schema:greaterOrEqual" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "This ordering relation for qualitative values indicates that the subject is greater than or equal to the object.",
          "rdfs:label" : "greaterOrEqual",
@@ -44,7 +44,7 @@
          "schema:rangeIncludes" : "schema:QualitativeValue"
       },
       "schema:lesser" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "This ordering relation for qualitative values indicates that the subject is lesser than the object.",
          "rdfs:label" : "lesser",
@@ -52,7 +52,7 @@
          "schema:rangeIncludes" : "schema:QualitativeValue"
       },
       "schema:lesserOrEqual" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "This ordering relation for qualitative values indicates that the subject is lesser than or equal to the object.",
          "rdfs:label" : "lesserOrEqual",
@@ -60,7 +60,7 @@
          "schema:rangeIncludes" : "schema:QualitativeValue"
       },
       "schema:nonEqual" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "This ordering relation for qualitative values indicates that the subject is not equal to the object.",
          "rdfs:label" : "nonEqual",
@@ -68,21 +68,21 @@
          "schema:rangeIncludes" : "schema:QualitativeValue"
       },
       "schema:valueReference" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A pointer to a secondary value that provides additional information on the original value, e.g. a reference temperature.",
          "rdfs:label" : "valueReference",
          "schema:domainIncludes" : [
-            "schema:QualitativeValue",
             "schema:PropertyValue",
-            "schema:QuantitativeValue"
+            "schema:QuantitativeValue",
+            "schema:QualitativeValue"
          ],
          "schema:rangeIncludes" : [
+            "schema:QualitativeValue",
+            "schema:StructuredValue",
             "schema:QuantitativeValue",
             "schema:Enumeration",
-            "schema:PropertyValue",
-            "schema:StructuredValue",
-            "schema:QualitativeValue"
+            "schema:PropertyValue"
          ]
       }
    }

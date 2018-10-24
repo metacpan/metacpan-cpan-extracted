@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::AggregateOffer;
 
 # ABSTRACT: When a single product is associated with multiple offers (for example
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has high_price => (
@@ -64,7 +66,7 @@ SemanticWeb::Schema::AggregateOffer - When a single product is associated with m
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -100,9 +102,9 @@ A low_price should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<Str>
+
+=item C<Num>
 
 =back
 

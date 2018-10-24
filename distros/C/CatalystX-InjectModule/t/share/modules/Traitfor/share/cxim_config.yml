@@ -1,0 +1,6 @@
+name: Traitfor
+version: 1
+
+Controller::A:
+  traits:
+    - BeforeIndex

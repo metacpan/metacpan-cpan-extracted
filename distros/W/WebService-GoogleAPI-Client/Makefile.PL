@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.006;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/goauth"
   ],
   "LICENSE" => "apache",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "WebService::GoogleAPI::Client",
   "PREREQ_PM" => {
     "CHI" => 0,
@@ -26,13 +26,15 @@ my %WriteMakefileArgs = (
     "Crypt::JWT" => 0,
     "Data::Dumper" => 0,
     "Hash::Slice" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.45",
     "Mojo::UserAgent" => 0,
     "Mojolicious::Lite" => 0,
+    "Mojolicious::Plugin::OAuth2" => "1.5",
     "Moo" => 0,
     "MooX::Singleton" => 0,
-    "Moose" => 0,
+    "Moose" => "2.2",
     "Net::EmptyPort" => 0,
+    "Path::Class" => 0,
     "Tie::File" => 0,
     "feature" => 0,
     "strict" => 0,
@@ -46,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Needs" => 0
   },
-  "VERSION" => "0.11",
+  "VERSION" => "0.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,14 +64,16 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "Email::Simple" => 0,
   "Hash::Slice" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.45",
   "MIME::Base64" => 0,
   "Mojo::UserAgent" => 0,
   "Mojolicious::Lite" => 0,
+  "Mojolicious::Plugin::OAuth2" => "1.5",
   "Moo" => 0,
   "MooX::Singleton" => 0,
-  "Moose" => 0,
+  "Moose" => "2.2",
   "Net::EmptyPort" => 0,
+  "Path::Class" => 0,
   "Test::More" => 0,
   "Test::Needs" => 0,
   "Tie::File" => 0,

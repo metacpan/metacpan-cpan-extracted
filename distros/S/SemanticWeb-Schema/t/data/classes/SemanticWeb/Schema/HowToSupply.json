@@ -11,8 +11,8 @@
          "rdfs:comment" : "The estimated cost of the supply or supplies consumed when performing instructions.",
          "rdfs:label" : "estimatedCost",
          "schema:domainIncludes" : [
-            "schema:HowToSupply",
-            "schema:HowTo"
+            "schema:HowTo",
+            "schema:HowToSupply"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",

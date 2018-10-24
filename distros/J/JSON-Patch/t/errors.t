@@ -3,9 +3,15 @@
 use strict;
 use warnings FATAL => 'all';
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 
 use JSON::Patch 'patch';
+
+eval { patch([], undef) };
+like($@, qr/^Arrayref expected for patch /);
+
+eval { patch([], [undef]) };
+like($@, qr/^Hashref expected for patch item /);
 
 eval { patch([], [{}]) };
 like($@, qr/^Undefined op value /);

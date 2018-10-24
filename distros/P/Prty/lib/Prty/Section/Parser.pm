@@ -3,9 +3,10 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 no bytes;
 use Prty::Section::Object;
@@ -727,7 +728,7 @@ Als Beispiel siehe prty-confluence:
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

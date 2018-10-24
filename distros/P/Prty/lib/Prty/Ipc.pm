@@ -3,8 +3,9 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Option;
 use Prty::Shell;
@@ -30,7 +31,9 @@ L<Prty::Object>
 
 =head4 Synopsis
 
+    $out = Prty::Ipc->filter($cmd,$in,@opt);
     ($out,$err) = Prty::Ipc->filter($cmd,$in,@opt);
+    $out = Prty::Ipc->filter($cmd,@opt);
     ($out,$err) = Prty::Ipc->filter($cmd,@opt);
 
 =head4 Options
@@ -48,7 +51,8 @@ geworfen, wenn das Kommando fehlschlägt.
 
 Rufe Kommando $cmd als Filter auf. Das Kommando erhält die Daten
 $in auf stdin und liefert die Daten $out und $err auf stdout
-bzw. stderr.
+bzw. stderr. In Skalarkontext wird nur die Ausgabe auf stdout
+geliefert.
 
 Achtung: Der Aufruf kann zu einem SIGPIPE führen, wenn per
 Parameter $in Daten an $cmd gesendet werden und das Kommando
@@ -99,14 +103,14 @@ sub filter {
         Prty::Shell->checkError($?,$err,$cmd);
     }
 
-    return ($out,$err);
+    return wantarray? ($out,$err): $out;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

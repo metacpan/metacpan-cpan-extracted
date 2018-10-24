@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::TrackAction;
 
-# ABSTRACT: <p>An agent tracks an object for updates
+# ABSTRACT: An agent tracks an object for updates
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has delivery_method => (
@@ -36,16 +38,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::TrackAction - <p>An agent tracks an object for updates
+SemanticWeb::Schema::TrackAction - An agent tracks an object for updates
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>An agent tracks an object for updates.</p> <p>Related actions:</p> <ul>
-<li><a class="localLink"
+=for html An agent tracks an object for updates.<br/><br/> Related actions:<br/><br/>
+<ul> <li><a class="localLink"
 href="http://schema.org/FollowAction">FollowAction</a>: Unlike
 FollowAction, TrackAction refers to the interest on the location of
 innanimates objects.</li> <li><a class="localLink"

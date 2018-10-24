@@ -1,3 +1,9 @@
+0.0603  2018-10-22
+        - Move to git+GitHub.
+
+0.0602  2018-10-22
+        - Document --trailing-slash=0 .
+
 0.0601  2018-10-17
         - Fix --trailing-slash=0 to avoid mkpath.
 

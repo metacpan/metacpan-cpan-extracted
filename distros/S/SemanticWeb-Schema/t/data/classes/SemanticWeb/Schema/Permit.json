@@ -11,8 +11,8 @@
          "rdfs:comment" : "The organization issuing the ticket or permit.",
          "rdfs:label" : "issuedBy",
          "schema:domainIncludes" : [
-            "schema:Ticket",
-            "schema:Permit"
+            "schema:Permit",
+            "schema:Ticket"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -38,18 +38,18 @@
          "schema:rangeIncludes" : "schema:Duration"
       },
       "schema:validFrom" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
+            "schema:Offer",
             "schema:MonetaryAmount",
-            "schema:Permit",
-            "schema:Demand",
+            "schema:LocationFeatureSpecification",
             "schema:PriceSpecification",
             "schema:OpeningHoursSpecification",
-            "schema:LocationFeatureSpecification",
-            "schema:Offer"
+            "schema:Demand",
+            "schema:Permit"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },

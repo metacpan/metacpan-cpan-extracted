@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::MoveAction;
 
-# ABSTRACT: <p>The act of an agent relocating to a place
+# ABSTRACT: The act of an agent relocating to a place
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has from_location => (
@@ -44,16 +46,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::MoveAction - <p>The act of an agent relocating to a place
+SemanticWeb::Schema::MoveAction - The act of an agent relocating to a place
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of an agent relocating to a place.</p> <p>Related actions:</p>
-<ul> <li><a class="localLink"
+=for html The act of an agent relocating to a place.<br/><br/> Related
+actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/TransferAction">TransferAction</a>: Unlike
 TransferAction, the subject of the move is a living Person or Organization
 rather than an inanimate object.</li> </ul> 

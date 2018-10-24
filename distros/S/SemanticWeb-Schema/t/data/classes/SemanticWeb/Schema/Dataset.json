@@ -1,10 +1,10 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_DatasetClass",
+      "dc:source" : "schemadotorgsources2:source_DatasetClass",
       "owl:equivalentClass" : [
+         "void:Dataset",
          "dcat:Dataset",
-         "dcmitype:Dataset",
-         "void:Dataset"
+         "dcmitype:Dataset"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A body of structured information describing some topic(s) of interest.",
@@ -52,7 +52,7 @@
          "schema:rangeIncludes" : "schema:DataCatalog"
       },
       "schema:issn" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
+         "dc:source" : "schemadotorgsources2:source_bibex",
          "owl:equivalentProperty" : "bibo:issn",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication.",
@@ -60,9 +60,9 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
             "schema:Blog",
+            "schema:Dataset",
             "schema:CreativeWorkSeries",
-            "schema:WebSite",
-            "schema:Dataset"
+            "schema:WebSite"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

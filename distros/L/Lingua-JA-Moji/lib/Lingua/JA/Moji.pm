@@ -7,7 +7,7 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -50,7 +50,6 @@ our @EXPORT_OK = qw/
                     kana2katakana
                     kana2morse
                     kana2romaji
-                    kana_order
                     kana_to_large
                     kanji2bracketed
                     kanji2circled
@@ -227,11 +226,13 @@ sub invert
 }
 
 
-# Kana ordered by consonant. Adds bogus "q" gyou for small vowels and
-# "x" gyou for youon (ya, yu, yo) to the usual ones.
+# Kana ordered by consonant. Adds two bogus gyous, a "q" gyou for
+# small vowels and an "xy" gyou for youon (ya, yu, yo), to the usual
+# ones.
 
 my @gyou = (
     a => [qw/ア イ ウ エ オ/],
+    # Not a real gyou.
     q => [qw/ァ ィ ゥ ェ ォ/],
     k => [qw/カ キ ク ケ コ/],
     g => [qw/ガ ギ グ ゲ ゴ/],
@@ -252,14 +253,6 @@ my @gyou = (
 );
 
 my %gyou = @gyou;
-
-sub kana_order
-{
-    # I don't know if it's necessary to copy the array or not, but I don't
-    # want to take a chance messing up the array.
-    my @copy = @gyou;
-    return \@copy;
-}
 
 # Kana => consonant mapping.
 
@@ -306,9 +299,17 @@ for my $vowel (keys %dan) {
 # Added z for "badge" etc.
 # Added g for ドッグ etc.
 
-my @takes_sokuon_gyou = qw/s t k p d z g/;
-my @takes_sokuon = (map {@{$gyou{$_}}} @takes_sokuon_gyou);
-my $takes_sokuon = join '', @takes_sokuon;
+#my @takes_sokuon_gyou = qw/s t k p d z g/;
+#my @takes_sokuon = (map {@{$gyou{$_}}} @takes_sokuon_gyou);
+#my $takes_sokuon = join '', @takes_sokuon;
+#die @takes_sokuon;
+my $takes_sokuon = 'サシスセソタチツテトカキクケコパピプペポダヂヅデドザジズゼゾガギグゲゴ';
+
+# Any kana except ん
+
+#my@b4s;push@b4s,@{$gyou{$_}}for sort keys%gyou;@b4s=grep!/ん/,@b4s;die join'',@b4s;
+
+my $before_sokuon = 'ヤユヨナニヌネノャュョガギグゲゴダヂヅデドカキクケコヴラリルレロワヰヱヲバビブベボタチツテトアイウエオパピプペポサシスセソァィゥェォマミムメモハヒフヘホザジズゼゾ';
 
 # N
 
@@ -756,9 +757,22 @@ sub is_romaji_strict
     my ($romaji) = @_;
     my $canonical = is_romaji ($romaji);
     if (! $canonical) {
-	return;
+	return undef;
     }
-    if ($romaji =~ /
+    my $kana = romaji2kana ($romaji);
+    if ($kana =~ m!
+		      # Don't allow tanggono
+		      ンッ
+		  |
+		      # Don't allow "nmichi".
+		      ^ン
+		  |
+		      # Don't allow ffun etc.
+		      ^ッ
+		  !x) {
+	return undef;
+    }
+    if ($romaji =~ m!
 		       (fy|l|x|v)y?($vowel_re|ts?u|wa|ka|ke)
 		   |
 		       # Don't allow hyi, hye, yi, ye.
@@ -790,9 +804,24 @@ sub is_romaji_strict
 		       # Don't allow some non-Japanese double consonants.
 		       (?:rr|yy)
 		   |
-		       # Don't allow 'thi'
-		       thi
-		   /ix) {
+		       # Don't allow 'thi'/'thu'
+		       th[iu]
+		   |
+		       # Don't allow 'johann'
+		       nn$
+		   |
+		       # Don't allow 'ridzuan' etc.
+		       dz
+		   |
+		       # Qs are out.
+		       q
+		   |
+		       # Double ws, hs, etc. are out
+		       ww|hh|bb
+		   |
+		       # This is allowed by IMEs as "ちゃ" etc.
+		       cy
+		   !ix) {
         return undef;
     }
     return $canonical;
@@ -1044,7 +1073,9 @@ my %daku2not = (qw/
 /);
 
 my %not2daku = reverse %daku2not;
+
 my $daku = qr![がぎぐげごだぢづでどざじずぜぞばびぶべぼガギグゲゴダヂヅデドザジズゼゾバビブベボ]!;
+
 my $nodaku = qr![かきくけこたしつてとさしすせそはひふへほカキクケコタシツテトサシスセソハヒフヘホ]!;
 
 my %handaku2not = (qw!
@@ -1061,7 +1092,9 @@ my %handaku2not = (qw!
 !);
 
 my %not2handaku = reverse %handaku2not;
+
 my $handaku = qr![ぱぴぷぺぽパピプペポ]!;
+
 my $nohandaku = qr![はひふへほハヒフヘホ]!;
 
 sub join_sound_marks
@@ -1351,13 +1384,18 @@ FF70
 -30FB
 END
     # Explanation of the above gibberish: The funny hex is for dakuten
-    # and handakuten half width. The Katakana catches halfwidth
-    # katakana, and the InKatakana catches the chouon mark. IsCn means
-    # "other, not assigned". 30FB is "Katakana middle dot", which is
-    # not kana as far as I know.
+    # and handakuten half width. The "Katakana" catches halfwidth
+    # katakana, and the "InKatakana" catches the chouon mark. "IsCn"
+    # means "other, not assigned", so we remove this to prevent
+    # matching non-kana characters floating around near to real
+    # ones. 30FB is "Katakana middle dot", which is not kana as far as
+    # I know, so that's also removed.
 }
 
 # お
+
+# Match zero or one sokuons, one full-sized kana character, then zero
+# or one each of small kana, chouon, and syllabic n, in that order.
 
 my $kana2syllable_re = qr/ッ?[アイウエオ-モヤユヨ-ヴ](?:[ャュョァィゥェォ])?ー?ン?/;
 
@@ -1394,51 +1432,17 @@ sub katakana2square
     return $square2katakana->invert (@_);
 }
 
-# Turn shima into jima etc.
-
-my %nigori = (qw/
-カ ガ
-キ ギ
-ク グ
-ケ ゲ
-コ ゴ
-サ ザ
-シ ジ
-ス ズ
-セ ゼ
-ソ ゾ
-タ ダ
-チ ヂ
-ツ ヅ
-テ デ
-ト ド
-ハ バ
-ヒ ビ
-フ ブ
-ヘ ベ
-ホ ボ
-/);
-
-my %handaku = (qw/
-ハ パ
-ヒ ピ
-フ プ
-ヘ ペ
-ホ ポ
-/);
-
 sub nigori_first
 {
     my ($list) = @_;
     my @nigori;
     for my $kana (@$list) {
 	my ($first, $remaining) = split //, $kana, 2;
-	my $nf = $nigori{$first};
+	my $nf = $not2daku{$first};
 	if ($nf) {
-	    #	print "$kana -> $nf$remaining\n";
 	    push @nigori, $nf.$remaining;
 	}
-	my $hf = $handaku{$first};
+	my $hf = $not2handaku{$first};
 	if ($hf) {
 	    push @nigori, $hf.$remaining;
 	}
@@ -1543,7 +1547,8 @@ sub smallize_kana
     my ($kana) = @_;
     my $orig = $kana;
     $kana =~ s/([キギシジチヂニヒビピミリ])([ヤユヨ])/$1$yayuyo{$2}/g;
-    $kana =~ s/ツ([カキクケコガギグゲゴサシスセソタチツテトパビプペポジ])/ッ$1/g;
+    # Don't make "ツル" into "ッル".
+    $kana =~ s/([$before_sokuon])ツ([$takes_sokuon])/$1ッ$2/g;
     if ($kana ne $orig) {
 	return $kana;
     }
@@ -1561,10 +1566,13 @@ sub cleanup_kana
 	$kana = romaji2kana ($kana);
     }
     $kana = kana2katakana ($kana);
-    # Translate kanjis into kana where "naive user" has inserted kanji
-    # not kana.
-    # LHS are all kanji, RHS are all kana/chouon
-    $kana =~ tr/八力二一/ハカニー/;
+    #$kana =~ s/([$nohandaku])°/$1゜/g;
+    $kana = join_sound_marks ($kana);
+    # Translate kanjis into katakana where a "naive user" has inserted
+    # kanji not kana.  Because the following expression is visually
+    # confusing, note that the LHS are all kanji, and the RHS are all
+    # kana/chouon
+    $kana =~ tr/口八力二一/ロハカニー/;
     return $kana;
 }
 

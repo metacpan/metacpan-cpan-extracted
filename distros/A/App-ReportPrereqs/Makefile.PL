@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Report prerequisite versions",
+  "ABSTRACT" => "report prerequisite versions",
   "AUTHOR" => "Sven Kirmess <sven.kirmess\@kzone.ch>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -22,7 +22,9 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Basename" => 0,
+    "File::Temp" => 0,
     "Getopt::Long" => 0,
+    "HTTP::Tiny" => "0.014",
     "List::Util" => 0,
     "Module::CPANfile" => 0,
     "Module::Path" => 0,
@@ -34,10 +36,11 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => 0,
     "Cwd" => 0,
     "FindBin" => 0,
+    "Test::MockModule" => 0,
     "Test::More" => "0.88",
     "lib" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,11 +52,14 @@ my %FallbackPrereqs = (
   "Cwd" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Basename" => 0,
+  "File::Temp" => 0,
   "FindBin" => 0,
   "Getopt::Long" => 0,
+  "HTTP::Tiny" => "0.014",
   "List::Util" => 0,
   "Module::CPANfile" => 0,
   "Module::Path" => 0,
+  "Test::MockModule" => 0,
   "Test::More" => "0.88",
   "lib" => 0,
   "strict" => 0,

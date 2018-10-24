@@ -7,7 +7,7 @@
    },
    "properties" : {
       "schema:albumProductionType" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Classification of the album by it's type of content: soundtrack, live album, studio album, etc.",
          "rdfs:label" : "albumProductionType",
@@ -23,7 +23,7 @@
          "schema:rangeIncludes" : "schema:MusicRelease"
       },
       "schema:albumReleaseType" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The kind of release which this album is: single, EP or album.",
          "rdfs:label" : "albumReleaseType",
@@ -35,8 +35,8 @@
          "rdfs:comment" : "The artist that performed this album or recording.",
          "rdfs:label" : "byArtist",
          "schema:domainIncludes" : [
-            "schema:MusicAlbum",
-            "schema:MusicRecording"
+            "schema:MusicRecording",
+            "schema:MusicAlbum"
          ],
          "schema:rangeIncludes" : "schema:MusicGroup"
       }

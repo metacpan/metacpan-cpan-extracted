@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::DayOfWeek;
 
 # ABSTRACT: The day of the week, e
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,12 +34,12 @@ SemanticWeb::Schema::DayOfWeek - The day of the week, e
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
 =for html The day of the week, e.g. used to specify to which day the opening hours of
-an OpeningHoursSpecification refer.</p> <p>Originally, URLs from <a
+an OpeningHoursSpecification refer.<br/><br/> Originally, URLs from <a
 href="http://purl.org/goodrelations/v1">GoodRelations</a> were used (for <a
 class="localLink" href="http://schema.org/Monday">Monday</a>, <a
 class="localLink" href="http://schema.org/Tuesday">Tuesday</a>, <a

@@ -3,9 +3,10 @@ use base qw/Prty::Database::Row/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Hash;
 use Prty::Option;
@@ -754,6 +755,10 @@ sub modifiedColumns {
 
     @clauses|$clauseA = $row->setClauseFromModifiedRow(@columns);
 
+=head4 See Also
+
+modifiedColumns()
+
 =head4 Example
 
 Auf einen View-Datensatz wurden Werte geschrieben. Wir wissen
@@ -778,10 +783,6 @@ setClauseFromModifiedRow() liefert uns die SET-Klausel für ein UPDATE:
 
 Wurde keine der Kolumnen geändert, liefert setClauseFromModifiedRow() eine leere
 Liste und $db->update() ist eine Nulloperation.
-
-=head4 See Also
-
-modifiedColumns()
 
 =cut
 
@@ -1634,7 +1635,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -28,9 +28,12 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Find" => 0,
-    "Test::More" => 0
+    "Test::Exception" => 0,
+    "Test::More" => 0,
+    "Test::Pod" => 0,
+    "Test::RedisDB" => 0
   },
-  "VERSION" => "1.002",
+  "VERSION" => "1.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +47,10 @@ my %FallbackPrereqs = (
   "Mail::SpamAssassin::Plugin" => 0,
   "Mail::SpamAssassin::Util" => 0,
   "Redis" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
+  "Test::Pod" => 0,
+  "Test::RedisDB" => 0,
   "strict" => 0,
   "vars" => 0,
   "warnings" => 0

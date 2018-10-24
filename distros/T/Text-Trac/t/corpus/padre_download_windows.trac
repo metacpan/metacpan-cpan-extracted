@@ -1,0 +1,53 @@
+= Windows Installation Instructions =
+
+== Padre on Strawberry Perl ==
+
+Now this is the featured installer on http://padre.perlide.org/download.html
+
+It is an executable installer that will also configure the PATH environment and configure Strawberry 
+to be usable from any installation path. (You probably need to avoid spaces and non-ascii characters in the path)
+
+If you have other Perls installed you will also have to make sure the PATH always contains entries to the one
+you actually want to use. 
+If you don't want to change your PATH ambient variable you can create a new Shortcut on your Desktop and specify "C:\Strawberry\perl\bin\perl.exe C:\strawberry\perl\site\bin\padre" as shortcut destination. Double-clicking on this, you will launch Padre using Strawberry interpreter. 
+
+Release notes are in [http://svn.perlide.org/padre/trunk/tools/padre_on_strawberry_release_notes.txt the SVN repository.]
+
+== Binary Installation ==
+The most convenient way to get Padre is via the Padre Standalone package.
+See the http://padre.perlide.org/download.html page for details.
+
+== Installation from CPAN ==
+Depending on which version of Perl you use, there are different instructions:
+ * [wiki:DownloadStrawberryPerl]
+ * [wiki:DownloadActivePerl]
+
+On Windows, the installation of IPC::Run (0.82) hangs sometimes - install it using
+{{{
+  cpan> force install notest IPC::Run
+}}}
+
+
+== Still Not Working? ==
+Following the instructions on this page did not lead to a successful installation?
+
+[http://padre.perlide.org/contact.html Contact us].
+
+We will do our best to help you.
+By letting us know that something does not work you will help us, too.
+When we know about it, we can improve this documentation and Padre itself.
+
+== Troubleshooting Padre on Strawberry Perl ==
+
+A couple of ideas what to check if Padre does not launch:
+
+ * Is this the only perl on the system?
+ * Was it installed in a path that does not contain spaces (or non-ascii characters?)
+ * What version of Windows do you run.
+ * Is there any space or non-ascii character in the username?
+ * Open a command window (Start/Run/cmd) and type   padre there
+ * in the command window type       perl c:\strawberry\perl\site\bin\padre
+ * perl c:\strawberry\perl\site\bin\padre --version
+ * Is there some firewall or access control that might prevent the server to launch and padre does not survive it?
+ * The configuration files should be in "C:\Documents and Settings\USERNAME\Local Settings\Application Data\Perl\Padre" maybe deleting them will allow Padre to launch
+

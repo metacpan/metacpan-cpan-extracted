@@ -1,7 +1,7 @@
 {
    "abstract" : "XAO Web Framework",
    "author" : [
-      "Andrew Maltsev, http://ejelta.com/xao/"
+      "Andrew Maltsev, https://ejelta.com/xao/"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
@@ -23,12 +23,13 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "XAO::Base" : "1.21"
+            "XAO::Base" : "1.22"
          }
       },
       "configure" : {
          "requires" : {
-            "XAO::Base" : "1.21"
+            "ExtUtils::MakeMaker" : "6.64",
+            "XAO::Base" : "1.22"
          }
       },
       "runtime" : {
@@ -53,12 +54,12 @@
             "Text::FormatTable" : "0.01",
             "Time::HiRes" : "1.9719",
             "Unicode::Normalize" : "1.18",
-            "XAO::Base" : "1.21",
+            "XAO::Base" : "1.22",
             "XAO::FS" : "1.21",
             "perl" : "5.010001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.71"
+   "version" : "1.72"
 }

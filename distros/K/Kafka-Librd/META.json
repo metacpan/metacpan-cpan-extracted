@@ -52,7 +52,7 @@
          "url" : "git://github.com/trinitum/perl-Kafka-Librd"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
       "Pavel Shaydo <zwon@cpan.org>"
    ],

@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::RejectAction;
 
-# ABSTRACT: <p>The act of rejecting to/adopting an object
+# ABSTRACT: The act of rejecting to/adopting an object
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,16 +30,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::RejectAction - <p>The act of rejecting to/adopting an object
+SemanticWeb::Schema::RejectAction - The act of rejecting to/adopting an object
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of rejecting to/adopting an object.</p> <p>Related actions:</p>
-<ul> <li><a class="localLink"
+=for html The act of rejecting to/adopting an object.<br/><br/> Related
+actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/AcceptAction">AcceptAction</a>: The antonym of
 RejectAction.</li> </ul> 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 use ExtUtils::Manifest;
 
 # Version needs to be known here, but it's also convenient to have it in
@@ -114,25 +114,28 @@ if(!$config_version || $config_version ne $version) {
 }
 
 WriteMakefile(
-    'NAME'          => 'XAO::Base',
-    'AUTHOR'        => 'Andrew Maltsev, https://ejelta.com/xao/',
-    'ABSTRACT'      => 'Base support modules for the XAO Suite',
-    'VERSION_FROM'  => 'Base.pm',
-    'PREREQ_PM'     => {
-        'Clone'             => 0.39,
-        'Digest::SHA'       => 5.47,
-        'Encode'            => 2.42,
-        'Error'             => 0.17,
-        'File::Path'        => 2.09,
-        'JSON'              => 2.94,
-        'Storable'          => 2.53,
+    'NAME'              => 'XAO::Base',
+    'AUTHOR'            => 'Andrew Maltsev, https://ejelta.com/xao/',
+    'ABSTRACT'          => 'Base support modules for the XAO Suite',
+    'VERSION_FROM'      => 'Base.pm',
+    'PREREQ_PM'         => {
+        'Clone'                 => 0.39,
+        'Digest::SHA'           => 5.47,
+        'Encode'                => 2.42,
+        'Error'                 => 0.17,
+        'File::Path'            => 2.09,
+        'JSON'                  => 2.94,
+        'Storable'              => 2.53,
     },
-    'PL_FILES'      => {
-        'BaseConfig.PL'     => '$(INST_LIB)/XAO/BaseConfig.pm',
+    CONFIGURE_REQUIRES  => {
+        'ExtUtils::MakeMaker'   => 6.64,
     },
-    TEST_REQUIRES   => {
-        'Test::Harness'     => '3.35',
-        'Test::Unit::Lite'  => '0.1202',
+    TEST_REQUIRES       => {
+        'Test::Harness'         => 3.35,
+        'Test::Unit::Lite'      => 0.1202,
+    },
+    'PL_FILES'          => {
+        'BaseConfig.PL'         => '$(INST_LIB)/XAO/BaseConfig.pm',
     },
     'MIN_PERL_VERSION'  => '5.10.1',
 );

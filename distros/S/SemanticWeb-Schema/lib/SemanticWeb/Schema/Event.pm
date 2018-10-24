@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Event;
 
 # ABSTRACT: An event happening at a certain time and location
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has about => (
@@ -312,7 +314,7 @@ SemanticWeb::Schema::Event - An event happening at a certain time and location
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -427,9 +429,9 @@ A contributor should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -533,9 +535,9 @@ A in_language should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Language']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Language']>
 
 =back
 
@@ -562,9 +564,9 @@ A location should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
+
+=item C<Str>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
 
@@ -606,9 +608,9 @@ A organizer should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -787,9 +789,9 @@ A translator should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 

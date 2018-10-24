@@ -1,3 +1,6 @@
+0.09 Tue Oct 23 2018 Pavel Shaydo <zwon@cpan.org>
+    - add note about maintenance status
+
 0.08 Fri Mar  3 2017 Pavel Shaydo <zwon@cpan.org>
     - implement all methods from High-Level consumer API
 

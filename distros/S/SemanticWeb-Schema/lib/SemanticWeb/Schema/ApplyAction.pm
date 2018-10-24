@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::ApplyAction;
 
-# ABSTRACT: <p>The act of registering to an organization/service without the guarantee to receive it
+# ABSTRACT: The act of registering to an organization/service without the guarantee to receive it
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,16 +30,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::ApplyAction - <p>The act of registering to an organization/service without the guarantee to receive it
+SemanticWeb::Schema::ApplyAction - The act of registering to an organization/service without the guarantee to receive it
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of registering to an organization/service without the guarantee
-to receive it.</p> <p>Related actions:</p> <ul> <li><a class="localLink"
+=for html The act of registering to an organization/service without the guarantee to
+receive it.<br/><br/> Related actions:<br/><br/> <ul> <li><a
+class="localLink"
 href="http://schema.org/RegisterAction">RegisterAction</a>: Unlike
 RegisterAction, ApplyAction has no guarantees that the application will be
 accepted.</li> </ul> 

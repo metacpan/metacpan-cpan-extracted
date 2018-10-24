@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::CheckOutAction;
 
-# ABSTRACT: <p>The act of an agent communicating (service provider
+# ABSTRACT: The act of an agent communicating (service provider
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,17 +30,17 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::CheckOutAction - <p>The act of an agent communicating (service provider
+SemanticWeb::Schema::CheckOutAction - The act of an agent communicating (service provider
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of an agent communicating (service provider, social media, etc)
+=for html The act of an agent communicating (service provider, social media, etc)
 their departure of a previously reserved service (e.g. flight check in) or
-place (e.g. hotel).</p> <p>Related actions:</p> <ul> <li><a
+place (e.g. hotel).<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/CheckInAction">CheckInAction</a>:
 The antonym of CheckOutAction.</li> <li><a class="localLink"
 href="http://schema.org/DepartAction">DepartAction</a>: Unlike

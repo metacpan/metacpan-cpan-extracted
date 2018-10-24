@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Xorg
 #
-# This software is Copyright (c) 2007-2016 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -93,39 +93,44 @@ my $build = $class->new
    license       => 'lgpl',
    dist_author   => "Dominique Dumont (ddumont at cpan dot org)",
    dist_abstract => "Xorg configuration editor and validator",
-   # to use gen_class_pod above
-   configure_requires => {
-       'Config::Model' => '2.087',
-   },
 
   'build_requires' => {
+    'Config::Model::Tester' => '3.006',
+    'ExtUtils::testlib' => '0',
     'Module::Build' => '0.34',
-    'Test::Exception' => '0',
-    'Test::More' => '0'
+    'Test::More' => '0',
+    'strict' => '0'
   },
   'configure_requires' => {
-    'Config::Model' => '2.087',
     'Module::Build' => '0.34'
   },
   'recommends' => {
+    'App::Cme' => '0',
     'Config::Model::CursesUI' => '0',
     'Config::Model::TkUI' => '0'
   },
   'requires' => {
-    'App::Cme' => '0',
-    'Config::Model' => '2.070',
-    'Exception::Class' => '0',
-    'Log::Log4perl' => '1.11',
-    'perl' => '5.010'
+    'Carp' => '0',
+    'Config::Model' => '2.123',
+    'Config::Model::Backend::Any' => '0',
+    'Config::Model::ObjTreeScanner' => '0',
+    'Data::Dumper' => '0',
+    'File::Path' => '0',
+    'IO::File' => '0',
+    'Log::Log4perl' => '0',
+    'Mouse' => '0',
+    'Mouse::Role' => '0',
+    'perl' => 'v5.10.1',
+    'warnings' => '0'
   },
 
     meta_merge => {
         resources => {
-            homepage => 'http://config-model.wiki.sourceforge.net',
+            homepage => 'https://github.com/dod38fr/config-model/wiki',
             MailingList =>
               'https://lists.sourceforge.net/lists/listinfo/config-model-users',
             repository =>
-              'http://config-model.hg.sourceforge.net:8000/hgroot/config-model/config-model',
+              'https://github.com/dod38fr/config-model-xorg',
         },
     },
 
@@ -157,14 +162,12 @@ my $xorg_config_file_model = [
         name => 'Xorg::ConfigDir',
         class_description => "Class used to tune location of xorg.conf which is not always in /etc/X11.",
         generated_by => $generator ,
-        read_config => [ 
-            { 
-                backend => 'Xorg',
-                file => 'xorg.conf',    
-                config_dir => $etc_xorg_dir ,
-                auto_create => 1,
-            }
-        ] ,
+        rw_config => {
+            backend => 'Xorg',
+            file => 'xorg.conf',
+            config_dir => $etc_xorg_dir ,
+            auto_create => 1,
+        }
     ]
 ] ;
 

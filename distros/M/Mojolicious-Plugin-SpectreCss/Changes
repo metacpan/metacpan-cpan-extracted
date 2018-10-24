@@ -1,0 +1,6 @@
+Revision history for Perl module Mojolicious::Plugin::SpectreCss
+
+0.01 2018-10-22
+
+  * Initial release
+  * Adds Spectre v0.5.3

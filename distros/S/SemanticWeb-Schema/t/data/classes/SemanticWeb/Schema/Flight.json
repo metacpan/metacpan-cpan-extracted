@@ -3,7 +3,7 @@
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An airline flight.",
       "rdfs:label" : "Flight",
-      "rdfs:subClassOf" : "schema:Intangible"
+      "rdfs:subClassOf" : "schema:Trip"
    },
    "properties" : {
       "schema:aircraft" : {
@@ -37,17 +37,6 @@
          "schema:domainIncludes" : "schema:Flight",
          "schema:rangeIncludes" : "schema:Text"
       },
-      "schema:arrivalTime" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The expected arrival time.",
-         "rdfs:label" : "arrivalTime",
-         "schema:domainIncludes" : [
-            "schema:TrainTrip",
-            "schema:Flight",
-            "schema:BusTrip"
-         ],
-         "schema:rangeIncludes" : "schema:DateTime"
-      },
       "schema:boardingPolicy" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The type of boarding policy used by the airline (e.g. zone-based or group-based).",
@@ -63,8 +52,8 @@
          "rdfs:comment" : "'carrier' is an out-dated term indicating the 'provider' for parcel delivery and flights.",
          "rdfs:label" : "carrier",
          "schema:domainIncludes" : [
-            "schema:Flight",
-            "schema:ParcelDelivery"
+            "schema:ParcelDelivery",
+            "schema:Flight"
          ],
          "schema:rangeIncludes" : "schema:Organization",
          "schema:supersededBy" : "schema:provider"
@@ -90,25 +79,14 @@
          "schema:domainIncludes" : "schema:Flight",
          "schema:rangeIncludes" : "schema:Text"
       },
-      "schema:departureTime" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The expected departure time.",
-         "rdfs:label" : "departureTime",
-         "schema:domainIncludes" : [
-            "schema:BusTrip",
-            "schema:Flight",
-            "schema:TrainTrip"
-         ],
-         "schema:rangeIncludes" : "schema:DateTime"
-      },
       "schema:estimatedFlightDuration" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The estimated time the flight will take.",
          "rdfs:label" : "estimatedFlightDuration",
          "schema:domainIncludes" : "schema:Flight",
          "schema:rangeIncludes" : [
-            "schema:Duration",
-            "schema:Text"
+            "schema:Text",
+            "schema:Duration"
          ]
       },
       "schema:flightDistance" : {
@@ -136,36 +114,17 @@
          "schema:domainIncludes" : "schema:Flight",
          "schema:rangeIncludes" : "schema:Text"
       },
-      "schema:provider" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
-         "rdfs:label" : "provider",
-         "schema:domainIncludes" : [
-            "schema:ParcelDelivery",
-            "schema:BusTrip",
-            "schema:CreativeWork",
-            "schema:Service",
-            "schema:TrainTrip",
-            "schema:Reservation",
-            "schema:Flight",
-            "schema:Invoice"
-         ],
-         "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
-         ]
-      },
       "schema:seller" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An entity which offers (sells / leases / lends / loans) the services / goods.  A seller may also be a provider.",
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:Order",
             "schema:BuyAction",
             "schema:Demand",
-            "schema:Flight",
-            "schema:Order",
-            "schema:Offer"
+            "schema:Flight"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

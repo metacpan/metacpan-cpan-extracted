@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "dc:source" : "schemadotorgsources2:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The costs of settling the payment using a particular payment method.",
       "rdfs:label" : "PaymentChargeSpecification",
@@ -8,7 +8,7 @@
    },
    "properties" : {
       "schema:appliesToDeliveryMethod" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The delivery method(s) to which the delivery charge or payment charge specification applies.",
          "rdfs:label" : "appliesToDeliveryMethod",
@@ -19,7 +19,7 @@
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       },
       "schema:appliesToPaymentMethod" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The payment method(s) to which the payment charge specification applies.",
          "rdfs:label" : "appliesToPaymentMethod",

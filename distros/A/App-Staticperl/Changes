@@ -12,6 +12,23 @@ TODO-IMPORTANT: CPAN::MyConfig!
 TODO: tell people that staticperl perl *PL;make/make install is not enough normally.
 TODO: document hooks
 
+TODO: -Ixxx overweritten during startzup for custom perl binaries
+
+TODO: proofread the pod!
+TODO: maybe make extutilc::cbuilder return value dynam,ic and have some kind of app-preferences?
+
+1.45 Fri Oct 19 23:26:54 CEST 2018
+	- work around weird, buggy and broken stacksize check in newer Storable.
+        - create a framework for patching modules before make, thanks to Storable.
+        - try to work around install phase changing thw cwd,m so instsrc . no
+          longer fails because the install dependency changed the cwd.
+	- restore PL_origfilename and $0 to argv[0] before running bootstrap,
+          so the script name is no longer '-e' in error messages and so on.
+	- PERL_VERSION can now be a full URL or a directory.
+        - default to stableperl.
+        - add -Uversiononly to Configure args, as it's required by staticperl, and
+          one of the many unrelated things usedevel needlessly toggles.
+
 1.44 Tue Jul  7 01:32:49 CEST 2015
 	- added Net::SSLeay hint, tested and improved by gleeco.
         - fix quoting bug, avoid failure when EXTRA_MODULES contains spaces.

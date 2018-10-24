@@ -4,7 +4,7 @@ Markdent - An event-based Markdown parser toolkit
 
 # VERSION
 
-version 0.31
+version 0.32
 
 # SYNOPSIS
 
@@ -31,10 +31,52 @@ use better battle-tested tools like [Text::Markdown](https://metacpan.org/pod/Te
 See [Markdent::Manual](https://metacpan.org/pod/Markdent::Manual) for more details on how Markdent works and how you can
 use it.
 
-# ALPHA WARNING
+# QUICK MARKDOWN TO HTML CONVERSION
 
-This code is still quite new. While the Markdown to HTML conversion seems to
-work fine, the internals are subject to change.
+If you just want to do some quick Markdown to HTML conversion use either the
+[Markdent::Simple::Document](https://metacpan.org/pod/Markdent::Simple::Document) or [Markdent::Simple::Fragment](https://metacpan.org/pod/Markdent::Simple::Fragment) class.
+
+This distribution also ships with a command line tool called
+[markdent-html](https://metacpan.org/pod/markdent-html). See that tool's documentation for details on how to use it.
+
+# PROCESSING PIPELINES
+
+If you want to create a Markdown processing pipeline, start by looking at the
+various handler classes:
+
+- [Markdent::Handler::HTMLStream::Document](https://metacpan.org/pod/Markdent::Handler::HTMLStream::Document)
+- [Markdent::Handler::HTMLStream::Fragment](https://metacpan.org/pod/Markdent::Handler::HTMLStream::Fragment)
+- [Markdent::Handler::HTMLStream::Multiplexer](https://metacpan.org/pod/Markdent::Handler::HTMLStream::Multiplexer)
+- [Markdent::Handler::HTMLStream::HTMLFilter](https://metacpan.org/pod/Markdent::Handler::HTMLStream::HTMLFilter)
+- [Markdent::Handler::HTMLStream::CaptureEvents](https://metacpan.org/pod/Markdent::Handler::HTMLStream::CaptureEvents)
+
+You will probably also want to write your own handler class as part of the
+pipeline. This will need to implement the [Markdent::Role::Handler](https://metacpan.org/pod/Markdent::Role::Handler) role.
+
+To do that you'll need to review the many `Markdent::Event::*` classes. Each
+event represents something seen by the parse, such as a piece of the start or
+end of a piece of block (paragraph, header) or span markup (strong, link) or
+some text.
+
+The start of a pipeline will generally be either the [Markdent::Parser](https://metacpan.org/pod/Markdent::Parser) or
+[Markdent::CapturedEvents](https://metacpan.org/pod/Markdent::CapturedEvents) class.
+
+# CUSTOM DIALECTS
+
+You may also want to implement a custom dialect to add some additional
+features to the parser. Your parser classes will need to consume either the
+[Markdent::Role::Dialect::BlockParser](https://metacpan.org/pod/Markdent::Role::Dialect::BlockParser) or the
+[Markdent::Role::Dialect::SpanParser](https://metacpan.org/pod/Markdent::Role::Dialect::SpanParser) role. The best way to understand how a
+dialect is implemented is to look at one of the existing dialect classes:
+
+- [Markdent::Dialect::GitHub::BlockParser](https://metacpan.org/pod/Markdent::Dialect::GitHub::BlockParser)
+- [Markdent::Dialect::GitHub::SpanParser](https://metacpan.org/pod/Markdent::Dialect::GitHub::SpanParser)
+- [Markdent::Dialect::Theory::BlockParser](https://metacpan.org/pod/Markdent::Dialect::Theory::BlockParser)
+- [Markdent::Dialect::Theory::SpanParser](https://metacpan.org/pod/Markdent::Dialect::Theory::SpanParser)
+
+You'll also need to dig into the core [Markdent::Parser::BlockParser](https://metacpan.org/pod/Markdent::Parser::BlockParser) and
+[Markdent::Parser::SpanParser](https://metacpan.org/pod/Markdent::Parser::SpanParser) classes in order to see h ow these dialects
+interact with the core parser.
 
 # DONATIONS
 
@@ -99,6 +141,7 @@ Dave Rolsky <autarch@urth.org>
 - Denis Ibaev <dionys@gmail.com>
 - Jason McIntosh <jmac@appleseed-sc.com>
 - Polina Shubina <925043@mai.com>
+- Shlomi Fish <shlomif@shlomifish.org>
 - Tom Hukins <tom@eborcom.com>
 
 # COPYRIGHT AND LICENSE

@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::ReplyAction;
 
-# ABSTRACT: <p>The act of responding to a question/message asked/sent by the object
+# ABSTRACT: The act of responding to a question/message asked/sent by the object
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has result_comment => (
@@ -36,18 +38,18 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::ReplyAction - <p>The act of responding to a question/message asked/sent by the object
+SemanticWeb::Schema::ReplyAction - The act of responding to a question/message asked/sent by the object
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of responding to a question/message asked/sent by the object.
+=for html The act of responding to a question/message asked/sent by the object.
 Related to <a class="localLink"
-href="http://schema.org/AskAction">AskAction</a></p> <p>Related
-actions:</p> <ul> <li><a class="localLink"
+href="http://schema.org/AskAction">AskAction</a><br/><br/> Related
+actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/AskAction">AskAction</a>: Appears generally as an
 origin of a ReplyAction.</li> </ul> 
 

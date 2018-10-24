@@ -1,12 +1,8 @@
 use Test::More;
-use POSIX qw(setlocale);
 use Time::Piece;     # for _tzset()
 
 $ENV{TZ} = "UTC";       # testing occurs in UTC
 Time::Piece::_tzset();  # see Time::Piece perldocs on TZ in Win32
-
-my $loc = setlocale( LC_ALL, "C" );
-# testing occurs in 'C' english, see https://rt.cpan.org/Public/Bug/Display.html?id=127400
 
 {
     use_ok( 'Finance::CoinbasePro::API::CLI::Account' );
@@ -74,7 +70,7 @@ my $loc = setlocale( LC_ALL, "C" );
         time     => "2017-10-11T13:54:51.834Z",
         trade_id => 2111111,
     );
-    is( $trade->to_str(), "Trade: 2017-10-11T13:54:51.834Z: buy 0.02000000 units at 6200.00000000: trade_id 2111111", "trade to str" );
+    is( $trade->to_str(), "buy 0.02000000 units at 6200.00000000: trade_id 2111111 2017-10-11T13:54:51.834Z", "trade to str" );
 }
 
 {

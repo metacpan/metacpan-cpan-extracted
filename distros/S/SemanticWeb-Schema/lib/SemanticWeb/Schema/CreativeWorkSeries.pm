@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::CreativeWorkSeries;
 
 # ABSTRACT: A CreativeWorkSeries in schema
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::CreativeWork /;
+extends qw/ SemanticWeb::Schema::CreativeWork SemanticWeb::Schema::Series /;
 
 
 use MooX::JSON_LD 'CreativeWorkSeries';
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has end_date => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::CreativeWorkSeries - A CreativeWorkSeries in schema
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -66,7 +68,7 @@ organized into some order, often chronological. Unlike <a class="localLink"
 href="http://schema.org/ItemList">ItemList</a> which is a general purpose
 data structure for lists of things, the emphasis with CreativeWorkSeries is
 on published materials (written e.g. books and periodicals, or media such
-as tv, radio and games).</p> <p>Specific subtypes are available for
+as tv, radio and games).<br/><br/> Specific subtypes are available for
 describing <a class="localLink"
 href="http://schema.org/TVSeries">TVSeries</a>, <a class="localLink"
 href="http://schema.org/RadioSeries">RadioSeries</a>, <a class="localLink"
@@ -78,8 +80,8 @@ the <a class="localLink" href="http://schema.org/hasPart">hasPart</a> / <a
 class="localLink" href="http://schema.org/isPartOf">isPartOf</a> properties
 can be used to relate the CreativeWorkSeries to its parts. The general
 CreativeWorkSeries type serves largely just to organize these more specific
-and practical subtypes.</p> <p>It is common for properties applicable to an
-item from the series to be usefully applied to the containing group.
+and practical subtypes.<br/><br/> It is common for properties applicable to
+an item from the series to be usefully applied to the containing group.
 Schema.org attempts to anticipate some of these cases, but publishers
 should be free to apply properties of the series parts to the series as a
 whole wherever they seem appropriate.
@@ -132,7 +134,7 @@ A start_date should be one of the following types:
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CreativeWork>
+L<SemanticWeb::Schema::Series>
 
 =head1 AUTHOR
 

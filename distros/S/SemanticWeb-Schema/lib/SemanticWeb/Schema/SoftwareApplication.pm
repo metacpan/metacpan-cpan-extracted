@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::SoftwareApplication;
 
 # ABSTRACT: A software application.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has application_category => (
@@ -224,7 +226,7 @@ SemanticWeb::Schema::SoftwareApplication - A software application.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

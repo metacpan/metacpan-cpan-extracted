@@ -35,7 +35,9 @@ WriteMakefile(
     AUTHOR              => '[% author.name %] <[% author.email %]>',
     VERSION_FROM        => 'lib/[% module.filename %]',
     ABSTRACT_FROM       => 'lib/[% module.filename %]',
+    LICENSE		=> '[% module.license %]',
     PL_FILES            => {},
+    MIN_PERL_VERSION	=> '[% perl.minversion %]',
     PREREQ_PM => {
         'Test::More' => 0,
     },

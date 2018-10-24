@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::VideoGame;
 
 # ABSTRACT: A video game is an electronic game that involves human interaction with a user interface to generate visual feedback on a video device.
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::Game SemanticWeb::Schema::SoftwareApplication /;
+extends qw/ SemanticWeb::Schema::SoftwareApplication SemanticWeb::Schema::Game /;
 
 
 use MooX::JSON_LD 'VideoGame';
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has actor => (
@@ -120,7 +122,7 @@ SemanticWeb::Schema::VideoGame - A video game is an electronic game that involve
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -209,9 +211,9 @@ A game_platform should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=item C<Str>
 
 =back
 
@@ -253,9 +255,9 @@ A music_by should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
 
 =back
 
@@ -289,7 +291,7 @@ A trailer should be one of the following types:
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::SoftwareApplication>
+L<SemanticWeb::Schema::Game>
 
 =head1 AUTHOR
 

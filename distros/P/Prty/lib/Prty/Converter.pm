@@ -3,9 +3,10 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use POSIX ();
 use Time::Local ();
@@ -25,6 +26,99 @@ L<Prty::Object>
 =head1 METHODS
 
 =head2 Zeichenketten
+
+=head3 newlineToName() - Liefere Namen einer Newline-Zeichenkette
+
+=head4 Synopsis
+
+    $nlName = $this->newlineToName($nl);
+
+=head4 Description
+
+Liefere den "Namen" einer Newline-Zeichenkette, also "LF", "CRLF"
+oder "CR".
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub newlineToName {
+    my ($this,$nl) = @_;
+
+    if ($nl eq "\cJ") {
+        return 'LF';
+    }
+    elsif ($nl eq "\cM\cJ") {
+        return 'CRLF';
+    }
+    elsif ($nl eq "\cM") {
+        return 'CR';
+    }
+    
+    $this->throw(
+        q~PATH-00099: Unknown newline string~,
+        NewlineString => $nl,
+    );
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 snakeCaseToCamelCase() - Wandele Snake Case nach Camel Case
+
+=head4 Synopsis
+
+    $camel = $this->snakeCaseToCamelCase($snake);
+
+=head4 Description
+
+Wandele einen in Snake Case geschriebenen Bezeichner in einen Camel Case
+Bezeichner und liefere diesen zurück.
+
+Snake Case:
+
+    ims-apply-delta-row-by-row
+    ims_apply_delta_row_by_row
+
+Camel Case:
+
+    imsApplyDeltaRowByRow
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub snakeCaseToCamelCase {
+    my ($this,$str) = @_;
+
+    # Eingebettete Bindestriche und Unterstriche in Camel Case wandeln
+
+    $str =~ s/(.)[_-](.)/$1\U$2/g;
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 strToHex() - Wandele String in Hex-Darstellung
+
+=head4 Synopsis
+
+    $strHex = $this->strToHex($str);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub strToHex {
+    my ($this,$str) = @_;
+
+    $str =~ s/(.)/sprintf '%02x ',ord $1/seg;
+    substr($str,-1) = '';
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 textToHtml() - Wandele Text nach HTML
 
@@ -181,6 +275,100 @@ sub intToWord {
     }
 
     return $word;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Längen
+
+=head3 ptToPx() - Rechne Punkt (pt) in Pixel (px) um
+
+=head4 Synopsis
+
+    $px = $this->ptToPx($pt);
+
+=head4 Alias
+
+pointToPixel()
+
+=head4 Arguments
+
+=over 4
+
+=item $pt (Number)
+
+Punkt-Wert
+
+=back
+
+=head4 Returns
+
+Pixel-Wert (Number)
+
+=head4 Description
+
+Rechne Punkt in Pixel um und liefere das Resultat zurück.
+
+    1 Punkt = 1/0.75 Pixel
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub ptToPx {
+    my ($this,$pt) = @_;
+    return $pt*(1/0.75);
+}
+
+{
+    no warnings 'once';
+    *pointToPixel = \&ptToPx;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 pxToPt() - Rechne Pixel (px) in Punkt (pt) um
+
+=head4 Synopsis
+
+    $pt = $this->pxToPt($px);
+
+=head4 Alias
+
+pixelToPoint()
+
+=head4 Arguments
+
+=over 4
+
+=item $px (Number)
+
+Pixel-Wert
+
+=back
+
+=head4 Returns
+
+Punkt-Wert (Number)
+
+=head4 Description
+
+Rechne Pixel in Punkt um und liefere das Resultat zurück.
+
+    1 Pixel = 0.75 Punkt
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub pxToPt {
+    my ($this,$px) = @_;
+    return $px*0.75;
+}
+
+{
+    no warnings 'once';
+    *pixelToPoint = \&pxToPt;
 }
 
 # -----------------------------------------------------------------------------
@@ -392,7 +580,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

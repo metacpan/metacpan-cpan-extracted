@@ -1,0 +1,8 @@
+# Multi values.
+%{multi}	Alpha:Beta
+%{multi.0}	Alpha:Beta
+%{multi.1}	Alpha
+%{multi.2}	Beta
+%{multi.-1}	Beta
+%{multi.-2}	Alpha
+%{subtitle.1}	CAPO 1

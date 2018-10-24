@@ -1,5 +1,42 @@
 Revision history for Finance-CoinbasePro-API-CLI
 
+0.024    2018-10-21
+        Skip locale issues by not using Number::Format.
+
+0.023    2018-10-21
+        More changes for locale in test.
+
+0.022    2018-10-21
+        Add Dist::Zilla::Plugin::CheckChangeLog.
+        Add examples/coinbasepro.conf.
+		Add docs to CLI.pm and coinbasepro.pl.
+
+0.021    2018-10-21
+        Add pod to coinbase.pl.
+
+0.020    2018-10-21
+        More POD fixes, error messages improved.
+
+0.019    2018-10-21
+        POD fixes
+
+0.018    2018-10-20
+        Factor out reformat_datetime(), fix for locales.
+
+0.017    2018-10-20
+        Update example in README.md, add pretty-printing of Ticker.
+
+0.016    2018-10-20
+        Put $VERSION in every module.
+
+0.015    2018-10-20
+        Have coinbasepro.pl script installed at installtime.
+
+0.014    2018-10-20
+        Fix thousands seperator when LANG is en_US.UTF-8 and LC_ALL has different thousands
+        seperator (like de_DE.UTF-8)
+        (See https://www.cpantesters.org/cpan/report/b04018fa-d438-11e8-a8d1-2867d896f7be ).
+
 0.013    2018-10-19
         Move coinbasepro.pl to script/.
 

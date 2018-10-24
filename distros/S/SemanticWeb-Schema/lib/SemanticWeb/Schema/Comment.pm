@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Comment;
 
 # ABSTRACT: A comment on an item - for example
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has downvote_count => (
@@ -56,7 +58,7 @@ SemanticWeb::Schema::Comment - A comment on an item - for example
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

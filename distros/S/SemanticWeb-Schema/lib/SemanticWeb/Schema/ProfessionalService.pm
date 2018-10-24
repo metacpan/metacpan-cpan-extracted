@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::ProfessionalService;
 
 # ABSTRACT: Original definition: "provider of professional services
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,11 +34,11 @@ SemanticWeb::Schema::ProfessionalService - Original definition: "provider of pro
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html Original definition: "provider of professional services."</p> <p>The
+=for html Original definition: "provider of professional services."<br/><br/> The
 general <a class="localLink"
 href="http://schema.org/ProfessionalService">ProfessionalService</a> type
 for local businesses was deprecated due to confusion with <a

@@ -17,8 +17,7 @@ our @EXPORT_OK = qw(
 
 =head1 NAME
 
-JSON::Patch - JSON Patch (L<rfc6902|https://tools.ietf.org/html/rfc6902>) for
-perl structures
+JSON::Patch - JSON Patch (rfc6902) for perl structures
 
 =begin html
 
@@ -30,11 +29,11 @@ perl structures
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -63,15 +62,21 @@ Nothing is exported by default.
 
 =head2 diff
 
-Calculate patch.
+Calculate patch for two arguments:
 
     $patch = diff($old, $new);
+
+Convert L<Struct::Diff> diff to JSON Patch when single arg passed:
+
+    require Struct::Diff;
+    $patch = diff(Struct::Diff::diff($old, $new));
 
 =cut
 
 sub diff($$) {
-    my @stask = Struct::Diff::list_diff
-        Struct::Diff::diff($_[0], $_[1], noO => 1, noU => 1, trimR => 1);
+    my @stask = Struct::Diff::list_diff @_ == 2
+        ? Struct::Diff::diff($_[0], $_[1], noO => 1, noU => 1, trimR => 1)
+        : $_[0];
 
     my ($hunk, @patch, $path);
 
@@ -102,8 +107,11 @@ Apply patch.
 
 =cut
 
-sub patch($$) {
+sub patch($;$) {
+    croak "Arrayref expected for patch" unless (ref $_[1] eq 'ARRAY');
+
     for my $hunk (@{$_[1]}) {
+        croak "Hashref expected for patch item" unless (ref $hunk eq 'HASH');
         croak "Undefined op value" unless (defined $hunk->{op});
         croak "Path parameter missing" unless (exists $hunk->{path});
 
@@ -190,6 +198,11 @@ L<http://cpanratings.perl.org/d/JSON-Patch>
 L<http://search.cpan.org/dist/JSON-Patch/>
 
 =back
+
+=head1 SEE ALSO
+
+L<rfc6902|https://tools.ietf.org/html/rfc6902>,
+L<Struct::Diff>, L<Struct::Diff::MergePatch>
 
 =head1 LICENSE AND COPYRIGHT
 

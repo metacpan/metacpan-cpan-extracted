@@ -1,0 +1,55 @@
+# No substitutions
+abcd			abcd
+
+# Percent -> %
+ab%cd			ab%cd
+
+# Lone brace
+ab{cd			ab{cd
+ab%{cd			ab%{cd
+ab}cd			ab}cd
+
+# Variable
+ab%{head}def		abyesdef
+ab%{head}def%{head}xy	abyesdefyesxy
+%{head}def		yesdef
+%{h}def			Zdef
+X%{}Y			XY
+
+# Subtitute the value
+X%{head}Y		XyesY
+X%{head=yes}Y		XY
+X%{head=no}Y		XY
+
+# Subtitute the 'true' part
+X%{head|foo}Y		XfooY
+X%{hexd|foo}Y		XY
+
+# %{} refers to the value of the key.
+X%{head|This is %{}!}Y	XThis is yes!Y
+X%{head=yes|This is %{}!}Y	XThis is yes!Y
+X%{head=no|This is %{}!}Y	XY
+X%{capo=1|%{} capo|%{} capoes}Y	X1 capoY
+X%{capo=0|%{} capoes|%{} capo}Y	X1 capoY
+
+# Subtitute the 'false' part
+X%{head=no|foo|bar}Y	XbarY
+X%{hexd|foo|bar}Y	XbarY
+X%{hexd=yes|foo|bar}Y	XbarY
+X%{hexd=no|foo|bar}Y	XbarY
+X%{hexd=|foo|bar}Y	XfooY
+X%{h|foo|bar}Y		XfooY
+X%{h=Z|foo|bar}Y	XfooY
+
+# Nested.
+X%{head|x%{foo}z|bar}Y	XxzY
+X%{hexd|x%{foo}z|bar}Y	XbarY
+
+# Note that %{} is the value of foo (inner), not head (outer)
+X%{head|x%{foo|ab|f%{}g}z}Y	XxfgzY
+
+# Recursive substitution.
+%{subtitle}	CAPO 1
+
+# Transpose.
+%{key}		G

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::HowTo;
 
 # ABSTRACT: Instructions that explain how to achieve a result by performing a sequence of steps.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has estimated_cost => (
@@ -36,6 +38,14 @@ has prep_time => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'prepTime',
+);
+
+
+
+has step => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'step',
 );
 
 
@@ -96,7 +106,7 @@ SemanticWeb::Schema::HowTo - Instructions that explain how to achieve a result b
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -154,20 +164,39 @@ A prep_time should be one of the following types:
 
 =back
 
+=head2 C<step>
+
+A single step item (as HowToStep, text, document, video, etc.) or a
+HowToSection.
+
+A step should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::HowToSection']>
+
+=item C<InstanceOf['SemanticWeb::Schema::HowToStep']>
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=back
+
 =head2 C<steps>
 
-The steps in the form of a single item (text, document, video, etc.) or an
-ordered list with HowToStep and/or HowToSection items.
+A single step item (as HowToStep, text, document, video, etc.) or a
+HowToSection (originally misnamed 'steps'; 'step' is preferred).
 
 A steps should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::ItemList']>
+
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =item C<Str>
-
-=item C<InstanceOf['SemanticWeb::Schema::ItemList']>
 
 =back
 
@@ -195,9 +224,9 @@ A tool should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::HowToTool']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::HowToTool']>
 
 =back
 
@@ -226,9 +255,9 @@ A yield should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 

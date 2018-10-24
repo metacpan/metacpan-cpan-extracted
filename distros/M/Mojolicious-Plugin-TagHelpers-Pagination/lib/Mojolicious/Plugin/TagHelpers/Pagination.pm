@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Scalar::Util 'blessed';
 use POSIX 'ceil';
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 our @value_list =
   qw/prev
@@ -76,6 +76,7 @@ sub pagination {
 
   # No valid count given
   local $_[1] = !$_[1] ? 1 : ceil($_[1]);
+  local $_[0] = $_[0] // 1;
 
   # New parameter hash
   my %values =
@@ -90,8 +91,8 @@ sub pagination {
 
     foreach (qw/page current/) {
       if (defined $overwrite->{$_}) {
-	@values{$_ . '_start', $_ . '_end'} = split("{$_}", $overwrite->{$_});
-	$values{$_ . '_end'} ||= '';
+        @values{$_ . '_start', $_ . '_end'} = split("{$_}", $overwrite->{$_});
+        $values{$_ . '_end'} ||= '';
       };
     };
   };
@@ -195,7 +196,7 @@ sub pagination {
 
     # Number is anywhere in between
     else {
-	$e .= $sub->($_[1]) . $s .
+      $e .= $sub->($_[1]) . $s .
 	      $sub->(($_[0] + 1), [$n, 'next']);
     };
   }
@@ -453,7 +454,7 @@ L<Mojolicious>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2014, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2012-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

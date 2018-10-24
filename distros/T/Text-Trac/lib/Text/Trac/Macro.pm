@@ -6,7 +6,7 @@ use base qw(Text::Trac::InlineNode Class::Accessor::Fast);
 use UNIVERSAL::require;
 use Text::ParseWords qw(quotewords);
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 __PACKAGE__->mk_accessors('pattern');
 

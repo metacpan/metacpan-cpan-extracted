@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::RegisterAction;
 
-# ABSTRACT: <p>The act of registering to be a user of a service
+# ABSTRACT: The act of registering to be a user of a service
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,16 +30,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::RegisterAction - <p>The act of registering to be a user of a service
+SemanticWeb::Schema::RegisterAction - The act of registering to be a user of a service
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of registering to be a user of a service, product or web
-page.</p> <p>Related actions:</p> <ul> <li><a class="localLink"
+=for html The act of registering to be a user of a service, product or web
+page.<br/><br/> Related actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/JoinAction">JoinAction</a>: Unlike JoinAction,
 RegisterAction implies you are registering to be a user of a service,
 <em>not</em> a group/team of people.</li> <li>[FollowAction]]: Unlike

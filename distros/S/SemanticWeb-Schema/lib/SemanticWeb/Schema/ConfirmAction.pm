@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::ConfirmAction;
 
-# ABSTRACT: <p>The act of notifying someone that a future event/action is going to happen as expected
+# ABSTRACT: The act of notifying someone that a future event/action is going to happen as expected
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,16 +30,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::ConfirmAction - <p>The act of notifying someone that a future event/action is going to happen as expected
+SemanticWeb::Schema::ConfirmAction - The act of notifying someone that a future event/action is going to happen as expected
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of notifying someone that a future event/action is going to
-happen as expected.</p> <p>Related actions:</p> <ul> <li><a
+=for html The act of notifying someone that a future event/action is going to happen
+as expected.<br/><br/> Related actions:<br/><br/> <ul> <li><a
 class="localLink" href="http://schema.org/CancelAction">CancelAction</a>:
 The antonym of ConfirmAction.</li> </ul> 
 

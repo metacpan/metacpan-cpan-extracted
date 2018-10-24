@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::HowToSupply;
 
 # ABSTRACT: A supply consumed when performing the instructions for how to achieve a result.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has estimated_cost => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::HowToSupply - A supply consumed when performing the instruc
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

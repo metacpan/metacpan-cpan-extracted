@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::QualitativeValue;
 
 # ABSTRACT: A predefined value for a product characteristic
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has additional_property => (
@@ -96,7 +98,7 @@ SemanticWeb::Schema::QualitativeValue - A predefined value for a product charact
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -111,7 +113,7 @@ C<additionalProperty>
 
 =for html A property-value pair representing an additional characteristics of the
 entitity, e.g. a product feature or another characteristic for which there
-is no matching property in schema.org.</p> <p>Note: Publishers should be
+is no matching property in schema.org.<br/><br/> Note: Publishers should be
 aware that applications designed to use specific schema.org properties
 (e.g. http://schema.org/width, http://schema.org/color,
 http://schema.org/gtin13, ...) will typically expect such data to be
@@ -221,15 +223,15 @@ A value_reference should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
+
+=item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
+
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Enumeration']>
 
 =item C<InstanceOf['SemanticWeb::Schema::PropertyValue']>
-
-=item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
-
-=item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
 
 =back
 

@@ -5,6 +5,7 @@ use base qw/Prty::Test::Class/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
 # -----------------------------------------------------------------------------
@@ -20,7 +21,7 @@ sub test_new : Test(7) {
 
     my $h = Prty::Html::Tag->new;
     $self->is(ref($h),'Prty::Html::Tag','new: Klassenname');
-    $self->is($h->{'htmlVersion'},'xhtml-1.0','new: version');
+    $self->is($h->{'htmlVersion'},'html-5','new: version');
     $self->is($h->{'uppercase'},0,'new: uppercase');
 
     $h = Prty::Html::Tag->new(htmlVersion=>'html-5');
@@ -35,7 +36,7 @@ sub test_new : Test(7) {
 # -----------------------------------------------------------------------------
 
 my $Html01 = <<'__HTML__';
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <title>Test</title>
   </head>
@@ -49,7 +50,7 @@ my $Html01 = <<'__HTML__';
 __HTML__
 
 my $Html02 = <<'__HTML__';
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
     <head>
         <title>Test</title>
     </head>
@@ -65,7 +66,7 @@ __HTML__
 sub test_tag : Test(7) {
     my $self = shift;
 
-    my $h = Prty::Html::Tag->new(htmlVersion=>'xhtml-1.0');
+    my $h = Prty::Html::Tag->new;
 
     my $html =
     $h->tag('html',
@@ -321,11 +322,15 @@ sub test_cat : Test(4) {
 
 # -----------------------------------------------------------------------------
 
-sub test_doctype : Test(4) {
+sub test_doctype : Test(5) {
     my $self = shift;
 
-    my $h = Prty::Html::Tag->new;
+    my $h = Prty::Html::Tag->new(htmlVersion=>'html-5');
     my $val = $h->doctype;
+    $self->is($val,"<!DOCTYPE html>\n\n");
+
+    $h = Prty::Html::Tag->new(htmlVersion=>'xhtml-1.0');
+    $val = $h->doctype;
     $self->like($val,qr/DTD XHTML/);
 
     $val = $h->doctype(-frameset=>1);
@@ -357,6 +362,26 @@ sub test_comment : Test(3) {
     $comment = "Ein\nTest";
     $val = $h->comment($comment);
     $self->is($val,"<!--\n  Ein\n  Test\n-->\n",'comment: mehrzeilig');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_protect : Test(4) {
+    my $self = shift;
+
+    my $h = Prty::Html::Tag->new;
+
+    my $val = $h->protect(undef);
+    $self->is($val,undef);
+
+    $val = $h->protect('a > b');
+    $self->is($val,'a &gt; b');
+
+    $val = $h->protect('a < b');
+    $self->is($val,'a &lt; b');
+
+    $val = $h->protect('a & b');
+    $self->is($val,'a &amp; b');
 }
 
 # -----------------------------------------------------------------------------

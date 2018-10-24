@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-Xorg
 #
-# This software is Copyright (c) 2007-2016 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Xorg ;
-$Config::Model::Backend::Xorg::VERSION = '1.113';
+$Config::Model::Backend::Xorg::VERSION = '1.115';
 
 use Mouse ;
 use Carp ;
@@ -21,10 +21,7 @@ with 'Config::Model::Backend::Xorg::Write';
 
 my $logger = get_logger("Backend::Xorg") ;
 
-sub suffix { return 'conf' ; }
-
 sub annotation { return 0 ;}
-
 
 sub read {
     my $self = shift ;
@@ -42,11 +39,16 @@ sub read {
     return 0 unless defined $args{io_handle} ; # no file to read
     my $check = $args{check} || 'yes' ;
 
-    my @lines = $args{io_handle}->getlines ;
+    my @lines ;
 
     my $idx = 0 ;
     # store also input line number
-    map {s/#.*$//; s/^\s*//; s/\s+$//; $_ = [ "line ".$idx++ ,$_ ]} @lines ;
+    foreach my $line ($args{file_path}->lines_utf8) {
+        $line =~ s/#.*$//;
+        $line =~ s/^\s*//;
+        $line =~ s/\s+$//;
+        push @lines, [ "line ".$idx++ ,$line ]
+    }
     my @raw_xorg_conf = grep { $_->[1] !~ /^\s*$/ ;} @lines;
     chomp @raw_xorg_conf ;
 
@@ -73,14 +75,9 @@ sub write {
     # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
-    my $ioh = $args{io_handle} ;
-    my $node = $args{object} ;
-
-    croak "Undefined file handle to write" unless defined $ioh;
-
     my $a_ref = write_all( $args{object} ) ;
-    $ioh->say( map {"$_\n"} @$a_ref )  ;
- 
+    $args{file_path}->spew_utf8( map {"$_\n"} @$a_ref )  ;
+
     return 1;
 }
 
@@ -95,7 +92,7 @@ Config::Model::Backend::Xorg - Read and write config from xorg.conf file
 
 =head1 VERSION
 
-version 1.113
+version 1.115
 
 =head1 SYNOPSIS
 

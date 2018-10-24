@@ -3,8 +3,9 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Shell;
 use Prty::FileHandle;
@@ -155,6 +156,10 @@ Encoding sollten Ausgaben auf das Terminal gewandelt werden.
 Wir ermitteln das Encoding durch Aufruf der internen Funktion
 _get_locale_encoding() des Pragmas encoding.
 
+=head4 See Also
+
+Pragma encoding
+
 =head4 Example
 
 Gib non-ASCII-Zeichen im Encoding der Umgebung auf STDOUT aus:
@@ -162,10 +167,6 @@ Gib non-ASCII-Zeichen im Encoding der Umgebung auf STDOUT aus:
     my $encoding = Prty::System->encoding;
     binmode STDOUT,":encoding($encoding)";
     print "äöüßÄÖÜ\n";
-
-=head4 See Also
-
-Pragma encoding
 
 =cut
 
@@ -303,7 +304,7 @@ sub searchProgram {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

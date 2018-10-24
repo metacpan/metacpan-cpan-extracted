@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A reservation for a rental car.</p>\n\n<p>Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.",
+      "rdfs:comment" : "A reservation for a rental car.<br/><br/>\n\nNote: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.",
       "rdfs:label" : "RentalCarReservation",
       "rdfs:subClassOf" : "schema:Reservation"
    },
@@ -25,8 +25,8 @@
          "rdfs:comment" : "Where a taxi will pick up a passenger or a rental car can be picked up.",
          "rdfs:label" : "pickupLocation",
          "schema:domainIncludes" : [
-            "schema:TaxiReservation",
-            "schema:RentalCarReservation"
+            "schema:RentalCarReservation",
+            "schema:TaxiReservation"
          ],
          "schema:rangeIncludes" : "schema:Place"
       },
@@ -35,8 +35,8 @@
          "rdfs:comment" : "When a taxi will pickup a passenger or a rental car can be picked up.",
          "rdfs:label" : "pickupTime",
          "schema:domainIncludes" : [
-            "schema:RentalCarReservation",
-            "schema:TaxiReservation"
+            "schema:TaxiReservation",
+            "schema:RentalCarReservation"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       }

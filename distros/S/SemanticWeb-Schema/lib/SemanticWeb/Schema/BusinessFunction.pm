@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::BusinessFunction;
 
-# ABSTRACT: <p>The business function specifies the type of activity or access (i
+# ABSTRACT: The business function specifies the type of activity or access (i
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,20 +30,20 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::BusinessFunction - <p>The business function specifies the type of activity or access (i
+SemanticWeb::Schema::BusinessFunction - The business function specifies the type of activity or access (i
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The business function specifies the type of activity or access (i.e.,
-the bundle of rights) offered by the organization or business person
-through the offer. Typical are sell, rental or lease, maintenance or
-repair, manufacture / produce, recycle / dispose, engineering /
-construction, or installation. Proprietary specifications of access rights
-are also instances of this class.</p> <p>Commonly used values:</p> <ul>
+=for html The business function specifies the type of activity or access (i.e., the
+bundle of rights) offered by the organization or business person through
+the offer. Typical are sell, rental or lease, maintenance or repair,
+manufacture / produce, recycle / dispose, engineering / construction, or
+installation. Proprietary specifications of access rights are also
+instances of this class.<br/><br/> Commonly used values:<br/><br/> <ul>
 <li>http://purl.org/goodrelations/v1#ConstructionInstallation</li>
 <li>http://purl.org/goodrelations/v1#Dispose</li>
 <li>http://purl.org/goodrelations/v1#LeaseOut</li>

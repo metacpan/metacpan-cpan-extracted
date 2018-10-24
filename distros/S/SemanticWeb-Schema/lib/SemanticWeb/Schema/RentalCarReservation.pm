@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::RentalCarReservation;
 
 # ABSTRACT: A reservation for a rental car
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has dropoff_location => (
@@ -64,13 +66,13 @@ SemanticWeb::Schema::RentalCarReservation - A reservation for a rental car
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html A reservation for a rental car.</p> <p>Note: This type is for information
-about actual reservations, e.g. in confirmation emails or HTML pages with
-individual confirmations of reservations.
+=for html A reservation for a rental car.<br/><br/> Note: This type is for
+information about actual reservations, e.g. in confirmation emails or HTML
+pages with individual confirmations of reservations.
 
 =head1 ATTRIBUTES
 

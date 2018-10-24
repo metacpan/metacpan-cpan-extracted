@@ -1,5 +1,5 @@
 {
-   "abstract" : "Report prerequisite versions",
+   "abstract" : "report prerequisite versions",
    "author" : [
       "Sven Kirmess <sven.kirmess@kzone.ch>"
    ],
@@ -31,7 +31,9 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Basename" : "0",
+            "File::Temp" : "0",
             "Getopt::Long" : "0",
+            "HTTP::Tiny" : "0.014",
             "List::Util" : "0",
             "Module::CPANfile" : "0",
             "Module::Path" : "0",
@@ -46,6 +48,7 @@
             "Capture::Tiny" : "0",
             "Cwd" : "0",
             "FindBin" : "0",
+            "Test::MockModule" : "0",
             "Test::More" : "0.88",
             "lib" : "0",
             "perl" : "5.006"
@@ -55,7 +58,7 @@
    "provides" : {
       "App::ReportPrereqs" : {
          "file" : "bin/report-prereqs",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -70,7 +73,10 @@
          "web" : "https://github.com/skirmess/App-ReportPrereqs"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
+   "x_contributors" : [
+      "Stephan Sachse <ste.sachse@gmail.com>"
+   ],
    "x_generated_by_perl" : "v5.24.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }

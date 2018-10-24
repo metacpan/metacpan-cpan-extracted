@@ -1,0 +1,9 @@
+Revision history for Perl module Perl5::Build::Warnings
+
+0.02 Sat Oct 20 21:11:13 EDT 2018
+    - No change in functionality; unneeded import removed
+
+0.01 Sat Oct 20 08:51:04 2018
+    - original version; created by ExtUtils::ModuleMaker 0.63
+
+

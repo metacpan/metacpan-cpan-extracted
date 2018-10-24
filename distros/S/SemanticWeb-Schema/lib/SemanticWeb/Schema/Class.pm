@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Class;
 
 # ABSTRACT: A class
@@ -13,15 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
-
-
-has category => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'category',
-);
-
+our $VERSION = 'v0.0.2';
 
 
 has superseded_by => (
@@ -48,28 +42,13 @@ SemanticWeb::Schema::Class - A class
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
 A class, also often called a 'Type'; equivalent to rdfs:Class.
 
 =head1 ATTRIBUTES
-
-=head2 C<category>
-
-A category for the item. Greater signs or slashes can be used to informally
-indicate a category hierarchy.
-
-A category should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=item C<InstanceOf['SemanticWeb::Schema::Thing']>
-
-=back
 
 =head2 C<superseded_by>
 
@@ -84,9 +63,9 @@ A superseded_by should be one of the following types:
 
 =item C<InstanceOf['SemanticWeb::Schema::Enumeration']>
 
-=item C<InstanceOf['SemanticWeb::Schema::Property']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Class']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Property']>
 
 =back
 

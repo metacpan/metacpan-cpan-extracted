@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Movie;
 
 # ABSTRACT: A movie.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has actor => (
@@ -112,7 +114,7 @@ SemanticWeb::Schema::Movie - A movie.
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -212,9 +214,9 @@ A music_by should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
 
 =back
 
@@ -244,9 +246,9 @@ A subtitle_language should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Language']>
+
+=item C<Str>
 
 =back
 

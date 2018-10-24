@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Product;
 
 # ABSTRACT: Any offered product or service
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has additional_property => (
@@ -304,7 +306,7 @@ SemanticWeb::Schema::Product - Any offered product or service
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -320,7 +322,7 @@ C<additionalProperty>
 
 =for html A property-value pair representing an additional characteristics of the
 entitity, e.g. a product feature or another characteristic for which there
-is no matching property in schema.org.</p> <p>Note: Publishers should be
+is no matching property in schema.org.<br/><br/> Note: Publishers should be
 aware that applications designed to use specific schema.org properties
 (e.g. http://schema.org/width, http://schema.org/color,
 http://schema.org/gtin13, ...) will typically expect such data to be
@@ -444,13 +446,11 @@ A depth should be one of the following types:
 
 =head2 C<gtin12>
 
-=for html The <a
-href="http://apps.gs1.org/GDD/glossary/Pages/GTIN-12.aspx">GTIN-12</a> code
-of the product, or the product to which the offer refers. The GTIN-12 is
-the 12-digit GS1 Identification Key composed of a U.P.C. Company Prefix,
-Item Reference, and Check Digit used to identify trade items. See <a
-href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
-Summary</a> for more details.
+=for html The GTIN-12 code of the product, or the product to which the offer refers.
+The GTIN-12 is the 12-digit GS1 Identification Key composed of a U.P.C.
+Company Prefix, Item Reference, and Check Digit used to identify trade
+items. See <a href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1
+GTIN Summary</a> for more details.
 
 A gtin12 should be one of the following types:
 
@@ -462,12 +462,11 @@ A gtin12 should be one of the following types:
 
 =head2 C<gtin13>
 
-=for html The <a
-href="http://apps.gs1.org/GDD/glossary/Pages/GTIN-13.aspx">GTIN-13</a> code
-of the product, or the product to which the offer refers. This is
-equivalent to 13-digit ISBN codes and EAN UCC-13. Former 12-digit UPC codes
-can be converted into a GTIN-13 code by simply adding a preceeding zero.
-See <a href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
+=for html The GTIN-13 code of the product, or the product to which the offer refers.
+This is equivalent to 13-digit ISBN codes and EAN UCC-13. Former 12-digit
+UPC codes can be converted into a GTIN-13 code by simply adding a
+preceeding zero. See <a
+href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
 Summary</a> for more details.
 
 A gtin13 should be one of the following types:
@@ -480,10 +479,8 @@ A gtin13 should be one of the following types:
 
 =head2 C<gtin14>
 
-=for html The <a
-href="http://apps.gs1.org/GDD/glossary/Pages/GTIN-14.aspx">GTIN-14</a> code
-of the product, or the product to which the offer refers. See <a
-href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
+=for html The GTIN-14 code of the product, or the product to which the offer refers.
+See <a href="http://www.gs1.org/barcodes/technical/idkeys/gtin">GS1 GTIN
 Summary</a> for more details.
 
 A gtin14 should be one of the following types:
@@ -518,9 +515,9 @@ A height should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Distance']>
-
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Distance']>
 
 =back
 
@@ -580,9 +577,9 @@ A is_similar_to should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Service']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Service']>
 
 =back
 
@@ -801,9 +798,9 @@ A width should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Distance']>
-
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Distance']>
 
 =back
 

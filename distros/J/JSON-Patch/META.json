@@ -1,5 +1,5 @@
 {
-   "abstract" : "JSON Patch (L<rfc6902|https://tools.ietf.org/html/rfc6902>) for",
+   "abstract" : "JSON Patch (rfc6902) for perl structures",
    "author" : [
       "Michael Samoglyadov <mixas@cpan.org>"
    ],
@@ -22,6 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "File::Spec::Functions" : "0",
+            "HTTP::Tiny" : "0",
             "JSON" : "0",
             "Test::More" : "0"
          }
@@ -46,5 +48,5 @@
          "url" : "https://github.com/mr-mixas/JSON-Patch.pm"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }

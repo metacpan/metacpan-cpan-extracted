@@ -1,0 +1,28 @@
+Changes
+json-transform.pgx
+lib/JSON/Transform.pm
+lib/JSON/Transform/Grammar.pm
+lib/JSON/Transform/Parser.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+scripts/jt
+t/00-report-prereqs.t
+t/language-parser.t
+t/lib/JTTest.pm
+t/snapshots/language-parser_t/array_identity
+t/snapshots/language-parser_t/array_identity_non-implicit
+t/snapshots/language-parser_t/array_to_hashes
+t/snapshots/language-parser_t/hash_copy
+t/snapshots/language-parser_t/hash_copy_with_transform
+t/snapshots/language-parser_t/hash_identity
+t/snapshots/language-parser_t/hash_move
+t/snapshots/language-parser_t/hashes_to_array
+t/snapshots/language-parser_t/variable_bind_then_replace
+t/transform.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

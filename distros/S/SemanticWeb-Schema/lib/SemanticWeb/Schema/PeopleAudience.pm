@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::PeopleAudience;
 
 # ABSTRACT: A set of characteristics belonging to people
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has required_gender => (
@@ -80,7 +82,7 @@ SemanticWeb::Schema::PeopleAudience - A set of characteristics belonging to peop
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

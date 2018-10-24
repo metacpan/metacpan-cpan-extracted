@@ -65,8 +65,8 @@ sub takechance
 		$configfile = $main::configfile; 
 		@sweeps = @main::sweeps; 
 		@sourcesweeps = @main::sourcesweeps; 
-		@varinumbers = @main::varinumbers; 
-		@mediumiters = @main::mediumiters;
+		@varnumbers = @main::varnumbers; 
+		@miditers = @main::miditers;
 		@rootnames = @main::rootnames; 
 		%vals = %main::vals; 
 		@caseseed = @main::caseseed; 
@@ -133,12 +133,12 @@ sub takechance
 	{	
 		
 		
-		my @tempvarinumbers = @varinumbers; ###ZZZ				
-		foreach my $elt ( keys %{ $varinumbers[$countcase] } ) # THIS STRIPS AWAY THE PARAMETERS THAT ARE NOT CONTAINED IN @pars_tocheck.
+		my @tempvarnumbers = @varnumbers; ###ZZZ				
+		foreach my $elt ( keys %{ $varnumbers[$countcase] } ) # THIS STRIPS AWAY THE PARAMETERS THAT ARE NOT CONTAINED IN @pars_tocheck.
 		{
 			unless ( $elt ~~ @{ $pars_tocheck[$countcase] } )
 			{
-				delete ${ $tempvarinumbers[$countcase] }{$elt};
+				delete ${ $tempvarnumbers[$countcase] }{$elt};
 			}
 		}
 		
@@ -149,7 +149,7 @@ sub takechance
 		my (@varnumbers, @newvarnumbers, @chance, @newchance, @shuffledchanceelms);		
 		my @chancerefs = @{$chanceseed_[$countcase]};  
 				
-		my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase); 
+		my %varnums = Sim::OPT::getcase(\@varnumbers, $countcase); 
 		my @variables;
 		if ( not (@{$pars_tocheck->[$countcase]}) )
 		{
@@ -585,7 +585,7 @@ sub takechance
 					#################################################################################################################
 					#################################################################################################################
 					
-					###my $steps = Sim::OPT::getstepsvar($elt, $countcase, \@varinumbers);
+					###my $steps = Sim::OPT::getstepsvar($elt, $countcase, \@varnumbers);
 
 					$varsnum = ( $activeblock + $zoneend); 
 					$limit = ($attachment + $activeblock + $zoneend); 
@@ -599,9 +599,9 @@ sub takechance
 					
 					$countfirstline = 0;
 					
-					if ($countblk > 0) { $antesize = Sim::OPT::givesize(\@pastslice, $countcase, \@varinumbers); } 
+					if ($countblk > 0) { $antesize = Sim::OPT::givesize(\@pastslice, $countcase, \@varnumbers); } 
 					
-					$postsize = Sim::OPT::givesize(\@presentslice, $countcase, \@varinumbers); 
+					$postsize = Sim::OPT::givesize(\@presentslice, $countcase, \@varnumbers); 
 					$localsize = $postsize + $antesize; 
 					
 					if ($countblk == 0)  
@@ -612,7 +612,7 @@ sub takechance
 					
 					$localsizeproduct = $postsize * $antesize; 
 					
-					$overlapsize =  Sim::OPT::givesize(\@intersection, $countcase, \@tempvarinumbers); 
+					$overlapsize =  Sim::OPT::givesize(\@intersection, $countcase, \@tempvarnumbers); 
 					###$overlapsize = ($steps ** $overlap); say $tee "BEYOND3 \$overlapsize $overlapsize";###DDD
 					
 					if ($overlap == 0) {$overlapsize = 1;} 
@@ -638,7 +638,7 @@ sub takechance
 					if ($totaloverlapsize == 0){$totaloverlapsize = 1;} ############ ZZZZ UNNEEDED?
 					
 					
-					#$overlapminussize = Sim::OPT::givesize(\@intersectionminus, $countcase, \@varinumbers); say $tee "BEYOND3 \$overlapsize $overlapsize"; ############ ZZZZ UNNEEDED
+					#$overlapminussize = Sim::OPT::givesize(\@intersectionminus, $countcase, \@varnumbers); say $tee "BEYOND3 \$overlapsize $overlapsize"; ############ ZZZZ UNNEEDED
 					#$overlapminussize = ($steps ** $overlapminus); ############ ZZZZ UNNEEDED
 					
 					#if ($overlapminussize == 0){$overlapminussize = 1;}  ############ ZZZZ UNNEEDED
@@ -831,13 +831,13 @@ How "@chanceseed" and "@caseseed" should be specified is more quickly described 
 
 5) The initialization blocks can be of different size. Example: <@chanceseed = ( [ [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [5, 2, 4, 1, 3], [2, 4, 1, 5, 2], [5, 1, 4, 2, 3], [5, 1, 4, 2, 3] ] );> and <@caseseed = ( [ [0, 3], [1, 3], [2, 3], [4, 3] ], [2, 2], [4, 2], [3, 4], [1, 4] ] );>.
 
-Other variables which are necessary to define in the configuration file for describing the operations to be performed by the "Sim::OPT::Takechance" module are "@chancedata", "$dimchance", "@pars_tocheck" and "@varinumbers".
+Other variables which are necessary to define in the configuration file for describing the operations to be performed by the "Sim::OPT::Takechance" module are "@chancedata", "$dimchance", "@pars_tocheck" and "@varnumbers".
 
 "@chancedata" is composed by references to arrays (one for each search path to be taken into account, as in all the other cases), each of which composed by three values: the first specifying the length (how many variables) of the blocks to be added; the second specifying the length of the overlap between blocks; the third specifying the number of sweeps (subsearches, searches in subspaces) to be added. For example, the setting < @chancedata = ([4, 3, 2]); > implies that the blocks to be added to the search path are each 4 parameters long, have each an overlap of 3 parameters with the immediately preceding block, and are 2 in number - that is, 2 sweeps have to be added to the search path.
 
 "$dimchance" tells the program among how many random samples the blocks to be added to the search path have to be chosen. The higher the value, the most efficient the search structure will turn out to be, the higher the required computation time will be. High values are likely to be required by large search structures.
 
-"@varinumbers" is shared with the Sim::OPT module. It specifies the number of iterations to be taken into account for each parameter and each search case. For example, to specifiy that the parameters of a search structure involving 5 parameters (numbered from 1 to 5) for one case are to be tried for 3 values (iterations) each, "@varinumbers" has to be set to "( { 1 => 3, 2 => 3, 3 => 3, 4 => 3, 5 => 3 } )".
+"@varnumbers" is shared with the Sim::OPT module. It specifies the number of iterations to be taken into account for each parameter and each search case. For example, to specifiy that the parameters of a search structure involving 5 parameters (numbered from 1 to 5) for one case are to be tried for 3 values (iterations) each, "@varnumbers" has to be set to "( { 1 => 3, 2 => 3, 3 => 3, 4 => 3, 5 => 3 } )".
 
 "@pars_tocheck" is a variable in which the parameter numbers to be taken into account in the creation of the added search path have to be listed. If it is not defined, all the available parameters will be used.
 

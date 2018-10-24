@@ -1,11 +1,12 @@
 package Dist::Util::Debian;
 
-our $DATE = '2017-01-18'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2018-10-23'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -23,19 +24,19 @@ sub dist2deb {
 }
 
 sub _deb_exists_or_deb_ver {
-    require HTTP::Tiny;
-
     my $which = shift;
     my $opts = ref($_[0]) eq 'HASH' ? shift : {};
 
     if ($opts->{use_allpackages}) {
         require File::Slurper::Temp;
         require File::Util::Tempdir;
+        require HTTP::Tiny;
         require IO::Uncompress::Gunzip;
         my $url  = "https://packages.debian.org/unstable/allpackages?format=txt.gz";
         my $path = File::Util::Tempdir::get_tempdir() . "/allpackages.txt";
         my @stat = stat($path);
         unless (@stat && $stat[9] > time() - 86400) {
+            log_trace "Downloading $url ...";
             my $res = HTTP::Tiny->new->get($url);
             unless ($res->{success}) {
                 warn "Can't download $url: $res->{status} - $res->{reason}";
@@ -48,6 +49,7 @@ sub _deb_exists_or_deb_ver {
         }
         my %versions;
         my $re = join("|", map { quotemeta($_) } @_); $re = qr/^($re) \(([^\)]+?)(?:\)|\s)/;
+        log_trace "Reading $path ...";
         open my($fh), "<", $path or die "Can't open $path: $!";
         while (defined(my $line = <$fh>)) {
             if ($line =~ $re) {
@@ -56,9 +58,11 @@ sub _deb_exists_or_deb_ver {
         }
         return map { $which eq 'deb_exists' ? (defined $versions{$_} ? 1:0) : $versions{$_} } @_;
     } else {
+        require HTTP::Tiny;
         my @res;
         for my $deb (@_) {
             my $url = "https://packages.debian.org/sid/$deb";
+            log_trace "Checking package $deb from $url ...";
             my $res = HTTP::Tiny->new->get($url);
             unless ($res->{success}) {
                 warn "Can't check $url: $res->{status} - $res->{reason}";
@@ -117,7 +121,7 @@ Dist::Util::Debian - Utilities related to Perl distribution and Debian
 
 =head1 VERSION
 
-This document describes version 0.006 of Dist::Util::Debian (from Perl distribution Dist-Util-Debian), released on 2017-01-18.
+This document describes version 0.007 of Dist::Util::Debian (from Perl distribution Dist-Util-Debian), released on 2018-10-23.
 
 =head1 SYNOPSIS
 
@@ -206,7 +210,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

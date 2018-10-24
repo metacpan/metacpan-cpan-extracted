@@ -3,12 +3,14 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::File::Video;
 use POSIX ();
 use Prty::Option;
+use Prty::Duration;
 use Prty::FileHandle;
 
 # -----------------------------------------------------------------------------
@@ -1222,11 +1224,13 @@ Extrahiere den Ausschnitt nicht, sondern zeige ihn an. 1=Exit am Ende,
 
 =item -start => $s (Default: 0)
 
-Start-Position in Sekunden (mit Millisekunden als Nachkommastellen).
+Start-Position in einem Format, das die Klasse Prty::Duration
+akzeptiert.
 
 =item -stop => $s (Default: undef)
 
-Ende-Position in Sekunden (mit Millisekunden als Nachkommastellen).
+Ende-Position in einem Format, das die Klasse Prty::Duration
+akzeptiert.
 
 =back
 
@@ -1266,6 +1270,12 @@ sub extract {
 
     my $self = $class->new;
     $self->addInput($input);
+    if (defined $start) {
+        $start = Prty::Duration->stringToSeconds($start);
+    }
+    if (defined $stop) {
+        $stop = Prty::Duration->stringToSeconds($stop);
+    }
     $self->addStartStop($start,$stop);
 
     if ($play) {
@@ -1275,7 +1285,9 @@ sub extract {
     else {
         my $inp = $self->input(0);
         $self->outName($name);
-        $self->outSize($inp->size);
+        # Rausgenommen, da Fehler bei Extraktion aus Audio-Datei.
+        # Bei Video nötig?
+        # $self->outSize($inp->size);
         $self->outStart($start || 0);
         $self->outStop($stop || $inp->duration);
         $self->prependString('ffmpeg -y');
@@ -1521,7 +1533,7 @@ sub execute {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

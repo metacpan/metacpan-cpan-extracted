@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>An agent tracks an object for updates.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/FollowAction\">FollowAction</a>: Unlike FollowAction, TrackAction refers to the interest on the location of innanimates objects.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/SubscribeAction\">SubscribeAction</a>: Unlike SubscribeAction, TrackAction refers to  the interest on the location of innanimate objects.</li>\n</ul>\n",
+      "rdfs:comment" : "An agent tracks an object for updates.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/FollowAction\">FollowAction</a>: Unlike FollowAction, TrackAction refers to the interest on the location of innanimates objects.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/SubscribeAction\">SubscribeAction</a>: Unlike SubscribeAction, TrackAction refers to  the interest on the location of innanimate objects.</li>\n</ul>\n",
       "rdfs:label" : "TrackAction",
       "rdfs:subClassOf" : "schema:FindAction"
    },
@@ -12,10 +12,10 @@
          "rdfs:label" : "deliveryMethod",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
+            "schema:SendAction",
             "schema:OrderAction",
             "schema:ReceiveAction",
-            "schema:TrackAction",
-            "schema:SendAction"
+            "schema:TrackAction"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       }

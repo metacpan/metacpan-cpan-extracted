@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::InvestmentOrDeposit;
 
 # ABSTRACT: A type of financial product that typically requires the client to transfer funds to a financial service in return for potential beneficial financial return.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has amount => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::InvestmentOrDeposit - A type of financial product that typi
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -58,9 +60,9 @@ A amount should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=item C<Num>
 
 =back
 

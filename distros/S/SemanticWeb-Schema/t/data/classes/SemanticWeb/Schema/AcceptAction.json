@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of committing to/adopting an object.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/RejectAction\">RejectAction</a>: The antonym of AcceptAction.</li>\n</ul>\n",
+      "rdfs:comment" : "The act of committing to/adopting an object.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/RejectAction\">RejectAction</a>: The antonym of AcceptAction.</li>\n</ul>\n",
       "rdfs:label" : "AcceptAction",
       "rdfs:subClassOf" : "schema:AllocateAction"
    },

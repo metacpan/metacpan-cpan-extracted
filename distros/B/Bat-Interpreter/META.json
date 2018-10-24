@@ -49,6 +49,7 @@
       "test" : {
          "requires" : {
             "English" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
             "strict" : "0",
@@ -68,10 +69,11 @@
          "web" : "https://github.com/pablrod/p5-Bat-Interpreter"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_contributors" : [
       "eva.dominguez <eva.dominguez@meteologica.com>",
       "Eva Dominguez <meloncego@gmail.com>",
+      "juanradiego <kilaweo@gmail.com>",
       "pablo.rodriguez <pablo.rodriguez@meteologica.com>",
       "ricardo.gomez <ricardogomezescalante@gmail.com>",
       "Toby Inkster <tobyink@cpan.org>"

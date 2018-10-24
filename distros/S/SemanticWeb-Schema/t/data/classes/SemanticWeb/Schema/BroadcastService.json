@@ -54,9 +54,9 @@
          "rdfs:comment" : "The type of screening or video broadcast used (e.g. IMAX, 3D, SD, HD, etc.).",
          "rdfs:label" : "videoFormat",
          "schema:domainIncludes" : [
+            "schema:ScreeningEvent",
             "schema:BroadcastEvent",
-            "schema:BroadcastService",
-            "schema:ScreeningEvent"
+            "schema:BroadcastService"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

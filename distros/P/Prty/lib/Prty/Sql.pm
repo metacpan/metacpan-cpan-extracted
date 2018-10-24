@@ -3,9 +3,10 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Hash;
 use Prty::Option;
@@ -1462,6 +1463,54 @@ sub dropSchema {
 # -----------------------------------------------------------------------------
 
 =head2 Table
+
+=head3 splitTableName() - Zerlege Tabellennamen
+
+=head4 Synopsis
+
+    ($schema,$table) = $class->splitTableName($name);
+    ($schema,$table) = $class->splitTableName($name,$sloppy);
+
+=head4 Alias
+
+splitTablename()
+
+=head4 Description
+
+Zerlege den Tabellennamen $name in die Komponenten $schema und $table.
+Besitzt der Tabellennamen keinen Schema-Präfix, wird eine Exception
+geworfen. Dies geschieht nicht, wenn der Parameter $sloppy gesetzt
+und wahr ist. In dem Fall wird keine Exception geworfen, sondern als
+Schemaname C<undef> geliefert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub splitTableName {
+    my ($class,$name,$sloppy) = @_;
+
+    my ($schema,$table) = split /\./,$name;
+    if (!$table) {
+        if (!$sloppy) {
+            $class->throw(
+                q~SQL-00099: Tablename without schema prefix~,
+                Tablename => $name,
+            );
+        }
+        $table = $schema;
+        $schema = undef;
+    }
+
+    return ($schema,$table);
+}
+
+{
+    no warnings 'once';
+    *splitTablename = \&splitTableName;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 createTable() - Generiere CREATE TABLE Statement
 
@@ -5171,15 +5220,15 @@ sub notExists {
 
 =head4 Example
 
-    my $tab = $db->diff(
-    't.id',
-    "de_ticket t LEFT OUTER JOIN spielgemeinschaftanteil s\n".
-    'ON t.id = s.spielid*65536+1',
-    ['N','t.subscription'=>'s.dauerschein'],
-    ['N','t.product_id'=>'s.spielgemeinschaftid',
-        \'CASE %C WHEN 9685 THEN 24 WHEN 9684 THEN 26 WHEN 9687 THEN 28 END',
-    ],
-    't.product_ticket_type'=>'LOTTERY_CLUB_TICKET',
+    $tab = $db->diff(
+        't.id',
+        "de_ticket t LEFT OUTER JOIN spielgemeinschaftanteil s\n".
+        'ON t.id = s.spielid*65536+1',
+        ['N','t.subscription'=>'s.dauerschein'],
+        ['N','t.product_id'=>'s.spielgemeinschaftid',
+            \'CASE %C WHEN 9685 THEN 24 WHEN 9684 THEN 26 WHEN 9687 THEN 28 END',
+        ],
+        't.product_ticket_type'=>'LOTTERY_CLUB_TICKET',
         -limit=>100,
     );
 
@@ -5259,7 +5308,7 @@ sub diff {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@ use warnings;
 
 use Test2::V0;
 
-use File::Slurp qw( read_file );
+use File::Slurper qw( read_text );
 
 use Markdent::Handler::CaptureEvents;
 use Markdent::Handler::MinimalTree;
@@ -14,7 +14,7 @@ use lib 't/lib';
 use Test::Markdent;
 
 my $markdown
-    = read_file('t/mdtest-data/Markdown Documentation - Basics.text');
+    = read_text('t/mdtest-data/Markdown Documentation - Basics.text');
 
 my $ch  = Markdent::Handler::CaptureEvents->new();
 my $th1 = Markdent::Handler::MinimalTree->new();

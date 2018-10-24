@@ -9,7 +9,7 @@
 #  $source =~ s(\x{a0}) ( )gs; The no break space problem
 
 package Data::Edit::Xml;
-our $VERSION = q(20181014);
+our $VERSION = q(20181018);
 use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;

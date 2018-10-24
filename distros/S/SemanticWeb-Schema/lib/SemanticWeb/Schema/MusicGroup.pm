@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::MusicGroup;
 
 # ABSTRACT: A musical group
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has album => (
@@ -80,7 +82,7 @@ SemanticWeb::Schema::MusicGroup - A musical group
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -148,9 +150,9 @@ A track should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::MusicRecording']>
-
 =item C<InstanceOf['SemanticWeb::Schema::ItemList']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MusicRecording']>
 
 =back
 

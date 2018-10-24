@@ -21,7 +21,7 @@ use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -150,6 +150,14 @@ The maximum number of seconds to wait until Chrome is ready. This helps on slow
 systems where Chrome takes some time starting up. The process will try every
 second to connect to Chrome.
 
+=item B<listen_host>
+
+  listen_host => 'myhostname'
+
+Specify the interface where a launched Chrome process should listen. This is
+usually not needed but available if you want to connect to the launched Chrome
+process from other machines as well.
+
 =item B<driver>
 
 A premade L<Chrome::DevToolsProtocol> object.
@@ -167,73 +175,73 @@ Mutes the audio output. This setting is enabled by default.
 
 Enable "background networking".
 
-Default is disabled.
+Disabled by default.
 
 =item B<client_side_phishing_detection>
 
 Enable "client side phising detection".
 
-Default is disabled.
+Disabled by default.
 
 =item B<component_update>
 
 Enable "component update".
 
-Default is disabled.
+Disabled by default.
 
 =item B<default_apps>
 
 Enable "default apps".
 
-Default is disabled.
+Disabled by default.
 
 =item B<hang_monitor>
 
 Enable "hang monitor".
 
-Default is disabled.
+Disabled by default.
 
 =item B<hide_scrollbars>
 
 Hide scrollbars.
 
-Default is disabled.
+Disabled by default.
 
 =item B<infobars>
 
 Enable "infobars".
 
-Default is disabled.
+Disabled by default.
 
 =item B<popup_blocking>
 
 Enable "popup blocking".
 
-Default is disabled.
+Disabled by default.
 
 =item B<prompt_on_repost>
 
 Enable "prompt on repost".
 
-Default is disabled.
+Disabled by default.
 
 =item B<save_password_bubble>
 
 Enable the "save password" bubble.
 
-Default is disabled.
+Disabled by default.
 
 =item B<sync>
 
 Enable "sync".
 
-Default is disabled.
+Disabled by default.
 
 =item B<web_resources>
 
 Enable "Web resources".
 
-Default is disabled.
+Disabled by default.
 
 =back
 
@@ -260,6 +268,10 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--remote-debugging-port=$options->{ port }";
     };
 
+    if ($options->{listen_host}) {
+        push @{ $options->{ launch_arg }}, "--remote-debugging-address==$options->{ listen_host }";
+    };
+
     if ($options->{incognito}) {
         push @{ $options->{ launch_arg }}, "--incognito";
     };
@@ -270,6 +282,10 @@ sub build_command_line {
 
     if ($options->{profile}) {
         push @{ $options->{ launch_arg }}, "--profile-directory=$options->{ profile }";
+    };
+
+    if( ! exists $options->{enable_automation} || $options->{enable_automation}) {
+        push @{ $options->{ launch_arg }}, "--enable-automation";
     };
 
     if( ! exists $options->{enable_first_run} || ! $options->{enable_first_run}) {
@@ -643,6 +659,9 @@ sub _connect( $self, %options ) {
         die $err;
     }
 
+    # Create new world if needed
+    # connect to current world/new world
+
     my $s = $self;
     weaken $s;
     my $collect_JS_problems = sub( $msg ) {
@@ -661,6 +680,7 @@ sub _connect( $self, %options ) {
         $self->driver->send_message('Page.enable'),    # capture DOMLoaded
         $self->driver->send_message('Network.enable'), # capture network
         $self->driver->send_message('Runtime.enable'), # capture console messages
+        #$self->driver->send_message('Debugger.enable'), # capture "script compiled" messages
         $self->set_download_directory_future($self->{download_directory}),
 
         keys %{$options{ extra_headers }} ? $self->_set_extra_headers_future( %{$options{ extra_headers }} ) : (),
@@ -703,7 +723,7 @@ sub requestId( $self ) {
 
   print $mech->chrome_version;
 
-Returns the version of the Chrome executable that is used. This information
+Returns the version of the Chrome executable being used. This information
 needs launching the browser and asking for the version via the network.
 
 =cut
@@ -1495,7 +1515,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
     })
 }
 
-sub get($self, $url, %options ) {
+sub get_future($self, $url, %options ) {
 
     # $frameInfo might come _after_ we have already seen messages for it?!
     # So we need to capture all events even before we send our command to the
@@ -1510,9 +1530,14 @@ sub get($self, $url, %options ) {
             url => "$url"
         )
         }, url => "$url", %options, navigates => 1 )
-    ->get;
+    ->then( sub {
+        Future->done( $self->response )
+    })
+};
 
-    return $self->response;
+sub get($self, $url, %options ) {
+
+    $self->get_future($url, %options)->get;
 };
 
 =head2 C<< $mech->get_local( $filename , %options ) >>
@@ -4428,7 +4453,6 @@ sub saveResources_future( $self, %options ) {
     $self->fetchResources_future( save => sub( $resource ) {
 
         # For mime/html targets without a name, use the title?!
-
         # Rewrite all HTML, CSS links
 
         # We want to store the top HTML under the name passed in (!)
@@ -4658,7 +4682,12 @@ sub render_content( $self, %options ) {
 
     my $pdf_data = $mech->content_as_pdf();
 
-Returns the current page rendered in PDF format as a bytestring.
+    my $pdf_data = $mech->content_as_pdf( format => 'A4' );
+
+    my $pdf_data = $mech->content_as_pdf( paperWidth => 8, paperHeight => 11 );
+
+Returns the current page rendered in PDF format as a bytestring. The page format
+can be specified through the C<format> option.
 
 Note that this method will only be successful with headless Chrome. At least on
 Windows, when launching Chrome with a UI, printing to PDF will be unavailable.
@@ -4667,7 +4696,27 @@ This method is specific to WWW::Mechanize::Chrome.
 
 =cut
 
+our %PaperFormats = (
+    letter  =>  {width =>  8.5,  height =>  11   },
+    legal   =>  {width =>  8.5,  height =>  14   },
+    tabloid =>  {width =>  11,   height =>  17   },
+    ledger  =>  {width =>  17,   height =>  11   },
+    a0      =>  {width =>  33.1, height =>  46.8 },
+    a1      =>  {width =>  23.4, height =>  33.1 },
+    a2      =>  {width =>  16.5, height =>  23.4 },
+    a3      =>  {width =>  11.7, height =>  16.5 },
+    a4      =>  {width =>  8.27, height =>  11.7 },
+    a5      =>  {width =>  5.83, height =>  8.27 },
+    a6      =>  {width =>  4.13, height =>  5.83 },
+);
+
 sub content_as_pdf($self, %options) {
+    if( my $format = delete $options{ format }) {
+        my $wh = $PaperFormats{ lc $format }
+            or croak "Unknown paper format '$format'";
+        @options{'paperWidth','paperHeight'} = @{$wh}{'width','height'};
+    };
+
     my $base64 = $self->driver->send_message('Page.printToPDF', %options)->get->{data};
     my $payload = decode_base64( $base64 );
     if( my $filename = delete $options{ filename } ) {

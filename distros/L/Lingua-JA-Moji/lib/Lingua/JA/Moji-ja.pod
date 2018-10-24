@@ -17,8 +17,8 @@ Lingua::JA::Moji - 総合日本文字変換「文字ュール」
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.53
-corresponding to git commit L<4d331013d110c3c316c352bd2409a6b609e6e214|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/4d331013d110c3c316c352bd2409a6b609e6e214> made on Wed Oct 3 15:41:13 2018 +0900.
+This document describes Lingua::JA::Moji version 0.54
+corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/79035f5895111c7bd0d2da461ebf78cee8c1d517> made on Mon Oct 22 20:28:13 2018 +0900.
 
 =head1 説明
 
@@ -300,6 +300,9 @@ L</is_romaji>より厳しく、コンピューター入力に見えるかどう�
 
 真の値はローマ字のワープロ変換です。
 
+L</0.27>から
+
+
 
 
 
@@ -448,6 +451,11 @@ C<normalize_romaji>はかなやローマ字で書いた言葉を比べるため�
 
 一番最初のかなに濁点又は半濁点をつけます。
 
+漢字を探すために使う予定だったのですが、現在使っていません。
+
+L</0.36>から
+
+
 
 
 
@@ -568,24 +576,6 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 
-=head2 kana_order 
-
-
-
-    use Lingua::JA::Moji 'kana_order';
-
-    $kana_order = kana_order ();
-
-
-
-仮名の（適当な）順番を返します。例えば、全ての仮名をループしたい時に使えます。
-
-
-
-
-
-
-
 =head2 katakana2syllable 
 
 
@@ -598,6 +588,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 カタカナをシラブルニワケル。たとえば、「ソーシャル」
 ハ'ソ', 'ー', 'シ', 'ャ', 'ル'という意味のない文字ではなく、日本語の「原子」ノ'ソー', 'シャ', 'ル'になります。撥音(ん)は前の仮名と一つになります。例えば、「フラナガン」ハ「フ」, 「ラ」, 「ナ」, 「ガン」となります。
+
+L</0.24>から
+
 
 
 
@@ -681,6 +674,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 片仮名の列に拗音と促音を入れる。昔の仮名使いを現代のに直す。あくまで実験的です。
 
+L</0.46>から
+
+
 
 
 
@@ -716,7 +712,7 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 濁点、半濁点をできる限り仮名につけます。「カ゛」-> 「ガ」など。残っている濁点を消します。
 
-0.53カラ
+L</0.53>から
 
 
 
@@ -737,7 +733,8 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 濁点、半濁点を仮名からわけます。-> 「が」-> 「か゛」など。半濁点はU+309B、濁点はU+309Cとなります。
 
-0.53カラ
+L</0.53>から
+
 
 
 
@@ -765,6 +762,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 変体仮名をひらがなに変換します。複数のかなにあてはまる変体仮名は「・」でつないだ列になります。
 
+L</0.43>から
+
+
 
 
 
@@ -783,6 +783,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 変体仮名を漢字に変換します。
+
+L</0.43>から
+
 
 
 
@@ -803,6 +806,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 あてはまる変体仮名があるかぎり、漢字を変体仮名に変換します。
 
+L</0.43>から
+
+
 
 
 
@@ -821,6 +827,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 あてはまる変体仮名があるかぎり、普通の仮名を変体仮名に変換します。複数の仮名があれば、「・」で分けます。濁点と半濁点はL</split_sound_marks>により仮名と分けてから変換します。
+
+L</0.43>から
+
 
 
 
@@ -1161,6 +1170,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 幽霊文字（実際には存在しない漢字）。L<https://www.wdic.org/w/WDIC/%E5%B9%BD%E9%9C%8A%E6%96%87%E5%AD%97>ご参照ください。こちらのページの典拠不詳・典拠不明・同定不能の字です。
 
+L</0.47>から
+
+
 
 
 
@@ -1177,6 +1189,9 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 否定的な意味（病名、不愉快な物、軽率の意味など）の漢字。
 L<https://www.lemoda.net/japanese/offensive-kanji/index.html>。
+
+L</0.47>から
+
 
 
 
@@ -1406,23 +1421,63 @@ strange, but since it was described in Naoki Tomita's book, and some
 people may be using it as is, I'm not very keen to change it in
 incompatible ways.
 
-0.43 added support for
+=over
+
+=item 0.24
+
+This version added L</katakana2syllable>.
+
+=item 0.27
+
+This version added L</is_romaji_strict>.
+
+=item 0.36
+
+This version added the L</nigori_first> function.
+
+=item 0.37
+
+This version added L</is_romaji_semistrict>.
+
+=item 0.43 
+
+This version added support for
 L<hentaigana|http://www.sljfaq.org/afaq/hentaigana.html>. This is
 based on copy and paste of the Unicode 10.0 standard draft
 documents. See the directory L<F<data>|https://github.com/benkasminbullock/Lingua-JA-Moji/tree/master/data> in the github repository for the files used to
 generate this data.
 
-0.46 disallowed hyphens as the first character of a romaji string and
-added L</smallize_kana> and L</cleanup_kana>.
+=item 0.46
 
-0.47 added a list of the "Yūrei moji" (幽霊文字), false kanji, and
+This version disallowed hyphens as the first character of a romaji
+string and added L</smallize_kana> and L</cleanup_kana>.
+
+=item 0.47
+
+This version added a list of the "Yūrei moji" (幽霊文字), false kanji, and
 changed romanisation somewhat.
 
-0.48 changed kana2romaji to be consistent with the documentation for
-long vowel options wapuro and none.
+=item 0.48
 
-0.53 added L</join_sound_marks> and L</split_sound_marks> to the
-module.
+This version changed L</kana2romaji> to be consistent with the
+documentation for the long vowel options C<wapuro> and C<none>.
+
+=item 0.53
+
+This version added L</join_sound_marks> and L</split_sound_marks> to
+the module.
+
+=item 0.54
+
+This version removed the nonsensical C<kana_order> function from the
+module. It improved the behaviour of L</is_romaji_strict> after
+comparing its negatives and positives with a large number of English
+and nonsense words. It improved the behaviour of L</smallize_kana>
+with regard to the "tsu" kana. L</cleanup_kana> was improved to deal
+with stray dakuten and handakuten and some other odd kanji/kana
+confusions.
+
+=back
 
 
 

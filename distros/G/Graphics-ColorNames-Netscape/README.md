@@ -4,7 +4,7 @@ Graphics::ColorNames::Netscape - Netscape 1.1 Color Names
 
 # VERSION
 
-version v3.1.2
+version v3.1.3
 
 # SYNOPSIS
 

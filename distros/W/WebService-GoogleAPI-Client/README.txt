@@ -4,30 +4,47 @@ NAME
 
 VERSION
 
-    version 0.11
+    version 0.13
 
 SYNOPSIS
 
     Access Google API Services Version 1 using an OAUTH2 User Agent
 
-        ## use goauth CLI helper to create the OATH credentials file ( see perldoc goauth )
-    
         use WebService::GoogleAPI::Client;
-        use Data::Dumper;
     
-        my $gapi = WebService::GoogleAPI::Client->new(debug => 0); # my $gapi = WebService::GoogleAPI::Client->new(access_token => '');
-        my $user = 'peter@pscott.com.au'; # full gmail or G-Suite email
+        ## assumes gapi.json configuration in working directory with scoped project and user authorization
+        
+        my $gapi_client = WebService::GoogleAPI::Client->new( debug => 1, gapi_json => 'gapi.json', user=> 'peter@pscott.com.au' );
+
+ AUTOMATIC API REQUEST CONSTRUCTION - SEND EMAL
+
+        ## using dotted API Endpoint id to invoke helper validation and default value interpolations etc to send email to self
+        use Email::Simple;    ## RFC2822 formatted messages
+        use MIME::Base64;
+        my $my_email_address = 'peter@shotgundriver.com'
     
-        $gapi->auth_storage->setup({type => 'jsonfile', path => './gapi.json' }); # by default
     
-        $gapi->user($user);       ## allows to select user configuration by google auth'd email address
-        $gapi->do_autorefresh(1); ## refresh auth token with refresh token if auth session has expired
+        my $raw_email_payload = encode_base64( Email::Simple->create( header => [To => $my_email_address, 
+                                                                                 From => $my_email_address, 
+                                                                                 Subject =>"Test email from '$my_email_address' ",], 
+                                                                                 body => "This is the body of email to '$my_email_address'", 
+                                                                    )->as_string 
+                                            );
+    
+        $gapi_client->api_query( 
+                                api_endpoint_id => 'gmail.users.messages.send',
+                                options    => { raw => $raw_email_payload },
+                            );
 
- OAUTH CREDENTIALS FILE TO ACCESS SERVCICES
+ MANUAL API REQUEST CONSTRUCTION - GET CALENDAR LIST
 
-    TODO
+        ## Completely manually constructed API End-Point Request to obtain Perl Data Structure converted from JSON response.
+        my $res = $gapi_client->api_query(
+          method => 'get',
+          path => 'https://www.googleapis.com/calendar/users/me/calendarList',
+        )->json;
 
- BUILD
+ new
 
     WebService::GoogleAPI::Client->new( user => 'useremail@sdf.com',
     gapi_json => '/fullpath/gapi.json' );
@@ -125,30 +142,7 @@ SYNOPSIS
 
     DELEGATED FROM WebService::GoogleAPI::Client::Discovery
 
-FUNCTIONAL CLASS PROPERTIES
-
- ua
-
-    Is a WebService::GoogleAPI::Client::UserAgent
-
-  DELEGATE METHOD
-
-METHODS DELEGATED TO PROPERTY CLASS INSTANCES
-
- access_token ua handles: access_token auth_storage do_autorefresh
- get_scopes_as_array user
-
-    discovery handles: discover_all
-    extract_method_discovery_detail_from_api_spec
-    get_api_discovery_for_api_id get_method_meta
-
-KEY FEATURES
-
-    Aim is to streamline endpoint access without forcing an additional
-    opinionated abstraction layer that imposes unecessary congnitive load.
-    Users of the module should be able to access all Google Services and
-    either use helper features or fully construct requests in a way that is
-    as portable to alternative approaches as possible.
+FEATURES
 
     API Discovery with local caching using CHI File
 
@@ -165,36 +159,6 @@ KEY FEATURES
     CLI tool (goauth) with lightweight http server to simplify OAuth2
     configuration, sccoping, authorization and obtaining access_ and
     refresh_ tokensn from users
-
- TODO:
-
-    Refactor AuthStorage and Credentials modules - include capability to
-    handle service accounts credentials which are not currently supported.
-    See https://gist.github.com/gsainio/6322375
-
-    standardise terminology in documentation and code
-
-    include POD for delegated methods
-
-    basic CLI to query API Discovery data ( Potentially with OPEN/Swagger
-    Output option ) potenitlaly evolving to something similar to gcloud
-
-SEE ALSO
-
-      * "/cloud.google.com/apis/docs/cloud-client-libraries" in Google
-      Cloud Client Libraries https:
-
-      * "/www.blog.google/products/google-cloud/" in Google Cloud Blog
-      https:
-
-      * Moo::Google - The original code base later forked into
-      WebService::Google::Client by Steve Dondley. Some shadows of the
-      original design remain
-
-      * "/github.com/APIs-guru/google-discovery-to-swagger" in Google
-      Swagger API https:
-
-      * OAuth2::Client::Google - Perl 6 OAuth2 Client
 
 AUTHOR
 

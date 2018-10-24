@@ -1,3 +1,18 @@
+1.115 2018-10-21
+
+  * dist.ini: use AutoPrereq
+  * adds build dependency on Config::Model::Tester 3.006
+
+1.114 2018-10-19
+
+  * dist.ini: require Config::Model 2.123
+  * Build.PL: update homepage
+  * Build.PL: fix repo url
+  * Backend: use file_path parameter (RT #127387)
+    Thanks Slaven for the report
+  * added t/README.md
+  * use new run_test in t/model_tests.t
+
 1.113 2016-11-24
 
   * add in the correct place (in dist.ini) the

@@ -3,12 +3,15 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Option;
 use Scalar::Util ();
 use Prty::Unindent;
+use Prty::Math;
+use Prty::Converter;
 
 # -----------------------------------------------------------------------------
 
@@ -153,7 +156,6 @@ sub c {
     }
 
     # Codezeile erzeugen und zurückliefern
-
     return ("\n" x $pnl).sprintf($fmt,@_).("\n" x $nl);
 }
 
@@ -537,9 +539,71 @@ sub modifyLength {
 
 # -----------------------------------------------------------------------------
 
+=head3 toLength() - Wandele Länge in TeX-Länge
+
+=head4 Synopsis
+
+    $length = $this->toLength($val);
+
+=head4 Arguments
+
+=over 4
+
+=item $val
+
+Länge, die in die TeX-Länge umgerechnet wird.
+
+=back
+
+=head4 Returns
+
+TeX-Länge (String)
+
+=head4 Examples
+
+Keine Angabe:
+
+    $class->toLength(undef);
+    # undef
+
+Angabe in Pixeln ohne Einheit:
+
+    $class->toLength(100);
+    # '75pt'
+
+Angabe in Pixeln mit Einheit:
+
+    $class->toLength('100px');
+    # '75pt'
+
+Alle anderen Werte bleiben unverändert:
+
+    $class->toLength($val);
+    # $val
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub toLength {
+    my ($this,$val) = @_;
+
+    if (defined $val) {
+        $val =~ s/px$//; # Einheit Pixel entfernen wir
+        if (Prty::Math->isNumber($val)) {
+            # Keine Einheit: Pixel -> Punkt
+            $val = Prty::Converter->pxToPt($val).'pt';
+        }
+    }
+
+    return $val;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::TypeAndQuantityNode;
 
 # ABSTRACT: A structured value indicating the quantity
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has amount_of_this_good => (
@@ -72,7 +74,7 @@ SemanticWeb::Schema::TypeAndQuantityNode - A structured value indicating the qua
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

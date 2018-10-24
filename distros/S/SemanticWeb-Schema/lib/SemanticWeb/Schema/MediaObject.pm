@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::MediaObject;
 
 # ABSTRACT: A media object
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has associated_article => (
@@ -152,7 +154,7 @@ SemanticWeb::Schema::MediaObject - A media object
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -265,7 +267,21 @@ A encodes_creative_work should be one of the following types:
 
 C<encodingFormat>
 
-mp3, mpeg4, etc.
+=for html Media type typically expressed using a MIME format (see <a
+href="http://www.iana.org/assignments/media-types/media-types.xhtml">IANA
+site</a> and <a
+href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME
+_types">MDN reference</a>) e.g. application/zip for a SoftwareApplication
+binary, audio/mpeg for .mp3 etc.).<br/><br/> In cases where a <a
+class="localLink" href="http://schema.org/CreativeWork">CreativeWork</a>
+has several media type representations, <a class="localLink"
+href="http://schema.org/encoding">encoding</a> can be used to indicate each
+<a class="localLink" href="http://schema.org/MediaObject">MediaObject</a>
+alongside particular <a class="localLink"
+href="http://schema.org/encodingFormat">encodingFormat</a>
+information.<br/><br/> Unregistered or niche encoding and file formats can
+be indicated instead via the most appropriate URL, e.g. defining Web page
+or a Wikipedia/Wikidata entry.
 
 A encoding_format should be one of the following types:
 
@@ -283,9 +299,9 @@ A height should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Distance']>
-
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Distance']>
 
 =back
 
@@ -372,9 +388,9 @@ A width should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Distance']>
-
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Distance']>
 
 =back
 

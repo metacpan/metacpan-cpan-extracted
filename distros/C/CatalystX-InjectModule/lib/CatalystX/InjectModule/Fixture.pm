@@ -1,6 +1,6 @@
 use utf8;
 package CatalystX::InjectModule::Fixture;
-$CatalystX::InjectModule::Fixture::VERSION = '0.17';
+$CatalystX::InjectModule::Fixture::VERSION = '0.19';
 use Moose::Role;
 use DBIx::Class::Fixtures;
 
@@ -52,7 +52,7 @@ CatalystX::InjectModule::Fixture Role to populate fixture data
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 SYNOPSIS
 

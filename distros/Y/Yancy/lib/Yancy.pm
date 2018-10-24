@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -96,6 +96,12 @@ our $VERSION = '1.008';
 #pod password-based authentication system for the Yancy editor and your
 #pod website.
 #pod
+#pod =item *
+#pod
+#pod L<The Form plugin|Yancy::Plugin::Form> can generate forms for the
+#pod configured collections, or for individual fields. There are included
+#pod form generators for L<Bootstrap 4|Yancy::Plugin::Form::Bootstrap4>.
+#pod
 #pod =back
 #pod
 #pod More development will be happening here soon!
@@ -111,19 +117,22 @@ our $VERSION = '1.008';
 #pod
 #pod =over
 #pod
-#pod =item * L<jQuery|http://jquery.com> Copyright JS Foundation and other contributors (MIT License)
+#pod =item * L<jQuery|http://jquery.com> (version 3.2.1) Copyright JS Foundation and other contributors (MIT License)
 #pod
-#pod =item * L<Bootstrap|http://getbootstrap.com> Copyright 2011-2017 the Bootstrap Authors and Twitter, Inc. (MIT License)
+#pod =item * L<Bootstrap|http://getbootstrap.com> (version 4.0.0) Copyright 2011-2017 the Bootstrap Authors and Twitter, Inc. (MIT License)
 #pod
-#pod =item * L<Popper.js|https://popper.js.org> Copyright 2016 Federico Zivolo (MIT License)
+#pod =item * L<Popper.js|https://popper.js.org> (version 1.13.0) Copyright 2017 Federico Zivolo (MIT License)
 #pod
-#pod =item * L<FontAwesome|http://fontawesome.io> Copyright Dave Gandy (SIL OFL 1.1 and MIT License)
+#pod =item * L<FontAwesome|http://fontawesome.io> (version 4.7.0) Copyright Dave Gandy (SIL OFL 1.1 and MIT License)
 #pod
-#pod =item * L<Vue.js|http://vuejs.org> Copyright 2013-2018, Yuxi (Evan) You (MIT License)
+#pod =item * L<Vue.js|http://vuejs.org> (version 2.5.3) Copyright 2013-2018, Yuxi (Evan) You (MIT License)
 #pod
-#pod =item * L<marked|https://github.com/chjj/marked> Copyright 2011-2018, Christopher Jeffrey (MIT License)
+#pod =item * L<marked|https://github.com/chjj/marked> (version 0.3.12) Copyright 2011-2018, Christopher Jeffrey (MIT License)
 #pod
 #pod =back
+#pod
+#pod The bundled versions of these modules may change. If you rely on these in your own app,
+#pod be sure to watch the changelog for version updates.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -168,7 +177,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -260,6 +269,12 @@ L<The Auth::Basic plugin|Yancy::Plugin::Auth::Basic> provides a simple,
 password-based authentication system for the Yancy editor and your
 website.
 
+=item *
+
+L<The Form plugin|Yancy::Plugin::Form> can generate forms for the
+configured collections, or for individual fields. There are included
+form generators for L<Bootstrap 4|Yancy::Plugin::Form::Bootstrap4>.
+
 =back
 
 More development will be happening here soon!
@@ -275,19 +290,22 @@ This project bundles some other projects with the following licenses:
 
 =over
 
-=item * L<jQuery|http://jquery.com> Copyright JS Foundation and other contributors (MIT License)
+=item * L<jQuery|http://jquery.com> (version 3.2.1) Copyright JS Foundation and other contributors (MIT License)
 
-=item * L<Bootstrap|http://getbootstrap.com> Copyright 2011-2017 the Bootstrap Authors and Twitter, Inc. (MIT License)
+=item * L<Bootstrap|http://getbootstrap.com> (version 4.0.0) Copyright 2011-2017 the Bootstrap Authors and Twitter, Inc. (MIT License)
 
-=item * L<Popper.js|https://popper.js.org> Copyright 2016 Federico Zivolo (MIT License)
+=item * L<Popper.js|https://popper.js.org> (version 1.13.0) Copyright 2017 Federico Zivolo (MIT License)
 
-=item * L<FontAwesome|http://fontawesome.io> Copyright Dave Gandy (SIL OFL 1.1 and MIT License)
+=item * L<FontAwesome|http://fontawesome.io> (version 4.7.0) Copyright Dave Gandy (SIL OFL 1.1 and MIT License)
 
-=item * L<Vue.js|http://vuejs.org> Copyright 2013-2018, Yuxi (Evan) You (MIT License)
+=item * L<Vue.js|http://vuejs.org> (version 2.5.3) Copyright 2013-2018, Yuxi (Evan) You (MIT License)
 
-=item * L<marked|https://github.com/chjj/marked> Copyright 2011-2018, Christopher Jeffrey (MIT License)
+=item * L<marked|https://github.com/chjj/marked> (version 0.3.12) Copyright 2011-2018, Christopher Jeffrey (MIT License)
 
 =back
+
+The bundled versions of these modules may change. If you rely on these in your own app,
+be sure to watch the changelog for version updates.
 
 =head1 SEE ALSO
 

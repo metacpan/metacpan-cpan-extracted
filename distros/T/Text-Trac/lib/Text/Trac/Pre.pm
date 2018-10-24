@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Text::Trac::BlockNode);
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 sub init {
 	my $self = shift;
@@ -18,10 +18,10 @@ sub parse {
 	my $pattern = $self->pattern;
 	$l =~ /$pattern/ or return $l;
 	my $match = $1;
-	my $class = $c->{class} ? q{class="wiki"} : '';
+	my $class = $c->{class} ? q{ class="wiki"} : '';
 
 	if ( $l =~ /^\{\{\{$/ ) {
-		$c->htmllines(qq{<pre $class>});
+		$c->htmllines(qq{<pre$class>});
 	}
 
 	while ( $c->hasnext ) {

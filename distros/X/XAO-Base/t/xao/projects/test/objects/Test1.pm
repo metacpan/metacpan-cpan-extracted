@@ -3,7 +3,8 @@ use strict;
 use base qw(XAO::SimpleHash);
 
 sub method ($) {
-    "XX" . (shift) . "XX";
+    my $self=shift;
+    return "XX" . (shift//'<no-arg>') . "XX";
 }
 
 1;

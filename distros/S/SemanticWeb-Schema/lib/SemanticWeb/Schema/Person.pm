@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Person;
 
 # ABSTRACT: A person (alive
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has additional_name => (
@@ -480,7 +482,7 @@ SemanticWeb::Schema::Person - A person (alive
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -539,9 +541,9 @@ A alumni_of should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::EducationalOrganization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -632,9 +634,9 @@ A colleague should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<Str>
 
 =back
 
@@ -872,9 +874,9 @@ A height should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Distance']>
-
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Distance']>
 
 =back
 
@@ -1031,9 +1033,9 @@ A net_worth should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
-
 =item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
 
 =back
 
@@ -1104,8 +1106,8 @@ href="http://schema.org/CreativeWork">CreativeWork</a> (e.g. <a
 class="localLink" href="http://schema.org/NewsArticle">NewsArticle</a>) the
 principles are those of the party primarily responsible for the creation of
 the <a class="localLink"
-href="http://schema.org/CreativeWork">CreativeWork</a>.</p> <p>While such
-policies are most typically expressed in natural language, sometimes
+href="http://schema.org/CreativeWork">CreativeWork</a>.<br/><br/> While
+such policies are most typically expressed in natural language, sometimes
 related information (e.g. indicating a <a class="localLink"
 href="http://schema.org/funder">funder</a>) can be expressed using
 schema.org terminology.
@@ -1262,9 +1264,9 @@ A work_location should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<InstanceOf['SemanticWeb::Schema::ContactPoint']>
 
 =back
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::AccountingService;
 
 # ABSTRACT: Accountancy business
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,11 +34,11 @@ SemanticWeb::Schema::AccountingService - Accountancy business
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html Accountancy business.</p> <p>As a <a class="localLink"
+=for html Accountancy business.<br/><br/> As a <a class="localLink"
 href="http://schema.org/LocalBusiness">LocalBusiness</a> it can be
 described as a <a class="localLink"
 href="http://schema.org/provider">provider</a> of one or more <a

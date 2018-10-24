@@ -3,8 +3,9 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Reference;
 
@@ -52,15 +53,16 @@ produziert
 
 =over 4
 
-=item align => 'l' | 'c' (Default: 'c')
+=item align => 'left' | 'center' (Default: 'center')
 
-Ausrichtung der Abbildung auf der Seite: l=links, c=zentriert.
+Ausrichtung der Abbildung auf der Seite. Nur der erste Buchstabe
+des Werts wird interpretiert.
 
 =item border => $bool (Default: 0)
 
 Zeichne einen Rahmen um die Abbildung.
 
-=item borderMargin => $length (Default: '0mm')
+=item padding => $length (Default: '0pt')
 
 Zeichne den Rahmen (Attribut C<border>) mit dem angegebenen
 Abstand um die Abbildung.
@@ -75,7 +77,9 @@ Pfad der Bilddatei.
 
 =item height => $height
 
-Höhe (ohne Angabe einer Einheit), auf die das Bild skaliert wird.
+Höhe in Pixel (ohne Angabe einer Einheit), auf die das Bild
+skaliert wird. Der Wert wird für LaTeX in pt umgerechnet (1px =
+0.75pt).
 
 =item indent => $length
 
@@ -124,8 +128,9 @@ Ist auch Attribut C<ref> gesetzt, hat dieses Priorität.
 
 =item width => $width
 
-Breite (ohne Angabe einer Einheit), auf die das Bild skaliert
-wird.
+Breite in Pixel (ohne Angabe einer Einheit), auf die das Bild
+skaliert wird. Der Wert wird für LaTeX in pt umgerechnet (1px =
+0.75pt).
 
 =back
 
@@ -147,9 +152,8 @@ sub new {
     # @_: @keyval
 
     my $self = $class->SUPER::new(
-        align => 'c',
+        align => undef,
         border => 0,
-        borderMargin => '0mm',
         caption => undef,
         file => undef,
         height => undef,
@@ -158,6 +162,7 @@ sub new {
         label => undef,
         link => undef,
         options => undef, # $str | \@opt
+        padding => '0pt',
         position => 'H',
         postVSpace => undef,
         scale => undef,
@@ -195,10 +200,12 @@ sub latex {
 
     my $self = ref $this? $this: $this->new(@_);
 
-    my ($align,$border,$borderMargin,$caption,$file,$height,$indent,$inline,
-        $label,$link,$options,$position,$postVSpace,$scale,$width) =
-        $self->get(qw/align border borderMargin caption file height indent
-        inline label link options position postVSpace scale width/);
+    my ($align,$border,$caption,$file,$height,$indent,$inline,$label,$link,
+        $options,$padding,$position,$postVSpace,$scale,$width) =
+        $self->get(qw/align border caption file height indent inline label
+        link options padding position postVSpace scale width/);
+
+    $align //= $inline? '': 'center';
 
     if (!$file) {
         return '';
@@ -209,10 +216,13 @@ sub latex {
         # $scale hat Priorität gegenüber width und height
         push @opt,"scale=$scale";
     }
-    elsif ($width && $height) {
-        # Fallback, wenn scale nicht angegeben ist
-        push @opt,"width=${width}px";
-        push @opt,"height=${height}px";
+    else {
+        if ($width) {
+            push @opt,"width=$width";
+        }
+        if ($height) {
+            push @opt,"height=$height";
+        }
     }
     if (defined $options) {
         if (Prty::Reference->isArrayRef($options)) {
@@ -223,39 +233,43 @@ sub latex {
         }
     }
 
-    my $code = $l->macro('\includegraphics',
+    my $code;
+    if ($inline) {
+        $code .= $l->ci('\protect');
+    }
+    $code .= $l->macro('\includegraphics',
         -o => \@opt,
         -p => $file,
         -nl => 0,
     );
     if ($border) {
-        $code = $l->ci('{\fboxsep%s\fbox{%s}}',$borderMargin,$code);
+        $code = $l->ci('{\fboxsep%s\fbox{%s}}',$padding,$code);
     }
     if ($link) {
         # $link muss %s enthalten
         $code = sprintf $link,$code;
     }
-    if ($indent && $align ne 'c') {
+    if ($indent && $align ne 'center') {
         $code = $l->ci('\hspace*{%s}',$indent).$code;
     }
 
-    # Inline Abbildung
+    # Abbildung inline
 
     if ($inline) {
-        return $code;
+        return "{$code}";
     }
 
     # Alleinstehende Abbildung
 
     if (!$inline) {
-        if ($align eq 'c') {
+        if ($align eq 'center') {
             $code = $l->c('\centering').$code;
         }
     }
 
     if ($caption) {
         my @opt;
-        if ($align ne 'c') {
+        if ($align ne 'center') {
             push @opt,'singlelinecheck=off';
             if ($indent) {
                 push @opt,"margin=$indent";
@@ -285,7 +299,7 @@ sub latex {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 =head1 NAME
 
-Deliantra::Protocol::Constants - export protocol-related cf constants
+Deliantra::Protocol::Constants - export protocol-related constants
 
 =head1 SYNOPSIS
 

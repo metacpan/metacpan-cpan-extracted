@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::BusReservation;
 
 # ABSTRACT: A reservation for bus travel
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,11 +34,11 @@ SemanticWeb::Schema::BusReservation - A reservation for bus travel
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html A reservation for bus travel. </p> <p>Note: This type is for information
+=for html A reservation for bus travel. <br/><br/> Note: This type is for information
 about actual reservations, e.g. in confirmation emails or HTML pages with
 individual confirmations of reservations. For offers of tickets, use <a
 class="localLink" href="http://schema.org/Offer">Offer</a>.

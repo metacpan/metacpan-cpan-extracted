@@ -391,7 +391,7 @@ sub test_mailer {
 
     my $outfile=$self->{'outfile'};
 
-    STDERR->binmode(':utf8');
+    binmode STDERR, ':utf8';
 
     my %cfsaved;
 

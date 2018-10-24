@@ -6,9 +6,10 @@ use base qw/Prty::Object/;
 
 use strict;
 use warnings;
+use v5.10.0;
 use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Option;
 use Prty::FileHandle;
@@ -43,6 +44,36 @@ Eine Dateisystem-Operation ist eine Operation auf einem I<Pfad>.
 
 =head1 METHODS
 
+=head2 Konstruktor
+
+=head3 new() - Instantiiere Objekt
+
+=head4 Synopsis
+
+    $p = $class->new;
+
+=head4 Returns
+
+Path-Objekt
+
+=head4 Description
+
+Instantiiere ein Objekt der Klasse und liefere eine Referenz auf
+dieses Objekt zurück. Da die Klasse ausschließlich Klassenmethoden
+enthält, hat das Objekt ausschließlich die Funktion, eine abkürzende
+Aufrufschreibweise zu ermöglichen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub new {
+    my $class = shift;
+    return bless \(my $dummy),$class;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Datei-Operationen
 
 =head3 append() - Hänge Daten an Datei an
@@ -67,7 +98,7 @@ sub append {
 
 # -----------------------------------------------------------------------------
 
-=head3 compare() - Prüfe, ob Inhalt der Dateien differiert
+=head3 compare() - Prüfe, ob Inhalt differiert
 
 =head4 Synopsis
 
@@ -680,9 +711,9 @@ Dekodiere die Dateinamen gemäß dem angegebenen Encoding.
 =item -exclude => $regex (Default: keiner)
 
 Schließe alle Pfade aus, die Muster $regex erfüllen. Directories
-werden gepruned. Matcht ein Pfad die Pattern sowohl von -pattern
-als auch -exclude, hat der exclude-Pattern Vorrang, d.h. die Datei
-wird ausgeschlossen.
+werden gepruned, d.h. sie werden nicht durchsucht. Matcht ein Pfad
+die Pattern sowohl von -pattern als auch -exclude, hat der
+exclude-Pattern Vorrang, d.h. die Datei wird ausgeschlossen.
 
 =item -follow => $bool (Default: 1)
 
@@ -887,9 +918,9 @@ sub find {
                     last;
                 }
             }
-	    if ($ok) {
-		push @arr,$paths[$i];
-	    }
+            if ($ok) {
+                push @arr,$paths[$i];
+            }
         }
         @paths = @arr;
     }
@@ -1057,8 +1088,6 @@ sub mkdir {
     my $dir = shift;
     # @_: @opt
 
-    return if !$dir;
-
     my $createParent = 0;
     my $forceMode = undef;
     my $mode = 0755;
@@ -1081,6 +1110,8 @@ sub mkdir {
             $recursive = 1;
         }
     }
+
+    return if !$dir;
 
     if (-d $dir) {
         if ($mustNotExist) {
@@ -1209,11 +1240,21 @@ sub absolute {
 
 =head4 Synopsis
 
-    $basename = $class->basename($path);
+    $basename = $class->basename($path,@opt);
 
 =head4 Alias
 
 baseName()
+
+=head4 Options
+
+=over 4
+
+=item -all => $bool (Default: 0)
+
+Entferne alle, nicht nur die erste Extension.
+
+=back
 
 =head4 Description
 
@@ -1224,7 +1265,25 @@ Liefere den Grundnamen des Pfads, d.h. ohne Pfadanfang und Extension.
 # -----------------------------------------------------------------------------
 
 sub basename {
-    return (shift->split(@_))[2];
+    my $class = shift;
+    my $path = shift;
+
+    # Optionen
+
+    my $all = 0;
+
+    if (@_) {
+        Prty::Option->extract(\@_,
+            -all => \$all,
+        );
+    }
+
+    my $basename = ($class->split($path))[2];
+    if ($all) {
+        $basename =~ s/\..*//;
+    }
+
+    return $basename;
 }
 
 {
@@ -1374,6 +1433,28 @@ Besitzt der Pfad keine Extension, liefere einen Leerstring ('').
 sub extension {
     my ($class,$path) = @_;
     return $path =~ /\.([^.]+)$/? $1: '';
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 filename() - Letzte Pfadkomponente
+
+=head4 Synopsis
+
+    $filename = $class->filename($path);
+
+=head4 Description
+
+Liefere die letzte Komponente des Pfads.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub filename {
+    my ($class,$path) = @_;
+    $path =~ s|.*/||;
+    return $path;
 }
 
 # -----------------------------------------------------------------------------
@@ -1578,6 +1659,68 @@ sub newer {
 
 # -----------------------------------------------------------------------------
 
+=head3 readlink() - Liefere Ziel des Symlink
+
+=head4 Synopsis
+
+    $path = $class->readlink($symlinkPath);
+
+=head4 Alias
+
+readLink()
+
+=head4 Description
+
+Liefere den Pfad, auf den der Symlink $symlinkPath zeigt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub readlink {
+    my $class = shift;
+    my $symlinkPath = shift;
+
+    return readlink($symlinkPath) // do {
+            $class->throw(
+                q~PATH-00099: Kann Symlink-Zielpfad nicht ermitteln~,
+                Path=>$symlinkPath,
+                Error=>"$!",
+            );
+    }; 
+}
+
+{
+    no warnings 'once';
+    *readLink = \&readlink;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 removeExtension() - Entferne Extension
+
+=head4 Synopsis
+
+    $newPath = $class->removeExtension($path);
+
+=head4 Description
+
+Entferne die Extension von Pfad $path und liefere den
+resultierenden Pfad zurück. Besitzt $path keine Extension, sind
+$path und $newPath identisch.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub removeExtension {
+    my ($class,$path) = @_;
+    $path =~ s|\.[^./]+$||;
+    return $path;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 rename() - Benenne Pfad um
 
 =head4 Synopsis
@@ -1732,7 +1875,19 @@ Die Methode liefert keinen Wert zurück.
 # -----------------------------------------------------------------------------
 
 sub symlink {
-    my ($class,$path,$symlink) = @_;
+    my ($class,$path,$symlink) = splice @_,0,3;
+
+    # Optionen
+
+    my $force = 0;
+
+    Prty::Option->extract(\@_,
+        -force=>\$force,
+    );
+
+    if ($force && -l $symlink) {
+        $class->delete($symlink);
+    }
 
     CORE::symlink $path,$symlink or do {
         $class->throw(
@@ -1758,6 +1913,10 @@ sub symlink {
 
 =over 4
 
+=item -createDir => $bool (Default: 0)
+
+Erzeuge nicht-existente Verzeichnisse des Zielpfads.
+
 =item -dryRun => $bool (Default: 0)
 
 Führe das Kommando nicht aus. Speziell Verbindung mit
@@ -1775,10 +1934,9 @@ Erzeuge einen Symlink $symlink, der auf den Pfad $path verweist.
 Die Methode liefert keinen Wert zurück.
 
 Die Methode zeichnet sich gegenüber der Methode symlink() dadurch
-aus, dass sie, wenn $path ein relativer Pfad zum ist,
-diesen so korrigiert, dass er von Pfad
-auch von $symlink aus korrekt ist. Denn der Pfad $path ist als
-relativer Pfad die Fortsetzung von $symlink!
+aus, dass sie, wenn $path ein relativer Pfad ist, diesen so korrigiert,
+dass er von $symlink aus korrekt ist. Denn der Pfad $path múss als
+relativer Pfad als Fortsetzung von $symlink gesehen werden.
 
 =head4 Example
 
@@ -1804,6 +1962,7 @@ sub symlinkRelative {
     my $symlink = shift;
     my %opt = @_;
 
+    my $createDir = delete $opt{'-createDir'};
     my $dryRun = delete $opt{'-dryRun'};
     my $verbose = delete $opt{'-verbose'};
     if (%opt) {
@@ -1811,6 +1970,15 @@ sub symlinkRelative {
             q~FILESYS-00001: Unbekannte Option(en)~,
             Options=>join(', ',keys %opt),
         );
+    }
+
+    # Erzeuge den Zielpfad, falls er nicht existiert
+
+    if ($createDir) {
+        my $dir = (Prty::Path->split($symlink))[0];
+        if ($dir && !-d $dir) {
+            $class->mkdir($dir,-recursive=>1);
+        }
     }
 
     # Sonderbehandlung, wenn der Pfad $path, auf den der Symlink zeigt,
@@ -1852,7 +2020,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

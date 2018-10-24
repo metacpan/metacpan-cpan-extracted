@@ -170,7 +170,38 @@ sv_clone (SV * ref, HV* hseen, int depth)
 #endif
       case SVt_PV:		/* 4 */
         TRACEME(("string scalar\n"));
+/*
+* Note: when using a Debug Perl with READONLY_COW
+* we cannot do 'sv_buf_to_rw + sv_buf_to_ro' as these APIs calls are not exported
+*/
+#if PERL_VERSION >= 20 && !defined(PERL_DEBUG_READONLY_COW)
+        /* only for simple PVs unblessed */
+        if ( SvIsCOW(ref) && !SvOOK(ref) ) {
+          /* cannot use newSVpv_share as this going to use a new PV we do not want to clone it */
+          /* create a fresh new PV */
+          clone = newSV(0);
+          sv_upgrade(clone, SVt_PV);
+          SvPOK_on(clone);
+          SvIsCOW_on(clone);
+          /* points the str slot to the COWed one */
+          SvPV_set(clone, SvPVX(ref) );
+          /* increase the Cow refcnt if possible (when not using PERL_DEBUG_READONLY_COW)
+          */
+          if ( CowREFCNT(ref) < SV_COW_REFCNT_MAX )
+            CowREFCNT(ref)++;
+          /* preserve cur, len and utf8 flag */
+          SvCUR_set(clone, SvCUR(ref));
+          SvLEN_set(clone, SvLEN(ref));
+
+          if (SvUTF8(ref))
+            SvUTF8_on(clone);
+
+        } else {
+          clone = newSVsv (ref);
+        }
+#else
         clone = newSVsv (ref);
+#endif
         break;
       case SVt_PVIV:		/* 5 */
         TRACEME (("PVIV double-type\n"));
@@ -210,8 +241,8 @@ sv_clone (SV * ref, HV* hseen, int depth)
     * to properly handle circular references. cb 2001-02-06
     */
 
-  if ( visible )
-    CLONE_STORE(ref,clone);
+  if ( visible && ref != clone )
+      CLONE_STORE(ref,clone);
 
     /*
      * We'll assume (in the absence of evidence to the contrary) that A) a

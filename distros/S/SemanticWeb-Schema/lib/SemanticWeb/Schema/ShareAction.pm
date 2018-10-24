@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::ShareAction;
 
 # ABSTRACT: The act of distributing content to people for their amusement or edification.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,7 +34,7 @@ SemanticWeb::Schema::ShareAction - The act of distributing content to people for
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

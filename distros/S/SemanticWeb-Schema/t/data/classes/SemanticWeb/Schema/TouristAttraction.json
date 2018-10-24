@@ -1,11 +1,11 @@
 {
    "class" : {
       "dc:source" : [
-         "schemadotorgsources:IIT-CNR.it",
-         "schemadotorgsources:Tourism"
+         "schemadotorgsources2:Tourism",
+         "schemadotorgsources2:IIT-CNR.it"
       ],
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A tourist attraction.  In principle any Thing can be a <a class=\"localLink\" href=\"http://schema.org/TouristAttraction\">TouristAttraction</a>, from a <a class=\"localLink\" href=\"http://schema.org/Mountain\">Mountain</a> and <a class=\"localLink\" href=\"http://schema.org/LandmarksOrHistoricalBuildings\">LandmarksOrHistoricalBuildings</a> to a <a class=\"localLink\" href=\"http://schema.org/LocalBusiness\">LocalBusiness</a>.  This Type can be used on its own to describe a general <a class=\"localLink\" href=\"http://schema.org/TourstAttraction\">TourstAttraction</a>, or be used as an <a class=\"localLink\" href=\"http://schema.org/additionalType\">additionalType</a> to add tourist attraction properties to any other type.  (See examples below)",
+      "rdfs:comment" : "A tourist attraction.  In principle any Thing can be a <a class=\"localLink\" href=\"http://schema.org/TouristAttraction\">TouristAttraction</a>, from a <a class=\"localLink\" href=\"http://schema.org/Mountain\">Mountain</a> and <a class=\"localLink\" href=\"http://schema.org/LandmarksOrHistoricalBuildings\">LandmarksOrHistoricalBuildings</a> to a <a class=\"localLink\" href=\"http://schema.org/LocalBusiness\">LocalBusiness</a>.  This Type can be used on its own to describe a general <a class=\"localLink\" href=\"http://schema.org/TouristAttraction\">TouristAttraction</a>, or be used as an <a class=\"localLink\" href=\"http://schema.org/additionalType\">additionalType</a> to add tourist attraction properties to any other type.  (See examples below)",
       "rdfs:label" : "TouristAttraction",
       "rdfs:subClassOf" : "schema:Place"
    },
@@ -15,10 +15,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:TouristAttraction",
+            "schema:ServiceChannel",
             "schema:LodgingBusiness",
-            "schema:ContactPoint",
-            "schema:ServiceChannel"
+            "schema:TouristAttraction",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -27,16 +27,16 @@
       },
       "schema:touristType" : {
          "dc:source" : [
-            "schemadotorgsources:Tourism",
-            "schemadotorgsources:IIT-CNR.it"
+            "schemadotorgsources2:IIT-CNR.it",
+            "schemadotorgsources2:Tourism"
          ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Attraction suitable for type(s) of tourist. eg. Children, visitors from a particular country, etc.",
          "rdfs:label" : "touristType",
          "schema:domainIncludes" : "schema:TouristAttraction",
          "schema:rangeIncludes" : [
-            "schema:Audience",
-            "schema:Text"
+            "schema:Text",
+            "schema:Audience"
          ]
       }
    }

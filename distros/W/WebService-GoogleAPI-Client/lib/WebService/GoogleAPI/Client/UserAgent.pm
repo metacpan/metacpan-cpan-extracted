@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::UserAgent;
-$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.11';
+$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.13';
 
 # ABSTRACT: User Agent wrapper for working with Google APIs
 
@@ -11,13 +11,10 @@ extends 'Mojo::UserAgent';
 use WebService::GoogleAPI::Client::Credentials;
 use WebService::GoogleAPI::Client::AuthStorage;
 use Mojo::UserAgent;
-use Data::Dumper;    # for debug
-
-# use Data::Printer;    # for debug - !PS is this used removing?
+use Data::Dumper;    # for dev debug
 
 use Carp;
 
-#has 'ua'                            => ( is => 'ro', default => sub { Mojo::UserAgent->new } ); ## why not extend and create a derviced class ?
 has 'do_autorefresh'                => ( is => 'rw', default => 1 );    # if 1 storage must be configured
 has 'auto_update_tokens_in_storage' => ( is => 'rw', default => 1 );
 has 'debug'                         => ( is => 'rw', default => 0 );
@@ -35,6 +32,8 @@ sub BUILD
   ## NB - to work with Google APIs also assumes that Accept-Encoding: gzip is set in HTTP headers
   $self->transactor->name( __PACKAGE__ . ' (gzip enabled)' );
 }
+
+
 
 sub header_with_bearer_auth_token
 {
@@ -92,6 +91,7 @@ sub build_http_transaction
 
 
 
+
 sub validated_api_query
 {
   my ( $self, $params ) = @_;
@@ -107,9 +107,12 @@ sub validated_api_query
   my $res = $self->start( $self->build_http_transaction( $params ) )->res;
   ## TODO: HANDLE TIMEOUTS AND OTHER ERRORS IF THEY WEREN'T HANDLED BY build_http_transaction
 
+  ## TODO:
+  return Mojo::Message::Response->new unless ref( $res ) eq 'Mojo::Message::Response';
+
   if ( ( $res->code == 401 ) && $self->do_autorefresh )
   {
-    if ( $res->code == 401 )     ## redundant - was there something else in mind ?
+    if ( $res->code == 401 )    ## redundant - was there something else in mind ?
     {
       croak "No user specified, so cant find refresh token and update access_token" unless $self->user;
       carp "401 response - access_token was expired. Attemptimg to update it automatically ..." if $self->debug;
@@ -181,23 +184,13 @@ WebService::GoogleAPI::Client::UserAgent - User Agent wrapper for working with G
 
 =head1 VERSION
 
-version 0.11
+version 0.13
 
-=head1 METHODS
+=head2 C<header_with_bearer_auth_token>
 
-=head2 refresh_access_token
+  returns a hashref describing gzip encoding and auth bearer token
 
-Get new access token for user from Google API server
-
-  $self->refresh_access_token({
-		client_id     => '',
-		client_secret => '',
-		refresh_token => ''
-	})
-
- Q: under what conditions could we not have a refresh token? - what scopes are required? ensure that included in defaults if they are req'd
-
-=head2 build_http_transaction
+=head2 C<build_http_transaction>
 
   Example of usage:
 
@@ -207,7 +200,7 @@ Get new access token for user from Google API server
         options => { key => value } ## form variables for POST etc otherwise - GET params treated properly
       })
 
-=head2 validated_api_query
+=head2 C<validated_api_query>
 
 Google API HTTP 'method' request to API End Point at 'path' with optional parameters described by 'options'
 
@@ -237,6 +230,18 @@ Examples of usage:
 See Also: Client->api_query that augments the parameters with some Google API Specific fucntionality before calling here.
 
 Returns L<Mojo::Message::Response> object
+
+=head2 C<refresh_access_token>
+
+Get new access token for user from Google API server
+
+  $self->refresh_access_token({
+		client_id     => '',
+		client_secret => '',
+		refresh_token => ''
+	})
+
+ Q: under what conditions could we not have a refresh token? - what scopes are required? ensure that included in defaults if they are req'd
 
 =head1 AUTHOR
 

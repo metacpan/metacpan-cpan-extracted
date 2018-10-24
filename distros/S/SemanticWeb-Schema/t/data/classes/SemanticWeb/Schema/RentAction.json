@@ -13,8 +13,8 @@
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : "schema:RentAction",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:realEstateAgent" : {

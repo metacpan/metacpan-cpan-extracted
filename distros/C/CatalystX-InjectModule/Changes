@@ -1,5 +1,15 @@
 Revision history for CatalystX-InjectModule
 
+0.19 2018-10-23
+     - die if a file of a module contains the name of the application
+     
+0.18 2018-10-22
+     - use only yaml files conf
+     - use packlist to search files in a module, ExtUtils::Installed is too slo
+     - add modules_injected
+     - die if the module name looks like Model/View/Controller/TraitFor
+     - tests traitfor to add before, after, around, mathod in a controller
+
 0.17 2018-09-13
      - change $module_file to pass uninstall module test
 

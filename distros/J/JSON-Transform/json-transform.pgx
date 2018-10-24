@@ -1,0 +1,122 @@
+# A simple grammar for JSON::Transform
+%grammar json-transform
+%version 0.01
+%include pegex-atoms
+
+# string and number from https://github.com/ingydotnet/json-pgx/blob/master/json.pgx
+
+transforms: -transformation+
+
+transformation: .(/-/) (
+  transformImpliedDest
+|
+  transformCopy
+|
+  transformMove
+|
+  .ws2
+) .(/-/)
+
+transformImpliedDest: jsonPointer exprMapping
+
+transformCopy: (jsonPointer | variableUser) .opCopyFrom -exprSingleValue exprMapping?
+
+transformMove: jsonPointer .opMoveFrom jsonPointer
+
+opCopyFrom: /- ( LANGLE DASH ) -/
+
+opMoveFrom: /- ( LANGLE LANGLE ) -/
+
+opFrom: opArrayFrom | opObjectFrom
+
+opArrayFrom: /- ( LANGLE AT ) -/
+
+opObjectFrom: /- ( LANGLE PERCENT ) -/
+
+exprMapping: +opFrom (exprArrayMapping | exprObjectMapping | exprSingleValue)
+
+exprArrayMapping: .(/- LSQUARE -/) exprSingleValue .(/- RSQUARE -/)
+
+exprObjectMapping: .(/- LCURLY -/) -colonPair .(/- RCURLY -/)
+
+colonPair: -exprStringValue .(/- COLON -/) exprSingleValue
+
+exprSingleValue: (jsonPointer | variableUser | variableSystem) -singleValueMod?
+
+singleValueMod: (exprKeyAdd | exprKeyRemove)
+
+exprKeyAdd: .(/- AT -/) -colonPair
+
+exprKeyRemove: .(/- HASH -/) -exprStringValue
+
+exprStringValue: (jsonPointer | variableUser | variableSystem | exprStringQuoted)
+
+exprStringQuoted:
+  .(/ GRAVE /)
+  (
+    jsonUnicode
+      |
+    jsonBackslashQuote
+      |
+    jsonBackslashDollar
+      |
+    jsonBackslashGrave
+      |
+    variableUser
+      |
+    variableSystem
+      |
+    jsonOtherNotGrave
+  )*
+  .(/ GRAVE /)
+
+jsonOtherNotGrave: /( [^ GRAVE CONTROLS BACK DOLLAR ]+ )/ # Anything else
+
+jsonBackslashGrave: /( BACK GRAVE )/
+
+jsonPointer:
+  .(/ DOUBLE /)
+  (
+    jsonUnicode
+      |
+    jsonBackslashQuote
+      |
+    jsonBackslashDollar
+      |
+    jsonBackslashDouble
+      |
+    variableUser
+      |
+    variableSystem
+      |
+    jsonOtherNotDouble
+  )*
+  .(/ DOUBLE /)
+
+jsonOtherNotDouble: /( [^ DOUBLE CONTROLS BACK DOLLAR ]+ )/ # Anything else
+
+jsonBackslashDouble: /( BACK DOUBLE )/
+
+jsonBackslashDollar: /( BACK DOLLAR )/
+
+jsonBackslashQuote: /(
+  BACK [
+    BACK    # Back Slash
+    SLASH   # Forward Slash
+    'b'     # Back Space
+    'f'     # Form Feed
+    'n'     # New Line
+    'r'     # Carriage Return
+    't'     # Horizontal Tab
+  ]
+)/
+
+jsonUnicode: /( BACK 'u' HEX{4} )/ # Unicode octet pair
+
+variableUser: .(/- DOLLAR/) /([ LOWERS ] [ ALPHAS ]*)/
+
+variableSystem: .(/- DOLLAR/) /([ UPPERS ]*)/
+
+ws: / (: WS | \x{FEFF} | comment ) /
+
+comment: / BLANK* DASH DASH BLANK* [^\r\n]* (: EOL | CR !NL | EOS ) / # CR is because MacOS 9

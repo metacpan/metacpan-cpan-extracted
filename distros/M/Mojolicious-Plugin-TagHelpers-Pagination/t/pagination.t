@@ -199,5 +199,8 @@ is($c->pagination( 8, 9, '/?p={page}'), '<a href="/?p=7" rel="prev">&lt;</a>&nbs
 
 is($c->pagination( 4, 5, '/?p={page}'), '<a href="/?p=3" rel="prev">&lt;</a>&nbsp;<a href="/?p=1">1</a>&nbsp;<a href="/?p=2">2</a>&nbsp;<a href="/?p=3">3</a>&nbsp;<a rel="self">[4]</a>&nbsp;<a href="/?p=5">5</a>&nbsp;<a href="/?p=5" rel="next">&gt;</a>', 'Prefinal bug');
 
+# Default start is 1
+is($c->pagination(undef, 1, ''), '<a rel="prev">&lt;</a>&nbsp;<a rel="self">[1]</a>&nbsp;<a rel="next">&gt;</a>', 'No current page');
+
 done_testing;
 __END__

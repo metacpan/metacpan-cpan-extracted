@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::HomeAndConstructionBusiness;
 
 # ABSTRACT: A construction business
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,13 +34,13 @@ SemanticWeb::Schema::HomeAndConstructionBusiness - A construction business
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html A construction business.</p> <p>A HomeAndConstructionBusiness is a <a
+=for html A construction business.<br/><br/> A HomeAndConstructionBusiness is a <a
 class="localLink" href="http://schema.org/LocalBusiness">LocalBusiness</a>
-that provides services around homes and buildings.</p> <p>As a <a
+that provides services around homes and buildings.<br/><br/> As a <a
 class="localLink" href="http://schema.org/LocalBusiness">LocalBusiness</a>
 it can be described as a <a class="localLink"
 href="http://schema.org/provider">provider</a> of one or more <a

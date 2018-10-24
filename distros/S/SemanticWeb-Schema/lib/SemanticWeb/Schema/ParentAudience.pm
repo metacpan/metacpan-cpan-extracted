@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::ParentAudience;
 
 # ABSTRACT: A set of characteristics describing parents
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has child_max_age => (
@@ -48,7 +50,7 @@ SemanticWeb::Schema::ParentAudience - A set of characteristics describing parent
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

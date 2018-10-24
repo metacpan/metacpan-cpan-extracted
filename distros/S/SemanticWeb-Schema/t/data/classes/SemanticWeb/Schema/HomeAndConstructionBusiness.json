@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A construction business.</p>\n\n<p>A HomeAndConstructionBusiness is a <a class=\"localLink\" href=\"http://schema.org/LocalBusiness\">LocalBusiness</a> that provides services around homes and buildings.</p>\n\n<p>As a <a class=\"localLink\" href=\"http://schema.org/LocalBusiness\">LocalBusiness</a> it can be described as a <a class=\"localLink\" href=\"http://schema.org/provider\">provider</a> of one or more <a class=\"localLink\" href=\"http://schema.org/Service\">Service</a>(s).",
+      "rdfs:comment" : "A construction business.<br/><br/>\n\nA HomeAndConstructionBusiness is a <a class=\"localLink\" href=\"http://schema.org/LocalBusiness\">LocalBusiness</a> that provides services around homes and buildings.<br/><br/>\n\nAs a <a class=\"localLink\" href=\"http://schema.org/LocalBusiness\">LocalBusiness</a> it can be described as a <a class=\"localLink\" href=\"http://schema.org/provider\">provider</a> of one or more <a class=\"localLink\" href=\"http://schema.org/Service\">Service</a>(s).",
       "rdfs:label" : "HomeAndConstructionBusiness",
       "rdfs:subClassOf" : "schema:LocalBusiness"
    },

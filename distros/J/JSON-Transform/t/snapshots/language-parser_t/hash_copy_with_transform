@@ -1,0 +1,98 @@
+{
+  'children' => [
+    {
+      'children' => [
+        {
+          'children' => [
+            {
+              'children' => [
+                '/destination'
+              ],
+              'nodename' => 'jsonOtherNotDouble',
+              'type' => 'element'
+            }
+          ],
+          'nodename' => 'jsonPointer',
+          'type' => 'element'
+        },
+        {
+          'children' => [
+            {
+              'children' => [
+                '/source'
+              ],
+              'nodename' => 'jsonOtherNotDouble',
+              'type' => 'element'
+            }
+          ],
+          'nodename' => 'jsonPointer',
+          'type' => 'element'
+        },
+        {
+          'attributes' => {
+            'opFrom' => '<@'
+          },
+          'children' => [
+            {
+              'children' => [
+                {
+                  'children' => [
+                    {
+                      'children' => [
+                        'V'
+                      ],
+                      'nodename' => 'variableSystem',
+                      'type' => 'element'
+                    },
+                    {
+                      'children' => [
+                        {
+                          'children' => [
+                            {
+                              'children' => [
+                                'order'
+                              ],
+                              'nodename' => 'jsonOtherNotGrave',
+                              'type' => 'element'
+                            }
+                          ],
+                          'nodename' => 'exprStringQuoted',
+                          'type' => 'element'
+                        },
+                        {
+                          'children' => [
+                            {
+                              'children' => [
+                                'K'
+                              ],
+                              'nodename' => 'variableSystem',
+                              'type' => 'element'
+                            }
+                          ],
+                          'nodename' => 'exprSingleValue',
+                          'type' => 'element'
+                        }
+                      ],
+                      'nodename' => 'exprKeyAdd',
+                      'type' => 'element'
+                    }
+                  ],
+                  'nodename' => 'exprSingleValue',
+                  'type' => 'element'
+                }
+              ],
+              'nodename' => 'exprArrayMapping',
+              'type' => 'element'
+            }
+          ],
+          'nodename' => 'exprMapping',
+          'type' => 'element'
+        }
+      ],
+      'nodename' => 'transformCopy',
+      'type' => 'element'
+    }
+  ],
+  'nodename' => 'transforms',
+  'type' => 'element'
+}

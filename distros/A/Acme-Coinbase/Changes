@@ -1,5 +1,11 @@
 Revision history for Acme-Coinbase
 
+0.009    2018/10/22
+        Deprecated. Use Finance::GDAX::API or WebService::Coinbase
+
+0.008    2018/10/22
+        Deprecated. Use Finance::GDAX::API or WebService::Coinbase
+
 0.007    2014/11/22
         Corrected Changes entry for 0.006
         More headers as speced.

@@ -20,6 +20,22 @@
 #######################################################################
 
 
+2018-10-21  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000426 released
+
+        * Updated Local ISet ClipBucket_is.pm. 
+
+
+2018-10-20  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000425 released
+
+        * Fixed CTRL-C in FA_Core.pm
+
+	* fa_local.pm how handles AWS.
+
+
 2018-10-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000424 released

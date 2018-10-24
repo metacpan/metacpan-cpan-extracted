@@ -1,0 +1,28 @@
+---
+abstract: 'Parse make output for build-time warnings'
+author:
+  - 'James E Keenan (jkeenan@cpan.org)'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '0.44'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl5-Build-Warnings
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl5-Build-Warnings
+  homepage: http://thenceforward.net/perl/modules/Perl5-Build-Warnings/
+  repository: https://github.com/jkeenan/perl5-build-warnings.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

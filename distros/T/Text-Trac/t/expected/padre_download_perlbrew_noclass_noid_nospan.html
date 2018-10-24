@@ -1,0 +1,23 @@
+<p>
+The combination of perlbrew <a  href="http://perlbrew.pl">http://perlbrew.pl</a> and cpanminus <a  href="http://search.cpan.org/dist/App-cpanminus/lib/App/cpanminus.pm">http://search.cpan.org/dist/App-cpanminus/lib/App/cpanminus.pm</a> allows you to easily build your own Perl installation and add additional CPAN programs (including Padre) without bothering to setup a CPAN client.
+</p>
+<p>
+perlbrew is a tool to manage multiple perl installations in your $HOME directory. They are completely isolated perl universes. This approach has many benefits:
+* No need to run sudo to install CPAN modules, any more.
+* Try the monthly released new perls.
+* Learn new language features.
+* Test production code.
+* Leave vendor perl (the one that comes with OS) alone
+</p>
+<p>
+cpanminus is a script to get, unpack, build and install modules from CPAN and does nothing else. It's dependency free (can bootstrap itself), requires zero configuration, and stands alone. When running, it requires only 10MB of RAM. 
+</p>
+<p>
+The websites of both project explain how to install them. Once the perlbrew and cpanminus is setup, you can install Padre by simply typing &quot;cpanm Padre&quot; in a shell.
+</p>
+<p>
+Additionall howtos (by a Padre developer), can be found below. The examples were taken from a Debian/Ubuntu and Solaris system, but it's applicable to other systems as well:
+- Get the latest Perl release with perlbrew <a  href="http://nxadm.wordpress.com/2010/12/10/get-the-latest-perl-release-with-perlbrew/">http://nxadm.wordpress.com/2010/12/10/get-the-latest-perl-release-with-perlbrew/</a>
+- App::cpanminus: zero-conf CPAN client <a  href="http://nxadm.wordpress.com/2010/12/10/appcpanminus-zero-conf-cpan-client/">http://nxadm.wordpress.com/2010/12/10/appcpanminus-zero-conf-cpan-client/</a>
+- Build Padre svn easily with perlbrew and cpanm <a  href="http://nxadm.wordpress.com/2010/12/10/build-padre-svn-easily-with-perlbrew-and-cpanm/">http://nxadm.wordpress.com/2010/12/10/build-padre-svn-easily-with-perlbrew-and-cpanm/</a>
+</p>

@@ -16,7 +16,7 @@ SiLK is available for download here:
 
 https://tools.netsa.cert.org/silk/
 
-This release was tested on SiLK version 3.11.0.1.
+This release was tested on SiLK version 3.17.2.
 
 
 INSTALLATION
@@ -52,7 +52,7 @@ Perl::Int128 project found here:
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2016 by Carnegie Mellon University
+Copyright (C) 2011-2018 by Carnegie Mellon University
 
 Use of the Net-Silk library and related source code is subject to the
 terms of the following licenses:

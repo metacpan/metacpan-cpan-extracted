@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:MBZ",
+      "dc:source" : "schemadotorgsources2:MBZ",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A musical composition.",
       "rdfs:label" : "MusicComposition",
@@ -8,13 +8,13 @@
    },
    "properties" : {
       "schema:composer" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The person or organization who wrote a composition, or who is the composer of a work performed at some event.",
          "rdfs:label" : "composer",
          "schema:domainIncludes" : [
-            "schema:MusicComposition",
-            "schema:Event"
+            "schema:Event",
+            "schema:MusicComposition"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
@@ -22,7 +22,7 @@
          ]
       },
       "schema:firstPerformance" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date and place the work was first performed.",
          "rdfs:label" : "firstPerformance",
@@ -30,7 +30,7 @@
          "schema:rangeIncludes" : "schema:Event"
       },
       "schema:includedComposition" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Smaller compositions included in this work (e.g. a movement in a symphony).",
          "rdfs:label" : "includedComposition",
@@ -38,7 +38,7 @@
          "schema:rangeIncludes" : "schema:MusicComposition"
       },
       "schema:iswcCode" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Musical Work Code for the composition.",
          "rdfs:label" : "iswcCode",
@@ -46,7 +46,7 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:lyricist" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The person who wrote the words.",
          "rdfs:label" : "lyricist",
@@ -54,7 +54,7 @@
          "schema:rangeIncludes" : "schema:Person"
       },
       "schema:lyrics" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The words in the song.",
          "rdfs:label" : "lyrics",
@@ -62,7 +62,7 @@
          "schema:rangeIncludes" : "schema:CreativeWork"
       },
       "schema:musicArrangement" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An arrangement derived from the composition.",
          "rdfs:label" : "musicArrangement",
@@ -70,7 +70,7 @@
          "schema:rangeIncludes" : "schema:MusicComposition"
       },
       "schema:musicCompositionForm" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The type of composition (e.g. overture, sonata, symphony, etc.).",
          "rdfs:label" : "musicCompositionForm",
@@ -78,7 +78,7 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:musicalKey" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The key, mode, or scale this composition uses.",
          "rdfs:label" : "musicalKey",
@@ -86,7 +86,7 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:recordedAs" : {
-         "dc:source" : "schemadotorgsources:MBZ",
+         "dc:source" : "schemadotorgsources2:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An audio recording of the work.",
          "rdfs:label" : "recordedAs",

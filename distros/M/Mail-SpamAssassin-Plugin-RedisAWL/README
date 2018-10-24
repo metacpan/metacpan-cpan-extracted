@@ -1,5 +1,5 @@
 This archive contains the distribution Mail-SpamAssassin-Plugin-RedisAWL,
-version 1.002:
+version 1.004:
 
   redis support for spamassassin AWL/TxRep
 

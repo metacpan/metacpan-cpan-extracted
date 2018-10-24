@@ -1,6 +1,25 @@
 https://github.com/amaltsev/XAO-Base
 ------------------------------------
 
+commit cb0434f5db66227784a9f661a5124647b4ab146e
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Oct 19 11:14:15 2018 -0700
+
+    1.22 Added library projects support
+    
+    Put a site name list into configuration at /xao/objects/include to make
+    that site objects available for direct use or inheritance.
+
+commit 62b013744891ef82c22011dfac33534d690384d8
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sat Aug 25 07:46:41 2018 -0700
+
+    Forced ExtUtils::MakeMaker 6.64
+    
+    That's the version that understands TEST_REQUIRES, otherwise an
+    unsatisfied dependency on Test::Unit::Lite prevents the build on some
+    installations with modern perl, but really old MakeMaker.
+
 commit f8d10f78a8fd2b5a452641206d6d9142be227642
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Sat Jul 7 09:12:11 2018 -0700
@@ -54,16 +73,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Jul 6 08:45:48 2018 -0700
 
     1.18 Tests updated to Test::Unit::Lite
-
-commit 5b7df5e54fd4da94c30b806fd2fad3472872eb63
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Jun 12 20:29:43 2018 -0700
-
-    1.17 version bump
-
-commit 46801d8d3829806f53796b1fe8d580f02c9c6956
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Jun 12 18:41:03 2018 -0700
-
-    More cpanm compatibility changes
 

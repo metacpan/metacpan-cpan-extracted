@@ -15,8 +15,8 @@
             "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
+            "schema:Date",
+            "schema:DateTime"
          ]
       },
       "schema:dateDeleted" : {
@@ -35,8 +35,8 @@
             "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       },
       "schema:item" : {

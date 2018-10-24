@@ -29,6 +29,9 @@ if (eval { ExtUtils::MakeMaker->VERSION(6.3002) }) {
 if (eval { ExtUtils::MakeMaker->VERSION(6.46) }) {
     $conf{META_MERGE} = {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'Filesys::DiskUsage' => { file => 'lib/Filesys/DiskUsage.pm', version => '0.12' },
+        },
         resources   => {
             repository => {
                 type => 'git',

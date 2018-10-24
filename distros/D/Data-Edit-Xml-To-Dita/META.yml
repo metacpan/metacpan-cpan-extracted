@@ -1,0 +1,36 @@
+---
+abstract: 'Convert multiple Xml documents in parallel to Dita.'
+author:
+  - L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Edit-Xml-To-Dita
+provides:
+  Data::Edit::Xml::To::Dita:
+    file: lib/Data/Edit/Xml/To/Dita.pm
+    version: '2018'
+requires:
+  Carp: '0'
+  Data::Dump: '0'
+  Data::Edit::Xml: '0'
+  Data::Edit::Xml::Lint: '0'
+  Data::Edit::Xml::Xref: '20181018'
+  Data::Table::Text: '20181018'
+  Exporter: '0'
+  Flip::Flop: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Test2::API: '0'
+  Test::More: '0'
+  utf8: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '2018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

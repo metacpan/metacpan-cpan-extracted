@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "<p>The act of searching for an object.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/FindAction\">FindAction</a>: SearchAction generally leads to a FindAction, but not necessarily.</li>\n</ul>\n",
+      "rdfs:comment" : "The act of searching for an object.<br/><br/>\n\nRelated actions:<br/><br/>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/FindAction\">FindAction</a>: SearchAction generally leads to a FindAction, but not necessarily.</li>\n</ul>\n",
       "rdfs:label" : "SearchAction",
       "rdfs:subClassOf" : "schema:Action"
    },

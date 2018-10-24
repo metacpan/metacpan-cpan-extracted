@@ -3,12 +3,14 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 use Prty::Option;
 use Time::HiRes ();
 use Prty::Duration;
+use Prty::Math;
 
 # -----------------------------------------------------------------------------
 
@@ -139,8 +141,8 @@ Gesamtzahl der Schritte
 
 =item -show => $bool (Default: 1)
 
-Die Methode liefert Meldungen. Mit -show=>0 kann die Ausgabe von
-Meldungen verhindert werden. Beispiel:
+Die Klasse liefert Meldungen. Mit -show=>0 kann die Ausgabe von
+Meldungen an-/abgeschaltet werden. Beispiel:
 
     $pi = $class->new($n,-show=>$verbose);
 
@@ -306,8 +308,12 @@ sub time {
     my $i = $self->{'i'};
     my $duration = $self->{'duration'};
 
-    my $durStr = Prty::Duration->secondsToString($duration);
-    if (!$n) {
+    my $durStr .= sprintf '%s',Prty::Duration->secondsToString($duration);
+
+    if ($duration > 60) {
+        $durStr .= sprintf '[%ds]',Prty::Math->roundToInt($duration);
+    }
+    if (!$n || !$i) {
         return $durStr;
     }        
 
@@ -727,7 +733,7 @@ sub warn {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

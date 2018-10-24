@@ -2027,16 +2027,14 @@ our $clipbucket_setup_summary=sub {
    }
    my $show_cost_banner=<<'END';
 
-      _                  _       ___        _  ___
-     /_\  __ __ ___ _ __| |_    / __|___ __| ||__ \
-    / _ \/ _/ _/ -_) '_ \  _|  | (__/ _ (_-<  _|/_/
-   /_/ \_\__\__\___| .__/\__|   \___\___/__/\__(_)
-                   |_|
+    ___           _        ___      _ _    _ ___
+   | _ ) ___ __ _(_)_ _   | _ )_  _(_) |__| |__ \
+   | _ \/ -_) _` | | ' \  | _ \ || | | / _` | /_/
+   |___/\___\__, |_|_||_| |___/\_,_|_|_\__,_|(_)
+            |___/
 
 END
    $show_cost_banner.=<<END;
-   Note: There is a \$$cost per hour cost$cents to launch $num_of_servers
-         AWS EC2 $type servers for the following application:
 
          $clipbucket
 
@@ -2047,7 +2045,7 @@ END
       Name => 'show_cost',
       Item_1 => {
 
-         Text => "I accept the \$$cost$cents per hour cost",
+         Text => "Begin ClipBucket Build",
          Result => $standup_clipbucket,
 
       },
@@ -2116,14 +2114,16 @@ END
 
             Text => 'Stay with Temporary Public IP Address',
             Result =>
-   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
+   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_enter_site_name,
+   #$Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
 
          },
          Item_2 => {
 
             Text => 'Use Elastic (Permanent) IP Address',
             Result =>
-   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
+   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_enter_site_name,
+   #$Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
 
          },
          Scroll => 1,
@@ -2178,7 +2178,8 @@ END
 
                Text => 'Stay with Temporary Public IP Address',
                Result =>
-   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
+   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_enter_site_name,
+   #$Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
 
             },
             Item_2 => {
@@ -2186,7 +2187,8 @@ END
                Text => "]C[ (to avoid cost)",
                Convey => \@available_remove,
                Result =>
-   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
+   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_enter_site_name,
+   #$Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
 
             },
             Item_3 => {
@@ -2194,7 +2196,8 @@ END
                Text => "Use Elastic (Permanent) IP Address ]C[",
                Convey => \@available,
                Result =>
-   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
+   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_enter_site_name,
+   #$Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
 
             },
             Scroll => 1,
@@ -2225,14 +2228,16 @@ END
 
                Text => 'Stay with Temporary Public IP Address',
                Result =>
-   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
+   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_enter_site_name,
+   #$Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
 
             },
             Item_2 => {
 
                Text => 'Allocate Additional Elastic (Permanent) IP Address',
                Result =>
-   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
+   $Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_enter_site_name,
+   #$Net::FullAuto::ISets::Local::ClipBucket_is::clipbucket_setup_summary,
 
             },
             Scroll => 1,
@@ -2712,7 +2717,8 @@ our $clipbucket_enter_site_name=sub {
    package clipbucket_enter_site_name;
    my $permanent_ip="]T[{permanent_ip}";
    my $remember="]I[{'clipbucket_enter_site_name',1}";
-   $remember='' if -1<index $remember,'clipbucket_enter_site_name';
+   $remember='video.get-wisdom.com'
+      if -1<index $remember,'clipbucket_enter_site_name';
    if ($permanent_ip=~/^["]Release.* (\d+\.\d+\.\d+\.\d+).*$/s) {
       my $ip_to_release=$1;
       my $c="aws ec2 describe-addresses";

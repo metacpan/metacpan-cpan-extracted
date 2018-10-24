@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.14'
+generated_by: 'Module::Install version 1.16'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,5 +32,5 @@ requires:
   UNIVERSAL::require: 0
 resources:
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/szabgab/Text-Trac
-version: '0.18'
+  repository: https://github.com/manwar/Text-Trac
+version: 0.19

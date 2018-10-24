@@ -11,8 +11,8 @@
          "rdfs:comment" : "The estimated cost of the supply or supplies consumed when performing instructions.",
          "rdfs:label" : "estimatedCost",
          "schema:domainIncludes" : [
-            "schema:HowToSupply",
-            "schema:HowTo"
+            "schema:HowTo",
+            "schema:HowToSupply"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -39,19 +39,32 @@
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
+      "schema:step" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A single step item (as HowToStep, text, document, video, etc.) or a HowToSection.",
+         "rdfs:label" : "step",
+         "schema:domainIncludes" : "schema:HowTo",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:HowToSection",
+            "schema:HowToStep",
+            "schema:CreativeWork"
+         ]
+      },
       "schema:steps" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The steps in the form of a single item (text, document, video, etc.) or an ordered list with HowToStep and/or HowToSection items.",
+         "rdfs:comment" : "A single step item (as HowToStep, text, document, video, etc.) or a HowToSection (originally misnamed 'steps'; 'step' is preferred).",
          "rdfs:label" : "steps",
          "schema:domainIncludes" : [
             "schema:HowTo",
             "schema:HowToSection"
          ],
          "schema:rangeIncludes" : [
+            "schema:ItemList",
             "schema:CreativeWork",
-            "schema:Text",
-            "schema:ItemList"
-         ]
+            "schema:Text"
+         ],
+         "schema:supersededBy" : "schema:step"
       },
       "schema:supply" : {
          "rdf:type" : "rdf:Property",
@@ -73,12 +86,12 @@
          "rdfs:label" : "tool",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
-            "schema:HowTo",
-            "schema:HowToDirection"
+            "schema:HowToDirection",
+            "schema:HowTo"
          ],
          "schema:rangeIncludes" : [
-            "schema:HowToTool",
-            "schema:Text"
+            "schema:Text",
+            "schema:HowToTool"
          ]
       },
       "schema:totalTime" : {
@@ -86,8 +99,8 @@
          "rdfs:comment" : "The total time required to perform instructions or a direction (including time to prepare the supplies), in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 duration format</a>.",
          "rdfs:label" : "totalTime",
          "schema:domainIncludes" : [
-            "schema:HowTo",
-            "schema:HowToDirection"
+            "schema:HowToDirection",
+            "schema:HowTo"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -97,8 +110,8 @@
          "rdfs:label" : "yield",
          "schema:domainIncludes" : "schema:HowTo",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:QuantitativeValue"
          ]
       }
    }

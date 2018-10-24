@@ -1,4 +1,10 @@
-0.011 2018-07-04T02:15:46
+0.013 2018-10-23T06:42:24
+ - Fix META repository (Meredith Howard)
+
+0.012 2018-10-23T03:50:03Z
+ - Fix next::method call (Meredith Howard)
+
+0.011 2018-07-04T02:15:46Z
  - Fix up prereqs (Meredith Howard)
 
 0.010 2018-07-03T03:58:32Z

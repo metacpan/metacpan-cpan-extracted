@@ -1,6 +1,6 @@
 package Method::ParamValidator::Key::Field;
 
-$Method::ParamValidator::Key::Field::VERSION   = '0.11';
+$Method::ParamValidator::Key::Field::VERSION   = '0.12';
 $Method::ParamValidator::Key::Field::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Key::Field - Represents 'parameter key field' for Method
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use Types::Standard qw(:all);
 use Method::ParamValidator::Key::Field::DataType qw(:all);

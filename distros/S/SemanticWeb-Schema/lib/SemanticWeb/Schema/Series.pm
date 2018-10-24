@@ -1,10 +1,12 @@
+use utf8;
+
 package SemanticWeb::Schema::Series;
 
 # ABSTRACT: A Series in schema
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::CreativeWork /;
+extends qw/ SemanticWeb::Schema::Intangible /;
 
 
 use MooX::JSON_LD 'Series';
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -32,16 +34,18 @@ SemanticWeb::Schema::Series - A Series in schema
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-A Series in schema.org is a group of related items, typically but not
-necessarily of the same kind.
+=for html A Series in schema.org is a group of related items, typically but not
+necessarily of the same kind. See also <a class="localLink"
+href="http://schema.org/CreativeWorkSeries">CreativeWorkSeries</a>, <a
+class="localLink" href="http://schema.org/EventSeries">EventSeries</a>.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CreativeWork>
+L<SemanticWeb::Schema::Intangible>
 
 =head1 AUTHOR
 

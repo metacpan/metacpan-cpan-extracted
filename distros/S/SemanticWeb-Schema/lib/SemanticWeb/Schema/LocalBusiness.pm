@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::LocalBusiness;
 
 # ABSTRACT: A particular physical business or branch of an organization
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has branch_of => (
@@ -72,7 +74,7 @@ SemanticWeb::Schema::LocalBusiness - A particular physical business or branch of
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -103,8 +105,14 @@ A branch_of should be one of the following types:
 
 C<currenciesAccepted>
 
-=for html The currency accepted (in <a
-href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217 currency format</a>).
+=for html The currency accepted.<br/><br/> Use standard formats: <a
+href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217 currency format</a>
+e.g. "USD"; <a
+href="https://en.wikipedia.org/wiki/List_of_cryptocurrencies">Ticker
+symbol</a> for cryptocurrencies e.g. "BTC"; well known names for <a
+href="https://en.wikipedia.org/wiki/Local_exchange_trading_system">Local
+Exchange Tradings Systems</a> (LETS) and other currency types e.g. "Ithaca
+HOUR".
 
 A currencies_accepted should be one of the following types:
 
@@ -118,11 +126,11 @@ A currencies_accepted should be one of the following types:
 
 C<openingHours>
 
-=for html <p>The general opening hours for a business. Opening hours can be specified
-as a weekly time range, starting with days, then times per day. Multiple
-days can be listed with commas ',' separating each day. Day or time ranges
-are specified using a hyphen '-'.</p> <ul> <li>Days are specified using the
-following two-letter combinations: <code>Mo</code>, <code>Tu</code>,
+=for html The general opening hours for a business. Opening hours can be specified as
+a weekly time range, starting with days, then times per day. Multiple days
+can be listed with commas ',' separating each day. Day or time ranges are
+specified using a hyphen '-'.<br/><br/> <ul> <li>Days are specified using
+the following two-letter combinations: <code>Mo</code>, <code>Tu</code>,
 <code>We</code>, <code>Th</code>, <code>Fr</code>, <code>Sa</code>,
 <code>Su</code>.</li> <li>Times are specified using 24:00 time. For
 example, 3pm is specified as <code>15:00</code>. </li> <li>Here is an
@@ -145,7 +153,7 @@ A opening_hours should be one of the following types:
 
 C<paymentAccepted>
 
-Cash, credit card, etc.
+Cash, Credit Card, Cryptocurrency, Local Exchange Tradings System, etc.
 
 A payment_accepted should be one of the following types:
 

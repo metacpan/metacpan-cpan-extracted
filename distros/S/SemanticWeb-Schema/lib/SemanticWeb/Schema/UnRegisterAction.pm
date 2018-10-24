@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::UnRegisterAction;
 
-# ABSTRACT: <p>The act of un-registering from a service
+# ABSTRACT: The act of un-registering from a service
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 
@@ -28,19 +30,19 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::UnRegisterAction - <p>The act of un-registering from a service
+SemanticWeb::Schema::UnRegisterAction - The act of un-registering from a service
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of un-registering from a service.</p> <p>Related actions:</p>
-<ul> <li><a class="localLink"
+=for html The act of un-registering from a service.<br/><br/> Related
+actions:<br/><br/> <ul> <li><a class="localLink"
 href="http://schema.org/RegisterAction">RegisterAction</a>: antonym of
 UnRegisterAction.</li> <li><a class="localLink"
-href="http://schema.org/Leave">Leave</a>: Unlike LeaveAction,
+href="http://schema.org/LeaveAction">LeaveAction</a>: Unlike LeaveAction,
 UnRegisterAction implies that you are unregistering from a service you
 werer previously registered, rather than leaving a team/group of
 people.</li> </ul> 

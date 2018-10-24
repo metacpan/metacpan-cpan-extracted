@@ -3,8 +3,10 @@ use base qw/Prty::Hash/;
 
 use strict;
 use warnings;
+use v5.10.0;
+use utf8;
 
-our $VERSION = 1.124;
+our $VERSION = 1.125;
 
 # -----------------------------------------------------------------------------
 
@@ -51,7 +53,7 @@ produziert
     Links & Rechts & Zentriert \\ \hline
     \endhead
     \hline
-    \multicolumn{3}{r}{\emph{weiter}} \
+    \multicolumn{3}{r}{\emph{weiter nächste Seite}} \
     \endfoot
     \caption{Ein Test}
     \endlastfoot
@@ -155,7 +157,7 @@ liefert, die in den LaTeX-Code eingesetzt wird. Default:
         return @row;
     }
 
-=item titleColor => $rgb
+=item titleColor => $color
 
 Farbe der Titelzeile.
 
@@ -292,6 +294,15 @@ sub latex {
     my $vBorder = $border =~ tr/v//? 1: 0;
     my $VBorder = $border =~ tr/V//? 1: 0;
 
+    # Titelfarbe
+
+    if ($titleColor && $titleColor !~ s/^#//) {
+        $self->throw(
+            q~LATEX-00001: Only RGB color allowed~,
+            Color => $titleColor,
+        );
+    }
+
     # Head
 
     my $titleLine = '';
@@ -299,7 +310,9 @@ sub latex {
         my @arr;
         for (my $i = 0; $i < @$titleA; $i++) {
              my $val = $titleCb->($self,$l,$titleA->[$i],$i,@$cbArguments);
-             if ($multiLine) {
+             # Wir setzen den Titel auch mehrzeilig, wenn $multiLine
+             # nicht gesetzt ist, aber \n in einem Titel vorhanden ist
+             if ($multiLine || grep {m|\n|} @$titleA) {
                  $val =~ s|\n|\\\\|g;
                  $val = $l->ci('\makecell[%sb]{%s}',$alignA->[$i],$val);
                  if ($titleColor) {
@@ -342,7 +355,8 @@ sub latex {
     # \endfoot
 
     $body .= $HBorder? $l->c('\hline'): '';
-    $msg = $language eq 'german'? 'weiter': 'next';
+    $msg = $language eq 'german'? 'weiter nächste Seite':
+        'continued next page';
     $body .= $l->c('\multicolumn{%s}{r}{\\emph{%s}} \\\\',$width,$msg);
     $body .= $l->c('\endfoot');
 
@@ -413,7 +427,7 @@ sub latex {
 
 =head1 VERSION
 
-1.124
+1.125
 
 =head1 AUTHOR
 

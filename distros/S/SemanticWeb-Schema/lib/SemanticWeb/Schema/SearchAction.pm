@@ -1,6 +1,8 @@
+use utf8;
+
 package SemanticWeb::Schema::SearchAction;
 
-# ABSTRACT: <p>The act of searching for an object
+# ABSTRACT: The act of searching for an object
 
 use Moo;
 
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has query => (
@@ -36,16 +38,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::SearchAction - <p>The act of searching for an object
+SemanticWeb::Schema::SearchAction - The act of searching for an object
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
-=for html <p>The act of searching for an object.</p> <p>Related actions:</p> <ul>
-<li><a class="localLink"
+=for html The act of searching for an object.<br/><br/> Related actions:<br/><br/>
+<ul> <li><a class="localLink"
 href="http://schema.org/FindAction">FindAction</a>: SearchAction generally
 leads to a FindAction, but not necessarily.</li> </ul> 
 

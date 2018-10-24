@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::ReservationPackage;
 
 # ABSTRACT: A group of multiple reservations with common values for all sub-reservations.
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has sub_reservation => (
@@ -40,7 +42,7 @@ SemanticWeb::Schema::ReservationPackage - A group of multiple reservations with 
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::Rating;
 
 # ABSTRACT: A rating is an evaluation on a numeric scale
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has author => (
@@ -64,7 +66,7 @@ SemanticWeb::Schema::Rating - A rating is an evaluation on a numeric scale
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -99,9 +101,9 @@ A best_rating should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<Num>
+
+=item C<Str>
 
 =back
 

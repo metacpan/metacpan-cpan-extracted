@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -170,11 +170,18 @@ our $VERSION = '1.008';
 #pod
 #pod =head2 yancy.set
 #pod
-#pod     $c->yancy->set( $collection, $id, $item_data );
+#pod     $c->yancy->set( $collection, $id, $item_data, %opt );
 #pod
 #pod Update an item in the backend. C<$collection> is the collection name.
 #pod C<$id> is the ID of the item to update. C<$item_data> is a hash of data
-#pod to update. See L<Yancy::Backend/set>.
+#pod to update. See L<Yancy::Backend/set>. C<%opt> is a list of options with
+#pod the following keys:
+#pod
+#pod =over
+#pod
+#pod =item * properties - An arrayref of properties to validate, for partial updates
+#pod
+#pod =back
 #pod
 #pod This helper will validate the data against the configuration and run any
 #pod filters as needed. If validation fails, this helper will throw an
@@ -224,11 +231,20 @@ our $VERSION = '1.008';
 #pod
 #pod =head2 yancy.validate
 #pod
-#pod     my @errors = $c->yancy->validate( $collection, $item );
+#pod     my @errors = $c->yancy->validate( $collection, $item, %opt );
 #pod
-#pod Validate the given C<$item> data against the configuration for the C<$collection>.
-#pod If there are any errors, they are returned as an array of L<JSON::Validator::Error>
-#pod objects. See L<JSON::Validator/validate> for more details.
+#pod Validate the given C<$item> data against the configuration for the
+#pod C<$collection>. If there are any errors, they are returned as an array
+#pod of L<JSON::Validator::Error> objects. C<%opt> is a list of options with
+#pod the following keys:
+#pod
+#pod =over
+#pod
+#pod =item * properties - An arrayref of properties to validate, for partial updates
+#pod
+#pod =back
+#pod
+#pod See L<JSON::Validator/validate> for more details.
 #pod
 #pod =head2 yancy.filter.add
 #pod
@@ -288,6 +304,14 @@ our $VERSION = '1.008';
 #pod Run the configured filters on the given C<$item_data>. C<$collection> is
 #pod a collection name. Returns the hash of C<$filtered_data>.
 #pod
+#pod =head2 yancy.schema
+#pod
+#pod     my $schema = $c->yancy->schema( $collection );
+#pod     my $schema = $c->yancy->schema( $collection => $field );
+#pod
+#pod Get the JSON schema for the given C<$collection>, or the C<$field>
+#pod inside the given C<$collection>. Returns a hashref of configuration.
+#pod
 #pod =head2 yancy.openapi
 #pod
 #pod     my $openapi = $c->yancy->openapi;
@@ -340,6 +364,7 @@ use Mojo::File qw( path );
 use Mojo::Loader qw( load_class );
 use Sys::Hostname qw( hostname );
 use Yancy::Util qw( load_backend );
+use JSON::Validator::OpenAPI;
 
 sub register {
     my ( $self, $app, $config ) = @_;
@@ -370,6 +395,13 @@ sub register {
         state $backend = load_backend( $config->{backend}, $config->{collections} );
     } );
 
+    $app->helper( 'yancy.schema' => sub {
+        if ( @_ > 2 ) {
+            return $_[0]->yancy->config->{collections}{$_[1]}{properties}{$_[2]};
+        }
+        return $_[0]->yancy->config->{collections}{$_[1]};
+    } );
+
     $app->helper( 'yancy.list' => sub {
         my ( $c, @args ) = @_;
         return @{ $c->yancy->backend->list( @args )->{items} };
@@ -382,14 +414,40 @@ sub register {
     }
     my %validator;
     $app->helper( 'yancy.validate' => sub {
-        my ( $c, $coll, $item ) = @_;
-        my $v = $validator{ $coll } ||= _build_validator( $config->{collections}{ $coll } );
-        my @errors = $v->validate( $item );
+        my ( $c, $coll, $item, %opt ) = @_;
+        my $schema = $config->{collections}{ $coll };
+        my $v = $validator{ $coll } ||= _build_validator( $schema );
+
+        my @args;
+        if ( $opt{ properties } ) {
+            # Only validate these properties
+            @args = (
+                {
+                    type => 'object',
+                    required => [
+                        grep { my $f = $_; grep { $_ eq $f } @{ $schema->{required} || [] } }
+                        @{ $opt{ properties } }
+                    ],
+                    properties => {
+                        map { $_ => $schema->{properties}{$_} }
+                        grep { exists $schema->{properties}{$_} }
+                        @{ $opt{ properties } }
+                    },
+                    additionalProperties => 0, # Disallow any other properties
+                }
+            );
+        }
+
+        my @errors = $v->validate_input( $item, @args );
         return @errors;
     } );
     $app->helper( 'yancy.set' => sub {
-        my ( $c, $coll, $id, $item ) = @_;
-        if ( my @errors = $c->yancy->validate( $coll, $item ) ) {
+        my ( $c, $coll, $id, $item, %opt ) = @_;
+        my %validate_opt =
+            map { $_ => $opt{ $_ } }
+            grep { exists $opt{ $_ } }
+            qw( properties );
+        if ( my @errors = $c->yancy->validate( $coll, $item, %validate_opt ) ) {
             $c->app->log->error(
                 sprintf 'Error validating item with ID "%s" in collection "%s": %s',
                 $id, $coll,
@@ -475,6 +533,7 @@ sub register {
 
     # Add supported formats to silence warnings from JSON::Validator
     my $formats = $openapi->validator->formats;
+    $formats->{ password } = sub { 1 };
     $formats->{ markdown } = sub { 1 };
     $formats->{ tel } = sub { 1 };
 }
@@ -495,6 +554,10 @@ sub _build_openapi_spec {
             type => 'array',
             items => { '$ref' => "#/definitions/${name}Item" },
         };
+
+        for my $prop ( keys %props ) {
+            $props{ $prop }{ type } ||= 'string';
+        }
 
         $paths{ '/' . $name } = {
             get => {
@@ -527,7 +590,7 @@ sub _build_openapi_spec {
                         name => $_,
                         in => 'query',
                         type => ref $props{ $_ }{type} eq 'ARRAY'
-                            ? $props{ $_ }{type}[0] : $props{ $_ }{type},
+                                ? $props{ $_ }{type}[0] : $props{ $_ }{type},
                         description => "Filter the list by the $_ field. By default, looks for rows containing the value anywhere in the column. Use '*' anywhere in the value to anchor the match.",
                     } } keys %props,
                 ],
@@ -725,8 +788,14 @@ sub _build_openapi_spec {
 #
 sub _build_validator {
     my ( $schema ) = @_;
-    my $v = JSON::Validator->new;
+    my $v = JSON::Validator::OpenAPI->new(
+        # This fixes HTML forms submitting the string "20" not being
+        # detected as a number, or the number 1 not being detected as
+        # a boolean
+        coerce => { booleans => 1, numbers => 1 },
+    );
     my $formats = $v->formats;
+    $formats->{ password } = sub { 1 };
     $formats->{ markdown } = sub { 1 };
     $formats->{ tel } = sub { 1 };
     $v->schema( $schema );
@@ -745,7 +814,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -915,11 +984,18 @@ C<$id> is the ID of the item to get. See L<Yancy::Backend/get>.
 
 =head2 yancy.set
 
-    $c->yancy->set( $collection, $id, $item_data );
+    $c->yancy->set( $collection, $id, $item_data, %opt );
 
 Update an item in the backend. C<$collection> is the collection name.
 C<$id> is the ID of the item to update. C<$item_data> is a hash of data
-to update. See L<Yancy::Backend/set>.
+to update. See L<Yancy::Backend/set>. C<%opt> is a list of options with
+the following keys:
+
+=over
+
+=item * properties - An arrayref of properties to validate, for partial updates
+
+=back
 
 This helper will validate the data against the configuration and run any
 filters as needed. If validation fails, this helper will throw an
@@ -969,11 +1045,20 @@ C<$id> is the ID of the item to delete. See L<Yancy::Backend/delete>.
 
 =head2 yancy.validate
 
-    my @errors = $c->yancy->validate( $collection, $item );
+    my @errors = $c->yancy->validate( $collection, $item, %opt );
 
-Validate the given C<$item> data against the configuration for the C<$collection>.
-If there are any errors, they are returned as an array of L<JSON::Validator::Error>
-objects. See L<JSON::Validator/validate> for more details.
+Validate the given C<$item> data against the configuration for the
+C<$collection>. If there are any errors, they are returned as an array
+of L<JSON::Validator::Error> objects. C<%opt> is a list of options with
+the following keys:
+
+=over
+
+=item * properties - An arrayref of properties to validate, for partial updates
+
+=back
+
+See L<JSON::Validator/validate> for more details.
 
 =head2 yancy.filter.add
 
@@ -1032,6 +1117,14 @@ And you configure this on a field using C<< x-filter >> and C<< x-digest >>:
 
 Run the configured filters on the given C<$item_data>. C<$collection> is
 a collection name. Returns the hash of C<$filtered_data>.
+
+=head2 yancy.schema
+
+    my $schema = $c->yancy->schema( $collection );
+    my $schema = $c->yancy->schema( $collection => $field );
+
+Get the JSON schema for the given C<$collection>, or the C<$field>
+inside the given C<$collection>. Returns a hashref of configuration.
 
 =head2 yancy.openapi
 

@@ -1,3 +1,5 @@
+use utf8;
+
 package SemanticWeb::Schema::ListItem;
 
 # ABSTRACT: An list item, e
@@ -13,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.1';
+our $VERSION = 'v0.0.2';
 
 
 has item => (
@@ -64,7 +66,7 @@ SemanticWeb::Schema::ListItem - An list item, e
 
 =head1 VERSION
 
-version v0.0.1
+version v0.0.2
 
 =head1 DESCRIPTION
 
@@ -107,9 +109,9 @@ A position should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=item C<Str>
 
 =back
 

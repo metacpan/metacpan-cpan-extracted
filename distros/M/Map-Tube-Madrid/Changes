@@ -1,5 +1,9 @@
 Revision history for Map::Tube::Madrid
 
+0.27  2018-10-19
+      - Updated section "NOTE" for Line L3.
+      - Updated map for Line L3 showing new connections.
+
 0.26  2018-09-30
       - Updated dependency on Map::Tube v3.57.
 
