@@ -1,25 +1,30 @@
 package Proc::Pidfile;
-$Proc::Pidfile::VERSION = '1.08';
+$Proc::Pidfile::VERSION = '1.09';
 use 5.006;
 use strict;
 use warnings;
 
-use Fcntl qw( :flock );
-use File::Basename qw( basename );
-use Carp qw/ carp croak /;
-require File::Spec;
+use Fcntl                   qw/ :flock         /;
+use File::Basename          qw/ basename       /;
+use Carp                    qw/ carp croak     /;
+use Time::HiRes             qw/ usleep         /;
+use File::Spec::Functions   qw/ catfile tmpdir /;
 
 sub new 
 { 
     my $class = shift;
     my %args = @_;
     my $self = bless \%args, $class;
-    unless ( $self->{pidfile} )
-    {
+
+    $self->{retries} = 2 unless defined($self->{retries});
+
+    unless ( $self->{pidfile} ) {
         my $basename = basename( $0 );
-        my $dir = -w "/var/run" ? "/var/run" : File::Spec->tmpdir();
+        my $dir      = tmpdir();
+
         croak "Can't write to $dir\n" unless -w $dir;
-        my $pidfile = "$dir/$basename.pid";
+
+        my $pidfile  = catfile($dir, "$basename.pid");
 
         # untaint the path, since it includes externally generated info
         # TODO: should we be a bit more pedantic on "valid path"?
@@ -91,34 +96,45 @@ sub _is_running
 
 sub _create_pidfile
 {
-    my $self = shift;
+    my $self    = shift;
     my $pidfile = $self->{pidfile};
-    if ( -e $pidfile )
-    {
+    my $attempt = 1;
+
+    while ( -e $pidfile ) {
         $self->_verbose( "pidfile $pidfile exists\n" );
         my $pid = $self->_get_pid();
         $self->_verbose( "pid in pidfile $pidfile = $pid\n" );
-        if ( _is_running( $pid ) )
-        {
-            if ( $self->{silent} )
-            {
+        if ( _is_running( $pid ) ) {
+            
+            # this might be a race condition, or parallel smoke testers,
+            # so we'll back off a random amount of time and try again
+            if ($attempt <= $self->{retries}) {
+                ++$attempt;
+                # TODO: let's try this. Guessing we don't have to
+                #       bother with increasing backoff times
+                my $backoff = 100 + rand(300);
+                $self->_verbose("backing off for $backoff microseconds before trying again");
+                usleep(100 + rand(300));
+                next;
+            }
+
+            if ( $self->{silent} ) {
                 exit;
             }
-            else
-            {
+            else {
                 croak "$0 already running: $pid ($pidfile)\n";
             }
         }
-        else
-        {
+        else {
             $self->_verbose( "$pid has died - replacing pidfile\n" );
             open( PID, ">$pidfile" ) or croak "Can't write to $pidfile\n";
             print PID "$$\n";
             close( PID );
+            last;
         }
     }
-    else
-    {
+
+    if (not -e $pidfile) {
         $self->_verbose( "no pidfile $pidfile\n" );
         open( PID, ">$pidfile" ) or croak "Can't write to $pidfile: $!\n";
         flock( PID, LOCK_EX ) or croak "Can't lock pid file $pidfile\n";
@@ -127,6 +143,7 @@ sub _create_pidfile
         close( PID ) or croak "Can't close pid file $pidfile: $!\n";
         $self->_verbose( "pidfile $pidfile created\n" );
     }
+
     $self->{created} = 1;
 }
 
@@ -181,7 +198,7 @@ the curent process
     # unlink $pidfile here
 
     my $pp = Proc::Pidfile->new();
-    # creates pidfile in default location - /var/run or File::Spec->tmpdir ...
+    # creates pidfile in default location
     my $pidfile = $pp->pidfile();
     # tells you where this pidfile is ...
 
@@ -193,8 +210,10 @@ the curent process
 =head1 DESCRIPTION
 
 Proc::Pidfile is a very simple OO interface which manages a pidfile for the
-current process. You can pass the path to a pidfile to use as an argument to
-the constructor, or you can let Proc::Pidfile choose one (basically, "/var/run/$basename", if you can write to /var/run, otherwise "/$tmpdir/$basename").
+current process.
+You can pass the path to a pidfile to use as an argument to the constructor,
+or you can let Proc::Pidfile choose one
+("/$tmpdir/$basename", where C<$tmpdir> is from C<File::Spec>).
 
 Pidfiles created by Proc::Pidfile are automatically removed on destruction of
 the object. At destruction, the module checks the process id in the pidfile
@@ -208,9 +227,46 @@ useful for, for example, cron jobs, where you don't want to create a new
 process if one is already running, but you don't necessarily want to be
 informed of this by cron.
 
+=head2 Retries
+
+If another instance of your script is already running,
+we'll retry a couple of times,
+with a random number of microseconds between each attempt.
+
+You can specify the number of retries, for example if you
+want to try more times for some reason:
+
+ $pidfile = $pp->pidfile(retries => 4);
+
+By default this is set to 2,
+which means if the first attempt to set up a pidfile fails,
+it will try 2 more times, so three attempts in total.
+
+Setting retries to 0 (zero) will disable this feature.
+
+
 =head1 SEE ALSO
 
-L<Proc::PID::File>
+L<Proc::PID::File> - provides a similar interface.
+
+L<PidFile> - provides effectively the same functionality,
+but via class methods. Hasn't been updated since 2011,
+and has quite a few CPAN Testers fails.
+
+L<IPC::Pidfile> - provides a simple interface, but has some restrictions,
+and its documentation even recommends you consider a different module,
+as it has a race condition.
+
+L<IPC::Lockfile> - very simple interface, and uses a different mechanism:
+it tries to lock the script file which used the module.
+The trouble with that is that you might be running someone else's script,
+and thus can't lock it.
+
+L<Sys::RunAlone> - another one with a simple default interface,
+but can be configured to retry. Based on locking, rather than a pid file.
+Doesn't work on Windows.
+
+L<Linux::Pidfile> - Linux-specific solution.
 
 =head1 REPOSITORY
 

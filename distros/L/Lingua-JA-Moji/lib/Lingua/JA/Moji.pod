@@ -1,3 +1,4 @@
+
 =encoding UTF-8
 
 =head1 NAME
@@ -6,19 +7,57 @@ Lingua::JA::Moji - Handle many kinds of Japanese characters
 
 =head1 SYNOPSIS
 
-Convert various types of Japanese characters into one another.
+Convert romanised Japanese to and from kana:
 
-    use Lingua::JA::Moji qw/kana2romaji romaji2kana/;
+    
     use utf8;
+    use Lingua::JA::Moji qw/kana2romaji romaji2kana/;
     my $romaji = kana2romaji ('あいうえお');
-    # $romaji is now 'aiueo'.
+    print "$romaji\n";
     my $kana = romaji2kana ($romaji);
-    # $kana is now 'アイウエオ'.
+    print "$kana\n";
+    
+
+
+produces output
+
+    aiueo
+    アイウエオ
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.55/examples/synopsis.pl> in the distribution.)
+
+
+Convert between different forms of kana:
+
+    
+    use utf8;
+    use Lingua::JA::Moji ':all';
+    my $h = 'あいうえおがっぷぴょん';
+    print kata2hira ($h), "\n";
+    print hira2kata (kata2hira ($h)), "\n";
+    print kana2hw ($h), "\n";
+    print kata2hira (hw2katakana (kana2hw ($h))), "\n";
+    # Silly circled kana
+    print kana2circled ($h), "\n";
+
+
+produces output
+
+    あいうえおがっぷぴょん
+    アイウエオガップピョン
+    ｱｲｳｴｵｶﾞｯﾌﾟﾋﾟｮﾝ
+    あいうえおがっぷぴょん
+    ㋐㋑㋒㋓㋔㋕゛ッ㋫゜㋪゜ョン
+
+
+(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.55/examples/syn-kana.pl> in the distribution.)
+
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.54
-corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/79035f5895111c7bd0d2da461ebf78cee8c1d517> made on Mon Oct 22 20:28:13 2018 +0900.
+This document describes Lingua::JA::Moji version 0.55
+corresponding to git commit L<4b5650f0e39a1cfaa3e283ce7a6b0ea15ce875eb|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/4b5650f0e39a1cfaa3e283ce7a6b0ea15ce875eb> made on Wed Oct 24 11:47:18 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -59,7 +98,6 @@ These functions convert Japanese letters to and from romanized forms.
 Convert kana to romaji.
 
     use Lingua::JA::Moji 'kana2romaji';
-
     $romaji = kana2romaji ("うれしいこども");
     # $romaji = 'uresîkodomo'
 
@@ -95,17 +133,8 @@ Possible styles are as follows:
 =item none/empty
 
 Without a style, the L<Nippon-shiki
-romanization|http://www.sljfaq.org/afaq/nippon-shiki.html> is
-used.
-
-=item hepburn
-
-This gives L<Hepburn romanization|http://www.sljfaq.org/afaq/hepburn.html>.
-
-=item kunrei
-
-This is L<the form of romanization used in childrens'
-education|http://www.sljfaq.org/afaq/kunrei-shiki.html>.
+romanization|https://www.sljfaq.org/afaq/nippon-shiki.html> is
+used. This is the only romanisation style which allows round trips from kana to romanised and back.
 
 =item common
 
@@ -114,9 +143,24 @@ combinations of large kana + small vowel kana into the commonest
 romanized form. For example "ジェット" becomes "jetto" and "ウェ"
 becomes "we".
 
+=item hepburn
+
+This gives L<Hepburn
+romanization|https://www.sljfaq.org/afaq/hepburn.html>. This is
+strictly defined to be the actual Hepburn system, so you may prefer to
+use L</common> if your kana contains things like ファ which you want
+to turn into "fa".
+
+=item kunrei
+
+This gives L<Kunrei-shiki romanisation|https://www.sljfaq.org/afaq/kunrei-shiki.html>, the form
+of romanisation used in childrens' education. This is similar to Nippon-shiki except for a few consonant-vowel combinations.
+
 =item passport
 
-Passport romaji. Long "o" vowels get turned into "oh".
+This gives "passport romaji" where long "o" vowels get turned into
+"oh" and other long vowels are deleted. In this system "おおの" turns
+into "ohno" and "ゆうすけ" turns into "yusuke".
 
 =back
 
@@ -141,7 +185,10 @@ the haphazard design of the module.
 =item ve_type
 
 The C<ve_type> option controls how long vowels are written. The
-default is to use circumflexes to represent long vowels.
+default is to use circumflexes to represent long vowels. If C<style>
+is set to C<hepburn> or C<common>, the default is set to use
+macrons. If C<style> is set to C<passport>, the value of C<ve_type> is
+also set to C<passport>. The choices are:
 
 =over
 
@@ -188,7 +235,6 @@ becomes "o".
 Convert romaji to kana.
 
     use Lingua::JA::Moji 'romaji2kana';
-
     $kana = romaji2kana ('yamaguti');
     # $kana = 'ヤマグチ'
 
@@ -215,6 +261,9 @@ IME. For example, input "gumma" becomes グッマ and input "onnna"
 becomes オンナ. Passport romaji ("Ohshimizu") is disallowed if this
 option is switched on.
 
+See also L</is_romaji>, L</is_romaji_strict>, and
+L</is_romaji_semistrict> for validation of romanised Japanese inputs.
+
 
 
 
@@ -226,7 +275,6 @@ option is switched on.
 Convert romaji to hiragana.
 
     use Lingua::JA::Moji 'romaji2hiragana';
-
     $hiragana = romaji2hiragana ('babubo');
     # $hiragana = 'ばぶぼ'
 
@@ -247,7 +295,6 @@ uses long vowels with a kana rather than a L</chouon>.
 
 
     use Lingua::JA::Moji 'romaji_styles';
-
     my @styles = romaji_styles ();
     # Returns a true value
     romaji_styles ("hepburn");
@@ -256,7 +303,7 @@ uses long vowels with a kana rather than a L</chouon>.
 
 
 
-Given an argument, this return a true value if it is a known style of
+Given an argument, this returns a true value if it is a known style of
 romanization.
 
 Without an argument, it returns a list of possible styles, as an array
@@ -276,7 +323,6 @@ under the key "abbrev" and the full name under the key "full_name".
     use Lingua::JA::Moji 'romaji_vowel_styles';
 
 
-
 Returns a list of valid styles of romaji vowels.
 
 
@@ -290,7 +336,6 @@ Returns a list of valid styles of romaji vowels.
 
 
     use Lingua::JA::Moji 'is_voiced';
-
     if (is_voiced ('が')) {
          print "が is voiced.\n";
     }
@@ -312,7 +357,6 @@ undefined value if not.
 
 
     use Lingua::JA::Moji 'is_romaji';
-
     # The following line returns "undef"
     is_romaji ("abcdefg");
     # The following line returns a defined value
@@ -346,7 +390,6 @@ converted into wapuro format.
 
 
     use Lingua::JA::Moji 'is_romaji_strict';
-
     # The following line returns "undef"
     is_romaji_strict ("abcdefg");
     # The following line returns "undef"
@@ -383,7 +426,6 @@ This was added to the module in version L</0.27>.
 
 
     use Lingua::JA::Moji 'is_romaji_semistrict';
-
     # The following line returns "undef"
     is_romaji_semistrict ("abcdefg");
     # The following line returns "undef"
@@ -410,7 +452,6 @@ stuff which "is_romaji" allows.
 
 
     use Lingua::JA::Moji 'normalize_romaji';
-
     $normalized = normalize_romaji ('tsumuji');
 
 
@@ -448,7 +489,6 @@ These functions convert one form of kana into another.
 Convert hiragana to katakana.
 
     use Lingua::JA::Moji 'hira2kata';
-
     $katakana = hira2kata ('ひらがな');
     # $katakana = 'ヒラガナ'
 
@@ -475,7 +515,6 @@ This does not convert L</chouon> signs.
 Convert katakana to hiragana.
 
     use Lingua::JA::Moji 'kata2hira';
-
     $hiragana = kata2hira ('カキクケコ');
     # $hiragana = 'かきくけこ'
 
@@ -502,15 +541,14 @@ also does not convert half-width katakana into hiragana.
 Convert kana to katakana.
 
     use Lingua::JA::Moji 'kana2katakana';
-
     
 
 
 
 This converts any of katakana, L</halfwidth katakana>, circled
-katakana and hiragana to full width katakana. It also joins dakuten
-and handakuten marks to kana where possible, or removes them, using
-L</join_sound_marks>.
+katakana and hiragana to full width katakana. It also joins
+L</dakuten> and L</handakuten> marks to kana where possible, or
+removes them, using L</join_sound_marks>.
 
 
 
@@ -523,7 +561,6 @@ L</join_sound_marks>.
 
 
     use Lingua::JA::Moji 'kana_to_large';
-
     $large = kana_to_large ('ぁあぃい');
     # $large = 'ああいい'
 
@@ -543,7 +580,6 @@ Convert small-sized kana such as 「ぁ」 into full-sized kana such as
 
 
     use Lingua::JA::Moji 'nigori_first';
-
     my @list = (qw/カン スウ ハツ オオ/);
     nigori_first (\@list);
     # Now @list = (qw/カン スウ ハツ オオ ガン ズウ バツ パツ/);
@@ -570,7 +606,6 @@ This was added to the module in version L</0.36>.
 
 
     use Lingua::JA::Moji 'InHankakuKatakana';
-
     use utf8;
     if ('ｱ' =~ /\p{InHankakuKatakana}/) {
         print "ｱ is half-width katakana\n";
@@ -592,7 +627,6 @@ expressions with C<\p> which can validate L</halfwidth katakana>.
 Convert kana to halfwidth katakana.
 
     use Lingua::JA::Moji 'kana2hw';
-
     $half_width = kana2hw ('あいウカキぎょう。');
     # $half_width = 'ｱｲｳｶｷｷﾞｮｳ｡'
 
@@ -615,7 +649,6 @@ L</katakana2hw> for a function which only converts katakana.
 Convert halfwidth katakana to katakana.
 
     use Lingua::JA::Moji 'hw2katakana';
-
     $full_width = hw2katakana ('ｱｲｳｶｷｷﾞｮｳ｡');
     # $full_width = 'アイウカキギョウ。'
 
@@ -637,7 +670,6 @@ C<japanese-zenkaku-region>. For the opposite function, see L<kana2hw>.
 Convert katakana to halfwidth katakana.
 
     use Lingua::JA::Moji 'katakana2hw';
-
     $hw = katakana2hw ("あいうえおアイウエオ");
     # $hw = 'あいうえおｱｲｳｴｵ'
 
@@ -657,7 +689,6 @@ unchanged. See also L</kana2hw>.
 
 
     use Lingua::JA::Moji 'is_kana';
-
     
 
 
@@ -677,7 +708,6 @@ punctuation or L</chouon>.
 
 
     use Lingua::JA::Moji 'is_hiragana';
-
     
 
 
@@ -698,7 +728,6 @@ cannot include punctuation marks or L</chouon>.
 
 
     use Lingua::JA::Moji 'katakana2syllable';
-
     $syllables = katakana2syllable ('ソーシャルブックマークサービス');
 
 
@@ -713,7 +742,13 @@ attached to the preceding sequence, so for example フラナガン is
 broken up into four syllables, フ, ラ, ナ, ガン.
 
 This routine is used as the basis of this L<Change your name to kanji
-web application|https://www.sljfaq.org/cgi/name-kanji.cgi>.
+web application|https://www.sljfaq.org/cgi/name-kanji.cgi>. The name
+is converted from English to kana, then this function is used to break
+the kana name into pieces to which a kanji may be attached. It's also
+used in L<this Katakana to English
+converter|https://www.sljfaq.org/cgi/k2e.cgi> for the case that no
+words can be matched, and suggestions are made for how to split the
+word into possible components.
 
 This was added to the module in version L</0.24>.
 
@@ -729,7 +764,6 @@ This was added to the module in version L</0.24>.
 
 
     use Lingua::JA::Moji 'InKana';
-
     $is_kana = ('アイウエオ' =~ /^\p{InKana}+$/);
     # $is_kana = '1'
 
@@ -745,9 +779,9 @@ This is a combination of the existing Perl character classes
 C<Katakana>, C<InKatakana>, and C<InHiragana>, minus unassigned
 characters, plus the "halfwidth katakana prolonged sound mark"
 (U+FF70) <ｰ> (chouon), the "halfwidth katakana voiced sound mark"
-(U+FF9E) <ﾞ> (dakuten) and the "halfwidth katakana semivoiced sound
-mark" (U+FF9F) <ﾟ> (handakuten), minus '・', Unicode 30FB, "KATAKANA
-MIDDLE DOT". It is somewhat like the following:
+(U+FF9E) <ﾞ> (L</dakuten>) and the "halfwidth katakana semivoiced
+sound mark" (U+FF9F) <ﾟ> (L</handakuten>), minus '・', Unicode 30FB,
+"KATAKANA MIDDLE DOT". It is somewhat like the following:
 
     qr/\p{Katakana}|\p{InKatakana}|\p{InHiragana}|ｰ|ﾞ|ﾟ>/
 
@@ -765,7 +799,6 @@ are not matched and KATAKANA MIDDLE DOT is not matched.
 
 
     use Lingua::JA::Moji 'square2katakana';
-
     $kata = square2katakana ('㌆');
     # $kata = 'ウォン'
 
@@ -784,7 +817,6 @@ Convert a square katakana box into its components.
 
 
     use Lingua::JA::Moji 'katakana2square';
-
     $sq = katakana2square ('カロリーアイウエオウォン');
     # $sq = '㌍アイウエオ㌆'
 
@@ -803,16 +835,23 @@ Convert katakana into a square thing if possible.
 
 
     use Lingua::JA::Moji 'smallize_kana';
-
     $smallize = smallize_kana ('オキヤクサマガカツタ');
     # $smallize = 'オキャクサマガカッタ'
 
 
 
 Given katakana input, convert possible "old-style" kana usage with
-large kanas used for youon or sokuon into smaller kana. If the
+large kanas used for L</youon> or L</sokuon> into smaller kana. If the
 conversion succeeds, return the converted value, otherwise return the
-undefined value. This function is experimental.
+undefined value. (I found the undefined value works better as a return
+value on failure than returning the text itself, since it saves the
+user from having to check whether the text has changed.)
+
+The conversion is not intelligent, it just attempts
+to do as much as possible, so although it will work to convert
+"shiyotsuchiyuu" ("シヨツチユウ") into "shotchuu" ("ショッチュウ"), it
+will also do stupid things like converting "chiyoda" (ちよだ) into
+"choda" (ちょだ).
 
 This was added to the module in version L</0.46>.
 
@@ -830,13 +869,17 @@ This was added to the module in version L</0.46>.
     use Lingua::JA::Moji 'cleanup_kana';
 
 
-
 This function converts any of hiragana, halfwidth katakana, or romaji
 input into katakana. It also converts various confusable kanji
-characters into kana. For example the "one" kanji is converted into
-chouons.
+characters into kana. For example the "one" kanji 一 is converted into
+a L</chouon>, ー, and the "mouth" kanji 口 is converted into the
+katakana ロ (ro).
+
+This is used as the "front end" function for L<this katakana to
+English web application|https://www.sljfaq.org/cgi/k2e.cgi>.
 
 This was added to the module in version L</0.46>.
+
 
 
 
@@ -849,16 +892,17 @@ This was added to the module in version L</0.46>.
 
 
     use Lingua::JA::Moji 'join_sound_marks';
-
     $joined = join_sound_marks ('か゛は゜つ゛');
     # $joined = 'がぱづ'
 
 
 
-Join dakuten and handakuten (Unicode U+3099-U+309C) to kana where
-possible. Where they cannot be joined, strip them out.
+Join L</dakuten> and L</handakuten> (Unicode U+3099-U+309C) to kana
+where possible. Where they cannot be joined, strip them out. This only
+works on full width kana. The return value is the joined text.
 
 This was added to the module in version L</0.53>.
+
 
 
 
@@ -871,7 +915,6 @@ This was added to the module in version L</0.53>.
 
 
     use Lingua::JA::Moji 'split_sound_marks';
-
     $split = split_sound_marks ('ガパヅ');
     # $split = 'カ゛ハ゜ツ゛'
 
@@ -881,7 +924,8 @@ Split L</dakuten> and L</handakuten> from kana where possible. U+309B
 and U+309C are chosen rather than U+3099 and U+309A. (This choice was
 somewhat arbitrary. I'm not sure which of the pairs should be used. I
 chose these because they were the ones already in use internally in
-the module in L</kana2braille> and L</kana2morse>.)
+the module in L</kana2braille> and L</kana2morse>.) This only
+works on full width kana. The return value is the split text.
 
 This was added to the module in version L</0.53>.
 
@@ -909,7 +953,6 @@ Variant kana forms. Hentaigana are new in Unicode 10.0 (June 2017).
     use Lingua::JA::Moji 'hentai2kana';
 
 
-
 Convert hentaigana into hiragana. Hentaigana with multiple
 interpretations are converted into a list of kana separated by a
 middle dot character.
@@ -928,7 +971,6 @@ This was added to the module in version L</0.43>.
 
 
     use Lingua::JA::Moji 'hentai2kanji';
-
     $kanji = hentai2kanji ('𛀢');
     # $kanji = '家'
 
@@ -950,7 +992,6 @@ This was added to the module in version L</0.43>.
 
 
     use Lingua::JA::Moji 'kanji2hentai';
-
     $kanji = kanji2hentai ('家');
     # $kanji = '𛀢'
 
@@ -972,16 +1013,15 @@ This was added to the module in version L</0.43>.
 
 
     use Lingua::JA::Moji 'kana2hentai';
-
     $hentai = kana2hentai ('ケンブ');
     # $hentai = '𛀢・𛀲・𛀳・𛀴・𛀵・𛀶・𛀷𛄝・𛄞𛂰・𛂱・𛂲゛'
 
 
 
 Convert kana to equivalent hentaigana. If more than one hentaigana
-exists, they are returned joined with a middle dot. Dakuten and
-handakuten are split out of the kana using L</split_sound_marks>
-before the conversion.
+exists, they are returned joined with a middle dot. The L</dakuten>
+and L</handakuten> are split out of the kana using
+L</split_sound_marks> before the conversion.
 
 This was added to the module in version L</0.43>.
 
@@ -1007,7 +1047,6 @@ Functions for handling L</wide ASCII>.
 
 
     use Lingua::JA::Moji 'InWideAscii';
-
     use utf8;
     if ('Ａ' =~ /\p{InWideAscii}/) {
         print "Ａ is wide ascii\n";
@@ -1015,7 +1054,8 @@ Functions for handling L</wide ASCII>.
 
 
 
-This is a character class for use with \p which matches L</wide ASCII>
+This is a character class for use with \p which matches L</wide
+ASCII>. It also matches the fullwidth space, C<U+3000>.
 
 
 
@@ -1028,13 +1068,13 @@ This is a character class for use with \p which matches L</wide ASCII>
 Convert wide ASCII characters to printable ASCII characters.
 
     use Lingua::JA::Moji 'wide2ascii';
-
     $ascii = wide2ascii ('ａｂＣＥ０１９');
     # $ascii = 'abCE019'
 
 
 
-Convert L</wide ASCII> into ASCII.
+Convert L</wide ASCII> into ASCII. It also converts the fullwidth
+space, C<U+3000>, into an ASCII space, ASCII C<0x20>.
 
 
 
@@ -1047,13 +1087,13 @@ Convert L</wide ASCII> into ASCII.
 Convert printable ASCII characters to wide ASCII characters.
 
     use Lingua::JA::Moji 'ascii2wide';
-
     $wide = ascii2wide ('abCE019');
     # $wide = 'ａｂＣＥ０１９'
 
 
 
-Convert ASCII into L</wide ASCII>.
+Convert ASCII into L</wide ASCII>. It also converts the ASCII space,
+ASCII C<0x20> into a fullwidth space, C<U+3000>.
 
 
 
@@ -1074,7 +1114,6 @@ Convert ASCII into L</wide ASCII>.
 Convert kana to Japanese morse code (wabun code).
 
     use Lingua::JA::Moji 'kana2morse';
-
     $morse = kana2morse ('ショッチュウ');
     # $morse = '--.-. -- .--. ..-. -..-- ..-'
 
@@ -1083,6 +1122,7 @@ Convert kana to Japanese morse code (wabun code).
 Convert Japanese kana into Morse code. Japanese morse code does not
 have any way of representing small kana characters, so converting to
 and then from morse code will result in ショッチュウ becoming シヨツチユウ.
+The function L</smallize_kana> may work to fix these outputs in some cases.
 
 
 
@@ -1095,7 +1135,6 @@ and then from morse code will result in ショッチュウ becoming シヨツチ
 Convert Japanese morse code (wabun code) to kana.
 
     use Lingua::JA::Moji 'morse2kana';
-
     $kana = morse2kana ('--.-. -- .--. ..-. -..-- ..-');
     # $kana = 'シヨツチユウ'
 
@@ -1114,7 +1153,6 @@ Convert Japanese Morse code into kana. Each Morse code element must be separated
 Convert kana to Japanese braille.
 
     use Lingua::JA::Moji 'kana2braille';
-
     
 
 
@@ -1141,7 +1179,6 @@ building a Perl braille converter could start here.
 Convert Japanese braille to kana.
 
     use Lingua::JA::Moji 'braille2kana';
-
     
 
 
@@ -1159,7 +1196,6 @@ Converts Japanese braille (I<tenji>) into the equivalent katakana.
 Convert kana to circled katakana.
 
     use Lingua::JA::Moji 'kana2circled';
-
     $circled = kana2circled ('アイウエオガン');
     # $circled = '㋐㋑㋒㋓㋔㋕゛ン'
 
@@ -1169,8 +1205,8 @@ This function converts kana into the "circled katakana" of Unicode,
 which have code points from 32D0 to 32FE. See also L</circled2kana>.
 
 There is no circled form of the ン kana, L</syllabic n>, so this is
-left untouched. Dakuten and handakuten are split from the kana
-using L</split_sound_marks>.
+left untouched. The L</dakuten> and L</handakuten> are split from the
+kana using L</split_sound_marks>.
 
 Circled katakana appear as Unicode code points U+32D0 to U+32FE.
 
@@ -1185,7 +1221,6 @@ Circled katakana appear as Unicode code points U+32D0 to U+32FE.
 Convert circled katakana to kana.
 
     use Lingua::JA::Moji 'circled2kana';
-
     $kana = circled2kana ('㋐㋑㋒㋓㋔');
     # $kana = 'アイウエオ'
 
@@ -1213,7 +1248,6 @@ full-width katakana. See also L</kana2circled>.
 Convert Modern kanji to Pre-1949 kanji.
 
     use Lingua::JA::Moji 'new2old_kanji';
-
     $old = new2old_kanji ('三国 連太郎');
     # $old = '三國 連太郎'
 
@@ -1241,7 +1275,6 @@ equivalents in the old system.
 Convert Pre-1949 kanji to Modern kanji.
 
     use Lingua::JA::Moji 'old2new_kanji';
-
     $new = old2new_kanji ('櫻井');
     # $new = '桜井'
 
@@ -1261,7 +1294,6 @@ Convert old-style (pre-1949) kanji (Chinese characters) into new-style
 
 
     use Lingua::JA::Moji 'circled2kanji';
-
     $kanji = circled2kanji ('㊯');
     # $kanji = '協'
 
@@ -1280,7 +1312,6 @@ Convert the circled forms of kanji into their uncircled equivalents.
 
 
     use Lingua::JA::Moji 'kanji2circled';
-
     $kanji = kanji2circled ('協嬉');
     # $kanji = '㊯嬉'
 
@@ -1300,7 +1331,6 @@ exist. Note that only a limited number of kanji have circled forms.
 
 
     use Lingua::JA::Moji 'bracketed2kanji';
-
     $kanji = bracketed2kanji ('㈱');
     # $kanji = '株'
 
@@ -1319,7 +1349,6 @@ Convert bracketed form of kanji into unbracketed form.
 
 
     use Lingua::JA::Moji 'kanji2bracketed';
-
     $kanji = kanji2bracketed ('株');
     # $kanji = '㈱'
 
@@ -1339,10 +1368,9 @@ exists, otherwise do nothing with it.
 
 
     use Lingua::JA::Moji 'yurei_moji';
+    my @yurei = yurei_moji ();
 
 
-
-my @yurei = yurei_moji ();
 
 Returns a list of the yurei moji (幽霊文字), kanji which don't
 actually exist but were mistakenly included in a computer
@@ -1363,10 +1391,9 @@ This was added to the module in version L</0.47>.
 
 
     use Lingua::JA::Moji 'bad_kanji';
+    my @bad_kanji = bad_kanji ();
 
 
-
-my @bad_kanji = bad_kanji ();
 
 Returns a list of kanji with negative meanings. See also
 L<https://www.lemoda.net/japanese/offensive-kanji/index.html>.
@@ -1399,7 +1426,6 @@ assistance in correcting this is very welcome.
 Convert kana to the Cyrillic (Russian) alphabet.
 
     use Lingua::JA::Moji 'kana2cyrillic';
-
     $cyril = kana2cyrillic ('シンブン');
     # $cyril = 'симбун'
 
@@ -1414,7 +1440,6 @@ Convert kana to the Cyrillic (Russian) alphabet.
 Convert the Cyrillic (Russian) alphabet to katakana.
 
     use Lingua::JA::Moji 'cyrillic2katakana';
-
     $kana = cyrillic2katakana ('симбун');
     # $kana = 'シンブン'
 
@@ -1437,7 +1462,6 @@ Convert the Cyrillic (Russian) alphabet to katakana.
 
 
     use Lingua::JA::Moji 'kana2hangul';
-
     $hangul = kana2hangul ('すごわざ');
     # $hangul = '스고와자'
 
@@ -1494,8 +1518,9 @@ kanji via the kakasi kanji to romaji convertor, and other functions.
 
 =item L<Lingua::JA::Romaji::Valid>
 
-Validate romanized Japanese. This module does the same thing as
-L</is_romaji> in Lingua::JA::Moji.
+Validate romanized Japanese. This module does something similar to
+L</is_romaji>, L</is_romaji_strict>, and L</is_romaji_semistrict> in
+Lingua::JA::Moji, but it has some extra options as well.
 
 =item L<Lingua::JA::Hepburn::Passport>
 
@@ -1507,7 +1532,8 @@ the C<< passport => 1 >> option, for example
 
 =item L<Lingua::JA::Fold>
 
-Full/half width conversion, collation of Japanese text.
+Full/half width conversion, collation of Japanese text, including
+handling of line breaks.
 
 =item L<Lingua::JA::Romaji>
 
@@ -1530,7 +1556,53 @@ This is similar to the present module for Korean.
 
 =item L<Lingua::JA::Onbiki>
 
+Convert a Japanese tilde character into the appropriate vowel. To
+achieve this with Lingua::JA::Moji, see the following example:
+
+    
+    use utf8;
+    use Lingua::JA::Moji ':all';
+    for (qw/あったか〜い つめた〜い ん〜 アッタカ〜イ/) {
+        my $word = $_;
+        while ($word =~ /(\p{InKana})〜/ && $1 ne 'ん') {
+            my $kana = $1;
+            my $romaji = kana2romaji ($kana);
+            $romaji =~ s/[^aiueo]//g;
+            my $vowel = romaji2kana ($romaji);
+            if ($kana =~ /\p{InHiragana}/) {
+                $vowel = kata2hira ($vowel);
+            }
+            $word =~ s/$kana〜/$kana$vowel/g;
+        }
+        print "$_ -> $word\n";
+    }
+    
+    
+    
+    
+
+
+produces output
+
+    あったか〜い -> あったかあい
+    つめた〜い -> つめたあい
+    ん〜 -> ん〜
+    アッタカ〜イ -> アッタカアイ
+
+
+(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.55/examples/onbiki.pl> in the distribution.)
+
+
 =item L<Lingua::JA::Jtruncate>
+
+Handle character boundaries over bytes in the old Japanese encodings
+EUC, JIS, and Shift-JIS, for people who don't like converting to
+Unicode.
+
+Until about 2008, I used to use CP932 (Microsoft variant of Shift-JIS)
+in Perl programs, until I had the bad experience of tracking down a
+very strange bug caused by the "kanji space", U+3000, containing an @
+mark when written in CP932, and being interpreted by Perl as an array.
 
 =back
 
@@ -1563,7 +1635,8 @@ WEB+DB PRESS plus, April 2011.
 This section explains some of the Japanese-language-specific
 terminology used elsewhere in the documentation. The headers in this
 section are in lower case for the benefit of internal documentation
-links.
+links. The explanatory links here go to the "sci.lang.japan Frequently
+Asked Questions", a Usenet FAQ about Japanese language.
 
 =over
 
@@ -1578,7 +1651,15 @@ katakana to indicate a lengthened vowel. See L<What is the long line symbol used
 
 Dakuten, 濁点, literally "voicing mark", and handakuten, 半濁点,
 literally "half voicing mark", are diacritic marks which appear on
-some kana to convert them to a voiced consonant.
+some kana to convert them to a voiced consonant. In modern Japanese
+encodings, these are usually displayed as part of the kana, but in
+L</halfwidth katakana> they are displayed separately from the kana to
+reduce the number of characters which need to be encoded. 
+
+This module offers L</split_sound_marks> and L</join_sound_marks> to
+associate or dissociate the marks from kana, which may be used, for
+example, for the case of Morse code, Braille, or halfwidth kana
+conversion.
 
 =item halfwidth katakana
 
@@ -1586,6 +1667,12 @@ Halfwidth katakana, I<hankaku katakana> (半角かたかな) is a legacy
 encoding of katakana based on an eight-bit encoding. See
 L<What is half-width katakana?|http://www.sljfaq.org/afaq/half-width-katakana.html>
 for full details.
+
+=item sokuon
+
+Sokuon, 促音, is the use of a small kana tsu to indicate a doubled
+consonant. This smaller letter was not used in some kinds of older
+encoding such as Morse codes.
 
 =item syllabic n
 
@@ -1600,6 +1687,11 @@ characters created to be the same size as one kanji or kana
 character. The name for normal ASCII characters in Japanese is
 I<hankaku eisūji> (半角英数字), literally "half width English letters
 and numerals". See L<What is "wide ASCII"?|http://www.sljfaq.org/afaq/wide-ascii.html> for full details.
+
+=item youon
+
+Youon (拗音) means the use of kana ending in "i" with a small ya, yu,
+or yo kana. These are called "glides" by linguists.
 
 =back
 

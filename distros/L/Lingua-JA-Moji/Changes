@@ -1,5 +1,9 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.55 2018-10-24
+
+* Only documentation has changed, all functionality is as 0.54
+
 0.54 2018-10-22
 
 * The function "kana_order" has been removed.

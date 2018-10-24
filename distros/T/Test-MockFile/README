@@ -1,0 +1,258 @@
+NAME
+    Test::MockFile - Lets tests validate code which interacts with files
+    without the file system ever being touched.
+
+VERSION
+    Version 0.002
+
+SYNOPSIS
+    Intercepts file system calls for specific files so unit testing can take
+    place without any files being altered on disk.
+
+    This is useful for small tests
+    <https://en.wikipedia.org/wiki/Google_Test#Small_Tests_(Unit_Tests)>
+    where file interaction is discouraged.
+
+    A strict mode is even provided which can throw a die when files are
+    accessed during your tests!
+
+        # Loaded before Test::MockModule so uses the core perl functions without any hooks.
+        use Module::I::Dont::Want::To::Alter;
+
+        use Test::MockFile;
+
+        my $mock_file = Test::MockFile->file("/foo/bar", "contents\ngo\nhere");
+        open(my $fh, "<", "/foo/bar") or die; # Does not actually open the file on disk.
+        say "ok" if -e $fh;
+        close $fh;
+        say "ok" if (-f "/foo/bar");
+        say "/foo/bar is THIS BIG: " . -s "/foo/bar"
+
+        my $missing_mocked_file = Test::MockFile->file("/foo/baz"); # File starts out missing.
+        my $opened = open(my $baz_fh, "<", "/foo/baz"); # File reports as missing so fails.
+        say "ok" if !-e "/foo/baz";
+    
+        open($baz_fh, ">", "/foo/baz") or die; # open for writing
+        print <$baz_fh> "replace contents\n";
+    
+        open($baz_fh, ">>", "/foo/baz") or die; # open for append.
+        print <$baz_fh> "second line";
+        close $baz_fh;
+    
+        say $baz->contents;
+    
+        # Unmock your file.
+        undef $missing_mocked_file;
+    
+        # The file check will now happen on file system now the file is no longer mocked.
+        say "ok" if !-e "/foo/baz";
+
+EXPORT
+    No exports are provided by this module.
+
+SUBROUTINES/METHODS
+  file
+    Args: ($file, $contents, $stats)
+
+    This will make cause $file to be mocked in all file checks, opens, etc.
+
+    undef contents means that the file should act like it's not there.
+
+    See "Mock Stats" for what goes in this hash ref.
+
+  symlink
+    Args: ($file, $readlink )
+
+    This will make cause $file to be mocked in all file checks, opens, etc.
+
+    $readlink indicates what "fake" file it points to. If the file $readlink
+    points to is not mocked, it will act like a broken link, regardless of
+    what's on disk.
+
+    Stats are not able to be specified on instantiation but can in theory be
+    altered after the object is created. People don't normally mess with the
+    permissions on a symlink.
+
+  dir
+    Args: ($dir, \@contents, $stats)
+
+    This will cause $dir to be mocked in all file checks, and opendir
+    interactions.
+
+    @contents should be provided in the sort order you expect to see the
+    files from readdir. NOTE: Because "." and ".." will always be the first
+    things readdir returns, These files are automatically inserted at the
+    front of the array.
+
+    See "Mock Stats" for what goes in this hash ref.
+
+  Mock Stats
+    When creating mocked files or directories, we default their stats to:
+
+        Test::MockModule->new( $file, $contents, {
+                'dev'       => 0,        # stat[0]
+                'inode'     => 0,        # stat[1]
+                'mode'      => $mode,    # stat[2]
+                'nlink'     => 0,        # stat[3]
+                'uid'       => 0,        # stat[4]
+                'gid'       => 0,        # stat[5]
+                'rdev'      => 0,        # stat[6]
+                'atime'     => $now,     # stat[8]
+                'mtime'     => $now,     # stat[9]
+                'ctime'     => $now,     # stat[10]
+                'blksize'   => 4096,     # stat[11]
+                'fileno'    => undef,    # fileno()
+        };
+
+    You'll notice that mode, size, and blocks have been left out of this.
+    Mode is set to 666 (for files) or 777 (for directores), xored against
+    the current umask. Size and blocks are calculated based on the size of
+    'contents' a.k.a. the fake file.
+
+    When you want to override one of the defaults, all you need to do is
+    specify that when you declare the file or directory. The rest will
+    continue to default.
+
+        Test::MockModule->file("/root/abc", "...", {inode => 65, uid => 123, mtime => int((2000-1970) * 365.25 * 24 * 60 * 60 }));
+
+        Test::MockModule->dir("/sbin", "...", { mode => 0700 }));
+
+  new
+    This class method is called by file/symlink/dir. There is no good reason
+    to call this directly.
+
+  contents
+    Optional Arg: $contents
+
+    Reports or updates the current contents of the file.
+
+    To update, pass an array ref of strings for a dir or a string for a
+    file. Symlinks have no contents.
+
+  stat
+    Returns the stat of a mocked file (does not follow symlinks.)
+
+  readlink
+    Optional Arg: $readlink
+
+    Returns the stat of a mocked file (does not follow symlinks.) You can
+    also use this to change what your symlink is poointing to.
+
+  is_link
+    returns true/false, depending on whether this object is a symlink.
+
+  is_dir
+    returns true/false, depending on whether this object is a directory.
+
+  is_file
+    returns true/false, depending on whether this object is regular file.
+
+  size
+    returns the size of the file based on its contents.
+
+  blocks
+    Calculates the block count of the file based on its size.
+
+  chmod
+    Optional Arg: $perms
+
+    Allows you to alter the permissions of a file. This only allows you to
+    change the 07777 bits of the file permissions. The number passed should
+    be the octal 0755 form, not the alphabetic "755" form
+
+  mtime
+    Optional Arg: $new_epoch_time
+
+    Returns and optionally sets the mtime of the file if passed as an
+    integer.
+
+  ctime
+    Optional Arg: $new_epoch_time
+
+    Returns and optionally sets the ctime of the file if passed as an
+    integer.
+
+  atime
+    Optional Arg: $new_epoch_time
+
+    Returns and optionally sets the atime of the file if passed as an
+    integer.
+
+  How this mocking is done:
+    Test::MockModule uses 2 methods to mock file access:
+
+   -X via Overload::FileCheck
+    It is currently not possible in pure perl to override stat
+    <http://perldoc.perl.org/functions/stat.html>, lstat
+    <http://perldoc.perl.org/functions/lstat.html> and -X operators
+    <http://perldoc.perl.org/functions/-X.html>. In conjunction with this
+    module, we've developed Overload::FileCheck.
+
+    This enables us to intercept calls to stat, lstat and -X operators (like
+    -e, -f, -d, -s, etc.) and passe them to our control.If the file is
+    currently being mocked, we return the stat (or lstat) information on the
+    file to be used to determine the answer to whatever check was made. This
+    even works for things like "-e _". If we do not control the file in
+    question, we return "FALLBACK_TO_REAL_OP()" which then makes a normal
+    check.
+
+   CORE::GLOBAL:: overrides
+    Since 5.20, it has been possible to override function calls by defining
+    them. like:
+
+        *CORE::GLOBAL::open = sub : prototype(*;$@) {...}
+
+    Any code which is loaded AFTER this happens will use the alternate open.
+    This means you can place your "use Test::MockFile" statement after
+    statements you don't want mocked and there is no risk that that code
+    will ever be altered by Test::MockModule.
+
+    We oveload the following statements and then return tied handles to
+    enable the rest of the IO functions to work properly:
+
+    open
+    sysopen
+    opendir
+    readdir
+    telldir
+    seekdir
+    rewinddir
+    closedir
+
+AUTHOR
+    Todd Rinaldo, "<toddr at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    <https://github.com/CpanelInc/Test-MockFile>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::MockFile
+
+    You can also look for information at:
+
+    *   CPAN Ratings
+
+        <https://cpanratings.perl.org/d/Test-MockFile>
+
+    *   Search CPAN
+
+        <https://metacpan.org/release/Test-MockFile>
+
+ACKNOWLEDGEMENTS
+    Thanks to Nicolas R., "<atoomic at cpan.org>" for help with
+    Overload::FileCheck. This module could not have been completed without
+    it.
+
+LICENSE AND COPYRIGHT
+    Copyright 2018 cPanel L.L.C.
+
+    All rights reserved.
+
+    <http://cpanel.net>
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself. See perlartistic.
+

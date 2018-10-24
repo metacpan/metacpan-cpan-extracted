@@ -1,5 +1,8 @@
 Revision history for Data::Password::Filter
 
+0.18  2018-10-24T05:55:00+01:00
+      - Used namespace::autoclean now.
+
 0.17  2017-06-09T11:25:00+01:00
       - Tidied up attribute definitions.
 

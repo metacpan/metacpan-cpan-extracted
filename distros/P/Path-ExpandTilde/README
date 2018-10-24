@@ -1,0 +1,54 @@
+NAME
+
+    Path::ExpandTilde - Expand tilde (~) to homedir in file paths
+
+SYNOPSIS
+
+      use Path::ExpandTilde;
+      my $homedir = expand_tilde('~');
+      my $bashrc = expand_tilde('~/.bashrc');
+      my $pg_home = expand_tilde('~postgres');
+
+DESCRIPTION
+
+    This module uses bsd_glob from File::Glob to portably expand a leading
+    tilde (~) in a file path into the current or specified user's home
+    directory. No other glob metacharacters are expanded.
+
+FUNCTIONS
+
+ expand_tilde
+
+      my $new_path = expand_tilde($path);
+
+    Exported by default. If the path starts with ~, expands that to the
+    current user's home directory. If the path starts with ~username,
+    expands that to the specified user's home directory. If the user
+    doesn't exist, no expansion is done. The returned path is canonicalized
+    as by "canonpath" in File::Spec either way.
+
+NOTES
+
+    The algorithm should be portable to most operating systems supported by
+    Perl, though the home directory may not be found by bsd_glob on some.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    File::Path::Expand, File::HomeDir, File::HomeDir::Tiny
+

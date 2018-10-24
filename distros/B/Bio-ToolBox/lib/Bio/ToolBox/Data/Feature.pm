@@ -1,5 +1,5 @@
 package Bio::ToolBox::Data::Feature;
-our $VERSION = '1.62';
+our $VERSION = '1.63';
 
 =head1 NAME
 
@@ -126,11 +126,11 @@ The name of the feature.
 
 =item coordinate
 
-Returns a coordinate string formatted as "seqid:start-stop".
+Returns a coordinate string formatted as C<seqid:start-stop>.
 
 =item type
 
-The type of feature. Typically either primary_tag or primary_tag:source_tag. 
+The type of feature. Typically either C<primary_tag> or C<primary_tag:source_tag>. 
 In a GFF3 file, this represents columns 3 and 2, respectively. In annotation 
 databases such as L<Bio::DB::SeqFeature::Store>, the type is used to restrict 
 to one of many different types of features, e.g. gene, mRNA, or exon.
@@ -139,7 +139,7 @@ to one of many different types of features, e.g. gene, mRNA, or exon.
 
 =item primary_id
 
-Here, this represents the primary_ID in the database. Note that this number 
+Here, this represents the C<primary_ID> in the database. Note that this number 
 is generally unique to a specific database, and not portable between databases.
 
 =item length
@@ -178,19 +178,19 @@ in the current data row.
 
 =head2 Special feature attributes
 
-GFF and VCF files have special attributes in the form of key = value pairs. 
+GFF and VCF files have special attributes in the form of key =E<gt> value pairs. 
 These are stored as specially formatted, character-delimited lists in 
 certain columns. These methods will parse this information and return as 
 a convenient hash reference. The keys and values of this hash may be 
 changed, deleted, or added to as desired. To write the changes back to 
-the file, use the rewrite_attributes() to properly write the attributes 
+the file, use the L</rewrite_attributes> to properly write the attributes 
 back to the file with the proper formatting.
 
 =over 4
 
 =item attributes
 
-Generic method that calls either gff_attributes() or vcf_attributes() 
+Generic method that calls either L</gff_attributes> or L</vcf_attributes> 
 depending on the data table format. 
 
 =item gff_attributes
@@ -252,18 +252,18 @@ module.
 
 Returns a SeqFeature object representing the feature or item in 
 the current row. If the SeqFeature object is stored in the parent 
-$Data object, it is retrieved from there. Otherwise, the SeqFeature 
+C<$Data> object, it is retrieved from there. Otherwise, the SeqFeature 
 object is retrieved from the database using the name and 
 type values in the current Data table row. The SeqFeature object 
 is requested from the database named in the general metadata. If 
 an alternate database is desired, you should change it first using  
-the $Data-E<gt>database() method. If the feature name or type is not 
+the C<$Data>-E<gt>database() method. If the feature name or type is not 
 present in the table, then nothing is returned.
 
 See L<Bio::ToolBox::SeqFeature> and L<Bio::SeqFeatureI> for more 
 information about working with these objects.
 
-This method normally only works with "named" feature_types in a 
+This method normally only works with "named" feature types in a 
 L<Bio::ToolBox::Data> Data table. If your Data table has coordinate 
 information, i.e. chromosome, start, and stop columns, then it will 
 likely be recognized as a "coordinate" feature_type and not work.
@@ -281,7 +281,7 @@ present instead of coordinates, then the feature is first automatically
 retrieved and a Segment returned based on its coordinates. The 
 database named in the general metadata is used to establish the 
 Segment object. If a different database is desired, it should be 
-changed first using the general database() method. 
+changed first using the general L</database> method. 
 
 See L<Bio::DB::SeqFeature::Segment> and L<Bio::RangeI> for more information 
 about working with Segment objects.
@@ -413,7 +413,7 @@ database.
 =item dataset 
 
 Specify the name of the dataset. If a database was specified, then this 
-value would be the I<primary_tag> or I<type:source> feature found in the 
+value would be the C<primary_tag> or C<type:source> feature found in the 
 database. Otherwise, the name of a data file, such as a bam, bigWig, 
 bigBed, or USeq file, would be provided here. This options is required!
 
@@ -559,14 +559,14 @@ database.
 =item dataset 
 
 Specify the name of the dataset. If a database was specified, then this 
-value would be the I<primary_tag> or I<type:source> feature found in the 
+value would be the C<primary_tag> or C<type:source> feature found in the 
 database. Otherwise, the name of a data file, such as a bam, bigWig, 
 bigBed, or USeq file, would be provided here. This options is required!
 
 =item position
 
 Indicate the position of the reference point relative to the Data table 
-Feature. 5 is the 5C<'> coordinate, 3 is the 3C<'> coordinate, and 4 is the 
+Feature. 5 is the 5' coordinate, 3 is the 3' coordinate, and 4 is the 
 midpoint (get it? it's between 5 and 3). Default is 5.
 
 =item extend
@@ -586,7 +586,7 @@ chromosomal coordinates.
 
 =item avoid
 
-Provide a I<primary_tag:source> database feature type to avoid overlapping 
+Provide a C<primary_tag> or C<type:source> database feature type to avoid overlapping 
 scores. Each found score is checked for overlapping features and is 
 discarded if found to do so. The database should be set to use this.
 
@@ -665,7 +665,7 @@ database.
 =item dataset 
 
 Specify the name of the dataset. If a database was specified, then this 
-value would be the I<primary_tag> or I<type:source> feature found in the 
+value would be the C<primary_tag> or C<type:source> feature found in the 
 database. Otherwise, the name of a data file, such as a bam, bigWig, 
 bigBed, or USeq file, would be provided here. This options is required!
 
@@ -737,7 +737,7 @@ chromosomal coordinates.
 
 =item avoid
 
-Provide a I<primary_tag:source> database feature type to avoid overlapping 
+Provide a C<primary_tag> or C<type:source> database feature type to avoid overlapping 
 scores. Each found score is checked for overlapping features and is 
 discarded if found to do so. The database should be set to use this.
 
@@ -918,6 +918,7 @@ use Bio::ToolBox::db_helper qw(
 	calculate_score
 	get_genomic_sequence
 );
+use Bio::ToolBox::db_helper::constants;
 
 my $GENETOOL_LOADED = 0;
 1;
@@ -1443,7 +1444,7 @@ sub _get_subfeature_sequence {
 
 sub get_score {
 	my $self = shift;
-	my %args = @_;
+	my %args = @_; # passed arguments to this method
 	
 	# verify the dataset for the user, cannot trust whether it has been done or not
 	my $db = $args{ddb} || $args{db} || $self->{data}->open_meta_database || undef;
@@ -1452,10 +1453,6 @@ sub get_score {
 		croak "provided dataset was unrecognized format or otherwise could not be verified!";
 	}
 	
-	# score attributes
-	$args{'method'}     ||= 'mean';
-	$args{strandedness} ||= $args{stranded} || 'all';
-	
 	# get positioned scores over subfeatures only
 	$args{subfeature} ||= $args{exon} || q();
 	if ($self->feature_type eq 'named' and $args{subfeature}) {
@@ -1463,20 +1460,27 @@ sub get_score {
 		return $self->_get_subfeature_scores($db, \%args);
 	}
 	
+	# build parameter array to pass on to the adapter
+	my @params;
+	
 	# verify coordinates based on type of feature
 	if ($self->feature_type eq 'coordinate') {
 		# coordinates are already in the table, use those
-		$args{chromo} ||= $args{seq_id} || $self->seq_id;
-		$args{start}  ||= $self->start;
-		$args{stop}   ||= $args{end} || $self->end;
+		$params[CHR]  = $args{seq_id} || $self->seq_id;
+		$params[STRT] = $args{start} || $self->start;
+		$params[STOP] = $args{stop} || $args{end} || $self->end;
+		$params[STR]  = (exists $args{strand} and defined $args{strand}) ? $args{strand} : 
+			$self->strand;
 	}
 	elsif ($self->feature_type eq 'named') {
 		# must retrieve feature from the database first
 		my $f = $self->seqfeature;
 		return unless $f;
-		$args{chromo} ||= $args{seq_id} || $f->seq_id;
-		$args{start}  ||= $f->start;
-		$args{stop}   ||= $args{end} || $f->end;
+		$params[CHR]  = $args{seq_id} || $f->seq_id;
+		$params[STRT] = $args{start} || $f->start;
+		$params[STOP] = $args{stop} || $args{end} || $f->end;
+		$params[STR]  = (exists $args{strand} and defined $args{strand}) ? $args{strand} : 
+			$f->strand;
 	}
 	else {
 		croak "data table does not have identifiable coordinate or feature identification columns for score collection";
@@ -1484,37 +1488,33 @@ sub get_score {
 	
 	# adjust coordinates as necessary
 	if (exists $args{extend} and $args{extend}) {
-		$args{start} -= $args{extend};
-		$args{stop}  += $args{extend};
+		$params[STRT] -= $args{extend};
+		$params[STOP] += $args{extend};
 	}
 	
 	# check coordinates
-	$args{start} = 1 if $args{start} <= 0;
-	if ($args{stop} < $args{start}) {
+	$params[STRT] = 1 if $params[STRT] <= 0;
+	if ($params[STOP] < $params[STRT]) {
 		# coordinates are flipped, reverse strand
-		return if ($args{stop} <= 0);
-		my $stop = $args{start};
-		$args{start} = $args{stop};
-		$args{stop}  = $stop;
-		$args{strand} = -1;
+		return if ($params[STOP] <= 0);
+		my $stop = $params[STRT];
+		$params[STRT] = $params[STOP];
+		$params[STOP] = $stop;
+		$params[STR]  = -1;
 	}
-	unless (exists $args{strand} and defined $args{strand}) {
-		$args{strand} = $self->strand; 
-	}
-	return unless ($args{chromo} and defined $args{start});
+	return unless ($params[CHR] and defined $params[STRT]);
+	
+	# score attributes
+	$params[METH] = $args{'method'} || 'mean';
+	$params[STND] = $args{strandedness} || $args{stranded} || 'all';
+	
+	# other parameters
+	$params[DB] = $db;
+	$params[RETT] = 0; # return type should be a calculated value
+	$params[DATA] = $args{dataset};
 	
 	# get the score
-	return get_segment_score(
-		$args{chromo},
-		$args{start},
-		$args{stop},
-		$args{strand},
-		$args{strandedness},
-		$args{'method'},
-		0, # return type should be a calculated value
-		$db,
-		$args{dataset},
-	);
+	return get_segment_score(@params);
 }
 
 sub _get_subfeature_scores {
@@ -1560,22 +1560,23 @@ sub _get_subfeature_scores {
 	# collect over each subfeature
 	my @scores;
 	foreach my $exon (@subfeatures) {
-		my $exon_scores = get_segment_score(
-			$exon->seq_id,
-			$exon->start,
-			$exon->end,
-			defined $args->{strand} ? $args->{strand} : $exon->strand, 
-			$args->{strandedness}, 
-			$args->{method},
-			1, # return type should be an array reference of scores
-			$db,
-			$args->{dataset}, 
-		);
+		my @params; # parameters to pass on to adapter
+		$params[CHR]  = $exon->seq_id;
+		$params[STRT] = $exon->start;
+		$params[STOP] = $exon->end;
+		$params[STR]  = defined $args->{strand} ? $args->{strand} : $exon->strand;
+		$params[STND] = $args->{strandedness} || $args->{stranded} || 'all';
+		$params[METH] = $args->{method} || 'mean';
+		$params[RETT] = 1; # return type should be an array reference of scores
+		$params[DB]   = $db;
+		$params[DATA] = $args->{dataset};
+		
+		my $exon_scores = get_segment_score(@params);
 		push @scores, @$exon_scores if defined $exon_scores;
 	}
 	
 	# combine all the scores based on the requested method
-	return calculate_score($args->{'method'}, \@scores);
+	return calculate_score($args->{method}, \@scores);
 }
 
 sub get_relative_point_position_scores {
@@ -1600,30 +1601,28 @@ sub get_relative_point_position_scores {
 	}
 	$args{avoid} = undef unless ($args{db} or $self->{data}->open_meta_database);
 	
-	# Assign coordinates
+	# determine reference coordinate
 	$self->_calculate_reference(\%args) unless defined $args{coordinate};
-	my $fchromo = $self->seq_id;
-	my $fstart = $args{coordinate} - $args{extend};
-	my $fstop  = $args{coordinate} + $args{extend};
-	my $fstrand = defined $args{strand} ? $args{strand} : $self->strand;
+	
+	# build parameter array to pass on to the adapter
+	my @params;
+	$params[CHR]  = $self->seq_id;
+	$params[STRT] = $args{coordinate} - $args{extend};
+	$params[STRT] = 1 if $params[STRT] < 1; # sanity check
+	$params[STOP] = $args{coordinate} + $args{extend};
+	$params[STR]  = defined $args{strand} ? $args{strand} : $self->strand;
+	$params[STND] = $args{strandedness};
+	$params[METH] = $args{'method'};
+	$params[RETT] = 2; # return type should be a hash reference of positioned scores
+	$params[DB]   = $ddb;
+	$params[DATA] = $args{dataset};
 	
 	# Data collection
-	$fstart = 1 if $fstart < 1; # sanity check
-	my $pos2data = get_segment_score(
-		$fchromo,
-		$fstart,
-		$fstop,
-		$fstrand, 
-		$args{strandedness}, 
-		$args{'method'},
-		2, # return type should be a hash reference of positioned scores
-		$ddb,
-		$args{dataset}, 
-	);
+	my $pos2data = get_segment_score(@params);
 	
 	# Avoid positions
 	if ($args{avoid}) {
-		$self->_avoid_positions($pos2data, \%args, $fchromo, $fstart, $fstop);
+		$self->_avoid_positions($pos2data, \%args, $params[CHR], $params[STRT], $params[STOP]);
 	}
 	
 	# covert to relative positions
@@ -1634,7 +1633,7 @@ sub get_relative_point_position_scores {
 	else {
 		# return the collected dataset hash
 		return $self->_convert_to_relative_positions($pos2data, 
-			$args{coordinate}, $fstrand);
+			$args{coordinate}, $params[STR]);
 	}
 }
 
@@ -1649,7 +1648,7 @@ sub get_region_position_scores {
 		croak "provided dataset was unrecognized format or otherwise could not be verified!\n";
 	}
 	
-	# assign some defaults
+	# assign some defaults here, in case we get passed on to subfeature method
 	$args{strandedness} ||= $args{stranded} || 'all';
 	$args{extend}       ||= 0;
 	$args{exon}         ||= 0;
@@ -1665,33 +1664,30 @@ sub get_region_position_scores {
 	}
 	
 	# Assign coordinates
+	# build parameter array to pass on to the adapter
+	my @params;
 	my $feature = $self->seqfeature || $self;
-	my $fchromo = $args{chromo} || $args{seq_id} || $feature->seq_id;
-	my $fstart  = $args{start} || $feature->start;
-	my $fstop   = $args{stop} || $args{end} || $feature->end;
-	my $fstrand = defined $args{strand} ? $args{strand} : $feature->strand;
+	$params[CHR]  = $args{chromo} || $args{seq_id} || $feature->seq_id;
+	$params[STRT] = $args{start} || $feature->start;
+	$params[STOP] = $args{stop} || $args{end} || $feature->end;
+	$params[STR]  = defined $args{strand} ? $args{strand} : $feature->strand;
 	if ($args{extend}) {
-		$fstart -= $args{extend};
-		$fstop  += $args{extend};
+		$params[STRT] -= $args{extend};
+		$params[STOP] += $args{extend};
+		$params[STRT] = 1 if $params[STRT] < 1; # sanity check
 	}
+	$params[STND] = $args{strandedness};
+	$params[METH] = $args{method};
+	$params[RETT] = 2; # return type should be a hash reference of positioned scores
+	$params[DB]   = $ddb;
+	$params[DATA] = $args{dataset};
 	
 	# Data collection
-	$fstart = 1 if $fstart < 1; # sanity check
-	my $pos2data = get_segment_score(
-		$fchromo,
-		$fstart,
-		$fstop,
-		$fstrand, 
-		$args{strandedness}, 
-		$args{'method'},
-		2, # return type should be a hash reference of positioned scores
-		$ddb,
-		$args{dataset}, 
-	);
+	my $pos2data = get_segment_score(@params);
 	
 	# Avoid positions
 	if ($args{avoid}) {
-		$self->_avoid_positions($pos2data, \%args, $fchromo, $fstart, $fstop);
+		$self->_avoid_positions($pos2data, \%args, $params[CHR], $params[STRT], $params[STOP]);
 	}
 	
 	# covert to relative positions
@@ -1703,7 +1699,7 @@ sub get_region_position_scores {
 		# return data converted to relative positions
 		$self->_calculate_reference(\%args) unless defined $args{coordinate};
 		return $self->_convert_to_relative_positions($pos2data, 
-			$args{coordinate}, $fstrand);
+			$args{coordinate}, $params[STR]);
 	}
 }
 
@@ -1727,7 +1723,7 @@ sub _get_subfeature_position_scores {
 		carp "no SeqFeature available! Cannot collect exon data!";
 		return;
 	}
-	my $fstrand = defined $args->{strand} ? $args->{strand} : $self->strand;
+	my $fstrand = defined $args->{strand} ? $args->{strand} : $feature->strand;
 	
 	# get the subfeatures
 	my @subfeatures;
@@ -1769,27 +1765,24 @@ sub _get_subfeature_position_scores {
 	my $adjustment = 0;
 	foreach my $exon (@subfeatures) {
 		
-		# exon positions
-		my $start = $exon->start;
-		my $end = $exon->end;
+		my @params; # parameters to pass on to adapter
+		$params[CHR]  = $exon->seq_id;
+		$params[STRT] = $exon->start;
+		$params[STOP] = $exon->end;
+		$params[STR]  = $fstrand;
+		$params[STND] = $args->{strandedness};
+		$params[METH] = $args->{method};
+		$params[RETT] = 2; # return type should be a hash reference of positioned scores
+		$params[DB]   = $ddb;
+		$params[DATA] = $args->{dataset};
 		
 		# collect scores
-		my $exon_scores = get_segment_score(
-			$exon->seq_id,
-			$start,
-			$end,
-			$fstrand, 
-			$args->{strandedness}, 
-			$args->{method},
-			2, # return type should be a hash reference of positioned scores
-			$ddb,
-			$args->{dataset}, 
-		);
+		my $exon_scores = get_segment_score(@params);
 		
 		# adjust the scores
-		$adjustment = $start - $current_end;
-		$self->_process_exon_scores($exon_scores, $pos2data, $adjustment, $start, $end, 
-			$namecheck, $args->{method});
+		$adjustment = $params[STRT] - $current_end;
+		$self->_process_exon_scores($exon_scores, $pos2data, $adjustment, $params[STRT], 
+			$params[STOP], $namecheck, $args->{method});
 		
 		# reset
 		$current_end += $exon->length;
@@ -1798,43 +1791,33 @@ sub _get_subfeature_position_scores {
 	# collect extensions if requested
 	if ($args->{extend}) {
 		# left side
-		my $start = $practical_start - $args->{extend};
-		my $end = $practical_start - 1;
-		my $ext_scores = get_segment_score(
-			$feature->seq_id,
-			$start,
-			$end,
-			$fstrand, 
-			$args->{strandedness}, 
-			$args->{method},
-			2, # return type should be a hash reference of positioned scores
-			$ddb,
-			$args->{dataset}, 
-		);
+		my @params; # parameters to pass on to adapter
+		$params[CHR]  = $feature->seq_id;
+		$params[STRT] = $practical_start - $args->{extend};
+		$params[STOP] = $practical_start - 1;
+		$params[STR]  = $fstrand;
+		$params[STND] = $args->{strandedness};
+		$params[METH] = $args->{method};
+		$params[RETT] = 2; # return type should be a hash reference of positioned scores
+		$params[DB]   = $ddb;
+		$params[DATA] = $args->{dataset};
+		
+		my $ext_scores = get_segment_score(@params);
 
 		# no adjustment should be needed
-		$self->_process_exon_scores($ext_scores, $pos2data, 0, $start, $end, 
-			$namecheck, $args->{method});
+		$self->_process_exon_scores($ext_scores, $pos2data, 0, $params[STRT], 
+			$params[STOP], $namecheck, $args->{method});
 		
 		
 		# right side
-		$start = $practical_stop + 1;
-		$end = $practical_stop + $args->{extend};
-		$ext_scores = get_segment_score(
-			$feature->seq_id,
-			$start,
-			$end,
-			$fstrand, 
-			$args->{strandedness}, 
-			$args->{method},
-			2, # return type should be a hash reference of positioned scores
-			$ddb,
-			$args->{dataset}, 
-		);
+		# we can reuse our parameter array
+		$params[STRT] = $practical_stop + 1;
+		$params[STOP] = $practical_stop + $args->{extend};
+		$ext_scores = get_segment_score(@params);
 
 		# the adjustment should be the same as the last exon
-		$self->_process_exon_scores($ext_scores, $pos2data, $adjustment, $start, $end, 
-			$namecheck, $args->{method});
+		$self->_process_exon_scores($ext_scores, $pos2data, $adjustment, $params[STRT], 
+			$params[STOP], $namecheck, $args->{method});
 	}
 	
 	# covert to relative positions
@@ -2081,8 +2064,8 @@ sub gff_string {
 	}
 	
 	# done
-	my $string = join("\t", $chr, $source, $primary_tag, $start, $stop, $strand, 
-		$score, $phase, $attributes);
+	my $string = join("\t", $chr, $source, $primary_tag, $start, $stop, $score, 
+		$strand, $phase, $attributes);
 	return $string;
 }
 

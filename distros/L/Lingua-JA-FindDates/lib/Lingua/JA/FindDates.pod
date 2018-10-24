@@ -62,13 +62,13 @@ produces output
     昭和64年1月1日
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Lingua::JA::FindDates version 0.026
-corresponding to git commit L<ba6a0c6a9ec653333dbabf2076dd5f71a17b64b9|https://github.com/benkasminbullock/Lingua--JA--FindDates/commit/ba6a0c6a9ec653333dbabf2076dd5f71a17b64b9> released on Tue Mar 14 16:36:13 2017 +0900.
+This documents Lingua::JA::FindDates version 0.027
+corresponding to git commit L<b81c538e423e7b262dc1b07b5484db23b965777c|https://github.com/benkasminbullock/Lingua--JA--FindDates/commit/b81c538e423e7b262dc1b07b5484db23b965777c> released on Wed Oct 24 19:46:22 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -123,39 +123,28 @@ attempts to convert that into an English-language interval.
 The default dates are American-style, with the month first. Users can
 supply a different date-making function using the second argument:
 
-    my $translation = subsjdate ($text, {make_date => \mymakedate,
-                                 make_date_interval => \myinterval});
+    my $translation = subsjdate ($text, {make_date => \&mymakedate,
+                                 make_date_interval => \&myinterval});
 
 The second argument is a hash reference which may have the
 following members:
 
 =over
 
-=item replace
-
-    subsjdate ($text, {replace => \&my_replace, data => $my_data});
-    # Now "my_replace" is called as
-    # my_replace ($my_data, $before, $after);
-
-If a code reference is supplied as C<replace>, subsjdate calls it as a
-subroutine with user-defined data L</data>, and C<$before>, the
-matched date and C<$after> the string with which it is to be replaced.
-
-If C<replace> is not supplied, subsjdate substitutes the dates itself.
-
 =item data
 
-Any data you want to pass to L</replace>, above. If nothing is
-supplied, C<subsjdate> simply passes the undefined value.
+Any data you want to pass to your callback functions. This is passed
+as the first argument to your functions. If you do not supply a value,
+C<subsjdate> passes the undefined value as the first argument.
 
 =item make_date
 
     subsjdate ($text, {make_date => \& mymakedate});
 
-This is a replacement for the default L</default_make_date>
-function. The default function turns "平成10年11月12日" into "November
-12, 1998". To change this to dates in the form "Th 1998/11/10", use a
-routine like the following:
+A replacement for the default L</default_make_date> function. The
+default function is American-style and turns "平成10年11月12日" into
+"November 12, 1998". For example, to change this to dates in the form
+"Th 1998/11/10", use a routine like the following:
 
     
     use utf8;
@@ -176,29 +165,29 @@ produces output
     Sa 1959/1/17。Sa 1997/12/20。
 
 
-(This example is included as L<F<subsjdate-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/subsjdate-make-date.pl> in the distribution.)
+(This example is included as L<F<subsjdate-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/subsjdate-make-date.pl> in the distribution.)
 
 
-The first two arguments passed to the user-defined routine are
-C<$data>, user-defined data as described in L</data>, and
-C<$original>, the original Japanese-language date. The following
-argument is the date as a hash reference, with the fields C<year>
-(Western-style year), C<month> (1-12), C<date> (1-31), and C<wday>
-(1-7 for Monday to Sunday). Your routine must check whether the fields
-C<year>, C<month>, C<date>, and C<wday> are defined, since
-L</subsjdate> matches all kinds of dates including year only,
-month/day only, and year/month only dates.
+The first two arguments passed to your routine will be whatever you
+supplied in L</data>, and C<$original>, the original Japanese-language
+date as a string, and the third argument is the parsed date in the
+form of a hash reference, with the fields C<year> (Western-style
+year), C<month> (1-12), C<date> (1-31), and C<wday> (1-7 for Monday to
+Sunday). Your routine must check whether the fields C<year>, C<month>,
+C<date>, and C<wday> are defined, since L</subsjdate> matches all
+kinds of dates, including year only, month/day only, and year/month
+only dates.
 
 =item make_date_interval
 
-This is a replacement for the L</default_make_date_interval> function. 
+A replacement for the L</default_make_date_interval> function.
 
     subsjdate ($text, {make_date_interval => \&mymakedateinterval});
 
 Your routine is called in the same way as the default routine,
 L</default_make_date_interval>. Its arguments are C<$data> and
-C<$original> as for C<make_date>, and the two dates in the form of
-hash references with the same keys as for C<make_date>.
+C<$original>, as for L</make_date>, and the two dates in the form of
+hash references, with the same keys as for C<make_date>.
 
     
     use utf8;
@@ -229,8 +218,20 @@ produces output
     1959/1/17 until 12/20。
 
 
-(This example is included as L<F<subsjdate-make-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/subsjdate-make-interval.pl> in the distribution.)
+(This example is included as L<F<subsjdate-make-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/subsjdate-make-interval.pl> in the distribution.)
 
+
+=item replace
+
+This enables you to supply a function which is called back to notify
+you when text is replaced.
+
+    subsjdate ($text, {replace => \&my_replace, data => $my_data});
+    # Now "my_replace" is called as
+    # my_replace ($my_data, $before, $after);
+
+The arguments to your function are whatever you gave in L</data>, the
+"before" date text, and the "after" date text.
 
 =back
 
@@ -245,8 +246,7 @@ kanjis. The return value is the numerical value of the kanji number,
 like 31, or zero if it can't read the number.
 
 kanji2number only goes up to thousands, because usually dates only go
-that far. For a more comprehensive Japanese number convertor, see
-L<Lingua::JA::Numbers>.
+that far. Other modules on CPAN may be able to convert larger numbers.
 
 =head2 seireki_to_nengo
 
@@ -260,7 +260,7 @@ produces output
 
     昭和64年1月1日
 
-(This example is included as L<F<seireki-to-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/seireki-to-nengo.pl> in the distribution.)
+(This example is included as L<F<seireki-to-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/seireki-to-nengo.pl> in the distribution.)
 
 
 This function substitutes Western-style dates with Japanese-style
@@ -279,7 +279,7 @@ produces output
 
     1989年1月1日
 
-(This example is included as L<F<nengo-to-seireki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/nengo-to-seireki.pl> in the distribution.)
+(This example is included as L<F<nengo-to-seireki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/nengo-to-seireki.pl> in the distribution.)
 
 
 This function substitutes Japanese-style "nengo" dates (年号) with
@@ -293,8 +293,7 @@ Western-style dates, leaving the rest of the text unchanged. The
 This is a simplistic number regularizer which utilizes
 L</kanji2number> to convert kanji digits or wide ascii numerals into
 Arabic numeral equivalents. Like L</kanji2number>, it can only cope
-with kanji numbers up to 9,999. Please see L</Lingua::JA::Numbers> for
-a fuller system.
+with kanji numbers up to 9,999.
 
 =head1 DEFAULT CALLBACKS
 
@@ -332,7 +331,7 @@ produces output
     Monday, March 19, 2012
 
 
-(This example is included as L<F<make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/make-date.pl> in the distribution.)
+(This example is included as L<F<make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/make-date.pl> in the distribution.)
 
 
 To replace the default routine C<default_make_date> with a different
@@ -354,7 +353,7 @@ produces output
 
     3/16
 
-(This example is included as L<F<my-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/my-date.pl> in the distribution.)
+(This example is included as L<F<my-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/my-date.pl> in the distribution.)
 
 
 Note that, depending on what dates are in your document, some of the
@@ -389,7 +388,7 @@ produces output
     Friday 19 February, 2010-Monday 19 March, 2012
 
 
-(This example is included as L<F<default-make-date-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/default-make-date-interval.pl> in the distribution.)
+(This example is included as L<F<default-make-date-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/default-make-date-interval.pl> in the distribution.)
 
 
 This function is called when an interval of two dates, such as 平成３年
@@ -487,7 +486,12 @@ anyway, so don't worry too much about it.
 
 This module exports L</subsjdate>, L</kanji2number>,
 L</seireki_to_nengo>, L</nengo_to_seireki> and L</regjnums> on
-request. All the functions can be exported using the tag C<:all> as in
+request. The variable L</@jdatere> is also exportable on
+request. L</$verbose> is not exportable, since it controls the
+module's behaviour.
+
+All the exportable functions and variables can be exported using the
+tag C<:all> as in
 
     use Lingua::JA::FindDates ':all';
 
@@ -507,11 +511,6 @@ to deal with the full range of dates in actual documents.
 This parses Japanese dates. Unlike the present module it claims to
 also format them, so it can turn a L<DateTime> object into a Japanese
 date, and it also does times. 
-
-=item L<Lingua::JA::Numbers>
-
-Kanji / numeral convertors. It converts numbers including decimal
-points, and numbers into the billions and trillions.
 
 =item L<DateTime::Calendar::Japanese::Era>
 
@@ -618,7 +617,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2008-2017
+2008-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

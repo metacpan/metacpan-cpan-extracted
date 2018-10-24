@@ -1,3 +1,4 @@
+
 =encoding UTF-8
 
 =head1 名前
@@ -6,19 +7,57 @@ Lingua::JA::Moji - 総合日本文字変換「文字ュール」
 
 =head1 概要
 
-日本の文字の総合変換
+Convert romanised Japanese to and from kana:
 
-    use Lingua::JA::Moji qw/kana2romaji romaji2kana/;
+    
     use utf8;
+    use Lingua::JA::Moji qw/kana2romaji romaji2kana/;
     my $romaji = kana2romaji ('あいうえお');
-    # $romaji is now 'aiueo'.
+    print "$romaji\n";
     my $kana = romaji2kana ($romaji);
-    # $kana is now 'アイウエオ'.
+    print "$kana\n";
+    
+
+
+produces output
+
+    aiueo
+    アイウエオ
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.55/examples/synopsis.pl> in the distribution.)
+
+
+Convert between different forms of kana:
+
+    
+    use utf8;
+    use Lingua::JA::Moji ':all';
+    my $h = 'あいうえおがっぷぴょん';
+    print kata2hira ($h), "\n";
+    print hira2kata (kata2hira ($h)), "\n";
+    print kana2hw ($h), "\n";
+    print kata2hira (hw2katakana (kana2hw ($h))), "\n";
+    # Silly circled kana
+    print kana2circled ($h), "\n";
+
+
+produces output
+
+    あいうえおがっぷぴょん
+    アイウエオガップピョン
+    ｱｲｳｴｵｶﾞｯﾌﾟﾋﾟｮﾝ
+    あいうえおがっぷぴょん
+    ㋐㋑㋒㋓㋔㋕゛ッ㋫゜㋪゜ョン
+
+
+(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.55/examples/syn-kana.pl> in the distribution.)
+
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.54
-corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/79035f5895111c7bd0d2da461ebf78cee8c1d517> made on Mon Oct 22 20:28:13 2018 +0900.
+This document describes Lingua::JA::Moji version 0.55
+corresponding to git commit L<4b5650f0e39a1cfaa3e283ce7a6b0ea15ce875eb|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/4b5650f0e39a1cfaa3e283ce7a6b0ea15ce875eb> made on Wed Oct 24 11:47:18 2018 +0900.
 
 =head1 説明
 
@@ -43,7 +82,6 @@ corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://g
 仮名をローマ字に.
 
     use Lingua::JA::Moji 'kana2romaji';
-
     $romaji = kana2romaji ("うれしいこども");
     # $romaji = 'uresîkodomo'
 
@@ -82,11 +120,15 @@ corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://g
 =item hepburn
 
 ヘボン式（「つづり」が「tsuzuri」, 「少女」が「shōjo」）。
-これを選べば、下記のuse_mが真になり、ve_typeがmacronになります。
+これを選べば、下記のuse_mが真になり、ve_typeがmacronになります。hepburnは厳しい意味でやりますので、L</common>のほうが役に立つかもしれません。
 
 =item common
 
 「ジェット」が「jetto」になります。「ウェ」が「we」になります。つまり普通のローマ字です。
+
+=item wapuro
+
+ワープロローマ字。長音符を使いません。「少女」が「shoujo」など、ASCIIのみの記号で表記するローマ字です。
 
 =back
 
@@ -94,6 +136,15 @@ corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://g
 
 真なら「しんぶん」が「shimbun」、「ぐんま」が「gumma」
 偽なら「しんぶん」が「shinbun」、「ぐんま」が「gunma」
+
+L</hepburn>を選ぶとき、use_mが真になってしまいますが、都合が悪いときにはuse_mをundef意外の偽の値にに設定してください：
+
+    my $romaji = kana2romaji ($hiragana,
+			  {style => 'hepburn', 
+			   ve_type => 'wapuro',
+			   use_m => 0,});
+
+面倒くさいデフォルトお詫びします。
 
 =item ve_type
 
@@ -119,15 +170,9 @@ corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://g
 
 =item wapuro
 
-「アー」、「イー」、「ウー」、「エー」が「a-」, 「i-」, 「u-」, 「e-」,
-「o-」になります。「おう」が「ou」など、仮名の長音を仮名で代表するよう、ロー
-マ字入力のようなことです。
+ワープロローマ字のように表示する。「アー」、「イー」、「ウー」、「エー」が「a-」, 「i-」, 「u-」, 「e-」,「o-」になります。「おう」が「ou」など、仮名の長音を仮名で代表するよう、ローマ字入力のようなことです。
 
 =back
-
-=item wapuro
-
-ワープロローマ字。長音符を使いません。「少女」が「shoujo」など、ASCIIのみの記号で表記するローマ字です。
 
 =item wo
 
@@ -148,13 +193,12 @@ corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://g
 ローマ字を仮名に.
 
     use Lingua::JA::Moji 'romaji2kana';
-
     $kana = romaji2kana ('yamaguti');
     # $kana = 'ヤマグチ'
 
 
 
-ローマ字をカタカナに変換します。ローマ字はできるだけ幅広く受け入れる。
+ローマ字をカタカナに変換します。ローマ字はできるだけ幅広く受け入れます。
 ローマ字をひらがなに変換したいときはL</romaji2hiragana>をお使いください。
 
 ローマ字変換のオプションは関数の２番目の引数でハシュリファレンスとして入る。
@@ -167,6 +211,8 @@ corresponding to git commit L<79035f5895111c7bd0d2da461ebf78cee8c1d517|https://g
 
 C<< ime => 1 >>オプションでIMEのような変換ができます。たとえば、"gumma"が「グッマ」、"onnna"が「オンナ」となります。パスポートローマ字 ("Ohshimizu") は無効となります。
 
+これはどんな入力でも仮名に変換しようとします。ローマ字日本語の確認のためにはL</is_romaji>、L</is_romaji_strict>、L</is_romaji_semistrict>もあります。
+
 
 
 
@@ -178,14 +224,12 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
 ローマ字をひらがなに.
 
     use Lingua::JA::Moji 'romaji2hiragana';
-
     $hiragana = romaji2hiragana ('babubo');
     # $hiragana = 'ばぶぼ'
 
 
 
-ローマ字をひらがなに変関します。オプションはL</romaji2kana>と同じ。wapuroオプション
-もオンにしたら、「ou」が「おー」ではなく、「おう」になります。
+ローマ字をひらがなに変関します。オプションはL</romaji2kana>と同じ。L</wapuro>オプションもオンにして、「ou」が「おー」ではなく、「おう」になります。
 
 
 
@@ -198,7 +242,6 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
 
 
     use Lingua::JA::Moji 'romaji_styles';
-
     my @styles = romaji_styles ();
     # Returns a true value
     romaji_styles ("hepburn");
@@ -224,7 +267,6 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
     use Lingua::JA::Moji 'romaji_vowel_styles';
 
 
-
 有効な母音スタイルのリスト・レファレンス
 
 
@@ -238,7 +280,6 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
 
 
     use Lingua::JA::Moji 'is_voiced';
-
     if (is_voiced ('が')) {
          print "が is voiced.\n";
     }
@@ -258,7 +299,6 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
 
 
     use Lingua::JA::Moji 'is_romaji';
-
     # The following line returns "undef"
     is_romaji ("abcdefg");
     # The following line returns a defined value
@@ -268,10 +308,11 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
 
 
 
-アルファベットの列はローマ字に見えるなら真、見えないなら偽を戻します。
-厳密に確認したい時はL</is_romaji_strict>をお勧めします。「-」で初まる文字列の場合は戻し値が偽(undef)となります。
+アルファベットの列はローマ字に見えるなら真、見えないなら偽を戻します。「-」で初まる文字列の場合は戻し値が偽(undef)となります。
 
 真の戻し値はローマ字のワープロ変換。
+
+これはローマ字を変換してみて、成功する場合「ローマ字だ」という原理で働きますので、色々な文字列を受けます。もっと厳密に確認したい時はL</is_romaji_strict>をお勧めします。
 
 
 
@@ -284,7 +325,6 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
 
 
     use Lingua::JA::Moji 'is_romaji_strict';
-
     # The following line returns "undef"
     is_romaji_strict ("abcdefg");
     # The following line returns "undef"
@@ -294,9 +334,7 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
 
 
 
-アルファベットの列はローマ字に見えるなら真、見えないなら偽。
-L</is_romaji>より厳しく、コンピューター入力に見えるかどうかではなく、
-「日本語になる」かどうか確認します。
+アルファベットの列はローマ字に見えるなら真、見えないなら偽。L</is_romaji>より厳しく、コンピューター入力に見えるかどうかではなく、「日本語になる」かどうか確認します。
 
 真の値はローマ字のワープロ変換です。
 
@@ -314,7 +352,6 @@ L</0.27>から
 
 
     use Lingua::JA::Moji 'is_romaji_semistrict';
-
     # The following line returns "undef"
     is_romaji_semistrict ("abcdefg");
     # The following line returns "undef"
@@ -339,7 +376,6 @@ L</is_romaji_strict>とL</is_romaji>の間にローマ字ですが厳密に日�
 
 
     use Lingua::JA::Moji 'normalize_romaji';
-
     $normalized = normalize_romaji ('tsumuji');
 
 
@@ -367,7 +403,6 @@ C<normalize_romaji>はかなやローマ字で書いた言葉を比べるため�
 ひらがなをカタカナに.
 
     use Lingua::JA::Moji 'hira2kata';
-
     $katakana = hira2kata ('ひらがな');
     # $katakana = 'ヒラガナ'
 
@@ -386,7 +421,6 @@ C<normalize_romaji>はかなやローマ字で書いた言葉を比べるため�
 カタカナをひらがなに.
 
     use Lingua::JA::Moji 'kata2hira';
-
     $hiragana = kata2hira ('カキクケコ');
     # $hiragana = 'かきくけこ'
 
@@ -405,7 +439,6 @@ C<normalize_romaji>はかなやローマ字で書いた言葉を比べるため�
 仮名をカタカナに.
 
     use Lingua::JA::Moji 'kana2katakana';
-
     
 
 
@@ -423,7 +456,6 @@ C<normalize_romaji>はかなやローマ字で書いた言葉を比べるため�
 
 
     use Lingua::JA::Moji 'kana_to_large';
-
     $large = kana_to_large ('ぁあぃい');
     # $large = 'ああいい'
 
@@ -442,7 +474,6 @@ C<normalize_romaji>はかなやローマ字で書いた言葉を比べるため�
 
 
     use Lingua::JA::Moji 'nigori_first';
-
     my @list = (qw/カン スウ ハツ オオ/);
     nigori_first (\@list);
     # Now @list = (qw/カン スウ ハツ オオ ガン ズウ バツ パツ/);
@@ -467,7 +498,6 @@ L</0.36>から
 
 
     use Lingua::JA::Moji 'InHankakuKatakana';
-
     use utf8;
     if ('ｱ' =~ /\p{InHankakuKatakana}/) {
         print "ｱ is half-width katakana\n";
@@ -488,7 +518,6 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 仮名を半角カタカナに.
 
     use Lingua::JA::Moji 'kana2hw';
-
     $half_width = kana2hw ('あいウカキぎょう。');
     # $half_width = 'ｱｲｳｶｷｷﾞｮｳ｡'
 
@@ -507,7 +536,6 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 半角カタカナをカタカナに.
 
     use Lingua::JA::Moji 'hw2katakana';
-
     $full_width = hw2katakana ('ｱｲｳｶｷｷﾞｮｳ｡');
     # $full_width = 'アイウカキギョウ。'
 
@@ -526,7 +554,6 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 カタカナを半角カタカナに.
 
     use Lingua::JA::Moji 'katakana2hw';
-
     $hw = katakana2hw ("あいうえおアイウエオ");
     # $hw = 'あいうえおｱｲｳｴｵ'
 
@@ -545,7 +572,6 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
     use Lingua::JA::Moji 'is_kana';
-
     
 
 
@@ -563,7 +589,6 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
     use Lingua::JA::Moji 'is_hiragana';
-
     
 
 
@@ -581,13 +606,13 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
     use Lingua::JA::Moji 'katakana2syllable';
-
     $syllables = katakana2syllable ('ソーシャルブックマークサービス');
 
 
 
-カタカナをシラブルニワケル。たとえば、「ソーシャル」
-ハ'ソ', 'ー', 'シ', 'ャ', 'ル'という意味のない文字ではなく、日本語の「原子」ノ'ソー', 'シャ', 'ル'になります。撥音(ん)は前の仮名と一つになります。例えば、「フラナガン」ハ「フ」, 「ラ」, 「ナ」, 「ガン」となります。
+カタカナをシラブルにわけます。たとえば、「ソーシャル」をC<split>などで文字に分けると'ソ', 'ー', 'シ', 'ャ', 'ル'になりますがソ、シ、ルは言えるのに、「ー」と「ャ」は口にできない文字です。なのでこの間数は日本語の「原子」の'ソー', 'シャ', 'ル'にわけます。撥音(ん)は前の仮名と一つになります。例えば、「フラナガン」は「フ」, 「ラ」, 「ナ」, 「ガン」となります。
+
+元々の作った理由はL<外国人の宛字名前制作|https://www.sljfaq.org/cgi/name-kanji_ja.cgi>のためでした。外国人の名前を仮名に変換した後に、その当て字を当てるためにそのかなをシラブルに分けます。その他の利用はL<カタカナを英語に変換|https://www.sljfaq.org/cgi/k2e_ja.cgi>で、片仮名が何もマッチしない場合、言葉を部分に分けるために使っています。
 
 L</0.24>から
 
@@ -603,19 +628,18 @@ L</0.24>から
 
 
     use Lingua::JA::Moji 'InKana';
-
     $is_kana = ('アイウエオ' =~ /^\p{InKana}+$/);
     # $is_kana = '1'
 
 
 
-正規表現に使うかたかなとひらがなにまっちします。
+正規表現に使うかたかなとひらがなにマッチします。
 
 詳しくいうと以下の正規表現
 
     qr/\p{Katakana}|\p{InKatakana}|\p{InHiragana}|ｰ|ﾞ|ﾟ>/
 
-と殆ど同じことにまっちしますが、C<\p{Katakana}>がマッチする未使用のコードポイントはマッチしません。「・」もマッチしません。変体仮名もマッチしません。
+と殆ど同じことにマッチしますが、C<\p{Katakana}>がマッチする未使用のコードポイントはマッチしません。「・」もマッチしません。変体仮名もマッチしません。
 
 
 
@@ -628,7 +652,6 @@ L</0.24>から
 
 
     use Lingua::JA::Moji 'square2katakana';
-
     $kata = square2katakana ('㌆');
     # $kata = 'ウォン'
 
@@ -647,7 +670,6 @@ L</0.24>から
 
 
     use Lingua::JA::Moji 'katakana2square';
-
     $sq = katakana2square ('カロリーアイウエオウォン');
     # $sq = '㌍アイウエオ㌆'
 
@@ -666,13 +688,12 @@ L</0.24>から
 
 
     use Lingua::JA::Moji 'smallize_kana';
-
     $smallize = smallize_kana ('オキヤクサマガカツタ');
     # $smallize = 'オキャクサマガカッタ'
 
 
 
-片仮名の列に拗音と促音を入れる。昔の仮名使いを現代のに直す。あくまで実験的です。
+試しに、モースコードなど、「っ」や「ゃゅょ」がない片仮名を拗音(ゃゅょ)と促音(っ)がある片仮名に変えます。昔の仮名使いを現代のに直すなどに使います。正確に変えることではなく、できるだけ変えることしますので、たとえば正確に「シヨツチユウ」を「ショッチュウ」にはするものの「ちよだ」を「ちょだ」にもしますので、頭の良い関数ではなく、最大限に変換する関数です。
 
 L</0.46>から
 
@@ -690,8 +711,10 @@ L</0.46>から
     use Lingua::JA::Moji 'cleanup_kana';
 
 
+雑な仮名遣いや間違ったかな入力を直します。ローマ字やひらがなを片仮名に変換します。仮名として漢字を使うような間違いも直します。例えば「一」（漢字のいち）を「ー」（長音）に。
 
-間違ったかな入力を直す。例えば「一」（漢字のいち）を「ー」（長音）に。
+L</0.46>から
+
 
 
 
@@ -704,7 +727,6 @@ L</0.46>から
 
 
     use Lingua::JA::Moji 'join_sound_marks';
-
     $joined = join_sound_marks ('か゛は゜つ゛');
     # $joined = 'がぱづ'
 
@@ -720,12 +742,12 @@ L</0.53>から
 
 
 
+
 =head2 split_sound_marks 
 
 
 
     use Lingua::JA::Moji 'split_sound_marks';
-
     $split = split_sound_marks ('ガパヅ');
     # $split = 'カ゛ハ゜ツ゛'
 
@@ -759,7 +781,6 @@ L</0.53>から
     use Lingua::JA::Moji 'hentai2kana';
 
 
-
 変体仮名をひらがなに変換します。複数のかなにあてはまる変体仮名は「・」でつないだ列になります。
 
 L</0.43>から
@@ -776,7 +797,6 @@ L</0.43>から
 
 
     use Lingua::JA::Moji 'hentai2kanji';
-
     $kanji = hentai2kanji ('𛀢');
     # $kanji = '家'
 
@@ -798,7 +818,6 @@ L</0.43>から
 
 
     use Lingua::JA::Moji 'kanji2hentai';
-
     $kanji = kanji2hentai ('家');
     # $kanji = '𛀢'
 
@@ -820,7 +839,6 @@ L</0.43>から
 
 
     use Lingua::JA::Moji 'kana2hentai';
-
     $hentai = kana2hentai ('ケンブ');
     # $hentai = '𛀢・𛀲・𛀳・𛀴・𛀵・𛀶・𛀷𛄝・𛄞𛂰・𛂱・𛂲゛'
 
@@ -852,7 +870,6 @@ L</0.43>から
 
 
     use Lingua::JA::Moji 'InWideAscii';
-
     use utf8;
     if ('Ａ' =~ /\p{InWideAscii}/) {
         print "Ａ is wide ascii\n";
@@ -873,7 +890,6 @@ L</0.43>から
 全角英数字を半角英数字に.
 
     use Lingua::JA::Moji 'wide2ascii';
-
     $ascii = wide2ascii ('ａｂＣＥ０１９');
     # $ascii = 'abCE019'
 
@@ -892,7 +908,6 @@ L</0.43>から
 半角英数字を全角英数字に.
 
     use Lingua::JA::Moji 'ascii2wide';
-
     $wide = ascii2wide ('abCE019');
     # $wide = 'ａｂＣＥ０１９'
 
@@ -919,7 +934,6 @@ L</0.43>から
 仮名を和文モールス符号に.
 
     use Lingua::JA::Moji 'kana2morse';
-
     $morse = kana2morse ('ショッチュウ');
     # $morse = '--.-. -- .--. ..-. -..-- ..-'
 
@@ -938,7 +952,6 @@ L</0.43>から
 和文モールス符号を仮名に.
 
     use Lingua::JA::Moji 'morse2kana';
-
     $kana = morse2kana ('--.-. -- .--. ..-. -..-- ..-');
     # $kana = 'シヨツチユウ'
 
@@ -957,7 +970,6 @@ L</0.43>から
 仮名を点字に.
 
     use Lingua::JA::Moji 'kana2braille';
-
     
 
 
@@ -980,7 +992,6 @@ L</0.43>から
 点字を仮名に.
 
     use Lingua::JA::Moji 'braille2kana';
-
     
 
 
@@ -998,7 +1009,6 @@ L</0.43>から
 仮名を丸付けカタカナに.
 
     use Lingua::JA::Moji 'kana2circled';
-
     $circled = kana2circled ('アイウエオガン');
     # $circled = '㋐㋑㋒㋓㋔㋕゛ン'
 
@@ -1019,7 +1029,6 @@ L</0.43>から
 丸付けカタカナを仮名に.
 
     use Lingua::JA::Moji 'circled2kana';
-
     $kana = circled2kana ('㋐㋑㋒㋓㋔');
     # $kana = 'アイウエオ'
 
@@ -1046,7 +1055,6 @@ L</0.43>から
 親字体を旧字体に.
 
     use Lingua::JA::Moji 'new2old_kanji';
-
     $old = new2old_kanji ('三国 連太郎');
     # $old = '三國 連太郎'
 
@@ -1070,7 +1078,6 @@ L</0.43>から
 旧字体を親字体に.
 
     use Lingua::JA::Moji 'old2new_kanji';
-
     $new = old2new_kanji ('櫻井');
     # $new = '桜井'
 
@@ -1089,7 +1096,6 @@ L</0.43>から
 
 
     use Lingua::JA::Moji 'circled2kanji';
-
     $kanji = circled2kanji ('㊯');
     # $kanji = '協'
 
@@ -1108,7 +1114,6 @@ L</0.43>から
 
 
     use Lingua::JA::Moji 'kanji2circled';
-
     $kanji = kanji2circled ('協嬉');
     # $kanji = '㊯嬉'
 
@@ -1127,7 +1132,6 @@ L</0.43>から
 
 
     use Lingua::JA::Moji 'bracketed2kanji';
-
     $kanji = bracketed2kanji ('㈱');
     # $kanji = '株'
 
@@ -1146,7 +1150,6 @@ L</0.43>から
 
 
     use Lingua::JA::Moji 'kanji2bracketed';
-
     $kanji = kanji2bracketed ('株');
     # $kanji = '㈱'
 
@@ -1165,6 +1168,7 @@ L</0.43>から
 
 
     use Lingua::JA::Moji 'yurei_moji';
+    my @yurei = yurei_moji ();
 
 
 
@@ -1184,6 +1188,7 @@ L</0.47>から
 
 
     use Lingua::JA::Moji 'bad_kanji';
+    my @bad_kanji = bad_kanji ();
 
 
 
@@ -1214,7 +1219,6 @@ L</0.47>から
 仮名をキリル文字に.
 
     use Lingua::JA::Moji 'kana2cyrillic';
-
     $cyril = kana2cyrillic ('シンブン');
     # $cyril = 'симбун'
 
@@ -1229,7 +1233,6 @@ L</0.47>から
 キリル文字をカタカナに.
 
     use Lingua::JA::Moji 'cyrillic2katakana';
-
     $kana = cyrillic2katakana ('симбун');
     # $kana = 'シンブン'
 
@@ -1252,7 +1255,6 @@ L</0.47>から
 
 
     use Lingua::JA::Moji 'kana2hangul';
-
     $hangul = kana2hangul ('すごわざ');
     # $hangul = '스고와자'
 
@@ -1304,8 +1306,9 @@ kanji via the kakasi kanji to romaji convertor, and other functions.
 
 =item L<Lingua::JA::Romaji::Valid>
 
-Validate romanized Japanese. This module does the same thing as
-L</is_romaji> in Lingua::JA::Moji.
+Validate romanized Japanese. This module does something similar to
+L</is_romaji>, L</is_romaji_strict>, and L</is_romaji_semistrict> in
+Lingua::JA::Moji, but it has some extra options as well.
 
 =item L<Lingua::JA::Hepburn::Passport>
 
@@ -1317,7 +1320,8 @@ the C<< passport => 1 >> option, for example
 
 =item L<Lingua::JA::Fold>
 
-Full/half width conversion, collation of Japanese text.
+Full/half width conversion, collation of Japanese text, including
+handling of line breaks.
 
 =item L<Lingua::JA::Romaji>
 
@@ -1340,7 +1344,53 @@ This is similar to the present module for Korean.
 
 =item L<Lingua::JA::Onbiki>
 
+Convert a Japanese tilde character into the appropriate vowel. To
+achieve this with Lingua::JA::Moji, see the following example:
+
+    
+    use utf8;
+    use Lingua::JA::Moji ':all';
+    for (qw/あったか〜い つめた〜い ん〜 アッタカ〜イ/) {
+        my $word = $_;
+        while ($word =~ /(\p{InKana})〜/ && $1 ne 'ん') {
+            my $kana = $1;
+            my $romaji = kana2romaji ($kana);
+            $romaji =~ s/[^aiueo]//g;
+            my $vowel = romaji2kana ($romaji);
+            if ($kana =~ /\p{InHiragana}/) {
+                $vowel = kata2hira ($vowel);
+            }
+            $word =~ s/$kana〜/$kana$vowel/g;
+        }
+        print "$_ -> $word\n";
+    }
+    
+    
+    
+    
+
+
+produces output
+
+    あったか〜い -> あったかあい
+    つめた〜い -> つめたあい
+    ん〜 -> ん〜
+    アッタカ〜イ -> アッタカアイ
+
+
+(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.55/examples/onbiki.pl> in the distribution.)
+
+
 =item L<Lingua::JA::Jtruncate>
+
+Handle character boundaries over bytes in the old Japanese encodings
+EUC, JIS, and Shift-JIS, for people who don't like converting to
+Unicode.
+
+Until about 2008, I used to use CP932 (Microsoft variant of Shift-JIS)
+in Perl programs, until I had the bad experience of tracking down a
+very strange bug caused by the "kanji space", U+3000, containing an @
+mark when written in CP932, and being interpreted by Perl as an array.
 
 =back
 

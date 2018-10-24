@@ -1,5 +1,10 @@
 Revision history for String-Interpolate-Named
 
+0.04
+
+	Require perl 5.10.1 or later due to Unicode problems.
+	Use $" as default for separator.
+
 0.03	2018-10-23
 
 	Require perl 5.10 or later for named captures.

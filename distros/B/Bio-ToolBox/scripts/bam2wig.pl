@@ -5,7 +5,9 @@
 use strict;
 use Getopt::Long qw(:config no_ignore_case bundling);
 use Pod::Usage;
-use List::Util qw(sum);
+use File::Spec;
+use File::Temp;
+use List::Util qw(sum0);
 use List::MoreUtils qw(natatime);
 use Bio::ToolBox::db_helper qw(
 	open_db_connection
@@ -29,7 +31,7 @@ eval {
 	$parallel = 1;
 };
 
-my $VERSION = '1.62';
+my $VERSION = '1.63';
 	
 	
 
@@ -59,6 +61,7 @@ my (
 	$use_coverage,
 	$splice,
 	$paired,
+	$fastpaired,
 	$shift,
 	$shift_value,
 	$extend_value,
@@ -76,6 +79,7 @@ my (
 	$max_isize,
 	$min_isize,
 	$multi_hit_scale,
+	$splice_scale,
 	$rpm,
 	$do_mean,
 	$chrnorm,
@@ -94,6 +98,7 @@ my (
 	$max_intron,
 	$window,
 	$verbose,
+	$tempdir,
 	$help,
 	$print_version,
 );
@@ -113,6 +118,7 @@ GetOptions(
 	'position=s'   => \$position, # legacy option
 	'l|splice|split!'   => \$splice, # split splices
 	'p|pe!'        => \$paired, # paired-end alignments
+	'P|fastpe!'    => \$fastpaired, # fast paired-end alignments
 	'I|shift!'     => \$shift, # shift coordinates 3'
 	'H|shiftval=i' => \$shift_value, # value to shift coordinates
 	'x|extval=i'   => \$extend_value, # value to extend reads
@@ -125,11 +131,12 @@ GetOptions(
 	'flip!'        => \$flip, # flip the strands
 	'q|qual=i'     => \$min_mapq, # minimum mapping quality
 	'S|nosecondary'  => \$nosecondary, # skip secondary alignments
-	'D|noduplicate!' => \$noduplicate, # skip duplicate alignments
-	'U|nosupplementary!' => \$nosupplementary, # skip supplementary alignments
+	'D|noduplicate' => \$noduplicate, # skip duplicate alignments
+	'U|nosupplementary' => \$nosupplementary, # skip supplementary alignments
 	'maxsize=i'    => \$max_isize, # maximum paired insert size to accept
 	'minsize=i'    => \$min_isize, # minimum paired insert size to accept
 	'fraction!'    => \$multi_hit_scale, # scale by number of hits
+	'splfrac!'     => \$splice_scale, # divide counts by number of spliced segments
 	'r|rpm!'       => \$rpm, # calculate reads per million
 	'm|separate|mean!' => \$do_mean, # rpm scale separately
 	'scale=s'      => \@scale_values, # user specified scale value
@@ -149,6 +156,7 @@ GetOptions(
 	'intron=i'     => \$max_intron, # maximum intron size to allow
 	'window=i'     => \$window, # window size to control memory usage
 	'V|verbose!'   => \$verbose, # print sample correlations
+	'temp=s'       => \$tempdir, # directory to write temp files
 	'adapter=s'    => \$BAM_ADAPTER, # explicitly set the adapter version
 	'h|help'       => \$help, # request help
 	'v|version'    => \$print_version, # print the version
@@ -181,6 +189,7 @@ if ($print_version) {
 my ($main_callback, $callback, $wig_writer, $outbase, $chromo_file,
 	$binpack, $buflength, $coverage_dump, $coverage_sub);
 check_defaults();
+print " Writing temp files to $tempdir\n" if $verbose;
 my $items = $paired ? 'fragments' : 'alignments';
 
 # record start time
@@ -192,6 +201,7 @@ my $start_time = time;
 
 ### Open files
 my @sams;
+printf " Processing files %s...\n", join(", ", @bamfiles);
 foreach (@bamfiles) {
 	# this will open each bam file using the high level API
 	# with the appropriate installed adapter
@@ -345,6 +355,7 @@ sub check_defaults {
 	if ($extend_value and !$use_extend) {
 		$use_extend = 1 unless ($use_cspan or $position);
 	}
+	$paired = 1 if $fastpaired; # for purposes here, fastpair is paired
 
 	
 	# check position
@@ -401,11 +412,6 @@ sub check_defaults {
 	$max_intron ||= 50000;
 	
 	# incompatible options
-	if ($paired and $use_start) {
-		warn " using start with paired-end reads is not recommended, recording midpoint\n";
-		undef $use_start;
-		$use_mid   = 1;
-	}
 	if ($splice and ($use_extend or $extend_value)) {
 		warn " disabling splices when extend is defined\n";
 		$splice = 0;
@@ -491,14 +497,17 @@ sub check_defaults {
 	}
 	
 	# determine binary file packing and length
-	if ($multi_hit_scale or $chrnorm or ($use_coverage and $bin_size > 1)) {
-		# pack as floating point values
+	if ($multi_hit_scale or $splice_scale or $chrnorm or 
+		($use_coverage and $bin_size > 1)
+	) {
+		# pack as floating point values, this is 32 bit
 		$binpack = 'f';
 	}
 	else {
 		# dealing only with integers here
-		# let's hope we never have depth greater than 65,536
-		$binpack = 'S';
+		# yes we do occasionally have depth greater than 65,536
+		# originally short (16 bits), now long (32 bits)
+		$binpack = 'L';
 	}
 	$buflength = length(pack($binpack, 1));
 	
@@ -512,7 +521,10 @@ sub check_defaults {
 		print " ignoring paired-end option with coverage\n" if $paired;
 		print " ignoring RPM option with coverage\n" if $rpm;
 		print " ignoring custom scale option with coverage\n" if @scale_values;
+		print " ignoring multi-hit fractional counting with coverage\n" if $multi_hit_scale;
+		print " ignoring splice segment fractional counting with coverage\n" if $splice_scale;
 		print " ignoring chromosome-specific normalization with coverage\n" if $chrnorm;
+		
 		if ($bin_size > 1) {
 			$coverage_dump = int(1000 / $bin_size) * $bin_size;
 			$coverage_dump = $bin_size if $coverage_dump == 0;
@@ -552,14 +564,33 @@ sub check_defaults {
 	unless ($outfile) {
 		if (scalar @bamfiles == 1) {
 			$outfile = $bamfiles[0];
-			$outfile =~ s/\.bam$//;
+			$outfile =~ s/\.(?:b|cr)am$//;
 		}
 		else {
 			die " Please define an output filename when providing multiple bam files!\n";
 		}
 	}
-	$outbase = $outfile;
+	(undef, my $outdir, $outbase) = File::Spec->splitpath($outfile);
 	$outbase =~ s/\.(?:wig|bdg|bedgraph|bw|bigwig)(?:\.gz)?$//i; # strip extension if present
+	$outfile =~ s/\.(?:wig|bdg|bedgraph|bw|bigwig)(?:\.gz)?$//i; # strip extension if present
+	
+	
+	# set output temporary directory
+	if ($tempdir) {
+		unless (-x $tempdir and -d _ and -w _ ) {
+			die " Specified temp directory '$tempdir' either does not exist or is not writeable!\n";
+		}
+		$tempdir = File::Temp->newdir("bam2wigTEMP_XXXX", DIR=>$tempdir, CLEANUP=>1);
+	}
+	else {
+		# use the base path of the output wig file identified above
+		unless ($outdir) {
+			$outdir = File::Spec->curdir;
+		}
+		$tempdir = File::Temp->newdir("bam2wigTEMP_XXXX", DIR=>$outdir, CLEANUP=>1);
+	}
+	# reassemble outbase file
+	$outbase = File::Spec->catfile($tempdir, $outbase);
 	
 	
 	# determine output format
@@ -604,100 +635,136 @@ sub check_defaults {
 	}
 	
 	# set the initial main callback for processing alignments
-	$main_callback = $paired ? \&pe_callback : \&se_callback;
-	
-	
+	$main_callback = $fastpaired ? \&fast_pe_callback : $paired ? \&pe_callback : 
+		\&se_callback;
+		
 	### Determine the alignment recording callback method
 	# coverage
 	if ($use_coverage) {
 		# does not use a callback subroutine
 		undef $callback;
+		print " Recording raw alignment coverage\n";
 	}
 	# start
 	elsif (not $paired and not $do_strand and not $shift and $use_start) {
 		$callback = \&se_start;
+		print " Recording single-end alignment starts\n";
 	}
 	elsif (not $paired and not $do_strand and $shift and $use_start) {
 		$callback = \&se_shift_start;
+		print " Recording single-end shifted alignment starts\n";
 	}
 	elsif (not $paired and $do_strand and not $shift and $use_start) {
 		$callback = \&se_strand_start;
+		print " Recording single-end stranded alignment starts\n";
 	}
 	elsif (not $paired and $do_strand and $shift and $use_start) {
 		$callback = \&se_shift_strand_start;
+		print " Recording single-end shifted, stranded alignment starts\n";
 	}
 	# midpoint
 	elsif (not $paired and not $do_strand and not $shift and $use_mid) {
 		$callback = \&se_mid;
+		print " Recording single-end alignment midpoints\n";
 	}
 	elsif (not $paired and not $do_strand and $shift and $use_mid) {
 		$callback = \&se_shift_mid;
+		print " Recording single-end shifted alignment midpoints\n";
 	}
 	elsif (not $paired and $do_strand and not $shift and $use_mid) {
 		$callback = \&se_strand_mid;
+		print " Recording single-end stranded alignment midpoints\n";
 	}
 	elsif (not $paired and $do_strand and $shift and $use_mid) {
 		$callback = \&se_shift_strand_mid;
+		print " Recording single-end shifted, stranded alignment midpoints\n";
 	}
 	# span
 	elsif (not $paired and not $do_strand and not $shift and $use_span) {
 		$callback = \&se_span;
+		print " Recording single-end alignment span\n";
 	}
 	elsif (not $paired and not $do_strand and $shift and $use_span) {
 		$callback = \&se_shift_span;
+		print " Recording single-end shifted alignment span\n";
 	}
 	elsif (not $paired and $do_strand and not $shift and $use_span) {
 		$callback = \&se_strand_span;
+		print " Recording single-end stranded alignment span\n";
 	}
 	elsif (not $paired and $do_strand and $shift and $use_span) {
 		$callback = \&se_shift_strand_span;
+		print " Recording single-end shifted, stranded alignment span\n";
 	}
 	# center span
 	elsif (not $paired and not $do_strand and not $shift and $use_cspan) {
 		$callback = \&se_center_span;
+		print " Recording single-end alignment center-span\n";
 	}
 	elsif (not $paired and not $do_strand and $shift and $use_cspan) {
 		$callback = \&se_shift_center_span;
+		print " Recording single-end shifted alignment center-span\n";
 	}
 	elsif (not $paired and $do_strand and not $shift and $use_cspan) {
 		$callback = \&se_strand_center_span;
+		print " Recording single-end stranded alignment center-span\n";
 	}
 	elsif (not $paired and $do_strand and $shift and $use_cspan) {
 		$callback = \&se_shift_strand_center_span;
+		print " Recording single-end shifted, stranded alignment center-span\n";
 	}
 	# extend
 	elsif (not $paired and not $do_strand and not $shift and $use_extend) {
 		$callback = \&se_extend;
+		print " Recording single-end extended alignment span\n";
 	}
 	elsif (not $paired and not $do_strand and $shift and $use_extend) {
 		$callback = \&se_shift_extend;
+		print " Recording single-end shifted, extended alignment span\n";
 	}
 	elsif (not $paired and $do_strand and not $shift and $use_extend) {
 		$callback = \&se_strand_extend;
+		print " Recording single-end stranded, extended alignment span\n";
 	}
 	elsif (not $paired and $do_strand and $shift and $use_extend) {
 		$callback = \&se_shift_strand_extend;
+		print " Recording single-end shifted, stranded, extended alignment span\n";
+	}
+	# paired-end start
+	elsif ($paired and not $do_strand and $use_start) {
+		$callback = \&pe_start;
+		print " Recording paired-end fragment start\n";
+	}
+	elsif ($paired and $do_strand and $use_start) {
+		$callback = \&pe_strand_start;
+		print " Recording paired-end stranded fragment start\n";
 	}
 	# paired-end midpoint
 	elsif ($paired and not $do_strand and $use_mid) {
 		$callback = \&pe_mid;
+		print " Recording paired-end fragment midpoint\n";
 	}
 	elsif ($paired and $do_strand and $use_mid) {
 		$callback = \&pe_strand_mid;
+		print " Recording paired-end stranded fragment midpoint\n";
 	}
 	# paired-end span
 	elsif ($paired and not $do_strand and $use_span) {
 		$callback = \&pe_span;
+		print " Recording paired-end fragment span\n";
 	}
 	elsif ($paired and $do_strand and $use_span) {
 		$callback = \&pe_strand_span;
+		print " Recording paired-end stranded, fragment span\n";
 	}
-	# paired-end span
+	# paired-end center span
 	elsif ($paired and not $do_strand and $use_cspan) {
 		$callback = \&pe_center_span;
+		print " Recording paired-end fragment center-span\n";
 	}
 	elsif ($paired and $do_strand and $use_cspan) {
 		$callback = \&pe_strand_center_span;
+		print " Recording paired-end stranded, fragment center-span\n";
 	}
 	else {
 		die "programmer error!\n" unless $shift; # special exception
@@ -972,8 +1039,8 @@ sub scan_high_coverage {
 	# score 500 bp intervals for coverage
 	my %pos2depth;
 	for (my $start = 0; $start < int($chr_length/10); $start += 50) {
-		my $readsum = sum( map { $data{f}->[$_] || 0 } ($start .. $start + 49) );
-		my $readsum += sum( map { $data{r}->[$_] || 0 } ($start .. $start + 49) );
+		my $readsum = sum0( map { $data{f}->[$_] || 0 } ($start .. $start + 49) );
+		my $readsum += sum0( map { $data{r}->[$_] || 0 } ($start .. $start + 49) );
 		next if $readsum == 0;
 		$pos2depth{$start} = $readsum;
 	}
@@ -1140,7 +1207,7 @@ sub write_model_file {
 
 
 sub mean {
-	return sum(@_) / scalar(@_);
+	return sum0(@_) / scalar(@_);
 }
 
 sub open_wig_file {
@@ -1206,7 +1273,7 @@ sub process_bam_coverage {
 		
 		# find the children
 		my %files;
-		my @filelist = glob "$outbase.*.temp.bin";
+		my @filelist = glob("$outbase.*.temp.bin");
 		die " unable to find children files!\n" unless @filelist;
 		foreach my $file (@filelist) {
 			# each file name is basename.samid.seqid.count.strand.bin.gz
@@ -1273,7 +1340,7 @@ sub parallel_process_bam_coverage {
 		
 		# find the children
 		my %files;
-		my @filelist = glob "$outbase.*.temp.bin";
+		my @filelist = glob("$outbase.*.temp.bin");
 		die " unable to find children files!\n" unless @filelist;
 		foreach my $file (@filelist) {
 			# each file name is basename.samid.seqid.count.strand.bin.gz
@@ -1330,11 +1397,11 @@ sub process_bam_coverage_on_chromosome {
 	# write out chromosome binary file, set count to arbitrary 0
 	if ($do_temp_bin) {
 		write_bin_file(\$chrom_data, 
-			join('.', $outbase, $samid, $seq_id, 0, 'f', 'temp.bin') );
+			join('.', $outbase, $samid, $seq_id, 0, 'f', 'temp.bin'));
 	}
 	else {
 		&$wig_writer(\$chrom_data, $binpack, $seq_id, $seq_length, 
-			join('.', $outbase, $samid, $seq_id, 0, 'f', 'temp.wig') );
+			join('.', $outbase, $samid, $seq_id, 0, 'f', 'temp.wig'));
 	}
 	
 	# verbose status line 
@@ -1369,7 +1436,7 @@ sub process_alignments {
 		my @totals;
 		my %seq_totals;
 		my %files;
-		my @filelist = glob "$outbase.*.temp.bin";
+		my @filelist = glob("$outbase.*.temp.bin");
 		die " unable to find children files!\n" unless @filelist;
 		foreach my $file (@filelist) {
 			# each file name is basename.samid.seqid.count.strand.bin.gz
@@ -1403,7 +1470,7 @@ sub process_alignments {
 			}
 			elsif ($rpm and not $do_mean) {
 				# scale them all the same
-				my $factor = 1_000_000 / ( sum(@totals) * scalar(@sams) );
+				my $factor = 1_000_000 / ( sum0(@totals) * scalar(@sams) );
 				foreach (@sams) {
 					push @norms, $factor;
 				}
@@ -1515,7 +1582,7 @@ sub parallel_process_alignments {
 		my @totals;
 		my %seq_totals;
 		my %files;
-		my @filelist = glob "$outbase.*.temp.bin";
+		my @filelist = glob("$outbase.*.temp.bin");
 		die " unable to find children files!\n" unless @filelist;
 		foreach my $file (@filelist) {
 			# each file name is basename.samid.seqid.count.strand.bin.gz
@@ -1552,7 +1619,7 @@ sub parallel_process_alignments {
 			}
 			elsif ($rpm and not $do_mean) {
 				# scale them all the same
-				my $factor = 1_000_000 / ( sum(@totals) * scalar(@sams) );
+				my $factor = 1_000_000 / ( sum0(@totals) * scalar(@sams) );
 				foreach (@sams) {
 					push @norms, $factor;
 				}
@@ -1601,7 +1668,7 @@ sub parallel_process_alignments {
 			# determine scaling factor
 			my $scale_factor = 1;
 			if ($rpm) {
-				printf " Normalizing depth based on %s total counted alignments\n",
+				printf " Normalizing depth based on %s total counted $items\n",
 					format_with_commas($totals[0]); 
 				$scale_factor = 1_000_000 / $totals[0];
 			}
@@ -1693,16 +1760,16 @@ sub process_alignments_on_chromosome {
 		write_bin_file(\$data->{fpack}, 
 			join('.', $outbase, $samid, $seq_id, $data->{count}, 'f', 'temp.bin') );
 		write_bin_file(\$data->{rpack}, 
-			join('.', $outbase, $samid, $seq_id, $data->{count}, 'r', 'temp.bin') ) 
-			if $do_strand;
+			join('.', $outbase, $samid, $seq_id, $data->{count}, 'r', 'temp.bin')
+		) if $do_strand;
 	}
 	else {
 		# write a chromosome specific wig file
 		&$wig_writer(\$data->{fpack}, $binpack, $seq_id, $seq_length, 
 			join('.', $outbase, $samid, $seq_id, $data->{count}, 'f', 'temp.wig') );
 		&$wig_writer(\$data->{rpack}, $binpack, $seq_id, $seq_length, 
-			join('.', $outbase, $samid, $seq_id, $data->{count}, 'r', 'temp.wig') ) 
-			if $do_strand;
+			join('.', $outbase, $samid, $seq_id, $data->{count}, 'r', 'temp.wig') 
+		) if $do_strand;
 	}
 	
 	# verbose status line 
@@ -1841,7 +1908,7 @@ sub normalize_bin_file {
 sub write_final_wig_file {
 	
 	# find children files
-	my @filelist = glob "$outbase.*.temp.wig";
+	my @filelist = glob("$outbase.*.temp.wig");
 	unless (scalar @filelist) {
 		die " can't find children file!\n";
 	}
@@ -1866,30 +1933,31 @@ sub write_final_wig_file {
 	
 	# print total alignment summaries
 	if ($r_total) {
-		printf " %s total forward alignments\n", format_with_commas($f_total);
-		printf " %s total reverse alignments\n", format_with_commas($r_total);
+		printf " %s total forward $items\n", format_with_commas($f_total);
+		printf " %s total reverse $items\n", format_with_commas($r_total);
 	}
 	else {
-		printf " %s total alignments\n", format_with_commas($f_total);
+		printf " %s total $items\n", format_with_commas($f_total);
 	}
 	
 	# write wig files with the appropriate wig writer
 	if ($do_strand and !$flip) {
+		
 		if ($cpu > 1) {
 			# we can fork this!!!!
 			my $pm = Parallel::ForkManager->new(2);
 			for my $i (1 .. 2) {
 				$pm->start and next;
-				merge_wig_files("$outbase\_f", @f_filelist) if $i == 1;
-				merge_wig_files("$outbase\_r", @r_filelist) if $i == 2;
+				merge_wig_files("$outfile\_f", @f_filelist) if $i == 1;
+				merge_wig_files("$outfile\_r", @r_filelist) if $i == 2;
 				unlink $chromo_file if $chromo_file;
 				$pm->finish;
 			}
 			$pm->wait_all_children;
 		}
 		else {
-			merge_wig_files("$outbase\_f", @f_filelist);
-			merge_wig_files("$outbase\_r", @r_filelist);
+			merge_wig_files("$outfile\_f", @f_filelist);
+			merge_wig_files("$outfile\_r", @r_filelist);
 			unlink $chromo_file if $chromo_file;
 		}
 	}
@@ -1899,21 +1967,21 @@ sub write_final_wig_file {
 			my $pm = Parallel::ForkManager->new(2);
 			for my $i (1..2) {
 				$pm->start and next;
-				merge_wig_files("$outbase\_r", @f_filelist) if $i == 1;
-				merge_wig_files("$outbase\_f", @r_filelist) if $i == 2;
+				merge_wig_files("$outfile\_r", @f_filelist) if $i == 1;
+				merge_wig_files("$outfile\_f", @r_filelist) if $i == 2;
 				unlink $chromo_file if $chromo_file;
 				$pm->finish;
 			}
 			$pm->wait_all_children;
 		}
 		else {
-			merge_wig_files("$outbase\_r", @f_filelist);
-			merge_wig_files("$outbase\_f", @r_filelist);
+			merge_wig_files("$outfile\_r", @f_filelist);
+			merge_wig_files("$outfile\_f", @r_filelist);
 			unlink $chromo_file if $chromo_file;
 		}
 	}
 	else {
-		merge_wig_files($outbase, @f_filelist);
+		merge_wig_files($outfile, @f_filelist);
 		unlink $chromo_file if $chromo_file;
 	}
 }
@@ -2040,9 +2108,9 @@ sub write_varstep {
 }
 
 sub merge_wig_files {
-	my ($outfile, @files) = @_;
+	my ($ofile, @files) = @_;
 	
-	my ($filename1, $fh) = open_wig_file($outfile, 1);
+	my ($filename1, $fh) = open_wig_file($ofile, 1);
 	while (@files) {
 		my $file = shift @files;
 		my $in = open_to_read_fh($file); 
@@ -2106,6 +2174,58 @@ sub se_callback {
 		$data->{f_offset} += 500_000;
 	}
 	if (scalar(@{$data->{r}}) > 1_000_000) {
+		$data->{rpack} .= pack("$binpack*", splice(@{$data->{r}}, 0, 500_000));
+		$data->{r_offset} += 500_000;
+	}
+}
+
+sub fast_pe_callback {
+	my ($a, $data) = @_;
+	
+	# check paired status
+	return unless $a->proper_pair; # both alignments are mapped
+	return if $a->reversed; # only look at forward alignments, that's why it's fast
+	return unless $a->tid == $a->mtid; # same chromosome?
+	my $isize = abs($a->isize); 
+	return if $isize > $max_isize;
+	return if $isize < $min_isize; 
+	
+	# check alignment quality and flags
+	return if ($min_mapq and $a->qual < $min_mapq); # mapping quality
+	my $flag = $a->flag;
+	return if ($nosecondary and $flag & 0x0100); # secondary alignment
+	return if ($noduplicate and $flag & 0x0400); # marked duplicate
+	return if ($flag & 0x0200); # QC failed but still aligned? is this necessary?
+	return if ($nosupplementary and $flag & 0x0800); # supplementary hit
+	
+	# filter black listed regions
+	if ($data->{black_list}) {
+		my $results = $data->{black_list}->fetch($a->pos, $a->pos + $isize);
+		return if @$results;
+	}
+	
+	# scale by number of hits
+	my $score;
+	if ($multi_hit_scale) {
+		my $nh = $a->aux_get('IH') || $a->aux_get('NH') || 1;
+		$score = $nh > 1 ? 1/$nh : 1;
+		$data->{count} += $score; # record fractional alignment counts
+		$score *= $data->{score}; # multiply by chromosome scaling factor
+	}
+	else {
+		$data->{count} += 1; # always record one alignment
+		$score = $data->{score}; # probably 1, but may be chromosome scaled
+	}
+	
+	# record based on the forward read
+	&$callback($a, $data, $score);
+	
+	# check data size
+	if (scalar(@{$data->{f}}) > 600_000) {
+		$data->{fpack} .= pack("$binpack*", splice(@{$data->{f}}, 0, 500_000));
+		$data->{f_offset} += 500_000;
+	}
+	if (scalar(@{$data->{r}}) > 600_000) {
 		$data->{rpack} .= pack("$binpack*", splice(@{$data->{r}}, 0, 500_000));
 		$data->{r_offset} += 500_000;
 	}
@@ -2207,6 +2327,11 @@ sub se_spliced_callback {
 		$size = $c->[1] if ($c->[0] eq 'N' and $c->[1] > $size);
 	}
 	return if $size > $max_intron; # exceed maximum intron size
+	
+	# adjust score
+	if ($splice_scale) {
+		$score /= scalar(@segments);
+	}
 	
 	# record
 	if ($use_start) {
@@ -2557,9 +2682,29 @@ sub se_shift_strand_extend {
 }
 
 sub pe_start {
+	# this essentially just records the forward start position
+	# it ignores sequencing orientation
+	my ($a, $data, $score) = @_;
+	$data->{f}->[int($a->pos / $bin_size) - $data->{f_offset}] += $score;
 }
 
 sub pe_strand_start {
+	my ($a, $data, $score) = @_;
+	my $flag = $a->flag;
+	# we always receive the forward read, never reverse, from pe_callback
+	# therefore the first and second read flag indicates orientation
+	if ($flag & 0x0040) {
+		# first read, forward
+		$data->{f}->[int($a->pos / $bin_size) - $data->{f_offset}] += $score;
+	}
+	elsif ($flag & 0x0080) {
+		# second read, reverse
+		my $pos = int(($a->pos + $a->isize) / $bin_size);
+		$data->{r}->[$pos - $data->{r_offset}] += $score;
+	}
+	else {
+		die " Paired-end flags are set incorrectly; neither 0x040 or 0x080 are set for paired-end.";
+	}
 }
 
 sub pe_mid {
@@ -2572,24 +2717,19 @@ sub pe_strand_mid {
 	my ($a, $data, $score) = @_;
 	my $mid = int( ($a->pos + int( $a->isize / 2 ) ) / $bin_size);
 	my $flag = $a->flag;
+	# we always receive the forward read, never reverse, from pe_callback
+	# therefore the first and second read flag indicates orientation
 	if ($flag & 0x0040) {
-		# first read
-		if ($a->reversed) {
-			$data->{r}->[$mid - $data->{r_offset}] += $score;
-		}
-		else {
-			$data->{f}->[$mid - $data->{f_offset}] += $score;
-		}
+		# first read, forward
+		$data->{f}->[$mid - $data->{f_offset}] += $score;
 	}
 	elsif ($flag & 0x0080) {
-		# second read
-		if ($a->reversed) {
-			$data->{f}->[$mid - $data->{f_offset}] += $score;
-		}
-		else {
-			$data->{r}->[$mid - $data->{r_offset}] += $score;
-		}
+		# second read, reverse
+		$data->{r}->[$mid - $data->{r_offset}] += $score;
 	} 
+	else {
+		die " Paired-end flags are set incorrectly; neither 0x040 or 0x080 are set for paired-end.";
+	}
 }
 
 sub pe_span {
@@ -2606,32 +2746,23 @@ sub pe_strand_span {
 	my $start = int($a->pos / $bin_size);
 	my $end = int( ($a->pos + $a->isize) / $bin_size);
 	my $flag = $a->flag;
+	# we always receive the forward read, never reverse, from pe_callback
+	# therefore the first and second read flag indicates orientation
 	if ($flag & 0x0040) {
-		# first read
-		if ($a->reversed) {
-			foreach ($start - $data->{r_offset} .. $end - $data->{r_offset} ) {
-				$data->{r}->[$_] += $score;
-			}
-		}
-		else {
-			foreach ($start - $data->{f_offset} .. $end - $data->{f_offset} ) {
-				$data->{f}->[$_] += $score;
-			}
+		# first read, forward
+		foreach ($start - $data->{f_offset} .. $end - $data->{f_offset} ) {
+			$data->{f}->[$_] += $score;
 		}
 	}
 	elsif ($flag & 0x0080) {
-		# second read
-		if ($a->reversed) {
-			foreach ($start - $data->{f_offset} .. $end - $data->{f_offset} ) {
-				$data->{f}->[$_] += $score;
-			}
-		}
-		else {
-			foreach ($start - $data->{r_offset} .. $end - $data->{r_offset} ) {
-				$data->{r}->[$_] += $score;
-			}
+		# second read, reverse
+		foreach ($start - $data->{r_offset} .. $end - $data->{r_offset} ) {
+			$data->{r}->[$_] += $score;
 		}
 	} 
+	else {
+		die " Paired-end flags are set incorrectly; neither 0x040 or 0x080 are set for paired-end.";
+	}
 }
 
 sub pe_center_span {
@@ -2652,32 +2783,23 @@ sub pe_strand_center_span {
 	$start = 0 if $start < 0;
 	my $end = int( ($position + $half_extend) / $bin_size);
 	my $flag = $a->flag;
+	# we always receive the forward read, never reverse, from pe_callback
+	# therefore the first and second read flag indicates orientation
 	if ($flag & 0x0040) {
-		# first read
-		if ($a->reversed) {
-			foreach ($start - $data->{r_offset} .. $end - $data->{r_offset} ) {
-				$data->{r}->[$_] += $score;
-			}
-		}
-		else {
-			foreach ($start - $data->{f_offset} .. $end - $data->{f_offset} ) {
-				$data->{f}->[$_] += $score;
-			}
+		# first read, forward
+		foreach ($start - $data->{f_offset} .. $end - $data->{f_offset} ) {
+			$data->{f}->[$_] += $score;
 		}
 	}
 	elsif ($flag & 0x0080) {
-		# second read
-		if ($a->reversed) {
-			foreach ($start - $data->{f_offset} .. $end - $data->{f_offset} ) {
-				$data->{f}->[$_] += $score;
-			}
-		}
-		else {
-			foreach ($start - $data->{r_offset} .. $end - $data->{r_offset} ) {
-				$data->{r}->[$_] += $score;
-			}
+		# second read, reverse
+		foreach ($start - $data->{r_offset} .. $end - $data->{r_offset} ) {
+			$data->{r}->[$_] += $score;
 		}
 	} 
+	else {
+		die " Paired-end flags are set incorrectly; neither 0x040 or 0x080 are set for paired-end.";
+	}
 }
 
 
@@ -2712,7 +2834,8 @@ bam2wig.pl --extend --rpm --mean --out file --bw file1.bam file2.bam
   --flip                        flip the strands for convenience
   
  Paired-end alignments:
-  -p --pe                       treat as paired-end alignments
+  -p --pe                       process paired-end alignments, both are checked
+  -P --fastpe                   process paired-end alignments, only F are checked
   --minsize <integer>           minimum allowed insertion size (30)
   --maxsize <integer>           maximum allowed insertion size (600)
   
@@ -2740,6 +2863,7 @@ bam2wig.pl --extend --rpm --mean --out file --bw file1.bam file2.bam
   -m --mean                     average multiple bams (default is addition)
   --scale <float>               explicit scaling factor, repeat for each bam file
   --fraction                    assign fractional counts to multi-mapped alignments
+  --splfrac                     assign fractional count to each spliced segment
   --format <integer>            number of decimal positions (4)
   --chrnorm <float>             use chromosome-specific normalization factor
   --chrapply <regex>            regular expression to apply chromosome-specific factor
@@ -2758,6 +2882,7 @@ bam2wig.pl --extend --rpm --mean --out file --bw file1.bam file2.bam
   
  General options:
   -c --cpu <integer>            number of parallel processes (4)
+  --temp <directory>            directory to write temporary files (output path)
   -V --verbose                  report additional information
   -v --version                  print version information
   -h --help                     show full documentation
@@ -2814,7 +2939,8 @@ The span is defined by the extension value.
 
 Specify that the raw alignment coverage be calculated and reported 
 in the wig file. This utilizes a special low-level operation and 
-precludes any alignment filtering or post-normalization methods.
+precludes any alignment filtering or post-normalization methods. 
+Overlapping bases in paired-end alignments are double-counted.
 
 =item --position [start|mid|span|extend|cspan|coverage]
 
@@ -2858,8 +2984,16 @@ coding sequence, depending on the library preparation method.
 The Bam file consists of paired-end alignments, and only properly 
 mapped pairs of alignments will be counted. Properly mapped pairs 
 include FR reads on the same chromosome, and not FF, RR, RF, or 
-pairs aligning to separate chromosomes. The default is to 
-treat all alignments as single-end.
+pairs aligning to separate chromosomes. Both alignments are required 
+to be present before the pair is counted. The default is to treat 
+all alignments as single-end.
+
+=item --fastpe
+
+The Bam file consists of paired-end alignments, but to increase processing 
+time and be more tolerant of weird pairings, only the forward alignment is 
+required and considered; all reverse alignments are ignored. The default is 
+to treat all alignments as single-end.
 
 =item --minsize E<lt>integerE<gt>
 
@@ -3025,6 +3159,13 @@ instead of full counts. The number of alignments is determined using the
 NH alignment tag. If a read has 10 alignments, then each alignment is 
 given a count of 0.1. 
 
+=item --splfrac
+
+Indicate that spliced segments should be given a fractional count. This 
+allows a count to be assigned to each spliced segment while avoiding 
+double-counting. Best used with RNASeq spliced point data (--start or 
+--mid); not recommended for --span.
+
 =item --format E<lt>integerE<gt>
 
 Indicate the number of decimal postions reported in the wig file. This 
@@ -3111,6 +3252,13 @@ the default format for start and midpoint modes of operation.
 Specify the number of parallel instances to run simultaneously. This requires 
 the installation of L<Parallel::ForkManager>. With support enabled, the 
 default is 4. Disable multi-threaded execution by setting to 1. 
+
+=item --temp E<lt>directoryE<gt>
+
+Optionally specify an alternate temporary directory path where the temporary 
+files will be written. The default is the specified output file path, or the 
+current directory. Temporary files will always be written in a subdirectory of 
+the path specified with the template "bam2wigTEMP_XXXX".
 
 =item --verbose
 

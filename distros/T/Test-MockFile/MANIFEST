@@ -1,0 +1,20 @@
+Changes
+eg/examples.pl
+lib/Test/MockFile.pm
+lib/Test/MockFile/DirHandle.pm
+lib/Test/MockFile/FileHandle.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/dir.t
+t/manifest.t
+t/mock_stat.t
+t/pod-coverage.t
+t/pod.t
+t/readline.t
+t/sysopen.t
+t/writeline.t
+xt/boilerplate.t

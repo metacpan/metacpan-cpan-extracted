@@ -4,11 +4,15 @@
 use 5.006;
 use strict;
 use warnings;
+use File::Spec::Functions qw/ tmpdir catfile /;
 
 # A quick google said that this is the default value for maxpid
 # and if we can't find a pid in the first 32k, I suspect we won't
 # find one at all.
-my $MAXPID = 32768;
+$0 = "Proc-Pidfile-Test-$$";
+my $MAXPID          = 32768;
+my $TMPDIR          = tmpdir();
+my $DEFAULT_PIDFILE = catfile($TMPDIR, "Proc-Pidfile-Test-$$.pid");
 
 use Test::More tests => 24;
 BEGIN { require_ok( 'Proc::Pidfile' ); }
@@ -20,7 +24,9 @@ ok( -e $pidfile, "pidfile created" );
 undef $obj;
 ok( ! -e $pidfile, "pidfile destroyed" );
 # test for expicit pidfile path creation and destruction
-$pidfile = '/tmp/Proc-Pidfile.test.pid';
+# $pidfile = '/tmp/Proc-Pidfile.test.pid';
+$pidfile = catfile($TMPDIR, "Proc-Pidfile.test.pid");
+
 unlink( $pidfile ) if -e $pidfile;
 $obj = Proc::Pidfile->new( pidfile => $pidfile );
 is( $obj->pidfile(), $pidfile, "temp pidfile matches" );
@@ -69,7 +75,7 @@ $ppid = $$;
 $pid = fork;
 if ( $pid == 0 )
 {
-    $obj = Proc::Pidfile->new();
+    $obj = Proc::Pidfile->new(retries => 0);
     exit( 0 );
 }
 ok( defined( $pid ), "fork successful" );
@@ -78,7 +84,7 @@ ok( $? >> 8 != 0, "child spotted existing pidfile" );
 $pid = fork;
 if ( $pid == 0 )
 {
-    $obj = Proc::Pidfile->new( silent => 1 );
+    $obj = Proc::Pidfile->new( silent => 1, retries => 0 );
     exit( 2 );
 }
 ok( defined( $pid ), "fork successful" );
@@ -91,13 +97,13 @@ $pid = find_unused_pid();
 SKIP: {
     skip("can't find unused pid", 2) unless defined($pid);
 
-    $pidfile = '/tmp/Proc-Pidfile.test.pid';
+    $pidfile = $DEFAULT_PIDFILE;
     unlink( $pidfile ) if -e $pidfile;
     ok( open( FH, ">$pidfile" ), "open pidfile" );
 
     print FH $pid;
     close( FH );
-    eval { $obj = Proc::Pidfile->new( pidfile => $pidfile ); };
+    eval { $obj = Proc::Pidfile->new( pidfile => $pidfile, retries => 0 ); };
     $err = $@; undef $@;
     ok( ! $err, "bogus pidfile ignored" );
     undef $obj;
@@ -111,13 +117,13 @@ SKIP: {
     skip("can't find appropriate pid in use on this OS", 2)
         unless defined($pid);
 
-    $pidfile = '/tmp/Proc-Pidfile.test.pid';
+    $pidfile = $DEFAULT_PIDFILE;
     unlink( $pidfile ) if -e $pidfile;
     ok( open( FH, ">$pidfile" ), "open pidfile" );
 
     print FH $pid;
     close( FH );
-    eval { $obj = Proc::Pidfile->new( pidfile => $pidfile ); };
+    eval { $obj = Proc::Pidfile->new( pidfile => $pidfile, retries => 0 ); };
     $err = $@; undef $@;
     like( $err, qr/already running: $pid/, "other users pid" );
     undef $obj;

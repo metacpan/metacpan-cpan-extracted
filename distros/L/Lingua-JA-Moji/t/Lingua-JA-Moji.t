@@ -143,6 +143,8 @@ is (smallize_kana ('ツプ'), undef, "Cannot smallize tsu kana at start");
 is (smallize_kana ('感ツプ'), undef, "Cannot smallize tsu kana after non-kana");
 is (smallize_kana ('サンゼンツプ'), undef, "Cannot smallize tsu kana after n");
 is (smallize_kana ('サツプ'), 'サップ', "Can smallize kana after 'sa'");
+is (smallize_kana ('シヨツチユウ'), 'ショッチュウ', "Test of smallize shotchuu");
+is (smallize_kana ('チヨダ'), 'チョダ', "Test of smallize chiyoda");
 
 # Test the cleanup of badly-input kana
 

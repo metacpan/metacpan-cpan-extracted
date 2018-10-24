@@ -23,15 +23,15 @@ FUNCTIONS
 
     Takes a directory path and optional hashref of options, and returns a
     list of items in the directory. Home directories represented by ~ will
-    be expanded by "path" in Path::Tiny. If no directory path is passed,
-    the current working directory will be used. Like in ls(1), the returned
+    be expanded by Path::ExpandTilde. If no directory path is passed, the
+    current working directory will be used. Like in ls(1), the returned
     names are relative to the passed directory path, so if you want to use
     a filename (such as passing it to open or stat), you must prefix it
     with the directory path, with ~ expanded if present.
 
       # Check the size of a file in current user's home directory
       my @contents = ls '~';
-      say -s glob('~') . "/$contents[0]";
+      say -s "$ENV{HOME}/$contents[0]";
 
     By default, hidden files and directories (those starting with .) are
     omitted, and the results are sorted by name according to the current

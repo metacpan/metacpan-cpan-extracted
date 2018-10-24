@@ -1,0 +1,10 @@
+Revision history for Test-MockFile
+
+0.002   10/24/2018
+        Set bug tracker to github
+
+0.001   10/23/2018
+        First release with basic support for open/sysopen/opendir
+        Support is limited to Perl 5.20 until we address this error:
+            Error:  Invalid CODE attribute: prototype(*;$@) at lib/Test/MockFile.pm 
+

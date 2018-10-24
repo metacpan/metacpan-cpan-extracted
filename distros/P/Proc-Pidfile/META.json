@@ -24,7 +24,8 @@
             "Carp" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
-            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "Time::HiRes" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -39,7 +40,7 @@
    "provides" : {
       "Proc::Pidfile" : {
          "file" : "lib/Proc/Pidfile.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
@@ -51,7 +52,7 @@
          "web" : "https://github.com/neilbowers/Proc-Pidfile"
       }
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

@@ -1,13 +1,14 @@
 use strict;
 use warnings;
 use Dir::ls;
-use File::chdir;
-use Path::Tiny 'tempdir';
+use File::pushd;
+use File::Spec;
+use File::Temp;
 use Sort::filevercmp;
 use Test::More;
 use sort 'stable';
 
-my $testdir = tempdir;
+my $testdir = File::Temp->newdir;
 
 my @testfiles = qw(test1  test2.foo.tar  TEST3  test3.bar  test4.TXT  test5  .test5.log  Test_6.Txt  test7.out  test8.jpg);
 my %testcontents = (
@@ -16,10 +17,14 @@ my %testcontents = (
   'test3.bar' => 'abcd',
   test5 => 'abcd',
 );
-$testdir->child($_)->touch for @testfiles;
-$testdir->child($_)->spew($testcontents{$_}) for grep { exists $testcontents{$_} } @testfiles;
-$testdir->child('test.d')->mkpath;
-$testcontents{'test.d'} = 'a'x(-s $testdir->child('test.d')); # for later size check
+foreach my $testfile (@testfiles) {
+  my $testpath = File::Spec->catfile($testdir, $testfile);
+  open my $testfh, '>', $testpath or die "Failed to create $testpath for testing: $!";
+  print $testfh $testcontents{$testfile} if exists $testcontents{$testfile};
+}
+my $testpath = File::Spec->catdir($testdir, 'test.d');
+mkdir $testpath or die "Failed to create $testpath for testing: $!";
+$testcontents{'test.d'} = "\0"x(-s $testpath); # for later size check
 
 my (@sorted_byname, @sorted_byext);
 {
@@ -34,7 +39,7 @@ my @default_sort = grep { !m/^\./ } @sorted_byname;
 is_deeply \@default_list, \@default_sort, 'default list correct';
 
 {
-  local $CWD = $testdir;
+  my $cwd = pushd $testdir;
   my @cwd_list = ls;
   my @cwd_sort = grep { !m/^\./ } @sorted_byname;
   is_deeply \@cwd_list, \@cwd_sort, 'cwd list correct';
@@ -45,7 +50,7 @@ my @reverse_sort = reverse grep { !m/^\./ } @sorted_byname;
 is_deeply \@reverse_list, \@reverse_sort, 'reverse list correct';
 
 {
-  local $CWD = $testdir;
+  my $cwd = pushd $testdir;
   my @cwd_reverse_list = ls {reverse => 1};
   my @cwd_reverse_sort = reverse grep { !m/^\./ } @sorted_byname;
   is_deeply \@cwd_reverse_list, \@cwd_reverse_sort, 'cwd reverse list correct';

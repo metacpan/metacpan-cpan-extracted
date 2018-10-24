@@ -16,7 +16,7 @@ String::Interpolate::Named - Interpolated named arguments in string
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,8 @@ specified:
       separator => ", ",
     }
 
-The separator defaults to a single space.
+The separator defaults to perl variable C<$">, which defaults to a
+single space.
 
 =cut
 
@@ -166,7 +167,7 @@ sub _interpolate {
 	    }
 	    # Zero or none means concatenate all.
 	    else {
-		$val = join( $ctl->{separator} // " ", @$val );
+		$val = join( $ctl->{separator} // $", @$val );
 	    }
 	}
 	elsif ( $inx ) {

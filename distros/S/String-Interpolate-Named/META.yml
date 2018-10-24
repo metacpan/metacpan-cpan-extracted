@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  perl: '5.010'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/sciurius/perl-String-Interpolate-Named/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/sciurius/perl-String-Interpolate-Named
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

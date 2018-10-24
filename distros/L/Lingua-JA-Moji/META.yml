@@ -25,7 +25,7 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/Lingua-JA-Moji/issues
   repository: https://github.com/benkasminbullock/Lingua-JA-Moji
-version: '0.54'
+version: '0.55'
 x_contributors:
   - 'Naoki Tomita <tomita@cpan.org>'
   - 'David Steinbrunner'

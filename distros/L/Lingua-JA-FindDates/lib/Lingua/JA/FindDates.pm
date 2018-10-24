@@ -13,7 +13,7 @@ our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 # Kanji number conversion table.
 
@@ -731,10 +731,10 @@ sub subsjdate
     # internal encoding.
     # $replace_callback is a routine to call back if we find valid dates.
     # $data is arbitrary data to pass to the callback routine.
-    my ($text, $callbacks) = @_;
+    my ($text, $c) = @_;
     # Save doing existence tests.
-    if (! $callbacks) {
-        $callbacks = {};
+    if (! $c) {
+        $c = {};
     }
     if (! $text) {
         return $text;
@@ -828,11 +828,9 @@ sub subsjdate
 	    my $edate;
 	    if ($date2) {
                 # Date interval
-		if ($callbacks->{make_date_interval}) {
-		    $edate = 
-                    &{$callbacks->{make_date_interval}} ($callbacks->{data},
-                                                         $orig,
-                                                         $date1, $date2);
+		if ($c->{make_date_interval}) {
+		    $edate = &{$c->{make_date_interval}} ($c->{data}, $orig,
+							  $date1, $date2);
 		}
                 else {
 		    $edate = default_make_date_interval ($date1, $date2);
@@ -840,10 +838,8 @@ sub subsjdate
 	    }
             else {
                 # Single date
-		if ($callbacks->{make_date}) {
-		    $edate = &{$callbacks->{make_date}}($callbacks->{data},
-                                                        $orig,
-                                                        $date1);
+		if ($c->{make_date}) {
+		    $edate = &{$c->{make_date}}($c->{data}, $orig, $date1);
 		}
                 else {
 		    $edate = default_make_date ($date1);
@@ -852,12 +848,9 @@ sub subsjdate
             if ($verbose) {
                 print "-> '$edate'\n";
             }
-
-
 	    $text =~ s/\Q$orig\E/$edate/g;
-	    if ($callbacks &&
-                $callbacks->{replace}) {
-		&{$callbacks->{replace}}($callbacks->{data}, $orig, $edate);
+	    if ($c->{replace}) {
+		&{$c->{replace}} ($c->{data}, $orig, $edate);
 	    }
 	}
     }

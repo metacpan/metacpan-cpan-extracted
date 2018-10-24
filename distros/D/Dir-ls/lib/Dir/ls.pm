@@ -4,11 +4,12 @@ use strict;
 use warnings;
 use Carp 'croak';
 use Exporter 'import';
-use Path::Tiny 'path';
+use File::Spec;
+use Path::ExpandTilde;
 use Sort::filevercmp 'fileversort';
 use sort 'stable';
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 our @EXPORT = 'ls';
 
@@ -21,10 +22,10 @@ sub ls {
   }
   $dir = '.' unless defined $dir and length $dir;
   $options ||= {};
+
+  $dir = expand_tilde($dir); # do homedir expansion
   
-  $dir = path($dir); # do glob expansion
-  
-  opendir my $dh, "$dir" or croak "Failed to open directory '$dir': $!";
+  opendir my $dh, $dir or croak "Failed to open directory '$dir': $!";
   my @entries = readdir $dh;
   closedir $dh or croak "Failed to close directory '$dir': $!";
   
@@ -77,9 +78,13 @@ sub ls {
 
 sub _stat_sorter {
   my ($dir, $entry, $index) = @_;
-  $entry = $dir->child($entry);
-  my @stat = stat $entry;
-  croak "Failed to stat '$entry': $!" unless @stat;
+  my $path = File::Spec->catfile($dir, $entry);
+  my @stat = stat $path;
+  unless (@stat) { # try as a subdirectory
+    $path = File::Spec->catdir($dir, $entry);
+    @stat = stat $path;
+  }
+  croak "Failed to stat '$path': $!" unless @stat;
   return $stat[$index];
 }
 
@@ -124,7 +129,7 @@ similar manner to the GNU coreutils command L<ls(1)>.
 
 Takes a directory path and optional hashref of options, and returns a list of
 items in the directory. Home directories represented by C<~> will be expanded
-by L<Path::Tiny/"path">. If no directory path is passed, the current working
+by L<Path::ExpandTilde>. If no directory path is passed, the current working
 directory will be used. Like in L<ls(1)>, the returned names are relative to
 the passed directory path, so if you want to use a filename (such as passing it
 to C<open> or C<stat>), you must prefix it with the directory path, with C<~>
@@ -132,7 +137,7 @@ expanded if present.
 
   # Check the size of a file in current user's home directory
   my @contents = ls '~';
-  say -s glob('~') . "/$contents[0]";
+  say -s "$ENV{HOME}/$contents[0]";
 
 By default, hidden files and directories (those starting with C<.>) are
 omitted, and the results are sorted by name according to the current locale

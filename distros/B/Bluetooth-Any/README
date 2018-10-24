@@ -2,8 +2,8 @@ NAME
     Bluetooth::Any - Common interface to bluetooth functions
 
 VERSION
-    This document describes version 0.001 of Bluetooth::Any (from Perl
-    distribution Bluetooth-Any), released on 2018-10-22.
+    This document describes version 0.002 of Bluetooth::Any (from Perl
+    distribution Bluetooth-Any), released on 2018-10-24.
 
 DESCRIPTION
     This module provides common functions related to bluetooth.

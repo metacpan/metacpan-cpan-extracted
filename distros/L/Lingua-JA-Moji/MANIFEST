@@ -1,4 +1,7 @@
 Changes
+examples/onbiki.pl
+examples/syn-kana.pl
+examples/synopsis.pl
 lib/Lingua/JA/Moji-ja.pod
 lib/Lingua/JA/Moji.pm
 lib/Lingua/JA/Moji.pod

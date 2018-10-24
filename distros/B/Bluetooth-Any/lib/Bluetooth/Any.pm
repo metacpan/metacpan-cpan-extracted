@@ -1,7 +1,7 @@
 package Bluetooth::Any;
 
-our $DATE = '2018-10-22'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-10-24'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -101,9 +101,10 @@ sub bluetooth_is_on {
         }
         log_trace "Using rfkill to check bluetooth status";
         my $out;
-        system {capture_stdout=>\$out}, "rfkill", "block", "bluetooth";
+        system {capture_stdout=>\$out}, "rfkill", "list", "bluetooth";
         last if $?;
         my $in_bt;
+        my $unblocked;
         for (split /^/m, $out) {
             if (/^\d/) {
                 if (/bluetooth/i) {
@@ -115,10 +116,18 @@ sub bluetooth_is_on {
             } else {
                 if (/blocked:\s*yes/i) {
                     return [200, "OK", 0, {'func.method'=>'rfkill', 'cmdline.result'=>'Bluetooth is OFF', 'cmdline.exit_code'=>1}];
+                } elsif (/blocked:\s*no/i) {
+                    $unblocked = 0;
                 }
             }
         }
-        return [200, "OK", 1, {'func.method'=>'rfkill', 'cmdline.result'=>'Bluetooth is on', 'cmdline.exit_code'=>0}];
+
+        if (defined $unblocked) {
+            return [200, "OK", 1, {'func.method'=>'rfkill', 'cmdline.result'=>'Bluetooth is on', 'cmdline.exit_code'=>0}];
+        } else {
+            log_warn "Cannot detect 'blocked: no' from 'rfkill list' output, skipping using rfkill";
+            last;
+        }
     }
     [500, "Failed, no methods succeeded"];
 }
@@ -138,7 +147,7 @@ Bluetooth::Any - Common interface to bluetooth functions
 
 =head1 VERSION
 
-This document describes version 0.001 of Bluetooth::Any (from Perl distribution Bluetooth-Any), released on 2018-10-22.
+This document describes version 0.002 of Bluetooth::Any (from Perl distribution Bluetooth-Any), released on 2018-10-24.
 
 =head1 DESCRIPTION
 

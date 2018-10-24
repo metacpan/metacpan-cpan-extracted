@@ -12,7 +12,7 @@
                                                 
 
 
-This is the README for Lingua::JA::FindDates version 0.026.
+This is the README for Lingua::JA::FindDates version 0.027.
 
 Lingua::JA::FindDates is a "module" for the Perl computer programming
 language, a library of computer code to install on a computer.  This
@@ -48,7 +48,7 @@ The module recognizes both Japanese years, such as "平成２４年"
 (Heisei), and European years, such as 2012年. It recognizes ASCII
 numerals, 1, 2, 3; the "wide" or "double width" numerals sometimes
 used in Japan, １, ２, ３ (see
-"What is "wide ASCII"?|http://www.sljfaq.org/afaq/wide-ascii.html"); 
+"What is "wide ASCII"?"); 
 and the kanji-based numeral system, 一, 二,三. It recognizes some
 special date formats such as 元年 for the first year of an era. It
 recognizes era names identified by their initial letters, such as S41
@@ -67,12 +67,11 @@ identify some kind of date within Japanese text, please report a bug.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?Lingua::JA::FindDates
     * http://metacpan.org/release/Lingua-JA-FindDates
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -94,10 +93,10 @@ If you have the App::cpanminus installer, you may prefer
     cpanm Lingua::JA::FindDates
 
 To install the module from the source file,
-Lingua-JA-FindDates-0.026.tar.gz, follow this sequence of commands:
+Lingua-JA-FindDates-0.027.tar.gz, follow this sequence of commands:
 
-    tar xfz Lingua-JA-FindDates-0.026.tar.gz
-    cd Lingua-JA-FindDates-0.026
+    tar xfz Lingua-JA-FindDates-0.027.tar.gz
+    cd Lingua-JA-FindDates-0.027
     perl Makefile.PL
     make
     make install
@@ -122,6 +121,6 @@ public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Oct 17 13:10:25 2017.
+This README was written on Wed Oct 24 19:47:44 2018.
 
 -----------------------------------------------------------------------------

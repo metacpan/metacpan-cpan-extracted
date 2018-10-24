@@ -1,6 +1,6 @@
 package Data::Password::Filter;
 
-$Data::Password::Filter::VERSION   = '0.17';
+$Data::Password::Filter::VERSION   = '0.18';
 $Data::Password::Filter::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Password::Filter - Interface to the password filter.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
@@ -20,7 +20,7 @@ use File::Share ':all';
 use Data::Password::Filter::Params qw(ZeroOrOne FilePath PositiveNum);
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 =head1 DESCRIPTION
 

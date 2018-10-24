@@ -50393,3 +50393,13 @@ U/UT/UTASHIRO/Text-ANSI-Fold-0.03.tar.gz
 M/MA/MANWAR/Text-Trac-0.19.tar.gz
 L/LO/LOCALSHOP/WebService-GoogleAPI-Client-0.13.tar.gz
 A/AM/AMALTSEV/XAO-Base-1.22.tar.gz
+T/TJ/TJPARNELL/Bio-ToolBox-1.63.tar.gz
+P/PE/PERLANCAR/Bluetooth-Any-0.002.tar.gz
+M/MA/MANWAR/Data-Password-Filter-0.18.tar.gz
+D/DB/DBOOK/Dir-ls-0.005.tar.gz
+B/BK/BKB/Lingua-JA-FindDates-0.027.tar.gz
+B/BK/BKB/Lingua-JA-Moji-0.55.tar.gz
+D/DB/DBOOK/Path-ExpandTilde-0.001.tar.gz
+N/NE/NEILB/Proc-Pidfile-1.09.tar.gz
+J/JV/JV/String-Interpolate-Named-0.04.tar.gz
+T/TO/TODDR/Test-MockFile-0.002.tar.gz

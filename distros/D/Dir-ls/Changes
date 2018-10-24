@@ -1,3 +1,6 @@
+0.005     2018-10-24 01:10:27 EDT
+  - Do tilde expansion with Path::ExpandTilde instead of Path::Tiny
+
 0.004     2017-07-15 18:24:22 EDT
   - Default to current working directory if no directory passed
 

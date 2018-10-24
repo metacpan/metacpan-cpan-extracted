@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,18 +21,18 @@ no_index:
 provides:
   Data::Password::Filter:
     file: lib/Data/Password/Filter.pm
-    version: '0.17'
+    version: '0.18'
   Data::Password::Filter::Params:
     file: lib/Data/Password/Filter/Params.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   File::Share: '0.25'
   Moo: '2.000000'
   Type::Tiny: '1.000005'
   autodie: '2.26'
-  namespace::clean: '0.24'
+  namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Data-Password-Filter.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

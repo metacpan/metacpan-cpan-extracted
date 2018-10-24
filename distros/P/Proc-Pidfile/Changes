@@ -1,5 +1,36 @@
 Revision history for Perl module Proc::Pidfile
 
+1.09 2018-09-26 NEILB
+    - Only one odd looking fail on CPAN Testers, so doing a non-developer
+      release, as that will get more testing.
+
+1.08_05 2018-09-26 NEILB
+    - After lots of testing to try and cope with parallel smoke testers,
+      decided its best to avoid that problem by having each installation
+      create a unique name for the pidfile, so the tests won't collide.
+
+1.08_04 2018-09-24 NEILB
+    - Don't bother with /var/run
+    - Use File::Spec to portably build paths. Hopefully will sort out
+      at least some of the Windows fails on CPAN Testers.
+
+1.08_03 2018-09-16 NEILB
+    - I realised that some of the test cases should set the new "retries"
+      parameter to zero, otherwise they'll increase the chance of problems
+      with parallel smokers.
+
+1.08_02 2018-09-13 NEILB
+    - Extended the SEE ALSO section with a bunch of modules for the same task.
+    - Changed the parameter name from "attempts" to "retries",
+      and added documentation for it.
+    - Added verbose message about backing off.
+
+1.08_01 2018-09-12 NEILB
+    - If pidfile already exists and process is running,
+      retry a couple of times. Parallel smoke testers were producing
+      spurious fails; this will hopefully fix that, and is potentially
+      a useful feature to have anyway.
+
 1.08 2018-09-07 NEILB
     - Fixes for when running in taint mode. One fix from Laurence Darby,
       and one from me.

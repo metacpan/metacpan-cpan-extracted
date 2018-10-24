@@ -1,3 +1,9 @@
+0.002   2018-10-24 (PERLANCAR)
+
+	- [bugfix] Fix checking bluetooth status, differentiate case of not
+	  finding /blocked: no/ as an error condition.
+
+
 0.001   2018-10-22 (PERLANCAR)
 
         - First release.
