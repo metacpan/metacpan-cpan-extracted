@@ -2,7 +2,7 @@ package Test2::Formatter::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.001069';
+our $VERSION = '0.001070';
 
 use Carp qw/croak confess/;
 use Time::HiRes qw/time/;
@@ -85,6 +85,7 @@ sub new_root {
     my $class = shift;
     my %params = @_;
 
+    $ROOT_PID = $$ unless defined $ROOT_PID;
     confess "new_root called from child process!"
         if $ROOT_PID != $$;
 

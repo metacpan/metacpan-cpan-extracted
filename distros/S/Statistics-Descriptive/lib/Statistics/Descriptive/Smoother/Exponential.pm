@@ -4,7 +4,7 @@ use warnings;
 
 use base 'Statistics::Descriptive::Smoother';
 
-our $VERSION = '3.0701';
+our $VERSION = '3.0702';
 
 sub _new {
     my ($class, $args) = @_;
@@ -41,7 +41,7 @@ Statistics::Descriptive::Smoother::Exponential - Implement exponential smoothing
 
 =head1 VERSION
 
-version 3.0701
+version 3.0702
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,7 @@ while C<1> the series is universally equal to the initial unsmoothed value.
 
 =head1 VERSION
 
-version 3.0701
+version 3.0702
 
 =head1 METHODS
 

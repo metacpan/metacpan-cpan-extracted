@@ -362,15 +362,16 @@ about one page down, at the end of this chapter.
  %>
 
 In most cases it is not recommended to make complex inline templates
-though, it is usually better to move sub-templates into a separate file
-and include it by passing path into Page. Usually it is also more time
-efficient because templates with known paths are cached in parsed state
-first time they used while inlined templates are parsed every time.
+though. It is usually better to move a sub-template into a separate file
+and include it by passing a 'path' parameter into Page. Usually it is
+also more efficient because templates with known paths are cached in
+parsed state the first time they are used while inlined templates are
+parsed every time.
 
-It is usually good idea to make templates as simple as possible and move
+It is usually a good idea to make templates as simple as possible and move
 most of the logic inside of objects. To comment what you're doing in
 various parts of template you can use normal HTML-style comments. They
-are removed from the output completely, so you can include any amounts
+are removed from the output completely, so you can include any amount
 of text inside of comments -- it won't impact the size of final HTML
 file. Here is an example:
 
@@ -385,15 +386,15 @@ file. Here is an example:
  <%Footer%>
 
 One exception is JavaScript code which is usually put into comments. The
-parser will NOT remove comments if open comment is <!--//. Here is an
+parser will NOT remove comments if the opening comment is <!--//. Here is an
 example of JavaScript code:
 
- <SCRIPT LANGUAGE="JAVASCRIPT"><!--//
+ <script type="text/javascript"><!--//
  function foo ()
  { alert("bar");
  }
  //-->
- </SCRIPT>
+ </script>
 
 
 =head2 CACHING
@@ -401,7 +402,7 @@ example of JavaScript code:
 Parsed templates are always cached either locally or using a configured
 cache. The cache is keyed on 'path' or 'template' parameters value (two
 identical 'template's will only parse once). Parse cache can be disabled
-by giving an "xao.uncached" parameter. See parse() method description
+by giving a "xao.uncached" parameter. See parse() method description
 for details.
 
 The fully rendered content can also be cached if a couple of conditions
@@ -1773,8 +1774,7 @@ sub pageurl ($;%) {
         throw $self "- no Web context, needs clipboard->'pagedesc'";
 
     my $url=$self->base_url(@_);
-    my $uri=$pagedesc->{fullpath} || '/';
-    $uri="/".$uri unless substr($uri,0,1) eq '/';
+    my $uri=$self->cgi->url(-absolute => 1);
 
     return $url.$uri;
 }

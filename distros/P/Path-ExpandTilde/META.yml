@@ -27,7 +27,7 @@ no_index:
 provides:
   Path::ExpandTilde:
     file: lib/Path/ExpandTilde.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Path-ExpandTilde/issues
   homepage: https://github.com/Grinnz/Path-ExpandTilde
   repository: https://github.com/Grinnz/Path-ExpandTilde.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -184,7 +184,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

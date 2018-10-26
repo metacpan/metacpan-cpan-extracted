@@ -1,0 +1,3 @@
+my $rv = unlink('/path/name', '/file/name');
+my($a, $b);
+$rv = unlink($a, $b)

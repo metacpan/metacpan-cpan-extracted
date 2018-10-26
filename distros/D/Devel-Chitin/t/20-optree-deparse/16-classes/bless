@@ -1,0 +1,2 @@
+my $obj = bless({}, 'Some::Package');
+$obj = bless([])

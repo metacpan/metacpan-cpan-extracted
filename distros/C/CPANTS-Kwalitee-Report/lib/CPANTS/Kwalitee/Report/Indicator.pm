@@ -1,6 +1,6 @@
 package CPANTS::Kwalitee::Report::Indicator;
 
-$CPANTS::Kwalitee::Report::Indicator::VERSION   = '0.10';
+$CPANTS::Kwalitee::Report::Indicator::VERSION   = '0.11';
 $CPANTS::Kwalitee::Report::Indicator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ CPANTS::Kwalitee::Report::Indicator - Interface to Kwalitee Indicator.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 use List::Util qw(any);
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 

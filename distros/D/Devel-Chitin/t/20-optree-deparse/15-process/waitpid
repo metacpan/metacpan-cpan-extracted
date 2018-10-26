@@ -1,0 +1,5 @@
+BEGIN { skip q(WNOHANG isn't defined on Windows) if $^O eq 'MSWin32'; } # omit
+use POSIX qw(:sys_wait_h); # omit
+my $a = waitpid(123, WNOHANG | WUNTRACED);
+$a = waitpid($a, 0)
+

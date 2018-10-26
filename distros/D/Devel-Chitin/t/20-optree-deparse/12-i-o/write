@@ -1,0 +1,5 @@
+write(FH);
+write(*FH);
+my $fh;
+write($fh);
+write()

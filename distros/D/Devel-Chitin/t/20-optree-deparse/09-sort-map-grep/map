@@ -1,0 +1,5 @@
+my($a, @list);
+map(chr(), $a, $a);
+map(chr(), @list);
+map { chr() } ($a, $a);
+map { chr() } @list

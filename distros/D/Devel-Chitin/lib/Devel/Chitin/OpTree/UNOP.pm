@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::UNOP;
 use base 'Devel::Chitin::OpTree';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use strict;
 use warnings;
@@ -326,6 +326,25 @@ foreach my $a ( [ pp_entereval  => 'eval',      0 ],
     *$pp_name = $sub;
 }
 
+sub pp_fc {
+    my($self, %params) = @_;
+
+    my $children = $self->children;
+    if (@$children > 1) {
+        # This is part of a \F...\E sequence within a double-quoted string, first child is a pushmark
+        '\F' . $children->[1]->deparse . '\E';
+
+    } else {
+        # This is a regular fc() UNOP
+        my $arg = $self->first->deparse;
+        my $target = $self->_maybe_targmy;
+        "${target}fc("
+            . ( $arg eq '$_' ? '' : $arg )
+            . ')';
+    }
+}
+
+
 # Functions that don't operate on $_
 #                   OP name        Perl fcn    targmy?
 foreach my $a ( [ pp_scalar     => 'scalar',    0 ],
@@ -384,7 +403,7 @@ foreach my $a ( [ pp_scalar     => 'scalar',    0 ],
 }
 
 # These look like keywords but take an argument
-foreach my $a ( [ pp_dump       => 'dump' ],
+foreach my $a ( [ pp_dump       => 'CORE::dump' ],
                 [ pp_next       => 'next' ],
                 [ pp_last       => 'last' ],
                 [ pp_redo       => 'redo' ],

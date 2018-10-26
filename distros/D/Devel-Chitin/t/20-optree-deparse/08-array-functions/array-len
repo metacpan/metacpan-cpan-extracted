@@ -1,0 +1,4 @@
+my($a, @list, $listref);
+$a = $#list;
+$a = $#$listref;
+$a = scalar(@list)

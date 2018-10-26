@@ -240,5 +240,5 @@ Written by Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>
 
 # COPYRIGHT
 
-Copyright (c) 2015 cPanel, Inc.  Released under the terms of the MIT license.
+Copyright (c) 2018 cPanel, L.L.C.  Released under the terms of the MIT license.
 See LICENSE for further details.

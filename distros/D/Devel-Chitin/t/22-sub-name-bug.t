@@ -1,49 +1,50 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0; no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(db_continue do_test);
 use Sub::Name;
 
-run_in_debugger();
-
-Devel::Chitin::TestDB->attach();
-Devel::Chitin::TestDB->trace(1);
 
 my $main_serial = $Devel::Chitin::stack_serial[0]->[-1];
-my($in_sub, @serials);
+my @serials;
 my $anon = Sub::Name::subname 'foo' => sub {
     push @serials, $Devel::Chitin::stack_serial[-1]->[-1];
-    $in_sub = 1;  # start testing here
-    my @a = (1, 2, 3);
-    (4, 5, 6);
-    undef $in_sub;  # stop testing after this...
+    $DB::single=1;
+    19;
+    $DB::single=1;
+    21;
 };
 $anon->(7, 8, 9);
 *anon = $anon;
 anon('a', 'b', 'c');
 
-package Devel::Chitin::TestDB;
-use base 'Devel::Chitin';
+sub __tests__ {
+    plan tests => 6;
 
-BEGIN {
-    if (Devel::Chitin::TestRunner::is_in_test_program) {
-        eval "use Test::More tests => 9";
-    }
+    # first, we're in the sub via the subref $anon->()
+    do_test { is_stackframe_serial($serials[0], 'subref stackframe serial matches') };
+    db_continue;
+    do_test { is_stackframe_serial($serials[0], 'subref stackframe serial still matches') };
+    db_continue;
+
+    # now, we're in the sub via anan()
+    do_test { is_stackframe_serial($serials[1], 'sub call stackframe serial is different than first call') };
+    do_test { isnt_stackframe_serial($serials[0], 'sub call stackframe serial matches expected') };
+    db_continue;
+    do_test { is_stackframe_serial($serials[1], 'sub call stackframe serial is still different than first call') };
+    do_test { isnt_stackframe_serial($serials[0], 'sub call stackframe serial still matches expected') };
 }
 
-sub notify_trace {
-    return unless $in_sub;
+sub is_stackframe_serial {
+    my($serial, $message) = @_;
+    my $stackframe = TestHelper->stack->frame(0);
+    is($stackframe->serial, $serial, $message);
+}
 
-    my($class, $loc) = @_;
-
-    my $stackframe = $class->stack->frame(0);
-    is($stackframe->serial, $serials[-1], 'serial matches');
-
-    if (@serials == 2) {
-        # We're in the second call
-        isnt($stackframe->serial, $serials[0], 'second serial is different than first');
-    }
+sub isnt_stackframe_serial {
+    my($serial, $message) = @_;
+    my $stackframe = TestHelper->stack->frame(0);
+    isnt($stackframe->serial, $serial, $message);
 }

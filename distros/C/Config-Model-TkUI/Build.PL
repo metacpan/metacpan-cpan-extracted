@@ -52,7 +52,7 @@ my $build = Module::Build->new
   },
   'requires' => {
     'Carp' => '0',
-    'Config::Model' => '2.114',
+    'Config::Model' => '2.123',
     'Config::Model::ObjTreeScanner' => '0',
     'File::HomeDir' => '0',
     'Log::Log4perl' => '1.11',

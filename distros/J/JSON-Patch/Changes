@@ -1,5 +1,9 @@
 Revision history for JSON-Patch
 
+0.04    2018-10-26
+        - Struct::Diff diff conversion mode fixed
+        - ops order fixed for hashes (reproducible diffs)
+
 0.03    2018-10-21
         - Throw errors for wrong patch and patch item's types
         - Struct::Diff diff conversion supported in diff()

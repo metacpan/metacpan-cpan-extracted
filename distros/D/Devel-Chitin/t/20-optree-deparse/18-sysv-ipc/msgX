@@ -1,0 +1,5 @@
+my($a, $rv);
+$rv = msgctl(1, 2, $a);
+$rv = msgget($a, 0);
+$rv = msgsnd(1, $a, 0);
+$rv = msgrecv(1, $a, 1, 2, 3)

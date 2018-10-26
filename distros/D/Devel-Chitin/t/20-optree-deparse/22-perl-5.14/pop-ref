@@ -1,0 +1,4 @@
+BEGIN { skip "requires 5.14.0 -> 5.22" if $^V lt v5.14.0 or $^V ge v5.24.0 } # omit
+use v5.14; # omit
+my $a = [1, 2, 3];
+pop($a)

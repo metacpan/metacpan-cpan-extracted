@@ -3,47 +3,36 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.69';
+our $VERSION = '1.70';
 
 use Carp;
-use Data::Dumper;
 
 BEGIN {
 
-    # we need to do some trickery for DTS due to circular referencing,
-    # which broke CPAN installs.
+    # we need to do some trickery for Devel::Trace::Subs due to circular
+    # referencing, which broke CPAN installs. DTS does nothing if not presented,
+    # per this code
 
     eval {
         require Devel::Trace::Subs;
-    };
-
-    eval {
         import Devel::Trace::Subs qw(trace);
     };
 
     if (! defined &trace){
         *trace = sub {};
     }
-};
+}
 
 sub new {
-    
     trace() if $ENV{TRACE};
-
     my $self = {};
     bless $self, shift;
-
-    my $struct = shift;
-
     $self->{post_procs} = $self->_dt();
-
     return $self;
 }
 sub _dt {
     
     trace() if $ENV{TRACE};
-
-    my $self = shift;
 
     my $dt = {
         file_lines_contain => \&file_lines_contain,
@@ -79,9 +68,8 @@ sub subs {
         
         trace() if $ENV{TRACE};
 
-        my $p = shift;
-        my $struct = shift;
-        
+        my ($p, $struct) = @_;
+
         my $s = $struct;
         my @subs;
 
@@ -91,7 +79,8 @@ sub subs {
                 $s->{$f}{subs}{$sub}{start}++;
                 $s->{$f}{subs}{$sub}{end}++;
                 $s->{$f}{subs}{$sub}{name} = $sub;
-                @{ $s->{$f}{subs}{$sub}{code} } = @{ $s->{$f}{subs}{$sub}{code} };
+                @{ $s->{$f}{subs}{$sub}{code} }
+                  = @{ $s->{$f}{subs}{$sub}{code} };
                 push @subs, $s->{$f}{subs}{$sub};
             }
         }
@@ -169,10 +158,8 @@ sub _test {
     trace() if $ENV{TRACE};
 
     return sub {
-        
         trace() if $ENV{TRACE};
-        my $p = shift;
-        my $struct = shift;
+        my ($p, $struct) = @_;
         return $struct;
     };
 }
@@ -193,14 +180,11 @@ sub objects {
 
         return if not ref($struct) eq 'ARRAY';
 
-        my $file = $p->{file};
         my $search = $p->{search};
 
         if ($search && ! $p->{regex}){
             $search = "\Q$search";
         }
-
-        my $lines;
 
         my $des_sub;
 
@@ -243,8 +227,8 @@ first parameter.
 
 =head2 C<exists('post-processor')>
 
-Verifies whether the post-processor name specified as the string parameter exists
-and is valid.
+Verifies whether the post-processor name specified as the string parameter
+exists and is valid.
 
 =head2 C<subs()>
 
@@ -274,7 +258,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2017 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

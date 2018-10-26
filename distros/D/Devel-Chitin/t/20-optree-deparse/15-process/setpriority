@@ -1,0 +1,2 @@
+my $a = setpriority(1, 2, 3);
+$a = setpriority(0, 0, -2)

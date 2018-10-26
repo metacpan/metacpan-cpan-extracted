@@ -1,0 +1,4 @@
+my $a = sysseek(F, 10, SEEK_CUR);
+my $fh;
+sysseek($fh, -10, SEEK_END);
+sysseek(*$fh, 0, SEEK_SET)

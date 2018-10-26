@@ -36,6 +36,7 @@ sub test_replace_die {
 	ok( eval 'Example->import_into("NsReplaceDie", {replace => "die"}, "alpha", { -as => "Array" });1',
 		'Allow adding sub when glob existed alredy' )
 		or diag $@;
+	done_testing;
 }
 
 subtest replace_warn => \&test_replace_warn;
@@ -52,6 +53,7 @@ sub test_replace_warn {
 	is( scalar @warned, 1, 'generated one warning' );
 	note @warned;
 	is( NsReplaceWarn->alpha, 'b', 'but did import it' );
+	done_testing;
 }
 
 subtest replace_skip => \&test_replace_skip;
@@ -64,6 +66,7 @@ sub test_replace_skip {
 		or diag @warned;
 	is( NsReplaceSkip->gamma, 'g', 'installed gamma' );
 	is( NsReplaceSkip->delta, 'ours', 'preserved existing delta' );
+	done_testing;
 }
 
 subtest replace_1 => \&test_replace_1;
@@ -76,6 +79,7 @@ sub test_replace_1 {
 		or diag @warned;
 	is( NsReplace1->gamma, 'g', 'installed gamma' );
 	is( NsReplace1->delta, 'd', 'installed (overwrote) delta' );
+	done_testing;
 }
 
 is_deeply( [ Example->alpha, Example->beta, Example->gamma, Example->delta ], [qw( a b g d )], 'sanity check' );

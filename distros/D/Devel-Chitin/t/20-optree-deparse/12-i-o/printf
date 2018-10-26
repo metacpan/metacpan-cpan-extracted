@@ -1,0 +1,2 @@
+printf FH ($a, 'foo', 'bar');
+printf($a, 'foo', 'bar')

@@ -119,13 +119,17 @@ When called from an established site context that context is checked for
 an optional configuration value /xao/objects/include that may contain a
 list of "library" projects that are checked for object implementations.
 
+Alternatively, the list of library sites can be given in 'include'
+argument to load(). This is useful in loading prototypes of Config
+itself when the configuration is not available yet.
+
 Given an objname equal "Foo::Bar" the logic is this:
 
   1. If there a current site, or a sitename is given, check that site
      for objects/Foo/Bar.pm and load if it exists.
-  2. If there is a /xao/objects/include configuration, then check
-     that list of sites for their objects/Foo/Bar.pm implementations,
-     returning first found if any.
+  2. If there is a /xao/objects/include configuration or an 'include'
+     argument, then check that list of sites for their objects/Foo/Bar.pm
+     implementations, returning first found if any.
   3. Default to the system XAO::DO::Foo::Bar implementation if none
      are found in site context.
 
@@ -170,6 +174,10 @@ sub load (@) {
     my @siteinc;
     if($sitename && !$baseobj) {
         push(@siteinc,$sitename);
+    }
+
+    if($args->{'include'}) {
+        push(@siteinc,ref $args->{'include'} ? @{$args->{'include'}} : $args->{'include'});
     }
 
     if($current_sitename && $current_sitename eq $sitename) {

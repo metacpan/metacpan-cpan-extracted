@@ -1,0 +1,8 @@
+my $a;
+while ($a) {
+	print 'hi'
+} continue {
+	print 'continued';
+	print 'here'
+}
+print 'done'

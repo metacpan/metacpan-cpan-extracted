@@ -1,5 +1,5 @@
 package Exporter::Extensible;
-BEGIN { $Exporter::Extensible::VERSION = '0.03'; }
+BEGIN { $Exporter::Extensible::VERSION = '0.04'; }
 use v5.12;
 use strict;
 use warnings;
@@ -49,12 +49,14 @@ sub import {
 	# Optional config hash might be given as first argument
 	$self= $self->exporter_apply_global_config(shift)
 		if ref $_[0] eq 'HASH';
+	$self->{todo}= \@_;
 	
 	# Quick access to these fields
 	my $inventory= $EXPORT_PKG_CACHE{ref $self} ||= {};
 	my $install= $self->{install_set} ||= {};
+	my $not= $self->{not};
 	
-	unshift @_, $self->exporter_get_tag_members('default')
+	unshift @_, @{ $self->exporter_get_tag('default') || [] }
 		unless @_;
 	for (my $i= 0; $i < @_;) {
 		my $symbol= $_[$i++];
@@ -62,12 +64,19 @@ sub import {
 		
 		# If it is a tag, then recursively call import on that list
 		if ($sigil eq ':') {
-			my $self2= $self;
 			# If followed by a hashref, add those options to the current ones.
-			$self2= $self->exporter_apply_inline_config($_[$i++])
-				if ref $_[$i] eq 'HASH';
-			my @tag_list= $self2->exporter_get_tag_members($name);
-			$self2->import(@tag_list) if @tag_list; # only if the tags weren't all excluded
+			if (ref $_[$i] eq 'HASH') {
+				_croak("can't apply -as to a tag") if exists $_[$i]{-as}; # this needed to ensure next line creates a clone
+				my $self2= $self->exporter_apply_inline_config($_[$i++]);
+				my $tag_cache= $self2->exporter_get_tag($name)
+					or _croak("Tag ':$name' is not exported by ".ref($self));
+				$self2->import(@$tag_cache);
+			}
+			else {
+				my $tag_cache= $self->exporter_get_tag($name)
+					or _croak("Tag ':$name' is not exported by ".ref($self));
+				splice(@_, $i, 0, @$tag_cache);
+			}
 			next;
 		}
 		# Else, it is an option or plain symbol to be exported
@@ -102,6 +111,7 @@ sub import {
 			# If followed by a hashref, add those options to the current ones.
 			$self2= $self->exporter_apply_inline_config($_[$i++])
 				if ref $_[$i] eq 'HASH';
+			next if defined $not and $self->_exporter_is_excluded($symbol);
 			no warnings 'uninitialized';
 			my $dest= delete $self2->{as} || $self2->{prefix} . $name . $self2->{suffix};
 			use warnings 'uninitialized';
@@ -115,7 +125,7 @@ sub import {
 					$self2->$method($symbol, $self2->{generator_arg});
 				};
 				# Verify generator output matches sigil
-				ref $ref eq $sigil_to_reftype{$sigil}
+				ref $ref eq $sigil_to_reftype{$sigil} or (ref $ref eq 'REF' && $sigil eq '$')
 					or _croak("Trying to export '$symbol', but generator returned "
 						.ref($ref).' (need '.$sigil_to_reftype{$sigil}.')');
 			}
@@ -304,7 +314,7 @@ sub exporter_apply_inline_config {
 	my ($self, $conf)= @_;
 	my @for_global_config= grep /^-/, keys %$conf;
 	# In the event that only "-as" was given, we don't actually need to create a new object
-	if (@for_global_config == 1 && $for_global_config[0] eq '-as') {
+	if (@for_global_config == 1 && $for_global_config[0] eq '-as' && keys %$conf == 1) {
 		$self->exporter_config_as($conf->{-as});
 		return $self;
 	}
@@ -345,6 +355,11 @@ sub exporter_register_symbol {
 	${$class.'::EXPORT'}{$export_name}= $ref;
 }
 
+sub exporter_autoload_symbol {
+	my ($class, $export_name)= @_;
+	return;
+}
+
 sub exporter_get_inherited {
 	my ($self, $sym)= @_;
 	my $class= ref($self)||$self;
@@ -357,8 +372,8 @@ sub exporter_get_inherited {
 		return $EXPORT_PKG_CACHE{$class}{$sym}= ${$_.'::EXPORT'}{$sym}
 			if exists ${$_.'::EXPORT'}{$sym};
 	}
-	# Isn't exported.
-	return undef;
+	# Isn't exported, but maybe autoload.
+	return $self->exporter_autoload_symbol($sym);
 }
 
 sub exporter_register_option {
@@ -388,64 +403,85 @@ sub exporter_register_tag_members {
 	push @{ ${$class.'::EXPORT_TAGS'}{$tag_name} }, @_;
 }
 
-sub exporter_get_tag_members {
+sub _exporter_build_tag_cache {
+	my ($self, $tagname)= @_;
+	my $class= ref($self)||$self;
+	# Collect all members of this tag from any parent class, but stop at the first undef
+	my ($dynamic, @keep, %seen, $known);
+	for (@{ mro::get_linear_isa($class) }) {
+		no strict 'refs';
+		my $add= ${$_.'::EXPORT_TAGS'}{$tagname}
+			# Special case, ':all' is built from all known keys of the %EXPORT var at each inherited package
+			# Also exclude anything exported as part of the Exporter API, but right now that is only
+			# the '-exporter_setup' option.
+			|| ($tagname eq 'all' && *{$_.'::EXPORT'}{HASH}
+				&& [ grep $_ =~ /^[^-:]/, keys %{$_.'::EXPORT'} ]
+			)
+			or next;
+		++$known;
+		if (ref $add ne 'ARRAY') {
+			# Found a generator (coderef or method name ref).  Call it to get the list of tags.
+			$add= ref $add eq 'CODE'? $add
+				: ref $add eq 'SCALAR'? $$add
+				: _croak("Tag must expand to an array, code, or a method name ref (not $add)");
+			$add= $self->$add($self->{generator_arg});
+			ref $add eq 'ARRAY' or _croak("Tag generator must return an arrayref");
+			++$dynamic;
+		}
+		# If first element of the list is undef it means this class wanted to reset the tag.
+		# Since we're iterating *up* the hierarchy, it just means end here.
+		my $start= (@$add && !defined $add->[0])? 1 : 0;
+		# symbol might be followed by options, so need to skip over refs, but also need to allow
+		# duplicate symbols if they were followed by a ref.
+		(ref $add->[$_] || !$seen{$add->[$_]}++ || ref $add->[$_+1]) && push @keep, $add->[$_]
+			for $start .. $#$add;
+		last if $start;
+	}
+	my $ret= $known? \@keep : $self->exporter_autoload_tag($tagname);
+	$EXPORT_TAGS_PKG_CACHE{$class}{$tagname}= $ret
+		unless $dynamic;
+	return $ret;
+}
+
+sub exporter_get_tag {
 	my ($self, $tagname)= @_;
 	my $class= ref($self)||$self;
 	# Make the common case fast
 	my $list= $EXPORT_TAGS_PKG_CACHE{$class}{$tagname};
-	if (!$list && !exists $EXPORT_TAGS_PKG_CACHE{$class}{$tagname}) {
-		# Collect all members of this tag from any parent class, but stop at the first undef
-		my ($dynamic, @keep, %seen);
-		for (@{ mro::get_linear_isa($class) }) {
-			no strict 'refs';
-			my $add= ${$_.'::EXPORT_TAGS'}{$tagname} or do {
-				next unless $tagname eq 'all';
-				# Auto-derive ':all' from the keys of %EXPORT
-				# Also exclude anything exported as part of the Exporter API, but right now that is only
-				# the '-exporter_setup' option.
-				push @keep, grep $_ =~ /^[^-:]/ && !$seen{$_}++, keys %{$_.'::EXPORT'};
-				next;
-			};
-			if (ref $add ne 'ARRAY') {
-				# Found a generator (coderef or method name ref).  Call it to get the list of tags.
-				$add= ref $add eq 'CODE'? $add
-					: ref $add eq 'SCALAR'? $$add
-					: _croak("Tag must expand to an array, code, or a method name ref (not $add)");
-				$add= $self->$add($self->{generator_arg});
-				ref $add eq 'ARRAY' or _croak("Tag generator must return an arrayref");
-				++$dynamic;
-			}
-			# If first element of the list is undef it means this class wanted to reset the tag.
-			# Since we're iterating *up* the hierarchy, it just means end here.
-			my $start= (@$add && !defined $add->[0])? 1 : 0;
-			# symbol might be followed by options, so need to skip over refs, but also need to allow
-			# duplicate symbols if they were followed by a ref.
-			(ref $add->[$_] || !$seen{$add->[$_]}++ || ref $add->[$_+1]) && push @keep, $add->[$_]
-				for $start .. $#$add;
-			last if $start;
+	$list= $self->_exporter_build_tag_cache($tagname)
+		unless $list or exists $EXPORT_TAGS_PKG_CACHE{$class}{$tagname};
+	return $list;
+}
+
+sub _exporter_is_excluded {
+	my ($self, $symbol)= @_;
+	return unless ref $self && (my $not= $self->{not});
+	# N^2 exclusion iteration isn't cool, but doing something smarter requires a
+	# lot more setup that probably won't pay off for the usual tiny lists of 'not'.
+	for my $filter (ref $not eq 'ARRAY'? @$not : ($not)) {
+		if (!ref $filter) {
+			return 1 if $symbol eq $filter;
 		}
-		$list= \@keep;
-		$EXPORT_TAGS_PKG_CACHE{$class}{$tagname}= $list unless $dynamic;
-	}
-	# Apply "not" exclusions
-	if (ref $self && (my $not= $self->{not})) {
-		$list= [ @$list ]; # clone before removing exclusions
-		# N^2 exclusion iteration isn't cool, but doing something smarter requires a
-		# lot more setup that probably won't pay off for the usual tiny lists of 'not'.
-		for my $filter (ref $not eq 'ARRAY'? @$not : ($not)) {
-			if (!ref $filter) {
-				@$list= grep $_ ne $filter, @$list;
-			}
-			elsif (ref $filter eq 'Regexp') {
-				@$list= grep $_ !~ $filter, @$list;
-			}
-			elsif (ref $filter eq 'CODE') {
-				@$list= grep !&$filter, @$list;
-			}
-			else { _croak("Unhandled 'not' filter: $filter") }
+		elsif (ref $filter eq 'Regexp') {
+			return 1 if $symbol =~ $filter;
 		}
+		elsif (ref $filter eq 'CODE') {
+			&$filter && return 1 for $symbol;
+		}
+		else { _croak("Unhandled 'not' filter: $filter") }
 	}
-	@$list;
+	return;
+}
+
+sub exporter_autoload_tag {
+	my ($self, $tagname)= @_;
+	return;
+}
+
+sub exporter_also_import {
+	my $self= shift;
+	ref $self && $self->{todo} or _croak('exporter_also_import can onnly be called on $self during an import()');
+	push @{$self->{todo}}, @_;
 }
 
 my %method_attrs;
@@ -546,6 +582,8 @@ sub exporter_setup {
 	strict->import;
 	warnings->import;
 	if ($version == 1) {
+		# Declare 'our %EXPORT'
+		*{$self->{into}.'::EXPORT'}= \%{$self->{into}.'::EXPORT'};
 		# Make @EXPORT and $EXPORT_TAGS{default} be the same arrayref.
 		# Allow either one to have been declared already.
 		my $tags= \%{$self->{into}.'::EXPORT_TAGS'};
@@ -594,7 +632,7 @@ sub exporter_export {
 				$ref= \$coderef; # REF to coderef
 			}
 			else {
-				ref $ref eq $sigil_to_reftype{$sigil}
+				ref $ref eq $sigil_to_reftype{$sigil} or (ref $ref eq 'REF' && $sigil eq '$')
 					or _croak("'$export' should be $sigil_to_reftype{$sigil} but you supplied ".ref($ref));
 			}
 			no strict 'refs';
@@ -641,7 +679,7 @@ Exporter::Extensible - Create easy-to-extend modules which export symbols
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -763,20 +801,31 @@ If you want a pure class hierarchy but also export a few symbols, consider somet
 
 =head1 IMPORT API (for consumer)
 
+=head2 import
+
+When you call C<< use MyPackage @list >> it is equivalent to
+
+  BEGIN {
+    require MyPackage;
+    MyPackage->import(@list)
+  }
+
 The user-facing API is mostly the same as Sub::Exporter or Exporter::Tiny, except that C<-foo>
 is not a group and there are no "collections" (though you could implement collections using
 options).
 
-=head2 C<name>, C<$name>, C<@name>, C<%name>, C<*name>, C<:name>
+The elements of C<@list> are handles as:
+
+=head3 C<name>, C<$name>, C<@name>, C<%name>, C<*name>, C<:name>
 
 Same as L<Exporter>, except it might be generated on the fly, and may be followed by an
 options hashref.
 
-=head2 C<-name>
+=head3 C<-name>
 
 Run custom processing defined by module author, possibly consuming arguments that follow it.
 
-=head2 Global Options
+=head3 C<< {...} >> (Global Options)
 
 If the first argument to C<import> is a hashref, these fields are recognized:
 
@@ -858,11 +907,11 @@ Prefix all imported names with this string.
 
 =item suffix (or -suffix)
 
-Append this string to all imported named.
+Append this string to all imported names.
 
 =back
 
-=head2 In-line Options
+=head3 C<< NAME => { ... } >> (In-line Options)
 
 The arguments to C<import> are generally scalars.  If one is followed by a hashref, the hashref
 becomes the argument to the generator (if any), but may also contain:
@@ -877,7 +926,7 @@ Install the thing as this exact name. (no sigil, but relative to C<into>)
 
 Same as global option C<prefix>, limited to this one tag.
 
-=item -suffix => $suffix
+=item -suffix
 
 Same as global option C<suffix>, limited to this one tag.
 
@@ -890,6 +939,14 @@ Same as global option C<not>, limited to this one tag.
 Same as global option C<replace>, limited to this one tag.
 
 =back
+
+=head2 import_into
+
+When you call C<use MyModule @list> you are calling C<< require MyModule; MyModule->import(@list) >>.
+It automatically picks up the calling package, and imports there.
+As a shortcut for the C<into> option, you may say C<< MyModule->import_into("SomePackage", @list) >>.
+
+There is also a more generic way to handle this need though - see L<Import::Into>
 
 =head1 EXPORT API (for author)
 
@@ -906,8 +963,9 @@ Those lines are shorthand for:
   use strict;
   use warnings;
   use parent 'Exporter::Extensible';
-  our %EXPORT= ( ... );
-  our %EXPORT_TAGS = ( ... );
+  our (@EXPORT, %EXPORT, %EXPORT_TAGS);
+  $EXPORT_TAGS{default} ||= \@EXPORT;
+  $EXPORT{...}= ...; # for each argument to export()
 
 Everything else below is just convenience and shorthand to make this easier.
 
@@ -933,7 +991,9 @@ want to override C<foo> must re-declare it.
 =item C<< '$foo' => \$SCALAR >>, C<< '@foo' => \@ARRAY >>, C<< '%foo' => \%HASH >>, C<< '*foo' => \*GLOB >>
 
 This exports a normal variable or typeglob.  If the ref is omitted, C<export> looks for it
-in the current package.
+in the current package. Note: this exports a B<global variable which can be modified>.
+In general, that's bad practice, but might be desired for efficiency.  If your goal is
+efficient access to a singleton object, consider a generator instead like C<=$foo>.
 
 =item C<< -foo => $CODEREF >> or C<< -foo => \"methodname" >>
 
@@ -951,7 +1011,7 @@ the tag is encountered.
 Prefixing an export name with an equal sign means you want to generate the export on the fly.
 The ref is understood to be the coderef or method name to call (as a method) which will return
 the ref of the correct type to be exported.  The default is to look for C<_generate_foo>,
-C<_generateSCALAR_foo>, C<_generateARRAY_foo>, C<_generateHASH_foo>, etc.
+C<_generateScalar_foo>, C<_generateArray_foo>, C<_generateHash_foo>, etc.
 
 =back
 
@@ -1070,6 +1130,45 @@ backward-compatibility.
 
 =back
 
+Meanwhile the C<%EXPORT_TAGS> variable is almost identical to the one used by Exporter, but
+with a few enhancements:
+
+=over
+
+=item C<:all>
+
+You don't need to declare the tag C<all>, because this module calculates it for you, from the
+list of all keys of C<%EXPORT> excluding tags or options.  You can override this default though.
+
+=item C<:default>
+
+C<@EXPORT> is added to C<%EXPORT_TAGS> as C<'default'>.  So, you can push items into C<@EXPORT>
+or into C<@{$EXPORT_TAGS{default}}> and it is the same arrayref.
+
+=item Resetting the Tag Members
+
+If the first element of the arrayref is C<undef>, it means "don't inherit the tag
+members from the parent class".
+
+  # Don't want to inherit members of ':foo' from parent:
+  foo => [ undef, 'x', 'y', 'z' ]
+
+=item Data in a Tag
+
+The elements of a tag can include parameters to generators, or arguments to an option, etc;
+anything that could be passed to C<import> will work as expected.
+
+  foo => [ 'x', 'y', -init => [1,2,3] ],
+
+=item Generators
+
+If the value in C<%EXPORT_TAGS> is not an arrayref, then it should be a REF-ref of either the
+scalar name of a generator, or a coderef of the generator.
+
+  foo => \\"_generate_foo",
+
+=back
+
 =head1 IMPLEMENTING OPTIONS
 
 Exporter::Extensible lets you run whatever code you like when it encounters "-name" in the
@@ -1107,13 +1206,26 @@ option decide how many arguments to consume.  So, the API is as follows:
   }
 
 The first argument C<$exporter> is a instance of the exporting package, and you can inspect it
-or even reconfigure it.
+or even reconfigure it.  For instance, if you want your option to automatically select some
+symbols as if they had been passed to L</import>, you could call L</exporter_also_import>.
+
+=head2 exporter_also_import
+
+This method can be used *during* a call to C<import> for an option or generator to request that
+aditional things be imported into the caller as if the caller ad requested them on the import
+line.  For example:
+
+  sub foo : Export(-) {
+    shift->exporter_also_import(':all');
+  }
+
+This causes the option C<-foo> to be equivalent to the tag C<':all'>;
 
 =head1 IMPLEMENTING GENERATORS
 
 A generator is just a function that returns the thing to be imported.  A generator is called as:
 
-  $generator->($exporter, $symbol, $args);
+  $exporter->$generator($symbol, $args);
 
 where C<$exporter> is an instance of your package, C<$symbol> is the name of the thing
 as specified to C<import> (with sigil) and C<$args> is the optional hashref the user might have
@@ -1127,8 +1239,8 @@ generator can retrieve the values from there.
   use Exporter::Extensible -exporter_setup => 1;
   export(
     # be sure to use names that won't conflict with Exporter::Extensible's internals
-    '-foo(1)' => sub { shift->{foo}= shift },
-    '-bar(1)' => sub { shift->{bar}= shift },
+    '-foo(1)' => sub { $_[0]{foo}= $_[1] },
+    '-bar(1)' => sub { $_[0]{bar}= $_[1] },
     '=foobar' => sub { my $foobar= $_[0]{foo} . $_[0]{bar}; sub { $foobar } },
   );
   
@@ -1137,6 +1249,31 @@ generator can retrieve the values from there.
   # This exports a sub as "foobar" which returns "abcdef", and a sub as "x" which
   # returns "xyzdef".  Note that if the second one didn't specify -as, it would get ignored
   # because 'foobar' was already queued to be installed.
+
+=head1 AUTOLOADING SYMBOLS AND TAGS
+
+In the same spirit that Perl lets you AUTOLOAD methods on demand, this exporter lets you define
+symbols and tags on demand.  Simply override one of these methods:
+
+=head2 exporter_autoload_symbol
+
+  my $ref= $self->exporter_autoload_symbol($sym);
+
+This takes a symbol (including sigil), and returns a ref which should be installed.  The ref
+is cached, but B<not> added to the package C<%EXPORT>.  If you want that to happen, you need to
+do it yourself.  This method is called once at the end of iterating the package hierarchy, so
+you should call C<next::method> if you don't recognize the symbol.
+
+=head2 exporter_autoload_tag
+
+  my $arrayref= $self->exporter_autoload_tag($name);
+
+This takes a tag name (no sigil) and returns an arrayref of items which should be added to the
+tag.  The combined tag members are cached, but not added to the package C<%EXPORT_TAGS>.
+This method is called only if no package in the hierarchy defined the tag, which could cause
+confusion if a derived class wants to add a few symbols to a tag which is otherwise autoloaded
+by a parent.  This method is called once at the end of iterating the package hierarchy, so
+you should call C<next::method> to collect any inherited autoloaded members of this tag.
 
 =head1 SEE ALSO
 

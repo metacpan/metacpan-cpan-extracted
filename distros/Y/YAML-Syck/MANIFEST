@@ -7,6 +7,7 @@ gram.c
 gram.h
 handler.c
 implicit.c
+inc/ExtUtils/HasCompiler.pm
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -50,6 +51,7 @@ t/2-scalars.t
 t/3-objects.t
 t/4-perl_tag_scheme.t
 t/bug/doesnt-stringify.t
+t/bug/rt-41141.t
 t/bug/rt-49404-double_free.t
 t/bug/rt-54167.t
 t/json-basic.t
@@ -67,6 +69,7 @@ t/json-refs.t
 t/json-singlequote.t
 t/leak.t
 t/load-blessed.t
+t/manifest.t
 t/meta.t
 t/TestYAML.pm
 t/yaml-alias.t
@@ -77,3 +80,4 @@ t/yaml-str-colon-first.t
 t/yaml-tie.t
 t/yaml-utf.t
 token.c
+META.json                                Module JSON meta-data (added by MakeMaker)

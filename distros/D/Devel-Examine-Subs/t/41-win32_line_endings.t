@@ -1,12 +1,17 @@
-#!perl 
+#!perl
 use warnings;
 use strict;
 
-use Test::More;
 use Data::Dumper;
 
 BEGIN {#1
     use_ok( 'Devel::Examine::Subs' ) || print "Bail out!\n";
+    if ($^O =~ /win32/i) {
+      use Test::More;
+    }
+    else {
+      use Test::More skip_all => 'not an MSWin32 OS';
+    }
 }
 
 my $des = Devel::Examine::Subs->new(file => 't/win_sample.data');
@@ -40,7 +45,7 @@ my $des = Devel::Examine::Subs->new(file => 't/win_sample.data');
     my $res = $des->has( file => 't/win_sample.data', search => 'asdfasdf' );
     ok ( ! $res->[0], "obj->has() returns an empty array if file exists and search text not found" );
 }
-{#7    
+{#7
     my $res = $des->has( file => 't/win_sample.data', search => 'this' );
     like ( $res, qr/ARRAY/, "obj->has() returns an aref " );
 }
@@ -61,12 +66,12 @@ my $des = Devel::Examine::Subs->new(file => 't/win_sample.data');
 }
 {#15-17
     my %params = (
-                    file => 't/win_sample.data', 
-                    engine => 'all', 
+                    file => 't/win_sample.data',
+                    engine => 'all',
                   );
 
     my $des = Devel::Examine::Subs->new(%params);
-    
+
     my $has = $des->run(\%params);
 
     ok ( ref($has) eq 'ARRAY', "calling the 'has' engine through run() returns an aref" );
@@ -78,7 +83,7 @@ my $des = Devel::Examine::Subs->new(file => 't/win_sample.data');
     my $des = Devel::Examine::Subs->new();
 
     my $has = $des->has(
-                file => 't/win_sample.data', 
+                file => 't/win_sample.data',
                 engine => 'all',
                 search => 'this',
             );

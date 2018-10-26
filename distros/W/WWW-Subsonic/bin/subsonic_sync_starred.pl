@@ -8,7 +8,6 @@ use CLI::Helpers qw(:output);
 use Getopt::Long::Descriptive;
 use List::Util qw( sum );
 use Path::Tiny;
-use Storable qw(dclone);
 use WWW::Subsonic;
 
 my ($opt,$usage) = describe_options('%c - %o <target_directory>',
@@ -68,7 +67,7 @@ my %SyncComplete = ();
 
 # Start Wide, circle back
 my $response = $subsonic->api_request('getStarred');
-debug_var({data=>1}, $response);
+debug_var({data=>1}, [sort keys %{$response->{starred}}]);
 if( exists $response->{starred} ) {
     my $starred = $response->{starred};
     debug("Processing starred items");
@@ -84,8 +83,14 @@ output({color=>'green'},
 
 sub processBranch {
     my ($branch) = @_;
+    debug_var($branch);
 
     foreach my $node (@{ $branch }) {
+        # MadSonic API doesn't format Artists the same as Subsonic
+        if( !exists $node->{artist} && exists $node->{name} ) {
+            $node->{artist} = $node->{name};
+            $node->{isDir} = 'true';
+        }
         verbose({level=>2,color=>'cyan'}, sprintf "Processing Branch: %s",
             join(' - ',
                 map  { $node->{$_} }
@@ -158,7 +163,7 @@ subsonic_sync_starred.pl - Download and/or sync starred media to a target direct
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 AUTHOR
 

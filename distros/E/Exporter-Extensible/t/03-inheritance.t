@@ -113,6 +113,8 @@ sub test_reexported_var {
 	isnt( *DestPkg::array{ARRAY}, *Child1::array{ARRAY}, "Isn't Child1's array" );
 	isnt( *DestPkg::array{ARRAY}, *Child2::array{ARRAY}, "Isn't Child2's array" );
 	isnt( *DestPkg::array{ARRAY}, *Example::array{ARRAY}, "Isn't Example's array" );
+
+	done_testing;
 }
 
 subtest inherited_var => \&test_inherited_var;
@@ -127,6 +129,7 @@ sub test_inherited_var {
 		isnt( *DestPkg::hash{HASH}, *{$_.'::hash'}{HASH}, "Isn't $_\'s hash" );
 		undef *DestPkg::hash;
 	}
+	done_testing;
 }
 
 subtest inherited_sub => \&test_inherited_sub;
@@ -138,6 +141,7 @@ sub test_inherited_sub {
 		isnt( DestPkg->can('code'), $_->can('code'), "Isn't $_\'s sub" );
 		undef *DestPkg::code;
 	}
+	done_testing;
 }
 
 subtest inherited_option => \&test_inherited_option;
@@ -150,6 +154,7 @@ sub test_inherited_option {
 		[ 'MultInherit', 'Child1', 'Child2', 'Example' ],
 		'option called ancestors in c3 order'
 	);
+	done_testing;
 }
 
 subtest inherited_tags => \&test_inherited_tags;
@@ -164,8 +169,9 @@ sub test_inherited_tags {
 	);
 	for (@tests) {
 		my ($pkg, $tag, $expected)= @$_;
-		is_deeply( [ sort $pkg->exporter_get_tag_members($tag) ], [ sort @$expected ], "$pkg\'s $tag" );
+		is_deeply( [ sort @{$pkg->exporter_get_tag($tag)} ], [ sort @$expected ], "$pkg\'s $tag" );
 	}
+	done_testing;
 }
 
 done_testing;

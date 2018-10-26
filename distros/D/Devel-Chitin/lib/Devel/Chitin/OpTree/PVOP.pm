@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::PVOP;
 use base 'Devel::Chitin::OpTree';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use warnings;
 use Config;
 
 sub pp_dump {
-    'dump ' . shift->op->pv;
+    'CORE::dump ' . shift->op->pv;
 }
 
 sub pp_goto {

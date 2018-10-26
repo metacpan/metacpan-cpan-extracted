@@ -1,0 +1,3 @@
+my $a = setpgrp();
+$a = setpgrp(0, 0);
+$a = setpgrp(9, 10)

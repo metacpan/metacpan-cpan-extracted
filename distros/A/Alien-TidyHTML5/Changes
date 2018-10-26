@@ -1,4 +1,13 @@
 Revision history for Alien-TidyHTML5
 
+v0.1.1    2018-10-25 17:50:49+01:00 Europe/London
+  [Documentation]
+  - Added a description and author acknowledgement to POD.
+
+  - Added INSTALL file to the distribution.
+
+  [Toolchain]
+  - Tweaks to dist.ini for simplifying build.
+
 v0.1.0    2018-05-02 00:29:34+01:00 Europe/London
 - Initial release.

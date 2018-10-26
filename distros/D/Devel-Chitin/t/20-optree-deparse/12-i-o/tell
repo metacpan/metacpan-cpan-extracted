@@ -1,0 +1,6 @@
+my $a = tell(F);
+$a = tell(*F);
+$a = tell();
+my $fh;
+$a = tell($fh);
+$a = tell(*$fh)

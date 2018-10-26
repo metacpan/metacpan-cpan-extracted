@@ -1,0 +1,5 @@
+BEGIN { skip "incompatible starting with 5.22.0" if $^V ge v5.22.0 } # omit
+# Starting with 5.22, these constructs look like a call to readline()
+my $fh;
+my $line = <$fh>;
+my @lines = <$fh>

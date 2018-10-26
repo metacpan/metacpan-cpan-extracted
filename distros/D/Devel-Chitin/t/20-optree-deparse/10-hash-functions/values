@@ -1,0 +1,2 @@
+my %h;
+my @vals = values(%h)

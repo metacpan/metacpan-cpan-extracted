@@ -1,0 +1,7 @@
+m/abc/;
+our $string = '123';
+$string =~ m/abc/;
+my $rx = qr/def/;
+my($b) = $a !~ m/abc$rx/i;
+my($c) = m/$rx def/x;
+$c = $1

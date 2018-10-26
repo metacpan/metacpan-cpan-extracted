@@ -1,0 +1,6 @@
+use Fcntl qw(:flock); # omit
+my $a = flock(F, LOCK_SH | LOCK_NB);
+$a = flock(*F, LOCK_EX | LOCK_NB);
+my $f;
+$a = flock($f, LOCK_UN);
+$a = flock(*$f, LOCK_UN | LOCK_NB)

@@ -1,0 +1,8 @@
+endprotent();
+setprotoent(undef);
+my $n = getprotoent();
+my @i = getprotoent();
+$n = getprotobtname('tcp');
+@i = getprotobtname('udp');
+$n = getprotobynumber($n);
+@i = getprotobynumber($n)

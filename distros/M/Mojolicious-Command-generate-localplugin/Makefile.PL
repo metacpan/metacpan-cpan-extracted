@@ -16,10 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Mojolicious::Command::generate::localplugin",
   "PREREQ_PM" => {
-    "Mojolicious" => "7.75",
+    "Mojolicious" => "8.0",
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Mojolicious" => "7.75",
+  "Mojolicious" => "8.0",
   "Test::More" => 0
 );
 

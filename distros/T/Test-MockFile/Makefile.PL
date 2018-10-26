@@ -15,7 +15,7 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
-        'Test::More'                => '0',
+        'Test::More'                => '1.302133',
         'Test2::Bundle::Extended'   => '0',
         'Test2::Tools::Explain'     => '0',
         'Test2::Plugin::NoWarnings' => '0',

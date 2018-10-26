@@ -1,0 +1,3 @@
+my $a;
+print 'hi' if $a;
+print 'done'

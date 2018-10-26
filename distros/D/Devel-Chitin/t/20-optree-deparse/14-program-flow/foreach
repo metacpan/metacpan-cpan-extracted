@@ -1,0 +1,13 @@
+my @a;
+foreach my $a (1, 2, @a) {
+	print 'hi';
+	print 'there'
+}
+foreach our $a (@a) {
+	print 'hi';
+	print 'there'
+}
+foreach my $a (reverse(@a)) {
+	print 'hi';
+	print 'there'
+}

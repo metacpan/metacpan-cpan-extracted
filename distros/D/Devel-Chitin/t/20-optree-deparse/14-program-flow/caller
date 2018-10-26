@@ -1,0 +1,4 @@
+my @info = caller();
+my $package = caller();
+@info = caller(1);
+$package = caller(2)

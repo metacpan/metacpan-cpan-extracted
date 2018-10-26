@@ -1,0 +1,2 @@
+my $a = sleep();
+$a = sleep(10)

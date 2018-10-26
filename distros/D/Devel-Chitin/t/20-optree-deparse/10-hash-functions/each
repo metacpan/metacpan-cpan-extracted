@@ -1,0 +1,2 @@
+my %h;
+my($k, $v) = each(%h)

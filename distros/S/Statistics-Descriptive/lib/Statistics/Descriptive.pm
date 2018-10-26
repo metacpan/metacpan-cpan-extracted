@@ -9,7 +9,7 @@ use 5.006;
 
 use vars (qw($Tolerance $Min_samples_number));
 
-our $VERSION = '3.0701';
+our $VERSION = '3.0702';
 
 $Tolerance = 0.0;
 $Min_samples_number = 4;
@@ -34,7 +34,7 @@ Statistics::Descriptive - Module of basic descriptive statistical functions.
 
 =head1 VERSION
 
-version 3.0701
+version 3.0702
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ calls with the same arguments are faster.
 
 =head1 VERSION
 
-version 3.0701
+version 3.0702
 
 =head1 METHODS
 
@@ -398,21 +398,20 @@ to analyze it.
 All calls to trimmed_mean() are cached so that they don't have to be
 calculated a second time.
 
-=item $stat->frequency_distribution_ref($partitions);
+=item $stat->frequency_distribution_ref($num_partitions);
 
 =item $stat->frequency_distribution_ref(\@bins);
 
 =item $stat->frequency_distribution_ref();
 
-C<frequency_distribution_ref($partitions)> slices the data into
-C<$partition> sets (where $partition is greater than 1) and counts the
-number of items that fall into each partition. It returns a reference to
-a hash where the keys are the numerical values of the
-partitions used. The minimum value of the data set is not a key and the
-maximum value of the data set is always a key. The number of entries
-for a particular partition key are the number of items which are
-greater than the previous partition key and less then or equal to the
-current partition key. As an example,
+C<frequency_distribution_ref($num_partitions)> slices the data into
+C<$num_partitions> sets (where $num_partitions is greater than 1) and counts
+the number of items that fall into each partition. It returns a reference to a
+hash where the keys are the numerical values of the partitions used. The
+minimum value of the data set is not a key and the maximum value of the data
+set is always a key. The number of entries for a particular partition key are
+the number of items which are greater than the previous partition key and less
+then or equal to the current partition key. As an example,
 
    $stat->add_data(1,1.5,2,2.5,3,3.5,4);
    $f = $stat->frequency_distribution_ref(2);
@@ -431,8 +430,8 @@ greater than 2.5 and less than 4.
 C<frequency_distribution_refs(\@bins)> provides the bins that are to be used
 for the distribution.  This allows for non-uniform distributions as
 well as trimmed or sample distributions to be found.  C<@bins> must
-be monotonic and contain at least one element.  Note that unless the
-set of bins contains the range that the total counts returned will
+be monotonic and must contain at least one element.  Note that unless the
+set of bins contains the full range of the data, the total counts returned will
 be less than the sample size.
 
 Calling C<frequency_distribution_ref()> with no arguments returns the last
@@ -444,8 +443,8 @@ distribution calculated, if such exists.
 
 =item my %hash = $stat->frequency_distribution();
 
-Same as C<frequency_distribution_ref()> except that returns the hash clobbered
-into the return list. Kept for compatibility reasons with previous
+Same as C<frequency_distribution_ref()> except that it returns the hash
+clobbered into the return list. Kept for compatibility reasons with previous
 versions of Statistics::Descriptive and using it is discouraged.
 
 =item $stat->least_squares_fit();

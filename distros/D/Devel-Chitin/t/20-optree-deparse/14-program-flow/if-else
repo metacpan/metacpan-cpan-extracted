@@ -1,0 +1,8 @@
+my $a;
+if ($a) {
+	print 'hi'
+} else {
+	print 'hello';
+	world()
+}
+print 'done'

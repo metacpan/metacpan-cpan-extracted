@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001069';
+our $VERSION = '0.001070';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -750,7 +750,8 @@ sub options {
             default   => sub {
                 my ($self, $settings) = @_;
                 return unless $settings->{log};
-                return $ENV{YATH_LOG_FILE_FORMAT} // '%Y-%m-%d~%H:%M:%S~%!U~%!p.jsonl';
+                return defined($ENV{YATH_LOG_FILE_FORMAT}) ? $ENV{YATH_LOG_FILE_FORMAT}
+                                                           : '%Y-%m-%d~%H:%M:%S~%!U~%!p.jsonl';
             },
         },
 

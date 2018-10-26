@@ -1,0 +1,4 @@
+my $a = 'hi there';
+my $b = qq(Joe, $a, this is a string blah blah\n\cP\x{1f});
+$b = $a . $a;
+$b = qq($b $b)

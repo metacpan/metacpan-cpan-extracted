@@ -1,0 +1,2 @@
+my $mask = umask();
+umask(0775)

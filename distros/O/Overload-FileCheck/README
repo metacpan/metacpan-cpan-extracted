@@ -1,7 +1,7 @@
 This archive contains the distribution Overload-FileCheck,
-version 0.002:
+version 0.005:
 
-  override/mock perl file checks ops
+  override/mock perl file check -X: -e, -f, -d, ...
 
 This software is copyright (c) 2018 by cPanel, Inc.
 

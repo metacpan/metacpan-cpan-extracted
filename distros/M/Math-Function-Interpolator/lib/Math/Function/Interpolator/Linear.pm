@@ -2,11 +2,11 @@ package Math::Function::Interpolator::Linear;
 
 use 5.006;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 our @ISA = qw(Math::Function::Interpolator);
 
-our $VERSION = '1.01';    ## VERSION
+our $VERSION = '1.02';    ## VERSION
 
 use Carp qw(confess);
 use Number::Closest::XS qw(find_closest_numbers_around);

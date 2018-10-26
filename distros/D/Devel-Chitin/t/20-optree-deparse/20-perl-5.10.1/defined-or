@@ -1,0 +1,4 @@
+BEGIN { skip "requires 5.10.1" if $^V lt v5.10.1 } # omit
+my $a;
+my $rv = $a // 1;
+$a //= 4

@@ -89,12 +89,13 @@ WriteMakefile(
     'NAME'              => 'XAO::Web',
     'VERSION_FROM'      => 'Web.pm',
     'MIN_PERL_VERSION'  => '5.10.1',
+    'LICENSE'           => 'artistic',
     'CONFIGURE_REQUIRES'=> {
-        'XAO::Base'                 => 1.22,
+        'XAO::Base'                 => 1.23,
         'ExtUtils::MakeMaker'       => 6.64,
     },
     'TEST_REQUIRES'     => {
-        'XAO::Base'                 => 1.22,
+        'XAO::Base'                 => 1.23,
     },
     'PREREQ_PM'     => {
         'Authen::SASL::SASLprep'    => 1.1,
@@ -119,8 +120,18 @@ WriteMakefile(
         'Text::FormatTable'         => 0.01,
         'Time::HiRes'               => 1.9719,
         'Unicode::Normalize'        => 1.18,
-        'XAO::Base'                 => 1.22,
+        'XAO::Base'                 => 1.23,
         'XAO::FS'                   => 1.21,
+    },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type    => 'git',
+                url     => 'git://github.com/amaltsev/XAO-Web.git',
+                web     => 'https://github.com/amaltsev/XAO-Web',
+            },
+        },
     },
 );
 

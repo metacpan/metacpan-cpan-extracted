@@ -1,0 +1,5 @@
+my($a, @list);
+$a = join(',', 2, $a, 4);
+$a = join("\n", 2, $a, 4);
+$a = join(1, @list);
+join(@list)

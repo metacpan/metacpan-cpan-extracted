@@ -1,0 +1,5 @@
+my($a, $rv);
+$rv = shmctl(1, $a, 2);
+$rv = shmget(1, $a, 2);
+$rv = shmread(1, $a, 2, 3);
+$rv = shmwrite(1, $a, 2, 3)

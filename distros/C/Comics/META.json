@@ -53,11 +53,17 @@
    "provides" : {
       "Comics" : {
          "file" : "lib/Comics.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "1.10",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sciurius/comics.git",
+         "web" : "https://github.com/sciurius/comics"
+      }
+   },
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

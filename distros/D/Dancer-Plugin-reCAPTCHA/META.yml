@@ -5,15 +5,23 @@ author:
 build_requires:
   Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dancer-Plugin-reCAPTCHA
 requires:
-  Captcha::reCAPTCHA: '0'
+  Captcha::reCAPTCHA::V2: '0'
   Dancer: '1.3110'
-version: '0.4'
+resources:
+  IRC: irc://irc.perl.org/#dancer
+  WebIRC: https://chat.mibbit.com/#dancer@irc.perl.org
+  bugtracker: https://github.com/cromedome/Dancer-Plugin-reCAPTCHA/issues
+  homepage: http://perldancer.org/
+  repository: git://github.com/cromedome/Dancer-Plugin-reCAPTCHA.git
+version: '0.90'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

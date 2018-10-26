@@ -1,0 +1,8 @@
+our %ourhash;
+my %myhash;
+my $a = delete($ourhash{'foo'});
+my @a = delete(@myhash{'foo', 'bar'});
+@a = delete(@ourhash{@a});
+delete(@myhash{@a});
+delete(local @ourhash{@a});
+delete(local $myhash{'foo'})

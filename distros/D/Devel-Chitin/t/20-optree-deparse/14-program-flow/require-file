@@ -1,0 +1,3 @@
+require 'file.pl';
+my $file;
+require $file

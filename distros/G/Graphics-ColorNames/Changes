@@ -1,5 +1,10 @@
 Revision history for Graphics-ColorNames:
 
+v3.3.1    2018-10-24 16:03:19+01:00 Europe/London
+  [Tests]
+  - Fixed text dependencies on modules that have been moved to
+    separate distributions, RT 127430.
+
 v3.3.0    2018-10-23 21:29:56+01:00 Europe/London
   [Incompatabilities]
   - The GCN::HTML and GCN::Windows schemes have been removed and

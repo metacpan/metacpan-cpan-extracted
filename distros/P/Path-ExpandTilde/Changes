@@ -1,2 +1,8 @@
+0.003     2018-10-24 16:37:04 EDT
+  - More fixes for tests
+
+0.002     2018-10-24 12:32:17 EDT
+  - Fix identifying system users in tests
+
 0.001     2018-10-24 00:54:45 EDT
   - First release

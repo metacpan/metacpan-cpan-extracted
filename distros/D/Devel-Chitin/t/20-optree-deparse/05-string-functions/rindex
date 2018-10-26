@@ -1,0 +1,6 @@
+no warnings 'void'; # omit
+my $a;
+$a = rindex($a, 'foo');
+rindex($a, 'foo', 1);
+$a = rindex($a, 'foo') == -1;
+$a = rindex($a, 'foo') != -1

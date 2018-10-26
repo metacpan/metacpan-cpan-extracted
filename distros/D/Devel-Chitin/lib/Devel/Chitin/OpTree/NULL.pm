@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::NULL;
 use base 'Devel::Chitin::OpTree';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use strict;
 use warnings;

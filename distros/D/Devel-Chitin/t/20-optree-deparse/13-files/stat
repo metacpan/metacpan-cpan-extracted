@@ -1,0 +1,8 @@
+my @rv = stat(FH);
+@rv = stat(*FH);
+@rv = stat(_);
+my $fh;
+my($dev, $ino, undef, $nlink) = stat($fh);
+@rv = stat(*$fh);
+stat();
+stat('/path/to/file')

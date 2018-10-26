@@ -4,7 +4,7 @@ package App::Module::Setup;
 
 ### Please use this module via the command line module-setup tool.
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use warnings;
 use strict;
@@ -22,14 +22,15 @@ sub main {
 
     # Replacement variables
     my $vars =
-      { "module.name"    => $mod,	# Foo::Bar
-	"module.version" => "0.01",
-	"module.license" => $options->{license} || "perl_5",
-	"current.year"   => $options->{year} || 1900 + (localtime)[5],
-	"author.name"    => $options->{author} || (getpwuid($<))[6],
-	"author.email"   => $options->{email},
-	"author.cpanid"  => $options->{cpanid},
-	"perl.minversion"  => $options->{minperl} || '5.008000',
+      { "module.name"     => $mod,	# Foo::Bar
+	"module.version"  => "0.01",
+	"module.license"  => $options->{license} || "perl_5",
+	"current.year"    => $options->{year} || 1900 + (localtime)[5],
+	"author.name"     => $options->{author} || (getpwuid($<))[6],
+	"author.email"    => $options->{email},
+	"author.cpanid"   => $options->{cpanid},
+	"author.githubid" => $options->{githubid},
+	"perl.minversion" => $options->{minperl} || '5.008000',
       };
 
     my $dir;
@@ -214,45 +215,36 @@ It takes a reference to a hash of params, as follows:
 
 Johan Vromans, C<< <jv at cpan.org> >>
 
-
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-app-module-setup at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Module-Setup>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
 =head1 SUPPORT
+
+Development of this module takes place on GitHub:
+https://github.com/sciurius/perl-module-starter.
 
 You can find documentation for this module with the perldoc command.
 
     perldoc App::Module::Setup
 
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Module-Setup>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/App-Module-Setup>
-
-=back
-
+Please report any bugs or feature requests using the issue tracker on
+GitHub.
 
 =head1 ACKNOWLEDGEMENTS
 
 David Golden, for giving me the final incentive to write this module.
 
-Sawyer X, for writing Module::Starter where I borrowed many ideas from.
-
+I borrowed many ideas from L<Module::Starter> which was originally
+written by Andy Lester (PETDANCE). Its current design came from
+Ricardo Signes (RJBS). Sawyer X added features and maintains the
+module after them.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2013 Johan Vromans, all rights reserved.
+Copyright 2013,2018 Johan Vromans, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -128,7 +128,7 @@ my ($section,%song,%TRACKS);
 while(<<>>) {
     chomp;
     next unless /^\t/;
-    if( my ($capture) = m{^\t<key>(\w+(?:\s+\w+)*)<\/key>$} ) {
+    if( my ($capture) = m{^\t<key>(\w+(?:\s+\w+)*)</key>$} ) {
         $section = $capture;
         next;
     }
@@ -209,7 +209,7 @@ subsonic_import_ratings.pl - Import Ratings from an iTunes Library XML Export to
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 AUTHOR
 

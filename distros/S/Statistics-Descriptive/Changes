@@ -1,5 +1,10 @@
 Revision history for Perl extension Statistics::Descriptive.
 
+3.0702      2018-10-25
+    - Rephrase some lacking phrasing in the docs.
+        - https://github.com/shlomif/perl-Statistics-Descriptive/issues/5
+        - Thanks to @melak .
+
 3.0701      2018-07-14
     - Typo corrections thanks to Debian
 

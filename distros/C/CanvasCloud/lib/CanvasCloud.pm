@@ -1,5 +1,5 @@
 package CanvasCloud;
-$CanvasCloud::VERSION = '0.005';
+$CanvasCloud::VERSION = '0.006';
 # ABSTRACT: Perl access for Canvas LMS API
 
 use Moose;
@@ -10,6 +10,7 @@ my %LOADER = (
                  'CanvasCloud::API::Account::Report'    => { small => 'reports',    short => 'Account::Report'    },
                  'CanvasCloud::API::Account::Term'      => { small => 'terms',      short => 'Account::Term'      },
                  'CanvasCloud::API::Account::SISImport' => { small => 'sisimports', short => 'Account::SISImport' },
+                 'CanvasCloud::API::Account::Users'     => { small => 'a_users',    short => 'Account::Users'     },
              );
 
              
@@ -56,7 +57,7 @@ CanvasCloud - Perl access for Canvas LMS API
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

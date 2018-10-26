@@ -1,0 +1,4 @@
+BEGIN { skip "requires 5.22.0" if $^V lt v5.22.0 } # omit
+while (defined($_ = <<>>)) {
+	print()
+}

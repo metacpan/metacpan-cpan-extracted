@@ -331,7 +331,7 @@ krdt_produce(rkt, partition, msgflags, payload, key)
         RETVAL
 
 void
-krdt_DESTORY(rkt)
+krdt_DESTROY(rkt)
         rd_kafka_topic_t* rkt
     CODE:
         rd_kafka_topic_destroy(rkt);

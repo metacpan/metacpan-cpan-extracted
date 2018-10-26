@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "unknown"
+      "artistic_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,14 +22,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "XAO::Base" : "1.22"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.64",
-            "XAO::Base" : "1.22"
+            "XAO::Base" : "1.23"
          }
       },
       "runtime" : {
@@ -54,12 +53,24 @@
             "Text::FormatTable" : "0.01",
             "Time::HiRes" : "1.9719",
             "Unicode::Normalize" : "1.18",
-            "XAO::Base" : "1.22",
+            "XAO::Base" : "1.23",
             "XAO::FS" : "1.21",
             "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "XAO::Base" : "1.23"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.72"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/amaltsev/XAO-Web.git",
+         "web" : "https://github.com/amaltsev/XAO-Web"
+      }
+   },
+   "version" : "1.73"
 }

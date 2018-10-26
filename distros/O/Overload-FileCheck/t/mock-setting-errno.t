@@ -23,14 +23,15 @@ use Errno ();
     ok -e q[/tmp],           "/tmp/exits";
     ok !-e q[/do/not/exist], "/do/not/exist";
 
-    my ( $check, $errno_int, $errno_str );
+    my ( $check, $errno_int );
 
-    $check     = -e q[/do/not/exist];
-    $errno_str = "$!";
+    $check = -e q[/do/not/exist];
+
+    # do not check the errno string, as it depends on the locale
     $errno_int = int($!);
 
     ok !$check, "file does not exist";
-    like $errno_str, qr{No such file or directory}, q[ERRNO set to "No such file or directory"];
+
     is $errno_int, Errno::ENOENT(), "ERRNO int value set";
 
     $check     = -e $^X;
@@ -58,7 +59,7 @@ use Errno ();
         }
     );
 
-    my ( $check, $errno_int, $errno_str );
+    my ( $check, $errno_int );
 
     is int($!), 0, 'errno=0 at startup';
 
@@ -105,12 +106,12 @@ use Errno ();
         }
     );
 
-    my $check     = -e q[/tmp];
-    my $errno_str = "$!";
+    my $check = -e q[/tmp];
+
+    # do not check the errno string, as it depends on the locale
     my $errno_int = int($!);
 
     ok !$check, "/tmp does not exist";
-    like $errno_str, qr{Interrupted system call}, q[ERRNO set to "Interrupted system call"];
     is $errno_int, Errno::EINTR(), "ERRNO int value set to Errno::EINTR()";
 
     unmock_all_file_checks();

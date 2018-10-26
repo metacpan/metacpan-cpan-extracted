@@ -133,6 +133,7 @@ sub test_all {
 
     my $text=$benchmark2->expand(
         'mode'              => 'stats',
+        'orderby'           => 'tag',
         'header.template'   => '<$TOTAL_ITEMS$>|',
         'template'          => '(<$TAG$>:<$COUNT$>:<$CACHEABLE$>:<$CACHE_FLAG$>)',
         'footer.template'   => '|<$TOTAL_ITEMS$>',
@@ -140,7 +141,7 @@ sub test_all {
 
     ### dprint $text;
 
-    my $expect='5|(test:1:1:0)(p:/bits/complex-template:30:1:0)(p:/bits/test-recurring:20:1:0)(p:/bits/test-non-cacheable:10:0:0)(p:/bits/system-test:10:1:1)|5';
+    my $expect='5|(p:/bits/complex-template:30:1:0)(p:/bits/system-test:10:1:1)(p:/bits/test-non-cacheable:10:0:0)(p:/bits/test-recurring:20:1:0)(test:1:1:0)|5';
     $self->assert($text eq $expect,
         "Expected to render into '$expect', got '$text'");
 
@@ -176,6 +177,7 @@ sub test_all {
 
     $text=$benchmark2->expand(
         'mode'              => 'stats',
+        'orderby'           => 'count',
         'tag'               => 'test',
         'path'              => '/bits/bench-row',
         'footer.template'   => '|<$TOTAL_ITEMS$>',

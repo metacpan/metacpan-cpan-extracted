@@ -3,48 +3,37 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.69';
+our $VERSION = '1.70';
 
 use Carp;
-use Data::Dumper;
 use Symbol qw(delete_package);
 
 BEGIN {
 
-    # we need to do some trickery for DTS due to circular referencing,
-    # which broke CPAN installs.
+    # we need to do some trickery for Devel::Trace::Subs due to circular
+    # referencing, which broke CPAN installs. DTS does nothing if not presented,
+    # per this code
 
     eval {
         require Devel::Trace::Subs;
-    };
-
-    eval {
         import Devel::Trace::Subs qw(trace);
     };
 
     if (! defined &trace){
         *trace = sub {};
     }
-};
+}
 
 sub new {
-
     trace() if $ENV{TRACE};
-
     my $self = {};
     bless $self, shift;
-
-    my $struct = shift;
-
     $self->{pre_procs} = $self->_dt;
-
     return $self;
 }
 sub _dt {
 
     trace() if $ENV{TRACE};
-
-    my $self = shift;
 
     my $dt = {
         module => \&module,
@@ -57,18 +46,10 @@ sub _dt {
     return $dt;
 }
 sub exists {
-
     trace() if $ENV{TRACE};
-
     my $self = shift;
     my $string = shift;
-
-    if (exists $self->{pre_procs}{$string}){
-        return 1;
-    }
-    else {
-        return 0;
-    }
+    return exists $self->{pre_procs}{$string} ? 1 : 0;
 }
 sub module {
 
@@ -91,11 +72,12 @@ sub module {
         my $module_is_loaded = 0;
 
         if (! $INC{$module_file}){
-            eval {
+            my $required_ok = eval {
                 require "$module_file";
+                1;
             };
 
-            if ($@) {
+            if (! $required_ok) {
                 die "Problem loading $p->{module}: $@";
             }
         }
@@ -315,8 +297,9 @@ Devel::Examine::Subs
         confess "pre_proc $pre_proc is not implemented.\n";
     }
 
-    eval {
+    my $compiled_ok = eval {
         $pre_proc_cref = $compiler->{pre_procs}{$pre_proc}->();
+        1;
     };
 
 =head1 DESCRIPTION
@@ -376,7 +359,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2017 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

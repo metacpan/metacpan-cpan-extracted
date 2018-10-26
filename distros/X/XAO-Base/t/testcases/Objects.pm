@@ -14,7 +14,6 @@ sub test_everything {
 
     use XAO::Objects;
 
-    ##
     # Loading `test' project Config
     #
     my $obj=XAO::Objects->new(objname => 'Config',
@@ -114,10 +113,18 @@ sub test_include {
     # test.
     #
     my $sitename='testuse';
-    my $config=XAO::Objects->new(
-        objname     => 'Config',
-        sitename    => $sitename,
-    );
+    my $config;
+    try {
+        $config=XAO::Objects->new(
+            objname     => 'Config',
+            sitename    => $sitename,
+        );
+    }
+    otherwise {
+        my $etext=''.shift;
+        $self->assert(0,
+            "Expected to get a config, got an error: $etext");
+    };
 
     $self->assert(ref($config),
                   "new(Config) did not return an object reference");
@@ -190,31 +197,74 @@ sub test_include {
             coderef => sub { return shift->method() },
             expect  => 'XX<no-arg>XX',
         },
+        t10a => {       # A level deeper
+            objname => 'Sub::Level',
+            coderef => sub { return shift->method_lib('t10a') },
+            expect  => 'testuse:testlib-Sub-Level:lib:t10a',
+        },
+        t10b => {       # A level deeper
+            objname => 'Sub::Level',
+            coderef => sub { return shift->method_use('t10b') },
+            expect  => 'testuse:testuse-Sub-Level:use:t10b',
+        },
+        t11a => {       # Inherited from testlib/Config1
+            coderef => sub { return $config->config_1_local() },
+            expect  => 'Config1:Local',
+        },
+        t11b => {       # Inherited from testlib/Config2
+            coderef => sub { return $config->config_2_lib() },
+            expect  => 'Config2:Lib',
+        },
+        t11c => {       # Overridden in testuse/Config2
+            coderef => sub { return $config->config_2_over() },
+            expect  => 'Config2:Over:Use',
+        },
+        t11d => {       # From testuse/Config2
+            coderef => sub { return $config->config_2_use() },
+            expect  => 'Config2:Use',
+        },
+        t11e => {       # From testuse/Config3
+            coderef => sub { return $config->config_3_use() },
+            expect  => 'Config3:Use',
+        },
     );
 
     foreach my $tname (sort keys %tests) {
         my $test=$tests{$tname};
 
         my $obj;
-        my $got;
         my $etext='';
 
+        if($test->{'objname'}) {
+            try {
+                $obj=XAO::Objects->new(objname => $test->{'objname'});
+            }
+            otherwise {
+                $etext=''.shift;
+            };
+
+            if($test->{'objerr'}) {
+                $self->assert(!defined $obj,
+                    "Expected to NOT receive an object for test '$tname'");
+                next;
+            }
+
+            $self->assert($obj && ref($obj),
+                "Expected '$test->{'objname'}' object for test '$tname', got error: $etext");
+
+            if($test->{'objname'} ne 'Test1') {
+                $self->assert($obj->objname eq $test->{'objname'},
+                    "Expected objname() to be '$test->{'objname'}', got '".$obj->objname."' for test '$tname'");
+            }
+        }
+
+        my $got;
         try {
-            $obj=XAO::Objects->new(objname => $test->{'objname'});
             $got=$test->{'coderef'}->($obj);
         }
         otherwise {
             $etext=''.shift;
         };
-
-        if($test->{'objerr'}) {
-            $self->assert(!defined $obj,
-                "Expected to NOT receive an object for test '$tname'");
-            next;
-        }
-
-        $self->assert($obj && ref($obj),
-            "Expected '$test->{'objname'}' object for test '$tname', got error: $etext");
 
         if($test->{'codeerr'}) {
             $self->assert(!defined $got,

@@ -1,0 +1,11 @@
+endpwent();
+setpwent();
+my $name = getpwent();
+my @info = getpwent();
+my($n, $pass, $uid, $gid) = getpwent();
+$name = getpwnam('root');
+@info = getpwnam('root');
+($name, $pass, $uid, $gid) = getpwnam('root');
+$name = getpwuid(0);
+@info = getpwuid(0);
+($name, $pass, $uid, $gid) = getpwuid(0)

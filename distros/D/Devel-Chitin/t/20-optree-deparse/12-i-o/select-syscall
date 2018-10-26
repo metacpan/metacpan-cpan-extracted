@@ -1,0 +1,5 @@
+my($found, $time) = select(*FH, 1, 2, 3);
+$found = select(*FH, 1, 2, 3);
+my $fh;
+($found, $time) = select($fh, 1, 2, 3);
+$found = select(*$fh, 1, 2, 3)

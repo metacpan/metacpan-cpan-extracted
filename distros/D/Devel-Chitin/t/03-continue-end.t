@@ -15,7 +15,7 @@ sub run_in_debugger {
     if ($ARGV[0] and $ARGV[0] eq '--test') {
         attach_debugger_and_run();
     } else {
-        my $rv = system($^X, '-Ilib', '-It/lib', '-d:Chitin::NullDB', __FILE__, '--test');
+        my $rv = system($^X, '-Ilib', '-It/lib', '-d:NullDB', __FILE__, '--test');
         if ($? == -1) {
             die "Couldn't start test in debugger mode: $!";
         }

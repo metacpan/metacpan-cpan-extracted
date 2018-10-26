@@ -1,50 +1,34 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0; no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(ok_set_breakpoint ok_change_breakpoint ok_location db_continue);
 
-run_test(
-    5,
-    sub {
-        $a = 0;
-        $DB::single=1; 13;
-        foo();
-        $a = 1; # 15
-        foo();
-        foo();
-        sub foo {
-            1;  # 19;
-        }
-        $DB::single=1;
-        22;
-    },
-    \&set_breakpoints,
-    'continue',
-    loc(line => 19, subroutine => 'main::foo'),
-    \&change_breakpoint,
-    'continue',
-    loc(line => 22),
-    'done'
-);
+# Since debugging isn't enabled until 'use TestHelper',
+# this file's lines don't show up in the _<$filename, and we can't set
+# breakpoints that get honored.  Starting a new compilation unit with
+# use gets around that problem.
+use SampleCode;
 
-sub set_breakpoints {
-    my($debugger, $loc) = @_;
+$DB::single=1;
+SampleCode::foo();
+SampleCode::foo();
+SampleCode::foo();
+$DB::single=1;
+19;
 
-    Test::More::ok(Devel::Chitin::Breakpoint->new(
-            file => $loc->filename,
-            line => 19,
-            code => '$a',
-        ), 'Set conditional breakpoint');
-}
+sub __tests__ {
+    plan tests => 4;
 
-sub change_breakpoint {
-    my($debugger, $loc) = @_;
+    my $file = 't/lib/SampleCode.pm';
+    ok_set_breakpoint line => 5, file => $file, code => 1, 'Set unconditional breakpoint';
 
-    my($bp) = $debugger->get_breaks(file => $loc->filename, line => 19);
-    Test::More::ok($bp, 'retrieved breakpoint');
-    Test::More::is($bp->code('0'), '0', 'Change breakpoint condition to not fire');
+    db_continue;
+    ok_location line => 5, filename => $file;
+    ok_change_breakpoint line => 5, file => $file, change => { code => 0 }, 'Change previous breakpoint to not stop';
+
+    db_continue;
+    ok_location line => 19, filename => __FILE__;
 }
 

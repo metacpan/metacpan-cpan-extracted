@@ -5,6 +5,8 @@ use Types::Standard qw(Bool Int Object Str);
 
 use WebService::Mattermost::V4::API;
 
+our $VERSION = 0.005;
+
 with 'WebService::Mattermost::Role::Logger';
 
 ################################################################################
@@ -44,7 +46,7 @@ sub _try_authentication {
             $self->user_id($ret->content->{id});
             $self->_set_resource_auth_token();
         } else {
-            $self->logger->logdie($ret->message);
+            $self->logger->fatal($ret->message);
         }
     } elsif ($self->authenticate && !($self->username && $self->password)) {
         $self->logger->logdie('"username" and "password" are required attributes for authentication');

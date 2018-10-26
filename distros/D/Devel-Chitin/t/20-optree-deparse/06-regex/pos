@@ -1,0 +1,3 @@
+my $a = pos();
+$a = pos($a);
+pos($a) = 123

@@ -49,6 +49,6 @@
          "url" : "https://github.com/noxxi/p5-mail-dkim-iterator"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

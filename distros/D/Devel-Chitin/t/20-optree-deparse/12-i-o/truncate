@@ -1,0 +1,5 @@
+my $a = truncate(FH, 10);
+$a = truncate(*FH, 11);
+my($fh, %h);
+truncate($fh, 12);
+truncate($h{'foo'}, 14)

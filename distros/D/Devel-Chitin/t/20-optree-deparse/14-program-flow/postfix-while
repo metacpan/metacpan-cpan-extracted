@@ -1,0 +1,8 @@
+my $a;
+++$a while ($a < 5);
+print 'hi' while ($a < 5);
+do {
+	++$a;
+	print 'hi'
+} while ($a < 5);
+print 'done'

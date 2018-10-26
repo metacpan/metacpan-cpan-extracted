@@ -36,15 +36,20 @@
             "constant" : "0",
             "perl" : "5.008009",
             "strict" : "0",
-            "vars" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
             "File::Basename" : "0",
-            "IO::Pipe" : "0",
+            "List::Util" : "1.45",
             "Sub::Name" : "0",
+            "Test2::API" : "1.302136",
+            "Test2::IPC" : "0",
+            "Test2::Require::Fork" : "0",
+            "Test2::Tools::Basic" : "0",
+            "Test2::Tools::Subtest" : "0",
+            "Test2::V0" : "0",
             "Test::Builder" : "0",
             "Test::More" : "0",
             "lib" : "0"
@@ -59,7 +64,7 @@
          "web" : "https://github.com/brummett/Devel-Chitin"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

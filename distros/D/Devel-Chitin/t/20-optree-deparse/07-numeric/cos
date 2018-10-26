@@ -1,0 +1,4 @@
+my $a;
+$a = cos();
+$a = cos($a);
+cos($a)

@@ -29,14 +29,14 @@ Several plugins have version numbers 0.xx. They use an obsolete but
 still functional version of the plugin API. They will be upgraded to
 the current API when changes to the plugin are required.
 
-Many plugins are for compatilbility with the original Gotblah
+Many plugins are for compatibility with the original Gotblah
 collection of comics. Some plugins are created/suggested by other
 users. The collection of distributed plugins therefore does not
 reflect my personal taste of humour.
 
 LICENSE
 
-Copyright (C) 2016 Johan Vromans,
+Copyright (C) 2016,2018 Johan Vromans,
 
 This module is free software. You can redistribute it and/or modify it
 under the same terms as Perl.

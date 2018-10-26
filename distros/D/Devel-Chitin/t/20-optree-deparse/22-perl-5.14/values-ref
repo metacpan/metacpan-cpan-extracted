@@ -1,0 +1,6 @@
+BEGIN { skip "requires 5.14.0 -> 5.22" if $^V lt v5.14.0 or $^V ge v5.24.0 } # omit
+use v5.14; # omit
+my $h = {1 => 2, 3 => 4};
+values($h);
+my $a = [1, 2, 3];
+values($a)

@@ -84,7 +84,10 @@ while ( my $mail = $mbox->nextmail ) {
 	    print STDERR " unkown $domain\n";
 	} else {
 	    my $error = $_->error;
-	    print STDERR " $status $domain".( $error ? " $error":"")."\n";
+	    my $warn = $_->warning;
+	    print STDERR " $status $domain"
+		. ( $error ? " error=\"$error\"":"")
+		. ( $warn ? " warning=\"$warn\"":"")."\n";
 	}
     }
 }

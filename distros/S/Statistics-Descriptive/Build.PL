@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Statistics-Descriptive",
-  "dist_version" => "3.0701",
+  "dist_version" => "3.0702",
   "license" => "perl",
   "module_name" => "Statistics::Descriptive",
   "recursive_test_files" => 1,

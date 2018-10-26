@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 cPanel, Inc.
+# Copyright (c) 2018 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -63,6 +63,22 @@ The OpenStack user name
 
 The OpenStack password
 
+=item * B<version>
+
+The version of the Glance API to negotiate with.  Default is C<2.0>, but
+C<3> is also accepted.
+
+=item * B<scope>
+
+When negotiating with an Identity v3 endpoint, the information provided here
+is passed in the B<scope> property of the B<auth> portion of the request body
+submitted to the endpoint.
+
+=item * B<domain>
+
+When negotiating with an Identity v3 endpoint, the name of the domain to
+authenticate to.
+
 =back
 
 When successful, this method will return an object containing the following:
@@ -89,37 +105,29 @@ for any requested OpenStack services
 sub new ($$%) {
     my ($class, $endpoint, %args) = @_;
 
-    die('No OpenStack authentication endpoint provided') unless defined $endpoint;
-    die('No OpenStack tenant name provided in "tenant"') unless defined $args{'tenant'};
-    die('No OpenStack username provided in "username"')  unless defined $args{'username'};
-    die('No OpenStack password provided in "password"')  unless defined $args{'password'};
-
-    my $client = OpenStack::Client->new($endpoint,
-        'package_ua'      => $args{'package_ua'},
-        'package_request' => $args{'package_request'}
+    my %CLASSES = (
+        '2.0' => 'OpenStack::Client::Auth::v2',
+        '3'   => 'OpenStack::Client::Auth::v3'
     );
 
-    my $response = $client->call('POST' => '/tokens', {
-        'auth' => {
-            'tenantName'          => $args{'tenant'},
-            'passwordCredentials' => {
-                'username' => $args{'username'},
-                'password' => $args{'password'}
-            }
-        }
-    });
-
-    unless (defined $response->{'access'}->{'token'}->{'id'}) {
-        die('No token found in response');
+    unless (defined $endpoint) {
+        die 'No OpenStack authentication endpoint provided';
     }
 
-    return bless {
-        'package_ua'      => $args{'package_ua'},
-        'package_request' => $args{'package_request'},
-        'response'        => $response,
-        'clients'         => {},
-        'services'        => $response->{'access'}->{'serviceCatalog'}
-    }, $class;
+    $args{'version'} ||= '2.0';
+
+    unless (defined $CLASSES{$args{'version'}}) {
+        die "Unsupported Identity endpoint version $args{'version'}";
+    }
+
+    local $@;
+
+    eval qq{
+        use $CLASSES{$args{'version'}} ();
+        1;
+    } or die $@;
+
+    return $CLASSES{$args{'version'}}->new($endpoint, %args);
 }
 
 =back
@@ -132,12 +140,6 @@ sub new ($$%) {
 
 Return the full decoded response from the Keystone API.
 
-=cut
-
-sub response ($) {
-    shift->{'response'};
-}
-
 =back
 
 =head1 ACCESSING AUTHORIZATION DATA
@@ -147,12 +149,6 @@ sub response ($) {
 =item C<$auth-E<gt>access()>
 
 Return the service access data stored in the current object.
-
-=cut
-
-sub access ($) {
-    shift->{'response'}->{'access'};
-}
 
 =back
 
@@ -164,12 +160,6 @@ sub access ($) {
 
 Return the authorization token data stored in the current object.
 
-=cut
-
-sub token ($) {
-    shift->{'response'}->{'access'}->{'token'};
-}
-
 =back
 
 =head1 OBTAINING LIST OF SERVICES AUTHORIZED
@@ -179,18 +169,6 @@ sub token ($) {
 =item C<$auth-E<gt>services()>
 
 Return a list of service types the OpenStack user is authorized to access.
-
-=cut
-
-sub services ($) {
-    my ($self) = @_;
-
-    my %types = map {
-        $_->{'type'} => 1
-    } @{$self->{'services'}};
-
-    return sort keys %types;
-}
 
 =back
 
@@ -248,57 +226,6 @@ endpoint is the public endpoint.
 
 =back
 
-=cut
-
-sub service ($$%) {
-    my ($self, $type, %opts) = @_;
-
-    if (defined $self->{'clients'}->{$type}) {
-        return  $self->{'clients'}->{$type};
-    }
-
-    if (defined $opts{'uri'}) {
-        return $self->{'clients'}->{$type} = OpenStack::Client->new($opts{'uri'},
-            'package_ua'      => $self->{'package_ua'},
-            'package_request' => $self->{'package_request'},
-            'token'           => $self->token
-        );
-    }
-
-    $opts{'endpoint'} ||= 'public';
-
-    if ($opts{'endpoint'} !~ /^(?:public|internal|admin)$/) {
-        die('Invalid endpoint type specified in "endpoint"');
-    }
-
-    foreach my $service (@{$self->{'services'}}) {
-        next unless $type eq $service->{'type'};
-
-        my $uri;
-
-        foreach my $endpoint (@{$service->{'endpoints'}}) {
-            next if defined $opts{'id'}     && $endpoint->{'id'}     ne $opts{'id'};
-            next if defined $opts{'region'} && $endpoint->{'region'} ne $opts{'region'};
-
-            if ($opts{'endpoint'} eq 'public') {
-                $uri = $endpoint->{'publicURL'};
-            } elsif ($opts{'endpoint'} eq 'internal') {
-                $uri = $endpoint->{'internalURL'};
-            } elsif ($opts{'endpoint'} eq 'admin') {
-                $uri = $endpoint->{'adminURL'};
-            }
-
-            return $self->{'clients'}->{$type} = OpenStack::Client->new($uri,
-                'package_ua'      => $self->{'package_ua'},
-                'package_request' => $self->{'package_request'},
-                'token'           => $self->token
-            );
-        }
-    }
-
-    die("No service type '$type' found");
-}
-
 =back
 
 =head1 AUTHOR
@@ -307,7 +234,7 @@ Written by Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015 cPanel, Inc.  Released under the terms of the MIT license.
+Copyright (c) 2018 cPanel, L.L.C.  Released under the terms of the MIT license.
 See LICENSE for further details.
 
 =cut

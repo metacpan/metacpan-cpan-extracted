@@ -1,0 +1,2 @@
+my $rv = readlink('/path/name');
+readlink()

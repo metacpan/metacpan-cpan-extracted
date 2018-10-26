@@ -70,7 +70,11 @@ sub first_index
   my $val = shift;
   my @array = @_;
 
-  return first { $array[$_] eq $val } 0..$#array;
+  for (my $i = 0; $i < scalar(@array); $i++) {
+    if ($array[$i] eq $val) {
+      return $i;
+    }
+  }
 }
 
 sub check_unique

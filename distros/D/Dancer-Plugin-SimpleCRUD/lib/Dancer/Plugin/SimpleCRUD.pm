@@ -33,13 +33,14 @@ use strict;
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use Dancer::Plugin::Database;
+#use Dancer::Plugin::DBIC;  # not a hard dependency
 use HTML::Table::FromDatabase;
 use CGI::FormBuilder;
 use HTML::Entities;
 use URI::Escape;
 use List::MoreUtils qw( first_index uniq );
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 =encoding utf8
 
@@ -221,15 +222,31 @@ which returns the WHERE clause hashref - for instance:
 
   where_filter => sub { { customer_id => logged_in_user()->{customer_id} } },
 
+=item C<db_connection_provider> (optional)
+
+By default, we use L<Dancer::Plugin::Database> to obtain database connections.
+ 
+If the module L<Dancer::Plugin::DBIC> is installed and you set this option to 'DBIC', 
+the database connection will be created using L<Dancer::Plugin::DBIC> 
+and its corresponding configuration options for database connections.
+Note that in DBIC, the default connection is named 'dafault', not ''.
+
 =item C<db_connection_name> (optional)
 
-We use L<Dancer::Plugin::Database> to obtain database connections.  This option
+By default, we use L<Dancer::Plugin::Database> to obtain database connections.  
+(You can override this using the C<db_connection_provider> option.)
+The db_connection_name option
 allows you to specify the name of a connection defined in the config file to
-use.  See the documentation for L<Dancer::Plugin::Database> for how multiple
-database configurations work.  If this is not supplied or is empty, the default
+use.  See the documentation for L<Dancer::Plugin::Database> (or 
+L<Dancer::Plugin::DBIC>) for how multiple database configurations work.
+
+If this is not supplied or is empty, the default
 database connection details in your config file will be used - this is often
 what you want, so unless your app is dealing with multiple DBs, you probably
 won't need to worry about this option.
+
+Note that in L<Dancer::Plugin::Database>, the default connection is named '', 
+but in L<Dancer::Plugin::DBIC> the default connection is named 'default'.
 
 =item C<labels> (optional)
 
@@ -525,7 +542,7 @@ sub simple_crud {
     my (%args) = @_;
 
     # Get a database connection to verify that the table name is OK, etc.
-    my $dbh = database($args{db_connection_name});
+    my $dbh = _database(\%args);
 
     if (!$dbh) {
         warn "No database handle";
@@ -632,7 +649,7 @@ CONFIRMDELETE
         );
         my $delete_handler = sub {
             my ($id) = params->{record_id} || splat;
-            my $dbh = database($args{db_connection_name});
+            my $dbh = _database(\%args);
             my $where = _get_where_filter_from_args(\%args);
             $where->{$key_column} = $id;
 
@@ -679,7 +696,7 @@ sub _create_view_handler {
     my $params = params;
     my $id     = $params->{id} or return _apply_template("<p>Need id to view!</p>", $args->{'template'});
 
-    my $dbh = database($args->{db_connection_name});
+    my $dbh = _database($args);
 
     # a hash containing the current values in the database.  Take where_filter
     # into account, so we can't fetch a row if it doesn't match the filter
@@ -713,12 +730,27 @@ register_hook(qw(
 ));
 register_plugin;
 
+
+sub _database {
+    my $args = shift;
+    my $provider = $args->{db_connection_provider} || "Database";
+    if ($provider eq "Database") {
+        return Dancer::Plugin::Database::database($args->{db_connection_name});  # D:P:Database already loaded
+    } 
+    if ($provider eq "DBIC") {
+        require Dancer::Plugin::DBIC;
+        my $dbh =  Dancer::Plugin::DBIC::schema($args->{db_connection_name})->storage->dbh;
+        return bless $dbh => 'Dancer::Plugin::Database::Core::Handle'; # so we can use ->quick_update/_insert
+    } 
+    die "db_connection_provider can be 'Database' or 'DBIC'. Don't understand '$provider'";
+}
+
 sub _create_add_edit_route {
     my ($args, $table_name, $key_column) = @_;
     my $params = params;
     my $id     = $params->{id};
 
-    my $dbh = database($args->{db_connection_name});
+    my $dbh = _database($args);
 
     # a hash containing the current values in the database
     my $values_from_database;
@@ -806,7 +838,8 @@ sub _create_add_edit_route {
             }
             $constrain_values{$name} = \%possible_values;
 
-        } elsif (my $values_from_db = $field->{mysql_values}) {
+        } elsif (my $values_from_db = $field->{mysql_values}
+				   || $field->{mariadb_values}) {
             $constrain_values{$name} = $values_from_db;
         }
     }
@@ -985,7 +1018,7 @@ sub _create_add_edit_route {
 sub _create_list_handler {
     my ($args, $table_name, $key_column) = @_;
 
-    my $dbh = database($args->{db_connection_name});
+    my $dbh = _database($args);
     my $columns = _find_columns($dbh, $table_name);
 
     my $display_columns = $args->{'display_columns'};
@@ -1428,12 +1461,20 @@ SEARCHFORM
         }
     }
 
-    $html .= $table->getTable || '';
-
+    my $add_link_html = "";
     if ($args->{addable} && _has_permission('edit', $args)) {
-        $html .= sprintf '<a href="%s">Add a new %s</a></p>',
+        $add_link_html = sprintf '<p><a href="%s">Add a new %s</a></p>',
             _external_url($args->{dancer_prefix}, $args->{prefix}, '/add'),
             $args->{record_title};
+    }
+
+    $html .= $add_link_html;
+
+    $html .= $table->getTable || '';
+
+    $html .= $add_link_html;
+
+    if ($args->{deleteable} && _has_permission('delete', $args)) {
 
         # Append a little Javascript which asks for confirmation that they'd
         # like to delete the record, then makes a POST request via a hidden
@@ -1547,10 +1588,10 @@ sub _return_downloadable_query {
 # NULLABLE
 # DATETIME ?
 # TYPE_NAME (e.g. INT, VARCHAR, ENUM)
-# MySQL-specific stuff includes:
-# mysql_type_name (e.g. "enum('One', 'Two', 'Three')"
-# mysql_is_pri_key
-# mysql_values (for an enum, ["One", "Two", "Three"]
+# MySQL/MariaDB-specific stuff includes:
+# {mysql,mariadb}_type_name (e.g. "enum('One', 'Two', 'Three')"
+# {mysql,mariadb}_is_pri_key
+# {mysql,mariadb}_values (for an enum, ["One", "Two", "Three"]
 sub _find_columns {
     my ($dbh, $table_name) = @_;
     my $sth = $dbh->column_info(undef, undef, $table_name, undef)
@@ -1795,6 +1836,8 @@ Martijn Lievaart
 
 Josh Rabinowitz
 
+Phil Carmody (thefatphil)
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-dancer-plugin-simplecrud at rt.cpan.org>, or through
@@ -1850,7 +1893,7 @@ L<http://search.cpan.org/dist/Dancer-Plugin-SimpleCRUD/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-16 David Precious.
+Copyright 2010-18 David Precious.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

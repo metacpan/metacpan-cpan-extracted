@@ -1,0 +1,4 @@
+my $a;
+$a = substr($a, 1, 2, 'foo');
+substr($a, 2, 3) = 'bar';  # doubled because the first one triggers an optimized-out
+substr($a, 2, 3) = 'bar'   # sassign with a single child

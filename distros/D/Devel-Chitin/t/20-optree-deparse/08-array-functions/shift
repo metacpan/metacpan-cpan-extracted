@@ -1,0 +1,4 @@
+my($a, @list);
+$a = shift(@list);
+shift(@list);
+$a = shift

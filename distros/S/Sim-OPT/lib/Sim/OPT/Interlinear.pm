@@ -1,6 +1,6 @@
 package Sim::OPT::Interlinear;
 
-# INTERLINEAR, v. 0.0013
+# INTERLINEAR
 # Author: Gian Luca Brunetti, Politecnico di Milano. (gianluca.brunetti@polimi.it)
 # Copyright reserved.  2018.
 # GPL License 3.0 or newer.
@@ -750,7 +750,7 @@ sub wei
     }
     return( \%bank );
   }
-  %bank = %{ clean( %bank ) }; say $tee "IN WEI CLEANED \%bank: " . dump( %bank ) ;
+  %bank = %{ clean( %bank ) }; #say $tee "IN WEI CLEANED \%bank: " . dump( %bank ) ;
   #my %bank =  %{ $bank_ref }; say $tee "CLEANED \%bank: " . dump( %bank );
 
   sub cyclearr
@@ -759,7 +759,7 @@ sub wei
     my @arr = @{ $arr_r };
     my %bank = %{ $bank_r };
     my %factlevels = %{ $factlevels };
-    say $tee "IN cyclearr ARR: " . dump( @arr );
+    #say $tee "IN cyclearr ARR: " . dump( @arr );
 
     my %wand;
     my $coun = 0;
@@ -931,7 +931,7 @@ sub wei
       push ( @limb0, [ $wand{$ke}{name}, $wand{$ke}{bulk}, $soughtval, $totstrength ] ); #say $tee "\$avg: $avg"; say $tee "\${ \$magic{\$ke}{\$dee} }->[1] : ${ $magic{$ke}{$dee} }->[1] ";
     }
   }
-  say $tee "LIMBO_WEI: " . dump( @limbo_wei );
+  #say $tee "LIMBO_WEI: " . dump( @limbo_wei );
   return( @limb0 )
 } ##### END SUB wei
 

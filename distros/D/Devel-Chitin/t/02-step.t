@@ -1,30 +1,31 @@
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0;  no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(ok_location ok_at_end db_step);
 
-run_test(
-    5,
-    sub {
-        $DB::single=1;
-        12;
-        foo();
-        14;
-        sub foo {
-            16;
-        }
-    },
-    loc(line => 12),
-    'step',
-    loc(line => 13),
-    'step',
-    loc(subroutine => 'main::foo', line => 16),
-    'step',
-    loc(line => 14),
-    'step',
-    'at_end',
-);
+$DB::single=1;
+9;
+foo(); # 10
+11;
+sub foo {
+    13;
+}
+
+sub __tests__ {
+    plan tests => 5;
+
+    ok_location subroutine => 'MAIN', line => 9, filename => __FILE__;
+    db_step;
+    ok_location subroutine => 'MAIN', line => 10, filename => __FILE__;
+    db_step;
+    ok_location subroutine => 'main::foo', line => 13, filename => __FILE__;
+    db_step;
+    ok_location subroutine => 'MAIN', line => 11, filename => __FILE__;
+    db_step;
+    ok_at_end;
+}
+
 
 

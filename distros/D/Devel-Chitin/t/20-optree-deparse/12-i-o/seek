@@ -1,0 +1,5 @@
+use Fcntl qw(SEEK_SET SEEK_CUR SEEK_END); # omit
+my $a = seek(F, 10, SEEK_CUR);
+my $fh;
+seek($fh, -10, SEEK_END);
+seek(*$fh, 0, SEEK_SET)

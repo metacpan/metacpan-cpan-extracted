@@ -1,0 +1,8 @@
+my($a, $b);
+while ($a && $b) {
+	print 'hi';
+	print 'there'
+}
+while ($a) {
+	print 'hi'
+}

@@ -1,6 +1,47 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 2cc30fd5b807363a490084db5327b358022e3fb0
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Thu Oct 25 12:11:09 2018 -0700
+
+    1.73 pageurl() returns real unmodified URL
+    
+    This was an old problem where for URLs like http://sample.com/foo/
+    a call to pageurl() would return http://sample.com/foo/index.html
+    (appending index.html). This affected all of the derived code, most
+    importantly <%URL...%> template calls.
+    
+    Changed to return the actual URL as was requested, not as it was
+    interpreted in file templates.
+    
+    Also fixed benchmark stats sort stability in testing for
+    https://rt.cpan.org/Public/Bug/Display.html?id=127440
+
+commit 08fb7c8ab74e830bf8e26c5fb0b1d17d01cff036
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Oct 23 16:36:28 2018 -0700
+
+    Removed EUMM upgrade compat WriteMakefile1
+    
+    There is already a requirement for version 6.64 of MakeMaker, so it
+    seems unnecessary.
+
+commit 291062d8d6595c5769ccad3e4ffb70b6244d627b
+Merge: 0a6923f 17a681a
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Oct 23 16:28:24 2018 -0700
+
+    Merge pull request #1 from chorny/master
+    
+    Display repository URL on MetaCPAN
+
+commit 17a681a8bf11c6640a35a8c98e6402e9ba4c7667
+Author: Alexandr Ciornii <alexchorny@gmail.com>
+Date:   Sun Oct 21 11:36:38 2018 +0300
+
+    Upgrade Makefile.PL
+
 commit 0a6923fda1dc15fe2a50b36ccbd5ea327b11a5b5
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Oct 19 17:34:23 2018 -0700
@@ -41,36 +82,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Sat Jul 7 10:30:15 2018 -0700
 
     Cleaner testing, no DESTROY warnings
-
-commit 9babe4b24e5067f5babccdf80e23a189a916ea48
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Jul 7 09:37:06 2018 -0700
-
-    XAO deps pushed to current
-
-commit 17731f66fb42992f13493da137e1a48f795cef6d
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Jul 7 09:35:46 2018 -0700
-
-    1.70 CPAN build fixes
-
-commit 818202a388ea37ae13b19d459ea44ddabb6d0388
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 20:27:11 2018 -0700
-
-    1.69 Test case fixed for no database and pm versions
-    
-    Fixed running tests when no database is configured, needed for
-    Test::Unit::Lite migration.
-    
-    Also added back $VERSION numbers on pm files. CPAN won't update
-    modules without that :(
-
-commit 6cb4d1ed5118cec6c3dd47a368681fc14506fc5d
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 17:36:28 2018 -0700
-
-    1.68 CPAN release updates
-    
-    No functional changes. Just tests reorganized, etc.
 

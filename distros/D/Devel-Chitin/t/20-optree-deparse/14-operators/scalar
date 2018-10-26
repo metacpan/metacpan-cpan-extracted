@@ -1,0 +1,3 @@
+my($a, @a);
+$a = scalar(@a);
+$a = scalar($a)

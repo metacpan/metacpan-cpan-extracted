@@ -1,0 +1,5 @@
+use Socket qw(PF_INET SOCK_STREAM PF_UNIX SOCK_DGRAM SOCK_RAW); # omit
+my $sock;
+my $rv = socket(SOCK, PF_INET, SOCK_STREAM, 3);
+$rv = socket(*SOCK, PF_UNIX, SOCK_DGRAM, 2);
+$rv = socket($sock, PF_INET, SOCK_RAW, 1)

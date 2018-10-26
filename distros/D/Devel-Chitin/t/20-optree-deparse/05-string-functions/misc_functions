@@ -1,0 +1,45 @@
+no warnings 'void'; # omit
+my $a;
+chomp();
+$a = chomp();
+chomp($a);
+
+chop();
+$a = chop();
+chop($a);
+
+chr();
+$a = chr();
+chr($a);
+
+hex();
+$a = hex();
+hex($a);
+
+lc();
+$a = lc();
+lc($a);
+
+lcfirst();
+$a = lcfirst();
+lcfirst($a);
+
+uc();
+$a = uc();
+uc($a);
+
+ucfirst();
+$a = ucfirst();
+ucfirst($a);
+
+length();
+$a = length();
+length($a);
+
+oct();
+$a = oct();
+oct($a);
+
+ord();
+$a = ord();
+ord($a)

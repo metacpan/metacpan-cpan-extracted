@@ -1,53 +1,29 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0; no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
-run_in_debugger();
+use TestHelper qw(db_trace db_step db_disable ok_set_breakpoint do_test do_disable_auto_disable);
+use SampleCode;
 
-Devel::Chitin::TestDB->attach();
-
+$DB::single=1;  # needed to get the tests defined in __test__ to run
+SampleCode::foo();
 $DB::single=1;
-13;
-14;
-15;
+11;
 
-BEGIN{ if (is_in_test_program) {
-    eval "use Test::More tests => 5";
-}}
+sub __tests__ {
+    plan tests => 2;
 
-package Devel::Chitin::TestDB;
-use base 'Devel::Chitin';
-
-my $already_stopped = 0;
-sub notify_stopped {
-    my($db, $loc) = @_;
-    if ($already_stopped++) {
-        Test::More::ok(0, 'should not stop');
-        exit;
-    }
-    Test::More::ok($db->trace(1), 'Turn on trace mode');
-    Test::More::ok($db->step(), 'Turn on step mode');
-    Test::More::ok(Devel::Chitin::Breakpoint->new(
-        file => __FILE__,
-        line => 14,
-        code => 1),
-        'Set unconditional breakpoint on line 14');
-
-    Test::More::ok($db->disable_debugger, 'Disable debugger');
-}
-
-sub notify_trace {
-    Test::More::ok(0, 'should not trace');
-    exit;
-}
-
-sub notify_program_exit {
-    Test::More::ok(0,' should not notify exit');
+    # Turn on several mechanisms to stop the debugger, then disable it
+    # If we ever get stopped, the TestHelper will complain there are no more
+    # tests remaining and fail the test
+    db_trace(1);
+    ok_set_breakpoint file => 't/lib/SampleCode.pm', line => 5, 'Set breakpoint that will be skipped';
+    do_disable_auto_disable;
+    db_disable;
+    db_step;
 }
 
 END {
-    Test::More::ok(1,'Ran to the end') if (Devel::Chitin::TestRunner::is_in_test_program);
+    pass('Ran to the end');
 }

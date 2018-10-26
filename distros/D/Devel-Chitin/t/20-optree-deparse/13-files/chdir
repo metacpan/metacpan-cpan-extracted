@@ -1,0 +1,3 @@
+my $a = chdir('/some/path/name');
+$a = chdir();
+chdir(*FH)

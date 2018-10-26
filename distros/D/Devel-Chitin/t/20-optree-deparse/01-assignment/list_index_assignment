@@ -1,0 +1,3 @@
+my(@the_list, $idx);
+$the_list[2] = 'foo';
+$the_list[$idx] = 'bar'

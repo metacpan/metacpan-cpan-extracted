@@ -1,0 +1,2 @@
+my(%the_hash, @indexes);
+@the_hash{'1', 'key', @indexes} = (1, 2, 3)

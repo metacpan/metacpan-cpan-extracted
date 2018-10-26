@@ -1,0 +1,4 @@
+my $a;
+$a = rand();
+$a = rand($a);
+rand($a)

@@ -1,0 +1,7 @@
+binmode(F);
+binmode(*F, ':raw');
+binmode(F, ':crlf');
+my $fh;
+binmode($fh);
+binmode(*$fh, ':raw');
+binmode($fh, ':crlf')

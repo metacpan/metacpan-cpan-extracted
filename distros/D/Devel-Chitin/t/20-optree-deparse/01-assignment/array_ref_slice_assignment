@@ -1,0 +1,2 @@
+my($list, $other_list);
+@$list[1, @$other_list] = (1, 2, 3)

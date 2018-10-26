@@ -2,7 +2,7 @@ package App::Yath::Command::projects;
 use strict;
 use warnings;
 
-our $VERSION = '0.001069';
+our $VERSION = '0.001070';
 
 use parent 'App::Yath::Command::test';
 use Test2::Harness::Util::HashBase;
@@ -27,8 +27,17 @@ This command will run all the tests for each project within a parent directory.
 sub make_run_from_settings {
     my $self = shift;
 
+    # Add the Author Testing search paths if enabled
+    my $settings       = $self->{+SETTINGS} ||= {};
+    my @default_search = @{$settings->{default_search}};
+    if ($ENV{AUTHOR_TESTING} || $settings->{env_vars}{AUTHOR_TESTING}) {
+        push @default_search, @{$settings->{default_at_search}};
+    }
+
+    # Go set up our test runner.
     return $self->SUPER::make_run_from_settings(
-        projects => 1,
+        projects       => 1,
+        default_search => \@default_search,
     );
 }
 

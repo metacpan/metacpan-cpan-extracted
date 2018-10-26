@@ -3,7 +3,7 @@ package Devel::Chitin::OpTree;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use Carp;
 use Scalar::Util qw(blessed reftype weaken refaddr);
@@ -88,8 +88,12 @@ sub _determine_start_of {
     if ($start->package eq 'main' and $start->subroutine eq 'MAIN') {
         return (B::main_root(), B::main_cv);
 
+    } elsif (my $subref = $start->subref) {
+        my $cv = B::svref_2object($subref);
+        return ($cv->ROOT, $cv);
+
     } elsif ($start->subroutine =~ m/::__ANON__\[\S+:\d+\]/) {
-        Carp::croak(q(Don't know how to handle anonymous subs yet));
+        Carp::croak(q(Don't know how to handle arbitrary anonymous subs yet));
 
     } else {
         my $subname = join('::', $start->package, $start->subroutine);
@@ -480,7 +484,7 @@ sub pp_stub { ';' }
 sub pp_unstack { '' }
 sub pp_undef { 'undef' }
 sub pp_wantarray { 'wantarray' }
-sub pp_dump { 'dump' }
+sub pp_dump { 'CORE::dump' }
 sub pp_next { 'next' }
 sub pp_last { 'last' }
 sub pp_redo { 'redo' }

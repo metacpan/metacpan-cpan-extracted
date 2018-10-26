@@ -1,0 +1,3 @@
+my $a = getpriority(1, 2);
+$a = getpriority(0, 0)
+

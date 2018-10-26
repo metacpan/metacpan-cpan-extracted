@@ -1,0 +1,2 @@
+my $a = mkdir('/some/path', 0755);
+$a = mkdir('/other/path')

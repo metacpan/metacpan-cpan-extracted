@@ -1,0 +1,3 @@
+my($a, $b);
+my $rv = socketpair(SOCK, $a, AF_UNIX, SOCK_STREAM, PF_UNSPEC);
+$rv = socketpair($b, *SOCK, AF_INET6, SOCK_DGRAM, 1234)

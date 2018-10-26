@@ -21,7 +21,8 @@ ok( eval q{
 		-opt => [ "opt", 0 ],
 	);
 	our %EXPORT_TAGS= (
-		group1 => [ '$scalar', '@array', '%hash' ]
+		group1 => [ '$scalar', '@array', '%hash' ],
+		default => [ '@array' ],
 	);
 	sub opt {
 		no strict "refs";
@@ -41,6 +42,12 @@ is_deeply( \%symbols, {
 		'$scalar' => eval '*Example::scalar{SCALAR}',
 		'@array'  => eval '*Example::array{ARRAY}',
 		'%hash'   => eval '*Example::hash{HASH}',
+	}, 'Exported to hashref' );
+
+%symbols= ();
+Example->import({ into => \%symbols });
+is_deeply( \%symbols, {
+		'@array'  => eval '*Example::array{ARRAY}',
 	}, 'Exported to hashref' );
 
 Example->unimport({ into => 'CleanNamespace1' }, '@array' );

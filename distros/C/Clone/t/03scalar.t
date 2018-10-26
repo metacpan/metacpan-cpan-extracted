@@ -13,7 +13,7 @@ my $has_data_dumper;
 
 BEGIN {
   $| = 1;
-  my $tests = 10;
+  my $tests = 12;
   $tests += 2 if $] > 5.0219;
   eval q[use Data::Dumper];
   if (!$@) {
@@ -78,19 +78,37 @@ my $b = $a->clone(1);
 ok( $$a == $$b, '$$a == $$b' );
 ok( $a != $b, '$a != $b' );
 
-my $c = \"test 2 scalar";
-my $d = Clone::clone($c, 2);
+{
+  print "# using a reference on a string (CowREFCNT == 0).\n";
 
-ok( $$c == $$d, 'test 2 scalar content' );
-ok( $c != $d, 'SV are differents SVs' );
+  my $c = \"something";
+  my $d = Clone::clone($c, 2);
 
-
-if ( $] > 5.0219 ) {
-  my $sv_c = svref_2object( $c );
-  my $sv_d = svref_2object( $d );
-  ok( $sv_c->FLAGS & B::SVf_IsCOW, 'COW flag set on c' );
-  ok( $sv_d->FLAGS & B::SVf_IsCOW, 'COW flag set on d' );
+  ok( $$c == $$d, 'test 2 scalar content' );
+  ok( $c != $d, 'SV are differents SVs' );
 }
+
+{
+  print "# using a reference on one SvPV (CowREFCNT > 0).\n";
+
+  my $str = "my string";
+  my $c = \$str;
+
+  my $d = Clone::clone($c, 2);
+
+  ok( $$c == $$d, 'test 2 scalar content' );
+  ok( $c != $d, 'SV are differents SVs' );
+
+
+  if ( $] > 5.0219 ) {
+    my $sv_c = svref_2object( $c );
+    my $sv_d = svref_2object( $d );
+
+    ok( $sv_c->FLAGS & B::SVf_IsCOW, 'COW flag set on c' );
+    ok( $sv_d->FLAGS & B::SVf_IsCOW, 'COW flag set on d' );
+  }
+}
+
 
 $$d .= 'abcd';
 ok( $$c ne $$d, 'only one scalar changed' );
@@ -99,20 +117,20 @@ my $circ = undef;
 $circ = \$circ;
 $aref = clone($circ);
 if ($has_data_dumper) {
-  ok( Dumper($circ) eq Dumper($aref) );
+  ok( Dumper($circ) eq Dumper($aref), 'Dumper check' );
 }
 
 # the following used to produce a segfault, rt.cpan.org id=2264
 undef $a;
 $b = clone($a);
-ok( $$a == $$b );
+ok( $$a == $$b, 'int check' );
 
 # used to get a segfault cloning a ref to a qr data type.
 my $str = 'abcdefg';
 my $qr = qr/$str/;
 my $qc = clone( $qr );
-ok( $qr eq $qc );
-ok( $str =~ /$qc/ );
+ok( $qr eq $qc, 'string check' );
+ok( $str =~ /$qc/, 'regexp check' );
 
 # test for unicode support
 {

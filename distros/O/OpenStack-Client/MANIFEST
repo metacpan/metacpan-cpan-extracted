@@ -6,7 +6,10 @@ README.md
 examples/images.pl
 examples/services.pl
 lib/OpenStack/Client/Auth.pm
+lib/OpenStack/Client/Auth/v2.pm
+lib/OpenStack/Client/Auth/v3.pm
 lib/OpenStack/Client.pm
+lib/OpenStack/Client/Response.pm
 t/lib/Test/OpenStack/Client.pm
 t/lib/Test/OpenStack/Client/Message.pm
 t/lib/Test/OpenStack/Client/Request.pm

@@ -1,0 +1,4 @@
+my($a, @list);
+$a = pop(@list);
+pop(@list);
+$a = pop

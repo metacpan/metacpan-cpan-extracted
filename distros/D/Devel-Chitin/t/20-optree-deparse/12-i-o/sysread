@@ -1,0 +1,4 @@
+my($fh, $buf);
+my $bytes = sysread(FH, $buf, 10);
+sysread(*$fh, $buf, 10, 5);
+sysread(*FH, $buf, 10, -5)

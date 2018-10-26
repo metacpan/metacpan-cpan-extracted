@@ -21,5 +21,5 @@ no_index:
     - lib/App/Module/Setup/Templates/Default.pm
 requires:
   Test::More: '0.8701'
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

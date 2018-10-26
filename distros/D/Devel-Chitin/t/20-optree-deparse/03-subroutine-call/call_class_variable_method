@@ -1,0 +1,2 @@
+my $method;
+Some::Other::Package->$method(1, 2, 3)

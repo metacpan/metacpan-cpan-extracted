@@ -1,0 +1,3 @@
+my $a;
+my $r = tie($a, 'Some::Package', 1, 2, 3);
+$r = tie($r, 'Other::Package', $a)

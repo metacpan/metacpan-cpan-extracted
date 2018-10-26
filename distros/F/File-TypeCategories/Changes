@@ -1,5 +1,9 @@
 Revision history for File-TypeCategories
 
+0.08   2018-10-24
+        Updating for release of version 0.08
+        Perl 5.8 support is dying off so removing it even if the code would work, also adding tests for 5.26 & 5.28 (Ivan Wills)
+
 0.07   2018-08-12
         Updating for release of version 0.07
         Fixning dependencies (Ivan Wills)

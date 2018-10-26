@@ -3,7 +3,7 @@ use 5.008;
 use warnings;
 use strict;
 
-our $VERSION = '1.69';
+our $VERSION = '1.70';
 
 use Carp;
 use Data::Compare;
@@ -19,21 +19,19 @@ use Symbol qw(delete_package);
 
 BEGIN {
 
-    # we need to do some trickery for DTS due to circular referencing,
-    # which broke CPAN installs.
+    # we need to do some trickery for Devel::Trace::Subs due to circular
+    # referencing, which broke CPAN installs. DTS does nothing if not presented,
+    # per this code
 
     eval {
         require Devel::Trace::Subs;
-    };
-
-    eval {
         import Devel::Trace::Subs qw(trace);
     };
 
     if (! defined &trace){
         *trace = sub {};
     }
-};
+}
 
 #
 # public methods
@@ -205,7 +203,9 @@ sub inject {
 
     # inject_use/inject_after_sub_def are preprocs
 
-    if ($p->{inject_use} || $p->{inject_after_sub_def} || defined $p->{line_num}){
+    if (
+        $p->{inject_use} || $p->{inject_after_sub_def} || defined $p->{line_num}
+    ){
         $self->{params}{pre_proc} = 'inject';
         $self->{params}{pre_proc_return} = 1;
     }
@@ -262,9 +262,9 @@ sub add_functionality {
     my $in_prod = $self->{params}{add_functionality_prod};
 
     my @allowed = qw(
-                    pre_proc
-                    post_proc
-                    engine
+        pre_proc
+        post_proc
+        engine
     );
 
     my $is_allowed = 0;
@@ -282,23 +282,25 @@ sub add_functionality {
 
     my %dt = (
             pre_proc => sub {
-                        trace() if $ENV{TRACE};
-                        return $in_prod
-                        ? $INC{'Devel/Examine/Subs/Preprocessor.pm'}
-                        : 'lib/Devel/Examine/Subs/Preprocessor.pm';
-                      },
+                trace() if $ENV{TRACE};
+                return $in_prod
+                    ? $INC{'Devel/Examine/Subs/Preprocessor.pm'}
+                    : 'lib/Devel/Examine/Subs/Preprocessor.pm';
+            },
+
             post_proc => sub {
-                        trace() if $ENV{TRACE};
-                        return $in_prod
-                        ? $INC{'Devel/Examine/Subs/Postprocessor.pm'}
-                        : 'lib/Devel/Examine/Subs/Postprocessor.pm';
-                      },
+                trace() if $ENV{TRACE};
+                return $in_prod
+                    ? $INC{'Devel/Examine/Subs/Postprocessor.pm'}
+                    : 'lib/Devel/Examine/Subs/Postprocessor.pm';
+            },
+
             engine => sub {
-                        trace() if $ENV{TRACE};
-                        return $in_prod
-                        ? $INC{'Devel/Examine/Subs/Engine.pm'}
-                        : 'lib/Devel/Examine/Subs/Engine.pm';
-                      },
+                trace() if $ENV{TRACE};
+                return $in_prod
+                    ? $INC{'Devel/Examine/Subs/Engine.pm'}
+                    : 'lib/Devel/Examine/Subs/Engine.pm';
+            },
     );
 
     my $caller = (caller)[1];
@@ -346,10 +348,11 @@ sub add_functionality {
     }
 
     $des = Devel::Examine::Subs->new(
-                                    file => $file,
-                                    engine => 'objects', 
-                                    post_proc => [qw(subs end_of_last_sub)],
-                                );
+        file => $file,
+        engine => 'objects',
+        post_proc => [qw(subs end_of_last_sub)],
+    );
+
     $p = {
         engine => 'objects', 
         post_proc => [qw(subs end_of_last_sub)],
@@ -362,9 +365,11 @@ sub add_functionality {
 
     $rw->splice(file => $file, insert => \@code, line => $start_writing);
 
+    # the weird spaces are required for layout... they're not erroneous
+
     my @insert = ("        $sub_name => \\&$sub_name,");
 
-    my @ret = $rw->splice(
+    $rw->splice(
         file => $file, 
         find => 'my\s+\$dt\s+=\s+\{',
         insert => \@insert,
@@ -397,7 +402,7 @@ sub pre_procs {
 
     my @pre_procs;
 
-    for (keys %{$pre_proc->_dt}){
+    for (keys %{ $pre_proc->_dt }){
         push @pre_procs, $_ if $_ !~ /^_/;
     }
     return @pre_procs;
@@ -412,7 +417,7 @@ sub post_procs {
 
     my @post_procs;
 
-    for (keys %{$post_proc->_dt}){
+    for (keys %{ $post_proc->_dt }){
         push @post_procs, $_ if $_ !~ /^_/;
     }
     return @post_procs;
@@ -443,11 +448,8 @@ sub run {
     return $struct;
 }
 sub valid_params {
-    
     trace() if $ENV{TRACE};
-
-    my $self = shift;
-    return %{$self->{valid_params}};
+    return %{ $_[0]->{valid_params} };
 }
 
 #
@@ -657,7 +659,9 @@ sub _file {
     my $self = shift;
     my $p = shift;
 
-    $self->{params}{file} = defined $p->{file} ? $p->{file} : $self->{params}{file};
+    $self->{params}{file} = defined $p->{file}
+        ? $p->{file}
+        : $self->{params}{file};
 
     # if a module was passed in, dig up the file
 
@@ -670,10 +674,13 @@ sub _file {
         my $module_is_loaded;
 
         if (! $INC{$file}){
-            
-            eval { require $file; import $module; };
+            my $import_ok = eval {
+                require $file;
+                import $module;
+                1;
+            };
 
-            if ($@){
+            if (! $import_ok){
                 $@ = "\nDevel::Examine::Subs::_file() speaking ... " .
                      "Can't transform module to a file name\n\n"
                      . $@;
@@ -710,9 +717,7 @@ sub _file {
    return $self->{params}{file};
 }
 sub _params {
-    
     trace() if $ENV{TRACE};
-
     my $self = shift;
     my %params = @_;
     return \%params;
@@ -789,11 +794,11 @@ sub _run_directory {
     $self->{rw} = File::Edit::Portable->new;
 
     my @files = $self->{rw}->dir(
-                            dir => $dir,
-                            maxdepth => $self->{params}{maxdepth} || 0,
-                            types => $self->{params}{extensions},
-                            list => 1,
-                        );
+        dir => $dir,
+        maxdepth => $self->{params}{maxdepth} || 0,
+        types => $self->{params}{extensions},
+        list => 1,
+    );
 
     my %struct;
 
@@ -856,11 +861,13 @@ sub _write_file {
 
     my $write_response;
 
-    eval {
-        $write_response = $self->{rw}->write(file => $file, contents => $contents);
+    my $write_ok = eval {
+        $write_response
+          = $self->{rw}->write(file => $file, contents => $contents);
+        1;
     };
 
-    if ($@ || ! $write_response){
+    if (! $write_ok || ! $write_response){
         $@ = "\nDevel::Examine::Subs::_write_file() speaking...\n\n" .
              "File::Edit::Portable::write() returned a failure status.\n\n" .
              $@;
@@ -877,11 +884,7 @@ sub _core {
     trace() if $ENV{TRACE};
     
     my $self = shift;
-
     my $p = $self->{params};
-
-    my $search = $self->{params}{search};
-    my $file = $self->{params}{file};
 
     $self->_read_file($p);
 
@@ -960,7 +963,6 @@ sub _core {
     # core dump
 
     if ($self->{params}{core_dump}){
-        
         print "\n\t Core Dump called...\n\n";
         print "\n\n\t Dumping data... \n\n";
         print Dumper $subs;
@@ -1005,11 +1007,12 @@ sub _pre_proc {
                   "pre_processor '$pre_proc' is not implemented.\n";
         }
 
-        eval {
+        my $compiled_ok = eval {
             $cref = $compiler->{pre_procs}{$pre_proc}->();
+            1;
         };
         
-        if ($@){
+        if (! $compiled_ok){
             $@ = "\n[Devel::Examine::Subs speaking] " .
                   "dispatch table in Devel::Examine::Subs::Preprocessor " .
                   "has a mistyped function as a value, but the key is ok\n\n"
@@ -1031,7 +1034,7 @@ sub _proc {
     # routine (aka the 'Processor phase') for all of DES
 
     # make sure all unit tests are successful after any change
-    # to this subroutine!
+    # to this subroutine
 
     # if you want the data structure to look differently before 
     # reaching here, use a pre_proc. If you want it different 
@@ -1073,11 +1076,13 @@ sub _proc {
         next if grep {$name eq $_ } @$exclude;
 
         if ($include->[0]){
-            next if (! grep {$name eq $_ && $_} @$include);
+            next if (! grep {$_ && $name eq $_} @$include);
         }
 
         $subs{$file}{subs}{$name}{start} = $PPI_sub->line_number;
         $subs{$file}{subs}{$name}{start}--;
+
+        # yep, its a hard to find thing 'y' is :)
 
         my $lines = $PPI_sub =~ y/\n//;
 
@@ -1142,11 +1147,12 @@ sub _post_proc {
                           "implemented. '$post_proc' was sent in.\n";
                 }
                 
-                eval {
+                my $compiled_ok = eval {
                     $cref = $compiler->{post_procs}{$pf}->();
+                    1;
                 };
         
-                if ($@){
+                if (! $compiled_ok){
                     $@ = "\n[Devel::Examine::Subs speaking] " .
                           "dispatch table in " .
                           "Devel::Examine::Subs::Postprocessor has a mistyped " .
@@ -1207,13 +1213,14 @@ sub _engine {
             confess "engine '$engine' is not implemented.\n";
         }
 
-        eval {
+        my $compiled_ok = eval {
             $cref = $compiler->{engines}{$engine}->();
+            1;
         };
 
         # engine has bad func val in dispatch table, but key is ok
 
-        if ($@){
+        if (! $compiled_ok){
             $@ = "\n[Devel::Examine::Subs speaking] " .
                   "dispatch table in Devel::Examine::Subs::Engine " .
                   "has a mistyped function as a value, but the key is ok\n\n"
@@ -1993,7 +2000,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2017 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the

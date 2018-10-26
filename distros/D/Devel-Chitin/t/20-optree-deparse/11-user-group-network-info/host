@@ -1,0 +1,9 @@
+use Socket;  # omit
+endhostent();
+sethostent(1);
+my $a = gethostent();
+my @a = gethostent();
+$a = gethostbyaddr(inet_aton('127.1'), AF_INET);
+@a = gethostbyaddr(inet_aton('127.2'), AF_UNIX);
+$a = gethostbyname('example.org');
+@a = gethostbyname('example.com')

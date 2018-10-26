@@ -49,7 +49,7 @@
             "IPC::Open3" : "0",
             "Importer" : "0.024",
             "JSON::PP" : "0",
-            "List::Util" : "1.33",
+            "List::Util" : "1.44",
             "Module::Pluggable" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
@@ -98,7 +98,7 @@
          "url" : "http://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "0.001069",
+   "version" : "0.001070",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

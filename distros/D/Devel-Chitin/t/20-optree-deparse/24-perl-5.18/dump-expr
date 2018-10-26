@@ -1,0 +1,7 @@
+BEGIN { skip "requires 5.18.0" if $^V lt v5.18.0 } # omit
+use v5.18.0; # omit
+no warnings 'misc'; # omit
+no warnings 'deprecated'; # omit
+my $expr;
+CORE::dump $expr;
+CORE::dump 'foo' . $expr

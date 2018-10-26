@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 cPanel, Inc.
+# Copyright (c) 2018 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -18,8 +18,8 @@ our @ISA = qw(Test::OpenStack::Client::Message);
 sub new ($%) {
     my ($class, $method, $path) = @_;
 
-    Carp::croak('No HTTP method provided')       unless defined $method;
-    Carp::croak('No HTTP request path provided') unless defined $path;
+    die 'No HTTP method provided'       unless defined $method;
+    die 'No HTTP request path provided' unless defined $path;
 
     return bless $class->SUPER::new(
         'method' => $method,

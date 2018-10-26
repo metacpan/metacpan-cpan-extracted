@@ -21,23 +21,22 @@ note "-------------- REAL MODE --------------";
 is( -d $temp_dir, 1, "Temp is created on disk." );
 is( opendir( my $dir_fh, $temp_dir ), 1, "$temp_dir can be read" );
 my @dir_files;
-push @dir_files, scalar readdir $dir_fh;
-push @dir_files, scalar readdir $dir_fh;
-push @dir_files, scalar readdir $dir_fh;
+push @dir_files, scalar readdir($dir_fh);
+push @dir_files, scalar readdir($dir_fh);
+push @dir_files, scalar readdir($dir_fh);
 my $base = basename $filename;
 is( [ sort @dir_files ], [ sort( qw/. .. /, $base ) ], "We read 3 entries in some order. Not predictable, but sort fixes that!" );
-is( scalar readdir $dir_fh, undef, "undef when nothing left from readdir." );
+is( scalar readdir($dir_fh), undef, "undef when nothing left from readdir." );
 my ( undef, $f2 ) = tempfile( DIR => $temp_dir );
 $base = basename $f2;
 ok( -e $f2, "File 2 ($f2) exists but...." );
-is( scalar readdir $dir_fh, undef, "readdir doesn't see it since it's there after the opendir." );
-is( closedir $dir_fh,       1,     "close the fake dir handle" );
+is( scalar readdir($dir_fh), undef, "readdir doesn't see it since it's there after the opendir." );
+is( closedir($dir_fh),       1,     "close the fake dir handle" );
 
 like( warning { readdir($dir_fh) }, qr/^readdir\(\) attempted on invalid dirhandle \S+ /, "warn on readdir when file handle is closed." );
 
 is( opendir( my $bad_fh, "/not/a/valid/path/kdshjfkjd" ), undef, "opendir on a bad path returns false" );
 is( $! + 0, ENOENT, '$! numeric is right.' );
-is( $!, "No such file or directory", '$! text is right.' );
 
 like( dies { readdir("abc"); }, qr/^Bad symbol for dirhandle at/, "Dies if string passed instead of dir fh" );
 
@@ -48,23 +47,23 @@ note "-------------- MOCK MODE --------------";
 my $bar = Test::MockFile->dir( $temp_dir, [qw/. .. abc def/] );
 
 is( opendir( $dir_fh, $temp_dir ), 1, "Mocked temp dir opens and returns true" );
-is( scalar readdir $dir_fh, ".",   "Read .  from fake readdir" );
-is( scalar readdir $dir_fh, "..",  "Read .. from fake readdir" );
-is( telldir $dir_fh,        2,     "tell dir in the middle of fake readdir is right." );
-is( scalar readdir $dir_fh, "abc", "Read abc from fake readdir" );
-is( scalar readdir $dir_fh, "def", "Read def from fake readdir" );
-is( telldir $dir_fh,        4,     "tell dir at the end of fake readdir is right." );
-is( scalar readdir $dir_fh, undef, "Read from fake readdir but no more in the list." );
-is( scalar readdir $dir_fh, undef, "Read from fake readdir but no more in the list." );
-is( scalar readdir $dir_fh, undef, "Read from fake readdir but no more in the list." );
-is( scalar readdir $dir_fh, undef, "Read from fake readdir but no more in the list." );
+is( scalar readdir($dir_fh), ".",   "Read .  from fake readdir" );
+is( scalar readdir($dir_fh), "..",  "Read .. from fake readdir" );
+is( telldir($dir_fh),        2,     "tell dir in the middle of fake readdir is right." );
+is( scalar readdir($dir_fh), "abc", "Read abc from fake readdir" );
+is( scalar readdir($dir_fh), "def", "Read def from fake readdir" );
+is( telldir($dir_fh),        4,     "tell dir at the end of fake readdir is right." );
+is( scalar readdir($dir_fh), undef, "Read from fake readdir but no more in the list." );
+is( scalar readdir($dir_fh), undef, "Read from fake readdir but no more in the list." );
+is( scalar readdir($dir_fh), undef, "Read from fake readdir but no more in the list." );
+is( scalar readdir($dir_fh), undef, "Read from fake readdir but no more in the list." );
 
 is( rewinddir($dir_fh), 1, "rewinddir returns true." );
-is( telldir $dir_fh,    0, "telldir afer rewinddir is right." );
-is( [ readdir $dir_fh ], [qw/. .. abc def/], "Read the whole dir from fake readdir after rewinddir" );
-is( telldir $dir_fh, 4, "tell dir at the end of fake readdir is right." );
+is( telldir($dir_fh),   0, "telldir afer rewinddir is right." );
+is( [ readdir($dir_fh) ], [qw/. .. abc def/], "Read the whole dir from fake readdir after rewinddir" );
+is( telldir($dir_fh), 4, "tell dir at the end of fake readdir is right." );
 is( seekdir( $dir_fh, 1 ), 1, "seekdir returns where it sought." );
-is( [ readdir $dir_fh ], [qw/.. abc def/], "Read the whole dir from fake readdir after seekdir" );
+is( [ readdir($dir_fh) ], [qw/.. abc def/], "Read the whole dir from fake readdir after seekdir" );
 closedir($dir_fh);
 
 done_testing();

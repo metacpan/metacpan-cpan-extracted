@@ -6,9 +6,9 @@ use warnings;
 use Test::More;
 use Errno qw/ENOENT EBADF/;
 
-use Test::MockFile;    # Everything below this can have its open overridden.
-
 use File::Temp qw/tempfile/;
+
+use Test::MockFile;    # Everything below this can have its open overridden.
 
 my ( $fh_real, $filename ) = tempfile();
 print {$fh_real} "not\nmocked\n";

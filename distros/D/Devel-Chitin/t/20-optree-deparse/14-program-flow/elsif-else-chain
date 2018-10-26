@@ -1,0 +1,11 @@
+my $a;
+if ($a < 1) {
+	print 'less'
+} elsif ($a > 1) {
+	print 'more'
+} elsif (defined($a)) {
+	print 'zero'
+} else {
+	print 'undef'
+}
+print 'done'

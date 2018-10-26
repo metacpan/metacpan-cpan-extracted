@@ -23,7 +23,7 @@ no_index:
 provides:
   Comics:
     file: lib/Comics.pm
-    version: '1.10'
+    version: '1.11'
 requires:
   Digest::MD5: '0'
   HTTP::Cookies: '0'
@@ -31,6 +31,7 @@ requires:
   JSON: '0'
   LWP::UserAgent: '0'
   perl: '5.012000'
-resources: {}
-version: '1.10'
+resources:
+  repository: https://github.com/sciurius/comics.git
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

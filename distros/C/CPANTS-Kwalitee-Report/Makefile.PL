@@ -19,14 +19,14 @@ WriteMakefile(
     BUILD_REQUIRES   => {
         'Test::More' => 0,
     },
-    PREREQ_PM              => {
-        'Moo'              => '2.000000',
-        'namespace::clean' => '0.24',
-        'MooX::Options'    => '4.023',
-        'List::Util'       => '1.33',
-        'LWP::Simple'      => '6.15',
-        'File::Temp'       => '0.2304',
-        'XML::RSS::Parser' => '4.0',
+    PREREQ_PM                  => {
+        'Moo'                  => '2.000000',
+        'namespace::autoclean' => '0.28',
+        'MooX::Options'        => '4.023',
+        'List::Util'           => '1.33',
+        'LWP::Simple'          => '6.15',
+        'File::Temp'           => '0.2304',
+        'XML::RSS::Parser'     => '4.0',
         'Module::CPANTS::Kwalitee' => '0.97',
         'Module::CPANTS::Analyse'  => '0.97',
         'Parse::CPAN::Packages'    => '2.40',
@@ -36,11 +36,11 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'CPANTS::Kwalitee::Report'               => { file => 'lib/CPANTS/Kwalitee/Report.pm'             , version => '0.10' },
-            'CPANTS::Kwalitee::Report::Score'        => { file => 'lib/CPANTS/Kwalitee/Report/Score.pm'       , version => '0.10' },
-            'CPANTS::Kwalitee::Report::Generator'    => { file => 'lib/CPANTS/Kwalitee/Report/Generator.pm'   , version => '0.10' },
-            'CPANTS::Kwalitee::Report::Indicator'    => { file => 'lib/CPANTS/Kwalitee/Report/Indicator.pm'   , version => '0.10' },
-            'CPANTS::Kwalitee::Report::Distribution' => { file => 'lib/CPANTS/Kwalitee/Report/Distribution.pm', version => '0.10' },
+            'CPANTS::Kwalitee::Report'               => { file => 'lib/CPANTS/Kwalitee/Report.pm'             , version => '0.11' },
+            'CPANTS::Kwalitee::Report::Score'        => { file => 'lib/CPANTS/Kwalitee/Report/Score.pm'       , version => '0.11' },
+            'CPANTS::Kwalitee::Report::Generator'    => { file => 'lib/CPANTS/Kwalitee/Report/Generator.pm'   , version => '0.11' },
+            'CPANTS::Kwalitee::Report::Indicator'    => { file => 'lib/CPANTS/Kwalitee/Report/Indicator.pm'   , version => '0.11' },
+            'CPANTS::Kwalitee::Report::Distribution' => { file => 'lib/CPANTS/Kwalitee/Report/Distribution.pm', version => '0.11' },
         },
         resources => {
             repository => {

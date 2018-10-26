@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::HashEditor;
-$Config::Model::Tk::HashEditor::VERSION = '1.367';
+$Config::Model::Tk::HashEditor::VERSION = '1.368';
 use strict;
 use warnings;
 use Carp;

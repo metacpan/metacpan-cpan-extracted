@@ -1,0 +1,2 @@
+my $a = chown(0, 3, '/some/file/name', '/other/file');
+chown(1, 999, 'foo')

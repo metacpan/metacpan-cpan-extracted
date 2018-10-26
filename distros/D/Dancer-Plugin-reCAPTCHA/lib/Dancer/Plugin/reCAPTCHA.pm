@@ -1,36 +1,34 @@
 package Dancer::Plugin::reCAPTCHA;
 # ABSTRACT: Easily integrate reCAPTCHA into your Dancer applications
 {
-    $Dancer::Plugin::reCAPTCHA::VERSION = '0.4';
+    $Dancer::Plugin::reCAPTCHA::VERSION = '0.90';
 }
 
 
 use Dancer ':syntax';
 use Dancer::Plugin;
-use Captcha::reCAPTCHA;
+use Captcha::reCAPTCHA::V2;
 
-my $rc = Captcha::reCAPTCHA->new;
+my $rc = Captcha::reCAPTCHA::V2->new;
 
 
 register recaptcha_display => sub {
     my $conf = plugin_setting();
-    return $rc->get_html( 
+    my %options = map { $_ => $conf->$_ if defined $conf->$_ } (qw[ theme type size ]);
+    return $rc->html(
         $conf->{ public_key },
-        undef,
-        $conf->{ use_ssl },
-        { theme =>  $conf->{ theme }},
+        { %options }
     );
 };
 
 
 register recaptcha_check => sub {
-    my ( $challenge, $response ) = @_;
+    my ( $response ) = @_;
     my $conf = plugin_setting();
-    return $rc->check_answer(
+    return $rc->verify(
         $conf->{ private_key },
-        request->remote_address,
-        $challenge,
         $response,
+        request->remote_address,
     );
 };
 
@@ -50,11 +48,38 @@ Dancer::Plugin::reCAPTCHA - Easily integrate reCAPTCHA into your Dancer applicat
 
 =head1 VERSION
 
-version 0.4
+version 0.90
+
+=head1 SYNOPSIS
+
+    # In your config.yml 
+    plugins: 
+        reCAPTCHA: 
+            public_key: "public key goes here" 
+            private_key: "private key goes here" 
+            theme: "dark"
+            type: "image"
+            size: "normal"
+
+    # In your Dancer app...
+    use Dancer::Plugin::reCAPTCHA;
+
+    # In your form display route...
+    return template 'accounts/create', { 
+        recaptcha => recaptcha_display(),
+    };
+
+    # In your template (TT2)
+    [% recaptcha %]
+
+    # In your validation code....
+    my $response  = param( 'recaptcha_response_field' );
+    my $result    = recaptcha_check( $response );
+    die "User didn't match the CAPTCHA" unless $result->{ success };
 
 =head1 METHODS
 
-=head2 recaptcha_display( )
+=head2 recaptcha_display()
 
 Generates the HTML needed to display the CAPTCHA.  This HTML is returned as
 a scalar value, and can easily be plugged into the template system of your 
@@ -70,57 +95,32 @@ Using Template Toolkit as an example, this might look like:
     # In your accounts/create template
     [% recaptcha %]
 
-=head2 recaptcha_check( $$ )
+=head2 recaptcha_check()
 
 Verify that the value the user entered matches what's in the CAPTCHA.  This
-methods takes two arguments: the challenge string and the response string.  
-These are returned to your Dancer application as two parameters: 
-F< recaptcha_challenge_field > and F< recaptcha_response_field >.
+methods takes an argument that is the response string.
+These are returned to your Dancer application as the parameter
+F< g-recaptcha-response >.
 
 For example:
 
-    my $challenge = param( 'recaptcha_challenge_field' );
-    my $response  = param( 'recaptcha_response_field' );
-    my $result    = recaptcha_check(
-        $challenge, 
-        $response,
-    );
-    die "User didn't match the CAPTCHA" unless $result->{ is_valid };
+    my $response  = param( 'g-recaptcha-response' );
+    my $result    = recaptcha_check( $response );
+    die "User didn't match the CAPTCHA" unless $result->{ success };
 
-See L<Captcha::reCAPTCHA> for a description of the result hash.
-
-=head1 SYNOPSIS
-    # In your config.yml
-    plugins:
-      reCAPTCHA:
-        public_key: "public key goes here"
-        private_key: "private key goes here"
-        theme: "clean"
-        use_ssl: 0
-
-    # In your application
-    use Dancer::Plugin::reCAPTCHA;
-
-    # In your form display....
-    return template 'accounts/create', { 
-        recaptcha => recaptcha_display(),
-    };
-
-    # In your template (TT2)
-    [% recaptcha %]
-
-    # In your validation code....
-    my $challenge = param( 'recaptcha_challenge_field' );
-    my $response  = param( 'recaptcha_response_field' );
-    my $result    = recaptcha_check(
-        $challenge, 
-        $response,
-    );
-    die "User didn't match the CAPTCHA" unless $result->{ is_valid };
+See L<Captcha::reCAPTCHA::V2> for a description of the result hash.
 
 =head2 TODO
 
 Add a real test suite.
+
+=head1 CREDITS
+
+The following people have contributes to C<Dancer::Plugin::reCAPTCHA> in some 
+way, either through bug reports, code, suggestions, or moral support:
+
+Mohammad S Anwar
+Shawn Sorichetti
 
 =head1 SEE ALSO
 
@@ -128,7 +128,7 @@ Add a real test suite.
 
 =item *
 
-L<Captcha::reCAPTCHA>
+L<Captcha::reCAPTCHA::V2>
 
 =item *
 

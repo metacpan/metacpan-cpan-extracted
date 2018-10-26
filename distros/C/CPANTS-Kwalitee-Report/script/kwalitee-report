@@ -2,13 +2,13 @@
 
 #
 # Author: Mohammad S Anwar (mohammad.anwar@yahoo.com)
-# Distribution: CPANTS::Kwalitee::Report v0.05.
+# Distribution: CPANTS::Kwalitee::Report v0.11.
 
 package KwaliteeReport;
 
 use CPANTS::Kwalitee::Report;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 use MooX::Options;
 
 has 'reporter' => (is => 'rw', default => sub { CPANTS::Kwalitee::Report->new });

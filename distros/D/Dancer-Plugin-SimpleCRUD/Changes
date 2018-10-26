@@ -1,5 +1,12 @@
 Revision history for Dancer-Plugin-SimpleCRUD 
 
+
+1.16    2018-10-25
+        [ ENHANCEMENTS ]
+        - Support for using Dancer::Plugin::DBIC for database connections
+          (joshrabinowitz)
+        - Support ENUM types under DBD::MariaDB (thefatphil)
+
 1.15    2018-05-06
         [ SECURITY ]
         - Some calls to _ensure_auth() were previously incorrect, meaning that
@@ -8,8 +15,9 @@ Revision history for Dancer-Plugin-SimpleCRUD
           the auth option to require a login / certain roles to access it are
           urged to upgrade immediately.  Also, sorry.
 
+
 1.14    2017-05-22
-        [ BUG FIXES]
+        [ BUG FIXES ]
         - Fix double prefixes when Dancer prefix is in effect (GH-36) (bigpresh)
 
 1.13    2017-05-21

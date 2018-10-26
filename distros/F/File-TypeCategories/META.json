@@ -35,14 +35,14 @@
             "Types::Standard" : "1.0",
             "YAML" : "1.0",
             "autodie" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       }
    },
    "provides" : {
       "File::TypeCategories" : {
          "file" : "lib/File/TypeCategories.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "url" : "git://github.com/ivanwills/File-TypeCategories.git"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

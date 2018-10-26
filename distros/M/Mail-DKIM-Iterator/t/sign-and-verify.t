@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Mail::DKIM::Iterator;
 
-plan tests => 17;
+plan tests => 18;
 
 # basic tests with different canonicalizations and algorithms
 for my $c (qw(
@@ -30,11 +30,28 @@ for my $c (qw(
 {
     my $ok = eval {
 	my $m = sign([mail()], h => 'from:from:to:subject');
+	verify(["Subject: foo\n".$m],dns());
+    };
+    my $err = $@ || ($ok ? '':'unknown error');
+    is($err,"valid warning=unprotected critical header subject\n",
+	"unsigned header fields");
+}
+
+# verification should succeed with warning if non-space data after body
+# signature (when 'l' is used)
+{
+    my $ok = eval {
+	my $m = sign([mail()],
+	    h => 'from:from:to:subject',
+	    l => 0,
+	);
+	$m = "Subject: foo\n".$m."foo\n";
 	verify([$m],dns());
     };
     my $err = $@ || ($ok ? '':'unknown error');
-    is($err,"valid warning=incomplete header protection for content-transfer-encoding,content-type,subject\n",
-	"unsigned header fields");
+    is($err,
+	"valid warning=unprotected critical header subject + data after signed body\n",
+	"data after signed body");
 }
 
 # expect verification perm-fail because of wrong pubkey
@@ -192,6 +209,9 @@ Message-Id: <foo@bar.com>
 In-Reply-To:
 References:
 
+1234
+MAIL
+=cut
 Hi Foo,
 Going to the Bar   Barfoot,
 
@@ -199,5 +219,4 @@ Greetings,
 Bar
 
 
-MAIL
 

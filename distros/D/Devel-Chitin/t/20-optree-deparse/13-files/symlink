@@ -1,0 +1,2 @@
+my $rv = symlink('/file/name', '/link/name');
+$rv = symlink('/other_file', 'new_link')

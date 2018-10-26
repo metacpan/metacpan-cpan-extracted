@@ -1,0 +1,3 @@
+my $r = ref(1);
+$r = ref($r);
+$r = ref()

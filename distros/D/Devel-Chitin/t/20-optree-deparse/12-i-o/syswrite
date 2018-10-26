@@ -1,0 +1,5 @@
+my($fh, $buf);
+my $bytes = syswrite(FH, $buf, 10, 5);
+$bytes = syswrite(*FH, $buf, 10);
+syswrite($fh, $buf);
+syswrite(*$fh, $buf)

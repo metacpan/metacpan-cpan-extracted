@@ -1,5 +1,5 @@
 package Statistics::Descriptive::Sparse;
-$Statistics::Descriptive::Sparse::VERSION = '3.0701';
+$Statistics::Descriptive::Sparse::VERSION = '3.0702';
 use strict;
 use warnings;
 
@@ -230,7 +230,7 @@ Statistics::Descriptive - Module of basic descriptive statistical functions.
 
 =head1 VERSION
 
-version 3.0701
+version 3.0702
 
 =head1 SYNOPSIS
 
@@ -262,7 +262,7 @@ calls with the same arguments are faster.
 
 =head1 VERSION
 
-version 3.0701
+version 3.0702
 
 =head1 METHODS
 

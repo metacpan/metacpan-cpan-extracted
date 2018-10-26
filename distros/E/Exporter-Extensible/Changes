@@ -1,4 +1,15 @@
-0.03 - 2018-09-29
+0.04 - 2018-10-24:
+  - Add autoload feature for symbols and tags.
+  - More correct application of "-not".
+  - Avoid recursion for tags when possible.
+  - New API: exporter_also_import, exporter_autoload_tag, exporter_autoload_symbol
+  - REMOVED API: exporter_get_tag_members
+  - Ensure that %EXPORT, @EXPORT, and %EXPORT_TAGS are automatically instantiated
+    for the derived package.
+  - Documentation improvements.
+  - More test cases.
 
-	Initial release, with support back to 5.12
-	Earlier perl support might happen in a future release.
+0.03 - 2018-09-29:
+
+  - Initial release, with support back to 5.12
+  - Earlier perl support might happen in a future release.

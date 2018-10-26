@@ -1,0 +1,10 @@
+BEGIN { skip "requires 5.22.0" if $^V lt v5.22.0 } # omit
+use if $^V ge v5.20.0, 'experimental', 'refaliasing'; # omit
+my($a, $b) = (1, 2);
+\$a = \$b;
+\($a) = \$b;
+our @array = (1, 2);
+\$array[1] = \$a;
+my %hash = (1, 1);
+\$hash{'1'} = \$b
+

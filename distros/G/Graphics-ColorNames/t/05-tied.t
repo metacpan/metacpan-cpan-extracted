@@ -2,6 +2,8 @@
 
 use Test::Most;
 
+use lib 't/lib';
+
 use_ok( 'Graphics::ColorNames', '3.3', qw( hex2tuple tuple2hex ) );
 
 tie my %colors, 'Graphics::ColorNames';
@@ -60,20 +62,15 @@ foreach my $rgb (
 
 # Test using multiple schemes, with issues in overlapping
 
-tie my %colors2, 'Graphics::ColorNames', qw( X HTML );
+tie my %colors3, 'Graphics::ColorNames', qw( X Test );
 
-ok( !exists $colors{fuscia} );     # mispelling doesn't exist in X
-ok( defined $colors2{fuscia} );    #      It does in HTML
-
-tie my %colors3, 'Graphics::ColorNames', qw( X Windows );
-
-tie my %colors4, 'Graphics::ColorNames', qw( Windows X );
+tie my %colors4, 'Graphics::ColorNames', qw( Test X );
 
 # Test precedence
 
 ok( $colors{DarkGreen} eq '006400' );     # DarkGreen in X
 ok( $colors3{DarkGreen} eq '006400' );    # DarkGreen in X
-ok( $colors4{DarkGreen} eq '008000' );    # DarkGreen in Windows
+ok( $colors4{DarkGreen} eq '008000' );    # DarkGreen in Test
 
 # Test handling of non-existent color names
 

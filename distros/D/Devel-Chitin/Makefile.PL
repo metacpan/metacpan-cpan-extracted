@@ -31,18 +31,23 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "constant" => 0,
     "strict" => 0,
-    "vars" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Basename" => 0,
-    "IO::Pipe" => 0,
+    "List::Util" => "1.45",
     "Sub::Name" => 0,
+    "Test2::API" => "1.302136",
+    "Test2::IPC" => 0,
+    "Test2::Require::Fork" => 0,
+    "Test2::Tools::Basic" => 0,
+    "Test2::Tools::Subtest" => 0,
+    "Test2::V0" => 0,
     "Test::Builder" => 0,
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,19 +63,24 @@ my %FallbackPrereqs = (
   "Fcntl" => 0,
   "File::Basename" => 0,
   "IO::File" => 0,
-  "IO::Pipe" => 0,
+  "List::Util" => "1.45",
   "POSIX" => 0,
   "PadWalker" => 0,
   "Scalar::Util" => 0,
   "Socket" => 0,
   "Sub::Name" => 0,
+  "Test2::API" => "1.302136",
+  "Test2::IPC" => 0,
+  "Test2::Require::Fork" => 0,
+  "Test2::Tools::Basic" => 0,
+  "Test2::Tools::Subtest" => 0,
+  "Test2::V0" => 0,
   "Test::Builder" => 0,
   "Test::More" => 0,
   "base" => 0,
   "constant" => 0,
   "lib" => 0,
   "strict" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

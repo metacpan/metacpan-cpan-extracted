@@ -1,0 +1,6 @@
+BEGIN { skip "requires 5.22.0" if $^V lt v5.22.0 } # omit
+use if $^V ge v5.20.0, 'experimental', 'refaliasing'; # omit
+my @array = (1, 2);
+our @ar2 = (1, 2);
+\(@array) = \(@ar2);
+\(@ar2) = \(@array)

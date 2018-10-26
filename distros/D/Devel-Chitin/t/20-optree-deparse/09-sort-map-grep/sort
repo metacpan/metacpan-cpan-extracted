@@ -1,0 +1,11 @@
+my(@a, $subref, $val);
+@a = sort @a;
+@a = sort ($val, @a);
+@a = sort { 1 } @a;
+@a = sort { ; } @a;
+@a = sort { $a <=> $b } @a;
+@a = sort { $b <=> $a } @a;
+@a = sort { $b cmp $a } @a;
+@a = reverse(sort { $b cmp $a } @a);
+@a = sort scalar_assignment @a;
+@a = sort $subref @a

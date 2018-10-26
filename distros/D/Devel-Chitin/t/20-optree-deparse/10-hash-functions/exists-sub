@@ -1,0 +1,2 @@
+my $a = exists(&some_sub);
+$a = exists(&foo::some_sub)

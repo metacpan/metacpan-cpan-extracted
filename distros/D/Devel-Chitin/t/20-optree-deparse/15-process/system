@@ -1,0 +1,4 @@
+my $rv = system('/bin/echo', 'hi', 'there');
+$rv = system('/bin/echo | cat');
+$rv = system { '/bin/echo' } ('hi', 'there');
+my $a = system $rv ('hi', 'there')

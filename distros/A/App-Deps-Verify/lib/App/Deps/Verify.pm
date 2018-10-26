@@ -1,5 +1,5 @@
 package App::Deps::Verify;
-$App::Deps::Verify::VERSION = '0.2.1';
+$App::Deps::Verify::VERSION = '0.4.0';
 # ABSTRACT: An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.
 
 use strict;
@@ -347,7 +347,7 @@ App::Deps::Verify - An app and API to verify the presence of dependencies (Perl
 
 =head1 VERSION
 
-version 0.2.1
+version 0.4.0
 
 =head1 SYNOPSIS
 

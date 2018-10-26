@@ -3,7 +3,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '1.69';
+our $VERSION = '1.70';
 
 use Carp;
 use Data::Dumper;
@@ -13,21 +13,19 @@ use File::Copy;
 
 BEGIN {
 
-    # we need to do some trickery for DTS due to circular referencing,
-    # which broke CPAN installs.
+    # we need to do some trickery for Devel::Trace::Subs due to circular
+    # referencing, which broke CPAN installs. DTS does nothing if not presented,
+    # per this code
 
     eval {
         require Devel::Trace::Subs;
-    };
-
-    eval {
         import Devel::Trace::Subs qw(trace);
     };
 
     if (! defined &trace){
         *trace = sub {};
     }
-};
+}
 
 sub new {
     
@@ -43,8 +41,6 @@ sub new {
 sub _dt {
     
     trace() if $ENV{TRACE};
-
-    my $self = shift;
 
     my $dt = {
         all => \&all,
@@ -62,23 +58,13 @@ sub _dt {
     return $dt;
 }
 sub exists {
-    
     trace() if $ENV{TRACE};
-
     my $self = shift;
     my $string = shift;
-
-    if (exists $self->{engines}{$string}){
-        return 1;
-    }
-    else {
-        return 0;
-    }
+    return exists $self->{engines}{$string} ? 1 : 0;
 }
 sub _test {
-    
     trace() if $ENV{TRACE};
-
     return sub {
         trace() if $ENV{TRACE};
         return {a => 1};
@@ -121,7 +107,7 @@ sub has {
 
         my $file = (keys %$struct)[0];
 
-        my @has = keys %{$struct->{$file}{subs}};
+        my @has = keys %{ $struct->{$file}{subs} };
 
         return \@has || [];
     };
@@ -137,7 +123,6 @@ sub missing {
         my $p = shift;
         my $struct = shift;
 
-        my $file = $p->{file};
         my $search = $p->{search};
 
         if ($search && ! $p->{regex}){
@@ -208,14 +193,9 @@ sub objects {
 
         return if not ref($struct) eq 'ARRAY';
 
-        my $file = $p->{file};
-
-        my $lines;
-
         my ($des_sub, %obj_hash, @obj_array);
 
         for my $sub (@$struct){
-
             $des_sub
               = Devel::Examine::Subs::Sub->new($sub, $sub->{name});
 
@@ -256,17 +236,19 @@ sub search_replace {
         }
 
         if (! $file){
-            confess "\nDevel::Examine::Subs::Engine::search_replace " .
-                  "speaking:\n" .
-                  "can't use search_replace engine without specifying a " .
-                  "file\n\n";
+            confess
+                "\nDevel::Examine::Subs::Engine::search_replace " .
+                "speaking:\n" .
+                "can't use search_replace engine without specifying a " .
+                "file\n\n";
         }
 
         if (! $exec || ref($exec) ne 'CODE'){
-            confess "\nDevel::Examine::Subs::Engine::search_replace " .
-                  " speaking:\n" .
-                  "can't use search_replace engine without specifying" .
-                  "a substitution regex code reference\n\n";
+            confess
+                "\nDevel::Examine::Subs::Engine::search_replace " .
+                " speaking:\n" .
+                "can't use search_replace engine without specifying" .
+                "a substitution regex code reference\n\n";
         }
 
         my @changed_lines;
@@ -282,12 +264,8 @@ sub search_replace {
 
                 $line_num++;
 
-                if ($line_num < $start_line){
-                    next;
-                }
-                if ($line_num > $end_line){
-                    last;
-                }
+                next if $line_num < $start_line;
+                last if $line_num > $end_line;
 
                 my $orig = $line;
 
@@ -324,23 +302,21 @@ sub inject_after {
         my $code = $p->{code};
 
         if (!$search) {
-            confess "\nDevel::Examine::Subs::Engine::inject_after speaking:\n" .
+            confess
+                "\nDevel::Examine::Subs::Engine::inject_after speaking:\n" .
                 "can't use inject_after engine without specifying a " .
                 "search term\n\n";
         }
         if (!$code) {
-            confess "\nDevel::Examine::Subs::Engine::inject_after speaking:\n" .
+            confess
+                "\nDevel::Examine::Subs::Engine::inject_after speaking:\n" .
                 "can't use inject_after engine without code to inject\n\n";
 
         }
 
-        my $file = $p->{file};
         my @file_contents = @{$p->{file_contents}};
-
         my @processed;
-
         my $added_lines = 0;
-
         my @subs;
 
         for my $sub (@$struct) {
@@ -502,7 +478,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2017 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of either: the GNU General Public License as published by the Free

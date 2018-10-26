@@ -1,0 +1,5 @@
+my $fh = select();
+select(FH);
+select(*FH);
+select($fh);
+select(*$fh)

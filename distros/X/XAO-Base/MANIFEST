@@ -40,13 +40,19 @@ t/xao/projects/test/objects/EmbeddableTest.pm
 t/xao/projects/test/objects/LocalConf.pm
 t/xao/projects/test/objects/Test1.pm
 t/xao/projects/test/objects/Thrower.pm
+t/xao/projects/testlib/objects/Config1.pm
+t/xao/projects/testlib/objects/Config2.pm
 t/xao/projects/testlib/objects/DepBase.pm
 t/xao/projects/testlib/objects/DepLib.pm
 t/xao/projects/testlib/objects/DepOver.pm
+t/xao/projects/testlib/objects/Sub/Level.pm
 t/xao/projects/testuse/objects/Config.pm
+t/xao/projects/testuse/objects/Config2.pm
+t/xao/projects/testuse/objects/Config3.pm
 t/xao/projects/testuse/objects/DepBase.pm
 t/xao/projects/testuse/objects/DepUse.pm
 t/xao/projects/testuse/objects/Local.pm
+t/xao/projects/testuse/objects/Sub/Level.pm
 test.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

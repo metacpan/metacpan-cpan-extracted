@@ -1,0 +1,3 @@
+my @a;
+print() foreach (@a);
+print 'done'

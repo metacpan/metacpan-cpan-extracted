@@ -1,0 +1,5 @@
+my($a, $fh);
+my $rv = ioctl(FH, 1, $a);
+$rv = ioctl(*FH, 2, $a);
+ioctl($fh, 3, $a);
+$rv = ioctl(*$fh, 4, $a)

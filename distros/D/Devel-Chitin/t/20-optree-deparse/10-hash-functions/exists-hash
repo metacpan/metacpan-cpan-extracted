@@ -1,0 +1,2 @@
+my %hash;
+my $a = exists($hash{'foo'})

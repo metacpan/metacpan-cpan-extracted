@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -157,6 +157,8 @@ our $VERSION = '1.009';
 #pod A hashref of values to fill in the form. Defaults to the value of the
 #pod C<item> in the stash (which is set by L<Yancy::Controller::Yancy/set>.)
 #pod
+#pod =back
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<Yancy>
@@ -190,7 +192,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 
@@ -346,6 +348,8 @@ The C<action> URL for the C<< <form> >> tag.
 
 A hashref of values to fill in the form. Defaults to the value of the
 C<item> in the stash (which is set by L<Yancy::Controller::Yancy/set>.)
+
+=back
 
 =head1 SEE ALSO
 

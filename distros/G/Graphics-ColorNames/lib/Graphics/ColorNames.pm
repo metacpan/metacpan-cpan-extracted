@@ -16,7 +16,7 @@ use File::Spec::Functions qw/ file_name_is_absolute /;
 use Module::Load 0.10;
 use Module::Loaded;
 
-our $VERSION = 'v3.3.0';
+our $VERSION = 'v3.3.1';
 
 our %EXPORT_TAGS = (
     'all'     => [qw( hex2tuple tuple2hex all_schemes )],
@@ -382,7 +382,7 @@ Graphics::ColorNames - defines RGB values for common color names
 
 =head1 VERSION
 
-version v3.3.0
+version v3.3.1
 
 =head1 SYNOPSIS
 
@@ -625,7 +625,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alan D. Salewski Steve Pomeroy "chemboy" Magnus Cedergren Gary Vollink Claus Färber Andreas J. König
+=for stopwords Alan D. Salewski Steve Pomeroy "chemboy" Magnus Cedergren Gary Vollink Claus Färber Andreas J. König Slaven Rezić
 
 =over 4
 
@@ -656,6 +656,10 @@ Claus Färber <cfaerber@cpan.org>
 =item *
 
 Andreas J. König <andk@cpan.org>
+
+=item *
+
+Slaven Rezić <slaven@rezic.de>
 
 =back
 

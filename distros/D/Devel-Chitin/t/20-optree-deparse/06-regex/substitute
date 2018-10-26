@@ -1,0 +1,7 @@
+s/abc/def/i;
+my $a;
+$a =~ s/abc/def/;
+$a =~ s/abc/def$a/;
+my $rx = qr/def/;
+s/abd $rx/def/x;
+$a =~ s/abd $rx/def/x

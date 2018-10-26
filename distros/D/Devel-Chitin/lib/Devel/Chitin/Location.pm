@@ -3,9 +3,10 @@ package Devel::Chitin::Location;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use Carp;
+use Scalar::Util qw(weaken reftype);
 
 sub new {
     my $class = shift;
@@ -18,6 +19,13 @@ sub new {
         }
     }
 
+    if (exists $props{subref}
+        and
+        ( !ref($props{subref}) or reftype($props{subref}) ne 'CODE' )
+    ) {
+        Carp::croak("'subref' attribute must be a coderef, not $props{subref}");
+    }
+
     my $self = bless \%props, $class;
     return $self;
 }
@@ -27,7 +35,7 @@ sub _required_properties {
 }
 
 sub _optional_properties {
-    qw( callsite );
+    qw( callsite subref );
 }
 
 sub at_end {
@@ -48,6 +56,12 @@ sub current {
             @props{'package','filename','line'} = @caller[0,1,2];
             $props{subroutine} = (caller($i+1))[3];
             $props{callsite} = get_callsite($i);
+
+            my $subref = Devel::Chitin->current_sub;
+            if (ref $subref) {
+                $props{subref} = $subref;
+            }
+
             last;
         }
     }
@@ -134,6 +148,12 @@ should be self-explanatory.  All parameters except callsite are required.
 
 Represents the opcode address of the location as reported by Devel::Callsite::callsite().
 This value will only be valid if the optional module L<Devel::Callsite> is installed.
+
+=item subref
+
+A coderef to the currently executing subroutine.  This will only be a valid
+value if this Location object was constructed through C<Devel::Chitin->current_location()>,
+and the current subroutine is an anonymous function.
 
 =back
 

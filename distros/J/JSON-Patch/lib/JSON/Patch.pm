@@ -29,11 +29,11 @@ JSON::Patch - JSON Patch (rfc6902) for perl structures
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -73,10 +73,11 @@ Convert L<Struct::Diff> diff to JSON Patch when single arg passed:
 
 =cut
 
-sub diff($$) {
-    my @stask = Struct::Diff::list_diff @_ == 2
+sub diff($;$) {
+    my $diff = @_ == 2
         ? Struct::Diff::diff($_[0], $_[1], noO => 1, noU => 1, trimR => 1)
         : $_[0];
+    my @stask = Struct::Diff::list_diff($diff, sort => 1);
 
     my ($hunk, @patch, $path);
 
@@ -107,7 +108,7 @@ Apply patch.
 
 =cut
 
-sub patch($;$) {
+sub patch($$) {
     croak "Arrayref expected for patch" unless (ref $_[1] eq 'ARRAY');
 
     for my $hunk (@{$_[1]}) {

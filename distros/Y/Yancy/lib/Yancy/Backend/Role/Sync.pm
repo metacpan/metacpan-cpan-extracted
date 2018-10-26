@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::Sync;
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 # ABSTRACT: A role to give a synchronous backend useful Promises methods
 
 #pod =head1 SYNOPSIS
@@ -19,13 +19,9 @@ our $VERSION = '1.009';
 #pod synchronous method is called and a promise object created from the
 #pod result. The promise is then returned already fulfilled.
 #pod
-#pod If you have an asynchronous backend and want to allow users to use the
-#pod synchronous API without implementing the methods yourself, see
-#pod L<Yancy::Backend::Role::Sync>.
-#pod
 #pod =head1 SEE ALSO
 #pod
-#pod L<Yancy::Backend>, L<Yancy::Backend::Role::Async>
+#pod L<Yancy::Backend>
 #pod
 #pod =cut
 
@@ -57,7 +53,7 @@ Yancy::Backend::Role::Sync - A role to give a synchronous backend useful Promise
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 
@@ -76,13 +72,9 @@ backends. This does not make the backend asynchronous: The original,
 synchronous method is called and a promise object created from the
 result. The promise is then returned already fulfilled.
 
-If you have an asynchronous backend and want to allow users to use the
-synchronous API without implementing the methods yourself, see
-L<Yancy::Backend::Role::Sync>.
-
 =head1 SEE ALSO
 
-L<Yancy::Backend>, L<Yancy::Backend::Role::Async>
+L<Yancy::Backend>
 
 =head1 AUTHOR
 

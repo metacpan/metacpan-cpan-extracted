@@ -3,7 +3,7 @@ package Devel::Chitin::Actionable;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use Digest::MD5 qw(md5);
 use Carp;
@@ -12,11 +12,22 @@ sub new {
     my $class = shift;
 
     my %params = __required([qw(file line code)], @_);
+    return unless $class->is_breakable($params{file}, $params{line});
 
     my $self = \%params;
     bless $self, $class;
     $self->_insert();
     return $self;
+}
+
+sub is_breakable {
+    my($class, $file, $line) = @_;
+
+    return unless exists $main::{'_<' . $file};
+    our @dbline;
+    local(*dbline) = $main::{'_<' . $file};
+    return unless defined $dbline[$line];
+    return ($dbline[$line] + 0);
 }
 
 sub __required {
@@ -52,12 +63,12 @@ sub get {
                     : ();
     }
             
-    if ($params{code}) {
+    if (exists $params{code}) {
         @candidates = grep { $_->{code} eq $params{code} }
                         @candidates;
     }
 
-    if ($params{inactive}) {
+    if (exists $params{inactive}) {
         @candidates = grep { $_->{inactive} eq $params{inactive} }
                         @candidates;
     }
@@ -206,10 +217,14 @@ code before a line in the debugged program executes.
 =head1 Breakpoints
 
 Breakpoints are associated with a file and line number, and the same
-file/line combination may have more than one breakpoint.  At each line
-with one or more breakpoints, all those breakpoints are tested by
-eval-ing (as a string eval) their C<code> in the context of the debugged
-program.  If any of these tests returns true, the debugger will stop the
+file/line combination may have more than one breakpoint.  Before executing a
+line with one or more breakpoints, all those breakpoints with string C<code>
+attributes are tested by eval-ing, as a string eval, their C<code> in the
+context of the debugged program; these can be used to implement a conditional
+breakpoint that stops depending on some condition in the program code.
+Coderef C<code> attributes are called directly, and get no special scoping.
+
+If any of these tests returns true, the debugger will stop the
 program before executing that line.
 
 =head2 Constructor
@@ -225,6 +240,11 @@ is omitted, the value "1" is used as a default which creates an unconditional
 breakpoint.  If C<once> is a true value, then the breakpoint will delete
 itself after triggering.  If C<inactive> is true, the breakpoint will not
 trigger.
+
+The breakpoint code can be either a string or a coderef.  Strings are executed
+as a string-eval, and are evaluated in the context of the program being
+debugged.  Coderefs are called directly, and behave according to normal
+scoping rules.
 
 =head2 Methods
 
@@ -269,8 +289,9 @@ Actions are a lot like breakpoints; they are associated with a file and line
 number, and they have code that runs before that line in the program is
 executed.  The difference is that the return value from the code is ignored.
 
-The code is evaluated in the context of the running program, so it can, for
-example, affect variables there or print them out.
+The code is evaluated in the context of the running program if specified as
+a string, so it can, for example, affect variables there or print them out.
+Coderefs are called directly, and get no special scoping.
 
 =head2 Constructor
 

@@ -23,9 +23,6 @@ my @files = (
     't/mock-lstat.t',
     't/mock-setting-errno.t',
     't/mock-stat.t',
-    't/perldoc_mock-all-file-check-trace.t',
-    't/perldoc_mock-all-file-check.t',
-    't/perldoc_mock-stat.t',
     't/recycle-stat.t',
     't/stat-helpers.t',
     't/test-A.t',
@@ -56,7 +53,8 @@ my @files = (
     't/test-u.t',
     't/test-w.t',
     't/test-x.t',
-    't/test-z.t'
+    't/test-z.t',
+    't/xt-author-check-examples.t'
 );
 
 notabs_ok($_) foreach @files;

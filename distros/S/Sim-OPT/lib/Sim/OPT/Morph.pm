@@ -58,54 +58,55 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.75'; # our $VERSION = '';
+$VERSION = '0.093'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH
 
 sub morph
 {
-	$mypath = $main::mypath;
-	$exeonfiles = $main::exeonfiles;
-	$generatechance = $main::generatechance;
-	$file = $main::file;
-	$preventsim = $main::preventsim;
-	$fileconfig = $main::fileconfig;
-	$outfile = $main::outfile;
-	$tofile = $main::tofile;
-	$report = $main::report;
-	$simnetwork = $main::simnetwork;
-	$max_processes = $main::max_processes;
+	my ( $configfile, $instances_r, $dirfiles_r, $dowhat_r ) = @_;
 
-	%simtitles = %main::simtitles;
-	%retrievedata = %main::retrievedata;
-	@keepcolumns = @main::keepcolumns;
-	@weights = @main::weights;
-	@weightsaim = @main::weightsaim;
-	@varthemes_report = @main::varthemes_report;
-	@varthemes_variations = @main::varthemes_variations;
-	@varthemes_steps = @main::varthemes_steps;
-	@rankdata = @main::rankdata; # CUT ZZZ
-	@rankcolumn = @main::rankcolumn;
-	%reportdata = %main::reportdata;
-	@files_to_filter = @main::files_to_filter;
-	@filter_reports = @main::filter_reports;
-	@base_columns = @main::base_columns;
-	@maketabledata = @main::maketabledata;
-	@filter_columns = @main::filter_columns;
+	my @instances = @{ $instances_r };
+	my %dirfiles = %{ $dirfiles_r };
+	my %dowhat = %{ $dowhat_r };
+
+	my $mypath = $main::mypath;
+	my $exeonfiles = $main::exeonfiles;
+	my $generatechance = $main::generatechance;
+	my $file = $main::file;
+	my $preventsim = $main::preventsim;
+	my $fileconfig = $main::fileconfig;
+	my $outfile = $main::outfile;
+	my $tofile = $main::tofile;
+	my $simnetwork = $main::simnetwork;
+	my $max_processes = $main::max_processes;
+
+	my %simtitles = %main::simtitles;
+	my %retrievedata = %main::retrievedata;
+	my @keepcolumns = @main::keepcolumns;
+	my @weights = @main::weights;
+	my @weightsaim = @main::weightsaim;
+	my @varthemes_report = @main::varthemes_report;
+	my @varthemes_variations = @main::varthemes_variations;
+	my @varthemes_steps = @main::varthemes_steps;
+	my @rankdata = @main::rankdata; # CUT ZZZ
+	my @rankcolumn = @main::rankcolumn;
+	my %reportdata = %main::reportdata;
+	my @files_to_filter = @main::files_to_filter;
+	my @filter_reports = @main::filter_reports;
+	my @base_columns = @main::base_columns;
+	my @maketabledata = @main::maketabledata;
+	my @filter_columns = @main::filter_columns;
+	my %vals = %main::vals;
 
 	$tee = new IO::Tee( \*STDOUT, ">>$tofile" ); # GLOBAL ZZZ
 
-	my ( $configfile, $instances_r, $dirfiles_r, $dowhat_r ) = @_;
-
-	require $configfile;
-
-	my @instances = @{ $instances_r }; #say $tee "IN MORPH \@instances " . dump( \@instances );
-	my %dirfiles = %{ $dirfiles_r }; #say $tee "IN MORPH \%dirfiles " . dump( \%dowhat );
-	my %dowhat = %{ $dowhat_r }; say $tee "IN MORPH \%dowhat " . dump( \%dowhat );
-
-
 	say $tee "\n# Now in Sim::OPT::Morph.\n";
+
+	#say $tee "IN MORPH! \$configfile " . dump( $configfile );
+
+	#say $tee "BEGINNING IN MORPH! \%vals " .dump( %vals );
 
 	if ( not ( $exeonfiles ) ) { $exeonfiles = "y"; }
 	if ( not ( $preventsim ) ) { $preventsim = "n"; }
@@ -135,9 +136,9 @@ sub morph
 	my $descendlist = $dirfiles{descendlist};
 	my $descendblock = $dirfiles{descendblock};
 
-	my $skipfile = $dowhat{skipfile};
-	my $skipsim = $dowhat{skipsim};
-	my $skipreport = $dowhat{skipreport};
+	my $skipfile = $vals{skipfile};
+	my $skipsim = $vals{skipsim};
+	my $skipreport = $vals{skipreport};
 
 	my ( %numvertmenu, %vertnummenu );
 
@@ -257,12 +258,12 @@ sub morph
 	my $numberof_morphings = scalar ( keys %{ $dowhat{simtools} } );
 	my ( @done_instances, @done_tos );
 
-	$countinstance = 1;
-	foreach my $instance ( sort { ${ $a }{to} <=> ${ $b }{to} } @instances )
+	################ $countinstance = 1;
+	foreach my $instance ( @instances )
 	{
 		my %d = %{ $instance }; #say $tee "IN MORPH dump(\%d): " . dump(%d);
-		say $tee "\$countinstance: " . dump( $countinstance );
-		#my $countinstance = ( $d{countinstance} + 1 );
+
+
 		my $instance_after = $instances[ $countinstance + 1];
 		my %d_after = %{ $instance_after };
 
@@ -275,7 +276,8 @@ sub morph
 		my $countvar = $d{countvar};
 		my $countvar_after = $d_after{countvar};
 		my $countstep = $d{countstep};
-
+		my $countinstance = ( $d{instn} );
+		#say $tee "IN MORPH! \$countinstance: " . dump( $countinstance );
 
 		my @uplift = @{ $d{uplift} };
 		my @backvalues = @{ $d{backvalues} };
@@ -284,28 +286,27 @@ sub morph
 		my @blockelts = @{ $d{blockelts} };
 		my @blocks = @{ $d{blocks} };
 
-		my $origin = $d{origin}; #say $tee " IN MORPH \$origin $origin ";
-		$origin = "$mypath/$file" . "_" . "$origin"; say $tee " IN MORPH \$origin $origin ";
-		my $to = $d{to}; #say $tee " IN MORPH \$to $to ";
-		$to = "$mypath/$file" . "_" . "$to"; say $tee " IN MORPH \$to $to ";
+		my $origin = $d{origin}; #say $tee "IN MORPH, \$origin: " . dump( $origin );
+		my %to = %{ $d{to} }; #say $tee "IN MORPH, \%to: " . dump( \%to );
+		my %inst = %{ $d{inst} }; #say $tee "IN MORPH, \%inst: " . dump( \%inst );
+
 		my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
-		$from = "$mypath/$file" . "_" . "$from"; say $tee " IN MORPH \$from $from ";
 		my $toitem = $d{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
-		$toitem = "$mypath/$file" . "_" . "$toitem"; say $tee " IN MORPH \$toitem $toitem ";
 
 		my %varnums = %{ $d{varnums} };
 		my %mids = %{ $d{mids} };
-		my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase);
+		my $rootname = Sim::OPT::getrootname( \@rootnames, $countcase );
 
-		my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varnumbers);
-		my $varnumber = $countvar;
 
-		my $countcaseplus1 = ( $countcase + 1);
-		my $countblockplus1 = ( $countblock + 1);
+		my $varnumber = $countvar; #say $tee "IN MORPH! \$countvar and \$varnumber : " . dump( $countvar );
+		my $stepsvar = $varnums{$countvar}; #say $tee "IN MORPH! \$stepsvar : " . dump( $stepsvar ); say $tee "IN MORPH! \$countvar : " . dump( $countvar );
+
+		my $countcaseplus1 = ( $countcase + 1 );
+		my $countblockplus1 = ( $countblock + 1 );
 
 
 		my $countmorphing = 1;
-		my $numberof_morphings = scalar ( keys %{ $dowhat{simtools} } );
+		my $numberof_morphings = scalar( keys %{ $dowhat{simtools} } );
 
 		while ( $countmorphing <= $numberof_morphings )
 		{
@@ -318,12 +319,15 @@ sub morph
 								];
 			}
 
-			if ( not ( defined( $dowhat{actonexisting_models}->{$countmorphing} ) ) )
+			if ( $dowhat{actonmodels} eq "" )
 			{
-				$dowhat{actonexisting_models}->{$countmorphing} = "y";
+				$dowhat{actonmodels} = "y";
 			}
 
-			my @applytype = @{ $vals{$countmorphing}{$countvar}{applytype} };
+			#say $tee "IN MORPH! \$countmorphing : " . dump( $countmorphing );
+			#say $tee "IN MORPH! \$countvar : " . dump( $countvar );
+			#say $tee "IN MORPH! \%vals : " . dump( \%vals );
+			my @applytype = @{ $vals{$countmorphing}{$countvar}{applytype} }; #say $tee "IN MORPH! \@applytype : " . dump( @applytype );
 			my $general_variables = $vals{$countmorphing}{$countvar}{general_variables};
 			my @generic_change = @{$vals{$countmorphing}{$countvar}{generic_change} };
 			my $rotate = $vals{$countmorphing}{$countvar}{rotate};
@@ -376,16 +380,21 @@ sub morph
 
 
 			if ( ( $countblock == 0 ) and ( $countstep == 1 ) )
+			#if ( $countblock == 0 )
 			{
 				unless ( $dowhat{inactivatemorph} eq "y" )
 				{
-					if (not ( -e "$origin" ) )
+					if (not ( -e $origin{crypto} ) )
 					{
+						my $target;
 						unless ($exeonfiles eq "n")
 						{
-							`cp -R $mypath/$file $from`;
+							$target = $inst{$dirfiles{starter}}; #say $tee "FIRSTTARGET IN MORPH1: \$target " .dump( $target );
+							`cp -R $mypath/$file $target`;
 						}
-						say $tee "cp -R $mypath/$file $from\n";
+						say $tee "cp -R $mypath/$file $target\n";
+						#my $cleartarget = $dirfiles{starter}; #say $tee "FIRST CLEAR TARGET IN MORPH1: \$cleartarget " .dump( $cleartarget );
+						#say $tee "LIKE SAYING cp -R $mypath/$file $cleartarget\n";
 					}
 				}
 			}
@@ -393,33 +402,39 @@ sub morph
 			unless ( $dowhat{inactivatemorph} eq "y" )
 			{
 				open( MORPHBLOCK, ">>$morphblock") or die( "$!" );# or die;
-				push ( @{ $morphstruct[$countcase][$countblock] }, $to );
+				push ( @{ $morphstruct[$countcase][$countblock] }, $to{cleanto} );
 
 
-				#	if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonexisting_models}->{$countmorphing} eq "y" ) )
-				if ( not ( $to ~~ @morphcases ) )
+				#	if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonmodels} eq "y" ) )
+				if ( not ( $to{cleanto} ~~ @morphcases ) )
 				{
 
-					push ( @morphcases, $to );
-					print MORPHLIST "$to\n";
-					say $tee "from: $from, origin: $origin, to: $to";
+					push ( @morphcases, $to{cleanto} );
+					print MORPHLIST "$to{cleanto}\n";
 
-					if ( ( not (-e $to ) ) or ( not ($to ~~ @morphcases) ) or ( $dowhat{overwrite_models}->{$countmorphing} eq "y" ) )
+					if ( ( not (-e $to{crypto} ) ) or ( not ( $to{cleanto} ~~ @morphcases) ) or ( $dowhat{overwrite_models} eq "y" ) )
 					{
 						unless ($exeonfiles eq "n")
 						{
-							`cp -R $origin $to\n`;
-							print $tee "cp -R $origin $to\n\n";
+							my $target = $to{crypto}; say $tee "TARGET IN MORPH: \$target " .dump( $target );
+							my $orig = $inst{$origin}; say $tee "ORIGIN IN MORPH: \$orig " .dump( $orig );
+							`cp -R $orig $target\n`;
+							print $tee "cp -R $orig $target\n\n";
+
+							my $cleartarget = $to{to}; #say $tee "CLEAR TARGET IN MORPH: \$cleartarget " .dump( $cleartarget );
+							print $tee "LIKE SAYING cp -R $origin $cleartarget\n\n";
 						}
 					}
 
-					if ( ( $dowhat{actonexisting_models}->{$countmorphing} eq "y" ) )
+					#say $tee "IN MORPH NEAR REASSIGNMNENT: \$dowhat{actonmodels} " .dump( $dowhat{actonmodels} );
+					if ( $dowhat{actonmodels} eq "y" )
 					{
 						my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
-						foreach my $op (@applytype) # "$op" MEANS OPERATION
+						foreach my $op ( @applytype ) # "$op" MEANS OPERATION
 						{
-
-							my $skip = $skipop->[ $countop ];
+							my $to = $to{crypto}; say $tee "IN MORPH: REASSIGNIMENT!!! \$to " .dump( $to ); ### TAKE CARE!!! REASSIGNIMENT!!!
+							my $origin = $inst{$origin}; say $tee "IN MORPH: REASSIGNIMENT!!! \$origin " .dump( $origin ); ### TAKE CARE!!! REASSIGNIMENT!!!
+							my $skip = $skipop->[ $countop ]	;
 							my $modification_type = $applytype[$countop][0]; #say $tee "\$modification_type: $modification_type"; #
 							if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type ne "changeconfig" ) )
 							{
@@ -444,12 +459,11 @@ sub morph
 							}
 
 
-							print `cd $to`;
-							print $tee "cd $to\n\n";
+							`cd $to`;
+							say $tee "cd $to\n";
 
-							my $launchline;
-							$launchline = " -file $to/cfg/$fileconfig -mode script";
-
+							my $launchline = " -file $to/cfg/$fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
+							say $tee "NOW MODIFICATION TYPE! $modification_type ";
 
 							if ( ( $stepsvar > 1) and ( not ( eval ( $skip ) ) ) )
 							{
@@ -500,6 +514,7 @@ sub morph
 								}
 								elsif ( $modification_type eq "translate_vertices" )
 								{
+									#say $tee "HITTING \$countinstance $countinstance";
 									translate_vertices
 									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
@@ -700,19 +715,9 @@ sub morph
 											}
 											if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
 											{
-
-
-
-
-
-
 												use_modish
 												( $to, $stepsvar, $countop,
 													$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
-
-
-
-
 											}
 											if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) )
 											{
@@ -744,7 +749,7 @@ sub morph
 												my $countblock_ = $d{countblock};
 												my $countvar_ = $d{countvar};
 												my $countstep_ = $d{countstep};
-												my $to_ = $d{to};
+												my $to_ = $d{to}{crypto};
 
 												if ( $parameter == $countvar )
 												{
@@ -796,7 +801,7 @@ sub morph
 											my @winneritems = @{ $d{winneritems} };
 											my $countvar = $d{countvar};
 											my $countstep = $d{countstep};
-											my $to = $d{to};
+											my $to = $d{to}{crypto};
 											my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varinumbers);
 
 											foreach my $todo ( @todolist )
@@ -937,23 +942,17 @@ sub morph
 							print $tee "cd $mypath\n\n";
 						}
 					}
-					#else
-					#{
-					#  unless ($exeonfiles eq "n") { print `cp -R $origin $to\n`; }
-					#  print $tee "cp -R $origin $to\n\n";
-					#}
-					#push(@morphed, $to);
 				}
 			}
 			$countmorphing++;
 		}
 		close MORPHLIST;
 		close MORPHBLOCK;
-		$countinstance++;
+		#$countinstance++;
 	}
 	close TOFILE;
 	close OUTFILE;
-	return (\@morphcases, \@morphsruct);
+	return ( \@morphcases, \@morphsruct );
 }    # END SUB morph
 
 

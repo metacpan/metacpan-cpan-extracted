@@ -1,0 +1,2 @@
+my($obj, $method);
+$obj->$method(1, 2, 3)

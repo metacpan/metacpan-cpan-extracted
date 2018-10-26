@@ -1,0 +1,2 @@
+my $a;
+$a = tr/$a/zyxw/cds

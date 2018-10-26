@@ -1,0 +1,10 @@
+BEGIN { skip "requires 5.10.1" if $^V lt v5.10.1 } # omit
+use v5.10.1; # omit
+my $a = say();
+say('foo bar', 'baz', "\n");
+say FH ('foo bar', 'baz', "\n");
+say "Hello\n";
+say FH "Hello\n";
+my $fh;
+say { $fh } ('foo bar', 'baz', "\n");
+say { *$fh } ('foo bar', 'baz', "\n")

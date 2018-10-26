@@ -1,0 +1,6 @@
+my $a = getgrent();
+endgrent();
+setgrent();
+$a = getgrgid($a);
+$a = getgrgid(123);
+$a = getgrnam($a)

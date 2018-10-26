@@ -1,0 +1,8 @@
+my $a;
+++$a until ($a < 5);
+print 'hi' until ($a < 5);
+do {
+	++$a;
+	print 'hi'
+} until ($a < 5);
+print 'done'

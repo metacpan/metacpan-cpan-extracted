@@ -1,0 +1,4 @@
+my $a;
+$a = sqrt();
+$a = sqrt($a);
+sqrt($a)

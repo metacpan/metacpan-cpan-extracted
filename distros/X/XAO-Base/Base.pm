@@ -1,10 +1,10 @@
 package XAO::Base;
 use strict;
-require 5.006_000;
+require 5.010_001;
 use XAO::BaseConfig;
 use base qw(XAO::BaseConfig);
 
-our $VERSION='1.22';
+our $VERSION='1.23';
 
 ###############################################################################
 1;

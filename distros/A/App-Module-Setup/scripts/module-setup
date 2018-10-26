@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Jun 30 21:15:32 2013
 # Last Modified By: Johan Vromans
-# Last Modified On: Sun Oct 21 16:16:54 2018
-# Update Count    : 59
+# Last Modified On: Thu Oct 25 20:47:13 2018
+# Update Count    : 63
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -85,6 +85,7 @@ sub app_setup {
 	  'author=s',
 	  'email=s',
 	  'cpanid=s',
+	  'githubid=s',
 	  'module=s',
 	  'template=s',
 	  'postcmd=s@',
@@ -143,6 +144,7 @@ Usage: $0 [options] [ module ]
     --email=EMAIL	email address of author*
     --module=MMM	the new module
     --cpanid=XXX	author's CPAN Id*
+    --githubid=XXX	author's GitHub Id*
     --template=XXX	select a set of templates*
     --postcmd=XXX	command(s) to execute after creating*
     --git		set up a git repo after creating
@@ -242,6 +244,12 @@ Specifies the CPAN id of the author of the module.
 
 If this option is not given, the id will be inferred from the email
 address if possible.
+
+This option can be preset in an optional configuration file.
+
+=item B<--githubid=>I<id>
+
+Specifies the GitHub id of the author of the module. Optional.
 
 This option can be preset in an optional configuration file.
 
@@ -380,6 +388,10 @@ The author's email address, e.g., C<a.u.thor@example.com>,
 
 The author's CPAN id, e.g., C<THORAX>.
 
+=item author.githubid
+
+The author's GitHub id, e.g., C<Thorax>.
+
 =item module.name
 
 The name of the module to be created, e.g., C<Foo::Bar>.
@@ -470,7 +482,7 @@ Sawyer X, for writing Module::Starter where I borrowed many ideas from.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2013 Johan Vromans, all rights reserved.
+Copyright 2013,2018 Johan Vromans, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

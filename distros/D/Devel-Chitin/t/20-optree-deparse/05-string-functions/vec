@@ -1,0 +1,2 @@
+my $a = vec('abcdef', 1, 4);
+vec($a, 2, 2) = 4

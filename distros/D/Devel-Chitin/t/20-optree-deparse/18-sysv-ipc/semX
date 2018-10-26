@@ -1,0 +1,4 @@
+my($a, $rv);
+$rv = semctl(1, $a, 2, 3);
+$rv = semget(1, $a, 2);
+$rv = semop(1, $a)

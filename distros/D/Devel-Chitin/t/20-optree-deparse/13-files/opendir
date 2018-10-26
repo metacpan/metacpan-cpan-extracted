@@ -1,0 +1,4 @@
+my $rv = opendir(D, '/path/name');
+$rv = opendir(*D, '/path/name');
+$rv = opendir(my $dh, '/path/name');
+$rv = opendir(*$dh, '/path/name')

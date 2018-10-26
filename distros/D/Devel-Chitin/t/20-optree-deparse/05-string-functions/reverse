@@ -1,0 +1,7 @@
+my $a;
+$a = reverse(@_);
+$a = reverse($a);
+scalar(reverse(@_));
+my @a;
+@a = reverse(@_);
+@a = reverse(@a)

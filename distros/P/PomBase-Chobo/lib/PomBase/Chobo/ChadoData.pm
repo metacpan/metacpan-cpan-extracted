@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 use Mouse;
 

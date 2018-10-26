@@ -1,0 +1,4 @@
+my $a;
+$a = exp();
+$a = exp($a);
+exp($a)

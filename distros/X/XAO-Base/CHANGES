@@ -1,6 +1,36 @@
 https://github.com/amaltsev/XAO-Base
 ------------------------------------
 
+commit 45a91ea05f5975402eb321b28d35c4ad91c43765
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Oct 24 20:09:34 2018 -0700
+
+    1.23 'include' argiment to XAO::Objects::load()
+    
+    Allowing to refer to library projects from Config.pm and other
+    situations when site configuration is not available yet.
+
+commit 3052f58da1e88bb792cf15fdb4d1ee1e66594608
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Oct 24 17:54:52 2018 -0700
+
+    Added forgotten files to MANIFEST
+
+commit c435fbba5235d996d64c136e7c37ad3a47b6196f
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Oct 19 18:48:47 2018 -0700
+
+    Sub-level testing added
+    
+    Just testing, no functional changes and no version bump. There was a
+    scare that this did not work right, that turned out to be unfounded.
+
+commit d4e1e42c950d5ca9b2a0ebe8c85c57a45f52e00c
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Oct 19 11:31:03 2018 -0700
+
+    MANIFEST update
+
 commit cb0434f5db66227784a9f661a5124647b4ab146e
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Oct 19 11:14:15 2018 -0700
@@ -46,31 +76,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Jul 6 18:47:20 2018 -0700
 
     Version bump
-
-commit ebd4413d9d980225d5a6cfe5a8de0180620f6048
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 18:46:12 2018 -0700
-
-    1.20 Removed unnecessary dependencies
-
-commit 0091282b7673760af583a05965ff17f13e3ee01c
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 17:17:40 2018 -0700
-
-    Forced CHANGES rebuild
-
-commit 16bbd0704b39a7b7dd094974cf88241deeafa01d
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 16:59:49 2018 -0700
-
-    1.19 Recursion on auto tests
-    
-    Added sub-directory scanning on tests in t/testcases and fixed a stray
-    dependency bug introduced in 1.18.
-
-commit 1fde5b69f326524d64380d87139792bf749f7d85
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 08:45:48 2018 -0700
-
-    1.18 Tests updated to Test::Unit::Lite
 

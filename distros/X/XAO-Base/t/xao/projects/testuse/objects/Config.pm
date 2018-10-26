@@ -1,7 +1,11 @@
 package XAO::DO::Config;
 use strict;
 use XAO::Objects;
-use base XAO::Objects->load(objname => 'Config', baseobj => 1);
+
+use parent XAO::Objects->load(objname => 'Config', baseobj => 1);
+use parent XAO::Objects->load(objname => 'Config1', include => [ qw(testuse testlib test) ]);
+use parent XAO::Objects->load(objname => 'Config2', include => [ qw(testuse testlib test) ]);
+use parent XAO::Objects->load(objname => 'Config3', include => [ qw(testuse testlib test) ]);
 
 sub init ($$) {
     my $self=shift;

@@ -1,3 +1,8 @@
+0.001070  2018-10-24 13:19:53-07:00 America/Los_Angeles
+
+    - Allow --author-testing in 'projects' command
+    - Misc minor changes
+
 0.001069  2018-08-23 13:48:54-07:00 America/Los_Angeles
 
     - Fix busy-spin in job reaper

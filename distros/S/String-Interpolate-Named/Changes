@@ -1,6 +1,10 @@
 Revision history for String-Interpolate-Named
 
-0.04
+0.05	2018-10-25
+
+	%{} should work only within a %{ ... } construct.
+
+0.04	2018-10-24
 
 	Require perl 5.10.1 or later due to Unicode problems.
 	Use $" as default for separator.
@@ -12,7 +16,7 @@ Revision history for String-Interpolate-Named
 
 0.02	2018-10-23 09:56
 
-	Renamed to String::Interpolate::Named to avoid coflicts with
+	Renamed to String::Interpolate::Named to avoid conflicts with
 	(non-existing!) Text::Substitute.
 	Move development to GitHub.
 

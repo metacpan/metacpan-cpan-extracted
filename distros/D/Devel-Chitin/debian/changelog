@@ -1,3 +1,25 @@
+libdevel-chitin-perl (0.18-1) unstable; urgency=low
+
+    * Test fixes to work on threaded perls, and to force minimum required versions of some modules
+
+ -- Anthony Brummett <brummett@cpan.org>   Wed, 25 Oct 2018  17:46:00 -0500
+
+libdevel-chitin-perl (0.17-1) unstable; urgency=low
+
+    * Deparser supports fc() and \F (foldcase) in double-quoted strings
+    * Deparser handles Perl 5.28's optimization of index() and rindex()
+    * Deparser supports Perl 5.30's requirement that CORE::dump() be used
+        instead of dump()
+    * current_location() is now valid if called before init()
+    * Coderefs are now allowed in breakpoints and actions
+    * Dosen't crash when stepping into/over lvalue subs
+    * continue_to() stops execution at a given file+line or the first
+        statement of a named sub or subref
+    * Big refactoring of tests using Test2.  They should be easier to
+        understand, run and modify.
+
+ -- Anthony Brummett <brummett@cpan.org>   Wed, 24 Oct 2018  15:20:00 -0500
+
 libdevel-chitin-perl (0.16-1) unstable; urgency=low
 
     * Support delete() on a hash-value slice, new in Perl 5.28

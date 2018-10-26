@@ -1,7 +1,7 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use strict;
 use warnings;
@@ -501,16 +501,17 @@ sub _verify_sig {
 	# warn "encrypt="._encode64($bencrypt)."\n";
 	return ($FAIL,'header sig mismatch');
     }
-    return (DKIM_SUCCESS, $sig->{':warning'} // '');
+    return (DKIM_SUCCESS, join(' + ', @{$sig->{':warning'} || []}));
 }
 
 # parse the header and extract
 sub _parse_header {
     my $hdr = shift;
+    my %all_critical = map { $_ => 0 } @critical_headers;
+    $all_critical{lc($_)}-- for $hdr =~m{^($critical_headers_rx):}mig;
     my @sig;
     while ( $hdr =~m{^(DKIM-Signature:\s*(.*\n(?:[ \t].*\n)*))}mig ) {
 	my $dkh = $1; # original value to exclude it when computing hash
-	my $down_hdr = substr($hdr,$+[1]); # headers below signature
 
 	my $error;
 	my $sig = parse_signature($2,\$error);
@@ -518,12 +519,11 @@ sub _parse_header {
 	    $sig->{'h:hash'} = _compute_hdrhash($hdr,
 		$sig->{'h:list'},$sig->{'a:hash'},$sig->{'c:hdr'},$dkh);
 
-	    my %critical = map { $_ => 0 } @critical_headers;
+	    my %critical = %all_critical;
 	    $critical{$_}++ for @{$sig->{'h:list'}};
-	    $critical{lc($_)}-- for $down_hdr =~m{^($critical_headers_rx):}mig;
-	    if (my @h = grep { $critical{$_} <= 0 } keys %critical) {
-		$sig->{':warning'} =
-		    "incomplete header protection for ".join(",",sort @h);
+	    if (my @h = grep { $critical{$_} < 0 } keys %critical) {
+		push @{$sig->{':warning'}},
+		    "unprotected critical header ".join(",",sort @h);
 	    }
 	} else {
 	    $sig = { error => "invalid DKIM-Signature header: $error" };
@@ -697,7 +697,9 @@ sub _parse_header {
 		push @bh, {
 		    digest => $digest,
 		    transform => $transform,
-		    l => $_->{l}
+		    $_->{l} ? (l => $_->{l}) :
+		    defined($_->{l}) ? (l => \$_->{l}) :  # capture l
+		    (),
 		};
 	    }
 	    \@bh;
@@ -705,20 +707,23 @@ sub _parse_header {
 
 	my $done = 0;
 	for(@$bh) {
-	    if ($_->{done}) {
-		$done++;
-		next;
-	    }
 	    my $tbuf = $_->{transform}($buf);
 	    $tbuf eq '' and next;
-	    if ($_->{l}) {
-		$_->{l} -= length($tbuf);
-		if ($_->{l}<=0) {
-		    substr($tbuf,$_->{l}) = '' if $_->{l}<0;
-		    $_->{done} = 1;
+	    {
+		defined $_->{l} or last;
+		if (ref $_->{l}) {
+		    ${$_->{l}} += length($tbuf)
+		} elsif ($_->{l} > 0) {
+		    last if ($_->{l} -= length($tbuf))>0;
+		    $_->{_data_after_l} ||=
+			substr($tbuf,$_->{l},-$_->{l},'') =~m{\S} & 1;
+		    $_->{l} = 0;
+		} else {
+		    $_->{_data_after_l} ||= $tbuf =~m{\S} & 1;
+		    $tbuf = '';
 		}
 	    }
-	    $_->{digest}->add($tbuf);
+	    $_->{digest}->add($tbuf) if $tbuf ne '';
 	}
 
 	if ($done == @$bh or $buf eq '') {
@@ -727,6 +732,8 @@ sub _parse_header {
 	    for(my $i=0;$i<@$bh;$i++) {
 		$self->{sig}[$i]{'bh:computed'} =
 		    ( $bh->[$i]{digest} || next)->digest;
+		push @{$self->{sig}[$i]{':warning'}}, 'data after signed body'
+		    if $bh->[$i]{_data_after_l};
 	    }
 	    $self->{_bhdone} = 1;
 	}
@@ -1069,9 +1076,11 @@ A VerifyRecord has additionally the following methods:
 
 =item warning - possible warnings if DKIM_SUCCESS
 
-Currently this is used to provide information if critical header fields are not
-properly included (i.e. covering all plus one instance, see RFC 6376, 5.4.2) in
-the signature.
+Currently this is used to provide information if critical header fields in
+the mail are not convered by the signature and thus might have been changed
+or added. It will also warn if the signature uses the C<l> attribute to
+limit whch part of the body is included in the signature and there are
+non-white-space data after the signed body.
 
 =back
 
@@ -1112,6 +1121,9 @@ C<$priv_key> (as PEM string or Crypt::OpenSSL::RSA object) and the header of the
 mail and computes the signature. The result C<$signed_dkim_sig> will be a
 signature string which can be put on top of the mail.
 
+If C<$hdr->{l}> is defined and C<0> then the signature will contain an 'l'
+attribute with the full length of the body.
+
 On errors $error will be set and undef will returned.
 
 
@@ -1129,7 +1141,7 @@ Steffen Ullrich <sullr[at]cpan[dot]org>
 
 =head1 COPYRIGHT
 
-Steffen Ullrich, 2015..2016
+Steffen Ullrich, 2015..2018
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -1,0 +1,2 @@
+my($a, $b);
+$a = formline('one', $b, 'three')

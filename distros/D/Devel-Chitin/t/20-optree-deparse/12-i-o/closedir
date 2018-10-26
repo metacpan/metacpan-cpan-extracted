@@ -1,0 +1,5 @@
+closedir(D);
+closedir(*D);
+my $d;
+closedir($d);
+closedir(*$d)

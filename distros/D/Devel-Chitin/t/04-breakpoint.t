@@ -1,87 +1,64 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0; no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(ok_location ok_breakable ok_not_breakable ok_set_breakpoint ok_breakpoint
+                  do_test db_continue);
 
-run_test(
-    30,
-    sub {
-        $DB::single=1; 12;
-        13;
-        14;
-        15;
-        16;
-        # 17
-    },
-    \&check_is_breakable,
-    \&set_breakpoints,
-    'continue',
-    loc(line => 13),
-    'continue',
-    loc(line => 16),
-    'done'
-);
+# Since debugging isn't enabled until 'use TestHelper',
+# this file's lines don't show up in the _<$filename, and we can't set
+# breakpoints that get honored.  Starting a new compilation unit with
+# use gets around that problem.
+use SampleCode;
 
-sub check_is_breakable {
-    my($db, $loc) = @_;
+$DB::single=1;
+SampleCode::foo();
 
-    Test::More::ok(! $db->is_breakable(__FILE__, 11), 'Line 11 is not breakable');
-    Test::More::ok($db->is_breakable(__FILE__, 12), 'Line 12 is breakable');
-    Test::More::ok(! $db->is_breakable(__FILE__, 17), 'Line 17 is not breakable');
-}
+sub __tests__ {  # 15
+    plan tests => 20;
 
-my @breakpoints;
-BEGIN {
-  @breakpoints = (
-    { line => 13, comment => 'Set unconditional breakpoint' },
-    { line => 14, code => 0, comment => 'Set breakpoint that will never fire' },
-    { line => 15, code => 1, inactive => 1, comment => 'Set unconditional, inactive breakpoint' },
-    { line => 16, code => 0, comment => 'Set breakpoint that will never fire' },
-    { line => 16, comment => 'Set second unconditional breakpoint' },
-  );
-}
+    my $file = 't/lib/SampleCode.pm';
+    do_test {
+        ok ! Devel::Chitin::Breakpoint->new(file => 'garbage_file_name', line => 1, code => 1),
+            q(Can't create breakpoint in non-existent file);
+        ok ! Devel::Chitin::Breakpoint->new(file => $file, line => 99, code => 1),
+            q(Can't create breakpoint on non-existent line');
+        ok ! Devel::Chitin::Breakpoint->new(file => $file, line => 1, code => 1),
+            q(Can't create breakpoint on non-breakable line);
+    };
 
-sub set_breakpoints {
-    my($db, $loc) = @_;
+    ok_breakable $file, 5;
+    ok_not_breakable $file, 4;
+    ok_not_breakable $file, 10;
 
-    foreach my $break ( @breakpoints ) {
-        my $line = $break->{line};
-        my $comment = delete($break->{comment}) . " on line $line";
+    ok_set_breakpoint line => 5, file => $file, 'Set unconditional breakpoint';
+    ok_set_breakpoint line => 6, code => 0, file => $file, 'Set conditional breakpoint that will not fire';
+    ok_set_breakpoint line => 7, code => 1, inactive => 1,  file => $file, 'Set unconditional, inactive breakpoint';
+    ok_set_breakpoint line => 8, code => 0, file => $file, 'Set another conditional breakpoint that will not fire';
+    ok_set_breakpoint line => 8, file => $file, 'Set unconditional on that same line';
 
-        Test::More::ok(Devel::Chitin::Breakpoint->new(
-            file => $loc->filename,
-            %$break
-        ), $comment);
-    }
+    do_test {
+        my @got_bp = Devel::Chitin::Breakpoint->get(file => $file);
+        is(scalar(@got_bp), 5, 'got all expected breakpoints');
 
-    {
-        my @bp = Devel::Chitin::Breakpoint->get(file => $loc->filename);
-        Test::More::is(scalar(@bp), scalar(@breakpoints), 'get() by file returns correct number of breakpoints');
-    }
+        foreach my $test ( [ 5 => 1 ], [ 6 => 1 ], [ 7 => 1 ], [ 8 => 2 ] ) {
+            my($line, $expected_bp) = @$test;
+            @got_bp = Devel::Chitin::Breakpoint->get(file => $file, line => $line);
+            is(scalar(@got_bp), $expected_bp, "expected breakpoint count for line $line");
+        }
 
-    my %breakpoints_by_line;
-    foreach my $break ( @breakpoints ) {
-        my $line = $break->{line};
-        $breakpoints_by_line{$line} ||= [];
-        push @{ $breakpoints_by_line{$line} }, $break;
-    }
+        foreach my $code ( 0, 1 ) {
+            @got_bp = Devel::Chitin::Breakpoint->get(file => $file, line => 8, code => $code);
+            is( scalar(@got_bp), 1, "Got one breakpoint on line 12 with code $code");
+        }
+    };
 
-    foreach my $line ( keys %breakpoints_by_line ) {
-        my @bp = Devel::Chitin::Breakpoint->get(file => $loc->filename, line => $line);
-        Test::More::is(scalar(@bp), scalar(@{ $breakpoints_by_line{$line} }), "expected breakpoints for line $line");
-    }
+    db_continue;
 
-    foreach my $break ( @breakpoints ) {
-        my $line = $break->{line};
-        my $code = exists($break->{code}) ? $break->{code} : 1;  # 1 for unconditional
+    ok_location line => 5, filename => $file;
 
-        my($bp) = Devel::Chitin::Breakpoint->get(file => $loc->filename, line => $line, code => $code);
-        Test::More::ok($bp, "Got breakpoint for line $line code $code");
-        Test::More::is($bp->line, $line, 'Breakpoint line');
-        Test::More::is($bp->code, $code, 'Breakpoint code');
-    }
-}
+    db_continue;
+    ok_location line => 8, filename => $file;
+};
 

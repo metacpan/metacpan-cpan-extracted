@@ -1,5 +1,5 @@
 ---
-abstract: 'override/mock perl file checks ops'
+abstract: 'override/mock perl file check -X: -e, -f, -d, ...'
 author:
   - 'Nicolas R <atoomic@cpan.org>'
 build_requires:
@@ -22,13 +22,13 @@ name: Overload-FileCheck
 provides:
   Overload::FileCheck:
     file: lib/Overload/FileCheck.pm
-    version: '0.002'
+    version: '0.005'
 requires:
   perl: '5.010'
 resources:
   bugtracker: https://github.com/CpanelInc/Overload-FileCheck/issues
   repository: https://github.com/CpanelInc/Overload-FileCheck.git
-version: '0.002'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -150,6 +150,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
               version: '4.015'
+            -
+              class: Pod::Weaver::Section::Contributors
+              name: Contributors
+              version: '0.009'
       name: PodWeaver
       version: '4.008'
     -
@@ -271,7 +275,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.002
+          tag: v0.005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -401,11 +405,19 @@ x_Dist_Zilla:
       name: PruneFiles
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::InsertExample
+      name: InsertExample
+      version: '0.09'
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: Test::Synopsis
+      version: '2.000007'
+    -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
-      name: MarkdownInRoot
+      name: ReadmeAnyFromPod
       version: '0.163250'
     -
       class: Dist::Zilla::Plugin::FinderCode

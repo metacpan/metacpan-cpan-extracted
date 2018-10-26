@@ -1,51 +1,49 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0; no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(ok_location db_continue db_stepout);
 
-run_test(
-    6,
-    sub {
-        one();
-        sub one {
-            $DB::single=1;
-            15;
-        }
-        two(); # 17
-        sub subtwo {
-            $DB::single=1;
-            20;
-        }
-        sub two {
-            subtwo();
-            24;
-        }
-        three();  # 26
-        sub three {
-            $DB::single=1;
-            29;
-            three_three();
-            31;
-        }
-        sub three_three {
-            34;
-        }
-        36;
-    },
-    loc(subroutine => 'main::one', line => 15),
-    'stepout',
-    loc(line => 17),
-    'continue',
-    'stepout',
-    loc(subroutine => 'main::two', line => 24),
-    'stepout',
-    loc(line => 26),
-    'continue',
-    loc(subroutine => 'main::three', line => 29),
-    'stepout',
-    loc(line => 36),
-    'done'
-);
+one();
+sub one {
+    $DB::single=1;
+    11;
+}
+two(); # 13
+sub subtwo {
+    $DB::single=1;
+    16;
+}
+sub two {
+    subtwo();
+    20;
+}
+three();  # 22
+sub three {
+    $DB::single=1;
+    25;
+    three_three();
+    27;
+}
+sub three_three {
+    30;
+}
+32;
+
+sub __tests__ {
+    plan tests => 6;
+
+    ok_location subroutine => 'main::one', line => 11;
+    db_stepout;
+    ok_location line => 13;
+    db_continue;
+    db_stepout;
+    ok_location subroutine => 'main::two', line => 20;
+    db_stepout;
+    ok_location line => 22;
+    db_continue;
+    ok_location subroutine => 'main::three', line => 25;
+    db_stepout;
+    ok_location line => 32;
+}

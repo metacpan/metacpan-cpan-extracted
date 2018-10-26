@@ -11,9 +11,9 @@ use lib "$FindBin::Bin/lib";
 
 use Mojo::File qw(path tempdir);
 
-require Mojolicious::Command::generate::localplugin;
+require Mojolicious::Command::Author::generate::localplugin;
 
-my $plugin = Mojolicious::Command::generate::localplugin->new;
+my $plugin = Mojolicious::Command::Author::generate::localplugin->new;
 
 ok $plugin->description, 'has a description';
 like $plugin->usage, qr/plugin/, 'has usage information';

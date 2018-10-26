@@ -1,0 +1,6 @@
+# These hash assigments are done with aassign, so there's no way to
+# tell that the lists would look better as ( one => 1, two => 2 )
+my %a = ('one', 1, 'two', 2);
+our %b = ('three', 3, 'four', 4);
+%a = %b;
+%a = (%b, %a)

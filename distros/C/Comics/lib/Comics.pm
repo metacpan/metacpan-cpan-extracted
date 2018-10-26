@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Oct 21 09:18:23 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue May 22 09:28:15 2018
-# Update Count    : 387
+# Last Modified On: Thu Oct 25 19:04:56 2018
+# Update Count    : 388
 # Status          : Unknown, Use with caution!
 
 use 5.012;
@@ -731,13 +731,29 @@ sub get {
 
 1;
 
+=head1 AUTHOR
+
+Johan Vromans, C<< <JV at CPAN dot org> >>
+
+=head1 SUPPORT
+
+Development of this module takes place on GitHub:
+https://github.com/sciurius/comics .
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Comics
+
+Please report any bugs or feature requests using the issue tracker on
+GitHub.
+
 =head1 ACKNOWLEDGEMENTS
 
 The people behind Gotblah, for creating the original tool.
 
 =head1 LICENSE
 
-Copyright (C) 2016, Johan Vromans,
+Copyright (C) 2016,2018 Johan Vromans,
 
 This module is free software. You can redistribute it and/or
 modify it under the terms of the Artistic License 2.0.

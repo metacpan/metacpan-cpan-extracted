@@ -1,5 +1,15 @@
 Revision history for Devel::Examine::Subs
 
+1.70    2018-10-24
+        - clean up code in respect to specific layouts (closes #18)
+        - efficiency change in the core _proc() sub. We now check for existence
+          before comparison (fixes #20)
+        - cleaned up all instances of eval() (closes #22)
+        - apply Pull Request that disables the win32 line-ending tests (t/41)
+          that caused the test suite to hang on some non-Win32 platforms
+          (thanks Slaven Rezić for the report, and thanks to Steve Dondley for
+          the PR) (fixes #25)
+
 1.69    2017-02-03
         - no operational/functional changes
         - forgot to add the t/57-heredoc-bug.t test file to MANIFEST, and this

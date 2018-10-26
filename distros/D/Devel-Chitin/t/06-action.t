@@ -1,37 +1,26 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0; no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(ok_set_action db_continue do_test);
+use SampleCode;
 
-run_test(
-    4,
-    sub { $DB::single=1;
-        my $a = 1;
-        13;
-        Test::More::is($a, 2, 'Action changed the value of $a to 2');
-        $DB::single=1;
-        14;
-    },
-    \&create_action,
-    'continue',
-    'done',
-);
-    
-sub create_action {
-    my($db, $loc) = @_;
-    Test::More::ok(Devel::Chitin::Action->new(
-            file => $loc->filename,
-            line => 13,
-            code => 'Test::More::ok(1, "action fired"); $a++',
-        ), 'Set action on line 13');
-    Test::More::ok(Devel::Chitin::Breakpoint->new(
-            file => $loc->filename,
-            line => 13,
-            code => 'Test::More::ok(1, "Inactive action not fired"); $a++',
-            inactive => 1,
-        ), 'Set inactive action also on line 13');
+$DB::single=1;
+our $a = 1;
+SampleCode::foo();
+is($a, 2, 'Action changed value of $a to 2');
+
+$DB::single=1;  # To pull the null test below off the test queue
+
+sub __tests__ {
+    plan tests => 3;
+
+    my $file = 't/lib/SampleCode.pm';
+    ok_set_action file => $file, line => 5, code => '$main::a++', 'Create action to increment $a';
+    ok_set_action file => $file, line => 5, code => '$main::a=100', inactive => 1, 'Create inactive action';
+    db_continue;
+
+    do_test { }; # A null test so the debugger doesn't get disabled due to an empty test queue
 }
 

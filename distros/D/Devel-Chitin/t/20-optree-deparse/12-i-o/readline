@@ -1,0 +1,6 @@
+my $line = <ARGV>;
+$line = readline(*FH);
+$line = <FH>;
+my $fh;
+my @lines = readline($fh);
+@lines = readline(*$fh)

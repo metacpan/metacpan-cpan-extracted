@@ -1,0 +1,12 @@
+my($scalar, @list, %hash);
+my $a = \$scalar;
+$a = \\@list;
+$a = \\(@list, 1, 2);
+$a = \\%hash;
+$a = \\*scalar_assignment;
+$a = \\&scalar_assignment;
+$a = sub { my $inner = 1 };
+$a = sub {
+	first_thing();
+	second_thing()
+}

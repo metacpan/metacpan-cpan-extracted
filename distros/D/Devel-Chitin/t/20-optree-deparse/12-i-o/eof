@@ -1,0 +1,7 @@
+my $a = eof(F);
+$a = eof(*F);
+my $f;
+$a = eof($f);
+$a = eof(*$f);
+$a = eof;
+$a = eof()

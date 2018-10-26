@@ -1,0 +1,4 @@
+my $a;
+$a = abs();
+$a = abs($a);
+abs($a)

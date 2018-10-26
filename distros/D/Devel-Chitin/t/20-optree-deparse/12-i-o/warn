@@ -1,0 +1,2 @@
+warn('some list', 'of things', 1, 1.234);
+warn()

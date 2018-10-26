@@ -1,10 +1,28 @@
 ==================================================
-Changes from 2017-02-28 00:00:00 +0000 to present.
+Changes from 2017-10-24 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.005 at 2018-02-28 16:09:43 +0000
+version 0.006 at 2018-10-24 17:54:07 +0000
 ------------------------------------------
+
+  Change: 98de530b13b81bcca356c93034c548450b328e29
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-10-24 12:49:59 +0000
+
+    version bump 
+
+  Change: 63988d45b490bb4195bdec10ca92c8ea0b857a5b
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-10-24 12:48:07 +0000
+
+    Needed API access 
+
+  Change: beb5bf624c6e290826d3c64e3a1ab54fb7801d0c
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-02-28 10:11:16 +0000
+
+    Release 0.005 
 
   Change: 247533760c4fee021b0f7102b8452153b7450214
   Author: tedkat <tedkat@cpan.org>

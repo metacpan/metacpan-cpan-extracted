@@ -1,0 +1,4 @@
+my $a;
+$a = log();
+$a = log($a);
+log($a)

@@ -1,0 +1,3 @@
+my @files = glob('some *patterns{one,two}');
+my $file = glob('*.c');
+$file = glob('*.h')

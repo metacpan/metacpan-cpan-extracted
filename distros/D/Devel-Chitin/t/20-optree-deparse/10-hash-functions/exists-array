@@ -1,0 +1,2 @@
+my @array;
+my $a = exists($array[1])

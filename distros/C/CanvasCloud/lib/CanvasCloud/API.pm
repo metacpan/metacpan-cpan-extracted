@@ -1,5 +1,5 @@
 package CanvasCloud::API;
-$CanvasCloud::API::VERSION = '0.005';
+$CanvasCloud::API::VERSION = '0.006';
 # ABSTRACT: Base Class for talking Canvas LMS API
 
 use Moose;
@@ -106,7 +106,7 @@ CanvasCloud::API - Base Class for talking Canvas LMS API
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

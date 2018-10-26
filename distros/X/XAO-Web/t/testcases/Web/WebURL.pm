@@ -11,32 +11,28 @@ use base qw(XAO::testcases::Web::base);
 sub test_all {
     my $self=shift;
 
-    $ENV{DOCUMENT_ROOT}='/tmp';
-    $ENV{GATEWAY_INTERFACE}='CGI/1.1';
-    $ENV{HTTP_HOST}='www.xao.com';
-    $ENV{HTTP_USER_AGENT}='Mozilla/5.0';
-    $ENV{PATH_INFO}='/test/WebURL.html';
-    $ENV{QUERY_STRING}='a=1&b=2';
-    $ENV{REMOTE_ADDR}='127.0.0.1';
-    $ENV{REMOTE_PORT}='12345';
-    $ENV{REQUEST_METHOD}='GET';
-    $ENV{REQUEST_URI}='/WebURL.html';
-    $ENV{SCRIPT_FILENAME}='/usr/local/xao/handlers/xao-apache.pl';
-    $ENV{SCRIPT_NAME}='';
-    $ENV{SCRIPT_URI}='http://www.xao.com/WebURL.html';
-    $ENV{SCRIPT_URL}='/WebURL.html';
-    $ENV{SERVER_ADDR}='127.0.0.1';
-    $ENV{SERVER_ADMIN}='am@xao.com';
-    $ENV{SERVER_NAME}='xao.com';
-    $ENV{SERVER_PORT}='80';
-    $ENV{SERVER_PROTOCOL}='HTTP/1.1';
-    $ENV{SERVER_SOFTWARE}='Apache/1.3.26 (Unix)';
-
-    my $site=$self->web;
-    $self->assert(ref($site),
-                  "Can't load Web object");
-
-    my $cgi=XAO::Objects->new(objname => 'CGI');
+    my %testenv=(
+        DOCUMENT_ROOT       => '/tmp',
+        GATEWAY_INTERFACE   => 'CGI/1.1',
+        HTTP_HOST           => 'www.xao.com',
+        HTTP_USER_AGENT     => 'Mozilla/5.0',
+        PATH_INFO           => '/test/WebURL.html',
+        QUERY_STRING        => 'a=1&b=2',
+        REMOTE_ADDR         => '127.0.0.1',
+        REMOTE_PORT         => '12345',
+        REQUEST_METHOD      => 'GET',
+        REQUEST_URI         => '/WebURL.html?a=1&b=2',
+        SCRIPT_FILENAME     => '/usr/local/xa,/handlers/xao-apache.pl',
+        SCRIPT_NAME         => '',
+        SCRIPT_URI          => 'http://www.xao.com/WebURL.html',
+        SCRIPT_URL          => '/WebURL.html',
+        SERVER_ADDR         => '127.0.0.1',
+        SERVER_ADMIN        => 'am@xao.com',
+        SERVER_NAME         => 'xao.com',
+        SERVER_PORT         => '80',
+        SERVER_PROTOCOL     => 'HTTP/1.1',
+        SERVER_SOFTWARE     => 'Apache/1.3.26 (Unix)',
+    );
 
     my %matrix=(
         #
@@ -316,8 +312,98 @@ sub test_all {
         },
         snh => {
             https       => 1,
-            template => '<%URL x="js" insecure%>',
-            result => 'http://xao.com',
+            template    => '<%URL x="js" insecure%>',
+            result      => 'http://xao.com',
+        },
+        #
+        ua1 => {
+            env         => {
+                PATH_INFO           => '/test/',
+                QUERY_STRING        => '',
+                REQUEST_URI         => '/',
+                SCRIPT_URI          => 'http://xao.com/',
+                SCRIPT_URL          => '/',
+            },
+            template    => '<%URL base full%>',
+            result      => 'http://xao.com/',
+        },
+        ua2 => {
+            env         => {
+                PATH_INFO           => '/test/',
+                QUERY_STRING        => '',
+                REQUEST_URI         => '/',
+                SCRIPT_URI          => 'https://xao.com/',
+                SCRIPT_URL          => '/',
+                HTTPS               => 'on',
+            },
+            template    => '<%URL base full%>',
+            result      => 'https://xao.com/',
+        },
+        ua3 => {
+            env         => {
+                PATH_INFO           => '/test/',
+                QUERY_STRING        => '?a=1&b=2',
+                REQUEST_URI         => '/?a=1&b=2',
+                SCRIPT_URI          => 'http://xao.com/',
+                SCRIPT_URL          => '/',
+            },
+            template    => '<%URL secure%>',
+            result      => 'https://xao.com/',
+        },
+        ub1 => {
+            env         => {
+                PATH_INFO           => '/test/index.html',
+                QUERY_STRING        => '',
+                REQUEST_URI         => '/index.html',
+                SCRIPT_URI          => 'http://xao.com/index.html',
+                SCRIPT_URL          => '/index.html',
+            },
+            template    => '<%URL%>',
+            result      => 'http://xao.com/index.html',
+        },
+        ub2 => {
+            env         => {
+                PATH_INFO           => '/test/index.html',
+                QUERY_STRING        => '?foo=bar',
+                REQUEST_URI         => '/index.html?foo=bar',
+                SCRIPT_URI          => 'http://xao.com/index.html',
+                SCRIPT_URL          => '/index.html',
+            },
+            template    => '<%URL%>',
+            result      => 'http://xao.com/index.html',
+        },
+        uc1 => {
+            env         => {
+                PATH_INFO           => '/test/sub/dir/',
+                QUERY_STRING        => '',
+                REQUEST_URI         => '/sub/dir/',
+                SCRIPT_URI          => 'http://xao.com/sub/dir/',
+                SCRIPT_URL          => '/sub/dir/',
+            },
+            template    => '<%URL full%>',
+            result      => 'http://xao.com/sub/dir/',
+        },
+        uc2 => {
+            env         => {
+                PATH_INFO           => '/test/sub/dir/index.html',
+                QUERY_STRING        => '',
+                REQUEST_URI         => '/sub/dir/index.html',
+                SCRIPT_URI          => 'http://xao.com/sub/dir/index.html',
+                SCRIPT_URL          => '/sub/dir/index.html',
+            },
+            template    => '<%URL full%>',
+            result      => 'http://xao.com/sub/dir/index.html',
+        },
+        uc3 => {
+            env         => {
+                PATH_INFO           => '/test/sub/dir/index.html',
+                QUERY_STRING        => '?query',
+                REQUEST_URI         => '/sub/dir/index.html?query',
+                SCRIPT_URI          => 'http://xao.com/sub/dir/index.html',
+                SCRIPT_URL          => '/sub/dir/index.html',
+            },
+            template    => '<%URL full%>',
+            result      => 'http://xao.com/sub/dir/index.html',
         },
     );
 
@@ -329,23 +415,33 @@ sub test_all {
         # Other modules and extensions might be calling XAO with HTTPS
         # environment expecting the default to switch to https.
         #
+        my $overenv=$matrix{$test}->{'env'} || {};
         if($matrix{$test}->{'https'}) {
-            $ENV{'HTTPS'}='on';
-        }
-        else {
-            delete $ENV{'HTTPS'};
+            $overenv->{'HTTPS'}='on';
         }
 
-        my $got=$site->expand(
-            cgi     => $cgi,
-            path    => '/WebURL.html',
-            objargs => {
-                TEMPLATE    => $template,
-            },
-        );
+        my $newenv=merge_refs(\%testenv,$overenv);
+        if(1) {
+            local %ENV;
+            @ENV{keys %$newenv}=values %$newenv;
 
-        $self->assert($got eq $expect,
-                      "Test $test failed - expected '$expect', got '$got'");
+            my $site=$self->web;
+            $self->assert(ref($site),
+                  "Can't load Web object");
+
+            my $cgi=XAO::Objects->new(objname => 'CGI');
+
+            my $got=$site->expand(
+                cgi     => $cgi,
+                path    => '/WebURL.html',
+                objargs => {
+                    TEMPLATE    => $template,
+                },
+            );
+
+            $self->assert($got eq $expect,
+                "Test $test failed - expected '$expect', got '$got'");
+        }
     }
 }
 

@@ -7,7 +7,7 @@ use warnings;
 
 use base qw/ Alien::Base /;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 
 1;
@@ -24,11 +24,23 @@ Alien::TidyHTML5 - Download and install HTML Tidy
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
+
+=head1 DESCRIPTION
+
+This distribution provides tidy (a.k.a. "libtidy" or "html-tidy")
+v5.6.0 or newer, so that it can be used by other Perl
+distributions. . It does this by first trying to detect an existing
+install of tidy on your system. If found it will use that. If it
+cannot be found, the source code will be downloaded from the official
+git repository, and it will be installed in a private share location
+for the use of other modules.
 
 =head1 SEE ALSO
 
 L<http://www.html-tidy.org/>
+
+L<Alien::Build::Manual::AlienUser>
 
 =head1 SOURCE
 
@@ -47,6 +59,9 @@ feature.
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+The initial development of this module was sponsored by Science Photo
+Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -4,7 +4,7 @@ use strict;
 
 package Devel::Chitin;
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use Scalar::Util;
 use IO::File;
@@ -96,6 +96,49 @@ sub stepout {
 sub continue {
     $DB::single=0;
     return 1;
+}
+
+sub continue_to {
+    my $self = shift;
+    my($file, $line);
+    if (@_ == 1) {
+        # passed in a subname
+        ($file, $line) = $self->_determine_first_breakable_line_of_sub($_[0]);
+    } elsif (@_ == 2) {
+        ($file, $line) = @_;
+    }
+
+    return unless $file;  # bad args
+
+    my $rv = Devel::Chitin::Breakpoint->new(file => $file, line => $line, once => 1, code => 1);
+    $DB::single=0 if $rv;
+    return $rv;
+}
+
+sub _determine_first_breakable_line_of_sub {
+    my($self, $sub) = @_;
+
+    my $subref;
+    if (! ref($sub)) {
+        $subref = do {
+            no strict 'refs';
+            \&$sub;
+        };
+
+    } elsif (Scalar::Util::reftype($sub) eq 'CODE') {
+        $subref = $sub;
+    } else {
+        return;
+    }
+    my $cv = B::svref_2object($subref);
+    my $op = $cv->START;
+    while($op && !$op->isa('B::NULL')) {
+        if ($op->isa('B::COP')) {
+            return ($op->file, $op->line);
+        }
+        $op = $op->next;
+    }
+    return;
 }
 
 sub trace {
@@ -196,10 +239,7 @@ sub remove_watchexpr {
 
 sub is_breakable {
     my($class, $filename, $line) = @_;
-
-    use vars qw(@dbline);
-    local(*dbline) = $main::{'_<' . $filename};
-    return $dbline[$line] + 0;   # FIXME change to == 0
+    Devel::Chitin::Actionable->is_breakable($filename, $line);
 }
 
 sub add_break {
@@ -298,6 +338,7 @@ sub file_source {
 
 my %optrees;
 our $current_sub;
+sub current_sub { $current_sub }
 sub _get_optree_for_current_sub {
     my $loc = current_location;
 
@@ -473,7 +514,12 @@ sub _do_each_client {
 
 package DB;
 
-use vars qw( %dbline @dbline );
+# If we wanted to only support 5.20 and later, these could go away and be
+# replaced by a lexical glob $dbline in subs where it's needed.
+# see details in
+# https://metacpan.org/pod/release/RJBS/perl-5.20.0/pod/perldelta.pod
+# https://rt.perl.org/Public/Bug/Display.html?id=119799
+our(%dbline, @dbline);
 
 our($stack_depth,
     $single,
@@ -579,8 +625,13 @@ sub is_breakpoint {
         foreach my $condition ( @{ $dbline{$line}->{$breakpoint_key} }) {
             next if $condition->inactive;
             my $code = $condition->code;
+
+            no warnings 'uninitialized';
             if ($code eq '1') {
                 $should_break = 1;
+            } elsif (Scalar::Util::reftype($code) eq 'CODE') {
+                local $@;
+                $should_break = eval { $code->() };
             } else {
                 ($should_break) = _eval_in_program_context($condition->code, 0);
             }
@@ -692,6 +743,15 @@ sub DB {
     }
     $subroutine ||= 'MAIN';
 
+    $current_location = Devel::Chitin::Location->new(
+        'package'   => $package,
+        filename    => $filename,
+        line        => $line,
+        subroutine  => $subroutine,
+        callsite    => scalar Devel::Chitin::Location::get_callsite(),
+        ( ref($Devel::Chitin::current_sub) ? ( subref => $Devel::Chitin::current_sub ) : () )
+    );
+
     unless ($is_initialized) {
         $is_initialized = 1;
         Devel::Chitin::_do_each_client('init');
@@ -703,14 +763,6 @@ sub DB {
     save();
     local $usercontext =
         'no strict; no warnings; ($@, $!, $^E, $,, $/, $\, $^W) = @DB::saved;' . "package $package;";
-
-    $current_location = Devel::Chitin::Location->new(
-        'package'   => $package,
-        filename    => $filename,
-        line        => $line,
-        subroutine  => $subroutine,
-        callsite    => scalar Devel::Chitin::Location::get_callsite(),
-    );
 
     $_->notify_trace($current_location) foreach values(%trace_clients);
 
@@ -824,6 +876,40 @@ sub sub {
     delete $Devel::Chitin::eval_serial{$$stack_tracker} if $stack_tracker;
 
     return wantarray ? @rv : $rv[0];
+}
+
+sub lsub : lvalue {
+    no strict 'refs';
+    goto &$sub if (! $ready or index($sub, 'Devel::Chitin::StackTracker') == 0 or $debugger_disabled);
+
+    local $Devel::Chitin::current_sub = $sub unless $in_debugger;
+
+    local @AUTOLOAD_names = @AUTOLOAD_names;
+    if (index($sub, '::AUTOLOAD', -10) >= 0) {
+        my $caller_pkg = substr($sub, 0, length($sub)-8);
+        my $caller_AUTOLOAD = ${ $caller_pkg . 'AUTOLOAD'};
+        unshift @AUTOLOAD_names, $caller_AUTOLOAD;
+    }
+    my $stack_tracker;
+    local @Devel::Chitin::stack_serial = @Devel::Chitin::stack_serial;
+    unless ($in_debugger) {
+        $stack_depth++;
+        $stack_tracker = _new_stack_tracker(_allocate_sub_serial());
+
+        my $subname = $sub;
+        if (ref $sub) {
+            my $cv = B::svref_2object($sub);
+            my $gv = $cv->GV;
+            if (my $name = $gv->NAME) {
+                my $package = $gv->STASH->NAME;
+                $subname = join('::', $package, $name);
+            }
+        }
+
+        push(@Devel::Chitin::stack_serial, [ $subname, $$stack_tracker]);
+    }
+
+    &$sub;
 }
 
 sub _new_stack_tracker {

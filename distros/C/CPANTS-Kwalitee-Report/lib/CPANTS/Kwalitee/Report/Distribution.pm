@@ -1,6 +1,6 @@
 package CPANTS::Kwalitee::Report::Distribution;
 
-$CPANTS::Kwalitee::Report::Distribution::VERSION   = '0.10';
+$CPANTS::Kwalitee::Report::Distribution::VERSION   = '0.11';
 $CPANTS::Kwalitee::Report::Distribution::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ CPANTS::Kwalitee::Report::Distribution - CPANTS Kwalitee Report Distribution.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 

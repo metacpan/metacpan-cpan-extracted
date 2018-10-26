@@ -33,22 +33,22 @@ name: Statistics-Descriptive
 provides:
   Statistics::Descriptive:
     file: lib/Statistics/Descriptive.pm
-    version: '3.0701'
+    version: '3.0702'
   Statistics::Descriptive::Full:
     file: lib/Statistics/Descriptive/Full.pm
-    version: '3.0701'
+    version: '3.0702'
   Statistics::Descriptive::Smoother:
     file: lib/Statistics/Descriptive/Smoother.pm
-    version: '3.0701'
+    version: '3.0702'
   Statistics::Descriptive::Smoother::Exponential:
     file: lib/Statistics/Descriptive/Smoother/Exponential.pm
-    version: '3.0701'
+    version: '3.0702'
   Statistics::Descriptive::Smoother::Weightedexponential:
     file: lib/Statistics/Descriptive/Smoother/Weightedexponential.pm
-    version: '3.0701'
+    version: '3.0702'
   Statistics::Descriptive::Sparse:
     file: lib/Statistics/Descriptive/Sparse.pm
-    version: '3.0701'
+    version: '3.0702'
 requires:
   Carp: '0'
   List::MoreUtils: '0'
@@ -64,10 +64,10 @@ resources:
   bugtracker: https://github.com/shlomif/perl-Statistics-Descriptive/issues
   homepage: http://metacpan.org/release/Statistics-Descriptive
   repository: git://github.com/shlomif/perl-Statistics-Descriptive.git
-version: '3.0701'
+version: '3.0702'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.028000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -413,5 +413,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

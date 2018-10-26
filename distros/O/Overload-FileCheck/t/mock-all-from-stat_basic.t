@@ -38,7 +38,29 @@ foreach my $l (<DATA>) {
     }
 
     next unless $l =~ qr{^[!-]};
-    ok eval $l, $l;
+    ok eval $l, $l or diag $@;
+}
+
+# some extra check
+
+if ( $] >= 5.016 ) {
+
+    like(
+        dies {
+            -e 'fake.dir' && !-l _
+        },
+        qr/\QThe stat preceding -l _ wasn't an lstat\E/,
+        "The stat preceding -l _ wasn't an lstat: -e 'fake.dir' && !-l -"
+    );
+
+    like(
+        dies {
+            -e 'regular.file' && !-l _
+        },
+        qr/\QThe stat preceding -l _ wasn't an lstat\E/,
+        "The stat preceding -l _ wasn't an lstat: -e 'fake.dir' && !-l -"
+    );
+
 }
 
 done_testing;
@@ -122,7 +144,6 @@ __DATA__
 # checking _ on a directory
 -e 'fake.dir'
 -d _
-!-l _
 -s _
 !-S _
 # checking some oneliners
@@ -138,7 +159,6 @@ __DATA__
 -e 'regular.file'
 -f _
 !-d _
-!-l _
 -s _
 !-z _
 !-S _

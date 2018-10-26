@@ -1,0 +1,2 @@
+my $a = chmod(0755, '/some/file/name', '/other/file');
+chmod(04322, 'foo')

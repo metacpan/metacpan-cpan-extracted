@@ -1,0 +1,5 @@
+my $a = 1;
+package Foo;
+my $b = 2;
+package Bar;
+my $c = 3

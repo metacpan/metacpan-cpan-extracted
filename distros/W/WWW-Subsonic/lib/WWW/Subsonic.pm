@@ -18,7 +18,7 @@ use version 0.77;
 # Clean Up the Namespace
 use namespace::autoclean;
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 
 has 'protocol' => (
@@ -174,7 +174,7 @@ WWW::Subsonic - Interface with the Subsonic API
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

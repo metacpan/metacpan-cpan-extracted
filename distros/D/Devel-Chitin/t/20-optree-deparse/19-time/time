@@ -1,0 +1,2 @@
+my $a = time();
+time()

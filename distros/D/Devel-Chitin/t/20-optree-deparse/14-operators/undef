@@ -1,0 +1,8 @@
+my $a = undef;
+undef($a);
+my(@a, %a);
+undef($a[1]);
+undef($a{'foo'});
+undef(@a);
+undef(%a);
+undef(&some::function::name)

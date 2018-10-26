@@ -1,0 +1,5 @@
+BEGIN { skip "requires 5.14.0" if $^V lt v5.14.0 } # omit
+use v5.14.0; # omit
+no warnings 'misc'; # omit
+my $a;
+$a = tr/$a/zyxw/cdsr

@@ -1,28 +1,42 @@
 {
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Linux-Inotify2",
    "no_index" : {
       "directory" : [
          "t",
          "inc"
       ]
    },
-   "meta-spec" : {
-      "version" : 1.4,
-      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "common::sense" : "0"
+         }
+      }
    },
-   "generated_by" : "ExtUtils::MakeMaker::JSONMETA version 7.000",
-   "distribution_type" : "module",
-   "version" : "1.22",
-   "name" : "Linux-Inotify2",
-   "author" : [],
-   "license" : "unknown",
-   "build_requires" : {
-      "ExtUtils::MakeMaker" : 0
-   },
-   "requires" : {
-      "common::sense" : 0
-   },
-   "abstract" : null,
-   "configure_requires" : {
-      "ExtUtils::MakeMaker" : 0
-   }
+   "release_status" : "stable",
+   "version" : "2.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,0 +1,5 @@
+no warnings 'exec'; # omit
+my $rv = exec('/bin/echo', 'hi', 'there');
+$rv = exec('/bin/echo | cat');
+$rv = exec { '/bin/echo' } ('hi', 'there');
+my $a = exec $rv ('hi', 'there')

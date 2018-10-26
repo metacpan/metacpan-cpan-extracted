@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 cPanel, Inc.
+# Copyright (c) 2018 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -11,9 +11,7 @@ package Test::OpenStack::Client::Response;
 use strict;
 use warnings;
 
-use Test::OpenStack::Client::Message ();
-
-our @ISA = qw(Test::OpenStack::Client::Message);
+use base qw(Test::OpenStack::Client::Message OpenStack::Client::Response);
 
 sub new ($%) {
     my ($class, %opts) = @_;

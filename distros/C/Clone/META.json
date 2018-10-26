@@ -34,7 +34,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Clone"
+         "web" : "https://github.com/garu/Clone/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -43,6 +43,6 @@
          "url" : "http://github.com/garu/Clone"
       }
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

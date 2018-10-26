@@ -1,0 +1,9 @@
+use Fcntl qw(:DEFAULT); # omit
+my $rv = sysopen(F, '/path/name', O_RDONLY);
+$rv = sysopen(*F, '/path_name', O_RDWR | O_TRUNC);
+sysopen(my $fh, '/path/name', O_WRONLY | O_CREAT, 0777);
+my $mode;
+sysopen($fh, '/path/name', O_WRONLY | O_CREAT, $mode);
+sysopen(*$fh, '/path/name', O_WRONLY | O_CREAT | O_EXCL);
+my $flags;
+sysopen($fh, '/path/name', $flags)

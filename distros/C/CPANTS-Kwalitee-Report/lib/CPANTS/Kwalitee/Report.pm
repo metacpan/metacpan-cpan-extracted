@@ -1,6 +1,6 @@
 package CPANTS::Kwalitee::Report;
 
-$CPANTS::Kwalitee::Report::VERSION   = '0.10';
+$CPANTS::Kwalitee::Report::VERSION   = '0.11';
 $CPANTS::Kwalitee::Report::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ CPANTS::Kwalitee::Report - CPANTS Kwalitee Report.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -29,7 +29,7 @@ use CPANTS::Kwalitee::Report::Indicator;
 use CPANTS::Kwalitee::Report::Distribution;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 our $PAUSE_INDEX = 'http://www.cpan.org/modules/02packages.details.txt.gz';
 our $RECENT_MODS = 'https://metacpan.org/feed/recent';

@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::LOGOP;
 use base 'Devel::Chitin::OpTree::UNOP';
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 use strict;
 use warnings;

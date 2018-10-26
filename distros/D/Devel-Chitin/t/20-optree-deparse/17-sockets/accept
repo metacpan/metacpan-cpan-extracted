@@ -1,0 +1,2 @@
+my($a, $b);
+my $rv = accept($a, $b)

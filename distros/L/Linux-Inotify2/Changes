@@ -3,6 +3,19 @@ Revision history for Linux::Inotify2
 TODO: document move/renaming issues for fullname
 TODO: find_watchers($path), or maybe just ->watchers
 
+2.0  Thu Oct 25 03:19:08 CEST 2018
+	- fix poll and read documentation w.r.t. errors - this changes the
+          documented API, but is how the module has always behaved.
+	- mention https://lwn.net/Articles/605128/ in the docs.
+	- new on_overflow callback, called for overflow events.
+        - new ->broadcast method that calls all watchers with some event.
+        - automatically broadcast overflow events to all watchers by default.
+	- read now returns all events (except ignored ones), not just ones
+          it has registered watchers for (e.g. overflow events).
+	- reduced dependencies (Mike Pomraning).
+        - add IN_EXCL_UNLINK flag.
+        - more efficient constant initialisation.
+
 1.22 Tue Jun 14 08:34:38 CEST 2011
 	- use a more useful definition of IN_xxx methods - any bits, not
           a match. (pointed out by Anatoliy Grishayev).
@@ -30,7 +43,7 @@ TODO: find_watchers($path), or maybe just ->watchers
 	- removed debugging code accidentally left in.
         - streaming API didn't always return properly blessed objects.
 
-1.0  Mon Dec 19 17:48:01 CET 2005                                                                                                 
+1.0  Mon Dec 19 17:48:01 CET 2005
 	- incorporated a major patch by Andrejs Dubovskis:
         - added a non-callback interface to read events
         - better error handling in non-blocking case.

@@ -1,0 +1,2 @@
+my $a;
+my $r = tied($a)

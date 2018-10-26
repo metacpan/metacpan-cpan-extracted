@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/reyjrar/WWW-Subsonic/issues
   homepage: https://github.com/reyjrar/WWW-Subsonic
   repository: https://github.com/reyjrar/WWW-Subsonic.git
-version: '0.007'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -287,7 +287,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
       name: Git::NextVersion
       version: '2.043'
@@ -309,7 +309,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
       name: Git::Check
       version: '2.043'
@@ -342,7 +342,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -355,11 +355,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.007
+          tag: v0.008
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -382,7 +382,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -396,7 +396,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
       name: Git::Push
       version: '2.043'

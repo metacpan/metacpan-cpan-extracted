@@ -57,7 +57,6 @@ like(
 push @mocked_files, Test::MockFile->symlink( '/aaa', '/bbb' );
 push @mocked_files, Test::MockFile->symlink( '/bbb', '/aaa' );
 is( Test::MockFile::_find_file_or_fh( '/aaa', 1 ), [], "_find_file_or_fh('/aaaa', 1) - with circular links" );
-is( $!, "Too many levels of symbolic links", '$! text message' );
 is( $! + 0, ELOOP, '$! is ELOOP' );
 
 note "_mock_stat";

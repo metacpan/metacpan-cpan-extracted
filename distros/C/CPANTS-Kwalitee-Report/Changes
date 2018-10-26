@@ -1,5 +1,8 @@
 Revision history for CPANTS::Kwalitee::Report
 
+0.11  Thu Oct 25 18:10:00 2018
+      - Used namespace::autoclean instead.
+
 0.10  Mon May 29 08:25:00 2017
       - Tidied up attributes definition using 'lazy' and 'builder'.
 

@@ -27,10 +27,11 @@ requires:
   HTML::Table::FromDatabase: '1.1'
   HTML::TreeBuilder: '5.03'
   List::MoreUtils: '0.416'
+  Moo: '0'
   Test::Differences: '0.64'
   Test::More: '0'
 resources:
   bugtracker: https://github.com/bigpresh/Dancer-Plugin-SimpleCRUD/issues
   homepage: https://github.com/bigpresh/Dancer-Plugin-SimpleCRUD/wiki/Quick-intro
   repository: https://github.com/bigpresh/Dancer-Plugin-SimpleCRUD
-version: '1.15'
+version: '1.16'

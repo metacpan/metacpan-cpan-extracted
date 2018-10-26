@@ -1,0 +1,2 @@
+BEGIN { skip "requires 5.10.1" if $^V lt v5.10.1 } # omit
+mkdir()

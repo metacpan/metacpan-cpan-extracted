@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -41,7 +41,7 @@
             "MooX::Options" : "4.023",
             "Parse::CPAN::Packages" : "2.40",
             "XML::RSS::Parser" : "4.0",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -49,23 +49,23 @@
    "provides" : {
       "CPANTS::Kwalitee::Report" : {
          "file" : "lib/CPANTS/Kwalitee/Report.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "CPANTS::Kwalitee::Report::Distribution" : {
          "file" : "lib/CPANTS/Kwalitee/Report/Distribution.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "CPANTS::Kwalitee::Report::Generator" : {
          "file" : "lib/CPANTS/Kwalitee/Report/Generator.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "CPANTS::Kwalitee::Report::Indicator" : {
          "file" : "lib/CPANTS/Kwalitee/Report/Indicator.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "CPANTS::Kwalitee::Report::Score" : {
          "file" : "lib/CPANTS/Kwalitee/Report/Score.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -76,6 +76,6 @@
          "web" : "https://github.com/manwar/CPANTS-Kwalitee-Report"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

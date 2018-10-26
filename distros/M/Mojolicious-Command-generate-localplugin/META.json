@@ -4,13 +4,13 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Mojolicious-Command-generate-localplugin",
    "prereqs" : {
@@ -28,15 +28,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.75",
+            "Mojolicious" : "8.0",
             "Test::More" : "0"
          }
       }
    },
    "provides" : {
-      "Mojolicious::Command::generate::localplugin" : {
-         "file" : "lib/Mojolicious/Command/generate/localplugin.pm",
-         "version" : "0.01"
+      "Mojolicious::Command::Author::generate::localplugin" : {
+         "file" : "lib/Mojolicious/Command/Author/generate/localplugin.pm",
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -51,7 +51,7 @@
          "web" : "http://github.com/reneeb/Mojolicious-Command-generate-localplugin"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

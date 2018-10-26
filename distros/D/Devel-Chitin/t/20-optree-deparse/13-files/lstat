@@ -1,0 +1,8 @@
+my @rv = lstat(FH);
+@rv = lstat(*FH);
+@rv = lstat(_);
+my $fh;
+my($dev, $ino, undef, $nlink) = lstat($fh);
+@rv = lstat(*$fh);
+lstat();
+lstat('/path/to/file')

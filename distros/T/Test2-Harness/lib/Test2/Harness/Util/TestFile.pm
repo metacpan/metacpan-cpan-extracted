@@ -2,7 +2,7 @@ package Test2::Harness::Util::TestFile;
 use strict;
 use warnings;
 
-our $VERSION = '0.001069';
+our $VERSION = '0.001070';
 
 use Carp qw/croak/;
 
@@ -10,7 +10,7 @@ use Time::HiRes qw/time/;
 
 use File::Spec();
 
-use List::Util qw/uniq/;
+use List::Util 1.45 qw/uniq/;
 
 use Test2::Harness::Util qw/open_file/;
 

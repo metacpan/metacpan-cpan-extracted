@@ -1,0 +1,6 @@
+my($a, @list, @rv);
+$a = splice(@list);
+@rv = splice(@list, 1);
+@rv = splice(@list, 1, 2);
+@rv = splice(@list, 1, 2, @rv);
+@rv = splice(@list, 1, 2, 3, 4, 5)

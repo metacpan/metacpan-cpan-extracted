@@ -1,0 +1,8 @@
+BEGIN { skip "requires 5.16.0" if $^V lt v5.16.0 } # omit
+no warnings 'void'; # omit
+use v5.16.0; # omit
+my $a = 'aAbBcC';
+$a = fc($a);
+fc($a);
+$a = fc();
+print qq(ab\F$a\E)

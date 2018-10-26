@@ -1,3 +1,8 @@
+0.017 - 2018/10/25
+- only warn on incomplete field protection if there is actually a critical
+  field unsigned and not already if the signature would allow such addition
+- additionally warn if 'l' is used and non-white-space is outside the
+  body signature
 0.016 - 2018/09/25
 - detects if header field protection is incomplete, check VerifyResult::warning
 - small improvements to scripts

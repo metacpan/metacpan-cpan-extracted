@@ -10,7 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI;
-$Config::Model::TkUI::VERSION = '1.367';
+$Config::Model::TkUI::VERSION = '1.368';
 use 5.10.1;
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ use Tk::FontDialog;
 use Tk::Pod;
 use Tk::Pod::Text;    # for findpod
 
-use Config::Model 2.114; # Node::gist
+use Config::Model 2.123; # New style of backend
 
 use Config::Model::Tk::LeafEditor;
 use Config::Model::Tk::CheckListEditor;
@@ -712,6 +712,8 @@ sub apply_filter {
             }
             my $obj = $node->fetch_element($elt);
             my $loc = $obj->location;
+            # make sure that the hash ref stays attached to $data_ref
+            $data_ref->{actions} //= {};
             my $inner_ref = { actions => $data_ref->{actions} };
             $scanner->scan_element($inner_ref, $node,$elt);
             my $action = $combine_hash{$filter_action}{$inner_ref->{return}};

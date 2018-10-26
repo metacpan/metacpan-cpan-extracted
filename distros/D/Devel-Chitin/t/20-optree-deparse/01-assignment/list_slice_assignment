@@ -1,0 +1,3 @@
+my(@the_list, $idx);
+my @other_list;
+@the_list[1, $idx, 3, @other_list] = @other_list[1, 2, 3]

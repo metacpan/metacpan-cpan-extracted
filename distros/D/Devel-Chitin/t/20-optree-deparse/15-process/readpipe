@@ -1,0 +1,5 @@
+my $rv = `/bin/echo 'hi','there'`;
+$rv = `$rv`;
+$rv = readpipe('/bin/echo "hi","there"');
+$rv = readpipe($rv);
+$rv = readpipe(foo())

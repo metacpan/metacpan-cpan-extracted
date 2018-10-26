@@ -1,0 +1,11 @@
+BEGIN { skip "incompatible starting with 5.22.0" if $^V ge v5.22.0 } # omit
+# Starting with 5.22, hash key lookups use the multideref OP, which has
+# no mechanism for distinguishing between a bareword key and a key with
+# string quotes around it
+my(%a, $a);
+$a{key} = 1;
+$a{'key'} = 1;
+$a{'1'} = 1;
+$a->{key} = 1;
+$a->{'key'} = 1;
+$a->{'1'} = 1

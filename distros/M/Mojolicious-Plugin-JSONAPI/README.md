@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 2.1
+version 2.2
 
 # SYNOPSIS
 
@@ -132,14 +132,13 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
     schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
     sure comments is passed in as a plural noun here.
 
-## render\_error(_Str_ $status, _ArrayRef|Str_ $errors, _HashRef_ $data. _HashRef_ $meta)
+## render\_error(_Str_ $status, _ArrayRef|Str_ $errors, _HashRef_ $meta?)
 
 Renders a JSON response under the required top-level `errors` key. `errors` should be an array reference of error objects
 as described in the specification, or a string that will be the content of _title_.
 See [Error Objects](http://jsonapi.org/format/#error-objects).
 
-Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
-to the response as-is. Use `resource_document` to generate the right structure for this argument.
+Can optionally provide meta information, which will be added to the response as-is.
 
 ## requested\_resources
 

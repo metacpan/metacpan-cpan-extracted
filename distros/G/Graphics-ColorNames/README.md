@@ -4,7 +4,7 @@ Graphics::ColorNames - defines RGB values for common color names
 
 # VERSION
 
-version v3.3.0
+version v3.3.1
 
 # SYNOPSIS
 
@@ -284,6 +284,7 @@ Robert Rothenberg <rrwo@cpan.org>
 - Gary Vollink <gary@vollink.com>
 - Claus Färber <cfaerber@cpan.org>
 - Andreas J. König <andk@cpan.org>
+- Slaven Rezić <slaven@rezic.de>
 
 # COPYRIGHT AND LICENSE
 

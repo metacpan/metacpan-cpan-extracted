@@ -1,0 +1,7 @@
+my $val = do { sub_name() };
+$val = do {
+	first_thing();
+	second_thing(1);
+	third_thing(1, 2, 3)
+};
+print 'done'

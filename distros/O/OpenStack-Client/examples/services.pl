@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 #
-# Copyright (c) 2015 cPanel, Inc.
+# Copyright (c) 2018 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #

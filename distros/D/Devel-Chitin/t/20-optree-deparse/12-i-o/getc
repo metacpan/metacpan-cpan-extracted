@@ -1,0 +1,2 @@
+my $a = getc(F);
+$a = getc()

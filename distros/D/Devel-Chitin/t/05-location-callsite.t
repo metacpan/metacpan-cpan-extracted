@@ -1,53 +1,48 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0; no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(has_callsite ok_location db_continue do_test);
 use Devel::Chitin::Location;
 
-unless (has_callsite) {
-    print "# SKIP - Devel::Callsite not available\n";
+$DB::single=1;
+for ( 1 .. 2 ) {
+    $DB::single=1;
+    12;
 }
+$DB::single=1; 14; $DB::single=1; 14;
 
-run_test(
-    has_callsite() ? 4 : undef,
-    sub {
-        for ( 1 .. 2 ) {
-            $DB::single=1;
-            22;
-        }
-        $DB::single=1; 24; $DB::single=1; 24;
-    },
-    \&set_loop_callsite,
-    'continue',
-    \&check_loop_callsite,
-    'continue',
-    \&set_sequential_callsite,
-    'continue',
-    \&check_sequential_callsite,
-    'done',
-);
+sub __tests__ {
+    if (has_callsite) {
+        plan tests => 4;
+    } else {
+        plan skip_all => 'Devel::Callsite not available';
+    }
 
-my $loop_callsite;
-sub set_loop_callsite {
-    my($db,$loc) = @_;
-    Test::More::ok($loop_callsite = $loc->callsite, 'Getting callsite inside loop');
-}
+    my $loop_callsite;
+    db_continue;
+    do_test {
+        my $loc = shift;
+        ok($loop_callsite = $loc->callsite, 'Getting callsite inside loop');
+    };
 
-sub check_loop_callsite {
-    my($db,$loc) = @_;
-    Test::More::is($loc->callsite, $loop_callsite, 'In loop, callsite is the same');
-}
+    db_continue;
+    do_test {
+        my $loc = shift;
+        is($loc->callsite, $loop_callsite, 'Callsite same second time in loop');
+    };
 
-my $seq_callsite;
-sub set_sequential_callsite {
-    my($db,$loc) = @_;
-    Test::More::ok($seq_callsite = $loc->callsite, 'Getting callsite in sequential statement');
-}
+    my $sequential_callsite;
+    db_continue;
+    do_test {
+        my $loc = shift;
+        ok($sequential_callsite = $loc->callsite, 'Getting callsite for sequential statement');
+    };
 
-sub check_sequential_callsite {
-    my($db,$loc) = @_;
-    Test::More::isnt($loc->callsite, $seq_callsite, 'In sequential statements, callsite is different');
+    db_continue;
+    do_test {
+        my $loc = shift;
+        isnt($loc->callsite, $sequential_callsite, 'Second in sequence has different callsite');
+    };
 }

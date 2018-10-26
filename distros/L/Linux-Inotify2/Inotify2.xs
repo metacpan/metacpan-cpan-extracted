@@ -15,31 +15,39 @@ PROTOTYPES: ENABLE
 
 BOOT:
 {
-        HV *stash = gv_stashpv ("Linux::Inotify2", 0);
+	HV *stash = GvSTASH (CvGV (cv));
 
-        newCONSTSUB (stash, "IN_ACCESS"       , newSViv (IN_ACCESS));
-        newCONSTSUB (stash, "IN_MODIFY"       , newSViv (IN_MODIFY));
-        newCONSTSUB (stash, "IN_ATTRIB"       , newSViv (IN_ATTRIB));
-        newCONSTSUB (stash, "IN_CLOSE_WRITE"  , newSViv (IN_CLOSE_WRITE	));
-        newCONSTSUB (stash, "IN_CLOSE_NOWRITE", newSViv (IN_CLOSE_NOWRITE));
-        newCONSTSUB (stash, "IN_OPEN"         , newSViv (IN_OPEN));
-        newCONSTSUB (stash, "IN_MOVED_FROM"   , newSViv (IN_MOVED_FROM));
-        newCONSTSUB (stash, "IN_MOVED_TO"     , newSViv (IN_MOVED_TO));
-        newCONSTSUB (stash, "IN_CREATE"       , newSViv (IN_CREATE));
-        newCONSTSUB (stash, "IN_DELETE"       , newSViv (IN_DELETE));
-        newCONSTSUB (stash, "IN_DELETE_SELF"  , newSViv (IN_DELETE_SELF));
-        newCONSTSUB (stash, "IN_MOVE_SELF"    , newSViv (IN_MOVE_SELF));
-        newCONSTSUB (stash, "IN_UNMOUNT"      , newSViv (IN_UNMOUNT));
-        newCONSTSUB (stash, "IN_Q_OVERFLOW"   , newSViv (IN_Q_OVERFLOW));
-        newCONSTSUB (stash, "IN_IGNORED"      , newSViv (IN_IGNORED));
-        newCONSTSUB (stash, "IN_CLOSE"        , newSViv (IN_CLOSE));
-        newCONSTSUB (stash, "IN_MOVE"         , newSViv (IN_MOVE));
-        newCONSTSUB (stash, "IN_ONLYDIR"      , newSViv (IN_ONLYDIR));
-        newCONSTSUB (stash, "IN_DONT_FOLLOW"  , newSViv (IN_DONT_FOLLOW));
-        newCONSTSUB (stash, "IN_MASK_ADD"     , newSViv (IN_MASK_ADD));
-        newCONSTSUB (stash, "IN_ISDIR"        , newSViv (IN_ISDIR));
-        newCONSTSUB (stash, "IN_ONESHOT"      , newSViv (IN_ONESHOT));
-        newCONSTSUB (stash, "IN_ALL_EVENTS"   , newSViv (IN_ALL_EVENTS));
+        static const struct civ { const char *name; IV iv; } *civ, const_iv[] = {
+          { "IN_ACCESS"       , IN_ACCESS        },
+          { "IN_MODIFY"       , IN_MODIFY        },
+          { "IN_ATTRIB"       , IN_ATTRIB        },
+          { "IN_CLOSE_WRITE"  , IN_CLOSE_WRITE	 },
+          { "IN_CLOSE_NOWRITE", IN_CLOSE_NOWRITE },
+          { "IN_OPEN"         , IN_OPEN          },
+          { "IN_MOVED_FROM"   , IN_MOVED_FROM    },
+          { "IN_MOVED_TO"     , IN_MOVED_TO      },
+          { "IN_CREATE"       , IN_CREATE        },
+          { "IN_DELETE"       , IN_DELETE        },
+          { "IN_DELETE_SELF"  , IN_DELETE_SELF   },
+          { "IN_MOVE_SELF"    , IN_MOVE_SELF     },
+          { "IN_UNMOUNT"      , IN_UNMOUNT       },
+          { "IN_Q_OVERFLOW"   , IN_Q_OVERFLOW    },
+          { "IN_IGNORED"      , IN_IGNORED       },
+          { "IN_CLOSE"        , IN_CLOSE         },
+          { "IN_MOVE"         , IN_MOVE          },
+          { "IN_ONLYDIR"      , IN_ONLYDIR       },
+          { "IN_DONT_FOLLOW"  , IN_DONT_FOLLOW   },
+#if IN_EXCL_UNLINK
+          { "IN_EXCL_UNLINK"  , IN_EXCL_UNLINK   },
+#endif
+          { "IN_MASK_ADD"     , IN_MASK_ADD      },
+          { "IN_ISDIR"        , IN_ISDIR         },
+          { "IN_ONESHOT"      , IN_ONESHOT       },
+          { "IN_ALL_EVENTS"   , IN_ALL_EVENTS    },
+	};
+
+        for (civ = const_iv + sizeof (const_iv) / sizeof (const_iv [0]); civ > const_iv; civ--)
+          newCONSTSUB (stash, (char *)civ[-1].name, newSViv (civ[-1].iv));
 }
 
 int
@@ -58,7 +66,7 @@ inotify_rm_watch (int fd, U32 wd)
 
 int
 inotify_blocking (int fd, I32 blocking)
-  	CODE:
+	CODE:
         fcntl (fd, F_SETFL, blocking ? 0 : O_NONBLOCK);
 
 void
@@ -94,5 +102,4 @@ inotify_read (int fd, int size = 8192)
             XPUSHs (sv_2mortal (newRV_noinc ((SV *)hv)));
           }
 }
-
 

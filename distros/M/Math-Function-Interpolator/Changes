@@ -1,5 +1,8 @@
 Revision history for Math-Function-Interpolator
 
+1.02      2018-10-25 12:07:53+08:00 Asia/Manila
+        Remove fatalized warnings
+
 1.01      2017-02-15 07:07:42+00:00 UTC
         switch to dzil
 

@@ -1,5 +1,13 @@
 Revision history for Comics
 
+1.11	2018-10-25
+	
+	Fix patterns for CSectionComics, Channelate, DoYouKnowFlo,
+	GirlsWithSlingshots.
+	Add CSectionComicsBonus.
+	Disable LoadingArtist.
+	Add missing plugins and update MANIFEST.
+
 1.10	2018-09-25
 
 	Add MonkeyUser, SoggyCardboard, PearlsBeforeSwine, Russmo,

@@ -108,6 +108,10 @@ SKIP: {
 	) ;
 
     push @test,
+     sub { $cmu->{elt_filter_value} = 'aa2'; $cmu->reload ;},
+     sub { $cmu->{elt_filter_value} = 'bb2'; $cmu->reload ;},
+     sub { $cmu->{elt_filter_value} = '[ab]+2'; $cmu->reload ;},
+     sub { $cmu->{elt_filter_value} = ''; $cmu->reload ;},
      sub { $cmu->create_element_widget('edit','test1'); ok(1,"test ".$idx++)},
      sub { $inst->show_message("Hello World")},
 	 sub { $cmu->force_element_display($root->grab('std_id:dd DX')) ; ok(1,"test ".$idx++)},
@@ -183,7 +187,7 @@ SKIP: {
 	       [ ( qr/warn_unless/ ) x 2 ] ,"warn test warn_unless ".$idx++ ;
 	     },
 	 sub { $root->load('warn_unless=foo2') ; $cmu->reload ;; ok(1,"test fix warn_unless ".$idx++)},
-         sub { $cmu ->show_changes ; ok(1,"test show_changes ".$idx++)} ,
+     sub { $cmu ->show_changes ; ok(1,"test show_changes ".$idx++)} ,
 
 	 sub { $mw->destroy; },
         unless $args->{show};

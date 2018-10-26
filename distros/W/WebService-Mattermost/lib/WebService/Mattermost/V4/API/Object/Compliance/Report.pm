@@ -28,7 +28,7 @@ sub BUILD {
     my $self = shift;
 
     $self->api_resource_name('compliance_report');
-    $self->available_api_methods([ 'download' ]);
+    $self->set_available_api_methods([ 'download' ]);
 
     return 1;
 }

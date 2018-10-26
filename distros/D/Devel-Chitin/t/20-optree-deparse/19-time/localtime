@@ -1,0 +1,2 @@
+my $a = localtime();
+my @a = localtime(12345)

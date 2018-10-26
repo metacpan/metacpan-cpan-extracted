@@ -1,24 +1,22 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0;  no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(ok_location db_stepover);
 
-run_test(
-    2,
-    sub {
-        do_goto();
-        GOTO_TARGET:
-        14; # actually 13
-        sub do_goto {
-            $DB::single = 1;
-            goto GOTO_TARGET; # line 17
-        }
-    },
-    loc(subroutine => 'main::do_goto', line => 17),
-    'stepover',
-    loc(line => 13),
-    'done'
-);
+do_goto();
+GOTO_TARGET:
+10;
+sub do_goto {
+    $DB::single = 1;
+    goto GOTO_TARGET; # line 13
+}
+
+sub __tests__ {
+    plan tests => 2;
+
+    ok_location subroutine => 'main::do_goto', line => 13;
+    db_stepover;
+    ok_location line => 9;
+}

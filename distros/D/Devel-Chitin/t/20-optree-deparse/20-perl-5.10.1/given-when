@@ -1,0 +1,19 @@
+BEGIN { skip "requires 5.10.1" if $^V lt v5.10.1 } # omit
+BEGIN { skip "given/when is different on 5.27.7" if $^V eq v5.27.7 } # omit
+use if $^V ge v5.20.0, 'experimental', qw(switch); # omit
+use 5.10.1; # omit
+my $a;
+given ($a) {
+	when (1) { print 'one' }
+	when (2) {
+		print 'two';
+		print 'more';
+		continue
+	}
+	when (3) {
+		print 'three';
+		break;
+		print 'will not run'
+	}
+	default { print 'something else' }
+}

@@ -1,0 +1,4 @@
+BEGIN { skip 'Incompatible starting with 5.25.6' if $^V ge v5.25.6 } # omit
+# Starting with 5.25.6, '' and ' ' are represented as // and / /
+our @s = split('', $a);
+my @strings = split(' ', $a)

@@ -1,0 +1,5 @@
+foreach my $a (1 .. 10) {
+	print 'hi';
+	print 'there'
+}
+print 'done'

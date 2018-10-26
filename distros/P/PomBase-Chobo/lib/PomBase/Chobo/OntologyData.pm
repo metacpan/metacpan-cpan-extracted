@@ -38,14 +38,13 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 use Mouse;
 
 use Clone qw(clone);
 use Try::Tiny;
 use Carp;
-use List::Util qw(uniq);
 
 use PomBase::Chobo::OntologyTerm;
 

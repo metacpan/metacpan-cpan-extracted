@@ -18,7 +18,7 @@ sub BUILD {
     my $self = shift;
 
     $self->api_resource_name('emoji');
-    $self->available_api_methods([ qw(
+    $self->set_available_api_methods([ qw(
         delete
         get_image
     ) ]);

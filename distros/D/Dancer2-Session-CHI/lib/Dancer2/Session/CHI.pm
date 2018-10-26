@@ -95,7 +95,7 @@ Dancer2::Session::CHI - Dancer 2 session storage with CHI backend
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -122,6 +122,16 @@ attributes beyond the driver will be passed as additional configuration
 parameters to CHI.
 
 =for Pod::Coverage method_names_here
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<CHI>
+
+=item * L<Dancer2>
+
+=back
 
 =head1 CREDITS 
 

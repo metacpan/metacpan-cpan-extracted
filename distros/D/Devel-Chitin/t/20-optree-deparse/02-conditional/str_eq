@@ -1,0 +1,2 @@
+my $a = 'one';
+my $result = $a eq 'five'

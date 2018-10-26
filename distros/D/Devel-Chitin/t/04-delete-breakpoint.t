@@ -1,43 +1,29 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0; no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(ok_location ok_set_breakpoint ok_delete_breakpoint db_continue);
+use SampleCode;
 
-run_test(
-    4,
-    sub {
-        $DB::single=1;
-        13;
-        for(my $i = 0; $i < 10; $i++) {
-            15;
-        }
-        17;
-    },
-    \&create_breakpoint,
-    'continue',
-    loc(line => 15),
-    \&delete_breakpoint,
-    'continue',
-    'at_end',
-    'done',
-);
+$DB::single=1;
+SampleCode::foo();
+SampleCode::foo();
+$DB::single=1;
+13;
 
-my $break;
-sub create_breakpoint {
-    my($db, $loc) = @_;
-    
-    $break = Devel::Chitin::Breakpoint->new(
-                    file => $loc->filename,
-                    line => 15,
-                );
-    Test::More::ok($break, 'Set unconditional breakpoint on line 15');
-}
+sub __tests__ {
+    plan tests => 4;
 
-sub delete_breakpoint {
-    my($db, $loc) = @_;
-    Test::More::ok($break->delete, 'Delete breakpoint');
+    my $file = 't/lib/SampleCode.pm';
+    ok_set_breakpoint file => $file, line => 5, 'Set breakpoint';
+
+    db_continue;
+    ok_location filename => $file, line => 5;
+
+    ok_delete_breakpoint file => $file, line => 5, 'Delete breakpoint';
+
+    db_continue;
+    ok_location filename => __FILE__, line => 13;
 }
 

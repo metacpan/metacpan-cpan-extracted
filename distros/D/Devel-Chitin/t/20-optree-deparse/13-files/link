@@ -1,0 +1,3 @@
+my $a = link('/old/path', '/new/path');
+$a = link('/other_file', 'new_link');
+$a = link($a, '/foo/bar')

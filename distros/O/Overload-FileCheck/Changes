@@ -1,5 +1,18 @@
 Revision history for Overload-FileCheck
 
+0.005     2018-10-25 12:58:55-05:00 America/Chicago
+
+improve POD and Markdown documentation
+
+0.004     2018-10-24 14:18:10-05:00 America/Chicago
+
+- fix XS compilation issue on some systems
+
+0.003     2018-10-24 12:55:07-05:00 America/Chicago
+
+- fix t/mock-setting-errno.t on server not using english as locale
+- adjust several checks to use stat instead of lstat
+
 0.002     2018-10-23 17:12:06-05:00 America/Chicago
 
 - mock_stat can handle empty array ref return

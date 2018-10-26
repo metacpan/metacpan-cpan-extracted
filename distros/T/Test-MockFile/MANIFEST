@@ -17,4 +17,3 @@ t/pod.t
 t/readline.t
 t/sysopen.t
 t/writeline.t
-xt/boilerplate.t

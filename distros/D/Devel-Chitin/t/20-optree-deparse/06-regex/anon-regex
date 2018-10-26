@@ -1,0 +1,5 @@
+my $a = qr/abc\w(\s+)/ims;
+my $b = qr/abc
+           \w
+           $a
+           (\s+)/iox

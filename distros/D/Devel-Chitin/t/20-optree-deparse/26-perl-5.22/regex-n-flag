@@ -1,0 +1,3 @@
+BEGIN { skip "requires 5.22.0" if $^V lt v5.22.0 } # omit
+my $str;
+$str =~ m/(hi|hello)/n

@@ -18,8 +18,8 @@ no_index:
     - t
     - inc
 resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Clone
+  bugtracker: https://github.com/garu/Clone/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/garu/Clone
-version: '0.40'
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,2 @@
+my $sock;
+my $rv = setsockopt($sock, 1, 2, 3)

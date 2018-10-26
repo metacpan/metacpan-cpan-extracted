@@ -1,0 +1,5 @@
+my $rv = open(FH, 'some/path');
+$rv = open(*FH, 'r', '/some/path');
+open(FH);
+open(my $fh, '|-', '/some/command', '-a', '-b');
+open(*$fh, '>:raw:perlio:encoding(utf-16le):crlf', 'filename.ext')

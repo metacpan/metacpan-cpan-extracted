@@ -19,7 +19,7 @@ WriteMakefile(
     META_MERGE      => {
       resources => {
         license    => 'http://dev.perl.org/licenses/',
-        bugtracker => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Clone',
+        bugtracker => 'https://github.com/garu/Clone/issues',
         repository => 'http://github.com/garu/Clone',
       },
     },

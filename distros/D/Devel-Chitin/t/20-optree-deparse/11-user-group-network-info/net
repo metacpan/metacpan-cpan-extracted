@@ -1,0 +1,9 @@
+use Socket; # omit
+endnetent();
+setnetent(0);
+my $a = getnetent();
+my @a = getnetent();
+$a = getnetbyaddr(inet_aton('127.1'), AF_INET);
+@a = getnetbyaddr(inet_aton('127.1'), AF_INET);
+$a = getnetbyname('example.org');
+@a = getnetbyname('example.org')

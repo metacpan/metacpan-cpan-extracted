@@ -1,0 +1,3 @@
+my $a;
+$a = unpack('%32b', $a);
+$a = unpack($a, $a)

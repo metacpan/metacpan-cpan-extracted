@@ -1,0 +1,3 @@
+my $rv = utime(undef, undef, '/path/name', '/file_name');
+my($a, $b);
+$rv = utime(123, 456, $a, $b)

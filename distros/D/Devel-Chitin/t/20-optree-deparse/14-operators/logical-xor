@@ -1,0 +1,5 @@
+no warnings 'void'; # omit
+my $a = 1;
+our $b = 2;
+$a = $a xor $b;
+$b = $b xor $a

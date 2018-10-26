@@ -1,4 +1,8 @@
+2.2       2018-10-25 14:25:34+01:00 Europe/London
+
 2.1       2018-07-25 23:41:24+01:00 Europe/London
+- Update minimum dependency on JSONAPI::Document
+- Fixup readme
 
 2.0       2018-07-18 23:23:36+01:00 Europe/London
 - Update minimum dependency on JSONAPI::Document, this removes the required

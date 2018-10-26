@@ -1,0 +1,67 @@
+{
+   "abstract" : "Fast OBO to Chado loading using PostgreSQL COPY",
+   "author" : [
+      "Kim Rutherford <kim@pombase.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PomBase-Chobo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0.41",
+            "DBI" : "0",
+            "Data::Compare" : "0",
+            "FileHandle" : "0",
+            "Getopt::Long" : "0",
+            "List::Compare" : "0",
+            "Mouse" : "0",
+            "Mouse::Role" : "0",
+            "Text::CSV" : "0",
+            "Text::CSV::Encoded" : "0",
+            "Try::Tiny" : "0",
+            "lib" : "0",
+            "perl" : "5.020",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Data::Dumper" : "0",
+            "List::Util" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pombase/chobo/issues"
+      },
+      "homepage" : "https://github.com/pombase/chobo",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pombase/chobo.git",
+         "web" : "https://github.com/pombase/chobo"
+      }
+   },
+   "version" : "0.024",
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

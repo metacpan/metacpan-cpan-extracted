@@ -60,7 +60,7 @@
    "provides" : {
       "Path::ExpandTilde" : {
          "file" : "lib/Path/ExpandTilde.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/Grinnz/Path-ExpandTilde"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -264,7 +264,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001",
+                  "tag" : "0.003",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },

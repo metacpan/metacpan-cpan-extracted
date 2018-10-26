@@ -1,0 +1,4 @@
+LABEL:
+goto LABEL;
+my $expr;
+goto $expr

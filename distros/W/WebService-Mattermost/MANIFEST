@@ -4,7 +4,6 @@ LICENSE.txt
 MANIFEST
 META.yml
 Makefile.PL
-Net-Mattermost-0.001-TRIAL.tar.gz
 README
 README.md
 dist.ini

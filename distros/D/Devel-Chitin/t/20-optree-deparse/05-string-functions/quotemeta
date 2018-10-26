@@ -1,0 +1,4 @@
+my $a;
+$a = quotemeta();
+$a = quotemeta($a);
+quotemeta($a)

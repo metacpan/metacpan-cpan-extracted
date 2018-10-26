@@ -1,5 +1,5 @@
 package App::Deps::Verify::App::VerifyDeps::Command::verify;
-$App::Deps::Verify::App::VerifyDeps::Command::verify::VERSION = '0.2.1';
+$App::Deps::Verify::App::VerifyDeps::Command::verify::VERSION = '0.4.0';
 use App::Deps::Verify::App::VerifyDeps -command;
 
 use strict;
@@ -15,8 +15,8 @@ sub description { return abstract(); }
 sub opt_spec
 {
     return (
-        [ "output|o=s", "path to output file" ],
-        [ "input|i=s",  "the input file" ],
+        [ "output|o=s",  "path to output file" ],
+        [ "input|i=s\@", "the input files" ],
     );
 }
 
@@ -33,7 +33,7 @@ sub execute
     my ( $self, $opt, $args ) = @_;
 
     App::Deps::Verify->new->verify_deps_in_yamls(
-        +{ filenames => [ $opt->{input}, ] } );
+        +{ filenames => [ @{ $opt->{input} }, ] } );
 
     path( $opt->{output} )->spew_utf8("Success!");
 }
@@ -52,7 +52,7 @@ App::Deps::Verify::App::VerifyDeps::Command::verify
 
 =head1 VERSION
 
-version 0.2.1
+version 0.4.0
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

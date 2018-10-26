@@ -1,0 +1,2 @@
+my $val = do 'some_file.pl'; # like require
+$val = do $val

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '2.1';
+$Mojolicious::Plugin::JSONAPI::VERSION = '2.2';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -124,7 +124,7 @@ sub create_error_helpers {
 
     $app->helper(
         render_error => sub {
-            my ($c, $status, $errors, $data, $meta) = @_;
+            my ($c, $status, $errors, $meta) = @_;
 
             unless (defined($errors) && ref($errors) eq 'ARRAY') {
                 $errors = [{
@@ -136,7 +136,8 @@ sub create_error_helpers {
             return $c->render(
                 status => $status || 500,
                 json => {
-                    $data ? %$data : (), $meta ? (meta => $meta) : (), errors => $errors,
+                    errors => $errors,
+                    ($meta ? (meta => $meta) : ()),
                 });
         });
 }
@@ -211,7 +212,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 SYNOPSIS
 
@@ -347,14 +348,13 @@ sure comments is passed in as a plural noun here.
 
 =back
 
-=head2 render_error(I<Str> $status, I<ArrayRef|Str> $errors, I<HashRef> $data. I<HashRef> $meta)
+=head2 render_error(I<Str> $status, I<ArrayRef|Str> $errors, I<HashRef> $meta?)
 
 Renders a JSON response under the required top-level C<errors> key. C<errors> should be an array reference of error objects
 as described in the specification, or a string that will be the content of I<title>.
 See L<Error Objects|http://jsonapi.org/format/#error-objects>.
 
-Can optionally provide a reference to the primary data for the route as well as meta information, which will be added
-to the response as-is. Use C<resource_document> to generate the right structure for this argument.
+Can optionally provide meta information, which will be added to the response as-is.
 
 =head2 requested_resources
 

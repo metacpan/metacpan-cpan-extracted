@@ -22,7 +22,9 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  perl: '5.014000'
 resources:
   repository: https://github.com/xantronix/openstack-client.git
-version: '1.0004'
+version: '1.0005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

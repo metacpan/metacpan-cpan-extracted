@@ -1,0 +1,7 @@
+our @ourarray;
+my @myarray;
+my $a = delete($ourarray[1]);
+my @a = delete(@myarray[1, 2]);
+@a = delete(@myarray[@a]);
+delete(local @ourarray[@a]);
+delete(local $myarray[3])

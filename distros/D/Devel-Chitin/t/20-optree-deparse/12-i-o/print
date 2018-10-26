@@ -1,0 +1,8 @@
+my $a = print();
+print('foo bar', 'baz', "\n");
+print FH ('foo bar', 'baz', "\n");
+print "Hello\n";
+print FH "Hello\n";
+my $f;
+print { $f } ('foo bar', 'baz', "\n");
+print { *$f } ('foo bar', 'baz', "\n")

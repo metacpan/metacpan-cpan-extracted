@@ -1,5 +1,8 @@
 Revision history for App-Module-Setup
 
+0.08	2018-10-25
+	Add githubid for GitHub based development.
+
 0.07	2018-10-21
 	Add minimal perl version, defaults to 5.008.
 	Add license, defaults to perl_5.

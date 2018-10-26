@@ -1,0 +1,2 @@
+my $a = getpgrp(0);
+$a = getpgrp(1234)

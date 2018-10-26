@@ -1,0 +1,6 @@
+THE_LABEL:
+foreach $_ (1, 2, 3) {
+	next;
+	last THE_LABEL;
+	redo
+}

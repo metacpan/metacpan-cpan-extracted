@@ -35,10 +35,6 @@ my @tests= (
 		[':all', { -not => 'log' }],
 		[qw( stat log_debug epilogue )]
 	],
-	[ 'log exported anyway, because enumerated',
-		[{ not => 'log' }, 'log' ],
-		[qw( log )]
-	],		
 	[ 'exclude by regex',
 		[{ not => qr/log/ }, ':all' ],
 		[qw( stat )]

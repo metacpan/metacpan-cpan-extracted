@@ -16,7 +16,7 @@ String::Interpolate::Named - Interpolated named arguments in string
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -123,12 +123,12 @@ sub interpolate {
 
 	# Unescape escaped specials.
 	$tpl =~ s/\x{fdd0}/\\/g;
-	$tpl =~ s/\x{fdd1}/{/g;
-	$tpl =~ s/\x{fdd2}/}/g;
-	$tpl =~ s/\x{fdd3}/|/g;
+	$tpl =~ s/\x{fdd1}/\\{/g;
+	$tpl =~ s/\x{fdd2}/\\}/g;
+	$tpl =~ s/\x{fdd3}/\\|/g;
 
 	# Restore (some) seqs.
-	$tpl =~ s/\x{fdd4}//g;
+	$tpl =~ s/\x{fdd4}/%{}/g;
 	$tpl =~ s/\x{fdd5}/%{/g;
 
 	last if $prev eq $tpl;

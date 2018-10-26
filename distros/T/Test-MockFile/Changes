@@ -1,10 +1,28 @@
 Revision history for Test-MockFile
 
+0.006   10/25/2018
+ - Fix for Locale-dependent failures on perl < 5.22
+     https://github.com/CpanelInc/Test-MockFile/issues/10
+ - Minor pod fixups.
+
+0.005   10/24/2018
+ - Complete basic documentation for all public methods.
+
+0.004   10/24/2018
+ - Raise the Test::More requirement to address an issue with Test2::Formatter::TAP
+   Fixes https://github.com/CpanelInc/Test-MockFile/issues/6
+   
+0.003   10/24/2018
+ - Correct bug in use constant statement. 0.002 was broken on release.
+ - Changes to code to give basic support for Perl 5.10+. Ideally you should be on
+    perl 5.16 to run this code but it'll mostly work below that.
+
 0.002   10/24/2018
-        Set bug tracker to github
+ - Set bug tracker to github
+ - Fix Fcntl bug when you use unsupported constants.
 
 0.001   10/23/2018
-        First release with basic support for open/sysopen/opendir
-        Support is limited to Perl 5.20 until we address this error:
-            Error:  Invalid CODE attribute: prototype(*;$@) at lib/Test/MockFile.pm 
+ - First release with basic support for open/sysopen/opendir
+ - Support is limited to Perl 5.20 until we address this error:
+    Error:  Invalid CODE attribute: prototype(*;$@) at lib/Test/MockFile.pm 
 

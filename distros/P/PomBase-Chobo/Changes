@@ -1,5 +1,11 @@
 Revision history for PomBase-Chobo
 
+0.024     2018-10-26 08:29:17
+          Require Clone version 0.41 to avoid crash
+
+0.023     2018-10-25 16:40:14
+          Remove dependency on List::Util
+
 0.022     2018-10-19 11:27:38
           Fixes to cope with the disease ontology OBO file
 

@@ -1,0 +1,2 @@
+goto &Some::sub;
+goto sub { 1 }

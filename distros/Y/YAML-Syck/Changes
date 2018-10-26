@@ -1,3 +1,14 @@
+
+[Changes for 1.31 - 2018-10-25]
+
+* Switch to ExtUtils::MakeMaker for builder
+* Switch official issue tracker and repo to github.
+* MANIFEST warning is now fixed. Also shipping additional tests because of this.
+
+[Changes for 1.30]
+
+* ???
+
 [Changes for 1.29_02 - 2016-03-03]
 
 * Fix handling carriage return after c-indicator RT 41141

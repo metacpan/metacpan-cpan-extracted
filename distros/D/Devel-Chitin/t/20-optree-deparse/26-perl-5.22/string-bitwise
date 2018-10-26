@@ -1,0 +1,10 @@
+BEGIN { skip "requires 5.22.0" if $^V lt v5.22.0 } # omit
+use if $^V ge v5.20.0, 'experimental', 'bitwise'; # omit
+my($a, $b);
+$a = $a &. $b;
+$a &.= $b;
+$a = $a |. 'str';
+$a |.= 'str';
+$a = $a ^. 1;
+$a ^.= $b;
+$a = ~.$a

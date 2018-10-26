@@ -1,0 +1,5 @@
+my $d;
+my $dir = readdir(D);
+$dir = readdir(*D);
+$dir = readdir($d);
+$dir = readdir(*$d)

@@ -1,0 +1,3 @@
+my($sock, $dest);
+my $rv = send($sock, 'themessage', 1);
+$rv = send($sock, $rv, 1, $dest)

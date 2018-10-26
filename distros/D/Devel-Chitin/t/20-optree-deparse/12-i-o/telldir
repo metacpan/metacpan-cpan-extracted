@@ -1,0 +1,5 @@
+my $a = telldir(D);
+$a = telldir(*D);
+my $dh;
+$a = telldir($dh);
+$a = telldir(*$dh)

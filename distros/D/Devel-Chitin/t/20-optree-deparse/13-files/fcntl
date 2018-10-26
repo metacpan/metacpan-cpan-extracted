@@ -1,0 +1,5 @@
+my $a = fcntl(F, 1, 2);
+fcntl(*F, 2, 'foo');
+my($fh, $buf);
+fcntl($fh, 3, $buf);
+fcntl(*$fh, 4, 0)

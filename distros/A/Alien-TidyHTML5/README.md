@@ -4,11 +4,23 @@ Alien::TidyHTML5 - Download and install HTML Tidy
 
 # VERSION
 
-version v0.1.0
+version v0.1.1
+
+# DESCRIPTION
+
+This distribution provides tidy (a.k.a. "libtidy" or "html-tidy")
+v5.6.0 or newer, so that it can be used by other Perl
+distributions. . It does this by first trying to detect an existing
+install of tidy on your system. If found it will use that. If it
+cannot be found, the source code will be downloaded from the official
+git repository, and it will be installed in a private share location
+for the use of other modules.
 
 # SEE ALSO
 
 [http://www.html-tidy.org/](http://www.html-tidy.org/)
+
+[Alien::Build::Manual::AlienUser](https://metacpan.org/pod/Alien::Build::Manual::AlienUser)
 
 # SOURCE
 
@@ -27,6 +39,9 @@ feature.
 # AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+The initial development of this module was sponsored by Science Photo
+Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 

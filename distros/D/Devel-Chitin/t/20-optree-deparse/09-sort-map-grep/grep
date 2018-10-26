@@ -1,0 +1,5 @@
+my($a, @list);
+grep(m/a/, $a, $a);
+grep(m/a/, @list);
+grep { m/a/ } ($a, $a);
+grep { m/a/ } @list

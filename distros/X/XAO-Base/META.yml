@@ -28,4 +28,4 @@ requires:
   JSON: '2.94'
   Storable: '2.53'
   perl: '5.010001'
-version: '1.22'
+version: '1.23'

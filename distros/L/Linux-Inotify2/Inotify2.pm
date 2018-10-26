@@ -26,32 +26,26 @@ Linux::Inotify2 - scalable directory/file change notification
  });
 
  # integration into AnyEvent (works with EV, Glib, Tk, POE...)
- my $inotify_w = AnyEvent->io (
-    fh => $inofity->fileno, poll => 'r', cb => sub { $inotify->poll }
- );
+ my $inotify_w = AE::io $inotify->fileno, 0, sub { $inotify->poll };
 
  # manual event loop
- 1 while $inotify->poll;
+ $inotify->poll while 1;
 
 =head2 Streaming Interface
 
- use Linux::Inotify2 ;
+ use Linux::Inotify2;
 
  # create a new object
  my $inotify = new Linux::Inotify2
-    or die "Unable to create new inotify object: $!" ;
+    or die "Unable to create new inotify object: $!";
 
  # create watch
  $inotify->watch ("/etc/passwd", IN_ACCESS)
-    or die "watch creation failed" ;
+    or die "watch creation failed";
 
  while () {
    my @events = $inotify->read;
-   unless (@events > 0) {
-     print "read error: $!";
-     last ;
-   }
-   printf "mask\t%d\n", $_->mask foreach @events ; 
+   printf "mask\t%d\n", $_->mask foreach @events;
  }
 
 =head1 DESCRIPTION
@@ -67,6 +61,10 @@ It has a number of advantages over the Linux::Inotify module:
    - it has callback-style interface, which is better suited for
      integration.
 
+As for the inotify API itself - it is a very tricky, and somewhat
+unreliable API. For a good overview of the challenges you might run into,
+see this LWN article: L<https://lwn.net/Articles/605128/>.
+
 =head2 The Linux::Inotify2 Class
 
 =over 4
@@ -75,16 +73,14 @@ It has a number of advantages over the Linux::Inotify module:
 
 package Linux::Inotify2;
 
-use Carp ();
-use Fcntl ();
 use Scalar::Util ();
 
 use common::sense;
 
-use base 'Exporter';
+use Exporter qw(import);
 
 BEGIN {
-   our $VERSION = '1.22';
+   our $VERSION = '2.0';
    our @EXPORT = qw(
       IN_ACCESS IN_MODIFY IN_ATTRIB IN_CLOSE_WRITE
       IN_CLOSE_NOWRITE IN_OPEN IN_MOVED_FROM IN_MOVED_TO
@@ -92,7 +88,8 @@ BEGIN {
       IN_ALL_EVENTS
       IN_UNMOUNT IN_Q_OVERFLOW IN_IGNORED
       IN_CLOSE IN_MOVE
-      IN_ISDIR IN_ONESHOT IN_MASK_ADD IN_DONT_FOLLOW IN_ONLYDIR
+      IN_ISDIR IN_ONESHOT IN_MASK_ADD
+      IN_DONT_FOLLOW IN_EXCL_UNLINK IN_ONLYDIR
    );
 
    require XSLoader;
@@ -155,7 +152,8 @@ directory), that is files, directories, symlinks, device nodes etc., while
 
  IN_ONESHOT           only send event once
  IN_ONLYDIR           only watch the path if it is a directory
- IN_DONT_FOLLOW       don't follow a sym link
+ IN_DONT_FOLLOW       don't follow a sym link (Linux 2.6.15+)
+ IN_EXCL_UNLINK       don't create events for unlinked objects (Linux 2.6.36+)
  IN_MASK_ADD          not supported with the current version of this module
 
  IN_CLOSE             same as IN_CLOSE_WRITE | IN_CLOSE_NOWRITE
@@ -237,10 +235,13 @@ sub blocking {
 
 Reads events from the kernel and handles them. If the notify file
 descriptor is blocking (the default), then this method waits for at least
-one event (and thus returns true unless an error occurs). Otherwise it
-returns immediately when no pending events could be read.
+one event. Otherwise it returns immediately when no pending events could
+be read.
 
-Returns the count of events that have been handled.
+Returns the count of events that have been handled (which can be C<0> in case
+events have been received but have been ignored or handled internally).
+
+Croaks when an error occurs.
 
 =cut
 
@@ -253,7 +254,9 @@ sub poll {
 Reads events from the kernel. Blocks when the file descriptor is in
 blocking mode (default) until any event arrives. Returns list of
 C<Linux::Inotify2::Event> objects or empty list if none (non-blocking
-mode) or error occurred ($! should be checked).
+mode or events got ignored).
+
+Croaks on error.
 
 Normally you shouldn't use this function, but instead use watcher
 callbacks and call C<< ->poll >>.
@@ -267,23 +270,71 @@ sub read {
    my @res;
 
    for (@ev) {
-      my $w = $_->{w} = $self->{w}{$_->{wd}}
-         or next; # no such watcher
+      $_->{wd}=-1; $_->{mask} = IN_Q_OVERFLOW;#d#
 
       exists $self->{ignore}{$_->{wd}}
          and next; # watcher has been canceled
 
-      bless $_, "Linux::Inotify2::Event";
+      push @res, bless $_, "Linux::Inotify2::Event";
 
-      push @res, $_;
+      my $w = $_->{w} = $self->{w}{$_->{wd}}
+         or do {
+            # no such watcher, but maybe we can do overflow handling
+            if ($_->{mask} & IN_Q_OVERFLOW) {
+               if ($self->{on_overflow}) {
+                  $self->{on_overflow}($_);
+               } else {
+                  $self->broadcast ($_);
+               }
+            }
+            next;
+         };
 
-      $w->{cb}->($_) if $w->{cb};
+      $w->{cb}($_) if $w->{cb};
       $w->cancel if $_->{mask} & (IN_IGNORED | IN_UNMOUNT | IN_ONESHOT | IN_DELETE_SELF);
    }
 
    delete $self->{ignore};
 
-   @res
+   wantarray ? @res : scalar @res
+}
+
+=item $inotify->on_overflow ($cb->($ev))
+
+Sets the callback to be used for overflow handling
+(default: C<undef>): When C<read> receives an event with C<IN_Q_OVERFLOW>
+set, it will invoke this callback with the event.
+
+When the callback is C<undef>, then it broadcasts the event to all
+registered watchers, i.e., C<undef> is equivalent to:
+
+   sub { $inotify->broadcast ($_[0]) }
+
+=cut
+
+sub on_overflow {
+   my $prev = $_[0]{on_overflow};
+
+   $_[0]{on_overflow} = $_[1]
+      if @_ >= 2;
+
+   $prev
+}
+
+=item $inotify->broadcast ($ev)
+
+Invokes all registered watcher callbacks and passes the given event to
+them. Most useful in overflow handlers.
+
+=cut
+
+sub broadcast {
+   my ($self, $ev) = @_;
+
+   for my $w (values %{ $self->{w} }) {
+      local $ev->{w} = $w;
+      $w->{cb}($ev) if $w->{cb};
+   }
 }
 
 sub DESTROY {
@@ -303,7 +354,8 @@ callback. It has the following members and methods:
 
 =item $event->{w}
 
-The watcher object for this event.
+The watcher object for this event, if one is available. Generally, you cna
+only rely on the value of this member inside watcher callbacks.
 
 =item $event->name
 
@@ -317,6 +369,9 @@ Returns the "full" name of the relevant object, i.e. including the C<name>
 member of the watcher (if the watch object is on a directory and a
 directory entry is affected), or simply the C<name> member itself when the
 object is the watch object itself.
+
+This call requires C<< $event->{w} >> to be valid, which is generally only
+the case within watcher callbacks.
 
 =item $event->mask
 
@@ -333,6 +388,7 @@ $inotify->watch >>, the following flags (exported by default) can be set:
  IN_UNMOUNT           filesystem for watched object was unmounted
  IN_IGNORED           file was ignored/is gone (no more events are delivered)
  IN_ONESHOT           only one event was generated
+ IN_Q_OVERFLOW        queue overflow - event might not be specific to a watcher
 
 =item $event->IN_xxx
 
@@ -348,6 +404,13 @@ The event cookie to "synchronize two events". Normally zero, this value is
 set when two events relating to the same file are generated. As far as I
 know, this only happens for C<IN_MOVED_FROM> and C<IN_MOVED_TO> events, to
 identify the old and new name of a file.
+
+Note that the inotify API makes it impossible to know whether there will
+be a C<IN_MOVED_TO> event - you might receive only one of the events,
+and even if you receive both, there might be any number of events in
+between. The best approach seems to be to implement a small timeout
+after C<IN_MOVED_FROM> to see if a matching C<IN_MOVED_TO> event will be
+received - 2ms seem to work relatively well.
 
 =back
 

@@ -5,6 +5,7 @@ author:
 build_requires:
   Capture::Tiny: '0'
   Data::Dumper: '0'
+  List::Util: '0'
   Test::Deep: '0'
   Test::More: '0'
   strict: '0'
@@ -19,13 +20,12 @@ meta-spec:
 name: PomBase-Chobo
 requires:
   Carp: '0'
-  Clone: '0'
+  Clone: '0.41'
   DBI: '0'
   Data::Compare: '0'
   FileHandle: '0'
   Getopt::Long: '0'
   List::Compare: '0'
-  List::Util: '1.49'
   Mouse: '0'
   Mouse::Role: '0'
   Text::CSV: '0'
@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/pombase/chobo/issues
   homepage: https://github.com/pombase/chobo
   repository: https://github.com/pombase/chobo.git
-version: '0.022'
+version: '0.024'
 x_serialization_backend: 'YAML::Tiny version 1.70'

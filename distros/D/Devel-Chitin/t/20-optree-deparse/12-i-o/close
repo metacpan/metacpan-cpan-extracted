@@ -1,0 +1,6 @@
+close(F);
+close(*G);
+my $f;
+close($f);
+close(*$f);
+close()

@@ -1,0 +1,7 @@
+BEGIN { skip "requires 5.18.0" if $^V lt v5.18.0 } # omit
+use v5.18.0; # omit
+foreach my $a (1, 2) {
+	next $a;
+	last 'foo' . $a;
+	redo $a + $a
+}

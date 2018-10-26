@@ -1,0 +1,68 @@
+{
+   "abstract" : "Calculate and verify Subresource Integrity hashes (SRI)",
+   "author" : [
+      "Hauke D <haukex@zero-g.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Digest-SRI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "Carp" : "0",
+            "Digest" : "1.03",
+            "Digest::SHA" : "6.00",
+            "Exporter" : "0",
+            "MIME::Base64" : "3.10",
+            "Scalar::Util" : "0",
+            "perl" : "5.006000"
+         },
+         "suggests" : {}
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Test::More" : "1.302096"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haukex/Digest-SRI/issues"
+      },
+      "homepage" : "https://github.com/haukex/Digest-SRI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haukex/Digest-SRI.git",
+         "web" : "https://github.com/haukex/Digest-SRI"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

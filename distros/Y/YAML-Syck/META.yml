@@ -1,28 +1,28 @@
 ---
 abstract: 'Fast, lightweight YAML loader and dumper'
 author:
-  - 'Audrey Tang <cpan@audreyt.org>'
+  - 'Todd Rinaldo <toddr@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.14'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: YAML-Syck
 no_index:
   directory:
-    - inc
     - t
+    - inc
 requires:
-  perl: 5.6.0
+  perl: '5.006'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=YAML-Syck
-  homepage: http://search.cpan.org/dist/YAML-Syck
-  license: http://opensource.org/licenses/mit-license.php
+  bugtracker: https://github.com/toddr/YAML-Syck/issues
+  homepage: http://github.com/toddr/YAML-Syck
+  license: http://dev.perl.org/licenses/
   repository: http://github.com/toddr/YAML-Syck
-version: '1.30'
+version: '1.31'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

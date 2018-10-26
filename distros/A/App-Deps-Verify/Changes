@@ -1,5 +1,9 @@
 Revision history for App-Deps-Verify
 
+0.4.0       2018-10-26
+    - Allow the subcommands to accept several input files using -i flags.
+        - For maintaining a common base.
+
 0.2.1       2018-09-30
     - Add the plinst sub command.
         - p5inst was not detected by App-Cmd.

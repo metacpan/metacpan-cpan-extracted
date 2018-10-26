@@ -1,0 +1,9 @@
+no warnings;  # omit
+my $a;
+my $size = split(/abc/, $a);  # This would normally warn Use of implicit split to @_ is deprecated
+my $rx;
+my @strings = split(/$rx/, $a, 1);
+@strings = split(/a/, $a);
+@strings = split(//, $a);
+@strings = split(/ /, $a);
+my($v1, $v2) = split(/$rx/, $a, 3)  # the 3 is implicit

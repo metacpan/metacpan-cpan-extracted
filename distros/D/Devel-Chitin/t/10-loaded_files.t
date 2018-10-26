@@ -1,27 +1,35 @@
-#!/usr/bin/env perl
 use strict;
-use warnings; no warnings 'void';
+use warnings;
 
-use lib 'lib';
+use Test2::V0; no warnings 'void';
 use lib 't/lib';
-use Devel::Chitin::TestRunner;
+use TestHelper qw(db_disable db_continue);
+use SampleCode;
 
-run_test(
-    4,
-    sub {
-        $DB::single=1;
-        13;
+plan tests => 6;
+
+ok( TestHelper->is_loaded(__FILE__), 'main file is loaded');
+ok( TestHelper->is_loaded($INC{'Devel/Chitin.pm'}), 'Devel::Chitin is loaded');
+ok( TestHelper->is_loaded($INC{'SampleCode.pm'}), 'SampleCode is loaded');
+ok( ! TestHelper->is_loaded('Non/Loaded/Module.pm'), 'Non::Loaded::Module not is_loaded');
+
+my @files = TestHelper->loaded_files();
+ok(scalar(@files), 'loaded_files()');
+is(\@files,
+    bag {
+        item __FILE__;
+        item $INC{'Devel/Chitin.pm'};
+        item $INC{'SampleCode.pm'};
+        etc();
     },
-    \&test_1,
-    'done',
-);
-    
-sub test_1 {
-    my($db, $loc) = @_;
-    Test::More::ok($db->is_loaded($INC{'Devel/Chitin.pm'}), 'Devel::Chitin is_loaded');
-    Test::More::ok(! $db->is_loaded('Non/Loaded/Module.pm'), 'Non::Loaded::Module not is_loaded');
+    'Found main file, Devel::Chitin and SampleCode in loaded files list');
 
-    my @files = $db->loaded_files();
-    Test::More::ok(scalar(@files), 'Get list of loaded_files');
-    Test::More::ok(scalar(grep { $_ eq $INC{'Devel/Chitin.pm'} } @files), 'Devel::Chitin is in the list');
+$DB::single=1;
+28;
+
+sub __tests__ {
+    # This will run after the $DB::single=1 above.
+    # It's needed otherwise TestHelper will complain about the debugger being
+    # stopped within the Test2 frmework with no tests to run.
+    db_continue;
 }

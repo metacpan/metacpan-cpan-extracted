@@ -2,9 +2,9 @@ package Math::Function::Interpolator::Cubic;
 
 use 5.006;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-our $VERSION = '1.01';    ## VERSION
+our $VERSION = '1.02';    ## VERSION
 
 our @ISA = qw(Math::Function::Interpolator);
 

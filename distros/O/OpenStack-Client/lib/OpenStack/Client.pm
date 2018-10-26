@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018 cPanel, Inc.
+# Copyright (c) 2018 cPanel, L.L.C.
 # All rights reserved.
 # http://cpanel.net/
 #
@@ -17,7 +17,9 @@ use LWP::UserAgent ();
 use JSON        ();
 use URI::Encode ();
 
-our $VERSION = '1.0004';
+use OpenStack::Client::Response ();
+
+our $VERSION = '1.0005';
 
 =encoding utf8
 
@@ -104,8 +106,9 @@ sub new ($%) {
 
     die 'No API endpoint provided' unless $endpoint;
 
-    $opts{'package_ua'}      ||= 'LWP::UserAgent';
-    $opts{'package_request'} ||= 'HTTP::Request';
+    $opts{'package_ua'}       ||= 'LWP::UserAgent';
+    $opts{'package_request'}  ||= 'HTTP::Request';
+    $opts{'package_response'} ||= 'OpenStack::Client::Response';
 
     my $ua = $opts{'package_ua'}->new(
         'ssl_opts' => {
@@ -114,11 +117,12 @@ sub new ($%) {
     );
 
     return bless {
-        'package_ua'      => $opts{'package_ua'},
-        'package_request' => $opts{'package_request'},
-        'ua'              => $ua,
-        'endpoint'        => $endpoint,
-        'token'           => $opts{'token'}
+        'package_ua'       => $opts{'package_ua'},
+        'package_request'  => $opts{'package_request'},
+        'package_response' => $opts{'package_response'},
+        'ua'               => $ua,
+        'endpoint'         => $endpoint,
+        'token'            => $opts{'token'}
     }, $class;
 }
 
@@ -169,6 +173,47 @@ sub uri ($$) {
 
 =over
 
+=cut
+
+sub request {
+    my ($self, %args) = @_;
+
+    $args{'headers'} ||= {};
+
+    my $request = $self->{'package_request'}->new(
+        $args{'method'} => $self->uri($args{'path'})
+    );
+
+    my @headers = $self->_get_headers_list($args{'headers'});
+
+    my $count = scalar @headers;
+
+    for (my $i=0; $i<$count; $i+=2) {
+        my $name  = $headers[$i];
+        my $value = $headers[$i+1];
+
+        $request->header($name => $value);
+    }
+
+    if (defined $args{'body'}) {
+        #
+        # Allow the request body to be supplied by a subroutine reference
+        # which, when called, will supply a chunk of data returned as per the
+        # behavior of LWP::UserAgent.  This is useful for uploading arbitrary
+        # amounts of data in a request body.
+        #
+        if (ref($args{'body'}) =~ /CODE/) {
+            $request->content($args{'body'});
+        } else {
+            $request->content(JSON::encode_json($args{'body'}));
+        }
+    }
+
+    return bless $self->{'ua'}->request($request,
+        defined $args{'handler'}? $args{'handler'}: ()),
+        $self->{'package_response'};
+}
+
 =item C<$client-E<gt>call(I<$args>)>
 
 Perform a call to the service endpoint using named arguments in the hash.  The
@@ -205,7 +250,7 @@ Defaults to C<identity, gzip, deflate, compress>.
 =item Content-Type
 
 Defaults to C<application/json>, although some API calls (e.g., a PATCH)
-expect a different type; the the case of an image update, the expected
+expect a different type; the case of an image update, the expected
 type is C<application/openstack-images-v2.1-json-patch> or some version
 thereof.
 
@@ -310,56 +355,7 @@ sub call {
 
     my ($args) = @_;
 
-    $args->{'headers'} ||= {};
-
-    my $request = $self->{'package_request'}->new(
-        $args->{'method'} => $self->uri($args->{'path'})
-    );
-
-    my @headers = $self->_get_headers_list($args->{'headers'});
-
-    my $count = scalar @headers;
-
-    for (my $i=0; $i<$count; $i+=2) {
-        my $name  = $headers[$i];
-        my $value = $headers[$i+1];
-
-        $request->header($name => $value);
-    }
-
-    if (defined $args->{'body'}) {
-        #
-        # Allow the request body to be supplied by a subroutine reference
-        # which, when called, will supply a chunk of data returned as per the
-        # behavior of LWP::UserAgent.  This is useful for uploading arbitrary
-        # amounts of data in a request body.
-        #
-        if (ref($args->{'body'}) =~ /CODE/) {
-            $request->content($args->{'body'});
-        } else {
-            $request->content(JSON::encode_json($args->{'body'}));
-        }
-    }
-
-    my $response = $self->{'ua'}->request($request,
-        defined $args->{'handler'}? $args->{'handler'}: ());
-
-    my $type    = $response->header('Content-Type');
-    my $content = $response->decoded_content;
-
-    if ($response->code =~ /^[45]\d{2}$/) {
-        $content ||= "@{[$response->code]} Unknown error";
-
-        die $content;
-    }
-
-    if (defined $content && length $content) {
-        if (lc($type) =~ qr{^application/json}i) {
-            return JSON::decode_json($content);
-        }
-    }
-
-    return $content;
+    return $self->request(%{$args})->decode_json;
 }
 
 sub _lc_merge {
@@ -400,7 +396,7 @@ sub _get_headers_list {
     # the one received during authentication
     #
     my %OVERRIDES = (
-        'X-Auth-Token' => $self->{'token'}->{'id'}
+        'X-Auth-Token' => $self->token
     );
 
     my %new_headers = %{$headers};
@@ -634,7 +630,7 @@ Written by Alexandra Hrefna Hilmisdóttir <xan@cpanel.net>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015 cPanel, Inc.  Released under the terms of the MIT license.
+Copyright (c) 2018 cPanel, L.L.C.  Released under the terms of the MIT license.
 See LICENSE for further details.
 
 =cut

@@ -29,46 +29,46 @@ no_index:
 provides:
   Mojolicious::Plugin::Yancy:
     file: lib/Mojolicious/Plugin/Yancy.pm
-    version: '1.009'
+    version: '1.010'
   Yancy:
     file: lib/Yancy.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Backend::Dbic:
     file: lib/Yancy/Backend/Dbic.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Backend::Mysql:
     file: lib/Yancy/Backend/Mysql.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Backend::Pg:
     file: lib/Yancy/Backend/Pg.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Backend::Role::Sync:
     file: lib/Yancy/Backend/Role/Sync.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Backend::Sqlite:
     file: lib/Yancy/Backend/Sqlite.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Controller::Yancy:
     file: lib/Yancy/Controller/Yancy.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Controller::Yancy::API:
     file: lib/Yancy/Controller/Yancy/API.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Controller::Yancy::MultiTenant:
     file: lib/Yancy/Controller/Yancy/MultiTenant.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Plugin::Auth::Basic:
     file: lib/Yancy/Plugin/Auth/Basic.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Plugin::Form:
     file: lib/Yancy/Plugin/Form.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Plugin::Form::Bootstrap4:
     file: lib/Yancy/Plugin/Form/Bootstrap4.pm
-    version: '1.009'
+    version: '1.010'
   Yancy::Util:
     file: lib/Yancy/Util.pm
-    version: '1.009'
+    version: '1.010'
 requires:
   Digest: '0'
   Exporter: '0'
@@ -77,17 +77,17 @@ requires:
   JSON::Validator: '2.05'
   Mojolicious: '7.79'
   Mojolicious::Plugin::OpenAPI: '1.28'
-  Role::Tiny: '0'
+  Role::Tiny: '2.000001'
   Scalar::Util: '0'
   Sys::Hostname: '0'
   Text::Balanced: '0'
-  perl: '5.010'
+  perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#yancy
   bugtracker: https://github.com/preaction/Yancy/issues
   homepage: https://github.com/preaction/Yancy
   repository: https://github.com/preaction/Yancy.git
-version: '1.009'
+version: '1.010'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Ed J <mohawk2@users.noreply.github.com>'

@@ -1,0 +1,6 @@
+endservent();
+setservent(1);
+my $port = getservbyname('ftp', 'tcp');
+my @info = getservbyname('echo', 'udp');
+$port = getservbyport(21, 'tcp');
+@info = getservbyport(7, 'udp')
