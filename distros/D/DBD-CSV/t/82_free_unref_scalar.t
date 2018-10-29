@@ -12,7 +12,8 @@ use warnings;
 use Test::More;
 #use Test::NoWarnings;
 
-$] < 5.026 and plan skip_all => "This is a perl5 CORE issue fixed in perl-5.26";
+require Text::CSV_XS;
+$Text::CSV_XS::VERSION < 1.35 and plan skip_all => "This leak should be fixed in Text::CSV_XS 1.35";
 
 use_ok "DBI";
 require "./t/lib.pl";
@@ -92,6 +93,6 @@ test_with_options (
 test_with_options (
     csv_auto_diag => 0,
     %$callbacks,
-    ) for (1 .. 100);
+    ) for (1 .. 200);
 
 done_testing ();

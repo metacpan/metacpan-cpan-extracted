@@ -2,21 +2,20 @@ package Catmandu::OCLC::xID;
 
 use LWP::Simple;
 use URI::Escape;
-use JSON;
-use Data::Dumper;
+use JSON::MaybeXS;
 
 sub query {
     my $query   = shift;
     my $type    = shift;
     my $method  = shift;
 
-    die "usage: query(query,type,method)" unless defined $query && 
+    die "usage: query(query,type,method)" unless defined $query &&
                                                        defined $type &&
                                                        defined $method;
     my $endpoint;
 
     if ($type eq 'xisbn') {
-    	$endpoint = 'http://xisbn.worldcat.org/webservices/xid/isbn'; 
+    	$endpoint = 'http://xisbn.worldcat.org/webservices/xid/isbn';
     }
     elsif ($type eq 'xissn') {
     	$endpoint = 'http://xisbn.worldcat.org/webservices/xid/issn';
@@ -32,9 +31,9 @@ sub query {
                             , $endpoint
                             , uri_escape($query)
                             , $method;
-                            
+
     my $response = get($request);
-    my $json     = JSON->new->utf8(0);
+    my $json     = JSON::MaybeXS->new->utf8(0);
 
     my $perl;
     eval {
@@ -48,3 +47,11 @@ sub query {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Catmandu::OCLC::xID - OCLC xID services offline since 2018-08-23
+
+=cut

@@ -2,6 +2,118 @@ See also Changes-ver_2 for changes released for PDF::API2, and incorporated
 into PDF::Builder.
 See also Changes_2017 for earlier version 3 release logs.
 
+3.012     2018-10-26
+
+   new PNG_IPL module got caught by t/00-all-usable.t on test systems that did 
+     not have Image::PNG::Libpng installed. Exclude from test, and add 
+     reminder in Makefile.PL to update 00-all-usable.t.
+
+3.011     2018-10-25
+
+   move .travis.yml.HOLD and dist.ini.old from the root to INFO/, to unclutter
+     the root. It is unknown when and if they will ever be used.
+
+   lib/PDF/Builder/Annotation.pm  [ref RT 125917] minor fix to properly 
+     implement a default target page fit (-xyz), otherwise the link() 
+     method would not go to the desired target page. Some minor POD updates
+     to indicate that some functionality depends on the PDF reader (e.g.,
+     mouseover text on a link).
+   lib/PDF/Builder/XObject/Resource/Image/PNG.pm-PNG_IPL.pm
+     minor POD updates
+
+   lib/PDF/Builder/XObject/Resource/Image/PNG-PNG_IPL-TIFF-TIFF_GT.pm,
+     Makefile.PL, MANIFEST, lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm,
+     t/png.t
+    [ref RT 124349] If libpng.a and its wrapper, Image::PNG::Libpng are 
+     installed, use them to process PNG files for inclusion into a PDF 
+     document. If this library is not installed, or the user directs that 
+     it is not be used via the -nouseIPL option, the existing pure Perl 
+     PNG library (PNG.pm) will be used. The new library (PNG_IPL.pm) is 
+     considerably faster than the old one and offers support for 16 bits 
+     per sample and interlaced images*. Documentation has been updated in 
+     TIFF and TIFF_GT, and functions LA_GT() and LA_IPL() have been added 
+     to Builder to check LibraryAvailability (package availability) for 
+     Graphics::TIFF and Image::PNG::Libpng, so you can know in advance 
+     whether it is safe to try to use certain image functionality.
+
+     * interlacing is removed during processing, so it is irrelevant to
+       PDF, and 16bps channels (force PDF 1.5) can be reduced to 8bps, 
+       permitting PDF 1.4 output, by use of the -force8bps option.
+
+   Makefile.PL  try directing support issues to GitHub rather than CPAN RT
+
+   lib/PDF/Builder.pm while working on 124349, I noticed that a partially 
+    transparent RGBA PNG file (white background made transparent) with -notrans 
+    option was showing as transparent. The problem was found to be that no
+    options given in the image_png() call, such as -notrans, were being passed 
+    to the PNG image processing routine. This has been fixed.
+
+   docs/buildDoc.pl modified to first look for .pod files, and then .pm files
+    for producing documentation .html files. It still has some issues with
+    finding too much input, but is generally workable. The POD search path
+    needs further work, as references to other packages often don't work 
+    (don't produce a working link, but a severe error message).
+
+   lib/PDF/Builder.pm  internal routine proc_pages() renamed _proc_pages(),
+    walk_obj() renamed _walk_obj(), and add POD for save() method. There is a 
+    release() method that is undocumented but it's not clear whether it's 
+    internal. Improve documentation of mediabox and other *box methods.
+   lib/PDF/Builder/Annotation.pm-Matrix.pm-Outline.pm-Page.pm minor POD fixes.
+    There are a lot of low level calls (e.g., Array.pm) that perhaps should not
+    be considered as part of the User API (i.e., remove from POD).
+
+   lib/PDF/Builder/Outline.pm-NamedDestination.pm-Annotation.pm, INFO/DEPRECATED
+    deprecate pdfile() method and replace by pdf_file() (same as done earlier
+     for Annotation.pm). pdfile() will be removed on or after October, 2020.
+   lib/PDF/Builder/XObject/Resource/Image/TIFF_GT.pm-TIFF.pm, INFO/DEPRECATED
+    remove warning and support for Blackls1 (should be BlackIs1).
+
+   lib/PDF/Builder/Content.pm, examples/Content.pl
+    [ref RT 124218] add -strikethru text capability similar to -underline.
+     New example of strike-through in Content.pl examples.
+
+   lib/PDF/Builder.pm  [ref #93] Bringing PDF::Builder into the 21st century
+    add -outver option (default: 1.4) to new() as output PDF version. It will
+     be increased by any PDF file read in with a higher PDF level (with message)
+     or by a call to version().
+    add -msgver option (default: 1) to output (value 1) a warning message when
+     the PDF output version is increased by verCheckInput() or verCheckOutput().
+     A value of 0 suppresses the warning messages.
+    add verCheckInput(version) to give warning if PDF just read in is of higher 
+     PDF version than the current version, and to increase the current version 
+     to that level. Implemented for reading of PDF files. 
+    WARNING: just because the PDF output version has been increased does NOT 
+     guarantee that any particular content will be handled correctly! There 
+     are many known cases of PDF 1.5 and up files being read in, that have 
+     content that PDF::Builder does not handle correctly, corrupting the 
+     resulting PDF. Pay attention to run-time warning messages that the PDF 
+     output level has been increased due to a PDF file being read in, and check 
+     the resulting file carefully.
+    add verCheckOutput(version, description) to increase the output PDF version 
+     if a PDF feature that requires a higher PDF version is requested. At this
+     time, there are no output features higher than 1.4.
+    in version(), give warning if LOWERING the output PDF version (not 
+     suppressed by -msgver).
+   lib/PDF/Builder.pm, lib/PDF/Builder/Basic/PDF/File.pm-Name.pm
+    internally store PDF version as full number (e.g., 1.4) instead of just the
+     minor version (e.g., 4), as PDF 2.0 has been announced.
+   t/02-xrefstm.t, t/03-xrefstm-index.t
+    both t-tests read in a PDF-1.5 file, so add a call to new(-outver=>1.5) to
+     silence the warning message that the maximum version is being increased.
+
+   lib/PDF/Builder/Resource/Basefont.pm-CIDFont.pm-UniFont.pm
+    fix typo variable name $ident to $indent (indentation)
+   lib/PDF/Builder/Resource/UniFont.pm
+    [ref RT 126274/#96] (reporter: fcc_del) by adding missing indentation
+     value to recursive text() call (rather than reporter's more complex fix).
+
+   lib/PDF/Builder/Content.pm
+    [ref RT 98539] (need to verify flatness function) close. According to PDF 
+     spec, there's no real way to tell by eye whether it's within tolerance, and
+     results are unpredictable if you try to force visible line segments with
+     a higher tolerance. Also update POD to clarify the range of permissible
+     tolerance values, and silently clamp the input value to be in that range.
+
 3.010     2018-08-20
 
    .gitignore, Changes, docs/buildDoc.pl, lib/PDF/Builder/Content.pm,

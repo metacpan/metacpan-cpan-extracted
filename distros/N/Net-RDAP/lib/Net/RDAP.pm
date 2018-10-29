@@ -1,18 +1,20 @@
 package Net::RDAP;
 use Digest::SHA1 qw(sha1_hex);
-use File::stat;
 use File::Slurp;
+use File::stat;
 use HTTP::Request::Common;
 use JSON;
+use MIME::Base64;
 use Net::RDAP::Error;
 use Net::RDAP::Object::Autnum;
 use Net::RDAP::Object::Domain;
 use Net::RDAP::Object::IPNetwork;
 use Net::RDAP::Registry;
+use Net::RDAP::SearchResult;
 use vars qw($VERSION);
 use strict;
 
-$VERSION = 0.10;
+$VERSION = 0.11;
 
 =pod
 
@@ -213,7 +215,7 @@ sub query {
 		);
 		
 	} else {
-		return $self->fetch($url);
+		return $self->fetch($url, %args);
 
 	}
 }
@@ -262,7 +264,7 @@ can.
 =cut
 
 sub fetch {
-	my ($self, $arg) = @_;
+	my ($self, $arg, %args) = @_;
 
 	my $url;
 	if ($arg->isa('URI')) {
@@ -292,6 +294,8 @@ sub fetch {
 	}
 
 	my $request = GET($url);
+
+	$request->header('Authorization' => sprintf('Basic %s', encode_base64(join(':', ($args{'user'}, $args{'pass'}))))) if ($args{'user'} && $args{'pass'});
 
 	my $file = sprintf(
 		'%s/%s::cache::%s.json',
@@ -354,7 +358,7 @@ sub fetch {
 			'description'	=> [ 'The response from the server is not a valid JSON object' ],
 		);
 
-	} elsif (!defined($data->{'objectClassName'})) {
+	} elsif (!defined($data->{'objectClassName'}) && scalar(grep { /^(domain|nameserver|entity)SearchResults$/ } keys(%{$data})) < 1) {
 		return $self->error(
 			'url'		=> $url,
 			'errorCode'	=> 500,
@@ -370,13 +374,31 @@ sub fetch {
 	}
 }
 
+#
+# generate an RDAP object from an RDAP response
+#
 sub object_from_response {
 	my ($self, $data, $url) = @_;
 
-	if ('domain' eq $data->{'objectClassName'}) 		{ return Net::RDAP::Object::Domain->new($data, $url)				}
-	elsif ('ip network' eq $data->{'objectClassName'})	{ return Net::RDAP::Object::IPNetwork->new($data, $url)				}
-	elsif ('autnum' eq $data->{'objectClassName'})		{ return Net::RDAP::Object::Autnum->new($data, $url)				}
-	elsif ('entity' eq $data->{'objectClassName'})		{ return Net::RDAP::Object::Entity->new($data, $url)				}
+	#
+	# lookup results
+	#
+	if ('domain'		eq $data->{'objectClassName'}) 	{ return Net::RDAP::Object::Domain->new($data, $url)	}
+	elsif ('ip network'	eq $data->{'objectClassName'})	{ return Net::RDAP::Object::IPNetwork->new($data, $url)	}
+	elsif ('autnum'		eq $data->{'objectClassName'})	{ return Net::RDAP::Object::Autnum->new($data, $url)	}
+	elsif ('nameserver'	eq $data->{'objectClassName'})	{ return Net::RDAP::Object::Nameserver->new($data, $url)}
+	elsif ('entity'		eq $data->{'objectClassName'})	{ return Net::RDAP::Object::Entity->new($data, $url)	}
+
+	#
+	# search results
+	#
+	elsif (defined($data->{'domainSearchResults'}))		{ return Net::RDAP::SearchResult->new($data, $url) }
+	elsif (defined($data->{'nameserverSearchResults'}))	{ return Net::RDAP::SearchResult->new($data, $url) }
+	elsif (defined($data->{'entitySearchResults'}))		{ return Net::RDAP::SearchResult->new($data, $url) }
+
+	#
+	# unprocessable response
+	#
 	else {
 		return $self->error(
 			'url'		=> $url,
@@ -387,6 +409,9 @@ sub object_from_response {
 	}
 }
 
+#
+# simple check that a server response is indeed an RDAP object
+#
 sub is_rdap {
 	my ($self, $response) = @_;
 
@@ -487,6 +512,8 @@ RDAP-related modules that all work together. They are:
 
 =item * L<Net::RDAP::Object::Nameserver>
 
+=item * L<Net::RDAP::SearchResult>
+
 =back
 
 =item * L<Net::RDAP::Remark>, and its submodule:
@@ -502,6 +529,8 @@ RDAP-related modules that all work together. They are:
 =item * L<Net::RDAP::EPPStatusMap>
 
 =item * L<Net::RDAP::Registry>
+
+=item * L<Net::RDAP::Service>
 
 =item * L<Net::RDAP::Link>
 

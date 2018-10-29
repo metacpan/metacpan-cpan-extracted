@@ -1,4 +1,7 @@
 requires "Alien::Base" => "0";
+requires "List::Util" => "0";
+requires "namespace::autoclean" => "0";
+requires "perl" => "v5.8.0";
 
 on 'build' => sub {
   requires "Alien::Build" => "0.32";
@@ -22,11 +25,13 @@ on 'configure' => sub {
   requires "Alien::Build" => "1.19";
   requires "Alien::Build::MM" => "0.32";
   requires "Alien::Build::Plugin::Build::CMake" => "0.99";
+  requires "Alien::Build::Plugin::PkgConfig::Negotiate" => "0.79";
   requires "ExtUtils::MakeMaker" => "6.52";
 };
 
 on 'develop' => sub {
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Test::CleanNamespaces" => "0.15";
   requires "Test::EOF" => "0";
   requires "Test::EOL" => "0";
   requires "Test::MinimumVersion" => "0";

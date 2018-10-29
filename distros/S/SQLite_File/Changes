@@ -1,4 +1,6 @@
 Revision history for Perl module SQLite_File
+0.1006 2018-10-28
+    - Fix warning per RT#127433 (thanks Luc)
 0.1005 2018-05-28
     - Create index for hash type per RT#122742
       (thanks again Pseudonym Man)

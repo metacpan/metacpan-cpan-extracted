@@ -1,4 +1,4 @@
-package Pcore::XMPP v0.10.2;
+package Pcore::XMPP v0.10.5;
 
 use Pcore -dist;
 use AnyEvent::XMPP::Client;

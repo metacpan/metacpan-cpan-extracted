@@ -1,39 +1,43 @@
-0.63 20180604
-    + Fix the form parameters getting lost
+0.64 2018-10-28
+    * Re-release including correct META.* information
+    * No upgrade necessary
+
+0.63 2018-06-04
+    * Fix the form parameters getting lost
       This was since we changed the form from GET to POST ...
 
-0.62 20180520
-    + Fix the ->redirect URL to honor the specified host
+0.62 2018-05-20
+    * Fix the ->redirect URL to honor the specified host
       This prevents breakage due to localhost vs. 127.0.0.1 mixups
-    + Add ->content method to serve arbitrary content like Javascript
+    * Add ->content method to serve arbitrary content like Javascript
 
-0.61 20171129
-    + Make the "->download" method actually work in the sense that it will send
+0.61 2017-11-29
+    * Make the "->download" method actually work in the sense that it will send
 	  downloads with a name other than "$1".
 
-0.60 20171127
-    + Add method to "download" a file
+0.60 2017-11-27
+    * Add method to "download" a file
 	  This is in preparation for WWW::Mechanize::Chrome trying to download
 	  a file
-	! Rework IPC to launch the server
+	* Rework IPC to launch the server
 	  The old method of a pipe-open was elegant but didn't really work out for
 	  cleanly shutting down the process. The new approach uses the same way
 	  we spawn and dissociate Chrome in WWW::Mechanize::Chrome.
-	. We are now more defensive about finding out whether CGI.pm can do
+	* We are now more defensive about finding out whether CGI.pm can do
 	  ->multi_param or not
 
-0.59 20170617
-    + Add support for checking Javascript properties if Javascript runs on the
+0.59 2017-06-17
+    * Add support for checking Javascript properties if Javascript runs on the
       client
       Currently, this only mirrors back the window.navigator.userAgent variable
 
-0.58 20170518
-    ! Remove support for Perl 5.6.x
+0.58 2017-05-18
+    * Remove support for Perl 5.6.x
       The module uses a fancy way of opening a lexical filehandle which
       doesn't work on Perl 5.6.x. Instead of trying to figure out how to make
       5.6.x open() work with an undef lexial variable for a filehandle via
       Travis CI, I simply declare this module incompatible with 5.6.x.
 
-0.57 20170508
-    . Spun off from WWW::Mechanize::PhantomJS
+0.57 2017-05-08
+    * Spun off from WWW::Mechanize::PhantomJS
       (and WWW::Mechanize::Firefox, and WWW::Mechanize::Shell)

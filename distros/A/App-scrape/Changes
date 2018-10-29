@@ -1,29 +1,32 @@
-0.07 20180223
-    + Use Text::CSV_XS for CSV output
-    + CSV output now adds headers if there are names
+0.08 2018-10-28
+    * Re-release with fixed META.* information
 
-0.06 20180212
-    + Actually output data even if the first selector is not found
-    + Add JSON output format
-    + Add functionality to fetch more than one URL
+0.07 2018-02-23
+    * Use Text::CSV_XS for CSV output
+    * CSV output now adds headers if there are names
 
-0.05 20151029
-    . Remove MYMETA.* from the distribution, reported by
+0.06 2018-02-12
+    * Actually output data even if the first selector is not found
+    * Add JSON output format
+    * Add functionality to fetch more than one URL
+
+0.05 2015-10-29
+    * Remove MYMETA.* from the distribution, reported by
       Alexandr Ciornii (CHORNY)
-    . No functional changes, no need to upgrade
+    * No functional changes, no need to upgrade
 
-0.04 20120701
-    . Force all searches to be relative to the current tree. This
+0.04 2012-07-01
+    * Force all searches to be relative to the current tree. This
       is relevant if you use the (undocumented) 'tree' option to scrape().
-    ! Don't deallocate the HTML::TreeBuilder::XPath tree if we don't
+    * Don't deallocate the HTML::TreeBuilder::XPath tree if we don't
       own it.
 
-0.03 20110922
-    . added pagination option to scrape2rss.pl
+0.03 2011-09-22
+    * added pagination option to scrape2rss.pl
 
-0.02 20110728
-    . added scrape2rss RSS generator
-    . moved scrape logic into module
+0.02 2011-07-28
+    * added scrape2rss RSS generator
+    * moved scrape logic into module
 
 0.01 to be done
-    . Released unto a propably suspecting audience
+    * Released unto a propably suspecting audience

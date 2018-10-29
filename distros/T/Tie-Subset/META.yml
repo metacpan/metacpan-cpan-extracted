@@ -1,0 +1,43 @@
+---
+abstract: 'Tie an array or hash to a subset of another array or hash, respectively'
+author:
+  - 'Hauke D <haukex@zero-g.net>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  FindBin: '0'
+  Test::More: '1.302096'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Subset
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Tie::Subset:
+    file: lib/Tie/Subset.pm
+    version: '0.01'
+  Tie::Subset::Array:
+    file: lib/Tie/Subset/Array.pm
+    version: '0.01'
+  Tie::Subset::Hash:
+    file: lib/Tie/Subset/Hash.pm
+    version: '0.01'
+recommends: {}
+requires:
+  Carp: '0'
+  perl: '5.006000'
+  warnings::register: '0'
+resources:
+  bugtracker: https://github.com/haukex/Tie-Subset/issues
+  homepage: https://github.com/haukex/Tie-Subset
+  repository: https://github.com/haukex/Tie-Subset.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

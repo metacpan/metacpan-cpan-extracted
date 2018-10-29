@@ -22,7 +22,7 @@ $app->plugin(Piwik => {
 });
 
 # API test
-my $url = $app->piwik_api_url('API.get' => {
+my $url = $app->piwik->api_url('API.get' => {
   site_id => [4,5],
   urls => ['https://grimms-abenteuer.de/', 'https://khm.li/'],
   period => 'range',
@@ -64,7 +64,7 @@ unless ($param{url}) {
 };
 
 
-ok($url = $app->piwik_api_url(
+ok($url = $app->piwik->api_url(
   'ExampleAPI.getPiwikVersion' => {
     %param
   }
@@ -75,7 +75,7 @@ ok(my $json = $ua->get($url)->res->json, 'Get JSON');
 
 like($json->{value}, qr{^[\.0-9]+$}, 'API.getPiwikVersion');
 
-ok($url = $app->piwik_api_url(
+ok($url = $app->piwik->api_url(
   'ExampleAPI.getAnswerToLife' => {
     %param
   }
@@ -84,7 +84,7 @@ ok($url = $app->piwik_api_url(
 ok($json = $ua->get($url)->res->json, 'Get JSON');
 is($json->{value}, 42, 'API.getAnswerToLife');
 
-ok($url = $app->piwik_api_url(
+ok($url = $app->piwik->api_url(
   'ExampleAPI.getObject' => {
     %param
   }
@@ -93,7 +93,7 @@ ok($url = $app->piwik_api_url(
 ok($json = $ua->get($url)->res->json, 'Get JSON');
 is($json->{result}, 'error', 'API.getObject');
 
-ok($url = $app->piwik_api_url(
+ok($url = $app->piwik->api_url(
   'ExampleAPI.getSum' => {
     %param,
     a => 5,

@@ -1,4 +1,4 @@
-package prefork;
+package prefork; # git description: 7b0d615
 
 =pod
 
@@ -111,7 +111,7 @@ In any use of C<prefork> as a pragma, you can only pass a single value
 as argument. Any additional arguments will be ignored. (This may throw
 an error in future versions).
 
-=head2 Compatbility with mod_perl and others
+=head2 Compatibility with mod_perl and others
 
 Part of the design of C<prefork>, and its minimalistic nature, is that it
 is intended to work easily with existing modules, needing only small
@@ -174,41 +174,39 @@ prefork provides, you can also do the following.
 
 =cut
 
-use 5.005;
+use 5.006;
 use strict;
+#use warnings;  # this might not be safe to turn on!
 use Carp              ();
 use List::Util   0.18 ();
 use Scalar::Util 0.18 ();
 
-use vars qw{$VERSION $FORKING %MODULES @NOTIFY};
-BEGIN {
-	$VERSION = '1.04';
+our $VERSION = '1.05';
 
-	# The main state variable for this package.
-	# Are we in preforking mode.
-	$FORKING = '';
+# The main state variable for this package.
+# Are we in preforking mode.
+our $FORKING = '';
 
-	# The queue of modules to load
-	%MODULES = ();
+# The queue of modules to load
+our %MODULES = ();
 
-	# The queue of notification callbacks
-	@NOTIFY = (
-		sub {
-			# Do a hash copy of Config to get everything
-			# inside of it preloaded.
-			require Config;
-			eval {
-				# Sometimes there is no Config_heavy.pl
-				require 'Config_heavy.pl';
-			};
-			my $copy = { %Config::Config };
-			return 1;
-		},
-	);
+# The queue of notification callbacks
+our @NOTIFY = (
+	sub {
+		# Do a hash copy of Config to get everything
+		# inside of it preloaded.
+		require Config;
+		eval {
+			# Sometimes there is no Config_heavy.pl
+			require 'Config_heavy.pl';
+		};
+		my $copy = { %Config::Config };
+		return 1;
+	},
+);
 
-	# Look for situations that need us to start in forking mode
-	$FORKING = 1 if $ENV{MOD_PERL};
-}
+# Look for situations that need us to start in forking mode
+$FORKING = 1 if $ENV{MOD_PERL};
 
 sub import {
 	return 1 unless $_[1];
@@ -223,7 +221,7 @@ The 'prefork' function indicates that a module should be loaded before
 the process will fork. If already in forking mode the module will be
 loaded immediately.
 
-Otherwise it will be added to a queue to be loaded later if it recieves
+Otherwise it will be added to a queue to be loaded later if it receives
 instructions that it is going to be forking.
 
 Returns true on success, or dies on error.
@@ -260,7 +258,7 @@ When called, prefork.pm will immediately load all outstanding modules, and
 will set a flag so that any further 'prefork' calls will load the module
 at that time.
 
-Returns true, dieing as normal is there is a problem loading a module.
+Returns true, dying as normal is there is a problem loading a module.
 
 =cut
 

@@ -2124,7 +2124,7 @@ QueryLastMessage( ... )
 
 BOOL
 ShowService( pszWindowStation = TEXT( "Winsta0" ), ... )
-	char *pszWindowStation
+	const char *pszWindowStation
 
 	PREINIT:
 		BOOL fResult;
@@ -2530,7 +2530,7 @@ GetSecurity( pszMachine, pszServiceName )
 
 
 
-char *
+const char *
 DebugOutputPath( ... )
 
 	CODE:

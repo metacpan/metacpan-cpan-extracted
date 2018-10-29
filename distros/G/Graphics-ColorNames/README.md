@@ -4,7 +4,7 @@ Graphics::ColorNames - defines RGB values for common color names
 
 # VERSION
 
-version v3.3.1
+version v3.3.3
 
 # SYNOPSIS
 

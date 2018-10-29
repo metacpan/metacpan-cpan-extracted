@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use strict; use warnings;
+use Getopt::Long;
+use App::Search::BackPAN;
+
+GetOptions("pauseid=s" => \my $pause_id, "help" => \my $help) or _show_help();
+_show_help() if $help;
+_show_help('ERROR: Missing PAUSE ID.') unless defined $pause_id;
+
+my $backpan = App::Search::BackPAN->new;
+my $result  = $backpan->search($pause_id);
+
+print join "\n",@$result,"\n";
+
+END {
+    my $time = time - $^T;
+    my $mm   = $time / 60;
+    my $ss   = $time % 60;
+    my $hh   = $mm / 60;
+    $mm = $mm % 60;
+
+    print sprintf("The program ran for %02d:%02d:%02d.\n", $hh, $mm, $ss);
+}
+
+sub _show_help {
+    my ($message) = @_;
+
+    my $help = "USAGE: search-backpan --pauseid <PAUSE_ID> [--help]
+
+    Options:
+        -p|--pauseid   Mandatory parameter PAUSE ID.
+        -h|--help      Print help message.\n";
+
+    if (defined $message) {
+        $help = sprintf("%s\n%s", $message, $help);
+    }
+
+    print $help and exit;
+}

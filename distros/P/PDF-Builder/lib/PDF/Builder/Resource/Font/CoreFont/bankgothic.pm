@@ -3,7 +3,7 @@ package PDF::Builder::Resource::Font::CoreFont::bankgothic;
 use strict;
 use warnings;
 
-our $VERSION = '3.010'; # VERSION
+our $VERSION = '3.012'; # VERSION
 my $LAST_UPDATE = '3.002'; # manually update whenever code is changed
 
 =head1 NAME

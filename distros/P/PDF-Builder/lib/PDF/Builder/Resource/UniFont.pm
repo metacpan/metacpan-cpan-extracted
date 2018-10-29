@@ -3,8 +3,8 @@ package PDF::Builder::Resource::UniFont;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -180,7 +180,7 @@ sub width {
 }
 
 sub text {
-    my ($self, $text, $size, $ident) = @_;
+    my ($self, $text, $size, $indent) = @_;
 
     $text = decode($self->{'encode'}, $text) unless is_utf8($text);
     die 'textsize not specified' unless defined $size;
@@ -198,9 +198,9 @@ sub text {
 
         if ($thisfont != $lastfont && $lastfont != -1) {
             my $f = $self->fontlist()->[$lastfont];
-            if (defined($ident) && $ident != 0) {
-	        $newtext .= '/'.$f->name().' '.$size.' Tf ['.$ident.' '.$f->text(pack('U*', @codes)).'] TJ ';
-	        $ident = undef;
+            if (defined($indent) && $indent != 0) {
+	        $newtext .= '/'.$f->name().' '.$size.' Tf ['.$indent.' '.$f->text(pack('U*', @codes)).'] TJ ';
+	        $indent = undef;
             } else {
 	        $newtext .= '/'.$f->name().' '.$size.' Tf '.$f->text(pack('U*', @codes)).' Tj ';
             }
@@ -213,7 +213,7 @@ sub text {
 
     if (scalar @codes > 0) {
         my $f = $self->fontlist()->[$lastfont];
-        $newtext .= '/'.$f->name().' '.$size.' Tf '.$f->text(pack('U*', @codes), $size).' ';
+        $newtext .= '/'.$f->name().' '.$size.' Tf '.$f->text(pack('U*', @codes), $size, $indent).' ';
     }
 
     return $newtext;

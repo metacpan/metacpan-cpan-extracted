@@ -50,8 +50,10 @@
       },
       "test" : {
          "requires" : {
+            "Hash::Merge" : "0",
             "Test::More" : "0.98",
-            "Test::Snapshot" : "0.02"
+            "Test::Snapshot" : "0.02",
+            "YAML::XS" : "0.67"
          }
       }
    },
@@ -69,6 +71,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

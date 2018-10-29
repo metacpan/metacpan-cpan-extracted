@@ -12,7 +12,7 @@ Mojo::Util::monkey_patch(__PACKAGE__,
   ? sub { Mojo::ByteStream->new(Text::Markdown::markdown($_[0])) }
   : sub { $_[0] });
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 my $X_RE = qr{^x-};
 
 has route     => sub {undef};
@@ -140,6 +140,7 @@ sub _add_routes {
 
 sub _before_render {
   my ($c, $args) = @_;
+  return unless _self($c);
   my $handler = $args->{handler} || 'openapi';
 
   # Call _render() for response data
@@ -634,6 +635,8 @@ specification is written in perl, instead of JSON or YAML.
 
 Can be used to overriden C</info/version> in the API specification, from the
 return value from the C<VERSION()> method in C<version_from_class>.
+
+This will only have an effect if "version" is "0".
 
 Defaults to the current C<$app>.
 

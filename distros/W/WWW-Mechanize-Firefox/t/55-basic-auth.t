@@ -2,14 +2,9 @@
 use strict;
 use FindBin;
 
-use lib 'inc';
-use IO::Catch;
-use vars qw( $_STDOUT_ $_STDERR_ );
+use lib './inc', '../inc';
 
 use WWW::Mechanize::Firefox;
-
-# pre-5.8.0's warns aren't caught by a tied STDERR.
-tie *STDOUT, 'IO::Catch', '_STDOUT_' or die $!;
 
 use Test::More;
 plan skip_all => "presetting auth does not work yet";

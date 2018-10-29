@@ -1,3 +1,13 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/Archive-Merged.svg?branch=master)](https://travis-ci.org/Corion/Archive-Merged)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Archive-Merged?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Archive-Merged)
+
+CONTRIBUTING
+
+See lib/WWW/Mechanize/Chrome/Contributing.pod
+
+[Google Keep Extraction](https://github.com/Corion/WWW-Mechanize-Chrome/raw/master/demo/keep-export-demo.mp4)
+
 # NAME
 
 Archive::Merged - virtually merge two archives

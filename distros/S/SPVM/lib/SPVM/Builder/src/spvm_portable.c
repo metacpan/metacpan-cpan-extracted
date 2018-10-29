@@ -308,7 +308,8 @@ void SPVM_PORTABLE_push_sub(SPVM_PORTABLE* portable, SPVM_SUB* sub) {
   new_portable_sub->double_vars_alloc_length = sub->double_vars_alloc_length;
   new_portable_sub->object_vars_alloc_length = sub->object_vars_alloc_length;
   new_portable_sub->ref_vars_alloc_length = sub->ref_vars_alloc_length;
-
+  new_portable_sub->return_runtime_type = sub->return_runtime_type;
+  
   for (int32_t arg_id = 0; arg_id < sub->args->length; arg_id++) {
     SPVM_MY* my = SPVM_LIST_fetch(sub->args, arg_id);
     SPVM_PORTABLE_push_arg(portable, my);
@@ -462,10 +463,10 @@ void SPVM_PORTABLE_push_field(SPVM_PORTABLE* portable, SPVM_FIELD* field) {
     new_portable_field->basic_type_id = 0;
   }
   new_portable_field->type_dimension = field->type->dimension;
-  new_portable_field->type_flag = field->type->flag;
   if (field->package) {
     new_portable_field->package_id = field->package->id;
   }
+  new_portable_field->runtime_type = field->runtime_type;
   
   portable->fields_length++;
 }

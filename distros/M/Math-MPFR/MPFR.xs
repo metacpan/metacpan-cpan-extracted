@@ -2766,13 +2766,13 @@ SV * Rmpfr_sum(pTHX_ mpfr_t * rop, SV * avref, SV * len, SV * round) {
 
      for(i = 0; i < s; ++i) {
         elem = av_fetch((AV*)SvRV(avref), i, 0);
-        p[i] = (INT2PTR(mpfr_t *, SvIVX(SvRV(*elem))))[0];
+        p[i] = *(INT2PTR(mpfr_t *, SvIVX(SvRV(*elem))));
      }
 
      ret = mpfr_sum(*rop, p, s, (mpfr_rnd_t)SvUV(round));
 
      Safefree(p);
-     return newSVuv(ret);
+     return newSViv(ret);
 }
 
 void _fr_to_q(mpq_t * q, mpfr_t * fr) {
@@ -6319,11 +6319,12 @@ SV * Rmpfr_set_DECIMAL64(pTHX_ mpfr_t * rop, SV * op, SV * rnd) {
 #endif
 
 /*
- MPFR_WANT_DECIMAL_FLOATS needs to have been defined prior to inclusion of mpfr.h - this is done by
- defining it at the 'Makefile.PL' step - see the Makefile.PL
+ MPFR_WANT_DECIMAL_FLOATS needs to have been defined prior to inclusion of mpfr.h.
+ MPFR_WANT_DECIMAL164 also needs to be defined.
+ See the Makefile.PL
 */
 
-#ifdef MPFR_WANT_DECIMAL_FLOATS
+#if defined(MPFR_WANT_DECIMAL_FLOATS) && defined(MPFR_WANT_DECIMAL64)
     if(sv_isobject(op)) {
       const char* h = HvNAME(SvSTASH(SvRV(op)));
 
@@ -6339,14 +6340,60 @@ SV * Rmpfr_set_DECIMAL64(pTHX_ mpfr_t * rop, SV * op, SV * rnd) {
 #if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(3,1,0)
     if( mpfr_buildopt_decimal_p() ) {
       warn("To make Rmpfr_set_DECIMAL64 available, rebuild Math::MPFR and pass \"D64=1\" as an arg to the Makefile.PL\n");
-      croak("See \"PASSING _Decimal64 VALUES\" in the Math::MPFR documentation");
+      croak("See \"PASSING _Decimal64 & _Decimal128 VALUES\" in the Math::MPFR documentation");
     }
 #endif
 
-    croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see \"PASSING _Decimal64 VALUES\" in the Math::MPFR documentation");
+    croak("Both MPFR_WANT_DECIMAL_FLOATS and MPFR_WANT_DECIMAL64 need to have been defined when building Math::MPFR - see \"PASSING _Decimal64 & _Decimal128 VALUES\" in the Math::MPFR documentation");
 
 #endif
 }
+
+/**********************************************
+ **********************************************/
+
+
+SV * Rmpfr_set_DECIMAL128(pTHX_ mpfr_t * rop, SV * op, SV * rnd) {
+#if (!defined(MPFR_VERSION) || (MPFR_VERSION<MPFR_VERSION_NUM(4,1,0)))
+     croak("Perl interface to Rmpfr_set_DECIMAL128 not available for this version (%s) of the mpfr library. We need at least version 4.1.0",
+            MPFR_VERSION_STRING);
+#endif
+
+/*
+ MPFR_WANT_DECIMAL_FLOATS needs to have been defined prior to inclusion of mpfr.h.
+ MPFR_WANT_DECIMAL1128 also needs to be defined.
+ See the Makefile.PL
+*/
+
+#if defined(MPFR_WANT_DECIMAL_FLOATS) && defined(MPFR_WANT_DECIMAL128)
+    if(sv_isobject(op)) {
+      const char* h = HvNAME(SvSTASH(SvRV(op)));
+
+      if(strEQ(h, "Math::Decimal128"))
+        return newSViv(mpfr_set_decimal128(*rop, *(INT2PTR(D128 *, SvIVX(SvRV(op)))), (mpfr_rnd_t)SvUV(rnd)));
+       croak("2nd arg (a %s object) supplied to Rmpfr_set_DECIMAL128 needs to be a Math::Decimal128 object",
+               HvNAME(SvSTASH(SvRV(op))));
+    }
+    else croak("2nd arg (which needs to be a Math::Decimal128 object) supplied to Rmpfr_set_DECIMAL128 is not an object");
+
+#else
+
+#if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(4,1,0)
+    if( mpfr_buildopt_decimal_p() ) {
+      warn("To make Rmpfr_set_DECIMAL128 available, rebuild Math::MPFR and pass \"D128=1\"  as separate args to the Makefile.PL\n");
+      croak("See \"PASSING _Decimal64 & _Decimal128 VALUES\" in the Math::MPFR documentation");
+    }
+#endif
+
+    croak("Both MPFR_WANT_DECIMAL_FLOATS and MPFR_WANT_DECIMAL128 need to have been defined when building Math::MPFR");
+
+#endif
+}
+
+
+
+/**********************************************
+ **********************************************/
 
 void Rmpfr_get_LD(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
      if(sv_isobject(rop)) {
@@ -6361,6 +6408,9 @@ void Rmpfr_get_LD(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
      else croak("1st arg (which needs to be a Math::LongDouble object) supplied to Rmpfr_get_LD is not an object");
 }
 
+/**********************************************
+ **********************************************/
+
 void Rmpfr_get_DECIMAL64(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
 #if (!defined(MPFR_VERSION) || (MPFR_VERSION<MPFR_VERSION_NUM(3,1,0)))
      croak("Perl interface to Rmpfr_get_DECIMAL64 not available for this version (%s) of the mpfr library. We need at least version 3.1.0",
@@ -6368,16 +6418,17 @@ void Rmpfr_get_DECIMAL64(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
 #endif
 
 /*
- MPFR_WANT_DECIMAL_FLOATS needs to have been defined prior to inclusion of mpfr.h - this is done by
- defining it at the 'Makefile.PL' step - see the Makefile.PL
+ MPFR_WANT_DECIMAL_FLOATS needs to have been defined prior to inclusion of mpfr.h.
+ MPFR_WANT_DECIMAL164 also needs to be defined.
+ See the Makefile.PL
 */
 
-#ifdef MPFR_WANT_DECIMAL_FLOATS
+#if defined(MPFR_WANT_DECIMAL_FLOATS) && defined(MPFR_WANT_DECIMAL64)
     if(sv_isobject(rop)) {
       const char* h = HvNAME(SvSTASH(SvRV(rop)));
 
       if(strEQ(h, "Math::Decimal64"))
-        *(INT2PTR(_Decimal64 *, SvIVX(SvRV(rop)))) = mpfr_get_decimal64(*op, (mpfr_rnd_t)SvUV(rnd));
+        *(INT2PTR(_Decimal64 *, SvIVX(SvRV(rop)))) = mpfr_get_decimal64(*op, (mp_rnd_t)SvUV(rnd));
 
        else croak("1st arg (a %s object) supplied to Rmpfr_get_DECIMAL64 needs to be a Math::Decimal64 object",
                       HvNAME(SvSTASH(SvRV(rop))));
@@ -6389,17 +6440,78 @@ void Rmpfr_get_DECIMAL64(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
 #if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(3,1,0)
     if( mpfr_buildopt_decimal_p() ) {
       warn("To make Rmpfr_get_DECIMAL64 available, rebuild Math::MPFR and pass \"D64=1\" as an arg to the Makefile.PL\n");
-      croak("See \"PASSING _Decimal64 VALUES\" in the Math::MPFR documentation");
+      croak("See \"PASSING _Decimal64 & _Decimal128 VALUES\" in the Math::MPFR documentation");
     }
 #endif
 
-    croak("MPFR_WANT_DECIMAL_FLOATS needs to have been defined when building Math::MPFR - see \"PASSING _Decimal64 VALUES\" in the Math::MPFR documentation");
+    croak("Both MPFR_WANT_DECIMAL_FLOATS and MPFR_WANT_DECIMAL64 need to have been defined when building Math::MPFR");
 
 #endif
 }
 
+/**********************************************
+ **********************************************/
+
+void Rmpfr_get_DECIMAL128(pTHX_ SV * rop, mpfr_t * op, SV * rnd) {
+#if (!defined(MPFR_VERSION) || (MPFR_VERSION<MPFR_VERSION_NUM(4,1,0)))
+     croak("Perl interface to Rmpfr_get_DECIMAL128 not available for this version (%s) of the mpfr library. We need at least version 4.1.0",
+              MPFR_VERSION_STRING);
+#endif
+
+/*
+ MPFR_WANT_DECIMAL_FLOATS needs to have been defined prior to inclusion of mpfr.h.
+ MPFR_WANT_DECIMAL1128 also needs to be defined.
+ See the Makefile.PL
+*/
+
+#if defined(MPFR_WANT_DECIMAL_FLOATS) && defined(MPFR_WANT_DECIMAL128)
+    if(sv_isobject(rop)) {
+      const char* h = HvNAME(SvSTASH(SvRV(rop)));
+
+      if(strEQ(h, "Math::Decimal128"))
+        *(INT2PTR(D128 *, SvIVX(SvRV(rop)))) = mpfr_get_decimal128(*op, (mp_rnd_t)SvUV(rnd));
+
+       else croak("1st arg (a %s object) supplied to Rmpfr_get_DECIMAL128 needs to be a Math::Decimal128 object",
+                      HvNAME(SvSTASH(SvRV(rop))));
+    }
+    else croak("1st arg (which needs to be a Math::Decimal128 object) supplied to Rmpfr_get_DECIMAL128 is not an object");
+
+#else
+
+#if defined(MPFR_VERSION) && MPFR_VERSION >= MPFR_VERSION_NUM(4,1,0)
+    if( mpfr_buildopt_decimal_p() ) {
+      warn("To make Rmpfr_get_DECIMAL128 available, rebuild Math::MPFR and pass \"D128=1\" as an arg to the Makefile.PL\n");
+      croak("See \"PASSING _Decimal64 & _Decimal128 VALUES\" in the Math::MPFR documentation");
+    }
+#endif
+
+    croak("Both MPFR_WANT_DECIMAL_FLOATS and MPFR_WANT_DECIMAL128 need to have been defined when building Math::MPFR");
+
+#endif
+}
+
+
+/**********************************************
+ **********************************************/
+
 int _MPFR_WANT_DECIMAL_FLOATS(void) {
 #ifdef MPFR_WANT_DECIMAL_FLOATS
+ return 1;
+#else
+ return 0;
+#endif
+}
+
+int _MPFR_WANT_DECIMAL64(void) {
+#ifdef MPFR_WANT_DECIMAL64
+ return 1;
+#else
+ return 0;
+#endif
+}
+
+int _MPFR_WANT_DECIMAL128(void) {
+#ifdef MPFR_WANT_DECIMAL128
  return 1;
 #else
  return 0;
@@ -7647,6 +7759,51 @@ int _ld_subnormal_bug(void) {
 #endif
 }
 
+/*
+*  The atodouble function was written as a means to check that the atonv
+*  function  handles subnormal double-doubles correctly.
+*  But it is readily available for any other purpose, too.
+*  On a perl whose nvtype is double it should return the same value as atonv,
+*  though atodouble is not as efficient as atonv.
+*/
+
+double atodouble(char * str) {
+
+
+#if defined(MPFR_VERSION) & MPFR_VERSION > 196869
+
+    mpfr_t workspace;
+    mpfr_prec_t emin, emax;
+    int inex;
+    double d;
+
+    mpfr_init2(workspace, 53);
+
+    emin = mpfr_get_emin();
+    emax = mpfr_get_emax();
+
+    mpfr_set_emin(-1073);
+    mpfr_set_emax(1024);
+
+    inex = mpfr_strtofr(workspace, str, NULL, 0, GMP_RNDN);
+    mpfr_subnormalize(workspace, inex, GMP_RNDN);
+
+    mpfr_set_emin(emin);
+    mpfr_set_emax(emax);
+
+    d = mpfr_get_d(workspace, GMP_RNDN);
+
+    mpfr_clear(workspace);
+
+    return d;
+
+#else
+
+    croak("The atodouble function requires mpfr-3.1.6 or later");
+
+#endif
+}
+
 SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
 
 
@@ -7726,11 +7883,46 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
 
 #if REQUIRED_LDBL_MANT_DIG == 2098
 
+    mpfr_t dspace;
+    double msd, lsd;        /* 'most' and 'least' significant doubles */
+    mpfr_prec_t emin, emax;
+    int inex;
+    long double ret;
+
     if(mpfr_get_prec(*workspace) != 2098)
       croak ("Precision of first arg to atonv function must be 2098");
 
+    mpfr_init2(dspace, 53);
+
+    emin = mpfr_get_emin();
+    emax = mpfr_get_emax();
+
+    mpfr_set_emin(-1073);
+    mpfr_set_emax(1024);
+
+    inex = mpfr_strtofr(dspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
+    mpfr_subnormalize(dspace, inex, GMP_RNDN);
+
+    msd = mpfr_get_d(dspace, GMP_RNDN);
+
+    if(!mpfr_regular_p(dspace)) {
+      mpfr_clear(dspace);
+      mpfr_set_emin(emin); /* restore to original value */
+      mpfr_set_emax(emax); /* restore to original value */
+      return newSVnv(msd);
+    }
+
     mpfr_strtofr(*workspace, SvPV_nolen(str), NULL, 0, GMP_RNDN);
-    return newSVnv(mpfr_get_ld(*workspace, GMP_RNDN));
+    inex = mpfr_sub(dspace, *workspace, dspace, GMP_RNDN);
+    mpfr_subnormalize(dspace, inex, GMP_RNDN);
+    lsd = mpfr_get_d(dspace, GMP_RNDN);
+
+    mpfr_clear(dspace);
+
+    mpfr_set_emin(emin); /* restore to original value */
+    mpfr_set_emax(emax); /* restore to original value */
+
+    return newSVnv((long double)msd + (long double)lsd);
 
 #endif
 #endif                                                  /* close LD */
@@ -7772,6 +7964,52 @@ SV * atonv(pTHX_ mpfr_t * workspace, SV * str) {
 #endif
 
 } /* close atonv */
+
+/* new in 4.1.0 (262400) */
+
+SV * Rmpfr_get_str_ndigits(pTHX_ int base, SV * prec) {
+#if defined(MPFR_VERSION) && MPFR_VERSION >= 262400 /* version 4.1.0 */
+    return newSVuv(mpfr_get_str_ndigits(base, (mpfr_prec_t)SvUV(prec)));
+#else
+    croak("The Rmpfr_get_str_ndigits function requires mpfr-4.1.0 or later");
+#endif
+}
+
+SV * Rmpfr_dot(pTHX_ mpfr_t * rop, SV * avref_A, SV * avref_B, SV * len, SV * round) {
+#if defined(MPFR_VERSION) && MPFR_VERSION >= 262400 /* version 4.1.0 */
+     mpfr_ptr *p_A, *p_B;
+     SV ** elem;
+     int ret, i;
+     unsigned long s = (unsigned long)SvUV(len);
+
+     if(s > av_len((AV*)SvRV(avref_A)) + 1 || s > av_len((AV*)SvRV(avref_B)) + 1)
+       croak("2nd last arg to Rmpfr_dot is too large");
+
+     Newx(p_A, s, mpfr_ptr);
+     if(p_A == NULL) croak("Unable to allocate memory for first array in Rmpfr_dot");
+
+     Newx(p_B, s, mpfr_ptr);
+     if(p_B == NULL) croak("Unable to allocate memory for second array in Rmpfr_dot");
+
+     for(i = 0; i < s; ++i) {
+        elem = av_fetch((AV*)SvRV(avref_A), i, 0);
+        p_A[i] = *(INT2PTR(mpfr_t *, SvIVX(SvRV(*elem))));
+     }
+
+     for(i = 0; i < s; ++i) {
+        elem = av_fetch((AV*)SvRV(avref_B), i, 0);
+        p_B[i] = *(INT2PTR(mpfr_t *, SvIVX(SvRV(*elem))));
+     }
+
+     ret = mpfr_dot(*rop, p_A, p_B, s, (mpfr_rnd_t)SvUV(round));
+
+     Safefree(p_A);
+     Safefree(p_B);
+     return newSViv(ret);
+#else
+    croak("The Rmpfr_dot function requires mpfr-4.1.0 or later");
+#endif
+}
 
 
 
@@ -11442,6 +11680,15 @@ CODE:
   RETVAL = Rmpfr_set_DECIMAL64 (aTHX_ rop, op, rnd);
 OUTPUT:  RETVAL
 
+SV *
+Rmpfr_set_DECIMAL128 (rop, op, rnd)
+	mpfr_t *	rop
+	SV *	op
+	SV *	rnd
+CODE:
+  RETVAL = Rmpfr_set_DECIMAL128 (aTHX_ rop, op, rnd);
+OUTPUT:  RETVAL
+
 void
 Rmpfr_get_LD (rop, op, rnd)
 	SV *	rop
@@ -11478,8 +11725,34 @@ Rmpfr_get_DECIMAL64 (rop, op, rnd)
         /* must have used dXSARGS; list context implied */
         return; /* assume stack size is correct */
 
+void
+Rmpfr_get_DECIMAL128 (rop, op, rnd)
+	SV *	rop
+	mpfr_t *	op
+	SV *	rnd
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpfr_get_DECIMAL128(aTHX_ rop, op, rnd);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
 int
 _MPFR_WANT_DECIMAL_FLOATS ()
+
+
+int
+_MPFR_WANT_DECIMAL64 ()
+
+
+int
+_MPFR_WANT_DECIMAL128 ()
 
 
 int
@@ -12114,11 +12387,34 @@ int
 _ld_subnormal_bug ()
 
 
+double
+atodouble (str)
+	char *	str
+
 SV *
 atonv (workspace, str)
 	mpfr_t *	workspace
 	SV *	str
 CODE:
   RETVAL = atonv (aTHX_ workspace, str);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_get_str_ndigits (base, prec)
+	int	base
+	SV *	prec
+CODE:
+  RETVAL = Rmpfr_get_str_ndigits (aTHX_ base, prec);
+OUTPUT:  RETVAL
+
+SV *
+Rmpfr_dot (rop, avref_A, avref_B, len, round)
+	mpfr_t *	rop
+	SV *	avref_A
+	SV *	avref_B
+	SV *	len
+	SV *	round
+CODE:
+  RETVAL = Rmpfr_dot (aTHX_ rop, avref_A, avref_B, len, round);
 OUTPUT:  RETVAL
 

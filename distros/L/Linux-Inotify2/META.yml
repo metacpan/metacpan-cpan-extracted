@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   common::sense: '0'
-version: '2.0'
+version: '2.1'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

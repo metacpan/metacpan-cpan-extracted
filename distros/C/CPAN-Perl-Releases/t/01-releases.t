@@ -30,6 +30,11 @@ my $expected = {
   ok( !$got, 'Should not have this release' );
 }
 
+{
+  my $got = perl_tarballs( );
+  ok( !$got, 'Should not have undef release' );
+}
+
 my @versions = perl_versions();
 
 ok (grep(/^5.6.1$/, @versions), "has 5.6.1");

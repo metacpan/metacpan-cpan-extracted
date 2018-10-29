@@ -83,6 +83,12 @@ Revision history for VSGDR::StaticData
         Fixed column typing for new genTestData.pl
 0.39	11/06/2018
         Fixed regression bug introduced into genStaticData.pl
+0.40	11/06/2018
+        Added type derivation for uniqueidentifier
+0.41	29/10/2018
+        Added ability to ignore all columns with only null 'values' when extracting test data.
+0.42	29/10/2018
+        Fixed changes. (this file.)
 
         
 	

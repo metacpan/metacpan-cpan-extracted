@@ -24,7 +24,7 @@ Test::MockFile::FileHandle - Provides a class for L<Test::MockFile> to tie to on
 
 =head1 VERSION
 
-Version 0.006
+Version 0.008
 
 =cut
 
@@ -126,7 +126,7 @@ This method will be called when the handle is written to via the syswrite functi
 Arguments passed are:C<( $self, $buf, $len, $offset )>
 
 This is one of the more complicated functions to mimic properly because $len and $offset have to be taken into
-account. Reviewing how syswrite works reveals there are all sorts of wierd corner cases.
+account. Reviewing how syswrite works reveals there are all sorts of weird corner cases.
 
 =cut
 

@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.014004;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Google API Services Client.",
+  "ABSTRACT" => "API WebService OAUTH2 Client Agent to streamline access to GOOGLE API End-Point Services using Discovery Data",
   "AUTHOR" => "Peter Scott <localshop\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/goauth"
   ],
   "LICENSE" => "apache",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.014004",
   "NAME" => "WebService::GoogleAPI::Client",
   "PREREQ_PM" => {
     "CHI" => 0,
@@ -28,11 +28,11 @@ my %WriteMakefileArgs = (
     "Hash::Slice" => 0,
     "List::Util" => "1.45",
     "Mojo::UserAgent" => 0,
+    "Mojolicious" => "7.12",
     "Mojolicious::Lite" => 0,
     "Mojolicious::Plugin::OAuth2" => "1.5",
     "Moo" => 0,
     "MooX::Singleton" => 0,
-    "Moose" => "2.2",
     "Net::EmptyPort" => 0,
     "Path::Class" => 0,
     "Tie::File" => 0,
@@ -44,11 +44,14 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Cwd" => 0,
     "Email::Simple" => 0,
+    "FindBin" => 0,
+    "JSON" => 0,
     "MIME::Base64" => 0,
+    "Sub::Override" => 0,
     "Test::More" => 0,
     "Test::Needs" => 0
   },
-  "VERSION" => "0.13",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,17 +66,20 @@ my %FallbackPrereqs = (
   "Cwd" => 0,
   "Data::Dumper" => 0,
   "Email::Simple" => 0,
+  "FindBin" => 0,
   "Hash::Slice" => 0,
+  "JSON" => 0,
   "List::Util" => "1.45",
   "MIME::Base64" => 0,
   "Mojo::UserAgent" => 0,
+  "Mojolicious" => "7.12",
   "Mojolicious::Lite" => 0,
   "Mojolicious::Plugin::OAuth2" => "1.5",
   "Moo" => 0,
   "MooX::Singleton" => 0,
-  "Moose" => "2.2",
   "Net::EmptyPort" => 0,
   "Path::Class" => 0,
+  "Sub::Override" => 0,
   "Test::More" => 0,
   "Test::Needs" => 0,
   "Tie::File" => 0,

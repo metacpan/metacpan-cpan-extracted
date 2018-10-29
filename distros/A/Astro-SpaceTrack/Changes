@@ -1,3 +1,12 @@
+0.121		2018-10-26	T. R. Wyant
+    Update canned status table for decay of
+
+    - Iridium 11
+    - Iridium 20
+
+    Skip data tests on fetch error. All tests but t/query_spacetrack.t
+    also skip the fetch if it returns a 500.
+
 0.120		2018-10-17	T. R. Wyant
     RT 127371 Dependency problem when bulding with Module::Build.
     Thanks to Slaven Rezic for finding this (unlike many dependency

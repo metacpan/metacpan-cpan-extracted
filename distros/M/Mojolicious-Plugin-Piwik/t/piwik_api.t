@@ -21,7 +21,7 @@ $app->plugin(Piwik => {
 });
 
 # API test
-my $url = $app->piwik_api('API.get' => {
+my $url = $app->piwik->api('API.get' => {
   site_id => [4,5],
   urls => ['http://grimms-abenteuer.de/', 'http://khm.li/'],
   period => 'range',
@@ -65,25 +65,25 @@ unless ($param{url}) {
 
 my $c = $app->build_controller;
 
-like($c->piwik_api(
+like($c->piwik->api(
   'ExampleAPI.getPiwikVersion' => {
     %param
   }
 )->{value}, qr{^[\.0-9]+$}, 'API.getPiwikVersion');
 
-is($app->piwik_api(
+is($app->piwik->api(
   'ExampleAPI.getAnswerToLife' => {
     %param
   }
 )->{value}, 42, 'API.getAnswerToLife');
 
-is($app->piwik_api(
+is($app->piwik->api(
   'ExampleAPI.getObject' => {
     %param
   }
 )->{result}, 'error', 'API.getObject');
 
-is($app->piwik_api(
+is($app->piwik->api(
   'ExampleAPI.getSum' => {
     %param,
     a => 5,
@@ -91,13 +91,13 @@ is($app->piwik_api(
   }
 )->{value}, 12, 'API.getSum');
 
-ok(!$app->piwik_api(
+ok(!$app->piwik->api(
   'ExampleAPI.getNull' => {
     %param
   }
 )->{value}, 'API.getNull');
 
-my $array = $app->piwik_api(
+my $array = $app->piwik->api(
   'ExampleAPI.getDescriptionArray' => {
     %param
   }
@@ -110,7 +110,7 @@ is($array->[3], 'free', 'API.getDescriptionArray 4');
 is($array->[4], 'Strong message: Свободный Тибет',
    'API.getDescriptionArray 5');
 
-my $table = $app->piwik_api(
+my $table = $app->piwik->api(
   'ExampleAPI.getCompetitionDatatable' => {
     %param
   }
@@ -122,7 +122,7 @@ is($table->[0]->{license}, 'GPL', 'API.getCompetitionDatatable 2');
 is($table->[1]->{name}, 'google analytics', 'API.getCompetitionDatatable 3');
 is($table->[1]->{license}, 'commercial', 'API.getCompetitionDatatable 4');
 
-is($app->piwik_api(
+is($app->piwik->api(
   'ExampleAPI.getMoreInformationAnswerToLife' => {
     %param
   }
@@ -130,7 +130,7 @@ is($app->piwik_api(
    'Check http://en.wikipedia.org/wiki/The_Answer_to_Life,_the_Universe,_and_Everything',
    'API.getMoreInformationAnswerToLife');
 
-my $marray = $app->piwik_api(
+my $marray = $app->piwik->api(
   'ExampleAPI.getMultiArray' => {
     %param
   }

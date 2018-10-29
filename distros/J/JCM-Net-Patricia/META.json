@@ -1,7 +1,7 @@
 {
    "abstract" : "Patricia Trie perl module for fast IP address lookups",
    "author" : [
-      "J. Maslak <jmaslak@antelope.net>"
+      "Joelle Maslak <jmaslak@antelope.net>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
@@ -41,12 +41,12 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "X_respoistory" : {
+      "repository" : {
          "type" : "git",
          "url" : "git://git@github.com/jmaslak/JCM-Net-Patricia.git",
          "web" : "https://github.com/jmaslak/JCM-Net-Patricia"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

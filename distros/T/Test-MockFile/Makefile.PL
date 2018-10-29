@@ -22,7 +22,7 @@ WriteMakefile(
         'File::Slurper'             => 0,
     },
     PREREQ_PM => {
-        'Overload::FileCheck' => 0,
+        'Overload::FileCheck' => '0.005',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'Test-MockFile-*' },

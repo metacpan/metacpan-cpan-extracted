@@ -1,5 +1,5 @@
 ---
-abstract: 'Use Piwik in Mojolicious'
+abstract: 'Use Matomo (Piwik) in Mojolicious'
 author:
   - 'Nils Diewald'
 build_requires:
@@ -21,6 +21,6 @@ requires:
   Mojolicious: '4.88'
   perl: '5.010001'
 resources:
-  license: http://www.opensource.org/licenses/artistic-license-2.0
-version: '0.20'
+  license: https://opensource.org/licenses/artistic-license-2.0
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

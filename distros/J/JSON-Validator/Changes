@@ -1,5 +1,11 @@
 Revision history for perl distribution JSON-Validator
 
+2.14 2018-10-26T11:39:05+0900
+ - Fix guessing schema type from "required" key #118
+ - Fix appending parameters for Mojolicious 8.00 #119 #120
+ - Improved error return values from allOf, anyOf and oneOf validation
+ - Will not overwrite OpenAPI "/info/version" from "version_from_class"
+
 2.13 2018-10-17T23:10:54+0900
  - Compatible with weak attrs in Mojolicious 8.03
 

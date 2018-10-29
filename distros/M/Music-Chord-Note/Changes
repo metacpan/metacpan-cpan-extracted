@@ -1,5 +1,8 @@
 Revision history for Music-Chord-Note
 
+0.08   Sun Oct 28 04:36:04 JST 2018
+        - Add `madd4` and `dim6`. Thanks, GENE!
+
 0.07   Wed Feb  6 23:29:25 JST 2013
         - not return 'base': is kind of chord name(for internal)
 

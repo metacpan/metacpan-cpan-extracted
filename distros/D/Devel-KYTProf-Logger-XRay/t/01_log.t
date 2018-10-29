@@ -38,6 +38,8 @@ Devel::KYTProf->logger("Devel::KYTProf::Logger::XRay");
 
 {
     local $AWS::XRay::TRACE_ID = AWS::XRay::new_trace_id();
+    local $AWS::XRay::ENABLED  = 1;
+
     example("1");
     my ($seg) = parse_buf(1);
     is $seg->{name} => "main";

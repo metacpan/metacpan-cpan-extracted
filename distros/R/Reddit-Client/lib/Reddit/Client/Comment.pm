@@ -6,28 +6,59 @@ use Carp;
 
 require Reddit::Client::VotableThing;
 
+# removed 4/18: media, url, ilink_flair_text, link_flair_css_class
+#
+# were these fields ever part of any comment, or were they copied form Link?
 use base   qw/Reddit::Client::VotableThing/;
-use fields qw/link_flair_text media url link_url link_flair_css_class 
+use fields qw/ 
 	  num_reports created_utc
 	  banned_by subreddit title author_flair_text is_self author media_embed
 	  permalink author_flair_css_class selftext domain num_comments clicked
 	  saved thumbnail subreddit_id approved_by selftext_html created hidden
-	  over_18 parent_id replies link_id body body_html
-	  user_reports mod_reports/;
+	  over_18 parent_id replies body body_html
+	  user_reports mod_reports
+	  link_author link_id link_permalink link_title link_url 
+	  more
+/;
 
 use constant type => "t1";
-
-sub set_replies {
+# This is called by the magic in Thing.pm on creation
+sub set_replies { 
     my ($self, $value) = @_;
     if (ref $value && exists $value->{data}{children}) {
-	    $self->{replies} = [ map { Reddit::Client::Comment->new($self->{session}, $_->{data}) } @{$value->{data}{children}} ];
+		my $comments = $value->{data}{children};
+		my $return = [];
+
+		for my $cmt (@$comments) {
+			# 'kind' is on same level as 'data'
+			if ($cmt->{kind} eq 't1') {
+				push @$return, Reddit::Client::Comment->new($self->{session}, $cmt->{data});
+			} elsif ($cmt->{kind} eq 'more') {
+				my $more = Reddit::Client::MoreComments->new($self->{session}, $cmt->{data});
+				$more->{link_id} = $self->{link_id};
+				$self->{more} = $more->{children};
+				push @$return, $more;
+			}
+		}
+		
+		$self->{replies} = $return;
     } else {
         $self->{replies} = [];
     }
 }
+# need fix this
+sub get_collapsed_comments {
+	my ($self, %param) = @_;
+	return undef if !$self->{more} or ref $self->{more} ne 'ARRAY';
+	
+	my %data = (
+		link_id		=> $self->{link_id},
+		children	=> $self->{more},
+	);
+	$data{sort}	= $param{sort} if $param{sort};
+	$data{id}	= $param{id} if $param{id};
 
-sub replies {
-    return shift->{replies};
+	return $self->{session}->get_collapsed_comments( %data );
 }
 
 sub reply {
@@ -37,7 +68,14 @@ sub reply {
 	return "t1_".$cmtid if $cmtid;
 	return $cmtid;
 }
-
+sub remove {
+	my $self = shift;
+	return $self->{session}->remove($self->{name});
+}
+sub spam {
+	my $self = shift;
+	return $self->{session}->spam($self->{name});
+}
 sub edit {
     	my ($self, $text) = @_;
 	my $cmtid = $self->{session}->edit($self->{name}, $text);
@@ -47,16 +85,37 @@ sub edit {
 sub delete {
     	my $self = shift;
 	my $cmtid = $self->{session}->delete($self->{name});
-	#return "t1_".$cmtid if $cmtid;
 	return $cmtid;
 }
-sub get_permalink {
+sub get_permalink { 	# deprecated. Duplicated instead of calling get_web_url
+	my $self = shift;	# because this may (and probably will) change someday
+	return $self->{session}->get_origin().$self->{permalink}
+}
+sub get_web_url {
 	my $self = shift;
-	my $parentid = substr $self->{link_id}, 3;
-
-	return sprintf "%s/r/$self->{subreddit}/comments/%s//%s", $self->{session}->LINK_URL, $parentid, $self->{id};
+	return $self->{session}->get_origin().$self->{permalink}
+}
+sub get_children {
+	my $self = shift;
+	my $cmts = $self->{session}->get_comments(permalink=>$self->{permalink});
+	$self->{replies} = $$cmts[0]->{replies}; # populate this comment's replies
+	return $$cmts[0]->{replies}; 
+}
+sub get_comments {
+	my $self = shift;
+	my $cmts = $self->{session}->get_comments(permalink=>$self->{permalink});
+	$self->{replies} = $$cmts[0]->{replies}; # populate this comment's replies
+	return $cmts;
 }
 
+sub has_collapsed_children {
+	my $self = shift;
+	return $self->{more} ? 1 : 0;
+}
+
+sub replies {
+    return shift->{replies};
+}
 1;
 
 __END__

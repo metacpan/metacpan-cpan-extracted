@@ -141,7 +141,7 @@ foreach my $yp (0..15) {
 delete $gfx->{'Filter'};
 delete $txt->{'Filter'};
 delete $txt2->{'Filter'};
-$pdf->{'pdf'}->{' version'} = 4;
+#$pdf->{'pdf'}->{' version'} = 1.4;
 my $myName = basename($ARGV[0]);
 $myName =~ s/\.bdf$//i;  # trim off extension
 $pdf->saveas("$0.$myName.pdf");

@@ -1,0 +1,32 @@
+---
+abstract: 'Fast, pure Perl collision 2D detection'
+author:
+  - 'Timm Murray <tmurray@wumpus-cave.net>'
+build_requires:
+  Scalar::Util: '1.50'
+  Test::Deep: '1.128'
+  Test::Memory::Cycle: '1.06'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Game-Collisions
+provides:
+  Game::Collisions:
+    file: lib/Game/Collisions.pm
+    version: '0.1'
+  Game::Collisions::AABB:
+    file: lib/Game/Collisions/AABB.pm
+    version: '0.1'
+requires:
+  perl: '5.014'
+resources:
+  homepage: http://www.wumpus-cave.net
+  repository: https://github.com/frezik/Game-Collisions
+version: '0.1'
+x_serialization_backend: 'YAML::Tiny version 1.70'

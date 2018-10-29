@@ -110,7 +110,7 @@ subtest(
     'unnamed union made of two builtins',
     sub {
         my $unnamed_union = Specio::Constraint::Union->new(
-            of => [ t('Int'), t('ArrayRef') ],
+            of          => [ t('Int'), t('ArrayRef') ],
             declared_at => Specio::DeclaredAt->new_from_caller(0),
         );
 

@@ -20,11 +20,11 @@ Lingua::RO::Numbers - Convert numeric values into their Romanian string equivale
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 # Numbers => text
 our %DIGITS;
@@ -47,8 +47,8 @@ our %WORDS;
 @WORDS{qw(o un doua cin sai ob)} = (1, 1, 2, 5, 6, 8);
 
 # Colocvial
-@WORDS{qw(unspe doispe treispe paispe cinspe cinsprezece saispe saptespe saptuspe optspe nouaspe)} =
-  (11, 12, 13, 14, 15, 15, 16, 17, 17, 18, 19);
+@WORDS{qw(unspe doispe treispe paispe cinspe cinsprezece saispe saptespe saptuspe optspe optuspe nouaspe)} =
+  (11, 12, 13, 14, 15, 15, 16, 17, 17, 18, 18, 19);
 
 # This array contains number greater than 99 and it's used to convert numbers into text
 our @BIGNUMS = (
@@ -125,7 +125,7 @@ Converts a number to its Romanian string representation.
 
   # Example:
   print number_to_ro(98_765, thousands_separator => q{,});
-    # says: 'nouăzeci și opt de mii, șapte sute șaizeci și cinci'
+    #=> 'nouăzeci și opt de mii, șapte sute șaizeci și cinci'
 
 =item B<ro_to_number($text)>
 
@@ -140,7 +140,7 @@ Converts a Romanian text into its numeric value.
   $number = $obj->ro_to_number($text);
 
   # Example:
-  print ro_to_number('patruzeci si doi');  # says: 42
+  print ro_to_number('patruzeci si doi');  #=> 42
 
 =back
 
@@ -513,14 +513,7 @@ sub _number_to_ro {
 
 =head1 AUTHOR
 
-Daniel "Trizen" Șuteu, C<< <trizenx at gmail.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-lingua-ro-numbers at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lingua-RO-Numbers>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
+Daniel Șuteu, C<< <trizen at protonmail.com> >>
 
 =head1 SUPPORT
 
@@ -528,77 +521,23 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Lingua::RO::Numbers
 
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-RO-Numbers>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Lingua-RO-Numbers>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Lingua-RO-Numbers>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Lingua-RO-Numbers/>
-
-=back
-
 =head1 REPOSITORY
 
 L<https://github.com/trizen/Lingua-RO-Numbers>
 
-=head1 ACKNOWLEDGEMENTS
+=head1 REFERENCES
 
 L<http://ro.wikipedia.org/wiki/Sistem_zecimal#Denumiri_ale_numerelor>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2017 Daniel "Trizen" Șuteu.
+Copyright 2013-2018 Daniel Șuteu.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 =cut
 

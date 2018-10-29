@@ -10,10 +10,13 @@ Makefile.PL
 README.md
 README.txt
 bin/goauth
+cpanfile
 dist.ini
 examples/README.md
 examples/discovery_example.pl
 examples/gmail_example.pl
+examples/mojo_ua_mocking_test.pl
+examples/text_to_speech.pl
 examples/usage_basic_examples.pl
 lib/WebService/GoogleAPI/Client.pm
 lib/WebService/GoogleAPI/Client/AuthStorage.pm
@@ -23,7 +26,9 @@ lib/WebService/GoogleAPI/Client/Discovery.pm
 lib/WebService/GoogleAPI/Client/UserAgent.pm
 t/00-load.t
 t/01-client-discovery.t
+t/03-pre-warmed-cache-discovery.t
+t/04-client-mocked-agent.t
 t/author-critic.t
+t/gapi.json
 t/manifest.t
 t/pod.t
-xt/gapi.json

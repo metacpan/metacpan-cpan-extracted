@@ -1,4 +1,14 @@
 Revision history for Perl CPAN module Lingua::En::NameParse
+
+1.38 Oct 2018
+    Allowed for names of type Jo A. Lin, thanks to Mike Edwards via Github
+        Note that an ambiguity now arises for names such as Mr ME Adam Symonds
+        the parser will assume a first name of ME, when it is actually the initials.
+        The surname should be Adam-Symonds to parse correctly
+    
+    Fixed typo in %component_order in NameParse.pm
+    Updated report method to not issue warning on empty results from case_all_reversed method
+    
 1.37 18 Aug 2018
     Allow case_all_reverse to work with name type of 'John' (thanks to Hugh S. Myers for reporting this)
     Fixed github issue for EdwardsMike, 2 letter surname not correctly parsed

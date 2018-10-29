@@ -1,4 +1,4 @@
-package Pcore::Ext v0.18.4;
+package Pcore::Ext v0.18.5;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Base;
@@ -61,9 +61,7 @@ sub scan ( $self, $app, @namespaces ) {
         my $root_namespace_path = $root_namespace =~ s[::][/]smgr;
 
         for my $inc_path ( grep { !is_ref $_ } @INC ) {
-            next if !-d "$inc_path/$root_namespace_path";
-
-            my $modules = P->path1("$inc_path/$root_namespace_path")->read_dir( abs => 0, is_dir => 0, scan_depth => 0 );
+            my $modules = P->path1("$inc_path/$root_namespace_path")->read_dir( abs => 0, is_dir => 0, max_depth => 0 );
 
             next if !$modules;
 
@@ -317,7 +315,7 @@ sub _build_ext ( $self, $tree ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 27                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 111                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 109                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 25                   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

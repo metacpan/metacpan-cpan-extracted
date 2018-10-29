@@ -1,7 +1,7 @@
 #  JCM::Net::Patricia - Patricia Trie perl module for fast IP address lookups
 #  Copyright (C) 2000-2005  Dave Plonka
 #  Copyright (C) 2009       Dave Plonka & Philip Prindeville
-#  Parts Copyright(C) 2016  J. Maslak
+#  Parts Copyright(C) 2016  Joelle Maslak
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA  02110-1301, USA.
 
-# J. Maslak <jmaslak@antelope.net>
+# Joelle Maslak <jmaslak@antelope.net>
 # Dave Plonka <plonka@doit.wisc.edu>
 # Philip Prindeville <philipp@redfish-solutions.com>
 # Anton Berezin <tobez@tobez.org>
@@ -42,7 +42,7 @@ BEGIN {
   @EXPORT = qw(AF_INET AF_INET6);
 }
 
-'$Revision: 1.03 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
+'$Revision: 1.04 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
 
 bootstrap JCM::Net::Patricia $VERSION;
 
@@ -450,7 +450,7 @@ represented as SCALAR values and therefore the user data can be
 complicated data objects.
 
 If no second argument is passed, the key_string will be stored as the
-user data and therfore will likewise be returned by the match
+user data and therefore will likewise be returned by the match
 functions.
 
 On success, this method returns the user_data passed as the second
@@ -480,7 +480,7 @@ the user data for the node.  This method returns undef on failure.
 
 This method searches the Patricia Trie to find a matching node,
 according to normal subnetting rules for the address and mask
-specified. It follwows the same rules as the C<match_string()> method.
+specified. It follows the same rules as the C<match_string()> method.
 
 The key_string argument is a network or subnet specification in
 canonical form, e.g. "10.0.0.0/8", where the number after the slash
@@ -583,8 +583,8 @@ if you are currently relying on the climb return value to accurately
 report a count of the number of nodes in the Patricia Trie, it would be
 prudent to have your subroutine return a non-zero value.
 
-This method is called climb() rather than walk() because climbing trees
-(and therfore tries) is a more popular pass-time than walking them.
+This method is called C<climb()> rather than C<walk()> because climbing trees
+(and tries) is a more popular pass-time than walking them.
 
 =item B<climb_inorder>
 
@@ -609,9 +609,6 @@ your subroutine returned non-zero, as it is called once per node.  So,
 if you are currently relying on the climb return value to accurately
 report a count of the number of nodes in the Patricia Trie, it would be
 prudent to have your subroutine return a non-zero value.
-
-This method is called climb() rather than walk() because climbing trees
-(and therfore tries) is a more popular pass-time than walking them.
 
 =back
 
@@ -645,7 +642,7 @@ use that module instead.
 
 =head1 AUTHOR
 
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
 
 Forked from code written by:
 

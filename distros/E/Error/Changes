@@ -1,2 +1,7 @@
+0.17027         2018-10-28
+    - Documentation and examples enhancements.
+        - https://bitbucket.org/shlomif/perl-error.pm/pull-requests/1/october-prc-some-minor-mostly-doc-changes/diff
+        - Thanks to https://metacpan.org/author/JMERELO .
+
 0.17026         2018-05-23
     - Convert to Dist-Zilla.

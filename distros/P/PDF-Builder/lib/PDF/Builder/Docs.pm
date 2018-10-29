@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -153,14 +153,14 @@ reference streams, but support beyond 1.4 is very limited. All we can say is to
 be careful when handling PDFs whose version is above 1.4, and test thoroughly, 
 as they may break at some point.
 
-Future plans for PDF::Builder include some sort of version control, where input
-PDFs greater than 1.4 (or whatever the default output level is) will receive a
-warning of some sort (that the output might be corrupt). Default output will 
-probaly remain at 1.4, but the use of certain features may trigger the output
-level to be 1.5 or higher, or else produce an error and be forbidden if beyond
-the selected output level. This hasn't been decided yet. Additional PDF 
-features at 1.5 or higher may be added at any time (a few are already in), but 
-should be guarded to prevent output in a PDF declared to be 1.4.
+PDF::Builder includes a simple version control mechanism, where the initial
+PDF version to be output (default 1.4) can be set by the programmer. Input
+PDFs greater than 1.4 (current output level) will receive a warning (can be
+suppressed) that the output level will be raised to that level. The use of PDF
+features greater than the current output level will likewise trigger a warning
+that the output level is to be raised to the necessary level. If this is not
+desired, you should avoid using those PDF features which are higher than the
+desired PDF output level.
 
 =head2 History
 
@@ -687,7 +687,8 @@ filehandle for C<$file>.
 
 PDF::Builder will use the Graphics::TIFF support library for TIFF functions, if
 it is available, unless explicitly told not to. Your code can test whether
-Graphics::TIFF is available by examining C<< $tiff->usesLib() >>.
+Graphics::TIFF is available by examining C<< $tiff->usesLib() >> or
+C<< $pdf->LA_GT() >>.
 
 =over
 
@@ -723,6 +724,55 @@ such as when you want to use a file I<handle> instead of a I<name>.
 Do not give the message that Graphics::TIFF is not B<installed>. This message
 will be given only once, but you may want to suppress it, such as during 
 t-tests.
+
+=back
+
+=head3 PNG Images
+
+PDF::Builder will use the Image::PNG::Libpng support library for PNG functions, 
+if it is available, unless explicitly told not to. Your code can test whether
+Image::PNG::Libpng is available by examining C<< $png->usesLib() >> or
+C<< $pdf->LA_IPL() >>.
+
+=over
+
+=item = -1 
+
+Image::PNG::Libpng I<is> installed, but your code has specified C<-nouseIPL>, 
+to I<not> use it. The old, pure Perl, code (slower and less capable) will be 
+used instead, as if Image::PNG::Libpng was not installed.
+
+=item = 0
+
+Image::PNG::Libpng is I<not> installed. Not all systems are able to successfully
+install this package, as it requires libpng.a.
+
+=item = 1
+
+Image::PNG::Libpng is installed and is being used.
+
+=back
+
+Options:
+
+=over
+
+=item -nouseIPL => 1
+
+Do B<not> use the Image::PNG::Libpng library, even if it's available. Normally
+you I<would> want to use this library, when available, but there may be cases 
+where you don't.
+
+=item -silent => 1
+
+Do not give the message that Image::PNG::Libpng is not B<installed>. This 
+message will be given only once, but you may want to suppress it, such as 
+during t-tests.
+
+=item -notrans => 1
+
+No transparency -- ignore tRNS chunk if provided, ignore Alpha channel if
+provided.
 
 =back
 

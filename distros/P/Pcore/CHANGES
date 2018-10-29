@@ -1,3 +1,9 @@
+v0.75.2 2018-10-26T20:44:26Z
+ - path1
+ - path1 normalize
+ - merged with Pcore::SQLite
+ - path xs
+
 v0.75.1 2018-10-18T05:58:51Z
  - CA updated
  - src is_binary fixed for zero file size

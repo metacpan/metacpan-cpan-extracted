@@ -6,13 +6,13 @@
       "Deluxaran <deluxaran@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Plugin-Deferred",
    "prereqs" : {
@@ -24,7 +24,6 @@
       "develop" : {
          "requires" : {
             "Test::More" : "0.96",
-            "Test::PAUSE::Permissions" : "0",
             "Test::Vars" : "0"
          }
       },
@@ -59,7 +58,7 @@
    "provides" : {
       "Dancer2::Plugin::Deferred" : {
          "file" : "lib/Dancer2/Plugin/Deferred.pm",
-         "version" : "0.007017"
+         "version" : "0.007018"
       }
    },
    "release_status" : "stable",
@@ -74,12 +73,17 @@
          "web" : "https://github.com/perldancer/Dancer2-Plugin-Deferred"
       }
    },
-   "version" : "0.007017",
+   "version" : "0.007018",
    "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
    "x_contributors" : [
       "Damien Krotkine <dams@zarb.org>",
+      "Julien Fiegehenn <simbabque@cpan.org>",
       "Peter Mottram <peter@sysnix.com>",
       "Sawyer X <xsawyerx@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

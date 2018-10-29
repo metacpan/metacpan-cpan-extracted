@@ -34,7 +34,8 @@ tables in an RDBMS with suitable columns and types.
 To try to make the data model represent the "real" data, it applies heuristics:
 
 - to remove object definitions that only have one property (which the
-author calls "thin objects")
+author calls "thin objects"), or that have two properties, one of whose
+names has the substring "count" (case-insensitive).
 - for definitions that have `allOf`, either merge them together if there
 is a `discriminator`, or absorb properties from referred definitions
 - to find object definitions that have all the same properties as another,
@@ -94,6 +95,33 @@ in the definitions. Not exported. E.g.
       d1 => (1 << 0) | (1 << 1),
       d2 => (1 << 1) | (1 << 2),
     }
+
+# OPENAPI SPEC EXTENSIONS
+
+## `x-view-of`
+
+Under `/definitions/$defname`, a key of `x-view-of` will name another
+definition (NB: not a full JSON pointer). That will make `$defname`
+not be created as a table. The handling of creating the "view" of the
+relevant table is left to the CRUD implementation. This gives it scope
+to use things like the current requesting user, or web parameters,
+which otherwise would require a parameterised view. These are not widely
+available.
+
+## `x-artifact`
+
+Under `/definitions/$defname/properties/$propname`, a key of
+`x-artifact` with a true value will indicate this is not to be stored,
+and will not cause a column to be created. The value will instead be
+derived by other means. The value of this key may become the definition
+of that derivation.
+
+## `x-input-only`
+
+Under `/definitions/$defname/properties/$propname`, a key of
+`x-input-only` with a true value will indicate this is not to be stored,
+and will not cause a column to be created. This may end up being merged
+with `x-artifact`.
 
 # DEBUGGING
 

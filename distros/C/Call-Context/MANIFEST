@@ -1,11 +1,14 @@
-MANIFEST
-README.pod
-LICENSE
-Todo
+.gitignore
+.travis.yml
 Changes
+LICENSE
+MANIFEST
 Makefile.PL
+README.pod
+Todo
 lib/Call/Context.pm
 t/001_load.t
 t/002_must_be_list.t
+t/003_must_not_be_scalar.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

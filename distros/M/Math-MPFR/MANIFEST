@@ -7,8 +7,10 @@ MPFR.xs
 README
 CHANGES
 have_d64.in
+have_d128.in
 have_f128.in
 try_dec64.in
+try_dec128.in
 try_flt128.in
 Prec/Prec.xs
 Prec/Prec.pm
@@ -32,6 +34,7 @@ t/bytes.t
 t/constants.t
 t/D64_LD.t
 t/decimal64_conv.t
+t/decimal128_conv.t
 t/div_by_zero.t
 t/DoubleDouble.t
 t/DoubleDouble2.t
@@ -53,6 +56,7 @@ t/NOK_and_POK.t
 t/not_zero.t
 t/new.t
 t/new_in_4.0.0.t
+t/new_in_4.1.0.t
 t/NV_overloading.t
 t/out_str.t
 t/overload.t
@@ -74,6 +78,7 @@ t/set_NV.t
 t/set_str.t
 t/sign.t
 t/sizes.t
+t/subnormal_doubles.t
 t/sum.t
 t/test1.t
 t/test2.t
@@ -83,6 +88,7 @@ t/tls.t
 t/tls_flags.t
 t/trig.t
 t/TRmpfr_out_str.t
+t/underflow.t
 t/use64bitint.t
 t/uselongdouble.t
 t/view_config.t

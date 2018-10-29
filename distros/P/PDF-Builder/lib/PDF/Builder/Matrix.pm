@@ -13,8 +13,8 @@ package PDF::Builder::Matrix;
 use strict;
 use warnings;
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -34,6 +34,7 @@ sub new {
     return $self;
 }
 
+# internal routine
 sub transpose {
     my $self = shift;
     my @result;
@@ -51,6 +52,7 @@ sub transpose {
     return PDF::Builder::Matrix->new(@result);
 }
 
+# internal routine
 sub vekpro {
     my ($a, $b) = @_;
     my $result = 0;
@@ -61,6 +63,7 @@ sub vekpro {
     return $result;
 }
 
+# used by Content.pm
 sub multiply {
     my $self  = shift;
     my $other = shift->transpose();

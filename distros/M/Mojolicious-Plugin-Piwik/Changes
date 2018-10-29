@@ -1,3 +1,10 @@
+0.21 2018-10-29
+        - Fix description of 'embed' flag
+        - Deprecate piwik_api and piwik_api_url in favor of
+          piwik->api and piwik->api_url
+        - Fix permissions of text files.
+        - Remove deprecated "Mojo::Transaction::success" call.
+
 0.20 2018-03-04
         - Fix secure flag to accept https scheme when
           provided by URL.

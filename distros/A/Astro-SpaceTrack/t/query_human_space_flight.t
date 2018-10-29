@@ -17,12 +17,17 @@ $skip = site_check 'spaceflight.nasa.gov'
 
 my $st = Astro::SpaceTrack->new();
 
-is_success $st, spaceflight => '-all', 'iss', 'Human Space Flight data';
+SKIP: {
 
-is $st->content_type(), 'orbit', "Content type is 'orbit'";
+    is_success_or_skip $st, spaceflight => '-all', 'iss',
+	'Human Space Flight data', 2;
 
-is $st->content_source(), 'spaceflight',
-    "Content source is 'spaceflight'";
+    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+
+    is $st->content_source(), 'spaceflight',
+	"Content source is 'spaceflight'";
+
+}
 
 done_testing;
 

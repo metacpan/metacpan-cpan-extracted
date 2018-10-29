@@ -46,7 +46,7 @@ As output, the script makes a directory containing the results in
 various formats (according the configuration): XML, text and
 TreeTgger-like output.
 
-==head2 USE OF YATEA
+=head2 USE OF YATEA
 
 Using YaTeA requires to have a output of TreeTagger
 (<http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html>. It
@@ -74,7 +74,8 @@ your PATH variable and that the configuration file is C</etc/yatea/yatea.rc>.
 
 =item If you are not allow to copy the configuration file C<yatea.rc>
 in the directory C</etc/yatea> (or create this directory), or if you
-want to use your own configuration file, you can specify the file with its path by using the option C<--rcfile>
+want to use your own configuration file, you can specify the file with
+its path by using the option C<--rcfile>
 
 C<yatea --rcfile MyYaTeAConfig.rc TreeTaggerOutputFile.ttg>
 
@@ -122,6 +123,71 @@ TODO
 -head2 YaTeA XML output
 
 TODO
+
+=head1 INPUT FILE
+
+The input is the output of a Part-of-Speech tagger and lemmatizer such
+as TreeTagger and Flemm.
+
+=head1 INPUT FILE FORMATS
+
+The input file contains the morpho-syntactic information and lemma
+associated to each word. Each line contains 3 information separated by
+tabulations: the inflected form of the word, its part-of-speech tag
+and its lemma. Basically, the input format is the TreeTagger output
+format. For instance:
+
+
+ Combined	VBN	Combine
+ action	NN	action
+ of	IN	of
+ two	CD	two
+ transcription	NN	transcription
+ factors	NNS	factor
+ regulates	VBZ	regulate
+ genes	NNS	gene
+ encoding	VBG	encode
+ spore	NN	spore
+ coat	NN	coat
+ proteins	NNS	protein
+ of	IN	of
+ Bacillus	NN	Bacillus
+ subtilis	NN	subtilis
+ .	SENT	.
+
+=head1 OUTPUT FILES
+
+=over 4
+
+=item *
+
+xml/candidates.xml
+
+This file contains all the information on the extracted terms. The
+C<share/doc/YaTeA/DTD/yatea.dtd> contains the DTD of the XML file.
+
+=item *
+
+raw/termCandidates.ttg
+
+This file contains the list of the term candidates in the TreeTagger
+(each line contains 3 information separated by tabulations: the
+inflected form of the word, its part-of-speech tag and its lemma).
+
+=item *
+
+raw/termList.txt
+
+This contains the list of the term candidates in a tabular format.
+The columns are the term ID, the inflected form and the lemmatized
+form of the term, the term frequency, the C-Value, and others ranking
+metrics. The three last columns are the id of the head, of the
+modifier, and the main head.  Lines starting with C<#> are comment
+line.
+
+=back
+
+
 
 =head1 CONFIGURATION FILE FORMAT
 
@@ -174,8 +240,9 @@ C<output-path> : set the path to the directory that will contain the
 
 =item * 
 
-C<termino> I<File> : Name of a file containing a list of
-testified terms. 
+C<termino> I<File> : Name of a file containing a list of testified
+terms. The testified terms have to provided in the TreeTagger output
+format.
 
 =item * 
 
@@ -305,7 +372,7 @@ Terminological Resources. In Advances in Natural Language Processing
 
 =head1 AUTHORS
 
-Thierry Hamon <thierry.hamon@univ-paris13.fr> and Sophie Aubin <sophie.aubin@lipn.univ-paris13.fr>
+Thierry Hamon <thierry.hamon@limsi.fr> and Sophie Aubin <sophie.aubin@lipn.univ-paris13.fr>
 
 =head1 LICENSE
 
@@ -355,7 +422,7 @@ pod2usage(1) if $help or (scalar(@ARGV) == 0);
 
 my %config = Lingua::YaTeA::load_config($rcfile);
 
-my $current_dir = `pwd`;
+# my $current_dir = `pwd`;
 my $corpus_path = $ARGV[$#ARGV];
 
 # warn "$corpus_path\n";

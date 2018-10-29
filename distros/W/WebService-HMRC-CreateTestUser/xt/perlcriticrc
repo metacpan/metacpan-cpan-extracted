@@ -1,0 +1,124 @@
+only = 1
+theme = perlmodule
+severity = 1
+profile-strictness = fatal
+verbose =%s %p %f   %l\n
+
+[RegularExpressions::ProhibitCaptureWithoutTest]
+    add_themes = perlmodule
+[ErrorHandling::RequireCarping]
+    add_themes = perlmodule
+
+# Policies based on those used by LedgerSMB project
+[BuiltinFunctions::ProhibitBooleanGrep]
+    add_themes = perlmodule
+[BuiltinFunctions::ProhibitStringySplit]
+    add_themes = perlmodule
+[BuiltinFunctions::ProhibitUniversalCan]
+    add_themes = perlmodule
+[BuiltinFunctions::ProhibitUniversalIsa]
+    add_themes = perlmodule
+[ClassHierarchies::ProhibitExplicitISA]
+    add_themes = perlmodule
+[CodeLayout::ProhibitHardTabs]
+    add_themes = perlmodule
+    allow_leading_tabs = 0
+[CodeLayout::ProhibitTrailingWhitespace]
+    add_themes = perlmodule
+[ControlStructures::ProhibitMutatingListFunctions]
+    add_themes = perlmodule
+[ControlStructures::ProhibitUnreachableCode]
+    add_themes = perlmodule
+[InputOutput::ProhibitBarewordFileHandles]
+    add_themes = perlmodule
+[InputOutput::ProhibitInteractiveTest]
+    add_themes = perlmodule
+[InputOutput::ProhibitOneArgSelect]
+    add_themes = perlmodule
+[InputOutput::ProhibitTwoArgOpen]
+    add_themes = perlmodule
+[InputOutput::RequireCheckedClose]
+    add_themes = perlmodule
+[InputOutput::RequireCheckedOpen]
+    add_themes = perlmodule
+[InputOutput::RequireCheckedSyscalls]
+    add_themes = perlmodule
+[InputOutput::RequireEncodingWithUTF8Layer]
+    add_themes = perlmodule
+[Miscellanea::ProhibitFormats]
+    add_themes = perlmodule
+[Modules::ProhibitAutomaticExportation]
+    add_themes = perlmodule
+[Modules::ProhibitConditionalUseStatements]
+    add_themes = perlmodule
+[Modules::ProhibitEvilModules]
+    add_themes = perlmodule
+[Modules::ProhibitExcessMainComplexity]
+    add_themes = perlmodule
+[Modules::ProhibitMultiplePackages]
+    add_themes = perlmodule
+[Modules::RequireBarewordIncludes]
+    add_themes = perlmodule
+[Modules::RequireEndWithOne]
+    add_themes = perlmodule
+[Modules::RequireExplicitPackage]
+    add_themes = perlmodule
+[Modules::RequireFilenameMatchesPackage]
+    add_themes = perlmodule
+[Modules::RequireNoMatchVarsWithUseEnglish]
+    add_themes = perlmodule
+[Objects::ProhibitIndirectSyntax]
+    add_themes = perlmodule
+[Perl::Critic::Policy::Moose::RequireCleanNamespace]
+    add_themes = perlmodule
+[Perl::Critic::Policy::Moose::ProhibitNewMethod]
+    add_themes = perlmodule
+[Perl::Critic::Policy::Moose::ProhibitDESTROYMethod]
+    add_themes = perlmodule
+[Perl::Critic::Policy::Moose::RequireMakeImmutable]
+    add_themes = perlmodule
+[Subroutines::ProhibitExplicitReturnUndef]
+    add_themes = perlmodule
+[Subroutines::ProhibitReturnSort]
+    add_themes = perlmodule
+[Subroutines::ProhibitSubroutinePrototypes]
+    add_themes = perlmodule
+[Subroutines::ProtectPrivateSubs]
+    add_themes = perlmodule
+[Subroutines::RequireFinalReturn]
+    add_themes = perlmodule
+[TestingAndDebugging::ProhibitNoStrict]
+    add_themes = perlmodule
+[TestingAndDebugging::ProhibitNoWarnings]
+    add_themes = perlmodule
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+    add_themes = perlmodule
+[TestingAndDebugging::RequireTestLabels]
+    add_themes = perlmodule
+[TestingAndDebugging::RequireUseStrict]
+    add_themes = perlmodule
+[TestingAndDebugging::RequireUseWarnings]
+    add_themes = perlmodule
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+    add_themes = perlmodule
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+    add_themes = perlmodule
+[ValuesAndExpressions::ProhibitLeadingZeros]
+    add_themes = perlmodule
+[ValuesAndExpressions::ProhibitMagicNumbers]
+    add_themes = perlmodule
+    allowed_values = -1 0 1
+[ValuesAndExpressions::ProhibitMismatchedOperators]
+    add_themes = perlmodule
+[Variables::ProhibitPerl4PackageNames]
+    add_themes = perlmodule
+[Variables::ProhibitUnusedVariables]
+    add_themes = perlmodule
+[Variables::ProtectPrivateVars]
+    add_themes = perlmodule
+[Variables::RequireInitializationForLocalVars]
+    add_themes = perlmodule
+[Variables::RequireLexicalLoopIterators]
+    add_themes = perlmodule
+[Variables::RequireLocalizedPunctuationVars]
+    add_themes = perlmodule

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form::Bootstrap4;
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 # ABSTRACT: Generate forms using Bootstrap 4
 
 #pod =head1 SYNOPSIS
@@ -161,10 +161,10 @@ sub field_for {
 
     # ; use Data::Dumper;
     # ; say Dumper \%opt;
-    my $required = !!grep { $_ eq $prop }
-        @{ $c->yancy->schema( $coll )->{required} // [] };
+    my $schema = $c->yancy->schema( $coll );
+    my $required = !!grep { $_ eq $prop } @{ $schema->{required} // [] };
 
-    my $field = $c->yancy->schema( $coll, $prop );
+    my $field = $schema->{properties}{ $prop };
     my $input = $c->yancy->form->input(
         %$field,
         name => $prop,
@@ -178,6 +178,7 @@ sub field_for {
     my $html = $c->render_to_string(
         template => $path,
         field => {
+            %$field,
             %opt,
             id => "field-$coll-$prop",
             name => $prop,
@@ -232,7 +233,7 @@ Yancy::Plugin::Form::Bootstrap4 - Generate forms using Bootstrap 4
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 

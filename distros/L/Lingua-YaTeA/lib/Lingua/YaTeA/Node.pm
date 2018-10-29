@@ -415,11 +415,11 @@ sub hitchMore
 		($node,$position) = $this->searchLeaf($pivot,\$depth);
 		if ((blessed($node)) && ($node->isa('Lingua::YaTeA::Node')))
 		{
-		
+		    
 		    ($mode) = $sub_index_set->defineAppendMode($added_index_set,$pivot);
 		    if(defined $mode)
 		    {
-		    #  print STDERR "mode1 = $mode\n";
+			# print STDERR "mode1 = $mode\n";
 			if($mode ne "DISJUNCTION")
 			{
 
@@ -499,7 +499,7 @@ sub hitchMore
 			}
 			else
 			{
-			    die;
+			    warn "DISJUNCTION (ignore but what to do ?)\n";
 			}
 		    }
 
@@ -1427,10 +1427,14 @@ sub plugInternalNode
 	       ($node->getEdgeStatus($place) ne "HEAD")
 	       )
 	    {
-		$new_previous_index = $node->searchHead(0)->getIndex;
-		if($new_previous_index < $internal_node->searchHead(0)->getIndex)
-		{
-		    $previous_index = $new_previous_index;
+		if (defined $node->searchHead(0)) {
+		    $new_previous_index = $node->searchHead(0)->getIndex;
+		    if($new_previous_index < $internal_node->searchHead(0)->getIndex)
+		    {
+			$previous_index = $new_previous_index;
+		    }
+		} else {
+		    warn "undefined head (previous)\n";
 		}
 	    }
 	}
@@ -1447,10 +1451,14 @@ sub plugInternalNode
 	   ($node->getEdgeStatus($place) ne "HEAD")
 	   )
 	{
-	    $new_next_index = $node->searchHead(0)->getIndex;
-	    if($new_next_index > $internal_node->searchHead(0)->getIndex)
-	    {
-		$next_index  = $new_next_index;
+	    if (defined $node->searchHead(0)) {
+		$new_next_index = $node->searchHead(0)->getIndex;
+		if($new_next_index > $internal_node->searchHead(0)->getIndex)
+		{
+		    $next_index  = $new_next_index;
+		}
+	    } else {
+		warn "undefined head (next)\n";
 	    }
 	}
 	#	   print $fh "nouveau next? : " .$next_index ."\n";
@@ -1545,23 +1553,25 @@ sub getHigherHookNode
 # 	{
 # 	    print $fh "post_insertion\n";
 # 	}
-	if(
-	   ((blessed($node)) && ($node->isa('Lingua::YaTeA::InternalNode')))
-	   &&
-	   ($node->getFather->getEdgeStatus($position) eq "HEAD")
-	   &&
-	   (
-	    ($position eq "LEFT")
+	if (
+	    ((blessed($node)) && ($node->isa('Lingua::YaTeA::InternalNode')))
 	    &&
-	    ($node->getRightEdge->searchLeftMostLeaf->getIndex < $to_insert)
-	    )
-	   ||
-	   (
-	    ($position eq "RIGHT")
+	    ($node->getFather->getEdgeStatus($position) eq "HEAD")
 	    &&
-	    ($node->getFather->getRightEdge->searchLeftMostLeaf->getIndex < $to_insert)
+	    (
+	     (
+	      ($position eq "LEFT")
+	      &&
+	      ($node->getRightEdge->searchLeftMostLeaf->getIndex < $to_insert)
+	     )
+	     ||
+	     (
+	      ($position eq "RIGHT")
+	      &&
+	      ($node->getFather->getRightEdge->searchLeftMostLeaf->getIndex < $to_insert)
+	     )
 	    )
-	   )
+	    )
 	{
 	    ($node,$position) = $this->getFather->getHigherHookNode($index,$position,$to_insert,$fh);
 	}
@@ -1575,26 +1585,25 @@ sub getHigherHookNode
 # 	    {
 # 		print $fh "ante_insertion\n";
 # 	    }
-	    if(
-	       ((blessed($node)) && ($node->isa('Lingua::YaTeA::InternalNode')))
+	    if (
+		((blessed($node)) && ($node->isa('Lingua::YaTeA::InternalNode')))
 	        &&
-
-	       ($node->getEdgeStatus($position) eq "HEAD")
-	       &&
+		($node->getEdgeStatus($position) eq "HEAD")
+		&&
 		(
-	       (
-		($position eq "LEFT")
-		&&
-		($node->getFather->getLeftEdge->searchRightMostLeaf->getIndex > $to_insert)
+		 (
+		  ($position eq "LEFT")
+		  &&
+		  ($node->getFather->getLeftEdge->searchRightMostLeaf->getIndex > $to_insert)
+		 )
+		 ||
+		 (
+		  ($position eq "RIGHT")
+		  &&
+		  ($node->getLeftEdge->searchRightMostLeaf->getIndex > $to_insert)
+		 )
 		)
-	       ||
-	       (
-		($position eq "RIGHT")
-		&&
-		($node->getLeftEdge->searchRightMostLeaf->getIndex > $to_insert)
 		)
-		)
-	       )
 	    {
 		$position = $this->getNodePosition;
 		($node,$position) = $this->getFather->getHigherHookNode($index,$position,$to_insert,$fh);

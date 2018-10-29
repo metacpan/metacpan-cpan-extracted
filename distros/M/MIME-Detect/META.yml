@@ -2,9 +2,13 @@
 abstract: 'MIME file type identification'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires: {}
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,7 +18,16 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  Carp: '0'
+  Fcntl: '0'
+  Filter::signatures: '0.15'
+  Moo: '2'
+  XML::LibXML: '1.70'
+  if: '0'
+  perl: '5.006'
 resources:
-  repository: git://github.com/Corion/mime-detect.git
-version: '0.08'
+  repository: git://github.com/Corion/MIME-Detect.git
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

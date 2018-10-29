@@ -26,7 +26,7 @@ use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '2.13';
+our $VERSION = '2.14';
 our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -527,20 +527,24 @@ sub _validate_all_of {
   $self->_report_schema($path, 'allOf', $rules) if REPORT;
   $self->{grouped}++;
 
+  my $i = 0;
   for my $rule (@$rules) {
     my @e = $self->_validate($data, $path, $rule) or next;
     my $schema_type = _guess_schema_type($rule);
-    push @errors, [@e] and next if !$schema_type or $schema_type eq $type;
+    push @errors, [$i, @e] and next if !$schema_type or $schema_type eq $type;
     push @expected, $schema_type;
+  }
+  continue {
+    $i++;
   }
 
   $self->{grouped}--;
 
   $self->_report_errors($path, 'allOf', \@errors) if REPORT;
   my $expected = join ' or ', _uniq(@expected);
-  return E $path, "allOf failed: Expected $expected, not $type."
+  return E $path, "/allOf Expected $expected, not $type."
     if $expected and @errors + @expected == @$rules;
-  return E $path, sprintf 'allOf failed: %s', _merge_errors(@errors) if @errors;
+  return _add_path_to_error_messages(allOf => @errors) if @errors;
   return;
 }
 
@@ -552,6 +556,7 @@ sub _validate_any_of {
   $self->_report_schema($path, 'anyOf', $rules) if REPORT;
   $self->{grouped}++;
 
+  my $i = 0;
   for my $rule (@$rules) {
     @e = $self->_validate($data, $path, $rule);
     if (!@e) {
@@ -559,16 +564,19 @@ sub _validate_any_of {
       return;
     }
     my $schema_type = _guess_schema_type($rule);
-    push @errors, [@e] and next if !$schema_type or $schema_type eq $type;
+    push @errors, [$i, @e] and next if !$schema_type or $schema_type eq $type;
     push @expected, $schema_type;
+  }
+  continue {
+    $i++;
   }
 
   $self->{grouped}--;
 
   $self->_report_errors($path, 'anyOf', \@errors) if REPORT;
   my $expected = join ' or ', _uniq(@expected);
-  return E $path, "anyOf failed: Expected $expected, got $type." unless @errors;
-  return E $path, sprintf "anyOf failed: %s", _merge_errors(@errors);
+  return E $path, "/anyOf Expected $expected, got $type." unless @errors;
+  return _add_path_to_error_messages(anyOf => @errors);
 }
 
 sub _validate_one_of {
@@ -579,11 +587,15 @@ sub _validate_one_of {
   $self->_report_schema($path, 'oneOf', $rules) if REPORT;
   $self->{grouped}++;
 
+  my $i = 0;
   for my $rule (@$rules) {
     my @e = $self->_validate($data, $path, $rule) or next;
     my $schema_type = _guess_schema_type($rule);
-    push @errors, [@e] and next if !$schema_type or $schema_type eq $type;
+    push @errors, [$i, @e] and next if !$schema_type or $schema_type eq $type;
     push @expected, $schema_type;
+  }
+  continue {
+    $i++;
   }
 
   $self->{grouped}--;
@@ -598,9 +610,9 @@ sub _validate_one_of {
 
   return if @errors + @expected + 1 == @$rules;
   my $expected = join ' or ', _uniq(@expected);
-  return E $path, "All of the oneOf rules match." unless @errors + @expected;
-  return E $path, "oneOf failed: Expected $expected, got $type." unless @errors;
-  return E $path, sprintf 'oneOf failed: %s', _merge_errors(@errors);
+  return E $path, "All of the oneOf rules match."         unless @errors + @expected;
+  return E $path, "/oneOf Expected $expected, got $type." unless @errors;
+  return _add_path_to_error_messages(oneOf => @errors);
 }
 
 sub _validate_type_enum {
@@ -851,6 +863,22 @@ sub _validate_type_string {
 
 # FUNCTIONS ==================================================================
 
+sub _add_path_to_error_messages {
+  my ($type, @errors_with_index) = @_;
+  my @errors;
+
+  for my $e (@errors_with_index) {
+    my $index = shift @$e;
+    push @errors, map {
+      my $msg = sprintf '/%s/%s %s', $type, $index, $_->{message};
+      $msg =~ s!(\d+)\s/!$1/!g;
+      E $_->path, $msg;
+    } @$e;
+  }
+
+  return @errors;
+}
+
 sub _cmp {
   return undef if !defined $_[0] or !defined $_[1];
   return "$_[3]=" if $_[2] and $_[0] >= $_[1];
@@ -884,6 +912,7 @@ sub _guess_schema_type {
   return _guessed_right($_[1], 'object') if $_[0]->{additionalProperties};
   return _guessed_right($_[1], 'object') if $_[0]->{patternProperties};
   return _guessed_right($_[1], 'object') if $_[0]->{properties};
+  return _guessed_right($_[1], 'object') if $_[0]->{required};
   return _guessed_right($_[1], 'object')
     if defined $_[0]->{maxProperties}
     or defined $_[0]->{minProperties};
@@ -992,13 +1021,6 @@ sub _is_uri_reference {
   return 1;
 }
 
-sub _merge_errors {
-  join ' ', map {
-    my $e = $_;
-    (@$e == 1) ? $e->[0]{message} : sprintf '(%s)', join '. ', map { $_->{message} } @$e;
-  } @_;
-}
-
 sub _path {
   local $_ = $_[1];
   s!~!~0!g;
@@ -1028,7 +1050,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-2.13
+2.14
 
 =head1 SYNOPSIS
 

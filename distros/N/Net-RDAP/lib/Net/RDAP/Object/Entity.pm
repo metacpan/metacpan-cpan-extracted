@@ -38,7 +38,8 @@ sub roles { $_[0]->{'roles'} ? @{$_[0]->{'roles'}} : () }
 
 	$vcard = $entity->vcard;
 
-Returns a L<vCard> object for the entity.
+Returns a L<vCard> object for the entity. Support for all the miriad options in vCard files is ongoing, at the moment,
+only the `fn`, `org`, `email`, `tel` and `adr` node types are supported.
 
 =cut
 

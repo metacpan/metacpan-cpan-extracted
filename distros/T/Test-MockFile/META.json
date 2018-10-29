@@ -36,7 +36,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Overload::FileCheck" : "0",
+            "Overload::FileCheck" : "0.005",
             "perl" : "5.006"
          }
       }
@@ -53,6 +53,6 @@
          "url" : "https://github.com/cpanelinc/Test-MockFile"
       }
    },
-   "version" : "0.006",
+   "version" : "0.008",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

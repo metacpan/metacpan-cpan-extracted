@@ -229,6 +229,7 @@ if ( 1 == 0 )    ## - validate user scope for an api service endpoint string - i
 ######################################
 
 
+
 #print ;exit;
 ######################################
 if ( 1 == 1 )                               ## TODO: - Audit all service method param

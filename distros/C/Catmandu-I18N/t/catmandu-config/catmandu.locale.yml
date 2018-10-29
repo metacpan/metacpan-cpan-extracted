@@ -1,0 +1,11 @@
+---
+locale:
+  en:
+    mail_subject: "Summary of your current loans at the library"
+    mail_greeting: "Dear [_1]"
+    mail_body: "[quant,_1,book is,books are] overdue now"
+
+  nl:
+    mail_subject: "Overzicht van uw huidige ontleningen"
+    mail_greeting: "Geachte [_1]"
+    mail_body: "[quant,_1,boek is,boeken zijn] nu te laat"

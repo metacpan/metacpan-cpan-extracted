@@ -1,10 +1,110 @@
 ==================================================
-Changes from 2018-10-09 00:00:00 +0000 to present.
+Changes from 2018-10-13 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.13 at 2018-10-23 12:40:47 +0000
+version 0.16 at 2018-10-27 23:26:52 +0000
 -----------------------------------------
+
+  Change: 6960a6b30a9eef4048856be8efafbbd41d038af4
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-10-28 04:21:08 +0000
+
+    bump version to 0.15.1 and add cpanfile to build 
+
+-----------------------------------------
+version 0.14 at 2018-10-27 08:19:26 +0000
+-----------------------------------------
+
+  Change: 27712515c258c94a9b0af1e72a09be63b180a659
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-27 18:19:26 +0000
+
+    Bump Version 0.14
+
+    FIX PAUSE FAILED MY VERSIONING SCHEME 
+
+  Change: 38626a8ec0cf935cfeef0c59793073d489ee1bf8
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-27 18:04:35 +0000
+
+    Minor Version Bump 0.13.1 to push #8 fix into cpan 
+
+  Change: 547edaba3db6511512abc1d54a3f1819457d1373
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-27 17:48:33 +0000
+
+    Set min perl in build
+
+    #8 
+
+  Change: e91aed3121ab59d61407f1b56b1e1f09fec5af26
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-27 11:54:05 +0000
+
+    expand test coverage 
+
+  Change: d7957983ab1ffc587f2f54279e8daa8933adc55e
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-27 11:31:08 +0000
+
+    Merge branch 'master' of
+    https://github.com/pscott-au/WebService-GoogleAPI-Client 
+
+  Change: 3a8b3c83ef3101f898edb532222079129399638f
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-27 11:31:02 +0000
+
+    client tests with http mocked 
+
+  Change: 3b4f9aa79f60c9b2030a08d9478ff351c17c391e
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-10-27 07:36:21 +0000
+
+    Replace docs index 
+
+  Change: f63268df4ddaffc2a57f73d90eeb0759814d7e93
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-27 06:17:15 +0000
+
+    add favicon 
+
+  Change: 7a83b4beb659bebfe20c07727946f4350ef5d5e4
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-10-27 05:31:39 +0000
+
+    tests - injecting http response instead of pre-warming cache 
+
+  Change: 3404e7428ecf6b2be4e254705bf49f610af8d8d9
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-10-26 04:34:49 +0000
+
+    added text to speech example 
+
+  Change: 4ffc258387b2dd6490e313eee38a0c740e9f5fea
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-10-25 21:10:22 +0000
+
+    Fix Minimum Perl Version - format breaking Travis 
+
+  Change: cac98b82b034fcca922e79ab652d09bd7f9679f1
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-10-25 20:58:08 +0000
+
+    cleanup 
+
+  Change: c7565c2b38c7848e2d41dec2e3be30e2ce845061
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-24 06:05:43 +0000
+
+    Extend Discovery test coverage 
+
+  Change: 3022a5874516295b79a50ad56db78a3617e6ce8d
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-10-24 05:43:14 +0000
+
+    Refactor Discovery to include internal stats and added new pre-cached
+    discovery test 
 
   Change: 9f2e8585e18a4d54710807223492534013941311
   Author: Peter Scott <peter@shotgundriver.com>

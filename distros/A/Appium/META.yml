@@ -6,7 +6,6 @@ build_requires:
   Capture::Tiny: '0'
   Cwd: '0'
   File::Basename: '0'
-  FileHandle: '0'
   IO::Socket::INET: '0'
   IPC::Cmd: '0'
   JSON: '0'
@@ -15,12 +14,13 @@ build_requires:
   Test::LWP::UserAgent: '0'
   Test::MockObject::Extends: '0'
   Test::More: '0'
+  Test::Spec: '0'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,17 +29,20 @@ name: Appium
 requires:
   Carp: '0'
   Moo: '0'
+  Moo::Role: '0'
   MooX::Aliases: '0.001005'
   Selenium::Remote::Commands: '0'
   Selenium::Remote::Driver: '0.2202'
   Selenium::Remote::ErrorHandler: '0'
   Selenium::Remote::RemoteConnection: '0'
   Selenium::Remote::WebElement: '0'
+  XML::LibXML: '0'
   constant: '0'
   feature: '0'
 resources:
   bugtracker: https://github.com/appium/perl-client/issues
   repository: git://github.com/appium/perl-client.git
-version: '0.0803'
+version: '0.0804'
 x_contributors:
   - 'Freddy Vega <freddy@vgp-miami.com>'
+x_serialization_backend: 'YAML::Tiny version 1.64'

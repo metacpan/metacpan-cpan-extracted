@@ -144,6 +144,10 @@
                                                 gdwLastError = GetLastError();                              \
                                             }                                                               \
                                             CloseServiceHandle( hSc );                                      \
+                                        }                                                                   \
+                                        else                                                                \
+                                        {                                                                   \
+                                                gdwLastError = GetLastError();                              \
                                         }
 
 

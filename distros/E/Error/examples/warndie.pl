@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 
+# Usage: perl warndie.pl [1 or true or whatever if you want to use warndie]
 require Error;
 if( $ARGV[0] ) {
     import Error qw( :warndie );

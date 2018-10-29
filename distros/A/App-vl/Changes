@@ -1,5 +1,8 @@
 Revision history for Perl extension App::vl
 
+0.03    Sun Oct 28 04:47:39 JST 2018
+        - Fix POD
+
 0.02    Mon Sep 17 12:59:19 JST 2018
         - Fix dependency
 

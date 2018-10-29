@@ -1,0 +1,8 @@
+msgid "mail_subject"
+msgstr "Summary of your current loans at the library"
+
+msgid "mail_greeting"
+msgstr "Dear %1"
+
+msgid "mail_body"
+msgstr "%quant(%1,book is,books are) overdue now"

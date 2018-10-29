@@ -508,7 +508,7 @@ NameParse was written by Kim Ryan <kimryan at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2016 Kim Ryan. All rights reserved.
+Copyright (c) 2018 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -527,7 +527,7 @@ use Parse::RecDescent;
 use Exporter;
 use vars qw (@ISA @EXPORT_OK);
 
-our $VERSION = '1.37';
+our $VERSION = '1.38';
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(clean case_surname);
 
@@ -683,7 +683,7 @@ my %component_order=
     'Mr_A_&_Ms_B_Smith'       => ['title_1','initials_1','conjunction_1','title_2','initials_2','surname_1'],
     'Mr_&_Ms_A_Smith'         => ['title_1','conjunction_1','title_2','initials_1','surname_1'],
     'Mr_A_&_B_Smith'          => ['title_1','initials_1','conjunction_1','initials_2','surname_1'],
-    'John_Smith_&Mary_Jones' => ['given_name_1','surname_1','conjunction_1','given_name_2','surname_2'],
+    'John_Smith_&_Mary_Jones' => ['given_name_1','surname_1','conjunction_1','given_name_2','surname_2'],
     'John_&_Mary_Smith'       => ['given_name_1','conjunction_1','given_name_2','surname_1'],
     'A_Smith_&_B_Jones'       => ['initials_1','surname_1','conjunction_1','initials_2','surname_2'],
 
@@ -1075,7 +1075,16 @@ sub report
     printf($fmt,"Original Input",$name->{original_input});
     printf($fmt,"Cleaned Input",$name->{input_string});
     printf($fmt,"Case all",$name->case_all);
-    printf($fmt,"Case all reversed",$name->case_all_reversed);
+    if ($name->case_all_reversed)
+    {
+        printf($fmt,"Case all reversed",$name->case_all_reversed);    
+    }
+    else
+    {
+        printf($fmt,"Case all reversed",'not applicable');
+    }
+    
+    
     printf($fmt,"Salutation",$name->salutation(salutation => 'Dear',sal_default => 'Friend', sal_type => 'title_plus_surname'));
     printf($fmt,"Type", $props{type});
     printf($fmt,"Number", $props{number});

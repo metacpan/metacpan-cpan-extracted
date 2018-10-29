@@ -425,15 +425,17 @@ sub getTermCandidates
 
 sub printBootstrapList
 {
-    my ($this,$file,$source) = @_;
-    my $fh;
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+    my ($this,$file,$source, $fh) = @_;
+    
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	$fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     binmode($fh, ":utf8");
@@ -465,20 +467,22 @@ sub printBootstrapList
 
 sub printTermList
 {
-    my ($this,$file,$term_list_style, $sorted_weight) = @_;
+    my ($this,$file,$term_list_style, $fh, $sorted_weight) = @_;
 
     my $term_candidate;
     my $mes;
     my @Measures;
 
-    my $fh;
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+#    my $fh;
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	    $fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     binmode($fh, ":utf8");
@@ -489,14 +493,15 @@ sub printTermList
 
     my @term_candidates = values(%{$this->getTermCandidates});
 
-    my $header = "Inflected form\tFrequency"; 
+    my $header = "ID\tInflected form\tLemmatised form\tFrequency"; 
 
     if (scalar(@term_candidates) > 0) {
 	@Measures = sort {lc($a) cmp lc($b)} keys %{$term_candidates[0]->getWeights};
 	foreach $mes (@Measures) {
 	    $header .= "\t$mes";
 	}
-    } 
+    }
+    $header .= "\tHead\tModifier\tMainHead";
     print $fh "# $header\n";
    
 #     warn "term_list_style: $term_list_style\n";
@@ -521,12 +526,21 @@ sub printTermList
 	    )
 	    )
 	{
-	    $printLine = $term_candidate->getIF. "\t" .  $term_candidate->getFrequency;
+	    $printLine = $term_candidate->getID . "\t" .  $term_candidate->getIF. "\t" .  $term_candidate->getLF. "\t" .  $term_candidate->getFrequency;
 	    foreach $mes (@Measures) {
 		if (defined $term_candidate->getWeight($mes)) {
 		    $printLine .= "\t" . $term_candidate->getWeight($mes);
 		}
 	    }
+	    $printLine .= "\t";
+	    if ((blessed($term_candidate)) && ($term_candidate->isa('Lingua::YaTeA::MultiWordTermCandidate'))) {
+		$printLine .= $term_candidate->getRootHead->getID . "\t";
+		$printLine .= $term_candidate->getRootModifier->getID . "\t" ;
+		$printLine .= $term_candidate->getHead->getID . "\t";
+	    } else {
+		$printLine .= "\t\t\t";
+	    }
+	    
 	    print $fh "$printLine\n";
 	}
     }
@@ -534,19 +548,21 @@ sub printTermList
 
 sub printTermAndHeadList
 {
-    my ($this,$file,$term_list_style, $sorted_weight) = @_;
+    my ($this,$file,$term_list_style, $fh, $sorted_weight) = @_;
 
     my $term_candidate;
     my $mes;
 
-    my $fh;
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+#    my $fh;
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	    $fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     binmode($fh, ":utf8");
@@ -583,7 +599,9 @@ sub printTermAndHeadList
 	    )
 	    
 	{
-	    $printLine = $term_candidate->getIF. "\t" .  $term_candidate->getHead->getIF;
+	    if ($term_candidate->getIF ne $term_candidate->getHead->getIF) {
+		$printLine = $term_candidate->getIF. "\t" .  $term_candidate->getHead->getIF;
+	    }
 # 	    foreach $mes (@Measures) {
 # 		if (defined $term_candidate->getWeight($mes)) {
 # 		    $printLine .= "\t" . $term_candidate->getWeight($mes);
@@ -596,19 +614,20 @@ sub printTermAndHeadList
 
 sub printTermAndRootHeadList
 {
-    my ($this,$file,$term_list_style, $sorted_weight) = @_;
+    my ($this,$file,$term_list_style, $fh, $sorted_weight) = @_;
 
     my $term_candidate;
     my $mes;
 
-    my $fh;
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	    $fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     binmode($fh, ":utf8");
@@ -645,7 +664,9 @@ sub printTermAndRootHeadList
 	    )
 	    
 	{
-	    $printLine = $term_candidate->getIF. "\t" .  $term_candidate->getRootHead->getIF;
+	    if ($term_candidate->getIF ne $term_candidate->getHead->getIF) {
+		$printLine = $term_candidate->getIF. "\t" .  $term_candidate->getRootHead->getIF;
+	    }
 # 	    foreach $mes (@Measures) {
 # 		if (defined $term_candidate->getWeight($mes)) {
 # 		    $printLine .= "\t" . $term_candidate->getWeight($mes);
@@ -657,19 +678,20 @@ sub printTermAndRootHeadList
 }
 
 sub printTermCandidatesAndComponents {
-    my ($this,$file,$term_list_style, $tagset) = @_;
+    my ($this,$file,$term_list_style, $fh, $tagset) = @_;
 
     my $term_candidate;
     my $mes;
 
-    my $fh;
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	    $fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     binmode($fh, ":utf8");
@@ -753,17 +775,19 @@ sub sortTermCandidates
 
 sub printUnparsable
 {
-    my ($this,$file) = @_;
+    my ($this,$file,$fh) = @_;
     my $phrase;
-    my $fh;
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
 #	    warn $file->getPath . "\n";
-	    $fh = FileHandle->new(">".$file->getPath);
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
 #    binmode($fh, ":utf8");
@@ -788,16 +812,18 @@ sub printUnparsable
 
 sub printUnparsed
 {
-    my ($this,$file) = @_;
+    my ($this,$file, $fh) = @_;
     my $phrase;
-    my $fh;
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	    $fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     # binmode($fh, ":utf8");
@@ -820,16 +846,17 @@ sub printUnparsed
 
 sub printTermCandidatesTTG
 {
-    my ($this,$file,$ttg_style) = @_;
+    my ($this,$file,$ttg_style,$fh) = @_;
     
-    my $fh;
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	    $fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     binmode($fh, ":utf8");
@@ -863,20 +890,21 @@ sub printTermCandidatesTTG
 
 sub printTermCandidatesFFandTTG
 {
-    my ($this,$file,$ttg_style,$tagset) = @_;
+    my ($this,$file,$ttg_style,$tagset,$fh) = @_;
     
     my $if;
     my $pos;
     my $lf;
 
-    my $fh;
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	    $fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     binmode($fh, ":utf8");
@@ -915,17 +943,17 @@ sub printTermCandidatesFFandTTG
 
 sub printTermCandidatesXML
 {
-    my ($this,$file,$tagset) = @_;
+    my ($this,$file,$tagset,$fh) = @_;
     
-    my $fh;
-
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	    $fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     binmode($fh,":utf8");
@@ -1091,17 +1119,17 @@ sub printListTermCandidatesXML {
 
 sub printTermCandidatesDot2
 {
-    my ($this,$file,$tagset) = @_;
+    my ($this,$file,$tagset,$fh) = @_;
     
-    my $fh;
-
-    if ($file eq "stdout") {
-	$fh = \*STDOUT;
-    } else {
-	if ($file eq "stderr") {
-	    $fh = \*STDERR;
+    if (!defined $fh) {
+	if ($file eq "stdout") {
+	    $fh = \*STDOUT;
 	} else {
-	    $fh = FileHandle->new(">".$file->getPath);
+	    if ($file eq "stderr") {
+		$fh = \*STDERR;
+	    } else {
+		$fh = FileHandle->new(">".$file->getPath);
+	    }
 	}
     }
     binmode($fh,":utf8");

@@ -1,5 +1,18 @@
 Revision history for Catalyst-Plugin-Statsd.
 
+v0.3.0    2018-10-26 16:58:25+01:00 Europe/London
+  [Enhancements]
+  - Added the statsd_client method.
+
+  [Documentation]
+  - Added INSTALL file to the distribution.
+
+  [Toolchain]
+  - Tweaks to dist.ini for simplifying build.
+
+  [Other]
+  - Remove cruft from distribution.
+
 v0.2.0    2018-10-18 23:14:52+01:00 Europe/London
   [Enhancements]
   - Added statsd_metric_name_filter method to filter/munge metric

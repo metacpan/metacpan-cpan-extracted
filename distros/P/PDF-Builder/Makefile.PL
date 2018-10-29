@@ -5,11 +5,18 @@ use warnings;
 use 5.016000;
 use ExtUtils::MakeMaker 6.5503;
 
+my $PERL_version = '5.016000';  # can't use in "use" statement above! eval?
+                                # could read from .perl-version file otherwise
+my $MakeMaker_version = '6.5503';
+my $version = '3.012';          # PDFbuild.pl updates from 'version' file
+
 # EVERY RELEASE: check https://www.cpan.org/src/ "First release in each branch
 #   of Perl" (NOT "Latest releases in each branch of Perl"!) and subtract 
 #   6 years to get date of oldest release, and then go one release before that. 
 #   Update the required Perl minimum here and in .perl-version, dist.ini[.old], 
-#   and .travis.yml, and commit to repository.
+#   and .travis.yml[.HOLD], and commit to repository.
+#   Can't fully automate, since "use $PERL_version;" is invalid (eval?).
+#   Would be nice to read cpan First Release and figure out min Perl version.
 
 # for future consideration
 #my $master  = 'lib/PDF/Builder.pm';
@@ -19,18 +26,17 @@ my %WriteMakefileArgs =
 (
  NAME		=> "PDF::Builder",
  DISTNAME       => "PDF-Builder",
-# VERSION	 => $version,
- VERSION        => "3.010",
+ VERSION        => $version,
 # ABSTRACT_FROM	 => $master,
  ABSTRACT       => "Facilitates the creation and modification of PDF files",
 
  AUTHOR		=> 'Phil Perry <phil4597@catskilltech.com>',
  LICENSE	=> "lgpl",
- MIN_PERL_VERSION	=> 5.016000,
+ MIN_PERL_VERSION	=> $PERL_version,
  INSTALLDIRS	=> "site",
 
  CONFIGURE_REQUIRES => {
-    "ExtUtils::MakeMaker" => 6.5503,
+    "ExtUtils::MakeMaker" => $MakeMaker_version,
  },
 
 # BUILD_REQUIRES => {
@@ -45,7 +51,9 @@ my %WriteMakefileArgs =
     "Compress::Zlib" => 1.0,
     "Font::TTF" => 1.04,
     # === "optional prerequisites", used if present, but not mandatory
+    #     update t/00-all-usable.t to exclude modules using these libraries!
     #"Graphics::TIFF" => 0,
+    #"Image::PNG::Libpng" => 0,
     # === found in CORE, so no need to explicitly list
     #"utf8" => 0,
     #"File::Temp" => 0,
@@ -73,6 +81,8 @@ my %WriteMakefileArgs =
           url => 'git://github.com/PhilterPaper/Perl-PDF-Builder.git',
           web => 'https://github.com/PhilterPaper/Perl-PDF-Builder',
       },
+
+      bugtracker => 'https://github.com/PhilterPaper/Perl-PDF-Builder/issues',
 
     },
 

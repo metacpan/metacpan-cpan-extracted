@@ -1,11 +1,11 @@
 /*
 @(#)File:           $RCSfile: dumpesql.h,v $
-@(#)Version:        $Revision: 1.18 $
-@(#)Last changed:   $Date: 2009/03/26 07:12:46 $
+@(#)Version:        $Revision: 1.19 $
+@(#)Last changed:   $Date: 2009/07/26 02:50:29 $
 @(#)Purpose:        ESQL/C Type Dumper Code
 @(#)Author:         J Leffler
 @(#)Copyright:      (C) JLSS 2005,2007-09
-@(#)Product:        Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+@(#)Product:        Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
 */
 
 /*TABSTOP=4*/
@@ -25,7 +25,7 @@ extern "C" {
 #ifndef lint
 /* Prevent over-aggressive optimizers from eliminating ID string */
 extern const char jlss_id_dumpesql_h[];
-const char jlss_id_dumpesql_h[] = "@(#)$Id: dumpesql.h,v 1.18 2009/03/26 07:12:46 jleffler Exp $";
+const char jlss_id_dumpesql_h[] = "@(#)$Id: dumpesql.h,v 1.19 2009/07/26 02:50:29 jleffler Exp $";
 #endif /* lint */
 #endif /* MAIN_PROGRAM */
 
@@ -71,27 +71,26 @@ typedef value_t ifx_value_t;
 
 /*
 ** It is not clear when ifx_sqlca_t, ifx_sqlda_t and ifx_sqlvar_t were
-** introduced.  They are not in ESQL/C 5.20; they are in ESQL/C 9.53 and
-** later.  There is considerable room for suspicion that it was some
-** ESQL/C 9.x version that added them.
+** introduced.  They are not in ESQL/C 7.24; they are in ESQL/C 9.53 and
+** later.  There is evidence that they were added in ESQL/C 9.12.
 */
 #ifndef IFX_SQLCA_T
 #define IFX_SQLCA_T
-#if ESQLC_VERSION >= 500 && ESQLC_VERSION < 600
+#if ESQLC_VERSION >= 500 && ESQLC_VERSION < 912
 typedef struct sqlca_s ifx_sqlca_t;
 #endif /* ESQLC_VERSION */
 #endif /* IFX_SQLCA_T */
 
 #ifndef IFX_SQLDA_T
 #define IFX_SQLDA_T
-#if ESQLC_VERSION >= 500 && ESQLC_VERSION < 600
+#if ESQLC_VERSION >= 500 && ESQLC_VERSION < 912
 typedef struct sqlda ifx_sqlda_t;
 #endif /* ESQLC_VERSION */
 #endif /* IFX_SQLDA_T */
 
 #ifndef IFX_SQLVAR_T
 #define IFX_SQLVAR_T
-#if ESQLC_VERSION >= 500 && ESQLC_VERSION < 600
+#if ESQLC_VERSION >= 500 && ESQLC_VERSION < 912
 typedef struct sqlvar_struct ifx_sqlvar_t;
 #endif /* ESQLC_VERSION */
 #endif /* IFX_SQLVAR_T */

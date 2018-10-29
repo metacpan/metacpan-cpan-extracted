@@ -29,7 +29,7 @@ for my $c (qw(
 # headers are properly covered
 {
     my $ok = eval {
-	my $m = sign([mail()], h => 'from:from:to:subject');
+	my $m = sign([mail()], h => 'from:from:to:subject', h_auto => 0);
 	verify(["Subject: foo\n".$m],dns());
     };
     my $err = $@ || ($ok ? '':'unknown error');
@@ -43,6 +43,7 @@ for my $c (qw(
     my $ok = eval {
 	my $m = sign([mail()],
 	    h => 'from:from:to:subject',
+	    h_auto => 0,
 	    l => 0,
 	);
 	$m = "Subject: foo\n".$m."foo\n";

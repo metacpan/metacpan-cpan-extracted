@@ -4,25 +4,27 @@ Dancer2::Plugin::Deferred - Defer messages or data across redirections
 
 # VERSION
 
-version 0.007017
+version 0.007018
 
 # SYNOPSIS
 
-    use Dancer2::Plugin::Deferred;
+```perl
+use Dancer2::Plugin::Deferred;
 
-    get '/defer' => sub {
-      deferred error => "Klaatu barada nikto";
-      redirect '/later';
-    }
+get '/defer' => sub {
+  deferred error => "Klaatu barada nikto";
+  redirect '/later';
+};
 
-    get '/later' => sub {
-      template 'later';
-    }
+get '/later' => sub {
+  template 'later';
+};
 
-    # in template 'later.tt'
-    <% IF deferred.error %>
-    <div class="error"><% deferred.error %></div>
-    <% END %>
+# in template 'later.tt'
+<% IF deferred.error %>
+<div class="error"><% deferred.error %></div>
+<% END %>
+```
 
 # DESCRIPTION
 
@@ -50,8 +52,10 @@ sure not to render the message if not desired.)
 
 ## deferred
 
-    deferred $key => $value;
-    $value = deferred $key; # also deletes $key
+```perl
+deferred $key => $value;
+$value = deferred $key; # also deletes $key
+```
 
 This function works just like `var` or `session`, except that it lasts only
 for the current request and across any redirects.  Data is deleted if accessed.
@@ -60,7 +64,9 @@ data hash.
 
 ## all\_deferred
 
-    template 'index', { deferred => all_deferred };
+```perl
+template 'index', { deferred => all_deferred };
+```
 
 This function returns all the deferred data as a hash reference and deletes
 the stored data.  This is called automatically in the `before_template_render`
@@ -68,7 +74,9 @@ hook, but is available if someone wants to have manual control.
 
 ## deferred\_param
 
-    template 'index' => { link => uri_for( '/other', { deferred_param } ) };
+```perl
+template 'index' => { link => uri_for( '/other', { deferred_param } ) };
+```
 
 This function returns the parameter key and value used to propagate the
 message to another request.  Using this function toggles the `var_keep_key`
@@ -91,8 +99,10 @@ what it does and putting up with my dumb ideas along the way.
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by David Golden.
+This software is Copyright (c) 2018, 2016 by David Golden.
 
 This is free software, licensed under:
 
-    The Apache License, Version 2.0, January 2004
+```
+The Apache License, Version 2.0, January 2004
+```

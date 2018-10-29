@@ -137,13 +137,16 @@ my %known_inconsistent = (
 #   25530 => { sladen => 1 },	# Kelso: partial failure 07-Sep-2018
     				# Sladen: failed 09-Sep-2018
 				# Kelso: failed 26-Sep-2018
-    25531 => { sladen => 1 },	# Kelso: partial failure 10-Oct-2018
+#   25531 => { sladen => 1 },	# Kelso: partial failure 10-Oct-2018
+				# Kelso: failure 18-Oct-2018
 #   25577 => { sladen => 1 },	# 14-Apr-2018: Sladen failed
 				# Kelso: Backup 30-May-2018
 				# Kelso: Failed 13-Oct-2018
-    25578 => { sladen => 1 },	# 26-Apr-2018: Sladen failed
+				# Decayed: 22-Oct-2018
+#   25578 => { sladen => 1 },	# 26-Apr-2018: Sladen failed
 				# Kelso: Backup 30-May-2018
 				# Kelso: failed 10-Oct-2018
+				# Decayed: 22-Oct-2018
     25777 => { sladen => 1 },	# Sladen failed 27-Sep-2018
 #   25778 => { sladen => 1 },	# 04-May-2018: Sladen failed
 				# 25-May-2018: Decayed
@@ -231,7 +234,7 @@ foreach (
  25078   Iridium 44     [-]      Tumbling
  25104   Iridium 45     [+]      
  25105   Iridium 24     [-]      Tumbling
- 25169   Iridium 52     [P]      
+ 25169   Iridium 52     [-]      Tumbling
  25171   Iridium 54     [+]      
  25262   Iridium 51     [-]      Tumbling
  25263   Iridium 61     [B]      
@@ -240,7 +243,7 @@ foreach (
  25274   Iridium 58     [B]      
  25275   Iridium 59     [+]      
  25276   Iridium 60     [+]      
- 25285   Iridium 62     [B]      
+ 25285   Iridium 62     [P]      
  25286   Iridium 63     [-]      Tumbling
  25287   Iridium 64     [B]      
  25319   Iridium 69     [-]      Tumbling
@@ -249,9 +252,7 @@ foreach (
  25467   Iridium 82     [-]      Tumbling
  25527   Iridium 2      [-]      Tumbling
  25530   Iridium 84     [-]      Tumbling
- 25531   Iridium 83     [P]      
- 25577   Iridium 20     [-]      Tumbling
- 25578   Iridium 11     [-]      Tumbling
+ 25531   Iridium 83     [-]      Tumbling
  25777   Iridium 14     [+]      
  27372   Iridium 91     [+]      
  27373   Iridium 90     [-]      Tumbling
@@ -288,7 +289,7 @@ KELSO
  25078   Iridium 44     [-]      Plane 6
  25104   Iridium 45     [+]      Plane 3
  25105   Iridium 24     [-]      Plane 2
- 25169   Iridium 52     [-]      Plane 5
+ 25169   Iridium 52     [-]      Plane 5 - Failed on station?
  25171   Iridium 54     [-]      Plane 5
  25262   Iridium 51     [-]      Plane 4 - Failed on station?
  25263   Iridium 61     [-]      Plane 4
@@ -297,7 +298,7 @@ KELSO
  25274   Iridium 58     [-]      Plane 3
  25275   Iridium 59     [+]      Plane 3
  25276   Iridium 60     [+]      Plane 3
- 25285   Iridium 62     [-]      Plane 1
+ 25285   Iridium 62     [-]      Plane 1 - Failed on station?
  25286   Iridium 63     [-]      Plane 1 - Failed on station?
  25287   Iridium 64     [-]      Plane 1
  25319   Iridium 69     [-]      Plane 2
@@ -307,8 +308,6 @@ KELSO
  25527   Iridium 2      [-]      Plane 5
  25530   Iridium 84     [-]      Plane 5 - Failed on station?
  25531   Iridium 83     [-]      Plane 5 - Failed on station?
- 25577   Iridium 20     [-]      Plane 2 - Failed on station?
- 25578   Iridium 11     [-]      Plane 2 - Failed on station?
  25777   Iridium 14     [-]      Plane 1
  27372   Iridium 91     [+]      Plane 3
  27373   Iridium 90     [-]      Plane 5 - Failed on station?
@@ -403,8 +402,8 @@ SLADEN
  25529   Iridium 85     [D]      Decayed 2000-12-30
  25530   Iridium 84     [?]      SpaceTrack
  25531   Iridium 83     [?]      SpaceTrack
- 25577   Iridium 20     [?]      SpaceTrack
- 25578   Iridium 11     [?]      SpaceTrack
+ 25577   Iridium 20     [D]      Decayed 2018-10-22
+ 25578   Iridium 11     [D]      Decayed 2018-10-22
  25777   Iridium 14     [?]      SpaceTrack
  25778   Iridium 21     [D]      Decayed 2018-05-24
  27372   Iridium 91     [?]      SpaceTrack

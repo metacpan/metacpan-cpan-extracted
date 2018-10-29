@@ -27,7 +27,7 @@ no_index:
 provides:
   AWS::XRay:
     file: lib/AWS/XRay.pm
-    version: '0.06'
+    version: '0.08'
   AWS::XRay::Buffer:
     file: lib/AWS/XRay/Buffer.pm
   AWS::XRay::Segment:
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/fujiwara/AWS-XRay/issues
   homepage: https://github.com/fujiwara/AWS-XRay
   repository: git://github.com/fujiwara/AWS-XRay.git
-version: '0.06'
+version: '0.08'
 x_authority: cpan:FUJIWARA
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

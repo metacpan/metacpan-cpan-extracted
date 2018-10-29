@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::Table::Text" : "20171004",
+            "Data::Table::Text" : "20181026",
             "Test2::API" : "0",
             "Test::More" : "0"
          }
@@ -31,7 +31,7 @@
    "provides" : {
       "Math::Vectors2" : {
          "file" : "lib/Math/Vectors2.pm",
-         "version" : "20171009"
+         "version" : "20181026"
       }
    },
    "release_status" : "stable",
@@ -40,5 +40,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171009"
+   "version" : "20181026",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,3 +1,67 @@
+Installing DBI and DBD::Informix without root privileges
+========================================================
+
+PERL5LIB and INSTALL_BASE are both relevant, but there are multiple other
+sources of confusion.  Setting PREFIX is not necessary.
+
+Note that PERL5LIB is a path-like environment variable — it consists
+of multiple entries separated by colons on Unix systems; semi-colons on
+Windows.  Perl uses it at runtime to modify the @INC list of directories
+which controls the runtime search for modules.  (See "PERL5LIB — How
+does it work?" http://www.perlmonks.org/?node_id=639559 for more
+insight.)  In a simple case, you might set it to $HOME/perl5.
+
+INSTALL_BASE is a single directory that can be specified on the command
+line to "perl Makefile.PL INSTALL_BASE=$HOME/perl5" for example (where
+this is one of possibly many directories specified in PERL5LIB).  (See:
+"perldoc ExtUtils::MakeMaker" for discussion of INSTALL_BASE vs other
+directory names, include PREFIX.  INSTALL_BASE was added in version 6.31
+of ExtUtils::MakeMaker in October 2006.  The documentation says: 
+
+    INSTALL_BASE can be passed into Makefile.PL to change where your
+    module will be installed.  INSTALL_BASE is more like what everyone
+    else calls "prefix" than PREFIX is.
+
+When you install software compiled with the invocation of 'perl
+Makefile.PL INSTALL_BASE=$HOME/perl5',
+
+* programs will be placed in $HOME/perl5/bin.
+* platform-neutral script files will be placed in $HOME/perl5/lib/perl5
+* manual pages in for modules go in $HOME/perl5/man/man3
+* manual pages for commands go in $HOME/perl5/man/man1
+* architecture-specific files go in
+  $HOME/perl5/lib/perl5/x86_64-linux-gnu-thread-multi (where the last
+  component is the canonical architecture name for your version of Perl)
+* some architecture-specific files go in the auto sub-dir:
+  $HOME/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/auto
+
+Setting PERL5LIB to include the base directory ($HOME/perl5) specified
+as INSTALL_BASE seems to be sufficient to make things work.
+
+To install DBI and DBD::Informix, you need to install these modules in
+this sequence:
+
+* Net::Daemon
+* PlRPC (which installs RPC::PlServer, RPC::PlClient)
+* DBI
+* DBD::Informix
+
+The DBI bundle lists DBI::Shell and DBD::Multiplex too; however, DBI can
+be installed successfully without those (tested: Perl 5.22.1, DBI
+1.641).  It is possible that there are othher dependencies which
+sufficiently archaic versions of Perl will not install by default; you
+may need to install those, too.
+
+Jonathan Leffler <jonathan.leffler@gmail.com>
+Sunday 13th May 2018
+
+---------------------------------------------------------------------------
+The notes below from 1998 are hallowed by antiquity, but are not very
+helpful in the second decade of the 21st century.  They may well have
+been crucial at the time, but they are more complex than necessary now.
+They are likely to be removed in the not-too-distant future.
+---------------------------------------------------------------------------
+
 From: David Alt <David.Alt@mailhost.bellhow.com>
 Subject: Re: compiling/installing DBI/DBD modules in home directory tree
 To: matthew@nocturnal.org
@@ -97,4 +161,4 @@ or for earlier perls (5.000 and 5.001)
 
 to indicate where your private library is.
 
-@(#)$Id: nonroot.install,v 100.2 2002/02/08 22:49:58 jleffler Exp $
+@(#)$Id: nonroot.install,v 2018.3 2018/05/14 00:20:28 jleffler Exp $

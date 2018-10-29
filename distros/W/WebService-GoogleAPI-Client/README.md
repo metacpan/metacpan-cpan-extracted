@@ -1,3 +1,7 @@
+# NAME
+
+WebService::GoogleAPI::Client - Perl Google API Services OAUTH Client.
+
 [![Build Status](https://travis-ci.org/pscott-au/WebService-GoogleAPI-Client.svg?branch=master)](https://travis-ci.org/pscott-au/WebService-GoogleAPI-Client)
 [![Coverage Status](https://coveralls.io/repos/github/pscott-au/WebService-GoogleAPI-Client/badge.svg?branch=master)](https://coveralls.io/github/pscott-au/WebService-GoogleAPI-Client?branch=master)
 [![CPAN Version](https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.svg)](http://search.cpan.org/~localshop/WebService-GoogleAPI-Client/lib/WebService/GoogleAPI/Client.pm)
@@ -11,7 +15,7 @@ WebService::GoogleAPI::Client - Perl Google API Services OAUTH Client.
 
 # VERSION
 
-version 0.13
+version 0.16
 
 # SYNOPSIS
 
@@ -169,13 +173,13 @@ I was unable to get the [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) pack
 ````perl
     use strict;
     use warnings;
-    ue Data::Dumper;
+    use Data::Dumper;
 
     use feature 'say';
     use WebService::GoogleAPI::Client;
 
     my $gapi = WebService::GoogleAPI::Client->new(debug => 0);
-
+    
     ## This idiom selects the first authorised user from gapi.json 
     my $aref_token_emails = $gapi->auth_storage->storage->get_token_emails_from_storage;
     my $user = $aref_token_emails->[0];
@@ -214,7 +218,7 @@ I was unable to get the [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) pack
 
 # SEE ALSO
 
-- [Moo::Google](https://metacpan.org/pod/Moo::Google) - The original code base later forked into [WebService::Google](https://metacpan.org/pod/WebService::Google) but is heading in a different direction
+- [Moo::Google](https://metacpan.org/pod/Moo::Google) - The original code base later forked into [WebService::Google::Client](https://metacpan.org/pod/WebService::Google::Client) but is heading in a different direction
 - [Google Swagger API https:](https:///github.com/APIs-guru/google-discovery-to-swagger) 
 
 # AUTHORS

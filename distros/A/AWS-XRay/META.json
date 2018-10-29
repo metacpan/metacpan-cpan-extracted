@@ -60,7 +60,7 @@
    "provides" : {
       "AWS::XRay" : {
          "file" : "lib/AWS/XRay.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       },
       "AWS::XRay::Buffer" : {
          "file" : "lib/AWS/XRay/Buffer.pm"
@@ -83,7 +83,7 @@
          "web" : "https://github.com/fujiwara/AWS-XRay"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_authority" : "cpan:FUJIWARA",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

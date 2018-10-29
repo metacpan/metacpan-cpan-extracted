@@ -7,6 +7,7 @@ lib/Reddit/Client/SubReddit.pm
 lib/Reddit/Client/Thing.pm
 lib/Reddit/Client/VotableThing.pm
 lib/Reddit/Client/Message.pm
+lib/Reddit/Client/MoreComments.pm
 
 ignore.txt
 Makefile.PL

@@ -2,14 +2,17 @@
 CREATE TABLE people (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(255)
+    email VARCHAR(255),
+    age INTEGER DEFAULT NULL,
+    contact BOOLEAN DEFAULT NULL
 );
 CREATE TABLE "user" (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    access TEXT NOT NULL CHECK( access IN ( 'user', 'moderator', 'admin' ) ) DEFAULT 'user'
+    access TEXT NOT NULL CHECK( access IN ( 'user', 'moderator', 'admin' ) ) DEFAULT 'user',
+    age INTEGER DEFAULT NULL
 );
 CREATE TABLE blog (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

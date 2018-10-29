@@ -3,6 +3,9 @@ Revision history for Linux::Inotify2
 TODO: document move/renaming issues for fullname
 TODO: find_watchers($path), or maybe just ->watchers
 
+2.1  Fri Oct 26 03:16:03 CEST 2018
+	- damn, left debugging code not caught by tests (reported by losyme).
+
 2.0  Thu Oct 25 03:19:08 CEST 2018
 	- fix poll and read documentation w.r.t. errors - this changes the
           documented API, but is how the module has always behaved.

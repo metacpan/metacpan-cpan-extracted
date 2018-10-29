@@ -1,10 +1,11 @@
 package Mojolicious::Plugin::Piwik;
 use Mojo::Base 'Mojolicious::Plugin';
+use Mojo::Util qw/deprecated/;
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent;
 use Mojo::IOLoop;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # Todo:
 # - Better test tracking API support
@@ -118,9 +119,9 @@ SCRIPTTAG
     });
 
 
-  # Add 'piwik_api' helper
+  # Add 'piwik->api' helper
   $mojo->helper(
-    piwik_api => sub {
+    'piwik.api' => sub {
       my ($c, $method, $param, $cb) = @_;
 
       # Get api_test parameter
@@ -258,7 +259,7 @@ SCRIPTTAG
         my $tx = $ua->get($url);
 
         # Return prepared response
-        return _prepare_response($tx->res) if $tx->success;
+        return _prepare_response($tx->res) unless $tx->error;
 
         return;
       }
@@ -285,14 +286,32 @@ SCRIPTTAG
       };
     });
 
-  # Establish 'piwik_api_url' helper
+  # Establish 'piwik.api_url' helper
   $mojo->helper(
-    piwik_api_url => sub {
+    'piwik.api_url' => sub {
       my ($c, $method, $param) = @_;
 
       # Set api_test to true
       $param->{api_test} = 1;
-      return $c->piwik_api($method => $param);
+      return $c->piwik->api($method => $param);
+    }
+  );
+
+  # Add legacy 'piwik_api' helper
+  $mojo->helper(
+    'piwik_api' => sub {
+      my $c = shift;
+      deprecated 'Deprecated in favor of piwik->api';
+      return $c->piwik->api(@_);
+    }
+  );
+
+  # Establish 'piwik_api_url' helper
+  $mojo->helper(
+    piwik_api_url => sub {
+      my $c = shift;
+      deprecated 'Deprecated in favor of piwik->api_url';
+      return $c->piwik->api_url(@_);
     }
   );
 };
@@ -362,7 +381,7 @@ Mojolicious::Plugin::Piwik - Use Matomo (Piwik) in Mojolicious
   %= piwik_tag
 
   # In controller
-  my $json = $c->piwik_api('API.getPiwikVersion');
+  my $json = $c->piwik->api('API.getPiwikVersion');
 
 
 =head1 DESCRIPTION
@@ -418,8 +437,8 @@ C<site_id> - The id of the site to monitor. Defaults to 1.
 =item
 
 C<embed> - Activates or deactivates the embedding of the script tag.
-Defaults to C<true> if Mojolicious is in production mode,
-defaults to C<false> otherwise.
+Defaults to a C<true> value if Mojolicious is in production mode,
+defaults to a C<false> value otherwise.
 
 =item
 
@@ -471,10 +490,10 @@ See the L<default tag helper|Mojolicious::Plugin::TagHelpers/tag>
 for explanation of usage.
 
 
-=head2 piwik_api
+=head2 piwik.api
 
   # In Controller - blocking ...
-  my $json = $c->piwik_api(
+  my $json = $c->piwik->api(
     'Actions.getPageUrl' => {
       token_auth => 'MyToken',
       idSite => [4,7],
@@ -484,7 +503,7 @@ for explanation of usage.
   );
 
   # ... or async
-  $c->piwik_api(
+  $c->piwik->api(
     'Actions.getPageUrl' => {
       token_auth => 'MyToken',
       idSite => [4,7],
@@ -511,7 +530,7 @@ L<Do-Not-Track|https://www.eff.org/issues/do-not-track>
 is activated.
 The ip address is not forwarded.
 
-  $c->piwik_api(
+  $c->piwik->api(
     Track => {
       idsite => '4',
       res    => [1024, 768],
@@ -548,7 +567,7 @@ of the plugin registration.
 Some parameters are allowed to be array references instead of string values,
 for example C<idSite> (for analysis), C<date> (for ranges) and C<res> (for tracking).
 
-  my $json = $c->piwik_api(
+  my $json = $c->piwik->api(
     'API.get' => {
       site_id => [4,5],
       period  => 'range',
@@ -556,7 +575,7 @@ for example C<idSite> (for analysis), C<date> (for ranges) and C<res> (for track
       secure  => 1
     });
 
-In case of an error, C<piwik_api> tries to response with a meaningsful
+In case of an error, C<piwik.api> tries to response with a meaningsful
 description in the hash value of C<error>.
 If an image is expected instead of a JSON object
 (as for the Tracking or the C<ImageGraph> API), the image is base64
@@ -564,9 +583,9 @@ encoded and mime-type prefixed in the hash value of C<image>,
 ready to be embedded as the C<src> of an C<E<lt>img /E<gt>> tag.
 
 
-=head2 piwik_api_url
+=head2 piwik.api_url
 
-  my $src_url = $c->piwik_api_url(
+  my $src_url = $c->piwik->api_url(
     'ImageGraph.get' => {
       apiModule => 'VisitsSummary',
       apiAction => 'get',
@@ -581,7 +600,7 @@ ready to be embedded as the C<src> of an C<E<lt>img /E<gt>> tag.
   <img src="<%= $src_url %>" alt="Piwik analysis" />
 
 Creates the URL of an API request and returns the L<Mojo::URL> object.
-Accepts the same parameters as the L<piwik_api|/piwik_api> helper,
+Accepts the same parameters as the L<piwik.api|/piwik.api> helper,
 excluding the callback.
 
 B<This helper is EXPERIMENTAL and may change without warnings!>
@@ -619,18 +638,22 @@ L<Mojolicious>.
   https://github.com/Akron/Mojolicious-Plugin-Piwik
 
 
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2012-2018, L<Nils Diewald|http://nils-diewald.de/>.
-
-This program is free software, you can redistribute it and/or
-modify it under the terms of the Artistic License version 2.0.
+=head1 PRIVACY NOTE
 
 Please make sure you are using Matomo (Piwik) in compliance to the law.
 For german users,
 L<this information|https://www.datenschutzzentrum.de/uploads/projekte/verbraucherdatenschutz/20110315-webanalyse-piwik.pdf>
 (last accessed on 2018-02-27)
 may help you to design your service correctly.
+You may need to inform your users about your usage of
+Piwik, especially if you are located in the European Union.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2018, L<Nils Diewald|http://nils-diewald.de/>.
+
+This program is free software, you can redistribute it and/or
+modify it under the terms of the Artistic License version 2.0.
 
 This plugin was developed for
 L<khm.li - Kinder- und Hausmärchen der Brüder Grimm|https://khm.li/>.

@@ -1,13 +1,13 @@
-# $Id: Summary.pm,v 2014.1 2014/04/21 06:38:37 jleffler Exp $
+# $Id: Summary.pm,v 2018.1 2018/05/11 18:33:03 jleffler Exp $
 #
-# Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+# Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
 #
 # This driver summary is for DBD::Informix
 #
 # Copyright 1999-2000 Tim Bunce and Jonathan Leffler.
 # Copyright 2000      Informix Software Inc.
 # Copyright 2002      IBM
-# Copyright 2014      Jonathan Leffler
+# Copyright 2014-2018 Jonathan Leffler
 #
 # You may distribute under the terms of either the GNU General Public
 # License or the Artistic License, as specified in the Perl README file.
@@ -18,7 +18,7 @@
     use warnings;
     use vars qw( $VERSION );
 
-    $VERSION = "2015.1101";
+    $VERSION = "2018.1029";
     $VERSION = "0.97002" if ($VERSION =~ m%[:]VERSION[:]%);
 
     1;
@@ -28,7 +28,7 @@ __END__
 
 =head1 NAME
 
-DBD::Informix::Summary - Characteristics of DBD::Informix 
+DBD::Informix::Summary - Characteristics of DBD::Informix
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ This file is an updated version of the information about DBD::Informix in the DB
 
 =head2 Driver Version
 
-DBD::Informix (Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01))
+DBD::Informix (Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28))
 
 =head2 Feature Summary
 
@@ -159,7 +159,7 @@ Informix supports the following string data types:
   NVARCHAR(size,min)  -- and synonyms for this type
   LVARCHAR            -- IDS/UDO only
 
-Arguably, TEXT and BYTE blobs should also be listed here, 
+Arguably, TEXT and BYTE blobs should also be listed here,
 as they are automatically converted from/to strings.
 
 CHAR types have a limit of 32767 bytes in OnLine and IDS and a slightly

@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.28"
+            "Mojolicious" : "8.00"
          }
       },
       "test" : {
@@ -51,6 +51,6 @@
          "web" : "https://github.com/jhthorsen/json-validator"
       }
    },
-   "version" : "2.13",
+   "version" : "2.14",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

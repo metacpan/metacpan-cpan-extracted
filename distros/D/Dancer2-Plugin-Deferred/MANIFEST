@@ -1,3 +1,4 @@
+CODE_OF_CONDUCT.md
 CONTRIBUTING
 CONTRIBUTORS
 Changes
@@ -22,5 +23,4 @@ t/deferred.t
 t/keep.t
 t/views/index.tt
 t/views/link.tt
-xt/release/pause-permissions.t
 xt/release/unused-vars.t

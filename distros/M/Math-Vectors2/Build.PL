@@ -8,7 +8,7 @@ my $b = Module::Build->new
   license       => 'perl',
   requires      =>
    {'Carp'             =>0,
-    'Data::Table::Text'=>20171004,
+    'Data::Table::Text'=>q(20181026),
     'Test2::API'       =>0,
     'Test::More'       =>0,
    },

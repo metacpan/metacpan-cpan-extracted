@@ -23,7 +23,7 @@ NameParse::Grammar was written by Kim Ryan <kimryan at cpan dot org>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2016 Kim Ryan. All rights reserved.
+Copyright (c) 2018 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -36,7 +36,7 @@ package Lingua::EN::NameParse::Grammar;
 use strict;
 use warnings;
 
-our $VERSION = '1.37';
+our $VERSION = '1.38';
 
 
 # Rules that define valid orderings of a names components
@@ -511,11 +511,12 @@ q{
     constonant: /[A-DF-HJ-NP-TV-Z]]/
     
     # For use with John_Adam_Smith and John_A_Smith name types
-    given_name_standard:
-        /[A-Z]{3,} / |
+    given_name_standard:        
         /[AEIOU]/ constonant / / |
         constonant /[AEIOUY] / |
+        /[A-Z]{2,} / |
         split_given_name
+    
     
    # Patronymic, place name and other surname prefixes
     prefix:

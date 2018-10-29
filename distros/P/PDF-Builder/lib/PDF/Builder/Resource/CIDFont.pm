@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::BaseFont';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -183,21 +183,21 @@ sub textByStr {
 }
 
 sub textByStrKern {
-    my ($self, $text, $size, $ident) = @_;
+    my ($self, $text, $size, $indent) = @_;
 
-    return $self->text_cid_kern($self->cidsByStr($text), $size, $ident);
+    return $self->text_cid_kern($self->cidsByStr($text), $size, $indent);
 }
 
 sub text {
-    my ($self, $text, $size, $ident) = @_;
+    my ($self, $text, $size, $indent) = @_;
 
     my $newtext = $self->textByStr($text);
     if      (defined $size && $self->{'-dokern'}) {
-        $newtext = $self->textByStrKern($text, $size, $ident);
+        $newtext = $self->textByStrKern($text, $size, $indent);
         return $newtext;
     } elsif (defined $size) {
-        if (defined($ident) && $ident!=0) {
-	    return("[ $ident $newtext ] TJ");
+        if (defined($indent) && $indent!=0) {
+	    return("[ $indent $newtext ] TJ");
         } else {
 	    return "$newtext Tj";
         }
@@ -223,7 +223,7 @@ sub text_cid {
 }
 
 sub text_cid_kern {
-    my ($self, $text, $size, $ident) = @_;
+    my ($self, $text, $size, $indent) = @_;
 
     if ($self->can('fontfile')) {
         foreach my $g (unpack('n*', $text)) {
@@ -247,15 +247,15 @@ sub text_cid_kern {
             $tBefore = 1;
         }
         $newtext .= '> ' if $tBefore;
-        if (defined($ident) && $ident != 0) {
-	    return "[ $ident $newtext ] TJ";
+        if (defined($indent) && $indent != 0) {
+	    return "[ $indent $newtext ] TJ";
         } else {
             return "[ $newtext ] TJ";
         }
     } elsif (defined $size) {
         my $newtext = unpack('H*', $text);
-        if (defined($ident) && $ident != 0) {
-	    return "[ $ident <$newtext> ] TJ";
+        if (defined($indent) && $indent != 0) {
+	    return "[ $indent <$newtext> ] TJ";
         } else {
 	    return "<$newtext> Tj";
         }

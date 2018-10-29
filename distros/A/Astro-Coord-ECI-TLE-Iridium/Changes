@@ -1,3 +1,19 @@
+0.111		2018-10-29	T. R. Wyant
+    Canned status update:
+
+    - Iridium 52 failed
+    - Iridium 62 failed
+    
+    Iridium 52 should have been marked failed in my code as of v0.110,
+    but I missed it somehow.
+
+0.110		2018-10-26	T. R. Wyant
+    Canned status update:
+
+    - Iridium 11 decayed
+    - Iridium 20 decayed
+    - Iridium 83 failed
+
 0.109		2018-10-17	T. R. Wyant
     Canned status update:
 

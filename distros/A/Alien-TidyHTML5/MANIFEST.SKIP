@@ -44,7 +44,7 @@
 # Author Extras
 ^inc/.*\.pod$
 ^pkg/
-^xt/
+# ^xt/
 # ^dist.ini$
 
 # Editors
@@ -101,5 +101,6 @@
 \.build/
 Alien-TidyHTML5-.*/
 Alien-TidyHTML5-.*\.tar\.gz
+\.mailmap$
 cpanfile\.snapshot$
 _alien/

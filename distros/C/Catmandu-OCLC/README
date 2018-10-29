@@ -4,8 +4,13 @@ NAME
 
 SYNOPSIS
 
-     marc_map('020a','my.isbn')
-     xID('my.isbn','xisbn','getMetadata')
+      add_field('number','102333412');
+      do
+         maybe();
+         viaf_read('number');
+         marc_map('700','author.$append')
+         remove_field(record)
+      end
 
 MODULES
 

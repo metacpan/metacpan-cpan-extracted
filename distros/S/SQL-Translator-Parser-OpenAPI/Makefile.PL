@@ -16,6 +16,8 @@ WriteMakefile(
   TEST_REQUIRES => {
     'Test::More' => '0.98',
     'Test::Snapshot' => '0.02', # better snapshot filenames
+    'YAML::XS' => '0.67', # YAML loader used by JV
+    'Hash::Merge' => '0',
   },
   PREREQ_PM => {
     'SQL::Translator' => '0.11024', # 0.11021 gives YAML diffs on "comments"

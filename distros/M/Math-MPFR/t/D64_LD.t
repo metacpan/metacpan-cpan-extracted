@@ -2,9 +2,9 @@ use warnings;
 use strict;
 use Math::MPFR qw (:mpfr);
 
-unless(Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS()) {
+unless(Math::MPFR::_MPFR_WANT_DECIMAL64()) {
   print "1..1\n";
-  warn "\n Skipping all tests - Math::MPFR not built with MPFR_WANT_DECIMAL_FLOATS defined\n";
+  warn "\n Skipping all tests - Math::MPFR not built with MPFR_WANT_DECIMAL64 defined\n";
   print "ok 1\n";
   exit 0;
 }
@@ -18,7 +18,7 @@ my $keep_printing = 1;
 eval {require Math::Decimal64; Math::Decimal64->import (qw(:all));};
 if($@) {$why = "Couldn't load Math::Decimal64\n"}
 else {$why = "Math::MPFR not built for _Decimal64\n"
-        unless Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS()}
+        unless Math::MPFR::_MPFR_WANT_DECIMAL64()}
 
 eval {require Math::LongDouble; Math::LongDouble->import (qw(:all));};
 if($@) {$why .= "Couldn't load Math::LongDouble\n"}

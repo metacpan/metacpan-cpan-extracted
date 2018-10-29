@@ -4,7 +4,7 @@ Specio - Type constraints and coercions for Perl
 
 # VERSION
 
-version 0.42
+version 0.43
 
 # SYNOPSIS
 
@@ -425,7 +425,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

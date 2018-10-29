@@ -7,8 +7,8 @@ use warnings;
 
 no warnings 'uninitialized';
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -66,6 +66,12 @@ sub new {
 
 Returns 1 if Graphics::TIFF installed and used, 0 if not installed, or -1 if
 installed but not used (-nouseGT option given to C<image_tiff>).
+
+B<Caution:> this method can only be used I<after> the image object has been
+created. It can't tell you whether Graphics::TIFF is available in
+advance of actually using it, in case you want to use some functionality
+available only in TIFF_GT. See the <PDF::Builder> LA_GT() call if you
+need to know in advance.
 
 =cut
 
@@ -220,8 +226,6 @@ sub handle_ccitt {
     $self->{'DecodeParms'}->{'K'} = (($tif->{'ccitt'} == 4 || ($tif->{'g3Options'} & 0x1))? PDFNum(-1): PDFNum(0));
     $self->{'DecodeParms'}->{'Columns'} = PDFNum($tif->{'imageWidth'});
     $self->{'DecodeParms'}->{'Rows'} = PDFNum($tif->{'imageHeight'});
-    # deprecated Blackls1 (incorrectly named). will be removed 8/2018 or later
-    $self->{'DecodeParms'}->{'Blackls1'} = 
     $self->{'DecodeParms'}->{'BlackIs1'} = PDFBool($tif->{'whiteIsZero'} == 1? 1: 0);
     if (defined($tif->{'g3Options'}) && ($tif->{'g3Options'} & 0x4)) {
         $self->{'DecodeParms'}->{'EndOfLine'} = PDFBool(1);

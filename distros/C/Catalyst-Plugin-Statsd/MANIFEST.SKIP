@@ -3,22 +3,108 @@
 \.git/.*
 \.gitignore
 
-^Makefile$
+# Begin standard Module::Manifest::Skip list:
 
+# ExtUtils::MakeMaker
 ^blib/
+^blibdirs$
+^blibdirs\.ts$
+^bpm_to_blib\.ts$
+^Makefile$
+^Makefile\.old$
+^MakeMaker-\d
+^MANIFEST\.bak$
+# ^MANIFEST\.SKIP$
+^MYMETA\.
 ^pm_to_blib$
+^pod2htm.*
 
-CatalystX-Statsd-.*\.tar\.gz
-CatalystX-Statsd-v\d+\.\d+\.\d+/
-Catalyst-Plugin-Statsd-.*\.tar\.gz
-Catalyst-Plugin-Statsd-v\d+\.\d+\.\d+/
+# Module::Build
+^Build$
+^_build/
+^Build.bat$
+^Build.COM$
+^BUILD.COM$
+^build.com$
 
-^MYMETA\.*
+# Revision Control
+\bCVS\b
+\b.cvsignore\b
+\b_darcs\b
+\B\.git\b
+\B\.gitignore\b
+\B\.gitmodules\b
+\B\.hg\b
+\B\.hgignore\b
+\B\.hgtags\b
+\bRCS\b
+\bSCCS\b
+\B\.svn\b
+,v$
+,B$
+,D$
+\baegis.log$
 
-# Travis-CI
+# Author Extras
+^inc/.*\.pod$
+^pkg/
+# ^xt/
+# ^dist.ini$
 
-\.travis\.yml
+# Editors
+~$
+\#$
+\b\.#
+\.kpf$
+\.sw[pmno]$
+^\.vimrc$
 
-# Distzilla etc
+# OS X
+\.DS_Store$
+^\.Trash/
+\B\._
 
+# VMS
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Development
+^benchmarks/
+^core$
+^cover_db\b
+^covered\b
+^debian/
+^devel\.
+^.devel-local$
+^out$
+^tmon.out$
+^old/
+^Old/
+
+# Author Notes
+^notes
+^todo
+^ToDo$
+
+# Common Junk Files
+\.bak$
+\.diff$
+^foo\b.*
+\.old$
+\.orig$
+\.patch$
+\.rej$
+\.tdy$
+\.tmp$
+^\w$
+\.ttc$
+\.pmc$
+
+# Added by Dist::Zilla::Plugin::Generate::ManifestSkip
 \.build/
+Catalyst-Plugin-Statsd-.*/
+Catalyst-Plugin-Statsd-.*\.tar\.gz
+\.mailmap$
+cpanfile\.snapshot$
+^CatalystX-Statsd

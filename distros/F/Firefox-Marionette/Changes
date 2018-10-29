@@ -1,5 +1,8 @@
 Revision history for Firefox-Marionette
 
+0.67  Sun Oct 28 16:14:00 2018
+       Adding support for Firefox 63
+
 0.66  Mon Sep 10 20:32:00 2018
        Improving synchronisation of commands for old and new marionette protocols
 

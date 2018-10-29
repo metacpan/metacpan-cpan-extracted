@@ -1,7 +1,14 @@
+4.05
+ - Add atodouble() function
+ - Fix atonv to correctly handle subnormal double-doubles
+ - Add Rmpfr_dot() and Rmpfr_get_str_ndigits. (New in 4.1.0.)
+ - Correct Rmpfr_sum to return signed int, not unsigned value.
+ - Add Rmpfr_set_DECIMAL128 and Rmpfr_get_DECIMAL128. (New in 4.1.0.)
+
 4.04
  - Support only mpfr-3.0.0 and later
  - Check that first arg given to atonv() is of correct precision.
- - In MPFR.xs - replace NULL FILE* arguments with stdout/stdout in
+ - In MPFR.xs - replace NULL FILE* arguments with stdin/stdout in
    mpfr_out_str/mpfr_inp_str. (Thanks Vincent Lefevre.)
 
 4.03

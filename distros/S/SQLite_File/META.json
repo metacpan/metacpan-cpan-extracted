@@ -21,7 +21,8 @@
             "DBI" : "0",
             "File::Temp" : "0",
             "Module::Build" : "0.30",
-            "TAP::Harness" : "0"
+            "TAP::Harness" : "0",
+            "Test::Warnings" : "0"
          }
       },
       "configure" : {
@@ -43,7 +44,7 @@
    "provides" : {
       "SQLite_File" : {
          "file" : "lib/SQLite_File.pm",
-         "version" : "0.1005"
+         "version" : "0.1006"
       }
    },
    "release_status" : "stable",
@@ -58,6 +59,6 @@
          "url" : "http://github.com/majensen/sqlite_file.git"
       }
    },
-   "version" : "0.1005",
+   "version" : "0.1006",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

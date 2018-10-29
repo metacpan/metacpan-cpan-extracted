@@ -1,6 +1,6 @@
-#   @(#)$Id: DBD-Informix.nmd,v 2015.10 2015/11/01 07:37:12 jleffler Exp $
+#   @(#)$Id: DBD-Informix.nmd,v 2018.5 2018/10/29 01:52:25 jleffler Exp $
 #   @(#)DBD::Informix - Perl Database Driver for Informix
-#   @(#)Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+#   @(#)Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
 #   @(#)Definitive list of files -- Non-Modifiable Source Distribution
 #
 #   -- The Source file column contains the name of the source file to be
@@ -28,61 +28,50 @@
 ##################################################################
 
 # Library Files
-debug.h                     RCS/debug.h,v               3.10
-decfix.c                    RCS/decfix.c,v              3.17
-decsci.c                    RCS/decsci.c,v              4.12
-decsci.h                    RCS/decsci.h,v              3.15
-decsetexp.c                 RCS/decsetexp.c,v           2.5
-dumpesql.h                  RCS/dumpesql.h,v            1.18
+debug.h                     RCS/debug.h,v               3.17
+dumpesql.h                  RCS/dumpesql.h,v            1.19
 esql5_00.h                  RCS/esql5_00.h,v            2008.2
 esql7_20.h                  RCS/esql7_20.h,v            2009.1
 esql_ius.h                  RCS/esql_ius.h,v            2008.2
 esqlc.h                     RCS/esqlc.h,v               2013.1
 esqlcver.ec                 RCS/esqlcver.ec,v           2003.1
 esqllib.h                   RCS/esqllib.h,v             2008.1
-esqltype.h                  RCS/esqltype.h,v            2008.3
+esqltype.h                  RCS/esqltype.h,v            2018.1
 esqlutil.h                  RCS/esqlutil.h,v            2009.1
 ifmxdec.h                   RCS/ifmxdec.h,v             1.19
 ixblob.ec                   RCS/ixblob.ec,v             2008.2
 ixblob.h                    RCS/ixblob.h,v              50.5
-jtypes.c                    RCS/jtypes.c,v              2008.1
-kludge.c                    RCS/kludge.c,v              1.10
-kludge.h                    RCS/kludge.h,v              1.15
-sqltoken.c                  RCS/sqltoken.c,v            2009.1
+kludge.c                    RCS/kludge.c,v              1.13
+kludge.h                    RCS/kludge.h,v              1.18
+sqltoken.c                  RCS/sqltoken.c,v            2016.1
 sqltoken.h                  RCS/sqltoken.h,v            2004.3
 sqltype.ec                  RCS/sqltype.ec,v            2011.1
 
 # Source Files
-Announce                        RCS/Announce,v          2015.6
+Announce                        RCS/Announce,v          2018.5
 BugReport                       RCS/BugReport,v         100.5
-ChangeLog                       RCS/ChangeLog,v         2015.4
+ChangeLog                       RCS/ChangeLog,v         2018.3
 
 InformixTechSupport             RCS/InformixTechSupport,v   2013.1
 ItWorks                         RCS/ItWorks,v               100.5
-MANIFEST                        RCS/MANIFEST,v              2015.5
+MANIFEST                        RCS/MANIFEST,v              2018.2
 MANIFEST.SKIP                   RCS/MANIFEST.SKIP,v         2004.2
-META.yml                        RCS/META.yml,v              2015.3
-Makefile.PL                     RCS/Makefile.PL,v           2015.8
+META.yml                        RCS/META.yml,v              2018.1
+Makefile.PL                     RCS/Makefile.PL,v           2018.4
 README                          RCS/README,v                2015.3
 TODO                            RCS/TODO,v                  2013.1
 
-apply.setminref.sh              RCS/apply.setminref.sh,v    1.1
-
 Informix.h                      RCS/Informix.h,v        100.3
-Informix.pm                     RCS/Informix.pm,v       2015.2
+Informix.pm                     RCS/Informix.pm,v       2018.1
 Informix.xs                     RCS/Informix.xs,v       2010.1
-dbdattr.ec                      RCS/dbdattr.ec,v        2011.2
-dbdimp.ec                       RCS/dbdimp.ec,v         2013.3
+dbdattr.ec                      RCS/dbdattr.ec,v        2015.1
+dbdimp.ec                       RCS/dbdimp.ec,v         2018.1
 dbdimp.h                        RCS/dbdimp.h,v          2013.1
 dbdixmap.h                      RCS/dbdixmap.h,v        100.6
 eprintf.c                       RCS/eprintf.c,v         60.1
 esqlbasic.ec                    RCS/esqlbasic.ec,v      2015.1
-esqlc_v5.ec                     RCS/esqlc_v5.ec,v       100.2
 esqlc_v6.ec                     RCS/esqlc_v6.ec,v       2007.1
-esqlcc.pl                       RCS/esqlcc.pl,v         2015.1
-esqlld.pl                       RCS/esqlld.pl,v         2015.1
 esqlperl.h                      RCS/esqlperl.h,v        2007.2
-esqlsed.pl                      RCS/esqlsed.pl,v        2015.1
 esqltest.ec                     RCS/esqltest.ec,v       2015.1
 link.c                          RCS/link.c,v            2007.1
 link.h                          RCS/link.h,v            2003.1
@@ -91,20 +80,19 @@ odbctype.h                      RCS/odbctype.h,v        100.1
 setminref.pl                    RCS/setminref.pl,v      2015.3
 setperl.pl                      RCS/setperl.pl,v        2015.1
 test.all.sh                     RCS/test.all.sh,v       2015.1
-test.c4gl.sh                    RCS/test.c4gl.sh,v      2015.1
 test.one.sh                     RCS/test.one.sh,v       2015.1
 test.quiet.sh                   RCS/test.quiet.sh,v     2015.1
 test.run.sh                     RCS/test.run.sh,v       2015.1
 
 # Release mechanism stuff - not needed elsewhere, mostly.
-Release.Checklist               RCS/Release.Checklist,v 2015.3
+Release.Checklist               RCS/Release.Checklist,v 2018.2
 
 # Supporting tools
 lib/Bundle/DBD/Informix.pm          lib/Bundle/DBD/RCS/Informix.pm,v        2013.1
-lib/DBD/Informix/Configure.pm       lib/DBD/Informix/RCS/Configure.pm,v     2015.2
-lib/DBD/Informix/GetInfo.pm         lib/DBD/Informix/RCS/GetInfo.pm,v       2014.1
+lib/DBD/Informix/Configure.pm       lib/DBD/Informix/RCS/Configure.pm,v     2018.1
+lib/DBD/Informix/GetInfo.pm         lib/DBD/Informix/RCS/GetInfo.pm,v       2018.1
 lib/DBD/Informix/Metadata.pm        lib/DBD/Informix/RCS/Metadata.pm,v      2014.1
-lib/DBD/Informix/Summary.pm         lib/DBD/Informix/RCS/Summary.pm,v       2014.1
+lib/DBD/Informix/Summary.pm         lib/DBD/Informix/RCS/Summary.pm,v       2018.1
 lib/DBD/Informix/TechSupport.pm     lib/DBD/Informix/RCS/TechSupport.pm,v   2015.2
 lib/DBD/Informix/TestHarness.pm     lib/DBD/Informix/RCS/TestHarness.pm,v   2015.1
 lib/DBD/Informix/TypeInfo.pm        lib/DBD/Informix/RCS/TypeInfo.pm,v      2014.1
@@ -175,17 +163,16 @@ t/t98pod.t                      t/RCS/t98pod.t,v        2014.1
 t/t99clean.t                    t/RCS/t99clean.t,v      2014.1
 
 # Various scraps of documentation.
-Notes/FAQ                       Notes/RCS/FAQ,v                     2010.2
+Notes/FAQ                       Notes/RCS/FAQ,v                     2018.1
 Notes/Working.Versions          Notes/RCS/Working.Versions,v        2015.1
 Notes/bug.reports               Notes/RCS/bug.reports,v             100.7
-Notes/environment.variables     Notes/RCS/environment.variables,v   2007.1
+Notes/environment.variables     Notes/RCS/environment.variables,v   2018.1
 Notes/eprintf                   Notes/RCS/eprintf,v                 100.1
 Notes/hpux                      Notes/RCS/hpux,v                    100.2
 Notes/hpux-gcc-build.sh         Notes/RCS/hpux-gcc-build.sh,v       100.3
 Notes/linux                     Notes/RCS/linux,v                   100.1
 Notes/load.unload               Notes/RCS/load.unload,v             100.3
-Notes/nonroot.install           Notes/RCS/nonroot.install,v         100.2
-Notes/nt                        Notes/RCS/nt,v                      100.4
+Notes/nonroot.install           Notes/RCS/nonroot.install,v         2018.3
 Notes/olipcshm                  Notes/RCS/olipcshm,v                100.1
 Notes/static.build              Notes/RCS/static.build,v            100.1
 Notes/web.servers               Notes/RCS/web.servers,v             100.1
@@ -212,8 +199,8 @@ examples/fetchscroll.pl                 examples/RCS/fetchscroll.pl,v           
 
 inc/ExtUtils/AutoInstall.pm             inc/ExtUtils/AutoInstall.pm             -
 
-DBD-Informix.jdc            RCS/DBD-Informix.jdc,v      2015.6
-DBD-Informix.msd            RCS/DBD-Informix.msd,v      2015.4
-DBD-Informix.nmd            RCS/DBD-Informix.nmd,v      $Revision: 2015.10 $
+DBD-Informix.jdc            RCS/DBD-Informix.jdc,v      2018.4
+DBD-Informix.msd            RCS/DBD-Informix.msd,v      2018.1
+DBD-Informix.nmd            RCS/DBD-Informix.nmd,v      $Revision: 2018.5 $
 mknmd.sh                    RCS/mknmd.sh,v              2012.1
 prodverstamp.sh             RCS/prodverstamp.sh,v       2015.1

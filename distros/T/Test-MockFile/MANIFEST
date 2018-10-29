@@ -10,10 +10,12 @@ META.yml
 README
 t/00-load.t
 t/dir.t
+t/file_access_hooks.t
 t/manifest.t
 t/mock_stat.t
 t/pod-coverage.t
 t/pod.t
 t/readline.t
 t/sysopen.t
+t/Test-MockFile_file.t
 t/writeline.t

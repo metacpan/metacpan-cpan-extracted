@@ -236,7 +236,7 @@ for my $pair (
     [ ScalarRef => sub { 'scalar ref to ' . describe( ${ $_[0] } ) } ],
     [ ArrayRef  => sub { 'array ref to ' . describe( $_[0]->[0] ) } ],
     [ HashRef   => sub { 'hash ref to ' . describe( $_[0]->{foo} ) } ],
-    ) {
+) {
     my ( $ptype, $describe ) = @{$pair};
     my $constraint = t( $ptype, of => t('Value') );
 

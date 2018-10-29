@@ -1,13 +1,15 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::UserAgent;
-$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.13';
+$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.16';
 
 # ABSTRACT: User Agent wrapper for working with Google APIs
 
 use Moo;
 
 extends 'Mojo::UserAgent';
+
+#extends 'Mojo::UserAgent::Mockable';
 use WebService::GoogleAPI::Client::Credentials;
 use WebService::GoogleAPI::Client::AuthStorage;
 use Mojo::UserAgent;
@@ -21,6 +23,9 @@ has 'debug'                         => ( is => 'rw', default => 0 );
 has 'credentials' =>
   ( is => 'rw', default => sub { WebService::GoogleAPI::Client::Credentials->instance }, handles => [qw/access_token auth_storage get_scopes_as_array user /], lazy => 1 );
 
+## NB - could cache using https://metacpan.org/pod/Mojo::UserAgent::Cached TODO: Review source of this for ideas
+
+
 ## NB - used by both Client and Discovery
 
 # Keep access_token in headers always actual
@@ -31,6 +36,7 @@ sub BUILD
   ## performance tip as per https://developers.google.com/calendar/performance and similar links
   ## NB - to work with Google APIs also assumes that Accept-Encoding: gzip is set in HTTP headers
   $self->transactor->name( __PACKAGE__ . ' (gzip enabled)' );
+  ## MAX SIZE ETC _ WHAT OTHER CONFIGURABLE PARAMS ARE AVAILABLE
 }
 
 
@@ -99,16 +105,17 @@ sub validated_api_query
 
   if ( ref( $params ) eq '' )    ## assume is a GET for the URI at $params
   {
-    carp( "transcribing $params to a hashref for validated_api_query" );
+    carp( "transcribing $params to a hashref for validated_api_query" ) if $self->debug;
     my $val = $params;
     $params = { path => $val, method => 'get', options => {}, };
   }
 
   my $res = $self->start( $self->build_http_transaction( $params ) )->res;
+
   ## TODO: HANDLE TIMEOUTS AND OTHER ERRORS IF THEY WEREN'T HANDLED BY build_http_transaction
 
   ## TODO:
-  return Mojo::Message::Response->new unless ref( $res ) eq 'Mojo::Message::Response';
+#  return Mojo::Message::Response->new unless ref( $res ) eq 'Mojo::Message::Response';
 
   if ( ( $res->code == 401 ) && $self->do_autorefresh )
   {
@@ -184,7 +191,7 @@ WebService::GoogleAPI::Client::UserAgent - User Agent wrapper for working with G
 
 =head1 VERSION
 
-version 0.13
+version 0.16
 
 =head2 C<header_with_bearer_auth_token>
 

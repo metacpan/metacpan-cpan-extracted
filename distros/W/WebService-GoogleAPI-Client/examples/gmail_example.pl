@@ -111,6 +111,10 @@ say "Running tests with default user email = $user";
 say 'Root cache folder: ' . $gapi_agent->discovery->chi->root_dir();                                         ## cached content temporary directory
 say "User Agent Name = " . $gapi_agent->ua->transactor->name();
 
+send_email_to_self_using_client( $gapi_agent );
+say 'done';
+exit;
+
 if ( 1 == 0 )
 {
   #my $api_spec = $gapi_agent->get_api_discovery_for_api_id('gmail:v1');
@@ -141,6 +145,8 @@ if ( 1 == 0 )
   exit;
 
 }
+
+
 
 
 if ( 1 == 1 )    ## Simplified use Cases
@@ -322,10 +328,57 @@ TODO:
 sub send_email_to_self_using_client
 {
   my ( $gapi ) = @_;
+  my $json_ld = '<script type="application/ld+json">
+{
+  "@context":"http://schema.org",
+  "@type": "EmailMessage",
+  "description": "View this Pull Request on GitHub",
+  "action": {
+    "@type": "ViewAction",
+    "url":"https://github.com/perma-id/w3id.org/pull/47",
+    "name":"View Pull Request"
+  }
+}
+</script>';
+
+my $email_sample = '
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <!-- NOTE: external links are for testing only -->
+    <link href="//cdn.muicss.com/mui-0.9.41/email/mui-email-styletag.css" rel="stylesheet" />
+    <link href="//cdn.muicss.com/mui-0.9.41/email/mui-email-inline.css" rel="stylesheet" />
+  </head>
+  <body>
+    <table class="mui-body" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td>
+        This is a very simple html email - love it?
+          <!--
+
+          email body goes here
+
+          -->
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+';
+
+#$email_sample = '<h1>FNAR</h1>';
+use MIME::Base64::URLSafe;
+
   my $cl = $gapi->api_query( {
     httpMethod => 'post',                                                                                                                ## method as key should also work fine
     path       => 'https://www.googleapis.com/gmail/v1/users/me/messages/send',
-    options    => { raw => construct_base64_email( $user, "Test email from $user", "This is the body of email from $user to $user" ) }
+    options    => { 
+      raw => urlsafe_b64encode(
+        Email::Simple->create( header => [To => 'peter@shotgundriver.com', From =>'peter@shotgundriver.com', Subject => "Test email from 'peter\@shotgundriver.com'",'Content-Type' => 'text/html', ], body => $email_sample )->as_string
+      ),
+      } ## "$json_ld Test email from $user"
   } );
   if ( $cl->code eq '200' )                                                                                                              ## Mojo::Message::Response
   {

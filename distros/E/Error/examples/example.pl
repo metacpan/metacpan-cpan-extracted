@@ -2,6 +2,9 @@
 use lib '.';
 use Error qw(:try);
 
+use strict;
+use warnings;
+
 @Error::Bad::ISA = qw(Error);
 
 $Error::Debug = 1; # turn on verbose stacktrace
@@ -17,7 +20,7 @@ sub abc {
 	}
 	except {
 	    return {
-		Error::Simple => sub { warn "simple" }
+		'Error::Simple' => sub { warn "simple" }
 	    }
 	}
 	otherwise {
@@ -40,12 +43,12 @@ sub def {
 abc();
 
 
-$x = prior Error;
+my $x = prior Error;
 
 print "--\n",$x->stacktrace;
 
 unless(defined def()) {
-    $x = prior Error 'main';
-    print "--\n",0+$x,"\n",$x;
+    my $x = prior Error 'main';
+    print "--\n",0+$x,"\n",$x; # 0+$x converts to Integer via "value" method
 }
 

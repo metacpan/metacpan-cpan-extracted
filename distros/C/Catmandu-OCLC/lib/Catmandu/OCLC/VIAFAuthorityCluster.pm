@@ -2,9 +2,7 @@ package Catmandu::OCLC::VIAFAuthorityCluster;
 
 use REST::Client;
 use URI::Escape;
-use JSON;
 use Catmandu;
-use Data::Dumper;
 
 our $MARC_HEADER = qq|<marc:collection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd" xmlns:marc="http://www.loc.gov/MARC21/slim">|;
 our $MARC_FOOTER = qq|</marc:collection>|;

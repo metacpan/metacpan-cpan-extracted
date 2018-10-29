@@ -65,11 +65,11 @@
    "provides" : {
       "Graphics::ColorNames" : {
          "file" : "lib/Graphics/ColorNames.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.3.3"
       },
       "Graphics::ColorNames::X" : {
          "file" : "lib/Graphics/ColorNames/X.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.3.3"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/robrwo/Graphics-ColorNames"
       }
    },
-   "version" : "v3.3.1",
+   "version" : "v3.3.3",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Alan D. Salewski <alans@cji.com>",

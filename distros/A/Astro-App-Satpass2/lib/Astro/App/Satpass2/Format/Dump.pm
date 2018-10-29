@@ -11,7 +11,7 @@ use Astro::App::Satpass2::Utils qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 
 my %dumper_hash = (
     'YAML' => 'Dump',

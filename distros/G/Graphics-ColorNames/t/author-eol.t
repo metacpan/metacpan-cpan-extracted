@@ -30,6 +30,7 @@ my @files = (
     't/10-sub.t',
     't/author-eof.t',
     't/author-eol.t',
+    't/author-minimum-version.t',
     't/author-no-tabs.t',
     't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
@@ -37,7 +38,6 @@ my @files = (
     't/lib/Graphics/ColorNames/Test.pm',
     't/release-check-manifest.t',
     't/release-fixme.t',
-    't/release-minimum-version.t',
     't/release-trailing-space.t'
 );
 

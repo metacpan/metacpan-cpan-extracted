@@ -8,7 +8,7 @@ use List::Util qw/first/;
 
 our @BOOL_FIELDS = qw/is_self likes clicked saved hidden over_18 over18 edited
                       has_mail has_mod_mail is_mod is_gold was_comment new
-		      public_traffic/;
+		      public_traffic is_employee verified has_verified_email/;
 
 
 use fields qw/session name id/;
@@ -26,7 +26,11 @@ sub load_from_source_data {
  
     my ($self, $source_data) = @_;
     if ($source_data) {
-        foreach my $field (keys %$source_data) {
+		# Hack that allows us to set link_id reliably when creating a MoreCommen
+		# object from Comment. This ensures that link_id is always set before 
+		# replies.
+        #foreach my $field (keys %$source_data) {
+        foreach my $field (sort keys %$source_data) {
             # Set data fields
             my $setter = sprintf 'set_%s', $field;
             if ($self->can($setter)) {

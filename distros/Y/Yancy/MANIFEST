@@ -22,14 +22,6 @@ eg/test-app/yancy.data.json
 eg/todo-app/.gitignore
 eg/todo-app/cpanfile
 eg/todo-app/myapp.pl
-eg/todo-app/public/css/bootstrap.css
-eg/todo-app/public/css/bootstrap.css.map
-eg/todo-app/public/css/bootstrap.min.css
-eg/todo-app/public/css/bootstrap.min.css.map
-eg/todo-app/public/js/bootstrap.js
-eg/todo-app/public/js/bootstrap.js.map
-eg/todo-app/public/js/bootstrap.min.js
-eg/todo-app/public/js/bootstrap.min.js.map
 lib/Mojolicious/Plugin/Yancy.pm
 lib/Mojolicious/Plugin/Yancy/resources/public/yancy/app.js
 lib/Mojolicious/Plugin/Yancy/resources/public/yancy/bootstrap.css

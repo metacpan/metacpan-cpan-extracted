@@ -18,6 +18,7 @@ enum {
   SPVM_SUB_C_FLAG_IS_STATIC = 64, 
   SPVM_SUB_C_FLAG_IS_RETURN_OBJECT_TYPE = 128,
   SPVM_SUB_C_FLAG_IS_RETURN_VALUE_TYPE = 256,
+  SPVM_SUB_C_FLAG_IS_ANON_SUB = 512,
 };
 
 // Method information
@@ -28,6 +29,7 @@ struct SPVM_sub {
   SPVM_OP* op_constant;
   SPVM_LIST* object_arg_ids;
   SPVM_LIST* mys;
+  SPVM_LIST* captures;
   int32_t opcodes_base;
   int32_t opcodes_length;
   int32_t call_sub_arg_stack_max;
@@ -57,6 +59,7 @@ struct SPVM_sub {
   int32_t double_vars_alloc_length;
   int32_t object_vars_alloc_length;
   int32_t ref_vars_alloc_length;
+  int32_t return_runtime_type;
 };
 
 SPVM_SUB* SPVM_SUB_new(SPVM_COMPILER* compiler);

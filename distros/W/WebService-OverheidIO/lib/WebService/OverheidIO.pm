@@ -3,7 +3,7 @@ use Moose;
 
 # ABSTRACT: A (semi) abstract class that implements logic to talk to Overheid.IO
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 use LWP::UserAgent;
 use URI;
@@ -132,7 +132,7 @@ WebService::OverheidIO - A (semi) abstract class that implements logic to talk t
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 

@@ -14,12 +14,13 @@ our $opt_tablename;
 our $opt_connection;
 our $opt_sql;
 our $opt_noMinimalForm;
+our $opt_noIgnoreNulls;
 
 use Getopt::Euclid qw( :vars<opt_> );
 use Data::Dumper;
 use VSGDR::StaticData;
 
-use version ; our $VERSION = qv('0.01');
+use version ; our $VERSION = qv('0.02');
 
 my $schema          = ($opt_tablename =~ m{ \A \[(.+)\] \. (\[.+\]) \z
                                           | \A \[(.+)\] \. (.+)     \z
@@ -34,13 +35,14 @@ my $table           = ($opt_tablename =~ m{ \A (\[.+\]) \. \[(.+)\] \z
 
 my $sql             = $opt_sql ;
 my $use_MinimalForm = ! $opt_noMinimalForm ;
+my $use_IgnoreNulls = ! $opt_noIgnoreNulls ;
 
 #die 'bad tablename' if $table =~ m{ \. }xms or $schema =~ m{ \. }xms; # it went wrong if we still have an embedded .
 
 my $dbh             = DBI->connect("dbi:ODBC:${opt_connection}", q{}, q{}, { LongReadLen => 512000, AutoCommit => 1, RaiseError => 1 });
 
 
-my $staticDataScript = VSGDR::StaticData::generateTestDataScript($dbh,$schema,$table,$sql,$use_MinimalForm) ;
+my $staticDataScript = VSGDR::StaticData::generateTestDataScript($dbh,$schema,$table,$sql,$use_MinimalForm,$use_IgnoreNulls) ;
 say $staticDataScript; 
 
 exit ;
@@ -62,7 +64,7 @@ genTestData.pl - Creates a static data script for a set of data to insert into a
 
 =head1 VERSION
 
-0.01
+0.02
 
 
 =head1 USAGE
@@ -106,6 +108,14 @@ Specify ODBC connection for Test script
 =for Euclid:
     false: --MinimalForm
  
+=item  --[no]IgnoreNulls
+ 
+[Don't] extract values where everything is null
+ 
+=for Euclid:
+    false: --IgnoreNulls
+ 
+
 
 =back
 

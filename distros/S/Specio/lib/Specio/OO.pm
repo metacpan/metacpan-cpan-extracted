@@ -5,25 +5,15 @@ use warnings;
 
 use B qw( perlstring );
 use Carp qw( confess );
-use Eval::Closure qw( eval_closure );
 use List::Util qw( all );
 use MRO::Compat;
 use Role::Tiny;
-use Scalar::Util qw( blessed weaken );
+use Scalar::Util qw( weaken );
 use Specio::PartialDump qw( partial_dump );
-use Specio::TypeChecks qw(
-    does_role
-    is_ArrayRef
-    is_ClassName
-    is_CodeRef
-    is_HashRef
-    is_Int
-    is_Str
-    isa_class
-);
+use Specio::TypeChecks;
 use Storable qw( dclone );
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use Exporter qw( import );
 
@@ -84,9 +74,8 @@ EOF
     {
         ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no strict 'refs';
-        *{ $class . '::' . $name } = eval_closure(
-            source      => $reader,
-            description => $class . '->' . $name,
+        *{ $class . '::' . $name } = _eval_or_die(
+            $reader, $class . '->' . $name,
         );
     }
 }
@@ -103,14 +92,26 @@ sub _inline_predicate {
     {
         ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no strict 'refs';
-        *{ $class . '::' . $attr->{predicate} } = eval_closure(
-            source      => $predicate,
-            description => $class . '->' . $attr->{predicate},
+        *{ $class . '::' . $attr->{predicate} } = _eval_or_die(
+            $predicate, $class . '->' . $attr->{predicate},
         );
     }
 }
 
 my @RolesWithBUILD = qw( Specio::Constraint::Role::Interface );
+
+# This is an optimization to avoid calling this many times over:
+#
+#     Specio::TypeChecks->can( 'is_' . $attr->{isa} )
+my %TypeChecks;
+
+BEGIN {
+    for my $sub (@Specio::TypeChecks::EXPORT_OK) {
+        my ($type) = $sub =~ /^is_(.+)$/
+            or next;
+        $TypeChecks{$type} = Specio::TypeChecks->can($sub);
+    }
+}
 
 sub _inline_constructor {
     my $class = shift;
@@ -187,7 +188,7 @@ EOF
 
         if ( $attr->{isa} ) {
             my $validator;
-            if ( Specio::TypeChecks->can( 'is_' . $attr->{isa} ) ) {
+            if ( $TypeChecks{ $attr->{isa} } ) {
                 $validator
                     = 'Specio::TypeChecks::is_'
                     . $attr->{isa}
@@ -245,11 +246,28 @@ EOF
     {
         ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no strict 'refs';
-        *{ $class . '::new' } = eval_closure(
-            source      => $constructor,
-            description => $class . '->new',
+        *{ $class . '::new' } = _eval_or_die(
+            $constructor, $class . '->new',
         );
     }
+}
+
+# This used to be done with Eval::Closure but that added a lot of unneeded
+# overhead. We're never actually eval'ing a closure, just plain source, so
+# doing it by hand is a worthwhile optimization.
+sub _eval_or_die {
+    local $@ = undef;
+    ## no critic (Variables::RequireInitializationForLocalVars)
+    # $SIG{__DIE__} = undef causes warnings with 5.8.x
+    local $SIG{__DIE__};
+    ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    my $sub = eval <<"EOF";
+#line 1 "$_[1]"
+$_[0];
+EOF
+    my $e = $@;
+    die $e if $e;
+    return $sub;
 }
 
 ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
@@ -274,6 +292,20 @@ sub _bad_value_message {
 }
 ## use critic
 
+my %BuiltinTypes = map { $_ => 1 } qw(
+    SCALAR
+    ARRAY
+    HASH
+    CODE
+    REF
+    GLOB
+    LVALUE
+    FORMAT
+    IO
+    VSTRING
+    Regexp
+);
+
 sub clone {
     my $self = shift;
 
@@ -295,20 +327,26 @@ sub clone {
             next;
         }
 
-        # We need to special case arrays and hashes of Specio objects, as they
-        # may contain code refs which cannot be cloned with dclone.
+        # We need to special case arrays of Specio objects, as they may
+        # contain code refs which cannot be cloned with dclone. Not using
+        # blessed is a small optimization.
         if ( ( ref $value eq 'ARRAY' )
-            && all { ( blessed($_) || q{} ) =~ /Specio/ } @{$value} ) {
+            && all { ( ref($_) || q{} ) =~ /Specio/ } @{$value} ) {
 
             $new->{$key} = [ map { $_->clone } @{$value} ];
             next;
         }
 
+        # This is a weird hacky way of trying to avoid calling
+        # Scalar::Util::blessed, which showed up as a hotspot in profiling of
+        # loading DateTime. That's because we call ->clone a _lot_ (it's
+        # called every time a type is exported).
+        my $ref = ref $value;
         $new->{$key}
-            = blessed $value           ? $value->clone
-            : ( ref $value eq 'CODE' ) ? $value
-            : ref $value               ? dclone($value)
-            :                            $value;
+            = !$ref               ? $value
+            : $ref eq 'CODE'      ? $value
+            : $BuiltinTypes{$ref} ? dclone($value)
+            :                       $value->clone;
     }
 
     bless $new, ( ref $self );
@@ -337,7 +375,7 @@ Specio::OO - A painfully poor reimplementation of Moo(se)
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 DESCRIPTION
 
@@ -362,7 +400,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

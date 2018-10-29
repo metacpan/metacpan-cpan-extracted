@@ -1,5 +1,5 @@
 package WebService::OverheidIO::KvK;
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 # ABSTRACT: Query Overheid.IO/OpenKVK via their API
 #
 use Moose;
@@ -48,7 +48,7 @@ WebService::OverheidIO::KvK - Query Overheid.IO/OpenKVK via their API
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 

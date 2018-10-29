@@ -30,6 +30,7 @@ my $collections = {
                 'x-order' => 2,
                 format => 'email',
                 pattern => '^[^@]+@[^@]+$',
+                title => 'E-mail Address',
             },
             password => {
                 'x-order' => 3,
@@ -48,6 +49,10 @@ my $collections = {
             username => {
                 'x-order' => 6,
                 description => 'Identifier to use for login',
+            },
+            age => {
+                'x-order' => 7,
+                type => [qw( integer null )],
             },
         },
     },
@@ -359,6 +364,9 @@ subtest 'field_for' => sub {
         is $input->attr( 'id' ), $label->attr( 'for' ), 'input id matches label for';
         is $input->attr( 'name' ), 'name', 'input name correct';
         is $input->attr( 'value' ), 'Doug', 'input value correct';
+        ok my $desc = $dom->at( '.form-group .form-text' ), 'description exists';
+        is $desc->text, 'The real name of the person',
+            'description text is correct';
     };
 
     subtest 'readonly field' => sub {
@@ -369,12 +377,13 @@ subtest 'field_for' => sub {
         is $input->text, 1, 'paragraph text correct';
     };
 
-    subtest 'required field with pattern' => sub {
+    subtest 'required field with title and pattern' => sub {
         my $html = $plugin->field_for( user => 'email' );
         my $dom = Mojo::DOM->new( $html );
         my $field = $dom->children->[0];
         ok my $label = $dom->at( 'label' ), 'label exists';
-        is $label->text, 'email *', 'label text is field name with required marker';
+        is $label->text, 'E-mail Address *',
+            'label text is field title with required marker';
         ok my $input = $dom->at( 'input' ), 'input exists';
         is $input->attr( 'name' ), 'email', 'input name correct';
         is $input->attr( 'pattern' ),
@@ -398,6 +407,7 @@ subtest 'form_for' => sub {
         name => 'Doug',
         access => 'user',
         username => 'preaction',
+        age => 35,
     );
     my $html = $plugin->form_for( 'user', item => \%item );
     #; diag $html;
@@ -412,18 +422,18 @@ subtest 'form_for' => sub {
 
     subtest 'form fields' => sub {
         my $fields = $dom->find( '.form-group' );
-        is $fields->size, 6, 'found 6 fields';
+        is $fields->size, 7, 'found 7 fields';
         #; diag $fields->each;
         my $labels = $fields->map( at => 'label' )->grep( sub { defined } );
-        is $labels->size, 6, 'found 6 labels';
+        is $labels->size, 7, 'found 7 labels';
         #; diag $labels->each;
         is_deeply [ $labels->map( 'text' )->each ],
-            [ 'id', 'email *', 'password', 'name', 'access', 'username' ],
+            [ 'id', 'E-mail Address *', 'password', 'name', 'access', 'username', 'age' ],
             'label texts in correct order';
         my $inputs = $fields->map( at => 'input,select,textarea' )->grep( sub { defined } );
-        is $inputs->size, 5, 'found 5 inputs (1 is read-only)';
+        is $inputs->size, 6, 'found 6 inputs (1 is read-only)';
         is_deeply [ $inputs->map( attr => 'name' )->each ],
-            [ 'email', 'password', 'name', 'access', 'username' ],
+            [ 'email', 'password', 'name', 'access', 'username', 'age' ],
             'input names in correct order';
 
         my $id_input = $dom->at( 'p[data-name=id]' );
@@ -481,11 +491,11 @@ subtest 'form_for' => sub {
         my $form = $dom->children->[0];
 
         my $fields = $dom->find( '.form-group' );
-        is $fields->size, 6, 'found 6 fields';
+        is $fields->size, 7, 'found 7 fields';
         my $labels = $fields->map( at => 'label' )->grep( sub { defined } );
-        is $labels->size, 6, 'found 6 labels';
+        is $labels->size, 7, 'found 7 labels';
         my $inputs = $fields->map( at => 'input,select,textarea' )->grep( sub { defined } );
-        is $inputs->size, 5, 'found 5 inputs (1 is read-only)';
+        is $inputs->size, 6, 'found 6 inputs (1 is read-only)';
 
         my $email_input = $dom->at( 'input[name=email]' );
         is $email_input->attr( 'type' ), 'email',

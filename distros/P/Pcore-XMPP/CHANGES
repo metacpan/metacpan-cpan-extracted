@@ -1,3 +1,11 @@
+v0.10.5 2018-10-26T20:55:01Z
+
+v0.10.4 2018-10-26T20:52:46Z
+
+v0.10.3 2018-10-26T20:48:04Z
+ - core event ported to the PP class system
+ - fixes
+
 v0.10.2 2018-06-30T09:03:16Z
  - pcore util mapping improved
 

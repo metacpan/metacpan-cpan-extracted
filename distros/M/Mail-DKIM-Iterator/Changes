@@ -1,3 +1,11 @@
+1.001 - 2018/10/27
+- return needed DNS queries as soon as possible
+- verify signature as soon as possible (return errors early)
+- add result and authentication_results methods
+1.000 - 2018/10/26
+- when signing make h_auto the default to get secure header protection
+- h_auto and h can be given together when signing and h can include additional
+  headers not automatically added using h_auto
 0.017 - 2018/10/25
 - only warn on incomplete field protection if there is actually a critical
   field unsigned and not already if the signature would allow such addition

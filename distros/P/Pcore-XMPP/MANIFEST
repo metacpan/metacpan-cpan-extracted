@@ -5,7 +5,7 @@ MANIFEST
 META.json
 README.md
 cpanfile
-lib/Pcore/Core/Event/Listener/Pipe/xmpp.pm
+lib/Pcore/Core/Event/Listener/xmpp.pm
 lib/Pcore/XMPP.pm
 share/dist-id.json
 share/dist.yaml

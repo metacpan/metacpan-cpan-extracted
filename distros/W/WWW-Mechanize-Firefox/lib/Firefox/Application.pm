@@ -5,8 +5,7 @@ use MozRepl::RemoteObject ();
 use URI ();
 use Carp qw(carp croak);
 
-use vars qw'$VERSION';
-$VERSION = '0.79';
+our $VERSION = '0.80';
 
 =head1 NAME
 

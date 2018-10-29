@@ -3,10 +3,11 @@
 # Vectors in two dimensions
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2017
 #-------------------------------------------------------------------------------
+# podDocumentation
 
 package Math::Vectors2;
 require v5.16;
-our $VERSION = '20171009';
+our $VERSION = '20181026';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
@@ -39,7 +40,7 @@ sub near2($$)                                                                   
 genLValueScalarMethods(qw(x));                                                  # X component of vector.
 genLValueScalarMethods(qw(y));                                                  # Y component of vector.
 
-#1 Methods                                                                      # Vector msethods.
+#1 Methods                                                                      # Vector methods.
 
 sub new($$)                                                                     # Create new vector from components.
  {my ($x, $y) = @_;                                                             # X component, Y component
@@ -184,378 +185,27 @@ Or more briefly:
 
 =head1 Description
 
+Vectors in two dimensions
+
+
+Version '20171009'.
+
+
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
-
-
-=head1 Attributes
-
-Attributes that can be set by =
-
-=head2 x :lvalue
-
-X component of vector.
-
-
-=head2 y :lvalue
-
-Y component of vector.
-
-
-=head1 Methods
-
-Vector msethods.
-
-=head2 new($$)
-
-Create new vector from components.
-
-  1  $x  X component
-  2  $y  Y component
-
-Example:
-
-
-  ok $o->print($x, $y) eq '(0,0), (1,0), (0,1)';
-
-  ok near2(Math::Vectors2::new(0, 0), $o);
-
-
-=head2 zeroAndUnits()
-
-Create the useful vectors: o=(0,0), x=(1,0), y=(0,1)
-
-
-Example:
-
-
-  my ($o, $x, $y) = Math::Vectors2::zeroAndUnits;
-
-  ok $o->print($x, $y) eq '(0,0), (1,0), (0,1)';
-
-
-=head2 print($@)
-
-Print one or more vectors.
-
-  1  $p  Vector to print
-  2  @p  More vectors to print
-
-Example:
-
-
-  ok $o->print($x, $y) eq '(0,0), (1,0), (0,1)';
-
-
-=head2 values($)
-
-Return components of a vector as a list.
-
-  1  $p  Vector
-
-Example:
-
-
-  my ($x, $y) = Math::Vectors2::new(3, 4)->values;
-
-  ok $x == 3 && $y == 4;
-
-
-=head2 clone($)
-
-Clone a vector.
-
-  1  $o  Vector to clone
-
-Example:
-
-
-  ok $o->print($P, $p1, $p2) eq '(0,0), (3,4), (3,0), (0,4)';
-
-  my $p = $P->clone;
-
-  ok $p->print($P) eq '(3,4), (3,4)';
-
-
-=head2 plus($@)
-
-Add zero or more other vectors to a copy of the first vector and return the result.
-
-  1  $o  First vector
-  2  @p  Other vectors
-
-Example:
-
-
-  my $P = $o->plus($p1, $p2);
-
-  ok $o->print($P, $p1, $p2) eq '(0,0), (3,4), (3,0), (0,4)';
-
-
-=head2 minus($@)
-
-Subtract zero or more vectors from a copy of the first vector and return the result.
-
-  1  $o  First vector
-  2  @p  Other vectors
-
-Example:
-
-
-  ok $o->print($p, $p1, $p2) eq '(0,0), (3,4), (3,0), (0,4)';
-
-  ok near2($o, $p->minus($p1, $p2));
-
-
-=head2 times($$)
-
-Multiply a copy of a vector by a scalar and return the result.
-
-  1  $o  Vector
-  2  $m  Scalar to multiply by
-
-Example:
-
-
-  ok $o->print($x, $y) eq '(0,0), (1,0), (0,1)';
-
-  my $p1 = $x->times(3);
-
-  my $p2 = $y->times(4);
-
-  ok $o->print($P, $p1, $p2) eq '(0,0), (3,4), (3,0), (0,4)';
-
-
-=head2 l($)
-
-Length of a vector.
-
-  1  $o  Vector
-
-Example:
-
-
-  ok $p->print($P) eq '(3,4), (3,4)';
-
-  ok $p->l == 5;
-
-
-=head2 l2($)
-
-Length squared of a vector.
-
-  1  $o  Vector
-
-Example:
-
-
-  ok near1($x->plus($y)->l2, 2);
-
-
-=head2 d($$)
-
-Distance between the points identified by two vectors when placed on the same point.
-
-  1  $o  Vector 1
-  2  $p  Vector 2
-
-Example:
-
-
-  ok $o->print($p) eq '(0,0), (3,4)';
-
-  ok $o->d($p) == 5;
-
-
-=head2 d2($$)
-
-Distance squared between the points identified by two vectors when placed on the same point.
-
-  1  $o  Vector 1
-  2  $p  Vector 2
-
-Example:
-
-
-  ok $o->print($x, $y) eq '(0,0), (1,0), (0,1)';
-
-  ok near1($x->d2($y), 2);
-
-  ok near1($x->plus($x)->d2($y), 5);
-
-
-=head2 n($)
-
-Return a normalized a copy of a vector.
-
-  1  $o  Vector
-
-Example:
-
-
-  ok $p->l == 5;
-
-  ok near1($p->n->l, 1);
-
-
-=head2 dot($$)
-
-Dot product of two vectors.
-
-  1  $o  Vector 1
-  2  $p  Vector 2
-
-Example:
-
-
-  ok $o->print($x, $y) eq '(0,0), (1,0), (0,1)';
-
-  ok near1($x->dot($y), 0);
-
-
-=head2 area($$)
-
-Signed area of the parallelogram defined by the two vectors. The area is negative if the second vector appears to the right of the first if they are both placed at the origin and the observer stands against the z-axis in a left handed coordinate system.
-
-  1  $o  Vector 1
-  2  $p  Vector 2
-
-Example:
-
-
-  ok near1($x->plus($y)->area($x->times(2)), -2);
-
-  ok near1($x->plus($y)->area($y->times(2)), +2);
-
-
-=head2 cos($$)
-
-cos(angle between two vectors) in radians.
-
-  1  $o  Vector 1
-  2  $p  Vector 2
-
-Example:
-
-
-  ok near1($x->cos($x), +1);
-
-  ok zero1($x->cos($y));
-
-
-=head2 sin($$)
-
-sin(angle between two vectors) in radians.
-
-  1  $o  Vector 1
-  2  $p  Vector 2
-
-Example:
-
-
-  ok zero1($x->sin($x));
-
-  ok near1($x->sin($y), +1);
-
-
-=head2 r90($)
-
-Rotate a vector by 90 degrees anticlockwise.
-
-  1  $o  Vector to rotate
-
-Example:
-
-
-  ok near2($x->r90, $y);
-
-  ok near2($y->r90, $o->minus($x));
-
-
-=head2 r180($)
-
-Rotate a vector by 180 degrees.
-
-  1  $o  Vector to rotate
-
-Example:
-
-
-  ok near2($x->r90->r90, $x->r180);
-
-
-=head2 r270($)
-
-Rotate a vector by 270 degrees anticlockwise.
-
-  1  $o  Vector to rotate
-
-Example:
-
-
-  ok near2($x->r90->r90->r90, $x->r270);
 
 
 
 =head1 Index
 
 
-1 L<area|/area>
-
-2 L<clone|/clone>
-
-3 L<cos|/cos>
-
-4 L<d|/d>
-
-5 L<d2|/d2>
-
-6 L<dot|/dot>
-
-7 L<l|/l>
-
-8 L<l2|/l2>
-
-9 L<minus|/minus>
-
-10 L<n|/n>
-
-11 L<new|/new>
-
-12 L<plus|/plus>
-
-13 L<print|/print>
-
-14 L<r180|/r180>
-
-15 L<r270|/r270>
-
-16 L<r90|/r90>
-
-17 L<sin|/sin>
-
-18 L<times|/times>
-
-19 L<values|/values>
-
-20 L<x|/x>
-
-21 L<y|/y>
-
-22 L<zeroAndUnits|/zeroAndUnits>
-
 =head1 Installation
 
-This module is written in 100% Pure Perl and, thus, it is easy to read, use,
-modify and install.
+This module is written in 100% Pure Perl and, thus, it is easy to read,
+comprehend, use, modify and install via B<cpan>:
 
-Standard L<Module::Build> process for building and installing modules:
-
-  perl Build.PL
-  ./Build
-  ./Build test
-  ./Build install
+  sudo cpan install Math::Vectors2
 
 =head1 Author
 
@@ -565,7 +215,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 =head1 Copyright
 
-Copyright (c) 2016-2017 Philip R Brenan.
+Copyright (c) 2016-2018 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -584,6 +234,7 @@ sub test
   $@ and die $@;
   eval $s;
   $@ and die $@;
+  1
  }
 
 test unless caller;

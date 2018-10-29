@@ -25,7 +25,6 @@
 - API worked examples with help functions
 - ability to examine CHI cache and introspect on Client instance metrics ( number of HTTP calls, cache size, TTL data sent/received etc )
 - comparison with other language Client libraries
-- survey of Perl Google API Modules
 - The structure under the AuthStorage is ugly and needs some love
 
 

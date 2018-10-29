@@ -1,5 +1,14 @@
 Revision history for Test-MockFile
 
+0.008   10/26/2018
+ - Depend on newest Overload::FileCheck version. Depdning on older
+   versions was breaking unit tests.
+
+0.007   10/25/2018
+ - More POD fixups
+ - Support for unmocked file access hooks.
+ - Implement strict mode to error any time an unmocked file access happens.
+
 0.006   10/25/2018
  - Fix for Locale-dependent failures on perl < 5.22
      https://github.com/CpanelInc/Test-MockFile/issues/10

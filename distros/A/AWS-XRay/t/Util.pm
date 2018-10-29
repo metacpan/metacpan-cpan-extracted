@@ -14,6 +14,7 @@ no warnings 'redefine';
 *AWS::XRay::sock = sub {
     IO::Scalar->new(\$buf);
 };
+1;
 
 sub reset {
     undef $buf;

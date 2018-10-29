@@ -41,9 +41,6 @@ struct SPVM_compiler {
   // Syntax error count
   int32_t error_count;
   
-  // Current case statements in switch statement
-  SPVM_LIST* cur_op_cases;
-
   // Include pathes
   SPVM_LIST* module_include_pathes;
 

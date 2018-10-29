@@ -4,7 +4,7 @@
       "Kenta, Kobayashi <kentafly88@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.17",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Function::Parameters" : "0",
+            "Function::Parameters" : "2.000003",
             "Scalar::Util" : "0",
             "Scope::Upper" : "0",
             "Sub::Info" : "0",
@@ -62,7 +62,7 @@
    "provides" : {
       "Function::Return" : {
          "file" : "lib/Function/Return.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Function::Return::Info" : {
          "file" : "lib/Function/Return/Info.pm"
@@ -79,10 +79,11 @@
          "web" : "https://github.com/kfly8/p5-Function-Return"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:KFLY",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

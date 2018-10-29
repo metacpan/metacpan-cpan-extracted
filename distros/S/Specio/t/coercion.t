@@ -37,7 +37,7 @@ use Specio::Library::Builtins;
     for my $pair (
         [ 'ArrayRef',          $arrayref ],
         [ 'clone of Arrayref', $clone ]
-        ) {
+    ) {
         my ( $name, $type ) = @{$pair};
 
         subtest(

@@ -1,11 +1,11 @@
 /*
 @(#)File:           $RCSfile: esqltype.h,v $
-@(#)Version:        $Revision: 2008.3 $
-@(#)Last changed:   $Date: 2008/03/08 20:36:34 $
+@(#)Version:        $Revision: 2018.1 $
+@(#)Last changed:   $Date: 2018/05/11 06:13:38 $
 @(#)Purpose:        Platform and Version Independent Types for ESQL/C
 @(#)Author:         J Leffler
-@(#)Copyright:      (C) JLSS 2001-08
-@(#)Product:        Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+@(#)Copyright:      (C) JLSS 2001-2018
+@(#)Product:        Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
 */
 
 /*TABSTOP=4*/
@@ -16,7 +16,7 @@
 #ifdef MAIN_PROGRAM
 #ifndef lint
 /* Prevent over-aggressive optimizers from eliminating ID string */
-const char jlss_id_esqltype_h[] = "@(#)$Id: esqltype.h,v 2008.3 2008/03/08 20:36:34 jleffler Exp $";
+const char jlss_id_esqltype_h[] = "@(#)$Id: esqltype.h,v 2018.1 2018/05/11 06:13:38 jleffler Exp $";
 #endif /* lint */
 #endif /* MAIN_PROGRAM */
 
@@ -133,7 +133,7 @@ typedef unsigned long long  ixUint8;
 
 #else
 
-/* ESQLC_VERSION >= 921 || (ESQLC_VERSION >= 290 && ESQLC_VERSION <= 399) */
+/* ESQLC_VERSION >= 921 || (ESQLC_VERSION >= 290 && ESQLC_VERSION <= 500) */
 /* ifxtypes.h provides typedefs for int1, uint2, muint, etc */
 
 #include "ifxtypes.h"

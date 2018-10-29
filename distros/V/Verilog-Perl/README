@@ -174,8 +174,10 @@ WHICH PARSER PACKAGE?
         nodes as would be needed to follow signals. Not all keywords have
         been implemented; many are parsed but otherwise ignored. A complete
         Ast tree would allow any arbitrary transformation of Verilog syntax
-        (everything is known excluding whitespace). If you'd find this
-        useful please contact the author.
+        (everything is known excluding whitespace). Long term the authors
+        would be interested in collaborating on a general parser, but for
+        now, applications can leverate the C++ code or use Verilator's XML
+        output (below).
 
     Verilog::SigParser
         Verilog::SigParser is useful when you need a list of modules,
@@ -195,8 +197,6 @@ WHICH PARSER PACKAGE?
         Verilog::Netlist interconnects modules with instantiations but does
         not perform any elaboration (resolution of parameters).
 
-        This is probably the most popular choice.
-
     VPI Using the VPI is the best way to access the behavior of the design.
         It is not part of this package as it requires a compliant simulator
         and C++ code to call the VPI, and understands as much of the
@@ -209,10 +209,13 @@ WHICH PARSER PACKAGE?
 
     Verilator
         The Verilator program also contains a very similar front end as
-        Verilog-Perl. It also understands how to elaborate and connect
-        complex pins and types, but supports mostly the synthesis subset. If
-        you're looking to add some lint like checks against netlists, this
-        may be a better starting point.
+        Verilog-Perl and can create XML output showing the abstract syntax
+        tree. Verilator also understands how to elaborate and connect
+        complex pins and types, but supports mostly only the synthesis
+        subset of SystemVerilog.
+
+        If you're looking to parse only synthesizable code this is the
+        recommended route.
 
     Verilog-Mode for Emacs
         Although not a parser, a common requested use of Verilog-Perl is to

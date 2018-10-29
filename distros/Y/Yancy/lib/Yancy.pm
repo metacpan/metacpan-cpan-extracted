@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -58,6 +58,14 @@ our $VERSION = '1.010';
 #pod
 #pod =item *
 #pod
+#pod L<Controllers|Yancy::Controller::Yancy> which you can use to easily
+#pod L<list data|Yancy::Controller::Yancy/list>, L<display
+#pod data|Yancy::Controller::Yancy/get>, L<modify
+#pod data|Yancy::Controller::Yancy/set>, and L<delete
+#pod data|Yancy::Controller::Yancy/delete>.
+#pod
+#pod =item *
+#pod
 #pod L<Helpers|Mojolicious::Plugin::Yancy/HELPERS> to access data, validate
 #pod forms
 #pod
@@ -70,19 +78,6 @@ our $VERSION = '1.010';
 #pod
 #pod For information on how to use Yancy as a Mojolicious plugin, see
 #pod L<Mojolicious::Plugin::Yancy>.
-#pod
-#pod =head2 Standalone App
-#pod
-#pod Yancy can also be run as a standalone app in the event one wants to
-#pod develop applications solely using Mojolicious templates. For
-#pod information on how to run Yancy as a standalone application, see
-#pod L<Yancy::Help::Standalone>.
-#pod
-#pod =head2 REST API
-#pod
-#pod This application creates a REST API using the standard
-#pod L<OpenAPI|http://openapis.org> API specification. The API spec document
-#pod is located at C</yancy/api>.
 #pod
 #pod =head2 Yancy Plugins
 #pod
@@ -105,6 +100,19 @@ our $VERSION = '1.010';
 #pod =back
 #pod
 #pod More development will be happening here soon!
+#pod
+#pod =head2 Standalone App
+#pod
+#pod Yancy can also be run as a standalone app in the event one wants to
+#pod develop applications solely using Mojolicious templates. For
+#pod information on how to run Yancy as a standalone application, see
+#pod L<Yancy::Help::Standalone>.
+#pod
+#pod =head2 REST API
+#pod
+#pod This application creates a REST API using the standard
+#pod L<OpenAPI|http://openapis.org> API specification. The API spec document
+#pod is located at C</yancy/api>.
 #pod
 #pod =head1 CONFIGURATION
 #pod
@@ -177,7 +185,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 
@@ -231,6 +239,14 @@ management of Mojolicious applications. Yancy provides:
 
 =item *
 
+L<Controllers|Yancy::Controller::Yancy> which you can use to easily
+L<list data|Yancy::Controller::Yancy/list>, L<display
+data|Yancy::Controller::Yancy/get>, L<modify
+data|Yancy::Controller::Yancy/set>, and L<delete
+data|Yancy::Controller::Yancy/delete>.
+
+=item *
+
 L<Helpers|Mojolicious::Plugin::Yancy/HELPERS> to access data, validate
 forms
 
@@ -243,19 +259,6 @@ to customize the Yancy editor's appearance
 
 For information on how to use Yancy as a Mojolicious plugin, see
 L<Mojolicious::Plugin::Yancy>.
-
-=head2 Standalone App
-
-Yancy can also be run as a standalone app in the event one wants to
-develop applications solely using Mojolicious templates. For
-information on how to run Yancy as a standalone application, see
-L<Yancy::Help::Standalone>.
-
-=head2 REST API
-
-This application creates a REST API using the standard
-L<OpenAPI|http://openapis.org> API specification. The API spec document
-is located at C</yancy/api>.
 
 =head2 Yancy Plugins
 
@@ -278,6 +281,19 @@ form generators for L<Bootstrap 4|Yancy::Plugin::Form::Bootstrap4>.
 =back
 
 More development will be happening here soon!
+
+=head2 Standalone App
+
+Yancy can also be run as a standalone app in the event one wants to
+develop applications solely using Mojolicious templates. For
+information on how to run Yancy as a standalone application, see
+L<Yancy::Help::Standalone>.
+
+=head2 REST API
+
+This application creates a REST API using the standard
+L<OpenAPI|http://openapis.org> API specification. The API spec document
+is located at C</yancy/api>.
 
 =head1 CONFIGURATION
 

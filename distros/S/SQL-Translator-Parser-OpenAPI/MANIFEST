@@ -13,9 +13,11 @@ t/03-schema.t
 t/04-corpus.json
 t/04-schema.t
 t/06-corpus.json
+t/06-corpus.json.overlay
 t/06-schema.t
 t/07-corpus.json
 t/07-schema.t
+t/lib/JTTest.pm
 t/snapshots/01-schema_t/schema
 t/snapshots/03-schema_t/schema
 t/snapshots/04-schema_t/schema

@@ -1,6 +1,7 @@
 .gitignore
 Changes
 lib/Archive/SevenZip.pm
+lib/Archive/SevenZip/API/ArchiveTar.pm
 lib/Archive/SevenZip/API/ArchiveZip.pm
 lib/Archive/SevenZip/Entry.pm
 Makefile.PL
@@ -8,9 +9,12 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml
+README
+README.mkdn
 t/01-identity.t
 t/02-add-scalar.t
 t/02_main.t
+t/03-archive-from-stdin.t
 t/05_tree.t
 t/20_bug_github11.t
 t/badjpeg/expected.jpg

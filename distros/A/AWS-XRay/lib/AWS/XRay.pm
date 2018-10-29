@@ -13,7 +13,7 @@ use AWS::XRay::Buffer;
 use Exporter 'import';
 our @EXPORT_OK = qw/ new_trace_id capture capture_from trace /;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 our $TRACE_ID;
 our $SEGMENT_ID;
@@ -169,6 +169,27 @@ sub parse_trace_header {
     return ($trace_id, $segment_id, $sampled);
 }
 
+sub add_capture {
+    my ($class, $package, @methods) = @_;
+    no warnings 'redefine';
+    no strict 'refs';
+    for my $method (@methods) {
+        my $orig = $package->can($method) or next;
+        *{"${package}::${method}"} = sub {
+            my @args = @_;
+            capture(
+                $package,
+                sub {
+                    my $segment = shift;
+                    $segment->{metadata}->{method}  = $method;
+                    $segment->{metadata}->{package} = $package;
+                    $orig->(@args);
+                },
+            );
+        };
+    }
+}
+
 1;
 __END__
 
@@ -249,6 +270,15 @@ capture_from() parses the trace header and capture the $code with sub segment of
     my ($trace_id, $segment_id) = parse_trace_header($header);
 
 Parse a trace header (e.g. "Root=1-5759e988-bd862e3fe1be46a994272793;Parent=53995c3f42cd8ad8").
+
+=head2 add_capture($package, $method1[, $method2, ...])
+
+add_capture() adds a capture to package::method.
+
+    AWS::XRay->add_capture("MyApp::Model", "foo", "bar");
+
+The segments of these captures are named as "MyApp::Model".
+These segments include metadata "method": "foo" or "bar".
 
 =head1 CONFIGURATION
 

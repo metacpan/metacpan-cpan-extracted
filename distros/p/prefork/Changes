@@ -1,35 +1,38 @@
 Revision history for Perl extension prefork
 
-1.04 Sun 12 Jul 2009
+1.05      2018-10-27 01:16:51Z
+          - distribution tooling updates
+
+1.04    2009-07-12
 	- Upgrading to Module::Install::DSL 0.91
 	- Sometimes there is no Config_heavy.pl
 	- Updating dependencies to rid myself of memory leaks
 
-1.03 Mon 21 Apr 2008
+1.03    2008-04-21
 	- Upgrading to Module::Install 0.83
 	- Preload all of Config.pm
 
-1.02 Fri 23 Nov 2007
+1.02    2007-11-23
 	- Upgrading to Module::Install 0.68
 
-1.01 Tue 25 Jul 2006
+1.01    2006-07-25
 	- Imported from CVS to svn repository
 
-1.00 Thu Sep  8 2005
+1.00    2005-09-08
 	- Has proven itself stable, promoting to 1.00
 	- Various small POD clean ups
 	- Adding default notifier to auto-compile the CGI functions
 	- Rebuilding with a newer (better) Module::Install
 
-0.04 Tue Feb 15 2005
+0.04    2005-02-15
 	- Removing braindead Build.PL
 
-0.03 Sat Nov 13 2004
+0.03    2004-11-13
 	- Adding support for third-party loader callbacks
 
-0.02 Sat Nov  6 2004
+0.02    2004-11-06
 	- Adding more documentation
 	- Complete a full set of unit tests
 
-0.01_01 Sat Nov  6 2004
+0.01_01  2004-11-06
 	- Created the initial version of the file

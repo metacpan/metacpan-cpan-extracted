@@ -1,3 +1,6 @@
+0.54	- 2018-10-29, H.Merijn Brand
+    * Free unref scalar test fixed in Text::CSV_XS 1.35
+
 0.53	- 2018-05-20, H.Merijn Brand
     * No folder scanning during automated tests
     * Fix col_names set to empty [] incorrectly skipping first row

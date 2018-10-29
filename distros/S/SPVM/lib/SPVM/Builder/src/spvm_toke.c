@@ -1204,10 +1204,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_PACKAGE_VAR);
                   return OUR;
                 }
-                
-                break;
-              case 'O' :
-                if (strcmp(keyword, "object") == 0) {
+                else if (strcmp(keyword, "object") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_OBJECT);
                   return OBJECT;
                 }

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.20';
+our $VERSION = '2.21';
 
 use DateTime::TimeZone::Catalog;
 use DateTime::TimeZone::Floating;
@@ -602,7 +602,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.20
+version 2.21
 
 =head1 SYNOPSIS
 
@@ -658,12 +658,12 @@ that time zone.
 
 There are also several special values that can be given as names.
 
-If the "name" parameter is "floating", then a
-C<DateTime::TimeZone::Floating> object is returned.  A floating time
-zone does have I<any> offset, and is always the same time.  This is
-useful for calendaring applications, which may need to specify that a
-given event happens at the same I<local> time, regardless of where it
-occurs.  See RFC 2445 for more details.
+If the "name" parameter is "floating", then a C<DateTime::TimeZone::Floating>
+object is returned.  A floating time zone does not have I<any> offset, and is
+always the same time.  This is useful for calendaring applications, which may
+need to specify that a given event happens at the same I<local> time,
+regardless of where it occurs. See L<RFC
+2445|https://www.ietf.org/rfc/rfc2445.txt> for more details.
 
 If the "name" parameter is "UTC", then a C<DateTime::TimeZone::UTC>
 object is returned.
@@ -745,8 +745,8 @@ at both -0500 and +1000/+1100.
 
 =head2 $tz->is_floating
 
-Returns a boolean indicating whether or not this object represents a
-floating time zone, as defined by RFC 2445.
+Returns a boolean indicating whether or not this object represents a floating
+time zone, as defined by L<RFC 2445|https://www.ietf.org/rfc/rfc2445.txt>.
 
 =head2 $tz->is_utc
 
@@ -936,7 +936,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Molchanov Alfie John Bron Gondwana Daisuke Maki David Pinkowitz Iain Truskett Jakub Wilk James E Keenan Joshua Hoblitt Karen Etheridge karupanerura Olaf Alders Peter Rabbitson Tom Wyant
+=for stopwords Alexey Molchanov Alfie John Bron Gondwana Daisuke Maki David Pinkowitz Iain Truskett Jakub Wilk James E Keenan Joshua Hoblitt Karen Etheridge karupanerura Mohammad S Anwar Olaf Alders Peter Rabbitson Tom Wyant
 
 =over 4
 
@@ -983,6 +983,10 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 karupanerura <karupa@cpan.org>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 

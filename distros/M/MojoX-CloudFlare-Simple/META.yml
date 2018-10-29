@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/fayland/perl-MojoX-CloudFlare-Simple/issues
   homepage: https://github.com/fayland/perl-MojoX-CloudFlare-Simple
   repository: https://github.com/fayland/perl-MojoX-CloudFlare-Simple.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'

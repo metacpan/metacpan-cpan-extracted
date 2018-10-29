@@ -1,5 +1,8 @@
 Revision history for RPi-WiringPi-Constant
 
+1.02    2018-10-26
+        - added deprecation warnings in POD
+
 1.01    2017-07-08
         - added new tag :pwm_mode that contains the values for setting the PWM
           mode to either MS (mark-space) or BAL (balanced) mode

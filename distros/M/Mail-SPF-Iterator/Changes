@@ -1,3 +1,7 @@
+1.118 2018-10-29
+- fixed potential busy loop with specific DNS responses
+- ignore case when comparing answer from DNS to query
+
 1.117 2018-09-24
 - fixed mail header when pass_all matched to include reason etc
 - add --passall option to samples/spflookup.pl

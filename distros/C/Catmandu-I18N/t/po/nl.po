@@ -1,0 +1,8 @@
+msgid "mail_subject"
+msgstr "Overzicht van uw huidige ontleningen"
+
+msgid "mail_greeting"
+msgstr "Geachte %1"
+
+msgid "mail_body"
+msgstr "%quant(%1,boek is,boeken zijn) nu te laat"

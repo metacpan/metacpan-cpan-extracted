@@ -1,6 +1,18 @@
 package Reddit::Client;
 
-our $VERSION = '1.0972';  
+our $VERSION = '1.2811';
+# TODO: make ispost, iscomment and get_type static
+# 1.2811-documentation update
+# 1.281 -morecomments get_collapsed args
+# 1.281 -get_collapsed can also return morecomments
+# 1.28  -get_links_by_id
+#		-get_collapsed_comments
+#		-get_comments new version
+#		-MoreComments objects
+#		-added function get_replies to Link
+#       -can change subdomain (www to old or new, etc)
+#       -removed line number message on die. should this be an option instead?
+#		-get_permalink renamed ro get_web_url in Link and Comment
 
 $VERSION = eval $VERSION;
 
@@ -9,7 +21,7 @@ use warnings;
 use Carp;
 
 use Data::Dumper   qw/Dumper/;
-use JSON           qw//;
+use JSON           qw/decode_json/;
 use File::Spec     qw//;
 use Digest::MD5    qw/md5_hex/;
 use POSIX          qw/strftime/;
@@ -21,6 +33,7 @@ require Reddit::Client::Link;
 require Reddit::Client::SubReddit;
 require Reddit::Client::Request;
 require Reddit::Client::Message;
+require Reddit::Client::MoreComments;
 
 #===============================================================================
 # Constants
@@ -32,7 +45,7 @@ use constant VIEW_HOT                => '';
 use constant VIEW_NEW                => 'new';
 use constant VIEW_CONTROVERSIAL      => 'controversial';
 use constant VIEW_TOP                => 'top';
-use constant VIEW_RISING	     => 'rising';
+use constant VIEW_RISING	         => 'rising';
 use constant VIEW_DEFAULT            => VIEW_HOT;
 
 use constant VOTE_UP                 => 1;
@@ -42,10 +55,11 @@ use constant VOTE_NONE               => 0;
 use constant SUBMIT_LINK             => 'link';
 use constant SUBMIT_SELF       	     => 'self';
 use constant SUBMIT_MESSAGE          => 'message';
+use constant SUBMIT_CROSSPOST        => 'crosspost';
 
-use constant MESSAGES_INBOX	     => 'inbox';
+use constant MESSAGES_INBOX	         => 'inbox';
 use constant MESSAGES_UNREAD	     => 'unread';
-use constant MESSAGES_SENT	     => 'sent';
+use constant MESSAGES_SENT	         => 'sent';
 use constant MESSAGES_MESSAGES       => 'messages';
 use constant MESSAGES_COMMENTREPLIES => 'comments';
 use constant MESSAGES_POSTREPLIES    => 'selfreply';
@@ -66,6 +80,7 @@ use constant USER_UPVOTED            => 'upvoted';
 use constant USER_DOWNVOTED          => 'downvoted';
 use constant USER_HIDDEN             => 'hidden';
 use constant USER_SAVED              => 'saved';
+use constant USER_ABOUT              => 'about';
 
 use constant API_ME                  => 0;
 use constant API_INFO                => 1;
@@ -84,10 +99,10 @@ use constant API_LINKS_OTHER         => 13;
 use constant API_DEL                 => 14;
 use constant API_MESSAGE             => 15;
 use constant API_COMMENTS_FRONT	     => 16;
-use constant API_COMMENTS	     => 17;
-use constant API_MESSAGES	     => 18;
-use constant API_MARK_READ	     => 19;
-use constant API_MARKALL	     => 20;
+use constant API_COMMENTS	         => 17;
+use constant API_MESSAGES	         => 18;
+use constant API_MARK_READ	         => 19;
+use constant API_MARKALL	         => 20;
 use constant API_MY_SUBREDDITS       => 21;
 use constant API_USER                => 22;
 use constant API_SELECTFLAIR         => 23;
@@ -101,6 +116,14 @@ use constant API_SUBREDDIT_INFO      => 30;
 use constant API_SEARCH              => 31;
 use constant API_MODQ                => 32;
 use constant API_EDIT                => 33;
+use constant API_REMOVE              => 34;
+use constant API_APPROVE             => 35;
+use constant API_IGNORE_REPORTS      => 36;
+use constant API_GETWIKI             => 37;
+use constant API_GET_MODMAIL         => 38;
+use constant API_BAN                 => 39;
+use constant API_MORECHILDREN        => 40;
+use constant API_BY_ID               => 41;
 
 #===============================================================================
 # Parameters
@@ -109,8 +132,8 @@ use constant API_EDIT                => 33;
 our $DEBUG            = 0;
 our $BASE_URL         = 'https://oauth.reddit.com';
 use constant BASE_URL =>'https://oauth.reddit.com';
-our $LINK_URL         = 'https://www.reddit.com';
-use constant LINK_URL =>'https://www.reddit.com';
+our $LINK_URL         = 'https://www.reddit.com'; # Why are there two of these?
+use constant LINK_URL =>'https://www.reddit.com'; # both are unused now?
 our $UA               = sprintf 'Reddit::Client/%f', $VERSION;
 
 our @API;
@@ -140,6 +163,7 @@ $API[API_USER          ] = ['GET',  '/user/%s/%s'             ];
 $API[API_SELECTFLAIR   ] = ['POST', '/r/%s/api/selectflair'   ];
 $API[API_FLAIROPTS     ] = ['POST', '/r/%s/api/flairselector' ];
 $API[API_EDITWIKI      ] = ['POST', '/r/%s/api/wiki/edit'     ];
+$API[API_GETWIKI       ] = ['GET',  '/r/%s/wiki/%s'           ];
 $API[API_CREATEMULTI   ] = ['POST', '/api/multi/user/%s/m/%s' ];
 $API[API_GETMULTI      ] = ['GET', '/api/multi/user/%s/m/%s%s'];
 $API[API_DELETEMULTI   ] = ['DELETE','/api/multi/user/%s/m/%s'];
@@ -148,54 +172,40 @@ $API[API_SUBREDDIT_INFO] = ['GET',  '/r/%s/about'             ];
 $API[API_SEARCH        ] = ['GET',  '/r/%s/search'            ];
 $API[API_MODQ          ] = ['GET',  '/r/%s/about/%s'          ];
 $API[API_EDIT          ] = ['POST', '/api/editusertext'       ];
-#===============================================================================
-# Package routines
-#===============================================================================
-
-sub DEBUG {
-    if ($DEBUG) {
-        my ($format, @args) = @_;
-        my $ts  = strftime "%Y-%m-%d %H:%M:%S", localtime;
-        my $msg = sprintf $format, @args;
-        chomp $msg;
-        printf STDERR "[%s] [ %s ]\n", $ts, $msg;
-    }
-}
-
-sub subreddit {
-    my $subject = shift;
-    $subject =~ s/^\/r//; # trim leading /r
-    $subject =~ s/^\///;  # trim leading slashes
-    $subject =~ s/\/$//;  # trim trailing slashes
-
-    if ($subject !~ /\//) {   # no slashes in name - it's probably good
-        if ($subject eq '') { # front page
-            return '';
-        } else {              # subreddit
-            return $subject;
-        }
-    } else { # fail
-        return;
-    }
-}
+$API[API_REMOVE        ] = ['POST', '/api/remove'             ];
+$API[API_APPROVE       ] = ['POST', '/api/approve'            ];
+$API[API_IGNORE_REPORTS] = ['POST', '/api/ignore_reports'     ];
+$API[API_GET_MODMAIL   ] = ['GET',  '/api/mod/conversations'  ];
+$API[API_BAN           ] = ['POST', '/r/%s/api/friend'        ];
+$API[API_MORECHILDREN  ] = ['GET',  '/api/morechildren'       ];
+$API[API_BY_ID         ] = ['GET',  '/by_id'                  ];
 
 #===============================================================================
 # Class methods
 #===============================================================================
 
 use fields (
-    	'modhash',      # store session modhash
-    	'cookie',       # store user cookie
-    	'session_file', # path to session file
-    	'user_agent',   # user agent string
-    	'token',	# oauth authorization token
-    	'tokentype',    # unused but saved for reference
-    	'last_token',	# time last token was acquired
-    	'client_id',	# These 4 values saved for automatic token refreshing
-    	'secret',
-	'username',
-	'password',
-	'request_errors',
+    'modhash',      # No longer used. stored session modhash
+    'cookie',       # No longer used. stored user cookie
+    'session_file', # No longer used. path to session file
+    'user_agent',   # user agent string
+    'token',		# oauth authorization token
+    'tokentype',    # unused but saved for reference
+    'last_token',	# time last token was acquired
+    'client_id',	# always required
+    'secret',       # always required
+	'username',		# now optional for web apps
+	'password',		# script apps only
+	'request_errors',		# print request errors, deprecated
+	'print_request_errors',	# print request errors
+	'print_response',		# print response content, deprecated
+	'print_response_content',# print response content
+	'print_request', 		# print entire request
+	'print_request_on_error',# print entire request on error
+	'refresh_token', 		# oauth refresh token
+	'auth_type',			# 'script' or 'webapp'
+	'debug',
+	'subdomain',
 );
 
 sub new {
@@ -203,26 +213,50 @@ sub new {
 	my $self = fields::new($class);
 
 	if (not exists $param{user_agent}) {
-		carp "Reddit::Client->new: user_agent required in future version.";
-		$param{user_agent} = $UA;
+		 croak "param 'user_agent' is required.";
 	}
-	$self->{user_agent} = $param{user_agent};
-	$self->{request_errors}= $param{request_errors} || 0;
+	$self->{user_agent} 	= $param{user_agent};
+	$self->{request_errors} = $param{print_request_errors} || $param{request_errors} || 0;
+	$self->{print_response} = $param{print_response} || $param{print_response_conent} || 0;
+	$self->{print_request}  = $param{print_request} || 0;
+	$self->{debug}			= $param{debug}	|| 0;
+	$self->{print_request_on_error} = $param{print_request_on_error} || 0;
+	$self->{subdomain}		= $param{subdomain} || 'www';
 
-	if ($param{username} || $param{password} || $param{client_id} || $param{secret}) {
-		if (!$param{username} || !$param{password} || !$param{client_id} || !$param{secret}) {
-			croak "If any of username, password, client_id, or secret are provided, all are required.";
+	if ($param{password}) {
+		if (!$param{username}) {
+			croak "if password is provided, username is required.";
+		} elsif (!$param{client_id} or !$param{secret}) {
+			croak "client_id and secret are required for authorized apps.";
 		} else {
-			$self->get_token(
-					client_id	=> $param{client_id},
-					secret		=> $param{secret},
-					username	=> $param{username},
-					password	=> $param{password},	
-			);
+			$self->{auth_type} 	= 'script';
+			$self->{client_id}	= $param{client_id};
+			$self->{secret} 	= $param{secret};
+			$self->{username}	= $param{username};
+			$self->{password}	= $param{password};
+
+			$self->get_token();
 		}
+	} elsif ($param{refresh_token}) {
+			croak "client_id and secret are required for authorized apps." unless $param{client_id} and $param{secret}; 
+		
+		$self->{auth_type} 	= 'webapp';
+		$self->{client_id}	= $param{client_id};
+		$self->{secret} 	= $param{secret};
+		$self->{refresh_token}= $param{refresh_token};
+		# will this break anything?
+		$self->{username}	= $param{username} if $param{username};
+
+		$self->get_token();
+	} else {
+		# optionall allow people to pass in client id and secret now, for people
+		# who choose to get refresh token from an RC object
+		$self->{client_id}	= $param{client_id} if $param{client_id};
+		$self->{secret} 	= $param{secret} if $param{secret};
+		# can this even be run without auth anymore?
+		$self->{auth_type}  = 'none';
 	}
 
-	#print Dumper $self;
     return $self;
 }
 
@@ -232,14 +266,16 @@ sub version {
 }
 
 #===============================================================================
-# Internal management
+# Requests and Oauth
 #===============================================================================
 
 sub request {
     my ($self, $method, $path, $query, $post_data) = @_;
 
-	if (!$self->{last_token} || $self->{last_token} <= time - 3598) {
-		$self->get_token(client_id=>$self->{client_id}, secret=>$self->{secret}, username=>$self->{username}, password=>$self->{password});
+	# 401s not being caused by this. they are a new API issue apparently.
+	if (!$self->{last_token} or $self->{last_token} <= ( time - 3600 + 55) ) {
+		# passing in username, pass, client_id, secret here did nothing
+		$self->get_token();
 	}
 
     # Trim leading slashes off of the path
@@ -254,9 +290,13 @@ sub request {
         post_data  => $post_data,
         modhash    => $self->{modhash},
         cookie     => $self->{cookie},
-	token	   => $self->{token},
-	tokentype  => $self->{tokentype},
-	request_errors=> $self->{request_errors},
+		token	   => $self->{token},
+		tokentype  => $self->{tokentype},
+		last_token => $self->{last_token},
+		request_errors=> $self->{request_errors},
+		print_response=> $self->{print_response},
+		print_request=>  $self->{print_request},
+		print_request_on_error=>$self->{print_request_on_error},
     );
 
     return $request->send;
@@ -264,14 +304,45 @@ sub request {
 
 sub get_token {
 	my ($self, %param) = @_;
-	$self->{client_id} 	= $param{client_id} || croak "need client_id"; 
-	$self->{secret} 	= $param{secret}    || croak "need secret";
-	$self->{username}	= $param{username}  || croak "need username";
-	$self->{password}	= $param{password}  || croak "need password";
+
+	# let people set auth things here. this was stupid to allow.
+	# these all set $self properties then continue as normal.
+	if ($param{username} or $param{password}) {
+		die "get_token: if username or password are provided, all 4 script-type authentication arguments (username, password, client_id, secret) are required." unless $param{username} and $param{password} and $param{client_id} and $param{secret}; 
+
+		$self->{auth_type} 	= 'script';
+		$self->{client_id}	= $param{client_id};
+		$self->{secret} 	= $param{secret};
+		$self->{username}	= $param{username};
+		$self->{password}	= $param{password};
+
+	} elsif ($param{refresh_token}) {
+		$self->{auth_type} 	= 'webapp';
+		$self->{client_id}	= $param{client_id} || $self->{client_id} || die "get_token: 'client_id' must be set, either as a parameter to get_token or when instantiating the Reddit::Client object.";
+		$self->{secret} 	= $param{secret} || $self->{secret} || die "get_token: 'secret' must be set, either as a parameter to get_token or when instantiating the Reddit::Client object.";
+		$self->{refresh_token} 	= $param{refresh_token};
+	}
+
 	$self->{last_token} 	= time;
 
-	my $message = Reddit::Client::Request->token_request($self->{client_id}, $self->{secret}, $self->{username}, $self->{password}, $self->{user_agent});
-	my $j = JSON::decode_json($message);
+	# why don't we just pass in the whole Client object ffs
+	my %p = (
+		client_id	=> $self->{client_id},
+		secret		=> $self->{secret},
+		user_agent	=> $self->{user_agent},
+		auth_type	=> $self->{auth_type},
+	);
+
+	if ($self->{auth_type} eq 'script') {
+		$p{username} = $self->{username},
+		$p{password} = $self->{password},
+	} elsif ($self->{auth_type} eq 'webapp') {
+		$p{refresh_token} = $self->{refresh_token};
+	} else { die "get_token: invalid auth type"; }
+
+	# Why is this static?
+	my $message = Reddit::Client::Request->token_request(%p);
+	my $j = decode_json($message);
 	$self->{token} 		= $j->{access_token};
 	$self->{tokentype} 	= $j->{token_type};
 
@@ -280,7 +351,31 @@ sub get_token {
 
 sub has_token {
 	my $self = shift;
-	return (!$self->{last_token} || $self->{last_token} <= time - 3598) ? 0 : 1;
+	return (!$self->{last_token} || $self->{last_token} <= time - 3595) ? 0 : 1;
+}
+# 
+# This must be called in static context because no refresh token or user/
+# pass combination exist. We would have to add a third flow and that doesn't
+# seem worth it.
+#
+# We could call it in an empty RC object, but that would require all sorts
+# of annoyoing conditions, and all other methods would be broken until
+# tokens were obtained
+sub get_refresh_token {
+	my ($self, %param) = @_;
+
+	my %data;
+	$data{code}			= $param{code} || die "'code' is required.\n";
+	$data{redirect_uri}	= $param{redirect_uri} || die "'redirect_uri' is required.\n";
+	$data{client_id}	= (ref $self eq 'HASH' and $self->{client_id}  ? $self->{client_id} : undef) || $param{client_id}   || die "'client_id' is required.\n";
+	$data{secret}		= (ref $self eq 'HASH' and $self->{secret}     ? $self->{secret} : undef)    || $param{secret}      || die "'secret' is required.";
+	$data{ua}			= (ref $self eq 'HASH' and $self->{user_agent} ? $self->{user_agent} : undef) || $param{user_agent} || die "'user_agent' is required.";
+	#$data{ua}			= $param{user_agent} || die "user_agent is required";
+	$data{grant_type} 	= 'authorization_code';
+	$data{duration}		= 'permanent';
+
+	my $refresh_token = Reddit::Client::Request->refresh_token_request(%data);
+	return $refresh_token;
 }
 
 sub json_request {
@@ -289,7 +384,7 @@ sub json_request {
 
     if ($method eq 'POST') {
         $post_data ||= {};
-        $post_data->{api_type} = 'json';
+        $post_data->{api_type} = 'json'; # only POST enpoints require*
     } else { 
         #$path .= '.json'; # the oauth api returns json by default
     }
@@ -379,16 +474,10 @@ sub me {
 }
 sub list_subreddits {
     	my ($self, %param) = @_;
-
 	my $type = $param{view} || SUBREDDITS_HOME;
-    	my $query  = {};
-        $query->{before} = $param{before} if $param{before};
-        $query->{after}  = $param{after}  if $param{after};
-	if (exists $param{limit}) { $query->{limit} = $param{limit} || 500; }
-	else 			  { $query->{limit} = DEFAULT_LIMIT;	    }
+	$type = '' if lc $type eq 'home';
 
-	DEBUG('List subreddits [%s]', $type);
-	defined $type || croak 'Expected $type"';
+	my $query = $self->set_listing_defaults(%param);
 
 	my $api = $type eq SUBREDDITS_MOD || $type eq SUBREDDITS_CONTRIB || $type eq SUBREDDITS_MINE ? API_MY_SUBREDDITS : API_SUBREDDITS; 
 
@@ -473,7 +562,8 @@ sub mark_read {
 sub mark_inbox_read {
 	my $self = shift;
 	my ($method, $path) = @{$API[API_MARKALL]};
-	my $post_data = {api_type=>'json'};
+	# Why does this error without api_type? json_request is adding it anyway?
+	my $post_data = {api_type => 'json'};
 	my $result = $self->request($method, $path, {}, $post_data);
 }
 
@@ -499,8 +589,10 @@ sub info {
     my $query->{id} = $id;
     
     my $info = $self->api_json_request(
-	api => API_INFO, 
-	data=>$query);
+		api => API_INFO, 
+		data=>$query
+	);
+	#return $info;
     my $rtn = $info->{data}->{children}[0]->{data};
     $rtn->{kind} = $info->{data}->{children}[0]->{kind} if $rtn;
     return $rtn;
@@ -535,11 +627,9 @@ sub search {
         	map {Reddit::Client::Link->new($self, $_->{data})} @{$result->{data}{children}}
     	       ];
 }
-
 sub get_permalink {
 	# This still makes an extra request. Why?
 	my ($self, $commentid, $post_fullname) = @_;
-	return "wtf in Client";
 
 	if (substr ($commentid, 0, 3) eq "t1_") { $commentid = substr $commentid, 3; } 
 	if (substr ($post_fullname, 0, 3) ne "t3_") { $post_fullname = "t3_" . $post_fullname; } 
@@ -564,33 +654,6 @@ sub find_subreddits {
     	];
 }
 
-# reports spam modqueue unmoderated edited
-sub get_modlinks {
-    	my ($self, %param) = @_;
-
-	my $query = $self->set_listing_defaults(%param);
-	my $sub   = $param{sub} || $param{subreddit} || 'mod';
-	my $mode  = $param{mode} || 'modqueue';
-
-    	my $result = $self->api_json_request(
-		api  => API_MODQ, 
-		args => [$sub, $mode],
-		data => $query,
-	);
-
-	#return $result->{data};
-
-	return [
-		map {
-
-		$_->{kind} eq "t1" ? 
-			Reddit::Client::Comment->new($self, $_->{data}) :
-			Reddit::Client::Link->new($self, $_->{data})
-		} 
-
-		@{$result->{data}{children}} 
-	];
-}
 sub fetch_links {
     	my ($self, %param) = @_;
     	my $subreddit = $param{sub} || $param{subreddit} || '';
@@ -615,35 +678,54 @@ sub fetch_links {
 }
 
 sub get_links { # alias for fetch_links to make naming convention consistent
-    	my ($self, %param) = @_;
+    my ($self, %param) = @_;
 	return $self->fetch_links(%param);
+}
+# Is this a better way to get a single link than a call to info?
+sub get_links_by_id {
+	my ($self, @fullnames) = @_;
+	die "get_links_by_id: argument 1 (\@fullnames) is required.\n" unless @fullnames;
+	@fullnames = map { fullname($_, 't3') } @fullnames;
+	my $str = join ",", @fullnames;	
+	#my $result = $self->api_json_request(
+	$self->{print_request_on_error} = 1;
+	my $result = $self->json_request('GET', $API[API_BY_ID][1]."/$str");
+
+	return [
+		map { Reddit::Client::Link->new($self, $_->{data}) } @{$result->{data}{children}} 
+	];
 }
 
 sub get_link {
     	my ($self, $fullname) = @_;
 	croak "expected argument 1: id or fullname" unless $fullname;
 
-	$fullname = "t3_$fullname" if $self->get_type($fullname) ne "t3";
+	$fullname = fullname($fullname, 't3');
 	my $info = $self->info($fullname);
+	return unless $info;
 
-	return $info if !$info;
 	return Reddit::Client::Link->new($self, $info);
 }
 
 sub get_comment {
-    	my ($self, $fullname) = @_;
+    my ($self, $fullname, %param) = @_;
 	croak "expected argument 1: id or fullname" unless $fullname;
 
-	$fullname = "t1_$fullname" if $self->get_type($fullname) ne "t1";
+	$fullname = fullname($fullname, 't1');
 	my $info = $self->info($fullname);
+	return unless $info;
 
-	return $info if !$info;
-	return Reddit::Client::Comment->new($self, $info);
+	my $cmt = Reddit::Client::Comment->new($self, $info);
+	if ($param{include_children} and $cmt->{permalink}) {
+		$cmt = $self->get_comments(permalink=>$cmt->{permalink});
+		$cmt = $$cmt[0];
+	} 
+	return $cmt;
 }
 
 sub get_subreddit_comments {
 	my ($self, %param) = @_;
-	my $subreddit 	= $param{subreddit} 	|| '';
+	my $subreddit 	= $param{sub} || $param{subreddit} || '';
 	my $view 	= $param{view} 		|| VIEW_DEFAULT;
 
 	my $query = {};
@@ -662,30 +744,120 @@ sub get_subreddit_comments {
         	data     => $query,
     	);
 
+		#return $result->{data}{children}[0]->{data};
     	return [
         	 map {Reddit::Client::Comment->new($self, $_->{data})} @{$result->{data}{children}} 
     	];
 }
 
-# Get information about a user
-sub get_user {
-    	my ($self, %param) = @_;
-	my $view	= $param{view} || 'overview';
-	my $user	= $param{user} || croak "expected 'user'";
+#=============================================================
+# Moderation
+#=============================================================
+sub remove {
+	my $self = shift;
+	my $fullname = shift || croak "arg 1 (fullname) is required.";
+	
+    	my $result = $self->api_json_request(
+		api  => API_REMOVE,
+		data => { id => $fullname, spam=> 'false' },
+	);
+	return $result;
+}
+# like remove, but sets spam flag
+sub spam {
+	my $self = shift;
+	my $fullname = shift || croak "arg 1 (fullname) is required.";
+	
+    	my $result = $self->api_json_request(
+		api  => API_REMOVE,
+		data => { id => $fullname, spam => 'true' },
+	);
+	return $result;
+}
+sub approve {
+	my $self = shift;
+	my $fullname = shift || croak "arg 1 (fullname) is required.";
+	
+    	my $result = $self->api_json_request(
+		api  => API_APPROVE,
+		data => { id => $fullname },
+	);
+	return $result;
+}
+sub ignore_reports {
+	my $self = shift;
+	my $fullname = shift || croak "arg 1 (fullname) is required.";
+	
+	my $result = $self->api_json_request(
+		api  => API_IGNORE_REPORTS,
+		data => { id => $fullname },
+	);
+	return $result;
+}
+# ban uses the "modcontributors" oauth scope
+sub ban {
+	my ($self, %param) = @_;
+	my $sub	= $param{sub} || $param{subreddit} || die "subreddit is required\n";
+	
+	my $data = {}; 
+	$data->{name}	= $param{username} || die "username is required\n";
+	# ban_context = fullname, but of what - not required
 
-    	my $query  = {};
-        $query->{before} = $param{before} if $param{before};
-        $query->{after}  = $param{after}  if $param{after};
-	if (exists $param{limit}) { $query->{limit} = $param{limit} || 500; }
-	else 			  { $query->{limit} = DEFAULT_LIMIT;	    }
+	# Ban message
+	$data->{ban_message} = $param{ban_message} if $param{ban_message};
+	# Reason: matches short report reason
+	if ($param{reason}) { 
+		if (length $param{reason} > 100) {
+			print "Warning: 'reason' longer than 100 characters. Truncating.\n";
+			$param{reason} = substr $param{reason}, 0, 100;
+		}
+		$data->{ban_reason} = $param{reason};
+	}
 
-    	my $args = [$user, $view];
+	if ($param{note}) {
+		if (length $param{note} > 300) {
+			print "Warning: 'note' longer than 300 characters. Truncating.\n";
+			$param{note} = substr $param{note}, 0, 300;
+		}
+		$data->{note} = $param{note};
+	}
+
+	# $data->{container} not needed unless mode is friend or enemy
+	if ($param{duration}){
+		if ($param{duration} > 999) {
+			print "Warning: Max duration is 999. Setting to 999.\n";
+			$param{duration} = 999;
+		} elsif ($param{duration} < 1) {
+			print "Warning: min duration is 1. Setting to indefinite.\n";
+			$param{duration} = 0;
+		}
+		$data->{duration} = $param{duration} if $param{duration};
+	}
+	# $data->{permissions} = ?
+	# type: one of (friend, moderator, moderator_invite, contributor, banned, muted, wikibanned, wikicontributor)
+	$data->{type} = 'banned';
 
 	my $result = $self->api_json_request(
-		api      => API_USER,
-		args     => $args,
-		data     => $query,
+		api  => API_BAN, 
+		args => [$sub],
+		data => $data,
 	);
+	return $result;
+}
+sub get_modlinks {
+    my ($self, %param) = @_;
+
+	my $query = $self->set_listing_defaults(%param);
+	my $sub   = $param{sub} || $param{subreddit} || 'mod';
+	my $mode  = $param{mode} || 'modqueue';
+
+	my $result = $self->api_json_request(
+		api  => API_MODQ, 
+		args => [$sub, $mode],
+		data => $query,
+	);
+
+	#return $result->{data};
 
 	return [
 		map {
@@ -698,6 +870,93 @@ sub get_user {
 		@{$result->{data}{children}} 
 	];
 }
+sub get_modqueue { 
+    my ($self, %param) = @_;
+	$param{mode} = 'modqueue';
+	return $self->get_modlinks(%param);
+}
+
+# after: conversation id
+# entity: comma-delimited list of subreddit names
+# limit
+# sort: one of (recent, mod, user, unread)
+# state: one of (new, inprogress, mod, notifications, archived, highlighted, all
+sub get_modmail {
+    	my ($self, %param) = @_;
+
+	my $data	= {};
+	$data->{sort}	= $param{sort} || 'unread';
+	$data->{state}	= $param{state} || 'all';
+	$data->{after}	= $param{after} if $param{after};
+	$data->{limit}	= exists $param{limit} ? ( $param{limit} ? $param{limit} : 500 )  : DEFAULT_LIMIT;
+
+	my $subs	= $param{entity} || $param{subreddits} || $param{subs};
+	if ($subs) {
+		$subs		= join ",", @$subs if ref $subs eq 'ARRAY';	
+		$data->{entity} = $subs if $subs;
+	}
+	my $result = $self->api_json_request(
+		api	=> API_GET_MODMAIL,
+		data	=> $data,
+	);
+	return $result;
+}
+sub get_modmail_raw {
+    	my ($self, %param) = @_;
+
+	my $data	= {};
+	$data->{sort}	= $param{sort} || 'unread';
+	$data->{state}	= $param{state} || 'all';
+	$data->{after}	= $param{after} if $param{after};
+	$data->{limit}	= exists $param{limit} ? ( $param{limit} ? $param{limit} : 500 )  : DEFAULT_LIMIT;
+
+	my $subs	= $param{entity} || $param{subreddits} || $param{subs};
+	if ($subs) {
+		$subs		= join ",", @$subs if ref $subs eq 'ARRAY';	
+		$data->{entity} = $subs if $subs;
+	}
+	my $result = $self->api_json_request(
+		api	=> API_GET_MODMAIL,
+		data	=> $data,
+	);
+	return $result;
+}
+
+#=============================================================
+# Users
+#=============================================================
+sub get_user {
+    	my ($self, %param) = @_;
+	my $view	= $param{view} || 'overview';
+	my $user	= $param{user} || croak "expected 'user'";
+
+	my $query = $self->set_listing_defaults(%param);
+
+    	my $args = [$user, $view];
+
+	my $result = $self->api_json_request(
+		api      => API_USER,
+		args     => $args,
+		data     => $query,
+	);
+
+	if ($view eq 'about') {
+		#return $result->{data};
+		return Reddit::Client::Account->new($self, $result->{data});
+	}
+	return [
+		map {
+
+		$_->{kind} eq "t1" ? 
+			Reddit::Client::Comment->new($self, $_->{data}) :
+			Reddit::Client::Link->new($self, $_->{data})
+		} 
+
+		@{$result->{data}{children}} 
+	];
+}
+# Remember that this will return a new hash and any key not from here will be
+# wuped out
 sub set_listing_defaults {
     	my ($self, %param) = @_;
 	my $query = {};
@@ -752,7 +1011,8 @@ sub delete {
 
 sub submit_link {
     my ($self, %param) = @_;
-    my $subreddit = $param{subreddit} || '';
+	# why is sub allowed to be empty?
+    my $subreddit = $param{subreddit} || $param{sub} || '';
     my $title     = $param{title}     || croak 'Expected "title"';
     my $url       = $param{url}       || croak 'Expected "url"';
     my $replies = exists $param{inbox_replies} ? ($param{inbox_replies} ? "true" : "false") : "true";
@@ -767,8 +1027,34 @@ sub submit_link {
         url         => $url,
         sr          => $subreddit,
         kind        => SUBMIT_LINK,
-	sendreplies => $replies,
-	resubmit    => $repost,
+		sendreplies => $replies,
+		resubmit    => $repost,
+    });
+
+    return $result->{data}{name};
+}
+
+sub submit_crosspost {
+    my ($self, %param) = @_;
+	# why is subreddit allowed to be empty?
+    my $subreddit = $param{subreddit} || $param{sub} || die "expected 'subreddit'\n";
+    my $title     = $param{title}     || die "Expected 'title'\n";
+	my $source_id = $param{source_id} || die "Expected 'source_id'\n";
+	$source_id = "t3_$source_id" if lc substr($source_id, 0, 3) ne 't3_';
+    #my $url       = $param{url}       || croak 'Expected "url"';
+    my $replies = exists $param{inbox_replies} ? ($param{inbox_replies} ? "true" : "false") : "true";
+    my $repost = exists $param{repost} ? ($param{repost} ? "true" : "false") : "false";
+
+    $subreddit = subreddit($subreddit);
+
+    my $result = $self->api_json_request(api => API_SUBMIT, data => {
+        title       		=> $title,
+        #url         => $url,
+		crosspost_fullname 	=> $source_id, 
+        sr          		=> $subreddit,
+        kind        		=> SUBMIT_CROSSPOST,
+		sendreplies 		=> $replies,
+		resubmit    		=> $repost,
     });
 
     return $result->{data}{name};
@@ -776,7 +1062,7 @@ sub submit_link {
 
 sub submit_text {
     my ($self, %param) = @_;
-    my $subreddit = $param{subreddit} || '';
+    my $subreddit = $param{subreddit} || $param{sub} || die "expected 'subreddit'\n";
     my $title     = $param{title}     || croak 'Expected "title"';
     my $text      = $param{text}      || croak 'Expected "text"';
     # true and false have to be the strings "true" or "false"
@@ -870,7 +1156,6 @@ sub get_flair_options {
 		}
 	}
 
-
 	return $result;
 }
 
@@ -878,13 +1163,36 @@ sub get_flair_options {
 # Subreddit management
 #==============================================================================
 
+sub get_wiki {
+	my ($self, %param) = @_;
+	my $page 	= $param{page} || croak "Need 'page'";
+	my $sub 	= $param{sub} || $param{subreddit} || die "need subreddit\n";
+
+	my $data 	= {};
+	$data->{v}	= $param{v}   if $param{v};
+	$data->{v2}	= $param{v2}  if $param{v2};
+
+	
+	my $result = $self->api_json_request(
+		api 	=> API_GETWIKI,
+		args 	=> [$sub, $page],
+		data	=> $data,
+	);
+	return $param{data} ? $result->{data} : $result->{data}->{content_md};
+}
+sub get_wiki_data {
+	my ($self, %param) = @_;
+	$param{data} = 1;
+	return $self->get_wiki(%param);
+}
+
 sub edit_wiki {
 	my ($self, %param) = @_;
 	my $page 	= $param{page} || croak "Need 'page'";
 	my $content	= defined $param{content} ? $param{content} : croak "Need 'content'";
 	# Reddit maximum length is 524,288
 	if (length $content > 524288) { croak "Maximum length for 'content' is 524288 bytes."; }
-	my $sub		= $param{subreddit} || croak "Need 'subreddit'";
+	my $sub		= $param{sub} || $param{subreddit} || croak "Need 'sub' or 'subreddit'";
 	my $previous	= $param{previous};
 	my $reason	= $param{reason};
 
@@ -906,22 +1214,94 @@ sub edit_wiki {
 #===============================================================================
 # Comments
 #===============================================================================
-
-sub get_comments { # currently broken
+sub get_comments { 
     my ($self, %param) = @_;
-    my $permalink = $param{permalink} || croak 'Expected "permalink"';
+    my $permalink;
+	my $sub		= $param{sub} || $param{subreddit};
 
-    DEBUG('Retrieve comments for %s', $permalink);
+	if ($param{permalink}) {
+		$permalink = $param{permalink};
+	} elsif ($sub and $param{comment_id} and $param{link_id}) {
+		my $id = id($param{link_id});
+		my $cmtid = id($param{comment_id});
+		$permalink = "/r/$sub/comments/$id//$cmtid";
+	} elsif ($sub and $param{id}) {
+		my $id = id($param{id});
+		$permalink = "/r/$sub/comments/$id";
+	} elsif ($param{url}) {
+		$permalink = $param{url};
+		$permalink =~ s/^https?:\/\/([a-zA-Z]{1,3}\.)?reddit\.com//i;
+	} else {
+		die "get_comments: Either 'permalink' OR 'url' OR 'subreddit' and 'link_id' OR 'subreddit' and 'link_id' and 'comment_id' are required.\n";
+	}
 
-    my $result   = $self->json_request('GET', $permalink);
+    my $result  = $self->json_request('GET', $permalink);
+	my $link_id	= $result->[0]{data}{children}[0]{data}{name};
+	# result->[0] is a listing with 1 element, the link, even if you requested a cmt
     my $comments = $result->[1]{data}{children};
-    return [ map { Reddit::Client::Comment->new($self, $_->{data}) } @$comments ];
+
+	my $return = [];
+	for my $cmt (@$comments) {
+		if ($cmt->{kind} eq 't1') {
+			push @$return, Reddit::Client::Comment->new($self, $cmt->{data});
+		} elsif ($cmt->{kind} eq 'more') {
+			my $more = Reddit::Client::MoreComments->new($self, $cmt->{data});
+			$more->{link_id} = $link_id;
+			push @$return, $more;
+		}
+	}
+	return $return;
+}
+# limit_children: get these comments and their descendants
+sub get_collapsed_comments {
+    my ($self, %param) = @_;
+	my $link_id		= fullname($param{link_id},'t3') || die "load_more_comments: 'link_id' is required.\n";
+	my $children	= $param{children} || die "get_collapsed_comments: 'children' is required.\n";
+	my $limit		= exists $param{limit_children} ? ($param{limit_children} ? 'true' : 'false') : 'false';
+	my $ids;
+
+	if (ref $children eq 'ARRAY') { 
+		$ids = join ",", @$children;
+		die "'children' must be non-empty array reference" unless $ids;
+	} else {
+		die "get_collapsed_comments: 'children' must be array reference\n"; 
+	}
+
+	my $data = {
+		link_id			=> $link_id,
+		children		=> $ids,	
+		limit_children	=> $limit, 
+		api_type		=> 'json', # This is the only GET endpoint that requires
+	};							   # api_type=json to be set.
+
+	$data->{sort} 		= $param{sort} if $param{sort};
+	$data->{id}			= $param{id} if $param{id};
+
+	my $result = $self->api_json_request(
+		api		=> API_MORECHILDREN,
+		data	=> $data,
+	);
+	my $comments = $result->{data}->{things};
+
+	my $return = [];
+	for my $cmt (@$comments) {
+		if ($cmt->{kind} eq 't1') {
+			push @$return, Reddit::Client::Comment->new($self, $cmt->{data});
+		} elsif ($cmt->{kind} eq 'more') {
+			my $more = Reddit::Client::MoreComments->new($self, $cmt->{data});
+			$more->{link_id} = $link_id;
+			push @$return, $more;
+		}
+	}
+	return $return;
 }
 
 sub submit_comment {
     my ($self, %param) = @_;
     my $parent_id = $param{parent} || $param{parent_id} || croak 'Expected "parent"';
     my $comment   = $param{text}      || croak 'Expected "text"';
+	# the replies option, it does nothing
+    #my $replies = exists $param{inbox_replies} ? ($param{inbox_replies} ? "true" : "false") : "true";
 
     croak '$fullname must be a post or comment' if !$self->ispost($parent_id) && !$self->iscomment($parent_id);
     DEBUG('Submit comment under %s', $parent_id);
@@ -929,6 +1309,7 @@ sub submit_comment {
     my $result = $self->api_json_request(api => API_COMMENT, data => {
         thing_id => $parent_id,
         text     => $comment,
+		#sendreplies=>$replies,
     });
 
     return $result->{data}{things}[0]{data}{id};
@@ -1027,6 +1408,7 @@ sub create_multi {
         my ($self, %param) = @_;
 	my $data 	= {};
         my $model 	= {};
+	my $username    = $param{username} || $self->{username} || die "'username' is required.";
 
         $model->{display_name}  = $param{name} || croak "Expected 'name'.";
         if (length($model->{display_name}) > 50) { croak "max length of 'name' is 50."; }
@@ -1072,11 +1454,11 @@ sub create_multi {
 
 	# Put a ribbon on it
 	$data->{model} = JSON::encode_json($model); 
-	$data->{multipath} = "/user/$self->{username}/m/$model->{display_name}";
+	$data->{multipath} = "/user/$username/m/$model->{display_name}";
 
 	my $result = $self->api_json_request( 
 		api => $param{edit} ? API_EDITMULTI : API_CREATEMULTI, 
-		args => [$self->{username}, $model->{display_name}],
+		args => [$username, $model->{display_name}],
 		data => $data,
 	);
 
@@ -1086,7 +1468,7 @@ sub create_multi {
 sub get_multi {
 	my ($self, %param) = @_;
 	my $name	= $param{name} || croak "expected 'name'";
-	my $username 	= $param{user} || $self->{username};
+	my $username= $param{user} || $param{username} || $self->{username} || die "'username' is required.\n";
 	my $expand	= $param{expand} ? '?expand_srs=true' : '';
 
 	my $result = $self->api_json_request( 
@@ -1095,10 +1477,9 @@ sub get_multi {
 	);
 
 	# The result looks like a Subreddit object, but is not.
-	# By returning just the data we lose the 'kind' key,
+	# By returning just the data we lose only the 'kind' key,
 	# which is just the string "LabeledMulti"
 	return $result->{data};
-	return $result;
 }
 
 sub delete_multi {
@@ -1111,25 +1492,72 @@ sub delete_multi {
 	);
 	return $result->{data};
 }
+#==============================================================================
+# Misc
+#==============================================================================
+sub get_origin { 
+	my $self = shift;
+	return "https://$self->{subdomain}.reddit.com";	
+}
 
 #==============================================================================
-# Internal
+# Internal and static
 #==============================================================================
 
-sub ispost {
+# Strip the type portion of a filname (i.e. t3_), if it exists
+sub id {
+	my $id	= shift;
+	$id 	=~ s/^[tT]\d_//;
+	return $id;
+}
+# accept id or fullname, always return fullname
+sub fullname {
+	my $id 		= shift || return;
+	my $type	= shift || die "fullname: 'type' is required";
+	$id = $type."_".$id if substr($id, 0, 3) ne $type."_";
+	return $id;
+}
+
+sub ispost { # todo: make this static function
 	my ($self, $name) = @_;
     	my $type = substr $name, 0, 2;
 	return $type eq 't3';
 }
 
-sub iscomment {
+sub iscomment { # todo: make this static
 	my ($self, $name) = @_;
     	my $type = substr $name, 0, 2;
 	return $type eq 't1';
 }
-sub get_type {
+sub get_type { # ditto
 	my ($self, $name) = @_;
     	return lc substr $name, 0, 2;
+}
+sub DEBUG {
+    if ($DEBUG) {
+        my ($format, @args) = @_;
+        my $ts  = strftime "%Y-%m-%d %H:%M:%S", localtime;
+        my $msg = sprintf $format, @args;
+        chomp $msg;
+        printf STDERR "[%s] [ %s ]\n", $ts, $msg;
+    }
+}
+
+sub subreddit {
+    my $subject = shift;
+    $subject =~ s/^\/r//; # trim leading /r
+    $subject =~ s/^\///;  # trim leading slashes
+    $subject =~ s/\/$//;  # trim trailing slashes
+
+    if ($subject !~ /\//) {   # no slashes in name - it's probably good
+        if ($subject eq '') { # front page
+            return '';
+        } else {              # subreddit
+            return $subject;
+        }
+    } else { # fail
+        return;
+    }
 }
 
 1;
@@ -1141,8 +1569,6 @@ __END__
 =head1 NAME
 
 Reddit::Client - A Perl wrapper for the Reddit API.
-
-Up to date, nicely-formatted documentation can be found at L<http://redditclient.readthedocs.org/en/latest/>. 
 
 =head1 SYNOPSIS
 
@@ -1156,7 +1582,7 @@ Up to date, nicely-formatted documentation can be found at L<http://redditclient
 
     # Create a Reddit::Client object and authorize in one step
     my $reddit = new Reddit::Client(
-	user_agent 	=> 'MyScriptName 1.0 by /u/earth-tone',
+	user_agent 	=> 'MyScriptName 1.0 by /u/myusername',
 	client_id	=> $client_id,
 	secret		=> $secret,
 	username	=> $username,
@@ -1166,7 +1592,7 @@ Up to date, nicely-formatted documentation can be found at L<http://redditclient
     # Or create object then authorize.
     # Useful if you need to switch between accounts, for example if you were to check the inboxes of several accounts.
     my $reddit = Reddit::Client->new(
-        user_agent   	=> 'MyApp/1.0 by /u/earth-tone',
+        user_agent   	=> 'MyApp/1.0 by /u/myusername',
     );
 
     $reddit->get_token(
@@ -1214,14 +1640,13 @@ Up to date, nicely-formatted documentation can be found at L<http://redditclient
 
 =head1 DESCRIPTION
 
-Reddit::Client provides methods and object wrappers for objects exposed
-. This module handles HTTP communication, oauth session management, and communication with Reddit's external API. For more information about the Reddit API, see L<https://github.com/reddit/reddit/wiki/API>.
+Reddit::Client handles HTTP communication, oauth session management, and communication with Reddit's external API. For more information about the Reddit API, see L<https://github.com/reddit/reddit/wiki/API>.
 
-Beginning August 3rd, 2015, the Reddit API requires Oauth authentication. This amounts to two extra arguments at the beginning of your script; in exchange you you twice as many requests per minute as before (60 vs 30) and some added convenience on the back end.
+Beginning August 3rd, 2015, the Reddit API requires Oauth2 authentication. This amounts to two extra arguments at the beginning of your script (for basic authentication); in exchange you get twice as many requests per minute as before (60 vs 30) and some added convenience on the back end.
 
-To get Oauth keys, visit your apps page: L<https://www.reddit.com/prefs/apps>. Choose a "script" type app. None of the other fields are needed for a script type app; you can put in C<127.0.0.1> for the URLs or whatever you like.
+To get Oauth keys, visit your apps page: L<https://www.reddit.com/prefs/apps>. Choose a "script" type app. None of the other fields are needed for this type of app; the URL fields must be filled, but can be any valid URL.
 
-Every account that uses this script must have permission to use it. So for example if you were to check the inboxes of your various accounts, each one would need permission. To add accounts click "add developer" on the right, after you've created the app.
+As of v1.20, Reddit::Client supports "web" apps. These are the kind of apps that are intended to run on a web server and can take actions on behalf of the public at large. While they are supported, there is not yet a setup guide, so getting one running is left as an exercise for the reader. 
 
 =head1 Constants
 

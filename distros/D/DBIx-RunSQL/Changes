@@ -1,88 +1,92 @@
-0.19 20180421
-    . Fix implicit test prerequisite in formatter.t
+0.20 2018-10-28
+    * Re-release including proper META.* information
+    * no need to upgrade
+
+0.19 2018-04-21
+    * Fix implicit test prerequisite in formatter.t
       This addresses RT 125157, reported and diagnosed by Slaven Rezic
 
-0.18 20180420
-    + List the Getopt::Long version we need
-    + Read SQL from STDIN if not given on the command line
+0.18 2018-04-20
+    * List the Getopt::Long version we need
+    * Read SQL from STDIN if not given on the command line
 	  This allows run-sql.pl to be used in a pipe
 
-0.17 20180223
-    ! API change: ->handle_command_line() and ->parse_command_line()
+0.17 2018-02-23
+    * API change: ->handle_command_line() and ->parse_command_line()
 	  now take an arrayREF for the command line items and modify that arrayref.
-	+ new "--quiet" / no_header_when_empty option to allow scripts to run
+	* new "--quiet" / no_header_when_empty option to allow scripts to run
 	  from cron without producing too much output
-	+ new "run-sql.pl" script in the distribution as a template or tool script
+	* new "run-sql.pl" script in the distribution as a template or tool script
 	  for running SQL commands.
 
-0.16 20170316
-    + Allow specifying the table formatter on the command line
+0.16 2017-03-16
+    * Allow specifying the table formatter on the command line
 
-0.15 20160619
-    . Fix grammar error (RT #114768, contributed by eythian )
-    + Allow for trailing whitespace while parsing SQL
+0.15 2016-06-19
+    * Fix grammar error (RT #114768, contributed by eythian )
+    * Allow for trailing whitespace while parsing SQL
       (RT #115442, contributed by niceperl)
 
-0.14 20160524
-    + ->handle_command_line now also accepts an SQL string
+0.14 2016-05-24
+    * ->handle_command_line now also accepts an SQL string
       instead of only accepting SQL files
-    . Silence some warnings if a statement does not return columns
+    * Silence some warnings if a statement does not return columns
       (like a CREATE statement). RT #114647
 
-0.13 20150519
-    + Fix bad thinko error in ->run_sql that prevented any
+0.13 2015-05-19
+    * Fix bad thinko error in ->run_sql that prevented any
       results from being shown
 
-0.12 20140222
-    + If Text::Table is installed, output SELECT statements
+0.12 2014-02-22
+    * If Text::Table is installed, output SELECT statements
       through it instead of simply using \t
-    . Document more of the internal helper routines
+    * Document more of the internal helper routines
 
-0.11 20131120
-    + Add functionality for SELECT statements
+0.11 2013-11-20
+    * Add functionality for SELECT statements
 
-0.10 20130510
-    . Fix the MANIFEST which listed MYMETA.*
-    . Fix a bug where ->handle_command_line() never properly processed
+0.10 2013-05-10
+    * Fix the MANIFEST which listed MYMETA.*
+    * Fix a bug where ->handle_command_line() never properly processed
       the parameters given to it.
 
-0.09 20120611
-    + Parse triggers. This fixes RT #77378
+0.09 2012-06-11
+    * Parse triggers. This fixes RT #77378
       Test and report by Gabor Szabo
 
-0.08 20120518
-    . Add a test for warnings raised while executing SQL
+0.08 2012-05-18
+    * Add a test for warnings raised while executing SQL
       (contributed by David Golden)
-    + Respect the 'verbose' setting, fixes RT #77260
+    * Respect the 'verbose' setting, fixes RT #77260
       (contributed by David Golden)
 
-0.07 20111023
-    . Fix bad test skip count
-    . Documentation fixes
-    o no need to upgrade
+0.07 2011-10-23
+    * Fix bad test skip count
+    * Documentation fixes
+    * no need to upgrade
 
-0.06 20110920
-    Suggested by Gabor Szabo
-    + allow a different output handle for the verbose messages
-    + Allow a callback for the verbose messages
-    + Separate the SQL statements by "--" in the verbose output
-    ! SQL errors are now fatal
-    + Add --force option to ignore SQL errors (fixes RT #70998)
+0.06 2011-09-20
+      Suggested by Gabor Szabo
+    * allow a different output handle for the verbose messages
+    * Allow a callback for the verbose messages
+    * Separate the SQL statements by "--" in the verbose output
+    * SQL errors are now fatal
+    * Add --force option to ignore SQL errors (fixes RT #70998)
 
-0.05 20110127
-    . Fix synopsis to use :dbname instead of (wrong) :dbfile parameter
+0.05 2011-01-27
+    * Fix synopsis to use :dbname instead of (wrong) :dbfile parameter
       for DBD::SQLite
-    . Added link to github repo
-    . Added metainformation about bugtracker etc.
-    . Bumped copyright
+    * Added link to github repo
+    * Added metainformation about bugtracker etc.
+    * Bumped copyright
 
-0.04 20101111
-    . Actually document ->handle_command_line, thanks to Terrence Brannon
-    . Add author information, license information
+0.04 2010-11-11
+    * Actually document ->handle_command_line, thanks to Terrence Brannon
+    * Add author information, license information
 
-0.03 20100518
-    . ->create now returns the database handle so you can use it
+0.03 2010-05-18
+    * ->create now returns the database handle so you can use it
       to create :memory: databases in SQLite
 
-0.02 20100213
-    . Collected from various copies and released
+0.02 2010-02-13
+    * Collected from various copies and released

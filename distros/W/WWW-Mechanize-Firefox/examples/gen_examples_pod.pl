@@ -23,12 +23,11 @@ main();
 # easier access via CPAN.
 #
 sub main {
-
     my @examples;
     my $examples_dir = $ARGV[0] || './examples';
 
     # Get the version from the local WWW::Mechanize::Firefox.pm.
-    push @INC, 'lib';
+    push @INC, './lib';
     require "$examples_dir/../lib/WWW/Mechanize/Firefox.pm";
     my $version = WWW::Mechanize::Firefox->VERSION();
 
@@ -90,8 +89,7 @@ sub print_header {
     print "#\n\n";
 
     print "use strict;\n";
-    print "use vars qw(\$VERSION);\n";
-    print "\$VERSION = '$version';\n\n";
+    print "our \$VERSION = '$version';\n\n";
 
     print "1;\n";
     print "\n";

@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Scalar::Util 1.26 qw{ blessed looks_like_number };
 use Text::ParseWords ();
 
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 
 our @CARP_NOT = qw{
     Astro::App::Satpass2
@@ -382,7 +382,7 @@ sub my_dist_config {
     my ( $opt ) = @_;
 
     defined $ENV{ASTRO_APP_SATPASS2_CONFIG_DIR}
-	and return $ENV{ASTRO_APP_SATPASS2_CONFIG_DIR};
+	and return Cwd::abs_path( $ENV{ASTRO_APP_SATPASS2_CONFIG_DIR} );
 
     return File::HomeDir->my_dist_config(
 	'Astro-App-Satpass2',
@@ -616,7 +616,8 @@ right-most argument is the one returned.
 
 This subroutine returns a path to the user's configuration directory. If
 environment variable C<ASTRO_APP_SATPASS2_CONFIG_DIR> is defined, that
-is returned regardless of any arguments. Otherwise it simply wraps
+is expanded to an absolute path and returned regardless of any
+arguments. Otherwise it simply wraps
 
  File::HomeDir->my_dist_config( 'Astro-App-Satpass2' );
 

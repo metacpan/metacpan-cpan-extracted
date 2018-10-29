@@ -1,0 +1,13 @@
+{
+   "gapi" : {
+      "client_id" : "mocked.apps.googleusercontent.com",
+      "client_secret" : "6iQ5pFYLgsssssssssssssssssssss",
+      "scopes" : "email profile https://www.googleapis.com/auth/plus.profile.emails.read https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/contacts.readonly https://mail.google.com",
+      "tokens" : {
+         "peter@shotgundriver.com" : {
+            "access_token" : "ya29.GltBBsl56Dd-drJHt3MfpuRkp7A3cwVJy--areTiZvSlHdsfdsjkfdsjkfdskfjaii--------mocked--------------------",
+            "refresh_token" : "--------------------mocked--------------------1/B5MVfXyiSs2Y-H"
+         }
+      }
+   }
+}

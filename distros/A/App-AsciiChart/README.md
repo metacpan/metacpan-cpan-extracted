@@ -6,7 +6,7 @@ App::AsciiChart - Simple Ascii Chart
 
     use App::AsciiChart;
 
-    App::AsciiChart->new->plot([1, 5, 3, 9, 10, 12]);
+    print App::AsciiChart->new->plot([1, 5, 3, 9, 10, 12]);
 
 # DESCRIPTION
 
@@ -33,6 +33,10 @@ Copyright (C) Viacheslav Tykhanovskyi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+# CREDITS
+
+Varadinsky (github/Varadinsky)
 
 # AUTHOR
 

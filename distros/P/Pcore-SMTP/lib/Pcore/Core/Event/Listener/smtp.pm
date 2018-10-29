@@ -5,8 +5,9 @@ use Pcore::SMTP;
 use Pcore::Handle qw[:TLS_CTX];
 use Pcore::Util::Data qw[to_json];
 use Pcore::Util::Scalar qw[is_ref];
+use Time::HiRes qw[];
 
-with qw[Pcore::Core::Event::Listener::Pipe];
+with qw[Pcore::Core::Event::Listener];
 
 has tmpl => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :>';
 
@@ -27,9 +28,9 @@ has _tmpl => ( init_arg => undef );
 has _smtp => ( init_arg => undef );
 has _init => ( init_arg => undef );
 
-sub _build_id ($self) { return "smtp://$self->{host}:$self->{port}?username=$self->{username}" }
+sub _build_id ($self) { return "smtp://$self->{host}:$self->{port}?username=$self->{username}&to=$self->{to}" }
 
-sub sendlog ( $self, $ev ) {
+sub forward_event ( $self, $ev ) {
 
     # init
     $self->{_init} //= do {
@@ -38,7 +39,7 @@ sub sendlog ( $self, $ev ) {
         # init template
         $self->{_tmpl} = P->tmpl;
 
-        $self->{_tmpl}->cache_string_tmpl( subject => \$self->{tmpl} );
+        $self->{_tmpl}->add_tmpl( subject => $self->{tmpl} );
 
         $self->{_smtp} = Pcore::SMTP->new( {
             host     => $self->{host},
@@ -55,7 +56,7 @@ sub sendlog ( $self, $ev ) {
     # sendlog
     {
         # prepare date object
-        local $ev->{date} = P->date->from_epoch( $ev->{timestamp} );
+        local $ev->{date} = P->date->from_epoch( $ev->{timestamp} // Time::HiRes::time() );
 
         # prepare data
         my $body;
@@ -92,11 +93,11 @@ sub sendlog ( $self, $ev ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 58                   | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
+## |    2 | 59                   | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 69                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 70                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 11                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 12                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

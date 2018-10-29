@@ -1,20 +1,35 @@
 NAME
 
-    WebService::GoogleAPI::Client - Google API Services Client.
+    WebService::GoogleAPI::Client - API WebService OAUTH2 Client Agent to
+    streamline access to GOOGLE API End-Point Services using Discovery Data
 
 VERSION
 
-    version 0.13
+    version 0.16
 
 SYNOPSIS
 
     Access Google API Services Version 1 using an OAUTH2 User Agent
 
+    assumes gapi.json configuration in working directory with scoped Google
+    project redentials and user authorization created by _goauth_
+
         use WebService::GoogleAPI::Client;
-    
-        ## assumes gapi.json configuration in working directory with scoped project and user authorization
         
         my $gapi_client = WebService::GoogleAPI::Client->new( debug => 1, gapi_json => 'gapi.json', user=> 'peter@pscott.com.au' );
+        
+        say $gapi_client->list_of_available_google_api_ids();
+    
+        my @gmail_endpoint_list =      $gapi_client->methods_available_for_google_api_id('gmail')
+    
+        if $gapi_agent->has_scope_to_access_api_endpoint( 'gmail.users.settings.sendAs.get' ) {
+          say 'User has Access to GMail Method End-Point gmail.users.settings.sendAs.get';
+        }
+
+    Package includes _go_auth_ CLI Script to collect initial end-user
+    authorisation to scoped services
+
+EXAMPLES
 
  AUTOMATIC API REQUEST CONSTRUCTION - SEND EMAL
 
@@ -43,6 +58,8 @@ SYNOPSIS
           method => 'get',
           path => 'https://www.googleapis.com/calendar/users/me/calendarList',
         )->json;
+
+METHODS
 
  new
 
@@ -104,6 +121,8 @@ SYNOPSIS
     Given an API Endpoint such as 'gmail.users.settings.sendAs.get' returns
     1 iff user has scope to access
 
+        say 'User has Access'  if $gapi_agent->has_scope_to_access_api_endpoint( 'gmail.users.settings.sendAs.get' );
+
     Returns 0 if scope to access is not available to the user.
 
     warns and returns 0 on error ( eg user or config not specified etc )
@@ -114,7 +133,7 @@ SYNOPSIS
     format. The hashed content contains a structure representing the
     corresponding discovery specification for that method ( API Endpoint )
 
-        methods_available_for_google_api_id('gmail.users.settings.delegates.get')
+        methods_available_for_google_api_id('gmail')
 
     TODO: consider ? refactor to allow parameters either as a single api id
     such as 'gmail' as well as the currently accepted hash keyed on the api

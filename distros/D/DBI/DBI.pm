@@ -11,7 +11,7 @@ package DBI;
 require 5.008_001;
 
 BEGIN {
-our $XS_VERSION = our $VERSION = "1.641"; # ==> ALSO update the version in the pod text below!
+our $XS_VERSION = our $VERSION = "1.642"; # ==> ALSO update the version in the pod text below!
 $VERSION = eval $VERSION;
 }
 
@@ -143,7 +143,7 @@ sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.641
+This is the DBI specification that corresponds to DBI version 1.642
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -443,7 +443,7 @@ my $keeperr = { O=>0x0004 };
 	commit     	=> { U =>[1,1], O=>0x0480|0x0800, T=>0x1000 },
 	rollback   	=> { U =>[1,1], O=>0x0480|0x0800, T=>0x1000 },
 	'do'       	=> { U =>[2,0,'$statement [, \%attr [, @bind_params ] ]'], O=>0x3200 },
-	last_insert_id	=> { U =>[5,6,'$catalog, $schema, $table_name, $field_name [, \%attr ]'], O=>0x2800 },
+	last_insert_id	=> { U =>[1,6,'[$catalog [,$schema [,$table_name [,$field_name [, \%attr ]]]]]'], O=>0x2800 },
 	preparse    	=> {  }, # XXX
 	prepare    	=> { U =>[2,3,'$statement [, \%attr]'],                    O=>0xA200 },
 	prepare_cached	=> { U =>[2,4,'$statement [, \%attr [, $if_active ] ]'],   O=>0xA200 },
@@ -477,6 +477,7 @@ my $keeperr = { O=>0x0004 };
 	bind_param	=> { U =>[3,4,'$parameter, $var [, \%attr]'] },
 	bind_param_inout=> { U =>[4,5,'$parameter, \\$var, $maxlen, [, \%attr]'] },
 	execute		=> { U =>[1,0,'[@args]'], O=>0x1040 },
+	last_insert_id	=> { U =>[1,6,'[$catalog [,$schema [,$table_name [,$field_name [, \%attr ]]]]]'], O=>0x2800 },
 
 	bind_param_array  => { U =>[3,4,'$parameter, $var [, \%attr]'] },
 	bind_param_inout_array => { U =>[4,5,'$parameter, \\@var, $maxlen, [, \%attr]'] },
@@ -612,13 +613,14 @@ sub connect {
             (ref $pass and not defined Scalar::Util::blessed($pass)));
 
     # extract dbi:driver prefix from $dsn into $1
+    my $orig_dsn = $dsn;
     $dsn =~ s/^dbi:(\w*?)(?:\((.*?)\))?://i
 			or '' =~ /()/; # ensure $1 etc are empty if match fails
     my $driver_attrib_spec = $2 || '';
 
     # Set $driver. Old style driver, if specified, overrides new dsn style.
     $driver = $old_driver || $1 || $ENV{DBI_DRIVER}
-	or Carp::croak("Can't connect to data source '$dsn' "
+	or Carp::croak("Can't connect to data source '$orig_dsn' "
             ."because I can't work out what driver to use "
             ."(it doesn't seem to contain a 'dbi:driver:' prefix "
             ."and the DBI_DRIVER env var is not set)");
@@ -2029,6 +2031,9 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 	return ($tuples, $rc_total);
     }
 
+    sub last_insert_id {
+        return shift->{Database}->last_insert_id(@_);
+    }
 
     sub fetchall_arrayref {	# ALSO IN Driver.xst
 	my ($sth, $slice, $max_rows) = @_;
@@ -4504,6 +4509,7 @@ database handle.
 
 =head3 C<last_insert_id>
 
+  $rv = $dbh->last_insert_id();
   $rv = $dbh->last_insert_id($catalog, $schema, $table, $field);
   $rv = $dbh->last_insert_id($catalog, $schema, $table, $field, \%attr);
 
@@ -4696,8 +4702,8 @@ yields a tree of nested hashes.
 
 If a row has the same key as an earlier row then it replaces the earlier row.
 
-If any method except C<fetchrow_hashref> fails, and L</RaiseError> is not set,
-C<selectall_hashref> will return C<undef>.  If C<fetchrow_hashref> fails and
+If any method except C<fetchall_hashref> fails, and L</RaiseError> is not set,
+C<selectall_hashref> will return C<undef>.  If C<fetchall_hashref> fails and
 L</RaiseError> is not set, then it will return with whatever data it
 has fetched thus far. $DBI::err should be checked to catch that.
 
@@ -6414,6 +6420,21 @@ each array ref in turn:
 
 The C<execute_for_fetch> method was added in DBI 1.38.
 
+=head3 C<last_insert_id>
+
+  $rv = $sth->last_insert_id();
+  $rv = $sth->last_insert_id($catalog, $schema, $table, $field);
+  $rv = $sth->last_insert_id($catalog, $schema, $table, $field, \%attr);
+
+Returns a value 'identifying' the row inserted by last execution of the
+statement C<$sth>, if possible.
+
+For some drivers the value may be 'identifying' the row inserted by the
+last executed statement, not by C<$sth>.
+
+See database handle method last_insert_id for all details.
+
+The C<last_insert_id> statement method was added in DBI 1.642.
 
 =head3 C<fetchrow_arrayref>
 
@@ -8402,16 +8423,6 @@ A German translation of this manual (possibly slightly out of date) is
 available, thanks to O'Reilly, at:
 
   http://www.oreilly.de/catalog/perldbiger/
-
-=head1 TRAINING
-
-References to DBI related training resources. No recommendation implied.
-
-  http://www.treepax.co.uk/
-  http://www.keller.com/dbweb/
-
-(If you offer professional DBI related training services,
-please send me your details so I can add them here.)
 
 =head1 OTHER RELATED WORK AND PERL MODULES
 

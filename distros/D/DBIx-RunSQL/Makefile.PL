@@ -42,6 +42,10 @@ my %module = (
                         'Getopt::Long' => '2.36', # GetOptionsFromArray
                         'DBI'          => 0,
                       }, # e.g., Module::Name => 1.1
+    'TEST_REQUIRES' => {
+        'Test::More'   => 0,
+        'Data::Dumper' => 0,
+    },
     ABSTRACT_FROM   => $main_file, # retrieve abstract from module
     AUTHOR          => 'Max Maischein <corion@cpan.org>',
 );

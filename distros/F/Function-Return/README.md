@@ -1,27 +1,29 @@
-[![Build Status](https://travis-ci.org/kfly8/p5-Function-Return.svg?branch=master)](https://travis-ci.org/kfly8/p5-Function-Return)
+[![Build Status](https://travis-ci.org/kfly8/p5-Function-Return.svg?branch=master)](https://travis-ci.org/kfly8/p5-Function-Return) [![Coverage Status](https://img.shields.io/coveralls/kfly8/p5-Function-Return/master.svg?style=flat)](https://coveralls.io/r/kfly8/p5-Function-Return?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/Function-Return.svg)](https://metacpan.org/release/Function-Return)
 # NAME
 
 Function::Return - add return type for a function
 
 # SYNOPSIS
 
-    use Function::Return;
-    use Types::Standard -types;
+```perl
+use Function::Return;
+use Types::Standard -types;
 
-    sub foo :Return(Int) { 123 }
-    sub bar :Return(Int) { 3.14 }
+sub foo :Return(Int) { 123 }
+sub bar :Return(Int) { 3.14 }
 
-    foo(); # 123
-    bar(); # ERROR! Invalid type
+foo(); # 123
+bar(); # ERROR! Invalid type
 
-    # multi return values
-    sub baz :Return(Num, Str) { 3.14, 'message' }
-    my ($pi, $msg) = baz();
-    my $count = baz(); # ERROR! Required list context.
+# multi return values
+sub baz :Return(Num, Str) { 3.14, 'message' }
+my ($pi, $msg) = baz();
+my $count = baz(); # ERROR! Required list context.
 
-    # empty return
-    sub boo :Return() { return; }
-    boo();
+# empty return
+sub boo :Return() { return; }
+boo();
+```
 
 # DESCRIPTION
 
@@ -33,32 +35,38 @@ Function::Return allows you to specify a return type for your functions.
 
 you can change \`Return\` to your own name:
 
-    use Function::Return name => 'MyReturn';
+```perl
+use Function::Return name => 'MyReturn';
 
-    sub foo :MyReturn(Str) { }
+sub foo :MyReturn(Str) { }
+```
 
 ### no\_check
 
 you can switch off type check:
 
-    use Function::Return no_check => 1;
+```perl
+use Function::Return no_check => 1;
 
-    sub foo :Return(Int) { 3.14 }
-    foo(); # NO ERROR!
+sub foo :Return(Int) { 3.14 }
+foo(); # NO ERROR!
+```
 
 ## INTROSPECTION
 
 The function Function::Return::info lets you introspect return values like [Function::Parameters::Info](https://metacpan.org/pod/Function::Parameters::Info):
 
-    use Function::Parameters;
-    use Function::Return;
+```perl
+use Function::Parameters;
+use Function::Return;
 
-    fun baz() :Return(Str) { 'hello' }
+fun baz() :Return(Str) { 'hello' }
 
-    my $pinfo = Function::Parameters::info \&baz;
-    my $rinfo = Function::Return::info \&baz;
+my $pinfo = Function::Parameters::info \&baz;
+my $rinfo = Function::Return::info \&baz;
 
-    $rinfo->types; # [Str]
+$rinfo->types; # [Str]
+```
 
 # SUPPORT
 

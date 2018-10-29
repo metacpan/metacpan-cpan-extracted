@@ -13,5 +13,6 @@ t/02_return_attribute.t
 t/03_return_info.t
 t/04_import_option_name.t
 t/05_import_option_no_check.t
+xt/02_perlcritic.t
 META.yml
 MANIFEST

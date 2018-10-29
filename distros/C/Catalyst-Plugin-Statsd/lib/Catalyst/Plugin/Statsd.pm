@@ -15,7 +15,14 @@ use namespace::autoclean;
 
 requires 'finalize';
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.0';
+
+
+sub statsd_client {
+    my ($c) = @_;
+    return $c->req->env->{'psgix.monitor.statsd'};
+}
+
 
 
 sub statsd_metric_name_filter {
@@ -32,7 +39,7 @@ sub statsd_metric_name_filter {
 around finalize => sub {
     my ( $next, $c ) = @_;
 
-    if ( my $client = $c->req->env->{'psgix.monitor.statsd'} ) {
+    if ( my $client = $c->statsd_client) {
         if ( $c->use_stats ) {
 
             my $stat = [ -1, "catalyst.response.time", $c->stats->elapsed ];
@@ -72,7 +79,7 @@ Catalyst::Plugin::Statsd - log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.2.0
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -97,6 +104,12 @@ version v0.2.0
 This plugin will log L<Catalyst> timing statistics to statsd.
 
 =head1 METHODS
+
+=head2 C<statsd_client>
+
+  $c->statsd_client;
+
+Returns the statsd client.
 
 =head2 C<statsd_metric_name_filter>
 

@@ -267,24 +267,36 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
       Rmpfr_set_str() and Rmpfr_get_str()
 
-=head1 PASSING _Decimal64 VALUES
+=head1 PASSING _Decimal64 & _Decimal128 VALUES
 
-   Install Math::Decimal64 and build the mpfr library (version
-   3.1.0 or later) with the --enable-decimal-float option, and
-   build Math::MPFR by providing the "D64=1" arg to the
-   Makefile.PL (which will define MPFR_WANT_DECIMAL_FLOATS):
+   Install Math::Decimal64 and/or Math::Decimal128 and build the mpfr
+   library (version 3.1.0 or later for _Decimal64, version 4.1.0 or
+   later for _Decimal128) with the --enable-decimal-float option. The
+   Math::MPFR build process should detect the _Decimal64/_Decimal128
+   availability and include or exclude the support accordingly.
 
-     perl Makefile.PL D64=1
+   If the auto-detection fails to detect the availability, you can
+   override it by providing the "D64=1" and/or "D128=1" arg to the
+   the Makefile.PL (either of which will define
+   MPFR_WANT_DECIMAL_FLOATS):
 
-   You can then pass _Decimal64 values between Math::MPFR and
-   Math::Decimal64 using:
+     perl Makefile.PL D64=1 D128=1
+
+   You can then pass _Decimal64/_Decimal128 values between Math::MPFR
+   and Math::Decimal64/Math::Decimal128 using:
 
       Rmpfr_set_DECIMAL64() and Rmpfr_get_DECIMAL64()
+      Rmpfr_set_DECIMAL128() and Rmpfr_get_DECIMAL128()
 
-   NOTE: It is allowable to pass both "D64=1" and "F128=1" args
-     to the Makefile.PL:
+   NOTE: It is allowable to pass any or all of "D64=1", "D128=1" and
+        "F128=1" args to the Makefile.PL.
 
-       perl Makefile.PL D64=1 F128=1
+  To force the removal of _Decimal64/Decimal128 support in
+  Math::MPFR, simply provide "D64=0" and/or "D128=0" as arguments to
+  the Makefile.PL:
+
+      perl Makefile.PL D64=0 D128=0
+
 
 =head1 FUNCTIONS
 
@@ -535,6 +547,12 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
                                                # && D64=1 arg given to
                                                # Makefile.PL. $D64 is a
                                                # Math::Decimal64 object
+   $si = Rmpfr_set_DECIMAL128($rop, $D128, $rnd) # mpfr-3.1.0 or later &&
+                                               # mpfr lib built with
+                                               # --enable-decimal-float
+                                               # && D128=1 arg given to
+                                               # Makefile.PL. $D128 is a
+                                               # Math::Decimal128 object
    $si = Rmpfr_set_FLOAT128($rop, $F128, $rnd);# mpfr-4.0.0 and later
                                                # && mpfr lib built with
                                                # --enable-float128 &&
@@ -889,6 +907,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     sign) and $exp is set to 0. If $op is  NaN or an infinity, then $rop
     is set to the same value and the value of $exp is meaningless (and
     should be ignored).
+
+   $ui1 = Rmpfr_get_str_ndigits($ui2, $ui3); # mpfr-4.1.0 and later only
+     Return the minimal integer $ui1 such that any number of precision
+     $ui3 bits, when output with $ui1 digits in radix $ui2 with rounding
+     to nearest, can be recovered exactly when read again, still with
+     rounding to nearest.
+     More precisely, we have $ui1 = 1 + ceil($ui3*log(2)/log($ui2)), with $ui3
+     replaced by $ui3-1 if $ui2 is a power of 2.
 
    ##########
 
@@ -1438,6 +1464,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     direction $rnd. The dilogarithm function is defined here as
     the integral of -log(1-t)/t from 0 to x.
 
+   $si = Rmpfr_dot ($rop, \@op1, \@op2, $ui, $rnd); # mpfr-4.1.0 &
+                                                    # later only
+    Set $rop to the dot product of elements of @op1 by those of
+    @op2, whose common size is $ui (== scalar @op1), correctly
+    rounded in the direction $rnd.
+    This function is experimental, and does not yet handle
+    intermediate overflows and underflows
+
    #############
 
    I-O FUNCTIONS
@@ -1652,9 +1686,15 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    MISCELLANEOUS
 
+   $nv = atodouble($str); # Needs mpfr-3.1.6 or later
+    Sets the $nv to the value of the double that's represented by
+    the string $str.
+    If $Config{nvtype} is double, it therefore returns the same
+    value as atonv - though it is less efficient than atonv().
+
    $nv = atonv($ws, $str); # $ws is a Math::MPFR object.
                            # Needs mpfr-3.1.6 or later
-    Sets the NV $nv to the value represented by the string $str.
+    Sets $nv to the NV value represented by the string $str.
     $ws needs to be initialized (once only) with a precision of
     $Math::MPFR::BITS - after which atonv() can be called repeatedly
     without incurring the overhead of having to repeatedly create the

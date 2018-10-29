@@ -19,7 +19,8 @@ Module::Build->new
       'AnyDBM_File::Importer'       => 0,
       'File::Temp'                  => 0,
       'Module::Build'               => '0.30',
-      'TAP::Harness'                => 0
+      'TAP::Harness'                => 0,
+      'Test::Warnings'              => 0,
      },
     recommends         => {
       'AnyDBM_File::Importer'       => 0

@@ -1,11 +1,11 @@
 /*
 @(#)File:           $RCSfile: sqltoken.c,v $
-@(#)Version:        $Revision: 2009.1 $
-@(#)Last changed:   $Date: 2009/02/26 21:35:41 $
+@(#)Version:        $Revision: 2016.1 $
+@(#)Last changed:   $Date: 2016/01/17 19:21:46 $
 @(#)Purpose:        Identify SQL token in string
 @(#)Author:         J Leffler
-@(#)Copyright:      (C) JLSS 1998-2005,2008-09
-@(#)Product:        Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+@(#)Copyright:      (C) JLSS 1998-2005,2008-09,2016
+@(#)Product:        Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
 */
 
 /*TABSTOP=4*/
@@ -32,7 +32,8 @@
 
 #ifndef lint
 /* Prevent over-aggressive optimizers from eliminating ID string */
-const char jlss_id_sqltoken_c[] = "@(#)$Id: sqltoken.c,v 2009.1 2009/02/26 21:35:41 jleffler Exp $";
+extern const char jlss_id_sqltoken_c[];
+const char jlss_id_sqltoken_c[] = "@(#)$Id: sqltoken.c,v 2016.1 2016/01/17 19:21:46 jleffler Exp $";
 #endif /* lint */
 
 /*
@@ -77,17 +78,18 @@ SQLComment sqlcomment(const char *input, int style, const char **bgn, const char
     unsigned char c = *input;
     const char s_hint[] = "+ hint";
     const char s_cmmt[] = " comment";
+    DB_TRACKING();
 
-    TRACE((0, "-->>sqlcomment: <<%.32s%s>>\n", input, (strlen(input) > 32 ? "..." : "")));
+    DB_TRACE(0, "-->>sqlcomment: <<%.32s%s>>\n", input, (strlen(input) > 32 ? "..." : ""));
     while (isspace(c = *input))
         input++;
     *bgn = input;
-    TRACE((0, "----sqlcomment: <<%c>>\n", c));
+    DB_TRACE(0, "----sqlcomment: <<%c>>\n", c);
     if (c != LCURLY && c != DASH && c != SLASH)
     {
         /* It isn't a comment - whatever else it is */
         *end = input;
-        TRACE((0, "<<--sqlcomment: non-comment (0x%02X)\n", **bgn));
+        DB_TRACE(0, "<<--sqlcomment: non-comment (0x%02X)\n", **bgn);
         return(SQL_NOCOMMENT);
     }
     else if ((style & JLSS_INFORMIX_COMMENT) != 0 && c == LCURLY)
@@ -97,11 +99,11 @@ SQLComment sqlcomment(const char *input, int style, const char **bgn, const char
         if ((token = strchr(input + 1, RCURLY)) == 0)
         {
             *end = input + strlen(input);
-            TRACE((0, "<<--sqlcomment: incomplete {%s\n", comment_type));
+            DB_TRACE(0, "<<--sqlcomment: incomplete {%s\n", comment_type);
             return SQL_INCOMPLETE;
         }
         *end = token + 1;
-        TRACE((0, "<<--sqlcomment: complete {%s }\n", comment_type));
+        DB_TRACE(0, "<<--sqlcomment: complete {%s }\n", comment_type);
         return (input[1] == PLUS) ? SQL_OPTIMIZERHINT : SQL_COMMENT;
     }
     else if ((style & JLSS_ISOSQL_COMMENT) != 0 && c == DASH && input[1] == DASH)
@@ -111,11 +113,11 @@ SQLComment sqlcomment(const char *input, int style, const char **bgn, const char
         if ((token = strchr(input + 2, '\n')) == 0)
         {
             *end = input + strlen(input);
-            TRACE((0, "<<--sqlcomment: incomplete --%s\n", comment_type));
+            DB_TRACE(0, "<<--sqlcomment: incomplete --%s\n", comment_type);
             return SQL_INCOMPLETE;
         }
         *end = token + 1;
-        TRACE((0, "<<--sqlcomment: complete --%s\n", comment_type));
+        DB_TRACE(0, "<<--sqlcomment: complete --%s\n", comment_type);
         return (input[2] == PLUS) ? SQL_OPTIMIZERHINT : SQL_COMMENT;
     }
     else if ((style & JLSS_CSTYLE_COMMENT) != 0 && c == SLASH && input[1] == STAR)
@@ -135,19 +137,19 @@ SQLComment sqlcomment(const char *input, int style, const char **bgn, const char
         if (token == 0)
         {
             *end = input + strlen(input);
-            TRACE((0, "<<--sqlcomment: incomplete /*%s\n", comment_type));
+            DB_TRACE(0, "<<--sqlcomment: incomplete /*%s\n", comment_type);
             return SQL_INCOMPLETE;
         }
         else
         {
             *end = token + 2;
-            TRACE((0, "<<--sqlcomment: complete /*%s */\n", comment_type));
+            DB_TRACE(0, "<<--sqlcomment: complete /*%s */\n", comment_type);
             return plus ? SQL_OPTIMIZERHINT : SQL_COMMENT;
         }
     }
     *end = input;
     /* Found, for example, the slash in SELECT a / b AS c ... */
-    TRACE((0, "<<--sqlcomment: non-comment (0x%02X)\n", **bgn));
+    DB_TRACE(0, "<<--sqlcomment: non-comment (0x%02X)\n", **bgn);
     return SQL_NOCOMMENT;
 }
 

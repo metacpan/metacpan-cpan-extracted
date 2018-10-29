@@ -1,5 +1,5 @@
-# @(#)$Id: MANIFEST,v 2015.5 2015/11/01 07:37:01 jleffler Exp $
-# MANIFEST for Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+# @(#)$Id: MANIFEST,v 2018.2 2018/05/11 22:20:21 jleffler Exp $
+# MANIFEST for Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
 Announce
 BugReport
 ChangeLog
@@ -12,7 +12,6 @@ Informix.xs
 InformixTechSupport
 ItWorks
 MANIFEST
-MANIFEST.SKIP
 META.yml
 Makefile.PL
 Notes/FAQ
@@ -25,14 +24,12 @@ Notes/hpux-gcc-build.sh
 Notes/linux
 Notes/load.unload
 Notes/nonroot.install
-Notes/nt
 Notes/olipcshm
 Notes/static.build
 Notes/web.servers
 README
 Release.Checklist
 TODO
-apply.setminref.sh
 bug-lvcnn.ec
 bug-lvcnn.pl
 dbdattr.ec
@@ -40,10 +37,6 @@ dbdimp.ec
 dbdimp.h
 dbdixmap.h
 debug.h
-decfix.c
-decsci.c
-decsci.h
-decsetexp.c
 dumpesql.h
 eprintf.c
 esql5_00.h
@@ -51,14 +44,10 @@ esql7_20.h
 esql_ius.h
 esqlbasic.ec
 esqlc.h
-esqlc_v5.ec
 esqlc_v6.ec
-esqlcc.pl
 esqlcver.ec
-esqlld.pl
 esqllib.h
 esqlperl.h
-esqlsed.pl
 esqltest.ec
 esqltype.h
 esqlutil.h
@@ -82,7 +71,6 @@ ifmxdec.h
 inc/ExtUtils/AutoInstall.pm
 ixblob.ec
 ixblob.h
-jtypes.c
 kludge.c
 kludge.h
 lib/Bundle/DBD/Informix.pm
@@ -166,7 +154,6 @@ t/t96bigint.t
 t/t98pod.t
 t/t99clean.t
 test.all.sh
-test.c4gl.sh
 test.one.sh
 test.quiet.sh
 test.run.sh

@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 
-unless(Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS()) {
+unless(Math::MPFR::_MPFR_WANT_DECIMAL64()) {
   print "1..1\n";
   warn "\n Skipping all tests - Math::MPFR not built with MPFR_WANT_DECIMAL_FLOATS defined\n";
   print "ok 1\n";
@@ -22,7 +22,7 @@ if($@) {
   exit 0;
 }
 
-my $proceed = Math::MPFR::_MPFR_WANT_DECIMAL_FLOATS();
+my $proceed = Math::MPFR::_MPFR_WANT_DECIMAL64();
 
 if($proceed) {
   Rmpfr_set_default_prec(55); # Using complementary Rounding Modes needs prec of 55.

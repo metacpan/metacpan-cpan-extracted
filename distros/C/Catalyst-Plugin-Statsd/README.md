@@ -4,7 +4,7 @@ Catalyst::Plugin::Statsd - log Catalyst stats to statsd
 
 # VERSION
 
-version v0.2.0
+version v0.3.0
 
 # SYNOPSIS
 
@@ -31,6 +31,14 @@ __PACKAGE__->config(
 This plugin will log [Catalyst](https://metacpan.org/pod/Catalyst) timing statistics to statsd.
 
 # METHODS
+
+## `statsd_client`
+
+```
+$c->statsd_client;
+```
+
+Returns the statsd client.
 
 ## `statsd_metric_name_filter`
 

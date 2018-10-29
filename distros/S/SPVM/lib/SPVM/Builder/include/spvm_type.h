@@ -24,7 +24,11 @@ enum {
   SPVM_TYPE_C_RUNTIME_TYPE_VALUE_LONG,
   SPVM_TYPE_C_RUNTIME_TYPE_VALUE_FLOAT,
   SPVM_TYPE_C_RUNTIME_TYPE_VALUE_DOUBLE,
-  SPVM_TYPE_C_RUNTIME_TYPE_OBJECT,
+  SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT,
+  SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE,
+  SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY,
+  SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY,
+  SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY,
   SPVM_TYPE_C_RUNTIME_TYPE_REF_BYTE,
   SPVM_TYPE_C_RUNTIME_TYPE_REF_SHORT,
   SPVM_TYPE_C_RUNTIME_TYPE_REF_INT,
@@ -37,6 +41,7 @@ enum {
   SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_LONG,
   SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_FLOAT,
   SPVM_TYPE_C_RUNTIME_TYPE_REF_VALUE_DOUBLE,
+  SPVM_TYPE_C_RUNTIME_TYPE_VOID,
 };
 
 
@@ -46,8 +51,8 @@ struct SPVM_type {
   int32_t dimension;
   int32_t flag;
   int32_t sub_rel_id;
-  int8_t is_self;
   int32_t info_constant_id;
+  int8_t is_self;
 };
 
 SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler);
@@ -57,6 +62,8 @@ int32_t SPVM_TYPE_has_interface(
   int32_t package_basic_type_id, int32_t package_type_dimension, int32_t package_type_flag,
   int32_t interface_basic_type_id, int32_t interface_type_dimension, int32_t interface_type_flag
 );
+
+int32_t SPVM_TYPE_get_runtime_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 SPVM_TYPE* SPVM_TYPE_create_void_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_create_undef_type(SPVM_COMPILER* compiler);

@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -271,6 +271,9 @@ sub _map_type {
         if ( $db_type =~ /^(?:text|varchar)/i ) {
             %conf = ( type => 'string' );
         }
+        elsif ( $db_type =~ /^(?:boolean)/i ) {
+            %conf = ( type => 'boolean' );
+        }
         elsif ( $db_type =~ /^(?:int|integer|smallint|bigint|tinyint|rowid)/i ) {
             %conf = ( type => 'integer' );
         }
@@ -305,7 +308,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 

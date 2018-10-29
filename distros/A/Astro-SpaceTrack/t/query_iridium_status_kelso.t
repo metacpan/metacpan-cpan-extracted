@@ -21,12 +21,15 @@ $st->set(
     iridium_status_format	=> 'kelso',
 );
 
-is_success $st, 'iridium_status', 'Get Iridium status (Kelso)';
+SKIP: {
 
-is $st->content_type(), 'iridium-status',
-    "Content type is 'iridium-status'";
+    is_success_or_skip $st, 'iridium_status', 'Get Iridium status (Kelso)', 2;
 
-is $st->content_source(), 'kelso', "Content source is 'kelso'";
+    is $st->content_type(), 'iridium-status',
+	"Content type is 'iridium-status'";
+
+    is $st->content_source(), 'kelso', "Content source is 'kelso'";
+}
 
 done_testing;
 

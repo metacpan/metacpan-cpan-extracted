@@ -1,38 +1,42 @@
-0.08 20161003
-    ! Identify h++ files correctly
+0.09 2018-10-28
+    * Re-release with correct META.* information
+    * No upgrade necessary
+
+0.08 2016-10-03
+    * Identify h++ files correctly
 
       On versions 5.10+, the "h++" was identified as a possessive RE quantifier,
       which made the code silently misbehave. CPAN Testers++ for testing
       with 5.8.x, where this part of the code failed.
 
-0.07 20191002
-    . Fix the version-based prerequisites
+0.07 2019-10-02
+    * Fix the version-based prerequisites
       There was one more mention of 5.022 in the code.
-    + Add ->mime_type_from_name() to also allow for name-based detection
+    * Add ->mime_type_from_name() to also allow for name-based detection
       of file types
 
-0.06 20161001
-    . 5.20 also supports signatures natively so we don't need to load
+0.06 2016-10-01
+    * 5.20 also supports signatures natively so we don't need to load
       Filter::signatures there.
-    . No code changes, no need to upgrade
+    * No code changes, no need to upgrade
 
-0.05 20160929
-    . Bump the prerequisite Filter::signatures to 0.05, which bumps
+0.05 2016-09-29
+    * Bump the prerequisite Filter::signatures to 0.05, which bumps
       the required version of Filter::Simple to 0.91
-    . No code changes, no need to upgrade
+    * No code changes, no need to upgrade
 
-0.04 20160927
-    + Correct the bug report address and repository, reported by Zaki Mughal
-    . No code changes, no need to upgrade
+0.04 2016-09-27
+    * Correct the bug report address and repository, reported by Zaki Mughal
+    * No code changes, no need to upgrade
 
-0.03 20160922
-    + Add 00-load.t to dump the modules loaded on this environment
+0.03 2016-09-22
+    * Add 00-load.t to dump the modules loaded on this environment
       Mostly used for easier debugging of minimal prerequisite versions
 
-0.02 20160921
-    ! Also support \x -style hex escapes
+0.02 2016-09-21
+    * Also support \x -style hex escapes
       This fixes the detection of PNG images
-    . Move MIME::Detect::Type into its own file
+    * Move MIME::Detect::Type into its own file
 
-0.01 20160920
-    - The module escapes
+0.01 2016-09-20
+    * The module escapes

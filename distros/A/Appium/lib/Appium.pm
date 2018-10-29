@@ -1,5 +1,5 @@
 package Appium;
-$Appium::VERSION = '0.0803';
+$Appium::VERSION = '0.0804';
 # ABSTRACT: Perl bindings to the Appium mobile automation framework (WIP)
 use Carp qw/croak/;
 use feature qw/state/;
@@ -27,10 +27,11 @@ use constant FINDERS => {
     accessibility_id    => 'accessibility id'
 };
 
-has '+desired_capabilities' => (
+has 'desired_capabilities' => (
     is => 'rw',
     required => 1,
     alias => 'caps',
+    predicate => 1
 );
 
 has '_type' => (
@@ -93,6 +94,12 @@ sub BUILD {
     my ($self) = @_;
 
     $self->_type($self->desired_capabilities->{platformName});
+
+    Moo::Role->apply_roles_to_object( $self, 'Appium::Ios::CanPage' )
+        if $self->is_ios;
+
+    Moo::Role->apply_roles_to_object( $self, 'Appium::Android::CanPage' )
+        if $self->is_android;
 }
 
 
@@ -380,72 +387,14 @@ sub set_network_connection {
 }
 
 
-
-sub page {
-    my ($self) = @_;
-
-    $self->_get_page;
-}
-
-sub _get_page {
-    my ($self, $element, $level) = @_;
-    return 'TODO: implement page on android' if $self->is_android;
-
-    $element //= $self->_source_window_with_children;
-    $level //= 0;
-    my $indent = '  ' x $level;
-
-    # App strings are found in an actual file in the app package
-    # somewhere, so I'm assuming we don't have to worry about them
-    # changing in the middle of our app execution. This may very well
-    # turn out to be a false assumption.
-    state $strings = $self->app_strings;
-
-    my @details = qw/name label value hint/;
-    if ($element->{visible}) {
-        print $indent .  $element->{type} . "\n";
-        foreach (@details) {
-            my $detail = $element->{$_};
-            if ($detail) {
-                print $indent .  '  ' . $_ . "\t: " . $detail  . "\n" ;
-
-                foreach my $key (keys %{ $strings }) {
-                    my $val = $strings->{$key};
-                    if ($val =~ /$detail/) {
-                        print $indent .  '  id  ' . "\t: " . $key . ' => ' . $val . "\n";
-                    }
-                }
-            }
-        }
-    }
-
-    $level++;
-    my @children = @{ $element->{children} };
-    foreach (@children) {
-        $self->_get_page($_, $level);
-    }
-}
-
-sub _source_window_with_children {
-    my ($self, $index) = @_;
-    $index //= 0;
-
-    my $window = $self->execute_script('UIATarget.localTarget().frontMostApp().windows()[' . $index . '].getTree()');
-    if (scalar @{ $window->{children} }) {
-        return $window;
-    }
-    else {
-        return $self->_source_window_with_children(++$index);
-    }
-}
-
 sub is_android {
-    return shift->_type eq 'Android'
+    return shift->_type eq 'Android';
 }
 
 sub is_ios {
-    return shift->_type eq 'iOS'
+    return shift->_type eq 'iOS';
 }
+
 
 
 1;
@@ -464,7 +413,7 @@ Appium - Perl bindings to the Appium mobile automation framework (WIP)
 
 =head1 VERSION
 
-version 0.0803
+version 0.0804
 
 =head1 SYNOPSIS
 
@@ -552,6 +501,29 @@ Here are some examples of using the Appium specific strategies:
 
 Note that using C<id> as your finding strategy also seems to find
 elements by accessibility_id.
+
+If you have Selenium::Remote::Driver v0.24 or later, you'll also have
+access to these non-croaking, auto-generated parameter versions of the
+finders; see L</Selenium::Remote::Driver/find_element> for more
+information. These subs take one argument: the locator for the element
+you want, and they'll throw a warning and return C<0> if an element is
+not found.
+
+    find_element_by_id
+    find_element_by_name
+    find_element_by_xpath
+    find_element_by_class
+    find_element_by_accessibility_id
+    find_element_by_ios
+    find_element_by_android
+    find_element_by_class
+    find_element_by_css
+    find_element_by_id
+    find_element_by_link
+    find_element_by_name
+    find_element_by_partial_link_text
+    find_element_by_tag_name
+    find_element_by_xpath
 
 =head1 METHODS
 
@@ -759,29 +731,10 @@ information.
 
 =head2 page
 
-A shadow of L<arc|https://github.com/appium/ruby_console>'s page
-command, this will print to STDOUT a list of all the visible elements
-on the page along with whatever details are available (name, label,
-value, etc). It's currently only compatible with iOS, and it doesn't
-take filtering arguments like arc's version of page does.
-
-    $appium->page;
-    # UIAWindow
-    #   UIATextField
-    #     name          : IntegerA
-    #     label         : TextField1
-    #     value         : 5
-    #     UIATextField
-    #       name        : TextField1
-    #       label       : TextField1
-    #       value       : 5
-    #   UIATextField
-    #     name          : IntegerB
-    #     label         : TextField2
-    #     UIATextField
-    #       name        : TextField2
-    #       label       : TextField2
-    # ...
+Display a quick summary of all interesting elements on the current
+view. See L<Appium::Android::CanPage> for more information about the
+Android implementation, and L<Appium::Ios::CanPage> for the iOS
+implementation.
 
 =head1 SEE ALSO
 

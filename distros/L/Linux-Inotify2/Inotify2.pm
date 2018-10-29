@@ -80,7 +80,7 @@ use common::sense;
 use Exporter qw(import);
 
 BEGIN {
-   our $VERSION = '2.0';
+   our $VERSION = '2.1';
    our @EXPORT = qw(
       IN_ACCESS IN_MODIFY IN_ATTRIB IN_CLOSE_WRITE
       IN_CLOSE_NOWRITE IN_OPEN IN_MOVED_FROM IN_MOVED_TO
@@ -270,8 +270,6 @@ sub read {
    my @res;
 
    for (@ev) {
-      $_->{wd}=-1; $_->{mask} = IN_Q_OVERFLOW;#d#
-
       exists $self->{ignore}{$_->{wd}}
          and next; # watcher has been canceled
 

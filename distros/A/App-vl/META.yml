@@ -20,7 +20,7 @@ name: App-vl
 provides:
   App::vl:
     file: lib/App/vl.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Getopt::Long: '2.42'
   IO::Pager: '0'
@@ -32,5 +32,5 @@ resources:
   bugtracker: http://github.com/bayashi/App-vl/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/bayashi/App-vl
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

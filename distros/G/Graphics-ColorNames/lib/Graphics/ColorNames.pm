@@ -16,7 +16,7 @@ use File::Spec::Functions qw/ file_name_is_absolute /;
 use Module::Load 0.10;
 use Module::Loaded;
 
-our $VERSION = 'v3.3.1';
+our $VERSION = 'v3.3.3';
 
 our %EXPORT_TAGS = (
     'all'     => [qw( hex2tuple tuple2hex all_schemes )],
@@ -27,7 +27,7 @@ our @EXPORT    = ();
 
 sub VERSION {
     my ( $class, $wanted ) = @_;
-    return version->parse($VERSION)->numify;
+    return version->parse($VERSION);
 }
 
 # We store Schemes in a hash as a quick-and-dirty way to filter
@@ -382,7 +382,7 @@ Graphics::ColorNames - defines RGB values for common color names
 
 =head1 VERSION
 
-version v3.3.1
+version v3.3.3
 
 =head1 SYNOPSIS
 

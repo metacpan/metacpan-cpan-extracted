@@ -12,18 +12,19 @@ $have_atonv = MPFR_VERSION <= 196869 ? 0 : 1;
 
 if($have_atonv) {
 
-  my($nv1, $nv2);
+  my($nv1, $nv2, $double);
 
   my $ws = Rmpfr_init2($Math::MPFR::BITS);
 
   if($Config::Config{nvtype} eq 'double' ||
       ($Config::Config{nvtype} eq 'long double' && ($Config::Config{nvsize} == 8 ||
                                                     Math::MPFR::_required_ldbl_mant_dig() == 2098))) {
+    $double = atodouble('0b0.100001e-1074');
     $nv1 = atonv($ws, '0b0.100001e-1074');
     $nv2 = atonv($ws, '4.96e-324');
-    if($nv1 == $nv2 && $nv1 > 0) {print "ok 1\n"}
+    if($nv1 == $nv2 && $double == $nv2 && $nv1 > 0) {print "ok 1\n"}
     else {
-      warn "\n \$nv1: $nv1\n \$nv2: $nv2\n";
+      warn "\n \$double: $double\n \$nv1: $nv1\n \$nv2: $nv2\n";
       print "not ok 1\n";
     }
 

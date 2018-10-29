@@ -38,5 +38,6 @@ xt/basic.t
 xt/immutable_core_for_update.t
 xt/mandatory_on_create.t
 xt/queue_change.t
+xt/require_owner_for_resolve.t
 xt/required_fields.t
 SIGNATURE                                Public-key signature (added by MakeMaker)

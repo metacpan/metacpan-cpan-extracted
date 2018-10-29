@@ -3,7 +3,7 @@ package Function::Return;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use attributes ();
 use Sub::Util ();
@@ -88,31 +88,36 @@ sub wrap_sub {
         }
     }
 
-    my $wrapped = sub {
-        _croak "Required list context in fun $shortname"
-            if @$types > 1 && !wantarray;
+    my $src = q|
+sub {
+    _croak "Required list context in fun $shortname"
+        if @$types > 1 && !wantarray;
 
-        # force LIST context.
-        #   reason: https://metacpan.org/pod/Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef
-        my @ret = &Scope::Upper::uplevel($sub, @_, &Scope::Upper::CALLER(0));
+    # force LIST context.
+    my @ret = &Scope::Upper::uplevel($sub, @_, &Scope::Upper::CALLER(0));
 
-        # return Empty List
-        return if @$types == 0 && !@ret;
+    # return Empty List
+    return if @$types == 0 && !@ret;
 
-        _croak "Too few return values for fun $shortname (expected @$types, got @{[map { defined $_ ? $_ : 'undef' } @ret]})" if @ret < @$types;
-        _croak "Too many return values for fun $shortname (expected @$types, got @{[map { defined $_ ? $_ : 'undef' } @ret]})" if @ret > @$types;
+    _croak "Too few return values for fun $shortname (expected @$types, got @{[map { defined $_ ? $_ : 'undef' } @ret]})" if @ret < @$types;
+    _croak "Too many return values for fun $shortname (expected @$types, got @{[map { defined $_ ? $_ : 'undef' } @ret]})" if @ret > @$types;
 
-        for my $i (0 .. $#$types) {
-            my $type  = $types->[$i];
-            my $value = $ret[$i];
-            _croak "Invalid return in fun $shortname: return $i: @{[$type->get_message($value)]}" unless $type->check($value);
-        }
+    for my $i (0 .. $#$types) {
+        my $type  = $types->[$i];
+        my $value = $ret[$i];
+        _croak "Invalid return in fun $shortname: return $i: @{[$type->get_message($value)]}" unless $type->check($value);
+    }
 
-        return @$types > 1 ? @ret # multi return
-             : $ret[0]            # single return
-    };
+    return @$types > 1 ? @ret # multi return
+         : $ret[0]            # single return
+};
+|;
 
-    return $wrapped;
+    my $code = eval $src; ## no critic
+    if ($@) {
+        _croak $@;
+    }
+    return $code;
 }
 
 sub _get_parameters_info {
@@ -129,8 +134,8 @@ sub _set_parameters_info {
         $info->keyword,
         $info->nshift,
         map {
-            my @params = $info->$_;
-            @params ? [ map { $_->name, $_->type } @params ] : []
+            my $params = $info->{"_$_"};
+            [ map { $_->name, $_->type } @$params ]
         } qw(
             positional_required
             positional_optional

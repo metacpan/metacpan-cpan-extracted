@@ -22,7 +22,7 @@ use Specio::Library::Builtins;
         [ line       => 42 ],
         [ package    => 'main' ],
         [ subroutine => 'main::t1' ],
-        ) {
+    ) {
 
         my ( $key, $expect ) = @{$pair};
         is(
@@ -39,7 +39,7 @@ use Specio::Library::Builtins;
         [ line       => 84 ],
         [ package    => 'main' ],
         [ subroutine => 'main::t2' ],
-        ) {
+    ) {
 
         my ( $key, $expect ) = @{$pair};
         is(
@@ -68,7 +68,7 @@ use Specio::Library::Builtins;
         [ $from_t,            't(...)' ],
         [ t('ArrayRefOfInt'), 'named type' ],
         [ $anon,              'anon type' ],
-        ) {
+    ) {
 
         my ( $arrayref_of_int, $desc ) = @{$pair};
 

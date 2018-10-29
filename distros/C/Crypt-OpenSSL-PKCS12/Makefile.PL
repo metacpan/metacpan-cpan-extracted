@@ -1,12 +1,13 @@
 # $Id: Makefile.PL 10 1998-12-16 23:02:45Z daniel $
 
+BEGIN { push @INC, '.' unless $INC[-1] eq '.' }
 use inc::Module::Install;
 
 use Config;
 
 name('Crypt-OpenSSL-PKCS12');
 license('perl');
-perl_version('5.005');
+perl_version('5.006');
 all_from('PKCS12.pm');
 
 homepage 'https://github.com/dsully/perl-crypt-openssl-pkcs12';

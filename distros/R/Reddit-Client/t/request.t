@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Carp;
+use Data::Dumper;
 use HTTP::Response;
 use Test::MockModule;
 use Test::More tests => 15;

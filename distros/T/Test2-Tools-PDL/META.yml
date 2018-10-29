@@ -1,0 +1,37 @@
+---
+abstract: 'Test2 tools for verifying Perl Data Language piddles'
+author:
+  - 'Stephan Loyd <sloyd@cpan.org>'
+build_requires:
+  PDL::Core: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Tools-PDL
+provides:
+  Test2::Tools::PDL:
+    file: lib/Test2/Tools/PDL.pm
+    version: '0.0001'
+requires:
+  Exporter: '0'
+  Safe::Isa: '0'
+  Scalar::Util: '0'
+  Test2::API: '0'
+  Test2::Compare: '0'
+  Test2::Compare::Float: '0'
+  Test2::Tools::Compare: '0'
+  Test2::Util::Ref: '0'
+  Test2::Util::Table: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/stphnlyd/perl5-Test2-Tools-PDL.git
+version: '0.0001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

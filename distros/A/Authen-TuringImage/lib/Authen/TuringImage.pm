@@ -1,9 +1,9 @@
 # -*-cperl-*-
 #
 # Authen::TuringImage - Image based Turing test
-# Copyright (c) 2001-2017 Ashish Gulhati <authen-ti at hash.neo.tc>
+# Copyright (c) Ashish Gulhati <authen-ti at hash.neo.tc>
 #
-# $Id: lib/Authen/TuringImage.pm v1.006 Fri Jun 16 03:00:07 PDT 2017 $
+# $Id: lib/Authen/TuringImage.pm v1.008 Sat Oct 27 21:04:57 PDT 2018 $
 
 package Authen::TuringImage;
 
@@ -11,8 +11,9 @@ use GD;
 use Bytes::Random::Secure;
 use File::Share ':all';
 #use PAR;
+use vars qw( $VERSION $AUTOLOAD );
 
-( $VERSION ) = '$Revision: 1.006 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.008 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   bless { FONTPATH       =>   $ENV{'PAR_TEMP'} ? $ENV{'PAR_TEMP'} . '/inc/misc/TTF/' : dist_dir('Authen-TuringImage') . '/',
@@ -98,8 +99,8 @@ Authen::TuringImage - Image based Turing test (CAPTCHA)
 
 =head1 VERSION
 
- $Revision: 1.006 $
- $Date: Fri Jun 16 03:00:07 PDT 2017 $
+ $Revision: 1.008 $
+ $Date: Sat Oct 27 21:04:57 PDT 2018 $
 
 =head1 SYNOPSIS
 
@@ -184,10 +185,11 @@ L<http://search.cpan.org/dist/Authen-TuringImage/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2001-2017 Ashish Gulhati.
+Copyright (c) Ashish Gulhati.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the Artistic License 2.0.
+This software package is Open Software; you can use, redistribute,
+and/or modify it under the terms of the Open Artistic License 1.0.
 
-See http://www.perlfoundation.org/artistic_license_2_0 for the full
-license terms.
+Please see L<http://www.opensoftwr.org/oal10.txt> for the full license
+terms. By using or modifying this software, you indicate your
+agreement with the license terms.

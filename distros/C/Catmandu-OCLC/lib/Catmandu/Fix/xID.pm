@@ -65,11 +65,11 @@ Catmandu::Fix::xID - query the OCLC xID service
 	# Retrieve a list of ISSNs in same group as the requested ISSN.
 	xID('my.issn','xissn','getEditions')
 
-	# Retrieve a list of ISSNs in same group as the requested ISSN, 
+	# Retrieve a list of ISSNs in same group as the requested ISSN,
 	# as well as preceding/succeeding groups
 	xID('my.issn','xissn','getHistory')
 
-	# Retrieve a list of ISSNs and its production form information 
+	# Retrieve a list of ISSNs and its production form information
 	# in same group as the requested ISSN.
 	xID('my.issn','xissn','getForms')
 
@@ -84,7 +84,9 @@ Catmandu::Fix::xID - query the OCLC xID service
 
 =head1 DESCRIPTION
 
-Submit an identifer such as an ISBN, ISSN, or OCLC Number to the OCLC xID service, and 
+**WARNING** : This OCLC service has been taken offline on 2018-08-23
+
+Submit an identifer such as an ISBN, ISSN, or OCLC Number to the OCLC xID service, and
 it returns a list of related identifiers and selected metadata.
 
 Access of 1000 queries/day is available to anyone.

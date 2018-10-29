@@ -103,7 +103,7 @@ Parse lines by simple spaces delimiter. It's for C<ps> command.
       PID TTY          TIME CMD
       605 pts/6    00:00:00 bash
      2561 pts/6    00:00:00 ps
-    $ ps | head -n3 | vl
+    $ ps | head -n3 | vl --ps
     ********** 1 ********************
      PID: 605
      TTY: pts/6
@@ -117,11 +117,11 @@ Parse lines by simple spaces delimiter. It's for C<ps> command.
 
 =head3 separator
 
-By default, this is ': '
+By default, this option is ': '
 
 =head3 line-char
 
-By default, this is '*'
+By default, this option is '*'
 
 
 =head1 AUTHOR

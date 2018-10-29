@@ -1,3 +1,14 @@
+0.037		2018-10-28	T. R. Wyant
+    Fix test failure in t/locale.t. I hope. Some of the CPAN testers
+    get errors like
+
+      do "t/locale/fu_BAR.pm" failed, '.' is no longer in @INC; did you
+      mean do "./t/locale/fu_BAR.pm"? at ...
+      gglib/Astro/App/Satpass2/Locale.pm line 210.
+
+    but I can't duplicate this, even under Perls that manifestly do not
+    have '.' or any facimile thereof in @INC.
+
 0.036		2018-10-17	T. R. Wyant
     Support alternate Sun and Moon classes, and other bodies that
     contain built-in models (e.g. Astro::Coord::ECI::VSOP87D::*).

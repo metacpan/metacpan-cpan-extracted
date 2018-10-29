@@ -1,21 +1,26 @@
 Revision history for Perl extension JCM::Net::Patricia.
 
-1.03 - 2017-09-15  J. Maslak <jmaslak@antelope.net>
+1.04 - 2018-10-28  Joelle Maslak <jmaslak@antelope.net>
+    - Merged documentation and metadata changes from Dylan Hardison
+    - Additional author name updates
+    - No functional changes
+
+1.03 - 2017-09-15  Joelle Maslak <jmaslak@antelope.net>
     - Update author name
     - No functional changes
 
-1.02 - 2016-09-17  J. Maslak <jmaslak@antelope.net>
+1.02 - 2016-09-17  Joelle Maslak <jmaslak@antelope.net>
     - Fixed test_dynamic not found issue on *BSD
     - Slightly reorganized directory structure
     - Added test for null results
 
-1.01 - 2016-09-04  J. Maslak <jmaslak@antelope.net>
+1.01 - 2015-09-04  Joelle Maslak <jmaslak@antelope.net>
     - Added matching_prefix_string() and matching_prefix_integer()
       methods that function similar to match_string() and
       match_integer(), but return the prefix instead of any user
       data.
 
-1.00 - 2016-09-03  J. Maslak <jmaslak@antelope.net>
+1.00 - 2015-09-03  Joelle Maslak <jmaslak@antelope.net>
     - First forked version
     - Tests all pass
     - climb()/climb_inorder() pass the node's subnet as the second

@@ -1,18 +1,18 @@
 # This file is manually maintained
 .perlcriticrc
 .perl-version
-.travis.yml.HOLD
 Changes
 contrib.bat
-dist.ini.old
 examples.bat
 Makefile.PL
 MANIFEST
 pc.bat
 t-tests.bat
+INFO/.travis.yml.HOLD
 INFO/Changes_2017
 INFO/Changes-ver_2
 INFO/DEPRECATED
+INFO/dist.ini.old
 INFO/KNOWN_INCOMP
 INFO/LICENSE
 INFO/PATENTS
@@ -145,6 +145,7 @@ lib/PDF/Builder/Resource/XObject/Image/GD.pm
 lib/PDF/Builder/Resource/XObject/Image/GIF.pm
 lib/PDF/Builder/Resource/XObject/Image/JPEG.pm
 lib/PDF/Builder/Resource/XObject/Image/PNG.pm
+lib/PDF/Builder/Resource/XObject/Image/PNG_IPL.pm
 lib/PDF/Builder/Resource/XObject/Image/PNM.pm
 lib/PDF/Builder/Resource/XObject/Image/TIFF.pm
 lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm

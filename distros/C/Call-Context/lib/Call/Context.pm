@@ -18,11 +18,27 @@ Call::Context - Sanity-check calling context
         return (1, 2, 3);
     }
 
-    gives_a_list();             #die()s: incorrect context (void)
+    gives_a_list();             # die()s: incorrect context (void)
 
-    my $v = gives_a_list();     #die()s: incorrect context (scalar)
+    my $v = gives_a_list();     # die()s: incorrect context (scalar)
 
-    my @list = gives_a_list();  #lives
+    my @list = gives_a_list();  # lives
+
+    #----------------------------------------------------------------------
+
+    sub scalar_is_bad {
+
+        #Will die() if the context is not list.
+        Call::Context::must_not_be_scalar();
+
+        return (1, 2, 3);
+    }
+
+    scalar_is_bad();            # lives
+
+    my $v = scalar_is_bad();    # die()s: incorrect context (scalar)
+
+    my @list = scalar_is_bad(); # lives
 
 =head1 DISCUSSION
 
@@ -36,6 +52,11 @@ then in production act differently.
 =head2 must_be_list()
 
 C<die()>s if the calling function is itself called outside list context.
+(See the SYNOPSIS for examples.)
+
+=head2 must_not_be_scalar()
+
+C<die()>s if the calling function is itself called in scalar context.
 (See the SYNOPSIS for examples.)
 
 =head1 EXCEPTIONS
@@ -53,12 +74,21 @@ https://github.com/FGasper/p5-Call-Context
 use strict;
 use warnings;
 
-our $VERSION = 0.02;
+our $VERSION = '0.03';
 
 my $_OVERLOADED_X;
 
 sub must_be_list {
-    return if (caller 1)[5];    #wantarray
+    return _must_be_list(0);
+}
+
+sub must_not_be_scalar {
+    return if !defined( (caller 1)[5] );
+    return _must_be_list(1);
+}
+
+sub _must_be_list {
+    return if (caller 2)[5];    #wantarray
 
     $_OVERLOADED_X ||= eval q{
         package Call::Context::X;
@@ -66,7 +96,7 @@ sub must_be_list {
         1;
     };
 
-    die Call::Context::X->_new();
+    die Call::Context::X->_new($_[0]);
 }
 
 #----------------------------------------------------------------------
@@ -76,10 +106,14 @@ package Call::Context::X;
 #Not to be instantiated except from Call::Context!
 
 sub _new {
-    my ($class) = @_;
+    my ($class, $accept_void_yn) = @_;
 
-    my ($sub, $ctx) = (caller 2)[3, 5];
-    my (undef, $cfilename, $cline, $csub) = caller 3;
+    my ($sub, $ctx) = (caller 3)[3, 5];
+    my (undef, $cfilename, $cline, $csub) = caller 4;
+
+    if ($accept_void_yn) {
+        return bless \"$sub called in scalar context from $csub (line $cline of $cfilename)", $class;
+    }
 
     $ctx = defined($ctx) ? 'scalar' : 'void';
 

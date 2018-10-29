@@ -1,5 +1,9 @@
 Revision history for Perl extension Devel-KYTProf-Logger-XRay
 
+0.03 2018-10-26T08:30:08Z
+    - use AWS::XRay::capture in internal
+    - add method, package, file, line to metadata.
+
 0.02 2018-06-15T15:17:16Z
     - follow to AWS::XRay 0.02
 

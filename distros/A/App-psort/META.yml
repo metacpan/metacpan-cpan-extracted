@@ -22,4 +22,4 @@ requires:
   Sort::Naturally: 0
 resources:
   repository: git://github.com/eserte/app-psort.git
-version: 0.08
+version: 0.09

@@ -1,3 +1,6 @@
+0.17 2018-10-26
+ - Add support for Owner as a mandatory field
+
 0.16 2018-09-19
  - Don't check permission to get queue name from ticket in RequiredFields
 

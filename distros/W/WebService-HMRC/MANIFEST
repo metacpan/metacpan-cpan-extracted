@@ -1,0 +1,23 @@
+Changes
+lib/WebService/HMRC.pm
+lib/WebService/HMRC/Authenticate.pm
+lib/WebService/HMRC/Request.pm
+lib/WebService/HMRC/Response.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/00-load.t
+t/01-hmrc-response.t
+t/02-hmrc-request.t
+t/03-hmrc-request-post.t
+t/04-hmrc-authenticate.t
+t/05-hmrc-api.t
+xt/boilerplate.t
+xt/manifest.t
+xt/perlcriticrc
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

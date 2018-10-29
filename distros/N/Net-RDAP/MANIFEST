@@ -1,0 +1,29 @@
+lib/Net/RDAP.pm
+lib/Net/RDAP/Base.pm
+lib/Net/RDAP/EPPStatusMap.pm
+lib/Net/RDAP/Error.pm
+lib/Net/RDAP/Event.pm
+lib/Net/RDAP/ID.pm
+lib/Net/RDAP/Link.pm
+lib/Net/RDAP/Notice.pm
+lib/Net/RDAP/Object.pm
+lib/Net/RDAP/Object/Autnum.pm
+lib/Net/RDAP/Object/Domain.pm
+lib/Net/RDAP/Object/Entity.pm
+lib/Net/RDAP/Object/IPNetwork.pm
+lib/Net/RDAP/Object/Nameserver.pm
+lib/Net/RDAP/Registry.pm
+lib/Net/RDAP/Remark.pm
+lib/Net/RDAP/SearchResult.pm
+lib/Net/RDAP/Service.pm
+lib/Net/RDAP/UA.pm
+lib/Net/RDAP/Values.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+Net-RDAP-0.1/META.json
+Net-RDAP-0.1/META.yml
+README.md
+t/use.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

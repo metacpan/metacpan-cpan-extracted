@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2011,2013,2015,2016 Slaven Rezic. All rights reserved.
+# Copyright (C) 2011,2013,2015,2016,2018 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,7 +15,7 @@ package App::psort;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 1;
 
@@ -26,6 +26,9 @@ __END__
 App::psort - a perl-enhanced sort
 
 =head1 DESCRIPTION
+
+A perl-enhanced variant of L<sort(1)>. The specified files (or
+standard input) are written sorted to standard output.
 
 See L<psort>. The module L<App::psort> is just a placeholder for CPAN.
 

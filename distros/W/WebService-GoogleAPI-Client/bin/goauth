@@ -4,7 +4,7 @@ use strict;
 use warnings;    ## required because I can't work out how to get percritic to use my modern config
 
 package goauth;
-$goauth::VERSION = '0.13';
+$goauth::VERSION = '0.16';
 use Carp;
 use Mojolicious::Lite;
 use Data::Dumper;
@@ -15,6 +15,9 @@ use feature 'say';
 use Net::EmptyPort qw(empty_port);
 
 use Crypt::JWT qw(decode_jwt);
+
+# Remove built-in favicon
+#delete $app->static->extra->{'favicon.ico'};
 
 
 # ABSTRACT: CLI tool with mini http server for negotiating Google OAuth2 Authorisation access tokens that allow offline access to Google API Services on behalf of the user.
@@ -182,6 +185,8 @@ sub runserver
       $c->render( template => 'oauth' );
     }
   };
+
+  #delete $static->extra->{'favicon.ico'};  ## look into https://mojolicious.org/perldoc/Mojolicious/Static with view to repalcing default favicon
   app->secrets( ['putyourownsecretcookieseedhereforsecurity' . time] );    ## NB persistence cookies not required beyond server run
   app->start( 'daemon', '-l', "http://*:$port" );
   return 1;
@@ -203,6 +208,10 @@ sub _stdin
   return $string;
 }
 
+
+
+#  data:image/vnd.microsoft.icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAAAAAAAAAAAACMhSAAAAGUBS04uKWNqJXxyeiK+d4Af2XeAINhweCK4YWcmckdJMCEAAP8AGRdQAAAAAAAAAAAAAAAAAERFMwA1NToKY2kmbH6HH9uOmR39lKAc/5WhHP+VoRz/k58c/42YHfx7hCDSX2QoXSgmQQY8PDgAAAAAAERGNwAzMj4KaXAkjIqVHfmWohz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/laEc/4eRHvRlayV4HRhMBT8/PQD//wAAZGonboqVHfmWohz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/h5Ee819kKlmLmAUATlEzLH+IINuWohz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP96gyHLRkc5G2VrJX+Omh3+lqId/ZaiHviVoRz/laEc/5WhHP+Woh/wlqIf8JWhHfyWoh74laEc/5aiHvmWohz9i5Yd+V5kJ2NzeyHClKAc/5aiH+SbpimjlaEc/5WhHP+YoyLSnagumpynK6+ZpCTVm6YoqJWhHP+ZpSaqlqIf5JKeHP9udSOmeYIf4JWhHP+Woh7enqkxeZikI9SWoh7ynKcrk5umKa6ZpCTOmaQkzZumKZGVoRz+maUllZaiH92UoBz/dHwgxnqDHuGVoRz/lqIe3qGrNW6cpyurnagtjZ2oLpSeqTCen6kxl5umKq6gqjN4mKQj2JqlJ5OWoh/dlKAc/3R9H8h1fSHJlKAc/5aiH92cpiuLlqIe+p2nLYeYpCPJm6Yov5qlJsOXoh/tm6YowpumKb+bpiiPlqIf3ZOfHP9vdyOtZ24kjJCbHP+Woh7nnagufpynK5WbpiihlaEd95WhHP+VoRz/laEc/5WhHP+VoRz/maQkpJejHuKNmB39YWcmb1NWLzeCjB/llqIc/5aiHvWWoh7zlaEd/ZWhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHfWWohz+focg10xONSUAAIgCaG8mg42ZHf6Wohz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/ipUd+mNpKGz//wAAS04xAD9BNhJvdyKmjpkd/paiHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/i5Yd+2tyI5IzMz0LRUY2AAAAqQBRVCsAQUMzFGpxJYuEjh7skp0c/5WhHP+Wohz/lqIc/5WhHP+RnBz/gowf5mZtJns5OjYNR0kwAAAAAAAAAAAAAAAAADc3OgAnJUMFVVkqRGtzI6N5giDgfoge936IHvZ4gSDcaXAjmVFVLDkdGVIDMzJEAAAAAAAAAAAA4AcAAMADAACAAQAAgAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAIABAADAAwAA4AcAAA==
+
 =pod
 
 =encoding UTF-8
@@ -213,14 +222,12 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.13
+version 0.16
 
 =head2 SUMMARY
 
 Supports multiple users
-OAuth2 for Google. You can find the key (CLIENT ID) and secret (CLIENT SECRET) from the app console here under "APIs & Auth" and "Credentials" in the menu at https://console.developers.google.com/project.
-
-# See also https://developers.google.com/+/quickstart/.
+OAuth2 for Google. You can find the key (CLIENT ID) and secret (CLIENT SECRET) from the app console here under "APIs & Auth" and "Credentials" in the menu at https://console.developers.google.com/project .
 
 =head2 QUICK START
 
@@ -330,7 +337,8 @@ curl <a href="https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=<%= $c
 <br/>
 You can check ( and if necessary revoke ) any previously granted permissions for your user account at <a href="https://myaccount.google.com/permissions">https://myaccount.google.com/permissions</a>.
 
-
+@@ favicon.ico (base64)
+AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAAAAAAAAAAAACMhSAAAAGUBS04uKWNqJXxyeiK+d4Af2XeAINhweCK4YWcmckdJMCEAAP8AGRdQAAAAAAAAAAAAAAAAAERFMwA1NToKY2kmbH6HH9uOmR39lKAc/5WhHP+VoRz/k58c/42YHfx7hCDSX2QoXSgmQQY8PDgAAAAAAERGNwAzMj4KaXAkjIqVHfmWohz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/laEc/4eRHvRlayV4HRhMBT8/PQD//wAAZGonboqVHfmWohz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/h5Ee819kKlmLmAUATlEzLH+IINuWohz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP96gyHLRkc5G2VrJX+Omh3+lqId/ZaiHviVoRz/laEc/5WhHP+Woh/wlqIf8JWhHfyWoh74laEc/5aiHvmWohz9i5Yd+V5kJ2NzeyHClKAc/5aiH+SbpimjlaEc/5WhHP+YoyLSnagumpynK6+ZpCTVm6YoqJWhHP+ZpSaqlqIf5JKeHP9udSOmeYIf4JWhHP+Woh7enqkxeZikI9SWoh7ynKcrk5umKa6ZpCTOmaQkzZumKZGVoRz+maUllZaiH92UoBz/dHwgxnqDHuGVoRz/lqIe3qGrNW6cpyurnagtjZ2oLpSeqTCen6kxl5umKq6gqjN4mKQj2JqlJ5OWoh/dlKAc/3R9H8h1fSHJlKAc/5aiH92cpiuLlqIe+p2nLYeYpCPJm6Yov5qlJsOXoh/tm6YowpumKb+bpiiPlqIf3ZOfHP9vdyOtZ24kjJCbHP+Woh7nnagufpynK5WbpiihlaEd95WhHP+VoRz/laEc/5WhHP+VoRz/maQkpJejHuKNmB39YWcmb1NWLzeCjB/llqIc/5aiHvWWoh7zlaEd/ZWhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHfWWohz+focg10xONSUAAIgCaG8mg42ZHf6Wohz/laEc/5WhHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/ipUd+mNpKGz//wAAS04xAD9BNhJvdyKmjpkd/paiHP+VoRz/laEc/5WhHP+VoRz/laEc/5WhHP+Wohz/i5Yd+2tyI5IzMz0LRUY2AAAAqQBRVCsAQUMzFGpxJYuEjh7skp0c/5WhHP+Wohz/lqIc/5WhHP+RnBz/gowf5mZtJns5OjYNR0kwAAAAAAAAAAAAAAAAADc3OgAnJUMFVVkqRGtzI6N5giDgfoge936IHvZ4gSDcaXAjmVFVLDkdGVIDMzJEAAAAAAAAAAAA4AcAAMADAACAAQAAgAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAIABAADAAwAA4AcAAA==
 
 
 

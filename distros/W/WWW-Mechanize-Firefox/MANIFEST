@@ -16,10 +16,6 @@ examples/scrape-ff.pl
 examples/screenshot.pl
 examples/tail-console.pl
 examples/urlbar.pl
-inc/IO/Catch.pm
-inc/Test/HTTP/cookie-server
-inc/Test/HTTP/LocalServer.pm
-inc/Test/HTTP/log-server
 INSTALL
 lib/Firefox/Application.pm
 lib/Firefox/Application/API35.pm
@@ -34,6 +30,7 @@ lib/WWW/Mechanize/Firefox/Examples.pm
 lib/WWW/Mechanize/Firefox/FAQ.pod
 lib/WWW/Mechanize/Firefox/Installation.pod
 lib/WWW/Mechanize/Firefox/Troubleshooting.pod
+LICENSE
 Makefile.PL
 makeppd.pl
 MANIFEST			This list of files
@@ -154,13 +151,6 @@ t/70-urlbar-2.html
 t/70-urlbar.html
 t/70-urlbar.t
 t/75-save_url-cookies.t
-t/99-changes.t
-t/99-examples.t
-t/99-manifest.t
-t/99-pod.t
-t/99-todo.t
-t/99-unix-text.t
-t/99-versions.t
 t/helper.pm
 t/mechanize/autocheck.t
 t/mechanize/content.t
@@ -169,13 +159,17 @@ t/rt65615.html
 t/rt65615.t
 t/rt78706.t
 t/rt84418.t
+t/rt88100-continuation.t
+t/sample.html
 t/select.html
 t/select.t
 t/sophos_co_jp_index.html
 xt/99-changes.t
+xt/99-compile.t
 xt/99-examples.t
 xt/99-manifest.t
 xt/99-pod.t
 xt/99-todo.t
 xt/99-unix-text.t
 xt/99-versions.t
+xt/meta-lint.t

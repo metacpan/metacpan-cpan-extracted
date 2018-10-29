@@ -17,11 +17,14 @@ $skip = site_check 'www.amsat.org'
 
 my $st = Astro::SpaceTrack->new();
 
-is_success $st, 'amsat', 'Radio Amateur Satellite Corporation';
+SKIP: {
 
-is $st->content_type(), 'orbit', "Content type is 'orbit'";
+    is_success_or_skip $st, 'amsat', 'Radio Amateur Satellite Corporation', 2;
 
-is $st->content_source(), 'amsat', "Content source is 'amsat'";
+    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+
+    is $st->content_source(), 'amsat', "Content source is 'amsat'";
+}
 
 done_testing;
 

@@ -16,6 +16,7 @@ t/04_sampling.t
 t/05_sampled_header.t
 t/06_sampler.t
 t/07_buffer.t
+t/08_add.t
 t/Util.pm
 xt/01_overhead.t
 META.yml

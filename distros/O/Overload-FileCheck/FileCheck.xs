@@ -37,6 +37,19 @@
   gl_overload_ft->op[op_type].real_pp = PL_ppaddr[op_type]; \
   PL_ppaddr[op_type] = f;
 
+/* TODO: need to improve for Perl <= 5.014 */
+#define RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV() STMT_START { \
+    if (gl_overload_ft->op[OP_STAT].is_mocked) { \
+      SV *const arg = *PL_stack_sp; \
+      GV *gv =  MAYBE_DEREF_GV(arg); \
+      /* printf ("### XXX ---> arg %d %p vs GV %p vs defgv %p \n", SvFLAGS(arg), *PL_stack_sp, gv, PL_defgv ); */ \
+      /* get the GV from the arg if it s not a GV */ \
+      if ( SvTYPE(arg) == SVt_NULL || gv == PL_defgv ) { \
+        return CALL_REAL_OP(); \
+      } \
+    } \
+  } STMT_END
+
 /* a Stat_t struct has 13 elements */
 #define STAT_T_MAX 13
 
@@ -230,6 +243,7 @@ int _overload_ft_stat(Stat_t *stat, int *size) {
   return check_status;
 }
 
+
 /* a generic OP to overload the FT OPs returning yes or no */
 /* FIXME also need to handle undef */
 PP(pp_overload_ft_yes_no) {
@@ -239,8 +253,7 @@ PP(pp_overload_ft_yes_no) {
 
   /* not currently mocked */
   RETURN_CALL_REAL_OP_IF_UNMOCK();
-
-//Perl_warn(".... continue" );
+  RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV();
 
   check_status = _overload_ft_ops();
 
@@ -263,6 +276,8 @@ PP(pp_overload_ft_int) {
 
   /* not currently mocked */
   RETURN_CALL_REAL_OP_IF_UNMOCK();
+  RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV();
+
   check_status = _overload_ft_ops();
 
   /* SETERRNO(EEXIST,RMS_FEX); */ /* TODO */
@@ -286,6 +301,8 @@ PP(pp_overload_ft_nv) {
 
   /* not currently mocked */
   RETURN_CALL_REAL_OP_IF_UNMOCK();
+  RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV();
+
   status = _overload_ft_ops_sv();
 
   if ( SvIOK(status) && SvIV(status) == -1 )
@@ -317,17 +334,7 @@ PP(pp_overload_stat) { /* stat & lstat */
 
   /* not currently mocked */
   RETURN_CALL_REAL_OP_IF_UNMOCK();
-
-
-  {   /* return earlier if the arg is PL_defgv as we can use cache from the previous call */
-      SV *const arg = *PL_stack_sp;
-      GV *gv =  MAYBE_DEREF_GV(arg); /* incomplete but should do most of the work */
-      //printf ("### arg %d %p vs GV %p vs defgv %p \n", SvFLAGS(arg), *PL_stack_sp, gv, PL_defgv );
-      /* get the GV from the arg if it s not a GV */
-      if ( SvTYPE(arg) == SVt_NULL || gv == PL_defgv ) {
-          return CALL_REAL_OP();
-      }
-  }
+  RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV();
 
   /* calling with our own tmp stat struct, instead of passing directly PL_statcache: more control */
   check_status = _overload_ft_stat(&mocked_stat, &size);

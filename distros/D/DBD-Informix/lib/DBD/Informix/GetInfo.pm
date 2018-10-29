@@ -1,4 +1,4 @@
-#   @(#)$Id: GetInfo.pm,v 2014.1 2014/04/21 06:38:37 jleffler Exp $
+#   @(#)$Id: GetInfo.pm,v 2018.1 2018/05/11 18:33:03 jleffler Exp $
 #
 #   @(#)DBD::Informix::GetInfo
 #
@@ -8,14 +8,14 @@
 #   2.80.UC1 on Solaris 7.
 #
 #   Copyright 2002-03 IBM
-#   Copyright 2004-14 Jonathan Leffler
+#   Copyright 2004-18 Jonathan Leffler
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
 #
 #-------------------------------------------------------------------------
 # Code and explanations follow for DBD::Informix
-# (Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01))
+# (Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28))
 #-------------------------------------------------------------------------
 #
 # NB: The Informix CLI (ODBC) driver did not provide a list of keywords.
@@ -28,7 +28,7 @@ package DBD::Informix::GetInfo;
 use strict;
 use warnings;
 use POSIX qw(strftime);
-use DBD::Informix; 
+use DBD::Informix;
 use DBI::Const::GetInfoType qw(%GetInfoType);
 use DBI::Const::GetInfoReturn qw(%GetInfoReturnTypes %GetInfoReturnValues);
 
@@ -36,7 +36,7 @@ use DBI::Const::GetInfoReturn qw(%GetInfoReturnTypes %GetInfoReturnValues);
 # Do not fold the 'my' onto the assignment line - antique CPAN related
 # code gets confused.
 my
-$VERSION = "2015.1101";
+$VERSION = "2018.1029";
 # Fixup for development system.
 $VERSION = "2003.00.0000" if ($VERSION =~ m%[:]VERSION[:]%);
 
@@ -405,7 +405,7 @@ use DBI;
 
 =head1 DESCRIPTION
 
-This module is used by Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) if you invoke the DBI metadata methods
+This module is used by Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) if you invoke the DBI metadata methods
 on a DBD::Informix handle.
 You will seldom if ever have cause to use this module directly.
 

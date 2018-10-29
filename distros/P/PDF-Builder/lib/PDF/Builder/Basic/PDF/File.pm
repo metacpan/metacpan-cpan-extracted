@@ -16,8 +16,8 @@ package PDF::Builder::Basic::PDF::File;
 
 use strict;
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -243,10 +243,11 @@ sub open {
     binmode $fh, ':raw';
     $fh->seek(0, 0);            # go to start of file
     $fh->read($buffer, 255);
-    unless ($buffer =~ m/^\%PDF\-1\.(\d)+\s*$cr/mo) {
-        die "$filename not a PDF file version 1.x";
+    unless ($buffer =~ m/^\%PDF\-(\d+\.\d+)\s*$cr/mo) {
+        die "$filename does not contain a PDF version";
     }
     $self->{' version'} = $1;
+    # can't run verCheckInput() yet, as full ' version' not set
 
     $fh->seek(0, 2);            # go to end of file
     my $end = $fh->tell();
@@ -336,9 +337,9 @@ sub append_file {
     # hack to upgrade pdf-version number to support
     # requested features in higher versions than
     # the pdf was originally created.
-    my $version = $self->{' version'} || 4;
+    my $version = $self->{' version'} || 1.4;
     $fh->seek(0, 0);
-    $fh->print("%PDF-1.$version\n");
+    $fh->print("%PDF-$version\n");
 
     my $tdict = PDFDict();
     $tdict->{'Prev'} = PDFNum($self->{' loc'});
@@ -400,7 +401,7 @@ sub create_file {
     }
 
     $self->{' OUTFILE'} = $fh;
-    $fh->print('%PDF-1.' . ($self->{' version'} || '2') . "\n");
+    $fh->print('%PDF-' . ($self->{' version'} || '1.4') . "\n");
     $fh->print("%\xC6\xCD\xCD\xB5\n");   # and some binary stuff in a comment
 
     return $self;

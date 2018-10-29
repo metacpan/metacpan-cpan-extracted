@@ -1,0 +1,52 @@
+{
+  "definitions": {
+    "LoginUser": {
+      "properties": {
+        "password": {
+          "x-input-only": true
+        }
+      }
+    },
+    "NewUser": {
+      "properties": {
+        "password": {
+          "x-input-only": true
+        }
+      }
+    },
+    "User": {
+      "properties": {
+        "token": {
+          "x-artifact": true
+        },
+        "follow": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        },
+        "password_hash": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "password_hash"
+      ]
+    },
+    "UpdateUser": {
+      "properties": {
+        "token": {
+          "x-artifact": true
+        }
+      }
+    },
+    "Profile": {
+      "x-view-of": "User",
+      "properties": {
+        "following": {
+          "x-artifact": true
+        }
+      }
+    }
+  }
+}

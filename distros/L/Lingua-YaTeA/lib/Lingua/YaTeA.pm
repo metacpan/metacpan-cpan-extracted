@@ -288,8 +288,9 @@ C<output-path> : set the path to the directory that will contain the
 
 =item * 
 
-C<termino> I<File> : Name of a file containing a list of
-testified terms. 
+C<termino> I<File> : Name of a file containing a list of testified
+terms. The testified terms have to provided in the TreeTagger output
+format.
 
 =item * 
 
@@ -435,7 +436,7 @@ use Lingua::YaTeA::TestifiedTermSet;
 
 use Config::General;
 
-our $VERSION='0.622';
+our $VERSION='0.626';
 
 our $process_counter = 1;
 

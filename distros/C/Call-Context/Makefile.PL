@@ -8,6 +8,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Call/Context.pm', # finds \$VERSION
     AUTHOR       => 'Felipe Gasper (FELIPE)',
     ABSTRACT     => 'Sanity-check calling context',
+    LICENSE      => 'perl',
     META_MERGE => {
         'meta-spec' => { version => 2 },
          resources => {

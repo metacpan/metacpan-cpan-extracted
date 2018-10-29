@@ -1,5 +1,9 @@
 Revision history for WebService::OverheidIO
 
+1.2       2018-10-26 12:57:59Z
+
+    * add bin/query_openkvk.pl
+
 1.1       2017-10-15 07:27:13Z
 
     * Update documentation

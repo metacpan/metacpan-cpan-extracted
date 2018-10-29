@@ -123,11 +123,12 @@ END
       'icu libicu-devel rubygems-devel libxml2-devel libevent-devel '.
       'ImageMagick ImageMagick-devel ImageMagick-perl',
       '__display__');
-   ($stdout,$stderr)=$handle->cmd(
-      "sudo yum -y groupinstall 'Development tools'",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "yum -y groupinstall 'Development tools'",'__display__');
    # https://shaunfreeman.name/compiling-php-7-on-centos/
    # https://www.vultr.com/docs/how-to-install-php-7-x-on-centos-7
-   ($stdout,$stderr)=$handle->cmd('rm -rvf /opt/source/','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf /opt/source/',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd('mkdir -vp /opt/source/',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
@@ -745,6 +746,29 @@ print "\n\n\n\n\n\n\nWE SHOULD HAVE INSTALLED MARIADB=$stdout<==\n\n\n\n\n\n\n";
          "sudo yum -y -v install git-all",'__display__');
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
+   #https://community.letsencrypt.org/t/help-with-certbot-on-the-new-amazon-linux-2/49399/7
+   ($stdout,$stderr)=$handle->cmd('wget https://dl.eff.org/certbot-auto');
+   ($stdout,$stderr)=$handle->cmd('chmod -v a+x certbot-auto','__display__');
+   my $ad='%SP%%SP%}%NL%'.
+      '  BOOTSTRAP_VERSION="BootstrapRpmCommon $BOOTSTRAP_RPM_COMMON_VERSION"%NL%'.
+      'elif grep -i "Amazon Linux" /etc/issue > /dev/null 2>&1 || \%NL%'.
+      '     grep %SQ%cpe:.*:amazon_linux:2%SQ% /etc/os-release > /dev/null 2>&1; then%NL%'.
+      '  Bootstrap() {%NL%'.
+      '    ExperimentalBootstrap "Amazon Linux" BootstrapRpmCommon%NL%'.
+      '  }%NL%'.
+      '  BOOTSTRAP_VERSION="BootstrapRpmCommon $BOOTSTRAP_RPM_COMMON_VERSION"';
+   ($stdout,$stderr)=$handle->cmd(
+      "sed -i -e '/Amazon Linux. BootstrapRpmCommon/{n;N;d}' certbot-auto");
+   ($stdout,$stderr)=$handle->cmd(
+      "${sudo}sed -i \'/Amazon Linux. BootstrapRpmCommon/a$ad\' certbot-auto");
+   ($stdout,$stderr)=$handle->cmd(
+      "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
+      'certbot-auto');
+   ($stdout,$stderr)=$handle->cmd(
+      "${sudo}sed -i \'s/%SP%/ /g\' ".
+      'certbot-auto');
+   ($stdout,$stderr)=$handle->cmd("${sudo}sed -i \"s/%SQ%/\'/g\" ".
+      'certbot-auto');
    ($stdout,$stderr)=$handle->cmd('sudo '.
       'git clone https://github.com/arslancb/clipbucket.git','__display__');
 my $z=0;
@@ -915,7 +939,7 @@ END
    my $nginx='nginx-1.14.0'; # updated from 1.10.0
    $nginx='nginx-1.9.13' if $^O eq 'cygwin';
    ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
-      "http://nginx.org/download/$nginx.tar.gz",'__display__');
+      "http://nginx.org/download/$nginx.tar.gz",300,'__display__');
    ($stdout,$stderr)=$handle->cmd("sudo tar xvf $nginx.tar.gz",'__display__');
    ($stdout,$stderr)=$handle->cwd($nginx);
    ($stdout,$stderr)=$handle->cmd("sudo mkdir -vp objs/lib",'__display__');

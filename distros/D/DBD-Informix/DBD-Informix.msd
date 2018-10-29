@@ -1,6 +1,6 @@
-#   @(#)$Id: DBD-Informix.msd,v 2015.4 2015/11/01 06:50:23 jleffler Exp $
+#   @(#)$Id: DBD-Informix.msd,v 2018.1 2018/05/11 17:02:43 jleffler Exp $
 #   @(#)DBD::Informix - Perl Database Driver for Informix
-#   @(#)Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+#   @(#)Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
 #   @(#)Definitive list of files -- Modifiable Source Distribution
 #
 #   -- The MSD RCS file column contains the name of the RCS file to be
@@ -37,10 +37,6 @@ JLSSDIST=${JL}/bin/JLSS-Dist/RCS
 
 # Library Files
 RCS/debug.h,v                   ${JLLS}/debug.h,v
-RCS/decfix.c,v                  ${JLES}/decfix.c,v
-RCS/decsci.c,v                  ${JLES}/decsci.c,v
-RCS/decsci.h,v                  ${JLES}/decsci.h,v
-RCS/decsetexp.c,v               ${JLES}/decsetexp.c,v
 RCS/dumpesql.h,v                ${JLES}/dumpesql.h,v
 RCS/esql5_00.h,v                ${JLES}/esql5_00.h,v
 RCS/esql7_20.h,v                ${JLES}/esql7_20.h,v
@@ -53,7 +49,6 @@ RCS/esqlutil.h,v                ${JLES}/esqlutil.h,v
 RCS/ifmxdec.h,v                 ${JLES}/ifmxdec.h,v
 RCS/ixblob.ec,v                 ${JLES}/ixblob.ec,v
 RCS/ixblob.h,v                  ${JLES}/ixblob.h,v
-RCS/jtypes.c,v                  ${JLES}/jtypes.c,v
 RCS/kludge.c,v                  ${JLLS}/kludge.c,v
 RCS/kludge.h,v                  ${JLLS}/kludge.h,v
 RCS/sqltoken.c,v                ${JLES}/sqltoken.c,v
@@ -77,19 +72,14 @@ RCS/TODO,v                      RCS/TODO,v
 RCS/Informix.h,v                RCS/Informix.h,v
 RCS/Informix.pm,v               RCS/Informix.pm,v
 RCS/Informix.xs,v               RCS/Informix.xs,v
-RCS/apply.setminref.sh,v        RCS/apply.setminref.sh,v
 RCS/dbdattr.ec,v                RCS/dbdattr.ec,v
 RCS/dbdimp.ec,v                 RCS/dbdimp.ec,v
 RCS/dbdimp.h,v                  RCS/dbdimp.h,v
 RCS/dbdixmap.h,v                RCS/dbdixmap.h,v
 RCS/eprintf.c,v                 RCS/eprintf.c,v
 RCS/esqlbasic.ec,v              RCS/esqlbasic.ec,v
-RCS/esqlc_v5.ec,v               RCS/esqlc_v5.ec,v
 RCS/esqlc_v6.ec,v               RCS/esqlc_v6.ec,v
-RCS/esqlcc.pl,v                 RCS/esqlcc.pl,v
-RCS/esqlld.pl,v                 RCS/esqlld.pl,v
 RCS/esqlperl.h,v                RCS/esqlperl.h,v
-RCS/esqlsed.pl,v                RCS/esqlsed.pl,v
 RCS/esqltest.ec,v               RCS/esqltest.ec,v
 RCS/link.c,v                    RCS/link.c,v
 RCS/link.h,v                    RCS/link.h,v
@@ -99,7 +89,6 @@ RCS/setperl.pl,v                RCS/setperl.pl,v
 RCS/odbctype.c,v                RCS/odbctype.c,v
 RCS/odbctype.h,v                RCS/odbctype.h,v
 RCS/test.all.sh,v               RCS/test.all.sh,v
-RCS/test.c4gl.sh,v              RCS/test.c4gl.sh,v
 RCS/test.one.sh,v               RCS/test.one.sh,v
 RCS/test.quiet.sh,v             RCS/test.quiet.sh,v
 RCS/test.run.sh,v               RCS/test.run.sh,v
@@ -190,7 +179,6 @@ Notes/RCS/hpux-gcc-build.sh,v       Notes/RCS/hpux-gcc-build.sh,v
 Notes/RCS/linux,v                   Notes/RCS/linux,v
 Notes/RCS/load.unload,v             Notes/RCS/load.unload,v
 Notes/RCS/nonroot.install,v         Notes/RCS/nonroot.install,v
-Notes/RCS/nt,v                      Notes/RCS/nt,v
 Notes/RCS/olipcshm,v                Notes/RCS/olipcshm,v
 Notes/RCS/static.build,v            Notes/RCS/static.build,v
 Notes/RCS/web.servers,v             Notes/RCS/web.servers,v

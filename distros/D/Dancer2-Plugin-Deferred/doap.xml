@@ -34,6 +34,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Julien Fiegehenn</foaf:name>
+      <foaf:mbox rdf:resource="mailto:simbabque@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Peter Mottram</foaf:name>
       <foaf:mbox rdf:resource="mailto:peter@sysnix.com" />
     </foaf:Person>
@@ -99,6 +105,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.007016</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-01-03</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.007017</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2016-07-11</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

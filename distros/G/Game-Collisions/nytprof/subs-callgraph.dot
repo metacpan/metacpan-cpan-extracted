@@ -1,0 +1,372 @@
+digraph {
+graph [overlap=false]
+subgraph cluster_List_Util {
+	label="List::Util";
+	"List::Util::BEGIN@31";
+	"List::Util::max";
+	"List::Util::BEGIN@9";
+	"List::Util::min";
+	"List::Util::BEGIN@10";
+}
+subgraph cluster_UNIVERSAL {
+	label="UNIVERSAL";
+	"UNIVERSAL::VERSION";
+}
+subgraph cluster_version {
+	label="version";
+	"version::(bool";
+	"version::(cmp";
+}
+subgraph cluster_Internals {
+	label="Internals";
+	"Internals::SvREADONLY";
+}
+subgraph cluster_DynaLoader {
+	label="DynaLoader";
+	"DynaLoader::dl_load_flags";
+	"DynaLoader::BEGIN@21";
+	"DynaLoader::dl_find_symbol";
+	"DynaLoader::CORE:ftdir";
+	"DynaLoader::dl_install_xsub";
+	"DynaLoader::CORE:ftsize";
+	"DynaLoader::dl_load_file";
+	"DynaLoader::CORE:ftfile";
+	"DynaLoader::bootstrap";
+	"DynaLoader::CORE:subst";
+	"DynaLoader::BEGIN@17";
+}
+subgraph cluster_warnings_register {
+	label="warnings::register";
+	"warnings::register::import";
+}
+subgraph cluster_Config {
+	label="Config";
+	"Config::TIEHASH";
+	"Config::BEGIN@47";
+	"Config::BEGIN@11";
+	"Config::BEGIN@10";
+	"Config::BEGIN@9";
+	"Config::import";
+	"Config::FETCH";
+}
+subgraph cluster_constant {
+	label="constant";
+	"constant::BEGIN@2";
+	"constant::import";
+	"constant::CORE:qr";
+	"constant::CORE:match";
+	"constant::BEGIN@4";
+	"constant::BEGIN@24";
+	"constant::BEGIN@65";
+	"constant::BEGIN@40";
+	"constant::BEGIN@141";
+	"constant::BEGIN@3";
+	"constant::CORE:subst";
+	"constant::BEGIN@90";
+	"constant::CORE:regcomp";
+}
+subgraph cluster_utf8 {
+	label="utf8";
+	"utf8::import";
+}
+subgraph cluster_mro {
+	label="mro";
+	"mro::method_changed_in";
+}
+subgraph cluster_Exporter_Heavy {
+	label="Exporter::Heavy";
+	"Exporter::Heavy::BEGIN@4";
+	"Exporter::Heavy::heavy_export_to_level";
+	"Exporter::Heavy::BEGIN@3";
+	"Exporter::Heavy::heavy_export";
+	"Exporter::Heavy::BEGIN@188";
+	"Exporter::Heavy::CORE:subst";
+	"Exporter::Heavy::_rebuild_cache";
+	"Exporter::Heavy::CORE:match";
+}
+subgraph cluster_Game_Collisions {
+	label="Game::Collisions";
+	"Game::Collisions::BEGIN@26";
+	"Game::Collisions::BEGIN@28";
+	"Game::Collisions::BEGIN@30";
+	"Game::Collisions::_new_meta_aabb";
+	"Game::Collisions::new";
+	"Game::Collisions::make_aabb";
+	"Game::Collisions::get_collisions";
+	"Game::Collisions::_add_aabb";
+	"Game::Collisions::BEGIN@27";
+	"Game::Collisions::get_collisions_for_aabb";
+}
+subgraph cluster_main {
+	label="main";
+	"main::BEGIN@28";
+	"main::BEGIN@27";
+	"main::CORE:say";
+	"main::BEGIN@30";
+	"main::BEGIN@25";
+	"main::BEGIN@31";
+	"main::RUNTIME";
+	"main::NULL";
+	"main::BEGIN@26";
+}
+subgraph cluster_Scalar_Util {
+	label="Scalar::Util";
+	"Scalar::Util::weaken";
+	"Scalar::Util::BEGIN@9";
+	"Scalar::Util::BEGIN@10";
+	"Scalar::Util::unweaken";
+}
+subgraph cluster_vars {
+	label="vars";
+	"vars::BEGIN@3";
+	"vars::BEGIN@8";
+	"vars::BEGIN@7";
+	"vars::CORE:match";
+	"vars::import";
+}
+subgraph cluster_XSLoader {
+	label="XSLoader";
+	"XSLoader::load";
+}
+subgraph cluster_strict {
+	label="strict";
+	"strict::bits";
+	"strict::unimport";
+	"strict::CORE:match";
+	"strict::import";
+	"strict::BEGIN@7";
+}
+subgraph cluster_warnings {
+	label="warnings";
+	"warnings::register_categories";
+	"warnings::import";
+	"warnings::_mkMask";
+	"warnings::CORE:match";
+	"warnings::unimport";
+}
+subgraph cluster_Game_Collisions_AABB {
+	label="Game::Collisions::AABB";
+	"Game::Collisions::AABB::BEGIN@39";
+	"Game::Collisions::AABB::BEGIN@28";
+	"Game::Collisions::AABB::parent";
+	"Game::Collisions::AABB::set_right_node";
+	"Game::Collisions::AABB::resize_all_parents";
+	"Game::Collisions::AABB::is_branch_node";
+	"Game::Collisions::AABB::does_collide";
+	"Game::Collisions::AABB::set_left_node";
+	"Game::Collisions::AABB::BEGIN@36";
+	"Game::Collisions::AABB::height";
+	"Game::Collisions::AABB::BEGIN@27";
+	"Game::Collisions::AABB::left_node";
+	"Game::Collisions::AABB::_set_node";
+	"Game::Collisions::AABB::BEGIN@40";
+	"Game::Collisions::AABB::BEGIN@32";
+	"Game::Collisions::AABB::BEGIN@34";
+	"Game::Collisions::AABB::new";
+	"Game::Collisions::AABB::BEGIN@33";
+	"Game::Collisions::AABB::_resize_to_fit_children";
+	"Game::Collisions::AABB::x";
+	"Game::Collisions::AABB::set_parent";
+	"Game::Collisions::AABB::BEGIN@35";
+	"Game::Collisions::AABB::find_best_sibling_node";
+	"Game::Collisions::AABB::BEGIN@29";
+	"Game::Collisions::AABB::BEGIN@38";
+	"Game::Collisions::AABB::right_node";
+	"Game::Collisions::AABB::_calculate_bounding_box_for_nodes";
+	"Game::Collisions::AABB::BEGIN@37";
+	"Game::Collisions::AABB::BEGIN@26";
+	"Game::Collisions::AABB::length";
+	"Game::Collisions::AABB::BEGIN@30";
+	"Game::Collisions::AABB::y";
+}
+subgraph cluster_Time_HiRes {
+	label="Time::HiRes";
+	"Time::HiRes::gettimeofday";
+	"Time::HiRes::bootstrap";
+	"Time::HiRes::BEGIN@3";
+	"Time::HiRes::BEGIN@4";
+	"Time::HiRes::tv_interval";
+	"Time::HiRes::BEGIN@48";
+	"Time::HiRes::import";
+}
+subgraph cluster_Exporter {
+	label="Exporter";
+	"Exporter::CORE:subst";
+	"Exporter::as_heavy";
+	"Exporter::export_to_level";
+	"Exporter::export";
+}
+"constant::import" -> "constant::CORE:regcomp";
+"Exporter::as_heavy" -> "Exporter::Heavy::BEGIN@4";
+"DynaLoader::BEGIN@21" -> "version::(bool";
+"main::BEGIN@27" -> "Time::HiRes::BEGIN@48";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@38";
+"main::NULL" -> "main::BEGIN@30";
+"Exporter::Heavy::heavy_export" -> "Exporter::Heavy::_rebuild_cache";
+"constant::import" -> "constant::CORE:match";
+"Game::Collisions::get_collisions" -> "Game::Collisions::get_collisions_for_aabb";
+"warnings::register::import" -> "warnings::register_categories";
+"Game::Collisions::_add_aabb" -> "Game::Collisions::AABB::x";
+"Game::Collisions::AABB::_calculate_bounding_box_for_nodes" -> "Game::Collisions::AABB::x";
+"Game::Collisions::_add_aabb" -> "Game::Collisions::AABB::y";
+"Game::Collisions::AABB::_calculate_bounding_box_for_nodes" -> "Game::Collisions::AABB::y";
+"DynaLoader::bootstrap" -> "DynaLoader::dl_install_xsub";
+"main::BEGIN@28" -> "Game::Collisions::BEGIN@26";
+"DynaLoader::bootstrap" -> "Time::HiRes::bootstrap";
+"strict::BEGIN@7" -> "strict::CORE:match";
+"main::BEGIN@26" -> "warnings::CORE:match";
+"Game::Collisions::BEGIN@28" -> "XSLoader::load";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@39";
+"Game::Collisions::AABB::resize_all_parents" -> "Game::Collisions::AABB::parent";
+"Game::Collisions::_add_aabb" -> "Game::Collisions::AABB::parent";
+"Game::Collisions::_add_aabb" -> "Game::Collisions::AABB::set_right_node";
+"Config::BEGIN@11" -> "vars::import";
+"Game::Collisions::get_collisions_for_aabb" -> "Game::Collisions::AABB::left_node";
+"Game::Collisions::_add_aabb" -> "Game::Collisions::AABB::left_node";
+"Game::Collisions::AABB::set_left_node" -> "Game::Collisions::AABB::_set_node";
+"Game::Collisions::AABB::set_right_node" -> "Game::Collisions::AABB::_set_node";
+"DynaLoader::bootstrap" -> "DynaLoader::dl_find_symbol";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@32";
+"Game::Collisions::_add_aabb" -> "Game::Collisions::_new_meta_aabb";
+"Time::HiRes::BEGIN@4" -> "strict::BEGIN@7";
+"main::BEGIN@27" -> "Config::FETCH";
+"Exporter::as_heavy" -> "Exporter::Heavy::BEGIN@3";
+"constant::BEGIN@4" -> "warnings::register::import";
+"vars::BEGIN@7" -> "warnings::register::import";
+"Game::Collisions::get_collisions_for_aabb" -> "Game::Collisions::AABB::right_node";
+"Game::Collisions::BEGIN@28" -> "List::Util::BEGIN@9";
+"Game::Collisions::AABB::BEGIN@26" -> "utf8::import";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@33";
+"main::BEGIN@27" -> "DynaLoader::BEGIN@17";
+"warnings::register_categories" -> "warnings::_mkMask";
+"DynaLoader::bootstrap" -> "DynaLoader::dl_load_flags";
+"main::NULL" -> "main::BEGIN@26";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@26";
+"DynaLoader::bootstrap" -> "DynaLoader::CORE:ftdir";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@30";
+"Game::Collisions::AABB::_set_node" -> "Scalar::Util::weaken";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@37";
+"Exporter::as_heavy" -> "Exporter::CORE:subst";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::BEGIN@3";
+"Game::Collisions::get_collisions_for_aabb" -> "Game::Collisions::AABB::does_collide";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::BEGIN@141";
+"main::RUNTIME" -> "Time::HiRes::gettimeofday";
+"Time::HiRes::tv_interval" -> "Time::HiRes::gettimeofday";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@28";
+"main::BEGIN@28" -> "Game::Collisions::BEGIN@27";
+"Game::Collisions::AABB::_set_node" -> "Scalar::Util::unweaken";
+"Time::HiRes::import" -> "Exporter::export_to_level";
+"main::BEGIN@27" -> "Time::HiRes::BEGIN@3";
+"constant::import" -> "mro::method_changed_in";
+"constant::BEGIN@24" -> "Internals::SvREADONLY";
+"constant::import" -> "Internals::SvREADONLY";
+"Game::Collisions::AABB::BEGIN@36" -> "constant::import";
+"Game::Collisions::AABB::BEGIN@38" -> "constant::import";
+"Game::Collisions::AABB::BEGIN@40" -> "constant::import";
+"Game::Collisions::AABB::BEGIN@35" -> "constant::import";
+"Game::Collisions::AABB::BEGIN@34" -> "constant::import";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::import";
+"Game::Collisions::AABB::BEGIN@37" -> "constant::import";
+"main::BEGIN@30" -> "constant::import";
+"main::BEGIN@31" -> "constant::import";
+"Game::Collisions::AABB::BEGIN@39" -> "constant::import";
+"Game::Collisions::AABB::BEGIN@33" -> "constant::import";
+"vars::import" -> "vars::CORE:match";
+"Game::Collisions::AABB::_calculate_bounding_box_for_nodes" -> "Game::Collisions::AABB::height";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@27";
+"Time::HiRes::import" -> "Exporter::Heavy::heavy_export_to_level";
+"Config::BEGIN@11" -> "vars::BEGIN@3";
+"Game::Collisions::AABB::_set_node" -> "Game::Collisions::AABB::set_parent";
+"main::BEGIN@28" -> "Game::Collisions::BEGIN@30";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@29";
+"Game::Collisions::BEGIN@28" -> "List::Util::BEGIN@10";
+"Game::Collisions::AABB::_calculate_bounding_box_for_nodes" -> "List::Util::max";
+"main::RUNTIME" -> "main::CORE:say";
+"Exporter::Heavy::heavy_export" -> "Exporter::Heavy::CORE:match";
+"Game::Collisions::AABB::resize_all_parents" -> "Game::Collisions::AABB::_resize_to_fit_children";
+"Game::Collisions::make_aabb" -> "Game::Collisions::_add_aabb";
+"main::RUNTIME" -> "Game::Collisions::new";
+"Game::Collisions::AABB::_calculate_bounding_box_for_nodes" -> "Game::Collisions::AABB::length";
+"Config::BEGIN@47" -> "strict::unimport";
+"Exporter::Heavy::BEGIN@4" -> "strict::unimport";
+"List::Util::BEGIN@31" -> "strict::unimport";
+"constant::BEGIN@90" -> "strict::unimport";
+"constant::BEGIN@65" -> "strict::unimport";
+"constant::BEGIN@141" -> "strict::unimport";
+"constant::BEGIN@40" -> "strict::unimport";
+"Time::HiRes::BEGIN@48" -> "strict::unimport";
+"main::BEGIN@28" -> "Game::Collisions::BEGIN@28";
+"Exporter::Heavy::heavy_export_to_level" -> "Exporter::Heavy::heavy_export";
+"DynaLoader::bootstrap" -> "DynaLoader::CORE:ftsize";
+"Exporter::export_to_level" -> "Exporter::as_heavy";
+"Exporter::export" -> "Exporter::as_heavy";
+"DynaLoader::BEGIN@21" -> "Config::TIEHASH";
+"Exporter::Heavy::heavy_export" -> "Exporter::Heavy::CORE:subst";
+"Exporter::Heavy::_rebuild_cache" -> "Exporter::Heavy::CORE:subst";
+"DynaLoader::BEGIN@21" -> "Config::BEGIN@10";
+"main::BEGIN@27" -> "Time::HiRes::import";
+"DynaLoader::BEGIN@21" -> "Config::BEGIN@9";
+"main::NULL" -> "main::BEGIN@27";
+"Game::Collisions::get_collisions_for_aabb" -> "Game::Collisions::AABB::is_branch_node";
+"Config::BEGIN@9" -> "strict::import";
+"Time::HiRes::BEGIN@4" -> "strict::import";
+"Exporter::Heavy::BEGIN@3" -> "strict::import";
+"Scalar::Util::BEGIN@9" -> "strict::import";
+"constant::BEGIN@3" -> "strict::import";
+"vars::BEGIN@8" -> "strict::import";
+"List::Util::BEGIN@9" -> "strict::import";
+"Exporter::Heavy::heavy_export_to_level" -> "Exporter::export";
+"DynaLoader::BEGIN@21" -> "Config::import";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@36";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::BEGIN@4";
+"DynaLoader::BEGIN@21" -> "version::(cmp";
+"main::RUNTIME" -> "Game::Collisions::make_aabb";
+"DynaLoader::BEGIN@21" -> "Config::BEGIN@47";
+"main::BEGIN@27" -> "Time::HiRes::BEGIN@4";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@40";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@34";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::BEGIN@24";
+"DynaLoader::bootstrap" -> "DynaLoader::CORE:ftfile";
+"main::NULL" -> "main::BEGIN@25";
+"DynaLoader::bootstrap" -> "DynaLoader::CORE:subst";
+"main::RUNTIME" -> "Time::HiRes::tv_interval";
+"main::RUNTIME" -> "Game::Collisions::get_collisions";
+"Game::Collisions::AABB::BEGIN@30" -> "Scalar::Util::BEGIN@10";
+"Config::BEGIN@11" -> "vars::BEGIN@8";
+"main::BEGIN@27" -> "DynaLoader::BEGIN@21";
+"Game::Collisions::BEGIN@30" -> "Game::Collisions::AABB::BEGIN@35";
+"Game::Collisions::_add_aabb" -> "Game::Collisions::AABB::find_best_sibling_node";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::CORE:qr";
+"main::NULL" -> "main::BEGIN@31";
+"main::NULL" -> "main::BEGIN@28";
+"Game::Collisions::BEGIN@28" -> "List::Util::BEGIN@31";
+"Game::Collisions::BEGIN@27" -> "warnings::import";
+"List::Util::BEGIN@10" -> "warnings::import";
+"Scalar::Util::BEGIN@10" -> "warnings::import";
+"main::BEGIN@26" -> "warnings::import";
+"Game::Collisions::AABB::BEGIN@28" -> "warnings::import";
+"Config::BEGIN@10" -> "warnings::import";
+"Config::BEGIN@11" -> "vars::BEGIN@7";
+"Game::Collisions::AABB::BEGIN@30" -> "UNIVERSAL::VERSION";
+"DynaLoader::bootstrap" -> "DynaLoader::dl_load_file";
+"Game::Collisions::AABB::_resize_to_fit_children" -> "Game::Collisions::AABB::_calculate_bounding_box_for_nodes";
+"Game::Collisions::AABB::find_best_sibling_node" -> "Game::Collisions::AABB::_calculate_bounding_box_for_nodes";
+"Game::Collisions::_add_aabb" -> "List::Util::min";
+"Game::Collisions::AABB::_calculate_bounding_box_for_nodes" -> "List::Util::min";
+"strict::import" -> "strict::bits";
+"strict::unimport" -> "strict::bits";
+"Game::Collisions::_add_aabb" -> "Game::Collisions::AABB::set_left_node";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::BEGIN@40";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::BEGIN@65";
+"Exporter::as_heavy" -> "Exporter::Heavy::BEGIN@188";
+"Game::Collisions::AABB::BEGIN@30" -> "Scalar::Util::BEGIN@9";
+"Game::Collisions::_add_aabb" -> "Game::Collisions::AABB::resize_all_parents";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::BEGIN@90";
+"constant::import" -> "constant::CORE:subst";
+"DynaLoader::BEGIN@21" -> "Config::BEGIN@11";
+"Game::Collisions::make_aabb" -> "Game::Collisions::AABB::new";
+"Game::Collisions::_new_meta_aabb" -> "Game::Collisions::AABB::new";
+"main::BEGIN@27" -> "DynaLoader::bootstrap";
+"Exporter::Heavy::BEGIN@188" -> "warnings::unimport";
+"Game::Collisions::AABB::BEGIN@32" -> "constant::BEGIN@2";
+}

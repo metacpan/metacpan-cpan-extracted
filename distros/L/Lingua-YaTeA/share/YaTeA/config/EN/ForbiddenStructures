@@ -72,3 +72,5 @@ of\LF CD\POS	END
 #JJR\POS NN CC JJR\POS NNS	split	1	CC
 #JJ\POS NN NN CC NN	new user name and group	Nb occ: 1
 #NN NN CC NN	split	1	CC
+kind\IF of\LF	ANY	delete
+case\IF of\LF	ANY	delete

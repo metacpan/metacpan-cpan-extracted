@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.005'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -40,10 +40,10 @@ sub new {
 
 # Deprecated (warning added in 2.031)
 sub new_api {
-    my ($class, $api2, @options) = @_;
-    warnings::warnif('deprecated', q{Call to deprecated method "new_api($api2, ...)".  Replace with "new($api2->{'pdf'}, ...)"});
+    my ($class, $api, @options) = @_;
+    warnings::warnif('deprecated', q{Call to deprecated method "new_api($api, ...)".  Replace with "new($api->{'pdf'}, ...)"});
 
-    my $destination = $class->new($api2->{'pdf'}, @options);
+    my $destination = $class->new($api->{'pdf'}, @options);
     return $destination;
 }
 
@@ -123,16 +123,26 @@ sub file {
     return $self;
 }
 
-=item $dest->pdfile($pdfile, $pagenum, %opts)
+=item $dest->pdf_file($pdffile, $pagenum, %opts)
 
-=item $dest->pdfile($pdfile, $pagenum)
+=item $dest->pdf_file($pdffile, $pagenum)
 
-Defines the destination as pdf-file with filepath C<$pdfile, $pagenum>
-and options %opts (same as dest).
+Defines the destination as a PDF-file with filepath C<$pdffile>, on page
+C<$pagenum>, and options %opts (same as dest()).
+
+The old name, I<pdfile>, is still available but is B<deprecated> and will be
+removed at some time in the future.
 
 =cut
 
+# to be removed no earlier than October, 2020
 sub pdfile {
+    my ($self, $url, $pnum, %opts) = @_;
+    warn "use pdf_file() method instead of pdfile()";
+    return $self->pdf_file($url, $pnum, %opts);
+}
+
+sub pdf_file {
     my ($self, $url, $pnum, %opts) = @_;
 
     $self->{'S'} = PDFName('GoToR');

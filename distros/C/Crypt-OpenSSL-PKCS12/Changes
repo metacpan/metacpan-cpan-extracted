@@ -1,5 +1,20 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+1.2  Sat Oct 27 09:37:04 CEST 2018
+
+- Maintenance release addressing the missing exclusion of the MYMETA files
+  issue spotted by Alexandr Ciornii (@chorny) #issue32
+
+1.1  Fri Oct 26 07:54:48 CEST 2018
+
+- PR from Todd Rinaldo (@toddr) Adding use of our instead of vars, since we are now bumping Perl version requirement
+  from 5.005 to 5.6.0
+
+- PR from Todd Rinaldo (@toddr) Exchange DynaLoader for XSLoader, bumping Perl version requirement
+  from 5.005 to 5.6.0
+
+- PR from Todd Rinaldo (@toddr) Add Makefile.PL support for perl 5.26.0 and above which don't include . in @INC
+
 1.0  Mon Mar 19 21:20:49 CET 2018
 
 - Re-release of 0.10, due to indexing issue with PAUSE/CPAN ref: #28

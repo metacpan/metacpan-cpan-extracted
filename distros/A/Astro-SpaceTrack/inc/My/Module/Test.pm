@@ -10,9 +10,10 @@ use Exporter;
 our @ISA = qw{ Exporter };
 
 use HTTP::Date;
+use HTTP::Status qw{ :constants };
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.120';
+our $VERSION = '0.121';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.
@@ -23,8 +24,10 @@ use constant VERIFY_HOSTNAME => defined $ENV{SPACETRACK_VERIFY_HOSTNAME}
 our @EXPORT =		## no critic (ProhibitAutomaticExportation)
 qw{
     is_error
+    is_error_or_skip
     is_not_success
     is_success
+    is_success_or_skip
     last_modified
     most_recent_http_response
     not_defined
@@ -60,6 +63,18 @@ sub is_error (@) {		## no critic (RequireArgUnpacking,ProhibitSubroutinePrototyp
     goto &ok;
 }
 
+sub is_error_or_skip (@) {		## no critic (RequireArgUnpacking,ProhibitSubroutinePrototypes)
+    my ( $obj, $method, @args ) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my ( $code, $name ) = splice @args, -2, 2;
+    $rslt = eval { $obj->$method( @args ) };
+    $rslt
+	or return fail "$name threw exception: $@";
+    my $got = $rslt->code();
+    __skip_if_server_error( $method, $got );
+    return cmp_ok $got, '==', $code, $name;
+}
+
 sub is_not_success (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutinePrototypes)
     my ( $obj, $method, @args ) = @_;
     my $name = pop @args;
@@ -85,6 +100,25 @@ sub is_success (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutinePrototy
     @_ = ( $rslt->is_success(), $name );
     goto &ok;
 }
+
+sub is_success_or_skip (@) {	## no critic (RequireArgUnpacking,ProhibitSubroutinePrototypes)
+    my ( $obj, $method, @args ) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $skip = pop @args;
+    my $name = pop @args;
+    $rslt = eval { $obj->$method( @args ) } or do {
+	fail "$name threw exception: $!" ;
+	skip "$method() threw exception", $skip;
+    };
+    __skip_if_server_error( $method, $rslt->code(), $skip );
+    ok $rslt->is_success(), $name
+	or do {
+	diag $rslt->status_line();
+	skip "$method() failed", $skip;
+    };
+    return 1;
+}
+
 
 sub last_modified {
     $rslt
@@ -146,6 +180,7 @@ sub not_defined ($$) {	## no critic (ProhibitSubroutinePrototypes)
     }
 
 }
+
 
 # Determine whether a given web site is to be skipped.
 
@@ -229,6 +264,25 @@ sub not_defined ($$) {	## no critic (ProhibitSubroutinePrototypes)
 	    return ( $skip_site{$site} = $check );
 	}
 	return ( $skip_site{$site} = undef );
+    }
+}
+
+{
+    my @is_server_error;
+
+    BEGIN {
+	foreach my $inx (
+	    HTTP_INTERNAL_SERVER_ERROR,
+	) {
+	    $is_server_error[$inx] = 1;
+	}
+    }
+
+    sub __skip_if_server_error {
+	my ( $method, $code, $skip ) = @_;
+	$is_server_error[$code]
+	    or return;
+	skip "$method() encountered server error $code", ( $skip || 0 ) + 1;
     }
 }
 
@@ -408,6 +462,15 @@ HTTP::Response object. The arguments are:
   - The expected HTTP status code
   - The test name
 
+=head2 is_error_or_skip
+
+ is_error $st, fubar => 42,
+     404,
+     'Make sure $st->fubar( 42 ) returns a 404';
+
+This subroutine is like C<is_error(), but if the returned status is 500,
+the test is skipped.
+
 =head2 is_not_success
 
  is_not_success $st, fubar => 42,
@@ -435,6 +498,17 @@ arguments are:
   - The method's name
   - Zero or more arguments
   - The test name
+
+=head2 is_success_or_skop
+
+ is_success_or_skip $st, fubar => 42,
+     'Make sure $st->fubar( 42 ) succeeds', 3;
+
+This subroutine is like C<is_success>, but if a problem occurs the
+number of tests given by the last argument is skipped. The skip argument
+assumes that the current test is B<not> skipped. If a 500 error is
+encountered, the current test B<is> skipped, and the number of tests
+skipped is the skip argument plus 1.
 
 =head2 last_modified
 

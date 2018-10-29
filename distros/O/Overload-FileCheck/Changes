@@ -1,5 +1,9 @@
 Revision history for Overload-FileCheck
 
+0.006     2018-10-29 10:59:05-05:00 America/Chicago
+
+fallback to Perl OP when filecheck is called with _ or *_ (use statcache)
+
 0.005     2018-10-25 12:58:55-05:00 America/Chicago
 
 improve POD and Markdown documentation

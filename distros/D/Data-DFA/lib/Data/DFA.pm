@@ -1,11 +1,12 @@
-#!/usr/bin/perl   
+#!/usr/bin/perl
 #-------------------------------------------------------------------------------
 # Deterministic finite state parser from a regular expression
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2018
 #-------------------------------------------------------------------------------
+# podDocumentation
 
 package Data::DFA;
-our $VERSION = "20180429";
+our $VERSION = "20181027";
 require v5.16;
 use warnings FATAL => qw(all);
 use strict;
@@ -134,7 +135,7 @@ sub transitionOnSymbol($$$)                                                     
   $$transitions{$symbol}
  }
 
-sub compress($)                                                                 # Compress DFA by renaming states and deleting no longered needed NFA dstates
+sub compress($)                                                                 # Compress DFA by renaming states and deleting no longer needed NFA states
  {my ($dfa) = @_;                                                               # DFA
   my %rename;
   my $cfa = bless {};
@@ -183,12 +184,12 @@ sub print($$;$)                                                                 
   "$title: No states in Dfa";
  }
 
-sub printNws($$;$)                                                              # Print DFA with whitespace normalized
+sub printNws($$;$)                                                              # Print DFA with white space normalized
  {my ($dfa, $title, $print) = @_;                                               # DFA, title, 1 - STDOUT or 2 - STDERR
   nws &print(@_);
  }
 
-sub symbols($)                                                                  # Return an array of all the symbols accepated by the DFA
+sub symbols($)                                                                  # Return an array of all the symbols accepted by the DFA
  {my ($dfa) = @_;                                                               # DFA
   my %symbols;
   for my $superStateName(keys %$dfa)                                            # Each state
@@ -232,9 +233,9 @@ sub Data::DFA::Parser::accept($$)                                               
     if (scalar(@next) > 0)
      {push  @m, "Expected one of  : ". join(' ', @next);
      }
-    else   
+    else
      {push  @m, "Expected nothing more.";
-     } 
+     }
 
     push    @m, "But found        : ". $symbol, "";
 
@@ -361,323 +362,27 @@ END
 
 =head1 Description
 
+Deterministic finite state parser from regular expression
+
+
+Version "20181027".
+
+
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 
 
-=head1 Construct regular expression
-
-Construct a regular expression that defines the language to be parsed using the following combining operations which can all be imported:
-
-=head2 element($)
-
-One element.
-
-     Parameter  Description
-  1  $label     Transition symbol
-
-This is a static method and so should be invoked as:
-
-  Data::DFA::element
-
-
-This method can be imported via:
-
-  use Data::DFA qw(element)
-
-
-=head2 sequence(@)
-
-Sequence of elements.
-
-     Parameter  Description
-  1  @elements  Elements
-
-This is a static method and so should be invoked as:
-
-  Data::DFA::sequence
-
-
-This method can be imported via:
-
-  use Data::DFA qw(sequence)
-
-
-=head2 optional(@)
-
-An optional sequence of element.
-
-     Parameter  Description
-  1  @element   Elements
-
-This is a static method and so should be invoked as:
-
-  Data::DFA::optional
-
-
-This method can be imported via:
-
-  use Data::DFA qw(optional)
-
-
-=head2 zeroOrMore(@)
-
-Zero or more repetitions of a sequence of elements.
-
-     Parameter  Description
-  1  @element   Elements
-
-This is a static method and so should be invoked as:
-
-  Data::DFA::zeroOrMore
-
-
-This method can be imported via:
-
-  use Data::DFA qw(zeroOrMore)
-
-
-=head2 oneOrMore(@)
-
-One or more repetitions of a sequence of elements.
-
-     Parameter  Description
-  1  @element   Elements
-
-This is a static method and so should be invoked as:
-
-  Data::DFA::oneOrMore
-
-
-This method can be imported via:
-
-  use Data::DFA qw(oneOrMore)
-
-
-=head2 choice(@)
-
-Choice from amongst one or more elements.
-
-     Parameter  Description
-  1  @elements  Elements to be chosen from
-
-This is a static method and so should be invoked as:
-
-  Data::DFA::choice
-
-
-This method can be imported via:
-
-  use Data::DFA qw(choice)
-
-
-=head1 Deterministic finite state parser
-
-Create a deterministic finite state automaton to parse sequences of symbols in the language defined by a regular expression.
-
-=head2 fromExpr(@)
-
-Create a DFA from a regular expression.
-
-     Parameter  Description
-  1  @expr      Expression
-
-This is a static method and so should be invoked as:
-
-  Data::DFA::fromExpr
-
-
-=head2 print($$$)
-
-Print DFA to a string and optionally to STDERR or STDOUT
-
-     Parameter  Description
-  1  $dfa       DFA
-  2  $title     Title
-  3  $print     1 - STDOUT or 2 - STDERR
-
-=head2 printNws($$$)
-
-Print DFA with whitespace normalized
-
-     Parameter  Description
-  1  $dfa       DFA
-  2  $title     Title
-  3  $print     1 - STDOUT or 2 - STDERR
-
-=head2 symbols($)
-
-Return an array of all the symbols accepated by the DFA
-
-     Parameter  Description
-  1  $dfa       DFA
-
-=head2 parser($)
-
-Create a parser from a deterministic finite state automaton constructed from a regular expression.
-
-     Parameter  Description
-  1  $dfa       Deterministic finite state automaton generated from an expression
-
-This is a static method and so should be invoked as:
-
-  Data::DFA::parser
-
-
-=head1 Parser methods
-
-Use the DFA to parse a sequence of symbols
-
-=head2 Data::DFA::Parser::accept($$)
-
-Accept the next symbol drawn from the symbol set if possible by moving to a new state otherwise confessing with a helpful message
-
-     Parameter  Description
-  1  $parser    DFA Parser
-  2  $symbol    Next symbol to be processed by the finite state automaton
-
-=head2 Data::DFA::Parser::final($)
-
-Returns whether we are currently in a final state or not
-
-     Parameter  Description
-  1  $parser    DFA Parser
-
-=head2 Data::DFA::Parser::next($)
-
-Returns an array of symbols that would be accepted in the current state
-
-     Parameter  Description
-  1  $parser    DFA Parser
-
-=head2 Data::DFA::Parser::accepts($@)
-
-Confirm that a DFA accepts an array representing a sequence of symbols
-
-     Parameter  Description
-  1  $parser    DFA Parser
-  2  @symbols   Array of symbols
-
-
-=head1 Private Methods
-
-=head2 finalState($$)
-
-Check whether any of the specified states in the NFA are final
-
-     Parameter  Description
-  1  $nfa       NFA
-  2  $reach     Hash of states in the NFA
-
-=head2 superState($$$$$)
-
-Create super states from existing superstate
-
-     Parameter              Description
-  1  $dfa                   DFA
-  2  $superStateName        Start state in DFA
-  3  $nfa                   NFA we are converting
-  4  $symbols               Symbols in the NFA we are converting
-  5  $nfaSymbolTransitions  States reachable from each state by symbol
-
-=head2 superStates($$$)
-
-Create super states from existing superstate
-
-     Parameter        Description
-  1  $dfa             DFA
-  2  $SuperStateName  Start state in DFA
-  3  $nfa             NFA we are tracking
-
-=head2 transitionOnSymbol($$$)
-
-The super state reached by transition on a symbol from a specified state
-
-     Parameter        Description
-  1  $dfa             DFA
-  2  $superStateName  Start state in DFA
-  3  $symbol          Symbol
-
 
 =head1 Index
 
 
-1 L<choice|/choice>
-
-2 L<Data::DFA::Parser::accept|/Data::DFA::Parser::accept>
-
-3 L<Data::DFA::Parser::accepts|/Data::DFA::Parser::accepts>
-
-4 L<Data::DFA::Parser::final|/Data::DFA::Parser::final>
-
-5 L<Data::DFA::Parser::next|/Data::DFA::Parser::next>
-
-6 L<element|/element>
-
-7 L<finalState|/finalState>
-
-8 L<fromExpr|/fromExpr>
-
-9 L<oneOrMore|/oneOrMore>
-
-10 L<optional|/optional>
-
-11 L<parser|/parser>
-
-12 L<print|/print>
-
-13 L<printNws|/printNws>
-
-14 L<sequence|/sequence>
-
-15 L<superState|/superState>
-
-16 L<superStates|/superStates>
-
-17 L<symbols|/symbols>
-
-18 L<transitionOnSymbol|/transitionOnSymbol>
-
-19 L<zeroOrMore|/zeroOrMore>
-
-
-
-=head1 Exports
-
-All of the following methods can be imported via:
-
-  use Data::DFA qw(:all);
-
-Or individually via:
-
-  use Data::DFA qw(<method>);
-
-
-
-1 L<choice|/choice>
-
-2 L<element|/element>
-
-3 L<oneOrMore|/oneOrMore>
-
-4 L<optional|/optional>
-
-5 L<sequence|/sequence>
-
-6 L<zeroOrMore|/zeroOrMore>
-
 =head1 Installation
 
-This module is written in 100% Pure Perl and, thus, it is easy to read, use,
-modify and install.
+This module is written in 100% Pure Perl and, thus, it is easy to read,
+comprehend, use, modify and install via B<cpan>:
 
-Standard L<Module::Build> process for building and installing modules:
-
-  perl Build.PL
-  ./Build
-  ./Build test
-  ./Build install
+  sudo cpan install Data::DFA
 
 =head1 Author
 
@@ -706,13 +411,14 @@ sub test
   $@ and die $@;
   eval $s;
   $@ and die $@;
+  1
  }
 
 test unless caller;
 
 1;
 # podDocumentation
-#__DATA__
+__DATA__
 use warnings FATAL=>qw(all);
 use strict;
 use Test::More tests=>11;

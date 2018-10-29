@@ -1,5 +1,5 @@
 ---
-abstract: 'The great new Sub::Fp!'
+abstract: 'A Clojure / Python Toolz / Lodash inspired Functional Utility Library'
 author:
   - 'Kristopher C. Paulsen <kristopherpaulsen+cpan@gmail.com>'
 build_requires:
@@ -19,4 +19,4 @@ no_index:
     - inc
 requires:
   perl: '5.006'
-version: '0.01'
+version: '0.09'

@@ -6,7 +6,7 @@ package Graphics::ColorNames::X;
 use strict;
 use warnings;
 
-our $VERSION = 'v3.3.1';
+our $VERSION = 'v3.3.3';
 
 
 sub NamesRgbTable() {
@@ -705,7 +705,7 @@ Graphics::ColorNames::X - X-Windows color names and equivalent RGB values
 
 =head1 VERSION
 
-version v3.3.1
+version v3.3.3
 
 =head1 SYNOPSIS
 
@@ -719,7 +719,7 @@ version v3.3.1
 This module defines color names and their associated RGB values used in
 X-Windows.
 
-It is based on the 2014 version of the F<rgb.txt> file, whcih includes
+It is based on the 2014 version of the F<rgb.txt> file, which includes
 colors from CSS4.
 
 =head1 SEE ALSO

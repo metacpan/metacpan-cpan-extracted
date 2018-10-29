@@ -4,12 +4,14 @@ use strict;
 use warnings;
 use List::Util qw(min max);
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 sub new {
     my $class = shift;
 
-    my $self = {};
+    my $self = {@_};
+    $self->{bg_char} ||= '.';
+
     bless $self, $class;
 
     return $self;
@@ -35,8 +37,10 @@ sub plot {
 
     my $result = [];
 
+    my $bg_char = substr($self->{bg_char}, 0, 1);
+
     for ( 0 .. $rows ) {
-        push @$result, [ '.', map { '.' } @$series ];
+        push @$result, [ $bg_char, map { $bg_char } @$series ];
     }
 
     for my $row ( 0 .. $rows ) {
@@ -92,7 +96,7 @@ App::AsciiChart - Simple Ascii Chart
 
     use App::AsciiChart;
 
-    App::AsciiChart->new->plot([1, 5, 3, 9, 10, 12]);
+    print App::AsciiChart->new->plot([1, 5, 3, 9, 10, 12]);
 
 =head1 DESCRIPTION
 
@@ -119,6 +123,10 @@ Copyright (C) Viacheslav Tykhanovskyi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 CREDITS
+
+Varadinsky (github/Varadinsky)
 
 =head1 AUTHOR
 

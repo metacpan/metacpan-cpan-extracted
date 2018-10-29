@@ -542,32 +542,32 @@ sub appendAdjuncts
     my $depth = 0;
     my $appended = 0;
     my $modified = 0;
-    if($added_node_set->getRoot->searchHead(0)->getIndex == $pivot )
+    if ($added_node_set->getRoot->searchHead(0)->getIndex == $pivot )
     {
 #	print $fh "pivot est tete de l'ajout\n";
 	my $tree2 = $tree_save->copy;
 #	$tree2->print($words_a,$fh);
 	my $added2 = $added_save->copy;
 	$root2 = $tree2->getNodeSet->searchRootNodeForLeaf($pivot);
-	if (defined $root) { # Added by Thierry 02/03/2007
+	if ((defined $root) && (defined $root2)) { # Added by Thierry 02/03/2007
 	    ($above,$place) = $root2->searchLeaf($pivot,\$depth); 
 #	    print $fh "above: " . $above->getID . "  plcae: " . $place ."\n";
 	    
 	    if(
-	       ($above->{"LINKED_TO_ISLAND"} == 0)
-	       ||
-	       ($above->getEdgeStatus($place) eq "MODIFIER")
-	       ||
-	       (
-		($above->{"LINKED_TO_ISLAND"} == 1)
-		&&
+		($above->{"LINKED_TO_ISLAND"} == 0)
+		||
+		($above->getEdgeStatus($place) eq "MODIFIER")
+		||
 		(
-		 ($added2->getRoot->{"LINKED_TO_ISLAND"} == 1)
-		 # ||
+		 ($above->{"LINKED_TO_ISLAND"} == 1)
+		 &&
+		 (
+		  ($added2->getRoot->{"LINKED_TO_ISLAND"} == 1)
+		  # ||
 # 		 ($above->searchHead(0)->getIndex == $pivot) 
 		 )
 		)
-	       )
+		)
 	    {
 		if($above->hitch($place,$added2->getRoot,$words_a,$fh))
 		{
@@ -588,29 +588,29 @@ sub appendAdjuncts
 		    }
 		}
 	    }
-	 #    else
+	    #    else
 # 	    {
 # 		print $fh "Linked to island above: " .$above->getID . "\n";
 # 	    }
 	}
 	
     }
-    if($root->searchHead(0)->getIndex == $pivot)
+    if ($root->searchHead(0)->getIndex == $pivot)
     {
 #	print $fh "pivot est tete du hook" . $root->getID. " \n";
 #	$this->print($words_a,$fh);
 	($above,$place) = $added_node_set->getRoot->searchLeaf($pivot,\$depth);
 	if (defined $above) { # Added by Thierry Hamon 31/01/2007 - to check
 #	    print $fh "above: " . $above->getID . "  plcae: " . $place ."\n";
-	if($above->hitch($place,$root,$words_a,$fh))
-	{
-	    $this->addNodes($added_node_set);
-	    $above->searchRoot->hitchMore($this->getNodeSet->searchFreeNodes($words_a),$this,$words_a,$fh);
-	    $this->updateRoot;
-	     $appended = 1;
-	    $modified = 1;
+	    if($above->hitch($place,$root,$words_a,$fh))
+	    {
+		$this->addNodes($added_node_set);
+		$above->searchRoot->hitchMore($this->getNodeSet->searchFreeNodes($words_a),$this,$words_a,$fh);
+		$this->updateRoot;
+		$appended = 1;
+		$modified = 1;
+	    }
 	}
-    }
     }
 
     return ($modified,$appended);

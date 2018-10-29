@@ -29,7 +29,7 @@ for ($c->req->headers) {
   $_->referrer('http://khm.li/');
 };
 
-my $track = $c->piwik_api(
+my $track = $c->piwik->api(
   Track => {
     idsite => '4',
     api_test => 1,
@@ -48,7 +48,7 @@ for ($c->req->headers) {
   $_->referrer('http://khm.li/');
 };
 
-$track = $c->piwik_api(
+$track = $c->piwik->api(
   Track => {
     idsite => [qw/4 5 6/],
     api_test => 1,
@@ -68,7 +68,7 @@ like($track, qr{res=1024x768}, 'Tracking 2');
 # Do not track
 $c->req->headers->dnt(1);
 
-$track = $c->piwik_api(
+$track = $c->piwik->api(
   Track => {
     idsite => [qw/4 5 6/],
     api_test => 1,
@@ -100,7 +100,7 @@ unless ($param{url}) {
   exit;
 };
 
-$track = $c->piwik_api(
+$track = $c->piwik->api(
   Track => {
     idsite => [qw/4 5 6/],
     res => '1024x768',
@@ -113,7 +113,7 @@ ok(!$track, 'Do not track');
 
 $c->req->headers->dnt(0);
 
-$track = $c->piwik_api(
+$track = $c->piwik->api(
   Track => {
     res => '1024x768',
     %param

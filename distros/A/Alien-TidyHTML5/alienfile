@@ -3,7 +3,7 @@
 use alienfile;
 
 plugin 'PkgConfig' => (
-    pkg_name        => 'tidy',
+    pkg_name        => [qw/ tidy tidy5 tidy-html5 /],
     minimum_version => '5.6.0',
 );
 

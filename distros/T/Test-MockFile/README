@@ -3,7 +3,7 @@ NAME
     without the file system ever being touched.
 
 VERSION
-    Version 0.006
+    Version 0.008
 
 SYNOPSIS
     Intercepts file system calls for specific files so unit testing can take
@@ -47,8 +47,26 @@ SYNOPSIS
         # The file check will now happen on file system now the file is no longer mocked.
         say "ok" if !-e "/foo/baz";
 
-EXPORT
-    No exports are provided by this module.
+IMPORT
+    If the module is loaded in strict mode, any file checks, open, sysopen,
+    opendir, stat, or lstat will throw a die.
+
+    For example:
+
+        use Test::MockFile qw/strict/;
+
+        # This will not die.
+        Test::MockFile->file("/bar", "...");
+        Test::MockFile->link("/foo", "/bar");
+        -l "/foo" or print "ok\n";
+        open(my $fh, ">", "/foo");
+    
+        # All of these will die
+        open(my $fh, ">", "/unmocked/file"); # Dies
+        sysopen(my $fh, "/other/file", O_RDONLY);
+        opendir(my $fh, "/dir");
+        -e "/file";
+        -l "/file"
 
 SUBROUTINES/METHODS
   file
@@ -63,7 +81,7 @@ SUBROUTINES/METHODS
   symlink
     Args: ($file, $readlink )
 
-    This will make cause $file to be mocked in all file checks, opens, etc.
+    This will cause $file to be mocked in all file checks, opens, etc.
 
     $readlink indicates what "fake" file it points to. If the file $readlink
     points to is not mocked, it will act like a broken link, regardless of
@@ -105,7 +123,7 @@ SUBROUTINES/METHODS
         };
 
     You'll notice that mode, size, and blocks have been left out of this.
-    Mode is set to 666 (for files) or 777 (for directores), xored against
+    Mode is set to 666 (for files) or 777 (for directories), xored against
     the current umask. Size and blocks are calculated based on the size of
     'contents' a.k.a. the fake file.
 
@@ -136,7 +154,7 @@ SUBROUTINES/METHODS
     Optional Arg: $readlink
 
     Returns the stat of a mocked file (does not follow symlinks.) You can
-    also use this to change what your symlink is poointing to.
+    also use this to change what your symlink is pointing to.
 
   is_link
     returns true/false, depending on whether this object is a symlink.
@@ -145,7 +163,7 @@ SUBROUTINES/METHODS
     returns true/false, depending on whether this object is a directory.
 
   is_file
-    returns true/false, depending on whether this object is regular file.
+    returns true/false, depending on whether this object is a regular file.
 
   size
     returns the size of the file based on its contents.
@@ -177,6 +195,27 @@ SUBROUTINES/METHODS
 
     Returns and optionally sets the atime of the file if passed as an
     integer.
+
+  add_file_access_hook
+    Args: ( $code_ref )
+
+    You can use add_file_access_hook to add a code ref that gets called
+    every time a real file (not mocked) operation happens. We use this for
+    strict mode to die if we detect your program is unexpectedly accessing
+    files. You are welcome to use it for whatever you like.
+
+    Whenever the code ref is called, we pass 2 arguments:
+    "$code->($access_type, $at_under_ref)". Be aware that altering the
+    variables in $at_under_ref will affect the variables passed to open /
+    sysopen, etc.
+
+    One use might be:
+
+        Test::MockFile::add_file_access_hook(sub { my $type = shift; print "$type called at: " . Carp::longmess() } );
+
+  clear_file_access_hooks
+    Calling this subroutine will clear everything that was passed to
+    add_file_access_hook
 
   How this mocking is done:
     Test::MockModule uses 2 methods to mock file access:

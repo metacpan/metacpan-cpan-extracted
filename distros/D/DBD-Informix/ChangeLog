@@ -1,32 +1,41 @@
-Change Log for Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) (aka DBD::Informix)
+Change Log for Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) (aka DBD::Informix)
+
+2018.1029 Release
+-----------------
+2018-10-29: Upload to PAUSE and CPAN.
+2018-10-29: General release tweaks.
+
+2018.0513 Release
+-----------------
+2018-05-13: Release to a few parties for testing.
+2018-05-13: Rewrite Notes/nonroot.install to recommend INSTALL_BASE.
+
+2018.0511 Release
+-----------------
+2018-05-11: Release to a few parties for testing.
+2018-05-10: Streamline Makefile.PL (throw away 400+ lines).  Reduce list
+            of supported versions of ESQL/C to version 3.xx and 4.xx
+            (corresponding to Informix 11.xx and 12.xx).  Simplify build
+            processing; do not use esql script directly in the library
+            building process, but use output from 'esql -libs' to
+            determine library list.  This should fix the problem with
+            the esql script stripping out '-shared' options which causes
+            link failures on Linux platforms.
 
 2015.1101 Release
 -----------------
 2015-11-01: Upload to PAUSE and CPAN.
-2015-10-31: Revise notes on release process to use apply.setminref.pl and
-            setminref.pl.  Update release tools on release platform so it
-            works.  Otherwise, no change to the product.
+2015-11-01: Fix glitches in release processing.
 
 2015.1031 Release
 -----------------
-2015-10-31: Upload to PAUSE and CPAN.  Announcement not sent.
+2015-10-31: Upload to PAUSE and CPAN.
 2015-10-28: Resolve RT#108030.  Use code fragment from 'perldoc perlvar' to
             find Perl executable via Config module.  Problem reported by
             Curtis Leach <CLEACH@cpan.org>.
 2015-10-28: Resolve RT#108031.  MANIFEST listed setmincur.pl but file was
             renamed to setminref.pl before prior release.  Problem reported
             by Curtis Leach <CLEACH@cpan.org>.
-
-2015.0826 Release
------------------
-2015-08-26: Upload to PAUSE and CPAN.
-2015-08-26: Automatically deal with Perl and DBI minimum versions since the
-            previous releases had a mish-mash of version numbers scattered
-            through the code.
-2015-08-26: Fix DBD::Informix::TechSupport module, thereby fixing the
-            TechSupport and ItWorks scripts too.
-2015-08-26: Announce that IBM Informix ClientSDK (CSDK) 3.50 will be the
-            oldest supported version from 2016-01-01 onwards.
 
 2015.0825 Release
 -----------------
@@ -1303,4 +1312,4 @@ Pre-Release
 --------------
 
 Jonathan Leffler <jleffler@google.com>
-@(#)$Id: ChangeLog,v 2015.4 2015/11/01 06:49:48 jleffler Exp $
+@(#)$Id: ChangeLog,v 2018.3 2018/10/29 01:52:18 jleffler Exp $

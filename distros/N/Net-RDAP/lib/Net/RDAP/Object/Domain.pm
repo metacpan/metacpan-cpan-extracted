@@ -24,7 +24,7 @@ Other methods include:
 
 	$name = $nameserver->name;
 
-Returns a Net::DNS::Domain representing the name of the nameserver.
+Returns a L<Net::DNS::Domain> representing the name of the nameserver.
 
 =cut
 

@@ -34,7 +34,7 @@
          "requires" : {
             "Compress::Zlib" : "1",
             "Font::TTF" : "1.04",
-            "perl" : "5.016"
+            "perl" : "5.016000"
          }
       },
       "test" : {
@@ -53,6 +53,6 @@
          "web" : "https://github.com/PhilterPaper/Perl-PDF-Builder"
       }
    },
-   "version" : "3.010",
+   "version" : "3.012",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

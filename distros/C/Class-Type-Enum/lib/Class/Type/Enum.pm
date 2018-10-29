@@ -1,6 +1,6 @@
 package Class::Type::Enum;
 # ABSTRACT: Build Enum-like classes
-$Class::Type::Enum::VERSION = '0.013';
+$Class::Type::Enum::VERSION = '0.014';
 
 use strict;
 use warnings;
@@ -220,7 +220,7 @@ Class::Type::Enum - Build Enum-like classes
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 # VERSION
 
-version 2.20
+version 2.21
 
 # SYNOPSIS
 
@@ -60,12 +60,12 @@ that time zone.
 
 There are also several special values that can be given as names.
 
-If the "name" parameter is "floating", then a
-`DateTime::TimeZone::Floating` object is returned.  A floating time
-zone does have _any_ offset, and is always the same time.  This is
-useful for calendaring applications, which may need to specify that a
-given event happens at the same _local_ time, regardless of where it
-occurs.  See RFC 2445 for more details.
+If the "name" parameter is "floating", then a `DateTime::TimeZone::Floating`
+object is returned.  A floating time zone does not have _any_ offset, and is
+always the same time.  This is useful for calendaring applications, which may
+need to specify that a given event happens at the same _local_ time,
+regardless of where it occurs. See [RFC
+2445](https://www.ietf.org/rfc/rfc2445.txt) for more details.
 
 If the "name" parameter is "UTC", then a `DateTime::TimeZone::UTC`
 object is returned.
@@ -139,8 +139,8 @@ at both -0500 and +1000/+1100.
 
 ## $tz->is\_floating
 
-Returns a boolean indicating whether or not this object represents a
-floating time zone, as defined by RFC 2445.
+Returns a boolean indicating whether or not this object represents a floating
+time zone, as defined by [RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
 
 ## $tz->is\_utc
 
@@ -341,6 +341,7 @@ Dave Rolsky <autarch@urth.org>
 - Joshua Hoblitt <jhoblitt@cpan.org>
 - Karen Etheridge <ether@cpan.org>
 - karupanerura <karupa@cpan.org>
+- Mohammad S Anwar <mohammad.anwar@yahoo.com>
 - Olaf Alders <olaf@wundersolutions.com>
 - Peter Rabbitson <ribasushi@cpan.org>
 - Tom Wyant <wyant@cpan.org>

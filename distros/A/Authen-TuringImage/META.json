@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0",
             "Test::More" : "0"
          }
       },
@@ -40,6 +40,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.006",
+   "version" : "1.008",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

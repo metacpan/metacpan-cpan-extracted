@@ -10,8 +10,10 @@ WriteMakefile(
 	      AUTHOR              => q{Ashish Gulhati <authen-ti at hash.neo.tc>},
 	      VERSION_FROM        => 'lib/Authen/TuringImage.pm',
 	      ABSTRACT_FROM       => 'lib/Authen/TuringImage.pm',
-              LICENSE             => 'Artistic_2_0',
 	      PL_FILES            => {},
+	      BUILD_REQUIRES      => {
+				      'File::ShareDir::Install' => 0,
+				     },
 	      TEST_REQUIRES       => {
 				      'Test::More' => 0,
 				     },

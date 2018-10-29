@@ -20,6 +20,9 @@ my $builder = Module::Build->new(
     build_requires => {
                        'Test::More' => 0,
                       },
+
+    extra_manify_args => { utf8 => 1 },
+
     meta_merge => {
                    resources => {
                                  repository => 'https://github.com/trizen/Lingua-RO-Numbers'

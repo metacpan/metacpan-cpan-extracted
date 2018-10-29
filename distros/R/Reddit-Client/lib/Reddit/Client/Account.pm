@@ -13,7 +13,7 @@ use fields qw/has_mail inbox_count created modhash created_utc link_karma
 	      new_modmail_exists pref_no_profanity pref_show_snoovatar
 	      suspension_expiration_utc verified subreddit in_beta is_employee
 	      is_sponsor is_suspended pref_geopopular pref_top_karma_subreddits
-	      over_18
+	      over_18 has_subscribed hide_from_robots has_verified_email
 	   /;
 
 use constant type => "t2";

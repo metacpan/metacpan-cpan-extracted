@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -192,7 +192,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 

@@ -13,14 +13,11 @@ CREATE TABLE `articles` (
   `slug` varchar(255) NOT NULL,
   `title` varchar(255) NOT NULL,
   `updatedAt` datetime NOT NULL,
-  `article_id` integer NOT NULL,
   `author_id` integer NOT NULL,
   INDEX `pk_id` (`id`),
-  INDEX (`article_id`),
   INDEX (`author_id`),
   PRIMARY KEY (`id`),
-  CONSTRAINT `articles_fk` FOREIGN KEY (`article_id`) REFERENCES `multiple_articles_responses` (`id`),
-  CONSTRAINT `articles_fk_1` FOREIGN KEY (`author_id`) REFERENCES `profiles` (`id`)
+  CONSTRAINT `articles_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB;
 
 --
@@ -48,42 +45,7 @@ CREATE TABLE `comments` (
   INDEX `pk_id` (`id`),
   INDEX (`author_id`),
   PRIMARY KEY (`id`),
-  CONSTRAINT `comments_fk` FOREIGN KEY (`author_id`) REFERENCES `profiles` (`id`)
-) ENGINE=InnoDB;
-
---
--- Table: `multiple_articles_responses`
---
-CREATE TABLE `multiple_articles_responses` (
-  `articlesCount` integer NOT NULL,
-  `id` integer NOT NULL auto_increment,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
---
--- Table: `new_users`
---
-CREATE TABLE `new_users` (
-  `email` varchar(255) NOT NULL,
-  `id` integer NOT NULL auto_increment,
-  `password` varchar(255) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
-);
-
---
--- Table: `profiles`
---
-CREATE TABLE `profiles` (
-  `bio` varchar(255) NOT NULL,
-  `following` tinyint NOT NULL,
-  `id` integer NOT NULL auto_increment,
-  `image` varchar(255) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  INDEX `pk_id` (`id`),
-  PRIMARY KEY (`id`)
+  CONSTRAINT `comments_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
 ) ENGINE=InnoDB;
 
 --
@@ -94,10 +56,22 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `id` integer NOT NULL auto_increment,
   `image` varchar(255) NOT NULL,
-  `token` varchar(255) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   INDEX `pk_id` (`id`),
   PRIMARY KEY (`id`)
-);
+) ENGINE=InnoDB;
+
+--
+-- Table: `user_follow_user_follows`
+--
+CREATE TABLE `user_follow_user_follows` (
+  `follow_from_id` integer NOT NULL,
+  `follow_to_id` integer NOT NULL,
+  INDEX `pk_follow_from_id_follow_to_id` (`follow_from_id`, `follow_to_id`),
+  PRIMARY KEY (`follow_from_id`, `follow_to_id`),
+  CONSTRAINT `user_follow_user_follows_fk` FOREIGN KEY (`follow_to_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `user_follow_user_follows_fk_1` FOREIGN KEY (`follow_from_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB;
 
 SET foreign_key_checks=1;'

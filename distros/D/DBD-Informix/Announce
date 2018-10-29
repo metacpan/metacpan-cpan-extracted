@@ -1,18 +1,18 @@
 To: dbi-announce@perl.org, dbi-dev@perl.org, dbi-users@perl.org,
         informix-list@iiug.org, dbd.informix@gmail.com
-Subject: ANNOUNCE: Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) released
+Subject: ANNOUNCE: Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) released
 
-Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) has been uploaded to CPAN.
+Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) has been uploaded to CPAN.
 
 IBM Informix Database Driver for Perl (also known as DBD::Informix) is
-the driver code that enables Perl 5.008001 or later to access Informix
+the driver code that enables Perl :PERL_MINVERSION: or later to access Informix
 databases via the DBI module (but if you are not already using Perl
-5.022000 - or a later version - you should be planning to upgrade Perl).
-You will to install DBI version 1.607 or later as well (version 1.634,
-or any later version, is recommended) before installing DBD::Informix.
-The code for DBD::Informix is available for download via:
+:PERL_REFVERSION:, or a later version, you should be planning to upgrade Perl).
+You will need to install DBI version :DBI_MINVERSION: or later as well (version :DBI_REFVERSION:,
+or any later version, is recommended) before installing DBD::Informix.  The
+code for DBD::Informix is available for download via:
 
-http://www.perl.org/CPAN/modules/by-category/07_Database_Interfaces
+http://www.cpan.org/modules/by-category/07_Database_Interfaces
 http://dbi.perl.org/
 
 ** When you successfully build this module, use the ItWorks (Perl)
@@ -21,9 +21,30 @@ http://dbi.perl.org/
 ** The ItWorks script does not send email to anybody; you have to do
 ** that yourself.
 
+New in release 2018.1029
+* Minor tweaks to Announce and ChangeLog for general release.
+
+New in release 2018.0513 (limited trial release):
+* Revise guidance in Notes/nonroot.install for modern ExtUtils::MakeMaker.
+
+New in release 2018.0511 (limited trial release):
+* Remove support for versions of ESQL/C prior to 3.00 for Informix 11.10.
+* Remove support for compilation with C4GL instead of ESQL/C.
+* Rework the linking process to exploit 'esql -libs' always.
+* Remove support for DG-UX and DEC OSF/1.
+* Remove support for 'Windows NT' (t was never shown to work on XP, let
+  alone Vista, Windows 7, 8 or 10)
+* Simplify support for HP-UX and Solaris.
+* Stop using the esqlcc, esqlld, esqlsed scripts.
+* Remove source code added solely to support unsupported versions of
+  ESQL/C.
+* Remove many conditional compilation fragments for unsupported versions
+  of ESQL/C.
+* Change work email address to jonathan.leffler@hcl.com
+
 New in release 2015.1101:
-* Pure bug-fix release (fixing glitches in release process, and documenting
-  the correct process so maybe the glitches won't reoccur).
+* Trivial bug fix for the 2015.1031 release.
+* The ghosties and ghoulies crept in!
 
 New in release 2015.1031:
 * This is basically a minor bug-fix release.
@@ -43,15 +64,6 @@ New in release 2015.0826:
   You're welcome to try using older versions, but if anything goes wrong,
   you will need to upgrade.
 
-New in release 2015.0825:
-* Deal with changes to ExtUtils::MakeMaker that broke the build.
-* Update to require Perl 5.8.1 and DBI 1.607.
-* Change work email address back to jleffler@us.ibm.com
-
-New in release 2013.0521:
-* Support CSDK 4.10 for IDS 12.10
-* Change work email address to jleffler@google.com
-
 Support email address:
 * This release is supported by Jonathan Leffler <dbd.informix@gmail.com>.
 * You may also report your bugs via the CPAN resolution tracking system:
@@ -61,6 +73,6 @@ Support email address:
 
 As always, see the ChangeLog file for details about what has changed.
 
-Jonathan Leffler (jleffler@us.ibm.com, jonathan.leffler@gmail.com)
+Jonathan Leffler (jonathan.leffler@hcl.com, jonathan.leffler@gmail.com)
 
-@(#)$Id: Announce,v 2015.6 2015/11/01 07:31:31 jleffler Exp $
+@(#)$Id: Announce,v 2018.5 2018/10/29 01:52:18 jleffler Exp $

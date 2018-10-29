@@ -219,10 +219,10 @@ is(
 
     ::is(
         ::exception { has native => (
-                traits => ['Array'],
-                is     => 'ro',
-                isa    => t( 'ArrayRef', of => t('Int') ),
-                default => sub          { [] },
+                traits  => ['Array'],
+                is      => 'ro',
+                isa     => t( 'ArrayRef', of => t('Int') ),
+                default => sub { [] },
                 handles => { add_native => 'push' },
             );
         },

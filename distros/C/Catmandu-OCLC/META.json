@@ -4,7 +4,7 @@
       "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -15,12 +15,12 @@
    "name" : "Catmandu-OCLC",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -36,15 +36,15 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.17",
             "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Catmandu" : "0",
-            "Catmandu::Importer::MARC" : "0",
-            "JSON" : "0",
+            "Catmandu::MARC" : "0",
+            "JSON::MaybeXS" : "0",
             "LWP::Simple" : "0",
             "Moo" : "1.0",
             "REST::Client" : "0",
@@ -71,9 +71,10 @@
          "web" : "https://github.com/LibreCat/Catmandu-OCLC"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_contributors" : [
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

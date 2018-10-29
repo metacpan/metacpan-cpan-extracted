@@ -1,5 +1,9 @@
 Revision history for Perl extension App-AsciiChart
 
+0.04 2018-10-26T19:20:50Z
+
+    - configurable background character by Varadinsky (github/Varadinsky)
+
 0.03 2018-10-05T19:29:12Z
 
     - show help when no sequence is passed

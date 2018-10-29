@@ -1,3 +1,6 @@
+
+- BUG : (line 690) if the output si TERMANDROOTHEAD and termlist is not set to "multi", term head of single term are tried to be printed.
+
 - Correcting the Input (TreeTagger Output) to be always conformed (use a method defined in YaTeA - todo)
 
 - Add POD directive =encoding in each file
@@ -61,18 +64,37 @@ Check the XML conformity, especially < and > and &
 
 - UTF-8
 
-- tests : loading a corpus
-	  loading  a testified term list
-          chunking
+- tests : chunking
           progressively parsing
 	  displaying results
-	  process English corpus
           process French corpus (tagged with TreeTagger)
           process French corpus (tagged with Flemm)
-	  process English corpus with testified terms
 
 - to check that Edge.pm is useful
 
 - review WordFromcorpus and LexiconItem (the word form is concated and then split !)
 
 - integrate message display in submodule (for instance TestifiedTermSet)
+
+- add HYPH in the list of syntactic borders
+
+- check and correct forbidden structures
+
+ order of the colums:
+
+sein\LF de\LF	ANY	delete	2
+NOM\POS DET:ART\POS NOM\POS	ANY	split	3	DET:ART
+du\LF à\LF un\LF	ANY	split	3	du
+au\LF sein\LF de\LF	ANY	split	3	sein
+ADJ\POS PRP\POS ADJ\POS	ANY	split	3	PRP
+PRP\LF NUM\POS aide\LF PRP\POS	ANY	split	4	aide
+
+
+ and rules:
+
+  à\LF DET:ART\POS aide\LF de\LF	ANY	delete	2	aide
+
+- add an output with the term/head/modifier in a tabular file
+
+- change Parse::Yapp for Parse::Eyapp
+

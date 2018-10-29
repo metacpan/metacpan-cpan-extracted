@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -64,7 +64,7 @@ sub outobjdeep {
 =item $ant->link($page)
 
 Defines the annotation as a launch-page with page C<$page> (within I<this>
-document) and options %opts (-rect, -border, I<fit> options).
+document) and options %opts (-rect, -border, I<fit>, -color (border's)).
 
 =cut
 
@@ -79,9 +79,8 @@ sub link {
     $self->dest($page, %opts);
     $self->rect(@{$opts{'-rect'}}) if defined $opts{'-rect'};
     $self->border(@{$opts{'-border'}}) if defined $opts{'-border'};
+    # border color
     $self->Color(@{ $opts{'-color'} }) if defined $opts{'-color'};
-    # descriptive text on mouse rollover
-    $self->{'T'} = PDFStr($opts{'-text'}) if exists $opts{'-text'};
 
     return $self;
 }
@@ -91,7 +90,7 @@ sub link {
 =item $ant->url($url)
 
 Defines the annotation as a launch-url with url C<$url> and
-options %opts (-rect, -border).
+options %opts (-rect, -border, and -color (border's)).
 
 =cut
 
@@ -116,8 +115,6 @@ sub url {
     $self->rect(@{$opts{'-rect'}}) if defined $opts{'-rect'};
     $self->border(@{$opts{'-border'}}) if defined $opts{'-border'};
     $self->Color(@{ $opts{'-color'} }) if defined $opts{'-color'};
-    # descriptive text on mouse rollover
-    $self->{'T'} = PDFStr($opts{'-text'}) if exists $opts{'-text'};
 
     return $self;
 }
@@ -127,7 +124,7 @@ sub url {
 =item $ant->file($file)
 
 Defines the annotation as a launch-file with filepath C<$file> and
-options %opts (-rect, -border).
+options %opts (-rect, -border, and -color (border's)).
 
 =cut
 
@@ -163,7 +160,7 @@ sub file {
 =item $ant->pdf_file($pdffile, $pagenum)
 
 Defines the annotation as a PDF-file with filepath C<$pdffile>, on page 
-C<$pagenum>, and options %opts (-rect, -border, I<fit> options).
+C<$pagenum>, and options %opts (-rect, -border, I<fit>, and -color (border's)).
 
 The old name, I<pdfile>, is still available but is B<deprecated> and will be
 removed at some time in the future.
@@ -173,6 +170,7 @@ removed at some time in the future.
 # to be removed no earlier than November 16, 2019
 sub pdfile {
     my ($self, $url, $pnum, %opts) = @_;
+    warn "use pdf_file() method instead of pdfile()";
     return $self->pdf_file($url, $pnum, %opts);
 }
 
@@ -210,7 +208,7 @@ sub pdf_file {
 =item $ant->text($text)
 
 Defines the annotation as a text note with content string C<$text> and
-options %opts (-rect, -border, -open). 
+options %opts (-rect, -border, -color (border's), and -open). 
 
 Additional options:
 
@@ -265,7 +263,7 @@ sub text {
 =item $ant->movie($file, $contentType)
 
 Defines the annotation as a movie from C<$file> with C<$contentType> and
-options %opts (-rect, -border).
+options %opts (-rect, -border, -color (border's)).
 
 =cut
 
@@ -470,9 +468,8 @@ sub rect {
 =item $ant->border(@b)
 
 Sets the border-style of the annotation, if applicable, as given by the
--border option. There are three or four entries in the array:
-horizontal and vertical corner radii, border width, and (optionally) dash
-pattern array [len_on, len_off].
+-border option. There are three entries in the array:
+horizontal and vertical corner radii, and border width.
 
 The default is [0 0 1] (solid line of width 1, sharp corners).
 
@@ -480,31 +477,45 @@ Defining option:
 
 =over
 
-=item -border => [CRh CRv W [on off]]
-
 =item -border => [CRh CRv W]
 
 Set annotation B<border style> of horizontal and vertical corner radii C<CRh> 
 and C<CRv> (value 0 for squared corners) and width C<W> (value 0 for no border).
 The default is squared corners and a solid line of width 1 ([0 0 1]).
 
-A dash pattern [C<on> length, C<off> length] may optionally be given.
-The default is a solid line.
+The border vector seems to ignore the first two settings (corner radii), but 
+the line thickness works, on basic Readers. 
+The radii I<may> work on some other Readers.
 
 =back
 
 =cut
+
+#-border option. There are three or four entries in the array:
+#horizontal and vertical corner radii, border width, and (optionally) dash
+#pattern array [len_on, len_off].
+#
+#A dash pattern [C<on> length, C<off> length] may optionally be given.
+#The default is a solid line.
+#
+#=item -border => [CRh CRv W [on off]]
+ 
+# TBD the dash pattern does work, if manually inserted into the PDF, something
+# like /Border [ 0 0 1 [ 5 3 2 1 ] ], but I haven't yet figured out how to
+# turn -border => [ 0,0,1, [5,3, 2,1] ] into that. I don't think PDFArray(map)
+# is going to do the job ... might have to manually build the /Border clause.
 
 sub border {
     my ($self, @b) = @_;
 
     if      (scalar @b == 3) {
         $self->{'Border'} = PDFArray( map { PDFNum($_) } $b[0],$b[1],$b[2]);
-    } elsif (scalar @b == 4) {
+   #} elsif (scalar @b == 4) {
 	# b[3] is an anonymous array
-        $self->{'Border'} = PDFArray( map { PDFNum($_) } $b[0],$b[1],$b[2],$b[3]);
+   #    $self->{'Border'} = PDFArray( map { PDFNum($_) } $b[0],$b[1],$b[2],@{$b[3]});
     } else {
-        die "annotation->border() style requires 3 or 4 parameters ";
+       #die "annotation->border() style requires 3 or 4 parameters ";
+        die "annotation->border() style requires 3 parameters ";
     }
     return $self;
 }
@@ -529,6 +540,7 @@ sub content {
     return $self;
 }
 
+# unused internal routine? TBD
 sub name {
     my ($self, $n) = @_;
 
@@ -631,6 +643,9 @@ magnified by the factor C<$zoom>. A zero (0) value for any of the parameters
 C<$left>, C<$top>, or C<$zoom> specifies that the current value of that 
 parameter is to be retained unchanged.
 
+This is the B<default> fit setting, with position (left and top) and zoom
+the same as the calling page's.
+
 =back
 
 =item $ant->dest($name)
@@ -643,8 +658,6 @@ sub dest {
     my ($self, $page, %opts) = @_;
 
     if (ref $page) {
-        $opts{'-xyz'} = [undef,undef,undef] if scalar(keys %opts) < 1;
-
         $self->{'A'} ||= PDFDict();
 
         if      (defined $opts{'-fit'}) {
@@ -665,6 +678,10 @@ sub dest {
         } elsif (defined $opts{'-xyz'}) {
             die "Insufficient parameters to ->dest(page, -xyz => []) " unless scalar @{$opts{'-xyz'}} == 3;
             $self->{'A'}->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$opts{'-xyz'}});
+        } else {
+	        # no "fit" option found. use default.
+            $opts{'-xyz'} = [undef,undef,undef];
+            $self->{'A'}->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$opts{'-xyz'}});
         }
     } else {
         $self->{'Dest'} = PDFStr($page);
@@ -679,6 +696,9 @@ Set the icon's fill color. The color is an array of 1, 3, or 4 numbers, each
 in the range 0.0 to 1.0. If 1 number is given, it is the grayscale value (0 = 
 black to 1 = white). If 3 numbers are given, it is an RGB color value. If 4
 numbers are given, it is a CMYK color value.
+
+For link and url annotations, this is the color of the rectangle border 
+(-border given with a width of at least 1).
 
 If an invalid array length or numeric value is given, a medium gray ( [0.5] ) 
 value is used, without any message. If no color is given, the usual fill color
@@ -696,13 +716,13 @@ If I<g> is between 0.0 (black) and 1.0 (white), the fill color will be gray.
 
 If I<r> (red), I<g> (green), and I<b> (blue) are all between 0.0 and 1.0, the 
 fill color will be the defined RGB hue. [ 0, 0, 0 ] is black, [ 1, 1, 0 ] is
-yellow, and [ 1, 1, 1] is white.
+yellow, and [ 1, 1, 1 ] is white.
 
 =item -color => [ c, m, y, k ]
 
 If I<c> (red), I<m> (magenta), I<y> (yellow), and I<k> (black) are all between 
 0.0 and 1.0, the fill color will be the defined CMYK hue. [ 0, 0, 0, 0 ] is
-white, [ 1, 0, 1, 0 ] is green, and [ 1, 1, 1, 1] is black.
+white, [ 1, 0, 1, 0 ] is green, and [ 1, 1, 1, 1 ] is black.
 
 =back
 
@@ -740,7 +760,8 @@ sub Color {
 
 Specify an optional B<text label> for annotation. This text or comment only
 shows up in the pop-up containing the file or text, when the mouse is rolled
-over the target rectangle.
+over the target rectangle. It does not normally show for link, url, etc.
+annotations.
 
 =cut
 

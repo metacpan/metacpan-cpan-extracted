@@ -16,7 +16,7 @@ use Verilog::Getopt;
 use strict;
 use vars qw ($Debug $VERSION);
 
-$VERSION = '3.454';
+$VERSION = '3.456';
 
 ######################################################################
 # main
@@ -229,7 +229,7 @@ reference manual. Defaults false.
 
 Requests simple output, an alias for --noline, --nocomment and --noblank.
 
-=item --sythesis
+=item --synthesis
 
 Define SYNTHESIS, and ignore text bewteen "ambit", "pragma", "synopsys" or
 "synthesis" translate_off and translate_on meta comments.  Note using

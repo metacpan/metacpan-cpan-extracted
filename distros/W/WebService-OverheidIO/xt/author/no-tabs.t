@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
+    'bin/query_openkvk.pl',
     'lib/WebService/OverheidIO.pm',
     'lib/WebService/OverheidIO/BAG.pm',
     'lib/WebService/OverheidIO/KvK.pm',

@@ -12,6 +12,12 @@ my $builder = Module::Build->new(
         'Test::More' => 0,
         'Carp'       => 0,
     },
+    meta_merge     => {
+      resources => {
+        repository  => 'http://github.com/bayashi/Music-Cord-Note',
+        bugtracker  => 'http://github.com/bayashi/Music-Cord-Note/issues',
+      }
+    },
     add_to_cleanup      => [ 'Music-Chord-Note-*' ],
 );
 

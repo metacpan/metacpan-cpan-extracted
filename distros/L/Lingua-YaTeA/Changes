@@ -1,23 +1,37 @@
 Revision history for Perl extension Lingua::YaTeA.
 
-0.622   - Correction of the input if the format is not correct (either
+0.626
+        - Remove of File::chmod, dependency in the install script (Build.PL)
+
+0.625
+        - Change in the customization of the install script (Build.PL)
+
+0.623   
+        - Homogenisation of the output management in the print* functions (PhraseSet)
+        - Change of the minimal required Perl version
+
+0.622   
+        - Correction of the input if the format is not correct (either
           incorrect lines are removed, either they are corrected)
         - Correction in the processing of the testified terms (if the
           option "TT-for-BioLG" is not set, yatea is usuable).
         - Add a module dependency for the configuration
         - Take into account the prefix for the configuration file
 
-0.621   - Add the installation of the FR-Flemm files (which have been
+0.621   
+        - Add the installation of the FR-Flemm files (which have been
           forgot before:-(
         - Add pod directive "=encoding utf8" to manage utf8 encoding
 
 
-0.62    - better management of argument in the script yatea
+0.62    
+        - better management of argument in the script yatea
 	- Correction in utf8 use directive to avoid failure with CPAN
           tests
 	- correction deprecated code in IndexSet (defined @array)
 
-0.61    - Add use utf8 in the script yatea to avoid failure with CPAN
+0.61    
+        - Add use utf8 in the script yatea to avoid failure with CPAN
           tests
         - Minor correction in the documentation of the main module
 
@@ -70,11 +84,13 @@ Revision history for Perl extension Lingua::YaTeA.
           identified in the XML files.
 
 
-0.5     - Minor correction in the installation process
+0.5     
+        - Minor correction in the installation process
         - for some OS, Config::General returns while setting variables
           as yatea.rc is on read-inly mode
 
-0.4     - use warnings in all the files
+0.4     
+        - use warnings in all the files
         - correction of minor bugs
         - control of the input type in Node.pm,  NodeSet.pm, Tree.pm
         - bug fix in Tree.pm (method
@@ -103,7 +119,8 @@ Revision history for Perl extension Lingua::YaTeA.
 	- documentation of the module TagSet.pm, File.pm and FileSet.pm
 	- Corrections in the LICENSE file
 
-0.3     - removing the .config file
+0.3     
+        - removing the .config file
         - bug fix: check in the hook_node is defined in Node.pm
         - replacement of the use of the Parse::Lex module by a
 	  module generated from Parse::Yapp
@@ -114,7 +131,8 @@ Revision history for Perl extension Lingua::YaTeA.
 	  array can be empty
 
 
-0.2     - correction of bugs (or temporary workaround) in the
+0.2     
+        - correction of bugs (or temporary workaround) in the
           tree/node management
         - Removing the file Config.pm (no more necessary)
           and from Makefile.PL

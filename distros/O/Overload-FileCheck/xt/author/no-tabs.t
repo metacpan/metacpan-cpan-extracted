@@ -24,6 +24,7 @@ my @files = (
     't/mock-setting-errno.t',
     't/mock-stat.t',
     't/recycle-stat.t',
+    't/simple-test.t',
     't/stat-helpers.t',
     't/test-A.t',
     't/test-B-uppercase.t',

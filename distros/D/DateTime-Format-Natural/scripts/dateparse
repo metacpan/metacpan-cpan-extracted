@@ -70,11 +70,12 @@ sub set_values
             }
         }
         if ($got_date || $got_time) {
+            my %opts = exists $opts->{t} ? (time_zone => $opts->{t}) : ();
             if (!$got_date) { # time only
                 my @units = qw(year month day);
-                @time{@units} = map DateTime->now->$_, @units;
+                @time{@units} = map DateTime->now(%opts)->$_, @units;
             }
-            eval { $opts->{d} = DateTime->new(%time) } or $ignore = true;
+            eval { $opts->{d} = DateTime->new(%time, %opts) } or $ignore = true;
         }
         else {
             $ignore = true;
@@ -102,14 +103,14 @@ sub set_values
 
 sub usage
 {
-    print <<USAGE;
+    print <<"USAGE";
 Usage: $0 [switches]
    -d, --datetime=<string>     datetime string
    -e, --extract               extract expressions
    -f, --format=<format>       format of numeric dates
    -h, --help                  this help screen
    -l, --lang=<code>           language code
-   -p, --prefer_future         use future dates (when possible)
+   -p, --prefer_future         prefer future dates
    -s, --supported             list of supported languages
    -t, --time_zone=<string>    time zone string
    -T, --trace                 print trace after processing
@@ -147,7 +148,7 @@ sub process
         last if $input =~ /^(?:q(?:uit)?|exit)$/i;
 
         if ($input =~ /^(?:\?|help)$/i) {
-            print <<EOT;
+            print <<'EOT';
 
 Commands
  ?, help                this help screen
@@ -170,7 +171,7 @@ EOT
 
             if ($parser->success) {
                 foreach my $dt (@dt) {
-                    printf("%4d-%02d-%02d %02d:%02d:%02d\n", map $dt->$_, qw(year month day hour min sec));
+                    print $dt->strftime('%Y-%m-%d %H:%M:%S'), "\n";
                     if ($trace && @traces) {
                         print shift @traces, "\n";
                     }
@@ -195,7 +196,7 @@ dateparse - frontend to DateTime::Format::Natural
    -f, --format=<format>       format of numeric dates
    -h, --help                  this help screen
    -l, --lang=<code>           language code
-   -p, --prefer_future         use future dates (when possible)
+   -p, --prefer_future         prefer future dates
    -s, --supported             list of supported languages
    -t, --time_zone=<string>    time zone string
    -T, --trace                 print trace after processing

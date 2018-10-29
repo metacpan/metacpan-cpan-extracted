@@ -1,5 +1,5 @@
 {
-   "abstract" : "Use Piwik in Mojolicious",
+   "abstract" : "Use Matomo (Piwik) in Mojolicious",
    "author" : [
       "Nils Diewald"
    ],
@@ -40,9 +40,9 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.opensource.org/licenses/artistic-license-2.0"
+         "https://opensource.org/licenses/artistic-license-2.0"
       ]
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -23,6 +23,7 @@ use App::sdif;
 my $version = $App::sdif::VERSION;
 
 my $opt_d;
+my $opt_B;
 my $opt_diff;
 my $opt_date = 1;
 my $opt_refresh = 1;
@@ -38,6 +39,7 @@ my @opt_colormap;
 
 my @optargs = (
     "d" => \$opt_d,
+    "B|char" => \$opt_B,
     "diff=s" => \$opt_diff,
     "e|exec=s" => \@opt_exec,
     "r|refresh:1" => \$opt_refresh,
@@ -100,6 +102,7 @@ my @diffcmd = do {
 	( @default_diff,
 	  map  { $_->[1] }
 	  grep { $_->[0] }
+	  [   $opt_B    => '-B' ],
 	  [ ! $opt_mark => '--no-mark' ],
 	  [ ! $opt_old  => '--no-old' ],
 	);
@@ -192,6 +195,8 @@ Options:
 	--[no]newline       print newline result (default on)
 	--[no]clear         clear screen after output (default on)
 	--diff=command      diff command used to compare result
+
+	-B, --char          char-by-char comparison
 
 =head1 EXAMPLES
 

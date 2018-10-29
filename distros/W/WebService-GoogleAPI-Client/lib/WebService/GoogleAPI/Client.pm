@@ -1,9 +1,13 @@
 use strictures;
+use 5.14.0;
 
 package WebService::GoogleAPI::Client;
-$WebService::GoogleAPI::Client::VERSION = '0.13';
+$WebService::GoogleAPI::Client::VERSION = '0.16';
 
-# ABSTRACT: Google API Services Client.
+# ABSTRACT: API WebService OAUTH2 Client Agent to streamline access to GOOGLE API End-Point Services using Discovery Data
+
+
+#   FROM MCE POD -- <p><img src="https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.png" width="664" height="446" alt="Bank Queuing Model" /></p>
 
 
 use Data::Dumper;
@@ -24,8 +28,8 @@ has 'ua' => (
 has 'chi' => ( is => 'rw', default => sub { CHI->new( driver => 'File', max_key_length => 512, namespace => __PACKAGE__ ) }, lazy => 1 );
 has 'discovery' => (
   handles => [
-    qw/ get_method_meta discover_all extract_method_discovery_detail_from_api_spec get_api_discovery_for_api_id
-      methods_available_for_google_api_id list_of_available_google_api_ids  /
+    qw/  discover_all extract_method_discovery_detail_from_api_spec get_api_discovery_for_api_id
+      methods_available_for_google_api_id list_of_available_google_api_ids  /    ## get_method_meta
   ],
   is      => 'ro',
   default => sub {
@@ -48,12 +52,8 @@ sub BUILD
 
   ## how to handle chi as a parameter
   $self->discovery->chi( $self->chi );    ## is this redundant? set in default?
-
-
   ## TODO - think about consequences of user not providing auth storage or user on instantiaton
-
 }
-
 
 
 ## ASSUMPTIONS:
@@ -312,21 +312,37 @@ __END__
 
 =head1 NAME
 
-WebService::GoogleAPI::Client - Google API Services Client.
+WebService::GoogleAPI::Client - API WebService OAUTH2 Client Agent to streamline access to GOOGLE API End-Point Services using Discovery Data
 
 =head1 VERSION
 
-version 0.13
+version 0.16
 
 =head1 SYNOPSIS
 
 Access Google API Services Version 1 using an OAUTH2 User Agent
 
-    use WebService::GoogleAPI::Client;
+assumes gapi.json configuration in working directory with scoped Google project 
+redentials and user authorization created by _goauth_
 
-    ## assumes gapi.json configuration in working directory with scoped project and user authorization
+    use WebService::GoogleAPI::Client;
     
     my $gapi_client = WebService::GoogleAPI::Client->new( debug => 1, gapi_json => 'gapi.json', user=> 'peter@pscott.com.au' );
+    
+    say $gapi_client->list_of_available_google_api_ids();
+
+    my @gmail_endpoint_list =      $gapi_client->methods_available_for_google_api_id('gmail')
+
+    if $gapi_agent->has_scope_to_access_api_endpoint( 'gmail.users.settings.sendAs.get' ) {
+      say 'User has Access to GMail Method End-Point gmail.users.settings.sendAs.get';
+    }
+
+Package includes _go_auth_ CLI Script to collect initial end-user authorisation to scoped services
+
+=for html <a href="https://travis-ci.org/pscott-au//WebService-GoogleAPI-Client"><img alt="Build Status" src="https://api.travis-ci.org/pscott-au/WebService-GoogleAPI-Client.png?branch=master" /></a>
+<a href="https://metacpan.org/pod/WebService::GoogleAPI::Client"><img alt="CPAN version" src="https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.png" /></a>
+
+=head1 EXAMPLES
 
 =head2 AUTOMATIC API REQUEST CONSTRUCTION  - SEND EMAL
 
@@ -355,6 +371,8 @@ Access Google API Services Version 1 using an OAUTH2 User Agent
       method => 'get',
       path => 'https://www.googleapis.com/calendar/users/me/calendarList',
     )->json;
+
+=head1 METHODS
 
 =head2 C<new>
 
@@ -413,6 +431,8 @@ Returns L<Mojo::Message::Response> object
 
 Given an API Endpoint such as 'gmail.users.settings.sendAs.get' returns 1 iff user has scope to access
 
+    say 'User has Access'  if $gapi_agent->has_scope_to_access_api_endpoint( 'gmail.users.settings.sendAs.get' );
+
 Returns 0 if scope to access is not available to the user.
 
 warns and returns 0 on error ( eg user or config not specified etc )
@@ -423,7 +443,7 @@ Returns a hashref keyed on the Google service API Endpoint in dotted format.
 The hashed content contains a structure
 representing the corresponding discovery specification for that method ( API Endpoint )
 
-    methods_available_for_google_api_id('gmail.users.settings.delegates.get')
+    methods_available_for_google_api_id('gmail')
 
 TODO: consider ? refactor to allow parameters either as a single api id such as 'gmail' 
       as well as the currently accepted  hash keyed on the api and version

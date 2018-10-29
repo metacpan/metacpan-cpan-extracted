@@ -156,6 +156,8 @@ t/bigints.t
 t/biglog.t
 t/bigroot.t
 t/blucas-mbi.t
+t/bnok-mbf.t
+t/bnok-mbi.t
 t/bnstr-mbf.t
 t/bnstr-mbi.t
 t/bsstr-mbf.t

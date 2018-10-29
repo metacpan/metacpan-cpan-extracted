@@ -1,0 +1,57 @@
+{
+   "abstract" : "Fast, pure Perl collision 2D detection",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Game-Collisions",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "1.50",
+            "Test::Deep" : "1.128",
+            "Test::Memory::Cycle" : "1.06",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Game::Collisions" : {
+         "file" : "lib/Game/Collisions.pm",
+         "version" : "0.1"
+      },
+      "Game::Collisions::AABB" : {
+         "file" : "lib/Game/Collisions/AABB.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/frezik/Game-Collisions"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+}
+

@@ -4,7 +4,7 @@ requires 'Sub::Util';
 requires 'Sub::Info';
 requires 'Scalar::Util';
 requires 'Scope::Upper';
-requires 'Function::Parameters';
+requires 'Function::Parameters', '2.000003';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

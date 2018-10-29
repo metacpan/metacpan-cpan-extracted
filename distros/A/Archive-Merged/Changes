@@ -1,3 +1,7 @@
-0.01 20160424
-    . Released on an unsuspecting world
-    . Spun out of App::PhotoGallery (unreleased)
+0.02 2018-10-28
+    * Re-release with proper META.* information
+    * No update necessary
+
+0.01 2016-04-24
+    * Released on an unsuspecting world
+    * Spun out of App::PhotoGallery (unreleased)

@@ -1,22 +1,32 @@
-echo === examples >logfile 2>&1    to preserve all output for inspection
-echo === follow along with examples.output to check output PDF files
+echo off
+echo "=== examples >logfile 2>&1    to preserve all output for inspection"
+echo "=== follow along with examples.output to check output PDF files"
+echo on
 perl examples\011_open_update
 perl examples\012_pages
 perl examples\020_corefonts
 perl examples\020_textrise
 perl examples\020_textunderline
+echo off
 echo === 021_psfonts needs T1 glyph and metrics files (not included)
 echo     here, assuming metrics file (.afm or .pfm) is in same directory
+echo on
 perl examples\021_psfonts \Users\Phil\T1fonts\URWPalladioL-Roma.pfb
 perl examples\021_synfonts
 perl examples\022_truefonts C:\WINDOWS\fonts\times.ttf
 perl examples\022_truefonts_diacrits_utf8 C:\WINDOWS\fonts\tahoma.ttf
+echo off
 echo === 023 to display the PDFs, you may need to install East Asian fonts
 echo ===     for your browser
+echo on
 perl examples\023_cjkfonts
+echo off
 echo === 024 needs a sample BDF font (not included with distribution)
-perl examples\024_bdffonts ..\work-PDF-Builder\codec\codec.bdf
+echo on
+perl examples\024_bdffonts "..\old PDF-APIx\work-PDF-Builder\codec\codec.bdf"
+echo off
 echo === 025 will fail with error messages about a bad UTF-8 character
+echo on
 perl examples\025_unifonts
 perl examples\026_unifont2
 REM perl examples\027_winfont
@@ -33,4 +43,6 @@ perl examples\Bspline.pl
 perl examples\Content.pl
 perl examples\ContentText.pl
 perl examples\ShowFont.pl Helvetica
+echo off
 echo === do not erase files if you are going to run "contrib.bat"
+echo on

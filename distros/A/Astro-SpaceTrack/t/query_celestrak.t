@@ -21,44 +21,56 @@ $st->set(
     direct	=> 1,
 );
 
-my $rslt = eval { $st->celestrak( 'stations' ) }
-    or diag "\$st->celestrak( 'stations' ) failed: $@";
+SKIP: {
 
-ok $rslt->is_success(), 'Direct fetch Celestrak stations'
-    or diag $rslt->status_line();
+    is_success_or_skip $st, celestrak => 'stations',
+    'Direct-fetch celestrak stations', 4;
 
-is $st->content_type(), 'orbit', "Content type is 'orbit'";
+    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
+    is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
 
-is $st->content_type( $rslt ), 'orbit', "Result type is 'orbit'";
+    my $resp = most_recent_http_response;
 
-is $st->content_source( $rslt ), 'celestrak',
-    "Result source is 'celestrak'";
+    is $st->content_type( $resp ), 'orbit', "Result type is 'orbit'";
 
-is_success $st, celestrak => 'iridium',
-    'Direct-fetch Celestrak iridium';
+    is $st->content_source( $resp ), 'celestrak',
+	"Result source is 'celestrak'";
+}
 
-is $st->content_type(), 'orbit', "Content type is 'orbit'";
+SKIP: {
+    is_success_or_skip $st, celestrak => 'iridium',
+	'Direct-fetch Celestrak iridium', 2;
 
-is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
+    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-is_error $st, celestrak => 'fubar',
-    404, 'Direct-fetch non-existent Celestrak catalog';
+    is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
+}
 
-is_success $st, celestrak_supplemental => 'orbcomm',
-    'Fetch Celestrak supplemental Orbcomm data';
+SKIP: {
 
-is $st->content_type(), 'orbit', "Content type is 'orbit'";
+    is_error_or_skip $st, celestrak => 'fubar',
+	404, 'Direct-fetch non-existent Celestrak catalog';
 
-is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
+}
 
-is_success $st, celestrak_supplemental => '-rms', 'intelsat',
-    'Fetch Celestrak supplemental Intelsat RMS data';
+SKIP: {
+    is_success_or_skip $st, celestrak_supplemental => 'orbcomm',
+	'Fetch Celestrak supplemental Orbcomm data', 2;
 
-is $st->content_type(), 'rms', "Content type is 'rms'";
+    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
+    is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
+}
+
+SKIP: {
+    is_success_or_skip $st, celestrak_supplemental => '-rms', 'intelsat',
+	'Fetch Celestrak supplemental Intelsat RMS data', 2;
+
+    is $st->content_type(), 'rms', "Content type is 'rms'";
+
+    is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
+}
 
 done_testing;
 

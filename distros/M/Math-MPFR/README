@@ -82,9 +82,9 @@ default is something I probably ought to know about.
 
 I am contactable by email at sisyphus at(@) cpan dot (.) org.
 
-=========================================================
-Conversion between Math::Decimal64 and Math::MPFR objects
-=========================================================
+===================================
+Decimal64 and Decimal128 conversion
+===================================
 
 The functions Rmpfr_set_DECIMAL64 and Rmpfr_get_DECIMAL64 allow
 conversion between Math::Decimal64 (_Decimal64) and Math::MPFR (mpfr_t)
@@ -113,6 +113,9 @@ of what's required for this.)
 
 Note that forcing 'D64=1' will not work unless the conditions
 mentioned earlier in this section are met.
+
+The above holds true also for the Math::Decimal128 and the _Decimal128
+type. Just replace all occurrences of "64" with "128".
 
 =========================================================
 Conversion between Math::Float128 and Math::MPFR objects

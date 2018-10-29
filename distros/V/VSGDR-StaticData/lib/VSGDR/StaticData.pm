@@ -22,11 +22,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.39
+Version 0.42
 
 =cut
 
-our $VERSION = '0.39';
+our $VERSION = '0.42';
 
 
 sub databaseName {
@@ -150,7 +150,7 @@ sub generateScript {
 #    croak 'No Primary Key defined'          unless scalar @{$ra_pkcolumns};
 #    croak 'Unusable Primary Key defined'    unless scalar @{$ra_pkcolumns} == 1;
 
-    my @IsColumnNumeric = map { $_->[1] =~ m{char|text|date}i ? 0 : 1 ;  } @{$ra_columns} ;
+    my @IsColumnNumeric = map { $_->[1] =~ m{uniqueidentifier|char|text|date}i ? 0 : 1 ;  } @{$ra_columns} ;
 #warn Dumper $ra_columns;
 #warn Dumper @IsColumnNumeric ;
 #exit;
@@ -624,12 +624,14 @@ sub generateTestDataScript {
     my $table                           = shift ;
     my $sql                             = shift ;
     my $use_MinimalForm                 = shift ;
+    my $use_IgnoreNulls                 = shift ;
 
     croak "bad arg dbh"                 unless defined $dbh;
     croak "bad arg schema"              unless defined $schema;
     croak "bad arg table"               unless defined $table;
     croak "bad arg sql"                 unless defined $sql;
     croak "bad arg minimal form"        unless defined $use_MinimalForm;
+    croak "bad arg minimal form"        unless defined $use_IgnoreNulls;
 
     $schema = substr $schema, 1, -1     if $schema =~ m/\A \[ .+ \] \Z /msix;
     $table  = substr $table,  1, -1     if $table  =~ m/\A \[ .+ \] \Z /msix;
@@ -657,7 +659,7 @@ sub generateTestDataScript {
     croak "${quotedCombinedName} doesn't appear to be a valid table"          unless scalar @{$ra_columns};
     
 
-    my @IsColumnNumeric         = map { $_->[1] =~ m{char|text|date}i ? 0 : 1 ;  } @{$ra_columns} ;
+    my @IsColumnNumeric         = map { $_->[1] =~ m{uniqueidentifier|char|text|date}i ? 0 : 1 ;  } @{$ra_columns} ;
     my @nonKeyColumns           = () ;
 
     my $widest_column_name_len      = max ( map { length ($_->[0]); } @{$ra_columns} ) ;
@@ -689,11 +691,45 @@ sub generateTestDataScript {
 
     my $ra_metadata = describeTestDataForTable($dbh,$sql);
     my @cols = map { $$_[0] } @$ra_metadata ;
-    my $colList = do { local $" = "," ; "@cols" } ;
 
     my $ra_data     = getTestDataForTable($dbh,$quotedCombinedName,$flatExtractColumnList,$sql);
+
+    my @useColumnValues   = ();
     
-#need to over lay tables with columns aprt from those whihc are 'hidden'    
+    #look over data and try to find the slices which are empty
+    if ($use_IgnoreNulls) {
+        @useColumnValues   = map { 0 } @$ra_metadata ;
+        foreach my $ra_row (@{$ra_data}){
+            for ( my $i = 0; $i < scalar @{$ra_row}; $i++ ) {
+                if ( ( defined ($ra_row->[$i]) ) ) {
+                    $useColumnValues[$i] = 1 ;  
+                }
+            }
+        }
+    }
+    else {
+        @useColumnValues   = map { 1 } @$ra_metadata ;
+    }
+    
+    my $colList = "" ;#do { local $" = "," ; "@cols" } ;
+    
+    my $i =0;
+    foreach my $c (@cols)
+    {
+        if ($useColumnValues[$i]) {
+            if ( ! scalar($colList) ) {
+                $colList = "${c}"
+            }
+            else {
+                $colList .= ",${c}"
+            }
+        }
+        $i++;
+    }
+
+#warn Dumper $colList;
+
+    #need to overlay tables with columns apart from those which are 'hidden'    
     my @valuesTable     ;
     my $valuesClause    = "values\n\t\t\t";
 
@@ -701,7 +737,7 @@ sub generateTestDataScript {
     foreach my $ra_row (@{$ra_data}){
         my @outVals = undef ;
         for ( my $i = 0; $i < scalar @{$ra_row}; $i++ ) {
-            
+            if ($useColumnValues[$i]) {
             if ( not ( defined ($ra_row->[$i]) ) ) {
                 $outVals[$i] = 'null' ;  
             }
@@ -709,16 +745,17 @@ sub generateTestDataScript {
                 if (${$ra_metadata}[$i][1] =~ m{\A(?:date|datetime[2]?|smalldatetime)\z}i) {
                     $outVals[$i] = "convert(". ${$ra_columns}[$i][1] ."," . $dbh->quote($ra_row->[$i]) . ",120)"   ;
                 }
-                elsif ( ${$ra_metadata}[$i][1] =~ m{(?:char|text|date)}i)  {
+                elsif ( ${$ra_metadata}[$i][1] =~ m{(?:uniqueidentifier|char|text|date)}i)  {
                     $outVals[$i] = $dbh->quote($ra_row->[$i])  ;  
                 }
                 else {
                     $outVals[$i] = $ra_row->[$i] ;  
                 }
             }
+            }
         }
         push @valuesTable, \@outVals ;
-        my $line = do{ local $" = ", "; "@outVals" } ;
+        #my $line = do{ local $" = ", "; "@outVals" } ;
         $lno++;
     }
 
@@ -734,8 +771,10 @@ sub generateTestDataScript {
         for ( my $i = 0; $i < scalar @valuesTable; $i++ ) {
             my @tmp = @{$valuesTable[$i]};
             for ( my $i = 0; $i <= $maxCol; $i++ ) {
+                if ($useColumnValues[$i]) {
                 if (length($tmp[$i]) > $maxWidth[$i] ) {
                     $maxWidth[$i] = length($tmp[$i]) ;
+                }
                 }
             }
         }
@@ -747,11 +786,14 @@ sub generateTestDataScript {
         my @tmp             = @{$valuesTable[$i]};
         my $line            = "";
         for ( my $j = 0; $j <= $maxCol; $j++ ) {
+            if ($useColumnValues[$j]) {
+            
             my $val         = $tmp[$j];
             my $valWidth    = length($val);
             my $PadLength   = $maxWidth[$j]-$valWidth;
             my $padding     = " "x$PadLength;
             $line           .= ", ${padding}${val}";
+            }
         }
         $line               =~ s{ ^,\s}{}msx;
         $valuesClause       .= "(\t" . $line . ")" . "\n\t\t,\t" ;

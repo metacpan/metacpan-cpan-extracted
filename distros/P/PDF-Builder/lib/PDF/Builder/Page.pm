@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 use POSIX qw(floor);
 use Scalar::Util qw(weaken);
@@ -44,11 +44,13 @@ sub new {
     return $self;
 }
 
-=item $page = PDF::Builder::Page->coerce($pdf, $pdfpage)
+#=item $page = PDF::Builder::Page->coerce($pdf, $pdfpage)
+#
+#Returns a page object converted from $pdfpage (called from $pdf->openpage()).
+#
+#=cut
 
-Returns a page object converted from $pdfpage (called from $pdf->openpage()).
-
-=cut
+# appears to be unused TBD
 
 sub coerce {
     my ($class, $pdf, $page) = @_;
@@ -59,11 +61,13 @@ sub coerce {
     return $self;
 }
 
-=item $page->update()
+#=item $page->update()
+#
+#Marks a page to be updated (by $pdf->update()).
+#
+#=cut
 
-Marks a page to be updated (by $pdf->update()).
-
-=cut
+# appears to be internal routine
 
 sub update {
     my ($self) = @_;
@@ -83,7 +87,7 @@ Sets the mediabox.  This method supports the following aliases I<and more>:
 '4B0', '2B0', 'B0', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6',
 'LETTER', 'BROADSHEET', 'LEDGER', 'TABLOID', 'LEGAL',
 'EXECUTIVE', and '36X36'. 
-See PDF::Builder::Resource::get_paper_sizes() for the full list.
+See L<PDF::Builder::Resource::PaperSizes> code for the full list.
 
 =cut
 

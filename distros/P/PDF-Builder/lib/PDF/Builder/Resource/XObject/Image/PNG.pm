@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -19,7 +19,10 @@ use Scalar::Util qw(weaken);
 =head1 NAME
 
 PDF::Builder::Resource::XObject::Image::PNG - support routines for PNG image 
-library. Inherits from L<PDF::Builder::Resource::XObject::Image>
+library (using pure Perl code). 
+Inherits from L<PDF::Builder::Resource::XObject::Image>
+
+=head1 METHODS
 
 =over
 
@@ -35,36 +38,66 @@ Returns a PNG-image object. C<$pdf> is the PDF object being added to, C<$file>
 is the input PNG file, and the optional C<$name> of the new parent image object
 defaults to PxAAA.
 
+If the Image::PNG::Libpng package is installed, the PNG_IPL library will be
+used instead of the PNG library. In such a case, use of the PNG library may be
+forced via the C<-nouseIPL> flag (see Builder documentation for C<image_png()>).
+
 opts: -notrans
 
    No transparency -- ignore tRNS chunk if provided, ignore Alpha channel
    if provided.
 
-=head3 Supported PNG types
+=head2 Supported PNG types
 
-   (0) Gray scale of depth 1, 2, 4, or 8 bits per pixel (2, 4, 16, or 256 gray
-       levels). 16 bps is not currently supported. Transparency via the tRNS
-       chunk is allowed, unless the -notrans option is given.
+   (0) Gray scale of depth 1, 2, 4, or 8 bits per pixel (2, 4, 16, or 256 
+       gray levels). 16 bpp is not currently supported (a PNG with 16 bpp 
+       is a fatal error). Full transparency (of one 8-bit gray value) via 
+       the tRNS chunk is allowed, unless the -notrans option specifies 
+       that it be ignored.
 
    (2) RGB 24-bit truecolor with 8 bits per sample (16.7 million colors). 
-       16 bps is not currently supported. Transparency via the tRNS chunk is
-       allowed, unless the -notrans option is given.
+       16 bps is not currently supported (a PNG with 16 bps is a fatal 
+       error). Full transparency (of one 3x8-bit RGB color value) via the 
+       tRNS chunk is allowed, unless the -notrans option specifies that it 
+       be ignored.
 
-   (3) Palette color with 1, 2, 4, or 8 bits per pixel depth (2, 4, 16, or
-       256 color table entries). 16 bpp is not currently supported. Transparency
-       via the tRNS chunk is allowed, unless the -notrans option is given.
+   (3) Palette color with 1, 2, 4, or 8 bits per pixel (2, 4, 16, or 256
+       color table/palette entries). 16 bpp is not currently supported by 
+       PNG or PDF. Partial transparency (8-bit Alpha) for each palette 
+       entry via the tRNS chunk is allowed, unless the -notrans option 
+       specifies that it be ignored (all entries fully opaque).
 
-   (4) Gray scale of depth 8 bits per pixel plus 8 bit Alpha channel (256
-       gray levels and 256 levels of transparency). 16 bpp is not currently
-       supported. The Alpha channel is ignored if the -notrans option is
-       given. The tRNS chunk is not permitted.
+   (4) Gray scale of depth 8 bits per pixel plus 8-bit Alpha channel (256
+       gray levels and 256 levels of transparency). 16 bpp is not 
+       currently supported (a PNG with 16 bpp is a fatal error). The Alpha 
+       channel is ignored if the -notrans option is given. The tRNS chunk 
+       is not permitted.
 
-   (6) RGB 24-bit truecolor with 8 bits per sample (16.7 million colors) plus
-       8 bit Alpha channel (256 levels of transparency). 16 bps is not 
-       currently supported. The Alpha channel is ignored if the -notrans
-       option is given. The tRNS chunk is not permitted.
+   (6) RGB 24-bit truecolor with 8 bits per sample (16.7 million colors) 
+       plus 8-bit Alpha channel (256 levels of transparency). 16 bps is not 
+       currently supported (a PNG with 16 bps is a fatal error). The Alpha 
+       channel is ignored if the -notrans option is given. The tRNS chunk 
+       is not permitted.
+
+In all cases, 16 bits per sample are not implemented. A fatal error will be
+returned if a PNG image with 16-bps data is supplied. The code is assuming
+standard "network" bit ordering (Big Endian). Interlaced (progressive) display
+images are not supported. Use the PNG_IPL version if you need to support 16 bps
+or interlaced images.
+
+The transparency chunk (tRNS) will specify one gray level entry or one RGB
+entry to be treated as transparent (Alpha = 0). For palette color, up to 
+256 palette entry 8-bit Alpha values are specified (256 levels of transparency, 
+from 0 = transparent to 255 = opaque).
+
+Only a limited number of chunks are handled: IHDR, IDAT (internally), PLTE, 
+tRNS, and IEND (internally). All other chunks are ignored at this time. Certain 
+filters and compressions applied to data will be handled, but there may be 
+unsupported methods.
 
 =cut
+
+# TBD: gAMA (gamma) chunk, perhaps some others?
 
 sub new {
     my ($class, $pdf, $file, $name, %opts) = @_;
@@ -200,7 +233,8 @@ sub new {
             $dict->{'Colors'} = PDFNum(1);
             $dict->{'Columns'} = PDFNum($w);
             if (defined $trns && !$opts{'-notrans'}) {
-                $trns .= "\xFF" x 256;
+                $trns .= "\xFF" x 256; # pad out with opaque entries to
+		                       # ensure at least 256 entries available
                 $dict = PDFDict();
                 $pdf->new_obj($dict);
                 $dict->{'Type'} = PDFName('XObject');
@@ -212,11 +246,20 @@ sub new {
                 # $dict->{'Filter'} = PDFArray(PDFName('ASCIIHexDecode'));
                 $dict->{'BitsPerComponent'} = PDFNum(8);
                 $self->{'SMask'} = $dict;
+		# length of row (scanline) in bytes, plus 1
                 my $scanline = 1 + ceil($bpc * $w/8);
+		# bytes per pixel (always 1)
                 my $bpp = ceil($bpc/8);
+		# uncompressed and unfiltered image data (stream of 1,2,4, or
+		# 8 bit indices into palette)
                 my $clearstream = unprocess($bpc, $bpp, 1, $w,$h, $scanline, \$self->{' stream'});
                 foreach my $n (0 .. ($h*$w)-1) {
-                    vec($dict->{' stream'}, $n, 8) = vec($trns, vec($clearstream, $n, $bpc), 8);
+		    # dict->stream initially empty. fill with Alpha value for
+		    # each pixel, indexed by pixel value
+                    vec($dict->{' stream'}, $n, 8) = # each Alpha 8 bits
+		      vec($trns, # the table of Alphas corresponding to palette
+			  vec($clearstream, $n, $bpc), #1-8 bit index to palette
+			  8); # Alpha is 8 bits
                 #    print STDERR vec($trns,vec($clearstream,$n,$bpc),8)."=".vec($clearstream,$n,$bpc).",";
                 }
                 # print STDERR "\n";
@@ -249,14 +292,21 @@ sub new {
                 $dict->{'BitsPerComponent'} = PDFNum($bpc);
                 $self->{'SMask'} = $dict;
             }
+	    # as with cs=3, create SMask of Alpha entry for each pixel. this
+	    # time, separating Alpha from grayscale and putting in dict->stream
             my $scanline = 1 + ceil($bpc*2 * $w/8);
             my $bpp = ceil($bpc*2 / 8);
             my $clearstream = unprocess($bpc, $bpp, 2, $w,$h, $scanline, \$self->{' stream'});
             delete $self->{' nofilt'};
             delete $self->{' stream'};
-            foreach my $n (0 .. ($h*$w)-1) {
-                vec($dict->{' stream'}, $n, $bpc) = vec($clearstream, ($n*2)+1,$bpc);
+	    # dict->stream is the outer dict if -notrans, and the Alpha data
+	    #   moved to it is simply unused
+	    # dict->stream is the inner dict (created if !-notrans), and the
+	    #   Alpha data moved to it becomes the SMask
+	    # rebuild self->stream from the gray data in clearstream
+            foreach my $n (0 .. $h*$w-1) {
                 vec($self->{' stream'}, $n, $bpc) = vec($clearstream, $n*2, $bpc);
+                vec($dict->{' stream'}, $n, $bpc) = vec($clearstream, $n*2+1, $bpc);
             }
         }
     } elsif ($cs == 6) {  # RGB+alpha 8 bps (16 not supported here)
@@ -286,25 +336,58 @@ sub new {
                 $dict->{'BitsPerComponent'} = PDFNum($bpc);
                 $self->{'SMask'} = $dict;
             }
+	    # bytes per pixel (4 samples) and length of row scanline in bytes
             my $scanline = 1 + ceil($bpc*4 * $w/8);
             my $bpp = ceil($bpc*4 /8);
+	    # unpacked, uncompressed, unfiltered image data
             my $clearstream = unprocess($bpc, $bpp, 4, $w,$h, $scanline, \$self->{' stream'});
             delete $self->{' nofilt'};
             delete $self->{' stream'};
-	    # this appears to be rearrangement of bytes for Endian ordering
-	    # PLUS remove the A channel (3 Bpp output)?
+	    # as with cs=4, create SMask of Alpha entry for each pixel. this
+	    # time, separating Alpha from RGB triplet and put in dict->stream
+	    # dict->stream is the outer dict if -notrans, and the Alpha data
+	    #   moved to it is simply unused
+	    # dict->stream is the inner dict (created if !-notrans), and the
+	    #   Alpha data moved to it becomes the SMask
+	    # rebuild self->stream from the RGB data in clearstream 1/3 smaller
             foreach my $n (0 .. ($h*$w)-1) {
+	       # pull out Alpha data bpc bits into new dict SMask
                 vec($dict->{' stream'}, $n, $bpc) = vec($clearstream, $n*4+3, $bpc);
-                vec($self->{' stream'}, $n*3, $bpc) = vec($clearstream, $n*4, $bpc);
+	       # transfer RGB triplet into self->stream
+                vec($self->{' stream'}, $n*3,   $bpc) = vec($clearstream, $n*4,   $bpc);
                 vec($self->{' stream'}, $n*3+1, $bpc) = vec($clearstream, $n*4+1, $bpc);
                 vec($self->{' stream'}, $n*3+2, $bpc) = vec($clearstream, $n*4+2, $bpc);
             }
         }
     } else {
-        die "unsupported PNG-type ($cs).";
+        die "unsupported PNG-color type (cs=$cs).";
     }
 
     return($self);
+}
+
+=over 
+
+=item  $mode = $png->usesLib()
+
+Returns 1 if Image::PNG::Libpng installed and used, 0 if not installed, or -1 
+if installed but not used (-nouseIPL option given to C<image_png>).
+
+B<Caution:> this method can only be used I<after> the image object has been
+created. It can't tell you whether Image::PNG::Libpng is available in
+advance of actually using it, in case you want to use some functionality
+available only in PNG_IPL. See the L<PDF::Builder> LA_IPL() call if you
+need to know in advance.
+
+=back
+
+=cut
+
+sub usesLib {
+    my ($self) = shift;
+    # should be 0 for Image::PNG::Libpng not installed, or -1 for is installed,
+    # but not using it
+    return $self->{'usesIPL'}->val();
 }
 
 sub PaethPredictor {

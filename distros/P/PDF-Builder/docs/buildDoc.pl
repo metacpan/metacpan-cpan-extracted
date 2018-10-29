@@ -1,5 +1,6 @@
 #!/usr/bin/perl
-# buildDoc.pl builds documentation tree from Perl .pm files (POD)
+# buildDoc.pl builds documentation tree from Perl .pod and .pm files (POD)
+#   in case of duplicate names, .pod is used in preference to .pm
 # 
 # (c) copyright 2018 Catskill Technology Services, LLC
 # licensed under license used in PDF::Builder package
@@ -15,8 +16,8 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 # =============
 # CONFIGURATION  these may be overridden by command-line flags. If reading from
@@ -57,7 +58,7 @@ my $not_pm = '0';        # if 1, output info message that non-.pm file ignored
 my $help = '0';
 # =============
 
-my ($i, $fname, $filename, $dirname);
+my ($i, $fname, $bname, $filename, $dirname);
 my @filelist;  # ignored if --all, else is list of files to update existing 
                #   doc tree. may be in file path format or PM format
 my @file_list; # complete list of files (in filepath format). array of hashes
@@ -128,21 +129,40 @@ if ($all) {
 	#   if doesn't exist, all .pm files in that directory are root
 	# then $libtop/$leading/$rootname/ follow all the way down if $rootname
 	#   not empty. if it is, all directories in top directory are followed
-	$fname = "$libtop/$leading/$rootname.pm";
+	$fname = "$libtop/$leading/$rootname";
+	if (-f "$fname.pod" && -r "$fname.pod") {
+		$fname = "$fname.pod";
+	} else {
+		$fname = "$fname.pm";
+	}
 	if (!-f $fname) {
-		print "$fname INFO  no $rootname.pm file, using all top level .pm files\n";
-		# all top-level .pm files mark as status -1
+		print "$fname INFO  no $rootname .pod or .pm file, using all top level .pod and .pm files\n";
+		# all top-level .pod, .pm files mark as status -1 (.pod has priority over .pm)
 		@filelist = ();
                 $dirname = "$libtop/$leading";
 		opendir my $dh, $dirname or die "$dirname ERROR  can't open and read directory\n";
 		while (my $direntry = readdir $dh) {
 			if ($direntry eq '.' || $direntry eq '..') { next; }
+
 			$fname = "$dirname/$direntry";
+			# if it's .pm, check to see if there is a readable .pod of the same name, and if so,
+			# ignore the .pm file
 			if (-f $fname) {
-				# it's a file. readable if .pm?
+				# it's a file. readable if .pod or .pm?
 				if ($fname =~ m#\.pm$#) { 
+					$bname = $fname;
+					$bname =~ s#\.pm$#.pod#;
+					if (-f $bname && -r $bname) { next; } # use .pod instead
+
 					if (!-r $fname) {
 						print "$fname WARNING  top-level .pm file not readable\n";
+					} else {
+						push @filelist, $fname;
+					}
+				} 
+				if ($fname =~ m#\.pod$#) { 
+					if (!-r $fname) {
+						print "$fname WARNING  top-level .pod file not readable\n";
 					} else {
 						push @filelist, $fname;
 					}
@@ -152,7 +172,7 @@ if ($all) {
 		closedir $dh;
 	} else {
 		if (!-r $fname) {
-			die "$fname ERROR  $rootname.pm file not readable\n";
+			die "$fname ERROR  $rootname .pod or .pm file not readable\n";
 		}
 		# just $rootname.pm is starting point
 		@filelist = ( $fname );
@@ -172,6 +192,7 @@ if ($all) {
 		opendir my $dh, $dirname or die "$dirname ERROR  can't open and read directory\n";
 		while (my $direntry = readdir $dh) {
 			if ($direntry eq '.' || $direntry eq '..') { next; }
+
 			$fname = "$dirname/$direntry";
 			if (-d $fname) {
 				# it's a directory, so use it
@@ -244,6 +265,8 @@ do {
 			$source = $file_list[$i]{'fpname'};
 			$target = $source;
 			$target =~ s#$libtop#$output#;
+
+			$target =~ s#\.pod$#.html#;
 			$target =~ s#\.pm$#.html#;
 
 			# $target may not exist yet, nor may its path
@@ -399,7 +422,7 @@ do {
 			# write $htmlfile back out to its .html file ($target)
 			spew($htmlfile, $target);
 
-		} # processed a .pm file into .html (was status -1)
+		} # processed a .pod or .pm file into .html (was status -1)
 	} # for loop through all entries, looking for status -1
 
 	$any_minus1 = 0;
@@ -421,7 +444,7 @@ do {
 
 } while($any_minus1); # big do-while loop for multiple passes through status -1
 
-# now we have all the .pm files' PODs turned into .html files. create a master
+# now we have all the .pod and .pm files' PODs turned into .html files. create a master
 # index file in $output/$leading/$TOC (e.g., ./PDF/index.html) for easy ref.
 open my $fh, '>', "$output/$leading/$TOC" or die "$output/$leading/$TOC ERROR  unable to open output index file\n";
 print $fh "<html>\n<head>\n<title>Master index for $leading";
@@ -459,6 +482,7 @@ for (my $i=0; $i<scalar @file_list; $i++) {
 
 	my $fname = $file_list[$i]{'fpname'};
 	$fname =~ s#$libtop/$leading/##;
+	$fname =~ s#\.pod$#.html#;
 	$fname =~ s#\.pm$#.html#;
 
 	if ($file_list[$i]{'status'} == 0) {
@@ -484,9 +508,9 @@ for (my $i=0; $i<scalar @file_list; $i++) {
 }
 
 # TBD within a huge comment <!-- --> write out all the global settings and
-#     the @file_list data. if implement running just a few .pm's rather than
+#     the @file_list data. if implement running just a few .pod/.pm's rather than
 #     --all, would read in global settings and @file_list up at the top to
-#     initialize to the point where only revised .pm's being run get -1 status
+#     initialize to the point where only revised .pod/.pm's being run get -1 status
 #     and are run normally
 
 print $fh "</body>\n</html>\n";
@@ -558,9 +582,9 @@ sub buildList {
 		if (-f "$dirname/$direntry") {
 			# it's a file. readable?
 			if (!-r "$dirname/$direntry") { die "$dirname/$direntry ERROR  unreadable file\n"; }
-			if ($direntry !~ m#\.pm$#) { 
+			if ($direntry !~ m#\.pm$# && $direntry !~ m#\.pod$#) { 
 				if ($not_pm) {
-					print "$dirname/$direntry INFO  not .pm, ignored\n"; 
+					print "$dirname/$direntry INFO  not .pod or .pm, ignored\n"; 
 				}
 				next; 
 			}
@@ -582,7 +606,8 @@ sub buildList {
 sub toPM {
 	my $fname = $_[0];
 
-	# strip off .pm
+	# strip off .pod or .pm
+	$fname =~ s#\.pod$##;
 	$fname =~ s#\.pm$##;
 	# strip off $libtop + /  e.g. ../lib/
 	$fname =~ s#^$libtop/##;
@@ -604,8 +629,12 @@ sub toFP {
 	# convert :: to / 
 	$filename = $fname;
 	$filename =~ s/::/$dirsep/g;
-	# append .pm
-	$filename .= '.pm';
+	# append .pod (if file exists), else .pm
+	if (-f "$filename.pod" && -r "$filename.pod") {
+		$filename .= ".pod";
+	} else {
+		$filename .= '.pm';
+	}
 
 	return $filename;
 }
@@ -619,7 +648,7 @@ Using buildDoc.pl
 buildDoc.pl -h
             --help   this help text
 
-	    --all   process all .pm files at and below current directory.
+	    --all   process all .pod and .pm files at and below current directory.
 	            this is the default, but is needed if no other command
 		    line options are given
 
@@ -634,16 +663,16 @@ buildDoc.pl -h
 
 	    --flagorphans  default: off. If 'on', a warning will be given during
                            processing that the module appears to be unreachable 
-                           from the "root" .pm file. However, it can always be
+                           from the "root" .pod or .pm file. However, it can always be
 			   accessed from the TOC index file
 
 	    --noignore  default: off. If 'on', a warning is given when a file
-	                without a .pm filetype is encountered (and skipped).
+	                without a .pod or .pm filetype is encountered (and skipped).
 			This can help you to clean out junk like editor backup
 			files.
 
 	    --libtop=string  default: "../lib". This is the directory path to
-	                     get to the top of the .pm source tree from wherever
+	                     get to the top of the .pod/.pm source tree from wherever
 			     you are running this documentation program. For
 			     PDF::Builder, the default is that you are running
 			     this program in docs/, which is a sibling to the
@@ -661,8 +690,8 @@ buildDoc.pl -h
                                --leading. For example, there are also PDF::API2
 			       and PDF::Report, among others. If it is given 
                                with a non-blank value, it is used to look for 
-                               the top <rootname>.pm file and top subdirectory
-			       <rootname>/
+                               the top <rootname>.pod or .pm file and top 
+			       subdirectory <rootname>/
 
 	    --output=string  default: "." for PDF::Builder. It is the location
 	                     of the new <leading>/ directory, under docs/ in
@@ -674,25 +703,28 @@ buildDoc.pl -h
 			  that will be written to with links to all modules, in
 			  the top level output directory (e.g., PDF/)
 
-The .pm file(s) are fed to pod2html utility (usually part of Perl installation) 
-to produce .html files stored in the current directory or below (see 
+The .pod or .pm file(s) are fed to pod2html utility (usually part of Perl 
+installation) to produce .html files stored in the current directory or below (see 
 configuration section). .html files with any links in them (L<> tag) are fixed 
 up to correct the href (path) to the referenced HTML files.
+
+If there are both .pod and .pm versions of a given filename, the .pod version
+will be preferably used. Presumably it has the documentation in it.
 
 If the resulting .html file has no content, it has a line added to inform anyone
 looking at it that there is no documentation for that module (rather than a 
 blank page).
 
-If all .pm files are being processed, an attempt will be made to check that 
-.html target files actually exist (cross reference check). In addition, a check 
-will be made that some other file links to this one so that there is a chain of 
-links from the root.
+If all .pod and .pm files are being processed, an attempt will be made to check 
+that .html target files actually exist (cross reference check). In addition, a 
+check will be made that some other file links to this one so that there is a 
+chain of links from the root.
 
 Messages:
 
-  <filename> INFO  no <rootname>.pm file, using all top level .pm files
-     You did not specify a rootname file, so all .pm files at the top level will
-     be treated as the "root" files.
+  <filename> INFO  no <rootname> .pod or .pm file, using all top level .pod and .pm files
+     You did not specify a rootname file, so all .pod and .pm files at the top 
+     level will be treated as the "root" files.
   <PMname> INFO  no link from root for this HTML file
      There does not appear to be a chain of links from the root down to this 
      file. It is still usable and can be accessed explicitly, and possibly via 
@@ -702,12 +734,12 @@ Messages:
      by default the message is suppressed. The --flagorphans flag will show it
      during processing.
   <filename> INFO  no POD content
-     There was no POD content in the .pm input file, so there is no 
-     documentation in the file.
-  <filename> INFO  not .pm, ignored
-     The file found is not a Perl Module (.pm) file, so it is ignored. This 
-     message is suppressed by the --noignore flag.
-
+     There was no POD content in the .pod or .pm input file, so there is no 
+     documentation in the file. A grayed-out dummy link will be given in the
+     master index file.
+  <filename> INFO  not .pod or .pm, ignored
+     The file found is not a Perl Documentation (.pod) or Module (.pm) file, 
+     so it is ignored. This message is suppressed by the --noignore flag.
   <item> WARNING  extra command line content ignored
      The indicated item was on the command line, but its purpose is not known,
      and it has been skipped over. Invalid flags or options get their own
@@ -715,9 +747,9 @@ Messages:
   <flag> WARNING  unknown flag skipped
      A flag (command line item) starting with - or -- was seen, but not
      recognized as a valid flag. It is skipped over.
-  <filename> WARNING  top-level .pm file not readable
-     One or more of the top level .pm files (<rootname>.pm) was missing or
-     not readable.
+  <filename> WARNING  top-level .pod or .pm file not readable
+     One or more of the top level .pod or .pm files (<rootname> .pod or .pm) 
+     was missing or not readable.
   <filename> WARNING  internal POD errors reported by pod2html
      At the end of the .html file, problems are listed. You should examine them 
      and attempt to correct the issue(s). Usually these are formatting issues.
@@ -730,14 +762,14 @@ Messages:
      and attempt to correct the issue(s).
   <PMname> ERROR  does not appear to exist, called from <sourcefile>
      You have a L<> link to a target .html file that does not appear to exist. 
-  <filename> ERROR  <rootname>.pm file not readable
+  <filename> ERROR  <rootname> .pod or .pm file not readable
      The input file could not be read, the output file could not be created or
      written, the output directory could not be created, etc. Check for 
      filesystem (disk) full, and incorrectly set permissions.
   <PMname> ERROR  still has status <n> at <TOCfile> output!
-     A .pm file got through the process and to the point of output to the TOC
-     (index.html) file still having a status of -2 or -1, when it should be 0
-     or higher by this point.
+     A .pod or .pm file got through the process and to the point of output to 
+     the TOC (index.html) file still having a status of -2 or -1, when it 
+     should be 0 or higher by this point.
   <TOC index file> ERROR  unable to open output index file
      There was an error trying to open the output <TOC>.html to write out the
      master index page.
@@ -758,7 +790,7 @@ Messages:
 END_OF_TEXT
 # TBD later, if implement individual file builds
 #                OR
-#	    path/filename.pm or path::filename   native directory/filename or Perl-style name
+#	    path/filename.pod/.pm or path::filename   native directory/filename or Perl-style name
 
 print $message;
 return;

@@ -11,8 +11,8 @@ use Module::Build;
 
  
 my $class = Module::Build->subclass(
-				    class => "Module::Build::Custom",
-code => <<'SUBCLASS' );
+				    # class => "Module::Build::Custom",
+code => q(
 
 sub ACTION_install {
     my $self = shift;
@@ -94,8 +94,9 @@ sub ACTION_clean {
     my $rcfile = $self->base_dir() . "/etc/yatea/yatea.rc";
     File::Copy::move("$rcfile.orig", $rcfile);
 }
+    ));
 
-SUBCLASS
+# SUBCLASS
 
 my $build = $class->new
     (
@@ -103,9 +104,9 @@ my $build = $class->new
      dist_version_from => 'lib/Lingua/YaTeA.pm',
      license => 'perl',
      configure_requires => { 'Module::Build' => 0.38,
-			     'File::chmod' => 0,
+#			     'File::chmod' => 0,
      },
-     requires => {'perl' => '5.005',
+     requires => {'perl' => '5.8.0',
 		  Parse::Yapp => 0,
 		  Getopt::Long => 0,
 		  File::Compare => 0,

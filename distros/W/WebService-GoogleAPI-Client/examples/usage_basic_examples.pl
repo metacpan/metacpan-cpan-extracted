@@ -10,7 +10,7 @@ use feature 'say';
 
 
 ## assumes gapi.json configuration in working directory with scoped project and user authorization
-my $gapi_client = WebService::GoogleAPI::Client->new( debug => 1, gapi_json => './gapi.json', user => 'peter@shotgundriver.com' );
+my $gapi_client = WebService::GoogleAPI::Client->new( debug => 1, gapi_json => '.gapi.json', user => 'peter@shotgundriver.com' );
 
 
 use Email::Simple;    ## RFC2822 formatted messages
@@ -38,8 +38,11 @@ if ( 0 )
 
 }
 
-if ( 0 )
+if ( 1 )
 {
+  ##  brew install ffmpeg –with-ffplay
+  ##  Scope required https://www.googleapis.com/auth/cloud-platform
+  ##  Assumes that Google Text To Speech API is enabled
   my $text_to_speech_request_options = {
     'input' => {
       'text' => 'Using the Web-Services-Google-Client Perl module, it is now a simple matter to access all of the Google API Resources in a consistent manner. Nice work Peter!'
@@ -103,44 +106,47 @@ if ( 0 )
   }
 }
 
-
-## edge cases to inform improvement to test coverage
-
-my $x = WebService::GoogleAPI::Client->new();
-say " WebService::GoogleAPI::Client->new() is a " . ref( $x );
-
-#exit;
-#my $y = $x->api_query();
-#say Dumper $y;
-say "WebService::GoogleAPI::Client->new->api_query() is a " . ref( WebService::GoogleAPI::Client->new->api_query() );    # eq 'Mojo::Message::Response';
-
-say "WebService::GoogleAPI::Client->new->has_scope_to_access_api_endpoint()" . WebService::GoogleAPI::Client->new->has_scope_to_access_api_endpoint();
-use WebService::GoogleAPI::Client::Discovery;
-
-#say my $x = WebService::GoogleAPI::Client::Discovery->new->list_of_available_google_api_ids();
-say 'fnarly' if ref( WebService::GoogleAPI::Client::Discovery->new->discover_all() ) eq 'HASH';
-
-#exit;
-if ( WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api() )
+if ( 0 )
 {
-  #say  Dumper [ WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api() ];
+  ## edge cases to inform improvement to test coverage
+
+  my $x = WebService::GoogleAPI::Client->new();
+  say " WebService::GoogleAPI::Client->new() is a " . ref( $x );
+
+  #exit;
+  #my $y = $x->api_query();
+  #say Dumper $y;
+  say "WebService::GoogleAPI::Client->new->api_query() is a " . ref( WebService::GoogleAPI::Client->new->api_query() );    # eq 'Mojo::Message::Response';
+
+  say "WebService::GoogleAPI::Client->new->has_scope_to_access_api_endpoint()" . WebService::GoogleAPI::Client->new->has_scope_to_access_api_endpoint();
+  use WebService::GoogleAPI::Client::Discovery;
+
+  #say my $x = WebService::GoogleAPI::Client::Discovery->new->list_of_available_google_api_ids();
+  say 'fnarly' if ref( WebService::GoogleAPI::Client::Discovery->new->discover_all() ) eq 'HASH';
+
+  #exit;
+  if ( WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api() )
+  {
+    #say  Dumper [ WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api() ];
+  }
+  else
+  {
+    #say Dumper WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api();
+  }
+
+  say length( WebService::GoogleAPI::Client::Discovery->new->supported_as_text ) > 100;
+
+  #say Dumper $x;
+
+  say WebService::GoogleAPI::Client::Discovery->new->api_verson_urls;
+  exit;
+  my $f = WebService::GoogleAPI::Client::AuthStorage->new;    #->get_credentials_for_refresh();
+  print Dumper $f;
+  my $dd = $f->get_credentials_for_refresh();
+
+
+  #say WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api();
+  #say join(',', WebService::GoogleAPI::Client->new->list_of_available_google_api_ids() ) . ' as list';
+  #say  WebService::GoogleAPI::Client->new->list_of_available_google_api_ids() . ' as scalar';
+
 }
-else
-{
-  #say Dumper WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api();
-}
-
-say length( WebService::GoogleAPI::Client::Discovery->new->supported_as_text ) > 100;
-
-#say Dumper $x;
-
-say WebService::GoogleAPI::Client::Discovery->new->api_verson_urls;
-exit;
-my $f = WebService::GoogleAPI::Client::AuthStorage->new;    #->get_credentials_for_refresh();
-print Dumper $f;
-my $dd = $f->get_credentials_for_refresh();
-
-
-#say WebService::GoogleAPI::Client::Discovery->new->augment_discover_all_with_unlisted_experimental_api();
-#say join(',', WebService::GoogleAPI::Client->new->list_of_available_google_api_ids() ) . ' as list';
-#say  WebService::GoogleAPI::Client->new->list_of_available_google_api_ids() . ' as scalar';

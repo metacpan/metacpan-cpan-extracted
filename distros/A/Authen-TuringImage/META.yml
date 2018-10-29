@@ -3,7 +3,7 @@ abstract: 'Image based Turing test (CAPTCHA)'
 author:
   - 'Ashish Gulhati <authen-ti at hash.neo.tc>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -22,5 +22,5 @@ requires:
   Bytes::Random::Secure: '0'
   File::Share: '0'
   GD: '0'
-version: '1.006'
+version: '1.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

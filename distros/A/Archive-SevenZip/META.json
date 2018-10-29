@@ -3,8 +3,8 @@
    "author" : [
       "Max Maischein <corion@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -19,13 +19,46 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Exporter" : "5",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IPC::Open3" : "0",
+            "Path::Class" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Corion/archive-sevenzip.git",
-         "web" : "https://github.com/Corion/archive-sevenzip"
+         "url" : "git://github.com/Corion/Archive-SevenZip.git",
+         "web" : "https://github.com/Corion/Archive-SevenZip"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27203",
+   "x_static_install" : 1
 }

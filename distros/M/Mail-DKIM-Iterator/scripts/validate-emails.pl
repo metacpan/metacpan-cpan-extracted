@@ -51,20 +51,19 @@ while ( my $mail = $mbox->nextmail ) {
 
     $dkim = Mail::DKIM::Iterator->new(dns => \%globdns);
 
-    my $rv;
     my @todo = \'';
     while (@todo) {
 	my $todo = shift(@todo);
 	if (ref($todo)) {
 	    # need more data from mail
 	    $buf //= $mbox->nextdata // die "no more data from mail";
-	    ($rv,@todo) = $dkim->next($buf);
+	    (undef,@todo) = $dkim->next($buf);
 	    $buf = undef;
 	} else {
 	    # need a DNS lookup
 	    if (my $q = $res->query($todo,'TXT')) {
 		# successful lookup
-		($rv,@todo) = $dkim->next({
+		(undef,@todo) = $dkim->next({
 		    $todo => [
 			map { $_->type eq 'TXT' ? (join('',$_->txtdata)) : () }
 			$q->answer
@@ -72,12 +71,12 @@ while ( my $mail = $mbox->nextmail ) {
 		});
 	    } else {
 		# failed lookup
-		($rv,@todo) = $dkim->next({ $todo => undef });
+		(undef,@todo) = $dkim->next({ $todo => undef });
 	    }
 	}
     }
 
-    for(@$rv) {
+    for(@{$dkim->result || []}) {
 	my $status = $_->status;
 	my $domain = $_->domain;
 	if (!defined $status) {
@@ -90,6 +89,7 @@ while ( my $mail = $mbox->nextmail ) {
 		. ( $warn ? " warning=\"$warn\"":"")."\n";
 	}
     }
+    print STDERR "Authentication-Results: foo\n".$dkim->authentication_results."\n";
 }
 
 #warn Dumper(\%globdns); use Data::Dumper;

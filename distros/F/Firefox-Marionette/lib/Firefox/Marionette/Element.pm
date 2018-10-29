@@ -3,7 +3,7 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 sub new {
     my ( $class, $browser, %parameters ) = @_;
@@ -11,6 +11,11 @@ sub new {
         browser => $browser,
         %parameters
     }, $class;
+    foreach my $key ( sort { $a cmp $b } keys %parameters ) {
+        if ( $key =~ /^element/smx ) {
+            $element->{ELEMENT} = $parameters{$key};
+        }
+    }
     return $element;
 }
 
@@ -274,7 +279,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 0.66
+Version 0.67
 
 =head1 SYNOPSIS
 

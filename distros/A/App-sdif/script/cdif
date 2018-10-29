@@ -849,7 +849,7 @@ Options:
 	--rcs		use rcsdiff
 	-r<rev>, -q	rcs options
 
-	-B                  char-by-char comparison
+	-B, --char          char-by-char comparison
 	--diff=command      specify diff command
 	--subdiff=command   specify backend diff command
 	--stat              show statistical information

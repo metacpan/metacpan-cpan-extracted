@@ -115,7 +115,7 @@ to this:
       unless @AnyDBM_File::ISA == 1; # 
   }
   use AnyDBM_File;
-  use AnyDBMImporter qw(:bdb);
+  use AnyDBM_File::Importer qw(:bdb);
   # ...
 
   $DB_BTREE->{cachesize} = 100000;
@@ -125,7 +125,7 @@ to this:
 
 =head1 SEE ALSO
 
-L<AnyDBMImporter>, L<DBD::SQLite>, L<DB_File>, L<AnyDBM_File>
+L<AnyDBM_File::Importer>, L<DBD::SQLite>, L<DB_File>, L<AnyDBM_File>
 
 =head1 AUTHOR
 
@@ -155,7 +155,7 @@ package SQLite_File;
 use base qw/Tie::Hash Tie::Array Exporter/;
 use strict;
 use warnings;
-our $VERSION = '0.1005';
+our $VERSION = '0.1006';
 
 use vars qw( $AUTOLOAD ) ;
 
@@ -1668,7 +1668,7 @@ sub _find_idx {
 	next unless defined $$seqidx[$_];
 	last if $pk == $$seqidx[$_];
     }
-    return (defined $$seqidx[$i] and $pk == $$seqidx[$i] ? $i : undef);
+    return (defined $i and defined $$seqidx[$i] and $pk == $$seqidx[$i] ? $i : undef);
 }
 
 # =head2 _wring_SEQIDX()

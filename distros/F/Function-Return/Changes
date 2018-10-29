@@ -1,5 +1,9 @@
 Revision history for Perl extension Function-Return
 
+0.03 2018-10-28T00:19:05Z
+    - Fix a bug where `Function::Parameters::info` does not work where defined by `method` (#2)
+    - improve test and document
+
 0.02 2018-08-29T21:58:05Z
     - update POD
 

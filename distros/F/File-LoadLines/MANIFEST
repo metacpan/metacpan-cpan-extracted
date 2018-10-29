@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/File/LoadLines.pm
+t/00-load.t
+t/10-basic.t
+t/11-basic.t
+t/20-encoding.t
+t/21-encoding.t
+t/test0.dat
+t/test1.dat
+t/test2.dat
+t/test3.dat
+t/test4.dat
+t/test5.dat
+t/test6.dat
+t/test7.dat
+t/test8.dat
+t/test9.dat
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

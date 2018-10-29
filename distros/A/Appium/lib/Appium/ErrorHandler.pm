@@ -1,5 +1,5 @@
 package Appium::ErrorHandler;
-$Appium::ErrorHandler::VERSION = '0.0803';
+$Appium::ErrorHandler::VERSION = '0.0804';
 # ABSTRACT: Reformat the error messages for user consumption
 use Moo;
 extends 'Selenium::Remote::ErrorHandler';
@@ -30,7 +30,7 @@ Appium::ErrorHandler - Reformat the error messages for user consumption
 
 =head1 VERSION
 
-version 0.0803
+version 0.0804
 
 =head1 SEE ALSO
 

@@ -1,16 +1,16 @@
 {
-   "abstract" : "Google API Services Client.",
+   "abstract" : "API WebService OAUTH2 Client Agent to streamline access to GOOGLE API End-Point Services using Discovery Data",
    "author" : [
       "Peter Scott <localshop@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-GoogleAPI-Client",
    "prereqs" : {
@@ -34,15 +34,16 @@
             "Hash::Slice" : "0",
             "List::Util" : "1.45",
             "Mojo::UserAgent" : "0",
+            "Mojolicious" : "7.12",
             "Mojolicious::Lite" : "0",
             "Mojolicious::Plugin::OAuth2" : "1.5",
             "Moo" : "0",
             "MooX::Singleton" : "0",
-            "Moose" : "2.2",
             "Net::EmptyPort" : "0",
             "Path::Class" : "0",
             "Tie::File" : "0",
             "feature" : "0",
+            "perl" : "v5.14.4",
             "strict" : "0",
             "strictures" : "0",
             "warnings" : "0"
@@ -52,10 +53,12 @@
          "requires" : {
             "Cwd" : "0",
             "Email::Simple" : "0",
+            "FindBin" : "0",
+            "JSON" : "0",
             "MIME::Base64" : "0",
+            "Sub::Override" : "0",
             "Test::More" : "0",
-            "Test::Needs" : "0",
-            "perl" : "5.006"
+            "Test::Needs" : "0"
          }
       }
    },
@@ -71,8 +74,8 @@
          "web" : "https://github.com/pscott-au/WebService-GoogleAPI-Client"
       }
    },
-   "version" : "0.13",
-   "x_generated_by_perl" : "v5.18.2",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.16",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

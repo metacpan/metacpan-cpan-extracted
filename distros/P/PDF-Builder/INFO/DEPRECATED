@@ -9,12 +9,6 @@ user in an emergency), but eventually they WILL be removed.
 
 In order of scheduled removal date:
 
-Blackls1     DecodeParms hash element in Resource/XObject/Image/TIFF.pm
-   Misspelling of "BlackIs1" (EYE instead of el) PDF flag. It was reported in 
-   PDF::API2 bug RT 15730, but rejected. BlackIs1 has been added, and Blackls1 
-   deprecated. Blackls1 will be removed (no longer set) on or after 
-   August, 2018.
-
 meterlimit      method in Content.pm and Resource/ExtGState.pm
    Misspelling, corrected to miterlimit. Use "miterlimit()" instead. A warning
    message is currently given. Scheduled to be removed on or after August, 2019.
@@ -97,7 +91,18 @@ spline    method in Content.pm
    Simply rename any call to "spline" to "qbspline". spline is scheduled to
    be removed on or after June, 2020.
 
+pdfile    method in Outline.pm, NamedDestination.pm
+   This functionality was renamed to pdf_file(). Simply rename any call to
+   "pdfile" to "pdf_file". pdfile is scheduled to be removed on or after
+   October, 2020.
+
 *** If I have missed any deprecated interfaces, please let me know! ***
 
 ======= Deprecated items that already have been removed ======================
-(none at this point)
+
+Blackls1     DecodeParms hash element in Resource/XObject/Image/TIFF.pm
+   Misspelling of "BlackIs1" (EYE instead of el) PDF flag. It was reported in 
+   PDF::API2 bug RT 15730, but rejected. BlackIs1 has been added, and Blackls1 
+   deprecated. Blackls1 will be removed (no longer set) on or after 
+   August, 2018. [Removed September, 2018]
+

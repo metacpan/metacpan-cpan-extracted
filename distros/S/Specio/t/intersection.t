@@ -118,7 +118,7 @@ subtest(
     'unnamed intersection made of two builtins',
     sub {
         my $unnamed_intersection = Specio::Constraint::Intersection->new(
-            of => [ t('HashRef'), t('ArrayRef') ],
+            of          => [ t('HashRef'), t('ArrayRef') ],
             declared_at => Specio::DeclaredAt->new_from_caller(0),
         );
 

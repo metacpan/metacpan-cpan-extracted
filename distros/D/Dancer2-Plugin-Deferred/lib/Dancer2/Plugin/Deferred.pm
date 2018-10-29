@@ -4,7 +4,7 @@ use warnings;
 
 package Dancer2::Plugin::Deferred;
 our $AUTHORITY = 'cpan:YANICK';
-$Dancer2::Plugin::Deferred::VERSION = '0.007017';
+$Dancer2::Plugin::Deferred::VERSION = '0.007018';
 # ABSTRACT: Defer messages or data across redirections
 # VERSION
 
@@ -167,7 +167,7 @@ Dancer2::Plugin::Deferred - Defer messages or data across redirections
 
 =head1 VERSION
 
-version 0.007017
+version 0.007018
 
 =head1 SYNOPSIS
 
@@ -176,11 +176,11 @@ version 0.007017
   get '/defer' => sub {
     deferred error => "Klaatu barada nikto";
     redirect '/later';
-  }
+  };
 
   get '/later' => sub {
     template 'later';
-  }
+  };
 
   # in template 'later.tt'
   <% IF deferred.error %>
@@ -279,7 +279,7 @@ Deluxaran <deluxaran@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by David Golden.
+This software is Copyright (c) 2018, 2016 by David Golden.
 
 This is free software, licensed under:
 

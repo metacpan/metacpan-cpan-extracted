@@ -33,6 +33,7 @@ Anchorage
 Andorra
 Android
 Antarctica
+Anwar
 Apia
 Aqtau
 Aqtobe
@@ -343,6 +344,7 @@ Mexico_City
 Millenium
 Minsk
 Miquelon
+Mohammad
 Molchanov
 Monaco
 Moncton
@@ -580,6 +582,7 @@ jwilk
 karupa
 karupanerura
 lib
+mohammad
 olaf
 pre
 ribasushi

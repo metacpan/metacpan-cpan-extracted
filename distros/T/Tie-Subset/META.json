@@ -1,0 +1,78 @@
+{
+   "abstract" : "Tie an array or hash to a subset of another array or hash, respectively",
+   "author" : [
+      "Hauke D <haukex@zero-g.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tie-Subset",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.006000",
+            "warnings::register" : "0"
+         },
+         "suggests" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Exporter" : "0",
+            "FindBin" : "0",
+            "Test::More" : "1.302096"
+         }
+      }
+   },
+   "provides" : {
+      "Tie::Subset" : {
+         "file" : "lib/Tie/Subset.pm",
+         "version" : "0.01"
+      },
+      "Tie::Subset::Array" : {
+         "file" : "lib/Tie/Subset/Array.pm",
+         "version" : "0.01"
+      },
+      "Tie::Subset::Hash" : {
+         "file" : "lib/Tie/Subset/Hash.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haukex/Tie-Subset/issues"
+      },
+      "homepage" : "https://github.com/haukex/Tie-Subset",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haukex/Tie-Subset.git",
+         "web" : "https://github.com/haukex/Tie-Subset"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

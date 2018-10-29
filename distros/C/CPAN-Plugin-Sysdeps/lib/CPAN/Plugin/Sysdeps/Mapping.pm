@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 # shortcuts
 #  os and distros
@@ -14,7 +14,8 @@ use constant os_windows  => (os => 'MSWin32');
 use constant os_darwin   => (os => 'darwin'); # really means installer=homebrew
 use constant like_debian => (linuxdistro => '~debian');
 use constant before_debian_stretch => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial)]);
-use constant before_debian_buster  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch)]);
+use constant before_ubuntu_bionic  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch)]);
+use constant before_debian_buster  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic)]);
 use constant like_fedora => (linuxdistro => '~fedora');
 #  package shortcuts
 use constant freebsd_jpeg => 'jpeg | jpeg-turbo';
@@ -513,6 +514,11 @@ sub mapping {
        [package => 'lzo']],
      ],
 
+     [cpanmod => 'Compress::Zstd',
+      [os_freebsd,
+       [package => 'gmake']],
+     ],
+
      [cpanmod => 'Config::Augeas',
       [os_freebsd,
        [package => ['augeas', 'pkgconf']]],
@@ -766,7 +772,7 @@ sub mapping {
 
      [cpanmod => 'DBD::mysql',
       [os_freebsd,
-       [package => 'mysql-connector-c | mysql57-client | mysql56-client | mysql55-client | mariadb101-client | mariadb100-client | mariadb55-client | percona56-client | percona55-client']],
+       [package => 'mysql-connector-c | mysql57-client | mysql56-client | mysql55-client | mariadb103-client | mariadb102-client | mariadb101-client | mariadb100-client | mariadb55-client | percona56-client | percona55-client']],
       [os_dragonfly,
        [package => 'mariadb101-client | mariadb100-client | mariadb55-client-5.5.58']],
       [os_openbsd,
@@ -1439,6 +1445,13 @@ sub mapping {
        ],
        [package => 'libctpp2-dev']],
       # ctpp2 not available for homebrew
+     ],
+
+     [cpanmod => 'HTML::Parser',
+      [like_debian,
+       [package => 'libc6-dev']],
+      [like_fedora,
+       [package => 'glibc-headers']],
      ],
 
      [cpanmod => 'HTTP::Webdav',
@@ -2124,7 +2137,7 @@ sub mapping {
       [os_freebsd,
        [package => 'libidn2']],
       [like_debian,
-       [before_debian_buster,
+       [before_ubuntu_bionic,
 	[package => []]], # libidn2-0-dev exists, but is too old
        [package => 'libidn2-dev']],
       [like_fedora,
@@ -2207,7 +2220,7 @@ sub mapping {
      [cpanmod => 'Net::Silk',
       [os_freebsd,
        [package => 'silktools']],
-      # XXX what about debian?
+      # does not seem to exist in debian wheezy..buster, Ubuntu 16.04 or 18.04, or CentOS6
      ],
 
      [cpanmod => 'Net::SSH2',

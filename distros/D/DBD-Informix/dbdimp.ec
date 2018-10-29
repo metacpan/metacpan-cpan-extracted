@@ -1,7 +1,7 @@
 /*
- * @(#)$Id: dbdimp.ec,v 2013.3 2013/05/22 05:51:39 jleffler Exp $
+ * @(#)$Id: dbdimp.ec,v 2018.1 2018/05/11 08:21:12 jleffler Exp $
  *
- * @(#)$Product: Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) $
+ * @(#)$Product: Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) $
  * @(#)Implementation details
  *
  * Copyright 1994-95 Tim Bunce
@@ -14,7 +14,7 @@
  * Copyright 2000    Paul Palacios, C-Group Inc
  * Copyright 2001-03 IBM
  * Copyright 2002    Bryan Castillo <Bryan_Castillo@eFunds.com>
- * Copyright 2003-13 Jonathan Leffler
+ * Copyright 2003-18 Jonathan Leffler
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Artistic License, as specified in the Perl README file.
@@ -24,25 +24,18 @@
 
 #ifndef lint
 /* Prevent over-aggressive optimizers from eliminating ID string */
-const char jlss_id_dbdimp_ec[] = "@(#)$Id: dbdimp.ec,v 2013.3 2013/05/22 05:51:39 jleffler Exp $";
+const char jlss_id_dbdimp_ec[] = "@(#)$Id: dbdimp.ec,v 2018.1 2018/05/11 08:21:12 jleffler Exp $";
 #endif /* lint */
 
 #include <float.h>
 #include <stdio.h>
 #include <string.h>
-
-#ifdef _WIN32   /* 2005-08-12: Brian D Campbell <campbelb@lucent.com> */
-#include <io.h>
-#else
 #include <unistd.h>
-#endif /* _WIN32 */
 
 #define MAIN_PROGRAM    /* Embed version information for JLSS headers */
 #include "Informix.h"
-#include "decsci.h"
 #include "sqltoken.h"
 #include "esqlutil.h"
-#include "dumpesql.h"
 
 /* Beware omitting the semi-colon! */
 $include "esqlinfo.h";
@@ -63,16 +56,6 @@ DBISTATE_DECLARE;
 
 static const Sqlca zero_sqlca;
 static const Link zero_link = { 0, 0, 0 };
-
-/*
-** SQLSTATE is only supported in ESQL/C version 6.00 and later, which
-** includes ESQL/C version 2.90 (part of CSDK 2.90) and later.
-** The DBI 0.81 spec says that the value S1000 should be returned
-** when the implementation does not support SQLSTATE.
-*/
-$ifndef ESQLC_SQLSTATE;
-static const char SQLSTATE[] = "S1000";
-$endif /* ESQLC_SQLSTATE */;
 
 /* One day, these will go!  Maybe... */
 static void del_statement(imp_sth_t *imp_sth);
@@ -194,11 +177,7 @@ dbd_ix_dr_driver(SV *drh)
 
     imp_drh->n_connections = 0;         /* No active connections */
     imp_drh->current_connection = 0;    /* No name */
-$ifdef ESQLC_CONNECT;
     imp_drh->multipleconnections = True;
-$else;
-    imp_drh->multipleconnections = False;
-$endif; /* ESQLC_CONNECT */
     dbd_ix_link_newhead(&imp_drh->head);    /* Linked list of connections */
 
     return 1;
@@ -550,18 +529,12 @@ dbd_ix_db_connect(SV *dbh, imp_dbh_t *imp_dbh, char *name, char *user, char *pas
     dbd_ix_printenv("pre-connect", function);
 #endif /* DBD_IX_DEBUG_ENVIRONMENT */
 
-$ifdef ESQLC_CONNECT;
     if (user != 0 && *user == '\0')
         user = 0;
     if (pass != 0 && *pass == '\0')
         pass = 0;
     /* 6.00 and later versions of Informix-ESQL/C support CONNECT */
     conn_ok = dbd_ix_connect(imp_dbh->nm_connection, name, user, pass);
-$else;
-    /* Pre-6.00 versions of Informix-ESQL/C do not support CONNECT */
-    /* Use DATABASE statement */
-    conn_ok = dbd_ix_opendatabase(name);
-$endif; /* ESQLC_CONNECT */
 
 #ifdef DBD_IX_DEBUG_ENVIRONMENT
     dbd_ix_printenv("post-connect", function);
@@ -729,11 +702,9 @@ dbd_ix_begin(imp_dbh_t *dbh)
     int rc = 1;
 
     /* Bryan Castillo: allow work to be done w/o replication */
-$ifdef ESQLC_BEGIN_WORK_WITHOUT_REPLICATION;
     if (dbh->no_replication)
         EXEC SQL BEGIN WORK WITHOUT REPLICATION;
     else
-$endif; -- ESQLC_BEGIN_WORK_WITHOUT_REPLICATION
         EXEC SQL BEGIN WORK;
 
     dbd_ix_sqlcode(dbh);
@@ -890,15 +861,7 @@ dbd_ix_db_disconnect(SV *dbh, imp_dbh_t *imp_dbh)
     if (imp_dbh->is_loggeddb == True && imp_dbh->is_txactive == True)
         (void)dbd_ix_rollback(imp_dbh);
 
-$ifdef ESQLC_CONNECT;
     dbd_ix_disconnect(imp_dbh->nm_connection);
-$else;
-    if (imp_dbh->is_connected == True)
-    {
-        char *dbname = (imp_dbh->database) ? SvPV(imp_dbh->database, PL_na) : "";
-        dbd_ix_closedatabase(dbname);
-    }
-$endif; /* ESQLC_CONNECT */
     SvREFCNT_dec(imp_dbh->database);
 
     dbd_ix_sqlcode(imp_dbh);
@@ -1004,45 +967,6 @@ static void dbd_ix_st_deallocate(char *p_name, int nblobs, int ncols)
     char *name = p_name;
     EXEC SQL END DECLARE SECTION;
 
-    /* ESQL/C does not (always) deallocate blob space automatically */
-    /* Verified unfixed for ESQL/C 6.00.UE1 on Solaris 2.4 */
-    /* Verified unfixed for ESQL/C 7.21.UC1 on Solaris 2.4 with Purify */
-    /* Verified unfixed for ESQL/C 7.23.UC1 on Solaris 2.4 */
-    /* Verified *fixed* in 7.24.UC1 on Solaris 2.5.1 (bad frees reported) */
-    /* Verified as a bad fix on Windows 95/NT by Harald Ums (no version) */
-#if ESQLC_EFFVERSION < 724
-#define DBD_IX_RELEASE_BLOBS
-#endif /* ESQLC_EFFVERSION */
-#ifdef WIN32
-#undef DBD_IX_RELEASE_BLOBS
-#endif /* WIN32 */
-
-#ifdef DBD_IX_RELEASE_BLOBS
-    if (nblobs > 0)
-    {
-        EXEC SQL BEGIN DECLARE SECTION;
-        int             colno;
-        int             coltype;
-        loc_t           blob;
-        EXEC SQL END DECLARE SECTION;
-
-        for (colno = 1; colno <= ncols; colno++)
-        {
-            EXEC SQL GET DESCRIPTOR :name VALUE :colno :coltype = TYPE;
-            if (sqlca.sqlcode != 0)
-                break;
-            if (coltype == SQLBYTES || coltype == SQLTEXT)
-            {
-                EXEC SQL GET DESCRIPTOR :name VALUE :colno :blob = DATA;
-                if (sqlca.sqlcode != 0)
-                    break;
-                if (blob.loc_loctype == LOCMEMORY && blob.loc_buffer != 0)
-                    free(blob.loc_buffer);
-            }
-        }
-    }
-#endif /* DBD_IX_RELEASE_BLOBS */
-
     if (ncols > 0)
     {
         dbd_ix_debug(3, "%s() DEALLOCATE DESCRIPTOR %s\n", function, name);
@@ -1052,7 +976,6 @@ static void dbd_ix_st_deallocate(char *p_name, int nblobs, int ncols)
     }
 }
 
-$ifdef ESQLC_IUSTYPES;
 static void
 free_udts(void **v_udts, int n_udts)
 {
@@ -1065,7 +988,6 @@ free_udts(void **v_udts, int n_udts)
     }
     free(v_udts);
 }
-$endif; /* ESQLC_IUSTYPES */
 
 /* Release all database and allocated resources for statement */
 static void
@@ -1126,14 +1048,12 @@ del_statement(imp_sth_t *imp_sth)
         break;
     }
 
-$ifdef ESQLC_IUSTYPES;
     if (imp_sth->n_lvcsz > 0)
         free(imp_sth->a_lvcsz);
     if (imp_sth->n_iudts > 0)
         free_udts(imp_sth->a_iudts, imp_sth->n_iudts);
     if (imp_sth->n_oudts > 0)
         free_udts(imp_sth->a_oudts, imp_sth->n_oudts);
-$endif; /* ESQLC_IUSTYPES */
 
     if (imp_sth->st_text != 0)
         SvREFCNT_dec(imp_sth->st_text);
@@ -1189,7 +1109,6 @@ dbd_ix_setbindnum(imp_sth_t *imp_sth, int items)
     return 1;
 }
 
-$ifdef ESQLC_IUSTYPES;
 /* Convert machine long to INT8 - both 32-bit and 64-bit machines */
 static void
 dbd_ix_int8_to_ifx_int8(ifx_int8_t *i8val, long intvar)
@@ -1211,7 +1130,6 @@ dbd_ix_int8_to_ifx_int8(ifx_int8_t *i8val, long intvar)
         i8val->data[1] = intvar & 0x7FFFFFFF;
     }
 }
-$endif; /* ESQLC_IUSTYPES */
 
 /* Bind the value to input descriptor entry */
 static int
@@ -1293,29 +1211,8 @@ dbd_ix_bindsv(imp_sth_t *imp_sth, int idx, int p_type, SV *val)
         /* It's a null! */
         dbd_ix_debug(2, "\t---- %s -- null\n", function);
         type = SQLCHAR;
-#if ESQLC_EFFVERSION >= 600
         EXEC SQL SET DESCRIPTOR :nm_ibind VALUE :index
                         TYPE = :type, LENGTH = 0, INDICATOR = -1;
-#else
-        /**
-        ** JL 1997-05-20:
-        ** There appears to be a bug in ESQL/C 5.0x (for x in 0..6) such
-        ** that the SET DESCRIPTOR code core dumps when asked to process a
-        ** NULL.  We use a cheat, pure and simple, to get around this bug.
-        ** We use the internal representation for a SMALLINT NULL (-32768)
-        ** as the value to be inserted.  It shouldn't work (arguably
-        ** another bug), but since it does, we'll exploit it.  Ugh!
-        */
-        {
-#define SMINTNULL -32768    /* Internal representation of SMALLINT NULL */
-        EXEC SQL BEGIN DECLARE SECTION;
-            short           ival = SMINTNULL;
-        EXEC SQL END DECLARE SECTION;
-        type = SQLSMINT;
-        EXEC SQL SET DESCRIPTOR :nm_ibind VALUE :index
-                        TYPE = :type, DATA = :ival;
-        }
-#endif /* ESQLC_EFFVERSION */
     }
     else if (type == SQLINT8 || type == SQLSERIAL8)
     {
@@ -1371,7 +1268,6 @@ dbd_ix_bindsv(imp_sth_t *imp_sth, int idx, int p_type, SV *val)
         {
             /* Changed to $ifdef from #ifdef SQLINT8 because of ESQL/C 7.24 issues */
             /* Bug found by Piotr Poloczek <poloczekp@interia.pl> on 2007-08-24. */
-$ifdef ESQLC_IUSTYPES;
             /* Value is not a valid 4-byte integer */
             EXEC SQL BEGIN DECLARE SECTION;
             ifx_int8_t i8val;
@@ -1384,16 +1280,6 @@ $ifdef ESQLC_IUSTYPES;
             dbd_ix_int8_to_ifx_int8(&i8val, intvar);
             EXEC SQL SET DESCRIPTOR :nm_ibind VALUE :index
                             TYPE = :type, DATA = :i8val;
-$else;
-            /* JL 2005-07-27: This is a viable alternative to using ifx_int8_t */
-            EXEC SQL BEGIN DECLARE SECTION;
-            char buffer[32];
-            EXEC SQL END DECLARE SECTION;
-            sprintf(buffer, "%ld", intvar);
-            type = SQLCHAR;
-            EXEC SQL SET DESCRIPTOR :nm_ibind VALUE :index
-                            TYPE = :type, DATA = :buffer;
-$endif; /* ESQLC_IUSTYPES */
         }
     }
     else if (SvNOK(val) && SvNOKp(val))
@@ -1497,8 +1383,6 @@ dbd_ix_blobs(imp_sth_t *imp_sth)
     }
     dbd_ix_exit(function);
 }
-
-$ifdef ESQLC_IUSTYPES;
 
 /*
 ** Workaround for CQ idsdb00247065: ESQL/C reporting error -1820 when
@@ -1703,7 +1587,6 @@ dbd_ix_udts(imp_sth_t *imp_sth)
     dbd_ix_exit(function);
     return(nudts);
 }
-$endif; /* ESQLC_IUSTYPES */
 
 /* Declare cursor for SELECT, EXECUTE PROCEDURE, or INSERT */
 static int
@@ -1725,9 +1608,7 @@ dbd_ix_declare(imp_sth_t *imp_sth)
     assert(imp_sth->st_state == Described);
     dbd_ix_blobs(imp_sth);
     dbd_ix_lvarchar(imp_sth);    /* CQ idsdb00247065 */
-$ifdef ESQLC_IUSTYPES;
     dbd_ix_udts(imp_sth);
-$endif; /* ESQLC_IUSTYPES */
 
     /* BR 1999-08-30: Hold Cursor -- Not necessarily correct... */
     if (imp_sth->dbh->is_modeansi == True &&
@@ -2110,11 +1991,7 @@ dbd_ix_st_prepare(SV *sth, imp_sth_t *imp_sth, char *stmt, SV *attribs)
 #endif  /* SQ_EXECPROC */
     else if (imp_sth->st_type == SQ_INSERT && desc_count > 0)
     {
-$ifdef ESQLC_IUSTYPES;
         int nudts = dbd_ix_udts(imp_sth);
-$else;
-        int nudts = 0;
-$endif; /* ESQLC_IUSTYPES */
 
         dbd_ix_blobs(imp_sth);
         if (imp_sth->n_oblobs > 0 || nudts > 0)
@@ -2322,12 +2199,10 @@ dbd_ix_st_fetch(SV *sth, imp_sth_t *imp_sth)
     dec_t           decval;
     double          dblval;
     float           fltval;
-$ifdef ESQLC_IUSTYPES;
     long            extypeid;
 #ifdef SQLLVARCHAR
     lvarchar       *lvar = 0;
 #endif
-$endif; -- ESQLC_IUSTYPES
     EXEC SQL END DECLARE SECTION;
     D_imp_dbh_from_sth;
     int             is_char_type = 0; /* UTF8 patch */
@@ -2484,7 +2359,6 @@ $endif; /* ESQLC_BIGINT */
                 /* warn("Decimal Data: %d <<%s>>\n", length, result); */
                 break;
 
-$ifdef ESQLC_IUSTYPES;
 #ifdef SQLUDTFIXED
             case SQLUDTFIXED:
                 {
@@ -2593,8 +2467,6 @@ $ifdef ESQLC_IUSTYPES;
                 break;
 #endif  /* SQLLVARCHAR */
 
-$endif; -- ESQLC_IUSTYPES
-
             case SQLVCHAR:
 #ifdef SQLNVCHAR
             case SQLNVCHAR:
@@ -2683,7 +2555,6 @@ $endif; -- ESQLC_IUSTYPES
             {
                 switch (coltype)
                 {
-$ifdef ESQLC_IUSTYPES;
 #ifdef SQLLVARCHAR
                 case CLVCHARPTRTYPE:
                 case SQLLVARCHAR:
@@ -2691,7 +2562,6 @@ $ifdef ESQLC_IUSTYPES;
                         warn("Having problems freeing lvarchar");
                     break;
 #endif  /* SQLLVARCHAR */
-$endif; -- ESQLC_IUSTYPES
                 case SQLBYTES:
                 case SQLTEXT:
                     break;
@@ -3171,7 +3041,7 @@ dbd_ix_st_bind_type(IV sql_type, SV *attribs)
                 croak("Can't bind ix_type %d not supported", val_type);
             if (sql_type)
                 croak("Can't specify both TYPE (%d) and ix_type (%d)",
-                        sql_type, val_type);
+                        (int)sql_type, val_type);
         }
     }
     if (sql_type)

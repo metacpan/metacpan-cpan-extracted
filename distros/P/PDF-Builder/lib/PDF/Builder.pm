@@ -5,8 +5,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.010'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.012'; # VERSION
+my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -31,8 +31,13 @@ use Scalar::Util qw(weaken);
 
 our @FontDirs = ( (map { "$_/PDF/Builder/fonts" } @INC),
                   qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );
-our @MSG_COUNT = (0,  # Graphics::TIFF not installed
+our @MSG_COUNT = (0,  # [0] Graphics::TIFF not installed
+	          0,  # [1] Image::PNG::Libpng not installed
+		  0,  # [2] TBD...
 	         );
+our $outVer = 1.4; # desired PDF version for output, bump up w/ warning on read or feature output
+our $msgVer = 1;   # 0=don't, 1=do issue message when PDF output version is bumped up
+our $myself;       # holds self->pdf
 
 =head1 NAME
 
@@ -96,11 +101,16 @@ for details.
 PDF::Builder intends to support all major Perl versions that were released in
 the past six years, plus one, in order to continue working for the life of
 most long-term-stable (LTS) server distributions.
+See the L<https://www.cpan.org/src/> table 
+B<First release in each branch of Perl> x.xxxx0 "Major" release dates.
 
 For example, a version of PDF::Builder released on 2018-06-05 would support 
-the last major version of Perl released before 2012-06-05 (5.18), and then one 
-before that, which would be 5.16.
+the last major version of Perl released I<on or after> 2012-06-05 (5.18), and 
+then one before that, which would be 5.16. Alternatively, the last major 
+version of Perl released I<before> 2012-06-05 is 5.16.
 
+The intent is to avoid expending unnecessary effort in supporting very old
+(obsolete) versions of Perl.
 If you need to use this module on a server with an extremely out-of-date version
 of Perl, consider using either plenv or Perlbrew to run a newer version of Perl
 without needing admin privileges.
@@ -166,11 +176,41 @@ PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 
 =item $pdf = PDF::Builder->new(%options)
 
-Creates a new PDF object.  If you will be saving it as a file and
+=item $pdf = PDF::Builder->new()
+
+Creates a new PDF object. 
+
+B<Options>
+
+=over
+
+=item -file
+
+If you will be saving it as a file and
 already know the filename, you can give the '-file' option to minimize
-possible memory requirements later on. The '-compress' option can be
+possible memory requirements later on. 
+
+=item -compress
+
+The '-compress' option can be
 given to specify stream compression: default is 'flate', 'none' is no
-compression.
+compression. No other compression methods are currently supported.
+
+=item -outver
+
+The '-outver' option defaults to 1.4 as the output PDF version and the highest 
+allowed feature version (attempts to use anything higher will give a warning).
+If an existing PDF with a higher version is read in, -outver will be increased 
+to that version, with a warning.
+
+=item -msgver
+
+The '-msgver' option value of 1 (default) gives a warning message if the 
+'-outver' PDF level has to be bumped up due to either a higher PDF level file 
+being read in, or a higher level feature was requested. A value of 0 
+suppresses the warning message.
+
+=back
 
 B<Example:>
 
@@ -198,7 +238,11 @@ sub new {
     bless $self, $class;
     $self->{'pdf'} = PDF::Builder::Basic::PDF::File->new();
 
-    $self->{'pdf'}->{' version'} = 4;
+    # make available to other routines
+    $myself = $self->{'pdf'};
+
+    # default output version
+    $self->{'pdf'}->{' version'} = $outVer;
     $self->{'pages'} = PDF::Builder::Basic::PDF::Pages->new($self->{'pdf'});
     $self->{'pages'}->proc_set(qw(PDF Text ImageB ImageC ImageI));
     $self->{'pages'}->{'Resources'} ||= PDFDict();
@@ -217,6 +261,20 @@ sub new {
       # for compatibility with old usage where forcecompress is directly set. 
     }
     $self->preferences(%options);
+    if (defined $options{'-outver'}) {
+        if ($options{'-outver'} >= 1.4) {
+	        $self->{'pdf'}->{' version'} = $outVer = $options{'-outver'};
+	    } else {
+	        print STDERR "Invalid -outver given, or less than 1.4. Ignored.\n";
+	    }
+    }
+    if (defined $options{'-msgver'}) {
+	    if ($options{'-msgver'} == 0 || $options{'-msgver'} == 1) {
+            $msgVer = $options{'-msgver'};
+	    } else {
+	        print STDERR "Invalid -msgver given, not 0 or 1. Ignored.\n";
+	    }
+    }
     if ($options{'-file'}) {
         $self->{' filed'} = $options{'-file'};
         $self->{'pdf'}->create_file($options{'-file'});
@@ -276,6 +334,66 @@ sub open {
     return $self;
 } # end of open()
 
+# when outputting a PDF feature, verCheckOutput(n, 'feature name') returns TRUE 
+# if n > $pdf->{' version'), plus a warning message. It returns FALSE otherwise.
+#
+#  a typical use:
+#
+#  PDF::Builder->verCheckOutput(1.6, "portzebie with foo-dangle");
+#
+#  if -msgver defaults to 1, a message will be output if the output PDF version 
+#  has to be increased to 1.6 in order to use the "portzebie" feature
+#
+# this is still somewhat experimental, and as experience is gained, the code 
+# might have to be modified.
+#
+sub verCheckOutput {
+    my ($dummy, $PDFver, $featureName) = @_;  # $self will be this package's
+
+    # check if feature required PDF version is higher than planned output
+    # ' version' should be the same as $outVer
+    if ($PDFver > $outVer) {
+        if ($msgVer) {
+	    print "PDF version of requested feature '$featureName'\n  is higher than outVer of $outVer (outVer reset to $PDFver)\n";
+	}
+        $outVer = $myself->{' version'} = $PDFver;
+        return 1;
+    } else {
+        return 0;
+    }
+}
+# when reading in a PDF, verCheckInput(n) gives a warning message if n (the PDF 
+# version just read in) > outVer, and resets outVer to n. return TRUE if 
+# outVer changed, FALSE otherwise. outVer is used instead of 
+# $pdf->{' version'} because the latter is often overwritten by a file read 
+# operation.
+#
+# this is still somewhat experimental, and as experience is gained, the code 
+# might have to be modified.
+#
+#    WARNING: just because the PDF output version has been increased does NOT 
+#    guarantee that any particular content will be handled correctly! There are 
+#    many known cases of PDF 1.5 and up files being read in, that have content 
+#    that PDF::Builder does not handle correctly, corrupting the resulting PDF. 
+#    Pay attention to run-time warning messages that the PDF output level has 
+#    been increased due to a PDF file being read in, and check the resulting 
+#    file carefully.
+
+sub verCheckInput {
+    my ($self, $PDFver) = @_;
+
+    # warning message and bump up outVer if read-in PDF level higher
+    if ($PDFver > $outVer) {
+        if ($msgVer) {
+	    print "PDF version just read in is higher than outVer of $outVer (outVer reset to $PDFver)\n";
+	}
+        $outVer = $self->{'pdf'}->{' version'} = $PDFver;
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 =item $pdf = PDF::Builder->open_scalar($pdf_string, %options)
 
 =item $pdf = PDF::Builder->open_scalar($pdf_string)
@@ -317,12 +435,19 @@ sub open_scalar {
     my $fh;
     CORE::open($fh, '+<', \$content) or die "Can't begin scalar IO";
 
+    # this would replace any existing self->pdf with a new one
     $self->{'pdf'} = PDF::Builder::Basic::PDF::File->open($fh, 1);
     $self->{'pdf'}->{'Root'}->realise();
     $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
     weaken $self->{'pages'};
-    $self->{'pdf'}->{' version'} ||= 3;
-    my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
+
+    $self->{'pdf'}->{' version'} ||= 1.4; # default minimum
+    # if version higher than desired output PDF level, give warning and
+    # bump up desired output PDF level
+#print "open_scalar read version=".($self->{'pdf'}->{' version'})." and outVer=$outVer\n";
+    $self->verCheckInput($self->{'pdf'}->{' version'});
+
+    my @pages = _proc_pages($self->{'pdf'}, $self->{'pages'});
     $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
     weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
@@ -506,7 +631,13 @@ sub default {
 
 =item $version = $pdf->version()
 
-Get/set the PDF version (e.g. 1.4)
+Get/set the PDF version (e.g. 1.4). 
+
+For compatibility with earlier releases, if no decimal point is given, assume
+"1." precedes the number given.
+
+A warning message is given if you attempt to I<decrease> the PDF version, as you
+might have already read in a higher level file, or used a higher level feature.
 
 =cut
 
@@ -514,11 +645,15 @@ sub version {
     my $self = shift();
     if (scalar @_) {
         my $version = shift();
-        croak "Invalid version $version" unless $version =~ /^(?:1\.)?([0-9]+)$/;
-        $self->{'pdf'}->{' version'} = $1;
+	if ($version =~ m/^\d+$/) { $version = "1.$version"; }  # no x.? assume it's 1.something
+        croak "Invalid version $version" unless $version =~ /^(\d+\.\d+)$/;
+	if ($outVer > $1) { 
+	    print "Warning: call to self->version() to LOWER the output PDF version number!\n";
+	}
+        $self->{'pdf'}->{' version'} = $outVer = $1;
     }
 
-    return '1.' . $self->{'pdf'}->{' version'};
+    return $self->{'pdf'}->{' version'};
 }
 
 =item $bool = $pdf->isEncrypted()
@@ -760,7 +895,7 @@ sub finishobjects {
     }
 }
 
-sub proc_pages {
+sub _proc_pages {
     my ($pdf, $object) = @_;
 
     if (defined $object->{'Resources'}) {
@@ -774,7 +909,7 @@ sub proc_pages {
     foreach my $page ($object->{'Kids'}->elementsof()) {
         $page->realise();
         if ($page->{'Type'}->val() eq 'Pages') {
-            push @pages, proc_pages($pdf, $page);
+            push @pages, _proc_pages($pdf, $page);
         }
         else {
             $pdf->{' apipagecount'}++;
@@ -789,7 +924,7 @@ sub proc_pages {
     }
 
     return @pages;
-} # end of proc_pages()
+} # end of _proc_pages()
 
 =item $pdf->update()
 
@@ -839,6 +974,19 @@ sub saveas {
 
     $self->end();
 }
+
+=item $pdf->save()
+
+Save the document to an already-defined file (or filename) and 
+remove the object structure from memory.
+
+B<Example:>
+
+    $pdf = PDF::Builder->new(-file => 'file_to_output');
+    ...
+    $pdf->save();
+
+=cut
 
 sub save {
     my ($self) = @_;
@@ -895,6 +1043,8 @@ sub stringify {
     return $str;
 }
 
+# there IS a release() method defined and documented in Basic/PDF/File.pm
+# it's not clear whether this release is just an internal (rename to _release)
 sub release {
     my $self = shift;
     $self->end();
@@ -1098,8 +1248,7 @@ sub openpage {
     return $page;
 } # end of openpage()
 
-
-sub walk_obj {
+sub _walk_obj {
     my ($object_cache, $source_pdf, $target_pdf, $source_object, @keys) = @_;
 
     if (ref($source_object) =~ /Objind$/) {
@@ -1120,14 +1269,14 @@ sub walk_obj {
         $target_object->{' val'} = [];
         foreach my $k ($source_object->elementsof()) {
             $k->realise() if ref($k) =~ /Objind$/;
-            $target_object->add_elements(walk_obj($object_cache, $source_pdf, $target_pdf, $k));
+            $target_object->add_elements(_walk_obj($object_cache, $source_pdf, $target_pdf, $k));
         }
     } elsif (ref($source_object) =~ /Dict$/) {
         @keys = keys(%$target_object) unless scalar @keys;
         foreach my $k (@keys) {
             next if $k =~ /^ /;
             next unless defined $source_object->{$k};
-            $target_object->{$k} = walk_obj($object_cache, $source_pdf, $target_pdf, $source_object->{$k});
+            $target_object->{$k} = _walk_obj($object_cache, $source_pdf, $target_pdf, $source_object->{$k});
         }
         if ($source_object->{' stream'}) {
             if ($target_object->{'Filter'}) {
@@ -1143,7 +1292,7 @@ sub walk_obj {
     delete $target_object->{' streamsrc'};
 
     return $target_object;
-} # end of walk_obj()
+} # end of _walk_obj()
 
 =item $xoform = $pdf->importPageIntoForm($source_pdf, $source_page_number)
 
@@ -1198,9 +1347,9 @@ sub importPageIntoForm {
     # This should never get past MediaBox, since it's a required object.
     foreach my $k (qw(MediaBox ArtBox TrimBox BleedBox CropBox)) {
        #next unless defined $s_page->{$k};
-       #my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
+       #my $box = _walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k});
         next unless defined $s_page->find_prop($k);
-        my $box = walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
+        my $box = _walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->find_prop($k));
         $xo->bbox(map { $_->val() } $box->elementsof());
         last;
     }
@@ -1216,7 +1365,7 @@ sub importPageIntoForm {
             $s_page->{$k}->{$sk}->realise() if ref($s_page->{$k}->{$sk}) =~ /Objind$/;
             foreach my $ssk (keys %{$s_page->{$k}->{$sk}}) {
                 next if $ssk =~ /^ /;
-                $xo->resource($sk, $ssk, walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k}->{$sk}->{$ssk}));
+                $xo->resource($sk, $ssk, _walk_obj($self->{'apiimportcache'}->{$s_pdf}, $s_pdf->{'pdf'}, $self->{'pdf'}, $s_page->{$k}->{$sk}->{$ssk}));
             }
         }
     }
@@ -1328,7 +1477,7 @@ sub import_page {
         my $prop = $s_page->find_prop($k);
         next unless defined $prop;
 
-        my $box = walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $prop);
+        my $box = _walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $prop);
         my $method = lc $k;
 
         $t_page->$method(map { $_->val() } $box->elementsof());
@@ -1343,7 +1492,7 @@ sub import_page {
         if (my $a = $s_pdf->{'pdf'}->{'Root'}->realise()->{'AcroForm'}) {
             $a->realise();
 
-            $AcroForm = walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $a, qw(NeedAppearances SigFlags CO DR DA Q));
+            $AcroForm = _walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $a, qw(NeedAppearances SigFlags CO DR DA Q));
         }
         my @Fields = ();
         my @Annots = ();
@@ -1390,7 +1539,7 @@ sub import_page {
             foreach my $k (keys %ky) {
                 next unless defined $a->{$k};
                 $a->{$k}->realise();
-                $t_a->{$k} = walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $a->{$k});
+                $t_a->{$k} = _walk_obj({}, $s_pdf->{'pdf'}, $self->{'pdf'}, $a->{$k});
             }
             $t_a->{'P'} = $t_page;
             push @Annots, $t_a;
@@ -1426,7 +1575,18 @@ sub pages {
 
 =item $pdf->mediabox($llx,$lly, $urx,$ury)
 
-Sets the global mediabox.
+Sets the global MediaBox. This defines the width and height (or corner
+coordinates, or by standard name) of the output page itself, such as the
+physical paper size. 
+
+Note that many printers can B<not> print all the way to the
+physical edge of the paper, so you should plan to leave some blank margin,
+even outside of any crop marks and bleeds. Printers and on-screen readers are 
+free to discard any content found outside the MediaBox, and printers may 
+discard some material just inside the MediaBox.
+
+It is required; if not given, the displayed media size is unpredictable. 
+A global setting can be inherited by each page, or can be overridden.
 
 B<Example:>
 
@@ -1461,7 +1621,12 @@ sub mediabox {
 
 =item $pdf->cropbox($llx,$lly, $urx,$ury)
 
-Sets the global cropbox.
+Sets the global CropBox. This will define the media size to which the output
+will later be cropped (trimmed) or clipped. Note that this does B<not> itself 
+output any crop marks to guide cutting of the paper! PDF Readers should 
+consider this to be the I<visible> portion of the page, and anything found
+outside it may be clipped (invisible). By default, it is equal to the MediaBox.
+A global setting can be inherited by each page, or can be overridden.
 
 =cut
 
@@ -1479,7 +1644,11 @@ sub cropbox {
 
 =item $pdf->bleedbox($llx,$lly, $urx,$ury)
 
-Sets the global bleedbox.
+Sets the global BleedBox. This is another form of CropBox, typically used in
+printing on paper where you want color (such as thumb tabs) to be printed a
+bit beyond the final paper size, to ensure that the cut goes I<through> the 
+ink, rather than accidentally leaving some white paper visible outside. 
+The default value is equal to the CropBox.
 
 =cut
 
@@ -1497,7 +1666,11 @@ sub bleedbox {
 
 =item $pdf->trimbox($llx,$lly, $urx,$ury)
 
-Sets the global trimbox.
+Sets the global TrimBox. Another form of CropBox, it is supposed to be the
+actual dimensions of the finished page (after trimming of the paper). In some
+production environments, it is useful to have printer's instructions, cut marks,
+and so on outside of the trim box.
+The default value is equal to CropBox.
 
 =cut
 
@@ -1515,7 +1688,11 @@ sub trimbox {
 
 =item $pdf->artbox($llx,$lly, $urx,$ury)
 
-Sets the global artbox.
+Sets the global ArtBox. Another form of CropBox, this is supposed to define 
+"the extent of the page's I<meaningful> content (including [margins])". It
+might exclude some content, such as Headlines or headings. Any
+binding or punched-holes margin would typically be outside of the ArtBox.
+The default value is equal to the CropBox.
 
 =cut
 
@@ -1798,7 +1975,7 @@ sub image_tiff {
 	}
     }
     if ($rc == 1) {
-	# Graphics::TIFF available and to be used
+	# Graphics::TIFF (_GT suffix) available and to be used
         require PDF::Builder::Resource::XObject::Image::TIFF_GT;
         $obj = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($self->{'pdf'}, $file);
         $self->{'pdf'}->out_obj($self->{'pages'});
@@ -1825,6 +2002,35 @@ sub image_tiff {
     return $obj;
 }
 
+=item $rc = $pdf->LA_GT()
+
+Returns 1 if the library name (package) Graphics::TIFF is installed, and 
+0 otherwise. For this optional library, this call can be used to know if it 
+is safe to use certain functions. For example:
+
+    if ($pdf->LA_GT() {
+        # is installed and usable
+    } else {
+        # not available. you will be running the old, pure PERL code
+    }
+
+=cut
+
+# there doesn't seem to be a way to pass in a string (or bare) package name,
+# to make a generic check routine
+sub LA_GT {
+    my ($self) = @_;
+
+    my ($rc);
+    $rc = eval {
+        require Graphics::TIFF;
+	1;
+    };
+    if (!defined $rc) { $rc = 0; }  # else is 1
+
+    return $rc;
+}
+
 =item $pnm = $pdf->image_pnm($file)
 
 Imports and returns a new PNM image object. C<$file> may be either a filename 
@@ -1844,23 +2050,85 @@ sub image_pnm {
     return $obj;
 }
 
+=item $png = $pdf->image_png($file, %options) 
+
 =item $png = $pdf->image_png($file)
 
-Imports and returns a new PNG image object. C<$file> may be either a filename 
-or a filehandle.
+Imports and returns a new PNG image object. C<$file> may be either 
+a filename or a filehandle.
+For details, see L<PDF::Builder::Docs> section B<PNG Images>.
 
 =cut
-
-# =item $png = $pdf->image_png($file, %options)   no current options
 
 sub image_png {
     my ($self, $file, %opts) = @_;
 
-    require PDF::Builder::Resource::XObject::Image::PNG;
-    my $obj = PDF::Builder::Resource::XObject::Image::PNG->new($self->{'pdf'}, $file);
-    $self->{'pdf'}->out_obj($self->{'pages'});
-    
+    my ($rc, $obj);
+    $rc = eval {
+        require Image::PNG::Libpng;
+	1;
+    };
+    if (!defined $rc) { $rc = 0; }  # else is 1
+    if ($rc) {
+	# Image::PNG::Libpng available
+	if (defined $opts{'-nouseIPL'} && $opts{'-nouseIPL'} == 1) {
+	   $rc = -1;  # don't use it
+	}
+    }
+    if ($rc == 1) {
+	# Image::PNG::Libpng (_IPL suffix) available and to be used
+        require PDF::Builder::Resource::XObject::Image::PNG_IPL;
+        $obj = PDF::Builder::Resource::XObject::Image::PNG_IPL->new($self->{'pdf'}, $file, 'Px'.pdfkey(), %opts);
+        $self->{'pdf'}->out_obj($self->{'pages'});
+    } else {
+	# Image::PNG::Libpng not available, or is but is not to be used
+        require PDF::Builder::Resource::XObject::Image::PNG;
+        $obj = PDF::Builder::Resource::XObject::Image::PNG->new($self->{'pdf'}, $file, 'Px'.pdfkey(), %opts);
+        $self->{'pdf'}->out_obj($self->{'pages'});
+
+	if ($rc == 0 && $MSG_COUNT[1]++ == 0) {
+	    # TBD give warning message once, unless silenced (-silent) or
+	    # deliberately not using Image::PNG::Libpng (rc == -1)
+	    if (!defined $opts{'-silent'} || $opts{'-silent'} == 0) {
+	        print STDERR "Your system does not have Image::PNG::Libpng installed, so some\nPNG functions may not run correctly.\n";
+		# even if -silent only once, COUNT still incremented
+	    }
+	}
+    }
+    $obj->{'usesIPL'} = PDFNum($rc);  # -1 available but unused
+                                      #  0 not available
+		 	              #  1 available and used
+		        	      # $png->usesLib() to get number
     return $obj;
+}
+
+=item $rc = $pdf->LA_IPL()
+
+Returns 1 if the library name (package) Image::PNG::Libpng is installed, and 
+0 otherwise. For this optional library, this call can be used to know if it 
+is safe to use certain functions. For example:
+
+    if ($pdf->LA_IPL() {
+        # is installed and usable
+    } else {
+        # not available. don't use 16bps or interlaced PNG image files
+    }
+
+=cut
+
+# there doesn't seem to be a way to pass in a string (or bare) package name,
+# to make a generic check routine
+sub LA_IPL {
+    my ($self) = @_;
+
+    my ($rc);
+    $rc = eval {
+        require Image::PNG::Libpng;
+	1;
+    };
+    if (!defined $rc) { $rc = 0; }  # else is 1
+
+    return $rc;
 }
 
 =item $gif = $pdf->image_gif($file)
@@ -1939,7 +2207,7 @@ sub colorspace_act {
 
 =item $cs = $pdf->colorspace_web()
 
-Returns a new colorspace-object based on the web color palette.
+Returns a new colorspace-object based on the "web-safe" color palette.
 
 =cut
 

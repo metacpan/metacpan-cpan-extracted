@@ -4,6 +4,8 @@ NAME
 
 SYNOPSIS
 
+        # THIS DISTRIBUTION IS DEPRECATED. PLEASE SEE THE "DESCRIPTION" SECTION
+    
         use RPi::WiringPi::Constant (:all);
     
         # or...
@@ -13,6 +15,13 @@ SYNOPSIS
         # etc
 
 DESCRIPTION
+
+    THIS DISTRIBUTION/MODULE IS DEPRECATED. It'll continue to install and
+    work, but it will not be updated or maintained further.
+
+    PLEASE USE RPi::Const FOR ANY PROJECTS MOVING FORWARD. If current
+    projects break due to the use of this distribution, please switch over
+    to RPi::Const.
 
     This module optionally exports selections or all constant variables
     used within the RPi::WiringPi suite.
@@ -71,6 +80,13 @@ CONSTANT EXPORT TAGS
         LOW  => 0,
         ON   => 1,
         OFF  => 0,
+
+ :pwm_mode
+
+    The modes the PWM can be set to.
+
+        PWM_MODE_MS  => 0,
+        PWM_MODE_BAL => 1,
 
  :interrupt
 

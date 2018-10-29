@@ -11,7 +11,7 @@ use WWW::Mechanize::Link;
 use IO::Socket::INET;
 
 use vars qw($VERSION %link_spec @CARP_NOT);
-$VERSION= '0.18';
+$VERSION= '0.20';
 @CARP_NOT=qw(Selenium::Remote::Driver);
 
 =head1 NAME
@@ -178,7 +178,6 @@ sub new {
     if( ! exists $options{ frames }) {
         $options{ frames }= 1;
     };
-
     unless ($options{pid}) {
         my @cmd= $class->build_command_line( \%options );
         $options{ kill_pid } = 1;

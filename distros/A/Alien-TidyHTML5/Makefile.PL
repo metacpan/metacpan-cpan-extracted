@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008000;
 
 use ExtUtils::MakeMaker;
 
@@ -18,13 +18,17 @@ my %WriteMakefileArgs = (
     "Alien::Build" => "1.19",
     "Alien::Build::MM" => "0.32",
     "Alien::Build::Plugin::Build::CMake" => "0.99",
+    "Alien::Build::Plugin::PkgConfig::Negotiate" => "0.79",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-TidyHTML5",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.008000",
   "NAME" => "Alien::TidyHTML5",
   "PREREQ_PM" => {
-    "Alien::Base" => 0
+    "Alien::Base" => 0,
+    "List::Util" => 0,
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -33,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,10 +50,12 @@ my %FallbackPrereqs = (
   "Alien::Build::MM" => "0.32",
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,
+  "List::Util" => 0,
   "Module::Metadata" => 0,
   "Test2::V0" => 0,
   "Test::Alien" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "namespace::autoclean" => 0
 );
 
 

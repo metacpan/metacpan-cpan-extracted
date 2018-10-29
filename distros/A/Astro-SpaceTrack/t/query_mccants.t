@@ -18,17 +18,23 @@ $skip = site_check 'mike.mccants'
 
 my $st = Astro::SpaceTrack->new();
 
-is_success $st, qw{ mccants classified }, 'Get classified elements';
+SKIP: {
+    is_success_or_skip $st, qw{ mccants classified },
+	'Get classified elements', 2;
 
-is $st->content_type(), 'orbit', "Content type is 'orbit'";
+    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-is $st->content_source(), 'mccants', "Content source is 'mccants'";
+    is $st->content_source(), 'mccants', "Content source is 'mccants'";
+}
 
-is_success $st, qw{ mccants integrated }, 'Get integrated elements';
+SKIP: {
+    is_success_or_skip $st, qw{ mccants integrated },
+	'Get integrated elements', 2;
 
-is $st->content_type(), 'orbit', "Content type is 'orbit'";
+    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-is $st->content_source(), 'mccants', "Content source is 'mccants'";
+    is $st->content_source(), 'mccants', "Content source is 'mccants'";
+}
 
 my $temp = File::Temp->new();
 
@@ -38,84 +44,109 @@ my @opt = eval { utime 0, 0, $temp->filename() } ?
     ( '-file' => $temp->filename() ) :
     ();
 
-is_success $st, 'mccants', @opt, 'mcnames',
-    'Get molczan-style magnitudes';
+SKIP: {
 
-is $st->content_type(), 'molczan', "Content type is 'molczan'";
+    my $do_cache_check = $ENV{AUTHOR_TEST} ||
+	defined $ENV{SPACETRACK_TEST_CACHE} &&
+	    '' ne $ENV{SPACETRACK_TEST_CACHE};
 
-is $st->content_source(), 'mccants', "Content source is 'mccants'";
+    my $count = 2 + ( $do_cache_check ? 3 : 0 );
 
-ok ! $st->cache_hit(), 'Content did not come from cache';
+    is_success_or_skip $st, 'mccants', @opt, 'mcnames',
+	'Get molczan-style magnitudes', $count;
 
-if ( $ENV{AUTHOR_TEST} ||
-    defined $ENV{SPACETRACK_TEST_CACHE} && '' ne $ENV{SPACETRACK_TEST_CACHE} ) {
+    is $st->content_type(), 'molczan', "Content type is 'molczan'";
 
-    my $dump = $ENV{SPACETRACK_TEST_CACHE};
-    defined $dump
-	or $dump = 0;
-    if ( $dump =~ m/ \A 0 (?: x [[:xdigit:]]+ | [0-7]+ ) \z /smx ) {
-	$dump =~ oct $dump;
-    } elsif ( $dump =~ m/ [^0-7] /smx ) {
-	$dump = $st->DUMP_NONE();
-    }
+    is $st->content_source(), 'mccants', "Content source is 'mccants'";
 
-    @opt
-	or BAIL_OUT 'Cache test requires functional uname()';
+    ok ! $st->cache_hit(), 'Content did not come from cache';
 
-    my $want = most_recent_http_response()->content();
-    $dump
-	and $st->set( dump_headers => $dump );
-    is_success $st, qw{ mccants -file }, $temp->filename(), 'mcnames',
-	'Get molczan-style magnitudes from cache';
-    my $obj_pragmata = $st->{_pragmata};
-    $dump
-	and $st->set( dump_headers => $st->DUMP_NONE() );
+    if ( $do_cache_check ) {
 
-    TODO: {
-	local $TODO = 'Flaky server suooprt';
+	my $dump = $ENV{SPACETRACK_TEST_CACHE};
+	defined $dump
+	    or $dump = 0;
+	if ( $dump =~ m/ \A 0 (?: x [[:xdigit:]]+ | [0-7]+ ) \z /smx ) {
+	    $dump =~ oct $dump;
+	} elsif ( $dump =~ m/ [^0-7] /smx ) {
+	    $dump = $st->DUMP_NONE();
+	}
 
-	ok $st->cache_hit(), 'This time content came from cache';
-	$st->cache_hit()
-	    and diag "Cache hit";
-	$st->cache_hit()
-	    or eval {
-	    diag <<'EOD';
+	@opt
+	    or BAIL_OUT 'Cache test requires functional uname()';
+
+	my $want = most_recent_http_response()->content();
+	$dump
+	    and $st->set( dump_headers => $dump );
+
+	SKIP: {
+
+	    is_success_or_skip $st, qw{ mccants -file }, $temp->filename(),
+		'mcnames', 'Get molczan-style magnitudes from cache', 2;
+
+	    my $obj_pragmata = $st->{_pragmata};
+	    $dump
+		and $st->set( dump_headers => $st->DUMP_NONE() );
+
+	    TODO: {
+		local $TODO = 'Flaky server suooprt';
+
+		ok $st->cache_hit(), 'This time content came from cache';
+		$st->cache_hit()
+		    and diag "Cache hit";
+		$st->cache_hit()
+		    or eval {
+		    diag <<'EOD';
 The above cache test seems to fail much more often than not, with the
 trace information (available by setting environment variable
 SPACETRACK_TEST_CACHE to 0x22) showing that the If-Modified-After header
 is in fact set but the server returns 200 anyway.
 EOD
-	    require YAML;
-	    diag 'Response pragmata: ', YAML::Dump( [
-		    most_recent_http_response()->header( 'pragma' ) ] );
-	    diag 'Object pragmata: ', YAML::Dump( $obj_pragmata );
-	    1;
-	} or diag 'Pragmata not dumped; can not load YAML';
-    }
+		    require YAML;
+		    diag 'Response pragmata: ', YAML::Dump( [
+			    most_recent_http_response()->header( 'pragma' ) ] );
+		    diag 'Object pragmata: ', YAML::Dump( $obj_pragmata );
+		    1;
+		} or diag 'Pragmata not dumped; can not load YAML';
+	    }
 
-    is most_recent_http_response()->content(), $want,
-	'We got the same result from the cache as from on line';
-} else {
-    note 'Cache test skipped. Neither AUTHOR_TEST nor SPACETRACK_TEST_CACHE set.';
+	    is most_recent_http_response()->content(), $want,
+		'We got the same result from the cache as from on line';
+
+	}
+    } else {
+	note 'Cache test skipped. Neither AUTHOR_TEST nor SPACETRACK_TEST_CACHE set.';
+    }
 }
 
-is_success $st, qw{ mccants quicksat }, 'Get quicksat-style magnitudes';
+SKIP: {
 
-is $st->content_type(), 'quicksat', "Content type is 'quicksat'";
+    is_success_or_skip $st, qw{ mccants quicksat },
+	'Get quicksat-style magnitudes', 2;
 
-is $st->content_source(), 'mccants', "Content source is 'mccants'";
+    is $st->content_type(), 'quicksat', "Content type is 'quicksat'";
 
-is_success $st, qw{ mccants rcs }, 'Get McCants-format RCS data';
+    is $st->content_source(), 'mccants', "Content source is 'mccants'";
+}
 
-is $st->content_type(), 'rcs.mccants', "Content type is 'rcs.mccants'";
+SKIP: {
 
-is $st->content_source(), 'mccants', "Content source is 'mccants'";
+    is_success_or_skip $st, qw{ mccants rcs }, 'Get McCants-format RCS data', 2;
 
-is_success $st, qw{ mccants vsnames }, 'Get molczan-style magnitudes for visual satellites';
+    is $st->content_type(), 'rcs.mccants', "Content type is 'rcs.mccants'";
 
-is $st->content_type(), 'molczan', "Content type is 'molczan'";
+    is $st->content_source(), 'mccants', "Content source is 'mccants'";
+}
 
-is $st->content_source(), 'mccants', "Content source is 'mccants'";
+SKIP: {
+
+    is_success_or_skip $st, qw{ mccants vsnames },
+	'Get molczan-style magnitudes for visual satellites', 2;
+
+    is $st->content_type(), 'molczan', "Content type is 'molczan'";
+
+    is $st->content_source(), 'mccants', "Content source is 'mccants'";
+}
 
 done_testing;
 

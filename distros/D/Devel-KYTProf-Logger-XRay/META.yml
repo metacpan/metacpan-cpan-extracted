@@ -27,7 +27,7 @@ no_index:
 provides:
   Devel::KYTProf::Logger::XRay:
     file: lib/Devel/KYTProf/Logger/XRay.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   AWS::XRay: '0.02'
   Devel::KYTProf: '0'
@@ -36,6 +36,6 @@ resources:
   bugtracker: https://github.com/fujiwara/Devel-KYTProf-Logger-XRay/issues
   homepage: https://github.com/fujiwara/Devel-KYTProf-Logger-XRay
   repository: git://github.com/fujiwara/Devel-KYTProf-Logger-XRay.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:FUJIWARA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

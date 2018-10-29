@@ -9,7 +9,9 @@ our $INC = $args{ INC };
 $use_64_bit_int  = 0;     # Let perl decide whether to include 64-bit 'long long' support
 $use_long_double = 0;     # Let perl decide whether to include 'long double' support
 $have_decimal64  = undef; # Default value
+$have_decimal128 = undef; # Default value
 $have_float128   = undef; # Default value
+$want_float128   = undef; # Default value
 
 #$use_64_bit_int  = -1; # Uncomment to Force exclusion of 64-bit 'long long' support
 #$use_long_double = -1; # Uncomment to Force exclusion of 'long double' support
@@ -86,7 +88,75 @@ else { # we still need to determine whether_Decimal64 should be supported
 my $d64_message = $have_decimal64 ? "Attempting to build with _Decimal64 support\n"
                                   : "Building without _Decimal64 support\n";
 
+#############################################
+
+
+
+#############################################
+# Whether to build with _Decimal128 support #
+#############################################
+
+if($have_decimal128) {$have_decimal128++} # $have_decimal128 is now either 0 or 2, depending
+                                          # upon which of the above lines was uncommented
+
+else { # we still need to determine whether_Decimal128 should be supported
+
+  for(@ARGV) {
+    $have_decimal128 = 1 if $_ eq 'D128=1';
+    $have_decimal128 = 0 if $_ eq 'D128=0';
+  }
+
+  if(!defined($have_decimal128)) { # _Decimal128 support still undetermined
+    my($mycc, $mylibs, $myinc) = ('', '', '');
+
+    if(@ARGV) {
+      for my $arg(@ARGV) {
+        $mycc   = (split /=/, $arg)[1] if $arg =~ /^cc=/i;
+        $mylibs = (split /=/, $arg)[1] if $arg =~ /^libs=/i;
+        $myinc  = (split /=/, $arg)[1] if $arg =~ /^inc=/i;
+      }
+    }
+
+    unless($mycc) {
+      $mycc = defined($Config{cc}) ? $Config{cc} : 'cc';
+    }
+
+    $mylibs = '-lmpfr -lgmp' unless $mylibs;
+
+    my $out = `$mycc -o have_d128.exe -x c have_d128.in 2>&1`;
+
+    if($out) {
+      print "$out\n";
+      if($save) {print SAVE "try_128 build: $out\n"}
+    }
+
+    unless(-e 'have_d128.exe') {$have_decimal128 = 0}
+
+    else { # _Decimal128 support still undetermined
+
+      my $out = `$mycc -o try_dec128.exe -x c try_dec128.in $myinc $mylibs 2>&1`;
+
+      if($out) {
+        print "$out\n";
+        if($save) {print SAVE "try_dec128 build: $out\n"}
+      }
+
+      if(-e 'try_dec128.exe') {
+        $out = $^O =~ /MSWin32/i ? `try_dec128.exe` : `./try_dec128.exe`;
+        if($out == 128) {$have_decimal128 = 1}
+        if($save) {print SAVE "try_dec128.exe: $out\n"}
+      }
+    }
+  }
+}
+
+my $d128_message = $have_decimal128 ? "Attempting to build with _Decimal128 support\n"
+                                    : "Building without _Decimal128 support\n";
+
 ###########################################
+
+
+
 ###########################################
 # Whether to build with __foat128 support #
 ###########################################
@@ -175,8 +245,11 @@ else {
   }
 }
 
-$defines .= " -DMPFR_WANT_DECIMAL_FLOATS" if $have_decimal64;
-$defines .= " -DMPFR_WANT_FLOAT128" if $have_float128;
+
+$defines .= " -DMPFR_WANT_DECIMAL_FLOATS" if ($have_decimal64 || $have_decimal128);
+$defines .= " -DMPFR_WANT_DECIMAL64"  if $have_decimal64;
+$defines .= " -DMPFR_WANT_DECIMAL128" if $have_decimal128;
+$defines .= " -DMPFR_WANT_FLOAT128"   if $have_float128;
 
 print "\nThis module requires the following C libraries:\n";
 print " gmp-4.2.0 (or later)\n mpfr-3.0.0 (or later)\n\n";
@@ -197,7 +270,10 @@ print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
 print "If this is wrong, see the \"__float128 NV\" conversion section in the README\n\n";
 
 print "\n$d64_message";
-print "If this is wrong, see the \"Decimal64 conversion\" section in the README\n\n";
+print "If this is wrong, see the \"Decimal64 and Decimal128 conversion\" section in the README\n\n";
+
+print "\n$d128_message";
+print "If this is wrong, see the \"Decimal64 and Decimal128 conversion\" section in the README\n\n";
 
 print "\n$float128_message";
 print "If this is wrong, see the \"Math::Float128 conversion\" section in the README\n\n";

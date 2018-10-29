@@ -2,18 +2,35 @@
 abstract: 'Read/write 7z , zip , ISO9960 and other archives'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires: {}
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Archive-SevenZip
 no_index:
   directory:
     - t
     - inc
+requires:
+  Encode: '0'
+  Exporter: '5'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IPC::Open3: '0'
+  Path::Class: '0'
+  Time::Piece: '0'
+  perl: '5.006'
 resources:
-  repository: git://github.com/Corion/archive-sevenzip.git
-version: 0.06
+  repository: git://github.com/Corion/Archive-SevenZip.git
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

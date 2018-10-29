@@ -2,9 +2,15 @@
 abstract: 'spawn a local HTTP server for testing'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires: {}
+build_requires:
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,8 +20,23 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  CGI: '0'
+  Carp: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  HTTP::Daemon: '0'
+  HTTP::Request::AsCGI: '0'
+  HTTP::Response: '0'
+  IO::Socket::INET: '0'
+  LWP::Simple: '0'
+  URI::URL: '0'
+  perl: '5.008'
 resources:
   repository: https://github.com/Corion/Test-HTTP-LocalServer.git
-version: '0.63'
+version: '0.64'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

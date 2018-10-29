@@ -1,0 +1,30 @@
+---
+abstract: 'Interact with the UK HMRC HelloWorld API'
+author:
+  - 'Nick Prater <nick@npbroadcast.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-HMRC-HelloWorld
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moose: '0'
+  WebService::HMRC: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/nick-prater/WebService-HMRC-HelloWorld.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

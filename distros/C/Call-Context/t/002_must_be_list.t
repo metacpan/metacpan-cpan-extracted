@@ -12,23 +12,24 @@ use Call::Context;
 
 sub foo {
     Call::Context::must_be_list();
+    1;
 }
 
-sub try {
+sub try_it {
     return foo();
 }
 
-eval { try() };
+eval { try_it() };
 
 isa_ok( $@, 'Call::Context::X' );
 like( "$@", qr<\Q${PKG}::foo>, 'called function is in message' );
 like( "$@", qr<\Q${PKG}::try>, 'calling function is in message' );
 like( "$@", qr<void>, 'context is in message (void)' );
 
-scalar eval { try() };
+scalar eval { try_it() };
 
 like( "$@", qr<scalar>, 'context is in message (scalar)' );
 
-() = eval { try() };
+scalar eval { () = try_it() };
 
 is( $@, q<>, 'no die() if in list context' );

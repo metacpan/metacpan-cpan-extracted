@@ -1,5 +1,11 @@
 Revision history for Perl extension AWS-XRay
 
+0.08 2018-10-26T13:56:35Z
+    - Segment name created by add_capture becomes to package name.
+
+0.07 2018-10-26T08:32:01Z
+    - Add add_capture method.
+
 0.06 2018-07-05T06:58:37Z
     - Fix segment data lost in 0.05 and auto_flush(0).
 

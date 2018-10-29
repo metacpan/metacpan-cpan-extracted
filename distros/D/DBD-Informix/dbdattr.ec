@@ -1,12 +1,12 @@
 /*
- * @(#)$Id: dbdattr.ec,v 2011.2 2011/09/26 00:45:09 jleffler Exp $
+ * @(#)$Id: dbdattr.ec,v 2015.1 2015/11/02 20:18:04 jleffler Exp $
  *
- * @(#)$Product: Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) $ -- attribute handling
+ * @(#)$Product: Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) $ -- attribute handling
  *
  * Copyright 1997-99 Jonathan Leffler
  * Copyright 2000    Informix Software Inc
  * Copyright 2002-03 IBM
- * Copyright 2004-11 Jonathan Leffler
+ * Copyright 2004-15 Jonathan Leffler
  *
  * You may distribute under the terms of either the GNU General Public
  * License or the Artistic License, as specified in the Perl README file.
@@ -16,7 +16,7 @@
 
 #ifndef lint
 /* Prevent over-aggressive optimizers from eliminating ID string */
-const char jlss_id_dbdattr_ec[] = "@(#)$Id: dbdattr.ec,v 2011.2 2011/09/26 00:45:09 jleffler Exp $";
+const char jlss_id_dbdattr_ec[] = "@(#)$Id: dbdattr.ec,v 2015.1 2015/11/02 20:18:04 jleffler Exp $";
 #endif /* lint */
 
 #include <stdio.h>
@@ -537,7 +537,14 @@ SV *dbd_ix_st_FETCH_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv)
     else if (KEY_MATCH(kl, key, "NUM_OF_FIELDS"))
     {
         assert(imp_sth->n_ocols == DBIc_NUM_FIELDS(imp_sth));
-        retsv = newSViv((IV)imp_sth->n_ocols);
+
+        /* RT#54426: Fix for NUM_OF_FIELDS > 0 test */
+        /* Avoid returning non-zero value on INSERT */
+        if (imp_sth->st_type == SQ_SELECT ||
+            (imp_sth->st_type == SQ_EXECPROC && imp_sth->n_ocols > 0))
+            retsv = newSViv((IV)imp_sth->n_ocols);
+        else
+            retsv = newSViv(0);
     }
     else if (KEY_MATCH(kl, key, "CursorName"))
     {

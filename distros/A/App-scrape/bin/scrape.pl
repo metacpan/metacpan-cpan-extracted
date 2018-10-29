@@ -5,7 +5,7 @@ use List::MoreUtils 'zip';
 use LWP::Simple qw(get);
 use Getopt::Long;
 use Pod::Usage;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 

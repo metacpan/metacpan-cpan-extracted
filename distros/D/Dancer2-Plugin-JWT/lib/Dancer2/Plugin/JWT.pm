@@ -2,13 +2,15 @@ use strict;
 use warnings;
 package Dancer2::Plugin::JWT;
 # ABSTRACT: JSON Web Token made simple for Dancer2
-$Dancer2::Plugin::JWT::VERSION = '0.015';
+$Dancer2::Plugin::JWT::VERSION = '0.016';
 use Dancer2::Plugin;
 use Crypt::JWT qw(encode_jwt decode_jwt);
 use URI;
 use URI::QueryParam;
 
 register_hook qw(jwt_exception);
+
+my $fourWeeks = 4 * 24 * 60 * 60;
 
 my $secret;
 my $alg;
@@ -216,15 +218,20 @@ on_plugin_import {
                 my $decoded = $dsl->app->request->var('jwt');
                 if (defined($decoded)) {
                     my $encoded = encode_jwt( payload      => $decoded, 
-					                                    key          => $secret, 
-                              					      alg          => $alg,
-                              					      enc          => $enc,
-                              					      auto_iat     => $need_iat,
-                              					      relative_exp => $need_exp,
-                              					      relative_nbf => $need_nbf );
+		                                      key          => $secret, 
+                      					      alg          => $alg,
+                      					      enc          => $enc,
+                      					      auto_iat     => $need_iat,
+                      					      relative_exp => $need_exp,
+                      					      relative_nbf => $need_nbf );
                     $response->headers->authorization($encoded);
 
-                    my %cookie =  (value => $encoded, name => '_jwt', expires => "4 weeks", path => '/', http_only => 0);
+                    my %cookie =  (
+                    	value     => $encoded,
+                    	name      => '_jwt',
+                    	expires   => time + ($need_exp // $fourWeeks),
+                    	path      => '/',
+                    	http_only => 0);
                     $cookie{domain} = $cookie_domain if defined $cookie_domain;
                     $response->push_header('Set-Cookie' => Dancer2::Core::Cookie->new(%cookie)->to_header());
 

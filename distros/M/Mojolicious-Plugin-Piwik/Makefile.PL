@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   VERSION_FROM => 'lib/Mojolicious/Plugin/Piwik.pm',
-  ABSTRACT     => 'Use Piwik in Mojolicious',
+  ABSTRACT     => 'Use Matomo (Piwik) in Mojolicious',
   NAME         => 'Mojolicious::Plugin::Piwik',
   AUTHOR       => 'Nils Diewald',
   BUILD_REQUIRES => {
@@ -19,7 +19,7 @@ WriteMakefile(
   (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
     requires  => {perl => '5.010001'},
     resources => {
-      license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
+      license     => 'https://opensource.org/licenses/artistic-license-2.0',
       repository  => {
         type => 'git',
         web => 'https://github.com/Akron/Mojolicious-Plugin-Piwik',

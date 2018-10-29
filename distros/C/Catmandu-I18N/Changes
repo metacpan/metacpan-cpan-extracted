@@ -1,0 +1,5 @@
+0.01  2018-10-26 14:00:55 CEST
+  - created Catmandu::I18N
+  - created Catmandu::Fix::i18n
+  - created Locale::Maketext::Lexicon::CatmanduConfig
+  - added tests

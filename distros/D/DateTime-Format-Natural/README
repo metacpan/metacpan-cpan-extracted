@@ -41,13 +41,13 @@ SYNOPSIS
      jan 24, 2011 12:00
 
 DESCRIPTION
-    `DateTime::Format::Natural' parses informal natural language date/time
+    "DateTime::Format::Natural" parses informal natural language date/time
     strings. In addition, parsable date/time substrings may be extracted
     from ordinary strings.
 
 CONSTRUCTOR
   new
-    Creates a new `DateTime::Format::Natural' object. Arguments to `new()'
+    Creates a new "DateTime::Format::Natural" object. Arguments to "new()"
     are options and not necessarily required.
 
      $parser = DateTime::Format::Natural->new(
@@ -62,25 +62,30 @@ CONSTRUCTOR
                                 },
      );
 
-    * `datetime'
+    *   "datetime"
+
         Overrides the present now with a DateTime object provided.
 
-    * `lang'
-        Contains the language selected, currently limited to `en' (english).
-        Defaults to '`en''.
+    *   "lang"
 
-    * `format'
-        Specifies the format of numeric dates, defaults to '`d/m/y''.
+        Contains the language selected, currently limited to "en" (english).
+        Defaults to '"en"'.
 
-    * `prefer_future'
-        Turns ambiguous weekdays/months to their future relatives. Accepts a
-        boolean, defaults to false.
+    *   "format"
 
-    * `time_zone'
+        Specifies the format of numeric dates, defaults to '"d/m/y"'.
+
+    *   "prefer_future"
+
+        Prefers future time and dates. Accepts a boolean, defaults to false.
+
+    *   "time_zone"
+
         The time zone to use when parsing and for output. Accepts any time
         zone recognized by DateTime. Defaults to 'floating'.
 
-    * `daytime'
+    *   "daytime"
+
         An anonymous hash reference consisting of customized daytime hours,
         which may be selectively changed.
 
@@ -92,13 +97,14 @@ METHODS
      $dt = $parser->parse_datetime($date_string);
      $dt = $parser->parse_datetime(string => $date_string);
 
-    * `string'
+    *   "string"
+
         The date string.
 
   parse_datetime_duration
     Returns one or two DateTime objects constructed from a natural language
     date/time string which may contain timespans/durations. *Same* interface
-    and options as `parse_datetime()', but should be explicitly called in
+    and options as "parse_datetime()", but should be explicitly called in
     list context.
 
      @dt = $parser->parse_datetime_duration($date_string);
@@ -109,7 +115,7 @@ METHODS
     extracted from the string provided; in scalar context only the first
     parsable substring is returned, whereas in list context all parsable
     substrings are returned. Each extracted substring can then be passed to
-    the `parse_datetime()'/ `parse_datetime_duration()' methods.
+    the "parse_datetime()"/ "parse_datetime_duration()" methods.
 
      $date_string  = $parser->extract_datetime($extract_string);
      @date_strings = $parser->extract_datetime($extract_string);
@@ -144,19 +150,19 @@ EXAMPLES
     currently valid input.
 
 BUGS & CAVEATS
-    `parse_datetime()'/`parse_datetime_duration()' always return one or two
+    "parse_datetime()"/"parse_datetime_duration()" always return one or two
     DateTime objects regardless whether the parse was successful or not. In
     case no valid expression was found or a failure occurred, an unaltered
     DateTime object with its initial values (most often the "current" now)
-    is likely to be returned. It is therefore recommended to use `success()'
+    is likely to be returned. It is therefore recommended to use "success()"
     to assert that the parse did succeed (at least, for common uses),
     otherwise the absence of a parse failure cannot be guaranteed.
 
-    `parse_datetime()' is not capable of handling durations.
+    "parse_datetime()" is not capable of handling durations.
 
 CREDITS
     Thanks to Tatsuhiko Miyagawa for the initial inspiration. See Miyagawa's
-    journal entry http://use.perl.org/~miyagawa/journal/31378 for more
+    journal entry <http://use.perl.org/~miyagawa/journal/31378> for more
     information.
 
     Furthermore, thanks to (in order of appearance) who have contributed
@@ -201,7 +207,7 @@ CREDITS
      Ricardo Signes
 
 SEE ALSO
-    dateparse, DateTime, Date::Calc, http://datetime.perl.org
+    dateparse, DateTime, Date::Calc, <http://datetime.perl.org>
 
 AUTHOR
     Steven Schubiger <schubiger@cpan.org>
@@ -210,5 +216,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

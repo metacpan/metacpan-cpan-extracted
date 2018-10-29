@@ -1,3 +1,6 @@
+0.016  2018-10-29
+   - Use expiration information (thanks to EM Hernández-Novich)
+
 0.015  2018-06-01
    - Check for undefined secret (thanks to Mohammad S Anwar)
 

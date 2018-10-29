@@ -1,0 +1,15 @@
+
+#include <stdio.h>
+#include <gmp.h>
+#include <mpfr.h>
+
+int main(void) {
+#if MPFR_VERSION >= MPFR_VERSION_NUM(4,1,0)
+ if(mpfr_buildopt_decimal_p())
+   printf("128");
+ else printf("mpfr_buildopt_decimal_p() returned false");
+#else
+ printf("This version (%s) of mpfr does not support _Decimal128. Need at least 4.1.0", MPFR_VERSION_STRING);
+#endif
+ return 0;
+}

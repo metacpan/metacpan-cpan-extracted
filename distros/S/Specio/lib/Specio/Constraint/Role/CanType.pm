@@ -3,7 +3,7 @@ package Specio::Constraint::Role::CanType;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use Scalar::Util qw( blessed );
 use Specio::PartialDump qw( partial_dump );
@@ -86,7 +86,7 @@ sub _wrap_message_generator {
                         (?:[Ee][\-+]?[0-9]+)?
                         \s*
                         \z/xs
-                    ) {
+                ) {
                     return
                         "A number ($value) will never pass an $type check (wants $all_word_list)";
                 }
@@ -144,7 +144,7 @@ Specio::Constraint::Role::CanType - Provides a common implementation for Specio:
 
 =head1 VERSION
 
-version 0.42
+version 0.43
 
 =head1 DESCRIPTION
 
@@ -166,7 +166,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2012 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

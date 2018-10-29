@@ -1,5 +1,8 @@
 Revision history for perl module Appium
 
+0.0804 2016-02-29
+ - #10: remove unnecessary failing test
+
 0.0803 2015-01-25
  - Inherit all webdriver finder strategies
  - Improve documentation in Appium & Appium::Element

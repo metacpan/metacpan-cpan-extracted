@@ -24,7 +24,7 @@ plan tests => scalar @files;
 
 # test each one, skipping over certain name patterns
 my @win32_modules;
-my @GT_modules;
+my @opt_modules;
 
 foreach my $file (@files) {
     ($file) = $file =~ m|^lib/(.*)\.pm$|;
@@ -36,7 +36,12 @@ foreach my $file (@files) {
     }
     if ($file =~ /_GT$/) {   # require Graphics::TIFF be installed
 	                     # but rarely is on test platforms
-        push @GT_modules, $file;
+        push @opt_modules, $file;
+        next;
+    }
+    if ($file =~ /_IPL$/) {  # require Image::PNG::Libpng be installed
+	                     # but rarely is on test platforms
+        push @opt_modules, $file;
         next;
     }
     use_ok($file);
@@ -44,12 +49,12 @@ foreach my $file (@files) {
 
 # special message and automatic pass for skipped-over modules
 TODO: {
-    local $TODO = q{Win32 modules currently die when "use"d on non-Win32 platforms, _GT modules die if no Graphics::TIFF installed};
+    local $TODO = q{Win32 modules currently die when "use"d on non-Win32 platforms, _GT modules die if no Graphics::TIFF installed, _IPL if no Image::PNG::Libpng};
 
     foreach my $file (@win32_modules) {
         ok($file);
     }
-    foreach my $file (@GT_modules) {
+    foreach my $file (@opt_modules) {
         ok($file);
     }
 }

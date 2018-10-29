@@ -1,5 +1,30 @@
 Revision history for Linux-Statm-Tiny
 
+0.0600    2018-10-27 23:37:11+01:00 Europe/London
+  [Bug Fixes]
+  - Fix pid detection in forks (aidy)
+
+  - Explicitly set minimum version to v5.10.1.
+
+  [Tests]
+  - Updated namespace tests and added other POD tests (ether)
+
+  - Added more tests.
+
+  [Documentation]
+  - Change README to markdown format.
+
+  - Stop using Pod::Readme to create README.
+
+  - Use Pod::Weaver to build documentation.
+
+  [Other Changes]
+  - Remove .travis.yml from git repo.
+
+  - Updated dist.ini to make releases easier.
+
+  - Define the module version normally, which works better with buildtools.
+
 0.0505    2015-06-23 18:05:22+01:00 Europe/London
   [Other Changes]
   - Only run tests on Linux machines

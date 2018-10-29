@@ -126,7 +126,7 @@ BEGIN {
     }
 }
 use constant HAVEZIP   => !!File::Which::which('zip');
-use constant HAVEUNZIP => !!File::Which::which('unzip');
+use constant HAVEUNZIP => undef; #!!File::Which::which('unzip');
 
 use constant ZIP     => 'zip ';
 use constant ZIPTEST => 'unzip -t ';

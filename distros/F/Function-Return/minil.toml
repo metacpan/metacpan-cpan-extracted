@@ -1,6 +1,7 @@
 name = "Function-Return"
-badges = ["travis"]
+badges = ["travis", "coveralls", "metacpan"]
 authority="cpan:KFLY"
 
 module_maker="ModuleBuildTiny"
+markdown_maker = "Pod::Markdown::Github"
 

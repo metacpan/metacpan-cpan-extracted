@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.6.0 2018-10-26T03:25:40Z
+
+    - Introduce -B option to watchdiff command.
+
 4.5.6 2018-10-12T02:33:40Z
 
     - Support Getopt::EX::Colormap L00..L25 grey levels.

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,11 +28,11 @@ no_index:
 provides:
   Function::Return:
     file: lib/Function/Return.pm
-    version: '0.02'
+    version: '0.03'
   Function::Return::Info:
     file: lib/Function/Return/Info.pm
 requires:
-  Function::Parameters: '0'
+  Function::Parameters: '2.000003'
   Scalar::Util: '0'
   Scope::Upper: '0'
   Sub::Info: '0'
@@ -43,8 +43,9 @@ resources:
   bugtracker: https://github.com/kfly8/p5-Function-Return/issues
   homepage: https://github.com/kfly8/p5-Function-Return
   repository: git://github.com/kfly8/p5-Function-Return.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:KFLY
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

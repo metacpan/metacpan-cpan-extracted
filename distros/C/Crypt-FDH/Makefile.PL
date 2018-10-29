@@ -7,9 +7,6 @@ WriteMakefile(
 	      AUTHOR              => q{Ashish Gulhati <crypt-fdh at hash.neo.tc>},
 	      VERSION_FROM        => 'lib/Crypt/FDH.pm',
 	      ABSTRACT_FROM       => 'lib/Crypt/FDH.pm',
-	      ($ExtUtils::MakeMaker::VERSION >= 6.64
-	       ? ('LICENSE'=> 'artistic_2')
-	       : ()),
 	      PL_FILES            => {},
 	      TEST_REQUIRES       => {
 				      'Test::More' => 0,

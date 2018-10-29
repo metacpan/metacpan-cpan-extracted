@@ -1,4 +1,7 @@
-0.013 2018-10-23T06:42:24
+0.014 2018-10-27T21:01:28
+ - Auto generate META.json using plugin [MetaJSON]. (Mohammad S Anwar)
+
+0.013 2018-10-23T06:42:24Z
  - Fix META repository (Meredith Howard)
 
 0.012 2018-10-23T03:50:03Z

@@ -4,8 +4,8 @@ Makefile.old
 *.bak
 pm_to_blib
 blib/
-Archive-SevenZip-*/
-Archive-SevenZip-*
+Archive-Merged-*/
+Archive-Merged-*
 .releaserc
 cover_db
 MYMETA.*

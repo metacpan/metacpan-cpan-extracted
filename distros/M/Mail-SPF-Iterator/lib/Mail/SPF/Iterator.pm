@@ -212,7 +212,7 @@ use warnings;
 
 package Mail::SPF::Iterator;
 
-our $VERSION = '1.117';
+our $VERSION = '1.118';
 
 use fields (
     # values given in or derived from params to new()
@@ -659,12 +659,14 @@ sub next {
     # handle CNAMEs
     my $qname = $question->qname;
     $qname =~s{\\(?:(\d\d\d)|(.))}{ $2 || chr($1) }esg; # presentation -> raw
+    $qname = lc($qname);
     my (%cname,%ans);
     for my $rr (@answer) {
 	my $rtype = $rr->type;
 	# changed between Net::DNS 0.63 and 0.64
 	# it reports now the presentation name instead of the raw name
 	( my $name = $rr->name ) =~s{\\(?:(\d\d\d)|(.))}{ $2 || chr($1) }esg;
+	$name = lc($name);
 	if ( $rtype eq 'CNAME' ) {
 	    # remember CNAME so that we can check that the answer record
 	    # for $qtype matches name from query or CNAME which is an alias
@@ -688,8 +690,8 @@ sub next {
     # if there are unconnected CNAMEs they will be left in %cname
     my @names = ($qname);
     while ( %cname ) {
-	push @names, grep { defined $_ } delete @cname{@names}
-	    or last;
+	my @n = grep { defined $_ } delete @cname{@names} or last;
+	push @names, map { lc($_) } @n;
     }
     if ( %cname ) {
 	# Report but ignore - XXX should we TempError instead?

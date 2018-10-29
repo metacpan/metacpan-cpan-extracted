@@ -115,7 +115,7 @@ is(
             key   => t('NonEmptyStr'),
             value => t( 'HashRef', of => t('Int') ),
         },
-        )->name,
+    )->name,
     'Map{ NonEmptyStr => HashRef[Int] }',
     'Map type has expected generated name'
 );

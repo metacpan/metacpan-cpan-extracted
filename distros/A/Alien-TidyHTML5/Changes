@@ -1,5 +1,18 @@
 Revision history for Alien-TidyHTML5
 
+v0.2.0    2018-10-28 14:24:32+00:00 Europe/London
+  [Enhancements]
+  - Look for alternative package names, "tidy5" and "tidy-html5", #1.
+
+  - Add exe_file method to return the path of the tidy executable, #2.
+
+  [Toolchain]
+  - Bumped prerequisite version for DZ plugin.
+
+  - Explicitly specified a minimum Perl version.
+
+  - Update distribution metadata.
+
 v0.1.1    2018-10-25 17:50:49+01:00 Europe/London
   [Documentation]
   - Added a description and author acknowledgement to POD.

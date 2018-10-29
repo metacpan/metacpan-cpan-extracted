@@ -1,0 +1,10 @@
+Revision history for App::Search::BackPAN
+
+0.03  Sun Oct 28 06:50:00 2018
+      - Added strict/warnings pragma as suggested by CPANTS.
+
+0.02  Sat Oct 27 04:00:00 2018
+      - Returned distribution with full URL.
+
+0.01  Fri Oct 26 18:50:00 2018
+      - Released to celebrate CPAN Birthday.

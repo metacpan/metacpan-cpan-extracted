@@ -21,7 +21,7 @@ use Params::Validate ':all';
 use Scalar::Util qw(blessed);
 use Storable qw(dclone);
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 validation_options(
     on_fail => sub
@@ -548,16 +548,19 @@ sub _advance_future
         } @{$self->{data}->{$identifier}};
     };
 
+    my $now = exists $self->{Datetime}
+      ? dclone($self->{Datetime})
+      : DateTime->now(time_zone => $self->{Time_zone});
+
     if ((all { /^(?:second|minute|hour)$/ } keys %modified)
         && (exists $self->{modified}{hour} && $self->{modified}{hour} == 1)
-        && $self->{datetime}->hour < DateTime->now(time_zone => $self->{Time_zone})->hour
+        && $self->{datetime}->hour < $now->hour
     ) {
         $self->{postprocess}{day} = 1;
     }
     elsif ($token_contains->('weekdays_all')
         && (exists $self->{modified}{day} && $self->{modified}{day} == 1)
-        && ($self->_Day_of_Week(map $self->{datetime}->$_, qw(year month day))
-         < DateTime->now(time_zone => $self->{Time_zone})->wday)
+        && ($self->_Day_of_Week(map $self->{datetime}->$_, qw(year month day)) < $now->wday)
     ) {
         $self->{postprocess}{day} = 7;
     }
@@ -568,7 +571,7 @@ sub _advance_future
               ? $self->{modified}{day} == 1
                 ? true : false
               : true)
-        && ($self->{datetime}->day_of_year < DateTime->now->day_of_year)
+        && ($self->{datetime}->day_of_year < $now->day_of_year)
     ) {
         $self->{postprocess}{year} = 1;
     }
@@ -725,8 +728,7 @@ Specifies the format of numeric dates, defaults to 'C<d/m/y>'.
 
 =item * C<prefer_future>
 
-Turns ambiguous weekdays/months to their future relatives. Accepts a boolean,
-defaults to false.
+Prefers future time and dates. Accepts a boolean, defaults to false.
 
 =item * C<time_zone>
 

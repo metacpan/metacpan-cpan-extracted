@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::Discovery;
-$WebService::GoogleAPI::Client::Discovery::VERSION = '0.13';
+$WebService::GoogleAPI::Client::Discovery::VERSION = '0.16';
 
 # ABSTRACT: Google API discovery service
 
@@ -15,9 +15,32 @@ use Data::Dumper;
 use CHI;    # Caching .. NB Consider reviewing https://metacpan.org/pod/Mojo::UserAgent::Role::Cache
 
 
+## NB - I am not familiar with this moosey approach to OO so there may be obvious errors - keep an eye on this.
+
 has 'ua' => ( is => 'rw', default => sub { WebService::GoogleAPI::Client::UserAgent->new }, lazy => 1 );    ## typically shared with parent instance of Client which sets on new
 has 'debug' => ( is => 'rw', default => 0, lazy => 1 );
-has 'chi' => ( is => 'rw', default => sub { CHI->new( driver => 'File', namespace => __PACKAGE__ ) }, lazy => 1 );
+has 'chi' => ( is => 'rw', default => sub { CHI->new( driver => 'File', namespace => __PACKAGE__ ) }, lazy => 1 );    ## i believe that this gives priority to param if provided ?
+
+
+my $stats = {
+  network => {
+
+    # last request timestamp
+    # last request response_code
+    # last request response_code_count
+    # total bytes sent
+    # total bytes received
+  },
+  cache => {
+    count => 0,
+
+    # last request timestamp
+    # last request response_code
+    # last request response_code_count
+    # total bytes sent
+    # total bytes received
+  }
+};
 
 
 sub get_api_discovery_for_api_id
@@ -65,6 +88,7 @@ sub get_api_discovery_for_api_id
   if ( my $dat = $self->chi->get( $api_discovery_uri ) )    ## clobbers some of the attempted thinking further on .. just return it for now if it's there
   {
     #carp Dumper $dat;
+    $self->{ stats }{ cache }{ get }++;
     return $dat;
   }
 
@@ -88,6 +112,7 @@ sub get_api_discovery_for_api_id
 
       #carp("dat1 = " . Dumper $dat);
       $self->chi->set( $api_discovery_uri, $dat, '30 days' );
+      $self->{ stats }{ network }{ get }++;
       return $dat;
 
       #my $ret_data = $self->chi->get( $api_discovery_uri );
@@ -122,6 +147,7 @@ sub discover_all
     carp "discovery_data cached data expires in ", scalar( $expires_at ) - time(), " seconds\n" if ( $self->debug > 2 );
     my $ret = $self->chi->get( 'https://www.googleapis.com/discovery/v1/apis' );
     croak( 'CHI Discovery should be a hash - got something other' ) unless ref( $ret ) eq 'HASH';
+    $self->{ stats }{ cache }{ get }++;
     return $ret;
   }
   else    ##
@@ -133,6 +159,7 @@ sub discover_all
     if ( $ret->is_success )
     {
       my $all = $ret->json;
+      $self->{ stats }{ network }{ get }++;
       $self->chi->set( 'https://www.googleapis.com/discovery/v1/apis', $all, '30d' );
       return $self->chi->get( 'https://www.googleapis.com/discovery/v1/apis' );
     }
@@ -154,7 +181,7 @@ sub augment_discover_all_with_unlisted_experimental_api
 
   my $all = $self->discover_all();
 
-#warn Dumper $all;
+  #warn Dumper $all;
   ## fail if any of the expected fields are not provided
   foreach my $field ( qw/version title description id kind documentationLink discoveryRestUrl name/ )    ## icons preferred
   {
@@ -170,6 +197,7 @@ sub augment_discover_all_with_unlisted_experimental_api
   ## warn and return existing data if entry appears to already exist
   foreach my $i ( @{ $all->{ items } } )
   {
+    $i->{ id } = '' unless defined $i->{ id };
     if ( ( $i->{ name } eq $api_spec->{ name } ) && ( $i->{ version } eq $api_spec->{ version } ) )
     {
       carp( "There is already an entry with name = $i->{name} and version = $i->{version} - no modifications saved" );
@@ -404,6 +432,9 @@ sub list_of_available_google_api_ids
 
 1;
 
+## TODO - CODE REVIEW
+## get_expires_at .. deos this do what is expected ? - what if has expired and so get fails - will this still return a value?
+
 __END__
 
 =pod
@@ -416,7 +447,7 @@ WebService::GoogleAPI::Client::Discovery - Google API discovery service
 
 =head1 VERSION
 
-version 0.13
+version 0.16
 
 =head2 MORE INFORMATION
 
@@ -481,21 +512,24 @@ SEE ALSO: available_APIs, list_of_available_google_api_ids
 Allows you to augment the cached stored version of the discovery structure
 
 augment_discover_all_with_unlisted_experimental_api( 
-                     {
-                       'version' => 'v4',
-                       'preferred' => 1,
-                       'title' => 'Google My Business API',
-                       'description' => 'The Google My Business API provides an interface for managing business location information on Google.',
-                       'id' => 'mybusiness:v4',
-                       'kind' => 'discovery#directoryItem',
-                       'documentationLink' => "https://developers.google.com/my-business/",
-                       'icons' => {
-                                  "x16": "http://www.google.com/images/icons/product/search-16.gif",
-                                  "x32": "http://www.google.com/images/icons/product/search-32.gif"
-                                },
-                       'discoveryRestUrl' => 'https://developers.google.com/my-business/samples/mybusiness_google_rest_v4p2.json',
-                       'name' => 'mybusiness'
-                     }  );
+                            {
+                              'version' => 'v4',
+                              'preferred' => 1,
+                              'title' => 'Google My Business API',
+                              'description' => 'The Google My Business API
+provides an interface for managing business location information on
+Google.',
+                              'id' => 'mybusiness:v4',
+                              'kind' => 'discovery#directoryItem',
+                              'documentationLink' => "https://developers.google.com/my-business/",
+                              'icons' => {
+                                         "x16"=> "http://www.google.com/images/icons/product/search-16.gif",
+                                         "x32"=> "http://www.google.com/images/icons/product/search-32.gif"
+                                       },
+                              'discoveryRestUrl' =>
+       'https://developers.google.com/my-business/samples/mybusiness_google_rest_v4p2.json',
+                              'name' => 'mybusiness'
+                            }   );
 
 if there is a conflict with the existing then warn and return the existing data without modification
 

@@ -27,10 +27,10 @@ name: Graphics-ColorNames
 provides:
   Graphics::ColorNames:
     file: lib/Graphics/ColorNames.pm
-    version: v3.3.1
+    version: v3.3.3
   Graphics::ColorNames::X:
     file: lib/Graphics/ColorNames/X.pm
-    version: v3.3.1
+    version: v3.3.3
 requires:
   Exporter: '5.57'
   Module::Load: '0.10'
@@ -40,7 +40,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNames
   repository: git://github.com/robrwo/Graphics-ColorNames.git
-version: v3.3.1
+version: v3.3.3
 x_authority: cpan:RRWO
 x_contributors:
   - 'Alan D. Salewski <alans@cji.com>'

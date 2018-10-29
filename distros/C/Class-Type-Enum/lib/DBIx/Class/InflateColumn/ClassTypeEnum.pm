@@ -1,6 +1,6 @@
 package DBIx::Class::InflateColumn::ClassTypeEnum;
 # ABSTRACT: Inflate enum-like columns to your Class::Type::Enum classes
-$DBIx::Class::InflateColumn::ClassTypeEnum::VERSION = '0.013';
+$DBIx::Class::InflateColumn::ClassTypeEnum::VERSION = '0.014';
 
 use warnings;
 use strict;
@@ -73,7 +73,7 @@ DBIx::Class::InflateColumn::ClassTypeEnum - Inflate enum-like columns to your Cl
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
