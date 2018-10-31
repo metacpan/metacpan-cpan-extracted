@@ -19,13 +19,13 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-Utils",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Simple" : "0"
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -42,7 +42,7 @@
    "provides" : {
       "Math::Utils" : {
          "file" : "lib/Math/Utils.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "git://github.com/jgamble/Math-Utils.git"
       }
    },
-   "version" : "1.12",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.13",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

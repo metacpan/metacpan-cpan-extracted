@@ -1,7 +1,7 @@
 package Git::Bunch;
 
-our $DATE = '2018-09-27'; # DATE
-our $VERSION = '0.623'; # VERSION
+our $DATE = '2018-10-30'; # DATE
+our $VERSION = '0.624'; # VERSION
 
 use 5.010001;
 use strict;
@@ -163,7 +163,7 @@ interested in recent repos (which is most of the time unless you are doing a
 full check/sync).
 
 _
-        schema => ['date*', 'x.perl.coerce_rules' => ['str_alami_en']],
+        schema => ['date*', 'x.perl.coerce_rules' => ['!float_epoch', 'float_epoch_always', 'str_alami_en']],
         tags => ['filter'],
     },
 );
@@ -1164,7 +1164,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.623 of Git::Bunch (from Perl distribution Git-Bunch), released on 2018-09-27.
+This document describes version 0.624 of Git::Bunch (from Perl distribution Git-Bunch), released on 2018-10-30.
 
 =head1 SYNOPSIS
 
@@ -1209,7 +1209,7 @@ See also L<rsybak>, which I wrote to backup everything else.
 
 Usage:
 
- check_bunch(%args) -> [status, msg, result, meta]
+ check_bunch(%args) -> [status, msg, payload, meta]
 
 Check status of git repositories inside gitbunch directory.
 
@@ -1290,7 +1290,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1301,7 +1301,7 @@ Return value:  (any)
 
 Usage:
 
- exec_bunch(%args) -> [status, msg, result, meta]
+ exec_bunch(%args) -> [status, msg, payload, meta]
 
 Execute a command for each repo in the bunch.
 
@@ -1384,7 +1384,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1395,7 +1395,7 @@ Return value:  (any)
 
 Usage:
 
- list_bunch_contents(%args) -> [status, msg, result, meta]
+ list_bunch_contents(%args) -> [status, msg, payload, meta]
 
 List contents inside gitbunch directory.
 
@@ -1468,7 +1468,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1479,7 +1479,7 @@ Return value:  (any)
 
 Usage:
 
- sync_bunch(%args) -> [status, msg, result, meta]
+ sync_bunch(%args) -> [status, msg, payload, meta]
 
 Synchronize bunch to another bunch.
 
@@ -1633,7 +1633,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

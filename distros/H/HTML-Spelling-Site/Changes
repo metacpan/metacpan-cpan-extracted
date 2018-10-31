@@ -1,5 +1,8 @@
 Revision history for HTML-Spelling-Site
 
+0.2.0      2018-10-30
+    - Add the light => 1 flag to lib/HTML/Spelling/Site/Checker.pm .
+
 v0.0.5      2017-05-11
     - Convert dist.ini to @SHLOMIF .
     - Eliminate duplicates in the global whitelist and fix some other bugs.

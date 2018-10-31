@@ -12,7 +12,7 @@ use warnings;
 use Carp;
 use English qw/ -no_match_vars /;
 
-our $VERSION     = 0.09;
+our $VERSION     = 0.10;
 
 has headers => (is => 'rw', default => sub {{}} );
 has data    => (is => 'rw', default => sub {[]} );
@@ -53,7 +53,7 @@ Mech - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Mech version 0.0.1
+This documentation refers to Mech version 0.10
 
 
 =head1 SYNOPSIS

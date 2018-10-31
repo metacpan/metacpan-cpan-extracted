@@ -19,6 +19,9 @@ my $builder = Module::Build->new(
         'WWW::Mechanize'   => '1.73',
         'namespace::clean' => '0.25',
     },
+    configure_requires => {
+        'Module::Build' => 0.38,
+    },
     build_requires => {
         'Test::More'     => '0.88',
         'Test::Warnings' => '0.026',

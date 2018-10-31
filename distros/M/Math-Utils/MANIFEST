@@ -3,7 +3,8 @@ Changes
 lib/Math/Utils.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
+CONTRIBUTING.md
 eg/derivative.pl
 eg/division.pl
 eg/evaluate.pl
@@ -25,6 +26,8 @@ t/14-derivative.t
 t/15-objcoeff.t
 t/16-evaluate.t
 t/17-derivative-eval.t
+t/18-translate.t
+t/20-finitedif.t
 t/manifest.t
 t/pod.t
 LICENSE

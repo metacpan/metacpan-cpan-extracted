@@ -16,6 +16,7 @@ use HTML::Entities;
 sub new {
     my ( $pkg, %args ) = @_;
     my $self = bless { %args }, $pkg;
+    $self->{transpose} //= 0;
     $self->parse( $args{data} ) if $args{data};
     $self->{playlist} = $args{playlist} if $args{playlist};
     return $self;
@@ -42,7 +43,8 @@ sub parse {
     $self->{playlist} =
       Data::iRealPro::Playlist->new( variant => $self->{variant},
 				      data    => $data,
-				      debug   => $self->{debug},
+				     debug   => $self->{debug},
+				     transpose => $self->{transpose},
 				    );
 
     return $self;

@@ -1,6 +1,6 @@
 # $Id: Summary.pm,v 2018.1 2018/05/11 18:33:03 jleffler Exp $
 #
-# Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+# Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 #
 # This driver summary is for DBD::Informix
 #
@@ -18,7 +18,7 @@
     use warnings;
     use vars qw( $VERSION );
 
-    $VERSION = "2018.1029";
+    $VERSION = "2018.1031";
     $VERSION = "0.97002" if ($VERSION =~ m%[:]VERSION[:]%);
 
     1;
@@ -42,7 +42,7 @@ This file is an updated version of the information about DBD::Informix in the DB
 
 =head2 Driver Version
 
-DBD::Informix (Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28))
+DBD::Informix (Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31))
 
 =head2 Feature Summary
 

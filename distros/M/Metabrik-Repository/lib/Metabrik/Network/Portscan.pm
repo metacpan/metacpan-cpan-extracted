@@ -1,5 +1,5 @@
 #
-# $Id: Portscan.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Portscan.pm,v 76c9b59191bd 2018/06/17 11:12:14 gomor $
 #
 # network::portscan Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Network::Device);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 76c9b59191bd $',
       tags => [ qw(unstable scan syn port synscan tcpscan) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -398,8 +398,10 @@ sub tcp_syn_stop_receiver {
       return 1;
    }
 
+   $self->log->debug("tcp_syn_stop_receiver: closing nr...");
    $nr->close;
    $self->_nr(undef);
+   $self->log->debug("tcp_syn_stop_receiver: closing nr...done");
 
    return 1;
 }
@@ -481,6 +483,7 @@ sub tcp_syn_receive_until_sender_exit {
 
    return { open => \%open, closed => \%closed };
 }
+
 sub tcp_syn_scan {
    my $self = shift;
    my ($ip_list, $port_list, $pps, $try) = @_;

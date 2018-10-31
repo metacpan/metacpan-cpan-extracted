@@ -90,10 +90,10 @@ sub test_all {
         $self->assert($count == $counts{$tag}->[0],
             "Expected '$tag' count to be $counts{$tag}->[0], got $count");
 
-        $self->assert($tagdata->{'average'} > 0,
+        $self->assert(defined $tagdata->{'average'} && $tagdata->{'average'} >= 0,
             "Expected 'average' for '$tag' to be positive");
 
-        $self->assert($tagdata->{'median'} > 0,
+        $self->assert(defined $tagdata->{'median'} && $tagdata->{'median'} >= 0,
             "Expected 'median' for '$tag' to be positive");
 
         $self->assert(ref $tagdata->{'last'} eq 'ARRAY',

@@ -18,12 +18,13 @@ die "can't read json" unless $truffle_project;
 my $contract = $rpc_client->contract({
     contract_abi => $truffle_project->{abi},
     rpc_client   => $rpc_client,
+    from         => $coinbase,
+    gas          => 4000000
 });
 
 my $res = $rpc_client->eth_sendTransaction([{
     to   => $coinbase,
     from => $coinbase,
-    gas  => Ethereum::RPC::Contract::Helper::UnitConversion::to_wei(400000),
 }]);
 
 sleep 2;
@@ -38,15 +39,10 @@ my $rate       = Math::BigInt->new(1000);
 my $wallet     = $coinbase;
 
 my $response = $contract->invoke_deploy($truffle_project->{bytecode}, $start_time, $end_time, $rate, $wallet)->get_contract_address(35);
-ok $response->is_failed;
-
-$contract->gas(4000000);
-$contract->from($coinbase);
-
-$response = $contract->invoke_deploy($truffle_project->{bytecode}, $start_time, $end_time, $rate, $wallet)->get_contract_address(35);
 ok !$response->is_failed;
 
 $contract->contract_address($response->get->response);
+$contract->gas(undef);
 
 my @account_list = @{$rpc_client->eth_accounts()};
 

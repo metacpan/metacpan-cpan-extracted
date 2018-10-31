@@ -8,14 +8,13 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,11 +30,13 @@ requires:
   IO::String: '0'
   List::Util: '1.33'
   Moose: '0'
-  Pod::Readme: v1.1.1
+  Pod::Readme: v1.2.0
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-ReadmeFromPod
   homepage: http://metacpan.org/release/Dist-Zilla-Plugin-ReadmeFromPod
   license: http://dev.perl.org/licenses/
   repository: git://github.com/fayland/dist-zilla-plugin-readmefrompod.git
-version: '0.35'
-x_authority: cpan:FAYLAND
+version: '0.36'
+x_authority: cpan:AVAR
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

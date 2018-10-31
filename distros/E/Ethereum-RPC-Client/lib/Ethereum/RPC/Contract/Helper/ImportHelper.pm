@@ -5,7 +5,7 @@ use warnings;
 
 use Path::Tiny;
 
-our $VERSION = '0.001';
+our $VERSION = '0.03';
 
 =head1 NAME
 

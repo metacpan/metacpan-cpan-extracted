@@ -1,6 +1,6 @@
-#   @(#)$Id: DBD-Informix.nmd,v 2018.5 2018/10/29 01:52:25 jleffler Exp $
+#   @(#)$Id: DBD-Informix.nmd,v 2018.6 2018/10/31 03:48:08 jleffler Exp $
 #   @(#)DBD::Informix - Perl Database Driver for Informix
-#   @(#)Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+#   @(#)Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 #   @(#)Definitive list of files -- Non-Modifiable Source Distribution
 #
 #   -- The Source file column contains the name of the source file to be
@@ -48,17 +48,17 @@ sqltoken.h                  RCS/sqltoken.h,v            2004.3
 sqltype.ec                  RCS/sqltype.ec,v            2011.1
 
 # Source Files
-Announce                        RCS/Announce,v          2018.5
+Announce                        RCS/Announce,v          2018.6
 BugReport                       RCS/BugReport,v         100.5
-ChangeLog                       RCS/ChangeLog,v         2018.3
+ChangeLog                       RCS/ChangeLog,v         2018.4
 
 InformixTechSupport             RCS/InformixTechSupport,v   2013.1
 ItWorks                         RCS/ItWorks,v               100.5
 MANIFEST                        RCS/MANIFEST,v              2018.2
 MANIFEST.SKIP                   RCS/MANIFEST.SKIP,v         2004.2
 META.yml                        RCS/META.yml,v              2018.1
-Makefile.PL                     RCS/Makefile.PL,v           2018.4
-README                          RCS/README,v                2015.3
+Makefile.PL                     RCS/Makefile.PL,v           2018.5
+README                          RCS/README,v                2018.1
 TODO                            RCS/TODO,v                  2013.1
 
 Informix.h                      RCS/Informix.h,v        100.3
@@ -89,7 +89,7 @@ Release.Checklist               RCS/Release.Checklist,v 2018.2
 
 # Supporting tools
 lib/Bundle/DBD/Informix.pm          lib/Bundle/DBD/RCS/Informix.pm,v        2013.1
-lib/DBD/Informix/Configure.pm       lib/DBD/Informix/RCS/Configure.pm,v     2018.1
+lib/DBD/Informix/Configure.pm       lib/DBD/Informix/RCS/Configure.pm,v     2018.2
 lib/DBD/Informix/GetInfo.pm         lib/DBD/Informix/RCS/GetInfo.pm,v       2018.1
 lib/DBD/Informix/Metadata.pm        lib/DBD/Informix/RCS/Metadata.pm,v      2014.1
 lib/DBD/Informix/Summary.pm         lib/DBD/Informix/RCS/Summary.pm,v       2018.1
@@ -199,8 +199,8 @@ examples/fetchscroll.pl                 examples/RCS/fetchscroll.pl,v           
 
 inc/ExtUtils/AutoInstall.pm             inc/ExtUtils/AutoInstall.pm             -
 
-DBD-Informix.jdc            RCS/DBD-Informix.jdc,v      2018.4
+DBD-Informix.jdc            RCS/DBD-Informix.jdc,v      2018.5
 DBD-Informix.msd            RCS/DBD-Informix.msd,v      2018.1
-DBD-Informix.nmd            RCS/DBD-Informix.nmd,v      $Revision: 2018.5 $
+DBD-Informix.nmd            RCS/DBD-Informix.nmd,v      $Revision: 2018.6 $
 mknmd.sh                    RCS/mknmd.sh,v              2012.1
 prodverstamp.sh             RCS/prodverstamp.sh,v       2015.1

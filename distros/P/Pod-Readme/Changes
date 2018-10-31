@@ -1,5 +1,33 @@
 Revision history for Pod-Readme
 
+v1.2.1    2018-10-30 18:23:48+00:00 Europe/London
+  [Documentation]
+  - Added note about Github Flavoured Markdown (GFM) support
+    to Changes for v1.2.0.
+
+  [Other]
+  - Restore license to "Perl_5" that was inadvertently changed
+    in the conversion to use Dist::Zilla, GH#25.
+
+v1.2.0    2018-10-29 19:24:01+00:00 Europe/London
+  [Bug Fixes]
+  - Specify minimum version of List::Util, GH#22.
+
+  [Enhancements]
+  - Added "md" as an alias for "markdown" in pod2readme.
+
+  - Added "github" or "gfm" for Github Flavored Markdown in
+    pod2readme, GH#15.
+
+  [Incompatabilities]
+  - Removed DistZilla type from Pod::Readme::Types, as it was not
+    necessary.
+
+  [Toolchain]
+  - Remove use of Module::Install, fixes GH#21.
+
+  - Use Dist::Zilla to build the distribution.
+
 v1.1.2 2014-12-09 18:55 GMT
   [Bug Fixes]
   - Regex in changes plugin fixed to work with Perl 5.21 deprecated
@@ -7,7 +35,7 @@ v1.1.2 2014-12-09 18:55 GMT
 
 v1.1.1 2014-12-04 13:11 GMT
   [Bug Fixes]
-  - The changes plugin will work with Dist::Zilla {{$NEXT}} tokens.
+  - The changes plugin will work with Dist::Zilla v1.2.1    2018-10-30 18:23:48+00:00 Europe/London tokens.
 
 v1.1.0 2014-12-03 19:08 GMT
   [Documentation]

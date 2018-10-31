@@ -39,11 +39,10 @@
             "Cwd" : "0",
             "DBD::SQLite" : "0",
             "DBI" : "0",
-            "Data::Sah::Coerce::perl::date::float_epoch" : "0.025",
+            "Data::Sah::Coerce::perl::date::float_epoch_always" : "0",
             "Data::Sah::Coerce::perl::date::obj_DateTime" : "0.025",
             "Data::Sah::Coerce::perl::date::obj_TimeMoment" : "0.025",
             "Data::Sah::Coerce::perl::date::str_alami_en" : "0.008",
-            "Data::Sah::Coerce::perl::date::str_iso8601" : "0.025",
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Data::Sah::Compiler::perl::TH::date" : "0",
@@ -91,7 +90,7 @@
          "web" : "https://github.com/perlancar/perl-Git-Bunch"
       }
    },
-   "version" : "0.623",
+   "version" : "0.624",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

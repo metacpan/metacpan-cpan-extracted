@@ -3,7 +3,7 @@ package File::Slurp;
 use strict;
 use warnings ;
 
-our $VERSION = '9999.23';
+our $VERSION = '9999.24';
 $VERSION = eval $VERSION;
 
 use Carp ;
@@ -779,44 +779,56 @@ File::Slurp - Simple and Efficient Reading/Writing/Modifying of Complete Files
   use File::Slurp;
 
   # read in a whole file into a scalar
-  my $text = read_file( 'filename' ) ;
+  my $text = read_file('/path/file');
 
   # read in a whole file into an array of lines
-  my @lines = read_file( 'filename' ) ;
+  my @lines = read_file('/path/file');
 
   # write out a whole file from a scalar
-  write_file( 'filename', $text ) ;
+  write_file('/path/file', $text);
 
   # write out a whole file from an array of lines
-  write_file( 'filename', @lines ) ;
+  write_file('/path/file', @lines);
 
   # Here is a simple and fast way to load and save a simple config file
   # made of key=value lines.
-  my %conf = read_file( $file_name ) =~ /^(\w+)=(.*)$/mg ;
-  write_file( $file_name, {atomic => 1}, map "$_=$conf{$_}\n", keys %conf ) ;
+  my %conf = read_file('/path/file') =~ /^(\w+)=(.*)$/mg;
+  write_file('/path/file', {atomic => 1}, map "$_=$conf{$_}\n", keys %conf);
 
   # insert text at the beginning of a file
-  prepend_file( 'filename', $text ) ;
+  prepend_file('/path/file', $text);
 
   # in-place edit to replace all 'foo' with 'bar' in file
-  edit_file { s/foo/bar/g } 'filename' ;
+  edit_file { s/foo/bar/g } '/path/file';
 
   # in-place edit to delete all lines with 'foo' from file
-  edit_file_lines sub { $_ = '' if /foo/ }, 'filename' ;
+  edit_file_lines sub { $_ = '' if /foo/ }, '/path/file';
 
   # read in a whole directory of file names (skipping . and ..)
-  my @files = read_dir( '/path/to/dir' ) ;
+  my @files = read_dir('/path/to/dir');
 
 =head1 DESCRIPTION
 
 This module provides subs that allow you to read or write entire files
 with one simple call. They are designed to be simple to use, have
 flexible ways to pass in or get the file contents and to be very
-efficient.  There is also a sub to read in all the files in a
+efficient. There is also a sub to read in all the files in a
 directory.
 
-These slurp/spew subs work for files, pipes and sockets, stdio,
-pseudo-files, and the C<DATA> handle.
+=head2 WARNING - PENDING DOOM
+
+Although you technically I<can>, do NOT use this module to work on file handles,
+pipes, sockets, standard IO, pseudo-files, or the C<DATA> handle. These are
+features implemented long ago that just really shouldn't be abused here.
+
+Be warned: this activity will lead to inaccurate encoding/decoding of data.
+
+All further mentions of actions on the above have been removed from this
+documentation and that feature set will likely be deprecated in the future.
+
+In other words, if you don't have a filename to pass, consider using the
+standard C<< do { local $/; <$fh> } >>, or
+L<Data::Section>/L<Data::Section::Simple> for working with C<__DATA__>.
 
 =head1 FUNCTIONS
 
@@ -825,9 +837,9 @@ L<File::Slurp> implements the following functions.
 =head2 append_file
 
 	use File::Spec qw(append_file write_file);
-	my $res = append_file('/path/to/file', "Some text");
+	my $res = append_file('/path/file', "Some text");
 	# same as
-	my $res = write_file('/path/to/file', {append => 1}, "Some text");
+	my $res = write_file('/path/file', {append => 1}, "Some text");
 
 The C<append_file> function is simply a synonym for the
 L<File::Slurp/"write_file"> function, but ensures that the C<append> option is
@@ -836,11 +848,11 @@ set.
 =head2 edit_file
 
 	use File::Slurp qw(edit_file);
-	# perl -0777 -pi -e 's/foo/bar/g' filename
-	edit_file { s/foo/bar/g } 'filename';
-	edit_file sub { s/foo/bar/g }, 'filename';
+	# perl -0777 -pi -e 's/foo/bar/g' /path/file
+	edit_file { s/foo/bar/g } '/path/file';
+	edit_file sub { s/foo/bar/g }, '/path/file';
 	sub replace_foo { s/foo/bar/g }
-	edit_file \&replace_foo, 'filename';
+	edit_file \&replace_foo, '/path/file';
 
 The C<edit_file> function reads in a file into C<$_>, executes a code block that
 should modify C<$_>, and then writes C<$_> back to the file. The C<edit_file>
@@ -864,11 +876,11 @@ have a consistent file.
 =head2 edit_file_lines
 
 	use File::Slurp qw(edit_file_lines);
-	# perl -pi -e '$_ = "" if /foo/' filename
-	edit_file_lines { $_ = '' if /foo/ } 'filename';
-	edit_file_lines sub { $_ = '' if /foo/ }, 'filename';
+	# perl -pi -e '$_ = "" if /foo/' /path/file
+	edit_file_lines { $_ = '' if /foo/ } '/path/file';
+	edit_file_lines sub { $_ = '' if /foo/ }, '/path/file';
 	sub delete_foo { $_ = '' if /foo/ }
-	edit_file \&delete_foo, 'filename';
+	edit_file \&delete_foo, '/path/file';
 
 The C<edit_file_lines> function reads each line of a file into C<$_>, and
 executes a code block that should modify C<$_>. It will then write C<$_> back
@@ -891,11 +903,11 @@ have a consistent file.
 =head2 ef
 
 	use File::Slurp qw(ef);
-	# perl -0777 -pi -e 's/foo/bar/g' filename
-	ef { s/foo/bar/g } 'filename';
-	ef sub { s/foo/bar/g }, 'filename';
+	# perl -0777 -pi -e 's/foo/bar/g' /path/file
+	ef { s/foo/bar/g } '/path/file';
+	ef sub { s/foo/bar/g }, '/path/file';
 	sub replace_foo { s/foo/bar/g }
-	ef \&replace_foo, 'filename';
+	ef \&replace_foo, '/path/file';
 
 The C<ef> function is simply a synonym for the L<File::Slurp/"edit_file">
 function.
@@ -903,11 +915,11 @@ function.
 =head2 efl
 
 	use File::Slurp qw(efl);
-	# perl -pi -e '$_ = "" if /foo/' filename
-	efl { $_ = '' if /foo/ } 'filename';
-	efl sub { $_ = '' if /foo/ }, 'filename';
+	# perl -pi -e '$_ = "" if /foo/' /path/file
+	efl { $_ = '' if /foo/ } '/path/file';
+	efl sub { $_ = '' if /foo/ }, '/path/file';
 	sub delete_foo { $_ = '' if /foo/ }
-	efl \&delete_foo, 'filename';
+	efl \&delete_foo, '/path/file';
 
 The C<efl> function is simply a synonym for the L<File::Slurp/"edit_file_lines">
 function.
@@ -915,7 +927,7 @@ function.
 =head2 overwrite_file
 
 	use File::Spec qw(overwrite_file);
-	my $res = overwrite_file('/path/to/file', "Some text");
+	my $res = overwrite_file('/path/file', "Some text");
 
 The C<overwrite_file> function is simply a synonym for the
 L<File::Slurp/"write_file"> function.
@@ -923,15 +935,15 @@ L<File::Slurp/"write_file"> function.
 =head2 prepend_file
 
 	use File::Slurp qw(prepend_file);
-	prepend_file($file, $header);
-	prepend_file($file, \@lines);
-	prepend_file($file, { binmode => 'raw:'}, $bin_data);
+	prepend_file('/path/file', $header);
+	prepend_file('/path/file', \@lines);
+	prepend_file('/path/file', { binmode => 'raw:'}, $bin_data);
 
 	# equivalent to:
 	use File::Slurp qw(read_file write_file);
-	my $content = read_file('file_name');
+	my $content = read_file('/path/file');
 	my $new_content = "hahahaha";
-	write_file('file_name', $new_content . $content);
+	write_file('/path/file', $new_content . $content);
 
 The C<prepend_file> function is the opposite of L<File::Slurp/"append_file"> as
 it writes new contents to the beginning of the file instead of the end. It is a
@@ -1003,21 +1015,21 @@ ensure the proper directory separator is used for your OS. See L<File::Spec>.
 =head2 read_file
 
 	use File::Slurp qw(read_file);
-	my $text = read_file('filename');
-	my $bin = read_file('filename', { binmode => ':raw' });
-	my @lines = read_file('filename');
-	my $lines_ref = read_file('file_name', array_ref => 1);
-	my $lines_ref = [ read_file('file_name') ];
+	my $text = read_file('/path/file');
+	my $bin = read_file('/path/file', { binmode => ':raw' });
+	my @lines = read_file('/path/file');
+	my $lines_ref = read_file('/path/file', array_ref => 1);
+	my $lines_ref = [ read_file('/path/file') ];
 
 	# or we can read into a buffer:
 	my $buffer;
-	read_file('file_name', buf_ref => \$buffer);
+	read_file('/path/file', buf_ref => \$buffer);
 
 	# or we can set the block size for the read
-	my $text_ref = read_file(\*STDIN, blk_size => 10_000_000, array_ref => 1);
+	my $text_ref = read_file('/path/file', blk_size => 10_000_000, array_ref => 1);
 
 	# or we can get a scalar reference
-	my $text_ref = read_file('file_name', scalar_ref => 1);
+	my $text_ref = read_file('/path/file', scalar_ref => 1);
 
 This function reads in an entire file and returns its contents to the
 caller. In scalar context it returns the entire file as a single
@@ -1025,9 +1037,7 @@ scalar. In list context it will return a list of lines (using the
 current value of C<$/> as the separator, including support for paragraph
 mode when it is set to C<''>).
 
-The first argument is the file to be slurped in. It can be a path to a file, an
-open file handle (C<\*DATA>, C<\*STDIN>). Overloaded objects use the stringified
-file path.
+The first argument is the path to the file to be slurped in.
 
 The next argument(s) is either a hash reference or a flattened hash,
 C<< key => value >> pairs. The following options are available:
@@ -1103,7 +1113,7 @@ copy of the file to return.
 =head2 rf
 
 	use File::Spec qw(rf);
-	my $text = rf('/path/to/file');
+	my $text = rf('/path/file');
 
 The C<rf> function is simply a synonym for the L<File::Slurp/"read_file">
 function.
@@ -1111,7 +1121,7 @@ function.
 =head2 slurp
 
 	use File::Spec qw(slurp);
-	my $text = slurp('/path/to/file');
+	my $text = slurp('/path/file');
 
 The C<slurp> function is simply a synonym for the L<File::Slurp/"read_file">
 function.
@@ -1119,7 +1129,7 @@ function.
 =head2 wf
 
 	use File::Spec qw(wf);
-	my $res = wf('/path/to/file', "Some text");
+	my $res = wf('/path/file', "Some text");
 
 
 The C<wf> function is simply a synonym for the
@@ -1128,28 +1138,28 @@ L<File::Slurp/"write_file"> function.
 =head2 write_file
 
 	use File::Slurp qw(write_file);
-	write_file('filename', @data);
-	write_file('filename', {append => 1}, @data);
-	write_file('filename', {binmode => ':raw'}, $buffer);
-	write_file('filename', \$buffer);
-	write_file('filename', $buffer);
-	write_file('filename', \@lines);
-	write_file('filename', @lines);
+	write_file('/path/file', @data);
+	write_file('/path/file', {append => 1}, @data);
+	write_file('/path/file', {binmode => ':raw'}, $buffer);
+	write_file('/path/file', \$buffer);
+	write_file('/path/file', $buffer);
+	write_file('/path/file', \@lines);
+	write_file('/path/file', @lines);
 
 	# binmode
-	write_file($bin_file, {binmode => ':raw'}, @data);
-	write_file($bin_file, {binmode => ':utf8'}, $utf_text);
+	write_file('/path/file', {binmode => ':raw'}, @data);
+	write_file('/path/file', {binmode => ':utf8'}, $utf_text);
 
 	# buffered
-	write_file($bin_file, {buf_ref => \$buffer});
-	write_file($bin_file, \$buffer);
-	write_file($bin_file, $buffer);
+	write_file('/path/file', {buf_ref => \$buffer});
+	write_file('/path/file', \$buffer);
+	write_file('/path/file', $buffer);
 
 	# append
-	write_file($file, {append => 1}, @data);
+	write_file('/path/file', {append => 1}, @data);
 
 	# no clobbering
-	write_file($file, {no_clobber => 1}, @data);
+	write_file('/path/file', {no_clobber => 1}, @data);
 
 This function writes out an entire file in one call. By default C<write_file>
 returns C<1> upon successfully writing the file or C<undef> if it encountered
@@ -1229,7 +1239,7 @@ The C<perms> option sets the permissions of newly-created files. This value
 is modified by your process's C<umask> and defaults to C<0666> (same as
 C<sysopen>).
 
-NOTE: this option is new as of File::Slurp version 9999.14;
+NOTE: this option is new as of File::Slurp version 9999.14.
 
 =back
 

@@ -9,6 +9,7 @@ META.json
 META.yml
 README
 cpanfile
+lib/Perl/Critic/Policy/TooMuchCode/ProhibitDuplicateSub.pm
 lib/Perl/Critic/Policy/TooMuchCode/ProhibitExcessiveColons.pm
 lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeBlock.pm
 lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeTryBlock.pm
@@ -19,6 +20,7 @@ lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedImport.pm
 lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm
 lib/Perl/Critic/TooMuchCode.pm
 metamerge.json
+t/TooMuchCode/ProhibitDuplicateSub.run
 t/TooMuchCode/ProhibitExcessiveColons.run
 t/TooMuchCode/ProhibitLargeBlock.run
 t/TooMuchCode/ProhibitLargeTryBlock.run

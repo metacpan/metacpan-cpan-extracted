@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form;
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 # ABSTRACT: Generate form HTML using various UI libraries
 
 #pod =head1 SYNOPSIS
@@ -166,17 +166,13 @@ our $VERSION = '1.011';
 #pod =cut
 
 use Mojo::Base 'Mojolicious::Plugin';
+use Yancy::Util qw( currym );
 
 sub register {
     my ( $self, $app, $conf ) = @_;
-    if ( !$self->can( 'input' ) ) {
-        die "Form plugin must implement 'input' method";
-    }
     my $prefix = $conf->{prefix} || 'form';
     for my $method ( qw( form_for field_for input ) ) {
-        $app->helper( "yancy.$prefix.$method" => sub {
-            $self->$method( @_ );
-        } );
+        $app->helper( "yancy.$prefix.$method" => currym( $self, $method ) );
     }
 }
 
@@ -192,7 +188,7 @@ Yancy::Plugin::Form - Generate form HTML using various UI libraries
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 

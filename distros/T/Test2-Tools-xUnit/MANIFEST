@@ -5,9 +5,6 @@ LICENSE
 MANIFEST
 META.json
 META.yml
-MYMETA.json
-MYMETA.yml
-Makefile
 Makefile.PL
 README
 examples/hello.t

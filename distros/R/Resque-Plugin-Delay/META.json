@@ -53,14 +53,14 @@
             "Test::MockTime" : "0",
             "Test::More" : "0.98",
             "Test::RedisServer" : "0",
-            "Time::Strptime" : "0"
+            "Time::Strptime" : "1.03"
          }
       }
    },
    "provides" : {
       "Resque::Plugin::Delay" : {
          "file" : "lib/Resque/Plugin/Delay.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Resque::Plugin::Delay::Dequeue" : {
          "file" : "lib/Resque/Plugin/Delay/Dequeue.pm"
@@ -80,8 +80,11 @@
          "web" : "https://github.com/meru-akimbo/resque-delay-perl"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:MERU",
+   "x_contributors" : [
+      "Nick Tonkin <1nickt@users.noreply.github.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

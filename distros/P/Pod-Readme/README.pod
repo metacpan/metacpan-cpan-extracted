@@ -4,7 +4,7 @@ Pod::Readme - Intelligently generate a README file from POD
 
 =head1 VERSION
 
-v1.1.2
+v1.2.0
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ This distribution requires the following modules:
 
 =over 4
 
-=item * L<Class::Method::Modifiers> (version 2.00)
+=item * L<Class::Method::Modifiers>
 
 =item * L<CPAN::Changes> (version 0.30)
 
@@ -76,7 +76,9 @@ This distribution requires the following modules:
 
 =item * L<IO::String>
 
-=item * L<Moo> (version 1.004005)
+=item * L<Module::Metadata>
+
+=item * L<Moo>
 
 =item * L<Moo::Role>
 
@@ -84,7 +86,7 @@ This distribution requires the following modules:
 
 =item * L<namespace::autoclean>
 
-=item * L<Path::Tiny> (version 0.018)
+=item * L<Path::Tiny>
 
 =item * L<Role::Tiny>
 
@@ -92,25 +94,13 @@ This distribution requires the following modules:
 
 =item * L<Test::Exception>
 
+=item * L<Test::Kit>
+
 =item * L<Try::Tiny>
 
 =item * L<Type::Tiny>
 
 =item * L<Types::Standard>
-
-=back
-
-This distribution recommends the following modules:
-
-=over 4
-
-=item * L<Pod::Man>
-
-=item * L<Pod::Markdown>
-
-=item * L<Pod::Simple::LaTeX>
-
-=item * L<Type::Tiny::XS>
 
 =back
 
@@ -122,7 +112,41 @@ This distribution recommends the following modules:
 
 =item * 
 
-Regex in changes plugin fixed to work with Perl 5.21 deprecated syntax [khwilliamson].
+Specify minimum version of List::Util, GH#22.
+
+=back
+
+=head2 Enhancements
+
+=over 4
+
+=item * 
+
+Added "md" as an alias for "markdown" in pod2readme.
+
+=back
+
+=head2 Incompatabilities
+
+=over 4
+
+=item * 
+
+Removed DistZilla type from Pod::Readme::Types, as it was not necessary.
+
+=back
+
+=head2 Toolchain
+
+=over 4
+
+=item * 
+
+Remove use of Module::Install, fixes GH#21.
+
+=item * 
+
+Use Dist::Zilla to build the distribution.
 
 =back
 

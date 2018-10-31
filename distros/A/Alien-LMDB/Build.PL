@@ -28,14 +28,14 @@ my $builder = Alien::Base::ModuleBuild->new(
           bugtracker => 'https://github.com/hoytech/Alien-LMDB/issues',
           repository  => 'git://github.com/hoytech/Alien-LMDB.git',
       },
-  }, 
+  },
 
   alien_name => 'lmdb',
   ## https://github.com/LMDB/lmdb/releases
   alien_repository => {
     protocol => 'local',
     location => 'inc',
-    pattern  => qr/^LMDB_([\d.]+)\.tar\.gz$/,
+    pattern  => qr/^lmdb-LMDB_([\d.]+)\.tar\.gz$/,
   },
   alien_build_commands => [
     "%{gmake} -C libraries/liblmdb/ CC=$Config{cc}",

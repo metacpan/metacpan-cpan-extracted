@@ -1,5 +1,11 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.98 2018/10/31
+  - added allow-test-pms option that forces to include test
+    dependencies that are used in t/**.pm files that are not
+    directly used .t files; this option is also set if
+    Test::Class family is used (RT-127383)
+
 0.97 2018/09/30
   - allow in-file parser package
 

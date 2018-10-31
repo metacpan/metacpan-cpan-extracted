@@ -1,8 +1,9 @@
 Build.PL
 Changes
-inc/LMDB_0.9.19.tar.gz
+inc/lmdb-LMDB_0.9.22.tar.gz
 lib/Alien/LMDB.pm
 MANIFEST			This list of files
 META.json
 META.yml
 t/installed.t
+t/style-trailing-space.t

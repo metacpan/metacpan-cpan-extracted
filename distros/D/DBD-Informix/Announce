@@ -1,14 +1,14 @@
 To: dbi-announce@perl.org, dbi-dev@perl.org, dbi-users@perl.org,
         informix-list@iiug.org, dbd.informix@gmail.com
-Subject: ANNOUNCE: Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) released
+Subject: ANNOUNCE: Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31) released
 
-Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) has been uploaded to CPAN.
+Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31) has been uploaded to CPAN.
 
 IBM Informix Database Driver for Perl (also known as DBD::Informix) is
-the driver code that enables Perl :PERL_MINVERSION: or later to access Informix
+the driver code that enables Perl 5.008001 or later to access Informix
 databases via the DBI module (but if you are not already using Perl
-:PERL_REFVERSION:, or a later version, you should be planning to upgrade Perl).
-You will need to install DBI version :DBI_MINVERSION: or later as well (version :DBI_REFVERSION:,
+5.026002, or a later version, you should be planning to upgrade Perl).
+You will need to install DBI version 1.607 or later as well (version 1.642,
 or any later version, is recommended) before installing DBD::Informix.  The
 code for DBD::Informix is available for download via:
 
@@ -20,6 +20,12 @@ http://dbi.perl.org/
 ** Jonathan Leffler) at dbd.informix@gmail.com.
 ** The ItWorks script does not send email to anybody; you have to do
 ** that yourself.
+
+New in release 2018.1031
+* Latest DBI is 1.642.
+* Fix other botched version number references.
+* Besides, Halloween is a good day for a release.
+* Read the changes for the 2018.0511 release too.
 
 New in release 2018.1029
 * Minor tweaks to Announce and ChangeLog for general release.
@@ -75,4 +81,4 @@ As always, see the ChangeLog file for details about what has changed.
 
 Jonathan Leffler (jonathan.leffler@hcl.com, jonathan.leffler@gmail.com)
 
-@(#)$Id: Announce,v 2018.5 2018/10/29 01:52:18 jleffler Exp $
+@(#)$Id: Announce,v 2018.6 2018/10/31 03:19:43 jleffler Exp $

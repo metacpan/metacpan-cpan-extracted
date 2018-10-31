@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Finder;
-$HTML::Spelling::Site::Finder::VERSION = '0.0.5';
+$HTML::Spelling::Site::Finder::VERSION = '0.2.0';
 use strict;
 use warnings;
 
@@ -9,33 +9,33 @@ use MooX (qw( late ));
 
 use File::Find::Object;
 
-has 'prune_cb' => (is => 'ro', isa => 'CodeRef', default => sub { return; });
-has 'root_dir' => (is => 'ro', isa => 'Str', 'required' => 1,);
+has 'prune_cb' => ( is => 'ro', isa => 'CodeRef', default => sub { return; } );
+has 'root_dir' => ( is => 'ro', isa => 'Str', 'required' => 1, );
 
 sub list_all_htmls
 {
     my ($self) = @_;
 
-    my $f = File::Find::Object->new({}, $self->root_dir);
+    my $f = File::Find::Object->new( {}, $self->root_dir );
 
     my @got;
-    while (my $r = $f->next_obj())
+    while ( my $r = $f->next_obj() )
     {
         my $path = $r->path;
-        if ($self->prune_cb->($path))
+        if ( $self->prune_cb->($path) )
         {
             $f->prune;
         }
-        elsif ($r->is_file and $r->basename =~ /\.x?html\z/)
+        elsif ( $r->is_file and $r->basename =~ /\.x?html\z/ )
         {
             push @got, $path;
         }
     }
     use locale;
     use POSIX qw(locale_h strtod);
-    setlocale(LC_COLLATE, 'C') or die "cannot set locale.";
+    setlocale( LC_COLLATE, 'C' ) or die "cannot set locale.";
 
-    return [sort @got];
+    return [ sort @got ];
 }
 
 1;
@@ -44,14 +44,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-HTML::Spelling::Site::Finder - find the relevant .html/.xhtml files in
-a directory tree.
+HTML::Spelling::Site::Finder
 
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -77,9 +78,14 @@ The instances of this class can be used to scan a directory tree of files
 ending with C<.html> and C<.xhtml> and to return a list of them as a sorted
 array reference.
 
+=head1 NAME
+
+HTML::Spelling::Site::Finder - find the relevant .html/.xhtml files in
+a directory tree.
+
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 METHODS
 
@@ -100,36 +106,9 @@ Returns the prune callback. Mostly for internal use.
 
 Returns the root directory.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-https://github.com/shlomif/html-spelling-site/issues
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc HTML::Spelling::Site
 
 =head2 Websites
 
@@ -144,7 +123,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-Spelling-Site>
+L<https://metacpan.org/release/HTML-Spelling-Site>
 
 =item *
 
@@ -180,14 +159,6 @@ L<http://cpanratings.perl.org/d/HTML-Spelling-Site>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/HTML-Spelling-Site>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -198,7 +169,7 @@ L<http://cpants.cpanauthors.org/dist/HTML-Spelling-Site>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/H/HTML-Spelling-Site>
 
@@ -235,5 +206,26 @@ from your repository :)
 L<https://github.com/shlomif/HTML-Spelling-Site>
 
   git clone https://github.com/shlomif/HTML-Spelling-Site.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/html-spelling-site/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

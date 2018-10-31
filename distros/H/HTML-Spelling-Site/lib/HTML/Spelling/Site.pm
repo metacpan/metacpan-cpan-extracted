@@ -1,5 +1,5 @@
 package HTML::Spelling::Site;
-$HTML::Spelling::Site::VERSION = '0.0.5';
+$HTML::Spelling::Site::VERSION = '0.2.0';
 use strict;
 use warnings;
 
@@ -11,14 +11,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-HTML::Spelling::Site - a system/framework for spell-checking an entire static
-HTML site.
+HTML::Spelling::Site
 
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -33,9 +34,14 @@ duplicate functionality for spell checking my web-sites. Currently
 documentation is somewhat lacking and the modules could use some extra
 automated tests, but I'm anxious to get something out the door.
 
+=head1 NAME
+
+HTML::Spelling::Site - a system/framework for spell-checking an entire static
+HTML site.
+
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 SEE ALSO
 
@@ -44,36 +50,9 @@ HTML::Spelling::Site and can also only handle one file at the time. Note that
 I contributed a little to it, but only after I started working on the code
 that became this framework.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-https://github.com/shlomif/html-spelling-site/issues
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc HTML::Spelling::Site
 
 =head2 Websites
 
@@ -88,7 +67,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-Spelling-Site>
+L<https://metacpan.org/release/HTML-Spelling-Site>
 
 =item *
 
@@ -124,14 +103,6 @@ L<http://cpanratings.perl.org/d/HTML-Spelling-Site>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/HTML-Spelling-Site>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -142,7 +113,7 @@ L<http://cpants.cpanauthors.org/dist/HTML-Spelling-Site>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/H/HTML-Spelling-Site>
 
@@ -179,5 +150,26 @@ from your repository :)
 L<https://github.com/shlomif/HTML-Spelling-Site>
 
   git clone https://github.com/shlomif/HTML-Spelling-Site.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/html-spelling-site/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

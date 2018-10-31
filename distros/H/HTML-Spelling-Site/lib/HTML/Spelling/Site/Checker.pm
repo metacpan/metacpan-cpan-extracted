@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Checker;
-$HTML::Spelling::Site::Checker::VERSION = '0.0.5';
+$HTML::Spelling::Site::Checker::VERSION = '0.2.0';
 use strict;
 use warnings;
 use autodie;
@@ -14,14 +14,15 @@ use List::MoreUtils qw(any);
 use JSON::MaybeXS qw(decode_json);
 use IO::All qw/ io /;
 
-has '_inside' => (is => 'rw', isa => 'HashRef', default => sub { return +{};});
-has 'whitelist_parser' => (is => 'ro', required => 1);
-has 'check_word_cb' => (is => 'ro', isa => 'CodeRef', required => 1);
-has 'timestamp_cache_fn' => (is => 'ro', isa => 'Str', required => 1);
+has '_inside' =>
+    ( is => 'rw', isa => 'HashRef', default => sub { return +{}; } );
+has 'whitelist_parser' => ( is => 'ro', required => 1 );
+has 'check_word_cb' => ( is => 'ro', isa => 'CodeRef', required => 1 );
+has 'timestamp_cache_fn' => ( is => 'ro', isa => 'Str', required => 1 );
 
 sub _tag
 {
-    my ($self, $tag, $num) = @_;
+    my ( $self, $tag, $num ) = @_;
 
     $self->_inside->{$tag} += $num;
 
@@ -30,7 +31,7 @@ sub _tag
 
 sub _calc_mispellings
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my @ret;
 
@@ -42,19 +43,18 @@ sub _calc_mispellings
     binmode STDOUT, ":encoding(utf8)";
 
     my $calc_cache_io = sub {
-        return io->file($self->timestamp_cache_fn);
+        return io->file( $self->timestamp_cache_fn );
     };
 
-    my $app_key = 'HTML-Spelling-Site';
+    my $app_key  = 'HTML-Spelling-Site';
     my $data_key = 'timestamp_cache';
 
     my $write_cache = sub {
         my $ref = shift;
         $calc_cache_io->()->print(
-            JSON::MaybeXS->new(canonical => 1)->encode(
+            JSON::MaybeXS->new( canonical => 1 )->encode(
                 {
-                    $app_key =>
-                    {
+                    $app_key => {
                         $data_key => $ref,
                     },
                 },
@@ -64,32 +64,37 @@ sub _calc_mispellings
         return;
     };
 
-    if (! $calc_cache_io->()->exists())
+    if ( !$calc_cache_io->()->exists() )
     {
-        $write_cache->(+{});
+        $write_cache->( +{} );
     }
 
-    my $timestamp_cache = decode_json(scalar($calc_cache_io->()->slurp()))->{$app_key}->{$data_key};
+    my $timestamp_cache =
+        decode_json( scalar( $calc_cache_io->()->slurp() ) )->{$app_key}
+        ->{$data_key};
 
     my $check_word = $self->check_word_cb;
 
-    FILENAMES_LOOP:
+FILENAMES_LOOP:
     foreach my $filename (@$filenames)
     {
-        if (exists($timestamp_cache->{$filename}) and
-            $timestamp_cache->{$filename} >= (io->file($filename)->mtime())
-        )
+        if ( exists( $timestamp_cache->{$filename} )
+            and $timestamp_cache->{$filename} >=
+            ( io->file($filename)->mtime() ) )
         {
             next FILENAMES_LOOP;
         }
 
         my $file_is_ok = 1;
 
-        my $process_text = sub
-        {
-            if (any {
-                    exists($self->_inside->{$_}) and $self->_inside->{$_} > 0
-                } qw(script style))
+        my $process_text = sub {
+            if (
+                any
+                {
+                    exists( $self->_inside->{$_} ) and $self->_inside->{$_} > 0
+                }
+                qw(script style)
+                )
             {
                 return;
             }
@@ -108,19 +113,21 @@ sub _calc_mispellings
 
                     $word =~ s{’(ve|s|m|d|t|ll|re)\z}{'$1};
                     $word =~ s{[’']\z}{};
-                    if ($word =~ /[A-Za-z]/)
+                    if ( $word =~ /[A-Za-z]/ )
                     {
-                        $word =~ s{\A(?:(?:ֹו?(?:ש|ל|מ|ב|כש|לכש|מה|שה|לכשה|ב-))|ו)-?}{};
+                        $word =~
+s{\A(?:(?:ֹו?(?:ש|ל|מ|ב|כש|לכש|מה|שה|לכשה|ב-))|ו)-?}{};
                         $word =~ s{'?ים\z}{};
                     }
 
-                    my $verdict =
-                    (
-                        (! $whitelist->check_word({filename => $filename, word => $word}))
-                        &&
-                        ($word !~ m#\A[\p{Hebrew}\-'’]+\z#)
-                        &&
-                        (!($check_word->($word)))
+                    my $verdict = (
+                        (
+                            !$whitelist->check_word(
+                                { filename => $filename, word => $word }
+                            )
+                        )
+                            && ( $word !~ m#\A[\p{Hebrew}\-'’]+\z# )
+                            && ( !( $check_word->($word) ) )
                     );
 
                     $mispelling_found ||= $verdict;
@@ -139,25 +146,27 @@ sub _calc_mispellings
                     $file_is_ok = 0;
                     push @ret,
                         {
-                            filename => $filename,
-                            line_num => 1,
-                            line_with_context => $l,
+                        filename          => $filename,
+                        line_num          => 1,
+                        line_with_context => $l,
                         };
                 }
             }
         };
 
-        open(my $fh, "<:utf8", $filename);
+        open( my $fh, "<:utf8", $filename );
 
-        HTML::Parser->new(api_version => 3,
-            handlers    => [start => [sub { return $self->_tag(@_); }, "tagname, '+1'"],
-                end   => [sub { return $self->_tag(@_); }, "tagname, '-1'"],
-                text  => [$process_text, "dtext"],
+        HTML::Parser->new(
+            api_version => 3,
+            handlers    => [
+                start => [ sub { return $self->_tag(@_); }, "tagname, '+1'" ],
+                end   => [ sub { return $self->_tag(@_); }, "tagname, '-1'" ],
+                text => [ $process_text, "dtext" ],
             ],
             marked_sections => 1,
         )->parse_file($fh);
 
-        close ($fh);
+        close($fh);
 
         if ($file_is_ok)
         {
@@ -170,21 +179,24 @@ sub _calc_mispellings
     return { misspellings => \@ret, };
 }
 
+sub _format_error
+{
+    my ( $self, $error ) = @_;
+
+    return sprintf( "%s:%d:%s",
+        $error->{filename}, $error->{line_num}, $error->{line_with_context},
+    );
+}
+
 sub spell_check
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $misspellings = $self->_calc_mispellings($args);
 
-    foreach my $error (@{$misspellings->{misspellings}})
+    foreach my $error ( @{ $misspellings->{misspellings} } )
     {
-        printf {*STDOUT}
-        (
-            "%s:%d:%s\n",
-            $error->{filename},
-            $error->{line_num},
-            $error->{line_with_context},
-        );
+        printf {*STDOUT} "%s\n", $self->_format_error($error);
     }
 
     print "\n";
@@ -192,17 +204,27 @@ sub spell_check
 
 sub test_spelling
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     my $misspellings = $self->_calc_mispellings($args);
 
+    if ( $args->{light} )
+    {
+        require Test::More;
+
+        my $ret = Test::More::is( scalar( @{ $misspellings->{misspellings} } ),
+            0, $args->{blurb} );
+
+        foreach my $error ( @{ $misspellings->{misspellings} } )
+        {
+            Test::More::diag( $self->_format_error($error) );
+        }
+        return $ret;
+    }
     require Test::Differences;
 
-    return Test::Differences::eq_or_diff(
-        $misspellings->{misspellings},
-        [],
-        $args->{blurb},
-    );
+    return Test::Differences::eq_or_diff( $misspellings->{misspellings},
+        [], $args->{blurb}, );
 }
 1;
 
@@ -210,13 +232,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-HTML::Spelling::Site::Checker - does the actual checking.
+HTML::Spelling::Site::Checker
 
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -376,9 +400,13 @@ In t/html-spell-check.t :
 The instances of this class can be used to do the actual scanning of
 local HTML files.
 
+=head1 NAME
+
+HTML::Spelling::Site::Checker - does the actual checking.
+
 =head1 VERSION
 
-version 0.0.5
+version 0.2.0
 
 =head1 METHODS
 
@@ -397,6 +425,10 @@ Performs the spell check and prints the erroneous words to stdout.
 
 A spell check function compatible with L<Test::More> . Emits one assertion.
 
+Since version 0.2.0, if a C<<< light => 1 >>> key is specified and is true, it
+will not use L<Test::Differences>, which tends to consume a lot of RAM when
+there are many messages.
+
 =head2 $finder->whitelist_parser()
 
 For internal use.
@@ -409,36 +441,9 @@ For internal use.
 
 For internal use.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2016 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-https://github.com/shlomif/html-spelling-site/issues
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc HTML::Spelling::Site
 
 =head2 Websites
 
@@ -453,7 +458,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-Spelling-Site>
+L<https://metacpan.org/release/HTML-Spelling-Site>
 
 =item *
 
@@ -489,14 +494,6 @@ L<http://cpanratings.perl.org/d/HTML-Spelling-Site>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/HTML-Spelling-Site>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -507,7 +504,7 @@ L<http://cpants.cpanauthors.org/dist/HTML-Spelling-Site>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/H/HTML-Spelling-Site>
 
@@ -544,5 +541,26 @@ from your repository :)
 L<https://github.com/shlomif/HTML-Spelling-Site>
 
   git clone https://github.com/shlomif/HTML-Spelling-Site.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/html-spelling-site/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

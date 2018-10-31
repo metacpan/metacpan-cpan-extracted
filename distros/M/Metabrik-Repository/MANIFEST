@@ -25,6 +25,7 @@ lib/Metabrik/Brik/Search.pm
 lib/Metabrik/Brik/Tool.pm
 lib/Metabrik/Client/Dns.pm
 lib/Metabrik/Client/Elasticsearch.pm
+lib/Metabrik/Client/Elasticsearch/Cluster.pm
 lib/Metabrik/Client/Elasticsearch/Query.pm
 lib/Metabrik/Client/Imap.pm
 lib/Metabrik/Client/Kafka.pm

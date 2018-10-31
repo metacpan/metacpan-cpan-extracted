@@ -15,6 +15,7 @@ use Encode qw( decode_utf8 encode_utf8 );
 
 sub encode {
     my ( $self, $xml ) = @_;
+    $self->{transpose} //= 0;
     my $parser = XML::LibXML->new;
     my $opts = { no_cdata => 1 };
     if ( $self->{catalog} && -r  $self->{catalog} ) {
@@ -109,12 +110,14 @@ sub encode {
       ( variant      => $variant,
 	songs        => \@songs,
 	$plname ? ( name => $plname ) : (),
+	transpose    => $self->{transpose},
       );
 
     # Build a URI for the playlist...
     my $uri = Data::iRealPro::URI->new
       ( variant      => $variant,
 	playlist     => $pl,
+	transpose    => $self->{transpose},
       );
 
     # And deliver.

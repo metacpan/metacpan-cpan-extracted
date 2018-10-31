@@ -4,7 +4,7 @@
       "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -31,9 +31,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Future" : "0.38",
+            "Future" : "0.37",
             "JSON" : "2.97001",
-            "JSON::MaybeXS" : "1.003010",
+            "JSON::MaybeXS" : "1.003008",
             "Math::BigFloat" : "1.999811",
             "Math::BigInt" : "1.999811",
             "Mojo::UserAgent" : "0",
@@ -66,7 +66,8 @@
          "web" : "https://github.com/binary-com/perl-Ethereum-RPC-Client"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
+   "version" : "0.03",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

@@ -1,12 +1,12 @@
 #
-# $Id: Repository.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Repository.pm,v 25ec7afdbe64 2018/10/30 15:24:17 gomor $
 #
 package Metabrik::Repository;
 use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 our $FIX = '0';
 
 1;

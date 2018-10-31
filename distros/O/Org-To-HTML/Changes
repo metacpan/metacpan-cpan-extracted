@@ -1,3 +1,21 @@
+0.231   2018-10-30 (PERLANCAR)
+
+        - [bugfix] Forgot to HTML-escape timestamp which might contain "<" and
+          ">" (reported by Harald Jörg).
+
+        - [bugfix] Fix broken --target-file because referring to old function
+          write_file instead of write_text (reported by Harald Jörg).
+
+        - Remove currently unused empty modules
+          Org::To::HTML::Link::{cpandist,cpanmod} to calm CPANTS down (Harald
+          Jörg).
+
+        - Update documentation to say that org-to-html script is now included in
+          App-OrgUtils distribution (Harald Jörg).
+
+        - Avoid running locale-related tests with Perl < 5.014 (Harald Jörg).
+
+
 0.230   2018-05-05 (PERLANCAR)
 
 	- Produce lowercase tag and attribute names, because believe it or

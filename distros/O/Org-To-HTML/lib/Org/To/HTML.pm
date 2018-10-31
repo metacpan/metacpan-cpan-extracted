@@ -1,7 +1,7 @@
 package Org::To::HTML;
 
-our $DATE = '2018-05-05'; # DATE
-our $VERSION = '0.230'; # VERSION
+our $DATE = '2018-10-30'; # DATE
+our $VERSION = '0.231'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +10,7 @@ use Log::ger;
 
 use vars qw($VERSION);
 
-use File::Slurper qw(read_text);
+use File::Slurper qw(read_text write_text);
 use HTML::Entities qw/encode_entities/;
 use Org::Document;
 
@@ -126,7 +126,7 @@ sub org_to_html {
     my $html = $obj->export($doc);
     #$log->tracef("html = %s", $html);
     if ($args{target_file}) {
-        write_file($args{target_file}, $html);
+        write_text($args{target_file}, $html);
         return [200, "OK"];
     } else {
         return [200, "OK", $html];
@@ -365,13 +365,13 @@ sub export_text {
 sub export_time_range {
     my ($self, $elem) = @_;
 
-    $elem->as_string;
+    encode_entities($elem->as_string);
 }
 
 sub export_timestamp {
     my ($self, $elem) = @_;
 
-    $elem->as_string;
+    encode_entities($elem->as_string);
 }
 
 sub export_link {
@@ -412,7 +412,7 @@ Org::To::HTML - Export Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.230 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2018-05-05.
+This document describes version 0.231 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2018-10-30.
 
 =head1 SYNOPSIS
 
@@ -438,7 +438,8 @@ This document describes version 0.230 of Org::To::HTML (from Perl distribution O
 
 Export Org format to HTML. To customize, you can subclass this module.
 
-A command-line utility is included: L<org-to-html>.
+A command-line utility L<org-to-html> is available in the distribution
+L<App::OrgUtils>.
 
 Note that this module is just a simple exporter, for "serious" works you'll
 probably want to use the exporting features or L<org-mode|http://orgmode.org>.
@@ -456,7 +457,7 @@ Export document to HTML.
 
 Usage:
 
- org_to_html(%args) -> [status, msg, result, meta]
+ org_to_html(%args) -> [status, msg, payload, meta]
 
 Export Org document to HTML.
 
@@ -525,7 +526,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

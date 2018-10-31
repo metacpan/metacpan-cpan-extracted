@@ -6,13 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Org/To/Base.pm',
     'Org/To/HTML.pm',
-    'Org/To/HTML/Link/cpandist.pm',
-    'Org/To/HTML/Link/cpanmod.pm',
     'Org/To/Role.pm'
 );
 

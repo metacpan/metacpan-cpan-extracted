@@ -1,5 +1,15 @@
 Revision history for WebService-SonarQube
 
+0.10   2018-10-30
+        Updating for release of version 0.10
+        Adding perl 5.26 to travis (Ivan Wills)
+        Adding in the configure_requires section (Ivan Wills)
+        Trying quoting version (Ivan Wills)
+        Fixing up another documentation version (Ivan Wills)
+        Fixing up documentation version (Ivan Wills)
+        Updating licence date (Ivan Wills)
+        Fixing POD (Ivan Wills)
+
 0.09   2017-11-24
         Updating for release of version 0.09
         Fixed date (Ivan Wills)

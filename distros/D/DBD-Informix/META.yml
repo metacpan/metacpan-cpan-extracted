@@ -1,20 +1,20 @@
 --- #YAML:1.0
 name:                DBD-Informix
-version:             2018.1029
+version:             2018.1031
 abstract:            IBM Informix Database Driver for Perl DBI
 license:             perl
 author:
     -                Jonathan Leffler <jonathan.leffler@hcl.com>
 distribution_type:   module
 build_requires:
-    DBI:             :DBI_MINVERSION:
+    DBI:             1.607
 configure_requires:
-    DBI:             :DBI_MINVERSION:
+    DBI:             1.607
 requires:     
-    DBI:             :DBI_MINVERSION:
+    DBI:             1.607
     Time::HiRes:     0
 recommends:
-    DBI:             :DBI_REFVERSION:
+    DBI:             1.642
 dynamic_config:      1
 urls:
     license:         http://dev.perl.org/licenses/

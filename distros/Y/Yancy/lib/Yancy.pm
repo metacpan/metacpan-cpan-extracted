@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -185,7 +185,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 

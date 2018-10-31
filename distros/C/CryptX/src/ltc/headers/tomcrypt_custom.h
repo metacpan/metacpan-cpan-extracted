@@ -43,7 +43,10 @@
 #define XMEM_NEQ  mem_neq
 #endif
 #ifndef XSTRCMP
-#define XSTRCMP strcmp
+#define XSTRCMP  strcmp
+#endif
+#ifndef XSTRNCPY
+#define XSTRNCPY strncpy
 #endif
 
 #ifndef XCLOCK
@@ -56,7 +59,7 @@
 
 #if ( defined(malloc) || defined(realloc) || defined(calloc) || defined(free) || \
       defined(memset) || defined(memcpy) || defined(memcmp) || defined(strcmp) || \
-      defined(clock) || defined(qsort) ) && !defined(LTC_NO_PROTOTYPES)
+      defined(strncpy) || defined(clock) || defined(qsort) ) && !defined(LTC_NO_PROTOTYPES)
 #define LTC_NO_PROTOTYPES
 #endif
 
@@ -417,7 +420,7 @@
 #define LTC_DH1536
 #define LTC_DH2048
 
-#ifndef TFM_DESC
+#if defined(LTM_DESC) || defined(GMP_DESC)
 /* tfm has a problem in fp_isprime for larger key sizes */
 #define LTC_DH3072
 #define LTC_DH4096
@@ -463,6 +466,8 @@
 
 #define LTC_PKCS_1
 #define LTC_PKCS_5
+#define LTC_PKCS_8
+#define LTC_PKCS_12
 
 /* Include ASN.1 DER (required by DSA/RSA) */
 #define LTC_DER
@@ -492,7 +497,11 @@
 
 #define LTC_CRC32
 
+#define LTC_SSH
+
 #define LTC_PADDING
+
+#define LTC_PBES
 
 #endif /* LTC_NO_MISC */
 
@@ -557,6 +566,15 @@
 
 #ifdef LTC_MRSA
    #define LTC_PKCS_1
+#endif
+
+#if defined(LTC_MRSA) || defined(LTC_MECC)
+   #define LTC_PKCS_8
+#endif
+
+#ifdef LTC_PKCS_8
+   #define LTC_PADDING
+   #define LTC_PBES
 #endif
 
 #if defined(LTC_PELICAN) && !defined(LTC_RIJNDAEL)

@@ -4,7 +4,7 @@ Alien::TidyHTML5 - Download and install HTML Tidy
 
 # VERSION
 
-version v0.2.0
+version v0.3.0
 
 # DESCRIPTION
 
@@ -18,9 +18,10 @@ for the use of other modules.
 
 # METHODS
 
-## `exe_file`
+## `exe`
 
-This returns the path of the `tidy` executable.
+This returns the name of the `tidy` executable, which _may_ be
+the path to the executable.
 
 # SEE ALSO
 
@@ -49,9 +50,10 @@ Robert Rothenberg <rrwo@cpan.org>
 The initial development of this module was sponsored by Science Photo
 Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Slaven Rezić <slaven@rezic.de>
+- Slaven Rezić <slaven@rezic.de>
+- Graham Ollis <plicease@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

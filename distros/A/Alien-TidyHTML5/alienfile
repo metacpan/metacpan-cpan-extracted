@@ -3,9 +3,25 @@
 use alienfile;
 
 plugin 'PkgConfig' => (
-    pkg_name        => [qw/ tidy tidy5 tidy-html5 /],
+    pkg_name        => 'tidy',
     minimum_version => '5.6.0',
 );
+
+meta->around_hook('probe' => sub {
+    my($orig, $build) = @_;
+
+    my $type = $orig->($build);
+    if($type eq 'system') {
+        foreach my $exe (qw( tidy5 tidy )) {
+            if(`$exe -version` =~ /HTML Tidy /) {
+                $build->runtime_prop->{command} = $exe;
+                return 'system';
+            }
+        }
+    }
+
+    return 'share';
+});
 
 share {
 
@@ -32,10 +48,9 @@ share {
         '%{make} install',
     ];
 
-};
+    after 'gather' => sub {
+        my($build) = @_;
+        $build->runtime_prop->{command} = 'tidy';
+    };
 
-gather [
-    [ 'pkg-config --modversion tidy', \'%{.runtime.version}' ],
-    [ 'pkg-config --cflags     tidy', \'%{.runtime.cflags}' ],
-    [ 'pkg-config --libs       tidy', \'%{.runtime.libs}' ],
-];
+};

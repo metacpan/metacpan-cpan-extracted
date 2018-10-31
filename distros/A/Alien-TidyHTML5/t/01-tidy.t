@@ -4,9 +4,9 @@ use Alien::TidyHTML5;
 
 alien_ok 'Alien::TidyHTML5';
 
-ok my $exe_file = Alien::TidyHTML5->exe_file, 'exe_file';
+ok my $exe = Alien::TidyHTML5->exe, 'exe';
 
-run_ok( [ $exe_file, '-version' ] )
+run_ok( [ $exe, '-version' ] )
     ->success
     ->out_like(qr/^HTML Tidy /);
 

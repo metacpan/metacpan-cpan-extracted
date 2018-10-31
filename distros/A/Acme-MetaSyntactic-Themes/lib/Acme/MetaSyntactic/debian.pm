@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::debian;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 __PACKAGE__->init();
 1;
 
@@ -24,6 +24,13 @@ Philippe Bruhat (Book).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2018-10-29 - v1.003
+
+Added C<buster> to the list of Debian codenames.
+Published in Acme-MetaSyntactic-Themes version 1.052.
 
 =item *
 
@@ -66,5 +73,5 @@ buzz rex bo
 hamm slink potato
 woody sarge etch
 lenny squeeze wheezy
-jessie stretch
+jessie stretch buster
 sid

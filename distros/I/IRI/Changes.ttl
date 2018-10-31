@@ -15,13 +15,27 @@
 	.
 
 
+<http://kasei.us/code/files/IRI-0.009.tar.gz>
+	dcterms:isVersionOf my:project ;
+	dcterms:replaces    <http://kasei.us/code/files/IRI-0.008.tar.gz> ;
+	
+	doap:Version [
+		doap:revision	"0.009" ;
+		doap:created	"2018-10-30" ;
+	] ;
+	asc:changes [
+		asc:update		"Reduce Minimum Perl Version to 5.10 (#12 from @tehmoth)." ;
+	] ;
+	.
+
+
 <http://kasei.us/code/files/IRI-0.008.tar.gz>
 	dcterms:isVersionOf my:project ;
 	dcterms:replaces    <http://kasei.us/code/files/IRI-0.007.tar.gz> ;
 	
 	doap:Version [
 		doap:revision	"0.008" ;
-		doap:created	"2017-XX-XX" ;
+		doap:created	"2017-08-06" ;
 	] ;
 	asc:changes [
 		asc:update		"Fix typo in regex rule causing problems parsing codepoints beyond BMP (#11)." ;

@@ -1,4 +1,9 @@
-Change Log for Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) (aka DBD::Informix)
+Change Log for Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31) (aka DBD::Informix)
+
+2018.1031 Release
+-----------------
+2018-10-31: Upload to PAUSE and CPAN.
+2018-10-31: Fix omissions and commissions in the 2018.1029 release.
 
 2018.1029 Release
 -----------------
@@ -1312,4 +1317,4 @@ Pre-Release
 --------------
 
 Jonathan Leffler <jleffler@google.com>
-@(#)$Id: ChangeLog,v 2018.3 2018/10/29 01:52:18 jleffler Exp $
+@(#)$Id: ChangeLog,v 2018.4 2018/10/31 03:23:30 jleffler Exp $

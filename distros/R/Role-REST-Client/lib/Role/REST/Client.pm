@@ -1,5 +1,5 @@
 package Role::REST::Client;
-$Role::REST::Client::VERSION = '0.22';
+$Role::REST::Client::VERSION = '0.23';
 use Moo::Role;
 use MooX::HandlesVia;
 use Types::Standard qw(HashRef Str Int Enum HasMethods);
@@ -168,7 +168,8 @@ sub _call {
 
 	my $use_serializer = exists $args->{deserializer}
 		? defined $args->{deserializer} ? 1 : 0
-		: $res->header('Content-Type') !~ m{(?:text/(?:plain|html)|application/octet-stream)};
+		: ($res->header('Content-Type')
+		  and $res->header('Content-Type') !~ m{(?:text/(?:plain|html)|application/octet-stream)});
 
 	my $deserializer_cb = sub {
 		# Try to find a serializer for the result content
@@ -236,7 +237,7 @@ Role::REST::Client - REST Client Role
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -440,7 +441,7 @@ Kaare Rasmussen <kaare at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Kaare Rasmussen.
+This software is copyright (c) 2018 by Kaare Rasmussen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

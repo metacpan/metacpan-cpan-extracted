@@ -1,7 +1,7 @@
 package Data::Sah::CoerceCommon;
 
-our $DATE = '2018-06-03'; # DATE
-our $VERSION = '0.026'; # VERSION
+our $DATE = '2018-10-30'; # DATE
+our $VERSION = '0.027'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -295,7 +295,7 @@ Data::Sah::CoerceCommon - Common stuffs for Data::Sah::Coerce and Data::Sah::Coe
 
 =head1 VERSION
 
-This document describes version 0.026 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2018-06-03.
+This document describes version 0.027 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2018-10-30.
 
 =head1 FUNCTIONS
 
@@ -304,7 +304,7 @@ This document describes version 0.026 of Data::Sah::CoerceCommon (from Perl dist
 
 Usage:
 
- get_coerce_rules(%args) -> [status, msg, result, meta]
+ get_coerce_rules(%args) -> [status, msg, payload, meta]
 
 Get coerce rules.
 
@@ -391,7 +391,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

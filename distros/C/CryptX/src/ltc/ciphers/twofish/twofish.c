@@ -37,8 +37,12 @@ const struct ltc_cipher_descriptor twofish_desc =
 };
 
 /* the two polynomials */
+#ifndef LTC_TWOFISH_TABLES
 #define MDS_POLY          0x169
+#endif
+#ifndef LTC_TWOFISH_ALL_TABLES
 #define RS_POLY           0x14D
+#endif
 
 /* The 4x8 RS Linear Transform */
 static const unsigned char RS[4][8] = {
@@ -278,8 +282,8 @@ static void h_func(const unsigned char *in, unsigned char *out, const unsigned c
 #endif
 
 /* the G function */
-#define g_func(x, dum)  (S1[byte(x,0)] ^ S2[byte(x,1)] ^ S3[byte(x,2)] ^ S4[byte(x,3)])
-#define g1_func(x, dum) (S2[byte(x,0)] ^ S3[byte(x,1)] ^ S4[byte(x,2)] ^ S1[byte(x,3)])
+#define g_func(x, dum)  (S1[LTC_BYTE(x,0)] ^ S2[LTC_BYTE(x,1)] ^ S3[LTC_BYTE(x,2)] ^ S4[LTC_BYTE(x,3)])
+#define g1_func(x, dum) (S2[LTC_BYTE(x,0)] ^ S3[LTC_BYTE(x,1)] ^ S4[LTC_BYTE(x,2)] ^ S1[LTC_BYTE(x,3)])
 
 #else
 
@@ -689,23 +693,22 @@ void twofish_done(symmetric_key *skey)
 int twofish_keysize(int *keysize)
 {
    LTC_ARGCHK(keysize);
-   if (*keysize < 16)
+   if (*keysize < 16) {
       return CRYPT_INVALID_KEYSIZE;
+   }
    if (*keysize < 24) {
       *keysize = 16;
       return CRYPT_OK;
-   } else if (*keysize < 32) {
+   }
+   if (*keysize < 32) {
       *keysize = 24;
       return CRYPT_OK;
-   } else {
-      *keysize = 32;
-      return CRYPT_OK;
    }
+   *keysize = 32;
+   return CRYPT_OK;
 }
 
 #endif
-
-
 
 
 /* ref:         $Format:%D$ */

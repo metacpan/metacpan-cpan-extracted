@@ -6,7 +6,7 @@ on 'test' => sub {
     requires 'Test::More', '0.98';
     requires 'Test::RedisServer';
     requires 'Test::MockTime';
-    requires 'Time::Strptime';
+    requires 'Time::Strptime', '1.03';
     requires 'Redis';
 };
 

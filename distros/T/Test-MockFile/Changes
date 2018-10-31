@@ -1,7 +1,11 @@
 Revision history for Test-MockFile
 
+0.009   10/29/2018
+ - Add unlink and touch as helpers when testing
+ - Depend on new Overload::FileCheck 0.006 which does not call MockFile to determine _ stats
+
 0.008   10/26/2018
- - Depend on newest Overload::FileCheck version. Depdning on older
+ - Depend on newest Overload::FileCheck version. Depending on older
    versions was breaking unit tests.
 
 0.007   10/25/2018

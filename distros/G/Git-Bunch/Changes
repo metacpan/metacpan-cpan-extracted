@@ -1,3 +1,8 @@
+0.624   2018-10-30 (PERLANCAR)
+
+	- Tweak Sah schema to allow --min-repo-access-time 0.
+
+
 0.623   2018-09-27 (PERLANCAR)
 
 	- [bugfix] Fix conditional ordering 'needs merging' before 'needs

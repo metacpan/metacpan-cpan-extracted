@@ -1,5 +1,5 @@
 #
-# $Id: Kafka.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Kafka.pm,v 50c217684c90 2018/07/17 12:37:05 gomor $
 #
 # client::kafka Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 50c217684c90 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -22,6 +22,7 @@ sub brik_properties {
          rtimeout => [ qw(seconds_float) ],
          retry => [ qw(count) ],
          retry_backoff => [ qw(milliseconds) ],
+         _broker => [ qw(INTERNAL) ],
          _kc => [ qw(INTERNAL) ],
          _kcli => [ qw(INTERNAL) ],
       },
@@ -101,10 +102,13 @@ sub create_connection {
    # By randomizing, different processes will use different brokers.
    my @list = List::Util::shuffle(@$host);
 
+   my $broker = $list[0];  # We take the first, as it is now randomized.
+   $self->_broker($broker);
+
    my $kc;
    eval {
       $kc = Kafka::Connection->new(
-         broker_list => \@list,
+         broker_list => [ $broker ],
          timeout => $rtimeout,
          SEND_MAX_ATTEMPTS => $send_max_attempts,
          RETRY_BACKOFF => $retry_backoff,
@@ -167,6 +171,8 @@ sub send {
    $self->brik_help_run_undef_arg('send', $messages) or return;
    $self->brik_help_run_invalid_arg('send', $messages, 'ARRAY', 'SCALAR') or return;
 
+   my $broker = $self->_broker;
+
    my $r;
    eval {
       $r = $kcli->send($topic, $partition, $messages);
@@ -216,7 +222,9 @@ sub send {
          $err = $invalid_arg_messages;
       }
 
-      return $self->log->error("send: fail [$err]");
+      my $broker = $self->_broker;
+
+      return $self->log->error("send: fail for broker [$broker]: [$err]");
    }
 
    return $r;

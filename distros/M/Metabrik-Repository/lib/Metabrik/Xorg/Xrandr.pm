@@ -1,5 +1,5 @@
 #
-# $Id: Xrandr.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Xrandr.pm,v de0c829662da 2018/10/09 14:39:51 gomor $
 #
 # xorg::xrandr Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: de0c829662da $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -29,6 +29,7 @@ sub brik_properties {
          list_secondary_output_resolutions => [ qw(output) ],
          get_first_output => [ ],
          get_secondary_output => [ ],
+         get_common_resolution => [ ],
          get_first_output_resolution => [ ],
          get_first_output_max_resolution => [ ],
          get_secondary_output_resolution => [ ],
@@ -43,7 +44,7 @@ sub brik_properties {
          set_output_resolution => [ qw(resolution) ], # Alias to set_first_output_resolution
          clone_first_to => [ qw(secondary_output) ],
          dual_first_right_of => [ qw(secondary_output) ],
-         clone => [ qw(resolution) ],
+         clone => [ qw(resolution|OPTIONAL) ],
       },
       require_binaries => {
          xrandr => [ ],
@@ -455,10 +456,46 @@ sub dual_first_right_of {
    return $self->capture($cmd);
 }
 
+sub get_common_resolution {
+   my $self = shift;
+   my ($first, $second) = @_;
+
+   my $outputs = $self->list_output_resolutions or return;
+   if ((! defined($first) && ! defined($second)) && (@$outputs < 2 || @$outputs > 2)) {
+      return $self->log->error("get_common_resolution: less than or more than 2 screens");
+   }
+
+   $first = $outputs->{$first};
+   $second = $outputs->{$second};
+
+   my $resolution;
+   for my $this_first (@$first) {
+      for my $this_second (@$second) {
+         if ($this_first eq $this_second) {
+            $self->log->info("get_common_resolution: found common ".
+               "resolution [$this_first]");
+            $resolution = $this_first;
+            last;
+         }
+      }
+      last if defined($resolution);
+   }
+
+   return $resolution;
+}
+
 sub clone {
    my $self = shift;
    my ($resolution) = @_;
 
+   # We try to find the best resolution for first and second outputs.
+   if (! defined($resolution)) {
+      my $first = $self->get_first_output or return;
+      my $second = $self->get_secondary_output or return;
+      $resolution = $self->get_common_resolution($first, $second) or return;
+   }
+
+   # If not found, user must give that information.
    $self->brik_help_run_undef_arg('clone', $resolution) or return;
 
    my $list1 = $self->list_first_output_resolutions or return;

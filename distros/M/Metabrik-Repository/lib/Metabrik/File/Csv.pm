@@ -1,5 +1,5 @@
 #
-# $Id: Csv.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Csv.pm,v 8f67b8413777 2018/01/18 09:31:29 gomor $
 #
 # file::csv Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 8f67b8413777 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -262,6 +262,8 @@ sub write {
       }
    }
 
+   my $header_count = @header;
+
    my $is_new_file = (! -f $output);
    my $fd = $fw->open or return;
 
@@ -342,12 +344,23 @@ sub write {
       }
 
       @fields = map { defined($_) ? $_ : '' } @fields;
+
+      # If this entry has less fields than the header, we add null entries.
+      my $field_count = @fields;
+      if ($field_count < $header_count) {
+         my $diff = $header_count - $field_count;
+         for (1..$diff) {
+            push @fields, '';
+         }
+      }
+
       if ($self->use_quoting) {
          for (@fields) {
             s/"/${escape}"/g;
             $_ = '"'.$_.'"';
          }
       }
+
       my $data = join($separator, @fields)."\n";
 
       my $r = $fw->write($data);

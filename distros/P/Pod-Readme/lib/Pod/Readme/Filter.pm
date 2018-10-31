@@ -4,10 +4,7 @@ use v5.10.1;
 
 use Moo;
 
-{
-    use version 0.77;
-    $Pod::Readme::Filter::VERSION = version->declare('v1.1.2');
-}
+our $VERSION = 'v1.2.1';
 
 use MooX::HandlesVia;
 with 'Pod::Readme::Plugin';
@@ -18,7 +15,7 @@ use IO qw/ File Handle /;
 use Module::Load qw/ load /;
 use Path::Tiny;
 use Try::Tiny;
-use Types::Standard qw/ Bool Int RegexpRef Str /;
+use Types::Standard qw/ Bool InstanceOf Int RegexpRef Str /;
 
 use Pod::Readme::Types qw/ Dir File ReadIO WriteIO TargetName DistZilla /;
 
@@ -206,7 +203,7 @@ has _begin_args => (
 
 has zilla => (
     is  => 'ro',
-    isa => DistZilla,
+    isa => InstanceOf[ 'Dist::Zilla' ],
 );
 
 sub process_for {
@@ -425,7 +422,7 @@ sub _load_plugin {
         Role::Tiny->apply_roles_to_object( $self, $module );
     }
     catch {
-        die "Unable to locate plugin '${plugin}'\n";
+        die "Unable to locate plugin '${plugin}': $_";
     };
 }
 

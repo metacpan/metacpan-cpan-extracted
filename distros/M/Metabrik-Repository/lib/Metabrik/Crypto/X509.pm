@@ -1,5 +1,5 @@
 #
-# $Id: X509.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: X509.pm,v 50c217684c90 2018/07/17 12:37:05 gomor $
 #
 # crypto::x509 Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 50c217684c90 $',
       tags => [ qw(unstable openssl ssl pki certificate) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -321,6 +321,26 @@ sub parse_certificate_string {
    if (! length($string)) {
       return $self->log->error("parse_certificate_string: empty string found");
    }
+
+   # Patch fonction to add a defined() check.
+   {
+      no warnings 'redefine';
+
+      *Crypt::X509::pubkey_components = sub {
+         my $self = shift;
+         my $pubkeyalg = $self->PubKeyAlg();
+         if (defined($pubkeyalg) && $pubkeyalg eq 'RSA') {
+            my $parser = Crypt::X509::_init('RSAPubKeyInfo');
+            my $values = $parser->decode(
+               $self->{tbsCertificate}{subjectPublicKeyInfo}{subjectPublicKey}[0]
+            );
+            return $values;
+         }
+         else {
+            return undef;
+         }
+      };
+   };
 
    my $decoded = Crypt::X509->new(cert => $string);
    if ($decoded->error) {

@@ -1,7 +1,6 @@
 #!/bin/perl
 
-use Math::Utils qw(:polynomial);
-use Math::Prime::Util qw(gcd lcm);
+use Math::Utils qw(:polynomial :utility);
 use Getopt::Long;
 #use Smart::Comments qw(###);
 use strict;

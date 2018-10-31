@@ -1,6 +1,6 @@
 package App::Search::BackPAN;
 
-$App::Search::BackPAN::VERSION   = '0.03';
+$App::Search::BackPAN::VERSION   = '0.05';
 $App::Search::BackPAN::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ App::Search::BackPAN - Command Line Interface for backpan.perl.org.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 

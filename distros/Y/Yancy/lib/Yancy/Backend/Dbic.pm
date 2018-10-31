@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -150,6 +150,7 @@ sub _find {
 
 sub create {
     my ( $self, $coll, $params ) = @_;
+    $self->_normalize( $coll, $params );
     my $created = $self->dbic->resultset( $coll )->create( $params );
     my $id_field = $self->collections->{ $coll }{ 'x-id-field' } || 'id';
     return $created->$id_field;
@@ -181,6 +182,7 @@ sub list {
 
 sub set {
     my ( $self, $coll, $id, $params ) = @_;
+    $self->_normalize( $coll, $params );
     if ( my $row = $self->_find( $coll, $id ) ) {
         $row->set_columns( $params );
         if ( $row->is_changed ) {
@@ -200,6 +202,28 @@ sub delete {
         return 1;
     }
     return 0;
+}
+
+sub _normalize {
+    my ( $self, $coll, $data ) = @_;
+    my $schema = $self->collections->{ $coll }{ properties };
+    for my $key ( keys %$data ) {
+        my $type = $schema->{ $key }{ type };
+        # Boolean: true (1, "true"), false (0, "false")
+        if ( _is_type( $type, 'boolean' ) ) {
+            $data->{ $key }
+                = $data->{ $key } && $data->{ $key } !~ /^false$/i
+                ? 1 : 0;
+        }
+    }
+}
+
+sub _is_type {
+    my ( $type, $is_type ) = @_;
+    return unless $type;
+    return ref $type eq 'ARRAY'
+        ? !!grep { $_ eq $is_type } @$type
+        : $type eq $is_type;
 }
 
 sub read_schema {
@@ -294,7 +318,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 

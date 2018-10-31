@@ -111,6 +111,12 @@ above.
 Ignore prerequisites that are bundled in the Perl core of specific
 version. This implies C<exclude-core> as well.
 
+=item allow-test-pms
+
+Print requirements/suggestions in .pm files that are placed under
+t/ directory but are not directly used from .t files, too.
+If Test::Class family is used under t/, this option is implicitly set.
+
 =item base-dir
 
 Set the base directory from where C<scan-perl-prereqs-nqlite>

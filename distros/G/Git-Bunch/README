@@ -3,8 +3,8 @@ NAME
     repos)
 
 VERSION
-    This document describes version 0.623 of Git::Bunch (from Perl
-    distribution Git-Bunch), released on 2018-09-27.
+    This document describes version 0.624 of Git::Bunch (from Perl
+    distribution Git-Bunch), released on 2018-10-30.
 
 SYNOPSIS
     See the included gitbunch script.
@@ -44,7 +44,7 @@ FUNCTIONS
   check_bunch
     Usage:
 
-     check_bunch(%args) -> [status, msg, result, meta]
+     check_bunch(%args) -> [status, msg, payload, meta]
 
     Check status of git repositories inside gitbunch directory.
 
@@ -120,7 +120,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -129,7 +129,7 @@ FUNCTIONS
   exec_bunch
     Usage:
 
-     exec_bunch(%args) -> [status, msg, result, meta]
+     exec_bunch(%args) -> [status, msg, payload, meta]
 
     Execute a command for each repo in the bunch.
 
@@ -207,7 +207,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -216,7 +216,7 @@ FUNCTIONS
   list_bunch_contents
     Usage:
 
-     list_bunch_contents(%args) -> [status, msg, result, meta]
+     list_bunch_contents(%args) -> [status, msg, payload, meta]
 
     List contents inside gitbunch directory.
 
@@ -289,7 +289,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -298,7 +298,7 @@ FUNCTIONS
   sync_bunch
     Usage:
 
-     sync_bunch(%args) -> [status, msg, result, meta]
+     sync_bunch(%args) -> [status, msg, payload, meta]
 
     Synchronize bunch to another bunch.
 
@@ -454,7 +454,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

@@ -1,5 +1,5 @@
 #
-# $Id: Address.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Address.pm,v de0c829662da 2018/10/09 14:39:51 gomor $
 #
 # network::address Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: de0c829662da $',
       tags => [ qw(unstable netmask convert ascii) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -91,6 +91,16 @@ sub match {
 
    if (! $self->is_ip($ip) || ! $self->is_ip($subnet)) {
       return $self->log->error("match: invalid format for ip [$ip] or subnet [$subnet]");
+   }
+
+   if ($self->is_ipv4($ip) && ! $self->is_ipv4($subnet)) {
+      return $self->log->error("match: cannot match IPv4 [$ip] against IPv6 ".
+         "subnet [$subnet]");
+   }
+
+   if ($self->is_ipv6($ip) && ! $self->is_ipv6($subnet)) {
+      return $self->log->error("match: cannot match IPv6 [$ip] against IPv4 ".
+         "subnet [$subnet]");
    }
 
    if (Net::CIDR::cidrlookup($ip, $subnet)) {

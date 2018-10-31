@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-09-27'; # DATE
-our $VERSION = '0.623'; # VERSION
+our $DATE = '2018-10-30'; # DATE
+our $VERSION = '0.624'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.623 of gitbunch (from Perl distribution Git-Bunch), released on 2018-09-27.
+This document describes version 0.624 of gitbunch (from Perl distribution Git-Bunch), released on 2018-10-30.
 
 =head1 SYNOPSIS
 

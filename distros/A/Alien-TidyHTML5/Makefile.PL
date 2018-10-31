@@ -15,10 +15,9 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build" => "1.19",
+    "Alien::Build" => "1.40",
     "Alien::Build::MM" => "0.32",
     "Alien::Build::Plugin::Build::CMake" => "0.99",
-    "Alien::Build::Plugin::PkgConfig::Negotiate" => "0.79",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-TidyHTML5",
@@ -37,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.2.0",
+  "VERSION" => "v0.3.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

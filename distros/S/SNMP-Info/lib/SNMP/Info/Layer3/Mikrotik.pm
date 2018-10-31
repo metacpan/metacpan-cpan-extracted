@@ -39,7 +39,7 @@ use SNMP::Info::Layer3;
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.61';
+$VERSION = '3.62';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -79,6 +79,7 @@ sub model {
     my $descr = $mikrotik->description() || '';
     my $model = undef;
     $model = $1 if ( $descr =~ /^RouterOS\s+(\S+)$/i );
+    $model = $1 if ( $descr =~ /^RouterOS\s+(RB .*)$/i );
     return $model;
 }
 

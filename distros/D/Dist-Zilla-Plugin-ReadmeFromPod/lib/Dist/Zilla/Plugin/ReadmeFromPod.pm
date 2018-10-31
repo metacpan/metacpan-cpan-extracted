@@ -1,13 +1,13 @@
 package Dist::Zilla::Plugin::ReadmeFromPod;
-our $AUTHORITY = 'cpan:FAYLAND';
-$Dist::Zilla::Plugin::ReadmeFromPod::VERSION = '0.35';
+our $AUTHORITY = 'cpan:AVAR';
+$Dist::Zilla::Plugin::ReadmeFromPod::VERSION = '0.36';
 use Moose;
 use List::Util 1.33 qw( first );
 with 'Dist::Zilla::Role::InstallTool' => { -version => 5 }; # after PodWeaver
 with 'Dist::Zilla::Role::FilePruner';
 
 use IO::String;
-use Pod::Readme;
+use Pod::Readme 'v1.2.0';
 
 has filename => (
     is => 'ro',
@@ -31,6 +31,8 @@ has type => (
 );
 
 my %FORMATS = (
+    'gfm'      => { class => 'Pod::Markdown::Github' },
+    'github'   => { class => 'Pod::Markdown::Github' },
     'html'     => { class => 'Pod::Simple::HTML' },
     'markdown' => { class => 'Pod::Markdown'     },
     'pod'      => { class => undef },

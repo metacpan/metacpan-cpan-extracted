@@ -12,7 +12,7 @@ license				'perl';
 build_requires		'Test::More'				=> 0.88;
 build_requires		'Try::Tiny'					=> 0;
 
-perl_version		'5.014';
+perl_version		'5.010001';
 
 requires			'Moo'						=> 0;
 requires			'MooX::HandlesVia'			=> 0;

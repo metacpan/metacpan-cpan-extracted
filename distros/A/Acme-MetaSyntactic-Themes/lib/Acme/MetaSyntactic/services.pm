@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::services;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -55,6 +55,12 @@ Philippe "BooK" Bruhat.
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2018-10-29 - v1.006
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.052.
 
 =item *
 
@@ -826,6 +832,7 @@ buddy_draw
 bues_service
 bullant_rap
 bullant_srap
+burp
 busboy
 buschtrommel
 business
@@ -1035,6 +1042,7 @@ ciphire_data
 ciphire_serv
 circle_x
 cis
+cisco_aqos
 cisco_avp
 ciscocsdb
 cisco_fna
@@ -1786,6 +1794,7 @@ encrypted_admin
 encrypted_llrp
 e_net
 enfs
+enguity_xccetp
 enl
 enl_name
 enpc
@@ -1916,6 +1925,7 @@ ezmessagesrv
 ezproxy
 ezproxy_2
 ezrelay
+f1_control
 f5_globalsite
 f5_iquery
 facelink
@@ -2233,6 +2243,7 @@ gsigatekeeper
 gsmp
 gsms
 gsmtap
+gs_realtime
 gss_http
 gss_xlicen
 g_talk
@@ -2645,6 +2656,7 @@ inovaport6
 insis
 insitu_conf
 inspect
+inspider
 instantia
 inst_discovery
 instl_bootc
@@ -2707,6 +2719,7 @@ ipfltbcst
 iphone_sync
 iph_policy_adm
 iph_policy_cli
+ipluminary
 iposplanet
 ipp
 ip_provision
@@ -3323,6 +3336,7 @@ mindprint
 minecraft
 minger
 minilock
+minirem
 mini_sql
 minivend
 minotaur_sa
@@ -3493,6 +3507,7 @@ mtp
 mtportmon
 mtport_regist
 mtqp
+mtrace
 mtrgtrans
 mt_scaleserver
 mtsserver
@@ -4163,6 +4178,7 @@ owms
 owserver
 p25cai
 p2pcommunity
+p2pevolvenet
 p2pgroup
 p2pq
 p2p_sip
@@ -4793,6 +4809,7 @@ rockwell_csp1
 rockwell_csp2
 rocrail
 roketz
+rome
 rootd
 rothaga
 route
@@ -5822,6 +5839,7 @@ trim
 trim_event
 trim_ice
 trinity_dist
+trinket_agent
 Trinoo_Bcast
 Trinoo_Master
 Trinoo_Register

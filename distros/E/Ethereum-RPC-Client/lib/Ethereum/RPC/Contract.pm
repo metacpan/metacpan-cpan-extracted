@@ -4,7 +4,7 @@ package Ethereum::RPC::Contract;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -14,6 +14,7 @@ our $VERSION = '0.001';
 
 use Moo;
 use JSON::MaybeXS;
+use Math::BigInt;
 
 use Ethereum::RPC::Client;
 use Ethereum::RPC::Contract::ContractResponse;
@@ -80,8 +81,11 @@ sub BUILD {
 
     my @decoded_json = @{decode_json($self->contract_abi)};
 
-    foreach my $json_input (@decoded_json) {
-        $self->contract_decoded->{$json_input->{name}} = \@{$json_input->{inputs}} if $json_input->{type} eq 'function';
+    for my $json_input (@decoded_json) {
+        if ($json_input->{type} =~ /^function|event$/) {
+            $self->contract_decoded->{$json_input->{name}} ||= [];
+            push(@{$self->contract_decoded->{$json_input->{name}}}, $json_input->{inputs}) if scalar @{$json_input->{inputs}} > 0;
+        }
     }
 
     $self->from($self->rpc_client->eth_coinbase())      unless $self->from;
@@ -107,7 +111,7 @@ Return:
 sub invoke {
     my ($self, $name, @params) = @_;
 
-    my $function_id = substr($self->get_function_id($name, @{$self->contract_decoded->{$name}}), 0, 10);
+    my $function_id = substr($self->get_function_id($name, scalar @params), 0, 10);
 
     my $res = $self->_prepare_transaction($function_id, \@params);
 
@@ -131,12 +135,20 @@ Return:
 =cut
 
 sub get_function_id {
+    my ($self, $function_string, $params_size) = @_;
 
-    my ($self, $function_string, @inputs) = @_;
+    my @inputs        = @{$self->contract_decoded->{$function_string}};
+    my @selected_data = ();
+    if (scalar @inputs > 0) {
+        for my $v (@inputs) {
+            @selected_data = @{$v} if ($params_size and @{$v} == $params_size) or not $params_size;
+            last if scalar @selected_data > 0;
+        }
+    }
 
     $function_string .= "(";
-    $function_string .= $_->{type} ? "$_->{type}," : "" for @inputs;
-    chop($function_string) if scalar @inputs > 0;
+    $function_string .= $_->{type} ? "$_->{type}," : "" for @selected_data;
+    chop($function_string) if scalar @selected_data > 0;
     $function_string .= ")";
 
     my $hex_function = $self->append_prefix(unpack("H*", $function_string));
@@ -198,11 +210,10 @@ sub get_hex_param {
     if ($param =~ /^0x[0-9A-F]+$/i) {
         $new_param = sprintf("%064s", substr($param, 2));
         # Is integer
-    } elsif ($param =~ /^[+-]?[0-9]+$/) {
-        $new_param = sprintf("%064s", sprintf("%x", $param));
+    } elsif ($param =~ /^[+-]?[0-9?e+]+$/) {
+        $new_param = sprintf("%064s", substr(Math::BigInt->new($param)->as_hex, 2));
         # Is string
     } else {
-        $param =~ s/(.)/sprintf("%x",ord($1))/eg;
         $new_param = sprintf("%064s", unpack("H*", $param));
     }
 
@@ -228,7 +239,7 @@ Return:
 sub read_all_events_from_block {
     my ($self, $from_block, $function) = @_;
 
-    my $function_id = $self->get_function_id($function, @{$self->contract_decoded->{$function}});
+    my $function_id = $self->get_function_id($function);
 
     $from_block = $self->append_prefix(unpack("H*", $from_block // "latest"));
 

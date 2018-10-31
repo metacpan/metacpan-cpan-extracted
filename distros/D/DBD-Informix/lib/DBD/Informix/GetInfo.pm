@@ -15,7 +15,7 @@
 #
 #-------------------------------------------------------------------------
 # Code and explanations follow for DBD::Informix
-# (Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28))
+# (Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31))
 #-------------------------------------------------------------------------
 #
 # NB: The Informix CLI (ODBC) driver did not provide a list of keywords.
@@ -36,7 +36,7 @@ use DBI::Const::GetInfoReturn qw(%GetInfoReturnTypes %GetInfoReturnValues);
 # Do not fold the 'my' onto the assignment line - antique CPAN related
 # code gets confused.
 my
-$VERSION = "2018.1029";
+$VERSION = "2018.1031";
 # Fixup for development system.
 $VERSION = "2003.00.0000" if ($VERSION =~ m%[:]VERSION[:]%);
 
@@ -405,7 +405,7 @@ use DBI;
 
 =head1 DESCRIPTION
 
-This module is used by Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) if you invoke the DBI metadata methods
+This module is used by Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31) if you invoke the DBI metadata methods
 on a DBD::Informix handle.
 You will seldom if ever have cause to use this module directly.
 

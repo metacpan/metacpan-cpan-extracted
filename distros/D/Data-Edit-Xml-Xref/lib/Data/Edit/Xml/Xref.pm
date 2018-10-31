@@ -1,6 +1,6 @@
 #!/usr/bin/perl -I/home/phil/perl/cpan/DataTableText/lib
 #-------------------------------------------------------------------------------
-# Cross reference data held in the XML format.
+# Cross reference Dita XML.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
 # podDocumentation
@@ -8,7 +8,7 @@
 # Handle relative files in hrefs, conrefs etc.
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20181028;
+our $VERSION = 20181030;
 use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;
@@ -18,39 +18,36 @@ use Data::Edit::Xml;
 use Data::Table::Text qw(:all);
 use utf8;
 
-#D1 Attributes                                                                  # Create a cross referencer.
-
-my $attributes = genHash(q(Data::Edit::Xml::Xref),                              # Attributes used by cross referencer.
-  badImageRefs=>[],                                                             # [file, href]   Missing images.
-  badXml1=>[],                                                                  # Files with a bad xml encoding header on the first line.
-  badXml2=>[],                                                                  # Files with a bad xml doc type on the second line.
-  badXRefs=>[],                                                                 # [file, href]   Invalid href attributes on xref tags.
-  badTopicRefs=>[],                                                             # [file, href]   Invalid href attributes topicref tags.
-  badConRefs=>[],                                                               # [file, href]   Invalid conref attributes.
-  conRefs=>{},                                                                  # {file}{id}++   Conref definitions.
-  duplicateIds=>[],                                                             # [file, id]     Duplicate id definitions within a file.
-  ids=>{},                                                                      # {file}{id}++   Id definitions across all files.
-  images=>{},                                                                   # {file}{href}++ Images references.
-  imagesFound=>{},                                                              # Consolidated images found
-  imagesMissing=>{},                                                            # Consolidated images missing
-  inputFiles=>[],                                                               # Input files from L<inputFolder|/inputFolder>.
-  inputFolder=>undef,                                                           # A folder containing the dita and ditamap files to be cross referenced.
-  parseFailed=>[],                                                              # [file] files that failed to parse
-  topicRefs=>{},                                                                # {file}{href}++ Topic references.
-  xRefs=>{},                                                                    # {file}{href}++ Xrefs references.
-  reports=>q(reports),                                                          # Reports folder: the cross referencer will write reports to files in this folder.
-  statusLine=>undef,                                                            # Status line summarizing the cross reference.
-  summary=>1,                                                                   # Print the summary line.
-  topicIds=>{},                                                                 # {file} = topic id
-  duplicateTopicIds=>[],                                                        # [topicId, [files]] Files with duplicate topic ids
-  maximumNumberOfProcesses=>8,                                                  # Maximum number of processes to run
- );
-
 #D1 Cross reference                                                             # Check the cross references in a set of Dita files and report the results.
 
-sub xref(%)                                                                     # Check the cross references in a set of Dita files held in B<inputFolder=>>B<folder> and report the results.
+sub xref(%)                                                                     # Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible atributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
  {my (%attributes) = @_;                                                        # Attributes
-  my $xref = genHash(__PACKAGE__, %$attributes);                                # Known attributes
+  my $xref = genHash(__PACKAGE__,                                               # Attributes used by cross referencer.
+    badImageRefs=>[],                                                           # [file, href]   Missing images.
+    badXml1=>[],                                                                # Files with a bad xml encoding header on the first line.
+    badXml2=>[],                                                                # Files with a bad xml doc type on the second line.
+    badXRefs=>[],                                                               # [file, href]   Invalid href attributes on xref tags.
+    badTopicRefs=>[],                                                           # [file, href]   Invalid href attributes topicref tags.
+    badConRefs=>[],                                                             # [file, href]   Invalid conref attributes.
+    conRefs=>{},                                                                # {file}{id}++   Conref definitions.
+    duplicateIds=>[],                                                           # [file, id]     Duplicate id definitions within a file.
+    ids=>{},                                                                    # {file}{id}++   Id definitions across all files.
+    images=>{},                                                                 # {file}{href}++ Images references.
+    imagesFound=>{},                                                            # Consolidated images found
+    imagesMissing=>{},                                                          # Consolidated images missing
+    inputFiles=>[],                                                             # Input files from L<inputFolder|/inputFolder>.
+    inputFolder=>undef,                                                         # A folder containing the dita and ditamap files to be cross referenced.
+    parseFailed=>[],                                                            # [file] files that failed to parse
+    topicRefs=>{},                                                              # {file}{href}++ Topic references.
+    xRefs=>{},                                                                  # {file}{href}++ Xrefs references.
+    results=>[],                                                                # Results table
+    reports=>q(reports),                                                        # Reports folder: the cross referencer will write reports to files in this folder.
+    statusLine=>undef,                                                          # Status line summarizing the cross reference.
+    summary=>1,                                                                 # Print the summary line.
+    topicIds=>{},                                                               # {file} = topic id
+    duplicateTopicIds=>[],                                                      # [topicId, [files]] Files with duplicate topic ids
+    maximumNumberOfProcesses=>16,                                               # Maximum number of processes to run
+   );
   loadHash($xref, @_);                                                          # Load attributes complaining about any invalid ones
 
   $xref->inputFolder = absFromAbsPlusRel(currentDirectory, $xref->inputFolder)  # Make input folder absolute
@@ -75,31 +72,31 @@ sub xref(%)                                                                     
     my $M = keys %{$xref->imagesMissing};
     my $p = @{$xref->parseFailed};
     my @o;
-    push @o, "$p files failed to parse" if $p >  1;
-    push @o, "$p file failed to parse"  if $p == 1;
-    push @o, "$x bad xrefs"             if $x >  1;
-    push @o, "$x bad xref"              if $x == 1;
-    push @o, "$c bad conrefs"           if $c >  1;
-    push @o, "$c bad conref"            if $c == 1;
-    push @o, "$t bad topicrefs"         if $t >  1;
-    push @o, "$t bad topicref"          if $t == 1;
-    push @o, "$i missing image refs"    if $i >  1;
-    push @o, "$i missing image ref"     if $i == 1;
-    push @o, "$I image files found"     if $I >  1;
-    push @o, "$I image file found"      if $I == 1;
-    push @o, "$M missing image files"   if $M >  1;
-    push @o, "$M missing image file"    if $M == 1;
-    push @o, "$d duplicate ids"         if $d >  1;
-    push @o, "$d duplicate id"          if $d == 1;
-    push @o, "$b bad first lines"       if $b >  1;
-    push @o, "$b bad first line"        if $b == 1;
-    push @o, "$B bad second lines"      if $B >  1;
-    push @o, "$B bad second line"       if $B == 1;
-    $xref->statusLine = undef;
-    if (@o)
-     {my $m = "Xref Errors: ". join q(, ), @o;
-      $xref->statusLine = $m;
-      say STDERR $m if $xref->summary;
+    push @o, [$p, q(files failed to parse)] if $p >  1;
+    push @o, [$p, q(file failed to parse)]  if $p == 1;
+    push @o, [$x, q(bad xrefs)]             if $x >  1;
+    push @o, [$x, q(bad xref)]              if $x == 1;
+    push @o, [$c, q(bad conrefs)]           if $c >  1;
+    push @o, [$c, q(bad conref)]            if $c == 1;
+    push @o, [$t, q(bad topicrefs)]         if $t >  1;
+    push @o, [$t, q(bad topicref)]          if $t == 1;
+    push @o, [$i, q(missing image refs)]    if $i >  1;
+    push @o, [$i, q(missing image ref)]     if $i == 1;
+    push @o, [$I, q(image files found)]     if $I >  1;
+    push @o, [$I, q(image file found)]      if $I == 1;
+    push @o, [$M, q(missing image files)]   if $M >  1;
+    push @o, [$M, q(missing image file)]    if $M == 1;
+    push @o, [$d, q(duplicate ids)]         if $d >  1;
+    push @o, [$d, q(duplicate id)]          if $d == 1;
+    push @o, [$b, q(bad first lines)]       if $b >  1;
+    push @o, [$b, q(bad first line)]        if $b == 1;
+    push @o, [$B, q(bad second lines)]      if $B >  1;
+    push @o, [$B, q(bad second line)]       if $B == 1;
+    $xref->statusLine = @o ? join " ",
+      "Xref Errors:", join ", ", map {join " ", @$_} @o : q();
+    $xref->results    = \@o;
+    if (@o and $xref->summary)
+     {say STDERR $xref->statusLine;
      }
    }
 
@@ -488,33 +485,39 @@ END
 
 =head1 Name
 
-Data::Edit::Xml::Xref - Cross reference data held in the XML format.
+Data::Edit::Xml::Xref - Cross reference Dita XML.
 
 =head1 Synopsis
 
-Check the references in a set of XML documents held in a file directory or folder:
+Check the references in a set of Dita XML documents held in folder
+L<inputFolder|/inputFolder>:
 
   use Data::Edit::Xml::Xref;
 
   my $x = xref(inputFolder=>q(in));
   ok $x->statusLine =~ m(\AXref Errors: 56 bad xrefs, 8 bad conrefs, 2 bad topicrefs, 8 missing images, 8 duplicate ids, 11 bad first lines, 11 bad second lines\Z);
+    Xref Errors: 1 file failed to parse, 48 bad xrefs, 8 bad conrefs,
+    2 bad topicrefs, 7 missing image refs, 1 image file found,
+    7 missing image files, 8 duplicate ids, 11 bad first lines,
+    11 bad second lines\Z);
 
-More detailed reports are produced in the:
+
+More detailed reports are produced in the  L<reports|_/reports> folder:
 
   $x->reports
 
-folder.
-
 =head1 Description
 
-Cross reference data held in the XML format.
+Cross reference Dita XML.
+
+
+Version 20181030.
+
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
-=head1 Attributes
 
-Create a cross referencer.
 
 =head1 Cross reference
 
@@ -522,7 +525,7 @@ Check the cross references in a set of Dita files and report the results.
 
 =head2 xref(%)
 
-Check the cross references in a set of Dita files held in B<inputFolder=>>B<folder> and report the results.
+Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible atributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
 
      Parameter    Description
   1  %attributes  Attributes
@@ -530,8 +533,8 @@ Check the cross references in a set of Dita files held in B<inputFolder=>>B<fold
 B<Example:>
 
 
-    my $x = 𝘅𝗿𝗲𝗳(inputFolder=>q(in));
-
+    my $x = 𝘅𝗿𝗲𝗳(inputFolder=>q(in), maximumNumberOfProcesses=>16);               
+  
 
 
 =head1 Hash Definitions
@@ -542,44 +545,56 @@ B<Example:>
 =head2 Data::Edit::Xml::Xref Definition
 
 
-Attributes used by a cross referencer
+Attributes used by cross referencer.
 
 
-B<badConRefs> - [file, href]   Invalid conrefs
+B<badConRefs> - [file, href]   Invalid conref attributes.
 
-B<badImages> - [file, href]   Missing images
+B<badImageRefs> - [file, href]   Missing images.
 
-B<badTopicRefs> - [file, href]   Invalid topic refs
+B<badTopicRefs> - [file, href]   Invalid href attributes topicref tags.
 
-B<badXRefs> - [file, href]   Invalid xrefs
+B<badXRefs> - [file, href]   Invalid href attributes on xref tags.
 
-B<badXml1> - Files with a bad xml encoding header on line 1
+B<badXml1> - Files with a bad xml encoding header on the first line.
 
-B<badXml2> - Files with a bad xml doc type on line 2
+B<badXml2> - Files with a bad xml doc type on the second line.
 
-B<conRefs> - {file}{id}++   Conref definitions
+B<conRefs> - {file}{id}++   Conref definitions.
 
-B<duplicateIds> - [file, id]     Duplicate id definitions within a file
+B<duplicateIds> - [file, id]     Duplicate id definitions within a file.
 
-B<ids> - {file}{id}++   Id definitions across all files
+B<duplicateTopicIds> - [topicId, [files]] Files with duplicate topic ids
 
-B<images> - {file}{href}++ Images references
+B<ids> - {file}{id}++   Id definitions across all files.
+
+B<images> - {file}{href}++ Images references.
+
+B<imagesFound> - Consolidated images found
+
+B<imagesMissing> - Consolidated images missing
 
 B<inputFiles> - Input files from L<inputFolder|/inputFolder>.
 
 B<inputFolder> - A folder containing the dita and ditamap files to be cross referenced.
 
-B<reports> - Reports folder, use this to receive reports from the cross reference.
+B<maximumNumberOfProcesses> - Maximum number of processes to run
 
-B<statusLine> - Status line
+B<parseFailed> - [file] files that failed to parse
 
-B<summary> - Print a summary line
+B<reports> - Reports folder: the cross referencer will write reports to files in this folder.
+
+B<results> - Results table
+
+B<statusLine> - Status line summarizing the cross reference.
+
+B<summary> - Print the summary line.
 
 B<topicIds> - {file} = topic id
 
-B<topicRefs> - {file}{href}++ Topic refs
+B<topicRefs> - {file}{href}++ Topic references.
 
-B<xRefs> - {file}{href}++ Xrefs references
+B<xRefs> - {file}{href}++ Xrefs references.
 
 
 
@@ -591,6 +606,13 @@ Load the names of the files to be processed
 
      Parameter  Description
   1  $xref      Cross referencer
+
+=head2 analyzeOneFile($)
+
+Analyze one input file
+
+     Parameter  Description
+  1  $iFile     File to analyze
 
 =head2 analyze($)
 
@@ -635,9 +657,16 @@ Report bad conrefs refs
      Parameter  Description
   1  $xref      Cross referencer
 
-=head2 reportBadImages($)
+=head2 reportImages($)
 
-Report bad images
+Reports on images and references to images
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportParseFailed($)
+
+Report failed parses
 
      Parameter  Description
   1  $xref      Cross referencer
@@ -669,13 +698,13 @@ Create sample input files for testing. The attribute B<inputFolder> supplies the
 
 1 L<analyze|/analyze> - Analyze the input files
 
-2 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
+2 L<analyzeOneFile|/analyzeOneFile> - Analyze one input file
 
-3 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
+3 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
 
-4 L<reportBadConrefs|/reportBadConrefs> - Report bad conrefs refs
+4 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
 
-5 L<reportBadImages|/reportBadImages> - Report bad images
+5 L<reportBadConrefs|/reportBadConrefs> - Report bad conrefs refs
 
 6 L<reportBadRefs|/reportBadRefs> - Report bad references found in xrefs or conrefs as they have the same structure
 
@@ -689,7 +718,11 @@ Create sample input files for testing. The attribute B<inputFolder> supplies the
 
 11 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
 
-12 L<xref|/xref> - Check the cross references in a set of Dita files held in B<inputFolder=>>B<folder> and report the results.
+12 L<reportImages|/reportImages> - Reports on images and references to images
+
+13 L<reportParseFailed|/reportParseFailed> - Report failed parses
+
+14 L<xref|/xref> - Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder.
 
 =head1 Installation
 
@@ -746,8 +779,20 @@ Test::More->builder->output("/dev/null")                                        
 if (1)
  {my $N = 8;
   createSampleInputFiles($N);
-  my $x = xref(inputFolder=>q(in));                                             #Txref
-  ok $x->statusLine =~ m(\AXref Errors: 1 file failed to parse, 48 bad xrefs, 8 bad conrefs, 2 bad topicrefs, 7 missing image refs, 1 image file found, 7 missing image files, 8 duplicate ids, 11 bad first lines, 11 bad second lines\Z);
+  my $x = xref(inputFolder=>q(in), maximumNumberOfProcesses=>16);               #Txref
+  ok nws($x->statusLine) eq nws(<<END);
+Xref Errors:
+  1 file failed to parse,
+ 48 bad xrefs,
+  8 bad conrefs,
+  2 bad topicrefs,
+  7 missing image refs,
+  1 image file found,
+  7 missing image files,
+  8 duplicate ids,
+  11 bad first lines,
+  11 bad second lines
+END
  }
 
 1

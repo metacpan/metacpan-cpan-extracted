@@ -11,7 +11,7 @@ WriteMakefile(
     EXE_FILES => ['bin/scan-perl-prereqs-nqlite'],
     META_MERGE => {
         resources => {
-            repository => 'git://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite',
+            repository => 'https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite',
         },
     },
     test => {TESTS => "t/*.t t/*/*.t t/*/*/*.t"},

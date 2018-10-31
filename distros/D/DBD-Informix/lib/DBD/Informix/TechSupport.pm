@@ -1,6 +1,6 @@
 #   @(#)$Id: TechSupport.pm,v 2015.2 2015/08/27 02:28:24 jleffler Exp $
 #
-#   Technical Support Tools for Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+#   Technical Support Tools for Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 #
 #   Copyright 2000-01 Informix Software Inc
 #   Copyright 2002-03 IBM
@@ -20,7 +20,7 @@
     @ISA = qw(Exporter);
     @EXPORT = qw(print_versions bug_report it_works);
 
-    $VERSION = "2018.1029";
+    $VERSION = "2018.1031";
     $VERSION = "0.97002" if ($VERSION =~ m%[:]VERSION[:]%);
 
     use Config;
@@ -314,14 +314,14 @@ use DBD::Informix::TechSupport;
 =head1 DESCRIPTION
 
 This document describes how to obtain technical support for
-Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 (which is also known as DBD::Informix).
 It also describes how to use the Perl module to report information to
 any of technical support channels.
 
 =head1 IBM INFORMIX TECHNICAL SUPPORT
 
-Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 is not officially supported by IBM Informix Technical Support.
 If you are using a supported configuration, they will route problem
 reports to the maintenance team listed below.
@@ -350,7 +350,7 @@ weekends.
 
 =head1 CONFIGURATIONS SUPPORTED
 
-We normally only support Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+We normally only support Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 if you are using certain supported versions of ESQL/C or Client SDK:
 
 =over 2
@@ -361,11 +361,11 @@ Client SDK Version 3.00 (ESQL/C 3.00) or later
 
 =back
 
-You may use Perl Version :PERL_MINVERSION:, but you should ideally be using Perl
-Version :PERL_REFVERSION: or a later, stable version of Perl.
+You may use Perl Version 5.008001, but you should ideally be using Perl
+Version 5.026002 or a later, stable version of Perl.
 
-You must be using DBI Version :DBI_MINVERSION: or later.  You should ideally
-be using DBI Version :DBI_REFVERSION: or later.
+You must be using DBI Version 1.607 or later.  You should ideally
+be using DBI Version 1.642 or later.
 
 If you are using some other version of ESQL/C, or some other version
 of Perl or DBI, you must use the other support channels documented
@@ -373,7 +373,7 @@ above.
 
 =head1 OTHER CONFIGURATIONS WHICH PROBABLY WORK
 
-Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) is believed to work with all versions of ESQL/C and ClientSDK
+Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31) is believed to work with all versions of ESQL/C and ClientSDK
 from ESQL/C 5.00.UC1 upwards.
 However, you may run into problems with shared libraries if you use
 versions of ESQL/C which are not explicitly supported.
@@ -388,11 +388,11 @@ At various times, DBD::Informix has been tested with both OnLine and
 SE at most versions from 5.00 upwards.
 
 DBD::Informix will probably work with most versions of Perl from
-:PERL_MINVERSION: upwards (subject to using an appropriate version of DBI), but
-you should aim to use :PERL_REFVERSION: until there is a later stable version available.
+5.008001 upwards (subject to using an appropriate version of DBI), but
+you should aim to use 5.026002 until there is a later stable version available.
 
-DBD::Informix currently requires DBI version :DBI_MINVERSION:; it will not accept earlier
-versions.  You should be using at least DBI version :DBI_REFVERSION:.
+DBD::Informix currently requires DBI version 1.607; it will not accept earlier
+versions.  You should be using at least DBI version 1.642.
 
 =head1 USING THE DBD::Informix::TechSupport Module
 
@@ -424,7 +424,7 @@ builds it (classes B, C, D) and tests it (classes C, D).
 =head2 Using it_works
 
 This generates the information needed for a report that you have managed
-to get Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) working.
+to get Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31) working.
 
     it_works;
 

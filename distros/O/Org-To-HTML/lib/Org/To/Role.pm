@@ -1,7 +1,7 @@
 package Org::To::Role;
 
-our $DATE = '2018-05-05'; # DATE
-our $VERSION = '0.230'; # VERSION
+our $DATE = '2018-10-30'; # DATE
+our $VERSION = '0.231'; # VERSION
 
 use 5.010;
 use strict;
@@ -47,7 +47,7 @@ Org::To::Role - Role for Org exporters
 
 =head1 VERSION
 
-This document describes version 0.230 of Org::To::Role (from Perl distribution Org-To-HTML), released on 2018-05-05.
+This document describes version 0.231 of Org::To::Role (from Perl distribution Org-To-HTML), released on 2018-10-30.
 
 =head1 HOMEPAGE
 

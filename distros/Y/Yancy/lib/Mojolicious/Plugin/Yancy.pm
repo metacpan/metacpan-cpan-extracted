@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -362,15 +362,10 @@ use Mojo::JSON qw( true false );
 use Mojo::File qw( path );
 use Mojo::Loader qw( load_class );
 use Sys::Hostname qw( hostname );
-use Yancy::Util qw( load_backend );
+use Yancy::Util qw( load_backend curry );
 use JSON::Validator::OpenAPI;
 
 has _filters => sub { {} };
-
-sub _curry {
-    my ( $sub, @args ) = @_;
-    return sub { $sub->( @args, @_ ) };
-}
 
 sub register {
     my ( $self, $app, $config ) = @_;
@@ -403,8 +398,8 @@ sub register {
     for my $name ( keys %{ $config->{filters} } ) {
         $self->_helper_filter_add( undef, $name, $config->{filters}{$name} );
     }
-    $app->helper( 'yancy.filter.add' => _curry( \&_helper_filter_add, $self ) );
-    $app->helper( 'yancy.filter.apply' => _curry( \&_helper_filter_apply, $self ) );
+    $app->helper( 'yancy.filter.add' => curry( \&_helper_filter_add, $self ) );
+    $app->helper( 'yancy.filter.apply' => curry( \&_helper_filter_apply, $self ) );
 
     # Routes
     $route->get( '/' )->name( 'yancy.index' )
@@ -764,7 +759,15 @@ sub _helper_set {
         die \@errors;
     }
     $item = $c->yancy->filter->apply( $coll, $item );
-    return $c->yancy->backend->set( $coll, $id, $item );
+    my $ret = eval { $c->yancy->backend->set( $coll, $id, $item ) };
+    if ( $@ ) {
+        $c->app->log->error(
+            sprintf 'Error setting item with ID "%s" in collection "%s": %s',
+            $id, $coll, $@,
+        );
+        die $@;
+    }
+    return $ret;
 }
 
 sub _helper_create {
@@ -778,7 +781,15 @@ sub _helper_create {
         die \@errors;
     }
     $item = $c->yancy->filter->apply( $coll, $item );
-    return $c->yancy->backend->create( $coll, $item );
+    my $ret = eval { $c->yancy->backend->create( $coll, $item ) };
+    if ( $@ ) {
+        $c->app->log->error(
+            sprintf 'Error creating item in collection "%s": %s',
+            $coll, $@,
+        );
+        die $@;
+    }
+    return $ret;
 }
 
 sub _helper_validate {
@@ -846,7 +857,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 

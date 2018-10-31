@@ -1,5 +1,5 @@
 #
-# $Id: Virtualbox.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Virtualbox.pm,v 8db9610c2999 2018/09/17 15:39:24 gomor $
 #
 # system::virtualbox Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 8db9610c2999 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -28,6 +28,7 @@ sub brik_properties {
          install => [ ], # Inherited
          command => [ qw(command) ],
          list => [ ],
+         register => [ qw(file_vbox) ],
          start => [ qw(name type|OPTIONAL) ],
          restore => [ qw(name type|OPTIONAL) ], # Alias for start
          stop => [ qw(name) ],
@@ -47,6 +48,7 @@ sub brik_properties {
          is_started => [ qw(name) ],
          is_stopped => [ qw(name) ],
          get_current_snapshot_id => [ qw(name) ],
+         reset_vboxnet => [ qw(device) ],
       },
       require_modules => {
          'Data::Dumper' => [ ],
@@ -85,6 +87,20 @@ sub list {
    }
 
    return \%vms;
+}
+
+sub register {
+   my $self = shift;
+   my ($vbox) = @_;
+
+   $self->brik_help_run_undef_arg('register', $vbox) or return;
+   $self->brik_help_run_file_not_found('register', $vbox) or return;
+
+   if ($vbox !~ m{\.vbox$}) {
+      return $self->log->error("register: give a .vbox file as input");
+   }
+
+   return $self->command("registervm \"$vbox\"");
 }
 
 sub start {
@@ -435,6 +451,18 @@ sub get_current_snapshot_id {
    }
 
    return 0;
+}
+
+sub reset_vboxnet {
+   my $self = shift;
+   my ($device) = @_;
+
+   $self->brik_help_run_undef_arg('reset_vboxnet', $device) or return;
+
+   my $lines1 = $self->command("hostonlyif remove $device") or return;
+   my $lines2 = $self->command("hostonlyif create") or return;
+
+   return [ $lines1, $lines2 ];
 }
 
 1;

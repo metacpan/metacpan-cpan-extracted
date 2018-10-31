@@ -7,10 +7,7 @@ use feature 'state';
 use strict;
 use warnings;
 
-{
-    use version 0.77;
-    $Pod::Readme::Types::VERSION = version->declare('v1.1.2');
-}
+our $VERSION = 'v1.2.1';
 
 use Exporter qw/ import /;
 use IO qw/ Handle /;
@@ -170,24 +167,6 @@ sub ReadIO {
 sub WriteIO {
     state $type = IO->plus_coercions(    #
         FileHandle, sub { IO::Handle->new_from_fd( $_, 'w' ) },
-    );
-    return $type;
-}
-
-=head2 C<DistZilla>
-
-A L<Dist::Zilla> object.
-
-=cut
-
-sub DistZilla {
-    state $type = Type::Tiny->new(
-        name       => 'DistZilla',
-        constraint => sub {
-            blessed($_)
-              && $_->isa('Dist::Zilla');
-        },
-        message => sub { "$_ must be be a Dist::Zilla object" },
     );
     return $type;
 }

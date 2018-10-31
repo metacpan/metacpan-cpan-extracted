@@ -1,5 +1,5 @@
 #
-# $Id: Read.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Read.pm,v 50c217684c90 2018/07/17 12:37:05 gomor $
 #
 # network::read Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Network::Frame);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 50c217684c90 $',
       tags => [ qw(unstable ethernet ip raw socket) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -229,8 +229,14 @@ sub close {
       return 1;
    }
 
+   # Free saved frames.
+   $self->log->debug("close: flush frames");
+   $dump->flush;
+
+   $self->log->debug("close: closing dump...");
    $dump->stop;
    $self->_dump(undef);
+   $self->log->debug("close: closing dump...done");
 
    return 1;
 }

@@ -10,6 +10,8 @@ use Getopt::Long::Descriptive;
 use IO::Handle;
 use Pod::Readme;
 
+our $VERSION = 'v1.2.1';
+
 =head1 NAME
 
 pod2readme - Intelligently generate a README file from POD
@@ -51,12 +53,12 @@ this, use the C<--no-backup> option.
 
 Specifies the name of the output file. If omitted, it will use the
 second command line argument, or default to the C<--target> plus the
-corresponding extention of the C<--format>.
+corresponding extension of the C<--format>.
 
 For all intents, the default is F<README>.
 
 If a format other than "text" is chosen, then the appropriate
-extention will be added, e.g. for "markdown", the default output file
+extension will be added, e.g. for "markdown", the default output file
 is F<README.md>.
 
 =head2 C<--target>
@@ -67,8 +69,8 @@ The target of the filter, which defaults to "readme".
 
 The output format, which defaults to "text".
 
-Other supposed formats are "html", "latex", "man", "markdown", "pod",
-"rtf", and "xhtml".
+Other supposed formats are "github", "html", "latex", "man",
+"markdown", "pod", "rtf", and "xhtml".
 
 =head2 C<--stdout>
 
@@ -92,10 +94,13 @@ L<pod2text>, L<pod2markdown>.
 =cut
 
 my %FORMATS = (
+    'gfm'      => { class => 'Pod::Markdown::Github' },
+    'github'   => { class => 'Pod::Markdown::Github' },
     'html'     => { class => 'Pod::Simple::HTML', },
     'latex'    => { class => 'Pod::Simple::LaTeX' },
     'man'      => { class => 'Pod::Man' },
     'markdown' => { class => 'Pod::Markdown' },
+    'md'       => { class => 'Pod::Markdown' },
     'pod'      => { class => undef },
     'rtf'      => { class => 'Pod::Simple::RTF' },
     'text'     => { class => 'Pod::Simple::Text' },

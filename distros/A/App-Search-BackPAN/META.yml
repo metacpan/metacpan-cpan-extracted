@@ -17,10 +17,14 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  App::Search::BackPAN:
+    file: lib/App/Search/BackPAN.pm
+    version: '0.05'
 requires:
   HTTP::Tiny: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/App-Search-BackPAN.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

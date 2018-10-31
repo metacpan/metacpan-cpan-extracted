@@ -9,26 +9,26 @@
 
 /* ---- LTC_BASE64 Routines ---- */
 #ifdef LTC_BASE64
-int base64_encode(const unsigned char *in,  unsigned long len,
+int base64_encode(const unsigned char *in,  unsigned long inlen,
                                  char *out, unsigned long *outlen);
 
-int base64_decode(const char *in,  unsigned long len,
+int base64_decode(const char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen);
-int base64_strict_decode(const char *in,  unsigned long len,
+int base64_strict_decode(const char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen);
 int base64_sane_decode(const char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen);
 #endif
 
 #ifdef LTC_BASE64_URL
-int base64url_encode(const unsigned char *in,  unsigned long len,
+int base64url_encode(const unsigned char *in,  unsigned long inlen,
                                     char *out, unsigned long *outlen);
 int base64url_strict_encode(const unsigned char *in,  unsigned long inlen,
                                            char *out, unsigned long *outlen);
 
-int base64url_decode(const char *in,  unsigned long len,
+int base64url_decode(const char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen);
-int base64url_strict_decode(const char *in,  unsigned long len,
+int base64url_strict_decode(const char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen);
 int base64url_sane_decode(const char *in,  unsigned long inlen,
                         unsigned char *out, unsigned long *outlen);
@@ -84,7 +84,7 @@ int hkdf(int hash_idx,
 
 /* ---- MEM routines ---- */
 int mem_neq(const void *a, const void *b, size_t len);
-void zeromem(volatile void *dst, size_t len);
+void zeromem(volatile void *out, size_t outlen);
 void burn_stack(unsigned long len);
 
 const char *error_to_string(int err);
@@ -153,6 +153,23 @@ enum padding_type {
 int padding_pad(unsigned char *data, unsigned long length, unsigned long* padded_length, unsigned long mode);
 int padding_depad(const unsigned char *data, unsigned long *length, unsigned long mode);
 #endif  /* LTC_PADDING */
+
+#ifdef LTC_SSH
+typedef enum ssh_data_type_ {
+   LTC_SSHDATA_BYTE,
+   LTC_SSHDATA_BOOLEAN,
+   LTC_SSHDATA_UINT32,
+   LTC_SSHDATA_UINT64,
+   LTC_SSHDATA_STRING,
+   LTC_SSHDATA_MPINT,
+   LTC_SSHDATA_NAMELIST,
+   LTC_SSHDATA_EOL
+} ssh_data_type;
+
+/* VA list handy helpers with tuples of <type, data> */
+int ssh_encode_sequence_multi(unsigned char *out, unsigned long *outlen, ...);
+int ssh_decode_sequence_multi(const unsigned char *in, unsigned long inlen, ...);
+#endif /* LTC_SSH */
 
 int compare_testvector(const void* is, const unsigned long is_len, const void* should, const unsigned long should_len, const char* what, int which);
 

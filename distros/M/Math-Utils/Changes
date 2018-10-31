@@ -1,5 +1,15 @@
 Revision history for Math-Utils
 
+1.13
+	30 Oct 2018
+	- Add function pl_translate(), by request.
+	- Turn README into README.md. With MetaCPAN replacing CPAN,
+	  there is no reason to have a plain-text README anymore
+	  (MetaCPAN doesn't treat the file as special).
+	- Add a CONTRIBUTING.md file, which is becoming a thing.
+	- New test file for pl_translate(), and upgrade test files
+	  that for some reason were still using Test::Simple to Test::More.
+	- Added an :all tag. Why not.
 1.12
 	26 Jun 2018
 	- Typo found by Florian Schlichting fixed.

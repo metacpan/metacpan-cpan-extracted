@@ -1,5 +1,5 @@
 #
-# $Id: Write.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Write.pm,v 50c217684c90 2018/07/17 12:37:05 gomor $
 #
 # file::write Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 50c217684c90 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -84,12 +84,10 @@ sub open {
       return $self->log->error($self->brik_help_set('overwrite'));
    }
 
-   if ($self->unbuffered) {
-      my $previous_default = select(STDOUT);
-      select($out);
-      $|++;
-      select($previous_default);          
-   }
+   my $previous_default = select(STDOUT);
+   select($out);
+   $| = $self->unbuffered ? 1 : 0;
+   select($previous_default);          
 
    $self->log->debug("open: fd [$out]");
 

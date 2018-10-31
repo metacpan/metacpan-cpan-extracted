@@ -1,5 +1,5 @@
 package Role::REST::Client::Serializer;
-$Role::REST::Client::Serializer::VERSION = '0.22';
+$Role::REST::Client::Serializer::VERSION = '0.23';
 use Try::Tiny;
 use Moo;
 use Types::Standard qw(Enum InstanceOf);
@@ -98,7 +98,7 @@ Role::REST::Client::Serializer
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 AUTHOR
 
@@ -106,7 +106,7 @@ Kaare Rasmussen <kaare at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Kaare Rasmussen.
+This software is copyright (c) 2018 by Kaare Rasmussen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

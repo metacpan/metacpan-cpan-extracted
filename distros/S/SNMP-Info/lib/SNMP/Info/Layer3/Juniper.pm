@@ -40,7 +40,7 @@ use SNMP::Info::LLDP;
 
 use vars qw/$VERSION $DEBUG %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.61';
+$VERSION = '3.62';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -653,6 +653,27 @@ sub e_parent {
     return \%e_parent;
 }
 
+sub peth_port_ifindex {
+    my $peth    = shift;
+    my $partial = shift;
+
+    my $peth_port_ifindex = {};
+    my $i_descr = $peth->i_description();
+
+    # Juniper doesn't have a translator, but the ports follow a standardized layout.
+    # Only the power status from the first member in a virtual chassis is reported.
+    foreach my $i ( keys %$i_descr ) {
+        # Juniper's port numbering is PHYS-FPC/PIC/PORT, only looking at PIC 0
+        if ($i_descr->{$i} =~ m/^(fe|ge|xe|et)-(\d+)\/(0)\/(\d+)$/) {
+            # Juniper port numbering begins at 0, but for PowerEthernet it begins at 1
+            my $mod = $2+1;
+            my $port = $4+1;
+            $peth_port_ifindex->{"$mod.$port"} = $i;
+        }
+    }
+    return $peth_port_ifindex;
+}
+
 1;
 __END__
 
@@ -825,6 +846,13 @@ IDs.  These are the VLANs which are members of the egress list for the port.
 Returns reference to hash of arrays: key = C<ifIndex>, value = array of VLAN
 IDs.  These are the VLANs which are members of the untagged egress list for
 the port.
+
+=item $juniper->peth_port_ifindex()
+
+Returns reference to a hash: key= PowerEthernet MIB interface number,
+value = C<ifIndex>. As Juniper does not provide a mapping function,
+this does it manually.
+For example, ge-0/0/1 registers as PowerEthernet interface '1.2'
 
 =back
 

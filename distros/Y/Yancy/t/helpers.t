@@ -90,7 +90,7 @@ my ( $backend_url, $backend, %items ) = init_backend(
         },
     ],
 );
-
+my $backend_class = blessed $backend;
 
 my $t = Test::Mojo->new( 'Yancy', {
     backend => $backend_url,
@@ -178,15 +178,52 @@ subtest 'set' => sub {
         is_deeply $backend->get( people => $set_id ), $new_person;
     };
 
-    subtest 'set boolean field with "1" as true' => sub {
-        my $set_id = $items{people}[0]{id};
-        my $new_person = { name => 'foobar', email => 'doug@example.com', contact => 1 };
-        eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
-        ok !$@, 'set() lives'
-            or diag "Errors: \n" . join "\n", map { "\t$_" } @{ $@ };
-        $new_person->{id} = $set_id;
-        $new_person->{age} = 20;
-        is_deeply $backend->get( people => $set_id ), $new_person;
+    subtest 'set boolean field' => sub {
+        subtest 'with "1" as true' => sub {
+            my $set_id = $items{people}[0]{id};
+            my $new_person = { name => 'foobar', email => 'doug@example.com', contact => 1 };
+            eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
+            ok !$@, 'set() lives'
+                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
+            $new_person->{id} = $set_id;
+            $new_person->{age} = 20;
+            is_deeply $backend->get( people => $set_id ), $new_person;
+        };
+
+        subtest 'with "true" as true' => sub {
+            my $set_id = $items{people}[0]{id};
+            my $new_person = { name => 'foobar', email => 'doug@example.com', contact => "true" };
+            eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
+            ok !$@, 'set() lives'
+                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
+            $new_person->{id} = $set_id;
+            $new_person->{age} = 20;
+            $new_person->{contact} = 1;
+            is_deeply $backend->get( people => $set_id ), $new_person;
+        };
+
+        subtest 'with "0" as false' => sub {
+            my $set_id = $items{people}[0]{id};
+            my $new_person = { name => 'foobar', email => 'doug@example.com', contact => 0 };
+            eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
+            ok !$@, 'set() lives'
+                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
+            $new_person->{id} = $set_id;
+            $new_person->{age} = 20;
+            is_deeply $backend->get( people => $set_id ), $new_person;
+        };
+
+        subtest 'with "false" as false' => sub {
+            my $set_id = $items{people}[0]{id};
+            my $new_person = { name => 'foobar', email => 'doug@example.com', contact => "false" };
+            eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
+            ok !$@, 'set() lives'
+                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
+            $new_person->{id} = $set_id;
+            $new_person->{age} = 20;
+            $new_person->{contact} = 0;
+            is_deeply $backend->get( people => $set_id ), $new_person;
+        };
     };
 
     subtest 'set date field with "" is an error' => sub {
@@ -213,7 +250,7 @@ subtest 'set' => sub {
             id => $set_id,
             name => 'foobar',
             email => 'doug@example.com',
-            contact => 1,
+            contact => '0',
             age => 20,
             %$new_email,
         };
@@ -230,6 +267,22 @@ subtest 'set' => sub {
             like $@->[0]{path}, qr{/name}, 'name is missing';
             like $@->[0]{message}, qr{Missing}, 'missing error correct';
         };
+    };
+
+    subtest 'backend method dies' => sub {
+        no strict 'refs';
+        no warnings 'redefine';
+        local *{$backend_class . '::set'} = sub { die "Died" };
+        eval {
+            $t->app->yancy->set( people => $set_id => { %{ $new_person } });
+        };
+        ok $@, 'set dies';
+        like $@, qr{Died}, 'set dies with same error';
+        is $t->app->log->history->[-1][1], 'error',
+            'error message is logged at error level';
+        like $t->app->log->history->[-1][2],
+            qr{Error setting item with ID "$set_id" in collection "people": Died},
+            'error message is logged with backend error';
     };
 
 };
@@ -262,6 +315,23 @@ subtest 'create' => sub {
         is $backend->list( 'people' )->{total},
             $count, 'no new person was added';
     };
+
+    subtest 'backend method dies' => sub {
+        no strict 'refs';
+        no warnings 'redefine';
+        local *{$backend_class . '::create'} = sub { die "Died" };
+        eval {
+            $t->app->yancy->create( people => { %{ $new_person } });
+        };
+        ok $@, 'create dies';
+        like $@, qr{Died}, 'create dies with same error';
+        is $t->app->log->history->[-1][1], 'error',
+            'error message is logged at error level';
+        like $t->app->log->history->[-1][2],
+            qr{Error creating item in collection "people": Died},
+            'error message is logged with backend error';
+    };
+
 };
 
 subtest 'delete' => sub {

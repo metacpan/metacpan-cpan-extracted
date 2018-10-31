@@ -1,0 +1,79 @@
+{
+   "abstract" : "bundle-multigem utility for gem versions benchmarking",
+   "author" : [
+      "Mauro Berlanda <kupta@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bundler-MultiGem",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd" : "0.331",
+            "Cwd" : "3",
+            "File::Find" : "1",
+            "File::Path" : "2",
+            "File::Spec" : "3",
+            "File::Spec::Functions" : "3",
+            "Hash::Merge" : "0.3",
+            "Storable" : "2.50",
+            "YAML::Tiny" : "1.7",
+            "common::sense" : "3"
+         }
+      }
+   },
+   "provides" : {
+      "Bundler::MultiGem" : {
+         "file" : "lib/Bundler/MultiGem.pm",
+         "version" : "0.01"
+      },
+      "Bundler::MultiGem::Command::initialize" : {
+         "file" : "lib/Bundler/MultiGem/Command/initialize.pm",
+         "version" : "0.01"
+      },
+      "Bundler::MultiGem::Command::setup" : {
+         "file" : "lib/Bundler/MultiGem/Command/setup.pm",
+         "version" : "0.01"
+      },
+      "Bundler::MultiGem::Model::Directories" : {
+         "file" : "lib/Bundler/MultiGem/Model/Directories.pm",
+         "version" : "0.01"
+      },
+      "Bundler::MultiGem::Model::Gem" : {
+         "file" : "lib/Bundler/MultiGem/Model/Gem.pm"
+      },
+      "Bundler::MultiGem::Utl::Directories" : {
+         "file" : "lib/Bundler/MultiGem/Utl/Directories.pm",
+         "version" : "0.01"
+      },
+      "Bundler::MultiGem::Utl::InitConfig" : {
+         "file" : "lib/Bundler/MultiGem/Utl/InitConfig.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.01"
+}

@@ -3,7 +3,7 @@ NAME
     without the file system ever being touched.
 
 VERSION
-    Version 0.008
+    Version 0.009
 
 SYNOPSIS
     Intercepts file system calls for specific files so unit testing can take
@@ -146,6 +146,18 @@ SUBROUTINES/METHODS
 
     To update, pass an array ref of strings for a dir or a string for a
     file. Symlinks have no contents.
+
+  unlink
+    Makes the virtual file go away by making its contents undef.
+
+  touch
+    Optional Args: ($epoch_time)
+
+    This function acts like the UNIX utility touch. It sets atime, mtime,
+    ctime to $epoch_time.
+
+    If no arguments are passed, $epoch_time is set to time(). If the file
+    does not exist, contents are set to an empty string.
 
   stat
     Returns the stat of a mocked file (does not follow symlinks.)

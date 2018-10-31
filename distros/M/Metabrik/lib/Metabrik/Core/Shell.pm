@@ -1,5 +1,5 @@
 #
-# $Id: Shell.pm,v 047dcc7d3c9d 2018/01/12 09:15:14 gomor $
+# $Id: Shell.pm,v 25fdfba6a43e 2018/10/30 17:07:37 gomor $
 #
 # core::shell Brik
 #
@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 our $FIX = '0';
 
 use base qw(Term::Shell Metabrik);
@@ -17,7 +17,7 @@ use IO::All;
 
 sub brik_properties {
    return {
-      revision => '$Revision: 047dcc7d3c9d $',
+      revision => '$Revision: 25fdfba6a43e $',
       tags => [ qw(main core) ],
       attributes => {
          echo => [ qw(0|1) ],

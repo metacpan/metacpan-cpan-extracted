@@ -1,12 +1,14 @@
+.gitignore
+ARTISTIC
+CHANGES
+GPL
+lib/Object/Import.pm
+Makefile.PL
 MANIFEST
+MANIFEST.SKIP
+META.json			Module JSON meta-data (added by MakeMaker)
 META.yml
 README
-ARTISTIC
-GPL
-CHANGES
-Makefile.PL
-TODO
-lib/Object/Import.pm
 t/00_require.t
 t/01_basic.t
 t/02_auto.t
@@ -21,5 +23,4 @@ t/10_alias.t
 t/11_exporter.t
 t/12_taint.t
 t/13_meta.t
-
-META.json                                Module JSON meta-data (added by MakeMaker)
+TODO

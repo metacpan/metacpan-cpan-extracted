@@ -3,13 +3,13 @@ require 5.010001;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
-  'EXE_FILES' => [],
-  'INSTALLDIRS' => 'site',
-  'PREREQ_PM' => {
-                   'Test::Simple' => 0
-                 },
   'NAME' => 'Math::Utils',
-  'VERSION_FROM' => 'lib/Math/Utils.pm'
+  'VERSION_FROM' => 'lib/Math/Utils.pm',
+  'PREREQ_PM' => {
+                   'Test::More' => 0
+                 },
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'PL_FILES' => {}
 )
 ;

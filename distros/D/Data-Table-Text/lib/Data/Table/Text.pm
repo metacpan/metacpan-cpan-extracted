@@ -9,7 +9,7 @@
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = q(20181028);                                                     # Version
+our $VERSION = q(20181029);                                                     # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -753,7 +753,7 @@ sub overWriteBinaryFile($$)                                                     
   $file
  }
 
-sub writeBinaryFile($$)                                                         #I Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+sub writeBinaryFile($$)                                                         # Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
  {my ($file, $string) = @_;                                                     # New file to write to or B<undef> for a temporary file,  string to write
   if (defined $file)
    {-e $file and confess "Binary file already exists:\n$file\n";
@@ -1363,9 +1363,10 @@ DDDD in this line will be replaced with the current date and time.
 NNNN in this line will be replaced with the number of rows in the table.
 END
      file=>q(The name of a file to which to write the formatted table.),
+     zero=>q(Write the report even if the table is empty.),
     });
 
-  my ($head, $file, $rows) = map{$options{$_}} qw(head file rows);
+  my ($head, $file, $zero) = map{$options{$_}} qw(head file zero);
 
   my @report;
   my $date = dateTimeStamp;
@@ -1374,7 +1375,7 @@ END
   push @report, qq(This file: $file),                           q() if $file;
   push @report, $formattedTable;
   my $report = join "\n", @report;
-  overWriteFile($file, $report) if $file and $a+$h+$o;                          # Only write the report if there is some data in it or the zero option has been specified to write it regardless.
+  overWriteFile($file, $report) if $file and $a+$h+$o || $zero;                 # Only write the report if there is some data in it or the zero option has been specified to write it regardless.
 
   $report
  }
@@ -8329,7 +8330,7 @@ if (1)                                                                          
   ok fileSize($f) == 4;
 
   eval {readFile($f)};
-  ok $@ =~ m(does not map to Unicode)i;
+  ok $@, "readFile";
 
   ok $s eq eval {readBinaryFile($f)};
 

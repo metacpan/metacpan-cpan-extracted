@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 16:09:10 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar  7 11:25:23 2017
-# Update Count    : 76
+# Last Modified On: Tue Oct 30 10:11:54 2018
+# Update Count    : 77
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -110,7 +110,9 @@ sub parsedata {
 	      unless $data =~ m;^(irealb(?:ook)?://.*?);;
 
 	    $all = Data::iRealPro::URI->new( data => $data,
-					     debug => $self->{debug} );
+					     debug => $self->{debug},
+					     transpose => $self->{transpose},
+					   );
 	}
     }
 

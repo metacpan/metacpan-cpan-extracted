@@ -1,5 +1,5 @@
 #
-# $Id: Ssh2tcp.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Ssh2tcp.pm,v 442c7ff03ff3 2018/01/25 11:48:12 gomor $
 #
 # proxy::ssh2tcp Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Process);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 442c7ff03ff3 $',
       tags => [ qw(unstable ssh tcp socket netcat) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -272,7 +272,9 @@ sub tunnel_loop {
                   }
                   else {
                      $self->log->verbose("start: read from tunnel [".length($buf)."]");
+                     $self->log->debug("start: read from tunnel [$buf]");
                      $self->log->verbose("start: write to client [".length($buf)."]");
+                     $self->log->debug("start: write to client [$buf]");
                      $this_client->syswrite($buf);
                   }
                }

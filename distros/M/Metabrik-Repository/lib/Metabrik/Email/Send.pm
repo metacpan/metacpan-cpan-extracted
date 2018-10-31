@@ -1,5 +1,5 @@
 #
-# $Id: Send.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Send.pm,v 372122273c49 2018/02/07 09:05:11 gomor $
 #
 # email::send Brik
 #
@@ -11,13 +11,15 @@ use base qw(Metabrik::Network::Smtp);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 372122273c49 $',
       tags => [ qw(unstable smtp) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       attributes => {
          from => [ qw(from) ],
          to => [ qw(to) ],
+         cc => [ qw(cc) ],
+         bcc => [ qw(bcc) ],
          subject => [ qw(subject) ],
          server => [ qw(server) ],
          port => [ qw(port) ],
@@ -52,6 +54,9 @@ sub send {
    $self->brik_help_run_undef_arg('send', $to) or return;
    $self->brik_help_run_undef_arg('send', $subject) or return;
 
+   my $cc = $self->cc;
+   my $bcc = $self->bcc;
+
    my $ct = $email->header('Content-Type');
    my $cl = $email->header('Content-Length');
    my $ce = $email->header('Content-Transfer-Encoding');
@@ -72,6 +77,14 @@ sub send {
    $smtp->mail($from);
    $smtp->to($to);
 
+   if (defined($cc)) {
+      $smtp->cc($cc);
+   }
+
+   if (defined($bcc)) {
+      $smtp->bcc($bcc);
+   }
+
    $smtp->data;
    $smtp->datasend("Content-Type: $ct\r\n") if defined($ct);
    $smtp->datasend("Content-Length: $cl\r\n") if defined($cl);
@@ -80,6 +93,9 @@ sub send {
    $smtp->datasend("Date: $date\r\n");
    $smtp->datasend("From: $from\r\n");
    $smtp->datasend("To: $to\r\n");
+   if (defined($cc)) {
+      $smtp->datasend("Cc: $cc\r\n");
+   }
    $smtp->datasend("Subject: $subject\r\n\r\n");
    $smtp->datasend($email->body);
    $smtp->dataend;

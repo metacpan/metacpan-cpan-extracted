@@ -14,6 +14,8 @@ meta-spec:
   version: '1.4'
 name: Perl-Critic-TooMuchCode
 provides:
+  Perl::Critic::Policy::TooMuchCode::ProhibitDuplicateSub:
+    file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitDuplicateSub.pm
   Perl::Critic::Policy::TooMuchCode::ProhibitExcessiveColons:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitExcessiveColons.pm
     version: '0.01'
@@ -33,7 +35,7 @@ provides:
     file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm
   Perl::Critic::TooMuchCode:
     file: lib/Perl/Critic/TooMuchCode.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   List::Util: '1.50'
   PPIx::Utils: '0.002'
@@ -41,6 +43,6 @@ requires:
   Scalar::Util: '1.50'
 resources:
   repository: https://github.com/gugod/Perl-Critic-TooMuchCode.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: '1'

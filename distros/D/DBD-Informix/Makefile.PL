@@ -1,9 +1,9 @@
 #!/usr/bin/perl -sw
 #
-# @(#)$Id: Makefile.PL,v 2018.4 2018/05/11 21:24:01 jleffler Exp $
+# @(#)$Id: Makefile.PL,v 2018.5 2018/10/31 03:46:33 jleffler Exp $
 #
 # Configuration script for DBD::Informix
-# (Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28))
+# (Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31))
 #
 # Copyright 1996-99 Jonathan Leffler
 # Copyright 1996    Alligator Descartes
@@ -99,7 +99,7 @@ if ($NTConfiguration)
     });
 }
 
-my $dbd_ix = "2018.1029";
+my $dbd_ix = "2018.1031";
 
 # This is for development only - the code must be recompiled each day!
 $dbd_ix = strftime("%Y.%m%d", localtime time) if $dbd_ix =~ m/^[:]VERSION[:]$/;
@@ -139,7 +139,7 @@ my %opts = (
            );
 
 print qq%
-Configuring Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) (aka $opts{NAME})
+Configuring Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31) (aka $opts{NAME})
         You are using DBI version $DBI::VERSION and Perl version $]
 Remember to actually read the README file!
 
@@ -216,7 +216,7 @@ $effvernum = 975 if ($vernum >= 350 && $vernum < 400);
 $effvernum = 980 if ($vernum >= 400 && $vernum < 500);
 
 dbd_ix_die "\n*** ESQL/C version $vernum is no longer supported (by IBM, HCL or DBD::Informix).\n\n"
-    if ($effvernum < 960);
+    if ($effvernum < 970);
 
 dbd_ix_die "\n*** Environment variable \$INFORMIXSERVER is not set and should be!\n\n"
     if (!defined $ENV{INFORMIXSERVER});
@@ -791,7 +791,7 @@ sub Write_DBD_Informix_Defaults
         or die "Cannot create $defaults ($!)";
 
     print DEFAULTS <<'EOF';
-#   Default Environment Variables for Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+#   Default Environment Variables for Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 #
 #   Copyright 2002-03 IBM
 #   Copyright 2004-10 Jonathan Leffler
@@ -805,7 +805,7 @@ sub Write_DBD_Informix_Defaults
     require Exporter;
     @ISA = qw(Exporter);
     @EXPORT = qw(default_INFORMIXDIR default_INFORMIXSERVER);
-    $VERSION = "2018.1029";
+    $VERSION = "2018.1031";
     $VERSION = "0.97002" if ($VERSION =~ m%[:]VERSION[:]%);
 
 EOF
@@ -829,7 +829,7 @@ use DBD::Informix::Defaults;
 =head1 DESCRIPTION
 
 This module was generated automatically by DBD::Informix
-(Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)).
+(Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)).
 It records the default values of INFORMIXDIR and INFORMIXSERVER
 that were in use when DBD::Informix was built.
 You can edit the returned values if you need to,

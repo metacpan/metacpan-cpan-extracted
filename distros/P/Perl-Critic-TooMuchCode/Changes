@@ -1,3 +1,7 @@
+0.09
+        - Released at 2018-10-31T09:10:59+0900
+        - new Policy: ProhibitDuplicateSub
+        
 0.08
         - Released at 2018-10-16T09:05:01+0900
         - ProhibitUnusedImport: Ignore symbols with '+' prefix.

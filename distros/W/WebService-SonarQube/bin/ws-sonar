@@ -16,7 +16,7 @@ use FindBin qw/$Bin/;
 use Path::Tiny;
 use WebService::SonarQube;
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -119,7 +119,7 @@ ws-sonar - Execute a SonarQube API command
 
 =head1 VERSION
 
-This documentation refers to ws-sonar version 0.0.1
+This documentation refers to ws-sonar version 0.10
 
 =head1 SYNOPSIS
 

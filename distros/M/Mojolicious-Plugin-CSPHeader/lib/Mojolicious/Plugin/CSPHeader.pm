@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::CSPHeader;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -27,7 +27,22 @@ sub register {
         if ($conf->{directives} || $conf->{extra}) {
             my @csp;
             for my $key (@directives, @deprecated, @experimental) {
-                push @csp, "$key ".$conf->{directives}->{$key} if $conf->{directives}->{$key};
+                if ($conf->{directives}->{$key}) {
+                    if (ref($conf->{directives}->{$key}) eq 'HASH') {
+                        my $value = $conf->{directives}->{$key}->{base};
+                        if ($conf->{directives}->{$key}->{ws}) {
+                            my $url = $c->req->url->to_abs;
+                            $url->path('/')
+                                ->scheme(($url->protocol =~ m/https|wss/) ? 'wss' : 'ws')
+                                ->to_string;
+                            $url =~ s#/$##;
+                            $value .= ' '.$url;
+                        }
+                        push @csp, "$key ".$value;
+                    } else {
+                        push @csp, "$key ".$conf->{directives}->{$key};
+                    }
+                }
             }
 
             if ($conf->{extra}) {
@@ -62,6 +77,13 @@ Mojolicious::Plugin::CSPHeader - Mojolicious Plugin to add Content-Security-Poli
       'font-src'    => "'self'",
       'img-src'     => "'self' data:",
       'style-src'   => "'self'"
+  });
+  # Allow a websocket connection to the current host
+  $self->plugin('CSPHeader', directives => {
+      'connect-src'   => {
+          base => "'self'",
+          ws   => 1
+      }
   });
 
   # Mojolicious::Lite

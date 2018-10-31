@@ -13,6 +13,7 @@ use Encode qw( encode_utf8 );
 sub new {
     my ( $pkg, %args ) = @_;
     my $self = bless { %args }, $pkg;
+    $self->{transpose} //= 0;
     $self->parse( $args{data} ) if $args{data};
     return $self;
 }
@@ -287,7 +288,7 @@ sub tokenize {
 	}
 	elsif ( /^\<(?:\*(\d\d))?(.*?)\>/ps ) { # text
 	    my $t = $2;
-	    $t =~ s/\s+$//;
+	    { local ${^MATCH}; $t =~ s/\s+$// }
 	    $d->( "text " . ( $1 || 0 ) . " " . $t );
 	}
 	elsif ( /^([\r\n]+)/p ) {
@@ -497,6 +498,9 @@ sub xpose {
 				  (.*)
 			    /x;
     my ( $r, $rest ) = ( $1, $2 );
+    if ( $rest =~ m;^(.*)/(.*); ) {
+	$rest = $1 . "/" . $self->xpose($2);
+    }
     my $mod = 0;
     $mod-- if $r =~ s/b$//;
     $mod++ if $r =~ s/\#$//;

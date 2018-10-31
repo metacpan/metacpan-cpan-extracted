@@ -1,3 +1,6 @@
+0.104  2018-10-30
+  * Upgrade to LMDB 0.9.22
+
 0.103  2017-01-15
   * use Alien::gmake as alien_bin_requires (thanks Graham Ollis)
   * add windows support (thanks Graham Ollis)

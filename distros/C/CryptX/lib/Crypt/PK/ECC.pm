@@ -2,7 +2,7 @@ package Crypt::PK::ECC;
 
 use strict;
 use warnings;
-our $VERSION = '0.061';
+our $VERSION = '0.062';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret )] );
@@ -42,6 +42,8 @@ our %curve = ( # must be "our" as we use it from XS code
   "wap-wsg-idm-ecid-wtls6"  => 'secp112r1',
   "wap-wsg-idm-ecid-wtls7"  => 'secp160r2',
   "wap-wsg-idm-ecid-wtls12" => 'secp224r1',
+  # extra aliases
+  'P-256K'                  => 'secp256k1',
 );
 
 our %curve_oid2name = ( # must be "our" as we use it from XS code
@@ -87,6 +89,7 @@ my %curve2jwk = (
   '1.2.840.10045.3.1.1' => 'P-192', # secp192r1
   '1.3.132.0.33'        => 'P-224', # secp224r1
   '1.2.840.10045.3.1.7' => 'P-256', # secp256r1
+  '1.3.132.0.10'        => 'P-256K',# secp256k1
   '1.3.132.0.34'        => 'P-384', # secp384r1
   '1.3.132.0.35'        => 'P-521', # secp521r1
   'nistp192'            => 'P-192',
@@ -99,6 +102,7 @@ my %curve2jwk = (
   'secp192r1'           => 'P-192',
   'secp224r1'           => 'P-224',
   'secp256r1'           => 'P-256',
+  'secp256k1'           => 'P-256K',
   'secp384r1'           => 'P-384',
   'secp521r1'           => 'P-521',
 );
@@ -828,6 +832,10 @@ I<Since: CryptX-0.024>
 Same as L<sign_message|/sign_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
 (JWA - JSON Web Algorithms).
 
+B<BEWARE:> This creates signatures according to the structure that RFC 7518 describes but does not apply
+the RFC logic for the hashing algorithm selection. You'll still need to specify, e.g., SHA256 for a P-256 key
+to get a fully RFC-7518-compliant signature.
+
 =head2 verify_message
 
  my $pk = Crypt::PK::ECC->new($pub_key_filename);
@@ -843,6 +851,10 @@ I<Since: CryptX-0.024>
 
 Same as L<verify_message|/verify_message> only the signature format is as defined by L<https://tools.ietf.org/html/rfc7518>
 (JWA - JSON Web Algorithms).
+
+B<BEWARE:> This verifies signatures according to the structure that RFC 7518 describes but does not apply
+the RFC logic for the hashing algorithm selection. You'll still need to specify, e.g., SHA256 for a P-256 key
+to get a fully RFC-7518-compliant signature.
 
 =head2 sign_hash
 

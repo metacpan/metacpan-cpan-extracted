@@ -1,5 +1,5 @@
 #
-# $Id: Www.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Www.pm,v 0c01574109db 2018/01/29 13:08:02 gomor $
 #
 # client::www Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 0c01574109db $',
       tags => [ qw(unstable browser http javascript screenshot) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -497,8 +497,8 @@ sub set_request_header {
    my $self = shift;
    my ($header, $value) = @_;
 
-   $self->brik_help_run_undef_arg('set_header', $header) or return;
-   $self->brik_help_run_undef_arg('set_header', $value) or return;
+   $self->brik_help_run_undef_arg('set_request_header', $header) or return;
+   $self->brik_help_run_undef_arg('set_request_header', $value) or return;
 
    my $headers = $self->add_headers;
    $headers->{$header} = $value;

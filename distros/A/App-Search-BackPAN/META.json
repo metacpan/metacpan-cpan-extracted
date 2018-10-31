@@ -37,6 +37,12 @@
          }
       }
    },
+   "provides" : {
+      "App::Search::BackPAN" : {
+         "file" : "lib/App/Search/BackPAN.pm",
+         "version" : "0.05"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -45,6 +51,6 @@
          "web" : "https://github.com/manwar/App-Search-BackPAN"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

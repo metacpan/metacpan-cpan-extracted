@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,8 +25,7 @@ requires:
   JSON::PP: '2.273'
   PDF::API2: '2.026'
   Text::CSV_XS: '1.19'
-  perl: '5.010000'
-resources:
-  repository: git://github.com/sciurius/perl-Data-iRealPro
-version: '1.09'
+  perl: '5.010001'
+resources: {}
+version: '1.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

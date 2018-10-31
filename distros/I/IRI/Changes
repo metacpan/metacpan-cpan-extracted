@@ -6,7 +6,11 @@ Home page:    <http://search.cpan.org/dist/IRI/>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=IRI>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
-0.008  2017-XX-XX
+0.009  2018-10-30
+
+ - (Update) Reduce Minimum Perl Version to 5.10 (#12 from @tehmoth).
+
+0.008  2017-08-06
 
  - (Update) Fix typo in regex rule causing problems parsing codepoints
    beyond BMP (#11).

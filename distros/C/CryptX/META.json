@@ -45,6 +45,6 @@
          "url" : "https://github.com/DCIT/perl-CryptX"
       }
    },
-   "version" : "0.061",
+   "version" : "0.062",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

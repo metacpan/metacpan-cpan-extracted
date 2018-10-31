@@ -1,3 +1,8 @@
+0.027   2018-10-30 (PERLANCAR)
+
+	- Add coercion rule: perl::date::float_epoch_always.
+
+
 0.026   2018-06-03 (PERLANCAR)
 
 	- [Bugfix] Multiple exclusion (e.g. ["!R1","!R2"]) did not work as

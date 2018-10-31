@@ -1,5 +1,5 @@
 {
-   "abstract" : "Cross reference data held in the XML format.",
+   "abstract" : "Cross reference Dita XML.",
    "author" : [
       "philiprbrenan@gmail.com"
    ],
@@ -24,7 +24,7 @@
             "Carp" : "0",
             "Data::Dump" : "0",
             "Data::Edit::Xml" : "20181008",
-            "Data::Table::Text" : "20181008",
+            "Data::Table::Text" : "20181029",
             "Test2::API" : "0",
             "Test::More" : "0",
             "utf8" : "0"
@@ -34,7 +34,7 @@
    "provides" : {
       "Data::Edit::Xml::Xref" : {
          "file" : "lib/Data/Edit/Xml/Xref.pm",
-         "version" : "20181028"
+         "version" : "20181030"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20181028",
+   "version" : "20181030",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

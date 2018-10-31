@@ -1,5 +1,5 @@
 #
-# $Id: Compress.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Compress.pm,v 59f1f3cd6d33 2018/06/08 07:18:55 gomor $
 #
 # string::gzip Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 59f1f3cd6d33 $',
       tags => [ qw(unstable gzip gunzip unzip uncompress) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -51,8 +51,10 @@ sub gunzip {
 
    $self->log->debug("gunzip: starting");
 
-   my $plain = Gzip::Faster::gunzip($data)
-      or return $self->log->error("gunzip: error");
+   my $plain = Gzip::Faster::gunzip($data);
+   if (! defined($plain)) {
+      return $self->log->error("gunzip: error");
+   }
 
    $self->log->debug("gunzip: finished");
 
@@ -71,8 +73,10 @@ sub gzip {
       return $self->log->error("gzip: empty data, nothing to compress");
    }
 
-   my $gzipped = Gzip::Faster::gzip($data)
-      or return $self->log->error("gzip: error");
+   my $gzipped = Gzip::Faster::gzip($data);
+   if (! defined($gzipped)) {
+      return $self->log->error("gzip: error");
+   }
 
    return \$gzipped;
 }

@@ -9,8 +9,6 @@ README
 dist.ini
 lib/Org/To/Base.pm
 lib/Org/To/HTML.pm
-lib/Org/To/HTML/Link/cpandist.pm
-lib/Org/To/HTML/Link/cpanmod.pm
 lib/Org/To/Role.pm
 t/00-compile.t
 t/author-critic.t

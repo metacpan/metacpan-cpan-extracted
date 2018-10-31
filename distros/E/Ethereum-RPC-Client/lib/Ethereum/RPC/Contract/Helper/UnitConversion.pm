@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Math::BigInt;
 
-our $VERSION = '0.001';
+our $VERSION = '0.03';
 
 =head1 NAME
 

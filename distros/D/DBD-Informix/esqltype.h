@@ -5,7 +5,7 @@
 @(#)Purpose:        Platform and Version Independent Types for ESQL/C
 @(#)Author:         J Leffler
 @(#)Copyright:      (C) JLSS 2001-2018
-@(#)Product:        Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+@(#)Product:        Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 */
 
 /*TABSTOP=4*/

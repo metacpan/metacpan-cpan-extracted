@@ -17,6 +17,7 @@ lib/Data/Sah/Coerce/js/duration/float_secs.pm
 lib/Data/Sah/Coerce/js/duration/str_iso8601.pm
 lib/Data/Sah/Coerce/perl/bool/str.pm
 lib/Data/Sah/Coerce/perl/date/float_epoch.pm
+lib/Data/Sah/Coerce/perl/date/float_epoch_always.pm
 lib/Data/Sah/Coerce/perl/date/obj_DateTime.pm
 lib/Data/Sah/Coerce/perl/date/obj_TimeMoment.pm
 lib/Data/Sah/Coerce/perl/date/str_iso8601.pm

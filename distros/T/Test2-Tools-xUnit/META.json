@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test2-Tools-xUnit",
    "prereqs" : {
@@ -42,7 +42,7 @@
    "provides" : {
       "Test2::Tools::xUnit" : {
          "file" : "lib/Test2/Tools/xUnit.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -50,13 +50,14 @@
       "bugtracker" : {
          "web" : "https://github.com/cv-library/Test2-Tools-xUnit/issues"
       },
+      "homepage" : "https://metacpan.org/pod/Test2::Tools::xUnit",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/cv-library/Test2-Tools-xUnit.git",
          "web" : "https://github.com/cv-library/Test2-Tools-xUnit"
       }
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.006",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

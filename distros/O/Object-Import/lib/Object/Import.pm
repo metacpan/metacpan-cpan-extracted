@@ -1,6 +1,6 @@
 package Object::Import;
-use warnings; 
-our $VERSION = 1.004;
+use warnings;
+our $VERSION = 1.005;
 
 
 =head1 NAME
@@ -25,7 +25,7 @@ You use the module with the following syntax:
 
 Here, C<$object> is the object from which you want to import the methods.
 This can be a perl object (blessed reference), or the name of a package
-that has class methods.  
+that has class methods.
 
 As usual, a C<use> statement is executed in compile time, so you should
 take care not to use values that you compute only in run-time, eg.
@@ -42,7 +42,7 @@ You can also call import in run-time, eg.
 	use Object::Import ();
 	my $object = Foo::Bar->new();
 	import Object::Import $object;
-	
+
 but in that case, you can't call the imported functions without parenthesis.
 
 If you don't give an explicit list of methods to export, Object::Import
@@ -73,7 +73,7 @@ The following import options can be passed to the module.
 Sets the list of methods to export, instead of the module deciding automatically.
 I<$arrayref> must be a reference to an array containing method names.  Eg.
 
-	use Object::Import LWP::UserAgent->new, list => 
+	use Object::Import LWP::UserAgent->new, list =>
 		[qw"get post head mirror request simple_request"];
 
 =item C<< target => >> I<$package_name>
@@ -165,9 +165,9 @@ It is possible to use an IO handle as the object to export methods from.
 If you do this, you should require IO::Handle first so that the handle
 actually has methods.  You should probably also use the prefix or suffix
 option in such a case, because many methods of handles have the same name
-as a builtin function.  
+as a builtin function.
 
-The handle must not be a symbolic reference, whether qualified or 
+The handle must not be a symbolic reference, whether qualified or
 unqualified, eg.
 
 	open FOO, "<", "somefile" or die;
@@ -183,7 +183,7 @@ IO::Handle object would be like this:
 
 =head2 Changing the object
 
-The C<< deref >> option deserves special mention.  
+The C<< deref >> option deserves special mention.
 This option adds a level of indirection to the imported functions:
 instead of them calling methods on an object passed to import,
 the methods are called on the object currently contained by a scalar
@@ -196,42 +196,42 @@ The first of this use is straightforward,
 but you may need to know the following for the other two uses.
 
 The list of methods imported is decided at the time you call import,
-and will not be changed later, 
+and will not be changed later,
 no matter how the object is changed or methods the object supports are changed.
-You thus have to do extra loops if you want to call import 
-before the object is available.  
+You thus have to do extra loops if you want to call import
+before the object is available.
 The simplest solution is to pass the list of methods you want explicitly
-using the I<< list >> option. 
-If for some reason you don't want to do this, 
+using the I<< list >> option.
+If for some reason you don't want to do this,
 you need to fill the scalar with a suitable prototype object
 that has all the methods of the actual object you want to use.
-In many cases, 
+In many cases,
 the package name the object will be blessed to is a suitable prototype,
 but note that if you do not control the module implementing the object,
-then that module may not guarantee 
+then that module may not guarantee
 what package the object will actually be blessed to:
-the package may depend on some run-time parameters 
+the package may depend on some run-time parameters
 and the details about this could change in future versions of the module.
 This is, of course, not specific to the deref option,
 but true to a lesser extent to any case when you're using
 Object::Import without an explicit list of methods:
-a future version of the module could create the methods of the class 
+a future version of the module could create the methods of the class
 in runtime or AUTOLOAD them without declaring them,
 or it could add new private methods that will clash with function names you're using.
 Nevertheless, using the classname as a prototype can be a useful trick
-in quick and dirty programs, 
+in quick and dirty programs,
 or if you are in control of the implementation of the object.
 
 Now let's hear about destroying an object that may hold resources you want to free.
 Object::Import guarantees that if you use the I<< deref >> option,
 it does not hold references to the object other than through the one scalar,
-so if undef the contents of that scalar, 
+so if undef the contents of that scalar,
 the object will be freed unless there are references from somewhere else.
 
 Finally, there's one thing you don't want to know but I must document it for completeness:
-if a method called through Object::Import changes its invocant (zeroth argument), 
-that will also change the object the imported functions refer to, 
-whether you use the deref option or not, 
+if a method called through Object::Import changes its invocant (zeroth argument),
+that will also change the object the imported functions refer to,
+whether you use the deref option or not,
 and will change the contents of the scalar if you use the deref option.
 
 =head1 EXAMPLES
@@ -245,7 +245,7 @@ Our examples assume the following declarations:
 First a simple example of importing class methods.
 
 	use Math::BigInt;
-	use Object::Import Math::BigInt::; 
+	use Object::Import Math::BigInt::;
 	say new("0x100");
 
 This prints 256, because Math::BigInt->new("0x100") creates a big integer equal to 256.
@@ -253,8 +253,8 @@ This prints 256, because Math::BigInt->new("0x100") creates a big integer equal 
 Now let's see a simple example of importing object methods.
 
 	use Math::BigInt;
-	use Object::Import Math::BigInt->new("100"); 
-	say bmul(2); 
+	use Object::Import Math::BigInt->new("100");
+	say bmul(2);
 	say as_hex();
 
 This prints 200 (2 multiplied by 100), then 0xc8 (100 as hexadecimal).
@@ -265,9 +265,9 @@ Now let's see a more complicated example.  This prints the leading news from the
 Wikinews website.
 
 	use warnings; use strict;
-	use LWP::UserAgent; 
+	use LWP::UserAgent;
 	use XML::Twig;
-	use Object::Import LWP::UserAgent->new; 
+	use Object::Import LWP::UserAgent->new;
 	my $response = get "http://en.wikinews.org/wiki/Special:Export?".
 		"pages=Template:Lead_article_1&limit=1";
 	import Object::Import $response;
@@ -288,10 +288,10 @@ For example, as I am writing this (2010-09-05), this outputs
 
 Magnitude 7.0 earthquake hits New Zealand
 
-An earthquake with magnitude 7.0 occurred near South Island, New 
-Zealand at Saturday 04:35:44 AM local time (16:35:44 UTC). The 
-earthquake occurred at a depth of 16.1 kilometers (10.0 miles). The 
-earthquake was reported to have caused widespread damage and power 
+An earthquake with magnitude 7.0 occurred near South Island, New
+Zealand at Saturday 04:35:44 AM local time (16:35:44 UTC). The
+earthquake occurred at a depth of 16.1 kilometers (10.0 miles). The
+earthquake was reported to have caused widespread damage and power
 outages. Several aftershocks were also reported.
 
 =back
@@ -309,15 +309,15 @@ imported and would shadow the methods we're supposed to import later.
 
 Now let's see an example of using a suffix.
 
-	use File::Temp; 
-	use Object::Import scalar(File::Temp->new()), suffix => "temp"; 
-	printtemp "hello, world\nhidden"; 
-	seektemp 0, 0; 
-	print getlinetemp; 
+	use File::Temp;
+	use Object::Import scalar(File::Temp->new()), suffix => "temp";
+	printtemp "hello, world\nhidden";
+	seektemp 0, 0;
+	print getlinetemp;
 	say filenametemp;
 
 Here we need the suffix because print and seek are names of builtin
-functions.  
+functions.
 
 =head2 Creating the object later
 
@@ -325,20 +325,20 @@ Let's see how we can import methods before we create an object.
 
 	use Math::BigInt;
 	our $number;
-	use Object::Import \$number, deref => 1, list => ["bmul"]; 
-	sub double { bmul 2 } 
-	$number = Math::BigInt->new("100"); 
+	use Object::Import \$number, deref => 1, list => ["bmul"];
+	sub double { bmul 2 }
+	$number = Math::BigInt->new("100");
 	say double;
 
-This will output 200. 
+This will output 200.
 Notice how here we're using the bmul function without parenthesis,
 so we must import it compile time for the code to parse correctly,
 but the object is not created till later.
 
 =head2 Prototype object
 
-This code is the same as above, 
-except that instead of supplying a list of methods, 
+This code is the same as above,
+except that instead of supplying a list of methods,
 we use a prototype object, namely the Math::BigInt package.
 At least one of the two is needed, for otherwise Object::Import
 would have no way to know what methods to import.
@@ -346,8 +346,8 @@ would have no way to know what methods to import.
 	use Math::BigInt;
 	our $number;
 	use Object::Import \($number = Math::BigInt::), deref => 1;
-	sub double { bmul 2 } 
-	$number = Math::BigInt->new("100"); 
+	sub double { bmul 2 }
+	$number = Math::BigInt->new("100");
 	say double;
 
 =head2 Exporting to other package
@@ -359,7 +359,7 @@ sugar module that provides a procedural syntax:
 	package My::Object::DSL;
 	use Object::Import;
 	use My::Object;
-	
+
 	sub import {
 	    my ($class, %options);
 	    if (@_ == 2) {
@@ -370,7 +370,7 @@ sugar module that provides a procedural syntax:
 	    my $target = delete $options{ target } || caller;
 	    my $name = delete $options{ name } || '$obj';
 	    my $obj = My::Object->new(%options);
-	    
+
 	    $name =~ s/^[\$]//
 		or croak 'Variable name must start with $';
 	    {
@@ -387,7 +387,7 @@ You can use the module C<< My::Object::DSL >> as follows:
 
         use My::Object::DSL '$obj';
 
-If you want to pass more options, you can use 
+If you want to pass more options, you can use
 
         use My::Object::DSL name => '$obj', foo => 'bar';
 
@@ -402,23 +402,25 @@ L<Class::Exporter>, L<Scope::With>, L<Sub::Exporter>, L<Acme::Nooo>
 =head1 BUGS
 
 Please report bugs using the CPAN bug tracker (under the distribution
-name Object-Import), or, failing that, to C<ambrus@math.bme.hu>.
+name Object-Import), or, failing that, to C<corion@cpan.org>.
 
 =head1 CREDITS
 
 The primary author and maintainer of this module is Zsban Ambrus
 C<ambrus@math.bme.hu>.  Some of the code was written by Max Maischein, who
 also gave the motivation to turn a prototype to the full module you see.
-Thanks to exussum0 for the original inspiration.  
+Thanks to exussum0 for the original inspiration.
+
+The module is maintained by Max Maischein since 2018.
 
 =head1 COPYING
 
 Copyright (C) Zsban Ambrus 2010
 
 This program is free software: you can redistribute it and/or modify
-it under the terms of either the GNU General Public License version 3, 
+it under the terms of either the GNU General Public License version 3,
 as published by the Free Software Foundation; or the "Artistic License"
-which comes with perl.  
+which comes with perl.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -439,31 +441,31 @@ use 5.007;
 use Scalar::Util qw"blessed reftype";
 eval "
 use MRO::Compat;
-"; 
+";
 if (my $use_mro_compat_error = $@) {
 	eval "
 	use mro;
-	"; 
+	";
 	my $use_mro_error = $@;
-	$use_mro_error and 
+	$use_mro_error and
 		die "$use_mro_compat_error\n$use_mro_error\nerror: could not use either of modules MRO::Compat or mro";
 }
 
 
 # Methods must not be exported automatically if their original name is in %special_source
-# or if the name of the exported sub is in %special_target.  
+# or if the name of the exported sub is in %special_target.
 our %special_source;
 our %special_target;
 
-# Any name starting with a character other than a letter or underscore are forced to 
-# package main.  Such names in other packages may only be accessed with an explicit 
+# Any name starting with a character other than a letter or underscore are forced to
+# package main.  Such names in other packages may only be accessed with an explicit
 # package name.  Most of these are special or reserved to be special by the core, though
-# none of their function slots are used.  We do not export these because the user could 
-# not call them easily unless exported to main.  Note that names starting with unicode 
+# none of their function slots are used.  We do not export these because the user could
+# not call them easily unless exported to main.  Note that names starting with unicode
 # non-letter characters or names that start with invalid utf-8 also seem to be forced
 # to main (these may only be accessed through symbolic references).
-# The following names are also forced to main like above. 
-$special_source{$_}++, $special_target{$_}++ for 
+# The following names are also forced to main like above.
+$special_source{$_}++, $special_target{$_}++ for
 	qw"ENV INC ARGV ARGVOUT SIG STDIN STDOUT STDERR _";
 # The following names are called by the core on some occasions.
 $special_source{$_}++, $special_target{$_}++ for qw"
@@ -475,11 +477,11 @@ $special_source{$_}++, $special_target{$_}++ for qw"
 # Names starting with "(" are used by the overload mechanism, even as functions in some
 # cases.  We do not touch such subs.
 # Names starting with "_<" are used for something related to source files,
-# but the sub slot is not used, so we don't care. 
+# but the sub slot is not used, so we don't care.
 # The following names are called by use/no, so they definitely should not be exported.
 $special_source{$_}++, $special_target{$_}++ for qw"import unimport";
 # The following should not occur as subs, but we exclude them for good measure.
-$special_source{$_}++, $special_target{$_}++ for 
+$special_source{$_}++, $special_target{$_}++ for
 	qw"BEGIN UNITCHECK CHECK INIT END";
 # The following names could override a builtin function if exported to a module
 $special_target{$_}++ for qw"
@@ -511,7 +513,7 @@ $special_target{$_}++ for qw"
 	fc evalbytes __SUB__ __FILE__ __LINE__ __PACKAGE__
 ";
 # The following four are UNIVERSAL functions.
-$special_source{$_}++, $special_target{$_}++ for qw"can isa DOES VERSION"; 
+$special_source{$_}++, $special_target{$_}++ for qw"can isa DOES VERSION";
 # The following keywords cannot be overriden this way, so are safe to export,
 # though you may have to use tricky syntax to call some of them:
 0 for qw "and cmp eq ge gt le lt m ne or q qq qr qw qx s tr x xor y";
@@ -521,7 +523,7 @@ $special_source{$_}++, $special_target{$_}++ for qw"can isa DOES VERSION";
 # The following are special, but are not functions and not forced to main.
 0 for qw"a b DATA OVERLOAD";
 # The following names are English aliases for special variables so they could
-#   be aliased to special names, eg. if the module imports English 
+#   be aliased to special names, eg. if the module imports English
 # then &ARG and &::_ are the same.  The function slot of none of these is special.
 # Exporting to such names would be a bad idea because they could overwrite
 # a function in main.
@@ -547,7 +549,7 @@ $special_source{$_}++, $special_target{$_}++ for qw"
 	heavy_require_version require_version";
 # (Ideally we should have a mechanism to exclude everything that's defined in Exporter
 # or Exporter::Heavy)
-# The following are depreciated aliases to the standard filehandles, but as these aren't 
+# The following are depreciated aliases to the standard filehandles, but as these aren't
 # forced to main we shan't exclude them.
 0 for qw"stdin stdout stderr";
 # Yeah, these lists got out of hand, but I want a place to collect all special names.
@@ -585,7 +587,7 @@ sub list_method {
 			return;
 		}
 	}
-	eval { $obj->can("import") }; 
+	eval { $obj->can("import") };
 	my $can_methods = !$@; # false if $obj is an unblessed ref or a string that does not look like a package name, so perl refuses to call any methods
 	if (!$can_methods) {
 		&$complain(
@@ -595,7 +597,7 @@ sub list_method {
 			!$obj ? "false value" :
 			"string value that is an invalid package name");
 		return;
-	} 
+	}
 	if (!reftype($obj) && do { no strict "refs"; !%{$obj . "::"} }) {
 		&$complain("nonexistent package");
 	}
@@ -621,7 +623,7 @@ sub list_method {
 }
 
 
-sub dor ($$) { 
+sub dor ($$) {
 	my($x, $y) = @_;
 	defined($x) ? $x : $y;
 }
@@ -631,17 +633,17 @@ sub import {
 	if (@_ <= 1) {
 		return; # required for later imports
 	}
-	0 == @opt % 2 or 
+	0 == @opt % 2 or
 		die q"error: odd number of import options to Object::Import; usage: use Object::Import $obj, %opts";
 	my %opt = @opt;
-	my($deref, $methl, $debug, $nowarn_redefine, $nowarn_nomethod, $underscore, $exclude_method, $exclude_import, $savename, $funprefix, $funsuffix, $expkgn) = 
+	my($deref, $methl, $debug, $nowarn_redefine, $nowarn_nomethod, $underscore, $exclude_method, $exclude_import, $savename, $funprefix, $funsuffix, $expkgn) =
 		delete(@opt{(qw"deref list debug nowarn_redefine nowarn_nomethod underscore exclude_methods exclude_imports savenames prefix suffix target")});
 	%opt and
 		die "error: unused import options to Object::Import: " . join(" ", keys(%opt));
 	$expkgn = dor($expkgn, scalar caller);
 	my $objr = $deref ? $arg1 : \$arg1;
 	$_ = dor($_, "") for $funprefix, $funsuffix; # one could use the suffix "0" afterall
-	my %exclude_import; $exclude_import and %exclude_import = %$exclude_import; 
+	my %exclude_import; $exclude_import and %exclude_import = %$exclude_import;
 	my $expkgns = $expkgn . "::";
 	my $expkg = do {no strict 'refs'; \%{$expkgns} };
 	if ($debug) { warn "debug: Object::Import starting to export methods to package $expkgns"; }
@@ -661,13 +663,13 @@ sub import {
 				# that's wrong because of some shortcut symbol table entries for constants or predeclared subs
 		) {
 			my $p = sub (@) { no strict "refs"; $$objr->${\$methn}(@_) };
-			{ 
-				no strict 'refs'; 
+			{
+				no strict 'refs';
 				if ($nowarn_redefine) {
 					no warnings "redefine";
-					*{$expkgns . $funn} = $p; 
+					*{$expkgns . $funn} = $p;
 				} else {
-					*{$expkgns . $funn} = $p; 
+					*{$expkgns . $funn} = $p;
 				}
 			}
 			push @funn, $funn;

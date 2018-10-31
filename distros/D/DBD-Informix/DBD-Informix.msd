@@ -1,6 +1,6 @@
 #   @(#)$Id: DBD-Informix.msd,v 2018.1 2018/05/11 17:02:43 jleffler Exp $
 #   @(#)DBD::Informix - Perl Database Driver for Informix
-#   @(#)Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+#   @(#)Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 #   @(#)Definitive list of files -- Modifiable Source Distribution
 #
 #   -- The MSD RCS file column contains the name of the RCS file to be

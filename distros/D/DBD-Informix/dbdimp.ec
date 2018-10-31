@@ -1,7 +1,7 @@
 /*
  * @(#)$Id: dbdimp.ec,v 2018.1 2018/05/11 08:21:12 jleffler Exp $
  *
- * @(#)$Product: Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28) $
+ * @(#)$Product: Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31) $
  * @(#)Implementation details
  *
  * Copyright 1994-95 Tim Bunce

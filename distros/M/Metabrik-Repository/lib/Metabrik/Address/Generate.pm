@@ -1,5 +1,5 @@
 #
-# $Id: Generate.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Generate.pm,v d09557af2531 2018/10/19 08:12:42 gomor $
 #
 # address::generate Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: d09557af2531 $',
       tags => [ qw(unstable ipv4 ipv6 public routable reserved) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -41,7 +41,7 @@ sub brik_properties {
 sub brik_init {
    my $self = shift;
 
-   my $limit = 16_384;
+   my $limit = 200_000;
    my $r = BSD::Resource::setrlimit(BSD::Resource::RLIMIT_OPEN_MAX(), $limit, $limit);
    if (! defined($r)) {
       return $self->log->error("brik_init: failed to set open file limit to [$limit]");

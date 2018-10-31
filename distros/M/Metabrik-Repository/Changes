@@ -1,5 +1,8 @@
 Revision history for Perl extension Metabrik::Repository.
 
+1.31.0 Tue 30 Oct 16:23:09 CET 2018
+   - update: mane changes since last version, time for a new CPAN release
+
 1.30.0 Fri 12 Jan 10:14:40 CET 2018
    - UPDATE: see UPDATING file.
    - bugfix: audio::soundconverter added to dist

@@ -1,4 +1,4 @@
-README file for Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+README file for Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 
     You may distribute under the terms of either the GNU General Public
     License or the Artistic License, as specified in the Perl README file.
@@ -21,10 +21,11 @@ PREREQUISITES
 
     You need the following five items to build Informix Database Driver for Perl DBI:
 
-    1.  Perl :PERL_MINVERSION: or later.
-    2.  DBI :DBI_MINVERSION: or later.
+    1.  Perl 5.008001 or later.
+    2.  DBI 1.607 or later.
     3.  A C compiler that accepts function prototypes (such as GCC).
-    4.  Informix ESQL/C 5.20 or later, or Client SDK 3.00 or later.
+    4.  Preferably Informix Client SDK 3.70 or later (you may be OK with
+        3.00 or later).
     5.  A 'stores' database to which you can connect without specifying
         username or password and in which you can create tables.  Ideally,
         the connection should not use shared memory (neither olipcshm nor
@@ -80,9 +81,9 @@ MAILING LIST SUPPORT FOR DBI AND DBD::INFORMIX
 
 PERL
 
-    If you do not have Perl Version :PERL_MINVERSION: or later installed, you must
+    If you do not have Perl Version 5.008001 or later installed, you must
     build, test, and install it before you do anything else.  You should
-    really use Perl :PERL_REFVERSION: or later.  If at all
+    really use Perl 5.026002 or later.  If at all
     possible, use the C compiler to create shared libraries even if the
     Perl configuration script suggests that you use the 'ld' program
     directly.  People who do not use the C compiler to create the shared
@@ -102,11 +103,11 @@ PERL
     If you are working on NT, you should use the Perl binaries available
     from ActiveState at http://www.activestate.com.  This site also
     provides pre-compiled versions of many Perl modules, including DBI (but
-    not DBD::Informix at 2015-08-25).
+    not DBD::Informix at 2018-10-31).
 
 DBI
 
-    If you do not have DBI version :DBI_MINVERSION: or later installed, you should
+    If you do not have DBI version 1.607 or later installed, you should
     build, test, and install it.  Some older versions of DBD::Informix
     allowed you to use older versions of DBI than the version it was
     developed with, but the current versions of DBD::Informix do not.
@@ -394,10 +395,9 @@ BUILDING DBD::Informix
     If you are concerned about both OnLine and SE, then the connection
     tests will use two different databases if you set the environment
     variable DBD_INFORMIX_DATABASE2 (and possibly DBD_INFORMIX_USERNAME2
-    and DBD_INFORMIX_PASSWORD2).  You can also use one SE database and one
-    OnLine database.  You can also test with different server versions (eg
-    using 7.2x ESQL/C to connect to a 5.0x OnLine) if you have the software
-    available.
+    and DBD_INFORMIX_PASSWORD2).  You can also use one SE database and
+    one OnLine database.  You can also test with different server
+    versions if you have the software available.
 
     Once you are satisfied that DBD::Informix is working correctly, you
     should install it:
@@ -456,24 +456,6 @@ BUILDING DBD::Informix
     For more information on environment variables for both DBD:Informix and
     Informix, see the Notes/environment.variables file.
 
-KNOWN PROBLEMS:
-
-    * If you run into problems with spurious options being passed to the
-      compiler, you can set $DBD_INFORMIX_ESQLCC_REMOVE_OPTIONS_REGEX to
-      remove those options.  For example, if the -KPIC option is being
-      passed to GCC, set the value of the environment variable to
-      '^-KPIC$'.
-
-    * If you run into problems with spurious options being passed to the
-      linker, you can set $DBD_INFORMIX_ESQLLD_REMOVE_OPTIONS_REGEX to
-      remove those options.  For example, if the -lc, -laio and -lelf
-      libraries cause trouble (or are simply redundant), set the value of
-      the environment variable to '^-l(c|aio|elf)$'.
-
-    * If you run into problems with esqlcc or esqlld, set either
-      DBD_INFORMIX_DEBUG_ESQLLD or DBD_INFORMIX_DEBUG_ESQLCC (or both) to a
-      non-zero, non-empty value such as 'yes' and rerun the build.
-
 IF YOU HAVE PROBLEMS BUILDING DBD::INFORMIX
 
     Read all this README file (there is a lot of information in here), and
@@ -523,9 +505,9 @@ IF YOU HAVE PROBLEMS USING DBD::INFORMIX
 
 REMEMBER IT IS SUPPOSED TO BE FUN!
 
-Jonathan Leffler (jleffler@us.ibm.com)
+Jonathan Leffler (jonathan.leffler@gmail.com)
 
-@(#)$Id: README,v 2015.3 2015/08/27 02:28:24 jleffler Exp $
+@(#)$Id: README,v 2018.1 2018/10/31 03:37:21 jleffler Exp $
 
 ---------------------------------------------------------------------------
 

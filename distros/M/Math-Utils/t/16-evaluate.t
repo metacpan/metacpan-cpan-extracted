@@ -1,7 +1,7 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl 16-evaluate.t'
 use 5.010001;
-use Test::Simple tests => 8;
+use Test::More tests => 8;
 
 use Math::Utils qw(:polynomial :compare);
 use Math::Complex;

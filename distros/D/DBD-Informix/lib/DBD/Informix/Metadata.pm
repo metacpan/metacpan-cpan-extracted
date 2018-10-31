@@ -10,7 +10,7 @@
 #
 #-------------------------------------------------------------------------
 # Code and explanations follow for DBD::Informix
-# (Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28))
+# (Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31))
 #-------------------------------------------------------------------------
 
 {
@@ -34,7 +34,7 @@
         );
 
     my
-    $VERSION         = "2018.1029";
+    $VERSION         = "2018.1031";
     my $ATTRIBUTION = 'Jonathan Leffler <jleffler@google.com>';
     my $Revision    = '$Id: Metadata.pm,v 2014.1 2014/04/21 06:38:37 jleffler Exp $';
 
@@ -329,7 +329,7 @@ DBD::Informix::Metadata - Metadata Methods for DBD::Informix
 =head1 DESCRIPTION
 
 This document describes the metadata methods for DBD::Informix
-(Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)).
+(Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)).
 
 Note that you would seldom actually use this package directly (despite
 the synopsis above); the methods you would use are defined in the

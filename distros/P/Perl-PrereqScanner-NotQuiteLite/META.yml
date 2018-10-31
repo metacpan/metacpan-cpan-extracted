@@ -31,6 +31,6 @@ requires:
   parent: '0'
   perl: '5.008001'
 resources:
-  repository: git://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite
-version: '0.97'
+  repository: https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite
+version: '0.98'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

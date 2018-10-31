@@ -1,5 +1,5 @@
 #
-# $Id: Dns.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Dns.pm,v 29229640649c 2018/04/26 11:58:09 gomor $
 #
 # audit::dns Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 29229640649c $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -61,14 +61,15 @@ sub version {
          debug => $self->log->level > 2 ? 1 : 0,
          udp_timeout => $self->rtimeout,
          tcp_timeout => $self->rtimeout,
+         #usevc => 1,  # Force TCP
       ) or return $self->log->error("version: Net::DNS::Resolver::new failed");
    
       my $version = 'undef';
       my $res = $dns->send('version.bind', 'TXT', 'CH');
       if (defined($res) && defined($res->{answer})) {
          my $rr = $res->{answer}->[0];
-         if (defined($rr) && defined($rr->{rdata})) {
-            $version = unpack("H*", $rr->{rdata});
+         if (defined($rr) && (defined($rr->{rdata}) || defined($rr->{txtdata}))) {
+            $version = unpack("H*", $rr->{rdata} || $rr->{txtdata}->[0]->value);
          }
       }
 

@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 14:58:26 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon May 22 08:35:13 2017
-# Update Count    : 78
+# Last Modified On: Tue Oct 30 10:05:29 2018
+# Update Count    : 81
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -27,6 +27,7 @@ use Data::iRealPro::Song;
 sub encode {
     my ( $self, $data ) = @_;
     my $variant = "irealpro";
+    $self->{transpose} //= 0;
 
     my $plname;
     if ( $data =~ /^Playlist:\s*(.*)/m ) {
@@ -57,6 +58,7 @@ sub encode {
     my $uri = Data::iRealPro::URI->new
       ( variant      => $variant,
 	playlist     => $pl,
+	transpose    => $self->{transpose},
       );
 
     # And deliver.
@@ -107,6 +109,7 @@ sub encode_song {
 	actual_tempo   => $tv->{actual_tempo}   || "0",
 	actual_style   => $tv->{actual_style}   || "",
 	actual_repeats => $tv->{actual_repeats} || "",
+	transpose      => $self->{transpose},
      );
     $song->{data} = yfitaen($data);
 

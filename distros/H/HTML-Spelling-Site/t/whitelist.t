@@ -14,7 +14,8 @@ use HTML::Spelling::Site::Whitelist;
     );
 
     # TEST
-    is_deeply($obj->get_sorted_text,
+    is_deeply(
+        $obj->get_sorted_text,
         <<'EOF',
 ==== GLOBAL:
 

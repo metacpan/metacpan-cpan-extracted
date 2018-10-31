@@ -10,9 +10,7 @@ use List::MoreUtils qw/any/;
 
 use HTML::Spelling::Site::Finder;
 
-my @prunes =
-(
-);
+my @prunes = ();
 
 sub list_htmls
 {
@@ -30,6 +28,7 @@ sub list_htmls
 }
 
 1;
+
 package Shlomif::Spelling::Whitelist;
 
 use strict;
@@ -39,7 +38,8 @@ use MooX qw/late/;
 
 extends('HTML::Spelling::Site::Whitelist');
 
-has '+filename' => (default => 't/data/sites/fully-correct-whitelist/whitelist.txt');
+has '+filename' =>
+    ( default => 't/data/sites/fully-correct-whitelist/whitelist.txt' );
 
 1;
 
@@ -55,34 +55,39 @@ use MooX qw/late/;
 use Text::Hunspell;
 use HTML::Spelling::Site::Checker;
 
-has 'obj' => (is => 'ro', default => sub {
-    my ($self) = @_;
+has 'obj' => (
+    is      => 'ro',
+    default => sub {
+        my ($self) = @_;
 
-    my $speller = Text::Hunspell->new(
-        '/usr/share/hunspell/en_GB.aff',
-        '/usr/share/hunspell/en_GB.dic',
-    );
+        my $speller = Text::Hunspell->new(
+            '/usr/share/hunspell/en_GB.aff',
+            '/usr/share/hunspell/en_GB.dic',
+        );
 
-    if (not $speller)
-    {
-        die "Could not initialize speller!";
-    }
-
-    return HTML::Spelling::Site::Checker->new(
+        if ( not $speller )
         {
-            timestamp_cache_fn => 't/data/sites/fully-correct-timestamp/cache.json',
-            whitelist_parser => scalar( Shlomif::Spelling::Whitelist->new() ),
-            check_word_cb => sub {
-                my ($word) = @_;
-                return $speller->check($word);
-            },
+            die "Could not initialize speller!";
         }
-    );
-    });
+
+        return HTML::Spelling::Site::Checker->new(
+            {
+                timestamp_cache_fn =>
+                    't/data/sites/fully-correct-timestamp/cache.json',
+                whitelist_parser =>
+                    scalar( Shlomif::Spelling::Whitelist->new() ),
+                check_word_cb => sub {
+                    my ($word) = @_;
+                    return $speller->check($word);
+                },
+            }
+        );
+    }
+);
 
 sub spell_check
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     return $self->obj->spell_check(
         {
@@ -100,14 +105,19 @@ use warnings;
 
 use MooX (qw( late ));
 
-has 'files' => (is => 'ro', default => sub { return Shlomif::Spelling::FindFiles->new->list_htmls(); });
-has 'obj' => (is => 'ro', default => sub { return Shlomif::Spelling::Check->new(); });
+has 'files' => (
+    is      => 'ro',
+    default => sub { return Shlomif::Spelling::FindFiles->new->list_htmls(); }
+);
+has 'obj' =>
+    ( is => 'ro', default => sub { return Shlomif::Spelling::Check->new(); } );
 
 sub test
 {
-    my ($self, $blurb) = @_;
+    my ( $self, $blurb ) = @_;
 
-    $self->obj->obj->test_spelling({ files => $self->files, blurb => $blurb});
+    $self->obj->obj->test_spelling(
+        { files => $self->files, blurb => $blurb } );
 }
 
 package main;

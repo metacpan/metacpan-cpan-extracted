@@ -1,5 +1,9 @@
 Revision history for perl module Test2::Tools::xUnit
 
+0.006     2018-10-30 08:42:33+00:00 Europe/London
+
+  - Updated release tooling to allow release, largely for housekeeping reasons.
+
 0.005     2018-03-28 17:32:46+01:00 Europe/London
 
   - Attempt to play nicely with other modules which define attributes.

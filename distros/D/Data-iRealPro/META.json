@@ -4,13 +4,13 @@
       "Johan Vromans <jvromans@squirrel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-iRealPro",
    "no_index" : {
@@ -39,18 +39,12 @@
             "JSON::PP" : "2.273",
             "PDF::API2" : "2.026",
             "Text::CSV_XS" : "1.19",
-            "perl" : "5.010000"
+            "perl" : "5.010001"
          }
       }
    },
    "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/sciurius/perl-Data-iRealPro",
-         "web" : "https://github.com/sciurius/perl-Data-iRealPro"
-      }
-   },
-   "version" : "1.09",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "resources" : {},
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -7,7 +7,7 @@ my $build = Module::Build->new(
 
 	dist_abstract => 'Useful mathematical functions not in Perl',
 	dist_author => ['John M. Gamble <jgamble@cpan.org>'],
-	dist_version => '1.12',
+	dist_version => '1.13',
 	dist_name => 'Math-Utils',
 
 	requires => {
@@ -19,7 +19,7 @@ my $build = Module::Build->new(
 	},
 
 	build_requires => {
-		'Test::Simple' => 0
+		'Test::More' => 0
 	},
 
 	license => 'perl',

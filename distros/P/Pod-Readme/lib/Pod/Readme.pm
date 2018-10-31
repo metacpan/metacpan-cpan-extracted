@@ -170,7 +170,7 @@ Note: earlier versions of this module suggested using
 
   =end readme
 
-While this version supports that syntax for backwards compatability,
+While this version supports that syntax for backwards compatibility,
 it is not standard POD.
 
 =cut
@@ -180,14 +180,11 @@ use v5.10.1;
 use Moo;
 extends 'Pod::Readme::Filter';
 
-{
-    use version 0.77;
-    $Pod::Readme::VERSION = version->declare('v1.1.2');
-}
+our $VERSION = 'v1.2.1';
 
 use Carp;
 use IO qw/ File Handle /;
-use List::Util qw/ any /;
+use List::Util 1.33 qw/ any /;
 use Module::Load qw/ load /;
 use Path::Tiny qw/ path tempfile /;
 use Types::Standard qw/ Bool Maybe Str /;
@@ -435,7 +432,7 @@ around 'run' => sub {
 
   Pod::Readme->parse_from_file( 'README.pod', 'README' );
 
-This is a class method that acts as a L<Pod::Select> compatability
+This is a class method that acts as a L<Pod::Select> compatibility
 shim for software that is designed for versions of L<Pod::Readme>
 prior to v1.0.
 
@@ -458,7 +455,7 @@ sub parse_from_file {
 
 =head2 C<parse_from_filehandle>
 
-Like L</parse_from_file>, this exists as a compatability shim.
+Like L</parse_from_file>, this exists as a compatibility shim.
 
 Its use is deprecated, and will be deleted in later versions.
 

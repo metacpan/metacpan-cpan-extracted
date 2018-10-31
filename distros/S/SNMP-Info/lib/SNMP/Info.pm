@@ -25,7 +25,7 @@ use vars
     qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
     $NOSUCH $BIGINT $REPEATERS/;
 
-$VERSION = '3.61';
+$VERSION = '3.62';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.61
+SNMP::Info - Version 3.62
 
 =head1 AUTHOR
 
@@ -1810,6 +1810,10 @@ sub device_type {
         # version >= 8.2 are known to do this
         $objtype = 'SNMP::Info::Layer3::CiscoASA'
             if ( $desc =~ /Cisco Adaptive Security Appliance/i );
+
+        # Cisco FTD includes an ASA running as lina process
+        $objtype = 'SNMP::Info::Layer3::CiscoASA'
+            if ( $desc =~ /Cisco Firepower Threat Defense/i );
 
         # Cisco FWSM
         $objtype = 'SNMP::Info::Layer3::CiscoFWSM'

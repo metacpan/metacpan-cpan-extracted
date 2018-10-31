@@ -44,6 +44,7 @@ my $exp =
    key		   => "C",
    style	   => "Rock Ballad",
    title	   => "You're Still The One",
+   transpose	   => 0,
    variant	   => "irealpro",
   };
 

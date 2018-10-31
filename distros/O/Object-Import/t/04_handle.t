@@ -7,7 +7,7 @@ use_ok("File::Temp", "tempfile");
 require_ok("Object::Import");
 }
 
-my(my $TT, my $tn) = tempfile(UNLINK => 1);
+my($TT, $tn) = tempfile(UNLINK => 1);
 ok($tn, "timefile name");
 ok(binmode($TT));
 

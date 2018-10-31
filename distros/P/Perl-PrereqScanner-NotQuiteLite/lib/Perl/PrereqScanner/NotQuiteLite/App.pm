@@ -10,6 +10,14 @@ use CPAN::Meta::Requirements;
 use Perl::PrereqScanner::NotQuiteLite;
 use Perl::PrereqScanner::NotQuiteLite::Util::Prereqs;
 
+my %IsTestClassFamily = map {$_ => 1} qw(
+  Test::Class
+  Test::Class::Moose
+  Test::Class::Most
+  Test::Class::Sugar
+  Test::Classy
+);
+
 sub new {
   my ($class, %opts) = @_;
 
@@ -76,20 +84,7 @@ sub run {
   }
 
   # add test requirements by .pm files used in .t files
-  if (my $test_reqs = $self->{prereqs}->requirements_for('test', 'requires')) {
-    my @required_modules = $test_reqs->required_modules;
-    for my $module (@required_modules) {
-      my $relpath = $self->{possible_modules}{$module} or next;
-      my $context = $self->{_test_pm}{$relpath} or next;
-      $test_reqs->add_requirements($context->requires);
-      if ($self->{recommends} or $self->{suggests}) {
-        $self->{prereqs}->requirements_for('test', 'recommends')->add_requirements($context->recommends);
-      }
-      if ($self->{suggests}) {
-        $self->{prereqs}->requirements_for('test', 'suggests')->add_requirements($context->suggests);
-      }
-    }
-  }
+  $self->_add_test_requires($self->{allow_test_pms});
 
   $self->_exclude_local_modules;
 
@@ -197,8 +192,20 @@ sub _exclude_core_prereqs {
   }
   $perl_version = '5.008001' unless exists $Module::CoreList::version{$perl_version};
 
+  my %core_alias = (
+    'Getopt::Long::Parser'   => 'Getopt::Long',
+    'Tie::File::Cache'       => 'Tie::File',
+    'Tie::File::Heap'        => 'Tie::File',
+    'Tie::StdScalar'         => 'Tie::Scalar',
+    'Tie::StdArray'          => 'Tie::Array',
+    'Tie::StdHash'           => 'Tie::Hash',
+    'Tie::ExtraHash'         => 'Tie::Hash',
+    'Tie::RefHash::Nestable' => 'Tie::RefHash',
+  );
+
   for my $req ($self->_requirements) {
     for my $module ($req->required_modules) {
+      $module = $core_alias{$module} if exists $core_alias{$module};
       if (Module::CoreList::is_core($module, undef, $perl_version) and
           !Module::CoreList::deprecated_in($module, undef, $perl_version)
       ) {
@@ -218,6 +225,37 @@ sub _find_used_perl_version {
     $perl_requirements->add_string_requirement('perl', $perl_req) if $perl_req;
   }
   return $perl_requirements->is_simple ? $perl_requirements->requirements_for_module('perl') : undef;
+}
+
+sub _add_test_requires {
+  my ($self, $force) = @_;  
+
+  if (my $test_reqs = $self->{prereqs}->requirements_for('test', 'requires')) {
+    my @required_modules = $test_reqs->required_modules;
+    for my $module (@required_modules) {
+      $force = 1 if exists $IsTestClassFamily{$module};
+      my $relpath = $self->{possible_modules}{$module} or next;
+      my $context = delete $self->{_test_pm}{$relpath} or next;
+      $test_reqs->add_requirements($context->requires);
+      if ($self->{recommends} or $self->{suggests}) {
+        $self->{prereqs}->requirements_for('test', 'recommends')->add_requirements($context->recommends);
+      }
+      if ($self->{suggests}) {
+        $self->{prereqs}->requirements_for('test', 'suggests')->add_requirements($context->suggests);
+      }
+    }
+    if ($force) {
+      for my $context (values %{$self->{_test_pm} || {}}) {
+        $test_reqs->add_requirements($context->requires);
+        if ($self->{recommends} or $self->{suggests}) {
+          $self->{prereqs}->requirements_for('test', 'recommends')->add_requirements($context->recommends);
+        }
+        if ($self->{suggests}) {
+          $self->{prereqs}->requirements_for('test', 'suggests')->add_requirements($context->suggests);
+        }
+      }
+    }
+  }
 }
 
 sub _dedupe {

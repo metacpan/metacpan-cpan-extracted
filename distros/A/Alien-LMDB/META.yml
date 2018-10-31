@@ -2,13 +2,12 @@
 abstract: 'Build and install the LMDB embedded database'
 author:
   - 'Doug Hoyte <doug@hcsw.org>'
-build_requires:
-  Alien::gmake: '0'
+build_requires: {}
 configure_requires:
   Alien::Base::ModuleBuild: '0'
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,14 +16,13 @@ name: Alien-LMDB
 provides:
   Alien::LMDB:
     file: lib/Alien/LMDB.pm
-    version: '0.103'
+    version: '0.104'
 requires:
   Alien::Base: '0'
-  File::ShareDir: '1.00'
   perl: v5.8.1
 resources:
   bugtracker: https://github.com/hoytech/Alien-LMDB/issues
   homepage: https://github.com/hoytech/Alien-LMDB
   repository: git://github.com/hoytech/Alien-LMDB.git
-version: '0.103'
+version: '0.104'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

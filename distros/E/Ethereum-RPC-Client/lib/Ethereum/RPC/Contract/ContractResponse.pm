@@ -3,7 +3,7 @@ package Ethereum::RPC::Contract::ContractResponse;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.03';
 
 =head1 NAME
 

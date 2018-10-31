@@ -15,18 +15,15 @@ use List::Util qw/ first /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.3.0';
 
 
-sub exe_file {
+sub exe {
     my ($self) = @_;
-    if ( my $bin = $self->bin_dir ) {
-        return first { -x $_ } map { catfile( $bin, $_ ) } qw/ tidy tidy5 /;
-    }
-    else {
-        return undef;
-    }
+    $self->runtime_prop->{command};
 }
+
+
 
 
 1;
@@ -43,7 +40,7 @@ Alien::TidyHTML5 - Download and install HTML Tidy
 
 =head1 VERSION
 
-version v0.2.0
+version v0.3.0
 
 =head1 DESCRIPTION
 
@@ -57,9 +54,10 @@ for the use of other modules.
 
 =head1 METHODS
 
-=head2 C<exe_file>
+=head2 C<exe>
 
-This returns the path of the F<tidy> executable.
+This returns the name of the F<tidy> executable, which I<may> be
+the path to the executable.
 
 =head1 SEE ALSO
 
@@ -88,11 +86,21 @@ Robert Rothenberg <rrwo@cpan.org>
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Slaven Rezić
+=for stopwords Slaven Rezić Graham Ollis
+
+=over 4
+
+=item *
 
 Slaven Rezić <slaven@rezic.de>
+
+=item *
+
+Graham Ollis <plicease@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

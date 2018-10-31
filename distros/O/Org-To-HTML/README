@@ -2,8 +2,8 @@ NAME
     Org::To::HTML - Export Org document to HTML
 
 VERSION
-    This document describes version 0.230 of Org::To::HTML (from Perl
-    distribution Org-To-HTML), released on 2018-05-05.
+    This document describes version 0.231 of Org::To::HTML (from Perl
+    distribution Org-To-HTML), released on 2018-10-30.
 
 SYNOPSIS
      use Org::To::HTML qw(org_to_html);
@@ -27,7 +27,8 @@ SYNOPSIS
 DESCRIPTION
     Export Org format to HTML. To customize, you can subclass this module.
 
-    A command-line utility is included: org-to-html.
+    A command-line utility org-to-html is available in the distribution
+    App::OrgUtils.
 
     Note that this module is just a simple exporter, for "serious" works
     you'll probably want to use the exporting features or org-mode
@@ -41,7 +42,7 @@ FUNCTIONS
   org_to_html
     Usage:
 
-     org_to_html(%args) -> [status, msg, result, meta]
+     org_to_html(%args) -> [status, msg, payload, meta]
 
     Export Org document to HTML.
 
@@ -108,7 +109,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

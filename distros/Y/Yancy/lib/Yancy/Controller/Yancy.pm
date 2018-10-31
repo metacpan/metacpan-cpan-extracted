@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -436,8 +436,16 @@ sub set {
     }
 
     if ( my $errors = $@ ) {
+        if ( ref $errors eq 'ARRAY' ) {
+            # Validation error
+            $c->res->code( 400 );
+        }
+        else {
+            # Unknown error
+            $c->res->code( 500 );
+            $errors = [ { message => $errors } ];
+        }
         my $item = $c->yancy->get( $coll_name, $id );
-        $c->res->code( 400 );
         return $c->respond_to(
             json => { json => { errors => $errors } },
             html => { item => $item, errors => $errors },
@@ -586,7 +594,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 

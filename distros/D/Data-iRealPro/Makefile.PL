@@ -37,16 +37,13 @@ WriteMakefile
 		    'Test::More'   => 1.001014,
 		   },
 
- MIN_PERL_VERSION => '5.010000',
+ MIN_PERL_VERSION => '5.010001',
  LICENSE => 'perl',
  META_MERGE => {
      'meta-spec' => { version => 2 },
      resources        => {
-	 repository   => {
-	     type => 'git',
-	     url  => 'git://github.com/sciurius/perl-Data-iRealPro',
-	     web  => 'https://github.com/sciurius/perl-Data-iRealPro',
-         },
+	 repository => "https://github.com/sciurius/perl-Data-iRealPro",
+	 bugtracker => "https://github.com/sciurius/perl-Data-iRealPro/issues",
      },
  },
 

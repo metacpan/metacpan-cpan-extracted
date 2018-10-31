@@ -1,6 +1,6 @@
 package Alien::LMDB;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 use parent 'Alien::Base';
 

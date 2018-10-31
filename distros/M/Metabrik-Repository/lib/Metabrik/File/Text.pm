@@ -1,5 +1,5 @@
 #
-# $Id: Text.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Text.pm,v de0c829662da 2018/10/09 14:39:51 gomor $
 #
 # file::text Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::File::Write);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: de0c829662da $',
       tags => [ qw(unstable read write) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -33,6 +33,7 @@ sub brik_properties {
          read => [ qw(input) ],
          read_line => [ qw(input count|OPTIONAL) ],
          read_split_by_blank_line => [ qw(input) ],
+         read_split_by_ini_block => [ qw(input) ],
          write => [ qw($data|$data_ref|$data_list output) ],
       },
       require_modules => {
@@ -69,6 +70,7 @@ sub read {
    my $fr = $self->_open($input) or return;
    my $data = $fr->read or return;
    $fr->close;
+   $self->_fr(undef);
 
    return $data;
 }
@@ -131,6 +133,30 @@ sub read_split_by_blank_line {
    }
 
    $fr->close;
+   $self->_fr(undef);
+
+   return \@chunks;
+}
+
+sub read_split_by_ini_block {
+   my $self = shift;
+   my ($input) = @_;
+
+   $input ||= $self->input;
+   $self->brik_help_run_undef_arg('read_split_by_ini_block', $input) or return;
+
+   my $fr = $self->_open($input) or return;
+   $fr->skip_comment(1);
+   $fr->skip_blank_line(1);
+
+   my @chunks = ();
+   while (my $this = $fr->read_until_ini_block) {
+      push @chunks, $this;
+      last if $fr->eof;
+   }
+
+   $fr->close;
+   $self->_fr(undef);
 
    return \@chunks;
 }

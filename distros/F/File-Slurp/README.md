@@ -8,33 +8,33 @@ File::Slurp - Simple and Efficient Reading/Writing/Modifying of Complete Files
 use File::Slurp;
 
 # read in a whole file into a scalar
-my $text = read_file( 'filename' ) ;
+my $text = read_file('/path/file');
 
 # read in a whole file into an array of lines
-my @lines = read_file( 'filename' ) ;
+my @lines = read_file('/path/file');
 
 # write out a whole file from a scalar
-write_file( 'filename', $text ) ;
+write_file('/path/file', $text);
 
 # write out a whole file from an array of lines
-write_file( 'filename', @lines ) ;
+write_file('/path/file', @lines);
 
 # Here is a simple and fast way to load and save a simple config file
 # made of key=value lines.
-my %conf = read_file( $file_name ) =~ /^(\w+)=(.*)$/mg ;
-write_file( $file_name, {atomic => 1}, map "$_=$conf{$_}\n", keys %conf ) ;
+my %conf = read_file('/path/file') =~ /^(\w+)=(.*)$/mg;
+write_file('/path/file', {atomic => 1}, map "$_=$conf{$_}\n", keys %conf);
 
 # insert text at the beginning of a file
-prepend_file( 'filename', $text ) ;
+prepend_file('/path/file', $text);
 
 # in-place edit to replace all 'foo' with 'bar' in file
-edit_file { s/foo/bar/g } 'filename' ;
+edit_file { s/foo/bar/g } '/path/file';
 
 # in-place edit to delete all lines with 'foo' from file
-edit_file_lines sub { $_ = '' if /foo/ }, 'filename' ;
+edit_file_lines sub { $_ = '' if /foo/ }, '/path/file';
 
 # read in a whole directory of file names (skipping . and ..)
-my @files = read_dir( '/path/to/dir' ) ;
+my @files = read_dir('/path/to/dir');
 ```
 
 # DESCRIPTION
@@ -42,11 +42,23 @@ my @files = read_dir( '/path/to/dir' ) ;
 This module provides subs that allow you to read or write entire files
 with one simple call. They are designed to be simple to use, have
 flexible ways to pass in or get the file contents and to be very
-efficient.  There is also a sub to read in all the files in a
+efficient. There is also a sub to read in all the files in a
 directory.
 
-These slurp/spew subs work for files, pipes and sockets, stdio,
-pseudo-files, and the `DATA` handle.
+## WARNING - PENDING DOOM
+
+Although you technically _can_, do NOT use this module to work on file handles,
+pipes, sockets, standard IO, pseudo-files, or the `DATA` handle. These are
+features implemented long ago that just really shouldn't be abused here.
+
+Be warned: this activity will lead to inaccurate encoding/decoding of data.
+
+All further mentions of actions on the above have been removed from this
+documentation and that feature set will likely be deprecated in the future.
+
+In other words, if you don't have a filename to pass, consider using the
+standard `do { local $/; <$fh> }`, or
+[Data::Section](https://metacpan.org/pod/Data::Section)/[Data::Section::Simple](https://metacpan.org/pod/Data::Section::Simple) for working with `__DATA__`.
 
 # FUNCTIONS
 
@@ -56,9 +68,9 @@ pseudo-files, and the `DATA` handle.
 
 ```perl
     use File::Spec qw(append_file write_file);
-    my $res = append_file('/path/to/file', "Some text");
+    my $res = append_file('/path/file', "Some text");
     # same as
-    my $res = write_file('/path/to/file', {append => 1}, "Some text");
+    my $res = write_file('/path/file', {append => 1}, "Some text");
 ```
 
 The `append_file` function is simply a synonym for the
@@ -69,11 +81,11 @@ set.
 
 ```perl
     use File::Slurp qw(edit_file);
-    # perl -0777 -pi -e 's/foo/bar/g' filename
-    edit_file { s/foo/bar/g } 'filename';
-    edit_file sub { s/foo/bar/g }, 'filename';
+    # perl -0777 -pi -e 's/foo/bar/g' /path/file
+    edit_file { s/foo/bar/g } '/path/file';
+    edit_file sub { s/foo/bar/g }, '/path/file';
     sub replace_foo { s/foo/bar/g }
-    edit_file \&replace_foo, 'filename';
+    edit_file \&replace_foo, '/path/file';
 ```
 
 The `edit_file` function reads in a file into `$_`, executes a code block that
@@ -99,11 +111,11 @@ have a consistent file.
 
 ```perl
     use File::Slurp qw(edit_file_lines);
-    # perl -pi -e '$_ = "" if /foo/' filename
-    edit_file_lines { $_ = '' if /foo/ } 'filename';
-    edit_file_lines sub { $_ = '' if /foo/ }, 'filename';
+    # perl -pi -e '$_ = "" if /foo/' /path/file
+    edit_file_lines { $_ = '' if /foo/ } '/path/file';
+    edit_file_lines sub { $_ = '' if /foo/ }, '/path/file';
     sub delete_foo { $_ = '' if /foo/ }
-    edit_file \&delete_foo, 'filename';
+    edit_file \&delete_foo, '/path/file';
 ```
 
 The `edit_file_lines` function reads each line of a file into `$_`, and
@@ -128,11 +140,11 @@ have a consistent file.
 
 ```perl
     use File::Slurp qw(ef);
-    # perl -0777 -pi -e 's/foo/bar/g' filename
-    ef { s/foo/bar/g } 'filename';
-    ef sub { s/foo/bar/g }, 'filename';
+    # perl -0777 -pi -e 's/foo/bar/g' /path/file
+    ef { s/foo/bar/g } '/path/file';
+    ef sub { s/foo/bar/g }, '/path/file';
     sub replace_foo { s/foo/bar/g }
-    ef \&replace_foo, 'filename';
+    ef \&replace_foo, '/path/file';
 ```
 
 The `ef` function is simply a synonym for the ["edit\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#edit_file)
@@ -142,11 +154,11 @@ function.
 
 ```perl
     use File::Slurp qw(efl);
-    # perl -pi -e '$_ = "" if /foo/' filename
-    efl { $_ = '' if /foo/ } 'filename';
-    efl sub { $_ = '' if /foo/ }, 'filename';
+    # perl -pi -e '$_ = "" if /foo/' /path/file
+    efl { $_ = '' if /foo/ } '/path/file';
+    efl sub { $_ = '' if /foo/ }, '/path/file';
     sub delete_foo { $_ = '' if /foo/ }
-    efl \&delete_foo, 'filename';
+    efl \&delete_foo, '/path/file';
 ```
 
 The `efl` function is simply a synonym for the ["edit\_file\_lines" in File::Slurp](https://metacpan.org/pod/File::Slurp#edit_file_lines)
@@ -156,7 +168,7 @@ function.
 
 ```perl
     use File::Spec qw(overwrite_file);
-    my $res = overwrite_file('/path/to/file', "Some text");
+    my $res = overwrite_file('/path/file', "Some text");
 ```
 
 The `overwrite_file` function is simply a synonym for the
@@ -166,15 +178,15 @@ The `overwrite_file` function is simply a synonym for the
 
 ```perl
     use File::Slurp qw(prepend_file);
-    prepend_file($file, $header);
-    prepend_file($file, \@lines);
-    prepend_file($file, { binmode => 'raw:'}, $bin_data);
+    prepend_file('/path/file', $header);
+    prepend_file('/path/file', \@lines);
+    prepend_file('/path/file', { binmode => 'raw:'}, $bin_data);
 
     # equivalent to:
     use File::Slurp qw(read_file write_file);
-    my $content = read_file('file_name');
+    my $content = read_file('/path/file');
     my $new_content = "hahahaha";
-    write_file('file_name', $new_content . $content);
+    write_file('/path/file', $new_content . $content);
 ```
 
 The `prepend_file` function is the opposite of ["append\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#append_file) as
@@ -240,21 +252,21 @@ The next argument(s) is either a hash reference or a flattened hash,
 
 ```perl
     use File::Slurp qw(read_file);
-    my $text = read_file('filename');
-    my $bin = read_file('filename', { binmode => ':raw' });
-    my @lines = read_file('filename');
-    my $lines_ref = read_file('file_name', array_ref => 1);
-    my $lines_ref = [ read_file('file_name') ];
+    my $text = read_file('/path/file');
+    my $bin = read_file('/path/file', { binmode => ':raw' });
+    my @lines = read_file('/path/file');
+    my $lines_ref = read_file('/path/file', array_ref => 1);
+    my $lines_ref = [ read_file('/path/file') ];
 
     # or we can read into a buffer:
     my $buffer;
-    read_file('file_name', buf_ref => \$buffer);
+    read_file('/path/file', buf_ref => \$buffer);
 
     # or we can set the block size for the read
-    my $text_ref = read_file(\*STDIN, blk_size => 10_000_000, array_ref => 1);
+    my $text_ref = read_file('/path/file', blk_size => 10_000_000, array_ref => 1);
 
     # or we can get a scalar reference
-    my $text_ref = read_file('file_name', scalar_ref => 1);
+    my $text_ref = read_file('/path/file', scalar_ref => 1);
 ```
 
 This function reads in an entire file and returns its contents to the
@@ -263,9 +275,7 @@ scalar. In list context it will return a list of lines (using the
 current value of `$/` as the separator, including support for paragraph
 mode when it is set to `''`).
 
-The first argument is the file to be slurped in. It can be a path to a file, an
-open file handle (`\*DATA`, `\*STDIN`). Overloaded objects use the stringified
-file path.
+The first argument is the path to the file to be slurped in.
 
 The next argument(s) is either a hash reference or a flattened hash,
 `key => value` pairs. The following options are available:
@@ -324,7 +334,7 @@ The next argument(s) is either a hash reference or a flattened hash,
 
 ```perl
     use File::Spec qw(rf);
-    my $text = rf('/path/to/file');
+    my $text = rf('/path/file');
 ```
 
 The `rf` function is simply a synonym for the ["read\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#read_file)
@@ -334,7 +344,7 @@ function.
 
 ```perl
     use File::Spec qw(slurp);
-    my $text = slurp('/path/to/file');
+    my $text = slurp('/path/file');
 ```
 
 The `slurp` function is simply a synonym for the ["read\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#read_file)
@@ -344,7 +354,7 @@ function.
 
 ```perl
     use File::Spec qw(wf);
-    my $res = wf('/path/to/file', "Some text");
+    my $res = wf('/path/file', "Some text");
 ```
 
 The `wf` function is simply a synonym for the
@@ -354,28 +364,28 @@ The `wf` function is simply a synonym for the
 
 ```perl
     use File::Slurp qw(write_file);
-    write_file('filename', @data);
-    write_file('filename', {append => 1}, @data);
-    write_file('filename', {binmode => ':raw'}, $buffer);
-    write_file('filename', \$buffer);
-    write_file('filename', $buffer);
-    write_file('filename', \@lines);
-    write_file('filename', @lines);
+    write_file('/path/file', @data);
+    write_file('/path/file', {append => 1}, @data);
+    write_file('/path/file', {binmode => ':raw'}, $buffer);
+    write_file('/path/file', \$buffer);
+    write_file('/path/file', $buffer);
+    write_file('/path/file', \@lines);
+    write_file('/path/file', @lines);
 
     # binmode
-    write_file($bin_file, {binmode => ':raw'}, @data);
-    write_file($bin_file, {binmode => ':utf8'}, $utf_text);
+    write_file('/path/file', {binmode => ':raw'}, @data);
+    write_file('/path/file', {binmode => ':utf8'}, $utf_text);
 
     # buffered
-    write_file($bin_file, {buf_ref => \$buffer});
-    write_file($bin_file, \$buffer);
-    write_file($bin_file, $buffer);
+    write_file('/path/file', {buf_ref => \$buffer});
+    write_file('/path/file', \$buffer);
+    write_file('/path/file', $buffer);
 
     # append
-    write_file($file, {append => 1}, @data);
+    write_file('/path/file', {append => 1}, @data);
 
     # no clobbering
-    write_file($file, {no_clobber => 1}, @data);
+    write_file('/path/file', {no_clobber => 1}, @data);
 ```
 
 This function writes out an entire file in one call. By default `write_file`
@@ -439,7 +449,7 @@ The next argument(s) is either a hash reference or a flattened hash,
     is modified by your process's `umask` and defaults to `0666` (same as
     `sysopen`).
 
-    NOTE: this option is new as of File::Slurp version 9999.14;
+    NOTE: this option is new as of File::Slurp version 9999.14.
 
 # EXPORT
 

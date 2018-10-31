@@ -1,5 +1,5 @@
 #
-# $Id: Rsync.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Rsync.pm,v 5db309a16909 2018/07/25 13:52:23 gomor $
 #
 # client::rsync Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 5db309a16909 $',
       tags => [ qw(unstable network) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -29,6 +29,7 @@ sub brik_properties {
          ssh_port => 22,
          ssh_args => '',
          args => '-azv',
+         capture_stderr => 1,
       },
       need_packages => {
          ubuntu => [ qw(rsync) ],
@@ -60,7 +61,7 @@ sub sync {
       $cmd .= " $args $source $destination";
    }
 
-   return $self->execute($cmd);
+   return $self->capture($cmd);
 }
 
 1;

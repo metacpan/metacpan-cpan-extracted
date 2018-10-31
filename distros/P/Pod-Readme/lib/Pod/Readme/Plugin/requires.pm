@@ -2,10 +2,7 @@ package Pod::Readme::Plugin::requires;
 
 use Moo::Role;
 
-{
-    use version 0.77;
-    $Pod::Readme::Plugin::requires::VERSION = version->declare('v1.1.2');
-}
+our $VERSION = 'v1.2.1';
 
 use CPAN::Meta;
 use Module::CoreList;

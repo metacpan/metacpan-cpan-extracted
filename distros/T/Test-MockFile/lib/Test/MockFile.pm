@@ -37,11 +37,11 @@ Test::MockFile - Lets tests validate code which interacts with files without the
 
 =head1 VERSION
 
-Version 0.008
+Version 0.009
 
 =cut
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 our %files_being_mocked;
 
@@ -511,6 +511,55 @@ sub contents {
     return $self->{'contents'};
 }
 
+=head2 unlink
+
+Makes the virtual file go away by making its contents undef.
+
+=cut
+
+sub unlink {
+    my ($self) = @_;
+    $self or die("unlink is a method");
+
+    $self->is_file or die("unlink only supports files");
+
+    $self->contents(undef);
+
+    return 1;
+}
+
+=head2 touch
+
+Optional Args: ($epoch_time)
+
+This function acts like the UNIX utility touch. It sets atime, mtime, ctime to $epoch_time.
+
+If no arguments are passed, $epoch_time is set to time(). If the file does not exist, contents are set to an empty string.
+
+=cut
+
+sub touch {
+    my ( $self, $now ) = @_;
+    $self or die("touch is a method");
+    $now //= time;
+
+    $self->is_file or die("touch only supports files");
+
+    my $pre_size = $self->size();
+
+    if ( !defined $pre_size ) {
+        $self->contents('');
+    }
+
+    # TODO: Should this happen any time contents goes from undef to existing? Should we be setting perms?
+    # Normally I'd say yes but it might not matter much for a .005 second test.
+    $self->mtime($now);
+    $self->ctime($now);
+    $self->atime($now);
+
+    return 1;
+}
+
 =head2 stat
 
 Returns the stat of a mocked file (does not follow symlinks.)
@@ -609,6 +658,11 @@ returns the size of the file based on its contents.
 
 sub size {
     my ($self) = @_;
+
+    # length undef is 0 not undef in perl 5.10
+    if ( $] < 5.012 ) {
+        return undef if !defined $self->contents;
+    }
 
     return length $self->contents;
 }

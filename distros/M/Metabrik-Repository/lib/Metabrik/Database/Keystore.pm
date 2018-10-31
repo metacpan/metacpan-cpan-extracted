@@ -1,5 +1,5 @@
 #
-# $Id: Keystore.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Keystore.pm,v 29229640649c 2018/04/26 11:58:09 gomor $
 #
 # database::keystore Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::File::Text);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 29229640649c $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -55,6 +55,7 @@ sub decrypt {
 
    $db ||= $self->db;
    $self->brik_help_run_undef_arg('decrypt', $db) or return;
+   $self->brik_help_run_file_not_found('decrypt', $db) or return;
 
    my $read = $self->read($db) or return;
 

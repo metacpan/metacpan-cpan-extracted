@@ -1,12 +1,12 @@
 #
-# $Id: Metabrik.pm,v 047dcc7d3c9d 2018/01/12 09:15:14 gomor $
+# $Id: Metabrik.pm,v 25fdfba6a43e 2018/10/30 17:07:37 gomor $
 #
 package Metabrik;
 use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 our $FIX = '0';
 
 use base qw(Class::Gomor::Hash);
@@ -51,7 +51,7 @@ sub brik_license {
 
 sub brik_properties {
    return {
-      revision => '$Revision: 047dcc7d3c9d $',
+      revision => '$Revision: 25fdfba6a43e $',
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       tags => [ ],
@@ -666,6 +666,11 @@ sub brik_set_default_attributes {
       else {
          $dir = $global_datadir || (defined($ENV{HOME}) && $ENV{HOME}."/metabrik")
                                 || "/tmp/metabrik";
+         if (! -d $dir) {
+            mkdir($dir)
+               or return $self->log->error("brik_set_default_attributes: mkdir ".
+                  "[$dir] failed: $!");
+         }
 
          (my $subdir = $self->brik_name) =~ s/::/-/g;
          if (length($subdir)) {
@@ -677,7 +682,8 @@ sub brik_set_default_attributes {
 
       if (! -d $dir) {
          mkdir($dir)
-            or return $self->log->error("brik_set_default_attributes: mkdir [$dir] failed: $!");
+            or return $self->log->error("brik_set_default_attributes: mkdir [$dir] ".
+               "failed: $!");
       }
    }
 

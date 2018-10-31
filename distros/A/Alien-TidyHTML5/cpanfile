@@ -22,10 +22,9 @@ on 'test' => sub {
 };
 
 on 'configure' => sub {
-  requires "Alien::Build" => "1.19";
+  requires "Alien::Build" => "1.40";
   requires "Alien::Build::MM" => "0.32";
   requires "Alien::Build::Plugin::Build::CMake" => "0.99";
-  requires "Alien::Build::Plugin::PkgConfig::Negotiate" => "0.79";
   requires "ExtUtils::MakeMaker" => "6.52";
 };
 

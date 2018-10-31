@@ -1,5 +1,5 @@
 #
-# $Id: Elasticsearch.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Elasticsearch.pm,v d09557af2531 2018/10/19 08:12:42 gomor $
 #
 # client::elasticsearch Brik
 #
@@ -11,11 +11,12 @@ use base qw(Metabrik::Client::Rest);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: d09557af2531 $',
       tags => [ qw(unstable es es) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       attributes => {
+         datadir => [ qw(datadir) ],
          nodes => [ qw(node_list) ],
          cxn_pool => [ qw(Sniff|Static|Static::NoPing) ],
          date => [ qw(date) ],
@@ -31,6 +32,7 @@ sub brik_properties {
          try => [ qw(count) ],
          use_bulk_autoflush => [ qw(0|1) ],
          use_indexing_optimizations => [ qw(0|1) ],
+         csv_header => [ qw(fields) ],
          csv_encoded_fields => [ qw(fields) ],
          csv_object_fields => [ qw(fields) ],
          _es => [ qw(INTERNAL) ],
@@ -61,10 +63,18 @@ sub brik_properties {
          close_scroll => [ ],
          total_scroll => [ ],
          next_scroll => [ qw(count|OPTIONAL) ],
+         reindex => [ qw(index_source index_destination type_destination|OPTIONAL) ],
+         get_reindex_tasks => [ ],
+         cancel_reindex_task => [ qw(id) ],
+         get_taskid => [ qw(id) ],
+         show_reindex_progress => [ ],
+         loop_show_reindex_progress => [ qw(seconds|OPTIONAL) ],
          index_document => [ qw(document index|OPTIONAL type|OPTIONAL hash|OPTIONAL id|OPTIONAL) ],
-         update_document => [ qw(document id index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
          index_bulk => [ qw(document index|OPTIONAL type|OPTIONAL hash|OPTIONAL id|OPTIONAL) ],
-         bulk_flush => [ ],
+         index_bulk_from_list => [ qw(document_list index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
+         update_document => [ qw(document id index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
+         update_document_bulk => [ qw(document index|OPTIONAL type|OPTIONAL hash|OPTIONAL id|OPTIONAL) ],
+         bulk_flush => [ qw(index|OPTIONAL) ],
          query => [ qw($query_hash index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
          count => [ qw(index|OPTIONAL type|OPTIONAL) ],
          get_from_id => [ qw(id index|OPTIONAL type|OPTIONAL) ],
@@ -72,12 +82,13 @@ sub brik_properties {
          delete_index => [ qw(index|indices_list) ],
          update_alias => [ qw(new_index alias) ],
          delete_document => [ qw(index type id) ],
-         delete_by_query => [ qw($query_hash index type) ],
+         delete_by_query => [ qw($query_hash index type proceed|OPTIONAL) ],
          show_indices => [ qw(string_filter|OPTIONAL) ],
          show_nodes => [ ],
          show_health => [ ],
          show_recovery => [ ],
-         list_indices => [ ],
+         show_allocation => [ ],
+         list_indices => [ qw(regex|OPTIONAL) ],
          get_indices => [ ],
          get_index => [ qw(index|indices_list) ],
          list_index_types => [ qw(index) ],
@@ -102,8 +113,13 @@ sub brik_properties {
          update_template_from_json_file => [ qw(file) ],
          get_settings => [ qw(index|indices_list|OPTIONAL name|names_list|OPTIONAL) ],
          put_settings => [ qw(settings_hash index|indices_list|OPTIONAL) ],
+         set_index_readonly => [ qw(index|indices_list boolean|OPTIONAL) ],
+         reset_index_readonly => [ qw(index|indices_list|OPTIONAL) ],
+         list_index_readonly => [ ],
          set_index_number_of_replicas => [ qw(index|indices_list number) ],
          set_index_refresh_interval => [ qw(index|indices_list number) ],
+         get_index_settings => [ qw(index|indices_list) ],
+         get_index_readonly => [ qw(index|indices_list) ],
          get_index_number_of_replicas => [ qw(index|indices) ],
          get_index_refresh_interval => [ qw(index|indices_list) ],
          get_index_number_of_shards => [ qw(index|indices_list) ],
@@ -113,8 +129,9 @@ sub brik_properties {
          is_document_exists => [ qw(index type document) ],
          parse_error_string => [ qw(string) ],
          refresh_index => [ qw(index) ],
-         export_as_csv => [ qw(index size|OPTIONAL) ],
-         import_from_csv => [ qw(input_csv index|OPTIONAL type|OPTIONAL hash|OPTIONAL cb|OPTIONAL) ],
+         export_as_csv => [ qw(index size|OPTIONAL callback|OPTIONAL) ],
+         import_from_csv => [ qw(input_csv index|OPTIONAL type|OPTIONAL hash|OPTIONAL callback|OPTIONAL) ],
+         import_from_csv_worker => [ qw(input_csv index|OPTIONAL type|OPTIONAL hash|OPTIONAL callback|OPTIONAL) ],
          get_stats_process => [ ],
          get_process => [ ],
          get_cluster_state => [ ],
@@ -161,6 +178,7 @@ sub brik_properties {
          'Metabrik::File::Json' => [ ],
          'Metabrik::File::Dump' => [ ],
          'Metabrik::Format::Number' => [ ],
+         'Metabrik::Worker::Parallel' => [ ],
          'Search::Elasticsearch' => [ ],
       },
    };
@@ -198,7 +216,7 @@ sub open {
    my $timeout = $self->rtimeout;
 
    my $nodes_str = join('|', @$nodes);
-   $self->log->verbose("open: using nodes [$nodes_str]");
+   $self->log->debug("open: using nodes [$nodes_str]");
 
    #
    # Timeout description here:
@@ -218,6 +236,7 @@ sub open {
       dead_timeout => 120,  # seconds, detault 60
       max_dead_timeout => 3600,  # seconds, default 3600
       sniff_request_timeout => 15, # seconds, default 2
+      #trace_to => 'Stderr',  # For debug purposes
    );
    if (! defined($es)) {
       return $self->log->error("open: failed");
@@ -245,6 +264,14 @@ sub open_bulk_mode {
    my %args = (
       index => $index,
       type => $type,
+      on_error => sub {
+         #my ($action, $response, $i) = @_;
+
+         #print Data::Dumper::Dumper($action)."\n";
+         #print Data::Dumper::Dumper($response)."\n";
+         #print Data::Dumper::Dumper($i)."\n";
+         print Data::Dumper::Dumper(\@_)."\n";
+      },
    );
 
    if ($self->use_bulk_autoflush) {
@@ -270,9 +297,13 @@ sub open_bulk_mode {
       $self->log->info("open_bulk_mode: opening without automatic flushing");
    }
 
-   my $bulk = $es->bulk_helper(%args);
-   if (! defined($bulk)) {
-      return $self->log->error("open_bulk_mode: failed");
+   my $bulk;
+   eval {
+      $bulk = $es->bulk_helper(%args);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("open_bulk_mode: failed: [$@]");
    }
 
    $self->_bulk($bulk);
@@ -297,13 +328,17 @@ sub open_scroll_scan_mode {
    $self->brik_help_run_undef_arg('open_scroll_scan_mode', $index) or return;
    $self->brik_help_run_undef_arg('open_scroll_scan_mode', $size) or return;
 
-   my $scroll = $es->scroll_helper(
-      index => $index,
-      search_type => 'scan',
-      size => $size,
-   );
-   if (! defined($scroll)) {
-      return $self->log->error("open_scroll_scan_mode: failed");
+   my $scroll;
+   eval {
+      $scroll = $es->scroll_helper(
+         index => $index,
+         search_type => 'scan',
+         size => $size,
+      );
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("open_scroll_scan_mode: failed: $@");
    }
 
    $self->_scroll($scroll);
@@ -350,14 +385,18 @@ sub open_scroll {
    #
    # https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html
    #
-   my $scroll = $es->scroll_helper(%args);
-   if (! defined($scroll)) {
-      return $self->log->error("open_scroll: failed");
+   my $scroll;
+   eval {
+      $scroll = $es->scroll_helper(%args);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("open_scroll: failed: $@");
    }
 
    $self->_scroll($scroll);
 
-   $self->log->info("open_scroll: opened with size [$size] and timeout [${timeout}s]");
+   $self->log->verbose("open_scroll: opened with size [$size] and timeout [${timeout}s]");
 
    return $self->nodes;
 }
@@ -469,6 +508,179 @@ sub index_document {
 }
 
 #
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-reindex.html
+#
+sub reindex {
+   my $self = shift;
+   my ($index, $new, $type) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('reindex', $index) or return;
+   $self->brik_help_run_undef_arg('reindex', $new) or return;
+
+   my %args = (
+      body => {
+         conflicts => 'proceed',
+         source => { index => $index },
+         dest => { index => $new },
+      },
+      wait_for_completion => 'false',  # Immediately return the task.
+   );
+
+   # Change the type for destination doc
+   if (defined($type)) {
+      $args{body}{dest}{type} = $type;
+   }
+
+   my $r;
+   eval {
+      $r = $es->reindex(%args);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("reindex: reindex failed for index [$index]: [$@]");
+   }
+
+   return $r;
+}
+
+#
+# List reindex tasks
+#
+# curl -X GET "localhost:9200/_tasks?detailed=true&actions=*reindex" | jq .
+#
+# Cancel reindex task
+#
+# curl -X POST "localhost:9200/_tasks/7VelPnOxQm21HtuJNFUAvQ:120914725/_cancel" | jq .
+#
+
+#
+# Search::Elasticsearch::Client::6_0::Direct::Tasks
+#
+sub get_reindex_tasks {
+   my $self = shift;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+
+   my $t = $es->tasks;
+
+   my $list = $t->list;
+   my $nodes = $list->{nodes};
+   if (! defined($nodes)) {
+      return $self->log->error("get_reindex_tasks: no nodes found");
+   }
+
+   my %tasks = ();
+   for my $node (keys %$nodes) {
+      for my $id (keys %{$nodes->{$node}}) {
+         my $tasks = $nodes->{$node}{tasks};
+         for my $task (keys %$tasks) {
+            my $action = $tasks->{$task}{action};
+            if ($action eq 'indices:data/write/reindex' && !exists($tasks{$task})) {
+               $tasks{$task} = $tasks->{$task};
+            }
+         }
+      }
+   }
+
+   return \%tasks;
+}
+
+sub cancel_reindex_task {
+   my $self = shift;
+   my ($id) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('cancel_reindex_task', $id) or return;
+
+   my $t = $es->tasks;
+
+   return $t->cancel(task_id => $id);
+}
+
+sub get_taskid {
+   my $self = shift;
+   my ($id) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('get_taskid', $id) or return;
+
+   my $t = $es->tasks;
+
+   return $t->get(task_id => $id);
+}
+
+sub show_reindex_progress {
+   my $self = shift;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+
+   my $tasks = $self->get_reindex_tasks or return;
+   if (! keys %$tasks) {
+      $self->log->info("show_reindex_progress: no reindex task in progress");
+      return 0;
+   }
+
+   for my $id (keys %$tasks) {
+      my $task = $self->get_taskid($id) or next;
+
+      my $status = $task->{task}{status};
+      my $desc = $task->{task}{description};
+      my $total = $status->{total};
+      my $created = $status->{created};
+      my $deleted = $status->{deleted};
+      my $updated = $status->{updated};
+
+      my $perc = ($created + $deleted + $updated) / $total * 100;
+
+      printf("> Task [%s]: %.02f%%\n", $desc, $perc);
+      print "created[$created] deleted[$deleted] updated[$updated] total[$total]\n";
+   }
+
+   return 1;
+}
+
+sub loop_show_reindex_progress {
+   my $self = shift;
+   my ($sec) = @_;
+
+   $sec ||= 60;
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+
+   while (1) {
+      $self->show_reindex_progress or return;
+      sleep($sec);
+   }
+
+   return 1;
+}
+
+sub reindex_with_mapping_from_json_file {
+   my $self = shift;
+   my ($index, $new, $file) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('reindex_with_mapping_from_json_file', $index)
+      or return;
+   $self->brik_help_run_undef_arg('reindex_with_mapping_from_json_file', $new) or return;
+   $self->brik_help_run_undef_arg('reindex_with_mapping_from_json_file', $file) or return;
+   $self->brik_help_run_file_not_found('reindex_with_mapping_from_json_file', $file)
+      or return;
+
+   my $fj = Metabrik::File::Json->new_from_brik_init($self) or return;
+   my $json = $fj->read($file) or return;
+
+   return $self->reindex($index, $new, $json);
+}
+
+#
 # Search::Elasticsearch::Client::5_0::Direct
 #
 sub update_document {
@@ -558,8 +770,117 @@ sub index_bulk {
    return $r;
 }
 
+#
+# Allows to index multiple docs at one time
+# $bulk->index({ source => $doc1 }, { source => $doc2 }, ...);
+#
+sub index_bulk_from_list {
+   my $self = shift;
+   my ($list, $index, $type, $hash) = @_;
+
+   my $bulk = $self->_bulk;
+   $index ||= $self->index;
+   $type ||= $self->type;
+   $self->brik_help_run_undef_arg('open_bulk_mode', $bulk) or return;
+   $self->brik_help_run_undef_arg('index_bulk_from_list', $list) or return;
+   $self->brik_help_run_invalid_arg('index_bulk_from_list', $list, 'ARRAY') or return;
+   $self->brik_help_run_empty_array_arg('index_bulk_from_list', $list) or return;
+   $self->brik_help_set_undef_arg('index', $index) or return;
+   $self->brik_help_set_undef_arg('type', $type) or return;
+
+   if (defined($hash)) {
+      $self->brik_help_run_invalid_arg('index_bulk_from_list', $hash, 'HASH') or return;
+   }
+
+   my @args = ();
+   for my $doc (@$list) {
+      my %args = (
+         source => $doc,
+      );
+      if (defined($hash)) {
+         %args = ( %args, %$hash );
+      }
+      push @args, \%args;
+   }
+
+   my $r;
+   eval {
+      $r = $bulk->index(@args);
+   };
+   if ($@) {
+      chomp($@);
+      my $p = $self->parse_error_string($@);
+      if (defined($p) && exists($p->{class})) {
+         my $class = $p->{class};
+         my $code = $p->{code};
+         my $node = $p->{node};
+         return $self->log->error("index_bulk: failed for index [$index] with error ".
+            "[$class] code [$code] for node [$node]");
+      }
+      else {
+         return $self->log->error("index_bulk: index failed for index [$index]: [$@]");
+      }
+   }
+
+   return $r;
+}
+
+sub update_document_bulk {
+   my $self = shift;
+   my ($doc, $index, $type, $hash, $id) = @_;
+
+   my $bulk = $self->_bulk;
+   $index ||= $self->index;
+   $type ||= $self->type;
+   $self->brik_help_run_undef_arg('open_bulk_mode', $bulk) or return;
+   $self->brik_help_run_undef_arg('update_document_bulk', $doc) or return;
+   $self->brik_help_set_undef_arg('index', $index) or return;
+   $self->brik_help_set_undef_arg('type', $type) or return;
+
+   my %args = (
+      index => $index,
+      type => $type,
+      doc => $doc,
+   );
+   if (defined($id)) {
+      $args{id} = $id;
+   }
+
+   if (defined($hash)) {
+      $self->brik_help_run_invalid_arg('update_document_bulk', $hash, 'HASH') or return;
+      %args = ( %args, %$hash );
+   }
+
+   my $r;
+   eval {
+      $r = $bulk->update(\%args);
+   };
+   if ($@) {
+      chomp($@);
+      my $p = $self->parse_error_string($@);
+      if (defined($p) && exists($p->{class})) {
+         my $class = $p->{class};
+         my $code = $p->{code};
+         my $node = $p->{node};
+         return $self->log->error("update_document_bulk: failed for index [$index] ".
+            "with error [$class] code [$code] for node [$node]");
+      }
+      else {
+         return $self->log->error("update_document_bulk: index failed for ".
+            "index [$index]: [$@]");
+      }
+   }
+
+   return $r;
+}
+
+#
+# We may have to call refresh_index after a bulk_flush, so we give an additional 
+# optional Argument for given index.
+#
 sub bulk_flush {
    my $self = shift;
+   my ($index) = @_;
 
    my $bulk = $self->_bulk;
    $self->brik_help_run_undef_arg('open_bulk_mode', $bulk) or return;
@@ -591,6 +912,10 @@ RETRY:
                "[$@]");
       sleep 10;
       goto RETRY;
+   }
+
+   if (defined($index)) {
+      $self->refresh_index($index);
    }
 
    return $r;
@@ -845,7 +1170,7 @@ sub delete_document {
 #
 sub delete_by_query {
    my $self = shift;
-   my ($query, $index, $type) = @_;
+   my ($query, $index, $type, $proceed) = @_;
 
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
@@ -861,6 +1186,10 @@ sub delete_by_query {
       type => $type,
       body => $query,
    );
+
+   if (defined($proceed) && $proceed) {
+      $args{conflicts} = 'proceed';
+   }
 
    my $r;
    eval {
@@ -879,6 +1208,8 @@ sub delete_by_query {
 
 #
 # Search::Elasticsearch::Client::2_0::Direct::Cat
+#
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html
 #
 sub show_indices {
    my $self = shift;
@@ -996,14 +1327,49 @@ sub show_recovery {
    return \@lines;
 }
 
+#
+# curl -s 'localhost:9200/_cat/allocation?v'
+#
+sub show_allocation {
+   my $self = shift;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+
+   my $r;
+   eval {
+      $r = $es->cat->allocation;
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("show_allocation: failed: [$@]");
+   }
+
+   my @lines = split(/\n/, $r);
+
+   if (@lines == 0) {
+      $self->log->warning("show_allocation: nothing returned, no index?");
+   }
+
+   return \@lines;
+}
+
 sub list_indices {
    my $self = shift;
+   my ($regex) = @_;
 
    my $get = $self->get_indices or return;
 
    my @indices = ();
    for (@$get) {
-      push @indices, $_->{index};
+      if (defined($regex)) {
+         if ($_->{index} =~ m{$regex}) {
+            push @indices, $_->{index};
+         }
+      }
+      else {
+         push @indices, $_->{index};
+      }
    }
 
    return [ sort { $a cmp $b } @indices ];
@@ -1454,7 +1820,8 @@ sub create_index_with_mappings {
    $self->brik_help_run_undef_arg('open', $es) or return;
    $self->brik_help_run_undef_arg('create_index_with_mappings', $index) or return;
    $self->brik_help_run_undef_arg('create_index_with_mappings', $mappings) or return;
-   $self->brik_help_run_invalid_arg('create_index_with_mappings', $mappings, 'HASH') or return;
+   $self->brik_help_run_invalid_arg('create_index_with_mappings', $mappings, 'HASH')
+      or return;
 
    my $r;
    eval {
@@ -1467,7 +1834,8 @@ sub create_index_with_mappings {
    };
    if ($@) {
       chomp($@);
-      return $self->log->error("create_index_with_mappings: create failed for index [$index]: [$@]");
+      return $self->log->error("create_index_with_mappings: create failed for ".
+         "index [$index]: [$@]");
    }
 
    return $r;
@@ -1596,16 +1964,17 @@ sub put_template_from_json_file {
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
    $self->brik_help_run_undef_arg('put_template_from_json_file', $json_file) or return;
-   $self->brik_help_run_file_not_found('put_template_from_json_file', $json_file) or return;
+   $self->brik_help_run_file_not_found('put_template_from_json_file', $json_file)
+      or return;
 
    my $fj = Metabrik::File::Json->new_from_brik_init($self) or return;
    my $data = $fj->read($json_file) or return;
 
-   if (! exists($data->{template})) {
+   if (! exists($data->{template}) && ! exists($data->{index_patterns})) {
       return $self->log->error("put_template_from_json_file: no template name found");
    }
 
-   my $name = $data->{template};
+   my $name = $data->{template} || $data->{index_patterns};
 
    return $self->put_template($name, $data);
 }
@@ -1617,16 +1986,17 @@ sub update_template_from_json_file {
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
    $self->brik_help_run_undef_arg('update_template_from_json_file', $json_file) or return;
-   $self->brik_help_run_file_not_found('update_template_from_json_file', $json_file) or return;
+   $self->brik_help_run_file_not_found('update_template_from_json_file', $json_file)
+      or return;
 
    my $fj = Metabrik::File::Json->new_from_brik_init($self) or return;
    my $data = $fj->read($json_file) or return;
 
-   if (! exists($data->{template})) {
+   if (! exists($data->{template}) && ! exists($data->{index_patterns})) {
       return $self->log->error("put_template_from_json_file: no template name found");
    }
 
-   my $name = $data->{template};
+   my $name = $data->{template} || $data->{index_patterns};
 
    $self->delete_template($name);  # We ignore errors, template may not exist.
 
@@ -1711,6 +2081,110 @@ sub put_settings {
    return $r;
 }
 
+sub set_index_readonly {
+   my $self = shift;
+   my ($indices, $bool) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('set_index_readonly', $indices) or return;
+   $self->brik_help_run_invalid_arg('set_index_readonly', $indices, 'ARRAY', 'SCALAR')
+      or return;
+
+   if (! defined($bool)) {
+      $bool = 'true';
+   }
+   else {
+      $bool = $bool ? 'true' : 'false';
+   }
+
+   my $settings = {
+      'blocks.read_only' => $bool,
+      'blocks.read_only_allow_delete' => 'true',
+   };
+
+   return $self->put_settings($settings, $indices);
+}
+
+#
+# curl -XPUT -H "Content-Type: application/json" http://localhost:9200/_all/_settings -d '{"index.blocks.read_only_allow_delete": null}'
+# PUT synscan-2018-05/_settings
+# {
+#  "index": {
+#    "blocks":{
+#      "read_only":"false",
+#      "read_only_allow_delete":"true"
+#    }
+#  }
+#}
+#
+#
+# If it fails with the following error:
+#
+# [2018-09-12T13:38:40,012][INFO ][logstash.outputs.elasticsearch] retrying failed action with response code: 403 ({"type"=>"cluster_block_exception", "reason"=>"blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];"})
+#
+# Use Kibana dev console and copy/paste both requests:
+#
+# PUT _settings
+# {
+#    "index": {
+#       "blocks": {
+#          "read_only_allow_delete": "false"
+#       }
+#    }
+# }
+#    
+# PUT _all/_settings
+# {
+#    "index": {
+#       "blocks": {
+#          "read_only_allow_delete": "false"
+#       }
+#    }
+# }
+#
+sub reset_index_readonly {
+   my $self = shift;
+   my ($indices) = @_;
+
+   $indices ||= '*';
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_invalid_arg('reset_index_readonly', $indices, 'ARRAY', 'SCALAR')
+      or return;
+
+   my $settings = {
+      'blocks.read_only_allow_delete' => 'false',
+   };
+
+   my $r = $self->put_settings($settings);
+   $self->log->info(Data::Dumper::Dumper($r));
+
+   $r = $self->put_settings($settings, $indices);
+   $self->log->info(Data::Dumper::Dumper($r));
+
+   return 1;
+}
+
+sub list_index_readonly {
+   my $self = shift;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+
+   my $list = $self->list_indices or return;
+
+   my @indices = ();
+   for my $this (@$list) {
+      my $ro = $self->get_index_readonly($this) or next;
+      if (defined($ro->{index}{provided_name})) {
+         push @indices, $ro->{index}{provided_name};
+      }
+   }
+
+   return \@indices;
+}
+
 sub set_index_number_of_replicas {
    my $self = shift;
    my ($indices, $number) = @_;
@@ -1745,6 +2219,47 @@ sub set_index_refresh_interval {
    my $settings = { refresh_interval => $number };
 
    return $self->put_settings($settings, $indices);
+}
+
+sub get_index_settings {
+   my $self = shift;
+   my ($indices) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('get_index_settings', $indices) or return;
+   $self->brik_help_run_invalid_arg('get_index_settings', $indices, 'ARRAY', 'SCALAR')
+      or return;
+
+   my $settings = $self->get_settings($indices);
+
+   my %indices = ();
+   for (keys %$settings) {
+      $indices{$_} = $settings->{$_}{settings};
+   }
+
+   return \%indices;
+}
+
+sub get_index_readonly {
+   my $self = shift;
+   my ($indices) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('get_index_readonly', $indices) or return;
+   $self->brik_help_run_invalid_arg('get_index_readonly', $indices, 'ARRAY', 'SCALAR')
+      or return;
+
+   my $settings = $self->get_settings($indices);
+
+   my %indices = ();
+   for (keys %$settings) {
+      #$indices{$_} = $settings->{$_}{settings}{index}{'blocks_write'};
+      $indices{$_} = $settings->{$_}{settings};
+   }
+
+   return \%indices;
 }
 
 sub get_index_number_of_replicas {
@@ -1999,7 +2514,7 @@ RETRY:
 
 sub export_as_csv {
    my $self = shift;
-   my ($index, $size) = @_;
+   my ($index, $size, $cb) = @_;
 
    $size ||= 10_000;
    my $es = $self->_es;
@@ -2008,6 +2523,9 @@ sub export_as_csv {
    $self->brik_help_run_undef_arg('export_as_csv', $size) or return;
 
    my $max = $self->max;
+   my $datadir = $self->datadir;
+
+   $self->log->debug("export_as_csv: selecting scroll Command...");
 
    my $scroll;
    my $version = $self->version or return;
@@ -2018,6 +2536,8 @@ sub export_as_csv {
       $scroll = $self->open_scroll($index, $size) or return;
    }
 
+   $self->log->debug("export_as_csv: selecting scroll Command...OK.");
+
    my $fd = Metabrik::File::Dump->new_from_brik_init($self) or return;
 
    my $fc = Metabrik::File::Csv->new_from_brik_init($self) or return;
@@ -2027,8 +2547,18 @@ sub export_as_csv {
    $fc->first_line_is_header(0);
    $fc->write_header(1);
    $fc->use_quoting(1);
-   $fc->encoded_fields($self->csv_encoded_fields);
-   $fc->object_fields($self->csv_object_fields);
+   if (defined($self->csv_header)) {
+      my $sorted = [ sort { $a cmp $b } @{$self->csv_header} ];
+      $fc->header($sorted);
+   }
+   if (defined($self->csv_encoded_fields)) {
+      $fc->encoded_fields($self->csv_encoded_fields);
+   }
+   if (defined($self->csv_object_fields)) {
+      $fc->object_fields($self->csv_object_fields);
+   }
+
+   my $csv_header = $fc->header;
 
    my $total = $self->total_scroll;
    $self->log->info("export_as_csv: total [$total] for index [$index]");
@@ -2038,25 +2568,38 @@ sub export_as_csv {
    my $skipped = 0;
    my $exported = 0;
    my $start = time();
-   my $done = "$index.exported";
+   my $done = $datadir."/$index.exported";
    my $start_time = time();
    my %chunk = ();
    while (my $next = $self->next_scroll(10000)) {
       for my $this (@$next) {
          $read++;
+
+         if (defined($cb)) {
+            $this = $cb->($this);
+            if (! defined($this)) {
+               $self->log->error("export_as_csv: callback failed for index [$index] ".
+                  "at read [$read], skipping single entry");
+               $skipped++;
+               next;
+            }
+         }
+
          my $id = $this->{_id};
          my $doc = $this->{_source};
          my $type = $this->{_type} || 'doc';  # Prepare for when types will be removed from ES
          if (! exists($types{$type})) {
-            my $fields = $self->list_index_fields($index, $type) or return;
-            #$types{$type}{header} = [ '_id', sort { $a cmp $b } keys %$doc ];
-            $types{$type}{header} = [ '_id', @$fields ];
-            if ($type ne 'doc') {
-               $types{$type}{output} = "$index:$type.csv";
+            # If not given, we guess the CSV fields to use.
+            if (! defined($csv_header)) {
+               my $fields = $self->list_index_fields($index, $type) or return;
+               #$types{$type}{header} = [ '_id', sort { $a cmp $b } keys %$doc ];
+               $types{$type}{header} = [ '_id', @$fields ];
             }
             else {
-               $types{$type}{output} = "$index.csv";
+               $types{$type}{header} = [ '_id', @$csv_header ];
             }
+
+            $types{$type}{output} = $datadir."/$index:$type.csv";
 
             # Verify it has not been exported yet
             if (-f $done) {
@@ -2105,10 +2648,12 @@ sub export_as_csv {
       }
    }
 
-   # Process remaining data waiting to be written
+   # Process remaining data waiting to be written and build output file list
+   my %files = ();
    for my $type (keys %types) {
       if (@{$chunk{$type}} > 0) {
          $fc->write($chunk{$type}, $types{$type}{output});
+         $files{$types{$type}{output}}++;
       }
    }
 
@@ -2129,10 +2674,13 @@ sub export_as_csv {
       complete => ($exported == $total) ? 1 : 0,
       duration => $duration,
       eps => $eps, 
+      files => [ sort { $a cmp $b } keys %files ],
    };
 
    # Say the file has been processed, and put resulting stats.
    $fd->write($result, $done) or return;
+
+   $self->log->info("export_as_csv: done.");
 
    return $result;
 }
@@ -2244,7 +2792,16 @@ sub import_from_csv {
          }
       }
 
-      my $r = $self->index_bulk($h, $index, $type, $hash, $id);
+      #$self->log->info(Data::Dumper::Dumper($h));
+
+      my $r;
+      eval {
+         $r = $self->index_bulk($h, $index, $type, $hash, $id);
+      };
+      if ($@) {
+         chomp($@);
+         $self->log->warning("import_from_csv: error [$@]");
+      }
       if (! defined($r)) {
          $self->log->error("import_from_csv: bulk processing failed for index [$index] ".
             "at read [$read], skipping chunk");
@@ -2289,12 +2846,253 @@ sub import_from_csv {
 
    my $stop_time = time();
    my $duration = $stop_time - $start_time;
-   my $eps = $imported / ($duration || 1);  # Avoid divide by zero error.
+   my $eps = sprintf("%.02f", $imported / ($duration || 1)); # Avoid divide by zero error.
 
    $self->refresh_index($index);
 
    my $count_current = $self->count($index, $type) or return;
-   $self->log->info("import_from_csv: after index [$index] count is [$count_current]");
+   $self->log->info("import_from_csv: after index [$index] count is [$count_current] ".
+      "at EPS [$eps]");
+
+   my $skipped = 0;
+   my $complete = (($count_current - $count_before) == $read) ? 1 : 0;
+   if ($complete) {  # If complete, import has been retried, and everything is now ok.
+      $imported = $read;
+   }
+   else {
+      $skipped = $read - ($count_current - $count_before);
+   }
+
+   my $result = {
+      read => $read,
+      imported => $imported,
+      skipped => $skipped,
+      previous_count => $count_before,
+      current_count => $count_current,
+      complete => $complete,
+      duration => $duration,
+      eps => $eps,
+   };
+
+   # Say the file has been processed, and put resulting stats.
+   $fd->write($result, $done) or return;
+
+   # Restore previous settings, if any
+   if (defined($refresh_interval)) {
+      $self->set_index_refresh_interval($index, $refresh_interval);
+   }
+   if (defined($number_of_replicas) && $self->use_indexing_optimizations) {
+      $self->set_index_number_of_replicas($index, $number_of_replicas);
+   }
+
+   return $result;
+}
+
+#
+# Same as import_from_csv Command but in worker mode for speed.
+#
+sub import_from_csv_worker {
+   my $self = shift;
+   my ($input_csv, $index, $type, $hash, $cb) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('import_from_csv_worker', $input_csv) or return;
+   $self->brik_help_run_file_not_found('import_from_csv_worker', $input_csv) or return;
+
+   # If index and/or types are not defined, we try to get them from input filename
+   if (! defined($index) || ! defined($type)) {
+      # Example: index-DATE:type.csv
+      if ($input_csv =~ m{^(.+):(.+)\.csv(?:.*)?$}) {
+         my ($this_index, $this_type) = $input_csv =~ m{^(.+):(.+)\.csv(?:.*)?$};
+         $index ||= $this_index;
+         $type ||= $this_type;
+      }
+   }
+
+   # Verify it has not been indexed yet
+   my $done = "$input_csv.imported";
+   if (-f $done) {
+      $self->log->info("import_from_csv_worker: import already done for ".
+         "file [$input_csv]");
+      return 0;
+   }
+
+   # And default to Attributes if guess failed.
+   $index ||= $self->index;
+   $type ||= $self->type;
+   $self->brik_help_set_undef_arg('index', $index) or return;
+   $self->brik_help_set_undef_arg('type', $type) or return;
+
+   if ($index eq '*') {
+      return $self->log->error("import_from_csv_worker: cannot import to invalid ".
+         "index [$index]");
+   }
+   if ($type eq '*') {
+      return $self->log->error("import_from_csv_worker: cannot import to invalid ".
+         "type [$type]");
+   }
+
+   $self->log->debug("input [$input_csv]");
+   $self->log->debug("index [$index]");
+   $self->log->debug("type [$type]");
+
+   my $count_before = 0;
+   if ($self->is_index_exists($index)) {
+      $count_before = $self->count($index, $type);
+      if (! defined($count_before)) {
+         return;
+      }
+      $self->log->info("import_from_csv_worker: current index [$index] count is ".
+         "[$count_before]");
+   }
+
+   my $max = $self->max;
+
+   $self->open_bulk_mode($index, $type) or return;
+
+   #my $batch = undef;
+   my $batch = 10_000;
+
+   $self->log->info("import_from_csv_worker: importing file [$input_csv] to ".
+      "index [$index] with type [$type] and batch [$batch]");
+
+   my $fd = Metabrik::File::Dump->new_from_brik_init($self) or return;
+
+   my $fc = Metabrik::File::Csv->new_from_brik_init($self) or return;
+   $fc->separator(',');
+   $fc->escape('\\');
+   $fc->first_line_is_header(1);
+   $fc->encoded_fields($self->csv_encoded_fields);
+   $fc->object_fields($self->csv_object_fields);
+
+   my $wp = Metabrik::Worker::Parallel->new_from_brik_init($self) or return;
+   $wp->pool_size(2);
+
+   $wp->create_manager or return;
+
+   my $refresh_interval;
+   my $number_of_replicas;
+   my $start = time();
+   my $speed_settings = {};
+   my $imported = 0;
+   my $first = 1;
+   my $read = 0;
+   my $skipped_chunks = 0;
+   my $start_time = time();
+   while (my $list = $fc->read_next($input_csv, $batch)) {
+
+      $wp->start(sub {
+         my @list = ();
+         for my $this (@$list) {
+            $read++;
+
+            my $h = {};
+            my $id = $this->{_id};
+            delete $this->{_id};
+            for my $k (keys %$this) {
+               my $value = $this->{$k};
+               # We keep only fields when they have a value.
+               # No need to index data that is empty.
+               if (defined($value) && length($value)) {
+                  $h->{$k} = $value;
+               }
+            }
+
+            if (defined($cb)) {
+               $h = $cb->($h);
+               if (! defined($h)) {
+                  $self->log->error("import_from_csv_worker: callback failed for ".
+                     "index [$index] at read [$read], skipping single entry");
+                  $skipped_chunks++;
+                  next;
+               }
+            }
+
+            push @list, $h;
+         }
+
+         my $r;
+         eval {
+            $r = $self->index_bulk_from_list(\@list, $index, $type, $hash);
+         };
+         if ($@) {
+            chomp($@);
+            $self->log->warning("import_from_csv_worker: error [$@]");
+         }
+         if (! defined($r)) {
+            $self->log->error("import_from_csv_worker: bulk processing failed for ".
+               "index [$index] at read [$read], skipping chunk");
+            $skipped_chunks++;
+            next;
+         }
+
+         # Log a status sometimes.
+         if (! ($imported % 10_000)) {
+            my $now = time();
+            my $diff = sprintf("%.02f", $now - $start);
+            my $eps = sprintf("%.02f", $imported / $diff);
+            $self->log->info("import_from_csv_worker: imported [$imported] entries ".
+               "in [$diff] second(s) to index [$index] at EPS [$eps]");
+            $start = time();
+         }
+
+         exit(0);
+      });
+
+      # Gather index settings, and set values for speed.
+      # We don't do it earlier, cause we need index to be created,
+      # and it should have been done from index_bulk Command.
+      if ($first && $self->is_index_exists($index)) {
+         # Save current values so we can restore them at the end of Command.
+         # We ignore errors here, this is non-blocking for indexing.
+         $refresh_interval = $self->get_index_refresh_interval($index);
+         $refresh_interval = $refresh_interval->{$index};
+         $number_of_replicas = $self->get_index_number_of_replicas($index);
+         $number_of_replicas = $number_of_replicas->{$index};
+         if ($self->use_indexing_optimizations) {
+            $self->set_index_number_of_replicas($index, 0);
+         }
+         $self->set_index_refresh_interval($index, -1);
+         $first = 0;
+      }
+
+      # Log a status sometimes.
+      #$imported += @$list;
+      #if (! ($imported % 10_000)) {
+         #my $now = time();
+         #my $diff = sprintf("%.02f", $now - $start);
+         #my $eps = sprintf("%.02f", 10_000 / $diff);
+         #$self->log->info("import_from_csv_worker: imported [$imported] entries ".
+            #"in [$diff] second(s) to index [$index] at EPS [$eps]");
+         #$start = time();
+      #}
+
+      # Limit import to specified maximum
+      if ($max > 0 && $imported >= $max) {
+         $self->log->info("import_from_csv_worker: max import reached [$imported] for ".
+            "index [$index], stopping");
+         last;
+      }
+
+      last if (@$list < $batch);
+
+      $imported += @$list;
+   }
+
+   $wp->stop;
+
+   $self->bulk_flush;
+
+   my $stop_time = time();
+   my $duration = $stop_time - $start_time;
+   my $eps = sprintf("%.02f", $imported / ($duration || 1)); # Avoid divide by zero error.
+
+   $self->refresh_index($index);
+
+   my $count_current = $self->count($index, $type) or return;
+   $self->log->info("import_from_csv_worker: after index [$index] count ".
+      "is [$count_current] at EPS [$eps]");
 
    my $skipped = 0;
    my $complete = (($count_current - $count_before) == $read) ? 1 : 0;

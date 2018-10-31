@@ -14,7 +14,7 @@ our %EXPORT_TAGS = (
 	utility => [ qw(log10 log2 copysign flipsign
 			sign floor ceil fsum
 			gcd hcf lcm moduli) ],
-	polynomial => [ qw(pl_evaluate pl_dxevaluate
+	polynomial => [ qw(pl_evaluate pl_dxevaluate pl_translate
 			pl_add pl_sub pl_div pl_mult
 			pl_derivative pl_antiderivative) ],
 );
@@ -25,7 +25,12 @@ our @EXPORT_OK = (
 	@{ $EXPORT_TAGS{polynomial} },
 );
 
-our $VERSION = '1.12';
+#
+# Add an :all tag automatically.
+#
+$EXPORT_TAGS{all} = [@EXPORT_OK];
+
+our $VERSION = '1.13';
 
 =head1 NAME
 
@@ -65,6 +70,12 @@ Math::Utils - Useful mathematical functions not in Perl.
     #
     $point = floor($goal);
     $limit = ceil($goal);
+
+    #
+    # gcd() and lcm() functions.
+    #
+    $divisor = gcd(@multipliers);
+    $numerator = lcm(@multipliers);
 
     #
     # Safe(r) summation.
@@ -378,7 +389,7 @@ sub gcd
 
 =head3 lcm
 
-Return the greatest common divisor of a list of integers.
+Return the least common multiple of a list of integers.
 
     $factor = lcm(@values);
 
@@ -625,6 +636,42 @@ sub pl_dxevaluate
 	}
 
 	return ($val, $d1val, $d2val);
+}
+
+=head3 pl_translate()
+
+    $x = [8, 3, 1];
+    $y = [3, 1];
+
+    #
+    # Translating C<x**2 + 3*x + 8> by C<x + 3> returns [26, 9, 1]
+    #
+    $z = pl_translate($x, $y);
+
+Returns a polynomial transformed by substituting a polynomial variable with another polynomial.
+For example, a simple linear translation by 1 to the polynomial C<x**3 + x**2 + 4*x + 4>
+would be accomplished by setting x = (y - 1); resulting in C<x**3 - 2*x**2 + 5*x>.
+
+    $x = [4, 4, 1, 1];
+    $y = [-1, 1];
+    $z = pl_translate($x, $y);         # Becomes [0, 5, -2, 1]
+
+=cut
+
+sub pl_translate
+{
+	my($x, $y) = @_;
+
+	my @x_arr = @$x;
+	my @z = pop @x_arr;
+
+	for my $c (reverse @x_arr)
+	{
+		@z = @{ pl_mult(\@z, $y) };
+		$z[0] += $c;
+	}
+
+	return [@z];
 }
 
 =head3 pl_add()

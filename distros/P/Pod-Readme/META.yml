@@ -3,66 +3,91 @@ abstract: 'Intelligently generate a README file from POD'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
-  Exporter: 0
-  ExtUtils::MakeMaker: 6.59
-  File::Compare: 0
-  File::Temp: 0
-  IO::String: 0
-  Test::Deep: 0
-  Test::Exception: 0
-  Test::More: 0
-  lib: 0
+  Cwd: '0'
+  File::Compare: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::String: '0'
+  Module::Metadata: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::Kit: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.12'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Moo
+  - data-driven
+  - development
+  - testing
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Pod-Readme
-no_index:
-  directory:
-    - inc
-    - t
-    - xt
-recommends:
-  Pod::Man: 0
-  Pod::Markdown: 0
-  Pod::Simple::LaTeX: 0
-  Type::Tiny::XS: 0
+provides:
+  Pod::Readme:
+    file: lib/Pod/Readme.pm
+    version: v1.2.1
+  Pod::Readme::Filter:
+    file: lib/Pod/Readme/Filter.pm
+    version: v1.2.1
+  Pod::Readme::Plugin:
+    file: lib/Pod/Readme/Plugin.pm
+    version: v1.2.1
+  Pod::Readme::Plugin::changes:
+    file: lib/Pod/Readme/Plugin/changes.pm
+    version: v1.2.1
+  Pod::Readme::Plugin::requires:
+    file: lib/Pod/Readme/Plugin/requires.pm
+    version: v1.2.1
+  Pod::Readme::Plugin::version:
+    file: lib/Pod/Readme/Plugin/version.pm
+    version: v1.2.1
+  Pod::Readme::Types:
+    file: lib/Pod/Readme/Types.pm
+    version: v1.2.1
 requires:
   CPAN::Changes: '0.30'
-  CPAN::Meta: 0
-  Carp: 0
-  Class::Method::Modifiers: '2.00'
-  Exporter: 0
-  ExtUtils::MakeMaker: 6.56
-  File::Copy: 0
-  File::Slurp: 0
-  Getopt::Long::Descriptive: 0
-  Hash::Util: 0
-  IO: 0
-  List::Util: 1.33
-  Module::CoreList: 0
-  Module::Load: 0
-  Moo: 1.004005
-  Moo::Role: 0
-  MooX::HandlesVia: 0
-  Path::Tiny: 0.018
-  Pod::Simple: 0
-  Role::Tiny: 0
-  Scalar::Util: 0
-  Try::Tiny: 0
-  Type::Tiny: 0
-  Types::Standard: 0
-  namespace::autoclean: 0
-  perl: 5.10.1
-  version: 0.77
+  CPAN::Meta: '0'
+  Carp: '0'
+  Class::Method::Modifiers: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Copy: '0'
+  File::Slurp: '0'
+  Getopt::Long::Descriptive: '0'
+  Hash::Util: '0'
+  IO: '0'
+  IO::Handle: '0'
+  List::Util: '1.33'
+  Module::CoreList: '0'
+  Module::Load: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::HandlesVia: '0'
+  Path::Tiny: '0'
+  Role::Tiny: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  feature: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.1
 resources:
   bugtracker: https://github.com/bigpresh/Pod-Readme/issues
-  homepage: https://metacpan.org/pod/Pod::Readme
-  license: http://www.perlfoundation.org/artistic_license_2_0
+  homepage: http://search.cpan.org/dist/Pod-Readme
   repository: git://github.com/bigpresh/Pod-Readme.git
-version: '1.001002'
+version: v1.2.1
+x_authority: cpan:RRWO
+x_contributors:
+  - 'David Precious <davidp@preshweb.co.uk>'
+  - 'Karl Williamson <khw@cpan.org>'
+  - 'Robert Rothenberg <rrwo@thermeon.com>'
+  - 'Sergey Romanov <sromanov-dev@yandex.ru>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

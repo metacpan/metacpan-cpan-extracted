@@ -1,5 +1,15 @@
 Revision history for Alien-TidyHTML5
 
+v0.3.0    2018-10-29 21:24:29+00:00 Europe/London
+  [Enhancements]
+  - Improved the alienfile configuration, to fix #1 (Graham Ollis).
+
+  [Incompatabilities]
+  - Renamed "exe_file" to "exe".
+
+  [Bug Fixes]
+  - Undid the check for alternative package names, #2 (Graham Ollis)
+
 v0.2.0    2018-10-28 14:24:32+00:00 Europe/London
   [Enhancements]
   - Look for alternative package names, "tidy5" and "tidy-html5", #1.

@@ -16,9 +16,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Future' => '0.38',
+                                      'Future' => '0.37',
                                       'JSON' => '2.97001',
-                                      'JSON::MaybeXS' => '1.003010',
+                                      'JSON::MaybeXS' => '1.003008',
                                       'Math::BigFloat' => '1.999811',
                                       'Math::BigInt' => '1.999811',
                                       'Mojo::UserAgent' => '0',

@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::linux;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.032';
+our $VERSION = '1.033';
 
 our %Remote = (
     source  => 'http://distrowatch.com/',
@@ -45,6 +45,12 @@ Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2018-10-29 - v1.033
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.052.
 
 =item *
 
@@ -292,7 +298,7 @@ __DATA__
 ThreeCX
 FourMLinux
 Absolute
-AbulEdu
+AIO
 Alpine
 ALT
 Android_x86
@@ -302,7 +308,8 @@ APODIO
 Arch
 ArchBang
 ArchLabs
-ArchStrike
+Archman
+Arco
 Artix
 Arya
 Asianux
@@ -311,8 +318,8 @@ Audiophile
 AUSTRUMI
 AV_Linux
 BackBox
-BackSlash
 Baruwa
+batocera
 BeeFree
 Berry
 Bicom
@@ -326,59 +333,58 @@ BlankOn
 BlueOnyx
 Bluestar
 Bodhi
-BOSS
 BSDRP
 BunsenLabs
+CAELinux
 CAINE
 Calculate
 Canaima
 CentOS
 Chakra
-ChaletOS
-Chapeau
 Clear
 ClearOS
 Clonezilla
 ClonOS
 CloudReady
-Connochaet
+Clu
 Container
 CRUX
 Cucumber
+Daphile
 Debian
 Debian_Edu
 deepin
 DEFT
-Devil
 Devuan
+DietPi
 DragonFly
+Dragora
 DRBL
 DuZeru
 EasyNAS
-Edubuntu
 Elastix
 elementary
 Elive
 Emmabuntus
 Endian
 Endless
+Enso
 Exe
 Exherbo
 ExTiX
 Fatdog64
 Fedora
-feren
-Fermi
+Feren
 FreeBSD
 FreeNAS
 FreePBX
+Freespire
 Frugalware
 FuguIta
 Funtoo
 Gecko
 Gentoo
 GhostBSD
-gNewSense
 GNUstep
 GoboLinux
 GParted
@@ -386,15 +392,16 @@ Greenie
 Grml
 GuixSD
 Haiku
+Hamara
 HardenedBSD
 heads
+Hyperbola
 IPFire
 Kali
 KANOTIX
 KaOS
 Karoshi
 KDE_neon
-Keysoft
 KNOPPIX
 Kodachi
 KolibriOS
@@ -403,14 +410,14 @@ Kubuntu
 Kwort
 KXStudio
 Lakka
-Leeenux
 Legacy
 LFS
 LibreELEC
 LinHES
-LinuxBBQ
+Linspire
 LinuxConsole
 Linuxfx
+Liquid_Lemur
 Lite
 Live_Raizo
 LliureX
@@ -420,7 +427,6 @@ LuninuX
 LXLE
 Mageia
 MakuluLinux
-Mangaka
 Manjaro
 Maui
 MAX
@@ -433,8 +439,7 @@ Mint
 MirOS
 MorpheusArch
 MX_Linux
-Nanolinux
-NAS4Free
+Namib
 Neptune
 NetBSD
 NethServer
@@ -442,10 +447,13 @@ Netrunner
 NexentaStor
 Nitrux
 NixOS
+NomadBSD
 NST
 NuTyX
 OB2D
+Obarun
 OLPC
+Omarine
 Omoikane
 OpenBSD
 OpenELEC
@@ -464,7 +472,6 @@ Parabola
 Pardus
 Pardus_Topluluk
 Parrot
-Parsix
 Parted_Magic
 PCLinuxOS
 Peach_OSI
@@ -474,11 +481,11 @@ Pentoo
 Peppermint
 pfSense
 Photon
+Pinguy
 Pisi
 Plamo
 PLD
 Plop
-PoliArch
 Pop_OS
 Porteus
 Porteus_Kiosk
@@ -501,8 +508,6 @@ Red_Hat
 Redcore
 Refracta
 Rescatux
-Resulinux
-Revenge
 RISC
 Robolinux
 Rocks_Cluster
@@ -514,38 +519,40 @@ Sabayon
 SalentOS
 Salix
 Scientific
+Secure_K
 Securepoint
 SELKS
 Shark
 siduction
 Slackel
 Slackware
+Slax
 SliTaz
 SmartOS
 SME_Server
 Smoothwall
 SMS
+Solaris
 Solus
 SolydXK
-Sonar
 Sophos
 Source_Mage
 SparkyLinux
 Springdale
 Star
 SteamOS
+Stella
 Subgraph
 SuliX
 Super_Grub2
+SuperGamer
 SUSE
 SwagArch
-Swecha
 Swift
 SystemRescue
 T2
 Tails
 TalkingArch
-Tanglu
 TENS
 Thinstation
 Tiny_Core
@@ -556,11 +563,10 @@ Trisquel
 TrueOS
 TurnKey
 tuxtrans
-UberStudent
 UBOS
+UBports
 Ubuntu
 Ubuntu_Budgie
-Ubuntu_DP
 Ubuntu_Kylin
 Ubuntu_MATE
 Ubuntu_Studio
@@ -569,24 +575,24 @@ Ulteo
 Ultimate
 Univention
 Untangle
-URIX
 Uruk
 UTUTO
 Vector
+VenenuX
 Vine
 Vinux
 Void
 Volumio
-VortexBox
 Voyager
 VyOS
-wattOS
 Webconverger
 Whonix
 Wifislax
 WM_Live
+XigmaNAS
 XStreamOS
 Xubuntu
+YunoHost
 Zentyal
 Zenwalk
 Zeroshell

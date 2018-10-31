@@ -1,5 +1,8 @@
 Revision history for Role-REST-Client
 
+0.23    2018-10-30 17:08:06 Europe/Copenhagen
+ - Make sure response has a content type before checking (jjatria)
+
 0.22    2017-06-11 07:54:35 Europe/Copenhagen
 
 0.21    2017-06-07 09:12:43 Europe/Copenhagen

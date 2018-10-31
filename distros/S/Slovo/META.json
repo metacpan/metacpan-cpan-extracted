@@ -36,7 +36,7 @@
             "Class::Method::Modifiers" : "2.12",
             "Cpanel::JSON::XS" : "4.06",
             "Mojo::SQLite" : "3.001",
-            "Mojolicious" : "8.02",
+            "Mojolicious" : "8.04",
             "Mojolicious::Plugin::Authentication" : "1.32",
             "Mojolicious::Plugin::OpenAPI" : "2.00",
             "Mojolicious::Plugin::RoutesConfig" : "0.05",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2018.10.16",
+   "version" : "v2018.10.29",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

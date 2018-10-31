@@ -7,7 +7,6 @@ __PACKAGE__->init();
 
 our %Remote = (
     source => {
-        female => 'http://en.wikipedia.org/wiki/List_of_pornographic_actresses_by_decade',
     },
     extract => sub {
         $_[0] =~ s/<h2>(?:<[^>]*>)?References<.*//s;    # drop everything after references

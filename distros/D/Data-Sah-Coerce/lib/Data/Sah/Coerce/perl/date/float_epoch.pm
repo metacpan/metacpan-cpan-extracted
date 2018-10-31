@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::date::float_epoch;
 
-our $DATE = '2018-06-03'; # DATE
-our $VERSION = '0.026'; # VERSION
+our $DATE = '2018-10-30'; # DATE
+our $VERSION = '0.027'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,6 +12,7 @@ sub meta {
         v => 3,
         enable_by_default => 1,
         prio => 50,
+        precludes => ['float_epoch_always'],
     };
 }
 
@@ -62,7 +63,7 @@ Data::Sah::Coerce::perl::date::float_epoch - Coerce date from number (assumed to
 
 =head1 VERSION
 
-This document describes version 0.026 of Data::Sah::Coerce::perl::date::float_epoch (from Perl distribution Data-Sah-Coerce), released on 2018-06-03.
+This document describes version 0.027 of Data::Sah::Coerce::perl::date::float_epoch (from Perl distribution Data-Sah-Coerce), released on 2018-10-30.
 
 =head1 DESCRIPTION
 
@@ -86,6 +87,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<Data::Sah::Coerce::perl::date::float_epoch_always>
 
 =head1 AUTHOR
 

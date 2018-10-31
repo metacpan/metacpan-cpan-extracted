@@ -13,6 +13,7 @@ use Data::iRealPro::Song;
 sub new {
     my ( $pkg, %args ) = @_;
     my $self = bless { %args }, $pkg;
+    $self->{transpose} //= 0;
     $self->parse( $args{data} ) if $args{data};
     $self->{songs} = [ $args{song} ] if $args{song};
     $self->{songs} = $args{songs} if $args{songs};
@@ -52,6 +53,7 @@ sub parse {
 	      Data::iRealPro::Song->new( variant => $self->{variant},
 					 data    => $_,
 					 debug   => $self->{debug},
+					 transpose => $self->{transpose},
 				       ) );
         };
 	warn("$@: $_\n") if $@;

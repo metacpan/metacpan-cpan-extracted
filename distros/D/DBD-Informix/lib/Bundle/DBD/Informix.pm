@@ -2,7 +2,7 @@
 
 package Bundle::DBD::Informix;
 
-$VERSION = '2018.1029';
+$VERSION = '2018.1031';
 
 1;
 

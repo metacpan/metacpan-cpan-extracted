@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Jan 15 19:15:00 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar  7 11:18:15 2017
-# Update Count    : 1513
+# Last Modified On: Tue Oct 30 10:28:19 2018
+# Update Count    : 1517
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -126,6 +126,8 @@ my $fonts =
     # Normal and condensed versions
     chordfont => "Myriad-CnSemibold.ttf",
     chrdfont  => "Myriad-UcnSemibold.ttf",
+#    chordfont => "FreeSansBold.ttf",
+#    chrdfont  => "FreeSansCn.ttf",
     musicfont => "Bravura.ttf",
     muscfont  => "BravuraCn.ttf",
   };
@@ -162,13 +164,23 @@ sub process {
     ( my $outtype = lc($self->{output}) ) =~ s/^.*\.(.+)$/$1/;
     $self->{outtype} = $outtype;
 
-    if ( $outtype eq "pdf" && eval { require PDF::API2 } ) {
-	$self->{pdf} = PDF::API2->new;
-#	$self->{pdf}->mediabox( 0, PAGE_HEIGHT, PAGE_WIDTH, 0 );
-	$self->{pdf}->mediabox( 0, 0, PAGE_WIDTH, PAGE_HEIGHT );
+    if ( $outtype eq "pdf" ) {
+	if ( eval { require PDF::API2 } ) {
+	    $self->{pdf} = PDF::API2->new;
+	    #	$self->{pdf}->mediabox( 0, PAGE_HEIGHT, PAGE_WIDTH, 0 );
+	    $self->{pdf}->mediabox( 0, 0, PAGE_WIDTH, PAGE_HEIGHT );
+	}
+	else {
+	    die( "PDF output requires module PDF::API2 to be installed.\n" );
+	}
     }
-    elsif ( $outtype =~ /^png|jpg$/ && eval { require Imager } ) {
-	# ok
+    elsif ( $outtype =~ /^png|jpg$/ ) {
+	if ( eval { require Imager } ) {
+	    # ok
+	}
+	else {
+	    die( "PNG and JPG output require module Imager to be installed.\n" );
+	}
     }
     else {
 	die( "Unsupported output type for ", $self->{output}, "\n" );

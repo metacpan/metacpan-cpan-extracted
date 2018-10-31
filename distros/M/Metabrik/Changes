@@ -1,5 +1,8 @@
 Revision history for Perl extension Metabrik.
 
+1.31.0 Tue 30 Oct 18:07:00 CET 2018
+   - bugfix: creates ~/metabrik on first run if it doesn't exist
+
 1.30.0 Fri 12 Jan 10:14:40 CET 2018
    - feature: no more needed to instanciate core::context, core::global or core::log Briks 
               when instanciating a Brik. You can now use a Brik as a standard Perl module.

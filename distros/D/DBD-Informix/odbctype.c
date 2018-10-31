@@ -4,7 +4,7 @@
 @(#)Copyright:       1997-98,2008 Jonathan Leffler (JLSS)
 @(#)Copyright:       2000         Informix Software Inc
 @(#)Copyright:       2002         IBM
-@(#)Product:         Informix Database Driver for Perl DBI Version 2018.1029 (2018-10-28)
+@(#)Product:         Informix Database Driver for Perl DBI Version 2018.1031 (2018-10-31)
 */
 
 /*TABSTOP=4*/

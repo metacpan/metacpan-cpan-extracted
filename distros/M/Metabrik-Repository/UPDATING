@@ -1,3 +1,8 @@
+20180403
+   AFFECTS: client::elasticsearch
+   - client::elasticsearch now uses datadir Attribute and export_as_csv Command now saves 
+     exported indices in that directory by default
+
 20171106
    AFFECTS: ALL BRIKS
 
