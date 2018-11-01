@@ -1,5 +1,25 @@
 Revision history for Pod-Readme
 
+v1.2.3    2018-10-31 22:56:42+00:00 Europe/London
+  [Bug Fixes]
+  - Increased minimum version of Type::Tiny to 1.000000.
+
+v1.2.2    2018-10-31 22:41:45+00:00 Europe/London
+  [Documentation]
+  - Updated POD with regard to format types (Mohammad S Anwar).
+
+  - Fixed typos in Changes.
+
+  [Bug Fixes]
+  - Added explicit requirements for Pod::Simple as well as recommended
+    modules.
+
+  [Toolchain]
+  - Remove explicit core dependencies from prereqs list.
+
+  - Updated list of contributors in distribution metadata. (Apologies
+    if anyone was omitted.)
+
 v1.2.1    2018-10-30 18:23:48+00:00 Europe/London
   [Documentation]
   - Added note about Github Flavoured Markdown (GFM) support
@@ -35,7 +55,7 @@ v1.1.2 2014-12-09 18:55 GMT
 
 v1.1.1 2014-12-04 13:11 GMT
   [Bug Fixes]
-  - The changes plugin will work with Dist::Zilla v1.2.1    2018-10-30 18:23:48+00:00 Europe/London tokens.
+  - The changes plugin will work with Dist::Zilla v1.2.3    2018-10-31 22:56:42+00:00 Europe/London tokens.
 
 v1.1.0 2014-12-03 19:08 GMT
   [Documentation]
@@ -297,7 +317,7 @@ v1.0.0_01 2014-09-23 13:58 BST
 
 0.08  2006-05-01
 
-  - head3/4 headings not recognized
+  - head3/4 headings now recognized
 
   - went back to using Pod::PlainText
 

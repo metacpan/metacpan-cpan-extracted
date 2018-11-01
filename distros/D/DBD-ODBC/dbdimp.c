@@ -1246,6 +1246,7 @@ int dbd_db_commit(SV *dbh, imp_dbh_t *imp_dbh)
       /* reset autocommit */
       rc = SQLSetConnectAttr(
           imp_dbh->hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, 0);
+      DBIc_on(imp_dbh,DBIcf_AutoCommit);
       DBIc_off(imp_dbh,DBIcf_BegunWork);
    }
    return 1;
@@ -1267,6 +1268,7 @@ int dbd_db_rollback(SV *dbh, imp_dbh_t *imp_dbh)
       /*  reset autocommit */
       rc = SQLSetConnectAttr(
           imp_dbh->hdbc, SQL_ATTR_AUTOCOMMIT, (SQLPOINTER)SQL_AUTOCOMMIT_ON, 0);
+      DBIc_on(imp_dbh,DBIcf_AutoCommit);
       DBIc_off(imp_dbh,DBIcf_BegunWork);
    }
    return 1;

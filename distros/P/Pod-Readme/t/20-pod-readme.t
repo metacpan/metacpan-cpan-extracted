@@ -9,6 +9,7 @@ use Cwd;
 use File::Compare qw/ compare_text /;
 use File::Temp qw/ tempfile /;
 use Path::Tiny qw/ path /;
+use Pod::Simple::Text;
 
 use lib 't/lib';
 use Pod::Readme::Test;

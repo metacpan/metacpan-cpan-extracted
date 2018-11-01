@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Util::RandomString;
 use Mojo::Base 'Mojolicious::Plugin';
 use Session::Token;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our (%generator, %setting, %default, %param);
 our $read_config;

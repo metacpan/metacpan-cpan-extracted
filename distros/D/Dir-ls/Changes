@@ -1,3 +1,12 @@
+1.000     2018-10-31 18:07:07 EDT
+  - Fix default sort when the configured locale does not have an alphanumeric collation (e.g. LC_COLLATE=C)
+  - Use lstat instead of stat to retrieve details for the files actually present
+  - Add B/ignore-backups option
+  - Add group-directories-first option
+  - Add hide and I/ignore options
+  - Add indicator-style, p, file-type, and F/classify options
+  - Allow options to be prefixed with hyphens
+
 0.005     2018-10-24 01:10:27 EDT
   - Do tilde expansion with Path::ExpandTilde instead of Path::Tiny
 

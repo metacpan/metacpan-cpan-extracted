@@ -114,6 +114,6 @@ that is to be removed upon natural or forced program termination.
 
 # COPYRIGHT
 
-Copyright (c) 2018, cPanel, Inc.  All rights reserved.  This is free software;
+Copyright (c) 2018, cPanel, L.L.C.  All rights reserved.  This is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
 See [perlartistic](https://metacpan.org/pod/perlartistic) for further details.

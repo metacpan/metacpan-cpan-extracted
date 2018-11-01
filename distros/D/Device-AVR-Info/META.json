@@ -4,16 +4,21 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-AVR-Info",
    "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Struct::Dumb" : "0",
@@ -29,11 +34,11 @@
    "provides" : {
       "Device::AVR::Info" : {
          "file" : "lib/Device/AVR/Info.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Device::AVR::Info::Module" : {
          "file" : "lib/Device/AVR/Info/Module.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -42,5 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

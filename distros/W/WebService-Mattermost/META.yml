@@ -26,5 +26,5 @@ requires:
   Readonly: '0'
   Role::EventEmitter: '0'
   Types::Standard: '0'
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.69'

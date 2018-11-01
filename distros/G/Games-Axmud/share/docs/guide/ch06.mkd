@@ -11,7 +11,7 @@
     * [6.1.2 Matching any text](#6.1.2)
     * [6.1.3 Escape sequences ](#6.1.3)
     * [6.1.4 Quantifiers](#6.1.4)
-    * [6.1.5 Backreferences](#6.1.5)
+    * [6.1.5 Substrings](#6.1.5)
 
 ---
 
@@ -148,9 +148,9 @@ The pattern **You have \d+ gold coins** matches both of the following lines:
 
 You can also use a question mark ( ? ) after any character. It means *zero or one of these characters (but not more)*. And you've already seen that the asterisk character ( \* ) means *zero, one or more of these characters*.
 
-###<a name="6.1.5">6.1.5 Backreferences</a>
+###<a name="6.1.5">6.1.5 Substrings</a>
 
-The pre-configured worlds have been set up to look for lines that these:
+The pre-configured worlds have been set up to look for lines like these:
 
         You have 100 gold coins
 
@@ -160,11 +160,13 @@ The patterns they use often look like this:
 
 A pair of brackets (braces) means *save everything in the middle for later*. In this case, we don't just want to recognise a line matching this pattern - we want to store the number of gold coins for later use.
 
-The __(.\*)__ combination is one example of a *backreference*. Sometimes we'll need to use several backreferences on the same line.
+The __(.\*)__ combination is one example of a *group*. The contents of the group - in this case, **100** - is called the *substring*. 
+
+Sometimes we'll need to use several groups on the same line.
 
         You have (.*) gold, (.*) silver and (.*) brass coins
 
-Because we have three backreferences, three different values are stored for later. These backreferences are numbered 1, 2 and 3 (not 0, 1 and 2).
+Because we have three groups, three different substrings are stored for later. These substrings are numbered 1, 2 and 3 (not 0, 1 and 2).
 
 That's the end of the regular expression tutorial. In the next section we'll go ahead and create some interfaces.
 

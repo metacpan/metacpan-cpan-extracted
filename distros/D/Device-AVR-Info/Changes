@@ -1,5 +1,10 @@
 Revision history for Device-AVR-Info
 
+0.02    2018-10-31 13:31:00
+        [CHANGES]
+         * Added `avr-fuses`
+         * Parse the initial value of registers from the device info file
+
 0.01    2014/12/14 13:12:33
         First version, released on an unsuspecting world.
 

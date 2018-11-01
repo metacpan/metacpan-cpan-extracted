@@ -67,7 +67,7 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean
 );
 
-$VERSION = '0.163';
+$VERSION = '0.173';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -161,8 +161,8 @@ sub countnetarray
 			push (@bag, $_);
 		}
 	}
-	@bag = uniq(@bag);
-	return scalar(@bag); # TO BE CALLED WITH: countnetarray(@array)
+	@bag = uniq( @bag );
+	return scalar( @bag ); # TO BE CALLED WITH: countnetarray(@array)
 }
 
 sub sorttable # TO SORT A TABLE ON THE BASIS OF A COLUMN
@@ -229,7 +229,7 @@ sub flattenvariables # THIS LISTS THE NUMBER OF VARIABLES PLAY IN A LIST OF BLOC
 			@blockelts = @$block;
 			push (@basket, @blockelts);
 		}
-		my @basket = sort { $a <=> $b} uniq(@basket);
+		my @basket = sort { $a <=> $b } uniq( @basket );
 		push ( @flatvarns, \@basket ); ###
 		# IT HAS TO BE CALLED WITH: flatten_variables(@treeseed);
 	}
@@ -484,19 +484,19 @@ sub clean
 
 sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 {
-	my ( $carrier_r, $mypath, $file, $instn ) = @_;
-	my %carrier = %{ $carrier_r };
+	my ( $tempc_r, $mypath, $file, $instn ) = @_;
+	my %tempc = %{ $tempc_r }; #say $tee "IN MAKEFILENAME \$tempc $tempc";
 	my $cleanto;
-	foreach my $key (sort {$a <=> $b} (keys %carrier) )
+	foreach my $key (sort {$a <=> $b} (keys %tempc) )
 	{
-		$cleanto = $cleanto . $key . "-" . $carrier{$key} . "_";
+		$cleanto = $cleanto . $key . "-" . $tempc{$key} . "_";
 	}
-	$cleanto =~ s/_$// ;
+	$cleanto =~ s/_$// ; #say $tee "IN MAKEFILENAME \$cleanto $cleanto";
 
-	my $to = "$mypath/$file" . "_" . "$cleanto";
-	my $cleancrypto = $instn . "__";
+	my $to = "$mypath/$file" . "_" . "$cleanto"; #say $tee "IN MAKEFILENAME \$to $to";
+	my $cleancrypto = $instn . "__"; #say $tee "IN MAKEFILENAME \$cleancrypto $cleancrypto";
 	#my $cleancrypto = $instn . "-";
-	my $crypto = "$mypath/$file" . "_" . "$cleancrypto";
+	my $crypto = "$mypath/$file" . "_" . "$cleancrypto"; #say $tee "IN MAKEFILENAME \$crypto $crypto";
 	my $it;
 	$it{to} = $to;
 	$it{cleanto} = $cleanto;
@@ -541,48 +541,52 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 {
 	my ( $transfile, $carrier_r, $file, $blockelts_r, $mypath, $instn ) = @_;
 	#say $tee "In extractcase; \$transfile: " . dump( $transfile) ;
-	#say $tee "In extractcase; \$carrier_r: " . dump( $carrier_r) ;
 	#say $tee "In extractcase; \$file: " . dump( $file) ;
-	my %carrier = %{ $carrier_r };
-	my @blockelts = @{ $blockelts_r };
-	my $num = scalar( @blockelts ); #ay $tee "In extractcase; \$num: " . dump( $num) ;
+	my %carrier = %{ $carrier_r }; #say $tee "In extractcase; \%carrier: " . dump( \%carrier) ;
+	my @blockelts = @{ $blockelts_r }; #say $tee "In extractcase; \@blockelts: " . dump( @blockelts ) ;
+	my $num = scalar( @blockelts ); #say $tee "In extractcase; \$num: " . dump( $num ) ;
+	#say $tee "In extractcase; \$mypath: " . dump( $mypath ) ;
+	#say $tee "In extractcase; \$instn: " . dump( $instn ) ;
 
-	my $counter = 0;
 	my %provhash;
-	while ( $counter < $num )
+	$transfile =~ s/^mypath\///; #say $tee "In extractcase1; \$transfile: " . dump( $transfile) ;
+	$transfile =~ s/^$file//; #say $tee "In extractcase1; \$transfile: " . dump( $transfile) ;
+	$transfile =~ s/^_//; #say $tee "In extractcase2; \$transfile: " . dump( $transfile) ;
+	foreach my $parnum ( keys %carrier )
 	{
-		$transfile =~ s/^$file//; #say $tee "In extractcase1; \$transfile: " . dump( $transfile) ;
-		$transfile =~ s/^_//; #say $tee "In extractcase2; \$transfile: " . dump( $transfile) ;
-
 		$transfile =~ /^(\d+)-(\d+)/;
 
 		if ( ($1) and ($2) )
 		{
-			$provhash{$1} = $2; #say $tee "In extractcase3; \$transfile: " . dump( $transfile) ;
+			if ( $1 ~~ @blockelts )
+			{
+				$provhash{$1} = $2; #say $tee "In extractcase3; \$transfile: " . dump( $transfile) ;
+			}
 		}
 
 		$transfile =~ s/^$1-$2//; #say $tee "In extractcase4; \$transfile: " . dump( $transfile) ;
 		$transfile =~ s/^_//; #say $tee "In extractcase5; \$transfile: " . dump( $transfile) ;
-		$counter++;
 	}
 	#say $tee "In extractcase; \%provhash: " . dump( \%provhash ) ;
 
+	my %tempc = %{ dclone( \%carrier )};
 	foreach my $key ( keys %provhash )
 	{
 		if ( scalar( @blockelts > 0 ) )
 		{
 			if ( $key ~~ @blockelts )
 			{
-				$carrier{$key} = $provhash{$key};
+				$tempc{$key} = $provhash{$key};
 			}
 		}
 		else
 		{
-			$carrier{$key} = $provhash{$key};
+			$tempc{$key} = $provhash{$key};
 		}
 	}
+
 	#say $tee "In extractcase, OBTAINED \%carrier: " . dump( \%carrier ) ;
-	my %to = %{ makefilename( \%carrier, $mypath, $file, $instn, \%inst ) }; say $tee "In extractcase, RESULT1:; \%to: " . dump( %to ) ;
+	my %to = %{ makefilename( \%tempc, $mypath, $file, $instn, \%inst ) }; #say $tee "In extractcase!, RESULT1:; \%to: " . dump( \%to ) ;
 	return( \%to );
 }
 
@@ -786,22 +790,27 @@ sub integratebox
 {
 	my @arrelts = @{ $_[0] }; #say $tee "IN INTEGRATEBOX \@arrelts " . dump( @arrelts ) ;
 	my %carrier = %{ $_[1] }; #say $tee "IN INTEGRATEBOX \%carrier " . dump( \%carrier ) ;
-	my $file = $_[2];
+	my $file = $_[2]; #say $tee "IN INTEGRATEBOX \$file $file" ;
 	my @blockelts = @{ $_[3] }; #say $tee "IN INTEGRATEBOX \@blockelts @blockelts" ;
-	my $mypath = $_[4];
+	my $mypath = $_[4]; #say $tee "IN INTEGRATEBOX \$mypath $mypath" ;
 	my @newbox;
-	foreach my $eltref ( @arrelts )
+	if ( ref( $arrelts[0] ) )
 	{
-		my @elts = @{ $eltref };
-		my $target = $elts[0]; #say $tee "IN INTEGRATEBOX Target $target" ;
-		my %righttarg = %{ extractcase( $target, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \$righttarget $righttarget" ;
-		my $righttarget = $righttarg{cleanto}; #say $tee "IN INTEGRATEBOX \$righttarget $righttarget" ;
-		my $origin = $elts[3]; #say $tee "IN INTEGRATEBOX \$origin $origin" ;
-		my %rightorig = %{ extractcase( $origin, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \$rightorigin $rightorigin";
-		my $rightorigin = $rightorig{cleanto}; #say $tee "IN INTEGRATEBOX \$rightorigin $rightorigin" ;
-		push ( @newbox, [ $righttarget, $elts[1], $elts[2], $rightorigin, $elts[4] ] );
-	} #say $tee "IN INTEGRATEBOX \@newbox " . dump( @newbox ) ;
-	return ( \@newbox );
+		foreach my $eltref ( @arrelts )
+		{
+			my @elts = @{ $eltref }; #say $tee "IN INTEGRATEBOX \@elts @elts" ;
+			my $target = $elts[0]; #say $tee "IN INTEGRATEBOX Target $target" ;
+			#say $tee "PRE EXTRACTCASE IN INTEGRATEBOX \$target $target" ;
+			my %righttarg = %{ extractcase( $target, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \%righttarg " . dump(  \%righttarg ) ;
+			my $righttarget = $righttarg{cleanto}; #say $tee "IN INTEGRATEBOX \$righttarget $righttarget" ;
+			my $origin = $elts[3]; #say $tee "IN INTEGRATEBOX \$origin $origin" ;
+			#say $tee "PRE EXTRACTCASE IN INTEGRATEBOX \$origin $origin";
+			my %rightorig = %{ extractcase( $origin, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \%rightorig " . dump(  \%rightorig ) ;
+			my $rightorigin = $rightorig{cleanto}; #say $tee "IN INTEGRATEBOX \$rightorigin " . dump(  \$rightorigin ) ;
+			push ( @newbox, [ $righttarget, $elts[1], $elts[2], $rightorigin, $elts[4] ] );
+		} #say $tee "IN INTEGRATEBOX \@newbox " . dump( @newbox ) ;
+		return ( \@newbox );
+	}
 }
 
 
@@ -1134,10 +1143,10 @@ sub solvestar
 
 		( $dirfiles{dummysweeps}, $dirfiles{dummyelt} ) = @{ star_act( \@sweeps, \@blockelts, $countcase, $countblock ) };
 	} ### if ( not( scalar( @{ $dirfiles{starpositions} } ) == 0 ) )YOU CAN CUT THIS. THE OBTAINED VARIABLES ARE UNUSED
-	say $tee "IN SOLVESTAR!! \$dirfiles{starpositions}: " . dump( $dirfiles{starpositions} );
+	#say $tee "IN SOLVESTAR!! \$dirfiles{starpositions}: " . dump( $dirfiles{starpositions} );
 	#say $tee "IN SOLVESTAR \$dirfiles{dummysweeps}: " . dump( $dirfiles{dummysweeps} );
 
-	$dirfiles{starnumber} = scalar( @{ $dirfiles{starpositions} } ); say $tee "AFTER \$dirfiles{starnumber}: " . dump( $dirfiles{starnumber} );
+	$dirfiles{starnumber} = scalar( @{ $dirfiles{starpositions} } ); #say $tee "AFTER \$dirfiles{starnumber}: " . dump( $dirfiles{starnumber} );
 
 	if ( not( scalar( @{ $dirfiles{starpositions} } ) == 0 ) )
 	{
@@ -1154,7 +1163,7 @@ sub takewinning
 {
 	my ( $toitem ) = @_;
 
-	my %carrier = split( "_|-", $toitem ); say $tee "IN takewinning ( \%carrier) " . dump( \%carrier );
+	my %carrier = split( "_|-", $toitem ); #say $tee "IN takewinning ( \%carrier) " . dump( \%carrier );
 	return( \%carrier );
 }
 
@@ -1182,6 +1191,8 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
   {
     exit(say $tee "#END RUN.");
   }
+
+	say $tee "#Beginning a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
 	my @blockelts = @{ getblockelts( \@sweeps, $countcase, $countblock ) }; #say $tee "IN callblock \@blockelts " . dump( @blockelts );
 
@@ -1228,8 +1239,11 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 
 	my @blocks = getblocks( \@sweeps, $countcase );
 
-	my $toitem = getitem( \@winneritems, $countcase, $countblock ); #say $tee "IN12 callblock \$toitem" . dump( $toitem ); #say $tee "IN12 callblock \$mypath" . dump( $mypath ); say $tee "IN12 callblock \$file" . dump( $file ); ### DDD
+	my $toitem = getitem( \@winneritems, $countcase, $countblock ); #say $tee "IN12 callblock \$toitem" . dump( $toitem ); #say $tee "IN12 callblock \$mypath" . dump( $mypath ); say $tee "IN12 callblock \$file" . dump( $file ); ###
 	$toitem = clean( $toitem, $mypath, $file ); #say $tee "IN12 callblock \$toitem " . dump( $toitem );
+	#say $tee "IN12 callblock \@winneritems " . dump( @winneritems );
+	#say $tee "IN12 callblock \$countcase " . dump( $countcase );
+	#say $tee "IN12 callblock \$countblock " . dump( $countblock );
 
 	my $from = getline($toitem);
 	$from = clean( $from, $mypath, $file ); #say $tee "IN12 callblock \$from " . dump( $from );
@@ -1237,8 +1251,8 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	my $file = $dowhat{file};
 
 	#my %intermids = getcase( \@miditers, $countcase ); say $tee "IN callblock \%intermids" . dump( \%intermids ); # UNUSED. CUT,
-	#say $tee "IN callblock \$toitem" . dump( \$toitem ); ### DDD
-	my %carrier = %{ takewinning( $toitem ) }; #say $tee "FROM TAKEWINNING IN callblock \%carrier " . dump( \%carrier ); ### DDD
+	#say $tee "IN callblock \$toitem" . dump( \$toitem ); ###
+	my %carrier = %{ takewinning( $toitem ) }; #say $tee "FROM TAKEWINNING IN callblock \%carrier " . dump( \%carrier ); ###
 
 
 	#say $tee "IN callblock  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
@@ -1420,10 +1434,11 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		foreach my $elt ( @blockelts )
 		{
 			my @dummys = ( $elt );
-			my @bix = @{ toil( \@dummys, \%varnums, \@basket, $c, $mypath, $file ) };
-			#@bix = @{ $bix[0] };
-			my @bark = @{ flattenbox( @bix ) };
-			push( @bux, @bark );
+			my @bix = @{ toil( \@dummys, \%varnums, \@basket, $c, $mypath, $file ) }; #say $tee "IN DEFFILES2 \@bix BEFORE: " . dump( @bix );
+			@bix = @{ $bix[0] };
+			#say $tee "IN DEFFILES2 \@bix AFTER: " . dump( @bix );
+			#my @bark = @{ flattenbox( @bix ) };
+			push( @bux, @bix );
 			$c++;
 		}
 	}
@@ -1437,6 +1452,34 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 
 	#############my $flattened_r = flattenbox( \@bux ); 	say $tee "IN DEFFILES2 \$flattened_r: " . dump( $flattened_r );
 	#say $tee "In DEFFILES5 \%mids!: " . dump ( %mids );
+
+	sub cleanduplicates
+	{
+		my @elts = @_; #say $tee "In cleanduplicates \@elts!: " . dump ( @elts );
+
+		#my @sack;
+		#foreach my $el ( @elts )
+		#{
+		#	push( @sack, $el->[0] );
+		#}
+
+		my @sack = map { $_[0] } @elts ;
+
+		my @finals;
+		foreach my $elt ( @sack )
+		{
+			foreach my $e ( @elts )
+			{
+				if ( $elt eq $e->[0] )
+				{
+					push( @finals, $e );
+					last;
+				}
+			}
+		} #say $tee "In cleanduplicates \@finals!: " . dump ( @finals );
+		return( @finals );
+	}
+
 	my ( @finalbox );
 	if ( $dirfiles{starsign} eq "yes" )
 	{
@@ -1447,16 +1490,17 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			my %midsurrs = %{ $midsurrs_r }; #say $tee "IN DEFFILES \%midsurrs" . dump( \%midsurrs );
 	 		@bag = uniq( @{ integratebox( \@bux, \%midsurrs, $file, \@blockelts, $mypath, \%inst ) } );
 			push( @finalbox, @bag );
-		}
+		} #say $tee "IN DEFFILES BEFORE WASH \@finalbox" . dump( @finalbox );
+		my @finalbox = cleanduplicates( @finalbox ); #say $tee "IN DEFFILES AFTER WASH \@finalbox" . dump( @finalbox );
 	}
 	else
 	{
 		#say $tee "IN DEFFILES RIGHT AFTER " ;
-		my @bark = @{ flattenbox( \@bux ) };
-		@finalbox = uniq( @{ integratebox( \@bark, \%carrier, $file, \@blockelts, $mypath, \%inst ) } );
+		my @bark = @{ flattenbox( \@bux ) }; #say $tee "In DEFFILES5-DESCENT \@bark!: " . dump ( @bark );
+		@finalbox = uniq( @{ integratebox( \@bark, \%carrier, $file, \@blockelts, $mypath, \%inst ) } ); say $tee "In DEFFILES5-DESCENT \@finalbox!: " . dump ( @finalbox );
 	}
 
-	@finalbox = sort { $a->[0] <=> $b->[0] } @finalbox; say $tee "In DEFFILES5 \@finalbox!: " . dump ( @finalbox );
+	@finalbox = sort { $a->[0] <=> $b->[0] } @finalbox; #say $tee "In DEFFILES5 \@finalbox!: " . dump ( @finalbox );
 
 
 	setlaunch( {
@@ -1530,33 +1574,40 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 	#say $tee "IN IN SETLAUNCH  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 
 	my ( @instances );
+	#say $tee "PRE EXTRACTCASE IN SETLAUNCH - NOTHING" . dump(  );
 	my %starters = %{ extractcase( "", \%carrier, $file, \@blockelts, $mypath, "" ) };
+
 	$dirfiles{starter} = $starters{cleanto}; #say $tee "IN SETLAUNCH \$dirfiles{starter}" . dump( $dirfiles{starter} );
 
 	my $count = 0;
 	foreach my $elt ( @basket )
 	{
 
-		my $newpars = $$elt[0];
+		my $newpars = $$elt[0]; #say $tee "IN SETLAUNCH \$newpars! " . dump( $newpars );
 		my $countvar = $$elt[1]; #say $tee "IN SETLAUNCH \$countvar! " . dump( $countvar );
 		my $countstep = $$elt[2]; #say $tee "IN SETLAUNCH \$countstep! " . dump( $countstep );
-		my $oldpars = $$elt[3];
+		my $oldpars = $$elt[3]; #say $tee "IN SETLAUNCH \$oldpars " . dump( $oldpars );
+		#say $tee "PRE EXTRACTCASE IN SETLAUNCH \$newpars" . dump( \$newpars );
 		my %to = %{ extractcase( $newpars, \%carrier, $file, \@blockelts, $mypath, $instn ) };
-		#say $tee "IN SETLAUNCH \%to" . dump( \%to );
-		#say $tee "IN SETLAUNCH \$to{cleanto}" . dump( $to{cleanto} );
+		#say $tee "IN SETLAUNCH FROM EXTRATCASE \%to" . dump( \%to );
+		#say $tee "IN SETLAUNCH FROM EXTRATCASE \$to{cleanto}" . dump( $to{cleanto} );
 		#say $tee "IN SETLAUNCH \$inst{\$to{cleanto}}" . dump( $inst{$to{cleanto}} );
 		#say $tee "IN SETLAUNCH \%inst" . dump( \%inst );
 
-		unless( $inst{$to{cleanto}} ne "" )
+
+		unless( ( $to{cleanto} ~~ @{ $dirfiles{dones} } ) and ( $dirfiles{precomputed} eq "" ))
 		{
+			push( @{ $dirfiles{dones} }, $to{cleanto} );
 			$inst{$to{cleanto}} = $to{crypto};
 			$inst{$to{crypto}} = $to{cleanto};
+			$inst{$to{to}} = $to{cleanto};
 
+			#say $tee "PRE EXTRACTCASE IN SETLAUNCH \$oldpars" . dump( \$oldpars );
 			my %orig = %{ extractcase( $oldpars, \%carrier, $file, \@blockelts, $mypath ) };
 			my $origin = $orig{cleanto};
-			#say $tee "IN SETLAUNCH \$origin" . dump( \$origin ) . "\n\n";
+			#say $tee "IN SETLAUNCH! \$origin" . dump( \$origin ) . "\n\n";
 			my $c = $$elt[4];
-			#say $tee "INSTANCE!: $instn";
+			#say $tee "IN SETLAUNCH INSTANCE!: $instn";
 			push ( @instances,
 			{
 				countcase => $countcase, countblock => $countblock,
@@ -1608,10 +1659,10 @@ sub exe
 	my ( @simcases, @simstruct );
 	say $tee "#Performing a search on case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 
-	my $cryptlinks = "$mypath/$file" . "_" . "$countcase" . "_cryptlinks.pl";
-	open ( CRYPTLINKS, ">$cryptlinks" ) or die;
-	say CRYPTLINKS "" . dump( \%inst );
-	close CRYPTLINKS;
+	my $cryptolinks = "$mypath/$file" . "_" . "$countcase" . "_cryptolinks.pl";
+	open ( CRYPTOLINKS, ">$cryptolinks" ) or die;
+	say CRYPTOLINKS "" . dump( \%inst );
+	close CRYPTOLINKS;
 
 	if ( $dowhat{morph} eq "y" )
 	{
@@ -2149,18 +2200,18 @@ Sim::OPT.
 
 =head1 DESCRIPTION
 
-Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Some of the Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module can seek for the least explored search paths when exploring new search spaces sequentially (following rules presented in: http://dx.doi.org/10.1016/j.autcon.2016.08.014). Sim::OPT::Morph, the morphing module, manipulates chosen parameters in the configuration files (constituted by text files) describing models for simulation programs, recognizing variables by position.
-Other modules unders the Sim::OPT namespace are Sim::OPT::Parcoord3d, a module which converts 2D parallel coordinates plots in Autolisp instructions for obtaining 3D plots as Autocad drawings; and Sim::OPT::Interlinear, which can build metamodels starting from sparse multidimensional data.
-The module Sim::OPT::Modish, capable of altering the shading values calculated with the ESP-r simulation platform to take into account the solar reflections from obstructions, is no more included in this distribution, because a modificed version of it has been included in the ESP-r distribution, available at the address http://www.esru.strath.ac.uk/Programs/ESP-r.htm.
+Sim::OPT is an optimization and parametric exploration program favouring problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. Sim::OPT's optimization modules (Sim::OPT, Sim::OPT::Descent) pursue optimization through block search, allowing blocks (subspaces) to overlap, and allowing a free intermix of sequential searches (inexact Gauss-Seidel method) and parallell ones (inexact Jacobi method). The Sim::OPT::Takechange module can seek for the least explored search paths when exploring new search spaces sequentially (following rules presented in: http://dx.doi.org/10.1016/j.autcon.2016.08.014). Sim::OPT::Morph, the morphing module, can manipulate parameters of simulation models.
+Other modules under the Sim::OPT namespace are Sim::OPT::Parcoord3d, a module which can convert 2D parallel coordinates plots into Autolisp instructions for obtaining 3D plots as Autocad drawings; and Sim::OPT::Interlinear, which can build metamodels from sparse multidimensional data.
+The module Sim::OPT::Modish, capable of altering the shading values calculated with the ESP-r simulation platform so as take into account the solar reflections from obstructions, is no more included in this distribution, because a modificed version of it has been included in the ESP-r distribution, available at the address http://www.esru.strath.ac.uk/Programs/ESP-r.htm.
 The Sim::OPT's morphing and reporting modules contain several additional functions specifically targeting the ESP-r building performance simulation platform. A working knowledge of ESP-r is necessary to use those functionalities.
 
-To install Sim::OPT, the command <cpanm Sim::OPT> has to be issued as a superuser. Sim::OPT can then be loaded through the command <use Sim::OPT> in a Perl repl. But to ease the launch, the batch file "opt" (which can be found packed in the "optw.tar.gz" file in "examples" folder in this distribution) may be copied in a work directory and the command <opt> may be issued. That command will call OPT with the settings specified in the configuration file. When launched, Sim::OPT will ask the path to that file, which must contain a suitable description of the operations to be accomplished and point to an existing simulation model.
+To install Sim::OPT, the command <cpanm Sim::OPT> has to be issued as a superuser. Sim::OPT can then be loaded through the command <use Sim::OPT> in a Perl repl. But to ease the launch, the batch file "opt" (which can be found packed in the "optw.tar.gz" file in "examples" folder in this distribution) may be copied in a work directory and the command <opt> may be issued. That command will launch Sim::OPT with the settings specified in the configuration file. When launched, OPT will ask the path to that file, which has to contain a suitable description of the operations to be accomplished and point to an existing simulation model.
 
 The "$mypath" variable in the configuration file must be set to the work directory where the base model reside.
 
-Besides an OPT configuration file, separate configuration files for propagation of constraints may be created. Those can be useful to give the morphing operations greater flexibility. Propagation of constraints can regard the geometry of a model, solar shadings, mass/flow network, controls, and generic text files descripting a simulation model.
+Besides an OPT configuration file, separate configuration files for propagation of constraints may be created. Those files can give the morphing operations greater flexibility. Propagation of constraints can regard the geometry of a model, solar shadings, mass/flow network, controls, and generic text files descripting a simulation model.
 
-The simulation model folders and the result files that will be created in a parametric search will be named as the base model, plus numbers and other characters naming the model instances. For example, the instance produced in the first iteration for a root model named "model" in a search constituted by 3 morphing phases and 5 iteration steps each will be named "model_1-1_2-1_3-1"; and the last one "model_1-5_2-5_3-5".
+The simulation model folders and the result files that will be created in a parametric search will assigned a name constituted by a unique, but within the program and the files saved, each instance will be assigned a name consituted by numbers describing the position of the instance in the multidimensional matrix (tensor). For example, the instance produced in the first iteration for a root model named "model" in a search constituted by 3 morphing phases and 5 iteration steps each would be named "model_1-1_2-1_3-1"; and the last one, "model_1-5_2-5_3-5".
 
 The structure of the block searches is described through the variable "@sweeps" in a configuration file. Each case is listed inside square brackets; and each search subspace (block) in each case is listed inside square brakets. For example: a sequence constituted by two sequential full-factorial force searches, one regarding parameters 1, 2, 3 and the other regarding parameters 1, 4, 5, 7, would be described with: @sweeps = ( [ [ 1, 2, 3 ] ] , [ [ 1, 4, 5, 7 ] ] ) . And a sequential block search with the first subspace regarding parameters 1, 2, 3 and the second regarding parameters 3, 4, 5, 6 would be described with: @sweeps = ( [ [ 1, 2, 3 ] , [ 3, 4, 5, 6 ] ] ).
 
@@ -2168,20 +2219,20 @@ The number of iterations to be taken into account for each parameter for each ca
 
 The instance number that has to trated as the basic instance, corresponding to the root case, is specified by the variable "@miditers". "@miditers" for the last example may be for instance set to ( { 1 => 2, 2 => 2, 3 => 2, 4 => 2, 5 => 2, 6 => 2 } ).
 
-OPT can work on a given set of pre-simulated results without launching new simulations, and it can randomize the sequence of the parameter search and the initialization level of the parameters (see the included examples).
+OPT can work on a given set of pre-simulated results without launching new simulations, and it can randomize both the sequence of the  search and the initialization level of the parameters (see the included examples).
 
-By default the behaviour of the program is sequential. To make it parallel locally, subspaces have to be named with a name not containing numbers, so as to work as a collector cells. If the name "name", for example, has to be given to a block, the letters "name" must be joined at the beginning of the first number describing an iteration number in a block. If that number is 1, for example, the first element of that block should be named "name1". As an effect, that block will receive values from all the blocks "pointing" to a block named "name". To point the search outcome of a block to another block, the name of the block pointed to has to be appended to the last number describing an iteration number in a block. If that number is 3 and the name of the block pointed to is "surname", for example, the last element of that block should be named "3surname". A block of in which both the mentioned situations took place could be named for example [ "name1", 2, "3surname" ].
+By default the behaviour of the program is sequential. To make it parallel locally, subspaces have to be named with a name not containing numbers, so as to work as a collector cells. If the name "name", for example, has to be given to a block, the letters "name" must be joined at the beginning of the first number describing an iteration number in a block. If that number is 1, for example, the first element of that block should be named "name1". As an effect, that block will receive values from all the blocks "pointing" to the name "name". To point the search outcome of a block to another block, the name of the block pointed to has to be appended to the last number describing an iteration number in a block. If, for example, that number is 3 and the name of the block pointed to is "surname", for example, the last element of that block should be named "3surname". A block of in which both the mentioned situations took place could be named [ "name1", 2, "3surname" ].
 
-If the search has to start from more than one block in parallel, the first block should be named and all the other starting blocks should be named like it.
+If the search is to start from more than one block in parallel, the first block should be named and all the other starting blocks should be named like it.
 
-The possibility of articulating a mix of parallel and sequential searches is of absolute importance, because it makes possible to design search structures with a depth, embodying precedence, and therefore procedural time, in them. Deriving from this, there is the fact that the representation tools in question are sufficient for describing directed graphs.
+The capability of articulating a mix of parallel and sequential searches is of absolute importance, because it makes possible to design search structures with a "depth", embodying precedence, and therefore procedural time, in them. This toolset is needed to describe directed graphs.
 
-Sim::OPT can perform one or more star (Jacoby) searches within a block in place of a multilevel full-factorial search. To ask for that in a configuration file, the first number in that block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in that block. A block, in that case, may turn out, for example, to be declared like this: ( "2>1", 2, 3).
+Sim::OPT can perform one or more star (Jacoby) searches within blocks in place of a multilevel full-factorial searches. To ask for that in a configuration file, the first number in that block has to be preceded by a ">" sign, which in its turn has to be preceded by a number specifying how many star points there have to be in the block. A block, in that case, may be declared like this: ( "2>1", 2, 3).
 
-To sayi in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from the star searches and not by the means of a multilevel full-factorial search is (once asked for one or more star searches in the block) to give to the < %dowhat > instance < $dowhat{metamodel} > the value "yes".
+For specifying in a Sim::OPT configuration file that a certain block has to be searched by the means of a metamodel derived from star searches and not by the means of a multilevel full-factorial search it is necessary (once asked for one or more star searches in the block) to assign to < $dowhat{metamodel} > the value "yes" in the configuration file.
 
 
-The program works under Linux.
+OPT works under Linux.
 
 =head2 EXPORT
 
@@ -2189,7 +2240,7 @@ The program works under Linux.
 
 =head1 SEE ALSO
 
-Annotated examples ("esp.pl" for ESP-r, "ep.pl" for EnergyPlus - the two perform the same morphing operations on models describing the same building -, "des.pl" about block search, and "f.pl" about a search in a pre-simulated dataset) can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. They constitute the available documentation. For more information, reference to the source code should be made.
+Annotated examples ("esp.pl" for ESP-r, "ep.pl" for EnergyPlus - the two perform the same morphing operations on models describing the same building -, "des.pl" about block search, and "f.pl" about a search in a pre-simulated dataset, and other) can be found packed in the "optw.tar.gz" file in "examples" directory in this distribution. They constitute all the available documentation besides these pages. For more information, reference to the source code should be made.
 
 =head1 AUTHOR
 
@@ -2197,7 +2248,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2017 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

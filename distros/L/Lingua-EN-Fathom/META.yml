@@ -17,14 +17,15 @@ name: Lingua-EN-Fathom
 provides:
   Lingua::EN::Fathom:
     file: lib/Lingua/EN/Fathom.pm
-    version: '1.19'
+    version: '1.22'
 requires:
+  Lingua::EN::Sentence: '0.28'
   Lingua::EN::Syllable: '0.28'
   locale: '1'
   strict: '1.04'
   warnings: '0'
 resources:
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/kimryan/Lingua-EN-Fathom
-version: '1.19'
+  repository: https://github.com/kimryan/Readability
+version: '1.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

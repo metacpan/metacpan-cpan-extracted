@@ -4,13 +4,13 @@
       "Ded MedVed <dedmedved@cpan>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "VSGDR-TestScriptGen",
    "no_index" : {
@@ -50,7 +50,6 @@
             "VSGDR::UnitTest::TestSet::Resx" : "0",
             "VSGDR::UnitTest::TestSet::Test" : "0",
             "VSGDR::UnitTest::TestSet::Test::TestCondition" : "0",
-            "Win32" : "0",
             "autodie" : "0",
             "indirect" : "0",
             "perl" : "5.010000",
@@ -59,6 +58,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -38,7 +38,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.026'; # VERSION
 
 use Mouse;
 
@@ -116,15 +116,17 @@ sub add
       if (@found_existing_terms == 1) {
         my $existing_term = $found_existing_terms[0];
 
-        my $old_namespace = $existing_term->namespace();
+        if (!$term->is_obsolete() && !$existing_term->is_obsolete()) {
+          my $old_namespace = $existing_term->namespace();
 
-        $existing_term->merge($term);
+          $existing_term->merge($term);
 
-        if ($old_namespace ne $existing_term->namespace()) {
-          delete $self->terms_by_cv_name()->{$old_namespace}->{$existing_term->name()};
+          if ($old_namespace ne $existing_term->namespace()) {
+            delete $self->terms_by_cv_name()->{$old_namespace}->{$existing_term->name()};
+          }
+
+          $term = $existing_term;
         }
-
-        $term = $existing_term;
       }
     }
 

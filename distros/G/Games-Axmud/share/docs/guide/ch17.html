@@ -226,7 +226,7 @@ S color.system.cmd
      Colour for sent world commands (GA::Client-&gt;customInsertCmdColour)
 S colour.system.text
 S color.system.text
-     Colour for system messages (GA::Client-&gt;customShowTextColour)
+     Colour for system messages (GA::Client-&gt;customShowSystemTextColour)
 S colour.system.error
 S color.system.error
      Colour for system error messages (GA::Client-&gt;customShowErrorColour)
@@ -263,6 +263,8 @@ o custom.NAME
      Custom profile called 'NAME' (from GA::Session-&gt;profHash)
 
 
+F debug.protocol.escape
+    Show invalid escape sequences (GA::Client-&gt;debugEscSequenceFlag)
 F debug.protocol.telnet
      Show incoming option negotiation info (GA::Client-&gt;debugTelnetFlag)
 F debug.protocol.telnet.short
@@ -689,6 +691,28 @@ F model.updateRoomCmdFlag
      Update room's room command list (GA::Obj::WorldModel-&gt;...)
 F model.updateOrnamentFlag
      Update room's exit ornaments (GA::Obj::WorldModel-&gt;...)
+S model.autoCompareMode
+    Current auto-compare mode setting (GA::Obj::WorldModel-&gt;...)
+F model.autoCompareAllFlag
+    Compare rooms in whole model, not just region (GA::Obj::WorldModel-&gt;...)
+S model.autoCompareMax
+    Maximum number of room comparisons (GA::Obj::WorldModel-&gt;...)
+S model.autoSlideMode
+    Current auto-slide mode setting (GA::Obj::WorldModel-&gt;...)
+S model.autoSlideMax
+    Maximum auto-slide distance (GA::Obj::WorldModel-&gt;...)
+F model.autoRescueFlag
+    Auto-rescue mode is enabled (GA::Obj::WorldModel-&gt;...)
+F model.autoRescueFirstFlag
+    In auto-rescue mode, merge rooms at first opportunity (GA::Obj::WorldModel-&gt;...)
+F model.autoRescuePromptFlag
+    In auto-rescue mode, prompt before merging rooms at first opportunity (GA::Obj::WorldModel-&gt;...)
+F model.autoRescueNoMoveFlag
+    In auto-rescue mode, don't move non-matching rooms (GA::Obj::WorldModel-&gt;...)
+F model.autoRescueVisitsFlag
+    In auto-rescue mode, only update character visits in merged rooms (GA::Obj::WorldModel-&gt;...)
+F model.autoRescueForceFlag
+    In auto-rescue mode, temporarily switch to 'update' mode (GA::Obj::WorldModel-&gt;...)
 F model.assistedMovesFlag
      Apply assisted moves (GA::Obj::WorldModel-&gt;...)
 F model.assistedBreakFlag
@@ -717,8 +741,6 @@ F model.allowRoomScriptFlag
      Allow individual room scripts (GA::Obj::WorldModel-&gt;...)
 F model.intelligentExitsFlag
      Use intelligent exits (GA::Obj::WorldModel-&gt;...)
-F model.autoCompareFlag
-     Auto-compare new rooms (GA::Obj::WorldModel-&gt;...)
 F model.followAnchorFlag
      Create new exit object using follow anchor pattern
         (GA::Obj::WorldModel-&gt;...)
@@ -962,13 +984,17 @@ S session.number
 O session.mainwin
      Current 'main' window object (GA::Session-&gt;mainWin)
 O session.tab.default
-     Current session's default tab object (GA::Session-&gt;defaultTabObj)
+    Current session's default tab object (GA::Session-&gt;defaultTabObj)
+S session.tab.default.width
+    Default tab width in chars (GA::Obj::TextView-&gt;textWidthChars)
+S session.tab.default.height
+    Default tab height in chars (GA::Session-&gt;textHeightChars)
 O session.tab.current
-     Current session's current tab object (GA::Session-&gt;currentTabObj)
-S session.tab.width
-     Default tab width (GA::Session-&gt;textViewWidthChars)
-S session.tab.height
-     Default tab height in chars (GA::Session-&gt;textViewHeightChars)
+    Current session's current tab object (GA::Session-&gt;currentTabObj)
+S session.tab.current.width
+    Current tab width in chars (GA::Obj::TextView-&gt;textWidthChars)
+S session.tab.current.height
+    Current tab height in chars (GA::Session-&gt;textHeightChars)
 O session.mapwin
      Current session's automapper window (GA::Session-&gt;mapWin)
 O session.map

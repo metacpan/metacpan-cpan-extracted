@@ -30,12 +30,15 @@ Revision history for VSGDR::TestScriptGen
         Fixed new perl 5.22 error message.
 		#     Error:  Can't use an array as a reference at C:\PerlModules\VSGDR-TestScriptGen-0.13\blib\lib/VSGDR/TestScriptGen.pm line 230.
 0.15	05/09/2015
-		xact_state() must be checked it's not sufficient to check @@trancount because of SQL Server's stupidly complicated
-		transaction system.
+	xact_state() must be checked it's not sufficient to check @@trancount because of SQL Server's stupidly complicated
+	transaction system.
 0.16	12/10/2016
-		Anonymous columns in stored procedure output sets are now called Column_1, Column_2 etc.
-		If this clashes will real columns more complex logic will be needed.
+	Anonymous columns in stored procedure output sets are now called Column_1, Column_2 etc.
+	If this clashes will real columns more complex logic will be needed.
 0.17	03/11/2017
-		Fixed generation of xml and user-defined table type variables.  Parameter types might not be completely correct yet.
+	Fixed generation of xml and user-defined table type variables.  Parameter types might not be completely correct yet.
+0.18	01/11/2018
+	Fixed Win32 usage for Linux.
+
 		
 	

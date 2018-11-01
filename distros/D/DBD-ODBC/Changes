@@ -5,6 +5,17 @@ use strict;
 
 DBD::ODBC::Changes - Log of significant changes to the DBD::ODBC
 
+1.60 2018-10-31
+
+  [BUG FIXES]
+
+  Merged pull request 11 from audun which fixes some issues with the AutoCommit flag
+  on commit and rollback.
+
+  [MISCELLANEOUS]
+
+  Merged pull request 10 from vadz which fixed typo (affecting license) in README.md.
+
 1.59 2018-08-10
 
   [BUG FIXES]

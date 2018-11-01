@@ -1,38 +1,29 @@
 ---
-abstract: 'Reliable subroutine attribute handlers'
+abstract: unknown
 author:
-  - 'Goro Fuji (gfx) <gfuji(at)cpan.org>.'
+  - unknown
 build_requires:
-  Class::Trigger: 0.14
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.59
-  MRO::Compat: 0.09
-  Test::More: 0.88
-  parent: 0.221
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.59
-  ExtUtils::ParseXS: 3.18
-distribution_type: module
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Sub::Attribute
+  version: '1.4'
 name: Sub-Attribute
 no_index:
   directory:
-    - example
-    - inc
     - t
-    - xt
+    - inc
 requires:
-  XSLoader: 0.02
-  parent: 0.2
-  perl: 5.8.1
+  Class::Trigger: '0.14'
+  MRO::Compat: '0.09'
+  Test::More: '0.88'
+  parent: '0.221'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/DrHyde/perl-modules-Sub-Attribute.git
-version: '0.06'
+  bugtracker: https://github.com/DrHyde/perl-modules-Sub-Attribute/issues
+  repository: https://github.com/DrHyde/perl-modules-Sub-Attribute
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

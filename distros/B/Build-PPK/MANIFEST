@@ -1,3 +1,4 @@
+COPYRIGHT
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -20,11 +21,11 @@ lib/Build/PPK/Deptool/Util.pm
 lib/Build/PPK/Dist.pm
 lib/Build/PPK/Exec.pm
 lib/Build/PPK/Pipeline.pm
-COPYRIGHT
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+META.yml
 README.md
-scripts/ppk
-scripts/ppk-deptool
+bin/ppk
+bin/ppk-deptool
 share/stub.pl

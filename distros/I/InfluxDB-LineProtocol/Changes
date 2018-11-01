@@ -1,5 +1,9 @@
 Changes for InfluxDB::LineProtocol
 
+1.011	2018-10-31T17:30:56
+    - Made TODO entry clickable. (Mohammad S Anwar)
+
+
 1.010   2018-06-19T13:07:50
     - it seems 1.009 was already published on CPAN, so another VERSION bump
 

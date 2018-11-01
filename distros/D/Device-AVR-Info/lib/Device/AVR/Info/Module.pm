@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 
@@ -67,6 +67,7 @@ Each is a structure of the following fields.
  $register->name
  $register->offset
  $register->size
+ $register->initval
  $register->caption
  $register->mask
  @fields = $register->bitfields
@@ -86,9 +87,10 @@ The C<bitfields> field returns a list of structures of the following fields:
    sub name      { shift->[0] }
    sub offset    { shift->[1] }
    sub size      { shift->[2] }
-   sub caption   { shift->[3] }
-   sub mask      { shift->[4] }
-   sub bitfields { @{ shift->[5] } }
+   sub initval   { shift->[3] }
+   sub caption   { shift->[4] }
+   sub mask      { shift->[5] }
+   sub bitfields { @{ shift->[6] } }
 
    package
       Device::AVR::Info::Module::_Bitfield;
@@ -122,7 +124,7 @@ sub _registers_offset
             bless [ "$_->{name}", "$_->{caption}", $mask, $values ], "Device::AVR::Info::Module::_Bitfield";
          } @{ $_->{bitfield} } : ();
 
-      bless [ "$_->{name}", $offset + hex "$_->{offset}", "$_->{size}",
+      bless [ "$_->{name}", $offset + hex "$_->{offset}", "$_->{size}", hex "$_->{initval}",
          "$_->{caption}", hex "$_->{mask}", \@fields ], "Device::AVR::Info::Module::_Register";
    } @{ $registers->{register} };
 }

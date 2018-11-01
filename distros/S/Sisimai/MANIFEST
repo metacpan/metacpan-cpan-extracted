@@ -89,7 +89,6 @@ lib/Sisimai/Message/JSON.pm
 lib/Sisimai/Order.pm
 lib/Sisimai/Order/Email.pm
 lib/Sisimai/Order/JSON.pm
-lib/Sisimai/RFC2606.pm
 lib/Sisimai/RFC3464.pm
 lib/Sisimai/RFC3834.pm
 lib/Sisimai/RFC5322.pm
@@ -221,6 +220,7 @@ set-of-emails/maildir/bsd/email-courier-03.eml
 set-of-emails/maildir/bsd/email-courier-04.eml
 set-of-emails/maildir/bsd/email-domino-01.eml
 set-of-emails/maildir/bsd/email-domino-02.eml
+set-of-emails/maildir/bsd/email-domino-03.eml
 set-of-emails/maildir/bsd/email-einsundeins-02.eml
 set-of-emails/maildir/bsd/email-exchange2003-01.eml
 set-of-emails/maildir/bsd/email-exchange2003-02.eml
@@ -490,6 +490,7 @@ set-of-emails/maildir/bsd/email-sendmail-52.eml
 set-of-emails/maildir/bsd/email-sendmail-53.eml
 set-of-emails/maildir/bsd/email-sendmail-54.eml
 set-of-emails/maildir/bsd/email-sendmail-55.eml
+set-of-emails/maildir/bsd/email-sendmail-56.eml
 set-of-emails/maildir/bsd/email-surfcontrol-01.eml
 set-of-emails/maildir/bsd/email-surfcontrol-02.eml
 set-of-emails/maildir/bsd/email-surfcontrol-03.eml
@@ -538,7 +539,6 @@ set-of-emails/maildir/bsd/email-zoho-03.eml
 set-of-emails/maildir/bsd/email-zoho-04.eml
 set-of-emails/maildir/bsd/email-zoho-05.eml
 set-of-emails/maildir/bsd/rfc3464-01.eml
-set-of-emails/maildir/bsd/rfc3464-02.eml
 set-of-emails/maildir/bsd/rfc3464-03.eml
 set-of-emails/maildir/bsd/rfc3464-04.eml
 set-of-emails/maildir/bsd/rfc3464-05.eml
@@ -734,7 +734,6 @@ t/026-smtp-status.t
 t/027-smtp-reply.t
 t/028-smtp-error.t
 t/031-rfc5322.t
-t/032-rfc2606.t
 t/040-message.t
 t/041-order.t
 t/043-message-email.t

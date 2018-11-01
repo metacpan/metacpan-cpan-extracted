@@ -238,13 +238,6 @@ use Carp;
 
 our $VERSION = '0.1';
 
-=for nothing
-
-TiedRow is the lowest-level tie, allowing you to treat a row as an array
-of column data.
-
-=cut
-
 sub TIEARRAY {
     my $class = shift;
     my $model = shift;
@@ -305,12 +298,6 @@ use Carp;
 # use Games::Axmud::Gtk::Simple::TiedCommon;
 
 our $VERSION = '0.1';
-
-=for nothing
-
-TiedList is an array in which each element is a row in the liststore.
-
-=cut
 
 sub TIEARRAY {
     my $class = shift;

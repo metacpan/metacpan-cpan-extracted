@@ -12,6 +12,10 @@ SYNOPSIS
 
         $self->report_warnings_groups;
 
+        $arrayref = $self->get_warnings_for_group('Wunused-variable');
+
+        $arrayref = $self->get_warnings_for_source('op.c');
+
 DESCRIPTION
     Perl5::Build::Warnings is a module for use in studying build-time
     warnings emitted by make when building the Perl 5 core distribution from
@@ -29,6 +33,10 @@ DESCRIPTION
     plain-text file. Something like:
 
         make test_prep 2>&1 > /path/to/make.log
+
+    The build log may be gzipped-compressed, *e.g.:*
+
+        make test_prep 2>&1 | gzip -c > /path/to/make.log.gz
 
    Format for Build-Time Warnings
     The module assumes that within such a logfile, warnings are recorded in
@@ -60,6 +68,11 @@ DESCRIPTION
     This is done in part because we may wish to use this data on the
     command-line and the hyphen is likely to be significant to the shell.
 
+   Complete Documentation
+    After installation, read the complete documentation via:
+
+        perldoc Perl5::Build::Warnings
+
 INSTALLATION
     To install:
 
@@ -69,9 +82,4 @@ INSTALLATION
         make install
 
     If you are on a windows box you should use 'nmake' rather than 'make'.
-
-    After installation, read the complete documentation via:
-
-        perldoc Perl5::Build::Warnings
-
 

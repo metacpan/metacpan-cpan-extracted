@@ -1,5 +1,9 @@
 Revision history for Math-Function-Interpolator
 
+1.03      2018-10-31 13:37:21+08:00 Asia/Manila
+        - Remove List::MoreUtils and replace with simpler equivalents (pairwise, indexes)
+        - Do not use `$a` and `$b` outside `sort()`
+
 1.02      2018-10-25 12:07:53+08:00 Asia/Manila
         Remove fatalized warnings
 

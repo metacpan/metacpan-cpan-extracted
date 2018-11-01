@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150001'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: FB3
 provides:
   FB3:
     file: lib/FB3.pm
-    version: '0.08'
+    version: '0.09'
   FB3::Validator:
     file: lib/FB3/Validator.pm
 requires:
@@ -29,6 +29,5 @@ requires:
   XML::LibXML: '0'
   perl: '5.014'
 resources:
-  license: http://opensource.org/licenses/lgpl-license.php
-version: '0.08'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+version: '0.09'

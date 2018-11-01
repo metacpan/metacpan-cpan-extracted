@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/RDF-NS-Curated>
 Bug tracker:  <https://github.com/kjetilk/p5-rdf-ns-curated/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+1.001	2018-11-01
+
+ - Added: Added solid and acl prefixes.
+
 1.000	2018-05-07
 
  - Added: Added qname method. Many thanks to Harald Jörg for a bugfix in my

@@ -19,10 +19,12 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  IO::File: '0'
+  IO::Zlib: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl5-Build-Warnings
   homepage: http://thenceforward.net/perl/modules/Perl5-Build-Warnings/
   repository: https://github.com/jkeenan/perl5-build-warnings.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

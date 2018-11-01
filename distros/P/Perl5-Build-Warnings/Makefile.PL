@@ -13,7 +13,10 @@ my %WriteMakefileArgs = (
     AUTHOR              => 'James E Keenan (jkeenan@cpan.org)',
     ABSTRACT            => 'Parse make output for build-time warnings',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
-    PREREQ_PM           => {},
+    PREREQ_PM           => {
+        'IO::Zlib'          => 0,
+        'IO::File'          => 0,
+    },
     ( $mm_ver < 6.63_03 ? 'BUILD_REQUIRES' : 'TEST_REQUIRES' ) => {
         'Test::Simple' => 0.44,
         'Capture::Tiny' => 0,

@@ -13,7 +13,7 @@ Axmud’s features include:
 * Full support for all major MUD protocols, including MXP and GMCP (with partial Pueblo support)
 * Class-based triggers, aliases, macros, timers and hooks
 * A powerful graphical automapper
-* 90 pre-configured worlds
+* 100 pre-configured worlds
 * Multiple approaches to scripting
 * Fully customisable from top to bottom, using the command line or the extensive GUI interface
 * Native support for visually-impaired users

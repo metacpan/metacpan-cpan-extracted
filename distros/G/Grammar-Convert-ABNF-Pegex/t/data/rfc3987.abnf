@@ -1,0 +1,19 @@
+IRI            = scheme ":" ihier-part [ "?" iquery ]
+                      [ "#" ifragment ]
+
+ihier-part     = "//" iauthority ipath-abempty
+               / ipath-absolute
+               / ipath-rootless
+               / ipath-empty
+
+IRI-reference  = IRI / irelative-ref
+
+absolute-IRI   = scheme ":" ihier-part [ "?" iquery ]
+
+irelative-ref  = irelative-part [ "?" iquery ] [ "#" ifragment ]
+
+irelative-part = "//" iauthority ipath-abempty
+                    / ipath-absolute
+                    / ipath-noscheme
+                    / ipath-empty
+

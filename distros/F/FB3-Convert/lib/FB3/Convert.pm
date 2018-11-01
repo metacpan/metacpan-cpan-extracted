@@ -21,7 +21,7 @@ use XML::Entities::Data;
 use Time::HiRes qw(gettimeofday sleep);
 binmode(STDOUT,':utf8');
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -89,6 +89,7 @@ our $ElsMainList = {
   'underline'=>undef,
   'b'=>undef,
   'strong'=>undef,
+  'br'=>undef,
 };
 
 our $ElsMainList2={};
@@ -283,7 +284,7 @@ sub new {
 
 			'DESCRIPTION' => {
 			  'TITLE-INFO' => {
-			    'COVER' => undef,
+ 			    'COVER_DESC' => undef,
 			      'AUTHORS' => undef, #[
 			                  #{
 			                  #  'first-name' => "Иван",
@@ -1211,6 +1212,7 @@ sub SomeFix {
   my $X = shift;
   my $Str = shift;
 
+  $Str =~ s#<([bB][rR])>\s*</\1>#<br/>#g; # <br> </br> => <br/>
   $Str =~ s/<\s*[bB][rR]\s*>/<br\/>/g; # <br> => <br/>
 
   return $Str;
@@ -1221,7 +1223,7 @@ sub ShitFix {
   my $X = shift;
   my $Str = shift;
   # /i здесь вызывает невероятные тормоза к сожалению
-  $Str =~ s#<([iI][mM][gG]) ([^>]+?/?)>\s*</\1>#<img $2>#g; # <img> </img> => <img/>t
+  $Str =~ s#<([iI][mM][gG]) ([^>]+?/?)>\s*</\1>#<img $2>#g; # <img> </img> => <img/>
 
   #DOM такое не любит
   $Str =~ s/<([aA])([^>]*?)\/\s*>/<$1$2><\/$1>/g; # <a/> => <a></a>

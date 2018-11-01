@@ -29,7 +29,7 @@ like $log, qr{NotASecret}, 'other response headers left untouched is filtered';
 $logger->CLEAR;
 $mech->{catalyst_debug} = 1;
 my $error_screen = $mech->get('http://localhost/boom?foo_param=secret')->content;
-my $expected_debug = qr/parameters\s+=&gt; { foo_param =&gt; &quot;\[FILTERED\]&quot; }/;
+my $expected_debug = qr/parameters\s+=&gt; \{ foo_param =&gt; &quot;\[FILTERED\]&quot; \}/;
 like $error_screen, $expected_debug, 'filtered on debug screen';
 
 use HTTP::Request::Common;

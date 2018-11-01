@@ -9,7 +9,6 @@ use POSIX qw(strftime);
 use Carp;
 use Data::Dumper;
 use English;
-use Win32;
 use XML::Simple;
 
 
@@ -19,11 +18,11 @@ XMLDB - Does XML Document to db schema conversion, Ded MedVed.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 
 

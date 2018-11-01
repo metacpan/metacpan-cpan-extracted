@@ -165,11 +165,12 @@ sub sim    # This function launch the simulations in ESP-r
     my $countstep = $dt{countstep}; #say $tee "IN SIM \$countstep : " . dump( $countstep );
     my $c = $dt{c}; #say $tee "IN SIM1 \$c : " . dump( $c );
 
-		my %to = %{ $dt{to} };
+		my %to = %{ $dt{to} }; say $tee " IN SIM \%to " . dump( \%to );
 		my %inst = %{ $dt{inst} };
+    my $instn = $dt{instn}; say $tee " IN SIM \$instn " . dump( $instn );
 
-		my $from = $dt{from}; #say $tee " IN MORPH \$from $from ";
-		my $toitem = $dt{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
+		my $from = $dt{from}; #say $tee " IN SIM \$from $from ";
+		my $toitem = $dt{toitem}; #say $tee " IN SIM \$toitem $toitem ";
 
     my @blockelts =$dt{blockelts};
     my @blocks = $dt{blocks};

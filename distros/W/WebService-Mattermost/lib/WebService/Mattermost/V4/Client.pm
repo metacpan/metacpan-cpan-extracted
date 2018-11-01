@@ -89,7 +89,7 @@ sub _connect {
         $self->ws($tx);
 
         unless ($tx->is_websocket) {
-            $self->logger->fatalf('WebSocket handshake failed: %s', $tx->res->error->{message});
+            $self->logger->fatal('WebSocket handshake failed');
         }
 
         $self->emit(gw_ws_started => {});
@@ -174,7 +174,7 @@ sub _on_message {
     my $message_args = { message => $message };
 
     if ($message->{data}->{post}) {
-        my $post_data = decode_json($message->{data}->{post});
+        my $post_data = decode_json(encode('utf8', $message->{data}->{post}));
 
         # Early return if the message is from the bot's own user ID (to halt
         # recursion)

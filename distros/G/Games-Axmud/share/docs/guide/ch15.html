@@ -43,7 +43,10 @@
 <li><a href="#15.17.2">15.17.2 Custom assisted moves</a></li>
 </ul>
 </li>
-<li><a href="#15.18">15.18 Pathfinding</a></li>
+<li><a href="#15.18">15.18 Pathfinding</a><ul>
+<li><a href="#15.18.1">15.18.1 Pathfinding problems</a> </li>
+</ul>
+</li>
 <li><a href="#15.19">15.19 Room tags</a></li>
 <li><a href="#15.20">15.20 Room guilds</a></li>
 <li><a href="#15.21">15.21 Room flags</a><ul>
@@ -75,22 +78,23 @@
 </ul>
 </li>
 <li><a href="#15.28">15.28 Checked directions</a></li>
-<li><a href="#15.29">15.29 Backing up maps</a><ul>
-<li><a href="#15.29.1">15.29.1 Sharing maps</a></li>
+<li><a href="#15.29">15.29 Getting lost</a></li>
+<li><a href="#15.29">15.30 Backing up maps</a><ul>
+<li><a href="#15.29.1">15.30.1 Sharing maps</a></li>
 </ul>
 </li>
-<li><a href="#15.30">15.30 Miscellaneous features</a><ul>
-<li><a href="#15.30.1">15.30.1 Opening the automapper window automatically</a></li>
-<li><a href="#15.30.2">15.30.2 Creating temporary regions</a></li>
-<li><a href="#15.30.3">15.30.3 Organising regions</a></li>
-<li><a href="#15.30.4">15.30.4 Favourite regions</a></li>
-<li><a href="#15.30.5">15.30.5 Running scripts</a></li>
-<li><a href="#15.30.6">15.30.6 Tooltips</a></li>
-<li><a href="#15.30.7">15.30.7 Using the automapper without a window</a></li>
-<li><a href="#15.30.8">15.30.8 Using unusual exits</a></li>
-<li><a href="#15.30.9">15.30.9 Primary directions in other languages</a></li>
-<li><a href="#15.30.10">15.30.10 Secondary directions</a></li>
-<li><a href="#15.30.11">15.30.11 Secondary directions in Cyrosphere</a></li>
+<li><a href="#15.30">15.31 Miscellaneous features</a><ul>
+<li><a href="#15.30.1">15.31.1 Opening the automapper window automatically</a></li>
+<li><a href="#15.30.2">15.31.2 Creating temporary regions</a></li>
+<li><a href="#15.30.3">15.31.3 Organising regions</a></li>
+<li><a href="#15.30.4">15.31.4 Favourite regions</a></li>
+<li><a href="#15.30.5">15.31.5 Running scripts</a></li>
+<li><a href="#15.30.6">15.31.6 Tooltips</a></li>
+<li><a href="#15.30.7">15.31.7 Using the automapper without a window</a></li>
+<li><a href="#15.30.8">15.31.8 Using unusual exits</a></li>
+<li><a href="#15.30.9">15.31.9 Primary directions in other languages</a></li>
+<li><a href="#15.30.10">15.31.10 Secondary directions</a></li>
+<li><a href="#15.30.11">15.31.11 Secondary directions in Cyrosphere</a></li>
 </ul>
 </li>
 </ul>
@@ -165,7 +169,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>As you move around the world, sometimes the automapper will get lost. This often happens when the current room (captured by the Locator task) isn't the one the automapper was expecting.</p>
 <p>When the automapper gets lost, the <em>previous</em> current room is drawn with a green border.</p>
 <p><img alt="Previous room" src="img/ch15/previous_room.png"></p>
-<p>Since there is no longer a current room, the automapper won't modify any of the existing rooms by mistake.</p>
+<p>Since there is no longer a current room, the automapper won't modify any of the existing rooms by mistake. (If you want the automapper to continue drawing rooms, rather than just giving up, then see <a href="#15.29">Section 15.29</a>.)</p>
 <h2><a name="15.6">15.6 Selecting rooms</a></h2>
 <p>You can select a room by clicking it. A selected room is drawn blue.</p>
 <p><img alt="Selected room" src="img/ch15/selected_room.png"></p>
@@ -259,24 +263,49 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>A fourth method is to drag the exit over the destination room. We'll discuss dragging in <a href="#15.11.1">Section 15.11.1</a>.</p>
 <h2><a name="15.11">15.11 Moving rooms and labels</a></h2>
 <p>Rooms can be moved to another part of the map or even to a different region altogether.</p>
-<p>First select the rooms you want to move. Then hold down the ALT-GR key (it's just to the right of the space bar) and simply drag-and-drop the rooms to their new position.</p>
+<p>First select the rooms you want to move. If you want to move rooms within the same region, hold down the <strong>ALT-GR</strong> key (it's just to the right of the space bar) and simply drag-and-drop the rooms to their new position.</p>
 <ul>
 <li>Multiple rooms are dragged together</li>
 <li>If you've selected at least one room, any selected labels are dragged along with it</li>
 <li>If you've selected only labels, only the label under the mouse cursor is dragged</li>
 <li>When you move rooms around, exits are automatically re-drawn. If necessary, they are re-drawn as region exits.</li>
 </ul>
-<p><img alt="Drag mode button" src="img/ch15/drag_mode_button.png"> A few keyboards don't have such any such key, in which case you can use the <em>Drag mode</em> button.</p>
+<p>Some keyboards don't have an <strong>ALT-GR</strong> key, in which case you can use the blue <em>Drag mode</em> button.</p>
+<p><img alt="Drag mode button" src="img/ch15/drag_mode_button.png"> </p>
 <ul>
 <li>Click the button to turn on <strong>Drag mode</strong></li>
 <li>Drag the room(s) to their new position</li>
-<li>Click the button again to turn off <strong>Drag mode</strong></li>
+<li>When you've finished dragging things around, click the button to turn off <strong>Drag mode</strong></li>
 </ul>
-<p>Yet another method is to use CTRL+C.</p>
+<p>Another method, which is especially useful if you want to move rooms to a new region, is to use <strong>CTRL+C</strong>.</p>
 <ul>
-<li>Select a group of rooms and/or labels</li>
-<li>Press CTRL+C</li>
-<li>Click on the map to move the selected rooms/labels to that position</li>
+<li>Select a group of rooms <ul>
+<li>Any selected labels are moved with them</li>
+</ul>
+</li>
+<li>Press <strong>CTRL+C</strong></li>
+<li>Click on a map to move the selected rooms/labels to that position</li>
+</ul>
+<p>You can move the selected rooms in a particular direction, if you want. This is useful for moving rooms a long distance within the same region.</p>
+<ul>
+<li>Select a group of rooms<ul>
+<li>Any selected labels are moved with them</li>
+</ul>
+</li>
+<li>From the menu, click <strong>Rooms &gt; Move rooms/labels &gt; Move in direction...</strong></li>
+<li>Enter a distance and a direction, then click the <strong>OK</strong> button</li>
+</ul>
+<p>You can transfer rooms to a different region. The rooms are moved to the same position in the new region.</p>
+<ul>
+<li>Select a group of rooms<ul>
+<li>Any selected labels are moved with them</li>
+</ul>
+</li>
+<li>From the menu, click <strong>Rooms &gt; Move rooms/labels &gt; Transfer to region &gt; Select region... </strong><ul>
+<li>Other regions you've recently viewed are also listed here, for your convenience</li>
+</ul>
+</li>
+<li>Select a destination region </li>
 </ul>
 <h3><a name="15.11.1">15.11.1 Dragging exits</a></h3>
 <p>You can connect rooms together by dragging the exit onto its destination room.</p>
@@ -379,6 +408,14 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>In the popup menu that appears, select <strong>Set label...</strong></li>
 <li>Select a label style, and click the <strong>OK</strong> button</li>
 </ul>
+<p>If you want to creates labels with multiple lines of text, you can do this:</p>
+<ul>
+<li>From the menu, select <strong>Labels &gt; Use multiline labels</strong><ul>
+<li>Repeat this step to go back to single-line labels</li>
+<li>This setting only affects new labels. If you turn off multiline labels, any existing multiline labels are not affected</li>
+</ul>
+</li>
+</ul>
 <h2><a name="15.16">15.16 Exit ornaments</a></h2>
 <p>When your character tries to move south but walks into a closed door, the automapper redraws the exit (assuming that the current world has been configured to recognise closed doors).</p>
 <p><img alt="Closed exit ornament" src="img/ch15/closed_ornament.png"></p>
@@ -449,9 +486,40 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>A custom assisted move of this kind will be used instead of the normal one. In other words, the automapper will not try to insert an <strong>open door</strong> command while moving through this exit.</p>
 <h2><a name="15.18">15.18 Pathfinding</a></h2>
 <p>The automapper can find the shortest path between two rooms virtually instantaneously, even if it means crossing dozens of different regions.</p>
-<p>Double-click on a room to go there via the shortest possible path. (You can also right-click the destination room and select <strong>Go to room</strong>.)</p>
+<p>Double-click on a room to go there via the shortest possible path. (You can also right-click the destination room and select <strong>Pathfinding &gt; Go to room</strong>.)</p>
 <p><img alt="Pathfinding example" src="img/ch15/pathfinding.png"></p>
 <p>All rooms along the path are selected so that you can clearly see the route. When you arrive, click on an empty area of the map to de-select them all.</p>
+<h3><a name="15.18.1">15.18.1 Pathfinding problems</a></h3>
+<p>Sometimes, when you double-click on a destination room, you'll get a <em>No path found</em> error instead of what you were expecting. There are usually two reasons for this.</p>
+<p>Reason 1: <em>A path exists between rooms in one direction, but not the opposite direction</em></p>
+<p>If the map has been drawn with simple exits (or no exits at all - see <a href="#15.8">Section 15.8</a>), there might appear to be a path from west to east:</p>
+<p><img alt="Pathfinding problem 1" src="img/ch15/path_problem1.png"></p>
+<p>But, in fact, when you turn on complex exits, you'll find that a path only exists from east to west:</p>
+<p><img alt="Pathfinding problem 2" src="img/ch15/path_problem2.png"></p>
+<p>Reason 2: <em>Axmud's pathfinding optimisation has failed</em></p>
+<p>Some maps can contain many tens thousands of rooms. Finding a path between two rooms might take a long time - perhaps, a <em>very</em> long time - so Amxud tries to do some of the work in advance, working out the shortest paths across each region. </p>
+<p>This approach works well in regions with just a few region exits, but would be useless in a large region with dozens or hundreds of region exits. (Working out all the possible paths would take much longer than actually moving between two rooms!)</p>
+<p>As a compromise, Axmud calculates a single path between two non-adjacent regions, ignoring all other possible paths between them. For example, consider a region B which is connected to regions A and C. </p>
+<pre><code>    A --- B --- C
+</code></pre>
+<p>Region B might have many exits which lead to Region A, but only one of them is marked as a <em>super-region exit</em>. That's the one Axmud uses when it does pathfinding between a room in Region A and a room in Region C.</p>
+<p>You can add more super-region exits, if you want, and this will allow you to move between rooms in Region A and Region C using any of those exits, instead of just one of them.</p>
+<ul>
+<li>Right-click on a region exit and select <strong>Set exit type &gt; Set super &gt; Mark exit as super-region exit</strong><ul>
+<li>To reverse this step, select <strong>Set exit type &gt; Set super &gt; Mark exit as normal region exit</strong></li>
+</ul>
+</li>
+</ul>
+<p>There's are two situations in which you might want to convert all of Region B's region exits into super-region exits.</p>
+<ul>
+<li>The only way to travel between two rooms in Region A is to go via Region B</li>
+<li>You're drawing a town in Region A. Most buildings are just one room, but some buildings contain lots of rooms, so you've moved those rooms into Region B. There are now several groups of rooms in Region B which are connected to Region A, but not to each other.</li>
+</ul>
+<p>If either of those situations apply, do this:</p>
+<ul>
+<li>Make Region B the current region</li>
+<li>From the menu, select <strong>Regions &gt; Current region &gt; Convert all region exits</strong></li>
+</ul>
 <h2><a name="15.19">15.19 Room tags</a></h2>
 <p>A good way to mark important rooms is with a room tag.  Rooms tags belong to a specific room.</p>
 <p><img alt="Room tag" src="img/ch15/room_tag.png"></p>
@@ -630,8 +698,8 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>You can convert a normal room to a wilderness room and back again, if you want to.</p>
 <ul>
 <li>Right click the room</li>
-<li>In the popup menu, select <strong>Set exits &gt; Mark room as wilderness</strong><ul>
-<li>Select <strong>Set exits &gt; Mark room as normal</strong> to convert back to a normal room</li>
+<li>In the popup menu, select <strong>Add/set exits &gt; Mark room as wilderness</strong><ul>
+<li>Select <strong>Add/set exits &gt; Mark room as normal</strong> to convert back to a normal room</li>
 </ul>
 </li>
 </ul>
@@ -649,7 +717,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p><img alt="Wilderness rooms" src="img/ch15/wild_room_3.png"></p>
 <p><em>Wilderness border rooms</em> are drawn with an empty circle in the middle.  The nearby rooms can remain as <em>wilderness rooms</em>.</p>
 <p>In this example, it's now only possible to enter the house from the south.</p>
-<h2>15.25<a name="15.25">Room interiors</a></h2>
+<h2><a name="15.25">15.25 Room interiors</a></h2>
 <p>The automapper can show statistics about each room. One useless but entertaining feature is to show how many times a room has been visited by the current character.</p>
 <ul>
 <li>In the automapper menu, select <strong>View &gt; Room interiors &gt; Draw character visits</strong></li>
@@ -732,14 +800,22 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>In crafty moves mode, if you character moves north from a room that doesn't contain a north exit, the automapper will create a hidden exit in that direction for you.  (This mode overrides protected moves mode, described in <a href="#15.17.1">Section 15.17.1</a>.)</p>
 <h3><a name="15.27.4">15.27.4 Transient exits</a></h3>
 <p>A transient exit is one which moves from room to room.</p>
-<p>A better explanation is that a transient exit leads to a moving <em>vehicle</em>, and it's the vehicle which moves from room to room.</p>
-<p>If your character moves into a room with a transient exit, the automapper will get lost.  (If the automapper was expecting a room with north and south exits, but the room contains three exits, the automapper is forced to assume that it's in the wrong place.)</p>
+<p>Transient exits usually lead to a room that represents a moving vehicle. As the vehicle moves around the world, a transient exit like <em>board wagon</em> moves with it. </p>
+<p>This causes a problem for the automapper, which usually checks the exits in a new room to make sure they're the exits it was expecting. If the <em>board wagon</em> exit has moved somewhere else, the automapper will assume it has lost track of the current location.</p>
 <p>For worlds like <em>Discworld</em> that use a lot of moving vehicles, you can specify a list of transient exits.  The automapper ignores any transient exits you specify.</p>
 <ul>
 <li>From the main window menu, click <strong>Edit &gt; Edit current profile &gt; Edit current world...</strong></li>
 <li>In the edit window, click <strong>Moves &gt; Page 4</strong></li>
-<li>In the box, add a transient exit like <strong>board wagon</strong></li>
+<li>In the <strong>Transient exit pattern</strong> box, add something like <strong>board wagon</strong><ul>
+<li>If you've drawn the wagon as a room on your map, you can specify that room's number</li>
+<li>Otherwise, just leave the <strong>Destination room #</strong> box empty</li>
 </ul>
+</li>
+<li>Click the <strong>Add</strong> button to add the transient exit</li>
+<li>Click the <strong>OK</strong> button to close the window</li>
+</ul>
+<p>If you specify a destination room, the automapper checks it against the Locator task's current room. If it doesn't match, the automapper keeps checking the other transient exits you've added.</p>
+<p>This is useful if the world contains (for example) five moving wagons, each with a different room description but the same <strong>board wagon</strong> exit. In that case, you can add five transient exits - each with the pattern <strong>board wagon</strong>, but with a different destination room.</p>
 <h2><a name="15.28">15.28 Checked directions</a></h2>
 <p>Some worlds have hidden exits dotted around the game which aren't easy for the player to find.</p>
 <p>If you're playing at such a world, you can go from room to room, testing each compass direction, and you can ask Axmud to keep track of each room and each direction you've tried.</p>
@@ -762,7 +838,84 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>From the automapper menu, select <strong>Edit &gt; Generate reports &gt; Checked directions &gt; Current region</strong></li>
 <li>Also, you can click <strong>Edit &gt; Select &gt; Select rooms &gt; Rooms with checkable directions</strong></li>
 </ul>
-<h2><a name="15.29">15.29 Backing up maps</a></h2>
+<h2><a name="15.29">15.29 Getting lost</a></h2>
+<p><a href="#15.5">Section 15.5</a> describes how the automapper sometimes gets lost, drawing the room with a green border and switching to <strong>Wait mode</strong>.</p>
+<p>There are a number of reasons why the automapper might get lost. In some cases - for example, when you've clicked the brown <strong>Reset Locator</strong> button - the automapper really is lost, and it's up to you to find your place again.</p>
+<p>In most cases, though, you can set the automapper to start drawing rooms in a different location. The automapper provides some tools to help you work out when you're drawing a duplicate room, and to merge that duplicate room with the original, if you want.</p>
+<h3><a name="15.29.1">15.29.1 Auto-compare mode</a></h3>
+<p>Some worlds arrange their rooms on a regular grid that's very easy to map. </p>
+<p>Many other worlds, however, arrange their rooms in a most irregular way. This can be very tricky to map, especially if you're not familiar with the area. </p>
+<p>In this situation, you might like to make use of <strong>Auto-compare mode</strong>. Auto-compare mode is available whenever the automapper window is open and in <strong>Update mode</strong>.</p>
+<ul>
+<li>From the automapper menu, select <strong>Mode &gt; Auto-compare &gt; Auto-compare new rooms</strong></li>
+</ul>
+<p>The automapper draws new rooms as your characters wanders around the world. Every new room is checked against the other rooms in the region. If the automapper finds any matching rooms, the new room is drawn like this:</p>
+<p><img alt="New room matching one other" src="img/ch15/match_one_room.png"></p>
+<p>The black rectangle inside the room represents a single matching room. The matching room is automatically selected, so if it's nearby, you'll see it drawn with a blue border.</p>
+<p>If you're sure that these two rooms on the map represent the same location, you can <em>merge</em> them together. There are several ways to do it:</p>
+<ul>
+<li>Double-click on the current room</li>
+<li>From the automapper menu, select <strong>Rooms &gt; Move rooms/labels &gt; Merge/move rooms</strong></li>
+<li>Right click the room and select <strong>Move rooms/labels &gt; Merge room</strong></li>
+<li>Drag-and-drop the current room onto the selected room</li>
+</ul>
+<p>If the new room matches <em>several</em> rooms, it is drawn like this:</p>
+<p><img alt="New room matching several others" src="img/ch15/match_many_rooms.png"></p>
+<p>You'll notice that the rectangle inside the room is now drawn red, not black. If the difference isn't clear, you can show the actual number of matching rooms.</p>
+<ul>
+<li>From the automapper menu, select <strong>View &gt; Room interiors &gt; Draw matching rooms</strong></li>
+</ul>
+<p>All of the matching rooms are selected. If you want to merge the current room with one of the selected rooms, you can drag-and-drop as before, or you can do it this way:</p>
+<ul>
+<li>Double-click on the current room</li>
+<li>Left-click on one of the matching selected rooms</li>
+</ul>
+<p>You don't need to merge one room at a time; you can merge a whole group of rooms, if that's more convenient. </p>
+<p>The automapper is fairly intelligent in the way it decides which pairs of rooms should be merged. It carefully compares how rooms are connected to each other; as a result, it makes little difference to the result if you've been dragging rooms all around your map.</p>
+<ul>
+<li>Select a group of rooms<ul>
+<li>One of the selected rooms <em>must</em> be the current room</li>
+</ul>
+</li>
+<li>Drag-and-drop the <strong>current room</strong> onto another room<ul>
+<li>That other room must match the current room</li>
+<li>All of the selected rooms are dragged-and-dropped at the same time</li>
+</ul>
+</li>
+<li>If the drag-and-drop operation succeeds, the current room is merged<ul>
+<li>Other rooms are merged with existing rooms, if possible</li>
+<li>If they can't be merged, they are simply moved</li>
+<li>Rooms that can't be merged or moved are left in their original location</li>
+</ul>
+</li>
+</ul>
+<h3><a name="15.29.2">15.29.2 Auto-rescue mode</a></h3>
+<p>When the automapper gets lost and <strong>auto-rescue mode</strong> is enabled, instead of just giving up, the automapper will create a temporary region and will start drawing rooms there, instead.</p>
+<ul>
+<li>From the automapper menu, select <strong>Mode &gt; Auto-rescue mode &gt; Enable auto-rescue mode</strong></li>
+</ul>
+<p>In this temporary region, the automapper will automatically compare the current room against rooms in the  <em>previous</em> region (in other words, the region in which you got lost).</p>
+<p>Move around until you find a room that matches exactly one room in the previous region, and then merge those rooms using any of the methods described above. <em>All of the rooms</em> in the temporary region are merged or moved at the same time.</p>
+<p>If you like, you can tell the automapper to perform the merge operation as soon as you find a room matching just one room in the previous region.</p>
+<ul>
+<li>From the automapper menu, select <strong>Mode &gt; Auto-rescue mode &gt; Merge at first matching room</strong><ul>
+<li>If you want a warning before this happens, select <strong>Prompt before merging</strong> as well</li>
+</ul>
+</li>
+</ul>
+<p>Note that auto-rescue mode can't be activated in all situations. It won't work if you manually reset the Locator task, if you're in <strong>Connect offline</strong> mode or if there's been an internal error of some kind.</p>
+<h3><a name="15.29.3">15.29.3 Auto-slide mode</a></h3>
+<p>An alternative to auto-rescue mode is <strong>auto-slide mode</strong>, which is useful in a situation like this:</p>
+<p><img alt="Slide mode before" src="img/ch15/slide_mode_1.png"></p>
+<p>If you try moving east from the current room (with a red border), the automapper won't be able to draw a new room just to the east because that position on the map is already occupied by the blocking (brown) room.</p>
+<p>When auto-slide mode is on, instead of giving up, the automapper slides the new room into the first empty space.</p>
+<p><img alt="Slide mode after" src="img/ch15/slide_mode_2.png"></p>
+<p>To turn on auto-slide mode:</p>
+<ul>
+<li>From the automapper menu, select <strong>Mode &gt; Auto-slide mode &gt; Slide new room forwards</strong></li>
+</ul>
+<p>The automapper can slide the original room, the blocking room or the new (destination room), either forwards or backwards, depending on your preference.</p>
+<h2><a name="15.30">15.30 Backing up maps</a></h2>
 <p>It's a good idea to make backup copies of your maps from time to time.</p>
 <p>Actually, maps are stored in a <em>world model</em>, and it's this file which needs to be backed up.</p>
 <ul>
@@ -785,7 +938,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>In the dialogue window that appears, select the file you saved earlier</li>
 <li>Then click the <strong>OK</strong> button</li>
 </ul>
-<h3><a name="15.29.1">15.29.1 Sharing maps</a></h3>
+<h3><a name="15.30.1">15.30.1 Sharing maps</a></h3>
 <p>If you've worked very hard on your maps, you might like to claim some credit before sharing them with other people.</p>
 <ul>
 <li>From the automapper menu, click <strong>Edit &gt; Edit world model...</strong></li>
@@ -799,13 +952,13 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>Share the back-up file with your friends</li>
 <li>They can load the map by importing the back-up file, as described above</li>
 </ul>
-<h2><a name="15.30">15.30 Miscellaneous features</a></h2>
-<h3><a name="15.30.1">15.30.1 Opening the automapper window automatically</a></h3>
+<h2><a name="15.31">15.31 Miscellaneous features</a></h2>
+<h3><a name="15.31.1">15.31.1 Opening the automapper window automatically</a></h3>
 <p>If you use the automapper regularly, it's convenient to set the window to open every time you connect to the world.</p>
 <ul>
 <li>From the automapper menu, select <strong>Mode &gt; Start-up flags &gt; Open automapper on startup</strong></li>
 </ul>
-<h3><a name="15.30.2">15.30.2 Creating temporary regions</a></h3>
+<h3><a name="15.31.2">15.31.2 Creating temporary regions</a></h3>
 <p>If you want to find your away around a random area - a maze that resets every time someone enters it, perhaps - you can use a temporary region.</p>
 <ul>
 <li>From the automapper menu, click <strong>Regions &gt; New temporary region...</strong></li>
@@ -818,7 +971,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <ul>
 <li>From the automapper menu, click <strong>Regions &gt; Delete temporary regions</strong></li>
 </ul>
-<h3><a name="15.30.3">15.30.3 Organising regions</a></h3>
+<h3><a name="15.31.3">15.31.3 Organising regions</a></h3>
 <p>If your map has a lot of regions it's possible to organise them into groups.</p>
 <p><img alt="Region list" src="img/ch15/region_list_1.png"></p>
 <p>For example, at <em>Dead Souls</em> the cave region is next to the much bigger town region, so we can make the town the <em>parent region</em>.</p>
@@ -834,20 +987,20 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>Click on the minus ( - ) sign, next to <strong>town</strong>, to hide its child regions</li>
 <li>Click on the new plus ( + ) to reveal its child regions</li>
 </ul>
-<h2><a name="15.30.4">15.30.4 Favourite regions</a></h2>
+<h2><a name="15.31.4">15.31.4 Favourite regions</a></h2>
 <p>The region list is normally in alphabetical order. If one region is at the centre of the world, or if you spend most of your time in a particular region, you can move it to the top of the list.</p>
 <ul>
 <li>In the region list, double-click on <strong>town</strong> to make it the current region</li>
 <li>From the automapper window, click <strong>View &gt; Window components &gt; Move current region to top</strong></li>
 </ul>
-<h2><a name="15.30.5">15.30.5 Running scripts</a></h2>
+<h2><a name="15.31.5">15.31.5 Running scripts</a></h2>
 <p>You can specify an Axbasic script that should be run, every time your character enters a particular room.</p>
 <ul>
 <li>Right-click the room and choose <strong>Edit room...</strong></li>
 <li>When the edit window is open, click on <strong>Room &gt; Page 1</strong></li>
 <li>Enter the name of one or more Axbasic scripts in the box at the bottom of the window</li>
 </ul>
-<h3><a name="15.30.6">15.30.6 Tooltips</a></h3>
+<h3><a name="15.31.6">15.31.6 Tooltips</a></h3>
 <p>If you want to find out more about a room, one method is to open its edit window. Exits also have their own edit windows. (Those edit windows can be opened from the automapper window's menus.)</p>
 <p>A move convenient method is to let your mouse hover above the room (or exit). After a moment, Axmud will display tooltips for the object.</p>
 <p><img alt="Room tooltips" src="img/ch15/room_tooltip.png"></p>
@@ -861,7 +1014,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>When the edit window is open, click on the <strong>Notes</strong> tab</li>
 <li>Enter any notes you like, then cick the <strong>OK</strong> button</li>
 </ul>
-<h3><a name="15.30.7">15.30.7 Using the automapper without a window</a></h3>
+<h3><a name="15.31.7">15.31.7 Using the automapper without a window</a></h3>
 <p>The automapper actually consists of three separate components - the <em>automapper object</em>, which tracks the character's current position, the <em>world model</em>, which stores the data, and the automapper window itself, which draws rooms, exits and labels.</p>
 <p>As a result, the automapper <em>object</em> can track your character's position, even when the automapper <em>window</em> is closed.</p>
 <ul>
@@ -896,7 +1049,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <pre><code>    ;resetroom
     ;rrm
 </code></pre>
-<h3><a name="15.30.8">15.30.8 Using unusual exits</a></h3>
+<h3><a name="15.31.8">15.31.8 Using unusual exits</a></h3>
 <p>Cryosphere, which is one of Axmud's pre-configured worlds, uses the standard north-south west-east directions, but some zones in the game use a fore-aft port-starboard system. In addition, areas of the game set on a radial space station use a hubwards-rimwards anticlockwise-clockwise system.</p>
 <p>If you're using the pre-configured world profile, exploring this game with the Axmud automapper should be easy. You can move your character through a <strong>port</strong> exit using any of the following commands:</p>
 <pre><code>    west
@@ -930,7 +1083,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>In this window, you can click the checkbutton near the top of the window (<strong>Show all intercardinal directions</strong>)</li>
 <li>In the automapper window, click on the menu item <strong>Mode &gt; Other flags &gt; Show all directions in dialogues</strong>. This setting will apply to most automapper dialogue windows</li>
 </ul>
-<h3><a name="15.30.9">15.30.9 Primary directions in other languages</a></h3>
+<h3><a name="15.31.9">15.31.9 Primary directions in other languages</a></h3>
 <p>Axmud knows how to set custom primary directions for about a dozen languages.</p>
 <ul>
 <li>In the edit window you just opened, click the <strong>Name</strong> tab</li>
@@ -952,7 +1105,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>When you're finished, click the <strong>Save'</strong>button at the bottom of the window</li>
 </ul>
 <p>By the way, Axmud continues to use a set of <em>standard</em> primary directions - the English words 'north', 'southeast', 'up' and so on - internally, regardless of which <em>custom</em> primary directions you set. (You will probably only notice this if you start poking around deep inside Axmud's edit windows.)</p>
-<h3><a name="15.30.10">15.30.10 Secondary directions</a></h3>
+<h3><a name="15.31.10">15.31.10 Secondary directions</a></h3>
 <p>Axmud uses exactly eighteen primary directions - the ones described in <a href="#15.30.8">Section 15.30.8</a> - but it also uses a set of 'secondary' directions.</p>
 <p>Secondary directions help Axmud to distinguish between things that are exits and things which aren't exits. The default set of secondary directions are:</p>
 <pre><code>    in / out
@@ -967,7 +1120,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>You can modify the list of secondary directions in any way you please. (The only rule is that you can't add a word that's already being used as a primary direction.)</p>
 <p>It's not necessary to add <em>every possible word</em> to your list of secondary directions. If Axmud encounters an exit called <em>cupboard</em>, this exit will be (temporarily) drawn in the first available direction (see <a href="#15.14">Section 15.14</a>). In fact, most users will never need to modify any of the secondary directions.</p>
 <p>(The previous Section demonstrated how you could change Axmud's custom primary directions, which are English words, into a set of French words at the click of a button. Doing so will not affect this list of secondary directions, which must be modified separately.)</p>
-<h3><a name="15.30.11">15.30.11 Secondary directions in Cyrosphere</a></h3>
+<h3><a name="15.31.11">15.31.11 Secondary directions in Cyrosphere</a></h3>
 <p>To set custom secondary directions, first open the current dictionary's edit window:</p>
 <pre><code>    ;editdictionary
     ;edy

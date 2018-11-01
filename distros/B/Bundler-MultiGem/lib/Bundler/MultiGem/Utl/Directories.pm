@@ -6,15 +6,15 @@ use warnings;
 
 =head1 NAME
 
-Bundler::MultiGem::Util::Directories - The great new Bundler::MultiGem::Directories!
+Bundler::MultiGem::Util::Directories - Wrapper of utility functions for directories
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Exporter qw(import);
 our @EXPORT = qw(mk_dir rm_dir);
@@ -23,23 +23,18 @@ use File::Path qw( make_path remove_tree );
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
+Wrapper of utility functions for directories
 
-Perhaps a little code snippet.
+    use Bundler::MultiGem::Directories qw(mk_dir rm_dir);
 
-    use Bundler::MultiGem::Directories;
-
-    my $foo = Bundler::MultiGem::Directories->new();
-    ...
+    mk_dir($path); # create path if not exists
+    rm_dir($path); # remove path if exists
 
 =head1 EXPORT
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+=head2 mk_dir
 
-=head1 SUBROUTINES/METHODS
-
-=head2 make_dir
+creates a path if not exists
 
 =cut
 
@@ -50,7 +45,9 @@ sub mk_dir {
   }
 }
 
-=head2 rm_{dir}
+=head2 rm_dir
+
+removes a path if exists
 
 =cut
 
@@ -67,12 +64,9 @@ Mauro Berlanda, C<< <kupta at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-. at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=.>.  I will be notified, and then you'll
+Please report any bugs or feature requests to L<https://github.com/mberlanda/Bundler-MultiGem/issues>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=.>. I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 
@@ -83,23 +77,15 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=.>
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bundler-MultiGem>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * Github Repository
 
-L<http://annocpan.org/dist/.>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/.>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/./>
+L<https://github.com/mberlanda/Bundler-MultiGem>
 
 =back
 
@@ -150,4 +136,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Bundler::MultiGem::Directories
+1;

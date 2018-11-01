@@ -1,3 +1,6 @@
+0.08 2018-11-01
+        - Change permissions for files (manwar++).
+
 0.07 2018-08-10
         - Fix memory leak in random_string
           (RT #125981; ether).

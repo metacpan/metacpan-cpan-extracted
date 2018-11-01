@@ -1,11 +1,22 @@
 Revision history for Perl CPAN module Lingua::En::Fathom
 
+1.22 1 Nov 2018
+    Added prerequsitie module Lingua::En::Sentence to build files
+    Updated main.t
+
+1.21 31 Oct 2018
+    Updated main.t
+    
+1.20 31 Oct 2018
+    Renamed github repo to 'Readability'
+    Used Lingua::EN::Sentence instead of a regexp to get a more accurate sentence count 
+
 1.19 15 Sep 2016
     Set github as repository
 
 1.18 7 Apr 2015
     removed indirect object notation for 'new' method
-    Fix for #102898, no minimim version set for warnings in Build.PL, to support very old versions of Perl
+    Fix for #102898, no minimum version set for warnings in Build.PL, to support very old versions of Perl
     
 1.17 20 Mar 2015
     Added prerequiste moudule to Build.PL

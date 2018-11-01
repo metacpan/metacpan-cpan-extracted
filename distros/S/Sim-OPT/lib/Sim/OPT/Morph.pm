@@ -154,7 +154,7 @@ sub morph
 		42 => "0\n0\nb\np", 43 => "0\n0\nb\nq", 44 => "0\n0\nb\nr", 45 => "0\n0\nb\ns", 46 => "0\n0\nb\nt",
 		47 => "0\n0\nb\n0\nb\nu", 48 => "0\n0\nb\n0\nb\nv", 49 => "0\n0\nb\n0\nb\nw", 50 => "0\n0\nb\n0\nb\nx",
 		51 => "0\n0\nb\n0\nb\ny", 52 => "0\n0\nb\n0\nb\nz",
-		53 => "0\n0\nc\n0\nc\na", 54 => "0\n0\nc\n0\nc\nb", 55 => "0\n0\nc\n0\nc\nc", 56 => "0\n0\nc\n0\nc\nd",
+		53 => "0\n0\nb\n0\nb\na", 54 => "0\n0\nb\n0\nb\nb", 55 => "0\n0\nb\n0\nb\nc", 56 => "0\n0\nb\n0\nb\nd",
 		57 => "0\n0\nb\n0\nb\ne", 58 => "0\n0\nb\n0\nb\nf",
 		59 => "0\n0\nb\n0\nb\ng", 60 => "0\n0\nb\n0\nb\nh", 61 => "0\n0\nb\n0\nb\ni",
 		62 => "0\n0\nb\n0\nb\n0\nb\nj", 63 => "0\n0\nb\n0\nb\n0\nb\nk", 64 => "0\n0\nb\n0\nb\n0\nb\nl",
@@ -182,7 +182,7 @@ sub morph
 	"0\n0\nb\nf" => 32, "0\n0\nb\ng" => 33, "0\n0\nb\nh" => 34, "0\n0\nb\ni" => 35, "0\n0\nb\nj" => 36, "0\n0\nb\nk" => 37, "0\n0\nb\nl" => 38,
 	"0\n0\nb\nm" => 39, "0\n0\nb\nn" => 40, "0\n0\nb\no" => 41, "0\n0\nb\np" => 42, "0\n0\nb\nq" => 43, "0\n0\nb\nr" => 44, "0\n0\nb\ns" => 45,
 	"0\n0\nb\nt" => 46,
-	"0\n0\nb\n0\nb\nu" => 47, "0\n0\nb\n0\nb\nv" => 48, "0\n0\nb\n0\nb\nw" => 49, "0\n0\nb\n0\nb\nx" => 50, "0\n0\nb\n0\nb\ny" => 51, "0\n0\nc0\nc\nz" => 52,
+	"0\n0\nb\n0\nb\nu" => 47, "0\n0\nb\n0\nb\nv" => 48, "0\n0\nb\n0\nb\nw" => 49, "0\n0\nb\n0\nb\nx" => 50, "0\n0\nb\n0\nb\ny" => 51, "0\n0\nb0\nb\nz" => 52,
 	"0\n0\nb\n0\nb\na" => 53, "0\n0\nb\n0\nb\nb" => 54, "0\n0\nb\n0\nb\nc" => 55, "0\n0\nb\n0\nb\nd" => 56, "0\n0\nb\n0\nb\ne" => 57, "0\n0\nb0\nb\nf" => 58,
 	"0\n0\nb\n0\nb\ng" => 59, "0\n0\nb\n0\nb\nh" => 60, "0\n0\nb\n0\nb\ni" => 61,
 	"0\n0\nb\n0\nb\n0\nb\nj" => 62, "0\n0\nb\n0\nb\n0\nb\nk" => 63, "0\n0\nb\n0\nb\n0\nb\nl" => 64, "0\n0\nb\n0\nb\n0\nb\nm" => 65, "0\n0\nb\n0\nb\n0\nb\nn" => 66,
@@ -286,9 +286,9 @@ sub morph
 		my @blockelts = @{ $d{blockelts} };
 		my @blocks = @{ $d{blocks} };
 
-		my $origin = $d{origin}; #say $tee "IN MORPH, \$origin: " . dump( $origin );
-		my %to = %{ $d{to} }; #say $tee "IN MORPH, \%to: " . dump( \%to );
-		my %inst = %{ $d{inst} }; #say $tee "IN MORPH, \%inst: " . dump( \%inst );
+		my $origin = $d{origin}; say $tee "IN MORPH, \$origin: " . dump( $origin );
+		my %to = %{ $d{to} }; say $tee "IN MORPH, \%to: " . dump( \%to );
+		my %inst = %{ $d{inst} }; say $tee "IN MORPH, \%inst: " . dump( \%inst );
 
 		my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
 		my $toitem = $d{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
@@ -392,9 +392,9 @@ sub morph
 							$target = $inst{$dirfiles{starter}}; #say $tee "FIRSTTARGET IN MORPH1: \$target " .dump( $target );
 							`cp -R $mypath/$file $target`;
 						}
-						say $tee "cp -R $mypath/$file $target\n";
+						say $tee "LEVEL 0: cp -R $mypath/$file $target\n";
 						#my $cleartarget = $dirfiles{starter}; #say $tee "FIRST CLEAR TARGET IN MORPH1: \$cleartarget " .dump( $cleartarget );
-						#say $tee "LIKE SAYING cp -R $mypath/$file $cleartarget\n";
+						say $tee "THAT IS TO SAY, LEVEL 0: cp -R $mypath/$file $cleartarget\n";
 					}
 				}
 			}
@@ -419,10 +419,10 @@ sub morph
 							my $target = $to{crypto}; say $tee "TARGET IN MORPH: \$target " .dump( $target );
 							my $orig = $inst{$origin}; say $tee "ORIGIN IN MORPH: \$orig " .dump( $orig );
 							`cp -R $orig $target\n`;
-							print $tee "cp -R $orig $target\n\n";
+							print $tee "LEVEL 1: cp -R $orig $target\n\n";
 
 							my $cleartarget = $to{to}; #say $tee "CLEAR TARGET IN MORPH: \$cleartarget " .dump( $cleartarget );
-							print $tee "LIKE SAYING cp -R $origin $cleartarget\n\n";
+							print $tee "THAT IS TO SAY, LEVEL 1: cp -R $origin $cleartarget\n\n";
 						}
 					}
 
@@ -445,8 +445,8 @@ sub morph
 
 										`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 								}
-								print $tee "cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
-								print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+								print $tee "LEVEL 2:cp -f $to/zones/$applytype[$countop][1] $to/zones/$applytype[$countop][2]\n\n";
+								print $tee "LEVEL 2: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 							}
 
 							if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type eq "changeconfig" ) )
@@ -455,7 +455,7 @@ sub morph
 								{
 									`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 								}
-								print $tee "cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+								print $tee "LEVEL 2b: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 							}
 
 
@@ -463,7 +463,7 @@ sub morph
 							say $tee "cd $to\n";
 
 							my $launchline = " -file $to/cfg/$fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
-							say $tee "NOW MODIFICATION TYPE! $modification_type ";
+							#say $tee "NOW MODIFICATION TYPE! $modification_type ";
 
 							if ( ( $stepsvar > 1) and ( not ( eval ( $skip ) ) ) )
 							{
@@ -1618,10 +1618,11 @@ $printthis";
 
 sub translate_vertices
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $translate_vertices_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $translate_vertices_ref,
+		$countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 
 	my @applytype = @$applytype_ref;
-	my @translate_vertices = @$translate_vertices_ref;
+	my @translate_vertices = @$translate_vertices_ref; say $tee "IN MORPH \@translate_vertices: " . dump( @translate_vertices );
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -1630,14 +1631,14 @@ sub translate_vertices
 	say "Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my @v;
 	my @verts_to_transl = @{ $translate_vertices[$countop][0] };
-	#say $tee "VERTS_TO_TRANSL: " . dump( @verts_to_transl );
+	say $tee "IN MORPH VERTS_TO_TRANSL: " . dump( @verts_to_transl );
 	#say TOFILE "TO: " . dump( $to );
 	my @transform_coordinates = @{ $translate_vertices[$countop][1] };
 	my @sourcefiles = @{ $translate_vertices[$countop][2] };
 
-	my $sourcefile = $sourcefiles[ 0 ];
+	my $sourcefile = $sourcefiles[0];
 	my $sourceaddress = "$to$sourcefile";
-	my $zone_letter = $sourcefiles[ 1 ];
+	my $zone_letter = $sourcefiles[1];
 
 	open( SOURCEFILE, $sourceaddress ) or die "Can't open $sourceaddress 2: $!\n";
 	my @lines = <SOURCEFILE>;
@@ -1649,7 +1650,7 @@ sub translate_vertices
 	my %verts = %vertnummenu;
 
 	foreach my $vert ( @verts_to_transl )
-		{
+	{
 		foreach my $line ( @lines )
 		{
 			$line =~ s/^\s+//;
@@ -1665,8 +1666,8 @@ sub translate_vertices
 		}
 	}
 
-	#say $tee "RECEIVED VERTS: " . dump( @v );
-	#say $tee "SOURCEADDRESS: " . dump( $sourceaddress );
+	say $tee "IN MORPH RECEIVED VERTS: " . dump( @v );
+	say $tee "SOURCEADDRESS: " . dump( $sourceaddress );
 
 	my $countvertex = 0;
 	foreach my $base_coordinates_ref ( @transform_coordinates )

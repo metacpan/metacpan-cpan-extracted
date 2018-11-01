@@ -1,5 +1,9 @@
 Revision history for App::wu
 
+0.06    2018-10-31
+        - Fized link to Perl.com article (thanks manwar)
+        - Added end of life warning to docs
+
 0.04    2015-04-22
         - Changed location capture to command line arg
         - Changed ownership to DFARRELL

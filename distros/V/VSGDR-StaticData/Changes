@@ -89,6 +89,10 @@ Revision history for VSGDR::StaticData
         Added ability to ignore all columns with only null 'values' when extracting test data.
 0.42	29/10/2018
         Fixed changes. (this file.)
+0.43	31/10/2018
+        Optionalised usage of Win32.
+0.44    31/10/2018
+        Optionalised usage of Win32.        (again)
 
         
 	

@@ -242,7 +242,7 @@ The strings specified below return the following kinds of value in a peek/poke o
          Colour for sent world commands (GA::Client->customInsertCmdColour)
     S colour.system.text
     S color.system.text
-         Colour for system messages (GA::Client->customShowTextColour)
+         Colour for system messages (GA::Client->customShowSystemTextColour)
     S colour.system.error
     S color.system.error
          Colour for system error messages (GA::Client->customShowErrorColour)
@@ -279,6 +279,8 @@ The strings specified below return the following kinds of value in a peek/poke o
          Custom profile called 'NAME' (from GA::Session->profHash)
 
 
+    F debug.protocol.escape
+        Show invalid escape sequences (GA::Client->debugEscSequenceFlag)
     F debug.protocol.telnet
          Show incoming option negotiation info (GA::Client->debugTelnetFlag)
     F debug.protocol.telnet.short
@@ -705,6 +707,28 @@ The strings specified below return the following kinds of value in a peek/poke o
          Update room's room command list (GA::Obj::WorldModel->...)
     F model.updateOrnamentFlag
          Update room's exit ornaments (GA::Obj::WorldModel->...)
+    S model.autoCompareMode
+        Current auto-compare mode setting (GA::Obj::WorldModel->...)
+    F model.autoCompareAllFlag
+        Compare rooms in whole model, not just region (GA::Obj::WorldModel->...)
+    S model.autoCompareMax
+        Maximum number of room comparisons (GA::Obj::WorldModel->...)
+    S model.autoSlideMode
+        Current auto-slide mode setting (GA::Obj::WorldModel->...)
+    S model.autoSlideMax
+        Maximum auto-slide distance (GA::Obj::WorldModel->...)
+    F model.autoRescueFlag
+        Auto-rescue mode is enabled (GA::Obj::WorldModel->...)
+    F model.autoRescueFirstFlag
+        In auto-rescue mode, merge rooms at first opportunity (GA::Obj::WorldModel->...)
+    F model.autoRescuePromptFlag
+        In auto-rescue mode, prompt before merging rooms at first opportunity (GA::Obj::WorldModel->...)
+    F model.autoRescueNoMoveFlag
+        In auto-rescue mode, don't move non-matching rooms (GA::Obj::WorldModel->...)
+    F model.autoRescueVisitsFlag
+        In auto-rescue mode, only update character visits in merged rooms (GA::Obj::WorldModel->...)
+    F model.autoRescueForceFlag
+        In auto-rescue mode, temporarily switch to 'update' mode (GA::Obj::WorldModel->...)
     F model.assistedMovesFlag
          Apply assisted moves (GA::Obj::WorldModel->...)
     F model.assistedBreakFlag
@@ -733,8 +757,6 @@ The strings specified below return the following kinds of value in a peek/poke o
          Allow individual room scripts (GA::Obj::WorldModel->...)
     F model.intelligentExitsFlag
          Use intelligent exits (GA::Obj::WorldModel->...)
-    F model.autoCompareFlag
-         Auto-compare new rooms (GA::Obj::WorldModel->...)
     F model.followAnchorFlag
          Create new exit object using follow anchor pattern
             (GA::Obj::WorldModel->...)
@@ -978,13 +1000,17 @@ The strings specified below return the following kinds of value in a peek/poke o
     O session.mainwin
          Current 'main' window object (GA::Session->mainWin)
     O session.tab.default
-         Current session's default tab object (GA::Session->defaultTabObj)
+        Current session's default tab object (GA::Session->defaultTabObj)
+    S session.tab.default.width
+        Default tab width in chars (GA::Obj::TextView->textWidthChars)
+    S session.tab.default.height
+        Default tab height in chars (GA::Session->textHeightChars)
     O session.tab.current
-         Current session's current tab object (GA::Session->currentTabObj)
-    S session.tab.width
-         Default tab width (GA::Session->textViewWidthChars)
-    S session.tab.height
-         Default tab height in chars (GA::Session->textViewHeightChars)
+        Current session's current tab object (GA::Session->currentTabObj)
+    S session.tab.current.width
+        Current tab width in chars (GA::Obj::TextView->textWidthChars)
+    S session.tab.current.height
+        Current tab height in chars (GA::Session->textHeightChars)
     O session.mapwin
          Current session's automapper window (GA::Session->mapWin)
     O session.map

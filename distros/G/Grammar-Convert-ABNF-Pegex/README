@@ -1,0 +1,39 @@
+NAME
+
+    Grammar::Convert::ABNF::Pegex - convert an ABNF grammar to Pegex
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+        use Grammar::Convert::ABNF::Pegex;
+        
+        my $abnf = "A = (B C) / *D\n";
+        my $conv = Grammar::Convert::ABNF::Pegex->new( abnf => $abnf );
+        say $conv->pegex;
+
+DESCRIPTION
+
+    This module should help to create parser module that uses Pegex
+    <https://metacpan.org/pod/Pegex> when an ABNF grammar is known.
+
+ATTRIBUTES
+
+ abnf
+
+ pegex
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

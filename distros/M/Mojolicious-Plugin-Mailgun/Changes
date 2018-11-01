@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojolicious-Plugin-Mailgun
 
+0.09 2018-11-01T11:09:43+0100
+
+ - Update test method to be compatible with Mojolicious 8.0
+
 0.08 2018-09-13T14:58:31+0200
  - Fix mailgun test to work without deprecated delay helper
 

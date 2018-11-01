@@ -7,12 +7,15 @@ Lingua::EN::Fathom - Measure readability of English text
     use Lingua::EN::Fathom;
 
     my $text = Lingua::EN::Fathom->new();
-
-    $text->analyse_file("sample.txt");
+    
+    # Analyse contents of a text file
+    $text->analyse_file("sample.txt"); # Analyse contents of a text file
 
     $accumulate = 1;
+    # Analyse contents of a text string
     $text->analyse_block($text_string,$accumulate);
 
+    # TO Do, remove repetition
     $num_chars             = $text->num_chars;
     $num_words             = $text->num_words;
     $percent_complex_words = $text->percent_complex_words;
@@ -23,7 +26,7 @@ Lingua::EN::Fathom - Measure readability of English text
     $syllables_per_word    = $text->syllables_per_word;
     $words_per_sentence    = $text->words_per_sentence;
 
-
+   # comment needed
     %words = $text->unique_words;
     foreach $word ( sort keys %words )
     {
@@ -80,13 +83,13 @@ a non zero value, all statistics are accumulated with each successive call.
 
 =head2 analyse_block
 
-The C<analyse_block> method takes as input the name of a text file. Various
+The C<analyse_block> method takes as input a text string. Various
 text based statistics are calculated for the file. This method and
 C<analyse_file> are prerequisites for all the following methods. An optional
 argument may be supplied to control accumulation of statistics. If set to
 a non zero value, all statistics are accumulated with each successive call.
 
-    $text->analyse_block("sample.txt");
+    $text->analyse_block($text_str);
 
 =head2 num_chars
 
@@ -230,8 +233,7 @@ L<Lingua::EN::Syllable>,L<Lingua::EN::Sentence>,L<B::Fathom>
 =head1 POSSIBLE EXTENSIONS
 
    Count white space and punctuation characters
-   Allow user control over what strictly defines a word
-   Provide a density measure of white space to characters
+   Allow user control over what strictly defines a word 
 
 =head1 LIMITATIONS
 
@@ -252,7 +254,7 @@ Lingua::EN::Fathom was written by Kim Ryan <kimryan at cpan dot org>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2016 Kim Ryan. All rights reserved.
+Copyright (c) 2018 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -264,10 +266,11 @@ it under the same terms as Perl itself.
 package Lingua::EN::Fathom;
 
 use Lingua::EN::Syllable;
+use Lingua::EN::Sentence;
 use strict;
 use warnings;
 
-our $VERSION = '1.19';
+our $VERSION = '1.22';
 
 #------------------------------------------------------------------------------
 # Create a new instance of a text object.
@@ -304,12 +307,17 @@ sub analyse_file
    open(IN_FH,"<$file_name");
 
    my $in_paragraph = 0;
+   my $all_text;
    while ( <IN_FH> )
    {
       my $one_line = $_;
+      $all_text .= $one_line;
       ($in_paragraph,$text) = &_analyse_line($text,$one_line,$in_paragraph);
    }
    close(IN_FH);
+   
+   my $sentences= Lingua::EN::Sentence::get_sentences($all_text);     
+   $text->{num_sentences} = scalar(@$sentences);   
    $text->_calculate_readability;
 
    return($text);
@@ -343,8 +351,11 @@ sub analyse_block
    {
       ($in_paragraph,$text) = &_analyse_line($text,$one_line,$in_paragraph);
    }
-
+   
+   my $sentences= Lingua::EN::Sentence::get_sentences($block);        
+   $text->{num_sentences} = scalar(@$sentences);      
    $text->_calculate_readability;
+   
    return($text);
 }
 #------------------------------------------------------------------------------
@@ -521,8 +532,7 @@ sub _analyse_line
    return($in_paragraph,$text);
 }
 #------------------------------------------------------------------------------
-# Try to detect real words in line. Increment syllable, word, complex word,
-# and sentence counters.
+# Try to detect real words in line. Increment syllable, word, and complex word counters.
 
 sub _analyse_words
 {
@@ -532,7 +542,11 @@ sub _analyse_words
     $text->{num_chars} += length($one_line);
 
    # Word found, such as: twice, BOTH, a, I'd, non-plussed ..
-   # Ignore words like K12, &, X.Y.Z ...
+   
+   # Ignore words like  'Mr.', K12, &, X.Y.Z ...
+   # It could be argued that Mr. is a word, but this approach should detect most of the non words
+   # whivh have punctuation or numbers in them
+   
    while ( $one_line =~ /\b([a-z][-'a-z]*)\b/ig )
    {
       my $one_word = $1;
@@ -549,11 +563,11 @@ sub _analyse_words
 
       # word frequency count
       $text->{unique_words}{lc($one_word)}++;
-
+      
       $text->{num_words}++;
 
       # Use subroutine from Lingua::EN::Syllable
-      my $num_syllables_current_word = &syllable($one_word);
+      my $num_syllables_current_word = syllable($one_word);
       $text->{num_syllables} += $num_syllables_current_word;
 
       # Required for Fog index, count non hyphenated words of 3 or more
@@ -563,39 +577,40 @@ sub _analyse_words
          $text->{num_complex_words}++;
       }
    }
-   # Remove full stops to denote common abbreviations. By requiring a following space
-   # we know the '.' is not also ending the sentence.
-   
-   # People's titles
-   $one_line =~ s/Mr\. /Mr /ig;
-   $one_line =~ s/Mrs\. /Mrs /ig;
-   $one_line =~ s/Ms\. /Ms /ig;
-   $one_line =~ s/M\/s\. /M\/s /ig;
-   $one_line =~ s/Dr\. /Dr /ig;
-   $one_line =~ s/Prof\. /Prof /ig;
-   $one_line =~ s/Det\. /Det /ig;
-   $one_line =~ s/Insp\. /Insp /ig;
-   
-   # Commercial abbreviations
-   $one_line =~ s/Pty\. /Pty /ig;
-   $one_line =~ s/PLC\. /PLC /ig;
-   $one_line =~ s/Ltd\. /Ltd /ig;
-   $one_line =~ s/Inc\. /Inc /ig;
+   ## Remove full stops to denote common abbreviations. By requiring a following space
+   ## we know the '.' is not also ending the sentence.
+   #
+   ## People's titles
+   #$one_line =~ s/Mr\. /Mr /ig;
+   #$one_line =~ s/Mrs\. /Mrs /ig;
+   #$one_line =~ s/Ms\. /Ms /ig;
+   #$one_line =~ s/M\/s\. /M\/s /ig;
+   #$one_line =~ s/Dr\. /Dr /ig;
+   #$one_line =~ s/Prof\. /Prof /ig;
+   #$one_line =~ s/Det\. /Det /ig;
+   #$one_line =~ s/Insp\. /Insp /ig;
+   #
+   ## Commercial abbreviations
+   #$one_line =~ s/Pty\. /Pty /ig;
+   #$one_line =~ s/PLC\. /PLC /ig;
+   #$one_line =~ s/Ltd\. /Ltd /ig;
+   #$one_line =~ s/Inc\. /Inc /ig;
+   #
+   ## Other abbreviations
+   #$one_line =~ s/etc\. /etc /ig;
+   #$one_line =~ s/vs\. /vs /ig;
+   #
+   #
+   ## Remove quotation marks as a quote followed by a full stop will not be
+   ## correctly detected by the following regexps.
+   #$one_line =~ s/"//g;
+   #$one_line =~ s/'//g;
 
-   # Other abbreviations
-   $one_line =~ s/etc\. /etc /ig;
-   $one_line =~ s/vs\. /vs /ig;
-   
-   
-   # Remove quotation marks as a quote followed by a full stop will not be
-   # correctly detected by the following regexps.
-   $one_line =~ s/"//g;
-   $one_line =~ s/'//g;
-
-   # Search for '.', '?' or '!'  to end a sentence.
-   while ( $one_line =~ /\b\s*[.!?]\s*\b/g ) { $text->{num_sentences}++ }
+   # Now search for '.', '?' or '!'  at the end of the normalised sentence.
+   # while ( $one_line =~ /\b\s*[.!?]\s*\b/g ) { $text->{num_sentences}++ }
    # Check for final sentence, with no following words.
-   $one_line =~ /\b\s*[.!?]\s*$/g and $text->{num_sentences}++;
+   # $one_line =~ /\b\s*[.!?]\s*$/g and $text->{num_sentences}++;
+
 
    return($text);
 }

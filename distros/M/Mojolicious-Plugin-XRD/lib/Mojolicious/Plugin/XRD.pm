@@ -2,7 +2,7 @@ package Mojolicious::Plugin::XRD;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/quote deprecated/;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 # Todo: Support
 #  $self->reply->xrd( $xrd => {

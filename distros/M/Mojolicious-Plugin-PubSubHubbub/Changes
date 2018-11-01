@@ -1,3 +1,7 @@
+0.19 2018-11-01
+        - Change permissions for files (manwar++).
+        - Removed deprecated method Mojo::Transaction::success().
+
 0.18 2017-12-27
         - Improved test coverage.
         - Fixed tests for recent Mojolicious versions.

@@ -3,7 +3,7 @@
 use Test::More tests => 1;
 
 BEGIN {
-    use_ok( 'VSGDR::StaticData' )  
+    use_ok( 'VSGDR::MergeData' )  
 }
 
-diag( "Testing VSGDR::StaticData, $VSGDR::StaticData::VERSION Perl $], $^X" );
+diag( "Testing VSGDR::MergeData, $VSGDR::MergeData::VERSION Perl $], $^X" );

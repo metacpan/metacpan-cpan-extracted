@@ -1,3 +1,6 @@
+0.20 2018-11-01
+        - Change permissions for files (manwar++).
+
 0.19 2018-05-17
         - Upgrade dependency to recent version of XML::Loy
           to be compatible with recent version of Mojolicious.

@@ -23,6 +23,7 @@ t/02-intense_test.t
 t/boilerplate.t
 t/rc/.perlcriticrc
 t/rc/.perltidyrc
+xt/author/critic.t
 xt/author/eol.t
 xt/author/mojibake.t
 xt/author/pod-coverage.t

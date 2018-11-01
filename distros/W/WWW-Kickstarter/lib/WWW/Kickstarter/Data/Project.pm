@@ -22,11 +22,11 @@ sub _new {
    }
 
    my $self = $class->SUPER::_new($ks, $data);
-   $self->{creator } = WWW::Kickstarter::Data::User    ->_new($ks, $self->{creator }) if exists($self->{creator });
-   $self->{category} = WWW::Kickstarter::Data::Category->_new($ks, $self->{category}) if exists($self->{category});
-   $self->{location} = WWW::Kickstarter::Data::Location->_new($ks, $self->{location}) if exists($self->{location});
+   $self->{creator } = WWW::Kickstarter::Data::User    ->_new($ks, $self->{creator }) if defined($self->{creator });
+   $self->{category} = WWW::Kickstarter::Data::Category->_new($ks, $self->{category}) if defined($self->{category});
+   $self->{location} = WWW::Kickstarter::Data::Location->_new($ks, $self->{location}) if defined($self->{location});
 
-   if (exists($self->{rewards})) {
+   if (defined($self->{rewards})) {
       for my $reward (@{ $self->{rewards} }) {
          $reward = WWW::Kickstarter::Data::Reward->_new($ks, $reward);
       }

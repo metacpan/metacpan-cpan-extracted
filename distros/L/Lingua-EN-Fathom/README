@@ -71,11 +71,6 @@ HOW TO INSTALL
     
 
 
-BUGS
-
-None known
-
-
 AUTHOR
 
 Lingua::EN::Fathom was written by Kim Ryan, kimryan at cpan dot org.
@@ -83,7 +78,7 @@ Lingua::EN::Fathom was written by Kim Ryan, kimryan at cpan dot org.
 
 COPYRIGHT AND LICENSE
 
-Copyright (c) 2015 Kim Ryan. All rights reserved.
+Copyright (c) 2018 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

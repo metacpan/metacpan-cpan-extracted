@@ -62,6 +62,7 @@ static void perl_caller(const FunctionCallbackInfo<Value>& args)
     FuncData* data = (FuncData*) v8_val->Value();
 
     SV* ret = 0;
+    SV *err_tmp;
 
     /* prepare Perl environment for calling the CV */
     dTHX;
@@ -83,6 +84,11 @@ static void perl_caller(const FunctionCallbackInfo<Value>& args)
     PUTBACK;
     call_sv(data->func, G_SCALAR | G_EVAL);
     SPAGAIN;
+
+    err_tmp = ERRSV;
+    if (SvTRUE(err_tmp)) {
+        croak("Perl sub died with error: %s", SvPV_nolen(err_tmp));
+    }
 
     /* get returned value from Perl and return it */
     ret = POPs;
@@ -201,6 +207,10 @@ static SV* pl_v8_to_perl_impl(pTHX_ V8Context* ctx, const Local<Object>& object,
 static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, MapP2J& seen, int ref)
 {
     Local<Object> ret = Local<Object>::Cast(Null(ctx->isolate));
+    if (SvTYPE(value) >= SVt_PVMG) {
+        // any Perl SV that has magic (think tied objects) needs to have that magic actually called to retrieve the value
+        mg_get(value);
+    }
     if (!SvOK(value)) {
     } else if (sv_isa(value, PL_JSON_BOOLEAN_CLASS)) {
         int val = SvTRUE(value);

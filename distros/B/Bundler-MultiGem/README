@@ -1,0 +1,197 @@
+=head1 Bundler-MultiGem
+
+The purpose of C<Bundler-MultiGem> is to provide an utility to install multiple versions of the same ruby gem.
+This may be very useful when developing serializers or other gems performance oriented.
+
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the README
+file from a module distribution so that people browsing the archive
+can use it to get an idea of the module's uses. It is usually a good idea
+to provide version information here so that people can decide whether
+fixes for the module are worth downloading.
+
+
+=head2 INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Or download it from CPAN
+
+    cpan -i Bundler::MultiGem
+
+This will make available the command C<bundle-multigem>
+
+
+=head2 USAGE
+
+=head3 OVERVIEW
+
+    $ bundle-multigem -h
+    bundle-multigem <command> [-?h] [long options...]
+        -? -h --help  show help
+
+    Available commands:
+
+        commands: list the application's commands
+            help: display a command's help screen
+
+      initialize: Generate a configuration file (alias: init bootstrap b)
+           setup: Create multiple gem versions out of a configuration file (alias: install i s)
+
+=head3 INITIALIZE
+
+    $ bundle-multigem init  -h
+    bundle-multigem [-f] [long options...] <path>
+
+        --gm --gem-main-module    provide the gem main module (default:
+                                  constantize --gem-name)
+        --gn --gem-name           provide the gem name
+        --gs --gem-source         provide the gem source (default:
+                                  https://rubygems.org)
+        --gv --gem-versions       provide the gem versions to install (e.g:
+                                  --gem-versions 0.0.1 --gem-versions 0.0.2)
+        --dp --dir-pkg            directory for downloaded gem pkg (default:
+                                  pkg)
+        --dt --dir-target         directory for extracted versions (default:
+                                  versions)
+        --cp --cache-pkg          keep cache of pkg directory (default: 1)
+        --ct --cache-target       keep cache of target directory (default: 0)
+        -f --conf-file            choose config file name (default:
+                                  .bundle-multigem.yml)
+
+
+Minimal Example:
+
+     bundle-multigem initialize --gn jsonschema_serializer --gv 0.5.0 --gv 0.1.0 .
+
+=head3 SETUP
+
+
+    $ bundle-multigem setup  -h
+    bundle-multigem [-f] [long options...] <path>
+
+        -f --file     provide the yaml configuration file (default:
+                      ./.bundle-multigem.yml)
+
+Sample Output:
+å
+    $ bundle-multigem setup
+    Unpacked gem: '/Users/mberlanda/Misc/Bundler-MultiGem/versions/v005-jsonschema_serializer'
+    v005-jsonschema_serializer completed!
+    Unpacked gem: '/Users/mberlanda/Misc/Bundler-MultiGem/versions/v010-jsonschema_serializer'
+    v010-jsonschema_serializer completed!
+    Process completed.
+
+    You can add to your Gemfile something like:
+    gem 'v005-jsonschema_serializer', path: 'versions/v005-jsonschema_serializer'
+    gem 'v010-jsonschema_serializer', path: 'versions/v010-jsonschema_serializer'
+
+
+I can now edit my C<Gemfile> to include
+
+    gem 'v005-jsonschema_serializer', path: 'versions/v005-jsonschema_serializer'
+    gem 'v010-jsonschema_serializer', path: 'versions/v010-jsonschema_serializer'
+
+And benchmark both implementations with the version namespace:
+
+
+    require 'benchmark/ips'
+
+    benchmark_options = { time: 10, warmup: 5 }
+
+    Benchmark.ips do |x|
+      x.config(benchmark_options)
+
+      x.report 'same_method v005 implementation' do
+        V005::JsonschemaSerializer.same_method()
+      end
+      x.report 'same_method v010 implementation' do
+        V010::JsonschemaSerializer.same_method()
+      end
+      x.compare!
+    end
+
+
+This can be very useful to track regressions in the CI.
+
+=head2 AUTHOR
+
+Mauro Berlanda, C<< <kupta at cpan.org> >>
+
+=head2 BUGS
+
+Please report any bugs or feature requests to L<https://github.com/mberlanda/Bundler-MultiGem/issues>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=.>. I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head2 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Bundler::MultiGem::Directories
+
+
+You can also look for information at:
+
+=over 2
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bundler-MultiGem>
+
+=item * Github Repository
+
+L<https://github.com/mberlanda/Bundler-MultiGem>
+
+=back
+
+=head2 LICENSE AND COPYRIGHT
+
+Copyright 2018 Mauro Berlanda.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

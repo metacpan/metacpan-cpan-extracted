@@ -9,11 +9,15 @@ lib/Bundler/MultiGem/Model/Gem.pm
 lib/Bundler/MultiGem/Utl/Directories.pm
 lib/Bundler/MultiGem/Utl/InitConfig.pm
 MANIFEST			This list of files
-README.md
+README
 t/00-load.t
+t/Bundler-MultiGem-Command-initialize.t
+t/Bundler-MultiGem-Command-setup.t
 t/Bundler-MultiGem-Model-Directories.t
 t/Bundler-MultiGem-Model-Gem.t
+t/Bundler-MultiGem-Utl-Directories.t
 t/Bundler-MultiGem-Utl-InitConfig.t
+t/Bundler-MultiGem.t
 t/manifest.t
 t/pod.t
 t/pod-coverage.t

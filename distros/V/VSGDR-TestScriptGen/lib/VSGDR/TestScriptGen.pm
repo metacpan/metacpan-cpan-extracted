@@ -6,7 +6,6 @@ use warnings;
 use 5.010;
 
 use List::Util qw(max);
-#use List::MoreUtils;
 use List::MoreUtils qw{firstidx} ;
 use POSIX qw(strftime);
 use Carp;
@@ -22,7 +21,7 @@ use VSGDR::UnitTest::TestSet::Test::TestCondition;
 use VSGDR::UnitTest::TestSet::Representation;
 use VSGDR::UnitTest::TestSet::Resx;
 use File::Basename;
-
+if ($OSNAME eq 'MSWin32') {require Win32} ;
 
 =head1 NAME
 
@@ -30,11 +29,11 @@ VSGDR::TestScriptGen - Unit test script support package for SSDT unit tests, Ded
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 
 sub databaseName {
@@ -229,7 +228,7 @@ sub generateScripts {
     my $database        = databaseName($dbh);
 
     no warnings;
-    my $userName        = $OSNAME eq 'MSWin32' ? Win32::LoginName : ${[getpwuid( $< )]}->[6]; $userName =~ s/,.*//;
+    my $userName                        = $OSNAME eq 'MSWin32' ? eval('Win32::LoginName') : ${[getpwuid( $< )]}->[6]; $userName =~ s/,.*//;
     use warnings;
     my $date            = strftime "%d/%m/%Y", localtime;
 #warn Dumper $userName ;    

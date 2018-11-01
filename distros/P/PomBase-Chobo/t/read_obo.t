@@ -12,7 +12,7 @@ my $ontology_data = PomBase::Chobo::OntologyData->new();
 $parser->parse(filename => 't/data/mini_test_fypo.obo',
                ontology_data => $ontology_data);
 
-is ($ontology_data->get_terms(), 26);
+is ($ontology_data->get_terms(), 27);
 
 my $lookup_name = 'elongated multinucleate cells';
 my $lookup_id = 'FYPO:0000133';
@@ -48,13 +48,13 @@ cmp_deeply(\@db_names, ['EXT', 'FYPO', 'PATO', 'PMID', 'PomBase', '_global']);
 
 my @fypo_cvterms = $ontology_data->get_terms_by_cv_name('fission_yeast_phenotype');
 
-is (@fypo_cvterms, 25);
+is (@fypo_cvterms, 26);
 
 my @fypo_relationships = grep { $_->is_relationshiptype(); } @fypo_cvterms;
 is (@fypo_relationships, 5);
 
 my @fypo_non_relationships = grep { !$_->is_relationshiptype(); } @fypo_cvterms;
-is (@fypo_non_relationships, 20);
+is (@fypo_non_relationships, 21);
 
 my @rels = sort {
   $a->[0] cmp $b->[0]
@@ -64,7 +64,7 @@ my @rels = sort {
   $a->[2] cmp $b->[2]
 } $ontology_data->relationships();
 
-is(@rels, 27);
+is(@rels, 28);
 
 cmp_deeply([@rels[0..2]], [
   ['FYPO:0000002', 'is_a', 'FYPO:0000001'],

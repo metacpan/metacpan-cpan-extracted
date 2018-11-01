@@ -243,6 +243,14 @@ created_by: midori
 creation_date: 2012-04-25T04:07:50Z
 
 [Term]
+id: FYPO:0009876
+name: some obsolete cell phenotype term
+def: "Obsolete." [PomBase:pombase]
+is_obsolete: true
+is_a: FYPO:0000002
+alt_id: FYPO:0001006
+
+[Term]
 id: EXT:0000001
 name: external term for testing
 namespace: external_cv

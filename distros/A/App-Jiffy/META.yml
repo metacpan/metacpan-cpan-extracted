@@ -35,4 +35,4 @@ resources:
   bugtracker: https://github.com/lejeunerenard/jiffy/issues
   homepage: https://github.com/lejeunerenard/jiffy
   repository: https://github.com/lejeunerenard/jiffy.git
-version: '0.07'
+version: '0.08'

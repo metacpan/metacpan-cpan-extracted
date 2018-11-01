@@ -1405,12 +1405,12 @@ my @arr;
 sub interlinear
 {
   my ( $configf, $sourcef, $metafile, $blockelts_r, $reportf, $countblock ) = @_;
-  say $tee "ARRIVED IN INTERLINEAR \$configf $configf";
-  say $tee "ARRIVED IN INTERLINEAR \$sourcef $sourcef";
-  say $tee "ARRIVED IN INTERLINEAR \$metafile $metafile";
-  say $tee "ARRIVED IN INTERLINEAR \$blockelts_r ". dump( $blockelts_r );
-  say $tee "ARRIVED IN INTERLINEAR \$reportf $reportf";
-  say $tee "ARRIVED IN INTERLINEAR \$countblock $countblock";
+  #say $tee "ARRIVED IN INTERLINEAR \$configf $configf";
+  #say $tee "ARRIVED IN INTERLINEAR \$sourcef $sourcef";
+  #say $tee "ARRIVED IN INTERLINEAR \$metafile $metafile";
+  #say $tee "ARRIVED IN INTERLINEAR \$blockelts_r ". dump( $blockelts_r );
+  #say $tee "ARRIVED IN INTERLINEAR \$reportf $reportf";
+  #say $tee "ARRIVED IN INTERLINEAR \$countblock $countblock";
 
   if ( $reportf ne "" ){ $report = $reportf; } #say $tee "CHECK5 \$report: " . dump( $report );
   $tee = new IO::Tee(\*STDOUT, ">>$report"); # GLOBAL ZZZ
@@ -1440,9 +1440,9 @@ sub interlinear
   my %factlevels = %{ prepfactlev( \@aarr ) }; #say $tee "IN INTERLINEAR REALLY \%factlevels: " . dump( \%factlevels );
 
   my ( $factlev_ref ) = tellstepsize( \%factlevels );
-  my %factlev = %{ $factlev_ref }; say $tee "REALLY \%factlev: " . dump( %factlev );
+  my %factlev = %{ $factlev_ref }; #say $tee "REALLY \%factlev: " . dump( %factlev );
 
-  my $maxdist = calcmaxdist( \@aarr, \%factlev ); say $tee "001\$maxdist: " . dump( $maxdist );
+  my $maxdist = calcmaxdist( \@aarr, \%factlev ); #say $tee "001\$maxdist: " . dump( $maxdist );
 
   my $count = 0;
   while ( $count < $maxloops )

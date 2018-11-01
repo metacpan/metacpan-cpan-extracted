@@ -18,7 +18,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Math::Function::Interpolator",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "List::MoreUtils" => 0,
     "List::Util" => 0,
     "Math::Cephes::Matrix" => 0,
     "Number::Closest::XS" => 0,
@@ -35,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::FailWarnings" => 0,
     "Test::More" => "0.94"
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +47,6 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::MoreUtils" => 0,
   "List::Util" => 0,
   "Math::Cephes::Matrix" => 0,
   "Number::Closest::XS" => 0,

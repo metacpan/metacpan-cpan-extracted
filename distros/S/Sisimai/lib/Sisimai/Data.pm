@@ -104,7 +104,6 @@ sub make {
 
     my $delivered1 = $argvs->{'delivered'} // 0;
     my $messageobj = $argvs->{'data'};
-    my $mailheader = $argvs->{'data'}->{'header'};
     my $rfc822data = $messageobj->rfc822;
     my $fieldorder = { 'recipient' => [], 'addresser' => [] };
     my $objectlist = [];
@@ -227,7 +226,7 @@ sub make {
 
         OTHER_TEXT_HEADERS: {
             # Scan "Received:" header of the original message
-            my $recvheader = $mailheader->{'received'} || [];
+            my $recvheader = $argvs->{'data'}->{'header'}->{'received'} || [];
 
             if( scalar @$recvheader ) {
                 # Get localhost and remote host name from Received header.
@@ -262,10 +261,9 @@ sub make {
             # The value of "Message-Id" header
             $p->{'messageid'} = $rfc822data->{'message-id'} // '';
             if( $p->{'messageid'} ) {
-                # Remove angle brackets
-                $p->{'messageid'} =  $1 if $p->{'messageid'} =~ /\A([^ ]+)[ ].*/;
-                $p->{'messageid'} =~ y/<>//d;
-                $p->{'messageid'} =~ s/\r\z//g;
+                # Leave only string inside of angle brackets(<>)
+                $p->{'messageid'} = $1 if $p->{'messageid'} =~ /\A([^ ]+)[ ].*/;
+                $p->{'messageid'} = $1 if $p->{'messageid'} =~ /[<]([^ ]+?)[>]/;
             }
 
             CHECK_DELIVERY_STATUS_VALUE: {

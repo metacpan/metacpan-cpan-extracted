@@ -32,17 +32,25 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "4.88",
+            "Mojolicious" : "5.27",
             "perl" : "5.010001"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-Piwik/issues"
+      },
       "license" : [
          "https://opensource.org/licenses/artistic-license-2.0"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Akron/Mojolicious-Plugin-Piwik.git",
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-Piwik"
+      }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

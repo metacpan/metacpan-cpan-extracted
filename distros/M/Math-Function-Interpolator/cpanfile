@@ -1,5 +1,4 @@
 requires 'Carp';
-requires 'List::MoreUtils';
 requires 'List::Util';
 requires 'Math::Cephes::Matrix';
 requires 'Number::Closest::XS';

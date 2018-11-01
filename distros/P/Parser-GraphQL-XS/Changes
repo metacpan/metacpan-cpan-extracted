@@ -1,2 +1,6 @@
+0.000003    2018-10-31
+            * Fix docs and add link to original C++ library
+            * Update links for github repo
+
 0.000002    2018-09-24
             * Initial release.

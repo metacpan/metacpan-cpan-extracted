@@ -14,27 +14,62 @@ use Test::More;
 use File::Temp qw/tempdir/;
 use File::ShareDir qw/dist_dir/;
 
-plan tests => 1;
-
 diag( "Testing result of body.xml, Perl $], $^X" );
 
 my $Diff = XML::Diff->new();
 
-my $DIR = dirname(__FILE__).'/examples';
-opendir(my $DH, $DIR) || die "Can't opendir $DIR: $!";
-my @Epubs = grep { $_ =~ /.+\.epub$/ && -f $DIR."/".$_ } readdir($DH);
-closedir $DH;
+#tests for fb2
+my $DIR1 = dirname(__FILE__).'/examples/fb2';
+opendir(my $DH1, $DIR1) || die "Can't opendir $DIR1: $!";
+my @FB2s = grep { $_ =~ /.+\.fb2$/ && -f $DIR1."/".$_ } readdir($DH1);
+closedir $DH1;
+diag("Testing FB2 files");
+foreach my $FB2File (sort{Num($a,'fb2')<=>Num($b,'fb2')} @FB2s ) {
+  $FB2File =~ m/^(.+)\.fb2$/;
+  my $FName = $1;
+
+  my $OldXml = $DIR1.'/'.$FName.'.xml';
+
+  diag("Testing ".$DIR1.'/'.$FB2File.' and compare with '.$OldXml);
+  unless ( -f $OldXml ) {
+    diag("file $OldXml not found");
+    next;
+  }
+
+  my $Obj = new FB3::Convert(
+    'source' => $DIR1.'/'.$FB2File,
+    'destination_dir' => tempdir(CLEANUP=>1),
+    'verbose' => 0,
+    'xsl_path' => dist_dir('FB3-Convert'),
+  );
+
+  $Obj->Reap();
+  my $FB3Path = $Obj->FB3Create();
+  if ( my $ValidErr = $Obj->Validate() ) {
+    diag($ValidErr);
+  } else {
+    ok( _Diff($Obj, $OldXml, "$FB3Path/fb3/body.xml"), $FB2File );
+  }
+
+  $Obj->Cleanup();
+}
+
+#tests for epub
+my $DIR2 = dirname(__FILE__).'/examples/epub';
+opendir(my $DH2, $DIR2) || die "Can't opendir $DIR2: $!";
+my @Epubs = grep { $_ =~ /.+\.epub$/ && -f $DIR2."/".$_ } readdir($DH2);
+closedir $DH2;
 
 my $PHS = PhantomIsSupport();
-
-foreach my $EpubFile (sort{Num($a)<=>Num($b)} @Epubs ) {
+diag("Testing EPUB files");
+foreach my $EpubFile (sort{Num($a,'epub')<=>Num($b,'epub')} @Epubs ) {
 
   $EpubFile =~ m/^(.+)\.epub$/;
   my $FName = $1;
 
-  my $OldXml = $DIR.'/'.$FName.'.xml';
+  my $OldXml = $DIR2.'/'.$FName.'.xml';
 
-  diag("Testing ".$DIR.'/'.$EpubFile.' and compare with '.$OldXml);
+  diag("Testing ".$DIR2.'/'.$EpubFile.' and compare with '.$OldXml);
   die("file $OldXml not found") unless -f $OldXml;
 
   my $Eur = 0;
@@ -55,7 +90,7 @@ foreach my $EpubFile (sort{Num($a)<=>Num($b)} @Epubs ) {
   );
 
   my $Obj = new FB3::Convert(
-    'source' => $DIR.'/'.$EpubFile,
+    'source' => $DIR2.'/'.$EpubFile,
     'destination_dir' => tempdir(CLEANUP=>1),
     'verbose' => 0,
     'euristic' => $Eur,
@@ -78,20 +113,26 @@ foreach my $EpubFile (sort{Num($a)<=>Num($b)} @Epubs ) {
 
 }
 
-ok(1,'Test ok');
+done_testing();
 exit;
 
 sub PhantomIsSupport {
+
   my $Supp = FindFile('phantomjs', [split /:/,$ENV{'PATH'}]);
 
   if ($Supp) {
-    diag('phantomjs founded ['.$Supp.']. Euristic enabled');
-  } else {
-    diag('phantomjs not found. Euristic skipped. see <http://phantomjs.org/>');
-		return;
+
+    # NOTE to avoid `QXcbConnection: Could not connect to display' error
+    qx{ QT_QPA_PLATFORM=offscreen $Supp -v > /dev/null 2>&1 };
+    my $err = $? > 0 ? $? >> 8 : 0;
+    $ENV{'QT_QPA_PLATFORM'} = 'offscreen' unless $err;
+
+    diag('phantomjr founded ['.$Supp.']. Euristic enabled');
+    return 1;
   }
 
-  return 1;
+  diag('phantomjs not found. Euristic skipped. see <http://phantomjs.org/>');
+  return 0;
 }
 
 sub FindFile {
@@ -108,7 +149,8 @@ sub FindFile {
 
 sub Num {
   my $Fname=shift;
-  $Fname =~ /(\d+)\.epub/;
+  my $fmt=shift;
+  $Fname =~ /(\d+)\.$fmt/;
   $Fname=$1;
   return $Fname;
 }
@@ -195,7 +237,7 @@ sub _Diff {
   if ($Err) {
     diag($Err);
     $X->Cleanup();
-    exit;
+    return 0;
   }
 
   return 1;

@@ -104,9 +104,10 @@ my %opts =
     # See note below on CONFIGURE. This used to work when we could rely on
     # CONFIGURE being after PREREQ_PM but that is not the case now so the
     # line below does nothing since 6.33 of MakeMaker.
-    PREREQ_PM    => {
+    BUILD_REQUIRES => {
         "Test::Simple" => 0.90, # actually Test::More pkg in T::S dist,
-        "DBI"          => 1.609 },
+        "Test::Output" => 1.031 },
+    PREREQ_PM    => { "DBI" => 1.609 },
     clean        => { FILES => 'ODBC.xsi dbdodbc.h' },
     dist         => {
 	DIST_DEFAULT => 'clean distcheck tardist',

@@ -58,6 +58,7 @@ my $get_isets=sub {
    my $test_aws=
          `wget -qO- http://169.254.169.254/latest/dynamic/instance-identity/`;
    if (-1<index $test_aws,'signature') {
+      $main::aws->{'CLIPBUCKET.com'}->[0]=[];
       my $out=`which aws 2>&1`;
       if (!(-e "/usr/bin/aws") && (-1<index $out,'no aws in')) {
          system("wget https://s3.amazonaws.com/aws-cli/awscli-bundle.zip");

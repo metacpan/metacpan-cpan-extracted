@@ -7,14 +7,16 @@ use feature 'state';
 use strict;
 use warnings;
 
-our $VERSION = 'v1.2.1';
+our $VERSION = 'v1.2.3';
 
 use Exporter qw/ import /;
 use IO qw/ Handle /;
 use Path::Tiny;
 use Scalar::Util qw/ blessed /;
-use Type::Tiny;
+use Type::Tiny 1.000000;
 use Types::Standard qw/ FileHandle Str /;
+
+# RECOMMEND PREREQ: Type::Tiny::XS
 
 our @EXPORT_OK =
   qw/ Dir File Indentation IO ReadIO WriteIO HeadingLevel TargetName DistZilla /;

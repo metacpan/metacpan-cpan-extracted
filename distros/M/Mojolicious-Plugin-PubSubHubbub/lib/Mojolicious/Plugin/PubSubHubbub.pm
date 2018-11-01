@@ -5,9 +5,10 @@ use Mojo::DOM;
 use Mojo::ByteStream 'b';
 use Mojo::Util qw/secure_compare hmac_sha1_sum/;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # Todo:
+# - Be compliant with https://www.w3.org/TR/websub/
 # - Prevent log injection
 # - Make everything async (top priority)
 # - Maybe allow something like ->feed_to_json (look at superfeedr)
@@ -157,7 +158,7 @@ sub publish {
   # Post to hub
   my $tx = $ua->post( $plugin->hub => form => \%post );
 
-  my $res = $tx->success;
+  my $res = $tx->result;
 
   # No response
   unless ($res) {
@@ -447,7 +448,7 @@ sub discover {
   # Retrieve resource
   my $tx = $ua->get($base);
 
-  if ($tx->success) {
+  unless ($tx->error) {
 
     # Change base after possible redirects
     $base = $tx->req->url;
@@ -487,7 +488,7 @@ sub discover {
       $tx = $ua->get($nbase);
 
       # Request was successful
-      if ($tx->success) {
+      unless ($tx->error) {
 
         # Change nbase after possible redirects
         $nbase = $tx->req->url;
@@ -602,7 +603,7 @@ sub _change_subscription {
   # Send subscription change to hub
   my $tx = $ua->post($param{hub} => form => \%post);
 
-  my $res = $tx->success;
+  my $res = $tx->result;
 
   # No response
   unless ($res) {
@@ -1352,7 +1353,7 @@ This plugin is part of the L<Sojolicious|http://sojolicio.us> project.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2017, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2011-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

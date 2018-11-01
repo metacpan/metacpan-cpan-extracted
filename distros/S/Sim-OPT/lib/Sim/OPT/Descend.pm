@@ -38,7 +38,7 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend ); # our @EXPORT = qw( );
 
-$VERSION = '0.115'; # our $VERSION = '';
+$VERSION = '0.117'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
@@ -657,7 +657,7 @@ sub descend
       @lines = uniq( @lines );
 
       #say TOFILE "TAKEOPTIMA--dump(\@lines): " . dump(@lines);
-      # NOTE: bugs to fix in "star" behaviour: 1) uniq reduces too much; 2) subsequent prepareblanks are longer and longer.
+      # NOTE: bugs to fix in "star" behav@winneritemsiour: 1) uniq reduces too much; 2) subsequent prepareblanks are longer and longer.
 
       my @sorted;
       if ( $direction ne "star" )
@@ -1169,11 +1169,11 @@ sub descend
     my $winnerentry;
     if ( ( $direction eq ">" ) or ( ( $direction eq "star"  ) and ( $starorder eq ">"  ) ) )
     {
-      $winnerentry = $lines[0]; say $tee "DIRECTION > OR STAR IN SUB TAKEOPTIMA. \$winnerentry: " . dump($winnerentry);
+      $winnerentry = $lines[0]; #say $tee "DIRECTION > OR STAR IN SUB TAKEOPTIMA. \$winnerentry: " . dump($winnerentry);
     }
     elsif ( ( $direction eq "<" ) or ( ( $direction eq "star"  ) and ( $starorder eq "<"  ) ) )
     {
-      $winnerentry = $lines[-1]; say $tee "DIRECTION < OR STAR IN SUB TAKEOPTIMA. \$winnerentry: " . dump($winnerentry);
+      $winnerentry = $lines[-1]; #say $tee "DIRECTION < OR STAR IN SUB TAKEOPTIMA. \$winnerentry: " . dump($winnerentry);
     }
     elsif ( ( $direction eq "=" ) or ( ( $direction eq "star"  ) and ( $starorder eq "="  ) ) )
     {
@@ -1494,9 +1494,9 @@ sub descend
         $countstring++;
         $dirfiles{countstring} = $countstring;
         #say $tee "IN12 TAKEOPTIMA-> CLOSECASE MAINPATH \$winneritem " . dump($winneritem);
-        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file ); say $tee "IN12 TAKEOPTIMA-> CLOSECSE MAINPATH \$winneritem " . dump($winneritem);
+        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file ); #say $tee "IN12 TAKEOPTIMA-> CLOSECSE MAINPATH \$winneritem " . dump($winneritem);
 
-        push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem ); say $tee "IN12 TAKEOPTIMA-> CLOSECSE MAINPATH \@winneritems " . dump(@winneritems);
+        push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem ); #say $tee "IN12 TAKEOPTIMA-> CLOSECSE MAINPATH \@winneritems " . dump(@winneritems);
         #say $tee "#Leaving case $countcase. Beginning with case " . ( plus1( $countcase ) ) . ".";
 
         Sim::OPT::callblock( { countcase => $countcase, countblock => $countblock,
@@ -1587,10 +1587,10 @@ sub descend
         my $winneritem = $winnerelms[0];
 
         #say $tee "IN12 STARPATH TAKEOPTIMA->\$winneritem " . dump($winneritem);
-        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file ); say $tee "IN12 STARPATH TAKEOPTIMA->\$winneritem " . dump($winneritem);
+        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file ); #say $tee "IN12 STARPATH TAKEOPTIMA->\$winneritem " . dump($winneritem);
 
 				#say $tee "IN12 STARPATH TAKEOPTIMA->\@winneritems " . dump( @winneritems );
-        push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem ); say $tee "IN12 STARPATH TAKEOPTIMA->\@winneritems " . dump(@winneritems);
+        push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem ); #say $tee "IN12 STARPATH TAKEOPTIMA->\@winneritems " . dump(@winneritems);
         #say $tee "#Leaving case " . ( plus1( $countcase ) ) . ", block " . ( plus1( $countcase ) ) . ", and descending!";
 
         @varnumbers = @{ dclone( $dirfiles{varnumbershold} ) };
@@ -1609,10 +1609,10 @@ sub descend
       { #say $tee "NOW I SHOULD ACT.";
         #say $tee "IN BLOCK END NOT STARSIGN.";
         #say $tee "IN12 MAINPATH TAKEOPTIMA->\$winneritem " . dump( $winneritem );
-        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file ); say $tee "IN12 MAINPATH TAKEOPTIMA->\$winneritem " . dump( $winneritem );
+        $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file ); #say $tee "IN12 MAINPATH TAKEOPTIMA->\$winneritem " . dump( $winneritem );
 
 				#say $tee "IN12 MAINPATH TAKEOPTIMA->\@winneritems " . dump( @winneritems );
-        push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem ); say $tee "IN12 MAINPATH TAKEOPTIMA->\@winneritems " . dump( @winneritems );
+        push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem ); #say $tee "IN12 MAINPATH TAKEOPTIMA->\@winneritems " . dump( @winneritems );
         #say $tee "#Leaving case " . ( plus1( $countcase ) ) . ", block " . ( plus1( $countcase ) ) . ", and descending!";
 
         $countblock++; ### !!!

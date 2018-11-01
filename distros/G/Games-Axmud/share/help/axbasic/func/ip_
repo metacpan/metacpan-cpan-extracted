@@ -1,0 +1,9 @@
+IP$ ()
+
+   Synopsis:
+      Returns your IP (IPv4) address as a string in the form "101.102.103.104".
+         If the IP address can't be determined for some reason, returns the
+         string "127.0.0.1".
+
+   Compatibility:
+      Since Axbasic v1.001

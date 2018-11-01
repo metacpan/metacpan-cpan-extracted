@@ -3,7 +3,7 @@ NAME
     without the file system ever being touched.
 
 VERSION
-    Version 0.009
+    Version 0.010
 
 SYNOPSIS
     Intercepts file system calls for specific files so unit testing can take

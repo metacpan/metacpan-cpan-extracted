@@ -1,5 +1,13 @@
 Revision history for Test-MockFile
 
+0.010   10/31/2018
+ - Add .perltidyrc policy
+ - When reporting strict mode violations, be sure to report the a stack location outside of our modules.
+ - Report a stack trace for strict mode violations to determine the source of the problem.
+ - Add an ignore hash for modules (like DynaLoader) which are allowed to open files.
+ - Ignore STDIN/STDERR/STDOUT since tests often have to manipulate them and that's not really IO.
+ - Autovivify a sysread where the buffer passed in is undef.
+
 0.009   10/29/2018
  - Add unlink and touch as helpers when testing
  - Depend on new Overload::FileCheck 0.006 which does not call MockFile to determine _ stats

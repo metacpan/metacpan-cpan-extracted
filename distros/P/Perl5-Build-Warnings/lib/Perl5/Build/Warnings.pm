@@ -1,8 +1,10 @@
 package Perl5::Build::Warnings;
 use 5.14.0;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use Carp;
+use IO::File;
+use IO::Zlib;
 
 =encoding utf8
 
@@ -21,6 +23,11 @@ Perl5::Build::Warnings - Parse make output for build-time warnings
     my $arrayref = $self->get_warnings;
 
     $self->report_warnings_groups;
+
+    $arrayref = $self->get_warnings_for_group('Wunused-variable');
+
+    $arrayref = $self->get_warnings_for_source('op.c');
+
 
 =head1 DESCRIPTION
 
@@ -43,6 +50,10 @@ F<make test_prep> -- but not F<make test> -- or Windows equivalents) to a
 plain-text file.  Something like:
 
     make test_prep 2>&1 > /path/to/make.log
+
+The build log may be gzipped-compressed, I<e.g.:>
+
+    make test_prep 2>&1 | gzip -c > /path/to/make.log.gz
 
 =head3 Format for Build-Time Warnings
 
@@ -123,7 +134,13 @@ sub _parse_log_for_warnings {
     my @warnings = ();
     my %warnings_groups = ();
     my $IN;
-    open $IN, '<', $data->{file} or croak "Cannot open $data->{file}";
+    if ($data->{file} =~ m/\.gz/) {
+        $IN = IO::Zlib->new($data->{file}, "rb");
+    }
+    else {
+        $IN = IO::File->new($data->{file}, "r");
+    }
+    croak "Could not open filehandle to $data->file" unless defined $IN;
     while (my $l = <$IN>) {
         chomp $l;
         # op.c:5468:34: warning: argument ‘o’ might be clobbered by ‘longjmp’ or ‘vfork’ [-Wclobbered]
@@ -200,15 +217,16 @@ Implicitly returns a Perl-true value.
 
 =item *  Comment
 
-The information reported will appear as below, but may change in the future.
+The information reported will appear as below (2 leading whitespaces), but may
+change in the future.
 
-    Wcast-function-type                        6
-    Wclobbered                                 2
-    Wformat-overflow=                          2
-    Wignored-qualifiers                        4
-    Wimplicit-fallthrough=                    32
-    Wmultistatement-macros                     1
-    Wpragmas                                   3
+      Wcast-function-type                        6
+      Wclobbered                                 2
+      Wformat-overflow=                          2
+      Wignored-qualifiers                        4
+      Wimplicit-fallthrough=                    32
+      Wmultistatement-macros                     1
+      Wpragmas                                   3
 
 =back
 
@@ -217,7 +235,7 @@ The information reported will appear as below, but may change in the future.
 sub report_warnings_groups {
     my $self = shift;
     for my $w (sort keys %{$self->{warnings_groups}}) {
-        say sprintf "%-40s %3s" => $w, $self->{warnings_groups}{$w};
+        say sprintf "  %-40s %3s" => $w, $self->{warnings_groups}{$w};
     }
 }
 
@@ -235,7 +253,7 @@ Generate a list of all warnings.
 
 =item * Return Value
 
-Array reference, each element of which is a reference hash holding a parsing
+Array reference, each element of which is a reference to a hash holding a parsing
 of the elements of an individual warning.
 
 =back
@@ -245,6 +263,67 @@ of the elements of an individual warning.
 sub get_warnings {
     my $self = shift;
     return $self->{warnings};
+}
+
+=head2 C<get_warnings_for_group()>
+
+=over 4
+
+=item * Purpose
+
+Get a list of all the warnings for one specified warnings group.
+
+=item * Arguments
+
+    $arrayref = $self->get_warnings_for_group("Wduplicate-decl-specifier");
+
+String holding name of one group of warnings.  Each such string must begin with an upper-case C<W>.  As mentioned above, we drop the leading hyphen to avoid confusing the shell.
+
+=item * Return Value
+
+Array reference, each element of which is a reference to a hash holding a parsing
+of the elements of an individual warning of the specified warnings group.
+
+=back
+
+=cut
+
+sub get_warnings_for_group {
+    my ($self, $wg) = @_;
+    croak "Name of warnings group must begin with 'W'" unless $wg =~ m/^W/;
+    croak "Warnings group '$wg' not found"
+        unless $self->{warnings_groups}->{$wg};
+
+    return [ grep { $_->{group} eq $wg } @{$self->{warnings}} ];
+}
+
+=head2 C<get_warnings_for_source()>
+
+=over 4
+
+=item * Purpose
+
+Get a list of all the warnings generated from one specified source file.
+
+=item * Arguments
+
+    $arrayref = $self->get_warnings_for_source('op.c');
+
+String holding name of one source file.  Note that there may be some ambiguity here.  Use with caution.
+
+=item * Return Value
+
+Array reference, each element of which is a reference to a hash holding a parsing
+of the elements of an individual warning of the specified warnings source.
+
+=back
+
+=cut
+
+sub get_warnings_for_source {
+    my ($self, $sf) = @_;
+
+    return [ grep { $_->{source} eq $sf } @{$self->{warnings}} ];
 }
 
 1;

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use 5.008_005;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use App::Jiffy::TimeEntry;
 use App::Jiffy::View::Timesheet;
@@ -133,7 +133,7 @@ sub time_sheet {
     $from = shift;
   }
 
-  my $from_date = DateTime->today;
+  my $from_date = DateTime->today( time_zone => 'local' );
 
   if ( defined $from ) {
     $from_date->subtract( days => $from );
@@ -175,7 +175,7 @@ sub search {
     $days = shift;
   }
 
-  my $from_date = DateTime->today;
+  my $from_date = DateTime->today( time_zone => 'local' );
 
   if ( defined $days ) {
     $from_date->subtract( days => $days );

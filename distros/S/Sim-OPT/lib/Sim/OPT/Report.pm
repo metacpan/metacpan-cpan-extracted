@@ -155,8 +155,10 @@ sub newretrieve
   my $countvar = $d{countvar}; #say $tee "IN RETRIEVE(\$countvar): " . dump($countvar );
   my $countstep = $d{countstep}; #say $tee "IN RETRIEVE(\$countstep): " . dump($countstep);
 
-  my %to = %{ $d{to} };
+  my %to = %{ $d{to} }; say $tee  "IN RETRIEVE( \%to) " . dump( %to );
+  my $thisto = $to{to}; say $tee  "IN RETRIEVE( \$thisto) " . dump( $thisto );
   my %inst = %{ $d{inst} };
+  my $cleanto = $inst{$thisto}; say $tee  "IN RETRIEVE( \$cleanto) " . dump( $cleanto );
 
 
   my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
@@ -982,8 +984,10 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $countvar = $d{countvar}; #say $tee "IN REPORT \$countvar " . dump( $countvar );
   my $countstep = $d{countstep}; #say $tee "IN REPORT \$countstep " . dump( $countstep );
 
-  my %to = %{ $d{to} }; #say $tee "IN REPORT \%to " . dump( \%to );
-  my %inst = %{ $d{inst} }; #say $tee "IN REPORT \%inst " . dump( \%inst );
+  my %to = %{ $d{to} }; say $tee  "IN REPORT( \%to) " . dump( %to );
+  my $thisto = $to{to}; say $tee  "IN REPORT( \$thisto) " . dump( $thisto );
+  my %inst = %{ $d{inst} };
+  my $cleanto = $inst{$thisto}; say $tee  "IN REPORT( \$cleanto) " . dump( $cleanto );
 
   my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
   my $toitem = $d{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
@@ -1068,7 +1072,8 @@ sub newreport # This function retrieves the results of interest from the texts f
             $signalnewinstance--;
           }
 
-          my ( $semaphore1, $semaphore2 );
+          my ( $semaphore1, $semaphore2 );     											$line =~ s/^\s+// ;
+
 
           if ( -e $retfile ) #if ( not ( eval ( $skipreport ) ) )
           {  say $tee "#Inspecting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1) . ", file $retfile, to report $themereport." ;
@@ -1085,6 +1090,7 @@ sub newreport # This function retrieves the results of interest from the texts f
             #my $thiscrypto = $to{crypto};
             foreach my $line ( @lines )
             {
+
               $line =~ s/^\s+//;
               #$line =~ s/$thiscrypto/$thisto/ ;
 
@@ -1115,7 +1121,6 @@ sub newreport # This function retrieves the results of interest from the texts f
                 $semaphore2 = "off";
               }
 
-              $line =~ s/^\s+// ;
               #$line =~ s/\s+/ /g ;
               #$line =~ s/ /,/ ;
               #chomp( $line );
@@ -1166,7 +1171,6 @@ sub newreport # This function retrieves the results of interest from the texts f
                     {
                       if ( not ( $afterlin =~ /-/ ) )
                       {
-     											$line =~ s/^\s+// ;
                           #$line =~ s/\s+/ /g ;
                           #$line =~ s/ /,/ ;
                           #chomp( $line );
@@ -1262,22 +1266,30 @@ sub newreport # This function retrieves the results of interest from the texts f
 	    close PRECOMPUTED;
 	  }
 
-    my $touse = $to{to}; ### TAKE CARE!
-    $touse =~ s/$mypath\///; #say $tee "IN REPORT1 \$touse " . dump($touse);
+    my $touse = $cleanto; ### TAKE CARE!
+    #$touse =~ s/$mypath\///; #say $tee "IN REPORT1 \$touse " . dump($touse);
+    #$touse =~ s/^$file//; #say $tee "IN REPORT1 \$touse " . dump($touse);
+    #$touse =~ s/^_//; #say $tee "IN REPORT1 \$touse " . dump($touse);
+    #$touse =~ /_-(\.+)grt/ ; #say $tee "IN REPORT1 \$touse " . dump($touse);
+    #$touse =~ s/$1// ; #say $tee "IN REPORT1 \$touse " . dump($touse);
     #say $tee "TOUSE: $touse\n";
     my @box;
     foreach my $line ( @precomputeds )
     {
+      $line =~ s/\s+/ / ;
       if ( $line =~ /$touse/ )
       {
+        my @row = split( ",", $line);
+        shift( @row );
+        unshift( @row, $cleanto );
+        $line = join( ",", @row );
         push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
         #say $tee "HIT!!! for $repfile\n";
         #say $tee "LINE! $line";
         #say $tee "TOUSE: $touse\n";
-        $line =~ s/\s+/ / ;
-        $line =~ s/ ,/,/ ;
-        $line =~ s/, /,/ ;
-        $line =~ s/ /,/ ;
+        #$line =~ s/ ,/,/ ;
+        #$line =~ s/, /,/ ;
+        #$line =~ s/ /,/ ;
         push( @box, $line );
       }
     }

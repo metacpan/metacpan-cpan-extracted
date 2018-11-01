@@ -36,7 +36,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.026'; # VERSION
 
 use Mouse;
 use FileHandle;
@@ -62,6 +62,10 @@ sub _finish_stanza
   if (!defined $current->{id}) {
     die_line $filename,  $current->{line}, "stanza has no id\n";
     return;
+  }
+
+  if ($current->{is_obsolete}) {
+    delete $current->{alt_id};
   }
 
   $current->{metadata} = $metadata_ref;

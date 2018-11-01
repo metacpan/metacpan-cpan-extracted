@@ -10,7 +10,7 @@ use Getopt::Long::Descriptive;
 use IO::Handle;
 use Pod::Readme;
 
-our $VERSION = 'v1.2.1';
+our $VERSION = 'v1.2.3';
 
 =head1 NAME
 
@@ -70,7 +70,8 @@ The target of the filter, which defaults to "readme".
 The output format, which defaults to "text".
 
 Other supposed formats are "github", "html", "latex", "man",
-"markdown", "pod", "rtf", and "xhtml".
+"markdown", "pod", "rtf", and "xhtml". You can also use "gfm"
+instead of "github". Similary you can use "md" for "markdown".
 
 =head2 C<--stdout>
 

@@ -8,7 +8,7 @@ SYNOPSIS
       
       print "$_\n" for ls; # defaults to current working directory
       
-      print "$_: ", -s "/foo/bar/$_", "\n" for ls '/foo/bar', {all => 1, sort => 'size'};
+      print "$_: ", -s "/foo/bar/$_", "\n" for ls '/foo/bar', {-a => 1, sort => 'size'};
 
 DESCRIPTION
 
@@ -37,7 +37,7 @@ FUNCTIONS
     omitted, and the results are sorted by name according to the current
     locale (see perllocale for more information).
 
-    Accepts the following options:
+    Accepts the following options (any prefixed hyphens are ignored):
 
     a
 
@@ -51,13 +51,69 @@ FUNCTIONS
 
       Include hidden files and directories, but not . or ...
 
+    B
+
+    ignore-backups
+
+      Omit files and directories ending in ~.
+
     c
 
       Sort by ctime (change time) in seconds since the epoch.
 
+    F
+
+    classify
+
+      Append classification indicators to the end of file and directory
+      names. Equivalent to 'indicator-style' => 'classify'.
+
     f
 
       Equivalent to passing all and setting sort to none.
+
+    file-type
+
+      Append file-type indicators to the end of file and directory names.
+      Equivalent to 'indicator-style' => 'file-type'.
+
+    group-directories-first
+
+      Return directories then files. The sort algorithm will be applied
+      within these groupings, but U or sort => 'none' will disable the
+      grouping.
+
+    hide
+
+      Omit files and directories matching given Text::Glob pattern.
+      Overriden by a/all or A/almost-all.
+
+    I
+
+    ignore
+
+      Omit files and directories matching given Text::Glob pattern.
+
+    indicator-style
+
+      Append indicators to the end of filenames according to the specified
+      style. Recognized styles are: none (default), slash (appends / to
+      directories), file-type (appends all of the below indicators except
+      *), and classify (appends all of the below indicators).
+
+        / directory
+        @ symbolic link
+        = socket
+        | named pipe (FIFO)
+        * executable
+
+      Use of indicator types other than slash will render the resulting
+      filenames suitable only for display due to the extra characters.
+
+    p
+
+      Append / to the end of directory names. Equivalent to
+      'indicator-style' => 'slash'.
 
     r
 

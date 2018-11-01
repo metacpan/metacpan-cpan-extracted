@@ -1,11 +1,13 @@
-use 5.006;
 use strict;
 use warnings;
 use Module::Build;
 
+use 5.006;
+
 my $builder = Module::Build->new(
     module_name         => 'Bundler::MultiGem',
     license             => 'mit',
+    perl_version        => '5.006001',
     dist_author         => q{Mauro Berlanda <kupta@cpan.org>},
     dist_version_from   => 'lib/Bundler/MultiGem.pm',
     release_status      => 'stable',
@@ -32,4 +34,5 @@ my $builder = Module::Build->new(
     add_to_cleanup     => [ 'Bundler-MultiGem-*' ],
 );
 
+$builder->meta_add("repository", "https://github.com/mberlanda/Bundler-MultiGem");
 $builder->create_build_script();

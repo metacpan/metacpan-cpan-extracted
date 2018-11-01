@@ -121,7 +121,7 @@ Besides world commands and client commands, Axmud offers commands called *echo*,
 These types of command start with a different special character; for example, speedwalk commands start with a full stop/period character ( . ) and script commands begin with an ampersand character
 ( & ).
 
-All commands except world and client commands are turned off by default (unless you turned them on when the setup wizard window was open). See Section 4.4 for more information about them.
+All commands except world and client commands are turned off by default (unless you turned them on when the setup wizard window was open). See [Section 4.4](#4.4) for more information about them.
 
 ##<a name="4.3">4.3 Important client commands</a>
 
@@ -285,7 +285,11 @@ Here's a summary of the most important buttons.
 
 ![Compass icon](img/ch04/icon_compass.png) Opens the automapper window
 
-![Help icon](img/ch04/icon_help.png) Opens a window which displays the quick help file, README
+![Help icon](img/ch04/icon_help.png) Opens a window which displays various help files
+
+![Broom icon](img/ch04/icon_broom.png) Clears the command entry box. If commands are being sent to the world, one character at a time, clicking this button tells Axmud that you're about to start typing a new world command
+
+![Exclamation mark icon](img/ch04/icon_console.png) Opens the Session Console window. If Axmud is unable to display system messages in the main window (for whatever reason) they're displayed here instead
 
 ![Lock icon](img/ch04/icon_lock.png) Stops the window from scrolling when text is received from the world
 

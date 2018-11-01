@@ -1,5 +1,10 @@
 Revision history for Perl module Perl5::Build::Warnings
 
+0.03 Wed Oct 31 18:12:20 EDT 2018
+    - Add ability to handle gzip-compressed input files.
+    - Add methods get_warnings_for_group() and
+      get_warnings_for_source().
+
 0.02 Sat Oct 20 21:11:13 EDT 2018
     - No change in functionality; unneeded import removed
 

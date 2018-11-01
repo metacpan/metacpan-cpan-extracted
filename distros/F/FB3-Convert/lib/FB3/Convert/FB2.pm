@@ -33,7 +33,7 @@ sub Reaper {
 
 	$X->Error("File '.fb2' not defined") if (!$X->{'src_type'} && lc($Source) !~ /\.fb2$/);
 
-  my $XC = XML::LibXML::XPathContext->new();
+	my $XC = XML::LibXML::XPathContext->new();
 	
 	my $FB2Doc = XML::LibXML->load_xml( location => $Source );
 	$FB2Doc->setEncoding('utf-8');
@@ -116,6 +116,39 @@ sub Reaper {
 		CreateEpigraph($FB2Doc, $Cite->parentNode, @SetInEpigraph); # сбросим хвост
 	}
 
+	#<poem> место в только в <section>. Другие заменяем на <blockquote>
+	for my $Poem ( $XPC->findnodes('//fb:poem', $FB2Doc )) {
+		if ($Poem->parentNode()->nodeName() ne 'section' && $Poem->parentNode()->nodeName() ne 'cite') {
+			my $BlockNode = $FB2Doc->createElement('blockquote');
+      foreach my $ChildInside ($Poem->getChildnodes) {
+        if ($ChildInside->nodeName() eq 'stanza') {
+					foreach my $StanzaInside ($ChildInside->getChildnodes) {
+						$BlockNode->addChild($StanzaInside->cloneNode(1));
+					}
+				} else {
+					$BlockNode->addChild($ChildInside->cloneNode(1));
+				}
+			}
+			$Poem->replaceNode($BlockNode);
+		}
+	}
+
+	#<body>some</body><body><title> все склеивает в невалидный вид
+	#если кол-во <body> < 2 или нет body/title, можно оставить как есть
+	if (scalar @{$XPC->findnodes('//fb:body[not(@name="notes")]', $FB2Doc)} > 1) {
+		#иначе в каждый <body> c <title> обернем <section>
+		for my $TitleNode ($XPC->findnodes('//fb:body[not(@name="notes")]/fb:title', $FB2Doc )) {
+			my $BodyNode = $TitleNode->parentNode();
+			my $SecNode = $FB2Doc->createElement('section');
+			$SecNode->setAttribute('id' => $FB2IdNode);
+			foreach my $ChildInside ($BodyNode->getChildnodes) {
+				$SecNode->addChild($ChildInside->cloneNode(1));
+				$BodyNode->removeChild($ChildInside);
+			}
+			$BodyNode->addChild($SecNode);
+		}
+	}
+
 	# приведём в порядок цитаты без текста, только с заголовками
 	for my $Cite ( $XPC->findnodes('//fb:section/fb:cite', $FB2Doc )) {
 
@@ -138,20 +171,41 @@ sub Reaper {
 
 		for my $Title ( @Titles ) {
 
+			my $PNode  = $FB2Doc->createElement('p');
+			my $Strong = $FB2Doc->createElement('strong');
+
+			my $strongAdd    = 0;
+			my $paragraphAdd = 0;
+
 			for my $Node ( $XPC->findnodes('*', $Title) ) {
 
-				$Cite->appendChild($Node);
+				if ( 'strong' eq $Node->nodeName() ) {
+
+					$PNode->appendChild($Node);
+					$paragraphAdd = 1;
+
+				} else {
+
+					$Strong->appendChild($Node);
+					$strongAdd = 1;
+				}
 			}
 
 			if ( my $Text = $Title->textContent ) {
 
-				my $PNode = $FB2Doc->createElement('p');
-				$PNode->appendTextNode($Text);
+				$Text =~ s/^\s+//s; $Text =~ s/\s+$//s;
 
-				$Cite->appendChild($PNode);
+				if ( $Text ) {
+
+					$Strong->appendTextNode($Text);
+					$strongAdd = 1;
+				}
 			}
 
 			$Title->unbindNode();
+
+			$PNode->appendChild($Strong) if ( $strongAdd );
+			$Cite->appendChild($PNode)   if ( $paragraphAdd or $strongAdd );
 		}
 	}
 

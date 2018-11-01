@@ -61,7 +61,7 @@
          "web" : "https://github.com/pombase/chobo"
       }
    },
-   "version" : "0.024",
+   "version" : "0.026",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

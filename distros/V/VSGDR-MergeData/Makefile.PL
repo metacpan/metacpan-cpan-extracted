@@ -16,6 +16,7 @@ WriteMakefile(
     EXE_FILES => [ "genMergeData.pl", 
                  ],
     PREREQ_PM => {
+        'VSGDR::StaticData'     => 0,
         'Test::More'            => 0,
         'Carp'                  => 0,
         'DBD::ODBC'             => 0,
@@ -26,7 +27,6 @@ WriteMakefile(
         'Graph'                 => 0.90,
         'List::Util'            => 1.00,
         'POSIX'                 => 0,
-        'Win32'                 => 0,
         'autodie'               => 0,
         'indirect'              => 0,
         'version'               => 0,

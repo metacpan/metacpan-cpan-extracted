@@ -26,8 +26,8 @@ WriteMakefile(
         resources   => {
             repository => {
                 type => 'git',
-                url  => 'git@github.com:gonzus/JavaScript-Duktape-XS',
-                web  => 'https://github.com/gonzus/JavaScript-Duktape-XS',
+                url  => 'git@github.com:gonzus/Parser-GraphQL-XS',
+                web  => 'https://github.com/gonzus/Parser-GraphQL-XS',
             },
         },
     },

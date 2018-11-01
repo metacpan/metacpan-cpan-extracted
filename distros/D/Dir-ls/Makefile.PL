@@ -19,9 +19,12 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Exporter" => "5.57",
+    "Fcntl" => 0,
     "File::Spec" => 0,
+    "File::stat" => 0,
     "Path::ExpandTilde" => 0,
     "Sort::filevercmp" => 0,
+    "Text::Glob" => 0,
     "locale" => 0,
     "sort" => 0
   },
@@ -32,7 +35,7 @@ my %WriteMakefileArgs = (
     "File::pushd" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "1.000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,12 +46,15 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => 0,
+  "Fcntl" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "File::pushd" => 0,
+  "File::stat" => 0,
   "Path::ExpandTilde" => 0,
   "Sort::filevercmp" => 0,
   "Test::More" => "0.88",
+  "Text::Glob" => 0,
   "locale" => 0,
   "sort" => 0
 );

@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/pombase/chobo/issues
   homepage: https://github.com/pombase/chobo
   repository: https://github.com/pombase/chobo.git
-version: '0.024'
+version: '0.026'
 x_serialization_backend: 'YAML::Tiny version 1.70'

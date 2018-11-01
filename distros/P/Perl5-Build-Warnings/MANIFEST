@@ -6,6 +6,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/01-new.t
+t/data/clang++.make.output.txt.gz
 t/data/linux.make.v5.29.3-26-g8da010579b.output.txt.gz
 t/data/make.g++-8-list-util-fallthrough.output.txt
 Todo

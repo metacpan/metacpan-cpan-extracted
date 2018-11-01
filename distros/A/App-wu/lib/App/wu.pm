@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package App::wu;
-$App::wu::VERSION = '0.05';
+$App::wu::VERSION = '0.06';
 use WWW::Wunderground::API 0.06;
 use Cache::FileCache;
 use Carp;
@@ -83,7 +83,7 @@ App::wu - Terminal app that provides an hourly weather forecast using Weather Un
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -101,6 +101,10 @@ This module installs the C<wu> command which prints a 36 hour weather forecast a
      7:00 AM  55  13       7  Partly Cloudy
     ...
 
+=head1 WARNING
+
+The free Weather Underground API service is being L<discontinued|https://apicommunity.wunderground.com/weatherapi/topics/end-of-service-for-the-weather-underground-api>. This module will be moved to the BackPAN.
+
 =head1 BUGS
 
 Windows PowerShell and cmd.exe both corrupt the Fareinheit and Celsius degrees symbols, but other than that work fine.
@@ -115,7 +119,7 @@ L<WWW::Wunderground::API> - the fabulous module that powers this app!
 
 =item *
 
-My PerlTricks.com L<article|http://perltricks.com/article/114/2014/9/11/Get-a-weather-report-at-the-terminal-with-Perl> about this script
+My Perl.com L<article|https://www.perl.com/article/114/2014/9/11/Get-a-weather-report-at-the-terminal-with-Perl/> about this script
 
 =back
 

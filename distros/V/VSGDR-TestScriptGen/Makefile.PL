@@ -34,7 +34,6 @@ WriteMakefile(
         'VSGDR::UnitTest::TestSet::Test::TestCondition'         => 0,
         'VSGDR::UnitTest::TestSet::Representation'              => 0,
         'VSGDR::UnitTest::TestSet::Resx'                        => 0,
-        'Win32'                 => 0,
         'autodie'               => 0,
         'indirect'              => 0,
         'version'               => 0,

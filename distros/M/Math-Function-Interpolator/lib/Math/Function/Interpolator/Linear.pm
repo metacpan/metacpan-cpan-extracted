@@ -6,7 +6,7 @@ use warnings;
 
 our @ISA = qw(Math::Function::Interpolator);
 
-our $VERSION = '1.02';    ## VERSION
+our $VERSION = '1.03';    ## VERSION
 
 use Carp qw(confess);
 use Number::Closest::XS qw(find_closest_numbers_around);

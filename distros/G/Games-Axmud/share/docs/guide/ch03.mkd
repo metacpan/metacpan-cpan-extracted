@@ -51,7 +51,7 @@ Axmud knows nothing about these worlds, besides how to connect to them. Features
 
 ![Sort icon](img/ch03/icon_sort_a.png) ![Sort icon](img/ch03/icon_sort_z.png) ![Sort icon](img/ch03/icon_sort_random.png) Click on these buttons to sort the list alphabetically or randomly.
 
-![Alert icon](img/ch03/icon_console_alert.png) If you see this orange button, Axmud has some error messages to display. Click the button to     read them, if you want to.
+![Alert icon](img/ch03/icon_console_alert.png) If you see this orange button, Axmud has some system messages to display. Click the button to read them, if you want to.
 
 ![18 icon](img/ch03/icon_adult.png) Some worlds, which contain explicit sexual themes, are marked as being suitable only for adults. The authors make no guarantees that this information is complete and correct.
 

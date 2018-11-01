@@ -23,7 +23,6 @@ meta-spec:
 name: Math-Function-Interpolator
 requires:
   Carp: '0'
-  List::MoreUtils: '0'
   List::Util: '0'
   Math::Cephes::Matrix: '0'
   Number::Closest::XS: '0'
@@ -33,6 +32,6 @@ requires:
 resources:
   bugtracker: https://github.com/binary-com/perl-Math-Function-Interpolator/issues
   repository: git://github.com/binary-com/perl-Math-Function-Interpolator.git
-version: '1.02'
+version: '1.03'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.66'

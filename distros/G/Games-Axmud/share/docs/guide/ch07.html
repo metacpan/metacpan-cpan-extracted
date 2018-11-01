@@ -15,10 +15,11 @@
 <li><a href="#7.1.2">7.1.2 Trigger attributes</a></li>
 <li><a href="#7.1.3">7.1.3 Trigger styles</a></li>
 <li><a href="#7.1.4">7.1.4 Rewriter triggers</a></li>
-<li><a href="#7.1.5">7.1.5 Advanced rewriter triggers</a></li>
-<li><a href="#7.1.6">7.1.6 Splitter triggers</a></li>
-<li><a href="#7.1.7">7.1.7 Simple splitter triggers</a></li>
-<li><a href="#7.1.8">7.1.8 Advanced splitter triggers</a></li>
+<li><a href="#7.1.5">7.1.5 Substrings in rewriter triggers</a></li>
+<li><a href="#7.1.6">7.1.6 Substrings in other triggers</a></li>
+<li><a href="#7.1.7">7.1.7 Splitter triggers</a></li>
+<li><a href="#7.1.8">7.1.8 Simple splitter triggers</a></li>
+<li><a href="#7.1.9">7.1.9 Advanced splitter triggers</a></li>
 </ul>
 </li>
 <li><a href="#7.2">7.2 Aliases</a><ul>
@@ -26,13 +27,14 @@
 <li><a href="#7.2.2">7.2.2 Safer aliases</a></li>
 <li><a href="#7.2.3">7.2.3 Editing aliases</a></li>
 <li><a href="#7.2.4">7.2.4 Alias attributes</a></li>
-<li><a href="#7.2.5">7.2.5 Advanced aliases</a></li>
+<li><a href="#7.2.5">7.2.5 Substrings in aliases</a></li>
 </ul>
 </li>
 <li><a href="#7.3">7.3 Macros</a><ul>
 <li><a href="#7.3.1">7.3.1 Axmud keycodes</a></li>
 <li><a href="#7.3.2">7.3.2 Adding macros</a></li>
 <li><a href="#7.3.3">7.3.3 Editing macros</a></li>
+<li><a href="#7.3.3">7.3.4 Macro attributes</a></li>
 </ul>
 </li>
 <li><a href="#7.4">7.4 Timers</a><ul>
@@ -46,8 +48,9 @@
 <li><a href="#7.5.2">7.5.2 Hook data</a></li>
 <li><a href="#7.5.3">7.5.3 Adding hooks</a></li>
 <li><a href="#7.5.4">7.5.4 Editing hooks</a></li>
-<li><a href="#7.5.5">7.5.5 Using hook data</a></li>
-<li><a href="#7.5.6">7.5.6 Redirect mode</a></li>
+<li><a href="#7.5.5">7.5.5 Hook attributes</a></li>
+<li><a href="#7.5.5">7.5.6 Using hook data</a></li>
+<li><a href="#7.5.6">7.5.7 Redirect mode</a></li>
 </ul>
 </li>
 <li><a href="#7.6">7.6 Active and inactive interfaces</a></li>
@@ -111,15 +114,17 @@
 <p>When the checkbutton is selected, any line which matches the trigger's pattern is <em>not</em> written to any logfiles.</p>
 <p><strong>Keep checking triggers after a match</strong></p>
 <p>If the checkbutton is not selected, when this trigger's pattern matches a line, Axmud will not check any other triggers. If the checkbutton is selected, Axmud will continue checking the line against other triggers.</p>
-<p><strong>Temporary trigger</strong>
-If the checkbutton is selected, the trigger only fires once. After that, the active trigger becomes an inactive trigger - it will be available again, the next time you connect to the world, but it will not be available again during this session.</p>
+<p><strong>Temporary trigger</strong></p>
+<p>If the checkbutton is selected, the trigger only fires once. After that, the active trigger becomes an inactive trigger - it will be available again, the next time you connect to the world, but it will not be available again during this session.</p>
+<p><strong>Cooldown (in seconds)</strong></p>
+<p>You can prevent a trigger from firing too often by setting a cooldown period. For example, if you set the cooldown to 10, after firing the trigger won't be able to fire again for another 10 seconds. The default value is 0, meaning no cooldown period is used.</p>
 <h3><a name="7.1.3">7.1.3 Trigger styles</a></h3>
 <p>Triggers are able to change the way matching lines are displayed. This is really useful if you want to change the colour of something like <strong>The orc drops its treasure</strong>, so that it stands out against the surrounding text.</p>
 <p>Trigger styles are turned <em>off</em> by default. When you turn them on, you need to decide whether the new style should apply to the whole line, or just the portion of the line that matches the trigger's pattern.</p>
-<p>If the trigger's pattern contains backreferences (see <a href="ch06.html#6.1.5">Section 6.1.5</a>, you can also apply a style just to that portion of text. For example, if you use the pattern <strong>You have (.*) gold coins</strong>, which matches the line:</p>
+<p>If the trigger's pattern contains groups (see <a href="ch06.html#6.1.5">Section 6.1.5</a>, you can also apply a style just to that portion of text. For example, if you use the pattern <strong>You have (.*) gold coins</strong>, which matches the line:</p>
 <pre><code>    You have 100 gold coins
 </code></pre>
-<p>...you can draw attention to the <strong>100</strong> by clicking on <strong>Mode n</strong>, then selecting the number 1 (meaning, the first backreference in the pattern) in the box just below.</p>
+<p>...you can draw attention to the <strong>100</strong> by clicking on <strong>Mode n</strong>, then selecting the number 1 (meaning, the substring matching the first group in the pattern) in the box just below.</p>
 <p>The trigger style can combine colours and other typographical features. <strong>Foreground colour</strong> is the colour of the text itself.  <strong>Underlay colour</strong> is the colour of the background immediately below the text. (Bold colours are shown in CAPITAL LETTERS). If you don't specify a colour, the line's normal colours are not changed.</p>
 <p>You can also apply italics, strikethrough, blinking text and underlines (underscores). If you apply the <strong>link</strong> style, the text will be a clickable link which Axmud will try to open in a web browser.</p>
 <h3><a name="7.1.4">7.1.4 Rewriter triggers</a></h3>
@@ -137,9 +142,9 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
 <p>Now, any received text which matches the pattern is modified, so that the scurrilous expletive is replaced by asterisks.</p>
 <pre><code>    Gandalf says 'Oh, ****!'
 </code></pre>
-<h3><a name="7.1.5">7.1.5 Advanced rewriter triggers</a></h3>
-<p>Rewriter triggers can use backreferences, but the substituted text must be enclosed in double-quotes.</p>
-<p>For example, suppose you want Axmud to convert a long string, containing lots of useless characters, into a shorter string containing only the important ones:</p>
+<h3><a name="7.1.5">7.1.5 Substrings in rewriter triggers</a></h3>
+<p>Rewriter triggers can use substrings.</p>
+<p>For example, suppose you want Axmud to convert a long string, containing lots of useless characters, into a shorter string containing only the important characters:</p>
 <pre><code>    And the winner is ========== Gandalf ==========
 </code></pre>
 <p>You could use a pattern like this:</p>
@@ -149,24 +154,54 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
 <pre><code>    And the winner is =+ (.*) =+
 </code></pre>
 <p>(<a href="ch06.html#6.1.4">Section 6.1.4</a> explains that + means <em>one or more of the previous characters</em>, in this case, one or more =  characters.)</p>
-<p>When the trigger fires, anything inside a pair of brackets (...) is treated as a backreference. In this case, the first backreference contains the winner, Gandalf.</p>
-<p>We can use the first backreference in the substituted text by specifying the variable <strong>$1</strong>. However, the whole substituted text <em>must be enclosed in double-quotes</em>. This allows Axmud to treat the substituted text as something that might contain backreferences.</p>
-<pre><code>    "And the winner is $1"
+<p>When the trigger fires, any part of the line matching the group <strong>(.*)</strong> is stored as a substring. In this case, the first substring contains the winner, <strong>Gandalf</strong>.</p>
+<p>We can use the first substring in the substituted text by specifying the variable <strong>$1</strong>. </p>
+<pre><code>    And the winner is $1
 </code></pre>
-<p>(If there is more than one backreference, you can also use <strong>$2</strong>, <strong>$3</strong> and so on.)</p>
+<p>(If there is more than one substring, you can also use <strong>$2</strong>, <strong>$3</strong> and so on.)</p>
 <p>So now we're ready to create our trigger:</p>
 <ul>
-<li>In the 'Trigger stimulus' box, enter the pattern <strong>And the winner is =+ (.*) =+</strong></li>
-<li>In the 'Trigger response' box, enter the text <strong>"And the winner is $1"</strong></li>
+<li>In the <strong>Trigger stimulus</strong> box, enter the pattern <strong>And the winner is =+ (.*) =+</strong></li>
+<li>In the <strong>Trigger response</strong> box, enter the text <strong>And the winner is $1</strong></li>
 <li>In the <strong>Name</strong> box, enter the name <strong>mytrigger</strong></li>
+<li>Click the <strong>Rewriter</strong> checkbutton to select it</li>
 <li>Click the <strong>Add</strong> button to create the trigger</li>
-<li>Select the trigger in the list and click the <strong>Edit</strong> button</li>
-<li>In the new edit window, click the <strong>Attributes</strong> tab, and click the <strong>Rewriter trigger</strong> checkbox</li>
 </ul>
 <p>When the trigger fires, the text at the top of this Section will be converted to:</p>
 <pre><code>    And the winner is Gandalf
 </code></pre>
-<h3><a name="7.1.6">7.1.6 Splitter triggers</a></h3>
+<p>There are a few things left to mention:</p>
+<ul>
+<li>NB Before v1.1.270, the substituted text had to be enclosed in double-quotes<ul>
+<li>e.g. <strong>"And the winner is $1"</strong></li>
+<li>This is no longer necessary (but your old triggers will continue to work)</li>
+</ul>
+</li>
+<li>If you <em>actually</em> want the substituted text to begin and end with double quotes, you must duplicate them<ul>
+<li>e.g. <strong>""And the winner is $1""</strong>  </li>
+</ul>
+</li>
+<li>If you want the substituted text to contain a literal <strong>$1</strong>, precede it with a backslash<ul>
+<li>e.g. <strong>You have \$1 gold coins in your $1</strong></li>
+</ul>
+</li>
+<li>If you <em>actually</em> want a backslash <em>anywhere</em> in the substituted text, use must use two of them<ul>
+<li>e.g. <strong>apples and\\or oranges</strong> </li>
+</ul>
+</li>
+</ul>
+<h3><a name="7.1.6">7.1.6 Substrings in other triggers</a></h3>
+<p>Substrings can be used in non-rewriter triggers, too. </p>
+<p>In this example, we'll create a trigger that joins in any fight started by Gandalf. If he attacks an orc, the trigger fires and Axmud sends the world command <strong>kill orc</strong>.</p>
+<ul>
+<li>In the <strong>Trigger stimulus</strong> box, enter the pattern <strong>Gandalf attacks (.*)</strong></li>
+<li>In the <strong>Trigger response</strong> box, enter the world command <strong>kill $1</strong></li>
+<li>In the <strong>Name</strong> box, enter the name <strong>attacktrigger</strong></li>
+<li>Click the <strong>Rewriter</strong> checkbutton to select it</li>
+<li>Click the <strong>Add</strong> button to create the trigger</li>
+</ul>
+<p>The rules about literal double quotes, literal dollars and literal backwards slashes, mentioned just above, still apply.</p>
+<h3><a name="7.1.7">7.1.7 Splitter triggers</a></h3>
 <p>At <em>Imperian: Sundered Heavens</em>, a room's verbose description and its exit list are usually on two separate lines, but occasionally they appear on the same line. This is confusing for the Locator task, on which the automapper relies, and can cause the automapper to lose its place.</p>
 <p>The solution to the problem is to use a splitter trigger to split the line into two, when necessary.</p>
 <p>(You don't need to read this Section if you want to play <em>Imperian</em>, because the pre-configured world profile already includes a suitable trigger. However, you should read this Section if you want to learn how to create your own splitter triggers.)</p>
@@ -181,7 +216,7 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
     This small storage room is neatly stacked. You see a single exit leading south.
 </code></pre>
 <p>Here, the verbose description and exit list appear on the same line. Because the Locator task is expecting the exit list on a separate line, we need to split the second line into two, with one sentence on each line.</p>
-<h3><a name="7.1.7">7.1.7 Simple splitter triggers</a></h3>
+<h3><a name="7.1.8">7.1.8 Simple splitter triggers</a></h3>
 <p>All triggers have a <em>stimulus</em> and a <em>response</em>. For splitter triggers, both of these are patterns. The simplest splitter triggers use the same pattern for both.</p>
 <ul>
 <li>From the main window menu, click <strong>Edit &gt; World triggers</strong></li>
@@ -215,7 +250,7 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
     This small storage room
     is neatly stacked. You see a single exit leading south.
 </code></pre>
-<h3><a name="7.1.8">7.1.8 Advanced splitter triggers</a></h3>
+<h3><a name="7.1.9">7.1.9 Advanced splitter triggers</a></h3>
 <p>The examples in the previous Section use identical patterns for both the stimulus and response. Sometimes it's useful to use two different patterns. Here's an example using the same room statement, in which the verbose description and exit list are initially on the same line.</p>
 <pre><code>    A neat storage room.
     This small storage room is neatly stacked. You see a single exit leading south.
@@ -309,7 +344,7 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
 <p>The <strong>Attributes</strong> tab allows you to customise the alias - for example, to disable the alias automatically after the first match.</p>
 <p>When Axmud is testing aliases against a world command, it checks the aliases in the same order every time. Sometimes the order is important, so the <strong>Before / after</strong> tab allows you to name the aliases that should be checked before or after this one.</p>
 <h3><a name="7.2.4">7.2.4 Alias attributes</a></h3>
-<p>Click on the <strong>Attributes</strong> tab. There are three attributes which can be customised.</p>
+<p>Click on the <strong>Attributes</strong> tab. There are four attributes which can be customised.</p>
 <p><strong>Ignore case</strong></p>
 <p>When the checkbutton is selected, this alias doesn't care about capital letters. In the examples above, <strong>amazing red crown</strong> will be substituted for all of the following world commands:</p>
 <pre><code>    arc
@@ -322,16 +357,41 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
 <p>If the checkbutton is not selected, when this alias's pattern matches a world command, Axmud will not check any other aliases. If the checkbutton is selected, Axmud will continue checking the command against other aliases.</p>
 <p><strong>Temporary alias</strong></p>
 <p>If the checkbutton is selected, the alias only fires once. After that, the active alias becomes an inactive alias - it will be available again, the next time you connect to the world, but it will not be available again during this session.</p>
-<h3><a name="7.2.5">7.2.5 Advanced aliases</a></h3>
-<p>Aliases can use backreferences, but the replacement string must be enclosed within double-quotes.</p>
+<p><strong>Cooldown (in seconds)</strong></p>
+<p>You can prevent an alias from firing too often by setting a cooldown period. For example, if you set the cooldown to 10, after firing the alias won't be able to fire again for another 10 seconds. The default value is 0, meaning no cooldown period is used.</p>
+<h3><a name="7.2.5">7.2.5 Substrings in aliases</a></h3>
+<p>Aliases, like triggers, can contain substrings.</p>
 <p>For example, suppose you want Axmud to convert a world command like <strong>give 50 gc to orc</strong> to <strong>give 50 gold coins to orc</strong>. This is how to do it, so that the alias will work with any number of coins being given to any creature:</p>
 <ul>
 <li>In the <strong>Alias stimulus</strong> box, enter the pattern <strong>^give (.*) gc to (.*)$</strong></li>
-<li>In the <strong>Alias response</strong> box, enter the text <strong>"give $1 gold coins to $2"</strong></li>
+<li>In the <strong>Alias response</strong> box, enter the text <strong>give $1 gold coins to $2</strong></li>
 <li>In the <strong>Name</strong> box, enter the name <strong>myalias3</strong></li>
 <li>Click the <strong>Add</strong> button to create the alias</li>
 </ul>
 <p>You can now test the alias by typing the world command <strong>give 50 gc to orc</strong>.</p>
+<p>There are a few things left to mention:</p>
+<ul>
+<li>NB Before v1.1.270, the instruction had to be enclosed in double-quotes<ul>
+<li>e.g. <strong>"give $1 gold coins to $2"</strong></li>
+<li>This is no longer necessary (but your old aliases will continue to work)</li>
+</ul>
+</li>
+<li>If you <em>actually</em> want the intruction to begin and end with double quotes, you must use two of them<ul>
+<li>e.g. <strong>""give $1 gold coins to $2""</strong></li>
+</ul>
+</li>
+<li>If you want the instruction to contain a literal <strong>$1</strong>, precede it with a backslash<ul>
+<li>e.g. <strong>give \$1 to $1</strong><ul>
+<li>This instruction would look something like <strong>give $1 to Gandalf</strong> </li>
+</ul>
+</li>
+</ul>
+</li>
+<li>If you <em>actually</em> want a backslash <em>anywhere</em> in the instruction, use must use two of them<ul>
+<li>e.g. <strong>apples and\\or oranges</strong> </li>
+</ul>
+</li>
+</ul>
 <h2><a name="7.3">7.3 Macros</a></h2>
 <p>Macros wait for you to press a key like F1, and then do something in response.</p>
 <p>Like all interfaces, Axmud macros have a <em>stimulus</em> and a <em>response</em>.  The stimulus is a <em>keycode</em> that represents one of the keys on your keyboard. When you press the key, we say that the macro <em>fires</em>.</p>
@@ -374,6 +434,12 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
 <p>The new edit window contains three tabs. The <strong>Name</strong> tab allows you to change the stimulus and response, and also allows you to enable or disable the macro.</p>
 <p>The <strong>Attributes</strong> tab allows you to customise the macro - for example, to disable the macro automatically after the first matching keypress.</p>
 <p>When Axmud is testing macros against a keypress, it checks the macros in the same order every time. Sometimes the order is important, so the <strong>Before / after</strong> tab allows you to name the macros that should be checked before or after this one.</p>
+<h3><a name="7.3.4">7.3.4 Macro attributes</a></h3>
+<p>Click on the <strong>Attributes</strong> tab. There are two attributes which can be customised.</p>
+<p><strong>Temporary macro</strong></p>
+<p>If the checkbutton is selected, the macro only fires once. After that, the active macro becomes an inactive macro - it will be available again, the next time you connect to the world, but it will not be available again during this session.</p>
+<p><strong>Cooldown (in seconds)</strong></p>
+<p>You can prevent a macro from firing too often by setting a cooldown period. For example, if you set the cooldown to 10, after firing the macro won't be able to fire again for another 10 seconds. The default value is 0, meaning no cooldown period is used.</p>
 <h2><a name="7.4">7.4 Timers</a></h2>
 <p>Timers allow you to execute an instruction repeatedly at regular intervals. They can also be used to execute an instruction once, after a certain period of time.</p>
 <p>Like all interfaces, Axmud timers have a <em>stimulus</em> and a <em>response</em>.  The stimulus is a time interval, expressed in seconds. When this interval has passed, we say that the timer <em>fires</em>.</p>
@@ -426,6 +492,13 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
 <li><strong>receive_text</strong> - happens when Axmud receives a packet of text from the world (which may comprise one line or several)</li>
 <li><strong>sending_cmd</strong> - happens when a world command is about to be sent, but <em>before</em> it has been checked against aliases</li>
 <li><strong>send_cmd</strong> - happens when a world command is about to be sent, <em>after</em> it has been checked against aliases, and possibly modified by them</li>
+<li><strong>system_text</strong> - happens when a system message is due to be displayed (although it might be diverted to a console or task window, rather than being displayed in the main window)</li>
+<li><strong>system_error</strong> - happens when a system error message is due to be displayed</li>
+<li><strong>system_warning</strong> - happens when a system warning message is due to be displayed</li>
+<li><strong>system_debug</strong> - happens when a system debug message is due to be displayed</li>
+<li><strong>system_improper</strong> - happens when a system improper arguments message is due to be displayed (due to an Axmud internal error)</li>
+<li><strong>system_all</strong> - happens when any system message is due to be displayed</li>
+<li><strong>system_all_error</strong> - happens when any system error, debug, warning or improper arguments message is due to be displayed</li>
 <li><strong>msdp</strong> - happens when some data is received using the MSDP protocol. This data is normally not visible to the user, but is available to your scripts</li>
 <li><strong>mssp</strong> - happens when some data is received using the MSSP protocol</li>
 <li><strong>zmp</strong> - happens when some data is received using the ZMP protocol</li>
@@ -439,10 +512,16 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
 <li><strong>visible_session</strong> - happens when this session becomes the visible session in its own main window</li>
 <li><strong>not_visible</strong> - happens in every session when any main window's visible session changes</li>
 <li><strong>change_visible</strong> - happens when a different session becomes the visible one in this session's own main window</li>
+<li><strong>textview_resize</strong> - happens when a textview object is resized, including when its scrollbars are made visible or invisible</li>
 <li><strong>user_idle</strong> - happens when no world commands have been sent for 60 seconds</li>
 <li><strong>world_idle</strong> - happens when no text has been received from the world for 60 seconds</li>
 <li><strong>get_focus</strong>, <strong>lose_focus</strong> - happen when this session's main window becomes the active (focused) window, or when some other window becomes the active window</li>
 <li><strong>close_disconnect</strong> - happens just before Axmud stops running</li>
+<li><strong>map_room</strong> - happens when the automapper's current room is set</li>
+<li><strong>map_no_room</strong> - happens when the automapper's current room is reset (for example, when the automapper gets lost)</li>
+<li><strong>map_rescue_on</strong> - happens when auto-rescue mode activates, and the automapper switches to a temporary region rather than marking the character as lost</li>
+<li><strong>map_rescue_merge</strong> - happens during auto-rescue mode when rooms are merged back into the previous region</li>
+<li><strong>map_rescue_off</strong> - happens when auto-rescue mode disactivates</li>
 </ul>
 <h3><a name="7.5.2">7.5.2 Hook data</a></h3>
 <p>Some hook events provide more information about whatever it was that caused the event to happen. This information, which is called <em>hook data</em>, is available to any code that needs it.</p>
@@ -471,7 +550,13 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
 <p>The new edit window contains three tabs. The <strong>Name</strong> tab allows you to change the stimulus and response, and also allows you to enable or disable the hook.</p>
 <p>The <strong>Attributes</strong> tab allows you to customise the hook - for example, to disable the hook automatically after its hook event happens for the first time.</p>
 <p>When Axmud is responding to hook events, it checks hooks in the same order every time. Sometimes the order is important, so the <strong>Before / after</strong> tab allows you to name the hooks that should be checked before or after this one.</p>
-<h3><a name="7.5.5">7.5.5 Using hook data</a></h3>
+<h3><a name="7.5.5">7.5.5 Hook attributes</a></h3>
+<p>Click on the <strong>Attributes</strong> tab. There are two attributes which can be customised.</p>
+<p><strong>Temporary hook</strong></p>
+<p>If the checkbutton is selected, the hook only fires once. After that, the active hook becomes an inactive hook - it will be available again, the next time you connect to the world, but it will not be available again during this session.</p>
+<p><strong>Cooldown (in seconds)</strong></p>
+<p>You can prevent a hook from firing too often by setting a cooldown period. For example, if you set the cooldown to 10, after firing the hook won't be able to fire again for another 10 seconds. The default value is 0, meaning no cooldown period is used.</p>
+<h3><a name="7.5.6">7.5.6 Using hook data</a></h3>
 <p>A hook's response can be an ordinary world command, a client command (like the one we created earlier, which uses <strong>';playsoundeffect'</strong>) or any other kind of instruction.</p>
 <p>Those instructions include Perl commands. As explained in <a href="ch04.html#4.4">Section 4.4</a>, a Perl command is a mini-Perl programme, all on one line. The programme's return value is processed as a normal instruction such as a world command.</p>
 <p>Let's create one of these hooks now. This hook will add the word <strong>sail</strong> before every world command. It will convert <strong>north</strong> into <strong>sail north</strong> or <strong>south</strong> into <strong>sail south</strong>. We'll be using the hook event <strong>sending_cmd</strong>. This hook event happens whenever you type a world command, but before the command is checked against aliases.</p>
@@ -497,7 +582,7 @@ If the checkbutton is selected, the trigger only fires once. After that, the act
 <pre><code>    /my $string = ' axe'; return $hookData . $string;
 </code></pre>
 <p>This mini-programme could convert the command <strong>get</strong> into <strong>get axe</strong>, the command <strong>drop</strong> into <strong>drop axe</strong> or the command <strong>sell</strong> into <strong>sell axe</strong>.</p>
-<h3><a name="7.5.6">7.5.6 Redirect mode</a></h3>
+<h3><a name="7.5.7">7.5.7 Redirect mode</a></h3>
 <p>Astute readers might now be asking themselves why there isn't an easier way to convert <strong>north</strong> into <strong>sail north</strong> automatically.</p>
 <p>In fact, there are several possible methods, including the clever use of aliases. But a much easier way is to use Axmud's <em>redirect mode</em>.</p>
 <pre><code>    ;help redirectmode

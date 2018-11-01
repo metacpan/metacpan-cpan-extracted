@@ -1,5 +1,8 @@
 Revision history for Perl extension App-BorgRestore
 
+3.2.1 2018-11-01T12:54:26Z
+	- Add missing version requirement to List::Util dependency
+
 3.2.0 2018-09-19T11:46:35Z
 	- Write data directly to DB instead of preparing it in memory first. The
 	  new algorithm should be faster and uses constant memory. If you want the

@@ -13,7 +13,6 @@ my $EndOfEmail = Sisimai::String->EOM;
 my $DefaultSet = Sisimai::Order::Email->another;
 my $SubjectTab = Sisimai::Order::Email->by('subject');
 my $ExtHeaders = Sisimai::Order::Email->headers;
-my $ReEncoding = Sisimai::MIME->patterns;
 my $ToBeLoaded = [];
 my $TryOnFirst = [];
 my $RFC822Head = Sisimai::RFC5322->HEADERFIELDS;
@@ -285,9 +284,7 @@ sub takeapart {
     # @return        [Hash]         Structured message headers
     my $class = shift;
     my $heads = shift || return {};
-
-    # Convert from string to hash reference
-    $$heads =~ s/^[>]+[ ]//mg;
+    $$heads =~ s/^[>]+[ ]//mg;  # Remove '>' indent symbol of forwarded message
 
     my $takenapart = {};
     my @hasdivided = split("\n", $$heads);
@@ -390,46 +387,6 @@ sub parse {
     $mailheader->{'subject'}      //= '';
     $mailheader->{'content-type'} //= '';
 
-    # Decode BASE64 Encoded message body
-    my $mesgformat = lc($mailheader->{'content-type'} || '');
-    my $ctencoding = lc($mailheader->{'content-transfer-encoding'} || '');
-
-    if( index($mesgformat, 'text/plain') == 0 || index($mesgformat, 'text/html') == 0 ) {
-        # Content-Type: text/plain; charset=UTF-8
-        if( $ctencoding eq 'base64' || $ctencoding eq 'quoted-printable' ) {
-            # Content-Transfer-Encoding: base64
-            # Content-Transfer-Encoding: quoted-printable
-            if( $ctencoding eq 'base64' ) {
-                # Content-Transfer-Encoding: base64
-                $bodystring = Sisimai::MIME->base64d($bodystring);
-
-            } else {
-                # Content-Transfer-Encoding: quoted-printable
-                $bodystring = Sisimai::MIME->qprintd($bodystring);
-            }
-        }
-
-        # Content-Type: text/html;...
-        $bodystring = Sisimai::String->to_plain($bodystring, 1) if $mesgformat =~ m|text/html;?|;
-    } else {
-        # NOT text/plain
-        my $lowercased = lc $$bodystring;
-        if( $lowercased =~ $ReEncoding->{'quoted-print'} ) {
-            # Content-Transfer-Encoding: quoted-printable
-            $bodystring = Sisimai::MIME->qprintd($bodystring, $mailheader);
-        }
-
-        if( $lowercased =~ $ReEncoding->{'7bit-encoded'} &&
-            $lowercased =~ $ReEncoding->{'some-iso2022'} ) {
-            # Content-Transfer-Encoding: 7bit
-            # Content-Type: text/plain; charset=ISO-2022-JP
-            if( index($1, 'us-ascii') == -1 && index($1, 'utf-8') == -1 ) {
-                # Convert to UTF-8
-                $bodystring = Sisimai::String->to_utf8($bodystring, $1);
-            }
-        }
-    }
-
     if( ref $hookmethod eq 'CODE' ) {
         # Call hook method
         my $p = { 
@@ -440,6 +397,32 @@ sub parse {
         };
         eval { $havecaught = $hookmethod->($p) };
         warn sprintf(" ***warning: Something is wrong in hook method:%s", $@) if $@;
+    }
+
+    # Decode BASE64 Encoded message body
+    my $mesgformat = lc($mailheader->{'content-type'} || '');
+    my $ctencoding = lc($mailheader->{'content-transfer-encoding'} || '');
+
+    if( index($mesgformat, 'text/plain') == 0 || index($mesgformat, 'text/html') == 0 ) {
+        # Content-Type: text/plain; charset=UTF-8
+        if( $ctencoding eq 'base64' ) {
+            # Content-Transfer-Encoding: base64
+            $bodystring = Sisimai::MIME->base64d($bodystring);
+
+        } elsif( $ctencoding eq 'quoted-printable' ) {
+            # Content-Transfer-Encoding: quoted-printable
+            $bodystring = Sisimai::MIME->qprintd($bodystring);
+        }
+
+        # Content-Type: text/html;...
+        $bodystring = Sisimai::String->to_plain($bodystring, 1) if $mesgformat =~ m|text/html;?|;
+    } else {
+        # NOT text/plain
+        if( index($mesgformat, 'multipart/') == 0 ) {
+            # In case of Content-Type: multipart/*
+            my $p = Sisimai::MIME->makeflat($mailheader->{'content-type'}, $bodystring);
+            $bodystring = $p if length $$p;
+        }
     }
 
     # EXPAND_FORWARDED_MESSAGE:

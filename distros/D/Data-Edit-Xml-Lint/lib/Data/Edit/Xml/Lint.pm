@@ -14,8 +14,8 @@
 # Higlight error counts in bold using boldText() or perhaps enclosed alphanumerics
 
 package Data::Edit::Xml::Lint;
-our $VERSION = 20181004;
-require v5.16.0;
+our $VERSION = 20181101;
+use v5.20;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(cluck confess);
@@ -589,7 +589,7 @@ sub report($;$)                                                                 
        }
      }
     if (my $d = $x->docType)                                                    # Document type summary
-     {$docTypes{(split /\s+/, $d)[1]}++;
+     {$docTypes{(split /\s+/, $d)[1]//$d}++;
      }
    }
 
@@ -890,6 +890,10 @@ L<file|/file> thus fixing the changes
 =back
 
 =head1 Description
+
+
+
+Version 20181101.
 
 
 The following sections describe the methods in each functional area of this
@@ -1302,7 +1306,7 @@ Timestamp of report
 
 =head3 totalCompressedErrorsFileByFile :lvalue
 
-Total number of errros summed file by file
+Total number of errors summed file by file
 
 
 =head3 totalCompressedErrors :lvalue
@@ -1509,7 +1513,7 @@ This is a static method and so should be invoked as:
 
 57 L<totalCompressedErrors|/totalCompressedErrors> - Number of compressed errors
 
-58 L<totalCompressedErrorsFileByFile|/totalCompressedErrorsFileByFile> - Total number of errros summed file by file
+58 L<totalCompressedErrorsFileByFile|/totalCompressedErrorsFileByFile> - Total number of errors summed file by file
 
 59 L<totalErrors|/totalErrors> - Total number of errors
 
@@ -1553,6 +1557,7 @@ sub test
   $@ and die $@;
   eval $s;
   $@ and die $@;
+  1
  }
 
 test unless caller;

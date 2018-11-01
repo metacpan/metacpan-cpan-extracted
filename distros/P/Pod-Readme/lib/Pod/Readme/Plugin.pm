@@ -4,7 +4,7 @@ use v5.10.1;
 
 use Moo::Role;
 
-our $VERSION = 'v1.2.1';
+our $VERSION = 'v1.2.3';
 
 use Class::Method::Modifiers qw/ fresh /;
 use Hash::Util qw/ lock_keys /;

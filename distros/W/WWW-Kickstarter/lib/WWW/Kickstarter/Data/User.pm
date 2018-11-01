@@ -21,7 +21,7 @@ sub _new {
    }
 
    my $self = $class->SUPER::_new($ks, $data);
-   $self->{location} = WWW::Kickstarter::Data::Location->_new($ks, $self->{location}) if exists($self->{location});
+   $self->{location} = WWW::Kickstarter::Data::Location->_new($ks, $self->{location}) if defined($self->{location});
 
    return $self;
 }

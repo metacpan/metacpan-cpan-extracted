@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';    ## VERSION
+our $VERSION = '1.03';    ## VERSION
 
 our @ISA = qw(Math::Function::Interpolator);
 
@@ -67,9 +67,9 @@ sub quadratic {
     my $solution;
     eval { $solution = $abc->simq($y); 1 }
         or confess 'Insoluble matrix: ' . $_;
-    my ($a, $b, $c) = @$solution;
+    my ($A, $B, $C) = @$solution;
 
-    return ($a * ($x**2) + $b * $x + $c);
+    return ($A * ($x**2) + $B * $x + $C);
 }
 
 =head1 AUTHOR

@@ -31,5 +31,5 @@ requires:
   perl: '5.010'
 resources:
   repository: git://github.com/domm/Web-Request-Role-JSON.git
-version: '1.005'
+version: '1.006'
 x_serialization_backend: 'YAML::Tiny version 1.69'

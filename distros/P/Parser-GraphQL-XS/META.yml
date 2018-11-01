@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl XS binding for the libgraphsql GraphSQL parsing library'
+abstract: 'Perl XS binding for libgraphqlparser, a GraphQL query parser in C++ with C and C++ APIs.'
 author:
   - 'Gonzalo Diethelm (gonzus@cpan.org)'
 build_requires:
@@ -25,6 +25,6 @@ requires:
   XSLoader: '0'
   perl: '5.018'
 resources:
-  repository: https://github.com/gonzus/JavaScript-Duktape-XS
-version: '0.000002'
+  repository: https://github.com/gonzus/Parser-GraphQL-XS
+version: '0.000003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

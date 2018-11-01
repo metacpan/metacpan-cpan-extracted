@@ -44,29 +44,31 @@
    "provides" : {
       "Bundler::MultiGem" : {
          "file" : "lib/Bundler/MultiGem.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bundler::MultiGem::Command::initialize" : {
          "file" : "lib/Bundler/MultiGem/Command/initialize.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bundler::MultiGem::Command::setup" : {
          "file" : "lib/Bundler/MultiGem/Command/setup.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bundler::MultiGem::Model::Directories" : {
          "file" : "lib/Bundler/MultiGem/Model/Directories.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bundler::MultiGem::Model::Gem" : {
-         "file" : "lib/Bundler/MultiGem/Model/Gem.pm"
+         "file" : "lib/Bundler/MultiGem/Model/Gem.pm",
+         "version" : "0.02"
       },
       "Bundler::MultiGem::Utl::Directories" : {
          "file" : "lib/Bundler/MultiGem/Utl/Directories.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bundler::MultiGem::Utl::InitConfig" : {
-         "file" : "lib/Bundler/MultiGem/Utl/InitConfig.pm"
+         "file" : "lib/Bundler/MultiGem/Utl/InitConfig.pm",
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -75,5 +77,6 @@
          "http://opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "0.01"
+   "version" : "0.02",
+   "x_repository" : "https://github.com/mberlanda/Bundler-MultiGem"
 }

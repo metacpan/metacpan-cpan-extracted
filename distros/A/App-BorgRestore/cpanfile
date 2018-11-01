@@ -6,7 +6,7 @@ requires 'Function::Parameters';
 requires 'Getopt::Long';
 requires 'IPC::Run';
 requires 'JSON';
-requires 'List::Util';
+requires 'List::Util', '1.33';
 requires 'Log::Any';
 requires 'Log::Any::Adapter::Log4perl';
 requires 'Log::Log4perl';

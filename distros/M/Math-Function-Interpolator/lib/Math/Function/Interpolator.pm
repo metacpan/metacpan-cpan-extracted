@@ -8,7 +8,6 @@ use Carp qw(confess);
 use Scalar::Util qw(looks_like_number);
 
 use Number::Closest::XS qw(find_closest_numbers_around);
-use List::MoreUtils qw(pairwise indexes);
 use List::Util qw(min max);
 
 use Math::Function::Interpolator::Linear;
@@ -49,7 +48,7 @@ HashRef of points for interpolations
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =head1 METHODS
 
@@ -162,7 +161,7 @@ sub closest_three_points {
 
     my ($first, $second) =
         @{find_closest_numbers_around($sought, $all_points, 2)};
-    my @indexes = indexes { $first == $_ or $second == $_ } @ap;
+    my @indexes = grep { $first == $ap[$_] or $second == $ap[$_] } 0 .. $#ap;
     my $third_index =
         (max(@indexes) < $length - 2) ? max(@indexes) + 1 : min(@indexes) - 1;
     my @sorted = sort { $a <=> $b } ($first, $second, $ap[$third_index]);

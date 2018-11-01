@@ -14,10 +14,10 @@ our @EXPORT_OK = qw(
     none        uniq     bool        spread
     len         to_keys  to_vals     is_array
     is_hash     every    noop        identity
-    is_empty    flow     is_eq
+    is_empty    flow     eql
 );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use constant ARG_PLACE_HOLDER => {};
 
@@ -308,7 +308,7 @@ sub reduces {
 sub _get_reduces_args {
     my $args = shift;
 
-    if (is_eq(len($args), 1)) {
+    if (eql(len($args), 1)) {
         return chain(
             $args,
             \&flatten,
@@ -339,14 +339,14 @@ sub partial {
 sub _fill_holders {
     my ($oldArgs, $newArgs) = @_;
 
-    if (none(sub { is_eq($_[0], __) }, $oldArgs)) {
+    if (none(sub { eql($_[0], __) }, $oldArgs)) {
         return [@$oldArgs, @$newArgs];
     }
 
     return reduces(sub {
         my ($args, $arg) = @_;
 
-        if (!is_eq($arg, __)) {
+        if (!eql($arg, __)) {
             return [spread($args), $arg]
         }
 
@@ -382,7 +382,7 @@ sub chain {
     } (ref($val) eq 'CODE' ? $val->() : $val), @funcs;
 }
 
-sub is_eq {
+sub eql {
     my $arg1 = shift // __;
     my $arg2 = shift // __;
 
@@ -442,7 +442,7 @@ concise code.
     none        uniq     bool        spread
     len         to_keys  to_vals     is_array
     is_hash     every    noop        identity
-    flow        is_eq
+    flow        eql
 
 =cut
 
@@ -696,36 +696,36 @@ A function that returns its first argument
 
 =cut
 
-=head2 is_eq
+=head2 eql
 
 Returns 0 or 1 if the two values have == equality, with convience wrapping
 for different types (no need to use eq vs ==). Follows internal perl rules
 on equality following strings vs numbers in perl.
 
-    is_eq([], [])
+    eql([], [])
 
     # 1
 
-    is_eq(1,1)
+    eql(1,1)
 
     # 1
 
 
     my $obj = {};
 
-    is_eq($obj, $obj);
+    eql($obj, $obj);
 
     # 1
 
 
-    is_eq("123", 123)
+    eql("123", 123)
 
     # 1  'Following perls internal rules on comparing scalars'
 
 
-    is_eq({ key => 'val' }, {key => 'val'});
+    eql({ key => 'val' }, {key => 'val'});
 
-    # 0
+    # 0 'Only identity equality'
 
 =cut
 
@@ -922,7 +922,7 @@ Iterates over elements of collection, returning the first element predicate retu
 
     find(sub {
         my $person = shift;
-        return is_eq($person->{'name'}, 'sally')
+        return eql($person->{'name'}, 'sally')
     }, $people);
 
     # { name => 'sally', age => 25 }

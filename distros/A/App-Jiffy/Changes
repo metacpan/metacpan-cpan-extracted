@@ -1,5 +1,8 @@
 Revision history for App-Jiffy
 
+0.08  2018-10-31 19:32:13 PDT
+        - Set timezone to `local` when displaying today's `timesheet`
+
 0.07  2018-04-06 17:47:15 CDT
         - Upgrade MonogoDB dependency to support v1
 

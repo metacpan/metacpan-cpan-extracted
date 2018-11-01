@@ -11,7 +11,7 @@ use Carp;
 use DBI;
 use Data::Dumper;
 use English;
-use Win32;
+if ($OSNAME eq 'MSWin32') {require Win32} 
 
 ##TODO 1. Fix multi-column primary/unique keys.
 ##TODO 2. Check that non-key identity columns are handled correctly when they occur in the final position in the table.
@@ -22,11 +22,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.42
+Version 0.44
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.44';
 
 
 sub databaseName {

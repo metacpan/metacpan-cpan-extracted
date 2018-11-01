@@ -2,7 +2,7 @@ package Web::Request::Role::JSON;
 
 # ABSTRACT: Make handling JSON easier in Web::Request
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 use 5.010;
 use MooseX::Role::Parameterized;
@@ -93,7 +93,7 @@ Web::Request::Role::JSON - Make handling JSON easier in Web::Request
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -157,7 +157,7 @@ is provided, we default to C<200>.
 
 Generate a JSON object out of your error message, if the message is a
 plain string. But you can also pass in a data structure that will be
-converte to JSON.
+converted to JSON.
 
 Per default, HTTP status is set to C<400>, but you can pass any other
 status as a second argument. (Yes, there is no checking if you pass a

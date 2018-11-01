@@ -2,7 +2,7 @@ package Pod::Readme::Plugin::version;
 
 use Moo::Role;
 
-our $VERSION = 'v1.2.1';
+our $VERSION = 'v1.2.3';
 
 use ExtUtils::MakeMaker;
 use Types::Standard qw/ Bool Str /;

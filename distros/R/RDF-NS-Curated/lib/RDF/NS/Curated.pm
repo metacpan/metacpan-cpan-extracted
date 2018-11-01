@@ -5,11 +5,12 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '1.000';
+our $VERSION   = '1.001';
 
 sub new {
   my $class = shift;
   my %prefix_ns = (
+					    acl => 'http://www.w3.org/ns/auth/acl#',
 						 adms => 'http://www.w3.org/ns/adms#',
 						 as => 'https://www.w3.org/ns/activitystreams#',
 						 bibo => 'http://purl.org/ontology/bibo/',
@@ -56,6 +57,7 @@ sub new {
 						 sioc => 'http://rdfs.org/sioc/ns#',
 						 skos => 'http://www.w3.org/2004/02/skos/core#',
 						 skosxl => 'http://www.w3.org/2008/05/skos-xl#',
+						 solid => 'http://www.w3.org/ns/solid/terms#',
 						 sosa => 'http://www.w3.org/ns/sosa/',
 						 ssn => 'http://www.w3.org/ns/ssn/',
 						 time => 'http://www.w3.org/2006/time#',
@@ -144,7 +146,7 @@ RDF::NS::Curated - A curated set of RDF prefixes
 
 =head1 DESCRIPTION
 
-This contains a list of 60 prefix and URI pairs that are commonly used
+This contains a list of 62 prefix and URI pairs that are commonly used
 in RDF. The intention is that prefixes in this list can be safely used
 in code that has a long lifetime. The list has been derived mostly
 from W3C standards documents, but also some popularity lists. See the

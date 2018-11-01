@@ -51,7 +51,7 @@
             "Getopt::Long" : "0",
             "IPC::Run" : "0",
             "JSON" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.33",
             "Log::Any" : "0",
             "Log::Any::Adapter::Log4perl" : "0",
             "Log::Log4perl" : "0",
@@ -84,7 +84,7 @@
    "provides" : {
       "App::BorgRestore" : {
          "file" : "lib/App/BorgRestore.pm",
-         "version" : "v3.2.0"
+         "version" : "v3.2.1"
       },
       "App::BorgRestore::Borg" : {
          "file" : "lib/App/BorgRestore/Borg.pm"
@@ -116,7 +116,7 @@
          "web" : "https://github.com/Bluewind/App-BorgRestore"
       }
    },
-   "version" : "3.2.0",
+   "version" : "3.2.1",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 0
 }

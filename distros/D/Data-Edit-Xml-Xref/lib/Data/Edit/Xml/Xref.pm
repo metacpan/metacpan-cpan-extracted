@@ -8,8 +8,8 @@
 # Handle relative files in hrefs, conrefs etc.
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20181030;
-use v5.8.0;
+our $VERSION = 20181101;
+use v5.20;
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess cluck);
@@ -46,7 +46,7 @@ sub xref(%)                                                                     
     summary=>1,                                                                 # Print the summary line.
     topicIds=>{},                                                               # {file} = topic id
     duplicateTopicIds=>[],                                                      # [topicId, [files]] Files with duplicate topic ids
-    maximumNumberOfProcesses=>16,                                               # Maximum number of processes to run
+    maximumNumberOfProcesses=>4,                                                # Maximum number of processes to run
    );
   loadHash($xref, @_);                                                          # Load attributes complaining about any invalid ones
 
@@ -82,8 +82,8 @@ sub xref(%)                                                                     
     push @o, [$t, q(bad topicref)]          if $t == 1;
     push @o, [$i, q(missing image refs)]    if $i >  1;
     push @o, [$i, q(missing image ref)]     if $i == 1;
-    push @o, [$I, q(image files found)]     if $I >  1;
-    push @o, [$I, q(image file found)]      if $I == 1;
+#   push @o, [$I, q(image files found)]     if $I >  1;
+#   push @o, [$I, q(image file found)]      if $I == 1;
     push @o, [$M, q(missing image files)]   if $M >  1;
     push @o, [$M, q(missing image file)]    if $M == 1;
     push @o, [$d, q(duplicate ids)]         if $d >  1;
@@ -511,7 +511,7 @@ More detailed reports are produced in the  L<reports|_/reports> folder:
 Cross reference Dita XML.
 
 
-Version 20181030.
+Version 20181101.
 
 
 The following sections describe the methods in each functional area of this
@@ -533,7 +533,7 @@ Check the cross references in a set of Dita files held in  L<inputFolder|/inputF
 B<Example:>
 
 
-    my $x = 𝘅𝗿𝗲𝗳(inputFolder=>q(in), maximumNumberOfProcesses=>16);               
+    my $x = 𝘅𝗿𝗲𝗳(inputFolder=>q(in), maximumNumberOfProcesses=>2);                
   
 
 
@@ -779,7 +779,7 @@ Test::More->builder->output("/dev/null")                                        
 if (1)
  {my $N = 8;
   createSampleInputFiles($N);
-  my $x = xref(inputFolder=>q(in), maximumNumberOfProcesses=>16);               #Txref
+  my $x = xref(inputFolder=>q(in), maximumNumberOfProcesses=>2);                #Txref
   ok nws($x->statusLine) eq nws(<<END);
 Xref Errors:
   1 file failed to parse,
@@ -787,7 +787,6 @@ Xref Errors:
   8 bad conrefs,
   2 bad topicrefs,
   7 missing image refs,
-  1 image file found,
   7 missing image files,
   8 duplicate ids,
   11 bad first lines,

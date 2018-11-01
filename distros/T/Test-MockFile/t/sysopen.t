@@ -116,6 +116,32 @@ is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache" ) or 
     close $fh;
     undef $bar;
 }
+
+{
+    my $str     = join( "", "a" .. "z" );
+    my $str_cap = join( "", "A" .. "Y" );
+
+    note "-------------- REAL MODE --------------";
+    File::Slurper::write_binary( $filename, $str_cap . $str );
+    is( sysopen( my $fh, $filename, O_RDONLY | O_NOFOLLOW ), 1, "Sysopen for read" );
+    my $buf;
+    is( sysread( $fh, $buf, 2 ), 2, "Read 2 into buf when buf is undef." );
+    is( $buf, "AB", "Confirm 2 char is read" );
+    unlink $filename;
+}
+
+{
+    my $str     = join( "", "a" .. "z" );
+    my $str_cap = join( "", "A" .. "Y" );
+
+    note "-------------- MOCK MODE --------------";
+    my $bar = Test::MockFile->file( $filename, $str_cap . $str );
+    is( sysopen( my $fh, $filename, O_RDONLY | O_NOFOLLOW ), 1, "Sysopen for read" );
+    my $buf;
+    is( sysread( $fh, $buf, 2 ), 2, "Read 2 into buf when buf is undef." );
+    is( $buf, "AB", "Confirm 2 char is read" );
+}
+
 is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache" );
 
 done_testing();

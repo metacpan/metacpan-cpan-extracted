@@ -2,7 +2,7 @@ package App::BorgRestore;
 use v5.14;
 use strictures 2;
 
-our $VERSION = "3.2.0";
+our $VERSION = "3.2.1";
 
 use App::BorgRestore::Borg;
 use App::BorgRestore::DB;

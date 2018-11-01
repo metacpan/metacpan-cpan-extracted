@@ -2,7 +2,7 @@ package InfluxDB::LineProtocol;
 use strict;
 use warnings;
 
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 
 # ABSTRACT: Write and read InfluxDB LineProtocol
 
@@ -337,7 +337,7 @@ InfluxDB::LineProtocol - Write and read InfluxDB LineProtocol
 
 =head1 VERSION
 
-version 1.010
+version 1.011
 
 =head1 SYNOPSIS
 
@@ -447,7 +447,7 @@ load via C<v0.9.2>
 =over
 
 =item * check if tag sorting algorithm matches
-http://golang.org/pkg/bytes/#Compare
+L<http://golang.org/pkg/bytes/#Compare>
 
 =back
 

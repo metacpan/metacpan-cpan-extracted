@@ -1,0 +1,67 @@
+{
+   "abstract" : "convert an ABNF grammar to Pegex",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Grammar-Convert-ABNF-Pegex",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "1.003001",
+            "Parse::ABNF" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0",
+            "Pod::Coverage::TrustPod" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Grammar::Convert::ABNF::Pegex" : {
+         "file" : "lib/Grammar/Convert/ABNF/Pegex.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Grammar-Convert-ABNF-Pegex/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Grammar-Convert-ABNF-Pegex",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/reneeb/Grammar-Convert-ABNF-Pegex.git",
+         "web" : "http://github.com/reneeb/Grammar-Convert-ABNF-Pegex"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

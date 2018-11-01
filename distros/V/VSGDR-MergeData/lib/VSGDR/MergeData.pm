@@ -11,7 +11,7 @@ use Carp;
 use DBI;
 use Data::Dumper;
 use English;
-use Win32;
+if ($OSNAME eq 'MSWin32') {require Win32} ;
 
 ##TODO 1. Fix multi-column primary/unique keys.
 ##TODO 2. Check that non-key identity columns are handled correctly when they occur in the final position in the table.
@@ -22,11 +22,11 @@ VSGDR::MergeData - Static data script support package for SSDT post-deployment s
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 
 sub databaseName {
@@ -125,7 +125,7 @@ sub generateScript {
     my $database                        = databaseName($dbh);
 
     no warnings;
-    my $userName                        = $OSNAME eq 'MSWin32' ? Win32::LoginName : ${[getpwuid( $< )]}->[6]; $userName =~ s/,.*//;
+    my $userName                        = $OSNAME eq 'MSWin32' ? eval('Win32::LoginName') : ${[getpwuid( $< )]}->[6]; $userName =~ s/,.*//;
     use warnings;
     
     use warnings;                      

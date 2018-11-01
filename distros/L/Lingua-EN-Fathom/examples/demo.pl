@@ -1,7 +1,7 @@
 #! /usr/local/bin/perl
 # Demo script for Lingua::EN::Fathom.pm
 
-
+use lib "../lib";
 use Lingua::EN::Fathom;
 
 my $sample1 =
@@ -29,11 +29,17 @@ q{
 The second paragraph to analyse.
 };
 
+my $sample3 =
+q{ Mr. Brown goes to town.
+
+};
+
 #-------------------------------------------------------------------------------
 
 my $text = Lingua::EN::Fathom->new();
-$text->analyse_block($sample1,1);
-$text->analyse_block($sample2,1);
+# $text->analyse_block($sample1,1);
+# $text->analyse_block($sample2,1);
+$text->analyse_block($sample3,1);
 
 print($text->report,"\n");
 

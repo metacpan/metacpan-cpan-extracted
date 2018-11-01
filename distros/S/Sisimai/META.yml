@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v4.23.0
+    version: v4.24.0
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -177,8 +177,6 @@ provides:
     file: lib/Sisimai/Order/Email.pm
   Sisimai::Order::JSON:
     file: lib/Sisimai/Order/JSON.pm
-  Sisimai::RFC2606:
-    file: lib/Sisimai/RFC2606.pm
   Sisimai::RFC3464:
     file: lib/Sisimai/RFC3464.pm
   Sisimai::RFC3834:
@@ -280,7 +278,7 @@ resources:
   bugtracker: https://github.com/sisimai/p5-Sisimai/issues
   homepage: https://libsisimai.org/
   repository: git://github.com/sisimai/p5-Sisimai.git
-version: v4.23.0
+version: v4.24.0
 x_contributors:
   - 'jcbf <underspell@gmail.com>'
   - 'Jonathan Leroy <jonathan@inikup.com>'

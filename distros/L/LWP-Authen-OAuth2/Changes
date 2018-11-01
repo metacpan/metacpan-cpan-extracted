@@ -1,5 +1,14 @@
 Revision history for LWP-Authen-OAuth2
 
+0.15	2018-10-31T17:54:15
+    - Update to match CPAN (Colin Newell)
+    - Add license file (eadjei)
+    - Adding travis config (Ndifreke Ekott)
+    - add Adam Millerchip to contributors/thanks (Thomas Klausner)
+    - update synopsis to show state is required (Adam Millerchip)
+    - Add Service Provider for Line (Adam Millerchip)
+
+
 0.14	2017-08-16T08:18:46
    - released on CPAN-Day 2017 from Sibiu, Romania
    - Add Service Provider for Line (Adam Millerchip)

@@ -1,3 +1,7 @@
+0.22 2018-11-01
+        - Added missing meta spec version (manwar++).
+        - Fixed Mojolicious dependency for nested helpers.
+
 0.21 2018-10-29
         - Fix description of 'embed' flag
         - Deprecate piwik_api and piwik_api_url in favor of

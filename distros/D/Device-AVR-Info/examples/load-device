@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-use Device::AVR;
+use Device::AVR::Info;
 
 use Getopt::Long;
 use List::UtilsBy qw( nsort_by );
@@ -13,7 +13,7 @@ GetOptions(
    'v|verbose+' => \( my $VERBOSE = 0 ),
 ) or exit 1;
 
-my $avr = Device::AVR->new_from_file( shift @ARGV )
+my $avr = Device::AVR::Info->new_from_file( shift @ARGV )
    or die "Can't load\n";
 
 printf "Device: %s (%s, %s)\n", $avr->name, $avr->family, $avr->architecture;
