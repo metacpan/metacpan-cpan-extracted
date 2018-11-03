@@ -104,6 +104,13 @@ B<NOTE> There is no need to start TOR. C<TaskPipe> will launch TOR instances as 
 
 =back
 
+=item 4.
+
+Install other dependencies
+
+yum install expat-devel sqlite
+
+
 =head2 Install L<TaskPipe>
 
 You can install TaskPipe using any of the usual methods available for intalling Perl modules. For example:
@@ -155,15 +162,11 @@ Also, before proceeding, make sure your home directory is writeable, because L<T
 
 Then type
 
-    taskpipe setup --root_dir=/home/myusername/taskpipe
+    taskpipe setup --root_dir=/home/myusername/taskpipe --job_tracking=none
 
 adjusting C</home/myusername/taskpipe> to suit your system. You should use an absolute path when executing this command.
 
-Note you will get a warning message:
-
-    Could not register job as database is unavailable. Proceeding without job_id...
-
-TaskPipe is complaining it can't find the global database. You can ignore this warning because we haven't set the database up yet - and we're just about to do that.
+The C<--job_tracking=none> switch is necessary because otherwise taskpipe will try to register the job in the global database, which doesn't exist yet. 
 
 Have a look at the files that were created. You should find the following structure:
 

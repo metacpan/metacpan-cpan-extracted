@@ -5,6 +5,7 @@ use MooseX::ClassAttribute;
 use Proc::ProcessTable;
 use TaskPipe::UserAgentManager::UserAgentHandler;
 use Log::Log4perl;
+use TaskPipe::TorManager;
 extends 'TaskPipe::UserAgentManager_ProxyNet';
 with 'MooseX::ConfigCascade';
 
@@ -48,11 +49,28 @@ sub init{
 
 
 
+sub before_request{
+    my ($self) = @_;
+
+    #$self->mu->record("before_request: at start");
+    $self->ua_handler->ua( $self->ua_handler->build_ua );
+
+    #$self->mu->record("before_request: after build ua");    
+    $self->ua_handler->call(
+        'proxy',
+        $self->tor_manager->settings->protocols,
+        $self->tor_manager->url
+    );
+
+    #$self->mu->record("before_request: at end");
+}
+
 
 sub change_ip{
     my $self = shift;
 
     $self->tor_manager->change_ip;
+    #$self->check_ip;
     $self->set_max;
     $self->cur_rno(0);
     $self->ua_handler->clear_cookies;

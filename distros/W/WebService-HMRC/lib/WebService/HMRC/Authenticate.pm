@@ -16,11 +16,11 @@ WebService::HMRC::Authenticate - Response object for the UK HMRC HelloWorld API
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -46,9 +46,9 @@ our $VERSION = '0.01';
     # by the user, or supplied via a callback uri. The
     # authorisation code is valid for 10 minutes.
 
-    # Exchange access code for an access token.
+    # Exchange authorisation code for an access token.
     my $result = $auth->get_access_token({
-        access_code => $access_code,
+        authorisation_code => $authorisaion_code,
         redirect_uri => 'urn:ietf:wg:oauth:2.0:oob',
     });
     $result->is_success or warn "ERROR: ", $result->data->{message};
@@ -70,7 +70,7 @@ our $VERSION = '0.01';
     })
 
     # Refreshing will then populate scope and expires_epoch properties
-    $new_auth->refresh;
+    $new_auth->refresh_tokens;
 
 =head1 DESCRIPTION
 
@@ -133,7 +133,7 @@ has client_secret => (
 =head2 access_token
 
 The access token issued by HMRC. Updated automatically when a new token
-is requested using access_token() or refresh_token() methods, or can be
+is requested using access_token() or refresh_tokens() methods, or can be
 set explicitly to use an existing token.
 
 Access tokens are typically valid for four hours after issue or until
@@ -151,7 +151,7 @@ has access_token => (
 =head2 refresh_token
 
 The refresh token issued by HMRC. Updated automatically when a new token
-is requested using access_token() or refresh_token() methods, or can be
+is requested using access_token() or refresh_tokens() methods, or can be
 set explicitly to use an existing refresh_token.
 
 Refresh tokens are typically valid for 18 months after the application was
@@ -187,7 +187,7 @@ tokens are valid. Scopes are specific and documented for each of HMRC's APIs.
 For example 'read:vat' or 'write:employment'.
 
 Updated according the the HMRC api response when a new token is requested using
-access_token() or refresh_token() methods.
+access_token() or refresh_tokens() methods.
 
 =cut
 
@@ -262,14 +262,14 @@ sub authorisation_url {
 }
 
 
-=head2 get_access_token({ access_code => $access_code, redirect_uri => $redirect_uri })
+=head2 get_access_token({ authorisation_code => $authorisation_code, redirect_uri => $redirect_uri })
 
-Exchanges the supplied access_code for an access_token.
+Exchanges the supplied authorisation_code for an access_token.
 
 Both client_id and client_secret object properties must be set before calling
 this method.
 
-The redirect_uri parameter must match that used when the access_code was 
+The redirect_uri parameter must match that used when the authorisation_code was 
 requested.
 
 Returns a WebService::HMRC::Response object.

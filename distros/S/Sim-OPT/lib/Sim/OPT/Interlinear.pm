@@ -29,7 +29,7 @@ use Sim::OPT::Takechance;
 use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
-our @EXPORT = qw( interlinear, interstart );
+our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
 
 $VERSION = '0.033';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of gradients weighted proportionally to multidimensional distances.';

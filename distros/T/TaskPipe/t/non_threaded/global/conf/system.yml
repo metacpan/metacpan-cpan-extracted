@@ -1,0 +1,211 @@
+---
+TaskPipe::JobManager::Settings:
+  job_tracking: register
+  max_kill_job_attempts: 5
+TaskPipe::PodReader::Settings:
+  pod_format:
+    B:
+      color: bright_yellow
+      display: inline
+    C:
+      color: cyan
+      display: inline
+    Document:
+      display: block
+      indent: 2
+      stacking: nest
+    E:
+      color: white
+      display: inline
+    F:
+      color: bright_white
+      display: inline
+    I:
+      color: bright_white
+      display: inline
+    L:
+      color: bright_green
+      display: inline
+    Para:
+      bottom_spacing: 2
+      color: white
+      display: block
+      stacking: nest
+    S:
+      color: cyan
+      display: inline
+      wrap: verbatim
+    Verbatim:
+      bottom_spacing: 2
+      color: cyan
+      display: block
+      stacking: nest
+      wrap: verbatim
+    head1:
+      after_indent: 2
+      bottom_spacing: 2
+      color: on_blue
+      display: block
+      indent: 0
+      stacking: revert
+    head2:
+      after_indent: 2
+      bottom_spacing: 2
+      color: blue
+      display: block
+      indent: 0
+      stacking: revert
+    head3:
+      after_indent: 2
+      bottom_spacing: 2
+      color: magenta
+      display: block
+      indent: 0
+      stacking: revert
+    head4:
+      after_indent: 2
+      bottom_spacing: 2
+      color: bright_magenta
+      display: block
+      indent: 0
+      stacking: revert
+    item-bullet:
+      bottom_spacing: 1
+      color: yellow
+      display: block
+      prepend:
+        color: red
+        text: '* '
+      stacking: nest
+    item-number:
+      bottom_spacing: 2
+      color: yellow
+      display: block
+      prepend:
+        color: red
+        text: '@number. '
+      stacking: nest
+    item-text:
+      after_indent: 2
+      bottom_spacing: 2
+      color: yellow
+      display: block
+      indent: 0
+      stacking: spot
+    over-bullet:
+      bottom_spacing: 1
+      display: block
+      indent: 2
+      stacking: nest
+    over-number:
+      display: block
+      indent: 2
+      stacking: nest
+    over-text:
+      display: block
+      indent: 2
+      stacking: nest
+  pod_format_mono:
+    B:
+      color: ~
+      display: inline
+    C:
+      color: ~
+      display: inline
+    Document:
+      display: block
+      indent: 2
+      stacking: nest
+    E:
+      color: ~
+      display: inline
+    F:
+      color: ~
+      display: inline
+    I:
+      color: ~
+      display: inline
+    L:
+      color: ~
+      display: inline
+    Para:
+      bottom_spacing: 2
+      color: ~
+      display: block
+      stacking: nest
+    S:
+      color: ~
+      display: inline
+      wrap: verbatim
+    Verbatim:
+      bottom_spacing: 2
+      color: ~
+      display: block
+      stacking: nest
+      wrap: verbatim
+    head1:
+      after_indent: 2
+      bottom_spacing: 2
+      color: ~
+      display: block
+      indent: 0
+      stacking: revert
+    head2:
+      after_indent: 2
+      bottom_spacing: 2
+      color: ~
+      display: block
+      indent: 0
+      stacking: revert
+    head3:
+      after_indent: 2
+      bottom_spacing: 2
+      color: ~
+      display: block
+      indent: 0
+      stacking: revert
+    head4:
+      after_indent: 2
+      bottom_spacing: 2
+      color: ~
+      display: block
+      indent: 0
+      stacking: revert
+    item-bullet:
+      bottom_spacing: 1
+      color: ~
+      display: block
+      prepend:
+        color: ~
+        text: '* '
+      stacking: nest
+    item-number:
+      bottom_spacing: 2
+      color: ~
+      display: block
+      prepend:
+        color: red
+        text: '@number. '
+      stacking: nest
+    item-text:
+      after_indent: 2
+      bottom_spacing: 2
+      color: ~
+      display: block
+      indent: 0
+      stacking: nest
+    over-bullet:
+      bottom_spacing: 1
+      display: block
+      indent: 2
+      stacking: nest
+    over-number:
+      display: block
+      indent: 2
+      stacking: nest
+    over-text:
+      display: block
+      indent: 2
+      stacking: nest
+TaskPipe::TaskUtils::Settings:
+  xtask_script: taskpipe-xtask

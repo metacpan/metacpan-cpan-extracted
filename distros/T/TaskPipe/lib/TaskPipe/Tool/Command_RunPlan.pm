@@ -32,6 +32,11 @@ has option_specs => (is => 'ro', isa => 'ArrayRef', default => sub{[{
 }, {
     module => 'TaskPipe::Plan::Settings',
     is_config => 1
+}, {
+    module => 'TaskPipe::Task::Settings',
+    items => [
+        'plan_mode'
+    ]
 }]});
 
 
@@ -79,7 +84,9 @@ sub execute{
     if ( $self->plan->settings->iterate eq 'repeat' ){
 
         while(1){
-            $self->plan->run;
+            $self->plan->load_content;
+            $self->plan->task->plan( $self->content );
+            $self->plan->task->execute;
             sleep( $self->plan->settings->poll_interval );
         }
 
@@ -88,6 +95,30 @@ sub execute{
     }
 
 }
+
+
+#sub set_run_id{
+#    my ($self) = @_;
+
+#    my $last_run = $self->sm->table('run')->search({},{
+#        order_by => 'id desc',
+#        rows => 1
+#    })->first;
+
+
+#    if ( $last_run && $last_run->status ne 'complete' ){
+#        $self->run_info->run_id( $last_run->id );
+#    } else {
+#        my $this_run = $self->sm->table('run')->create({
+#            status => 'processing',
+#            started => $dt,
+#        });
+
+#        $self->run_info->run_id( $this_run->id );
+#    }
+#}
+#    
+
 
 =head1 NAME
 

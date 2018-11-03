@@ -17,10 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::HTMLFilter::AnchorTarget;
-$Qgoda::HTMLFilter::AnchorTarget::VERSION = 'v0.9.2';
+$Qgoda::HTMLFilter::AnchorTarget::VERSION = 'v0.9.3';
 use strict;
-
-use base qw(Qgoda::Processor);
 
 use Qgoda::Util qw(empty);
 

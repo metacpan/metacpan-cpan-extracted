@@ -1,5 +1,8 @@
 Revision history for WebService::HMRC
 
+0.02    2018-11-01
+        POD corrections
+        Fix initialisation of Request object in combination with other modules
+
 0.01    2018-10-27
         First release.
-

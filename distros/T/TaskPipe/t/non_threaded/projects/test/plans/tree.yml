@@ -1,0 +1,43 @@
+---
+task:
+    _name: SeparateArray
+    array: '"A".."B"'
+
+pipe_to:
+
+    task:
+        _name: Record
+        table: city
+        values:
+            label: $this{li}
+
+    pipe_to:
+
+        task:
+            _name: SeparateArray
+            array: '"A".."B"'
+
+        pipe_to:
+
+            task:
+                _name: Record
+                table: company
+                values:
+                    label: $this{li}
+                    city_id: $this[1]{id}
+
+            pipe_to:
+
+                task:
+                    _name: SeparateArray
+                    array: '"A".."B"'
+
+                pipe_to:
+
+                    task:
+                        _name: Record
+                        table: employee
+                        values:
+                            label: $this{li}
+                            company_id: $this[1]{id}
+

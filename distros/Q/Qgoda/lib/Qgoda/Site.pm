@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Site;
-$Qgoda::Site::VERSION = 'v0.9.2';
+$Qgoda::Site::VERSION = 'v0.9.3';
 use strict;
 
 # FIXME! This is only needed for debugging the filter cache.  Remove it,
@@ -79,7 +79,7 @@ sub getErrors {
 }
 
 sub getAssets {
-    sort { $a->{priority} <=> $b->{priority} } values %{shift->{assets}};
+    sort { $b->{priority} <=> $a->{priority} } values %{shift->{assets}};
 }
 
 sub addArtefact {

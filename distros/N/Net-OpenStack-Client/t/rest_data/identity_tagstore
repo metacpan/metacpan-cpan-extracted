@@ -1,0 +1,20 @@
+$cmds{mainprojid}{cmd}="GET http://controller:35357/v3/projects[?]name=tagprojectid";
+$cmds{mainprojid}{result}={projects => [{id => 2}]};
+
+$cmds{existingchildproj}{cmd}="GET http://controller:35357/v3/projects[?]parent_id=2";
+$cmds{existingchildproj}{result}={projects => [
+    {id => 6, name => "tagprojectid_5", tags => [(1 .. 70)]}, # full
+    {id => 5, name => "tagprojectid_4", tags => [(101 .. 169)]}, # one left
+    ]};
+
+$cmds{newchildproject}{cmd}="POST http://controller:35357/v3/projects .*tagprojectid_6.*";
+$cmds{newchildproject}{result}={project => {name => "tagprojectid_6", id => 9}};
+
+$cmds{mainprojid2}{cmd}="GET http://controller:35357/v3/projects[?]name=tagprojectempty";
+$cmds{mainprojid2}{result}={projects => [{id => 11111}]};
+
+$cmds{existingchildproj2}{cmd}="GET http://controller:35357/v3/projects[?]parent_id=11111";
+$cmds{existingchildproj2}{result}={projects => [
+    {id => 11113, name => "tagprojectempty_2", tags => []}, # empty
+    {id => 11112, name => "tagprojectempty_1", tags => [1]}, # only one
+    ]};

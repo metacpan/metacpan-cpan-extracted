@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Loader;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use YAML::PP::Parser;
 use YAML::PP::Constructor;

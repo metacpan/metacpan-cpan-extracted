@@ -9,7 +9,7 @@ use File::Spec;
 use Text::Amuse::Compile::File;
 use Text::Amuse::Compile::Templates;
 use Text::Amuse::Compile;
-
+use Text::Amuse::Compile::Devel qw/create_font_object/;
 
 my $builder = Test::More->builder;
 binmode $builder->output,         ":utf8";
@@ -49,6 +49,7 @@ my %options = (
                logger => sub {
                    push @report, @_;
                },
+               fonts => create_font_object(),
               );
 
 my $muse = Text::Amuse::Compile::File->new(%options);

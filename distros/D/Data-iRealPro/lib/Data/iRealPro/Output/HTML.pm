@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep 30 19:36:29 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Oct  6 21:23:41 2016
-# Update Count    : 50
+# Last Modified On: Thu Nov  1 21:23:03 2018
+# Update Count    : 59
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -19,8 +19,6 @@ use utf8;
 package Data::iRealPro::Output::HTML;
 
 use parent qw( Data::iRealPro::Output::Base );
-
-our $VERSION = "1.00";
 
 use Data::iRealPro::URI;
 use Data::iRealPro::Playlist;
@@ -42,6 +40,19 @@ sub process {
 
 	$self->{output} ||= $options->{output} || "__new__.html";
 
+	if ( $u->{transpose} ) {
+	    foreach my $song ( @{ $u->{playlist}->{songs} } ) {
+		# Do not change key to actual.
+		local $song->{_transpose} = 0;
+
+		$song->{key} = $song->xpose($song->{key} // "C");
+		$song->{actual_key} =
+		  ( ($song->{actual_key} || 0) + $song->{transpose} ) % 12;
+		$song->tokenize;
+		$song->{data} = $song->{dataxp} if $song->{dataxp};
+	    }
+	}
+
 	if ( ref( $self->{output} ) ) {
 	    ${ $self->{output} } = to_html($u);
 	}
@@ -59,6 +70,16 @@ sub process {
     make_path( $outdir, {} ) unless -d $outdir;
 
     foreach my $song ( @{ $u->{playlist}->{songs} } ) {
+	# Do not change key to actual.
+	local $song->{_transpose} = 0;
+
+	if ( $song->{transpose} ) {
+	    $song->{key} = $song->xpose($song->{key} // "C");
+	    $song->{actual_key} =
+	      ( ($song->{actual_key} || 0) + $song->{transpose} ) % 12;
+	    $song->tokenize;
+	    $song->{data} = $song->{dataxp} if $song->{dataxp};
+	}
 
 	# Make a playlist with just this song.
 	my $pls = Data::iRealPro::Playlist->new( song => $song );

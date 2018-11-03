@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Processor::TT2;
-$Qgoda::Processor::TT2::VERSION = 'v0.9.2';
+$Qgoda::Processor::TT2::VERSION = 'v0.9.3';
 use strict;
 
 use Template;
@@ -85,7 +85,7 @@ sub process {
 }
 
 package Qgoda::Template::GitProvider;
-$Qgoda::Template::GitProvider::VERSION = 'v0.9.2';
+$Qgoda::Template::GitProvider::VERSION = 'v0.9.3';
 use strict;
 
 use Template::Constants;

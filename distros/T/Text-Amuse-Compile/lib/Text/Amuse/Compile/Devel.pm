@@ -4,11 +4,13 @@ use utf8;
 use strict;
 use warnings;
 use Text::Amuse::Compile::Utils qw/write_file read_file/;
+use Text::Amuse::Compile::Fonts;
+use Text::Amuse::Compile::Fonts::Selected;
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 
 
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw/explode_epub/;
+our @EXPORT_OK = qw/explode_epub create_font_object/;
 
 
 =head1 NAME
@@ -20,6 +22,10 @@ Text::Amuse::Compile::Utils - Common routines used for developmetn
 =head2 explode_epub
 
 Return the HTML content of an epub
+
+=head2 create_font_object
+
+Return a valid Text::Amuse::Compile::Fonts::Selected object.
 
 =cut
 
@@ -39,4 +45,12 @@ sub explode_epub {
           read_file(File::Spec->catfile($tmpdir->dirname, $piece));
     }
     return join('', @html);
+}
+
+sub create_font_object {
+    my $fonts = Text::Amuse::Compile::Fonts->new;
+    return Text::Amuse::Compile::Fonts::Selected->new(size => 12,
+                                                      sans => ($fonts->sans_fonts)[0],
+                                                      main => ($fonts->serif_fonts)[0],
+                                                      mono => ($fonts->mono_fonts)[0]);
 }

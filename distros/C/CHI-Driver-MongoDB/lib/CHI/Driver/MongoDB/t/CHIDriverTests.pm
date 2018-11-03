@@ -1,5 +1,5 @@
 package CHI::Driver::MongoDB::t::CHIDriverTests;
-$CHI::Driver::MongoDB::t::CHIDriverTests::VERSION = '0.0001';
+$CHI::Driver::MongoDB::t::CHIDriverTests::VERSION = '0.0100';
 # ABSTRACT: Wrapper for the CHI driver test suite
 
 use strict;
@@ -22,7 +22,7 @@ sub new_cache_options {
 		$self->SUPER::new_cache_options(),
 
 		# Any necessary CHI->new parameters for your test driver
-		connection_uri => $ENV{'MONGODB_CONNECTION_URI'} // 'mongodb://127.0.0.1:27017',
+		connection_uri => defined( $ENV{'MONGODB_CONNECTION_URI'} ) ? $ENV{'MONGODB_CONNECTION_URI'} : 'mongodb://127.0.0.1:27017',
 		db_name        => '_CHI_TESTING_',
 	);
 }
@@ -66,7 +66,7 @@ CHI::Driver::MongoDB::t::CHIDriverTests - Wrapper for the CHI driver test suite
 
 =head1 VERSION
 
-version 0.0001
+version 0.0100
 
 =head1 AUTHOR
 
@@ -74,7 +74,7 @@ Heiko Jansen <hjansen@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Heiko Jansen.
+This software is copyright (c) 2018 by Heiko Jansen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

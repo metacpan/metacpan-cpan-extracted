@@ -1,8 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
-use lib '/var/www/taskpipe/main/lib';
 use TaskPipe::Tool;
 use Try::Tiny;
 use Data::Dumper;

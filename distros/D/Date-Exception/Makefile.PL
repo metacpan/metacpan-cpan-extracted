@@ -19,9 +19,9 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Moo'              => '2.000000',
-        'namespace::clean' => '0.24',
-        'Throwable'        => '0.200011',
+        'Moo'                  => '2.000000',
+        'namespace::autoclean' => '0.28',
+        'Throwable'            => '0.200011',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Date-Exception-*' },

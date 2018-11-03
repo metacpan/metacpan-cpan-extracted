@@ -1,0 +1,37 @@
+SYNOPSIS
+
+        use Test::More;
+        use Test::DirectoryLayout;
+    
+        directory_layout_ok();
+
+DESCRIPTION
+
+FUNCTIONS
+
+ get_allowed_dirs
+
+    Returns reference to the list of allowed directories.
+
+ set_allowed_dirs($dirs)
+
+    Set list of allowed directories to the provided list. The contents of
+    the list are copied.
+
+ directory_layout_ok ($dir)
+
+    Tests if the provided directory contains only allowed directories.
+
+    If no name is provided the current directory is assumed.
+
+    directory_layout_ok
+
+SEE ALSO
+
+    Test::Dir for testing several attributes of a single directory.
+
+    Test::Dirs for comparing a directory with an existing directory.
+
+    Test::Directory for testing if creating and deleting files and
+    directories was performed as expected.
+

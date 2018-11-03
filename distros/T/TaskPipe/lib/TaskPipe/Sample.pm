@@ -116,8 +116,15 @@ sub deploy_tables_from_schema_template{
         my $err;
         try {
             my $count = $schema->resultset( $sn )->count;
-        } catch ( DBIx::Error $err where { $_->state eq "42S02" }){
-            $table_exists = 0;
+        } catch ( DBIx::Error $err ){
+            if ( ( $self->schema_manager->settings->type eq 'SQLite' && $err->state eq 'S1000' )
+                || $err->state eq "42S02" ){
+
+                $table_exists = 0;
+
+            } else {
+                die $@;
+            }
         };
         if ( $table_exists ){
             confess +$self->_table_exists_message($table_name);

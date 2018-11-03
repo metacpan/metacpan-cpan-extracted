@@ -25,6 +25,22 @@ CC0_1_0: |
 
  On Debian systems, the complete text of the CC0 license, version 1.0,
  can be found in /usr/share/common-licenses/CC0-1.0.
+GFDL_1_2: |
+  Permission is granted to copy, distribute and/or modify this document
+  under the terms of the GNU Free Documentation License, Version 1.2
+  or any later version published by the Free Software Foundation;
+  with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+  On Debian systems, the complete text of the GFDL license, version 1.2,
+  can be found in /usr/share/common-licenses/GFDL-1.2
+GFDL_1_3: |
+  Permission is granted to copy, distribute and/or modify this document
+  under the terms of the GNU Free Documentation License, Version 1.3
+  or any later version published by the Free Software Foundation;
+  with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+  On Debian systems, the complete text of the GFDL license, version 1.3,
+  can be found in /usr/share/common-licenses/GFDL-1.3
 GPL_1: |
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Command::Po;
-$Qgoda::Command::Po::VERSION = 'v0.9.2';
+$Qgoda::Command::Po::VERSION = 'v0.9.3';
 use strict;
 
 use Locale::TextDomain 1.28 qw(qgoda);
@@ -36,7 +36,7 @@ use Qgoda::Site;
 
 use base 'Qgoda::Command';
 
-my $seed_repo = 'file://' . $ENV{HOME} . '/perl/Template-Plugin-Gettext-Seed';
+my $seed_repo = 'https://github.com/gflohr/Template-Plugin-Gettext-Seed';
 
 sub _run {
     my ($self, $args, $global_options, %options) = @_;
@@ -201,7 +201,7 @@ EOF
 Where to send msgid bug reports?
 EOF
     chomp $msgid_bugs_address_comment;
-    my $msgid_bugs_address = $po_config->{msgid_bugs_address};
+    my $msgid_bugs_address = $po_config->{'msgid-bugs-address'};
     $msgid_bugs_address = __"Please set MSGID_BUGS_ADDRESS in 'PACKAGE'"
         if empty $msgid_bugs_address;
     
@@ -209,7 +209,7 @@ EOF
 Initial copyright holder added to pot and po files.
 EOF
     chomp $copyright_holder_comment;
-    my $copyright_holder = $po_config->{copyright_holder};
+    my $copyright_holder = $po_config->{'copyright-holder'};
     $copyright_holder = __"Please set COPYRIGHT_HOLDER in 'PACKAGE'"
         if empty $copyright_holder;
 
@@ -218,17 +218,16 @@ Override these default values as needed.
 EOF
     chomp $override_comment;
 
-    my $xgettext_line = empty $po_config->{xgettext}
-        ? "#XGETTEXT = xgettext" : "XGETTEXT = $config->{po}->{xgettext}";
-    my $xgettext_tt2_line = empty $po_config->{xgettext_tt2}
-        ? "#XGETTEXT_TT2 = xgettext-tt2" 
-        : "XGETTEXT = $config->{po}->{xgettext_tt2}";
-    my $msgmerge_line = empty $po_config->{msgmerge}
-        ? "#MSGMERGE = msgmerge" : "MSGMERGE = $config->{po}->{msgmerge}";
-    my $msgfmt_line = empty $po_config->{msgfmt}
-        ? "#MSGFMT = msgfmt" : "MSGFMT = $config->{po}->{msgfmt}";
-    my $qgoda_line = empty $po_config->{qgoda}
-        ? "QGODA = qgoda" : "QGODA = $config->{po}->{qgoda}";
+	my @cmd_lines;
+	foreach my $cmd ('xgettext', 'xgettext-tt2', 'msgmerge', 'msgfmt',
+	                 'qgoda') {
+		my $varname = uc $cmd;
+		$varname =~ s/-/_/g;
+		my $cmd_line = $self->__escapeCommand($po_config->{$cmd});
+		my $comment = $cmd_line eq $cmd ? '#' : '';
+		push @cmd_lines, "$comment$varname = $cmd_line";
+	}
+	my $cmd_lines = join "\n", @cmd_lines;
 
     my $contents = <<EOF;
 $header_comment
@@ -245,11 +244,7 @@ $copyright_holder_comment
 COPYRIGHT_HOLDER = $copyright_holder
 
 $override_comment
-$xgettext_line
-$xgettext_tt2_line
-$msgmerge_line
-$msgfmt_line
-$qgoda_line
+$cmd_lines
 EOF
 
     if (!write_file $package, $contents) {
@@ -388,14 +383,18 @@ sub __comment {
     return $text;
 }
 
-sub __expandCommand {
-    my ($self, $cmd) = @_;
+sub __escapeCommand {
+	my ($self, $command) = @_;
 
-    if (ref $cmd) {
-        return @$cmd;
+	my @escaped;
+    foreach my $part (@$command) {
+        my $pretty = $part;
+        $pretty =~ s{(["\\\$])}{\\$1}g;
+        $pretty = qq{"$pretty"} if $pretty =~ /[ \t]/;
+        push @escaped, $pretty;
     }
 
-    return $cmd;
+    return join ' ', @escaped;
 }
 
 sub __command {
@@ -628,12 +627,12 @@ sub __makePOT {
     # FIXME! Check dependencies!
     my ($pox, $pot) = ('perl.pox', 'perl.pot');
     my @options = split / /, Locale::TextDomain->options;
-    my @cmd = ($self->__expandCommand($po_config->{xgettext}),
+    my @cmd = (@{$po_config->{xgettext}},
                "--output=$pox", "--from-code=utf-8",
                "--add-comments=TRANSLATORS:", "--files-from=PLFILES",
-               "--copyright-holder='$po_config->{copyright_holder}'",
+               "--copyright-holder='$po_config->{'copyright-holder'}'",
                "--force-po",
-               "--msgid-bugs-address='$po_config->{msgid_bugs_address}'",
+               "--msgid-bugs-address='$po_config->{'msgid-bugs-address'}'",
                @options);
     $self->__fatalCommand(@cmd);
     $logger->info(__x("unlink '{filename}'", filename => $pot));
@@ -642,12 +641,12 @@ sub __makePOT {
 
     ($pox, $pot) = ("markdown.pox", 
                     "markdown.pot");
-    @cmd = ($self->__expandCommand($po_config->{qgoda}), "xgettext",
+    @cmd = (@{$po_config->{qgoda}}, "xgettext",
                "--output=$pox", "--from-code=utf-8",
                "--add-comments=TRANSLATORS:", "--files-from=MDPOTFILES",
-               "--copyright-holder='$po_config->{copyright_holder}'",
+               "--copyright-holder='$po_config->{'copyright-holder'}'",
                "--force-po",
-               "--msgid-bugs-address='$po_config->{msgid_bugs_address}'");
+               "--msgid-bugs-address='$po_config->{'msgid-bugs-address'}'");
     $self->__fatalCommand(@cmd);
     $logger->info(__x("unlink '{filename}'", filename => $pot));
     unlink $pot;
@@ -655,12 +654,12 @@ sub __makePOT {
 
     ($pox, $pot) = ("$po_config->{textdomain}.pox", 
                     "$po_config->{textdomain}.pot");
-    @cmd = ($self->__expandCommand($po_config->{xgettext_tt2}),
+    @cmd = (@{$po_config->{'xgettext-tt2'}},
                "--output=$pox", "--from-code=utf-8",
                "--add-comments=TRANSLATORS:", "--files-from=POTFILES",
-               "--copyright-holder='$po_config->{copyright_holder}'",
+               "--copyright-holder='$po_config->{'copyright-holder'}'",
                "--force-po",
-               "--msgid-bugs-address='$po_config->{msgid_bugs_address}'");
+               "--msgid-bugs-address='$po_config->{'msgid-bugs-address'}'");
     $self->__fatalCommand(@cmd);
     $logger->info(__x("unlink '{filename}'", filename => $pot));
     unlink $pot;
@@ -693,7 +692,7 @@ sub __makeUpdatePO {
 
         $self->__safeRename("$lang.po", "$lang.old.po");
 
-        my @cmd = ($self->__expandCommand($po_config->{msgmerge}), 
+        my @cmd = (@{$po_config->{msgmerge}}, 
                    "$lang.old.po", "$po_config->{textdomain}.pot", 
                    '--previous',
                    '-o', "$lang.po");
@@ -739,7 +738,7 @@ sub __makeUpdateMO {
 
     foreach my $lang (@linguas) {
         $self->__makeUpdatePO if $self->__outOfDate("$lang.po", @deps);
-        my @cmd = ($self->__expandCommand($po_config->{msgfmt}), "--check",
+        my @cmd = (@{$po_config->{msgfmt}}, "--check",
                    "--statistics", "--verbose",
                    '-o', "$lang.gmo", "$lang.po");
         $self->__fatalCommand(@cmd);
@@ -887,13 +886,13 @@ The first value is assumed to be the base language of your site.
 
 Your site's textdomain, for example C<com.example.www>.
 
-=item B<po.msgid_bugs_address>
+=item B<po.msgid-bugs-address>
 
 An email address or web site for issuing errors in translatable strings.
 Translators will use that address for reporting problems with translating
 your site.  See below for an example.
 
-=item B<po.copyright_holder>
+=item B<po.copyright-holder>
 
 The copyright holder that should be put into the header of the master
 translation file F<TEXTDOMAIN.pot>.

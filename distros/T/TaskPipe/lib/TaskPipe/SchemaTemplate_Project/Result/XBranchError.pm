@@ -5,6 +5,7 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
+__PACKAGE__->load_components("InflateColumn::DateTime");
 __PACKAGE__->table("xbranch_error");
 
 __PACKAGE__->add_columns(

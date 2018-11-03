@@ -18,7 +18,8 @@ Whether to log to file or to the screen (or both). Choices are
 C<file> - always log to file
 C<screen> - always log to screen
 C<shell> - log to file if command is run in the background, but screen otherwise
-C<always> - always log to both screen and file
+C<both> - log to both screen and file
+C<none> - don't log at all
 
 =cut
 

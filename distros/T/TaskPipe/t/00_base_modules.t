@@ -39,9 +39,7 @@ my @base_modules = qw(
     Template_Config
 );
 
-my @need_gm = qw(
-    ThreadManager
-);
+my @need_gm = qw();
 
 my @need_gm_and_sm = qw(
     Task
@@ -49,9 +47,10 @@ my @need_gm_and_sm = qw(
     Task_SourceFromFile
     Task_SourceFromDB
     Task_Record
+    ThreadManager
 );
     
-
+plan tests => 2 * ( @base_modules + @need_gm + @need_gm_and_sm );
 
 foreach my $bm (@base_modules){
 

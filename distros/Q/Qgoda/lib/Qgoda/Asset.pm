@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Asset;
-$Qgoda::Asset::VERSION = 'v0.9.2';
+$Qgoda::Asset::VERSION = 'v0.9.3';
 use strict;
 
 use Qgoda::Util qw(merge_data);
@@ -59,7 +59,12 @@ sub getOrigin {
 sub dump {
     my ($self) = @_;
 
-    %{$self};
+    return %$self;
 }
 
+sub TO_JSON {
+    my ($self) = @_;
+
+    return {%$self};
+}
 1;

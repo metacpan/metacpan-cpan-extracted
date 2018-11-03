@@ -1,0 +1,55 @@
+---
+TaskPipe::LoggerManager::Settings:
+  log_dir_format: <% job_id %>-<% cmd %>
+  log_file_access: append
+  log_file_pattern: '[%d] (%p) %N: %m%n'
+  log_filename_format: Thread-<% thread_id %>.log
+  log_level: ERROR
+  log_mode: shell
+  log_screen_pattern: '%-5p%6J%6P%3h%N %m%n'
+TaskPipe::PathSettings::Project:
+  plan: plan.yml
+  task_module_prefix: TaskPipe
+TaskPipe::Plan::Settings:
+  iterate: once
+  poll_interval: 0
+  shell: foreground
+TaskPipe::Task::Settings:
+  cache_results: 0
+  on_task_error: stop
+  plan_mode: branch
+  resume_record_interval: '100'
+  seen_xbranch_policy: skip
+  xbranch_key_mode: id
+TaskPipe::ThreadManager::Settings:
+  max_threads: 4
+  refresh_mins: 20
+TaskPipe::Task::TestSettings:
+  file_prefix: TestResult.
+  file_suffix: .log
+  output: file
+TaskPipe::Task_Scrape::Settings:
+  max_retries: 3
+  require_referer: 1
+  require_url: 1
+  ua_handler_module: TaskPipe::UserAgentManager::UserAgentHandler
+  ua_mgr_module: TaskPipe::UserAgentManager
+TaskPipe::UserAgentManager::CheckIPSettings:
+  max_retries: 4
+  regex: Current IP Address:\s*([\d\.]+)
+  retry_delay: 1
+  url: http://checkip.dyndns.org
+TaskPipe::UserAgentManager::Settings:
+  delay_base: 4
+  delay_max_rand: 8
+  max_retries: 3
+TaskPipe::UserAgentManager::UserAgentHandler::Settings:
+  agent: Mozilla/5.0 (Windows NT 6.1; rv:52.0) Gecko/20100101 Firefox/52.0
+  headers:
+    Accept: '*/*'
+    Accept-Encoding: gzip deflate br
+    Accept-Language: en-USen;q=0.5
+    Connection: keep-alive
+  timeout: 60
+TaskPipe::Task_Record:
+    _test_table: operations

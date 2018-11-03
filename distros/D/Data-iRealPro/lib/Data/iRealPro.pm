@@ -11,7 +11,7 @@ Data::iRealPro - Convert iRealBook/iRealPro data
 
 =cut
 
-our $VERSION = "1.10";
+our $VERSION = "1.11";
 
 =head1 SYNOPSIS
 
@@ -47,6 +47,16 @@ perform conversions on the command line.
 
 iRealPro web site: L<http://www.irealpro.com>.
 
+=head1 A NOTE ABOUT WRITTEN KEY AND PLAYING KEY
+
+In iRealPro you can write a song in a specific key, and play it in a
+different key. The formatter backends PDF and PNG will show the song
+in the key it was played, just like iRealPro when it is playing your song.
+
+The JSON and Text reflect the raw data of the song and will show the
+song in the key it was written, just like iRealPro when you are
+editing the song.
+
 =head1 REQUIREMENTS
 
 PDF document generation requires L<PDF::API2>. This is considered core
@@ -60,15 +70,13 @@ The web backend C<irealpro.cgi> requires L<Template::Tiny>.
 
 Johan Vromans, C<< <jv at cpan.org> >>
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-music-irealpro at
-rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Music-iRealPro>. I
-will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
-
 =head1 SUPPORT
+
+The development of this module is hosted on GitHub, repository
+L<https://github.com/sciurius/perl-Data-iRealPro>.
+
+Please report any bugs or feature requests to the GitHub issue tracker,
+L<https://github.com/sciurius/perl-Data-iRealPro/issues>.
 
 You can find documentation for this module with the perldoc command.
 
@@ -82,7 +90,7 @@ The iRealPro community, for contributing many, many songs.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2013,2017 Johan Vromans, all rights reserved.
+Copyright 2013,2018 Johan Vromans, all rights reserved.
 
 Clone me at L<GitHub|https://github.com/sciurius/perl-Data-iRealPro>
 

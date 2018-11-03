@@ -6,7 +6,12 @@ extends 'TaskPipe::Template_Config';
 has filename_label => (is => 'ro', isa => 'Str', default => 'system');
 
 has option_specs => (is => 'ro', isa => 'ArrayRef', default => sub{[
-    "TaskPipe::PodReader::Settings"
+    "TaskPipe::PodReader::Settings",
+    "TaskPipe::TaskUtils::Settings",
+    {
+        module => "TaskPipe::JobManager::Settings",
+        exclude => [ 'job_tracking' ]
+    }
 ]});
 
 =head1 NAME

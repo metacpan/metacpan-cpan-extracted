@@ -5,8 +5,11 @@ use DateTime;
 use Carp;
 use TryCatch;
 use Log::Log4perl;
+use Data::Dumper;
 extends 'TaskPipe::Task';
+with 'MooseX::ConfigCascade';
 
+has _test_table => (is => 'ro', isa => 'Str');
 has dt => (is => 'rw', isa => 'DateTime');
 
 sub set_dt{
@@ -20,7 +23,19 @@ sub action{
     
     my $logger = Log::Log4perl->get_logger;
 
+    if ( $self->pinterp->{'require'} ){
+        my $ok = 1;
+        foreach my $required ( @{$self->pinterp->{'require'}} ){
+            if ( ! $self->pinterp->{'values'}{$required} ){
+                $ok = 0;
+                last;
+            }
+        }
+        return [{}] unless $ok;
+    }
+
     my $table = $self->param->{table};
+    $self->run_info->task_details( $table );
 
     confess $self->run_info.": Could not record - no table specified" unless $self->param->{table};
 
@@ -29,15 +44,12 @@ sub action{
     my $record = $self->record_row( $self->pinterp->{'values'} );
 
     return [] unless $record;
+    return [{}] if ref $record eq ref {};
 
     my $rec_hash = { $record->get_columns };
 
     delete $rec_hash->{modified_dt};
     delete $rec_hash->{created_dt};
-#    my $mdt = $rec_hash->{modified_dt};
-#    $rec_hash->{modified_dt} = $mdt->ymd.' '.$mdt->hms if $mdt;
-#    my $cdt = $rec_hash->{created_dt};
-#    $rec_hash->{created_dt} = $cdt->ymd.' '.$cdt->hms if $cdt;
 
     return [ $rec_hash ];
 
@@ -46,11 +58,33 @@ sub action{
 
 sub record_row{
 
-    my ($self,$row) = @_;
+    my ($self,$row,$table_name) = @_;
 
-    my $record;
+    $table_name ||= $self->param->{table};
+    my $table = $self->sm->table( $table_name, 'plan' );
+
+    my $logger = Log::Log4perl->get_logger;
+
+    my $record={};
     my $mode = $self->param->{mode};
-    my $table = $self->sm->table( $self->param->{table}, 'plan' );
+    my $options = {};
+    if ( $self->param->{key} ){
+        $options->{key} = $self->param->{key};
+    }
+
+    my $row_serialized = $self->utils->serialize( $row );
+    $logger->debug( $row_serialized );
+
+    if ( $self->_test_table ){
+    
+        $self->sm->table( $self->_test_table, 'plan' )->create({
+            thread_id => $self->run_info->thread_id,
+            target_table => $table_name,
+            result => $row_serialized
+        });
+
+        sleep 1;
+    }
 
     if ( $mode && $mode eq 'insert' ){
 
@@ -60,10 +94,11 @@ sub record_row{
             modified_dt => $self->dt
         });
 
-    } elsif ( $mode && $mode =~ /(find|new)/ ){
+    } elsif ( $mode && $mode =~ /(find|new|skip)/ ){
 
         my $found = $table->find( $row );
         $record = $found if $found and $mode eq 'find';
+        $record = undef if $found and $mode eq 'skip';
 
         if ( ! $found ){
 
@@ -73,15 +108,15 @@ sub record_row{
                     %$row,
                     created_dt => $self->dt,
                     modified_dt => $self->dt
-                });
+                }, $options);
 
             } catch ( DBIx::Error::IntegrityConstraintViolation $err ){
 
                 $record = $table->find({
                     %$row
-                }) if $mode eq 'find';
+                }, $options) if $mode eq 'find';
 
-            }
+            };
 
         }
 
@@ -89,10 +124,11 @@ sub record_row{
 
         $record = $table->update_or_new({ 
             %$row,
-        });
+        }, $options);
+
 
         if ( ! $record->in_storage ){
-
+            
             try {
 
                 $record->insert;
@@ -100,11 +136,17 @@ sub record_row{
 
             } catch ( DBIx::Error::IntegrityConstraintViolation $err ){
 
-                $record = $table->update({ 
+                $record = $table->find({ 
                     %$row,
+                },$options);
+
+                confess "Unknown error when trying to update record: ".Dumper( $row ) unless $record;
+
+                $record->update({
+                    %$row
                 });
 
-            }
+            };
 
         }
 
@@ -113,7 +155,6 @@ sub record_row{
         });
     
     }
-
 
     return $record;
 

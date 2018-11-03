@@ -1,12 +1,9 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-
-use lib '../lib';
-
 use Test::More;
 use Test::Mojo;
-
+use Test::Memory::Cycle;
 use Mojolicious::Lite;
 
 my $t = Test::Mojo->new;
@@ -56,6 +53,11 @@ is($c->callback(from_cache => 'Akron'), 'is 30', 'Call callback');
 is($c->callback(from_cache => 'Peter'), 'is 31', 'Call callback');
 is($c->callback(from_cache => 'Jan'), 'is 32', 'Call callback');
 ok(!$c->callback(from_supercache => 'Jan'), 'Call callback');
+
+{
+  local $SIG{__WARN__} = sub { };
+  memory_cycle_ok($app);
+};
 
 
 done_testing;

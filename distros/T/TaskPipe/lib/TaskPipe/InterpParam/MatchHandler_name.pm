@@ -4,11 +4,14 @@ use Moose;
 extends 'TaskPipe::InterpParam::MatchHandler';
 
 
+has match_adjustment => (is => 'ro', isa => 'Int', default => -1 );
+
 sub match_condition{
     my ($self,$param) = @_;
 
-    $param->{_name} eq $self->parts->param_val?1:0;
+    $param->{_name} eq $self->parts->label_val?1:0;
 }
+
 
 =head1 NAME
 

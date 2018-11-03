@@ -59,7 +59,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.04';
+our $VERSION  = '8.05';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -166,11 +166,10 @@ sub new {
   my $r = $self->routes->namespaces(["@{[ref $self]}::Controller", ref $self]);
 
   # Hide controller attributes/methods
-  $r->hide(qw(app continue cookie every_cookie every_param));
-  $r->hide(qw(every_signed_cookie finish flash helpers match on param));
-  $r->hide(qw(redirect_to render render_later render_maybe render_to_string));
-  $r->hide(qw(rendered req res respond_to send session signed_cookie stash));
-  $r->hide(qw(tx url_for validation write write_chunk));
+  $r->hide(qw(app cookie every_cookie every_param every_signed_cookie finish));
+  $r->hide(qw(helpers match on param render render_later render_maybe));
+  $r->hide(qw(render_to_string rendered req res send session signed_cookie));
+  $r->hide(qw(stash tx url_for write write_chunk));
 
   $self->plugin($_)
     for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);

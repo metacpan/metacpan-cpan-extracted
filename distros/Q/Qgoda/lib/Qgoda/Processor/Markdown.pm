@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Processor::Markdown;
-$Qgoda::Processor::Markdown::VERSION = 'v0.9.2';
+$Qgoda::Processor::Markdown::VERSION = 'v0.9.3';
 use strict;
 
 use base qw(Qgoda::Processor);

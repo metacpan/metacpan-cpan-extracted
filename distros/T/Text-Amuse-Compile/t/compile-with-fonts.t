@@ -6,19 +6,21 @@ use Text::Amuse::Compile;
 use Text::Amuse::Compile::Utils qw/write_file read_file/;
 use File::Temp;
 use File::Spec;
+use Path::Tiny;
 use JSON::MaybeXS;
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
-use Test::More tests => 149;
+use Test::More tests => 155;
 use Data::Dumper;
 
 my $wd = File::Temp->newdir;
 my %fontfiles = map { $_ => File::Spec->catfile($wd, $_ . '.otf') } (qw/regular italic
                                                                         bold bolditalic/);
+my $font_re = qr{\{regular\.otf\}\[[^]]*?Path=\Q$wd\E[^]]*?\]}s;
+
 my $font_size_in_pt = qr{font-size:.*pt};
 
-foreach my $file (values %fontfiles) {
-    diag "Creating file $file";
-    write_file($file, 'x');
+foreach my $file (keys %fontfiles) {
+    path(qw/t fonts/, $file  . '.otf')->copy($fontfiles{$file});
 }
 my @fonts = (
              {
@@ -54,7 +56,8 @@ $html =~ s/\.muse/.html/;
 
 my $xelatex = $ENV{TEST_WITH_LATEX};
 foreach my $fs ($file, \@fonts) {
-    my $c = Text::Amuse::Compile->new(epub => 1, html => 1,
+    my $c = Text::Amuse::Compile->new(epub => 1,
+                                      html => 1,
                                       tex => 1,
                                       fontspec => $fs,
                                       extra => {
@@ -64,13 +67,16 @@ foreach my $fs ($file, \@fonts) {
                                                },
                                       pdf => $xelatex);
     ok $c->fonts, "Font accessor built";
+    foreach my $family (qw/mono sans main/) {
+        ok $c->fonts->$family->has_files, "$family has files";
+    }
     $c->compile($muse_file);
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont.*\{DejaVuSerif\}/;
-        like $texbody, qr/monofont.*\{DejaVuSansMono\}/;
-        like $texbody, qr/sansfont.*\{DejaVuSans\}/ or die Dumper($c);
+        like $texbody, qr/mainfont$font_re/;
+        like $texbody, qr/monofont$font_re/;
+        like $texbody, qr/sansfont$font_re/;
     }
   SKIP: {
         skip "No pdf required", 1 unless $xelatex;
@@ -117,9 +123,9 @@ foreach my $fs ($file, \@fonts) {
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont.*\{DejaVuSerif\}/;
-        like $texbody, qr/monofont.*\{DejaVuSansMono\}/;
-        like $texbody, qr/sansfont.*\{DejaVuSans\}/ or die Dumper($c);
+        like $texbody, qr/mainfont$font_re/;
+        like $texbody, qr/monofont$font_re/;
+        like $texbody, qr/sansfont$font_re/ or die Dumper($c);
     }
   SKIP: {
         skip "No pdf required", 1 unless $xelatex;
@@ -221,6 +227,7 @@ ok ($@, "bad specification: $@");
                                                },
                                      );
 
+    diag Dumper($c->fonts);
     $c->compile($muse_file);
     {
         ok (-f $tex, "$tex produced");
@@ -278,13 +285,13 @@ ok ($@, "bad specification: $@");
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont.*\{DejaVuSansMono\}/;
-        like $texbody, qr/monofont.*\{DejaVuSans\}/;
-        like $texbody, qr/sansfont.*\{DejaVuSerif\}/;
+        like $texbody, qr/mainfont$font_re/;
+        like $texbody, qr/monofont$font_re/;
+        like $texbody, qr/sansfont$font_re/;
     }
   SKIP: {
         skip "No pdf required", 1 unless $xelatex;
-        ok (-f $pdf);
+        ok (-f $pdf, "PDF produced with " . Dumper($c->fonts));
     }
     {
         ok (-f $epub);

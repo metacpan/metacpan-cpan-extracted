@@ -62,20 +62,26 @@ has monikers => (is => 'rw', isa => 'HashRef', lazy => 1, default => sub{
 sub db_string{
 	my $self = shift;
 
-	my @sp = ();
+#	my @sp = ();
 
     use Data::Dumper;
     use MooseX::ConfigCascade::Util;
 
-    my @frags = qw(method type database host);
+    my @frags = qw(method type database host port);
+    my $db_string = '';
     foreach my $frag ( @frags ){
+        if ( $self->settings->$frag ){
+            $db_string.=':' if $db_string;
+            $db_string.=$self->settings->$frag;
+        }
 
-        confess "A database connect string was requested, but a $frag was not provided. (Check your database connection information in the ".ref( $self->settings )." section of your ".$self->run_info->scope." config. You should have definitions for the following fields: ".join(",",@frags) unless $self->settings->$frag;
-    	push @sp,$self->settings->$frag;
+#        confess "A database connect string was requested, but a $frag was not provided. (Check your database connection information in the ".ref( $self->settings )." section of your ".$self->run_info->scope." config. You should have definitions for the following fields: ".join(",",@frags) unless $self->settings->$frag;
+#    	push @sp,$self->settings->$frag;
 
     }
 
-	return join(':',@sp);
+#    my $db_string = join(':',@sp);
+	return $db_string;
 
 }
 
@@ -115,13 +121,25 @@ B<):>\n$_]";
 }
 
 
+sub flush{
+    my ($self) = @_;
+
+    $self->schema->storage->disconnect;
+    my $schema = $self->connect_schema;
+    $self->schema( $schema );
+
+}
+
+
+
 sub gen_schema{
     my ($self) = @_;
 
     $self->clear_schema_path;
 
 	make_schema_at($self->settings->module, { 
-        dump_directory => $self->path_settings->path('lib')
+        dump_directory => $self->path_settings->path('lib'),
+        components => ['InflateColumn::DateTime']
     }, [
 		$self->db_string,
 		$self->settings->{username},

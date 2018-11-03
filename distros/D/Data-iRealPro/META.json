@@ -16,7 +16,8 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "lib/Data/iRealPro"
       ]
    },
    "prereqs" : {
@@ -43,8 +44,24 @@
          }
       }
    },
+   "provides" : {
+      "Data::iRealPro" : {
+         "file" : "lib/Data/iRealPro.pm",
+         "version" : "1.11"
+      },
+      "irealcvt" : {
+         "file" : "script/irealcvt",
+         "version" : "1.11"
+      }
+   },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "1.10",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sciurius/perl-Data-iRealPro.git",
+         "web" : "https://github.com/sciurius/perl-Data-iRealPro"
+      }
+   },
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,6 +1,6 @@
 package Date::Exception::InvalidDayCount;
 
-$Date::Exception::InvalidDayCount::VERSION   = '0.04';
+$Date::Exception::InvalidDayCount::VERSION   = '0.05';
 $Date::Exception::InvalidDayCount::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Exception::InvalidDayCount - Handles 'invalid day count' exception.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has status => (is => 'ro', default => sub { 104 });
 

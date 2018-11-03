@@ -1,13 +1,14 @@
 package CHI::Driver::MongoDB;
 # vim:syntax=perl:tabstop=4:number:noexpandtab:
-$CHI::Driver::MongoDB::VERSION = '0.0001';
+$CHI::Driver::MongoDB::VERSION = '0.0100';
 # ABSTRACT: MongoDB driver for CHI
 
 use Moo;
 use MongoDB;
+use BSON;
+use BSON::Types qw( bson_bytes bson_time );
 use URI::Escape::XS;
 use Try::Tiny;
-use Time::Moment;
 
 use strict;
 use warnings;
@@ -55,10 +56,8 @@ sub BUILD {
 			delete $params->{$param};
 		}
 	}
-	my $codec = MongoDB::BSON->new( dt_type => 'Time::Moment' );
 
 	my %options = (
-		bson_codec => $codec,
 		%{ $self->mongodb_options() },
 		%{ $self->non_common_constructor_params($params) },
 	);
@@ -132,10 +131,10 @@ sub store {
 	$key = encodeURIComponent($key);
 	my $doc = {
 		_id     => $key,
-		payload => MongoDB::BSON::Binary->new( data => $data ),
+		payload => bson_bytes($data),
 	};
 	if ( defined $expires_in ) {
-		$doc->{'expireAt'} = Time::Moment->from_epoch( time() + $expires_in );
+		$doc->{'expireAt'} = bson_time( time() + $expires_in );
 	}
 	my $result = $self->_coll->update_one( { _id => $key }, { '$set' => $doc }, { upsert => 1 } );
 
@@ -226,7 +225,7 @@ CHI::Driver::MongoDB - MongoDB driver for CHI
 
 =head1 VERSION
 
-version 0.0001
+version 0.0100
 
 =head1 SYNOPSIS
 
@@ -262,11 +261,11 @@ variable.
 
 =head1 WARNING
 
-This module is currently considered to be a B<beta release>.
+Because of the not fully understood test failures this module is
+still considered to be a B<beta release>.
 
-While the (mostly) succeeding test suite shows that there probably
-are no major issues endangering your data it has only been tested
-with MongoDB 3.2.x and the MongoDB Perl module v1.4.5.
+On the other hand I have never received any reports - which either
+means that nobody uses it or that it does work as intended ;-)
 
 Please open a bug report on L<https://rt.perl.org/> or send me a
 mail if you encounter any problems.
@@ -367,7 +366,7 @@ Heiko Jansen <hjansen@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Heiko Jansen.
+This software is copyright (c) 2018 by Heiko Jansen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

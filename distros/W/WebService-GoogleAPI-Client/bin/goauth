@@ -4,7 +4,7 @@ use strict;
 use warnings;    ## required because I can't work out how to get percritic to use my modern config
 
 package goauth;
-$goauth::VERSION = '0.16';
+$goauth::VERSION = '0.17';
 use Carp;
 use Mojolicious::Lite;
 use Data::Dumper;
@@ -222,7 +222,7 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head2 SUMMARY
 

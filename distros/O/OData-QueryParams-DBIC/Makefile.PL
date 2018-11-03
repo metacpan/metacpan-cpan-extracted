@@ -17,13 +17,18 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "OData::QueryParams::DBIC",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Data::Dumper" => 0,
+    "List::Util" => 0,
+    "Mojo::Parameters" => 0,
     "Mojo::URL" => 0
   },
   "TEST_REQUIRES" => {
-    "Pod::Coverage::TrustPod" => 0
+    "Pod::Coverage::TrustPod" => 0,
+    "Test::Exception" => 0,
+    "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,9 +36,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Data::Dumper" => 0,
+  "List::Util" => 0,
+  "Mojo::Parameters" => 0,
   "Mojo::URL" => 0,
-  "Pod::Coverage::TrustPod" => 0
+  "Pod::Coverage::TrustPod" => 0,
+  "Test::Exception" => 0,
+  "Test::More" => 0
 );
 
 

@@ -12,17 +12,18 @@ has settings => (is => 'ro', isa => __PACKAGE__.'::Settings', default => sub{
 });
 
 has ua => (is => 'rw', isa => 'UserAgentType', lazy => 1, builder => 'build_ua');
-#has thread_id => (is => 'rw', isa => 'Str');
-#has job_id => (is => 'rw', isa => 'Str');
 has gm => (is => 'rw', isa => 'TaskPipe::SchemaManager');
 has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', default => sub{
     TaskPipe::RunInfo->new;
 });
 
+
+
+
 sub build_ua{
     my $self = shift;
 
-    my $ua = LWP::UserAgent->new;
+    my $ua = LWP::UserAgent->new( ssl_opts => { verify_hostname => 0 } );
     $ua->cookie_jar( {} );
     $ua->agent( $self->settings->agent );
     $ua->timeout( $self->settings->timeout );
@@ -36,11 +37,13 @@ sub build_ua{
 sub call{
     my ($self,$method,@params) = @_;
 
+    my $logger = Log::Log4perl->get_logger;
+    $self->clear_cookies;
     my $resp = $self->ua->$method(@params);
 
     return $resp;
-
 }
+
 
 
 sub clear_cookies{

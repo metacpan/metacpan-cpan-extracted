@@ -109,7 +109,7 @@ ok( $disc->available_APIs(),                               'Get available APIs' 
 ok( $disc->supported_as_text(),                            'Supported as text' );
 ok( $disc->available_versions( 'gmail' ),                  'Available versions for Gmail' );
 ok( $disc->latest_stable_version( 'gmail' ),               'Latest stable version for Gmail' );
-ok( $disc->api_verson_urls(),                              'api version urls' );
+ok( $disc->api_version_urls(),                             'api version urls' );
 ok( $disc->methods_available_for_google_api_id( 'gmail' ), 'Get end points available for gmail' );
 ok( $disc->list_of_available_google_api_ids(),             'All available Google API IDs' );
 

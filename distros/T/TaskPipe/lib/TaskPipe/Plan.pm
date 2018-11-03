@@ -50,9 +50,13 @@ sub run{
 sub load_content{
     my $self = shift;
 
+    my $logger = Log::Log4perl->get_logger;
+
     my $filename = $self->filename || $self->path_settings->project->plan;
 
     my $path = $self->path_settings->path('plan',$filename);
+    $logger->debug("Path to plan file: $path");
+
     $self->content( $self->cascade_util->parser->( $path ) );
 }
 

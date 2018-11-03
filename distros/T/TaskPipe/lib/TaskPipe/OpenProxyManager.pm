@@ -7,7 +7,6 @@ use DateTime;
 use Module::Runtime 'require_module';
 use Digest::MD5 qw(md5_base64);
 use TaskPipe::UserAgentManager;
-use Parallel::ForkManager;
 use TaskPipe::ThreadManager;
 with 'MooseX::ConfigCascade';
 

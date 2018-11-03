@@ -28,6 +28,14 @@ my $apache_lic = $class->new_from_short_name({
 });
 is($apache_lic->license_class,'Software::License::Apache_2_0',"license class");
 
+# test also fulltext
+my $lgpl_2_lic = $class->new_from_short_name({
+    short_name => 'LGPL-2',
+    holder => 'X. Ample'
+});
+is($lgpl_2_lic->license_class,'Software::LicenseMoreUtils::LGPL_2',"license class");
+like($lgpl_2_lic->fulltext, qr/we are referring to freedom/,"found full text");
+
 # kaboom test
 throws_ok {
     my $kaboom_lic = $class->new_from_short_name({

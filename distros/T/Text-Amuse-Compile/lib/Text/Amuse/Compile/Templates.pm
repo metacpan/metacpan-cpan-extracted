@@ -673,21 +673,32 @@ sub latex {
                [% safe_options.paging %],%
                paper=[% safe_options.papersize %]]%
                {[% safe_options.class %]}
-\usepackage{fontspec}
-\setmainfont[Script=[% doc.font_script %]]{[% safe_options.mainfont %]}
-\setsansfont[Script=[% doc.font_script %],Scale=MatchLowercase]{[% safe_options.sansfont %]}
-\setmonofont[Script=[% doc.font_script %],Scale=MatchLowercase]{[% safe_options.monofont %]}
-[% safe_options.mainlanguage_script %]
+[% IF safe_options.areaset_width %]
+[% IF safe_options.areaset_height %]
+\areaset[current]{[% safe_options.areaset_width %]}{[% safe_options.areaset_height %]}
+[% END %]
+[% END %]
+
+[% tex_setup_langs %]
 
 [% IF safe_options.nocoverpage %]
 \let\chapter\section
+[% ELSE %]
+\renewcommand*{\partpagestyle}{empty}
 [% END %]
+
 % global style
 [% IF safe_options.headings %]
 \setlength{\headsep}{\baselineskip}
 \usepackage{scrlayer-scrpage}
 \pagestyle{scrheadings}
   [% IF safe_options.twoside %]
+    [% IF safe_options.headings.part_chapter %]
+    \automark[part]{part}
+    \automark*[chapter]{}
+    \ohead{\pagemark}
+    \ihead{\headmark}
+    [% END %]
     [% IF safe_options.headings.title_subtitle %]
     \lehead{\pagemark}
     \rohead{\pagemark}
@@ -729,6 +740,10 @@ sub latex {
     \cfoot[]{}
     \ofoot[]{}
   [% ELSE %]
+    [% IF safe_options.headings.part_chapter %]
+    \automark[part]{part}
+    \chead[]{\headmark}
+    [% END %]
     [% IF safe_options.headings.title_subtitle %]
     \chead{[% doc.header_as_latex.title %]}
     [% END %]
@@ -763,24 +778,8 @@ sub latex {
 
 
 
-\usepackage{microtype} % you need an *updated* texlive 2012, but harmless
-\usepackage{graphicx}
-\usepackage{alltt}
-\usepackage{verbatim}
-% http://tex.stackexchange.com/questions/3033/forcing-linebreaks-in-url
-\PassOptionsToPackage{hyphens}{url}\usepackage[hyperfootnotes=false,hidelinks,breaklinks=true]{hyperref}
-\usepackage{bookmark}
-
-
-\usepackage[shortlabels]{enumitem}
-\usepackage{tabularx}
-\usepackage[normalem]{ulem}
-\def\hsout{\bgroup \ULdepth=-.55ex \ULset}
-% https://tex.stackexchange.com/questions/22410/strikethrough-in-section-title
-% Unclear if \protect \hsout is needed. Doesn't looks so
-\DeclareRobustCommand{\sout}[1]{\texorpdfstring{\hsout{#1}}{#1}}
-\usepackage{wrapfig}
 \usepackage{indentfirst}
+
 % remove the numbering
 \setcounter{secnumdepth}{-2}
 
@@ -803,32 +802,7 @@ sub latex {
 \let\raggedsection\centering
 [% END %]
 
-\usepackage{polyglossia}
-\setmainlanguage{[% safe_options.lang %]}
-[% safe_options.mainlanguage_script %]
 
-[% IF safe_options.other_languages %]
-\setotherlanguages{[% safe_options.other_languages %]}
-[% END %]
-[% IF safe_options.other_languages_additional %]
-[% safe_options.other_languages_additional %]
-[% END %]
-
-[% IF safe_options.mainlanguage_toc_name %]
-\renewcaptionname{[% safe_options.lang %]}{\contentsname}{[% safe_options.mainlanguage_toc_name %]}
-[% END %]
-
-[% IF doc.is_bidi %]
-\usepackage{bidi}
-[% END %]
-
-[% IF disable_bigfoot %]
-\newcommand{\footnoteB}[1]{\{\{#1\}\}}
-[% ELSE %]
-% footnote handling
-\usepackage[fragile]{bigfoot}
-\usepackage{perpage}
-\DeclareNewFootnote{default}
 [% IF safe_options.secondary_footnotes_alpha %]
 \DeclareNewFootnote{B}[alph]
 \MakeSortedPerPage[1]{footnoteB}
@@ -837,48 +811,36 @@ sub latex {
 \MakeSorted{footnoteB}
 \renewcommand*\thefootnoteB{(\arabic{footnoteB})}
 [% END %]
-[% END %]
 \deffootnote[3em]{0em}{4em}{\textsuperscript{\thefootnotemark}~}
-
-
-% avoid breakage on multiple <br><br> and avoid the next [] to be eaten
-\newcommand*{\forcelinebreak}{\strut\\*{}}
-
-\newcommand*{\hairline}{%
-  \bigskip%
-  \noindent \hrulefill%
-  \bigskip%
-}
-
-% reverse indentation for biblio and play
-
-\newenvironment*{amusebiblio}{
-  \leftskip=\parindent
-  \parindent=-\parindent
-  \smallskip
-  \indent
-}{\smallskip}
-
-\newenvironment*{amuseplay}{
-  \leftskip=\parindent
-  \parindent=-\parindent
-  \smallskip
-  \indent
-}{\smallskip}
-
-\newcommand*{\Slash}{\slash\hspace{0pt}}
 
 [% UNLESS safe_options.sansfontsections %]
 \addtokomafont{disposition}{\rmfamily}
 \addtokomafont{descriptionlabel}{\rmfamily}
 [% END %]
-% forbid widows/orphans
+
 \frenchspacing
-\sloppy
+% avoid vertical glue
+\raggedbottom
+
+% this will generate overfull boxes, so we need to set a tolerance
+% \pretolerance=1000
+% pretolerance is what is accepted for a paragraph without
+% hyphenation, so it makes sense to be strict here and let the user
+% accept tweak the tolerance instead.
+\tolerance=[% safe_options.tex_tolerance %]
+% Additional tolerance for bad paragraphs only
+\setlength{\emergencystretch}{[% safe_options.tex_emergencystretch %]}
+
+% (try to) forbid widows/orphans
 \clubpenalty=10000
 \widowpenalty=10000
+
+
+[% IF safe_options.fussy_last_word %]
 % http://tex.stackexchange.com/questions/304802/how-not-to-hyphenate-the-last-word-of-a-paragraph
 \finalhyphendemerits=10000
+[% END %]
+
 
 % given that we said footinclude=false, this should be safe
 \setlength{\footskip}{2\baselineskip}
@@ -942,8 +904,10 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 
 [% UNLESS safe_options.nocoverpage %]
    [% IF safe_options.cover %]
+      [% UNLESS safe_options.ignore_cover %]
       \vskip 3em
       \includegraphics[keepaspectratio=true,height=0.5\textheight,width=[% safe_options.coverwidth %]\textwidth]{[% safe_options.cover %]}
+      [% END %]
    [% END %]
    \vfill
 [% END %]
@@ -1017,7 +981,7 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 [% END %]
 [% END %]
 
-[% doc.as_latex %]
+[% latex_body %]
 
 [% UNLESS safe_options.nofinalpage %]
 % begin final page
@@ -1118,6 +1082,10 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 
 \end{document}
 
+[% IF safe_options.format_id.DEFAULT %]
+% No format ID passed.
+[% END %]
+
 EOF
     return \$latex;
 }
@@ -1129,70 +1097,16 @@ sub slides {
     }
     my $slides =<<'LATEX';
 \documentclass[ignorenonframetext]{beamer}
-\usepackage{fontspec}
-\setmainfont[Script=[% doc.font_script %]]{[% safe_options.mainfont %]}
-\setsansfont[Script=[% doc.font_script %],Scale=MatchLowercase]{[% safe_options.sansfont %]}
-\setmonofont[Script=[% doc.font_script %],Scale=MatchLowercase]{[% safe_options.monofont %]}
+[% tex_setup_langs %]
 \usetheme{[% safe_options.beamertheme %]}
 \usecolortheme{[% safe_options.beamercolortheme %]}
-\usepackage{graphicx}
-\usepackage{alltt}
-\usepackage{verbatim}
-\usepackage[stable]{footmisc}
-\usepackage[shortlabels]{enumitem}
-\usepackage{tabularx}
-\usepackage[normalem]{ulem}
-\def\hsout{\bgroup \ULdepth=-.55ex \ULset}
-% https://tex.stackexchange.com/questions/22410/strikethrough-in-section-title
-% Unclear if \protect  \hsout is needed. Doesn't looks so
-\DeclareRobustCommand{\sout}[1]{\texorpdfstring{\hsout{#1}}{#1}}
-\usepackage{wrapfig}
 
-\usepackage{polyglossia}
-\setmainlanguage{[% safe_options.lang %]}
-[% safe_options.mainlanguage_script %]
-[% IF safe_options.mainlanguage_toc_name %]
-\renewcaptionname{[% safe_options.lang %]}{\contentsname}{[% safe_options.mainlanguage_toc_name %]}
-[% END %]
-
-[% IF doc.is_bidi %]
-\usepackage{bidi}
-[% END %]
 [% IF doc.is_rtl %]
 \setbeamertemplate{frametitle}[default][right]
 [% END %]
 
-
-
 % remove the numbering
 \setcounter{secnumdepth}{-2}
-
-% avoid breakage on multiple <br><br> and avoid the next [] to be eaten
-\newcommand*{\forcelinebreak}{\strut\\*{}}
-
-\newcommand*{\hairline}{%
-  \bigskip%
-  \noindent \hrulefill%
-  \bigskip%
-}
-
-% reverse indentation for biblio and play
-
-\newenvironment*{amusebiblio}{
-  \leftskip=\parindent
-  \parindent=-\parindent
-  \smallskip
-  \indent
-}{\smallskip}
-
-\newenvironment*{amuseplay}{
-  \leftskip=\parindent
-  \parindent=-\parindent
-  \smallskip
-  \indent
-}{\smallskip}
-
-\newcommand*{\Slash}{\slash\hspace{0pt}}
 
 \title{[% doc.header_as_latex.title %]}
 \date{[% doc.header_as_latex.date %]}

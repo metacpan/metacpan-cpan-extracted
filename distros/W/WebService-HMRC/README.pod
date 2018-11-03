@@ -4,7 +4,7 @@ WebService::HMRC - Interact with the UK HMRC Making Tax Digital API
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 
 =cut
@@ -83,7 +83,7 @@ To install this module, run the following commands:
 =head1 AUTHORISATION
 
 Except for a small number of open endpoints, access to the HMRC APIs requires
-appliction or user credentials. These must be obtained from HMRC. Application
+application or user credentials. These must be obtained from HMRC. Application
 credentials (and documentation) may be obtained from their
 L<Developer Hub|https://developer.service.hmrc.gov.uk/api-documentation>
 
@@ -155,12 +155,12 @@ for the other tests above and the following environment variables set:
 
 =item * HMRC_SERVER_TOKEN (issued when application was registered)
 
-=item * HMRC_AUTH_CODE (refreshed code output by previous test above)
+=item * HMRC_ACCESS_TOKEN (refreshed access_token output by previous test above)
 
 =back
 
     HMRC_SERVER_TOKEN=[MY-SERVER-TOKEN] \
-    HMRC_AUTH_CODE=[MY-AUTH_CODE] \
+    HMRC_ACCESS_TOKEN=[MY-ACCESS-TOKEN] \
     prove -l t/05-hmrc-api.t
 
 =head1 AUTHOR

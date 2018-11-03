@@ -4,7 +4,7 @@ use warnings;
 package YAML::PP;
 use B;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/ Load LoadFile Dump DumpFile /;

@@ -4,7 +4,7 @@ use Mojo::Loader qw/load_class/;
 use Mojo::Util qw!deprecated!;
 use XML::Loy;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 my %base_classes;
 
@@ -48,11 +48,11 @@ sub register {
 
       # Load base class
       if (my $e = load_class $base) {
-	for ($mojo->log) {
-	  $_->error("Exception: $e")  if ref $e;
-	  $_->error(qq{Unable to load base class "$base"});
-	};
-	next;
+        for ($mojo->log) {
+          $_->error("Exception: $e")  if ref $e;
+          $_->error(qq{Unable to load base class "$base"});
+        };
+        next;
       };
 
       my $mime   = $base->mime;
@@ -61,8 +61,8 @@ sub register {
       # Establish mime types
       if ($mime && $prefix) {
 
-	# Apply mime type
-	$mojo->types->type($prefix => $mime);
+        # Apply mime type
+        $mojo->types->type($prefix => $mime);
       };
 
       # module loaded
@@ -77,8 +77,8 @@ sub register {
     # Extend base class
     if (@helper) {
       $code .= '$doc->extension(' .
-	join(',', map( '"' . qq{$_"}, @helper)) .
-      ");";
+        join(',', map( '"' . qq{$_"}, @helper)) .
+        ");";
     };
     $code .= 'return $doc };';
 
@@ -98,8 +98,8 @@ sub register {
     # Default 'new_xml' helper
     $mojo->helper(
       new_xml => sub {
-	shift;
-	return XML::Loy->new( @_ );
+        shift;
+        return XML::Loy->new( @_ );
       });
 
     my $reply_xml = sub {
@@ -109,24 +109,24 @@ sub register {
       # Check format based on mime type
       my $class = ref $xml;
       if ($base_classes{$class}) {
-	if ($base_classes{$class}->[0] && $base_classes{$class}->[1]) {
-	  $format = $base_classes{$class}->[0];
-	};
+        if ($base_classes{$class}->[0] && $base_classes{$class}->[1]) {
+          $format = $base_classes{$class}->[0];
+        };
       };
 
       # render XML with correct mime type
       return $c->render(
-	'data'   => $xml->to_pretty_xml,
-	'format' => $format,
-	@_
+        'data'   => $xml->to_pretty_xml,
+        'format' => $format,
+        @_
       );
     };
 
     # Add 'render_xml' helper
     $mojo->helper(
       render_xml => sub {
-	deprecated 'render_xml is deprecated in favor of reply->xml';
-	$reply_xml->(@_);
+        deprecated 'render_xml is deprecated in favor of reply->xml';
+        $reply_xml->(@_);
       }
     );
 
@@ -224,19 +224,19 @@ new ones.
 =head2 register
 
   # Mojolicious
-  $mojo->plugin(XML::Loy => {
+  $mojo->plugin('XML::Loy' => {
     max_size     => 2048,
     new_activity => [-Atom, -ActivityStreams]
   });
 
   # Mojolicious::Lite
-  plugin XML::Loy => {
+  plugin 'XML::Loy' => {
     new_activity => [-Atom, -ActivityStreams]
   };
 
   # In your config file
   {
-    XML::Loy => {
+    'XML-Loy' => {
       new_activity => [-Atom, -ActivityStreams]
     }
   };

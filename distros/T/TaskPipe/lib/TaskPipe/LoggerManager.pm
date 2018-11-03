@@ -40,7 +40,7 @@ has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', default => sub{
 
 has custom_cspecs => (is => 'ro', isa => 'HashRef', default => sub{{
     J => 'job_id',
-    i => 'run_id',
+    #i => 'run_id',
     h => 'thread_id',
     N => 'task_name'
 }});
@@ -76,7 +76,7 @@ sub logging_settings{
         $s{'appender.SCREEN.stderr'}  = '0';
         $s{'appender.SCREEN.layout'} = 'Log::Log4perl::Layout::ColoredPatternLayout';
 
-        $s{'appender.SCREEN.layout.ConversionPattern'}=$c->{log_screen_pattern};
+        $s{'appender.SCREEN.layout.ConversionPattern'}=$c->log_screen_pattern;
         $s{'appender.SCREEN.layout.ColorMap'} = $self->build_color_map;
         $s{'appender.SCREEN.layout.ColorMap'} =~ s/\n//g;
         $s{'appender.SCREEN.layout.ColorStyle'} = 'continuous';
@@ -88,9 +88,9 @@ sub logging_settings{
         $s{'rootLogger'}.=', LOGFILE';
         $s{'appender.LOGFILE'}='Log::Log4perl::Appender::File';
         $s{'appender.LOGFILE.filename'}= $self->get_log_path;
-        $s{'appender.LOGFILE.mode'}= $c->{log_file_access};
+        $s{'appender.LOGFILE.mode'}= $c->log_file_access;
         $s{'appender.LOGFILE.layout'}='PatternLayout';
-        $s{'appender.LOGFILE.layout.ConversionPattern'} = $c->{log_file_pattern};
+        $s{'appender.LOGFILE.layout.ConversionPattern'} = $c->log_file_pattern;
         $self->add_custom_cspecs( \%s, 'LOGFILE' );
     } 
 
@@ -107,7 +107,8 @@ sub get_log_methods{
     my $log_methods = {'screen' => 1 };
     $log_methods = {'file' => 1 } if $log_mode eq 'file';
     $log_methods = {'file' => 1 } if ( $log_mode eq 'shell' && $self->run_info->shell eq 'background');
-    $log_methods->{'file'} = 1 if $log_mode eq 'always';
+    $log_methods->{'file'} = 1 if $log_mode eq 'both';
+    $log_methods = {} if $log_mode eq 'none';
 
     return $log_methods;
 }

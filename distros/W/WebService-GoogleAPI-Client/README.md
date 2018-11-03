@@ -15,16 +15,16 @@ WebService::GoogleAPI::Client - Perl Google API Services OAUTH Client.
 
 # VERSION
 
-version 0.16
+version 0.17
 
 # SYNOPSIS
 
-Provides client access to [Google API V.1](https://developers.google.com/discovery/v1) Service End-Points using a user-agent that handles OAUTH2 authentication and access control and provides helpers to cache API Discovery specifications.
+Provides client access to [Google API V.1](https://developers.google.com/apis-explorer/) Service End-Points using a user-agent that handles OAUTH2 authentication and access control and provides helpers to cache API Discovery specifications.
 
 The guiding principal is to minimise the conceptual load when using the Client agent for users who want to make calls directly, but also make available functions to help explore unfamiliar API endpoints by offering optional validation etc against the latest published Google API Discovery specifications.
 
 
-NB: To create or modify an authorization configuration file with scope and user tokens in current folder run _goauth_ CLI tool to interactively create the JSON configuration and launch a local HTTP server to acquire authenticated access permissions with a Google email account. 
+NB: To create or modify an authorization configuration file for a [Goole Project](https://console.developers.google.com/apis/) with scope and user tokens in current folder run _goauth_ CLI tool to interactively create the JSON configuration and launch a local HTTP server to acquire authenticated access permissions with a Google email account. 
 
 ![goauth screen capture](https://pscott-au.github.io/WebService-GoogleAPI-Client/goauth-login-cap.gif)
 
@@ -38,7 +38,7 @@ See ````perldoc goauth```` for more detail.
 
     ## assumes gapi.json configuration in working directory with scoped project and user authorization
     
-    my $gapi_client = WebService::GoogleAPI::Client->new( debug => 1, gapi_json => './gapi.json', user=> 'peter@pscott.com.au' );
+    my $gapi_client = WebService::GoogleAPI::Client->new( debug => 1, gapi_json => 'gapi.json', user=> 'peter@pscott.com.au' );
 
 
     ## Completely manually constructed API End-Point Request to obtain Perl Data Structure converted from JSON response.
@@ -47,6 +47,82 @@ See ````perldoc goauth```` for more detail.
           path => 'https://www.googleapis.com/calendar/users/me/calendarList',
         )->json;
 
+
+````
+
+
+
+
+# INSTALLATION
+
+## From Repository Source Root Using Dist::Zilla
+
+The code in this repository uses [Dist::Zilla](http://dzil.org/) Build System to assist package building and creation of Tarball and CPAN distribution. Curiously the [Github Repo](https://github.com/rjbs/dist-zilla/) describes itself as '*scary tools for building CPAN distributions*'
+
+````shell
+    dzil listdeps | cpanm
+    dzil build
+    dzil test
+    dzil install
+````
+
+## Install from CPAN
+
+   cpanm WebService::GoogleAPI::Client
+
+### Windows Strawberry Perl Notes
+
+At the time of writing I had issues installing [Config::Json V1.5202](https://metacpan.org/pod/Config::JSON) due to [an issue with the tests](https://github.com/plainblack/config-json/issues/5). Until [the patch](https://github.com/plainblack/config-json/pull/4) is applied it is OK to force the install in cpan to get things working. 
+
+I was unable to get the [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) packages installed under Windows but installing without the dzil build layer through _cpanm_ or _cpan_ should now work as of V0.13
+
+
+## TYPICAL USAGE QUICKSTART
+
+### PRE-REQUISITES
+
+* Requires a suitably configured Project in Google Admin Console with scopes and OAUTH Client
+* Requires a local project configuration file that can be generated with the included *goauth* CLI Tool (perldoc goauth for more detail )
+
+````perl
+    use strict;
+    use warnings;
+    use Data::Dumper;
+
+    use feature 'say';
+    use WebService::GoogleAPI::Client;
+
+    my $gapi = WebService::GoogleAPI::Client->new(debug => 0);
+    
+    ## This idiom selects the first authorised user from gapi.json 
+    my $aref_token_emails = $gapi->auth_storage->storage->get_token_emails_from_storage;
+    my $user = $aref_token_emails->[0];
+    print "Running tests with default user email = $user\n";
+    $gapi->user($user);
+
+    ## Get all emails sent to $user newer than 1 day
+    my $cl =   $gapi->api_query({
+        method => 'get',
+        path       => "https://www.googleapis.com/gmail/v1/users/me/messages?q=newer_than:1d;to:$user", 
+    });
+
+    if ($cl->code eq '200') ## Mojo::Message::Response
+    {
+        foreach my $msg ( @{ $cl->json->{messages} } )
+        {
+            say Dumper $msg;
+        }
+
+    }
+
+````
+
+## More Examples
+
+See the examples folder for specific access examples.
+
+
+````perl
 
     ## using dotted API Endpoint id to invoke helper validation and default value interpolations etc to send email to self
     use Email::Simple;    ## RFC2822 formatted messages
@@ -126,7 +202,7 @@ See ````perldoc goauth```` for more detail.
     {
         if ( $r->code eq '418' )
         {
-            print qq{Cool - I'm a teapot - this was caught ebfore sending the request through to Google \n};
+            print qq{Cool - I'm a teapot - this was caught before sending the request through to Google \n};
             print $r->body;
         }
         else ## other error - should appear in warnings but can inspect $r for more detail
@@ -136,98 +212,32 @@ See ````perldoc goauth```` for more detail.
         
     }
 
-
-
-````
-
-
-
-# INSTALLATION
-
-## From Repository Source Root Using Dist::Zilla
-
-The code in this repository uses [Dist::Zilla](http://dzil.org/) Build System to assist package building and creation of Tarball and CPAN distribution. Curiously the [Github Repo](https://github.com/rjbs/dist-zilla/) describes itself as '*scary tools for building CPAN distributions*'
-
-````shell
-    sudo dzil install
-````
-
-## Install from CPAN
-
-  sudo cpanm WebService::GoogleAPI::Client
-
-### Windows Strawberry Perl Notes
-
-At the time of writing I had issues installing [Config::Json V1.5202](https://metacpan.org/pod/Config::JSON) due to [an issue with the tests](https://github.com/plainblack/config-json/issues/5). Until [the patch](https://github.com/plainblack/config-json/pull/4) is applied it is OK to force the install in cpan to get things working. 
-
-I was unable to get the [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) packages installed under Windows but installing without the dzil build layer through _cpanm_ or _cpan_ should now work as of V0.13
-
-
-## TYPICAL USAGE QUICKSTART
-
-### PRE-REQUISITES
-
-* Requires a suitably configured Project in Google Admin Console with scopes and OAUTH Client
-* Requires a local project configuration file that can be generated with the included *goauth* CLI Tool (perldoc goauth for more detail )
-
-````perl
-    use strict;
-    use warnings;
-    use Data::Dumper;
-
-    use feature 'say';
-    use WebService::GoogleAPI::Client;
-
-    my $gapi = WebService::GoogleAPI::Client->new(debug => 0);
-    
-    ## This idiom selects the first authorised user from gapi.json 
-    my $aref_token_emails = $gapi->auth_storage->storage->get_token_emails_from_storage;
-    my $user = $aref_token_emails->[0];
-    print "Running tests with default user email = $user\n";
-    $gapi->user($user);
-
-    ## Get all emails sent to $user newer than 1 day
-    my $cl =   $gapi->api_query({
-        method => 'get',
-        path       => "https://www.googleapis.com/gmail/v1/users/me/messages?q=newer_than:1d;to:$user", 
-    });
-
-    if ($cl->code eq '200') ## Mojo::Message::Response
-    {
-        foreach my $msg ( @{ $cl->json->{messages} } )
-        {
-            say Dumper $msg;
-        }
-
-    }
-
 ````
 
 
 # KEY FEATURES
 
-- API Discovery with local caching using CHI File
+- API Discovery with local caching using [CHI](https://metacpan.org/pod/CHI) File
 - OAUTH app credentials (client\_id, client\_secret, users access\_token && refresh\_token) storage stored in local gapi.json file
 - Automatic access\_token refresh (if user has refresh\_token) and saving refreshed token to storage
-- CLI tool (_goauth_) with lightweight HTTP server to simplify config OAuth2 configuration, sccoping, authorization and obtaining access\_ and refresh\_ tokens
-
-## TODO: 
-
-- UNDER REVIEW
+- CLI tool ([go_auth](https://metacpan.org/pod/distribution/WebService-GoogleAPI-Client/bin/goauth)) with lightweight HTTP server to simplify config OAuth2 configuration, sccoping, authorization and obtaining access\_ and refresh\_ tokens
 
 
 # SEE ALSO
 
-- [Moo::Google](https://metacpan.org/pod/Moo::Google) - The original code base later forked into [WebService::Google::Client](https://metacpan.org/pod/WebService::Google::Client) but is heading in a different direction
+- https://developers.google.com/apis-explorer/
+
+- https://console.developers.google.com/apis/
+
+- [Moo::Google](https://metacpan.org/pod/Moo::Google) - The original code base later forked into [WebService::Google::Client](https://metacpan.org/pod/WebService::Google::Client) but currently looks stagnant
+
 - [Google Swagger API https:](https:///github.com/APIs-guru/google-discovery-to-swagger) 
+
+- [Google Cloud Developer Cheat Spread-Sheet](https://docs.google.com/spreadsheets/d/1OkFbizpnc_iyzcApqRrqsNtUVazKJDtCyH5vw3352xM/edit?usp=sharing)
 
 # AUTHORS
 
 - Peter Scott <peter@pscott.com.au>
-
-# CONTRIBUTORS
-
-- Pavel Serikov <pavelsr@cpan.org> provided the original source code in Moo::Google
 
 # COPYRIGHT AND LICENSE
 

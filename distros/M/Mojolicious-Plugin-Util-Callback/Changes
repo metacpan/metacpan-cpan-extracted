@@ -1,3 +1,7 @@
+0.06 2018-11-01
+        - Changed permission of non-executable files.
+        - Fix memory leak in callback helper.
+
 0.05 2017-01-12
         - Removed experimental smartmatch operator.
 

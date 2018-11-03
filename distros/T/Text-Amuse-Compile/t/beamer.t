@@ -148,7 +148,7 @@ my %extra = (
         ok (-f $pdf, "PDF generated");
     }
     my $content = read_file($tex);
-    like $content, qr/sansfont\[.*?\]\{CMU/, "Sans font as default";
+    like $content, qr/sansfont\{CMU Sans/, "Sans font as default";
     like $content, qr/colortheme\{dove/, "colortheme is dove";
     like $content, qr/usetheme\{default/, "theme is default";
     unlike $content, qr/ignored/, "Ignored sections are skipped";
@@ -159,7 +159,7 @@ my %extra = (
     ok (!$c->file_needs_compilation($muse), "File $muse doesn't need compilation");
     ok (-f $pdf, "PDF $pdf generated") if TEST_WITH_LATEX;
     $content = read_file($tex);
-    like $content, qr/sansfont\[.*?\]\{Iwona/, "Sans font as default";
+    like $content, qr/sansfont\{Iwona\}/, "Sans font as default";
     like $content, qr/colortheme\{wolverine/, "colortheme is dove";
     like $content, qr/usetheme\{Madrid/, "theme is default";
     $c->purge($muse);

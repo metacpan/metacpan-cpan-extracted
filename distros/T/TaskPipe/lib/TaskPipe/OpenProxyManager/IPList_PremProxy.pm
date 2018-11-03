@@ -36,6 +36,13 @@ has last_page_index_ws => (is => 'ro', isa => 'Web::Scraper', default => sub{
 });
 
 
+has list_settings => (
+    is => 'ro', 
+    isa => 'TaskPipe::OpenProxyManager::IPList_PremProxy::Settings'
+);
+
+
+
 sub page_index_url{
     return +$_[0]->url_from_page_index( 1 );
 }

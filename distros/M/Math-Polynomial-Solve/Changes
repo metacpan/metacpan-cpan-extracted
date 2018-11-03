@@ -1,5 +1,20 @@
 Revision history for Perl extension Math::Polynomial::Solve.
 
+2.86
+     November 1 2018
+	- Made a function is_ascending() to tell what the coefficient
+	  order currently is.
+	- Typo and error fixes: one case where I meant 'descending' instead
+	  of 'ascending' in the coefficients section. And more embarassingly,
+	  I dropped the 'c' from Dr. Nickalls's name.
+	- Turn README into README.md. With MetaCPAN replacing CPAN,
+	  there is no reason to have a plain-text README anymore
+	  (MetaCPAN doesn't treat the file as special).
+	- Alas, Karl's Calculus Tutor has vanished from the web (not even
+	  to be found on the Wayback Machine), so use a link on the
+	  Encyclopedia of Mathematics web page instead on README.md.
+	- Fixed the links in the POD.
+	- Add a CONTRIBUTING.md file, which is becoming a thing.
 2.85
      June 30 2018
 	- Enable the warning to set the coefficient order in one's code.

@@ -1,11 +1,13 @@
 use 5.010001;
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use Math::Polynomial::Solve qw(:numeric coefficients);
 use strict;
 use warnings;
 
 coefficients order => 'ascending';
+
+ok(is_ascending() == 1, "is_ascending() failed to follow coefficients correctly.");
 
 my @options = qw( hessenberg root_function varsubst);
 my %okeys = poly_option();

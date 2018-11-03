@@ -28,7 +28,6 @@ t/04_repository.t
 t/05_cache.t
 t/06_inject_live.t
 t/07_auditor.t
-t/Util.pm
 t/cli/gc.t
 t/cli/indexer.t
 t/cli/merge-index.t
@@ -40,6 +39,7 @@ t/dat/auditor/cpan/02packages.details.txt
 t/dat/auditor/darkpan/02packages.details.txt
 t/dat/modules/02.packages.txt
 t/index.t
+t/lib/Local/Util.pm
 xt/inject-spiffy-from-cpan.t
 META.yml
 MANIFEST

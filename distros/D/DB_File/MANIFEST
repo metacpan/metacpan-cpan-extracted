@@ -11,6 +11,10 @@ fallback.h
 fallback.xs
 hints/dynixptx.pl
 hints/sco.pl
+hints/bitrig.pl
+hints/netbsd.pl
+hints/minix.pl
+hints/openbsd.pl
 patches/5.004
 patches/5.004_01
 patches/5.004_02

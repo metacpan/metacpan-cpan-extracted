@@ -17,14 +17,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::HTMLFilter::TOC;
-$Qgoda::HTMLFilter::TOC::VERSION = 'v0.9.2';
+$Qgoda::HTMLFilter::TOC::VERSION = 'v0.9.3';
 use strict;
 
 use Qgoda;
 use Qgoda::Util qw(html_escape slugify empty write_file);
 use Locale::TextDomain qw(qgoda);
-
-use base qw(Qgoda::Processor);
 
 sub new {
     my ($class, %args) = @_;

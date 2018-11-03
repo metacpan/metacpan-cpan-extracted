@@ -1,14 +1,20 @@
 Revision history for Perl extension HTML::Selector::XPath
 
-0.24 NEXT
+0.25 NEXT
 
-0.23 20170323 (Thu Mar 23 19:35:00 GMT+1 2017)
+0.24 2018-11-02
+    * Test stability improvement if HTML::TreeBuilder::XPath is not installed
+    * Re-release with properly fixed META.* information
+      (RT 127555, reported by Dan Book)
+    * No code changes, no need to upgrade
+
+0.23 2017-03-23 (Thu Mar 23 19:35:00 GMT+1 2017)
       - seems as if "provides" in META.json makes new versions not get indexed
         properly
       . No code changes, no need to upgrade
       . We also allow static installation now, without running Makefile.PL
 
-0.22 20160923 (Fri Sep 23 21:35:00 GMT+2 2016)
+0.22 2016-09-23 (Fri Sep 23 21:35:00 GMT+2 2016)
       - seems as if "provides" in META.json must be a full path to the file...
       . No code changes, no need to upgrade
 

@@ -23,7 +23,11 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0"
+            "File::Basename" : "0",
+            "MooseX::ConfigCascade" : "0",
+            "Proc::ProcessTable" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0"
          }
       },
       "configure" : {
@@ -41,11 +45,17 @@
             "DBIx::Class::Schema::Loader" : "0",
             "DBIx::Error" : "0",
             "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::MySQL" : "0",
+            "DateTime::Format::SQLite" : "0",
             "Digest::MD5" : "0",
+            "Fatal" : "0",
             "File::Basename" : "0",
             "File::Inplace" : "0",
             "File::Path" : "0",
+            "File::Path::Expand" : "0",
             "File::Save::Home" : "0",
+            "File::Slurp" : "0",
             "File::Spec" : "0",
             "Hash::Merge" : "0",
             "IO::Socket::INET" : "0",
@@ -57,15 +67,16 @@
             "Moose::Util::TypeConstraints" : "0",
             "MooseX::ClassAttribute" : "0",
             "MooseX::ConfigCascade" : "0.02",
-            "MooseX::RelClassTypes" : "0.03",
             "Net::EmptyPort" : "0",
             "POSIX" : "0",
             "Path::Tiny" : "0",
             "Pod::POM" : "0",
             "Pod::Term" : "0.02",
             "Proc::Background" : "0",
+            "Proc::Exists" : "0",
             "Proc::ProcessTable" : "0",
             "SQL::Translator" : "0",
+            "Selenium::Remote::Driver" : "0",
             "String::CamelCase" : "0",
             "Template::Nest" : "0.03",
             "Term::ANSIColor" : "0",
@@ -81,6 +92,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.05,
+   "version" : 0.06,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

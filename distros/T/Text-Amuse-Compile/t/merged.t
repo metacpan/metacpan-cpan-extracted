@@ -17,8 +17,8 @@ binmode STDOUT, ':encoding(utf-8)';
 binmode STDERR, ':encoding(utf-8)';
 
 use Text::Amuse::Compile::Merged;
-use Text::Amuse::Compile::Devel qw/explode_epub/;
-
+use Text::Amuse::Compile::Devel qw/explode_epub
+                                  create_font_object/;
 chdir File::Spec->catdir(qw/t merged-dir/) or die $!;
 
 my $doc = Text::Amuse::Compile::Merged->new(files => [qw/first.muse second.muse/],
@@ -148,6 +148,7 @@ my $compile = Text::Amuse::Compile::File->new(
                                               suffix => '.muse',
                                               virtual => 1,
                                               templates => $templates,
+                                              fonts => create_font_object(),
                                              );
 
 my $outtex = read_file($compile->tex);

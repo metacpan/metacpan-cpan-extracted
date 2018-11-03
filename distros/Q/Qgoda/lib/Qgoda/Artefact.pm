@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Artefact;
-$Qgoda::Artefact::VERSION = 'v0.9.2';
+$Qgoda::Artefact::VERSION = 'v0.9.3';
 use strict;
 
 use Locale::TextDomain qw('qgoda');

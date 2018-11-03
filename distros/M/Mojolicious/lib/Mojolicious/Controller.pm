@@ -32,8 +32,6 @@ sub BUILD_DYNAMIC {
   };
 }
 
-sub continue { $_[0]->app->routes->continue($_[0]) }
-
 sub cookie {
   my ($self, $name) = (shift, shift);
 
@@ -117,21 +115,6 @@ sub finish {
   return @_ ? $self->write(@_)->write('') : $self->write('');
 }
 
-sub flash {
-  my $self = shift;
-
-  # Check old flash
-  my $session = $self->session;
-  return $session->{flash} ? $session->{flash}{$_[0]} : undef
-    if @_ == 1 && !ref $_[0];
-
-  # Initialize new flash and merge values
-  my $values = ref $_[0] ? $_[0] : {@_};
-  @{$session->{new_flash} ||= {}}{keys %$values} = values %$values;
-
-  return $self;
-}
-
 sub helpers { $_[0]->app->renderer->get_helper('')->($_[0]) }
 
 sub on {
@@ -146,15 +129,6 @@ sub param {
   return $self->every_param($name)->[-1] unless @_;
   $self->stash->{'mojo.captures'}{$name} = @_ > 1 ? [@_] : $_[0];
   return $self;
-}
-
-sub redirect_to {
-  my $self = shift;
-
-  # Don't override 3xx status
-  my $res = $self->res;
-  $res->headers->location($self->url_for(@_));
-  return $self->rendered($res->is_redirect ? () : 302);
 }
 
 sub render {
@@ -226,31 +200,6 @@ sub rendered {
 
 sub req { (shift->tx || Carp::croak 'Transaction already destroyed')->req }
 sub res { (shift->tx || Carp::croak 'Transaction already destroyed')->res }
-
-sub respond_to {
-  my ($self, $args) = (shift, ref $_[0] ? $_[0] : {@_});
-
-  # Find target
-  my $target;
-  my $renderer = $self->app->renderer;
-  my @formats  = @{$renderer->accepts($self)};
-  for my $format (@formats ? @formats : ($renderer->default_format)) {
-    next unless $target = $args->{$format};
-    $self->stash->{format} = $format;
-    last;
-  }
-
-  # Fallback
-  unless ($target) {
-    return $self->rendered(204) unless $target = $args->{any};
-    delete $self->stash->{format};
-  }
-
-  # Dispatch
-  ref $target eq 'CODE' ? $target->($self) : $self->render(%$target);
-
-  return $self;
-}
 
 sub send {
   my ($self, $msg, $cb) = @_;
@@ -332,22 +281,6 @@ sub url_for {
   $base_path->parts([])->trailing_slash(0);
 
   return $url;
-}
-
-sub validation {
-  my $self = shift;
-
-  my $stash = $self->stash;
-  return $stash->{'mojo.validation'} if $stash->{'mojo.validation'};
-
-  my $req    = $self->req;
-  my $token  = $self->session->{csrf_token};
-  my $header = $req->headers->header('X-CSRF-Token');
-  my $hash   = $req->params->to_hash;
-  $hash->{csrf_token} //= $header if $token && $header;
-  $hash->{$_} = $req->every_upload($_) for map { $_->name } @{$req->uploads};
-  my $v = $self->app->validator->validation->input($hash);
-  return $stash->{'mojo.validation'} = $v->csrf_token($token);
 }
 
 sub write {
@@ -451,13 +384,6 @@ connection might get closed early.
 L<Mojolicious::Controller> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 continue
-
-  $c->continue;
-
-Continue dispatch chain from an intermediate destination with
-L<Mojolicious::Routes/"continue">.
-
 =head2 cookie
 
   my $value = $c->cookie('foo');
@@ -514,18 +440,6 @@ sharing the same name as an array reference.
 Close WebSocket connection or long poll stream gracefully. This method will
 automatically respond to WebSocket handshake requests with a C<101> response
 status, to establish the WebSocket connection.
-
-=head2 flash
-
-  my $foo = $c->flash('foo');
-  $c      = $c->flash({foo => 'bar'});
-  $c      = $c->flash(foo => 'bar');
-
-Data storage persistent only for the next request, stored in the L</"session">.
-
-  # Show message after redirect
-  $c->flash(message => 'User created successfully!');
-  $c->redirect_to('show_user', id => 23);
 
 =head2 helpers
 
@@ -607,24 +521,6 @@ For more control you can also access request information directly.
 
   # Only file uploads
   my $foo = $c->req->upload('foo');
-
-=head2 redirect_to
-
-  $c = $c->redirect_to('named', foo => 'bar');
-  $c = $c->redirect_to('named', {foo => 'bar'});
-  $c = $c->redirect_to('/index.html');
-  $c = $c->redirect_to('http://example.com/index.html');
-
-Prepare a C<302> (if the status code is not already C<3xx>) redirect response
-with C<Location> header, takes the same arguments as L</"url_for">.
-
-  # Moved Permanently
-  $c->res->code(301);
-  $c->redirect_to('some_route');
-
-  # Temporary Redirect
-  $c->res->code(307);
-  $c->redirect_to('some_route');
 
 =head2 render
 
@@ -770,30 +666,6 @@ Get L<Mojo::Message::Response> object from L</"tx">.
   $c->res->headers->cache_control('public, max-age=300');
   $c->res->headers->append(Vary => 'Accept-Encoding');
 
-=head2 respond_to
-
-  $c = $c->respond_to(
-    json => {json => {message => 'Welcome!'}},
-    html => {template => 'welcome'},
-    any  => sub {...}
-  );
-
-Automatically select best possible representation for resource from C<format>
-C<GET>/C<POST> parameter, C<format> stash value or C<Accept> request header,
-defaults to L<Mojolicious::Renderer/"default_format"> or rendering an empty
-C<204> response. Each representation can be handled with a callback or a hash
-reference containing arguments to be passed to L</"render">.
-
-  # Everything else than "json" and "xml" gets a 204 response
-  $c->respond_to(
-    json => sub { $c->render(json => {just => 'works'}) },
-    xml  => {text => '<just>works</just>'},
-    any  => {data => '', status => 204}
-  );
-
-For more advanced negotiation logic you can also use the helper
-L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
-
 =head2 send
 
   $c = $c->send({binary => $bytes});
@@ -938,27 +810,6 @@ to inherit query parameters from the current request.
 
   # "/list?q=mojo&page=2" if current request was for "/list?q=mojo&page=1"
   $c->url_with->query([page => 2]);
-
-=head2 validation
-
-  my $v = $c->validation;
-
-Get L<Mojolicious::Validator::Validation> object for current request to
-validate file uploads as well as C<GET> and C<POST> parameters extracted from
-the query string and C<application/x-www-form-urlencoded> or
-C<multipart/form-data> message body. Parts of the request body need to be loaded
-into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large. There's a 16MiB limit for requests by default.
-
-  # Validate GET/POST parameter
-  my $v = $c->validation;
-  $v->required('title', 'trim')->size(3, 50);
-  my $title = $v->param('title');
-
-  # Validate file upload
-  my $v = $c->validation;
-  $v->required('tarball')->upload->size(1, 1048576);
-  my $tarball = $v->param('tarball');
 
 =head2 write
 

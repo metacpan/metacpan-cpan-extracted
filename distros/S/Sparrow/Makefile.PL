@@ -1,3 +1,4 @@
+use lib ".";
 use inc::Module::Install;
 
 # Define metadata
@@ -20,6 +21,7 @@ requires    'HTTP::Tiny';
 requires    'IO::Socket::SSL';
 requires    'Archive::Extract';
 requires    'Archive::Tar';
+requires    'File::Copy::Recursive';
 license     'perl';
 
 repository  'https://github.com/melezhik/sparrow';

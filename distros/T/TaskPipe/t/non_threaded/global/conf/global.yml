@@ -1,0 +1,58 @@
+---
+TaskPipe::OpenProxyManager::IPList_PremProxy::Settings:
+  page_num_format: '%02d'
+  ua_handler_module: TaskPipe::UserAgentManager::UserAgentHandler_PhantomJS
+  ua_mgr_module: TaskPipe::UserAgentManager_ProxyNet_TOR
+  url_template: https://premproxy.com/list/time-<page_num>.htm
+TaskPipe::OpenProxyManager::IPList_ProxyNova::Settings:
+  countries_url: https://www.proxynova.com/proxy-server-list/
+  default_port: 80
+  ua_handler_module: TaskPipe::UserAgentManager::UserAgentHandler_PhantomJS
+  ua_mgr_module: TaskPipe::UserAgentManager_ProxyNet_TOR
+  url_template: https://www.proxynova.com/proxy-server-list/country-<country_code>/
+TaskPipe::OpenProxyManager::IPList_Xroxy::Settings:
+  proxies_per_page: 10
+  ua_handler_module: TaskPipe::UserAgentManager::UserAgentHandler_PhantomJS
+  ua_mgr_module: TaskPipe::UserAgentManager_ProxyNet_TOR
+  url_template: http://www.xroxy.com/proxylist.php?port=&type=&ssl=&country=&latency=&reliability=&sort=reliability&desc=true&pnum=<page>#table
+TaskPipe::PathSettings::Global:
+  conf_dir: /conf
+  conf_filename: project.yml
+  global_conf_dir: /conf
+  global_dir: /global
+  global_lib_dir: /lib
+  global_log_dir: /logs
+  project: default_project
+  project_dir: /projects
+TaskPipe::PathSettings::Project:
+  lib_dir: /lib
+  log_dir: /logs
+  plan: plan.yml
+  plan_dir: /plans
+  source_dir: /sources
+  task_identifier: Task_
+  task_module_prefix: TaskPipe
+TaskPipe::SchemaManager::Settings_Global:
+  database: t/non_threaded/db/global.db
+  host: ''
+  method: dbi
+  module: TaskPipe::GlobalSchema
+  password: ''
+  table_prefix: ''
+  type: SQLite
+  username: ''
+TaskPipe::TorManager::Settings:
+  base_port: '9050'
+  config_path: /etc/tor/torrc
+  exec_name: tor
+  exec_opts:
+    ControlPort: --ControlPort
+    DataDirectory: --DataDirectory
+    HashedControlPassword: --HashedControlPassword
+    SocksPort: --SocksPort
+    f: -f
+    hash-password: --hash-password
+  ip: 127.0.0.1
+  kill_cmd: kill <pid>
+  process_name: tor
+  scheme: socks

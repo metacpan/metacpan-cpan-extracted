@@ -3,6 +3,8 @@ package TaskPipe::InterpParam::MatchHandler_id;
 use Moose;
 extends 'TaskPipe::InterpParam::MatchHandler';
 
+has match_adjustment => (is => 'ro', isa => 'Int', default => -1 );
+
 =head1 NAME
 
 TaskPipe::InterpParam::MatchHandler_id - Match handler for the $id parameter variable

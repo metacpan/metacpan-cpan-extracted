@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Locale::XGettext;
-$Qgoda::Locale::XGettext::VERSION = 'v0.9.2';
+$Qgoda::Locale::XGettext::VERSION = 'v0.9.3';
 use strict;
 
 use Locale::TextDomain qw(qgoda);
@@ -31,6 +31,7 @@ use Qgoda::Util::Translate qw(get_masters);
 use Qgoda::CLI;
 use Qgoda::Splitter;
 
+use Locale::XGettext '0.4';
 use base qw(Locale::XGettext);
 
 sub readFile {

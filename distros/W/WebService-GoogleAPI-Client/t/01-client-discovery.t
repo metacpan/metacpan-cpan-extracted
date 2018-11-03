@@ -65,7 +65,7 @@ subtest 'Naked instance method tests (without Client parent container)' => sub {
   );
 
   ok( ref( WebService::GoogleAPI::Client::AuthStorage->new ) eq 'WebService::GoogleAPI::Client::AuthStorage', 'WebService::GoogleAPI::Client::AuthStorage->new' );
-  ok( ref( WebService::GoogleAPI::Client::Discovery->new->api_verson_urls ) eq 'HASH', 'WebService::GoogleAPI::Client::Discovery->new->api_verson_url returns HASHREF' );
+  ok( ref( WebService::GoogleAPI::Client::Discovery->new->api_version_urls ) eq 'HASH', 'WebService::GoogleAPI::Client::Discovery->new->api_version_url returns HASHREF' );
 
 # supported_as_text
 

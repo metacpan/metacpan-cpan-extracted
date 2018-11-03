@@ -31,6 +31,7 @@ our %EXPORT_TAGS = (
 		cubic_roots
 		quartic_roots
 		coefficients
+		is_ascending
 	) ],
 	'numeric' => [ qw(poly_roots
 		poly_option
@@ -38,6 +39,7 @@ our %EXPORT_TAGS = (
 		balance_matrix
 		hqr_eigen_hessenberg
 		coefficients
+		is_ascending
 	) ],
 	'sturm' => [ qw(
 		poly_real_root_count
@@ -50,6 +52,7 @@ our %EXPORT_TAGS = (
 		sturm_sign_minus_inf
 		sturm_sign_plus_inf
 		coefficients
+		is_ascending
 	) ],
 	'utility' => [ qw(
 		epsilon
@@ -59,6 +62,7 @@ our %EXPORT_TAGS = (
 		poly_nonzero_term_count
 		poly_tolerance
 		coefficients
+		is_ascending
 	) ],
 );
 
@@ -68,7 +72,7 @@ our @EXPORT_OK = (
 	@{ $EXPORT_TAGS{'sturm'} },
 	@{ $EXPORT_TAGS{'utility'} } );
 
-our @EXPORT = qw( coefficients ascending_order );
+our @EXPORT = qw( coefficients is_ascending ascending_order );
 
 #
 # Add an :all tag automatically.
@@ -278,6 +282,11 @@ sub ascending_order
 	return $ascend;
 }
 
+sub is_ascending
+{
+	return $ascending_flag;
+}
+
 sub coefficients
 {
 	my %def = @_;
@@ -286,12 +295,12 @@ sub coefficients
 		carp "'coefficients' needs to know the order.";
 		$coeff_order_set = 0;
 	}
-	elsif ($def{order} =~ m/ascend/i)
+	elsif ($def{order} =~ m/^ascend/i)
 	{
 		$ascending_flag = 1;
 		$coeff_order_set = 1;
 	}
-	elsif ($def{order} =~ m/descend/i)
+	elsif ($def{order} =~ m/^descend/i)
 	{
 		$ascending_flag = 0;
 		$coeff_order_set = 1;
@@ -424,13 +433,6 @@ Math::Polynomial::Solve's functions, using the coefficients() function:
 
     my $fp4 = Math::Polynomial->interpolate([1 .. 4], [14, 19, 25, 32]);
 
-    #
-    # Find roots of $fp4.
-    #
-    my @fp4_roots = quartic_roots($fp4->coefficients);
-
-or
-
     my @fp4_roots = poly_roots($fp4->coefficients);
 
 If C<coefficients order =E<gt> 'ascending'> had not been called, the
@@ -441,7 +443,20 @@ previous line of code would have been written instead as
 The function is a way to help with the change in the API when version 3.00 of
 this module is released. At that point coefficients will be in ascending
 order by default, and you will need to use
-C<coefficients order =E<gt> 'ascending'> to use the old (current) style.
+C<coefficients order =E<gt> 'descending'> to use the old (current) style.
+
+=head3 is_ascending()
+
+Returns C<1> if the coefficent order is ascending, C<0> if the order is descending.
+
+    if (is_ascending())
+    {
+        print "Please enter your coefficients from lowest power to highest: ";
+    }
+    else
+    {
+        print "Please enter your coefficients from highest power to lowest: ";
+    }
 
 =head2 Numeric Functions
 
@@ -2342,12 +2357,12 @@ Div. PMA, Katholieke Universiteit Leuven, Belgium. This function is an
 almost direct translation of that script, and I owe Herman Bruyninckx
 for creating it in the first place. 
 
-Beginning with version 2.51, Dr. Nikalls's paper is included in the references
+Beginning with version 2.51, Dr. Nickalls's paper is included in the references
 directory of this package. Dr. Nickalls has also made his paper available at
 L<http://www.nickalls.org/dick/papers/maths/cubic1993.pdf>.
 
-This article is also available on L<http://www.2dcurves.com/cubic/cubic.html>,
-and there is a nice discussion of his method at
+This article is also available on 2dcurvses.com, L<http://www.2dcurves.com/cubic/cubic.html>,
+and there is a nice discussion of his method at S.O.S. Math,
 L<http://www.sosmath.com/algebra/factor/fac111/fac111.html>.
 
 Dick Nickalls, dick@nickalls.org
@@ -2363,9 +2378,9 @@ vectors.  It is included with this package in the C<eg> directory.
 =head2 The quartic
 
 The method for quartic solution is Ferrari's, as described in the web
-page Karl's Calculus Tutor at L<http://www.karlscalculus.org/quartic.html>.
+page Encyclopedia of Mathematics at L<https://www.encyclopediaofmath.org/index.php/Ferrari_method>.
 I also made use of some short cuts mentioned in web page Ask Dr. Math FAQ,
-at L<http://forum.swarthmore.edu/dr.math/faq/faq.cubic.equations.html>.
+at L<http://mathforum.org/dr.math/faq/faq.cubic.equations.html>
 
 =head2 Quintic and higher.
 

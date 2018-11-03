@@ -3,9 +3,8 @@
 # Ease the life of the CPAN testers.
 exit 0 if $ENV{AUTOMATED_TESTING} && $] < 5.010000;
 
-require 5.010;
-
-use ExtUtils::MakeMaker;
+# EU::MM 6.5503 is the first version to understand *_REQUIRES.
+use ExtUtils::MakeMaker 6.5503;
 
 my $master = 'lib/Data/iRealPro.pm';
 my $version = MM->parse_version($master);
@@ -42,8 +41,24 @@ WriteMakefile
  META_MERGE => {
      'meta-spec' => { version => 2 },
      resources        => {
-	 repository => "https://github.com/sciurius/perl-Data-iRealPro",
+	 repository => {
+		type => 'git',
+		url  => "https://github.com/sciurius/perl-Data-iRealPro.git",
+		web  => "https://github.com/sciurius/perl-Data-iRealPro",
+	 },
 	 bugtracker => "https://github.com/sciurius/perl-Data-iRealPro/issues",
+     },
+     provides => {
+	 irealcvt => { file => "script/irealcvt",
+		       version => $version },
+	 "Data::iRealPro"
+		  => { file => "lib/Data/iRealPro.pm",
+		       version => $version },
+     },
+     no_index => {
+         directory => [
+	    "lib/Data/iRealPro",
+	 ],
      },
  },
 

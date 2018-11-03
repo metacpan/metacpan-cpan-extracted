@@ -10,11 +10,13 @@ sub action{
     my ($self) = @_;
 
     my $search = $self->param->{search} || {};
-    my $rs = $self->sm->schema->resultset($self->param->{table})->search($search);
+    my $rs = $self->sm->table($self->param->{table},'plan')->search($search);
 
     return +TaskPipe::Iterator->new(
-        next => sub{ 
-            return { +$rs->next->get_columns }; 
+        next => sub{
+            my $next = $rs->next;
+            $next = { $next->get_columns } if $next;
+            return $next;
         },
         count => sub{ $rs->count },
         reset => sub{ $rs->reset }

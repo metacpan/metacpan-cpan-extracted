@@ -19,7 +19,7 @@ has option_specs => (is => 'ro', isa => 'ArrayRef', default => sub{[
     },
     'TaskPipe::PathSettings::Project',
     'TaskPipe::SchemaManager::Settings_Global',
-    'TaskPipe::JobManager::Settings', {
+    {
         module => 'TaskPipe::TorManager::Settings',
         exclude => [
             'protocols'

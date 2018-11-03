@@ -1,5 +1,8 @@
 Revision history for Date::Exception
 
+0.05  2018-11-01T16:50:00+01:00
+      - Used namespace::autoclean now.
+
 0.04  2016-08-25T10:30:00+01:00
       - Updated copyright year information.
       - Tidied up Makefile.PL script.

@@ -48,6 +48,7 @@ has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', default => sub{
 
 has url => (is => 'rw', isa => 'Str');
 has page_content => (is => 'rw', isa => 'Str');
+has status => (is => 'rw', isa => 'Str');
 
 
 
@@ -55,8 +56,11 @@ has page_content => (is => 'rw', isa => 'Str');
 sub scrape{
     my ($self) = @_;
 
+    #$self->log_mem("Top of scrape                       ");
     my $scraped = $self->ws->scrape( $self->page_content, $self->url ) || [];
+    #$self->log_mem("After ws scrape                     ");
     $scraped = $self->post_process( $scraped ) if $self->can('post_process');
+    #$self->log_mem("After post process                  ");
     confess "->ws should return an array ref, but instead returned a ".ref( $scraped ) unless ref( $scraped ) =~ /array/i;
     
     return $scraped;
@@ -74,12 +78,14 @@ sub _verbose_fail{
 sub action{
     my ($self) = @_;
 
+    #$self->log_mem("Top of action                       ");
     my $logger = Log::Log4perl->get_logger;  
 
     if ( ! $self->pinterp->{url} ){
         $self->_verbose_fail("url required but none provided") if $self->scrape_settings->require_url;
         return [];
     }
+
 
     $self->url( $self->pinterp->{url} );
     $logger->info("Getting ".$self->pinterp->{url});
@@ -94,25 +100,35 @@ sub action{
 
     }
 
+    #$self->log_mem("After request page content          ");
+
     my $scraped = $self->scrape;
+
+    #$self->log_mem("After scrape                        ");
+
     my $tries = 0;
 
     while( $self->url && $self->retry_condition( $scraped ) && $tries < $self->scrape_settings->max_retries ){
-
-        $self->ua_mgr->refresh;
+        #$self->ua_mgr->refresh;
         $self->request_page_content;
         $scraped = $self->scrape;
         $tries++;
+        $logger->debug("Retry $tries");
 
     }
 
     $self->_verbose_fail("Fail condition persisted despite ".$self->scrape_settings->max_retries." retry attempts") if $self->fail_condition( $scraped );
+
+    $self->ws( undef ) if defined $self->ws;
+    $self->page_content('');
+    #$self->log_mem("End of sub                          ");
     return $scraped;
 }
 
 
 sub retry_condition{ #override in child?
     my ($self,$scraped) = @_;
+    return 1 unless $self->status =~ /^200/;
     my $retry = 1;
     $retry = 0 if $scraped && @$scraped;
     return $retry;
@@ -120,6 +136,7 @@ sub retry_condition{ #override in child?
 
 sub fail_condition{
     my ($self,$scraped) = @_;
+    return 1 unless $self->status =~ /^200/;
 
     my $fail = 1;
     $fail = 0 if $scraped; # && @$scraped;
@@ -129,6 +146,8 @@ sub fail_condition{
 sub request_page_content{
     my ($self) = @_;
 
+    #$self->log_mem("top of request_page_content sub     ");
+    #$self->mu->record("request_page_content: at start") if $self->can('mu');
     my $logger = Log::Log4perl->get_logger;
 
     my $headers = $self->pinterp->{headers} || {};
@@ -139,13 +158,19 @@ sub request_page_content{
 
     }
 
+    #$self->mu->record("request_page_content: before set headers") if $self->can('mu');
     foreach my $header_name ( keys %$headers ){ 
         $self->ua_mgr->ua_handler->call('default_header',$header_name, $headers->{$header_name});
     }
 
+    #$self->log_mem("After default headers               ");
+
+    #$self->mu->record("request_page_content: before get") if $self->can('mu');
     my $content;
     my $resp = $self->ua_mgr->request( 'get', $self->url );
+    #$self->mu->record("request_page_content: after get") if $self->can('mu');
 
+    #$self->log_mem("After request                       ");
     if ( ! $resp || ! $resp->is_success ){
 
         my $message = "Request to ".$self->url." failed. ";
@@ -159,11 +184,20 @@ sub request_page_content{
                     
     }
 
+    #$self->log_mem("After test resp                     ");
+    #$self->mu->record("request_page_content: after is_success") if $self->can('mu');
+
     if ( $content ){
         $self->page_content( $content );
     } else {
         $self->page_content( '' );
     }
+
+    my $status = '400';
+    $status = $resp->status_line if $resp;
+    $self->status( $status );
+    #$self->mu->record("request_page_contetn: at end") if $self->can('mu');
+    #$self->log_mem("End of request_page_content sub     ");
 
 }
 

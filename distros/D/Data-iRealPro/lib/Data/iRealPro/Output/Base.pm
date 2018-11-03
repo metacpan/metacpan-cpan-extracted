@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Mon Oct  3 08:13:17 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar  7 11:25:47 2017
-# Update Count    : 31
+# Last Modified On: Thu Nov  1 21:08:55 2018
+# Update Count    : 32
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -17,8 +17,6 @@ use Carp;
 use utf8;
 
 package Data::iRealPro::Output::Base;
-
-our $VERSION = "1.03";
 
 sub new {
     my ( $pkg, $options ) = @_;

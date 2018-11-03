@@ -1,7 +1,9 @@
 package TaskPipe::PathSettings::Global;
 
 use Moose;
+use Moose::Util::TypeConstraints;
 use Cwd 'abs_path';
+use File::Path::Expand;
 with 'MooseX::ConfigCascade';
 
 
@@ -55,11 +57,11 @@ has default_home_filename => (is => 'ro', isa => 'Str', default => '.taskpipe');
 
 =item root_dir
 
-The taskpipe root directory
+The taskpipe root directory. This is normally set from the file found in your home directory (see C<home_filename>), if it is not explicitly provided.
 
 =cut
 
-has root_dir => (is => 'ro', isa => 'Str');
+has root_dir => (is => 'ro', isa => 'Str', trigger => sub { $_[0]->{root_dir} = expand_filename( $_[1] ) });
 
 
 =item project_dir

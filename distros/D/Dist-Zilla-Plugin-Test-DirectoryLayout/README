@@ -1,0 +1,22 @@
+METHODS
+
+    Currently we have only one multi-value option: add_dir.
+
+    If additional directories are configured these are added to the list of
+    allowed directories.
+
+    Then we test the directory layout.
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 3:
+
+      Unknown directive: =method
+
+    Around line 7:
+
+      Unknown directive: =method
+

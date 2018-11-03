@@ -7,8 +7,6 @@ use utf8;
 
 package Data::iRealPro::Input::MusicXML;
 
-our $VERSION = '0.08';
-
 use XML::LibXML;
 #use DDumper;
 use Encode qw( decode_utf8 encode_utf8 );

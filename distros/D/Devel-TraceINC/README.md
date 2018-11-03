@@ -4,7 +4,7 @@ Devel::TraceINC - Trace who is loading which perl modules
 
 VERSION
 =======
-version 1.100851
+version 1.100852
 
 SYNOPSIS
 ========

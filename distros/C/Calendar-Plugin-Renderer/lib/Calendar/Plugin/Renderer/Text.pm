@@ -1,6 +1,6 @@
 package Calendar::Plugin::Renderer::Text;
 
-$Calendar::Plugin::Renderer::Text::VERSION   = '0.13';
+$Calendar::Plugin::Renderer::Text::VERSION   = '0.14';
 $Calendar::Plugin::Renderer::Text::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Plugin::Renderer::Text - Interface to render calendar in text format.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'start_index' => (is => 'ro', required => 1);
 has 'month_name'  => (is => 'ro', required => 1);

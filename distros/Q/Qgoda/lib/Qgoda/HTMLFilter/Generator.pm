@@ -17,12 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::HTMLFilter::Generator;
-$Qgoda::HTMLFilter::Generator::VERSION = 'v0.9.2';
+$Qgoda::HTMLFilter::Generator::VERSION = 'v0.9.3';
 use strict;
 
 use Qgoda;
-
-use base qw(Qgoda::Processor);
 
 sub new {
     my ($class, %args) = @_;
@@ -43,8 +41,8 @@ sub end {
     $args{output} =~ /([ \t]*)/;
     my $head_indent = $1;
 
-    my $content = "Qgoda $Qgoda::VERSION (http://www.qgoda.net/)";
-    my $version = qq{<meta name="generator" content="$content" />};
+    my $generator = Qgoda->new->config->{generator};
+    my $version = qq{<meta name="generator" content="$generator" />};
 
     $chunk = $self->{__indent} . "$version\n$head_indent$chunk";
 

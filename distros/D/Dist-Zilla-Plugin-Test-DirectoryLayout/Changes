@@ -1,0 +1,21 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+0.002     2018-11-02 15:17:36 Europe/Berlin
+
+0.002     2018-09-20 18:09:17 Europe/Berlin
+
+	[Added]
+
+	Introduced configuration directive 'add_dir' to allow
+	additional directories.
+
+0.001     2018-09-20 11:15:04 Europe/Berlin
+
+	[Added]
+
+	Initial version with first implementation.

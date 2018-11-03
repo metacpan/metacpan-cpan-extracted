@@ -1,8 +1,19 @@
 
 
+1.843 2 November 2018
+
+   * hints file (sourced from
+     http://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/lang/perl5/files/)
+     Highlighed by Sevan Janiyan <venture37@geeklan.co.uk>
+
+        hints/bitrig.pl
+        hints/netbsd.pl
+        hints/minix.pl
+        hints/openbsd.pl
+
 1.842 14 July 2018
 
-   * Document the MaocOS build failures & how MacPort can work around th eissue.
+   * Document the MaocOS build failures & how MacPort can work around the issue.
      # 125238
      # 125585
      # RT 133280

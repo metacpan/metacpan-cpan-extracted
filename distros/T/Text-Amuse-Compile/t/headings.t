@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 222;
+use Test::More tests => 248;
 use Text::Amuse::Compile;
 use Text::Amuse::Compile::TemplateOptions;
 use Text::Amuse::Compile::Utils qw/read_file write_file/;
@@ -53,6 +53,8 @@ my $muse =<< "MUSE";
 #subtitle My subtitle
 #author My author
 
+* This is a part
+
 $random
 
 ** This is a chapter
@@ -64,6 +66,10 @@ $random
 $random
 
 **** this is a subsection
+
+$random
+
+* This is a part (2)
 
 $random
 

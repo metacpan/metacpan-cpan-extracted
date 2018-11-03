@@ -4,7 +4,7 @@
       "Guido Flohr <guido.flohr@cantanea.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -34,6 +34,7 @@
             "AnyEvent::Loop" : "0",
             "Archive::Extract" : "0",
             "Carp" : "0",
+            "Cpanel::JSON::XS" : "0",
             "Cwd" : "0",
             "Data::Dumper" : "0",
             "Data::Walk" : "2.00",
@@ -50,6 +51,7 @@
             "File::Path" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "Filter::Util::Call" : "0",
             "Getopt::Long" : "2.36",
             "Git" : "0",
             "HTML::Parser" : "0",
@@ -61,7 +63,9 @@
             "IPC::Open3" : "0",
             "IPC::Signal" : "0",
             "Inline" : "0",
-            "JSON" : "0",
+            "JSON" : "2.0",
+            "JSON::PP" : "0",
+            "JavaScript::Duktape::XS" : "0",
             "LWP::UserAgent" : "0",
             "List::Util" : "1.45",
             "Locale::Messages" : "0",
@@ -92,10 +96,13 @@
             "URI::file" : "0",
             "URI::http" : "0",
             "YAML" : "0",
-            "YAML::XS" : "0",
+            "YAML::XS" : "0.67",
             "base" : "0",
+            "boolean" : "0",
+            "constant" : "0",
             "integer" : "0",
             "overload" : "0",
+            "perl" : "5.018",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0"
@@ -103,7 +110,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Time::Local" : "0"
          }
       }
    },
@@ -119,7 +127,8 @@
          "web" : "http://github.com/gflohr/qgoda.git"
       }
    },
-   "version" : "v0.9.2",
+   "version" : "v0.9.3",
+   "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

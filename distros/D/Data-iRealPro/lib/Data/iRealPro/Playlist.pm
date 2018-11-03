@@ -6,8 +6,6 @@ use Carp;
 
 package Data::iRealPro::Playlist;
 
-our $VERSION = "1.00";
-
 use Data::iRealPro::Song;
 
 sub new {

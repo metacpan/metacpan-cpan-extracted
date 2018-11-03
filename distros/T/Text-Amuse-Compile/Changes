@@ -1,5 +1,14 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.24 2018-11-01
+
+ - New heading style: part_chapter
+ - New option: typearea dimensions
+ - New options: tex_tolerance, tex_emergencystretch, fussy_last_word, ignore_cover
+ - New experimental feature: magic comments (not documented)
+ - New option: format_id, to be passed down to the template.
+ - Refactor the LaTeX fontspec loading using filenames when possible.
+
 1.23 2018-09-22
 
  - Report overfull boxes

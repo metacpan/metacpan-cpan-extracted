@@ -20,8 +20,9 @@ sub interp{
     return undef unless defined $i;
 
     $i += $self->parts->match_offset;
+    $i += $self->match_adjustment if $self->can('match_adjustment');
  
-    return undef if $i > scalar(@{$self->param_history});
+    return undef if ($i > scalar(@{$self->param_history}) || $i < 0 );
 
     my $input_i;
 

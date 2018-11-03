@@ -24,7 +24,7 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jgamble/Math-Polynomial-Solve.git
-version: '2.85'
+version: '2.86'
 x_keyword:
   - math
   - polynomial
@@ -33,6 +33,7 @@ x_keyword:
   - quartic
   - matrix
   - companion-matrix
+  - polynomial-zeros
   - Sturm
   - Nickalls
   - Ferrari

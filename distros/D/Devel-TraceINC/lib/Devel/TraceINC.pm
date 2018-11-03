@@ -3,30 +3,31 @@ use strict;
 use warnings;
 
 package Devel::TraceINC;
-our $VERSION = '1.100851';
+our $VERSION = '1.100852';
 # ABSTRACT: Trace who is loading which perl modules
 
 # a base package for sticky arrays; see this on CPAN
 BEGIN {
-    package Array::Sticky;
-    
+    package              # newline to hide this inline package from the PAUSE indexer
+      Array::Sticky;
+
     sub TIEARRAY {
       my ($class, %args) = @_;
-    
+
       my $self = bless +{
         head => [ @{ $args{head} || [] } ],
         body => [ @{ $args{body} || [] } ],
         tail => [ @{ $args{tail} || [] } ],
       }, $class;
-    
+
       return $self;
     }
-    
+
     sub POP { pop @{shift()->{body}} }
     sub PUSH { push @{shift()->{body}}, @_ }
     sub SHIFT { shift @{shift()->{body}} }
     sub UNSHIFT { unshift @{shift()->{body}}, @_ }
-    
+
     sub CLEAR {
       my ($self) = @_;
       @{$self->{body}} = ();
@@ -37,52 +38,52 @@ BEGIN {
       my @serial = $self->serial;
       return exists $serial[$index];
     }
-    
+
     sub serial {
       my ($self) = @_;
       return map { @{$self->{$_}} } qw(head body tail);
     }
-    
+
     sub STORE {
       my ($self, $index, $value) = @_;
       $self->{body}[$index] = $value;
     }
-    
+
     sub SPLICE {
       my $self = shift;
       my $offset = shift || 0;
       my $length = shift; $length = $self->FETCHSIZE if ! defined $length;
-    
+
       # avoid "splice() offset past end of array"
       no warnings;
-    
+
       return splice @{$self->{body}}, $offset, $length, @_;
     }
-    
+
     sub FETCHSIZE {
       my $self = shift;
-    
+
       my $size = 0;
       my %size = $self->sizes;
-    
+
       foreach (values %size) {
         $size += $_;
       }
-    
+
       return $size;
     }
-    
+
     sub sizes {
       my $self = shift;
       return map { $_ => scalar @{$self->{$_}} } qw(head body tail);
     }
-    
+
     sub FETCH {
       my $self = shift;
       my $index = shift;
-    
+
       my %size = $self->sizes;
-    
+
       foreach my $slot (qw(head body tail)) {
         if ($size{$slot} > $index) {
           return $self->{$slot}[$index];
@@ -90,14 +91,15 @@ BEGIN {
           $index -= $size{$slot};
         }
       }
-    
+
       return $self->{body}[$size{body} + 1] = undef;
     }
 }
 
 # also from CPAN
 BEGIN {
-    package Array::Sticky::INC;
+    package              # newline to hide this inline package from the PAUSE indexer
+			Array::Sticky::INC;
 
     sub make_sticky { tie @INC, 'Array::Sticky', head => [shift @INC], body => [@INC] }
 }

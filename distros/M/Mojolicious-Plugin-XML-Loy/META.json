@@ -4,7 +4,7 @@
       "Nils Diewald"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -34,20 +34,25 @@
       "runtime" : {
          "requires" : {
             "Mojolicious" : "5.81",
-            "XML::Loy" : "0.38",
+            "XML::Loy" : "0.45",
             "perl" : "5.010001"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-XML-Loy/issues"
+      },
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
       "repository" : {
-         "url" : "https://github.com/Akron/Mojolicious-Plugin-XML-Loy"
+         "type" : "git",
+         "url" : "https://github.com/Akron/Mojolicious-Plugin-XML-Loy.git",
+         "web" : "https://github.com/Akron/Mojolicious-Plugin-XML-Loy"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -5,8 +5,6 @@ use warnings;
 
 package Data::iRealPro::Input::MusicXML::Data;
 
-our $VERSION = "0.01";
-
 use parent qw( Exporter );
 
 our @EXPORT;

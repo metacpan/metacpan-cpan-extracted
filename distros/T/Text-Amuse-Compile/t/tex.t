@@ -44,7 +44,7 @@ test_file($file_no_toc, {
           qr/DIV=9/,
           qr/fontsize=11pt/,
           qr/mainlanguage\{croatian\}/,
-          qr/\\setmainfont\[Script=Latin\]\{CMU Serif\}/,
+          qr/\\setmainfont\{CMU Serif\}\[Script=Latin\]/,
           qr/paper=5.5in:8.5in/,
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
           qr/document\}\s*\\hyphenation\{\s*a-no-ther\ste-st\s*}/s,
@@ -73,7 +73,7 @@ test_file($file_no_toc, {
                          twoside => 1,
                         }, [
           qr/\\end\{center\}\s*\\vskip 3em\s*\\par\s*\w/s,
-          qr/\\setmainfont\[Script=Latin\]\{Iwona\}/,
+          qr/\\setmainfont\{Iwona\}\[Script=Latin\]/,
           qr/\n\s+twoside\,\%\n/s,
           qr/BCOR=0mm/,
           qr/ifthispageodd/,
@@ -106,7 +106,7 @@ test_file($file_with_toc, {
           qr/\n\s+oneside\,\%\n/s,
           qr/^\\setmainlanguage\{russian\}/m,
           qr/\\renewcaptionname\{russian\}\{\\contentsname\}\{Содржина\}/,
-          qr/\\russianfont\[Script=Cyrillic\]\{CMU\sSerif\}/,
+          qr/\\russianfont\{CMU\sSerif\}\[Script=Cyrillic\]/,
           qr/paper=210mm:11in/,
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
                              ]
@@ -170,10 +170,14 @@ test_file({
           qr/mainlanguage\{russian}.*selectlanguage\{croatian}.*selectlanguage\{russian}/s,
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
           qr/\\setmainlanguage\{russian\}\s*
-             \\newfontfamily\s*
-             \\russianfont\[Script=Cyrillic\]\{CMU\sSerif\}\s*
              \\setotherlanguages\{croatian\}\s*
-             \\renewcaptionname\{russian\}\{\\contentsname\}\{Содржина\}/sx,
+             \\setmainfont\{CMU\sSerif\}\[Script=Cyrillic\]\s*
+             .*
+             \\newfontfamily\s*
+             \\russianfont\{CMU\sSerif\}\[Script=Cyrillic\]\s*
+             \\renewcaptionname\{russian\}\{\\contentsname\}\{Содржина\}
+             .*
+             \\usepackage\{perpage\}/sx,
              ],
          );
 
@@ -193,8 +197,12 @@ test_file({
           qr/russian/,
           qr/\\setmainlanguage\{croatian\}\s*
              \\setotherlanguages\{russian\}\s*
+             .*
              \\newfontfamily\s*
-             \\russianfont\[Script=Cyrillic\]\{CMU\sSerif\}/sx
+             \\russianfont\{CMU\sSerif\}\[Script=Cyrillic\]
+             .*
+             \\usepackage\{perpage\}
+            /sx
           ],
          );
 

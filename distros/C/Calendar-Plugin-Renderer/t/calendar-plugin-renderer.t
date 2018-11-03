@@ -4,7 +4,7 @@ package T;
 
 use File::Temp qw(tempfile tempdir);
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 with 'Calendar::Plugin::Renderer';
 
 sub calendar_bahai {

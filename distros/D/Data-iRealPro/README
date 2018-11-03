@@ -49,17 +49,15 @@ perldoc command.
 
     perldoc Data::iRealPro
 
-You can also look for information at:
+The development of this module is hosted on GitHub, repository
+https://github.com/sciurius/perl-Data-iRealPro.
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-iRealPro
-
-    Search CPAN
-        http://search.cpan.org/dist/Data-iRealPro
+Please report any bugs or feature requests to the GitHub issue tracker,
+https://github.com/sciurius/perl-Data-iRealPro/issues.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013,2016 Johan Vromans
+Copyright (C) 2013,2018 Johan Vromans
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

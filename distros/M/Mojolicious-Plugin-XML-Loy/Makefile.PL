@@ -15,16 +15,25 @@ WriteMakefile(
   },
   PREREQ_PM => {
     'Mojolicious' => 5.81,
-    'XML::Loy' => 0.38
+    'XML::Loy' => 0.45
   },
   LICENSE      => 'artistic_2',
-  META_MERGE   => {
-    requires  => {perl => '5.010001'},
+    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+    'meta-spec' => { version => 2 },
+    requires  => { perl => '5.010001' },
     resources => {
       license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
-      repository  => 'https://github.com/Akron/Mojolicious-Plugin-XML-Loy'
+      repository  => {
+        type => 'git',
+        web => 'https://github.com/Akron/Mojolicious-Plugin-XML-Loy',
+        url => 'https://github.com/Akron/Mojolicious-Plugin-XML-Loy.git',
+      },
+      bugtracker  => {
+        web => 'https://github.com/Akron/Mojolicious-Plugin-XML-Loy/issues',
+      },
     }
-  },
+  }) : (),
+  ),
   MIN_PERL_VERSION => '5.010001',
   test => {TESTS => 't/*.t'}
 );

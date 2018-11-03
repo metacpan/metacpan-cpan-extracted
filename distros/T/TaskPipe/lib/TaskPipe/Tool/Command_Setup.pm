@@ -95,15 +95,15 @@ sub execute{
 
             $self->pod_reader->message( qq|=pod
 
-    The file $home_fp already seems to exist on your system. Did you set up TaskPipe already? If you are sure TaskPipe has not already been set up, or you need a fresh install, you should delete this file.
+The file $home_fp already seems to exist on your system. Did you set up TaskPipe already? If you are sure TaskPipe has not already been set up, or you need a fresh install, you should delete this file.
 
-    If this file exists because some other process created it, you will need to change the default filename which TaskPipe looks for in your home directory. You can do this by including the C<--home_filename> parameter on the command line:
+If this file exists because some other process created it, you will need to change the default filename which TaskPipe looks for in your home directory. You can do this by including the C<--home_filename> parameter on the command line:
 
         taskpipe --home_filename=.new_taskpipe_home_file
 
-    Note that the C<--home_filename> parameter B<will change this filename system wide>. ie B<all users> will be affected by the change, so use with caution.
+Note that the C<--home_filename> parameter B<will change this filename system wide>. ie B<all users> will be affected by the change, so use with caution.
 
-    =cut|);
+|);
             exit;
 
         }

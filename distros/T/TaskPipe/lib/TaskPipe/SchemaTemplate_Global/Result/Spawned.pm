@@ -6,7 +6,7 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
-
+__PACKAGE__->load_components("InflateColumn::DateTime");
 __PACKAGE__->table("spawned");
 
 __PACKAGE__->add_columns(
@@ -48,7 +48,7 @@ TaskPipe::SchemaTemplate_Global::Result::Spawned - global schema template for C<
 
 =head1 DESCRIPTION
 
-Schema Template for the tor_thread table
+Schema Template for the spawned table
 
 =head1 AUTHOR
 

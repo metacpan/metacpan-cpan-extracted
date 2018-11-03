@@ -1,6 +1,6 @@
 package Calendar::Plugin::Renderer::SVG;
 
-$Calendar::Plugin::Renderer::SVG::VERSION   = '0.13';
+$Calendar::Plugin::Renderer::SVG::VERSION   = '0.14';
 $Calendar::Plugin::Renderer::SVG::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Plugin::Renderer::SVG - Interface to render calendar in SVG format.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -24,7 +24,7 @@ use Calendar::Plugin::Renderer::SVG::Label;
 
 use SVG;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'days'          => (is => 'ro', required => 1);
 has 'month_name'    => (is => 'ro', required => 1);

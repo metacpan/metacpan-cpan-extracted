@@ -17,17 +17,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Command::Config;
-$Qgoda::Command::Config::VERSION = 'v0.9.2';
+$Qgoda::Command::Config::VERSION = 'v0.9.3';
 use strict;
 
 use Qgoda;
 
 use base 'Qgoda::Command';
 
-sub _getDefaults { processor => 'Markdown' }
+sub _getDefaults {}
 
-sub _getOptionSpecs {
-}
+sub _getOptionSpecs {}
 
 sub _run {
     my ($self, $args, $global_options, %options) = @_;
@@ -36,7 +35,7 @@ sub _run {
     delete $global_options->{verbose};
     $global_options->{log_stderr} = 1;
 
-    Qgoda->new($global_options)->dumpConfig;
+    Qgoda->new($global_options)->printConfig;
 
     return $self;
 }
@@ -49,7 +48,7 @@ qgoda config - Dump the Qgoda configuration
 
 =head1 SYNOPSIS
 
-qgoda config [<global options>]
+qgoda [<global options>] config [--help]
 
 Try 'qgoda --help' for a description of global options.
 

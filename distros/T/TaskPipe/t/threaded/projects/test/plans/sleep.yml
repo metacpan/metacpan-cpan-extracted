@@ -1,0 +1,6 @@
+---
+-   _name: SeparateArray
+    array: 1..100
+
+-   _name: Sleep
+    delay: $this{li}

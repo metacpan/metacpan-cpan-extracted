@@ -1,0 +1,2 @@
+$cmds{mainprojid}{cmd}="GET http://controller:35357/v3/projects[?]name=tagprojectid";
+$cmds{mainprojid}{result}={projects => [{id => 2}]};

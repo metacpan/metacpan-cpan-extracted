@@ -13,10 +13,11 @@ bin/goauth
 cpanfile
 dist.ini
 examples/README.md
+examples/cloudstorage_bucket_example.pl
 examples/discovery_example.pl
 examples/gmail_example.pl
-examples/mojo_ua_mocking_test.pl
 examples/text_to_speech.pl
+examples/translation_example.pl
 examples/usage_basic_examples.pl
 lib/WebService/GoogleAPI/Client.pm
 lib/WebService/GoogleAPI/Client/AuthStorage.pm

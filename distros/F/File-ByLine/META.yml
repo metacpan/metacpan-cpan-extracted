@@ -23,10 +23,10 @@ name: File-ByLine
 provides:
   File::ByLine:
     file: lib/File/ByLine.pm
-    version: '1.182370'
+    version: '1.183060'
   File::ByLine::Object:
     file: lib/File/ByLine/Object.pm
-    version: '1.182370'
+    version: '1.183060'
 recommends:
   Parallel::WorkUnit: '2.181850'
 requires:
@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/File-ByLine/issues
   repository: git://github.com/jmaslak/File-ByLine.git
-version: '1.182370'
+version: '1.183060'
 x_contributor_covenant:
   version: 0.02
 x_serialization_backend: 'YAML::Tiny version 1.70'

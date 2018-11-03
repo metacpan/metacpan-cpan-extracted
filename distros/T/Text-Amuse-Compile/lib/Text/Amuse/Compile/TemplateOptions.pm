@@ -3,7 +3,7 @@ package Text::Amuse::Compile::TemplateOptions;
 use utf8;
 use strict;
 use warnings FATAL => 'all';
-use Types::Standard qw/Str Bool Enum StrMatch/;
+use Types::Standard qw/Str Bool Enum StrMatch Int is_Int/;
 use Pod::Usage qw//;
 use File::Spec;
 use Moo;
@@ -54,6 +54,14 @@ and oneside=true for the planin version in this case.
 The DIV of the C<typearea> package. Defaults to 12. Go and read the
 doc. Sensible values are from 9 to 15. 15 has narrow margins, while in
 9 they are pretty generous.
+
+=item * areaset_width 3in
+
+=item * areaset_height 50mm
+
+Usually you want to use the DIV factor, but you can also set the type
+area manually specifying the dimensions. The dimensions can be in mm,
+cm, in and pt, separated by a colon.
 
 =item * oneside (boolean)
 
@@ -121,12 +129,28 @@ sub tex_papersize {
     return _get_papersize($self->papersize);
 }
 
+sub _is_tex_measure {
+    die "$_[0] is not a TeX measure"
+      unless $_[0] =~ TEX_MEASURE;
+}
+
+sub _is_tex_measure_or_false {
+    _is_tex_measure($_[0]) if $_[0];
+}
+
+sub _is_tex_tolerance {
+    die "tolerance needs to be between 0 and 1000"
+      unless is_Int($_[0]) && $_[0] > -1 && $_[0] < 10_001;
+}
+
+has areaset_width => (is => 'rw',
+                      isa => \&_is_tex_measure_or_false);
+
+has areaset_height => (is => 'rw',
+                       isa => \&_is_tex_measure_or_false);
 
 has bcor => (is => 'rw',
-             isa => sub {
-                 die "Bcor $_[0] must be a measure like 11mm"
-                   unless $_[0] =~ TEX_MEASURE;                 
-             },
+             isa => \&_is_tex_measure,
              default => sub { '0mm' });
 
 has division   => (is => 'rw',
@@ -320,6 +344,10 @@ width.
 Force the use of the LaTeX article class. If there are chapters
 present, consider them aliases for a section.
 
+=item * ignore_cover
+
+Ignore the cover unconditionally
+
 =item * notoc
 
 Do not generate a table of contents, even if the document requires
@@ -431,6 +459,8 @@ has coverwidth => (is => 'rw',
                    default => sub { 1 });
 
 has nocoverpage => (is => 'rw', isa => Bool, default => sub { 0 });
+has ignore_cover => (is => 'rw', isa => Bool, default => sub { 0 });
+
 has notoc       => (is => 'rw', isa => Bool, default => sub { 0 });
 has nofinalpage => (is => 'rw', isa => Bool, default => sub { 0 });
 has impressum => (is => 'rw', isa => Bool, default => sub { 0 });
@@ -449,6 +479,10 @@ sub all_headings {
                     {
                      name => '0',
                      desc => 'None',
+                    },
+                    {
+                     name => 'part_chapter',
+                     desc => 'Part and chapter. If one side document: part.',
                     },
                     {
                      name => 'title_subtitle',
@@ -580,6 +614,90 @@ has beamercolortheme => (is => 'rw',
                          isa => Enum[ __PACKAGE__->beamer_colorthemes ],
                          default => sub { __PACKAGE__->default_beamercolortheme });
 
+=head2 Advanced
+
+=over 4
+
+=item * tex_tolerance
+
+An integer between 0 and 10000
+
+Quoting: a parameter that tells TeX how much badness is allowable
+without error. Default to 200.
+
+\tolerance sets the maximum "badness" that tex is allowed to use while
+setting the paragraph, that is it inserts breakpoints allowing white
+space to stretch and penalties to be taken, so long as the badness
+keeps below this threshold. If it can not do that then you get
+overfull boxes. So different values produce different typeset result.
+
+=item * tex_emergencystretch
+
+Default to 30pt. It can be a TeX measure (I guess pt is what makes
+most sense for our use)
+
+\emergencystretch (added at TeX3) is used if TeX can not set the
+paragraph below the \tolerance badness, but rather than make overfull
+boxes it tries an extra pass "pretending" that every line has an
+additional \emergencystretch of stretchable glue, this allows the
+overall badness to be kept below 1000 and stops TeX "giving up" and
+putting all stretch into one line. So \emergencystretch does not
+change the setting of "good" paragraphs, it only changes the setting
+of paragraphs that would have produced over-full boxes. Note that you
+get warnings about the real badness calculation from TeX even though
+it retries with \emergencystretch the extra stretch is used to control
+the typesetting but it is not considered as good for the purposes of
+logging.
+
+See L<https://tex.stackexchange.com/questions/241343/what-is-the-meaning-of-fussy-sloppy-emergencystretch-tolerance-hbadness> for reference.
+
+=item * fussy_last_word
+
+Avoid breking the last word of a paragraph. This sounds great, but if
+you have short paragraphs (say, on line, or the text is full of
+dialogs), this is going to be a big problem, generating really bad
+lines.
+
+=item * format_id
+
+This does nothing per se but makes C<safe_options.format_id.$name>
+accessible in the template.
+
+This is useful if you have a local latex.tt template which needs to do
+different things with different formats, so you can call:
+
+  [% IF safe_options.format_id.c999 %]
+  Output 1
+  [% ELSE %]
+  Output 2
+  [% END %]
+
+If not specified, C<DEFAULT> is set.
+
+The value must begin with a letter and have only letters, digits and
+underscores.
+
+=back
+
+=cut
+
+has tex_tolerance => (is => 'rw',
+                  isa => \&_is_tex_tolerance,
+                  default => sub { 200 });
+
+has tex_emergencystretch => (is => 'rw',
+                             isa => \&_is_tex_measure,
+                             default => sub { '30pt' }, # more or less 3em
+                            );
+
+has fussy_last_word => (is => 'rw',
+                        isa => Bool,
+                        default => sub { 0 });
+
+has format_id => (is => 'rw',
+                  isa => StrMatch[ qr{\A[a-zA-Z][a-zA-Z0-9_]+\z} ],
+                  default => sub { 'DEFAULT' });
+
 =head1 METHODS
 
 =head2 paging
@@ -619,9 +737,15 @@ sub paging {
 
 sub config_setters {
     return (qw/papersize bcor division oneside twoside
+               areaset_width
+               areaset_height
                mainfont sansfont monofont fontsize
                sitename siteslogan site logo
+               tex_emergencystretch
+               tex_tolerance
+               fussy_last_word
                headings
+               ignore_cover
                cover coverwidth nocoverpage notoc
                nofinalpage
                impressum sansfontsections
@@ -631,6 +755,7 @@ sub config_setters {
                continuefootnotes
                centerchapter
                centersection
+               format_id
                opening beamertheme beamercolortheme/);
 }
 
@@ -653,6 +778,9 @@ sub config_output {
                 $out{headings} = { $value => 1 };
             }
         }
+        elsif ($method eq 'format_id') {
+            $out{format_id} = { $self->format_id => 1 };
+        }
         else {
             $out{$method} = $self->$method;
         }
@@ -665,6 +793,7 @@ sub show_options {
                                              ACCESSORS/Fonts
                                              ACCESSORS/Colophon
                                              ACCESSORS/Cover
+                                             ACCESSORS/Advanced
                                              ACCESSORS/Slides
                                            )],
                             -input => __FILE__,

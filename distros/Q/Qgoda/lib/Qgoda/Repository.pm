@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Repository;
-$Qgoda::Repository::VERSION = 'v0.9.2';
+$Qgoda::Repository::VERSION = 'v0.9.3';
 use strict;
 
 use Locale::TextDomain qw(qgoda);
@@ -148,31 +148,31 @@ sub fetch {
 }
 
 package URI::git;
-$URI::git::VERSION = 'v0.9.2';
+$URI::git::VERSION = 'v0.9.3';
 use strict;
 
 use base qw(URI::http);
 
 package URI::git_Phttp;
-$URI::git_Phttp::VERSION = 'v0.9.2';
+$URI::git_Phttp::VERSION = 'v0.9.3';
 use strict;
 
 use base qw(URI::git);
 
 package URI::git_Phttps;
-$URI::git_Phttps::VERSION = 'v0.9.2';
+$URI::git_Phttps::VERSION = 'v0.9.3';
 use strict;
 
 use base qw(URI::git);
 
 package URI::git_Pssh;
-$URI::git_Pssh::VERSION = 'v0.9.2';
+$URI::git_Pssh::VERSION = 'v0.9.3';
 use strict;
 
 use base qw(URI::git);
 
 package URI::git_Pfile;
-$URI::git_Pfile::VERSION = 'v0.9.2';
+$URI::git_Pfile::VERSION = 'v0.9.3';
 use strict;
 
 use base qw(URI::file);

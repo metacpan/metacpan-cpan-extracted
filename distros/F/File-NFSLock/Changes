@@ -1,5 +1,9 @@
 Revision history for Perl extension File::NFSLock.
 
+1.28  Nov 01 10:00 2018
+        - Patch RT#130467 and RT#120088:
+        - Handle "." not in @INC
+
 1.27  Nov 12 13:00 2014
         - RT#99431:
         - More Win32 compatibility fixes in test suite.

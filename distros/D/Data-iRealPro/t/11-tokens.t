@@ -43,6 +43,7 @@ my $exp =
    style	   => "Rock Ballad",
    title	   => "You're Still The One",
    transpose	   => 0,
+   _transpose	   => 0,
    variant	   => "irealpro",
    tokens => [
     'start repeat',

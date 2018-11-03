@@ -14,10 +14,10 @@ my $wd = File::Temp->newdir;
 
 my %files = ('file.ttf' => 'truetype',
              'fileuc.TTF' => 'truetype',
+             'fileuc.Ttf' => 'truetype',
+             'fileuc.Otf' => 'opentype',
              'fileuc.OTF' => 'opentype',
-             'file.otf' => 'opentype',
-             'file.woff' => 'woff',
-             'fileuc.WOFF' => 'woff');
+             'file.otf' => 'opentype');
 
 plan tests => scalar(keys %files) * 18 + 32;
 
@@ -58,9 +58,6 @@ foreach my $file (sort keys %files) {
         }
         elsif ($files{$file} eq 'opentype') {
             is $font->mimetype, 'application/x-font-opentype', 'mimetype ok';
-        }
-        elsif ($files{$file} eq 'woff') {
-            is $font->mimetype, 'application/font-woff', 'mimetype ok';
         }
         else {
             die "Not reached";

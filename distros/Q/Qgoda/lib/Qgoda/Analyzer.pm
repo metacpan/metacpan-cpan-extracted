@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Analyzer;
-$Qgoda::Analyzer::VERSION = 'v0.9.2';
+$Qgoda::Analyzer::VERSION = 'v0.9.3';
 use strict;
 
 use Locale::TextDomain qw('qgoda');
@@ -158,6 +158,10 @@ sub __fillPathInformation {
 
     my ($basename, @suffixes) = strip_suffix $filename;
     $asset->{basename} = $basename;
+
+    # For migration from Jekyll sites.
+    $basename =~ s/^[0-9]{4}-[0-9]{2}-[0-9]{2}-//;
+    $asset->{basename_nodate} = $basename;
 
     if (empty $asset->{chain}) {
         my $trigger = $site->getTrigger(@suffixes);

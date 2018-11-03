@@ -1,0 +1,11 @@
+Plack-Middleware-Debug-RefCounts
+================================
+
+Created:         2018-09-14
+Home page:       <https://metacpan.org/release/Plack-Middleware-Debug-RefCounts>
+Bug tracker:     <https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts/issues>
+Maintainer:      Grant Street Group <developers@grantstreet.com>
+
+0.90        2018-09-14
+
+    - Initial release

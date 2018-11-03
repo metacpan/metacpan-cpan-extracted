@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/nichtich/RDF-NS/issues
   homepage: https://github.com/nichtich/RDF-NS
   repository: https://github.com/nichtich/RDF-NS.git
-version: '20180227'
+version: '20181102'
 x_contributors:
   - 'Andreas Koenig <andk@cpan.org>'
   - 'Jakob Voss <jakob@nichtich.de>'

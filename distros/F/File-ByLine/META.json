@@ -69,11 +69,11 @@
    "provides" : {
       "File::ByLine" : {
          "file" : "lib/File/ByLine.pm",
-         "version" : "1.182370"
+         "version" : "1.183060"
       },
       "File::ByLine::Object" : {
          "file" : "lib/File/ByLine/Object.pm",
-         "version" : "1.182370"
+         "version" : "1.183060"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/jmaslak/File-ByLine"
       }
    },
-   "version" : "1.182370",
+   "version" : "1.183060",
    "x_contributor_covenant" : {
       "version" : 0.02
    },

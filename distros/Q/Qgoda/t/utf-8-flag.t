@@ -32,7 +32,7 @@ use Qgoda::Util qw(read_file);
 use Qgoda::CLI;
 
 my $content = <<EOF;
-<!--QGODA-NO-XGETTEXT-->[% USE q = Qgoda %]<!--/QGODA-NO-XGETTEXT-->
+<!--qgoda-no-xgettext-->[% USE q = Qgoda %]<!--/qgoda-no-xgettext-->
 
 config.title: [% config.title %]
 
@@ -84,8 +84,8 @@ ok $html =~ m{<p>config.title: Lots of €€</p>};
 if ($ENV{AUTHOR_TESTING}) {
     # Requires a German locale being installed.
     ok $html =~ m{<p>month: März</p>};
+    ok $html =~ m{<p>full date: März</p>};
 }
-ok $html =~ m{<p>full date: März</p>};
 ok $html =~ m{<p>37,2 °C am Morgen.</p>};
 
 $site->tearDown;

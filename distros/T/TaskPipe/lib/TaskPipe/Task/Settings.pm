@@ -7,7 +7,7 @@ with 'MooseX::ConfigCascade';
 
 TaskPipe::Task::Settings - Settings for L<TaskPipe::Task>
 
-=head1 METHODS
+=head1 OPTIONS
 
 =over
 
@@ -68,13 +68,46 @@ Cache xtask results. This prevents the same xtask (ie the same task with the sam
 has cache_results => (is => 'ro', isa => 'Bool', default => 0);
 
 
-=item threads
 
-The maximum number of threads to use when running a plan. Taskpipe tries to adhere strictly to the number of threads you specify here - so parent threads are included in the value. You should experiment with your setup to determine the optimum value for your system
+=item test_result_limit
+
+The maximum number of results to output when testing a task
 
 =cut
 
-has threads => (is => 'ro', isa => 'Int', default => 10);
+has test_result_limit => (is => 'ro', isa => 'Int', default => 10);
+
+
+
+
+=item seen_xbranch_policy
+
+Whether to remember xbranches that have been completed or not. TaskPipe can C<skip> seen xbranches (ie prevent them from being executed more than once) or C<delete> them (if they are not expected to be seen more than once, this option keeps the database trim)
+
+=cut
+
+has seen_xbranch_policy => (is => 'ro', isa => 'Str', default => 'delete');
+
+
+
+=item xbranch_key_mode
+
+Choose 'md5' to have taskpipe create xbranch identifiers using md5 hashes. Choose 'id' to use raw id values (less flexible, but also less CPU intensive)
+
+=cut
+
+has xbranch_key_mode => (is => 'ro', isa => 'Str', default => 'md5');
+
+
+
+=item resume_record_interval
+
+The number of records to process between recording resume information. For example C<resume_record_interval=1> would mean recording resume information every time a new record is processed. If C<resume_record_interval=100>, 100 records would be processed between recording resume information. This hits the database a lot less, but means after premature termination, the next run may repeat processing for up to 100 records
+
+=cut
+
+has resume_record_interval => (is => 'ro', isa => 'Int', default => '100');
+
 
 
 =item on_task_error

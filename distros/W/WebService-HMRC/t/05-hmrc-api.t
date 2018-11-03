@@ -26,7 +26,7 @@ To run these tests:
 
 =item * HMRC_SERVER_TOKEN environment variable must be set
 
-=item * HMRC_AUTH_CODE environment variable must be set
+=item * HMRC_ACCESS_TOKEN environment variable must be set
 
 =item * The HMRC sandbox test api endpoints must be functioning
 
@@ -40,8 +40,8 @@ SKIP: {
         'environment variable HMRC_SERVER_TOKEN is not set',
         $skip_count,
     );
-    my $authorisation_code = $ENV{HMRC_AUTH_CODE} or skip (
-        'environment variable HMRC_AUTH_CODE is not set',
+    my $access_token = $ENV{HMRC_ACCESS_TOKEN} or skip (
+        'environment variable HMRC_ACCESS_TOKEN is not set',
         $skip_count,
     );
 
@@ -80,7 +80,7 @@ SKIP: {
 
    
     # get from user-restricted endpoint
-    ok($r->auth->access_token($authorisation_code), 'set access_token');
+    ok($r->auth->access_token($access_token), 'set access_token');
     isa_ok(
         $response = $r->get_endpoint({
             endpoint => '/hello/user',

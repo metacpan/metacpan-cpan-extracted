@@ -1,0 +1,17 @@
+---
+-   _name: SeparateArray
+    array: '"A".."B"'
+
+-   _name: Record
+    table: city
+    values:
+        label: $this{li}
+
+-   _name: SeparateArray
+    array: '"A".."B"'
+
+-   _name: Record
+    table: company
+    values:
+        label: $this{li}
+        city_id: $this[1]{id}

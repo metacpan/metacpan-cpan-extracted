@@ -1,4 +1,8 @@
 
+0.0100    2018-11-01 18:56:10+01:00 Europe/Berlin
+	- Fix tests for Perl 5.8.x (do not use "defined-or" operator)
+	- Update dependency and fix compatibility to MongoDB > 2.0
+
 0.0001    2016-10-01 21:00:56+02:00 Europe/Berlin
 	- Skip tests unless a MongoDB server is available
 

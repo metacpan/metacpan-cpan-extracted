@@ -1,4 +1,5 @@
 Build.PL
+CONTRIBUTING.md
 Changes
 LICENSE
 MANIFEST
@@ -6,7 +7,7 @@ Makefile.PL
 META.json
 META.yml
 lib/Math/Polynomial/Solve.pm
-README
+README.md
 eg/cubic.m
 eg/cubic.pl
 eg/hqr.pl

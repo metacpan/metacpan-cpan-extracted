@@ -7,7 +7,7 @@ use Test::More;
 use File::Spec;
 use Data::Dumper;
 use Text::Amuse::Compile::Utils qw/read_file write_file/;
-
+use Text::Amuse::Compile::Devel qw/create_font_object/;
 use Text::Amuse::Compile;
 use Text::Amuse::Compile::File;
 use Text::Amuse::Compile::Templates;
@@ -39,6 +39,7 @@ else {
 
 my $tt = Text::Amuse::Compile::Templates->new;
 my $file = Text::Amuse::Compile::File->new(name => 'test',
+                                           fonts => create_font_object(),
                                            suffix => '.muse',
                                            templates => $tt);
 
@@ -97,6 +98,7 @@ foreach my $ext ($file->purged_extensions) {
 
 
 $file = Text::Amuse::Compile::File->new(name => 'deleted',
+                                        fonts => create_font_object(),
                                         suffix => '.muse',
                                         templates => $tt);
 

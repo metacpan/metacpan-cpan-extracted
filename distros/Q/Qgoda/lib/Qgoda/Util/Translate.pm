@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Util::Translate;
-$Qgoda::Util::Translate::VERSION = 'v0.9.2';
+$Qgoda::Util::Translate::VERSION = 'v0.9.3';
 use strict;
 
 use Locale::TextDomain qw(qgoda);
@@ -157,6 +157,9 @@ sub get_masters {
     my ($self) = @_;
 
     my $qgoda = Qgoda->new;
+    # For translations we always want all files.
+    $qgoda->buildOptions(drafts => 1, future => 1);
+    
     $qgoda->initPlugins;
     $qgoda->initAnalyzers;
     my $config = $qgoda->config;

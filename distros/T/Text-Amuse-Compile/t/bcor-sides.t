@@ -11,6 +11,7 @@ use Data::Dumper;
 use Text::Amuse::Compile;
 use Text::Amuse::Compile::File;
 use Text::Amuse::Compile::Templates;
+use Text::Amuse::Compile::Devel qw/create_font_object/;
 
 my $xelatex = $ENV{TEST_WITH_LATEX};
 if ($xelatex) {
@@ -47,6 +48,7 @@ my $muse = Text::Amuse::Compile::File->new(name => 'test',
                                                        twoside => 1,
                                                        bcor => '12mm',
                                                       },
+                                           fonts => create_font_object(),
                                            templates => $templates);
 
 my $tex = read_file($muse->tex);
@@ -62,6 +64,7 @@ check_no_overriden($tex);
 $muse = Text::Amuse::Compile::File->new(name => 'test',
                                         suffix => '.muse',
                                         standalone => 1,
+                                        fonts => create_font_object(),
                                         options => {
                                                     oneside => 0,
                                                     twoside => 1,

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Highlight;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our @EXPORT_OK = qw/ Dump /;
 
@@ -132,11 +132,23 @@ sub transform {
     my ($class, $tokens) = @_;
     my @list;
     for my $token (@$tokens) {
-        push @list, map {
-                $_ =~ tr/\t/\t/
-                ? { name => 'TAB', value => $_ }
-                : { name => $token->{name}, value => $_ }
-            } split m/(\t+)/, $token->{value};
+        my @values;
+        my $value = $token->{value};
+        my $subtokens = $token->{subtokens};
+        if ($subtokens) {
+            @values = @$subtokens;
+        }
+        else {
+            @values = $token;
+        }
+        for my $token (@values) {
+            my $value = defined $token->{orig} ? $token->{orig} : $token->{value};
+            push @list, map {
+                    $_ =~ tr/\t/\t/
+                    ? { name => 'TAB', value => $_ }
+                    : { name => $token->{name}, value => $_ }
+                } split m/(\t+)/, $value;
+        }
     }
     for my $i (0 .. $#list) {
         my $token = $list[ $i ];

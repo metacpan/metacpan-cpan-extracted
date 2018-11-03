@@ -1,4 +1,13 @@
 
+8.05  2018-10-25
+  - Deprecated Mojolicious::Plugin::PODRenderer in favor of alternatives from
+    CPAN.
+  - Deprecated Mojo::Home::mojo_lib_dir.
+  - Replaced continue, flash, redirect_to, respond_to and validation methods in
+    Mojolicious::Controller with helpers in Mojolicious::Plugin::DefaultHelpers.
+  - Updated FAQ with a warning not to use Perl 5.10.x and 5.12.x with
+    Mojolicious.
+
 8.04  2018-10-21
   - Added EXPERIMENTAL module Mojo::DynamicMethods. (mst)
   - Replaced all uses of AUTOLOAD with a much faster alternative, so helpers are

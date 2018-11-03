@@ -11,7 +11,7 @@ use MIME::Base64;
 
 =head1 text_to_speech.pl
 
-=head2 PREEQUISITES
+=head2 PRE-REQUISITES
 
 assumes gapi.json configuration in working directory with scoped project and user authorization
   

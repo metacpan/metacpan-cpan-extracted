@@ -5,67 +5,159 @@ use Data::Dumper;
 use Log::Log4perl;
 use Digest::MD5 qw(md5_base64);
 use TaskPipe::RunInfo;
+use Module::Runtime 'require_module';
 use TaskPipe::LoggerManager;
 use TaskPipe::SchemaManager;
 use TryCatch;
+use Proc::ProcessTable;
+use Proc::Exists qw(pexists);
+use DateTime;
+use Carp qw(confess longmess);
+
+
 with 'MooseX::ConfigCascade';
+
+
+has utils => (is => 'ro', isa => 'TaskPipe::TaskUtils');
 
 has logger_manager => (is => 'ro', isa => 'TaskPipe::LoggerManager', default => sub{
     TaskPipe::LoggerManager->new;
 });
 
 has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', default => sub{
-    TaskPipe::RunInfo->new
+    TaskPipe::RunInfo->new;
 });
 
-has max_threads => (is => 'rw', isa => 'Str');
-has forks => (is => 'rw', isa => 'Int');
+
+has settings => (is => 'rw', isa => __PACKAGE__.'::Settings', default => sub{
+    my $module = __PACKAGE__.'::Settings';
+    require_module( $module );
+    my $settings = $module->new;
+    return $settings;
+});
+
 
 has gm => (is => 'rw', isa => 'TaskPipe::SchemaManager', required => 1);
+has sm => (is => 'rw', isa => 'TaskPipe::SchemaManager', required => 1);
 
 
 sub init{
     my ($self) = @_;
 
-    confess "Need a job id" unless $self->run_info->job_id;
+    my $logger = Log::Log4perl->get_logger;
+    $SIG{CHLD} = 'IGNORE';
 
-    $self->gm->table('thread')->create({
-        job_id => $self->run_info->job_id,
-        id => 1,
-        parent_id => 0,
-        pid => $$,
-        parent_pid => 'NONE',
-        status => 'processing'
+#    print "run info: ".Dumper( $self->run_info )."\n";
+#    print longmess("Stack Trace: ");
+
+    confess "Need a job id" unless +$self->run_info->job_id;
+
+    my $conf = MooseX::ConfigCascade::Util->conf;    
+    my $conf_serialized = $self->utils->serialize( $conf );
+
+    my $job_row = $self->gm->table('job')->find({
+        id => $self->run_info->job_id
+    });
+
+    confess "Could not find a row on the job table with job id ".$self->run_info->job_id unless $job_row;
+
+    $job_row->update({
+        conf => $conf_serialized
     });
         
-    my $num_threads = $self->max_threads;
+    my $thread_count = $self->sm->table('thread')->search({})->count;
+    $self->top_up_thread_slots;
 
-    if ( $num_threads >= 2 ){
+    # judge (and return) the run situation from the state of the
+    # thread table
 
-        for my $id (2..$num_threads){
-            $self->gm->table('thread')->create({
-                job_id => $self->run_info->job_id,
-                id => $id,
-                status => 'available'
-            });
-        }
+    return "start" unless $thread_count;
+
+    $self->sm->table('thread')->search({
+        data => undef
+    })->update({
+        status => 'available'
+    });
+
+    my $resume_threads = $self->sm->table('thread')->search({
+        data => { '!=', undef }
+    });
+
+    if ( $resume_threads->count ){
+        $resume_threads->update({
+            status => 'ready'
+        });
+        return "resume";
     }
+
+    return "stop";
+
 }
 
-sub finalize{
+
+
+
+#    my $max_threads = $self->settings->max_threads;
+
+#    my $resume_threads = $self->sm->table('thread')->search({});
+#    my $num_resume_threads = $resume_threads->count;
+
+#    if ( $max_threads > $num_resume_threads ){
+#        my $start = $num_resume_threads + 1;
+#        
+#        for my $id ($start..$max_threads){
+#            $self->sm->table('thread')->create({
+#                id => $id,
+#                status => 'available'
+#            });
+#        }
+#    }
+#}
+
+
+
+
+
+sub manage{
     my ($self) = @_;
 
-    confess "Need a job id" unless $self->run_info->job_id;
-
     my $logger = Log::Log4perl->get_logger;
+    my $count;
 
-    $logger->trace("->finalize routine called");
+    $logger->trace("Starting manage subroutine");
+    $logger->info("pid $$ started manage sub");
 
-    $self->gm->table('thread')->search({
-        job_id => $self->run_info->job_id
-    })->delete_all;
+    use Carp 'longmess';
+    $logger->info("manage: ".longmess("trace:"));
+#    do {
+
+    while(1){
+        $self->top_up_thread_slots;
+        $self->start_forks;
+        $self->clean_thread_table;
+
+        $count = $self->sm->table('thread')->search({
+            status => 'available'
+        });
+
+        if ( $count == +$self->settings->max_threads ){
+            sleep 1;
+            $count = $self->sm->table('thread')->search({
+                status => 'available'
+            });
+            last if $count == +$self->settings->max_threads;
+        }
+    }
+#    } while ( $count <= +$self->settings->max_threads );
+
+    $logger->debug("Leaving manage subroutine");
+
 }
 
+
+
+
+    
 
 
 
@@ -76,7 +168,10 @@ sub request_process{
 
     my $logger = Log::Log4perl->get_logger;
 
-    my $reserve_id = "reserved-".md5_base64( $$ * rand );
+    $logger->debug("Requesting process");
+
+    #my $reserve_id = "reserved-".md5_base64( $$ * rand );
+    my $token = md5_base64( $$ * rand );
 
     my $deadlock;
     my $counter = 0;
@@ -86,8 +181,7 @@ sub request_process{
         try {
             
             $self->gm->schema->txn_do( sub{
-                my $rs = $self->gm->table('thread')->search({
-                    job_id => $self->run_info->job_id,
+                my $rs = $self->sm->table('thread')->search({
                     status => 'available'
                 },
                 { 
@@ -96,7 +190,8 @@ sub request_process{
                     order_by => { -asc => 'id' }
                 });
                 $rs->update({
-                    status => $reserve_id
+                    token => $token,
+                    status => 'reserved'
                 });
             });
 
@@ -110,161 +205,85 @@ sub request_process{
 
         };
 
-    } while ( $deadlock && $counter < 4 );
+        $counter++;
+
+    } while ( $deadlock && $counter < +$self->settings->thread_table_deadlock_retries );
 
     confess "Serialization failure while trying to update threads database: ".$deadlock if $deadlock;
 
-
-    my $row = $self->gm->table('thread')->find({
-        job_id => $self->run_info->job_id,
-        status => $reserve_id
+    my $row = $self->sm->table('thread')->find({
+        status => 'reserved',
+        token => $token
     });
+    $logger->trace("Ending request_process subroutine");
 
-    my $thread_id;
-    $thread_id = $row->id if $row;
+    return unless $row;
 
-
-
-    my @resp;
-
-    if ( ! $thread_id ){
-
-        my $check_num_threads = $self->gm->table('thread')->search({
-            job_id => $self->run_info->job_id
-        })->count;
-    
-        $logger->trace("There are $check_num_threads threads currently associated with this job");
-
-        if ( $check_num_threads == 0 ){
-
-            @resp = (
-                'parent',
-                'terminated'
-            );
-
-        } else {
-
-            @resp = (
-                'parent',       #identity
-                'unavailable'  #status
-                #$self->run_info->thread_id
-            );
-
-        }
-
-    } else {
-
-        my $parent_pid = $$;
-        my $parent_thread_id = $self->run_info->thread_id;
-        my $pid = fork();
-        confess "Fork failed" if not defined $pid;
-
-        if ( $pid ){
-
-            $self->forks( $self->forks + 1 );
-            $logger->info("Started thread $thread_id");
-
-            @resp = (
-                'parent',
-                'ok'
-                #$self->run_info->thread_id,
-            );
-
-        } else {
-
-            $self->run_info->thread_id( $thread_id );
-            $self->logger_manager->init_logger;
-
-            my $deadlock;
-            my $counter = 0;
-
-            do {
-                try {
-
-                    $self->gm->schema->txn_do( sub{
-                        $self->gm->table('thread')->search({
-                            job_id => $self->run_info->job_id,
-                            id => $thread_id
-                        })->update({
-                            status => 'processing',
-                            pid => $$,
-                            parent_pid => $parent_pid,
-                            parent_id => $parent_thread_id
-                        });
-                    });
-
-                } catch ( DBIx::Error::SerializationFailure $err ) {
-
-                    $deadlock = $err;
-
-                } catch ( DBIx::Error $err ){
-
-                    confess "Error updating thread table. SQLSTATE = ".$err->state.":\n$err";
-
-                };
-            } while ( $deadlock && $counter < 4 );
-
-            confess "Serialization failure while trying to update threads database: ".$deadlock if $deadlock;
-
-
-            @resp = ( 
-                'child',
-                'ok'
-                #$thread_id
-            );
-        }
-    }
-
-    return @resp;
+    $row->update({
+        status => 'ready'
+    });
+    return $row;
 }
 
 
+#sub mark_finished{
+#    my ($self) = @_;
 
-sub wait_child{
-    my $self = shift;
+#    $self->gm->table('thread')->search({
+#        pid => $$
+#    })->update({
+#        status => 'available'
+#    });
+#}
 
-    my $logger = Log::Log4perl->get_logger;
 
-    $logger->debug("Waiting for a child process to terminate");
-    my $terminated_pid = wait();
-    if ( $terminated_pid == -1 ){   # shouldn't happen, but recalibrate 
-        $self->forks( 0 );          # if there is a mismatch
-    } else {
-        $self->forks( $self->forks - 1 );
-        $self->mark_finished( $terminated_pid );
-    }
-    return $terminated_pid;
+sub stop_threads{
+    my ($self) = @_;
+
+    $self->sm->table('thread')->search({})->update({
+        status => 'stopping'
+    });
 }
 
-
-sub wait_children{
-    my $self = shift;
-
-    my $logger = Log::Log4perl->get_logger;
-
-    my $forks = $self->forks;
-    if ( $forks ){
-        $logger->debug("Waiting for $forks child processes to finish");
-        for(1..$forks){
-            my $t_pid = $self->wait_child;
-            last if $t_pid == -1;
-        }
-        $logger->debug("All children reaped.");
-    }
-}
 
 
 
 sub mark_finished{
-    my ( $self,$pid ) = @_;
+    my ($self) = @_;
 
-    $self->gm->table('thread')->search({
-        job_id => $self->run_info->job_id,
-        pid => $pid
-    })->update({
-        status => 'available'
+    $self->sm->table('xresult')->search({
+        thread_id => +$self->run_info->thread_id
+    })->delete;
+
+    $self->sm->table('xbranch')->search({
+        thread_id => +$self->run_info->thread_id
+    })->delete;
+
+    my $thread_row = $self->sm->table('thread')->find({
+        id => +$self->run_info->thread_id
     });
-}
+
+    if ( $self->run_info->thread_id > +$self->settings->max_threads ) {
+        $thread_row->delete;
+
+        my $spawned_row = $self->gm->table('spawned')->find({
+            process_name => 'thread',
+            job_id => +$self->run_info->job_id,
+            thread_id => +$self->run_info->thread_id
+        });
+        $spawned_row->delete if $spawned_row;
+    } else {
+        $thread_row->update({
+            status => 'available',
+            data => undef
+        });
+    }
+
+
+}           
+
+
+
 
 
 sub terminate{
@@ -272,69 +291,291 @@ sub terminate{
 
     my $logger = Log::Log4perl->get_logger;
 
-    $logger->debug("Terminating process on thread ".$self->run_info->thread_id);
+    $self->mark_finished( $$ );
+    $logger->debug("Terminating process $$ on thread ".$self->run_info->thread_id);
+
+    Log::Log4perl->remove_logger( $logger );
     exit;
 }
  
 
 sub execute{
-    my ($self,$code,$count,$last_rec_cond) = @_;
+    my ($self,$task_data) = @_;
+    my $logger = Log::Log4perl->get_logger;
+    $logger->trace("Starting execute subroutine");
+
+    return if ($self->xbranch_seen( $task_data ));
+
+
+    confess "Need task_data" unless $task_data;
+    my $thread_row = $self->request_process;
+    $logger->trace("After request_process");
+    my $xbranch;
+
+    
+
+    if ( $thread_row ){
+        
+        $xbranch = $self->utils->create_xbranch_record(
+            $task_data,
+            $thread_row->id
+        );
+        unshift @{$task_data->{xbranch_ids}}, $xbranch->id;
+        $self->utils->add_run_info( $task_data );
+        my $ds = $self->utils->serialize( $task_data );
+        $thread_row->update({ data => $ds });
+    } else {
+        if ( $self->thread_is_old ){
+            $logger->debug("Thread refresh time exceeded. Restarting thread");
+            $self->utils->exec_xtask_script;
+        } else {
+            $xbranch = $self->utils->create_xbranch_record(
+                $task_data,
+                $self->run_info->thread_id
+            );
+            unshift @{$task_data->{xbranch_ids}}, $xbranch->id;
+            $logger->trace("Parent executing task directly");
+            $self->utils->exec_task_from_data( $task_data );
+        }
+    }
+    $self->sm->table('xbranch')->search({
+        id => +$xbranch->id
+    })->update({
+        status => 'seen'
+    });
+
+#    $xbranch->update({ status => 'seen' });
+    $logger->trace("End of execute subroutine");
+
+}
+
+
+sub xbranch_seen{
+    my ($self,$task_data) = @_;
+
+    my $logger = Log::Log4perl->get_logger;
+    $logger->trace("starting xbranch_seen subroutine");
+
+    my $xbranch_row = $self->sm->table('xbranch')->find({
+        plan_key => $task_data->{branch_id},
+        input_key => $task_data->{input_id}
+    }, {
+        key => 'plan_key'
+    });
+
+    my $seen = 0;
+
+    if ( $xbranch_row ){
+        my $status = $xbranch_row->status;
+        $seen = 1 if $status && $status eq 'seen';
+    }
+
+    $logger->debug("Already seen xbranch with plan key ".$task_data->{branch_id}." and input key ".$task_data->{input_id}) if $seen;
+
+    $logger->trace("ending xbranch_seen subroutine");
+    return $seen;
+}
+
+
+
+
+sub thread_is_old{
+    my ($self,$thread_row) = @_;
 
     my $logger = Log::Log4perl->get_logger;
 
-    confess "Need code,count,last_rec_cond" unless $code && defined $last_rec_cond && $count;
-    confess "code should be a code_ref" unless ref $code eq ref(sub{});
+    my $dt = DateTime->now;
 
-    $logger->trace("count is $count at beginning of execute");
+    if ( ! $thread_row ){
+        $thread_row = $self->sm->table('thread')->find({
+            id => $self->run_info->thread_id
+        });
+    }
 
-    if ( $last_rec_cond ){
+    $logger->debug("thread_is_old: thread_id: ".$self->run_info->thread_id." job_id ".$self->run_info->job_id);
 
-        $logger->trace("Last record in loop - self executing");            
-        #$code->($self->run_info->thread_id);
-        $code->();
+    my $thread_is_old = 0;
+    if ( $thread_row ){
+        $logger->debug("Got a thread row");
+        my $forked_dt = $thread_row->last_forked;
+        
+        if ( $forked_dt ){
+
+            $forked_dt->add( minutes => +$self->settings->refresh_mins );
+            $thread_is_old = 1 if ( DateTime->compare( $dt, $forked_dt ) == 1 );
+ 
+        }
+
+        $thread_row->update({
+            last_checked => $dt
+        });
 
     } else {
+        
+        $logger->debug("No thread row");
 
-        my ($ident,$status) = $self->request_process;
+    }
 
-        while ( $ident eq 'parent' && $status eq 'unavailable' ) {
+    return $thread_is_old;
+}
 
-            $logger->trace("count: $count got unavailable status");
 
-            if ( $self->forks ){
 
-                $logger->trace("count: $count Waiting for an available thread");
-                my $pid = $self->wait_child;
-                $logger->trace("count: $count A process finished (pid $pid). Continuing");
-                ($ident,$status) = $self->request_process;
+sub start_fork{
+    my ($self,$thread_id) = @_;
 
-            } else {
+    my $logger = Log::Log4perl->get_logger;
 
-                $logger->trace("Parent executing task directly");
-                #$code->($thread_id);
-                $code->();
-                last;
+    my $dt = DateTime->now;
 
+    my $parent_pid = $$;
+    $self->sm->schema->txn_do( sub{
+        $self->sm->table('thread')->search({
+            id => $thread_id
+        })->update({
+            status => 'forking',
+            parent_id => +$self->run_info->thread_id,
+            parent_pid => $parent_pid,
+            last_forked => $dt,
+            last_checked => $dt
+        });
+    });
+
+    $logger->debug("Forking");
+    #$self->sm->schema->storage->disconnect;
+    #$self->gm->schema->storage->disconnect;
+
+    my $pid = fork();
+
+#    $self->sm( TaskPipe::SchemaManager->new );
+#    $self->sm->connect_schema;
+#    $self->gm( TaskPipe::SchemaManager->new( scope => 'global' ) );
+#    $self->gm->connect_schema;
+
+    confess "Fork failed" if not defined $pid;
+    $logger->debug("Created fork $pid") if $pid;
+    return $pid if $pid;
+    
+    $self->run_info->thread_id( $thread_id );
+    $self->logger_manager->init_logger;
+
+    $self->gm->schema->txn_do( sub{
+        $self->gm->table('spawned')->update_or_create({
+            process_name => 'thread',
+            job_id => $self->run_info->job_id,
+            used_by_pid => $parent_pid,
+            thread_id => $thread_id,
+            status => 'processing',
+            pid => $$,
+            last_checked => $dt
+        });
+    });
+
+    $self->sm->table('thread')->find({
+        id => $thread_id
+    })->update({
+        status => 'processing',
+        pid => $$
+    });
+
+    $logger->debug("In child executing xtask script");
+    $self->utils->exec_xtask_script;
+
+}
+
+
+
+
+sub start_forks{
+    my ($self) = @_;
+
+#    my $processing_rs = $self->sm->table('thread')->search({
+#        status => 'processing'
+#    });
+
+#    return if ($processing_rs->count);
+
+#    my $threads_rs = $self->sm->table('thread')->search({
+#        status => 'ready'
+#    }, {
+#        rows => 1
+#    });
+
+    my $threads_rs = $self->sm->table('thread')->search({
+        status => 'ready'
+    });
+
+    while ( my $thread_row = $threads_rs->next ){
+
+        #sleep 2;
+        $self->start_fork( $thread_row->id );
+
+    }
+}
+
+
+sub top_up_thread_slots{
+    my ($self) = @_;
+
+    my $logger = Log::Log4perl->get_logger;
+
+    my $taken_slots = $self->sm->table('thread')->search({},{
+        order_by => 'id',
+        columns => ['id']
+    });
+
+    my $max = $self->settings->max_threads;
+
+    my $needed = $max - $taken_slots->count;
+
+    if ( $needed > 0 ){
+        my $taken_lookup = {};
+        while( my $taken_slot = $taken_slots->next ){
+            $taken_lookup->{ $taken_slot->id } = 1;
+        }
+
+        my $slots_to_create = [];
+
+        my $id = 0;
+        my $added = 0;
+
+        while( $added < $needed ){
+            $id++;
+            
+            if ( ! $taken_lookup->{$id} ){
+                $self->sm->table('thread')->create({
+                    id => $id,
+                    status => 'available'
+                });
+                $added++;
             }
-
-        }
-
-        if ( $ident eq 'parent' && $status eq 'terminated' ){
-
-            $logger->info("Looks like some kind of error was encountered. Terminating");
-            $self->terminate;
-
-        }
-
-        if ( $ident eq 'child' ){
-
-            #$code->($thread_id);
-            $code->();
-            $self->terminate;
-
         }
     }
 }
+                
+
+
+
+sub clean_thread_table{
+    my ($self) = @_;
+
+    my $thread_rs = $self->sm->table('thread')->search({
+        status => 'processing'
+    });
+
+    while( my $thread = $thread_rs->next ){
+
+        if ( ! pexists( $thread->pid ) ){
+
+            $thread->update({
+                status => 'available'
+            });
+
+        }
+
+    }
+}
+
 
 =head1 NAME
 

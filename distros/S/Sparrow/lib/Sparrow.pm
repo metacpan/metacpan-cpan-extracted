@@ -1,12 +1,10 @@
 package Sparrow;
 
-our $VERSION = '0.3.2';
+our $VERSION = '0.3.4';
 
 1;
 
 __END__
-
-=pod
 
 
 =encoding utf8
@@ -16,7 +14,9 @@ __END__
 
 Sparrow - multipurpose scenarios manager.
 
+
 =head1 SYNOPSIS
+
 
 =head1 Install
 
@@ -25,9 +25,10 @@ Sparrow - multipurpose scenarios manager.
     $ cpanm Sparrow
 
 
-=head1 Build status
+=head1 Build statuses
 
 L<![Build Status](https://travis-ci.org/melezhik/sparrow.svg)|https://travis-ci.org/melezhik/sparrow>
+L<![Build status](https://ci.appveyor.com/api/projects/status/hdowsd2jvmy0x3ae?svg=true)|https://ci.appveyor.com/project/melezhik/sparrow>
 
 
 =head1 Sparrow plugins
@@ -304,6 +305,10 @@ For example:
     $ sparrow plg search  nginx        # to get know available nginx* plugins
     $ sparrow plg install nginx-check  # to download and install a chosen plugin
     $ sparrow plg install nginx-check --version 0.1.1 # install specific version
+
+Installing plugin from local source:
+
+    $ cd /plg/src/ && sparrow plg install .
 
 To see installed plugin list say this:
 
@@ -669,34 +674,64 @@ Dump-config could be useful when copy some task configuration into other:
 
 =head2 Task boxes API
 
-Use this command to run task box
+Run task box - collection of sparrow tasks.
 
 B<sparrow box run $path [opts]>
 
-Where $path sets the file path to task box json file. A structure of the file:
+Where $path is the path to task box specification file ( json or yaml format). 
+
+
+=head2 The structure of task box specification file ( outthentic plugins ):
+
+JSON:
 
     [
     
-      {
-        "task" : "task_name",
+      { // task1
+        "task" : "task1_name",
         "plugin" : "plugin_name",
-        "data" : {
-            : plugin parameters 
+        "data" : { // plugin parameters
+            "param1" : "value1",
+            "param2" : "value2"
         }
       },
-      {
-        // another task
-      },
-    
-      ...
-    
+      { // task2
+        "task" : "task2_name",
+        "plugin" : "plugin_name",
+        "data" : { // plugin parameters
+            "param1" : "value1",
+            "param2" : "value2"
+        }
+      }
+      // so on
     ]
+
+YAML:
+
+    ---
+    # task1
+    - task: task1_name
+      plugin: plugin name
+      data:
+        param1: value1
+        param2: value2
+    # task2
+    - task: task2_name
+      plugin: plugin_name
+      data:
+        param1: value1
+        param2: value2
+      # so on
 
 Command example:
 
     $ sparrow box run /var/sparrow/boxes/nginx.json
+    
+    $ sparrow box run /var/sparrow/boxes/nginx.yaml
 
-Thus task box files should hold a list of sparrow tasks. Here is example:
+Task box specification file example:
+
+JSON:
 
     [
     
@@ -718,7 +753,66 @@ Thus task box files should hold a list of sparrow tasks. Here is example:
     
     ]
 
-To suppress some extra message from this command use C<--mode quiet>:
+YAML:
+
+    ---
+    - task: disk check
+      plugin: df-check
+      data:
+        threshold: 95
+    - task: disk check
+      plugin: df-check
+      data:
+        threshold: 95
+    - task: test plugin
+      plugin: foo-generic
+      data: {}
+    - task: test ruby plugin
+      plugin: ruby-test
+      data: {}
+
+
+=head2 The structure of tasks box specification file ( swat plugins ):
+
+JSON:
+
+    [
+      // task1
+      {
+        "task" : "task1_name",
+        "plugin" : "plugin_name",
+        "type" : "swat",
+        "host" : "http host"
+      },
+      // task2
+      {
+        "task" : "task2_name",
+        "plugin" : "plugin_name",
+        "type" : "swat",
+        "host" : "http host"
+      }
+      // so on
+    ]
+
+YAML:
+
+    ---
+    # task1
+    - task: task1_name
+      plugin: plugin_name
+      type: swat
+      host: http host
+    # task2
+    - task: task2_name
+      plugin: plugin_name
+      type: swat
+      host: http host
+    # so on
+
+
+=head2 Sparrow box run parameters
+
+To make command output less verbose ( suppress some details ) use C<--mode quiet> option:
 
     $ sparrow box run /path/to/my/box/ --mode quiet
 
@@ -1177,6 +1271,18 @@ Also see "Disable color output" section.
 If set defines an alternative location for sparrow configuration file.
 
 
+=head2 sparrowI<hub>api_url
+
+Sets alternative location of SparrowHub API. If not set Sparrow client uses https://sparrowhub.org as API URL.
+
+Primarily used  for internal testing and development. But also see L<offline mode support|#offline-mode-support> section.
+
+
+=head2 SPARROW_UNSECURE
+
+Disable ssl verification during C<sparrow plg upload, sparrow remote task run> commands. Use this option on your risk.
+
+
 =head1 Remote Tasks
 
 B<I<WARNING!>> This feature is quite experimental and should be tested.
@@ -1272,6 +1378,31 @@ To get a list of available public remote tasks say this:
 And finally you can remove remote task:
 
     $ sparrow remote task remove app/old-stuff
+
+
+=head1 Offline mode support
+
+For servers with limited or no access to internet, there is offline mode support.
+
+
+=head2 Create local repository of Sparrow plugins
+
+    $ mkdir -p sparrow-local-repo/api/v1
+    $ mkidr -p sparrow-local-repo/plugins
+
+
+=head2 Copy index file and plugins
+
+    $ curl https://sparrowhub.org/api/v1/index -o sparrow-local-repo/api/v1/index
+    $ curl https://sparrowhub.org/plugins/python-echo-script-v0.001000.tar.gz -o sparrow-local-repo/plugins/python-echo-script-v0.001000.tar.gz
+    $ # so on
+
+
+=head2 Set sparrowI<hub>api_url
+
+    $ export sparrow_hub_api_url=$PWD/sparrow-local-repo
+
+Now Sparrow client will be looking for local repository instead of making requests to internet.
 
 
 =head1 AUTHOR

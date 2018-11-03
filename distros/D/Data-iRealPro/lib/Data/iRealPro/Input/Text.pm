@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 14:58:26 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct 30 10:05:29 2018
-# Update Count    : 81
+# Last Modified On: Wed Oct 31 22:31:44 2018
+# Update Count    : 95
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -18,11 +18,37 @@ use utf8;
 
 package Data::iRealPro::Input::Text;
 
-our $VERSION = "1.00";
-
 use Data::iRealPro::URI;
 use Data::iRealPro::Playlist;
 use Data::iRealPro::Song;
+
+my %keymap =
+  ( 'C'   =>  0,
+    'C#'  =>  1, 'Db' =>  1,
+    'D'   =>  2,
+    'D#'  =>  3, 'Eb' =>  3,
+    'E '  =>  4,
+    'F'   =>  5,
+    'F#'  =>  6, 'Gb' =>  6,
+    'G'   =>  7,
+    'G#'  =>  8, 'Ab' =>  8,
+    'A'   =>  9,
+    'A#'  => 10, 'Bb' => 10,
+    'B'   => 11,
+
+    'A-'  =>  0,
+    'A#-' =>  1, 'Bb-' =>  1,
+    'B-'  =>  2,
+    'C-'  =>  3,
+    'C#-' =>  4, 'Db-' =>  4,
+    'D-'  =>  5,
+    'D#-' =>  6, 'Eb-' =>  6,
+    'E-'  =>  7,
+    'F-'  =>  8,
+    'F#-' =>  9, 'Gb-' =>  9,
+    'G-'  => 10,
+    'G#-' => 11, 'Ab-' => 11,
+  );
 
 sub encode {
     my ( $self, $data ) = @_;
@@ -67,8 +93,17 @@ sub encode {
 
 sub encode_song {
     my ( $self, $data ) = @_;
-    my $tv = {};
     my $variant = "irealpro";
+    my $tv =
+      { variant		=> $variant,
+	composer	=> "Composer",
+	key		=> 'C',
+	style		=> "Rock Ballad",
+	actual_key	=> 0,
+	actual_repeats	=> 0,
+	actual_style	=> "",
+	actual_tempo	=> 0,
+      };
 
     if ( $data =~ /^Playlist:\s*(.*)/m ) {
 	$tv->{pl_name} = $1 unless $1 eq "<NoName>";
@@ -89,6 +124,12 @@ sub encode_song {
     if ( $data =~ /; key:\s+([^;\n]+)/ ) {
 	$tv->{key} = $1;
     }
+    if ( $data =~ /; actual\s+key:\s+([^;\n]+)/ ) {
+	$tv->{actual_key} = $keymap{$1};
+    }
+    else {
+	$tv->{actual_key} = $keymap{$tv->{key}};
+    }
 
     if ( $data =~ /; tempo:\s+(\d+)/ ) {
 	$tv->{actual_tempo} = $1;
@@ -103,13 +144,15 @@ sub encode_song {
     my $song = Data::iRealPro::Song->new
       ( variant	       => $variant,
 	title	       => $tv->{title},
-	composer       => $tv->{composer}       || "Composer",
-	style	       => $tv->{style}          || "Rock Ballad",
-	key	       => $tv->{key}            || "C",
-	actual_tempo   => $tv->{actual_tempo}   || "0",
-	actual_style   => $tv->{actual_style}   || "",
-	actual_repeats => $tv->{actual_repeats} || "",
+	composer       => $tv->{composer},
+	style	       => $tv->{style},
+	key	       => $tv->{key},
+	actual_key     => $tv->{actual_key},
+	actual_tempo   => $tv->{actual_tempo},
+	actual_style   => $tv->{actual_style},
+	actual_repeats => $tv->{actual_repeats},
 	transpose      => $self->{transpose},
+	_transpose     => ( $tv->{actual_key} - $keymap{$tv->{key}} ) % 12,
      );
     $song->{data} = yfitaen($data);
 

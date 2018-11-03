@@ -1,4 +1,4 @@
- #! /bin/false
+#! /bin/false
 
 # Copyright (C) 2016-2018 Guido Flohr <guido.flohr@cantanea.com>,
 # all rights reserved.
@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Template::Plugin::Qgoda;
-$Template::Plugin::Qgoda::VERSION = 'v0.9.2';
+$Template::Plugin::Qgoda::VERSION = 'v0.9.3';
 use strict;
 
 use base qw(Template::Plugin);
@@ -27,16 +27,17 @@ use File::Spec;
 use Cwd;
 use URI;
 use Scalar::Util qw(reftype);
-use JSON qw(encode_json decode_json);
+use JSON 2.0 qw(encode_json decode_json);
 use Date::Parse qw(str2time);
-use POSIX qw(strftime setlocale LC_ALL );
+use POSIX qw(setlocale LC_ALL);
 use File::Basename;
 use List::Util qw(pairmap);
 use Locale::Util qw(web_set_locale);
 
 use Qgoda;
 use Qgoda::Util qw(collect_defaults merge_data empty read_file html_escape
-                   escape_link);
+                   escape_link qstrftime);
+use Qgoda::Util::Date;
 use Qgoda::Builder;
 
 sub new {
@@ -170,6 +171,7 @@ sub new {
     $context->define_vmethod(hash => kebapSnake => $kebap_snake);
     $context->define_vmethod(hash => kebapCamel => $kebap_camel);
     $context->define_vmethod(hash => quoteValues => $quote_values);
+	$context->define_vmethod(hash => vmap => $vmap);
 
     my $self = {
         __context => $context
@@ -381,6 +383,14 @@ sub link {
     return $set->[0]->{permalink};
 }
 
+sub existsLink {
+    my ($self, @args) = @_;
+
+    local $SIG{__WARN__} = sub {};
+
+    return $self->link(@args);
+}
+
 sub xref {
     my ($self, $variable, $filters) = @_;
 
@@ -400,6 +410,14 @@ sub xref {
     return $set->[0]->{$variable};
 }
 
+sub existsXref {
+    my ($self, @args) = @_;
+
+    local $SIG{__WARN__} = sub {};
+
+    return $self->xref(@args);
+}
+
 sub llink {
     my ($self, $filters) = @_;
 
@@ -409,6 +427,14 @@ sub llink {
     return $self->link($filters);
 }
 
+sub lexistsLink {
+    my ($self, @args) = @_;
+
+    local $SIG{__WARN__} = sub {};
+
+    return $self->llink(@args);
+}
+
 sub lxref {
     my ($self, $variable, $filters) = @_;
 
@@ -416,6 +442,14 @@ sub lxref {
     $filters->{lingua} = $self->__getAsset->{lingua};
 
     return $self->xref($variable, $filters);
+}
+
+sub lexistsXref {
+    my ($self, @args) = @_;
+
+    local $SIG{__WARN__} = sub {};
+
+    return $self->lxref(@args);
 }
 
 sub anchor {
@@ -445,6 +479,14 @@ sub linkPost {
     return $self->link($filters);
 }
 
+sub existsLinkPost {
+    my ($self, @args) = @_;
+
+    local $SIG{__WARN__} = sub {};
+
+    return $self->linkPost(@args);
+}
+
 sub llinkPost {
     my ($self, $filters) = @_;
 
@@ -452,6 +494,14 @@ sub llinkPost {
     $filters->{lingua} = $self->__getAsset->{lingua};
 
     return $self->linkPost($filters);
+}
+
+sub lexistsLinkPost {
+    my ($self, @args) = @_;
+
+    local $SIG{__WARN__} = sub {};
+
+    return $self->llinkPost(@args);
 }
 
 sub writeAsset {
@@ -496,7 +546,7 @@ sub clone {
 }
 
 sub strftime {
-    my ($self, $format, $date, $lingua) = @_;
+    my ($self, $format, $date, $lingua, $markup) = @_;
 
     my $time = $date =~ /^[-+]?[1-9][0-9]*$/ ? "$date" : str2time $date;
     $time = $date if !defined $time;
@@ -506,10 +556,11 @@ sub strftime {
     my $saved_locale;    
     if (!empty $lingua) {
         $saved_locale = POSIX::setlocale(LC_ALL);
-        web_set_locale($lingua, 'utf-8') if $lingua;
+        web_set_locale($lingua, 'utf-8');
     }
 
-    my $formatted_date = POSIX::strftime($format, localtime $time);
+    $markup = "sup" if !defined $markup;
+    my $formatted_date = qstrftime $format, $time, $lingua, $markup;
 
     POSIX::setlocale(LC_ALL, $saved_locale) if defined $saved_locale;
 
@@ -529,7 +580,7 @@ sub paginate {
     $data = $self->__sanitizeHashref($data, 'paginate', 1);
     die __"argument '{total}' is mandatory for paginate()\n"
         if empty $data->{total};
-    die __"argument '{total}' cannot be zero paginate()\n"
+    die __"argument '{total}' cannot be zero for paginate()\n"
         if !$data->{total};
 
     use integer;
@@ -627,6 +678,50 @@ sub sprintf {
     return sprintf $fmt, @args;
 }
 
+sub encodeJSON {
+    my ($self, $data, @flags) = @_;
+
+    my $options = {};
+    if (ref $flags[-1] && 'HASH' eq ref $flags[-1]) {
+        $options = pop @flags;
+    }
+
+    my %flags = (utf8 => 1);
+    my %supported = map { $_ => 1 } qw(ascii latin1 utf8 pretty indent
+                                       space_before space_after relaxed
+                                       canonical allow_nonref allow_unknown
+                                       allow_blessed convert_blessed);
+    foreach my $flag (@flags) {
+        my $negated = $flag =~ s/^-//;
+        if (!exists $supported{$flag}) {
+            warn __x("the flag '{flag}' is not supported by encodeJSON().\n",
+                     flag => $flag);
+            next;
+        }
+        if ($negated) {
+            delete $flags{$flag};
+        } else {
+            $flags{$flag} = 1;
+        }
+    }
+
+    my $json = JSON->new;
+    foreach my $flag (keys %flags) {
+        $json->$flag;
+    }
+    my %allowed_options = map { $_ =>  1 } qw(max_depth max_size);
+    foreach my $option (keys %$options) {
+        if (!exists $supported{$option}) {
+            warn __x("the option '{option}' is not supported by encodeJSON().\n",
+                     option => $option);
+            next;
+        }
+        $json->$option($options->{$option});
+    }
+
+    return $json->encode($data);
+}
+
 sub loadJSON {
     my ($self, $filename) = @_;
 
@@ -673,6 +768,10 @@ sub lrelated {
     $filters->{lingua} = $self->__getAsset->{lingua};
 
     return $self->related($threshold, $filters);
+}
+
+sub time {
+    return Qgoda::Util::Date->newFromEpoch;
 }
 
 1;

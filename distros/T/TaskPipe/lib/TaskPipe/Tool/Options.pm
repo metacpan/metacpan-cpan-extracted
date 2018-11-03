@@ -11,6 +11,7 @@ use Carp;
 has specs => (is => 'rw', isa => 'HashRef', default => sub{{}});
 has specs_by_module => (is => 'rw', isa => 'HashRef', default => sub{{}});
 has args => (is => 'rw', isa => 'HashRef');
+has unused_args => (is => 'rw', isa => 'HashRef');
 
 has pod_reader => (is => 'rw', isa => 'TaskPipe::PodReader', default => sub{
     TaskPipe::PodReader->new;
@@ -23,15 +24,27 @@ sub load{
     confess "args is not defined (call get_args first?)" unless defined $self->args;
 
     foreach my $name (keys %{$self->specs}){
-        
 
         my $val = $self->args->{$name};
+        delete $self->unused_args->{$name};
         my $type = $self->specs->{$name}->{type};
         MooseX::ConfigCascade::Util->conf->{ $self->specs->{$name}->{module} }->{$name} = $val if defined $val;
 
     }
 
 }
+
+
+sub check_unused_args{
+    my ($self) = @_;
+
+    if ( %{$self->unused_args} ){
+        my @arg_keys = keys( %{$self->unused_args} );
+        confess '1 or more command line arguments was not recognised ("'.join('","',@arg_keys).'")';
+    }
+}
+
+
 
 
 sub get_args{
@@ -67,6 +80,7 @@ sub get_args{
     }
 
     $self->args( $args );
+    $self->unused_args( $args );
     return $args;
 }
 

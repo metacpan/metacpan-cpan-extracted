@@ -1,0 +1,17 @@
+=pod
+
+=head2 Generated API service [% service %] version v[% version %]
+
+=over
+
+=cut
+
+[% FOREACH method IN methods.pairs %]
+[%      INCLUDE data_pod.tt name=method.key details=method.value %]
+[% END %]
+
+=pod
+
+=back
+
+=cut

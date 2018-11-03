@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Util;
-$Qgoda::Util::VERSION = 'v0.9.2';
+$Qgoda::Util::VERSION = 'v0.9.3';
 use strict;
 
 use IO::File;
@@ -41,7 +41,7 @@ use vars qw(@EXPORT_OK);
                 slugify html_escape unmarkup globstar trim
                 flatten2hash is_archive archive_extender collect_defaults
                 canonical purify safe_yaml_load
-                escape_link blength);
+                escape_link blength qstrftime tt2_args_merge);
 
 sub js_unescape($);
 sub tokenize($$);
@@ -489,6 +489,9 @@ sub slugify($;$) {
     # are condensed into one.
     $slug =~ s/[\x00-\x2c\x2f\x3a-\x5e\x60\x7b-\x7f]/-/g;
     $slug =~ s/--+/-/g;
+    $slug =~ s/^-//;
+    $slug =~ s/-$//;
+    $slug = '-' if !length $slug;
 
     return $slug;
 }
@@ -727,6 +730,77 @@ sub blength {
     Encode::_utf8_on($scalar);
 
     return $blength;
+}
+
+sub qstrftime($;$$$) {
+    my ($format, $date, $lingua, $markup) = @_;
+
+    my ($open, $close) = $markup ? ("<$markup>", "</$markup>") : ("", "");
+    my %converters = (
+        de => sub { shift . '.' },
+        en => sub {
+            my ($mday) = @_;
+
+            my $last_digit = ($mday >= 11 && $mday <= 13) ? 0
+                        : substr $mday, -1, 1;
+            if (1 == $last_digit) {
+                return "${mday}${open}st${close}";
+            } elsif (2 == $last_digit) {
+                return "${mday}${open}nd${close}";
+            } elsif (3 == $last_digit) {
+                return "${mday}${open}rd${close}";
+            } else {
+                return "${mday}${open}th${close}";
+            }
+        },
+        fr => sub {
+            my ($mday) = @_;
+
+            if (1 == $mday) {
+                return "${mday}${open}er${close}";
+            } else {
+                shift;
+            }
+        },
+    );
+
+    if (!defined $lingua) {
+        $lingua = POSIX::setlocale(POSIX::LC_TIME()) || '';
+        # FIXME! This will not work under Windows.  But we can use a mapping
+        # tabel from Locale::Util.
+    }
+    $lingua = lc substr $lingua, 0, 2;
+
+    my $handler = $converters{$lingua} || sub { shift };
+
+    my @then = localtime $date;
+    my $mday = $then[3];
+    # The handler will probably never be called more than once.  No need to
+    # cache the result.
+    $format =~ s/\%([#\%])/$1 eq '%' ? '%%' : $handler->($mday)/ge;
+
+    return POSIX::strftime($format, localtime $date);
+}
+
+sub tt2_args_merge($$$$) {
+    my ($global_args, $global_conf, $local_args, $local_conf) = @_;
+
+    my @args = @$global_args;
+    my %conf = %$global_conf;
+
+    foreach my $arg (@$local_args) {
+        if ($arg =~ /^-(.*)/) {
+            @args = grep { $_ ne $1 } @args;
+        } else {
+            push @args, $arg;
+        }
+    }
+
+    while (my ($key, $value) = each %$local_conf) {
+        $conf{$key} = $value;
+    }
+
+    return \@args, \%conf;
 }
 
 1;

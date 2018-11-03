@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::Discovery;
-$WebService::GoogleAPI::Client::Discovery::VERSION = '0.16';
+$WebService::GoogleAPI::Client::Discovery::VERSION = '0.17';
 
 # ABSTRACT: Google API discovery service
 
@@ -9,11 +9,12 @@ $WebService::GoogleAPI::Client::Discovery::VERSION = '0.16';
 use Moo;
 use Carp;
 use WebService::GoogleAPI::Client::UserAgent;
-use List::Util qw/uniq/;
+use List::Util qw/uniq/;    ## are these util dependencies necessary?
 use Hash::Slice qw/slice/;
 use Data::Dumper;
-use CHI;    # Caching .. NB Consider reviewing https://metacpan.org/pod/Mojo::UserAgent::Role::Cache
+use CHI;                    # Caching .. NB Consider reviewing https://metacpan.org/pod/Mojo::UserAgent::Role::Cache
 
+# use feature
 
 ## NB - I am not familiar with this moosey approach to OO so there may be obvious errors - keep an eye on this.
 
@@ -32,7 +33,7 @@ my $stats = {
     # total bytes received
   },
   cache => {
-    count => 0,
+    get => 0,
 
     # last request timestamp
     # last request response_code
@@ -50,16 +51,17 @@ sub get_api_discovery_for_api_id
   ## TODO: consolidate the http method calls to a single function - ie - discover_all - simplistic quick fix -  assume that if no param then endpoint is as per discover_all
 
   $params = { api => $params } if ref( $params ) eq '';    ## scalar parameter not hashref - so assume is intended to be $params->{api}
+
   ## trim any resource, method or version details in api id
-  if ( $params->{ api } =~ /([^:]+):(v\d+)/ixsm )
+  if ( $params->{ api } =~ /([^:]+):(v[^\.]+)/ixsm )
   {
     $params->{ api }     = $1;
     $params->{ version } = $2;
   }
-  if ( $params->{ api } =~ /^(.*?)\./xsm )
+  if ( $params->{ api } =~ /^(.*?)\./xsm )                 ## we only want the api and not the children so trime them out here
   {
     $params->{ api } = $1;
-    ## TODO: split version if is in name:v3 format
+
   }
 
 
@@ -316,7 +318,7 @@ sub latest_stable_version
 
 
 ########################################################
-sub api_verson_urls
+sub api_version_urls
 {
   my ( $self ) = @_;
   ## transform structure to be keyed on api->versionRestUrl
@@ -342,12 +344,21 @@ sub extract_method_discovery_detail_from_api_spec
   ## where tree is the method in format from _extract_resource_methods_from_api_spec() like projects.models.versions.get
   ##   the root is the api id - further '.' sep levels represent resources until the tailing label that represents the method
   return {} unless defined $tree;
+
   my @nodes = split /\./smx, $tree;
   croak( "tree structure '$tree' must contain at least 2 nodes including api id, [list of hierarchical resources ] and method - not " . scalar( @nodes ) )
     unless scalar( @nodes ) > 1;
 
   my $api_id = shift( @nodes );    ## api was head
   my $method = pop( @nodes );      ## method was tail
+
+  ## split out version if is defined as part of $tree
+  ## trim any resource, method or version details in api id
+  if ( $api_id =~ /([^:]+):([^\.]+)$/ixsm )    ## we have already isolated head from api tree children
+  {
+    $api_id      = $1;
+    $api_version = $2;
+  }
 
   ## handle incorrect api_id
   if ( $self->service_exists( $api_id ) == 0 )
@@ -357,16 +368,40 @@ sub extract_method_discovery_detail_from_api_spec
   }
 
   $api_version = $self->latest_stable_version( $api_id ) unless $api_version;
+
+
   ## TODO: confirm that spec available for api version
   my $api_spec = $self->get_api_discovery_for_api_id( { api => $api_id, version => $api_version } );
-  ## TODO - check for failure?
-  my $all_api_methods = $self->_extract_resource_methods_from_api_spec( $api_id, $api_spec );
+
+
+  ## we use the schames to substitute into '$ref' keyed placeholders
+  my $schemas = {};
+  foreach my $schema_key ( sort keys %{ $api_spec->{ schemas } } )
+  {
+    $schemas->{ $schema_key } = $api_spec->{ 'schemas' }{ $schema_key };
+  }
+
+  ## recursive walk through the structure in _fix_ref
+  ##  substitute the schema keys into the total spec to include
+  ##  '$ref' values within the schema structures themselves
+  ##  including within the schema spec structures (NB assumes no cyclic structures )
+  ##   otherwise would could recursive chaos
+  my $api_spec_fix = $self->_fix_ref( $api_spec, $schemas );    ## first level ( '$ref' in the method params and return values etc )
+  $api_spec = $self->_fix_ref( $api_spec_fix, $schemas );       ## second level ( '$ref' in the interpolated schemas from first level )
+
+  ## now extract all the methods (recursive )
+  my $all_api_methods = $self->_extract_resource_methods_from_api_spec( "$api_id:$api_version", $api_spec );
+
+  #print Dumper $all_api_methods;exit;
   if ( defined $all_api_methods->{ $tree } )
   {
     return $all_api_methods->{ $tree };
   }
   else
   {
+    #return $all_api_methods->{ "$api_id:$api_version" } if ( defined $all_api_methods->{ "$api_id:$api_version" } );
+    return $all_api_methods->{ $tree } if ( $all_api_methods = $self->_extract_resource_methods_from_api_spec( "$api_id", $api_spec ) );
+
     carp( "Unable to find method detail for '$tree' within Google Discovery Spec for $api_id version $api_version" ) if $self->debug;
     return {};
   }
@@ -399,13 +434,79 @@ sub _extract_resource_methods_from_api_spec
 }
 ########################################################
 
+#=head2 C<fix_ref>
+#
+#This sub walks through the structure and replaces any hashes keyed with '$ref' with
+#the value defined in $schemas->{ <value of keyed $ref> }
+#
+#eg
+# ->{'response'}{'$ref'}{'Buckets'}
+# is replaced with
+# ->{response}{ $schemas->{Buckets} }
+#
+# It assumes that the schemas have been extracted from the original discover for the API
+# and is typically applued to the method ( api endpoint ) to provide a fully descriptive
+# structure without external references.
+#
+#=cut
 
+########################################################
+sub _fix_ref
+{
+  my ( $self, $node, $schemas ) = @_;
+  my $ret = undef;
+  my $r   = ref( $node );
+
+
+  if ( $r eq 'ARRAY' )
+  {
+    $ret = [];
+    foreach my $el ( @$node )
+    {
+      push @$ret, $self->_fix_ref( $el, $schemas );
+    }
+  }
+  elsif ( $r eq 'HASH' )
+  {
+    $ret = {};
+    foreach my $key ( keys %$node )
+    {
+      if ( $key eq '$ref' )
+      {
+        #say $node->{'$ref'};
+        $ret = $schemas->{ $node->{ '$ref' } };
+      }
+      else
+      {
+        $ret->{ $key } = $self->_fix_ref( $node->{ $key }, $schemas );
+      }
+    }
+  }
+  else { $ret = $node; }
+
+  return $ret;
+}
+########################################################
+
+
+
+#TODO: consider ? refactor to allow parameters either as a single api id such as 'gmail'
+#      as well as the currently accepted  hash keyed on the api and version
+#
+#SEE ALSO:
+#  The following methods are delegated through to Client::Discovery - see perldoc WebService::Client::Discovery for detils
+#
+#  get_method_meta
+#  discover_all
+#  extract_method_discovery_detail_from_api_spec
+#  get_api_discovery_for_api_id
 
 ########################################################
 ## TODO: consider renaming ?
 sub methods_available_for_google_api_id
 {
   my ( $self, $api_id, $version ) = @_;
+
   $version = $self->latest_stable_version( $api_id ) unless $version;
   ## TODO: confirm that spec available for api version
   my $api_spec = $self->get_api_discovery_for_api_id( { api => $api_id, version => $version } );
@@ -447,7 +548,7 @@ WebService::GoogleAPI::Client::Discovery - Google API discovery service
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head2 MORE INFORMATION
 
@@ -466,10 +567,11 @@ say $client-dicovery->chi->root_dir(); ## provides full file path to temp storag
 
 =head2 TODO
 
-* deal with case of service names - either make it case insensitive or lock in a consistent approach - currently smells like case changes on context
-* handle 403 ( Daily Limit for Unauthenticated Use Exceeded.) errors when reqeusting a disdovery resource for a resvice 
-  but do we have access to authenticated reqeusts?
-* consider refactoring this entire module into UserAgent .. NB - this is also included as property of  Services.pm which is the factory for dynamic classes
+=over 2
+
+=item * handle 403 ( Daily Limit for Unauthenticated Use Exceeded.) errors when reqeusting a discovrey resource for a service but do we have access to authenticated reqeusts?
+
+=back
 
 =head1 METHODS
 
@@ -478,8 +580,14 @@ say $client-dicovery->chi->root_dir(); ## provides full file path to temp storag
 returns the cached version if avaiable in CHI otherwise retrieves discovery data via HTTP, stores in CHI cache and returns as
 a Perl data structure.
 
-  my $hashref = $self->get_api_discovery_for_api_id( 'gmail' );
-  my $hashref = $self->get_api_discovery_for_api_id( 'gmail:v3' );
+    my $hashref = $self->get_api_discovery_for_api_id( 'gmail' );
+    my $hashref = $self->get_api_discovery_for_api_id( 'gmail:v3' );
+    my $hashref = $self->get_api_discovery_for_api_id( 'gmail:v3.users.list' );
+    my $hashref = $self->get_api_discovery_for_api_id( { api=> 'gmail', version => 'v3' } ); ## nb enclosing bracer - must be hashref
+
+NB: if deeper structure than the api_id is provided then only the head is used
+
+so get_api_discovery_for_api_id( 'gmail' ) is the same as get_api_discovery_for_api_id( 'gmail.some.child.method' )
 
 returns the api discovery specification structure ( cached by CHI ) for api id ( eg 'gmail ')
 
@@ -511,14 +619,12 @@ SEE ALSO: available_APIs, list_of_available_google_api_ids
 
 Allows you to augment the cached stored version of the discovery structure
 
-augment_discover_all_with_unlisted_experimental_api( 
+    augment_discover_all_with_unlisted_experimental_api( 
                             {
                               'version' => 'v4',
                               'preferred' => 1,
                               'title' => 'Google My Business API',
-                              'description' => 'The Google My Business API
-provides an interface for managing business location information on
-Google.',
+                              'description' => 'The Google My Business API provides an interface for managing business location information on Google.',
                               'id' => 'mybusiness:v4',
                               'kind' => 'discovery#directoryItem',
                               'documentationLink' => "https://developers.google.com/my-business/",
@@ -534,6 +640,8 @@ Google.',
 if there is a conflict with the existing then warn and return the existing data without modification
 
 on success just returns the augmented structure
+
+NB - does not interpolate schema object '$ref' values.
 
 =head2 C<available_APIs>
 
@@ -591,7 +699,7 @@ return latest stable verion of API
 
 =head2 C<extract_method_discovery_detail_from_api_spec>
 
-$self->extract_method_discovery_detail_from_api_spec( $tree, $api_version )
+    $agent->extract_method_discovery_detail_from_api_spec( $tree, $api_version )
 
 returns a hashref representing the discovery specification for the method identified by $tree in dotted API format such as texttospeech.text.synthesize
 
@@ -603,23 +711,19 @@ Returns a hashref keyed on the Google service API Endpoint in dotted format.
 The hashed content contains a structure
 representing the corresponding discovery specification for that method ( API Endpoint )
 
-    methods_available_for_google_api_id('gmail.users.settings.delegates.get')
+    methods_available_for_google_api_id('gmail.users.settings.delegates.get');
 
-TODO: consider ? refactor to allow parameters either as a single api id such as 'gmail' 
-      as well as the currently accepted  hash keyed on the api and version
-
-SEE ALSO:  
-  The following methods are delegated through to Client::Discovery - see perldoc WebService::Client::Discovery for detils
-
-  get_method_meta 
-  discover_all 
-  extract_method_discovery_detail_from_api_spec 
-  get_api_discovery_for_api_id
+    methods_available_for_google_api_id('gmail.users.settings.delegates.get', 'v1');
 
 =head2 C<list_of_available_google_api_ids>
 
 Returns an array list of all the available API's described in the API Discovery Resource
 that is either fetched or cached in CHI locally for 30 days.
+
+    my $r = $agent->list_of_available_google_api_ids();
+    print "List of API Services ( comma separated): $r\n";
+
+    my @list = $agent->list_of_available_google_api_ids();
 
 =head1 AUTHOR
 

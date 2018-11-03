@@ -12,7 +12,7 @@ use Data::Dumper;
 use Log::Log4perl;
 use DateTime;
 use Module::Runtime 'require_module';
-use Try::Tiny;
+use TryCatch;
 use Carp;
 use TaskPipe::PortManager;
 
@@ -78,18 +78,42 @@ sub connect_socket{
         $self->new_password;
         $self->start_tor;
         $socket = $self->get_socket;
-        $self->gm->table('spawned')->create({
-            process_name => $self->settings->process_name,
-            thread_id => $self->run_info->thread_id,
-            job_id => $self->run_info->job_id,
-            used_by_pid => $$,
-            pid => $self->proc_pid,
-            port => $self->port,
-            control_port => $self->control_port,
-            password => $self->password,
-            status => 'connecting',
-            temp_dir => $self->data_dir
-        });
+
+
+        my $duplicate;
+        my $counter = 0;
+
+        do {
+            $duplicate = '';
+            try {           
+                $self->gm->table('spawned')->create({
+                    process_name => $self->settings->process_name,
+                    thread_id => $self->run_info->thread_id,
+                    job_id => $self->run_info->job_id,
+                    used_by_pid => $$,
+                    pid => $self->proc_pid,
+                    port => $self->port,
+                    control_port => $self->control_port,
+                    password => $self->password,
+                    status => 'connecting',
+                    temp_dir => $self->data_dir
+                });
+
+            } catch ( DBIx::Error::IntegrityConstraintViolation $err ){
+
+                $duplicate = $err;
+            
+            } catch ( DBIx::Error $err ){
+
+                confess "Error creating record on spawned table. SQLSTATE = ".$err->state.":\n$err";
+
+            };
+
+            $counter++;
+
+        } while ( $duplicate && $counter < 4 );
+
+        confess "Duplicate error condition persisted while trying to create record, despite retry attempts: ".$duplicate if $duplicate;
     }
 
     if ( ! $socket ){

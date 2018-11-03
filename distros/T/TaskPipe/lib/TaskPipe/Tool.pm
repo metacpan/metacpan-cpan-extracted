@@ -1,7 +1,6 @@
 package TaskPipe::Tool;
 
 use Moose;
-use Getopt::Long;
 use TaskPipe::PathSettings;
 use TaskPipe::PathSettings::Global;
 use TaskPipe::Tool::Options;
@@ -11,38 +10,34 @@ use MooseX::ConfigCascade::Util;
 use TaskPipe::LoggerManager;
 use Log::Log4perl;
 use File::Spec;
-use File::Save::Home;
-use Clone 'clone';
-use Hash::Merge 'merge';
 use Module::Runtime 'require_module';
 use Data::Dumper;
 use Try::Tiny;
-use Array::Utils;
 use Pod::Term;
-use String::CamelCase qw(wordsplit camelize);
 use Cwd 'abs_path';
 use Term::ANSIColor 'colored';
 use POSIX qw(isatty);
 
 with 'MooseX::ConfigCascade';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 has cmd => (is => 'rw', isa => 'ArrayRef');
 
-has options => (is => 'rw', isa => 'TaskPipe::Tool::Options', default => sub{
+has options => (is => 'rw', isa => 'TaskPipe::Tool::Options', lazy => 1, default => sub{
     TaskPipe::Tool::Options->new;
 });
 has pod_reader => (is => 'ro', isa => 'TaskPipe::PodReader', lazy => 1, default => sub{
     TaskPipe::PodReader->new;
 });
-has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', default => sub{
+has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', lazy => 1, default => sub{
     TaskPipe::RunInfo->new;
 });
-has path_settings => (is => 'ro', isa => 'TaskPipe::PathSettings', default => sub{
+has path_settings => (is => 'ro', isa => 'TaskPipe::PathSettings', lazy => 1, default => sub{
     TaskPipe::PathSettings->new;
 });
+has handler => (is => 'rw', isa => 'TaskPipe::Tool::Command');
 
 
 sub get_cmd{
@@ -64,19 +59,36 @@ sub get_cmd{
 sub get_conf{
     my ($self) = @_;
 
-    my $ps = TaskPipe::PathSettings->new( scope => 'global' );
+    my $root_dir = $self->options->args->{root_dir};
 
-    my $root_dir;
+    my $ps;
+    
 
-    try {
+    if ( $root_dir ){
 
-        $root_dir = $ps->root_dir;
-        
-    } catch {
+        $ps = TaskPipe::PathSettings->new( 
+            scope => 'global',
+            root_dir => $root_dir
+        );
 
-        $self->message( qq|=pod\n\nFailed to retrieve the path to the taskpipe root directory from the file ${\$ps->home_filepath}. The following error was reported: $_\n\n=cut|);
-        exit;
-    };
+    } else {
+
+        $ps = TaskPipe::PathSettings->new(
+            scope => 'global'
+        );
+
+        try {
+
+            $root_dir = $ps->root_dir;
+            
+        } catch {
+
+            $self->pod_reader->message( qq|=pod\n\nFailed to retrieve the path to the taskpipe root directory from the file ${\$ps->home_filepath}. The following error was reported: $_\n\n|);
+            exit;
+        };
+    }
+
+    $self->run_info->root_dir( $root_dir );
 
     my %conf;
 
@@ -85,6 +97,7 @@ sub get_conf{
         my $path = $ps->path('conf', $ps->global->$method );
 
         if ( ! -f $path ){
+            print "path is really: $path\n";
             $self->print_intro;
             $self->print_setup_help;
             exit;
@@ -92,7 +105,8 @@ sub get_conf{
 
         $conf{$conf_type} = MooseX::ConfigCascade::Util->parser->( $path );
     }
-    my $conf = merge( $conf{global}, $conf{"system"} );
+    require_module( 'Hash::Merge' );
+    my $conf = Hash::Merge::merge( $conf{global}, $conf{"system"} );
     MooseX::ConfigCascade::Util->conf( $conf );
 
     $self->pod_reader->settings( TaskPipe::PodReader::Settings->new );
@@ -135,10 +149,11 @@ sub get_conf{
     
     return unless -f $project_conf_path;
 
-    my $global_conf = clone +MooseX::ConfigCascade::Util->conf;
+    require_module( 'Clone' );
+    my $global_conf = Clone::clone( +MooseX::ConfigCascade::Util->conf );
     my $project_conf = MooseX::ConfigCascade::Util->parser->( $project_conf_path );
 
-    $conf = merge( $project_conf, $global_conf );
+    $conf = Hash::Merge::merge( $project_conf, $global_conf );
     MooseX::ConfigCascade::Util->conf( $conf );
 
     my $path_settings = TaskPipe::PathSettings->new( project_name => $ps->global->project );
@@ -187,6 +202,7 @@ sub print_intro{
 sub print_setup_help{
     my ($self) = @_;
 
+    require_module( 'File::Save::Home' );
     my $home_dir = File::Save::Home::get_home_directory();
     my $suggested_global_root = File::Spec->catdir( $home_dir, 'taskpipe' );
     my $ps = TaskPipe::PathSettings->new( scope => 'global' );
@@ -208,25 +224,31 @@ I couldn't find a path to one or more of the global configuration files. These f
 
 
 
+
+
 sub dispatch{
     my $self = shift;
 
+    $self->options->add_specs([{
+        module => 'TaskPipe::JobManager::Settings',
+        is_config => 1
+    }]);
+
     $self->get_cmd;
     my $cmd = lc($self->run_info->cmd->[0]);
+    $self->get_conf unless $cmd eq 'setup';
 
     if ( ! @{$self->run_info->cmd} || $cmd eq 'help' ){
 
-        $self->get_conf;
         $self->help;
 
-    } elsif( $cmd eq 'options' ){
-
-        $self->get_conf;
-        $self->options;
-
+# TODO:
+#    } elsif( $cmd eq 'options' ){
+#
+#      $self->options;
+#
     } else {
 
-        $self->get_conf unless $cmd eq 'setup';
         $self->run_cmd;
 
     }
@@ -237,20 +259,15 @@ sub dispatch{
 sub init_logger{
     my ($self,$job_id) = @_;
 
-#    my $run_info = TaskPipe::RunInfo->new(
-#        orig_cmd => $self->orig_cmd,
-#        job_id => $job_id,
-#        thread_id => 1
-#    );      
-
     my $lm = TaskPipe::LoggerManager->new;
     $lm->init_logger;
 }
 
 
-sub run_cmd{
-    my $self = shift;
+sub prep_run_cmd{
+    my ($self) = @_;
 
+    $self->init_logger;
     my $module = $self->require_handler( @{$self->run_info->cmd} );
     my $handler = $module->new;
 
@@ -263,12 +280,29 @@ sub run_cmd{
     $self->options->load;
 
     $handler = $module->new;
+    $self->handler( $handler );
 
-    my $cmd = lc($self->run_info->cmd->[0]);
-    $handler->job_manager->init_job;
-    $self->init_logger;
-    $handler->execute;
-    $handler->job_manager->end_job;
+}
+
+
+sub exec_run_cmd{
+    my ($self) = @_;
+
+    $self->options->check_unused_args;
+    $self->handler->job_manager->init_job;
+    $self->handler->execute;
+    $self->handler->job_manager->end_job;
+
+}
+
+
+
+
+sub run_cmd{
+    my $self = shift;
+
+    $self->prep_run_cmd;
+    $self->exec_run_cmd;
 
 }
 
@@ -281,7 +315,8 @@ sub require_handler{
 
     my @filenames = @{$self->list_of_command_filenames};
 
-    my $frag = camelize(join('_',@cmd));
+    require_module( 'String::CamelCase' );
+    my $frag = String::CamelCase::camelize(join('_',@cmd));
     my ($filename) = grep{ $_ =~ /_$frag\.pm$/ } @filenames;
 
     confess "Could not find a handler for command '@cmd'" unless $filename;
@@ -405,6 +440,8 @@ sub available_commands_list{
     my $delim = File::Spec->catdir('');
 
     my $list = [];
+    require_module( 'String::CamelCase' );
+
     foreach my $filename (@filenames){
 
         my $command = $filename;
@@ -413,7 +450,7 @@ sub available_commands_list{
         $command =~ s{\.pm$}{};
         $command =~ s{^\w_}{};
 
-        my @cmd = map {lc} wordsplit($command);
+        my @cmd = map {lc} String::CamelCase::wordsplit($command);
         
         my $module = $self->command_filename_to_module( $filename );
 

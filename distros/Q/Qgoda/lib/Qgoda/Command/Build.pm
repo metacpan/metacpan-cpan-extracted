@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Command::Build;
-$Qgoda::Command::Build::VERSION = 'v0.9.2';
+$Qgoda::Command::Build::VERSION = 'v0.9.3';
 use strict;
 
 use Qgoda;

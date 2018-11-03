@@ -6,9 +6,35 @@ use Carp;
 
 package Data::iRealPro::Song;
 
-our $VERSION = "1.02";
-
 use Encode qw( encode_utf8 );
+
+my %keymap =
+  ( 'C'   =>  0,
+    'C#'  =>  1, 'Db' =>  1,
+    'D'   =>  2,
+    'D#'  =>  3, 'Eb' =>  3,
+    'E '  =>  4,
+    'F'   =>  5,
+    'F#'  =>  6, 'Gb' =>  6,
+    'G'   =>  7,
+    'G#'  =>  8, 'Ab' =>  8,
+    'A'   =>  9,
+    'A#'  => 10, 'Bb' => 10,
+    'B'   => 11,
+
+    'A-'  =>  0,
+    'A#-' =>  1, 'Bb-' =>  1,
+    'B-'  =>  2,
+    'C-'  =>  3,
+    'C#-' =>  4, 'Db-' =>  4,
+    'D-'  =>  5,
+    'D#-' =>  6, 'Eb-' =>  6,
+    'E-'  =>  7,
+    'F-'  =>  8,
+    'F#-' =>  9, 'Gb-' =>  9,
+    'G-'  => 10,
+    'G#-' => 11, 'Ab-' => 11,
+  );
 
 sub new {
     my ( $pkg, %args ) = @_;
@@ -16,14 +42,6 @@ sub new {
     $self->{transpose} //= 0;
     $self->parse( $args{data} ) if $args{data};
     return $self;
-}
-
-sub actual_key {
-    my ( $self, $n ) = @_;
-    # Actual key as shown. Fixed range, only flats, no minor.
-    my $keys = [ qw( C Db D Eb E F Gb G Ab A Bb B ) ];
-    wantarray && !defined($n) && return @$keys;
-    $keys->[$n % 12];
 }
 
 sub parse {
@@ -60,6 +78,9 @@ sub parse {
 	$self->{key} = $self->{a3}, $self->{a3} = "n" if $self->{key} eq "n";
     }
     $tokstring = $self->{raw};
+
+    # Correct for iReal key transposition.
+    $self->{_transpose} = ( ($self->{actual_key} || 0) - $keymap{$self->{key}} ) % 12;
 
     # iRealPro format must start with "1r34LbKcu7" magic.
     unless ( !!($self->{variant} eq "irealpro")
@@ -183,7 +204,6 @@ my $p_chord = qr{ $p_root $p_qual (?: / $p_root )? }xo;
 
 sub tokenize {
     my ( $self ) = @_;
-
     $_ = $self->{data};
 
     # Make tokens.
@@ -203,7 +223,10 @@ sub tokenize {
     # Mark markup spaces.
     s/([\}\]])( +)([\[\]\{\|])/$1 . ( "\240" x length($2) ) . $3/ge;
 
+    my $dataxp = "";
+
     while ( length($_) ) {
+	my $res;
 	if ( /^\{/p ) {		# |:
 	    $d->( "start repeat" );
 	}
@@ -228,19 +251,24 @@ sub tokenize {
 	elsif ( /^$p_chord(?:\($p_chord\))?/p ) {
 	    my $t = ${^MATCH};
 	    if ( $t =~ /^(.+)Z$/ ) {
-		$d->( "chord " . $self->xpose($1) );
+		$res = $self->xpose($1);
+		$d->( "chord " . $res );
 		$d->( "end" );
+		$res .= "Z";
 	    }
 	    else {
-		$d->( "chord " . $self->xpose($t) );
+		$res = $self->xpose($t);
+		$d->( "chord " . $res );
 	    }
 	}
 	elsif ( /^$p_root/p ) {
 	    warn( "Unparsable chord: " . ${^MATCH} . "\n" );
-	    $d->( "chord? " . $self->xpose(${^MATCH}) );
+	    $res = $self->xpose(${^MATCH});
+	    $d->( "chord? " . $res );
 	}
 	elsif ( /^\($p_chord\)/p ) {
-	    $d->( "chord " . $self->xpose(${^MATCH}) );
+	    $res = $self->xpose(${^MATCH});
+	    $d->( "chord " . $res );
 	}
 	elsif ( /^n/p ) {	# silent chord
 	    $d->( "chord NC" );
@@ -298,12 +326,15 @@ sub tokenize {
 	    $d->( "ignore $1" );
 	    warn( "Unhandled token: " . ${^MATCH} . "\n" );
 	}
+	$dataxp .= $res // ${^MATCH};
 	$_ = ${^POSTMATCH};
 	$index = $l0 - length($_);
     }
 
     $self->{tokens} = [ map { $_->[0] } @d ];
     $self->{raw_tokens} = [ @d ] if $self->{raw}; # USED?
+    $dataxp =~ s/\240/ /g;
+    $self->{dataxp} = $dataxp if $dataxp ne $self->{data};
 
     return $self->{tokens};
 }
@@ -485,7 +516,7 @@ my %notes = ( A => 1, B => 3, C => 4, D => 6, E => 8, F => 9, G => 11 );
 
 sub xpose {
     my ( $self, $c ) = @_;
-    return $c unless $self->{transpose};
+    return $c unless my $xp = $self->{transpose} + $self->{_transpose};
 
     return $c unless $c =~ m/
 				^ (
@@ -505,7 +536,7 @@ sub xpose {
     $mod-- if $r =~ s/b$//;
     $mod++ if $r =~ s/\#$//;
     warn("WRONG NOTE: '$c' '$r' '$rest'") unless $r = $notes{$r};
-    $r = ($r - 1 + $mod + $self->{transpose}) % 12;
+    $r = ($r - 1 + $mod + $xp) % 12;
     return ( $self->{transpose} > 0 ? $notesS : $notesF )->[$r] . $rest;
 }
 

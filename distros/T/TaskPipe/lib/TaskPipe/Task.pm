@@ -1,11 +1,12 @@
 package TaskPipe::Task;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 use Moose;
 use Module::Runtime qw(require_module);
 use Data::Dumper;
 use Carp;
+use Encode qw(encode);
 use Digest::MD5 qw(md5_base64);
 use Log::Log4perl;
 use DateTime;
@@ -18,12 +19,22 @@ use JSON;
 use TaskPipe::ThreadManager;
 use TaskPipe::Iterator_Array;
 use TaskPipe::RunInfo;
-use Try::Tiny;
+use TaskPipe::TaskUtils;
+use TryCatch;
 use Clone 'clone';
+
 with 'MooseX::ConfigCascade';
 
-has sm => (is => 'ro', isa => 'TaskPipe::SchemaManager', required => 1);
-has gm => (is => 'ro', isa => 'TaskPipe::SchemaManager', required => 1);
+has sm => (is => 'rw', isa => 'TaskPipe::SchemaManager', default => sub{
+    my $sm = TaskPipe::SchemaManager->new( scope => 'project' );
+    $sm->connect_schema;
+    return $sm;
+});
+has gm => (is => 'rw', isa => 'TaskPipe::SchemaManager', default => sub{
+    my $gm = TaskPipe::SchemaManager->new( scope => 'global' );
+    $gm->connect_schema;
+    return $gm;
+});
 
 has run_info => (is => 'ro', isa => 'TaskPipe::RunInfo', default => sub{
     TaskPipe::RunInfo->new;
@@ -31,47 +42,58 @@ has run_info => (is => 'ro', isa => 'TaskPipe::RunInfo', default => sub{
 
 has settings => (is => 'ro', isa => 'TaskPipe::Task::Settings', default => sub{ TaskPipe::Task::Settings->new });
 
-has counter => (is => 'rw', isa => 'Int');
+has utils => (is => 'ro', isa => 'TaskPipe::TaskUtils', lazy => 1, default => sub{
+    TaskPipe::TaskUtils->new(
+        sm => $_[0]->sm,
+        gm => $_[0]->gm
+    );
+});
+
 
 has plan => (is => 'rw', isa => 'ArrayRef|HashRef');
 has plan_dd => (is => 'rw', isa => 'Str');
 has plan_md5 => (is => 'rw', isa => 'Str');
+has plan_key => (is => 'rw', isa => 'Str');
 
 has input => (is => 'rw', isa => 'HashRef', default => sub{{}});
 has input_dd => (is => 'rw', isa => 'Str');
 has input_md5 => (is => 'rw', isa => 'Str');
+has input_id => (is => 'rw', isa => 'Str');
+has input_key => (is => 'rw', isa => 'Str');
+
 has input_history => (is => 'rw', isa => 'ArrayRef', default => sub{[]});
 
 has param => (is => 'rw', isa => 'HashRef', default => sub{{}});
 has param_dd => (is => 'rw', isa => 'Str');
-has param_md5 => (is => 'rw', isa => 'Str');
+#has param_md5 => (is => 'rw', isa => 'Str');
 has param_history => (is => 'rw', isa => 'ArrayRef', default => sub{[]});
 
-
+has branch_id => (is => 'rw', isa => 'Str', default => '1-0' );
 has xbranch_ids => (is => 'rw', isa => 'ArrayRef', default => sub{[]});
 
 has pinterp => (is => 'rw', isa => 'HashRef', default => sub{{}});
 has pinterp_dd => (is => 'rw', isa => 'Str');
 has pinterp_md5 => (is => 'rw', isa => 'Str');
 
-has results_iterator => (is => 'rw', isa => 'TaskPipe::Iterator');
+
+has results => (is => 'rw', isa => 'ArrayRef');
+has results_pointer => (is => 'rw', isa => 'Int', default => 0);
 
 has thread_manager => (is => 'rw', isa => 'TaskPipe::ThreadManager', lazy => 1, default => sub{
     TaskPipe::ThreadManager->new(
         gm => $_[0]->gm,
-        max_threads => $_[0]->settings->threads
+        sm => $_[0]->sm,
+        utils => $_[0]->utils,
+        logger_manager => $_[0]->logger_manager
     );
 });
 
-has json_encoder => (is => 'ro', isa => 'JSON', default => sub{
-    my $json_enc = JSON->new;
-    $json_enc->canonical;
-    return $json_enc;
-});
 
 has logger_manager => (is => 'ro', isa => 'TaskPipe::LoggerManager', default => sub{
     TaskPipe::LoggerManager->new;
 });
+
+
 
 ####### Attributes related to testing #############
 has test_label => (                  
@@ -111,6 +133,7 @@ sub test{
 
         $self->pinterp( $test_pinterp );
         my $results = $self->action;
+        $self->results( $results ) if $results;
 
         $output.= "\n\n" if $output;
         $output.= "\n";
@@ -118,15 +141,13 @@ sub test{
         $output.= "\nTesting ".ref($self).":\n\n";
         $output.= "Test Pinterp: ".Dumper( $test_pinterp )."\n\n";
 
-        if ( ref $results eq 'TaskPipe::Iterator' ){
-            $output.="Task returned an iterator. Showing first 10 results\n\n";
-            for my $i (1..10){
-                my $result = $results->next->();
-                $output .= "RESULT $i:\n";
-                $output .= Dumper( $result )."\n\n";
-            }
-        } else {
-            $output.= "Results: ".Dumper( $results )."\n\n";
+        my $max = $self->settings->test_result_limit;
+
+        for my $i (1..$max){
+            my $result = $self->next_result;
+            last unless $result;
+            $output .= "RESULT $i:\n";
+            $output .= Dumper( $result )."\n\n";
         }
 
     }
@@ -200,9 +221,9 @@ sub set_input_md5{
     my ($self) = @_;
 
     my $full = [ $self->input, @{$self->input_history} ];
-    my $serialized = $self->serialize( $full );
+    my $serialized = $self->utils->serialize( $full );
     $self->input_dd( $serialized );
-    $self->input_md5( md5_base64( $serialized ) );
+    $self->input_md5( md5_base64( encode("utf8",$serialized) ) );
 
 }
 
@@ -211,20 +232,19 @@ sub set_param_md5{
     my ($self) = @_;
 
     my $full = [ $self->param, @{$self->param_history} ];
-    my $serialized = $self->serialize( $full );
+    my $serialized = $self->utils->serialize( $full );
     $self->param_dd( $serialized );
-    $self->param_md5( md5_base64( $serialized ) );
 }
 
 
 sub set_plan_md5{
     my ($self) = @_;
 
-    my $serialized = $self->serialize( $self->plan );
+    my $serialized = $self->utils->serialize( $self->plan );
     $self->plan_dd( $serialized );
-    $self->plan_md5( md5_base64( $serialized ) );
+    $self->plan_md5( md5_base64( encode("utf8",$serialized) ) );
 }
-
+    
 
 
 sub seen_xbranch{
@@ -236,22 +256,50 @@ sub seen_xbranch{
     $parent_xbranch_id = $self->xbranch_ids->[0] if defined $self->xbranch_ids->[0];
 
     my $xbranch;
+
+    my $input_key;
+    my $plan_key;
+    if ( $self->settings->xbranch_key_mode eq 'md5' ){
+        $self->set_input_md5;
+        $self->set_plan_md5;
+        $input_key = $self->input_md5;
+        $plan_key = $self->plan_md5;
+    } else {
+        $input_key = $self->input_id,
+        $plan_key = $self->branch_id
+    }
+    
+    $logger->trace("Recording plan_key $plan_key input_key $input_key");
+
+    #$self->show_xbranches("before find_or_create");
+
+
     do {
         eval{
 
             $xbranch = $self->sm->table('xbranch')->find_or_create({
-                plan_md5 => $self->plan_md5,
-                input_md5 => $self->input_md5,
-                param_md5 => $self->param_md5,
+                plan_key => $plan_key,
+                input_key => $input_key,
+                #param_md5 => $self->param_md5,
+                branch_id => $self->branch_id,
+                input_id => $self->input_id,
                 parent_id => $parent_xbranch_id,        
                 plan_dd => $self->plan_dd,
                 input_dd => $self->input_dd,
                 param_dd => $self->param_dd,
                 thread_id => $self->run_info->thread_id
             },
-            {key => 'plan_md5'});
-        }
-    } while ($@ && $@ =~ /duplicate\sentry/i);
+            {key => 'plan_key'});
+        };
+
+#        if ($@ && $@ =~ /duplicate\sentry/i){
+
+#            die "duplicate entry: $@";
+
+#        }
+
+    } while ($@);
+#    } while ($@ && $@ =~ /duplicate\sentry/i);
 
     confess $@ if $@;
 
@@ -260,12 +308,28 @@ sub seen_xbranch{
     my $seen = 0;
 
     if ( $xbranch->status && $xbranch->status eq 'seen' ){
-        $logger->debug("Current inputs ".$self->input_dd." Seen inputs ".$xbranch->input_dd);
         $seen = 1;
     }
 
     return $seen;
 }
+
+
+############################# TEST ######################
+sub show_xbranches{
+    my ($self,$msg) = @_;
+    my $logger = Log::Log4perl->get_logger;
+
+
+    my $xbrancheschk = $self->sm->table('xbranch')->search({});
+    my $chk = '';
+    while( my $xbranchchk = $xbrancheschk->next ){
+        $chk.=$self->utils->serialize( { $xbranchchk->get_columns })."\n";
+    }
+    $logger->trace("xbranches $msg:\n$chk");    
+
+}
+#########################################################
 
 
 
@@ -284,20 +348,20 @@ sub execute_as_task{
     my ($self) = @_;
 
     $self->run_info->task_name( $self->name );
+    $self->run_info->task_details('');
+
     $self->logger_manager->init_logger;
     my $logger = Log::Log4perl->get_logger;
 
-    $self->set_input_md5;
-    $self->set_param_md5;
-    $self->set_plan_md5;
-    
+    $logger->trace("Starting execute_as_task subroutine");
 
-    if ( $self->seen_xbranch ){
-        $logger->info("Already seen xbranch ".$self->xbranch_ids->[0]." - skipping");
-        $logger->debug("BRANCH: ".$self->plan_dd);
-        $logger->debug("INPUTS: ".$self->input_dd);
-        return;
-    }
+
+#    if ( $self->seen_xbranch ){
+#        $logger->info("Already seen xbranch ".$self->xbranch_ids->[0]." - skipping");
+#        return;
+#    }
+
+#    $logger->trace("After seen_xbranch check");
 
     $self->clear_xbranch_error;
 
@@ -314,42 +378,54 @@ sub execute_as_task{
         param_history => $self->param_history
     );
 
+    $logger->trace("After interp");
+
     $self->pinterp( $interp->interp );
 
-    my $results;
+#    my $results;
+#    my $from_cache = 0;
+#    my $should_cache = $self->settings->cache_results;
+#    
+#    if ( $should_cache ){
+#        $results = $self->get_cached_results;
+#        $from_cache = 1;
+#    }
+    #my $results;
+    my $results = $self->get_cached_xresults;
+    $logger->trace("Before action");
+
+    $logger->debug("Plan: ".Dumper( $self->plan ));
+
     my $from_cache = 0;
-    my $should_cache = $self->settings->cache_results;
-
-    if ( $should_cache ){
-        $results = $self->get_cached_results;
-        $from_cache = 1 if $results;
-    }
-
-    $results = $results || $self->action;
-    my $is_array = ref $results eq ref [];
-
-    if ( $should_cache && $is_array && ! $from_cache ){
-        $self->cache_results( $results );
-    }
-
-    if ( $is_array ){
-        $self->results_iterator( TaskPipe::Iterator_Array->new( array => $results ) );
-    } elsif ( ref($results) eq 'TaskPipe::Iterator' ){
-        $self->results_iterator( $results );
+    if ( $results ){
+        $logger->debug("Results (from cache): ".Dumper( $results ));
+        $from_cache = 1;
     } else {
-        confess "Expected an arrayref, or a TaskPipe::Iterator. Instead action returned [$results]";
+        $results = $self->action;
+        $logger->debug("Results (from actioning): ".Dumper( $results ));
     }
 
+    $self->results( $results ) if $results;
+
+    #$self->cache_results if $should_cache && ! $from_cache && $self->results;
+    $self->cache_xresults if $results && ! $from_cache;
+
+    #$logger->debug("After cache_results");
 
     my $to_pipe = $self->get_plan_to_pipe;
-    
     $self->pipe_to( $to_pipe ) if $to_pipe;
+
 
     if ( $self->xbranch_has_error ){
         $self->set_xbranch_status( 'errors were encountered on xbranch' );
-    } else {
-        $self->mark_seen;
-    }
+    } #else {
+#        $self->mark_seen; # if ! $from_cache;
+#    }
+
+    #$self->show_xbranches("at end of task");
+    $logger->trace("Ending task");
+
+    Log::Log4perl->remove_logger( $logger );
 
 }
 
@@ -357,9 +433,11 @@ sub execute_as_task{
 sub get_cached_results{
     my ($self) = @_;
 
-    my $serialized = $self->serialize( $self->pinterp );
+    my $logger = Log::Log4perl->get_logger;
+
+    my $serialized = $self->utils->serialize( $self->pinterp );
     $self->pinterp_dd( $serialized );
-    $self->pinterp_md5( md5_base64( $serialized ) );
+    $self->pinterp_md5( md5_base64( encode("utf8",$serialized ) ) );
 
     my $cached = $self->sm->table('pinterp')->search({
         task_name => $self->name,
@@ -376,9 +454,12 @@ sub get_cached_results{
         if ( $results_rs ){
             $results = [];
             while( my $serialized = $results_rs->next ){
-                push @$results, +$self->deserialize( $serialized );
+                push @$results, +$self->utils->deserialize( $serialized );
             }
+            $logger->debug("Got cached results - pinterp id ".$cached->id);
         }
+    } else {
+        $logger->debug("Pinterp not cached");
     }
 
     return $results;
@@ -387,11 +468,14 @@ sub get_cached_results{
            
 
 sub cache_results{
-    my ($self,$results) = @_;
+    #my ($self,$results) = @_;
+    my ($self) = @_;
 
-    my $serialized = $self->serialize( $self->pinterp );
+    my $results = $self->all_results;
+
+    my $serialized = $self->utils->serialize( $self->pinterp );
     $self->pinterp_dd( $serialized );
-    $self->pinterp_md5( md5_base64( $serialized ) );
+    $self->pinterp_md5( md5_base64( encode("utf8",$serialized ) ) );
 
 
     my $guard = $self->sm->schema->txn_scope_guard;    
@@ -405,11 +489,93 @@ sub cache_results{
         
         $self->sm->table('result')->create({
             pinterp_id => $pinterp->id,
-            result => +$self->serialize( $result )
+            result => +$self->utils->serialize( $result )
         });
     }
     $guard->commit;
 }
+
+
+
+sub cache_xresults{
+    my ($self) = @_;
+
+    if ( @{$self->results} ){
+        try {
+
+            $self->sm->table('xresult')->create({
+                xbranch_id => +$self->xbranch_ids->[0],
+                thread_id => +$self->run_info->thread_id,
+                result => +$self->utils->serialize( $self->results->[0] )
+            });
+
+        } catch ( DBIx::Error $err where { $_->state =~ /^23/ }){
+
+            my $parent_xbranch_id = undef;
+            $parent_xbranch_id = $self->xbranch_ids->[1] if @{$self->xbranch_ids} > 1;
+
+            $self->sm->table('xbranch')->create({
+                id => +$self->xbranch_ids->[0],
+                plan_key => +$self->plan_key,
+                input_key => +$self->input_key,
+                thread_id => +$self->run_info->thread_id,
+                branch_id => +$self->branch_id,
+                input_id => +$self->input_id,
+                parent_id => $parent_xbranch_id,
+                status => undef
+            });
+
+            $self->sm->table('xresult')->create({
+                xbranch_id => +$self->xbranch_ids->[0],
+                thread_id => +$self->run_info->thread_id,
+                result => +$self->utils->serialize( $self->results->[0] )
+            });
+
+        };
+                
+        for my $i (1..$#{$self->results}){
+#        foreach my $result (@{$self->results}){
+
+            my $result = $self->results->[$i];
+            $self->sm->table('xresult')->create({
+                xbranch_id => +$self->xbranch_ids->[0],
+                thread_id => +$self->run_info->thread_id,
+                result => +$self->utils->serialize( $result )
+            });
+        }
+    }
+}
+
+
+sub get_cached_xresults{
+    my ($self) = @_;
+
+    my $results_rs = $self->sm->table('xresult')->search({
+        xbranch_id => $self->xbranch_ids->[0]
+    });
+
+    my $results = [];        
+    while( my $result_row = $results_rs->next ){
+        push @$results, +$self->utils->deserialize( $result_row->result );
+    }
+
+    return undef unless @$results;
+    return $results;
+}            
+
+
+
+#sub delete_cached_xresults{
+#    my ($self) = @_;
+
+#    my $results_rs = $self->sm->table('xresult')->search({
+#        xbranch_id => $self->xbranch_ids->[0]
+#    });
+
+#    $results_rs->delete_all if $results_rs;
+#}
+
+    
 
 
 
@@ -455,9 +621,24 @@ sub execute_as_manager{
         ||  $self->settings->plan_mode eq 'branch' && ! @{$self->plan}
     );
 
-    $self->thread_manager->init;
-    $self->pipe_through;
-    $self->thread_manager->finalize;
+    my $status = $self->thread_manager->init;
+
+    if ( $status eq 'stop' ){
+        $logger->warn("It looks like a previous completed run exists for this project, so I won't continue. If you want to start a fresh run, you should first clear the cache tables (type \"help clear tables\")");
+    } else {
+
+        if ( $status eq 'start' ){
+            my $plan = clone +$self->plan;
+            my $data = $self->prep_child_task_data( $plan, {},0, 0 );
+            $self->thread_manager->execute( $data );
+        }
+
+        $self->thread_manager->manage;
+
+    }
+    #$self->show_xbranches("at very end");
+    $logger->info("Manager: Finished run");
+
 }
 
 
@@ -467,9 +648,9 @@ sub execute_as_manager{
 sub get_cached_pinterp{
     my ($self) = @_;
     my $logger = Log::Log4perl->get_logger;
-    my $serialized = $self->serialize( $self->pinterp );
+    my $serialized = $self->utils->serialize( $self->pinterp );
     $self->pinterp_dd( $serialized );
-    $self->pinterp_md5( md5_base64( $serialized ) );
+    $self->pinterp_md5( md5_base64( encode("utf8",$serialized ) ) );
 
     my $cached = $self->sm->table('pinterp')->search({
         task_name => $self->name,
@@ -521,7 +702,7 @@ sub clear_partially_cached{
 sub cache_pinterp{
     my ($self) = @_;
 
-    my $serialized = $self->serialize( $self->pinterp );
+    my $serialized = $self->utils->serialize( $self->pinterp );
     $self->pinterp_dd( $serialized );
 
     $self->pinterp_md5( md5_base64($self->pinterp_dd) );
@@ -538,40 +719,9 @@ sub cache_pinterp{
 
 
 
-
-sub serialize{
-    my ($self,$ref) = @_;
-
-    my $serialized;
-    try {
-        $serialized = $self->json_encoder->encode( $ref );
-    } catch {
-        confess "Serialize error: $_\nref was ".Dumper( $ref );
-    };
-
-    return $serialized;
-}
-
-
-sub deserialize{
-    my ($self,$json) = @_;
-
-    my $ref;
-    try {
-        $ref = $self->json_encoder->decode( $json );
-    } catch {
-        confess "Error deserialising json string '$json': $_";
-    }
-
-    return $ref;
-}
-
-
-
-
     
     
-sub next_result{
+sub next_result{# override in child
     my ($self) = @_;
 
     if ( $self->is_manager ){
@@ -600,23 +750,37 @@ sub next_result_as_manager{
 sub next_result_as_task{
     my ($self) = @_;
 
-    return +$self->results_iterator->next->();
+    confess "next_result called in TaskPipe::Task but ->results is not defined. Did you forget to define a next_result method in your task?" unless $self->results;
+
+    return undef if $self->results_pointer > $#{$self->results};
+    my $result = $self->results->[ $self->results_pointer ];
+    $self->results_pointer( $self->results_pointer + 1 );
+    return $result;
 }
+
+
 
 
 
 sub count_results{
     my ($self) = @_;
 
-    return +$self->results_iterator->count->();
+    my $logger = Log::Log4perl->get_logger;
+
+    return -1 unless $self->results;
+
+    $logger->debug("results: ".Dumper( $self->results )) if $self->name eq 'Scrape_SearchSuggestions';
+
+    return +scalar(@{$self->results});
 }
 
 
+sub reset_results{
+    my ($self,$index) = @_;
+    confess "reset_results called in TaskPipe::Task but ->results is not defined. Did you forget to define a count_results method in your task?" unless $self->results;
 
-sub reset_results_iterator{
-    my ($self,$index,$last) = @_;
-
-    $self->results_iterator->reset->($index,$last);
+    $index ||= 0;
+    $self->results_pointer( $index );
 }
 
 
@@ -645,7 +809,7 @@ sub pipe_through{
     }
 
     eval{ $task->execute };
-    $task->handle_error($@) if $@;
+    $task->handle_error($@) if $@;    
 
 }
 
@@ -657,65 +821,61 @@ sub pipe_to{
     my $logger = Log::Log4perl->get_logger;
 
     my $tm = $self->thread_manager;
-    $tm->forks(0);
     
     my $ni = $self->count_results;
     
     my ($i0, $p0, $last_result ) = $self->get_resume_info;
+    $logger->trace("xbranch_id ".$self->xbranch_ids->[0]." plan id ".$self->branch_id." input id ".$self->input_id." Got resume info i0 $i0 p0 $p0 last_result ".Dumper($last_result));
+
+    my $input_item;
+
+    my $count = 0;
+
+    $logger->trace("Results: ".Dumper( $self->results ));
 
     for my $pi ($p0..$#$plan){
+        $logger->trace("in loop, pi $pi");
 
-        $self->reset_results_iterator( $i0, $last_result );
-        $i0 = 0; # make sure to start inputs from scratch on the next plan iteration
-        $last_result = undef;
-        my $ii = 0;
-
-        my $input_item;
-        my $gid;
+        $self->reset_results( $i0, $last_result );
+        my $ii = $i0;
 
         while(1){
+
             $input_item = $self->next_result;
+            $logger->trace("input item: ".Dumper( $input_item ));
             last unless $input_item;
 
             $ii++;
-            my $count = $pi * $ni + $ii;
-            my $last_rec_cond = $pi == $#$plan && $ii == $ni ? 1 : 0;
 
-            $tm->execute( sub{
-                    $self->execute_child_task( $plan->[$pi], $input_item );
-                    $self->record_resume_info( $ii,$pi,$input_item );
-                },
-                $count,
-                $last_rec_cond
+            my $data = $self->prep_child_task_data( 
+                $plan->[$pi], 
+                $input_item,
+                $ii,
+                $pi
             );
+
+            $tm->execute( $data );
+            $self->utils->record_resume_info(
+                $self->xbranch_ids->[0],
+                $ii,
+                $pi,
+                $input_item
+            );
+
         }
+
+        $i0 = 0; # make sure to start inputs from scratch on the next plan iteration
+
     }
 
-    $tm->wait_children;
-}
-
-
-
-sub record_resume_info{
-    my ($self,$input_index,$plan_index,$last_result) = @_;
-
-    my $xbranch = $self->sm->table('xbranch')->find({
-        id => $self->xbranch_ids->[0]
-    });
-
-    if ($xbranch){
-        $xbranch->update({
-            last_plan_index => $plan_index,
-            last_input_index => $input_index,
-            last_result => +$self->serialize($last_result)
-        });
-    }
 }
 
 
 
 sub get_resume_info{
     my ($self) = @_;
+
+    my $logger = Log::Log4perl->get_logger;
 
     my $xbranch = $self->sm->table('xbranch')->find({
         id => $self->xbranch_ids->[0]
@@ -731,50 +891,149 @@ sub get_resume_info{
         $last_result = $xbranch->last_result || undef;
     }
 
-    $last_result = $self->deserialize( $last_result ) if $last_result;
+    $last_result = $self->utils->deserialize( $last_result ) if $last_result;
 
+    #$logger->debug("GOT RESUME INFO: xid ".$self->xbranch_ids->[0]." ii $input_index pi $plan_index last_result ".Dumper( $last_result ) );
+    
     return ($input_index,$plan_index,$last_result);
+
 }
 
 
+#sub execute_child_task{
+#    my ($self,$plan,$input) = @_;
+
+#    my $logger = Log::Log4perl->get_logger;
+
+#    my $task = $self->task_from_plan($plan);
+
+#    $task->input($input);
+#    $self->add_history( $task );
+
+#    my $param;
+#    if ( $self->settings->plan_mode eq 'tree' ){
+#        $task->param( clone $plan->{task} );            
+#    } else {
+#        $task->param( clone $plan->[0] );
+#    }
+
+#    my $err;
+#    try { 
+#        $task->execute; 
+#    } catch( $err ) {
+#        $task->handle_error($err);
+#    };
+
+#    Log::Log4perl->remove_logger( $logger );
+#    $task->sm->schema->storage->disconnect;
+#    $task->gm->schema->storage->disconnect;
+
+#}
 
 
 
+sub prep_child_task_data{
+    my ($self,$plan,$input,$ii,$pi) = @_;
 
-sub execute_child_task{
-    my ($self,$plan,$input) = @_;
+    my $i_current = clone $self->input;
+    my $i_history = clone $self->input_history;
+    unshift @$i_history, $i_current;
 
-    my $logger = Log::Log4perl->get_logger;
+    my $p_current = clone $self->param;
+    my $p_history = clone $self->param_history;
+    unshift @$p_history, $p_current;
 
-    my $task = $self->task_from_plan($plan);
-    $task->input($input);
-    $self->add_history( $task );
+    my $xbranches = clone $self->xbranch_ids;
 
     my $param;
     if ( $self->settings->plan_mode eq 'tree' ){
-        $task->param( clone $plan->{task} );            
+        $param = clone $plan->{task};
     } else {
-        $task->param( clone $plan->[0] );
+        $param = clone $plan->[0];
     }
 
-    try { 
-        $task->execute; 
-    } catch {
-        $task->handle_error($_);
-    };
+    my ($branch_id) = $self->branch_id =~ /^(\d+)/;
+    $branch_id++;
+    $branch_id.='-'.$pi;
 
+    my $input_id;
+    if ( ! $self->input_id ){
+        $input_id = $ii;
+    } else {
+        $input_id = $self->input_id.'-'.$ii;
+    }
+
+    my $plan_key = $branch_id;
+    my $input_key = $input_id;
+    if ( $self->settings->xbranch_key_mode eq 'md5' ){
+        my $full = [ $input, @$i_history ];
+        $input_key = md5_base64( encode("utf8",+$self->utils->serialize( $full ) ) );
+        $plan_key = md5_base64( encode("utf8",+$self->utils->serialize( $plan ) ) );
+    }
+
+    return {
+        plan_key => $plan_key,
+        input_key => $input_key,
+        plan => $plan,
+        input => $input,
+        ii => $ii,
+        pi => $pi,
+        branch_id => $branch_id,
+        input_id => $input_id,
+        input_history => $i_history,
+        param_history => $p_history,
+        xbranch_ids => $xbranches,
+        param => $param,
+        plan_mode => +$self->settings->plan_mode
+    };
 }
+
+
 
 
 
 sub mark_seen{
     my ($self) = @_;
     
-    my $xbranch = $self->sm->table('xbranch')->search({
+    my $logger = Log::Log4perl->get_logger;
+
+   my $xbranch = $self->sm->table('xbranch')->search({
         id => $self->xbranch_ids->[0]
-    })->delete_all;
+    });
+    my $child_xbranches = $self->sm->table('xbranch')->search({
+        parent_id => $self->xbranch_ids->[0]
+    });
+
+#    if ( $self->branch_id !~ /^2/ ){
+        if ( $self->settings->seen_xbranch_policy eq 'skip' ){
+
+            $logger->debug("Updating xbranch status to 'seen'");
+
+            if ( $xbranch ){ 
+                $xbranch->update({ status => 'seen' });
+            }
+        } elsif ( $self->settings->seen_xbranch_policy eq 'delete' ){
+            $logger->debug("Deleting xbranch record");
+        
+            $xbranch->update({ status => 'seen' });
+
+            while( my $child_xbranch = $child_xbranches->next ){
+                $self->sm->table('xresult')->search({
+                    xbranch_id => $child_xbranch->id
+                })->delete_all;
+            }
+            $child_xbranches->delete_all;
+            $self->sm->table('xresult')->search({
+                xbranch_id => $self->xbranch_ids->[0]
+            })->delete_all;
+
+        } else {
+            confess "Unrecognised seen_xbranch_policy: ".$self->settings->seen_xbranch_policy;
+        }
+#    }
 
 }
+
 
 
 
@@ -821,12 +1080,14 @@ sub task_from_plan{
         sm => $self->sm,
         gm => $self->gm,
         thread_manager => $self->thread_manager,
+        logger_manager => $self->logger_manager,
         plan => $plan
     );
 
     return $task;
 
 }
+
 
 
 sub set_xbranch_status{
@@ -845,12 +1106,18 @@ sub set_xbranch_status{
 
 
 
+
 sub handle_error{
     my ($self,$error_msg) = @_;
+
+    my $logger = Log::Log4perl->get_logger;
+
+    $logger->error($error_msg);
 
     my $guard = $self->sm->schema->txn_scope_guard;
 
     my $error = $self->sm->table('error')->create({
+        job_id => $self->run_info->job_id,
         history_index => scalar( @{$self->input_history} ),
         tag => $self->param->{_tag},
         task_name => $self->name,
@@ -871,7 +1138,7 @@ sub handle_error{
     }
     $guard->commit;
 
-    $self->thread_manager->finalize if $self->settings->on_task_error eq 'stop';
+    $self->thread_manager->stop_threads if $self->settings->on_task_error eq 'stop';
 }
 
 
@@ -898,6 +1165,10 @@ sub action{
     confess "action in ".__PACKAGE__." should NOT be called. Override this method in child class";
 
 }
+
+
+
+
 
 =head1 NAME
 

@@ -157,13 +157,10 @@ my $exp = <<EOD;
                "advance 1",
                "end",
                "advance 1"
-            ],
-            "transpose" : 0
+            ]
          }
-      ],
-      "transpose" : 0
-   },
-   "transpose" : 0
+      ]
+   }
 }
 EOD
 

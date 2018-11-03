@@ -26,4 +26,4 @@ requires:
   IO::File: 0
   IO::Seekable: 0
   YAML: 0
-version: v1.3.25
+version: v1.3.26

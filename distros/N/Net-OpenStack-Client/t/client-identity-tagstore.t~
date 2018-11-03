@@ -1,0 +1,17 @@
+use strict;
+use warnings;
+
+use File::Basename;
+use Test::More;
+
+BEGIN {
+    push(@INC, dirname(__FILE__));
+}
+
+use Test::MockModule;
+
+use Net::OpenStack::Client;
+use mock_rest qw(identity_v3);
+use logger;
+
+done_testing();

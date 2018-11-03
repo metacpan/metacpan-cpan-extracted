@@ -1,3 +1,16 @@
+20181102  2018-11-02 20:23:05 CET
+ - 2145 prefixes
+ - added:   activity adr antenne atlasterms az bioentity cocoon crml
+            cubeont cwlprov da dao dcx dead dnbt dossier ecore faostat
+            foaffff frbroo gbol gdpr goaf grel gt ids imas jpo kmgeo ldt
+            led legal lido mandaat mem mml mmo mobivoc mydb nosql number
+            numbers physics plg ppn r3d seo seokoeln sfd swo swrc2 sylld
+            tikag timex uc vartrans vss vsso waarde
+ - changed: cco cpm doi edam lime lindt opm parl sparql ssn video wordnet
+
+
+20181102  2018-11-02 20:23:05 CET
+
 20180227  2018-02-27 20:35:38 CET
  - 2086 prefixes
  - added:   besluit bgt geo7 shui
@@ -6,7 +19,7 @@
  - adjust the counts
  - Do not load namespaces with example
 
-20180227  2018-02-27 20:35:38 CET
+20181102  2018-11-02 20:23:05 CET
 
 20180213  2018-02-13 10:16:58 CET
  - 2082 prefixes
@@ -30,7 +43,7 @@
 
  - Test on Perl 5.26 instead of 5.12
 
-20180227  2018-02-27 20:35:38 CET
+20181102  2018-11-02 20:23:05 CET
 
 20170111  2017-01-11 17:02:03 CET
  - 1922 prefixes
@@ -50,7 +63,7 @@
             ogc res role san seas units verb wikipedia wp
 
 
-20180227  2018-02-27 20:35:38 CET
+20181102  2018-11-02 20:23:05 CET
 
 20160409  2016-04-09 14:03:22 CEST
  - 1793 prefixes

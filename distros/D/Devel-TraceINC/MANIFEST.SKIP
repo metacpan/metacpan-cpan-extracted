@@ -40,3 +40,5 @@ nytprof.out
 ^scratch$
 ^core$
 ^var$
+^MYMETA.yml$
+^MYMETA.json$

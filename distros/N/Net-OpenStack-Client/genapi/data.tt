@@ -1,0 +1,47 @@
+#
+# This module is generated with [% script_name %]
+# Do not modify.
+#
+
+package Net::OpenStack::Client::API::[% service %]::[% modname %];
+
+use strict;
+use warnings;
+
+use version;
+our \$VERSION = version->new("v[% version %]");
+
+use Readonly;
+
+Readonly our \$API_DATA => {
+[% FILTER indent -%]
+[%-     FOREACH method IN methods.pairs %]
+[%          method.key %] => {
+[%              FILTER indent -%]
+method => '[%       method.value.method %]',
+endpoint => '[%          method.value.url %]',
+[%                  IF method.value.templates.defined -%]
+templates => [%         sdump(method.value.templates) %],
+[%                  END %]
+[%                  IF method.value.parameters.defined -%]
+parameters => [%        sdump(method.value.parameters) %],
+[%                  END %]
+[%                  IF method.value.options.defined -%]
+options => {
+[%-                     FILTER indent -%]
+[%-                         FOREACH opt IN method.value.options.pairs %]
+'[%                              opt.key %]' => [% sdump(opt.value) %],
+[%-                          END -%]
+[%-                      END %]
+},
+[%-                 END %]
+[%                  IF method.value.result.defined -%]
+result => '[%         method.value.result %]',
+[%                  END %]
+[%-             END %]
+},
+[%      END -%]
+[%- END %]
+};
+
+1;

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,11 @@ no_index:
     - inc
 requires:
   Mojolicious: '5.81'
-  XML::Loy: '0.38'
+  XML::Loy: '0.45'
   perl: '5.010001'
 resources:
+  bugtracker: https://github.com/Akron/Mojolicious-Plugin-XML-Loy/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/Akron/Mojolicious-Plugin-XML-Loy
-version: '0.14'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  repository: https://github.com/Akron/Mojolicious-Plugin-XML-Loy.git
+version: '0.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

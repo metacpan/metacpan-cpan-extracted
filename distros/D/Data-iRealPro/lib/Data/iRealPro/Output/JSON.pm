@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Jan 15 19:15:00 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Dec  6 10:22:35 2016
-# Update Count    : 1094
+# Last Modified On: Thu Nov  1 21:09:11 2018
+# Update Count    : 1102
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -19,8 +19,6 @@ use utf8;
 package Data::iRealPro::Output::JSON;
 
 use parent qw( Data::iRealPro::Output::Base );
-
-our $VERSION = "1.01";
 
 use JSON::PP;
 
@@ -42,7 +40,8 @@ sub process {
     };
 
     # Process the song(s).
-    my @goners = qw( variant debug a2 data raw_tokens cells );
+    my @goners = qw( variant debug a2 data raw_tokens cells
+		     transpose _transpose dataxp );
     for my $item ( $u, $u->{playlist} ) {
 	delete( $item->{$_} ) for @goners;
     }
@@ -51,11 +50,16 @@ sub process {
 	$songix++;
 	warn( sprintf("Song %3d: %s\n", $songix, $song->{title}) )
 	  if $self->{verbose};
-	$song->tokens;
+	{ local $song->{_transpose} = 0;
+	  $song->tokens; }
 	delete( $song->{$_} ) for @goners;
     }
     if ( ref( $self->{output} ) ) {
 	${ $self->{output} } = $json->encode($u);
+    }
+    elsif ( $self->{output} eq "-" ) {
+	binmode( STDOUT, ':utf8' );
+	print( $json->encode($u) );
     }
     else {
 	open( my $fd, ">:utf8", $self->{output} )

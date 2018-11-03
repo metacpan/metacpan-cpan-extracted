@@ -5,18 +5,19 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.03
 
 SYNOPSIS
 
         use OData::QueryParams::DBIC;
         
-        my $query_string = 'orderby=username asc, userid';
-        my $opts         = params_to_dbic( $query_string );
+        my $query_string  = 'orderby=username asc, userid';
+        my ($where,$opts) = params_to_dbic( $query_string );
         
-        # { order_by => [ {-asc => 'username'}, {-asc => 'userid'} ] }
+        # $where = {}
+        # $opts  = { order_by => [ {-asc => 'username'}, {-asc => 'userid'} ] }
         # can be used in
-        # $schema->resultset('users')->search( undef, $opts );
+        # $schema->resultset('users')->search( $where, $opts );
 
 DESCRIPTION
 
@@ -39,8 +40,101 @@ EXPORTED FUNCTION
 
         use OData::QueryParams::DBIC;
         
-        my $query_string = 'orderby=username asc, userid';
-        my $opts         = params_to_dbic( $query_string );
+        my $query_string  = 'orderby=username asc, userid';
+        my ($where,$opts) = params_to_dbic( $query_string );
+
+    More examples:
+
+        my $query_string  = 'filter=Price eq 5&orderby=username asc, userid';
+        my ($where,$opts) = params_to_dbic( $query_string );
+        
+        # $where = { Price => 5 }
+        # $opts  = { order_by => [ {-asc => 'username'}, {-asc => 'userid'} ] }
+    
+        my $query_string  = 'select=Price&orderby=username asc, userid';
+        my ($where,$opts) = params_to_dbic( $query_string );
+        
+        # $where = {}
+        # $opts  = { columns => ['Price'], order_by => [ {-asc => 'username'}, {-asc => 'userid'} ] }
+    
+        my $query_string  = 'orderby=username asc, userid';
+        my ($where,$opts) = params_to_dbic( $query_string );
+        
+        # $where = {}
+        # $opts  = { order_by => [ {-asc => 'username'}, {-asc => 'userid'} ] }
+
+SUPPORTED QUERY PARAMS
+
+ filter
+
+    This lists the top number of entries.
+
+        my $query_string   = 'filter=Price le 100';
+        my ($where, $opts) = paras_to_dbic( $query_string );
+        
+        # $where = { Price => { '<=' => 100 } }
+
+    Currently only simple filters are supported:
+
+        "filter=Price le 3.5 or Price gt 200"
+            => { -or => [ { Price => { '<=' => 3.5 } }, { Price => { '>' => 200 } } ] } },
+        
+        "filter=Price le 200 and Price gt 3.5"
+            => { -and => [ { Price => { '<=' => 200 } }, { Price => { '>' => 3.5 } } ] },
+        
+        "filter=Price le 100"
+            => { Price => { '<=' => 100 } },
+        
+        "filter=Price lt 20"
+            => { Price => { '<' => 20 } },
+        
+        "filter=Price ge 10"
+            => { Price => { '>=' => 10 } },
+        
+        "filter=Price gt 20"
+            => { Price => { '>' => 20 } },
+        
+        "filter=Address/City ne 'London'"
+            => { 'Address.City' => { '!=' => 'London' } },
+        
+        "filter=Address/City eq 'Redmond'"
+            => { 'Address.City' => 'Redmond' },
+
+ orderby
+
+    This orders the list of entries by the given column.
+
+    A simple query string:
+
+        my $query_string = 'orderby=username';
+        my $opts = paras_to_dbic( $query_string );
+        
+        # $opts = { order_by => [ {-asc => 'username'} ] };
+
+    A more complex one:
+
+        my $query_string = 'orderby=username asc, userid asc';
+        my $opts = paras_to_dbic( $query_string );
+        
+        # $opts = { order_by => [ {-asc => 'username'}, {-asc => 'userid'} ] };
+
+ skip
+
+    In combination with top, this can be used for pageination.
+
+        my $query_string = 'skip=5';
+        my $opts = paras_to_dbic( $query_string );
+        
+        # $opts = { page => 5 }
+
+ top
+
+    This lists the top number of entries.
+
+        my $query_string = 'top=5';
+        my $opts = paras_to_dbic( $query_string );
+        
+        # $opts = { rows => 5 }
 
 AUTHOR
 

@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               File-NFSLock
-version:            1.27
+version:            1.28
 abstract:           perl module to do NFS (or not) locking
 author:
     - Paul Seamons
@@ -15,7 +15,7 @@ no_index:
     directory:
         - t
         - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+generated_by:       ExtUtils::MakeMaker version 6.55_02
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4

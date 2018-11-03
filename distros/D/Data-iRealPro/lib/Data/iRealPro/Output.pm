@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 16:09:10 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Oct  7 09:50:21 2016
-# Update Count    : 72
+# Last Modified On: Thu Nov  1 21:08:33 2018
+# Update Count    : 79
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -18,8 +18,6 @@ use utf8;
 
 package Data::iRealPro::Output;
 
-our $VERSION = "1.00";
-
 use Data::iRealPro::Input;
 use Encode qw ( decode_utf8 );
 
@@ -30,6 +28,14 @@ sub new {
     my $opts;
 
     $opts->{output} = $options->{output} || "";
+    $opts->{transpose} = $options->{transpose} // 0;
+    if ( $options->{generate} ) {
+	$self->{_backend} = "Data::iRealPro::Output::" . ucfirst($options->{generate});
+	eval "require $self->{_backend}";
+	die($@) if $@;
+	$opts->{output} ||= "-";
+    }
+
     if ( $options->{list}
 	 || $opts->{output} =~ /\.txt$/i ) {
 	require Data::iRealPro::Output::Text;
@@ -45,7 +51,7 @@ sub new {
 	require Data::iRealPro::Output::HTML;
 	$self->{_backend} = Data::iRealPro::Output::HTML::;
     }
-    else {
+    elsif ( !$self->{_backend} ) {
 	require Data::iRealPro::Output::Imager;
 	$self->{_backend} = Data::iRealPro::Output::Imager::;
     }

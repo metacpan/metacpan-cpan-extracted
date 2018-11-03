@@ -1,0 +1,60 @@
+
+=item [% name %]
+
+API method [% name %]
+
+[% details.description %]
+
+=over
+
+=item [% -%]
+[%- IF details.templates.defined -%]
+Required url / endpoint templates
+
+=over
+[%      FOREACH template IN details.templates %]
+=item [% template %]
+[%      END %]
+=back
+[% ELSE -%]
+No required url / endpoint templates
+[%- END %]
+
+=item [% -%]
+[%- IF details.parameters.defined -%]
+Optional url / endpoint parameters
+
+=over
+[%      FOREACH param IN details.parameters %]
+=item [% param %]
+[%      END %]
+=back
+[% ELSE -%]
+No optional url / endpoint parameters
+[%- END %]
+
+=item Options
+
+=over
+[%  FOREACH opt IN details.options.pairs %]
+=item [% opt.key %]: [% opt.value.islist ? 'arrayref of ' : '' %][% opt.value.type %] (JSON path: [% opt.value.path.join(' -> ') %])
+[%  END -%]
+[%-  IF details.options.defined %]
+=item raw: hashref used for JSON body, ignoring all options[%- IF details.templates.defined -%] (except the url/endpoint templates)[% END %]
+[%-  END %]
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+[% IF details.result.defined -%]
+[%-     IF details.result.match('^/') -%]
+Result path is set to JSON path [% details.result %]
+[%-     ELSE -%]
+Result is set to [% details.result %] response header.
+[%-     END -%]
+[%- END %]
+
+=back
+
+=cut

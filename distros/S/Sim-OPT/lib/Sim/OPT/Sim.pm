@@ -138,6 +138,10 @@ sub sim    # This function launch the simulations in ESP-r
 
   if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
   {
+    if ( $dirfiles{checksensitivity} eq "yes" )
+    {
+      Sim::OPT::sense( $dirfiles{ordtot}, $mypath, $sense{objectivecolumn} );
+    }
     exit(say $tee "#END RUN.");
   }
 

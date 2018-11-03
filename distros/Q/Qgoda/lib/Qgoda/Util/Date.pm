@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Util::Date;
-$Qgoda::Util::Date::VERSION = 'v0.9.2';
+$Qgoda::Util::Date::VERSION = 'v0.9.3';
 use strict;
 
 use Date::Parse qw(str2time);
@@ -42,7 +42,8 @@ sub new {
 
 sub newFromEpoch {
     my ($class, $epoch) = @_;
-
+    
+    $epoch = time if !defined $epoch;
     my $self = $epoch;
 
     bless \$self, $class;
@@ -195,6 +196,102 @@ sub nequals {
     my ($self, $other) = @_;
 
     return $$self == $other;
+}
+
+# Date and time in RFC822 format. For performance reasons, this is always
+# in GMT.
+sub rfc822 {
+    my ($self) = @_;
+
+    my @time = gmtime $$self;
+
+    my @month_names = qw(Jan Feb Mar Apr May Jun
+                         Jul Aug Sep Oct Nov Dec);
+    my @day_names = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
+
+    return sprintf('%s, %02u %s %04u %02u:%02u:%02u +0000',
+                   $day_names[$time[6]], $time[3], $month_names[$time[4]],
+                   $time[5] + 1900, $time[2], $time[1], $time[0]);
+}
+
+# This is the same as rfc822() above but takes some effort to use the real
+# timezone of the server. This is mostly a waste of time and not needed, see
+# https://stackoverflow.com/a/52787169/5464233 for details.
+sub rfc822Local {
+    my ($self) = @_;
+
+    my @time = localtime $$self;
+
+    use integer;
+
+    my $tz_offset = (Time::Local::timegm(@time) - $$self) / 60;
+    my $tz = sprintf('%s%02u%02u',
+                     $tz_offset < 0 ? '-' : '+',
+                     $tz_offset / 60, $tz_offset % 60);
+
+    my @month_names = qw(Jan Feb Mar Apr May Jun
+                         Jul Aug Sep Oct Nov Dec);
+    my @day_names = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
+
+    return sprintf('%s, %02u %s %04u %02u:%02u:%02u %s',
+                   $day_names[$time[6]], $time[3], $month_names[$time[4]],
+                   $time[5] + 1900, $time[2], $time[1], $time[0], $tz);
+}
+
+# Date in W3C format in GMT.
+sub w3c {
+    my ($self) = @_;
+
+    my @time = gmtime $$self;
+
+    return sprintf('%04u-%02u-%02u', $time[5] + 1900, $time[4] + 1, $time[3]);
+}
+
+# Date in W3C format in local time.
+sub w3cLocal {
+    my ($self, $short) = @_;
+
+    my @time = localtime $$self;
+
+    return sprintf('%04u-%02u-%02u', $time[5] + 1900, $time[4] + 1, $time[3]);
+}
+
+# Date and time in W3C format. For performance reasons, this is always
+# in GMT.
+sub w3cWithTime {
+    my ($self) = @_;
+
+    my @time = gmtime $$self;
+
+    return sprintf('%04u-%02u-%02uT%02u:%02u:%02u+0000',
+                   $time[5] + 1900, $time[4] + 1, $time[3], $time[2], $time[1],
+                   $time[0]);
+}
+
+# This is the same as w3cWithTime() above but takes some effort to use the real
+# timezone of the server. This is mostly a waste of time and not needed, see
+# https://stackoverflow.com/a/52787169/5464233 for details.
+sub w3cWithTimeLocal {
+    my ($self, $short) = @_;
+
+    my @time = localtime $$self;
+
+    use integer;
+
+    my $tz_offset = (Time::Local::timegm(@time) - $$self) / 60;
+    my $tz = sprintf('%s%02u%02u',
+                     $tz_offset < 0 ? '-' : '+',
+                     $tz_offset / 60, $tz_offset % 60);
+
+    return sprintf('%04u-%02u-%02uT%02u:%02u:%02u%s',
+                   $time[5] + 1900, $time[4] + 1, $time[3], $time[2], $time[1],
+                   $time[0], $tz);
+}
+
+sub TO_JSON {
+    my ($self) = @_;
+
+    return $self->ISOString;
 }
 
 1;

@@ -1,3 +1,15 @@
+1.004 2018-11-02
+
+  * fix CPAN tester tests: test full text instead of summary text
+    on non debian system
+  * fix full text extraction of LGPL_2 license
+
+1.003 2018-11-01
+
+  * add notice to summary (Debian #911403)
+    Thanks to Felix Lechner for the patch
+  * add GFDL_1_2 and GFDL_1_3 license summaries
+
 1.002 2018-07-17
 
   * Fix LGPL2.1 summary

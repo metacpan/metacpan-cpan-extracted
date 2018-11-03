@@ -6,6 +6,7 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
+__PACKAGE__->load_components("InflateColumn::DateTime");
 __PACKAGE__->table("open_proxy");
 __PACKAGE__->add_columns(
   "ip",

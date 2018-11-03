@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Processor::Hoedown;
-$Qgoda::Processor::Hoedown::VERSION = 'v0.9.2';
+$Qgoda::Processor::Hoedown::VERSION = 'v0.9.3';
 use strict;
 
 use base qw(Qgoda::Processor);

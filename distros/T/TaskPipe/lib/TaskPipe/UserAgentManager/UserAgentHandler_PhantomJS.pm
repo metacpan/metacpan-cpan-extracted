@@ -69,23 +69,30 @@ sub build_ua{
 
     my $timeout = $self->settings->timeout * 1000;
 
-    $ua->eval_in_phantomjs("
-        var page = this;
-        page.settings.userAgent = ${\$self->settings->agent};
-        page.settings.resourceTimeout = $timeout;
-    ");
-    
-    foreach my $header_name ( keys %{$self->settings->headers} ){
-
-        my $header_val = $self->settings->headers->{$header_name};
-
-        $ua->eval_in_phantomjs( qq|
+    try {
+        $ua->eval_in_phantomjs("
             var page = this;
-            page.customHeaders["$header_name"] = "$header_val";
-        |);
-    };
+            page.settings.userAgent = ${\$self->settings->agent};
+            page.settings.resourceTimeout = $timeout;
+        ");
+        
+        foreach my $header_name ( keys %{$self->settings->headers} ){
 
-    $ua->driver->debug_on if $self->phantom_settings->debug;
+            my $header_val = $self->settings->headers->{$header_name};
+
+            $ua->eval_in_phantomjs( qq|
+                var page = this;
+                page.customHeaders["$header_name"] = "$header_val";
+            |);
+        };
+
+        $ua->driver->debug_on if $self->phantom_settings->debug;
+
+    } catch {
+
+        confess "Error connecting to PhantomJS: ".$_;
+
+    };
 
     return $ua;
 }
@@ -96,27 +103,38 @@ sub call{
 
     my $resp;
 
-    if ( grep { $_ eq $method } @{$self->settings->request_methods} ){
+    try {
 
-        $resp = $self->request($method,@params);
+        if ( grep { $_ eq $method } @{$self->settings->request_methods} ){
 
-    } elsif ( $method eq 'proxy' ){
 
-        $resp = $self->set_proxy(@params);
+            $resp = $self->request($method,@params);
 
-    } elsif ( $method eq 'default_header' ){
 
-        $resp = $self->default_header( @params );
+        } elsif ( $method eq 'proxy' ){
 
-    } elsif ( $method eq 'default_headers' ){
+            $resp = $self->set_proxy(@params);
 
-        $resp = $self->default_headers;
+        } elsif ( $method eq 'default_header' ){
 
-    } else {
+            $resp = $self->default_header( @params );
 
-        $resp = $self->SUPER::call( $method, @params );
+        } elsif ( $method eq 'default_headers' ){
 
-    }
+            $resp = $self->default_headers;
+
+        } else {
+
+            $resp = $self->SUPER::call( $method, @params );
+
+        }
+
+    } catch {
+
+        confess "PhantomJS call failed: $_";
+
+    };
+
 
     return $resp;
 }
@@ -134,10 +152,14 @@ sub set_proxy{
     my $type = $self->phantom_settings->proxy_schemes->{ $scheme };
     confess "attempt to set proxy with unrecognised scheme '$scheme'" unless $type;
 
-    $self->ua->eval_in_phantomjs( qq|
-        var page = this;
-        phantom.setProxy("$host","$port","$type");
-    |);
+    try {
+        $self->ua->eval_in_phantomjs( qq|
+            var page = this;
+            phantom.setProxy("$host","$port","$type");
+        |);
+    } catch {
+        "PhantomJS error setting proxy: $_";
+    };
 }
 
 
@@ -210,6 +232,7 @@ sub request{
                     last;
                 }
             }
+            print "elapsed $elapsed success $success\n";
             last if $success;
             usleep( $self->phantom_settings->poll_for_interval );
             $elapsed = 1000 * tv_interval( $t0, [ gettimeofday ] );
@@ -226,7 +249,11 @@ sub request{
 sub clear_cookies{
     my ($self) = @_;
 
-    $self->ua->eval_in_phantomjs( qq| phantom.clearCookies(); | );
+    try {
+        $self->ua->eval_in_phantomjs( qq| phantom.clearCookies(); | );
+    } catch {
+        confess "PhantomJS Clear cookies error: $_";
+    };
 }
        
 =head1 NAME

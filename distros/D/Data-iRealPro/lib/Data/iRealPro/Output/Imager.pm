@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Jan 15 19:15:00 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Oct 30 10:28:19 2018
-# Update Count    : 1517
+# Last Modified On: Thu Nov  1 21:08:59 2018
+# Update Count    : 1518
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -21,8 +21,6 @@ use FindBin;
 package Data::iRealPro::Output::Imager;
 
 use parent qw( Data::iRealPro::Output::Base );
-
-our $VERSION = "1.00";
 
 use Data::Dumper;
 use Text::CSV_XS;

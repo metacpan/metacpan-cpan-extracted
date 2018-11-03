@@ -1,11 +1,16 @@
+0.15 2016-09-09
+        - Minor fixes for Kwalitee.
+        - Update meta_merge.
+        - Fixes in the documentation.
+
 0.14 2016-07-21
         - Fixed compatibility with Mojolicious 7.
-	- Added reply->xml.
-	- Deprecated render_xml.
+        - Added reply->xml.
+        - Deprecated render_xml.
 
 0.13 2015-04-20
         - Updated dependency on XML::Loy.
-	- Fixed compatibility with Mojolicious 6.
+        - Fixed compatibility with Mojolicious 6.
 
 0.12 2015-01-26
         - Updated dependency on XML::Loy.     
@@ -15,8 +20,8 @@
         - Fixed namespace handling for 5.71 (renee++ for reporting!).
 
 0.10 2014-08-18
-	- Fixed License issue (now coherent Artistic License 2.0).
-	- Bugfix of documentation for configuration key
+        - Fixed License issue (now coherent Artistic License 2.0).
+        - Bugfix of documentation for configuration key
           (XML-Loy instead of XML::Loy).
 
 0.09 2013-09-10
@@ -36,16 +41,16 @@
 
 0.04 2013-04-06
         - Update dependencies.
-	- Improved test suite.
-	- Deprecated namespace parameter and
-	  unprepended classes.
+        - Improved test suite.
+        - Deprecated namespace parameter and
+          unprepended classes.
 
 0.03 2013-03-28
         - Fix bug in redefined helpers.
 
 0.02 2013-03-24
         - Fix bug in documentation.
-	- Small improvements in Synopsis.
+        - Small improvements in Synopsis.
 
 0.01 2013-03-23
         - Initial CPAN release.

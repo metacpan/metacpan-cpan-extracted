@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.16
+    version 0.17
 
 SYNOPSIS
 
@@ -26,7 +26,10 @@ SYNOPSIS
           say 'User has Access to GMail Method End-Point gmail.users.settings.sendAs.get';
         }
 
-    Package includes _go_auth_ CLI Script to collect initial end-user
+    Internal User Agent provided be property
+    WebService::GoogleAPI::Client::UserAgent dervied from Mojo::UserAgent
+
+    Package includes go_auth CLI Script to collect initial end-user
     authorisation to scoped services
 
 EXAMPLES
@@ -63,8 +66,20 @@ METHODS
 
  new
 
-    WebService::GoogleAPI::Client->new( user => 'useremail@sdf.com',
-    gapi_json => '/fullpath/gapi.json' );
+      WebService::GoogleAPI::Client->new( user => 'peter@pscott.com.au', gapi_json => '/fullpath/gapi.json' );
+
+  PARAMETERS
+
+   user :: the email address that identifies key of credentials in the
+   config file
+
+   gapi_json :: Location of the configuration credentials - default
+   gapi.json
+
+   debug :: if '1' then diagnostics are send to STDERR - default false
+
+   chi :: an instance to a CHI persistent storage case object - if none
+   provided FILE is used
 
  api_query
 
@@ -78,8 +93,6 @@ METHODS
     Optional params: api_endpoint_id
 
     $self->access_token must be valid
-
-    Examples of usage:
 
       $gapi->api_query({
           method => 'get',
@@ -127,28 +140,90 @@ METHODS
 
     warns and returns 0 on error ( eg user or config not specified etc )
 
+METHODS DELEGATED TO WebService::GoogleAPI::Client::Discovery
+
+ discover_all
+
+      Return details about all Available Google APIs as provided by Google or in CHI Cache
+    
+      On Success: Returns HASHREF containing items key => list of hashes describing each API
+      On Failure: Warns and returns empty hashref
+    
+        my $client = WebService::GoogleAPI::Client->new; ## has discovery member WebService::GoogleAPI::Client::Discovery
+    
+        $d = $client->discover_all();
+        $d = $client->discover_all(1); ## NB if include a parameter that evaluates to true such as '1' then the cache is flushed with a new version
+    
+        ## OR
+        $d = $client->discovery-> discover_all();
+        $d = WebService::GoogleAPI::Client::Discovery->discover_all();
+    
+        print Dumper $d;
+    
+          $VAR1 = {
+                    'items' => [
+                                {
+                                  'preferred' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' ),
+                                  'id' => 'abusiveexperiencereport:v1',
+                                  'icons' => {
+                                                'x32' => 'https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png',
+                                                'x16' => 'https://www.gstatic.com/images/branding/product/1x/googleg_16dp.png'
+                                              },
+                                  'version' => 'v1',
+                                  'documentationLink' => 'https://developers.google.com/abusive-experience-report/',
+                                  'kind' => 'discovery#directoryItem',
+                                  'discoveryRestUrl' => 'https://abusiveexperiencereport.googleapis.com/$discovery/rest?version=v1',
+                                  'title' => 'Abusive Experience Report API',
+                                  'name' => 'abusiveexperiencereport',
+                                  'description' => 'Views Abusive Experience Report data, and gets a list of sites that have a significant number of abusive experiences.'
+                                }, ...
+    
+        ## NB because the structure isn't indexed on the api name it can be convenient to post-process it
+        ## 
+        
+        my $new_hash = {};
+        foreach my $api ( @{ %{$client->discover_all()}{items} } )
+        {
+            # convert JSON::PP::Boolean to true|false strings
+            $api->{preferred}  = "$api->{preferred}" if defined $api->{preferred};
+            $api->{preferred}  = $api->{preferred} eq '0' ? 'false' : 'true';
+    
+            $new_hash->{ $api->{name} } = $api;
+        }
+        print Dumper $new_hash->{gmail};
+
+ get_api_discovery_for_api_id
+
+    returns the cached version if avaiable in CHI otherwise retrieves
+    discovery data via HTTP, stores in CHI cache and returns as a Perl data
+    structure.
+
+        my $hashref = $self->get_api_discovery_for_api_id( 'gmail' );
+        my $hashref = $self->get_api_discovery_for_api_id( 'gmail:v3' );
+
+    returns the api discovery specification structure ( cached by CHI ) for
+    api id ( eg 'gmail ')
+
+    returns the discovery data as a hashref, an empty hashref on certain
+    failing conditions or croaks on critical errors.
+
  methods_available_for_google_api_id
 
     Returns a hashref keyed on the Google service API Endpoint in dotted
     format. The hashed content contains a structure representing the
-    corresponding discovery specification for that method ( API Endpoint )
+    corresponding discovery specification for that method ( API Endpoint ).
 
         methods_available_for_google_api_id('gmail')
 
-    TODO: consider ? refactor to allow parameters either as a single api id
-    such as 'gmail' as well as the currently accepted hash keyed on the api
-    and version
+ extract_method_discovery_detail_from_api_spec
 
-    DELEGATED FROM WebService::GoogleAPI::Client::Discovery
+        $my $api_detail = $gapi->discovery->extract_method_discovery_detail_from_api_spec( 'gmail.users.settings' );
 
-    SEE ALSO: The following methods are delegated through to
-    Client::Discovery - see perldoc WebService::Client::Discovery for
-    detils
+    returns a hashref representing the discovery specification for the
+    method identified by $tree in dotted API format such as
+    texttospeech.text.synthesize
 
-      get_method_meta 
-      discover_all 
-      extract_method_discovery_detail_from_api_spec 
-      get_api_discovery_for_api_id
+    returns an empty hashref if not found
 
  list_of_available_google_api_ids
 
@@ -156,28 +231,28 @@ METHODS
     Discovery Resource that is either fetched or cached in CHI locally for
     30 days.
 
-    WHen called in a scalar context returns the list as a comma joined
-    string.
-
-    DELEGATED FROM WebService::GoogleAPI::Client::Discovery
+        my $r = $agent->list_of_available_google_api_ids();
+        print "List of API Services ( comma separated): $r\n";
+    
+        my @list = $agent->list_of_available_google_api_ids();
 
 FEATURES
 
-    API Discovery with local caching using CHI File
+      * API Discovery requests cached with CHI ( Default File )
 
-    OAUTH app credentials (client_id, client_secret, scope, users
-    access_token and refresh_tokens) stored in local file (default name =
-    gapi.json)
+      * OAUTH app and user credentials (client_id, client_secret, scope,
+      users access_token and refresh_tokens) stored in local file (default
+      name = gapi.json)
 
-    access_token refreshes when expires (if user has refresh_token) saving
-    refreshed token back to json file
+      * access_token auto-refreshes when expires (if user has
+      refresh_token) saving refreshed token back to json file
 
-    helper api_query to streamline request composition without preventing
-    manual construction if preferred.
+      * helper api_query to streamline request composition without
+      preventing manual construction if preferred.
 
-    CLI tool (goauth) with lightweight http server to simplify OAuth2
-    configuration, sccoping, authorization and obtaining access_ and
-    refresh_ tokensn from users
+      * CLI tool (goauth) with lightweight HTTP server to simplify OAuth2
+      configuration, sccoping, authorization and obtaining access_ and
+      refresh_ tokens from users
 
 AUTHOR
 

@@ -17,12 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::HTMLFilter::CleanUp;
-$Qgoda::HTMLFilter::CleanUp::VERSION = 'v0.9.2';
+$Qgoda::HTMLFilter::CleanUp::VERSION = 'v0.9.3';
 use strict;
 
 use Qgoda;
-
-use base qw(Qgoda::Processor);
 
 sub new {
     my ($class, %args) = @_;

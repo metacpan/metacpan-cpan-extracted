@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::Util::Callback;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my %callback;
 
@@ -35,7 +35,7 @@ sub register {
 
             # Establish callback
             if (ref $cb && ref $cb eq 'CODE') {
-              $mojo->callback($_, $cb, $flag);
+              $c->app->callback($_, $cb, $flag);
             };
           }
 
@@ -59,7 +59,7 @@ sub register {
         if (exists $callback{$name} &&   # Callback exists
               $callback{$name}->[0] &&   # Callback is defined
               $callback{$name}->[1]) { # Callback is -once
-          $mojo->log->debug(
+          $c->app->log->debug(
             qq{No allowance to redefine callback "$name"}
           );
 
@@ -240,7 +240,7 @@ L<Mojolicious> (best with SSL support).
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2017, L<Nils Diewald|http://nils-diewald.de/>.
+Copyright (C) 2013-2018, L<Nils Diewald|http://nils-diewald.de/>.
 
 This program is free software, you can redistribute it
 and/or modify it under the terms of the Artistic License version 2.0.

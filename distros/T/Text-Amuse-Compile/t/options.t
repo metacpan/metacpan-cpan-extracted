@@ -13,6 +13,8 @@ use Text::Amuse::Compile::Utils qw/read_file/;
 use Text::Amuse::Compile::TemplateOptions;
 use Text::Amuse::Compile::Fonts::Family;
 use Text::Amuse::Compile::Fonts::Selected;
+use Text::Amuse::Compile::Devel qw/create_font_object/;
+
 use Cwd;
 
 my $templates = Text::Amuse::Compile::Templates->new;
@@ -187,6 +189,7 @@ my $dummy = Text::Amuse::Compile::File->new(
                                             suffix => '.muse',
                                             templates => $templates,
                                             document => $merged,
+                                            fonts => create_font_object(),
                                             options => {
                                                         pippo => '[[http://test.org][test]]',
                                                         prova => 'hello *there* & \stuff',
@@ -244,6 +247,7 @@ $dummy = Text::Amuse::Compile::File->new(
                                          suffix => '.muse',
                                          templates => $templates,
                                          document => $merged,
+                                         fonts => create_font_object(),
                                          options => {
                                                      cover => 'prova.pdf',
                                                      logo => 'c-i-a',
@@ -273,6 +277,7 @@ SKIP: {
                                                          logo => $wintestfile,
                                                         },
                                              virtual => 1,
+                                             fonts => create_font_object(),
                                             );
 
     ok $dummy->_looks_like_a_sane_name($testfile), "$testfile is valid";
@@ -282,6 +287,7 @@ SKIP: {
     is $dummy->tex_options->{logo}, $testfile, "logo is $testfile";
 
     $dummy = Text::Amuse::Compile::File->new(
+                                             fonts => create_font_object(),
                                              name => 'dummy',
                                              suffix => '.muse',
                                              templates => $templates,

@@ -1,4 +1,4 @@
-TaskPipe version 0.05
+TaskPipe version 0.06
 =====================
 
 INSTALLATION
@@ -15,7 +15,6 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
     MooseX::ConfigCascade v0.02
-    MooseX::RelClassTypes v0.03
     Pod::Term v0.02
     Template::Nest v0.03
     Log::Log4perl::Layout::ColoredPatternLayout v0.01
@@ -23,6 +22,7 @@ This module requires these other modules and libraries:
     Log::Log4perl v1.49
     Moose
     Module::Runtime
+    DateTime
     DBIx::Class
     Data::Dumper
     Log::Log4perl
@@ -32,6 +32,7 @@ This module requires these other modules and libraries:
     DBIx::Class::Schema::Loader
     DBIx::Error
     File::Path
+    File::Path::Expand
     Try::Tiny
     Digest::MD5
     Time::HiRes

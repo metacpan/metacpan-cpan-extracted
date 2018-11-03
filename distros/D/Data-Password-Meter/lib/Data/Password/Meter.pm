@@ -4,8 +4,9 @@ use warnings;
 
 # Todo:
 # - see: https://en.wikipedia.org/wiki/Password_strength#NIST_Special_Publication_800-63
+# - see: http://www.spiegel.de/netzwelt/web/dashlane-untersuchung-viele-webanbieter-akzeptieren-zu-schwache-passwoerter-a-1161922.html
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 # Error messages
@@ -367,7 +368,7 @@ No dependencies other than core.
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2006, Steve Moitozo,
-(C) 2013-2016, L<Nils Diewald|http://nils-diewald.de>.
+(C) 2013-2018, L<Nils Diewald|http://nils-diewald.de>.
 
 Licensed under the MIT License
 

@@ -31,6 +31,7 @@ sub processPL {
   # "Version:" in spec needs to match
   # "$VERSION" from VERSION_FROM
   $block =~ s%(spec.PL\s*)$%$1 \$\(VERSION_FROM\)%m;
+  $block =~ s[(\$\(PERLRUNINST\)\s+)][PERL_USE_UNSAFE_INC=1 $1]gm;
   $block;
 }
 

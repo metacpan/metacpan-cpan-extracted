@@ -20,6 +20,11 @@ has option_specs => (is => 'ro', isa => 'ArrayRef', default => sub{[
         exclude => [
             'log_screen_colors'
         ]
+    }, {
+        module => 'TaskPipe::ThreadManager::Settings',
+        exclude => [
+            'thread_table_deadlock_retries'
+        ]
     },
     'TaskPipe::UserAgentManager::Settings', {
         module => 'TaskPipe::UserAgentManager::UserAgentHandler::Settings',

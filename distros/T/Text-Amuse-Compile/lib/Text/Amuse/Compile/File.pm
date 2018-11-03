@@ -114,7 +114,7 @@ Use luatex instead of xetex
 
 =item fonts
 
-The optional L<Text::Amuse::Compile::Fonts::Selected> object.
+The L<Text::Amuse::Compile::Fonts::Selected> object (required).
 
 =item epub_embed_fonts
 
@@ -147,7 +147,7 @@ has wants_slides => (is => 'lazy', isa => Bool);
 has is_deleted => (is => 'lazy', isa => Bool);
 has file_header => (is => 'lazy', isa => Object);
 has coverpage_only_if_toc => (is => 'ro', isa => Bool, default => sub { 0 });
-has fonts => (is => 'ro', isa => InstanceOf['Text::Amuse::Compile::Fonts::Selected']);
+has fonts => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile::Fonts::Selected']);
 has epub_embed_fonts => (is => 'ro', isa => Bool, default => sub { 1 });
 
 sub _build_file_header {
@@ -613,7 +613,7 @@ sub sl_tex {
     my $texfile = $self->name . '.sl.tex';
     return unless $self->wants_slides;
     return $self->_process_template($self->templates->slides,
-                                    $self->_prepare_tex_tokens,
+                                    $self->_prepare_tex_tokens(is_slide => 1),
                                     $texfile);
 }
 
@@ -1209,6 +1209,7 @@ sub _process_template {
 sub _prepare_tex_tokens {
     my ($self, %args) = @_;
     my $doc = $self->document;
+    my $is_slide = delete $args{is_slide};
     my %tokens = %{ $self->tex_options };
     my $escaped_args = $self->_escape_options_hashref(ltx => \%args);
     foreach my $k (keys %$escaped_args) {
@@ -1218,13 +1219,13 @@ sub _prepare_tex_tokens {
     # now validate the options against the new shiny module
     my %options = (%{ $self->full_options }, %args);
     # print Dumper($self->full_options);
-    my $parsed = eval { Text::Amuse::Compile::TemplateOptions->new(%options) };
-    unless ($parsed) {
-        $parsed = Text::Amuse::Compile::TemplateOptions->new;
+    my $template_options = eval { Text::Amuse::Compile::TemplateOptions->new(%options) };
+    unless ($template_options) {
+        $template_options = Text::Amuse::Compile::TemplateOptions->new;
         $self->log_info("# Validation failed: $@, setting one by one\n");
-        foreach my $method ($parsed->config_setters) {
+        foreach my $method ($template_options->config_setters) {
             if (exists $options{$method}) {
-                eval { $parsed->$method($options{$method}) };
+                eval { $template_options->$method($options{$method}) };
                 if ($@) {
                     print "Error on $method: $@\n";
                 }
@@ -1232,7 +1233,7 @@ sub _prepare_tex_tokens {
         }
     }
     my $safe_options =
-      $self->_escape_options_hashref(ltx => $parsed->config_output);
+      $self->_escape_options_hashref(ltx => $template_options->config_output);
 
     # defaults
     my %parsed = (%$safe_options,
@@ -1242,15 +1243,21 @@ sub _prepare_tex_tokens {
                   wants_toc => 0,
                  );
 
-    if (my $fonts = $self->fonts) {
-        # these are validated and sane.
+
+    my $fonts = $self->fonts;
+
+    # not used but for legacy templates
         $parsed{mainfont} = $fonts->main->name;
         $parsed{sansfont} = $fonts->sans->name;
         $parsed{monofont} = $fonts->mono->name;
         $parsed{fontsize} = $fonts->size;
-    }
 
-
+    my $tex_setup_langs = $fonts
+      ->compose_polyglossia_fontspec_stanza(lang => $doc->language,
+                                            others => $doc->other_languages || [],
+                                            bidi => $doc->is_bidi,
+                                            is_slide => $is_slide,
+                                           );
     # no cover page if header or compiler says so, or
     # if coverpage_only_if_toc is set and doc doesn't have a toc.
     if ($self->nocoverpage or
@@ -1267,67 +1274,38 @@ sub _prepare_tex_tokens {
         }
     }
 
-    # main language
-    my $orig_lang = $doc->language;
-    my %lang_aliases = (
-                        # bad hack, no mk hyphens...
-                        macedonian => 'russian',
-
-                        # the rationale is that polyglossia seems to
-                        # go south when you load serbian with latin
-                        # script, as the logs are spammed with cyrillic loading.
-                        serbian    => 'croatian',
-                       );
-    my $lang = $parsed{lang} = $lang_aliases{$orig_lang} || $orig_lang;
-
-    # I don't like doing this here, but here we go...
-    my %scripts = (
-                   russian  => 'Cyrillic',
-                   farsi    => 'Arabic',
-                   arabic   => 'Arabic',
-                   hebrew   => 'Hebrew',
-                  );
-
-    if (my $script = $scripts{$lang}) {
-        $parsed{mainlanguage_script} = "\\newfontfamily\\" .
-          $lang . 'font[Script=' . $script . ']{' . $parsed{mainfont} . "}\n";
-    }
-
-    my %toc_names = (
-                     macedonian => 'Содржина',
-                    );
-    if (my $toc_name = $toc_names{$orig_lang}) {
-        $parsed{mainlanguage_toc_name} = $toc_name;
-    }
-
-    if (my $other_langs_arrayref = $doc->other_languages) {
-        my %other_languages;
-        my %additional_strings;
-        foreach my $olang (@$other_langs_arrayref) {
-
-            # a bit of duplication...
-            my $other_lang = $lang_aliases{$olang} || $olang;
-            $other_languages{$other_lang} = 1;
-            if (my $script = $scripts{$other_lang}) {
-                my $additional = "\\newfontfamily\\" . $other_lang
-                  . 'font[Script=' . $script . ']{' . $parsed{mainfont} . "}";
-                $additional_strings{$additional} = 1;
-            }
-        }
-        if (%other_languages) {
-            $parsed{other_languages} = join(',', sort keys %other_languages);
-        }
-        if (%additional_strings) {
-            $parsed{other_languages_additional} = join("\n", sort keys %additional_strings);
-        }
-    }
     return {
             options => \%tokens,
             safe_options => \%parsed,
             doc => $doc,
+            tex_setup_langs => $tex_setup_langs,
+            latex_body => $self->_interpolate_magic_comments($template_options->format_id, $doc),
             disable_bigfoot => 0, # $doc->is_rtl || $doc->is_bidi,
             tex_metadata => $self->file_header->tex_metadata,
            };
+}
+
+sub _interpolate_magic_comments {
+    my ($self, $format, $doc) = @_;
+    my $latex = $doc->as_latex;
+    # format is validated.
+    my $re = qr{^
+                \%
+                \x{20}+
+                \:\Q$format\E\:
+                \x{20}+
+                \\textbackslash\{\}
+                ( # permitted commands
+                    sloppy |
+                    fussy  |
+                    newpage |
+                    strut |
+                    vskip\x{20}+[1-9][0-9]*(?:mm|cm|pt)
+                )
+                \x{20}*
+                $}xms;
+    $latex =~ s/$re/\\$1/g;
+    return $latex;
 }
 
 sub _looks_like_a_sane_name {

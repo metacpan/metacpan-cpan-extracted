@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Builder;
-$Qgoda::Builder::VERSION = 'v0.9.2';
+$Qgoda::Builder::VERSION = 'v0.9.3';
 use strict;
 
 use Locale::TextDomain qw('qgoda');
@@ -67,7 +67,7 @@ sub build {
     $site->computeRelations;
 
     # 2nd pass, usually HTML.
-    ASSET: foreach my $asset (sort { $a->{priority} <=> $b->{priority} }
+    ASSET: foreach my $asset (sort { $b->{priority} <=> $a->{priority} }
                             $site->getAssets) {
         if ($asset->{virtual}) {
             $logger->debug(__x("not wrapping virtual asset '/{relpath}'",
@@ -117,7 +117,10 @@ sub readAssetContent {
     } elsif (!empty $asset->{master}) {
         return translate_body $asset;
     } else {
-        my $placeholder = Qgoda->new->config->{front_matter_placeholder};
+        my $chain = $asset->{chain};
+        my $config = Qgoda->new->config;
+        my $placeholder = $config->{'front-matter-placeholder'}->{$chain}
+                          || $config->{'front-matter-placeholder'}->{'*'};
         return read_body($asset->getPath, $placeholder);
     }
 }
@@ -142,7 +145,7 @@ sub saveArtefact {
     }
 
     my $write_file = 1;
-    if ($config->{compare_output}) {
+    if ($config->{'compare-output'}) {
         my @stat = stat $path;
         if (@stat) {
             if ($stat[7] == blength $asset->{content}) {

@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 14:58:26 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon May 22 08:34:17 2017
-# Update Count    : 79
+# Last Modified On: Thu Nov  1 19:42:17 2018
+# Update Count    : 102
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -20,8 +20,6 @@ package Data::iRealPro::Output::Text;
 
 use parent qw( Data::iRealPro::Output::Base );
 
-our $VERSION = "1.00";
-
 use Data::iRealPro::URI;
 use Data::iRealPro::Playlist;
 use Data::iRealPro::Song;
@@ -30,6 +28,9 @@ sub options {
     my $self = shift;
     [ @{ $self->SUPER::options }, qw( list ) ];
 }
+
+my @majkeys = split( ' ', 'C  Dd  D  Eb E   F  Gb  G  Ab A   Bb B'   );
+my @minkeys = split( ' ', 'A- Bb- B- C- C#- D- Eb- E- F- F#- G- G#-' );
 
 sub process {
     my ( $self, $u, $options ) = @_;
@@ -48,16 +49,22 @@ sub process {
 
     foreach my $s ( @{ $u->{playlist}->{songs} } ) {
 	$song++;
+
+	# Do not change key to actual.
+	local $s->{_transpose} = 0;
+
+	my $key = $s->xpose($s->{key} // "C");
+	my $akey = $s->{actual_key} || 0;
+	$akey = $s->xpose( $key =~ /-$/ ? $minkeys[$akey] : $majkeys[$akey] );
+
 	my @t = split( ' ', $s->{composer} );
 	@t[0,1] = @t[1,0] if @t == 2;
 	push( @songs,
 	      { index => $song,
 		title =>
 		$list
-		?
-		  sprintf("%4d: %s (%s)", $song, $s->{title}, "@t" )
-		:
-		  join( "",
+		? sprintf("%4d: %s (%s)", $song, $s->{title}, "@t" )
+		: join( "",
 			( $song > 1 || $pl ) ? "Song $song: " : "Song: ",
 			$s->{title},
 			" (@t)" ),
@@ -66,14 +73,22 @@ sub process {
 			"Style: ", $s->{style},
 			$s->{actual_style}
 			? ( " (", $s->{actual_style}, ")" ) : (),
-			$s->{key} ? ( "; key: ", $s->{key} ) : (),
+			"; key: ", $key,
+			"; actual key: ", $akey,
 			$s->{actual_tempo}
 			? ( "; tempo: ", $s->{actual_tempo} ) : (),
 			$s->{actual_repeats}
 			? ( "; repeat: ", $s->{actual_repeats} ) : (),
 		      ),
-		cooked => neatify( $s->{data} ),
 	      } );
+
+	if ( $s->{transpose} ) {
+	    $s->tokenize;
+	    $songs[-1]->{cooked} = neatify( $s->{dataxp} );
+	}
+	else {
+	    $songs[-1]->{cooked} = neatify( $s->{data} );
+	}
     }
 
     my $res = "";

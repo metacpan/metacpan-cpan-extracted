@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -38,7 +38,7 @@
             "Moo::Role" : "2.000000",
             "SVG" : "2.64",
             "Term::ANSIColor::Markup" : "0.06",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -46,35 +46,35 @@
    "provides" : {
       "Calendar::Plugin::Renderer" : {
          "file" : "lib/Calendar/Plugin/Renderer.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Calendar::Plugin::Renderer::SVG" : {
          "file" : "lib/Calendar/Plugin/Renderer/SVG.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Calendar::Plugin::Renderer::SVG::Box" : {
          "file" : "lib/Calendar/Plugin/Renderer/SVG/Box.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Calendar::Plugin::Renderer::SVG::Label" : {
          "file" : "lib/Calendar/Plugin/Renderer/SVG/Label.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Calendar::Plugin::Renderer::SVG::Page" : {
          "file" : "lib/Calendar/Plugin/Renderer/SVG/Page.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Calendar::Plugin::Renderer::SVG::Text" : {
          "file" : "lib/Calendar/Plugin/Renderer/SVG/Text.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Calendar::Plugin::Renderer::Text" : {
          "file" : "lib/Calendar/Plugin/Renderer/Text.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "Calendar::Plugin::Renderer::Util" : {
          "file" : "lib/Calendar/Plugin/Renderer/Util.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -85,6 +85,6 @@
          "web" : "https://github.com/manwar/Calendar-Plugin-Renderer"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

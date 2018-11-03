@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Command::Watch;
-$Qgoda::Command::Watch::VERSION = 'v0.9.2';
+$Qgoda::Command::Watch::VERSION = 'v0.9.3';
 use strict;
 
 use Qgoda;
@@ -51,7 +51,7 @@ qgoda watch - Build a qgoda site and watch for changes
 
 =head1 SYNOPSIS
 
-qgoda watch [<global options>] [--dry-run]
+qgoda watch [<global options>] [--drafts][--future][--dry-run][--help]
 
 Try 'qgoda --help' for a description of global options.
 

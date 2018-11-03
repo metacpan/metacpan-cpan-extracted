@@ -128,9 +128,7 @@ lib/Mojolicious/resources/public/mojo/logo.png
 lib/Mojolicious/resources/public/mojo/noraptor.png
 lib/Mojolicious/resources/public/mojo/notfound.png
 lib/Mojolicious/resources/public/mojo/pinstripe-dark.png
-lib/Mojolicious/resources/public/mojo/pinstripe-light.png
 lib/Mojolicious/resources/public/mojo/prettify/prettify-mojo-dark.css
-lib/Mojolicious/resources/public/mojo/prettify/prettify-mojo-light.css
 lib/Mojolicious/resources/public/mojo/prettify/run_prettify.js
 lib/Mojolicious/resources/templates/mojo/debug.html.ep
 lib/Mojolicious/resources/templates/mojo/exception.html.ep
@@ -303,7 +301,6 @@ t/mojolicious/multipath_lite_app.t
 t/mojolicious/ojo.t
 t/mojolicious/ojo_signatures.t
 t/mojolicious/pattern.t
-t/mojolicious/pod_renderer_lite_app.t
 t/mojolicious/production_app.t
 t/mojolicious/public/hello.txt
 t/mojolicious/public/hello2.txt

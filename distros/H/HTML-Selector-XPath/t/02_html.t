@@ -3,8 +3,9 @@ use Test::Base;
 use HTML::Selector::XPath;
 use Encode qw(decode);
 
-eval { require HTML::TreeBuilder::XPath };
-plan skip_all => "HTML::TreeBuilder::XPath is not installed." if $@;
+if( ! eval { require HTML::TreeBuilder::XPath; 1 }) {
+    plan skip_all => "HTML::TreeBuilder::XPath is not installed.";
+};
 
 filters { selector => 'chomp', expected => [ 'lines', 'array' ] };
 plan tests => 1 * blocks;

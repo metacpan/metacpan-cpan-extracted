@@ -16,18 +16,18 @@ __PACKAGE__->add_columns(
   { data_type => "bigint", is_nullable => 1 },
   "parent_id",
   { data_type => "bigint", is_nullable => 1 },
-  "plan_md5",
-  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "plan_key",
+  { data_type => "varchar", is_nullable => 1, size => 190 },
   "plan_dd",
-  { data_type => "text", is_nullable => 1 },
-  "input_md5",
-  { data_type => "varchar", is_nullable => 1, size => 255 },
+  { data_type => "mediumtext", is_nullable => 1 },
+  "input_key",
+  { data_type => "varchar", is_nullable => 1, size => 190 },
   "input_dd",
-  { data_type => "text", is_nullable => 1 },
+  { data_type => "mediumtext", is_nullable => 1 },
   "param_md5",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "param_dd",
-  { data_type => "text", is_nullable => 1 },
+  { data_type => "mediumtext", is_nullable => 1 },
   "status",
   { data_type => "varchar", is_nullable => 1, size => 255 },
   "last_plan_index",
@@ -35,13 +35,27 @@ __PACKAGE__->add_columns(
   "last_input_index",
   { data_type => "bigint", is_nullable => 1 },
   "last_result",
-  { data_type => "text", is_nullable => 1 }
+  { data_type => "mediumtext", is_nullable => 1 },
+  "branch_id",
+  { data_type => "varchar", is_nullable => 1, size => 190 },
+  "input_id",
+  { data_type => "varchar", is_nullable => 1, size => 190 },
 );
+
 
 
 __PACKAGE__->set_primary_key("id");
 
-__PACKAGE__->add_unique_constraint("plan_md5", ["plan_md5", "input_md5"]);
+__PACKAGE__->add_unique_constraint("plan_key", ["plan_key", "input_key"]);
+
+sub sqlt_deploy_hook {
+    my ($self, $sqlt_table) = @_; 
+    $sqlt_table->add_index(name => 'thread_id', fields => ['thread_id']);
+    $sqlt_table->add_index(name => 'parent_id', fields => ['parent_id']);   
+}
+
+
+
 
 
 =head1 NAME

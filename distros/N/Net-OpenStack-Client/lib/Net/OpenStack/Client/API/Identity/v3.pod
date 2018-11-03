@@ -1,0 +1,464 @@
+=pod
+
+=head2 Generated API service Identity version v3
+
+=over
+
+=cut
+
+
+
+=item add_domain
+
+API method add_domain
+
+Add domain
+
+=over
+
+=item No required url / endpoint templates
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item description: string (JSON path: domain -> description)
+
+=item enabled: boolean (JSON path: domain -> enabled)
+
+=item name: string (JSON path: domain -> name)
+
+=item raw: hashref used for JSON body, ignoring all options
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+
+
+=back
+
+=cut
+
+
+
+=item add_project
+
+API method add_project
+
+Add project
+
+=over
+
+=item No required url / endpoint templates
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item description: string (JSON path: project -> description)
+
+=item domain_id: string (JSON path: project -> domain_id)
+
+=item enabled: boolean (JSON path: project -> enabled)
+
+=item name: string (JSON path: project -> name)
+
+=item parent_id: string (JSON path: project -> parent_id)
+
+=item raw: hashref used for JSON body, ignoring all options
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+Result path is set to JSON path /project
+
+=back
+
+=cut
+
+
+
+=item add_tag
+
+API method add_tag
+
+Add tag to project
+
+=over
+
+=item Required url / endpoint templates
+
+=over
+
+=item project_id
+
+=item tag
+
+=back
+
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options (except the url/endpoint templates)
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+
+
+=back
+
+=cut
+
+
+
+=item catalog
+
+API method catalog
+
+Get the services catalog
+
+=over
+
+=item No required url / endpoint templates
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+Result path is set to JSON path /catalog
+
+=back
+
+=cut
+
+
+
+=item delete_tag
+
+API method delete_tag
+
+Delete tag from project
+
+=over
+
+=item Required url / endpoint templates
+
+=over
+
+=item project_id
+
+=item tag
+
+=back
+
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options (except the url/endpoint templates)
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+
+
+=back
+
+=cut
+
+
+
+=item domain
+
+API method domain
+
+Show domain details
+
+=over
+
+=item Required url / endpoint templates
+
+=over
+
+=item domain_id
+
+=back
+
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options (except the url/endpoint templates)
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+Result path is set to JSON path /domain
+
+=back
+
+=cut
+
+
+
+=item domains
+
+API method domains
+
+List domains
+
+=over
+
+=item No required url / endpoint templates
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+Result path is set to JSON path /domains
+
+=back
+
+=cut
+
+
+
+=item project
+
+API method project
+
+Get project details
+
+=over
+
+=item Required url / endpoint templates
+
+=over
+
+=item project_id
+
+=back
+
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options (except the url/endpoint templates)
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+Result path is set to JSON path /project
+
+=back
+
+=cut
+
+
+
+=item projects
+
+API method projects
+
+Get all projects
+
+=over
+
+=item No required url / endpoint templates
+
+=item Optional url / endpoint parameters
+
+=over
+
+=item domain_id
+
+=item enabled
+
+=item name
+
+=item parent_id
+
+=back
+
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+Result path is set to JSON path /projects
+
+=back
+
+=cut
+
+
+
+=item tag
+
+API method tag
+
+Get a tag for project
+
+=over
+
+=item Required url / endpoint templates
+
+=over
+
+=item project_id
+
+=item tag
+
+=back
+
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options (except the url/endpoint templates)
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+
+
+=back
+
+=cut
+
+
+
+=item tags
+
+API method tags
+
+Get all tags for project
+
+=over
+
+=item Required url / endpoint templates
+
+=over
+
+=item project_id
+
+=back
+
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options (except the url/endpoint templates)
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+Result path is set to JSON path /tags
+
+=back
+
+=cut
+
+
+
+=item tokens
+
+API method tokens
+
+Password authentication with unscoped authorization
+
+=over
+
+=item No required url / endpoint templates
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item methods: arrayref of string (JSON path: auth -> identity -> methods)
+
+=item password: string (JSON path: auth -> identity -> password -> user -> password)
+
+=item project_domain_name: string (JSON path: auth -> scope -> project -> domain -> name)
+
+=item project_name: string (JSON path: auth -> scope -> project -> name)
+
+=item user_domain_name: string (JSON path: auth -> identity -> password -> user -> domain -> name)
+
+=item user_name: string (JSON path: auth -> identity -> password -> user -> name)
+
+=item raw: hashref used for JSON body, ignoring all options
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+Result is set to X-Subject-Token response header.
+
+=back
+
+=cut
+
+
+
+=pod
+
+=back
+
+=cut

@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils::LicenseWithSummary;
-$Software::LicenseMoreUtils::LicenseWithSummary::VERSION = '1.002';
+$Software::LicenseMoreUtils::LicenseWithSummary::VERSION = '1.004';
 # ABSTRACT: Software::License with a summary
 
 use strict;
@@ -23,8 +23,8 @@ use Text::Template;
 our $AUTOLOAD;
 
 # map location of distro file (like /etc/redhat_release) to distro.
-# must match a <distro>_summaries.yml file in the same directory at
-# this file
+# must match a <distro>_summaries.yml file in the directory containing
+# this Perl module file
 my %path_to_distro = (
     '/etc/debian_version' => 'debian',
 );
@@ -79,12 +79,14 @@ sub license_class {
 sub debian_text {
     my $self = shift;
     carp "debian_text is deprecated, please use summary_or_text";
-    return $self->summary || $self->fulltext;
+    return $self->summary_or_text;
 }
 
 sub summary_or_text {
     my $self = shift;
-    return $self->summary || $self->fulltext;
+    return join("\n",  grep { $_ } ($self->notice, $self->summary))
+        if length $self->summary;
+    return $self->fulltext;
 }
 
 sub AUTOLOAD {
@@ -108,7 +110,7 @@ Software::LicenseMoreUtils::LicenseWithSummary - Software::License with a summar
 
 =head1 VERSION
 
-version 1.002
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -131,7 +133,9 @@ Returns the license summary, or an empty string.
 
 =head2 summary_or_text
 
-Returns the license summary or the full text of the license.
+Returns the license summary or the full text of the license. Like
+L<Software::License/fulltext>, this method returns also the copyright
+notice (if available).
 
 =head2 distribution
 

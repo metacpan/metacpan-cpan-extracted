@@ -6,7 +6,7 @@
 #
 
 package File::ByLine;
-$File::ByLine::VERSION = '1.182370';
+$File::ByLine::VERSION = '1.183060';
 use v5.10;
 
 # ABSTRACT: Line-by-line file access loops
@@ -196,7 +196,7 @@ File::ByLine - Line-by-line file access loops
 
 =head1 VERSION
 
-version 1.182370
+version 1.183060
 
 =head1 SYNOPSIS
 
@@ -260,7 +260,7 @@ version 1.182370
 
   # Skip the header line
   my $byline = File::ByLine->new();
-  $byline->skip_header(1);
+  $byline->header_skip(1);
   $byline->do( sub { foo($_) }, "file.txt");
   my (@grep_result) = $byline->grep( sub { m/foo/ }, "file.txt");
   my (@map_result)  = $byline->map( sub { lc($_) }, "file.txt");

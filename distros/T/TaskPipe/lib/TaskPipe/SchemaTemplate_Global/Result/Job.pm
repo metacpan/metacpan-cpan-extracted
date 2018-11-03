@@ -5,6 +5,7 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
+__PACKAGE__->load_components("InflateColumn::DateTime");
 __PACKAGE__->table("job");
 
 __PACKAGE__->add_columns(
@@ -26,6 +27,8 @@ __PACKAGE__->add_columns(
     datetime_undef_if_invalid => 1,
     is_nullable => 1,
   },
+  "conf",
+  { data_type => "mediumtext", is_nullable => 1 },
 );
 
 __PACKAGE__->set_primary_key("id");

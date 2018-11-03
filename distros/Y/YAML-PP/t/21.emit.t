@@ -21,14 +21,14 @@ my $yts = "$Bin/../yaml-test-suite";
 # skip tests that parser can't parse
 my @skip = qw/
     4ABK 87E4 8CWC 8UDB 9MMW
-    C2DT CN3R CT4Q DFF7
+    CN3R CT4Q DFF7
     FRK4
     KZN9 L9U5 LQZ7 LX3P
     Q9WF QF4Y
-    UT92 WZ62
 
     6BFJ
     F6MC
+    NB6Z
 
 /;
 
@@ -94,6 +94,8 @@ my %skip_yaml_equal = (
     '6CK3' => 1,
     '5TYM' => 1,
     '565N' => 1,
+    '8KB6' => 1,
+    '9BXH' => 1,
 );
 
 my ($testcases) = $testsuite->read_tests(

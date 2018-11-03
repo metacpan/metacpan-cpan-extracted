@@ -36,6 +36,12 @@ sub url_from_page_index{
 }
 
 
+has list_settings => (
+    is => 'ro', 
+    isa => 'TaskPipe::OpenProxyManager::IPList_Xroxy::Settings'
+);
+
+
 
 sub page_index_url{
     my ($self) = @_;

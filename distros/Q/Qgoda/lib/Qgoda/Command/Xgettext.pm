@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Command::Xgettext;
-$Qgoda::Command::Xgettext::VERSION = 'v0.9.2';
+$Qgoda::Command::Xgettext::VERSION = 'v0.9.3';
 use strict;
 
 use Qgoda;

@@ -17,30 +17,38 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda;
-$Qgoda::VERSION = 'v0.9.2';
+$Qgoda::VERSION = 'v0.9.3';
 use strict;
+
+# FIXME! This assumes that we are a top-level package. Instead,
+# inpect also __PACKAGE__ and adjust the directory accordingly.
+use File::Basename qw(fileparse dirname);
+my $package_dir = File::Spec->catdir(Cwd::abs_path(dirname __FILE__), 'Qgoda');
 
 use base 'Exporter';
 use vars qw(@EXPORT $VERSION);
 @EXPORT = qw($VERSION);
-$VERSION = '0.9.0-alpha.1';
+$VERSION = '0.9.3';
 
 use Locale::TextDomain qw(qgoda);
 use Locale::Messages;
 use Locale::gettext_dumb;
 use File::Find;
+use Cwd;
 use Scalar::Util qw(reftype blessed);
 use AnyEvent;
 use AnyEvent::Loop;
 use AnyEvent::Filesys::Notify;
 use AnyEvent::Handle;
-use File::Basename qw(fileparse);
 use Symbol qw(gensym);
 use IPC::Open3 qw(open3);
 use IPC::Signal;
 use POSIX qw(:sys_wait_h);
 use Template::Plugin::Gettext 0.6;
 use List::Util 1.45 qw(uniq);
+use YAML::XS 0.67;
+use boolean;
+$YAML::XS::Boolean = 'JSON::PP';
 
 use Qgoda::Logger;
 use Qgoda::Config;
@@ -76,6 +84,10 @@ sub new {
     return $qgoda;
 }
 
+sub reset {
+	undef $qgoda;
+}
+
 sub setSite {
     my ($self, $site) = @_;
 
@@ -108,7 +120,7 @@ sub build {
 
     $logger->info(__"start building site");
 
-    chdir $self->{__config}->{srcdir}
+    chdir $config->{srcdir}
         or $logger->fatal(__x("cannot chdir to source directory '{dir}': {error}",
                               dir => $config->{srcdir},
                               error => $!));
@@ -123,7 +135,7 @@ sub build {
     my $textdomain = $config->{po}->{textdomain};
     my $locale_dir = File::Spec->catfile($config->{srcdir}, 'LocaleData');
     Locale::gettext_dumb::bindtextdomain($textdomain, $locale_dir);
-    if (!empty $config->{po}->{textdomain} && $config->{po}->{refresh}) {
+    if (!empty $config->{po}->{textdomain} && $config->{po}->{reload}) {
         eval {
             # Delete the cached translations so that changes are immediately
             # visible.
@@ -143,7 +155,7 @@ sub build {
 
     my $site = $self->getSite;
     my $modified = scalar keys %{$site->getModified};
-    
+
     if (($modified + $deleted) && !empty $config->{paths}->{timestamp}) {
         my $timestamp_file = File::Spec->catfile($config->{srcdir},
                                                  $config->{paths}->{timestamp});
@@ -361,19 +373,32 @@ sub config {
     shift->{__config};
 }
 
+sub rawConfig {
+	my ($self) = @_;
+
+    # We need our own copy so that we can mess around with it.
+    my $config = Qgoda::Config->new(raw => 1);
+
+    # Poor man's Data::Structure::unbless().
+    my %config = %$config;
+
+	return \%config;
+}
+
 sub dumpConfig {
     my ($self) = @_;
 
-    # Make a shallow copy so that we unbless the reference.
-    my %config = %{$self->config};
-    foreach my $key (grep { /^__q_/ } keys %config) {
-        delete $config{$key};
-    }
+    return YAML::XS::Dump($self->rawConfig);
+}
 
-    require YAML::XS;
-    print YAML::XS::Dump(\%config);
+sub printConfig {
+	my ($self) = @_;
 
-    return $self;
+	my $config = $self->dumpConfig;
+
+	print $config;
+
+	return $self;
 }
 
 sub migrate {
@@ -884,12 +909,12 @@ sub __initNoSCMPatterns {
     my ($self) = @_;
 
     my $config = $self->config;
-    my $no_scm = $config->{no_scm};
+    my $no_scm = $config->{'no-scm'};
 
     return $no_scm if blessed $no_scm;
 
     require File::Globstar::ListMatch;
-    return $config->{no_scm} = 
+    return $config->{'no-scm'} = 
             File::Globstar::ListMatch->new($no_scm,
                                            $config->{'case-insensitive'});
 }
@@ -914,9 +939,53 @@ sub versionControlled {
 }
 
 sub buildOptions {
-    my ($self) = @_;
+    my ($self, %options) = @_;
+
+    if (%options) {
+        $self->{__build_options} = {%options};
+    }
 
     return %{$self->{__build_options} || {}};
+}
+
+sub nodeModules {
+	my ($self) = @_;
+
+    return join '/', $package_dir, 'node_modules';
+}
+
+sub jsout {
+	my ($self, $jsout) = @_;
+
+	if (@_ == 1) {
+		$jsout = $self->{__jsout};
+		$jsout = '' if empty $jsout;
+		return $jsout;
+	}
+
+	$self->{__jsout} = $jsout;
+}
+
+sub jserr {
+	my ($self, $jserr) = @_;
+
+	if (@_ == 1) {
+		$jserr = $self->{__jserr};
+		$jserr = '' if empty $jserr;
+		return $jserr;
+	}
+
+	$self->{__jserr} = $jserr;
+}
+
+sub jsreturn {
+	my ($self, $value) = @_;
+
+	if (@_ > 1) {
+		$self->{__jsreturn} = $value;
+	}
+
+	return $self->{__jsreturn};
 }
 
 1;

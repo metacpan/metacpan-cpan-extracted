@@ -1,0 +1,35 @@
+---
+abstract: 'reference count debugging for plack apps'
+author:
+  - 'Grant Street Group <developers@grantstreet.com>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  HTTP::Request::Common: '0'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Debug-RefCounts
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Devel::Gladiator: '0'
+  Plack::Middleware::Debug::Base: '0'
+  Scalar::Util: '0'
+  namespace::clean: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts/issues
+  homepage: https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts
+  repository: https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts.git
+version: '0.90'
+x_authority: cpan:GSG

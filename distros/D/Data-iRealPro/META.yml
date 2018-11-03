@@ -17,6 +17,14 @@ no_index:
   directory:
     - t
     - inc
+    - lib/Data/iRealPro
+provides:
+  Data::iRealPro:
+    file: lib/Data/iRealPro.pm
+    version: '1.11'
+  irealcvt:
+    file: script/irealcvt
+    version: '1.11'
 requires:
   App::Packager: '1.42'
   Data::Struct: '1.701'
@@ -26,6 +34,7 @@ requires:
   PDF::API2: '2.026'
   Text::CSV_XS: '1.19'
   perl: '5.010001'
-resources: {}
-version: '1.10'
+resources:
+  repository: https://github.com/sciurius/perl-Data-iRealPro.git
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

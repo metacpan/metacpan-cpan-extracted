@@ -1,9 +1,6 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-
-use lib ('lib', '../lib', '../../lib', '../../../lib');
-
 use Mojo::ByteStream 'b';
 use Test::Mojo;
 use Mojolicious::Lite;

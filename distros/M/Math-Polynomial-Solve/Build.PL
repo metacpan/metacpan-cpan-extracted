@@ -8,7 +8,7 @@ my $build = Module::Build->new(
 
 	dist_abstract => 'Find the roots of polynomial equations',
 	dist_author => ['John M. Gamble <jgamble@cpan.org>'],
-	dist_version => '2.85',
+	dist_version => '2.86',
 	dist_name => 'Math-Polynomial-Solve',
 
 	provides => {
@@ -41,7 +41,7 @@ my $build = Module::Build->new(
 
 	meta_merge => {
 		keyword => [ qw(math polynomial quadratic cubic quartic matrix
-				companion-matrix
+				companion-matrix polynomial-zeros
 			        Sturm Nickalls Ferrari Laguerre Hessenberg
 				Newton-Raphson) ],
 		resources => {

@@ -2,7 +2,7 @@
 #
 #  File::NFSLock - bdpO - NFS compatible (safe) locking utility
 #
-#  $Id: NFSLock.pm,v 1.27 2014/11/10 14:00:00 hookbot Exp $
+#  $Id: NFSLock.pm,v 1.28 2014/11/10 14:00:00 hookbot Exp $
 #
 #  Copyright (C) 2002, Paul T Seamons
 #                      paul@seamons.com
@@ -32,7 +32,7 @@ our $errstr;
 use base 'Exporter';
 our @EXPORT_OK = qw(uncache);
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 #Get constants, but without the bloat of
 #use Fcntl qw(LOCK_SH LOCK_EX LOCK_NB);

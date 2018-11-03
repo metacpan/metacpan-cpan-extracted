@@ -28,6 +28,13 @@ has ws => (is => 'ro', isa => 'Web::Scraper', default => sub{
 });
 
 
+has list_settings => (
+    is => 'ro', 
+    isa => 'TaskPipe::OpenProxyManager::IPList_ProxyNova::Settings'
+);
+
+
+
 sub page_index_url{
     my ($self) = @_;
 

@@ -4,7 +4,7 @@
       "Marcel Gruenauer <marcel@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "perl_5"
    ],
@@ -30,15 +30,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : 0,
-            "English" : 0,
-            "File::Find" : 0,
-            "File::Temp" : 0,
-            "Scalar::Util" : 0,
+            "Carp" : "0",
+            "English" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Scalar::Util" : "0",
             "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.100851"
+   "version" : "1.100852"
 }

@@ -7,7 +7,6 @@ use LWP::UserAgent;
 use Moose;
 use namespace::autoclean;
 use URI;
-use WebService::HMRC::Authenticate;
 use WebService::HMRC::Response;
 
 
@@ -17,11 +16,11 @@ WebService::HMRC::Request - Base class for accessing the UK HMRC MTD API
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -376,6 +375,7 @@ sub _build_ua {
 
 sub _build_auth {
     my $self = shift;
+    require WebService::HMRC::Authenticate;
     return WebService::HMRC::Authenticate->new();
 }
 

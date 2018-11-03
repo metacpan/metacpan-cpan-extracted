@@ -9,16 +9,18 @@ class_has scope => (is => 'rw', isa => 'ScopeMode', default => 'project');
 class_has shell => (is => 'rw', isa => 'ShellMode', default => 'foreground');
 class_has cmd => (is => 'rw', isa => 'ArrayRef');
 class_has orig_cmd => (is => 'rw', isa => 'ArrayRef');
+class_has root_dir => (is => 'rw', isa => 'Str');
 class_has job_id => (is => 'rw', isa => 'Int');
-class_has run_id => (is => 'rw', isa => 'Int');
-class_has thread_id => (is => 'rw', isa => 'Int',default => 1);
+#class_has run_id => (is => 'rw', isa => 'Int');
+class_has thread_id => (is => 'rw', isa => 'Int',default => 0);
 class_has task_name => (is => 'rw', isa => 'Str');
+class_has task_details => (is => 'rw', isa => 'Str');
 
 sub as_string{
     my ($self) = @_;
 
     my @out;
-    foreach my $info_item ( qw(orig_cmd job_id run_id thread_id task_name) ){
+    foreach my $info_item ( qw(orig_cmd job_id thread_id task_name) ){
         push @out, "$info_item: ".$self->$info_item;
     }
     return +join(' ',@out);

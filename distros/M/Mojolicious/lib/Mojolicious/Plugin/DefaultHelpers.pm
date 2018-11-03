@@ -14,7 +14,7 @@ sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  for my $name (qw(app flash param stash session url_for validation)) {
+  for my $name (qw(app param stash session url_for)) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
@@ -32,8 +32,11 @@ sub register {
   $app->helper(content_for  => sub { _content(1, 0, @_) });
   $app->helper(content_with => sub { _content(0, 1, @_) });
 
+  $app->helper(continue => sub { $_[0]->app->routes->continue($_[0]) });
+
   $app->helper($_ => $self->can("_$_"))
-    for qw(csrf_token current_route inactivity_timeout is_fresh url_with);
+    for qw(csrf_token current_route flash inactivity_timeout is_fresh),
+    qw(redirect_to respond_to url_with validation);
 
   $app->helper(dumper => sub { shift; dumper @_ });
   $app->helper(include => sub { shift->render_to_string(@_) });
@@ -131,6 +134,21 @@ sub _fallbacks {
 
 sub _file { _asset(shift, Mojo::Asset::File->new(path => shift)) }
 
+sub _flash {
+  my $c = shift;
+
+  # Check old flash
+  my $session = $c->session;
+  return $session->{flash} ? $session->{flash}{$_[0]} : undef
+    if @_ == 1 && !ref $_[0];
+
+  # Initialize new flash and merge values
+  my $values = ref $_[0] ? $_[0] : {@_};
+  @{$session->{new_flash} ||= {}}{keys %$values} = values %$values;
+
+  return $c;
+}
+
 sub _inactivity_timeout {
   my ($c, $timeout) = @_;
   my $stream = Mojo::IOLoop->stream($c->tx->connection // '');
@@ -141,6 +159,40 @@ sub _inactivity_timeout {
 sub _is_fresh {
   my ($c, %options) = @_;
   return $c->app->static->is_fresh($c, \%options);
+}
+
+sub _redirect_to {
+  my $c = shift;
+
+  # Don't override 3xx status
+  my $res = $c->res;
+  $res->headers->location($c->url_for(@_));
+  return $c->rendered($res->is_redirect ? () : 302);
+}
+
+sub _respond_to {
+  my ($c, $args) = (shift, ref $_[0] ? $_[0] : {@_});
+
+  # Find target
+  my $target;
+  my $renderer = $c->app->renderer;
+  my @formats  = @{$renderer->accepts($c)};
+  for my $format (@formats ? @formats : ($renderer->default_format)) {
+    next unless $target = $args->{$format};
+    $c->stash->{format} = $format;
+    last;
+  }
+
+  # Fallback
+  unless ($target) {
+    return $c->rendered(204) unless $target = $args->{any};
+    delete $c->stash->{format};
+  }
+
+  # Dispatch
+  ref $target eq 'CODE' ? $target->($c) : $c->render(%$target);
+
+  return $c;
 }
 
 sub _static {
@@ -171,6 +223,22 @@ sub _timing_server_timing {
 sub _url_with {
   my $c = shift;
   return $c->url_for(@_)->query($c->req->url->query->clone);
+}
+
+sub _validation {
+  my $c = shift;
+
+  my $stash = $c->stash;
+  return $stash->{'mojo.validation'} if $stash->{'mojo.validation'};
+
+  my $req    = $c->req;
+  my $token  = $c->session->{csrf_token};
+  my $header = $req->headers->header('X-CSRF-Token');
+  my $hash   = $req->params->to_hash;
+  $hash->{csrf_token} //= $header if $token && $header;
+  $hash->{$_} = $req->every_upload($_) for map { $_->name } @{$req->uploads};
+  my $v = $c->app->validator->validation->input($hash);
+  return $stash->{'mojo.validation'} = $v->csrf_token($token);
 }
 
 1;
@@ -302,6 +370,13 @@ already in use.
   % end
   %= content 'message'
 
+=head2 continue
+
+  $c->continue;
+
+Continue dispatch chain from an intermediate destination with
+L<Mojolicious::Routes/"continue">.
+
 =head2 csrf_token
 
   %= csrf_token
@@ -334,9 +409,16 @@ L</"stash">.
 
 =head2 flash
 
+  my $foo = $c->flash('foo');
+  $c      = $c->flash({foo => 'bar'});
+  $c      = $c->flash(foo => 'bar');
   %= flash 'foo'
 
-Alias for L<Mojolicious::Controller/"flash">.
+Data storage persistent only for the next request, stored in the L</"session">.
+
+  # Show message after redirect
+  $c->flash(message => 'User created successfully!');
+  $c->redirect_to('show_user', id => 23);
 
 =head2 inactivity_timeout
 
@@ -383,6 +465,24 @@ L</"stash">.
   %= param 'foo'
 
 Alias for L<Mojolicious::Controller/"param">.
+
+=head2 redirect_to
+
+  $c = $c->redirect_to('named', foo => 'bar');
+  $c = $c->redirect_to('named', {foo => 'bar'});
+  $c = $c->redirect_to('/index.html');
+  $c = $c->redirect_to('http://example.com/index.html');
+
+Prepare a C<302> (if the status code is not already C<3xx>) redirect response
+with C<Location> header, takes the same arguments as L</"url_for">.
+
+  # Moved Permanently
+  $c->res->code(301);
+  $c->redirect_to('some_route');
+
+  # Temporary Redirect
+  $c->res->code(307);
+  $c->redirect_to('some_route');
 
 =head2 reply->asset
 
@@ -453,6 +553,30 @@ directories.
   # Serve file from a relative path with a custom content type
   $c->res->headers->content_type('application/myapp');
   $c->reply->static('foo.txt');
+
+=head2 respond_to
+
+  $c = $c->respond_to(
+    json => {json => {message => 'Welcome!'}},
+    html => {template => 'welcome'},
+    any  => sub {...}
+  );
+
+Automatically select best possible representation for resource from C<format>
+C<GET>/C<POST> parameter, C<format> stash value or C<Accept> request header,
+defaults to L<Mojolicious::Renderer/"default_format"> or rendering an empty
+C<204> response. Each representation can be handled with a callback or a hash
+reference containing arguments to be passed to
+L<Mojolicious::Controller/"render">.
+
+  # Everything else than "json" and "xml" gets a 204 response
+  $c->respond_to(
+    json => sub { $c->render(json => {just => 'works'}) },
+    xml  => {text => '<just>works</just>'},
+    any  => {data => '', status => 204}
+  );
+
+For more advanced negotiation logic you can also use L</"accepts">.
 
 =head2 session
 
@@ -561,9 +685,24 @@ request.
 
 =head2 validation
 
-  %= validation->param('foo')
+  my $v = $c->validation;
 
-Alias for L<Mojolicious::Controller/"validation">.
+Get L<Mojolicious::Validator::Validation> object for current request to
+validate file uploads as well as C<GET> and C<POST> parameters extracted from
+the query string and C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body. Parts of the request body need to be loaded
+into memory to parse C<POST> parameters, so you have to make sure it is not
+excessively large. There's a 16MiB limit for requests by default.
+
+  # Validate GET/POST parameter
+  my $v = $c->validation;
+  $v->required('title', 'trim')->size(3, 50);
+  my $title = $v->param('title');
+
+  # Validate file upload
+  my $v = $c->validation;
+  $v->required('tarball')->upload->size(1, 1048576);
+  my $tarball = $v->param('tarball');
 
 =head1 METHODS
 

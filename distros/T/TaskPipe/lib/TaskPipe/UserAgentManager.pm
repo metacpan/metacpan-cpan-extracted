@@ -22,8 +22,6 @@ has check_ip_settings => (is => 'ro', isa => 'TaskPipe::UserAgentManager::CheckI
     TaskPipe::UserAgentManager::CheckIPSettings->new;
 });
 
-#has thread_id => (is => 'rw', isa => 'Str');
-#has job_id => (is => 'rw', isa => 'Str');
 
 has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', default => sub{
     TaskPipe::RunInfo->new;
@@ -34,8 +32,6 @@ has ua_handler => (is => 'rw', isa => __PACKAGE__.'::UserAgentHandler', lazy => 
     my $module = __PACKAGE__.'::UserAgentHandler';
     require_module( $module );
     my $handler = $module->new(
-#        thread_id => $_[0]->thread_id,
-#        job_id => $_[0]->job_id,
         gm => $_[0]->gm
     );
     return $handler;
@@ -104,16 +100,23 @@ sub delay{
 sub request{
     my ($self,$method,@params) = @_;
 
+    #$self->mu->record("request: at start");
     my $logger = Log::Log4perl->get_logger;
 
     my @req_meths = @{$self->ua_handler->settings->request_methods};
     confess "invalid request method '$method'. Valid methods are: @req_meths" unless grep { $_ eq $method } @req_meths;
 
+    #$self->mu->record("request: after req meths");
+
     $self->delay if $self->settings->delay_base || $self->settings->delay_max_rand;
 
     my $resp;
+    #$self->mu->record("request: after delay");
+
 
     $self->before_request($method,@params);
+
+    #$self->mu->record("request: after before_request");
 
     try {
 
@@ -126,7 +129,14 @@ sub request{
 
     };
 
+    #$self->mu->record("request: after call");
+
     $self->after_request($resp,$method,@params);
+
+    #$self->mu->record("request: at end");
+
+    #$logger->debug("MEM: ".$self->mu->report);
+
     return $resp;
 }
 
@@ -139,7 +149,8 @@ sub after_request{} #override?
 sub refresh{
     my $self = shift;
 
-    $self->ua_handler->ua( $self->ua_handler->build_ua );
+    #$self->ua_handler->ua( $self->ua_handler->build_ua );
+    $self->ua_handler->clear_cookies;
 }
 
 

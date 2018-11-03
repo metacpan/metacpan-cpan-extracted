@@ -8,6 +8,7 @@ use TaskPipe::PathSettings::Global;
 use TaskPipe::RunInfo;
 use File::Save::Home;
 use Data::Dumper;
+use File::Slurp;
 
 with 'MooseX::ConfigCascade';
 with 'TaskPipe::Role::MooseType_ScopeMode';
@@ -32,12 +33,16 @@ has project_name => (is => 'rw', isa => 'Str', lazy => 1, default => sub{
 has root_dir => (is => 'ro', isa => 'Str', lazy => 1, default => sub{
     my ($self) = @_;
 
-    my $home_fp = $self->home_filepath;
-    open my $fh, "<", $home_fp or confess "Could not open $home_fp: $!";
-    my $root_dir = <$fh>;
-    $root_dir =~ s/^\s*//;
-    $root_dir =~ s/\s*$//;
+    return $self->global->root_dir if +$self->global->root_dir;
 
+    my $home_fp = $self->home_filepath;
+    #open my $fh, "<", $home_fp or confess "Could not open $home_fp: $!";
+    #my $root_dir = <$fh>;
+    my $root_dir = read_file( $home_fp );
+    $root_dir =~ s/^\s*//s;
+    $root_dir =~ s/\s*$//s;
+
+    #close $fh or die "close file $home_fp failed: $!";
     return $root_dir;
 });
 

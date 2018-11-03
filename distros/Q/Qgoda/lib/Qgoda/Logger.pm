@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::Logger;
-$Qgoda::Logger::VERSION = 'v0.9.2';
+$Qgoda::Logger::VERSION = 'v0.9.3';
 use strict;
 
 use POSIX qw (setlocale LC_TIME strftime);

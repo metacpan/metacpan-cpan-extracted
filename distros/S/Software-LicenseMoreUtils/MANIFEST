@@ -12,6 +12,7 @@ lib/Software/LicenseMoreUtils.pm
 lib/Software/LicenseMoreUtils/LGPL_2.pm
 lib/Software/LicenseMoreUtils/LicenseWithSummary.pm
 lib/Software/LicenseMoreUtils/debian-summaries.yml
+t/distro_text.t~
 t/license-summary.t
 t/pod.t
 t/short-name-fallback.t

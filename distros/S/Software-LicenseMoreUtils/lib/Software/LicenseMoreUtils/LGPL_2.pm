@@ -9,7 +9,7 @@
 use strict;
 use warnings;
 package Software::LicenseMoreUtils::LGPL_2;
-$Software::LicenseMoreUtils::LGPL_2::VERSION = '1.002';
+$Software::LicenseMoreUtils::LGPL_2::VERSION = '1.004';
 use base 'Software::License';
 # ABSTRACT: GNU Library General Public License, Version 2
 
@@ -19,8 +19,6 @@ sub meta_name  { 'lgpl' }
 sub meta2_name { 'lgpl_2' }
 
 1;
-
-__END__
 
 =pod
 
@@ -32,11 +30,24 @@ Software::LicenseMoreUtils::LGPL_2 - GNU Library General Public License, Version
 
 =head1 VERSION
 
-version 1.002
+version 1.004
 
 =head1 NAME
 
 Software::LicenseMoreUtils::LGPL_2 - GNU Library General Public License, Version 2
+
+=head1 AUTHOR
+
+Dominique Dumont
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Dominique Dumont.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
 
 __DATA__
 __LICENSE__
@@ -443,7 +454,7 @@ conditions either of that version or of any later version published by
 the Free Software Foundation.  If the Library does not specify a
 license version number, you may choose any version ever published by
 the Free Software Foundation.
-
+
   14. If you wish to incorporate parts of the Library into other free
 programs whose distribution conditions are incompatible with these,
 write to the author to ask for permission.  For software which is
@@ -521,16 +532,3 @@ necessary.  Here is a sample; alter the names:
   Ty Coon, President of Vice
 
 That's all there is to it!
-
-=head1 AUTHOR
-
-Dominique Dumont
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Dominique Dumont.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

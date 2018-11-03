@@ -4,17 +4,33 @@ TaskPipe::Manual::Overview - An overview of the TaskPipe framework
 
 =head1 WHAT IS TASKPIPE?
 
-TaskPipe is a framework which may be used to build web scrapers and crawlers. A longer term goal of the project is to become the data-gathering component of tool(s) performing scientific studies of societal trends through analysis of the web.
+TaskPipe is a framework for managing scraping projects. TaskPipe aims to simplify the transfer of a web database, which may be spread across many interlinking web pages, directly to a local, cross-referenced SQL database. 
 
 =head1 WHY TASKPIPE?
 
-TaskPipe resulted from the observation that systems which extract data from the web often share certain characteristics, particularly in terms of workflow. At the same time web data-extraction systems are typically built with static components which are only geared towards solving a specific problem. When a new scraper or crawler is required, coding starts again from scratch. 
+Suppose your friend Bob wants a copy of the simple online database at example.com which just has a "list" page, and each item in the list has a link to a "detail" page.
 
-TaskPipe is an attempt to approach the general problem of web-data extraction in a more modular way, where existing tasks may be quickly adapted and reused. Common operations, and in particular operations related to workflow are abstracted. The aim is to allow engineers to rapidly develop tailored web-extraction systems by providing only the information which is unique to the process in question.
+So to get that database you:
+- create a module called Example::Com::List that grabs the list page
+- create a module called Example::Com::Detail that grabs.. guess what? the detail page!
+
+Great. Then your friend Bill wants a copy of a different online db at example.net, which is is similarly structured. So you write
+- Example::Net::List
+- Example::Net::Detail
+but sigh in exasperation as you feel a strange sense of deja vu.
+
+The problem is, although the jobs are structurally similar, each is coded quite specifically. Example::Com::List looks specifically for the module Example::Com::Detail to send links to. 
+
+Wouldn't it be better to have a module which scrapes a B<general> list page and feeds that to a B<general> detail page? Then the specifics could be coded on top in each case.
+
+So now we are on the way to building TaskPipe.
+
+Indeed, this is basically how the project started. Basically I built many scrapers, and found myself wondering if there wasn't a more flexible and modular way which avoided reinventing the wheel each time. Does TaskPipe achieve this? It's early days, but I think it does look promising.
+
 
 =head1 WHAT IS TASKPIPE SUITABLE FOR?
 
-In fact the core of TaskPipe is simply a task management system (hence the name) and could be used in applications other than web data gathering - however it is best adapted to certain kinds of process:
+Right now it's probably best for feeding a (scraped) web database into SQL. In fact the core of TaskPipe is really a task execution system (hence the name) and could potentially be used in applications other than web data gathering - however it is probably going to work best with:
 
 =over
 
@@ -24,57 +40,78 @@ Multi-threaded processes where the threads do not rejoin. ie the parent kicks of
 
 =item *
 
-Workflows where the execution time of individual tasks is relatively long (on the order of milliseconds up to seconds, or longer). TaskPipe caches intensively and is built with L<Moose> and L<DBIx::Class>, both of which involve a performance penalty.
+Workflows where the execution time of individual tasks is relatively long (on the order of milliseconds up to seconds, or longer). TaskPipe is built with L<Moose> and L<DBIx::Class>, both of which involve a performance penalty.
 
 =back
 
-For these reasons TaskPipe is probably best-suited to web operations where the download/store operations are independent and the request/response cycle typically dwarfs other processing times.
+Additionally, a number of web related tools are built around the core functionality (e.g. the inclusion of TOR, PhantomJS etc.) with the presumption this is how it is going to be used. If you wanted to use it for something else, you'd need to write your own tasks.
+
+Finally TaskPipe may also be good for building crawlers (?) I have not yet tried to do this, and I imagine some code adjustments may be needed before this is really feasible. So perhaps not with this version, but coming soon! (Perhaps!) 
+
 
 =head2 Features
 
-In addition, the core of TaskPipe has been expanded with web data gathering in mind, so that it offers the following features:
+The core of TaskPipe has been expanded with web data gathering in mind, so that it offers the following features:
 
 =over
 
 =item *
 
-Advanced caching to minimise the need to repeat requests, and allow the process to resume quickly in the case of premature termination
+Caching to minimise the need to repeat requests, and allow the process to resume quickly in the case of premature termination
 
 =item *
 
-Thread management designed to ensure a consistent number of threads remain active regardless of the workflow. E.g. if a 10 thread limit is specified and 4 threads are required on a given task, then the remaining 6 threads automatically cascade to the next or adjacent tasks.
+Thread management designed to ensure a consistent number of threads remain active regardless of the workflow. E.g. if a 10 thread limit is specified and 4 threads are required on a given task, then the remaining 6 threads automatically cascade to the next or adjacent tasks. 
+
+Quite a bit of work has been done on improving the resume and threading functionality in version 0.06, together with combating (or even eliminating?) memory leaks in long running TaskPipe processes. Hopefully version 0.06 does these things considerably better than earlier versions.
 
 =item *
 
-Choice of non-rendering or rendering useragent: Currently these are Perl's native LWP (non-rendering) or PhantomJS (rendering). Switching between useragent simply requires a one line change in the project config.
+Choice of non-rendering or rendering useragent: Currently these are Perl's native LWP (non-rendering) or PhantomJS (rendering). Switching between useragent just requires a one line change in the project config.
 
 =item *
 
 Choice of proxy net system: Currently these are TOR and Open Proxy. The TOR UserAgent Manager automatically launches TOR instances on separate ports for each designated thread. The Open Proxy system runs as a daemon gathering IPs from Open Proxy lists and testing them. Switching between proxy systems, or switching between proxying and non-proxying requires only a one line change in the project config.
 
+(As of version 0.06 the TOR functionality has been worked on considerably. The open proxy system remains much more of a work in progress.)
+
 =item *
 
-A command line tool (TaskPipe Tool) allows quick deployment of files and database tables, simplifying the creation of fresh projects
+A command line tool (TaskPipe Tool) is intended to enable quick deployment of files and database tables, simplifying the creation of fresh projects
 
 =back
 
-Remember TaskPipe is a framework, and as such is designed to be extensible. Custom tasks, IP lists and even TaskPipe Tool commands can be added.
+So TaskPipe is a framework, and as such is intended to be extensible. Custom tasks, IP lists and even TaskPipe Tool commands can (potentially) be added. (But maybe I need to create more documentation first...)
 
-TaskPipe is also designed with a certain degree of platform independence in mind. That is, modules that purport to offer platform independence have been selected for all areas of functionality. For example any database which supports SQLSTATE should work (MySQL, PostGreSQL, and SQLite are 3 major database systems which should support SQLSTATE). However, see below: it's early days, and none of this has really been tested.
 
 =head1 HOW READY IS TASKPIPE?
 
-Quick answer: it's not. So you probably shouldn't get too excited. That is, right now you are looking at a bleeding edge alpha version which only has the barest skeleton test framework in place. You'll want commands that aren't there and the ones that are will probably grumble. Some specific issues:
+Version 0.06 is looking considerably more robust than version 0.05. Actually I think this now C<can> be used to build practical applications. But it is rough round the edges, and still needs a lot of work.
+
+Some notes specifically related to improvements made in version 0.06:
+
+=head2 Caching and Resume
+
+At first I built a caching system which, in it's original form, was definitely too complex. I found in practical situations - particularly when using a fully developed project in production - that caching was more of a nuisance than anything else. In this situation I really only wanted a speedy resume, which got all threads going quickly and where possible did not repeat requests.
+
+In fact this turned out to be quite an engineering challenge in itself due to having threads distributed over a tree of tasks. Large jobs where the precise number of items to be extracted is not known also presents a difficulty (e.g grabbing links from an e-commerce site search box).
+
+A 3 pronged approach seems to achieve a resume system with a tolerance of 1 'lost' operation per thread. ie when resuming each thread starts either exactly where it left off, or at worst it repeats the last request. (I think this is as good as it can be, because there is always going to be a gap between making a request and recording the fact you did that successfully)
+
+The best way I could find to achieve this is via a holographic approach involving 3 separate tracking mechanisms:
+1. keep a snapshot of which branches each thread is assigned to
+2. persist loop counters (or last pointer positions) for each task
+3. cache executed tasks in semi-executed branches
+
+This method now seems quite robust, and boasts an in-built safety advantage: in a really long running process, involving hundreds of threads mopping up millions of records, the last thing you need is to lose track of where you were. With the resume system in v0.06, losing any one tracking mechanism (e.g. if you deleted the threads snapshot) will generally set you back a few records, but nothing that a few minutes of execution won't recapture. (In fact, I believe you could lose 2 of the 3 and still recover fairly quickly, as long as one of those was item 3.)
+
+However, there are still some kinks that need to be ironed out. One is deciding when the process has finished. With every thread pottering off unsupervised and doing its own thing, it becomes surprisingly difficult to tell the difference between e.g. a pause in throughput and complete termination. Currently the system decides the process has terminated when all threads go into an 'available' state. This ought to be correct, because if all threads are 'available', none can dish out further jobs, and the process has to terminate anyway. In practice there are occasions when all threads go into 'available' state, but the process is still a long way of completion. Why? This needs to be solved. Deleting the thread snapshot (item 1) and starting the process again gets past this roadblock - but a more permanent solution (and indeed explanation) is definitely needed.
+
+The original general caching is now turned off by default. It may be desirable to turn it on for specific tasks during the development phase - but exactly how this should work to provide the best benefit has not been worked out.
+
+=head2 TaskPipe Tool Commands
 
 =over
-
-=item *
-
-Most notably the caching system needs commands. Right now it is tricky to leverage much of the caching system's potential. The caching system does several things automatically and it is believed those things work reasonably well. For example it avoids repeating executed tasks ('xtasks' in TaskPipe language) and it does not cache xtasks which error (which is correct behaviour). 
-
-However, it is intended that targeted removal of cached items be possible, such that when a plan is changed, cached items that are no longer needed can easily be removed while keeping those that are still relevant. Some careful thought is going into this. However, in the meantime you have 2 options: clear the project cache tables completely or try to edit cache database tables manually (requires a genius level IQ).
-
-On the bright side, this is being worked on as a priority.
 
 =item *
 

@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Jan 15 19:15:00 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Mar  7 09:52:00 2017
-# Update Count    : 123
+# Last Modified On: Thu Nov  1 21:16:21 2018
+# Update Count    : 126
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -16,7 +16,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../CPAN";
 use lib "$FindBin::Bin/../lib";
-use Data::iRealPro 1.02;
+use Data::iRealPro 1.11;
 use Data::iRealPro::Output;
 
 ################ Setup  ################
@@ -131,6 +131,7 @@ sub app_setup {
 	  ### ADD OPTIONS HERE ###
 
 	  'output|o=s',
+	  'generate=s',
 	  'select=i',
 	  'list',
 	  'split',

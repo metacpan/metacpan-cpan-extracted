@@ -6,12 +6,12 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
-
+__PACKAGE__->load_components("InflateColumn::DateTime");
 __PACKAGE__->table("error");
 __PACKAGE__->add_columns(
   "id",
   { data_type => "bigint", is_auto_increment => 1, is_nullable => 0 },
-  "run_id",
+  "job_id",
   { data_type => "bigint", is_nullable => 1 },
   "history_index",
   { data_type => "bigint", is_nullable => 1 },

@@ -1,6 +1,6 @@
 package Calendar::Plugin::Renderer;
 
-$Calendar::Plugin::Renderer::VERSION   = '0.13';
+$Calendar::Plugin::Renderer::VERSION   = '0.14';
 $Calendar::Plugin::Renderer::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Plugin::Renderer - Role to render calendar.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -21,7 +21,7 @@ use Calendar::Plugin::Renderer::Text;
 use Calendar::Plugin::Renderer::SVG;
 
 use Moo::Role;
-use namespace::clean;
+use namespace::autoclean;
 
 =head1 DESCRIPTION
 
@@ -47,7 +47,7 @@ taken by the following calendars:
     package Cal;
 
     use Moo;
-    use namespace::clean;
+    use namespace::autoclean;
     with 'Calendar::Plugin::Renderer';
 
     package main;

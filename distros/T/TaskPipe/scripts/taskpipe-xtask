@@ -1,0 +1,108 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use MooseX::ConfigCascade::Util;
+use TaskPipe::PathSettings;
+use TaskPipe::SchemaManager;
+use TaskPipe::RunInfo;
+use TaskPipe::Task::ModuleMap;
+use TaskPipe::LoggerManager;
+use TaskPipe::TaskUtils;
+use Data::Dumper;
+use JSON;
+use Try::Tiny;
+use Carp;
+
+$SIG{CHLD} = 'IGNORE';
+
+my $job_id = $ARGV[0];
+my $thread_id = $ARGV[1];
+my $root_dir = $ARGV[2];
+
+confess "Need job_id" unless $job_id; 
+confess "Need thread_id" unless $thread_id;
+confess "Need root_dir" unless $root_dir;
+
+my $ps = TaskPipe::PathSettings->new( 
+    scope => 'global',
+    root_dir => $root_dir
+);
+
+my $global_lib_path = $ps->path('lib');
+
+confess "Could not find global lib dir. Looked in $global_lib_path" unless -d $global_lib_path;
+push @INC, $global_lib_path;
+
+my %conf;
+
+my $path = $ps->path('conf', $ps->global->global_conf_filename );
+confess "$path does not exist" unless -f $path;    
+my $conf = MooseX::ConfigCascade::Util->parser->( $path );
+MooseX::ConfigCascade::Util->conf( $conf );
+
+my $gm = TaskPipe::SchemaManager->new( scope => 'global' );
+$gm->connect_schema;
+
+my $xtu = TaskPipe::TaskUtils->new(
+    gm => $gm
+);
+
+my $job_row = $gm->table('job')->find({
+    id => $job_id
+});
+
+exit unless $job_row;
+
+$conf = $xtu->deserialize( $job_row->conf );
+MooseX::ConfigCascade::Util->conf( $conf );
+
+my $path_settings = TaskPipe::PathSettings->new( project_name => $ps->global->project );
+my $lib_dir = $path_settings->path('lib');
+
+confess "Could not find project lib dir $lib_dir" unless $lib_dir && -d $lib_dir;
+
+push @INC, $lib_dir;
+
+
+my $lm = TaskPipe::LoggerManager->new;
+$lm->init_logger;
+
+
+my $sm = TaskPipe::SchemaManager->new( scope => 'project' );
+$sm->connect_schema;
+$xtu->sm( $sm );
+
+
+my $thread_row = $sm->table('thread')->find({
+    id => $thread_id
+});
+exit unless $thread_row && $thread_row->data;
+my $dt = DateTime->now;
+
+$thread_row->update({
+    last_forked => $dt,
+    last_checked => $dt,
+});
+
+
+my $data = $xtu->deserialize( $thread_row->data );
+my $run_info = TaskPipe::RunInfo->new;
+
+foreach my $ri (keys %{$data->{run_info}}){
+    next unless +$data->{run_info}{$ri};
+    $run_info->$ri( $data->{run_info}{$ri} );
+};
+$run_info->job_id( $job_id );
+$run_info->thread_id( $thread_id );
+$run_info->root_dir( $root_dir );
+   
+
+my $task = $xtu->exec_task_from_data( $data );
+$task->thread_manager->terminate;
+
+
+
+
+
+
+

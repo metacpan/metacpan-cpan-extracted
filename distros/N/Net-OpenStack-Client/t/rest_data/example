@@ -1,0 +1,9 @@
+$cmds{post}{cmd}="POST /some/auser/super";
+$cmds{post}{result}={woo => 'hoo'};
+
+$cmds{post2}{cmd}="POST /some/anotheruser/super";
+$cmds{post2}{result}={error => {message => 'fail fail fail'}};
+$cmds{post2}{code}=400;
+
+$cmds{get}{cmd}="GET";
+$cmds{get}{headers}={'Content-Type' => 'application/json', 'Special' => 123};

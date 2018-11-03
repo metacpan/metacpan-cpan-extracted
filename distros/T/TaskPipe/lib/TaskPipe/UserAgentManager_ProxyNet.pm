@@ -42,7 +42,7 @@ sub handle_failed_request{
         $logger->warn("REQUEST FAILED - got ".$resp->status_line." content was ".$resp->decoded_content." - retrying");
     }
 
-    $self->refresh;
+    #$self->refresh;
     $self->change_ip;
 }
 
@@ -64,7 +64,7 @@ sub after_request{
 sub refresh{
     my $self = shift;
 
-    $self->ua_handler->ua( $self->ua_handler->build_ua );
+#    $self->ua_handler->ua( $self->ua_handler->build_ua );
     $self->change_ip;
 }
 

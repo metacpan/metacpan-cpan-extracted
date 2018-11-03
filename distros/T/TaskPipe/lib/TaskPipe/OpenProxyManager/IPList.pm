@@ -10,7 +10,6 @@ use Data::Dumper;
 use Carp;
 use Try::Tiny;
 
-with 'MooseX::RelClassTypes';
 with 'MooseX::ConfigCascade';
 
 has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', default => sub{
@@ -42,13 +41,6 @@ has settings => (
         $module->new;
     }
 );
-
-
-has list_settings => (
-    is => 'ro', 
-    isa => '{CLASS}::Settings'
-);
-
 
 
 has ua_mgr => (is => 'rw', isa => 'TaskPipe::UserAgentManager', lazy => 1, builder => 'build_ua_mgr');

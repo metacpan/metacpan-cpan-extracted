@@ -6,8 +6,6 @@ use Carp;
 
 package Data::iRealPro::URI;
 
-our $VERSION = "1.02";
-
 use Data::iRealPro;
 use Data::iRealPro::Playlist;
 use Encode qw(decode_utf8 encode_utf8);
@@ -41,9 +39,9 @@ sub parse {
     }
 
     $self->{playlist} =
-      Data::iRealPro::Playlist->new( variant => $self->{variant},
-				      data    => $data,
-				     debug   => $self->{debug},
+      Data::iRealPro::Playlist->new( variant   => $self->{variant},
+				     data      => $data,
+				     debug     => $self->{debug},
 				     transpose => $self->{transpose},
 				    );
 

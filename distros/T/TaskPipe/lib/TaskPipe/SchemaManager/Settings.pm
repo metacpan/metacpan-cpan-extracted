@@ -63,6 +63,16 @@ has host => (is => 'ro', isa => 'Str', default => 'localhost');
 
 
 
+=item port
+
+The port to use to connect to your database (leave blank to use the default)
+
+=cut
+
+has port => (is => 'ro', isa => 'Str', default => '');
+
+
+
 
 =item username
 

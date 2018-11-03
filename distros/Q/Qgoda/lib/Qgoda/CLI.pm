@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package Qgoda::CLI;
-$Qgoda::CLI::VERSION = 'v0.9.2';
+$Qgoda::CLI::VERSION = 'v0.9.3';
 use strict;
 
 use IO::Handle;
@@ -137,8 +137,11 @@ EOF
   build                       build site and exit
   watch                       build, then watch for changes and build on demand
   config                      dump the current configuration and exit
+  schema                      dump the configuration JSON schema and exit
   init                        initialize a new qgoda site
   dump                        dump the site structure as JSON (implies --quiet)
+  javascript                  evaluate JavaScript code
+  js                          same as "javascript" above
   markdown                    process Markdown
   xgettext                    extract translatable strings from Markdown
                               files

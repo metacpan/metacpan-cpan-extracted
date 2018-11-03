@@ -20,6 +20,7 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
+t/advanced-options.t
 t/article-class.t
 t/bcor-sides.t
 t/beamer.t
@@ -43,7 +44,12 @@ t/filenames.t
 t/fonts-compat.t
 t/fonts-import.t
 t/fonts.t
+t/fonts/bold.otf
+t/fonts/bolditalic.otf
+t/fonts/italic.otf
+t/fonts/regular.otf
 t/fontsizes.t
+t/fontspec-file-paths.t
 t/header.t
 t/headings.t
 t/html-title.t
@@ -52,6 +58,7 @@ t/langs.t
 t/leaks.t
 t/log-encoding.log
 t/logger.t
+t/magic-comments.t
 t/manifest.t
 t/manual/br-in-footnotes.muse
 t/manual/logo.png

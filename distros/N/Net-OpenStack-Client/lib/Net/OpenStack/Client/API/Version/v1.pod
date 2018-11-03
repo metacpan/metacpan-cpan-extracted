@@ -1,0 +1,45 @@
+=pod
+
+=head2 Generated API service Version version v1
+
+=over
+
+=cut
+
+
+
+=item all
+
+API method all
+
+List all versions
+
+=over
+
+=item No required url / endpoint templates
+
+=item No optional url / endpoint parameters
+
+=item Options
+
+=over
+
+=item raw: hashref used for JSON body, ignoring all options
+
+=item All options starting with C<__> are passed as options to C<Net::OpenStack::Client::REST::rest>.
+
+=back
+
+
+
+=back
+
+=cut
+
+
+
+=pod
+
+=back
+
+=cut

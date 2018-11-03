@@ -4,13 +4,13 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "OData-QueryParams-DBIC",
    "prereqs" : {
@@ -28,21 +28,30 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Data::Dumper" : "0",
+            "List::Util" : "0",
+            "Mojo::Parameters" : "0",
             "Mojo::URL" : "0",
             "perl" : "5.020"
          }
       },
       "test" : {
          "requires" : {
-            "Pod::Coverage::TrustPod" : "0"
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "OData::QueryParams::DBIC" : {
          "file" : "lib/OData/QueryParams/DBIC.pm",
-         "version" : "0.01"
+         "version" : "0.03"
+      },
+      "OData::QueryParams::DBIC::FilterUtils" : {
+         "file" : "lib/OData/QueryParams/DBIC/FilterUtils.pm",
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -57,10 +66,10 @@
          "web" : "http://github.com/reneeb/OData-QueryParams-DBIC"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

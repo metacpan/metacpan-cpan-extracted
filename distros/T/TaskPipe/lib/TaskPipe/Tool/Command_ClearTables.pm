@@ -10,6 +10,7 @@ use TryCatch;
 use Log::Log4perl;
 use Data::Dumper;
 use DateTime;
+use DBIx::Error;
 extends 'TaskPipe::Tool::Command';
 with 'MooseX::ConfigCascade';
 with 'TaskPipe::Role::MooseType_ScopeMode';
@@ -147,7 +148,7 @@ sub execute{
 
             $self->schema_manager->schema->resultset( $moniker )->delete;
 
-        } catch ( DBIx::Error::ForeignKeyViolation $err ){
+        } catch ( DBIx::Error $err where { $_->state =~ /^23/ }){
             unshift @{$self->monikers},$moniker;
             $failed{ $moniker } = 1;
             confess "Unable to clear tables of group '".$self->group."': Foreign key references prevent record deletion. Last error message was $err" if scalar(keys %failed) == @{$self->monikers};
