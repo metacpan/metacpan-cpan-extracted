@@ -1,3 +1,5 @@
+#!perl
+
 # Test form parsing.  Taken out of 83-attachments.t as a special case,
 # just to make sure that the form parsing is performed correctly.
 

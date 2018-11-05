@@ -390,7 +390,7 @@ sub Reaper {
     push @Spine, $IdRef;
   }
 
-  if ($CoverImg &&  1==1) {
+  if ($CoverImg) {
     $X->Msg("Try process cover image '$CoverImg'\n");
    
     my $SkipExists = 1;
@@ -402,7 +402,7 @@ sub Reaper {
 
     $CoverSrcFile = CheckIsCover($X,$CoverSrcFile) if $CheckIsCover;
 
-    if (-f $CoverSrcFile && 1==3) {
+    if (-f $CoverSrcFile) {
       my $ImgList = $X->{'STRUCTURE'}->{'IMG_LIST'};
       my $CoverDestPath = $X->{'DestinationDir'}."/fb3/img";
 
@@ -1504,7 +1504,8 @@ sub FB3Creator {
 
   open FHbody, ">$FNbody" or $X->Error("$FNbody: $!");
   my $BodyString = $Body->toString(1);
-  $BodyString =~ s/<br\/>/<\/p><p>/g; #здесь уже правильный fb3, чистый и с параграфами, вот только <br/> нужно превратить в </p><p> 
+  $BodyString =~ s/(<p>[^<>]*)<br\/>/$1<\/p><p>/g; #здесь уже правильный fb3, чистый и с параграфами, вот только <br/> нужно превратить в </p><p> 
+  $BodyString =~ s/<br\/>/ /g;
   print FHbody $BodyString;
   close FHbody;
 

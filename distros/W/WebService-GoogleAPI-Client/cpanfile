@@ -2,7 +2,7 @@ requires "CHI" => "0";
 requires "Carp" => "0";
 requires "Config::JSON" => "0";
 requires "Crypt::JWT" => "0";
-requires "Data::Dumper" => "0";
+requires "Data::Dump" => "0";
 requires "Hash::Slice" => "0";
 requires "List::Util" => "1.45";
 requires "Mojo::UserAgent" => "0";
@@ -16,12 +16,11 @@ requires "Path::Class" => "0";
 requires "Tie::File" => "0";
 requires "feature" => "0";
 requires "perl" => "v5.14.4";
-requires "strict" => "0";
 requires "strictures" => "0";
-requires "warnings" => "0";
 
 on 'test' => sub {
   requires "Cwd" => "0";
+  requires "Data::Dumper" => "0";
   requires "Email::Simple" => "0";
   requires "FindBin" => "0";
   requires "JSON" => "0";
@@ -29,6 +28,8 @@ on 'test' => sub {
   requires "Sub::Override" => "0";
   requires "Test::More" => "0";
   requires "Test::Needs" => "0";
+  requires "strict" => "0";
+  requires "warnings" => "0";
 };
 
 on 'configure' => sub {

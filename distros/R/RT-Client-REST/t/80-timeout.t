@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#!perl
+# vim:ft=perl:
 #
 # This script tests whether timeout actually works.
 
@@ -36,7 +37,7 @@ if (0 == $pid) {                                            # Child
 plan tests => 8;                                            # Parent
 for my $timeout (1, 2, 5, 10) {
     my $rt = RT::Client::REST->new(
-        server => "http://localhost:$port",
+        server => "http://127.0.0.1:$port",
         timeout => $timeout,
     );
     my $t1 = time;
@@ -52,4 +53,3 @@ for my $timeout (1, 2, 5, 10) {
     ok($t2 - $t1 >= $timeout, "Timed out after $timeout seconds");
 }
 
-# vim:ft=perl:

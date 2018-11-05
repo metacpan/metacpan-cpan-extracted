@@ -11,6 +11,23 @@ cd Alien-Build-*
 
 cpanm -n --installdeps .
 
+if echo $INSTALL_OPTIONAL | grep Alien::Base::ModuleBuild ; then
+
+  # ABase::PkgConfig is needed by ABase::ModuleBuild, but we don't want
+  # to install all of AB from cpan, so install just ABase::ModuleBuild.
+  mkdir -p maint/Alien-Base-PkgConfig/lib/Alien/Base
+  mkdir -p maint/Alien-Base-PkgConfig/t
+  mkdir -p maint/Alien-Base-PkgConfig/corpus/alien_base_pkgconfig
+  cp lib/Alien/Base/PkgConfig.pm maint/Alien-Base-PkgConfig/lib/Alien/Base/PkgConfig.pm
+  cp t/alien_base_pkgconfig.t maint/Alien-Base-PkgConfig/t/alien_base_pkgconfig.t
+  cp corpus/alien_base_pkgconfig/* maint/Alien-Base-PkgConfig/corpus/alien_base_pkgconfig
+
+  cd maint/Alien-Base-PkgConfig
+  cpanm -v .
+  cd ../..
+
+fi
+
 if echo $INSTALL_OPTIONAL | grep PkgConfig::LibPkgConf ; then
 
   echo "installing PkgConfig::LibPkgConf from git";
@@ -25,11 +42,8 @@ if echo $INSTALL_OPTIONAL | grep PkgConfig::LibPkgConf ; then
   # build pkgconf
   git clone https://git.dereferenced.org/pkgconf/pkgconf.git $MYPREFIX/src/pkgconf
   cd $MYPREFIX/src/pkgconf
-  git checkout remotes/origin/graham/system-paths-regression -b graham/system-paths-regression
-
-  # commenting this part out and using my branch till this gets fixed upstream
-  #git fetch --tags
-  ## checkout the most recent tagged release of pkgconf to avoid some of the churn
+  git fetch --tags
+  ### checkout the most recent tagged release of pkgconf to avoid some of the churn
   #git checkout `git tag | perl -e 'my %tags = map { /^pkgconf-(.*)$/ && $_ => join(".", map { sprintf "%05d", $_ } split /\./, $1) } grep /^pkgconf-/, map { chomp; $_ } <STDIN>; my($tag) = reverse sort { $tags{$a} cmp $tags{$b} } keys %tags; print $tag'`
   ./autogen.sh
   ./configure \
@@ -63,5 +77,37 @@ else
 
 fi
 
-echo $INSTALL_OPTIONAL | cpanm -n
+if echo $INSTALL_OPTIONAL | grep Test2::Harness ; then
 
+  if perl -e '($] >= 5.010) or exit 2'; then
+
+    echo "will install Test2::Harness"
+
+  else
+
+    echo "not installing Test2::Harness (removing from list)"
+    export INSTALL_OPTIONAL=`perl -e '$ENV{INSTALL_OPTIONAL} =~ s/Test2::Harness//; print $ENV{INSTALL_OPTIONAL}'`
+
+  fi
+
+else
+
+  echo "not installing Test2::Harness"
+
+fi
+
+if echo $INSTALL_OPTIONAL | grep FFI::Platypus ; then
+
+  echo "installing Alit::Alien::FFI::System for FFI::Platypus"
+  env PERL_ALT_INSTALL=OVERWRITE cpanm -n Alt::Alien::FFI::System
+
+fi
+
+if echo $INSTALL_OPTIONAL | grep Alien::cmake3 ; then
+
+  echo "installing Alt::Alien::cmake3::Systemfor Alien::cmake3"
+  env PERL_ALT_INSTALL=OVERWRITE cpanm -n Alt::Alien::cmake3::System
+
+fi
+
+echo $INSTALL_OPTIONAL | cpanm -n

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use App::CISetup::AppVeyor::ConfigUpdater;
 
@@ -25,7 +25,7 @@ setup-appveyor-yml.pl - Tool for managing appveyor.yml files
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 

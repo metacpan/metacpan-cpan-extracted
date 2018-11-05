@@ -7,12 +7,12 @@ use warnings FATAL => 'all';
 use Test::More;
 use English qw(-no_match_vars);
 
-plan tests => 9;
+plan tests => 10;
 
 subtest 'Require some module' => sub {
     plan tests => 2;
 
-    use_ok 'JIP::DataPath', '0.03';
+    use_ok 'JIP::DataPath', '0.04';
     require_ok 'JIP::DataPath';
 
     diag(
@@ -39,7 +39,7 @@ subtest 'new()' => sub {
 
     isa_ok $o, 'JIP::DataPath';
 
-    can_ok $o, qw(new get contains set perform path);
+    can_ok $o, qw(new get get_new contains set perform path);
 
     is $o->document, 42;
 };
@@ -105,6 +105,78 @@ subtest 'get()' => sub {
 
         is_deeply $o->get([qw(foo bar 0)]),     undef;
         is_deeply $o->get([qw(foo bar 0)], 42), 42;
+
+        # side effects
+        is_deeply $document, {foo => 'bar'};
+    };
+};
+
+subtest 'get_new()' => sub {
+    plan tests => 4;
+
+    subtest 'when document is not defined' => sub {
+        plan tests => 4;
+
+        my $document = undef;
+
+        my $o = JIP::DataPath->new(document => $document)->get_new([]);
+
+        isa_ok $o, 'JIP::DataPath';
+
+        is $o->get([qw()]),    undef;
+        is $o->get([qw(foo)]), undef;
+        is $o->get([qw(0)]),   undef;
+    };
+
+    subtest 'when document is defined' => sub {
+        plan tests => 4;
+
+        my $document = {
+            foo => {
+                bar => [
+                    {wtf => 42},
+                ],
+            },
+        };
+
+        my $o = JIP::DataPath->new(document => $document)->get_new([qw(foo bar)]);
+
+        is_deeply $o->get([qw()]),      $document->{'foo'}->{'bar'};
+        is_deeply $o->get([qw(0)]),     $document->{'foo'}->{'bar'}->[0];
+        is_deeply $o->get([qw(0 wtf)]), $document->{'foo'}->{'bar'}->[0]->{'wtf'};
+
+        # side effects
+        is_deeply $document, {
+            foo => {
+                bar => [
+                    {wtf => 42},
+                ],
+            },
+        };
+    };
+
+    subtest 'when path_parts is empty' => sub {
+        plan tests => 3;
+
+        my $document = {foo => 'bar'};
+
+        my $o = JIP::DataPath->new(document => $document)->get_new([]);
+
+        isa_ok $o, 'JIP::DataPath';
+
+        is_deeply $o->get([]),        $document;
+        is_deeply $o->get([qw(foo)]), $document->{'foo'};
+    };
+
+    subtest 'default_value' => sub {
+        plan tests => 3;
+
+        my $document = {foo => 'bar'};
+
+        my $o = JIP::DataPath->new(document => $document);
+
+        is $o->get_new([qw(not exists)]),     undef;
+        is $o->get_new([qw(not exists)], 42), 42;
 
         # side effects
         is_deeply $document, {foo => 'bar'};

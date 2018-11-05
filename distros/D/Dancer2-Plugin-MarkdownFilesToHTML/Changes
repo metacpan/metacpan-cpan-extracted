@@ -1,0 +1,28 @@
+Revision history for Dancer2-Plugin-MarkdownFilesToHTML
+
+0.006     2018-11-04 22:18:14-05:00 America/New_York
+  - fix sample yaml file in documentation
+  - moved function for creating cache directory
+  - added prereq for Dancer2
+  - added minimum Perl version
+
+0.005     2018-11-03 20:25:14-04:00 America/New_York
+  - remove crufty directory
+  - fix typo in documentation
+
+0.004     2018-11-03 19:57:45-04:00 America/New_York
+  - Add dist.ini and weaver.ini back to distro
+  - modify .gitignore so .ini files aren't ignored
+  - Add markdent as prereq to dist.ini file
+  - Add documentation for MarkdownParser module
+
+0.003     2018-11-03 17:50:50-04:00 America/New_York
+  - Improve documentation
+  - Ensure files/directories supplied in config file are valid
+  - Ensure cache directory exists for storing cached data
+
+0.002     2018-11-03 17:09:55-04:00 America/New_York
+  - Documentation additions
+
+0.001     2018-11-03 16:24:32-04:00 America/New_York
+  - Initial release

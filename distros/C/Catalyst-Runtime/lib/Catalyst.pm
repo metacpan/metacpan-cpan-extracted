@@ -205,7 +205,7 @@ sub composed_stats_class {
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90120';
+our $VERSION = '5.90122';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -1640,8 +1640,9 @@ sub uri_for {
 
         if($num_captures) {
           unless($expanded_action->match_captures_constraints($c, $captures)) {
-            carp "captures [@{$captures}] do not match the type constraints in actionchain ending with '$expanded_action'";
-            return;
+            $c->log->debug("captures [@{$captures}] do not match the type constraints in actionchain ending with '$expanded_action'")
+                if $c->debug;
+            return undef;
           }
         }
 
@@ -1656,8 +1657,9 @@ sub uri_for {
         # At this point @encoded_args is the remaining Args (all captures removed).
         if($expanded_action->has_args_constraints) {
           unless($expanded_action->match_args($c,\@args)) {
-             carp "args [@args] do not match the type constraints in action '$expanded_action'";
-             return;
+             $c->log->debug("args [@args] do not match the type constraints in action '$expanded_action'")
+                if $c->debug;
+             return undef;
           }
         }
     }

@@ -4,7 +4,7 @@
       "Peter Scott <localshop@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -30,7 +30,7 @@
             "Carp" : "0",
             "Config::JSON" : "0",
             "Crypt::JWT" : "0",
-            "Data::Dumper" : "0",
+            "Data::Dump" : "0",
             "Hash::Slice" : "0",
             "List::Util" : "1.45",
             "Mojo::UserAgent" : "0",
@@ -44,21 +44,22 @@
             "Tie::File" : "0",
             "feature" : "0",
             "perl" : "v5.14.4",
-            "strict" : "0",
-            "strictures" : "0",
-            "warnings" : "0"
+            "strictures" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Cwd" : "0",
+            "Data::Dumper" : "0",
             "Email::Simple" : "0",
             "FindBin" : "0",
             "JSON" : "0",
             "MIME::Base64" : "0",
             "Sub::Override" : "0",
             "Test::More" : "0",
-            "Test::Needs" : "0"
+            "Test::Needs" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
@@ -74,7 +75,7 @@
          "web" : "https://github.com/pscott-au/WebService-GoogleAPI-Client"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }

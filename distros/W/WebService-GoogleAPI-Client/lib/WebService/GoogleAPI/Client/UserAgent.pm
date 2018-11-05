@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::UserAgent;
-$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.17';
+$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.18';
 
 # ABSTRACT: User Agent wrapper for working with Google APIs
 
@@ -13,7 +13,7 @@ extends 'Mojo::UserAgent';
 use WebService::GoogleAPI::Client::Credentials;
 use WebService::GoogleAPI::Client::AuthStorage;
 use Mojo::UserAgent;
-use Data::Dumper;    # for dev debug
+use Data::Dump;    # for dev debug
 
 use Carp;
 
@@ -40,6 +40,8 @@ sub BUILD
 }
 
 
+
+## TODO: this should probably nbe handled ->on('start' => sub {}) as per https://metacpan.org/pod/Mojolicious::Guides::Cookbook#Decorating-follow-up-requests
 
 sub header_with_bearer_auth_token
 {
@@ -78,16 +80,32 @@ sub build_http_transaction
 
   carp 'Attention! You are using POST, but no payload specified' if ( ( $http_method eq 'POST' ) && !defined $optional_data );
   carp "build_http_transaction:: $http_method $path " if $self->debug;
-  carp "$http_method Not a SUPPORTED HTTP method parameter specified to build_http_transaction" . Dumper $params unless $http_method =~ /^GET|PATH|PUT|POST|PATCH|DELETE$/ixm;
+  carp "$http_method Not a SUPPORTED HTTP method parameter specified to build_http_transaction" . pp $params unless $http_method =~ /^GET|PATH|PUT|POST|PATCH|DELETE$/ixm;
 
   ## NB - headers not passed if no_auth
   $headers = $self->header_with_bearer_auth_token( $headers ) unless $no_auth;
   if ( $http_method =~ /^POST|PATH|PUT|PATCH$/ixg )
   {
     ## ternary conditional on whether optional_data is set
-    return $optional_data eq '' ? $self->build_tx( $http_method => $path => $headers ) : $self->build_tx( $http_method => $path => $headers => json => $optional_data );
+    ## return $optional_data eq '' ? $self->build_tx( $http_method => $path => $headers ) : $self->build_tx( $http_method => $path => $headers => json => $optional_data );
+    if ( $optional_data eq '' )
+    {
+      return $self->build_tx( $http_method => $path => $headers );
+    }
+    else
+    {
+      if ( ref( $optional_data ) eq 'HASH' )
+      {
+        return $self->build_tx( $http_method => $path => $headers => json => $optional_data );
+      }
+      elsif ( ref( $optional_data ) eq '' )    ## am assuming is a post with options containing a binary payload
+      {
+        return $self->build_tx( $http_method => $path => $headers => $optional_data );
+      }
+
+    }
   }
-  else    ## DELETE or GET
+  else                                         ## DELETE or GET
   {
     return $self->build_tx( $http_method => $path => $headers => form => $optional_data ) if ( $http_method eq 'GET' );
     return $self->build_tx( $http_method => $path => $headers ) if ( $http_method eq 'DELETE' );
@@ -192,7 +210,7 @@ WebService::GoogleAPI::Client::UserAgent - User Agent wrapper for working with G
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head2 C<header_with_bearer_auth_token>
 

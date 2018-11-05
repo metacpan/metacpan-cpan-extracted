@@ -115,95 +115,95 @@
    "provides" : {
       "Test::Class::Moose" : {
          "file" : "lib/Test/Class/Moose.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::AttributeRegistry" : {
          "file" : "lib/Test/Class/Moose/AttributeRegistry.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::CLI" : {
          "file" : "lib/Test/Class/Moose/CLI.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Config" : {
          "file" : "lib/Test/Class/Moose/Config.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Deprecated" : {
          "file" : "lib/Test/Class/Moose/Deprecated.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Executor::Parallel" : {
          "file" : "lib/Test/Class/Moose/Executor/Parallel.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Executor::Sequential" : {
          "file" : "lib/Test/Class/Moose/Executor/Sequential.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Load" : {
          "file" : "lib/Test/Class/Moose/Load.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Report" : {
          "file" : "lib/Test/Class/Moose/Report.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Report::Class" : {
          "file" : "lib/Test/Class/Moose/Report/Class.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Report::Instance" : {
          "file" : "lib/Test/Class/Moose/Report/Instance.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Report::Method" : {
          "file" : "lib/Test/Class/Moose/Report/Method.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Report::Time" : {
          "file" : "lib/Test/Class/Moose/Report/Time.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Role" : {
          "file" : "lib/Test/Class/Moose/Role.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Role::AutoUse" : {
          "file" : "lib/Test/Class/Moose/Role/AutoUse.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Role::CLI" : {
          "file" : "lib/Test/Class/Moose/Role/CLI.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Role::Executor" : {
          "file" : "lib/Test/Class/Moose/Role/Executor.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Role::HasTimeReport" : {
          "file" : "lib/Test/Class/Moose/Role/HasTimeReport.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Role::ParameterizedInstances" : {
          "file" : "lib/Test/Class/Moose/Role/ParameterizedInstances.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Role::Reporting" : {
          "file" : "lib/Test/Class/Moose/Role/Reporting.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Runner" : {
          "file" : "lib/Test/Class/Moose/Runner.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Tutorial" : {
          "file" : "lib/Test/Class/Moose/Tutorial.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       },
       "Test::Class::Moose::Util" : {
          "file" : "lib/Test/Class/Moose/Util.pm",
-         "version" : "0.94"
+         "version" : "0.95"
       }
    },
    "release_status" : "stable",
@@ -218,7 +218,7 @@
          "web" : "https://github.com/houseabsolute/test-class-moose"
       }
    },
-   "version" : "0.94",
+   "version" : "0.95",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"
@@ -324,7 +324,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Meta",
             "name" : "@DROLSKY/GitHub::Meta",
-            "version" : "0.46"
+            "version" : "0.47"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Update",
@@ -334,7 +334,7 @@
                }
             },
             "name" : "@DROLSKY/GitHub::Update",
-            "version" : "0.46"
+            "version" : "0.47"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -499,6 +499,7 @@
                      "TCM",
                      "TODO",
                      "arisdottle",
+                     "dirs",
                      "distro",
                      "drolsky",
                      "hardcode",
@@ -670,7 +671,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -678,7 +679,7 @@
                }
             },
             "name" : "@DROLSKY/Git::Contributors",
-            "version" : "0.034"
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::SurgicalPodWeaver",
@@ -881,7 +882,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "name" : "@DROLSKY/InstallGuide",
-            "version" : "1.200011"
+            "version" : "1.200012"
          },
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
@@ -923,7 +924,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
@@ -939,7 +940,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
@@ -972,7 +973,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
@@ -1001,7 +1002,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1018,12 +1019,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.94",
+                  "tag" : "v0.95",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1043,7 +1044,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
@@ -1083,7 +1084,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1103,7 +1104,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },

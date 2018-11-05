@@ -16,15 +16,13 @@ sub generate_songbook {
     return [] unless eval { $sb->{songs}->[0]->{body} };
 
     # Build regex for the known metadata items.
-    if ( $::config->{metadata}->{keys} ) {
-	$re_meta = '^(' .
-	  join( '|', map { quotemeta } @{$::config->{metadata}->{keys}} )
-	    . ')$';
-	$re_meta = qr/$re_meta/;
-    }
-    else {
-	undef $re_meta;
-    }
+    $re_meta = join( '|',
+		     map { quotemeta }
+		     "title", "subtitle",
+		     "artist", "composer", "lyricist", "arranger",
+		     "album", "copyright", "year",
+		     "key", "time", "tempo", "capo", "duration" );
+    $re_meta = qr/^($re_meta)$/;
 
     my @book;
 
@@ -41,23 +39,24 @@ sub generate_songbook {
 }
 
 my $lyrics_only = 0;
-my @gridparams;
 
 sub generate_song {
     my ($s, $options) = @_;
 
     my $tidy = $options->{'backend-option'}->{tidy};
-    $lyrics_only = 2 * $options->{'lyrics-only'};
+    $lyrics_only = 2 * $::config->{settings}->{'lyrics-only'};
+    my $rechorus = $::config->{chordpro}->{chorus}->{recall};
     my $structured = ( $options->{'backend-option'}->{structure} // '' ) eq 'structured';
     # $s->structurize if ++$structured;
     my $variant = $options->{'backend-option'}->{variant} || 'cho';
+    my $seq     = $options->{'backend-option'}->{seq};
 
     my @s;
 
     if ( $s->{preamble} ) {
 	@s = @{ $s->{preamble} };
     }
- 
+
     push(@s, "{title: " . $s->{meta}->{title}->[0] . "}")
       if defined $s->{meta}->{title};
     if ( defined $s->{subtitle} ) {
@@ -65,14 +64,23 @@ sub generate_song {
     }
 
     if ( $s->{meta} ) {
+	if ( $variant eq 'msp' ) {
+	    $s->{meta}->{source} //= [ "Lead Sheet" ];
+	    $s->{meta}->{custom2} //= [ $seq ] if defined $seq;
+	}
+	# Known ones 'as is'.
 	foreach my $k ( sort keys %{ $s->{meta} } ) {
 	    next if $k =~ /^(?:title|subtitle)$/;
-	    if ( $variant eq 'msp' || $k =~ $re_meta ) {
+	    if ( $k =~ $re_meta ) {
 		push( @s, map { +"{$k: $_}" } @{ $s->{meta}->{$k} } );
+		delete $s->{meta}->{$k};
 	    }
-	    else {
-		push( @s, map { +"{meta: $k $_}" } @{ $s->{meta}->{$k} } );
-	    }
+	}
+	# Unknowns with meta prefix.
+	foreach my $k ( sort keys %{ $s->{meta} } ) {
+	    next if $k =~ /^(?:title|subtitle)$/;
+	    next if $k =~ /^_/;
+	    push( @s, map { +"{meta: $k $_}" } @{ $s->{meta}->{$k} } );
 	}
     }
 
@@ -102,13 +110,23 @@ sub generate_song {
 	    $t .= " fingers " .
 	      join(" ", map { $_ < 0 ? "N" : $_ } @{$info->{fingers}})
 		if $info->{fingers};
-	    push(@s, $t);
+	    push(@s, $t . "}");
 	}
 	push(@s, "") if $tidy;
     }
 
     my $ctx = "";
     my $dumphdr = 1;
+
+    if ( $s->{chords} && $variant ne 'msp' ) {
+	$dumphdr = 0 unless $s->{chords}->{origin} eq "__CLI__";
+	push( @s,
+	      @{ App::Music::ChordPro::Chords::list_chords
+		  ( $s->{chords}->{chords},
+		    $s->{chords}->{origin},
+		    $dumphdr ) } );
+	$dumphdr = 0;
+    }
 
     my @elts = @{$s->{body}};
     while ( @elts ) {
@@ -118,21 +136,30 @@ sub generate_song {
 	    push(@s, "{end_of_$ctx}") if $ctx;
 	    $ctx = $elt->{context};
 	    if ( $ctx ) {
-		if ( $elt->{type} eq "set" &&
-		     $elt->{name} eq "gridparams" ) {
-		    @gridparams = @{ $elt->{value} };
+
+		my $t = "{start_of_$ctx";
+
+		if ( $elt->{type} eq "set" ) {
+		    if ( $elt->{name} eq "gridparams" ) {
+			my @gridparams = @{ $elt->{value} };
+			$t .= ": ";
+			$t .= $gridparams[2] . "+" if $gridparams[2];
+			$t .= $gridparams[0];
+			$t .= "x" . $gridparams[1] if $gridparams[1];
+			$t .= "+" . $gridparams[3] if $gridparams[3];
+			if ( $gridparams[4] ) {
+			    my $tag = $gridparams[4];
+			    $t .= " " . $tag if $tag ne "";
+			}
+		    }
+		    elsif ( $elt->{name} eq "label" ) {
+			my $tag = $elt->{value};
+			$t .= ": " . $tag if $tag ne "";
+		    }
+
 		}
-		if ( @gridparams ) {
-		    my $t = "{start_of_$ctx ";
-		    $t .= $gridparams[2] . "+" if $gridparams[2];
-		    $t .= $gridparams[0];
-		    $t .= "x" . $gridparams[1] if $gridparams[1];
-		    $t .= "+" . $gridparams[3] if $gridparams[3];
-		    push( @s, $t );
-		}
-		else {
-		    push(@s, "{start_of_$ctx}");
-		}
+		$t .= "}";
+		push( @s, $t );
 	    }
 	}
 
@@ -208,8 +235,14 @@ sub generate_song {
 	    if ( $variant eq 'msp' ) {
 		push( @s, "{chorus}" );
 	    }
-	    else {
+	    elsif ( $rechorus->{quote} ) {
 		unshift( @elts, @{ $elt->{chorus} } );
+	    }
+	    elsif ( $rechorus->{type} &&  $rechorus->{tag} ) {
+		push( @s, "{".$rechorus->{type}.": ".$rechorus->{tag}."}" );
+	    }
+	    else {
+		push( @s, "{chorus}" );
 	    }
 	    next;
 	}
@@ -277,9 +310,6 @@ sub generate_song {
 		$lyrics_only = $elt->{value}
 		  unless $lyrics_only > 1;
 	    }
-	    elsif ( $elt->{name} eq "gridparams" ) {
-		@gridparams = @{ $elt->{value} };
-	    }
 	    elsif ( $elt->{name} eq "transpose" ) {
 	    }
 	    next;
@@ -289,7 +319,9 @@ sub generate_song {
 	    push( @s, $elt->{text} );
 	    next;
 	}
+
     }
+
     push(@s, "{end_of_$ctx}") if $ctx;
 
     \@s;

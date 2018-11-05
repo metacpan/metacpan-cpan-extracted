@@ -1,10 +1,43 @@
 ==================================================
-Changes from 2018-10-19 00:00:00 +0000 to present.
+Changes from 2018-10-22 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.17 at 2018-11-02 07:55:31 +0000
+version 0.18 at 2018-11-05 06:33:01 +0000
 -----------------------------------------
+
+  Change: 6842cf46ed39e64fc0a251d0cf62628f087c9b09
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-11-04 16:37:57 +0000
+
+    Add Geocoding and Places example
+
+    NB - isn't discoverable or accessible through OAUTH access control
+    but may be of interest to see how can still use the library UserAgent
+    to construct API requests. 
+
+  Change: c83b36632f57e9b730dc581efcefaa2d89ca8af9
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-11-03 10:46:20 +0000
+
+    code before strictures test fail fix 
+
+  Change: 0631af032e940b964992b00bfd6dd183e61f7524
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-11-03 10:44:31 +0000
+
+    useragent accepts options=>$FILE_CONTENT to perform data post like
+    curl --data-binary
+
+    needed to perform bucket file upload in
+    cloudstorage_bucket_example.pl also replaced Data::Dumper with
+    Data::Dump pp bumped version to 0.17.1 
+
+  Change: 5e97a95d7f7bdebfd9d07266168ccbdb28430f0f
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-11-02 18:16:33 +0000
+
+    CPAN RELEASE 0.17 
 
   Change: 1dc5085736e6428e0edc830f6c04bf6b36200bb3
   Author: Peter Scott <peter@computerpros.com.au>
@@ -225,71 +258,6 @@ version 0.14 at 2018-10-27 08:19:26 +0000
     place - hacked in a validation of type in case unable to start HTTP
     transaction request. 
 
------------------------------------------
-version 0.12 at 2018-10-21 03:26:55 +0000
------------------------------------------
-
-  Change: dd18738db8e55c9cc5efa68e141811cc0b7aa538
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-21 13:26:55 +0000
-
-    Version 0.12 Release
-
-    #4 drill perltidy and POD Cleanup 
-
-  Change: a1e3ce5798e972fa800f1b26f55e0aa2de609369
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-21 00:31:39 +0000
-
-    fix link in README 
-
-  Change: 326d73ebf57ff00c093562c7b5e336c7326b9ba1
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-20 21:27:16 +0000
-
-    Merge branch 'Exploring-CHI' 
-
-  Change: dc905cd7febfe3b8de4a395ebdacddbc0aef81cd
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-20 21:24:05 +0000
-
-    POD and replace Moose with Moo dependency
-
-    also attempt to address #4 with minor validation check addition to
-    Discovery 
-
-  Change: 403680ca16d948c387fecce65025addde081ba77
-  Author: Peter Scott <peter@pscott.com.au>
-  Date : 2018-10-18 23:00:25 +0000
-
-    Merge pull request #1 from pscott-au/add-code-of-conduct-1
-
-    Create CODE_OF_CONDUCT.md 
-
-  Change: 3023a31b8cf9fd178c586a7efcb551416f43b78c
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-18 22:55:19 +0000
-
-    fix conflicting LICENSE files on build 
-
-  Change: e750c9c77482d79fbfeafd0de547a87defd27ab9
-  Author: Peter Scott <peter@pscott.com.au>
-  Date : 2018-10-18 22:44:53 +0000
-
-    Create CODE_OF_CONDUCT.md 
-
-  Change: 1598a5212e08e97c2f5d405242c7755b2ab4ca35
-  Author: Peter Scott <peter@pscott.com.au>
-  Date : 2018-10-18 22:43:55 +0000
-
-    Update issue templates 
-
-  Change: f033ede160c9b0f0fc1c89973caba924942b9115
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-18 22:42:37 +0000
-
-    Create LICENSE 
-
-===============================================
-Plus 1 release after 2018-10-19 00:00:00 +0000.
-===============================================
+================================================
+Plus 2 releases after 2018-10-22 00:00:00 +0000.
+================================================

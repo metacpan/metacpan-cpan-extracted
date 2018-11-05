@@ -1,10 +1,11 @@
 package Docker::Registry::Auth::ECR;
-  use Moose;
+  use Moo;
+  use Types::Standard qw/Str/;
   with 'Docker::Registry::Auth';
 
   use Paws;
 
-  has region => (is => 'ro', isa => 'Str');
+  has region => (is => 'ro', isa => Str);
 
   has ecr => (is => 'ro', lazy => 1, default => sub {
     my $self = shift;
@@ -12,7 +13,7 @@ package Docker::Registry::Auth::ECR;
     Paws->service('ECR', region => $self->region);
   });
 
-  has token => (is => 'ro', isa => 'Str', required => 1, lazy => 1, default => sub {
+  has token => (is => 'ro', isa => Str, required => 1, lazy => 1, default => sub {
     my $self = shift;
     $self->ecr->GetAuthorizationToken->AuthorizationData->[0]->AuthorizationToken;  
   });

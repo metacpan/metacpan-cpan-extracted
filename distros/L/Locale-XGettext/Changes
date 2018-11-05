@@ -1,5 +1,9 @@
 Changes for Locale-XGettext.
 
+0.7  2018-11-04
+  - fixes for utf-8 ideosyncrasies that caused wrong encoding on output
+    files
+
 0.6  2018-10-22
   - fixes https://github.com/gflohr/Locale-XGettext/issues/3
     That was a blocker for [Qgoda](http://www.qgoda.net/),

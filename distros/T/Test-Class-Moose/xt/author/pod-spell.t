@@ -104,6 +104,7 @@ catchgithub
 charles_adams
 de
 denny
+dirs
 distro
 djgoku
 drolsky

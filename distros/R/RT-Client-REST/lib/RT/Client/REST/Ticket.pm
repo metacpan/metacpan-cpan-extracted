@@ -6,16 +6,16 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Ticket;
-$RT::Client::REST::Ticket::VERSION = '0.52';
+$RT::Client::REST::Ticket::VERSION = '0.53';
+use base 'RT::Client::REST::Object';
+
 use Error qw(:try);
 use Params::Validate qw(:types);
 use RT::Client::REST 0.18;
 use RT::Client::REST::Attachment;
-use RT::Client::REST::Object 0.01;
 use RT::Client::REST::Object::Exception 0.04;
 use RT::Client::REST::SearchResult 0.02;
 use RT::Client::REST::Transaction;
-use base 'RT::Client::REST::Object';
 
 
 sub _attributes {{
@@ -306,7 +306,7 @@ RT::Client::REST::Ticket - ticket object representation.
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

@@ -46,4 +46,4 @@ There is NO WARRANTY, to the extent permitted by law.
 
 =head1 SEE ALSO
 
-L<xgettext-txt>, L<Locale::XGettext>, L<perl>, B<xgettext(1)>
+L<xgettext-txt>, L<Locale::XGettext>, L<perl>, L<xgettext(1)>

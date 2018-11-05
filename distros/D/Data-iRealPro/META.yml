@@ -21,10 +21,10 @@ no_index:
 provides:
   Data::iRealPro:
     file: lib/Data/iRealPro.pm
-    version: '1.11'
+    version: '1.12'
   irealcvt:
     file: script/irealcvt
-    version: '1.11'
+    version: '1.12'
 requires:
   App::Packager: '1.42'
   Data::Struct: '1.701'
@@ -36,5 +36,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/sciurius/perl-Data-iRealPro.git
-version: '1.11'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

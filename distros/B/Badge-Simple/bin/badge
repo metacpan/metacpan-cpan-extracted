@@ -1,0 +1,61 @@
+#!perl
+use warnings;
+use strict;
+use 5.008; # for binmode STDOUT, ":encoding(...)";
+use Getopt::Long qw/ HelpMessage :config posix_default gnu_compat bundling auto_help /;
+use Badge::Simple 'badge';
+
+=head1 SYNOPSIS
+
+A simple command-line front-end to the Perl module L<Badge::Simple|Badge::Simple>.
+
+ badge -l LEFTTEXT -r RIGHTTEXT [-c COLOR] [-f FONTFILE] [-o OUTFILE] [-p]
+ 
+ Options:
+   -l | --left TEXT    - Text for left side of badge
+   -r | --right TEXT   - Text for right side of badge
+   -c | --color COLOR  - Color for right side of badge
+   -f | --font FILE    - Font file (for metrics)
+   -o | --out FILE     - Output file (default is STDOUT)
+   -p | --pretty       - Format and indent the XML output
+ 
+ Colors: blue, brightgreen, green, lightgrey, orange, red, yellow,
+         yellowgreen, or #XXXXXX (custom HTML color)
+
+=head1 Author, Copyright, and License
+
+Copyright (c) 2018 Hauke Daempfling (haukex@zero-g.net).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5 itself.
+
+For more information see the L<Perl Artistic License|perlartistic>,
+which should have been distributed with your copy of Perl.
+Try the command C<perldoc perlartistic> or see
+L<http://perldoc.perl.org/perlartistic.html>.
+
+Please see the file F<README.md> in the module's distribution for
+additional information.
+
+=cut
+
+my %opts = ( version => sub {
+		print 'Badge::Simple version ',$Badge::Simple::VERSION,"\n"; exit }
+	);
+GetOptions(\%opts, 'version',
+		'left|l=s', 'right|r=s', 'color|c=s', 'font|f=s', 'out|o=s', 'pretty|p'
+	) or HelpMessage(-exitval=>255);
+HelpMessage(-msg=>'Too many arguments',-exitval=>255) if @ARGV;
+HelpMessage(-msg=>'Left and right text is required',-exitval=>255)
+	unless length($opts{left}) && length($opts{right});
+
+my $badge = badge( left=>$opts{left}, right=>$opts{right},
+	defined($opts{color}) ? (color=>$opts{color}) : (),
+	defined($opts{font}) ? (font=>$opts{font}) : () );
+
+if (defined $opts{out})
+	{ $badge->toFile($opts{out}, $opts{pretty}?1:0) }
+else {
+	binmode select, ':encoding('.$badge->actualEncoding().')';  ## no critic (ProhibitOneArgSelect)
+	print $badge->toString($opts{pretty}?1:0);
+}

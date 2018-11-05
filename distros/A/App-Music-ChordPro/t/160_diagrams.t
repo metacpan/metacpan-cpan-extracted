@@ -25,7 +25,9 @@ isa_ok( $s->{songs}->[0], 'App::Music::ChordPro::Song', "It's a song" );
 my $song = {
 	    'settings' => {},
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'
@@ -48,14 +50,13 @@ my $song = {
 				     ],
 			'context' => ''
 		       },
-		       {
+		      ],
+	    'chords' => {
 			'chords' => [ 'G', 'D' ],
-			'context' => '',
 			'origin' => 'song',
 			'show' => 'all',
 			'type' => 'diagrams'
-		       }
-		      ],
+		       },
 	   };
 
 is_deeply( { %{ $s->{songs}->[-1] } }, $song,
@@ -79,7 +80,9 @@ $song = {
 			   'diagrams' => 0
 			  },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'
@@ -111,21 +114,20 @@ $song = {
 			   'diagrams' => 1
 			  },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'
 				  ]
 		      },
-	    'body' => [
-		       {
+	    'chords' => {
 			'chords' => [],
-			'context' => '',
 			'origin' => 'song',
 			'show' => 'all',
 			'type' => 'diagrams'
-		       }
-		      ],
+		       },
 	   };
 
 is_deeply( { %{ $s->{songs}->[0] } }, $song,

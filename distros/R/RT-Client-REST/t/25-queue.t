@@ -1,3 +1,6 @@
+#!perl
+# vim:ft=perl:
+
 use strict;
 use warnings;
 
@@ -28,4 +31,3 @@ for my $method (METHODS) {
 
 ok('queue' eq $user->rt_type);
 
-# vim:ft=perl:

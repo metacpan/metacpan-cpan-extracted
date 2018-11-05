@@ -1,34 +1,40 @@
 package Docker::Registry::Call::Repositories;
-  use Moose;
-  has n => (is => 'ro', isa => 'Int');
-  has limit => (is => 'ro', isa => 'Int');
+  use Moo;
+  use Types::Standard qw/Int/;
+  has n => (is => 'ro', isa => Int);
+  has limit => (is => 'ro', isa => Int);
 
 package Docker::Registry::Result::Repositories;
-  use Moose;
-  has repositories => (is => 'ro', isa => 'ArrayRef[Str]');
+  use Moo;
+  use Types::Standard qw/ArrayRef Str/;
+  has repositories => (is => 'ro', isa => ArrayRef[Str]);
 
 package Docker::Registry::Call::RepositoryTags;
-  use Moose;
-  has repository => (is => 'ro', isa => 'Str', required => 1);
-  has n => (is => 'ro', isa => 'Int');
-  has limit => (is => 'ro', isa => 'Int');
+  use Moo;
+  use Types::Standard qw/Int Str/;
+  has repository => (is => 'ro', isa => Str, required => 1);
+  has n => (is => 'ro', isa => Int);
+  has limit => (is => 'ro', isa => Int);
 
 package Docker::Registry::Result::RepositoryTags;
-  use Moose;
-  has name => (is => 'ro', isa => 'Str', required => 1);
-  has tags => (is => 'ro', isa => 'ArrayRef[Str]', required => 1);
+  use Moo;
+  use Types::Standard qw/ArrayRef Str/;
+  has name => (is => 'ro', isa => Str, required => 1);
+  has tags => (is => 'ro', isa => ArrayRef[Str], required => 1);
 
 package Docker::Registry::V2;
-  use Moose;
+  use Moo;
+  use Docker::Registry::Types qw(DockerRegistryURI);
+  use Types::Standard qw/Str ConsumerOf/;
 
-  has url => (is => 'ro', isa => 'Str', required => 1);
+  has url => (is => 'ro', coerce => 1, isa => DockerRegistryURI, required => 1);
   has api_base => (is => 'ro', default => 'v2');
 
-  has caller => (is => 'ro', does => 'Docker::Registry::IO', default => sub {
+  has caller => (is => 'ro', isa => ConsumerOf['Docker::Registry::IO'], default => sub {
     require Docker::Registry::IO::Simple;
     Docker::Registry::IO::Simple->new;  
   });
-  has auth => (is => 'ro', does => 'Docker::Registry::Auth', lazy => 1, builder => 'build_auth' );
+  has auth => (is => 'ro', isa => ConsumerOf['Docker::Registry::Auth'], lazy => 1, builder => 'build_auth' );
 
   sub build_auth {
     require Docker::Registry::Auth::None;
@@ -86,7 +92,8 @@ package Docker::Registry::V2;
       method => 'GET',
       url => (join '/', $self->url, $self->api_base, '_catalog')
     );
-    $request = $self->auth->authorize($request);
+    my $scope = 'registry:catalog:*';
+    $request = $self->auth->authorize($request, $scope);
     my $response = $self->caller->send_request($request);
     my $result_class = 'Docker::Registry::Result::Repositories';
     my $result = $result_class->new($self->process_json_response($response));
@@ -112,7 +119,8 @@ package Docker::Registry::V2;
       method => 'GET',
       url => (join '/', $self->url, $self->api_base, $call->repository, 'tags/list')
     );
-    $request = $self->auth->authorize($request);
+    my $scope = sprintf 'repository:%s:%s', $call->repository, 'pull';
+    $request = $self->auth->authorize($request, $scope);
     my $response = $self->caller->send_request($request);
     my $result_class = 'Docker::Registry::Result::RepositoryTags';
     my $result = $result_class->new($self->process_json_response($response));

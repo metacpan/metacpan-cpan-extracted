@@ -2,7 +2,7 @@ use strictures;
 use 5.14.0;
 
 package WebService::GoogleAPI::Client;
-$WebService::GoogleAPI::Client::VERSION = '0.17';
+$WebService::GoogleAPI::Client::VERSION = '0.18';
 
 # ABSTRACT: API WebService OAUTH2 Client Agent to streamline access to GOOGLE API End-Point Services using Discovery Data
 
@@ -10,7 +10,7 @@ $WebService::GoogleAPI::Client::VERSION = '0.17';
 #   FROM MCE POD -- <p><img src="https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.png" width="664" height="446" alt="Bank Queuing Model" /></p>
 
 
-use Data::Dumper;
+use Data::Dump;
 use Moo;
 use WebService::GoogleAPI::Client::UserAgent;
 use WebService::GoogleAPI::Client::Discovery;
@@ -92,7 +92,7 @@ sub api_query
   {
     $params = { @params_array };    ## what happens if not even count
   }
-  carp( Dumper $params) if $self->debug > 10;
+  carp( pp $params) if $self->{ debug } > 10;
 
   my @teapot_errors = ();           ## used to collect pre-query validation errors - if set we return a response with 418 I'm a teapot
 
@@ -139,6 +139,7 @@ sub api_query
 
       foreach my $meth_param_spec ( keys %{ $method_discovery_struct->{ parameters } } )
       {
+        carp( "Checking $meth_param_spec" ) if ( $self->{ debug } > 10 );
         ## set default value if is not provided within $params->{options} - nb technically not required but provides visibility of the params if examining the options when debugging
         $params->{ options }{ $meth_param_spec } = $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default }
           if (
@@ -153,19 +154,19 @@ sub api_query
         #carp("$meth_param_spec  has a user option value defined") if ( defined $params->{options}{$meth_param_spec} );
         if ( $params->{ path } =~ /\{.+\}/xms )    ## there are un-interpolated variables in the path - try to fill them for this param if reqd
         {
-          carp( "$params->{path} includes unfilled variables " ) if $self->debug > 10;
-          carp Dumper $params if $self->debug > 10;
+          carp( "$params->{path} includes un-filled variables " ) if $self->debug > 10;
+          carp( Dumper $params) if $self->debug > 10;
           ## interpolate variables into URI if available and not filled
           if ( $method_discovery_struct->{ parameters }{ $meth_param_spec }{ 'location' } eq 'path' )    ## this is a path variable
           {
             ## requires interpolations into the URI -- consider && into containing if
-            if ( $params->{ path } =~ /\{$meth_param_spec\}/xg )                                         ## eg match {jobId} in 'v1/jobs/{jobId}/reports/{reportId}'
+            if ( $params->{ path } =~ /\{\+*$meth_param_spec\}/xg )                                      ## eg match {jobId} in 'v1/jobs/{jobId}/reports/{reportId}'
             {
               ## if provided as an option
               if ( defined $params->{ options }{ $meth_param_spec } )
               {
-                carp( "DEBUG: $meth_param_spec is defined in param->{options}" ) if $self->debug > 10;
-                $params->{ path } =~ s/\{$meth_param_spec\}/$params->{options}{$meth_param_spec}/xsmg;
+                carp( "DEBUG: $meth_param_spec is defined in param->{options}" ) if $self->{ debug } > 10;
+                $params->{ path } =~ s/\{\+*$meth_param_spec\}/$params->{options}{$meth_param_spec}/xsmg;
                 ## TODO - possible source of errors in future - do we need to undefine the option here?
                 ## undefining it so that it doesn't break post contents
                 delete $params->{ options }{ $meth_param_spec };
@@ -195,10 +196,14 @@ sub api_query
       }
 
       ## error now if there remain uninterpolated variables in the path ?
+      if ( $params->{ path } =~ /\{.+\}/xms )
+      {
+        push @teapot_errors, "Path '$params->{path}' includes unfilled variable after processing";
+      }
 
 
       ## prepend base if it doesn't match expected base
-      #print Dumper $method_discovery_struct;
+      #print pp $method_discovery_struct;
       $api_discovery_struct->{ baseUrl } =~ s/\/$//sxmg;    ## remove trailing '/'
       $params->{ path } =~ s/^\///sxmg;                     ## remove leading '/'
 
@@ -246,7 +251,7 @@ sub api_query
   }
   else
   {
-    #carp Dumper $params;
+    #carp pp $params;
 
     return $self->ua->validated_api_query( $params );
 
@@ -312,7 +317,7 @@ WebService::GoogleAPI::Client - API WebService OAUTH2 Client Agent to streamline
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -424,7 +429,7 @@ $self->access_token must be valid
   print  $gapi_agent->api_query(
             api_endpoint_id => 'gmail.users.messages.list', ## auto sets method to GET, path to 'https://www.googleapis.com/calendar'
           )->to_string;
-  #print Dumper $r;
+  #print pp $r;
 
 
   NB: including the version in the API Endpoint Spec is not supported .. yet? eg gmail:v1.users.messages.list .. will always use the latest stable version
@@ -495,7 +500,7 @@ warns and returns 0 on error ( eg user or config not specified etc )
 
         $new_hash->{ $api->{name} } = $api;
     }
-    print Dumper $new_hash->{gmail};
+    print dump $new_hash->{gmail};
 
 =head2 C<get_api_discovery_for_api_id>
 

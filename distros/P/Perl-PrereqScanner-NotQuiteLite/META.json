@@ -42,7 +42,7 @@
             "CPAN::Meta::Requirements" : "2.140",
             "Data::Dump" : "0",
             "Exporter" : "5.57",
-            "Module::CPANfile" : "1.1003",
+            "Module::CPANfile" : "1.1004",
             "Module::CoreList" : "2.99",
             "Module::Find" : "0",
             "Regexp::Trie" : "0",
@@ -66,6 +66,6 @@
          "url" : "https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite"
       }
    },
-   "version" : "0.98",
+   "version" : "0.99",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

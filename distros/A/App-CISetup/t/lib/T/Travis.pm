@@ -98,6 +98,7 @@ sub test_create_and_update {
             },
             matrix => {
                 allow_failures => [ { perl => 'blead' } ],
+                fast_finish    => 1,
                 include        => [
                     {
                         env  => 'COVERAGE=1',

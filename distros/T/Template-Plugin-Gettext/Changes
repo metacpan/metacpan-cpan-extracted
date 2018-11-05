@@ -1,3 +1,8 @@
+0.7  2018-11-04
+        - Always set utf8 flag on translations.
+        - Require libintl-perl 1.30, because of
+          https://github.com/gflohr/libintl-perl/issues/4
+
 0.6  2018-05-09
         - Re-allow relative paths (was broken in 0.5).  Otherwise common
           POTFILES files cannot be read.

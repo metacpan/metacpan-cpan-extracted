@@ -1,17 +1,17 @@
 package Docker::Registry::Auth::Exception;
-  use Moose;
+  use Moo;
   extends 'Docker::Registry::Exception';
 
 package Docker::Registry::Auth::Exception::HTTP;
-  use Moose;
+  use Moo;
   extends 'Docker::Registry::Exception::HTTP';
 
 package Docker::Registry::Auth::Exception::FromRemote;
-  use Moose;
+  use Moo;
   extends 'Docker::Registry::Exception::FromRemote';
 
 package Docker::Registry::Auth;
-  use Moose::Role;
+  use Moo::Role;
 
   requires 'authorize';
 

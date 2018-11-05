@@ -29,7 +29,9 @@ isa_ok( $s->{songs}->[0], 'App::Music::ChordPro::Song', "It's a song" );
 my $song = {
 	    'settings' => {},
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'
@@ -74,7 +76,9 @@ isa_ok( $s->{songs}->[0], 'App::Music::ChordPro::Song', "It's a song" );
 $song = {
 	    'settings' => {},
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'

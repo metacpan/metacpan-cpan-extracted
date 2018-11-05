@@ -4,6 +4,10 @@ package App::Music::ChordPro::Config;
 
 use strict;
 use warnings;
+use utf8;
+use App::Packager;
+use Carp;
+use App::Music::ChordPro;
 
 =head1 NAME
 
@@ -24,6 +28,13 @@ This is the current built-in configuration file, showing all settings.
   // This is a relaxed JSON document, so comments are possible.
   
   {
+      // Includes. These are processed first, before the rest of
+      // the config file.
+      //
+      // "include" takes a list of either filenames or preset names.
+      // "include" : [ "modern1", "lib/mycfg.json" ],
+      "include" : [ "guitar" ],
+  
       // General settings, to be changed by legacy configs and
       // command line.
       "settings" : {
@@ -37,6 +48,16 @@ This is the current built-in configuration file, showing all settings.
   	// Suppress chords.
   	// Overrides --lyrics-only command line option.
   	"lyrics-only" : false,
+	// Memorize chords in sections, to be recalled by [^].
+	"memorize" : false,
+  	// Chords inline.
+  	// May be a string containing pretext %s posttext.
+  	// Defaults to "[%s]" if true.
+  	"inline-chords" : false,
+  	// Chords under the lyrics.
+  	"chords-under" : false,
+        // Transcoding.
+        "transcode" : null,
       },
   
       // Metadata.
@@ -54,22 +75,49 @@ This is the current built-in configuration file, showing all settings.
         "separator" : "; ",
       },
   
+      // Instrument settings. These are usually set by a separate
+      // config file.
+      //
+      "instrument" : null,
+  
+      // Note (chord root) names.
       // Strings and tuning.
-      // Note that using this will discard all built-in chords!
-      // "tuning" : [ "E2", "A2", "D3", "G3", "B3", "E4" ],
-      "tuning" : null,
+      "tuning" : [ "E2", "A2", "D3", "G3", "B3", "E4" ],
+
+      // In case of alternatives, the first one is used for output.
+      "notes" : {
+  
+  	"system" : "common",
+  
+  	"sharp" : [ "C", [ "C#", "Cis", "C♯" ],
+  		    "D", [ "D#", "Dis", "D♯" ],
+  		    "E",
+  		    "F", [ "F#", "Fis", "F♯" ],
+  		    "G", [ "G#", "Gis", "G♯" ],
+  		    "A", [ "A#", "Ais", "A♯" ],
+  		    "B",
+  		  ],
+  
+  	"flat" :  [ "C",
+  		    [ "Db", "Des",        "D♭" ], "D",
+  		    [ "Eb", "Es",  "Ees", "E♭" ], "E",
+  		    "F",
+  		    [ "Gb", "Ges",        "G♭" ], "G",
+  		    [ "Ab", "As",  "Aes", "A♭" ], "A",
+  		    [ "Bb", "Bes",        "B♭" ], "B",
+    		  ],
+      },
   
       // User defined chords.
       // "base" defaults to 1.
-      // "easy" is ignored.
       // Use 0 for an empty string, and -1 for a muted string.
+      // "fingers" is optional.
       "chords" : [
         //  {
   	//    "name"  : "Bb",
   	//    "base"  : 1,
   	//    "frets" : [ 1, 1, 3, 3, 3, 1 ],
   	//    "fingers" : [ 1, 1, 2, 3, 4, 1 ],
-  	//    "easy"  : true,
   	//  },
       ],
   
@@ -88,6 +136,15 @@ This is the current built-in configuration file, showing all settings.
       // Diagnostig messages.
       "diagnostics" : {
 	  "format" : "\"%f\", line %n, %m\n\t%l",
+      },
+  
+      // Table of contents.
+      "toc" : {
+  	  // Title for ToC.
+  	  "title" : "Table of Contents",
+	  // Sorting order.
+	  // Currently only sorting by page number and alpha is implemented.
+	  "order" : "page",
       },
   
       // Layout definitions for PDF output.
@@ -138,8 +195,9 @@ This is the current built-in configuration file, showing all settings.
 		"width"  :  1,
 		"color"  : "black",
 	    },
+	    "tag" : "Chorus",
             // Recall style: Print the tag using the type.
-            // Optionally quote the lines of the preceding chorus.
+            // Alternatively quote the lines of the preceding chorus.
             "recall" : {
                  "tag"   : "Chorus",
                  "type"  : "comment",
@@ -147,14 +205,28 @@ This is the current built-in configuration file, showing all settings.
             },
 	},
   
+	// Markup for sections (in progress).
+  	// Define what to do with begin_of_XXX directives.
+  	// Use fallback as fallback.
+  	// Default is to ignore them.
+  	"section" : {
+  	    // "fallback" : "comment",
+  	},
+  
+	// This opens a margin for margin labels.
+	"labels" : {
+	    // Margin width. Default is 0 (no margin labels).
+            // "auto" will automatically reserve a margin if labels are used.
+	    "width" : "auto",
+	    // Alignment for the labels. Default is left.
+	    "align" : "left",
+	},
+  
   	// Alternative songlines with chords in a side column.
   	// Value is the column position.
   	// "chordscolumn" : 400,
   	"chordscolumn" :  0,
-  
-  	// Alternative placement for chord diagrams.
-  	// Value is the column position.
-  	"diagramscolumn" :  0,
+	"capoheading" : "%{capo|Capo: %{}}",
   
 	// A {titles: left} may conflict with customized formats.
 	// Set to non-zero to ignore the directive.
@@ -169,7 +241,11 @@ This is the current built-in configuration file, showing all settings.
   	// The horizontal distance between diagrams is "hspace" cells.
   	// The vertical distance is "vspace" cells.
 	// "linewidth" is the thickness of the lines as a fraction of "width".
+	// Diagrams for all chords of the song can be shown at the
+  	// "top", "bottom" or "right" side of the first page,
+	// or "below" the last song line.
   	"diagrams" : {
+	    "show"     :  "bottom",
 	    "width"    :  6,
   	    "height"   :  6,
   	    "hspace"   :  3.95,
@@ -196,8 +272,6 @@ This is the current built-in configuration file, showing all settings.
   	    	"subtitle"  : null,
   		// Footer is title -- page number.
   	    	"footer"    : [ "%{title}", "", "%{page}" ],
-  		// Title for ToC.
-  		"toc-title" : "Table of Contents",
   	    },
   	    // The first page of a song has:
   	    "title" : {
@@ -242,7 +316,17 @@ This is the current built-in configuration file, showing all settings.
   	    },
   	    "comment" : {
   		"name" : "Helvetica",
-  		"size" : 12
+  		"size" : 12,
+		"background" : "#E5E5E5"
+  	    },
+  	    "comment_italic" : {
+  		"name" : "HelveticaOblique",
+  		"size" : 12,
+  	    },
+  	    "comment_box" : {
+  		"name" : "Helvetica",
+  		"size" : 12,
+		"frame" : 1
   	    },
   	    "tab" : {
   		"name" : "Courier",
@@ -274,11 +358,29 @@ This is the current built-in configuration file, showing all settings.
   	// This will show the page layout if non-zero.
   	"showlayout" : false,
       },
+  
+      // Settings for ChordPro backend.
+      "chordpro" : {
+  	  // Style of chorus.
+  	  "chorus" : {
+  	      // Recall style: Print the tag using the type.
+  	      // Alternatively quote the lines of the preceding chorus.
+	      // If no tag+type or quote: use {chorus}.
+	      // Note: Variant 'msp' always uses {chorus}.
+  	      "recall" : {
+  		   // "tag"   : "Chorus", "type"  : "comment",
+  		   "tag"   : "", "type"  : "",
+  		   // "quote" : false,
+  		   "quote" : false,
+  	      },
+  	  },
+      }
   }
   // End of config.
 
 =cut
 
+use File::Spec;
 use JSON::PP ();
 
 sub hmerge($$$);
@@ -294,7 +396,7 @@ sub config_defaults {
     if ( $App::Packager::PACKAGED ) {
 	my $defs = App::Packager::GetResourcePath() .
 	  "/config/chordpro.json";
-	open( my $fd, "<:utf8", $defs )
+	open( my $fd, "<:raw", $defs )
 	  or die("$defs: $!\n");
 	local $/;
 	return $default_config = <$fd>;
@@ -306,6 +408,7 @@ sub config_defaults {
     my $copy;
     my $pfx;
     seek(DATA,0,0);
+    binmode( DATA, ':raw' );
     while ( <DATA> ) {
 	if ( !$copy && m;^(\s+)// Configuration; ) {
 	    $pfx = length($1);
@@ -325,18 +428,34 @@ sub config_defaults {
 sub configurator {
     my ( $options ) = @_;
 
-    my $pp = JSON::PP->new->utf8->relaxed;
+    my $pp = JSON::PP->new->relaxed;
 
     # Load defaults.
+    warn("Config: <builtin>\n") if $options && $options->{verbose};
     my $cfg = $pp->decode( config_defaults() );
 
-    # For testing.
-    return $cfg unless $options;
+    # Only tests call configurator without options arg.
+    unless ( $options ) {
+	# Finish minimal config.
+	process_config( $cfg, "<builtin>", $options );
+	return $cfg;
+    }
+
+    # If there are includes, add them.
+    if ( exists $cfg->{include} ) {
+	foreach my $c ( @{ delete $cfg->{include} } ) {
+	    # Check for resource names.
+	    if ( $c !~ m;[/.]; ) {
+		$c = ::rsc_or_file($c);
+	    }
+	    else {
+		die("$c: Not a resource name\n");
+	    }
+	    $cfg = add_config( $cfg, $options, $c, $pp );
+	}
+    }
 
     # Add some extra entries to prevent warnings.
-    for ( qw(tuning) ) {
-	$cfg->{$_} //= undef;
-    }
     for ( qw(title subtitle footer) ) {
 	next if exists($cfg->{pdf}->{formats}->{first}->{$_});
 	$cfg->{pdf}->{formats}->{first}->{$_} = "";
@@ -374,6 +493,7 @@ sub configurator {
 	    $add_legacy->( $options->{$config} );
 	}
 	else {
+	    warn("Adding config for $config\n") if $options->{verbose};
 	    $add_config->( $options->{$config} );
 	}
     }
@@ -390,11 +510,14 @@ sub configurator {
     }
     $cfg = hmerge( $cfg, $ccfg, "" );
 
-    # Sanitize added extra entries.
-    for ( qw(tuning) ) {
-	delete( $cfg->{$_} )
-	  unless defined( $cfg->{$_} );
+    if ( $cfg->{settings}->{transcode} ) {
+	my $xc = $cfg->{settings}->{transcode};
+	unless ( App::Music::ChordPro::Chords::Parser->get_parser($xc, 1) ) {
+	    die("No transcoder for ", $xc, "\n");
+	}
     }
+
+    # Sanitize added extra entries.
     for ( qw(title subtitle footer) ) {
 	delete($cfg->{pdf}->{formats}->{first}->{$_})
 	  if ($cfg->{pdf}->{formats}->{first}->{$_} // 1) eq "";
@@ -457,22 +580,12 @@ sub configurator {
     if ( defined $options->{'chord-grids-sorted'} ) {
 	$cfg->{diagrams}->{sorted} = $options->{'chord-grids-sorted'};
     }
-
-    if ( $cfg->{tuning} ) {
-	my $res =
-	  App::Music::ChordPro::Chords::set_tuning( $cfg->{tuning} );
-	warn( "Invalid tuning in config: ",
-	      $res, "\n" ) if $res;
+    if ( $options->{'lyrics-only'} ) {
+	$cfg->{settings}->{'lyrics-only'} = $options->{'lyrics-only'};
     }
-
-    foreach ( @{ $cfg->{chords} } ) {
-	my $res =
-	  App::Music::ChordPro::Chords::add_config_chord
-	      ( $_->{name}, $_->{base}||1, $_->{frets}, $_->{fingers} );
-	warn( "Invalid chord in config: ",
-	      $_->{name}, ": ", $res, "\n" ) if $res;
+    if ( $options->{transcode} ) {
+	$cfg->{settings}->{transcode} = $options->{transcode};
     }
-
     return $cfg if $options->{'cfg-print'};
 
     # Backend specific configs.
@@ -492,10 +605,46 @@ sub configurator {
 
 sub add_config {
     my ( $cfg, $options, $file, $pp ) = @_;
+    Carp::confess("FATAL: Insufficient config") unless @_ == 4;
+    Carp::confess("FATAL: Undefined config") unless defined $file;
     warn("Config: $file\n") if $options->{verbose};
-    if ( open( my $fd, "<:utf8", $file ) ) {
-	local $/;
-	$cfg = hmerge( $cfg, $pp->decode( scalar( <$fd> ) ), "" );
+
+    if ( open( my $fd, "<:raw", $file ) ) {
+	my $new = $pp->decode( ::loadfile ($fd, { %$options, donotsplit => 1 } ) );
+
+	# Handle obsolete keys.
+	if ( exists $new->{pdf}->{diagramscolumn} ) {
+	    $new->{pdf}->{diagrams}->{show} //= "right";
+	    delete $new->{pdf}->{diagramscolumn};
+	    warn("$file: pdf.diagramscolumn is obsolete, use pdf.diagrams.show instead\n");
+	}
+	if ( exists $new->{pdf}->{formats}->{default}->{'toc-title'} ) {
+	    $new->{toc}->{title} //= $new->{pdf}->{formats}->{default}->{'toc-title'};
+	    delete $new->{pdf}->{formats}->{default}->{'toc-title'};
+	    warn("$file: pdf.formats.default.toc-title is obsolete, use toc.title instead\n");
+	}
+
+	# If there are includes, process these first.
+	if ( exists $new->{include} ) {
+	    my ( $vol, $dir, undef ) = File::Spec->splitpath($file);
+	    foreach my $c ( @{ delete $new->{include} } ) {
+		# Check for resource names.
+		if ( $c !~ m;[/.]; ) {
+		    $c = ::rsc_or_file($c);
+		}
+		elsif ( $dir ne ""
+			&& !File::Spec->file_name_is_absolute($c) ) {
+		    # Prepend dir of the caller, if needed.
+		    $c = File::Spec->catpath( $vol, $dir, $c );
+		}
+		$cfg = add_config( $cfg, $options, $c, $pp );
+	    }
+	}
+
+	# Process.
+	process_config( $new, $file, $options );
+	# Merge final.
+	$cfg = hmerge( $cfg, $new, "" );
 	close($fd);
     }
     else {
@@ -505,10 +654,54 @@ sub add_config {
     return $cfg;
 }
 
+sub process_config {
+    my ( $cfg, $file, $options ) = @_;
+
+    warn("Process: $file\n") if $options && $options->{verbose};
+
+    if ( $cfg->{tuning} ) {
+	my $res =
+	  App::Music::ChordPro::Chords::set_tuning( $cfg->{tuning},
+						    $options );
+	warn( "Invalid tuning in config: ", $res, "\n" ) if $res;
+	$cfg->{tuning} = [];
+    }
+
+    if ( $cfg->{notes} ) {
+	my $res =
+	  App::Music::ChordPro::Chords::set_notes( $cfg->{notes},
+						   $options );
+	warn( "Invalid notes in config: ", $res, "\n" ) if $res;
+	delete $cfg->{notes};
+    }
+
+    if ( $cfg->{chords} ) {
+	my $c = $cfg->{chords};
+	if ( @$c && $c->[0] eq "append" ) {
+	    shift(@$c);
+	}
+	foreach ( @$c ) {
+	    my $res =
+	      App::Music::ChordPro::Chords::add_config_chord($_);
+	    warn( "Invalid chord in config: ",
+		  $_->{name}, ": ", $res, "\n" ) if $res;
+	}
+	if ( $options->{verbose} && $options->{verbose} > 1 ) {
+	    warn( "Processed ", scalar(@$c), " chord entries\n");
+	    warn( "Totals: ",
+		  App::Music::ChordPro::Chords::chord_stats(), "\n" );
+	}
+	delete $cfg->{chords};
+    }
+}
+
 sub add_legacy {
     my ( $cfg, $options, $file, $pp ) = @_;
     warn("Config: $file (legacy)\n") if $options->{verbose};
+
     $options->{_legacy} = 1;
+    $::config = $cfg;
+
     require App::Music::ChordPro::Songbook;
     my $s = App::Music::ChordPro::Songbook->new;
     $s->parsefile( $file, $options );
@@ -582,18 +775,48 @@ sub hmerge($$$) {
 
     for my $key ( keys(%$right) ) {
 
-        if ( ref($right->{$key}) eq 'HASH'
-	     and
-	     ref($left->{$key}) eq 'HASH' ) {
+	warn("Config error: unknown item $path$key\n")
+	  unless exists $res{$key}
+	    || $path.$key =~ /^pdf\.section\./;
 
-	    # Both hashes. Recurse.
-            $res{$key} = hmerge( $left->{$key}, $right->{$key}, "$path$key:" );
+	if ( ref($right->{$key}) eq 'HASH'
+	     and
+	     ref($res{$key}) eq 'HASH' ) {
+
+	    # Hashes. Recurse.
+            $res{$key} = hmerge( $res{$key}, $right->{$key}, "$path$key." );
         }
-        else {
-	    warn("Config error: unknown item $path$key\n")
-	      unless exists $res{$key};
-            $res{$key} = $right->{$key};
+	elsif ( ref($right->{$key}) eq 'ARRAY'
+		and
+		ref($res{$key}) eq 'ARRAY' ) {
+
+	    # Arrays. Overwrite or append.
+	    if ( @{$right->{$key}} ) {
+		my @v = @{ $right->{$key} };
+		if ( $v[0] eq "append" ) {
+		    shift(@v);
+		    # Append the rest.
+		    push( @{ $res{$key} }, @v );
+		}
+		elsif ( $v[0] eq "prepend" ) {
+		    shift(@v);
+		    # Prepend the rest.
+		    unshift( @{ $res{$key} }, @v );
+		}
+		else {
+		    # Overwrite.
+		    $res{$key} = $right->{$key};
+		}
+	    }
+	    else {
+		# Overwrite.
+		$res{$key} = $right->{$key};
+	    }
         }
+	else {
+	    # Overwrite.
+	    $res{$key} = $right->{$key};
+	}
     }
 
     return \%res;

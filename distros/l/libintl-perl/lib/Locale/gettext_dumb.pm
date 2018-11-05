@@ -160,9 +160,7 @@ sub dnpgettext ($$$$$) {
     return dcnpgettext ($domainname, $msgctxt, $msgid, $msgid_plural, $n, undef);
 }
 
-sub dcnpgettext ($$$$$$) {
-    my ($domainname, $msgctxt, $msgid, $msgid_plural, $n, $category) = @_;
-
+sub __get_locale() {
     my $locale;
 
     if (exists $ENV{LANGUAGE} && length $ENV{LANGUAGE}) {
@@ -178,6 +176,14 @@ sub dcnpgettext ($$$$$$) {
         $locale = 'C';
     }
     
+    return $locale;
+}
+
+sub dcnpgettext ($$$$$$) {
+    my ($domainname, $msgctxt, $msgid, $msgid_plural, $n, $category) = @_;
+
+    my $locale = __get_locale;
+
     return Locale::gettext_pp::_dcnpgettext_impl ($domainname, $msgctxt,
                                                   $msgid, $msgid_plural, $n,
                                                   $category, $locale);

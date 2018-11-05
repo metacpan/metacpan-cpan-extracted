@@ -51,12 +51,12 @@ foreach my $id (qw/DEFAULT c111 c1 c9/) {
         unlike $tex, qr{START.*\\(fussy|sloppy).*Done.*\\(sloppy|fussy).*END/}ms;
     }
     if ($id eq 'c9') {
-        like $tex, qr{^\\newpage$}m;
-        like $tex, qr{^\\vskip 10mm$}m;
+        like $tex, qr{^\\newpage\s*\n}ms;
+        like $tex, qr{^\\vskip 10mm\s*\n}ms;
     }
     else {
-        like $tex, qr{^\%.*?\\textbackslash\{\}newpage$}m;
-        like $tex, qr{^\%.*?\\textbackslash\{\}vskip 10mm$}m;
+        like $tex, qr{^\%.*?\\textbackslash\{\}newpage\s*\n}ms;
+        like $tex, qr{^\%.*?\\textbackslash\{\}vskip 10mm\s*\n}ms;
     }
     unlike $tex, qr{\\sloppy 10};
 }

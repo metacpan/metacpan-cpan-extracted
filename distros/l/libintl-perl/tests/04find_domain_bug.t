@@ -37,6 +37,7 @@ BEGIN {
 	Locale::Messages::nl_putenv ("OUTPUT_CHARSET=iso-8859-1");
 
 	Locale::Messages::setlocale (POSIX::LC_ALL() => '');
+    Locale::Messages->select_package ('gettext_pp');
 }
 
 # Make sure that LocaleData/ can befound.

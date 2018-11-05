@@ -34,13 +34,12 @@ my $mock = Mock::MonkeyPatch->patch(
 my $class = 'Beam::Minion::Command::job';
 $ENV{BEAM_MINION} = 'sqlite:' . $tmp->filename;
 $ENV{BEAM_PATH} = catdir( $FindBin::Bin, '..', 'share' );
-$class->run( '-w' );
+my $obj = $class->new;
+$obj->run( '-w' );
 
 ok $mock->called, 'Minion::Command::minion::job->run called';
 is_deeply $mock->method_arguments, [qw( -w )], 'arguments are correct';
-
-my $invocant = $mock->arguments->[0];
-my $minion = $invocant->app->minion;
+my $minion = $obj->app->minion;
 
 subtest 'tasks are created' => sub {
     my $tasks = $minion->tasks;
@@ -54,7 +53,7 @@ subtest 'BEAM_MINION must be set' => sub {
     local $ENV{BEAM_MINION} = '';
     like
         exception {
-            Beam::Minion::Command::job->run();
+            Beam::Minion::Command::job->new->run();
         },
         qr{You must set the BEAM_MINION environment variable},
         'BEAM_MINION missing raises exception';

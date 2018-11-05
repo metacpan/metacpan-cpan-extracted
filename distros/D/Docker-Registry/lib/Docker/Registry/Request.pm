@@ -1,10 +1,12 @@
 package Docker::Registry::Request;
-  use Moose;
+  use Moo;
+  use Types::Standard qw/Str Maybe InstanceOf/;
+  use HTTP::Headers;
 
-  has headers => (is => 'ro', isa => 'HTTP::Headers', default => sub { HTTP::Headers->new });
-  has method => (is => 'ro', isa => 'Str', required => 1);
-  has url => (is => 'ro', isa => 'Str', required => 1);
-  has content => (is => 'ro', isa => 'Maybe[Str]');
+  has headers => (is => 'ro', isa => InstanceOf['HTTP::Headers'], default => sub { HTTP::Headers->new });
+  has method => (is => 'ro', isa => Str, required => 1);
+  has url => (is => 'ro', isa => Str, required => 1);
+  has content => (is => 'ro', isa => Maybe[Str]);
 
   sub header_hash {
     my $self = shift;

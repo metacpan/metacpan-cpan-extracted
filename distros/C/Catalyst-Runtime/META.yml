@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3503, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -48,6 +48,7 @@ requires:
   MooseX::MethodAttributes::Role::AttrContainer::Inheritable: '0.24'
   MooseX::Role::WithOverloading: '0.09'
   Path::Class: '0.09'
+  PerlIO::utf8_strict: '0'
   Plack: '0.9991'
   Plack::Middleware::Conditional: '0'
   Plack::Middleware::ContentLength: '0'
@@ -85,7 +86,7 @@ resources:
   homepage: http://dev.catalyst.perl.org/
   license: http://dev.perl.org/licenses/
   repository: git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git
-version: '5.90120'
+version: '5.90122'
 x_authority: cpan:MSTROUT
 x_breaks:
   Catalyst::Action::REST: '<= 0.67'

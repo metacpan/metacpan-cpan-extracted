@@ -7,6 +7,7 @@ use Catalyst::Exception;
 use File::Copy ();
 use IO::File ();
 use File::Spec::Unix;
+use PerlIO::utf8_strict;
 use namespace::clean -except => 'meta';
 
 has filename => (is => 'rw');
@@ -157,7 +158,7 @@ sub decoded_fh {
     my ($self, $layer) = @_;
     my $fh  = $self->fh;
 
-    $layer = ":encoding(UTF-8)" if !$layer && $self->is_utf8_encoded;
+    $layer = ':utf8_strict' if !$layer && $self->is_utf8_encoded;
     $layer = ':raw' unless $layer;
 
     binmode($fh, $layer);
@@ -211,14 +212,20 @@ sub slurp {
         $layer = ':raw';
     }
 
-    my $content = undef;
+    my $content = '';
     my $handle  = $self->fh;
 
     binmode( $handle, $layer );
 
     $handle->seek(0, IO::File::SEEK_SET);
-    while ( $handle->sysread( my $buffer, 8192 ) ) {
-        $content .= $buffer;
+
+    if ($layer eq ':raw') {
+        while ( $handle->sysread( my $buffer, 8192 ) ) {
+            $content .= $buffer;
+        }
+    }
+    else {
+        $content = do { local $/; $handle->getline };
     }
 
     $handle->seek(0, IO::File::SEEK_SET);
@@ -237,11 +244,9 @@ sub decoded_slurp {
     my ( $self, $layer ) = @_;
     my $handle = $self->decoded_fh($layer);
 
-    my $content = undef;
     $handle->seek(0, IO::File::SEEK_SET);
-    while ( $handle->sysread( my $buffer, 8192 ) ) {
-        $content .= $buffer;
-    }
+
+    my $content = do { local $/; $handle->getline };
 
     $handle->seek(0, IO::File::SEEK_SET);
     return $content;

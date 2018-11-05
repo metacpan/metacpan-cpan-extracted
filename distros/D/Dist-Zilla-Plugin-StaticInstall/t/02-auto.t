@@ -8,6 +8,7 @@ use Test::Deep;
 use Test::Fatal;
 use Path::Tiny;
 use Term::ANSIColor 2.01 'colorstrip';
+use Module::Runtime 'require_module';
 
 {
     package MyMetadata;
@@ -105,7 +106,7 @@ my @tests = (
             'checking configure prereqs',
             'checking build prereqs',
             'checking execdirs',
-            'found ineligible executable dir \'bin\'',
+            'found ineligible [ExecDir] dir \'bin\'',
             'setting x_static_install to 0',
         ],
     },
@@ -353,6 +354,32 @@ my @tests = (
             'checking .pm, .pod, .pl files',
             'checking for .PL, .pmc files',
             'found example/Foo.PL, lib/Bar.pmc',
+            'setting x_static_install to 0',
+        ],
+    },
+    {
+        test_name => 'non-.pm, .pod files in lib/',
+        zilla_config_pre => [
+            [ MakeMaker => ],
+            [ MetaJSON => ],
+        ],
+        zilla_files => [
+            path(qw(source lib extra.dat)) => "I am a data file\n",
+        ],
+        x_static_install => 0,
+        messages => [
+            'checking dynamic_config',
+            'checking configure prereqs',
+            'checking build prereqs',
+            'checking execdirs',
+            'checking sharedirs',
+            'checking installer plugins',
+            'checking for munging of Makefile.PL',
+            'checking META.json',
+            'checking for .xs files',
+            'checking .pm, .pod, .pl files',
+            'checking for .PL, .pmc files',
+            'found non-installable file lib/extra.dat',
             'setting x_static_install to 0',
         ],
     },

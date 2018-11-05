@@ -6,7 +6,7 @@ use base qw( Alien::Build::Interpolate );
 use File::chdir;
 
 # ABSTRACT: Default interpolator for Alien::Build
-our $VERSION = '1.48'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 sub _config
 {
@@ -112,7 +112,7 @@ Alien::Build::Interpolate::Default - Default interpolator for Alien::Build
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 CONSTRUCTOR
 

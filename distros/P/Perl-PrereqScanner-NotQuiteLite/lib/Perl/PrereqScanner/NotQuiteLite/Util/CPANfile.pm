@@ -74,27 +74,6 @@ sub _dedupe {
   }
 }
 
-sub to_string {
-  my ($self, $include_empty) = @_;
-
-  my $mirrors = $self->mirrors;
-  my $prereqs = $self->prereq_specs;
-
-  my $code = '';
-  $code .= $self->_dump_mirrors($mirrors);
-  $code .= $self->_dump_prereqs($prereqs, $include_empty);
-
-  for my $feature ($self->features) {
-    $code .= sprintf "feature %s, %s => sub {\n", Module::CPANfile::_d($feature->{identifier}), Module::CPANfile::_d($feature->{description});
-    # See https://github.com/miyagawa/cpanfile/pull/32
-    $code .= $self->_dump_prereqs($feature->{prereqs}->as_string_hash, $include_empty, 4);
-    $code .= "};\n\n"; # ALSO TWEAKED
-  }
-
-  $code =~ s/\n+$/\n/s;
-  $code;
-}
-
 sub _dump_prereqs {
   my($self, $prereqs, $include_empty, $base_indent) = @_;
 

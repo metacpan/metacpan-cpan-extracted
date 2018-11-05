@@ -10,7 +10,7 @@ Template Toolkit version 2.
 =head1 DESCRIPTION
 
 B<Locale::XGettext::TT2> is the parser backend for
-L<xgettext-tt2>.  It is based on L<Locale::XGerttext>.
+L<xgettext-tt2>.  It is based on L<Locale::XGettext>.
 
 See L<https://github.com/gflohr/Template-Plugin-Gettext>
 for the big picture.

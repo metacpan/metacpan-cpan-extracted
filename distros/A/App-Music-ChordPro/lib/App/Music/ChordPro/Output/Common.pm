@@ -4,14 +4,30 @@ package App::Music::ChordPro::Output::Common;
 
 use strict;
 use warnings;
+use App::Music::ChordPro::Chords;
+use utf8;
 
-# Substitute %X sequences in title formats.
+# Substitute %X sequences in title formats and comments.
 use Text::Balanced qw( extract_bracketed );
 
 sub fmt_subst {
     my ( $s, $t, $cur ) = @_;
     my $res = "";
     my $m = $s->{meta};
+
+    # Derived item(s).
+    $m->{_key} = $m->{key} if exists $m->{key};
+    if ( $m->{key} && $m->{capo} && (my $capo = $m->{capo}->[-1]) ) {
+	$m->{_key} =
+	  [ map { App::Music::ChordPro::Chords::transpose( $_, $capo ) }
+	        @{$m->{key}} ];
+    }
+
+    # Hide escaped specials by replacing them with Unicode noncharacters.
+    $t =~ s/\\\\/\x{fdd0}/g;
+    $t =~ s/\\\{/\x{fdd1}/g;
+    $t =~ s/\\\}/\x{fdd2}/g;
+    $t =~ s/\\\|/\x{fdd3}/g;
 
     # Examine %{ sequences.
     while ( $t =~ /^(.*?)\%\{(.*)/ ) {
@@ -47,7 +63,7 @@ sub fmt_subst {
 	    $bal = $2;
 	}
 	else {
-	    return $res . $t; # error
+	    last; # error
 	}
 
 	# We cannot use extract_bracketed since we must also look
@@ -80,8 +96,19 @@ sub fmt_subst {
 	    $else = join( "", @a );
 	}
 
-	my $key = lc($if);
-	( $key, my $inx ) = ( $1, $2 ) if $key =~ /^(.*)\.(-?\d+)$/;
+	my ( $key, $op, $test );
+	if ( $if =~ /^(.+?)([=])(.*)/ ) {
+	    $key  = lc $1; #fmt_subst( $s, $1);
+	    $op   = $2;
+	    $test = $3; #fmt_subst( $s, $3 );
+	}
+	else {
+	    $key = lc $if;
+	    $op = "";
+	}
+
+	( $key, my $inx ) = ( $1, $2 )
+	  if $key =~ /^(.*)\.(-?\d+)$/;
 
 	# Establish the value for this key.
 	my $val;
@@ -96,11 +123,20 @@ sub fmt_subst {
 	    }
 	    else {
 		$val = join( $::config->{metadata}->{separator}, @{ $m->{$key} } );
+		# Allow substitutions in (sub)titles.
+		if ( $key =~ /^(?:sub)?title$/ ) {
+		    $val = fmt_subst( $s, $val );
+		}
 	    }
 	}
 
 	# Use the true/false parts to get a new value.
-	if ( defined($val) && $val ne "" ) {
+	$val //= "";
+	if ( ( $val ne "" || $op ne "" )
+	     && ( $op eq '='
+		  ? $val eq $test
+		  : 1 )
+	   ) {
 	    if ( defined $then ) {
 		$val = fmt_subst( $s, $then, $val );
 	    }
@@ -109,14 +145,26 @@ sub fmt_subst {
 	elsif ( defined $else ) {
 	    $val = fmt_subst( $s, $else, "" );
 	}
+	elsif ( $op ) {
+	    $val = "";
+	}
 
 	# Append and continue.
 	$res .= $val if defined $val;
 	next;
     }
 
-    # Return new value plus the unprocessed rest.
-    $res . $t;
+    # Add the unprocessed rest.
+    $res .= $t;
+
+    # Unescape escaped specials.
+    $res =~ s/\x{fdd0}/\\/g;
+    $res =~ s/\x{fdd1}/{/g;
+    $res =~ s/\x{fdd2}/}/g;
+    $res =~ s/\x{fdd3}/|/g;
+
+    # Return new value.
+    return $res;
 }
 
 1;

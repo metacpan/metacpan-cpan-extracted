@@ -4,13 +4,15 @@ do { my $x = {
                                     'HTTP::Server::Simple' => '0.44',
                                     'HTTP::Server::Simple::CGI' => '0',
                                     'HTTP::Server::Simple::CGI::Environment' => '0',
+                                    'Module::Build' => '0.28',
                                     'Test::Exception' => '0',
                                     'Test::More' => '0'
                                   }
                   },
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Module::Build' => '0.28'
                                       }
                       },
        'develop' => {

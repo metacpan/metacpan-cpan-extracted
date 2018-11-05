@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::AuthStorage::ConfigJSON;
-$WebService::GoogleAPI::Client::AuthStorage::ConfigJSON::VERSION = '0.17';
+$WebService::GoogleAPI::Client::AuthStorage::ConfigJSON::VERSION = '0.18';
 
 # ABSTRACT: Specific methods to fetch tokens from JSON data sources
 
@@ -96,7 +96,7 @@ WebService::GoogleAPI::Client::AuthStorage::ConfigJSON - Specific methods to fet
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 AUTHOR
 

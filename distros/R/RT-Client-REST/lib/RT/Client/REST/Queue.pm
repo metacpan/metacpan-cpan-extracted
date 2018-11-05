@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Queue;
-$RT::Client::REST::Queue::VERSION = '0.52';
+$RT::Client::REST::Queue::VERSION = '0.53';
 use Params::Validate qw(:types);
 use RT::Client::REST 0.20;
 use RT::Client::REST::Object 0.01;
@@ -82,6 +82,21 @@ sub _attributes {{
             type   => SCALAR,
         },
     },
+
+    admin_cc_addresses => {
+        validation => {
+            type => SCALAR,
+        },
+        rest_name => 'AdminCcAddresses',
+    },
+
+    cc_addresses => {
+        validation => {
+            type => SCALAR,
+        },
+        rest_name => 'CcAddresses',
+    },
+
 }}
 
 
@@ -117,7 +132,7 @@ RT::Client::REST::Queue - queue object representation.
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 
@@ -173,6 +188,14 @@ Final priority.
 =item B<default_due_in>
 
 Default due in.
+
+=item B<cc_addresses>
+
+CC Addresses (comma delimited).
+
+=item B<admin_cc_addresses>
+
+Admin CC Addresses (comma delimited).
 
 =back
 

@@ -1,5 +1,5 @@
 package Beam::Minion::Util;
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 # ABSTRACT: Utility functions for Beam::Minion
 
 #pod =head1 SYNOPSIS
@@ -115,7 +115,6 @@ sub build_mojo_app {
     push @{$app->commands->namespaces}, 'Minion::Command';
 
     my $minion = minion();
-    weaken $minion->app($app)->{app};
     $app->helper(minion => sub {$minion});
 
     my %container = find_containers();
@@ -161,7 +160,7 @@ Beam::Minion::Util - Utility functions for Beam::Minion
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

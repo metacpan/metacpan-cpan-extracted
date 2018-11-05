@@ -23,5 +23,5 @@ requires:
 resources:
   homepage: http://www.wumpus-cave.net
   repository: https://github.com/frezik/Graphics-GVG
-version: '0.9'
+version: '0.91'
 x_serialization_backend: 'YAML::Tiny version 1.70'

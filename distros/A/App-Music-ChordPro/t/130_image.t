@@ -40,7 +40,9 @@ my $song = {
 			'opts' => {}
 		       }
 		      ],
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	   };
 
 is_deeply( { %{ $s->{songs}->[0] } }, $song, "Song contents" );
@@ -59,7 +61,9 @@ isa_ok( $s->{songs}->[0], 'App::Music::ChordPro::Song', "It's a song" );
 #use Data::Dumper; warn(Dumper($s));
 $song = {
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'

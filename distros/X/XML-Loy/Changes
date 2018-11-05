@@ -1,3 +1,7 @@
+0.48 2018-11-03
+        - Fix permissions for non-executable files.
+        - Improve dependencies.
+
 0.47 2018-05-15
         - Improve support for recent
           versions of Mojolicious.

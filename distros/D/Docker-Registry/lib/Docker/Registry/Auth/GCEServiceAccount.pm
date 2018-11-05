@@ -1,5 +1,6 @@
 package Docker::Registry::Auth::GCEServiceAccount;
-  use Moose;
+  use Moo;
+  use Types::Standard qw/HashRef Str ArrayRef CodeRef Int/;
   with 'Docker::Registry::Auth';
 
   use Crypt::JWT qw/encode_jwt/;
@@ -8,18 +9,18 @@ package Docker::Registry::Auth::GCEServiceAccount;
   use URI;
   use HTTP::Tiny;
 
-  has service_account_file => (is => 'ro', isa => 'Str', default => sub {
+  has service_account_file => (is => 'ro', isa => Str, default => sub {
     "$ENV{HOME}/.gcloud/sd.json"
   });
 
-  has service_account => (is => 'ro', isa => 'HashRef', lazy => 1, default => sub {
+  has service_account => (is => 'ro', isa => HashRef, lazy => 1, default => sub {
     my $self = shift;
     my $f = Path::Class::File->new($self->service_account_file);
     my $json = JSON::MaybeXS->new;
     return $json->decode(join '', $f->slurp);
   });
 
-  has client_email => (is => 'ro', isa => 'Str', lazy => 1, default => sub {
+  has client_email => (is => 'ro', isa => Str, lazy => 1, default => sub {
     my $self = shift;
     my $value = $self->service_account->{ client_email };
     Docker::Registry::Auth::Exception->throw({
@@ -27,7 +28,7 @@ package Docker::Registry::Auth::GCEServiceAccount;
     }) if (not defined $value);
     return $value;
   });
-  has private_key => (is => 'ro', isa => 'Str', lazy => 1, default => sub {
+  has private_key => (is => 'ro', isa => Str, lazy => 1, default => sub {
     my $self = shift;
     my $value = $self->service_account->{ private_key };
     Docker::Registry::Auth::Exception->throw({
@@ -36,17 +37,17 @@ package Docker::Registry::Auth::GCEServiceAccount;
     return $value;
   });
 
-  has scopes => (is => 'ro', isa => 'ArrayRef[Str]', default => sub {
+  has scopes => (is => 'ro', isa => ArrayRef[Str], default => sub {
     [ 'https://www.googleapis.com/auth/devstorage.read_only' ];
   });
 
-  has time_source => (is => 'ro', isa => 'CodeRef', default => sub {
+  has time_source => (is => 'ro', isa => CodeRef, default => sub {
     return sub { time };
   });
 
-  has expiry => (is => 'ro', isa => 'Int', default => 300);
+  has expiry => (is => 'ro', isa => Int, default => 300);
 
-  has signed_jwt => (is => 'ro', isa => 'Str', lazy => 1, default => sub {
+  has signed_jwt => (is => 'ro', isa => Str, lazy => 1, default => sub {
     my $self = shift;
     my $scope = join ' ', @{ $self->scopes };
 
@@ -66,11 +67,11 @@ package Docker::Registry::Auth::GCEServiceAccount;
     );
   });
 
-  has auth_url => (is => 'ro', isa => 'Str', default => sub {
+  has auth_url => (is => 'ro', isa => Str, default => sub {
     'https://www.googleapis.com/oauth2/v4/token';
   });
 
-  has accesstoken => (is => 'ro', isa => 'Str', lazy => 1, default => sub {
+  has accesstoken => (is => 'ro', isa => Str, lazy => 1, default => sub {
     my $self = shift;
 
     my $url = URI->new($self->auth_url);

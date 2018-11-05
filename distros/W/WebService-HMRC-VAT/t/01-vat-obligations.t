@@ -5,7 +5,7 @@ use Test::Exception;
 use Test::More;
 use WebService::HMRC::VAT;
 
-plan tests => 19;
+plan tests => 26;
 
 my($ws, $r, $auth);
 
@@ -103,6 +103,7 @@ dies_ok {
 SKIP: {
 
     my $skip_count = 5;
+    my $count;
 
     $ENV{HMRC_ACCESS_TOKEN} or skip (
         'Skipping tests on HMRC test api as environment variable HMRC_ACCESS_TOKEN is not set',
@@ -127,22 +128,45 @@ SKIP: {
         'set access token from envrionment variable'
     );
 
-    # Request VAT returns over a period of the current year.
+    # Request VAT returns over a period of one year.
     # The sandbox api takes no notice of the specified date values
     # except that valid dates must be provided. Neither does it
     # respect the open/fulfilled filter parameter.
     my $from = "2017-01-01";
     my $to   = "2017-12-31";
 
+    # By default, calling the sandbox api simulates the scenario where
+    # there are quarterly obligations and one is fulfilled.
     isa_ok(
         $r = $ws->obligations({
             from => $from,
             to => $to,
         }),
         'WebService::HMRC::Response',
-        'called obligations from HMRC without status filter'
+        'called obligations from HMRC without status filter or test mode'
     );
-
     ok($r->is_success, 'successful response calling obligations from HMRC without status filter');
-    ok(scalar @{$r->data->{obligations}} > 0, 'At lease one  VAT return obligations returned without filter');
+    is(scalar @{$r->data->{obligations}}, 2, 'expected number of obligations returned');
+    $count = scalar(grep {$_->{status} eq 'O'} @{$r->data->{obligations}});
+    is($count, 1, 'expected number of open obligations returned');
+    $count = scalar(grep {$_->{status} eq 'F'} @{$r->data->{obligations}});
+    is($count, 1, 'expected number of fulfilled obligations returned');
+
+    # Using test mode 'QUARTERLY_FOUR_MET'
+    # We should receive four obligations, all fulfilled.
+    isa_ok(
+        $r = $ws->obligations({
+            from => $from,
+            to => $to,
+            test_mode => 'QUARTERLY_FOUR_MET',
+        }),
+        'WebService::HMRC::Response',
+        'called obligations from HMRC with test mode'
+    );
+    ok($r->is_success, 'successful response calling obligations from HMRC with test mode');
+    is(scalar @{$r->data->{obligations}}, 4, 'expected number of obligations returned');
+    $count = scalar(grep {$_->{status} eq 'O'} @{$r->data->{obligations}});
+    is($count, 0, 'expected number of open obligations returned');
+    $count = scalar(grep {$_->{status} eq 'F'} @{$r->data->{obligations}});
+    is($count, 4, 'expected number of fulfilled obligations returned');
 }

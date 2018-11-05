@@ -15,11 +15,11 @@ WebService::HMRC::VAT - Interact with the UK HMRC VAT API
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -113,13 +113,13 @@ has vrn => (
 
 Inherits from L<WebService::HMRC::Request>.
 
-=head2 obligations({ from => 'YYYY-MM-DD', to => 'YYYY-MM-DD', [status => $status] })
+=head2 obligations({ from => 'YYYY-MM-DD', to => 'YYYY-MM-DD', [status => $status, ] [test_mode => $test_mode] })
 
 Retrieve a set of VAT filing obligations for the specified date range. Returns
 a WebService::HMRC::Response object reference. Requires permission for the
 C<read:vat> service scope.
 
-=head3 Parameters:
+=head3 Parameters
 
 =over
 
@@ -140,9 +140,52 @@ return only 'open' obligations, or 'F' to return only 'fulfilled' obligations.
 
 Default is to return all obligations, both fulfilled and open.
 
+=item test_mode
+
+Optional parameter used only for testing against the HMRC sandbox api.
+
+This parameter should not be used in production systems - it causes dummy
+test data to be returned.
+
+By default, when testing against the sandbox with no C<test_mode> specified,
+the test api simulates the scenario where the client has quarterly
+obligations and one is fulfilled
+
+Other test scenarios are available by setting the C<test_mode> parameter
+as detailed below:
+
+C<QUARTERLY_NONE_MET> simulates the scenario where the client has quarterly
+obligations and none are fulfilled.
+
+C<QUARTERLY_ONE_MET> simulates the scenario where the client has quarterly
+obligations and one is fulfilled.
+
+C<QUARTERLY_TWO_MET> simulates the scenario where the client has quarterly
+obligations and two are fulfilled.
+
+C<QUARTERLY_THREE_MET> simulates the scenario where the client has quarterly
+obligations and three are fulfilled.
+
+C<QUARTERLY_FOUR_MET> simulates the scenario where the client has quarterly
+obligations and four are fulfilled.
+
+C<MONTHLY_NONE_MET> simulates the scenario where the client has monthly
+obligations and none are fulfilled.
+
+C<MONTHLY_ONE_MET> simulates the scenario where the client has monthly
+obligations and one month is fulfilled.
+
+C<MONTHLY_TWO_MET> simulates the scenario where the client has monthly
+obligations and two months are fulfilled.
+
+C<MONTHLY_THREE_MET> simulates the scenario where the client has monthly
+obligations and three months are fulfilled.
+
+C<NOT_FOUND> simulates the scenario where no data is found.
+
 =back
 
-=head3 Response Data:
+=head3 Response Data
 
 For full details of the response data, see the HMRC API specification. In summary,
 the data contains a single element `obligations` pointing to an array of
@@ -168,7 +211,7 @@ VAT return obligations:
       ]
     }
 
-=head3 Example usage:
+=head3 Example usage
 
     my $result = $vat->obligations({
         from => '2018-01-01',
@@ -194,6 +237,7 @@ VAT return obligations:
 sub obligations {
 
     my ($self, $args) = @_;
+    my @headers;
 
     $self->_require_date_range($args);
 
@@ -213,11 +257,16 @@ sub obligations {
         $params->{status} = $args->{status};
     }
 
+    if($args->{test_mode}) {
+        push @headers, ('Gov-Test-Scenario' => $args->{test_mode});
+        carp 'TEST MODE enabled - returning dummy test data!';
+    }
+
     return $self->get_endpoint({
         endpoint => $endpoint,
         auth_type => 'user',
         parameters => $params,
-        #headers => ['Content-Type' => 'application/json'],
+        headers => [@headers],
     });
 }
 
@@ -227,14 +276,15 @@ sub obligations {
 Retrieve a set of VAT payment liabilities. Returns a WebService::HMRC::Response
 object reference. Requires permission for the C<read:vat> service scope.
 
-=head3 Parameters:
+=head3 Parameters
 
 =over
 
 =item from
 
 Return liabilities from this date, specified as YYYY-MM-DD.
-Required parameter.
+Required parameter. The date must be before today's date, otherwise the api
+will return an error.
 
 =item to
 
@@ -245,10 +295,10 @@ Required parameter.
 
 Optional parameter used only for testing against the HMRC sandbox api.
 
-If set to 'SINGLE_LIABILITY', returns a single valid liability when used
+If set to C<SINGLE_LIABILITY>, returns a single valid liability when used
 with dates from 2017-01-02 and to 2017-02-02.
 
-If set to 'MULTIPLE_LIABILITIES', returns multiple valid liabilities when
+If set to C<MULTIPLE_LIABILITIES>, returns multiple valid liabilities when
 used with dates from 2017-04-05 and to 2017-12-21.
 
 This parameter should not be used in production systems - it causes dummy
@@ -256,7 +306,7 @@ test data to be returned.
 
 =back
 
-=head3 Response Data:
+=head3 Response Data
 
 For full details of the response data, see the HMRC API specification. In summary,
 the data contains a single element `liabilities` pointing to an array of
@@ -277,7 +327,7 @@ VAT payment liabilities:
       ]
     }
 
-=head3 Example usage:
+=head3 Example usage
 
     my $result = $vat->liabilities({
         from => '2018-01-01',
@@ -332,7 +382,7 @@ Retrieve a set of payments received by HMRC in respect of VAT over the
 specified date range. Returns a WebService::HMRC::Response object reference.
 Requires permission for the C<read:vat> service scope.
 
-=head3 Parameters:
+=head3 Parameters
 
 =over
 
@@ -350,10 +400,10 @@ Required parameter.
 
 Optional parameter used only for testing against the HMRC sandbox api.
 
-If set to 'SINGLE_PAYMENT', returns a single valid payment when used with
+If set to C<SINGLE_PAYMENT>, returns a single valid payment when used with
 dates from 2017-01-02 and to 2017-02-02.
 
-If set to 'MULTIPLE_PAYMENTS', returns multiple valid payments when used
+If set to C<MULTIPLE_PAYMENTS>, returns multiple valid payments when used
 with dates from 2017-02-27 and to 2017-12-21.
 
 This parameter should not be used in production systems - it causes dummy
@@ -361,7 +411,7 @@ test data to be returned.
 
 =back
 
-=head3 Response Data:
+=head3 Response Data
 
 For full details of the response data, see the HMRC API specification. In
 summary, the data contains a single element `payments` pointing to an array
@@ -376,14 +426,14 @@ of payments received by HMRC:
       ]
     }
 
-=head3 Example usage:
+=head3 Example usage
 
     my $result = $vat->payments(
         from => '2018-01-01',
         to   => '2018-03-31',
     );
     foreach my $payment( @{$result->data->{payments}} ) {
-        print "-- VAT Payments Recevied by HMRC --\n"
+        print "-- VAT Payments Received by HMRC --\n"
         print "Date Received: $payment->{received}\n";
         print "       Amount: $payment->{amount}\n";
     }
@@ -427,7 +477,7 @@ Retrieve a previously submitted VAT return corresponding to the supplied
 period_key. Returns a WebService::HMRC::Response object reference.
 Requires permission for the C<read:vat> service scope.
 
-=head3 Parameters:
+=head3 Parameters
 
 =over
 
@@ -439,7 +489,7 @@ method call.
 
 =back
 
-=head3 Response Data:
+=head3 Response Data
 
 For full details of the response data, see the HMRC API specification. In
 summary, the data is a hashref comprising the following elements which
@@ -489,7 +539,7 @@ Retrieve a previously submitted VAT return corresponding to the supplied
 period_key. Returns a WebService::HMRC::Response object reference.
 Requires permission for the C<write:vat> service scope.
 
-=head3 Parameters:
+=head3 Parameters
 
 For full details of the required parameters and the rules for calculating
 each value, see the HMRC API specification and VAT documentation. The
@@ -573,7 +623,7 @@ Defaults to false.
 
 =back
 
-=head3 Response Headers:
+=head3 Response Headers
 
 For full details of the response headers, see the HMRC API specification. In
 summary the headers confirm receipt of the submission, comprising:
@@ -594,7 +644,7 @@ Unique ID for this operation.
 
 =back
 
-=head3 Response Data:
+=head3 Response Data
 
 For full details of the response data, see the HMRC API specification. In
 summary, the response data is a hashref with keys:
@@ -623,7 +673,7 @@ Present only is payment is due to HMRC.
 
 =back
 
-=head3 Example:
+=head3 Example
 
     my $result = $vat->submit_return({
         periodKey => "#001",

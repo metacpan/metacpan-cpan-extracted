@@ -29,7 +29,7 @@ my $builder = Module::Build->new(
         'Test::Warnings' => '0.026',
     },
     recommends => {
-        'Astro::Coord::ECI::Moon' => 0.044,
+        'Astro::Coord::ECI::Moon' => 0.103,
         'Astro::MoonPhase'        => 0.60,
         'Test::Spelling'          => 0,
         'Test::Perl::Critic'      => 0,

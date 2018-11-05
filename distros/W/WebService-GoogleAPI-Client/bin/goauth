@@ -1,13 +1,12 @@
 #!perl
 
-use strict;
-use warnings;    ## required because I can't work out how to get percritic to use my modern config
+use strictures;
 
 package goauth;
-$goauth::VERSION = '0.17';
+$goauth::VERSION = '0.18';
 use Carp;
 use Mojolicious::Lite;
-use Data::Dumper;
+use Data::Dump;
 use Path::Class;
 use Config::JSON;
 use Tie::File;
@@ -15,9 +14,6 @@ use feature 'say';
 use Net::EmptyPort qw(empty_port);
 
 use Crypt::JWT qw(decode_jwt);
-
-# Remove built-in favicon
-#delete $app->static->extra->{'favicon.ico'};
 
 
 # ABSTRACT: CLI tool with mini http server for negotiating Google OAuth2 Authorisation access tokens that allow offline access to Google API Services on behalf of the user.
@@ -154,7 +150,7 @@ sub runserver
     {
       app->log->info( "Authorization code was retrieved: " . $c->param( 'code' ) );
       $tokens = $c->get_new_tokens( $c->param( 'code' ) );
-      app->log->info( "App got new tokens: " . Dumper $tokens);
+      app->log->info( "App got new tokens: " . pp $tokens);
       if ( $tokens )
       {
 
@@ -222,12 +218,14 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head2 SUMMARY
 
 Supports multiple users
 OAuth2 for Google. You can find the key (CLIENT ID) and secret (CLIENT SECRET) from the app console here under "APIs & Auth" and "Credentials" in the menu at https://console.developers.google.com/project .
+
+Included as a utility within the CPAN L<Webservice::GoogleAPI::Client> Bundle.
 
 =head2 QUICK START
 

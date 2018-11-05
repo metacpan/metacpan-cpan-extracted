@@ -18,6 +18,22 @@ use constant TIMFMT => '%d-%b-%Y %H:%M:%S';
 
 Astro::Coord::ECI->set (debug => 0);
 
+{
+    local $@ = undef;
+    my $eci;
+    eval {
+	$eci = Astro::Coord::ECI->new();
+	pass 'Can instantiate a default object';
+	1;
+    } or BAIL_OUT 'Can not instantiate a default object';
+
+    eval {
+	$eci->get( 'sun' );
+	pass q<Can get the default 'sun' attribute>;
+	1;
+    } or BAIL_OUT q<Can not get the default 'sun' attribute>;
+}
+
 # universal time
 # Tests: universal()
 

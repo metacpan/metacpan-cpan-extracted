@@ -22,7 +22,7 @@
 # ABSTRACT: Extract Strings To PO Files
 
 package Locale::XGettext;
-$Locale::XGettext::VERSION = '0.6';
+$Locale::XGettext::VERSION = '0.7';
 use strict;
 
 use Locale::TextDomain 1.20 qw(Locale-XGettext);
@@ -31,6 +31,7 @@ use Locale::PO 0.27;
 use Scalar::Util qw(reftype blessed);
 use Locale::Recode;
 use Getopt::Long 2.36 qw(GetOptionsFromArray);
+use Encode;
 
 use Locale::XGettext::Util::POEntries;
 use Locale::XGettext::Util::Keyword;
@@ -489,7 +490,11 @@ sub output {
                    file => $filename, error => $!);
     
     foreach my $entry ($self->{__po}->entries) {
-        print $fh $entry->dump
+        my $dump = $entry->dump;
+        # We have no idea about the encoding.
+        Encode::_utf8_off($dump);
+
+        print $fh $dump
             or die __x("Error writing '{file}': {error}.\n",
                        file => $filename, error => $!);
     }

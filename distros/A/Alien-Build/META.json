@@ -59,7 +59,6 @@
             "Module::Load" : "0",
             "Path::Tiny" : "0.077",
             "Test2::API" : "1.302015",
-            "Test2::Require" : "0.000060",
             "Text::ParseWords" : "3.26",
             "perl" : "5.008001"
          },
@@ -71,6 +70,7 @@
       "test" : {
          "requires" : {
             "Test2::Mock" : "0.000060",
+            "Test2::Require" : "0.000060",
             "Test2::Require::Module" : "0.000060",
             "Test2::V0" : "0.000060",
             "perl" : "5.008001"
@@ -93,7 +93,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.48",
+   "version" : "1.49",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -122,8 +122,8 @@
       "Shoichi Kaji (SKAJI)",
       "Shawn Laffan (SLAFFAN)"
    ],
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "x_generated_by_perl" : "v5.29.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_use_unsafe_inc" : 0
 }
 

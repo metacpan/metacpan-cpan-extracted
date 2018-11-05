@@ -1,3 +1,6 @@
+#!perl
+# vim:ft=perl:
+
 use strict;
 use warnings;
 
@@ -36,4 +39,3 @@ for my $method (qw(store search count)) {
 
 ok('transaction' eq $tr->rt_type);
 
-# vim:ft=perl:

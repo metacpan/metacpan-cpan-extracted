@@ -1,0 +1,266 @@
+#!/usr/bin/env perl
+#Copyright (c) 2018, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use BackupPC::Backups::Info;
+use Time::Piece;
+use Time::Seconds;
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+			"-l   Show the last backup variables.\n".
+			"-m <machine>   Specify a specific machine for the operation.\n".
+			"-a <decimal days>  Search based on age.\n".
+			"-e <equality>  The equality to use when searching based on age.\n".
+			"-n   Nagios check mode.\n".
+			"-w <warn level>  Number of machines not backed up to warn at. Default is 1.\n".
+			"-c <crit level>  Number of machines not backed up to crit at. Default is 2.\n".
+			"\n".
+			"Equilities: either symbol or name can be used\n".
+			"e, =\n".
+			"lt, <\n".
+			"le, <=\n".
+			"gt, >\n".
+			"ge, >=\n";
+		exit 0;
+}
+
+sub main::VERSION_MESSAGE {
+        print "bpc-info v. 0.0.0\n";
+}
+
+#finds the age in days
+# $_[0] $data->{startTime} or some other unix time
+sub age{
+	my $start=localtime($_[0]);
+	my $now=localtime();
+	my $tdiff=$now-$start;
+	return sprintf("%.2f", $tdiff->days);
+}
+
+#gets the options
+my %opts=();
+getopts('lm:a:e:n', \%opts);
+
+if(!defined( $opts{w} )){
+	$opts{w}=1;
+}
+if(!defined( $opts{c} )){
+	$opts{c}=2;
+}
+
+#sets the default equality
+if (!defined( $opts{e} )){
+	$opts{e}='>=';
+}else{
+	#translates le, ge, lt, and gt
+	if ( $opts{e} eq 'le' ){
+		$opts{e}='<=';
+	}elsif( $opts{e} eq 'ge' ){
+		$opts{e}='>=';
+	}elsif( $opts{e} eq 'lt' ){
+		$opts{e}='<';
+	}elsif( $opts{e} eq 'gt' ){
+		$opts{e}='>';
+	}elsif( $opts{e} eq 'e' ){
+		$opts{e}='==';
+	}elsif( $opts{e} eq '=' ){
+		$opts{e}='==';
+	}
+	
+	# checks -e to make sure no evil drek has been shoved into it as it is used in an eval
+	if ($opts{e} !~ /^[\>\<=]\=?$/){
+		warn('bpc-info:253: "'.$opts{e}.'" is not a valid perl equality');
+		exit 253;
+	}
+}
+
+#as -a is used in a eval, do extra sanity checking
+if ( $opts{a} !~ /^\-?[0123456789]+\.?[0123456789]*$/ ){
+	warn('bpcinfo:253: "'.$opts{a}.'" is non-numeric');
+	exit 252;
+}
+
+my $bpcinfo=BackupPC::Backups::Info->new;
+if ( $bpcinfo->error ){
+	warn("bpc-info: init failed.... the pool directy does not exist or is not accessible");
+	exit $bpcinfo->error;
+}
+
+# prints the last info for a machine
+# requires -m be defined
+if (defined( $opts{l} )){
+	if (!defined( $opts{m} )){
+		warn('bpc-info:254: No machine specificied via -m');
+		exit 254;
+	}
+
+	my $data=$bpcinfo->get_last($opts{m});
+
+	my $age=age($data->{startTime});
+	
+	print 'num: '.$data->{num}."\n".
+		'type: '.$data->{type}."\n";
+
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($data->{startTime});
+	$year=$year+1900;
+	$mon++;
+	print 'startTime: '.$year.'-'.sprintf("%02d", $mon).'-'.sprintf("%02d", $mday).' '.sprintf("%02d", $hour).':'.sprintf("%02d", $min).':'.sprintf("%02d", $sec)."\n";
+
+	($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($data->{endTime});
+	$year=$year+1900;
+	$mon++;
+	print 'endTime:   '.$year.'-'.sprintf("%02d", $mon).'-'.sprintf("%02d", $mday).' '.sprintf("%02d", $hour).':'.sprintf("%02d", $min).':'.sprintf("%02d", $sec)."\n";
+
+	print 'age: '.$age."\n".
+		'size: '.$data->{size}."\n".
+		'sizeNew: '.$data->{sizeNew}."\n".
+		'sizeExist: '.$data->{sizeExist}."\n".
+		'sizeNewComp: '.$data->{sizeNewComp}."\n".
+		'sizeExistComp: '.$data->{sizeExistComp}."\n".
+		'compress: '.$data->{compress}."\n".
+		'nFiles: '.$data->{nFiles}."\n".
+		'nFilesExist: '.$data->{nFilesExist}."\n".
+		'nFilesNew: '.$data->{nFilesNew}."\n".
+		'xferMethod: '.$data->{xferMethod}."\n".
+		'xferBadShare: '.$data->{xferBadShare}."\n".
+		'xferBadFile: '.$data->{xferBadFile}."\n".
+		'tarErrs: '.$data->{tarErrs}."\n".
+		'noFill: '.$data->{noFill}."\n".
+		'fillFromNum: '.$data->{fillFromNum}."\n".
+		'mangle: '.$data->{mangle}."\n".
+		'level: '.$data->{level}."\n";
+
+	exit 0;
+}
+
+#does age search
+if (defined( $opts{a} )){
+	$bpcinfo->read_in_all;
+	my @machines=$bpcinfo->list_machines;
+
+	my $matched=0;
+	
+	foreach my $machine (@machines){
+		my $data=$bpcinfo->get_last($machine);
+		my $age=age($data->{startTime});
+
+		my $hit=0;
+		my $toEval='if ( $age '.$opts{e}.' '.$opts{a}.'){ $hit=1;  }';
+		eval( $toEval );
+
+		if ( $hit ){
+			if (defined( $opts{n} )) {
+				$matched++;
+			}else{
+				print $machine.': '. $age."\n";
+			}
+		}
+	}
+
+	if (defined( $opts{n} )){
+		if( $matched < $opts{w} ){
+			print "BACKUPS OK - ".$matched." ".$opts{e}." ".$opts{a}." days old;\n";
+			exit 0;
+		}elsif($matched >= $opts{c}){
+			print "BACKUPS CRITICAL - ".$matched." ".$opts{e}." ".$opts{a}." days old;\n";
+			exit 2;
+		}else{
+			print "BACKUPS WARNING - ".$matched." ".$opts{e}." ".$opts{a}." days old;\n";
+			exit 1;
+		}
+	}
+}
+
+=head1 NAME
+
+bpc-info - A utility to get backup information from BackupPC in regards to backups.
+
+=head1 SYNOPSIS
+
+cps B<-l> B<-m> <machine>
+cps B<-a> <days> B<-e> <equality>
+cps B<-a> <days> B<-e> <equality> B<-n> [B<-w> <warn level>] [B<-c> <critical level>]
+
+=head1 USAGE
+
+Either B<-a> or B<-l> need to be given.
+
+With B<-n>, B<-a> may be used as a nagios check and the output will be a simplified version
+formated as such.
+
+=head1 SWITCHES
+
+=head2 B<-a> <days>
+
+Deminal days after the last backup to used for searching. The comparison equality
+is set via B<-e>.
+
+A value of "-1" or the like may be given to display all machines and backup ages.
+
+=head2 B<-c> <critical level>
+
+The number of machines needing to match B<-a> when B<-n> is used for it to be
+considered critical.
+
+=head2 B<-e> <equality>
+
+Either the symbol or letter equivalent may be used.
+
+This is evaluated as below.
+
+   $backup_age $equality $opts{a}
+
+The understood ones are listed below.
+
+    e, =
+    lt, <
+    le, <=
+    gt, >
+    ge, >=
+
+=head2 B<-l>
+
+Displays the last information for the machine specificied via B<-m>.
+
+=head2 B<-m> <machine>
+
+The machine to operate on in terms of backups.
+
+=head2 B<-n>
+
+Operate in Nagios mode.
+
+When combined with B<-a> can be used for alerting if to many backups
+are older than a specific age.
+
+=head2 B<-w> <warn level>
+
+The number of machines needing to match B<-a> when B<-n> is used for it to
+throw a warning.
+
+=cut

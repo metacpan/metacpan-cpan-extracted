@@ -19,13 +19,19 @@
           'children' => [
             {
               'children' => [
-                '/source'
+                {
+                  'children' => [
+                    '/source'
+                  ],
+                  'nodename' => 'jsonOtherNotDouble',
+                  'type' => 'element'
+                }
               ],
-              'nodename' => 'jsonOtherNotDouble',
+              'nodename' => 'jsonPointer',
               'type' => 'element'
             }
           ],
-          'nodename' => 'jsonPointer',
+          'nodename' => 'exprSingleValue',
           'type' => 'element'
         },
         {

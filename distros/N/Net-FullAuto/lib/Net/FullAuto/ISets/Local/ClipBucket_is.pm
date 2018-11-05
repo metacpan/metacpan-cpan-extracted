@@ -81,7 +81,7 @@ my $configure_clipbucket=sub {
    my ($stdout,$stderr)=('','');
    my $c='';
    ($stdout,$stderr)=$handle->cmd($sudo.'groupadd www-data');
-   ($stdout,$stderr)=$handle->cmd($sudo.'adduser -r -g www-data www-data');
+   ($stdout,$stderr)=$handle->cmd($sudo.'adduser -r -m -g www-data www-data');
    $handle->{_cmd_handle}->print($sudo.'passwd www-data');
    my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
    $prompt=~s/\$$//;
@@ -99,14 +99,16 @@ my $configure_clipbucket=sub {
          next;
       }
    }
-   ($stdout,$stderr)=$handle->cmd("rm -rvf /var/cache/yum",'__display__');
-   ($stdout,$stderr)=$handle->cmd("sudo yum -y update",'__display__');
-   ($stdout,$stderr)=$handle->cmd("sudo yum clean all",'__display__');
-   ($stdout,$stderr)=$handle->cmd("sudo yum grouplist hidden",'__display__');
-   ($stdout,$stderr)=$handle->cmd("sudo yum groups mark convert",
+   ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf /var/cache/yum',
       '__display__');
-   ($stdout,$stderr)=$handle->cmd(
-      'sudo yum -y install cyrus-sasl-plain sendmail-cf m4 java java-devel',
+   ($stdout,$stderr)=$handle->cmd($sudo.'yum -y update','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'yum clean all','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'yum grouplist hidden',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'yum groups mark convert',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install cyrus-sasl-plain sendmail-cf m4 java java-devel',
       '__display__');
    # https://www.unixmen.com/setup-your-own-youtube-clone-website-using-clipbucket/
    # http://opensourceeducation.net/clip-bucket-2-8-on-ubuntu-14-04-with-nginx-php5-fpm-on-digitalocean-vps/
@@ -136,8 +138,8 @@ my $configure_clipbucket=sub {
 
 END
    print $install_clipbucket;sleep 10;
-   ($stdout,$stderr)=$handle->cmd(
-      'sudo yum -y install openssl-devel libcurl-devel libpng-devel '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install openssl-devel libcurl-devel libpng-devel '.
       'icu libicu-devel rubygems-devel libxml2-devel libevent-devel '.
       'ImageMagick ImageMagick-devel ImageMagick-perl',
       '__display__');
@@ -153,12 +155,12 @@ END
       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot -O libmcrypt-2.5.8.tar.gz ".
-      "https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/".
-      "libmcrypt-2.5.8.tar.gz/download",'__display__');
+      'wget --random-wait --progress=dot -O libmcrypt-2.5.8.tar.gz '.
+      'https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/'.
+      'libmcrypt-2.5.8.tar.gz/download','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "tar zxvf libmcrypt-2.5.8.tar.gz",'__display__');
-   ($stdout,$stderr)=$handle->cwd("libmcrypt-2.5.8");
+   ($stdout,$stderr)=$handle->cwd('libmcrypt-2.5.8');
    ($stdout,$stderr)=$handle->cmd($sudo.
       './configure','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -171,7 +173,6 @@ if ($b==1) {
          'git clone https://github.com/php/php-src.git','__display__');
       ($stdout,$stderr)=$handle->cwd('php-src');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         #'git checkout PHP-7.0.2','__display__');
          'git checkout PHP-7.1.21','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
@@ -278,79 +279,81 @@ END
          'chkconfig --levels 235 php-fpm on');
       ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd(
-         "sudo /usr/local/php7/bin/pecl channel-update pecl.php.net",
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         '/usr/local/php7/bin/pecl channel-update pecl.php.net',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd(
-         "sudo /usr/local/php7/bin/pecl install mailparse-3.0.2",
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         '/usr/local/php7/bin/pecl install mailparse-3.0.2',
          '__display__');
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "https://dl.fedoraproject.org/pub/epel/".
-      "epel-release-latest-7.noarch.rpm",'__display__');
+      'wget --random-wait --progress=dot '.
+      'https://dl.fedoraproject.org/pub/epel/'.
+      'epel-release-latest-7.noarch.rpm','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'yum install -y epel-release-latest-7.noarch.rpm','__display__');
+      'yum install -y epel-release-latest-7.noarch.rpm',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'rm -rf epel-release-latest-7.noarch.rpm','__display__');
-   #($stdout,$stderr)=$handle->cmd('sudo yum -y install epel-release',
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'yum -y install epel-release',
    #   '__display__');
    ($stdout,$stderr)=$handle->cwd('/etc/yum.repos.d');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
-      "wget --random-wait --progress=dot ".
-      "https://www.nasm.us/nasm.repo",'__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      'https://www.nasm.us/nasm.repo','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'yum -y --disablerepo=amzn2-core '.
       'install nasm','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'yum -y install autoconf automake gcc gcc-c++ '.
       'git libtool make pkgconfig wget opencv zlib-devel dbus-devel '.
       'lua-devel zvbi libdvdread-devel libdc1394-devel libxcb-devel '.
       'xcb-util-devel libxml2-devel mesa-libGLU-devel pulseaudio-libs-devel '.
       'alsa-lib-devel libgcrypt-devel qt-devel re2c lshw','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo yum -y --skip-broken --enablerepo=epel '.
+   ($stdout,$stderr)=$handle->cmd($sudo.'yum -y --skip-broken --enablerepo=epel '.
       'install yasm libva-devel libass-devel libkate-devel libbluray-devel '.
       'libdvdnav-devel libcddb-devel libmodplug-devel','__display__');
-   ($stdout,$stderr)=$handle->cmd('yum install '.
+   ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install '.
       'a52dec-devel libmpeg2-devel','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'which ffmpeg');
-   if ($stdout=~/\/ffmpeg/) {
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+   if ($stdout!~/\/ffmpeg/) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -pv /opt/source/ffmpeg','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone git://git.videolan.org/x264','__display__');
       ($stdout,$stderr)=$handle->cwd('x264');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --enable-shared','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo cp -v x264.pc /usr/lib64/pkgconfig',
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'cp -v x264.pc /usr/lib64/pkgconfig',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone --depth 1 git://github.com/mstorsjo/fdk-aac.git',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('fdk-aac');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'autoreconf -fiv','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --enable-shared');
-      ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v fdk-aac.pc /usr/lib64/pkgconfig','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
       my $lame_tar='lame-3.99.5.tar.gz';
       my $lame_md5='84835b313d4a8b68f5349816d33e07ce';
       foreach my $count (1..3) {
-         ($stdout,$stderr)=$handle->cmd('sudo '.
-            "wget --random-wait --progress=dot ".
-            "http://downloads.sourceforge.net/project/lame/lame/3.99/".
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'wget --random-wait --progress=dot '.
+            'http://downloads.sourceforge.net/project/lame/lame/3.99/'.
             $lame_tar,'__display__');
-         ($stdout,$stderr)=$handle->cmd(
-            "sudo md5sum -c - <<<\"$lame_md5 $lame_tar\"",
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "md5sum -c - <<<\"$lame_md5 $lame_tar\"",
             '__display__');
          unless ($stderr) {
             print(qq{ + CHECKSUM Test for $lame_tar *PASSED* \n});
@@ -360,26 +363,26 @@ END
                   "after $count attempts\n";
             &Net::FullAuto::FA_Core::cleanup;
          }
-         ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $lame_tar",'__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo."rm -rvf $lame_tar",'__display__');
       }
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "tar xzvf $lame_tar",'__display__');
       $lame_tar=~s/\.tar\.gz$//;
       ($stdout,$stderr)=$handle->cwd($lame_tar);
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --enable-shared --enable-nasm');
-      ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
       my $libogg_tar='libogg-1.3.0.tar.gz';
       my $libogg_md5='0a7eb40b86ac050db3a789ab65fe21c2';
       foreach my $count (1..3) {
-         ($stdout,$stderr)=$handle->cmd('sudo '.
-            "wget --random-wait --progress=dot ".
-            "http://downloads.xiph.org/releases/ogg/".
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'wget --random-wait --progress=dot '.
+            'http://downloads.xiph.org/releases/ogg/'.
             $libogg_tar,'__display__');
-         ($stdout,$stderr)=$handle->cmd(
-            "sudo md5sum -c - <<<\"$libogg_md5 $libogg_tar\"",
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "md5sum -c - <<<\"$libogg_md5 $libogg_tar\"",
             '__display__');
          unless ($stderr) {
             print(qq{ + CHECKSUM Test for $libogg_tar *PASSED* \n});
@@ -389,28 +392,28 @@ END
                   "after $count attempts\n";
             &Net::FullAuto::FA_Core::cleanup;
          }
-         ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $libogg_tar",'__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf '.$libogg_tar,'__display__');
       }
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "tar xzvf $libogg_tar",'__display__');
       $libogg_tar=~s/\.tar\.gz$//;
       ($stdout,$stderr)=$handle->cwd($libogg_tar);
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --enable-shared','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo cp -v ogg.pc /usr/lib64/pkgconfig',
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'cp -v ogg.pc /usr/lib64/pkgconfig',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
       my $libtheora_tar='libtheora-1.1.1.tar.gz';
       my $libtheora_md5='bb4dc37f0dc97db98333e7160bfbb52b';
       foreach my $count (1..3) {
-         ($stdout,$stderr)=$handle->cmd('sudo '.
-            "wget --random-wait --progress=dot ".
-            "http://downloads.xiph.org/releases/theora/".
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'wget --random-wait --progress=dot '.
+            'http://downloads.xiph.org/releases/theora/'.
             $libtheora_tar,'__display__');
-         ($stdout,$stderr)=$handle->cmd(
-            "sudo md5sum -c - <<<\"$libtheora_md5 $libtheora_tar\"",
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "md5sum -c - <<<\"$libtheora_md5 $libtheora_tar\"",
             '__display__');
          unless ($stderr) {
             print(qq{ + CHECKSUM Test for $libtheora_tar *PASSED* \n});
@@ -420,21 +423,21 @@ END
                   "after $count attempts\n";
             &Net::FullAuto::FA_Core::cleanup;
          }
-         ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $libtheora_tar",
+         ($stdout,$stderr)=$handle->cmd($sudo."rm -rvf $libtheora_tar",
             '__display__');
       }
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "tar xzvf $libtheora_tar",'__display__');
       $libtheora_tar=~s/\.tar\.gz$//;
       ($stdout,$stderr)=$handle->cwd($libtheora_tar);
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --enable-shared','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    #my $ffmpeg_tar='ffmpeg.static.64bit.2014-07-16.tar.gz';
    #my $ffmpeg_md5='965739cd5cfeb84401857dadea3af93c';
    #foreach my $count (1..3) {
-   #   ($stdout,$stderr)=$handle->cmd('sudo '.
+   #   ($stdout,$stderr)=$handle->cmd($sudo.
    #      "wget --random-wait --progress=dot ".
    #      "http://ffmpeg.gusari.org/static/64bit/$ffmpeg_tar",
    #      '__display__');
@@ -451,29 +454,29 @@ END
    #   }
    #   ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $ffmpeg_tar",'__display__');
    #}
-   #($stdout,$stderr)=$handle->cmd('sudo '.
+   #($stdout,$stderr)=$handle->cmd($sudo.
    #   "tar zxvf $ffmpeg_tar",'__display__');
-   #($stdout,$stderr)=$handle->cmd('sudo '."rm -rvf $ffmpeg_tar",'__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo."rm -rvf $ffmpeg_tar",'__display__');
    #($stdout,$stderr)=$handle->cmd("./ffmpeg -version",'__display__');
-   #($stdout,$stderr)=$handle->cmd('sudo '.
+   #($stdout,$stderr)=$handle->cmd($sudo.
    #   "ln -s /usr/local/bin/ffmpeg/ffmpeg /usr/bin/ffmpeg");
    # http://wiki.razuna.com/display/ecp/FFMpeg+Installation+on+CentOS+and+RedHat
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'wget -qO- https://www.libsdl.org/download-2.0.php');
       $stdout=~s/^.*href=["](.*?[.]tar[.]gz[.]sig)["].*$/$1/s;
       my $sdl_tar=$stdout;
       $sdl_tar=~s/^(.*)[.]sig$/$1/;
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "mkdir -pv release",'__display__');
       my $goodsig=0;
       foreach my $count (1..3) {
          ($stdout,$stderr)=$handle->cwd('release');
-         ($stdout,$stderr)=$handle->cmd('sudo '.
+         ($stdout,$stderr)=$handle->cmd($sudo.
             'wget --random-wait --progress=dot '.
             "https://www.libsdl.org/$sdl_tar",
             '__display__');
-         ($stdout,$stderr)=$handle->cmd('sudo '.
+         ($stdout,$stderr)=$handle->cmd($sudo.
             'wget --random-wait --progress=dot '.
             "https://www.libsdl.org/$sdl_tar.sig",
             '__display__');
@@ -491,8 +494,8 @@ END
                '__display__');
          }
          if (-1<index $stderr, 'Good signature') {
-            ($stdout,$stderr)=$handle->cmd(
-               "sudo rm -rvf $sdl_tar.sig",'__display__');
+            ($stdout,$stderr)=$handle->cmd($sudo.
+               "rm -rvf $sdl_tar.sig",'__display__');
             $goodsig=1;
             last;
          }
@@ -501,20 +504,20 @@ END
          " line ".__LINE__."\n")
          if !$goodsig;
       ($stdout,$stderr)=$handle->cwd('release');
-      ($stdout,$stderr)=$handle->cmd('sudo tar zxvf *','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'tar zxvf *','__display__');
       ($stdout,$stderr)=$handle->cwd('SDL2*');
-      ($stdout,$stderr)=$handle->cmd('sudo ./configure','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo cp -v sdl2.pc /usr/lib64/pkgconfig',
+      ($stdout,$stderr)=$handle->cmd($sudo.'./configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'cp -v sdl2.pc /usr/lib64/pkgconfig',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
       my $libvorbis_tar='libvorbis-1.3.3.tar.gz';
       my $libvorbis_md5='6b1a36f0d72332fae5130688e65efe1f';
       foreach my $count (1..3) {
-         ($stdout,$stderr)=$handle->cmd('sudo '.
-            "wget --random-wait --progress=dot ".
-            "http://downloads.xiph.org/releases/vorbis/".
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'wget --random-wait --progress=dot '.
+            'http://downloads.xiph.org/releases/vorbis/'.
             $libvorbis_tar,'__display__');
          ($stdout,$stderr)=$handle->cmd(
             "sudo md5sum -c - <<<\"$libvorbis_md5 $libvorbis_tar\"",
@@ -527,41 +530,42 @@ END
                   "after $count attempts\n";
             &Net::FullAuto::FA_Core::cleanup;
          }
-         ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $libvorbis_tar",
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rm -rvf $libvorbis_tar",
             '__display__');
       }
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "tar xzvf $libvorbis_tar",'__display__');
       $libvorbis_tar=~s/\.tar\.gz$//;
       ($stdout,$stderr)=$handle->cwd($libvorbis_tar);
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --enable-shared','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo cp -v vorbis.pc /usr/lib64/pkgconfig',
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'cp -v vorbis.pc /usr/lib64/pkgconfig',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo cp -v vorbisenc.pc /usr/lib64/pkgconfig',
+      ($stdout,$stderr)=$handle->cmd($sudo.'cp -v vorbisenc.pc /usr/lib64/pkgconfig',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo cp -v vorbisfile.pc /usr/lib64/pkgconfig',
+      ($stdout,$stderr)=$handle->cmd($sudo.'cp -v vorbisfile.pc /usr/lib64/pkgconfig',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone https://chromium.googlesource.com/webm/libvpx',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('libvpx');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --enable-shared','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
       my $libmad_tar='libmad-0.15.1b.tar.gz';
       $goodsig=0;
       foreach my $count (1..3) {
-         ($stdout,$stderr)=$handle->cmd('sudo '.
+         ($stdout,$stderr)=$handle->cmd($sudo.
             "wget --random-wait --progress=dot ".
             "ftp://ftp.mars.org/pub/mpeg/".$libmad_tar,
             '__display__');
-         ($stdout,$stderr)=$handle->cmd('sudo '.
+         ($stdout,$stderr)=$handle->cmd($sudo.
             "wget --random-wait --progress=dot ".
             "ftp://ftp.mars.org/pub/mpeg/$libmad_tar.sign",
             '__display__');
@@ -588,50 +592,50 @@ END
       exit_on_error($stderr." in package ".__PACKAGE__.
          " line ".__LINE__."\n")
          if !$goodsig;
-      ($stdout,$stderr)=$handle->cmd('sudo tar zxvf '.$libmad_tar,'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'tar zxvf '.$libmad_tar,'__display__');
       ($stdout,$stderr)=$handle->cwd("libmad-0.15.1b");
-      ($stdout,$stderr)=$handle->cmd('sudo ./configure','__display__');
-      ($stdout,$stderr)=$handle->cmd("sudo sed -i 's/-fforce-mem //' ".
+      ($stdout,$stderr)=$handle->cmd($sudo.'./configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo."sed -i 's/-fforce-mem //' ".
          "Makefile");
-      ($stdout,$stderr)=$handle->cmd('sudo make','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone git://source.ffmpeg.org/ffmpeg','__display__');
       ($stdout,$stderr)=$handle->cwd('ffmpeg');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --enable-gpl --enable-libfdk_aac --enable-libmp3lame '.
          '--enable-libtheora --enable-libvorbis --enable-libvpx --enable-libx264 '.
          '--enable-nonfree --disable-static --enable-shared','__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make',300,'__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo make install',300,'__display__');
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.'make',300,'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install',300,'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'sed -i "/\/usr\/local\/lib$/d" /etc/ld.so.conf');
-      ($stdout,$stderr)=$handle->cmd_raw('sudo '.
+      ($stdout,$stderr)=$handle->cmd_raw($sudo.
          'sed -i "\\$a/usr/local/lib" /etc/ld.so.conf');
-      ($stdout,$stderr)=$handle->cmd('sudo '.'ldconfig');
+      ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
    } 
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "gem install flvtool2",'__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'yum -y install freetype-devel freeglut-devel',
       '__display__');
    my $mediainfo_tar='MediaInfo_CLI_0.7.92.1_GNU_FromSource.tar.gz';
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".
       "https://mediaarea.net/download/binary/mediainfo/0.7.92.1/".
       $mediainfo_tar,300,
       '__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "tar xvf $mediainfo_tar",'__display__');
    ($stdout,$stderr)=$handle->cwd('MediaInfo_CLI_GNU_FromSource');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       './CLI_Compile.sh','__display__');
    ($stdout,$stderr)=$handle->cwd('MediaInfo/Project/GNU/CLI');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'ln -s /usr/local/bin/mediainfo /usr/bin/mediainfo');
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
    my $c='wget -qO- https://api.github.com/users/gpac/repos';
@@ -655,10 +659,10 @@ END
          $scrollnum=$count;
       }
    }
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "git clone -v -b $default_branch git://github.com/gpac/gpac",
       '__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "git ls-remote --tags git://github.com/gpac/gpac",
       '__display__');
    my %tags=();
@@ -669,27 +673,27 @@ END
    }
    ($stdout,$stderr)=$handle->cwd('gpac');
    my $tag=(reverse sort keys %tags)[0];
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "git checkout tags/$tag",'__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'ls -l','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       './configure','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i \'s#-lgpac$#-lgpac -Wl,-rpath=/usr/local/lib#\' '.
       'applications/mp4box/Makefile');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'make','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v gpac.pc /usr/lib64/pkgconfig','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/php7/bin/pecl config-set php_ini '.
       '/usr/local/php7/lib/php.ini',
       '__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/php7/bin/pear config-set php_ini '.
       '/usr/local/php7/lib/php.ini',
       '__display__');
@@ -709,19 +713,19 @@ END
 #END
 #   ($stdout,$stderr)=$handle->cmd(
 #      "echo -e \"$im\" > imagick.ini");
-#   ($stdout,$stderr)=$handle->cmd('sudo '.
+#   ($stdout,$stderr)=$handle->cmd($sudo.
 #      "mv -fv imagick.ini /etc/php.d",'__display__');
-#   ($stdout,$stderr)=$handle->cmd('sudo '.
+#   ($stdout,$stderr)=$handle->cmd($sudo.
 #      "mkdir -pv /opt/source/sourceguardian",'__display__');
 #   ($stdout,$stderr)=$handle->cwd(
 #      '/opt/source/sourceguardian');
-#   ($stdout,$stderr)=$handle->cmd('sudo '.
+#   ($stdout,$stderr)=$handle->cmd($sudo.
 #      "wget --random-wait --progress=dot ".
 #      "http://www.sourceguardian.com/loaders/download/".
 #      "loaders.linux-x86_64.tar.gz",'__display__');
-#   ($stdout,$stderr)=$handle->cmd('sudo '.
+#   ($stdout,$stderr)=$handle->cmd($sudo.
 #      "tar zxvf loaders.linux-x86_64.tar.gz",'__display__');
-#   ($stdout,$stderr)=$handle->cmd('sudo '.
+#   ($stdout,$stderr)=$handle->cmd($sudo.
 #      "cp -Rv ixed.5.5.lin /usr/lib64/php/5.5/modules",'__display__');
 #   ($stdout,$stderr)=$handle->cwd('/opt/source');
 #   my $zd=<<END;
@@ -730,7 +734,7 @@ END
 #END
 #   ($stdout,$stderr)=$handle->cmd(
 #      "echo -e \"$zd\" > sourceguardian.ini");
-#   ($stdout,$stderr)=$handle->cmd('sudo '.
+#   ($stdout,$stderr)=$handle->cmd($sudo.
 #      "mv -fv sourceguardian.ini /etc/php.d",'__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
 #   my $ad=<<END;
@@ -782,11 +786,11 @@ END
    }
    ($stdout,$stderr)=$handle->cmd("uname -a");
    if ($stdout=~/Ubuntu/i) {
-      ($stdout,$stderr)=$handle->cmd(
-         "sudo apt-get -y install git-all",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'apt-get -y install git-all','__display__');
    } else {
-      ($stdout,$stderr)=$handle->cmd(
-         "sudo yum -y -v install git-all",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y -v install git-all','__display__');
    }
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
    #https://community.letsencrypt.org/t/help-with-certbot-on-the-new-amazon-linux-2/49399/7
@@ -812,19 +816,19 @@ END
       'certbot-auto');
    ($stdout,$stderr)=$handle->cmd("${sudo}sed -i \"s/%SQ%/\'/g\" ".
       'certbot-auto');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://github.com/arslancb/clipbucket.git','__display__');
 my $z=0;
 if ($z==1) {
    my $cb_tar='clipbucket-2.8.v3354-stable.zip';
    my $cb_md5='7dc581a36120592035b18cf8b7111916';
    foreach my $count (1..3) {
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "wget --random-wait --progress=dot ".
          "https://sourceforge.net/projects/clipbucket/files/ClipBucket%20v2/".
          $cb_tar,'__display__');
-      ($stdout,$stderr)=$handle->cmd(
-         "sudo md5sum -c - <<<\"$cb_md5 $cb_tar\"",
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "md5sum -c - <<<\"$cb_md5 $cb_tar\"",
          '__display__');
       unless ($stderr) {
          print(qq{ + CHECKSUM Test for $cb_tar *PASSED* \n});
@@ -834,12 +838,13 @@ if ($z==1) {
                "after $count attempts\n";
          &Net::FullAuto::FA_Core::cleanup;
       }
-      ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $cb_tar",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "rm -rvf $cb_tar",'__display__');
    }
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "unzip $cb_tar",'__display__');
    $cb_tar=~s/\.zip$//;
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "chmod -Rv 755 $cb_tar",'__display__');
    ($stdout,$stderr)=$handle->cwd("$cb_tar/upload");
 }
@@ -848,25 +853,25 @@ if ($z==1) {
       'git tag | sort -n | tail -1','__display__');
    chomp($stdout);
    # git ls-remote --tags git://github.com/arslancb/clipbucket
-   ($stdout,$stderr)=$handle->cmd(
-      "sudo git checkout $stdout",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git checkout $stdout",'__display__');
    ($stdout,$stderr)=$handle->cwd("upload");
    ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /var/www/html',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'chmod 777 /var','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -Rv . /var/www/html/clipbucket','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chmod -Rv 775 /var/www','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -Rv www-data:www-data /var/www','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'chmod -Rv 777 /var/www/html/clipbucket/cache','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'chmod -Rv 777 /var/www/html/clipbucket/files','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'chmod -Rv 777 /var/www/html/clipbucket/images','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'chmod -Rv 777 /var/www/html/clipbucket/includes','__display__');
    my $fa_builddir=fullauto_builddir($local,$sudo);
    my $ignore='';
@@ -885,7 +890,7 @@ if ($z==1) {
    ($stdout,$stderr)=$local->cmd($sudo.
       "rm -rvf fullauto_clickable_image.png",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'sudo chmod -Rv 777 /var/www/html/clipbucket/styles','__display__');
+      $sudo.'chmod -Rv 777 /var/www/html/clipbucket/styles','__display__');
    my $fullstyle=
       '                                <div class="fullauto">%NL%'.
       '                                        <a href="http://www.fullauto.com">%NL%'.
@@ -929,7 +934,7 @@ END
        "${sudo}sed -i 's/\\(^[<]div.*\\\)/                                \\1/' ".
        "/var/www/html/clipbucket/styles/cb_28/layout/header.html");
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
-   ($stdout,$stderr)=$handle->cmd("sudo wget -qO- http://icanhazip.com");
+   ($stdout,$stderr)=$handle->cmd($sudo.'wget -qO- http://icanhazip.com');
    my $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
    unless ($public_ip) {
       require Sys::Hostname;
@@ -1048,7 +1053,7 @@ END
    }
    ($stdout,$stderr)=$handle->cmd("sudo tar xvf $ossl.tar.gz",'__display__');
    ($stdout,$stderr)=$handle->cwd("../..");
-   my $make_nginx='sudo ./configure --sbin-path=/usr/local/nginx/nginx '.
+   my $make_nginx=$sudo.'./configure --sbin-path=/usr/local/nginx/nginx '.
                   '--conf-path=/usr/local/nginx/nginx.conf '.
                   '--pid-path=/usr/local/nginx/nginx.pid '.
                   "--with-http_ssl_module --with-pcre=objs/lib/$pcre ".
@@ -1059,123 +1064,6 @@ END
    ($stdout,$stderr)=$handle->cmd("${sudo}make install",'__display__');
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
-   ($stdout,$stderr)=$handle->cmd(
-      "${sudo}mkdir -vp /etc/nginx/ssl.key");
-   ($stdout,$stderr)=$handle->cmd(
-      "${sudo}mkdir -vp /etc/nginx/ssl.crt");
-   ($stdout,$stderr)=$handle->cmd(
-      "${sudo}mkdir -vp /etc/nginx/ssl.csr");
-   $handle->{_cmd_handle}->print(
-      "${sudo}openssl genrsa -des3 -out ".
-      "/etc/nginx/ssl.key/$public_ip.key 2048");
-   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
-   $prompt=~s/\$$//;
-   while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($handle);
-      last if $output=~/$prompt/;
-      print $output;
-      if (-1<index $output,'pass phrase for') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
-         $output='';
-         next;
-      } elsif (-1<index $output,'Verifying - Enter') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
-         $output='';
-         next;
-      }
-   }
-   while (1) {
-      my $trys=0;
-      my $ereturn=eval {
-         local $SIG{ALRM} = sub { die "alarm\n" }; # \n required
-         alarm 7;
-         $handle->{_cmd_handle}->print(
-            "${sudo}openssl req -new -key /etc/nginx/ssl.key/$public_ip.key ".
-            "-out /etc/nginx/ssl.csr/$public_ip.csr");
-         my $test='';my $output='';
-         while (1) {
-            $output.=Net::FullAuto::FA_Core::fetch($handle);
-            $test.=$output;
-            $test=~tr/\0-\11\14-\37\177-\377//d;
-            return 'DONE' if $output=~/$prompt/;
-            print $output;
-            $test=~s/\n//gs;
-            if ($test=~/Enter pass phrase.*key:/s) {
-               $handle->{_cmd_handle}->print($service_and_cert_password);
-               $output='';
-               $test='';
-               next;
-            } elsif ((-1<index $test,'[AU]:') ||
-                  (-1<index $test,'[XX]:')) {
-               $handle->{_cmd_handle}->print();
-               $output='';
-               $test='';
-               next;
-            } elsif ((-1<index $test,'[Some-State]:') ||
-                  (-1<index $test,'State or Province')) {
-               $handle->{_cmd_handle}->print();
-               $output='';
-               $test='';
-               next;
-            } elsif (-1<index $test,'city') {
-               $handle->{_cmd_handle}->print();
-               $output='';
-               $test='';
-               next;
-            } elsif ((-1<index $test,'Pty Ltd]:') ||
-                  (-1<index $test,'company')) {
-               $handle->{_cmd_handle}->print();
-               $output='';
-               $test='';
-               next;
-            } elsif (-1<index $test,'section) []:') {
-               $handle->{_cmd_handle}->print();
-               $output='';
-               $test='';
-               next;
-            } elsif ((-1<index $test,'YOUR name) []:') ||
-                  (-1<index $test,'Common Name')) {
-               $handle->{_cmd_handle}->print();
-               $output='';
-               $test='';
-               next;
-            } elsif (-1<index $test,'Address []:') {
-               $handle->{_cmd_handle}->print();
-               $output='';
-               $test='';
-               next;
-            } elsif (-1<index $test,'challenge password []:') {
-               $handle->{_cmd_handle}->print();
-               $output='';
-               $test='';
-               next;
-            } elsif (-1<index $test,'company name []:') {
-               $handle->{_cmd_handle}->print();
-               $output='';
-               $test='';
-               next;
-            }
-         }
-         return 'DONE';
-      };
-      alarm(0);
-      last if $ereturn eq 'DONE' || $trys++>3;
-   }
-   $handle->{_cmd_handle}->print(
-      "${sudo}openssl x509 -req -days 365 -in ".
-      "/etc/nginx/ssl.csr/$public_ip.csr -signkey ".
-      "/etc/nginx/ssl.key/$public_ip.key -out ".
-      "/etc/nginx/ssl.crt/$public_ip.crt");
-   while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($handle);
-      last if $output=~/$prompt/;
-      print $output;
-      if (-1<index $output,'Enter pass phrase') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
-         $output='';
-         next;
-      }
-   }
    ($stdout,$stderr)=$handle->cmd("${sudo}sed -i 's/1024/64/' ".
        "/usr/local/nginx/nginx.conf");
    $ad='          fastcgi_split_path_info ^(.+\\\\.php)(/.+)\$;%NL%'.
@@ -1318,12 +1206,12 @@ END
    $ad='%NL%        location /static {'.
        "%NL%            root /var/www/html/clipbucket/root;".
        '%NL%        }%NL%'.
-       '%NL%        ssl off;'.
-       "%NL%        ssl_certificate /etc/nginx/ssl.crt/$public_ip.crt;".
-       "%NL%        ssl_certificate_key /etc/nginx/ssl.key/$public_ip.key;".
-       '%NL%        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;'.
-       '%NL%        ssl_ciphers '.
-       '"HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";';
+       '%NL%        ssl off;';
+   #    "%NL%        ssl_certificate /etc/nginx/ssl.crt/$public_ip.crt;".
+   #    "%NL%        ssl_certificate_key /etc/nginx/ssl.key/$public_ip.key;".
+   #    '%NL%        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;'.
+   #    '%NL%        ssl_ciphers '.
+   #    '"HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";';
    ($stdout,$stderr)=$handle->cmd(
       "${sudo}sed -i \'/404/a$ad\' /usr/local/nginx/nginx.conf");
    ($stdout,$stderr)=$handle->cmd(
@@ -1369,18 +1257,143 @@ END
    ($stdout,$stderr)=$handle->cmd(
        "${sudo}sed -i '/^          fastcgi_index/{n;N;d}' ".
        '/usr/local/nginx/nginx.conf');
-   $handle->{_cmd_handle}->print($sudo.'/usr/local/nginx/nginx');
-   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
-   while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($handle);
-      last if $output=~/$prompt/;
-      print $output;
-      if (-1<index $output,'PEM pass phrase') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
-         $output='';
-         next;
-      }
-   }
+   #$handle->{_cmd_handle}->print($sudo.'/usr/local/nginx/nginx');
+   #$prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   #while (1) {
+   #   my $output.=Net::FullAuto::FA_Core::fetch($handle);
+   #   last if $output=~/$prompt/;
+   #   print $output;
+   #   if (-1<index $output,'PEM pass phrase') {
+   #      $handle->{_cmd_handle}->print($service_and_cert_password);
+   #      $output='';
+   #      next;
+   #   }
+   #}
+
+   #
+   # echo-ing/streaming files over ssh can be tricky. Use echo -e
+   #          and replace these characters with thier HEX
+   #          equivalents (use an external editor for quick
+   #          search and replace - and paste back results.
+   #          use copy/paste or cat file and copy/paste results.):
+   #
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
+   #          "  -   \\x22     \  -  \\x5C
+   #          $  -   \\x24     %  -  \\x25
+   #
+   # https://www.lisenet.com/2014/ - bash approach to conversion
+   my $nginxconf=<<END;
+#\\x21/bin/sh
+#
+# nginx - this script starts and stops the nginx daemin
+#
+# chkconfig:   - 85 15
+# description:  Nginx is an HTTP(S) server, HTTP(S) reverse #               proxy and IMAP/POP3 proxy server
+# processname: nginx
+# config:      /usr/local/nginx/nginx.conf
+# pidfile:     /usr/local/nginx/nginx.pid
+# user:        www-data
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ \\x22\\x24NETWORKING\\x22 = \\x22no\\x22 ] && exit 0
+
+nginx=\\x22/usr/local/nginx/nginx\\x22
+prog=\\x24(basename \\x24nginx)
+
+NGINX_CONF_FILE=\\x22/usr/local/nginx/nginx.conf\\x22
+
+lockfile=/usr/local/nginx/nginx.lock
+
+start() {
+    [ -x \\x24nginx ] || exit 5
+    [ -f \\x24NGINX_CONF_FILE ] || exit 6
+    echo -n \\x24\\x22Starting \\x24prog: \\x22
+    daemon \\x24nginx -c \\x24NGINX_CONF_FILE
+    retval=\\x24?
+    echo
+    [ \\x24retval -eq 0 ] && touch \\x24lockfile
+    return \\x24retval
+}
+
+stop() {
+    echo -n \\x24\\x22Stopping \\x24prog: \\x22
+    killproc \\x24prog -QUIT
+    retval=\\x24?
+    echo
+    [ \\x24retval -eq 0 ] && rm -f \\x24lockfile
+    return \\x24retval
+}
+
+restart() {
+    configtest || return \\x24?
+    stop
+    start
+}
+
+reload() {
+    configtest || return \\x24?
+    echo -n \\x24\\x22Reloading \\x24prog: \\x22 
+    killproc \\x24nginx -HUP
+    RETVAL=\\x24?
+    echo
+}
+
+force_reload() {
+    restart
+}
+
+configtest() {
+  \\x24nginx -t -c \\x24NGINX_CONF_FILE
+}
+
+rh_status() {
+    status \\x24prog
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
+
+case \\x22\\x241\\x22 in
+    start)
+        rh_status_q && exit 0
+        \\x241
+        ;;
+    stop)
+        rh_status_q || exit 0
+        \\x241
+        ;;
+    restart|configtest)
+        \\x241
+        ;;
+    reload)
+        rh_status_q || exit 7
+        \\x241
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+            ;;
+    \\x2A)
+        echo \\x24\\x22Usage: \\x240 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest}\\x22
+        exit 2
+esac
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$nginxconf\" > /opt/source/nginx");
+   ($stdout,$stderr)=$handle->cmd(
+      'cp -v /opt/source/nginx /etc/init.d','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'/etc/init.d/mysql start',
       '__display__');
    if ($stderr) {
@@ -1618,9 +1631,42 @@ END
       "sed -i \'s/max_execution_time = 30/max_execution_time = 7500/\' ".
       "/usr/local/php7/lib/php.ini");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \'s/memory_limit = 128M/memory_limit = 256M/\' ".
-      "/usr/local/php7/lib/php.ini");
+      'sed -i \'s/memory_limit = 128M/memory_limit = 256M/\' '.
+      '/usr/local/php7/lib/php.ini');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v /usr/local/php7/lib/php.ini /usr/local/php7/etc',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm restart');
+   # https://aaronsadler.uk/2016/june/26/mount-google-drive-on-headless-centos-7-server/
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install ocaml ocaml-camlp4-devel ocaml-ocamldoc',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install gmp-devel.x86_64',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone https://github.com/OCamlPro/opam.git','__display__');
+   ($stdout,$stderr)=$handle->cwd('opam');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make lib-ext','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'./configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('..');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install m4 fuse fuse-devel libcurl-devel libsqlite3x-devel zlib-devel',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'yum -y install bubblewrap',
+      '__display__');
+#   ($stdout,$stderr)=$handle->cmd($sudo.
+#      'opam init','__display__');
+#   ($stdout,$stderr)=$handle->cmd($sudo.
+#      'opam update','__display__');
+#   ($stdout,$stderr)=$handle->cmd($sudo.
+#      'opam install google-drive-ocamlfuse',
+#      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /google-drive','__display__');
    my $substitute_email_module='%NL%'.
 '#####################################################%NL%'.
 '# Inserted by FullAuto to handle Amazon SES passwords%NL%'.
@@ -1668,12 +1714,12 @@ END
    ($stdout,$stderr)=$handle->cmd("${sudo}sed -i ".
       "'/MsgHTML/,+8 s/^/#/' ".
       'functions.php');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's/webmaster\@website/".$verified_email."/' ".
       'functions.php');
    ($stdout,$stderr)=$handle->cmd_raw('cat functions.php | sudo '.
       'bash -ic "awk \'{ sub(/\r$/,\"\"); print }\' > temp.php"');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'mv -fv temp.php functions.php','__display__');
    ($stdout,$stderr)=$handle->cwd("/var/www/html/clipbucket/cb_install/sql");
    my %smtp_host=('us-east-1' => 'email-smtp.us-east-1.amazonaws.com',
@@ -1684,50 +1730,50 @@ END
    if (exists $smtp_host{$region}) {
       $smtp_host=$smtp_host{$region};
    }
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's/webmaster\@website/".$verified_email."/' ".
       'add_admin.sql');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/2, '777750fea4d3bd585bf47dc1873619fc'/".
       "2, '38d8e594a1ddbd29fdba0de385d4fefa'/\" ".
       'add_admin.sql');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's/webmaster\@localhost/".$verified_email."/' ".
       'configs.sql');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/'mail'/'smtp'/\" ".
       'configs.sql');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/'smtp_host', ''/'smtp_host', '".$smtp_host.
       "'/\" configs.sql");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s#'baseurl', ''#'baseurl', 'https://".$public_ip.
       "'#\" configs.sql");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s#'basedir', ''#'basedir', '/var/www/html/clipbucket".
       "'#\" configs.sql");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/'smtp_user', ''/'smtp_user', '".$access_id.
       "'/\" configs.sql");
    $smtppass=~s/\//\\\//g;
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/'smtp_pass', ''/'smtp_pass', '".$smtppass.
       "'/\" configs.sql");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/'smtp_auth', 'no'/'smtp_auth', 'yes'/\"".
       " configs.sql");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/'smtp_port', ''/'smtp_port', '25'/\"".
       " configs.sql");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/{tbl_prefix}_video/{tbl_prefix}video/\"".
       " structure.sql");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/{tbl_prefix}_groups/{tbl_prefix}groups/\"".
       " structure.sql");
    my $datestring = strftime "%Y-%d-%e %H:%M:%S", localtime;
    $datestring=sprintf($datestring);
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/now()/'".$datestring."'/\"".
       " categories.sql");
    my @sql=('structure','configs','ads_placements',
@@ -1735,7 +1781,7 @@ END
             'categories','add_admin');
    foreach my $file (@sql) {
       print "\nRUNNING $file.sql SQL FILE\n";
-      ($stdout,$stderr)=$handle->cmd('sudo '.
+      ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i \"s/{tbl_prefix}/cb_/\" $file.sql");
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mysql --verbose --force -u clipbucket -p'.
@@ -1743,21 +1789,21 @@ END
          '__display__');
    }
    ($stdout,$stderr)=$handle->cwd("/var/www/html/clipbucket/includes");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v /var/www/html/clipbucket/cb_install/clipbucket.php ".
       "/var/www/html/clipbucket/includes",'__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v dbconnect.sample.php dbconnect.php",'__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's/clipbucket_svn/clipbucket/' dbconnect.php");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i 's/root/clipbucket/' dbconnect.php");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/''/'".$service_and_cert_password."'/\" dbconnect.php");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'rm -rvf /var/www/html/clipbucket/cb_install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'chmod -Rv 755 /var/www/html/clipbucket/includes/','__display__');
    $ad=<<'END';
 \\x2A \\x2A \\x2A \\x2A \\x2A php -q /var/www/html/clipbucket/actions/video_convert.php
@@ -1765,13 +1811,13 @@ END
 0 0,12,13 \\x2A \\x2A \\x2A php -q /var/www/html/clipbucket/actions/update_cb_stats.php
 END
    ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > root");
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'cp root /var/spool/cron/','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'rm -rvf root','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'service crond restart','__display__');
-   ($stdout,$stderr)=$handle->cmd('sudo '.
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'rm -rvf /var/www/html/clipbucket/files/temp/install.me','__display__');
    use LWP::UserAgent;
    use HTTP::Request::Common;
@@ -1810,7 +1856,7 @@ END
 END
    print $starting_clipbucket;sleep 10;
    $region=~s/^.*['](.*)[']$/$1/;
-   ($stdout,$stderr)=$handle->cmd('sudo wget -qO- '.
+   ($stdout,$stderr)=$handle->cmd($sudo.'wget -qO- '.
       'http://docs.aws.amazon.com/ses/latest/DeveloperGuide/smtp-connect.html'
       );
    my @smtp_servers=();my $smtp_server='us-east-1';

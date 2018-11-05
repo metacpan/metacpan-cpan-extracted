@@ -1,5 +1,5 @@
 package Docker::Registry::IO;
-  use Moose::Role;
+  use Moo::Role;
 
   use Docker::Registry::Request;
   use Docker::Registry::Response;

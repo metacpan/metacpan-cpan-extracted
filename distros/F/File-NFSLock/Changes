@@ -1,5 +1,8 @@
 Revision history for Perl extension File::NFSLock.
 
+1.29  Nov 01 14:00 2018
+        - Avoid deprecated PERL_USE_UNSAFE_INC
+
 1.28  Nov 01 10:00 2018
         - Patch RT#130467 and RT#120088:
         - Handle "." not in @INC

@@ -17,6 +17,13 @@ This is the current built-in configuration file, showing all settings.
   // This is a relaxed JSON document, so comments are possible.
   
   {
+      // Includes. These are processed first, before the rest of
+      // the config file.
+      //
+      // "include" takes a list of either filenames or preset names.
+      // "include" : [ "modern1", "lib/mycfg.json" ],
+      "include" : [ "guitar" ],
+  
       // General settings, to be changed by legacy configs and
       // command line.
       "settings" : {
@@ -30,6 +37,16 @@ This is the current built-in configuration file, showing all settings.
   	// Suppress chords.
   	// Overrides --lyrics-only command line option.
   	"lyrics-only" : false,
+	// Memorize chords in sections, to be recalled by [^].
+	"memorize" : false,
+  	// Chords inline.
+  	// May be a string containing pretext %s posttext.
+  	// Defaults to "[%s]" if true.
+  	"inline-chords" : false,
+  	// Chords under the lyrics.
+  	"chords-under" : false,
+        // Transcoding.
+        "transcode" : null,
       },
   
       // Metadata.
@@ -47,22 +64,49 @@ This is the current built-in configuration file, showing all settings.
         "separator" : "; ",
       },
   
+      // Instrument settings. These are usually set by a separate
+      // config file.
+      //
+      "instrument" : null,
+  
+      // Note (chord root) names.
       // Strings and tuning.
-      // Note that using this will discard all built-in chords!
-      // "tuning" : [ "E2", "A2", "D3", "G3", "B3", "E4" ],
-      "tuning" : null,
+      "tuning" : [ "E2", "A2", "D3", "G3", "B3", "E4" ],
+
+      // In case of alternatives, the first one is used for output.
+      "notes" : {
+  
+  	"system" : "common",
+  
+  	"sharp" : [ "C", [ "C#", "Cis", "C♯" ],
+  		    "D", [ "D#", "Dis", "D♯" ],
+  		    "E",
+  		    "F", [ "F#", "Fis", "F♯" ],
+  		    "G", [ "G#", "Gis", "G♯" ],
+  		    "A", [ "A#", "Ais", "A♯" ],
+  		    "B",
+  		  ],
+  
+  	"flat" :  [ "C",
+  		    [ "Db", "Des",        "D♭" ], "D",
+  		    [ "Eb", "Es",  "Ees", "E♭" ], "E",
+  		    "F",
+  		    [ "Gb", "Ges",        "G♭" ], "G",
+  		    [ "Ab", "As",  "Aes", "A♭" ], "A",
+  		    [ "Bb", "Bes",        "B♭" ], "B",
+    		  ],
+      },
   
       // User defined chords.
       // "base" defaults to 1.
-      // "easy" is ignored.
       // Use 0 for an empty string, and -1 for a muted string.
+      // "fingers" is optional.
       "chords" : [
         //  {
   	//    "name"  : "Bb",
   	//    "base"  : 1,
   	//    "frets" : [ 1, 1, 3, 3, 3, 1 ],
   	//    "fingers" : [ 1, 1, 2, 3, 4, 1 ],
-  	//    "easy"  : true,
   	//  },
       ],
   
@@ -81,6 +125,15 @@ This is the current built-in configuration file, showing all settings.
       // Diagnostig messages.
       "diagnostics" : {
 	  "format" : "\"%f\", line %n, %m\n\t%l",
+      },
+  
+      // Table of contents.
+      "toc" : {
+  	  // Title for ToC.
+  	  "title" : "Table of Contents",
+	  // Sorting order.
+	  // Currently only sorting by page number and alpha is implemented.
+	  "order" : "page",
       },
   
       // Layout definitions for PDF output.
@@ -131,8 +184,9 @@ This is the current built-in configuration file, showing all settings.
 		"width"  :  1,
 		"color"  : "black",
 	    },
+	    "tag" : "Chorus",
             // Recall style: Print the tag using the type.
-            // Optionally quote the lines of the preceding chorus.
+            // Alternatively quote the lines of the preceding chorus.
             "recall" : {
                  "tag"   : "Chorus",
                  "type"  : "comment",
@@ -140,14 +194,28 @@ This is the current built-in configuration file, showing all settings.
             },
 	},
   
+	// Markup for sections (in progress).
+  	// Define what to do with begin_of_XXX directives.
+  	// Use fallback as fallback.
+  	// Default is to ignore them.
+  	"section" : {
+  	    // "fallback" : "comment",
+  	},
+  
+	// This opens a margin for margin labels.
+	"labels" : {
+	    // Margin width. Default is 0 (no margin labels).
+            // "auto" will automatically reserve a margin if labels are used.
+	    "width" : "auto",
+	    // Alignment for the labels. Default is left.
+	    "align" : "left",
+	},
+  
   	// Alternative songlines with chords in a side column.
   	// Value is the column position.
   	// "chordscolumn" : 400,
   	"chordscolumn" :  0,
-  
-  	// Alternative placement for chord diagrams.
-  	// Value is the column position.
-  	"diagramscolumn" :  0,
+	"capoheading" : "%{capo|Capo: %{}}",
   
 	// A {titles: left} may conflict with customized formats.
 	// Set to non-zero to ignore the directive.
@@ -162,7 +230,11 @@ This is the current built-in configuration file, showing all settings.
   	// The horizontal distance between diagrams is "hspace" cells.
   	// The vertical distance is "vspace" cells.
 	// "linewidth" is the thickness of the lines as a fraction of "width".
+	// Diagrams for all chords of the song can be shown at the
+  	// "top", "bottom" or "right" side of the first page,
+	// or "below" the last song line.
   	"diagrams" : {
+	    "show"     :  "bottom",
 	    "width"    :  6,
   	    "height"   :  6,
   	    "hspace"   :  3.95,
@@ -189,8 +261,6 @@ This is the current built-in configuration file, showing all settings.
   	    	"subtitle"  : null,
   		// Footer is title -- page number.
   	    	"footer"    : [ "%{title}", "", "%{page}" ],
-  		// Title for ToC.
-  		"toc-title" : "Table of Contents",
   	    },
   	    // The first page of a song has:
   	    "title" : {
@@ -235,7 +305,17 @@ This is the current built-in configuration file, showing all settings.
   	    },
   	    "comment" : {
   		"name" : "Helvetica",
-  		"size" : 12
+  		"size" : 12,
+		"background" : "#E5E5E5"
+  	    },
+  	    "comment_italic" : {
+  		"name" : "HelveticaOblique",
+  		"size" : 12,
+  	    },
+  	    "comment_box" : {
+  		"name" : "Helvetica",
+  		"size" : 12,
+		"frame" : 1
   	    },
   	    "tab" : {
   		"name" : "Courier",
@@ -267,6 +347,23 @@ This is the current built-in configuration file, showing all settings.
   	// This will show the page layout if non-zero.
   	"showlayout" : false,
       },
+  
+      // Settings for ChordPro backend.
+      "chordpro" : {
+  	  // Style of chorus.
+  	  "chorus" : {
+  	      // Recall style: Print the tag using the type.
+  	      // Alternatively quote the lines of the preceding chorus.
+	      // If no tag+type or quote: use {chorus}.
+	      // Note: Variant 'msp' always uses {chorus}.
+  	      "recall" : {
+  		   // "tag"   : "Chorus", "type"  : "comment",
+  		   "tag"   : "", "type"  : "",
+  		   // "quote" : false,
+  		   "quote" : false,
+  	      },
+  	  },
+      }
   }
   // End of config.
 

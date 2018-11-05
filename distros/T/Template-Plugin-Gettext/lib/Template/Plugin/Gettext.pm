@@ -21,10 +21,10 @@
 # ABSTRACT: Gettext Support For the Template Toolkit Version 2
 
 package Template::Plugin::Gettext;
-$Template::Plugin::Gettext::VERSION = '0.6';
+$Template::Plugin::Gettext::VERSION = '0.7';
 use strict;
 
-use Locale::TextDomain 1.20 qw(com.cantanea.Template-Plugin-Gettext);
+use Locale::TextDomain 1.30 qw(com.cantanea.Template-Plugin-Gettext);
 use Locale::Messages;
 use Locale::Util qw(web_set_locale);
 use Encode;
@@ -191,16 +191,9 @@ sub new {
 }
 
 sub __fixup {
-    my ($msgid, $trans, $msgid_plural, $count) = @_;
-
-    if (@_ > 2) {
-        ($trans, $msgid_plural, $count) = ($msgid_plural, $count, $trans);
-    }
-    my $ref = @_ > 2 && $count != 1 ? $msgid_plural : $msgid;
     my $trans = $_[-1];
-    if ($trans ne $ref && Encode::is_utf8($ref, 0)) {
-        Encode::_utf8_on($trans);
-    }
+
+    Encode::_utf8_on($trans);
 
     return $trans;
 }

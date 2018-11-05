@@ -6,13 +6,13 @@ use strict;
 use warnings;
 
 package RT::Client::REST::User;
-$RT::Client::REST::User::VERSION = '0.52';
+$RT::Client::REST::User::VERSION = '0.53';
+use base 'RT::Client::REST::Object';
+
 use Params::Validate qw(:types);
 use RT::Client::REST 0.14;
-use RT::Client::REST::Object 0.01;
 use RT::Client::REST::Object::Exception 0.01;
 use RT::Client::REST::SearchResult 0.02;
-use base 'RT::Client::REST::Object';
 
 
 sub _attributes {{
@@ -179,7 +179,7 @@ RT::Client::REST::User - user object representation.
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

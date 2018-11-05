@@ -1,3 +1,6 @@
+#!perl
+# vim:ft=perl:
+
 use strict;
 use warnings;
 
@@ -217,4 +220,3 @@ throws_ok {
     $ticket->due_datetime(bless {}, 'foo');
 } 'RT::Client::REST::Object::InvalidValueException';
 
-# vim:ft=perl:

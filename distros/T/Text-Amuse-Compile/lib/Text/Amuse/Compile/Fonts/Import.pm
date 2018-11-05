@@ -108,9 +108,9 @@ sub import_with_fclist {
               \s*(.+?)(\,.+)?\s*:
               \s*style=(
                   Book|Roman|Medium|Regular|
-                  Italic|Oblique|
+                  Italic|Oblique|Slanted|
                   Bold|
-                  Bold\s*Italic|Bold\s*Oblique)$/x) {
+                  Bold\s*Italic|Bold\s*Oblique|Bold\s*Slanted)(,.*?)?$/x) {
             my $file = $1;
             my $name = $2;
             my $style = lc($4);
@@ -197,6 +197,7 @@ sub import_with_imagemagick {
 sub import_list {
     my $self = shift;
     my $list = $self->try_list;
+    local $ENV{LC_ALL} = 'C';
     my $specs = $self->import_with_fclist || $self->import_with_imagemagick;
     die "Cannot retrieve specs, nor with fc-list, nor with imagemagick" unless $specs;
     my @out;
@@ -206,8 +207,8 @@ sub import_list {
                 my $files = $found->{files};
                 my %styles = (
                               bold => $files->{bold},
-                              bolditalic => $files->{bolditalic} || $files->{boldoblique},
-                              italic => $files->{italic} || $files->{oblique},
+                              bolditalic => $files->{bolditalic} || $files->{boldoblique} ||  $files->{boldslanted},
+                              italic => $files->{italic} || $files->{oblique} || $files->{slanted},
                               regular => $files->{regular} || $files->{book} || $files->{roman} || $files->{medium},
                               name => $font,
                               desc => $font,

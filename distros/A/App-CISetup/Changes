@@ -1,3 +1,10 @@
+0.15     2018-11-03
+
+- The matrix.fast_finish key is now set to true for all Travis configs. See
+  https://blog.travis-ci.com/2013-11-27-fast-finishing-builds/ for an
+  explanation of what this does.
+
+
 0.14     2018-08-25
 
 - Added 5.28 to our list of Perl versions.

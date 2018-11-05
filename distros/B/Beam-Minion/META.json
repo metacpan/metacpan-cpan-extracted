@@ -4,7 +4,7 @@
       "Doug Bell <preaction@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -61,27 +61,27 @@
    "provides" : {
       "Beam::Minion" : {
          "file" : "lib/Beam/Minion.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Beam::Minion::Command::job" : {
          "file" : "lib/Beam/Minion/Command/job.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Beam::Minion::Command::run" : {
          "file" : "lib/Beam/Minion/Command/run.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Beam::Minion::Command::worker" : {
          "file" : "lib/Beam/Minion/Command/worker.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Beam::Minion::Util" : {
          "file" : "lib/Beam/Minion/Util.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "Beam::Runner::Command::minion" : {
          "file" : "lib/Beam/Runner/Command/minion.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -96,11 +96,12 @@
          "web" : "https://github.com/preaction/Beam-Minion"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

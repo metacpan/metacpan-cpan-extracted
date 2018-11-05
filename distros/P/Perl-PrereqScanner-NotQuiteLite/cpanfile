@@ -2,7 +2,7 @@ requires 'CPAN::Meta::Prereqs', '2.150010';
 requires 'CPAN::Meta::Requirements', '2.140';
 requires 'Data::Dump';
 requires 'Exporter', '5.57';
-requires 'Module::CPANfile', '1.1003';
+requires 'Module::CPANfile', '1.1004';
 requires 'Module::CoreList', '2.99';
 requires 'Module::Find';
 requires 'Regexp::Trie';

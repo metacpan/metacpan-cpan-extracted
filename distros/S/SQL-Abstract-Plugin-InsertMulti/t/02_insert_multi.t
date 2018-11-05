@@ -108,6 +108,24 @@ subtest "insert_multi" => sub {
             );
         } "ARRAYREFREF";
     };
+
+    subtest 'with returning option' => sub {
+        my ($stmt, @bind) = $sql->insert_multi(
+            'example',
+            [
+                +{ foo => 'a', bar => 'b' },
+                +{ foo => 'c', bar => 'd' }
+            ],
+            { returning => [qw(foo bar)] }
+        );
+
+        is (
+            $stmt,
+            q|INSERT INTO example ( bar, foo ) VALUES ( ?, ? ), ( ?, ? ) RETURNING foo, bar|
+        );
+
+        is_deeply(\@bind, [qw(b a d c)]);
+    };
 };
 
 subtest "update_multi" => sub {

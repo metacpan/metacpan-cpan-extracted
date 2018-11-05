@@ -702,4 +702,4 @@ all rights reserved.
 
 =head1 SEE ALSO
 
-Getopt::Long(3pm), xgettext(1), perl(1)
+L<Getopt::Long>, L<xgettext(1)>, L<perl>

@@ -8,9 +8,28 @@ use Storable qw(dclone);
 
 use constant DEBUG => $ENV{JSON_TRANSFORM_DEBUG};
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our @EXPORT_OK = qw(
   parse_transform
+);
+
+my %QUOTED2LITERAL = (
+  b => "\b",
+  f => "\f",
+  n => "\n",
+  r => "\r",
+  t => "\t",
+  '\\' => "\\",
+  '$' => "\$",
+  '`' => "`",
+  '"' => '"',
+  '/' => "/",
+);
+my %IS_BACKSLASH_ENTITY = map {$_=>1} qw(
+  jsonBackslashDouble
+  jsonBackslashDollar
+  jsonBackslashQuote
+  jsonBackslashGrave
 );
 
 sub parse_transform {
@@ -104,7 +123,7 @@ sub _apply_mapping {
 
 sub _make_sysvals {
   my ($pair, $pairs) = @_;
-  my %vals = (EO => {}, EA => []);
+  my %vals = ();
   $vals{C} = scalar @$pairs if $pairs;
   @vals{qw(K V)} = @$pair if $pair;
   return \%vals;
@@ -147,11 +166,40 @@ sub _eval_expr {
         my $key = _eval_expr($topdata, $keyexpr, $sysvals, $uservals);
         my $addvalue = _eval_expr($topdata, $valueexpr, $sysvals, $uservals);
         $value->{$key} = $addvalue;
+      } elsif ($othername eq 'exprApplyJsonPointer') {
+        my ($ptrexpr) = @{$_->{children}};
+        return _eval_expr($value, $ptrexpr, $sysvals, $uservals);
       } else {
         die "Unknown expression modifier '$othername'";
       }
     }
     return $value;
+  } elsif ($IS_BACKSLASH_ENTITY{$name}) {
+    my ($what) = @{$expr->{children}};
+    my $really = $QUOTED2LITERAL{$what};
+    die "Unknown $name '$what'" if !defined $really;
+    return $really;
+  } elsif ($name eq 'jsonUnicode') {
+    my ($what) = @{$expr->{children}};
+    return chr hex $what;
+  } elsif ($name eq 'exprArrayLiteral') {
+    my @contents = @{$expr->{children} || []};
+    my @data;
+    for (@contents) {
+      my $value = _eval_expr($topdata, $_, $sysvals, $uservals);
+      push @data, $value;
+    }
+    return \@data;
+  } elsif ($name eq 'exprObjectLiteral') {
+    my @colonPairs = @{$expr->{children} || []};
+    my %data;
+    for (@colonPairs) {
+      my ($keyexpr, $valueexpr) = @{$_->{children}};
+      my $key = _eval_expr($topdata, $keyexpr, $sysvals, $uservals);
+      my $value = _eval_expr($topdata, $valueexpr, $sysvals, $uservals);
+      $data{$key} = $value;
+    }
+    return \%data;
   } else {
     die "Unknown expr type '$name'";
   }
@@ -285,6 +333,23 @@ To bind a variable, then replace the whole data structure:
   $defs <- "/definitions"
   "" <- $defs
 
+A slightly complex transformation, using the L<jt> script:
+
+  $ cat <<EOF | jt '"" <- "/Time Series (Daily)" <% [ .{ `date`: $K, `close`: $V<"/4. close" } ]'
+  {
+    "Meta Data": {},
+    "Time Series (Daily)": {
+      "2018-10-26": { "1. open": "", "4. close": "106.9600" },
+      "2018-10-25": { "1. open": "", "4. close": "108.3000" }
+    }
+  }
+  EOF
+  # produces:
+  [
+    {"date":"2018-10-25","close":"108.3000"},
+    {"date":"2018-10-26","close":"106.9600"}
+  ]
+
 =head2 Expression types
 
 =over
@@ -364,6 +429,17 @@ concatenated in the obvious way, and numbers will be coerced into strings
 (be careful of locale). Booleans and nulls will be stringified into
 C<[true]>, C<[false]>, C<[null]>.
 
+=head2 Literal arrays
+
+These are a single value of type array, expressed as surrounded by C<.[]>,
+with zero or more comma-separated single values.
+
+=head2 Literal objects/hashes
+
+These are a single value of type object/hash, expressed as surrounded
+by C<.{}>, with zero or more comma-separated colon pairs (see "Mapping
+to an object/hash", below).
+
 =head2 Mapping expressions
 
 A mapping expression has a source-value, a mapping operator, and a
@@ -424,6 +500,12 @@ The operand value must be of type object/hash.
 The argument must be a string-value.
 The return value will be the object/hash without that key.
 
+=head3 C<< < >>
+
+The operand value must be of type object/hash or array.
+The argument must be a JSON pointer.
+The return value will be the value, but having had the JSON pointer applied.
+
 =head2 Available system variables
 
 =head3 C<$K>
@@ -438,14 +520,6 @@ Available in mapping expressions. For each data pair, set to the value.
 =head3 C<$C>
 
 Available in mapping expressions. Set to the integer number of values.
-
-=head3 C<$EO>
-
-An empty object/hash.
-
-=head3 C<$EA>
-
-An empty array.
 
 =head2 Comments
 

@@ -40,7 +40,7 @@ xgettext-txt - Create PO files from text files
 
 =head1 DESCRIPTION
 
-Reads one ore more text files and turns every paragraph into a
+Reads one or more text files and turns every paragraph into a
 translatable string in a PO, resp. .pot file.
 
 See the
@@ -66,4 +66,4 @@ There is NO WARRANTY, to the extent permitted by law.
 
 =head1 SEE ALSO
 
-L<Locale::XGettext>, L<perl>, B<xgettext(1)>
+L<Locale::XGettext>, L<perl>, L<xgettext(1)>

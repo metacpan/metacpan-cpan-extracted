@@ -4,7 +4,7 @@
       "Sebastian Riedel <sri@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3503, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -79,6 +79,7 @@
             "MooseX::MethodAttributes::Role::AttrContainer::Inheritable" : "0.24",
             "MooseX::Role::WithOverloading" : "0.09",
             "Path::Class" : "0.09",
+            "PerlIO::utf8_strict" : "0",
             "Plack" : "0.9991",
             "Plack::Middleware::Conditional" : "0",
             "Plack::Middleware::ContentLength" : "0",
@@ -138,7 +139,7 @@
       "x_IRC" : "irc://irc.perl.org/#catalyst",
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst"
    },
-   "version" : "5.90120",
+   "version" : "5.90122",
    "x_authority" : "cpan:MSTROUT",
    "x_breaks" : {
       "Catalyst::Action::REST" : "<= 0.67",
@@ -168,5 +169,5 @@
       "Reaction" : "<= 0.001999",
       "Test::WWW::Mechanize::Catalyst" : "<= 0.53"
    },
-   "x_serialization_backend" : "JSON::MaybeXS version 1.004"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

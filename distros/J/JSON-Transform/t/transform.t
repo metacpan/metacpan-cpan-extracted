@@ -94,18 +94,57 @@ my @OPS = (
     2
   ],
   [
-    'EA system variable',
+    'literal empty array',
     q{
       $a <- "/a"
       $b <- "/b"
-      "" <- $EA
+      "" <- .[]
       "/0" <- $b
       "/1" <- $a
-      -- second use of EA ensures not mutating a global!
-      "/2" <- $EA
+      -- second use of .[] ensures not mutating a global!
+      "/2" <- .[]
     },
     { a => {k=>'va'}, b => {k=>'vb'} },
     [ {k=>'vb'}, {k=>'va'}, [] ],
+  ],
+  [
+    'other string tokens',
+    '"" <- `hi\u0021\n`',
+    { a => 1, b => 2 },
+    "hi!\n",
+  ],
+  [
+    'apply JSON pointer to expression',
+    '"" <- "/a"<"/b"',
+    { a => { b => 2 } },
+    2,
+  ],
+  [
+    'array literal',
+    '"" <- .[ `hi`, `there` ]',
+    { a => { b => 2 } },
+    [ 'hi', 'there' ],
+  ],
+  [
+    'hash literal',
+    '"" <- .{ `hi`: `there` }',
+    { a => { b => 2 } },
+    { 'hi' => 'there' },
+  ],
+  [
+    'complex transform',
+    '"" <- "/Time Series (Daily)" <% [ .{ `date`: $K, `close`: $V<"/4. close" } ]',
+    {
+      "Meta Data" => {},
+      "Time Series (Daily)" => {
+        "2018-10-26" => { "1. open" => "", "4. close" => "106.9600" },
+        "2018-10-25" => { "1. open" => "", "4. close" => "108.3000" },
+      }
+    },
+    [
+      { 'close' => '108.3000', 'date' => '2018-10-25' },
+      { 'close' => '106.9600', 'date' => '2018-10-26' },
+    ],
   ],
 );
 

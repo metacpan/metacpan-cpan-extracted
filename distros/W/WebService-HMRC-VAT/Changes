@@ -1,5 +1,9 @@
 Revision history for WebService-HMRC-VAT
 
+0.02    2018-11-05
+        Add test_mode support for `obligations` method
+        POD changes - fix spelling
+
 0.01    2018-08-16
         First version.
 

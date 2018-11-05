@@ -1,0 +1,42 @@
+---
+abstract: 'Markdown Files to HTML'
+author:
+  - 'Steve Dondley <s@dondley.com>'
+build_requires:
+  Modern::Perl: '0'
+  Test::More: '0'
+  vars: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-MarkdownFilesToHTML
+requires:
+  Carp: '0'
+  Dancer2: '0.206000'
+  Dancer2::Plugin: '0'
+  Data::Dumper: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  File::Slurper: '0'
+  File::Spec::Functions: '0'
+  HTML::TreeBuilder: '0'
+  Markdent: '0'
+  Markdent::Handler::HTMLStream::Fragment: '0'
+  Markdent::Parser: '0'
+  Moose: '0'
+  Storable: '0'
+  perl: v5.13.2
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sdondley/Dancer2-Plugin-MarkdownFilesToHTML/issues
+  repository: git://github.com/sdondley/Dancer2-Plugin-MarkdownFilesToHTML.git
+version: '0.006'
+x_generated_by_perl: v5.24.4
+x_serialization_backend: 'YAML::Tiny version 1.70'

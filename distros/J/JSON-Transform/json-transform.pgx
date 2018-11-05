@@ -19,7 +19,7 @@ transformation: .(/-/) (
 
 transformImpliedDest: jsonPointer exprMapping
 
-transformCopy: (jsonPointer | variableUser) .opCopyFrom -exprSingleValue exprMapping?
+transformCopy: (jsonPointer | variableUser) .opCopyFrom exprSingleValue exprMapping?
 
 transformMove: jsonPointer .opMoveFrom jsonPointer
 
@@ -41,18 +41,23 @@ exprObjectMapping: .(/- LCURLY -/) -colonPair .(/- RCURLY -/)
 
 colonPair: -exprStringValue .(/- COLON -/) exprSingleValue
 
-exprSingleValue: (jsonPointer | variableUser | variableSystem) -singleValueMod?
+exprObjectLiteral: .(/- DOT LCURLY -/) colonPair* %% .(/- COMMA -/) .(/- RCURLY -/)
 
-singleValueMod: (exprKeyAdd | exprKeyRemove)
+exprArrayLiteral: .(/- DOT LSQUARE -/) (exprSingleValue* %% .(/- COMMA -/)) .(/- RSQUARE -/)
+
+exprSingleValue: (jsonPointer | variableUser | variableSystem | exprStringQuoted | exprArrayLiteral | exprObjectLiteral) -singleValueMod?
+
+singleValueMod: (exprKeyAdd | exprKeyRemove | exprApplyJsonPointer)
 
 exprKeyAdd: .(/- AT -/) -colonPair
 
 exprKeyRemove: .(/- HASH -/) -exprStringValue
 
+exprApplyJsonPointer: .(/- LANGLE -/) jsonPointer
+
 exprStringValue: (jsonPointer | variableUser | variableSystem | exprStringQuoted)
 
-exprStringQuoted:
-  .(/ GRAVE /)
+stringValueCommon:
   (
     jsonUnicode
       |
@@ -60,11 +65,17 @@ exprStringQuoted:
       |
     jsonBackslashDollar
       |
-    jsonBackslashGrave
-      |
     variableUser
       |
     variableSystem
+  )
+
+exprStringQuoted:
+  .(/ GRAVE /)
+  (
+    -stringValueCommon
+      |
+    jsonBackslashGrave
       |
     jsonOtherNotGrave
   )*
@@ -72,22 +83,14 @@ exprStringQuoted:
 
 jsonOtherNotGrave: /( [^ GRAVE CONTROLS BACK DOLLAR ]+ )/ # Anything else
 
-jsonBackslashGrave: /( BACK GRAVE )/
+jsonBackslashGrave: .BACK /( GRAVE )/
 
 jsonPointer:
   .(/ DOUBLE /)
   (
-    jsonUnicode
-      |
-    jsonBackslashQuote
-      |
-    jsonBackslashDollar
+    -stringValueCommon
       |
     jsonBackslashDouble
-      |
-    variableUser
-      |
-    variableSystem
       |
     jsonOtherNotDouble
   )*
@@ -95,12 +98,12 @@ jsonPointer:
 
 jsonOtherNotDouble: /( [^ DOUBLE CONTROLS BACK DOLLAR ]+ )/ # Anything else
 
-jsonBackslashDouble: /( BACK DOUBLE )/
+jsonBackslashDouble: .BACK /( DOUBLE )/
 
-jsonBackslashDollar: /( BACK DOLLAR )/
+jsonBackslashDollar: .BACK /( DOLLAR )/
 
-jsonBackslashQuote: /(
-  BACK [
+jsonBackslashQuote: .BACK /(
+  [
     BACK    # Back Slash
     SLASH   # Forward Slash
     'b'     # Back Space
@@ -111,7 +114,7 @@ jsonBackslashQuote: /(
   ]
 )/
 
-jsonUnicode: /( BACK 'u' HEX{4} )/ # Unicode octet pair
+jsonUnicode: .(/ BACK 'u' /) /( HEX{4} )/ # Unicode octet pair
 
 variableUser: .(/- DOLLAR/) /([ LOWERS ] [ ALPHAS ]*)/
 

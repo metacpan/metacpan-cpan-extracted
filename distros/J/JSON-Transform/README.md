@@ -80,6 +80,23 @@ To bind a variable, then replace the whole data structure:
     $defs <- "/definitions"
     "" <- $defs
 
+A slightly complex transformation, using the [jt](https://metacpan.org/pod/jt) script:
+
+    $ cat <<EOF | jt '"" <- "/Time Series (Daily)" <% [ .{ `date`: $K, `close`: $V<"/4. close" } ]'
+    {
+      "Meta Data": {},
+      "Time Series (Daily)": {
+        "2018-10-26": { "1. open": "", "4. close": "106.9600" },
+        "2018-10-25": { "1. open": "", "4. close": "108.3000" }
+      }
+    }
+    EOF
+    # produces:
+    [
+      {"date":"2018-10-25","close":"108.3000"},
+      {"date":"2018-10-26","close":"106.9600"}
+    ]
+
 ## Expression types
 
 - Object/hash
@@ -146,6 +163,17 @@ concatenated in the obvious way, and numbers will be coerced into strings
 (be careful of locale). Booleans and nulls will be stringified into
 `[true]`, `[false]`, `[null]`.
 
+## Literal arrays
+
+These are a single value of type array, expressed as surrounded by `.[]`,
+with zero or more comma-separated single values.
+
+## Literal objects/hashes
+
+These are a single value of type object/hash, expressed as surrounded
+by `.{}`, with zero or more comma-separated colon pairs (see "Mapping
+to an object/hash", below).
+
 ## Mapping expressions
 
 A mapping expression has a source-value, a mapping operator, and a
@@ -200,6 +228,12 @@ The operand value must be of type object/hash.
 The argument must be a string-value.
 The return value will be the object/hash without that key.
 
+### `<`
+
+The operand value must be of type object/hash or array.
+The argument must be a JSON pointer.
+The return value will be the value, but having had the JSON pointer applied.
+
 ## Available system variables
 
 ### `$K`
@@ -214,14 +248,6 @@ Available in mapping expressions. For each data pair, set to the value.
 ### `$C`
 
 Available in mapping expressions. Set to the integer number of values.
-
-### `$EO`
-
-An empty object/hash.
-
-### `$EA`
-
-An empty array.
 
 ## Comments
 

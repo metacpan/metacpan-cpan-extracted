@@ -29,12 +29,20 @@ my $song = {
 	    'settings' => {
 			  },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'
 				  ]
 		      },
+	    'body' => [
+		       { type => "ignore",
+			 text => "{x_custom: foo}",
+			 context => "",
+		       },
+		      ],
 	   };
 
 is_deeply( { %{ $s->{songs}->[0] } }, $song,

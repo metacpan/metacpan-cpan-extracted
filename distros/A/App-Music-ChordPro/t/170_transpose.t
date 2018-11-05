@@ -4,19 +4,18 @@ use strict;
 use warnings;
 use utf8;
 use Test::More tests => 3;
+use App::Packager qw( :name App::Music::ChordPro );
 
 use App::Music::ChordPro::Config;
 use App::Music::ChordPro::Songbook;
 
 our $config = App::Music::ChordPro::Config::configurator;
-# Prevent a dummy {body} for chord grids.
-$config->{diagrams}->{show} = 0;
 my $s = App::Music::ChordPro::Songbook->new;
 
 my $data = <<EOD;
 {title: Swing Low Sweet Chariot}
 {key: D}
-I [D]looked over Jordan, and [G]what did I [D]see,
+I [D]looked over Jordan, and [G/B]what did I [D]see,
 EOD
 
 eval { $s->parsefile( \$data, { transpose => 3 } ) } or diag("$@");
@@ -33,6 +32,15 @@ my $song = {
 				  ],
 		      },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'chords' => {
+			 'origin' => 'song',
+			 'type' => 'diagrams',
+			 'show' => 'all',
+			 'chords' => [
+				      'F',
+				      'A#/D'
+				     ]
+			},
 	    'body' => [
                        {
 			 'context' => '',
@@ -45,13 +53,15 @@ my $song = {
 			 'chords' => [
 				       '',
 				       'F',
-				       'A#',
+				       'A#/D',
 				       'F'
 				     ],
 			 'type' => 'songline'
 		       }
 		      ],
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	   };
 
 is_deeply( { %{ $s->{songs}->[0] } }, $song, "Song contents" );

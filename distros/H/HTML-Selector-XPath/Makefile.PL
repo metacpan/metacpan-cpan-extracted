@@ -24,6 +24,7 @@ my %module = (
         #    }
         #}
     },
+    MIN_PERL_VERSION => '5.008001',
     BUILD_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },

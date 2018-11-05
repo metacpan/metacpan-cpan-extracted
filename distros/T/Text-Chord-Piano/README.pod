@@ -4,7 +4,7 @@ This is Perl module B<Text::Chord::Piano>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/Text-Chord-Piano"><img src="https://secure.travis-ci.org/bayashi/Text-Chord-Piano.png"/></a>
+<a href="http://travis-ci.org/bayashi/Text-Chord-Piano"><img src="https://secure.travis-ci.org/bayashi/Text-Chord-Piano.png"/></a> <a href="https://coveralls.io/r/bayashi/Text-Chord-Piano"><img src="https://coveralls.io/repos/bayashi/Text-Chord-Piano/badge.png?branch=master"/></a>
 
 =end html
 

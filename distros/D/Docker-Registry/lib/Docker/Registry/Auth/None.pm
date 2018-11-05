@@ -1,5 +1,5 @@
 package Docker::Registry::Auth::None;
-  use Moose;
+  use Moo;
   with 'Docker::Registry::Auth';
 
   sub authorize {

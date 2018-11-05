@@ -1,3 +1,6 @@
+0.75 Sat Nov  3 14:17:28 CET 2018
+ - Implement $LoadCode
+
 0.74 Fri Aug 31 18:06:17 PDT 2018
  - Fix tests on older perls
  - Support back to perl.5.8.1

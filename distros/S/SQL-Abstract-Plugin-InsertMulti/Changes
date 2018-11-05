@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::Abstract::Plugin::InsertMulti
 
+0.05 2018-11-05T06:44:12Z
+        Mon Nov  5 15:35:23 JST 2018
+        - Add support for SQL::Abstracts "returning" option for insert (by mschout)
+
 0.04
         Fri Oct 11 22:16:43 JST 2013
         - (Incompatible changes) Refuse ARRAYREF in VALUES parameter

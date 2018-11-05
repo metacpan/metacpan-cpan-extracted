@@ -7,6 +7,7 @@ exit 0 if $ENV{AUTOMATED_TESTING} && $] < 5.010000;
 use ExtUtils::MakeMaker 6.5503;
 
 my $master = 'lib/Data/iRealPro.pm';
+#my $version = '1.011_001';
 my $version = MM->parse_version($master);
 
 WriteMakefile
@@ -23,14 +24,14 @@ WriteMakefile
 		   },
 
  PREREQ_PM      => {
-		    'PDF::API2'    => 2.026,
-		    'Font::TTF'    => 1.06,
-		    'Data::Struct' => 1.701,
-		    'Text::CSV_XS' => 1.19,
-		    'JSON::PP'	   => 2.27300,
+		    'PDF::API2'      => 2.026,
+		    'Font::TTF'      => 1.06,
+		    'Data::Struct'   => 1.701,
+		    'Text::CSV_XS'   => 1.19,
+		    'JSON::PP'	     => 2.27300,
 		    'HTML::Entities' => 3.69,
-		    'App::Packager' => 1.420,
-		    # 'XML::LibXML'  => 2.0120, # assumed
+		    'App::Packager'  => 1.420,
+		    $ENV{DATA_IREALPRO_MUSICXML} ? ( 'XML::LibXML' => 2.0132 ) : (),
 		   },
  BUILD_REQUIRES  => {
 		    'Test::More'   => 1.001014,

@@ -1,0 +1,62 @@
+NAME
+
+    POE::Component::DirWatch::Object::NewUnmodifiedFile
+
+SYNOPSIS
+
+      use POE::Component::DirWatch::Object::NewUnmodifiedFile;
+    
+      #$watcher is a PoCo::DW:Object::NewUnmodifiedFile
+      my $watcher = POE::Component::DirWatch::Object::NewUnmodifiedFile->new
+        (
+         alias      => 'dirwatch',
+         directory  => '/some_dir',
+         filter     => sub { $_[0] =~ /\.gz$/ && -f $_[1] },
+         callback   => \&some_sub,
+         interval   => 1,
+        );
+    
+      $poe_kernel->run;
+
+DESCRIPTION
+
+    POE::Component::DirWatch::Object::NewUnmodifiedFile extends
+    DirWatch::Object in order to exclude files that have already been
+    processed
+
+Accessors
+
+ seen_files
+
+    Read-write. Will return a hash ref in with keys will be the full path
+    of all previously processed documents.
+
+Extended methods
+
+ dispatch
+
+    override 'dispatch' Don't dispatch if file has been seen.
+
+ poll
+
+    before 'poll' the list of known files is checked and if any of the
+    files no longer exist they are removed from the list of known files to
+    avoid the list growing out of control.
+
+AUTHOR
+
+    Dominic Humphries <perl@oneandoneis2.com> Based on
+    POE::Component::DirWatch::Object::NewFile by Guillermo Roditi,
+    <groditi@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2018- Dominic Humphries
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+

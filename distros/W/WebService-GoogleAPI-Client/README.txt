@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.17
+    version 0.18
 
 SYNOPSIS
 
@@ -118,7 +118,7 @@ METHODS
       print  $gapi_agent->api_query(
                 api_endpoint_id => 'gmail.users.messages.list', ## auto sets method to GET, path to 'https://www.googleapis.com/calendar'
               )->to_string;
-      #print Dumper $r;
+      #print pp $r;
     
     
       NB: including the version in the API Endpoint Spec is not supported .. yet? eg gmail:v1.users.messages.list .. will always use the latest stable version
@@ -190,7 +190,7 @@ METHODS DELEGATED TO WebService::GoogleAPI::Client::Discovery
     
             $new_hash->{ $api->{name} } = $api;
         }
-        print Dumper $new_hash->{gmail};
+        print dump $new_hash->{gmail};
 
  get_api_discovery_for_api_id
 

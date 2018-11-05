@@ -1,5 +1,10 @@
 ﻿Revision history for Perl module RT::Client::REST
 
+0.53 MOn Nov 05 2018 "Dean Hamstead" <dean@bytefoundry.com.au>"
+  - Fix some tests on Windows
+  - Various coding changes internally
+  - Expose CC Addresses and Admin CC Addresses on Queues
+
 0.52 Fri Apr 06 2018 "Dean Hamstead" <dean@bytefoundry.com.au>
   - Fix up lots of Pod Critic complaints
   - Fix up lots of Perl Critic complaints

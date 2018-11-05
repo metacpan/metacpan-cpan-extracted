@@ -1,5 +1,13 @@
 Revision history for Perl distribution Test-Class-Moose
 
+0.95     2018-11-03
+
+  [ENHANCEMENTS]
+
+  * The CLI class/role now accepts a --test-lib-dirs option. This lets you
+    tell it what directories contain test classes from the CLI.
+
+
 0.94     2018-08-18
 
   [BUG FIXES]

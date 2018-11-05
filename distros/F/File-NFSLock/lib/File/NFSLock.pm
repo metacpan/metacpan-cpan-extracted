@@ -2,7 +2,7 @@
 #
 #  File::NFSLock - bdpO - NFS compatible (safe) locking utility
 #
-#  $Id: NFSLock.pm,v 1.28 2014/11/10 14:00:00 hookbot Exp $
+#  $Id: NFSLock.pm,v 1.29 2018/11/01 14:00:00 bbb Exp $
 #
 #  Copyright (C) 2002, Paul T Seamons
 #                      paul@seamons.com
@@ -32,7 +32,7 @@ our $errstr;
 use base 'Exporter';
 our @EXPORT_OK = qw(uncache);
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 #Get constants, but without the bloat of
 #use Fcntl qw(LOCK_SH LOCK_EX LOCK_NB);
@@ -798,7 +798,7 @@ from which Mark Overmeer based Mail::Box::Locker.
   paul@seamons.com
   http://seamons.com/
 
-  Copyright (C) 2002-2014,
+  Copyright (C) 2002-2018,
   Rob B Brown
   bbb@cpan.org
 

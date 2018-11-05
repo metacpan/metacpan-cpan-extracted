@@ -88,7 +88,7 @@ EOW
         "Mike Doherty <doherty\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-InstallGuide",
-      "dist_version" => "1.200011",
+      "dist_version" => "1.200012",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::InstallGuide",
       "recursive_test_files" => 1,

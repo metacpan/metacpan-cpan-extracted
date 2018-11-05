@@ -20,12 +20,13 @@ sub new_auth_none {
 }
 
 package Test::Docker::Registry::FakeIO {
-    use Moose;
+    use Moo;
+    use Types::Standard qw/Int Str HashRef InstanceOf/;
     with 'Docker::Registry::IO';
 
     has status_code => (
         is      => 'rw',
-        isa     => 'Int',
+        isa     => Int,
         default => 200,
         writer  => 'set_status_code',
         lazy    => 1,
@@ -33,7 +34,7 @@ package Test::Docker::Registry::FakeIO {
 
     has content => (
         is      => 'rw',
-        isa     => 'Str',
+        isa     => Str,
         writer  => 'set_content',
         default => '',
         lazy    => 1,
@@ -41,7 +42,7 @@ package Test::Docker::Registry::FakeIO {
 
     has headers => (
         is      => 'rw',
-        isa     => 'HashRef',
+        isa     => HashRef,
         writer  => 'set_headers',
         lazy    => 1,
         default => sub { {} },
@@ -49,7 +50,7 @@ package Test::Docker::Registry::FakeIO {
 
     has response_to_return => (
         is  => 'rw',
-        isa => 'Docker::Registry::Response'
+        isa => InstanceOf['Docker::Registry::Response'],
     );
 
     sub send_request {

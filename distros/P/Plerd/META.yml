@@ -1,0 +1,67 @@
+---
+abstract: 'Ultralight blogging with Markdown and Dropbox'
+author:
+  - 'Jason McIntosh <jmac@jmac.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plerd
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plerd:
+    file: lib/Plerd.pm
+    version: '1.7'
+  Plerd::Init:
+    file: lib/Plerd/Init.pm
+  Plerd::Post:
+    file: lib/Plerd/Post.pm
+  Plerd::SmartyPants:
+    file: lib/Plerd/SmartyPants.pm
+  Plerd::Util:
+    file: lib/Plerd/Util.pm
+  Plerd::WebmentionQueue:
+    file: lib/Plerd/WebmentionQueue.pm
+requires:
+  App::Daemon: '0'
+  Data::GUID: '0'
+  DateTime: '0'
+  DateTime::Format::W3CDTF: '0'
+  File::ChangeNotify: '0'
+  File::HomeDir: '0'
+  FindBin: '0'
+  HTML::SocialMeta: '0.72'
+  HTML::Strip: '0'
+  List::Util: '1.45'
+  Mojolicious::Lite: '0'
+  Moose: '0'
+  Path::Class: '0'
+  Readonly: '0'
+  Template: '0'
+  Text::Markdown: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  Web::Mention: '0.6'
+  YAML: '0'
+version: '1.7'
+x_authority: cpan:JMAC
+x_contributors:
+  - 'Christian Sánchez <sanchezchristian@gmail.com>'
+  - 'David Turner <novalis@novalis.org>'
+  - 'Rebecca Turner <me@re-becca.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

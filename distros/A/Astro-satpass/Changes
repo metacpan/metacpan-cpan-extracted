@@ -1,3 +1,21 @@
+0.103		2018-11-03	T. R. Wyant
+    RT 127488: Load default Sun class before use
+    
+    This actually manifested in RT 127463 against SVG-Calendar. The smallest
+    self-contained piece of code to tickle this is
+      use Astro::Coord::ECI;
+      Astro::Coord::ECI->new()->get( 'sun' );
+    
+    The bug was introduced (or maybe just exacerbated) in version 0.100_01,
+    which was where I added support for alternate Sun classes. In the course
+    of this, 'use Astro::Coord::ECI::Sun' was dropped from
+    Astro::Coord::ECI::Moon and Astro::Coord::ECI::Star. The former is
+    involved in the SVG-Calendar problem.
+    
+    Thanks to Slaven Rezic for spotting this in his smoker, submitting the
+    original RT ticket, and adding me to it with the note that it seemed
+    only to be a problem with recent versions of Astro-satpass.
+
 0.102		2018-09-24	T. R. Wyant
     Almanac descriptions are now sensitive to object name. That is to
     say, if for some reason you designate a different name for the Sun,

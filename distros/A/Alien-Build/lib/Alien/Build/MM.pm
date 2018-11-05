@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.48'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 
 sub new
@@ -353,7 +353,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 
@@ -418,7 +418,7 @@ Adjust the arguments passed into C<WriteMakefile> as needed by L<Alien::Build>.
 
 =head2 mm_postamble
 
- my %args = $abmm->mm_args(%args);
+ my $postamble $abmm->mm_postamble;
 
 Returns the postamble for the C<Makefile> needed for L<Alien::Build>.
 This adds the following C<make> targets which are normally called when

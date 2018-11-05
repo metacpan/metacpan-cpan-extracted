@@ -30,7 +30,7 @@ For more information. please, see code.
 =cut
 
 package QBit::Application::Model::DBManager;
-$QBit::Application::Model::DBManager::VERSION = '0.021';
+$QBit::Application::Model::DBManager::VERSION = '0.022';
 use qbit;
 
 use base qw(QBit::Application::Model);
@@ -41,6 +41,9 @@ use QBit::Application::Model::DBManager::Filter;
 use Parse::Eyapp;
 
 use Exception::DBManager::Grammar;
+
+my $FILTER_PREFIX = 'QBit::Application::Model::DBManager::Filter';
+dynamic_loading($FILTER_PREFIX);
 
 __PACKAGE__->abstract_methods(qw(query add));
 
@@ -55,7 +58,7 @@ B<Return value:> $model_fields (type: ref of a hash)
 B<Example:>
 
   my $model_fields = $app->users->remove_model_fields();
-  
+
   # set new fields.
   $app->users->model_fields(...);
 
@@ -381,34 +384,17 @@ sub get_db_filter_fields {
 
     my $filter_fields = package_stash(ref($self))->{'__DB_FILTER__'};
 
-    if (exists($opts{fields})) {
-        foreach my $field (@{$opts{fields}}) {
-            throw Exception::BadArguments gettext('Filter by unknown field "%s" in model %s', $field, ref($self))
-              unless exists($filter_fields->{$field});
-        }
-    }
     my @fields = exists($opts{fields}) ? (@{delete($opts{fields})}) : (keys %$filter_fields);
 
-    foreach my $field (@fields) {
-        my $fdata = $filter_fields->{$field};
-
-        throw Exception::BadArguments gettext('Missed filter type (package: "%s", filter: "%s")', ref($self), $field)
-          unless defined($fdata->{'type'});
-        my $filter_class = 'QBit::Application::Model::DBManager::Filter::' . $fdata->{'type'};    #delete(
-        my $filter_fn    = "$filter_class.pm";
-        $filter_fn =~ s/::/\//g;
-        require $filter_fn or throw $!;
-
-        $self->{'__DB_FILTER__'}{$field} = $filter_class->new(%$fdata, field_name => $field, db_manager => $self);
-    }
-
-    my %fields = %{clone(package_stash(ref($self))->{'__DB_FILTER__'}) || {}};
+    my %fields = %{clone($filter_fields || {})};
 
     foreach my $field (@fields) {
         my $save = TRUE;
 
-        $save = $self->{'__DB_FILTER__'}{$field}->pre_process($fields{$field}, $field, %opts)
-          if $self->{'__DB_FILTER__'}{$field}->can('pre_process');
+        my $filter_field = $self->_get_filter_field($field, $filter_fields);
+
+        $save = $filter_field->pre_process($fields{$field}, $field, %opts)
+          if $filter_field->can('pre_process');
 
         unless ($save) {
             delete($fields{$field});
@@ -424,6 +410,26 @@ sub get_db_filter_fields {
     }
 
     return \%fields;
+}
+
+sub _get_filter_field {
+    my ($self, $field, $filter_fields) = @_;
+
+    unless (defined($self->{'__DB_FILTER__'}{$field})) {
+        throw Exception::BadArguments gettext('Filter by unknown field "%s" in model %s', $field, ref($self))
+          unless exists($filter_fields->{$field});
+
+        my $fdata = $filter_fields->{$field};
+
+        throw Exception::BadArguments gettext('Missed filter type (package: "%s", filter: "%s")', ref($self), $field)
+          unless defined($fdata->{'type'});
+
+        my $filter_class = $FILTER_PREFIX . '::' . $fdata->{'type'};
+
+        $self->{'__DB_FILTER__'}{$field} = $filter_class->new(%$fdata, field_name => $field, db_manager => $self);
+    }
+
+    return $self->{'__DB_FILTER__'}{$field};
 }
 
 sub get_db_filter_simple_fields {

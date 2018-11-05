@@ -30,7 +30,9 @@ my $song = {
 			   'titles' => 'left'
 			  },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'
@@ -59,7 +61,9 @@ $song = {
 			   'titles' => 'right'
 			  },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'
@@ -88,7 +92,9 @@ $song = {
 			   'titles' => 'center',
 			  },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'
@@ -117,7 +123,9 @@ $song = {
 			   'titles' => 'center',
 			  },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	    'meta' => {
 		       'title' => [
 				   'Swing Low Sweet Chariot'

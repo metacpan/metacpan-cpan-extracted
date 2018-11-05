@@ -198,6 +198,12 @@ E#myid
 
 ===
 --- selector
+p:not(#me)
+--- xpath
+//p[not(self::*[@id='me'])]
+
+===
+--- selector
 foo.bar, bar
 --- xpath
 //foo[contains(concat(' ', normalize-space(@class), ' '), ' bar ')] | //bar
@@ -629,3 +635,23 @@ form[name='foo']
 
 --- xpath
 //form[@name='foo']
+===
+--- selector
+E:last-of-type
+--- xpath
+//E[last()]
+===
+--- selector
+E:disabled
+--- xpath
+//E[@disabled]
+===
+--- selector
+E:selected
+--- xpath
+//E[@selected]
+===
+--- selector
+E:checked
+--- xpath
+//E[@checked]

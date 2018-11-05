@@ -1,5 +1,5 @@
 package Beam::Minion::Command::job;
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 # ABSTRACT: Command to manage minion jobs
 
 #pod =head1 SYNOPSIS
@@ -77,15 +77,14 @@ our $VERSION = '0.014';
 #pod
 #pod =cut
 
-use strict;
-use warnings;
+use Mojo::Base -base;
 use Beam::Minion::Util qw( build_mojo_app );
 use Minion::Command::minion::job;
 
+has app => sub { build_mojo_app() };
 sub run {
-    my ( $class, @args ) = @_;
-    my $app = build_mojo_app();
-    my $cmd = Minion::Command::minion::job->new( app => $app );
+    my ( $self, @args ) = @_;
+    my $cmd = Minion::Command::minion::job->new( app => $self->app );
     $cmd->run( @args );
 }
 
@@ -101,7 +100,7 @@ Beam::Minion::Command::job - Command to manage minion jobs
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

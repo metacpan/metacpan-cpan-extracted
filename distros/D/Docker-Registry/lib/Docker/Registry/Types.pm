@@ -4,15 +4,16 @@ use strict;
 
 # ABSTRACT: Moose like types defined for Docker::Registry
 
-use MooseX::Types::Moose qw(Str);
+use Types::Standard qw(Str);
 use URI;
-use MooseX::Types -declare => [
-    qw(
-        DockerRegistryURI
-    )
-];
+use Type::Library 
+  -base,
+  -declare => qw( DockerRegistryURI );
+use Type::Utils -all;
+use Types::Standard qw/Str/;
 
-class_type DockerRegistryURI, {class => 'URI' };
+class_type DockerRegistryURI, { class => 'URI' };
+
 coerce DockerRegistryURI, from Str, via { return URI->new($_); };
 
 1;

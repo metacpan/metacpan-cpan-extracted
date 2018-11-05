@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="59" height="20">
+  <linearGradient x2="0" y2="100%" id="smooth">
+    <stop stop-opacity=".1" offset="0" stop-color="#bbb"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <clipPath id="round">
+    <rect rx="3" width="59" fill="#fff" height="20"/>
+  </clipPath>
+  <g clip-path="url(#round)">
+    <rect height="20" fill="#555" width="29"/>
+    <rect x="29" width="30" fill="#e542f4" height="20"/>
+    <rect height="20" width="59" fill="url(#smooth)"/>
+  </g>
+  <g fill="#fff" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11" text-anchor="middle">
+    <text x="15.5" y="15" fill-opacity=".3" fill="#010101">foo</text>
+    <text x="15.5" y="14">foo</text>
+    <text x="43" fill="#010101" fill-opacity=".3" y="15">bar</text>
+    <text x="43" y="14">bar</text>
+  </g>
+</svg>

@@ -22,10 +22,19 @@ my $DOUBLE_PRECICE = 65536.5;
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
-# Anon package
+# variable length arguments
 {
-  ok(TestCase::Sub->anon_sub_call_anon_sub());
-  ok(TestCase::Sub->anon_sub_call_anon_sub_from_interface());
+  ok(TestCase::Sub->vaarg_objects_pass_each_values);
+  ok(TestCase::Sub->vaarg_objects_pass_array);
+  ok(TestCase::Sub->vaarg_pass_each_values);
+  ok(TestCase::Sub->vaarg_pass_array);
+}
+
+# Anon sub
+{
+  ok(TestCase::Sub->anon_sub_capture);
+  ok(TestCase::Sub->anon_sub_call_anon_sub);
+  ok(TestCase::Sub->anon_sub_call_anon_sub_from_interface);
 }
 
 # Return value

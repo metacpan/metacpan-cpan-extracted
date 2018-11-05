@@ -4,7 +4,7 @@ package Test::Class::Moose::CLI;
 
 use 5.010000;
 
-our $VERSION = '0.94';
+our $VERSION = '0.95';
 
 use Moose 2.0000;
 use Carp;
@@ -28,7 +28,7 @@ Test::Class::Moose::CLI - Use this in your tcm.t script for a drop-in runner too
 
 =head1 VERSION
 
-version 0.94
+version 0.95
 
 =head1 SYNOPSIS
 
@@ -132,6 +132,15 @@ C<HARNESS_IS_VERBOSE> environment variable is also true.
 The name of the runner class to use. Defaults to
 L<Test::Class::Moose::Runner>. This class will be loaded when creating the
 runner if it is not already loaded.
+
+=head2 --test-lib-dirs
+
+This should be the path to a directory containing test classes. The path can
+be relative to the project root (F<t/lib>) or absolute. If you do not pass
+this argument, it will default to F<t/lib>.
+
+You can pass this option more than once if you'd like to include multiple test
+directories.
 
 =head2 --timing-data-file
 

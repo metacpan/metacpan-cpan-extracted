@@ -1,5 +1,25 @@
 Revision history for Data-iRealPro
 
+1.12	2018-xx-xx
+
+	(Song) Fix typo in keymap that made key E undetectable.
+	For testing, set env DATA_IREALPRO_MUSICXML to require the
+	XML::LibXML module and perform the MusicXML tests.
+
+1.11	2018-11-01
+
+	Add App::Packager 1.420 until 1.430 works.
+	Make transpositions work.
+	(script/irealcvt) Add --generate.
+	(pp/linux) Update Makefile.
+	(irealpro.cgi) Remove superfluous actual key text.
+	(README) Move to GitHub.
+	(Makefile.PL) Index irealcvt, hide modules.
+	(irealpro.cgi) Show actual key as well.
+	(Output/JSON, Output/Text) Allow output to stdout.
+	(Output/JSON) Discard transpose.
+	Tidied up repo meta in the Makefile.PL script.
+
 1.10	2018-10-30
 
 	Add --transpose option.

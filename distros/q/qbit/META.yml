@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,6 +22,8 @@ requires:
   Date::Calc: '0'
   Exporter: '0'
   Fcntl: '0'
+  File::Find: '0'
+  File::Spec: '0'
   HTML::Entities: '0'
   JSON::XS: '0'
   Locale::Messages: '0'
@@ -36,4 +38,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: '2.6'
+version: '2.7'
+x_serialization_backend: 'YAML::Tiny version 1.70'

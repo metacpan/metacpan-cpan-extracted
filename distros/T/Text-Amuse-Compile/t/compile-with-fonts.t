@@ -15,7 +15,21 @@ use Data::Dumper;
 my $wd = File::Temp->newdir;
 my %fontfiles = map { $_ => File::Spec->catfile($wd, $_ . '.otf') } (qw/regular italic
                                                                         bold bolditalic/);
-my $font_re = qr{\{regular\.otf\}\[[^]]*?Path=\Q$wd\E[^]]*?\]}s;
+
+my $inopt_re =  qr{[^]]*?};
+
+my $pathre = qr{$inopt_re Path= \Q$wd\E $inopt_re}xs;
+
+unless ($wd =~ m/\A([A-Za-z0-9\.\/_-]+)\z/) {
+    $pathre = $inopt_re;
+}
+
+my $font_re = qr{\{regular\.otf\}\[
+                 $pathre
+                 BoldFont=bold\.otf $inopt_re
+                 BoldItalicFont=bolditalic\.otf $inopt_re
+                 ItalicFont=italic\.otf $inopt_re
+                 \]}sx;
 
 my $font_size_in_pt = qr{font-size:.*pt};
 

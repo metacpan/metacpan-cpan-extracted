@@ -1,0 +1,11 @@
+template: 'simple'
+plugins:
+  JSManager:
+    autoload: 1
+    libraries:
+      - jquery: 
+          uri: 'https://code.jquery.com/jquery-1.11.1.min.js'
+          fallback: '/js/jquery-1.11.1.min.js'
+      - growler: 
+          uri: '/js/jquery.growl.min.js'
+          injection_pt: 'body_top'

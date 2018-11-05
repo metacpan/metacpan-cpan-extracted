@@ -3,24 +3,26 @@ abstract: 'This module is a chord table generator of Piano by the text'
 author:
   - 'Dai Okabayashi <bayashi@cpan.org>'
 build_requires:
-  Test::More: 0.88
+  Test::More: '0.88'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Text-Chord-Piano
 provides:
   Text::Chord::Piano:
     file: lib/Text/Chord/Piano.pm
-    version: 0.061
+    version: '0.062'
 requires:
-  Carp: 0
-  Class::Accessor::Fast: 0
-  Music::Chord::Note: 0.07
+  Carp: '0'
+  Class::Accessor::Fast: '0'
+  Music::Chord::Note: '0.07'
   perl: v5.6.2
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.061
+version: '0.062'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

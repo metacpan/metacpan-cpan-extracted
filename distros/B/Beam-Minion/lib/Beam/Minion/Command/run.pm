@@ -1,5 +1,5 @@
 package Beam::Minion::Command::run;
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 # ABSTRACT: Command to enqueue a job on Beam::Minion job queue
 
 #pod =head1 SYNOPSIS
@@ -67,13 +67,12 @@ our $VERSION = '0.014';
 #pod
 #pod =cut
 
-use strict;
-use warnings;
+use Mojo::Base -base;
 use Beam::Minion;
 use Getopt::Long qw( GetOptionsFromArray );
 
 sub run {
-    my ( $class, $container, $service_name, @args ) = @_;
+    my ( $self, $container, $service_name, @args ) = @_;
     GetOptionsFromArray( \@args, \my %opt,
         'delay|d=i',
         'attempts|a=i',
@@ -94,7 +93,7 @@ Beam::Minion::Command::run - Command to enqueue a job on Beam::Minion job queue
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

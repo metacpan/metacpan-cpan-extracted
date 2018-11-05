@@ -43,7 +43,7 @@
          "web" : "https://github.com/frezik/Graphics-GVG"
       }
    },
-   "version" : "0.9",
+   "version" : "0.91",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

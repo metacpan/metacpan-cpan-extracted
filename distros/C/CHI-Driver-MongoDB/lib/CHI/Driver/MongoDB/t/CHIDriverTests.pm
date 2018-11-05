@@ -1,5 +1,5 @@
 package CHI::Driver::MongoDB::t::CHIDriverTests;
-$CHI::Driver::MongoDB::t::CHIDriverTests::VERSION = '0.0100';
+$CHI::Driver::MongoDB::t::CHIDriverTests::VERSION = '0.0101';
 # ABSTRACT: Wrapper for the CHI driver test suite
 
 use strict;
@@ -66,7 +66,7 @@ CHI::Driver::MongoDB::t::CHIDriverTests - Wrapper for the CHI driver test suite
 
 =head1 VERSION
 
-version 0.0100
+version 0.0101
 
 =head1 AUTHOR
 

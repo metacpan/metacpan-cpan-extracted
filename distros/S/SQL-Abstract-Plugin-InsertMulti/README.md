@@ -15,9 +15,9 @@ SQL::Abstract::Plugin::InsertMulti - add mysql bulk insert supports for SQL::Abs
 
 # DESCRIPTION
 
-SQL::Abstract::Plugin::InsertMulti is enable bulk insert support for [SQL::Abstract](http://search.cpan.org/perldoc?SQL::Abstract). Declare 'use SQL::Abstract::Plugin::InsertMulti;' with 'use SQL::Abstract;',
-exporting insert\_multi() and update\_multi() methods to [SQL::Abstract](http://search.cpan.org/perldoc?SQL::Abstract) namespace from SQL::Abstract::Plugin::InsertMulti.
-Plugin system is depends on 'into' options of [Sub::Exporter](http://search.cpan.org/perldoc?Sub::Exporter).
+SQL::Abstract::Plugin::InsertMulti is enable bulk insert support for [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract). Declare 'use SQL::Abstract::Plugin::InsertMulti;' with 'use SQL::Abstract;',
+exporting insert\_multi() and update\_multi() methods to [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract) namespace from SQL::Abstract::Plugin::InsertMulti.
+Plugin system is depends on 'into' options of [Sub::Exporter](https://metacpan.org/pod/Sub::Exporter).
 
 Notice: please check your mysql\_allow\_packet parameter using this module.
 
@@ -61,11 +61,11 @@ Notice: please check your mysql\_allow\_packet parameter using this module.
     # $stmt = q|INSERT INTO foo( a, b, c ) VALUES ( ?, ?, ? ), ( ?, ?, ? )|
     # @bind = (1, 2, 3, 4, 5, 6);
 
-@data is ArrayRef list. See also ["insert\_multi($table, \\@data, \\%opts)"](#insert\_multi($table, \\@data, \\%opts)) %opts details.
+@data is ArrayRef list. See also ["insert\_multi($table, \\@data, \\%opts)"](#insert_multi-table-data-opts) %opts details.
 
 ## update\_multi($table, \\@data, \\%opts)
 
-@data is HashRef list. See also ["insert\_multi($table, \\@data, \\%opts)"](#insert\_multi($table, \\@data, \\%opts)) %opts details.
+@data is HashRef list. See also ["insert\_multi($table, \\@data, \\%opts)"](#insert_multi-table-data-opts) %opts details.
 
     my ($stmt, @bind) = $sql->update_multi('foo', [ [ 1, 2, 3 ], [ 4, 5, 6 ] ]);
     # $stmt = q|INSERT INTO foo( a, b, c ) VALUES ( ?, ?, ? ), ( ?, ?, ? ) ON DUPLICATE KEY UPDATE a = VALUES( a ), b = VALUES( b ), c = VALUES( c )|
@@ -77,7 +77,7 @@ Notice: please check your mysql\_allow\_packet parameter using this module.
     # $stmt = q|INSERT INTO foo( a, b, c ) VALUES ( ?, ?, ? ), ( ?, ?, ? ) ON DUPLICATE KEY UPDATE a = VALUES( a ), b = VALUES( b ), c = VALUES( c )|
     # @bind = (1, 2, 3, 4, 5, 6);
 
-@data is ArrayRef list. See also ["insert\_multi($table, \\@data, \\%opts)"](#insert\_multi($table, \\@data, \\%opts)) %opts details.
+@data is ArrayRef list. See also ["insert\_multi($table, \\@data, \\%opts)"](#insert_multi-table-data-opts) %opts details.
 
 # AUTHOR
 
@@ -89,8 +89,8 @@ Thanks ma.la [http://subtech.g.hatena.ne.jp/mala/](http://subtech.g.hatena.ne.jp
 
 - http://subtech.g.hatena.ne.jp/mala/20090729/1248880239
 - http://gist.github.com/158203
-- [SQL::Abstract](http://search.cpan.org/perldoc?SQL::Abstract)
-- [Sub::Exporter](http://search.cpan.org/perldoc?Sub::Exporter)
+- [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract)
+- [Sub::Exporter](https://metacpan.org/pod/Sub::Exporter)
 
 # LICENSE
 

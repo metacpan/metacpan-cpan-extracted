@@ -16,7 +16,7 @@ my @roman = qw( I ii iii IV V vi vii );
 my $bach = Music::BachChoralHarmony->new;
 my $songs = $bach->parse();
 # Show all keys:
-#use Data::Dumper;warn(Dumper[map{$songs->{$_}{key}}keys%$songs]);exit;
+#use Data::Dumper;warn(Dumper[map{"$_: $songs->{$_}{key}"}sort keys%$songs]);exit;
 
 my %score;
 
@@ -48,7 +48,20 @@ for my $song ( sort keys %$songs ) {
 
         # Get the roman representation based on the scale position
         my $position = first_index { $_ eq $note } @notes;
-        my $roman = $roman[$position] || '?';
+        my ( $roman, $accidental );
+        if ( $position == -1 ) {
+            if ( length($note) == 1 ) {
+                $position = first_index { $_ =~ /$note/ } @notes;
+                ( $accidental = $notes[$position] ) =~ s/^\w(.)$/$1/;
+                $accidental = $accidental eq '#' ? 'b' : '#';
+            }
+            else {
+                my $letter;
+                ( $letter, $accidental ) = $letter =~ /^(\w)(.)$/;
+                $position = first_index { $_ eq $letter } @notes;
+            }
+        }
+        $roman = $roman[$position];
 
         # Get everything but the note part
         ( my $decorator = $chord ) =~ s/^\w[#b]?(\w*)$/$1/;
@@ -59,6 +72,9 @@ for my $song ( sort keys %$songs ) {
 
         # Convert the case of the roman representation based on minor or major
         $roman = $minor ? lc($roman) : uc($roman);
+
+        # Add any accidental found in a non-scale note
+        $roman = $accidental . $roman if $accidental;
 
         # Drop the minor and major part of the chord name
         $decorator =~ s/M//i;

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -21,9 +21,11 @@ my %WriteMakefileArgs = (
     "bin/xgettext-txt"
   ],
   "LICENSE" => "lgpl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Locale::XGettext",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Encode" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
     "Locale::Messages" => 0,
@@ -39,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "vars" => 0
   },
-  "VERSION" => "0.6",
+  "VERSION" => "0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +50,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Encode" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => "2.36",
   "Locale::Messages" => 0,

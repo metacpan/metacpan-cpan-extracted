@@ -4,6 +4,8 @@ use 5.010;
 
 package App::Music::ChordPro;
 
+use App::Packager;
+
 use App::Music::ChordPro::Version;
 
 our $VERSION = $App::Music::ChordPro::Version::VERSION;
@@ -40,6 +42,7 @@ L<http://www.chordpro.org>.
 use strict;
 use warnings;
 use Data::Dumper;
+use Carp;
 
 ################ The Process ################
 
@@ -83,6 +86,9 @@ sub main {
         }
         elsif ( $of =~ /\.(crd|txt)$/i ) {
             $options->{generate} ||= "Text";
+        }
+        elsif ( $of =~ /\.html?$/i ) {
+            $options->{generate} ||= "HTML";
         }
         elsif ( $of =~ /\.(debug)$/i ) {
             $options->{generate} ||= "Debug";
@@ -160,8 +166,22 @@ sub main {
 
     warn(Dumper($s), "\n") if $options->{debug};
 
-    # Generate the songbook.
-    my $res = $pkg->generate_songbook( $s, $options );
+    my $res;
+
+    if ( my $xc = $::config->{settings}->{transcode} ) {
+	# Set target parser for the backend so it can find the transcoded
+	# chord definitions.
+	my $p = App::Music::ChordPro::Chords::get_parser;
+	App::Music::ChordPro::Chords::set_parser($xc);
+	# Generate the songbook.
+	$res = $pkg->generate_songbook( $s, $options );
+	# Restore parser.
+	App::Music::ChordPro::Chords::set_parser($p);
+    }
+    else {
+	# Generate the songbook.
+	$res = $pkg->generate_songbook( $s, $options );
+    }
 
     # Some backends write output themselves, others return an
     # array of lines to be written.
@@ -226,6 +246,15 @@ diagrams.
 
 Specify the encoding for input files. Default is UTF-8.
 ISO-8859.1 (Latin-1) encoding is automatically sensed.
+
+=item B<--filelist=>I<FILE>
+
+Read the names of the files to be processed from the named file.
+
+This option may be specified multiple times.
+
+Song file names listed on the command line are processed I<after> the
+files from the filelist arguments.
 
 =item B<--lyrics-only> (short: B<-l>)
 
@@ -617,13 +646,14 @@ sub app_setup {
           ### Options ###
 
           "output|o=s",                 # Saves the output to FILE
-          "lyrics-only",                # Suppress all chords
           "generate=s",
           "backend-option|bo=s\%",
 	  "diagrams=s",			# Prints chord diagrams
           "encoding=s",
 	  "csv!",			# Generates contents CSV
 	  "cover=s",			# Cover page(s)
+	  "filelist=s@",		# List of input files
+	  "meta=s\%",			# Command line meta data
 
           ### Standard Chordii Options ###
 
@@ -632,9 +662,9 @@ sub app_setup {
           "chord-grid-size|s=f",        # Sets chord diagram size [30]
           "chord-grids-sorted|S!",      # Prints chord diagrams ordered
           "chord-size|c=i",             # Sets chord size [9]
-	  "diagrams=s",			# Prints chords diagrams
           "dump-chords|D",              # Dumps chords definitions (PostScript)
           "dump-chords-text|d" => \$dump_chords,  # Dumps chords definitions (Text)
+          "dump-chords-json" => sub { $dump_chords = 2},  # Dumps instrument defs (json).
           "even-pages-number-left|L",   # Even pages numbers on left
           "odd-pages-number-left",      # Odd pages numbers on left
           "lyrics-only|l",              # Only prints lyrics
@@ -650,6 +680,7 @@ sub app_setup {
           "i" => sub { $clo->{toc} = 1 },
           "toc!",                       # Generates a table of contents
           "transpose|x=i",              # Transposes by N semi-tones
+          "transcode|xc=s",             # Transcodes to another notation
           "user-chord-grids!",          # Do[esn't] print diagrams for user defined chords.
           "version|V" => \$version,     # Prints version and exits
           "vertical-space|w=f",         # Extra vertical space between lines
@@ -676,9 +707,9 @@ sub app_setup {
           'help|h|?'            => \$help,
           'help-config'         => sub { $manual = 2 },
           'manual'              => \$manual,
-          'verbose|v',
+          'verbose|v+',
           'trace',
-          'debug',
+          'debug+',
 
          ) )
     {
@@ -691,13 +722,7 @@ sub app_setup {
         require Pod::Usage;
         Pod::Usage->import;
 	my $f = $manual == 2 ? "pod/Config.pod" : "pod/ChordPro.pod";
-	if ( $App::Packager::PACKAGED ) {
-	    $f = App::Packager::GetResource($f);
-	}
-	else {
-	    $f = ::findlib($f);
-	}
-        unshift( @_, -input => $f );
+        unshift( @_, -input => getresource($f) );
         &pod2usage;
     };
 
@@ -731,8 +756,7 @@ sub app_setup {
                 foreach my $c ( @$_ ) {
 		    # Check for resource names.
 		    if ( ! -r $c && $c !~ m;[/.]; ) {
-			my $t = ::findlib( "config/".lc($c).".json" );
-			$c = $t if $t;
+			$c = ::rsc_or_file($c);
 		    }
                     die("$c: $!\n") unless -r $c;
                 }
@@ -750,9 +774,35 @@ sub app_setup {
         $clo->{"no$config"} = 1 unless $clo->{$config};
     }
 
+    # Decode command line strings.
+    # File names are dealt with elsewhere.
+    for ( qw(transcode) ) {
+	next unless defined $clo->{$_};
+	$clo->{$_} = decode_utf8($clo->{$_});
+    }
+
     # Plug in command-line options.
     @{$options}{keys %$clo} = values %$clo;
     # warn(Dumper($options), "\n") if $options->{debug};
+
+    if ( $clo->{transcode} ) {
+	my $xc = $clo->{transcode};
+	# Load the appropriate notes config, but retain the current parser.
+	unless ( App::Music::ChordPro::Chords::Parser->get_parser($xc, 1) ) {
+	    my $file = getresource("notes/$xc.json");
+	    if ( $file and open( my $fd, "<:raw", $file ) ) {
+		my $pp = JSON::PP->new->relaxed;
+		warn("Config: $file\n") if $clo->{verbose};
+		my $new = $pp->decode( ::loadfile ($fd, { %$clo, donotsplit => 1 } ) );
+		App::Music::ChordPro::Chords::set_notes( $new->{notes},
+							 { %$clo,
+							   'keep-parser' => 1 } );
+	    }
+	}
+	unless ( App::Music::ChordPro::Chords::Parser->get_parser($xc, 1) ) {
+	    die("No transcoder for ", $xc, "\n");
+	}
+    }
 
     if ( $defcfg || $fincfg ) {
 	print App::Music::ChordPro::Config::config_defaults()
@@ -763,14 +813,30 @@ sub app_setup {
     }
 
     if ( $dump_chords ) {
+	$::config = App::Music::ChordPro::Config::configurator($options);
 	require App::Music::ChordPro::Chords;
-	App::Music::ChordPro::Chords::dump_chords();
+	App::Music::ChordPro::Chords::dump_chords($dump_chords);
 	exit 0;
     }
 
+    if ( $clo->{filelist} ) {
+	my @files;
+	foreach ( @{ $clo->{filelist} } ) {
+	    my $list = ::loadfile( $_, $clo );
+	    foreach ( @$list ) {
+		next unless /\S/;
+		next if /^#/;
+		s/[\r\n]+$//;
+		push( @files, encode_utf8($_) );
+	    }
+	}
+	unshift( @ARGV, @files );
+    }
+
     # At this point, there should be filename argument(s)
-    # unless we're embedded.
-    app_usage(\*STDERR, 1) unless $::__EMBEDDED__ || @ARGV;
+    # unless we're embedded or just dumping chords.
+    app_usage(\*STDERR, 1)
+      unless $::__EMBEDDED__ || $clo->{'dump-chords'} || @ARGV;
 
     # Return result.
     $options;
@@ -828,11 +894,13 @@ Options:
     --cover=FILE                  Add cover pages from PDF document
     --diagrams=WHICH		  Prints chord diagrams
     --encoding=ENC                Encoding for input files (UTF-8)
+    --filelist=FILE               Reads song file names from FILE
     --lyrics-only  -l             Only prints lyrics
     --output=FILE  -o             Saves the output to FILE
     --config=JSON  --cfg          Config definitions (multiple)
     --start-page-number=N  -p     Starting page number [1]
     --toc --notoc -i              Generates/suppresses a table of contents
+    --transcode=SYS  -xc          Transcodes to notation system
     --transpose=N  -x             Transposes by N semi-tones
     --version  -V                 Prints version and exits
 
@@ -885,27 +953,117 @@ EndOfUsage
 
 ################ Resources ################
 
-sub ::findlib {
-    my ( $file ) = @_;
+use Encode qw(decode decode_utf8 encode_utf8);
 
-    # Packaged.
-    if ( $App::Packager::PACKAGED ) {
-	my $found = App::Packager::GetUserFile($file);
-	return $found if -e $found;
-	$found = App::Packager::GetResource($file);
-	return $found if -e $found;
+sub ::rsc_or_file {
+    my ( $c ) = @_;
+    # Check for resource names.
+    if ( ! -r $c && $c !~ m;[/.]; ) {
+	my $t;
+	if ( $c =~ /^(.+):(.*)/ ) {
+	    $t = getresource( lc($1) . "/".lc($2).".json" );
+	}
+	else {
+	    $t = getresource( "config/".lc($c).".json" );
+	}
+	$c = $t if $t;
     }
-
-    ( my $me = __PACKAGE__ ) =~ s;::;/;g;
-    foreach ( @INC ) {
-	return "$_/$me/user/$file" if -e "$_/$me/user/$file";
-	return "$_/$me/res/$file"  if -e "$_/$me/res/$file";
-	return "$_/$me/$file"      if -e "$_/$me/$file";
-    }
-    undef;
+    return $c;
 }
 
-use lib ( grep { defined } ::findlib("CPAN") );
+sub ::loadfile {
+    my ( $filename, $options ) = @_;
+
+    my $data;			# slurped file data
+    my $encoded;		# already encoded
+
+    # Gather data from the input.
+    if ( ref($filename) ) {
+	if ( ref($filename) eq 'GLOB' ) {
+	    binmode( $filename, ':raw' );
+	    $data = do { local $/; <$filename> };
+	    $filename = "__GLOB__";
+	}
+	else {
+	    $data = $$filename;
+	    $filename = "__STRING__";
+	    $encoded++;
+	}
+    }
+    elsif ( $filename eq '-' ) {
+	$filename = "__STDIN__";
+	$data = do { local $/; <STDIN> };
+    }
+    else {
+	my $name = $filename;
+	$filename = decode_utf8($name);
+	open( my $fh, '<', $name)
+	  or croak("$filename: $!\n");
+	$data = do { local $/; <$fh> };
+    }
+    $options->{_filesource} = $filename if $options;
+
+    my $name = encode_utf8($filename);
+    if ( $encoded ) {
+	# Nothing to do, already dealt with.
+    }
+
+    # Detect Byte Order Mark.
+    elsif ( $data =~ /^\xEF\xBB\xBF/ ) {
+	warn("$name is UTF-8 (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-8", substr($data, 3) );
+    }
+    elsif ( $data =~ /^\xFE\xFF/ ) {
+	warn("$name is UTF-16BE (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-16BE", substr($data, 2) );
+    }
+    elsif ( $data =~ /^\xFF\xFE\x00\x00/ ) {
+	warn("$name is UTF-32LE (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-32LE", substr($data, 4) );
+    }
+    elsif ( $data =~ /^\xFF\xFE/ ) {
+	warn("$name is UTF-16LE (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-16LE", substr($data, 2) );
+    }
+    elsif ( $data =~ /^\x00\x00\xFE\xFF/ ) {
+	warn("$name is UTF-32BE (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-32BE", substr($data, 4) );
+    }
+
+    # No BOM, did user specify an encoding?
+    elsif ( $options->{encoding} ) {
+	warn("$name is ", $options->{encoding}, " (--encoding)\n")
+	  if $options->{debug};
+	$data = decode( $options->{encoding}, $data, 1 );
+    }
+
+    # Try UTF8, fallback to ISO-8895.1.
+    else {
+	my $d = eval { decode( "UTF-8", $data, 1 ) };
+	if ( $@ ) {
+	    warn("$name is ISO-8859.1 (assumed)\n") if $options->{debug};
+	    $data = decode( "iso-8859-1", $data );
+	}
+	else {
+	    warn("$name is UTF-8 (detected)\n") if $options->{debug};
+	    $data = $d;
+	}
+    }
+
+    return $data if $options->{donotsplit};
+
+    # Split in lines;
+    my @lines;
+    $data =~ s/^\s+//s;
+    # Unless empty, make sure there is a final newline.
+    $data .= "\n" if $data =~ /.(?!\r\n|\n|\r)\Z/;
+    # We need to maintain trailing newlines.
+    push( @lines, $1 ) while $data =~ /(.*)(?:\r\n|\n|\r)/g;
+
+    return \@lines;
+}
+
+use lib ( grep { defined } getresource("CPAN") );
 
 =head1 FONTS
 
@@ -989,14 +1147,17 @@ Johan Vromans C<< <jv at CPAN dot org > >>
 =head1 SUPPORT
 
 ChordPro (the program) development is hosted on GitHub, repository
-L<https://github.com/sciurius/chordpro>.
+L<https://github.com/ChordPro/chordpro>.
 
 Please report any bugs or feature requests to the GitHub issue tracker,
-L<https://github.com/sciurius/chordpro/issues>.
+L<https://github.com/ChordPro/chordpro/issues>.
+
+A user community discussing ChordPro can be found at
+L<https://groups.google.com/forum/#!forum/chordpro>.
 
 =head1 LICENSE
 
-Copyright (C) 2010,2017 Johan Vromans,
+Copyright (C) 2010,2018 Johan Vromans,
 
 This program is free software. You can redistribute it and/or
 modify it under the terms of the Artistic License 2.0.

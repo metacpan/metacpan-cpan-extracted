@@ -1,5 +1,14 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.26 2018-11-04
+
+ - Remove Crimson Text from the default font list
+ - Improve the font importer
+
+1.25 2018-11-03
+
+ - Fix tests (hopefully) for windows
+
 1.24 2018-11-01
 
  - New heading style: part_chapter

@@ -30,10 +30,18 @@ MUSE
     foreach my $def (keys %{$fonts->definitions}) {
         my $defined = $fonts->definitions->{$def};
         ok $defined->{name};
-        foreach my $attr (qw/ItalicFont BoldFont BoldItalicFont Path/) {
+        foreach my $attr (qw/ItalicFont BoldFont BoldItalicFont/) {
             ok $defined->{attr}->{$attr},
               "$attr in $def $defined->{name} is $defined->{attr}->{$attr}";
         }
+        if ($fonts->main->regular->dirname =~ m/\A([A-Za-z0-9\.\/_-]+)\z/) {
+            is $defined->{attr}->{Path}, $fonts->main->regular->dirname;
+        }
+        else {
+            ok !$defined->{attr}->{Path}, "No Path provided";
+        }
+
+
         diag $fonts->_fontspec_args($def, 'english');
         diag $fonts->_fontspec_args($def, 'russian');        
     }

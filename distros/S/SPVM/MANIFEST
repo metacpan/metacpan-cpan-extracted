@@ -57,6 +57,7 @@ lib/SPVM/Builder/include/spvm_string_buffer.h
 lib/SPVM/Builder/include/spvm_sub.h
 lib/SPVM/Builder/include/spvm_switch_info.h
 lib/SPVM/Builder/include/spvm_toke.h
+lib/SPVM/Builder/include/spvm_tree_info.h
 lib/SPVM/Builder/include/spvm_type.h
 lib/SPVM/Builder/include/spvm_use.h
 lib/SPVM/Builder/include/spvm_util_allocator.h
@@ -135,6 +136,7 @@ lib/SPVM/Object.pm
 lib/SPVM/PerlAPI.pm
 lib/SPVM/Short.pm
 lib/SPVM/Short.spvm
+LICENSE.txt
 Makefile.PL
 MANIFEST			This list of files
 ppport.h
@@ -241,8 +243,6 @@ t/default/lib/TestCase/Extension.native/Extension.c
 t/default/lib/TestCase/Extension.spvm
 t/default/lib/TestCase/Extension2.native/Extension2.c
 t/default/lib/TestCase/Extension2.native/Extension2.config
-t/default/lib/TestCase/Extension2.native/Extension2_util.c
-t/default/lib/TestCase/Extension2.native/Extension2_util.h
 t/default/lib/TestCase/Extension2.spvm
 t/default/lib/TestCase/Float.spvm
 t/default/lib/TestCase/Increment.spvm
@@ -280,6 +280,7 @@ t/default/lib/TestCase/Sub.spvm
 t/default/lib/TestCase/Switch.spvm
 t/default/lib/TestCase/Unless.spvm
 t/default/lib/TestCase/ValueTArray.spvm
+t/default/lib/TestCase/Var.spvm
 t/default/lib/TestCase/Weaken.spvm
 t/default/list.t
 t/default/literal.t
@@ -296,6 +297,7 @@ t/default/sub.t
 t/default/switch.t
 t/default/unless.t
 t/default/value_t_array.t
+t/default/var.t
 t/default/weaken.t
 t/exe.t
 t/lib/TestAuto.pm

@@ -16,12 +16,14 @@ build_requires:
   HTTP::Server::Simple::CGI::Environment: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Module::Build: '0.28'
   Test::Exception: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -46,7 +48,8 @@ requires:
   vars: '0'
   warnings: '0'
 resources:
-  homepage: https://github.com/RT-Client-REST/RT-Client-REST
-  repository: https://github.com/RT-Client-REST/RT-Client-REST.git
-version: '0.52'
+  homepage: https://github.com/djzort/RT-Client-REST
+  repository: https://github.com/djzort/RT-Client-REST.git
+version: '0.53'
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

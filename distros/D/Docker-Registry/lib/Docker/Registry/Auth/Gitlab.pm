@@ -1,5 +1,6 @@
 package Docker::Registry::Auth::Gitlab;
-use Moose;
+use Moo;
+use Types::Standard qw/Str/;
 use namespace::autoclean;
 
 # ABSTRACT: Authentication module for gitlab registry
@@ -12,13 +13,13 @@ use JSON::MaybeXS qw(decode_json);
 
 has username => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => Str,
     required => 1,
 );
 
 has access_token => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => Str,
     required => 1,
 );
 
@@ -29,50 +30,26 @@ has jwt => (
     default => 'https://gitlab.com/jwt/auth',
 );
 
-has repo => (
-    is        => 'ro',
-    isa       => 'Str',
-    predicate => 'has_repo',
-);
-
-has bearer_token => (
-    is       => 'ro',
-    isa      => 'Str',
-    lazy     => 1,
-    builder => 'get_bearer_token',
-);
-
-sub _build_scope {
-    my $self = shift;
-
-    if ($self->has_repo) {
-        return sprintf("repository:%s:pull,push", $self->repo);
-    }
-    else {
-        return 'registry:catalog:*';
-    }
-}
-
 sub _build_token_uri {
-    my $self = shift;
+    my ($self, $scope) = @_;
 
     my $uri = $self->jwt->clone;
 
-    $uri->query_form(
+    $uri->query_form({
         service       => 'container_registry',
-        scope         => $self->_build_scope,
+        scope         => $scope,
         client_id     => 'docker',
         offline_token => 'true',
-    );
+    });
 
     $uri->userinfo(join(':', $self->username, $self->access_token));
     return $uri;
 }
 
 sub get_bearer_token {
-    my $self = shift;
+    my ($self, $scope) = @_;
 
-    my $uri = $self->_build_token_uri;
+    my $uri = $self->_build_token_uri($scope);
 
     my $ua = HTTP::Tiny->new();
     my $res = $ua->get($uri);
@@ -85,9 +62,11 @@ sub get_bearer_token {
 }
 
 sub authorize {
-    my ($self, $request) = @_;
+    my ($self, $request, $scope) = @_;
 
-    $request->header('Authorization', 'Bearer ' . $self->bearer_token);
+    my $bearer_token = $self->get_bearer_token($scope);
+
+    $request->header('Authorization', 'Bearer ' . $bearer_token);
     $request->header('Accept',
         'application/vnd.docker.distribution.manifest.v2+json');
 

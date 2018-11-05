@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.48'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -303,16 +303,27 @@ sub requires
 
 sub load_requires
 {
-  my($self, $phase) = @_;
+  my($self, $phase, $eval) = @_;
   my $reqs = $self->requires($phase);
   foreach my $mod (keys %$reqs)
   {
     my $ver = $reqs->{$mod};
-    require do {
+    my $check = sub {
       my $pm = "$mod.pm";
       $pm =~ s{::}{/}g;
-      $pm;
+      require $pm;
     };
+    if($eval)
+    {
+      eval { $check->() };
+      die "Required $mod @{[ $ver || 'undef' ]}, missing";
+    }
+    else
+    {
+      $check->();
+    }
+    # note Test::Alien::Build#alienfile_skip_if_missing_prereqs does a regex
+    # on this diagnostic, so if you change it here, change it there too.
     die "Required $mod $ver, have @{[ $mod->VERSION || 0 ]}" if $ver && ! $mod->VERSION($ver);
     
     # allow for requires on Alien::Build or Alien::Base
@@ -1135,7 +1146,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 

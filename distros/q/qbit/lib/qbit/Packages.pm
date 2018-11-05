@@ -6,10 +6,13 @@ qbit::Packages - Functions to manipulate data in packages.
 =cut
 
 package qbit::Packages;
-$qbit::Packages::VERSION = '2.6';
+$qbit::Packages::VERSION = '2.7';
 use strict;
 use warnings;
 use utf8;
+
+use File::Spec;
+use File::Find qw(find);
 
 use base qw(Exporter);
 
@@ -21,9 +24,10 @@ BEGIN {
     our (@EXPORT, @EXPORT_OK);
 
     @EXPORT = qw(
-      package_sym_table
-      package_stash
+      dynamic_loading
       package_merge_isa_data
+      package_stash
+      package_sym_table
       require_class
       );
     @EXPORT_OK = @EXPORT;
@@ -167,6 +171,71 @@ sub require_class {
     };
 
     return $result || throw Exception gettext('Cannot requre class "%s": %s', $class, fix_utf($@ || $!));
+}
+
+=head2 dynamic_loading
+
+B<Arguments:>
+
+=over
+
+=item
+
+B<$package_prefix> - string.
+
+=back
+
+Dynamic loading all packages from directory $package_prefix.
+
+B<Example:>
+
+  dynamic_loading('QBit::Application::Model::DBManager::Filter');
+
+=cut
+
+sub dynamic_loading {
+    my ($pakage_prefix) = @_;
+
+    my $stash = package_stash(__PACKAGE__);
+
+    unless ($stash->{$pakage_prefix}) {
+        my $dir = File::Spec->catdir(split(/::/, $pakage_prefix));
+
+        my @dirs = map {File::Spec->catdir($_, $dir)} @INC;
+
+        my %package_names = ();
+        foreach my $basedir (@dirs) {
+            next unless -d $basedir;
+
+            find(
+                {
+                    wanted => sub {
+                        my $name = File::Spec->abs2rel($_, $basedir);
+
+                        return unless $name && $name ne File::Spec->curdir();
+
+                        return unless /\.pm$/ && -r;
+
+                        $name =~ s/\.pm$//;
+                        $name = join('::', File::Spec->splitdir($name));
+
+                        $package_names{$name} = 1;
+                    },
+                    no_chdir => 1,
+                    follow   => 1
+                },
+                $basedir
+            );
+        }
+
+        my @packages = map "$pakage_prefix\::$_", keys(%package_names);
+
+        foreach my $package (sort @packages) {
+            require_class($package);
+        }
+
+        $stash->{$pakage_prefix} = 1;
+    }
 }
 
 1;

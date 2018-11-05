@@ -27,9 +27,10 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "Test::Class" => 0,
     "Test::Warn" => 0,
+    "Try::Tiny" => 0,
     "URI::Escape::XS" => 0
   },
-  "VERSION" => "0.0100",
+  "VERSION" => "0.0101",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Test::Class" => 0,
   "Test::Warn" => 0,
+  "Try::Tiny" => 0,
   "URI::Escape::XS" => 0
 );
 

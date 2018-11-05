@@ -22,12 +22,12 @@ SKIP: {
 
     foreach my $lang (qw( en es )) {
 
-	skip "Need dictionary for '${lang}'", 1
-	    unless (grep { $ARG->{code} eq $lang } @dicts);
+        skip "Need dictionary for '${lang}'", 1
+          unless ( grep { $ARG->{code} eq $lang } @dicts );
 
     }
 
-    my $content = join("", <DATA>);
+    my $content = join( "", <DATA> );
 
     note($content);
 
@@ -35,7 +35,7 @@ SKIP: {
 
     test_out("ok 1 - spelling_ok");
 
-    $sc->spelling_ok($content, "spelling_ok");
+    $sc->spelling_ok( $content, "spelling_ok" );
 
     test_test;
 

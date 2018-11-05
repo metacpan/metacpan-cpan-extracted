@@ -11,7 +11,7 @@ use WWW::Mechanize::Link;
 use IO::Socket::INET;
 
 use vars qw($VERSION %link_spec @CARP_NOT);
-$VERSION= '0.21';
+$VERSION= '0.22';
 @CARP_NOT=qw(Selenium::Remote::Driver);
 
 =head1 NAME
@@ -162,12 +162,18 @@ sub new {
     unless ( defined $options{ port } ) {
         my $port = 8910;
         while (1) {
-            $port++, next unless IO::Socket::INET->new(
-                Listen    => 5,
-                Proto     => 'tcp',
-                Reuse     => 1,
-                LocalPort => $port
+            my $sock = IO::Socket::INET->new(
+                Proto    => 'tcp',
+                PeerAddr => $localhost,
+                PeerPort => $port,
+                Timeout => 1,
+                #V6Only   => 1,
             );
+            if( $sock ) {
+                $port++;
+                $sock->close;
+                next;
+            };
             last;
         }
         $options{ port } = $port;
@@ -249,9 +255,9 @@ sub new {
              //_log.warn("Caught JS error", msg);
              page.errors.push({ "message": msg, "trace": trace });
          };
-         page.onConsoleMessage= function(msg, trace) {
-             //_log.warn("Caught JS error", msg);
-             page.errors.push({ "message": msg, "trace": trace });
+         page.onConsoleMessage= function(msg, line, file) {
+            // line and file are declared but will never be used :(
+             page.errors.push({ "message": msg, "trace": [{"line":line,"file":file}] });
          };
          page.onAlert = function(msg) {
              page.alerts.push(msg);

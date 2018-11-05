@@ -160,40 +160,40 @@ foreach my $options ({
     else {
         unlike $tex, qr{\\areaset};
     }
-    like $tex, qr{\\tolerance=}m;
+    like $tex, qr{^\\tolerance=}ms;
     if (!$options->{tex_tolerance} or $options->{tex_tolerance} > 10000) {
-        like $tex, qr{\\tolerance=200$}m, "Tolerance is 200 (default)" or die;
+        like $tex, qr{^\\tolerance=200\b}ms, "Tolerance is 200 (default)" or die;
     }
     else {
-        like $tex, qr{\\tolerance=\Q$options->{tex_tolerance}\E$}m,
+        like $tex, qr{^\\tolerance=\Q$options->{tex_tolerance}\E\b}ms,
           "Tolerance is $options->{tex_tolerance}";
     }
     unlike $tex, qr{^\\sloppy}m, "Not sloppy";
 
     if ($options->{tex_emergencystretch} and $options->{tex_emergencystretch} =~ m/\A[0-9]+pt\z/) {
-        like $tex, qr/^\\setlength\{\\emergencystretch\}\{\Q$options->{tex_emergencystretch}\E\}$/m
+        like $tex, qr/^\\setlength\{\\emergencystretch\}\{\Q$options->{tex_emergencystretch}\E\}/ms;
     }
     else {
-        like $tex, qr/^\\setlength\{\\emergencystretch\}\{30pt\}$/m
+        like $tex, qr/^\\setlength\{\\emergencystretch\}\{30pt\}/ms;
     }
 
 
     if ($options->{fussy_last_word}) {
-        like $tex, qr{\\finalhyphendemerits=10000};
+        like $tex, qr{^\\finalhyphendemerits=10000}ms;
     }
     else {
-        unlike $tex, qr{\\finalhyphendemerits=10000};
+        unlike $tex, qr{^\\finalhyphendemerits=10000}ms;
     }
     if ($options->{ignore_cover}) {
-        unlike $tex, qr{\\includegraphics};
+        unlike $tex, qr{^\s*\\includegraphics}ms;
     }
     else {
-        like $tex, qr{\\includegraphics};
+        like $tex, qr{^\s*\\includegraphics}ms;
     }
     if (!$options->{format_id}) {
-        like $tex, qr{^\% No format ID passed\.$}m;
+        like $tex, qr{^\% No format ID passed\.}ms;
     }
     else {
-        unlike $tex, qr{^\% No format ID passed\.$}m;
+        unlike $tex, qr{^\% No format ID passed\.}ms;
     }
 }

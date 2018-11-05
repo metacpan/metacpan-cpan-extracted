@@ -21,17 +21,7 @@ sub new {
   return bless $self, $class;
 }
 
-sub info {
-  my $self = shift;
-  
-  return $self->{info};
-}
-
-sub category {
-  my $self = shift;
-  
-  $self->{category};
-}
+sub category { shift->{category} }
 
 sub quiet { shift->{quiet} }
 
@@ -57,13 +47,7 @@ sub build {
       my $shared_lib_path = $self->get_shared_lib_path_dist($package_name);
       
       # Try runtime compile if shared library is not found
-      if (-f $shared_lib_path) {
-        # Copy distribution shared lib to build directory
-        if ($self->{copy_dist}) {
-          $self->copy_shared_lib_to_build_dir($package_name, $category);
-        }
-      }
-      else {
+      unless (-f $shared_lib_path) {
         if ($category eq 'native') {
           $self->build_shared_lib_native_runtime($package_name, $sub_names);
         }
@@ -150,22 +134,23 @@ sub build_shared_lib {
   my ($self, $package_name, $sub_names, $opt) = @_;
   
   # Compile source file and create object files
-  my $object_files = $self->compile_objects($package_name, $sub_names, $opt);
+  my $object_file = $self->compile($package_name, $opt);
   
   # Link object files and create shared library
-  $self->link_shared_lib(
+  $self->link(
     $package_name,
     $sub_names,
-    $object_files,
+    [$object_file],
     $opt
   );
 }
 
-sub compile_objects {
-  my ($self, $package_name, $sub_names, $opt) = @_;
+sub compile {
+  my ($self, $package_name, $opt) = @_;
 
   # Build directory
   my $work_dir = $opt->{work_dir};
+
   unless (defined $work_dir && -d $work_dir) {
     confess "Work directory must be specified for " . $self->category . " build";
   }
@@ -179,11 +164,6 @@ sub compile_objects {
   # shared lib file
   my $shared_lib_rel_file = SPVM::Builder::Util::convert_package_name_to_shared_lib_rel_file($package_name, $self->category);
   my $shared_lib_file = "$output_dir/$shared_lib_rel_file";
-
-  # Return if source code is chaced and exists shared lib file
-  if ($opt->{is_cached} && -f $shared_lib_file) {
-    return;
-  }
   
   # Quiet output
   my $quiet = $self->quiet;
@@ -195,18 +175,11 @@ sub compile_objects {
   my $work_object_dir = "$work_dir/$package_path";
   mkpath $work_object_dir;
   
-  # Correct source files
-  my $src_files = [];
-  my @valid_exts = ('c', 'C', 'cpp', 'i', 's', 'cxx', 'cc');
-  for my $src_file (glob "$input_src_dir/*") {
-    if (grep { $src_file =~ /\.$_$/ } @valid_exts) {
-      push @$src_files, $src_file;
-    }
-  }
-  
-  # Config file
+  # Package base name
   my $package_base_name = $package_name;
   $package_base_name =~ s/^.+:://;
+  
+  # Config file
   my $input_config_dir = $input_src_dir;
   my $config_file = "$input_config_dir/$package_base_name.config";
   
@@ -224,7 +197,15 @@ sub compile_objects {
   else {
     $build_config = SPVM::Builder::Util::new_default_build_config;
   }
+
+  # Source file
+  my $src_exe = $build_config->get_src_ext;
+  my $src_file = "$input_config_dir/$package_base_name.$src_exe";
   
+  unless (-f $src_file) {
+    confess "Can't find source file $src_file: $!";
+  }
+
   # CBuilder configs
   my $ccflags = $build_config->get_ccflags;
   
@@ -238,31 +219,37 @@ sub compile_objects {
   # Compile source files
   my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
   my $object_files = [];
-  for my $src_file (@$src_files) {
-    # Object file
-    my $object_file = "$work_object_dir/" . basename($src_file);
-    $object_file =~ s/\.c$//;
-    $object_file =~ s/\.C$//;
-    $object_file =~ s/\.cpp$//;
-    $object_file =~ s/\.i$//;
-    $object_file =~ s/\.s$//;
-    $object_file =~ s/\.cxx$//;
-    $object_file =~ s/\.cc$//;
-    $object_file .= '.o';
+  
+  # Object file
+  my $object_file = "$work_object_dir/$package_base_name.o";
+
+  # Do compile. This is same as make command
+  my $do_compile;
+  if (!-f $object_file) {
+    $do_compile = 1;
+  }
+  else {
+    my $mod_time_src = (stat($src_file))[9];
+    my $mod_time_object = (stat($object_file))[9];
     
+    if ($mod_time_src > $mod_time_object) {
+      $do_compile = 1;
+    }
+  }
+  
+  if ($do_compile) {
     # Compile source file
     $cbuilder->compile(
       source => $src_file,
       object_file => $object_file,
       extra_compiler_flags => $build_config->get_extra_compiler_flags,
     );
-    push @$object_files, $object_file;
   }
   
-  return $object_files;
+  return $object_file;
 }
 
-sub link_shared_lib {
+sub link {
   my ($self, $package_name, $sub_names, $object_files, $opt) = @_;
 
   # Build directory
@@ -281,11 +268,6 @@ sub link_shared_lib {
   my $shared_lib_rel_file = SPVM::Builder::Util::convert_package_name_to_shared_lib_rel_file($package_name, $self->category);
   my $shared_lib_file = "$output_dir/$shared_lib_rel_file";
 
-  # Return if source code is chaced and exists shared lib file
-  if ($opt->{is_cached} && -f $shared_lib_file) {
-    return;
-  }
-  
   # Quiet output
   my $quiet = $self->quiet;
  
@@ -385,15 +367,13 @@ sub build_shared_lib_precompile_runtime {
   my $output_dir = "$build_dir/lib";
   mkpath $output_dir;
   
-  my $is_cached;
-  $self->create_precompile_csource(
+  $self->create_source_precompile(
     $package_name,
     $sub_names,
     {
       input_dir => $input_dir,
       work_dir => $work_dir,
       output_dir => $work_dir,
-      is_cached => \$is_cached,
     }
   );
   
@@ -404,7 +384,6 @@ sub build_shared_lib_precompile_runtime {
       input_dir => $work_dir,
       work_dir => $work_dir,
       output_dir => $output_dir,
-      is_cached => $is_cached,
     }
   );
 }
@@ -454,15 +433,22 @@ sub build_shared_lib_precompile_dist {
   $module_base_name =~ s/^.+:://;
   my $config_file = "$input_dir/$module_base_name.config";
 
-  my $is_cached;
-  $self->create_precompile_csource(
+  $self->create_source_precompile(
     $package_name,
     $sub_names,
     {
       input_dir => $input_dir,
       work_dir => $work_dir,
       output_dir => $work_dir,
-      is_cached => \$is_cached,
+    }
+  );
+  
+  $self->copy_source_precompile_dist(
+    $package_name,
+    $sub_names,
+    {
+      input_dir => $work_dir,
+      output_dir => $output_dir,
     }
   );
   
@@ -473,7 +459,6 @@ sub build_shared_lib_precompile_dist {
       input_dir => $work_dir,
       work_dir => $work_dir,
       output_dir => $output_dir,
-      is_cached => $is_cached,
     }
   );
 }
@@ -502,17 +487,13 @@ sub build_shared_lib_native_dist {
   );
 }
 
-sub create_precompile_csource {
+sub create_source_precompile {
   my ($self, $package_name, $sub_names, $opt) = @_;
   
-  my $input_dir = $opt->{input_dir};
-
   my $work_dir = $opt->{work_dir};
   mkpath $work_dir;
   
   my $output_dir = $opt->{output_dir};
-  
-  my $is_cached_ref = $opt->{is_cached};
   
   my $package_path = SPVM::Builder::Util::convert_package_name_to_path($package_name, $self->category);
   my $work_src_dir = "$work_dir/$package_path";
@@ -536,17 +517,35 @@ sub create_precompile_csource {
   
   # Create c source file
   my $package_csource = $self->build_package_csource_precompile($package_name, $sub_names);
-  open my $fh, '>', $source_file
-    or die "Can't create $source_file";
-  print $fh $package_csource;
-  close $fh;
-  
   if ($package_csource ne $old_package_csource) {
-    $$is_cached_ref = 0;
+    open my $fh, '>', $source_file
+      or die "Can't create $source_file";
+    print $fh $package_csource;
+    close $fh;
   }
-  else {
-    $$is_cached_ref = 1;
-  }
+}
+
+sub copy_source_precompile_dist {
+  my ($self, $package_name, $sub_names, $opt) = @_;
+  
+  my $input_dir = $opt->{input_dir};
+
+  my $output_dir = $opt->{output_dir};
+  
+  my $package_path = SPVM::Builder::Util::convert_package_name_to_path($package_name, $self->category);
+  my $input_src_dir = "$input_dir/$package_path";
+  my $output_src_dir = "$output_dir/$package_path";
+
+  mkpath $output_src_dir;
+  
+  my $module_base_name = $package_name;
+  $module_base_name =~ s/^.+:://;
+  
+  my $input_source_file = "$input_src_dir/$module_base_name.c";
+  my $output_source_file = "$output_src_dir/$module_base_name.c";
+  
+  copy $input_source_file, $output_source_file
+    or confess "Can't copy $input_source_file to $output_source_file: $!";
 }
 
 1;

@@ -21,6 +21,7 @@ lib/Perl/PrereqScanner/NotQuiteLite/Parser/MojoBase.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/Moose.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/MooseXDeclare.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/Only.pm
+lib/Perl/PrereqScanner/NotQuiteLite/Parser/PackageVariant.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/Plack.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/POE.pm
 lib/Perl/PrereqScanner/NotQuiteLite/Parser/Prefork.pm
@@ -74,6 +75,7 @@ t/moose/no_moose.t
 t/moose/with_variable.t
 t/moosex_declare.t
 t/only.t
+t/package_variant.t
 t/plack.t
 t/prefork.t
 t/scan/apos.t

@@ -182,6 +182,7 @@ lib/Alien/Build/Plugin/Prefer/SortVersions.pm
 lib/Alien/Build/Plugin/Probe.pod
 lib/Alien/Build/Plugin/Probe/CBuilder.pm
 lib/Alien/Build/Plugin/Probe/CommandLine.pm
+lib/Alien/Build/Plugin/Test/Mock.pm
 lib/Alien/Build/Util.pm
 lib/Alien/Build/Version/Basic.pm
 lib/Alien/Role.pm
@@ -192,6 +193,7 @@ lib/Test/Alien/CanPlatypus.pm
 lib/Test/Alien/Run.pm
 lib/Test/Alien/Synthetic.pm
 lib/alienfile.pm
+maint/Alien-Base-PkgConfig/Makefile.PL
 maint/ci-test-plugins.pl
 maint/gen.pl
 maint/travis-daemon
@@ -255,6 +257,7 @@ t/alien_build_plugin_prefer_goodversion.t
 t/alien_build_plugin_prefer_sortversions.t
 t/alien_build_plugin_probe_cbuilder.t
 t/alien_build_plugin_probe_commandline.t
+t/alien_build_plugin_test_mock.t
 t/alien_build_rc.t
 t/alien_build_tempdir.t
 t/alien_build_util.t
@@ -275,6 +278,12 @@ t/test_alien_cancompile.t
 t/test_alien_canplatypus.t
 t/test_alien_run.t
 t/test_alien_synthetic.t
+testalienIXehT/foo.pl
+testalienIXehT/test.xs
+testalienMC_9y/Test/Alien/XS/Mod0.pm
+testalienMC_9y/auto/Test/Alien/XS/Mod0/Mod0.so
+testalienMC_9y/foo.pl
+testalienMC_9y/test.xs
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

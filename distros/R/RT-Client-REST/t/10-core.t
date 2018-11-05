@@ -1,3 +1,6 @@
+#!perl
+# vim:ft=perl:
+
 use strict;
 use warnings;
 
@@ -76,4 +79,3 @@ lives_ok {
 
 1;
 
-# vim:ft=perl:

@@ -42,6 +42,9 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
     '+include' => 'pegex-atoms',
     '+toprule' => 'transforms',
     '+version' => '0.01',
+    'BACK' => {
+      '.rgx' => qr/\G\\/
+    },
     'colonPair' => {
       '.all' => [
         {
@@ -54,6 +57,55 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
         },
         {
           '.ref' => 'exprSingleValue'
+        }
+      ]
+    },
+    'exprApplyJsonPointer' => {
+      '.all' => [
+        {
+          '-skip' => 1,
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*<(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
+        },
+        {
+          '.ref' => 'jsonPointer'
+        }
+      ]
+    },
+    'exprArrayLiteral' => {
+      '.all' => [
+        {
+          '-skip' => 1,
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*\.\[(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
+        },
+        {
+          '+max' => 1,
+          '.all' => [
+            {
+              '.ref' => 'exprSingleValue'
+            },
+            {
+              '+min' => 0,
+              '-flat' => 1,
+              '.all' => [
+                {
+                  '-skip' => 1,
+                  '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*,(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
+                },
+                {
+                  '.ref' => 'exprSingleValue'
+                }
+              ]
+            },
+            {
+              '+max' => 1,
+              '-skip' => 1,
+              '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*,(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
+            }
+          ]
+        },
+        {
+          '-skip' => 1,
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*\](?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
         }
       ]
     },
@@ -117,6 +169,44 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
         }
       ]
     },
+    'exprObjectLiteral' => {
+      '.all' => [
+        {
+          '-skip' => 1,
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*\.\{(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
+        },
+        {
+          '+max' => 1,
+          '.all' => [
+            {
+              '.ref' => 'colonPair'
+            },
+            {
+              '+min' => 0,
+              '-flat' => 1,
+              '.all' => [
+                {
+                  '-skip' => 1,
+                  '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*,(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
+                },
+                {
+                  '.ref' => 'colonPair'
+                }
+              ]
+            },
+            {
+              '+max' => 1,
+              '-skip' => 1,
+              '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*,(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
+            }
+          ]
+        },
+        {
+          '-skip' => 1,
+          '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*\}(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
+        }
+      ]
+    },
     'exprObjectMapping' => {
       '.all' => [
         {
@@ -145,6 +235,15 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
             },
             {
               '.ref' => 'variableSystem'
+            },
+            {
+              '.ref' => 'exprStringQuoted'
+            },
+            {
+              '.ref' => 'exprArrayLiteral'
+            },
+            {
+              '.ref' => 'exprObjectLiteral'
             }
           ]
         },
@@ -165,22 +264,11 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
           '+min' => 0,
           '.any' => [
             {
-              '.ref' => 'jsonUnicode'
-            },
-            {
-              '.ref' => 'jsonBackslashQuote'
-            },
-            {
-              '.ref' => 'jsonBackslashDollar'
+              '-flat' => 1,
+              '.ref' => 'stringValueCommon'
             },
             {
               '.ref' => 'jsonBackslashGrave'
-            },
-            {
-              '.ref' => 'variableUser'
-            },
-            {
-              '.ref' => 'variableSystem'
             },
             {
               '.ref' => 'jsonOtherNotGrave'
@@ -210,16 +298,48 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
       ]
     },
     'jsonBackslashDollar' => {
-      '.rgx' => qr/\G(\\\$)/
+      '.all' => [
+        {
+          '-skip' => 1,
+          '.ref' => 'BACK'
+        },
+        {
+          '.rgx' => qr/\G(\$)/
+        }
+      ]
     },
     'jsonBackslashDouble' => {
-      '.rgx' => qr/\G(\\")/
+      '.all' => [
+        {
+          '-skip' => 1,
+          '.ref' => 'BACK'
+        },
+        {
+          '.rgx' => qr/\G(")/
+        }
+      ]
     },
     'jsonBackslashGrave' => {
-      '.rgx' => qr/\G(\\`)/
+      '.all' => [
+        {
+          '-skip' => 1,
+          '.ref' => 'BACK'
+        },
+        {
+          '.rgx' => qr/\G(`)/
+        }
+      ]
     },
     'jsonBackslashQuote' => {
-      '.rgx' => qr/\G(\\[\\\/bfnrt])/
+      '.all' => [
+        {
+          '-skip' => 1,
+          '.ref' => 'BACK'
+        },
+        {
+          '.rgx' => qr/\G([\\\/bfnrt])/
+        }
+      ]
     },
     'jsonOtherNotDouble' => {
       '.rgx' => qr/\G([^"\x00-\x1f\\\$]+)/
@@ -237,22 +357,11 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
           '+min' => 0,
           '.any' => [
             {
-              '.ref' => 'jsonUnicode'
-            },
-            {
-              '.ref' => 'jsonBackslashQuote'
-            },
-            {
-              '.ref' => 'jsonBackslashDollar'
+              '-flat' => 1,
+              '.ref' => 'stringValueCommon'
             },
             {
               '.ref' => 'jsonBackslashDouble'
-            },
-            {
-              '.ref' => 'variableUser'
-            },
-            {
-              '.ref' => 'variableSystem'
             },
             {
               '.ref' => 'jsonOtherNotDouble'
@@ -266,7 +375,15 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
       ]
     },
     'jsonUnicode' => {
-      '.rgx' => qr/\G(\\u[0-9a-fA-F]{4})/
+      '.all' => [
+        {
+          '-skip' => 1,
+          '.rgx' => qr/\G\\u/
+        },
+        {
+          '.rgx' => qr/\G([0-9a-fA-F]{4})/
+        }
+      ]
     },
     'opArrayFrom' => {
       '.rgx' => qr/\G(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*(<\@)(?:\s|\x{FEFF}|[\ \t]*\-\-[\ \t]*[^\r\n]*(?:\r?\n|\r!NL|\z))*/
@@ -297,6 +414,28 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
         },
         {
           '.ref' => 'exprKeyRemove'
+        },
+        {
+          '.ref' => 'exprApplyJsonPointer'
+        }
+      ]
+    },
+    'stringValueCommon' => {
+      '.any' => [
+        {
+          '.ref' => 'jsonUnicode'
+        },
+        {
+          '.ref' => 'jsonBackslashQuote'
+        },
+        {
+          '.ref' => 'jsonBackslashDollar'
+        },
+        {
+          '.ref' => 'variableUser'
+        },
+        {
+          '.ref' => 'variableSystem'
         }
       ]
     },
@@ -317,7 +456,6 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.67)
           '.ref' => 'opCopyFrom'
         },
         {
-          '-flat' => 1,
           '.ref' => 'exprSingleValue'
         },
         {

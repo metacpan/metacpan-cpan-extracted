@@ -9,10 +9,14 @@ BEGIN {
 
 SKIP: {
 
-eval { require XML::LibXML };
+eval { use XML::LibXML 2.0132 };
 if ( $@ ) {
-    diag( "SKIPPED -- No support for MusicXML import" );
-    skip "No support for MusicXML import", 4;
+    my $msg = "SKIPPED -- No support for MusicXML import";
+    unless ( $ENV{DATA_IREALPRO_MUSICXML} ) {
+	$msg = "SKIPPED MusicXML import testing";
+    }
+    diag($msg);
+    skip $msg => 4;
 }
 my $in = Data::iRealPro::Input->new;
 ok( $in, "Create input handler" );

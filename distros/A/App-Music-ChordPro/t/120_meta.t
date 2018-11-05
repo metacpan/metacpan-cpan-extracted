@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 use App::Music::ChordPro::Config;
 use App::Music::ChordPro::Songbook;
@@ -46,7 +46,9 @@ my $song = {
 		       'capo' => [ '2' ],
 		      },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
 	   };
 
 is_deeply( { %{ $s->{songs}->[0] } }, $song, "Song contents" );
@@ -94,11 +96,18 @@ $data = <<EOD;
 {meta: tempo 320}
 {meta: capo 3}
 {tempo 220}
+{c: %%}
 EOD
 
-eval { $s->parsefile(\$data) } or diag("$@");
 
+my $warning;
+{
+    local $SIG{__WARN__} = sub { $warning = "@_" };
+    eval { $s->parsefile(\$data) } or diag("$@");
+}
 ok( scalar( @{ $s->{songs} } ) == 1, "One song" );
+ok( $warning =~ /Multiple capo settings may yield surprising results/,
+    "You have been warned" );
 isa_ok( $s->{songs}->[0], 'App::Music::ChordPro::Song', "It's a song" );
 #use Data::Dumper; warn(Dumper($s));
 $song = {
@@ -112,11 +121,21 @@ $song = {
 		       'album' => [ 'The Album', 'Another Album' ],
 		       'capo' => [ '2', '3' ],
 		       'key' => [ 'F', 'G' ],
+		       '_key' => [ 'G#', 'A#' ],
 		       'tempo' => [ '320', '220' ],
 		       'time' => [ '3/4', '4/4' ],
 		      },
 	    'title' => 'Swing Low Sweet Chariot',
+	    'source' => { file => "__STRING__", line => 1 },
 	    'structure' => 'linear',
+	    'system' => 'common',
+	    'body' => [
+		       { context => '',
+			 orig => '%%',
+			 text => '%%',
+			 type => 'comment',
+		       },
+		    ],
 	   };
 
 is_deeply( { %{ $s->{songs}->[0] } }, $song, "Song contents" );

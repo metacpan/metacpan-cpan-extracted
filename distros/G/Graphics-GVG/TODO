@@ -1,4 +1,4 @@
-Version 0.91
+Version 0.92
 ===========
 * Rename 'meta' to something that doesn't conflict with an existing
   Moose method

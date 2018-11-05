@@ -1,4 +1,9 @@
 Revision history for JSON::Transform
 
+0.02 Sun  4 Nov 21:15:46 GMT 2018
+ - literal hashes and arrays, zap $EO and $EA
+ - $expr<"/newpointer"
+ - handle various \-quoted entities in strings
+
 0.01 Sun 21 Oct 20:27:16 BST 2018
  - First version, released on an unsuspecting world.

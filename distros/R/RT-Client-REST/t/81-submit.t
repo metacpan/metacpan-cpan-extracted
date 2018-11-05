@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#!perl
+# vim:ft=perl:
 #
 # This script tests whether submited data looks good
 
@@ -36,7 +37,7 @@ response text");
 
 plan tests => 1;
 my $rt = RT::Client::REST->new(
-        server => "http://localhost:$port",
+        server => "http://127.0.0.1:$port",
         timeout => 2,
 );
 my $res = $rt->_submit("ticket/1", undef, {
@@ -45,4 +46,3 @@ my $res = $rt->_submit("ticket/1", undef, {
     });
 unlike($res->{_content}, qr/this is a fake successful response header/, "Make sure response content doesn't contain headers");
 
-# vim:ft=perl:

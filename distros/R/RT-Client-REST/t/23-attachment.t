@@ -1,3 +1,6 @@
+#!perl
+# vim:ft=perl:
+
 use strict;
 use warnings;
 
@@ -40,4 +43,3 @@ for my $method (qw(store search count)) {
 
 ok('attachment' eq $ticket->rt_type);
 
-# vim:ft=perl:

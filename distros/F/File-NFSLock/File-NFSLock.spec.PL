@@ -11,29 +11,31 @@ my $name;
 my $version;
 $INC{"ExtUtils/MakeMaker.pm"} = 1;
 sub WriteMakefile {
-  my %props = @_;
-  $name = $props{NAME} || die "Makefile.PL: Missing NAME";
-  if ($version = $props{VERSION}) {
-    # done
-  } elsif (my $version_from = $props{VERSION_FROM}) {
-    $@ = "";
-    $version = eval qq{
-      do "$version_from";
-      \$$name\::VERSION || die "$version_from: Missing VERSION";
-    };
-    die $@ if $@;
-    if (!defined $version) {
-      die "$version_from: Missing VERSION";
+    my %props = @_;
+    $name = $props{NAME} || die "Makefile.PL: Missing NAME";
+    if ($version = $props{VERSION}) {
+        # done
     }
-  } else {
-    die "Makefile.PL: Could not determine version!";
-  }
+    elsif (my $version_from = $props{VERSION_FROM}) {
+        $@ = "";
+        $version = eval qq{
+            do "./$version_from";
+            \$$name\::VERSION || die "$version_from: Missing VERSION";
+        };
+        die $@ if $@;
+        if (!defined $version) {
+            die "$version_from: Missing VERSION";
+        }
+    }
+    else {
+        die "Makefile.PL: Could not determine version!";
+    }
 }
-do "Makefile.PL";
+do "./Makefile.PL";
 if ($name) {
-  $name =~ s/::/-/g;
+    $name =~ s/::/-/g;
 } else {
-  die "Makefile.PL: Missing WriteMakefile";
+    die "Makefile.PL: Missing WriteMakefile";
 }
 
 $version || die "No version!";

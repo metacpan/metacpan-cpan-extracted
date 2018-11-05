@@ -1,3 +1,6 @@
+#!perl
+# vim:ft=perl:
+
 use strict;
 use warnings;
 
@@ -62,4 +65,3 @@ while (my $obj = &$iter) {
 
 ok(9 == $i, "Iterated 9 times (as expected)");
 
-# vim:ft=perl:

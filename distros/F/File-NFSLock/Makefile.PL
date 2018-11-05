@@ -26,23 +26,22 @@ WriteMakefile
 package MY;
 
 sub processPL {
-  my $self = shift;
-  my $block = $self->SUPER::processPL(@_);
-  # "Version:" in spec needs to match
-  # "$VERSION" from VERSION_FROM
-  $block =~ s%(spec.PL\s*)$%$1 \$\(VERSION_FROM\)%m;
-  $block =~ s[(\$\(PERLRUNINST\)\s+)][PERL_USE_UNSAFE_INC=1 $1]gm;
-  $block;
+    my $self = shift;
+    my $block = $self->SUPER::processPL(@_);
+    # "Version:" in spec needs to match
+    # "$VERSION" from VERSION_FROM
+    $block =~ s%(spec.PL\s*)$%$1 \$\(VERSION_FROM\)%m;
+    $block;
 }
 
 sub libscan {
-  my $self = shift;
-  my $path = shift;
-  ($path =~ / \bCVS\b | \~$ /x) ? undef : $path;
+    my $self = shift;
+    my $path = shift;
+    ($path =~ / \bCVS\b | \~$ /x) ? undef : $path;
 }
 
 sub postamble {
-  return qq^
+    return qq^
 
 pm_to_blib: README
 

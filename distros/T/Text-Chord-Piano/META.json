@@ -1,0 +1,50 @@
+{
+   "abstract" : "This module is a chord table generator of Piano by the text",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Chord-Piano",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Music::Chord::Note" : "0.07",
+            "perl" : "v5.6.2"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Chord::Piano" : {
+         "file" : "lib/Text/Chord/Piano.pm",
+         "version" : "0.062"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.062",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

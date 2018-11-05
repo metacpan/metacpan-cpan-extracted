@@ -1,3 +1,6 @@
+#!perl
+# vim:ft=perl:
+
 package MyObject;
 # For testing purposes
 
@@ -87,4 +90,3 @@ $stored = $STORED;
 $obj->id(10);
 ok($stored == $STORED, "modifying 'id' did not trigger a store");
 
-# vim:ft=perl:

@@ -13,13 +13,19 @@
           'children' => [
             {
               'children' => [
-                '/definitions'
+                {
+                  'children' => [
+                    '/definitions'
+                  ],
+                  'nodename' => 'jsonOtherNotDouble',
+                  'type' => 'element'
+                }
               ],
-              'nodename' => 'jsonOtherNotDouble',
+              'nodename' => 'jsonPointer',
               'type' => 'element'
             }
           ],
-          'nodename' => 'jsonPointer',
+          'nodename' => 'exprSingleValue',
           'type' => 'element'
         }
       ],
@@ -34,9 +40,15 @@
         },
         {
           'children' => [
-            'defs'
+            {
+              'children' => [
+                'defs'
+              ],
+              'nodename' => 'variableUser',
+              'type' => 'element'
+            }
           ],
-          'nodename' => 'variableUser',
+          'nodename' => 'exprSingleValue',
           'type' => 'element'
         }
       ],

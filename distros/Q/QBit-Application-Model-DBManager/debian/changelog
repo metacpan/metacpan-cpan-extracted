@@ -1,3 +1,9 @@
+libqbit-application-model-dbmanager-perl (0.022) raring; urgency=low
+
+  * use dynamic_loading
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon,  5 Nov 2018 13:08:40 +0300
+
 libqbit-application-model-dbmanager-perl (0.021) raring; urgency=low
 
   * fields

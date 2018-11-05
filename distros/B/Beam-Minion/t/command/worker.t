@@ -34,13 +34,13 @@ my $mock = Mock::MonkeyPatch->patch(
 my $class = 'Beam::Minion::Command::worker';
 $ENV{BEAM_MINION} = 'sqlite:' . $tmp->filename;
 $ENV{BEAM_PATH} = catdir( $FindBin::Bin, '..', 'share' );
-$class->run();
+my $obj = $class->new;
+$obj->run();
 
 ok $mock->called, 'Minion::Command::minion::worker->run called';
 is_deeply $mock->method_arguments, [qw()], 'arguments are correct';
 
-my $invocant = $mock->arguments->[0];
-my $minion = $invocant->app->minion;
+my $minion = $obj->app->minion;
 
 subtest 'tasks are created' => sub {
     my $tasks = $minion->tasks;
@@ -90,7 +90,7 @@ subtest 'BEAM_MINION must be set' => sub {
     local $ENV{BEAM_MINION} = '';
     like
         exception {
-            Beam::Minion::Command::worker->run();
+            Beam::Minion::Command::worker->new->run();
         },
         qr{You must set the BEAM_MINION environment variable},
         'BEAM_MINION missing raises exception';
@@ -100,6 +100,7 @@ subtest 'test that object is destroyed' => sub {
     my $id = $minion->enqueue( 'container:success', [] );
     my $job = $minion->job( $id );
     $job->execute;
+    no warnings 'once';
     is $Local::Service::DESTROYED, 1, 'DESTROY was called';
 };
 

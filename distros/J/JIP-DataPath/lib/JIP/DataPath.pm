@@ -9,7 +9,7 @@ use JIP::ClassField;
 use Carp qw(croak);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT_OK = qw(path);
 
@@ -48,6 +48,29 @@ sub get {
         }
         elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
             return $context->[$last_part];
+        }
+    }
+
+    return $default_value;
+}
+
+sub get_new {
+    my ($self, $path_parts, $default_value) = @ARG;
+
+    return __PACKAGE__->new(document => $self->document)
+        if @{ $path_parts } == 0;
+
+    my ($contains, $context) = $self->_accessor($path_parts);
+
+    if ($contains) {
+        my $last_part = $path_parts->[-1] // q{};
+        my $type      = ref $context      // q{};
+
+        if ($type eq 'HASH' && length $last_part) {
+            return __PACKAGE__->new(document => $context->{$last_part});
+        }
+        elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
+            return __PACKAGE__->new(document => $context->[$last_part]);
         }
     }
 
@@ -134,7 +157,7 @@ JIP::DataPath - provides a way to access data elements in a deep, complex and ne
 
 =head1 VERSION
 
-This document describes L<JIP::DataPath> version C<0.03>.
+This document describes L<JIP::DataPath> version C<0.04>.
 
 =head1 SYNOPSIS
 
@@ -191,6 +214,29 @@ Build new L<JIP::DataPath> object.
     JIP::DataPath->new(document => ['foo', 'bar'])->get([2], 'default value');
 
 Extract value from L</"document"> identified by the given path.
+
+=head2 get_new
+
+    my $o = JIP::DataPath->new(
+        document => {
+            foo => {
+                bar => {
+                    wtf => 42,
+                },
+            },
+        },
+    );
+
+    # undef
+    $o->get_new(['not exists']);
+
+    # {wtf => 42}
+    $o->get_new(['foo bar'])->document;
+
+    # 'default value'
+    $o->get_new(['not exists'], 'default value');
+
+Extract value from L</"document">, identified by the given path, and create an instance of the L<JIP::DataPath> with this value.
 
 =head2 set
 

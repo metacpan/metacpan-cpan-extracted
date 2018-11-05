@@ -17,6 +17,28 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Date::Exception:
+    file: lib/Date/Exception.pm
+    version: '0.07'
+  Date::Exception::InvalidDay:
+    file: lib/Date/Exception/InvalidDay.pm
+    version: '0.07'
+  Date::Exception::InvalidDayCount:
+    file: lib/Date/Exception/InvalidDayCount.pm
+    version: '0.07'
+  Date::Exception::InvalidMonth:
+    file: lib/Date/Exception/InvalidMonth.pm
+    version: '0.07'
+  Date::Exception::InvalidMonthCount:
+    file: lib/Date/Exception/InvalidMonthCount.pm
+    version: '0.07'
+  Date::Exception::InvalidYear:
+    file: lib/Date/Exception/InvalidYear.pm
+    version: '0.07'
+  Date::Exception::InvalidYearCount:
+    file: lib/Date/Exception/InvalidYearCount.pm
+    version: '0.07'
 requires:
   Moo: '2.000000'
   Throwable: '0.200011'
@@ -24,5 +46,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Date-Exception.git
-version: '0.05'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

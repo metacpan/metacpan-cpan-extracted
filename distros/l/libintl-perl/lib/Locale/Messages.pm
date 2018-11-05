@@ -26,7 +26,7 @@ use File::Spec;
 
 use vars qw ($package @EXPORT_OK %EXPORT_TAGS @ISA $VERSION);
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 # Try to load the C version first.
 $package = 'gettext_xs';
@@ -1065,8 +1065,7 @@ code for details!code for details!
 =head1 SEE ALSO
 
 Locale::TextDomain(3pm), Locale::gettext_pp(3pm), Encode(3pm),
-Locale::TextDomain::UTF8(3pm), perllocale(3pm), POSIX(3pm), perl(1), 
-gettext(1), gettext(3)
+perllocale(3pm), POSIX(3pm), perl(1), gettext(1), gettext(3)
 
 =cut
 

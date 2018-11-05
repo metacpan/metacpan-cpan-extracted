@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-
 use Modern::Perl;
 
 use WebService::GoogleAPI::Client;
@@ -16,13 +15,18 @@ use MIME::Types;
 #use utf8;
 use Image::PNG::Libpng;
 
+require './EXAMPLE_HELPERS.pm'; ## check_api_endpoint_and_user_scopes() and display_api_summary_and_return_versioned_api_string()
+
 my $config = {
   #api => 'storage:v1beta2',
   api => 'storage',
   debug => 01,
   project => $ENV{GOOGLE_PROJECT_ID},
+  selected_bucket => undef, ## filled with first available bucket of user for project
   upload  =>  $ARGV[0] || undef,
-  parameters_concise => 01,
+  file_content => undef, ## will be filled with content of file at path 'upload'
+  
+  # parameters_concise => 01, replaced by client->debug
 };
 
 
@@ -94,10 +98,21 @@ if ( $config->{upload} )
     #my $mt    = MIME::Types->new();
     croak("not going to try to upload file $config->{upload} as it doesn't seem to be available in the path") unless -e $config->{upload};
     $config->{MIMETYPE} = MIME::Types->new()->mimeTypeOf( $config->{upload});
+    ## maybe consider use File::Slurp; qw/read_file/ .. so my $config->{file_content} = read_file( $config->{upload} , binmode => ':raw' , scalar_ref => 1 );
+    open F, $config->{upload};
+    $config->{file_content} = do { local $/; <F> };
+    close F;
 
 }
 
 
+
+
+####
+####
+####            SET UP THE CLIENT AS THE DEFAULT USER 
+####
+####
 ## assumes gapi.json configuration in working directory with scoped project and user authorization
 ## manunally sets the client user email to be the first in the gapi.json file
 my $gapi_client = WebService::GoogleAPI::Client->new( debug => $config->{debug}, gapi_json => 'gapi.json' );
@@ -105,23 +120,38 @@ my $aref_token_emails = $gapi_client->auth_storage->storage->get_token_emails_fr
 my $user              = $aref_token_emails->[0];                                                             ## default to the first user
 $gapi_client->user( $user );
 
+
+
+
+####
+####
+####            DISPLAY AN OVERVIEW OF THE API VERSIONS 
+####            AND SELECT THE PREFERRED VERSION IF NOT SPECIFIED
+####
+
 #display_api_summary_and_return_versioned_api_string( $gapi_client, $config->{api}, 'v1beta2' );
 my $versioned_api = display_api_summary_and_return_versioned_api_string( $gapi_client, $config->{api} );
 
 #say "Versioned version of API = $versioned_api ";
-
 
 ## interestingly an auth'd request is denied without the correct scope .. so can't use that to find the missing scope :)
 #my $methods = $gapi_client->methods_available_for_google_api_id( $versioned_api );
 # say join("\n\t", "STORAGE API METHODS:\n", sort keys %$methods );
 #exit;
 
-
-
+####
+####
+####            DISPLAY A SUMMARY OF THE API-ENDPOINT  -- storage.buckets.list
+####
+####
 check_api_endpoint_and_user_scopes( $gapi_client, "$versioned_api.buckets.list" );
 
 
-## 
+####
+####
+####            EXECUTE API - GET LIST OF BUCKETS  
+####
+####
 my $r = $gapi_client->api_query(  api_endpoint_id => 'storage.buckets.list',  #storage.objects.list
                                  options => { 
                                      project => $config->{project}
@@ -131,10 +161,21 @@ my $r = $gapi_client->api_query(  api_endpoint_id => 'storage.buckets.list',  #s
 my $d = $r->json;
 say pp $d;
 say "First bucket has id = '$d->{items}[0]{id}'" if defined $d->{items}[0]{id};
+$config->{selected_bucket} = $d->{items}[0]{id};
+
+####
+####
+####            DISPLAY A SUMMARY OF THE API-ENDPOINT  -- storage.objects.insert
+####
+####
 
 check_api_endpoint_and_user_scopes( $gapi_client, "$versioned_api.objects.insert" );
 
-
+####
+####
+####            EXECUTE API - INSERT A FILE INTO A BUCKET .. NB - not working using API Spec
+####
+####
 =pod
     "message": "Upload requests must include an uploadType URL parameter and a URL path beginning with /upload/",
     "extendedHelp": "https://cloud.google.com/storage/docs/json_api/v1/how-tos/upload"
@@ -144,9 +185,6 @@ $r = $gapi_client->api_query(  api_endpoint_id => 'storage.objects.insert',  #st
                                      bucket => $d->{items}[0]{id},
                                      uploadType => 'media'
                                      #contentEncoding
-#                                      q=> '',
-#                                      target => 'fr',
-#                                      format => 'text',
                                   } 
                                   );
 print Dumper  $r; # ->json;
@@ -155,140 +193,48 @@ pp $r->json;
 =cut
 
 
+=pod
+
+As per L<https://cloud.google.com/storage/docs/uploading-objects> 
+"https://www.googleapis.com/upload/storage/v1/b/[BUCKET_NAME]/o?uploadType=media&name=[OBJECT_NAME]
+
+$config->{MIMETYPE}
+$config->{file_content}
+$config->{selected_bucket}
+
+NB _ to make publicly accessible  you need to add 
+{
+"entity": "allUsers",
+"role": "READER"
+}
+to the file or bucket through the browser - will include example on API in future.
+
+as per L<https://cloud.google.com/storage/docs/access-control/making-data-public>
+
+=cut
+## split out the filename - a bit rough
+if ( $config->{upload} =~ /([^\/]*)$/xsmg )
+{
+     $config->{upload} = $1;
+}
+
+say "File content length = " . length( $config->{file_content});
+say "MIME TYPE of $config->{upload} is '$config->{MIMETYPE}'";
+#exit;
+$r = $gapi_client->api_query( { 
+                                path => "https://www.googleapis.com/upload/storage/v1/b/$config->{selected_bucket}/o?uploadType=media&name=$config->{upload}",  
+                                method => 'POST',
+                                 options => $config->{file_content}
+                                  });
+#print Dumper  $r; # ->json;
+
+pp $r->json;
+exit;
+
 
 exit;
 
 
-sub check_api_endpoint_and_user_scopes ## TODO - Doesn't actually do waht it says here yet
-{
-    my ( $client, $api_endpoint ) = @_;
-  say '-' x 40;
-  my $has_scope = $client->has_scope_to_access_api_endpoint( $api_endpoint );
-    my $api_spec = $client->get_api_discovery_for_api_id( $api_endpoint  ); ## only for base url
-    my $base_url = $api_spec->{baseUrl};
-    # print pp $api_spec;exit;
-    
-    my $api_method_details = $gapi_client->extract_method_discovery_detail_from_api_spec( $api_endpoint );
-    #print pp $api_method_details;exit;
-
-
-    ## Construct summary textual display for the endpoint
-
-    my $scopes_txt = join("\n", @{$api_method_details->{scopes}} );
-    my $param_order_txt = join(",", @{$api_method_details->{parameterOrder}} );
-
-
-    ## parameters 
-    my $parameters_txt = '';
-    if ( $config->{parameters_concise})
-    {     ## SHORT VERSION - just the names
-      $parameters_txt = join("\n", sort keys %{$api_method_details->{parameters}} );
-    }
-    else  ## LONG VERSION - name, description, location, type
-    {
-        foreach my $param ( sort keys %{$api_method_details->{parameters}}  )
-        {
-            $parameters_txt .= "  $param\n";
-            #say Dumper $api_method_details->{parameters}{$param}; exit;
-            my $text_table = Text::Table->new();
-            foreach my $field (qw/description type  location required/) 
-            {
-                if (defined $api_method_details->{parameters}{$param}{$field} )
-                {
-                    $text_table->add( '     ', $field, "'$api_method_details->{parameters}{$param}{$field}'"  ) ;
-                }
-            }
-            $parameters_txt .= $text_table . "\n";
-        }
-    }
-
-
-    print qq{
-# $api_method_details->{description} - ( $api_method_details->{id} )
-
-METHOD: $api_method_details->{httpMethod}
-PATH: $base_url$api_method_details->{path}
-REQUIRED PARAMETER ORDER: $param_order_txt
-
-
-## SCOPES
-$scopes_txt    
-
-## PARAMETERS
-$parameters_txt
-    
-    };
-    print "User has scope = $has_scope\n";
-  say '-' x 40;
-}
-
-
-
-
-sub display_api_summary_and_return_versioned_api_string
-{
-    my ( $client, $api_name, $version  ) = @_;
-    $api_name =~ s/\..*$//smg;
-    if ($api_name =~ /^([^:]*):(.*)$/xsm )
-    {
-        $api_name = $1;
-        $version = $2;
-    }
-
-    #say "api $api_name version $version";
-
-    my $new_hash = {}; ## index by 'api:version' ( id )
-    my $preferred_api_name = ''; ## this is set to the preferred version if described 
-    my $text_table = Text::Table->new();
-
-    foreach my $api ( @{ %{$client->discover_all()}{items} } )
-    {
-        # convert JSON::PP::Boolean to true|false strings
-        if ( defined $api->{preferred} )
-        {
-            $api->{preferred}  = "$api->{preferred}";
-            $api->{preferred}  = $api->{preferred} eq '0' ? 'no' : 'YES';
-            
-            if ( $preferred_api_name eq '' && $api->{preferred} eq 'YES' )
-            {
-                if (  $api->{id} =~ /$api_name/mx )
-                {
-                    $preferred_api_name = $api->{id} ;
-                    $new_hash->{ $api_name } = $api;
-                }
-            }
-
-
-        }
-        #$new_hash->{ $api->{name} } = $api unless defined $new_hash->{ $api->{name} };
-        $new_hash->{ $api->{id} } = $api;
-        if (  $api->{name} =~ /$api_name/xm  )
-        {
-            foreach my $field (qw/title version preferred id  description discoveryRestUrl documentationLink name/)
-            {
-                #say qq{$field = $api->{$field}};
-                $text_table->add( $field, $api->{$field}  );
-            }
-            $text_table->add(' ',' ');
-        }
-    }
-
-    
-    say "## Google $new_hash->{$api_name}{title} ( $api_name ) SUMMARY\n\n";
-    say $text_table;
-    
-    if ( defined $version)
-    {
-        $api_name = "$api_name:$version";
-    }
-    else 
-    {
-        $api_name = $preferred_api_name;
-    }
-    say pp $new_hash->{$api_name}  if $config->{debug}; 
-    
-    return $api_name;
-}
 
 
 
@@ -330,6 +276,8 @@ You can run these tools interactively or in your automated scripts.
 
 =head2 gsutil L<https://cloud.google.com/storage/docs/gsutil>
 
+I believe gsutil is installed as part of the gcloud Google SDK.
+
 gsutil is a Python application that lets you access Cloud Storage from the command line. You can use gsutil to do a wide range of bucket and object management tasks, including:
 
 =over 4
@@ -346,7 +294,7 @@ gsutil is a Python application that lets you access Cloud Storage from the comma
 
 =back
 
-    Peters-MacBook-Pro-2:examples peter$ gsutil ls
+    bash$ gsutil ls
     gs://computerproscomau-vcm/
     gs://perl-webservice/
 

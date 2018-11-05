@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Exception;
-$RT::Client::REST::Exception::VERSION = '0.52';
+$RT::Client::REST::Exception::VERSION = '0.53';
 use base qw(Exception::Class);
 
 use vars qw($VERSION);
@@ -17,40 +17,40 @@ use Error;
 use Exception::Class (
     'RT::Client::REST::OddNumberOfArgumentsException'   => {
         isa         => __PACKAGE__,
-        description => "This means that we wanted name/value pairs",
+        description => 'This means that we wanted name/value pairs',
     },
 
     'RT::Client::REST::InvaildObjectTypeException'   => {
         isa         => __PACKAGE__,
-        description => "Invalid object type was specified",
+        description => 'Invalid object type was specified',
     },
 
     'RT::Client::REST::MalformedRTResponseException'    => {
         isa         => __PACKAGE__,
-        description => "Malformed RT response received from server",
+        description => 'Malformed RT response received from server',
     },
 
     'RT::Client::REST::InvalidParameterValueException'  => {
         isa         => __PACKAGE__,
-        description => "This happens when you feed me bad values",
+        description => 'This happens when you feed me bad values',
     },
 
     'RT::Client::REST::CannotReadAttachmentException'  => {
         isa         => __PACKAGE__,
-        description => "Cannot read attachment",
+        description => 'Cannot read attachment',
     },
 
     'RT::Client::REST::RequiredAttributeUnsetException' => {
         isa         => __PACKAGE__,
-        description => "An operation failed because a required attribute " .
-                       "was not set in the object",
+        description => 'An operation failed because a required attribute ' .
+                       'was not set in the object',
     },
 
 
     'RT::Client::REST::RTException' => {
         isa         => __PACKAGE__,
         fields      => ['code'],
-        description => "RT server returned an error code",
+        description => 'RT server returned an error code',
     },
 
     'RT::Client::REST::ObjectNotFoundException' => {
@@ -65,7 +65,7 @@ use Exception::Class (
 
     'RT::Client::REST::AuthenticationFailureException'  => {
         isa         => 'RT::Client::REST::RTException',
-        description => "Incorrect username or password",
+        description => 'Incorrect username or password',
     },
 
     'RT::Client::REST::UpdateException' => {
@@ -133,40 +133,50 @@ use Exception::Class (
     'RT::Client::REST::HTTPException'   => {
         isa         => __PACKAGE__,
         fields      => ['code'],
-        description => "Error in the underlying protocol (HTTP)",
+        description => 'Error in the underlying protocol (HTTP)',
     },
 );
 
 sub _get_exception_class {
     my ($self, $content) = @_;
 
-    if ($content =~ /not found|\d+ does not exist|[Ii]nvalid attachment id/) {
+    if ($content =~ m/not found|\d+ does not exist|[Ii]nvalid attachment id/) {
         return 'RT::Client::REST::ObjectNotFoundException';
-    } elsif ($content =~ /not create/) {
+    }
+    if ($content =~ m/not create/) {
         return 'RT::Client::REST::CouldNotCreateObjectException';
-    } elsif ($content =~ /[Uu]nknown custom field/) {
+    }
+    if ($content =~ m/[Uu]nknown custom field/) {
         return 'RT::Client::REST::UnknownCustomFieldException';
-    } elsif ($content =~ /[Ii]nvalid query/) {
+    }
+    if ($content =~ m/[Ii]nvalid query/) {
         return 'RT::Client::REST::InvalidQueryException';
-    } elsif ($content =~ /could not be set to/) {
+    }
+    if ($content =~ m/could not be set to/) {
         return 'RT::Client::REST::CouldNotSetAttributeException';
-    } elsif ($content =~ /not a valid email address/) {
+    }
+    if ($content =~ m/not a valid email address/) {
         return 'RT::Client::REST::InvalidEmailAddressException';
-    } elsif ($content =~ /is already the current value/) {
+    }
+    if ($content =~ m/is already the current value/) {
         return 'RT::Client::REST::AlreadyCurrentValueException';
-    } elsif ($content =~ /[Ii]mmutable field/) {
+    }
+    if ($content =~ m/[Ii]mmutable field/) {
         return 'RT::Client::REST::ImmutableFieldException';
-    } elsif ($content =~ /[Ii]llegal value/) {
+    }
+    if ($content =~ m/[Ii]llegal value/) {
         return 'RT::Client::REST::IllegalValueException';
-    } elsif ($content =~ /[Yy]ou are not allowed/) {
+    }
+    if ($content =~ m/[Yy]ou are not allowed/) {
         return 'RT::Client::REST::UnauthorizedActionException';
-    } elsif ($content =~ /[Yy]ou already own this ticket/ ||
-             $content =~ /[Tt]hat user already owns that ticket/)
+    }
+    if ($content =~ m/[Yy]ou already own this ticket/ ||
+             $content =~ m/[Tt]hat user already owns that ticket/)
     {
         return 'RT::Client::REST::AlreadyTicketOwnerException';
-    } else {
-        return 'RT::Client::REST::UnknownRTException';
     }
+
+    return 'RT::Client::REST::UnknownRTException';
 }
 
 sub _rt_content_to_exception {
@@ -200,7 +210,7 @@ RT::Client::REST::Exception - Exceptions thrown by RT::Client::REST
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 

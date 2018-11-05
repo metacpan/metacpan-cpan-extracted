@@ -14,6 +14,7 @@ use Alien::Build::Util qw( _mirror );
 our @EXPORT = qw(
   alienfile
   alienfile_ok
+  alienfile_skip_if_missing_prereqs
   alien_download_ok
   alien_extract_ok
   alien_build_ok
@@ -26,7 +27,7 @@ our @EXPORT = qw(
 );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '1.48'; # VERSION
+our $VERSION = '1.49'; # VERSION
 
 
 my $build;
@@ -117,16 +118,73 @@ sub _alienfile_clear
 
 sub alienfile_ok
 {
-  my $build = eval { alienfile(@_) };
-  my $error = $@;
+  my $build;
+  my $name;
+  my $error;
+  
+  if(@_ == 1 && ! defined $_[0])
+  {
+    $build = $_[0];
+    $error = 'no alienfile given';
+    $name = 'alienfile compiled';
+  }
+  elsif(@_ == 1 && eval { $_[0]->isa('Alien::Build') })
+  {
+    $build = $_[0];
+    $name = 'alienfile compiled';
+  }
+  else
+  {
+    $build = eval { alienfile(@_) };
+    $error = $@;
+    $name = 'alienfile compiles';
+  }
+
   my $ok = !! $build;
   
   my $ctx = context();
-  $ctx->ok($ok, 'alienfile compiles');
+  $ctx->ok($ok, $name);
   $ctx->diag("error: $error") if $error;
   $ctx->release;
   
   $build;
+}
+
+
+sub alienfile_skip_if_missing_prereqs
+{
+  my($phase) = @_;
+  
+  if($build)
+  {
+    eval { $build->load_requires('configure', 1) };
+    if(my $error = $@)
+    {
+      my $reason = "Missing configure prereq";
+      if($error =~ /Required (.*) (.*),/)
+      {
+        $reason .= ": $1 $2";
+      }
+      my $ctx = context();
+      $ctx->plan(0, SKIP => $reason);
+      $ctx->release;
+      return;
+    }
+    $phase ||= $build->install_type;
+    eval { $build->load_requires($phase, 1) };
+    if(my $error = $@)
+    {
+      my $reason = "Missing $phase prereq";
+      if($error =~ /Required (.*) (.*),/)
+      {
+        $reason .= ": $1 $2";
+      }
+      my $ctx = context();
+      $ctx->plan(0, SKIP => $reason);
+      $ctx->release;
+      return;
+    }
+  }
 }
 
 
@@ -509,7 +567,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 1.48
+version 1.49
 
 =head1 SYNOPSIS
 
@@ -593,9 +651,30 @@ The install prefix for the build.
  my $build = alienfile_ok;
  my $build = alienfile_ok q{ use alienfile ... };
  my $build = alienfile_ok filename => 'alienfile';
+ my $build = alienfile_ok $build;
 
 Same as C<alienfile> above, except that it runs as a test, and will not throw an exception
 on failure (it will return undef instead).
+
+[version 1.49]
+
+As of version 1.49 you can also pass in an already formed instance of L<Alien::Build>.  This
+allows you to do something like this:
+
+ subtest 'a subtest' => sub {
+   my $build = alienfile q{ use alienfile; ... };
+   alienfile_skip_if_missing_prereqs; # skip if alienfile prereqs are missing
+   alienfile_ok $build;  # delayed pass/fail for the compile of alienfile
+ };
+
+=head2 alienfile_skip_if_missing_prereqs
+
+ alienfile_skip_if_missing_prereqs;
+ alienfile_skip_if_missing_prereqs $phase;
+
+Skips the test or subtest if the prereqs for the alienfile are missing.
+If C<$phase> is not given, then either C<share> or C<system> will be
+detected.
 
 =head2 alien_install_type_is
 

@@ -1,0 +1,4 @@
+Revision history for POE-Component-DirWatch-Object-NewUnmodifiedFile
+
+0.002  2018-11-05 14:56:24 GMT
+        - Initial release: Modify POE::Component::DirWatch::Object::NewFile to check mtime

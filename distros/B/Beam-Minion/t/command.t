@@ -22,8 +22,10 @@ subtest 'delegates to correct module' => sub {
     ok !exception { Beam::Runner::Command->run( 'minion', 'test', 1, 2, 3 ) },
         'command is run successfully'
             or diag $@;
+    my $obj = shift @Beam::Minion::Command::test::ARGS;
+    isa_ok $obj, 'Beam::Minion::Command::test', 'object is created';
     is_deeply \@Beam::Minion::Command::test::ARGS,
-        [qw( Beam::Minion::Command::test 1 2 3 )],
+        [qw( 1 2 3 )],
         'arguments to command are correct';
 };
 

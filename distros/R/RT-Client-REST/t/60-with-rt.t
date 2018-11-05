@@ -1,3 +1,5 @@
+#!perl
+
 # This test is for testing RT::Client::REST with a real instance of RT.
 # This is so that we can verify bug reports and compare functionality
 # (and bugs) between different versions of RT.

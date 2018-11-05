@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.26 2018-11-03
+
+ - Fix perl warning about unescaped {}
+
 1.25 2018-10-13
 
  - Adjustment to French punctuation in HTML

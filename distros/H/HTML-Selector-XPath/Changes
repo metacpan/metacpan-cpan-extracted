@@ -1,6 +1,15 @@
 Revision history for Perl extension HTML::Selector::XPath
 
-0.25 NEXT
+0.26 NEXT
+
+0.25 2018-11-03
+    * Add support for compiling :disabled, :selected, :checked, :text,
+      :last-of-type
+
+      I'm not sure whether the Perl XPath libaries support this, but at least
+      we can compile it.
+
+      This addresses RT #124406, thanks to Andrew Maguire
 
 0.24 2018-11-02
     * Test stability improvement if HTML::TreeBuilder::XPath is not installed
@@ -9,10 +18,10 @@ Revision history for Perl extension HTML::Selector::XPath
     * No code changes, no need to upgrade
 
 0.23 2017-03-23 (Thu Mar 23 19:35:00 GMT+1 2017)
-      - seems as if "provides" in META.json makes new versions not get indexed
-        properly
-      . No code changes, no need to upgrade
-      . We also allow static installation now, without running Makefile.PL
+    * seems as if "provides" in META.json makes new versions not get indexed
+      properly
+    * No code changes, no need to upgrade
+    * We also allow static installation now, without running Makefile.PL
 
 0.22 2016-09-23 (Fri Sep 23 21:35:00 GMT+2 2016)
       - seems as if "provides" in META.json must be a full path to the file...

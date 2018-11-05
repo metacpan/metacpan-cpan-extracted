@@ -112,12 +112,12 @@ __END__
 
 =head1 NAME
 
-Perl::PrereqScanner::NotQuiteLite::Parser::ClassAccessor
+Perl::PrereqScanner::NotQuiteLite::Parser::AnyMoose
 
 =head1 DESCRIPTION
 
 This parser is to deal with modules loaded by C<extends>
-from L<Class::Accessor> and its friends.
+from L<Any::Moose> and its friends.
 
 =head1 AUTHOR
 

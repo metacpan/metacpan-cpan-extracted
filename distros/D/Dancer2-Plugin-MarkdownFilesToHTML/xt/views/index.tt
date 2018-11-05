@@ -1,0 +1,6 @@
+<head>
+<% js_head %>
+</head>
+<body>
+  <% js_body_top %>
+</body>

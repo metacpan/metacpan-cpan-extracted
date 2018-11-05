@@ -3,7 +3,7 @@ package SQL::Abstract::Plugin::InsertMulti;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp ();
 use Sub::Exporter -setup => +{
@@ -41,6 +41,12 @@ sub _insert_multi {
         $self->_sqlcase( ( $opts->{ignore} ) ? 'ignore' : 'into' ),
         $table, $sql,
     );
+
+    if ($opts->{returning}) {
+        my ($s, @b) = $self->_insert_returning($opts);
+        $sql .= $s;
+        push @bind, @b;
+    }
 
     return ( $sql, @bind );
 }

@@ -7,7 +7,13 @@
           'type' => 'element'
         },
         {
-          'nodename' => 'jsonPointer',
+          'children' => [
+            {
+              'nodename' => 'jsonPointer',
+              'type' => 'element'
+            }
+          ],
+          'nodename' => 'exprSingleValue',
           'type' => 'element'
         },
         {

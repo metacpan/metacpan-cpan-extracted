@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Graphics::GVG::AST::Polygon;
-$Graphics::GVG::AST::Polygon::VERSION = '0.9';
+$Graphics::GVG::AST::Polygon::VERSION = '0.91';
 use strict;
 use warnings;
 use Moose;

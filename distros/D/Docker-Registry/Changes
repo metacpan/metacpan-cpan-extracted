@@ -1,3 +1,14 @@
+0.06 2018-11-05
+ - GCE receives a new attribute "region" to select the region where the registry
+   is hosted.
+ - New Azure Container Registry provider (ACR). Can authenticate with admin credentials
+   or Azure AD credentials.
+ - Don't follow redirections. Some Container Registries return 30X responses that lead
+   to random HTML (so the response processor was not making anything out of these responses)
+ - Internal refactor
+   - using Moo and Types::Standard instead of Moose
+   - pass the scope to the signnature method in auth modules
+
 0.05 2018-06-04
  - Require Import::Into 1.002003 to avoid some installation failures on 
    some systems http://matrix.cpantesters.org/?dist=Docker-Registry+0.04 (waterkip)

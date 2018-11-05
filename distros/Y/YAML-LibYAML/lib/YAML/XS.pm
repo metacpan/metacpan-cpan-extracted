@@ -1,7 +1,7 @@
 use strict; use warnings;
 
 package YAML::XS;
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 use base 'Exporter';
 
@@ -125,6 +125,16 @@ sub __qr_loader {
         return $qr;
     }
     return qr/$_[0]/;
+}
+
+sub __code_loader {
+    my ($string) = @_;
+    my $sub = eval "sub $string";
+    if ($@) {
+        warn "YAML::XS failed to load sub: $@";
+        return sub {};
+    }
+    return $sub;
 }
 
 1;

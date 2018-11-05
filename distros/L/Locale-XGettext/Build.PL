@@ -19,12 +19,13 @@ my %module_build_args = (
     "Guido Flohr <guido.flohr\@cantanea.com>"
   ],
   "dist_name" => "Locale-XGettext",
-  "dist_version" => "0.6",
+  "dist_version" => "0.7",
   "license" => "lgpl",
   "module_name" => "Locale::XGettext",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
+    "Encode" => 0,
     "File::Spec" => 0,
     "Getopt::Long" => "2.36",
     "Locale::Messages" => 0,
@@ -33,6 +34,7 @@ my %module_build_args = (
     "Locale::TextDomain" => "1.20",
     "Scalar::Util" => 0,
     "base" => 0,
+    "perl" => "5.008",
     "strict" => 0,
     "utf8" => 0
   },

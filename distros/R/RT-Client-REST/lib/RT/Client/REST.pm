@@ -24,7 +24,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST;
-$RT::Client::REST::VERSION = '0.52';
+$RT::Client::REST::VERSION = '0.53';
 use Error qw(:try);
 use HTTP::Cookies;
 use HTTP::Request::Common;
@@ -865,7 +865,7 @@ sub _version { $RT::Client::REST::VERSION }
     # The problem with the second approach is that it creates unrelated
     # methods in RT::Client::REST namespace.
     package RT::Client::REST::NoopLogger;
-$RT::Client::REST::NoopLogger::VERSION = '0.52';
+$RT::Client::REST::NoopLogger::VERSION = '0.53';
 sub new { bless \(my $logger), __PACKAGE__ }
     for my $method (RT::Client::REST::LOGGER_METHODS) {
         no strict 'refs'; ## no critic (ProhibitNoStrict)
@@ -887,7 +887,7 @@ RT::Client::REST - Client for RT using REST API
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

@@ -58,7 +58,7 @@
          "web" : "https://github.com/ingydotnet/yaml-pm"
       }
    },
-   "version" : "1.26",
+   "version" : "1.27",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

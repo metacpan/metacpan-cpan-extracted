@@ -1,5 +1,9 @@
 Revision history for JIP-DataPath
 
+0.04         2018-11-04
+        Added get_new method.
+        Added Perl 5.28 into ".travis.yml".
+
 0.03         2018-06-03
         Added default_value parameter to JIP::DataPath::get.
 

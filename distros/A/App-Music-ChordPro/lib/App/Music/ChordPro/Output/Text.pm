@@ -23,13 +23,15 @@ sub generate_songbook {
 
 my $single_space = 0;		# suppress chords line when empty
 my $lyrics_only = 0;		# suppress all chords lines
+my $chords_under = 0;		# chords under lyrics
 
 sub generate_song {
     my ($s, $options) = @_;
 
     my $tidy = $options->{'backend-option'}->{tidy};
     $single_space = $options->{'single-space'};
-    $lyrics_only = $options->{'lyrics-only'};
+    $lyrics_only = $::config->{settings}->{'lyrics-only'};
+    $chords_under = $::config->{settings}->{'chords-under'};
 
     $s->structurize
       if ( $options->{'backend-option'}->{structure} // '' ) eq 'structured';
@@ -197,6 +199,17 @@ sub songline {
 	return ( "", join( " ", @{ $elt->{phrases} } ) );
     }
 
+    if ( my $f = $::config->{settings}->{'inline-chords'} ) {
+	$f = '[%s]' unless $f =~ /^[^%]*\%s[^%]*$/;
+	$f .= '%s';
+	foreach ( 0..$#{$elt->{chords}} ) {
+	    $t_line .= sprintf( $f,
+				$elt->{chords}->[$_],
+				$elt->{phrases}->[$_] );
+	}
+	return ( $t_line );
+    }
+
     my $c_line = "";
     foreach ( 0..$#{$elt->{chords}} ) {
 	$c_line .= $elt->{chords}->[$_] . " ";
@@ -206,7 +219,9 @@ sub songline {
 	$c_line .= " " x -$d if $d < 0;
     }
     s/\s+$// for ( $t_line, $c_line );
-    return ( $c_line, $t_line );
+    return $chords_under
+      ? ( $t_line, $c_line )
+      : ( $c_line, $t_line )
 }
 
 # Substitute %X sequences in title formats and comments.

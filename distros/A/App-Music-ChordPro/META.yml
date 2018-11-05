@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.5503'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,12 +30,12 @@ no_index:
 provides:
   App::Music::ChordPro:
     file: lib/App/Music/ChordPro.pm
-    version: v0.910.1
+    version: '0.971'
   chordpro:
     file: script/chordpro
-    version: v0.910.1
+    version: '0.971'
 requires:
-  App::Packager: '1.42'
+  App::Packager: '1.43'
   Font::TTF: '1.04'
   JSON::PP: '2.27203'
   PDF::API2: '2.02'
@@ -46,5 +46,5 @@ resources:
   homepage: http://www.chordpro.org
   license: http://dev.perl.org/licenses/
   repository: https://github.com/sciurius/chordpro
-version: v0.910.1
+version: '0.971'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

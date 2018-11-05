@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes YAML version 1.26.
+    This document describes YAML version 1.27.
 
 NOTE
 
@@ -409,7 +409,7 @@ GLOBAL OPTIONS
 
       NOTE: YAML's block style is akin to Perl's here-document.
 
-    UseFold
+    UseFold (Not supported anymore since v0.60)
 
       If you want to force YAML to use the 'folded' style for all multiline
       scalars, then set $UseFold to 1.

@@ -201,6 +201,10 @@ sub _build_definitions {
             if ($font->regular->dirname  =~ m/\A([A-Za-z0-9\.\/_-]+)\z/) {
                 $definition{attr}{Path} = $1;
             }
+            else {
+                warn $font->regular->dirname . " does not look like a path which can be embedded." .
+                  " Please make sure the fonts are installed in a standard TeX location\n";
+            }
 
             my %map = %{$self->_shape_mapping};
             foreach my $method (keys %map) {

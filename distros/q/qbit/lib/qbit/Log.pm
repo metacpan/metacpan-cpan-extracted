@@ -5,7 +5,7 @@ qbit::Log - Functions to logging
 =cut
 
 package qbit::Log;
-$qbit::Log::VERSION = '2.6';
+$qbit::Log::VERSION = '2.7';
 use strict;
 use warnings;
 use utf8;

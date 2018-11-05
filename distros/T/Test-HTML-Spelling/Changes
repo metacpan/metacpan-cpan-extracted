@@ -1,5 +1,20 @@
 Revision history for Test-HTML-Spelling
 
+v0.4.0    2018-11-04 15:06:57+00:00 Europe/London
+  [Documentation]
+   - Fixed typo in POD (Shlomi Fish)
+
+   - Added to SEE ALSO section.
+
+  [Toolchain]
+  - Convert the distribution to use Dist-Zilla as the build system
+    instead of the undermaintained and unloved Module-Install.
+    (Shlomi Fish)
+
+  [Other]
+  - Perltidy source.
+
+
 v0.3.7   2014-08-16
 
        - Fixed license in Makefile.PL to make CPANTS happy.
@@ -107,4 +122,3 @@ v0.1.1  2012-11-29
 v0.1.0  2012-11-24
 
        - First prototype released on GitHub.
-

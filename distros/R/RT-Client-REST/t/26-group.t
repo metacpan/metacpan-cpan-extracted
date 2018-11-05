@@ -1,3 +1,6 @@
+#!perl
+# vim:ft=perl:
+
 use strict;
 use warnings;
 
@@ -28,4 +31,3 @@ for my $method (METHODS) {
 
 ok('group' eq $user->rt_type, 'rt_type is ok');
 
-# vim:ft=perl:

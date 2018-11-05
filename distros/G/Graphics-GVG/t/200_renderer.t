@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 6;
+use Test::More tests => 12;
 use strict;
 use warnings;
 use Graphics::GVG;
@@ -69,6 +69,14 @@ sub call_pack
     pass( "Called call_pack" );
 }
 
+package MockClass2;
+use Test::More;
+
+sub call_pack2
+{
+    pass( "Called call_pack2" );
+}
+
 
 package main;
 
@@ -86,3 +94,6 @@ my $gvg = Graphics::GVG->new;
 my $ast = $gvg->parse( $CODE );
 my ($code, $pack) = RenderMock->make_code( $ast );
 $pack->call_pack;
+
+($code, $pack) = RenderMock->make_code( $ast, 'MockClass2' );
+$pack->call_pack2;

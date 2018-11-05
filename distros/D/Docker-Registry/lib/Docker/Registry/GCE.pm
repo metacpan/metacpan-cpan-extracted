@@ -1,10 +1,17 @@
 package Docker::Registry::GCE;
-  use Moose;
+  use Moo;
+  use Types::Standard qw/Str Maybe/;
   extends 'Docker::Registry::V2';
+
+  has region => (is => 'ro', isa => Maybe[Str], default => undef);
 
   has '+url' => (lazy => 1, default => sub {
     my $self = shift;
-    'https://gcr.io';
+    if (defined $self->region) {
+      sprintf 'https://%s.gcr.io', $self->region;
+    } else {
+      'https://gcr.io';
+    }
   });
 
 1;

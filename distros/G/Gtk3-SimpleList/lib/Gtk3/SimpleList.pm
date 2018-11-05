@@ -11,7 +11,7 @@ use Gtk3;
 
 our @ISA = 'Gtk3::TreeView';
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 our %column_types = (
   'hidden' => {type=>'Glib::String',                                        attr=>'hidden'},
@@ -814,8 +814,10 @@ section will prove redundant, but just in case:
 Perl(1), Glib(3pm), Gtk3(3pm), Gtk3::TreeView(3pm), Gtk3::TreeModel(3pm),
 Gtk3::ListStore(3pm).
 
-Note: Gtk3::SimpleList is deprecated in favor of Gtk3::Ex::Simple::List, part
-of the Gtk3-Perl-Ex project at http://gtk2-perl-ex.sf.net .
+Note: Gtk2::SimpleList was deprecated in favor of Gtk2::Ex::Simple::List, part
+of the Gtk2-Perl-Ex project at http://gtk2-perl-ex.sf.net .
+Gtk3::SimpleList is a simple port of Gtk2::SimpleList on top of Gtk3 for its
+users that wanted to switch to Gtk3.
 
 =head1 AUTHORS
 

@@ -1,20 +1,22 @@
 package Docker::Registry::Exception;
-  use Moose;
+  use Moo;
   extends 'Throwable::Error';
 
 package Docker::Registry::Exception::HTTP;
-  use Moose;
+  use Moo;
+  use Types::Standard qw/Int/;
   extends 'Docker::Registry::Exception';
-  has status => (is => 'ro', isa => 'Int', required => 1);
+  has status => (is => 'ro', isa => Int, required => 1);
 
 package Docker::Registry::Exception::Unauthorized;
-  use Moose;
+  use Moo;
   extends 'Docker::Registry::Exception::HTTP';
 
 package Docker::Registry::Exception::FromRemote;
-  use Moose;
+  use Moo;
+  use Types::Standard qw/Str/;
   extends 'Docker::Registry::Exception::HTTP';
 
-  has code => (is => 'ro', isa => 'Str', required => 1);
+  has code => (is => 'ro', isa => Str, required => 1);
 
 1;

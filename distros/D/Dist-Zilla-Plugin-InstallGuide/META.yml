@@ -30,7 +30,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::InstallGuide:
     file: lib/Dist/Zilla/Plugin/InstallGuide.pm
-    version: '1.200011'
+    version: '1.200012'
 requires:
   Dist::Zilla::File::InMemory: '0'
   Dist::Zilla::Role::FileGatherer: '0'
@@ -48,10 +48,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InstallGuide
   homepage: https://github.com/karenetheridge/Dist-Zilla-Plugin-InstallGuide
   repository: https://github.com/karenetheridge/Dist-Zilla-Plugin-InstallGuide.git
-version: '1.200011'
+version: '1.200012'
 x_Dist_Zilla:
   perl:
-    version: '5.029001'
+    version: '5.029004'
   plugins:
     -
       class: Dist::Zilla::Plugin::Bootstrap::lib
@@ -93,7 +93,11 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
+          exclude_filename:
+            - CONTRIBUTING
+            - INSTALL
+            - LICENSE
+            - README.pod
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -143,7 +147,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::ETHER/InstallGuide'
-      version: '1.200011'
+      version: '1.200012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -475,11 +479,13 @@ x_Dist_Zilla:
           version: '6.012'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
           version: '0.47'
+        Dist::Zilla::Plugin::MakeMaker::Fallback:
+          skip_release_testing: 0
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
           version: '6.012'
       name: '@Author::ETHER/MakeMaker::Fallback'
-      version: '0.027'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::ModuleBuildTiny::Fallback
       config:
@@ -508,13 +514,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.18.0
+          git_version: 2.19.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
           paths: []
       name: '@Author::ETHER/Git::Contributors'
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -575,7 +581,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20180720'
+          Module::CoreList: '5.20181020'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -600,7 +606,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.045'
@@ -608,7 +614,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -616,7 +622,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -642,7 +648,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.045'
@@ -717,11 +723,15 @@ x_Dist_Zilla:
           commit_msg: '%N-%v%t%n%n%c'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - CONTRIBUTING
             - Changes
+            - INSTALL
+            - LICENSE
+            - README.pod
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -734,11 +744,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.200011
+          tag: v1.200012
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -775,7 +785,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -797,7 +807,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.18.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.045'
@@ -807,7 +817,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@Author::ETHER/GitHub::Update'
-      version: '0.45'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
@@ -905,6 +915,6 @@ x_contributors:
   - 'Dan Book <grinnz@gmail.com>'
   - 'Dave Rolsky <autarch@urth.org>'
   - 'Apocalypse <APOCAL@cpan.org>'
-x_generated_by_perl: v5.29.1
+x_generated_by_perl: v5.29.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

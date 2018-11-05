@@ -1,5 +1,9 @@
 Revision history for Text-Chord-Piano
 
+0.062   Tue Nov  6 01:31:02 JST 2018
+    [NO CODE CHANGE]
+        - Fix test
+
 0.061   Sat Feb  9 09:55:02 JST 2013
     [NO CODE CHANGE]
         - fixed test

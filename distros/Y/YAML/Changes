@@ -1,3 +1,6 @@
+1.27 Sat Nov  3 14:01:26 CET 2018
+ - Remove a warning about uninitialized value for perl <= 5.10
+
 1.26 Fri May 18 21:57:20 CEST 2018
  - Fix bug introduced in 1.25 - loading of quoted string with colon as
    sequence element (tinita, fixes issue#208)

@@ -1,0 +1,5 @@
+name = "SQL-Abstract-Plugin-InsertMulti"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

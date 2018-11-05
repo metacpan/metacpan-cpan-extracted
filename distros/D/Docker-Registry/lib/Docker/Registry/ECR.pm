@@ -1,5 +1,6 @@
 package Docker::Registry::ECR;
-  use Moose;
+  use Moo;
+  use Types::Standard qw/Str/;
   extends 'Docker::Registry::V2';
 
   has '+url' => (lazy => 1, default => sub {
@@ -9,13 +10,13 @@ package Docker::Registry::ECR;
     sprintf 'https://%s.dkr.ecr.%s.amazonaws.com', $self->account_id, $self->region;
   });
 
-  override build_auth => sub {
-    my $self = shift;
+  around build_auth => sub {
+    my ($orig, $self) = @_;
     require Docker::Registry::Auth::ECR;
     Docker::Registry::Auth::ECR->new(region => $self->region);
   };
 
-  has account_id => (is => 'ro', isa => 'Str');
-  has region => (is => 'ro', isa => 'Str');
+  has account_id => (is => 'ro', isa => Str);
+  has region => (is => 'ro', isa => Str);
 
 1;

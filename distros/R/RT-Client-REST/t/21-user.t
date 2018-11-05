@@ -1,3 +1,5 @@
+#!perl
+# vim:ft=perl:
 use strict;
 use warnings;
 
@@ -34,4 +36,3 @@ ok('user' eq $user->rt_type);
 
 done_testing;
 
-# vim:ft=perl:

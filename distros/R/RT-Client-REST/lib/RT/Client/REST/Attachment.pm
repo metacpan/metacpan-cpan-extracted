@@ -6,11 +6,11 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Attachment;
-$RT::Client::REST::Attachment::VERSION = '0.52';
-use Params::Validate qw(:types);
-use RT::Client::REST::Object 0.01;
-use RT::Client::REST::Object::Exception 0.03;
+$RT::Client::REST::Attachment::VERSION = '0.53';
 use base 'RT::Client::REST::Object';
+
+use Params::Validate qw(:types);
+use RT::Client::REST::Object::Exception 0.03;
 
 sub _attributes {{
     id  => {
@@ -157,7 +157,7 @@ RT::Client::REST::Attachment - attachment object representation.
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

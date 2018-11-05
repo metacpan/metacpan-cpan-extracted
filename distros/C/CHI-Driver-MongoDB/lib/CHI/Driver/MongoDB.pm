@@ -1,6 +1,6 @@
 package CHI::Driver::MongoDB;
 # vim:syntax=perl:tabstop=4:number:noexpandtab:
-$CHI::Driver::MongoDB::VERSION = '0.0100';
+$CHI::Driver::MongoDB::VERSION = '0.0101';
 # ABSTRACT: MongoDB driver for CHI
 
 use Moo;
@@ -225,7 +225,7 @@ CHI::Driver::MongoDB - MongoDB driver for CHI
 
 =head1 VERSION
 
-version 0.0100
+version 0.0101
 
 =head1 SYNOPSIS
 

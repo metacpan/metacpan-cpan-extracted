@@ -2,7 +2,7 @@ package HTML::Selector::XPath;
 
 use strict;
 use 5.008_001;
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 require Exporter;
 our @EXPORT_OK = qw(selector_to_xpath);
@@ -191,6 +191,14 @@ sub consume {
         while ($rule =~ s/$reg->{pseudo}//) {
             if ( my @expr = $self->parse_pseudo($1, \$rule) ) {
                 push @parts, @expr;
+            } elsif ( $1 eq 'disabled') {
+                push @parts, '[@disabled]';
+            } elsif ( $1 eq 'checked') {
+                push @parts, '[@checked]';
+            } elsif ( $1 eq 'selected') {
+                push @parts, '[@selected]';
+            } elsif ( $1 eq 'text') {
+                push @parts, '*[@type="text"]';
             } elsif ( $1 eq 'first-child') {
                 # Translates to :nth-child(1)
                 push @parts, nth_child(1);
@@ -216,6 +224,8 @@ sub consume {
                 push @parts, "[1]";
             } elsif ($1 =~ /^nth-of-type\((\d+)\)$/) {
                 push @parts, "[$1]";
+            } elsif ($1 =~ /^last-of-type$/) {
+                push @parts, "[last()]";
             } elsif ($1 =~ /^contains\($/) {
                 if( $rule =~ s/^\s*"([^"]*)"\s*\)// ) {
                     push @parts, qq{[text()[contains(string(.),"$1")]]};
@@ -399,5 +409,6 @@ it under the same terms as Perl itself.
 
 L<http://www.w3.org/TR/REC-CSS2/selector.html>
 L<http://use.perl.org/~miyagawa/journal/31090>
+L<https://en.wikibooks.org/wiki/XPath/CSS_Equivalents>
 
 =cut

@@ -30,7 +30,6 @@ sub new {
   
   my $builder_c_precompile = SPVM::Builder::C->new(
     build_dir => $self->{build_dir},
-    info => $self->{info},
     category => 'precompile',
     builder => $self
   );
@@ -98,6 +97,38 @@ sub get_package_names {
   return \@package_names;
 }
 
+sub get_precompile_package_names {
+  my ($self) = @_;
+  
+  my $precompile_package_names = [];
+  
+  my $package_names = $self->get_package_names;
+  for my $package_name (@$package_names) {
+    my $sub_names = $self->get_precompile_sub_names($package_name);
+    if (@$sub_names) {
+      push @$precompile_package_names, $package_name;
+    }
+  }
+  
+  return $precompile_package_names;
+}
+
+sub get_native_package_names {
+  my ($self) = @_;
+  
+  my $native_package_names = [];
+  
+  my $package_names = $self->get_package_names;
+  for my $package_name (@$package_names) {
+    my $sub_names = $self->get_native_sub_names($package_name);
+    if (@$sub_names) {
+      push @$native_package_names, $package_name;
+    }
+  }
+  
+  return $native_package_names;
+}
+
 sub get_package_load_path {
   my ($self, $package_name) = @_;
   
@@ -138,12 +169,6 @@ sub use {
   push @{$self->{package_infos}}, $package_info;
 }
 
-sub info {
-  my $self = shift;
-  
-  return $self->{info};
-}
-
 sub build_shared_lib_native_dist {
   my ($self, $package_name) = @_;
   
@@ -155,7 +180,6 @@ sub build_shared_lib_native_dist {
 
   my $builder_c_native = SPVM::Builder::C->new(
     build_dir => $self->{build_dir},
-    info => $self->{info},
     category => 'native',
     builder => $self,
     quiet => 0,
@@ -178,7 +202,6 @@ sub build_shared_lib_precompile_dist {
 
   my $builder_c_precompile = SPVM::Builder::C->new(
     build_dir => $self->{build_dir},
-    info => $self->{info},
     category => 'precompile',
     builder => $self,
     quiet => 0,
@@ -192,7 +215,6 @@ sub build_precompile {
 
   my $builder_c_precompile = SPVM::Builder::C->new(
     build_dir => $self->{build_dir},
-    info => $self->{info},
     category => 'precompile',
     builder => $self,
     quiet => 1,
@@ -206,7 +228,6 @@ sub build_native {
 
   my $builder_c_native = SPVM::Builder::C->new(
     build_dir => $self->{build_dir},
-    info => $self->{info},
     category => 'native',
     builder => $self,
     quiet => 1,

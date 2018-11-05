@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 package Graphics::GVG;
-$Graphics::GVG::VERSION = '0.9';
+$Graphics::GVG::VERSION = '0.91';
 # ABSTRACT: Game Vector Graphics
 use strict;
 use warnings;

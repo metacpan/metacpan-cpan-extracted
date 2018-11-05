@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::StaticInstall; # git description: v0.010-7-gd38f166
+package Dist::Zilla::Plugin::StaticInstall; # git description: v0.011-11-g38ad80f
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
-# ABSTRACT: (EXPERIMENTAL, DANGEROUS) Identify a distribution as eligible for static installation
+# ABSTRACT: Identify a distribution as eligible for static installation
 # KEYWORDS: distribution metadata toolchain static dynamic installation
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider',
@@ -59,6 +59,7 @@ sub metadata
     my $self = shift;
     my $mode = $self->mode;
 
+    # FIXME: is this supposed to be a version?! document that!
     my $value = $mode eq 'on' ? 1 : $mode eq 'off' ? 0 : undef;
     if (defined $value)
     {
@@ -130,24 +131,24 @@ sub _heuristics
             join(', ', sort @build_requires) ]) if @build_requires;
 
     $self->$log('checking execdirs');
-    if (my @execfiles_plugins = @{ $self->zilla->plugins_with(-ExecFiles) })
+    if (my $exec_files_plugin = $self->zilla->plugin_named(':ExecFiles'))
     {
         my @bad_unempty_execdirs =
-            map { m{^([^/]+)/}g }
-            grep { path($_) !~ m{^script/} }
-            map { $_->name }
-            map {; @{ $_->find_files } }
-            @execfiles_plugins;
+            grep { $_ ne 'script' }
+            map { (split(/\//, path($_->name)->parent, 2))[0] }
+            @{ $exec_files_plugin->find_files };
 
-        return (0, [ 'found ineligible executable dir%s \'%s\'',
+        return (0, [ 'found ineligible [ExecDir] dir%s \'%s\'',
                 (@bad_unempty_execdirs == 1 ? '' : 's'), join(', ', @bad_unempty_execdirs) ])
             if @bad_unempty_execdirs;
 
+        # this would be a failure if a file actually existed in this dir, but it's empty, so just warn.
         if (my @bad_execdirs =
                 grep { $_ ne 'script' }
                 map { $_->dir }
                 grep { $_->isa('Dist::Zilla::Plugin::ExecDir') }
-                @execfiles_plugins)
+                @{ $self->zilla->plugins_with(-ExecFiles) }
+            )
         {
             $self->log([ colored('found ineligible executable dir%s \'%s\' configured: better to avoid', 'yellow'),
                 (@bad_execdirs == 1 ? '' : 's'), join(', ', @bad_execdirs) ]);
@@ -161,7 +162,7 @@ sub _heuristics
             join(', ', sort @module_sharedirs) ]) if @module_sharedirs;
 
     $self->$log('checking installer plugins');
-    my @installers = @{ $self->zilla->plugins_with(-InstallTool) };
+    my @installers = grep { not $_->isa('Dist::Zilla::Plugin::VerifyPhases') } @{ $self->zilla->plugins_with(-InstallTool) };
 
     # we need to be last, to see the final copy of the installer files
     return (0, [ 'this plugin must be after %s', blessed($installers[-1]) ]) if $installers[-1] != $self;
@@ -215,6 +216,11 @@ sub _heuristics
     my @PL_files = grep { !/^(Makefile|Build)\.PL$/ and /\.(PL|pmc)$/ } @filenames;
     return (0, [ 'found %s', join(', ', sort @PL_files) ]) if @PL_files;
 
+    $self->$log('checking for extra files in lib/');
+    # TODO: what about .pl?
+    my @non_pm_pod_files = grep { !m{\.(?:pm|pod)$} } grep { m{^lib/} } @filenames;
+    return (0, [ 'found non-installable file%s %s', @non_pm_pod_files > 1 ? 's' : '', join(', ', sort @non_pm_pod_files) ]) if @non_pm_pod_files;
+
     return 1;
 }
 
@@ -228,11 +234,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::StaticInstall - (EXPERIMENTAL, DANGEROUS) Identify a distribution as eligible for static installation
+Dist::Zilla::Plugin::StaticInstall - Identify a distribution as eligible for static installation
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -344,6 +350,10 @@ F<.pm>, F<.pod>, F<.pl> files may not be present in the root of the distribution
 =item *
 
 F<.pmc> and F<.PL> files (excluding F<Makefile.PL>, F<Build.PL>) may not be present
+
+=item *
+
+files in F<lib/> other than F<.pod>, F<.pm> may not be present
 
 =back
 

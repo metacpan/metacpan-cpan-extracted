@@ -1,4 +1,4 @@
-### OPEN SOURCE iICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
+### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
 #    Copyright © 2000-2018  Brian M. Kelly
@@ -18,6 +18,20 @@
 #    <http://www.gnu.org/licenses/agpl.html>.
 #
 #######################################################################
+
+
+2018-11-04  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000431 released
+
+        * Updated Local ISet ClipBucket_is.pm.
+
+
+2018-11-04  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000430 released
+
+        * Updated Local ISet ClipBucket_is.pm.
 
 
 2018-10-31  Brian M. Kelly <Brian.Kelly@fullauto.com>

@@ -1,0 +1,76 @@
+{
+   "abstract" : "Generate simple SVG badges",
+   "author" : [
+      "Hauke D <haukex@zero-g.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Badge-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "Imager" : "1.000"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
+            "Imager" : "1.000",
+            "XML::LibXML" : "2.0122",
+            "perl" : "5.006000"
+         },
+         "suggests" : {}
+      },
+      "test" : {
+         "requires" : {
+            "File::Glob" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::More" : "1.302096"
+         }
+      }
+   },
+   "provides" : {
+      "Badge::Simple" : {
+         "file" : "lib/Badge/Simple.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/haukex/Badge-Simple/issues"
+      },
+      "homepage" : "https://github.com/haukex/Badge-Simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haukex/Badge-Simple.git",
+         "web" : "https://github.com/haukex/Badge-Simple"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

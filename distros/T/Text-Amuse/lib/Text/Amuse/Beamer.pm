@@ -61,7 +61,7 @@ sub process {
                            subsection|
                            subsubsection)
                        (\[\{(.+)\}\])?
-                       ({(.+)}\s*\z)
+                       (\{(.+)\}\s*\z)
                       /x) {
             my $type = $1;
             $in_frame = $3 || $5;

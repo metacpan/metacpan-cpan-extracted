@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Roman numeral analysis of the most common bass lines.
+
+use List::MoreUtils 'first_index';
+use Music::BachChoralHarmony;
+use Music::Scales;
+
+my $size = shift || 4;
+
+my @roman = qw( I ii iii IV V vi vii );
+
+my $bach = Music::BachChoralHarmony->new;
+my $songs = $bach->parse();
+
+my %score;
+
+# Process each song for key and chord
+for my $song ( sort keys %$songs ) {
+    my $key = $songs->{$song}{key};
+#    print "SONG: $song in $key\n";
+
+    # Get the scale name
+    my $name = $key =~ /M/ ? 'major' : 'minor';
+    $key =~ s/_?M//i;
+
+    # Get the scale notes
+    my @notes = get_scale_notes( $key, $name );
+#    print "KEY: $key, SCALE: $name, NOTES: @notes\n";
+
+    # The last seen roman group
+    my $last;
+    my @seen;
+
+    # Turn the bass into a roman representation
+    for my $event ( @{ $songs->{$song}{events} } ) {
+        my $bass = $event->{bass};
+
+        # Get the roman representation based on the scale position
+        my $position = first_index { $_ eq $bass } @notes;
+        my $roman;
+        if ( $position == -1 ) {
+            if ( length($bass) == 1 ) {
+                $position = first_index { $_ =~ /$bass/ } @notes;
+                ( my $accidental = $notes[$position] ) =~ s/^\w(.)$/$1/;
+                my $factor = $accidental eq '#' ? 'b' : '#';
+                $roman = $factor . $roman[$position];
+            }
+            else {
+                my ( $note, $accidental ) = $bass =~ /^(\w)(.)$/;
+                $position = first_index { $_ eq $note } @notes;
+                $roman = $accidental . $roman[$position];
+            }
+        }
+        else {
+            $roman = $roman[$position];
+        }
+#        print "\t$position - BASS: $bass, ROMAN: $roman\n";
+
+        # Tally the seen group
+        push @seen, $roman;
+
+        if ( @seen == $size ) {
+            my $group = join ',', @seen;
+            @seen = ();
+            $score{ $last . ' ' . $group }++ if $last;
+
+            # Tally the bigram
+            $last = $group;
+        }
+    }
+}
+use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper[map{"$_: $score{$_}"}sort{$score{$a}<=>$score{$b}}keys%score]);

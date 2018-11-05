@@ -37,22 +37,7 @@ subtest 'available' => sub {
     override => [
       which => sub {
         my($prog) = @_;
-        if(defined $prog)
-        {
-          if($which{$prog})
-          {
-            note "which: $prog => $which{$prog}";
-            return $which{$prog};
-          }
-          else
-          {
-            note "which: $prog N/A";
-          }
-        }
-        else
-        {
-          note "which: undef";
-        }
+        defined $prog ? $which{$prog} : ();
       },
     ],
   );
@@ -165,6 +150,7 @@ subtest 'system available, okay' => sub {
       field libs        => "-L$prefix/lib -lfoo ";
       field libs_static => "-L$prefix/lib -lfoo -lbar -lbaz ";
       field version     => '1.2.3';
+      field alt         => U();
       etc;
     },
   );
@@ -173,11 +159,6 @@ subtest 'system available, okay' => sub {
   # may be supported by recent pkgconfig
   # so we do not test it.
   note "cflags_static = @{[ $build->runtime_prop->{cflags_static} ]}";
-
-  is(
-    $build->runtime_prop->{alt},
-    U(),
-  );
 
 };
 

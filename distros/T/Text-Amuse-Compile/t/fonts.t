@@ -14,12 +14,10 @@ my $wd = File::Temp->newdir;
 
 my %files = ('file.ttf' => 'truetype',
              'fileuc.TTF' => 'truetype',
-             'fileuc.Ttf' => 'truetype',
-             'fileuc.Otf' => 'opentype',
              'fileuc.OTF' => 'opentype',
              'file.otf' => 'opentype');
 
-plan tests => scalar(keys %files) * 18 + 32;
+plan tests => scalar(keys %files) * 17 + 38;
 
 foreach my $file (sort keys %files) {
     my $path = File::Spec->catfile($wd, $file);
@@ -47,6 +45,8 @@ foreach my $file (sort keys %files) {
     };
     ok $@, "Error found with wrong shape";
     ok (-f $path, "$path exists");
+
+    # 5 + 12 tests
     foreach my $shape (qw/regular bold italic bolditalic/) {
         diag "Creathing $path $shape";
         my $font = Text::Amuse::Compile::Fonts::File->new(file => $path,
