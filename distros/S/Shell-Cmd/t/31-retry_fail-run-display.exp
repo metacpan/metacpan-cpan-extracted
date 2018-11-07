@@ -1,0 +1,21 @@
+fail_twice running first time
+fail_twice running second time
+
+#****************************************
+# The following script failed at command 2
+SC_ORIG_DIRE=CURRDIR;
+SC_DIRE=CURRDIR;
+# 1
+rm -f TESTDIR/fail_twice.*.flag;
+# 2
+TESTDIR/bin/fail_twice TESTDIR;
+# 3
+TESTDIR/bin/succ 1 warn;
+cd "CURRDIR";
+
+###STDERR
+fail_twice failing first time
+fail_twice failing second time
+
+###EXIT
+2

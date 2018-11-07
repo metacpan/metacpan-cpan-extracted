@@ -1,7 +1,5 @@
-Version 0.92
+Version 0.93
 ===========
-* Rename 'meta' to something that doesn't conflict with an existing
-  Moose method
 * Include files
 * Arc
 * Rotate ellipses

@@ -41,15 +41,21 @@ $params
 sub new {
     my $class = shift;
     my %opts = @_;
-    $opts{consumer_key} ||= "";
-    $opts{consumer_secret} ||= "";
+    $opts{client_id} ||= "";
+    $opts{client_secret} ||= "";
     $opts{access_token} ||= "";
-    $opts{access_secret} ||= "";
-    $opts{callback} ||= "oob";
-    $opts{signature_method} ||= "HMAC-SHA1";
+    $opts{refresh_token} ||= "";
+    $opts{expires_in} ||= "";
+    $opts{expires_at} ||= "";
+    $opts{redirect_uri} ||= "";
+    $opts{site} ||= "https://www.upwork.com";
+    $opts{authorize_path} ||= "/ab/account-security/oauth2/authorize";
+    $opts{access_token_path} ||= "/api/v3/oauth2/token";
+    $opts{refresh_token_path} ||= "/api/v3/oauth2/token";
+    $opts{callback} ||= "";
     $opts{debug} ||= 0;
-    unless ($opts{consumer_key} && $opts{consumer_secret}) {
-        die "You must specify a consumer key and a secret in the config\n";
+    unless ($opts{client_id} && $opts{client_secret}) {
+        die "You must specify a consumer key (client_id) and secret (client_secret) in the config\n";
     }
     my $self = bless \%opts, $class;
 
@@ -64,7 +70,7 @@ Maksym Novozhylov C<< <mnovozhilov@upwork.com> >>
 
 =head1 COPYRIGHT
 
-Copyright E<copy> Upwork Global Corp., 2015
+Copyright E<copy> Upwork Global Corp., 2018
 
 =cut
 

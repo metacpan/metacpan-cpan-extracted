@@ -2,19 +2,19 @@
 use strict;
 use warnings;
 
-use 5.013002;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Markdown Files to HTML",
+  "ABSTRACT" => "Easy conversion of markdown documents to HTML for display in your Dancer2 website",
   "AUTHOR" => "Steve Dondley <s\@dondley.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Dancer2-Plugin-MarkdownFilesToHTML",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.013002",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Dancer2::Plugin::MarkdownFilesToHTML",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -24,23 +24,22 @@ my %WriteMakefileArgs = (
     "Encode" => 0,
     "File::Basename" => 0,
     "File::Path" => 0,
-    "File::Slurper" => 0,
     "File::Spec::Functions" => 0,
     "HTML::TreeBuilder" => 0,
-    "Markdent" => 0,
-    "Markdent::Handler::HTMLStream::Fragment" => 0,
-    "Markdent::Parser" => 0,
-    "Moose" => 0,
     "Storable" => 0,
+    "Text::Markdown::Hoedown" => "1.02",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Modern::Perl" => 0,
+    "Dancer2" => "0.206000",
+    "HTTP::Request::Common" => 0,
+    "Plack::Test" => 0,
     "Test::More" => 0,
-    "vars" => 0
+    "Test::Most" => 0,
+    "Test::NoWarnings" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,18 +54,16 @@ my %FallbackPrereqs = (
   "Encode" => 0,
   "File::Basename" => 0,
   "File::Path" => 0,
-  "File::Slurper" => 0,
   "File::Spec::Functions" => 0,
   "HTML::TreeBuilder" => 0,
-  "Markdent" => 0,
-  "Markdent::Handler::HTMLStream::Fragment" => 0,
-  "Markdent::Parser" => 0,
-  "Modern::Perl" => 0,
-  "Moose" => 0,
+  "HTTP::Request::Common" => 0,
+  "Plack::Test" => 0,
   "Storable" => 0,
   "Test::More" => 0,
+  "Test::Most" => 0,
+  "Test::NoWarnings" => 0,
+  "Text::Markdown::Hoedown" => "1.02",
   "strict" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

@@ -3,10 +3,11 @@ use warnings;
 
 package Git::Hooks::CheckRewrite;
 # ABSTRACT: Git::Hooks plugin for checking against unsafe rewrites
-$Git::Hooks::CheckRewrite::VERSION = '2.9.10';
+$Git::Hooks::CheckRewrite::VERSION = '2.10.0';
 use 5.010;
 use utf8;
 use Path::Tiny;
+use Log::Any '$log';
 use Git::Hooks;
 
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
@@ -33,6 +34,8 @@ sub _branches_containing {
 sub record_commit_parents {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::record_commit_parents");
+
     # Here we record the HEAD commit's own id and it's parent's ids in
     # a file under the git directory. The file has two lines in this
     # format:
@@ -54,6 +57,8 @@ sub record_commit_parents {
 
 sub check_commit_amend {
     my ($git) = @_;
+
+    $log->debug(__PACKAGE__ . "::check_commit_amend");
 
     my $record_file = _record_filename($git);
 
@@ -106,6 +111,8 @@ EOS
 sub check_rebase {
     my ($git, $upstream, $branch) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_rebase", {upstream => $upstream, branch => $branch});
+
     unless (defined $branch) {
         # This means we're rebasing the current branch. We try to grok
         # it's name using git symbolic-ref.
@@ -118,14 +125,16 @@ sub check_rebase {
         return 1 unless defined $success;
     }
 
-    # Find the base commit of the rebased sequence
-    my $base_commit = $git->run(qw/rev-list --topo-order --reverse/, "$upstream..$branch");
+    my @rebased_sequence = $git->run(qw/rev-list --topo-order --reverse/, "$upstream..$branch");
 
-    # If $upstream is a decendant of $branch, $base_commit is
+    # If $upstream is a decendant of $branch, the @rebased_sequence is
     # empty. In this situation the rebase will turn out to be a simple
     # fast-forward merge from $branch on $upstream and there is
     # nothing to lose.
-    return 1 unless $base_commit;
+    return 1 unless @rebased_sequence;
+
+    # Find the base commit of the rebased sequence
+    my $base_commit = $rebased_sequence[0];
 
     # Find all branches containing that commit
     my @branches = _branches_containing($git, $base_commit);
@@ -173,7 +182,7 @@ Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrite
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -189,7 +198,7 @@ may configure it in a Git configuration file like this:
     admin = joe molly
 
 This section enables the plugin and defines the users C<joe> and C<molly> as
-administrators, effectivelly exempting them from any restrictions the plugin may
+administrators, effectively exempting them from any restrictions the plugin may
 impose.
 
 =head1 DESCRIPTION

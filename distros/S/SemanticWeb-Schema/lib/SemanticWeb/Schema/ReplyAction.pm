@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.2';
+our $VERSION = 'v0.0.4';
 
 
 has result_comment => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::ReplyAction - The act of responding to a question/message a
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.4
 
 =head1 DESCRIPTION
 

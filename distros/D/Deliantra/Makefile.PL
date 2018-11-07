@@ -16,7 +16,7 @@ my $mm = MM->new({
     },
     NAME         => "Deliantra",
     VERSION_FROM => "Deliantra.pm",
-    EXE_FILES    => [qw(bin/cfarch-normalize bin/cfmap-normalize bin/cfarch-normalize bin/cfmap-plushify
+    EXE_FILES    => [qw(bin/cfarch-normalize bin/cfmap-normalize bin/cfmap-plushify bin/cffi-filter
                         bin/cfmap-cavehify bin/cfmap-tagify bin/cfxmlrender bin/cf-slotutil bin/cfmap-set)],
 });
 

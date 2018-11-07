@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::Open;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: open links associated to a task
-$Taskwarrior::Kusarigama::Plugin::Command::Open::VERSION = '0.9.3';
+$Taskwarrior::Kusarigama::Plugin::Command::Open::VERSION = '0.10.0';
 
 use 5.20.0;
 
@@ -31,12 +31,11 @@ sub on_command {
     my $self = shift;
 
     my $args = $self->args;
-    my( $id, $type ) = $args =~ /^task\s+(?<id>.*?)\s+open\s*(?<type>\w*)/g;
+    my( $id, $type ) = $args =~ /^task\s+(?<id>.*?)\s+open\s*(?<type>[\w-]*)/g;
 
     die "no task provided\n" unless $id;
 
     my $prefixes = eval { $self->tw->config->{kusarigama}{plugin}{'open'} };
-    $prefixes = { $prefixes->%{ $type } } if $type;
 
     my @tasks = $self->export_tasks($id);
 
@@ -44,13 +43,15 @@ sub on_command {
     die "'open' requires a single task\n" if @tasks > 1;
 
     my @links = 
-       pairs
-       pairgrep { $b }
-       pairmap { $b => $prefixes->{$a} }
-       map { ( ( split ':', $_, 2)[0], $_ ) }
+       map { [ $_, split ':', $_, 2 ] }
        grep { /:/ }
        map { $_->{description} }
        eval { $tasks[0]->{annotations}->@* };
+
+    if( $type ) {
+        my( $subtype ) = split '-', $type;
+        @links = grep { $_->[1] eq $subtype } @links;
+    }
 
     unless( @links ) {
         die "found nothing to open\n";
@@ -83,7 +84,8 @@ sub on_command {
     }
 
     for my $l ( @links ) {
-        my( $link, $command ) = $l->@*;
+        my( $link, $link_type ) = $l->@*;
+        my $command = $prefixes->{ $type || $link_type };
         $command = $self->expand( $command, $link, @tasks );
         system $command;
     }
@@ -118,7 +120,7 @@ Taskwarrior::Kusarigama::Plugin::Command::Open - open links associated to a task
 
 =head1 VERSION
 
-version 0.9.3
+version 0.10.0
 
 =head1 SYNOPSIS
 
@@ -148,6 +150,14 @@ to the template has three variables: C<link> (e.g., C<wiki:my_page>), C<path> (C
 and C<task>, which is the associated task object. 
 
 Note that in the examples I'm using the triple bracket notation such that the '/' in the paths don't get escaped.
+
+If you want to set more than one opening action for a type, append C<-action> to it. E.g.:
+
+    $ task config kusarigama.plugin.open.wiki 'cat "/home/yanick/vimwiki/{{{path}}}.mkd"'
+    $ task config kusarigama.plugin.open.wiki-edit 'tmux split-window "nvim /home/yanick/vimwiki/{{{path}}}.mkd"'
+
+    $ task open wiki         # prints it 
+    $ task open wiki-edit    # opens editor
 
 =head1 INSTALLATION
 

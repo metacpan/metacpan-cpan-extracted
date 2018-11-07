@@ -1,36 +1,14 @@
 package QBit::WebInterface::OwnServer;
-$QBit::WebInterface::OwnServer::VERSION = '0.007';
+$QBit::WebInterface::OwnServer::VERSION = '0.008';
 use qbit;
 
 use base qw(QBit::WebInterface);
 
 use IO::Socket;
 use MIME::Types;
-use URI::Escape qw(uri_escape_utf8);
 
 use QBit::WebInterface::OwnServer::Request;
 use QBit::WebInterface::Response;
-
-my %RESPONSE_TEXT = (
-    200 => 'OK',
-    201 => 'CREATED',
-    202 => 'Accepted',
-    203 => 'Partial Information',
-    204 => 'No Response',
-    301 => 'Moved',
-    302 => 'Found',
-    303 => 'Method',
-    304 => 'Not Modified',
-    400 => 'Bad request',
-    401 => 'Unauthorized',
-    402 => 'PaymentRequired',
-    403 => 'Forbidden',
-    404 => 'Not found',
-    500 => 'Internal Error',
-    501 => 'Not implemented',
-    502 => 'Service temporarily overloaded',
-    503 => 'Gateway timeout',
-);
 
 sub run {
     my ($self, %opts) = @_;
@@ -42,7 +20,8 @@ sub run {
         LocalPort => $opts{'port'},
         Listen    => SOMAXCONN,
         Reuse     => 1,
-    ) || throw gettext('Cannot create socket');
+      )
+      || throw Exception gettext('Cannot create socket');
 
     l "http://127.0.0.1:$opts{'port'}";
     l "Ctrl+C to terminate";
@@ -86,7 +65,12 @@ sub run {
         my $status = $self->response->status || 200;
 
         print $socket "HTTP/1.0 $status "
-          . (exists($RESPONSE_TEXT{$status}) ? " $RESPONSE_TEXT{$status}" : 'Unknown') . "\n";
+          . (
+            exists($QBit::WebInterface::HTTP_STATUSES{$status})
+            ? " $QBit::WebInterface::HTTP_STATUSES{$status}"
+            : 'Unknown'
+          )
+          . "\n";
         print $socket 'Server: QBit::WebInterface::OwnServer (' . ref($self) . ")\n";
         print $socket 'Set-Cookie: ' . $_->as_string() . "\n" foreach values(%{$self->response->cookies});
 
@@ -96,10 +80,15 @@ sub run {
 
         if ($status == 200) {
             print $socket 'Content-Type: ' . $self->response->content_type . "\n\n";
-            print $socket 'Content-Disposition: '
-              . 'attachment; filename="'
-              . $self->_escape_filename($self->response->filename) . '"'
-              if $self->response->filename;
+
+            my $filename = $self->response->filename;
+            if (defined($filename)) {
+                utf8::encode($filename) if utf8::is_utf8($filename);
+
+                print $socket 'Content-Disposition: '
+                  . 'attachment; filename="'
+                  . $self->_escape_filename($self->response->filename) . '"';
+            }
 
             if (defined($self->response->data)) {
                 my $data_ref = ref($self->response->data) ? $self->response->data : \$self->response->data;
@@ -121,45 +110,6 @@ sub run {
 
         close($socket);
     }
-}
-
-sub get_cmd {
-    my ($self) = @_;
-
-    my ($path, $cmd);
-    if ($self->request->uri() =~ /^\/([^?\/]+)(?:\/([^\/?#]+))?/) {
-        ($path, $cmd) = ($1, $2);
-    } else {
-        ($path, $cmd) = $self->default_cmd();
-    }
-
-    $path = '' unless defined($path);
-    $cmd  = '' unless defined($cmd);
-
-    return ($path, $cmd);
-}
-
-sub make_cmd {
-    my ($self, $new_cmd, $new_path, @params) = @_;
-
-    my %vars = defined($params[0])
-      && ref($params[0]) eq 'HASH' ? %{$params[0]} : @params;
-
-    my ($path, $cmd) = $self->get_cmd();
-
-    $path = uri_escape_utf8($self->_get_new_path($new_path, $path));
-    $cmd = uri_escape_utf8($self->_get_new_cmd($new_cmd, $cmd));
-
-    return "/$path/$cmd"
-      . (
-        %vars
-        ? '?'
-          . join(
-            $self->get_option('link_param_separator', '&amp;'),
-            map {uri_escape_utf8($_) . '=' . uri_escape_utf8($vars{$_})} keys(%vars)
-          )
-        : ''
-      );
 }
 
 sub _is_static {
@@ -214,10 +164,6 @@ https://github.com/Madskill/QBit-WebInterface-OwnServer
 =item *
 
 cpanm QBit::WebInterface::OwnServer
-
-=item *
-
-apt-get install libqbit-webinterface-ownserver-perl (http://perlhub.ru/)
 
 =back
 

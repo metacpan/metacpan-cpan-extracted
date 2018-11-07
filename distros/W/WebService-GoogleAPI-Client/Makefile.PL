@@ -7,7 +7,7 @@ use 5.014004;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "API WebService OAUTH2 Client Agent to streamline access to GOOGLE API End-Point Services using Discovery Data",
+  "ABSTRACT" => "Google API Discovery and SDK",
   "AUTHOR" => "Peter Scott <localshop\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.18",
+  "VERSION" => "0.19",
   "test" => {
     "TESTS" => "t/*.t"
   }

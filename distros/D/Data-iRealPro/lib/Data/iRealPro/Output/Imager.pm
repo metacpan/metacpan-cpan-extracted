@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Jan 15 19:15:00 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov  1 21:08:59 2018
-# Update Count    : 1518
+# Last Modified On: Mon Nov  5 21:33:13 2018
+# Update Count    : 1520
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -35,12 +35,7 @@ sub new {
 
     # Get the resource dir.
     $self->{resdir} = $ENV{RESDIR};
-    if ( $App::Packager::PACKAGED ) {
-	$self->{resdir} ||= App::Packager::GetResourcePath();
-    }
-    else {
-	$self->{resdir} ||= "$FindBin::Bin/../res";
-    }
+    $self->{resdir} ||= App::Packager::GetResourcePath();
     $self->{resdir} .= "/";
     $self->{resdir} =~ s;/+$;/;;
 

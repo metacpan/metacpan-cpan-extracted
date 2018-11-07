@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.2';
+our $VERSION = 'v0.0.4';
 
 
 has arrival_platform => (
@@ -82,7 +82,7 @@ SemanticWeb::Schema::TrainTrip - A trip on a commercial train line.
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.4
 
 =head1 DESCRIPTION
 

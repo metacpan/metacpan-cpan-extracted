@@ -41,7 +41,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Shell::Cmd",
-   VERSION          => "2.13",
+   VERSION          => "3.00",
    ABSTRACT         => "run shell commands with enhanced support",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -61,8 +61,8 @@ WriteMakefile(
     ? (META_ADD => {
           provides     => {
              'Shell::Cmd' => {
-                file    => 'Cmd.pm',
-                version => '2.13',
+                file    => 'lib/Shell/Cmd.pm',
+                version => '3.00',
              },
 
           },

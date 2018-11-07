@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.2';
+our $VERSION = 'v0.0.4';
 
 
 has recipient => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::TipAction - The act of giving money voluntarily to a benefi
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.4
 
 =head1 DESCRIPTION
 

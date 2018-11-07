@@ -3,9 +3,10 @@ use warnings;
 
 package Git::Hooks::CheckReference;
 # ABSTRACT: Git::Hooks plugin for checking references
-$Git::Hooks::CheckReference::VERSION = '2.9.10';
+$Git::Hooks::CheckReference::VERSION = '2.10.0';
 use 5.010;
 use utf8;
+use Log::Any '$log';
 use Git::Hooks;
 use List::MoreUtils qw/any none/;
 
@@ -96,6 +97,8 @@ EOS
 sub check_affected_refs {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_affected_refs");
+
     return 1 if $git->im_admin();
 
     my $errors = 0;
@@ -110,9 +113,11 @@ sub check_affected_refs {
 }
 
 # Install hooks
-UPDATE       \&check_affected_refs;
-PRE_RECEIVE  \&check_affected_refs;
-REF_UPDATE   \&check_affected_refs;
+UPDATE           \&check_affected_refs;
+PRE_RECEIVE      \&check_affected_refs;
+REF_UPDATE       \&check_affected_refs;
+COMMIT_RECEIVED  \&check_affected_refs;
+SUBMIT           \&check_affected_refs;
 
 1;
 
@@ -128,7 +133,7 @@ Git::Hooks::CheckReference - Git::Hooks plugin for checking references
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -180,6 +185,10 @@ constraints. If they don't, the commit/push is aborted.
 
 =item * B<ref-update>
 
+=item * B<commit-received>
+
+=item * B<submit>
+
 =back
 
 To enable it you should add it to the githooks.plugin configuration
@@ -207,7 +216,7 @@ documentation.
 
 This multi-valued option specifies rules allowing or denying specific users to
 perform specific actions on specific references. (Common references are branches
-and tags, but an ACL may refer to any reference under the F<refs/> namespace.)
+and tags, but an ACL may refer to any reference under the F<refs/> name space.)
 By default any user can perform any action on any reference. So, the rules are
 used to impose restrictions.
 
@@ -239,10 +248,10 @@ If the C<refspec> starts with a caret (^) it's interpreted as a Perl regular
 expression, the caret being kept as part of the regexp. These refspecs match
 potentially many references (e.g. F<^refs/heads/feature/>).
 
-Before being interpreted as a string or as a regexp, any substring of it in the
+Before being interpreted as a string or as a regexp, any sub-string of it in the
 form C<{VAR}> is replaced by C<$ENV{VAR}>. This is useful, for example, to
 interpolate the committer's username in the refspec, in order to create
-reference namespaces for users.
+reference name spaces for users.
 
 =back
 

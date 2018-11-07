@@ -1,0 +1,11 @@
+always_succ running first time
+always_succ running second time
+This is the 'succ' command stdout with argument: 1
+
+###STDERR
+always_succ succeeding first time
+always_succ succeeding second time
+This is the 'succ' command stderr with argument: 1
+
+###EXIT
+0

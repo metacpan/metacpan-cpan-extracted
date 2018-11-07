@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Graphics::GVG::OpenGLRenderer",
   "PREREQ_PM" => {
     "Data::UUID" => "1.221",
-    "Graphics::GVG" => "0.8",
+    "Graphics::GVG" => "0.92",
     "Imager" => "1.005",
     "Moose" => "2.1806",
     "OpenGL" => "0.6704",
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Pod" => 0
   },
-  "VERSION" => "0.3",
+  "VERSION" => "0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::UUID" => "1.221",
-  "Graphics::GVG" => "0.8",
+  "Graphics::GVG" => "0.92",
   "Imager" => "1.005",
   "Moose" => "2.1806",
   "OpenGL" => "0.6704",

@@ -25,12 +25,12 @@ requires:
   Data::Dump: '0'
   Exporter: '5.57'
   Module::CPANfile: '1.1004'
-  Module::CoreList: '2.99'
+  Module::CoreList: '3.11'
   Module::Find: '0'
   Regexp::Trie: '0'
   parent: '0'
   perl: '5.008001'
 resources:
   repository: https://github.com/charsbar/Perl-PrereqScanner-NotQuiteLite
-version: '0.99'
+version: '0.9901'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

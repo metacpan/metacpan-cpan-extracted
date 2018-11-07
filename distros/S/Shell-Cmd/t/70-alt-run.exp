@@ -1,0 +1,10 @@
+This is the 'succ' command stdout with argument: 1
+fail_on_2 fails on 2
+This is the 'fail' command stdout with argument: 3
+This is the 'succ' command stdout with argument: 4
+This is the 'succ' command stdout with argument: 6
+
+###STDERR
+
+###EXIT
+0

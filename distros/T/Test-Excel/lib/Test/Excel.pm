@@ -1,15 +1,15 @@
 package Test::Excel;
 
-$Test::Excel::VERSION   = '1.40';
+$Test::Excel::VERSION   = '1.42';
 $Test::Excel::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
-Test::Excel - Interface to test and compare Excel files.
+Test::Excel - Interface to test and compare Excel files (.xls/.xlsx).
 
 =head1 VERSION
 
-Version 1.40
+Version 1.42
 
 =cut
 
@@ -19,9 +19,8 @@ use 5.006;
 use IO::File;
 use Data::Dumper;
 use Test::Builder ();
+use Spreadsheet::Read;
 use Scalar::Util 'blessed';
-use Spreadsheet::ParseExcel;
-use Spreadsheet::ParseExcel::Utility qw(int2col col2int);
 
 use parent 'Exporter';
 our @ISA    = qw(Exporter);
@@ -39,6 +38,7 @@ my $TESTER               = Test::Builder->new;
 
 This  module is meant to be used for testing  custom  generated  Excel  files, it
 provides interfaces to compare_excel two Excel files if they are I<visually> same.
+It now supports Excel file with extension C<.xls> and C<.xlsx>.
 
 =head1 SYNOPSIS
 
@@ -72,9 +72,8 @@ Using as standalone as below:
 
 This function will tell you whether the two Excel files are "visually" different,
 ignoring  differences  in  embedded fonts/images and metadata. Both $got and $exp
-can be either instances of Spreadsheet::ParseExcel / file path (which is in  turn
-passed to the Spreadsheet::ParseExcel constructor). This one  is for use in  TEST
-MODE.
+can be either instances of Spreadsheet::Read / file path (which is in turn passed
+passed to the Spreadsheet::Read constructor). This one  is for use in  TEST MODE.
 
     use strict; use warnings;
     use Test::More tests => 1;
@@ -124,8 +123,8 @@ sub cmp_excel_not_ok {
 
 This function will tell you whether the two Excel files are "visually" different,
 ignoring  differences  in  embedded fonts/images and  metadata. Both  C<$got> and
-C<$exp> can be either instances of Spreadsheet::ParseExcel / file path (which  in
-turn passed to the Spreadsheet::ParseExcel constructor).
+C<$exp> can be either instances of Spreadsheet::Read / file  path (which  in turn
+passed to the Spreadsheet::Read constructor).
 
     use strict; use warnings;
     use Test::Excel;
@@ -146,15 +145,14 @@ sub compare_excel {
     die("ERROR: Unable to locate file [$exp][$!].\n") unless (-f $exp);
 
     _log_message("INFO: Excel comparison [$got] [$exp]\n");
-
-    unless (blessed($got) && $got->isa('Spreadsheet::ParseExcel::WorkBook')) {
-        $got = Spreadsheet::ParseExcel::Workbook->Parse($got)
-            || die("ERROR: Couldn't create Spreadsheet::ParseExcel::WorkBook instance with: [$got]\n");
+    unless (blessed($got) && $got->isa('Spreadsheet::Read')) {
+        $got = Spreadsheet::Read->new($got)
+            || die("ERROR: Couldn't create Spreadsheet::Read instance with: [$got]\n");
     }
 
-    unless (blessed($exp) && $exp->isa('Spreadsheet::ParseExcel::WorkBook')) {
-        $exp = Spreadsheet::ParseExcel::Workbook->Parse($exp)
-            || die("ERROR: Couldn't create Spreadsheet::ParseExcel::WorkBook instance with: [$exp]\n");
+    unless (blessed($exp) && $exp->isa('Spreadsheet::Read')) {
+        $exp = Spreadsheet::Read->new($exp)
+            || die("ERROR: Couldn't create Spreadsheet::Read instance with: [$exp]\n");
     }
 
     _validate_rule($rule);
@@ -162,8 +160,8 @@ sub compare_excel {
     my $spec          = _get_hashval($rule, 'spec');
     my $error_limit   = _get_hashval($rule, 'error_limit');
     my $sheet         = _get_hashval($rule, 'sheet');
-    my @gotWorkSheets = $got->worksheets();
-    my @expWorkSheets = $exp->worksheets();
+    my @gotWorkSheets = $got->sheets();
+    my @expWorkSheets = $exp->sheets();
 
     $spec        = _parse($spec)         if     defined $spec;
     $error_limit = $MAX_ERRORS_PER_SHEET unless defined $error_limit;
@@ -183,8 +181,8 @@ sub compare_excel {
         my $error_on_sheet = 0;
         my $gotWorkSheet   = $gotWorkSheets[$i];
         my $expWorkSheet   = $expWorkSheets[$i];
-        my $gotSheetName   = $gotWorkSheet->get_name();
-        my $expSheetName   = $expWorkSheet->get_name();
+        my $gotSheetName   = $gotWorkSheet;
+        my $expSheetName   = $expWorkSheet;
 
         if (uc($gotSheetName) ne uc($expSheetName)) {
             my $error = "ERROR: Sheetname mismatch. Got: [$gotSheetName] exp: [$expSheetName].\n";
@@ -192,10 +190,12 @@ sub compare_excel {
             return 0;
         }
 
-        my ($gotRowMin, $gotRowMax) = $gotWorkSheet->row_range();
-        my ($gotColMin, $gotColMax) = $gotWorkSheet->col_range();
-        my ($expRowMin, $expRowMax) = $expWorkSheet->row_range();
-        my ($expColMin, $expColMax) = $expWorkSheet->col_range();
+        my $got_sheet = $got->sheet($gotSheetName);
+        my $exp_sheet = $exp->sheet($expSheetName);
+        my ($gotRowMin, $gotRowMax) = (0, $got_sheet->maxrow);
+        my ($gotColMin, $gotColMax) = (0, $got_sheet->maxcol);
+        my ($expRowMin, $expRowMax) = (0, $exp_sheet->maxrow);
+        my ($expColMin, $expColMax) = (0, $exp_sheet->maxcol);
 
         _log_message("INFO: [$gotSheetName]:[$gotRowMin][$gotColMin]:[$gotRowMax][$gotColMax]\n");
         _log_message("INFO: [$expSheetName]:[$expRowMin][$expColMin]:[$expRowMax][$expColMax]\n");
@@ -217,12 +217,14 @@ sub compare_excel {
         my ($swap);
         for (my $row = $gotRowMin; $row <= $gotRowMax; $row++) {
             for (my $col = $gotColMin; $col <= $gotColMax; $col++) {
-                my $gotData = $gotWorkSheet->{Cells}[$row][$col]->{Val};
-                my $expData = $expWorkSheet->{Cells}[$row][$col]->{Val};
+                #my $gotData = $gotWorkSheet->{Cells}[$row][$col]->{Val};
+                #my $expData = $expWorkSheet->{Cells}[$row][$col]->{Val};
+                my $gotData = $got_sheet->cell($col, $row);
+                my $expData = $exp_sheet->cell($col, $row);
 
                 next if ( defined($spec)
-                          && exists($spec->{uc($gotSheetName)}->{$col+1}->{$row+1})
-                          && ($spec->{uc($gotSheetName)}->{$col+1}->{$row+1} == $IGNORE) );
+                          && exists($spec->{uc($gotSheetName)}->{$col}->{$row})
+                          && ($spec->{uc($gotSheetName)}->{$col}->{$row} == $IGNORE) );
 
                 if (defined($gotData) && defined($expData)) {
                     if (($gotData =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/)
@@ -237,17 +239,17 @@ sub compare_excel {
                                 my $difference = abs($expData - $gotData) / abs($expData);
 
                                 if ( ( defined($spec)
-                                       && exists($spec->{uc($gotSheetName)}->{$col+1}->{$row+1})
-                                       && ($spec->{uc($gotSheetName)}->{$col+1}->{$row+1} == $SPECIAL_CASE)
+                                       && exists($spec->{uc($gotSheetName)}->{$col}->{$row})
+                                       && ($spec->{uc($gotSheetName)}->{$col}->{$row} == $SPECIAL_CASE)
                                      ) || (scalar(@sheets) && grep(/$gotSheetName/,@sheets) )) {
 
                                     _log_message("INFO: [NUMBER]:[$gotSheetName]:[SPC][".
-                                                 ($row+1)."][".($col+1)."]:[$gotData][$expData] ... ");
+                                                 ($row)."][".($col)."]:[$gotData][$expData] ... ");
                                     $compare_with = $rule->{sheet_tolerance};
                                 }
                                 else {
                                     _log_message("INFO: [NUMBER]:[$gotSheetName]:[STD][".(
-                                                     $row+1)."][".($col+1)."]:[$gotData][$expData] ... ");
+                                                     $row)."][".($col)."]:[$gotData][$expData] ... ");
                                     $compare_with = $rule->{tolerance};
                                 }
 
@@ -263,7 +265,7 @@ sub compare_excel {
                             }
                             else {
                                 _log_message("INFO: [NUMBER]:[$gotSheetName]:[N/A][".
-                                             ($row+1)."][".($col+1)."]:[$gotData][$expData] ... ");
+                                             ($row)."][".($col)."]:[$gotData][$expData] ... ");
                                 if ($expData != $gotData) {
                                     _log_message("[FAIL]\n");
                                     return 0;
@@ -289,7 +291,7 @@ sub compare_excel {
                         else {
                             $status = 1;
                             _log_message("INFO: [STRING]:[$gotSheetName]:[STD][".
-                                         ($row+1)."][".($col+1)."]:[$gotData][$expData] ... [PASS]\n");
+                                         ($row)."][".($col)."]:[$gotData][$expData] ... [PASS]\n");
                         }
                     }
 
@@ -297,8 +299,8 @@ sub compare_excel {
                         && defined($rule->{swap_check}) && ($rule->{swap_check})) {
                         if ($status == 0) {
                             $error_on_sheet++;
-                            push @{$swap->{exp}->{_number_to_letter($col-1)}}, $expData;
-                            push @{$swap->{got}->{_number_to_letter($col-1)}}, $gotData;
+                            push @{$swap->{exp}->{_number_to_letter($col)}}, $expData;
+                            push @{$swap->{got}->{_number_to_letter($col)}}, $gotData;
 
                             if (($error_on_sheet >= $error_limit) && ($error_on_sheet % 2 == 0) && !_is_swapping($swap)) {
                                 _log_message("ERROR: Max error per sheet reached.[$error_on_sheet]\n");
@@ -363,7 +365,7 @@ values are space seperated.
 
 =head1 What is "Visually" Similar?
 
-This module uses the L<Spreadsheet::ParseExcel> module to parse Excel files, then
+This module uses  the L<Spreadsheet::Read> module  to parse the Excel files, then
 compares the parsed  data structure for differences.We ignore certain  components
 of the Excel file, such as embedded fonts,  images,  forms and  annotations,  and
 focus  entirely  on  the layout of each Excel page instead.  Future versions will
@@ -373,7 +375,7 @@ likely support font and image comparisons.
 
 By turning the environment variable DEBUG ON would spit out PASS/FAIL comparison.
 
-e.g. $/> $DEBUG=1 perl your_script.pl
+e.g. $ $DEBUG=1 perl your_script.pl
 
 =cut
 
@@ -397,10 +399,47 @@ sub _letter_to_number {
     return col2int($letter);
 }
 
+# --------------------------------------------------------------------------
+# col2int (for Spreadsheet::ParseExcel::Utility)
+# --------------------------------------------------------------------------
+sub col2int {
+    my $result = 0;
+    my $str    = shift;
+    my $incr   = 0;
+
+    for ( my $i = length($str) ; $i > 0 ; $i-- ) {
+        my $char = substr( $str, $i - 1 );
+        my $curr += ord( lc($char) ) - ord('a') + 1;
+        $curr *= $incr if ($incr);
+        $result += $curr;
+        $incr   += 26;
+    }
+
+    # this is one out as we range 0..x-1 not 1..x
+    $result--;
+
+    return $result;
+}
+
 sub _number_to_letter {
     my ($number) = @_;
 
     return int2col($number);
+}
+
+# --------------------------------------------------------------------------
+# int2col (for Spreadsheet::ParseExcel::Utility)
+# --------------------------------------------------------------------------
+sub int2col {
+    my $out = "";
+    my $val = shift;
+
+    do {
+        $out .= chr( ( $val % 26 ) + ord('A') );
+        $val = int( $val / 26 ) - 1;
+    } while ( $val >= 0 );
+
+    return scalar reverse $out;
 }
 
 sub _cells_within_range {
@@ -573,8 +612,7 @@ that I have just "gotten it wrong" in some places.
 
 =over 4
 
-=item L<Spreadsheet::ParseExcel>  -  I  could  not have written this without this
-module.
+=item L<Spreadsheet::Read> - I could not have written without this module.
 
 =back
 
@@ -582,11 +620,11 @@ module.
 
 =over 4
 
-=item John McNamara (author of Spreadsheet::ParseExcel).
+=item H.Merijn Brand (author of Spreadsheet::Read).
 
 =item Kawai Takanori (author of Spreadsheet::ParseExcel::Utility).
 
-=item Stevan Little (author of Test::PDF).
+=item Stevan Little  (author of Test::PDF).
 
 =back
 

@@ -2,11 +2,12 @@ package Meta::Builder;
 use strict;
 use warnings;
 
+use 5.006;
 use Carp qw/croak/;
 use Meta::Builder::Util;
 use Meta::Builder::Base;
 
-our $VERSION = "0.003";
+our $VERSION = "0.004";
 
 our @SUGAR = qw/metric action hash_metric lists_metric/;
 our @HOOKS = qw/before after/;
@@ -34,7 +35,7 @@ sub import {
     my $caller = caller;
 
     inject( $caller, $_, $class->can( $_ )) for @EXPORT;
-    no strict 'refs';
+    no strict 'refs';  ## no critic
     push @{"$caller\::ISA"} => 'Meta::Builder::Base';
 }
 
@@ -62,18 +63,18 @@ Meta::Builder - Tools for creating Meta objects to track custom metrics.
 
 =head1 DESCRIPTION
 
-Meta programming is becomming more and more popular. The popularity of Meta
+Meta programming is becoming more and more popular. The popularity of Meta
 programming comes from the fact that many problems are made significantly
 easier. There are a few specialized Meta tools out there, for instance
 L<Class:MOP> which is used by L<Moose> to track class metadata.
 
 Meta::Builder is designed to be a generic tool for writing Meta objects. Unlike
 specialized tools, Meta::Builder makes no assumptions about what metrics you
-will care about. Meta::Builder also mkaes it simple for others to extend your
+will care about. Meta::Builder also makes it simple for others to extend your
 meta-object based tools by providing hooks for other packages to add metrics to
 your meta object.
 
-If a specialized Meta object tool is available ot meet your needs please use
+If a specialized Meta object tool is available to meet your needs please use
 it. However if you need a simple Meta object to track a couple metrics, use
 Meta::Builder.
 
@@ -142,7 +143,7 @@ My.pm:
 
 When you use Meta::Builder your class is automatically turned into a subclass
 of L<Meta::Builder::Base>. In addition several "sugar" functions are exported
-into your namespace. To avoid the "sugar" functions you can simply sublass
+into your namespace. To avoid the "sugar" functions you can simply subclass
 L<Meta::Builder::Base> directly.
 
 =head1 EXPORTS
@@ -151,31 +152,31 @@ L<Meta::Builder::Base> directly.
 
 =item metric( $name, \&generator, %actions )
 
-Wraper around C<caller->add_metric()>. See L<Meta::Builder::Base>.
+Wrapper around C<caller->add_metric()>. See L<Meta::Builder::Base>.
 
 =item action( $metric, $name, $code )
 
-Wraper around C<caller->add_action()>. See L<Meta::Builder::Base>.
+Wrapper around C<caller->add_action()>. See L<Meta::Builder::Base>.
 
 =item hash_metric( $name, %additional_actions )
 
-Wraper around C<caller->add_hash_metric()>. See L<Meta::Builder::Base>.
+Wrapper around C<caller->add_hash_metric()>. See L<Meta::Builder::Base>.
 
 =item lists_metric( $name, %additional_actions )
 
-Wraper around C<caller->add_lists_metric()>. See L<Meta::Builder::Base>.
+Wrapper around C<caller->add_lists_metric()>. See L<Meta::Builder::Base>.
 
 =item before( $metric, $action, $code )
 
-Wraper around C<caller->hook_before()>. See L<Meta::Builder::Base>.
+Wrapper around C<caller->hook_before()>. See L<Meta::Builder::Base>.
 
 =item after( $metric, $action, $code )
 
-Wraper around C<caller->hook_after()>. See L<Meta::Builder::Base>.
+Wrapper around C<caller->hook_after()>. See L<Meta::Builder::Base>.
 
 =item accessor( $name )
 
-Wraper around C<caller->set_accessor()>. See L<Meta::Builder::Base>.
+Wrapper around C<caller->set_accessor()>. See L<Meta::Builder::Base>.
 
 =item make_immutable()
 
@@ -193,7 +194,7 @@ Chad Granum L<exodist7@gmail.com>
 
 Copyright (C) 2010 Chad Granum
 
-Meta-Builder is free software; Standard perl licence.
+Meta-Builder is free software and is licensed under the same terms as Perl itself.
 
 Meta-Builder is distributed in the hope that it will be useful, but WITHOUT
 ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS

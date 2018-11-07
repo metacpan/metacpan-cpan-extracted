@@ -1,0 +1,9 @@
+@import url(sheet2.html);
+foo{
+    asdf:asdf;
+    ew:12;
+}
+bar{
+    content:"a\n  b\
+    asdf";
+}

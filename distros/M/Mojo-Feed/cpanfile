@@ -7,3 +7,7 @@ on 'test' => sub {
     requires 'Test::More', '0.98';
 };
 
+on 'develop' => sub {
+    # sunshine and rainbows
+    requires 'Minilla';
+};

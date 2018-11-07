@@ -11,20 +11,14 @@ use QBit::WebInterface::Test::Request;
 sub get_response {
     my ($self, $path, $cmd, $params, %opts) = @_;
 
-    $self->request(
-        QBit::WebInterface::Test::Request->new(
-            path => $path,
-            cmd  => $cmd,
-            query =>
-              join('&', map {uri_escape_utf8($_) . '=' . uri_escape_utf8($params->{$_})} sort keys(%{$params || {}})),
-            method  => $opts{'method'}  || 'GET',
-            headers => $opts{'headers'} || {},
-            scheme  => $opts{'scheme'}  || 'http'
-        )
+    my $request = $self->get_request(
+        path   => $path,
+        cmd    => $cmd,
+        params => $params,
+        %opts
     );
 
-    open($self->request->{'__STDIN__'}, '<', \$opts{'stdin'}) || throw "Cannot open file in memory"
-      if defined($opts{'stdin'});
+    $self->request($request);
 
     $self->build_response();
 
@@ -36,33 +30,26 @@ sub get_response {
     return $response;
 }
 
-sub get_cmd {
-    my ($self) = @_;
+sub get_request {
+    my ($self, %opts) = @_;
 
-    return ($self->request->{'path'}, $self->request->{'cmd'});
-}
+    my $request = QBit::WebInterface::Test::Request->new(
+        path  => $opts{'path'},
+        cmd   => $opts{'cmd'},
+        query => $opts{'params'}
+        ? join('&',
+            map {uri_escape_utf8($_) . '=' . uri_escape_utf8($opts{'params'}->{$_})}
+            sort keys(%{$opts{'params'} || {}}))
+        : '',
+        method  => $opts{'method'}  || 'GET',
+        headers => $opts{'headers'} || {},
+        scheme  => $opts{'scheme'}  || 'http'
+    );
 
-sub make_cmd {
-    my ($self, $new_cmd, $new_path, @params) = @_;
+    open($request->{'__STDIN__'}, '<', \$opts{'stdin'}) || throw "Cannot open file in memory"
+      if defined($opts{'stdin'});
 
-    my %vars = defined($params[0])
-      && ref($params[0]) eq 'HASH' ? %{$params[0]} : @params;
-
-    my ($path, $cmd) = $self->get_cmd();
-
-    $path = uri_escape_utf8($self->_get_new_path($new_path, $path));
-    $cmd = uri_escape_utf8($self->_get_new_cmd($new_cmd, $cmd));
-
-    return "/$path/$cmd"
-      . (
-        %vars
-        ? '?'
-          . join(
-            $self->get_option('link_param_separator', '&amp;'),
-            map {uri_escape_utf8($_) . '=' . uri_escape_utf8($vars{$_})} keys(%vars)
-          )
-        : ''
-      );
+    return $request;
 }
 
 TRUE;

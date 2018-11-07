@@ -41,9 +41,16 @@ then only if the owner changes.  It needs to be followed by an
 
 This returns the number currently being worked on as a [Phone::Number](https://metacpan.org/pod/Phone::Number).
 
+### exists
+
+This is a boolean which can be tested to find out if the number
+already exists on the Magrathea database.  It is set during
+the call to ["emergency\_info" in Magrathea::API](https://metacpan.org/pod/Magrathea::API#emergency_info) and updated after
+a successful call to ["create"](#create).
+
 ### info
 
-This returns all the fields in a hash or as a pointer to a has
+This returns all the fields in a hash or as a pointer to a hash
 depending on list or scalar context.  The fields are as documented for
 methods below.
 

@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Jan 15 19:15:00 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov  1 21:16:21 2018
-# Update Count    : 126
+# Last Modified On: Mon Nov  5 21:34:36 2018
+# Update Count    : 130
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -16,6 +16,8 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../CPAN";
 use lib "$FindBin::Bin/../lib";
+use App::Packager qw( :name Data::iRealPro );
+
 use Data::iRealPro 1.11;
 use Data::iRealPro::Output;
 
@@ -47,7 +49,7 @@ sub main {
 
 ################ Options and Configuration ################
 
-use Getopt::Long 2.13 qw( :config no_ignorecase );
+use Getopt::Long 2.13;
 use File::Spec;
 use Carp;
 
@@ -59,6 +61,7 @@ my %configs;
 
 sub app_setup {
     my ($appname, $appversion, %args) = @_;
+    my $version = 0;		# handled locally
     my $help = 0;		# handled locally
     my $ident = 0;		# handled locally
     my $man = 0;		# handled locally
@@ -161,6 +164,7 @@ sub app_setup {
 	  'ident'		=> \$ident,
 	  'help|h|?'		=> \$help,
 	  'man'			=> \$man,
+	  'version'		=> \$version,
 	  'verbose',
 	  'trace',
 	  'debug',
@@ -170,6 +174,7 @@ sub app_setup {
 	$pod2usage->(2);
     }
     # GNU convention: message to STDOUT upon request.
+    app_ident(\*STDOUT), exit if $version;
     $pod2usage->(1) if $help;
     $pod2usage->( VERBOSE => 2 ) if $man;
     app_ident(\*STDOUT) if $ident;

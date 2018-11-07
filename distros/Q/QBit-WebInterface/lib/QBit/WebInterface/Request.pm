@@ -1,5 +1,5 @@
 package QBit::WebInterface::Request;
-$QBit::WebInterface::Request::VERSION = '0.031';
+$QBit::WebInterface::Request::VERSION = '0.033';
 use qbit;
 
 use base qw(QBit::Class);

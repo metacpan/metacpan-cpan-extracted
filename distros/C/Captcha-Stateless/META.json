@@ -1,0 +1,43 @@
+{
+   "abstract" : "A stateless captcha implementation that stores state in an HTTP cookie in the browser.",
+   "author" : [
+      "Martin Schmitt <mas at scsy dot de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Captcha-Stateless",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::Blowfish" : "2.14",
+            "Crypt::CBC" : "2.33"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

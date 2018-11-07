@@ -1,5 +1,5 @@
 package QBit::WebInterface::Controller;
-$QBit::WebInterface::Controller::VERSION = '0.031';
+$QBit::WebInterface::Controller::VERSION = '0.033';
 use qbit;
 
 use base qw(QBit::Application::Part);
@@ -10,58 +10,66 @@ use Template 2.20;
 use Template::Config;
 use Digest::MD5 qw(md5_hex);
 
+use B qw(svref_2object);
+
 use QBit::WebInterface::Controller::Form;
 
 our %TEMPLATE_PRE_DEFINE;
 
 __PACKAGE__->mk_ro_accessors(qw(path attrs));
 
-sub _register_cmd {
-    my ($package, $sub, $type, $process_method) = @_;
-
-    my $pkg_stash = package_stash($package);
-    $pkg_stash->{'__CMDS__'} = [] unless exists($pkg_stash->{'__CMDS__'});
-
-    push(
-        @{$pkg_stash->{'__CMDS__'}},
-        {
-            sub     => $sub,
-            package => $package,
-            type    => $type,
-            (defined($process_method) ? (process_method => $process_method) : ())
-        }
-    );
-}
-
-sub _set_cmd_attr {
-    my ($package, $sub, $name, $value) = @_;
-
-    my $pkg_stash = package_stash($package);
-    $pkg_stash->{'__CMD_ATTRS__'} = {} unless exists($pkg_stash->{'__CMD_ATTRS__'});
-
-    $pkg_stash->{'__CMD_ATTRS__'}{$package, $sub}{$name} = $value;
-}
-
 sub MODIFY_CODE_ATTRIBUTES {
     my ($package, $sub, @attrs) = @_;
 
     my @unknown_attrs = ();
-
+    my $cmd           = {};
     foreach my $attr (@attrs) {
-        if ($attr =~ /^CMD$/) {
-            _register_cmd($package, $sub, 'CMD');
-        } elsif ($attr =~ /^DEFAULT$/) {
-            _register_cmd($package, $sub, 'DEFAULT');
-        } elsif ($attr =~ /^FORMCMD$/) {
-            _register_cmd($package, $sub, 'FORM', '_process_form');
-        } elsif ($attr =~ /^SAFE$/) {
-            $package->_set_cmd_attr($sub, SAFE => TRUE);
-        } else {
+        unless ($package->_process_attribute($attr, $cmd)) {
             push(@unknown_attrs, $attr);
         }
     }
 
+    if (%$cmd) {
+        $cmd->{'package'} = $package;
+        $cmd->{'sub'}     = $sub;
+
+        my $cv       = svref_2object($sub);
+        my $gv       = $cv->GV;
+        my $sub_name = $gv->NAME;
+
+        $cmd->{'sub_name'} = $sub_name;
+
+        my $pkg_stash = package_stash($package);
+        $pkg_stash->{'__CMDS__'}{$sub_name} = $cmd;
+    }
+
     return @unknown_attrs;
+}
+
+sub _process_attribute {
+    my ($package, $attr, $cmd) = @_;
+
+    my $result = TRUE;
+    if ($attr =~ /^CMD$/) {
+        $cmd->{'attributes'}{'CMD'} = TRUE;
+    } elsif ($attr =~ /^DEFAULT$/) {
+        $cmd->{'attributes'}{'DEFAULT'} = TRUE;
+    } elsif ($attr =~ /^FORMCMD$/) {
+        $cmd->{'attributes'}{'FORM'} = TRUE;
+        $cmd->{'process_method'} = '_process_form';
+    } elsif ($attr =~ /^SAFE$/) {
+        $cmd->{'attributes'}{'SAFE'} = TRUE;
+    } elsif ($attr =~ /^URL\((.+)\)/) {
+        my @params = eval($1);
+        throw Exception $@ if $@;
+
+        $cmd->{'attributes'}{'URL'} = TRUE;
+        $cmd->{'route_params'} = \@params;
+    } else {
+        $result = FALSE;
+    }
+
+    return $result;
 }
 
 sub import {
@@ -71,10 +79,10 @@ sub import {
 
     $opts{'path'} ||= '';
 
-    my $app_pkg = caller();
+    my $app_pkg = $opts{'app_pkg'} // caller();
     die gettext('Use only in QBit::WebInterface and QBit::Application descendant')
       unless $app_pkg->isa('QBit::WebInterface')
-          && $app_pkg->isa('QBit::Application');
+      && $app_pkg->isa('QBit::Application');
 
     my $pkg_stash = package_stash($package);
 
@@ -84,28 +92,18 @@ sub import {
     $app_pkg_stash->{'__CMDS__'} = {}
       unless exists($app_pkg_stash->{'__CMDS__'});
 
-    my $pkg_sym_table = package_sym_table($package);
+    foreach my $sub_name (sort keys(%{$pkg_stash->{'__CMDS__'} || {}})) {
+        my $cmd = $pkg_stash->{'__CMDS__'}{$sub_name};
 
-    foreach my $cmd (@{$pkg_stash->{'__CMDS__'} || []}) {
-        my ($name) =
-          grep {
-                !ref($pkg_sym_table->{$_})
-              && defined(&{$pkg_sym_table->{$_}})
-              && $cmd->{'sub'} == \&{$pkg_sym_table->{$_}}
-          }
-          keys %$pkg_sym_table;
+        throw Exception gettext("Cmd \"%s\" is exists in package \"%s\"",
+            $sub_name, $app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{$sub_name}{'package'})
+          if exists($app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{$sub_name});
 
-        $cmd->{'attrs'} = $pkg_stash->{'__CMD_ATTRS__'}{$cmd->{'package'}, $cmd->{'sub'}} || {};
+        $app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{$sub_name} = $cmd;
 
-        if ($cmd->{'type'} eq 'DEFAULT') {
+        if ($cmd->{'attributes'}{'DEFAULT'}) {
             $app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{'__DEFAULT__'} =
-              $app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{$name};
-            $app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{'__DEFAULT__'}{'name'} = $name;
-        } else {
-            die gettext("Cmd \"%s\" is exists in package \"%s\"",
-                $name, $app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{$name}{'package'})
-              if exists($app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{$name});
-            $app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{$name} = $cmd;
+              $app_pkg_stash->{'__CMDS__'}{$opts{'path'}}{$sub_name};
         }
     }
 
@@ -309,8 +307,8 @@ sub _process_template {
             check_rights => sub {$wself->check_rights(@_)},
             gettext      => sub {return gettext(shift, @_)},
             ngettext     => sub {return ngettext(shift, shift, shift, @_)},
-            pgettext => sub {return pgettext(shift, shift, @_)},
-            npgettext => sub {return npgettext(shift, shift, shift, shift, @_)},
+            pgettext     => sub {return pgettext(shift, shift, @_)},
+            npgettext    => sub {return npgettext(shift, shift, shift, shift, @_)},
 
             dumper => sub {
                 local $Data::Dumper::Terse = 1;
@@ -360,7 +358,8 @@ sub _process_template {
         },
         PRE_PROCESS  => $opts{'pre_process'},
         POST_PROCESS => $opts{'post_process'},
-    ) || throw $Template::ERROR;
+      )
+      || throw $Template::ERROR;
 
     $self->timelog->finish();
 

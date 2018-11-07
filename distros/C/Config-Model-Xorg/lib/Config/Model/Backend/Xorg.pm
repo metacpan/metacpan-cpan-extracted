@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Xorg ;
-$Config::Model::Backend::Xorg::VERSION = '1.115';
+$Config::Model::Backend::Xorg::VERSION = '1.116';
 
 use Mouse ;
 use Carp ;
@@ -92,7 +92,7 @@ Config::Model::Backend::Xorg - Read and write config from xorg.conf file
 
 =head1 VERSION
 
-version 1.115
+version 1.116
 
 =head1 SYNOPSIS
 

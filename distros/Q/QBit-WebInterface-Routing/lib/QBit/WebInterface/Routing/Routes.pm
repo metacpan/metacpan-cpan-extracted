@@ -1,5 +1,5 @@
 package QBit::WebInterface::Routing::Routes;
-$QBit::WebInterface::Routing::Routes::VERSION = '0.009';
+$QBit::WebInterface::Routing::Routes::VERSION = '0.010';
 use qbit;
 
 use base qw(QBit::Class);

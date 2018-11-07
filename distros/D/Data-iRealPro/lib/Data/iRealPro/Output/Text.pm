@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 14:58:26 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov  1 19:42:17 2018
-# Update Count    : 102
+# Last Modified On: Tue Nov  6 08:27:04 2018
+# Update Count    : 105
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -54,8 +54,10 @@ sub process {
 	local $s->{_transpose} = 0;
 
 	my $key = $s->xpose($s->{key} // "C");
-	my $akey = $s->{actual_key} || 0;
-	$akey = $s->xpose( $key =~ /-$/ ? $minkeys[$akey] : $majkeys[$akey] );
+	my $akey = $s->{actual_key};
+	if ( $akey ne '' ) {
+	    $akey = $s->xpose( $key =~ /-$/ ? $minkeys[$akey] : $majkeys[$akey] );
+	}
 
 	my @t = split( ' ', $s->{composer} );
 	@t[0,1] = @t[1,0] if @t == 2;
@@ -74,7 +76,7 @@ sub process {
 			$s->{actual_style}
 			? ( " (", $s->{actual_style}, ")" ) : (),
 			"; key: ", $key,
-			"; actual key: ", $akey,
+			$akey ? ( "; actual key: ", $akey ) : (),
 			$s->{actual_tempo}
 			? ( "; tempo: ", $s->{actual_tempo} ) : (),
 			$s->{actual_repeats}

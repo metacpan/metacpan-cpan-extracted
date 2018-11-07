@@ -1,5 +1,12 @@
 Revision history
 
+0.004   2018-11-06
+    - INCOMPATIBLE CHANGE: Now fields Imports, LinkintTo, Enhances are also
+      parsed to hashref, just like Depends and Suggests. And the hashref's
+      value is now an empty string (was number 0) for dependency that has no
+      version requirements.
+    - Add a space when joining string that across multi lines.
+
 0.003   2018-06-09
     - RT#124376 remove Test::More from build dependencies.
 

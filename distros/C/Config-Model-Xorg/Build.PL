@@ -102,6 +102,7 @@ my $build = $class->new
     'strict' => '0'
   },
   'configure_requires' => {
+    'Config::Model' => '2.123',
     'Module::Build' => '0.34'
   },
   'recommends' => {

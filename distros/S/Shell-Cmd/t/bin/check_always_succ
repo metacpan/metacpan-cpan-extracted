@@ -1,8 +1,9 @@
-#!/usr/bin/perl
-$| = 1;
+#!/bin/sh
 
-if (-f "always_succ_2" ) {
-   exit 0;
-} else {
-   exit 40;
-}
+dir=$1
+
+if [ -f $dir/always_succ.2.flag ]; then
+   exit 0
+else
+   exit 40
+fi

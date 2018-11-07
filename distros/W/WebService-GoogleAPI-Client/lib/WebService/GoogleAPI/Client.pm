@@ -2,10 +2,9 @@ use strictures;
 use 5.14.0;
 
 package WebService::GoogleAPI::Client;
-$WebService::GoogleAPI::Client::VERSION = '0.18';
+$WebService::GoogleAPI::Client::VERSION = '0.19';
 
-# ABSTRACT: API WebService OAUTH2 Client Agent to streamline access to GOOGLE API End-Point Services using Discovery Data
-
+# ABSTRACT: Google API Discovery and SDK
 
 #   FROM MCE POD -- <p><img src="https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.png" width="664" height="446" alt="Bank Queuing Model" /></p>
 
@@ -313,15 +312,17 @@ __END__
 
 =head1 NAME
 
-WebService::GoogleAPI::Client - API WebService OAUTH2 Client Agent to streamline access to GOOGLE API End-Point Services using Discovery Data
+WebService::GoogleAPI::Client - Google API Discovery and SDK
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
-Access Google API Services Version 1 using an OAUTH2 User Agent
+Access Google API Services Version 1 using an OAUTH2 User Agent.
+
+Includes Discovery, validation authentication and API Access.
 
 assumes gapi.json configuration in working directory with scoped Google project 
 redentials and user authorization created by _goauth_

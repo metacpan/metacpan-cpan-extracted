@@ -6,6 +6,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Metadata: '1.000033'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -17,8 +18,14 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Shannon::Entropy:
+    file: lib/Shannon/Entropy.pm
+    version: '1.101011'
 requires:
   Import::Export: '0.08'
   perl: '5.006'
-version: '1.101010'
+version: '1.101011'
+x_contributors:
+  - 'John Imrie (JGNI) <jgni@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,9 @@
 Revision history for perl module Graphics::GVG::OpenGLRenderer
 
+0.4 2018-11-05
+
+- Update for DefaultRenderer changes in parent Graphics::GVG v0.92
+
 0.3 2018-10-09
 
 - Implement against Graphics::GVG::Renderer

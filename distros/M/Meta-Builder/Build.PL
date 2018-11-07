@@ -9,12 +9,13 @@ my $build = Module::Build->new(
     dist_author => 'Chad Granum <exodist7@gmail.com>',
     create_readme => 1,
     requires => {
+        perl => '5.006',
         Carp => 0,
     },
     build_requires => {
-        'Fennec::Lite'    => "",
-        'Test::More'      => "",
-        'Test::Exception' => "",
+        'Fennec::Lite'    => 0,
+        'Test::More'      => 0,
+        'Test::Exception' => 0,
     },
     meta_merge => {
         resources => {

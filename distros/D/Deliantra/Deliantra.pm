@@ -8,7 +8,7 @@ Deliantra - Deliantra suppport module to read/write archetypes, maps etc.
 
 package Deliantra;
 
-our $VERSION = '2.0';
+our $VERSION = '2.01';
 
 use common::sense;
 

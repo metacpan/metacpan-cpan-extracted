@@ -1,10 +1,10 @@
 {
-   "abstract" : "Interface to test and compare Excel files.",
+   "abstract" : "Interface to test and compare Excel files (.xls/.xlsx).",
    "author" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -32,12 +32,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::RC4" : "0",
-            "Digest::Perl::MD5" : "0",
             "File::Spec" : "0",
-            "OLE::Storage_Lite" : "0",
             "Scalar::Util" : "0",
             "Spreadsheet::ParseExcel" : "0.58",
+            "Spreadsheet::ParseXLSX" : "0.27",
+            "Spreadsheet::Read" : "0.75",
             "Test::Builder" : "0",
             "Test::Builder::Tester" : "0",
             "Test::More" : "0",
@@ -48,7 +47,7 @@
    "provides" : {
       "Test::Excel" : {
          "file" : "lib/Test/Excel.pm",
-         "version" : "1.40"
+         "version" : "1.42"
       }
    },
    "release_status" : "stable",
@@ -59,6 +58,6 @@
          "web" : "https://github.com/manwar/Test-Excel"
       }
    },
-   "version" : "1.40",
+   "version" : "1.42",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Graphics::GVG::AST::Ellipse;
-$Graphics::GVG::AST::Ellipse::VERSION = '0.91';
+$Graphics::GVG::AST::Ellipse::VERSION = '0.92';
 use strict;
 use warnings;
 use Moose;

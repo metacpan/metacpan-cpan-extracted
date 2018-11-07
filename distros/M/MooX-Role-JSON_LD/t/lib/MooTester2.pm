@@ -3,6 +3,7 @@ package MooTester2;
 use Moo;
 
 use MooX::JSON_LD 'Example';
+use JSON::MaybeXS;
 
 use namespace::autoclean;
 
@@ -24,5 +25,10 @@ has boop => (
     default => 'Bop!',
     json_ld => 1,
 );
+
+around _build_json_ld_encoder => sub {
+    return JSON->new->utf8->canonical;
+};
+
 
 1;

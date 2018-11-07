@@ -1,0 +1,17 @@
+# SC_ORIG_DIRE=CURRDIR
+# export SC_VAR_1="val_1"
+# export SC_VAR_2="val_2"
+# SC_DIRE="/tmp"
+# cd "$SC_DIRE"
+# TESTDIR/bin/succ 1 warn
+This is the 'succ' command stdout with argument: 1
+# TESTDIR/bin/succ 2 warn
+This is the 'succ' command stdout with argument: 2
+# cd "$SC_ORIG_DIRE"
+
+###STDERR
+This is the 'succ' command stderr with argument: 1
+This is the 'succ' command stderr with argument: 2
+
+###EXIT
+0

@@ -1,0 +1,18 @@
+Revision history for Perl module Meta::Builder
+
+0.004 2018-11-05
+
+  * Package standard updates (via pr's thanks!)
+  * Spelling and doc fixes (Thanks!)
+
+0.003 2010-10-09
+
+  * Return from get() methods.
+
+0.002 2010-10-09
+
+  * Add merging capability.
+
+0.001 2010-10-09
+
+  * First release to CPAN.

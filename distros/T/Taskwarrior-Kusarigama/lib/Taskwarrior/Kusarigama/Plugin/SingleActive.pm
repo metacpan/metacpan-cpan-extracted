@@ -1,6 +1,6 @@
 package Taskwarrior::Kusarigama::Plugin::SingleActive;
 our $AUTHORITY = 'cpan:YANICK';
-$Taskwarrior::Kusarigama::Plugin::SingleActive::VERSION = '0.9.3';
+$Taskwarrior::Kusarigama::Plugin::SingleActive::VERSION = '0.10.0';
 
 use strict;
 use warnings;
@@ -33,7 +33,7 @@ Taskwarrior::Kusarigama::Plugin::SingleActive
 
 =head1 VERSION
 
-version 0.9.3
+version 0.10.0
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,10 @@
 Partial Revision history for DFA::Simple
 
-0.33
+0.34
+    - added meta files rt #127476
+	- added MANIFEST file
 
+0.33
     - removed AutoLoader, related to rt #36110
     - fixed and extended MakeFile, related to rt #8225
     - removed threads, as it was the old threads and as threads are officially discouraged
@@ -12,7 +15,6 @@ Partial Revision history for DFA::Simple
     - fixed typos and indentation
 
 0.32
-
     - Until version 0.32 the action table had a small bug. 
 	  The third element of the Actions array was employ as the code ref to be run when leaving a state. 
 	  This is still supported for backwards compatibility, but is deprecated. 

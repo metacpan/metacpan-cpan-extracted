@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "turns baubles into trinkets",
+  "ABSTRACT" => "Fast/easy Web Apps in Perl",
   "AUTHOR" => "Sudheer Murthy <pause\@a1z.us>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -15,15 +15,27 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "A1z-HTML5-Template",
   "LICENSE" => "perl",
   "NAME" => "A1z::HTML5::Template",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.07",
+  "PREREQ_PM" => {
+    "CGI" => 0,
+    "Exporter" => 0,
+    "parent" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => ""
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "CGI" => 0,
+  "Exporter" => 0,
+  "parent" => 0,
+  "strict" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

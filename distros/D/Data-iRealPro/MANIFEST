@@ -19,15 +19,15 @@ lib/Data/iRealPro/Output/Text.pm
 lib/Data/iRealPro/Playlist.pm
 lib/Data/iRealPro/Song.pm
 lib/Data/iRealPro/URI.pm
-res/catalog.xml
-res/catalogs/README
-res/fonts/BravuraCn.ttf
-res/fonts/Bravura.ttf
-res/fonts/DroidSans.ttf
-res/fonts/DroidSans-Bold.ttf
-res/fonts/Myriad-CnSemibold.ttf
-res/fonts/Myriad-UcnSemibold.ttf
-res/drawable-nodpi-v4/README
+lib/Data/iRealPro/res/catalog.xml
+lib/Data/iRealPro/res/catalogs/README
+lib/Data/iRealPro/res/fonts/BravuraCn.ttf
+lib/Data/iRealPro/res/fonts/Bravura.ttf
+lib/Data/iRealPro/res/fonts/DroidSans.ttf
+lib/Data/iRealPro/res/fonts/DroidSans-Bold.ttf
+lib/Data/iRealPro/res/fonts/Myriad-CnSemibold.ttf
+lib/Data/iRealPro/res/fonts/Myriad-UcnSemibold.ttf
+lib/Data/iRealPro/res/drawable-nodpi-v4/README
 t/00-load.t
 t/01-cpan.t
 t/02-cpan.t
@@ -49,8 +49,12 @@ t/31-chords.t
 t/32-chords.t
 t/40-transpose.t
 t/41-transpose.t
-pp/Makefile.lnx
-pp/Makefile.msw
-pp/irealcvt.pp
+pp/linux/Makefile
+pp/linux/irealcvt.pp
+pp/windows/GNUmakefile
+pp/windows/irealcvt.pp
+pp/common/irealcvt.pp
+pp/common/PDF_API2_Bundle.pm
+pp/README
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

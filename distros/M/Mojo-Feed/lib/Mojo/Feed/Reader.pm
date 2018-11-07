@@ -22,44 +22,15 @@ has charset => 'UTF-8';
 sub parse {
   my ($self, $xml, $charset) = @_;
   my ($body, $source, $url, $file);
-  return unless ($xml);
-  if (!ref $xml) {
-    if ($xml =~ /^\</) { # looks like XML string...
-      $body = $xml;
-    }
-    elsif ($xml =~ /^https?\:/) {
-      $url = Mojo::URL->new($xml);
-    }
-    elsif (-r $xml) { # a readable file path
-      $file = path($xml);
-    }
-    else {
-      die "unknown argument $xml";
-    }
-  }
-  else {  # $xml is a reference
-   if (blessed $xml && $xml->can('slurp')) {
-      $file = $xml;
-   }
-   elsif (blessed $xml && $xml->isa('Mojo::URL')) {
-      $url = $xml->clone();
-   }
-   elsif (blessed $xml && $xml->isa('Mojo::DOM')) {
-      $body = $xml->to_string;  # we don't need your dom, we make our own
-   }
-   elsif (ref $xml eq 'SCALAR') {
-        $body = $$xml;
-   }
-   else {
-      die "unknown argument $xml";
-    }
-  }
-  if ($url) {
+  return undef unless ($xml);
+  $body = $self->_from_string($xml) || undef;
+  if (!$body && ($url = $self->_from_url($xml))) {
     ($body, $charset) = $self->load($url);
   }
-  if ($file) {
+  if (!$body && ($file = $self->_from_file($xml))) {
     $body = $file->slurp;
   }
+  croak "unknown argument $xml" unless ($body);
   $charset ||= $self->charset;
   $body = $charset ? decode($charset, $body) // $body : $body;
   $source = $url || $file;
@@ -67,14 +38,41 @@ sub parse {
   return ($feed->is_valid) ? $feed : undef;
 }
 
+sub _from_file {
+  my ($self, $xml) = @_;
+  my $file
+    = (ref $xml)
+    ? (blessed $xml && $xml->can('slurp'))
+      ? $xml
+      : undef
+    : (-r "$xml") ? Mojo::File->new($xml)
+    :               undef;
+  return $file;
+}
+
+sub _from_url {
+  my ($self, $xml) = @_;
+  my $url
+    = (blessed $xml && $xml->isa('Mojo::URL')) ? $xml->clone()
+    : ($xml =~ /^https?\:/) ? Mojo::URL->new("$xml")
+    :                         undef;
+  return $url;
+}
+
+sub _from_string {
+  my ($self, $xml) = @_;
+  my $str = (!ref $xml) ? $xml : (ref $xml eq 'SCALAR') ? $$xml : '';
+  return ($str =~ /^\s*\</s) ? $str : undef;
+}
+
 sub load {
   my ($self, $url) = @_;
   my $tx = $self->ua->get($url);
-  if (!$tx->success) {
-    croak "Error getting feed from url ", $url, ": ",
-      (($tx->error) ? $tx->error->{message} : '');
+  my $result = $tx->result; # this will croak on network errors
+  if ($result->is_error) {
+    croak "Error getting feed from url ", $url, ": ", $result->message;
   }
-  return ($tx->res->body, $tx->res->content->charset);
+  return ($result->body, $result->content->charset);
 }
 
 # discover - get RSS/Atom feed URL from argument.
@@ -85,9 +83,9 @@ sub discover {
 
 #  $self->ua->max_redirects(5)->connect_timeout(30);
   return $self->ua->get_p($url)
-    ->catch(sub { my ($err) = shift; die "Connection Error: $err" })->then(sub {
+    ->catch(sub { my ($err) = shift; croak "Connection Error: $err" })->then(sub {
     my ($tx) = @_;
-    if ($tx->success && $tx->res->code == 200) {
+    if ($tx->res->is_success && $tx->res->code == 200) {
       return $self->_find_feed_links($tx->req->url, $tx->res);
     }
     return;
@@ -97,7 +95,7 @@ sub discover {
 sub _find_feed_links {
   my ($self, $url, $res) = @_;
 
-  state $feed_ext = qr/\.(?:rss|xml|rdf)$/;
+  state $feed_exp = qr/((\.(?:rss|xml|rdf)$)|(\/feed\/)|(feeds*\.))/;
   my @feeds;
 
   # use split to remove charset attribute from content_type
@@ -123,7 +121,7 @@ sub _find_feed_links {
     });
     $res->dom->find('a')->grep(sub {
       $_->attr('href')
-        && Mojo::URL->new($_->attr('href'))->path =~ /$feed_ext/io;
+        && $_->attr('href') =~ /$feed_exp/io;
     })->each(sub {
       push @feeds, Mojo::URL->new($_->attr('href'))->to_abs($base);
     });
@@ -264,7 +262,7 @@ the method will return undef.
 
 =head2 parse_opml
 
-  my @subscriptions = Mojo::Feed->parse_opml( 'mysubs.opml' );
+  my @subscriptions = Mojo::Feed::Reader->new->parse_opml( 'mysubs.opml' );
   foreach my $sub (@subscriptions) {
     say 'RSS URL is: ',     $sub->{xmlUrl};
     say 'Website URL is: ', $sub->{htmlUrl};

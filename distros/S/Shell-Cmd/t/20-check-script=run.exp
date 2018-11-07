@@ -1,0 +1,72 @@
+SC_FAILED=0;
+SC_ORIG_DIRE=`pwd`;
+
+main () {
+   SC_DIRE=$SC_ORIG_DIRE;
+
+   #
+   # Command 1
+   #
+
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+
+   #
+   # Command 1.0
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/fail 1 warn;
+      # CHECK WITH
+      TESTDIR/bin/succ;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_FAILED=1;
+   fi
+
+   if [ $SC_FAILED -ne 0 ]; then
+      return;
+   fi
+
+   #
+   # Command 2
+   #
+
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+
+   #
+   # Command 2.0
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/succ 1 warn;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_FAILED=2;
+   fi
+
+   if [ $SC_FAILED -ne 0 ]; then
+      return;
+   fi
+}
+
+main;
+cd "$SC_ORIG_DIRE";
+exit $SC_FAILED;

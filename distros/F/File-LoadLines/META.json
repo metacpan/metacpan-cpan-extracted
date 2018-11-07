@@ -6,7 +6,6 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5",
       "perl_5"
    ],
    "meta-spec" : {
@@ -33,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "ExtUtils::MakeMaker" : "6.46",
             "Test::More" : "0",
             "perl" : "5.010001"
          }
@@ -46,6 +46,6 @@
          "web" : "https://github.com/sciurius/perl-File-LoadLines"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

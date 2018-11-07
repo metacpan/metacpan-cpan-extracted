@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,9 @@ no_index:
 provides:
   CPAN::Audit:
     file: lib/CPAN/Audit.pm
-    version: '0.08'
+    version: '0.10'
+  CPAN::Audit::DB:
+    file: lib/CPAN/Audit/DB.pm
   CPAN::Audit::Discover:
     file: lib/CPAN/Audit/Discover.pm
   CPAN::Audit::Discover::Cpanfile:
@@ -43,13 +45,14 @@ provides:
 requires:
   CPAN::DistnameInfo: '0'
   Module::CPANfile: '0'
+  Pod::Usage: '1.69'
   perl: '5.008001'
   version: '0'
 resources:
   bugtracker: https://github.com/vti/cpan-audit/issues
   homepage: https://github.com/vti/cpan-audit
   repository: git://github.com/vti/cpan-audit.git
-version: '0.08'
+version: '0.10'
 x_authority: cpan:VTI
 x_contributors:
   - 'Takumi Akiyama <t.akiym@gmail.com>'

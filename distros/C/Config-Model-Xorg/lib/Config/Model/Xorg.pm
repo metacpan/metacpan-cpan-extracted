@@ -9,7 +9,7 @@
 #
 
 package Config::Model::Xorg ;
-$Config::Model::Xorg::VERSION = '1.115';
+$Config::Model::Xorg::VERSION = '1.116';
 use 5.10.1;
 use Config::Model 2.123;
 
@@ -22,7 +22,7 @@ Config::Model::Xorg - Xorg configuration model for Config::Model
 
 =head1 VERSION
 
-version 1.115
+version 1.116
 
 =head1 SYNOPSIS
 

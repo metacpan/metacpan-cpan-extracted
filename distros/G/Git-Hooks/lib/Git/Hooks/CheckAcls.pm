@@ -3,9 +3,10 @@ use warnings;
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: [DEPRECATED] Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.9.10';
+$Git::Hooks::CheckAcls::VERSION = '2.10.0';
 use 5.010;
 use utf8;
+use Log::Any '$log';
 use Git::Hooks;
 
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
@@ -106,6 +107,8 @@ EOS
 sub check_affected_refs {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_affected_refs");
+
     return 1 if $git->im_admin();
 
     foreach my $ref ($git->get_affected_refs()) {
@@ -117,9 +120,11 @@ sub check_affected_refs {
 }
 
 # Install hooks
-UPDATE      \&check_affected_refs;
-PRE_RECEIVE \&check_affected_refs;
-REF_UPDATE  \&check_affected_refs;
+UPDATE          \&check_affected_refs;
+PRE_RECEIVE     \&check_affected_refs;
+REF_UPDATE      \&check_affected_refs;
+COMMIT_RECEIVED \&check_affected_refs;
+SUBMIT          \&check_affected_refs;
 
 1;
 
@@ -135,7 +140,7 @@ Git::Hooks::CheckAcls - [DEPRECATED] Git::Hooks plugin for branch/tag access con
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -186,6 +191,17 @@ branch.
 This hook is invoked when a push request is received by Gerrit Code
 Review, to check if the user performing the push can update the branch
 in question.
+
+=item * B<commit-received>
+
+This hook is invoked when a push request is received by Gerrit Code Review to
+create a change for review, to check if the user performing the push can update
+the branch in question.
+
+=item * B<submit>
+
+This hook is invoked when a change is submitted in Gerrit Code Review, to check
+if the user performing the push can update the branch in question.
 
 =back
 
@@ -276,7 +292,7 @@ and processed.
 
 This is useful, for instance, if you want developers to be restricted
 in what they can do to official branches but to have complete control
-with their own branch namespace.
+with their own branch name space.
 
     [githooks "checkacls"]
       acl = ^. CRUD ^refs/heads/{USER}/

@@ -3,10 +3,11 @@ use warnings;
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '2.9.10';
+$Git::Hooks::CheckCommit::VERSION = '2.10.0';
 use 5.010;
 use utf8;
 use Carp;
+use Log::Any '$log';
 use Git::Hooks;
 use Git::Repository::Log;
 use List::MoreUtils qw/any none/;
@@ -361,6 +362,8 @@ EOS
 sub check_pre_commit {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_pre_commit");
+
     _setup_config($git);
 
     my $current_branch = $git->get_current_branch();
@@ -393,6 +396,8 @@ sub check_pre_commit {
 sub check_post_commit {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_post_commit");
+
     _setup_config($git);
 
     my $current_branch = $git->get_current_branch();
@@ -407,6 +412,8 @@ sub check_post_commit {
 # This routine can act both as an update or a pre-receive hook.
 sub check_affected_refs {
     my ($git) = @_;
+
+    $log->debug(__PACKAGE__ . "::check_affected_refs");
 
     _setup_config($git);
 
@@ -424,6 +431,8 @@ sub check_affected_refs {
 
 sub check_patchset {
     my ($git, $opts) = @_;
+
+    $log->debug(__PACKAGE__ . "::check_patchset");
 
     _setup_config($git);
 
@@ -452,6 +461,8 @@ POST_COMMIT      \&check_post_commit;
 UPDATE           \&check_affected_refs;
 PRE_RECEIVE      \&check_affected_refs;
 REF_UPDATE       \&check_affected_refs;
+COMMIT_RECEIVED  \&check_affected_refs;
+SUBMIT           \&check_affected_refs;
 PATCHSET_CREATED \&check_patchset;
 DRAFT_PUBLISHED  \&check_patchset;
 
@@ -469,7 +480,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -539,8 +550,18 @@ check if all commits being pushed comply.
 
 =item * B<ref-update>
 
-This hook is invoked when a push request is received by Gerrit Code Review,
-to check if all commits being pushed comply.
+This hook is invoked when a direct push request is received by Gerrit Code
+Review, to check if all commits being pushed comply.
+
+=item * B<commit-received>
+
+This hook is invoked when a push request is received by Gerrit Code Review to
+create a change for review, to check if all commits being pushed comply.
+
+=item * B<submit>
+
+This hook is invoked when a change is submitted in Gerrit Code Review, to check
+if all commits being pushed comply.
 
 =item * B<patchset-created>
 
@@ -616,7 +637,7 @@ L<Git::Hooks>.  If it's not found or if there's an error in the construction
 of the C<Email::Valid> object the check fails with a suitable message.
 
 The C<Email::Valid> constructor (new) accepts some parameters. You can pass
-the boolean parameters to change their default values by means of the
+the Boolean parameters to change their default values by means of the
 following sub-options. For more information, please consult the
 L<Email::Valid> documentation.
 
@@ -739,7 +760,7 @@ B<pre-receive> hooks. For the B<pre-commit> hook this argument is B<undef>.
 
 =back
 
-The subroutine should return a boolean value indicating success. Any errors
+The subroutine should return a Boolean value indicating success. Any errors
 should be produced by invoking the
 B<Git::Repository::Plugin::GitHooks::error> method.
 

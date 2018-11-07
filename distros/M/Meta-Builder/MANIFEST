@@ -1,9 +1,13 @@
+.appveyor.yml
+.travis.yml
 Build.PL
+Changes
 lib/Meta/Builder.pm
 lib/Meta/Builder/Base.pm
 lib/Meta/Builder/Util.pm
 MANIFEST			This list of files
-META.yml
 README
 t/Builder.t
 t/Merge.t
+META.yml
+META.json

@@ -7,13 +7,13 @@ use v5.10.1;
 use Moo;
 
 use List::Util qw/ first /;
-use MooX::JSON_LD 'Class';
+use MooX::JSON_LD 'base';
 use Ref::Util qw/ is_blessed_ref is_plain_arrayref /;
 use Types::Standard qw/ Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.2';
+our $VERSION = 'v0.0.4';
 
 # RECOMMEND PREREQ: aliased
 # RECOMMEND PREREQ: Ref::Util::XS
@@ -45,7 +45,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.4
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,6 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5",
       "perl_5"
    ],
    "meta-spec" : {
@@ -42,29 +41,34 @@
       "runtime" : {
          "requires" : {
             "App::Packager" : "1.43",
+            "File::LoadLines" : "0.02",
             "Font::TTF" : "1.04",
             "JSON::PP" : "2.27203",
             "PDF::API2" : "2.02",
-            "Text::Balanced" : "v2.0.0",
+            "String::Interpolate::Named" : "0.05",
             "perl" : "5.01"
          }
       },
       "test" : {
          "requires" : {
             "JSON::PP" : "2.27203",
-            "Test::More" : "0",
-            "Text::Balanced" : "v2.0.0"
+            "String::Interpolate::Named" : "0.05",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/App/Music/ChordPro.pm",
-         "version" : "0.971"
+         "version" : "0.972"
+      },
+      "a2crd" : {
+         "file" : "script/a2crd",
+         "version" : "0.972"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "0.971"
+         "version" : "0.972"
       }
    },
    "release_status" : "stable",
@@ -80,6 +84,6 @@
          "url" : "https://github.com/sciurius/chordpro"
       }
    },
-   "version" : "0.971",
+   "version" : "0.972",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

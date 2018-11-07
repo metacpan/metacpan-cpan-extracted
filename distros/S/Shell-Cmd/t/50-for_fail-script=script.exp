@@ -1,0 +1,56 @@
+SC_FAILED=0;
+SC_ORIG_DIRE=`pwd`;
+
+main () {
+   SC_DIRE=$SC_ORIG_DIRE;
+
+   for i in 1 2 3 ;do
+
+      #
+      # Command 2
+      #
+
+      SC_CURR_EXIT=0;
+      SC_CURR_SUCC=0;
+
+      #
+      # Command 2.0
+      #
+
+      if [ $SC_CURR_SUCC -eq 0 ]; then
+         echo "#SC CMD 2.0";
+         echo "#SC CMD 2.0" >&2;
+      fi
+
+      if [ $SC_CURR_SUCC -eq 0 ]; then
+         TESTDIR/bin/fail_on_2 $i;
+         CMD_EXIT=$?;
+         echo "";
+         echo "" >&2;
+         if [ $CMD_EXIT -eq 0 ]; then
+            SC_CURR_SUCC=1;
+            SC_CURR_EXIT=0;
+         elif [ $SC_CURR_EXIT -eq 0 ]; then
+            SC_CURR_EXIT=$CMD_EXIT;
+         fi
+         if [ $CMD_EXIT -ne 0 ]; then
+            echo "#SC EXIT 2.0 $CMD_EXIT";
+            echo "#SC EXIT 2.0 $CMD_EXIT" >&2;
+         fi
+      fi
+
+      if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+         SC_FAILED=2;
+      fi
+
+      if [ $SC_FAILED -ne 0 ]; then
+         return;
+      fi
+
+   done
+}
+
+main;
+cd "$SC_ORIG_DIRE";
+exit $SC_FAILED;
+

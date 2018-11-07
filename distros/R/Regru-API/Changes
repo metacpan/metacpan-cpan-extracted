@@ -1,6 +1,14 @@
 Revision history for Perl distribution Regru-API.
 
-0.047   Tue Aug 29 19:10:28 2017 +0000
+0.049   Wed Nov 7 12:13:02 2018 +0000
+
+0.049   Wed Nov  7 12:11:49 2018 +0000
+    [ FIXES ]
+    - release permissions fix
+
+0.048   Fri Oct 26 07:44:03 2018 +0000
+    [ FEATURES ]
+    - added support for CAA resource record in "zone" namespace
 
 0.047   Fri Jul 14 05:26:30  2017 +0000
     [ FEATURES ]

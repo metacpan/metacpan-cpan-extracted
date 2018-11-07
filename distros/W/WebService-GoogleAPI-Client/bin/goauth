@@ -3,10 +3,9 @@
 use strictures;
 
 package goauth;
-$goauth::VERSION = '0.18';
+$goauth::VERSION = '0.19';
 use Carp;
 use Mojolicious::Lite;
-use Data::Dump;
 use Path::Class;
 use Config::JSON;
 use Tie::File;
@@ -150,7 +149,7 @@ sub runserver
     {
       app->log->info( "Authorization code was retrieved: " . $c->param( 'code' ) );
       $tokens = $c->get_new_tokens( $c->param( 'code' ) );
-      app->log->info( "App got new tokens: " . pp $tokens);
+      app->log->info( "App got new tokens: " );    # . join(',' keys %{$tokens})
       if ( $tokens )
       {
 
@@ -218,7 +217,7 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head2 SUMMARY
 

@@ -9,6 +9,7 @@ use MooTester3;
 
 ok(my $obj = MooTester3->new);
 isa_ok($obj, 'MooTester3' );
+isa_ok($obj, 'MooTester2' );
 can_ok($obj, qw[ foo bar boop json_ld_type json_ld_fields
                  json_ld_data json_ld json_ld_encoder ]);
 

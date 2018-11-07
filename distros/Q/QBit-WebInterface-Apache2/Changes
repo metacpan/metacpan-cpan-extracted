@@ -1,25 +1,62 @@
 ==================================================
-Changes from 2015-09-12 00:00:00 +0000 to present.
+Changes from 2017-11-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2016-09-11 13:54:08 +0000
+version 0.006 at 2018-11-05 18:40:55 +0000
 ------------------------------------------
 
-  Change: fd43f970ad13aae1a028127ffeb34c325997c6b7
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-09-11 17:53:21 +0000
-
-    Merge pull request #4 from Madskill/upload_to_cpan
-
-    upload to cpan 
-
-  Change: 6b29f9ea9451de564d43364bc761eb6f45219479
+  Change: f57514d2d1f19682db5c66d566e8717abea225f6
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-11 16:52:36 +0000
+  Date : 2018-11-05 21:40:29 +0000
 
-    upload to cpan 
+    Merge branch 'master' of
+    https://github.com/QBitFramework/QBit-WebInterface-Apache2 
+
+  Change: 26032c8de7ab6b6fb5ab7cc30673ce0459dd132c
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:39:53 +0000
+
+    Merge pull request #6 from Madskill/fix_dist_ini
+
+    fix dist.ini 
+
+  Change: 05fda16b5f94de8c8dd01e3d4ef5a6f7f76c30b4
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:39:34 +0000
+
+    Merge branch 'master' into fix_dist_ini 
+
+  Change: fdbff8db53930ddd295dfa6edac01538f732b165
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:37:47 +0000
+
+    fix dist.ini 
+
+  Change: 8253f867034c33438bd5ba3e47eb69f4834643f2
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:34:48 +0000
+
+    Merge pull request #5 from Madskill/use_subs_from_base
+
+    use subs from base 
+
+  Change: c8f35e450a30c4057e646b7ff38c298229c8ef6c
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:33:43 +0000
+
+    use subs from base 
+
+------------------------------------------
+version 0.005 at 2018-11-05 18:35:33 +0000
+------------------------------------------
+
+  Change: c8507f3f55cfacdecf1544cb7c021a0a47ff4e4b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:35:33 +0000
+
+    Version 0.005 
 
 ================================================
-Plus 3 releases after 2015-09-12 00:00:00 +0000.
+Plus 4 releases after 2017-11-05 00:00:00 +0000.
 ================================================

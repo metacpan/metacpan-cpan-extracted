@@ -1,3 +1,19 @@
+libqbit-webinterface-perl (0.033) raring; urgency=low
+
+  * use $package
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon,  5 Nov 2018 23:40:35 +0300
+
+libqbit-webinterface-perl (0.032) raring; urgency=low
+
+  * fix docs and dist.ini
+
+  * added documentations and fix path and cmd for handler routes
+
+  * fix sub_name and added routing
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon,  5 Nov 2018 21:17:12 +0300
+
 libqbit-webinterface-perl (0.031) raring; urgency=low
 
   * fix post params

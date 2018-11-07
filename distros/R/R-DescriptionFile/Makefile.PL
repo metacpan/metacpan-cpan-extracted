@@ -27,11 +27,12 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "List::Util" => "1.33",
     "Test2::Plugin::NoWarnings" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => "1.33",
   "Path::Tiny" => 0,
   "Test2::Plugin::NoWarnings" => 0,
   "Test2::V0" => 0,

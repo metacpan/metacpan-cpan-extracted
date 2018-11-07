@@ -1,10 +1,37 @@
 ==================================================
-Changes from 2018-10-22 00:00:00 +0000 to present.
+Changes from 2018-10-23 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.18 at 2018-11-05 06:33:01 +0000
+version 0.19 at 2018-11-06 23:16:29 +0000
 -----------------------------------------
+
+  Change: efe8a90c5b68f6989ea0717bce21cfd5b7ea10fd
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-07 08:30:52 +0000
+
+    #9 as reported by rabbiveesh
+
+    Previous transition to using Data::Dump from Data::Dumper with
+    "app->log->info( "App got new tokens: " . pp $tokens);" in goauth was
+    breaking 
+
+  Change: de9a523023a051243d3795d816d0c2137a9b4426
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-06 18:12:08 +0000
+
+    typo 
+
+  Change: 7bac2f8fe641aa31507e7bdd6c1bad1bd7803732
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-05 16:33:47 +0000
+
+    CPAN RELEASE 0.18
+
+    *refactor GET path parameter interpolation to allow {+varname} as
+    used in persons API *came across issue while creating people_api.pl
+    example in which people.people.connections.list had path with
+    {+resourceName} which was not being interpolated. 
 
   Change: 6842cf46ed39e64fc0a251d0cf62628f087c9b09
   Author: Peter Scott <peter@computerpros.com.au>
@@ -259,5 +286,5 @@ version 0.14 at 2018-10-27 08:19:26 +0000
     transaction request. 
 
 ================================================
-Plus 2 releases after 2018-10-22 00:00:00 +0000.
+Plus 2 releases after 2018-10-23 00:00:00 +0000.
 ================================================

@@ -5,9 +5,7 @@ package Test::HTML::Spelling;
 
 use v5.10;
 
-use Moose;
-use MooseX::NonMoose;
-
+use Moo;
 extends 'Test::Builder::Module';
 
 use utf8;
@@ -21,8 +19,11 @@ use List::Util qw( reduce );
 use Scalar::Util qw( looks_like_number );
 use Search::Tokenizer;
 use Text::Aspell;
+use Types::Standard -types;
 
-our $VERSION = 'v0.4.0';
+use namespace::autoclean;
+
+our $VERSION = 'v0.5.0';
 
 # A placeholder key for the default spellchecker
 
@@ -32,20 +33,20 @@ const my $DEFAULT => '_';
 
 has 'ignore_classes' => (
     is      => 'rw',
-    isa     => 'ArrayRef[Str]',
+    isa     => ArrayRef[Str],
     default => sub { [qw( no-spellcheck )] },
 );
 
 
 has 'check_attributes' => (
     is      => 'rw',
-    isa     => 'ArrayRef[Str]',
+    isa     => ArrayRef[Str],
     default => sub { [qw( title alt )] },
 );
 
 has '_empty_elements' => (
     is      => 'rw',
-    isa     => 'HashRef',
+    isa     => HashRef[Bool],
     default => sub {
         return {
             map { $_ => 1 } (
@@ -58,7 +59,7 @@ has '_empty_elements' => (
 
 has 'ignore_words' => (
     is      => 'rw',
-    isa     => 'HashRef',
+    isa     => HashRef,
     default => sub { {} },
 );
 
@@ -115,7 +116,7 @@ has 'parser' => (
 
 has '_spellers' => (
     is      => 'ro',
-    isa     => 'HashRef',
+    isa     => HashRef,
     lazy    => 1,
     default => sub {
         my $speller = Text::Aspell->new();
@@ -186,13 +187,13 @@ sub langs {
 
 has '_errors' => (
     is      => 'rw',
-    isa     => 'Int',
+    isa     => Int,
     default => 0,
 );
 
 has '_context' => (
     is      => 'rw',
-    isa     => 'ArrayRef[HashRef]',
+    isa     => ArrayRef[HashRef],
     default => sub { [] },
 );
 
@@ -364,12 +365,6 @@ sub spelling_ok {
     $self->tester->ok( $self->check_spelling($text), $message );
 }
 
-__PACKAGE__->meta->make_immutable;
-
-no Moose;
-
-
-use namespace::autoclean;
 
 1;    # End of Test::HTML::Spelling
 
@@ -385,7 +380,7 @@ Test::HTML::Spelling - spelling of HTML documents
 
 =head1 VERSION
 
-version v0.4.0
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -422,48 +417,6 @@ placenames that are unlikely to be in a dictionary (such as timezones)
 should be in this class.
 
 It will fail when an HTML document is not well-formed.
-
-=begin readme
-
-=head1 REQUIREMENTS
-
-This module requires Perl v5.10 or newer and the following non-core
-modules:
-
-=over
-
-=item L<Const::Fast>
-
-=item L<curry>
-
-=item L<HTML::Parser>
-
-=item L<Moose>
-
-=item L<MooseX::NonMoose>
-
-=item L<namespace::autoclean>
-
-=item L<Search::Tokenizer>
-
-=item L<Text::Aspell>
-
-=back
-
-The following modules are used for tests but are not needed to run
-this module:
-
-=over
-
-=item L<File::Slurp>
-
-=item L<Test::Builder>
-
-=item L<Test::Pod::Spelling>
-
-=back
-
-=end readme
 
 =for readme stop
 
@@ -602,7 +555,7 @@ Murray Walker <perl@minty.org>
 
 =item *
 
-Rusty Conover <rusty@luckydinosaur.com>
+Rusty Conover <rusty+cpan@luckydinosaur.com>
 
 =item *
 

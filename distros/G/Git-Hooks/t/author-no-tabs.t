@@ -47,13 +47,13 @@ my @files = (
     't/02-notify.t',
     't/02-prepare-log.t',
     't/author-critic.t',
+    't/author-minimum-version.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/make-debug-environment.sh',
     't/release-kwalitee.t',
-    't/release-minimum-version.t',
     't/release-unused-vars.t',
     't/setup-vagrant-environment.sh'
 );

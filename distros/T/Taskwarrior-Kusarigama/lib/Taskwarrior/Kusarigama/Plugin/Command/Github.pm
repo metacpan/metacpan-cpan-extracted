@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::Github;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: sync tickets of a Github project
-$Taskwarrior::Kusarigama::Plugin::Command::Github::VERSION = '0.9.3';
+$Taskwarrior::Kusarigama::Plugin::Command::Github::VERSION = '0.10.0';
 
 use 5.10.0;
 
@@ -132,7 +132,7 @@ Taskwarrior::Kusarigama::Plugin::Command::Github - sync tickets of a Github proj
 
 =head1 VERSION
 
-version 0.9.3
+version 0.10.0
 
 =head1 SYNOPSIS
 

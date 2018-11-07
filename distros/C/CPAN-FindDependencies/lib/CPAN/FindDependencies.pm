@@ -17,7 +17,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(finddeps);
 
-$VERSION = '2.47';
+$VERSION = '2.48';
 
 use constant DEFAULT02PACKAGES => 'http://www.cpan.org/modules/02packages.details.txt.gz';
 use constant MAXINT => ~0;
@@ -39,7 +39,7 @@ CPAN::FindDependencies - find dependencies for modules on the CPAN
 
 The module uses the CPAN packages index to map modules to distributions and
 vice versa, and then fetches distributions' META.yml or Makefile.PL files from
-C<http://search.cpan.org/> to determine pre-requisites.  This means that a
+C<http://metacpan.org/> to determine pre-requisites.  This means that a
 working interwebnet connection is required.
 
 =head1 FUNCTIONS
@@ -155,7 +155,7 @@ that feature.
 
 =head1 BUGS/WARNINGS/LIMITATIONS
 
-You must have web access to L<http://search.cpan.org/> and (unless
+You must have web access to L<http://metacpan.org/> and (unless
 you tell it where else to look for the index)
 L<http://www.cpan.org/>, or have all the data cached locally..
 If any
@@ -185,7 +185,7 @@ L<CPAN>
 
 L<http://deps.cpantesters.org/>
 
-L<http://search.cpan.org>
+L<http://metacpan.org>
 
 =head1 AUTHOR, LICENCE and COPYRIGHT
 
@@ -392,7 +392,7 @@ sub _getreqs {
     # If neither is found, add warning to stack and return
 
     my $yaml = _get_file_cached(
-        src => "http://search.cpan.org/src/$author/$distname/META.yml",
+        src => "http://fastapi.metacpan.org/source/$author/$distname/META.yml",
         destfile => "$distname.yml",
         opts => $opts
     );
@@ -418,7 +418,7 @@ sub _getreqs {
         return ['-warning', 'no META.yml'];
     } else {
         my $makefilepl = _get_file_cached(
-            src => "http://search.cpan.org/src/$author/$distname/Makefile.PL",
+            src => "http://fastapi.metacpan.org/source/$author/$distname/Makefile.PL",
             destfile => "$distname.MakefilePL",
             opts => $opts
         );

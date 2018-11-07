@@ -1,5 +1,21 @@
 # Change Log
 
+## [0.0.16] - 2018-11-06
+
+### Fixed
+
+- Fix typo in SYNOPSIS.
+
+- Do not apply role from MooX::JSON_LD if the target is a role or it
+  already has the expected methods.
+
+  This should fix issues with inheritance, but existing code that
+  works around this bug may need to be updated.
+
+- Allow `_build_json_ld_encoder` method to be overridden.
+
+- Explicitly test subclass parent.
+
 ## [0.0.14] - 2018-07-31
 
 ### Changed

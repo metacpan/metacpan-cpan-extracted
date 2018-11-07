@@ -1,5 +1,5 @@
 package QBit::WebInterface::FastCGI::Request;
-$QBit::WebInterface::FastCGI::Request::VERSION = '0.005';
+$QBit::WebInterface::FastCGI::Request::VERSION = '0.006';
 use qbit;
 
 use base qw(QBit::WebInterface::Request);

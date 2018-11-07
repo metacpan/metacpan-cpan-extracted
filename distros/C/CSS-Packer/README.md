@@ -10,7 +10,7 @@ CSS::Packer - Another CSS minifier
 
 # VERSION
 
-Version 2.05
+Version 2.07
 
 # DESCRIPTION
 
@@ -61,6 +61,11 @@ Second argument must be a hashref of options. Possible options are:
     'minify' converts the same rules to
 
         a{color:black;}div{width:100px;}
+
+- indent
+
+    Defines number of spaces, used for indentation. Used only when compress is 'pretty'.
+    Default value is 0.
 
 - copyright
 

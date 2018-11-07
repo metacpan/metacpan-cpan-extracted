@@ -41,6 +41,7 @@ isa_ok($feed, 'HASH');
 is($feed->{title}, 'First Weblog');
 
 # And DOM (deprecated):
+$t->app->ua->server->app($t->app);  # WHY???
 my $tx = $t->app->ua->get('/atom.xml');
 $feed = $t->app->parse_feed($tx->res->dom);
 isa_ok($feed, 'HASH');

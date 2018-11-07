@@ -1,12 +1,13 @@
 {
-   "abstract" : "Perl bindings for Upwork API",
+   "abstract" : "Perl bindings for Upwork API (OAuth2)",
    "author" : [
       "Maksym Novozhylov <mnovozhilov@upwork.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
-      "upwork"
+      "upwork",
+      "oauth2"
    ],
    "license" : [
       "apache_2_0"
@@ -31,14 +32,15 @@
       "runtime" : {
          "requires" : {
             "IO::Socket::SSL" : "1.965",
-            "Net::OAuth" : "0.28"
+            "Net::OAuth2" : "0.63",
+            "perl" : "v5.8.8"
          }
       }
    },
    "provides" : {
       "Net::Upwork::API" : {
          "file" : "lib/Net/Upwork/API.pm",
-         "version" : "v1.3.0"
+         "version" : "v2.0.1"
       },
       "Net::Upwork::API::Client" : {
          "file" : "lib/Net/Upwork/API/Client.pm"
@@ -143,13 +145,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/upwork/perl-upwork/issues"
+         "web" : "https://github.com/upwork/perl-upwork-oauth2/issues"
       },
       "homepage" : "http://developers.upwork.com",
       "repository" : {
-         "url" : "https://github.com/upwork/perl-upwork.git"
+         "url" : "https://github.com/upwork/perl-upwork-oauth2.git"
       }
    },
-   "version" : "v1.3.0",
+   "version" : "v2.0.1",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

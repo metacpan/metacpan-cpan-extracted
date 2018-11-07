@@ -2,7 +2,7 @@ package Archive::Peek::Libarchive;
 use strict;
 use warnings;
 use Object::Tiny qw{ filename };
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 require XSLoader;
 XSLoader::load( 'Archive::Peek::Libarchive', $VERSION );
@@ -53,7 +53,7 @@ Archive::Peek::Libarchive - Peek into archives without extracting them (using li
 =head1 DESCRIPTION
 
 This module lets you peek into archives without extracting them. This is
-a wrapper to the libarchive C libary (http://code.google.com/p/libarchive/),
+a wrapper to the libarchive C library (http://code.google.com/p/libarchive/),
 which you must have installed (libarchive-dev package for Debian/Ubuntu).
 It supports many different archive formats and compression algorithms and
 is fast.
@@ -88,6 +88,12 @@ Iterate over all the files in the archive:
       ...
     }
   );
+
+=head1 ATTRIBUTES
+
+=head2 filename
+
+Contains the name of the archive file to use.
 
 =head1 AUTHOR
 

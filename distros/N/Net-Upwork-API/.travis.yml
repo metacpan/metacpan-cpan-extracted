@@ -1,5 +1,7 @@
 language: perl
 perl:
+  - "5.28"
+  - "5.26"
   - "5.20"
   - "5.20-shrplib"
   - "5.18"

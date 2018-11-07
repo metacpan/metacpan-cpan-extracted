@@ -102,7 +102,7 @@ sub new
     };
     bless $self, $class;
     my %info;
-    my $response = $self->DATA($number->packed);
+    my $response = $self->DATA;
     while ($response == 0) {
         chomp $response;
         my ($key, $value) = split / /, $response, 2;
@@ -110,6 +110,8 @@ sub new
         $response = $self->sendline;
     }
     $self->{info} = \%info;
+    my $exists : Boolean = keys(%info) > 0;
+    $self->{exists} = $exists;
     $self;
 }
 
@@ -126,6 +128,7 @@ sub create
     my $self = shift;
     my $result = $self->CREATE;
     croak "$result" unless $result == 0;
+    $self->{exists} = true;
 }
 
 =head3 number
@@ -140,9 +143,24 @@ sub number
     return $self->{number};
 }
 
+=head3 exists
+
+This is a boolean which can be tested to find out if the number
+already exists on the Magrathea database.  It is set during
+the call to L<Magrathea::API/emergency_info> and updated after
+a successful call to L</create>.
+
+=cut
+
+sub exists
+{
+    my $self = shift;
+    return $self->{exists};
+}
+
 =head3 info
 
-This returns all the fields in a hash or as a pointer to a has
+This returns all the fields in a hash or as a pointer to a hash
 depending on list or scalar context.  The fields are as documented for
 methods below.
 

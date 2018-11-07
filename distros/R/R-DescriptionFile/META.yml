@@ -8,6 +8,7 @@ build_requires:
   FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  List::Util: '1.33'
   Test2::Plugin::NoWarnings: '0'
   Test2::V0: '0'
   Test::More: '0'
@@ -24,12 +25,12 @@ name: R-DescriptionFile
 provides:
   R::DescriptionFile:
     file: lib/R/DescriptionFile.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Path::Tiny: '0'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/stphnlyd/perl5-R-DescriptionFile.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'YAML::Tiny version 1.70'

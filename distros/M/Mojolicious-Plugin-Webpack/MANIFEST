@@ -1,0 +1,39 @@
+Changes
+cpanfile
+example/assets/css/css-example.css
+example/assets/js/app.js
+example/assets/js/App.vue
+example/assets/sass/scss-example.scss
+example/assets/webpack.custom.js
+example/lite.pl
+example/package-lock.json
+example/package.json
+example/webpack.config.js
+lib/Mojolicious/Plugin/Webpack.pm
+lib/Mojolicious/Plugin/Webpack/package.json
+lib/Mojolicious/Plugin/Webpack/webpack.config.js
+lib/Mojolicious/Plugin/Webpack/webpack.custom.js
+lib/Mojolicious/Plugin/Webpack/webpack.html
+Makefile.PL
+MANIFEST			This list of files
+script/crushinator
+t/00-basic.t
+t/assets/css/basic.css
+t/assets/js/calc.js
+t/assets/js/process-js-add.js
+t/assets/js/process-js-subtract.js
+t/assets/sass/basic.scss
+t/assets/webpack.process-css.js
+t/assets/webpack.process-js.js
+t/assets/webpack.process-sass.js
+t/crushinator.t
+t/cwd.t
+t/Helper.pm
+t/install-deps.t
+t/markup.t
+t/process-css.t
+t/process-js.t
+t/process-sass.t
+t/register.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

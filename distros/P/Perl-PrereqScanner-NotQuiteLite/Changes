@@ -1,5 +1,8 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.9901 2018/11/07
+  - improved Package::Variant parser
+
 0.99 2018/11/05
   - Package::Variant support
   - requires Module::CPANfile 1.1004

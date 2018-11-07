@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Feed::Reader;
 
-our $VERSION = "0.16";
+our $VERSION = "0.17";
 
 use Scalar::Util qw(blessed);
 
@@ -44,12 +44,13 @@ sub parse_rss {
       sub {
         my $tx = pop;
         my $feed = undef;
-        if ($tx->success) {
-          my $feed_obj = $self->feed_reader->parse($tx->res->body,
-            $tx->res->content->charset);
+        my $result = $tx->result;
+        if ($result->is_success) {
+          my $feed_obj = $self->feed_reader->parse($result->body,
+            $result->content->charset);
           if ($feed_obj) {
             $feed = $feed_obj->to_hash;
-            $feed->{'htmlUrl'} = delete $feed->{'html_url'};
+            $feed->{'htmlUrl'} = delete $feed->{'link'};
             for (keys %$feed) { delete $feed->{$_} if ($feed->{$_} eq '') };
             delete $feed->{'items'} if (scalar @{$feed->{'items'}} == 0);
           }
@@ -62,7 +63,7 @@ sub parse_rss {
     my $feed_obj = $self->feed_reader->parse(@args);
     return undef unless ($feed_obj);
     my $feed = $feed_obj->to_hash;
-    $feed->{'htmlUrl'} = delete $feed->{'html_url'};
+    $feed->{'htmlUrl'} = delete $feed->{'link'};
     for (keys %$feed) { delete $feed->{$_} if ($feed->{$_} eq '') };
     delete $feed->{'items'} if (scalar @{$feed->{'items'}} == 0);
     return $feed;

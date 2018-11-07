@@ -33,6 +33,12 @@ This is just a shortcut with stronger error messages for:
 
 # DESCRIPTION
 
+**NOTE** Starting with version '0.003' I changed that way this works.  If you want
+or need the old API for backcompatibility please set the following configuration
+flag:
+
+    MyApp->config('Plugin::URI' => { use_v1 => 1 });
+
 Currently if you want to create a URL to a controller's action properly the formal
 syntax is rather verbose:
 
@@ -40,7 +46,7 @@ syntax is rather verbose:
       $c->controller($controller)->action_for($action),
         \@args, \%query, \$fragment);
 
-Which is verbose enough that i probably encourages people to do the wrong thing
+Which is verbose enough that it probably encourages people to do the wrong thing
 and use a hard coded link path.  This might later bite you if you need to change
 your controllers and URL hierarchy.
 
@@ -57,7 +63,7 @@ This plugin adds the following methods to your context
 
 Example:
 
-    $c->uri("$controller.$action", \@parts, \%query, \$fragment);
+    $c->uri("$controller:$action", \@parts, \%query, \$fragment);
 
 This is a sugar method which works the same as:
 
@@ -72,13 +78,43 @@ message that is I think more clear than the longer version.
 You can also use a 'relative' specification for the action, which assumes
 the current controller.  For example:
 
-    $c->uri(".$action", \@parts, \%query, \$fragment);
+    $c->uri(":$action", \@parts, \%query, \$fragment);
 
 Basically the same as:
 
     my $url = $c->uri_for(
       $self->action_for($action),
         \@args, \%query, \$fragment);
+
+We also support a corrected version of what 'uri\_for\_action' meant to achieve:
+
+    $c->uri("$action", @args);
+
+Basically the same as:
+
+    my $url = $c->uri_for($self->action_for($action), @args);
+
+Where the $action string is the full or relative (to the current controller) private
+name of the action.  Please note this does support path traversal with '..' so the
+following means "create a URL to an action in the controller namespace above the
+current one":
+
+    my $url = $c->uri("../foo");  # $c->uri($self->action_for("../foo"));
+
+Experimentally we support named actions so that you can specify a link with a custom
+name:
+
+    sub name_action :Local Args(0) Name(hi) {
+      my ($self, $c) = @_;
+      # rest of action
+    }
+
+    my $url = $c->uri("#hi");
+
+This allows you to specify the action by its name from any controller.  We don't
+allow you to use the same name twice, and we also throw an exception if you attempt
+to add a name to an intermediate action in a chain of actions (you can only name
+an endpoint).
 
 Lastly For ease of use if the first argument is an action object we just pass it
 down to 'uri\_for'.  That way you should be able to use this method for all types

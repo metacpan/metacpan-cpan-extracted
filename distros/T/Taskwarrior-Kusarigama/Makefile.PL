@@ -42,6 +42,7 @@ my %WriteMakefileArgs = (
     "MooseX::MungeHas" => 0,
     "Net::GitHub" => 0,
     "Path::Tiny" => 0,
+    "PerlX::Maybe" => 0,
     "Prompt::ReadKey" => 0,
     "Set::Object" => 0,
     "Symbol" => 0,
@@ -64,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::MockObject::Extends" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.9.3",
+  "VERSION" => "0.10.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -97,6 +98,7 @@ my %FallbackPrereqs = (
   "MooseX::MungeHas" => 0,
   "Net::GitHub" => 0,
   "Path::Tiny" => 0,
+  "PerlX::Maybe" => 0,
   "Prompt::ReadKey" => 0,
   "Set::Object" => 0,
   "Symbol" => 0,

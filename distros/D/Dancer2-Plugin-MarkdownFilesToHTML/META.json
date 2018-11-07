@@ -1,5 +1,5 @@
 {
-   "abstract" : "Markdown Files to HTML",
+   "abstract" : "Easy conversion of markdown documents to HTML for display in your Dancer2 website",
    "author" : [
       "Steve Dondley <s@dondley.com>"
    ],
@@ -19,14 +19,6 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "develop" : {
-         "requires" : {
-            "Dancer2" : "0",
-            "HTTP::Request::Common" : "0",
-            "Plack::Test" : "0",
-            "Test::More" : "0"
-         }
-      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -36,24 +28,23 @@
             "Encode" : "0",
             "File::Basename" : "0",
             "File::Path" : "0",
-            "File::Slurper" : "0",
             "File::Spec::Functions" : "0",
             "HTML::TreeBuilder" : "0",
-            "Markdent" : "0",
-            "Markdent::Handler::HTMLStream::Fragment" : "0",
-            "Markdent::Parser" : "0",
-            "Moose" : "0",
             "Storable" : "0",
-            "perl" : "v5.13.2",
+            "Text::Markdown::Hoedown" : "1.02",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Modern::Perl" : "0",
+            "Dancer2" : "0.206000",
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
             "Test::More" : "0",
-            "vars" : "0"
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0"
          }
       }
    },
@@ -68,7 +59,7 @@
          "web" : "https://github.com/sdondley/Dancer2-Plugin-MarkdownFilesToHTML"
       }
    },
-   "version" : "0.006",
+   "version" : "0.014",
    "x_generated_by_perl" : "v5.24.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

@@ -1,0 +1,2 @@
+TESTDIR/bin/succ 1 warn     #OPTS foo 1
+TESTDIR/bin/succ 2 warn

@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/MysqlUtils/mysql_run_pl_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.482
+# Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_run_pl_files
+# and generated automatically using Perinci::CmdLine::Gen version 0.486
 
-our $DATE = '2017-10-25'; # DATE
+our $DATE = '2018-11-06'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,14 +14,16 @@ use Log::ger;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MysqlUtils/mysql_run_pl_files",
     program_name => "mysql-run-pl-files",
     log => 1,
     log_level => "info",
     pass_cmdline_object => 1,
     config_filename => "mysqlutils.conf",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Run each .pl file, feed the output to `mysql` command and write result to .txt file
 # PODNAME: mysql-run-pl-files
@@ -38,7 +40,7 @@ mysql-run-pl-files - Run each .pl file, feed the output to `mysql` command and w
 
 =head1 VERSION
 
-This document describes version 0.010 of mysql-run-pl-files (from Perl distribution App-MysqlUtils), released on 2017-10-25.
+This document describes version 0.012 of mysql-run-pl-files (from Perl distribution App-MysqlUtils), released on 2018-11-06.
 
 =head1 SYNOPSIS
 
@@ -60,6 +62,20 @@ C<*> marks required options.
 =over
 
 =item B<--database>=I<s>*, B<--db>
+
+=item B<--directory>=I<s>, B<-d>
+
+Specify directory for the resulting *.txt files.
+
+Default value:
+
+ "."
+
+=item B<--no-mkdir>, B<-p>
+
+Default value:
+
+ 1
 
 =item B<--overwrite-when>=I<s>
 
@@ -104,17 +120,15 @@ See C<--overwrite-when>.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -262,8 +276,10 @@ Finally, you can filter a section by environment variable using the filter C<env
 List of available configuration parameters:
 
  database (see --database)
+ directory (see --directory)
  format (see --format)
  log_level (see --log-level)
+ mkdir (see --no-mkdir)
  naked_res (see --naked-res)
  overwrite_when (see --overwrite-when)
  pl_files (see --pl-files)
@@ -304,7 +320,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

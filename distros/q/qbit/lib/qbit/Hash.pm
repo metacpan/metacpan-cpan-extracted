@@ -5,7 +5,7 @@ qbit::Hash - Functions to manipulate hashes.
 =cut
 
 package qbit::Hash;
-$qbit::Hash::VERSION = '2.7';
+$qbit::Hash::VERSION = '2.8';
 use strict;
 use warnings;
 use utf8;

@@ -11,7 +11,7 @@ Data::iRealPro - Convert iRealBook/iRealPro data
 
 =cut
 
-our $VERSION = "1.12";
+our $VERSION = "1.13";
 
 =head1 SYNOPSIS
 

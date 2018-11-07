@@ -11,12 +11,12 @@ sub import {
 sub inject {
     my ( $class, $sub, $code, $nowarn ) = @_;
     if ( $nowarn ) {
-        no strict 'refs';
+        no strict 'refs';  ## no critic
         no warnings 'redefine';
         *{"$class\::$sub"} = $code;
     }
     else {
-        no strict 'refs';
+        no strict 'refs';  ## no critic
         *{"$class\::$sub"} = $code;
     }
 }

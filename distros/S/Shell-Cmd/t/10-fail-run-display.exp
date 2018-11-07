@@ -1,0 +1,23 @@
+This is the 'succ' command stdout with argument: 1
+This is the 'fail' command stdout with argument: 1
+
+#****************************************
+# The following script failed at command 2
+SC_ORIG_DIRE=CURRDIR;
+SC_DIRE=CURRDIR;
+# 1 [Succ1]
+TESTDIR/bin/succ 1 warn;
+# 2 [Fail1]
+TESTDIR/bin/fail 1 warn;
+# 3 [Succ2]
+TESTDIR/bin/succ 2 warn;
+# 4 [Fail2]
+TESTDIR/bin/fail 2 warn;
+cd "CURRDIR";
+
+###STDERR
+This is the 'succ' command stderr with argument: 1
+This is the 'fail' command stderr with argument: 1
+
+###EXIT
+2

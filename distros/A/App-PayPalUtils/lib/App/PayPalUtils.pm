@@ -1,7 +1,7 @@
 package App::PayPalUtils;
 
-our $DATE = '2016-12-30'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-11-07'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 
@@ -20,13 +20,15 @@ App::PayPalUtils - CLI utilities related to PayPal
 
 =head1 VERSION
 
-This document describes version 0.002 of App::PayPalUtils (from Perl distribution App-PayPalUtils), released on 2016-12-30.
+This document describes version 0.003 of App::PayPalUtils (from Perl distribution App-PayPalUtils), released on 2018-11-07.
 
 =head1 DESCRIPTION
 
 This distribution includes a few CLI utilities related to PayPal:
 
 =over
+
+=item * L<parse-paypal-old-txdetail-report>
 
 =item * L<parse-paypal-txdetail-report>
 
@@ -58,7 +60,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

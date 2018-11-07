@@ -1,0 +1,19 @@
+EXPERIMENTAL support for PAR packaging
+======================================
+
+linux/Makefile : Makefile for Linux
+
+  Targets: irealcvt (standalone binary)
+
+linux/irealcvt.pp : pp options for irealcvt (specific)
+
+windows/GNUmakefile : Makefile (gmake) for Microsoft Windows.
+
+  Targets: irealcvt.exe (standalone binary)
+
+windows/irealcvt.pp : pp options for irealcvt (specific)
+
+common/irealcvt.pp : pp options for irealcvt (generic)
+common/PDF_API2_Bundle.pm : Bundle for PDF::API2
+common/Imager_Bundle.pm : Bundle for Imager
+

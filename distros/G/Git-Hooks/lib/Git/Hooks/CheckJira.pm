@@ -3,9 +3,10 @@ use warnings;
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '2.9.10';
+$Git::Hooks::CheckJira::VERSION = '2.10.0';
 use 5.010;
 use utf8;
+use Log::Any '$log';
 use Git::Hooks;
 use Git::Repository::Log;
 use Path::Tiny;
@@ -377,6 +378,8 @@ sub check_commit_msg {
 sub check_patchset {
     my ($git, $opts) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_patchset");
+
     _setup_config($git);
 
     return 1 if $git->im_admin();
@@ -405,6 +408,8 @@ sub check_patchset {
 
 sub check_message_file {
     my ($git, $commit_msg_file) = @_;
+
+    $log->debug(__PACKAGE__ . "::check_message_file($commit_msg_file)");
 
     _setup_config($git);
 
@@ -463,6 +468,8 @@ sub check_ref {
 # This routine can act both as an update or a pre-receive hook.
 sub check_affected_refs {
     my ($git) = @_;
+
+    $log->debug(__PACKAGE__ . "::check_affected_refs");
 
     _setup_config($git);
 
@@ -538,6 +545,8 @@ sub notify_ref {
 sub notify_affected_refs {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::notify_affected_refs");
+
     _setup_config($git);
 
     my $comment = $git->get_config($CFG => 'comment');
@@ -579,6 +588,8 @@ COMMIT_MSG       \&check_message_file;
 UPDATE           \&check_affected_refs;
 PRE_RECEIVE      \&check_affected_refs;
 REF_UPDATE       \&check_affected_refs;
+COMMIT_RECEIVED  \&check_affected_refs;
+SUBMIT           \&check_affected_refs;
 POST_RECEIVE     \&notify_affected_refs;
 PATCHSET_CREATED \&check_patchset;
 DRAFT_PUBLISHED  \&check_patchset;
@@ -597,7 +608,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -673,8 +684,19 @@ push>. It's used to notify JIRA of commits citing its issues via comments.
 
 =item * B<ref-update>
 
-This hook is invoked when a push request is received by Gerrit Code
+This hook is invoked when a direct push request is received by Gerrit Code
 Review, to check if the commit message cites valid JIRA issues.
+
+=item * B<commit-received>
+
+This hook is invoked when a push request is received by Gerrit Code Review to
+create a change for review, to check if the commit message cites valid JIRA
+issues.
+
+=item * B<submit>
+
+This hook is invoked when a change is submitted in Gerrit Code Review, to check
+if the commit message cites valid JIRA issues.
 
 =item * B<patchset-created>
 
@@ -790,7 +812,7 @@ which must match all cited issues. For example, you may want to:
   [githooks "checkjira"]
     jql = resolution IS EMPTY OR resolution IS NOT EMPTY
 
-=item * Require specific projects, issuetypes, and statuses
+=item * Require specific projects, issue-types, and statuses
 
   [githooks "checkjira"]
     jql = project IN (ABC, UTF, GIT) AND issuetype IN (Bug, Story) AND status IN ("In progress", "In testing")
@@ -919,7 +941,7 @@ issues being cited by the commit's message.
 
 =back
 
-The subroutine should return a boolean value indicating success. Any errors
+The subroutine should return a Boolean value indicating success. Any errors
 should be produced by invoking the
 B<Git::Repository::Plugin::GitHooks::error> method.
 

@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::UserAgent;
-$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.18';
+$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.19';
 
 # ABSTRACT: User Agent wrapper for working with Google APIs
 
@@ -210,7 +210,7 @@ WebService::GoogleAPI::Client::UserAgent - User Agent wrapper for working with G
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head2 C<header_with_bearer_auth_token>
 

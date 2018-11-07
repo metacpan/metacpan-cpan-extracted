@@ -33,13 +33,6 @@ SYNOPSIS
         bar.onmessage = function (e) { console.log('bar channel got: ' + e.data) };
       </script>
 
-CAUTION
-
-    This module is in its infancy and things can and will change in
-    incompatible ways until this warning is removed. That said, the author
-    is using it for real work so hopefully incompatible changes will be
-    minimal (for his own sanity).
-
 DESCRIPTION
 
     Mojolicious::Plugin::Multiplex implements a mechanism proposed by
@@ -74,6 +67,16 @@ DESCRIPTION
     example may also be seen on GitHub
     <https://github.com/jberger/Mojolicious-Plugin-Multiplex/blob/master/ex/vue_chat.pl>.
 
+CAVEAT
+
+    While I'm declaring this module stable and production worthy, I still
+    don't nearly have enough tests. The biggest reason for this is that I
+    don't have a great way to test Perl and Javascript together.
+    Unfortunately PhantomJS declared defeat right as Mojo::Phantom was
+    catching on. A project to wrap its successor, headless Chrome, is
+    stalled waiting for now, so we wait. Contributions from people with
+    experience in this area would be greatly appreciated.
+
 HELPERS
 
  multiplex
@@ -94,24 +97,24 @@ HELPERS
 
 BUNDLED FILES
 
- websocket_multiplex.js
+ websocket_multiplex.mjs
 
-      # in your template
-      %= javascript 'websocket_multiplex.js';
-    
-      var ws = new WebSocket(url);
-      var multiplex = new WebSocketMultiplex(ws);
-      var channel = multiplex.channel(topic);
+      <script type="module">
+        import WebSocketMultiplex from '/websocket_multiplex.mjs';
+        var ws = new WebSocket(url);
+        var multiplex = new WebSocketMultiplex(ws);
+        var channel = multiplex.channel(topic);
+      </script>
 
-    Bundled with this plugin is a javascript file which provides the
-    front-end code to create a multiplexer entitled websocket_multiplex.js.
-    It provides the new class WebSocketMultiplex whose constructor takes as
-    its only argument an existing WebSocket object. This then is used to
-    open new channel objects via the channel method which takes a topic
-    string as an arugment. Topics can be almost any string, however they
-    must not contain a comma (a limitation of the protocol). The resulting
-    channel objects implement the same API as a WebSocket (though they do
-    not inherit from it).
+    Bundled with this plugin is a javascript module file called
+    websocket_multiplex.mjs which contains the front-end code to create a
+    multiplexer. It exports the WebSocketMultiplex class, whose constructor
+    takes as its only argument an existing WebSocket object or a url string
+    to build one. This then is used to open new channel objects via the
+    channel method which takes a topic string as an arugment. Topics can be
+    almost any string, however they must not contain a comma (a limitation
+    of the protocol). The resulting channel objects implement the same API
+    as a WebSocket (though they do not inherit from it).
 
     The client-side multiplexer will also attempt to reconnect to closed
     sockets and when successful will automatically resubscribe to the
@@ -119,6 +122,29 @@ BUNDLED FILES
 
     N.B. This library is the least stable of the entire project. Use with
     caution.
+
+    Also, this library will likely use very modern conventions, even going
+    forward. Older browsers are not the target for this file. For those you
+    want ...
+
+ websocket_multiplex.js
+
+      <script src="websocket_multiplex.js"></script>
+      <script>
+        var ws = new WebSocket(url);
+        var multiplex = new WebSocketMultiplex(ws);
+        var channel = multiplex.channel(topic);
+      </script>
+
+    This is the above javascript module but transpiled back to work on
+    older browsers (and minified). It sets the global symbol
+    WebSocketMultiplex when loaded. In all other ways it works just like
+    the above file.
+
+ websocket_multiplex.js.map
+
+    A file used to get better diagnostics from the minified javascript
+    file.
 
 SOURCE REPOSITORY
 
@@ -128,9 +154,13 @@ AUTHOR
 
     Joel Berger, <joel.a.berger@gmail.com>
 
+ADDITIONAL THANKS
+
+    John Susek
+
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2016 by Joel Berger
+    Copyright (C) 2016-2018 by Joel Berger
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

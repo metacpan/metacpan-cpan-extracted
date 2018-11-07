@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.2';
+our $VERSION = 'v0.0.4';
 
 
 has applies_to_delivery_method => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::DeliveryChargeSpecification - The price for the delivery of
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.4
 
 =head1 DESCRIPTION
 

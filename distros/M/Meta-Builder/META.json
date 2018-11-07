@@ -1,0 +1,62 @@
+{
+   "abstract" : "Tools for creating Meta objects to track custom metrics.",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Meta-Builder",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Fennec::Lite" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Meta::Builder" : {
+         "file" : "lib/Meta/Builder.pm",
+         "version" : "0.004"
+      },
+      "Meta::Builder::Base" : {
+         "file" : "lib/Meta/Builder/Base.pm"
+      },
+      "Meta::Builder::Util" : {
+         "file" : "lib/Meta/Builder/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Meta-Builder/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Meta-Builder"
+      }
+   },
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

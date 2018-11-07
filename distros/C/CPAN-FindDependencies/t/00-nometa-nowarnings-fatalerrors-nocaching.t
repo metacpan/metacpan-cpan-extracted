@@ -6,7 +6,7 @@ use Test::More;
 use LWP::Simple;
 
 unless(
-    head("http://search.cpan.org/~dcantrell/") &&
+    head("http://fastapi.metacpan.org/source/DCANTRELL/Number-Phone-1.0/MANIFEST") &&
     head("http://www.cpan.org/modules/02packages.details.txt.gz")
 ) {
     plan skip_all => "Need web access to the CPAN";

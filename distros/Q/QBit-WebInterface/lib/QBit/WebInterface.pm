@@ -1,13 +1,36 @@
 package QBit::WebInterface;
-$QBit::WebInterface::VERSION = '0.031';
-use POSIX qw(strftime setlocale LC_TIME);
-
+$QBit::WebInterface::VERSION = '0.033';
 use qbit;
 
+use POSIX qw(strftime setlocale LC_TIME);
+use URI::Escape qw(uri_escape_utf8);
+
+use QBit::WebInterface::Routing;
 use QBit::WebInterface::Response;
 
 use Exception::WebInterface::Controller::CSRF;
 use Exception::Request::UnknownMethod;
+
+our %HTTP_STATUSES = (
+    200 => 'OK',
+    201 => 'CREATED',
+    202 => 'Accepted',
+    203 => 'Partial Information',
+    204 => 'No Response',
+    301 => 'Moved',
+    302 => 'Found',
+    303 => 'Method',
+    304 => 'Not Modified',
+    400 => 'Bad request',
+    401 => 'Unauthorized',
+    402 => 'PaymentRequired',
+    403 => 'Forbidden',
+    404 => 'Not found',
+    500 => 'Internal Error',
+    501 => 'Not implemented',
+    502 => 'Service temporarily overloaded',
+    503 => 'Gateway timeout',
+);
 
 sub request {
     my ($self, $request) = @_;
@@ -21,28 +44,78 @@ sub response {
     return defined($response) ? $self->{'__RESPONSE__'} = $response : $self->{'__RESPONSE__'};
 }
 
+sub routing {
+    my ($self, %opts) = @_;
+
+    $self->{'__ROUTING__'} = QBit::WebInterface::Routing->new(%opts);
+
+    return $self->{'__ROUTING__'};
+}
+
 sub get_cmds {
     my ($self) = @_;
 
-    my $cmds = {};
+    unless (exists($self->{'__ALL_CMDS__'})) {
+        my $cmds           = {};
+        my @cmd_with_route = ();
+        package_merge_isa_data(
+            ref($self),
+            $cmds,
+            sub {
+                my ($package, $res) = @_;
 
-    package_merge_isa_data(
-        ref($self),
-        $cmds,
-        sub {
-            my ($package, $res) = @_;
+                my $pkg_cmds = package_stash($package)->{'__CMDS__'} || {};
+                foreach my $path (keys(%$pkg_cmds)) {
+                    foreach my $cmd (keys(%{$pkg_cmds->{$path}})) {
+                        $cmds->{$path}{$cmd} = $pkg_cmds->{$path}{$cmd};
 
-            my $pkg_cmds = package_stash($package)->{'__CMDS__'} || {};
-            foreach my $path (keys(%$pkg_cmds)) {
-                foreach my $cmd (keys(%{$pkg_cmds->{$path}})) {
-                    $cmds->{$path}{$cmd} = $pkg_cmds->{$path}{$cmd};
+                        $self->{'__IMPORTED_CONTROLLERS__'}{$cmds->{$path}{$cmd}{'package'}} = TRUE;
+
+                        if ($cmds->{$path}{$cmd}{'attributes'}{'URL'}) {
+                            push(
+                                @cmd_with_route,
+                                {
+                                    path         => $path,
+                                    cmd          => $cmd,
+                                    route_params => $cmds->{$path}{$cmd}{'route_params'}
+                                }
+                            );
+                        }
+                    }
                 }
-            }
-        },
-        __PACKAGE__
-    );
+            },
+            __PACKAGE__
+        );
 
-    return $cmds;
+        if (defined($self->{'__ROUTING__'})) {
+            my $package = $self->get_option('controller_class', 'QBit::WebInterface::Controller');
+
+            unless ($self->{'__IMPORTED_CONTROLLERS__'}{$package}) {
+                require_class($package);
+                $package->import(app_pkg => ref($self));
+
+                $self->{'__IMPORTED_CONTROLLERS__'}{$package} = TRUE;
+            }
+
+            $self->{'__ROUTING__'}->create_handler_cmds($package, $cmds);
+        }
+
+        if (@cmd_with_route) {
+            my $routing = $self->{'__ROUTING__'};
+
+            unless (defined($routing)) {
+                $routing = $self->routing();
+            }
+
+            foreach (@cmd_with_route) {
+                $routing->_generate_route(@{$_->{'route_params'}})->to(path => $_->{'path'}, cmd => $_->{'cmd'});
+            }
+        }
+
+        $self->{'__ALL_CMDS__'} = $cmds;
+    }
+
+    return $self->{'__ALL_CMDS__'};
 }
 
 sub build_response {
@@ -50,26 +123,26 @@ sub build_response {
 
     $self->pre_run();
 
-    throw gettext('No request object') unless $self->request;
+    throw Exception gettext('No request object') unless $self->request;
     $self->response(QBit::WebInterface::Response->new());
 
-    my $cmds = $self->get_cmds();
-    my ($path, $cmd) = $self->get_cmd();
+    try {
+        my $cmds = $self->get_cmds();
+        my ($path, $cmd_name, %params) = $self->get_cmd();
 
-    $cmd = $cmds->{$path}{'__DEFAULT__'}{'name'} if $cmd eq '';
-    $cmd = '' unless defined($cmd);
+        $cmd_name = $cmds->{$path}{'__DEFAULT__'}{'name'} if $cmd_name eq '';
+        $cmd_name = '' unless defined($cmd_name);
 
-    $self->set_option(cur_cmd     => $cmd);
-    $self->set_option(cur_cmdpath => $path);
+        $self->set_option(cur_cmd     => $cmd_name);
+        $self->set_option(cur_cmdpath => $path);
 
-    if (exists($cmds->{$path}{$cmd})) {
-        try {
-            my $cmd = $cmds->{$path}{$cmd};
+        if (exists($cmds->{$path}{$cmd_name})) {
+            my $cmd = $cmds->{$path}{$cmd_name};
 
             my $controller = $cmd->{'package'}->new(
                 app   => $self,
                 path  => $path,
-                attrs => $cmd->{'attrs'}
+                attrs => $cmd->{'attributes'}
             );
 
             $self->{'__BREAK_PROCESS__'} = 0;
@@ -80,13 +153,13 @@ sub build_response {
                 $controller->pre_cmd() if $controller->can('pre_cmd');
 
                 unless ($controller->{'__BREAK_CMD__'}) {
-                    if ($controller->attrs()->{'SAFE'}) {
+                    if ($cmd->{'attributes'}{'SAFE'}) {
                         throw Exception::WebInterface::Controller::CSRF gettext('CSRF has been detected')
                           unless $controller->check_anti_csrf_token($self->request->param(sign => ''),
                             url => $self->get_option('cur_cmdpath') . '/' . $self->get_option('cur_cmd'));
                     }
 
-                    my @data = $cmd->{'sub'}($controller);
+                    my @data = $cmd->{'sub'}->($controller, %params);
                     if (defined(my $method = $cmd->{'process_method'})) {
                         $controller->$method(@data);
                     }
@@ -94,21 +167,22 @@ sub build_response {
             }
 
             $self->post_cmd();
+        } else {
+            $self->response->status(404);
         }
-        catch Exception::Denied with {
-            $self->response->status(403);
-            $self->response->data(undef);
-        }
-        catch Exception::Request::UnknownMethod with {
-            $self->response->status(400);
-            $self->response->data(undef);
-        }
-        catch {
-            $self->_catch_internal_server_error(@_);
-        };
-    } else {
-        $self->response->status(404);
     }
+    catch Exception::Denied with {
+        $self->response->status(403);
+        $self->response->data(undef);
+    }
+    catch Exception::Request::UnknownMethod with {
+        $self->response->status(400);
+        $self->response->data(undef);
+    }
+    catch {
+        ldump(@_);
+        $self->_catch_internal_server_error(@_);
+    };
 
     my $ua = $self->request->http_header('User-Agent');
     $self->response->headers->{'Pragma'} = ($ua =~ /MSIE/) ? 'public' : 'no-cache';
@@ -147,9 +221,57 @@ sub post_cmd { }
 
 sub default_cmd {throw 'Abstract metod'}
 
-sub get_cmd {throw 'Abstract metod'}
+sub get_cmd {
+    my ($self) = @_;
 
-sub make_cmd {throw 'Abstract metod'}
+    my ($path, $cmd, %params);
+    if (defined($self->{'__ROUTING__'})) {
+        my $route = $self->{'__ROUTING__'}->get_current_route($self);
+
+        $path = $route->{'path'} // '';
+        $cmd  = $route->{'cmd'} // '';
+
+        %params = %{$route->{'args'} // {}};
+
+        if (length($path) || length($cmd) || !$self->get_option('use_base_routing')) {
+            return ($path, $cmd, %params);
+        }
+    }
+
+    if ($self->request->uri() =~ /^\/([^?\/]+)(?:\/([^\/?#]+))?/) {
+        ($path, $cmd) = ($1, $2);
+    } else {
+        ($path, $cmd, %params) = $self->default_cmd();
+    }
+
+    $path = '' unless defined($path);
+    $cmd  = '' unless defined($cmd);
+
+    return ($path, $cmd, %params);
+}
+
+sub make_cmd {
+    my ($self, $new_cmd, $new_path, @params) = @_;
+
+    my %vars = defined($params[0])
+      && ref($params[0]) eq 'HASH' ? %{$params[0]} : @params;
+
+    my ($path, $cmd) = $self->get_cmd();
+
+    $path = uri_escape_utf8($self->_get_new_path($new_path, $path));
+    $cmd = uri_escape_utf8($self->_get_new_cmd($new_cmd, $cmd));
+
+    return "/$path/$cmd"
+      . (
+        %vars
+        ? '?'
+          . join(
+            $self->get_option('link_param_separator', '&amp;'),
+            map {uri_escape_utf8($_) . '=' . uri_escape_utf8($vars{$_})} keys(%vars)
+          )
+        : ''
+      );
+}
 
 sub _get_new_cmd {
     my ($self, $new_cmd, $cur_cmd) = @_;
@@ -224,7 +346,7 @@ sub _exception2html {
     };
 
     my $html =
-        '<html>' 
+        '<html>'
       . '<head>'
       . '<meta http-equiv="content-type" content="text/html; charset=UTF-8">'
       . '<title>'
@@ -285,7 +407,7 @@ sub _exception2html {
               . '</th><td>'
               . html_encode($self->request->http_header($_->[0]) || '')
               . '</td></tr>'
-          } (
+        } (
             [referer           => gettext('Referer')],
             ['user-agent'      => gettext('User agent')],
             ['remote-addr'     => gettext('Remote address')],
@@ -298,8 +420,8 @@ sub _exception2html {
       . '</table>'
       . '</div>'
 
-      . '<div style="background-color: #FFFACD; padding: 5px 10px; margin: 1px;">' 
-      . '<h3>Backtrace:</h3>' 
+      . '<div style="background-color: #FFFACD; padding: 5px 10px; margin: 1px;">'
+      . '<h3>Backtrace:</h3>'
       . join(
         '',
         map {
@@ -312,7 +434,7 @@ sub _exception2html {
               . '</pre>' . ') '
               . gettext('called at %s line %s', html_encode($_->{'filename'}), $_->{'line'})
               . '</div>';
-          } @{$exception->{'callstack'}}
+        } @{$exception->{'callstack'}}
       )
       . '</div>'
 
@@ -343,7 +465,7 @@ __END__
 =encoding utf8
 
 =head1 Name
- 
+
 QBit::WebInterface - Base class for creating web interface.
 
 =head1 GitHub
@@ -357,10 +479,6 @@ https://github.com/QBitFramework/QBit-WebInterface
 =item *
 
 cpanm QBit::WebInterface
-
-=item *
-
-apt-get install libqbit-webinterface-perl (http://perlhub.ru/)
 
 =back
 

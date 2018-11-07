@@ -1,0 +1,6 @@
+lib/Suffix/Trie.pm
+Makefile.PL
+MANIFEST
+t/01_basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

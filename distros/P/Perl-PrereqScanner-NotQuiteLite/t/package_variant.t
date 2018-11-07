@@ -5,6 +5,14 @@ use lib "$FindBin::Bin/..";
 use Test::More;
 use t::Util;
 
+test('no importing', <<'END', {'Package::Variant' => 0}); # MSTROUT/Package-Variant-1.003002/t/01simple.t
+  use Package::Variant ();
+END
+
+test('importing with a scalar', <<'END', {'Package::Variant' => 0, 'TestImportableA' => 0}); # MSTROUT/Package-Variant-1.003002/t/01simple.t
+use Package::Variant importing => 'TestImportableA';
+END
+
 test('importing with an arrayref', <<'END', {'Package::Variant' => 0, 'Data::Record::Serialize::Role::Base' => 0, 'Moo' => 0}); # DJERIUS/Data-Record-Serialize-0.07/lib/Data/Record/Serialize.pm
 use Package::Variant
   importing => ['Moo'],

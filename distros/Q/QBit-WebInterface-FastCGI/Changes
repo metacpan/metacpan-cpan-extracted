@@ -1,45 +1,31 @@
 ==================================================
-Changes from 2015-09-05 00:00:00 +0000 to present.
+Changes from 2017-11-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.005 at 2016-09-04 20:49:55 +0000
+version 0.006 at 2018-11-05 18:52:28 +0000
 ------------------------------------------
 
-  Change: a07fc58ef00f3bb4202ca6aec0017a33a93fca1b
+  Change: d34c34535da37e9f2bee6ff5c3b6ab684ba11755
   Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-09-05 00:48:26 +0000
+  Date : 2018-11-05 21:51:44 +0000
 
-    Merge pull request #6 from Madskill/upload_to_cpan
+    Merge pull request #7 from Madskill/use_subs_from_base
 
-    Upload to cpan 
+    use subs from base 
 
-  Change: 4547671cd0cb082a749eda5611cb6e8b676f8e09
+  Change: 58ce90c31feb9f646c905cd7849e88bc5123e1ba
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:50:07 +0000
+
+    Merge branch 'master' into use_subs_from_base 
+
+  Change: 8670a82389b64f40cc4c908df97278cd6e61044a
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-04 23:47:45 +0000
+  Date : 2018-11-05 21:49:12 +0000
 
-    Merge remote-tracking branch 'upstream/master' into upload_to_cpan 
-
-  Change: 65a5389aa072bc5d55ae88886e917e0f806c60bd
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-04 23:46:54 +0000
-
-    upload to cpan 
-
-  Change: a40698277b884581da9b7f41f72c2019694b9505
-  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
-  Date : 2015-05-14 14:50:11 +0000
-
-    Merge pull request #5 from Madskill/fix_filename
-
-    use utf8::encode for filename 
-
-  Change: f826e7bc14b44ad57a2c03fc415e63be0a8af21a
-  Author: Igor Sverdlov <blizzard@yandex-team.ru>
-  Date : 2015-05-14 14:43:19 +0000
-
-    use utf8::encode for filename 
+    use subs from base 
 
 ================================================
-Plus 4 releases after 2015-09-05 00:00:00 +0000.
+Plus 5 releases after 2017-11-05 00:00:00 +0000.
 ================================================

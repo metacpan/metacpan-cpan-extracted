@@ -6,7 +6,7 @@ use strict;
 use Carp;
 use Regexp::RegGrp;
 
-our $VERSION            = '2.05';
+our $VERSION            = '2.07';
 
 our @COMPRESS           = ( 'minify', 'pretty' );
 our $DEFAULT_COMPRESS   = 'pretty';
@@ -38,7 +38,7 @@ our $IMPORT         = '\@import\s+(' . $DICTIONARY->{STRING1} . '|' . $DICTIONAR
 
 our $AT_RULE        = '\@\S+([^{}]+)\{((?:' . $IMPORT . '|' . $RULE . '|' . $WHITESPACES . ')+)\}';
 
-our $DECLARATION    = '((?>[^;:]+)):(?<=:)((?>[^;]*))(?:;|\s*$)';
+our $DECLARATION    = '((?>[^;:]+)):(?<=:)((?>[^;]*))(?:;(?!(charset|base64))|\s*$)';
 
 our $COMMENT        = '(\/\*[^*]*\*+([^/][^*]*\*+)*\/)';
 
@@ -124,6 +124,7 @@ our $reggrp_declaration;
 our $reggrp_mediarules;
 our $reggrp_content_value;
 our $global_compress;
+our $indent = '';
 
 sub init {
     my $class   = shift;
@@ -210,7 +211,7 @@ sub init {
 
                 return '' if ( not $key or $value eq '' );
 
-                return $key . ':' . $value . ';' . ( $compress eq 'pretty' ? "\n" : '' );
+                return $indent . $key . ':' . $value . ';' . ( $compress eq 'pretty' ? "\n" : '' );
             }
         }
     ];
@@ -339,6 +340,8 @@ sub minify {
         foreach my $field ( 'compress', 'copyright' ) {
             $self->$field( $opts->{$field} ) if ( defined( $opts->{$field} ) );
         }
+
+        $indent = $opts->{indent} && ( !$opts->{compress} || $opts->{compress} eq 'pretty' ) ? ' ' x $opts->{indent} : '';
     }
 
 	# (re)initialize variables used in the closures
@@ -390,7 +393,7 @@ CSS::Packer - Another CSS minifier
 
 =head1 VERSION
 
-Version 2.05
+Version 2.07
 
 =head1 DESCRIPTION
 
@@ -443,6 +446,11 @@ to
 'minify' converts the same rules to
 
     a{color:black;}div{width:100px;}
+
+=item indent
+
+Defines number of spaces, used for indentation. Used only when compress is 'pretty'.
+Default value is 0.
 
 =item copyright
 

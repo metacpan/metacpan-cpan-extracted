@@ -1,5 +1,5 @@
 package Exception::BadArguments::InvalidJSON;
-$Exception::BadArguments::InvalidJSON::VERSION = '2.7';
+$Exception::BadArguments::InvalidJSON::VERSION = '2.8';
 use base qw(Exception::BadArguments);
 
 =head1 Name
@@ -9,7 +9,7 @@ qbit::StringUtils - Functions to manipulate strings.
 =cut
 
 package qbit::StringUtils;
-$qbit::StringUtils::VERSION = '2.7';
+$qbit::StringUtils::VERSION = '2.8';
 use strict;
 use warnings;
 use utf8;
@@ -321,18 +321,19 @@ sub from_json($) {
 
     my $original_text = $text;
 
-    utf8::encode($text);
+    utf8::encode($text) if defined($text);
+
     my $result;
     eval {$result = JSON::XS->new->utf8->allow_nonref->decode($text);};
 
     if (!$@) {
         return $result;
     } else {
-        $text = '' if !defined $text;
         my ($error) = ($@ =~ m'(.+) at /');
         $error ||= $@;
-        throw Exception::BadArguments::InvalidJSON gettext("Error in from_json: %s\n" . "Input:\n" . "'%s'\n", $error,
-            $original_text,);
+
+        throw Exception::BadArguments::InvalidJSON gettext("Error in from_json: %s\nInput:\n%s\n", $error,
+            $original_text // 'UNDEF');
     }
 }
 

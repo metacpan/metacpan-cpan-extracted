@@ -4,13 +4,13 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CSS-Packer",
    "no_index" : {
@@ -50,5 +50,6 @@
          "url" : "https://github.com/leejo/css-packer-perl"
       }
    },
-   "version" : "2.05"
+   "version" : "2.07",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -73,3 +73,6 @@
 # Avoid App::ModuleBuildTiny files
 \bmetamerge.*
 
+# Avoid javascript build files
+\bnode_modules/
+\bwebpack.config.js$

@@ -5,29 +5,108 @@ use Scalar::Util ();
 
 requires 'uri_for';
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
-sub uri {
+my $uri_v1 = sub {
   my ($c, $path, @args) = @_;
-
+ 
   # already is an $action
   if(Scalar::Util::blessed($path) && $path->isa('Catalyst::Action')) {
     return $c->uri_for($path, @args);
   }
-
+ 
   # Hard error if the spec looks wrong...
   die "$path is not a string" unless ref \$path eq 'SCALAR';
   die "$path is not a controller.action specification" unless $path=~m/^(.*)\.(.+)$/;
-
+ 
   die "$1 is not a controller"
     unless my $controller = $c->controller($1||'');
-
+ 
   die "$2 is not an action for controller ${\$controller->component_name}"
     unless my $action = $controller->action_for($2);
-
+ 
   return $c->uri_for($action, @args);
-}
+};
 
+my $uri_v2 = sub {
+  my ($c, $action_proto, @args) = @_;
+
+  # already is an $action
+  if(Scalar::Util::blessed($action_proto) && $action_proto->isa('Catalyst::Action')) {
+    return $c->uri_for($action_proto, @args);
+  }
+
+  # Hard error if the spec looks wrong...
+  die "$action_proto is not a string" unless ref \$action_proto eq 'SCALAR';
+
+  my $action;
+  if($action_proto =~/^\/?#/) {
+    die "$action_proto is not a named action"
+      unless $action = $c->dispatcher->get_action_by_path($action_proto);
+  } elsif($action_proto=~m/^(.*)\:(.+)$/) {
+    die "$1 is not a controller"
+      unless my $controller = $c->controller($1||'');
+    die "$2 is not an action for controller ${\$controller->component_name}"
+      unless $action = $controller->action_for($2);
+  } elsif($action_proto =~/\//) {
+    my $path = $action_proto=~m/^\// ? $action_proto : $c->controller->action_for($action_proto)->private_path;
+    die "$action_proto is not a full or relative private action path" unless $path;
+    die "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
+  } elsif($action = $c->controller->action_for($action_proto)) {
+    # Noop
+  } else {
+    # Fallback to static
+    $action = $action_proto;
+  }
+  die "We can't create a URI from $action with the given arguements"
+    unless my $uri = $c->uri_for($action, @args);
+
+  return $uri;
+};
+
+*uri = $uri_v2;
+
+after 'setup_finalize', sub {
+  my ($c) = @_;
+  if (my $config = $c->config->{'Plugin::URI'}) {
+    if($config->{use_v1}) {
+      *uri = $uri_v1;
+    } else {
+      *uri = $uri_v2;
+    }
+  } else {
+    *uri = $uri_v2;
+  }
+};
+
+after 'setup_actions', sub {
+  my ($c) = @_;
+  my %action_hash = %{$c->dispatcher->_action_hash||+{}};
+  foreach my $key (keys %action_hash) {
+    if(my ($name) = @{$action_hash{$key}->attributes->{Name}||[]}) {
+      die "You can only name endpoint actions on a chain"
+        if defined$action_hash{$key}->attributes->{CaptureArgs};
+      die "Named action '$name' is already defined"
+        if $c->dispatcher->_action_hash->{"/#$name"};
+      $c->dispatcher->_action_hash->{"/#$name"} = $action_hash{$key};      
+    }
+  }
+};
+
+foreach my $method(qw/detach forward visit go/) {
+  around $method, sub {
+    my ($orig, $c, $action_proto, @args) = @_;
+    my $action;
+    if($action_proto =~/^\/?#/) {
+      die "$action_proto is not a named action"
+        unless $action = $c->dispatcher->get_action_by_path($action_proto);
+    } else {
+      $action = $action_proto;
+    }
+
+    $c->$orig($action, @args);
+  };
+}
 
 1;
 
@@ -66,6 +145,12 @@ This is just a shortcut with stronger error messages for:
 
 =head1 DESCRIPTION
 
+B<NOTE> Starting with version '0.003' I changed that way this works.  If you want
+or need the old API for backcompatibility please set the following configuration
+flag:
+
+    MyApp->config('Plugin::URI' => { use_v1 => 1 });
+
 Currently if you want to create a URL to a controller's action properly the formal
 syntax is rather verbose:
 
@@ -74,7 +159,7 @@ syntax is rather verbose:
         \@args, \%query, \$fragment);
 
 
-Which is verbose enough that i probably encourages people to do the wrong thing
+Which is verbose enough that it probably encourages people to do the wrong thing
 and use a hard coded link path.  This might later bite you if you need to change
 your controllers and URL hierarchy.
 
@@ -91,7 +176,7 @@ This plugin adds the following methods to your context
 
 Example:
 
-    $c->uri("$controller.$action", \@parts, \%query, \$fragment);
+    $c->uri("$controller:$action", \@parts, \%query, \$fragment);
 
 This is a sugar method which works the same as:
 
@@ -106,13 +191,44 @@ message that is I think more clear than the longer version.
 You can also use a 'relative' specification for the action, which assumes
 the current controller.  For example:
 
-    $c->uri(".$action", \@parts, \%query, \$fragment);
+    $c->uri(":$action", \@parts, \%query, \$fragment);
 
 Basically the same as:
 
     my $url = $c->uri_for(
       $self->action_for($action),
         \@args, \%query, \$fragment);
+
+We also support a corrected version of what 'uri_for_action' meant to achieve:
+
+  $c->uri("$action", @args);
+
+Basically the same as:
+
+    my $url = $c->uri_for($self->action_for($action), @args);
+
+Where the $action string is the full or relative (to the current controller) private
+name of the action.  Please note this does support path traversal with '..' so the
+following means "create a URL to an action in the controller namespace above the
+current one":
+
+    my $url = $c->uri("../foo");  # $c->uri($self->action_for("../foo"));
+
+Experimentally we support named actions so that you can specify a link with a custom
+name:
+
+    sub name_action :Local Args(0) Name(hi) {
+      my ($self, $c) = @_;
+      # rest of action
+    }
+
+    my $url = $c->uri("#hi");
+
+This allows you to specify the action by its name from any controller.  We don't
+allow you to use the same name twice, and we also throw an exception if you attempt
+to add a name to an intermediate action in a chain of actions (you can only name
+an endpoint).
+
 
 Lastly For ease of use if the first argument is an action object we just pass it
 down to 'uri_for'.  That way you should be able to use this method for all types

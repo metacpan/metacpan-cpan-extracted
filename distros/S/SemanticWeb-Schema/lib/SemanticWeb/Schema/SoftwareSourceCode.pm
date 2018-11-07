@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.2';
+our $VERSION = 'v0.0.4';
 
 
 has code_repository => (
@@ -90,7 +90,7 @@ SemanticWeb::Schema::SoftwareSourceCode - Computer programming source code
 
 =head1 VERSION
 
-version v0.0.2
+version v0.0.4
 
 =head1 DESCRIPTION
 

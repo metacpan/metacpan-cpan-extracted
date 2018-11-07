@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "0.33";
+our $VERSION = "0.34";
 
 # XXX: looks more like an instance variable
 my $CurrentStateTable = [];

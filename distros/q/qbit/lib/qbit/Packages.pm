@@ -6,7 +6,7 @@ qbit::Packages - Functions to manipulate data in packages.
 =cut
 
 package qbit::Packages;
-$qbit::Packages::VERSION = '2.7';
+$qbit::Packages::VERSION = '2.8';
 use strict;
 use warnings;
 use utf8;

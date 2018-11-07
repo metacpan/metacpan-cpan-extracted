@@ -3,9 +3,10 @@ use warnings;
 
 package Git::Hooks::CheckWhitespace;
 # ABSTRACT: Git::Hooks plugin for checking whitespace errors
-$Git::Hooks::CheckWhitespace::VERSION = '2.9.10';
+$Git::Hooks::CheckWhitespace::VERSION = '2.10.0';
 use 5.010;
 use utf8;
+use Log::Any '$log';
 use Git::Hooks;
 
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
@@ -13,6 +14,8 @@ use Git::Hooks;
 # This routine can act both as an update or a pre-receive hook.
 sub check_affected_refs {
     my ($git) = @_;
+
+    $log->debug(__PACKAGE__ . "::check_affected_refs");
 
     return 1 if $git->im_admin();
 
@@ -72,6 +75,8 @@ EOS
 sub check_commit {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_commit");
+
     my $current_branch = $git->get_current_branch();
 
     return 1 unless $git->is_reference_enabled($current_branch);
@@ -92,6 +97,8 @@ EOS
 
 sub check_patchset {
     my ($git, $opts) = @_;
+
+    $log->debug(__PACKAGE__ . "::check_patchset");
 
     return 1 if $git->im_admin();
 
@@ -141,7 +148,7 @@ Git::Hooks::CheckWhitespace - Git::Hooks plugin for checking whitespace errors
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -157,7 +164,7 @@ may configure it in a Git configuration file like this:
     admin = joe molly
 
 The first section enables the plugin and defines the users C<joe> and C<molly>
-as administrators, effectivelly exempting them from any restrictions the plugin
+as administrators, effectively exempting them from any restrictions the plugin
 may impose.
 
 =head1 DESCRIPTION

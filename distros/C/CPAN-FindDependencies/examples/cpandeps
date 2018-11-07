@@ -121,7 +121,7 @@ is indicated with an asterisk before the module's name.
 This script has not been thoroughly tested.
 
 I welcome feedback about my code, including constructive criticism.
-Bug reports should be made using L<http://rt.cpan.org/> or by email.
+Bug reports should be made on Github or by email.
 
 =head1 SEE ALSO
 

@@ -20,7 +20,7 @@ my $config = {
 
 =head1 contacts_v3_api.pl
 
-Provides an OAUTH'd client interface to L<https://developers.google.com/contacts/v3/>
+Provides an OAUTH'd client interface to L<https://developers.google.com/people/>
 
     perl people_api.pl 
 

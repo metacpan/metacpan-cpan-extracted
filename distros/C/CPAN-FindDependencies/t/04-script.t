@@ -44,6 +44,9 @@ $stderr = join("\n", grep {
     /x
 } split(/[\r\n]+/, $stderr));
 
+# in case we're deliberately turning this off ...
+$stderr =~ s{Devel::Hide hides LWP/Protocol/https.pm}{};
+
 is_deeply($stderr, '', "no errors reported");
 is_deeply($stdout, "*Tie::Scalar::Decay (dist: D/DC/DCANTRELL/Tie-Scalar-Decay-1.1.1.tar.gz)\n",
     "got Tie::Scalar::Decay right not using Makefile.PL");

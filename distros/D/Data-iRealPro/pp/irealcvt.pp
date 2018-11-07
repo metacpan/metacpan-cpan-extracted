@@ -1,5 +1,0 @@
---lib=../CPAN
---lib=../lib
---module=Data::iRealPro::Bundle
---addfile=../res;res
---cachedeps=irealcvt.pp.deps

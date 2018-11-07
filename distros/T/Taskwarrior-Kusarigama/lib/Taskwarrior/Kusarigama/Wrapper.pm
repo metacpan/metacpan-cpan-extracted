@@ -1,7 +1,7 @@
 package  Taskwarrior::Kusarigama::Wrapper;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: interface to the taskwarrior's 'task' command
-$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.9.3';
+$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.10.0';
 
 # TODO use Test::Pod::Snippet for that example ^^^
 
@@ -95,6 +95,18 @@ sub RUN($self,$cmd,@args) {
 }
 
 sub _map_to_arg ( $self, $entry ) {
+
+    if( not ref $entry ) {  # simple string 
+        # extract the attributes so that they are not dealt 
+        # with as part of the definition 
+        my %opts;
+        
+        while ( $entry =~ s/\b(?<key>[^\s:]+):(?<value>\S+)// ) {
+            $opts{ $+{key} } = $+{value};
+        }
+        return $entry, $self->_map_to_arg(\%opts);
+    }
+
     return $entry unless ref $entry eq 'HASH';
 
     return pairmap { join( ( $a =~ /^rc/ ? '=' : ':' ), $a, $b ) } %$entry;
@@ -102,11 +114,16 @@ sub _map_to_arg ( $self, $entry ) {
 
 sub _parse_args($self,$cmd,@args) {
     my @command  = ( $cmd );
+
+    # arrayrefs are for pre-command arguments, like
+    # task 123 list =>  ( 'list', [ 123 ] )
     if( @args and ref $args[0] eq 'ARRAY' ) {
         unshift @command, map {  $self->_map_to_arg($_) } ( shift @args )->@*;
     }
+
     my @stdin;
     push @stdin, ${pop @args} if @args and ref $args[-1] eq 'SCALAR';
+
     return ( [ @command, map { $self->_map_to_arg($_) } @args ], @stdin );
 }
 
@@ -160,7 +177,7 @@ Taskwarrior::Kusarigama::Wrapper - interface to the taskwarrior's 'task' command
 
 =head1 VERSION
 
-version 0.9.3
+version 0.10.0
 
 =head1 SYNOPSIS
 

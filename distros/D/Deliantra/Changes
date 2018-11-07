@@ -1,5 +1,8 @@
 Revision history for Deliantra
 
+2.01 Wed Nov  7 13:04:23 CET 2018
+	- add missing bin/ files to manifest (reported by Kent Fredric).
+
 2.0  Tue Oct 23 00:45:23 CEST 2018
 	- update tilecache loader to new faceinfo/facedata format. this
           saves a lot of ram when creating the tilecache, and makes it

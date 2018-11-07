@@ -1,0 +1,8 @@
+fail_on_2 succeeds on 1
+fail_on_2 fails on 2
+fail_on_2 succeeds on 3
+
+###STDERR
+
+###EXIT
+2

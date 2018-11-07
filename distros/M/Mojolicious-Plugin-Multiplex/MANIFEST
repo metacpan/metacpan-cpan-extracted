@@ -11,5 +11,8 @@ ex/vue_chat.pl
 lib/Mojolicious/Plugin/Multiplex.pm
 lib/Mojolicious/Plugin/Multiplex/Multiplexer.pm
 share/websocket_multiplex.js
+share/websocket_multiplex.js.map
+share/websocket_multiplex.mjs
 t/server.t
 xt/reconnect.t
+xt/reconnect_esm.t

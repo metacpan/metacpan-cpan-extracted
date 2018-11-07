@@ -27,31 +27,31 @@ name: Test-HTML-Spelling
 provides:
   Test::HTML::Spelling:
     file: lib/Test/HTML/Spelling.pm
-    version: v0.4.0
+    version: v0.5.0
 requires:
   Const::Fast: '0'
   Encode: '0'
   Getopt::Long: '2.36'
   HTML::Parser: '0'
   List::Util: '0'
-  Moose: '0'
-  MooseX::NonMoose: '0'
+  Moo: '0'
   Scalar::Util: '0'
   Search::Tokenizer: '0'
   Test::Builder::Module: '0'
   Text::Aspell: '0'
+  Types::Standard: '0'
   curry: '0'
   namespace::autoclean: '0'
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/robrwo/Test-HTML-Spelling/issues
   repository: git://github.com/robrwo/Test-HTML-Spelling.git
-version: v0.4.0
+version: v0.5.0
 x_authority: cpan:RRWO
 x_contributors:
   - 'Interactive Information, Ltd <cpan@interactive.co.uk>'
   - 'Murray Walker <perl@minty.org>'
-  - 'Rusty Conover <rusty@luckydinosaur.com>'
+  - 'Rusty Conover <rusty+cpan@luckydinosaur.com>'
   - 'Shlomi Fish <shlomif@shlomifish.org>'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

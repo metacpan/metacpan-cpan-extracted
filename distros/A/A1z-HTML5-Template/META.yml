@@ -1,5 +1,5 @@
 ---
-abstract: 'turns baubles into trinkets'
+abstract: 'Fast/easy Web Apps in Perl'
 author:
   - 'Sudheer Murthy <pause@a1z.us>'
 build_requires: {}
@@ -12,6 +12,12 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: A1z-HTML5-Template
-version: '0.07'
+requires:
+  CGI: '0'
+  Exporter: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.16'
 x_generated_by_perl: v5.16.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

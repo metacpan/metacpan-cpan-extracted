@@ -36,6 +36,8 @@ first param required, second param of filename optional
 
 * more optional parameters 
 * Selectable voices - https://cloud.google.com/text-to-speech/docs/voices 
+* Check out Google TTS Voice Training Project - https://github.com/google/voice-builder#prerequisites ( Voice Builder: A Tool for Building Text-To-Speech Voices
+)
 
 =cut
 

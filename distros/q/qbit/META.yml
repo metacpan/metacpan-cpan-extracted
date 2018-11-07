@@ -38,5 +38,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: '2.7'
+version: '2.8'
 x_serialization_backend: 'YAML::Tiny version 1.70'

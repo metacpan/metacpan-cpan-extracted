@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2017 Sullivan Beck. All rights reserved.
+# Copyright (c) 2013-2018 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -17,10 +17,10 @@ Shell::Cmd - run shell commands with enhanced support
 =head1 DESCRIPTION
 
 A very common use of perl is to act as a wrapper around shell commands
-where perl is used to prepare the shell commands, execute them, and deal
-with the resulting output.  Even where the bulk of the work is actually
-done in the perl script, creating small shell scripts within it to do
-some portion of the task is common.
+where perl is used to prepare the shell commands, execute them, and
+deal with the resulting output.  Even where the bulk of the work is
+actually done in the perl script, creating small shell scripts within
+it to do some portion of the task is common.
 
 In the simplest form, running shell commands can be done very simply
 using the C<system()> call, backticks, or several other ways, but I
@@ -37,60 +37,65 @@ commands) which adds some common desirable functionality including:
 
 =item Handle STDOUT/STDERR
 
-Commonly, I want to treat STDOUT and STDERR in some way.  I may want to
-keep one or both of them, or discard one or both of them, or merge them.
+Commonly, I want to treat STDOUT and STDERR in some way.  I may want
+to keep one or both of them, or discard one or both of them, or merge
+them.
 
 =item Command echoing
 
-A common option I want to set is command echoing where the commands
-I run are echoed as they are run.  I want to be able to easily turn this
-on or off.
+A common option I want to set is command echoing where the commands I
+run are echoed as they are run.  I want to be able to easily turn this
+on or off (typically with a command line option in the calling script).
 
 =item Dry-run
 
-Another common option is to create a dry-run environment where the shell
-commands may be printed, but not actually run.  Again, I want to be able
-to turn this on and off easily.
+Another common option is to create a dry-run environment where the
+shell commands may be printed, but not actually run.  Again, I want to
+be able to turn this on and off easily.
 
 =item Error trapping
 
-Even though I may combine a number of shell commands into a single script
-(so that it all runs in one shell), I still want to have built in
-error trapping at a per-command basis.  I want to take a series of
-commands and know exactly which one failed.
+Even though I may combine a number of shell commands into a single
+script (so that it all runs in one shell), I still want to have built
+in error trapping at a per-command basis.  I want to take a series of
+commands and know exactly which one failed.  If I execute the commands
+one at a time, I can get that information, but typically, I want to
+combine multiple commands in a single script but still have that
+ability.
 
 I also want to be able to control what happens to commands that are
 listed after a failed command.  I may want to ignore an error and
-continue to run the remaining commands.  I may want to simply exit.  Or
-I may want to echo, but not run the remaining commands so that I can see
-what didn't get completed.
+continue to run the remaining commands.  I may want to simply exit.
+Or I may want to echo, but not run the remaining commands so that I
+can see what didn't get completed.
 
 =item Shell environment
 
-I sometimes want to set up some environment for the script such as what
-directory it will be run in and what environment variables should be set
-in advance.
+I sometimes want to set up some environment for the script such as
+what directory it will be run in and what environment variables should
+be set in advance.
 
 =item Command alternates
 
 Sometimes, especially if you are running the script on multiple
-platforms, you may not know which command you should use.  You can
-of course generate a platform specific script, but an alternative is
-to specify alternate commands.  If ANY of those commands succeed,
-then that portion of the script succeeds.
+platforms, you may not know which command you should use.  You can of
+course generate a platform specific script, but an alternative is to
+specify alternate commands.  If ANY of those commands succeed, then
+that portion of the script succeeds.
 
 =item Command retrying
 
-Occasionally you have a command that may fail, but on retrying, it will
-succeed.  This is especially true when some effect from a previous command
-takes some amount of time to actually go into effect.  By allowing a certain
-number of retries, you can often work around this situation.
+Occasionally you have a command that may fail, but on retrying, it
+will succeed.  This is especially true when some effect from a
+previous command takes some amount of time to actually go into effect.
+By allowing a certain number of retries, you can often work around
+this situation.
 
 =item Remote execution
 
-Sometimes you want to run the commands locally.  Other times, you want to
-run it remotely using ssh.  When running remotely, you may want to run the
-same script on multiple hosts.
+Sometimes you want to run the commands locally.  Other times, you want
+to run it remotely using ssh.  When running remotely, you may want to
+run the same script on multiple hosts.
 
 =item SSH handling
 
@@ -130,19 +135,20 @@ Returns the version of this module.
 
 =item B<cmd>
 
-   $err=$obj->cmd($cmd [,\%options], $cmd [,\%options], ...);
+   $err = $obj->cmd($cmd [,\%options], $cmd [,\%options], ...);
 
 This is used to add one or more commands to the list of commands that
 will be executed.
 
-Here, each C<$cmd> is a string containing a command, or a listref where each
-element in the list is a command.
+Here, each C<$cmd> is either a string containing a command, or a
+listref where each element in the list is a string containing a
+command.
 
 In the listref form, the list of commands are alternates to try until
 one succeeds, and the command only fails if all of the alternates
 fail.  This might be used to specify different paths to an executable,
-or different executables that perform essentially the same function, but
-which might not all be available on all platforms.
+or different executables that perform essentially the same function,
+but which might not all be available on all platforms.
 
 For example, if you wanted to run a command to get the contents of a
 web site, and you didn't know which of curl, wget, or lftp were
@@ -150,19 +156,19 @@ available, you might use something like this:
 
    $err = $obj->cmd([ "wget $URL", "curl $URL", "lftp $URL"]);
 
-and in this case, it would try wget, and if that failed, it would
-try curl, and if that failed, it would try lftp.  The command will only
+and in this case, it would try wget, and if that failed, it would try
+curl, and if that failed, it would try lftp.  The command will only
 fail if all three alternates fail.
 
 Each command (or list of alternates) can have options passed in.
 These options apply only to this command (or list), and are described
 in the L</"PER-COMMAND OPTIONS"> section below.
 
-All of the commands stored in C<$obj> will be run in a single shell, so
-it is fine to gather information in one command and store it in a
-shell variable for use in a later command.  Also, it is not necessary
-(or desirable) to include a trailing semi-colon on the command as
-these will be added automatically as needed.
+All of the commands stored in C<$obj> will be run in a single shell,
+so it is fine to gather information in one command and store it in a
+shell variable for use in a later command.  Commands should not
+include a trailing semi-colon as these will be added automatically as
+needed.
 
 An error is returned if any of the arguments are invalid.
 
@@ -172,170 +178,105 @@ shell command is correct.  That is beyond the scope of this module.
 If only simple lists of commands are used, handling them is relatively
 straightforward, but trying to include commands that affect the flow
 of the script (such as C<while...done>, C<if...else>, and the like)
-then handling can be much more complicated.  Only a subset of these
-are supported.  Refer to the L</"FLOW COMMANDS"> section below.
+then handling can be much more complicated.  Refer to the L</"FLOW
+COMMANDS"> section below.  Defining functions is NOT supported.
 
 =item B<run>
 
-   $obj->run();
+   $ret = $obj->run();
 
 This prepares a shell script based on the commands and options entered
-and runs it as appropriate.  There are several different ways in which
-the commands can be run, and these are described in the B<options> method
-below.  The most important option is the B<mode> option which sets the mode
-which determines the form of the script, and how it is run.
+and runs it as appropriate.  The script is stored in a temporary file that
+can be set using the B<tmp_script> option (refer to the L</"GLOBAL OPTIONS">
+section below).
 
-If C<$obj> is in 'run' mode, the method can be called as either:
+There are several different ways in which the commands can be run, and
+these are described in the B<options> method below.  The most
+important option is the B<mode> option which determines the form of
+the script, and how it is run.
 
-   ($err)    = $obj->run();
-   $err      = $obj->run();
+If the mode is B<run>, the method is called as:
+
+   $err = $obj->run();
 
 In this mode, the script is run, and output is sent directly to STDOUT
 and STDERR as appropriate for the options specified.  In essence, this
 generates a script and runs it with the C<system()> call.
 
-If a temporary script file is used, but it cannot be written, $err
-will be -2.  Otherwise, the return value of the method is the exit
-code of the script (which is the exit code of the first failing
-command).
+The error code returned is described below in the L</"ERROR CODES"> section.
 
-If C<$obj> is in 'dry-run' mode, the method should be called as either:
+In B<dry-run> mode, the method is called as:
 
-   ($script) = $obj->run();
-   $script   = $obj->run();
+   $script = $obj->run();
 
 In this mode, the commands are not actually executed.  Instead, the
-script is built and returned.  The form of the script is determined
-by the B<script> option described below.
+script is built and returned.  The form of the script is determined by
+the B<script> option described below.
 
-If C<$obj> is in 'script' mode, the output from the commands are kept for
-further analysis.  The method should be called as:
+In B<script> mode, the method is called as:
 
-   @out      = $obj->run();
+   $err = $obj->run();
 
-Here, C<@out> is a list of command output descriptors:
+In this case, the output from the commands are kept for further
+analysis.  The C<$obj->output(...)> method may then be used to examine
+the resulting output.
 
-   @out      = ( FAILED_COMMAND, COMMAND_SUMMARY_1, COMMAND_SUMMARY_2, ... )
-
-Here, FAILED_COMMAND is the command number that failed.  If
-FAILED_COMMAND is 0, it means that the script completed successfully.
-If it is -1, it means that the script initialization failed before any
-of the commands were run.  This typically means that an invalid
-directory was specified with the B<dire> method.  If FAILED_COMMAND is
-any other value, it will be an integer I.  In this case, the failed
-command is described in COMMAND_SUMMARY_I.
-
-For each command that ran, the output is returned along with
-information about the command status.  The format of each
-COMMAND_SUMMARY is a listref of the form:
-
-   COMMAND_SUMMARY = [ CMD_NUM, STATUS, ALT_SUMMARY_1, ALT_SUMMARY_2, ... ]
-
-CMD_NUM is the number of the command as it was entered with the B<cmd>
-method starting at 0.  Each ALT_SUMMARY is the summary for one of the
-alternates for this command.
-
-STATUS is one of the strings:
-
-   ''       : Any command that succeeds will be given either a
-   succ       STATUS of an empty string, or the string 'succ'.
-              If the B<failure> option is set to 'continue',
-              all commands which succeed are given the empty
-              string until a command fails.  Commands run after
-              that are given a STATUS of 'succ'.
-
-              If B<failure> is set to any other option, only
-              the empty string is ever assigned as STATUS for
-              a successful command.
-
-   retried  : If a command is retried, all attempts may fail
-              (except the final one) and it is not counted as
-              a script failure.  These failing commands are
-              given this STATUS.
-
-   exit     : The first command that actually fails is given
-   fail       the status 'exit'.  Other commands that fail
-              (if the B<failure> option is set to 'continue')
-              are given the status 'fail'.
-
-   disp     : This is only available if the B<failure>
-              option is set to 'display', and will apply to
-              all commands after the failing command.
-
-It should be noted that if a command is retried multiple times,
-each attempt will be returned as a separate COMMAND_SUMMARY structure.
-Since any attempt but the final one failed, the status in those
-will all be 'retried'.  Only the final attempt will include a status
-indicating success or failure for the command as a whole.
-
-Each alternate will return a separate summary, also a listref, of
-the form:
-
-   ALT_SUMMARY_i = [ CMD, EXIT, STDOUT, STDERR ]
-
-CMD is the full command that was run.
-
-EXIT is the exit value from that command.  Note that if a command
-has alternates, then one or more of them may fail (causing an exit
-value to appear here) without causing the overall command to fail.
-
-STDOUT and STDERR are the output produced by that command.  Depending
-on the values of the B<output> and B<f-output> options, one or both of
-these may be empty, even if the command actually produced that type of
-output.  So, if the value of B<output> is 'stderr', the the STDOUT
-will be empty, even if the command produced something.  Both are
-listrefs of lines.
+The error codes are described in the L</"ERROR CODES"> section below.
 
 =item B<ssh>
 
-   $obj->ssh(@hosts);
+This behaves similar to the C<run> method except it will run the commands on
+each host in C<@hosts> using ssh.  The return values for each mode are
+identical to the return methods from the C<run> method except that for both
+the B<run> mode and B<script> mode, the output is returned as a hash where
+the keys are the hosts and the values are the value for that host.
 
-This behaves similar to the run method except it will run the commands on
-each host in C<@hosts> using ssh.
+For example, in B<run> mode, the call would be:
 
-In 'dry-run' mode, the call is:
+   %err = $obj->ssh(@hosts)
 
-   @script = $obj->ssh(@hosts);
+In B<dry-run> mode, the call is identical to the B<run> method, and it
+will return the script that would be run on each host.
 
-In 'run' mode, the call is:
+   $script = $obj->ssh(@hosts);
 
-   @err = $obj->ssh(@hosts);
-
-In 'script' mode, the call is:
-
-   ($out1,$out2,...) = $obj->ssh(@hosts);
-
-where C<$out1> is a reference to the list of output on the 1st host, etc.
-
-Note that when running in parallel in 'run' mode, the output that is
+Note that when running in parallel in B<run> mode, the output that is
 printed to the terminal will be a mix of the output from each of the
 hosts the commands are being run on.
 
-If the B<tmp_script> option is set but the file cannot be written,
-the return value in both cases will be (-2).  If the file cannot
-be copied to a host, then the return value for that host will be -3.
+=item B<output>
+
+   $ret = $obj->output(%options);
+   @ret = $obj->output(%options);
+   %ret = $obj->output(%options);
+
+This will return the output produced by running the commands in B<script>
+mode depending on the options passed in.
+
+The C<%options> argument is described below in the B<OUTPUT OPTIONS> section.
 
 =item B<flush>
 
    $obj->flush( [@opts] );
 
-If C<@opts> is not given, it removes the commands, directory, and
-environment stored in the object, and resets the options to the default
-values.
+If C<@opts> is not given, it removes all the data stored in the object,
+resetting it to a clean object.  If C<@opts> is given, you can clear specific
+parts of the object.  Any of the following options can be given:
 
-If C<@opts> is given, it can include any of the following:
-
-   commands   : clears commands
-   dire       : clears the directory
+   commands   : clears all commands and their options
    env        : clears the environment
    opts       : clears all options
+   out        : clears the output from running the command
+                in B<script> mode
 
 =item B<dire>
 
    $err = $obj->dire($dire);
 
 This method is used to set the B<dire> option.  For a description, please
-see the entry in L</"GLOBAL OPTIONS"> below.
+see the entry in L</"GLOBAL OPTIONS"> below.  This is a shortcut for:
+
+   $err = $obj->options('dire',$dire);
 
 You can also check the value that is set using:
 
@@ -346,7 +287,9 @@ You can also check the value that is set using:
    $err = $obj->mode($mode);
 
 This method is used to set the B<mode> option.  For a description, please
-see the entry in L</"GLOBAL OPTIONS"> below.
+see the entry in L</"GLOBAL OPTIONS"> below.  This is a shortcut for:
+
+   $err = $obj->options('mode',$dire);
 
 You can also check the value that is set using:
 
@@ -354,7 +297,7 @@ You can also check the value that is set using:
 
 =item B<env>
 
-   $obj->env(VAR, VAL, VAR, VAL, ...);
+   $obj->env($var1, $val1, $var2, $val2, ...);
 
 This can be called any number of times to set some environment
 variables.  If C<$val> is undef, the environment variable will be
@@ -362,9 +305,7 @@ explicitly unset.
 
 You can also query the environment variables with:
 
-   @env = $obj->env();
-
-It will return a list of ( VAR VAL VAR VAL ... ).
+   %env = $obj->env();
 
 =item B<options>
 
@@ -382,6 +323,30 @@ The options are defined in the L</"GLOBAL OPTIONS"> section below.
 
 =back
 
+=head1 ERROR CODES
+
+The error code returned by the B<run> or B<ssh> methods are described
+in the following table:
+
+   0       No error
+   1-200   The number of the command that failed.
+           Commands entered with the B<cmd> method
+           are numbered starting at 1.  If 200 or
+           less commands are entered, the error code
+           will correspond to the command that
+           failed.
+   201     If more than 200 commands are entered,
+           and any of them beyond the 200th fail,
+           the error code will be 201.
+   252     Flow commands not correctly nested/closed
+   253     If the temporary script cannot
+           be copied to a remote host (for use in
+           the B<ssh> method), this is returned.
+   254     If a temporary script could not be
+           created, this will be returned.
+   255     If a global directory was specified that
+           does not exist, this will be returned.
+
 =head1 GLOBAL OPTIONS
 
 The following global options exist can can be set using the B<options>
@@ -391,29 +356,121 @@ method:
 
 =item B<mode>
 
-The B<mode> option determines how the commands will be handled by the run
-method.  The following values are available.
+The B<mode> option determines how the commands will be handled by the B<run/ssh>
+methods.  The following values are available.
 
+   run      (default)
    dry-run
-   run
    script
 
-The default option is to use 'run' mode.
-
-The 'dry-run' mode will simply return the script that would have been
-run, but it doesn't actually run it.
-
-The 'run' mode is the standard way to run commands in an interactive
+The B<run> mode is the standard way to run commands in an interactive
 setting.  It will run the commands in real-time and allow you to watch
 STDOUT and/or STDERR (depending on the options you choose) as they run.
 
-The 'script' mode is more appropriate for running in an unattended
+The B<dry-run> mode will not execute any commands.  Instead, it will generate
+a script that WOULD have been run and returns it.  The script can take
+several different forms, and is described in the B<script> option below.
+
+The B<script> mode is more appropriate for running in an unattended
 script.  It gathers the output and post-processes it allowing for more
 useful handling of the output.  For example, you could discard the output
 from commands that succeed and keep only the output for the one that
-failed.
+failed, or a number of other options.
 
 The B<mode> option can also be set using the B<mode> method.
+
+=item B<dire>
+
+The B<dire> option is use to specify the directory where all of the
+the commands should be run.  This can be overridden on a per-command
+basis using per-command options in the B<cmd> method, but all commands
+not specifically set will run in this directory.
+
+This does NOT check the existence of the directory until the commands
+are actually run since the commands may be run via. ssh.
+
+The B<dire> option can also be set using the B<dire> method.
+
+=item B<output>
+
+The B<output> option can be one of the following:
+
+   both     (default)
+   merged
+   stdout
+   stderr
+   quiet
+
+In the B<run> mode, these determine what output will be displayed.  In
+B<script> mode, it determines which output is stored in the object.
+Obviously, if output is not kept, it will not be available to examine
+using the C<output> method.
+
+It can display only STDOUT, only STDERR, or both, or both can be
+discarded with the 'quiet' option.  The default is to include 'both'.
+The 'merged' option is used to display both but merge STDERR into
+STDOUT (using a C<2E<gt>&1> redirection).
+
+=item B<script>
+
+The B<script> option is used only in B<dry-run> mode.
+
+When commands are run in B<dry-run> mode, a script is produced.  The form
+of that script is controlled by this option.  The value may be any of:
+
+   run     (default)
+   script
+   simple
+
+If the value is B<run> or B<script>, the script produced will be exactly
+the script produced in those modes, including all of the wrapping shell
+structure to add the requested functionality.
+
+If the value is B<simple>, the script will simply be the list of commands
+with the minimum necessary additions to handle directory and environment
+variables.  No additional scripting will be added to do error checking
+or add other functionality.
+
+=item B<echo>
+
+The B<echo> option is used only in B<run> mode.  With it, you can choose
+whether or not the commands should be displayed when they are run.
+
+The values are:
+
+   echo
+   noecho
+   failed
+
+With B<echo> and B<noecho> values, commands will be displayed or NOT
+displayed respectively.  With B<echo> the commands will be displayed
+before they are run.
+
+If the value is B<failed>, a command that failed will be displayed.  Since
+it has already run, the command will be echoed after execution rather than
+before.
+
+Note that flow commands are not echoed.
+
+=item B<failure>
+
+The B<failure> option is used in B<run> and B<script> modes.  When a
+command fails, there are several alternatives that can be done.
+Values for this option are:
+
+   exit
+   display
+   continue
+
+The default is B<exit>.  With this option, the script will stop
+executing commands once one has failed.
+
+The B<display> option is only used in B<run> mode.  With it, if any
+command fails, a simple script will be displayed showing what commands
+failed to run.
+
+With the B<continue> option, remaining command are executed, but the
+overall exit values is still set to point at the first failed command.
 
 =item B<tmp_script, tmp_script_keep>
 
@@ -421,8 +478,11 @@ The B<tmp_script> option is used to specify a temporary script name.
 
 The script that is generated by this module may exceed the length of a
 string that can be passed directly to a shell.  In order to avoid this
-problem, the script can be stored in a temporary script file (set with
-the B<tmp_script> option) which will be executed.
+problem, the script will be stored in a temporary script file (set with
+the B<tmp_script> option) which will be executed.  If not set, the
+default value for B<tmp_script> will be:
+
+   /tmp/.cmd.shell.$$
 
 Once execution is complete, the temporary script file will be removed
 unless the B<tmp_script_keep> option is set.
@@ -440,132 +500,6 @@ defaults to the same value as B<tmp_script>.
 
 B<ssh_script_keep> defaults to 0, even if B<tmp_script_keep> is set.
 
-=item B<dire>
-
-The B<dire> option is use to specify the directory where all of the the
-commands should be run.  This can be overridden on a per-command basis
-using the B<cmd> method, but all commands not specifically set will run
-in this directory.
-
-This does NOT check the existence of the directory until the commands
-are actually run since the commands may be run via. ssh.
-
-The B<dire> option can also be set using the B<dire> method.
-
-=item B<output>
-
-The B<output> option can be one of the following:
-
-   both
-   merged
-   stdout
-   stderr
-   quiet
-
-In the 'run' mode, these determine what output will be displayed.
-
-It can display only STDOUT, only STDERR, or both, or both can be
-discarded with the 'quiet' option.  The default is to include 'both'.
-The 'merged' option is used to display both but merge STDERR into
-STDOUT (using a C<2E<gt>&1> redirection).
-
-The default in both cases is 'both'.
-
-In the 'script' mode, the output is determined by using a combination of
-the 'output' and 'f-output' options as described next.
-
-=item B<f-output>
-
-The B<f-output> option can be one of the following:
-
-   both
-   merged
-   stdout
-   stderr
-   quiet
-
-and is only used in 'script' mode.
-
-In 'script' mode, all of the output is gathered and analyzed after
-the commands are run, so the output can be tailored to whether a
-command completed successfully or failed.
-
-The 'output' option controls what output is returned for commands that
-completed successfully, and the 'f-output' option controls the output
-given for a failed command.  Note that if a command has multiple
-alternatives, and one of them succeeds, the command is treated as
-succeeding, and the output for all alternates (even the individual ones
-that fail) will follow the rules of 'output' rather than 'f-output'.
-
-It should be noted that since the command runs fully before it can be
-seen whether it failed or not, STDOUT/STDERR will either be separate
-or merged based on the first option.  If the first option is 'both',
-'stdout, or 'stderr', they will be separate, and the 'f-merged' option
-is not supported (it will be replaced by 'f-both').  If the first
-option is 'merged', then the 'f-both', 'f-stdout', and 'f-stderr'
-options are not supported and will be replaced by 'f-merged'.
-
-The default to these are 'both' and 'f-both'.
-
-=item B<script>
-
-The B<script> option is used only in dry-run mode.
-
-When commands are run in dry-run mode, a script is produced.  The form
-of that script is controlled by this option.  The value may be any of:
-
-   run
-   script
-   simple
-
-If the value is 'run' (which is the default), the script produced will
-be exactly the script produced in the 'run' mode.  If the value is
-'script', the script will be the script produced in 'script' mode.
-
-If the value is 'simple', the script will simply be the list of commands
-with the minimum necessary additions to handle directory and environment
-variables.  No additional scripting will be added to do error checking
-or add other functionality.
-
-=item B<echo>
-
-The 'echo' option is used in 'run' mode.  With it, you can choose
-whether or not the commands should be displayed before they are run.
-
-The values are:
-
-   echo
-   noecho
-   failed
-
-With 'echo' and 'noecho', commands will be displayed or NOT displayed
-respectively.
-
-If the value is 'failed', a command that failed will be displayed.  Since
-it has already run, the command will be echoed after execution rather than
-before.
-
-=item B<failure>
-
-When a command fails, there are several alternatives that can be done.
-Values for this option are:
-
-   exit
-   display
-   continue
-
-The default is 'exit'.  With this option, the shell will stop
-executing commands once one has failed.  The exit code is the code
-from the failed command.  When running in script mode, no information
-about remaining commands is returned.
-
-With the 'display' option, the simple script is displayed (in 'run'
-mode) and the point of failure is marked.  The exit code is the code
-from the failed command.
-
-With the 'continue' option, remaining command are executed, but the
-overall exit values is still set to point at the first failed command.
-
 =item B<ssh_num>
 
 When running a command on multiple hosts via SSH, it is possible to run
@@ -577,7 +511,8 @@ be contacted serially.
 
 If the option is set to 0, all of the hosts will be run simultaneously.
 
-If the option is set to N, N simultaneous connections will be allowed.
+If the option is set to N, N simultaneous connections will be allowed
+and additional hosts will be run only after others have completed.
 
 =item B<ssh_sleep>
 
@@ -587,15 +522,16 @@ the same time, but not at EXACTLY the same time.
 
 If this option is set to 0 (the default), all of the commands will be
 run with no delay.  If it is set to the value N, commands will sleep
-a random amount of time (from 0 to N seconds) before running.
+a random amount of time (from 0 to N seconds) before running.  If it is
+set to a negative value -N, it will sleep for exactly N seconds.
 
 =item B<ssh:XXX>
 
 When running a command on a remote host via. ssh, the Net::OpenSSH module
 is used.
 
-Every option that can be passed to the 'new' method can be set here.  For
-example, if you want to call Net::OpenSSH as:
+Every option that can be passed to the C<Net::OpenSSH::new> method can
+be set here.  For example, if you want to call Net::OpenSSH as:
 
    $ssh = Net::OpenSSH->new($host, user => $user_name);
 
@@ -628,11 +564,15 @@ This will basically wrap a command in:
 
 If the B<noredir> option is included, no command line redirection is
 done for this command.  Most commands automatically redirect STDOUT
-and STDERR based on the B<output> and B<f-output> global options.
+and STDERR based on the B<output> global option.
 
 If the command explicitly sends these to somewhere (such as a log file
 or temporary file), use the B<noredir> option so automatic redirection
 is not done.
+
+Since the command is not parsed to see whether or not redirection is
+handled by the command, this option must be used with every shell
+command which includes any type of I/O redirection.
 
 =item B<retry>, B<sleep>
 
@@ -656,7 +596,7 @@ integer, there will be no delay between retries.
 
 This command will be marked as failed only if all of the retries fail.
 
-You cannot retry a B<flow> command.
+You cannot retry a flow command.
 
 =item B<check>
 
@@ -674,6 +614,14 @@ it failed, it should be set to something non-zero.
 If this is given for a command which has alternatives, it will be run
 after every alternative.
 
+=item B<label>
+
+Each command can have a label attached to it which will allow you
+to refer to that command by the label.  This is useful in analyzing
+the output.
+
+The label should not consist only of digits (i.e. be an integer).
+
 =back
 
 =head1 FLOW COMMANDS
@@ -683,11 +631,11 @@ to treat each, so handling them is relatively simple.  Simple commands
 are fully supported, and all of the functionality described above can
 be added.
 
-However, when flow commands are included, there is a great deal of difficulty
-in handling them properly.  This is because the added functionality is
-done by wrapping each command with some enclosing shell structure to add it.
-It is very easy to wrap regular shell commands in some enclosing structure.
-For example, it is easy to turn:
+In order to add the desired functionality, the commands are wrapped
+with some enclosing shell structure using very basic shell command
+which add the requested features.  Simple command are very easy to
+wrap in a basic enclosing shell structure.  For example, it is easy to
+turn:
 
    mycommand arg1 arg2
 
@@ -699,8 +647,11 @@ into
       DO_SOMETHING
    fi
 
-but you can't wrap the commands of an C<if/else/fi> block or a C<while/done>
-block.  As a result, each type of flow must be considered carefully.
+However, when commands are added which affect the flow of the script,
+they must be handled differently than simple commands in order to deal
+with them properly.  Wrapping them in other shell structure would
+produce invalid shell scripts.  As a result, each type of flow must be
+considered carefully.
 
 Currently, the supported flow commands are:
 
@@ -738,13 +689,107 @@ The commands must be of the form:
 
    while ... ; do
    until ... ; do
-   for ... ;do
+   for ... ; do
    done
 
 =back
 
+If flow commands are entered, but not correctly closed and/or nested,
+an error will be returned.
+
+Also, flow commands must generally be simple tests.  If complex shell
+commands are entered which produce output, this output will NOT be
+handled correctly, and may actually break things when running in
+B<script> mode.
+
 At some point, the C<select> and C<case> structures may be supported, but
 this in not yet available.
+
+Also, shell functions are not currently supported.
+
+=head1 OUTPUT OPTIONS
+
+When commands are run in the 'script' mode, the output is stored in the
+object.
+
+To access the output, use one of the following calls to the B<output>
+method:
+
+   $obj->output(%options);
+
+Each call to the method will return one part of the output.  To following
+options may be used to determine what is returned.
+
+=over 4
+
+=item B<host=HOST>
+
+If the output was generated using the B<ssh> method, this option is required
+(since it is possible to run the commands both locally and remotely, and the
+output is stored separately).
+
+B<HOST> can be any of:
+
+   all      The output for all hosts will be returned.  The return value
+            will be a hash of the form:
+
+               %ret = ( HOST1 => OUTPUT1, HOST2 => OUTPUT2, ...)
+
+   HOST1,HOST2,...
+            The output for all of the hosts listed will be returned in a
+            hash
+
+   HOST     If only a single host is specified, the output for only
+            that host will be returned.  It will not be returned as a hash.
+
+=item B<output=TYPE>
+
+This tells what output will be returned.  B<TYPE> can be any of:
+
+   stdout   STDOUT will be returned for the command(s) selected.
+            This is the default.
+
+   stderr   STDERR will be returned for the command(s) selected.
+
+   command  The command itself will be returned.
+
+   num      The command number will be returned.
+
+   label    The command label (if any) will be returned.
+
+   exit     The exit code will be returned for the command(s) selected.
+            The exit code is the one returned by the final alternative
+            on the final try.
+
+=item B<command=COMMAND>
+
+This tells which commands will be included in the output.  B<COMMAND> can
+be any of:
+
+   curr     An internal flag is kept which starts at the 1st command
+            which produced any type of output. The value is returned
+            for this command.  This is the default.
+
+   next     The internal flag is incremented, and that becomes the new
+            current command.
+
+   all      The value for all commands will be returned in the order they
+            occurred.
+
+   CMD_NUM  The commands are numbered starting at 1.  This will return the
+            output for only the command given.  Note however that a command
+            may occur multiple times (due to retries, being in a loop, etc.)
+            so the output will be a list of values, one per occurrence.
+
+   LABEL    This will return the output for all commands assigned the
+            given label (using the per-command B<label> option).  Multiple
+            commands may be assigned the same label, so the output from
+            all occurrences of all commands with this label will be returned
+            as a list.
+
+   fail     This will return the output for the command that failed (if any).
+
+=back
 
 =head1 KNOWN PROBLEMS
 
@@ -753,7 +798,15 @@ this in not yet available.
 =item B<Minimal support for complex scripts>
 
 These methods work best for simple lists of commands.  Using simple command
-flow (<if...then...else>, etc.) is allowed, but must be used carefully.
+flow (<if...then...else>, etc.) is allowed, but must be used carefully.  The
+use of functions is NOT supported and will not work.
+
+=item B<Maximum of 200 commands fully supported>
+
+In order to determine which command fails, a unique error code is
+assigned to each command.  Since exit codes must be between 0-255, and
+some are reserved, there is a limit of 200 commands that can be
+entered if accurate error tracking is needed.
 
 =back
 

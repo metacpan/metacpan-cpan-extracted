@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="<% settings.charset %>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title><% title %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="<% request.uri_base %>/css/style.css">
+  <link rel="stylesheet" href="<% request.uri_base %>/javascripts/jquery-ui-1.12.1.custom/jquery-ui.min.css">
+  <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript">/* <![CDATA[ */
+      !window.jQuery && document.write('<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery.js"><\/script>')
+  /* ]]> */</script>
+  <script src="/javascripts/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+</head>
+
+<body>
+    <% content %>
+<div id="footer">
+Powered by <a href="http://perldancer.org/">Dancer2</a> <% dancer_version %>
+</div>
+
+<script>
+
+// set up some globals
+var elems = $('.scrollspy');
+var headers = {};
+var headers_pos = [];
+var current_active = $("#sidebar a:first");
+
+// calc header element positions
+function get_pos() {
+  headers = {};
+  headers_pos = [];
+  elems.each(function(index){
+    var pos = $(this).position().top - 100;
+
+    var id = $(this).attr('id');
+    pos_str = pos;
+    headers[pos_str] = id;
+    headers_pos.push(pos_str);
+  });
+  headers_pos.sort(function(a, b) {return a-b});
+}
+
+
+// Turn off autoscrolling when hovering over sidebar
+var over;
+
+// We sometimes want to force sidebar to seek current location
+// when set to true
+var seek = false;
+
+// when true, used to suppress any unwanted activation of sidebar links when
+// sliding sidebar in and out
+var sidebar_change = false;
+
+// toggle sidebar visibility
+$('#sb-slider').click(function() {
+  sidebar_change = true;
+  speed = 400;
+  $('#sidebar').toggle('slide', speed);
+  $('#sb-slider').toggleClass('collapsed', speed);
+  $('#sb-slider').toggleClass('expanded', speed);
+  //if ($(window).width() > 599) {
+    //$('#content').fadeTo(200, 0);
+  //}
+
+  // The width of the #content area will change when the sidebar is opened
+  // and closed. This can create a drastic change the user sees in the viewport.
+  // To compensate we do back of the envelope calculations to guess at where in the
+  // content div to scroll to to minimize the change in content so the user
+  // does not have to scroll to get back to where they were before closing or
+  // opening the sidebar. This algorithm ususally gets us
+  // with 10 pixels or so but there are layout factors that could throw it
+  // further off. It works well enough.
+  if ($(window).width() > 599) {
+    var curr_height = $('#content').height();
+		var distance_to_top_of_page = $(window).scrollTop(),
+				content_div_distance_from_top_of_page = $('#content').offset().top ;
+        content_div_scroll_distance = distance_to_top_of_page - content_div_distance_from_top_of_page;
+    var href = current_active.attr('href');
+
+    active_elem_distance_to_top_of_content_div = $('#content ' + href).position().top;
+		distance_into_active_element = content_div_scroll_distance - active_elem_distance_to_top_of_content_div;
+    over = false;
+    $('#content').toggleClass('full', 1, 'linear', function() {
+      get_pos();
+      var new_curr_height = $('#content').height();
+      var proportional_change = new_curr_height/curr_height;
+		  var new_active_elem_distance_to_top_of_content_div = $('#content ' + href).position().top;
+      var new_scroll_pos = new_active_elem_distance_to_top_of_content_div + (distance_into_active_element * proportional_change);
+      var scroll_to = new_scroll_pos + content_div_distance_from_top_of_page;
+
+      // add a 5 pixel fudge factor to try to ensure content near the top of
+      // viewport remains in viewport
+      if ($('#sb-slider').hasClass('collapsed')) {
+        $(window).scrollTop( scroll_to + 5 );
+      } else {
+        $(window).scrollTop( scroll_to - 5 );
+      }
+    });
+    //$('#content').fadeTo(500, 1);
+  }
+  sidebar_change = false;
+  seek = true;
+} );
+
+$('#sidebar a').click(function() {
+  $('#sidebar a').removeClass('active');
+  $(this).addClass('active');
+});
+
+// set proper initial location of sidebar slider toggle
+$(function() {
+  if ($(window).width() < 599) {
+    $('#sb-slider').addClass('collapsed');
+  } else {
+    $('#sb-slider').addClass('expanded');
+  }
+});
+
+// needed to suppress autoscrolling when scrolling manually in sidebar.
+// set to true when in sidebar except when we are actively sliding
+// the sidebar in and out to prevent spurious link activation
+$("#sidebar").hover(
+  function() { if (!sidebar_change) { over = true } },
+  function() { over = false; },
+);
+
+// init element positions
+get_pos();
+
+// recalc element positions when resized
+$( window ).resize(function() {
+  get_pos();
+
+  // handle sidebar position when resizing window
+  if ($(window).width() < 599) {
+    if ($('#sb-slider').hasClass('expanded')) {
+      $('#sidebar').css('display', 'inline-block');
+      $('#sidebar-inner').css('display', 'block');
+    }
+  } else {
+    if ($('#sb-slider').hasClass('collapsed')) {
+      $('#content').addClass('full');
+    }
+  }
+
+});
+
+// call autoscroll feature very .030 seconds. Slower
+// periodicity will increase menu snappiness but
+// will degrade smoothness of menu animation effect.
+window.setInterval(function(){
+		autoscroll();
+}, 30);
+
+// scroll the table of contents automatically
+// called periodically as set by window.setInterval function
+function autoscroll() {
+    // get out of here if we are hovering over the sidebar
+    if (over == true) {
+      return;
+    }
+
+    // figure out where we are
+    var scrollTop = $(window).scrollTop(),
+                    elementOffset = $('#content').offset().top,
+		    distance = Math.abs(elementOffset - scrollTop);
+
+    // get id of header section located near top of viewport
+    var id;
+    var last = $('#sidebar a:first').attr('href');
+    headers_pos.forEach(function(index) {
+      if (index > distance) {
+        if (!id) {
+          id = last;
+          return;
+        }
+      } else {
+        last = '#' + headers[index];
+      }
+    });
+    if (!id) {
+      id = last;
+    }
+
+    // get new jquery element and remove active class from last active element
+    var navElem = $('a[href="' + id + '"]');
+    navElem.addClass('active', 300);
+
+    if (!current_active.is(navElem) || seek == true) {
+      if (seek != true) {
+        current_active.removeClass('active', 300);
+      } else {
+        $('#sidebar a').removeClass('active', 100);
+        current_active.addClass('active', 300);
+      }
+      seek = false;
+    } else {
+      return;
+    }
+    current_active = navElem;
+
+    // do the scrolling
+    var dft = navElem[0].getBoundingClientRect().top; // distance from top of viewport
+    var s = $('#sidebar');
+    if (dft > s.innerHeight() * .5 || dft < s.scrollTop() ) {
+      $('#sidebar').animate({ scrollTop: navElem.offset().top - s.offset().top + s.scrollTop() - s.innerHeight()/2 },
+				100,
+     );
+   }
+}
+
+// cargo-culted code for smooth scrolling in content area
+$(function() {
+$('a[href*="#"]')
+  // Remove links that don't actually link to anything
+  .not('[href="#"]')
+  .not('[href="#0"]')
+  .click(function(event) {
+    // On-page links
+    if (
+      location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '')
+      &&
+      location.hostname == this.hostname
+    ) {
+      // Figure out element to scroll to
+      var target = $(this.hash);
+      target = target.length ? target : $('[id=' + this.hash.slice(1) + ']');
+      // Does a scroll target exist?
+      if (target.length) {
+        // Only prevent default if animation is actually gonna happen
+        event.preventDefault();
+        $('html, body').animate({
+          scrollTop: target.offset().top
+        }, 300, function() {
+          // Callback after animation
+          // Must change focus!
+          var $target = $(target);
+          $target.focus();
+          if ($target.is(":focus")) { // Checking if the target was focused
+            return false;
+          } else {
+            $target.attr('tabindex','-1'); // Adding tabindex for elements not focusable
+            $target.focus(); // Set focus again
+          };
+        });
+      }
+    }
+  });
+});
+
+
+</script>
+</body>
+</html>

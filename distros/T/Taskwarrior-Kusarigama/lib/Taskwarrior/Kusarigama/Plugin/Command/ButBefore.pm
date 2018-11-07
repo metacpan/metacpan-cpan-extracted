@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::ButBefore;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Create a preceding task
-$Taskwarrior::Kusarigama::Plugin::Command::ButBefore::VERSION = '0.9.3';
+$Taskwarrior::Kusarigama::Plugin::Command::ButBefore::VERSION = '0.10.0';
 
 use 5.10.0;
 
@@ -13,28 +13,21 @@ use Moo;
 extends 'Taskwarrior::Kusarigama::Plugin';
 
 with 'Taskwarrior::Kusarigama::Hook::OnCommand';
-with 'Taskwarrior::Kusarigama::Hook::OnExit';
 
 sub on_command {
     my $self = shift;
 
-    my $args = $self->args;
-    $args =~ s/(?<=task)\s+(.*?)\s+but-before/ add revdepends:$1 /
-        or die "'$args' not in the expected format\n";
+    my @revdeps = $self->run_task->_uuids( $self->pre_command_args || '+LATEST' );
 
-    system $args;
+    $self->run_task->add( $self->post_command_args );
+
+    my ( $latest ) = $self->run_task->_uuids('+LATEST');
+
+    $self->run_task->append( [ $_ ], { depends => $latest } )
+        for @revdeps;
+
+    say for $self->run_task->list( '+LATEST' );
 };
-
-sub on_exit {
-    my $self = shift;
-
-    for my $task ( grep { $_->{revdepends} } @_ ) {
-        for my $depending ( split ',', $task->{revdepends} ) {
-            system 'task', $depending, 'mod', 'depends:' . $task->{uuid};
-        }
-    }
-    
-}
 
 1;
 
@@ -50,12 +43,20 @@ Taskwarrior::Kusarigama::Plugin::Command::ButBefore - Create a preceding task
 
 =head1 VERSION
 
-version 0.9.3
+version 0.10.0
 
 =head1 SYNOPSIS
 
-    $ tasl add go for a run
-    $ task 'go for a run' but-before tie shoes
+    $ task add go for a run
+    $ task but-before tie shoes
+
+=head1 DESCRIPTION 
+
+Creates a task that is a dependency of the given task(s). If no task is
+provided, defaults to C<+LATEST>.
+
+If no project is explicitly given for the 
+new task, it inherits the project of the follow-up task.
 
 =head1 AUTHOR
 

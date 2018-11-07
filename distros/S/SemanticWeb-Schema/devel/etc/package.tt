@@ -1,0 +1,78 @@
+use utf8;
+
+package [% class_name %];
+
+# ABSTRACT: [% abstract %]
+
+use Moo;
+
+[% IF parents.size -%]
+extends qw/[% FOREACH parent IN parents %] [% parent %][% END %] /;
+[% END -%]
+
+[% IF roles.size -%]
+with qw/[% FOREACH role IN roles %] [% role %][% END %] /;
+[% END -%]
+
+use MooX::JSON_LD '[% label %]';
+use Ref::Util qw/ is_plain_hashref /;
+# RECOMMEND PREREQ: Ref::Util::XS
+
+use namespace::autoclean;
+
+our $VERSION = '[% version %]';
+
+=encoding utf8
+
+=head1 DESCRIPTION
+
+[% description %]
+
+[% IF attributes.size %]
+=head1 ATTRIBUTES
+
+[% FOREACH name IN attributes.keys.sort -%]
+
+=head2 C<[% name %]>
+
+[% IF name != attributes.$name.label %]C<[% attributes.$name.label %]>[% END %]
+
+[% attributes.$name.description -%]
+
+[% IF attributes.$name.types -%]
+A [% name %] should be one of the following types:
+
+=over
+[% FOREACH type IN attributes.$name.types %]
+=item C<[% type %]>
+[% END -%]
+
+=back
+[% END -%]
+
+=cut
+
+has [% name %] => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => '[% attributes.$name.label %]',
+);
+
+[% END %]
+[% ELSE %]
+=cut
+[% END %]
+
+=head1 SEE ALSO
+
+[% FOREACH role in roles %]
+L<[% role %]>
+[% END -%]
+
+[% FOREACH parent in parents %]
+L<[% parent %]>
+[% END -%]
+
+=cut
+
+1;

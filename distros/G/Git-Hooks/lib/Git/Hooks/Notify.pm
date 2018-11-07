@@ -3,13 +3,15 @@ use warnings;
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.9.10';
+$Git::Hooks::Notify::VERSION = '2.10.0';
 use 5.010;
 use utf8;
+use Log::Any '$log';
 use Git::Hooks;
 use Encode qw/decode/;
 use Email::Sender::Simple;
 use Email::Simple;
+use List::MoreUtils qw/none part/;
 
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
@@ -148,6 +150,10 @@ EOS
         $body .= join(' ', 'FILTER:', @paths) . "\n";
     }
 
+    if (my @extra_options = @{$rule->{options}}) {
+        $body .= join(' ', 'EXTRA OPTIONS:', @extra_options) . "\n";
+    }
+
     $body .= $message;
 
     if ($git->get_config_boolean($CFG, 'html')) {
@@ -204,12 +210,36 @@ sub grok_rules {
     my @text_rules = $git->get_config($CFG, 'rule');
 
     my @rules;
+
     foreach my $rule (@text_rules) {
-        my ($recipients, $paths) = split /\s*--\s*/, $rule;
+        # We use the List::MoreUtils::part function to parse a rule after
+        # splitting it on whitespaces.
+
+        my $part = 0;
+        my @partition = part {
+            if ($part == 0) {
+                # refs
+                $part = /^-/ ? 1 : 2 if /^[^^]/;
+            } elsif ($part == 1) {
+                # options
+                $part = 2 if /^[^-]/;
+            } elsif ($part == 2) {
+                # recipients
+                $part = 3 if $_ eq '--';
+            } elsif ($part == 3) {
+                # --
+                $part = 4
+            } elsif ($part == 4) {
+                # pathspecs
+            }
+            $part;
+        } split ' ', $rule;
 
         push @rules, {
-            recipients => [split ' ', $recipients],
-            paths      => [defined $paths ? split ' ', $paths : ()],
+            refs       => $partition[0] || [],
+            options    => $partition[1] || [],
+            recipients => $partition[2] || [],
+            paths      => $partition[4] || [],
         };
     }
 
@@ -219,6 +249,8 @@ sub grok_rules {
 # This routine can act as a post-receive hook.
 sub notify_affected_refs {
     my ($git) = @_;
+
+    $log->debug(__PACKAGE__ . "::notify_affected_refs");
 
     # We're only interested in branches
     my @refs = grep {m:^refs/heads/:} $git->get_affected_refs();
@@ -239,7 +271,11 @@ sub notify_affected_refs {
         next unless $git->is_reference_enabled($ref);
         my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
         foreach my $rule (@rules) {
-            my @commits = $git->get_commits($old_commit, $new_commit, \@options, $rule->{paths});
+            next if @{$rule->{refs}} && none {$ref =~ /$_/} @{$rule->{refs}};
+
+            my @commits = $git->get_commits($old_commit, $new_commit,
+                                            [@options, @{$rule->{options}}],
+                                            $rule->{paths});
 
             next unless @commits;
 
@@ -279,7 +315,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -302,12 +338,19 @@ may configure it in a Git configuration file like this:
     # Notify this email about all pushes
     rule = gnustavo@cpan.org
 
+    # Notify this email about all pushes, except merge commits
+    rule = --no-merges gnustavo@cpan.org
+
     # Notify these emails about changes in the lib/Git/Hooks/Notify.pm file.
     rule = fred@example.net barney@example.net -- lib/Git/Hooks/Notify.pm
 
     # Notify these emails about changes in the file Changes and below the
     # directory lib/.
     rule = batman@example.net robin@example.net -- Changes lib/
+
+    # Notify the manager about any changes in branches which name start with
+    # "release"
+    rule = ^refs/heads/release manager@example.net
 
 =head1 DESCRIPTION
 
@@ -404,12 +447,30 @@ It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
 documentation.
 
-=head2 rule RECIPIENTS [-- PATHSPECS]
+=head2 rule [REFS] [OPTIONS] RECIPIENTS [-- PATHSPECS]
 
 The B<rule> directive adds a notification rule specifying which RECIPIENTS
-should be notified of pushed commits affecting the specified PATHSPECS.
+should be notified of commits pushed to a reference matching REFS, affecting the
+specified PATHSPECS.
 
-If no pathspec is specified, the recipients are notified about every push.
+If no REFS are specified, the recipients are notified about commits affecting
+any reference.
+
+If no PATHSPECS are specified, the recipients are notified about commits
+affecting any file.
+
+The commits are grokked as with the following command:
+
+  git log --numstat --first-parent -m
+
+C<REFS> is a space-separated list of regular expressions matching absolute
+reference names. They must begin with a caret (^), anchoring the match to the
+left. For example: F<^refs/heads/master$>, F<^refs/heads/release>,
+F<^refs/heads/(?:feature|release)>.
+
+C<OPTIONS> is a space-separated list of extra options to pass to the C<git log>
+command. Avoid options that may change the output formatting. Feel free to use
+the I<commit limiting> options, as documented in the C<git log> manual.
 
 C<RECIPIENTS> is a space-separated list of email addresses.
 
@@ -422,17 +483,21 @@ For example:
   [githooks "notify"]
     rule = gnustavo@cpan.org
     rule = fred@example.net barney@example.net -- lib/Git/Hooks/Notify.pm
-    rule = batman@example.net robin@example.net -- Changes lib/
+    rule = --no-merge batman@example.net robin@example.net -- Changes lib/
+    rule = ^refs/heads/release manager@example.net
 
-The first rule above sends notifications to gnustavo@cpan.org about every change
+The first rule above sends notifications to gnustavo@cpan.org about every commit
 pushed to the repository.
 
-The second rule sends notifications to the Bedrock fellows just about changes in
-the F<lib/Git/Hooks/Notify.pm> file.
+The second rule sends notifications to the Bedrock fellows just about commits
+affecting the F<lib/Git/Hooks/Notify.pm> file.
 
-The third rule sends notifications to the Dynamic Duo just about modifications
-in the F<Changes> file in the repository root and about modifications in any
-file under the F<lib/> directory.
+The third rule sends notifications to the Dynamic Duo just about commits
+affecting in the F<Changes> file in the repository root and about commits
+affecting any file under the F<lib/> directory, except merge commits.
+
+The fourth rule sends notifications to the manager about commits to any branch
+which name starts with "release".
 
 You can read all about I<pathspecs> in the C<git help glossary>.
 

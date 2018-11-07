@@ -1,5 +1,5 @@
 package QBit::WebInterface::Apache2::Request;
-$QBit::WebInterface::Apache2::Request::VERSION = '0.004';
+$QBit::WebInterface::Apache2::Request::VERSION = '0.006';
 use qbit;
 
 use base qw(QBit::WebInterface::Request);

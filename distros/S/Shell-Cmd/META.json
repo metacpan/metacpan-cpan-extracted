@@ -4,13 +4,13 @@
       "Sullivan Beck (sbeck@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Shell-Cmd",
    "no_index" : {
@@ -49,8 +49,8 @@
    },
    "provides" : {
       "Shell::Cmd" : {
-         "file" : "Cmd.pm",
-         "version" : "2.13"
+         "file" : "lib/Shell/Cmd.pm",
+         "version" : "3.00"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/SBECK-github/Shell-Cmd"
       }
    },
-   "version" : "2.13",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "3.00",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

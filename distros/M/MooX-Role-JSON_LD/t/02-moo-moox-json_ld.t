@@ -24,13 +24,6 @@ is_deeply($obj->json_ld_data, {
   boop => 'Bop!',
 }, 'JSON data is correct');
 
-is($obj->json_ld, '{
-   "@context" : "http://schema.org/",
-   "@type" : "Example",
-   "bax" : "Bar",
-   "baz" : "Bar Foo",
-   "boop" : "Bop!"
-}
-', 'JSON is correct');
+is($obj->json_ld, '{"@context":"http://schema.org/","@type":"Example","bax":"Bar","baz":"Bar Foo","boop":"Bop!"}', 'JSON is correct');
 
 done_testing;

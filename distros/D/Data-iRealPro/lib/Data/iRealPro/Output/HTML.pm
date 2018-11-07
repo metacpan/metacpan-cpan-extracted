@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Sep 30 19:36:29 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov  1 21:23:03 2018
-# Update Count    : 59
+# Last Modified On: Tue Nov  6 08:31:11 2018
+# Update Count    : 61
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -46,8 +46,10 @@ sub process {
 		local $song->{_transpose} = 0;
 
 		$song->{key} = $song->xpose($song->{key} // "C");
-		$song->{actual_key} =
-		  ( ($song->{actual_key} || 0) + $song->{transpose} ) % 12;
+		if ( $song->{actual_key} ne '' ) {
+		    $song->{actual_key} =
+		      ( $song->{actual_key} + $song->{transpose} ) % 12;
+		}
 		$song->tokenize;
 		$song->{data} = $song->{dataxp} if $song->{dataxp};
 	    }
@@ -75,8 +77,10 @@ sub process {
 
 	if ( $song->{transpose} ) {
 	    $song->{key} = $song->xpose($song->{key} // "C");
-	    $song->{actual_key} =
-	      ( ($song->{actual_key} || 0) + $song->{transpose} ) % 12;
+	    if ( $song->{actual_key} ne '' ) {
+		$song->{actual_key} =
+		  ( $song->{actual_key} + $song->{transpose} ) % 12;
+	    }
 	    $song->tokenize;
 	    $song->{data} = $song->{dataxp} if $song->{dataxp};
 	}

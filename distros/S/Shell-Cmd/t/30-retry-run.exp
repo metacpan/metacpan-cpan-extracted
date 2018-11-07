@@ -1,0 +1,12 @@
+fail_twice running first time
+fail_twice running second time
+fail_twice running third time
+This is the 'succ' command stdout with argument: 1
+
+###STDERR
+fail_twice failing first time
+fail_twice failing second time
+This is the 'succ' command stderr with argument: 1
+
+###EXIT
+0

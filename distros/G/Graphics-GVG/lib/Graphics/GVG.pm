@@ -23,7 +23,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 package Graphics::GVG;
-$Graphics::GVG::VERSION = '0.91';
+$Graphics::GVG::VERSION = '0.92';
 # ABSTRACT: Game Vector Graphics
 use strict;
 use warnings;
@@ -134,7 +134,7 @@ my $DSL = <<'END_DSL';
 
     Str ~ '"' StrChars '"'
 
-    StrChars ~ [\w\s]+
+    StrChars ~ [^"]+
 
     Number ~ Digits
         | Digits Dot Digits
@@ -167,7 +167,7 @@ my $DSL = <<'END_DSL';
 
     SemiColon ~ ';'
 
-    VarName ~ [\w]+
+    VarName ~ [\w_]+
 
     Whitespace ~ [\s]+
 

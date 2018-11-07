@@ -3,10 +3,11 @@ use warnings;
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.9.10';
+$Git::Hooks::CheckFile::VERSION = '2.10.0';
 use 5.010;
 use utf8;
 use Carp;
+use Log::Any '$log';
 use Git::Hooks;
 use Text::Glob qw/glob_to_regex/;
 use Path::Tiny;
@@ -425,6 +426,8 @@ sub check_everything {
 sub check_affected_refs {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_affected_refs");
+
     _setup_config($git);
 
     return 1 if $git->im_admin();
@@ -453,6 +456,8 @@ sub check_affected_refs {
 sub check_commit {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_commit");
+
     _setup_config($git);
 
     my $current_branch = $git->get_current_branch();
@@ -472,6 +477,8 @@ sub check_commit {
 
 sub check_patchset {
     my ($git, $opts) = @_;
+
+    $log->debug(__PACKAGE__ . "::check_patchset");
 
     _setup_config($git);
 
@@ -501,6 +508,8 @@ PRE_COMMIT       \&check_commit;
 UPDATE           \&check_affected_refs;
 PRE_RECEIVE      \&check_affected_refs;
 REF_UPDATE       \&check_affected_refs;
+COMMIT_RECEIVED  \&check_affected_refs;
+SUBMIT           \&check_affected_refs;
 PATCHSET_CREATED \&check_patchset;
 DRAFT_PUBLISHED  \&check_patchset;
 
@@ -518,7 +527,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -730,11 +739,11 @@ files which basename matches REGEXP.
 =head2 deny-case-conflict BOOL
 
 This directive checks for newly added files that would conflict in
-case-insensitive filesystems.
+case-insensitive file-systems.
 
 Git itself is case-sensitive with regards to file names. Many operating system's
-filesystems are case-sensitive too, such as Linux, macOS, and other Unix-derived
-systems. But Windows's filesystems are notoriously case-insensitive. So, if you
+file-systems are case-sensitive too, such as Linux, macOS, and other Unix-derived
+systems. But Windows's file-systems are notoriously case-insensitive. So, if you
 want your repository to be absolutely safe for Windows users you don't want to
 add two files which filenames differ only in a case-sensitive manner. Enable
 this option to be safe

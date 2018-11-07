@@ -7,8 +7,8 @@ use warnings;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '0.047'; # VERSION
-our $AUTHORITY = 'cpan:IMAGO'; # AUTHORITY
+our $VERSION = '0.049'; # VERSION
+our $AUTHORITY = 'cpan:OLEG'; # AUTHORITY
 
 with 'Regru::API::Role::Client';
 
@@ -20,6 +20,7 @@ sub available_methods {[qw(
     nop
     add_alias
     add_aaaa
+    add_caa
     add_cname
     add_mx
     add_ns
@@ -54,7 +55,7 @@ Regru::API::Zone - REG.API v2 DNS resource records management
 
 =head1 VERSION
 
-version 0.047
+version 0.049
 
 =head1 DESCRIPTION
 
@@ -123,6 +124,23 @@ Answer will contains a field C<domains> with a list of results for each involved
 error otherwise.
 
 More info at L<DNS management: add_aaaa|https://www.reg.com/support/help/api2#zone_add_aaaa>.
+
+=head2 add_caa
+
+Creates a CAA (SSL certificate issue rule) resource record for domain(s). Scope: B<clients>. Typical usage:
+
+    $resp = $client->zone->add_caa(
+        subdomain       => 'home',
+        flags           => 128,
+        tag             => 'issue',
+        value           => 'commodo.com; id=321'
+        domain_name     => 'gobias.co.uk',
+    );
+
+Answer will contains a field C<domains> with a list of results for each involved to this operation domain names or
+error otherwise.
+
+More info at L<DNS management: add_caa|https://www.reg.com/support/help/api2#zone_add_caa>.
 
 =head2 add_cname
 
@@ -275,7 +293,7 @@ Takes a set of actions and manipulates the resource records in batch mode. Scope
         ],
     );
 
-Action should one of allowed methods related to resource records: L</add_alias>, L</add_aaaa>, L</add_cname>, L</add_mx>,
+Action should one of allowed methods related to resource records: L</add_alias>, L</add_aaaa>, L</add_caa>, L</add_cname>, L</add_mx>,
 L</add_ns>, L</add_txt>, L</add_srv> or L</remove_record>.
 
 Answer will contains a field C<domains> with a list of results for each involved to this operation domain names and actions or

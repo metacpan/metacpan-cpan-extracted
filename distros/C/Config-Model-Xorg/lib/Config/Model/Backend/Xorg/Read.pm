@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Xorg::Read ;
-$Config::Model::Backend::Xorg::Read::VERSION = '1.115';
+$Config::Model::Backend::Xorg::Read::VERSION = '1.116';
 use Mouse::Role;
 
 use Carp ;

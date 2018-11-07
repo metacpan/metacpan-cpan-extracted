@@ -1,5 +1,21 @@
 Revision history for SemanticWeb-Schema:
 
+v0.0.4    2018-11-06 21:04:04+00:00 Europe/London
+  [Bug Fixes]
+  - Remove cache/ from distribution.
+
+v0.0.3    2018-11-06 20:54:26+00:00 Europe/London
+  [Bug Fixes]
+  - Upgrade MooX::JSON_LD prereq to v0.0.16 to fix inheritance issues.
+
+  - Rename the JSON_LD base class to avoid conflict with
+    SemanticWeb::Schema::Class.
+
+  - Remove local/ from distribution.
+
+  [Toolchain]
+  - Tweaks to dist.ini for simplifying build.
+
 v0.0.2    2018-10-19 18:07:44+01:00 Europe/London
   [Enhancements]
   - Updated classes to Version 3.4 of the schema.

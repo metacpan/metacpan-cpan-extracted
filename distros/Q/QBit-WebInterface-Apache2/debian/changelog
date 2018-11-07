@@ -1,3 +1,17 @@
+libqbit-webinterface-apache2-perl (0.006) raring; urgency=low
+
+  * fix dist.ini
+
+  * use subs from base
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon,  5 Nov 2018 21:40:55 +0300
+
+libqbit-webinterface-apache2-perl (0.005) raring; urgency=low
+
+  * Version 0.005
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon,  5 Nov 2018 21:35:33 +0300
+
 libqbit-webinterface-apache2-perl (0.004) raring; urgency=low
 
   * upload to cpan

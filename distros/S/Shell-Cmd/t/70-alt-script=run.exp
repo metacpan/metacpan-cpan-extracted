@@ -1,0 +1,145 @@
+SC_FAILED=0;
+SC_ORIG_DIRE=`pwd`;
+
+main () {
+   SC_DIRE=$SC_ORIG_DIRE;
+
+   #
+   # Command 1
+   #
+
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+
+   #
+   # Command 1.0
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/succ 1;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_FAILED=1;
+   fi
+
+   if [ $SC_FAILED -ne 0 ]; then
+      return;
+   fi
+
+   #
+   # Command 1
+   #
+
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+
+   #
+   # Command 2.1
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/fail_on_2 2;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   #
+   # Command 2.2
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/fail 3;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   #
+   # Command 2.3
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/succ 4;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   #
+   # Command 2.4
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/succ 5;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_FAILED=2;
+   fi
+
+   if [ $SC_FAILED -ne 0 ]; then
+      return;
+   fi
+
+   #
+   # Command 3
+   #
+
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+
+   #
+   # Command 3.0
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/succ 6;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_FAILED=3;
+   fi
+
+   if [ $SC_FAILED -ne 0 ]; then
+      return;
+   fi
+}
+
+main;
+cd "$SC_ORIG_DIRE";
+exit $SC_FAILED;

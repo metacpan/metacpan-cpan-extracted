@@ -4,45 +4,74 @@
       "Leon Brocard <acme@astray.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "perl_5",
+      "bsd",
+      "freebsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Archive-Peek-Libarchive",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::CBuilder" : 0
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Capture::Tiny" : "0.06",
+            "Config::AutoConf" : "0.317",
+            "ExtUtils::CBuilder" : "0.27",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "parent" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0"
          }
       },
       "runtime" : {
+         "recommends" : {},
          "requires" : {
-            "Object::Tiny" : 0,
-            "Test::More" : 0
+            "Object::Tiny" : "0",
+            "XSLoader" : "0",
+            "perl" : "v5.8.1"
          }
-      }
-   },
-   "provides" : {
-      "Archive::Peek::Libarchive" : {
-         "file" : "lib/Archive/Peek/Libarchive.pm",
-         "version" : "0.37"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.9"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://search.cpan.org/dist/Archive-Peek-Libarchive/",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "bugtracker" : {
+         "mailto" : "bug-Archive-Peek-Libarchive@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Peek-Libarchive"
+      },
+      "homepage" : "https://metacpan.org/release/Archive-Peek-Libarchive",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rehsack/Archive-Peek-Libarchive.git",
+         "web" : "https://github.com/rehsack/Archive-Peek-Libarchive"
+      }
    },
-   "version" : "0.37"
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

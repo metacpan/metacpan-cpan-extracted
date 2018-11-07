@@ -1,0 +1,10 @@
+template: 'simple'
+layout: 'main'
+logger: 'console'
+plugins:
+  MarkdownFilesToHTML:
+    defaults:
+      file_root: 't/data/markdown_files'
+    routes:
+      - dzil_tutorial:
+          dir: 'dzil_tutorial'

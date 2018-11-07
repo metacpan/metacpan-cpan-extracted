@@ -10,7 +10,7 @@ use HTML::Parser;
 use HTML::Form;
 use Digest::MD5();
 
-our $VERSION = '8.02';
+our $VERSION = '9.00';
 
 # $Id: $
 # $Log: LaPoste.pm,v $
@@ -248,25 +248,19 @@ sub _list_accounts {
     my $html = $response->content;
     my @l = _list_accounts_one_page($self, $html);
 
-    if ($self->{cb_accounts} || $self->{all_accounts}) {
-        if (my ($url) = $html =~ m!<a href="(.*?mouvementsCarteDD.*?)"!) {
-            $url =~ s/&amp;/&/g;
-            push @l, _list_cb_accounts($self, $url);
-        }
-    }
     if ($self->{all_accounts}) {
         my $html = _GET_content($self, _rel_url($response, '/voscomptes/canalXHTML/comptesCommun/synthese_ep/afficheSyntheseEP-synthese_ep.ea'));
-        push @l, _list_accounts_one_page($self, $html);
+        push @l, _list_accounts_one_page($self, $html, 'savings');
     }
     @l;
 }
 
 sub _list_accounts_one_page {
-    my ($self, $html) = @_;
+    my ($self, $html, $type) = @_;
     my @l;
 
     my $flag = '';
-    my ($url, $name, $owner, $account_no);
+    my ($url, $name, $owner, $account_no, $balance_cb);
 
     foreach (split("\n", $html)) {
         if ($flag eq 'url' && m!<a href="(.*?)"!) {
@@ -278,12 +272,20 @@ sub _list_accounts_one_page {
             $account_no = $1;
         } elsif (m!<span class="number">([\d\s,.+-]*)! && $url) {
             my $balance = $normalize_number->($1);
-            push @l, { url => $url, balance => $balance, name => $name, owner => $owner, account_no => $account_no } if $url;
+            push @l, { url => $url, balance => $balance, name => $name, owner => $owner, account_no => $account_no, type => $type } if $url;
             $url = '';
+        } elsif ($flag eq 'balance_cb' && m!<span>([\d\s,.+-]*)!) {
+            $balance_cb = $normalize_number->($1);            
+        } elsif (m!<a href="(.*?mouvementsCarteDD.*?)"!) {
+            my $cb_url = $1;
+            $cb_url =~ s/&amp;/&/g;
+            push @l, { url => $cb_url, balance => $balance_cb, name => "Carte bancaire", owner => $owner, account_no => $account_no, type => 'cb' }  if $self->{cb_accounts} || $self->{all_accounts};
         }
 
         if (/account-resume--banq|account-resume--saving/) {
             $flag = 'url';
+        } elsif (/D&#233;bit diff&#233;r&#233; en cours/) {
+            $flag = 'balance_cb';
         } else {
             $flag = '';
         }
@@ -381,6 +383,10 @@ Return the account number, in the form C<0123456L012>.
 
 Returns the balance of the account.
 
+=head2 type()
+
+Returns the account type, like C<cb> or C<savings>.
+
 =head2 statements()
 
 Return a list of Statement object (Finance::Bank::LaPoste::Statement).
@@ -403,6 +409,7 @@ sub name       { $_[0]{name} }
 sub owner      { $_[0]{owner} }
 sub account_no { $_[0]{account_no} }
 sub balance    { $_[0]{balance} }
+sub type       { $_[0]{type} }
 sub currency   { 'EUR' }
 sub statements { 
     my ($self) = @_;
@@ -417,7 +424,7 @@ sub statements {
 	my $html = $response->content;
 
 	$self->{balance} ||= do {
-	    my ($balance) = $html =~ m!<span class="amount">(.*?) &euro;</span>!;
+	    my $balance = ($html =~ m!<span class='negatif'>(.*?)</span>&nbsp;euros! || $html =~ m!<span class="amount">(.*?)&nbsp;&euro;</span>!) && $1;
 	    $normalize_number->($balance);
 	};
 	my $l = $parse_table->($html);

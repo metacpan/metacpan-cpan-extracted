@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl bindings for Upwork API'
+abstract: 'Perl bindings for Upwork API (OAuth2)'
 author:
   - 'Maksym Novozhylov <mnovozhilov@upwork.com>'
 build_requires:
@@ -11,6 +11,7 @@ dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 keywords:
   - upwork
+  - oauth2
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +20,7 @@ name: Net-Upwork-API
 provides:
   Net::Upwork::API:
     file: lib/Net/Upwork/API.pm
-    version: v1.3.0
+    version: v2.0.1
   Net::Upwork::API::Client:
     file: lib/Net/Upwork/API/Client.pm
   Net::Upwork::API::Config:
@@ -88,10 +89,11 @@ provides:
     file: lib/Net/Upwork/API/Routers/Workdiary.pm
 requires:
   IO::Socket::SSL: '1.965'
-  Net::OAuth: '0.28'
+  Net::OAuth2: '0.63'
+  perl: v5.8.8
 resources:
-  bugtracker: https://github.com/upwork/perl-upwork/issues
+  bugtracker: https://github.com/upwork/perl-upwork-oauth2/issues
   homepage: http://developers.upwork.com
-  repository: https://github.com/upwork/perl-upwork.git
-version: v1.3.0
+  repository: https://github.com/upwork/perl-upwork-oauth2.git
+version: v2.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

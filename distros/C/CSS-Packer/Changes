@@ -1,5 +1,12 @@
 Revision history for CSS-Packer
 
+2.06       2018-11-06
+    - Add missing files to MANIFEST
+
+2.06       2018-11-05
+    - Added option to define indentation level (GH #9, thanks to zdm)
+    - Fixed minification of data URLs due to spurious new lines (GH #7)
+
 2.05       2018-02-02
     - Add missing files to MANIFEST (GH #5, thanks to nfg)
 

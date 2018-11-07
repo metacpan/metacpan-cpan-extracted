@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "1.000033"
          }
       },
       "runtime" : {
@@ -37,7 +38,16 @@
          }
       }
    },
+   "provides" : {
+      "Shannon::Entropy" : {
+         "file" : "lib/Shannon/Entropy.pm",
+         "version" : "1.101011"
+      }
+   },
    "release_status" : "stable",
-   "version" : "1.101010",
+   "version" : "1.101011",
+   "x_contributors" : [
+      "John Imrie (JGNI) <jgni@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

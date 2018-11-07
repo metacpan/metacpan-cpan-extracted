@@ -1,0 +1,16 @@
+cache:
+    - C:\Strawberry -> .appveyor_clear_cache.txt
+
+shallow_clone: true
+
+install:
+  - if not exist "C:\Strawberry" cinst strawberryperl
+  - cinst make
+  - set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - cpanm --installdeps . || type C:\Users\appveyor\.cpanm\build.log ; perl -e "exit 1"
+
+build_script:
+  - perl Build.PL
+  - ./Build manifest
+  - ./Build test

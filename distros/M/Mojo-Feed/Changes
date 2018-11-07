@@ -1,5 +1,13 @@
 Revision history for Perl extension Mojo-Feed
 
+0.17 2018-11-07T10:08:44Z
+
+    - Make autodiscovery more liberal (get any url with containing the word "feed")
+    - Added feed_type method to Mojo::Feed
+    - Combine tagline attribute of Mojo::Feed with subtitle attribute
+    - Rename html_url attribute of Mojo::Feed to link
+    - Mojolicious v8.05 compatibility (thanks Slaven Rezić from CPANTesters)
+
 0.16 2018-04-04T14:56:31Z
 
     - Added Mojo::Feed::is_valid() to assert object is an actual feed (Mario Domgoergen)

@@ -2,8 +2,8 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.010 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2017-10-25.
+    This document describes version 0.012 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2018-11-06.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
@@ -12,7 +12,7 @@ FUNCTIONS
   mysql_drop_all_tables
     Usage:
 
-     mysql_drop_all_tables(%args) -> [status, msg, result, meta]
+     mysql_drop_all_tables(%args) -> [status, msg, payload, meta]
 
     Drop all tables in a MySQL database.
 
@@ -50,7 +50,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -59,7 +59,7 @@ FUNCTIONS
   mysql_drop_tables
     Usage:
 
-     mysql_drop_tables(%args) -> [status, msg, result, meta]
+     mysql_drop_tables(%args) -> [status, msg, payload, meta]
 
     Drop tables in a MySQL database.
 
@@ -116,7 +116,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -125,7 +125,7 @@ FUNCTIONS
   mysql_query
     Usage:
 
-     mysql_query(%args) -> [status, msg, result, meta]
+     mysql_query(%args) -> [status, msg, payload, meta]
 
     Run query and return table result.
 
@@ -176,7 +176,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -185,7 +185,7 @@ FUNCTIONS
   mysql_run_pl_files
     Usage:
 
-     mysql_run_pl_files(%args) -> [status, msg, result, meta]
+     mysql_run_pl_files(%args) -> [status, msg, payload, meta]
 
     Run each .pl file, feed the output to `mysql` command and write result
     to .txt file.
@@ -198,6 +198,14 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   database* => *str*
+
+    *   directory => *dirname* (default: ".")
+
+        Specify directory for the resulting *.txt files.
+
+    *   mkdir => *true* (default: 1)
+
+        Create output directory if not exists.
 
     *   overwrite_when => *str* (default: "none")
 
@@ -214,7 +222,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -223,7 +231,7 @@ FUNCTIONS
   mysql_run_sql_files
     Usage:
 
-     mysql_run_sql_files(%args) -> [status, msg, result, meta]
+     mysql_run_sql_files(%args) -> [status, msg, payload, meta]
 
     Feed each .sql file to `mysql` command and write result to .txt file.
 
@@ -232,6 +240,14 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   database* => *str*
+
+    *   directory => *dirname* (default: ".")
+
+        Specify directory for the resulting *.txt files.
+
+    *   mkdir => *true* (default: 1)
+
+        Create output directory if not exists.
 
     *   overwrite_when => *str* (default: "none")
 
@@ -248,7 +264,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -257,7 +273,7 @@ FUNCTIONS
   mysql_sql_dump_extract_tables
     Usage:
 
-     mysql_sql_dump_extract_tables(%args) -> [status, msg, result, meta]
+     mysql_sql_dump_extract_tables(%args) -> [status, msg, payload, meta]
 
     Parse SQL dump and spit out tables to separate files.
 
@@ -288,7 +304,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -314,7 +330,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

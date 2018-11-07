@@ -9,7 +9,7 @@
 #
 
 package Config::Model::Backend::Xorg::Write ;
-$Config::Model::Backend::Xorg::Write::VERSION = '1.115';
+$Config::Model::Backend::Xorg::Write::VERSION = '1.116';
 use Mouse::Role ;
 
 use Carp ;

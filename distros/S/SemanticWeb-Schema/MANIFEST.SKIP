@@ -2,30 +2,113 @@
 SemanticWeb-Schema-.*.tar.gz
 SemanticWeb-Schema-.*/
 
-^devel/
+# Begin standard Module::Manifest::Skip list:
 
-.*~$
-.*\.(bak|old)$
-\.git/.*
-\.gitignore
-
-^Makefile$
-
+# ExtUtils::MakeMaker
 ^blib/
+^blibdirs$
+^blibdirs\.ts$
+^bpm_to_blib\.ts$
+^Makefile$
+^Makefile\.old$
+^MakeMaker-\d
+^MANIFEST\.bak$
+# ^MANIFEST\.SKIP$
+^MYMETA\.
 ^pm_to_blib$
+^pod2htm.*
 
-^cache/
-^local/
+# Module::Build
+^Build$
+^_build/
+^Build.bat$
+^Build.COM$
+^BUILD.COM$
+^build.com$
 
-# Travis-CI
+# Revision Control
+\bCVS\b
+\b.cvsignore\b
+\b_darcs\b
+\B\.git\b
+\B\.gitignore\b
+\B\.gitmodules\b
+\B\.hg\b
+\B\.hgignore\b
+\B\.hgtags\b
+\bRCS\b
+\bSCCS\b
+\B\.svn\b
+,v$
+,B$
+,D$
+\baegis.log$
 
-\.travis\.yml
+# Author Extras
+^inc/.*\.pod$
+^pkg/
+# ^xt/
+# ^dist.ini$
 
-# Distzilla etc
+# Editors
+~$
+\#$
+\b\.#
+\.kpf$
+\.sw[pmno]$
+^\.vimrc$
 
+# OS X
+\.DS_Store$
+^\.Trash/
+\B\._
+
+# VMS
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Development
+^benchmarks/
+^core$
+^cover_db\b
+^covered\b
+^debian/
+^devel\.
+^.devel-local$
+^out$
+^tmon.out$
+^old/
+^Old/
+
+# Author Notes
+^notes
+^todo
+^ToDo$
+
+# Common Junk Files
+\.bak$
+\.diff$
+^foo\b.*
+\.old$
+\.orig$
+\.patch$
+\.rej$
+\.tdy$
+\.tmp$
+^\w$
+\.ttc$
+\.pmc$
+
+# Added by Dist::Zilla::Plugin::Generate::ManifestSkip
 \.build/
-
+SemanticWeb-Schema-.*/
+SemanticWeb-Schema-.*\.tar\.gz
+\.mailmap$
+cpanfile\.snapshot$
 lib/SemanticWeb/Schema/DataType.pm
 lib/SemanticWeb/Schema/Float.pm
 lib/SemanticWeb/Schema/Integer.pm
 lib/SemanticWeb/Schema/URL.pm
+local/
+cache/

@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/MysqlUtils/mysql_sql_dump_extract_tables
-# and generated automatically using Perinci::CmdLine::Gen version 0.482
+# Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_sql_dump_extract_tables
+# and generated automatically using Perinci::CmdLine::Gen version 0.486
 
-our $DATE = '2017-10-25'; # DATE
+our $DATE = '2018-11-06'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,14 +14,16 @@ use Log::ger;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/MysqlUtils/mysql_sql_dump_extract_tables",
     program_name => "mysql-sql-dump-extract-tables",
     log => 1,
     log_level => "info",
     pass_cmdline_object => 1,
     config_filename => "mysqlutils.conf",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Parse SQL dump and spit out tables to separate files
 # PODNAME: mysql-sql-dump-extract-tables
@@ -38,7 +40,7 @@ mysql-sql-dump-extract-tables - Parse SQL dump and spit out tables to separate f
 
 =head1 VERSION
 
-This document describes version 0.010 of mysql-sql-dump-extract-tables (from Perl distribution App-MysqlUtils), released on 2017-10-25.
+This document describes version 0.012 of mysql-sql-dump-extract-tables (from Perl distribution App-MysqlUtils), released on 2018-11-06.
 
 =head1 SYNOPSIS
 
@@ -64,17 +66,15 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -94,7 +94,7 @@ Do not read environment for default options.
 
 =over
 
-=item B<--exclude-table-pattern>=I<s@>
+=item B<--exclude-table-pattern>=I<s@>, B<--xpat>
 
 Can be specified multiple times.
 
@@ -102,7 +102,7 @@ Can be specified multiple times.
 
 See C<--exclude-table-pattern>.
 
-=item B<--exclude-table>=I<s@>
+=item B<--exclude-table>=I<s@>, B<-X>
 
 Can be specified multiple times.
 
@@ -110,7 +110,7 @@ Can be specified multiple times.
 
 See C<--exclude-table>.
 
-=item B<--include-table-pattern>=I<s@>
+=item B<--include-table-pattern>=I<s@>, B<--pat>
 
 Can be specified multiple times.
 
@@ -118,7 +118,7 @@ Can be specified multiple times.
 
 See C<--include-table-pattern>.
 
-=item B<--include-table>=I<s@>
+=item B<--include-table>=I<s@>, B<-I>
 
 Can be specified multiple times.
 
@@ -313,7 +313,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -22,12 +22,12 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => "2.36",
     "HTML::Parser" => 0,
     "List::Util" => 0,
-    "Moose" => 0,
-    "MooseX::NonMoose" => 0,
+    "Moo" => 0,
     "Scalar::Util" => 0,
     "Search::Tokenizer" => 0,
     "Test::Builder::Module" => 0,
     "Text::Aspell" => 0,
+    "Types::Standard" => 0,
     "curry" => 0,
     "namespace::autoclean" => 0
   },
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::Builder::Tester" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "v0.4.0",
+  "VERSION" => "v0.5.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,14 +54,14 @@ my %FallbackPrereqs = (
   "HTML::Parser" => 0,
   "List::Util" => 0,
   "Module::Metadata" => 0,
-  "Moose" => 0,
-  "MooseX::NonMoose" => 0,
+  "Moo" => 0,
   "Scalar::Util" => 0,
   "Search::Tokenizer" => 0,
   "Test::Builder::Module" => 0,
   "Test::Builder::Tester" => 0,
   "Test::More" => 0,
   "Text::Aspell" => 0,
+  "Types::Standard" => 0,
   "curry" => 0,
   "namespace::autoclean" => 0
 );

@@ -1,7 +1,12 @@
-#!/usr/bin/perl
-$| = 1;
+#!/bin/sh
+arg=$1
+warn=$2
+if [ -z "$arg" ]; then
+   arg="NONE"
+fi
 
-print "This is the 'succ' command\n";
-warn  "It will give a warning\n";
-print "It will succeed\n";
-exit 0;
+echo "This is the 'succ' command stdout with argument: $arg"
+if [ ! -z "$warn" ]; then
+   echo "This is the 'succ' command stderr with argument: $arg" >&2
+fi
+exit 0

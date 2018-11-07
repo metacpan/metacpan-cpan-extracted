@@ -13,6 +13,7 @@ t/40_unit_test.t
 t/50_spec_test.t
 t/foo_bar.xls
 t/hello_world.xls
+t/hello_world.xlsx
 t/exp-0.xls
 t/got-0.xls
 t/exp-1.xls

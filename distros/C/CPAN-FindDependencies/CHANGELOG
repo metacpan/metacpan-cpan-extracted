@@ -1,3 +1,6 @@
+2.48    2018-05-24      search.cpan.org is going away so switch to using
+                          metacpan
+
 2.47    2017-04-13      Make tests pass on perl 5.26
 
 2.46    2016-09-21      Increase timeout for running Makefile.PL, to

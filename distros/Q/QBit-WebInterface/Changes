@@ -1,10 +1,70 @@
 ==================================================
-Changes from 2017-05-19 00:00:00 +0000 to present.
+Changes from 2017-11-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.031 at 2018-05-19 04:47:26 +0000
+version 0.033 at 2018-11-05 20:40:34 +0000
 ------------------------------------------
+
+  Change: 8ea847f76cd5b42b7b94e6bc992fe6d05480b52e
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 23:39:42 +0000
+
+    Merge pull request #29 from Madskill/fix_attributes
+
+    use $package 
+
+  Change: b92d1eafc8f1fd3f3d65876296638582c61206b7
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 23:38:10 +0000
+
+    use $package 
+
+------------------------------------------
+version 0.032 at 2018-11-05 18:17:28 +0000
+------------------------------------------
+
+  Change: 2d8601e792759af28493ffff2daa84f39a72fa6a
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:17:28 +0000
+
+    Version 0.032 
+
+  Change: 2539f3e7ee18a5adfb0d9c0a48c1f8be0e8324d7
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:16:25 +0000
+
+    Merge pull request #28 from Madskill/fix_sub_name
+
+    fix sub_name and added routing 
+
+  Change: afc47bca7f8b7d23ea7ab31eb43f82afc7a04c2b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:13:54 +0000
+
+    fix docs and dist.ini 
+
+  Change: ef8bbfc099b91fa2d631591664acaf1d1b252c0c
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:09:38 +0000
+
+    added documentations and fix path and cmd for handler routes 
+
+  Change: fc93eec63076fd873f0e86365b6b83da646a0e99
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 20:53:01 +0000
+
+    fix sub_name and added routing 
+
+------------------------------------------
+version 0.031 at 2018-05-19 04:47:53 +0000
+------------------------------------------
+
+  Change: 29e254c507ef2674393957682ef2db24d0855b23
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-05-19 07:47:53 +0000
+
+    Version 0.031 
 
   Change: 15d4a02ad0845f087d65acf8dc795784638d467d
   Author: Igor <igor-sverdlov@mail.ru>
@@ -20,36 +80,6 @@ version 0.031 at 2018-05-19 04:47:26 +0000
 
     fix post params 
 
-------------------------------------------
-version 0.030 at 2017-11-03 20:31:00 +0000
-------------------------------------------
-
-  Change: 43ecfad841d7a606427d8dd331882bd104a0ad64
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-11-03 23:31:00 +0000
-
-    Version 0.030 
-
-  Change: adf8a4b877eaa20a7b8c8cb4b39e951567ec66cc
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2017-11-03 23:29:45 +0000
-
-    Merge pull request #26 from Madskill/fix_json
-
-    Fix json 
-
-  Change: 0b6c07ffe19d858a696d29f38cf7d2c72604f2e2
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-11-03 23:28:12 +0000
-
-    Merge remote-tracking branch 'upstream/master' into fix_json 
-
-  Change: 343142f40c493d86c0688fe8ab12d2c1278ff1fc
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-11-03 23:27:27 +0000
-
-    fix json 
-
 =================================================
-Plus 29 releases after 2017-05-19 00:00:00 +0000.
+Plus 30 releases after 2017-11-05 00:00:00 +0000.
 =================================================

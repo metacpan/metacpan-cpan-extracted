@@ -7,18 +7,20 @@ build_requires:
   QBit::Application: '0'
   Test::Deep: '0'
   Test::More: '0'
-  URI::Escape: '0'
   lib: '0'
+  lib::abs: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: QBit-WebInterface
 requires:
+  B: '0'
   CGI::Cookie: '0'
   Digest::MD5: '0'
   Exception: '0'
@@ -30,7 +32,9 @@ requires:
   Template: '2.20'
   Template::Config: '0'
   Template::Provider: '0'
+  URI::Escape: '0'
   base: '0'
   qbit: '0'
   strict: '0'
-version: '0.031'
+version: '0.033'
+x_serialization_backend: 'YAML::Tiny version 1.70'

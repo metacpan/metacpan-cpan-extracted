@@ -1,5 +1,5 @@
 package QBit::WebInterface::PSGI::Request;
-$QBit::WebInterface::PSGI::Request::VERSION = '0.003';
+$QBit::WebInterface::PSGI::Request::VERSION = '0.005';
 use qbit;
 
 use base qw(QBit::WebInterface::Request);

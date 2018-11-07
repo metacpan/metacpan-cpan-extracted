@@ -112,9 +112,9 @@ sub run {
 
     print "Certificate key:$/$key$/$/";
 
-    print "$/Certificate URL: " . $order->certificate() . $/ . $/;
+    print "Certificate chain:$/$/";
 
-    print HTTP::Tiny->new()->get($order->certificate())->{'content'};
+    print $acme->get_certificate_chain($order);
 
     return;
 }

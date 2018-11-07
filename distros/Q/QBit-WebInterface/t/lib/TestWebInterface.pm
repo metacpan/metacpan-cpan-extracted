@@ -11,6 +11,7 @@ __PACKAGE__->config_opts(
     ,    # Use framework templates
     MinimizeTemplate => TRUE,
     timelog_class    => 'TestTimeLog',
+    use_base_routing => TRUE,
 );
 
 TRUE;

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+perl -e "use Test::Tdd" -- $@

@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Message;
 # ABSTRACT: A Git commit message
-$Git::Message::VERSION = '2.9.10';
+$Git::Message::VERSION = '2.10.0';
 use 5.010;
 use utf8;
 use Carp;
@@ -195,7 +195,7 @@ Git::Message - A Git commit message
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -339,7 +339,7 @@ L<above/Footer syntax>.
 
 =head2 get_footer_keys
 
-This returns the list of footer keys. Multivalued keys appear only
+This returns the list of footer keys. Multi-valued keys appear only
 once in the list, in lower case.
 
 =head2 delete_footer_key KEY

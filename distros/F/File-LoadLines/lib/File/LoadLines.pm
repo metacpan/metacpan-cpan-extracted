@@ -14,7 +14,7 @@ File::LoadLines - Load lines from file
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,8 @@ our $VERSION = '0.01';
 =head1 DESCRIPTION
 
 File::LoadLines provides an easy way to load the contents of a text
-file into an array of lines.
+file into an array of lines. It is intended for relatively small files
+like config files that are often produced by weird tools (and users).
 
 It automatically handles ASCII, Latin and UTF-8 text.
 When the file has a BOM, it handles UTF-8, UTF-16 LE and BE, and
@@ -51,11 +52,15 @@ that are returned in the result array. Line terminators are removed.
 
 In scalar context, returns an array reference.
 
-The first argument may be the name of a file, and opened file handle,
+The first argument may be the name of a file, an opened file handle,
 or a reference to a string that contains the data.
 
 The second argument can be used to influence the behaviour.
 It is a hash reference of option settings.
+
+Note that loadlines() is a I<slurper>, it reads the whole file into
+memory and requires temporarily memory for twice the size of the
+file.
 
 =over
 
@@ -162,7 +167,6 @@ sub loadlines {
 
     # Split in lines;
     my @lines;
-    $data =~ s/^\s+//s;
     if ( $options->{chomp} ) {
 	# Unless empty, make sure there is a final newline.
 	$data .= "\n" if $data =~ /.(?!\r\n|\n|\r)\z/;
@@ -173,8 +177,17 @@ sub loadlines {
 	# We need to maintain trailing newlines.
 	push( @lines, $1 ) while $data =~ /(.*?(?:\r\n|\n|\r))/g;
     }
+    undef $data;
     return wantarray ? @lines : \@lines;
 }
+
+=head1 SEE ALSO
+
+There are currently no other modules that handle BOM detection and
+line splitting.
+
+I have a faint hope that Perl6 will deal with this transparently, but
+I fear the worst.
 
 =head1 AUTHOR
 

@@ -3,9 +3,10 @@ use warnings;
 
 package Git::Hooks::CheckLog;
 # ABSTRACT: Git::Hooks plugin to enforce commit log policies
-$Git::Hooks::CheckLog::VERSION = '2.9.10';
+$Git::Hooks::CheckLog::VERSION = '2.10.0';
 use 5.010;
 use utf8;
+use Log::Any '$log';
 use Git::Hooks;
 use Git::Message;
 use List::MoreUtils qw/uniq/;
@@ -306,6 +307,8 @@ sub message_errors {
 sub check_message_file {
     my ($git, $commit_msg_file) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_message_file($commit_msg_file)");
+
     _setup_config($git);
 
     my $current_branch = $git->get_current_branch();
@@ -354,6 +357,8 @@ sub check_ref {
 sub check_affected_refs {
     my ($git) = @_;
 
+    $log->debug(__PACKAGE__ . "::check_affected_refs");
+
     _setup_config($git);
 
     return 1 if $git->im_admin();
@@ -371,6 +376,8 @@ sub check_affected_refs {
 
 sub check_patchset {
     my ($git, $opts) = @_;
+
+    $log->debug(__PACKAGE__ . "::check_patchset");
 
     _setup_config($git);
 
@@ -404,6 +411,8 @@ COMMIT_MSG       \&check_message_file;
 UPDATE           \&check_affected_refs;
 PRE_RECEIVE      \&check_affected_refs;
 REF_UPDATE       \&check_affected_refs;
+COMMIT_RECEIVED  \&check_affected_refs;
+SUBMIT           \&check_affected_refs;
 PATCHSET_CREATED \&check_patchset;
 DRAFT_PUBLISHED  \&check_patchset;
 
@@ -421,7 +430,7 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -485,9 +494,19 @@ comply.
 
 =item * B<ref-update>
 
-This hook is invoked when a push request is received by Gerrit Code
-Review, to check if the commit log messages of all commits being
-pushed comply.
+This hook is invoked when a direct push request is received by Gerrit Code
+Review, to check if the commit log messages of all commits being pushed comply.
+
+=item * B<commit-received>
+
+This hook is invoked when a push request is received by Gerrit Code Review to
+create a change for review, to check if the commit log messages of all commits
+being pushed comply.
+
+=item * B<submit>
+
+This hook is invoked when a change is submitted in Gerrit Code Review, to check
+if the commit log messages of all commits being pushed comply.
 
 =item * B<patchset-created>
 
@@ -593,7 +612,7 @@ messages. If the '!' prefix is used, the log must not match the
 REGEXPs. Otherwise, the log must match REGEXPs.
 
 The REGEXPs are matched with the C</m> modifier so that the C<^> and the C<$>
-metacharacters, if used, match the beginning and end of each line in the log,
+meta-characters, if used, match the beginning and end of each line in the log,
 respectively.
 
 This allows you, for example, to disallow hard-tabs in your log messages:
@@ -629,7 +648,7 @@ are duplicate C<Signed-off-by> footers in the commit.
 
 =head2 deny-merge-revert BOOL
 
-This boolean option allows you to deny commits that revert merge commits, since
+This Boolean option allows you to deny commits that revert merge commits, since
 such beasts introduce complications in the repository which you may want to
 avoid. (To know more about this you should read Linus Torvald's L<How to revert
 a faulty

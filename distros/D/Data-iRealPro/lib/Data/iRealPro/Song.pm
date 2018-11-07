@@ -61,7 +61,7 @@ sub parse {
 	$self->{a2}		 = shift(@a); # ??
 	$self->{style}		 = shift(@a);
 	$self->{key}		 = shift(@a); # C ...
-	$self->{actual_key}	 = shift(@a); # 0 ...
+	$self->{actual_key}	 = shift(@a); # '', 0 ...
 	$self->{raw}		 = shift(@a);
 	$self->{actual_style}	 = shift(@a);
 	$self->{actual_tempo}	 = shift(@a);
@@ -80,7 +80,12 @@ sub parse {
     $tokstring = $self->{raw};
 
     # Correct for iReal key transposition.
-    $self->{_transpose} = ( ($self->{actual_key} || 0) - $keymap{$self->{key}} ) % 12;
+    if ( $self->{actual_key} eq '' ) {
+	$self->{_transpose} = 0;
+    }
+    else {
+	$self->{_transpose} = ( $self->{actual_key} - $keymap{$self->{key}} ) % 12;
+    }
 
     # iRealPro format must start with "1r34LbKcu7" magic.
     unless ( !!($self->{variant} eq "irealpro")

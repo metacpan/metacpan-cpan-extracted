@@ -1,41 +1,31 @@
 ==================================================
-Changes from 2015-09-12 00:00:00 +0000 to present.
+Changes from 2017-11-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.007 at 2016-09-11 14:56:18 +0000
+version 0.008 at 2018-11-05 19:12:03 +0000
 ------------------------------------------
 
-  Change: 1227ea4301b24476451db9ee23a8ce9a6f3bf41f
+  Change: d2ed957d26cec77458d3173c59aed5145dfea8fa
   Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-09-11 18:55:41 +0000
+  Date : 2018-11-05 22:11:29 +0000
 
-    Merge pull request #3 from Madskill/upload_to_cpan
+    Merge pull request #4 from Madskill/use_subs_from_base
 
-    upload to cpan 
+    use subs from base 
 
-  Change: 41a10ccc2dc5b68e503ff115a9a9195629fbadcd
+  Change: 7860411a57ef6c191c1d6bab95b80aa31250c146
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-11 17:54:51 +0000
+  Date : 2018-11-05 22:10:39 +0000
 
-    upload to cpan 
+    use Exception 
 
-  Change: fb36aa59776c09a451676c1c76d8b5a3f3012d97
-  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
-  Date : 2014-05-28 17:36:37 +0000
+  Change: 1d1d76466fe48894e632fc0fb88072321d419667
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 22:08:03 +0000
 
-    Merge pull request #2 from QBitFramework/allow_head_request
-
-    Allowing HEAD request 
-
-  Change: a127d4485400cabcaf6d059bbaba66801653269a
-  Author: Ivan Bessarabov <ivan@bessarabov.ru>
-  Date : 2014-05-28 17:25:19 +0000
-
-    Allowing HEAD request
-
-    To make `curl -I http://127.0.0.1:5000` work 
+    use subs from base 
 
 ================================================
-Plus 6 releases after 2015-09-12 00:00:00 +0000.
+Plus 7 releases after 2017-11-05 00:00:00 +0000.
 ================================================

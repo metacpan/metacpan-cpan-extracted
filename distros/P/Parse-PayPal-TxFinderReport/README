@@ -1,7 +1,15 @@
-SYNOPSIS
+NAME
+    Parse::PayPal::TxFinderReport - Parse PayPal transaction detail report
+    into data structure
 
+VERSION
+    This document describes version 0.003 of Parse::PayPal::TxFinderReport
+    (from Perl distribution Parse-PayPal-TxFinderReport), released on
+    2018-11-06.
+
+SYNOPSIS
      use Parse::PayPal::TxFinderReport qw(parse_paypal_txfinder_report);
-    
+
      my $res = parse_paypal_txfinder_report(file => );
 
     Sample result when there is a parse error:
@@ -28,23 +36,100 @@ SYNOPSIS
      }]
 
 DESCRIPTION
-
     PayPal provides various kinds reports which you can retrieve from their
-    website under Reports menu. This module provides routine to parse
-    PayPal transaction finder report into a Perl data structure (from the
-    website under Reports > Transactions > Transaction finder). The CSV
-    format is supported. No official documentation of the format is
-    available, but it's mostly regular CSV.
+    website under Reports menu. This module provides routine to parse PayPal
+    transaction finder report into a Perl data structure. The CSV format is
+    supported. No official documentation of the format is available, but
+    it's mostly regular CSV.
 
-    Some characteristics of this report:
+    This module can recognize two variants of the report:
 
-      * Date is MM/DD/YYYY only without hour/minute/second information
+  Search Transaction Results (STR)
+    Some characteristics of this variant:
 
-      * No transaction status field
+    *   Date is MM/DD/YYYY only without hour/minute/second information
+
+        Date will be converted to Unix epoch in the returned data structure.
+
+    *   No transaction status field
+
+  Transaction Finder (TF)
+    Some characteristics of this variant:
+
+    *   Dates are locale-formatted (e.g. DD/MM/YYYY)
+
+        Date will be converted to Unix epoch in the returned data structure.
+        Make sure you set the correct "date_format" parameter.
+
+    *   Numbers are locale-formatted (e.g. 1,23 instead of 1.23 when using
+        comma as decimal character)
+
+        Formatting will be removed. Make sure you set the correct
+        "thousands_sep" and "decimal_point" parameters.
+
+FUNCTIONS
+  parse_paypal_txfinder_report
+    Usage:
+
+     parse_paypal_txfinder_report(%args) -> [status, msg, payload, meta]
+
+    Parse PayPal transaction detail report into data structure.
+
+    The result will be a hashref. The main key is "transactions" which will
+    be an arrayref of hashrefs.
+
+    Dates will be converted into Unix timestamps.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   date_format => *str* (default: "MM/DD/YYYY")
+
+    *   decimal_point => *str* (default: ".")
+
+    *   file => *filename*
+
+        File can be in tab-separated or comma-separated (CSV) format.
+
+    *   format => *str*
+
+        If unspecified, will be deduced from the filename's extension
+        (/csv/i for CSV, or /txt|tsv|tab/i for tab-separated).
+
+    *   string => *str*
+
+        Instead of "files", you can alternatively provide the file contents
+        in "strings".
+
+    *   thousands_sep => *str* (default: ",")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+BUGS
+    Please report all bug reports or feature requests to
+    <mailto:stevenharyanto@gmail.com>.
 
 SEE ALSO
-
-    https://www.paypal.com
+    <https://www.paypal.com>
 
     Parse::PayPal::TxDetailReport
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

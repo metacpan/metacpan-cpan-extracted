@@ -1,0 +1,40 @@
+#!/opt/bin/perl
+
+# Usage: cfmap-set var=value map...
+# example: cfmap-set music=@tavern **/inn.map
+# modify the given map header in all maps
+
+use common::sense;
+
+use Deliantra;
+use Deliantra::Map;
+use Tie::Cache;
+use Errno;
+
+(shift) =~ /^(\S+?)=(.*)$/
+   or die "Usage: $0 var=value map...";
+
+my ($var, $value) = ($1, $2);
+
+$|=1;
+
+for my $path (@ARGV) {
+   print "$path... ";
+
+   my $map = new_from_file Deliantra::Map $path
+      or die "$path: file load error\n";
+
+   if ($map->{info}{$var} eq $value) {
+      print "unchanged\n";
+   } else {
+      if (length $value) {
+         $map->{info}{$var} = $value;
+      } else {
+         delete $map->{info}{$var};
+      }
+      $map->write_file ($path);
+      print "updated\n";
+   }
+
+}
+

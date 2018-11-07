@@ -8,7 +8,7 @@ use Import::Export;
 
 use base qw/Import::Export/;
 
-our $VERSION = '1.101010';
+our $VERSION = '1.101011';
 
 our %EX = (
 	entropy => [qw/all/]
@@ -16,8 +16,17 @@ our %EX = (
 
 sub entropy {
 	my ($entropy, $len, $p, %t) = (0, length($_[0]));
-	return (map { $p = $_/$len; $entropy -= $p * log $p } (map { $t{$_}++ } split '', $_[0]) ? values %t : () and $entropy / log 2);
+	$t{$_}++ foreach split '', $_[0];
+	foreach (values %t) {
+		$p = $_/$len;
+		$entropy -= $p * log $p;
+	} 
+	return $entropy / log 2;
 }
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -25,7 +34,7 @@ Shannon::Entropy - Calculate the Shannon entropy H of a given input string.
 
 =head1 VERSION
 
-Version 1.101010
+Version 1.101011
 
 =cut
 
@@ -54,7 +63,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Shannon::Entropy
+	perldoc Shannon::Entropy
 
 You can also look for information at:
 
@@ -122,4 +131,3 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Shannon::Entropy

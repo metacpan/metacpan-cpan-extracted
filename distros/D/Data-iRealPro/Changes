@@ -1,10 +1,15 @@
 Revision history for Data-iRealPro
 
-1.12	2018-xx-xx
+1.13	2018-11-06
+
+	Miscellaneous small fixes, mostly for tests.
+
+1.12	2018-11-05
 
 	(Song) Fix typo in keymap that made key E undetectable.
 	For testing, set env DATA_IREALPRO_MUSICXML to require the
 	XML::LibXML module and perform the MusicXML tests.
+	Rework packaging.
 
 1.11	2018-11-01
 

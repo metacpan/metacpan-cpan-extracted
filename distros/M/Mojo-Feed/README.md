@@ -38,29 +38,25 @@ The parsed feed as <Mojo::DOM> object.
 ## source
 
 The source of the feed; either a [Mojo::Path](https://metacpan.org/pod/Mojo::Path) or [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object, or
-undef if the feed source was a string scalar.
+undef if the feed source was a string.
 
 ## title
 
-Returns the feeds title.
+Returns the feed's title.
 
-## description 
+## description
 
-May be filled from subtitle or tagline if absent
+Description of the feed, filled from channel description (RSS), subtitle (Atom 1.0) or tagline (Atom 0.3)
 
-## html\_url
+## link
 
-web page URL associated with the feed
+Web page URL associated with the feed
 
 ## items
 
 [Mojo::Collection](https://metacpan.org/pod/Mojo::Collection) of [Mojo::Feed::Item](https://metacpan.org/pod/Mojo::Feed::Item) objects representing feed news items
 
 ## subtitle
-
-Optional feed description
-
-## tagline
 
 Optional feed description
 
@@ -98,6 +94,10 @@ Return a XML serialized text of the feed's Mojo::DOM node. Note that this can be
 ## is\_valid
 
 Returns true if the top-level element of the DOM is a valid RSS (0.9x, 1.0, 2.0) or Atom tag. Otherwise, returns false.
+
+## feed\_type
+
+Detect type of feed - returns one of "RSS 1.0", "RSS 2.0", "Atom 0.3", "Atom 1.0" or "unknown"
 
 # CREDITS
 

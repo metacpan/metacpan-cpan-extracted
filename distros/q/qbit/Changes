@@ -3,8 +3,32 @@ Changes from 2017-11-05 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 2.7 at 2018-11-05 09:18:01 +0000
+version 2.8 at 2018-11-05 18:22:06 +0000
 ----------------------------------------
+
+  Change: 9ff23d78dbd63f07933d0577b7ef4bb77fb8f06c
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:21:35 +0000
+
+    Merge pull request #28 from Madskill/fix_from_json
+
+    fix from_json 
+
+  Change: 06940007eeaa1bdb3a78d41b0b64a83104001121
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 21:19:31 +0000
+
+    fix from_json 
+
+----------------------------------------
+version 2.7 at 2018-11-05 09:18:14 +0000
+----------------------------------------
+
+  Change: a9ea184e3e80dd0cc03607a7c7742208f348b25e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-11-05 12:18:14 +0000
+
+    Version 2.7 
 
   Change: c18804dab18e687087ff0ac649f963143af8010b
   Author: Igor <igor-sverdlov@mail.ru>

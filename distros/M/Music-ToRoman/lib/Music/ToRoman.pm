@@ -1,9 +1,11 @@
 package Music::ToRoman;
 our $AUTHORITY = 'cpan:GENE';
 
-# ABSTRACT: Convert chords to Roman numeral notation
+# ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.0300';
+our $VERSION = '0.0600';
+
+use Carp;
 
 use Moo;
 use strictures 2;
@@ -34,10 +36,29 @@ has chords => (
 sub parse {
     my ( $self, $chord ) = @_;
 
-    # XXX Assume minor if not major!
-    my @roman = $self->scale_name eq 'major'
-        ? qw( I ii iii IV V vi vii )
-        : qw( i ii III iv v VI VII );
+    # Literal diatonic modes when chords attribute is zero
+    my @roman;
+    if ( $self->scale_name eq 'major' || $self->scale_name eq 'ionian' ) {
+        @roman = qw( I ii iii IV V vi vii );
+    }
+    elsif ( $self->scale_name eq 'dorian' ) {
+        @roman = qw( i ii III IV v vi VII );
+    }
+    elsif ( $self->scale_name eq 'phrygian' ) {
+        @roman = qw( i II III iv v VI vii );
+    }
+    elsif ( $self->scale_name eq 'lydian' ) {
+        @roman = qw( I II iii iv V vi vii );
+    }
+    elsif ( $self->scale_name eq 'mixolydian' ) {
+        @roman = qw( I ii iii IV v vi VII );
+    }
+    elsif ( $self->scale_name eq 'minor' || $self->scale_name eq 'aeolian' ) {
+        @roman = qw( i ii III iv v VI VII );
+    }
+    elsif ( $self->scale_name eq 'locrian' ) {
+        @roman = qw( i II iii iv V VI vii );
+    }
 
     # Get the scale notes
     my @notes = get_scale_notes( $self->scale_note, $self->scale_name );
@@ -79,10 +100,15 @@ sub parse {
     # Drop the minor and major part of the chord name
     $decorator =~ s/M//i;
 
-    if ( $decorator =~ /([A-G])/ ) {
+    if ( $decorator =~ /([A-G][#b]?)/ ) {
         my $letter = $1;
         $position = first_index { $_ eq $letter } @notes;
-        $decorator =~ s/[A-G]/$roman[$position]/;
+        if ( $position >= 0 ) {
+            $decorator =~ s/[A-G][#b]?/$roman[$position]/;
+        }
+        else {
+            croak "Can't parse non-scale note in bass";
+        }
     }
 
     # Append the remaining decorator to the roman representation
@@ -101,11 +127,11 @@ __END__
 
 =head1 NAME
 
-Music::ToRoman - Convert chords to Roman numeral notation
+Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.0300
+version 0.0600
 
 =head1 SYNOPSIS
 
@@ -121,40 +147,60 @@ version 0.0300
   $roman = $mtr->parse('Em7');   # v7 (minor seventh)
   $roman = $mtr->parse('A+');    # I+ (augmented)
   $roman = $mtr->parse('BbM');   # bII (flat-two major)
+  $roman = $mtr->parse('Cm9/G'); # iii9/VII
 
   # Also:
   $mtr = Music::ToRoman->new(
     scale_note => 'A',
-    scale_name => 'minor',
+    scale_name => 'dorian',
     chords     => 0,
   );
-  $roman = $mtr->parse('A'); # i
-  $roman = $mtr->parse('B'); # ii
-  $roman = $mtr->parse('C'); # III
+  $roman = $mtr->parse('A');  # i
+  $roman = $mtr->parse('B');  # ii
+  $roman = $mtr->parse('C');  # III
+  $roman = $mtr->parse('D');  # IV
+  $roman = $mtr->parse('E7'); # v7
+  $roman = $mtr->parse('F#'); # vi
+  $roman = $mtr->parse('G');  # VII
 
 =head1 DESCRIPTION
 
-C<Music::ToRoman> converts chords to Roman numeral notation.
+C<Music::ToRoman> converts chords to Roman numeral notation.  Also individual
+"chordless" notes may be converted given a diatonic mode B<scale_name>.
+
+For example usage, check out the files F<eg/roman> and F<eg/basslines> in
+L<Music::BachChoralHarmony>.
 
 =head1 ATTRIBUTES
 
 =head2 scale_note
 
-Note on which the scale is based.  This can be one of C, D, E, F, G, A or B.
+Note on which the scale is based.  This can be one of C, Cb, C#, D, Db, D# ...
 
 Default: C
 
 =head2 scale_name
 
-Name of the scale.  See L<Music::Scales/SCALES> for the possible names.
+Name of the scale.  The diatonic mode names supported are:
+
+  ionian / major
+  dorian
+  phrygian
+  lydian
+  mixolydian
+  aeolian / minor
+  locrian
 
 Default: major
 
 =head2 chords
 
-Are we given chords with major ("M") and minor ("m") designations?
+Are we given chords to B<parse> with major ("M") and minor ("m") designations?
 
 Default: 1
+
+If this is set to 0, single notes may be used to return the major/minor Roman
+numeral for the given diatonic mode B<scale_name>.
 
 =head1 METHODS
 
@@ -168,7 +214,17 @@ Create a new C<Music::ToRoman> object.
 
   $roman = $mtr->parse($chord);
 
-Parse a given chord name into a Roman numeral representation.
+Parse a note or chord name into a Roman numeral representation.
+
+For instance, the Roman numeral representation for the C<aeolian> (or minor)
+mode is: i ii III iv v VI VII - where the case indicates the major/minor status
+of the given chord.
+
+This can be overridden by parsing say, C<BM7> (B major seven), thus producing
+C<II7> in the key of A minor.
+
+If the B<chords> attribute is off and a single note is given, the diatonic mode
+of the B<scale_name> is used to find the correct Roman numeral representation.
 
 =head1 SEE ALSO
 

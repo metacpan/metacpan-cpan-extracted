@@ -1,0 +1,2 @@
+TESTDIR/bin/succ 1 warn       #OPTS label Succ1 check TESTDIR/bin/check_false
+TESTDIR/bin/succ 2 warn       #OPTS label Succ2

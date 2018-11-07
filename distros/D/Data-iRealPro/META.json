@@ -47,11 +47,11 @@
    "provides" : {
       "Data::iRealPro" : {
          "file" : "lib/Data/iRealPro.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       },
       "irealcvt" : {
          "file" : "script/irealcvt",
-         "version" : "1.12"
+         "version" : "1.13"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/sciurius/perl-Data-iRealPro"
       }
    },
-   "version" : "1.12",
+   "version" : "1.13",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

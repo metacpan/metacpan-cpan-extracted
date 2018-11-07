@@ -1,5 +1,24 @@
 Revision history for Perl module Net::ACME2
 
+0.25 6 November 2018
+- BREAKING (?) CHANGE: Convert get_authorization() to POST-as-GET.
+  See 0.24 for a discussion of the impact of this change. This complements
+  and completes the changes in 0.24.
+- Minor documentation formatting updates.
+
+0.24 6 November 2018
+- BREAKING (?) CHANGE: Convert poll functions to POST-as-GET. This
+  accommodates the corresponding protocol change made in draft 15 of
+  the ACME specification. This will break only those applications whose
+  ACME server does not yet implement POST-as-GET for polling. I don’t think
+  there are any such servers in production, though; in particular,
+  Let’s Encrypt continues to work.
+- Add $acme->get_certificate_chain() method. This implements POST-as-GET
+  logic for certificate chain. Callers that previously fetched
+  $order->certificate() directly via their own HTTP logic will need to
+  switch to this new method unless the ACME server they’re interacting
+  with continues to allow plain GET for certificates.
+
 0.23 24 Aug 2018
 - Fix LICENSE file (again)
 

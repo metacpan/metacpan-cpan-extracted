@@ -67,7 +67,7 @@
          "web" : "https://github.com/ology/Music-BachChoralHarmony"
       }
    },
-   "version" : "0.0104",
+   "version" : "0.0105",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

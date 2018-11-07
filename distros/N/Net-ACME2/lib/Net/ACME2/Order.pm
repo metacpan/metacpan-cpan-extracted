@@ -31,7 +31,7 @@ use constant _ACCESSORS => (
 
 =head1 ACCESSORS
 
-These provide text strings as defined in the ACME specification.
+These provide text strings as defined in the ACME specification:
 
 =over
 

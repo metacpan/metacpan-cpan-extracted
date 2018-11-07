@@ -1,9 +1,10 @@
-#!/usr/bin/perl
-$| = 1;
-$i = $ARGV[0] || '';
+#!/bin/sh
+i=$1
 
-print "Input: $i\n";
-if ($i eq '2') {
-   exit 10;
-}
-exit 0;
+if [ $i -eq 2 ]; then
+   echo "fail_on_2 fails on 2"
+   exit 10
+else
+   echo "fail_on_2 succeeds on $i"
+   exit 0
+fi

@@ -40,6 +40,7 @@ my $file = path( $sample_dir, 'atom.xml' );
 $feed = Mojo::Feed::Reader->new->parse($file);
 isa_ok( $feed, 'Mojo::Feed' );
 is( $feed->title, 'First Weblog', 'title ok' );
+is( $feed->subtitle, 'This is a test weblog.', 'tagline/subtitle');
 is ( $feed->source, $file , 'source ok' );
 
 # parse a string
@@ -67,7 +68,7 @@ for my $file ( sort keys %Feeds ) {
     #is($feed->format, $Feeds{$file});
     #is($feed->language, 'en-us');
     is( $feed->title,       'First Weblog' );
-    is( $feed->html_url,    'http://localhost/weblog/' );
+    is( $feed->link,        'http://localhost/weblog/' );
     is( $feed->description, 'This is a test weblog.' );
     my $dt = $feed->published;
 
@@ -152,7 +153,7 @@ ok( ! $feed->is_valid, "feed is not valid");
 is( scalar $feed->items->each, 0,     'no entries from html page' );
 is( $feed->title,              undef, 'no title from html page' );
 is( $feed->description,        undef, 'no description from html page' );
-is( $feed->html_url,           undef, 'no htmlUrl from html page' );
+is( $feed->link,               undef, 'no link from html page' );
 
 # Invalid input:
 $feed = $feedr->parse("<xml><garbage>this is invalid</garbage></xml>");

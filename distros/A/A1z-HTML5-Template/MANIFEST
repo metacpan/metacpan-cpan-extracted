@@ -5,5 +5,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/A1z/HTML5/SimpleTemplate.cgi
+lib/A1z/HTML5/Templage.cgi
 lib/A1z/HTML5/Template.pm
 weaver.ini

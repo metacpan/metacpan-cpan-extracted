@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::Progress;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Record progress on a task
-$Taskwarrior::Kusarigama::Plugin::Command::Progress::VERSION = '0.9.3';
+$Taskwarrior::Kusarigama::Plugin::Command::Progress::VERSION = '0.10.0';
 
 use strict;
 use warnings;
@@ -139,7 +139,7 @@ Taskwarrior::Kusarigama::Plugin::Command::Progress - Record progress on a task
 
 =head1 VERSION
 
-version 0.9.3
+version 0.10.0
 
 =head1 SYNOPSIS
 

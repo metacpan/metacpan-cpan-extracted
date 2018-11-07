@@ -10,7 +10,7 @@ my $master = 'lib/App/Music/ChordPro/Version.pm';
 my $version = MM->parse_version($master);
 $master =~ s;/Version;;;
 
-my @bins = qw( chordpro wxchordpro );
+my @bins = qw( chordpro a2crd wxchordpro );
 
 WriteMakefile
 (
@@ -31,7 +31,8 @@ WriteMakefile
 		    'PDF::API2'   => 2.020,
 		    'Font::TTF'   => 1.04,
 		    'JSON::PP'	  => 2.27203,
-		    'Text::Balanced' => 2.0.0
+		    'String::Interpolate::Named' => 0.05,
+		    'File::LoadLines' => 0.02,
 		   },
 
  CONFIGURE_REQUIRES => {
@@ -44,11 +45,10 @@ WriteMakefile
  TEST_REQUIRES  => {
 		    'Test::More'  => 0,
 		    'JSON::PP'	  => 2.27203,
-		    'Text::Balanced' => 2.0.0
+		    'String::Interpolate::Named' => 0.05,
 		   },
 
  META_MERGE => {
-     license   => "perl_5",
      resources => {
 	 license    => "http://dev.perl.org/licenses/",
 	 homepage   => "http://www.chordpro.org",
@@ -57,6 +57,8 @@ WriteMakefile
      },
      provides => {
 	 chordpro => { file => "script/chordpro",
+		       version => $version },
+	 a2crd    => { file => "script/a2crd",
 		       version => $version },
 	 "App::Music::ChordPro"
 		  => { file => "lib/App/Music/ChordPro.pm",

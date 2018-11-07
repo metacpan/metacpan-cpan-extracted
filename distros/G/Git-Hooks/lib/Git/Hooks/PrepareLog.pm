@@ -3,9 +3,10 @@ use warnings;
 
 package Git::Hooks::PrepareLog;
 # ABSTRACT: Git::Hooks plugin to prepare commit messages before being edited
-$Git::Hooks::PrepareLog::VERSION = '2.9.10';
+$Git::Hooks::PrepareLog::VERSION = '2.10.0';
 use 5.010;
 use utf8;
+use Log::Any '$log';
 use Git::Hooks;
 use Path::Tiny;
 
@@ -115,8 +116,10 @@ EOS
 sub prepare_message {
     my ($git, $msg_file, $source) = @_;
 
+    $log->debug(__PACKAGE__ . "::prepare_message($msg_file, $source)");
+
     # Do not mess up with messages if there is already a previous source for it.
-    return 0 if defined $source;
+    return 0 if defined $source && $source =~ /^(?:commit|merge|squash)$/;
 
     _setup_config($git);
 
@@ -144,7 +147,7 @@ Git::Hooks::PrepareLog - Git::Hooks plugin to prepare commit messages before bei
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -175,14 +178,13 @@ information in the message before the user is given a chance to edit it. If you
 want to check problems in the message you should use the L<Git::Hooks::CheckLog>
 plugin instead.
 
-The C<prepare-commit-msg> is invoked in every commit, but the plugin only
-changes the message if it's a new commit and not if it's the result of an amend,
-a merge, or if the message is provided via the C<-m> or the C<-F> options,
-because it assumes that preexisting messages shouldn't be re-prepared. Hence,
-the plugin simply skips these types of commits.
+The C<prepare-commit-msg> is invoked in every commit, but the plugin does not
+change the message if it's the result of an amend or a merge because it assumes
+that preexisting messages shouldn't be re-prepared. Hence, the plugin simply
+skips these types of commits.
 
 Even though it's not intended to "check" the message it's possible that the
-plugin encounters a few problems. In these situations it will abort the commit
+plugin encounters a some problems. In these situations it will abort the commit
 with a suitable message.
 
 To enable the plugin you should add it to the githooks.plugin configuration

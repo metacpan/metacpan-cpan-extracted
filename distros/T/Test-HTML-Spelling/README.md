@@ -4,7 +4,7 @@ Test::HTML::Spelling - spelling of HTML documents
 
 # VERSION
 
-version v0.4.0
+version v0.5.0
 
 # SYNOPSIS
 
@@ -174,7 +174,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 - Interactive Information, Ltd <cpan@interactive.co.uk>
 - Murray Walker <perl@minty.org>
-- Rusty Conover <rusty@luckydinosaur.com>
+- Rusty Conover &lt;rusty+cpan@luckydinosaur.com>
 - Shlomi Fish <shlomif@shlomifish.org>
 
 # COPYRIGHT AND LICENSE

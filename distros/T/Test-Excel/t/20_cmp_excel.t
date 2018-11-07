@@ -2,7 +2,7 @@
 
 use strict; use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 use File::Spec::Functions;
 
 BEGIN { use_ok('Test::Excel'); }
@@ -10,6 +10,13 @@ BEGIN { use_ok('Test::Excel'); }
 cmp_excel(
     catfile('t', 'hello_world.xls'),
     catfile('t', 'hello_world.xls'),
+    {},
+    'Our Excels were essentially the same.'
+);
+
+cmp_excel(
+    catfile('t', 'hello_world.xlsx'),
+    catfile('t', 'hello_world.xlsx'),
     {},
     'Our Excels were essentially the same.'
 );

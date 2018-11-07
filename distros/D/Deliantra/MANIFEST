@@ -15,6 +15,7 @@ bin/cfarch-normalize
 bin/cfmap-normalize
 bin/cfmap-plushify
 bin/cfmap-tagify
+bin/cfmap-set
 bin/cfmap-cavehify
 bin/cfxmlrender
 bin/cf-slotutil

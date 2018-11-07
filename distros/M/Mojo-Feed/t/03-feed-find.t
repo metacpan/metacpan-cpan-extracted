@@ -28,6 +28,12 @@ get '/monks' => sub {
         format => 'htm'
     );
 };
+get '/wp' => sub {
+    shift->render(
+        data => '<html><a href="http://feed.dummy.com">subscribe</a> for updates</html>',
+        format => 'html'
+    );
+};
 
 my $t            = Test::Mojo->new(app);
 my $feedr        = Mojo::Feed::Reader->new->ua( $t->ua );
@@ -105,6 +111,11 @@ is( scalar @feeds, 0, 'no feeds for perlmonks' );
 @feeds = ();
 $feedr->discover( '/monks')->then(sub{ (@feeds) = @_ })->wait;
 is( scalar @feeds, 0, 'no feeds for perlmonks (nb)' );
+
+# why just an extension? look for the word "feed" somewhere in the url
+@feeds=();
+$feedr->discover('/wp')->then(sub { @feeds = @_ })->wait;
+is($feeds[0], 'http://feed.dummy.com', 'promising url title');
 
 # @feeds = ();
 # $delay = Mojo::IOLoop->delay(sub { shift; (@feeds) = @_; });

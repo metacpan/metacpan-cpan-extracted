@@ -1,5 +1,5 @@
 {
-   "abstract" : "Convert chords to Roman numeral notation",
+   "abstract" : "Convert notes and chords to Roman numeral notation",
    "author" : [
       "Gene Boggs <gene@cpan.org>"
    ],
@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "List::MoreUtils" : "0",
             "Moo" : "2",
             "Music::Scales" : "0",
@@ -47,6 +48,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -65,7 +67,7 @@
          "web" : "https://github.com/ology/Music-ToRoman"
       }
    },
-   "version" : "0.0300",
+   "version" : "0.0600",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -295,7 +297,7 @@
                   ],
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
-                     "foo"
+                     "chordless"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }

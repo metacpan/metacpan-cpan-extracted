@@ -1,0 +1,13 @@
+bin/DFA-Simple-compiler.pl
+bin/example-from-pod.pl
+bin/fix_bullets.pl
+bin/fix_bullets_input.txt
+Changes
+lib/DFA/Simple.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/test.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

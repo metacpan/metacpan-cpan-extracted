@@ -1,10 +1,52 @@
 Revision history for Dancer2-Plugin-MarkdownFilesToHTML
 
+0.014     2018-11-07 11:29:25-05:00 America/New_York
+
+0.013     2018-11-07 09:46:59-05:00 America/New_York
+  - attempt fixes for systems with failing smoke tests
+
+0.012     2018-11-06 20:34:30-05:00 America/New_York
+  - more documentation improvements
+  - fix absolute path in test config that was causing smoke tests to fail
+
+0.011     2018-11-06 15:22:38-05:00 America/New_York
+  - minor documentation fixes, tweaks and updates
+  - removed support for changing dialects
+  - fix bug where single line code was not getting insert for content w/o toc
+  - add test for addition of "single-line" class to code
+
+0.010     2018-11-06 13:48:03-05:00 America/New_York
+  - fixed critical bug with direct calls to mdfile_ and mdfiles_2html
+  - moved xt tests to standard test directory
+  - added tests
+  - remove debug code from author test
+
+0.009     2018-11-06 00:11:55-05:00 America/New_York
+  - reintroduce "single-line" class for <code> that is a single line of code
+  - minor code improvements
+  - make cache hits more reliable and accurate
+  - fix critical bug in caching mechanism
+  - introduce first real test
+
+0.008     2018-11-05 16:54:02-05:00 America/New_York
+  - removed newer regex syntax so module can work with perl > 5.10 now
+  - No Moose needed! Switched parser from Markdent to Hoedown
+  - updated documentation
+
+0.007     2018-11-05 12:11:31-05:00 America/New_York
+  - tidied up the main module code
+  - improve documentation for options
+  - other documentation improvements, corrections and additions
+  - improved name of app in documentation
+  - add .build to .gitignore
+
 0.006     2018-11-04 22:18:14-05:00 America/New_York
   - fix sample yaml file in documentation
   - moved function for creating cache directory
   - added prereq for Dancer2
   - added minimum Perl version
+  - cache content that does not have accompanying TOC
+  - add striken text for content witout TOC
 
 0.005     2018-11-03 20:25:14-04:00 America/New_York
   - remove crufty directory

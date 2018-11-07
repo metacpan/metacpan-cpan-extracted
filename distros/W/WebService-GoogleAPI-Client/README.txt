@@ -1,15 +1,16 @@
 NAME
 
-    WebService::GoogleAPI::Client - API WebService OAUTH2 Client Agent to
-    streamline access to GOOGLE API End-Point Services using Discovery Data
+    WebService::GoogleAPI::Client - Google API Discovery and SDK
 
 VERSION
 
-    version 0.18
+    version 0.19
 
 SYNOPSIS
 
-    Access Google API Services Version 1 using an OAUTH2 User Agent
+    Access Google API Services Version 1 using an OAUTH2 User Agent.
+
+    Includes Discovery, validation authentication and API Access.
 
     assumes gapi.json configuration in working directory with scoped Google
     project redentials and user authorization created by _goauth_

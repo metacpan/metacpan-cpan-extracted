@@ -6,7 +6,7 @@ qbit::File - Functions to manipulate files.
 =cut
 
 package qbit::File;
-$qbit::File::VERSION = '2.7';
+$qbit::File::VERSION = '2.8';
 use strict;
 use warnings;
 use utf8;

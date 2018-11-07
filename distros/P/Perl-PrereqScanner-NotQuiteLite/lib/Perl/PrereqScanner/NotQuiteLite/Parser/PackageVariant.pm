@@ -19,7 +19,16 @@ sub parse_package_variant_args {
     if ($token->[0] eq 'importing') {
       shift @$tokens if @$tokens && $tokens->[0][1] eq 'COMMA';
       my $next_token = shift @$tokens or last;
-      if ($next_token->[1] eq '[]') {
+      if (!ref $next_token) {
+        my $module = $next_token;
+        if (is_module_name($module)) {
+          $c->add($module);
+          if ($c->has_callback_for(use => $module)) {
+            $c->run_callback_for('use', $module, [["use", "KEYWORD"], [$module, "WORD"], [";", ";"]]);
+          }
+        }
+      }
+      elsif ($next_token->[1] eq '[]') {
         my $modules = convert_string_token_list($next_token->[0]);
         while(my $module = shift @$modules) {
           next unless is_module_name($module);
@@ -40,11 +49,11 @@ sub parse_package_variant_args {
         }
       }
     }
-    elsif ($token->[1] eq 'WORD') {
+    elsif (!ref $token->[0] && $token->[1] eq 'WORD') {
       shift @$tokens if @$tokens && $tokens->[0][1] eq 'COMMA';
       shift @$tokens if @$tokens;
     }
-    shift @$tokens if @$tokens && $tokens->[0][1] eq 'COMMA';
+    shift @$tokens if @$tokens && !ref $tokens->[0] && $tokens->[0][1] eq 'COMMA';
   }
 }
 

@@ -1,5 +1,9 @@
 Revision history for Perl module Mojolicious-Plugin-Multiplex
 
+1.0 2018-11-06
+  - Provide an ECMAScript module
+  - The old-school javascript library is now built from it using webpack
+
 0.06 2018-09-08
   - Refactor the javascript to handle unsubscriptions more cleanly
 

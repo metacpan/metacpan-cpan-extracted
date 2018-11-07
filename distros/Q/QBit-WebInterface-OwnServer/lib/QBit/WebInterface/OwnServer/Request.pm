@@ -1,9 +1,9 @@
 package Exception::WebInterface::OwnServer::BadRequest;
-$Exception::WebInterface::OwnServer::BadRequest::VERSION = '0.007';
+$Exception::WebInterface::OwnServer::BadRequest::VERSION = '0.008';
 use base qw(Exception);
 
 package QBit::WebInterface::OwnServer::Request;
-$QBit::WebInterface::OwnServer::Request::VERSION = '0.007';
+$QBit::WebInterface::OwnServer::Request::VERSION = '0.008';
 use qbit;
 
 use base qw(QBit::WebInterface::Request);

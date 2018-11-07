@@ -11,26 +11,16 @@ $obj->options("mode" => "script");
 $obj->options("ssh_num" => 5);
 $obj->cmd(q(echo "Dollar \$ Backtick \` Backslash \\\\ Quote \\""));
 $obj->cmd("hostname");
-@out = $obj->ssh(@ARGV);
+$obj->ssh(@ARGV);
 
 foreach my $host (@ARGV) {
    print "#############################\n";
    print "# $host\n";
    print "#############################\n";
-   $tmp = shift(@out);
-   @tmp = @$tmp;
-   shift(@tmp);
 
-   while (@tmp) {
-      my ($cmd_num,$status,@alt) = @{ shift(@tmp) };
-      foreach my $alt (@alt) {
-         my($cmd,$exit,$stdout,$stderr) = @$alt;
-         print "# $cmd\n";
-         print "# STDOUT\n";
-         print join("\n",@$stdout),"\n";
-         print "# STDERR\n";
-         print join("\n",@$stderr),"\n";
-         print "\n";
-      }
+   @tmp = $obj->output('host' => $host, 'output' => 'stdout', 'command' => 'all');
+
+   foreach my $tmp (@tmp) {
+      print join("\n",@$tmp,'');
    }
 }

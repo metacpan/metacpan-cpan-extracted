@@ -3,11 +3,13 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.9.10';
+$Git::Hooks::VERSION = '2.10.0';
 use 5.010;
 use utf8;
 use Carp;
 use Exporter qw/import/;
+use Path::Tiny;
+use Log::Any '$log';
 use Git::Repository qw/GitHooks Log/;
 
 our @EXPORT; ## no critic (Modules::ProhibitAutomaticExportation)
@@ -23,6 +25,7 @@ BEGIN {                         ## no critic (RequireArgUnpacking)
             PUSH_TO_CHECKOUT PRE_AUTO_GC POST_REWRITE
 
             REF_UPDATE PATCHSET_CREATED DRAFT_PUBLISHED
+            COMMIT_RECEIVED SUBMIT
           /;
 
     for my $installer (@installers) {
@@ -48,9 +51,19 @@ BEGIN {                         ## no critic (RequireArgUnpacking)
 sub run_hook {
     my ($hook_name, @args) = @_;
 
+    my $hook_basename = path($hook_name)->basename;
+
+    # Contextualize the logs with the PID on server hooks. However, note that
+    # the Log::Any::context method was implemented on Log::Any version 1.050.
+    $log->context->{pid} = $$
+        if $hook_basename =~ /^(?:(pre|post)?-receive|(post-)?update|push-to-checkout)$/
+        && $log->can('context');
+
+    $log->info("run_hook($hook_basename)", {args => \@args});
+
     my $git = Git::Repository->new();
 
-    my $hook_basename = $git->prepare_hook($hook_name, \@args);
+    $git->prepare_hook($hook_name, \@args);
 
     $git->load_plugins();
 
@@ -89,11 +102,14 @@ sub run_hook {
     }
 
     if (my $faults = $git->get_faults()) {
+        $log->debug(Environment => {ENV => \%ENV});
         $faults .= "\n" unless $faults =~ /\n$/;
         if (($hook_basename eq 'commit-msg' or $hook_basename eq 'pre-commit')
                 and not $git->get_config_boolean(githooks => 'abort-commit')) {
+            $log->warning(Warning => {faults => $faults});
             carp $faults;
         } else {
+            $log->error(Error => {faults => $faults});
             croak $faults;
         }
     }
@@ -116,7 +132,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -228,7 +244,7 @@ Instead of having separate scripts implementing different
 functionality you may have a single script implementing all the
 functionality you need either directly or using some of the existing
 plugins, which are implemented by Perl scripts in the Git::Hooks::
-namespace. This single script can be used to implement all standard
+name space. This single script can be used to implement all standard
 hooks, because each hook knows when to perform based on the context in
 which the script was called.
 
@@ -293,7 +309,7 @@ implemented in the generic script you have created. They must be
 defined after the C<use Git::Hooks> line and before the C<run_hook()>
 line.
 
-A hook should return a boolean value indicating if it was
+A hook should return a Boolean value indicating if it was
 successful. B<run_hook> dies after invoking all hooks if at least one
 of them returned false.
 
@@ -446,7 +462,7 @@ The CONFIGURATION section below explains this in more detail.
 
 =head2 Implementing Plugins
 
-Plugins are simply Perl modules inside the Git::Hooks namespace. Choose a
+Plugins are simply Perl modules inside the Git::Hooks name space. Choose a
 descriptive name for it so that it can be installed by means of the
 C<githooks.plugin> configuration option. The only requirement of a plugin is
 that it record one of more functions as hooks using the HOOK DIRECTIVES
@@ -624,23 +640,50 @@ error message.
 
 =head2 Gerrit Hooks
 
-L<Gerrit|gerrit.googlecode.com> is a web based code review and project
-management for Git based projects. It's based on
-L<JGit|http://www.eclipse.org/jgit/>, which is a pure Java
-implementation of Git.
+L<Gerrit|https://www.gerritcodereview.com/> is a web based code review and
+project management for Git based projects. It's based on
+L<JGit|http://www.eclipse.org/jgit/>, which is a pure Java implementation of
+Git.
 
 Gerrit doesn't support Git standard hooks. However, it implements its own
 L<special
-hooks|https://gerrit-review.googlesource.com/Documentation/config-hooks.html>.
-B<Git::Hooks> currently supports only three of Gerrit hooks:
+hooks|https://gerrit.googlesource.com/plugins/hooks/+/refs/heads/master/src/main/resources/Documentation/hooks.md>.
+B<Git::Hooks> currently supports only a few of Gerrit hooks:
+
+=head3 Synchronous hooks
+
+These hooks are invoked synchronously so it is recommended that they not block.
+
+Their purpose is the same as Git's B<update> hook, i.e. to block commits from
+being integrated, and Git::Hooks's plugins usually support them all together.
 
 =over
 
 =item * ref-update
 
-The B<ref-update> hook is executed synchronously when a user performs
-a push to a branch. It's purpose is the same as Git's B<update> hook
-and Git::Hooks's plugins usually support them both together.
+This is called when a ref update request (direct push, non-fast-forward update,
+or ref deletion) is received by Gerrit. It allows a request to be rejected
+before it is committed to the Gerrit repository.  If the hook fails the update
+will be rejected.
+
+=item * commit-received
+
+This is called when a commit is received for review by Gerrit. It allows a push
+to be rejected before the review is created. If the hook fails the push will be
+rejected.
+
+=item * submit
+
+This is called when a user attempts to submit a change. It allows the submit to
+be rejected. If the hook fails the submit will be rejected.
+
+=back
+
+=head3 Asynchronous hooks
+
+These hooks are invoked asynchronously on a background thread.
+
+=over
 
 =item * patchset-created
 
@@ -674,6 +717,31 @@ to work on them. All plugins that work on the B<patchset-created> also work
 on the B<draft-published> hook to cast a vote when drafts are published.
 
 =back
+
+=head2 Logging
+
+L<Git::Hooks> logs using the L<Log::Any> framework. You may tell where it should
+log using any available L<Log::Any::Adapter> module.
+
+For example, to log everything to a file you just have to add a line to your
+hook script, like this:
+
+        #!/usr/bin/env perl
+        use Log::Any::Adapter (File => '/var/log/githooks.log');
+        use Git::Hooks;
+        run_hook($0, @ARGV);
+
+This will produce copious logs. If you are interested only in the informational
+messages, select the C<log_level> C<info>, like so:
+
+        use Log::Any::Adapter (File => '/var/log/githooks.log', log_level => 'info');
+
+Read the L<Log::Any> documentation to know what other options you have.
+
+Note that several log messages contain context data, which is a feature that was
+implemented on version 1.050 of L<Log::Any>, released on 2017-08-04. If you're
+using an older version the context data will appear as a ref-scalar and won't
+make much sense.
 
 =head1 MAIN FUNCTION
 
@@ -793,6 +861,10 @@ The information from these lines is read and can be fetched by the
 hooks using the C<Git::Hooks::get_input_data> method.
 
 =head2 REF_UPDATE(GIT, OPTS)
+
+=head2 COMMIT_RECEIVED(GIT, OPTS)
+
+=head2 SUBMIT(GIT, OPTS)
 
 =head2 PATCHSET_CREATED(GIT, OPTS)
 
@@ -960,7 +1032,7 @@ configuration options.
 =head2 groups GROUPSPEC
 
 You can define user groups in order to make it easier to configure access
-control plugins. A group is specified by a GROUPSPEC, which is a multiline
+control plugins. A group is specified by a GROUPSPEC, which is a multi-line
 string containing a sequence of group definitions, one per line. Each line
 defines a group like this, where spaces are significant only between users
 and group references:
@@ -1067,7 +1139,7 @@ anchored at the start of the username.
 
 =head2 noref REFSPEC
 
-These multivalued options are meant to selectively enable/disable hook
+These multi-valued options are meant to selectively enable/disable hook
 processing for commits in particular references (usually branches). Hook
 developers should use the C<is_reference_enabled> method
 L<Git::Repository::Plugin> method to check it.
@@ -1273,7 +1345,7 @@ Currently L<Git::Hooks> require Perl 5.10 and Git 1.7.1.
 We try to be compatible with the Git and Perl native packages of the oldest
 L<Ubuntu LTS|https://www.ubuntu.com/info/release-end-of-life> and
 L<CentOS|https://wiki.centos.org/About/Product> Linux distributions still
-getting maintainance updates.
+getting maintenance updates.
 
   +-----------------------+------+--------+-------------+
   | Distro                | Perl |   Git  | End of Life |

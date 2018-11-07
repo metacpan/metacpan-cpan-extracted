@@ -2,8 +2,8 @@ package App::MysqlUtils;
 
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2017-10-25'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-11-06'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -79,6 +79,25 @@ _
         cmdline_aliases => {
             o         => {summary=>'Shortcut for --overwrite_when=older' , is_flag=>1, code=>sub {$_[0]{overwrite_when} = 'older' }},
             O         => {summary=>'Shortcut for --overwrite_when=always', is_flag=>1, code=>sub {$_[0]{overwrite_when} = 'always'}},
+        },
+    },
+);
+
+my %args_output = (
+    directory => {
+        summary => 'Specify directory for the resulting *.txt files',
+        schema => 'dirname*',
+        default => '.',
+        cmdline_aliases => {
+            d => {},
+        },
+    },
+    mkdir => {
+        summary => 'Create output directory if not exists',
+        schema => ['true*'],
+        default => 1,
+        cmdline_aliases => {
+            p => {},
         },
     },
 );
@@ -366,24 +385,28 @@ $SPEC{mysql_sql_dump_extract_tables} = {
             'x.name.singular' => 'include_table',
             schema => ['array*', of=>'str*'],
             tags => ['category:filtering'],
+            cmdline_aliases => {I=>{}},
         },
         exclude_tables => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'exclude_table',
             schema => ['array*', of=>'str*'],
             tags => ['category:filtering'],
+            cmdline_aliases => {X=>{}},
         },
         include_table_patterns => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'include_table_pattern',
             schema => ['array*', of=>'re*'],
             tags => ['category:filtering'],
+            cmdline_aliases => {pat=>{}},
         },
         exclude_table_patterns => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'exclude_table_pattern',
             schema => ['array*', of=>'re*'],
             tags => ['category:filtering'],
+            cmdline_aliases => {xpat=>{}},
         },
         stop_after_table => {
             schema => 'str*',
@@ -484,6 +507,7 @@ $SPEC{mysql_run_sql_files} = {
         %args_database,
         # XXX output_file_pattern
         %args_overwrite_when,
+        %args_output,
     },
     deps => {
         prog => 'mysql',
@@ -492,11 +516,17 @@ $SPEC{mysql_run_sql_files} = {
 sub mysql_run_sql_files {
     my %args = @_;
 
+    my $dir = $args{directory} // '.';
+    my $mkdir = $args{mkdir} // 1;
+    if (!(-d $dir) && $mkdir) {
+        require File::Path;
+        File::Path::make_path($dir);
+    }
     my $ov_when = $args{overwrite_when} // 'none';
 
     for my $sqlfile (@{ $args{sql_files} }) {
 
-        my $txtfile = $sqlfile;
+        my $txtfile = "$dir/$sqlfile";
         $txtfile =~ s/\.sql$/.txt/i;
         if ($sqlfile eq $txtfile) { $txtfile .= ".txt" }
 
@@ -551,6 +581,7 @@ _
         %args_database,
         # XXX output_file_pattern
         %args_overwrite_when,
+        %args_output,
     },
     deps => {
         prog => 'mysql',
@@ -559,11 +590,17 @@ _
 sub mysql_run_pl_files {
     my %args = @_;
 
+    my $dir = $args{directory} // '.';
+    my $mkdir = $args{mkdir} // 1;
+    if (!(-d $dir) && $mkdir) {
+        require File::Path;
+        File::Path::make_path($dir);
+    }
     my $ov_when = $args{overwrite_when} // 'none';
 
     for my $plfile (@{ $args{pl_files} }) {
 
-        my $txtfile = $plfile;
+        my $txtfile = "$dir/$plfile";
         $txtfile =~ s/\.pl$/.txt/i;
         if ($plfile eq $txtfile) { $txtfile .= ".txt" }
 
@@ -614,7 +651,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.010 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2017-10-25.
+This document describes version 0.012 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2018-11-06.
 
 =head1 SYNOPSIS
 
@@ -631,7 +668,7 @@ This distribution includes the following CLI utilities:
 
 Usage:
 
- mysql_drop_all_tables(%args) -> [status, msg, result, meta]
+ mysql_drop_all_tables(%args) -> [status, msg, payload, meta]
 
 Drop all tables in a MySQL database.
 
@@ -678,7 +715,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -689,7 +726,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_drop_tables(%args) -> [status, msg, result, meta]
+ mysql_drop_tables(%args) -> [status, msg, payload, meta]
 
 Drop tables in a MySQL database.
 
@@ -755,7 +792,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -766,7 +803,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_query(%args) -> [status, msg, result, meta]
+ mysql_query(%args) -> [status, msg, payload, meta]
 
 Run query and return table result.
 
@@ -820,7 +857,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -831,7 +868,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_run_pl_files(%args) -> [status, msg, result, meta]
+ mysql_run_pl_files(%args) -> [status, msg, payload, meta]
 
 Run each .pl file, feed the output to `mysql` command and write result to .txt file.
 
@@ -845,6 +882,14 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<database>* => I<str>
+
+=item * B<directory> => I<dirname> (default: ".")
+
+Specify directory for the resulting *.txt files.
+
+=item * B<mkdir> => I<true> (default: 1)
+
+Create output directory if not exists.
 
 =item * B<overwrite_when> => I<str> (default: "none")
 
@@ -863,7 +908,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -874,7 +919,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_run_sql_files(%args) -> [status, msg, result, meta]
+ mysql_run_sql_files(%args) -> [status, msg, payload, meta]
 
 Feed each .sql file to `mysql` command and write result to .txt file.
 
@@ -885,6 +930,14 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<database>* => I<str>
+
+=item * B<directory> => I<dirname> (default: ".")
+
+Specify directory for the resulting *.txt files.
+
+=item * B<mkdir> => I<true> (default: 1)
+
+Create output directory if not exists.
 
 =item * B<overwrite_when> => I<str> (default: "none")
 
@@ -903,7 +956,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -914,7 +967,7 @@ Return value:  (any)
 
 Usage:
 
- mysql_sql_dump_extract_tables(%args) -> [status, msg, result, meta]
+ mysql_sql_dump_extract_tables(%args) -> [status, msg, payload, meta]
 
 Parse SQL dump and spit out tables to separate files.
 
@@ -949,7 +1002,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -979,7 +1032,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

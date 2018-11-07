@@ -2,10 +2,12 @@ use strict;
 use warnings;
 package A1z::HTML5::Template;
 
-# ABSTRACT: turns baubles into trinkets
+# ABSTRACT: Fast/easy Web Apps in Perl
 
 
-our $VERSION = '0.07';
+sub NAME { my $self = shift; my $NAME; $NAME = "Fast and Easy Web Apps"; return $NAME; }
+
+our $VERSION = '0.16';
 
 
 
@@ -36,9 +38,8 @@ sub math1
 	if ($num2 eq '') { $num2 = '4'; }
 	
 	my $out;
-	#$out .= "Repeat this line 4 times\n"  x 4 . "\n";
 	
-	my $m = $num1 * $num2;		# To avoid error: #Argument "Addition 8 + 4 = 8" isn't numeric in addition <+> at Template.PM line 70# do the math in a new var
+	my $m = $num1 * $num2;
 	my $a  = $num1 + $num2;
 	my $s  = $num1 - $num2;
 	my $s1 = $num2 - $num1;
@@ -101,6 +102,8 @@ sub timestable
 }
 # end timestable 
 
+
+
 # begin header 
 sub header 
 {
@@ -146,6 +149,8 @@ sub header
 } 
 # end header 
 
+
+
 # begin start html 01
 sub start_html  
 { 
@@ -184,6 +189,9 @@ sub start_html
 } 
 # end start_html 
 
+
+
+
 sub body_js_css 
 {
 	my $self = shift;
@@ -197,54 +205,58 @@ sub body_js_css
 	
 	my $out; 
 	
-	$out .= qq{<!--jquery-->
-<script src="/jquery/jquery-1.11.1.min.js"></script>
-<!--bootstrap/jQueryUI-->
-<script src="/jquery/bootstrap/js/bootstrap.min.js"></script>
-<script src="/jquery/ui/1.11.2.lightness/jquery-ui.min.js"></script>
+	$out .= qq^
+		<!--jquery-->
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+		<!--bootstrap/jQueryUI-->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script type="text/javascript" src="/jquery/bootstrap/fixed-top/ie10-viewport-bug-workaround.js"></script>
-<script type="text/javascript">
-// for tabs 
-\$(function() {
-    var tabs = \$( "#tabs" ).tabs();
-    tabs.find( ".ui-tabs-nav" ).sortable({
-      axis: "x",
-      stop: function() {
-        tabs.tabs( "refresh" );
-      }
-    });
-  }); 
-  
-// dialog 
-\$(function() {
-    \$( "#dialog" ).dialog({
-      autoOpen: false,
-      show: {
-        effect: "blind",
-        duration: 1000
-      },
-      hide: {
-        effect: "explode",
-        duration: 1000
-      }
-    });
- 
-    \$( "#opener" ).click(function() {
-      \$( "#dialog" ).dialog( "open" );
-    });
-  });
-  
-\$('#menu').menu(); 
-\$('#accordion').accordion(); 
-\$('#accordion1').accordion(); 
-\$('#accordion2').accordion(); 
-\$('#accordion3').accordion(); 
-\$('#tabs').tabs(); 
-//\$('#dialog').dialog(); // no need, is taken care by the animation dialog above.  enabling this will make the dialog appear on load instead of on click of a/the link
-</script>
-}; 
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script type="text/javascript" src="https://www.a1z.us/jquery/bootstrap/fixed-top/ie10-viewport-bug-workaround.js"></script>
+
+		<script type="text/javascript">
+		
+		// for tabs 
+		\$( function() {
+			var tabs = \$("#tabs").tabs();
+			tabs.find( ".ui-tabs-nav" ).sortable({
+				axis: "x",
+				stop: function() { tabs.tabs( "refresh" ); }
+			});
+		}); 
+		  
+		// dialog 
+		\$( function() {
+			\$( "#dialog" ).dialog({
+			  autoOpen: false,
+			  show: {
+				effect: "blind",
+				duration: 1000
+			  },
+			  hide: {
+				effect: "explode",
+				duration: 1000
+			  }
+			});
+		 
+			\$( "#opener" ).click(function() {
+			  \$( "#dialog" ).dialog( "open" );
+			});
+		});
+		  
+		\$('#menu').menu(); 
+		\$('#accordion').accordion(); 
+		\$('#accordion1').accordion(); 
+		\$('#accordion2').accordion(); 
+		\$('#accordion3').accordion(); 
+		\$('#tabs').tabs(); 
+		
+		</script>
+	
+	^; 
+	
+	
 	if ( $args ) 
 	{
 		
@@ -270,11 +282,11 @@ sub body_js_css
 				}
 			}
 			
-			return qq{<!--216 jQ-->$return}; 	#
+			return qq{$return}; 	#
 		}
 		else 
 		{
-			return qq{<!--223 noArgs-->$out}; 
+			return qq{$out}; 
 		}
 		
 	}
@@ -283,7 +295,10 @@ sub body_js_css
 		return qq{<!--229 noParams-->$out}; 	# 
 	} 
 	
-} 
+}
+
+
+
 
 
 # start end_html 
@@ -298,11 +313,11 @@ sub end_html
 	
 	my $out; 
 		
-	$out .= qq~</html>\n\n~;
+	$out .= qq{</html>\n\n};
 	
 	if ($ARGV and $ARGV > 0 or scalar(@keys) > 0) 
 	{
-		return qq~@_~;
+		return qq{@_};
 	}
 	else 
 	{	
@@ -310,6 +325,9 @@ sub end_html
 	}
 } 
 # end end_html
+
+
+
 
 # start head title 02 
 sub head_title
@@ -323,28 +341,31 @@ sub head_title
 	
 	my $out; 
 	
-	$out .= qq~~; 
+	$out .= qq{}; 
 	
 	if ($ARGV and $ARGV > 0 or scalar(@keys) > 0) 
 	{
 		
 		if ($key) 
 		{
-			return qq~<title>@_</title>\n~; 
+			return qq{<title>@_</title>\n}; 
 		}
 		else 
 		{
-			return qq~<title>Template</title>\n~; 
+			return qq{<title>Template</title>\n}; 
 		}
 		
 	}
 	else 
 	{
-		return qq~<title>Package Html5</title>\n~; 	# this works but does not ask the user
+		return qq{<title>Package Html5</title>\n}; 	# this works but does not ask the user
 	}
 	
 } 
 # end head title 
+
+
+
 
 # begin head meta 03
 sub head_meta
@@ -360,12 +381,12 @@ sub head_meta
 	
 	my $out; 
 	
-	$out .= qq~<meta charset="utf-8">
+	$out .= qq{<meta charset="utf-8">
 <meta lang="en">
 <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
 <meta name="HandheldFriendly" content="true"> 
 <meta name="viewport" content="width=device-width, initial-scale=1"> 
-~; 
+}; 
 	
 	if ($args) 
 	{
@@ -380,26 +401,29 @@ sub head_meta
 				
 				my ( $meta_name, $meta_cont) = split(/---/, $_, 2);
 				
-				$return .= qq~<meta name="$meta_name" content="$meta_cont">\n~; 
+				$return .= qq{<meta name="$meta_name" content="$meta_cont">\n}; 
 			}
 			
-			return qq~$return<!--360-->~; 
+			return qq{$return<!--360-->}; 
 		}
 		else 
 		{
-			$out .= qq~<meta name="description" content="HTML5 by Business Impact Solutions - bislinks.com"/><!--364-->~; 
+			$out .= qq{<meta name="description" content="HTML5 by Business Impact Solutions - bislinks.com"/><!--364-->}; 
 			# add default meta if user has not called one of his own
-			return qq~$out~; 
+			return qq{$out}; 
 		}
 		
 	}
 	else 
 	{
-		return qq~$out~; 	# this works but does not ask the user
+		return qq{$out}; 	# this works but does not ask the user
 	}
 	
 } 
 # end head meta 03 
+
+
+
 
 # begin body top nav bar
 sub body_topnavbar
@@ -409,7 +433,7 @@ sub body_topnavbar
 	my %in;
 	
 	%in = (
-		file => "/A1z/Html5/Template/tob-nav-bar.js",
+		file => "https://www.a1z.us/js/utils/top-nav-bar.js",
 		name => "Menu",
 		@_,
 	);
@@ -424,10 +448,13 @@ sub body_topnavbar
 <!-- top nav bar end--> 
 }; 
 	
-	return qq~$out\n~; 	# this works but does not ask the user
+	return qq{$out\n}; 	# this works but does not ask the user
 	
 } 
 # end body top nav bar
+
+
+
 
 sub head_js_css
 {
@@ -442,20 +469,22 @@ sub head_js_css
 	
 	my $out; 
 	
-	$out .= qq~<!-- Bootstrap/jqueryUI -->
+	$out .= qq{
+	
+	<!-- Bootstrap/jqueryUI -->
 
-<link href="/jquery/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-<link href="/jquery/bootstrap/fixed-top/navbar-fixed-top.css" rel="stylesheet">
-<link href="/jquery/ui/themes/smoothness/jquery-ui.min.css" rel="stylesheet">
-<link href="/jquery/ui/themes/smoothness/theme.css" rel="stylesheet">
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="https://www.a1z.us/jquery/bootstrap/fixed-top/navbar-fixed-top.css" rel="stylesheet">
+	<link href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css" rel="stylesheet">
 
-<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-<!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+	<!--HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries-->
 
-~; 
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+
+}; 
 	
 	if ($args) 
 	{
@@ -464,39 +493,42 @@ sub head_js_css
 		{
 			my $return;
 			
-			for (@keys ) 
+			for (@keys) 
 			{
 				chomp;
 				if ($_ =~ /.js$/)
 				{
-					$return .= qq~<!--442--> \n<script type="text/javascript" src="$_"></script> \n~; 
+					$return .= qq{<!--442--> \n<script type="text/javascript" src="$_"></script> \n}; 
 				}
 				elsif ($_ =~ /.css$/)
 				{
-					$return .= qq~<!--446--> \n<link href="$_" rel="stylesheet" style="text/css"> \n~; 
+					$return .= qq{<!--446--> \n<link href="$_" rel="stylesheet" style="text/css"> \n}; 
 				}
 				else 
 				{
 					# do nothing
-					return qq~@keys<!--469-->\n~; 
+					return qq{@keys<!--469-->\n}; 
 				}
 			}
 			
-			return qq~$return<!--473 jQ-->\n~; 
+			return qq{$return<!--473 jQ-->\n}; 
 		}
 		else 
 		{
-			return qq~$out\n~; 
+			return qq{$out\n}; 
 		}
 		
 	}
 	else 
 	{
-		return qq~$out\n~; 	# this works but does not ask the user
+		return qq{$out\n}; 	# this works but does not ask the user
 	}
 	
 } 
 # end head js css
+
+
+
 
 # begin end head
 sub end_head 
@@ -510,27 +542,28 @@ sub end_head
 	
 	my $out; 
 	
-	$out .= qq~</head>~; 
+	$out .= qq{</head>}; 
 	
 	if ($ARGV and $ARGV > 0 or scalar(@keys) > 0) 
 	{
 		
 		if (@_) 
 		{
-			return qq~@_\n~; 
+			return qq{@_\n}; 
 		}
 		else 
 		{
-			return qq~$out\n~; 
+			return qq{$out\n}; 
 		}
 		
 	}
 	else 
 	{
-		return qq~$out\n~; 	# this works but does not ask the user
+		return qq{$out\n}; 	# this works but does not ask the user
 	}
 } 
 # end end head 
+
 
 
 # begin begin body 
@@ -545,24 +578,24 @@ sub begin_body
 	
 	my $out; 
 	
-	$out .= qq~<body>~; 
+	$out .= qq{<body>}; 
 	
 	if ($ARGV and $ARGV > 0 or scalar(@keys) > 0) 
 	{
 		
 		if (@_) 
 		{
-			return qq~@_\n~; 
+			return qq{@_\n}; 
 		}
 		else 
 		{
-			return qq~$out\n~; 
+			return qq{$out\n}; 
 		}
 		
 	}
 	else 
 	{
-		return qq~$out\n~; 	# this works but does not ask the user
+		return qq{$out\n}; 	# this works but does not ask the user
 	}
 } 
 # end begin body
@@ -572,9 +605,6 @@ sub begin_body
 # begin accordion or rather file content.  Need to change name of this method
 sub body_accordion 
 {
-
-
-
 	my $self = shift;
 	
 	my $key = "@_"; 
@@ -584,7 +614,7 @@ sub body_accordion
 	
 	my $out; 
 	
-	$out .= qq~<!--begin Content--> 
+	$out .= qq{<!--begin Content--> 
 <div id="accordion617" class="accordion">
 	<h3>Who is it for</h3>
 	<div>For those who know/uderstand Perl/HTML/jQuery</div>
@@ -597,27 +627,31 @@ sub body_accordion
 </div>
 
 <!--end Content-->
-~; 
+
+}; 
 	
 	if ($ARGV and $ARGV > 0 or scalar(@keys) > 0) 
 	{
 		
 		if (@_) 
 		{
-			return qq~@_\n~; 
+			return qq{\n@_\n}; 
 		}
 		else 
 		{
-			return qq~\n<!--525--> \n$out\n~; 
+			return qq{\n$out\n}; 
 		}
 		
 	}
 	else 
 	{
-		return qq~\n$out\n~; 	#
+		return qq{\n$out\n}; 	#
 	}
 } 
 # end accordion
+
+
+
 
 sub body_article 
 {  
@@ -649,6 +683,9 @@ sub body_article
 	}
 }
 
+
+
+
 # begin begin body 
 sub end_body 
 { 
@@ -661,27 +698,30 @@ sub end_body
 	
 	my $out; 
 	
-	$out .= qq~\n</body>\n~; 
+	$out .= qq{\n</body>\n}; 
 	
 	if ($ARGV and $ARGV > 0 or scalar(@keys) > 0) 
 	{
 		
 		if (@_) 
 		{
-			return qq~@_\n~; 
+			return qq{@_\n}; 
 		}
 		else 
 		{
-			return qq~$out\n~; 
+			return qq{$out\n}; 
 		}
 		
 	}
 	else 
 	{
-		return qq~$out\n~; 	# this works but does not ask the user
+		return qq{$out\n}; 	# this works but does not ask the user
 	}
 } 
 # end end body
+
+
+
 
 # begin content folder to select form 
 sub body_form 
@@ -691,9 +731,9 @@ sub body_form
 	my $out; 
 	
 	my @keys;  
-	if (@_) { @keys = @_; } 
+	if (@_) { @keys = "@_"; } 
 	
-	my ($vars, $vals) = ''; 
+	my ($vars, $vals) = (''); 
 	for (@keys) 
 	{
 		$vars = $_ if ($_ =~ /^vars/); 
@@ -723,17 +763,18 @@ sub body_form
 	{
 		# get the params for the form 
 		my ($sel_key, $sel_name, $sel_default, $folder_or_file) = split(/\,/, $form_vars[3], 4); 
-		$select .= qq~<label for"$sel_name">$sel_default</label>
-<div class="form-group"><!--begin select-->
-<select name="$sel_name">
-	<option selected value="$sel_default">$sel_default</option>
-~;
+		$select .= qq{
+			<label for"$sel_name">$sel_default</label>
+			<div class="form-group"><!--begin select-->
+			<select name="$sel_name">
+			<option selected value="$sel_default">$sel_default</option>
+		};
 		
 		#now open file/folder to fill "options" 
 		if ( -f $folder_or_file ) 
 		{
 			# open as file 
-			#$select .= qq~none~; 
+			#$select .= qq{none}; 
 		}
 		elsif (-d $folder_or_file)
 		{
@@ -751,7 +792,7 @@ sub body_form
 				next if $file =~ /^(\.|\.\.)/; 
 				# do not add hidden files to the options list
 				next if $file =~ /^\./; 
-				#$select .= '  ' x 8 . qq~<option value="$file">$file</option>\n~ if $file; 	# ' ' x 8 = 8 spaces 
+				#$select .= '  ' x 8 . qq{<option value="$file">$file</option>\n} if $file; 	# ' ' x 8 = 8 spaces 
 				
 				# get the size of th file 
 				my $size = -s "$folder_or_file/$file"; 
@@ -759,39 +800,39 @@ sub body_form
 					$size /= 1024; 
 					$size /= 1024;
 					$size = sprintf "%.2f", $size; 
-				$select .= qq~\t<option value="$file">$file [$size mb]</option>\n~ if $file; 	# ' ' x 9 #= spaces
+				$select .= qq{\t<option value="$file">$file [$size mb]</option>\n} if $file; 	# ' ' x 9 #= spaces
 			}
 		}
 
-$select .= qq~</select>
-</div><!--end select-->
-~; 
+		$select .= qq{
+			</select> </div> 
+		}; 
 	}
 	else 
 	{
 		# no select
-		$select .= qq~~; 
+		$select .= qq{}; 
 	}
 	 
 	
-	$out .= qq~<form action="$form_vars[2]" method="$form_vars[1]">~;  
+	$out .= qq{<form action="$form_vars[2]" method="$form_vars[1]">};  
 	
 		# add hidden fields/values # from $form_vars[4] 
 		for (@hidden)
 		{
-			my ($name, $value) = split(/---/, $_, 2) if $_; 
-			$out .= qq~<input type="hidden" name="$name" value="$value"/>\n~ if $_; 
+			my ($name, $value) = split(/\-\-\-/, $_, 2) if $_; 
+			$out .= qq{<input type="hidden" name="$name" value="$value"/>\n} if $_; 
 		}
 		# add select 
-		$out .= qq~$select~;  
-	$out .= qq~\n<button type="submit" class="btn btn-default">Submit</button>\n</form>\n\n~; 
+		$out .= qq{$select};  
+	$out .= qq{\n<button type="submit" class="btn btn-default">Submit</button>\n</form>\n\n}; 
 	
-	return qq~$out~; 
-	
-	
+	return qq{$out}; 
 }
 
-# 
+# end body_form 
+
+
 
 sub defaults_begin
 {
@@ -814,6 +855,8 @@ sub defaults_begin
 		return $out; 
 }
 
+
+
 sub defaults_end 
 {
 	my $self = shift; 
@@ -831,126 +874,145 @@ sub defaults_end
 
 
 
-# Begin Fri Mar 13 00:15:20 2015
-
-
 # HTML 
-my %HTML = (
-	-defaultjquery => qq~<script type="text/javascript" src="/jquery/jquery-1.11.1.min.js"></script>
-<!--bootstrap/jQueryUI-->
-<script type="text/javascript" src="/jquery/bootstrap/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/jquery/ui/1.11.2.lightness/jquery-ui.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script type="text/javascript" src="/jquery/bootstrap/fixed-top/ie10-viewport-bug-workaround.js"></script>
-<script type="text/javascript">
-// for tabs 
-\$(function() {
-    var tabs = \$( "#tabs" ).tabs();
-    tabs.find( ".ui-tabs-nav" ).sortable({
-      axis: "x",
-      stop: function() {
-        tabs.tabs( "refresh" );
-      }
-    });
-  }); 
-  
-// dialog 
-\$(function() {
-    \$( "#dialog" ).dialog({
-      autoOpen: false,
-      show: {
-        effect: "blind",
-        duration: 1000
-      },
-      hide: {
-        effect: "explode",
-        duration: 1000
-      }
-    });
- 
-    \$( "#opener" ).click(function() {
-      \$( "#dialog" ).dialog( "open" );
-    });
-  });
-  
-\$('#menu').menu(); 
-\$('#accordion').accordion(); 
-\$('#accordion1').accordion(); 
-\$('#accordion2').accordion(); 
-\$('#accordion3').accordion(); 
-\$('accordion617').accordion();
-\$('#tabs').tabs(); 
-</script>
-~,
-	 
+my %HTML;
+
+%HTML = (
+	-defaultjquery => qq{\n<!-- -defaultjquery-->
+
+		<!-- jquery-->
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+		<!--bootstrap-->
+		<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
+		<!--blueimp gallery-->
+		<script src="https://blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
+
+		<!-- jquery ui -->
+		<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<script type="text/javascript" src="https://www.a1z.us/jquery/bootstrap/fixed-top/ie10-viewport-bug-workaround.js"></script>
+		<script type="text/javascript">
+		
+		// for tabs 
+		\$( function() {
+			var tabs = \$( "#tabs" ).tabs();
+			
+			tabs.find( ".ui-tabs-nav" ).sortable({
+				axis: "x",
+				stop: function() { tabs.tabs( "refresh" ); }
+			});
+		}); 
+		  
+		// dialog 
+		\$(function() {
+			\$( "#dialog" ).dialog({
+			  autoOpen: false,
+			  show: {
+				effect: "blind",
+				duration: 1000
+			  },
+			  hide: {
+				effect: "explode",
+				duration: 1000
+			  }
+			});
+		 
+			\$( "#opener" ).click(function() {
+			  \$( "#dialog" ).dialog( "open" );
+			});
+		});
+		  
+			\$('#menu').menu(); 
+			\$('#accordion').accordion(); 
+			\$('#accordion1').accordion(); 
+			\$('#accordion2').accordion(); 
+			\$('#accordion3').accordion(); 
+			\$('accordion617').accordion();
+			\$('#tabs').tabs(); 
+		
+		</script>
+	},
+	
+	-default_LastItem => qq{},
+	
 );
+
 
 sub html_bootstrap_css   
 {
-	return qq~<!-- Bootstrap/jqueryUI -->
-<link href="/jquery/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-<link href="/jquery/bootstrap/fixed-top/navbar-fixed-top.css" rel="stylesheet">
-~;  
+	return qq{<!-- Bootstrap/jqueryUI -->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="https://www.a1z.us/jquery/bootstrap/fixed-top/navbar-fixed-top.css" rel="stylesheet">
+};
+  
 }
+
+
+
 
 sub html_jqueryui_css 
 {
-	return qq~<link href="/jquery/ui/themes/smoothness/jquery-ui.min.css" rel="stylesheet">
-<link href="/jquery/ui/themes/smoothness/theme.css" rel="stylesheet"> 
-~; 
+	# jquery ui theme jquery-ui.css #1.12.0
+	return qq{<link href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css" rel="stylesheet">}; 
 }
+
+
+
 
 sub html_shim_respond 
 {
-	return qq~<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	return qq{<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
-~;
+};
 
 }
+
+
 
 sub html_navbar 
 {
 	#my $self = shift; 
+
+	#serverName, pageName, menuName, dropDownLinks
 	
-	my %i;
-	%i = (
-		-nbmenu 	=>	"", 
-		-nbpage 	=> 	"",
-		-nbpage1    =>  "",
-		-nbmenu1    =>  "",
+	my %in;
+	%in = (
+		-nbMenuName 	=>	"", 
+		-nbPageName 	=> 	"",
+		-nbServer    =>  "",
+		-nbLinks => "blog-support-help-contact-sale",
 		@_,		
 	);
 	
-	return qq~<script type="text/javascript" src="/jquery/top-nav-bar.js"></script>
+	return qq{<script src="https://www.a1z.us/js/utils/top-nav-bar.js"></script>
 <!--top nav bar begin-->
-<script type="text/javascript">
+<script>
 //<-- 
-//fixed_top_navbar('$i{-nbpage1}', '', '$i{-nbmenu1}', '', '');
-fixed_top_navbar('$_[0]', '', '$_[1]', '', '');
+fixed_top_navbar('$in{-nbServer}', '$in{-nbPageName}', '$in{-nbMenuName}', '$in{-nbLinks}');
 //-->
 </script>
 <!-- top nav bar end--> 
-~; 
+}; 
 
 }
 
 
+ 
+
 sub html_bootstrap_js  
 {
-	return qq~<!-- Bootstrap/jqueryUI -->
-<link href="/jquery/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-<link href="/jquery/bootstrap/fixed-top/navbar-fixed-top.css" rel="stylesheet">
-<link href="/jquery/ui/themes/smoothness/jquery-ui.min.css" rel="stylesheet">
-<link href="/jquery/ui/themes/smoothness/theme.css" rel="stylesheet">
-<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-<!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
-~; 
+	# jquery:3.3.0 ui:1/12/1
+
+	return qq{<!-- Bootstrap/jqueryUI -->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js" rel="stylesheet" type="text/css">
+
+}; 
 
 }
 
@@ -964,23 +1026,30 @@ sub html_jquery
 	
 }
 
+
+
+
 sub html_humanejs_css
 {
-	return qq~<link rel='stylesheet' href='/jquery/humane-js/themes/bigbox.css'>
-      <link rel='stylesheet' href='/jquery/humane-js/themes/boldlight.css'>
-      <link rel='stylesheet' href='/jquery/humane-js/themes/jackedup.css'>
-      <link rel='stylesheet' href='/jquery/humane-js/themes/libnotify.css'>
-      <link rel='stylesheet' href='/jquery/humane-js/themes/original.css'>
-<link rel='stylesheet' href='/jquery/humane-js/themes/flatty.css'>
-<link href='http://fonts.googleapis.com/css?family=Ubuntu&v2' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Cabin+Sketch:700&v2' rel='stylesheet' type='text/css'>
-~; 
+	return qq{<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/humane-js/3.2.2/themes/bigbox.css'>
+      <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/humane-js/3.2.2/themes/boldlight.css'>
+      <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/humane-js/3.2.2/themes/jackedup.css'>
+      <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/humane-js/3.2.2/themes/libnotify.css'>
+      <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/humane-js/3.2.2/themes/original.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/humane-js/3.2.2/themes/flatty.min.css'>
+<link href='https://fonts.googleapis.com/css?family=Ubuntu&v2' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Cabin+Sketch:700&v2' rel='stylesheet' type='text/css'>
+}; 
+
 }
+
+
+
 
 sub html_bootstrap_bluimp 
 {
-	return qq~<!-- The Bootstrap Image Gallery lightbox, should be a child element of the document body -->
+	return qq{<!-- The Bootstrap Image Gallery lightbox, should be a child element of the document body -->
 		<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-use-bootstrap-modal="false">
 	    <!-- The container for the modal slides -->
 	    <div class="slides"></div>
@@ -1014,9 +1083,12 @@ sub html_bootstrap_bluimp
 	        </div>
 	    </div>
 	</div>
-	~;
+	};
 }
 # end sub html_bootstrap_bluimp 
+
+
+
 
 sub head 
 {
@@ -1030,12 +1102,13 @@ sub head
 		-jqueryui 	=> html_jqueryui_css, 
 		-htmlshim	=> html_shim_respond, 
 		-humanejs  => html_humanejs_css, 
-		-title 		=> "Page Title", 
-		-cssLinks => "", 
+		-title 		=> "$ENV{SERVER_NAME}" || "", 
+		-cssLinks => "https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css,https://blueimp.github.io/Gallery/css/blueimp-gallery.min.css,https://www.a1z.us/A1z/HTML5/Template.css", 
 		-cssCode => "", 
-		-mobilemeta => qq~<meta name="HandheldFriendly" content="true">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">~, 
-		-charsetmeta => qq~<meta charset="utf-8">~, 
+		-mobilemeta => qq{<meta name="HandheldFriendly" content="true">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+}, 
+		-charsetmeta => qq{<meta charset="utf-8">}, 
 		-usermeta => "",
 		@_,
 		
@@ -1043,7 +1116,7 @@ sub head
 	
 	for (keys %in) 
 	{
-		#$out .= qq~$in{$_}\n~;  # disordered 
+		#$out .= qq{$in{$_}\n};  # disordered 
 		
 	}
 
@@ -1058,7 +1131,7 @@ if ($in{-cssLinks} )
 		{
 			if ($_ =~ /\.css$/) 
 			{
-				$css .= qq~<link type="text/css" rel="stylesheet" href="$_">\n~ ; 
+				$css .= qq{<link type="text/css" rel="stylesheet" href="$_">\n} ; 
 			}
 			else 
 			{
@@ -1069,11 +1142,11 @@ if ($in{-cssLinks} )
 }
 else 
 {
-	$css = qq~~; 
+	$css = qq{}; 
 }
 
 
-	return qq~$in{-type}<!DOCTYPE html>
+	return qq{$in{-type}<!DOCTYPE html>
 <html>
 <head>
 <title>$in{-title}</title> 
@@ -1089,10 +1162,12 @@ $css
 $in{-cssCode}
 </style>
 </head>
-~; 	# thats orderly 
+}; 	# thats orderly 
 
 }
 # end head 
+
+
 
 sub body 
 {
@@ -1103,35 +1178,39 @@ sub body
 	my %in; 
 	
 	%in = (
-		-h1		=> qq~$ENV{SERVER_NAME}~,
-		-onload => qq~setTitle();~,  
-		-nbhead 	=> qq~~,
-		-nbpage => qq~~, 
-		-nbmenu => qq~~, 
-		-defaultjquery => qq~$HTML{-defaultjquery}~, 
-		-humanejs => qq~<script type="text/javascript" src="/jquery/js/humane-js/humane.min.js">~, 
-		-userjquery => qq~~, 
-		-navbar => html_navbar( $in{-nbmenu}, $in{-nbpage}, "Obselete Thu Mar 26 10:03:47 2015") , 
-		-content => qq~<div class="content">Content</div>~, 
-		-footer => qq~All rights reserved &copy; $ENV{SERVER_NAME}~, 	
+		-h1		=> qq{$ENV{SERVER_NAME}},
+		-onload => qq{setTitle();},  
+		-nbhead 	=> qq{},
+		-nbpage => qq{}, 
+		-nbmenu => qq{More}, 
+		-defaultjquery => qq{$HTML{-defaultjquery}}, 
+		-humanejs => qq{<script src="https://cdnjs.cloudflare.com/ajax/libs/humane-js/3.2.2/humane.min.js">},
+		-userjquery => qq{}, 
+		-navbar => html_navbar( $in{-nbmenu}, $in{-nbpage}, " ") , 
+		-content => qq{<div class="content">Content</div>}, 
+		-footer => qq{All rights reserved &copy; $ENV{SERVER_NAME}}, 	
 		-bootstrapbluimp => html_bootstrap_bluimp, 	
 		@_, 		
 	); 
 	
-	return qq~<body onload="$in{-onload}">
+	return qq{<body onload="$in{-onload}">
 <div id="main" class="container">
-		<script type="text/javascript" src="/jquery/utils/top-nav-bar.js"></script>
-<!--top nav bar begin-->
-<script type="text/javascript">
-//<-- 
-fixed_top_navbar('$in{-nbhead}', '$in{-nbpage}', '$in{-nbmenu}', '', '');
-//-->
-</script>
+	<!--top nav bar begin-->
+	<script type="text/javascript" src="https://www.a1z.us/js/utils/top-nav-bar.js"></script>
+	<script type="text/javascript">
+	//<-- 
+	fixed_top_navbar('$in{-nbhead}', '$in{-nbpage}', '$in{-nbmenu}', 'support-sales');
+	//-->
+	</script>
 
-$in{-bootstrapbluimp}
+	$in{-bootstrapbluimp}
 
-	<div class="content">$in{-content}</div>
-	<div class="footer">$in{-footer}</div>
+	$in{-h1}
+
+	$in{-content}
+	
+	$in{-footer}
+
 </div>
 
 $in{-defaultjquery}
@@ -1148,7 +1227,7 @@ $in{-userjquery}
 	
 </html>
 	
-~; 
+}; 
 
 }
 # end body 
@@ -1168,7 +1247,7 @@ sub create_accordion
 	} 
 	else 
 	{
-		$out .= qq~#55 Unable to open file $file~; 
+		$out .= qq{#55 Unable to open file $file}; 
 	
 	}
 	
@@ -1176,6 +1255,7 @@ sub create_accordion
 	
 } 
 # end create accordion
+
 
 
 
@@ -1197,36 +1277,36 @@ sub open_file
 	
 	if (open(FILE, "$file") )
 	{
-		#open(FILE, "$file") or $out .= qq~77 $!~; 
+		#open(FILE, "$file") or $out .= qq{77 $!}; 
 		
 		@data = <FILE>; 
 		
-		$out .= qq~\n<!--begin file output-->\n<div class="file_output">\n~; 
+		$out .= qq{\n<!--begin file output-->\n<div class="file_output">\n}; 
 		
 		# Step 1 
 		# set the header as per format  
 		if ($output_format eq 'table') 
 		{ 
-			$out .= qq~<table class="table table-striped table-bordered table-hover table-condensed table-responsive">
+			$out .= qq{<table class="table table-striped table-bordered table-hover table-condensed table-responsive">
 				<thead>
 					<tr><th colspan="2">$output_header</th></tr>
 				</thead>
 				<tbody>
-			~; 
+			}; 
 		}
 		elsif ($output_format eq 'accordion')
 		{
-			$out .= qq~<h2>$output_header</h2>\n<div id="accordion2" class="accordion"><!--118-->\n~;
+			$out .= qq{<h2>$output_header</h2>\n<div id="accordion2" class="accordion"><!--118-->\n};
 		} 
 		elsif ($output_format eq 'menu') 
 		{
-			$out .= qq~<ul class="menu" id="menu">\n<li><a href="/">$output_header</a>\n<ul>~;
+			$out .= qq{<ul class="menu" id="menu">\n<li><a href="/">$output_header</a>\n<ul>};
 		}
 		elsif ($output_format eq 'tabs')
 		{
 			# special case for tabs since the data needs to be formatted a little differently 
 			
-			$out .= qq~<h2>$output_header</h2>\n<div id="tabs">\n<ul>\n~;
+			$out .= qq{<h2>$output_header</h2>\n<div id="tabs">\n<ul>\n};
 			
 			my $sl = '0'; 
 			
@@ -1263,18 +1343,18 @@ sub open_file
 						$h1 =~ s!^==!!g;
 					}
 				
-					$out .= qq~\t<li><a href="#tabs-$sl">$h1</a></li>\n~; 
+					$out .= qq{\t<li><a href="#tabs-$sl">$h1</a></li>\n}; 
 				}
-			$out .= qq~</ul>\n~; 
+			$out .= qq{</ul>\n}; 
 		}
 		elsif ($output_format eq 'dialog')
 		{
-			$out .= qq~<h2>Dialog: <a href="#opener" id="opener" title="Opens the Dialog">$output_header</a></h2>
-<div id="dialog">\n~; 
+			$out .= qq{<h2>Dialog: <a href="#opener" id="opener" title="Opens the Dialog">$output_header</a></h2>
+<div id="dialog">\n}; 
 		}
 		else 
 		{
-			$out .= qq~\n<h2>$output_header</h2>\n~; 
+			$out .= qq{\n<h2>$output_header</h2>\n}; 
 		}
 		# End Step 1
 		
@@ -1328,7 +1408,7 @@ sub open_file
 					$div =~ s!^#!!g;
 					$h1 =~ s!^#!!g;
 				}
-				$out .= qq~\t<tr><td>$h1</td><td>$div</td></tr>\n~; 
+				$out .= qq{\t<tr><td>$h1</td><td>$div</td></tr>\n}; 
 			}
 			elsif ($output_format eq 'accordion')
 			{
@@ -1347,7 +1427,7 @@ sub open_file
 					$h1 =~ s!^--!!g;
 				} 
 				
-				$out .= qq~\t<h3>$h1</h3>\n\t<div>$div</div>\n~ if $line; 
+				$out .= qq{\t<h3>$h1</h3>\n\t<div>$div</div>\n} if $line; 
 			} 
 			elsif ($output_format eq 'menu') 
 			{
@@ -1373,7 +1453,7 @@ sub open_file
 					$div =~ s!^http!!g;
 					$h1 =~ s!^http!!g;
 				}
-				$out .= qq~\t<li id="li-$serial"><a id="a-$serial" href="$div" title="$h1">$h1</a></li>\n~;
+				$out .= qq{\t<li id="li-$serial"><a id="a-$serial" href="$div" title="$h1">$h1</a></li>\n};
 			}
 			elsif ($output_format eq 'tabs') 
 			{
@@ -1392,7 +1472,7 @@ sub open_file
 					$h1 =~ s!^==!!g;
 				}
 				
-				$out .= qq~\t<div id="tabs-$serial"><p>$div</p></div>\n~; 
+				$out .= qq{\t<div id="tabs-$serial"><p>$div</p></div>\n}; 
 			}
 			elsif ($output_format eq 'dialog')
 			{
@@ -1402,46 +1482,46 @@ sub open_file
 				$div =~ s!^(==|\#|--)!!g;
 				$h1 =~ s!^(==|\#|--)!!g;
 					
-				$out .= qq~<p>$h1</p>\n<p>$div</p>\n~; 
+				$out .= qq{<p>$h1</p>\n<p>$div</p>\n}; 
 			}
 			else 
 			{
-				$out .= qq~$h1 $div~; 	# or $line
+				$out .= qq{$h1 $div}; 	# or $line
 			}
 		} 
 		
 		# add an extra item at the end of file output
-		#$out .= qq~\t<h3>Powered by Business Impact Solutions</h3>\n\t<div>bislinks.com, bizImpactSolutions.com - Business Impact Solutions</div>\n~; 
+		#$out .= qq{\t<h3>Powered by Business Impact Solutions</h3>\n\t<div>bislinks.com, bizImpactSolutions.com - Business Impact Solutions</div>\n}; 
 		
 		# Step 3 
 		# set the output ending as per format  
 		if ($output_format eq 'table') 
 		{ 
-			$out .= qq~\n</tbody>\n</table>\n\n~; 
+			$out .= qq{\n</tbody>\n</table>\n\n}; 
 		}
 		elsif ($output_format eq 'accordion')
 		{
-			$out .= qq~\n<!--end accordion--></div>\n\n~;
+			$out .= qq{\n<!--end accordion--></div>\n\n};
 		} 
 		elsif ($output_format eq 'menu') 
 		{
-			$out .= qq~</ul></ul>~;
+			$out .= qq{</ul></ul>};
 		}
 		elsif ($output_format eq 'tabs')
 		{
-			$out .= qq~</div><!--end tabs-->\n~; 
+			$out .= qq{</div><!--end tabs-->\n}; 
 		}
 		elsif ($output_format eq 'dialog') 
 		{
-			$out .= qq~</div><!--end dialog-->\n~; 
+			$out .= qq{</div><!--end dialog-->\n}; 
 		}
 		else 
 		{
-			$out .= qq~\n\n~; 
+			$out .= qq{\n\n}; 
 		}
 		
 		# end file output wrapper
-		$out .= qq~</div><!--end file output-->\n~; 
+		$out .= qq{</div><!--end file output-->\n}; 
 		
 		close FILE; 
 		
@@ -1452,8 +1532,10 @@ sub open_file
 		my $out;
 		
 		@data = <DATA>; 
+
+		close DATA;
 	
-		$out .= qq~\n<!--begin accord 112-->\n<div id="accordion1460" class="accordion">\n~; 
+		$out .= qq{\n<!--begin accord 112-->\n<div id="accordion1460" class="accordion">\n}; 
 		foreach my $line (@data) 
 		{ 
 			chomp $line; 
@@ -1462,17 +1544,19 @@ sub open_file
 			
 			($h1, $div) = split(/\t+/, $line, 2) if $line; 
 			
-			$out .= qq~\t<h3>$h1</h3>\n\t<div>$div</div>\n~ if $line; 
+			$out .= qq{\t<h3>$h1</h3>\n\t<div>$div</div>\n} if $line; 
 		} 
-		$out .= qq~\t<h3>Powered by</h3>\n\t<div>Package HTML5</div>\n~; 
+		$out .= qq{\t<h3>Powered by</h3>\n\t<div>Perl/CPAN</div>\n}; 
 		
-		$out .= qq~</div>\n<!--end accord-->\n~; 
+		$out .= qq{</div>\n<!--end accord-->\n}; 
 		
 		return $out; 
 	}
 	
 }
 # end open_file
+
+
 
 
 sub edit_file
@@ -1556,6 +1640,7 @@ sub edit_file
 }
 
 
+
 sub write_file
 {
 	my $self = shift;
@@ -1590,7 +1675,7 @@ sub write_file
 			my @f = <F>;
 			
 			# save original file content to backup file
-			open(BAK, ">$in{file}.bak.txt") or $in{error} .= "#1570 Unable to create backup file '$in{file}.bak.txt' '$!' <br/>";
+			open(BAK, ">$in{file},bak.txt") or $in{error} .= "#1570 Unable to create backup file '$in{file},bak.txt' '$!' <br/>";
 			for (@f)
 			{
 				print BAK qq{$_};	
@@ -1630,7 +1715,7 @@ sub write_file
 			close FILE;
 			
 			
-			if (-e -f "$in{file}.bak.txt" and -e -f "$in{file}")
+			if (-e -f "$in{file},bak.txt" and -e -f "$in{file}")
 			{	
 				return "<div class='success'>Saved</div> <div class='error'>$in{error}</div>";
 			}
@@ -1655,6 +1740,65 @@ sub write_file
 	
 }
 
+# end write_file
+
+
+
+
+sub display_gallery_thumbnails
+{
+	my $self = shift;
+
+	my $out;
+
+	my %in;
+
+	%in = (
+		
+		error => "",
+
+		images_dir => "/images/a1z-html5-template/",
+		thumbs_dir => "/images/a1z-html5-template/thumbs",
+		
+		images_url => "/images/a1z-html5-template",
+		thumbs_url => "/thumbs/a1z-html5-template/thumbs",
+
+		width => "100",
+		height => "100",
+
+		@_,
+	);
+
+	if (-e -d "$in{images_dir}" and "$in{thumbs_dir}" )
+	{
+		opendir(TH, "$in{thumbs_dir}") or $in{error} .= qq{<p>$!</p>};
+		my @thumbs = readdir(TH);
+		close TH;
+
+		foreach ( @thumbs ) 
+		{
+			if ( $_ and $_ =~ /(.jpg|.gif|.jpeg|.png|.tiff)$/ )
+			{
+				$out .= qq{\n<a href="$in{images_url}/$_" title="$_" data-gallery> <img src="$in{thumbs_url}/$_" alt="Image $_" width="$in{width}" height="$in{height}"> </a> \n};
+			}
+		}
+	}
+	else
+	{
+		$in{error} .= qq{<p>Image directory does not exist or is inaccessible. Make sure you provided the correct path.</p>};
+
+		$out = $in{error};
+	}
+
+	return $out;
+}
+# end display gallery thumbnails 
+
+
+
+
+
+
 
 
 
@@ -1668,67 +1812,412 @@ __END__
 
 =head1 NAME
 
-A1z::HTML5::Template - turns baubles into trinkets
+A1z::HTML5::Template - Fast/easy Web Apps in Perl
 
 =head1 VERSION
 
-version 0.07
+version 0.16
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
     use A1z::HTML5::Template;
-
     my $foo = A1z::HTML5::Template->new();
-    ...
+
+    This directory should be writable by the web server, required to create/hold page content files.
+	This may also contain your custom JavaScript/CSS libraries.
+	Works for both Windows and Linux
+	
+		use lib '/home/user/path/to/app';
+		or
+		use lib 'C:/Inetpub/wwwroot/path/to/app';
+
+	# for features like 'say'
+	use 5.10.0;
+
+	my $h = A1z::HTML5::Template->new(); 
+
+	Fast, Easy, and Simple: Just Two Lines!
+	
+		say $h->head( -title => "My Brand Name" );
+		say $h->body( -content => qq{ Coming Soon });
+
+	For More Control/Customization: Not for the lazy!
+	
+	say $h->header('utf8');  
+	say $h->start_html(); 
+	say $h->head_title("My New App"); 
+	say $h->head_meta(); 
+
+	Load basic/required JavaScript/CSS libraries
+	say $h->head_js_css(); 
+
+	Add your own custom JavaScript/CSS files
+	say $h->head_js_css('/url/to/app/Template.css'); 
+
+	say $h->end_head(); 
+	say $h->begin_body();
+
+	say qq{<h1>My New App/Website</h1>};
+
+	say qq{<main class="container">}; 
+
+		# output file content as menu
+		say $h->body_accordion( $h->open_file("/home/user/path/to/app/open_file_example.txt", 'menu', 'Menu') ); 
+
+		# as a HTML5 table 
+		say $h->body_accordion( $h->open_file("$sys{cgibase}/open_file_example.txt", 'table', 'Table Header') );
+		
+		# Simple mathematics 
+		say $h->body_article( header => "Simple Mathematics", content => $h->math1("2", "4") );
+
+		# Times Table  
+		say $h->body_article( header => "Times Table", content => $h->timestable("2") );
+
+	say qq{</main>};
+
+	Required/Default JavaScript libraries.
+		say $h->body_js_css(); 
+	
+	Add your own JavaScript libraries:
+		say $h->body_js_css("complete-url_or_path-to-js-css-libraries")	
+
+	say $h->end_body();
+	say $h->end_html(); 
 
 =head1 NAME
 
-A1z::HTML5::Template
+	Fast and Easy Web Apps.
 
-=head1 VERSION
+	"A1z::HTML5::Template" provides customizable HTML5 tags for creating "Fast and Easy Web Apps."
 
-Version 0.07
+=head2 VERSION
 
-=head1 EXPORT
+	0.16
 
-A list of functions that can be exported.
+=head1 Installation
 
-=head1 SUBROUTINES/METHODS
+	cpan install A1z::HTML5::Template 
+	or
+	cpanm A1z::HTML5::Template
 
-header start_html head_title head_meta head_js_css end_head begin_body body_js_css body_topnavbar 
-body_accordion end_body end_html 
+=head1 METHODS
+
+	header start_html head_title head_meta head_js_css end_head begin_body body_js_css body_topnavbar body_accordion end_body end_html 
 
 =head2 new
 
    use A1z::HTML5::Template;
-   my $foo = A1z::HTML5::Template->new();
+   my $h = A1z::HTML5::Template->new();
 
 =head2 math1
 
-Usage
+	$h->math1(num1, num2);
+	
+	$h->body_article( header => "Math", content => $h->math1(num1, num2) );
 
-$foo->math1(num1, num2);
+=head2 timestable
 
-=head1 Times Table
-	usage $foo->timestable("Number");
+	$h->timestable("Number");
 
-=head1 Usage
+=head2 header
 
-	my $h = Template->new();
-	say $h->body_accordion( $h->open_file("C:/Users/user/public/app/open_file_example.txt", 'Type', 'Header') ); 
+	Provides HTML Content-Header 
+	
+	$h->header("");
 
-=head1 AUTHOR
+=head2 start_html
 
-Sudheer Murthy, C<< <pause at a1z.us> >>
+	Provides doctype html
+	
+	Default includes utf-8
+
+		$h->start_html();
+	
+	Or, add your own charset to your app:
+
+		$h->start_html('DifferentCharset');
+
+=head2 body_js_css
+
+	Add/include javascript and css files just above </body> section 
+	
+	Typically, CSS files should/are not be used here. 
+	
+	Default behavior: 
+	
+		$h->body_js_css();
+		
+		Includes 
+			jquery 1.12.4, jquery ui 1.11.4, bootstrap 3.3.0, 
+			javascript for #dialog function, #menu, #accordion, #tabs 
+	
+	Add your own .js file: 
+		
+		use $h->body_js_css("/path/to/js/file.js");
+		
+	You can use both to include default .js files and your own custom .js file. 
+
+=head2 end_html 
+
+	Provides </html>
+
+=head2 head_title
+
+	Provides <title></title>
+	
+	$h->head_title("App/Page Title");
+
+=head2 head_meta
+
+	Provides <meta ... >. Includes the following by default:
+		IE=Edge
+		HandheldFriendly
+		viewport
+	
+	$h->head_meta();
+	
+	Just like body_js_css, you can use both to add default values and your own meta 
+
+=head2 body_topnavbar
+
+	Provides top nav bar optionally.
+	
+	By default it is loaded from www.a1z.us which probably be removed in a future version.
+	So, get a copy from bootstrap 3 and store it on your server.
+
+=head2 head_js_css
+
+	provides the ability to add/include .js/.css files in the </head> tag.
+	
+	$h->head_js_css();
+	
+		Default includes the following:
+		
+			bootstrap 3.3.0 .css from maxcdn 
+			navbar-fixed-top.css from www.a1z.us
+			jquery 1.12.1 smoothness theme from code.jquery.com 
+			Shim and Respond.js from maxcdn 
+	
+	$h->head_js_css("/path/to/.js")
+	$h->head_js_css("/path/to/.css")
+
+=head2 end_head
+
+	Provides </head>
+	
+	$h->end_head();
+
+=head2 begin_body
+
+	provides <body> tag.
+	
+	$h->begin_body();
+
+=head2 body_accordion
+
+	The accordion in 'body_accordion' is misleading. It is not limited to just an accordion but all kinds of content.
+
+	C<say $h->body_accordion( $h->open_file("/path/to/app/open_file_example.txt", 'Type', 'Heading') );>
+
+	C<say $h->body_accordion( $h->open_file("/path/to/app/open_file_example.txt", "table", "Name and Price");
+
+	C<say $h->body_accordion( $h->open_file("/path/to/app/open_file_example.txt", "tabs", "Space Saving Tabs");
+
+=head2 body_article
+
+	provides the ability to add content into <main> tags. 
+	
+	$h->body_article( header => "", content => "");
+
+=head2 end_body
+
+	provides </body> tag.
+	
+	$h->end_body();
+
+=head2 body_form
+
+	provides the ability to add forms 
+	
+	$h->body_form();
+
+=head2 defaults_begin
+
+	Provides defaults for very lightweight template for those in a hurry; Can be used for apps/sites that are under construction! 
+	
+	$h->defaults_begin();
+
+=head2 defaults_end
+
+	provides defaults for lightweight or under construction app/website. 
+	
+	$h->defaults_end();
+
+=head1 HTML Hash
+
+	Hash contains -defaultjquery which is used in body.
+
+	-defaultjquery includes 
+		
+		jquery                1.12.4       from code.jquery
+		jquery ui             1.11.4       
+		bootstrap             3.3.0        from maxcdn
+		blueimp-gallery
+		ie-10 workaround                   from a1z.us
+		
+		functions
+		
+			tabs, dialog, menu, accordion
+
+=head2 html_bootstrap_css 
+
+	Used in $h->head and $h->body internally.
+
+	All methods starting with 'html_' are used internally!
+
+	Include bootstrap.min.css, #3.3.0 from maxcdn and navbar-fixed-top.css from a1z.us
+		
+		$h->html_bootstrap_css()
+
+=head2 html_jqueryui_css
+
+	Includes jquery ui theme jquery-ui.css #1.12.0
+
+=head2 html_shim_respond
+
+	html5shiv.min.js   #3.7.2
+	respond.min.js     #1.4.2
+
+=head2 html_navbar
+
+	Customizations for top-nav-bar.js from a1z.us
+
+	$h->html_navbar(
+		-nbMenuName => "menuName", 
+		-nbPageName => "pageName", 
+		-nbServer => "serverName", 
+		-nbLinks => "dropDownLinks: URLs separated by a dash, mostly relative URLs. E.g., blog-support-help-contact-sale"
+	);
+
+=head2 html_bootstrap_js
+
+	bootstrap.min.js, #3.3.0, from maxcdn
+
+=head2 html_humanejs_css
+
+	humane-js #3.2.2 cdnjs.cloudflare
+	fonts.googleapis.com
+
+=head2 html_bootstrap_bluimp
+
+	bootstrap gallery lightbox controls for use immediately after C<body> tag
+
+	C<&html_bootstrap_bluimp;>
+
+	Used internally in C<$h->body()> 
+
+=head2 head
+
+	$h->head();
+
+	For use in Fast/Easy Web App - E.g., in under construction web sites.
+
+=head2 body
+
+	$h->body();
+
+	For use in Fast/Easy Web App - E.g., in under construction web sites.
+
+=head2 create_accordion
+
+	$h->create_accordion("path/to/file/containing/accordion/elements");
+
+	Uses open_file to load content from a text file
+
+=head2 open_file
+
+	Used for loading all kinds of custom elements for different output formats stored in simple text files.
+
+	$h->open_file("path/to/file", "outputFormat", "outputHeader");
+
+	$h->open_file("C:/Inetpub/wwwroot/MyApp/menu.txt", "menu", "Menu");
+
+	This is the heart of the App, A1z::HTML5::Template, quite a long sub/method comprising of about 292 lines including empty lines. 
+
+=head2 edit_file
+
+	Edit your app/page/site. Customize HTML produced by A1z::HTML5::Template. 
+
+	Creates a form to edit contents of a file. 
+
+	The contents of this file should be in a special format. See open_file_example.txt. 
+
+	Data is stored in simple text files in the app's home dir.  
+
+	We recommend creating a separate file for editing/writing purposes, e.g., "TemplateAdmin.cgi"
+
+	use lib '/path/to/app';
+
+	use A1z::HTML5::Template;
+	my $h = A1z::HTML5::Template->new();
+
+	say $h->header('utf8');
+	say $h->start_html(); 
+	say $h->head_title("Edit App"); 
+	say $h->head_meta();
+	say $h->head_js_css();  
+	say $h->end_head(); 
+	say $h->begin_body();
+
+	# Show edit form
+
+ 	say $h->body_article( 
+
+		header => "Edit page items", 
+
+		action => "TemplateAdmin.cgi",
+
+		content => $h->edit_file( file => "/absolute/path/to/app/open_file_example.txt") 
+	);
+
+	# Save Customizations back to the same file.
+
+	# include write_file if you submit form to the same file ( TemplateAdmin.cgi )
+
+	say $h->body_article( 
+
+		header => "<a href='$sys{cgiurl}/TemplateAdmin.cgi' title='Refresh to get the latest/saved content'>Refresh</a> ", 
+
+		content => $h->write_file( file => "/absolute/path/to/app/open_file_example.txt")
+	 
+	);
+
+	say $h->body_js_css(); 
+	say $h->end_body();
+	say $h->end_html(); 
+
+=head2 write_file
+
+	See documentation for 'edit_file.'
+
+=head2 display_gallery_thumbnails
+
+	my $images = $h->display_gallery_thumbnails(
+
+		images_dir => "{images_dir}",
+		thumbs_dir => "{thumbs_dir}",
+		
+		images_url => "{images_url}",
+		thumbs_url => "{thumbs_url}",
+
+		width => "100",
+		height => "100"
+	);
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-html5-template at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML5-Template>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-a1z-html5-template at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=A1z-HTML5-Template>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -1743,23 +2232,25 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML5-Template>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=A1z-HTML5-Template>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/HTML5-Template>
+L<http://annocpan.org/dist/A1z-HTML5-Template>
 
 =item * CPAN Ratings
 
-L<https://cpanratings.perl.org/d/HTML5-Template>
+L<https://cpanratings.perl.org/d/A1z-HTML5-Template>
 
 =item * Search CPAN
 
-L<https://metacpan.org/release/HTML5-Template>
+L<https://metacpan.org/release/A1z-HTML5-Template>
 
 =back
 
 =head1 ACKNOWLEDGEMENTS
+
+	I am greatly indebted to my family for letting me be 'addicted' and 'married' to my computers.
 
 =head1 LICENSE AND COPYRIGHT
 

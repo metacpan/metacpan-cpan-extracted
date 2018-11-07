@@ -18,10 +18,10 @@ no_index:
     - t
     - inc
 requires:
-  Mojolicious: '8.00'
+  Mojolicious: '7.28'
 resources:
   bugtracker: https://github.com/jhthorsen/json-validator/issues
   homepage: https://github.com/jhthorsen/json-validator
   repository: https://github.com/jhthorsen/json-validator.git
-version: '2.14'
+version: '2.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

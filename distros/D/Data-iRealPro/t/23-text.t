@@ -28,7 +28,7 @@ my $res;
 $be->process( $u, { output => \$res } );
 my $exp = <<'EOD';
 Song: You're Still The One (Shania Twain)
-Style: Rock Ballad; key: C; actual key: C; tempo: 155
+Style: Rock Ballad; key: C; tempo: 155
 
 {*i T44D _ |D/F# _ |G _ |A _ }
 {*A D _ |D/F# _ |G _ |A _ }

@@ -340,7 +340,7 @@ My.pm:
 
 Whenever you create a new instance of a meta-object you must provide the name
 of the package to which the meta-object belongs. The 'package' metric will be
-set to this package name, and can be retirved via the 'package' method:
+set to this package name, and can be retrieved via the 'package' method:
 C<$meta->package()>.
 
 =head1 HASH METRICS
@@ -485,7 +485,7 @@ details on how to write a hook coderef.
     }
 
 Action and hook methods are called when someone calls
-C<$meta-<gt>metric_action(...)>. First all before hooks will be called, the the
+C<$meta-<gt>metric_action(...)>. First all before hooks will be called, the
 action itself, and finally the after hooks will be called. All methods in the
 chain get the exact same unaltered arguments. Only the main action sub can
 return anything.

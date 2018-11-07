@@ -4,7 +4,7 @@ use Moose::Role;
 
 requires 'response', 'uri_for', 'uri_for_action';
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 our $DEFAULT_REDIRECT_STATUS = 303;
 
 my $normalize_status = sub {
@@ -32,18 +32,23 @@ sub redirect_to_action {
   return $c->uri_for($action_proto, @args)
     if Scalar::Util::blessed($action_proto); 
 
-  my $controller = $c->controller;
-  my $action;
-  if($action_proto =~/\//) {
-    my $path = $action_proto=~m/^\// ? $action_proto : $controller->action_for($action_proto)->private_path;
-    die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}" unless $path;
-    die "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
+  my $url;
+  if($c->can('uri')) {
+    $url = $c->uri($action_proto, @args);
   } else {
-    die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}"
-      unless $action = $controller->action_for($action_proto);
+    my $controller = $c->controller;
+    my $action;
+    if($action_proto =~/\//) {
+      my $path = $action_proto=~m/^\// ? $action_proto : $controller->action_for($action_proto)->private_path;
+      die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}" unless $path;
+      die "$path is not a private path" unless $action = $c->dispatcher->get_action_by_path($path);
+    } else {
+      die "$action_proto is not an action for controller ${\$controller->catalyst_component_name}"
+        unless $action = $controller->action_for($action_proto);
+    }
+    die "Could not create a URI from '$action_proto' with the given arguments" unless $action;
+    $url = $c->uri_for($action, @args);
   }
-  die "Could not create a URI from '$action_proto' with the given arguments" unless $action;
-  my $url = $c->uri_for($action, @args);
   $c->response->redirect($url, $code);
 }
 
@@ -163,7 +168,9 @@ distinguish from an argument that gets passed to 'uri_for'.
 
 =head2 redirect_to_action
 
-Same as 'redirect_to' but submits the arguments to 'uri_for_action' instead.
+Same as 'redirect_to' but submits the arguments to 'uri_for_action' instead.  Please
+B<NOTE> that if you also install L<Catalyst::Plugin::URI> we will use that for
+action resolution (supports named Actions).
 
 =head1 AUTHOR
 
@@ -175,7 +182,7 @@ L<Catalyst>, L<Catalyst::Response>
 
 =head1 COPYRIGHT & LICENSE
  
-Copyright 2015, John Napiorkowski L<email:jjnapiork@cpan.org>
+Copyright 2018, John Napiorkowski L<email:jjnapiork@cpan.org>
  
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

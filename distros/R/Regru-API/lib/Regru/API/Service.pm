@@ -7,8 +7,8 @@ use warnings;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '0.047'; # VERSION
-our $AUTHORITY = 'cpan:IMAGO'; # AUTHORITY
+our $VERSION = '0.049'; # VERSION
+our $AUTHORITY = 'cpan:OLEG'; # AUTHORITY
 
 with 'Regru::API::Role::Client';
 
@@ -58,7 +58,7 @@ Regru::API::Service - REG.API v2 service management
 
 =head1 VERSION
 
-version 0.047
+version 0.049
 
 =head1 DESCRIPTION
 

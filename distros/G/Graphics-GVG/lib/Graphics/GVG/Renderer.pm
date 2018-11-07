@@ -22,12 +22,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Graphics::GVG::Renderer;
-$Graphics::GVG::Renderer::VERSION = '0.91';
+$Graphics::GVG::Renderer::VERSION = '0.92';
 use strict;
 use warnings;
 use Data::UUID;
 use Moose::Role;
 
+requires 'class_suffix';
 requires 'make_line';
 requires 'make_rect';
 requires 'make_poly';
@@ -48,21 +49,38 @@ has 'glow_count' => (
 
 sub make_pack
 {
-    my ($self) = @_;
-    my $uuid = Data::UUID->new->create_hex;
-    my $pack = __PACKAGE__ . '::' . $uuid;
+    my ($self, $ast) = @_;
+    my $class_suffix = $self->class_suffix;
+    my $class_prefix = $ast->meta_data->{class_prefix};
+
+    if(! defined $class_prefix ) {
+        my $uuid = Data::UUID->new->create_hex;
+        $class_prefix = __PACKAGE__ . '::' . $uuid;
+    }
+
+    $class_suffix =~ s/\A :://x;
+    $class_prefix =~ s/:: \z//x;
+
+    my $pack = $class_prefix . '::' . $class_suffix;
     return $pack;
 }
 
 sub make_obj
 {
     my ($self, $ast, $args) = @_;
+    my $pack = $self->make_class( $ast );
+    my $obj = $pack->new( $args );
+    return $obj;
+}
+
+sub make_class
+{
+    my ($self, $ast) = @_;
 
     my ($code, $pack) = $self->make_code( $ast );
     eval $code or die $@;
 
-    my $obj = $pack->new( $args );
-    return $obj;
+    return $pack;
 }
 
 sub make_code
@@ -70,8 +88,7 @@ sub make_code
     my ($self, $ast, $target_class) = @_;
 
     my $pack = $target_class
-        // $ast->meta_data->{class}
-        // $self->make_pack;
+        // $self->make_pack( $ast );
     my $code = $self->make_opening_code( $pack, $ast );
     $code .= $self->_walk_ast( $pack, $ast, $ast );
     $code .= $self->make_closing_code( $pack, $ast );

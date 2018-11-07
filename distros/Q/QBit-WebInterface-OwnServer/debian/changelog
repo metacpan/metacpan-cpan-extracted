@@ -1,3 +1,11 @@
+libqbit-webinterface-ownserver-perl (0.008) saucy; urgency=low
+
+  * use Exception
+
+  * use subs from base
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Mon,  5 Nov 2018 22:12:03 +0300
+
 libqbit-webinterface-ownserver-perl (0.007) saucy; urgency=low
 
   * upload to cpan

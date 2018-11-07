@@ -1,0 +1,110 @@
+SC_FAILED=0;
+SC_ORIG_DIRE=`pwd`;
+
+main () {
+   SC_DIRE=$SC_ORIG_DIRE;
+
+   #
+   # Command 1
+   #
+
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+
+   #
+   # Command 1.0
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      rm -f TESTDIR/fail_twice.*.flag;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_FAILED=1;
+   fi
+
+   if [ $SC_FAILED -ne 0 ]; then
+      return;
+   fi
+
+   #
+   # Command 2
+   #
+
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+
+   SC_RETRIES=2;
+   SC_TRY=0;
+   while [ $SC_TRY -lt $SC_RETRIES ]; do
+
+      #
+      # Command 2.0
+      #
+
+      if [ $SC_CURR_SUCC -eq 0 ]; then
+         TESTDIR/bin/fail_twice TESTDIR;
+         CMD_EXIT=$?;
+         if [ $CMD_EXIT -eq 0 ]; then
+            SC_CURR_SUCC=1;
+            SC_CURR_EXIT=0;
+         elif [ $SC_CURR_EXIT -eq 0 ]; then
+            SC_CURR_EXIT=$CMD_EXIT;
+         fi
+      fi
+
+      if [ $SC_CURR_EXIT -eq 0 ]; then
+         break;
+      fi
+      SC_TRY=`expr $SC_TRY + 1`;
+   done
+
+   if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_FAILED=2;
+   fi
+
+   if [ $SC_FAILED -ne 0 ]; then
+      return;
+   fi
+
+   #
+   # Command 3
+   #
+
+   SC_CURR_EXIT=0;
+   SC_CURR_SUCC=0;
+
+   #
+   # Command 3.0
+   #
+
+   if [ $SC_CURR_SUCC -eq 0 ]; then
+      TESTDIR/bin/succ 1 warn;
+      CMD_EXIT=$?;
+      if [ $CMD_EXIT -eq 0 ]; then
+         SC_CURR_SUCC=1;
+         SC_CURR_EXIT=0;
+      elif [ $SC_CURR_EXIT -eq 0 ]; then
+         SC_CURR_EXIT=$CMD_EXIT;
+      fi
+   fi
+
+   if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+      SC_FAILED=3;
+   fi
+
+   if [ $SC_FAILED -ne 0 ]; then
+      return;
+   fi
+}
+
+main;
+cd "$SC_ORIG_DIRE";
+exit $SC_FAILED;

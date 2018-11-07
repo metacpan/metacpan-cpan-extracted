@@ -39,6 +39,7 @@
             "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "List::Util" : "1.33",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0",
@@ -49,7 +50,7 @@
    "provides" : {
       "R::DescriptionFile" : {
          "file" : "lib/R/DescriptionFile.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -58,7 +59,7 @@
          "url" : "https://github.com/stphnlyd/perl5-R-DescriptionFile.git"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

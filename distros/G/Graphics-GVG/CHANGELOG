@@ -1,5 +1,10 @@
 Revision history for perl module Graphics::GVG
 
+0.92 2018-11-05
+
+- Method for creating a class without creating an object
+- Role for doing sensible things for the package start and end code
+
 0.91 2018-11-04
 
 - Override classname

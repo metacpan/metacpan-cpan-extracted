@@ -11,10 +11,10 @@ WriteMakefile(
     PL_FILES            => {},
     MIN_PERL_VERSION	=> '5.010001',
     PREREQ_PM => {
+        'ExtUtils::MakeMaker' => 6.46,
         'Test::More' => 0,
     },
     META_MERGE => {
-      license      => "perl_5",
       resources    => {
         repository => {
           type => 'git',

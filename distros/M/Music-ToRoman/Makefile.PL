@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Convert chords to Roman numeral notation",
+  "ABSTRACT" => "Convert notes and chords to Roman numeral notation",
   "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Music::ToRoman",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "List::MoreUtils" => 0,
     "Moo" => 2,
     "Music::Scales" => 0,
@@ -27,11 +28,12 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0300",
+  "VERSION" => "0.0600",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,12 +41,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,
   "Moo" => 2,
   "Music::Scales" => 0,
+  "Test::Exception" => 0,
   "Test::More" => 0,
   "namespace::clean" => 0,
   "strict" => 0,

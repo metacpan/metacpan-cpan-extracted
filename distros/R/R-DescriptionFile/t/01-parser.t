@@ -7,6 +7,7 @@ use Data::Dumper;
 use FindBin;
 use Path::Tiny;
 
+use List::Util 1.33;
 use R::DescriptionFile;
 
 use Test2::V0;
@@ -14,7 +15,7 @@ use Test2::Plugin::NoWarnings echo => 1;
 
 my $data_path = "$FindBin::RealBin/data";
 
-{
+subtest Rcpp => sub {
     my $descfile =
       R::DescriptionFile->parse_file( path( $data_path, "DESCRIPTION_Rcpp" ) );
     ok( $descfile, "parse_file()" );
@@ -24,21 +25,29 @@ my $data_path = "$FindBin::RealBin/data";
         "Description field is merged from multiple lines" );
 
     is( $descfile->get('Package'), 'Rcpp', "Package field" );
-    is( $descfile->get('Depends'), { 'R' => '>= 3.0.0' }, "Depends field" );
+    is(
+        $descfile->get('Depends'),
+        { 'R' => '>= 3.0.0' },
+        '$descfile->get($field)'
+    );
+    is(
+        $descfile->get('Imports'),
+        { 'methods' => '', 'utils' => '' },
+        '$descfile->get($field)'
+    );
     is(
         $descfile->{'Suggests'},
         {
             'pkgKitten'  => '>= 0.1.2',
-            'rbenchmark' => 0,
-            'knitr'      => 0,
-            'pinp'       => 0,
-            'RUnit'      => 0,
-            'inline'     => 0,
-            'rmarkdown'  => 0
+            'rbenchmark' => '',
+            'knitr'      => '',
+            'pinp'       => '',
+            'RUnit'      => '',
+            'inline'     => '',
+            'rmarkdown'  => ''
         },
-        "Suggests field"
+        '$descfile->{$field}'
     );
-    is( $descfile->get('Imports'), [ 'methods', 'utils' ], "Imports field" );
 
     is(
         $descfile->get('URL'),
@@ -50,17 +59,45 @@ my $data_path = "$FindBin::RealBin/data";
         "URL field"
     );
 
-    ok($descfile->{'Date/Publication'}, "last line is parsed");
-}
+    ok( $descfile->{'Date/Publication'}, "last line is parsed" );
+};
+
+subtest dplyr => sub {
+    my $descfile =
+      R::DescriptionFile->parse_file( path( $data_path, "DESCRIPTION_dplyr" ) );
+    ok( $descfile, "parse_file()" );
+
+    ok(
+        (
+            List::Util::all { ref( $descfile->{$_} ) eq 'HASH' }
+            qw(Depends Suggests Imports LinkingTo)
+        ),
+        'Depends, Suggests, Imports, LinkingTo shall all be hashref'
+    );
+
+    ok(
+        (
+            List::Util::all { ref( $descfile->{$_} ) eq 'ARRAY' }
+            qw(URL VignetteBuilder)
+        ),
+        'URL, VignetteBuilder shall all be arrayref'
+    );
+};
 
 {
-    my $descfile = 
-      R::DescriptionFile->parse_text( path( $data_path, "DESCRIPTION_Rcpp" )->slurp_utf8 );
+    my $descfile =
+      R::DescriptionFile->parse_text(
+        path( $data_path, "DESCRIPTION_foo" )->slurp_utf8 );
     ok( $descfile, "parse_text()" );
+
+    is(
+        $descfile->{Description},
+        'This is a multiline description.',
+        'good for multiline Description field'
+    );
 }
 
 {
-
     like(
         dies {
             R::DescriptionFile->parse_file(
@@ -78,4 +115,5 @@ my $data_path = "$FindBin::RealBin/data";
         "Got exception on invalid line"
     );
 }
+
 done_testing;

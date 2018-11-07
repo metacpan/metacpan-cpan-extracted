@@ -1,22 +1,21 @@
-#!/usr/bin/perl
-$| = 1;
+#!/bin/sh
 
-if ( ! -f "fail_twice_1" ) {
-   print "Running first time\n";
-   open(OUT, ">fail_twice_1");
-   close(OUT);
-   warn  "Failing first time\n";
-   exit 20;
-}
+dir=$1
 
-if ( ! -f "fail_twice_2" ) {
-   print "Running second time\n";
-   open(OUT, ">fail_twice_2");
-   close(OUT);
-   warn "Failing second time\n";
-   exit 21;
-}
+if [ ! -f "$dir/fail_twice.1.flag" ]; then
+   echo "fail_twice running first time"
+   touch $dir/fail_twice.1.flag
+   echo "fail_twice failing first time" >&2
+   exit 20
+fi
 
-print "Running third time\n";
-unlink ("fail_twice_1","fail_twice_2");
-exit 0;
+if [ ! -f "$dir/fail_twice.2.flag" ]; then
+   echo "fail_twice running second time"
+   touch $dir/fail_twice.2.flag
+   echo "fail_twice failing second time" >&2
+   exit 21
+fi
+
+echo "fail_twice running third time"
+rm -f $dir/fail_twice.*.flag
+exit 0

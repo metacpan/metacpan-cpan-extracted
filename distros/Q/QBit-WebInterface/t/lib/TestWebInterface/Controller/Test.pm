@@ -14,7 +14,13 @@ sub formcmd1 : FORMCMD {
     return (
         title  => 'Test form 1',
         fields => [{name => 'testinput', type => 'input', value => 'i1'}, {type => 'submit', value => 'Submit'}]
-      );
+    );
+}
+
+sub cmd2 : CMD : URL('GET', '/cmd2/!field!') {
+    my ($self, %params) = @_;
+
+    return $self->as_json(\%params);
 }
 
 TRUE;

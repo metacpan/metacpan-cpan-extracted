@@ -10,9 +10,7 @@ $obj->options("echo" => "echo");
 $obj->options("mode" => "dry-run");
 $obj->cmd(q(echo "Dollar \$ Backtick \` Backslash \\\\ Quote \\""));
 $obj->cmd("hostname");
-@script = $obj->ssh(@ARGV);
+$script = $obj->ssh(@ARGV);
 
-foreach my $script (@script) {
-   print $script;
-}
+print $script;
 

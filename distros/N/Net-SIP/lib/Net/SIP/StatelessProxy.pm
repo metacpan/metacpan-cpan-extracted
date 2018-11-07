@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Net::SIP::StatelessProxy;
-use fields qw( dispatcher rewrite_contact nathelper force_rewrite );
+use fields qw( dispatcher rewrite_contact nathelper force_rewrite respcode );
 
 use Net::SIP::Util ':all';
 use Digest::MD5 qw(md5);
@@ -50,6 +50,7 @@ sub new {
     };
     $self->{nathelper} = delete $args{nathelper};
     $self->{force_rewrite} = delete $args{force_rewrite};
+    $self->{respcode} = [ {},{} ];
 
     return $self;
 }
@@ -641,6 +642,11 @@ sub do_nat {
 	: ( undef,$packet )
 	;
     my $method = $request ? $request->method : '';
+    my $track_resp_code;
+    if ($response and $response->method eq 'INVITE') {
+	my $code = $response->code;
+	$track_resp_code = $code if $code>=400;
+    }
 
     # NAT for anything with SDP body
     # activation and close of session will be done on ACK|CANCEL|BYE
@@ -649,7 +655,7 @@ sub do_nat {
 	or $method eq 'CANCEL'
 	or $method eq 'BYE' ) {
 	DEBUG( 100, "no NAT because no SDP body and method is $method" );
-	return;
+	return if ! $track_resp_code;
     }
 
 
@@ -693,6 +699,18 @@ sub do_nat {
 	or return [ 0,'no CSEQ in packet' ];
     my $callid = $packet->callid;
 
+    if ($track_resp_code) {
+	my $rc = $self->{respcode}[0];
+	if (keys(%$rc)>5000) {
+	    # expire entries
+	    $self->{respcode}[1] = $rc;
+	    $rc = $self->{respcode}[0] = {};
+	}
+	$rc->{$callid,$cseq,$idfrom,$idto} = $track_resp_code;
+	# no NAT to do, we just needed to track the response code
+	return;
+    }
+
     # CANCEL|BYE will be handled first to close session
     # no NAT will be done, even if the packet contains SDP (which makes no sense)
     if ( $method eq 'CANCEL' ) {
@@ -729,8 +747,16 @@ sub do_nat {
 
     if ( ! $nathelper->activate_session( $callid,$cseq,$idfrom,$idto ) ) {
 	if ( $method eq 'ACK' ) {
-	    DEBUG( 50,"session $callid|$cseq $idfrom -> $idto still incomplete in ACK" );
-	    return [ 0,'incomplete session in ACK' ]
+	    my $code = $self->{respcode}[0]{$callid,$cseq,$idfrom,$idto}
+		|| $self->{respcode}[1]{$callid,$cseq,$idfrom,$idto}
+		|| -1;
+	    if ($code < 400) {
+		DEBUG( 50,"session $callid|$cseq $idfrom -> $idto still incomplete in ACK" );
+		return [ 0,'incomplete session in ACK' ]
+	    } else {
+		# ignore problem, ACK to response with error code
+		DEBUG( 100, "session $callid|$cseq $idfrom -> ACK to failure response" );
+	    }
 	} else {
 	    # ignore problem, session not yet complete
 	    DEBUG( 100, "session $callid|$cseq $idfrom -> $idto not yet complete" );

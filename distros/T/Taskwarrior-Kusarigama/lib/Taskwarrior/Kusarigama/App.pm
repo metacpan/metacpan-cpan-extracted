@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::App;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: helper app for Taskwarrior::Kusarigama
-$Taskwarrior::Kusarigama::App::VERSION = '0.9.3';
+$Taskwarrior::Kusarigama::App::VERSION = '0.10.0';
 
 use strict;
 use warnings;
@@ -29,7 +29,7 @@ Taskwarrior::Kusarigama::App - helper app for Taskwarrior::Kusarigama
 
 =head1 VERSION
 
-version 0.9.3
+version 0.10.0
 
 =head1 SYNOPSIS
 

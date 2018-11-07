@@ -1,4 +1,4 @@
-Perl bindings for Upwork API
+Perl bindings for Upwork API (OAuth2)
 ============
 
 [![License](http://img.shields.io/packagist/l/upwork/php-upwork.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
@@ -8,7 +8,7 @@ Perl bindings for Upwork API
 
 # Introduction
 This project provides a set of resources of Upwork API from http://developers.upwork.com
- based on OAuth 1.0a.
+ based on OAuth 2.0.
 
 # Features
 These are the supported API resources:
@@ -56,7 +56,7 @@ To integrate this library you need to have:
 
 ## Example
 In addition to this, a full example is available in the `example` directory. 
-This includes `myapp.pl` that gets an access token and requests the data
+This includes `example.pl` that gets an access token and requests the data
 for applications that are not web-based applications.
 
 ## Installation
@@ -70,5 +70,5 @@ cpan> install Net::Upwork::API
 ```
 
 3.
-open `myapp.pl` and type the consumerKey and consumerSecret that you previously got from the API Center.
-***That's all. Run your app as `perl myapp.pl` and have fun.***
+open `example.pl` and type the clientId (a.k.a. consumer key), clientSecret (a.k.a. client secret) and `redirectUri` that you previously got from the API Center
+***That's all. Run your app as `perl example.pl` and have fun.***

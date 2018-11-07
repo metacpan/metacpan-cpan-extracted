@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Multiplex;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.06';
+our $VERSION = '1.0';
 $VERSION = eval $VERSION;
 
 use Mojolicious::Plugin::Multiplex::Multiplexer;
@@ -13,6 +13,12 @@ sub register {
   my ($plugin, $app, $conf) = @_;
 
   push @{ $app->static->paths }, File::Share::dist_dir('Mojolicious-Plugin-Multiplex');
+
+  # this is still a gray area it seems, but certainly this will be honored even
+  # if in the future they add some new preferred type
+  my $types = $app->types;
+  $types->type(mjs => ['application/javascript'])
+    unless exists $types->mapping->{mjs};
 
   $app->helper(multiplex => sub {
     my $c = shift;
@@ -59,11 +65,6 @@ Mojolicious::Plugin::Multiplex - A websocket multiplexing layer for Mojolicious 
     bar.onmessage = function (e) { console.log('bar channel got: ' + e.data) };
   </script>
 
-=head1 CAUTION
-
-This module is in its infancy and things can and will change in incompatible ways until this warning is removed.
-That said, the author is using it for real work so hopefully incompatible changes will be minimal (for his own sanity).
-
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Multiplex> implements a mechanism proposed by L<SockJS|https://github.com/sockjs/websocket-multiplex> for the multiplexing of data on a single websocket.
@@ -83,6 +84,14 @@ Another might be to stream updates to multiple types of data (perhaps in multipl
 For reference, the distribution comes with an example which uses L<Mojo::Pg> as a message broker for a multi-channel chat application.
 The example may also be seen on L<GitHub|https://github.com/jberger/Mojolicious-Plugin-Multiplex/blob/master/ex/vue_chat.pl>.
 
+=head1 CAVEAT
+
+While I'm declaring this module stable and production worthy, I still don't nearly have enough tests.
+The biggest reason for this is that I don't have a great way to test Perl and Javascript together.
+Unfortunately PhantomJS declared defeat right as L<Mojo::Phantom> was catching on.
+A project to wrap its successor, headless Chrome, is stalled waiting for now, so we wait.
+Contributions from people with experience in this area would be greatly appreciated.
+
 =head1 HELPERS
 
 =head2 multiplex
@@ -98,17 +107,17 @@ Though not prevented, the user is highly discouraged from sending other traffic 
 
 =head1 BUNDLED FILES
 
-=head2 websocket_multiplex.js
+=head2 websocket_multiplex.mjs
 
-  # in your template
-  %= javascript 'websocket_multiplex.js';
+  <script type="module">
+    import WebSocketMultiplex from '/websocket_multiplex.mjs';
+    var ws = new WebSocket(url);
+    var multiplex = new WebSocketMultiplex(ws);
+    var channel = multiplex.channel(topic);
+  </script>
 
-  var ws = new WebSocket(url);
-  var multiplex = new WebSocketMultiplex(ws);
-  var channel = multiplex.channel(topic);
-
-Bundled with this plugin is a javascript file which provides the front-end code to create a multiplexer entitled C<websocket_multiplex.js>.
-It provides the new class C<WebSocketMultiplex> whose constructor takes as its only argument an existing WebSocket object.
+Bundled with this plugin is a javascript module file called C<websocket_multiplex.mjs> which contains the front-end code to create a multiplexer.
+It exports the C<WebSocketMultiplex> class, whose constructor takes as its only argument an existing WebSocket object or a url string to build one.
 This then is used to open new channel objects via the C<channel> method which takes a topic string as an arugment.
 Topics can be almost any string, however they must not contain a comma (a limitation of the protocol).
 The resulting channel objects implement the same API as a WebSocket (though they do not inherit from it).
@@ -118,6 +127,27 @@ The client-side multiplexer will also attempt to reconnect to closed sockets and
 N.B. This library is the least stable of the entire project.
 Use with caution.
 
+Also, this library will likely use very modern conventions, even going forward.
+Older browsers are not the target for this file.
+For those you want ...
+
+=head2 websocket_multiplex.js
+
+  <script src="websocket_multiplex.js"></script>
+  <script>
+    var ws = new WebSocket(url);
+    var multiplex = new WebSocketMultiplex(ws);
+    var channel = multiplex.channel(topic);
+  </script>
+
+This is the above javascript module but transpiled back to work on older browsers (and minified).
+It sets the global symbol C<WebSocketMultiplex> when loaded.
+In all other ways it works just like the above file.
+
+=head2 websocket_multiplex.js.map
+
+A file used to get better diagnostics from the minified javascript file.
+
 =head1 SOURCE REPOSITORY
 
 L<http://github.com/jberger/Mojolicious-Plugin-Multiplex>
@@ -126,9 +156,13 @@ L<http://github.com/jberger/Mojolicious-Plugin-Multiplex>
 
 Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 
+=head1 ADDITIONAL THANKS
+
+John Susek
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Joel Berger
+Copyright (C) 2016-2018 by Joel Berger
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

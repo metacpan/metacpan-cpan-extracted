@@ -19,13 +19,15 @@ use warnings;
 use Net::Upwork::API::Config;
 use Net::Upwork::API::Client;
 
-our $VERSION = '1.3.0';
+our $VERSION = '2.0.1';
+
+use constant TOKEN_TYPE_BEARER => 'Bearer';
 
 =pod
 
 =head1 NAME
 
-API
+Net::Upwork::API - Perl bindings for Upwork API (OAuth2).
 
 =head1 FUNCTIONS
 
@@ -100,29 +102,25 @@ sub init_router {
 
 B<Parameters>
 
-$verifier
+$code
 
-    OAuth verifier
+    Authorization Code, see https://tools.ietf.org/html/rfc6749.html#section-1.3.1
 
 B<Return value>
 
-    A hash that contains access token and secret
+    Net::OAuth2::AccessToken object 
 
 =cut
 
 sub get_access_token {
     my $self = shift;
-    my ($verifier) = @_;
+    my ($code) = @_;
 
-    chomp($verifier);
+    chomp($code);
 
-    $self->{client}{access_token} = $self->{client}{oauth_client}->get_access_token(
-                    $self->{client}{request_token}{token},
-                    $verifier,
-                    token_secret => $self->{client}{request_token}{token_secret},
-                );
+    $self->{client}{access_token_session} = $self->{client}{oauth_client}->get_access_token($code);
 
-    return {access_token => $self->{client}{access_token}{token}, access_secret => $self->{client}{access_token}{token_secret}}
+    return $self->{client}{access_token_session};
 }
 
 =item get_authorization_url()
@@ -138,8 +136,7 @@ B<Return value>
 sub get_authorization_url {
     my $self = shift;
 
-    $self->{client}{request_token} = $self->{client}{oauth_client}->get_request_token();
-    return $self->{client}{oauth_client}->site_url($self->{client}{oauth_client}->_make_url('authorize', oauth_token => $self->{client}{request_token}{token}));
+    return $self->{client}{request_token} = $self->{client}{oauth_client}->authorize_response->as_string;
 }
 
 =item has_access_token()
@@ -156,7 +153,38 @@ sub has_access_token {
     my $self = shift;
 
     return defined $self->{client}{access_token} ||
-            (!($self->{config}{access_token} eq "") && !($self->{config}{access_secret} eq ""));
+            (!($self->{config}{access_token} eq "") && !($self->{config}{refresh_token} eq ""));
+}
+
+=item set_access_token_session()
+
+    Sets the AccessToken session based on the provided config
+
+B<Return value>
+
+    Net::OAuth2::AccessToken object
+
+=cut
+
+sub set_access_token_session() {
+    my $self = shift;
+
+    $self->{client}{access_token_session} = Net::OAuth2::AccessToken->new(
+        profile      => $self->{client}->get_oauth_client,
+        auto_refresh => 0,
+	(
+	    access_token  => $self->{config}{access_token},
+	    refresh_token => $self->{config}{refresh_token},
+	    token_type    => TOKEN_TYPE_BEARER,
+	    expires_in    => $self->{config}{expires_in},
+	    expires_at    => $self->{config}{expires_at}
+	)
+    );
+
+    # expire? then refresh
+    if ($self->{config}{expires_at} < time()) {
+        $self->{client}{access_token_session}->refresh();
+    }
 }
 
 =item client()
@@ -182,7 +210,12 @@ Maksym Novozhylov C<< <mnovozhilov@upwork.com> >>
 
 =head1 COPYRIGHT
 
-Copyright E<copy> Upwork Global Corp., 2015
+Copyright E<copy> Upwork Global Corp., 2018
+
+=head1 LICENSE
+
+This is released under the Apache Version 2.0
+License. See L<https://www.apache.org/licenses/LICENSE-2.0>.
 
 =cut
 

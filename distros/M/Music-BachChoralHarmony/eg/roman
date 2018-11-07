@@ -5,13 +5,10 @@ use warnings;
 # Roman numeral analysis
 
 use GraphViz2;
-use List::MoreUtils 'first_index';
 use Music::BachChoralHarmony;
-use Music::Scales;
+use Music::ToRoman;
 
 my $in_key = shift || 'G_M';
-
-my @roman = qw( I ii iii IV V vi vii );
 
 my $bach = Music::BachChoralHarmony->new;
 my $songs = $bach->parse();
@@ -26,15 +23,16 @@ for my $song ( sort keys %$songs ) {
 
     # Skip unless we are in the right key
     next unless $key eq $in_key;
-#    print "SONG: $song\n";
 
     # Get the scale name
     my $name = $key =~ /M/ ? 'major' : 'minor';
     $key =~ s/_?M//i;
 
-    # Get the scale notes
-    my @notes = get_scale_notes( $key, $name );
-#    print "KEY: $key, SCALE: $name, NOTES: @notes\n";
+    my $mtr = Music::ToRoman->new(
+        scale_note => $key,
+        scale_name => $name,
+    );
+#    print "SONG: $song in $key $name\n";
 
     # The last seen roman
     my $last;
@@ -43,44 +41,10 @@ for my $song ( sort keys %$songs ) {
     for my $event ( @{ $songs->{$song}{events} } ) {
         my $chord = $event->{chord};
 
-        # Get just the note part of the chord name
-        ( my $note = $chord ) =~ s/^(\w[#b]?)\w*$/$1/;
+        $chord =~ s/_//;
+        $chord =~ s/d/o/;
 
-        # Get the roman representation based on the scale position
-        my $position = first_index { $_ eq $note } @notes;
-        my ( $roman, $accidental );
-        if ( $position == -1 ) {
-            if ( length($note) == 1 ) {
-                $position = first_index { $_ =~ /$note/ } @notes;
-                ( $accidental = $notes[$position] ) =~ s/^\w(.)$/$1/;
-                $accidental = $accidental eq '#' ? 'b' : '#';
-            }
-            else {
-                my $letter;
-                ( $letter, $accidental ) = $letter =~ /^(\w)(.)$/;
-                $position = first_index { $_ eq $letter } @notes;
-            }
-        }
-        $roman = $roman[$position];
-
-        # Get everything but the note part
-        ( my $decorator = $chord ) =~ s/^\w[#b]?(\w*)$/$1/;
-        $decorator =~ s/_//;
-
-        # Are we minor or major?
-        my $minor = $decorator =~ /m/ ? 1 : 0;
-
-        # Convert the case of the roman representation based on minor or major
-        $roman = $minor ? lc($roman) : uc($roman);
-
-        # Add any accidental found in a non-scale note
-        $roman = $accidental . $roman if $accidental;
-
-        # Drop the minor and major part of the chord name
-        $decorator =~ s/M//i;
-
-        # Append the remaining decorator to the roman representation
-        $roman .= $decorator;
+        my $roman = $mtr->parse($chord);
 #        print "CHORD: $chord, ROMAN: $roman\n";
 
         # Tally the bigram

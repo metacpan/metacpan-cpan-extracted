@@ -9,7 +9,7 @@ BEGIN {
 
 SKIP: {
 
-eval { use XML::LibXML 2.0132 };
+eval { require XML::LibXML; XML::LibXML->VERSION(2.0132) };
 if ( $@ ) {
     my $msg = "SKIPPED -- No support for MusicXML import";
     unless ( $ENV{DATA_IREALPRO_MUSICXML} ) {

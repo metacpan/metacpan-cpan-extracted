@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.9.10';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.10.0';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -11,6 +11,7 @@ use utf8;
 use Carp;
 use Path::Tiny;
 use IO::Interactive 'is_interactive';
+use Log::Any '$log';
 
 sub _keywords {                 ## no critic (ProhibitUnusedPrivateSubroutines)
 
@@ -76,7 +77,9 @@ sub _prepare_input_data {
         chomp;
         _push_input_data($git, [split]);
     }
-    return;
+    my $input_data = _get_input_data($git);
+    $log->info(_prepare_input_data => {input_data => $input_data});
+    return $input_data;
 }
 
 # The pre-receive and post-receive hooks get the list of affected
@@ -85,8 +88,7 @@ sub _prepare_input_data {
 
 sub _prepare_receive {
     my ($git) = @_;
-    _prepare_input_data($git);
-    foreach (@{_get_input_data($git)}) {
+    foreach (@{_prepare_input_data($git)}) {
         my ($old_commit, $new_commit, $ref) = @$_;
         _set_affected_ref($git, $ref, $old_commit, $new_commit);
     }
@@ -100,14 +102,14 @@ sub _prepare_receive {
 sub _prepare_update {
     my ($git, $args) = @_;
     _set_affected_ref($git, @$args);
+    $log->debug(_prepare_update => {affected_refs => _get_affected_refs_hash($git)});
     return;
 }
 
-# Gerrit hooks get a list of option/value pairs. Here we convert the
-# list into a hash and change the original argument list into a single
-# hash-ref. We also record information about the user performing the
-# push. Based on:
-# https://gerrit-review.googlesource.com/Documentation/config-hooks.html
+# Gerrit hooks get a list of option/value pairs. Here we convert the list into a
+# hash and change the original argument list into a single hash-ref. We also
+# record information about the user performing the push. Based on:
+# https://gerrit.googlesource.com/plugins/hooks/+/refs/heads/master/src/main/resources/Documentation/hooks.md
 
 sub _prepare_gerrit_args {
     my ($git, $args) = @_;
@@ -134,6 +136,8 @@ sub _prepare_gerrit_args {
         $ENV{GERRIT_USER_NAME}  = $1; ## no critic (Variables::RequireLocalizedPunctuationVars)
         $ENV{GERRIT_USER_EMAIL} = $2; ## no critic (Variables::RequireLocalizedPunctuationVars)
     }
+
+    $log->debug(_prepare_gerrit_args => {opt => \%opt});
 
     # Now we create a Gerrit::REST object connected to the Gerrit
     # server and tack it to the hook arguments so that Gerrit plugins
@@ -162,14 +166,17 @@ sub _prepare_gerrit_args {
     return;
 }
 
-# The ref-update Gerrit hook is invoked synchronously when a user
-# pushes commits to a branch. So, it acts much like Git's standard
-# 'update' hook. This routine prepares the options as usual and sets
-# the affected ref accordingly. The documented arguments for the hook
-# are these:
+# The ref-update and the commit-received Gerrit hooks are invoked synchronously
+# when a user pushes commits to a branch. So, they act much like Git's standard
+# 'update' hook. This routine prepares the options as usual and sets the
+# affected ref accordingly. The documented arguments for the hook are these:
 
-# ref-update --project <project name> --refname <refname> --uploader \
-# <uploader> --oldrev <sha1> --newrev <sha1>
+# ref-update --project <project name> --refname <refname> --uploader <uploader>
+# --uploader-username <username> --oldrev <sha1> --newrev <sha1>
+
+# commit-received --project <project name> --refname <refname> --uploader
+# <uploader> --uploader-username <username> --oldrev <sha1> --newrev <sha1>
+# --cmdref <refname>
 
 sub _prepare_gerrit_ref_update {
     my ($git, $args) = @_;
@@ -184,6 +191,34 @@ sub _prepare_gerrit_ref_update {
         unless $refname =~ m:^refs/:;
 
     _set_affected_ref($git, $refname, @{$args->[0]}{qw/--oldrev --newrev/});
+    $log->debug(_prepare_gerrit_ref_update => {affected_refs => _get_affected_refs_hash($git)});
+    return;
+}
+
+# The submit Gerrit hook is invoked synchronously when a user tries to submit a
+# change. So, it acts much like Git's standard 'update' hook. This routine
+# prepares the options as usual and sets the affected ref accordingly. The
+# documented arguments for the hook are these:
+
+# submit --project <project name> --branch <branch> --submitter <submitter>
+# --patchset <patchset id> --commit <sha1>
+
+sub _prepare_gerrit_submit {
+    my ($git, $args) = @_;
+
+    _prepare_gerrit_args($git, $args);
+
+    # The --branch argument contains the branch short-name if it's in the
+    # refs/heads/ namespace. But we need to always use the branch long-name,
+    # so we change it here.
+    my $refname = $args->[0]{'--branch'};
+    $refname = "refs/heads/$refname"
+        unless $refname =~ m:^refs/:;
+
+    my $parent = $git->get_sha1("$refname^");
+
+    _set_affected_ref($git, $refname, $parent, $args->[0]{'--commit'});
+    $log->debug(_prepare_gerrit_submit => {affected_refs => _get_affected_refs_hash($git)});
     return;
 }
 
@@ -229,8 +264,8 @@ sub _gerrit_patchset_post_hook {
         'auto-submit'      => $git->get_config_boolean('githooks.gerrit' => 'auto-submit'),
     );
 
-    # https://gerrit-documentation.storage.googleapis.com/Documentation/2.13.1/rest-api-changes.html#set-review
-    my %review_input;
+    # https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#set-review
+    my %review_input = (tag => 'autogenerated:git-hooks');
     my $auto_submit = 0;
 
     if (my $errors = $git->get_errors()) {
@@ -256,6 +291,11 @@ sub _gerrit_patchset_post_hook {
     if (my $notify = $git->get_config('githooks.gerrit' => 'notify')) {
         $review_input{notify} = $notify;
     }
+
+    $log->debug(_gerrit_patchset_post_hook => {
+        review_input => \%review_input,
+        auto_submit  => $auto_submit,
+    });
 
     # Cast review
     eval { $args->{gerrit}->POST("/changes/$id/revisions/$patchset/review", \%review_input) }
@@ -317,6 +357,8 @@ my %prepare_hook = (
     'pre-receive'      => \&_prepare_receive,
     'post-receive'     => \&_prepare_receive,
     'ref-update'       => \&_prepare_gerrit_ref_update,
+    'commit-received'  => \&_prepare_gerrit_ref_update,
+    'submit'           => \&_prepare_gerrit_submit,
     'patchset-created' => \&_prepare_gerrit_patchset,
     'draft-published'  => \&_prepare_gerrit_patchset,
 );
@@ -369,6 +411,8 @@ sub load_plugins {
         $git->get_config(githooks => 'plugins'),
         path($INC{'Git/Hooks.pm'})->parent->child('Hooks'),
     );
+
+    $log->debug(load_plugins => {enabled_plugins => \%enabled_plugins, plugin_dirs => \@plugin_dirs});
 
     # Load remaining enabled plugins
     while (my ($key, $plugin) = each %enabled_plugins) {
@@ -607,8 +651,30 @@ sub get_config {
         $config->{$section} = {} unless exists $config->{$section};
         return $config->{$section};
     } elsif (exists $config->{$section}{$var}) {
-        return wantarray ? @{$config->{$section}{$var}} : $config->{$section}{$var}[-1];
+        if (wantarray) {
+            $log->trace(get_config => {
+                wantarray => 1,
+                section   => $section,
+                var       => $var,
+                result    => $config->{$section}{$var},
+            });
+            return @{$config->{$section}{$var}};
+        } else {
+            $log->trace(get_config => {
+                wantarray => 0,
+                section   => $section,
+                var       => $var,
+                result    => $config->{$section}{$var}[-1],
+            });
+            return $config->{$section}{$var}[-1];
+        }
     } else {
+        $log->trace(get_config => {
+            wantarray => wantarray,
+            section   => $section,
+            var       => $var,
+            result    => [],
+        });
         return;
     }
 }
@@ -988,10 +1054,7 @@ sub _set_affected_ref {
 sub _get_affected_refs_hash {
     my ($git) = @_;
 
-    $git->{_plugin_githooks}{affected_refs}
-        or croak __PACKAGE__, ": get_affected_refs(): no affected refs set\n";
-
-    return $git->{_plugin_githooks}{affected_refs};
+    return $git->{_plugin_githooks}{affected_refs} || {};
 }
 
 sub get_affected_refs {
@@ -1532,7 +1595,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -1635,7 +1698,7 @@ The remaining arguments that were passed to the plugin hooks.
 
 =back
 
-The callbacks may see if there were any errors signalled by the plugin hook
+The callbacks may see if there were any errors signaled by the plugin hook
 by invoking the C<get_errors> method on the GIT object. They may be used to
 signal the hook result in any way they want, but they should not die or they
 will prevent other post hooks to run.
@@ -1722,17 +1785,17 @@ C<undef>, if it's not defined.
 
 As a special case, options without values (i.e., with no equals sign after its
 name in the configuration file) are set to the string 'true' to force Perl
-recognize them as true booleans.
+recognize them as true Booleans.
 
 =head2 get_config_boolean SECTION VARIABLE
 
-Git configuration variables may be grokked as booleans. (See C<git help
+Git configuration variables may be grokked as Booleans. (See C<git help
 config>.)  There are specific values meaning B<true> (viz. C<yes>, C<on>,
-C<true>, C<1>, and the absense of a value) and specific values meaning B<false>
+C<true>, C<1>, and the absence of a value) and specific values meaning B<false>
 (viz. C<no>, C<off>, C<false>, C<0>, and the empty string).
 
-This method checks the variable's value and returns 1 or 0 representing boolean
-values in Perl. If the variable's value isn't recognized as a Git boolean the
+This method checks the variable's value and returns 1 or 0 representing Boolean
+values in Perl. If the variable's value isn't recognized as a Git Boolean the
 method croaks. If the variable isn't defined the method returns undef.
 
 In the L<Git::Hooks> documentation, all configuration variables mentioning a
@@ -2125,13 +2188,13 @@ in revision REV.
 
 This method should be invoked by hooks to see if REF is enabled according to
 the C<githooks.ref> and C<githooks.noref> options. Please, read about these
-options in L<Git::Hooks> documetation.
+options in L<Git::Hooks> documentation.
 
 REF must be a complete reference name or undef. Local hooks should pass the
 current branch, and server hooks should pass the references affected by the push
 command. If REF is undef, the method returns true.
 
-The method decides if a reference is enabled using the following algorithn:
+The method decides if a reference is enabled using the following algorithm:
 
 =over
 
@@ -2148,7 +2211,7 @@ The method decides if a reference is enabled using the following algorithn:
 This method is DEPRECATED. Please, use the C<is_reference_enabled> method
 instead.
 
-Returns a boolean indicating if REF matches one of the ref-specs in
+Returns a Boolean indicating if REF matches one of the ref-specs in
 SPECS. REF is the complete name of a Git ref and SPECS is a list of strings,
 each one specifying a rule for matching ref names.
 
@@ -2221,10 +2284,10 @@ If the C<spec> starts with a caret (^) it's interpreted as a Perl regular
 expression, the caret being kept as part of the regexp. These specs match
 potentially many things.
 
-Before being interpreted as a string or as a regexp, any substring of it in the
+Before being interpreted as a string or as a regexp, any sub-string of it in the
 form C<{VAR}> is replaced by C<$ENV{VAR}>. This is useful, for example, to
 interpolate the committer's username in the spec, in order to create personal
-namespaces for users.
+name spaces for users.
 
 (See the documentation of the C<acl> option in the L<Git::Hooks::CheckFile> and
 the L<Git::Hooks::CheckReference> plugins for examples things as files and
@@ -2261,7 +2324,7 @@ error messages.
 
 =item * B<allow>
 
-A boolean telling if the ACL is an "allow".
+A Boolean telling if the ACL is an "allow".
 
 =item * B<action>
 

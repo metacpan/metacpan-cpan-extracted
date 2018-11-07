@@ -3,10 +3,11 @@ use warnings;
 
 package Git::Hooks::GerritChangeId;
 # ABSTRACT: Git::Hooks plugin to insert a Change-Id in a commit message
-$Git::Hooks::GerritChangeId::VERSION = '2.9.10';
+$Git::Hooks::GerritChangeId::VERSION = '2.10.0';
 use 5.010;
 use utf8;
 use Carp;
+use Log::Any '$log';
 use Git::Hooks;
 use Git::Message;
 use Path::Tiny;
@@ -68,6 +69,8 @@ sub insert_change_id {
 sub rewrite_message {
     my ($git, $commit_msg_file) = @_;
 
+    $log->debug(__PACKAGE__ . "::rewrite_message($commit_msg_file)");
+
     my $msg = eval { $git->read_commit_msg_file($commit_msg_file) };
     unless (defined $msg) {
         $git->fault("Internal error: cannot read commit message file '$commit_msg_file'",
@@ -101,7 +104,7 @@ Git::Hooks::GerritChangeId - Git::Hooks plugin to insert a Change-Id in a commit
 
 =head1 VERSION
 
-version 2.9.10
+version 2.10.0
 
 =head1 SYNOPSIS
 
@@ -117,7 +120,7 @@ may configure it in a Git configuration file like this:
     admin = joe molly
 
 The first section enables the plugin and defines the users C<joe> and C<molly>
-as administrators, effectivelly exempting them from any restrictions the plugin
+as administrators, effectively exempting them from any restrictions the plugin
 may impose.
 
 =head1 DESCRIPTION

@@ -14,7 +14,7 @@ MooX::JSON_LD - Extend Moo to provide JSON-LD mark-up for your objects.
     has first_name => ( ... json_ld => 1 );
     has last_name  => ( ... json_ld => 1 );
 
-    has birth date => ( ...
+    has birth_date => ( ...
         json_ld => 'birthDate',
         json_ld_serializer => sub { shift->birth_date->ymd },
     );
@@ -107,6 +107,8 @@ use warnings;
 use Moo       ();
 use Moo::Role ();
 
+use MRO::Compat;
+use List::Util qw/ all /;
 use Sub::Quote qw/ quote_sub /;
 
 our $VERSION = '0.0.15';
@@ -143,9 +145,9 @@ sub import {
         {
             '$code' => \sub {
                 my ($self) = @_;
-                my $fields = eval { $self->next::method };
+                my $fields = $self->maybe::next::method || [];
                 return [
-                    @{$fields || []},
+                    @{$fields},
                     @{$Attributes{$target} || []}
                 ];
             },
@@ -155,7 +157,14 @@ sub import {
         };
 
 
-    Moo::Role->apply_single_role_to_package( $target, 'MooX::Role::JSON_LD' );
+    unless ( all { $target->can($_) }
+        qw/ json_ld_encoder json_ld_data json_ld / )
+    {
+
+        Moo::Role->apply_single_role_to_package( $target,
+            'MooX::Role::JSON_LD' );
+
+    }
 
 }
 

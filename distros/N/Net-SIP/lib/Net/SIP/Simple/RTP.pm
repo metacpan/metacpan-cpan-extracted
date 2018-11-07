@@ -287,7 +287,7 @@ sub _receive_rtp {
 
     if ( ref($writeto)) {
 	# callback
-	invoke_callback($writeto,$payload,$seq,$tstamp,$channel);
+	invoke_callback($writeto,$payload,$seq,$tstamp,$channel,$mpt & 0x7f);
     } elsif ( $writeto ) {
 	# save into file
 	my $fd = $targs->{fdr};
@@ -405,7 +405,7 @@ sub _send_rtp {
 	0x1234,    # source ID
     );
     DEBUG( 100,"send %d bytes to RTP", length($buf));
-    send( $sock,$header.$buf,0,$addr ) || die $!;
+    send( $sock,$header.$buf,0,$addr );
 }
 
 ###########################################################################

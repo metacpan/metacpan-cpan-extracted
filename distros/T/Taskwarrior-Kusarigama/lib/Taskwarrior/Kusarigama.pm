@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: plugin system for the Taskwarrior task manager
-$Taskwarrior::Kusarigama::VERSION = '0.9.3';
+$Taskwarrior::Kusarigama::VERSION = '0.10.0';
 
 # TODO document the kusarigama.dir key
 1;
@@ -18,7 +18,7 @@ Taskwarrior::Kusarigama - plugin system for the Taskwarrior task manager
 
 =head1 VERSION
 
-version 0.9.3
+version 0.10.0
 
 =head1 SYNOPSIS
 

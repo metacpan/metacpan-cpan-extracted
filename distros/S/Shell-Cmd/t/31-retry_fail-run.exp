@@ -1,0 +1,9 @@
+fail_twice running first time
+fail_twice running second time
+
+###STDERR
+fail_twice failing first time
+fail_twice failing second time
+
+###EXIT
+2

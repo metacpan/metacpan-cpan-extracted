@@ -26,6 +26,7 @@ lib/Graphics/GVG/AST/Polygon.pm
 lib/Graphics/GVG/AST/Rect.pm
 lib/Graphics/GVG/Args.pm
 lib/Graphics/GVG/Renderer.pm
+lib/Graphics/GVG/Renderer/DefaultCode.pm
 t/001_load.t
 t/002_pod.t
 t/010_single_line.t
@@ -50,6 +51,7 @@ t/190_meta.t
 t/200_renderer.t
 t/210_two_meta.t
 t/220_named_params.t
+t/230_renderer_class.t
 t_data/test_include.gvg
 t_data/test_loader.gvg
 t_data/test_var.gvg

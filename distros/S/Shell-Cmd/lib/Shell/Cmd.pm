@@ -1,7 +1,17 @@
 package Shell::Cmd;
-# Copyright (c) 2013-2017 Sullivan Beck. All rights reserved.
+# Copyright (c) 2013-2018 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
+
+# Variables used in scripts
+#   SC_ORIG_DIRE     : the directory you were in when the script ran
+#   SC_DIRE          : the working directory of the script
+#   SC_DIRE_n        : the working directory going into command n
+#   SC_FAILED = N    : the command which failed
+#   SC_CURR_EXIT     : the exit code for the current command
+#   SC_CURR_SUCC     : 1 if the current command (any alternate) succeeded
+#   SC_RETRIES = N   : this command will run up to N times
+#   SC_TRY = N       : we're currently on the Nth try
 
 ###############################################################################
 
@@ -15,17 +25,18 @@ use IO::File;
 use Cwd;
 
 our($VERSION);
-$VERSION = "2.13";
+$VERSION = "3.00";
 
 $| = 1;
+$Data::Dumper::Sortkeys = 1;
 
 ###############################################################################
-# METHODS
+# METHODS TO CREATE OBJECT
 ###############################################################################
 
 sub version {
-  my($self) = @_;
-  return $VERSION;
+   my($self) = @_;
+   return $VERSION;
 }
 
 sub new {
@@ -41,73 +52,194 @@ sub new {
 
 sub flush {
    my($self, @opts)   = @_;
-   $self->_init_cache();
 
-   my $all            = 1  if (! @opts);
-   my %opts           = map { $_,1 } @opts;
+   my $all                      = 1  if (! @opts);
+   my %opts                     = map { $_,1 } @opts;
 
-   $$self{'err'}      = '';
+   # $self = {
+   #           'g'       => { VAR => VAL }             global options
+   #           'c'       => { VAR => VAL }             per-command options
+   #           'e'       => [ VAR, VAL ]               environment
+   #           'o'       => { out => STDOUT,           output from script mode
+   #                          err => STDERR,
+   #                          exit => EXIT }
+   #           's'       => { HOST => { out => STDOUT, output from ssh script mode
+   #                                    err => STDERR,
+   #                                    exit => EXIT } }
+   #           'curr'    => NUM,                       the current command in
+   #                                                   the output method
+   #           'err'     => ERROR,
+   #           'cmd'     => { CMD_NUM => CMD_DESC }    command descriptions
+   #           'cmd_num' => NUM
+   #           'max_alt' => NUM                        the greatest number of
+   #                                                   alternates
+   #           'scr'     => []                         the current script
 
-   $$self{'dire'}     = '.'       if ($all  ||  $opts{'dire'});
-
-   # [ [VAR, VAL], [VAR, VAL], ... ]
-   $$self{'env'}      = {}        if ($all  ||  $opts{'env'});
+   $$self{'err'}                = '';
+   $$self{'scr'}                = [];
 
    if ($all  ||  $opts{'opts'}) {
-      $$self{'mode'}            = 'run';
-      $$self{'output'}          = 'both';
-      $$self{'f-output'}        = 'both';
-      $$self{'script'}          = '';
-      $$self{'echo'}            = 'noecho';
-      $$self{'failure'}         = 'exit';
+      $$self{'g'}               =
+        {
+         #
+         # Options set with the options method.
+         #
 
-      $$self{'tmp_script'}      = '';
-      $$self{'tmp_script_keep'} = 0;
-      $$self{'ssh_script'}      = '';
-      $$self{'ssh_script_keep'} = 0;
+         'mode'            => 'run',
+         'dire'            => '',
+         'output'          => 'both',
+         'script'          => '',
+         'echo'            => 'noecho',
+         'failure'         => 'exit',
 
-      $$self{'ssh_opts'}        = {};
-      $$self{'ssh_num'}         = 1;
-      $$self{'ssh_sleep'}       = 0;
+         'tmp_script'      => "/tmp/.cmd.shell.$$",
+         'tmp_script_keep' => 0,
+         'ssh_script'      => '',
+         'ssh_script_keep' => 0,
+
+         'ssh_opts'        => {},
+         'ssh_num'         => 1,
+         'ssh_sleep'       => 0,
+
+         #
+         # A description of the script (calulated
+         # from some of the obove options in _script_options).
+         #
+         # s_type    : Type of script currently being
+         #             created.
+         #               run, simple, script
+         # simple    : Type of simple script currently being
+         #             created.
+         #               script  : s_type = script
+         #               failure : s_type = run, failure = display
+         # c_echo    : mode=run: echo,noecho,failed
+         #             otherwise: ''
+         # c_fail    : How to treat command failure
+         #             in the calculated environment.
+         #               simple: ''
+         #               otherwise: exit,display,continue
+         # out       : 1 if STDOUT captured
+         # err       : 1 if STDERR captured
+         # redir     : String to redirect output
+         #
+
+         's_type'          => '',
+         'simple'          => '',
+         'out'             => 0,
+         'err'             => 0,
+         'redir'           => '',
+         'c_echo'          => '',
+         'c_fail'          => '',
+
+         #
+         # Script indentation (used to keep track of
+         # all indentation)
+         #
+         'ind_per_lev'     => 3,
+         'ind_cur_lev'     => 0,
+         'curr_ind'        => "",
+         'next_ind'        => "",
+         'prev_ind'        => "",
+
+         #
+         # Keep track of current flow structure
+         # as commands are added (not used once
+         # they are done).
+         #
+         #   ( [ FLOW, CMD_NUM ],
+         #     [ FLOW, CMD_NUM ], ... )
+         # where:
+         #   FLOW     : type of flow
+         #   CMD_NUM  : command where it opened
+         #
+         'flow'           => [],
+        };
    }
 
-   # [ [CMD, %OPTS], [CMD, %OPTS], ... ]
-   $$self{'cmd'}      = []        if ($all  ||  $opts{'commands'});
+   if ($all  ||  $opts{'commands'}) {
+      # cmd => { CMD_NUM => { 'meta'      => VAL,   (0 or a string)
+      #                       'label'     => LABEL,
+      #                       'cmd'       => [ CMD ],
+      #                       'dir'       => DIRE,
+      #                       'noredir'   => 0/1,
+      #                       'retry'     => NUM,
+      #                       'sleep'     => NUM,
+      #                       'check'     => CMD,
+      #                       'flow'      => if/loop/...
+      #                       'flow_type' => open/cont/close
+      #                     }
+      $$self{'cmd'}             = {};
+      $$self{'cmd_num'}         = 1;
+      $$self{'max_alt'}         = 0;
+   }
+
+   # Command options
+   #   c_flow       1 if this is a flow command
+   #   c_num        The number of the current command
+   #   f_num        The failure code (c_num if <=200, 201 otherwise)
+   #   alts         1 if alternates are available
+   #   a_num        The number of the alternate
+   #   c_label      The label for the command
+   #
+   #   c_retries    The number of retries
+   #   c_sleep      How long to sleep between retries
+   #   c_redir      Redirect string for this command (takes into account
+   #                noredir)
+   #   c_check      The command to check success
+   #   c_check_q    The quoted check command
+   #   simp         If the current command is in a simple script
+   #
+   #   cmd_str      The current command string
+   #                e.g. '/bin/ls /tmp'
+   #   cmd_str_q    The quoted command string
+   #   cmd_label    A label describing the command (command number and
+   #                command label if available):
+   #                   '1'
+   #                   '1 [LABEL]'
+   #   alt_label    A label describing the alternate
+   #                   '1.1'
+   #                   '1.1 [LABEL]'
+   #                   '1.0'             (if no alternates)
+
+   $$self{'c'}                  = {};
+
+   $$self{'e'}                  = []   if ($all  ||  $opts{'env'});
+
+   if ($all  ||  $opts{'out'}) {
+      $$self{'o'}               = {};
+      $$self{'s'}               = {};
+      $$self{'curr'}            = 0;
+   }
 
    return;
 }
 
 ###############################################################################
+# METHODS TO SET OPTIONS
+###############################################################################
 
 sub dire {
    my($self,$dire) = @_;
-   return $$self{'dire'}  if (! defined($dire));
+   return $$self{'g'}{'dire'}  if (! defined($dire));
 
    return $self->options("dire",$dire);
 }
 
 sub mode {
    my($self,$mode) = @_;
-   return $$self{'mode'}  if (! defined($mode));
+   return $$self{'g'}{'mode'}  if (! defined($mode));
 
    return $self->options("mode",$mode);
 }
 
 sub env {
    my($self,@tmp) = @_;
-
-   if (! @tmp) {
-      my @ret;
-      foreach my $key (sort keys %{ $$self{'env'} }) {
-         push(@ret,$key,$$self{'env'}{$key});
-      }
-      return @ret;
-   }
+   return @{ $$self{'e'} }  if (! @tmp);
 
    while (@tmp) {
       my $var = shift(@tmp);
       my $val = shift(@tmp);
-      $$self{'env'}{$var} = $val;
+      push @{ $$self{'e'} },($var,$val);
    }
 
    return;
@@ -125,50 +257,50 @@ sub options {
       if ($opt eq 'mode') {
 
          if (lc($val) =~ /^(run|dry-run|script)$/) {
-            $$self{$opt} = lc($val);
+            $$self{'g'}{$opt} = lc($val);
             next OPT;
          }
 
       } elsif ($opt eq 'dire') {
-         $$self{$opt} = $val;
+         $$self{'g'}{$opt} = $self->_quote($val);
          next OPT;
 
-      } elsif ($opt eq 'output'  ||  $opt eq 'f-output') {
+      } elsif ($opt eq 'output') {
 
          if (lc($val) =~ /^(both|merged|stdout|stderr|quiet)$/) {
-            $$self{$opt} = lc($val);
+            $$self{'g'}{$opt} = lc($val);
             next OPT;
          }
 
       } elsif ($opt eq 'script') {
 
          if (lc($val) =~ /^(run|script|simple)$/) {
-            $$self{$opt} = lc($val);
+            $$self{'g'}{$opt} = lc($val);
             next OPT;
          }
 
       } elsif ($opt eq 'echo') {
 
          if (lc($val) =~ /^(echo|noecho|failed)$/) {
-            $$self{$opt} = lc($val);
+            $$self{'g'}{$opt} = lc($val);
             next OPT;
          }
 
       } elsif ($opt eq 'failure') {
 
          if (lc($val) =~ /^(exit|display|continue)$/) {
-            $$self{$opt} = lc($val);
+            $$self{'g'}{$opt} = lc($val);
             next OPT;
          }
 
       } elsif ($opt =~ s/^ssh://) {
-         $$self{'ssh_opts'}{$opt} = $val;
+         $$self{'g'}{'ssh_opts'}{$opt} = $val;
          next OPT;
 
       } elsif ($opt eq 'ssh_num'    ||
                $opt eq 'ssh_sleep'
               ) {
-         $$self{$opt} = $val;
+         $$self{'g'}{$opt} = $val;
          next OPT;
 
       } elsif ($opt eq 'tmp_script'       ||
@@ -176,7 +308,7 @@ sub options {
                $opt eq 'ssh_script'       ||
                $opt eq 'ssh_script_keep'
               ) {
-         $$self{$opt} = $val;
+         $$self{'g'}{$opt} = $val;
          next OPT;
 
       } else {
@@ -192,12 +324,16 @@ sub options {
 }
 
 ###############################################################################
+# ADDING COMMANDS
+###############################################################################
 
 sub cmd {
    my($self,@args) = @_;
 
    while (@args) {
-      my $cmd  = shift(@args);
+      my $cmd     = shift(@args);
+      my $cmd_num = $$self{'cmd_num'}++;
+
       if (ref($cmd) ne ''  &&
           ref($cmd) ne 'ARRAY') {
          $$self{'err'} = "cmd must be a string or listref";
@@ -211,72 +347,205 @@ sub cmd {
       }
 
       foreach my $opt (keys %options) {
-         if ($opt !~ /^(dire|flow|noredir|retry|sleep|check)$/) {
+         if ($opt !~ /^(dire|noredir|retry|sleep|check|label)$/) {
             $$self{'err'} = "Invalid cmd option: $opt";
             $self->_print(1,$$self{'err'});
             return 1;
          }
+         if ($opt eq 'dire') {
+            $$self{'cmd'}{$cmd_num}{$opt} = $self->_quote($options{$opt});
+         } else {
+            $$self{'cmd'}{$cmd_num}{$opt} = $options{$opt};
+         }
       }
 
-      push @{ $$self{'cmd'} },[$cmd,%options];
+      # Check if it is a flow command.  Also, make sure that flow
+      # commands are properly opened, closed, and nested.
+
+      my $err = $self->_cmd_flow($cmd,$cmd_num);
+      return 1  if ($err);
+
+      # If the command has alternates, update the max_alt value
+      # as necessary.
+
+      if (ref($cmd) eq 'ARRAY') {
+         my $n = $#{ $cmd } + 1;
+         if ($n > $$self{'max_alt'}) {
+            $$self{'max_alt'} = $n;
+         }
+
+         $$self{'cmd'}{$cmd_num}{'cmd'} = $cmd;
+
+      } else {
+         $$self{'cmd'}{$cmd_num}{'cmd'} = [ $cmd ];
+      }
+
+   }
+   return 0;
+}
+
+#####################
+# Check whether a command is a flow command
+
+sub _cmd_flow {
+   my($self,$cmd,$cmd_num) = @_;
+
+   # A flow command may not have alternatives, so it must be a single command.
+   return  if (ref($cmd));
+
+   my($flow,$type,$err);
+
+   #
+   # Check to see if it is a flow command
+   #
+
+   if ($cmd =~ /^\s*(if)\s+.*?;\s*then\s*$/   ||
+       $cmd =~ /^\s*(elif)\s+.*?;\s*then\s*$/ ||
+       $cmd =~ /^\s*(else)\s*$/               ||
+       $cmd =~ /^\s*(fi)\s*$/) {
+      $flow = $1;
+
+      if ($flow eq 'if') {
+         $err = $self->_cmd_open_flow($cmd_num,'if');
+         $$self{'cmd'}{$cmd_num}{'flow_type'} = 'open';
+      } elsif ($flow eq 'fi') {
+         $err = $self->_cmd_close_flow($cmd_num,'if','fi');
+         $$self{'cmd'}{$cmd_num}{'flow_type'} = 'close';
+      } else {
+         $err = $self->_cmd_cont_flow($cmd_num,'if',$flow);
+         $$self{'cmd'}{$cmd_num}{'flow_type'} = 'cont';
+      }
+      $$self{'cmd'}{$cmd_num}{'flow'} = 'if';
+
+   } elsif ($cmd =~ /^\s*(while)\s+.*?;\s*do\s*$/   ||
+            $cmd =~ /^\s*(until)\s+.*?;\s*do\s*$/   ||
+            $cmd =~ /^\s*(for)\s+.*?;\s*do\s*$/     ||
+            $cmd =~ /^\s*(done)\s*$/) {
+      $flow = $1;
+
+      if ($flow eq 'while'  ||  $flow eq 'until'  ||  $flow eq 'for') {
+         $err = $self->_cmd_open_flow($cmd_num,'loop [while|until|for]');
+         $$self{'cmd'}{$cmd_num}{'flow_type'} = 'open';
+      } else {
+         $err = $self->_cmd_close_flow($cmd_num,'loop [while|until|for]','done');
+         $$self{'cmd'}{$cmd_num}{'flow_type'} = 'close';
+      }
+      $$self{'cmd'}{$cmd_num}{'flow'} = 'loop';
+
+   } else {
+      return 0;
+   }
+
+   #
+   # Flow commands may not have the following options:
+   #    dir, noredir, retry, check
+   #
+
+   foreach my $opt ('dir','noredir','retry','check') {
+      if (exists $$self{'cmd'}{$cmd_num}{$opt}) {
+         $$self{'err'} = "$opt option not allowed with flow command: $cmd_num";
+         return 1;
+      }
+   }
+
+   return 1  if ($err);
+}
+
+sub _cmd_curr_flow {
+   my($self) = @_;
+   my @flow  = @{ $$self{'g'}{'flow'} };
+   return ''  if (! @flow);
+   return $flow[$#flow]->[0];
+}
+sub _cmd_open_flow {
+   my($self,$cmd_num,$flow) = @_;
+
+   push(@{ $$self{'g'}{'flow'} },
+        [$flow,$cmd_num]);
+
+   return 0;
+}
+sub _cmd_close_flow {
+   my($self,$cmd_num,$flow,$close) = @_;
+
+   my $curr_flow = $self->_cmd_curr_flow();
+   if ($flow ne $curr_flow) {
+      $$self{'err'} = "Broken flow: '$close' found, but no '$flow': $cmd_num";
+      return 1;
+   }
+
+   pop(@{ $$self{'g'}{'flow'} });
+   return 0;
+}
+sub _cmd_cont_flow {
+   my($self,$cmd_num,$flow,$cont) = @_;
+
+   my $curr_flow = $self->_cmd_curr_flow();
+   if ($flow ne $curr_flow) {
+      $$self{'err'} = "Broken flow: '$cont' found, but no '$flow': $cmd_num";
+      return 1;
+   }
+   return 0;
+}
+sub _cmd_valid_script {
+   my($self) = @_;
+
+   return 1  if ($$self{'err'});
+   my $curr_flow = $self->_cmd_curr_flow();
+   if ($curr_flow) {
+      $$self{'err'} = "Broken flow: '$curr_flow' opened, but not closed";
+      return 1;
    }
    return 0;
 }
 
 ###############################################################################
+# RUN THE COMMANDS
+###############################################################################
 
-# Construct and run or print the script.
-#
 sub run {
    my($self)   = @_;
-   my ($script,$stdout,$stderr) = $self->_script();
-
-   #
-   # Print out the script if this is a dry run.
-   #
-
-   if ($$self{'mode'} eq 'dry-run') {
-      $script .= "\n";
-      if (wantarray) {
-         return ($script);
-      }
-      return $script;
+   if ($self->_cmd_valid_script()) {
+      $self->_print(1,"script flow commands not closed correctly");
+      return 252;
    }
+   $self->_script();
+
+   #
+   # Return the script if this is a dry run.
+   #
+
+   my $script = join("\n",@{ $$self{'scr'} });
+   return $script  if ($$self{'g'}{'mode'} eq 'dry-run');
 
    #
    # If it's running in real-time, do so.
    #
 
-   my $tmp_script = $$self{'tmp_script'};
-   if ($tmp_script) {
-      my $out = new IO::File;
+   my $tmp_script = $$self{'g'}{'tmp_script'};
+   if (! $tmp_script) {
+      $self->_print(1,"tmp_script option must be set");
+      return 254;
+   }
 
-      if ($out->open("> $tmp_script")) {
-         print $out $script;
-         $out->close();
-         $script = ". $tmp_script";
-      } else {
-         my $err = -2;
-         if (wantarray) {
-            return ($err);
-         }
-         return $err;
-      }
+   my $out = new IO::File;
+
+   if ($out->open("> $tmp_script")) {
+      print $out $script;
+      $out->close();
+   } else {
+      return 254;
    }
 
    my $err;
-   if ($$self{'mode'} eq 'run') {
-      system("$script");
+   if ($$self{'g'}{'mode'} eq 'run') {
+      system(". $tmp_script");
       $err = $?;
 
-      if ($tmp_script  &&
-          ! $$self{'tmp_script_keep'}) {
+      if (! $$self{'g'}{'tmp_script_keep'}) {
          unlink($tmp_script);
       }
 
-      if (wantarray) {
-         return ($err);
-      }
       return $err;
    }
 
@@ -285,1033 +554,470 @@ sub run {
    # we can parse it.
    #
 
-   my($capt_out,$capt_err,$capt_exit);
+   my($stdout,$stderr,$exit);
 
-   if      ($stdout  &&  $stderr) {
-      ($capt_out,$capt_err,$capt_exit) = capture        { system( "$script" ) };
-   } elsif ($stdout) {
-      ($capt_out,$capt_exit)           = capture_stdout { system( "$script" ) };
-   } elsif ($stderr) {
-      ($capt_err,$capt_exit)           = capture_stderr { system( "$script" ) };
+   if      ($$self{'g'}{'out'}  &&
+            $$self{'g'}{'err'}) {
+      ($stdout,$stderr,$exit) = capture        { system( ". $tmp_script" ) };
+   } elsif ($$self{'g'}{'out'}) {
+      ($stdout,$exit)          = capture_stdout { system( ". $tmp_script" ) };
+   } elsif ($$self{'g'}{'err'}) {
+      ($stderr,$exit)          = capture_stderr { system( ". $tmp_script" ) };
    } else {
-      system("$script");
-      $capt_exit = $?;
+      system(". $tmp_script");
+      $exit = $?;
    }
-   $capt_exit = $capt_exit >> 8;
+   $exit = $exit >> 8;
 
-   if ($tmp_script  &&
-       ! $$self{'tmp_script_keep'}) {
+   if (! $$self{'g'}{'tmp_script_keep'}) {
       unlink($tmp_script);
    }
 
-   #
-   # Parse the output and return it.
-   #
+   $$self{'o'}{'out'}  = $self->_script_output($stdout)  if ($stdout);
+   $$self{'o'}{'err'}  = $self->_script_output($stderr)  if ($stderr);
+   $$self{'o'}{'exit'} = $exit;
 
-   return $self->_script_output($capt_out,$capt_err,$capt_exit);
+   return $exit;
 }
 
 ###############################################################################
-
-sub ssh {
-   my($self,@hosts) = @_;
-
-   if (! @hosts) {
-      $self->_print(1,"A host or hosts must be supplied with the ssh method");
-      return 1;
-   }
-
-   my ($script,$stdout,$stderr) = $self->_script();
-
-   #
-   # Print out the script if this is a dry run.
-   #
-
-   if ($$self{'mode'} eq 'dry-run') {
-      $script .= "\n";
-      $script  = $self->_quote($script);
-
-      my @ret;
-      foreach my $host (@hosts) {
-         push @ret, "##########################\n" .
-                    "ssh $host \"$script\"\n\n";
-      }
-      return @ret;
-   }
-
-   #
-   # Run the script on each host.
-   #
-
-   my $tmp_script = $$self{'tmp_script'};
-   if ($tmp_script) {
-      my $f   = $$self{'ssh_script'}  ||  $tmp_script;
-      my $out = new IO::File;
-
-      if ($out->open("> $tmp_script")) {
-         print $out $script;
-         $out->close();
-         $script = ". $f";
-
-      } else {
-         my $err = -2;
-         if (wantarray) {
-            return ($err);
-         }
-         return $err;
-      }
-   }
-
-   if ($$self{'ssh_num'} == 1) {
-      return $self->_ssh_serial($script,$stdout,$stderr,@hosts);
-   } else {
-      return $self->_ssh_parallel($script,$stdout,$stderr,@hosts);
-   }
-}
-
-sub _ssh_serial {
-   my($self,$script,$stdout,$stderr,@hosts) = @_;
-   my @ret;
-
-   foreach my $host (@hosts) {
-      push @ret, $self->_ssh($script,$stdout,$stderr,$host);
-   }
-
-   return @ret;
-}
-
-sub _ssh_parallel {
-   my($self,$script,$stdout,$stderr,@hosts) = @_;
-   my @ret;
-
-   my $max_proc = ($$self{'ssh_num'} ? $$self{'ssh_num'} : @hosts);
-   my $manager = Parallel::ForkManager->new($max_proc);
-
-   $manager->run_on_finish
-     (
-      sub {
-         my($pid,$exit_code,$id,$signal,$core_dump,$data) = @_;
-         my $n    = shift(@$data);
-         $ret[$n] = $data;
-      }
-     );
-
-   for (my $i=0; $i<@hosts; $i++) {
-      my $host = $hosts[$i];
-
-      $manager->start and next;
-
-      my @r = ($i);
-      push @r, $self->_ssh($script,$stdout,$stderr,$host);
-
-      $manager->finish(0,\@r);
-   }
-
-   $manager->wait_all_children();
-   return @ret;
-}
-
-sub _ssh {
-   my($self,$script,$stdout,$stderr,$host) = @_;
-
-   my $ssh = Net::OpenSSH->new($host, %{ $$self{'ssh_opts'} });
-
-   if ($$self{'tmp_script'}) {
-      my $f1 = $$self{'tmp_script'};
-      my $f2 = $$self{'ssh_script'}  ||  $f1;
-      $ssh->scp_put($f1,$f2)  or
-        return (-3);
-   }
-
-   #
-   # If we're sleeping, do so.
-   #
-
-   if ($$self{'ssh_sleep'}) {
-      sleep(int(rand($$self{'ssh_sleep'})));
-   }
-
-   #
-   # If it's running in real-time, do so.
-   #
-
-   my $f   = $$self{'ssh_script'}  ||  $$self{'tmp_script'};
-
-   if ($$self{'mode'} eq 'run') {
-      $ssh->system({},$script);
-      my $ret = $?;
-
-      if (! $$self{'ssh_script_keep'}) {
-         $ssh->system({},"rm -f $f");
-      }
-      return ($ret);
-   }
-
-   #
-   # If it's running in 'script' mode, capture the output so that
-   # we can parse it.
-   #
-
-   my($capt_out,$capt_err,$capt_exit);
-
-   if      ($stderr) {
-      ($capt_out,$capt_err) = $ssh->capture2({},$script);
-      $capt_exit            = $?;
-   } elsif ($stdout) {
-      $capt_out             = $ssh->capture({},$script);
-      $capt_exit            = $?;
-   } else {
-      $ssh->system({},$script);
-      $capt_exit            = $?;
-   }
-   $capt_exit = $capt_exit >> 8;
-
-   if (! $$self{'ssh_script_keep'}) {
-      $ssh->system({},"rm -f $f");
-   }
-
-   #
-   # Parse the output and return it.
-   #
-
-   return $self->_script_output($capt_out,$capt_err,$capt_exit);
-}
-
-###############################################################################
+# CREATE THE SCRIPT
 ###############################################################################
 
-# Some hashes to make some operations cleaner
-my(%keep_stdout,%keep_stderr,%succ_status,%fail_status);
-BEGIN {
-   %keep_stdout = map { $_,1 } qw(both merged stdout);
-   %keep_stderr = map { $_,1 } qw(both stderr);
-   %succ_status = map { $_,1 } qw(succ retried);
-   $succ_status{''} = 1;
-   %fail_status = map { $_,1 } qw(exit fail);
-}
-
-sub _init_cache {
-   my($self) = @_;
-
-   $$self{'c'} =
-     {
-      #
-      # Script indentation
-      #
-      'ind_per_lev'    => 3,
-      'ind_cur_lev'    => 0,
-      'curr_ind'       => "",
-      'next_ind'       => "",
-      'prev_ind'       => "",
-
-      # The simple script
-      #   ( SIMPLE_CMD_DESC1, SIMPLE_CMD_DESC2, ... )
-      # where:
-      #   SIMPLE_CMD_DESC = { 'num'       => CMD_NUM,
-      #                       'flow'      => FLOW,
-      #                       'flow_type' => FLOW_TYPE,
-      #                       'opts'      => OPTS,
-      #                       'cmd'       => CMD,
-      #                     }
-      #   CMD_NUM         : the number of this command
-      #   FLOW            : '', if, else, ...  (the actual flow command or empty)
-      #   FLOW_TYPE       : 'open', 'cont', or 'close'
-      #   OPTS            : a hash of options for this command
-      #   CMD             : a string containing a command alternative or a listref
-      #                     of alternates
-      #
-      'simple'         => [],
-
-      # Keep track of current flow structure
-      #   ( [ FLOW_COMMAND, CMD_NUM ], [ FLOW_COMMAND, CMD_NUM ], ... )
-      # where:
-      #   FLOW_COMMAND    : if, while, ... (the opening command)
-      #   CMD_NUM         : the number of the opening command
-      #
-      'flow'           => [],
-
-      # Global options
-      #   g_run        How the script is run:         dry-run, run, script
-      #   g_type       The type of script to create:  run, script, simple
-      #   g_echo       If we want to echo commands:   0/1
-      #   g_fail       How to handle failure:         exit, display, continue
-      #   g_redir      String to redirect output
-      #   g_out        Capture STDOUT
-      #   g_err        Capture STDERR
-      #   g_output     The output option
-      #   g_foutput    The f-output option
-      'g_run'          => '',
-      'g_type'         => '',
-      'g_echo'         => '',
-      'g_fail'         => '',
-      'g_redir'        => '',
-      'g_out'          => '',
-      'g_err'          => '',
-      'g_output'       => '',
-      'g_foutput'      => '',
-
-      # Command options
-      #   c_meta       A meta command (supplied by this module) that does not
-      #                need to be wrapped in error traps, retries, etc.
-      #   c_num        The number of the current command
-      #   c_flow       The flow command being processed (if, elif, while, ...)
-      #   c_flow_type  The type of flow command (open, cont, close)
-      #   c_retries    The number of retries
-      #   c_sleep      How long to sleep between retries
-      #   c_noredir    1 if this command should not be redirected
-      #   c_check      The command to check success
-
-      'c_meta'         => '',
-      'c_num'          => '',
-      'c_flow'         => '',
-      'c_flow_type'    => '',
-      'c_retries'      => '',
-      'c_sleep'        => '',
-      'c_noredir'      => '',
-      'c_check'        => '',
-
-     };
-}
-
-# Variables used in scripts
-#   SC_ORIG_DIRE     : the directory you are in when the script ran
-#   SC_DIRE          : the working directory of the script
-#   SC_FAILED = N    : the command which failed (0 = none, 1 = script
-#                      initialization, 2+ = command N)
-#                      Unused in simple scripts
-#   SC_EXIT          : the exit code for the script
-#   SC_CURR_EXIT     : the exit code for the current command
-#   SC_CURR_SUCC     : 1 if the current command (any alternate) succeeded
-#   SC_RETRIES = N   : this command will run up to N times
-#   SC_TRY = N       : we're currently on the Nth try
-
-#####################
-# This creates the script and it is ready to be printed or evaluated
-# in double quotes.
-#
 sub _script {
    my($self)  = @_;
+   my(@ret);
    $self->_script_options();
+   $self->_ind_0();
 
-   # First, generate the simple script.  This contains the basic commands
-   # that will run.  Then we'll flesh it out with options in the second
-   # step.
+   while (1) {
 
-   $$self{'c'}{'c_num'} = 1;
-   push @{ $$self{'c'}{'simple'} }, $self->_simple_init();
-   $$self{'c'}{'c_num'}++;
+      ##############################
+      # If needed, we'll generate a simple script.
+      #
+      # The simple script is used in two ways:
+      #   o  If a simple script is all that is needed, we'll use this
+      #      to print out the list of commands that would run without
+      #      all of the fancy error handling and I/O redirection.
+      #   o  If the 'failure' option is set to 'display', we'll build
+      #      in a function to the script that will display the commands
+      #      that should have run.  This function will be called in
+      #      the event of a failure.
 
-   foreach my $ele (@{ $$self{'cmd'} }) {
-      my($cmd,%options) = @$ele;
-      push @{ $$self{'c'}{'simple'} }, $self->_simple_cmd($cmd,%options);
-      $$self{'c'}{'c_num'}++;
-   }
-   return ()  if ($$self{'err'});
+      if ($$self{'g'}{'simple'}) {
+         $self->_script_init('simple');
 
-   push @{ $$self{'c'}{'simple'} }, $self->_simple_term();
-
-   # Now generate the actual script.
-
-   my @script;
-   push @script, $self->_simple_script();
-
-   # If we want to generate a simple script, we're done.
-
-   if ($$self{'c'}{'g_type'} eq 'simple') {
-      my $script = join("\n",@script);
-      return ($script,$$self{'c'}{'g_out'},$$self{'c'}{'g_err'});
-   }
-
-   # Generate the rest of a full script
-
-   push @script, $self->_script_init();
-
-   #
-   # Handle each command.
-   #
-
-   foreach my $tmp (@{ $$self{'c'}{'simple'} }) {
-      next           if (! $$tmp{'cmd'});
-      $$self{'c'}{'c_num'}       = $$tmp{'num'};
-      $$self{'c'}{'c_flow'}      = $$tmp{'flow'};
-      $$self{'c'}{'c_flow_type'} = $$tmp{'flow_type'};
-      my $options    = $$tmp{'opts'};
-      my @cmd        = (ref($$tmp{'cmd'}) ? @{ $$tmp{'cmd'} } : ($$tmp{'cmd'}));
-
-      if ($$self{'c'}{'c_flow'}) {
-         push @script, $self->_flow(@cmd);
-      } else {
-         push @script, $self->_cmd($options,@cmd);
-      }
-   }
-
-   #
-   # Form the script.
-   #
-
-   push @script, $self->_script_term();
-   my $script = join("\n",@script);
-
-   return ()  if ($$self{'err'});
-   return ($script,$$self{'c'}{'g_out'},$$self{'c'}{'g_err'});
-}
-
-#####################
-# Generate the simple script
-
-sub _simple_init {
-   my($self)  = @_;
-   my @script;
-
-   my %cmd    = ('num'       => $$self{'c'}{'c_num'},
-                 'flow'      => '',
-                 'flow_type' => '',
-                );
-
-   #
-   # Keep track of our starting directory.
-   #
-
-   push @script, { %cmd,
-                   'opts' => { 'sc'  => 1 },
-                   'cmd'  => qq(SC_ORIG_DIRE=`pwd`),
-                 };
-
-   #
-   # Handle environment variables.
-   #
-   #   ENV_VAR=VAL
-   #   export ENV_VAR
-   #
-
-   my @env = sort keys %{ $$self{'env'} };
-   if (@env) {
-      my @var;
-      foreach my $var (@env) {
-         my $val       = $$self{'env'}{$var};
-         $val          = $self->_quote($val);
-         push @script, { %cmd,
-                         'opts' => { 'sc'  => 1 },
-                         'cmd'  => qq($var="$val"),
-                       };
-         push(@var,$var);
-      }
-      my $vars = join(' ',@var);
-      push @script, { %cmd,
-                      'opts' => { 'sc'  => 1 },
-                      'cmd'  => qq(export $vars),
-                    };
-   }
-
-   #
-   # If we specify a global dire option, handle that now.
-   #
-
-   if ($$self{'dire'}  &&  $$self{'dire'} ne '.') {
-      my $dire = $self->_quote($$self{'dire'});
-      push @script, { %cmd,
-                      'opts' => { 'sc'  => 1 },
-                      'cmd'  => qq(SC_DIRE="$dire"),
-                    },
-                    { %cmd,
-                      'opts' => {},
-                      'cmd'  => qq(cd "\$SC_DIRE"),
-                    };
-   } else {
-      push @script, { %cmd,
-                      'opts' => { 'sc'  => 1 },
-                      'cmd'  => qq(SC_DIRE=`pwd`),
-                    };
-   }
-
-   return @script;
-}
-
-sub _simple_term {
-   my($self)  = @_;
-   my @script;
-
-   my %cmd    = ('num'       => $$self{'c'}{'c_num'},
-                 'flow'      => '',
-                 'flow_type' => '',
-                 'opts'      => { 'sc'  => 1 },
-                );
-   my @cmd;
-
-   #
-   # Make sure we end up in the original directory.
-   #
-
-   push(@cmd, qq(cd "\$SC_ORIG_DIRE"));
-
-   foreach my $cmd (@cmd) {
-      push @script, { %cmd,
-                      'cmd' => $cmd,
-                    }
-   }
-   return @script;
-}
-
-#####################
-# Add each simple command
-
-sub _simple_cmd {
-   my($self,$cmd,%options) = @_;
-   my @script;
-
-   my %cmd    = ('num'       => $$self{'c'}{'c_num'},
-                 'opts'      => {},
-                );
-
-   #
-   # Check to see if it is a flow command
-   #
-
-   my $flow = '';
-   my $type = '';
-
-   if (! ref($cmd)) {
-
-      # if, elif, else, fi
-      if      ($cmd =~ /^\s*(if)\s+.*?;\s*then\s*$/   ||
-               $cmd =~ /^\s*(elif)\s+.*?;\s*then\s*$/ ||
-               $cmd =~ /^\s*(else)\s*$/               ||
-               $cmd =~ /^\s*(fi)\s*$/) {
-         $flow = $1;
-
-         if ($flow eq 'if') {
-            push(@{ $$self{'c'}{'flow'} },[$flow,$$self{'c'}{'c_num'}]);
-            $type = 'open';
-
-         } else {
-            if (! @{ $$self{'c'}{'flow'} }  ||
-                $$self{'c'}{'flow'}[$#{ $$self{'c'}{'flow'} }][0] ne 'if') {
-               $$self{'err'} =
-                 "Broken flow: 'fi' found, but no 'if': $$self{'c'}{'c_num'}";
-               return ();
-            }
-
-            if ($flow eq 'fi') {
-               $type = 'close';
-               pop(@{ $$self{'c'}{'flow'} });
-            } else {
-               $type = 'cont';
-            }
+         foreach my $cmd_num (1 .. $$self{'cmd_num'}-1) {
+            $self->_cmd_options($cmd_num,'simple');
+            $self->_script_cmd($cmd_num)
          }
 
-      } elsif ($cmd =~ /^\s*(while)\s+.*?;\s*do\s*$/   ||
-               $cmd =~ /^\s*(until)\s+.*?;\s*do\s*$/   ||
-               $cmd =~ /^\s*(for)\s+.*?;\s*do\s*$/     ||
-               $cmd =~ /^\s*(done)\s*$/) {
-         $flow = $1;
+         $self->_script_term('simple');
 
-         if ($flow eq 'while'  ||  $flow eq 'until'  ||  $flow eq 'for') {
-            push(@{ $$self{'c'}{'flow'} },[$flow,$$self{'c'}{'c_num'}]);
-            $type = 'open';
-         } else {
-            if (! @{ $$self{'c'}{'flow'} }  ||
-                ($$self{'c'}{'flow'}[$#{ $$self{'c'}{'flow'} }][0] ne 'while'  &&
-                 $$self{'c'}{'flow'}[$#{ $$self{'c'}{'flow'} }][0] ne 'until'  &&
-                 $$self{'c'}{'flow'}[$#{ $$self{'c'}{'flow'} }][0] ne 'for')) {
-               $$self{'err'} =
-                 "Broken flow: 'done' found, but no 'while/until/for': $$self{'c'}{'c_num'}";
-               return ();
-            }
-
-            $type = 'close';
-            pop(@{ $$self{'c'}{'flow'} });
-         }
+         last  if ($$self{'g'}{'simple'} eq 'simple');
       }
+
+      ##############################
+      # Now generate the full script
+
+      $self->_script_init();
+
+      foreach my $cmd_num (1 .. $$self{'cmd_num'}-1) {
+         $self->_cmd_options($cmd_num);
+         $self->_script_cmd($cmd_num)
+      }
+
+      $self->_script_term();
+
+      last;
    }
-
-   if ($flow) {
-      push @script, { %cmd,
-                      'flow'      => $flow,
-                      'flow_type' => $type,
-                      'opts'      => {},
-                      'cmd'       => $cmd,
-                    };
-      return @script;
-   }
-
-   #
-   # Now handle the other commands.
-   #
-
-   %cmd    = ('num'       => $$self{'c'}{'c_num'},
-              'flow'      => '',
-              'flow_type' => '',
-             );
-
-   #
-   # Handle the per-command 'dire' option.
-   #
-
-   my $dire = '';
-   if ($options{'dire'}  &&  $options{'dire'} ne '.') {
-      $dire = $self->_quote($options{'dire'});
-      push @script, { %cmd,
-                      'opts'  => {},
-                      'cmd'   => qq(cd "$dire";),
-                    };
-   }
-
-   #
-   # Handle the command.
-   #
-
-   push @script, { %cmd,
-                   'opts'  => \%options,
-                   'cmd'   => $cmd,
-                 };
-
-   #
-   # Handle the per-command 'dire' option.
-   #
-
-   if ($dire) {
-      push @script, { %cmd,
-                      'opts'  => {},
-                      'cmd'   => qq(cd "\$SC_DIRE";),
-                    };
-   }
-
-   return @script;
 }
-
-#####################
-# This will either generate a shell function that will print the simple
-# script, or it will create the simple script itself.
-#
-# The shell function will be used to print the simple script only if
-# 'failure' is set to display.
-#
-# The simple script will be generated only if we're doing a dry-run and
-# producing a simple script.
-
-sub _simple_script {
-   my($self) = @_;
-   my @script;
-   return @script
-     unless ($$self{'c'}{'g_fail'} eq 'display'  ||  $$self{'c'}{'g_type'} eq 'simple');
-   my $curr_ind = $$self{'c'}{'curr_ind'};
-   my $next_ind = $$self{'c'}{'next_ind'};
-   my $prev_ind = $$self{'c'}{'prev_ind'};
-
-   # A call to simple() prints out the simple script.  It will be
-   # used only if a command failed, and the failure option is
-   # display.
-
-   if ($$self{'c'}{'g_fail'} eq 'display') {
-      push @script,
-        q[simple () {],
-        q[   echo ""],
-        q[   echo "#****************************************"],
-        q[   echo "# The following script failed"],
-        q[   while read line ;do],
-        q[      loc=`echo "$line" | sed -e 's,:.*,,'`],
-        q[      txt=`echo "$line" | sed -e 's,^[0-9]*:,,'`],
-        q[      if [ "$SC_FAILED" = "$loc" ]; then],
-        q[         echo "#*** Script failed in the following command"],
-        q[      fi],
-        q[      echo "$txt"],
-        q[   done << EOF];
-
-      $self->_ind_0();
-      $curr_ind = $$self{'c'}{'curr_ind'};
-      $next_ind = $$self{'c'}{'next_ind'};
-      $prev_ind = $$self{'c'}{'prev_ind'};
-   }
-
-   foreach my $tmp (@{ $$self{'c'}{'simple'} }) {
-      my $num     = $$tmp{'num'};
-      my $pref    = ($$self{'c'}{'g_type'} eq 'simple' ? '' : "${num}:");
-      my $flow    = $$tmp{'flow'};
-      my $type    = $$tmp{'flow_type'};
-      my $opts    = $$tmp{'opts'};
-      my @cmd     = (ref($$tmp{'cmd'}) ? @{ $$tmp{'cmd'} } : ($$tmp{'cmd'}));
-
-      if ($flow) {
-         my ($cmd) = @cmd;
-         if ($type eq 'open') {
-            push @script,qq(${pref}${curr_ind}$cmd);
-            $self->_ind_plus();
-            $curr_ind = $$self{'c'}{'curr_ind'};
-            $next_ind = $$self{'c'}{'next_ind'};
-            $prev_ind = $$self{'c'}{'prev_ind'};
-         } elsif ($type eq 'cont') {
-            push @script,qq(${pref}${prev_ind}$cmd);
-         } else {
-            $self->_ind_minus();
-            $curr_ind = $$self{'c'}{'curr_ind'};
-            $next_ind = $$self{'c'}{'next_ind'};
-            $prev_ind = $$self{'c'}{'prev_ind'};
-            push @script,qq(${pref}${curr_ind}$cmd);
-         }
-         next;
-      }
-
-      my $cmd = shift(@cmd);
-      push @script, qq(${pref}${curr_ind}$cmd);
-      foreach my $c (@cmd) {
-         push @script, qq(${pref}${curr_ind}# or),
-                       qq(${pref}${curr_ind}# $c);
-      }
-
-      if ($$opts{'check'}) {
-         my $c = $$opts{'check'};
-         push @script, qq(${pref}${curr_ind}# Check with),
-                       qq(${pref}${curr_ind}# $c);
-      }
-   }
-
-   if ($$self{'c'}{'g_fail'} eq 'display') {
-      push @script,
-        q[EOF],
-        q[}],
-        q[];
-   }
-
-   return @script;
-}
-
-#####################
-# Start the script.
 
 sub _script_init {
-   my($self) = @_;
-   my @script;
-   my $curr_ind = $$self{'c'}{'curr_ind'};
-   my $next_ind = $$self{'c'}{'next_ind'};
-   my $prev_ind = $$self{'c'}{'prev_ind'};
+   my($self,$simple) = @_;
+   my($text,$env,$text2);
 
-   #
-   # Initialize the variable which tracks which command failed.
-   #
+   if ($simple) {
+      $$self{'c'}{'simp'} = $$self{'g'}{'simple'};
+   } else {
+      $$self{'c'}{'simp'} = '';
+   }
 
-   push @script, qq(${curr_ind}SC_FAILED=0;),
-                 qq(${curr_ind}SC_EXIT=0;),
-                 qq(${curr_ind}main () {);
-   $self->_ind_plus();
-   $curr_ind = $$self{'c'}{'curr_ind'};
-   $next_ind = $$self{'c'}{'next_ind'};
-   $prev_ind = $$self{'c'}{'prev_ind'};
+   if ($simple) {
 
-   return @script;
+      $text = <<'EOT';
+<simp=failure>      : simple () {
+<simp=failure>      :    echo ""
+<simp=failure>      :    echo "#****************************************"
+<simp=failure>      :    if   [ $SC_FAILED -eq 201 ]; then
+<simp=failure>      :       echo "# The following script failed after command 200"
+<simp=failure>      :    elif [ $SC_FAILED -gt 201 ]; then
+<simp=failure>      :       echo "# The following script failed during initialization"
+<simp=failure>      :    else
+<simp=failure>      :       echo "# The following script failed at command $SC_FAILED"
+<simp=failure>      :    fi
+<simp=failure>      :    while read line ;do
+<simp=failure>      :       echo "$line"
+<simp=failure>      :    done << SC_SIMPLE_EOS
+                    : SC_ORIG_DIRE=`pwd`;
+EOT
+
+   } else {
+      $text = <<'EOT';
+                    : SC_FAILED=0;
+<c_echo=echo>       : echo "# SC_ORIG_DIRE=`pwd`";
+                    : SC_ORIG_DIRE=`pwd`;
+                    :
+                    : main () {
+EOT
+   }
+
+   $env = <<'EOT';
+<c_echo=echo>       :    echo '# export <VAR>="<VAL>"';
+                    :    export <VAR>="<VAL>";
+EOT
+
+   $text2 = <<'EOT';
+<dire><c_echo=echo> :    echo '# SC_DIRE="<?dire?>"';
+<dire>              :    SC_DIRE="<?dire?>";
+<dire><c_echo=echo> :    echo '# cd "$SC_DIRE"';
+<dire><simp>        :    cd "$SC_DIRE";
+<dire><!simp>       :    cd "$SC_DIRE" 2>/dev/null;
+<dire><!simp>       :    if [ $? -ne 0 ]; then
+<dire><!simp>       :       SC_FAILED=255;
+<dire><!simp>       :       return;
+<dire><!simp>       :    fi
+<!dire><c_echo=echo>:    echo "# SC_DIRE=$SC_ORIG_DIRE";
+<!dire>             :    SC_DIRE=$SC_ORIG_DIRE;
+EOT
+
+   $self->_text_to_script($text);
+   $self->_ind_plus()  if (! $simple);
+
+   my(@tmp) = @{ $$self{'e'} };
+   while (@tmp) {
+      my $var  = shift(@tmp);
+      my $val  = shift(@tmp);
+      my $str  = $env;
+      $str     =~ s/<VAR>/$var/g;
+      $str     =~ s/<VAL>/$val/g;
+      $self->_text_to_script($str);
+   }
+
+   $self->_text_to_script($text2);
 }
 
 sub _script_term {
-   my($self) = @_;
-   my @script;
-   my $curr_ind = $$self{'c'}{'curr_ind'};
-   my $next_ind = $$self{'c'}{'next_ind'};
-   my $prev_ind = $$self{'c'}{'prev_ind'};
+   my($self,$simple) = @_;
+   my($text);
 
-   $self->_ind_minus();
-   $curr_ind = $$self{'c'}{'curr_ind'};
-   $next_ind = $$self{'c'}{'next_ind'};
-   $prev_ind = $$self{'c'}{'prev_ind'};
-   push @script, qq(${curr_ind}}),
-                 '',
-                 qq(${curr_ind}main);
-
-   # If failure = display, call simple with $SC_FAILED
-
-   if ($$self{'c'}{'g_fail'} eq 'display') {
-      push @script, qq(${curr_ind}if [ \$SC_FAILED -ne 0 ]; then),
-                    qq(${next_ind}simple),
-                    qq(${curr_ind}fi);
-   }
-
-   push @script, qq(${curr_ind}exit \$SC_EXIT;);
-
-   return @script;
-}
-
-#####################
-# Handle a command
-
-sub _flow {
-   my($self,$cmd) = @_;
-   my @script = ('');
-   my $curr_ind = $$self{'c'}{'curr_ind'};
-   my $next_ind = $$self{'c'}{'next_ind'};
-   my $prev_ind = $$self{'c'}{'prev_ind'};
-
-   if ($$self{'c'}{'c_flow_type'} eq 'open') {
-      push @script, qq(${curr_ind}echo "# $cmd";)
-        if ($$self{'c'}{'g_type'} eq 'run'  &&  $$self{'c'}{'g_echo'} eq 'echo');
-      push @script, qq(${curr_ind}$cmd);
-      $self->_ind_plus();
-      $curr_ind = $$self{'c'}{'curr_ind'};
-      $next_ind = $$self{'c'}{'next_ind'};
-      $prev_ind = $$self{'c'}{'prev_ind'};
-
-   } elsif ($$self{'c'}{'c_flow_type'} eq 'cont') {
-      push @script, qq(${prev_ind}$cmd);
-      push @script, qq(${prev_ind}echo "# $cmd";)
-        if ($$self{'c'}{'g_type'} eq 'run'  &&  $$self{'c'}{'g_echo'} eq 'echo');
+   if ($simple) {
+      $$self{'c'}{'simp'} = $$self{'g'}{'simple'};
+      $text = <<'EOT';
+                  : cd "$SC_ORIG_DIRE";
+<simp=failure>    : SC_SIMPLE_EOS
+<simp=failure>    : }
+<simp=failure>    :
+EOT
 
    } else {
       $self->_ind_minus();
-      $curr_ind = $$self{'c'}{'curr_ind'};
-      $next_ind = $$self{'c'}{'next_ind'};
-      $prev_ind = $$self{'c'}{'prev_ind'};
-      push @script, qq(${curr_ind}$cmd);
-      push @script, qq(${prev_ind}echo "# $cmd";)
-        if ($$self{'c'}{'g_type'} eq 'run'  &&  $$self{'c'}{'g_echo'} eq 'echo');
+      $text = <<'EOT';
+                  : }
+                  :
+                  : main;
+                  : cd "$SC_ORIG_DIRE";
+<failure=display> : if [ $SC_FAILED -ne 0 ]; then
+<failure=display> :    simple;
+<failure=display> : fi
+<c_echo=echo>     : echo '# cd "$SC_ORIG_DIRE"';
+                  : exit $SC_FAILED;
+                  :
+EOT
    }
 
-   return @script;
-}
-
-sub _cmd {
-   my($self,$options,@cmd) = @_;
-   my @script;
-   $self->_cmd_options(%$options);
-
-   push @script, $self->_cmd_init();
-   push @script, $self->_cmd_exe(@cmd);
-   push @script, $self->_cmd_term();
-
-   return @script;
-}
-
-sub _cmd_init {
-   my($self) = @_;
-   my @script;
-   return @script  if ($$self{'c'}{'c_meta'});
-   my $curr_ind = $$self{'c'}{'curr_ind'};
-   my $next_ind = $$self{'c'}{'next_ind'};
-   my $prev_ind = $$self{'c'}{'prev_ind'};
-
-   #
-   # Print out a header to clarify the start of the command.
-   #
-   #   #
-   #   # Command NUM
-   #   #
-   #
-
-   push @script,
-     '',
-     qq(${curr_ind}#),
-     qq(${curr_ind}# Command $$self{'c'}{'c_num'}),
-     qq(${curr_ind}#),
-     qq(${curr_ind}SC_CURR_EXIT=0;),
-     qq(${curr_ind}SC_CURR_SUCC=0;);
-
-   #
-   # Handle command retries.  If a command is set to do retries,
-   # we'll always do them, but if a command has failed with 'display'
-   # mode, then we'll only do 1 iteration.
-   #
-
-   if ($$self{'c'}{'c_retries'} > 1) {
-      push @script, qq(${curr_ind}SC_RETRIES=$$self{'c'}{'c_retries'};),
-                    qq(${curr_ind}SC_TRY=0;),
-                    qq(${curr_ind}while [ \$SC_TRY -lt \$SC_RETRIES ]; do);
-      $self->_ind_plus();
-      $curr_ind = $$self{'c'}{'curr_ind'};
-      $next_ind = $$self{'c'}{'next_ind'};
-      $prev_ind = $$self{'c'}{'prev_ind'};
-   }
-
-   return @script;
-}
-
-sub _cmd_term {
-   my($self) = @_;
-   my @script;
-   return @script  if ($$self{'c'}{'c_meta'});
-   my $curr_ind = $$self{'c'}{'curr_ind'};
-   my $next_ind = $$self{'c'}{'next_ind'};
-   my $prev_ind = $$self{'c'}{'prev_ind'};
-
-   #
-   # Handle command retries.
-   #
-
-   if ($$self{'c'}{'c_retries'} > 1) {
-      push @script, qq(${curr_ind}if [ \$SC_CURR_EXIT -eq 0 ]; then),
-                    qq(${next_ind}break;),
-                    qq(${curr_ind}fi),
-                    qq(${curr_ind}SC_TRY=`expr \$SC_TRY + 1`;);
-
-      if ($$self{'c'}{'c_sleep'}) {
-         push @script, qq(${curr_ind}if [ \$SC_TRY -lt \$SC_RETRIES ]; then),
-                       qq(${next_ind}sleep $$self{'c'}{'c_sleep'};),
-                       qq(${curr_ind}fi);
-      }
-
-      $self->_ind_minus();
-      $curr_ind = $$self{'c'}{'curr_ind'};
-      $next_ind = $$self{'c'}{'next_ind'};
-      $prev_ind = $$self{'c'}{'prev_ind'};
-      push @script, qq(${curr_ind}done);
-   }
-
-   #
-   # Handle the current exit code
-   #
-
-   push @script,
-     qq(${curr_ind}if [ \$SC_EXIT -eq 0  -a  \$SC_CURR_EXIT -ne 0 ]; then),
-     qq(${next_ind}SC_EXIT=\$SC_CURR_EXIT;),
-     qq(${next_ind}SC_FAILED=$$self{'c'}{'c_num'};),
-     qq(${curr_ind}fi);
-
-   #
-   # If we have failed, then see what the options 'failure' is set to.
-   #
-   # If it is 'exit' or 'display', then we need to stop running
-   # commands.  Since the script is wrapped as a subroutine, just
-   # return.
-   #
-
-   if ($$self{'c'}{'g_fail'} eq 'exit'  ||  $$self{'c'}{'g_fail'} eq 'display') {
-      push @script, qq(${curr_ind}if [ \$SC_EXIT -ne 0 ]; then),
-                    qq(${next_ind}return),
-                    qq(${curr_ind}fi);
-   }
-
-   return @script;
+   $self->_text_to_script($text);
 }
 
 #####################
-# Do a command (with any number of alternates)
-
-sub _cmd_exe {
-   my($self,@cmd) = @_;
-   my @script;
-
-   #
-   # Handle each alternate of the command.  They will be numbered
-   # starting at 1.
-   #
-
-   my $alt_num     = 0;
-   while (@cmd) {
-      $alt_num++;
-      my $first    = ($alt_num==1 ? 1 : 0); # 1 if this is the first or only
-                                            # alternate
-      my $c        = shift(@cmd);
-      my $last     = (! @cmd ? 1 : 0);      # 1 if this is the last alternate
-
-      #
-      # Add the command to the script
-      #
-
-      push @script, $self->_alt_init($c,$$self{'c'}{'c_num'},$alt_num);
-      push @script, $self->_alt_cmd($c,$$self{'c'}{'c_num'},$alt_num,$first,$last);
-      push @script, $self->_alt_term();
-   }
-
-   return @script;
-}
-
-#####################
-# Set up a single command alternative.
-
-sub _alt_init {
-   my($self,$cmd,$cmd_num,$alt_num) = @_;
-   my $curr_ind = $$self{'c'}{'curr_ind'};
-   my $next_ind = $$self{'c'}{'next_ind'};
-   my $prev_ind = $$self{'c'}{'prev_ind'};
-   my @script;
-
-   if (! $$self{'c'}{'c_meta'}) {
-   #
-   # Add some stuff to clarify the start of the command.
-   #
-   # If we're running it in 'script' mode, then we need to specify the
-   # start of the output for this command.
-   #
-   # If we're just creating a script, we'll just add some comments.
-   #
-
-      if ($$self{'c'}{'g_type'} eq 'script') {
-         push @script, qq(${curr_ind}echo "#SC CMD $cmd_num.$alt_num";)
-           if ($$self{'c'}{'g_out'});
-         push @script, qq(${curr_ind}echo "#SC CMD $cmd_num.$alt_num" >&2;)
-           if ($$self{'c'}{'g_err'});
-
-         if ($$self{'c'}{'c_retries'} > 1) {
-            push @script, qq(${curr_ind}echo "#SC TRY \$SC_TRY";)
-              if ($$self{'c'}{'g_out'});
-            push @script, qq(${curr_ind}echo "#SC TRY \$SC_TRY" >&2;)
-              if ($$self{'c'}{'g_err'});
-         }
-
-      } elsif ($$self{'c'}{'g_type'} eq 'run') {
-         #
-         # Command number comment
-         #
-
-         if ($$self{'c'}{'c_retries'} > 1) {
-            push @script,
-              qq(${curr_ind}#),
-                qq(${curr_ind}# Command $cmd_num.$alt_num  [Retry: \$SC_TRY]),
-                  qq(${curr_ind}#);
-         } else {
-            push @script,
-              qq(${curr_ind}#),
-                qq(${curr_ind}# Command $cmd_num.$alt_num),
-                  qq(${curr_ind}#);
-         }
-      }
-   }
-
-   #
-   # Display the command if running in 'run' mode with 'echo' selected.
-   #
-
-   if ($$self{'c'}{'g_type'} eq 'run'  &&  $$self{'c'}{'g_echo'} eq 'echo') {
-      push @script, qq(${curr_ind}echo "# $cmd";);
-   }
-
-   return @script;
-}
-
-# This will finish up a command
+# This analyzes the options and sets some variables to determine
+# how the script behaves.
 #
-sub _alt_term {
+sub _script_options {
    my($self) = @_;
-   my @script;
-   return @script  if ($$self{'c'}{'c_meta'});
-   my $curr_ind = $$self{'c'}{'curr_ind'};
-   my $next_ind = $$self{'c'}{'next_ind'};
-   my $prev_ind = $$self{'c'}{'prev_ind'};
 
    #
-   # Make sure that the last command has included a newline when
-   # running in script mode (for both STDOUT and STDERR).
+   # Calculate the type of script that we're creating.
+   #
+   # In dry-run mode, we may produce any of the script types:
+   #    simple, run, script
+   #
+   # In run/script mode, we will produce that type of script.
+   # We'll also produce a simple script for failure in 'run'
+   # mode if 'failure' is 'display'.
    #
 
-   if ($$self{'c'}{'g_type'} eq 'script') {
-      push @script, qq(${curr_ind}echo "";)      if ($$self{'c'}{'g_out'});
-      push @script, qq(${curr_ind}echo "" >&2;)  if ($$self{'c'}{'g_err'});
+   if ($$self{'g'}{'mode'} eq 'dry-run') {
+      $$self{'g'}{'s_type'} = $$self{'g'}{'script'}  ||  'run';
+      if ($$self{'g'}{'script'} eq 'simple') {
+         $$self{'g'}{'simple'} = 'simple';
+      } elsif ($$self{'g'}{'s_type'} eq 'run'  &&
+               $$self{'g'}{'failure'} eq 'display') {
+         $$self{'g'}{'simple'} = 'failure';
+      } else {
+         $$self{'g'}{'simple'} = '';
+      }
+   } else {
+      $$self{'g'}{'s_type'} = $$self{'g'}{'mode'};
+      if ($$self{'g'}{'s_type'} eq 'run'  &&
+          $$self{'g'}{'failure'} eq 'display') {
+         $$self{'g'}{'simple'} = 'failure';
+      } else {
+         $$self{'g'}{'simple'} = '';
+      }
    }
 
-   push @script, "";
-   return @script;
+   #
+   # Echoing commands applies to run mode.  In both dry-run and
+   # script mode, it doesn't apply.
+   #
+
+   if ($$self{'g'}{'mode'} eq 'run') {
+      $$self{'g'}{'c_echo'} = $$self{'g'}{'echo'};
+   } else {
+      $$self{'g'}{'c_echo'} = '';
+   }
+
+   #
+   # When a command fails, we normally handle it using the 'failure'
+   # option.  In a simple script, we don't do failure handling.
+   #
+
+   if ($$self{'g'}{'s_type'} eq 'simple') {
+      $$self{'g'}{'c_fail'} = '';
+   } else {
+      $$self{'g'}{'c_fail'} = $$self{'g'}{'failure'};
+   }
+
+   #
+   # Analyze the 'output' option to determine whether we are capturing
+   # STDOUT and/or STDERR.  Set the 'redir' flag to the appropriate
+   # string for performing this capture.
+   #
+   # 'simple' scripts do no redirection.
+   #
+   #
+   # If we ever want:
+   #    STDOUT -> /dev/null,  STDERR -> STDOUT:
+   # use:
+   #    $$self{'c'}{'g_redir'} = '2>&1 >/dev/null';
+
+   if ($$self{'g'}{'s_type'} eq 'run'  ||
+       $$self{'g'}{'s_type'} eq 'script') {
+
+      if ($$self{'g'}{'output'} eq 'both') {
+         # Capturing both so no redirection
+         $$self{'g'}{'redir'} = '';
+         $$self{'g'}{'out'}   = 1;
+         $$self{'g'}{'err'}   = 1;
+
+      } elsif ($$self{'g'}{'output'} eq 'merged') {
+         # Merged output
+         $$self{'g'}{'redir'} = '2>&1';
+         $$self{'g'}{'out'}   = 1;
+         $$self{'g'}{'err'}   = 0;
+
+      } elsif ($$self{'g'}{'output'} eq 'stdout') {
+         # Keep STDOUT, discard STDERR
+         $$self{'g'}{'redir'} = '2>/dev/null';
+         $$self{'g'}{'out'}   = 1;
+         $$self{'g'}{'err'}   = 0;
+
+      } elsif ($$self{'g'}{'output'} eq 'stderr') {
+         # Discard STDOUT, keep STDERR
+         $$self{'g'}{'redir'} = '>/dev/null';
+         $$self{'g'}{'out'}   = 0;
+         $$self{'g'}{'err'}   = 1;
+
+      } elsif ($$self{'g'}{'output'} eq 'quiet') {
+         # Discard everthing
+         $$self{'g'}{'redir'} = '>/dev/null 2>&1';
+         $$self{'g'}{'out'}   = 0;
+         $$self{'g'}{'err'}   = 0;
+      }
+
+   } else {
+      # s_type = simple
+
+      $$self{'g'}{'redir'} = '';
+      $$self{'g'}{'out'}   = 1;
+      $$self{'g'}{'err'}   = 1;
+
+   }
 }
 
-sub _alt_cmd {
-   my($self,$cmd,$cmd_num,$alt_num,$first,$last) = @_;
-   my(@script);
-   my $curr_ind = $$self{'c'}{'curr_ind'};
-   my $next_ind = $$self{'c'}{'next_ind'};
-   my $prev_ind = $$self{'c'}{'prev_ind'};
+###############################################################################
+# ADD A COMMAND TO THE SCRIPT
+###############################################################################
 
-   # For the meta commnds (SC_* = VAL), we just run it (no special checks
-   # needed).
-   if ($$self{'c'}{'c_meta'}) {
-      push @script, qq(${curr_ind}$cmd;);
-      return @script;
+sub _script_cmd {
+   my($self,$cmd_num) = @_;
+
+   if ($$self{'cmd'}{$cmd_num}{'flow'}) {
+      $self->_script_cmd_flow($cmd_num);
+   } else {
+      $self->_script_cmd_nonflow($cmd_num);
+   }
+}
+
+sub _script_cmd_flow {
+   my($self,$cmd_num) = @_;
+
+   my $type = $$self{'cmd'}{$cmd_num}{'flow_type'};
+
+   if ($type eq 'open') {
+      $self->_script_cmd_cmd();
+      $self->_ind_plus();
+   } elsif ($type eq 'cont') {
+      $self->_ind_minus();
+      $self->_script_cmd_cmd();
+      $self->_ind_plus();
+   } else {
+      $self->_ind_minus();
+      $self->_script_cmd_cmd();
+   }
+}
+
+sub _script_cmd_nonflow {
+   my($self,$cmd_num) = @_;
+
+   $self->_script_cmd_init($cmd_num);
+   my $n = @{ $$self{'cmd'}{$cmd_num}{'cmd'} };
+
+   if ($n > 1) {
+      # Command with alternates
+
+      for (my $a=1; $a<= $n; $a++) {
+         $self->_alt_options($cmd_num,$a);
+         $self->_script_cmd_cmd();
+      }
+
+   } else {
+      # Single command
+
+      $self->_script_cmd_cmd();
    }
 
-   my $redir = ($$self{'c'}{'c_noredir'} ? '' : $$self{'c'}{'g_redir'});
+   $self->_script_cmd_term($cmd_num);
+}
+
+sub _script_cmd_init {
+   my($self,$cmd_num) = @_;
+
+   my $text = <<'EOT';
+<simp=failure>                : # <?cmd_label?>
+<!simp>                       :
+<!simp>                       : #
+<!simp>                       : # Command <?cmd_label?>
+<!simp>                       : #
+<!simp>                       :
+<!simp>                       : SC_CURR_EXIT=0;
+<!simp>                       : SC_CURR_SUCC=0;
+<dir>                         :
+<dir><c_echo=echo>            : echo '# SC_DIRE_<?c_num?>=`pwd`';
+<dir><c_echo=echo>            : echo '# cd "<?dir?>"';
+<dir>                         : SC_DIRE_<?c_num?>=`pwd`;
+<dir><simp>                   : cd "<?dir?>";
+<dir><!simp>                  : cd "<?dir?>" 2>/dev/null;
+<dir><!simp>                  : if [ $? -eq 0 ]; then
+EOT
+
+   $self->_text_to_script($text);
+
+   $text = <<'EOT';
+<!simp><c_retries>            :
+<!simp><c_retries>            :    SC_RETRIES=<?c_retries?>;
+<!simp><c_retries>            :    SC_TRY=0;
+<!simp><c_retries>            :    while [ $SC_TRY -lt $SC_RETRIES ]; do
+EOT
+
+   $self->_text_to_script($text);
+   $self->_ind_plus()  if ($$self{'c'}{'c_retries'}  &&  ! $$self{'c'}{'simp'});
+}
+
+sub _script_cmd_term {
+   my($self,$cmd_num) = @_;
+
+   my $text = <<'EOT';
+<!simp><c_retries>            :
+<!simp><c_retries>            :       if [ $SC_CURR_EXIT -eq 0 ]; then
+<!simp><c_retries>            :          break;
+<!simp><c_retries>            :       fi
+<!simp><c_retries>            :       SC_TRY=`expr $SC_TRY + 1`;
+<!simp><c_retries><c_sleep>   :       if [ $SC_TRY -lt $SC_RETRIES ]; then
+<!simp><c_retries><c_sleep>   :          sleep <?c_sleep?>;
+<!simp><c_retries><c_sleep>   :       fi
+<!simp><c_retries>            :    done
+EOT
+
+   $self->_text_to_script($text);
+
+   $text = <<'EOT';
+<dir>                         :
+<dir><!simp><c_echo=echo>     :    echo '# cd "$SC_DIRE_<?c_num?>"';
+<dir>                         :    cd "$SC_DIRE_<?c_num?>";
+<dir><!simp>                  : else
+<dir><!simp>                  :    SC_CURR_EXIT=<?f_num?>;
+<dir><!simp>                  : fi
+EOT
+
+   $self->_text_to_script($text);
+
+   $text = <<'EOT';
+<!simp>                       :
+<!simp>                       : if [ $SC_FAILED -eq 0  -a  $SC_CURR_EXIT -ne 0 ]; then
+<!simp>                       :    SC_FAILED=<?f_num?>;
+<!simp>                       : fi
+<!simp><!c_fail=continue>     :
+<!simp><!c_fail=continue>     : if [ $SC_FAILED -ne 0 ]; then
+<!simp><!c_fail=continue>     :    return;
+<!simp><!c_fail=continue>     : fi
+EOT
+
+   $self->_text_to_script($text);
+}
+
+sub _script_cmd_cmd {
+   my($self) = @_;
+   my($text);
+
+   # Print out any header and echo the command as appropriate
+
+   if (! $$self{'c'}{'simp'}) {
+      if (! $$self{'c'}{'c_flow'}) {
+         $text = <<'EOT';
+                                      :
+                                      : #
+                                      : # Command <?alt_label?>
+                                      : #
+<s_type=script>                       :
+<s_type=script>                       : if [ $SC_CURR_SUCC -eq 0 ]; then
+<s_type=script><out>                  :    echo "#SC CMD <?c_num?>.<?a_num?>";
+<s_type=script><err>                  :    echo "#SC CMD <?c_num?>.<?a_num?>" >&2;
+<s_type=script><c_retries><out>       :    echo "#SC TRY $SC_TRY";
+<s_type=script><c_retries><err>       :    echo "#SC TRY $SC_TRY" >&2;
+<s_type=script>                       : fi
+<c_echo=echo>                         :
+<c_echo=echo><alts><a_num=1>          : echo "# <?cmd_str_q?>";
+<c_echo=echo><alts><a_num=1><c_check> : echo "#    Check with: <?c_check_q?>";
+<c_echo=echo><alts><!a_num=1>         : echo "#    ALT: <?cmd_str_q?>";
+<c_echo=echo><!alts>                  : echo "# <?cmd_str_q?>";
+<c_echo=echo><!alts><c_check>         : echo "#    Check with: <?c_check_q?>";
+EOT
+
+         $self->_text_to_script($text);
+      }
+   }
 
    # We want to generate essentially the following script:
    #
@@ -1331,525 +1037,237 @@ sub _alt_cmd {
    #
    # If we have a 'check' option, we'll need to run that
    # command immediately after every CMDi.
-
-   push @script,
-     qq(${curr_ind}if [ \$SC_CURR_SUCC -eq 0 ]; then);
-
-   $self->_ind_plus();
-   $curr_ind = $$self{'c'}{'curr_ind'};
-   $next_ind = $$self{'c'}{'next_ind'};
-   $prev_ind = $$self{'c'}{'prev_ind'};
-
-   push @script,
-     qq(${curr_ind}$cmd $redir;);
-
-   push @script,
-     qq(${curr_ind}# CHECK WITH),
-       qq(${curr_ind}$$self{'c'}{'c_check'} $redir;)  if ($$self{'c'}{'c_check'});
-
+   #
    # if command succeeded
    #   SC_CURR_SUCC = 1   -> this will mean that no more alternates run
    #   SC_CURR_EXIT = 0
    # else if this is the first alternate to fail
    #   SC_CURR_EXIT = $?  -> we'll use the first exit code if all alt. fail
+   #
+   # For script mode, make sure that both STDOUT and STDIN have a newline.
 
-   push @script, qq(${curr_ind}CMD_EXIT=\$?;),
-                 qq(${curr_ind}if [ \$CMD_EXIT -eq 0 ]; then),
-                 qq(${next_ind}SC_CURR_SUCC=1;),
-                 qq(${next_ind}SC_CURR_EXIT=0;),
-                 qq(${curr_ind}elif [ \$SC_CURR_EXIT -eq 0 ]; then),
-                 qq(${next_ind}SC_CURR_EXIT=\$CMD_EXIT;),
-                 qq(${curr_ind}fi);
 
-   if ($$self{'c'}{'g_type'} eq 'script') {
-      my $c = qq(echo "#SC EXIT $cmd_num.$alt_num \$CMD_EXIT");
+   if      ($$self{'c'}{'c_flow'}) {
+      $text = <<'EOT';
+                        :
+                        :    <?cmd_str?>
+EOT
 
-      push @script, qq(${curr_ind}if [ \$CMD_EXIT -ne 0 ]; then);
-      push @script, qq(${next_ind}${c};)      if ($$self{'c'}{'g_out'});
-      push @script, qq(${next_ind}${c} >&2;)  if ($$self{'c'}{'g_err'});
-      push @script, qq(${curr_ind}fi);
+   } elsif ($$self{'c'}{'simp'}) {
+      $text = <<'EOT';
+                        :    <?cmd_str?>;
+EOT
+
+   } else {
+      $text = <<'EOT';
+                        :
+                        : if [ $SC_CURR_SUCC -eq 0 ]; then
+                        :    <?cmd_str?><?c_redir?>;
+<c_check>               :    # CHECK WITH
+<c_check>               :    <?c_check?><?c_redir?>;
+                        :    CMD_EXIT=$?;
+<s_type=script><out>    :    echo "";
+<s_type=script><err>    :    echo "" >&2;
+                        :    if [ $CMD_EXIT -eq 0 ]; then
+                        :       SC_CURR_SUCC=1;
+                        :       SC_CURR_EXIT=0;
+                        :    elif [ $SC_CURR_EXIT -eq 0 ]; then
+                        :       SC_CURR_EXIT=$CMD_EXIT;
+                        :    fi
+<s_type=script>         :    if [ $CMD_EXIT -ne 0 ]; then
+<s_type=script><out>    :       echo "#SC EXIT <?c_num?>.<?a_num?> $CMD_EXIT";
+<s_type=script><err>    :       echo "#SC EXIT <?c_num?>.<?a_num?> $CMD_EXIT" >&2;
+<s_type=script>         :    fi
+                        : fi
+EOT
    }
 
-   $self->_ind_minus();
-   $curr_ind = $$self{'c'}{'curr_ind'};
-   $next_ind = $$self{'c'}{'next_ind'};
-   $prev_ind = $$self{'c'}{'prev_ind'};
-   push @script,
-     qq(${curr_ind}fi);
-
-   return @script;
+   $self->_text_to_script($text);
 }
 
-#####################
-# This analyzes the options and sets some variables to determine
-# how the script behaves.
+###################
+
+# Set cmd_str and cmd_pref for the current command.
 #
-# If we're creating a simple script, ignore retries.
-#
+sub _alt_options {
+   my($self,$cmd_num,$alt_num) = @_;
+   my $label = $$self{'c'}{'c_label'};
+
+   #
+   # Only called with a command with alternates.
+   #
+
+   $$self{'c'}{'cmd_str'}   = $$self{'cmd'}{$cmd_num}{'cmd'}[$alt_num-1];
+   $$self{'c'}{'cmd_str_q'} = $self->_quote($$self{'c'}{'cmd_str'});
+   $$self{'c'}{'cmd_label'} = "$cmd_num" . ($label ? " [$label]" : '');
+   $$self{'c'}{'alt_label'} = "$cmd_num.$alt_num";
+   $$self{'c'}{'alts'}      = 1;
+   $$self{'c'}{'a_num'}     = $alt_num;
+}
+
 sub _cmd_options {
-   my($self,%options) = @_;
+   my($self,$cmd_num,$simple) = @_;
 
-   $$self{'c'}{'c_meta'}    = ($options{'sc'}      ? $options{'sc'}      : 0);
-   $$self{'c'}{'c_retries'} = ($options{'retry'}   ? $options{'retry'}   : 0) + 0;
-   $$self{'c'}{'c_sleep'}   = ($options{'sleep'}   ? $options{'sleep'}   : 0) + 0;
-   $$self{'c'}{'c_noredir'} = ($options{'noredir'} ? $options{'noredir'} : 0);
-   $$self{'c'}{'c_check'}   = ($options{'check'}   ? $options{'check'}   : '');
-}
+   $$self{'c'}{'c_num'}     = $cmd_num;
+   $$self{'c'}{'f_num'}     = ($cmd_num > 200 ? 201 : $cmd_num);
+   $$self{'c'}{'c_label'}   = $$self{'cmd'}{$cmd_num}{'label'};
 
-#####################
-# This analyzes the options and sets some variables to determine
-# how the script behaves.
-#
-sub _script_options {
-   my($self) = @_;
+   $$self{'c'}{'c_retries'} = ($$self{'cmd'}{$cmd_num}{'retry'}
+                               ? $$self{'cmd'}{$cmd_num}{'retry'}+0
+                               : 0);
+   $$self{'c'}{'c_sleep'}   = ($$self{'cmd'}{$cmd_num}{'sleep'}
+                               ? $$self{'cmd'}{$cmd_num}{'sleep'}+0
+                               : 0);
+   $$self{'c'}{'c_redir'}   = (($$self{'cmd'}{$cmd_num}{'noredir'} ||
+                                $simple  ||
+                                ! $$self{'g'}{'redir'})
+                               ? ''
+                               : ' ' . $$self{'g'}{'redir'} );
+   $$self{'c'}{'c_check'}   = ($$self{'cmd'}{$cmd_num}{'check'}
+                               ? $$self{'cmd'}{$cmd_num}{'check'}
+                               : '');
+   $$self{'c'}{'c_check_q'} = $self->_quote($$self{'c'}{'c_check'});
+   $$self{'c'}{'c_dir'}     = ($$self{'cmd'}{$cmd_num}{'dir'}
+                               ? $self->_quote($$self{'cmd'}{$cmd_num}{'dir'})
+                               : '');
 
-   #
-   # What type of script, and whether it runs or not.
-   #
+   $$self{'c'}{'c_retries'} = 0  if ($$self{'c'}{'c_retries'} == 1);
 
-   $$self{'c'}{'g_run'}  = $$self{'mode'};
+   $$self{'c'}{'ind'}       = $$self{'g'}{'curr_ind'};
+   $$self{'c'}{'simp'}      = $$self{'g'}{'simple'}  if ($simple);
 
-   if ($$self{'c'}{'g_run'} eq 'dry-run') {
-      $$self{'c'}{'g_type'} = $$self{'script'};
-   } else {
-      $$self{'c'}{'g_type'} = $$self{'c'}{'g_run'};
-   }
+   $$self{'c'}{'c_flow'}    = ($$self{'cmd'}{$cmd_num}{'flow'} ? 1 : 0);
 
-   if ($$self{'c'}{'g_run'} eq 'run') {
-      $$self{'c'}{'g_echo'} = $$self{'echo'};
-   } else {
-      $$self{'c'}{'g_echo'} = 0;
-   }
+   # Handle the cases of a command with no alternates and init stuff
 
-   $$self{'c'}{'g_fail'} = $$self{'failure'};
-   $$self{'c'}{'g_fail'} = ''  if ($$self{'c'}{'g_type'} eq 'simple');
+   my $n = @{ $$self{'cmd'}{$cmd_num}{'cmd'} };
 
-   #
-   # Analyze the 'output' and 'f-output' options.
-   #
-   #
-   # If we ever want:
-   #    STDOUT -> /dev/null,  STDERR -> STDOUT:
-   # use:
-   #    $$self{'c'}{'g_redir'} = '2>&1 >/dev/null';
+   if (! $cmd_num) {
+      #
+      # This should never be called if $cmd_num = 0
+      #
 
-   $$self{'c'}{'g_output'}  = $$self{'output'};
-   $$self{'c'}{'g_foutput'} = $$self{'f-output'};
+      $$self{'c'}{'cmd_str'}   = '';
+      $$self{'c'}{'cmd_str_q'} = '';
+      $$self{'c'}{'cmd_label'} = '';
+      $$self{'c'}{'alt_label'} = '';
+      $$self{'c'}{'alts'}      = 0;
+      $$self{'c'}{'a_num'}     = 0;
 
-   if ($$self{'c'}{'g_type'} eq 'run') {
+   } elsif ($n == 1) {
+      #
+      # A command with no alternates.
+      #
 
-      if ($$self{'c'}{'g_output'} eq 'both') {
-         # Capturing both so no redirection
-         $$self{'c'}{'g_redir'} = '';
-         $$self{'c'}{'g_out'}   = 1;
-         $$self{'c'}{'g_err'}   = 1;
-
-      } elsif ($$self{'c'}{'g_output'} eq 'merged') {
-         # Merged output
-         $$self{'c'}{'g_redir'} = '2>&1';
-         $$self{'c'}{'g_out'}   = 1;
-         $$self{'c'}{'g_err'}   = 0;
-
-      } elsif ($$self{'c'}{'g_output'} eq 'stdout') {
-         # Keep STDOUT, discard STDERR
-         $$self{'c'}{'g_redir'} = '2>/dev/null';
-         $$self{'c'}{'g_out'}   = 1;
-         $$self{'c'}{'g_err'}   = 0;
-
-      } elsif ($$self{'c'}{'g_output'} eq 'stderr') {
-         # Discard STDOUT, keep STDERR
-         $$self{'c'}{'g_redir'} = '>/dev/null';
-         $$self{'c'}{'g_out'}   = 0;
-         $$self{'c'}{'g_err'}   = 1;
-
-      } elsif ($$self{'c'}{'g_output'} eq 'quiet') {
-         # Discard everthing
-         $$self{'c'}{'g_redir'} = '>/dev/null 2>&1';
-         $$self{'c'}{'g_out'}   = 0;
-         $$self{'c'}{'g_err'}   = 0;
-      }
-
-   } elsif ($$self{'c'}{'g_type'} eq 'script') {
-
-      if ($$self{'c'}{'g_output'} eq 'merged'  ||
-          ($$self{'c'}{'g_output'} eq 'quiet'  &&
-           $$self{'c'}{'g_foutput'} eq 'merged')) {
-         # Merged output
-         $$self{'c'}{'g_redir'} = '2>&1';
-         $$self{'c'}{'g_out'}   = 1;
-         $$self{'c'}{'g_err'}   = 0;
-
-         if ($$self{'c'}{'g_foutput'} eq 'both'    ||
-             $$self{'c'}{'g_foutput'} eq 'stdout'  ||
-             $$self{'c'}{'g_foutput'} eq 'stderr') {
-            # If regular output is merged, then it cannot be
-            # separate for a failed command.
-            $$self{'f-output'} = 'merged';
-         }
-
-      } elsif ($$self{'c'}{'g_output'} eq 'quiet'  &&
-               $$self{'c'}{'g_foutput'} eq 'quiet') {
-         # Discard everthing
-         $$self{'c'}{'g_redir'} = '>/dev/null 2>&1';
-         $$self{'c'}{'g_out'}   = 0;
-         $$self{'c'}{'g_err'}   = 0;
-
-      } elsif (($$self{'c'}{'g_output'} eq 'stdout'   ||
-                $$self{'c'}{'g_output'} eq 'quiet')  &&
-               ($$self{'c'}{'g_foutput'} eq 'stdout'  ||
-                $$self{'c'}{'g_foutput'} eq 'quiet')) {
-         # We only need STDOUT
-         $$self{'c'}{'g_redir'} = '2>/dev/null';
-         $$self{'c'}{'g_out'}   = 1;
-         $$self{'c'}{'g_err'}   = 0;
-
-      } elsif (($$self{'c'}{'g_output'} eq 'stderr'   ||
-                $$self{'c'}{'g_output'} eq 'quiet')  &&
-               ($$self{'c'}{'g_foutput'} eq 'stderr'  ||
-                $$self{'c'}{'g_foutput'} eq 'quiet')) {
-         # We only need STDERR
-         $$self{'c'}{'g_redir'} = '>/dev/null';
-         $$self{'c'}{'g_out'}   = 0;
-         $$self{'c'}{'g_err'}   = 1;
-
-      } else {
-         # Keep both.
-         $$self{'c'}{'g_redir'} = '';
-         $$self{'c'}{'g_out'}   = 1;
-         $$self{'c'}{'g_err'}   = 1;
-
-         if ($$self{'c'}{'g_foutput'} eq 'merged') {
-            # We can't support merged output on a failed
-            # command since it hasn't been merged, so we'll
-            # just do the next best thing.
-            $$self{'f-output'} = 'both';
-         }
-      }
-
-   } else {   # $$self{'c'}{'g_type'} eq 'simple'
-
-      $$self{'c'}{'g_redir'} = '';
-      $$self{'c'}{'g_out'}   = 1;
-      $$self{'c'}{'g_err'}   = 1;
-
+      my $label = $$self{'c'}{'c_label'};
+      $$self{'c'}{'cmd_str'}   = $$self{'cmd'}{$cmd_num}{'cmd'}[0];
+      $$self{'c'}{'cmd_str_q'} = $self->_quote($$self{'c'}{'cmd_str'});
+      $$self{'c'}{'cmd_label'} = $cmd_num . ($label ? " [$label]" : '');
+      $$self{'c'}{'alt_label'} = "$cmd_num.0";
+      $$self{'c'}{'alts'}      = 0;
+      $$self{'c'}{'a_num'}     = 0;
    }
 }
 
-#####################
-# The stdout/stderr from a script-mode run are each of the form:
-#     #SC CMD N1.A1
-#     ...
-#     #SC CMD N2.A2
-#     ...
-# where N* are the command number and A* are the alternate number.
-#
-# Both may have:
-#     #SC EXIT N1.A1 EXIT_VALUE
-#
-sub _script_output {
-   my($self,$out,$err,$exit) = @_;
-   $out    = ''  if (! defined $out);
-   $err    = ''  if (! defined $err);
-   my @out = split(/\n/,$out);
-   my @err = split(/\n/,$err);
+###############################################################################
 
+# Text to script
+
+sub _text_to_script {
+   my($self,$text) = @_;
+   my @script;
+
+   # Text is a combination of:
+   #    <TAG=VAL>  : CMD
+   #    <!TAG=VAL> : CMD
+   #    <TAG>      : CMD
+   #    <!TAG>     : CMD
+   #               : CMD
    #
-   # Parse stdout and stderr and turn it into:
+   # <TAG=VAL>  means to include this line only if the given TAG has a value
+   #            of 'VAL'.  The TAG can be either of:
+   #               $$self{'c'}{TAG}
+   #               $$self{'g'}{TAG}
+   # <!TAG=VAL> means to include this line only if the given TAG does NOT
+   #            have a value of 'VAL'
+   # <TAG>      means to include this line only if the TAG has a true value
+   # <!TAG>     means to include this line only if the TAG has a false value
+   # CMD        can include indentation relative to the current text
+   #            CMD can include <?TAG?> and it will be replaced by the
+   #            value of TAG
    #
-   #   ( [ CMD_NUM_1, ALT_NUM_1, TRY_1, EXIT_1, STDOUT_1, STDERR_1 ],
-   #     [ CMD_NUM_2, ALT_NUM_2, TRY_2, EXIT_2, STDOUT_2, STDERR_2 ], ... )
-   #
+   # Every line must contain a colon, and the colon defines the start of
+   # the actual line (so spacing to the right of the colon is used to
+   # determine indentation).
 
-   my @cmd;
+   my @lines    = split(/\n/,$text);
+   my $line_ind = '';
 
-   PARSE_LOOP:
-   while (@out  ||  @err) {
+   LINE:
+   foreach my $line (@lines) {
+      $line =~ /(.*?)\s*:(\s*)(.*)$/;
+      my($tags,$ind,$cmd) = ($1,$2,$3);
 
-      #
-      # Get STDOUT/STDERR for the one command.
-      #
-
-      my($cmd_num,$alt_num,$cmd_exit,$cmd_try,$tmp);
-      my($out_hdr,@stdout);
-      my($err_hdr,@stderr);
-      $cmd_exit = 0;
-      $cmd_try  = 0;
-
-      # STDOUT
-
-      if (@out) {
-         $out_hdr = shift(@out);
-
-         # If there is any STDOUT, it MUST start with a header:
-         #    #SC CMD X.Y
-         #
-         if ($out_hdr !~ /^\#SC CMD (\d+)\.(\d+)$/) {
-            # Invalid output... should never happen
-            $self->_print(1,"Missing command header in STDOUT: $out_hdr");
-            return ();
-         }
-
-         ($cmd_num,$alt_num) = ($1,$2);
-
-         while (@out  &&  $out[0] !~ /^\#SC CMD (\d+)\.(\d+)$/) {
-            if      ($out[0] =~ /^\#SC_TRY (\d+)$/) {
-               $cmd_try = $1;
-               shift(@out);
-
-            } elsif ($out[0] =~ /^\#SC EXIT $cmd_num\.$alt_num (\d+)$/) {
-               $cmd_exit = $1;
-               shift(@out);
-
+      while ($tags =~ s,^<(!?)(.*?)>,,) {
+         my ($not,$tagstr) = ($1,$2);
+         if ($tagstr =~ /^(.*?)=(.*)$/) {
+            my($tag,$req) = ($1,$2);
+            if ($self->_tagval($tag) eq $req) {
+               next LINE  if ($not);
             } else {
-               push(@stdout,shift(@out));
-            }
-         }
-      }
-
-      # STDERR
-
-      if (@err) {
-         $err_hdr = shift(@err);
-
-         # If there is any STDERR, it MUST start with a header:
-         #    #SC CMD X.Y
-         #
-         if ($err_hdr !~ /^\#SC CMD (\d+)\.(\d+)$/) {
-            # Invalid output... should never happen
-            $self->_print(1,"Missing command header in STDERR: $err_hdr");
-            return ();
-         }
-
-         ($cmd_num,$alt_num) = ($1,$2);
-
-         # If there was any STDOUT, then the command headers must be
-         # identical.
-         #
-         if ($out_hdr  &&  $err_hdr ne $out_hdr) {
-            # Mismatched headers... should never happen
-            $self->_print(1,"Mismatched header in STDERR: $err_hdr");
-            return ();
-         }
-
-         while (@err  &&  $err[0] !~ /^\#SC CMD (\d+)\.(\d+)$/) {
-            if      ($err[0] =~ /^\#SC_TRY (\d+)$/) {
-               $tmp = $1;
-               shift(@err);
-               if ($out_hdr  &&  $tmp != $cmd_try) {
-                  # Mismatched try number... should never happen
-                  $self->_print(1,"Mismatched try number in STDERR: $err_hdr");
-                  return ();
-               }
-               $cmd_try = $tmp;
-
-            } elsif ($err[0] =~ /^\#SC EXIT $cmd_num\.$alt_num (\d+)$/) {
-               $tmp = $1;
-               shift(@err);
-               if ($out_hdr  &&  $tmp != $cmd_exit) {
-                  # Mismatched exit codes... should never happen
-                  $self->_print(1,"Mismatched exit codes in STDERR: $err_hdr");
-                  return ();
-               }
-               $cmd_exit = $tmp;
-
-            } else {
-               push(@stderr,shift(@err));
-            }
-         }
-      }
-
-      push (@cmd, [ $cmd_num,$alt_num,$cmd_try,$cmd_exit, \@stdout, \@stderr]);
-   }
-
-   #
-   # Now go through this list and group all alternates together and determine
-   # the status for each command.
-   #
-   # When looking at the I'th status list, we also have to take into account
-   # the J'th (J=I+1) list:
-   #
-   #   I            J
-   #   CMD ALT TRY  CMD ALT TRY
-   #
-   #   *   *   *    *   1   0/1     The current command determines status.
-   #                                It will be '', succ, exit, fail, or disp.
-   #
-   #   C   A   T    C   A+1 T       The next command is another alternate.
-   #                                Check it for status.
-   #
-   #   C   A   T    C   1   T+1     This command failed, but we will retry.
-   #                                Status = 'retried'.
-   #
-   #   Everthing else is an error
-   #
-
-   my $failed = ($exit == 1 ? -1 : 0);
-   my @ret    = ($failed);
-   my @curr   = (0,undef);
-
-   STATUS_LOOP:
-   foreach (my $i = 0; $i < @cmd; $i++) {
-
-      #
-      # Get the values of current and next command, alt, and try
-      # numbers.
-      #
-
-      my($curr_cmd_num,$curr_alt_num,$curr_try_num,
-         $curr_exit,$curr_out,$curr_err) = @{ $cmd[$i] };
-
-      my $next_cmd     = (defined $cmd[$i+1] ? 1 : 0);
-
-      my($next_cmd_num,$next_alt_num,$next_try_num) =
-        ($next_cmd ? @{ $cmd[$i+1] } : (0,1,0));
-
-      #
-      # Get the command that was actually run.
-      #
-
-      my $tmp  = $$self{'cmd'}[$curr_cmd_num-2][0];
-      my @cmd  = (ref($tmp) ? @$tmp : ($tmp));
-      my $c    = $cmd[$curr_alt_num-1];
-
-      #
-      # If this is the last alternate in a command that is not
-      # being retried, we'll use this to determined the status.
-      #
-      # Status will be '', succ, or disp if it succeeds, or exit or
-      # fail if it does not succeed.
-      #
-
-      if ($next_alt_num == 1  &&
-          $next_try_num <= 1) {
-
-         $curr[0] = $curr_cmd_num;
-         push(@curr,[$c,$curr_exit,$curr_out,$curr_err]);
-
-         if ($curr_exit) {
-            if ($failed) {
-               $curr[1] = 'fail';
-            } else {
-               $curr[1] = 'exit';
-               $curr[0] = $i+1;
+               next LINE  if (! $not);
             }
 
          } else {
-            if (! $failed) {
-               $curr[1] = '';
-            } elsif ($$self{'c'}{'g_fail'} eq 'display') {
-               $curr[1] = 'disp';
+            my $tag = $tagstr;
+            if ($self->_tagval($tag)) {
+               next LINE  if ($not);
             } else {
-               $curr[1] = 'succ';
+               next LINE  if (! $not);
             }
          }
-
-         push(@ret,[@curr]);
-         @curr = (0,undef);
-
-         next STATUS_LOOP;
       }
 
-      #
-      # If the next command is another alternate, we'll need to check
-      # it for the status.
-      #
-
-      if ($next_cmd_num == $curr_cmd_num  &&
-          $next_alt_num == ($curr_alt_num + 1)  &&
-          $next_try_num == $curr_try_num) {
-
-         push(@curr,[$c,$curr_exit,$curr_out,$curr_err]);
-         next STATUS_LOOP;
+      while ($cmd =~ /<\?(.*?)\?>/) {
+         my $tag = $1;
+         my $val = $self->_tagval($tag);
+         $cmd    =~ s/<\?$tag\?>/$val/g;
       }
 
-      #
-      # If this command failed, but we will retry it, the status will
-      # be 'retried'.
-      #
-
-      if ($next_cmd_num == $curr_cmd_num  &&
-          $next_alt_num == 1  &&
-          $next_try_num == ($curr_try_num+1)) {
-
-         push(@curr,[$c,$curr_exit,$curr_out,$curr_err]);
-         $curr[1] = 'retried';
-
-         push(@ret,[@curr]);
-         @curr = (0,undef);
-
-         next STATUS_LOOP;
+      if (! $cmd) {
+         push(@script,'');
+         next;
       }
 
-      #
-      # Everything else is an error in the output.
-      #
+      my $len             = length($ind);
+      $line_ind           = $len  if ($line_ind eq '');
 
-      $self->_print(1,"Unexpected error in output: $i " .
-                      "[$curr_cmd_num,$curr_alt_num,$curr_try_num] " .
-                      "[$next_cmd_num,$next_alt_num,$next_try_num]");
-      return ();
+      if ($len > $line_ind) {
+         $self->_ind_plus();
+         $line_ind = $len;
+      } elsif ($len < $line_ind) {
+         $self->_ind_minus();
+         $line_ind = $len;
+      }
+      my $spc = $$self{'g'}{'curr_ind'};
+      push(@script,"${spc}$cmd");
    }
 
-   #
-   # Do some final cleanup of the output including:
-   #    discard STDOUT/STDERR based on output/f-output
-   #    strip leading/trailing blank lines from STDOUT/STDERR if being kept
-   #
+   push @{ $$self{'scr'} },@script;
+}
 
-   for (my $c = 1; $c <= $#ret; $c++) {
-      my $status = $ret[$c][1];
-      for (my $a = 2; $a <= $#{ $ret[$c] }; $a++) {
-         my $out = $ret[$c][$a][2];
-         my $err = $ret[$c][$a][3];
+sub _tagval {
+   my($self,$tag) = @_;
 
-         # Keep STDOUT if:
-         #    command succeded and output = both/merged/stdout
-         #    command failed and f-output = both/merged/stdout
-         #
-         # Similar for STDERR.
-
-         if ( (exists $succ_status{$status}  &&
-               exists $keep_stdout{$$self{'c'}{'g_output'}})  ||
-              (exists $fail_status{$status}  &&
-               exists $keep_stdout{$$self{'c'}{'g_foutput'}}) ) {
-
-            my @tmp = @$out;
-            while (@tmp  &&  $tmp[0] eq '') {
-               shift(@tmp);
-            }
-            while (@tmp  &&  $tmp[$#tmp] eq '') {
-               pop(@tmp);
-            }
-            $out = [@tmp];
-
-         } else {
-            $out = [];
-         }
-
-         if ( (exists $succ_status{$status}  &&
-               exists $keep_stderr{$$self{'c'}{'g_output'}})  ||
-              (exists $fail_status{$status}  &&
-               exists $keep_stderr{$$self{'c'}{'g_foutput'}}) ) {
-
-            my @tmp = @$err;
-            while (@tmp  &&  $tmp[0] eq '') {
-               shift(@tmp);
-            }
-            while (@tmp  &&  $tmp[$#tmp] eq '') {
-               pop(@tmp);
-            }
-            $err = [@tmp];
-
-         } else {
-            $err = [];
-         }
-
-         $ret[$c][$a][2] = $out;
-         $ret[$c][$a][3] = $err;
-      }
+   my $val;
+   if (exists $$self{'c'}{$tag}) {
+      $val = $$self{'c'}{$tag};
+   } elsif (exists $$self{'g'}{$tag}) {
+      $val = $$self{'g'}{$tag};
    }
 
-   return @ret;
+   $val = ''  if (! defined($val));
+   return $val;
 }
 
 #####################
@@ -1857,31 +1275,31 @@ sub _script_output {
 
 sub _ind {
    my($self) = @_;
-   $$self{'c'}{'curr_ind'} =
-     " "x($$self{'c'}{'ind_per_lev'} * $$self{'c'}{'ind_cur_lev'});
-   $$self{'c'}{'next_ind'} =
-     " "x($$self{'c'}{'ind_per_lev'} * ($$self{'c'}{'ind_cur_lev'} + 1));
-   $$self{'c'}{'prev_ind'} =
-     " "x($$self{'c'}{'ind_cur_lev'} == 0
+   $$self{'g'}{'curr_ind'} =
+     " "x($$self{'g'}{'ind_per_lev'} * $$self{'g'}{'ind_cur_lev'});
+   $$self{'g'}{'next_ind'} =
+     " "x($$self{'g'}{'ind_per_lev'} * ($$self{'g'}{'ind_cur_lev'} + 1));
+   $$self{'g'}{'prev_ind'} =
+     " "x($$self{'g'}{'ind_cur_lev'} == 0
           ? 0
-          : $$self{'c'}{'ind_per_lev'} * ($$self{'c'}{'ind_cur_lev'} - 1));
+          : $$self{'g'}{'ind_per_lev'} * ($$self{'g'}{'ind_cur_lev'} - 1));
 }
 
 sub _ind_0 {
    my($self) = @_;
-   $$self{'c'}{'ind_cur_lev'} = 0;
+   $$self{'g'}{'ind_cur_lev'} = 0;
    $self->_ind();
 }
 
 sub _ind_plus {
    my($self) = @_;
-   $$self{'c'}{'ind_cur_lev'}++;
+   $$self{'g'}{'ind_cur_lev'}++;
    $self->_ind();
 }
 sub _ind_minus {
    my($self) = @_;
-   $$self{'c'}{'ind_cur_lev'}--;
-   $$self{'c'}{'ind_cur_lev'} = 0  if ($$self{'c'}{'ind_cur_lev'} < 0);
+   $$self{'g'}{'ind_cur_lev'}--;
+   $$self{'g'}{'ind_cur_lev'} = 0  if ($$self{'g'}{'ind_cur_lev'} < 0);
    $self->_ind();
 }
 
@@ -1912,6 +1330,587 @@ sub _quote {
    return $string;
 }
 
+###############################################################################
+# The stdout/stderr from a script-mode run are each of the form:
+#     #SC CMD N1.A1
+#     ...
+#     #SC CMD N2.A2
+#     ...
+# where N* are the command number and A* are the alternate number.
+#
+# Retries are noted with:
+#     #SC TRY T
+#
+# If the script fails, for the failing command, it includes:
+#     #SC EXIT N1.A1 EXIT_VALUE
+#
+# STDOUT and STDERR are guaranteed to be identical in form (provided both
+# are kept).
+#
+sub _script_output {
+   my($self,$out) = @_;
+   my @out = split(/\n/,$out);
+
+   #
+   # Parse stdout and turn it into:
+   #
+   #   ( [ CMD_NUM_1, ALT_NUM_1, TRY_1, EXIT_1, STDOUT_1 ],
+   #     [ CMD_NUM_2, ALT_NUM_2, TRY_2, EXIT_2, STDOUT_2 ], ... )
+   #
+
+   my @cmd_raw;
+
+   PARSE_LOOP:
+   while (@out) {
+
+      #
+      # Get STDOUT (or STDERR) for the one command.
+      #
+
+      my($cmd_num,$alt_num,$cmd_exit,$cmd_try,$tmp);
+      my($out_hdr,@output);
+      $cmd_exit = 0;
+      $cmd_try  = 0;
+
+      $out_hdr = shift(@out);
+
+      # The output MUST start with a header:
+      #    #SC CMD X.Y
+      #
+      if ($out_hdr !~ /^\#SC CMD (\d+)\.(\d+)$/) {
+         # Invalid output... should never happen
+         $self->_print(1,"Missing command header in STDOUT: $out_hdr");
+         return ();
+      }
+
+      ($cmd_num,$alt_num) = ($1,$2);
+
+      while (@out  &&  $out[0] !~ /^\#SC CMD (\d+)\.(\d+)$/) {
+         if      ($out[0] =~ /^\#SC TRY (\d+)$/) {
+            $cmd_try = $1;
+            shift(@out);
+
+         } elsif ($out[0] =~ /^\#SC EXIT $cmd_num\.$alt_num (\d+)$/) {
+            $cmd_exit = $1;
+            shift(@out);
+
+         } else {
+            push(@output,shift(@out));
+         }
+      }
+
+      pop(@output)  if (! defined($output[$#output])  ||  $output[$#output] eq '');
+      push (@cmd_raw, [ $cmd_num,$alt_num,$cmd_try,$cmd_exit,\@output ]);
+   }
+
+   #
+   # Now go through this list and group all alternates together and determine
+   # the status for each command.
+   #
+   # This will now look like:
+   #    ( CMD_1 CMD_2 ... )
+   # where
+   #    CMD_i = [ CMD_NUM EXIT TRY_1 TRY_2 ... ]
+   #            CMD_NUM is the command number being executed
+   #            EXIT    is the exit code produced by this command
+   #            TRY_i   is the i'th retry (there will only be one if
+   #                    the command does not have retries
+   #
+   # TRY_i = [ ALT_1 ALT_2 ... ]
+   # ALT_i = [ LINE1 LINE2 ... ]    the output
+   #
+   # The exit code is the one produced by the very first alternate in the first
+   # try.
+   #
+   # When looking at a command (I), we have to take into account the following
+   # command (J = I+1).
+   #
+   #   I            J
+   #   CMD ALT TRY  CMD ALT TRY
+   #
+   #   *   *   *    *   0/1 0       The next command is from a totally new
+   #                                command, so the current command concludes
+   #                                a retry and a command.
+   #
+   #   C   A   T    C   A+1 T       The next command is another alternate.
+   #                                Add it to the current retry.
+   #
+   #   C   A   T    C   0/1 T+1     The next command starts another retry,
+   #                                so the current command concludes a
+   #                                retry, but NOT a command.
+   #
+   #   Everthing else is an error
+   #
+
+   my @cmds      = ();       # @cmds = ( CMD_1 CMD_2 ... )
+   my @cmd       = ();       # @cmd  = ( TRY_1 TRY_2 ... )
+   my @try       = ();       # @try  = ( ALT_1 ALT_2 ... )
+   my $alt;                  # $alt  = [ LINE_1 LINE_2 ... ]
+   my $cmd_curr  = 0;
+   my $alt_curr  = 0;
+   my $try_curr  = 0;
+   my $cmd_next  = 0;
+   my $alt_next  = 0;
+   my $try_next  = 0;
+   my $exit_curr = 0;
+   my $exit_next = 0;
+   my $i         = 0;
+
+   ($cmd_curr,$alt_curr,$try_curr,$exit_curr,$alt) = @{ shift(@cmd_raw) };
+   push(@try,$alt);
+
+   COMMAND_LOOP:
+   while (@cmd_raw) {
+      $i++;
+
+      ($cmd_next,$alt_next,$try_next,$exit_next,$alt) = @{ shift(@cmd_raw) };
+
+      # ALT_NEXT = 0/1    and
+      # TRY_NEXT = 0
+      #    new command
+
+      if ($alt_next <= 1  &&
+          $try_next == 0) {
+
+         push(@cmd,[@try]);
+         push(@cmds,[$cmd_curr,$exit_curr,@cmd]);
+         @cmd      = ();
+         @try      = ($alt);
+         $cmd_curr = $cmd_next;
+         $alt_curr = $alt_next;
+         $try_curr = $try_next;
+         $exit_curr= $exit_next;
+         next COMMAND_LOOP;
+      }
+
+      # CMD_NEXT = CMD_CURR     and
+      # ALT_NEXT = ALT_CURR+1   and
+      # TRY_NEXT = TRY_CURR
+      #    next alternate
+
+      if ($cmd_next == $cmd_curr    &&
+          $alt_next == $alt_curr+1  &&
+          $try_next == $try_curr) {
+
+         push(@try,$alt);
+         $alt_curr = $alt_next;
+         $exit_curr= $exit_next;
+         next COMMAND_LOOP;
+      }
+
+      # CMD_NEXT = CMD_CURR  and
+      # ALT_NEXT = 0/1       and
+      # TRY_NEXT = TRY_CURR+1
+      #    next try
+
+      if ($cmd_next == $cmd_curr    &&
+          $alt_next <= 1            &&
+          $try_next == $try_curr+1) {
+
+         push(@cmd,[@try]);
+         @try      = ($alt);
+         $alt_curr = $alt_next;
+         $try_curr = $try_next;
+         $exit_curr= $exit_next;
+         next COMMAND_LOOP;
+      }
+
+      #
+      # Everything else is an error in the output (should never happen)
+      #
+
+      $self->_print(1,"Unexpected error in output: $i " .
+                    "[$cmd_curr,$alt_curr,$try_curr] " .
+                    "[$cmd_next,$alt_next,$try_next]");
+      return ();
+   }
+
+   #
+   # Add on the last command is stored.
+   #
+
+   push(@cmd,[@try]);
+   push(@cmds,[$cmd_curr,$exit_curr,@cmd]);
+
+   return [@cmds];
+}
+
+###############################################################################
+
+sub ssh {
+   my($self,@hosts) = @_;
+
+   if (! @hosts) {
+      $self->_print(1,"A host or hosts must be supplied with the ssh method");
+      return;
+   }
+
+   if ($self->_cmd_valid_script()) {
+      $self->_print(1,"script flow commands not closed correctly");
+      return;
+   }
+   $self->_script();
+
+   #
+   # Return the script if this is a dry run.
+   #
+
+   my $script = join("\n",@{ $$self{'scr'} });
+   return $script  if ($$self{'g'}{'mode'} eq 'dry-run');
+
+   #
+   # Create the temporary script
+   #
+
+   my $tmp_script = $$self{'g'}{'tmp_script'};
+   if (! $tmp_script) {
+      $self->_print(1,"tmp_script option must be set");
+      return 254;
+   }
+
+   my $out = new IO::File;
+
+   if ($out->open("> $tmp_script")) {
+      print $out $script;
+      $out->close();
+   } else {
+      return 254;
+   }
+
+   #
+   # Run the script
+   #
+
+   my %ret;
+   if ($$self{'g'}{'ssh_num'} == 1) {
+      %ret = $self->_ssh_serial(@hosts);
+   } else {
+      %ret = $self->_ssh_parallel(@hosts);
+   }
+
+   if (! $$self{'g'}{'tmp_script_keep'}) {
+      unlink($tmp_script);
+   }
+
+   return %ret;
+}
+
+sub _ssh_serial {
+   my($self,@hosts) = @_;
+   my %ret;
+
+   foreach my $host (@hosts) {
+      $ret{$host} = $self->_ssh($host);
+   }
+
+   return %ret;
+}
+
+sub _ssh_parallel {
+   my($self,@hosts) = @_;
+   my %ret;
+
+   my $max_proc = ($$self{'g'}{'ssh_num'} ? $$self{'g'}{'ssh_num'} : @hosts);
+   my $manager = Parallel::ForkManager->new($max_proc);
+
+   $manager->run_on_finish
+     (
+      sub {
+         my($pid,$exit_code,$id,$signal,$core_dump,$data) = @_;
+         my($host,$exit,$stdout,$stderr) = @$data;
+         $ret{$host} = $exit;
+         $$self{'s'}{$host}{'out'} = $self->_script_output($stdout)  if ($stdout);
+         $$self{'s'}{$host}{'err'} = $self->_script_output($stderr)  if ($stderr);
+         $$self{'s'}{$host}{'exit'} = $exit;
+      }
+     );
+
+   foreach my $host (@hosts) {
+      $manager->start and next;
+
+      my @r = ($host,$self->_ssh($host));
+
+      $manager->finish(0,\@r);
+   }
+
+   $manager->wait_all_children();
+   return %ret;
+}
+
+sub _ssh {
+   my($self,$host) = @_;
+
+   my $ssh = Net::OpenSSH->new($host, %{ $$self{'g'}{'ssh_opts'} });
+
+   my $script_loc = $$self{'g'}{'tmp_script'};
+   my $script_rem = $$self{'g'}{'ssh_script'}  ||  $script_loc;
+   $ssh->scp_put($script_loc,$script_rem)  or  return 253;
+
+   #
+   # If we're sleeping, do so.
+   #
+
+   if ($$self{'g'}{'ssh_sleep'}) {
+      my $n = $$self{'g'}{'ssh_sleep'};
+      if ($n < 0) {
+         sleep(-$n);
+      } else {
+         sleep(int(rand($$self{'g'}{'ssh_sleep'})));
+      }
+   }
+
+   #
+   # If it's running in real-time, do so.
+   #
+
+   if ($$self{'g'}{'mode'} eq 'run') {
+      $ssh->system({},". $script_rem");
+      my $ret = $?;
+
+      if (! $$self{'g'}{'ssh_script_keep'}) {
+         $ssh->system({},"rm -f $script_rem");
+      }
+      return ($ret);
+   }
+
+   #
+   # If it's running in script mode, do so.
+   #
+
+   my($stdout,$stderr,$exit);
+
+   if      ($$self{'g'}{'err'}) {
+      ($stdout,$stderr) = $ssh->capture2({},". $script_rem");
+      $stdout           = undef  if (! $$self{'g'}{'out'});
+   } elsif ($$self{'g'}{'out'}) {
+      $stdout           = $ssh->capture({},". $script_rem");
+   } else {
+      $ssh->system({},". $script_rem");
+   }
+   $exit = $?;
+   $exit = $exit >> 8;
+
+   if (! $$self{'g'}{'ssh_script_keep'}) {
+      $ssh->system({},"rm -f $script_rem");
+   }
+
+   return ($exit,$stdout,$stderr);
+}
+
+###############################################################################
+
+sub output {
+   my($self,%options) = @_;
+
+   my $host = (exists $options{'host'}    ? $options{'host'}    : '');
+   my $type = (exists $options{'output'}  ? $options{'output'}  : 'stdout');
+   my $cmd  = (exists $options{'command'} ? $options{'command'} : 'curr');
+
+   if ($type !~ /^(stdout|stderr|command|num|label|exit)$/) {
+      $self->_print(1,"Invalid output option: output=$type");
+      return;
+   }
+
+   #
+   # Output from ssh method
+   #
+
+   if ($host) {
+      my @all = keys %{ $$self{'s'} };
+      if (! @all) {
+         $self->_print(1,"Invalid option in output: " .
+                       "host not allowed unless run with ssh method");
+         return;
+      }
+
+      # host = all
+      # host = HOST,HOST,...
+
+      if ($host eq 'all'  ||  $host =~ /,/) {
+         my %ret;
+         my @host = ($host eq 'all'
+                     ? @all
+                     : split(/,/,$host));
+
+         foreach my $host (@host) {
+            if (! exists $$self{'s'}{$host}) {
+               $self->_print(1,"Host has no output: $host");
+               next;
+            }
+
+            $ret{$host} = [ $self->_output($type,$cmd,$$self{'s'}{$host}) ];
+         }
+         return %ret;
+      }
+
+      # host = HOST
+
+      if (! exists $$self{'s'}{$host}) {
+         $self->_print(1,"Host has no output: $host");
+         return;
+      }
+      return $self->_output($type,$cmd,$$self{'s'}{$host});
+   }
+
+   #
+   # Output from run method
+   #
+
+   return $self->_output($type,$cmd,$$self{'o'});
+}
+
+sub _output {
+   my($self,$type,$cmd,$output) = @_;
+
+   #
+   # Figure out which output sections need to be returned.
+   #
+
+   my @c;
+   my $no  = (exists $$output{'out'} ? @{ $$output{'out'} } : 0);
+   my $ne  = (exists $$output{'err'} ? @{ $$output{'err'} } : 0);
+   my $max = ($no > $ne ? $no : $ne);
+
+   if ($cmd eq 'curr') {
+      push @c,$$self{'curr'};
+
+   } elsif ($cmd eq 'next') {
+      $$self{'curr'}++;
+      push @c,$$self{'curr'};
+
+   } elsif ($cmd eq 'all') {
+      push @c, (0 .. ($max-1));
+
+   } elsif ($cmd eq 'fail') {
+      # Find the command that failed.
+
+      foreach my $i (0 .. ($max-1)) {
+         if (exists $$output{'out'}  &&  defined $$output{'out'}[$i]) {
+            if ($$output{'out'}[$i][1]) {
+               push(@c,$i);
+               last;
+            }
+
+         } elsif (exists $$output{'err'}  &&  defined $$output{'err'}[$i]) {
+            if ($$output{'err'}[$i][1]) {
+               push(@c,$i);
+               last;
+            }
+         }
+      }
+
+   } elsif ($cmd =~ /^\d+$/) {
+      # CMD_NUM
+
+      foreach my $i (0 .. ($max-1)) {
+         if (exists $$output{'out'}  &&  defined $$output{'out'}[$i]) {
+            if ($$output{'out'}[$i][0] eq $cmd) {
+               push(@c,$i);
+            }
+
+         } elsif (exists $$output{'err'}  &&  defined $$output{'err'}[$i]) {
+            if ($$output{'err'}[$i][0] eq $cmd) {
+               push(@c,$i);
+            }
+         }
+      }
+
+   } else {
+      # LABEL
+
+      foreach my $i (0 .. ($max-1)) {
+         if (exists $$output{'out'}  &&  defined $$output{'out'}[$i]) {
+            my $n = $$output{'out'}[$i][0];
+            if ($$self{'cmd'}{$n}{'label'} eq $cmd) {
+               push(@c,$i);
+            }
+
+         } elsif (exists $$output{'err'}  &&  defined $$output{'err'}[$i]) {
+            my $n = $$output{'err'}[$i][0];
+            if ($$self{'cmd'}{$n}{'label'} eq $cmd) {
+               push(@c,$i);
+            }
+         }
+      }
+   }
+
+   return  if (! @c);
+
+   #
+   # Now gather up the stuff to return.
+   #
+
+   my @ret;
+
+   foreach my $i (@c) {
+      if      ($type eq 'stdout') {
+         my @r;
+         if (exists $$output{'out'}  &&  defined $$output{'out'}[$i]) {
+            my @tmp = @{ $$output{'out'}[$i] };
+            shift(@tmp);
+            shift(@tmp);
+            foreach my $try (@tmp) {
+               foreach my $alt (@$try) {
+                  push(@r,@$alt);
+               }
+            }
+            push(@ret,[@r]);
+         }
+
+      } elsif ($type eq 'stderr') {
+         my @r;
+         if (exists $$output{'err'}  &&  defined $$output{'err'}[$i]) {
+            my @tmp = @{ $$output{'err'}[$i] };
+            shift(@tmp);
+            shift(@tmp);
+            foreach my $try (@tmp) {
+               foreach my $alt (@$try) {
+                  push(@r,@$alt);
+               }
+            }
+            push(@ret,[@r]);
+         }
+
+      } elsif ($type eq 'command') {
+         my $n;
+         if (exists $$output{'out'}  &&  defined $$output{'out'}[$i]) {
+            $n = $$output{'out'}[$i][0];
+         } elsif (exists $$output{'err'}  &&  defined $$output{'err'}[$i]) {
+            $n = $$output{'err'}[$i][0];
+         }
+         push(@ret,$$self{'cmd'}{$n}{'cmd'});
+
+      } elsif ($type eq 'num') {
+         my $n;
+         if (exists $$output{'out'}  &&  defined $$output{'out'}[$i]) {
+            $n = $$output{'out'}[$i][0];
+         } elsif (exists $$output{'err'}  &&  defined $$output{'err'}[$i]) {
+            $n = $$output{'err'}[$i][0];
+         }
+         push(@ret,$n);
+
+      } elsif ($type eq 'label') {
+         my $n;
+         if (exists $$output{'out'}  &&  defined $$output{'out'}[$i]) {
+            $n = $$output{'out'}[$i][0];
+         } elsif (exists $$output{'err'}  &&  defined $$output{'err'}[$i]) {
+            $n = $$output{'err'}[$i][0];
+         }
+         push(@ret,$$self{'cmd'}{$n}{'label'});
+
+      } elsif ($type eq 'exit') {
+         my $exit;
+         if (exists $$output{'out'}  &&  defined $$output{'out'}[$i]) {
+            $exit = $$output{'out'}[$i][1];
+         } elsif (exists $$output{'err'}  &&  defined $$output{'err'}[$i]) {
+            $exit = $$output{'err'}[$i][1];
+         }
+         push(@ret,$exit);
+      }
+   }
+
+   return @ret;
+}
 
 1;
 # Local Variables:
