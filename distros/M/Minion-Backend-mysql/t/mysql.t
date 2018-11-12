@@ -13,6 +13,7 @@ use Time::HiRes qw(time usleep);
 my $mysqld = Test::mysqld->new(
   my_cnf => {
     'skip-networking' => '', # no TCP socket
+    'log-bin-trust-function-creators' => 1, # We're creating unsafe functions
   }
 ) or plan skip_all => $Test::mysqld::errstr;
 

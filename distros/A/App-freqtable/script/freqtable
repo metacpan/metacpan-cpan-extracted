@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-07-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-11-12'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -9,10 +9,14 @@ use warnings;
 use Getopt::Long qw(:config bundling no_ignore_case);
 use POSIX qw(ceil);
 
+my $tmp_freq;
 my %Opts = (
     mode => 'line',
     ignore_case => 0,
+    print_freq => 1,
     # XXX options to limit memory usage, e.g. max keys, max line length, --md5 (like in nauniq), ...
+    min_freq => undef,
+    max_freq => undef,
 );
 
 sub parse_cmdline {
@@ -24,6 +28,9 @@ sub parse_cmdline {
         'number|n'  => sub { $Opts{mode} = 'number' },
         'integer|i' => sub { $Opts{mode} = 'integer' },
         'ignore-case|f' => \$Opts{ignore_case},
+        'no-print-freq|F' => sub { $Opts{print_freq} = 0 },
+        'print-freq'      => sub { $Opts{print_freq} = 1 },
+        'freq=s'    => \$tmp_freq,
         'help|h'  => sub {
             print <<USAGE;
 Usage:
@@ -37,41 +44,71 @@ Options:
   --number, -n
   --integer, -i
   --ignore-case, -f
+  --no-print-freq, -F
+  --freq N|M-N|M-|-N
 For more details, see the manpage/documentation.
 USAGE
             exit 0;
         },
     );
+
+    if (defined $tmp_freq) {
+        if ($tmp_freq =~ /\A\d+\z/) {
+            $Opts{min_freq} = $Opts{max_freq} = $tmp_freq;
+        } elsif ($tmp_freq =~ /\A-(\d+)\z/) {
+            $Opts{max_freq} = $1;
+        } elsif ($tmp_freq =~ /\A(\d+)-\z/) {
+            $Opts{min_freq} = $1;
+        } elsif ($tmp_freq =~ /\A(\d+)-(\d+)\z/) {
+            $Opts{min_freq} = $1;
+            $Opts{max_freq} = $2;
+        } else {
+            warn "freqtable: Invalid value for --freq: '$tmp_freq', ".
+                "please specify N|M-N|M-|-N\n";
+            $res = 0;
+        }
+    }
+
     exit 99 if !$res;
 }
 
 sub run {
-    my $fh = select();
-
     my %occurences;
     my $numeric;
 
     if ($Opts{mode} eq 'byte' || $Opts{mode} eq 'char') {
-        if ($Opts{mode} eq 'byte') {
-            binmode $fh, ":encoding(bytes)";
-        } else {
-            binmode $fh, ":encoding(utf8)";
-        }
-        while (1) {
-            read $fh, my $block, 4096;
-            last if !length $block;
-            for (split //, $block) {
-                if ($Opts{ignore_case}) {
-                    $occurences{lc $_}++;
-                } else {
-                    $occurences{$_}++;
+        @ARGV = (\*STDIN) unless @ARGV;
+        for my $fn (@ARGV) {
+            my $fh;
+            if (ref $fn) {
+                $fh = $fn;
+            } else {
+                open $fh, "<", $fn or do {
+                    warn "freqtable: Can't open '$fn': $!\n";
+                    next;
+                };
+            }
+            if ($Opts{mode} eq 'byte') {
+                binmode $fh;
+            } else {
+                binmode $fh, ":encoding(utf8)";
+            }
+            while (1) {
+                read $fh, my $block, 4096;
+                last if !length $block;
+                for (split //, $block) {
+                    if ($Opts{ignore_case}) {
+                        $occurences{lc $_}++;
+                    } else {
+                        $occurences{$_}++;
+                    }
                 }
             }
-        }
+        } # fn
     } elsif ($Opts{mode} eq 'word') {
         while (defined(my $line = <>)) {
             chomp $line;
-            while (my $line =~ /(\w+)/g) {
+            while ($line =~ /(\w+)/g) {
                 if ($Opts{ignore_case}) {
                     $occurences{lc $1}++;
                 } else {
@@ -95,7 +132,7 @@ sub run {
             $occurences{$num}++;
         }
     } else {
-        die "BUG: Unknown mode '$Opts{mode}'";
+        die "freqtable: BUG: Unknown mode '$Opts{mode}'";
     }
 
     my $fmt;
@@ -104,10 +141,16 @@ sub run {
             ($numeric ? $a <=> $b : $a cmp $b)
     } keys %occurences) {
         my $n = $occurences{$k};
-        unless (defined $fmt) {
-            $fmt = "%" . ceil(log($n)/log(10)) . "s\t%s\n";
+        next if defined $Opts{min_freq} && $n < $Opts{min_freq};
+        next if defined $Opts{max_freq} && $n > $Opts{max_freq};
+        if ($Opts{print_freq}) {
+            unless (defined $fmt) {
+                $fmt = "%" . ceil(log($n)/log(10)) . "s\t%s\n";
+            }
+            printf $fmt, $n, $k;
+        } else {
+            print $k, "\n";
         }
-        printf $fmt, $n, $k;
     }
 }
 
@@ -132,13 +175,143 @@ freqtable - Print frequency table of lines/words/characters/bytes/numbers
 
 =head1 VERSION
 
-This document describes version 0.001 of freqtable (from Perl distribution App-freqtable), released on 2018-07-07.
+This document describes version 0.002 of freqtable (from Perl distribution App-freqtable), released on 2018-11-12.
 
 =head1 SYNOPSIS
 
- freqtable [OPTIONS] < INPUT
+ % freqtable [OPTIONS] < INPUT
+
+Sample input:
+
+ % cat input-lines.txt
+ one
+ one
+ two
+ three
+ four
+ five
+ five
+ five
+ six
+ seven
+ eight
+ eight
+ nine
+
+ % cat input-words.txt
+ one one two three four five five five six seven eight eight nine
+
+ % cat input-nums.txt
+ 9.99 cents
+ 9.99 dollars
+ 9 cents
+
+=head2 Modes
+
+Display frequency table (by default: lines):
+
+ % freqtable input-lines.txt
+ 3       five
+ 2       eight
+ 2       one
+ 1       four
+ 1       nine
+ 1       seven
+ 1       six
+ 1       three
+ 1       two
+
+Display frequency table (words):
+
+ % freqtable -w input-words.txt
+ 3       five
+ 2       eight
+ 2       one
+ 1       four
+ 1       nine
+ 1       seven
+ 1       six
+ 1       three
+ 1       two
+
+Display frequency table (characters):
+
+ % freqtable -c input-words.txt
+ 12
+ 12      e
+  7      i
+  5      n
+  4      f
+  4      o
+  4      t
+  4      v
+  3      h
+  2      g
+  2      r
+  2      s
+  1
+
+  1      u
+  1      w
+  1      x
+
+Display frequency table (nums):
+
+ % freqtable -n input-nums.txt
+ 2      9.99
+ 1      9
+
+Display frequency table (integers):
+
+ % freqtable -i input-nums.txt
+ 3      9
+
+=head2 -F option
+
+Don't display the frequencies:
+
+ % freqtable -F input-lines.txt
+ five
+ eight
+ one
+ four
+ nine
+ seven
+ six
+ three
+ two
+
+=head2 Filter by frequencies
+
+Only display lines that appear three times:
+
+ % freqtable -F input-lines.txt --freq 3
+ 3       five
+
+Only display lines that appear more than once:
+
+ % freqtable -F input-lines.txt --freq 2-
+ 3       five
+ 2       eight
+ 2       one
+
+Only display lines that appear less than three times:
+
+ % freqtable -F input-lines.txt --freq -2
+ 2       eight
+ 2       one
+ 1       four
+ 1       nine
+ 1       seven
+ 1       six
+ 1       three
+ 1       two
 
 =head1 DESCRIPTION
+
+This utility counts the occurences of lines (or words/characters) in the input
+then display each unique lines along with their number of occurrences. You can
+also instruct it to only show lines that have a specified number of occurrences.
 
 =head1 EXIT CODES
 
@@ -162,9 +335,37 @@ This document describes version 0.001 of freqtable (from Perl distribution App-f
 
 =item * --number, -n
 
+Treat each line as a number. A line like this:
+
+ 9.99 cents
+
+will be regarded as:
+
+ 9.99
+
 =item * --integer, -i
 
+Treat each line as an integer. A line like this:
+
+ 9.99 cents
+
+will be regarded as:
+
+ 9
+
 =item * --ignore-case, -f
+
+=item * --no-print-freq, -F
+
+Will not print the frequencies.
+
+=item * --freq=s
+
+Filter by frequencies. C<N> (e.g. --freq 5) means only display items that occur
+N times. C<M-N> (e.g. --freq 5-10) means only display items that occur between M
+and N times. C<M-> (e.g. --freq 5-) means only display items that occur at least
+M times. C<-N> (e.g. --freq -10) means only display items that occur at most N
+times.
 
 =back
 

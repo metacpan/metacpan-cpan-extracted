@@ -75,7 +75,7 @@ sub is_superuser {
 }
 
 sub run_proc (@) {
-    state $init = !!require Pcore::Util::Sys::Proc;
+    require Pcore::Util::Sys::Proc;
 
     return Pcore::Util::Sys::Proc->new(@_);
 }

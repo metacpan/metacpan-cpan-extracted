@@ -3,7 +3,7 @@ package Assert::Refute::Contract;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.1301';
+our $VERSION = '0.1501';
 
 =head1 NAME
 
@@ -42,10 +42,69 @@ See L<Assert::Refute/contract> for convenient interface.
 =cut
 
 use Carp;
+use parent qw(Exporter);
 
 use Assert::Refute::Report;
 
 our @CARP_NOT = qw(Assert::Refute Assert::Refute::Build);
+our @EXPORT_OK = qw(contract);
+
+=head1 EXPORT
+
+C<contract> prototyped function is optionally exported.
+
+=head2 contract { ... }
+
+Save a contract BLOCK for future use:
+
+    use Assert::Refute qw(:all);
+
+    my $spec = contract {
+        my ($foo, $bar) = @_;
+        is $foo, 42, "Life";
+        like $bar, qr/b.*a.*r/, "Regex";
+    };
+
+    # later
+    my $report = $spec->apply( 42, "bard" );
+    $report->get_count;  # 2
+    $report->is_passing; # true
+    $report->get_tap;    # printable summary *as if* it was Test::More
+
+The same may be written as
+
+    my $spec = contract {
+        my ($report, @args) = @_;
+        $report->is( ... );
+        $report->like( ... );
+    } need_object => 1;
+
+The C<need_object> form may be preferable if one doesn't want to pollute the
+main namespace with test functions (C<is>, C<ok>, C<like> etc)
+and instead intends to use object-oriented interface.
+
+Note that contract does B<not> validate anything by itself,
+it just creates a read-only L<Assert::Refute::Contract>
+object sitting there and waiting for an C<apply> call.
+
+The C<apply> call returns a L<Assert::Refute::Report> object containing
+results of specific execution.
+
+This is similar to how C<prepare> / C<execute> works in L<DBI>.
+
+This function is equivalent to C<new> (see below)
+but may be more convenient in some cases.
+
+=cut
+
+sub contract (&@) { ## no critic
+    croak "Odd number of elements in contract { ... } options"
+        unless @_ % 2;
+    my ($code, %opt) = @_;
+
+    $opt{code} = $code;
+    return __PACKAGE__->new( %opt );
+};
 
 =head1 OBJECT-ORIENTED INTERFACE
 

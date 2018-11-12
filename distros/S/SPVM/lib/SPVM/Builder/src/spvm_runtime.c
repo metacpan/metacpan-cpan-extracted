@@ -20,10 +20,7 @@
 #include "spvm_runtime_sub.h"
 #include "spvm_runtime_field.h"
 #include "spvm_runtime_package_var.h"
-#include "spvm_runtime_my.h"
-#include "spvm_runtime_info_type.h"
-#include "spvm_runtime_info_switch_info.h"
-#include "spvm_runtime_info_case_info.h"
+#include "spvm_runtime_arg.h"
 #include "spvm_portable.h"
 
 // Only use for constant value
@@ -139,30 +136,23 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   
   SPVM_ENV* env = SPVM_RUNTIME_create_env(runtime);
   
-  // Share runtime information with portable
+  runtime->string_pool = portable->string_pool;
+  runtime->string_pool_length = portable->string_pool_length;
+  
+  runtime->constant_pool = portable->constant_pool;
+  runtime->constant_pool_length = portable->constant_pool_length;
+  
   runtime->basic_types = portable->basic_types;
   runtime->basic_types_length = portable->basic_types_length;
 
-  runtime->symbols = portable->symbols;
-  runtime->symbols_length = portable->symbols_length;
   runtime->fields = (SPVM_RUNTIME_FIELD*)portable->fields;
   runtime->fields_length = portable->fields_length;
   runtime->package_vars = (SPVM_RUNTIME_PACKAGE_VAR*)portable->package_vars;
   runtime->package_vars_length = portable->package_vars_length;
-  runtime->args = (SPVM_RUNTIME_MY*)portable->args;
-  runtime->info_types = (SPVM_RUNTIME_INFO_TYPE*)portable->info_types;
-  runtime->info_field_ids = portable->info_field_ids;
-  runtime->info_package_var_ids = portable->info_package_var_ids;
-  runtime->info_sub_ids = portable->info_sub_ids;
+  runtime->args = (SPVM_RUNTIME_ARG*)portable->args;
   runtime->opcodes = (SPVM_OPCODE*)portable->opcodes;
   runtime->subs = (SPVM_RUNTIME_SUB*)portable->subs;
   runtime->subs_length = portable->subs_length;
-
-  runtime->info_long_values = portable->info_long_values;
-  runtime->info_double_values = portable->info_double_values;
-  runtime->info_string_values = portable->info_string_values;
-  runtime->info_string_values_length = portable->info_string_values_length;
-  runtime->info_string_lengths = portable->info_string_lengths;
 
   // Native sub addresses
   runtime->sub_native_addresses = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(void*) * (runtime->subs_length + 1));
@@ -170,31 +160,6 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   // Precompile sub addresses
   runtime->sub_precompile_addresses = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(void*) * (runtime->subs_length + 1));
   
-  // build runtime info_switch_info info_switch_infos
-  int32_t info_switch_info_ints_index = 0;
-  runtime->info_switch_infos = SPVM_LIST_new(0);
-  for (int32_t i = 0; i < portable->info_switch_infos_length; i++) {
-    int32_t* portable_info_switch_info_ints = (int32_t*)&portable->info_switch_info_ints[info_switch_info_ints_index];
-
-    SPVM_RUNTIME_INFO_SWITCH_INFO* runtime_info_switch_info = SPVM_RUNTIME_INFO_SWITCH_INFO_new();
-    runtime_info_switch_info->default_opcode_rel_index = portable_info_switch_info_ints[0];
-    int32_t case_infos_length = portable_info_switch_info_ints[1];
-    
-    runtime_info_switch_info->case_infos = SPVM_LIST_new(0);
-    for (int32_t case_info_index = 0; case_info_index < case_infos_length; case_info_index++) {
-      SPVM_RUNTIME_INFO_CASE_INFO* info_case_info = SPVM_RUNTIME_INFO_CASE_INFO_new();
-      
-      info_case_info->match = portable_info_switch_info_ints[2 + (2 * case_info_index)];
-      info_case_info->opcode_rel_index = portable_info_switch_info_ints[2 + (2 * case_info_index) + 1];
-      
-      SPVM_LIST_push(runtime_info_switch_info->case_infos, info_case_info);
-    }
-    
-    info_switch_info_ints_index += 2 + case_infos_length * 2;
-    
-    SPVM_LIST_push(runtime->info_switch_infos, runtime_info_switch_info);
-  }
-
   // build packages
   runtime->packages_length = portable->packages_length;
   runtime->packages = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(SPVM_RUNTIME_PACKAGE) * (runtime->packages_length + 1));
@@ -205,7 +170,7 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   for (int32_t package_id = 1; package_id < runtime->packages_length; package_id++) {
     
     SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
-    const char* package_name = runtime->symbols[package->name_id];
+    const char* package_name = &runtime->string_pool[package->name_id];
     SPVM_HASH_insert(runtime->package_symtable, package_name, strlen(package_name), package);
     
     package->fields = SPVM_LIST_new(0);
@@ -217,7 +182,7 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
     package->sub_symtable = SPVM_HASH_new(0);
   }
 
-  // Register field info to package
+  // Register field to package
   for (int32_t field_id = 1; field_id < runtime->fields_length; field_id++) {
     SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
     
@@ -226,7 +191,7 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
     SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
     
     SPVM_LIST_push(package->fields, field);
-    const char* field_name = runtime->symbols[field->name_id];
+    const char* field_name = &runtime->string_pool[field->name_id];
     SPVM_HASH_insert(package->field_symtable, field_name, strlen(field_name), field);
     
     switch (field->runtime_type) {
@@ -242,7 +207,7 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
     }
   }
   
-  // Register package_var info to package
+  // Register package_var to package
   for (int32_t package_var_id = 1; package_var_id < runtime->package_vars_length; package_var_id++) {
     SPVM_RUNTIME_PACKAGE_VAR* package_var = &runtime->package_vars[package_var_id];
     
@@ -251,11 +216,11 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
     SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
     
     SPVM_LIST_push(package->package_vars, package_var);
-    const char* package_var_name = runtime->symbols[package_var->name_id];
+    const char* package_var_name = &runtime->string_pool[package_var->name_id];
     SPVM_HASH_insert(package->package_var_symtable, package_var_name, strlen(package_var_name), package_var);
   }
 
-  // Register sub info to package
+  // Register sub to package
   for (int32_t sub_id = 1; sub_id < runtime->subs_length; sub_id++) {
     SPVM_RUNTIME_SUB* sub = &runtime->subs[sub_id];
     
@@ -264,7 +229,7 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
     SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
     
     SPVM_LIST_push(package->subs, sub);
-    const char* sub_name = runtime->symbols[sub->name_id];
+    const char* sub_name = &runtime->string_pool[sub->name_id];
     SPVM_HASH_insert(package->sub_symtable, sub_name, strlen(sub_name), sub);
 
     // Variable allocation max length
@@ -286,7 +251,7 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   runtime->basic_type_symtable = SPVM_HASH_new(0);
   for (int32_t basic_type_id = 0; basic_type_id < runtime->basic_types_length; basic_type_id++) {
     SPVM_RUNTIME_BASIC_TYPE* runtime_basic_type = &runtime->basic_types[basic_type_id];
-    const char* runtime_basic_type_name = runtime->symbols[runtime_basic_type->name_id];
+    const char* runtime_basic_type_name = &runtime->string_pool[runtime_basic_type->name_id];
     SPVM_HASH_insert(runtime->basic_type_symtable, runtime_basic_type_name, strlen(runtime_basic_type_name), runtime_basic_type);
   }
   
@@ -321,18 +286,6 @@ void SPVM_RUNTIME_free(SPVM_ENV* env) {
   
   SPVM_HASH_free(runtime->basic_type_symtable);
   
-  for (int32_t switch_index = 0; switch_index < runtime->info_switch_infos->length; switch_index++) {
-    SPVM_RUNTIME_INFO_SWITCH_INFO* info_switch_info = SPVM_LIST_fetch(runtime->info_switch_infos, switch_index);
-    
-    SPVM_LIST* case_infos = info_switch_info->case_infos;
-    for (int32_t case_index = 0; case_index < case_infos->length; case_index++) {
-      SPVM_RUNTIME_INFO_CASE_INFO* info_case_info = SPVM_LIST_fetch(case_infos, case_index);
-      free(info_case_info);
-    }
-    SPVM_LIST_free(info_switch_info->case_infos);
-  }
-  SPVM_LIST_free(runtime->info_switch_infos);
-
   for (int32_t package_id = 1; package_id < runtime->packages_length; package_id++) {
     
     SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];

@@ -1,5 +1,9 @@
 Revision history for MooseX-Types-Email
 
+0.008     2018-11-12 00:39:13Z
+
+  - inline all types
+
 0.007     2015-08-16 01:23:10Z
   - update some distribution tooling
 
@@ -22,4 +26,3 @@ Revision history for MooseX-Types-Email
 
 0.001  2009-07-02
   - First version
-

@@ -163,8 +163,8 @@ sims_test "Consume a specified 3 parent-layers deep" => {
 
     $schema->load_sims({
       House => [
-        { id => 1, name => 'Mansion2' },
-        { id => 3, name => 'Mansion' },
+        { name => 'Mansion2' },
+        { name => 'Mansion' },
       ],
     });
     return $schema->load_sims({
@@ -173,10 +173,10 @@ sims_test "Consume a specified 3 parent-layers deep" => {
   },
   expect => {
     House => [
-      { id => 1, name => 'Mansion2' },
-      { id => 3, name => 'Mansion' },
+      { name => 'Mansion2' },
+      { name => 'Mansion' },
     ],
-    Artist => { id => 1, name => re('.+'), house_id => 3 },
+    Artist => { id => 1, name => re('.+'), house_id => 2 },
     Studio => { id => 1, name => re('.+') },
     Album => { id => 1, name => re('.+'), artist_id => 1, studio_id => 1 },
     Track => { id => 1, name => re('.+'), album_id => 1 },

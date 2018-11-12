@@ -3,8 +3,8 @@ package Pcore::Ext::Context::Raw;
 use Pcore -class;
 use Pcore::Util::Scalar qw[refaddr];
 
-has ctx => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
-has js  => ();    #  ( is => 'ro', isa => Str, required => 1 );
+has ctx => ( required => 1 );    # InstanceOf ['Pcore::Ext::Context']
+has js  => ( required => 1 );    # Str
 
 sub TO_JSON ( $self ) {
     my $id = refaddr $self;

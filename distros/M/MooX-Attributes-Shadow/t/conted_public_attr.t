@@ -1,11 +1,7 @@
 #!perl
 
-use strict;
-use warnings;
-
-use Test::More;
-
-use lib 't';
+use Test2::V0;
+use Test::Lib;
 
 use Container3;
 
@@ -20,6 +16,6 @@ is ( $obj->foo->a, 3, 'contained attribute a' );
 
 is ( $obj->foo->b, 'b', 'contained attribute b' );
 
-is_deeply( [ sort $obj->foo->shadowable_attrs ], [ qw( a b ) ], 'shadowable attrs' );
+is( [ sort $obj->foo->shadowable_attrs ], [ qw( a b ) ], 'shadowable attrs' );
 
 done_testing;

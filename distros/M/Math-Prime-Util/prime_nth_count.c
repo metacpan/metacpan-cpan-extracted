@@ -331,8 +331,6 @@ UV segment_prime_count(UV low, UV high)
 
 UV prime_count(UV lo, UV hi)
 {
-  UV count, range_threshold;
-
   if (lo > hi || hi < 2)
     return 0;
 
@@ -341,16 +339,14 @@ UV prime_count(UV lo, UV hi)
 #endif
 
   /* We use table acceleration so this is preferable for small inputs */
-  if (hi < 66000000)  return segment_prime_count(lo, hi);
+  if (hi < _MPU_LMO_CROSSOVER)  return segment_prime_count(lo, hi);
 
-  /* Rough empirical threshold for when segment faster than LMO */
-  range_threshold = hi / (isqrt(hi)/200);
-  if ( (hi-lo+1) < range_threshold )
-    return segment_prime_count(lo, hi);
-
+  { /* Rough empirical threshold for when segment faster than LMO */
+    UV range_threshold = hi / (isqrt(hi)/200);
+    if ( (hi-lo+1) < range_threshold )
+      return segment_prime_count(lo, hi);
+  }
   return LMO_prime_count(hi) - ((lo < 2) ? 0 : LMO_prime_count(lo-1));
-
-  return count;
 }
 
 UV prime_count_approx(UV n)
@@ -566,7 +562,7 @@ UV nth_prime_lower(UV n)
     return lo;
   }
 
-  { /* Axler 2017 http//arxiv.org/pdf/1706.03651.pdf Corollary 1.4 */
+  { /* Axler 2017 http://arxiv.org/pdf/1706.03651.pdf Corollary 1.4 */
     double b1 = (n < 56000000)  ?  11.200  :  11.508;
     lower = fn * (flogn + flog2n-1.0 + ((flog2n-2.00)/flogn) - ((flog2n*flog2n-6*flog2n+b1)/(2*flogn*flogn)));
   }
@@ -838,38 +834,6 @@ UV nth_twin_prime_approx(UV n)
     else                                   hi = mid;
   }
   return lo;
-}
-
-/******************************************************************************/
-/*                                SEMI PRIMES                                 */
-/******************************************************************************/
-
-static UV _semiprime_count(UV n)
-{
-  UV pc = 0, sum = 0;
-  START_DO_FOR_EACH_PRIME(2, isqrt(n)) {
-    sum += LMO_prime_count(n/p) - pc++;
-  } END_DO_FOR_EACH_PRIME;
-  return sum;
-}
-static UV _range_semiprime_count(UV lo, UV hi)
-{
-  UV sum = 0;
-  for (; lo < hi; lo++)     /* TODO: We should walk composites */
-    if (is_semiprime(lo))
-      sum++;
-  if (is_semiprime(hi))
-    sum++;
-  return sum;
-}
-
-UV semiprime_count(UV lo, UV hi)
-{
-  if (lo > hi || hi < 4)
-    return 0;
-  return   (hi >= 1000 && (hi-lo+1) < hi / (isqrt(hi)/12))
-         ? _range_semiprime_count(lo, hi)
-         : _semiprime_count(hi) - ((lo < 4) ? 0 : _semiprime_count(lo-1));
 }
 
 /******************************************************************************/

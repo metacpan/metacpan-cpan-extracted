@@ -89,7 +89,7 @@ Dancer2::Logger::Log4perl - Dancer2 logger interface for Log4perl.
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

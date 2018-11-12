@@ -2,7 +2,7 @@ package Pcore::Dist::Build::Clean;
 
 use Pcore -class, -const;
 
-has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'], required => 1 );
+has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
 const our $DIR => [
 
@@ -27,15 +27,15 @@ const our $FILE => [
 
 sub run ($self) {
     for my $dir ( sort $DIR->@* ) {
-        say 'rmtree ' . $dir;
+        say "rmtree $dir";
 
-        P->file->rmtree( $self->dist->root . $dir );
+        P->file->rmtree("$self->{dist}->{root}/$dir");
     }
 
     for my $file ( sort $FILE->@* ) {
-        say 'unlink ' . $file;
+        say "unlink $file";
 
-        unlink $self->dist->root . $file or die qq[Can't unlink "$file"] if -f $self->dist->root . $file;
+        unlink "$self->{dist}->{root}/$file" or die qq[Can't unlink "$file"] if -f "$self->{dist}->{root}/$file";
     }
 
     return;

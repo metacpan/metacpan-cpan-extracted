@@ -87,6 +87,16 @@ sub schema { shift->{schema} }
 sub driver { shift->schema->storage->dbh->{Driver}{Name} }
 sub datetime_parser { shift->schema->storage->datetime_parser }
 
+sub set_allow_pk_to {
+  my ($target, $source) = @_;
+  if (ref $source) {
+    ($target->{__META__} //= {})->{allow_pk_set_value}
+      = ($source->{__META__} // {})->{allow_pk_set_value};
+  } else {
+    ($target->{__META__} //= {})->{allow_pk_set_value} = $source;
+  }
+}
+
 sub create_search {
   my $self = shift;
   my ($rs, $name, $cond) = @_;
@@ -109,12 +119,14 @@ sub create_search {
   # 2. Keeping it in breaks the test in t/parent_child_parent.t named
   #     "Auto-generate other children of parent by amount"
   # 3. It's unclear if the functionality is even desirable.
+  #
   # The goal of this section looked to be to find the best match, including any
   # parentage. The best element in the tree of parentage is a good goal, but it
   # does require that we have converted the FK relationships first. We need a
   # test before this section can be re-enabled.
   #
   # In any case, it definitely won't be in this form.
+  #
   #foreach my $rel_name ($source->relationships) {
   #  next unless exists $cond->{$rel_name};
   #  next unless reftype($cond->{$rel_name}) eq 'HASH';
@@ -122,7 +134,7 @@ sub create_search {
   #  my %search = map {
   #    ;"$rel_name.$_" => $cond->{$rel_name}{$_}
   #  } grep {
-  #    # Nested relationships are automagically handled. q.v. t/t5.t
+  #    # Nested relationships are "automagically handled."
   #    !ref $cond->{$rel_name}{$_}
   #  } keys %{$cond->{$rel_name}};
   #
@@ -139,22 +151,25 @@ sub fix_fk_dependencies {
   # 1. If we have something, then:
   #   a. If it's a scalar, then, COND = { $fk => scalar }
   #   b. Look up the row by COND
-  #   c. If the row is not there, then $create_item->($fksrc, COND)
+  #   c. If the row is not there and the FK is nullable, defer til later.
+  #      This let's us deal with self-referential FKs
+  #   d. If the row is not there and it is NOT nullable, then $create_item
   # 2. If we don't have something and the column is non-nullable, then:
   #   a. If rows exists, pick a random one.
   #   b. If rows don't exist, $create_item->($fksrc, {})
-  my %child_deps;
+  my (%child_deps, %deferred_fks);
   my $source = $self->schema->source($name);
+  RELATIONSHIP:
   foreach my $rel_name ( $source->relationships ) {
     my $rel_info = $source->relationship_info($rel_name);
     unless ( $is_fk->($rel_info) ) {
       if ($item->{$rel_name}) {
         $child_deps{$rel_name} = delete $item->{$rel_name};
       }
-      next;
+      next RELATIONSHIP;
     }
 
-    next unless $self->{reqs}{$name}{$rel_name};
+    next RELATIONSHIP unless $self->{reqs}{$name}{$rel_name};
 
     my $col = $self_fk_col->($rel_info);
     my $fkcol = $foreign_fk_col->($rel_info);
@@ -202,7 +217,7 @@ sub fix_fk_dependencies {
       $rs = $self->create_search($rs, $fk_name, $cond);
     }
     elsif ( $col_info->{is_nullable} ) {
-      next;
+      next RELATIONSHIP;
     }
     else {
       $cond = {};
@@ -215,14 +230,26 @@ sub fix_fk_dependencies {
     my $parent;
     unless ($meta->{create}) {
       $parent = $rs->search(undef, { rows => 1 })->first;
+
+      # This occurs when a FK condition was specified, but the column is
+      # nullable. We want to defer these because self-referential values need
+      # to be set after creation.
+      if (!$parent && $col_info->{is_nullable}) {
+        $item->{$col} = undef;
+        set_allow_pk_to($cond, $item);
+        $deferred_fks{$rel_name} = $cond;
+        next RELATIONSHIP;
+      }
     }
     unless ($parent) {
-      $parent = $self->create_item($fk_name, $cond);
+      my $fk_item = MyCloner::clone($cond);
+      set_allow_pk_to($fk_item, $item);
+      $parent = $self->create_item($fk_name, $fk_item);
     }
     $item->{$col} = $parent->get_column($fkcol);
   }
 
-  return \%child_deps;
+  return \%child_deps, \%deferred_fks;
 }
 
 {
@@ -346,10 +373,35 @@ sub fix_child_dependencies {
     # Need to ensure that $child_deps >= $self->{reqs}
 
     foreach my $child (@children) {
+      set_allow_pk_to($child, 1);
       $child->{$fkcol} = $row->get_column($col);
       $self->add_child($fk_name, $fkcol, $child, $name);
     }
   }
+}
+
+sub fix_deferred_fks {
+  my ($self, $name, $row, $deferred_fks) = @_;
+
+  my $source = $self->schema->source($name);
+  while (my ($rel_name, $cond) = each %$deferred_fks) {
+    my $cond = $deferred_fks->{$rel_name};
+
+    my $rel_info = $source->relationship_info($rel_name);
+
+    my $col = $self_fk_col->($rel_info);
+    my $fkcol = $foreign_fk_col->($rel_info);
+    my $fk_name = $short_source->($rel_info);
+
+    my $rs = $self->schema->resultset($fk_name);
+    $rs = $self->create_search($rs, $fk_name, $cond);
+
+    my $parent = $rs->search(undef, { rows => 1 })->first;
+    $parent = $self->create_item($fk_name, $cond) unless $parent;
+
+    $row->$col($parent->get_column($fkcol));
+  }
+  $row->update;
 }
 
 my %types = (
@@ -418,6 +470,19 @@ sub fix_columns {
   foreach my $col_name ( $source->columns ) {
     my $sim_spec;
     if ( exists $item->{$col_name} ) {
+      if (
+           $is{in_pk}->($col_name)
+        && !($item->{__META__}//{})->{allow_pk_set_value}
+        && !$source->column_info($col_name)->{is_nullable}
+        && $source->column_info($col_name)->{is_auto_increment}
+      ) {
+        my $msg = sprintf(
+          "Primary-key autoincrement non-null columns should not be hardcoded in tests (%s.%s = %s)",
+          $name, $col_name, $item->{$col_name},
+        );
+        warn $msg;
+      }
+
       # This is the original way of specifying an override with a HASHREFREF.
       # Reflection has realized it was an unnecessary distinction to a parent
       # specification. Either it's a relationship hashref or a simspec hashref.
@@ -558,13 +623,15 @@ sub create_item {
   my $source = $self->schema->source($name);
   $self->{hooks}{preprocess}->($name, $source, $item);
 
-  my $child_deps = $self->fix_fk_dependencies($name, $item);
+  my ($child_deps, $deferred_fks) = $self->fix_fk_dependencies($name, $item);
 
   #warn "Creating $name (".np($item).")\n";
   my $row = $self->find_by_unique_constraints($name, $item);
   unless ($row) {
     $row = eval {
-      $self->schema->resultset($name)->create($item);
+      my $to_create = MyCloner::clone($item);
+      delete $to_create->{__META__};
+      $self->schema->resultset($name)->create($to_create);
     }; if ($@) {
       my $e = $@;
       warn "ERROR Creating $name (".np($item).")\n";
@@ -575,6 +642,7 @@ sub create_item {
   }
 
   $self->fix_child_dependencies($name, $row, $child_deps);
+  $self->fix_deferred_fks($name, $row, $deferred_fks);
 
   $self->{hooks}{postprocess}->($name, $source, $row);
 
@@ -593,6 +661,9 @@ sub run {
         next unless $self->{spec}{$name};
 
         while ( my $item = shift @{$self->{spec}{$name}} ) {
+          if ($self->{allow_pk_set_value}) {
+            set_allow_pk_to($item, 1);
+          }
           my $row = $self->create_item($name, $item);
 
           if ($self->{initial_spec}{$name}{$item}) {

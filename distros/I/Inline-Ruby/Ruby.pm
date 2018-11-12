@@ -9,7 +9,7 @@ require DynaLoader;
 require Exporter;
 use vars qw(@ISA $VERSION @EXPORT_OK);
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 @ISA = qw(Inline DynaLoader Exporter);
 @EXPORT_OK = qw(rb_eval
 		rb_call_function

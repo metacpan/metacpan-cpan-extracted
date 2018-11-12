@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Queue;
-$RT::Client::REST::Queue::VERSION = '0.53';
+$RT::Client::REST::Queue::VERSION = '0.54';
 use Params::Validate qw(:types);
 use RT::Client::REST 0.20;
 use RT::Client::REST::Object 0.01;
@@ -132,7 +132,7 @@ RT::Client::REST::Queue - queue object representation.
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -196,6 +196,23 @@ CC Addresses (comma delimited).
 =item B<admin_cc_addresses>
 
 Admin CC Addresses (comma delimited).
+
+=item B<cf>
+
+Access custom fields. Inherited from L<RT::Client::REST::Object>, where
+you can read more details.
+
+Trivial example:
+
+ my $queue = RT::Client::REST::Queue->new(
+   rt => $rt, id => $queue_id
+ )->retrieve();
+ my @customfields = $queue->cf();
+ for my $f (@customfields) {
+   my $v = $queue->cf($f);
+   say "field: $f";
+   say "value: $v";
+ }
 
 =back
 

@@ -1,4 +1,4 @@
-package Pcore::SMTP v0.6.4;
+package Pcore::SMTP v0.6.5;
 
 use Pcore -dist, -const, -class, -res;
 use Pcore::Handle qw[:TLS_CTX];
@@ -343,7 +343,7 @@ sub _DATA ( $self, $h, $args ) {
                 elsif ( is_plain_arrayref $part) {
                     if ( !is_ref $part->[0] ) {
                         my $headers = [    #
-                            qq[Content-Type: @{[P->path($part->[0])->mime_type]}; name="$part->[0]"],
+                            qq[Content-Type: @{[ P->path($part->[0])->mime_type // 'application/octet-stream' ]}; name="$part->[0]"],
                             qq[Content-Disposition: attachment; filename="$part->[0]"],
                         ];
 

@@ -793,6 +793,15 @@ sub _get_targz
   croak "Cannot find $src\n";
 }
 
+sub _get_core_ver
+{
+  my $module = shift;
+  my $ver    = $Module::CoreList::version{$]}{$module};
+  undef $ver
+    if defined $Module::CoreList::deprecated{$]}{$module};
+  return $ver;
+}
+
 sub _get_mod_ver
 {
   my $module = shift;
@@ -804,10 +813,8 @@ sub _get_mod_ver
     MM->parse_version($file);
   };
 
-  if ( !defined $ver )
-  {
-    $ver = $Module::CoreList::version{$]}{$module};
-  }
+  $ver = _get_core_ver($module)
+    if !defined $ver;
 
   return $ver;
 }
@@ -846,10 +853,10 @@ sub _phase_prereq
   for my $module ( sort keys %$reqs )
   {
     my $is_core;
+    my $version = _get_core_ver($module);
 
-    if ( exists $Module::CoreList::version{$]}{$module} )
+    if ( defined $version )
     {
-      my $version = $Module::CoreList::version{$]}{$module};
       $is_core = $requirements->accepts_module( $module, $version );
     }
 
@@ -951,7 +958,7 @@ sub _source_translate
 
   if ( $opts->{'only-sources'} && !defined $new_src )
   {
-    if ( exists $Module::CoreList::version{$]}{$src_name} )
+    if ( _get_core_ver($src_name) )
     {
       return $src_name;
     }
@@ -975,7 +982,7 @@ sub _complete
     my $ver    = $target->{installed_version};
 
     $target->{was_installed} = 1
-      if $ver eq $Module::CoreList::version{$]}{$module};
+      if $ver eq _get_core_ver($module);
   }
 
   if ( exists $target->{inital_version}

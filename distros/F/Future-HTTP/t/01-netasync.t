@@ -16,6 +16,8 @@ if( !$ok) {
     plan skip_all => "Couldn't load Net::Async::HTTP: $err";
     exit;
 };
+plan tests => 10;
+
 
 diag( "Version of Net::Async::HTTP: " . Net::Async::HTTP->VERSION );
 

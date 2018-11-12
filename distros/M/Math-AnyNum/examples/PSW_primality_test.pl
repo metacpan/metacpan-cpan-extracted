@@ -33,14 +33,14 @@ sub PSW_primality_test ($n) {
     # Find P such that kronecker(n, P^2 + 4) = -1.
     my $P;
     for (my $k = 1 ; ; ++$k) {
-        if (kronecker($n, $k*$k + 4) == -1) {
+        if (kronecker($n, $k * $k + 4) == -1) {
             $P = $k;
             last;
         }
     }
 
     # If LucasU(P, -1, n+1) = 0 (mod n), then n is probably prime.
-    lucasUmod($P, -1, $n+1, $n) == 0;
+    lucasUmod($P, -1, $n + 1, $n) == 0;
 }
 
 #
@@ -48,7 +48,7 @@ sub PSW_primality_test ($n) {
 #
 
 my $from  = 1;
-my $to    = 1e5;
+my $to    = 1e4;
 my $count = 0;
 
 foreach my $n ($from .. $to) {

@@ -1,6 +1,6 @@
 package Calendar::Hebrew;
 
-$Calendar::Hebrew::VERSION   = '0.05';
+$Calendar::Hebrew::VERSION   = '0.06';
 $Calendar::Hebrew::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Hebrew - Interface to Hebrew Calendar.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 
 use Date::Hebrew::Simple;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 with 'Calendar::Plugin::Renderer';
 
 use overload q{""} => 'as_string', fallback => 1;

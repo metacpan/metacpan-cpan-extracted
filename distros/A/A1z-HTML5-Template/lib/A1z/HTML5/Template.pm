@@ -2,12 +2,14 @@ use strict;
 use warnings;
 package A1z::HTML5::Template;
 
+use vars qw(%ENV);
+
 # ABSTRACT: Fast/easy Web Apps in Perl
 
 
 sub NAME { my $self = shift; my $NAME; $NAME = "Fast and Easy Web Apps"; return $NAME; }
 
-our $VERSION = '0.16';
+our $VERSION = '0.19';
 
 
 
@@ -925,13 +927,14 @@ my %HTML;
 			});
 		});
 		  
-			\$('#menu').menu(); 
-			\$('#accordion').accordion(); 
-			\$('#accordion1').accordion(); 
-			\$('#accordion2').accordion(); 
-			\$('#accordion3').accordion(); 
-			\$('accordion617').accordion();
-			\$('#tabs').tabs(); 
+		\$('#menu').menu(); 
+		\$('#accordion').accordion(); 
+		\$('#accordion1').accordion(); 
+		\$('#accordion2').accordion(); 
+		\$('#accordion3').accordion(); 
+		\$('accordion617').accordion();
+		\$('#tabs').tabs(); 
+
 		
 		</script>
 	},
@@ -1028,6 +1031,45 @@ sub html_jquery
 
 
 
+sub html_setTitle 
+{
+	my $out;
+
+	my %in;
+	
+	%in = (
+		ta => qq{},
+		tb => qq{},
+		tc => qq{},
+		@_,
+	);
+
+	$out .= qq{<script>		
+<!-- Begin
+	function setTitle() 
+	{
+		var a = "$in{ta}";
+		var b = "$in{tb}";
+		var c = "$in{tc}";
+		var t = new Date();
+		s = t.getSeconds();
+		if (s == 10) { document.title = a;}
+		else if (s == 20) { document.title = b;}
+		else if (s == 30) { document.title = c;}
+		else if (s == 40) { document.title = a;}
+		else if (s == 50) { document.title = b;}
+		else if (s == 00) { document.title = c;}
+		setTimeout("setTitle()", 1000);
+	}
+//  End -->
+</script>
+	};
+
+	return $out; 
+}
+
+
+
 
 sub html_humanejs_css
 {
@@ -1102,7 +1144,7 @@ sub head
 		-jqueryui 	=> html_jqueryui_css, 
 		-htmlshim	=> html_shim_respond, 
 		-humanejs  => html_humanejs_css, 
-		-title 		=> "$ENV{SERVER_NAME}" || "", 
+		-title 		=> "$ENV{SERVER_NAME}", 
 		-cssLinks => "https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css,https://blueimp.github.io/Gallery/css/blueimp-gallery.min.css,https://www.a1z.us/A1z/HTML5/Template.css", 
 		-cssCode => "", 
 		-mobilemeta => qq{<meta name="HandheldFriendly" content="true">
@@ -1110,15 +1152,25 @@ sub head
 }, 
 		-charsetmeta => qq{<meta charset="utf-8">}, 
 		-usermeta => "",
+		-titleRotatingText => qq{text1,text2,text3},
 		@_,
 		
 	); 
-	
-	for (keys %in) 
-	{
-		#$out .= qq{$in{$_}\n};  # disordered 
-		
-	}
+
+
+# rotating title function and text 
+my $setTitle;
+if ( $in{-titleRotatingText} and $in{-titleRotatingText} =~ /\,/ )
+{
+	my @a;
+	@a = split(/\,/, $in{-titleRotatingText}, 3);
+
+	$setTitle = html_setTitle(ta => "$a[0]", tb => "$a[1]", tc => "$a[2]");
+}
+else
+{
+	$setTitle = html_setTitle(ta => "Text01", tb => "text02", tc => "text03");
+}
 
 # css multiple links/files 
 my $css; my @css; 
@@ -1161,6 +1213,9 @@ $css
 <style type="text/css">
 $in{-cssCode}
 </style>
+
+$setTitle
+
 </head>
 }; 	# thats orderly 
 
@@ -1186,10 +1241,11 @@ sub body
 		-defaultjquery => qq{$HTML{-defaultjquery}}, 
 		-humanejs => qq{<script src="https://cdnjs.cloudflare.com/ajax/libs/humane-js/3.2.2/humane.min.js">},
 		-userjquery => qq{}, 
-		-navbar => html_navbar( $in{-nbmenu}, $in{-nbpage}, " ") , 
+		-navbar => html_navbar( $in{-nbmenu}, $in{-nbpage}, "", ""), 
 		-content => qq{<div class="content">Content</div>}, 
 		-footer => qq{All rights reserved &copy; $ENV{SERVER_NAME}}, 	
-		-bootstrapbluimp => html_bootstrap_bluimp, 	
+		-bootstrapbluimp => html_bootstrap_bluimp,
+		-nbLinks => qq{contact-help-feedback},
 		@_, 		
 	); 
 	
@@ -1199,7 +1255,7 @@ sub body
 	<script type="text/javascript" src="https://www.a1z.us/js/utils/top-nav-bar.js"></script>
 	<script type="text/javascript">
 	//<-- 
-	fixed_top_navbar('$in{-nbhead}', '$in{-nbpage}', '$in{-nbmenu}', 'support-sales');
+	fixed_top_navbar('$in{-nbhead}', '$in{-nbpage}', '$in{-nbmenu}', '$in{-nbLinks}');
 	//-->
 	</script>
 
@@ -1816,7 +1872,7 @@ A1z::HTML5::Template - Fast/easy Web Apps in Perl
 
 =head1 VERSION
 
-version 0.16
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -1892,7 +1948,7 @@ version 0.16
 
 =head2 VERSION
 
-	0.16
+	0.19
 
 =head1 Installation
 
@@ -2102,6 +2158,16 @@ version 0.16
 =head2 html_bootstrap_js
 
 	bootstrap.min.js, #3.3.0, from maxcdn
+
+=head2 html_setTitle 
+
+	setTitle javascript function 
+
+	Used in body
+
+	Includes the C<script> tag pair
+
+	C<$h->html_set_title( ta => "Text001", tb => "TExt002", tc => "TeXt003" );>
 
 =head2 html_humanejs_css
 

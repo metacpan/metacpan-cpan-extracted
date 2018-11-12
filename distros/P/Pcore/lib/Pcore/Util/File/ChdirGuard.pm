@@ -2,7 +2,7 @@ package Pcore::Util::File::ChdirGuard;
 
 use Pcore -class;
 
-has dir => ( isa => 'Str', required => 1 );
+has dir => ( required => 1 );    # Str
 
 sub DESTROY ( $self ) {
     chdir $self->{dir} or die;

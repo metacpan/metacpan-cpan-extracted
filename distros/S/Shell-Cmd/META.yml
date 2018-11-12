@@ -22,7 +22,7 @@ no_index:
 provides:
   Shell::Cmd:
     file: lib/Shell/Cmd.pm
-    version: '3.00'
+    version: '3.02'
 requires:
   Capture::Tiny: '0'
   Cwd: '0'
@@ -32,5 +32,5 @@ requires:
   perl: '5.008'
 resources:
   repository: git://github.com/SBECK-github/Shell-Cmd.git
-version: '3.00'
+version: '3.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

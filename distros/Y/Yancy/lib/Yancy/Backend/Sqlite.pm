@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.012';
+our $VERSION = '1.014';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -99,6 +99,12 @@ our $VERSION = '1.012';
 #pod         },
 #pod     }
 #pod
+#pod =head2 Ignored Tables
+#pod
+#pod By default, this backend will ignore some tables when using
+#pod C<read_schema>: C<mojo_migrations> and all the tables used by the
+#pod L<Minion::Backend::SQLite> Minion backend.
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<Mojo::SQLite>, L<Yancy>
@@ -114,6 +120,13 @@ BEGIN {
     eval { require Mojo::SQLite; Mojo::SQLite->VERSION( 3 ); 1 }
         or die "Could not load SQLite backend: Mojo::SQLite version 3 or higher required\n";
 }
+
+our %IGNORE_TABLE = (
+    mojo_migrations => 1,
+    minion_jobs => 1,
+    minion_workers => 1,
+    minion_locks => 1,
+);
 
 has sqlite =>;
 has collections =>;
@@ -241,8 +254,8 @@ ENDQ
             # We are parsing SQL here, but not well. We may need to
             # actually parse the SQL here soon so we can divide this all
             # up into attributes
-            my $is_auto = !!( $t->{sql} =~ /${column}[^,\)]+AUTOINCREMENT/ );
-            my $is_unique = !!( $t->{sql} =~ /${column}[^,]+UNIQUE/ );
+            my $is_auto = !!( $t->{sql} =~ /${column}[^,\)]+AUTOINCREMENT/i );
+            my $is_unique = !!( $t->{sql} =~ /${column}[^,]+UNIQUE/i );
             if ( $is_unique ) {
                 push @unique_columns, $column;
             }
@@ -263,6 +276,10 @@ ENDQ
         }
         elsif ( !$pk && @unique_columns ) {
             $schema{ $table }{ 'x-id-field' } = $unique_columns[0];
+        }
+
+        if ( $IGNORE_TABLE{ $table } ) {
+            $schema{ $table }{ 'x-ignore' } = 1;
         }
     }
 
@@ -313,7 +330,7 @@ sub _map_type {
         }
     }
 
-    if ( $table->{sql} !~ /${col_name}\s+\S+[^,\)]+(?:NOT NULL|PRIMARY KEY)/ ) {
+    if ( $table->{sql} !~ /${col_name}\s+\S+[^,\)]+(?:NOT NULL|PRIMARY KEY)/i ) {
         $conf{ type } = [ $conf{ type }, 'null' ];
     }
 
@@ -332,7 +349,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.012
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -430,6 +447,12 @@ You could map that schema to the following collections:
             },
         },
     }
+
+=head2 Ignored Tables
+
+By default, this backend will ignore some tables when using
+C<read_schema>: C<mojo_migrations> and all the tables used by the
+L<Minion::Backend::SQLite> Minion backend.
 
 =head1 SEE ALSO
 

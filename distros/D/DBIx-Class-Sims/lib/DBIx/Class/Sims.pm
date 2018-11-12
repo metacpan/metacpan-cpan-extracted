@@ -5,7 +5,7 @@ use 5.010_001;
 
 use strictures 2;
 
-our $VERSION = '0.301000';
+our $VERSION = '0.302000';
 
 {
   # Do **NOT** import a clone() function into the DBIx::Class::Schema namespace
@@ -173,7 +173,7 @@ sub load_sims {
     $additional->{seed} = $opts->{seed} //= rand(time & $$);
     srand($opts->{seed});
 
-    my @toposort =  DBIx::Class::TopoSort->toposort(
+    my @toposort = DBIx::Class::TopoSort->toposort(
       $schema,
       %{$opts->{toposort} // {}},
     );
@@ -186,6 +186,9 @@ sub load_sims {
       spec => $spec,
       hooks => $hooks,
       reqs => $reqs,
+      # Set this to false to throw a warning if a non-null auto-increment column
+      # has a value set. It defaults to false. Set to true to disable.
+      allow_pk_set_value => $opts->{allow_pk_set_value} // 0,
     );
 
     $rows = eval {
@@ -452,6 +455,23 @@ row in the database that was found.
 The list will be ordered by when the duplicate was found, but that ordering will
 B<NOT> be stable across different runs unless the same C<< seed >> is used.
 
+=item * allow_set_pk_value
+
+If this is false or omitted, then a warning will be emitted if a sims spec sets
+a value for a column that is:
+
+=over 4
+
+=item * in a primary key (either alone or with other columns)
+
+=item * NOT NULLL
+
+=item * set to auto_increment
+
+=back
+
+If this is true, then the warning is suppressed.
+
 =back
 
 =head2 set_sim_type
@@ -483,6 +503,15 @@ C<< $class_or_obj->sim_types(); >>
 This method will return a sorted list of all registered sim types.
 
 This method may be called as a class or object method.
+
+=head2 add_sims
+
+Given a C<< $schema >>, source name, and pairs of column/sim_type info, this
+method will decorate the source's columns with appropriate sim types. This is
+in lieu of adding the sim information to the column definition.
+
+This method is only meant for usage as a class method. Do not use this method if
+you load Sims as a component.
 
 =head1 SPECIFICATION
 

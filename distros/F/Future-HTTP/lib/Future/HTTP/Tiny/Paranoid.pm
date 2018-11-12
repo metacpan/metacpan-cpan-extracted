@@ -1,13 +1,13 @@
 package Future::HTTP::Tiny::Paranoid;
 use strict;
 use Future;
-use HTTP::Tiny::Paranoid;
+use HTTP::Tiny::Paranoid 0.07; # 0.04 had spurious CPAN tester failures
 use Moo 2; # or Moo::Lax if you can't have Moo v2
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 extends 'Future::HTTP::Tiny';
 

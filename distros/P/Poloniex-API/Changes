@@ -1,5 +1,9 @@
 Revision history for Perl extension Poloniex::API.
 
+0.04 12.11.2018
+	- Fix Undefined subroutine &Poloniex::API::_croak called
+	- keepalive=>1 allows faster successive queries #3
+
 0.03  15.12.2017
 	- add Dependency on Test::* in Makefile.PL
 

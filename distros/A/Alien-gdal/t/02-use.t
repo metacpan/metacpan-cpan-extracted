@@ -10,11 +10,12 @@ alien_ok 'Alien::gdal';
 diag ('libs: '   . Alien::gdal->libs);
 diag ('cflags: ' . Alien::gdal->cflags);
 diag ('Dynamic libs: ' . join ':', Alien::gdal->dynamic_libs);
-diag ('bin dir: ', Alien::gdal->bin_dir);
+diag ('bin dir: ' . Alien::gdal->bin_dir);
 my $bin = Alien::gdal->bin_dir;
 
 #  nasty hack
-$ENV{LD_LIBRARY_PATH} = Alien::gdal->dist_dir . '/lib';
+$ENV{LD_LIBRARY_PATH}   = Alien::gdal->dist_dir . '/lib';
+$ENV{DYLD_LIBRARY_PATH} = Alien::gdal->dist_dir . '/lib';
 
 #if ($^O !~ /mswin/i) {
     #diag join "", `ls -l $bin`;
@@ -41,7 +42,8 @@ TODO: {
 
     run_ok([ "$bin/gdalwarp", '--version' ])
       ->success
-      ->out_like(qr{GDAL \d+\.\d+\.\d+, released \d{4}/\d{2}/\d{2}}); 
+      ->out_like(qr{GDAL \d+\.\d+\.\d+, released \d{4}/\d{2}/\d{2}})
+      ->note; 
 }
 
 done_testing();

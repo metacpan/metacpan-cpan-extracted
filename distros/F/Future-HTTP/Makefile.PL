@@ -19,7 +19,7 @@ regen_README($main_file);
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
-WriteMakefile1(
+my %module = (
     NAME                => $module,
     AUTHOR              => q{Max Maischein <corion@cpan.org>},
     VERSION_FROM        => $main_file,
@@ -46,6 +46,8 @@ WriteMakefile1(
                 }
             },
         },
+        dynamic_config   => 0, # we promise to keep META.* up-to-date
+        x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
     MIN_PERL_VERSION => '5.006',
@@ -77,6 +79,10 @@ WriteMakefile1(
 
     test            => { TESTS => join( ' ', @tests ) },
 );
+
+sub get_module_info { %module };
+
+WriteMakefile1( get_module_info() );
 
 1;
 
@@ -156,7 +162,7 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Build Status](https://travis-ci.org/Corion/Filter-signatures.svg?branch=master)](https://github.com/Corion/Filter-signatures)
+[![Build Status](https://travis-ci.org/Corion/future-http.svg?branch=master)](https://travis-ci.org/Corion/future-http)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -170,8 +176,8 @@ sub pod_section {
 
     my @section =
         grep { /^=head1\s+$section/.../^=/ } <$fh>;
-    pop @section if $section[-1] =~ /^=/;
-    unshift @section if $remove_heading;
+    pop @section if $section[-1] and $section[-1] =~ /^=/;
+    shift @section if $remove_heading;
 
     # Trim the section
     if( @section ) {

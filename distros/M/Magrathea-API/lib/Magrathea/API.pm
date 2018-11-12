@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-use version 0.77; our $VERSION = qv('v1.4.0');
+use version 0.77; our $VERSION = qv('v1.5.1');
 
 use Net::Telnet;
 use Phone::Number;
@@ -26,9 +26,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 =head2 VERSION
 
-Version 1.4.0
-
-Please note that this software is currently beta.
+Version 1.5.1
 
 =head2 SYNOPSIS
 
@@ -550,13 +548,17 @@ Passed a phone number, this method returns a
 L<Magrathea::API::Emergency> object with the current 999
 information.
 
+Optionally it can be passed a second parameter which, if it
+is a truthy value, will set the C<ported> flag.
+
 =cut
 
 sub emergency_info
 {
     my $self = shift;
     my $number = new Phone::Number(shift);
-    return new Magrathea::API::Emergency($self, $number);
+    my $ported = shift;
+    return new Magrathea::API::Emergency($self, $number, $ported);
 }
 
 =head2 Low Level Methods

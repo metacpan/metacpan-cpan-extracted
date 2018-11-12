@@ -56,7 +56,7 @@ sub to_w3cdtf ($self) {
 }
 
 sub duration ( $self, $start, $end ) {
-    state $init = !!require Pcore::Util::Date::Duration;
+    require Pcore::Util::Date::Duration;
 
     return Pcore::Util::Date::Duration->new( { start => $start, end => $end } );
 }

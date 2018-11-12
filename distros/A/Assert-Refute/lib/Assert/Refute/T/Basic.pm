@@ -3,7 +3,7 @@ package Assert::Refute::T::Basic;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.1301';
+our $VERSION = '0.1501';
 
 =head1 NAME
 
@@ -448,6 +448,26 @@ sub _deep_noexist {
         "Expected: ".($sign > 0 ? to_scalar( $new, 2 ) : "Does not exist"),
     );
 };
+
+=head2 pass "explanation"
+
+Declare the test ok. Synonym for ok(1)
+
+=cut
+
+build_refute pass => sub {
+    return 0;
+}, args => 0, export => 1;
+
+=head2 fail "explanation"
+
+Declare the test not ok. Synonym for ok(0)
+
+=cut
+
+build_refute fail => sub {
+    return 1;
+}, args => 0, export => 1;
 
 =head1 LICENSE AND COPYRIGHT
 

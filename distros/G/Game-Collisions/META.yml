@@ -19,14 +19,14 @@ name: Game-Collisions
 provides:
   Game::Collisions:
     file: lib/Game/Collisions.pm
-    version: '0.1'
+    version: '0.2'
   Game::Collisions::AABB:
     file: lib/Game/Collisions/AABB.pm
-    version: '0.1'
+    version: '0.2'
 requires:
   perl: '5.014'
 resources:
   homepage: http://www.wumpus-cave.net
   repository: https://github.com/frezik/Game-Collisions
-version: '0.1'
+version: '0.2'
 x_serialization_backend: 'YAML::Tiny version 1.70'

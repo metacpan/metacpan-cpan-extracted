@@ -1,4 +1,99 @@
 Revision history for Types-Const:
 
+v0.3.3    2018-11-10 22:06:06+00:00 Europe/London
+  [Bug Fix]
+  - Uses version modeule for older Perls than cannot handle tuple
+    versions.
+
+  [Documentation]
+  - Fixed typo in Changes.
+
+  [Toolchain]
+  - Use a different Pod::Coverage plugin.
+
+v0.3.2    2018-11-10 02:26:35+00:00 Europe/London
+  [Bug Fix]
+  - Fix checks for read-only RegexpRefs.
+
+  [Documentation]
+  - Added section on performance issues.
+
+  - Added notes on limitations.
+
+  [Toolchain]
+  - Added diagnostics for cpantesters.
+
+  - Updated development tests.
+
+  [Other]
+  - Added minimum version for recommended Ref::Util::XS.
+
+v0.3.1    2018-11-09 18:48:21+00:00 Europe/London
+  [Documentation]
+  - Updated SYNOPSIS.
+
+v0.3.0    2018-11-09 18:40:10+00:00 Europe/London
+  [Enhancements]
+  - Add the generic Const type, #2.
+
+  [Incompatabilities]
+  - The ConstArrayRef and ConstHashRef types are no longer provided.
+
+  [Tests]
+  - Corrected test descriptions.
+
+v0.2.2    2018-11-09 16:35:39+00:00 Europe/London
+  [Bug Fixes]
+  - Fix paramertized ConstHashRef, #1.
+
+  [Documentation]
+  - Mention that this is experimental, #3.
+
+  - Document issue with hash references, #4.
+
+  - Combined KNOWN ISSUES with BUGS section.
+
+  [Tests]
+  - Add more tests.
+
+  - Removed Pod::LinkCheck test, since it is buggy.
+
+  [Other]
+  - Remove perltidy files that were accidentally included in
+    distribution.
+
+v0.2.1    2018-11-08 21:49:49+00:00 Europe/London
+  [Bug Fixes]
+  - Set required minimum version of Type::Tiny.
+
+v0.2.0    2018-11-08 20:30:31+00:00 Europe/London
+  [Enhancements]
+  - Add support for parameterized types.
+
+  [Bug Fixes]
+  - Added missing declaration of the ConstHashRef type.
+
+  - Frozen coercions.
+
+  [Toolchain]
+  - Updated module metadata.
+
+v0.1.1    2018-11-07 22:32:09+00:00 Europe/London
+  [Bug Fixes]
+  - Clean namespace.
+
+  - Constraint checks are now recursive.
+
+  [Other]
+  - Removed unnecessary prerequisite.
+
+  - Added recommended prerequisite for Type::Tiny::XS and
+    Ref::Util::XS.
+
+  [Tests]
+  - Fixed minimum prerequisite for Moo.
+
+  - Fixed typo in test-case description.
+
 v0.1.0    2018-11-07 07:31:02+00:00 Europe/London
   - Initial version released.

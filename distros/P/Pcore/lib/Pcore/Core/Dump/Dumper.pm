@@ -7,31 +7,31 @@ use re qw[];
 use Sort::Naturally qw[nsort];
 use PerlIO::Layers qw[];
 
-has color  => ( is => 'ro', isa => Bool, default => 0 );    # colorize dump
-has tags   => ( is => 'ro', isa => Bool, default => 0 );    # do not add tags
-has indent => ( is => 'ro', isa => Int,  default => 4 );    # indent spaces
+has color  => (0);    # colorize dump
+has tags   => (0);    # do not add tags
+has indent => (4);    # indent spaces
 
-has _indent => ( is => 'ro', isa => Str, init_arg => undef );
-has _seen => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );
+has _indent => ( init_arg => undef );
+has _seen   => ( sub { {} }, init_arg => undef );    # HashRef
 
 our $COLOR = {
-    number  => $BOLD . $CYAN,                               # numbers
-    string  => $BOLD . $YELLOW,                             # strings
-    class   => $BOLD . $GREEN,                              # class names
-    regex   => $YELLOW,                                     # regular expressions
-    code    => $GREEN,                                      # code references
-    glob    => $BOLD . $CYAN,                               # globs (usually file handles)
-    vstring => $BOLD . $YELLOW,                             # version strings (v5.16.0, etc)
+    number  => $BOLD . $CYAN,                        # numbers
+    string  => $BOLD . $YELLOW,                      # strings
+    class   => $BOLD . $GREEN,                       # class names
+    regex   => $YELLOW,                              # regular expressions
+    code    => $GREEN,                               # code references
+    glob    => $BOLD . $CYAN,                        # globs (usually file handles)
+    vstring => $BOLD . $YELLOW,                      # version strings (v5.16.0, etc)
     format  => $BOLD . $CYAN,
 
-    array => $WHITE,                                        # array index numbers
-    hash  => $BOLD . $MAGENTA,                              # hash keys
+    array => $WHITE,                                 # array index numbers
+    hash  => $BOLD . $MAGENTA,                       # hash keys
 
     refs    => $BOLD . $WHITE,
-    unknown => $BLACK . $ON_YELLOW,                         # potential new Perl datatypes
-    undef   => $BOLD . $RED,                                # the 'undef' value
-    escaped => $BOLD . $RED,                                # escaped characters (\t, \n, etc)
-    seen    => $WHITE . $ON_RED,                            # references to seen values
+    unknown => $BLACK . $ON_YELLOW,                  # potential new Perl datatypes
+    undef   => $BOLD . $RED,                         # the 'undef' value
+    escaped => $BOLD . $RED,                         # escaped characters (\t, \n, etc)
+    seen    => $WHITE . $ON_RED,                     # references to seen values
 };
 
 our $DUMPERS = {
@@ -63,7 +63,7 @@ our $DUMPERS = {
         my $tags;
 
         $res .= $dumper->_dump_blessed( $self, path => $args{path} );
-        $res .= qq[,\npath: "] . $self->filename . q["];
+        $res .= qq[,\npath: "$self->{filename}"];
 
         return $res, $tags;
     },

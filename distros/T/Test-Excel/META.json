@@ -47,7 +47,7 @@
    "provides" : {
       "Test::Excel" : {
          "file" : "lib/Test/Excel.pm",
-         "version" : "1.42"
+         "version" : "1.45"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/manwar/Test-Excel"
       }
    },
-   "version" : "1.42",
+   "version" : "1.45",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -177,6 +177,10 @@ which do work well with this module, but are not valid according to W3C.
 In many cases, however, the translater will refuse to accept mistakes:
 mainly because it cannot produce valid code.
 
+The values (both for reading as for writing) are strictly validated.
+However, the reader is sloppy with unexpected attributes, and many
+other things: that's too expensive to check.
+
 Extends L<"DESCRIPTION" in XML::Compile|XML::Compile/"DESCRIPTION">.
  
 =head1 METHODS
@@ -577,7 +581,7 @@ output NIL when the nillable elements are missing.
 
 =item json_friendly => BOOLEAN
 
-[1.55] When enabled, booleans will be blessed in Types::Serializer
+[1.55] When enabled, booleans will be blessed in Types::Serialiser
 booleans.  Floats get nummified.  Together, this will make the output
 of the reader usable as JSON without any further conversion.
 
@@ -738,6 +742,7 @@ improvements: read and understand the comments in the text.
   include_namespaces    <true>
   indent                " "
   key_rewrite           []
+  output_style          1
   show_comments         ALL
   skip_header           <false>
 
@@ -759,6 +764,10 @@ The leading indentation string per nesting.  Must start with at least one
 blank.
 
 =item key_rewrite => HASH|CODE|ARRAY
+
+=item output_style => 1|2
+
+[1.61] Style 2 is a little different.
 
 =item show_comments => STRING|'ALL'|'NONE'
 
@@ -1705,12 +1714,12 @@ to promote it into a BLOB (string) like this
    { color => pack('N', $i) }          # writer
    my $i = unpack('N', $d->{color});   # reader
 
-Module Geo::KML implements a nice hook to avoid the explicit need
+Module Geo::KML implemented a nice hook to avoid the explicit need
 for this C<pack> and C<unpack>. The KML schema designers liked colors
 to be written as C<ffc0c0c0> and abused C<hexBinary> for that purpose.
 The C<colorType> fields in KML are treated as binary, but just represent
 an int. Have a look in that Geo::KML code if your schema has some of
-those tricks.
+those tricks.  Only available in Backpan, withdrawn from CPAN.
 
 =head2 Schema hooks
 
@@ -2139,8 +2148,8 @@ then still only one prefix is added.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.60,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.61,
+built on November 09, 2018. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 

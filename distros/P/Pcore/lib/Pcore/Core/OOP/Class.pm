@@ -6,11 +6,16 @@ use Class::XSAccessor qw[];
 use Package::Stash::XS qw[];
 use Sub::Util qw[];       ## no critic qw[Modules::ProhibitEvilModules]
 use Data::Dumper qw[];    ## no critic qw[Modules::ProhibitEvilModules]
+use mro qw[];
 
 our %REG;
 
 sub import ( $self, $caller = undef ) {
     $caller //= caller;
+
+    # register caller module in %INC
+    my $module = $caller =~ s[::][/]smgr . '.pm';
+    if ( !exists $INC{$module} ) { $INC{$module} = "(embedded)" }    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     _defer_sub( $caller, new => sub { return _build_constructor($caller) } );
 
@@ -26,7 +31,7 @@ sub import ( $self, $caller = undef ) {
 sub load_class ($class) {
     my $name = $class =~ s[::][/]smgr . '.pm';
 
-    require $name if !exists $INC{$name};
+    require $name;
 
     return;
 }
@@ -97,33 +102,24 @@ sub _with (@roles) {
 sub export_methods ( $roles, $to ) {
     my $is_role = $REG{$to}{is_role};
 
-    my $to_role_methods;
-
-    if ($is_role) {
-        $to_role_methods = $REG{$to}{method} //= {
-            map { $_ => undef }
-              grep {
-                my $fullname = Sub::Util::subname( *{"$to\::$_"}{CODE} );
-
-                "$to\::$_" eq $fullname || substr( $_, 0, 1 ) eq '(';
-              } Package::Stash::XS->new($to)->list_all_symbols('CODE')
-        };
-    }
+    $REG{$to}{method} //= {} if $is_role;
 
     for my $role ( $roles->@* ) {
-        my $role_methods = $REG{$role}{method} //= {
-            map { $_ => undef }
-              grep {
-                my $fullname = Sub::Util::subname( *{"$role\::$_"}{CODE} );
+        $REG{$role}{method} //= {};
 
-                "$role\::$_" eq $fullname || substr( $_, 0, 1 ) eq '(';
-              } Package::Stash::XS->new($role)->list_all_symbols('CODE')
-        };
+        for my $subname ( Package::Stash::XS->new($role)->list_all_symbols('CODE') ) {
+            my $fullname = Sub::Util::subname( *{"$role\::$subname"}{CODE} );
 
-        for my $name ( grep { !defined *{"$to\::$_"}{CODE} } keys $role_methods->%* ) {
-            $to_role_methods->{$name} = undef if $is_role;
+            next unless $fullname eq "$role\::$subname" || $fullname eq "$role\::__ANON__" || substr( $subname, 0, 1 ) eq '(' || exists $REG{$role}{method}->{$subname};
 
-            *{"$to\::$name"} = *{"$role\::$name"}{CODE};
+            next if defined *{"$to\::$subname"}{CODE};
+
+            *{"$to\::$subname"} = *{"$role\::$subname"}{CODE};
+
+            # export overload fallback value
+            *{"$to\::()"} = *{"$role\::()"} if $subname eq '()';
+
+            $REG{$to}{method}->{$subname} = undef if $is_role;
         }
     }
 
@@ -437,12 +433,14 @@ PERL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 157, 237, 250, 264,  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## |      | 286, 430             |                                                                                                                |
+## |    3 | 18                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 164                  | Subroutines::ProhibitExcessComplexity - Subroutine "add_attribute" with high complexity score (24)             |
+## |    3 | 153, 233, 246, 260,  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |      | 282, 426             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 164                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 160                  | Subroutines::ProhibitExcessComplexity - Subroutine "add_attribute" with high complexity score (24)             |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 160                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -4,7 +4,14 @@ logger: 'console'
 plugins:
   MarkdownFilesToHTML:
     defaults:
+      layout: 'main.tt'
       file_root: 't/data/markdown_files'
     routes:
       - dzil_tutorial:
-          dir: 'dzil_tutorial'
+          resource: 'dzil_tutorial'
+      - no_resource:
+          generate_toc: 1
+          resource: 'none.md'
+      - prefix_test:
+          prefix: 'blah'
+          resource: 'intro.md'

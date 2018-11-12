@@ -117,7 +117,7 @@ print $dev->getfriendlyname() . "\n";
 if ($command eq "list") {
 	print " ExternalIPAddress = " . $gwdev->getexternalipaddress() . "\n";
 	print " PortMappingNumberOfEntries = " . $gwdev->getportmappingnumberofentries() . "\n";
-	@port_mapping = $gwdev->getportmappingentry();
+	@port_mapping = $gwdev->getportmappingentries();
 	$port_num = 0;
 	foreach $port_entry (@port_mapping) {
 		if ($port_entry) {

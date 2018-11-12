@@ -1,11 +1,9 @@
 #!/usr/bin/env perl
 # PODNAME: yancy
-our $VERSION = '1.012';
+# ABSTRACT: Start the standalone Yancy web application
 
-#pod =head1 NAME
-#pod
-#pod yancy -- Start the standalone Yancy web application
-#pod
+our $VERSION = '1.014';
+
 #pod =head1 SYNOPSIS
 #pod
 #pod   yancy daemon
@@ -38,11 +36,11 @@ __END__
 
 =head1 NAME
 
-yancy
+yancy - Start the standalone Yancy web application
 
 =head1 VERSION
 
-version 1.012
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -54,10 +52,6 @@ version 1.012
 This program loads the standalone Yancy web application,
 a L<Mojolicious> web application. For more detailed help, see
 C<yancy help>.
-
-=head1 NAME
-
-yancy -- Start the standalone Yancy web application
 
 =head1 SEE ALSO
 

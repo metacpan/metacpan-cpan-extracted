@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Collisions::AABB;
-$Game::Collisions::AABB::VERSION = '0.1';
+$Game::Collisions::AABB::VERSION = '0.2';
 use utf8;
 use v5.14;
 use warnings;
@@ -90,6 +90,13 @@ sub set_parent
     my $current_parent = $self->[_PARENT_NODE];
     $self->[_PARENT_NODE] = $parent;
     return $current_parent;
+}
+
+sub set_user_data
+{
+    my ($self, $data) = @_;
+    $self->[_USER_DATA] = $data;
+    return;
 }
 
 sub resize_all_parents
@@ -531,6 +538,10 @@ Automatically sets the parent.
 
 Pass in the AABB object that will become the right node in the tree. 
 Automatically sets the parent.
+
+=head2 set_user_data
+
+Sets the user data.
 
 =head2 set_parent
 

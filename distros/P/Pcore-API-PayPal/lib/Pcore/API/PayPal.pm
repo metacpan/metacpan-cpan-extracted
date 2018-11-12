@@ -1,4 +1,4 @@
-package Pcore::API::PayPal v0.3.3;
+package Pcore::API::PayPal v0.3.4;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Util::Data qw[from_json to_json to_b64];
@@ -6,11 +6,11 @@ use Pcore::Util::Data qw[from_json to_json to_b64];
 const our $SANDBOX_ENDPOINT => 'https://api.sandbox.paypal.com';
 const our $LIVE_ENDPOINT    => 'https://api.paypal.com';
 
-has id      => ( is => 'ro', isa => Str,  required => 1 );
-has secret  => ( is => 'ro', isa => Str,  required => 1 );
-has sandbox => ( is => 'ro', isa => Bool, default  => 1 );
+has id     => ( required => 1 );
+has secret => ( required => 1 );
+has sandbox => (1);    # Bool
 
-has _access_token => ( is => 'ro', isa => Str, init_arg => undef );
+has _access_token => ( init_arg => undef );
 
 sub _get_access_token ( $self, $cb ) {
     if ( $self->{_access_token} && $self->{_access_token}->{expires} > time ) {

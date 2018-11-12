@@ -305,8 +305,8 @@ with some extra checks.
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.60,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.61,
+built on November 09, 2018. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-package Pcore::Ext v0.18.5;
+package Pcore::Ext v0.18.6;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Base;
@@ -61,7 +61,7 @@ sub scan ( $self, $app, @namespaces ) {
         my $root_namespace_path = $root_namespace =~ s[::][/]smgr;
 
         for my $inc_path ( grep { !is_ref $_ } @INC ) {
-            my $modules = P->path1("$inc_path/$root_namespace_path")->read_dir( abs => 0, is_dir => 0, max_depth => 0 );
+            my $modules = P->path("$inc_path/$root_namespace_path")->read_dir( abs => 0, is_dir => 0, max_depth => 0 );
 
             next if !$modules;
 

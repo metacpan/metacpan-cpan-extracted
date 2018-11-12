@@ -24,20 +24,20 @@ const our $SQLITE_OPEN => {
     rwc => $SQLITE_OPEN_RWC,
 };
 
-has mode         => 'rwc';        # ( is => 'ro', isa => Enum [ keys $SQLITE_OPEN->%* ] );
-has busy_timeout => 1_000 * 3;    # ( is => 'ro', isa => PositiveOrZeroInt );    # milliseconds, set to 0 to disable timeout, default - 3 seconds
+has mode         => 'rwc';        # Enum [ keys $SQLITE_OPEN->%* ]
+has busy_timeout => 1_000 * 3;    # PositiveOrZeroInt ), milliseconds, set to 0 to disable timeout, default - 3 seconds
 
 # SQLITE PRAGMAS
-has temp_store   => 'MEMORY';      # ( is => 'ro', isa => Enum [qw[FILE MEMORY]] );
-has journal_mode => 'WAL';         # ( is => 'ro', isa => Enum [qw[DELETE TRUNCATE PERSIST MEMORY WAL OFF]] );      # WAL is the best
-has synchronous  => 'OFF';         # ( is => 'ro', isa => Enum [qw[FULL NORMAL OFF]] );      # OFF - data integrity on app failure, NORMAL - data integrity on app and OS failures, FULL - full data integrity on app or OS failures, slower
-has cache_size   => -1_048_576;    # ( is => 'ro', isa => Int );    # 0+ - pages,  -kilobytes, default 1G
-has foreign_keys => 1;             # ( is => 'ro', isa => Bool );
+has temp_store   => 'MEMORY';      # Enum [qw[FILE MEMORY]]
+has journal_mode => 'WAL';         # Enum [qw[DELETE TRUNCATE PERSIST MEMORY WAL OFF]], WAL is the best
+has synchronous  => 'OFF';         # Enum [qw[FULL NORMAL OFF]], OFF - data integrity on app failure, NORMAL - data integrity on app and OS failures, FULL - full data integrity on app or OS failures, slower
+has cache_size   => -1_048_576;    # Int, 0+ - pages,  -kilobytes, default 1G
+has foreign_keys => 1;             # Bool
 
-has is_sqlite    => 1;             # ( is => 'ro', isa => Bool,      default  => 1, init_arg => undef );
-has h            => ();            # ( is => 'ro', isa => Object,    init_arg => undef );
-has prepared_sth => ();            # ( is => 'ro', isa => HashRef,   init_arg => undef );
-has query        => ();            # ( is => 'ro', isa => ScalarRef, init_arg => undef );                  # ref to the last query
+has is_sqlite    => ( 1, init_arg => undef );    # Bool
+has h            => ( init_arg    => undef );    # Object
+has prepared_sth => ( init_arg    => undef );    # HashRef
+has query        => ( init_arg    => undef );    # ScalarRef, ref to the last query
 
 # SQLite types
 const our $SQLITE_UNKNOWN => 0;

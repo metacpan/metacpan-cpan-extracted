@@ -95,7 +95,6 @@ $defs = join ' ', $WALL, qw(-UEXPOSE_PERL -DCREATE_RUBY -UCREATE_PERL),
     (grep { defined } map { my $v = get_config_var($sel, $_); defined $v ? "-DRUBY_VERSION_$_=$v" : undef } qw/MAJOR MINOR/);
 
 my $lddlflags = $Config{lddlflags};
-$lddlflags =~ s/-L\S+//g;
 
 sub _slurp
 {
@@ -183,11 +182,12 @@ sub interrogate {
             $ref->{libruby} = get_config_var($ref, "LIBRUBYARG");
     }
     my $ruby_hdr_dir = get_config_var($ref, "rubyhdrdir");
+    my $ruby_arch_hdr_dir = get_config_var($ref, "rubyarchhdrdir");
     if (defined $ruby_hdr_dir) {
         my $arch = get_config_var($ref, "arch");
         # no "archhdrdir", so construct it by hand:
         my $arch_hdr_dir = defined $arch ? catdir($ruby_hdr_dir, $arch) : undef;
-        $ref->{incpath} = [ grep { defined } $ruby_hdr_dir, $arch_hdr_dir ];
+        $ref->{incpath} = [ grep { defined } $ruby_hdr_dir, $ruby_arch_hdr_dir, $arch_hdr_dir ];
     }
 
     # Ruby 1.6.4 supports archdir, which is what we need. But 1.6.3 (the

@@ -448,9 +448,9 @@ sub get_connect ($connect) {
         # parse uri string
         $connect = P->uri( $connect, base => 'tcp:' ) if !is_ref $connect;
 
-        my $scheme = $connect->scheme eq q[] ? 'tcp' : $connect->scheme;
+        my $scheme = $connect->{scheme} eq q[] ? 'tcp' : $connect->{scheme};
 
-        $connect = [ $connect->host->name, $connect->connect_port, $scheme, $scheme . q[_] . $connect->connect_port ];
+        $connect = [ $connect->{host}->{name}, $connect->connect_port, $scheme, $scheme . q[_] . $connect->connect_port ];
     }
     else {
 

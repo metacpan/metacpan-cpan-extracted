@@ -97,10 +97,22 @@ I'm not sure _why_ you'd want to uninstall Mashtree but here is how you would cl
 
     $ cpanm --uninstall Mashtree --local-lib=$HOME
 
+## Further documentation
+
+For more information please see the [docs folder](docs/)
+
+For more information on plugins, see the [plugins folder](plugins).
+
 ## References
 
 *  Mash: http://mash.readthedocs.io
 *  BioPerl: http://bioperl.org
+
+## Citation
+
+The paper is in preparation but for now, this is a valid citation:
+
+Katz, L. S., Griswold, T., & Carleton, H. A. (2017, October 8-11). [_Generating WGS Trees with Mashtree_](misc/mashtree%20ASM%20NGS.pptx). Poster presented at the American Society for Microbiology Conference on Rapid Applied Microbial Next-Generation Sequencing and Bioinformatic Pipelines, Washington, DC. 
 
 ## GitHub stickers for Mashtree
 

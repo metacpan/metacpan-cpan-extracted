@@ -34,9 +34,9 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 
             $files->render_tmpl( { main_script => 'main.pl' } );
 
-            $files->write_to( $dist->root );
+            $files->write_to( $dist->{root} );
 
-            say q[PAR profile was created. You should edit "par.ini" manually.];
+            say q[PAR profile was created. You should edit "par.yaml" manually.];
         }
 
         return;

@@ -19,7 +19,7 @@ sub EXT_panel : Extend('Ext.Component') : Type('widget') {
             this._loadCharts();
 JS
 
-        afterRender => func [], <<'JS',
+        afterRender => func <<'JS',
             this.callParent(arguments);
 
             this._onReady();
@@ -51,11 +51,11 @@ JS
 JS
 
         # TODO remove copyright
-        _loadCharts => func [], <<"JS",
+        _loadCharts => func <<"JS",
             var urls = [],
                 chartConfig = this.getChartConfig(),
-                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts4_base') ]}";
-                geoDataBaseUrl = "@{[ $cdn->get_resources('amcharts4_geodata_base') ]}";
+                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts4_path')->[0] ]}";
+                geoDataBaseUrl = "@{[ $cdn->get_resources('amcharts4_geodata_path')->[0] ]}";
 
             urls.push( chartsBaseUrl + 'core.js');
             urls.push( chartsBaseUrl + 'charts.js');
@@ -93,7 +93,7 @@ JS
             this.chart.validateData();
 JS
 
-        _onReady => func [], <<'JS',
+        _onReady => func <<'JS',
             if (!this.chartsLoaded) return;
             if (!this.rendered) return;
 

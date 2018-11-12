@@ -88,6 +88,9 @@ sub get_databases {
     }
     $databases = [];
     print 'Searching ...' . "\n";
+
+    no if $^O eq "MSWin32", 'warnings', 'File::Find';
+
     for my $dir ( @$dirs ) {
         File::Find::find( {
             wanted => sub {
@@ -104,7 +107,7 @@ sub get_databases {
                     1 }
                 ) {
                     utf8::decode( $@ );
-                    print $@;
+                    print $@ if $^O ne "MSWin32";
                 }
             },
             no_chdir => 1,

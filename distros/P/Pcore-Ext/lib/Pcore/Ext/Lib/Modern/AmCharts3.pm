@@ -19,7 +19,7 @@ sub EXT_panel : Extend('Ext.Component') : Type('widget') {
             this._loadCharts();
 JS
 
-        afterRender => func [], <<'JS',
+        afterRender => func <<'JS',
             this.callParent(arguments);
 
             this._onReady();
@@ -50,11 +50,11 @@ JS
             };
 JS
 
-        _loadCharts => func [], <<"JS",
+        _loadCharts => func <<"JS",
             var urls = [],
                 chartConfig = this.getChartConfig(),
-                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts3_base') ]}";
-                mapBaseUrl = "@{[ $cdn->get_resources('ammap3_base') ]}";
+                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts3_path')->[0] ]}";
+                mapBaseUrl = "@{[ $cdn->get_resources('ammap3_path')->[0] ]}";
 
             if (typeof AmCharts == 'undefined') {
                 urls.push( chartsBaseUrl + 'amcharts.js');
@@ -117,7 +117,7 @@ JS
             this.chart.validateData();
 JS
 
-        _onReady => func [], <<'JS',
+        _onReady => func <<'JS',
             if (!this.chartsLoaded) return;
             if (!this.rendered) return;
 

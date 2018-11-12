@@ -1,5 +1,10 @@
 Revision history for Perl extension GitLab::API::v4.
 
+0.13 2018-11-08
+
+- group() now accepts parameters.
+- Add the transfer_project_to_namespace() method.
+
 0.12 2018-09-11
 
 - Added API methods for Protected Tags, Search, Project Import/Export,

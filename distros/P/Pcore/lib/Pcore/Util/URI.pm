@@ -2,35 +2,37 @@ package Pcore::Util::URI;
 
 use Pcore -class, -const;
 use Pcore::Util::Net qw[get_free_port];
-use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Util::Scalar qw[is_path is_uri is_ref];
 use Pcore::Util::Data qw[:URI to_b64];
 use Pcore::Util::Text qw[decode_utf8 encode_utf8];
 use Pcore::Util::UUID qw[uuid_v4_str];
 use Clone qw[];
 
 use overload
-  q[""]    => sub { return $_[0]->{to_string} },
+  q[""]    => sub { return $_[0]->{uri} },
   q[bool]  => sub { return 1 },
   fallback => 1;
 
-has scheme     => ( is => 'ro' );    # unescaped, utf8
-has authority  => ();                # escaped
-has path       => ();                # object
-has query      => ();                # escaped
-has fragment   => ();                # escaped
-has userinfo   => ();                # escaped
-has username   => ();                # unescaped, utf8
-has password   => ();                # unescaped, utf8
-has host_port  => ();                # escaped
-has host       => ();                # object
-has port       => ();                # int
-has path_query => ();                # escaped
+has uri        => ();    # escaped
+has scheme     => ();    # unescaped, utf8
+has authority  => ();    # escaped
+has path       => ();    # object
+has query      => ();    # escaped
+has fragment   => ();    # escaped
+has userinfo   => ();    # escaped
+has username   => ();    # unescaped, utf8
+has password   => ();    # unescaped, utf8
+has host_port  => ();    # escaped
+has host       => ();    # object
+has port       => ();    # int
+has path_query => ();    # escaped
 
 has default_port => ();
 
-has to_string     => ();             # escaped
-has _canon        => ();             # escaped
-has _userinfo_b64 => ();
+has _canon        => ( init_arg => undef );    # escaped
+has _userinfo_b64 => ( init_arg => undef );
+
+sub IS_PCORE_URI ($self) { return 1 }
 
 around new => sub ( $orig, $self, $uri = undef, %args ) {
     no warnings qw[uninitialized];
@@ -47,19 +49,19 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
                 return $self->$orig;
             }
             else {
-                if ( is_ref $args{base} ) {
+                if ( is_uri $args{base} ) {
                     $base = $args{base}->clone;
                 }
                 else {
                     $base = P->uri( $args{base} );
                 }
 
-                delete $base->@{qw[to_string _canon]};
+                delete $base->@{qw[uri _canon]};
 
                 # do not inherit fragment from the base uri
                 $base->{fragment} = undef;
 
-                $base->to_string;
+                $base->_build;
 
                 return $base;
             }
@@ -82,7 +84,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
     my ( $scheme, $authority, $path, $query, $fragment );
 
     # parse source uri
-    if ( is_ref $uri) {
+    if ( is_uri $uri) {
         return $uri->clone if !defined $args{base};
 
         ( $scheme, $authority, $path, $query, $fragment ) = $uri->@{qw[scheme authority path query fragment]};
@@ -111,7 +113,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
             $target = $self->$orig;
         }
         else {
-            $base = is_ref $args{base} ? $args{base} : P->uri( $args{base} );
+            $base = is_uri $args{base} ? $args{base} : P->uri("$args{base}");
 
             # Pre-parse the Base URI: https://tools.ietf.org/html/rfc3986#section-5.2.1
             # base URI MUST contain scheme
@@ -137,7 +139,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
 
         # if source path is empty (undef or "")
         if ( $path eq '' ) {
-            $path = $base->{path};
+            $path = $base->{path}->clone;
 
             $query = $base->{query} if !$query;
         }
@@ -145,17 +147,8 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
         # source path is not empty
         else {
 
-            # Merge Paths: https://tools.ietf.org/html/rfc3986#section-5.2.3
-            # If the base URI has a defined authority component and an empty path,
-            # then return a string consisting of "/" concatenated with the reference's path
-            if ( defined $base->{authority} ) {
-                $path = P->path( $path, base => !defined $base->{path} || $base->{path} eq '' ? '/' : $base->{path}, from_uri => 1 );
-            }
-
-            # otherwise, merge base + source paths
-            else {
-                $path = P->path( $path, base => $base->{path}, from_uri => 1 );
-            }
+            # merge paths: https://tools.ietf.org/html/rfc3986#section-5.2.3
+            $path = P->path( $path, from_uri => 1 )->merge( $base->{path} );
         }
     }
 
@@ -168,7 +161,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
     }
 
     # path
-    if ( is_ref $path) {
+    if ( is_path $path) {
         $target->{path} = $path;
     }
     else {
@@ -206,44 +199,48 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
 
             # for linux use abstract UDS
             else {
-                $target->{path} = P->path( "/\x00" . uuid_v4_str, from_uri => 1 );
+                $target->{path} = P->path( "/\x00" . uuid_v4_str );
             }
         }
     }
 
     # build uri
-    $target->to_string;
+    $target->_build;
 
     return $target;
 };
 
-sub authority ( $self, $val = undef ) {
+# authority
+sub set_authority ( $self, $val = undef ) {
     no warnings qw[uninitialized];
 
-    if ( @_ > 1 ) {
+    # clear related attributes
+    delete $self->@{qw[uri _canon authority userinfo _userinfo_b64 username password host_port host port]};
 
-        # clear related attributes
-        delete $self->@{qw[to_string _canon authority userinfo _userinfo_b64 username password host_port host port]};
-
-        # $val match undef or ''
-        if ( $val eq '' ) {
-            $self->{authority} = $val;
-        }
-        else {
-            $self->_set_authority($val);
-        }
-
-        # rebuild uri
-        $self->to_string;
+    # $val match undef or ''
+    if ( $val eq '' ) {
+        $self->{authority} = $val;
     }
+    else {
+        $self->_set_authority($val);
+    }
+
+    # rebuild uri
+    $self->_build;
+
+    return $self;
+}
+
+sub _get_authority ( $self ) {
+    no warnings qw[uninitialized];
 
     # build authority
     if ( !exists $self->{authority} ) {
         my $authority;
 
-        $authority .= "$self->{userinfo}@" if defined $self->userinfo;
+        $authority .= "$self->{userinfo}@" if defined $self->_get_userinfo;
 
-        $authority .= $self->host_port;
+        $authority .= $self->_get_host_port;
 
         \$self->{authority} = \$authority;
     }
@@ -251,17 +248,21 @@ sub authority ( $self, $val = undef ) {
     return $self->{authority};
 }
 
-sub userinfo ( $self, $val = undef ) {
-    if ( @_ > 1 ) {
+# userinfo
+sub set_userinfo ( $self, $val = undef ) {
 
-        # clear related attributes
-        delete $self->@{qw[to_string _canon authority userinfo _userinfo_b64 username password]};
+    # clear related attributes
+    delete $self->@{qw[uri _canon authority userinfo _userinfo_b64 username password]};
 
-        $self->_set_userinfo($val) if defined $val;
+    $self->_set_userinfo($val) if defined $val;
 
-        # rebuild uri
-        $self->to_string;
-    }
+    # rebuild uri
+    $self->_build;
+
+    return $self;
+}
+
+sub _get_userinfo ( $self ) {
 
     # build userinfo
     if ( !exists $self->{userinfo} ) {
@@ -277,45 +278,47 @@ sub userinfo ( $self, $val = undef ) {
     return $self->{userinfo};
 }
 
-sub username ( $self, $val = undef ) {
-    if ( @_ > 1 ) {
+# username
+sub set_username ( $self, $val = undef ) {
 
-        # clear related attributes
-        delete $self->@{qw[to_string _canon authority userinfo _userinfo_b64 username]};
+    # clear related attributes
+    delete $self->@{qw[uri _canon authority userinfo _userinfo_b64 username]};
 
-        $self->{username} = from_uri_utf8 $val if defined $val;
+    $self->{username} = from_uri_utf8 $val if defined $val;
 
-        # rebuild uri
-        $self->to_string;
-    }
+    # rebuild uri
+    $self->_build;
 
-    return $self->{username};
+    return $self;
 }
 
-sub password ( $self, $val = undef ) {
-    if ( @_ > 1 ) {
+# password
+sub set_password ( $self, $val = undef ) {
 
-        # clear related attributes
-        delete $self->@{qw[to_string _canon authority userinfo _userinfo_b64 password]};
+    # clear related attributes
+    delete $self->@{qw[uri _canon authority userinfo _userinfo_b64 password]};
 
-        $self->{password} = from_uri_utf8 $val if defined $val;
+    $self->{password} = from_uri_utf8 $val if defined $val;
 
-        # rebuild uri
-        $self->to_string;
-    }
+    # rebuild uri
+    $self->_build;
 
-    return $self->{password};
+    return $self;
 }
 
-sub host_port ( $self, $val = undef ) {
-    if ( @_ > 1 ) {
-        delete $self->@{qw[to_string _canon authority host_port host port]};
+# host_port
+sub set_host_port ( $self, $val = undef ) {
+    delete $self->@{qw[uri _canon authority host_port host port]};
 
-        $self->_set_host_port($val) if defined $val;
+    $self->_set_host_port($val) if defined $val;
 
-        # rebuild uri
-        $self->to_string;
-    }
+    # rebuild uri
+    $self->_build;
+
+    return $self;
+}
+
+sub _get_host_port ( $self ) {
 
     # build host_port
     if ( !exists $self->{host_port} ) {
@@ -332,125 +335,113 @@ sub host_port ( $self, $val = undef ) {
     return $self->{host_port};
 }
 
-sub host ( $self, $val = undef ) {
-    if ( @_ > 1 ) {
+# host
+sub set_host ( $self, $val = undef ) {
 
-        # clear related attributes
-        delete $self->@{qw[to_string _canon authority host_port host]};
+    # clear related attributes
+    delete $self->@{qw[uri _canon authority host_port host]};
 
-        $self->{host} = P->host($val) if defined $val;
+    $self->{host} = P->host($val) if defined $val;
 
-        # rebuild uri
-        $self->to_string;
-    }
+    # rebuild uri
+    $self->_build;
 
-    return $self->{host};
+    return $self;
 }
 
-sub port ( $self, $val = undef ) {
-    if ( @_ > 1 ) {
-        delete $self->@{qw[to_string _canon authority host_port port]};
+# port
+sub set_port ( $self, $val = undef ) {
+    delete $self->@{qw[uri _canon authority host_port port]};
 
-        $self->{port} = $val;
+    $self->{port} = $val;
 
-        # rebuild uri
-        $self->to_string;
-    }
+    # rebuild uri
+    $self->_build;
 
-    return $self->{port};
+    return $self;
 }
 
-sub path ( $self, $val = undef ) {
+sub set_path ( $self, $val = undef ) {
     no warnings qw[uninitialized];
 
-    if ( @_ > 1 ) {
+    # clear related attributes
+    delete $self->@{qw[uri _canon path path_query]};
 
-        # clear related attributes
-        delete $self->@{qw[to_string _canon path path_query]};
+    # $val is defined and not ''
+    if ( $val ne '' ) {
+        my $path = P->path( $val, from_uri => 1 );
 
-        # $val is defined and not ''
-        if ( $val ne '' ) {
-            my $path = P->path( $val, from_uri => 1 );
-
-            # only abs path is allowed if uri has authority
-            if ( defined $self->authority ) {
-                if ( $path->is_abs ) {
-                    $self->{path} = $path;
-                }
-                else {
-                    die q[Can't set relative path to uri with authority];
-                }
-            }
-
-            # any path allowed
-            else {
+        # only abs path is allowed if uri has authority
+        if ( defined $self->_get_authority ) {
+            if ( $path->{is_abs} ) {
                 $self->{path} = $path;
+            }
+            else {
+                die q[Can't set relative path to uri with authority];
             }
         }
 
-        # rebuild uri
-        $self->to_string;
+        # any path allowed
+        else {
+            $self->{path} = $path;
+        }
     }
 
-    return $self->{path};
+    # rebuild uri
+    $self->_build;
+
+    return $self;
 }
 
-sub query ( $self, $val = undef ) {
-    if ( @_ > 1 ) {
+sub set_query ( $self, $val = undef ) {
 
-        # clear related attributes
-        delete $self->@{qw[to_string _canon query path_query]};
+    # clear related attributes
+    delete $self->@{qw[uri _canon query path_query]};
 
-        no warnings qw[uninitialized];
+    no warnings qw[uninitialized];
 
-        $self->_set_query($val) if $val ne '';
+    $self->_set_query($val) if $val ne '';
 
-        # rebuild uri
-        $self->to_string;
-    }
+    # rebuild uri
+    $self->_build;
 
-    return $self->{query};
+    return $self;
 }
 
-sub fragment ( $self, $val = undef ) {
-    if ( @_ > 1 ) {
+sub set_fragment ( $self, $val = undef ) {
 
-        # clear related attributes
-        delete $self->@{qw[to_string _canon fragment]};
+    # clear related attributes
+    delete $self->@{qw[uri _canon fragment]};
 
-        no warnings qw[uninitialized];
+    no warnings qw[uninitialized];
 
-        $self->_set_fragment($val) if $val ne '';
+    $self->_set_fragment($val) if $val ne '';
 
-        # rebuild uri
-        $self->to_string;
-    }
+    # rebuild uri
+    $self->_build;
 
-    return $self->{fragment};
+    return $self;
 }
 
 # UTIL
+sub to_string ($self) { return $self->{uri} }
+
 sub clone ($self) { return Clone::clone($self) }
 
-sub has_scheme ($self)    { return defined $self->{scheme} }
+sub has_scheme ($self) { return defined $self->{scheme} }
+
 sub has_authority ($self) { return defined $self->{authority} }
 
 sub to_abs ( $self, $base ) {
-    my $wantarray = defined wantarray;
 
-    return $wantarray ? $self->clone : () if defined $self->{scheme};
+    # already absolute uri
+    return $self if defined $self->{scheme};
 
-    $base = P->uri($base) if !is_ref $base;
+    $base = P->uri("$base") unless is_uri $base;
 
-    if ( !defined $base->{scheme} ) {
-        die qq[Can't convert URI to absolute] if $wantarray;
-
-        return;
-    }
+    die qq[Can't convert URI to absolute] if !defined $base->{scheme};
 
     my $uri = P->uri( $self, base => $base );
-
-    return $uri if $wantarray;
 
     bless $self, ref $uri;
 
@@ -494,7 +485,7 @@ sub connect ($self) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
         return $self->{host}, $self->{port} || $self->{default_port};
     }
     else {
-        return 'unix/', $self->{path}->to_string;
+        return 'unix/', $self->{path}->{path};
     }
 }
 
@@ -504,7 +495,7 @@ sub connect_port ($self) {
 
 sub userinfo_b64 ($self) {
     if ( !exists $self->{_userinfo_b64} ) {
-        if ( defined $self->userinfo ) {
+        if ( defined $self->_get_userinfo ) {
             $self->{_userinfo_b64} = to_b64 $self->{userinfo}, '';
         }
         else {
@@ -525,7 +516,7 @@ sub to_nginx_upstream_server ($self) {
         return "$self->{host}" . ( $self->{port} ? ":$self->{port}" : '' );
     }
     else {
-        return 'unix:' . $self->{path}->to_string;
+        return 'unix:' . $self->{path}->{path};
     }
 
     return;
@@ -614,24 +605,24 @@ sub _set_fragment ( $self, $val ) {
     return;
 }
 
-sub to_string ($self) {
-    if ( !exists $self->{to_string} ) {
-        my $to_string;
+sub _build ($self) {
+    if ( !exists $self->{uri} ) {
+        my $uri;
 
-        $to_string .= to_uri_scheme( $self->{scheme} ) . ':' if defined $self->{scheme};
+        $uri .= to_uri_scheme( $self->{scheme} ) . ':' if defined $self->{scheme};
 
-        $to_string .= "//$self->{authority}" if defined $self->authority;
+        $uri .= "//$self->{authority}" if defined $self->_get_authority;
 
-        $to_string .= $self->{path}->to_uri if defined $self->{path};
+        $uri .= $self->{path}->to_uri if defined $self->{path};
 
-        $to_string .= "?$self->{query}" if defined $self->{query};
+        $uri .= "?$self->{query}" if defined $self->{query};
 
-        $to_string .= "#$self->{fragment}" if defined $self->{fragment};
+        $uri .= "#$self->{fragment}" if defined $self->{fragment};
 
-        $self->{to_string} = $to_string;
+        $self->{uri} = $uri;
     }
 
-    return $self->{to_string};
+    return;
 }
 
 # TODO, sort query params
@@ -641,7 +632,7 @@ sub canon ($self) {
 
 # SERIALIZE
 *TO_JSON = *TO_CBOR = sub ($self) {
-    return $self->{to_string};
+    return $self->{uri};
 };
 
 1;
@@ -651,22 +642,21 @@ sub canon ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (49)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (45)                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 91                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |    3 | 93                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 446                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 442                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 639                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 630                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 42, 97, 139, 152,    | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |      | 163, 177, 179, 183,  |                                                                                                                |
-## |      | 186, 229, 372, 406,  |                                                                                                                |
-## |      | 423, 508, 511, 525,  |                                                                                                                |
-## |      | 548, 561, 563, 568,  |                                                                                                                |
-## |      | 598                  |                                                                                                                |
+## |    2 | 44, 99, 141, 156,    | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |      | 170, 172, 176, 179,  |                                                                                                                |
+## |      | 221, 371, 403, 418,  |                                                                                                                |
+## |      | 499, 502, 516, 539,  |                                                                                                                |
+## |      | 552, 554, 559, 589   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 77, 209              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 79, 202              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

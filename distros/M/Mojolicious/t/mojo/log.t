@@ -4,19 +4,28 @@ use Test::More;
 use Mojo::File qw(path tempdir);
 use Mojo::Log;
 use Mojo::Util 'decode';
+use Time::HiRes 'time';
 
 # Logging to file
 my $dir  = tempdir;
 my $path = $dir->child('test.log');
 my $log  = Mojo::Log->new(level => 'error', path => $path);
-$log->error('Just works');
+$log->error('Works');
 $log->fatal('I ♥ Mojolicious');
+$log->error(sub {'This too'});
 $log->debug('Does not work');
+$log->debug(sub { return 'And this', 'too' });
 undef $log;
 my $content = decode 'UTF-8', path($path)->slurp;
-like $content,   qr/\[.*\] \[error\] Just works/,        'right error message';
-like $content,   qr/\[.*\] \[fatal\] I ♥ Mojolicious/, 'right fatal message';
-unlike $content, qr/\[.*\] \[debug\] Does not work/,     'no debug message';
+like $content,
+  qr/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{5}] \[\d+\] \[error\] Works/,
+  'right error message';
+like $content, qr/\[.*\] \[\d+\] \[fatal\] I ♥ Mojolicious/,
+  'right fatal message';
+like $content, qr/\[.*\] \[\d+\] \[error\] This too/, 'right error message';
+unlike $content, qr/\[.*\] \[\d+\] \[debug\] Does not work/, 'no debug message';
+unlike $content, qr/\[.*\] \[\d+\] \[debug\] And this\ntoo\n/,
+  'right debug message';
 
 # Logging to STDERR
 my $buffer = '';
@@ -27,11 +36,13 @@ my $buffer = '';
   $log->error('Just works');
   $log->fatal('I ♥ Mojolicious');
   $log->debug('Works too');
+  $log->debug(sub { return 'And this', 'too' });
 }
 $content = decode 'UTF-8', $buffer;
 like $content, qr/\[.*\] \[error\] Just works\n/,        'right error message';
 like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\n/, 'right fatal message';
 like $content, qr/\[.*\] \[debug\] Works too\n/,         'right debug message';
+like $content, qr/\[.*\] \[debug\] And this\ntoo\n/,     'right debug message';
 
 # Formatting
 $log = Mojo::Log->new;
@@ -45,8 +56,8 @@ $log->format(sub {
   my ($time, $level, @lines) = @_;
   return join ':', $level, $time, @lines;
 });
-like $log->format->(time, 'debug', qw(Test 1 2 3)), qr/^debug:\d+:Test:1:2:3$/,
-  'right format';
+like $log->format->(time, 'debug', qw(Test 1 2 3)),
+  qr/^debug:[0-9.]+:Test:1:2:3$/, 'right format';
 
 # Short log messages (systemd)
 {
@@ -59,18 +70,18 @@ like $log->format->(time, 'debug', qw(Test 1 2 3)), qr/^debug:\d+:Test:1:2:3$/,
   ok $log->short, 'short messages';
   $log = Mojo::Log->new(short => 1);
   ok $log->short, 'short messages';
-  like $log->format->(time, 'debug', 'Test 123'), qr/^<7>\[d\] Test 123\n$/,
-    'right format';
-  like $log->format->(time, 'info', 'Test 123'), qr/^<6>\[i\] Test 123\n$/,
-    'right format';
-  like $log->format->(time, 'warn', 'Test 123'), qr/^<4>\[w\] Test 123\n$/,
-    'right format';
-  like $log->format->(time, 'error', 'Test 123'), qr/^<3>\[e\] Test 123\n$/,
-    'right format';
-  like $log->format->(time, 'fatal', 'Test 123'), qr/^<2>\[f\] Test 123\n$/,
-    'right format';
+  like $log->format->(time, 'debug', 'Test 123'),
+    qr/^<7>\[\d+\] \[d\] Test 123\n$/, 'right format';
+  like $log->format->(time, 'info', 'Test 123'),
+    qr/^<6>\[\d+\] \[i\] Test 123\n$/, 'right format';
+  like $log->format->(time, 'warn', 'Test 123'),
+    qr/^<4>\[\d+\] \[w\] Test 123\n$/, 'right format';
+  like $log->format->(time, 'error', 'Test 123'),
+    qr/^<3>\[\d+\] \[e\] Test 123\n$/, 'right format';
+  like $log->format->(time, 'fatal', 'Test 123'),
+    qr/^<2>\[\d+\] \[f\] Test 123\n$/, 'right format';
   like $log->format->(time, 'debug', 'Test', '1', '2', '3'),
-    qr/^<7>\[d\] Test\n<7>1\n<7>2\n<7>3\n$/, 'right format';
+    qr/^<7>\[\d+\] \[d\] Test\n<7>1\n<7>2\n<7>3\n$/, 'right format';
 }
 
 # Events
@@ -111,15 +122,17 @@ my $history;
   $history = $log->history;
 }
 $content = decode 'UTF-8', $buffer;
-like $content,   qr/\[.*\] \[error\] First\n/,        'right error message';
-like $content,   qr/\[.*\] \[info\] Fourth\nFifth\n/, 'right info message';
-unlike $content, qr/debug/,                           'no debug message';
-like $history->[0][0], qr/^\d+$/, 'right epoch time';
-is $history->[0][1],   'fatal',   'right level';
-is $history->[0][2],   'Second',  'right message';
-is $history->[1][1],   'info',    'right level';
-is $history->[1][2],   'Fourth',  'right message';
-is $history->[1][3],   'Fifth',   'right message';
+like $content,
+  qr/\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{5}\] \[$$\] \[error\] First\n/,
+  'right error message';
+like $content, qr/\[.*\] \[info\] Fourth\nFifth\n/, 'right info message';
+unlike $content, qr/debug/, 'no debug message';
+like $history->[0][0], qr/^[0-9.]+$/, 'right epoch time';
+is $history->[0][1],   'fatal',       'right level';
+is $history->[0][2],   'Second',      'right message';
+is $history->[1][1],   'info',        'right level';
+is $history->[1][2],   'Fourth',      'right message';
+is $history->[1][3],   'Fifth',       'right message';
 ok !$history->[2], 'no more messages';
 
 # "debug"

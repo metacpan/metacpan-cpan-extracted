@@ -1,7 +1,7 @@
 package Dancer::Plugin::reCAPTCHA;
 # ABSTRACT: Easily integrate reCAPTCHA into your Dancer applications
 {
-    $Dancer::Plugin::reCAPTCHA::VERSION = '0.90';
+    $Dancer::Plugin::reCAPTCHA::VERSION = '0.91';
 }
 
 
@@ -48,7 +48,7 @@ Dancer::Plugin::reCAPTCHA - Easily integrate reCAPTCHA into your Dancer applicat
 
 =head1 VERSION
 
-version 0.90
+version 0.91
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ package Assert::Refute;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.1301';
+our $VERSION = '0.1501';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ This can be though of as a lightweight design-by-contract form.
 
 =head1 SYNOPSIS
 
-The following code will die unless the conditions listed there are fullfilled:
+The following code will die unless the conditions listed there are fulfilled:
 
     use Assert::Refute ":all", { on_fail => 'croak' };
 
@@ -123,7 +123,7 @@ would also export the following assertions:
 
 C<is>, C<isnt>, C<ok>, C<use_ok>, C<require_ok>, C<cmp_ok>,
 C<like>, C<unlike>, C<can_ok>, C<isa_ok>, C<new_ok>,
-C<is_deeply>, C<note>, C<diag>.
+C<is_deeply>, C<fail>, C<pass>, C<note>, C<diag>.
 
 See L<Assert::Refute::T::Basic> for more.
 
@@ -148,7 +148,7 @@ These need to be C<use>d explicitly.
 use Carp;
 use Exporter;
 
-use Assert::Refute::Contract;
+use Assert::Refute::Report;
 use Assert::Refute::Build qw(current_contract);
 use Assert::Refute::T::Basic;
 
@@ -221,7 +221,7 @@ my %default_conf = (
 Check whether given contract BLOCK containing zero or more assertions passes.
 
 Contract will fail if any of the assertions fails,
-a C<plan> is declared and not fullfilled,
+a C<plan> is declared and not fulfilled,
 or an exception is thrown.
 Otherwise it is assumed to pass.
 
@@ -280,56 +280,33 @@ sub refute_these (&;@) { ## no critic # need prototype
 
 Save a contract BLOCK for future use:
 
-    use Assert::Refute qw(:all);
-
-    my $spec = contract {
+    my $contract = contract {
         my ($foo, $bar) = @_;
-        is $foo, 42, "Life";
-        like $bar, qr/b.*a.*r/, "Regex";
+        # conditions here
     };
 
-    # later
-    my $report = $spec->apply( 42, "bard" );
-    $report->get_count;  # 2
-    $report->is_passing; # true
-    $report->get_tap;    # printable summary *as if* it was Test::More
-
-The same may be written as
-
-    my $spec = contract {
-        my ($report, @args) = @_;
-        $report->is( ... );
-        $report->like( ... );
-    } need_object => 1;
-
-The C<need_object> form may be preferable if one doesn't want to pollute the
-main namespace with test functions (C<is>, C<ok>, C<like> etc)
-and instead intends to use object-oriented interface.
-
-Note that contract does B<not> validate anything by itself,
-it just creates a read-only L<Assert::Refute::Contract>
-object sitting there and waiting for an C<apply> call.
-
-The C<apply> call returns a L<Assert::Refute::Report> object containing
-results of specific execution.
+    # much later
+    my $report = $contract->apply( $real_foo, $real_bar );
+    # Returns an Assert::Refute::Report with conditions applied
 
 This is similar to how C<prepare> / C<execute> works in L<DBI>.
 
-See L<Assert::Refute::Contract> for the underlying object-oriented interface.
+B<[DEPRECATED]> This function will disappear in v.0.20.
 
 Prior to advent of C<try_refute>, this call used to be the main entry point
 to this module.
 This is no more the case, and a simple subroutine containing assertions
 would fit in most places where C<contract> is appropriate.
 
+Use L<Assert::Refute::Contract/contract> instead.
+
 =cut
 
 sub contract (&@) { ## no critic
-    my ($todo, %opt) = @_;
+    carp "contract{ ... } is DEPRECATED, use Assert::Refute::Contract::contract instead";
 
-    # TODO check
-    $opt{code} = $todo;
-    return Assert::Refute::Contract->new( %opt );
+    require Assert::Refute::Contract;
+    goto &Assert::Refute::Contract::contract;
 };
 
 =head2 plan tests => $n
@@ -337,7 +314,7 @@ sub contract (&@) { ## no critic
 Plan to run exactly C<n> assertions within a contract block.
 Plan is optional, contract blocks can run fine without a plan.
 
-A contract will fail unconditionally if plan is present and is not fullfilled.
+A contract will fail unconditionally if plan is present and is not fulfilled.
 
 C<plan> may only be called before executing any assertions.
 C<plan> dies if called outside a contract block.
@@ -448,7 +425,7 @@ sub subcontract($$@) { ## no critic
 
     contract_is $report, $signature, "Message";
 
-Assert that a contract is fullfilled exactly to the specified extent.
+Assert that a contract is fulfilled exactly to the specified extent.
 See L<Assert::Refute::Report/get_sign> for signature format.
 
 This may be useful for verifying assertions and contracts themselves.
@@ -741,6 +718,8 @@ for C<try_refute> function name as well as a lot of feedback.
 =item * This L<rant|https://www.perlmonks.org/?node_id=1122667>
 by C<Daniel Dragan> inspired me to actually start working
 on the first incarnation of this project.
+
+=item * Thanks to C<Jacobo Chamorro> for pass() and fail() calls.
 
 =back
 

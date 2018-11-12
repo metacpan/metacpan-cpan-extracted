@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.627';
+our $VERSION = '1.628';
 
 use Exporter qw( import );
 
@@ -97,8 +97,9 @@ sub line_fold {
     # return if ! length $string;
     for ( $init_tab, $subseq_tab ) {
         if ( $_ ) {
-            s/\s/ /g;
-            s/\p{C}//g;
+            s/\t/ /g;
+            s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
+            s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
             if ( length > $avail_width / 4 ) {
                 $_ = cut_to_printwidth( $_, int( $avail_width / 2 ) );
             }
@@ -107,14 +108,16 @@ sub line_fold {
             $_ = '';
         }
     }
-    $string =~ s/[^\n\P{Space}]/ /g;
-    $string =~ s/[^\n\P{C}]//g;
-    if ( $string !~ /\n/ && print_columns( $init_tab . $string ) <= $avail_width ) {
+    $string =~ s/\t/ /g;
+    $string =~ s/[^\x{0a}\x{0b}\x{0c}\x{0d}\x{85}\P{Cc}]//g; # remove control chars but keep vertical spaces
+    $string =~ s/[\p{Noncharacter_Code_Point}\p{Cs}]//g;
+    my $regex = qr/\x{0d}\x{0a}|[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]/; # \R 5.10
+    if ( $string !~ /$regex/ && print_columns( $init_tab . $string ) <= $avail_width ) {
         return $init_tab . $string;
     }
     my @paragraph;
 
-    for my $row ( split "\n", $string, -1 ) { # -1 to keep trailing empty fields
+    for my $row ( split /$regex/, $string, -1 ) { # -1 to keep trailing empty fields
         my @lines;
         $row =~ s/\s+\z//;
         my @words = split( /(?<=\S)(?=\s)/, $row );
@@ -127,7 +130,7 @@ sub line_fold {
             else {
                 my $tmp;
                 if ( $i == 0 ) {
-                    $tmp = $init_tab . $words[$i];;
+                    $tmp = $init_tab . $words[$i];
                 }
                 else {
                     push( @lines, $line );

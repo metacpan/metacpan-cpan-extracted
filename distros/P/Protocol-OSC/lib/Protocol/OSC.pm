@@ -3,10 +3,10 @@ use strict;
 use warnings;
 
 package Protocol::OSC;
-$Protocol::OSC::VERSION = '0.08';
+$Protocol::OSC::VERSION = '0.09';
 use Scalar::Util 'looks_like_number';
 use constant { NTP_EPOCH_DIFF => 2208988800, MAX_INT => 2**32 };
-my %converter = qw(i N f N s Z*x!4 b N/C*x!4 h h t N2);
+my %converter = qw(i N f N s Z*x!4 b N/a*x!4 h h t N2);
 my %filter = (f => [qw'f L']);
 if (pack('f>', 0.5) eq pack N => unpack L => pack f => 0.5) { # f> is ieee754 compatible
     delete$filter{f}; $converter{f} = 'f>' }
@@ -92,14 +92,14 @@ sub from_stream {
     (unpack('N/a*', substr $buf, 0, 4+$n, ''), $buf) }
 
 package Protocol::OSC::Message;
-$Protocol::OSC::Message::VERSION = '0.08';
+$Protocol::OSC::Message::VERSION = '0.09';
 sub new { bless [splice(@_,1)], shift }
 sub path { $_[0][0] }
 sub type { $_[0][1] }
 sub args { my $self = shift; @$self[2..$#$self] }
 
 package Protocol::OSC::Bundle;
-$Protocol::OSC::Bundle::VERSION = '0.08';
+$Protocol::OSC::Bundle::VERSION = '0.09';
 sub new { bless [splice(@_,1)], shift }
 sub time { $_[0][0] }
 sub packets { my $self = shift; @$self[1..$#$self] }

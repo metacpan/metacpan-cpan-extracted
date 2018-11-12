@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Group;
-$RT::Client::REST::Group::VERSION = '0.53';
+$RT::Client::REST::Group::VERSION = '0.54';
 use base 'RT::Client::REST::Object';
 
 use Params::Validate qw(:types);
@@ -72,7 +72,7 @@ RT::Client::REST::Group - group object representation.
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 

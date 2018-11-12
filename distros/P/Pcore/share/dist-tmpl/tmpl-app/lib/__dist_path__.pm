@@ -6,7 +6,7 @@ use <: $module_name ~ "::Util" :>;
 
 has cfg => ( required => 1 );
 
-has util => ( is => 'ro', isa => InstanceOf ['<: $module_name :>::Util'], init_arg => undef );
+has util => ( init_arg => undef );    # InstanceOf ['<: $module_name :>::Util']
 
 with qw[Pcore::App];
 
@@ -83,7 +83,7 @@ sub run ( $self ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 4, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 9, 16, 17, 54        | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 16, 17, 54           | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 93                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 97 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

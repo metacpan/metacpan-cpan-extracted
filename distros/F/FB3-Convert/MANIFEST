@@ -1,12 +1,7 @@
-'bin/30105790 (1).fb3'
-bin/9789985329689.epub
-bin/br.zip
 bin/convert2fb3.pl
 bin/cutfb3.pl
 bin/fb3_2_json.pl
 bin/fb3_to_fb2.pl
-'bin/Frayi_R._Krasnyiyidiplom._Kak_Stat_Organizovannyim_ (1).epub'
-bin/thumb.epub.zip
 Build.PL
 lib/FB3/Convert.pm
 lib/FB3/Convert/Epub.pm
@@ -87,6 +82,9 @@ t/examples/fb2/subtitle_114533.fb2
 t/examples/fb2/subtitle_114533.xml
 t/examples/fb2/subtitle_cite_109783.fb2
 t/examples/fb2/subtitle_cite_109783.xml
+t/examples/fb3_to_fb2/same_img_cover_135705.fb3
+t/examples/fb3_to_fb2/same_img_cover_135705.xml
 t/test1.t
+t/test2.t
 META.yml
 META.json

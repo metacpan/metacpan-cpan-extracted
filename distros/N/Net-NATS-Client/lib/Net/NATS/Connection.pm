@@ -42,7 +42,7 @@ sub upgrade {
     }
 
     my $socket = IO::Socket::SSL->start_SSL($self->_socket, %{$self->socket_args})
-        or return;
+        or die "failed to start_SSL: error=$!, ssl_error=$SSL_ERROR";
 
     $self->_socket($socket);
     $socket->blocking(0);
@@ -57,6 +57,7 @@ sub flush {
     $self->eobuf = 0;
     $self->eof = 0;
     $self->error = '';
+    return 1;
 }
 
 # test if we have data on the handle, with optional timeout.

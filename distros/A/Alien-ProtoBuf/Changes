@@ -1,5 +1,9 @@
 Revision history for Alien-ProtoBuf
 
+0.08      2018-11-10 22:37:30 CET
+
+    - Add cxxflags method, to support protobuf 3.6
+
 0.07      2018-07-22 14:12:42 CEST
 
     - Tweak build for FreeBSD

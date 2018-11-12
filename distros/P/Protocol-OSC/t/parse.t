@@ -12,6 +12,9 @@ my @tests = (
     ['pattern i1i1' => "/test\x00\x00\x00".",ii\x00"."\x00\x00\x00\x01"."\x00\x00\x00\x01" => ['/test','ii',1,1]],
     ['pattern s0s0' => "/test\x00\x00\x00".",ss\x00"."\x00\x00\x00\x00"."\x00\x00\x00\x00" => ['/test','ss','','']],
     ['pattern f0f0' => "/test\x00\x00\x00".",ff\x00"."\x00\x00\x00\x00"."\x00\x00\x00\x00" => ['/test','ff',0,0]],
+    ['pattern b0b0' => "/test\x00\x00\x00".",bb\x00"."\x00\x00\x00\x00"."\x00\x00\x00\x00" => ['/test','bb','','']],
+    ['pattern b0b%' => "/test\x00\x00\x00".",bb\x00"."\x00\x00\x00\x00"."\x00\x00\x00\x01"."\x25\x00\x00\x00" => ['/test','bb','','%']], 
+    ['pattern b%b0' => "/test\x00\x00\x00".",bb\x00"."\x00\x00\x00\x01"."\x25\x00\x00\x00"."\x00\x00\x00\x00" => ['/test','bb','%','']],
 );
 
 my $osc = Protocol::OSC->new;

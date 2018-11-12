@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Test2::Bundle::Extended;
+use Test2::Tools::Explain;
+use Test2::Plugin::NoWarnings;
+
+use Errno qw/ENOENT EISDIR/;
+use File::Temp qw/tempfile tempdir/;
+
+my $temp_dir_name = tempdir( CLEANUP => 1 );
+
+my ( undef, $missing_file_name ) = tempfile();
+CORE::unlink($missing_file_name);
+
+my ( $fh, $existing_file_name ) = tempfile();
+print $fh "This is the real file\n";
+close $fh;
+
+use Test::MockFile ();
+
+subtest 'unlink on a missing file' => sub {
+    $! = 0;
+    is( CORE::unlink($missing_file_name), 0,      "REAL CORE::unlink returns 0 files deleted." );
+    is( $! + 0,                           ENOENT, '$! is set to ENOENT' );
+
+    my $mock = Test::MockFile->file($missing_file_name);
+
+    $! = 0;
+    is( unlink($missing_file_name), 0,      "MOCKED unlink returns 0 files deleted." );
+    is( $! + 0,                     ENOENT, '$! is set to ENOENT' );
+};
+
+subtest 'unlink on a existing directory' => sub {
+    $! = 0;
+    is( CORE::unlink($temp_dir_name), 0,      "REAL CORE::unlink returns 0 files deleted." );
+    is( $! + 0,                       EISDIR, '$! is set to EISDIR' );
+
+    my $mock = Test::MockFile->dir( $temp_dir_name, [] );
+
+    $! = 0;
+    is( unlink($temp_dir_name), 0,      "MOCKED unlink returns 0 files deleted." );
+    is( $! + 0,                 EISDIR, '$! is set to EISDIR' );
+};
+
+subtest 'unlink on an existing file' => sub {
+    $! = 0;
+    is( CORE::unlink($existing_file_name), 1, "REAL CORE::unlink returns 1 files deleted." );
+    is( $! + 0,                            0, '$! remains 0' );
+
+    my $mock = Test::MockFile->file( $existing_file_name, "abc" );
+
+    $! = 0;
+    is( unlink($existing_file_name), 1, "MOCKED unlink returns 1 files deleted." );
+    is( $! + 0,                      0, '$! remains 0' );
+};
+
+subtest 'unlink on an unmocked file' => sub {
+
+    CORE::open( $fh, '>', $existing_file_name ) or die;
+    print $fh "This is the real file\n";
+    close $fh;
+
+    $! = 0;
+    is( unlink($existing_file_name), 1, "MOCKED unlink returns 1 files deleted." );
+    is( $! + 0,                      0, '$! remains 0' );
+
+    is( CORE::open( $fh, '<', $existing_file_name ), undef, "CORE::open fails since the file is removed from disk" );
+    is( $! + 0, ENOENT, '$! becomes ENOENT' );
+
+};
+
+done_testing();

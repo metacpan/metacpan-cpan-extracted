@@ -18,7 +18,7 @@ sub CLI {
 }
 
 # load app config
-my $cfg = P->cfg->read("$ENV->{DATA_DIR}cfg.yaml");
+my $cfg = P->cfg->read("$ENV->{DATA_DIR}/cfg.yaml");
 
 my $app = <: $module_name :>->new( {    #
     app_cfg => {
@@ -48,7 +48,7 @@ my $app = <: $module_name :>->new( {    #
             },
         }
     },
-    devel => $ENV->cli->{opt}->{devel},
+    devel => $ENV->{cli}->{opt}->{devel},
     cfg   => $cfg,
 } );
 

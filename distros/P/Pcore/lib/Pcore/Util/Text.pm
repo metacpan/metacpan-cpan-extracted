@@ -207,7 +207,7 @@ PERL
 
 # UTIL
 sub table {
-    state $init = !!require Pcore::Util::Text::Table;
+    require Pcore::Util::Text::Table;
 
     return Pcore::Util::Text::Table->new( {@_} );
 }
@@ -428,7 +428,7 @@ sub decode_html_entities {
         splice @_, 1,
     );
 
-    state $init = !!require HTML::Entities;
+    require HTML::Entities;
 
     Pcore::Util::Text::decode_utf8 $_;
 

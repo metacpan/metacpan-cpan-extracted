@@ -2,6 +2,12 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
+3.02  2018-11-08
+   - Fixed one more test that failed.  RT 127604
+
+3.01  2018-11-08
+   - Fixed two tests that failed everywhere.  RT 127596
+
 3.00  2018-11-07
    - Significant rewrite of including several backward incompatible
      changes.

@@ -79,7 +79,7 @@ our $EXPORT = {
 *sha3_512_b64 = \&Digest::SHA3::sha3_512_base64;
 
 sub crc32 {
-    state $init = !!require String::CRC32;
+    require String::CRC32;
 
     return &String::CRC32::crc32;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }

@@ -70,12 +70,15 @@ REQUEST_HEADER
 
 	#print "header = " . %{$add_header} . "\n";
 	#%add_header = %{$add_header_ref};
+        my $has_connection_header;
 	if (ref $add_header) {
+                $has_connection_header = 1 if( defined ${$add_header}{'Connection'} );
 		while ( ($add_header_name, $add_header_value) =  each %{$add_header}) {
 			$req_header .= "$add_header_name: $add_header_value\n";
 		}
 	}
 
+	$req_header .= "Connection: close\n" unless( $has_connection_header );
 	$req_header .= "\n";
 	$req_header =~ s/\r//g;
 	$req_header =~ s/\n/\r\n/g;
@@ -179,7 +182,7 @@ sub postsoap {
 }
 
 #------------------------------
-# postsoap
+# xmldecode
 #------------------------------
 
 sub xmldecode {

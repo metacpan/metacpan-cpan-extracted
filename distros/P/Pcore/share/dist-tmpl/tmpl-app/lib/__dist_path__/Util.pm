@@ -5,12 +5,12 @@ use Pcore::SMTP;
 use Pcore::API::ReCaptcha;
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 
-has tmpl     => ( init_arg => undef );    # isa => InstanceOf ['Pcore::Util::Tmpl']
-has dbh      => ( init_arg => undef );    # isa => ConsumerOf ['Pcore::Handle::DBI']
-has settings => ( init_arg => undef );    # isa => HashRef
+has tmpl     => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
+has dbh      => ( init_arg => undef );    # ConsumerOf ['Pcore::Handle::DBI']
+has settings => ( init_arg => undef );    # HashRef
 
-has _smtp     => ( is => 'lazy', init_arg => undef );    # isa => Maybe [ InstanceOf ['Pcore::SMTP'] ]
-has recaptcha => ( is => 'lazy', init_arg => undef );    # isa => Maybe [ InstanceOf ['Pcore::API::Recaptcha'] ]
+has _smtp     => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::SMTP'] ]
+has recaptcha => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::API::Recaptcha'] ]
 
 sub BUILD ( $self, $args ) {
 

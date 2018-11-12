@@ -1,0 +1,201 @@
+use 5.010;
+use alienfile;
+use Sort::Versions;
+
+my $on_windows = ($^O =~ /mswin/i);
+my $on_automated_rig
+  =  $ENV{PERL_CPAN_REPORTER_DIR}
+  || $ENV{PERL_CPAN_REPORTER_CONFIG}
+  || $ENV{AUTOMATED_TESTING}
+  || $ENV{TRAVIS}
+  || $ENV{APPVEYOR};
+
+use Cwd;
+my $base_dir = getcwd();
+
+my $min_target_version = '3.6.0';
+
+plugin 'Build::MSYS';
+
+probe sub {
+    my($build) = @_;  # $build is the Alien::Build instance.
+    my $version = `geos-config --version`;
+    my $build_type
+      = $? == 0
+      && (versioncmp ($version, $min_target_version) == 1)
+      ? 'system'
+      : 'share';
+    say "Build type is $build_type, found version " . ($version // 'n/a');
+    return $build_type;
+};
+
+
+share {
+
+  my $with_local = '';
+  my $with_cpp11 = '';
+
+  start_url 'http://download.osgeo.org/geos';
+  #start_url "file://$base_dir";  #  debug
+  plugin Download => (
+    filter  => qr/^geos-([0-9\.]+)\.tar\.bz2$/,
+    version => qr/^geos-([0-9\.]+)\.tar\.bz2$/,
+  );
+
+  my $geos_version = get_geos_version() // 'not yet defined';
+  say "Downloaded version is $geos_version";
+  
+  plugin Extract => (format => 'tar.bz2');
+
+  plugin 'Build::Autoconf' => ();
+
+  my $build_static = ($on_windows) ? '' : '--disable-shared';
+  $build_static = '';
+  $build_static = '--enable-static=no';  #  override - HUGE files if static
+  #$build_static = '' if $ENV{FORCE_DYNAMIC};
+  
+  
+  if ($^O =~ /bsd/) {
+    plugin 'Build::Make' => 'gmake';
+    if (-d '/usr/local') {
+        $with_local = ' --with-local=/usr/local ';
+    }
+  }
+  elsif ($^O =~ /dragonfly/) {
+    #  might need to be combined with bsd check above
+    #  but not sure if /usr/local is needed yet
+    plugin 'Build::Make' => 'gmake';
+  }
+
+  my $make_cmd = '%{make}';
+  my $make_inst_cmd = '%{make} install';
+  my @make_clean;
+  #  try not to exceed the cpan-testers log limits
+  if ($on_automated_rig) {
+    say "Running under CI or automated testing";
+    $make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
+    $make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type install.log/;
+    if (!$on_windows) {
+        $make_cmd =~ s/%%/%/;
+        $make_cmd =~ s/type/cat/;
+        $make_cmd =~ s/"/'/g;
+        $make_inst_cmd =~ s/%%/%/;
+        $make_inst_cmd =~ s/type/cat/;
+        $make_inst_cmd =~ s/"/'/g;
+    }
+    if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
+        push @make_clean, '%{make} clean';
+    }
+    #  clean up the build dir on cpan testers etc
+    #after 'build' => \&cleanse_build_dir;
+    plugin 'Cleanse::BuildDir';
+  }
+  
+  build [
+    "%{configure} $with_local $with_cpp11 $build_static",
+    $make_cmd,
+    \&pause,
+    $make_inst_cmd,
+    @make_clean
+  ];
+
+};
+
+
+gather [
+    \&rename_la_files,
+    #  get all the geos-config fields
+    \&set_runtime_props_from_config,
+];
+
+sub set_runtime_props_from_config {
+    my ($build) = @_;
+    
+    say 'set_runtime_props_from_config: Currently in ' . getcwd();
+    use File::Find::Rule;
+    my ($geos_config)
+      = $build->install_type eq 'share'
+          ? File::Find::Rule
+                ->file()
+                ->name( 'geos-config' )
+                ->in( $base_dir )
+          : 'geos-config';
+    
+    my $bin_sh = '';
+    if ($on_windows) {
+        eval 'require Alien::MSYS';
+        #$ENV{PATH} .= ';' . Alien::MSYS->msys_path;
+        #say $ENV{PATH};
+        $bin_sh = Alien::MSYS->msys_path . '/sh';
+    }
+    #else {
+    #    $bin_sh = `which sh`;
+    #}
+    
+    foreach my $flag (qw /cflags libs
+                          clibs cclibs
+                          ldflags includes
+                          static-clibs static-cclibs/) {
+        say "Calling: $bin_sh $geos_config --$flag";
+        $build->runtime_prop->{$flag} = `$bin_sh $geos_config --$flag`;
+        $build->runtime_prop->{$flag} =~ s/[\r\n]+$//;  #  generic chomp
+        if ($on_windows) {
+            #  windowsify the paths
+            $build->runtime_prop->{$flag} =~ s|(?<=-[IL])/C/|C:/|i;
+        }
+        say "Runtime prop $flag is " . $build->runtime_prop->{$flag};
+    }
+}
+
+sub rename_la_files {
+    #  need to return if not share
+    return if !$on_windows;
+    
+    use File::Find::Rule;
+    my @la_files
+      = File::Find::Rule->file()
+                        ->name( '*.la' )
+                        ->in( '.' );
+    foreach my $file (@la_files) {
+        say "Renaming $file so it will not intefere with gdal compilation";
+        rename $file, $file . '.bak';
+    }
+
+}
+
+sub pause {
+    return;  #  disable
+    return if !$on_windows || $on_automated_rig;
+
+    say "CONTINUE?";
+    my $response = <>;
+    while (not $response =~ /yes/) {
+        $response = <>;
+    }
+}
+
+sub get_geos_version {
+    my $h = get_alien_state_hash();
+    return $h->{runtime}{version};
+}
+
+sub get_stage_dir {
+    my $h = get_alien_state_hash();
+    return $h->{install}{stage};
+}
+
+sub get_alien_state_hash {
+    use JSON::PP;
+    my $root = "$base_dir/_alien";
+    my $f = "$root/state.json";
+    my $h = {};
+    if (-e $f) {
+        open my $fh, '<', $f or die $!;
+        my $d = do {
+            local $/ = undef;
+            <$fh>;
+        };
+        $h = JSON::PP::decode_json($d);
+    }
+    return $h;
+}

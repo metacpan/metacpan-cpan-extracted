@@ -6,7 +6,7 @@ use base 'Tree::Fast';
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use Scalar::Util qw( blessed refaddr weaken );
 
@@ -479,7 +479,7 @@ Tree - An N-ary tree
   $tree->remove_child( 0 );
 
   my @nodes = $tree->traverse( $tree->POST_ORDER );
-  my $clone = $tree->clone;
+  my $clone = $tree->clone; # See remarks under clone() re deep cloning.
   my $mirror = $tree->clone->mirror;
 
   $tree->add_event_handler({
@@ -520,8 +520,11 @@ children will be cloned.
 
 If you call C<< Tree->clone([$value]) >>, it will instead call C<new($value)>.
 
-B<NOTE:> the value is merely a shallow copy. This means that all references
-will be kept.
+B<NOTE:> the C<value> is merely a shallow copy. This means that all references
+will be kept, but the C<meta> data attached to each node is not copied.
+
+See L<Tree::DeepClone> and t/Tree_DeepClone/*.t if you want deep cloning, which is defined to
+mean that the C<meta> data attached to each node is also copied into the clone.
 
 =head2 Behaviors
 
@@ -1007,7 +1010,7 @@ C<Tree> itself is also lightweight.
 These statistics are as of V 1.01.
 
 We use L<Devel::Cover> to test the code coverage of our tests. Below is the
-L<Devel::Cover> report on this module's test suite.
+L<Devel::Cover> report on the test suite of this module.
 
   ---------------------------- ------ ------ ------ ------ ------ ------ ------
   File                           stmt   bran   cond    sub    pod   time  total

@@ -1,3 +1,7 @@
+0.09
+
+    correct osc blob encode/decode (tehmoth)
+
 0.08
 
     fix RT#123504 POD

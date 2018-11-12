@@ -3,6 +3,7 @@ example/00-benchmark.pl
 example/01-assert-stdin.pl
 example/02-json-structure.pl
 example/03-build-prime.pl
+example/04-lets-pretend.pl
 lib/Assert/Refute.pm
 lib/Assert/Refute/Build.pm
 lib/Assert/Refute/Contract.pm
@@ -20,7 +21,6 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/000-load.t
-t/001-contract-signature.t
 t/002-try_refute.t
 t/101-Report-refute.t
 t/102-Contract-apply.t
@@ -35,6 +35,8 @@ t/112-Report-refute-multiline.t
 t/113-Report-plan-tests.t
 t/114-Report-get_result_details-vs-tap.t
 t/115-T-Tester.t
+t/116-Report-context.t
+t/117-Report-done_testing.t
 t/201-current_contract.t
 t/202-Build-build_refute.t
 t/203-T-Basic-smoke.t
@@ -67,6 +69,7 @@ t/404-configure.t
 t/502-refute_these-config-0.13.t
 t/503-refute_these-v.0.15.t
 t/504-Report-set_result-v.0.15.t
+t/505-contract-block-v.0.20.t
 t/603-Driver-More-popen.t
 t/604-Driver-More.t
 t/README

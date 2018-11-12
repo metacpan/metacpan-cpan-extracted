@@ -1,10 +1,10 @@
 # NAME
 
-Dist::Zilla::Plugin::Generate::ManifestSkip - generate a MANIFEST.SKIP file for your distribution
+Dist::Zilla::Plugin::Generate::ManifestSkip - Generate a MANIFEST.SKIP file for your distribution
 
 # VERSION
 
-version v0.1.3
+version v0.1.5
 
 # SYNOPSIS
 
@@ -12,7 +12,7 @@ In your `dist.ini` file:
 
 ```
 [Generate::ManifestSkip]
-:version = v0.1.2
+:version = v0.1.3
 ```
 
 # DESCRIPTION
@@ -36,6 +36,8 @@ By defaut, the following files are added to the skipfile:
 - `\.mailmap$`
 - `{$dist_name}-.*/`
 - `{$dist_name}-.*\.tar\.gz`
+- `perltidy\.(LOG|ERR)'`
+- `fatlib/`
 
 where `$dist_name` is the name of the distribution.
 
@@ -47,7 +49,7 @@ will be added.
 ## remove
 
 This removes a regular expression from the ["skipfile"](#skipfile). Note that it
-must the expression from [Module::Manifest::Skip](https://metacpan.org/pod/Module::Manifest::Skip).
+must exactly match the expression used by [Module::Manifest::Skip](https://metacpan.org/pod/Module::Manifest::Skip).
 
 By default, the following files are already removed from the skipfile:
 

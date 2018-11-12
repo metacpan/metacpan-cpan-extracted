@@ -13,7 +13,7 @@ my %module_build_args = (
   "configure_requires" => {
     "Alien::Base" => 0,
     "Alien::Base::ModuleBuild" => "0.023",
-    "Alien::ProtoBuf" => "0.01",
+    "Alien::ProtoBuf" => "0.08",
     "Alien::gmake" => 0,
     "Archive::Zip" => 0,
     "ExtUtils::CppGuess" => "0.11",
@@ -24,7 +24,7 @@ my %module_build_args = (
     "Mattia Barbon <mattia\@barbon.org>"
   ],
   "dist_name" => "Alien-uPB",
-  "dist_version" => "0.11",
+  "dist_version" => "0.12",
   "license" => "perl",
   "module_name" => "Alien::uPB",
   "recursive_test_files" => 1

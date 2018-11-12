@@ -9,23 +9,23 @@ use Pcore::Util::Digest qw[md5_hex];
 use Pcore::Util::Data qw[from_json];
 use Pcore::AE::Handle;
 
-has handle     => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Handle::pgsql'], required => 1 );
-has password   => ();    # ( is => 'ro', isa => Str );
-has on_connect => ();    # ( is => 'ro', isa => CodeRef, required => 1 );
+has handle     => ( required => 1 );    # InstanceOf ['Pcore::Handle::pgsql']
+has on_connect => ( required => 1 );    # CodeRef
+has password => ();                     # Str
 
-has is_pgsql => 1;       # ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
+has is_pgsql => 1, init_arg => undef;
 
-has state        => $STATE_CONNECT;    # ( is => 'ro', isa => Enum [ $STATE_CONNECT, $STATE_READY, $STATE_BUSY, $STATE_DISCONNECTED ], init_arg => undef );
-has h            => ();                # ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );
-has parameter    => ();                # ( is => 'ro', isa => HashRef, init_arg => undef );
-has key_data     => ();                # ( is => 'ro', isa => HashRef, init_arg => undef );
-has tx_status    => ();                # ( is => 'ro', isa => Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRANS, $TX_STATUS_ERROR ], init_arg => undef );    # current transaction status
-has wbuf         => ();                # ( is => 'ro', isa => ArrayRef, init_arg => undef );     # outgoing messages buffer
-has sth          => ();                # ( is => 'ro', isa => HashRef, init_arg => undef );      # currently executed sth
-has prepared_sth => ();                # ( is => 'ro', isa => HashRef, init_arg => undef );
-has query        => ();                # ( is => 'ro', isa => ScalarRef, init_arg => undef );    # ref to the last query
+has state        => $STATE_CONNECT, init_arg => undef;    # Enum [ $STATE_CONNECT, $STATE_READY, $STATE_BUSY, $STATE_DISCONNECTED ]
+has h            => ( init_arg => undef );                # InstanceOf ['Pcore::AE::Handle']
+has parameter    => ( init_arg => undef );                # HashRef
+has key_data     => ( init_arg => undef );                # HashRef
+has tx_status    => ( init_arg => undef );                # Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRANS, $TX_STATUS_ERROR ], current transaction status
+has wbuf         => ( init_arg => undef );                # ArrayRef, outgoing messages buffer
+has sth          => ( init_arg => undef );                # HashRef, currently executed sth
+has prepared_sth => ( init_arg => undef );                # HashRef
+has query        => ( init_arg => undef );                # ScalarRef, ref to the last query
 
-const our $PROTOCOL_VER => "\x00\x03\x00\x00";    # v3
+const our $PROTOCOL_VER => "\x00\x03\x00\x00";            # v3
 
 # FRONTEND
 const our $PG_MSG_BIND             => 'B';

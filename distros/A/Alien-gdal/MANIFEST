@@ -14,7 +14,6 @@ t/00-load.t
 t/01-config.t
 t/02-use.t
 t/src/test.c
-xt/.perlcritic-history
 xt/01-has_versions.t
 xt/03-has_pod.t
 xt/03-test_pod.t

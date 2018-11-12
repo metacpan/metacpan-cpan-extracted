@@ -1,0 +1,80 @@
+{
+   "abstract" : "POD renderer plugin",
+   "author" : [
+      "Sebastian Riedel <kraih@mojolicious.org>",
+      "Doug Bell <preaction@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-PODViewer",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "8",
+            "Pod::Simple" : "3.09",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::PODViewer" : {
+         "file" : "lib/Mojolicious/Plugin/PODViewer.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/preaction/Mojolicious-Plugin-PODViewer/issues"
+      },
+      "homepage" : "https://github.com/preaction/Mojolicious-Plugin-PODViewer",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/preaction/Mojolicious-Plugin-PODViewer.git",
+         "web" : "https://github.com/preaction/Mojolicious-Plugin-PODViewer"
+      }
+   },
+   "version" : "0.002",
+   "x_authority" : "cpan:PREACTION",
+   "x_contributors" : [
+      "Oleg <verdrehung@gmail.com>",
+      "Zoffix Znet <cpan@zoffix.com>"
+   ],
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+}
+

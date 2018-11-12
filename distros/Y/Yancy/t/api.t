@@ -112,7 +112,7 @@ my %data = (
             age => 35,
         },
         {
-            username => 'joel',
+            username => 'joe/',
             email => 'joel@example.com',
             password => 'ignore',
             access => 'user',
@@ -145,7 +145,7 @@ sub test_api {
         $t->get_ok( '/yancy/api' )
           ->status_is( 200 )
           ->content_type_like( qr{^application/json} )
-          ->json_is( '/definitions/peopleItem' => {
+          ->json_is( '/definitions/people' => {
             type => 'object',
             required => [qw( name )],
             properties => {
@@ -174,7 +174,7 @@ sub test_api {
             },
           } )
 
-          ->json_is( '/definitions/userItem' => {
+          ->json_is( '/definitions/user' => {
             type => 'object',
             'x-id-field' => 'username',
             'x-list-columns' => [qw( username email )],
@@ -243,7 +243,7 @@ sub test_api {
             $t->get_ok( '/yancy/api' )
               ->status_is( 200 )
               ->content_type_like( qr{^application/json} )
-              ->json_is( '/definitions/peopleItem' => {
+              ->json_is( '/definitions/people' => {
                 type => 'object',
                 required => [qw( name )],
                 properties => {
@@ -269,9 +269,9 @@ sub test_api {
                     },
                 },
               } )
-              ->or( sub { diag explain shift->tx->res->json( '/definitions/peopleItem' ) } )
+              ->or( sub { diag explain shift->tx->res->json( '/definitions/people' ) } )
 
-              ->json_is( '/definitions/userItem' => {
+              ->json_is( '/definitions/user' => {
                 type => 'object',
                 required => [qw( username email password )],
                 properties => {
@@ -302,7 +302,7 @@ sub test_api {
                     },
                 },
               } )
-              ->or( sub { diag explain shift->tx->res->json( '/definitions/userItem' ) } )
+              ->or( sub { diag explain shift->tx->res->json( '/definitions/user' ) } )
 
         };
 
@@ -315,8 +315,8 @@ sub test_api {
             $t->get_ok( '/yancy/api' )
               ->status_is( 200 )
               ->content_type_like( qr{^application/json} )
-              ->json_has( '/definitions/peopleItem', 'people read from schema' )
-              ->json_hasnt( '/definitions/userItem', 'user ignored from schema' )
+              ->json_has( '/definitions/people', 'people read from schema' )
+              ->json_hasnt( '/definitions/user', 'user ignored from schema' )
               ;
         };
 
@@ -534,6 +534,21 @@ sub test_api {
                 age => 35,
             },
           );
+
+        subtest 'fetch one with / in ID' => sub {
+            $t->get_ok( '/yancy/api/user/joe/' )
+              ->status_is( 200 )
+              ->json_is(
+                {
+                    id => $items{user}[1]{id},
+                    username => 'joe/',
+                    email => 'joel@example.com',
+                    password => 'ignore',
+                    access => 'user',
+                    age => 32,
+                },
+              );
+        };
     };
 
     subtest 'set one' => sub {
@@ -561,6 +576,23 @@ sub test_api {
         $t->json_is( { %$new_user, id => $items{user}[0]{id} } );
         is_deeply $backend->get( user => 'doug' ),
             { %$new_user, id => $items{user}[0]{id} };
+
+        subtest 'change id in set' => sub {
+            my $new_user = {
+                username => 'douglas',
+                email => 'douglas@example.com',
+                password => 'ignore',
+                access => 'user',
+                age => 35,
+            };
+            $t->put_ok( '/yancy/api/user/doug' => json => $new_user )
+              ->status_is( 200 );
+            $t->json_is( { %$new_user, id => $items{user}[0]{id} } );
+            is_deeply $backend->get( user => 'douglas' ),
+                { %$new_user, id => $items{user}[0]{id} };
+            ok !$backend->get( user => 'doug' ), 'old id does not exist';
+        };
+
     };
 
     subtest 'add one' => sub {

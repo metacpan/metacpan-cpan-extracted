@@ -1,5 +1,8 @@
 Revision history for Keyword-Pluggable
 
+1.02    2018-11-11
+        - coderef gets code text as a parameter, for peeking out
+
 1.01    2018-08-25
         - Allow global and package scopes
         - Change API from arglist to opthash

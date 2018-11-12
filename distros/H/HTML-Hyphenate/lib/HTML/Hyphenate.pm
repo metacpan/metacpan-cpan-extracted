@@ -1,14 +1,10 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2009-2018, Roland van Ipenburg
-package HTML::Hyphenate v1.1.0;
-
-use strict;
-use warnings;
+package HTML::Hyphenate v1.1.1;
+use Moose;
 use utf8;
 use 5.014000;
 
-use Moose;
-use namespace::autoclean '-also' => qr/^__/sxm;
 use charnames qw(:full);
 
 use Log::Log4perl qw(:easy get_logger);
@@ -18,56 +14,56 @@ use TeX::Hyphen::Pattern 0.100;
 use Mojo::DOM;
 
 use Readonly;
-Readonly::Scalar my $DOT                => q{.};
-Readonly::Scalar my $SOFT_HYPHEN        => qq{\N{SOFT HYPHEN}};
-Readonly::Scalar my $ONE_LEVEL_UP       => -1;
-Readonly::Scalar my $DEFAULT_MIN_LENGTH => 10;
-Readonly::Scalar my $DEFAULT_MIN_PRE    => 2;
-Readonly::Scalar my $DEFAULT_MIN_POST   => 2;
-Readonly::Scalar my $DEFAULT_LANG       => q{en_us};
+## no critic qw(ProhibitCallsToUnexportedSubs)
+Readonly::Scalar my $DOT          => q{.};
+Readonly::Scalar my $SOFT_HYPHEN  => qq{\N{SOFT HYPHEN}};
+Readonly::Scalar my $CLASS_JOINER => q{, .};                # for CSS classnames
+Readonly::Scalar my $ONE_LEVEL_UP => -1;
 
-Readonly::Scalar my $DEFAULT_INCLUDED => 1;
-Readonly::Scalar my $DEFAULT_XML      => 1;
-
-Readonly::Scalar my $LANG         => q{lang};
-Readonly::Scalar my $TEXT         => q{text};
-Readonly::Scalar my $TAG          => q{tag};
-Readonly::Scalar my $RAW          => q{raw};
-Readonly::Scalar my $PRE          => q{pre};
-Readonly::Scalar my $CLASS        => q{class};
-Readonly::Scalar my $CLASS_JOINER => q{, .};
-
-Readonly::Scalar my $LOG_TRAVERSE      => q{Traversing HTML element '%s'};
-Readonly::Scalar my $LOG_LANGUAGE_SET  => q{Language changed to '%s'};
-Readonly::Scalar my $LOG_PATTERN_FILE  => q{Using pattern file '%s'};
-Readonly::Scalar my $LOG_TEXT_NODE     => q{Text node value '%s'};
-Readonly::Scalar my $LOG_HYPHEN_TEXT   => q{Hyphenating text '%s'};
-Readonly::Scalar my $LOG_HYPHEN_WORD   => q{Hyphenating word '%s' to '%s'};
-Readonly::Scalar my $LOG_LOOKING_UP    => q{Looking up for %d class(es)};
-Readonly::Scalar my $LOG_HTML_METHOD   => q{Using HTML passed to method '%s'};
-Readonly::Scalar my $LOG_HTML_PROPERTY => q{Using HTML property '%s'};
-Readonly::Scalar my $LOG_HTML_UNDEF    => q{HTML to hyphenate is undefined};
-Readonly::Scalar my $LOG_NO_LANG       => q{No language defined for '%s'};
-Readonly::Scalar my $LOG_NOT_HYPHEN    => q{No pattern found for '%s'};
-Readonly::Scalar my $LOG_REGISTER =>
-  q{Registering TeX::Hyphen object for label '%s'};
+Readonly::Hash my %DEFAULT => (
+    'MIN_LENGTH' => 10,
+    'MIN_PRE'    => 2,
+    'MIN_POST'   => 2,
+    'LANG'       => q{en_us},
+    'INCLUDED'   => 1,
+);
 
 # HTML %Text attributes <http://www.w3.org/TR/REC-html40/index/attributes.html>
-# HTML5 %Text attributes <https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes>
+# HTML5 text attributes <https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes>
 my $text_attr =
   Set::Scalar->new(qw/abbr alt label list placeholder standby summary title/);
+
+## no critic qw(ProhibitCallsToUnexportedSubs)
+Readonly::Hash my %LOG => (
+    'TRAVERSE'      => q{Traversing HTML element '%s'},
+    'LANGUAGE_SET'  => q{Language changed to '%s'},
+    'PATTERN_FILE'  => q{Using pattern file '%s'},
+    'TEXT_NODE'     => q{Text node value '%s'},
+    'HYPHEN_TEXT'   => q{Hyphenating text '%s'},
+    'HYPHEN_WORD'   => q{Hyphenating word '%s' to '%s'},
+    'LOOKING_UP'    => q{Looking up for %d class(es)},
+    'HTML_METHOD'   => q{Using HTML passed to method '%s'},
+    'HTML_PROPERTY' => q{Using HTML property '%s'},
+    'HTML_UNDEF'    => q{HTML to hyphenate is undefined},
+    'NO_LANG'       => q{No language defined for '%s'},
+    'NOT_HYPHEN'    => q{No pattern found for '%s'},
+    'REGISTER'      => q{Registering TeX::Hyphen object for label '%s'},
+);
+## use critic
 
 Log::Log4perl->easy_init($ERROR);
 my $log = get_logger();
 
-has html       => ( is => 'rw', isa => 'Str' );
-has style      => ( is => 'rw', isa => 'Str' );
-has min_length => ( is => 'rw', isa => 'Int', default => $DEFAULT_MIN_LENGTH );
-has min_pre    => ( is => 'rw', isa => 'Int', default => $DEFAULT_MIN_PRE );
-has min_post   => ( is => 'rw', isa => 'Int', default => $DEFAULT_MIN_POST );
-has default_lang => ( is => 'rw', isa => 'Str', default => $DEFAULT_LANG );
+## no critic qw(ProhibitHashBarewords ProhibitCallsToUnexportedSubs ProhibitCallsToUndeclaredSubs)
+has html  => ( is => 'rw', isa => 'Str' );
+has style => ( is => 'rw', isa => 'Str' );
+has min_length =>
+  ( is => 'rw', isa => 'Int', default => $DEFAULT{'MIN_LENGTH'} );
+has min_pre  => ( is => 'rw', isa => 'Int', default => $DEFAULT{'MIN_PRE'} );
+has min_post => ( is => 'rw', isa => 'Int', default => $DEFAULT{'MIN_POST'} );
+has default_lang => ( is => 'rw', isa => 'Str', default => $DEFAULT{'LANG'} );
 has default_included =>
-  ( is => 'rw', isa => 'Int', default => $DEFAULT_INCLUDED );
+  ( is => 'rw', isa => 'Int', default => $DEFAULT{'INCLUDED'} );
 has classes_included =>
   ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 has classes_excluded =>
@@ -76,15 +72,25 @@ has classes_excluded =>
 has _hyphenators => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
 has _lang        => ( is => 'rw', isa => 'Str' );
 has _dom         => ( is => 'rw', isa => 'Mojo::DOM' );
+## use critic
+
+## no critic qw(ProhibitCallsToUnexportedSubs)
+Readonly::Scalar my $LANG  => q{lang};
+Readonly::Scalar my $TEXT  => q{text};
+Readonly::Scalar my $TAG   => q{tag};
+Readonly::Scalar my $RAW   => q{raw};
+Readonly::Scalar my $PRE   => q{pre};
+Readonly::Scalar my $CLASS => q{class};
+## use critic
 
 sub hyphenated {
     my ( $self, $html ) = @_;
     if ( defined $html ) {
-        $log->debug( sprintf $LOG_HTML_METHOD, $html );
+        $log->debug( sprintf $LOG{'HTML_METHOD'}, $html );
         $self->html($html);
     }
     else {
-        $log->debug( sprintf $LOG_HTML_PROPERTY, $self->html );
+        $log->debug( sprintf $LOG{'HTML_PROPERTY'}, $self->html );
     }
     if ( defined $self->html ) {
         $self->_reset_dom;
@@ -92,7 +98,7 @@ sub hyphenated {
         $self->_traverse_dom( $self->_dom->root );
         return $self->_clean_html();
     }
-    $log->warn($LOG_HTML_UNDEF);
+    $log->warn( $LOG{'HTML_UNDEF'} );
     return;
 }
 
@@ -100,7 +106,7 @@ sub register_tex_hyphen {
     my ( $self, $label, $tex ) = @_;
     if ( defined $label && $tex->isa('TeX::Hyphen') ) {
         my $cache = $self->_hyphenators;
-        $log->debug( sprintf $LOG_REGISTER, $label );
+        $log->debug( sprintf $LOG{'REGISTER'}, $label );
         ${$cache}{$label} = $tex;
         $self->_hyphenators($cache);
     }
@@ -111,7 +117,7 @@ sub _traverse_dom {
     my ( $self, $node ) = @_;
     if ( $self->_hyphenable($node) ) {
         if ( $node->type eq $TAG ) {
-            $log->debug( sprintf $LOG_TRAVERSE, $node->tag );
+            $log->debug( sprintf $LOG{'TRAVERSE'}, $node->tag );
             $self->_configure_lang($node);
             foreach my $attr ( keys %{ $node->attr } ) {
                 if ( $text_attr->has($attr) ) {
@@ -119,11 +125,11 @@ sub _traverse_dom {
                 }
             }
         }
-        elsif ( 'text' eq $node->type || $node->type eq $RAW ) {
+        elsif ( $TEXT eq $node->type || $RAW eq $node->type ) {
             if ( !defined $self->_lang ) {
                 $self->_configure_lang($node);
             }
-            $log->debug( sprintf $LOG_TEXT_NODE, $node->to_string );
+            $log->debug( sprintf $LOG{'TEXT_NODE'}, $node->to_string );
             $node->replace( $self->_hyphen( $node->to_string ) );
             return;
         }
@@ -143,7 +149,7 @@ sub _clean_html {
 
 sub _hyphen {
     my ( $self, $text ) = @_;
-    $log->debug( sprintf $LOG_HYPHEN_TEXT, $text );
+    $log->debug( sprintf $LOG{'HYPHEN_TEXT'}, $text );
     $text =~ s/(\w{@{[$self->min_length]},})/$self->_hyphen_word($1)/xsmeg;
     return $text;
 }
@@ -152,7 +158,7 @@ sub _hyphen_word {
     my ( $self, $word ) = @_;
     if ( defined $self->_lang ) {
         if ( defined $self->_hyphenators->{ $self->_lang } ) {
-            $log->debug( sprintf $LOG_HYPHEN_WORD,
+            $log->debug( sprintf $LOG{'HYPHEN_WORD'},
                 $word,
                 $self->_hyphenators->{ $self->_lang }->visualize($word) );
             my $number = 0;
@@ -164,11 +170,11 @@ sub _hyphen_word {
             }
         }
         else {
-            $log->warn( sprintf $LOG_NOT_HYPHEN, $self->_lang );
+            $log->warn( sprintf $LOG{'NOT_HYPHEN'}, $self->_lang );
         }
     }
     else {
-        $log->warn( sprintf $LOG_NO_LANG, $word );
+        $log->warn( sprintf $LOG{'NO_LANG'}, $word );
     }
     return $word;
 }
@@ -186,7 +192,7 @@ sub _configure_lang {
     defined $lang || ( $lang = $self->default_lang );
     if ( !defined $self->_lang || $lang ne $self->_lang ) {
         $self->_lang($lang);
-        $log->debug( sprintf $LOG_LANGUAGE_SET, $lang );
+        $log->debug( sprintf $LOG{'LANGUAGE_SET'}, $lang );
         if ( !exists $self->_hyphenators->{$lang} ) {
             $self->_add_tex_hyphen_to_cache();
         }
@@ -200,7 +206,7 @@ sub _add_tex_hyphen_to_cache {
     $thp->label( $self->_lang );
     my $cache = $self->_hyphenators;
     if ( my $file = $thp->filename ) {
-        $log->debug( sprintf $LOG_PATTERN_FILE, $file );
+        $log->debug( sprintf $LOG{'PATTERN_FILE'}, $file );
         ${$cache}{ $self->_lang } = TeX::Hyphen->new(
             q{file}     => $file,
             q{leftmin}  => $self->min_pre,
@@ -239,7 +245,7 @@ sub _hyphenable {
 sub _get_nearest_ancestor_level_by_classname {
     my ( $self, $node, $ar_classnames, $level ) = @_;
     my $classnames = Set::Scalar->new( @{$ar_classnames} );
-    $log->debug( sprintf $LOG_LOOKING_UP, $classnames->size );
+    $log->debug( sprintf $LOG{'LOOKING_UP'}, $classnames->size );
     if ( !$classnames->is_empty
         && ( $node->ancestors->size ) )
     {
@@ -266,7 +272,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords Ipenburg Readonly merchantability
+=for stopwords Ipenburg Readonly merchantability Mojolicious
 
 =head1 NAME
 
@@ -274,7 +280,7 @@ HTML::Hyphenate - insert soft hyphens into HTML.
 
 =head1 VERSION
 
-This document describes HTML::Hyphenate version v1.1.0.
+This document describes HTML::Hyphenate version v1.1.1.
 
 =head1 SYNOPSIS
 
@@ -375,7 +381,7 @@ The output is generated by L<Mojo::DOM|Mojo::DOM>.
 
 =item * L<Moose|Moose>
 
-=item * L<Mojo::DOM|Mojo::DOM>
+=item * L<Mojolicious|Mojolicious> for L<Mojo::Dom|Mojo::Dom>
 
 =item * L<Log::Log4perl|Log::Log4perl>
 
@@ -386,10 +392,6 @@ The output is generated by L<Mojo::DOM|Mojo::DOM>.
 =item * L<TeX::Hyphen|TeX::Hyphen>
 
 =item * L<TeX::Hyphen::Pattern|TeX::Hyphen::Pattern>
-
-=item * L<namespace::autoclean|namespace::autoclean>
-
-=item * L<Test::More|Test::More>
 
 =back
 

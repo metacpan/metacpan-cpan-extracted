@@ -1,0 +1,44 @@
+Mojolicious::Command::export
+
+Export a Mojolicious webapp to static files.
+
+  Configuration
+
+Default values for the command's options can be specified in the
+configuration using one of Mojolicious's configuration plugins.
+
+    # myapp.conf
+    {
+        export => {
+            # Configure the default paths to export
+            paths => [ '/', '/hidden' ],
+            # The directory to export to
+            to => '/var/www/html',
+            # Rewrite URLs to include base directory
+            base => '/',
+        }
+    }
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

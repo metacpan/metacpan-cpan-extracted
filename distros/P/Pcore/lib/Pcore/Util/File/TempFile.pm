@@ -9,10 +9,10 @@ use overload    #
   q[""] => sub {
     return $_[0]->path;
   },
-  q[cmp] => sub {
+  'cmp' => sub {
     return !$_[2] ? $_[0]->path cmp $_[1] : $_[1] cmp $_[0]->path;
   },
-  q[0+] => sub {
+  '0+' => sub {
     return refaddr $_[0];
   },
   fallback => undef;
@@ -60,7 +60,7 @@ sub new ( $self, @ ) {
 
     my $fh = P->file->get_fh( $args{base} . q[/] . $filename, $mode, %args );
 
-    *$fh->$* = [ P->path( $args{base} . q[/] . $filename )->realpath->to_string, $$ ];    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    *$fh->$* = [ P->path("$args{base}/$filename")->to_abs, $$ ];    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     return bless $fh, $self;
 }

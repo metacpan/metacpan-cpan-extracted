@@ -70,7 +70,7 @@ sub BUILD ( $self, $args ) {
 
     $self->{listen} = $self->{_http_server}->{listen};
 
-    $self->{listen}->username(uuid_v4_str) if !defined $self->{listen}->{username};
+    $self->{listen}->set_username(uuid_v4_str) if !defined $self->{listen}->{username};
 
     return;
 }

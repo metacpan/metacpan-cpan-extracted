@@ -1,5 +1,8 @@
 Revision history for Calendar::Hebrew
 
+0.06  Mon Nov 12 14:10:00 2018
+      - Used namespace::autoclean instead.
+
 0.05  Sat Oct 21 08:00:00 2017
       - Added test scripts (t/meta-json.t and t/meta-yml.t).
 

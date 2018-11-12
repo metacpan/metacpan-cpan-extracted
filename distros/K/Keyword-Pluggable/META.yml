@@ -25,5 +25,5 @@ requires:
   perl: '5.014000'
 resources:
   repository: http://github.com/dk/Keyword-Pluggable
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

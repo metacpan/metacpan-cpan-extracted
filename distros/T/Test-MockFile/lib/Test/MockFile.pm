@@ -27,7 +27,7 @@ use Test::MockFile::DirHandle  ();
 use Scalar::Util               ();
 use Overload::FileCheck '-from-stat' => \&_mock_stat, q{:check};
 
-use Errno qw/ENOENT ELOOP EEXIST/;
+use Errno qw/EPERM ENOENT ELOOP EEXIST EISDIR ENOTDIR/;
 
 use constant FOLLOW_LINK_MAX_DEPTH => 10;
 
@@ -37,11 +37,11 @@ Test::MockFile - Lets tests validate code which interacts with files without the
 
 =head1 VERSION
 
-Version 0.010
+Version 0.011
 
 =cut
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 our %files_being_mocked;
 
@@ -218,23 +218,54 @@ sub file {
     );
 }
 
+=head2 file_from_disk
+
+Args: C<($file_to_mock, $file_on_disk, $stats)>
+
+This will make cause $file to be mocked in all file checks, opens, etc.
+
+If C<file_on_disk> isn't present, then this will die.
+
+See L<Mock Stats> for what goes in this hash ref.
+
+=cut
+
+sub file_from_disk {
+    my ( $class, $file, $file_on_disk, @stats ) = @_;
+
+    my $fh;
+    local $!;
+    if ( !CORE::open( $fh, '<', $file_on_disk ) ) {
+        $file_on_disk //= '<no file specified>';
+        die("Sorry, I cannot read from $file_on_disk to mock $file. It doesn't appear to be present ($!)");
+    }
+
+    local $/;
+    my $contents = <$fh>;    # Slurp!
+    close $fh;
+
+    return __PACKAGE__->file( $file, $contents, @stats );
+}
+
 =head2 symlink
 
-Args: ($file, $readlink )
+Args: ($readlink, $file )
 
 This will cause $file to be mocked in all file checks, opens, etc.
 
-$readlink indicates what "fake" file it points to. If the file $readlink points to is not mocked, it will act like a broken link, regardless of what's on disk.
+C<$readlink> indicates what "fake" file it points to. If the file C<$readlink> points to is not mocked, it will act like a broken link, regardless of what's on disk.
+
+If C<$readlink> is undef, then the symlink is mocked but not present.(lstat $file is empty.)
 
 Stats are not able to be specified on instantiation but can in theory be altered after the object is created. People don't normally mess with the permissions on a symlink.
 
 =cut
 
 sub symlink {
-    my ( $class, $file, $readlink ) = @_;
+    my ( $class, $readlink, $file ) = @_;
 
-    length $file     or die("No file provided to instantiate $class");
-    length $readlink or die("No file provided for $file to point to in $class");
+    length $file or die("No file provided to instantiate $class");
+    ( !defined $readlink || length $readlink ) or die("No file provided for $file to point to in $class");
 
     $files_being_mocked{$file} and die("It looks like $file is already being mocked. We don't support double mocking yet.");
 
@@ -291,7 +322,7 @@ sub dir {
         %stats = @stats;
     }
 
-    my $perms = S_IFPERMS & ( defined $stats{'mode'} ? int( $stats{'mode'} ) : 0666 );
+    my $perms = S_IFPERMS & ( defined $stats{'mode'} ? int( $stats{'mode'} ) : 0777 );
     $stats{'mode'} = ( $perms ^ umask ) | S_IFDIR;
 
     return $class->new(
@@ -439,6 +470,14 @@ sub _mock_stat {
     return [ $file_data->stat ];
 }
 
+sub _get_file_object {
+    my ($file_path) = @_;
+
+    my $file = _find_file_or_fh($file_path);
+
+    return $files_being_mocked{$file};
+}
+
 sub _find_file_or_fh {
     my ( $file_or_fh, $follow_link, $depth, $parent ) = @_;
 
@@ -498,12 +537,20 @@ sub _abs_path_to_file {
 
 sub DESTROY {
     my ($self) = @_;
-    $self or return;
     ref $self or return;
 
-    my $file_name = $self->{'file_name'} or return;
+    # This is just a safety. It doesn't make much sense if we get here but
+    # $self doesn't have a file_name. Either way we can't delete it.
+    my $file_name = $self->{'file_name'};
+    defined $file_name or return;
 
-    $self == $files_being_mocked{$file_name} or die("Tried to destroy object for $file_name ($self) but something else is mocking it?");
+    # If the object survives into global destruction, the object which is
+    # the value of $files_being_mocked{$file_name} might destroy early.
+    # As a result, don't worry about the self == check just delete the key.
+    if ( defined $files_being_mocked{$file_name} ) {
+        $self == $files_being_mocked{$file_name} or die("Tried to destroy object for $file_name ($self) but something else is mocking it?");
+    }
+
     delete $files_being_mocked{$file_name};
 }
 
@@ -541,7 +588,7 @@ sub contents {
 
 =head2 unlink
 
-Makes the virtual file go away by making its contents undef.
+Makes the virtual file go away. NOTE: This also works for directories.
 
 =cut
 
@@ -549,10 +596,22 @@ sub unlink {
     my ($self) = @_;
     $self or die("unlink is a method");
 
-    $self->is_file or die("unlink only supports files");
+    if ( !$self->exists ) {
+        $! = ENOENT;
+        return 0;
+    }
 
-    $self->contents(undef);
+    if ( $self->is_dir ) {
+        $! = EISDIR;
+        return 0;
+    }
 
+    if ( $self->is_link ) {
+        $self->{'readlink'} = undef;
+    }
+    else {
+        $self->contents(undef);
+    }
     return 1;
 }
 
@@ -689,10 +748,24 @@ sub size {
 
     # length undef is 0 not undef in perl 5.10
     if ( $] < 5.012 ) {
-        return undef if !defined $self->contents;
+        return undef unless $self->exists;
     }
 
     return length $self->contents;
+}
+
+=head2 exists
+
+returns true or false base on if the file exists right now.
+
+=cut
+
+sub exists {
+    my ($self) = @_;
+
+    my $exists_field = $self->is_link ? 'readlink' : 'contents';
+
+    return defined $self->{$exists_field} ? 1 : 0;
 }
 
 =head2 blocks
@@ -723,11 +796,23 @@ The number passed should be the octal C<0755> form, not the alphabetic C<"755"> 
 sub chmod {
     my ( $self, $mode ) = @_;
 
-    $mode = int($mode) | S_IFPERMS;
+    $mode = ( int($mode) & S_IFPERMS ) ^ umask;
 
-    $self->{'mode'} = ( $self->{'mode'} | S_IFMT ) + $mode;
+    $self->{'mode'} = ( $self->{'mode'} & S_IFMT ) + $mode;
 
     return $mode;
+}
+
+=head2 permissions
+
+Returns the permissions of the file.
+
+=cut
+
+sub permissions {
+    my ($self) = @_;
+
+    return int( $self->{'mode'} ) & S_IFPERMS;
 }
 
 =head2 mtime
@@ -901,6 +986,10 @@ BEGIN {
         }
 
         my $mode = $_[1];
+
+        # For now we're going to just strip off the binmode and hope for the best.
+        $mode =~ s/(:.+$)//;
+        my $encoding_mode = $1;
 
         # TODO: We technically need to support this.
         # open(my $fh, "-|", "/bin/hostname"); # Read from command
@@ -1200,6 +1289,113 @@ BEGIN {
         return if !defined $self->{'tell'};
 
         delete $self->{'tell'};
+        return 1;
+    };
+
+    *CORE::GLOBAL::unlink = sub(@) {
+        my @files_to_unlink = @_;
+        my $files_deleted   = 0;
+
+        foreach my $file (@files_to_unlink) {
+            my $mock = _get_file_object($file);
+
+            if ( !$mock ) {
+                _real_file_access_hook( "unlink", [$file] );
+                $files_deleted += CORE::unlink($file);
+            }
+            else {
+                $files_deleted += $mock->unlink;
+            }
+        }
+
+        return $files_deleted;
+
+    };
+
+    # $file is always passed because of the prototype.
+    *CORE::GLOBAL::mkdir = sub(_;$) {
+        my ( $file, $perms ) = @_;
+
+        $perms = ( $perms // 0777 ) & S_IFPERMS;
+
+        if ( !defined $file ) {
+
+            # mkdir warns if $file is undef
+            Carp::carp("Use of uninitialized value in mkdir");
+            $! = ENOENT;
+            return 0;
+        }
+
+        my $mock = _get_file_object($file);
+
+        if ( !$mock ) {
+            if ( $] > 5.015 ) {
+                goto \&CORE::mkdir;
+            }
+            else {
+                return CORE::mkdir(@_);
+            }
+        }
+
+        # Because we've mocked this to be a file and it doesn't exist we are going to die here.
+        # The tester needs to fix this presumably.
+        if ( !$mock->is_dir && $mock->exists ) {
+            $! = EEXIST;
+            return 0;
+        }
+
+        # If the mock was a symlink or a file, we've just made it a dir.
+        $mock->{'mode'} = ( $perms ^ umask ) | S_IFDIR;
+        delete $mock->{'readlink'};
+
+        $mock->contents( [qw/. ../] );
+
+        return 1;
+    };
+
+    # $file is always passed because of the prototype.
+    *CORE::GLOBAL::rmdir = sub(_) {
+        my ($file) = @_;
+
+        # technically this is a minor variation from core. We don't seem to be able to
+        # detect when they didn't pass an arg like core can.
+        # Core sometimes warns: 'Use of uninitialized value $_ in rmdir'
+        if ( !defined $file ) {
+            Carp::carp('Use of uninitialized value in rmdir');
+            return 0;
+        }
+
+        my $mock = _get_file_object($file);
+
+        if ( !$mock ) {
+            if ( $] > 5.015 ) {
+                goto \&CORE::rmdir;
+            }
+            else {
+                return CORE::rmdir($file);
+            }
+        }
+
+        # Because we've mocked this to be a file and it doesn't exist we are going to die here.
+        # The tester needs to fix this presumably.
+        if ( $mock->exists ) {
+            if ( $mock->is_file ) {
+                $! = ENOTDIR;
+                return 0;
+            }
+
+            if ( $mock->is_link ) {
+                $! = ENOTDIR;
+                return 0;
+            }
+        }
+
+        if ( !$mock->exists ) {
+            $! = ENOENT;
+            return 0;
+        }
+
+        $mock->contents(undef);
         return 1;
     };
 }

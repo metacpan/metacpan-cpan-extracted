@@ -3,13 +3,12 @@ package Term::TablePrint;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
-our $VERSION = '0.076';
+our $VERSION = '0.077';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
-use Carp         qw( carp croak );
+use Carp         qw( croak );
 use List::Util   qw( sum );
 use Scalar::Util qw( looks_like_number );
 
@@ -34,6 +33,7 @@ BEGIN {
 
 
 sub new {
+    # 'print_table' as a function uses its own implicit new
     my $class = shift;
     croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected." if @_ > 1;
     my ( $opt ) = @_;
@@ -536,6 +536,8 @@ sub __header_sep {
 }
 
 sub __sanitize_string {
+    # Use this function whenever a sanitized string is required instead of
+    # saving the sanitized strings to avoid a second copy of the list in memory.
     my ( $self, $str ) = @_; # copy
     return $self->{undef}                    if ! defined $str;
     return $self->__handle_reference( $str ) if ref $str;
@@ -545,10 +547,9 @@ sub __sanitize_string {
         $str =~ s/\p{Space}+\z//;
         $str =~ s/\p{Space}+/ /g;
     }
-    else {
-        $str =~ s/\p{Space}/ /g;
-    }
-    $str =~ s/\p{C}//g;
+    $str =~ s/\t/ /g;
+    $str =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
+    $str =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
     return $str;
 }
 
@@ -619,7 +620,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.076
+Version 0.077
 
 =cut
 
@@ -656,27 +657,16 @@ If the terminal is too narrow to print the table, the columns are adjusted to th
 If the option table_expand is enabled and a row is selected with Return, each column of that row is output in its own
 line preceded by the column name. This might be useful if the columns were cut due to the too low terminal width.
 
-To get a proper output C<print_table> uses the C<columns> method from L<Unicode::GCString> to calculate the string
-length.
+The following modifications are made (at a copy of the original data) to the table elements before the output.
 
-The following modifications are made (at a copy of the original data) before the output.
+Tab characters (C<\t>) are replaces with a space.
 
-Leading and trailing spaces are removed from the array elements
+Vertical spaces are squashed to two spaces
 
-    s/^\p{Space}+//;
-    s/\p{Space}+\z//;
+Control characters, code points of the surrogate ranges and non-characters are removed.
 
-and spaces are squashed to a single white-space.
-
-    s/\p{Space}+/ /g;
-
-In addition, characters of the Unicode property C<Other> are removed.
-
-    s/\p{C}//g;
-
-In C<Term::TablePrint> the C<utf8> C<warnings> are disabled.
-
-    no warnings 'utf8';
+If the option L<squash_spaces> is enabled leading and trailing spaces are removed from the array elements and spaces
+are squashed to a single space.
 
 The elements in a column are right-justified if one or more elements of that column do not look like a number, else they
 are left-justified.
@@ -826,7 +816,7 @@ To disable the automatic limit set I<max_rows> to 0.
 If the number of table rows is equal to or higher than I<max_rows>, the last row of the output tells that the limit has
 been reached.
 
-Default: 50_000
+Default: 100_000
 
 =head3 min_col_width
 

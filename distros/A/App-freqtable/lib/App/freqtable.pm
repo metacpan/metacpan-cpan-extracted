@@ -1,6 +1,6 @@
 package App::freqtable;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Print frequency table of lines/words/characters/bytes/numbers
@@ -17,7 +17,7 @@ App::freqtable - Print frequency table of lines/words/characters/bytes/numbers
 
 =head1 VERSION
 
-This document describes version 0.001 of App::freqtable (from Perl distribution App-freqtable), released on 2018-07-07.
+This document describes version 0.002 of App::freqtable (from Perl distribution App-freqtable), released on 2018-11-12.
 
 =head1 SYNOPSIS
 

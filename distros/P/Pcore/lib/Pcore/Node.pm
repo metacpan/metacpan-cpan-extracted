@@ -1,7 +1,7 @@
 package Pcore::Node;
 
 use Pcore -class, -res, -const;
-use Pcore::Util::Scalar qw[weaken refaddr is_ref is_blessed_ref is_plain_coderef is_plain_hashref];
+use Pcore::Util::Scalar qw[is_callback weaken refaddr is_ref is_blessed_hashref is_plain_coderef is_plain_hashref];
 use Pcore::HTTP::Server;
 use Pcore::Node::Server;
 use Pcore::Node::Proc;
@@ -79,7 +79,7 @@ sub BUILD ( $self, $args ) {
     $self->{listen} = P->uri( $self->{listen}, base => 'ws:', listen => 1 ) if !is_ref $self->{listen};
 
     # generate token
-    $self->{listen}->username(uuid_v4_str) if !defined $self->{listen}->{username};
+    $self->{listen}->set_username(uuid_v4_str) if !defined $self->{listen}->{username};
 
     # init node status
     $self->{status} = $self->{_has_requires} ? $NODE_STATUS_CONNECTING : $NODE_STATUS_ONLINE;
@@ -93,7 +93,7 @@ sub BUILD ( $self, $args ) {
     $self->_run_http_server;
 
     # remote server
-    if ( defined $self->{server} && ( !is_ref $self->{server} || ( is_blessed_ref $self->{server} && $self->{server}->isa('Pcore::Util::URI') ) ) ) {
+    if ( defined $self->{server} && ( !is_ref $self->{server} || ( is_blessed_hashref $self->{server} && $self->{server}->isa('Pcore::Util::URI') ) ) ) {
         $self->{_server_is_remote} = 1;
         $self->{server_is_online}  = 0;
 
@@ -195,7 +195,7 @@ sub _connect_to_remote_server ($self) {
             $self->{server},
             compression   => $self->{compression},
             pong_timeout  => $self->{pong_timeout},
-            token         => [ $self->{server}->username, $self->{id}, $self->_get_node_register_data ],
+            token         => [ $self->{server}->{username}, $self->{id}, $self->_get_node_register_data ],
             on_disconnect => sub ($h) {
 
                 # node was destroyed
@@ -346,7 +346,7 @@ sub _connect_node ( $self, $node_id, $check_connecting = 1 ) {
             $node->{listen},
             compression   => $self->{compression},
             pong_timeout  => $self->{pong_timeout},
-            token         => [ $node->{listen}->username, $self->{id}, $self->{type} ],
+            token         => [ $node->{listen}->{username}, $self->{id}, $self->{type} ],
             bindings      => $self->_get_bindings( $node->{type} ) // undef,
             node_id       => $node_id,
             node_type     => $node->{type},
@@ -856,7 +856,7 @@ sub rpc_call ( $self, $type, $method, @args ) {
     if ( !defined $h ) {
         my $res = res [ 404, qq[Node type "$type" is not available] ];
 
-        my $cb = is_plain_coderef $args[-1] || ( is_blessed_ref $args[-1] && $args[-1]->can('IS_CALLBACK') ) ? pop @args : undef;
+        my $cb = is_plain_coderef $args[-1] || is_callback $args[-1] ? pop @args : undef;
 
         return $cb ? $cb->($res) : $res;
     }

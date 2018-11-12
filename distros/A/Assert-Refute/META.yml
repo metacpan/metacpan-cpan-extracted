@@ -25,5 +25,8 @@ requires:
 resources:
   bugtracker: https://github.com/dallaylaen/assert-refute-perl/issues
   repository: https://github.com/dallaylaen/assert-refute-perl.git
-version: '0.1301'
+version: '0.1501'
+x_contributors:
+  - 'Jacobo Chamorro'
+  - 'Mohammad S Anwar <manwar@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

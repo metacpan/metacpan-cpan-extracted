@@ -17,7 +17,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0386';
+our $VERSION = '0.0388';
 
 my $SPVM_ENV;
 my $BUILDER;
@@ -54,7 +54,7 @@ CHECK {
   if ($BUILDER) {
     my $compile_success = $BUILDER->build_spvm();
     unless ($compile_success) {
-      die "SPVM compile error";
+      exit(255);
     }
     
     # Set env

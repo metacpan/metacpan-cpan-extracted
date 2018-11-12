@@ -18,7 +18,7 @@ has _init => ( init_arg => undef );
 
 const our $INDENT => q[ ] x 4;
 
-sub _build_id ($self) { return 'file:' . $self->{uri}->path->to_string }
+sub _build_id ($self) { return "file:$self->{uri}->{path}->{path}" }
 
 sub forward_event ( $self, $ev ) {
     $self->{_init} //= do {
@@ -29,13 +29,13 @@ sub forward_event ( $self, $ev ) {
         $self->{_tmpl}->add_tmpl( message => "$self->{tmpl}$LF" );
 
         # init path
-        if ( $self->{uri}->path->is_abs ) {
-            P->file->mkpath( $self->{uri}->path->dirname );
+        if ( $self->{uri}->{path}->{is_abs} ) {
+            P->file->mkpath( $self->{uri}->{path}->{dirname} );
 
-            $self->{_path} = $self->{uri}->path->to_string;
+            $self->{_path} = $self->{uri}->{path}->{path};
         }
         else {
-            $self->{_path} = P->path( $ENV->{DATA_DIR} . $self->{uri}->path->to_string );
+            $self->{_path} = "$ENV->{DATA_DIR}/$self->{uri}->{path}";
         }
 
         1;

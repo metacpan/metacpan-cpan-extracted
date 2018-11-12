@@ -1,13 +1,13 @@
         -- next big thing --
-+   +   API bail_out()
++   ++  MOD split out T::Numeric, T::Array, and T::Hash
 
         -- backlog --
++   ++  API one-line report format for dying/warning
 ++  +   MOD multiline like
-+   ++  MOD port Test::Deep to refute
 +   ++  MOD port Test::Differences to refute
 +   ++  TST Even more examples
 ++  +   MOD T::Array: point out misbehaving elements in all tests
-++  ++  API todo() or $TODO - need to do something about passing tests
+++  ++  API todo() or $TODO - don't slow down passing tests!
 ++  ++  MOD Round-trip assertion
 ++  ++  MOD Util::Tempfile - preserve file if tests fail
 +++ +   API If contract with args fails, display args
@@ -15,6 +15,7 @@
 +++ +   API Some extra goodies to contract {...} like title
 +++ +   API verbosity switch to include more/less info in report
 +++ +   MOD T::Array: block subs curry if no second arg
++++ +   API bail_out() - can die for now, only needed for Unit
 ++  +++ DRV add Test-based driver
 ++  +++ MOD Provide what Test::Most can
 ++  +++ MOD import Test::Builder-based tests
@@ -23,7 +24,6 @@
 +++ +++ MOD async_ok "event id" => [ prerequisite1, prerequisite2 ]
 
         -- need to think more --
-++  +++ API one-line abbreviated log-friendly report
 +++ +   MOD `is_unique` - make a string unique within current contract
 +++ +++ MOD Module to check that "foo" is really implementation of "bar"
 

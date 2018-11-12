@@ -16,7 +16,7 @@ use File::Spec::Functions qw/ file_name_is_absolute /;
 use Module::Load 0.10;
 use Module::Loaded;
 
-our $VERSION = 'v3.3.3';
+our $VERSION = 'v3.3.4';
 
 our %EXPORT_TAGS = (
     'all'     => [qw( hex2tuple tuple2hex all_schemes )],
@@ -382,7 +382,7 @@ Graphics::ColorNames - defines RGB values for common color names
 
 =head1 VERSION
 
-version v3.3.3
+version v3.3.4
 
 =head1 SYNOPSIS
 
@@ -581,6 +581,41 @@ Since version 1.03, C<NamesRgbTable> may also return a code reference:
   }
 
 See L<Graphics::ColorNames::GrayScale> for an example.
+
+=head1 ROADMAP
+
+The following changes are planned in the future:
+
+=over 4
+
+=item *
+
+Support for Perl versions earlier than 5.10 will be removed sometime
+in 2019.
+
+=item *
+
+Autoloaded color name methods will be removed.
+
+=item *
+
+The tied interface will be removed, but implemented in a separate
+module for users that wish to use it.
+
+=item *
+
+The namespace for color schemes will be moved to the
+C<Graphics::ColorNames::Schemes> but optios will be added to use the
+existing scheme.
+
+This will allow modules to be named like C<Graphics::ColorNames::Tied>
+without being confused for color schemes.
+
+=item *
+
+This module will be rewritten to be a L<Moo>-based class.
+
+=back
 
 =head1 SEE ALSO
 

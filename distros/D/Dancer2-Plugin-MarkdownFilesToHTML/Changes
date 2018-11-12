@@ -1,6 +1,28 @@
 Revision history for Dancer2-Plugin-MarkdownFilesToHTML
 
+0.017     2018-11-08 21:06:25-05:00 America/New_York
+  - fix critical bug where local options were getting ignored
+  - add test to see if prefixes work as advertised
+  - fix internal document links
+
+0.016     2018-11-08 20:27:01-05:00 America/New_York
+  - Add #Abstract comment
+  - Remove NAME section from inline POD
+  - Fix up section links in POD
+  - remove newer regex so it will work with older versions of perl
+  - change "route_root" option to "prefix"
+
+0.015     2018-11-08 11:38:07-05:00 America/New_York
+  - remove unneeded test code
+  - add and improve code comments
+  - documentation rearrangement and improvements
+  - major overhaul to code
+    - replace two keywords with single keyword
+    - made use of Moo attributes for loading configuration defaults
+    - streamlined code and code logic
+
 0.014     2018-11-07 11:29:25-05:00 America/New_York
+  - make saving cache files cross platform (win32)
 
 0.013     2018-11-07 09:46:59-05:00 America/New_York
   - attempt fixes for systems with failing smoke tests

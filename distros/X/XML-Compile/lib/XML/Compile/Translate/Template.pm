@@ -8,7 +8,7 @@
 
 package XML::Compile::Translate::Template;
 use vars '$VERSION';
-$VERSION = '1.60';
+$VERSION = '1.61';
 
 use base 'XML::Compile::Translate';
 
@@ -53,6 +53,7 @@ my (%recurse_type, %reuse_type, %recurse_tag, %reuse_tag);
 sub compile($@)
 {   my ($self, $type, %args) = @_;
     $self->{_output} = $args{output};
+    $self->{_style}  = $args{output_style} || 1;
     (%recurse_type, %reuse_type, %recurse_tag, %reuse_tag) = ();
     $self->SUPER::compile($type, %args);
 }
@@ -687,10 +688,9 @@ sub _perlAny($$);
 sub _perlAny($$)
 {   my ($self, $ast, $args) = @_;
 
-    my @lines;
+    my ($pref, @lines);
     if($ast->{_TYPE} && $args->{show_type})
-    {   my $pref = $self->prefixed($ast->{_TYPE});
-        if($pref)
+    {   if($pref = $self->prefixed($ast->{_TYPE}))
         {   push @lines  # not perfect, but a good attempt
               , $pref =~ m/^[aiou]/i && $pref !~ m/^(uni|eu)/i
               ? "# is an $pref" : "# is a $pref";
@@ -770,14 +770,19 @@ sub _perlAny($$)
         if($ast->{is_array})
         {   s/^(.)/  $1/ for @subs;
             $subs[0]  =~ s/^[ ]{0,3}/[ {/;
-            if($subs[-1] =~ m/\#\s/) { push @subs, "}, ], " }
-            else {$subs[-1] .= ' }, ], ' }
+            if($subs[-1] =~ m/\#\s/ || $self->{_style}==2)
+                 { push @subs, "}, ], " }
+            else { $subs[-1] .= ' }, ], ' }
             push @lines, "$tag =>", @subs;
         }
         else
         {   $subs[0]  =~ s/^  /{ /;
-            if($subs[-1] =~ m/\#\s/) { push @subs, "}, " }
-            else {$subs[-1] .= ' },' }
+            if($self->{_style}==2)
+            {   push @subs, "}, ";
+                $subs[-1] .= "# $pref" if $pref;
+            }
+            elsif($subs[-1] =~ m/\#\s/) { push @subs, "}, " }
+            else { $subs[-1] .= ' },' }
             push @lines, "$tag =>", @subs;
         }
     }

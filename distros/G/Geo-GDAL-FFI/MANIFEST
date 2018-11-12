@@ -17,6 +17,8 @@ lib/Geo/GDAL/FFI/GeomFieldDefn.pm
 lib/Geo/GDAL/FFI/Layer.pm
 lib/Geo/GDAL/FFI/Object.pm
 lib/Geo/GDAL/FFI/SpatialReference.pm
+lib/Geo/GDAL/FFI/VSI.pm
+lib/Geo/GDAL/FFI/VSI/File.pm
 t/00.t
 t/geometry.t
 t/pdl.t

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Attachment;
-$RT::Client::REST::Attachment::VERSION = '0.53';
+$RT::Client::REST::Attachment::VERSION = '0.54';
 use base 'RT::Client::REST::Object';
 
 use Params::Validate qw(:types);
@@ -157,7 +157,7 @@ RT::Client::REST::Attachment - attachment object representation.
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -272,6 +272,12 @@ Wraps the normal I<can()> call, to exclude unsupported methods from parent.
 Returns 'attachment'.
 
 =back
+
+=head1 CREATING ATTACHMENTS
+
+Currently RT does not allow creating attachments via their API.
+
+See L<https://rt-wiki.bestpractical.com/wiki/REST#Ticket_Attachment>
 
 =head1 SEE ALSO
 

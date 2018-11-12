@@ -25,7 +25,7 @@ sub dies_like (&$$) { ## no critic
     };
 };
 
-use Assert::Refute qw(:core);
+use Assert::Refute::Contract qw(contract);
 
 my $c = contract{} args => 3;
 

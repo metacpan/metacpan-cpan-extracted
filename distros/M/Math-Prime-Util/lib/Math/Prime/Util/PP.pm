@@ -5,7 +5,7 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::PP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PP::VERSION = '0.71';
+  $Math::Prime::Util::PP::VERSION = '0.72';
 }
 
 BEGIN {
@@ -2054,6 +2054,18 @@ sub twin_prime_count_approx {
   return int(1.32032363169373914785562422 * $li2 + 0.5);
 }
 
+sub semiprime_count_approx {
+  my($n) = @_;
+  return 0 if $n < 4;
+  _validate_positive_integer($n);
+  $n = _upgrade_to_float($n) if ref($n);
+  my $l1 = log($n);
+  my $l2 = log($l1);
+  #my $est = $n * $l2 / $l1;
+  my $est = $n * ($l2 + 0.302) / $l1;
+  int(0.5+$est);
+}
+
 sub nth_twin_prime {
   my($n) = @_;
   return undef if $n < 0;  ## no critic qw(ProhibitExplicitReturnUndef)
@@ -2087,6 +2099,28 @@ sub nth_twin_prime_approx {
   _binary_search($n, $lo, $hi,
                  sub{Math::Prime::Util::twin_prime_count_approx(shift)},
                  sub{ ($_[2]-$_[1])/$_[1] < 1e-15 } );
+}
+
+sub nth_semiprime {
+  my $n = shift;
+  return undef if $n < 0;  ## no critic qw(ProhibitExplicitReturnUndef)
+  return (undef,4,6,9,10,14,15,21,22)[$n] if $n <= 8;
+  my $logn = log($n);
+  my $est = 0.966 * $n * $logn / log($logn);
+  1+_binary_search($n, int(0.9*$est)-1, int(1.15*$est)+1,
+                   sub{Math::Prime::Util::semiprime_count(shift)});
+}
+
+sub nth_semiprime_approx {
+  my $n = shift;
+  return undef if $n < 0;  ## no critic qw(ProhibitExplicitReturnUndef)
+  _validate_positive_integer($n);
+  return (undef,4,6,9,10,14,15,21,22)[$n] if $n <= 8;
+  $n = _upgrade_to_float($n) if ref($n);
+  my $l1 = log($n);
+  my $l2 = log($l1);
+  my $est = 0.966 * $n * $l1 / $l2;
+  int(0.5+$est);
 }
 
 sub nth_ramanujan_prime_upper {
@@ -4095,15 +4129,19 @@ sub is_frobenius_khashin_pseudoprime {
 
   $n = Math::BigInt->new("$n") unless ref($n) eq 'Math::BigInt';
 
-  my $k;
-  my $c = 1;
-  do {
-    $c += 2;
-    $k = kronecker($c, $n);
-  } while $k == 1;
-  return 0 if $k == 0;
+  my($k,$c) = (2,1);
+  if    ($n % 4 == 3) { $c = $n-1; }
+  elsif ($n % 8 == 5) { $c = 2; }
+  else {
+    do {
+      $c += 2;
+      $k = kronecker($c, $n);
+    } while $k == 1;
+  }
+  return 0 if $k == 0 || ($k == 2 && !($n % 3));;
 
-  my($ra,$rb,$a,$b,$d) = (1,1,1,1,$n-1);
+  my $ea = ($k == 2) ? 2 : 1;
+  my($ra,$rb,$a,$b,$d) = ($ea,1,$ea,1,$n-1);
   while (!$d->is_zero) {
     if ($d->is_odd()) {
       ($ra, $rb) = ( (($ra*$a)%$n + ((($rb*$b)%$n)*$c)%$n) % $n,
@@ -4115,7 +4153,7 @@ sub is_frobenius_khashin_pseudoprime {
                    (($b*$a)%$n + ($a*$b)%$n) % $n );
     }
   }
-  return ($ra == 1 && $rb == $n-1) ? 1 : 0;
+  return ($ra == $ea && $rb == $n-1) ? 1 : 0;
 }
 
 sub is_frobenius_underwood_pseudoprime {
@@ -6610,7 +6648,7 @@ Math::Prime::Util::PP - Pure Perl version of Math::Prime::Util
 
 =head1 VERSION
 
-Version 0.71
+Version 0.72
 
 
 =head1 SYNOPSIS

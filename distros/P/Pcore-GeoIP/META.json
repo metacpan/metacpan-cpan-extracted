@@ -70,6 +70,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-geoip/overview"
       }
    },
-   "version" : "v1.3.0",
+   "version" : "v1.3.1",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

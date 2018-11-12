@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::Generate::ManifestSkip;
 
-# ABSTRACT: generate a MANIFEST.SKIP file for your distribution
+# ABSTRACT: Generate a MANIFEST.SKIP file for your distribution
 
 use v5.10;
 
@@ -19,7 +19,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.5';
 
 
 sub mvp_multivalue_args { qw/ add remove / }
@@ -60,13 +60,18 @@ sub gather_files {
     $mms->add( $zilla->name . '-.*/' );
     $mms->add( $zilla->name . '-.*\.tar\.gz' );
     $mms->add( '\.mailmap$' );
+    $mms->add( 'perltidy\.(LOG|ERR)' );
+    $mms->add( 'fatlib/' );
 
     $mms->remove('^MANIFEST\.SKIP$');
     $mms->remove('^dist.ini$');
     $mms->remove('^weaver.ini$');
     $mms->remove('^xt/');
 
-    $mms->add('cpanfile\.snapshot$') if any { $_->name eq 'cpanfile' } @files;
+    if ( any { $_->name eq 'cpanfile' } @files ) {
+        $mms->add('cpanfile\.snapshot$');
+        $mms->add('local/');
+    }
     $mms->add('_alien/') if any { $_->name eq 'alienfile' } @files;
 
     foreach my $file (@{ $self->add }) {
@@ -102,18 +107,18 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::Generate::ManifestSkip - generate a MANIFEST.SKIP file for your distribution
+Dist::Zilla::Plugin::Generate::ManifestSkip - Generate a MANIFEST.SKIP file for your distribution
 
 =head1 VERSION
 
-version v0.1.3
+version v0.1.5
 
 =head1 SYNOPSIS
 
 In your F<dist.ini> file:
 
   [Generate::ManifestSkip]
-  :version = v0.1.2
+  :version = v0.1.3
 
 =head1 DESCRIPTION
 
@@ -142,6 +147,10 @@ By defaut, the following files are added to the skipfile:
 
 =item C<{$dist_name}-.*\.tar\.gz>
 
+=item C<perltidy\.(LOG|ERR)'>
+
+=item C<fatlib/>
+
 =back
 
 where C<$dist_name> is the name of the distribution.
@@ -154,7 +163,7 @@ will be added.
 =head2 remove
 
 This removes a regular expression from the L</skipfile>. Note that it
-must the expression from L<Module::Manifest::Skip>.
+must exactly match the expression used by L<Module::Manifest::Skip>.
 
 By default, the following files are already removed from the skipfile:
 

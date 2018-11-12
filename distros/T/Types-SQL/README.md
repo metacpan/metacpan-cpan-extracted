@@ -4,7 +4,7 @@ Types::SQL - a library of SQL types
 
 # VERSION
 
-version v0.2.0
+version v0.2.1
 
 # SYNOPSIS
 
@@ -138,7 +138,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Robert Rothenberg.
+This software is Copyright (c) 2016-2018 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -2,6 +2,7 @@ Changelog.ini
 Changes
 lib/Tree.pm
 lib/Tree/Binary2.pm
+lib/Tree/DeepClone.pm
 lib/Tree/Fast.pm
 LICENSE
 Makefile.PL
@@ -9,6 +10,8 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 scripts/print.tree.pl
+t/00.versions.t
+t/00.versions.tx
 t/lib/Tests.pm
 t/Tree/000_interface.t
 t/Tree/001_root_node.t
@@ -30,6 +33,7 @@ t/Tree/017_traverse_scalar.t
 t/Tree_Binary/000_binary_trees.t
 t/Tree_Binary/001_mirror.t
 t/Tree_Binary/002_clone.t
+t/Tree_DeepClone/01.deep.clone.t
 t/Tree_Fast/001_clone.t
 xt/author/pod.t
 xt/author/pod_coverage.t

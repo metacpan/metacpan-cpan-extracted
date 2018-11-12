@@ -106,4 +106,7 @@
 Graphics-ColorNames-.*/
 Graphics-ColorNames-.*\.tar\.gz
 \.mailmap$
+perltidy\.(LOG|ERR)
+fatlib/
 cpanfile\.snapshot$
+local/

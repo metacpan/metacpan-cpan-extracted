@@ -53,8 +53,6 @@
  * using parallel primesieve, though cannot come close to LMO.
  */
 
-/* Below this size, just sieve (with table speedup). */
-#define SIEVE_LIMIT  66000000
 /* Adjust to get best performance.  Alpha from TOS paper. */
 #define M_FACTOR(n)     (UV) ((double)n * (log(n)/log(5.2)) * (log(log(n))-1.4))
 /* Size of segment used for previous primes, must be >= 21 */
@@ -66,6 +64,7 @@
 #define FUNC_icbrt 1
 #include "lmo.h"
 #include "util.h"
+#include "constants.h"
 #include "prime_nth_count.h"
 #include "cache.h"
 #include "sieve.h"
@@ -577,8 +576,20 @@ UV LMO_prime_count(UV n)
   const uint32 c = PHIC;  /* We can use our fast function for this */
 
   /* For "small" n, use our table+segment sieve. */
-  if (n < SIEVE_LIMIT || n < 10000)  return segment_prime_count(2, n);
+  if (n < _MPU_LMO_CROSSOVER || n < 10000)  return segment_prime_count(2, n);
   /* n should now be reasonably sized (not tiny). */
+
+#ifdef USE_PRIMECOUNT_FOR_LARGE_LMO
+  if (n > 110000000000UL) {
+    FILE *f;
+    char cmd[100];
+    sprintf(cmd, "primecount %lu", n);
+    f = popen(cmd, "r");
+    fscanf(f, "%lu", &sum1);
+    pclose(f);
+    return sum1;
+  }
+#endif
 
   N2 = isqrt(n);             /* floor(N^1/2) */
   N3 = icbrt(n);             /* floor(N^1/3) */

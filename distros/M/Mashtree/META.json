@@ -40,6 +40,7 @@
             "Data::Dumper" : "0",
             "Exporter" : "0",
             "File::Basename" : "0",
+            "Graph::Dijkstra" : "0.7",
             "List::Util" : "0",
             "Thread::Queue" : "0",
             "perl" : "5.010000",
@@ -56,6 +57,6 @@
          "web" : "https://github.com/lskatz/mashtree"
       }
    },
-   "version" : "0.33",
+   "version" : "0.34",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

@@ -12,7 +12,7 @@ use Time::Piece ();
 
 has 'mysql';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub dequeue {
   my ($self, $id, $wait, $options) = @_;
@@ -55,7 +55,7 @@ SQL
   my $current_hour = $now->hour;
   for my $i ( 0..23 ) {
     my $i_hour = ( $current_hour - ( 23 - $i ) ) % 24;
-    if ( $data->[ $i ]{ hour } != $i_hour ) {
+    if ( exists $data->[$i] and $data->[ $i ]{ hour } != $i_hour ) {
       my $epoch = $now->epoch - ( 3600 * ( 24 - $i ) );
       splice @$data, $i, 0, {
         epoch => $epoch - ( $epoch % 3600 ),
@@ -949,7 +949,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -1371,7 +1371,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexander Nalobin Dmitry Krylov Olaf Alders Paul Cochrane Zoffix Znet
+=for stopwords Alexander Nalobin Dmitry Krylov Jason A. Crome Olaf Alders Paul Cochrane Zoffix Znet
 
 =over 4
 
@@ -1382,6 +1382,10 @@ Alexander Nalobin <nalobin@reg.ru>
 =item *
 
 Dmitry Krylov <pentabion@gmail.com>
+
+=item *
+
+Jason A. Crome <jcrome@empoweredbenefits.com>
 
 =item *
 

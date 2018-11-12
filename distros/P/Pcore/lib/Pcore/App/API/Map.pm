@@ -4,9 +4,9 @@ use Pcore -class;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Package::Stash::XS qw[];
 
-has app    => ();    # ( isa => ConsumerOf ['Pcore::App'], required => 1 );
-has method => ();    # ( isa => HashRef, init_arg => undef );
-has obj    => ();    # ( isa => HashRef, init_arg => undef );
+has app    => ( required => 1 );    # ConsumerOf ['Pcore::App']
+has method => ();                   # HashRef
+has obj    => ();                   # HashRef
 
 # TODO https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
 
@@ -36,7 +36,7 @@ sub init ($self) {
 
     # scan filesystem namespace, find and preload controllers
     for my $inc ( grep { !ref } @INC ) {
-        for my $file ( ( P->path1("$inc/$ns_path")->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
+        for my $file ( ( P->path("$inc/$ns_path")->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
 
             # .pm file
             if ( $file =~ s/[.]pm\z//sm ) {

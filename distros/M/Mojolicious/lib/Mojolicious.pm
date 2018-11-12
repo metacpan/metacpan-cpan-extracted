@@ -59,7 +59,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.05';
+our $VERSION  = '8.06';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -119,12 +119,14 @@ sub dispatch {
   # Start timer (ignore static files)
   my $stash = $c->stash;
   unless ($stash->{'mojo.static'} || $stash->{'mojo.started'}) {
-    my $req    = $c->req;
-    my $method = $req->method;
-    my $path   = $req->url->path->to_abs_string;
-    my $id     = $req->request_id;
-    $self->log->debug(qq{$method "$path" ($id)});
-    $c->helpers->timing->begin('mojo.timer');
+    $self->log->debug(sub {
+      my $req    = $c->req;
+      my $method = $req->method;
+      my $path   = $req->url->path->to_abs_string;
+      my $id     = $req->request_id;
+      $c->helpers->timing->begin('mojo.timer');
+      return qq{$method "$path" ($id)};
+    });
   }
 
   # Routes
@@ -898,6 +900,8 @@ Al Newkirk
 Alex Efros
 
 Alex Salimon
+
+Alexander Karelas
 
 Alexey Likhatskiy
 

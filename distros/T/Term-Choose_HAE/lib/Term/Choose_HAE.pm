@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -18,8 +18,6 @@ use Term::Choose::Constants qw( :choose :screen :linux );
 use Term::Choose::LineFold qw( print_columns );
 
 use parent 'Term::Choose';
-
-no warnings 'utf8';
 
 
 
@@ -64,68 +62,80 @@ sub __copy_orig_list {
             if ( ref ) {
                 $_ = sprintf "%s(0x%x)", ref $_, $_;
             }
-            s/\p{Space}/ /g;               # replace, but don't squash sequences of spaces
-            s/\p{C}/$&=~m|\e| && $&/eg;    # remove \p{C} but keep \e
+            s/\t/ /g;
+            s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
+            s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]/$&=~m|\e| && $&/eg; # remove \p{Cc} but keep \e\[
         }
     }
 }
 
 
-sub __unicode_trim {
-    my ( $self, $str, $len ) = @_;
-    return ta_mbtrunc( $str, $len );
+sub __length_longest {
+    my ( $self ) = @_;
+    my $list = $self->{list};
+    if ( $self->{ll} ) {
+        $self->{length_longest} = $self->{ll};
+        $self->{length} = [ ( $self->{length_longest} ) x @$list ];
+    }
+    else {
+        my $len = [];
+        my $longest = 0;
+        for my $i ( 0 .. $#$list ) {
+            $len->[$i] = print_columns( _strip_ansi_color( $list->[$i] ) );
+            $longest = $len->[$i] if $len->[$i] > $longest;
+        }
+        $self->{length_longest} = $longest;
+        $self->{length} = $len;
+    }
 }
+
 
 sub _strip_ansi_color {
     ( my $str = $_[0] ) =~ s/\e\[[\d;]*m//msg;
     return $str;
 }
 
-sub __print_columns {
-    #my $self = $_[0];
-    print_columns( _strip_ansi_color( $_[1] ) );
-}
 
-
-sub __wr_cell {
-    my( $self, $row, $col ) = @_;
-    my $is_current_pos = $row == $self->{pos}[ROW] && $col == $self->{pos}[COL];
-    my $idx = $self->{rc2idx}[$row][$col];
-    my( $wrap, $str ) = ( '', '' );
-    open my $trapstdout, '>', \$wrap or die "can't open TRAPSTDOUT: $!";
-    if ( $#{$self->{rc2idx}} == 0 ) {
-        my $lngth = 0;
-        if ( $col > 0 ) {
-            for my $cl ( 0 .. $col - 1 ) {
-                my $i = $self->{rc2idx}[$row][$cl];
-                $lngth += $self->__print_columns( $self->{list}[$i] );
-                $lngth += $self->{pad};
-            }
+sub __unicode_sprintf {
+    my ( $self, $idx, $is_current_pos, $is_marked ) = @_;
+    my $unicode = '';
+    my $str_length = $self->{length}[$idx];
+    if ( $str_length > $self->{avail_col_width} ) {
+        if ( $self->{avail_col_width} > 3 ) {
+            $unicode = ta_mbtrunc( $self->{list}[$idx], $self->{avail_col_width} - 3 ) . '...';
         }
-        $self->__goto( $row - $self->{p_begin}, $lngth );
-        select $trapstdout;
-        print BOLD_UNDERLINE if $self->{marked}[$row][$col];    # use escape sequences for Win32 too and translate them with Win32::Console::ANSI
-        print REVERSE        if $is_current_pos;                # so Parse::ANSIColor::Tiny can take into account these highlightings
-        select STDOUT;
-        $str = $self->{list}[$idx];
-        $self->{i_col} += $self->__print_columns( $self->{list}[$idx] );
+        else {
+            $unicode = ta_mbtrunc( $self->{list}[$idx], $self->{avail_col_width} );
+        }
+    }
+    elsif ( $str_length < $self->{avail_col_width} ) {
+        if ( $self->{justify} == 0 ) {
+            $unicode = $self->{list}[$idx] . " " x ( $self->{avail_col_width} - $str_length );
+        }
+        elsif ( $self->{justify} == 1 ) {
+            $unicode = " " x ( $self->{avail_col_width} - $str_length ) . $self->{list}[$idx];
+        }
+        elsif ( $self->{justify} == 2 ) {
+            my $all = $self->{avail_col_width} - $str_length;
+            my $half = int( $all / 2 );
+            $unicode = " " x $half . $self->{list}[$idx] . " " x ( $all - $half );
+        }
     }
     else {
-        $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width} );
-        select $trapstdout;
-        print BOLD_UNDERLINE if $self->{marked}[$row][$col];
-        print REVERSE        if $is_current_pos;
-        select STDOUT;
-        $str = $self->__unicode_sprintf( $idx );
-        $self->{i_col} += $self->{length_longest};
+        $unicode = $self->{list}[$idx];
     }
+
+    my $wrap = '';
+    open my $trapstdout, '>', \$wrap or die "can't open TRAPSTDOUT: $!";
+    select $trapstdout;
+    print BOLD_UNDERLINE if $is_marked;
+    print REVERSE        if $is_current_pos;
     select STDOUT;
     close $trapstdout;
-
     my $ansi   = Parse::ANSIColor::Tiny->new();
     my @codes  = ( $wrap =~ /\e\[([\d;]*)m/g );
     my @attr   = $ansi->identify( @codes ? @codes : '' );
-    my $marked = $ansi->parse( $str );
+    my $marked = $ansi->parse( $unicode );
     if ( $self->{length}[$idx] > $self->{avail_width} && $self->{fill_up} != 2 ) {
         if ( @$marked > 1 && ! @{$marked->[-1][0]} && $marked->[-1][1] =~ /^\.\.\.\z/ ) {
             $marked->[-1][0] = $marked->[-2][0];
@@ -164,10 +174,12 @@ sub __wr_cell {
         }
     }
     print join '', map { @{$_->[0]} ? colored( @$_ ) : $_->[1] } @$marked;
-    if ( $self->{marked}[$row][$col] || $is_current_pos ) {
+    if ( $is_marked || $is_current_pos ) {
         print RESET;
     }
 }
+
+
 
 
 1;
@@ -185,7 +197,7 @@ Term::Choose_HAE - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 0.055
+Version 0.056
 
 =cut
 

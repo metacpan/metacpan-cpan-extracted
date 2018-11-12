@@ -128,6 +128,7 @@ lib/Mojolicious/resources/public/mojo/logo.png
 lib/Mojolicious/resources/public/mojo/noraptor.png
 lib/Mojolicious/resources/public/mojo/notfound.png
 lib/Mojolicious/resources/public/mojo/pinstripe-dark.png
+lib/Mojolicious/resources/public/mojo/pinstripe-light.png
 lib/Mojolicious/resources/public/mojo/prettify/prettify-mojo-dark.css
 lib/Mojolicious/resources/public/mojo/prettify/run_prettify.js
 lib/Mojolicious/resources/templates/mojo/debug.html.ep

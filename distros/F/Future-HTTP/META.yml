@@ -2,9 +2,15 @@
 abstract: 'provide the most appropriate HTTP client with a Future API'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires: {}
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::HTTP::LocalServer: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +27,15 @@ recommends:
   IO::Uncompress::RawInflate: '0'
   MIME::Base64: '0'
   MIME::QuotedPrint: '0'
+requires:
+  Filter::signatures: '0.03'
+  Future: '0.31'
+  HTTP::Headers: '6.07'
+  HTTP::Tiny: '0'
+  Moo: '2'
+  perl: '5.006'
 resources:
   repository: git://github.com/Corion/future-http.git
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

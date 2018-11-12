@@ -1,26 +1,26 @@
 package Pcore::Core::CLI::Type;
 
 use Pcore -role, -const;
-use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
+use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref is_plain_coderef];
 
 const our $TYPE => {
     Str => sub ($val) {
-        return Str->check($val);
+        return defined $val;
     },
     Bool => sub ($val) {
-        return Bool->check($val);
+        return $val eq 1 || $val eq 0;
     },
     Int => sub ($val) {
-        return Int->check($val);
+        return $val =~ /\A[[:digit:]-]+\z/sm;
     },
     PositiveInt => sub ($val) {
-        return PositiveInt->check($val);
+        return $val =~ /\A[[:digit:]-]+\z/sm && $val > 0;
     },
     PositiveOrZeroInt => sub ($val) {
-        return PositiveOrZeroInt->check($val);
+        return $val =~ /\A[[:digit:]-]+\z/sm && $val >= 0;
     },
     Num => sub ($val) {
-        return Num->check($val);
+        return $val =~ /\A[[:digit:].-]+\z/sm && $val > 0;
     },
     Path => sub ($val) {
         return -e $val;
@@ -36,24 +36,24 @@ const our $TYPE => {
 sub _validate_isa ( $self, @ ) {
     my $vals = is_plain_arrayref $_[1] ? $_[1] : is_plain_hashref $_[1] ? [ values $_[1]->%* ] : [ $_[1] ];
 
-    my $isa_ref = ref $self->isa;
+    my $isa_ref = ref $self->{isa};
 
     for my $val ( $vals->@* ) {
         if ( !$isa_ref ) {
-            return qq[value "$val" is not a ] . uc $self->isa if !$TYPE->{ $self->isa }->($val);
+            return qq[value "$val" is not a ] . uc $self->{isa} if !$TYPE->{ $self->{isa} }->($val);
         }
         elsif ( $isa_ref eq 'CODE' ) {
-            if ( my $error_msg = $self->isa->($val) ) {
+            if ( my $error_msg = $self->{isa}->($val) ) {
                 return $error_msg;
             }
         }
         elsif ( $isa_ref eq 'Regexp' ) {
-            return qq[value "$val" should match regexp ] . $self->isa if $val !~ $self->isa;
+            return qq[value "$val" should match regexp ] . $self->{isa} if $val !~ $self->{isa};
         }
         elsif ( $isa_ref eq 'ARRAY' ) {
             my $possible_val = [];
 
-            for ( $self->isa->@* ) {
+            for ( $self->{isa}->@* ) {
                 if ( index( $_, $val, 0 ) == 0 ) {
                     if ( length == length $val ) {
 
@@ -68,10 +68,10 @@ sub _validate_isa ( $self, @ ) {
             }
 
             if ( !$possible_val->@* ) {
-                return qq[value "$val" should be one of the: ] . join q[, ], map {qq["$_"]} $self->isa->@*;
+                return qq[value "$val" should be one of the: ] . join ', ', map {qq["$_"]} $self->{isa}->@*;
             }
             elsif ( $possible_val->@* > 1 ) {
-                return qq[value "$val" is ambigous, did you mean: ] . join q[, ], map {qq["$_"]} $possible_val->@*;
+                return qq[value "$val" is ambigous, did you mean: ] . join ', ', map {qq["$_"]} $possible_val->@*;
             }
             else {
                 $val = $possible_val->[0];
@@ -89,6 +89,8 @@ sub _validate_isa ( $self, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
+## |    3 | 11                   | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 36                   | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_validate_isa' declared but not     |
 ## |      |                      | used                                                                                                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

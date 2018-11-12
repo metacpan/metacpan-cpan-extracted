@@ -24,19 +24,18 @@ name: HTML-Hyphenate
 provides:
   HTML::Hyphenate:
     file: lib/HTML/Hyphenate.pm
-    version: v1.1.0
+    version: v1.1.1
 requires:
   Log::Log4perl: '0'
-  Mojo::DOM: '0'
+  Mojolicious: '6'
   Moose: '0'
   Readonly: '1.03'
   Set::Scalar: '0'
   TeX::Hyphen: '0'
   TeX::Hyphen::Pattern: '0.1'
-  namespace::autoclean: '0'
   perl: v5.14.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ipenburg/HTML-Hyphenate
-version: v1.1.0
+version: v1.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -53,6 +53,6 @@
          "web" : "https://github.com/kuerbis/Term-TablePrint"
       }
    },
-   "version" : "0.076",
+   "version" : "0.077",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

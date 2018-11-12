@@ -32,4 +32,18 @@ sub alien_provides_cflags {
     return $cflags;
 }
 
+sub ACTION_alien_code {
+    my $self = shift;
+    $self->SUPER::ACTION_alien_code();
+    my $system_provides = scalar $self->config_data('system_provides');
+
+    my $version = $self->alien_check_installed_version;
+    my ($major, $minor) = split /\./, $version;
+    if ($major > 3 || ($major == 3 && $minor >= 6)) {
+        if (!ExtUtils::CppGuess->new->is_msvc) {
+            $system_provides->{'C++flags'} = "-std=c++11";
+        }
+    }
+}
+
 1;

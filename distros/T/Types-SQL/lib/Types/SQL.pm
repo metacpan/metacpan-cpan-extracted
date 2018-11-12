@@ -1,5 +1,7 @@
 package Types::SQL;
 
+use v5.8;
+
 use strict;
 use warnings;
 
@@ -12,13 +14,22 @@ use Type::Utils 0.44 -all;
 use Types::Standard -types;
 use PerlX::Maybe;
 
+use namespace::autoclean;
+
 # RECOMMEND PREREQ: PerlX::Maybe::XS
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
 # ABSTRACT: a library of SQL types
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
+
+
+sub VERSION { # for older Perls
+    my ( $class, $wanted ) = @_;
+    require version;
+    return version->parse($VERSION);
+}
 
 
 our $Blob = _generate_type(
@@ -167,7 +178,7 @@ sub _generate_type {
 }
 
 
-1;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 
@@ -181,7 +192,7 @@ Types::SQL - a library of SQL types
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 
@@ -195,6 +206,8 @@ This module provides a type library of SQL types.  These are
 L<Type::Tiny> objects that are augmented with a C<dbic_column_info>
 method that returns column information for use with
 L<DBIx::Class>.
+
+=for Pod::Coverage VERSION
 
 =for readme stop
 
@@ -301,7 +314,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Robert Rothenberg.
+This software is Copyright (c) 2016-2018 by Robert Rothenberg.
 
 This is free software, licensed under:
 

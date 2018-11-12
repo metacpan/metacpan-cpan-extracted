@@ -1,3 +1,7 @@
+0.23 2018-11-07
+        - Added piwik_tag 'as-script' and shortcut 'piwik'
+          for track_script.
+
 0.22 2018-11-01
         - Added missing meta spec version (manwar++).
         - Fixed Mojolicious dependency for nested helpers.

@@ -17,7 +17,7 @@ our @EXPORT_OK = qw{
     __ns_can __to_ordinal_en
 };
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 
 {
 
@@ -73,13 +73,10 @@ our $VERSION = '0.062';
 	},
     );
 
-    my $deprecate_parse;
-
     sub __choose_tokenizer_class {
 	my ( $content, $arg ) = @_;
 	if ( defined $arg->{parse} &&
-	    warnings::enabled( 'deprecated' ) &&
-	    ! $deprecate_parse++
+	    warnings::enabled( 'deprecated' )
 	) {
 	    my $warning = q<The 'parse' argument is deprecated.>;
 	    { guess => 1, string => 1 }->{$arg->{parse}}

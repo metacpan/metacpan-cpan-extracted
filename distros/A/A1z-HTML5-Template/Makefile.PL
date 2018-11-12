@@ -20,9 +20,10 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "parent" => 0,
     "strict" => 0,
+    "vars" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.19",
   "test" => {
     "TESTS" => ""
   }
@@ -34,6 +35,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "parent" => 0,
   "strict" => 0,
+  "vars" => 0,
   "warnings" => 0
 );
 

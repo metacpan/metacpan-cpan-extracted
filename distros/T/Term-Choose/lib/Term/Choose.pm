@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.627';
+our $VERSION = '1.628';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -13,7 +13,6 @@ use Carp qw( croak carp );
 use Term::Choose::Constants qw( :choose );
 use Term::Choose::LineFold  qw( line_fold print_columns cut_to_printwidth );
 
-no warnings 'utf8';
 
 my $Plugin;
 
@@ -30,7 +29,7 @@ BEGIN {
 
 
 sub new {
-    # 'choose' as function uses its own implicit new
+    # the function 'choose' uses its own implicit new
     my $class = shift;
     my ( $opt ) = @_;
     croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
@@ -226,7 +225,7 @@ sub __choose {
     $self->{wantarray} = wantarray;
     $self->__undef_to_defaults();
     $self->__copy_orig_list( $orig_list_ref );
-    $self->__length_longest(); #
+    $self->__length_longest();
     $self->{col_width} = $self->{length_longest} + $self->{pad};
     local $SIG{'INT'} = sub {
         # my $signame = shift;
@@ -655,28 +654,23 @@ sub __marked_rc2idx {
 sub __copy_orig_list {      #hae
     my ( $self, $orig_list_ref ) = @_;
     $self->{list} = [ @$orig_list_ref ];
-    if ( $self->{ll} ) {
-        for ( @{$self->{list}} ) {
-            $_ = $self->{undef} if ! defined $_;
-        }
-    }
-    else {
+    if ( ! $self->{ll} ) {
         for ( @{$self->{list}} ) {
             if ( ! $_ ) {
                 $_ = $self->{undef} if ! defined $_;
                 $_ = $self->{empty} if $_ eq '';
             }
-            if ( ref ) {
-                $_ = sprintf "%s(0x%x)", ref $_, $_;
-            }
-            s/\p{Space}/ /g;  # replace, but don't squash sequences of spaces
-            s/\p{C}//g;
+            s/\t/ /g;
+            s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
+            # \p{Cn} might not be up to date and remove assigned codepoints
+            # therefore only \p{Noncharacter_Code_Point}
+            s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
         }
     }
 }
 
 
-sub __length_longest {
+sub __length_longest {        #hae
     my ( $self ) = @_;
     my $list = $self->{list};
     if ( $self->{ll} ) {
@@ -687,7 +681,7 @@ sub __length_longest {
         my $len = [];
         my $longest = 0;
         for my $i ( 0 .. $#$list ) {
-            $len->[$i] = $self->__print_columns( $list->[$i] );
+            $len->[$i] = print_columns( $list->[$i] );
             $longest = $len->[$i] if $len->[$i] > $longest;
         }
         $self->{length_longest} = $longest;
@@ -791,10 +785,15 @@ sub __size_and_layout {
     $self->{current_layout} = $layout;
     my $all_in_first_row = '';
     if ( $layout == 0 || $layout == 1 ) {
+        my $firstrow_w = 0;
         for my $idx ( 0 .. $#{$self->{list}} ) {
             $all_in_first_row .= $self->{list}[$idx];
-            $all_in_first_row .= ' ' x $self->{pad} if $idx < $#{$self->{list}};
-            if ( $self->__print_columns( $all_in_first_row ) > $self->{avail_width} ) {
+            $firstrow_w += $self->{length}[$idx];
+            if ( $idx < $#{$self->{list}} ) {
+                $all_in_first_row .= ' ' x $self->{pad};
+                $firstrow_w += $self->{pad};
+            }
+            if ( $firstrow_w > $self->{avail_width} ) {
                 $all_in_first_row = '';
                 last;
             }
@@ -941,71 +940,54 @@ sub __wr_screen {
 }
 
 
-sub __wr_cell {     # hae
+sub __wr_cell {
     my( $self, $row, $col ) = @_;
-    my $is_current_pos = $row == $self->{pos}[ROW] && $col == $self->{pos}[COL];
     my $idx = $self->{rc2idx}[$row][$col];
     if ( $#{$self->{rc2idx}} == 0 && $#{$self->{rc2idx}[0]} > 0 ) {
         my $lngth = 0;
         if ( $col > 0 ) {
             for my $cl ( 0 .. $col - 1 ) {
                 my $i = $self->{rc2idx}[$row][$cl];
-                $lngth += $self->__print_columns( $self->{list}[$i] );
+                $lngth += $self->{length}[$i];
                 $lngth += $self->{pad};
             }
         }
         $self->__goto( $row - $self->{p_begin}, $lngth );
-        $self->{plugin}->__bold_underline() if $self->{marked}[$row][$col];
-        $self->{plugin}->__reverse()        if $is_current_pos;
-        print $self->{list}[$idx];
-        $self->{i_col} += $self->__print_columns( $self->{list}[$idx] );
+        $self->{avail_col_width} = $self->{length}[$idx];
     }
     else {
         $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width} );
-        $self->{plugin}->__bold_underline() if $self->{marked}[$row][$col];
-        $self->{plugin}->__reverse()        if $is_current_pos;
-        print $self->__unicode_sprintf( $idx );
-        $self->{i_col} += $self->{avail_col_width};
+
     }
-    $self->{plugin}->__reset() if $self->{marked}[$row][$col] || $is_current_pos;
+    $self->__unicode_sprintf( $idx, $row == $self->{pos}[ROW] && $col == $self->{pos}[COL], $self->{marked}[$row][$col] );
+    $self->{i_col} = $self->{i_col} + $self->{avail_col_width};
 }
 
 
-# Term::Choose_HAE overwrites __valid_options, __defaults, choose,
-# __copy_orig_list, __wr_cell, __print_columns, __unicode_trim
+# Term::Choose_HAE overwrites: __valid_options, __defaults, choose, __copy_orig_list, __length_longest, __unicode_sprintf
 
 
-sub __print_columns {       #hae
-    #my $self = $_[0];
-    print_columns( $_[1] );
-}
-
-sub __unicode_trim {        #hae
-    #my $self = $_[0];
-    cut_to_printwidth( $_[1], $_[2] ); # , 0
-}
-
-sub __unicode_sprintf {
-    my ( $self, $idx ) = @_;
+sub __unicode_sprintf {     # hae
+    my ( $self, $idx, $is_current_pos, $is_marked ) = @_;
     my $unicode;
-    my $str_length = $self->{length}[$idx];
-    if ( $str_length > $self->{avail_col_width} ) {
+    my $str_w = $self->{length}[$idx];
+    if ( $str_w > $self->{avail_col_width} ) {
         if ( $self->{avail_col_width} > 3 ) {
-            $unicode = $self->__unicode_trim( $self->{list}[$idx], $self->{avail_col_width} - 3 ) . '...';
+            $unicode = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} - 3 ) . '...';
         }
         else {
-            $unicode = $self->__unicode_trim( $self->{list}[$idx], $self->{avail_col_width} );
+            $unicode = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} );
         }
     }
-    elsif ( $str_length < $self->{avail_col_width} ) {
+    elsif ( $str_w < $self->{avail_col_width} ) {
         if ( $self->{justify} == 0 ) {
-            $unicode = $self->{list}[$idx] . " " x ( $self->{avail_col_width} - $str_length );
+            $unicode = $self->{list}[$idx] . " " x ( $self->{avail_col_width} - $str_w );
         }
         elsif ( $self->{justify} == 1 ) {
-            $unicode = " " x ( $self->{avail_col_width} - $str_length ) . $self->{list}[$idx];
+            $unicode = " " x ( $self->{avail_col_width} - $str_w ) . $self->{list}[$idx];
         }
         elsif ( $self->{justify} == 2 ) {
-            my $all = $self->{avail_col_width} - $str_length;
+            my $all = $self->{avail_col_width} - $str_w;
             my $half = int( $all / 2 );
             $unicode = " " x $half . $self->{list}[$idx] . " " x ( $all - $half );
         }
@@ -1013,7 +995,10 @@ sub __unicode_sprintf {
     else {
         $unicode = $self->{list}[$idx];
     }
-    return $unicode;
+    $self->{plugin}->__bold_underline() if $is_marked;
+    $self->{plugin}->__reverse()        if $is_current_pos;
+    print $unicode;
+    $self->{plugin}->__reset()          if $is_marked || $is_current_pos;
 }
 
 
@@ -1042,7 +1027,7 @@ sub __mouse_info_to_key {
         my $end_this_col;
         if ( $#{$self->{rc2idx}} == 0 ) {
             my $idx = $self->{rc2idx}[$row][$col];
-            $end_this_col = $end_last_col + $self->__print_columns( $self->{list}[$idx] ) + $self->{pad};
+            $end_this_col = $end_last_col + $self->{length}[$idx] + $self->{pad};
         }
         else { #
             $end_this_col = $end_last_col + $self->{col_width};
@@ -1098,7 +1083,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.627
+Version 1.628
 
 =cut
 
@@ -1287,44 +1272,29 @@ If an element holds an empty string the value from the option I<empty> is assign
 
 =item *
 
-White-spaces in elements are replaced with simple spaces.
+Tab characters in elements are replaces with a space.
 
-    $element =~ s/\p{Space}/ /g;
-
-=item *
-
-If the length of an element is greater than the width of the screen the element is cut and at the end of the string are
-added three dots.
-
-=back
-
-The following should be without meaning if you comply with the requirements.
-
-=over
+    $element =~ s/\t/ /g;
 
 =item *
 
-Characters which match the Unicode character property C<Other> are removed.
+Vertical spaces in elements are squashed to two spaces.
 
-    $element =~ s/\p{C}//g;
+    $element =~ s/\v+/\ \ /g;
+
+=item *
+
+Code points from the ranges of control, surrogate and noncharacter are removed.
+
+    $element =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
 
 C<ESC> characters are removed by this substitution so it is not possible to color the output with ANSI escape sequences.
 For colored output see L<Term::Choose_HAE>.
 
 =item *
 
-If an element is a reference it will be replaced with a string: the reference type followed with the hexadecimal value
-of the reference enclosed in parentheses.
-
-    if ( ref $element ) {
-        $element = sprintf "%s(0x%x)", ref $element, $element;
-    }
-
-=item *
-
-The category of C<utf8> C<warnings> is disabled.
-
-    no warnings 'utf8';
+If the length of an element is greater than the width of the screen the element is cut and at the end of the string are
+added three dots.
 
 =back
 
@@ -1488,12 +1458,10 @@ with this option.
 
 I<length> refers here to the number of print columns the element will use on the terminal.
 
-The length of undefined elements depends on the value of the option I<undef>.
+Undefined list elements are not allowed.
 
-If the option I<ll> is set, only undefined values are replaced. The replacements described in L</Modifications for the
-output> are not applied. If elements contain unsupported characters the output might break if the width (number of print
-columns) of the replacement character does not correspond to the width of the replaced character - for example when a
-unsupported non-spacing character is replaced by a replacement character with a normal width.
+The replacements described in L</Modifications for the output> are not applied. If elements contain unsupported
+characters the output might break.
 
 If I<ll> is set to a value less than the length of the elements, the output could break.
 

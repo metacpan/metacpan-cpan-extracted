@@ -7,25 +7,53 @@ struct Tokens {
     U8 *token;
 };
 
-PcoreUtilPath *normalize (U8 *buf, size_t buf_len) {
-    PcoreUtilPath *res = malloc(sizeof(PcoreUtilPath));
+void destroyPcoreUtilPath (PcoreUtilPath *path) {
+    Safefree(path->path);
+    Safefree(path->volume);
+    Safefree(path->dirname);
+    Safefree(path->filename);
+    Safefree(path->filename_base);
+    Safefree(path->suffix);
+    Safefree(path);
+}
+
+PcoreUtilPath *parse (const char *buf, size_t buf_len) {
+    PcoreUtilPath *res;
+    Newx(res, 1, PcoreUtilPath);
 
     res->is_abs = 0;
     res->path_len = 0;
     res->path = NULL;
     res->volume_len = 0;
     res->volume = NULL;
+    res->dirname_len = 0;
+    res->dirname = NULL;
+    res->filename_len = 0;
+    res->filename = NULL;
+    res->filename_base_len = 0;
+    res->filename_base = NULL;
+    res->suffix_len = 0;
+    res->suffix = NULL;
 
     // buf is not empty
     if (buf_len) {
+        U8 prefix[3];
         size_t prefix_len = 0;
         size_t i = 0;
 
-        // parse leading windows volume
-# ifdef WIN32
-        U8 prefix[3];
+        // parse leading "/"
+        if (buf[0] == '/' || buf[0] == '\\') {
+            prefix[0] = '/';
+            prefix_len = 1;
+            i = 1;
 
-        if ( buf_len >= 2 && buf[1] == ':' && ( buf[2] == '/' || buf[2] == '\\' ) && isalpha(buf[0]) ) {
+            res->is_abs = 1;
+        }
+
+# ifdef WIN32
+
+        // parse windows volume
+        else if ( buf_len >= 2 && buf[1] == ':' && ( buf[2] == '/' || buf[2] == '\\' ) && isalpha(buf[0]) ) {
             prefix[0] = tolower(buf[0]);
             prefix[1] = ':';
             prefix[2] = '/';
@@ -33,21 +61,9 @@ PcoreUtilPath *normalize (U8 *buf, size_t buf_len) {
             i = 3;
 
             res->is_abs = 1;
-            res->volume_len = 3;
-            res->volume = malloc(3);
-            memcpy(res->volume, &prefix, 3);
-        }
-
-        // parse leading "/"
-# else
-        U8 prefix;
-
-        if (buf[0] == '/' || buf[0] == '\\') {
-            prefix = '/';
-            prefix_len = 1;
-            i = 1;
-
-            res->is_abs = 1;
+            res->volume_len = 1;
+            Newx(res->volume, 1, char);
+            res->volume[0] = prefix[0];
         }
 # endif
 
@@ -58,7 +74,7 @@ PcoreUtilPath *normalize (U8 *buf, size_t buf_len) {
         U8 token[ buf_len ];
         size_t token_len = 0;
 
-        for ( i; i < buf_len; i++ ) {
+        for ( ; i < buf_len; i++ ) {
             int process_token = 0;
 
             // slash char
@@ -95,7 +111,7 @@ PcoreUtilPath *normalize (U8 *buf, size_t buf_len) {
                         if (!tokens[tokens_len - 1].is_dots) {
                             skip_token = 1;
 
-                            free(tokens[tokens_len - 1].token);
+                            Safefree(tokens[tokens_len - 1].token);
                             tokens_total_len -= tokens[tokens_len - 1].len;
 
                             tokens_len -= 1;
@@ -112,7 +128,43 @@ PcoreUtilPath *normalize (U8 *buf, size_t buf_len) {
 
                 // store token
                 if (!skip_token) {
-                    tokens[tokens_len].token = malloc(token_len);
+
+                    // last token, and token is not "." or ".." or last char is not "/" or "\" - last token is filename
+                    if (i + 1 == buf_len && !is_dots && buf[i] != '/' && buf[i] != '\\') {
+                        res->filename_len = token_len;
+                        Newx(res->filename, token_len, char);
+                        memcpy(res->filename, token, token_len);
+
+                        int has_suffix = 0;
+
+                        // parse filename_base, suffix
+                        for (size_t i = token_len - 1; i > 0; i--) {
+
+                            // not-leading dot found
+                            if (token[i] == '.') {
+                                has_suffix = 1;
+
+                                res->suffix_len = token_len - i - 1;
+                                Newx(res->suffix, res->suffix_len, char);
+                                memcpy(res->suffix, token + i + 1, res->suffix_len);
+
+                                res->filename_base_len = i;
+                                Newx(res->filename_base, res->filename_base_len, char);
+                                memcpy(res->filename_base, token, res->filename_base_len);
+
+                                break;
+                            }
+                        }
+
+                        // filename_base = filename if !has_suffix
+                        if (!has_suffix) {
+                            res->filename_base_len = token_len;
+                            Newx(res->filename_base, token_len, char);
+                            memcpy(res->filename_base, token, token_len);
+                        }
+                    }
+
+                    Newx(tokens[tokens_len].token, token_len, U8);
                     memcpy(tokens[tokens_len].token, token, token_len);
 
                     tokens[tokens_len].len = token_len;
@@ -132,7 +184,7 @@ PcoreUtilPath *normalize (U8 *buf, size_t buf_len) {
 
         // path is not empty
         if (res->path_len) {
-            res->path = malloc(res->path_len);
+            Newx(res->path, res->path_len, char);
             size_t dst_pos = 0;
 
             // add prefix
@@ -145,14 +197,44 @@ PcoreUtilPath *normalize (U8 *buf, size_t buf_len) {
             for ( size_t i = 0; i < tokens_len; i++ ) {
                 memcpy(res->path + dst_pos, tokens[i].token, tokens[i].len);
 
-                free(tokens[i].token);
+                Safefree(tokens[i].token);
 
                 dst_pos += tokens[i].len;
 
                 // add "/" if token is not last
-                if (i < tokens_len) res->path[dst_pos++] = '/';
+                if (i < tokens_len - 1) res->path[dst_pos++] = '/';
+            }
+
+            // path has filename, dirname = path - filename
+            if (res->filename_len) {
+                res->dirname_len = res->path_len - res->filename_len;
+                if (res->dirname_len > 1) res->dirname_len -= 1;
+
+                if(res->dirname_len) {
+                    Newx(res->dirname, res->dirname_len, char);
+                    Copy(res->path, res->dirname, res->dirname_len, char);
+                }
+            }
+
+            // path has no filename, dirname = path
+            else {
+                res->dirname_len = res->path_len;
+                Newx(res->dirname, res->dirname_len, char);
+                Copy(res->path, res->dirname, res->dirname_len, char);
             }
         }
+    }
+
+    if (!res->path_len) {
+        res->path_len = 1;
+        Newx(res->path, res->path_len, char);
+        res->path[0] = '.';
+    }
+
+    if (!res->dirname_len) {
+        res->dirname_len = 1;
+        Newx(res->dirname, res->dirname_len, char);
+        res->dirname[0] = '.';
     }
 
     return res;

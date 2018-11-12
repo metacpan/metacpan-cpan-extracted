@@ -1,39 +1,20 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2012 Smithsonian Astrophysical Observatory
-#
-# This file is part of MooX-Attributes-Shadow
-#
-# MooX-Attributes-Shadow is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package MooX::Attributes::Shadow;
+
+# ABSTRACT: shadow attributes of contained objects
 
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
-use Carp;
-use Params::Check qw[ check last_error ];
-use Scalar::Util qw[ blessed ];
+use Carp ();
+use Params::Check;
+use Scalar::Util;
 
 use Exporter 'import';
 
 our %EXPORT_TAGS = ( all => [ qw( shadow_attrs shadowed_attrs xtract_attrs ) ],
-		   );
+                   );
 Exporter::export_ok_tags('all');
 
 my %MAP;
@@ -46,42 +27,42 @@ sub shadow_attrs {
 
     my $container = caller;
 
-    my $args = check( {
+    my $args = Params::Check::check( {
             fmt => {
                 allow => sub { ref $_[0] eq 'CODE' }
             },
 
             attrs => { allow => sub { 'ARRAY' eq ref $_[0] && @{ $_[0] }
-					or 'HASH' eq ref $_[0] },
-		     },
+                                        or 'HASH' eq ref $_[0] },
+                     },
             private  => { default => 1 },
             instance => {},
         },
-        {@_} ) or croak( "error parsing arguments: ", last_error, "\n" );
+        {@_} ) or Carp::croak( "error parsing arguments: ", Params::Check::last_error, "\n" );
 
 
     unless ( exists $args->{attrs} ) {
 
         $args->{attrs} = [ eval { $contained->shadowable_attrs } ];
 
-        croak( "must specify attrs or call shadowable_attrs in shadowed class" )
+        Carp::croak( "must specify attrs or call shadowable_attrs in shadowed class" )
           if $@;
 
     }
 
     my $has = $container->can( 'has' )
-      or croak( "container class $container does not have a 'has' function.",
-		" Is it really a Moo class?" );
+      or Carp::croak( "container class $container does not have a 'has' function.",
+                " Is it really a Moo class?" );
 
     my %attr =
       'ARRAY' eq ref $args->{attrs} ? ( map { $_ => undef } @{$args->{attrs}} )
-	                           : %{$args->{attrs}};
+                                   : %{$args->{attrs}};
 
     my %map;
     while( my ( $attr, $alias ) = each %attr ) {
 
-	$alias = $args->{fmt} ? $args->{fmt}->( $attr ) : $attr
-	  unless defined $alias;
+        $alias = $args->{fmt} ? $args->{fmt}->( $attr ) : $attr
+          unless defined $alias;
 
         my $priv  = $args->{private} ? "_shadow_${contained}_${alias}" : $alias;
         $priv =~ s/::/_/g;
@@ -118,16 +99,16 @@ sub _resolve_attr_env {
     my ( $contained, $container, $options ) = @_;
 
     # contained should be resolved into a class name
-    my $containedClass = blessed $contained || $contained;
+    my $containedClass = Scalar::Util::blessed $contained || $contained;
 
     # allow $container to be either a class or an object
-    my $containerClass = blessed $container || $container;
+    my $containerClass = Scalar::Util::blessed $container || $container;
 
     my $map = defined $options->{instance}
             ? $MAP{$containedClass}{$containerClass}{instance}{$options->{instance}}
-	    : $MAP{$containedClass}{$containerClass}{default};
+            : $MAP{$containedClass}{$containerClass}{default};
 
-    croak( "attributes must first be shadowed using ${containedClass}::shadow_attrs\n" )
+    Carp::croak( "attributes must first be shadowed using ${containedClass}::shadow_attrs\n" )
       unless defined $map;
 
     return $map;
@@ -155,30 +136,49 @@ sub xtract_attrs {
     my $containedClass = shift;
     my $options = 'HASH' eq ref $_[-1] ? pop() : {};
     my $container = shift;
-    my $containerClass = blessed $container or
-      croak( "container_obj parameter is not a container object\n" );
+    my $containerClass = Scalar::Util::blessed $container or
+      Carp::croak( "container_obj parameter is not a container object\n" );
 
     my $map = _resolve_attr_env( $containedClass, $containerClass, $options );
 
     my %attr;
     while( my ($attr, $names) = each %$map ) {
 
-	my $priv = $names->{priv};
-	my $has = "_has_${priv}";
+        my $priv = $names->{priv};
+        my $has = "_has_${priv}";
 
-	$attr{$attr} = $container->$priv
-	  if $container->$has;
+        $attr{$attr} = $container->$priv
+          if $container->$has;
     }
 
     return %attr;
 }
 
 1;
+
+#
+# This file is part of MooX-Attributes-Shadow
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory Inkster
 
 =head1 NAME
 
 MooX::Attributes::Shadow - shadow attributes of contained objects
+
+=head1 VERSION
+
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -222,7 +222,6 @@ A contained class can use B<MooX::Attributes::Shadow::Role> to
 simplify things even further, so that container classes using it need
 not know the names of the attributes to shadow.  This is the preferred
 approach.
-
 
 =head2 The Problem
 
@@ -318,7 +317,6 @@ C<A> has it's own attribute named C<attr>?
 
 Endless tedium and no laziness, that's what.  Hence this module.
 
-
 =head1 INTERFACE
 
 =over
@@ -403,7 +401,6 @@ delegate accessors to the contained class:
      handles => shadowed_attrs( 'Foo' ),
   );
 
-
 =item B<xtract_attrs>
 
   %attrs = xtract_attrs( $contained, $container_obj, \%options );
@@ -430,17 +427,32 @@ this (string) is used to identify an individual instance.
 
 Toby Inkster for the C<BUILDARGS> approach.
 
+=head1 BUGS
 
-=head1 COPYRIGHT & LICENSE
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Attributes-Shadow>
+or by email to
+L<bug-MooX-Attributes-Shadow@rt.cpan.org|mailto:bug-MooX-Attributes-Shadow@rt.cpan.org>.
 
-Copyright 2012 Smithsonian Astrophysical Observatory
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-This software is released under the GNU General Public License.  You
-may find a copy at
+=head1 SOURCE
 
-   http://www.fsf.org/copyleft/gpl.html
-
+The development version is on github at L<https://github.com/djerius/moox-attributes-shadow>
+and may be cloned from L<git://github.com/djerius/moox-attributes-shadow.git>
 
 =head1 AUTHOR
 
-Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

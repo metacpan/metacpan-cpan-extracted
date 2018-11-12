@@ -6,6 +6,7 @@ BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Test::More;
 
 use Assert::Refute qw(:core);
+use Assert::Refute::Contract qw(contract);
 
 my $c = contract {
     my $c = shift;

@@ -2,17 +2,17 @@ package Pcore::Util::Date::Duration;
 
 use Pcore -class;
 
-has seconds => ( is => 'ro', isa => Int, required => 1 );
+has seconds => ( required => 1 );    # Int
 
-has minutes => ( is => 'lazy', isa => Int );
-has hours   => ( is => 'lazy', isa => Int );
-has days    => ( is => 'lazy', isa => Int );
+has minutes => ( is => 'lazy' );     # Int
+has hours   => ( is => 'lazy' );     # Int
+has days    => ( is => 'lazy' );     # Int
 
-has ms   => ( is => 'lazy', isa => ArrayRef );
-has hm   => ( is => 'lazy', isa => ArrayRef );
-has hms  => ( is => 'lazy', isa => ArrayRef );
-has dhms => ( is => 'lazy', isa => ArrayRef );
-has dhm  => ( is => 'lazy', isa => ArrayRef );
+has ms   => ( is => 'lazy' );        # ArrayRef
+has hm   => ( is => 'lazy' );        # ArrayRef
+has hms  => ( is => 'lazy' );        # ArrayRef
+has dhms => ( is => 'lazy' );        # ArrayRef
+has dhm  => ( is => 'lazy' );        # ArrayRef
 
 sub BUILDARGS ( $self, $args ) {
     my $seconds;
@@ -30,32 +30,22 @@ sub BUILDARGS ( $self, $args ) {
     return { seconds => $seconds };
 }
 
-sub _build_minutes ($self) {
-    return int $self->seconds / 60;
-}
+sub _build_minutes ($self) { return int $self->{seconds} / 60 }
 
-sub _build_hours ($self) {
-    return int $self->seconds / 3_600;
-}
+sub _build_hours ($self) { return int $self->{seconds} / 3_600 }
 
-sub _build_days ($self) {
-    return int $self->seconds / 86_400;
-}
+sub _build_days ($self) { return int $self->{seconds} / 86_400 }
 
-sub _build_ms ($self) {
-    return [ $self->minutes, $self->seconds - $self->minutes * 60 ];
-}
+sub _build_ms ($self) { return [ $self->minutes, $self->{seconds} - $self->minutes * 60 ] }
 
-sub _build_hm ($self) {
-    return [ $self->hours, $self->minutes - $self->hours * 60 ];
-}
+sub _build_hm ($self) { return [ $self->hours, $self->minutes - $self->hours * 60 ] }
 
 sub _build_hms ($self) {
-    return [ $self->hours, $self->minutes - $self->hours * 60, $self->seconds - $self->minutes * 60 ];
+    return [ $self->hours, $self->minutes - $self->hours * 60, $self->{seconds} - $self->minutes * 60 ];
 }
 
 sub _build_dhms ($self) {
-    return [ $self->days, $self->hours - $self->days * 24, $self->minutes - $self->hours * 60, $self->seconds - $self->minutes * 60 ];
+    return [ $self->days, $self->hours - $self->days * 24, $self->minutes - $self->hours * 60, $self->{seconds} - $self->minutes * 60 ];
 }
 
 sub _build_dhm ($self) {

@@ -11,7 +11,29 @@ Yancy::Help::Standalone - How to run Yancy without writing Perl code
 
 =head1 VERSION
 
-version 1.012
+version 1.014
+
+=head1 SYNOPSIS
+
+To see the Yancy UI in action with some sample data, do this in a checkout
+of the repo:
+
+  $ cp eg/test-app/yancy.data.json yancy.data.json
+  $ cp eg/test-app/myapp.conf yancy.conf
+  # t/lib is to provide Yancy::Backend::Test
+  $ perl -Ilib -It/lib bin/yancy daemon &
+
+Having done the above, now visit L<http://localhost:3000/yancy>.
+
+Alternatively, you can try some test data, together with the
+L<read_schema|Yancy::Help::Config/read_schema> feature to automatically
+configure the API from the database schema:
+
+  $ export TEST_ONLINE_SQLITE=sqlite:/tmp/test.db
+  # run the test, put the test data in a disk file
+  $ prove -l t/backend/sqlite.t
+  $ echo >yancy.conf "{backend=>'$TEST_ONLINE_SQLITE', read_schema=>1}"
+  $ perl -Ilib bin/yancy daemon &
 
 =head1 Getting Started
 

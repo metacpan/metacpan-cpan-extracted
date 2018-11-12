@@ -1,8 +1,7 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '1.012';
+our $VERSION = '1.014';
 # ABSTRACT: A simple auth module for a site
 
-#pod =encoding utf8
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
@@ -108,7 +107,7 @@ our $VERSION = '1.012';
 #pod         password_digest => {
 #pod             type => 'Bcrypt',
 #pod             cost => 12,
-#pod             salt => 'abcdefgh♥stuff',
+#pod             salt => 'abcdefghnstuff',
 #pod         },
 #pod     } );
 #pod
@@ -380,15 +379,8 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 1.012
+version 1.014
 
-=head1 DESCRIPTION
-
-This plugin provides a basic authentication and authorization scheme for
-a L<Mojolicious> site using L<Yancy>. If a user is authenticated, they are
-then authorized to use the administration application and API.
-
-=encoding utf8
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
@@ -413,6 +405,12 @@ then authorized to use the administration application and API.
             type => 'SHA-1',
         },
     } );
+
+=head1 DESCRIPTION
+
+This plugin provides a basic authentication and authorization scheme for
+a L<Mojolicious> site using L<Yancy>. If a user is authenticated, they are
+then authorized to use the administration application and API.
 
 =head1 CONFIGURATION
 
@@ -488,7 +486,7 @@ Not all Digest types require additional configuration.
         password_digest => {
             type => 'Bcrypt',
             cost => 12,
-            salt => 'abcdefgh♥stuff',
+            salt => 'abcdefghnstuff',
         },
     } );
 

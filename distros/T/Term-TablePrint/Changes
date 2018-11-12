@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.077   2018-11-12
+        - Changed modification of list elements.
+        - Removed "no warnings 'utf8'".
+        - Update documentation.
+
 0.076   2018-08-21
         - Use 'hide_cursor', 'show_cursor' and 'clear_screen' from "Term::Choose".
         - "Term::Choose": minimum version "1.626".

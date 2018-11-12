@@ -69,12 +69,16 @@ sub get_resources ( $self, @resources ) {
     my @res;
 
     for my $name (@resources) {
+        my $res;
+
         if ( is_plain_arrayref $name) {
-            push @res, $self->{resources}->{ $name->[0] }->( $self, $name->@[ 1 .. $name->$#* ] )->@*;
+            $res = $self->{resources}->{ $name->[0] }->( $self, $name->@[ 1 .. $name->$#* ] );
         }
         else {
-            push @res, $self->{resources}->{$name}->($self)->@*;
+            $res = $self->{resources}->{$name}->($self);
         }
+
+        push @res, is_plain_arrayref $res ? $res->@* : $res;
     }
 
     return \@res;
@@ -140,7 +144,7 @@ sub get_nginx_cfg($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 108                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 112                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -12,12 +12,13 @@ Protocol::DBus::Peer - base class for a D-Bus peer
 =head1 SYNOPSIS
 
     $dbus->send_call(
-        method => 'org.freedesktop.DBus.Properties.GetAll',
+        interface => 'org.freedesktop.DBus.Properties',
+        member => 'GetAll',
         signature => 's',
         path => '/org/freedesktop/DBus',
         destination => 'org.freedesktop.DBus',
         body => [ 'org.freedesktop.DBus' ],
-        callback => sub { my ($msg) = @_ },
+        on_return => sub { my ($msg) = @_ },
     );
 
     my $msg = $dbus->get_message();

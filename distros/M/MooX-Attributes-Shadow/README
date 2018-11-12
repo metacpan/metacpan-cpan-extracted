@@ -1,62 +1,123 @@
 MooX::Attributes::Shadow
 
-NAME
+If an object contains another object (i.e. the first object's attribute
+is a reference to the second), it's often useful to access the contained
+object's attributes as if they were in the container object.
 
-    MooX::Attributes::Shadow - shadow attributes of contained objects
+MooX::Attributes::Shadow provides a means of registering the attributes
+to be shadowed, automatically creating proxy attributes in the container
+class, and easily extracting the shadowed attributes and values from the
+container class for use in the contained class's constructor.
 
-DESCRIPTION
+A contained class can use MooX::Attributes::Shadow::Role to simplify
+things even further, so that container classes using it need not know
+the names of the attributes to shadow. This is the preferred approach.
 
-    This module provides utility functions (and a role) to 
-    easy for a container class to shadow contained classes'
-    attributes.
+  The Problem
 
+An object in class "A" ($a) has an attribute ("$a->b") which contains a
+reference to an object in class "B" ($b), which itself has an attribute
+"$b->attr", which you want to transparently access from $a, e.g.
 
-DEPENDENCIES
+  $a->attr => $a->b->attr;
 
-    Moo
-    Moo::Role
-    MooX::Types::MooseLike
+One approach might be to use method delegation:
+
+  package B;
+
+  has attr => ( is => 'rw' );
+
+  package A;
+
+  has b => (
+     is => 'ro',
+     default => sub { B->new },
+     handles => [ 'attr' ]
+   );
+
+  $a = A->new;
+
+  $a->attr( 3 ); # works!
+
+But, what if "attr" is a required parameter to "B"'s constructor? The
+default generator might look something like this:
+
+  has b => (
+     is => 'ro',
+     lazy => 1,
+     default => sub { B->new( shift->attr ) },
+     handles => [ 'attr' ]
+   );
+
+  $a = A->new( attr => 3 );  # doesn't work!
+
+(Note that "b" now must be lazily created, so that $a is in a
+deterministic state when asked for the value of "attr").
+
+However, this doesn't work, because $a doesn't have an attribute called
+"attr"; that's just a method delegated to "$a->b". Oops.
+
+If you don't mind explicitly calling "B->new" in "A"'s constructor, this
+works:
+
+  sub BUILDARGS {
+
+    my $args = shift->SUPER::BUILDARGS(@_);
+
+    $args->{b} //= B->new( attr => delete $args->{attr} );
+
+    return $args;
+  }
+
+  $a = A->new( attr => 3 );  # works!
+
+but now "b" can't be lazily constructed. To achieve that requires
+actually storing "attr" in $a. We can do that with a proxy attribute
+which masquerades as "attr" in "A"'s constructor:
+
+  has _attr => ( is => 'ro', init_arg => 'attr' );
+
+  has b => (
+     is => 'ro',
+     lazy => 1,
+     default => sub { B->new( shift->_attr ) },
+     handles => [ 'attr' ]
+   );
+
+  $a = A->new( attr => 3 );  #  works!
+
+Simple, but what happens if
+
+*   there's more than one attribute, or
+
+*   there's more than one instance of "B" to construct, or
+
+*   "A" has it's own attribute named "attr"?
+
+Endless tedium and no laziness, that's what. Hence this module.
 
 INSTALLATION
 
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    To compile, test and install:
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
-CHANGES
+COPYRIGHT AND LICENSE
 
-    See the Changes file for more details
+This software is Copyright (c) 2018 by Smithsonian Astrophysical
+Observatory.
 
-COPYRIGHT
+This is free software, licensed under:
 
-
---8<--8<--8<--8<--
-
-Copyright (C) 2012 Smithsonian Astrophysical Observatory
-
-This file is part of MooX-Attributes-Shadow
-
-MooX-Attributes-Shadow is free software: you can redistribute it
-and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
--->8-->8-->8-->8--
-
-AUTHOR
-
-    Diab Jerius (djerius@cpan.org)
-
+  The GNU General Public License, Version 3, June 2007

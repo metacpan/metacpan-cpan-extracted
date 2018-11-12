@@ -1,19 +1,19 @@
 package Pcore::Util::Perl::Module;
 
 use Pcore -class;
+use Pcore::Util::Scalar qw[is_ref];
 use Config;
 
-has name => ( is => 'lazy', isa => Maybe [Str] );    # Module/Name.pm
-has content => ( is => 'lazy', isa => ScalarRef );
+has name    => ( is => 'lazy' );    # Maybe [Str], Module/Name.pm
+has content => ( is => 'lazy' );    # ScalarRef
+has path    => ( is => 'lazy' );    # Maybe [Str], /absolute/path/to/lib/Module/Name.pm
+has lib     => ( is => 'lazy' );    # Maybe [Str], /absolute/path/to/lib/
 
-has path => ( is => 'lazy', isa => Maybe [Str] );    # /absolute/path/to/lib/Module/Name.pm
-has lib  => ( is => 'lazy', isa => Maybe [Str] );    # /absolute/path/to/lib/
-
-has is_cpan_module => ( is => 'lazy', isa => Bool, init_arg => undef );    # module has lib and lib is a part of pcore dist
-has is_crypted     => ( is => 'lazy', isa => Bool, init_arg => undef );    # module is crypted with Filter::Crypto
-has abstract => ( is => 'lazy', isa => Maybe [Str], init_arg => undef );   # abstract from POD
-has version => ( is => 'lazy', isa => Maybe [ InstanceOf ['version'] ], init_arg => undef );    # parsed version
-has auto_deps => ( is => 'lazy', isa => Maybe [HashRef], init_arg => undef );
+has is_cpan_module => ( is => 'lazy', init_arg => undef );    # module has lib and lib is a part of pcore dist
+has is_crypted     => ( is => 'lazy', init_arg => undef );    # module is crypted with Filter::Crypto
+has abstract       => ( is => 'lazy', init_arg => undef );    # abstract from POD
+has version        => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['version'] ], parsed version
+has auto_deps      => ( is => 'lazy', init_arg => undef );    # Maybe [HashRef]
 
 around new => sub ( $orig, $self, $module, @inc ) {
     if ( ref $module eq 'SCALAR' ) {
@@ -28,7 +28,7 @@ around new => sub ( $orig, $self, $module, @inc ) {
     }
     else {
 
-        # if module is not contain .pl or .pl suffixes - this is Package::Name
+        # if module is not contains .pl or .pm suffixes - this is Package::Name
         # convert Package::Name to Module/Name.pm
         my $suffix = substr $module, -3, 3;
 
@@ -41,15 +41,20 @@ around new => sub ( $orig, $self, $module, @inc ) {
         if ( -f $module ) {
 
             # module was found at full path
-            return $self->$orig( { path => P->path($module)->realpath->to_string } );
+            return $self->$orig( { path => P->path($module)->to_abs } );
         }
         else {
 
-            # try to find module in @INC
-            for my $lib ( @inc, @INC ) {
-                next if ref $lib;
+            # try to find module in @inc, items can be path objects
+            for my $lib (@inc) {
+                return $self->$orig( { lib => P->path($lib)->to_abs, name => $module } ) if -f "$lib/$module";
+            }
 
-                return $self->$orig( { lib => P->path( $lib, is_dir => 1 )->realpath->to_string, name => $module } ) if -f "$lib/$module";
+            # try to find module in @INC
+            for my $lib (@INC) {
+                next if is_ref $lib;
+
+                return $self->$orig( { lib => P->path($lib)->to_abs, name => $module } ) if -f "$lib/$module";
             }
         }
     }
@@ -101,7 +106,7 @@ sub _build_name ($self) {
 }
 
 sub _build_path ($self) {
-    return $self->lib . $self->name if $self->lib && $self->name;
+    return $self->lib . '/' . $self->name if $self->lib && $self->name;
 
     return;
 }
@@ -165,24 +170,22 @@ sub _build_auto_deps ($self) {
 
     $name = P->path($name);
 
-    return if $name->suffix eq 'pl';
+    return if $name->{suffix} eq 'pl';
 
-    my $auto_path = 'auto/' . $name->dirname . $name->filename_base . q[/];
+    my $auto_path = P->path("auto/$name->{dirname}/$name->{filename_base}")->{path};
 
-    my $so_filename = $name->filename_base . q[.] . $Config{dlext};
+    my $so_filename = "$name->{filename_base}.$Config{dlext}";
 
     my $deps;
 
-    for my $lib ( map { P->path($_)->to_string } "$ENV->{INLINE_DIR}/lib", @INC ) {
-        if ( -f "$lib/$auto_path" . $so_filename ) {
-            $deps->{ $auto_path . $so_filename } = "$lib/$auto_path" . $so_filename;
+    for my $lib ( map { P->path($_) } "$ENV->{INLINE_DIR}/lib", @INC ) {
+        if ( -f "$lib/$auto_path/$so_filename" ) {
+            $deps->{"$auto_path/$so_filename"} = "$lib/$auto_path/$so_filename";
 
             # add .ix, .al
-            for my $file ( P->file->read_dir("$lib/$auto_path")->@* ) {
-                my $suffix = substr $file, -3, 3;
-
-                if ( $suffix eq '.ix' or $suffix eq '.al' ) {
-                    $deps->{ $auto_path . $file } = "$lib/$auto_path" . $file;
+            for my $file ( ( P->path("$lib/$auto_path")->read_dir( abs => 0, is_dir => 0, max_depth => 0 ) // [] )->@* ) {
+                if ( defined $file->{suffix} && ( $file->{suffix} eq 'ix' || $file->{suffix} eq 'al' ) ) {
+                    $deps->{"$auto_path/$file"} = "$lib/$auto_path/$file";
                 }
             }
 
@@ -212,9 +215,7 @@ sub clear ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 144                  | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 177                  | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
+## |    3 | 149                  | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

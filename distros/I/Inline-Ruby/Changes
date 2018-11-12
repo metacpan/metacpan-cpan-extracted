@@ -1,5 +1,11 @@
 Revision history for Perl extension Inline-Ruby.
 
+0.10    2018-11-12
+    - Fix build on Ubuntu and FreeBSD .
+        - https://rt.cpan.org/Public/Bug/Display.html?id=127628
+        - https://github.com/shlomif/Inline-Ruby/pull/5
+        - Thanks to @quarkbuddha .
+
 0.09    2017-09-12
     - Fix Ruby 'require' for classes and modules.
 

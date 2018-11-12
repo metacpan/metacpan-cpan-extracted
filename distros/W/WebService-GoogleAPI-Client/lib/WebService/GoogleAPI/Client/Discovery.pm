@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::Discovery;
-$WebService::GoogleAPI::Client::Discovery::VERSION = '0.19';
+$WebService::GoogleAPI::Client::Discovery::VERSION = '0.20';
 
 # ABSTRACT: Google API discovery service
 
@@ -11,7 +11,7 @@ use Carp;
 use WebService::GoogleAPI::Client::UserAgent;
 use List::Util qw/uniq/;    ## are these util dependencies necessary?
 use Hash::Slice qw/slice/;
-use Data::Dump;
+use Data::Dump qw/pp/;
 use CHI;                    # Caching .. NB Consider reviewing https://metacpan.org/pod/Mojo::UserAgent::Role::Cache
 
 # use feature
@@ -542,7 +542,7 @@ WebService::GoogleAPI::Client::Discovery - Google API discovery service
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head2 MORE INFORMATION
 

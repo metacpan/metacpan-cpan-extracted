@@ -57,6 +57,7 @@ typedef __int8 int8_t;
   typedef        size_t STRLEN;
   #define UV_MAX ULONG_MAX
   #define IV_MAX LONG_MAX
+  #define NV_MAX DBL_MAX
   #define UVCONST(x) ((unsigned long)x##UL)
   #define U32_CONST(x) ((unsigned int)x##U)
   #define UVuf "lu"
@@ -136,6 +137,8 @@ typedef __int8 int8_t;
 #define NBYTES(bits)  ( ((bits)+8-1) / 8 )
 
 #define MPUassert(c,text) if (!(c)) { croak("Math::Prime::Util internal error: " text); }
+#define MPUverbose(level,fmt,...) \
+  if (_XS_get_verbose() >= level) { printf(fmt,##__VA_ARGS__); fflush(stdout); }
 
 /* The ASSUME bits are from perl 5.19.6 perl.h */
 
@@ -192,6 +195,30 @@ typedef __int8 int8_t;
   #else
     #define NVMANTBITS 64
   #endif
+#endif
+
+#if defined(USE_QUADMATH)
+  typedef __float128   LNV;
+  #define LNV_ZERO     0.0Q
+  #define LNV_ONE      1.0Q
+  #define LNVCONST(x) ((__float128)x##Q)
+  #define loglnv(x)    logq(x)
+  #define explnv(x)    expq(x)
+  #define sqrtlnv(x)   sqrtq(x)
+  #define fabslnv(x)   fabsq(x)
+  #define LNV_EPSILON  FLT128_EPSILON
+  #define LNV_IS_QUAD  1
+#else
+  typedef long double  LNV;
+  #define LNV_ZERO     0.0L
+  #define LNV_ONE      1.0L
+  #define LNVCONST(x) ((long double)x##L)
+  #define loglnv(x)    logl(x)
+  #define explnv(x)    expl(x)
+  #define sqrtlnv(x)   sqrtl(x)
+  #define fabslnv(x)   fabsl(x)
+  #define LNV_EPSILON  LDBL_EPSILON
+  #define LNV_IS_QUAD  0
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)

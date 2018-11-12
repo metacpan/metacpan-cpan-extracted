@@ -1,33 +1,21 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2012 Smithsonian Astrophysical Observatory
-#
-# This file is part of MooX-Attributes-Shadow
-#
-# MooX-Attributes-Shadow is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package MooX::Attributes::Shadow::Role;
+
+# ABSTRACT: enumerate shadowable attributes in a contained class
 
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 use Moo::Role;
 
-use MooX::Attributes::Shadow ':all';
+use namespace::clean;
+
+use MooX::Attributes::Shadow;
+
+# make sure we have symbols in this package, so namespace clean test passes.
+sub shadow_attrs { goto \&MooX::Attributes::Shadow::shadow_attrs };
+sub shadowed_attrs { goto \&MooX::Attributes::Shadow::shadowed_attrs };
+sub xtract_attrs { goto \&MooX::Attributes::Shadow::xtract_attrs };
 
 ## no critic (ProhibitSubroutinePrototypes)
 sub shadowable_attrs (@) {
@@ -60,27 +48,27 @@ sub new_from_attrs (@) {
 
     if ( @_ == 1 ) {
 
-	$options = shift;
+        $options = shift;
 
     }
 
     elsif ( @_ == 2 && 'HASH' eq ref $_[0] && 'HASH' eq ref $_[1] ) {
 
-	$options = shift;
-	%attrs = %{ shift() };
+        $options = shift;
+        %attrs = %{ shift() };
 
     }
 
     elsif ( @_ % 2 ) {
 
-	$options = shift;
-	%attrs = @_;
+        $options = shift;
+        %attrs = @_;
 
     }
 
     else {
 
-	%attrs = @_;
+        %attrs = @_;
 
     }
 
@@ -89,12 +77,29 @@ sub new_from_attrs (@) {
 
 1;
 
+#
+# This file is part of MooX-Attributes-Shadow
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory ContainedClass shadowable
 
 =head1 NAME
 
 MooX::Attributes::Shadow::Role - enumerate shadowable attributes in a contained class
+
+=head1 VERSION
+
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -128,7 +133,6 @@ MooX::Attributes::Shadow::Role - enumerate shadowable attributes in a contained 
                  handles => Foo->shadowed_attrs,
                );
 
-
 =head1 DESCRIPTION
 
 B<MooX::Attributes::Shadow::Role> provides a means for a class to
@@ -137,7 +141,6 @@ it.  (See B<MooX::Attributes::Shadow> for more on what this means).
 A class containing a class composed with this role need know nothing about
 the attributes which will be shadowed, and can use the class methods to
 integrate the shadowable attributes into their interface.
-
 
 =head1 INTERFACE
 
@@ -159,9 +162,7 @@ shadowed as an array:
    Class->shadowable_attrs( qw[ a b c ] );
    @attrs = Class->shadowable_attrs;
 
-
 =back
-
 
 =head2 Class methods for use by the Container Classes
 
@@ -268,19 +269,46 @@ this (string) is used to identify an individual instance.
 
 =back
 
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Attributes-Shadow>
+or by email to
+L<bug-MooX-Attributes-Shadow@rt.cpan.org|mailto:bug-MooX-Attributes-Shadow@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/djerius/moox-attributes-shadow>
+and may be cloned from L<git://github.com/djerius/moox-attributes-shadow.git>
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<MooX::Attributes::Shadow|MooX::Attributes::Shadow>
 
 =back
 
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2012 Smithsonian Astrophysical Observatory
-
-This software is released under the GNU General Public License.  You
-may find a copy at
-
-   http://www.fsf.org/copyleft/gpl.html
-
-
 =head1 AUTHOR
 
-Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

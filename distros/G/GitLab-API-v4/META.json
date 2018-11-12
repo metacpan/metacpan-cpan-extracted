@@ -76,7 +76,7 @@
          "web" : "https://github.com/bluefeet/GitLab-API-v4"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

@@ -1,83 +1,105 @@
 package Pcore::Util::Result;
 
-use Pcore -export;
-use Pcore::Util::Result::Status;
-use Pcore::Util::Scalar qw[is_plain_arrayref is_plain_hashref];
-use Pcore::Util::Result::Status;
-
-use overload
-  bool     => sub { substr( $_[0]->{status}, 0, 1 ) == 2 },
-  '0+'     => sub { $_[0]->{status} },
-  q[""]    => sub {"$_[0]->{status} $_[0]->{reason}"},
-  fallback => 1;
+use Pcore -export, -const;
+use Pcore::Util::Scalar qw[is_res is_plain_arrayref is_plain_hashref];
+use Pcore::Util::Result::Class;
 
 our $EXPORT = [qw[res]];
 
-# CONSTRUCTOR
+our $STATUS_REASON;
+
+const our $STATUS_CATEGORY => [    #
+    'Unknown Status',              # 0
+    'Informational',               # 1xx
+    'Success',                     # 2xx
+    'Redirection',                 # 3xx
+    'Client Error',                # 4xx
+    'Server Error',                # 5xx
+];
+
+sub update ($cb = undef) {
+    print 'updating status.yaml ... ';
+
+    return P->http->get(
+        'https://www.iana.org/assignments/http-status-codes/http-status-codes-1.csv',
+        sub ($res) {
+            if ($res) {
+                my $data;
+
+                for my $line ( split /\n\r?/sm, $res->{data}->$* ) {
+                    my ( $status, $reason ) = split /,/sm, $line;
+
+                    $data->{$status} = $reason if $status =~ /\A\d\d\d\z/sm;
+                }
+
+                local $YAML::XS::QuoteNumericStrings = 0;
+
+                $ENV->{share}->write( 'Pcore', 'data/status.yaml', $data );
+
+                $STATUS_REASON = $data;
+            }
+
+            say $res;
+
+            $cb->($res) if $cb;
+
+            return $res;
+        }
+    );
+}
+
+sub _load_data {
+    $STATUS_REASON = $ENV->{share}->read_cfg( 'Pcore', 'data', 'status.yaml' );
+
+    return;
+}
+
 sub res ( $status, @args ) {
-    my $hash = @args % 2 ? { @args[ 1 .. $#args ], data => $args[0] } : {@args};
+    my $self = @args % 2 ? { @args[ 1 .. $#args ], data => $args[0] } : {@args};
 
-    my $self = bless $hash, __PACKAGE__;
+    $self = bless $self, 'Pcore::Util::Result::Class';
 
-    if ( is_plain_arrayref $status ) {
-        $hash->{status} = $status->[0];
+    my $reason;
 
-        if ( is_plain_hashref $status->[1] ) {
-            $hash->{reason} = Pcore::Util::Result::Status::get_reason( undef, $status->[0], $status->[1] );
-        }
-        else {
-            $hash->{reason} = $status->[1] // Pcore::Util::Result::Status::get_reason( undef, $status->[0], $status->[2] );
-        }
+  REDO:
+    if ( is_plain_arrayref $status) {
+        ( $status, $reason ) = $status->@*;
+
+        goto REDO;
+    }
+    elsif ( is_res $status) {
+        $self->{status} = $status->{status};
+
+        $self->{reason} = $status->{reason};
     }
     else {
-        $hash->{status} = $status;
+        $self->{status} = $status;
 
-        $hash->{reason} = Pcore::Util::Result::Status::get_reason( undef, $status, undef );
+        if ( !defined $reason ) {
+            $self->{reason} = resolve_reason($status);
+        }
+        elsif ( is_plain_hashref $reason) {
+            $self->{reason} = resolve_reason( $status, $reason );
+        }
+        else {
+            $self->{reason} = $reason;
+        }
     }
 
     return $self;
 }
 
-sub get_standard_reason ( $status ) {
-    $status = 0+ $status;
+sub resolve_reason ( $status, $status_reason = undef ) {
+    _load_data() if !defined $STATUS_REASON;
 
-    if    ( exists $Pcore::Util::Result::Status::STATUS_REASON->{$status} ) { return $Pcore::Util::Result::Status::STATUS_REASON->{$status} }
-    elsif ( $status < 200 )                                                 { return $Pcore::Util::Result::Status::STATUS_REASON->{'1xx'} }
-    elsif ( $status < 300 )                                                 { return $Pcore::Util::Result::Status::STATUS_REASON->{'2xx'} }
-    elsif ( $status < 400 )                                                 { return $Pcore::Util::Result::Status::STATUS_REASON->{'3xx'} }
-    elsif ( $status < 500 )                                                 { return $Pcore::Util::Result::Status::STATUS_REASON->{'4xx'} }
-    else                                                                    { return $Pcore::Util::Result::Status::STATUS_REASON->{'5xx'} }
+    if ( $status_reason && $status_reason->{$status} ) { return $status_reason->{$status} }
+    elsif ( exists $STATUS_REASON->{$status} ) { return $STATUS_REASON->{$status} }
+    elsif ( $status < 200 ) { return $STATUS_CATEGORY->[1] }
+    elsif ( $status >= 200 && $status < 300 ) { return $STATUS_CATEGORY->[2] }
+    elsif ( $status >= 300 && $status < 400 ) { return $STATUS_CATEGORY->[3] }
+    elsif ( $status >= 400 && $status < 500 ) { return $STATUS_CATEGORY->[4] }
+    else                                      { return $STATUS_CATEGORY->[5] }
 }
-
-# STATUS METHODS
-sub is_info ($self) {
-    return substr( $_[0]->{status}, 0, 1 ) == 1;
-}
-
-sub is_success ($self) {
-    return substr( $_[0]->{status}, 0, 1 ) == 2;
-}
-
-sub is_redirect ($self) {
-    return substr( $_[0]->{status}, 0, 1 ) == 3;
-}
-
-sub is_error ($self) {
-    return substr( $_[0]->{status}, 0, 1 ) >= 4;
-}
-
-sub is_client_error ($self) {
-    return substr( $_[0]->{status}, 0, 1 ) == 4;
-}
-
-sub is_server_error ($self) {
-    return substr( $_[0]->{status}, 0, 1 ) >= 5;
-}
-
-# SERIALIZE
-*TO_JSON = *TO_CBOR = sub ($self) {
-    return { $_[0]->%* };
-};
 
 1;
 __END__

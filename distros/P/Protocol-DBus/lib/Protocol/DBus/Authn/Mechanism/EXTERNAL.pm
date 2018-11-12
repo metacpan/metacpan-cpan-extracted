@@ -21,6 +21,18 @@ sub AFTER_OK {
     );
 }
 
+sub new {
+    my $self = $_[0]->SUPER::new(@_[ 1 .. $#_ ]);
+
+    $self->{'_skip_unix_fd'} = 1 if !Socket->can('SCM_RIGHTS');
+
+    # TODO: Research this a bit more to figure out
+    # how to make it work.
+    $self->{'_skip_unix_fd'} = 1;
+
+    return $self;
+}
+
 sub _consume_agree_unix_fd {
     my ($authn, $line) = @_;
 

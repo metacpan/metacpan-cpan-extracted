@@ -3,13 +3,13 @@ package Pcore::API::SCM::Upstream;
 use Pcore -class;
 use Pcore::API::SCM::Const qw[:ALL];
 
-has local_scm_type => ( is => 'ro', isa => Enum [ $SCM_TYPE_HG,           $SCM_TYPE_GIT ] );
-has scm_type       => ( is => 'ro', isa => Enum [ $SCM_TYPE_HG,           $SCM_TYPE_GIT ], required => 1 );
-has hosting        => ( is => 'ro', isa => Enum [ $SCM_HOSTING_BITBUCKET, $SCM_HOSTING_GITHUB ], required => 1 );
+has local_scm_type => ();                   # Enum [ $SCM_TYPE_HG, $SCM_TYPE_GIT ]
+has scm_type       => ( required => 1 );    # Enum [ $SCM_TYPE_HG, $SCM_TYPE_GIT ]
+has hosting        => ( required => 1 );    # Enum [ $SCM_HOSTING_BITBUCKET, $SCM_HOSTING_GITHUB ]
 
-has repo_namespace => ( is => 'ro', isa => Str, required => 1 );
-has repo_name      => ( is => 'ro', isa => Str, required => 1 );
-has repo_id        => ( is => 'ro', isa => Str, required => 1 );
+has repo_namespace => ( required => 1 );    # Str
+has repo_name      => ( required => 1 );    # Str
+has repo_id        => ( required => 1 );    # Str
 
 # NOTE https://bitbucket.org/repo_owner/repo_name - upstream SCM type can't be recognized correctly, use ".git" suffix fot git repositories
 

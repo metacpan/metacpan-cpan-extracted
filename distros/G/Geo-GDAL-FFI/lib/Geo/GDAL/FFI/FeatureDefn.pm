@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 0.05_03;
+our $VERSION = 0.0601;
 
 sub new {
     my ($class, $args) = @_;
@@ -66,7 +66,7 @@ sub GetFieldDefn {
     my $i = $fname // 0;
     $i = Geo::GDAL::FFI::OGR_FD_GetFieldIndex($$self, $i) unless Geo::GDAL::FFI::isint($i);
     my $d = Geo::GDAL::FFI::OGR_FD_GetFieldDefn($$self, $i);
-    confess "No such field: $fname" unless $d;
+    confess "No such field: $fname." unless $d;
     ++$Geo::GDAL::FFI::immutable{$d};
     return bless \$d, 'Geo::GDAL::FFI::FieldDefn';
 }
@@ -85,7 +85,7 @@ sub GetGeomFieldDefn {
     my $i = $fname // 0;
     $i = Geo::GDAL::FFI::OGR_FD_GetGeomFieldIndex($$self, $i) unless Geo::GDAL::FFI::isint($i);
     my $d = Geo::GDAL::FFI::OGR_FD_GetGeomFieldDefn($$self, $i);
-    confess "No such field: $fname" unless $d;
+    confess "No such field: $fname." unless $d;
     ++$Geo::GDAL::FFI::immutable{$d};
     return bless \$d, 'Geo::GDAL::FFI::GeomFieldDefn';
 }
@@ -132,7 +132,7 @@ sub SetGeomType {
     my ($self, $type) = @_;
     $type //= 'Unknown';
     my $tmp = $Geo::GDAL::FFI::geometry_types{$type};
-    confess "Unknown geometry type: $type\n" unless defined $tmp;
+    confess "Unknown geometry type: $type." unless defined $tmp;
     Geo::GDAL::FFI::OGR_FD_SetGeomType($$self, $tmp);
 }
 

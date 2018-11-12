@@ -7,13 +7,11 @@ use Cwd qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 use Config;
 
 sub cat_path {
-    return P->path( join q[/], splice @_, 1 );
+    return P->path( join '/', splice @_, 1 );
 }
 
 # return cwd, symlinks are resolved
-sub cwd {
-    return P->path( Cwd::realpath(q[.]), is_dir => 1 );
-}
+sub cwd { return P->path->to_abs }
 
 sub chdir ($path) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     if ( defined wantarray ) {
@@ -21,7 +19,7 @@ sub chdir ($path) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
 
         return unless chdir $path;
 
-        state $init = !!require Pcore::Util::File::ChdirGuard;
+        require Pcore::Util::File::ChdirGuard;
 
         return Pcore::Util::File::ChdirGuard->new( { dir => $cwd } );
     }
@@ -38,7 +36,7 @@ sub umask ($mode) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     return '00' if $MSWIN;
 
     if ( defined wantarray ) {
-        state $init = !!require Pcore::Util::File::UmaskGuard;
+        require Pcore::Util::File::UmaskGuard;
 
         return Pcore::Util::File::UmaskGuard->new( { old_umask => CORE::umask calc_umask($mode) } );
     }
@@ -493,9 +491,9 @@ sub read_dir ( $path, % ) {
     }
 
     if ( $args{full_path} ) {
-        my $path = P->path( $path, is_dir => 1 );
+        my $path = P->path($path);
 
-        $files = [ map { $path . $_ } $files->@* ];
+        $files = [ map {"$path/$_"} $files->@* ];
     }
 
     closedir $dh or die;
@@ -541,7 +539,7 @@ sub mkpath ( $path, % ) {
         splice @_, 1,
     );
 
-    state $init = !!require File::Path;
+    require File::Path;    ## no critic qw[Modules::ProhibitEvilModules]
 
     $args{mode} = calc_chmod( $args{mode} );
 
@@ -557,7 +555,7 @@ sub rmtree ( $path, @ ) {
         splice @_, 1,
     );
 
-    state $init = !!require File::Path;
+    require File::Path;                                                                              ## no critic qw[Modules::ProhibitEvilModules]
 
     my $error;
 
@@ -570,25 +568,25 @@ sub rmtree ( $path, @ ) {
 
 sub empty_dir ( $path, @ ) {
     my %args = (
-        safe => 0,    # 0 - will attempts to alter file permission
+        safe => 0,                                                                                   # 0 - will attempts to alter file permission
         splice @_, 1,
         keep_root => 1,
     );
 
-    state $init = !!require File::Path;
+    require File::Path;                                                                              ## no critic qw[Modules::ProhibitEvilModules]
 
     return File::Path::remove_tree( "$path", \%args );
 }
 
 # TEMP
 sub tempfile (%args) {
-    state $init = !!require Pcore::Util::File::TempFile;
+    require Pcore::Util::File::TempFile;
 
     return Pcore::Util::File::TempFile->new(%args);
 }
 
 sub tempdir (%args) {
-    state $init = !!require Pcore::Util::File::TempDir;
+    require Pcore::Util::File::TempDir;
 
     return Pcore::Util::File::TempDir->new( \%args );
 }
@@ -603,7 +601,7 @@ sub temppath {
 
     $args{suffix} = q[.] . $args{suffix} if defined $args{suffix} && $args{suffix} ne q[] && substr( $args{suffix}, 0, 1 ) ne q[.];
 
-    state $init = !!require Pcore::Util::File::TempFile;
+    require Pcore::Util::File::TempFile;
 
     mkpath( $args{base} ) if !-e $args{base};
 
@@ -616,7 +614,7 @@ sub temppath {
 
     goto REDO if -e $args{base} . q[/] . $filename;
 
-    return P->path( $args{base} . q[/] . $filename );
+    return P->path("$args{base}/$filename");
 }
 
 # COPY / MOVE FILE
@@ -689,7 +687,13 @@ sub move ( $from, $to, @ ) {
     local $File::Copy::Recursive::PFSCheck = $args{pfs_check};
     local $File::Copy::Recursive::CPRFComp = $args{cprf};
 
-    state $init = !!require File::Copy::Recursive;
+    state $init = do {
+
+        # redefine $Coro::State::DIEHOOK, required under MSWin to handle Time::HiRes::utime import
+        local $SIG{__DIE__} = undef;
+
+        !!require File::Copy::Recursive;
+    };
 
     if ( -d $from ) {
         if ( $args{glob} ) {
@@ -739,10 +743,10 @@ sub where ( $filename ) {
         for my $ext ( $pathext->@* ) {
             if ( -e "$path/${filename}${ext}" ) {
                 if ($wantarray) {
-                    push @res, P->path("$path/${filename}${ext}")->realpath;
+                    push @res, P->path("$path/${filename}${ext}")->to_abs;
                 }
                 else {
-                    return P->path("$path/${filename}${ext}")->realpath;
+                    return P->path("$path/${filename}${ext}")->to_abs;
                 }
             }
         }
@@ -753,7 +757,7 @@ sub where ( $filename ) {
 
 # UNTAR
 sub untar ( $tar, $target, @ ) {
-    state $init = !!require Archive::Tar;
+    require Archive::Tar;
 
     my %args = (
         strip_component => 0,
@@ -767,9 +771,9 @@ sub untar ( $tar, $target, @ ) {
     my @extracted;
 
     for my $file ( $tar->get_files ) {
-        next if !$file->is_file;
+        next if !defined $file->{filename};
 
-        my $path = P->path( q[/] . $file->full_path )->to_string;
+        my $path = P->path( '/' . $file->full_path );
 
         if ( $args{strip_component} ) {
             if ( !$strip_component ) {
@@ -777,7 +781,7 @@ sub untar ( $tar, $target, @ ) {
 
                 die q[Can't strip component, path is too short] if @labels < $args{strip_component};
 
-                $strip_component = P->path( q[/] . join( q[/], splice @labels, 0, $args{strip_component} + 1 ) )->to_string;
+                $strip_component = P->path( '/' . join( '/', splice @labels, 0, $args{strip_component} + 1 ) );
             }
 
             die qq[Can't strip component "$strip_component" from path "$path"] if $path !~ s[\A$strip_component][]sm;
@@ -785,7 +789,7 @@ sub untar ( $tar, $target, @ ) {
 
         my $target_path = P->path("$target/$path");
 
-        P->file->mkpath( $target_path->dirname ) if !-e $target_path->dirname;
+        P->file->mkpath( $target_path->{dirname} ) if !-e $target_path->{dirname};
 
         if ( $file->extract($target_path) ) {
             push @extracted, $target_path;
@@ -806,11 +810,11 @@ sub untar ( $tar, $target, @ ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 50                   | * Subroutine "calc_umask" with high complexity score (25)                                                      |
-## |      | 124                  | * Subroutine "calc_chmod" with high complexity score (25)                                                      |
-## |      | 250                  | * Subroutine "read_lines" with high complexity score (27)                                                      |
+## |      | 48                   | * Subroutine "calc_umask" with high complexity score (25)                                                      |
+## |      | 122                  | * Subroutine "calc_chmod" with high complexity score (25)                                                      |
+## |      | 248                  | * Subroutine "read_lines" with high complexity score (27)                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 780                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 784                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -10,16 +10,16 @@ with qw[Pcore::Core::Event::Listener];
 
 has tmpl => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :><: $text | raw :>';
 
-has username => ( required => 1 );    # is => 'ro', isa => Str, required => 1
-has password => ( required => 1 );    # isa => Str,         required => 1
-has host     => ( required => 1 );    # isa => Str,         required => 1
-has port => 5222;                     # isa => PositiveInt
-has to => ( required => 1 );          # isa => Str,         required => 1
+has username => ( required => 1 );    # Str
+has password => ( required => 1 );    # Str
+has host     => ( required => 1 );    # Str
+has port => 5222;                     # PositiveInt
+has to => ( required => 1 );          # Str
 
-has _tmpl  => ( init_arg => undef );  # InstanceOf ['Pcore::Util::Tmpl'], init_arg => undef
-has _h     => ( init_arg => undef );  # InstanceOf ['Pcore::Handle::xmpp'],   init_arg => undef
-has _queue => ( init_arg => undef );  # isa => ArrayRef, init_arg => undef
-has _init  => ( init_arg => undef );  #  isa => Bool, init_arg => undef
+has _tmpl  => ( init_arg => undef );  # InstanceOf ['Pcore::Util::Tmpl']
+has _h     => ( init_arg => undef );  # InstanceOf ['Pcore::Handle::xmpp']
+has _queue => ( init_arg => undef );  # ArrayRef
+has _init  => ( init_arg => undef );  # Bool
 
 const our $INDENT => q[ ] x 4;
 

@@ -10,6 +10,11 @@ README
 bin/yancy
 cpanfile
 dist.ini
+eg/README.md
+eg/doc-site/README.md
+eg/doc-site/cpanfile
+eg/doc-site/docs.db
+eg/doc-site/myapp.pl
 eg/screenshot-edit.png
 eg/screenshot.png
 eg/test-app/myapp.conf
@@ -70,6 +75,7 @@ t/backend/pg.t
 t/backend/sqlite.t
 t/controller/multi_tenant.t
 t/controller/yancy.t
+t/examples/doc-site.t
 t/examples/test-app.t
 t/examples/todo-app.t
 t/filter.t

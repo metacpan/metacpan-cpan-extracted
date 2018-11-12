@@ -1,0 +1,8 @@
+Revision history for Alien::geos::af
+
+1.001 2018-11-13
+    - Add File::Find::Rule to CONFIGURE_REQUIRES.
+      This should avoid some CAN testers fails.
+
+1.001 2018-11-12
+    - First release to cpan

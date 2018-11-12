@@ -7,7 +7,7 @@ use Exporter qw/ import /;
 
 use PerlX::Maybe;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 # RECOMMEND PREREQ: PerlX::Maybe::XS
 
@@ -127,7 +127,7 @@ Types::SQL::Util - extract DBIx::Class column_info from types
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 
@@ -246,7 +246,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Robert Rothenberg.
+This software is Copyright (c) 2016-2018 by Robert Rothenberg.
 
 This is free software, licensed under:
 

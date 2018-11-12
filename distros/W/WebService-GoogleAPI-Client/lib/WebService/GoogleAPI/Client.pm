@@ -2,14 +2,14 @@ use strictures;
 use 5.14.0;
 
 package WebService::GoogleAPI::Client;
-$WebService::GoogleAPI::Client::VERSION = '0.19';
+$WebService::GoogleAPI::Client::VERSION = '0.20';
 
 # ABSTRACT: Google API Discovery and SDK
 
 #   FROM MCE POD -- <p><img src="https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.png" width="664" height="446" alt="Bank Queuing Model" /></p>
 
 
-use Data::Dump;
+use Data::Dump qw/pp/;
 use Moo;
 use WebService::GoogleAPI::Client::UserAgent;
 use WebService::GoogleAPI::Client::Discovery;
@@ -316,7 +316,7 @@ WebService::GoogleAPI::Client - Google API Discovery and SDK
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

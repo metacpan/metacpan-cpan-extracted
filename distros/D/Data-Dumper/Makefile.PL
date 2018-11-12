@@ -40,6 +40,7 @@ WriteMakefile(
     NAME          => 'Data::Dumper',
     VERSION_FROM  => 'Dumper.pm',
     ABSTRACT_FROM => 'Dumper.pm',
+    DEFINE        => '-DUSE_PPPORT_H',
     realclean     => { FILES => "@temps" },
     (%pod_scripts ? (
         PL_FILES  => \%pod_scripts,

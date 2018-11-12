@@ -7,7 +7,7 @@ use Pcore::Util::Text qw[encode_utf8];
 use Pcore::App::API::Auth;
 
 use overload    #
-  q[&{}] => sub ( $self, @ ) {
+  '&{}' => sub ( $self, @ ) {
     return sub { return _respond( $self, @_ ) };
   },
   fallback => undef;
@@ -74,7 +74,7 @@ sub _respond ( $self, @ ) {
         # https://tools.ietf.org/html/rfc7230#section-3.2
         $buf = do {
             my $status = 0+ $_[1];
-            my $reason = Pcore::Util::Result::get_standard_reason($status);
+            my $reason = P->result->resolve_reason($status);
 
             "HTTP/1.1 $status $reason\r\n";
         };

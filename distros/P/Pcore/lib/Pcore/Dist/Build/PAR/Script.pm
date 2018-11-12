@@ -6,22 +6,22 @@ use Pcore::Util::File::Tree;
 use Archive::Zip qw[];
 use PAR::Filter;
 use Filter::Crypto::CryptFile;
-use Pcore::Src::File;
 use Config;
 use Fcntl qw[:DEFAULT SEEK_END];
 
-has dist   => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'],       required => 1 );
-has script => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Path'], required => 1 );
-has release => ( is => 'ro', isa => Bool,    required => 1 );
-has crypt   => ( is => 'ro', isa => Bool,    required => 1 );
-has clean   => ( is => 'ro', isa => Bool,    required => 1 );
-has mod     => ( is => 'ro', isa => HashRef, required => 1 );
+has dist    => ( required => 1 );    # InstanceOf ['Pcore::Dist']
+has script  => ( required => 1 );    # InstanceOf ['Pcore::Util::Path']
+has release => ( required => 1 );
+has crypt   => ( required => 1 );
+has clean   => ( required => 1 );
+has gui     => ( required => 1 );
+has mod     => ( required => 1 );    # HashRef
 
-has tree           => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::File::Tree'], init_arg => undef );
-has par_suffix     => ( is => 'lazy', isa => Str,                                    init_arg => undef );
-has exe_filename   => ( is => 'lazy', isa => Str,                                    init_arg => undef );
-has main_mod       => ( is => 'lazy', isa => HashRef,                                default  => sub { {} }, init_arg => undef );    # main modules, found during deps processing
-has shared_objects => ( is => 'ro',   isa => HashRef,                                init_arg => undef );
+has tree         => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Util::File::Tree']
+has par_suffix   => ( is => 'lazy', init_arg => undef );
+has exe_filename => ( is => 'lazy', init_arg => undef );
+has main_mod => ( sub { {} }, is => 'lazy', init_arg => undef );    # HashRef, main modules, found during deps processing
+has shared_objects => ( init_arg => undef );                        # HashRef
 
 sub _build_tree ($self) {
     return Pcore::Util::File::Tree->new;
@@ -32,19 +32,19 @@ sub _build_par_suffix ($self) {
 }
 
 sub _build_exe_filename ($self) {
-    my $filename = $self->script->filename_base;
+    my $filename = $self->{script}->{filename_base};
 
     my @attrs;
 
-    if ( $self->release ) {
-        push @attrs, $self->dist->version;
+    if ( $self->{release} ) {
+        push @attrs, $self->{dist}->version;
     }
     else {
-        if ( $self->dist->id->{bookmark} ) {
-            push @attrs, $self->dist->id->{bookmark};
+        if ( $self->{dist}->id->{bookmark} ) {
+            push @attrs, $self->{dist}->id->{bookmark};
         }
         else {
-            push @attrs, $self->dist->id->{branch};
+            push @attrs, $self->{dist}->id->{branch};
         }
     }
 
@@ -55,13 +55,13 @@ sub _build_exe_filename ($self) {
 
 # TODO enable repack
 sub run ($self) {
-    say qq[\nBuilding ] . ( $self->crypt ? $BLACK . $ON_GREEN . ' crypted ' : $BOLD . $WHITE . $ON_RED . q[ not crypted ] ) . $RESET . q[ ] . $BLACK . $ON_GREEN . ( $self->clean ? ' clean ' : ' cached ' ) . $RESET . qq[ "@{[$self->exe_filename]}" for $Config{archname}$LF];
+    say qq[\nBuilding ] . ( $self->{crypt} ? $BLACK . $ON_GREEN . ' crypted ' : $BOLD . $WHITE . $ON_RED . q[ not crypted ] ) . $RESET . q[ ] . $BLACK . $ON_GREEN . ( $self->{clean} ? ' clean ' : ' cached ' ) . $RESET . qq[ "@{[$self->exe_filename]}" for $Config{archname}$LF];
 
     # add main script
-    $self->_add_perl_source( $self->script->realpath->to_string, 'script/main.pl' );
+    $self->_add_perl_source( $self->{script}->to_abs->{path}, 'script/main.pl' );
 
     # add META.yml
-    $self->tree->add_file( 'META.yml', P->data->to_yaml( { par => { clean => 1 } } ) ) if $self->clean;
+    $self->tree->add_file( 'META.yml', P->data->to_yaml( { par => { clean => 1 } } ) ) if $self->{clean};
 
     # add modules
     print 'adding modules ... ';
@@ -102,12 +102,12 @@ sub run ($self) {
         $member->unixFileAttributes( oct 666 );
     }
 
-    my $zip_path = P->file->temppath( suffix => 'zip' );
+    my $zip_path = P->file1->tempfile;
 
-    $zip->writeToFileNamed("$zip_path");
+    $zip->writeToFileNamed( $zip_path->{path} );
 
     # create parl executable
-    my $parl_path = P->file->temppath( suffix => $self->par_suffix );
+    my $parl_path = P->file1->tempfile;
 
     print 'writing parl ... ';
 
@@ -124,13 +124,49 @@ sub run ($self) {
     # patch windows exe icon
     $self->_patch_icon("$repacked_path");
 
-    my $target_exe = $self->dist->root . 'data/' . $self->exe_filename;
+    my $target_exe = "$self->{dist}->{root}/data/" . $self->exe_filename;
 
     P->file->move( $repacked_path, $target_exe );
 
     P->file->chmod( 'rwx------', $target_exe );
 
     say 'final binary size: ' . $BLACK . $ON_GREEN . q[ ] . add_num_sep( -s $target_exe ) . q[ ] . $RESET . ' bytes';
+
+    $self->_gui($target_exe) if $self->{gui} && $MSWIN;
+
+    return;
+}
+
+sub _gui ( $self, $file ) {
+    my ( $record, $magic, $signature, $offset, $size );
+
+    open my $exe, '+<', $file or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
+
+    binmode $exe or die $!;
+    seek $exe, 0, 0 or die $!;
+
+    # read IMAGE_DOS_HEADER structure
+    read $exe, $record, 64 or die $!;
+    ( $magic, $offset ) = unpack "Sx58L", $record;
+
+    die "$file is not an MSDOS executable file.\n" unless $magic == 0x5a4d;    # "MZ"
+
+    # read signature, IMAGE_FILE_HEADER and first WORD of IMAGE_OPTIONAL_HEADER
+    seek $exe, $offset, 0 or die $!;
+    read $exe, $record, 4 + 20 + 2 or die $!;
+
+    ( $signature, $size, $magic ) = unpack "Lx16Sx2S", $record;
+
+    die "PE header not found" unless $signature == 0x4550;                     # "PE\0\0"
+
+    die "Optional header is neither in NT32 nor in NT64 format"
+      unless ( $size == 224 && $magic == 0x10b )                               # IMAGE_NT_OPTIONAL_HDR32_MAGIC
+      || ( $size == 240 && $magic == 0x20b );                                  # IMAGE_NT_OPTIONAL_HDR64_MAGIC
+
+    # Offset 68 in the IMAGE_OPTIONAL_HEADER(32|64) is the 16 bit subsystem code
+    seek $exe, $offset + 4 + 20 + 68, 0 or die $!;
+    print $exe pack "S", 2;                                                    # IMAGE_WINDOWS
+    close $exe or die $!;
 
     return;
 }
@@ -139,7 +175,7 @@ sub _add_modules ($self) {
 
     # add full unicore database
     for my $lib ( reverse @INC ) {
-        for my $path ( ( P->path1("$lib/unicore")->read_dir( max_depth => 0, abs => 1, is_dir => 0 ) // [] )->@* ) {
+        for my $path ( ( P->path("$lib/unicore")->read_dir( max_depth => 0, abs => 1, is_dir => 0 ) // [] )->@* ) {
             next if $path !~ /[.]p[lm]\z/sm;
 
             $self->_add_module($path);
@@ -149,14 +185,14 @@ sub _add_modules ($self) {
     my $not_found_modules;
 
     # add .pl, .pm
-    for my $module ( grep {/[.](?:pl|pm)\z/sm} keys $self->mod->%* ) {
+    for my $module ( grep {/[.](?:pl|pm)\z/sm} keys $self->{mod}->%* ) {
         my $found = $self->_add_module($module);
 
         push $not_found_modules->@*, $module if !$found;
     }
 
     # add .pc (part of some Win32API modules)
-    for my $module ( grep {/[.](?:pc)\z/sm} keys $self->mod->%* ) {
+    for my $module ( grep {/[.](?:pc)\z/sm} keys $self->{mod}->%* ) {
         my $found;
 
         for my $inc ( grep { !ref } @INC ) {
@@ -183,7 +219,7 @@ sub _add_modules ($self) {
 sub _add_shlib ($self) {
     die q[Currently on MSWIN platform is supported] if !$MSWIN;
 
-    state $system_root = P->path( $ENV{SYSTEMROOT}, is_dir => 1 )->realpath;
+    state $system_root = P->path( $ENV{SYSTEMROOT} )->to_abs;
 
     state $is_system_lib = sub ($path) {
         return $path =~ m[^\Q$system_root\E]smi ? 1 : 0;
@@ -243,7 +279,7 @@ sub _add_shlib ($self) {
 
     my $perl_path = P->path($^X);
 
-    $dso->{ $perl_path->filename } = "$perl_path";
+    $dso->{ $perl_path->{filename} } = "$perl_path";
 
     # add found deps
     for my $filename ( sort keys $dso->%* ) {
@@ -256,7 +292,7 @@ sub _add_shlib ($self) {
 }
 
 sub _add_module ( $self, $module ) {
-    $module = P->perl->module( $module, $self->dist->root . 'lib/' );
+    $module = P->perl->module( $module, "$self->{dist}->{root}/lib" );
 
     # module wasn't found
     return if !$module;
@@ -290,7 +326,7 @@ sub _process_main_modules ($self) {
     $self->_add_dist( $ENV->{pcore} );
 
     for my $main_mod ( keys $self->main_mod->%* ) {
-        next if $main_mod eq 'Pcore.pm' or $main_mod eq $self->dist->module->name;
+        next if $main_mod eq 'Pcore.pm' or $main_mod eq $self->{dist}->module->name;
 
         my $dist = Pcore::Dist->new($main_mod);
 
@@ -300,7 +336,7 @@ sub _process_main_modules ($self) {
     }
 
     # add current dist, should be added last to preserve share libs order
-    $self->_add_dist( $self->dist );
+    $self->_add_dist( $self->{dist} );
 
     return;
 }
@@ -319,24 +355,22 @@ sub _add_perl_source ( $self, $source, $target, $is_cpan_module = 0, $module = u
         $src = PAR::Filter->new('PatchContent')->apply( $src, $module );
     }
 
-    $src = Pcore::Src::File->new( {
-        action      => $Pcore::Src::SRC_COMPRESS,
-        path        => $target,
-        is_realpath => 0,
-        in_buffer   => $src,
-        filter_args => {
+    $src = \P->src->compress(
+        path   => $target,
+        data   => $src->$*,
+        filter => {
             perl_compress_keep_ln => 1,
             perl_strip_comment    => 1,
             perl_strip_pod        => 1,
-        },
-    } )->run->out_buffer;
+        }
+    )->{data};
 
     # crypt sources, do not crypt CPAN modules
-    if ( !$is_cpan_module && $self->crypt && ( !$module || $module ne 'Filter/Crypto/Decrypt.pm' ) ) {
+    if ( !$is_cpan_module && $self->{crypt} && ( !$module || $module ne 'Filter/Crypto/Decrypt.pm' ) ) {
         my $crypt = 1;
 
         # do not crypt modules, that belongs to the CPAN distribution
-        if ( !$is_cpan_module && ( my $dist = Pcore::Dist->new( P->path($source)->dirname ) ) ) {
+        if ( !$is_cpan_module && ( my $dist = Pcore::Dist->new( P->path($source)->{dirname} ) ) ) {
             $crypt = 0 if $dist->cfg->{cpan};
         }
 
@@ -361,10 +395,10 @@ sub _add_perl_source ( $self, $source, $target, $is_cpan_module = 0, $module = u
 }
 
 sub _add_dist ( $self, $dist ) {
-    if ( $dist->name eq $self->dist->name ) {
+    if ( $dist->name eq $self->{dist}->name ) {
 
         # add main dist share
-        $self->tree->add_dir( $dist->share_dir, 'share/' );
+        $self->tree->add_dir( $dist->{share_dir}, 'share' );
 
         # add main dist dist-id.json
         $self->tree->add_file( 'share/dist-id.json', P->data->to_json( $dist->id, readable => 1 ) );
@@ -372,7 +406,7 @@ sub _add_dist ( $self, $dist ) {
     else {
 
         # add dist share
-        $self->tree->add_dir( $dist->share_dir, "lib/auto/share/dist/@{[ $dist->name ]}/" );
+        $self->tree->add_dir( $dist->{share_dir}, "lib/auto/share/dist/@{[ $dist->name ]}" );
 
         # add dist-id.json
         $self->tree->add_file( "lib/auto/share/dist/@{[ $dist->name ]}/dist-id.json", P->data->to_json( $dist->id, readable => 1 ) );
@@ -405,8 +439,6 @@ sub _repack_parl ( $self, $parl_path, $zip ) {
     # cut cache id, now overlay = files sections + par zip section
     $overlay =~ s/.{40}\x{00}CACHE\z//sm;
 
-    my $parl_so_temp = P->file->tempdir;
-
     my $file_section = {};
 
     while (1) {
@@ -425,23 +457,21 @@ sub _repack_parl ( $self, $parl_path, $zip ) {
         if ( $filename =~ /[.](?:pl|pm)\z/sm ) {
 
             # compress perl sources
-            $file_section->{$filename} = Pcore::Src::File->new( {
-                action      => $Pcore::Src::SRC_COMPRESS,
-                path        => $filename,
-                is_realpath => 0,
-                in_buffer   => \$content,
-                filter_args => {                            #
+            $file_section->{$filename} = \P->src->compress(
+                path   => $filename,
+                data   => $content,
+                filter => {
                     perl_compress         => 1,
                     perl_compress_keep_ln => 0,
                 },
-            } )->run->out_buffer;
+            )->{data};
         }
         else {
             $file_section->{$filename} = \$content;
         }
     }
 
-    my $path = P->file->temppath( suffix => $self->par_suffix );
+    my $path = P->file1->tempfile;
 
     # write raw exe
     P->file->write_bin( $path, $src );
@@ -503,7 +533,7 @@ sub _patch_icon ( $self, $path ) {
     # all layers 8bpp, 1-bit alpha, 256-slot palette
 
     if ($MSWIN) {
-        state $init = !!require Win32::Exe;
+        require Win32::Exe;
 
         # path should be passed as plain string
         my $exe = Win32::Exe->new("$path");
@@ -527,17 +557,24 @@ sub _error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 176                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 141                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "record"                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 308                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 150, 158, 160, 162,  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |      | 168, 212             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 387                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_repack_parl' declared but not used |
+## |    3 | 344                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 398                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 421                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_repack_parl' declared but not used |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 482, 485             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    3 | 432                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 415, 421             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    2 | 160                  | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 512, 515             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 168                  | InputOutput::RequireBracedFileHandleWithPrint - File handle for "print" or "printf" is not braced              |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 447, 453             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

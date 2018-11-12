@@ -9,42 +9,109 @@ use warnings;
 
 use Type::Library
    -base,
-   -declare => qw/ ConstArrayRef /;
+   -declare => qw/ Const /;
 
 use Const::Fast ();
-use Type::Tiny;
+use List::Util 1.33 ();
+use Type::Coercion;
+use Type::Tiny 1.002001;
 use Type::Utils -all;
-use Types::Standard -types;
+use Types::Standard qw/ -types is_ArrayRef is_HashRef is_ScalarRef /;
+use Types::TypeTiny ();
 
-our $VERSION = 'v0.1.0';
+# RECOMMEND PREREQ: Ref::Util::XS 0.100
+# RECOMMEND PREREQ: Type::Tiny::XS
+
+use namespace::autoclean 0.28;
+
+our $VERSION = 'v0.3.3';
 
 
-declare "ConstArrayRef",
-  as ArrayRef,
-  where   { Internals::SvREADONLY(@$_) },
+sub VERSION { # for older Perls
+    my ( $class, $wanted ) = @_;
+    require version;
+    return version->parse($VERSION);
+}
+
+
+declare Const,
+  as Ref,
+  where   \&__is_readonly,
   message {
-    return ArrayRef->get_message($_) unless ArrayRef->check($_);
     return "$_ is not readonly";
-  };
+  },
+  constraint_generator => \&__constraint_generator,
+  coercion_generator   => \&__coercion_generator;
 
-coerce "ConstArrayRef",
-  from ArrayRef,
-  via { Const::Fast::_make_readonly( $_ => 0 ); return $_; };
+coerce Const,
+  from Ref,
+  via \&__coerce_constant;
 
+sub __coerce_constant {
+    my $value = @_ ? $_[0] : $_;
+    Const::Fast::_make_readonly( $value => 0 );
+    return $value;
+}
 
-declare "ConstHashRef",
-  as HashRef,
-  where   { Internals::SvREADONLY(%$_) },
-  message {
-    return HashRef->get_message($_) unless HashRef->check($_);
-    return "$_ is not readonly";
-  };
+sub __is_readonly {
+    if ( is_ArrayRef( $_[0] ) ) {
+        return Internals::SvREADONLY( @{ $_[0] } )
+          && List::Util::all { __is_readonly($_) } @{ $_[0] };
+    }
+    elsif ( is_HashRef( $_[0] ) ) {
+        &Internals::hv_clear_placeholders( $_[0] );
+        return Internals::SvREADONLY( %{ $_[0] } )
+          && List::Util::all { __is_readonly($_) } values %{ $_[0] };
+    }
+    elsif ( is_ScalarRef( $_[0] )  ) {
+        return Internals::SvREADONLY( ${ $_[0] } );
+    }
 
-coerce "ConstHashRef",
-  from HashRef,
-  via { Const::Fast::_make_readonly( $_ => 0 ); return $_; };
+    return Internals::SvREADONLY( $_[0] );
+}
 
-1;
+sub __constraint_generator {
+    return Const unless @_;
+
+    my $param = shift;
+    Types::TypeTiny::TypeTiny->check($param)
+        or _croak("Parameter to Const[`a] expected to be a type constraint; got $param");
+
+    _croak("Only one parameter to Const[`a] expected; got @{[ 1 + @_ ]}.")
+        if @_;
+
+    my $psub = $param->constraint;
+
+    return sub {
+        return $psub->($_) && __is_readonly($_);
+    };
+}
+
+sub __coercion_generator {
+    my ( $parent, $child, $param ) = @_;
+
+    return $parent->coercion unless $param->has_coercion;
+
+    my $coercion = Type::Coercion->new( type_constraint => $child );
+
+    my $coercable_item = $param->coercion->_source_type_union;
+
+    $coercion->add_type_coercions(
+        $parent => sub {
+            my $value = @_ ? $_[0] : $_;
+            my @new;
+            for my $item (@$value) {
+                return $value unless $coercable_item->check($item);
+                push @new, $param->coerce($item);
+            }
+            return __coerce_constant(\@new);
+        },
+        );
+
+    return $coercion;
+}
+
+__PACKAGE__->meta->make_immutable;
 
 __END__
 
@@ -58,10 +125,11 @@ Types::Const - Types that coerce references to read-only
 
 =head1 VERSION
 
-version v0.1.0
+version v0.3.3
 
 =head1 SYNOPSIS
 
+  use Moo;
   use Types::Const -types;
   use Types::Standard -types;
 
@@ -69,28 +137,33 @@ version v0.1.0
 
   has bar => (
     is      => 'ro',
-    isa     => ConstArrayRef,
+    isa     => Const[ArrayRef[Str]],
     coerce  => 1,
   );
 
 =head1 DESCRIPTION
 
-The type library provides types that allow read-only attributes to be
-read-only.
+This is an I<experimental> type library that provides types that force
+read-only hash and array reference attributes to be deeply read-only.
+
+See the L<known issues|/KNOWN_ISSUES> below for a discussion of
+side-effects.
 
 =head1 TYPES
 
-=head2 C<ConstArrayRef>
+=head2 C<Const[`a]>
 
-A read-only array reference.
+Any defined reference value that is read-only.
 
-=head2 C<ConstHashRef>
+If parameterized, then the referred value must also pass the type
+constraint, for example C<Const[HashRef[Int]]> must a a hash reference
+with integer values.
 
-A read-only hash reference.
+It supports coercions to read-only.
 
-=head1 KNOWN ISSUES
+This was added in v0.3.0.
 
-Parameterized types, e.g. C<ConstArrayRef[Int]> are not yet supported.
+=for Pod::Coverage VERSION
 
 =head1 SEE ALSO
 
@@ -98,12 +171,35 @@ L<Const::Fast>
 
 L<Type::Tiny>
 
-=head1 SOURCE
+L<Types::Standard>
 
-The development version is on github at L<https://github.com/robrwo/Types-Const>
-and may be cloned from L<git://github.com/robrwo/Types-Const.git>
+=head1 KNOWN ISSUES
 
-=head1 BUGS
+=head2 Side-effects of read-only data structures
+
+A side-effect of read-only data structures is that an exception will
+be thrown if you attempt to fetch the value of a non-existent key:
+
+    Attempt to access disallowed key 'foo' in a restricted hash
+
+The work around for this is to check that a key exists beforehand.
+
+=head2 Performance issues
+
+Validating that a complex data-structure is read-only can affect
+performance.  If this is an issue, one workaround is to use
+L<Devel::StrictMode> and only validate data structures during tests:
+
+  has bar => (
+    is      => 'ro',
+    isa     => STRICT ? Const[ArrayRef[Str]] : ArrayRef,
+    coerce  => 1,
+  );
+
+Another means of improving performance is to only check the type
+once. (Since it is read-only, there is no need to re-check it.)
+
+=head2 Bug reports and feature requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/Types-Const/issues>
@@ -111,6 +207,11 @@ L<https://github.com/robrwo/Types-Const/issues>
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/Types-Const>
+and may be cloned from L<git://github.com/robrwo/Types-Const.git>
 
 =head1 AUTHOR
 

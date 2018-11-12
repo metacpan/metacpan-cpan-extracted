@@ -230,6 +230,11 @@ sub twin_prime_count_approx {
   _validate_positive_integer($n);
   return Math::Prime::Util::PP::twin_prime_count_approx($n);
 }
+sub semiprime_count_approx {
+  my($n) = @_;
+  _validate_positive_integer($n);
+  return Math::Prime::Util::PP::semiprime_count_approx($n);
+}
 sub ramanujan_prime_count_lower {
   my($n) = @_;
   _validate_positive_integer($n);
@@ -254,6 +259,16 @@ sub nth_twin_prime_approx {
   my($n) = @_;
   _validate_positive_integer($n);
   return Math::Prime::Util::PP::nth_twin_prime_approx($n);
+}
+sub nth_semiprime {
+  my($n) = @_;
+  _validate_positive_integer($n);
+  return Math::Prime::Util::PP::nth_semiprime($n);
+}
+sub nth_semiprime_approx {
+  my($n) = @_;
+  _validate_positive_integer($n);
+  return Math::Prime::Util::PP::nth_semiprime_approx($n);
 }
 sub nth_ramanujan_prime {
   my($n) = @_;
@@ -807,6 +822,29 @@ sub forperm (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
 }
 sub forderange (&$;$) {    ## no critic qw(ProhibitSubroutinePrototypes)
   Math::Prime::Util::PP::forderange(@_);
+}
+
+sub forsetproduct (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)
+  my($sub, @v) = @_;
+  croak 'Not a subroutine reference' unless (ref($sub) || '') eq 'CODE';
+  croak 'Not an array reference' if grep {(ref($_) || '') ne 'ARRAY'} @v;
+  # Exit if no arrays or any are empty.
+  return if scalar(@v) == 0 || grep { !@$_ } @v;
+
+  my @outv = map { $v[$_]->[0] } 0 .. $#v;
+  my @cnt = (0) x @v;
+
+  my $oldforexit = _start_for_loop();
+  my $i = 0;
+  while ($i >= 0) {
+    $sub->(@outv);
+    last if $_exitloop;
+    for ($i = $#v; $i >= 0; $i--) {
+      if ($cnt[$i] >= $#{$v[$i]}) { $cnt[$i] = 0; $outv[$i] = $v[$i]->[0]; }
+      else { $outv[$i] = $v[$i]->[++$cnt[$i]]; last; }
+    }
+  }
+  _end_for_loop($oldforexit);
 }
 
 sub vecreduce (&@) {    ## no critic qw(ProhibitSubroutinePrototypes)

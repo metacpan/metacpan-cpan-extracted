@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::HTTPClient;
-$RT::Client::REST::HTTPClient::VERSION = '0.53';
+$RT::Client::REST::HTTPClient::VERSION = '0.54';
 use base 'LWP::UserAgent';
 
 
@@ -32,6 +32,9 @@ sub basic_auth_cb {
     return $self->{basic_auth_cb};
 }
 
+
+1;
+
 __END__
 
 =pod
@@ -44,7 +47,7 @@ RT::Client::REST::HTTPClient - Subclass LWP::UserAgent in order to support basic
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 METHODS
 
@@ -59,8 +62,6 @@ Returns basic authentication credentials
 Gets/sets basic authentication callback
 
 =back
-
-1;
 
 =head1 AUTHORS
 

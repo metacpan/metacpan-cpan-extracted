@@ -52,7 +52,7 @@ my(%params) =
 		'Test::Exception'		=> 0.43,
 		'Test::Pod'				=> 1.51,
 		'Test::Pod::Coverage'	=> 1.10,
-		'Test::More'			=> 1.302056,
+		'Test::More'			=> 1.001002,
 		'Test::Warn'			=> 0.30,
 	},
 	VERSION_FROM => 'lib/Tree.pm',

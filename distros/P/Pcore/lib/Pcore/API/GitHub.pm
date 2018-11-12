@@ -3,8 +3,8 @@ package Pcore::API::GitHub;
 use Pcore -class, -res;
 use Pcore::Util::Scalar qw[is_plain_coderef];
 
-has username => ( is => 'ro', isa => Str, required => 1 );
-has token    => ( is => 'ro', isa => Str, required => 1 );
+has username => ( required => 1 );
+has token    => ( required => 1 );
 
 sub BUILDARGS ( $self, $args = undef ) {
     $args->{username} ||= $ENV->user_cfg->{GITHUB}->{username} if $ENV->user_cfg->{GITHUB}->{username};

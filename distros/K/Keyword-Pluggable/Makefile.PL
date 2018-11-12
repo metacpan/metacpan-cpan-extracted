@@ -8,7 +8,7 @@ return <<'POST'
 pure_all :: README.md
 
 README.md : lib/$(subst ::,/,$(NAME)).pm
-	pod2markdown < '$<' > '$@.~tmp~' && $(MV) -- '$@.~tmp~' '$@'
+	pod2markdown < $< > $@.tmp && $(MV) -- $@.tmp $@
 POST
 }
 

@@ -1,3 +1,36 @@
+0.009   2018-11-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention CSF.
+
+	- [doc] Mention possible conflict with firewall package.
+
+
+0.008   2018-11-10 (PERLANCAR)
+
+	- [Bugfix] Fix code ordering so display update is proper.
+
+
+0.007   2018-11-10 (PERLANCAR)
+
+	- [Bugfix] --has-pattern and --lacks-pattern were not considered.
+
+
+0.006   2018-11-10 (PERLANCAR)
+
+	- [Bugfix] Display the correct number of blocked IPs.
+
+
+0.005   2018-11-10 (PERLANCAR)
+
+	- Now by default only blocks an IP for 86400 seconds.
+
+        - Store blocklist in SQLite database to persist between runs.
+
+	- [doc] Forgot to list --spanel-site under Options.
+
+
 0.004   2017-06-09 (PERLANCAR)
 
         - Add option: --spanel-site.

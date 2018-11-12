@@ -2,6 +2,15 @@ use v5.10;
 use strict;
 use warnings;
 
+my $gdal_src_root = shift @ARGV;
+
+my @h_files = (
+    'gcore/gdal.h',
+    'ogr/ogr_api.h',
+    'ogr/ogr_srs_api.h',
+    'apps/gdal_utils.h'    
+    );
+
 my %pre = (
     CPL_C_START => '',
     CPL_DLL => '',
@@ -20,6 +29,7 @@ my %constants = (
     OGRwkbGeometryType => 1,
     GDALRATFieldUsage => 1,
     GDALRATFieldType => 1,
+    GDALRATTableType => 1,
     GDALTileOrganization => 1,
     OGRwkbByteOrder => 1,
     OGRFieldType => 1,
@@ -39,6 +49,19 @@ my %callbacks = (
     GDALContourWriter => 1,
     );
 
+my %char_p_p_ok = (
+    OGR_G_CreateFromWkt => 1,
+    OGR_G_ImportFromWkt => 1,
+    OGR_G_ExportToWkt => 1,
+    OGR_G_ExportToIsoWkt => 1,
+    OSRExportToWkt => 1,
+    OSRExportToPrettyWkt => 1,
+    OSRExportToProj4 => 1,
+    OSRExportToPCI => 1,
+    OSRExportToXML => 1,
+    OSRExportToMICoordSys => 1,
+    );
+
 my %use_CSL = (
     GDALCreate => 1,
     GDALOpenEx => 1,
@@ -54,8 +77,11 @@ my %use_CSL = (
     GDALDatasetCopyLayer => 1,
     OGR_DS_CreateLayer => 1,
     OGR_DS_CopyLayer => 1,
+    GDALGetRasterCategoryNames => 1,
     OGR_F_GetFieldAsStringList => 1,
     OGR_F_SetFieldStringList => 1,
+    OGR_G_ExportToGMLEx => 1,
+    OGR_G_ExportToJsonEx => 1,
     GDALInfoOptionsNew => 1,
     GDALTranslateOptionsNew => 1,
     GDALWarpAppOptionsNew => 1,
@@ -66,6 +92,40 @@ my %use_CSL = (
     GDALRasterizeOptionsNew => 1,
     GDALBuildVRTOptionsNew => 1,
     GDALBuildVRT => 1,
+    OGR_L_Intersection => 1,
+    OGR_L_Union => 1,
+    OGR_L_SymDifference => 1,
+    OGR_L_Identity => 1,
+    OGR_L_Update => 1,
+    OGR_L_Clip => 1,
+    OGR_L_Erase => 1,
+    );
+
+# these return strings which must be freed
+my %use_ret_opaque = (
+    OGR_G_ExportToGML => 1,
+    OGR_G_ExportToGMLEx => 1,
+    OGR_G_ExportToKML => 1,
+    OGR_G_ExportToJson => 1,
+    OGR_G_ExportToJsonEx => 1,
+    );
+
+my %ret_string_ok = (
+    GDALGetDataTypeName => 1,
+    GDALGetAsyncStatusTypeName => 1,
+    GDALGetColorInterpretationName => 1,
+    GDALGetPaletteInterpretationName => 1,
+    GDALGetDriverShortName => 1,
+    GDALGetDriverLongName => 1,
+    GDALGetDriverHelpTopic => 1,
+    GDALGetDriverCreationOptionList => 1,
+    GDALGetMetadataItem => 1,
+    GDALGetDescription => 1,
+    GDALGetProjectionRef => 1,
+    GDALGetGCPProjection => 1,
+    GDALGetRasterUnitType => 1,
+    GDALDecToDMS => 1,
+    OGR_G_GetGeometryName => 1,
     );
 
 my %use_array = (
@@ -74,10 +134,22 @@ my %use_array = (
     OGR_F_SetFieldDoubleList => 1,
     );
 
+my %use_opaque_array = (
+    GDALWarp => 1,
+    GDALVectorTranslate => 1,
+    GDALBuildVRT => 1,
+    );
+
 my %use_ret_pointer = (
     OGR_F_GetFieldAsIntegerList => 1,
     OGR_F_GetFieldAsInteger64List => 1,
     OGR_F_GetFieldAsDoubleList => 1,
+    );
+
+my %use_string = (
+    OGR_G_CreateFromWkb => 1,
+    OGR_G_CreateFromFgf => 1,
+    OGR_G_ImportFromWkb => 1,
     );
 
 my %opaque_pointers = (
@@ -112,11 +184,12 @@ my %defines;
 my %enums;
 my %structs;
 
-say "# created with parse_h.pl";
-for my $f (@ARGV) {
+say "# generated with parse_h.pl";
+for my $f (@h_files) {
     say "# from $f";
-    parse_h($f);
+    parse_h($gdal_src_root . '/' . $f);
 }
+say "# end of generated code";
 
 sub parse_h {
     my $f = shift;
@@ -197,7 +270,7 @@ sub parse_type {
     $arg =~ s/^\s+//;
     $arg =~ s/\s+$//;
     for my $c (keys %constants) {
-        if ($arg =~ /^$c/) {
+        if ($arg =~ /^$c/ or $arg =~ /^const $c/) {
             $arg = 'unsigned int';
         }
     }
@@ -212,7 +285,11 @@ sub parse_type {
         }
     }
     if ($arg =~ /^\w+?H\s*\*/) {
-        $arg = 'uint64*';
+        if ($use_opaque_array{$name}) {
+            $arg = 'opaque[]';
+        } else {
+            $arg = 'uint64*';
+        }
     } elsif ($arg =~ /^\w+?H/) {
         $arg = 'opaque';
     } elsif ($arg =~ /^const \w+?H/) {
@@ -228,17 +305,27 @@ sub parse_type {
     } elsif ($arg =~ /^FILE\s*\*/) {
         $arg = 'opaque';
     } elsif ($arg =~ /void\s*\*/) {
+        for my $c (keys %use_string) {
+            if ($c eq $name) {
+                say STDERR "$name returns a string" if $mode eq 'ret' && !$ret_string_ok{$name};
+                return 'string';
+            }
+        }
         $arg = 'opaque';
     } elsif ($arg =~ /^char\s*\*\*/ or $arg =~ /^const char\s*\*\s*const\s*\*/) {
         if ($use_CSL{$name}) {
-            # CSL
             $arg = 'opaque';
         } else {
-            say STDERR "char ** in $name";
+            say STDERR "char ** in $name" unless $char_p_p_ok{$name};
             $arg = 'string_pointer';
         }
     } elsif ($arg =~ /char\s*\*/) {
-        $arg = 'string';
+        if ($mode eq 'ret' && $use_ret_opaque{$name}) {
+            $arg = 'opaque';
+        } else {
+            say STDERR "$name returns a string" if $mode eq 'ret' && !$ret_string_ok{$name};
+            $arg = 'string';
+        }
     } elsif ($arg =~ /^unsigned char\s*\*/) {
         $arg = 'pointer';
     } elsif ($arg =~ /int\s*\*/) {
@@ -305,6 +392,8 @@ sub parse_type {
         $arg = 'sint64';
     } elsif ($arg =~ /^void/) {
         $arg = 'void';
+    } elsif ($arg =~ /^CSLConstList/) {
+        $arg = 'opaque';
     } else {
         die "can't parse arg '$arg'";
     }

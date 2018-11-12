@@ -6,10 +6,10 @@ BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Test::More;
 use Carp;
 
-use Assert::Refute qw(:core);
+use Assert::Refute qw(:core), {};
 use Assert::Refute::T::Errors;
 
-my $c = contract {
+my $report = try_refute {
     warns_like {
     } [], "No warnings";
 
@@ -34,9 +34,9 @@ my $c = contract {
         warn "Foo";
         warn "Bar";
     } qr/^Foo/, "Extra second warning";
-}->apply;
+};
 
-contract_is $c, "t2NNNNd", "Contract as expected";
-note "REPORT\n".$c->get_tap."/REPORT";
+contract_is $report, "t2NNNNd", "Contract as expected";
+note "REPORT\n".$report->get_tap."/REPORT";
 
 done_testing;

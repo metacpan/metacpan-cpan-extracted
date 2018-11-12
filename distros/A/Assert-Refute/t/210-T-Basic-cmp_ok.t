@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
-use Assert::Refute qw(:core);
+use Assert::Refute qw(:core), {};
 use Test::More;
 
-my $c = contract {
+my $report = try_refute {
     package T;
     use Assert::Refute qw(:all);
     cmp_ok 1, "<", 2;
@@ -15,15 +15,15 @@ my $c = contract {
     cmp_ok "a", "gt", "b";
     cmp_ok undef, "eq", '';
     cmp_ok undef, "==", undef;
-}->apply;
-is $c->get_sign, "t1N1NNNd", "Compare results";
-note $c->get_tap;
+};
+is $report->get_sign, "t1N1NNNd", "Compare results";
+note $report->get_tap;
 
-my $ce = contract {
+my $deadman = try_refute {
     package T;
     cmp_ok 1, "<<", 2;
-}->apply;
-is $ce->get_sign, 'tE', "Bad operator died";
-like $ce->get_error, qr/cmp_ok.*Comparison.*<</, "Error as expected";
+};
+is $deadman->get_sign, 'tE', "Bad operator died";
+like $deadman->get_error, qr/cmp_ok.*Comparison.*<</, "Error as expected";
 
 done_testing;

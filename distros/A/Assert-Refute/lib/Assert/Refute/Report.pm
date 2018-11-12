@@ -3,7 +3,7 @@ package Assert::Refute::Report;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.1301';
+our $VERSION = '0.1501';
 
 =head1 NAME
 
@@ -50,9 +50,9 @@ use Assert::Refute::T::Basic qw();
 
 my $ERROR_DONE = "done_testing was called, no more changes may be added";
 
-=head1 OBJECT-ORIENTED INTERFACE
+=head1 METHODS
 
-=head2 new
+=head3 new
 
     Assert::Refute::Report->new();
 
@@ -206,7 +206,6 @@ sub done_testing {
         # Record a totally failing contract.
         delete $self->{done};
         $self->{has_error} = $exception;
-        $self->diag( "Looks like contract was interrupted by", $exception );
     } elsif ($self->{done}) {
         # A special case - done_testing(0) means "tentative stop"
         return $self if defined $exception;
@@ -214,7 +213,11 @@ sub done_testing {
     };
 
     # Any post-mortem messages go to a separate bucket
-    $self->{log} = $self->{messages}{ -1 } = [];
+    $self->{log} = $self->{messages}{ -1 } ||= [];
+
+    if ($self->{has_error}) {
+        $self->diag( "Looks like contract was interrupted by", $self->{has_error} );
+    };
 
     if (defined $self->{plan_tests}) {
         # Check plan
@@ -226,11 +229,47 @@ sub done_testing {
         };
     };
 
-    $self->diag(
-        "Looks like $self->{fail_count} tests out of $self->{count} have failed")
-            if $self->{fail_count};
+    if ($self->{fail_count}) {
+        $self->diag(
+            "Looks like $self->{fail_count} tests out of $self->{count} have failed");
+        my $ctx = $self->context;
+        foreach (keys %$ctx) {
+            $self->diag("context: $_:", $ctx->{$_});
+        };
+    };
 
     $self->{done}++;
+    return $self;
+};
+
+=head3 context()
+
+Get execution context hash with arbitrary user data.
+
+Upon failure, the hash content is going to be appended to the log at diag level.
+
+=cut
+
+sub context {
+    my $self = shift;
+    return $self->{context} ||= {};
+};
+
+=head3 set_context( \%hash )
+
+Set the context hash.
+
+Only plain (not blessed) hash is allowed as argument.
+
+=cut
+
+sub set_context {
+    my ($self, $hash) = @_;
+
+    $self->_croak( "argument must be a HASH reference" )
+        unless ref $hash eq 'HASH';
+
+    $self->{context} = $hash;
     return $self;
 };
 
@@ -246,7 +285,7 @@ The list is as follows:
 
 C<is>, C<isnt>, C<ok>, C<use_ok>, C<require_ok>, C<cmp_ok>,
 C<like>, C<unlike>, C<can_ok>, C<isa_ok>, C<new_ok>,
-C<contract_is>, C<is_deeply>, C<note>, C<diag>.
+C<contract_is>, C<is_deeply>, C<fail>, C<pass>, C<note>, C<diag>.
 
 See L<Assert::Refute::T::Basic> for more details.
 
@@ -654,7 +693,7 @@ sub do_log {
     return $self;
 };
 
-=head2 get_log
+=head3 get_log
 
 Return log messages "as is" as array reference
 containing triads of (indent, level, message).
@@ -680,7 +719,7 @@ sub get_log {
     foreach my $n ( 0 .. $self->{count}, -1 ) {
         # Report test details.
         # Only append the logs for
-        #   premature (0) and postmortem (count+1) messages
+        #   premature (0) and postmortem (-1) messages
         if ($n > 0) {
             my $reason = $self->{fail}{$n};
             my ($level, $prefix)  = $reason ? (-2, "not ok") : (0, "ok");

@@ -88,6 +88,7 @@ SSDP_SEARCH_MSG
 		$dev_location = $1;
 		print "dev_location=$dev_location\n" if ($Net::UPnP::DEBUG);
                 unless ($dev_location =~ m{http://([0-9a-z.-]+)(?::(\d+))?/(.*)}i) {
+                        print "bad dev_location: $dev_location\n" if ($Net::UPnP::DEBUG);
 			next;
 		}
 		$dev_addr = $1;

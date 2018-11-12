@@ -1,11 +1,11 @@
-package Pcore::API::ReCaptcha v0.2.7;
+package Pcore::API::ReCaptcha v0.2.8;
 
 use Pcore -dist, -class, -res;
 use Pcore::Util::Data qw[from_json];
 
-has secret_key => ( is => 'ro', isa => Str, required => 1 );
+has secret_key => ( required => 1 );    # Str
 
-has site_key => ( is => 'ro', isa => Str );
+has site_key => ();                     # Str
 
 # https://developers.google.com/recaptcha/docs/
 
@@ -13,7 +13,7 @@ sub verify ( $self, $response, $user_ip = undef, $cb = undef ) {
     return P->http->post(
         'https://www.google.com/recaptcha/api/siteverify',
         accept_compressed => 0,
-        headers           => [    #
+        headers           => [          #
             'Content-Type' => 'application/x-www-form-urlencoded',
         ],
         data => P->data->to_uri( {

@@ -24,29 +24,29 @@ const our $TX_STATUS_ERROR => 'E';    # in a failed transaction block (queries w
 
 require Pcore::PgSQL::DBH;
 
-has max_dbh  => 3;                    # ( is => 'ro', isa => PositiveInt );
-has backlog  => 1_000;                # ( is => 'ro',   isa => Maybe [PositiveInt] );
-has host     => ( is => 'lazy' );     # isa => Str
-has port     => 5432;                 # ( is => 'ro', isa => PositiveOrZeroInt );
-has username => ( is => 'lazy' );     # isa => Str
-has password => ( is => 'lazy' );     # isa => Str
-has database => ( is => 'lazy' );     # isa => Str
+has max_dbh  => 3;                    # PositiveInt
+has backlog  => 1_000;                # Maybe [PositiveInt]
+has host     => ( is => 'lazy' );     # Str
+has port     => 5432;                 # PositiveOrZeroInt
+has username => ( is => 'lazy' );     # Str
+has password => ( is => 'lazy' );     # Str
+has database => ( is => 'lazy' );     # Str
 
-has is_pgsql       => 1;              # ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
-has active_dbh     => 0;              # ( is => 'ro', isa => Int,  default => 0, init_arg => undef );
-has _dbh_pool      => ();             # ( is => 'ro', isa => ArrayRef, init_arg => undef );
-has _get_dbh_queue => sub { [] };     # ( is => 'ro', isa => ArrayRef, init_arg => undef );
+has is_pgsql   => 1, init_arg => undef;
+has active_dbh => 0, init_arg => undef;
+has _dbh_pool      => ( init_arg => undef );            # ArrayRef
+has _get_dbh_queue => sub { [] }, init_arg => undef;    # ArrayRef
 
 sub _build_host ($self) {
-    return $self->{uri}->path eq q[/] ? q[] . $self->{uri}->host : q[] . $self->{uri}->path;
+    return $self->{uri}->{path} eq '/' ? "$self->{uri}->{host}" : "$self->{uri}->{path}";
 }
 
 sub _build_username ($self) {
-    return $self->{uri}->username;
+    return $self->{uri}->{username};
 }
 
 sub _build_password ($self) {
-    return $self->{uri}->password // q[];
+    return $self->{uri}->{password} // q[];
 }
 
 sub _build_database ($self) {

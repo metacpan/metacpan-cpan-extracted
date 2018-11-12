@@ -436,8 +436,7 @@ void* start_segment_primes(UV low, UV high, unsigned char** segmentmem)
   *segmentmem = ctx->segment;
   nsegments = (((high-low+29)/30)+ctx->segment_size-1) / ctx->segment_size;
 
-  if (_XS_get_verbose() >= 2)
-    printf("segment sieve: byte range %lu split into %lu segments of size %lu\n", (unsigned long)range, (unsigned long)nsegments, (unsigned long)ctx->segment_size);
+  MPUverbose(3, "segment sieve: byte range %lu split into %lu segments of size %lu\n", (unsigned long)range, (unsigned long)nsegments, (unsigned long)ctx->segment_size);
 
   ctx->base = 0;
   ctx->warray = 0;
@@ -459,8 +458,7 @@ void* start_segment_primes(UV low, UV high, unsigned char** segmentmem)
       limit = next_prime(limit);
       /* We'll make space for this many */
       nprimes = simple_prime_count_upper(limit);
-      if (_XS_get_verbose() >= 4)
-        printf("segment sieve %lu - %lu, primes to %lu (max %lu)\n", (unsigned long)low, (unsigned long)high, (unsigned long)limit, (unsigned long)nprimes);
+      MPUverbose(4, "segment sieve %lu - %lu, primes to %lu (max %lu)\n", (unsigned long)low, (unsigned long)high, (unsigned long)limit, (unsigned long)nprimes);
       New(0, warray, nprimes, wheel_t);
       START_DO_FOR_EACH_PRIME(0,limit) {
         if (wsize >= nprimes) croak("segment bad upper count");
@@ -522,4 +520,27 @@ void end_segment_primes(void* vctx)
     ctx->warray = 0;
   }
   Safefree(ctx);
+}
+
+void* array_of_primes_in_range(UV* count, UV beg, UV end)
+{
+  UV *P, i = 0;
+  UV cntest = prime_count_upper(end) - prime_count_lower(beg) + 1;
+  New(0, P, cntest, UV);
+  if (beg <= 2 && end >= 2) P[i++] = 2;
+  if (beg <= 3 && end >= 3) P[i++] = 3;
+  if (beg <= 5 && end >= 5) P[i++] = 5;
+  {
+    unsigned char* segment;
+    UV seg_base, seg_low, seg_high;
+    void* ctx = start_segment_primes(beg, end, &segment);
+    while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
+      START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
+        P[i++] = p;
+      END_DO_FOR_EACH_SIEVE_PRIME
+    }
+    end_segment_primes(ctx);
+  }
+  *count = i;
+  return P;
 }

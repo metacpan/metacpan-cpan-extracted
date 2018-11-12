@@ -168,8 +168,6 @@
 
 - circular primes ... just use repdigits after 1M?  https://oeis.org/A068652
 
-- Figure out how to use multicall for forfactored and forsquarefree.
-
 - perhaps square-free flag for factor for early stop.  Use in moebius etc.
 
 - make a NVCONST, define log, sqrt, etc. for quadmath vs. long double
@@ -184,3 +182,9 @@
 - Pari/GP 2.12 beta has rewritten (much faster) Bernoulli.  Check it out.
 
 - semiprime_count PP just walk if small range.
+
+- limit for semiprime and ramanujan prime
+
+- consider adding multifactorial.  See MPU::GMP.
+
+- multicall in forpart/forcomp.

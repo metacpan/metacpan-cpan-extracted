@@ -21,9 +21,9 @@ sub get_indicator (%args) {
 
     my $indicator = P->class->load( $args{type} // 'Bar', ns => 'Pcore::Util::Term::Progress::Indicator' )->new( { %args, id => $INDICATOR_ORDER++ } );    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
 
-    $INDICATOR->{ $indicator->id } = $indicator;
+    $INDICATOR->{ $indicator->{id} } = $indicator;
 
-    weaken $INDICATOR->{ $indicator->id };
+    weaken $INDICATOR->{ $indicator->{id} };
 
     return $indicator;
 }
@@ -31,7 +31,7 @@ sub get_indicator (%args) {
 sub _update {
 
     # go to beginning of the output
-    my $buffer = "\e[" . ( scalar keys $INDICATOR->%* ) . q[A];
+    my $buffer = "\e[" . scalar( keys $INDICATOR->%* ) . 'A';
 
     for my $id ( sort keys $INDICATOR->%* ) {
         if ( !defined $INDICATOR->{$id} ) {

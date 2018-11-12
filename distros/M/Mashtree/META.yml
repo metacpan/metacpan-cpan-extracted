@@ -26,6 +26,7 @@ requires:
   Data::Dumper: '0'
   Exporter: '0'
   File::Basename: '0'
+  Graph::Dijkstra: '0.7'
   List::Util: '0'
   Thread::Queue: '0'
   perl: '5.010000'
@@ -33,5 +34,5 @@ requires:
   threads::shared: '0'
 resources:
   repository: git://github.com/lskatz/mashtree.git
-version: '0.33'
+version: '0.34'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

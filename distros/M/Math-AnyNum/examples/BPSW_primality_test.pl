@@ -19,11 +19,7 @@ use warnings;
 use experimental qw(signatures);
 
 use lib qw(../lib);
-
-use Math::AnyNum qw(
-  is_prime is_power is_congruent
-  kronecker powmod as_bin bit_scan1
-  );
+use Math::AnyNum qw(is_prime is_power kronecker powmod as_bin bit_scan1);
 
 sub BPSW_primality_test($n) {
 
@@ -77,15 +73,15 @@ sub BPSW_primality_test($n) {
     $V1 = ($V2 * $V1 - $Q1) % $n;
     $Q1 = ($Q1 * $Q2) % $n;
 
-    return 1 if is_congruent($U1, 0, $n);
-    return 1 if is_congruent($V1, 0, $n);
+    return 1 if $U1 == 0;
+    return 1 if $V1 == 0;
 
     for (1 .. $s) {
 
         $V1 = ($V1 * $V1 - 2 * $Q1) % $n;
         $Q1 = ($Q1 * $Q1) % $n;
 
-        return 1 if is_congruent($V1, 0, $n);
+        return 1 if $V1 == 0;
     }
 
     return 0;

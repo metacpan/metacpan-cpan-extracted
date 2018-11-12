@@ -168,7 +168,7 @@ sub connect_socks4 ( $self, $uri, @args ) {
     if ( $rep == 90 ) {
         $h->{proxy}      = $self;
         $h->{proxy_type} = $PROXY_TYPE_SOCKS4;
-        $h->{peername}   = $uri->host;
+        $h->{peername}   = $uri->{host};
     }
 
     # request rejected or failed, tunnel creation error

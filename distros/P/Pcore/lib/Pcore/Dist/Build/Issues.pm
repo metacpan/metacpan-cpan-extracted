@@ -2,7 +2,7 @@ package Pcore::Dist::Build::Issues;
 
 use Pcore -class, -const, -ansi;
 
-has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'], required => 1 );
+has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
 const our $PRIORITY_ID => {
     trivial  => 1,
@@ -80,7 +80,7 @@ sub print_issues ( $self, $issues ) {
     }
     else {
         my $tbl = P->text->table(
-            style => 'pcore',
+            style => 'full',
             width => 120,
             cols  => [
                 id => {
@@ -127,7 +127,7 @@ sub get_issue ( $self, $id ) {
 
 sub print_issue ( $self, $issue, $print_content = 1 ) {
     my $tbl = P->text->table(
-        style => 'pcore',
+        style => 'full',
         width => 120,
         cols  => [
             id => {

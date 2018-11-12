@@ -1,34 +1,53 @@
 ---
 abstract: 'shadow attributes of contained objects'
 author:
-  - 'Smithsonian Astrophysical Observatory'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
-  Moo: 0
-  Test::Deep: 0
-  Test::Exception: 0
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Moo: '0'
+  Test2::V0: '0'
+  Test::Lib: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MooX-Attributes-Shadow
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  MooX::Attributes::Shadow:
+    file: lib/MooX/Attributes/Shadow.pm
+    version: '0.05'
+  MooX::Attributes::Shadow::Role:
+    file: lib/MooX/Attributes/Shadow/Role.pm
+    version: '0.05'
 requires:
-  Moo: 0
-  Moo::Role: 0
-  Params::Check: 0
+  Carp: '0'
+  Exporter: '0'
+  Moo::Role: '0'
+  Params::Check: '0'
+  Scalar::Util: '0'
+  namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Attributes-Shadow
-  license: http://opensource.org/licenses/gpl-license.php
-  repository: https://bitbucket.org/djerius/moox-attributes-shadow
-version: 0.03
+  repository: git://github.com/djerius/moox-attributes-shadow.git
+version: '0.05'
+x_serialization_backend: 'YAML::Tiny version 1.70'

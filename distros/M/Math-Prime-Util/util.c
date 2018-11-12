@@ -48,20 +48,6 @@
   #define LDBL_MAX DBL_MAX
 #endif
 
-#define KAHAN_INIT(s) \
-  long double s ## _y, s ## _t; \
-  long double s ## _c = 0.0; \
-  long double s = 0.0;
-
-#define KAHAN_SUM(s, term) \
-  do { \
-    s ## _y = (term) - s ## _c; \
-    s ## _t = s + s ## _y; \
-    s ## _c = (s ## _t - s) - s ## _y; \
-    s = s ## _t; \
-  } while (0)
-
-
 #include "ptypes.h"
 #define FUNC_isqrt 1
 #define FUNC_icbrt 1
@@ -85,6 +71,20 @@
 #include "constants.h"
 #include "montmath.h"
 #include "csprng.h"
+
+#define KAHAN_INIT(s) \
+  LNV s ## _y, s ## _t; \
+  LNV s ## _c = 0.0; \
+  LNV s = 0.0;
+
+#define KAHAN_SUM(s, term) \
+  do { \
+    s ## _y = (term) - s ## _c; \
+    s ## _t = s + s ## _y; \
+    s ## _c = (s ## _t - s) - s ## _y; \
+    s = s ## _t; \
+  } while (0)
+
 
 static int _verbose = 0;
 void _XS_set_verbose(int v) { _verbose = v; }
@@ -267,26 +267,33 @@ void print_primes(UV low, UV high, int fd) {
   if (bend > buf) { bend = write_buf(fd, buf, bend); }
 }
 
+/******************************************************************************/
+/*                     TOTIENT, MOEBIUS, MERTENS                              */
+/******************************************************************************/
 
 /* Return a char array with lo-hi+1 elements. mu[k-lo] = µ(k) for k = lo .. hi.
  * It is the callers responsibility to call Safefree on the result. */
-#define PGTLO(p,lo)  ((p) >= lo) ? (p) : ((p)*(lo/(p)) + ((lo%(p))?(p):0))
-#define P2GTLO(pinit, p, lo) \
-   ((pinit) >= lo) ? (pinit) : ((p)*(lo/(p)) + ((lo%(p))?(p):0))
-signed char* _moebius_range(UV lo, UV hi)
+#define PGTLO(ip,p,lo)  ((ip)>=(lo)) ? (ip) : ((p)*((lo)/(p)) + (((lo)%(p))?(p):0))
+signed char* range_moebius(UV lo, UV hi)
 {
   signed char* mu;
-  UV i;
-  UV sqrtn = isqrt(hi);
+  UV i, sqrtn = isqrt(hi), count = hi-lo+1;
 
   /* Kuznetsov indicates that the Deléglise & Rivat (1996) method can be
    * modified to work on logs, which allows us to operate with no
    * intermediate memory at all.  Same time as the D&R method, less memory. */
   unsigned char logp;
-  UV nextlog;
+  UV nextlog, nextlogi;
 
-  Newz(0, mu, hi-lo+1, signed char);
-  if (sqrtn*sqrtn != hi) sqrtn++;  /* ceil sqrtn */
+  Newz(0, mu, count, signed char);
+  if (sqrtn*sqrtn != hi && sqrtn < (UVCONST(1)<<(BITS_PER_WORD/2))-1) sqrtn++;
+
+  /* For small ranges, do it by hand */
+  if (hi < 100 || count <= 10 || (hi > (1UL<<25) && count < icbrt(hi)/4)) {
+    for (i = 0; i < count; i++)
+      mu[i] = moebius(lo+i);
+    return mu;
+  }
 
   logp = 1; nextlog = 3; /* 2+1 */
   START_DO_FOR_EACH_PRIME(2, sqrtn) {
@@ -295,41 +302,46 @@ signed char* _moebius_range(UV lo, UV hi)
       logp += 2;   /* logp is 1 | ceil(log(p)/log(2)) */
       nextlog = ((nextlog-1)*4)+1;
     }
-    for (i = PGTLO(p, lo); i <= hi; i += p)
+    for (i = PGTLO(p, p, lo); i >= lo && i <= hi; i += p)
       mu[i-lo] += logp;
-    for (i = PGTLO(p2, lo); i <= hi; i += p2)
+    for (i = PGTLO(p2, p2, lo); i >= lo && i <= hi; i += p2)
       mu[i-lo] = 0x80;
   } END_DO_FOR_EACH_PRIME
 
   logp = log2floor(lo);
-  nextlog = UVCONST(2) << logp;
-  for (i = lo; i <= hi; i++) {
-    unsigned char a = mu[i-lo];
-    if (i >= nextlog) {  logp++;  nextlog *= 2;  } /* logp is log(p)/log(2) */
+  nextlogi = (UVCONST(2) << logp) - lo;
+  for (i = 0; i < count; i++) {
+    unsigned char a = mu[i];
+    if (i >= nextlogi) nextlogi = (UVCONST(2) << ++logp) - lo;
     if (a & 0x80)       { a = 0; }
     else if (a >= logp) { a =  1 - 2*(a&1); }
     else                { a = -1 + 2*(a&1); }
-    mu[i-lo] = a;
+    mu[i] = a;
   }
   if (lo == 0)  mu[0] = 0;
 
   return mu;
 }
 
-UV* _totient_range(UV lo, UV hi) {
+UV* range_totient(UV lo, UV hi) {
   UV* totients;
-  UV i, seg_base, seg_low, seg_high;
+  UV i, seg_base, seg_low, seg_high, count = hi-lo+1;
   unsigned char* segment;
   void* ctx;
 
-  if (hi < lo) croak("_totient_range error hi %"UVuf" < lo %"UVuf"\n", hi, lo);
-  New(0, totients, hi-lo+1, UV);
+  if (hi < lo) croak("range_totient error hi %"UVuf" < lo %"UVuf"\n", hi, lo);
+  New(0, totients, count, UV);
 
   /* Do via factoring if very small or if we have a small range */
-  if (hi < 100 || (hi-lo) < 10 || hi/(hi-lo+1) > 1000) {
-    for (i = lo; i <= hi; i++)
-      totients[i-lo] = totient(i);
+  if (hi < 100 || count <= 10 || hi/count > 1000) {
+    for (i = 0; i < count; i++)
+      totients[i] = totient(lo+i);
     return totients;
+  }
+
+  if (hi == UV_MAX) {
+    totients[--count] = totient(UV_MAX);
+    hi--;
   }
 
   /* If doing a full sieve, do it monolithic.  Faster. */
@@ -342,7 +354,7 @@ UV* _totient_range(UV lo, UV hi) {
     UV j, index, nprimes = 0;
 
     New(0, prime, max_index, UV);  /* could use prime_count_upper(hi) */
-    memset(totients, 0, (hi-lo+1) * sizeof(UV));
+    memset(totients, 0, count * sizeof(UV));
     for (i = 2; i <= hi/2; i++) {
       index = 2*i;
       if ( !(i&1) ) {
@@ -373,27 +385,27 @@ UV* _totient_range(UV lo, UV hi) {
     return totients;
   }
 
-  for (i = lo; i <= hi; i++) {
-    UV v = i;
-    if (i % 2 == 0)  v -= v/2;
-    if (i % 3 == 0)  v -= v/3;
-    if (i % 5 == 0)  v -= v/5;
-    totients[i-lo] = v;
+  for (i = 0; i < count; i++) {
+    UV v = lo+i, nv = v;
+    if (v % 2 == 0)  nv -= nv/2;
+    if (v % 3 == 0)  nv -= nv/3;
+    if (v % 5 == 0)  nv -= nv/5;
+    totients[i] = nv;
   }
 
   ctx = start_segment_primes(7, hi/2, &segment);
   while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
     START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high ) {
-      for (i = P2GTLO(2*p,p,lo); i <= hi; i += p)
+      for (i = PGTLO(2*p,p,lo); i >= lo && i <= hi; i += p)
         totients[i-lo] -= totients[i-lo]/p;
     } END_DO_FOR_EACH_SIEVE_PRIME
   }
   end_segment_primes(ctx);
 
   /* Fill in all primes */
-  for (i = lo | 1; i <= hi; i += 2)
-    if (totients[i-lo] == i)
-      totients[i-lo]--;
+  for (i = (lo | 1) - lo; i < count; i += 2)
+    if (totients[i] == i+lo)
+      totients[i]--;
   if (lo <= 1) totients[1-lo] = 1;
 
   return totients;
@@ -414,8 +426,8 @@ IV mertens(UV n) {
   u = isqrt(n);
   maxmu = (n/(u+1));              /* maxmu lets us handle u < sqrt(n) */
   if (maxmu < u) maxmu = u;
-  mu = _moebius_range(0, maxmu);
-  New(0, M, maxmu+1, short);
+  mu = range_moebius(0, maxmu);
+  New(0, M, maxmu+1, short);      /* Works up to maxmu < 7613644886 */
   M[0] = 0;
   for (j = 1; j <= maxmu; j++)
     M[j] = M[j-1] + mu[j];
@@ -440,6 +452,10 @@ IV mertens(UV n) {
   Safefree(mu);
   return sum;
 }
+
+/******************************************************************************/
+/*                             POWERS and ROOTS                               */
+/******************************************************************************/
 
 /* There are at least 4 ways to do this, plus hybrids.
  * 1) use a table.  Great for 32-bit, too big for 64-bit.
@@ -1062,9 +1078,9 @@ int is_totient(UV n) {
 }
 
 UV pillai_v(UV n) {
-  UV v, fac = 5040 % n;
+  UV v, fac;
   if (n == 0) return 0;
-  for (v = 8; v < n-1 && fac != 0; v++) {
+  for (v = 8, fac = 5040 % n; v < n-1 && fac != 0; v++) {
     fac = (n < HALF_WORD) ? (fac*v) % n : mulmod(fac,v,n);
     if (fac == n-1 && (n % v) != 1)
       return v;
@@ -1691,43 +1707,201 @@ UV chinese(UV* a, UV* n, UV num, int* status) {
   return sum;
 }
 
-long double chebyshev_function(UV n, int which)
+NV chebyshev_psi(UV n)
 {
-  long double logp, logn = logl(n);
-  UV sqrtn = which ? isqrt(n) : 0;  /* for theta, p <= sqrtn always false */
+  UV k;
+  KAHAN_INIT(sum);
+
+  for (k = log2floor(n); k > 0; k--) {
+    KAHAN_SUM(sum, chebyshev_theta(rootof(n,k)));
+  }
+  return sum;
+}
+
+#if BITS_PER_WORD == 64
+typedef struct {
+  UV n;
+  LNV theta;
+} cheby_theta_t;
+static const cheby_theta_t _cheby_theta[] = { /* >= quad math precision */
+  { UVCONST(      67108864),LNVCONST(    67100507.6357700963903836828562472350035880) },
+  { UVCONST(     100000000),LNVCONST(    99987730.0180220043832124342600487053812729) },
+  { UVCONST(     134217728),LNVCONST(   134204014.5735572091791081610859055728165544) },
+  { UVCONST(     268435456),LNVCONST(   268419741.6134308193112682817754501071404173) },
+  { UVCONST(     536870912),LNVCONST(   536842885.8045763840625719515011160692495056) },
+  { UVCONST(    1000000000),LNVCONST(   999968978.5775661447991262386023331863364793) },
+  { UVCONST(    1073741824),LNVCONST(  1073716064.8860663337617909073555831842945484) },
+  { UVCONST(    2147483648),LNVCONST(  2147432200.2475857676814950053003448716360822) },
+  { UVCONST(    4294967296),LNVCONST(  4294889489.1735446386752045191908417183337361) },
+  { UVCONST(    8589934592),LNVCONST(  8589863179.5654263491545135406516173629373070) },
+  { UVCONST(   10000000000),LNVCONST(  9999939830.6577573841592219954033850595228736) },
+  { UVCONST(   12884901888),LNVCONST( 12884796620.4324254952601520445848183460347362) },
+  { UVCONST(   17179869184),LNVCONST( 17179757715.9924077567777285147574707468995695) },
+  { UVCONST(   21474836480),LNVCONST( 21474693322.0998273969188369449626287713082943) },
+  { UVCONST(   25769803776),LNVCONST( 25769579799.3751535467593954636665656772211515) },
+  { UVCONST(   30064771072),LNVCONST( 30064545001.2305211029215168703433831598544454) },
+  { UVCONST(   34359738368),LNVCONST( 34359499180.0126643918259085362039638823175054) },
+  { UVCONST(   51539607552),LNVCONST( 51539356394.9531019037592855639826469993402730) },
+  { UVCONST(   68719476736),LNVCONST( 68719165213.6369838785284711480925219076501720) },
+  { UVCONST(   85899345920),LNVCONST( 85899083852.3471545629838432726841470626910905) },
+  { UVCONST(  100000000000),LNVCONST( 99999737653.1074446948519125729820679772770146) },
+  { UVCONST(  103079215104),LNVCONST(103079022007.113299711630969211422868856259124) },
+  { UVCONST(  120259084288),LNVCONST(120258614516.787336970535750737470005730125261) },
+  { UVCONST(  137438953472),LNVCONST(137438579206.444595884982301543904849253294539) },
+  { UVCONST(  171798691840),LNVCONST(171798276885.585945657918751085729734540334501) },
+  { UVCONST(  206158430208),LNVCONST(206158003808.160276853604927822609009916573462) },
+  { UVCONST(  240518168576),LNVCONST(240517893445.995868018331936763125264759516048) },
+  { UVCONST(  274877906944),LNVCONST(274877354651.045354829956619821889825596300686) },
+  { UVCONST(  309237645312),LNVCONST(309237050379.850690561796126460858271984023198) },
+  { UVCONST(  343597383680),LNVCONST(343596855806.595496630500062749631211394707114) },
+  { UVCONST(  377957122048),LNVCONST(377956498560.227794386327526022452943941537993) },
+  { UVCONST(  412316860416),LNVCONST(412316008796.349553568121442261222464590518293) },
+  { UVCONST(  446676598784),LNVCONST(446675972485.936512329625489223180824947531484) },
+  { UVCONST(  481036337152),LNVCONST(481035608287.572961376833237046440177624505864) },
+  { UVCONST(  515396075520),LNVCONST(515395302740.633513931333424447688399032397200) },
+  { UVCONST(  549755813888),LNVCONST(549755185085.539613556787409928561107952681488) },
+  { UVCONST(  584115552256),LNVCONST(584115015741.698143680148976236958207248900725) },
+  { UVCONST(  618475290624),LNVCONST(618474400071.621528348965919774195984612254220) },
+  { UVCONST(  652835028992),LNVCONST(652834230470.583317059774197550110194348469358) },
+  { UVCONST(  687194767360),LNVCONST(687193697328.927006867624832386534836384752774) },
+  { UVCONST(  721554505728),LNVCONST(721553211683.605313067593521060195071837766347) },
+  { UVCONST(  755914244096),LNVCONST(755913502349.878525212441903698096011352015192) },
+  { UVCONST(  790273982464),LNVCONST(790273042590.053075430445971969285969445183076) },
+  { UVCONST(  824633720832),LNVCONST(824633080997.428352876758261549475609957696369) },
+  { UVCONST(  858993459200),LNVCONST(858992716288.318498931165663742671579465316192) },
+  { UVCONST(  893353197568),LNVCONST(893352235882.851072417721659027263613727927680) },
+  { UVCONST(  927712935936),LNVCONST(927711881043.628817668337317445143018372892386) },
+  { UVCONST(  962072674304),LNVCONST(962071726126.508938539006575212272731584070786) },
+  { UVCONST(  996432412672),LNVCONST(996431411588.361462717402562171913706963939018) },
+  { UVCONST( 1099511627776),LNVCONST(1099510565082.05800550569923209414874779035972) },
+  { UVCONST( 1168231104512),LNVCONST(1168230478726.83399452743801182220790107593115) },
+  { UVCONST( 1236950581248),LNVCONST(1236949680081.02610603189530371762093291521116) },
+  { UVCONST( 1305670057984),LNVCONST(1305668780900.04255251887970870257110498423202) },
+  { UVCONST( 1374389534720),LNVCONST(1374388383792.63751003694755359184583212193880) },
+  { UVCONST( 1443109011456),LNVCONST(1443107961091.80955496949174183091839841371227) },
+  { UVCONST( 1511828488192),LNVCONST(1511827317611.91227277802426032456922797572429) },
+  { UVCONST( 1580547964928),LNVCONST(1580546753969.30607547506449941085747942395437) },
+  { UVCONST( 1649267441664),LNVCONST(1649265973878.75361554498682516738256005501353) },
+  { UVCONST( 1717986918400),LNVCONST(1717985403764.24562741452793071287954107946922) },
+  { UVCONST( 1786706395136),LNVCONST(1786704769212.04241689416220650800274263053933) },
+  { UVCONST( 1855425871872),LNVCONST(1855425013030.54920163513184322741954734357404) },
+  { UVCONST( 1924145348608),LNVCONST(1924143701943.02957992419280264060220278182021) },
+  { UVCONST( 1992864825344),LNVCONST(1992863373568.84039296068619447120308124302086) },
+  { UVCONST( 2061584302080),LNVCONST(2061583632335.91985095534685076604018573279204) },
+  { UVCONST( 2130303778816),LNVCONST(2113122935598.01727180199783433992649406589029) },
+  { UVCONST( 2199023255552),LNVCONST(2199021399611.18488312543276191461914978761981) },
+  { UVCONST( 2267742732288),LNVCONST(2267740947106.05038218811506263712808318234921) },
+  { UVCONST( 2336462209024),LNVCONST(2336460081480.34962633829077377680844065198307) },
+  { UVCONST( 2405181685760),LNVCONST(2405179969505.38642629423585641169740223940265) },
+  { UVCONST( 2473901162496),LNVCONST(2473899311193.37872375168104562948639924654178) },
+  { UVCONST( 2542620639232),LNVCONST(2542619362554.88893589220737167756411653816418) },
+  { UVCONST( 2611340115968),LNVCONST(2611338370515.94936514022501267847930999670553) },
+  { UVCONST( 2680059592704),LNVCONST(2680057722824.52981820001574883706268873541107) },
+  { UVCONST( 2748779069440),LNVCONST(2748777610452.18903407570165081726781627254885) },
+  { UVCONST( 2817498546176),LNVCONST(2817497017165.31924616507392971415494161401775) },
+  { UVCONST( 2886218022912),LNVCONST(2886216579432.32232322707222172612181994322081) },
+  { UVCONST( 2954937499648),LNVCONST(2954936100812.97301730406598982753121204977388) },
+  { UVCONST( 3023656976384),LNVCONST(3023654789503.82041452274471455184651411931920) },
+  { UVCONST( 3298534883328),LNVCONST(3298533215621.76606493931157388037915263658637) },
+  { UVCONST( 3573412790272),LNVCONST(3573411344351.74163523704886736624674718378131) },
+  { UVCONST( 3848290697216),LNVCONST(3848288415701.82534219216958446478503907262807) },
+  { UVCONST( 4123168604160),LNVCONST(4123166102085.86116301709394219323327831487542) },
+  { UVCONST( 4398046511104),LNVCONST(4398044965678.05143041707871320554940671182665) },
+  { UVCONST( 4672924418048),LNVCONST(4672922414672.04998927945349278916525727295687) },
+  { UVCONST( 4947802324992),LNVCONST(4947800056419.04384937181159608905993450182729) },
+  { UVCONST( 5222680231936),LNVCONST(5222678728087.69487334278665824384732845008859) },
+  { UVCONST( 5497558138880),LNVCONST(5497555766573.55159115560501595606332808978878) },
+  { UVCONST( 5772436045824),LNVCONST(5772433560746.27053256770924553245647027548204) },
+  { UVCONST( 6047313952768),LNVCONST(6047310750621.24497633828761530843255989494448) },
+  { UVCONST( 6322191859712),LNVCONST(6322189275338.39747421237532473168802646234745) },
+  { UVCONST( 6597069766656),LNVCONST(6579887620000.56226807898107616294821989189226) },
+  { UVCONST( 6871947673600),LNVCONST(6871945430474.61791600096091374271286154432006) },
+  { UVCONST( 7146825580544),LNVCONST(7146823258390.34361980709600216319269118247416) },
+  { UVCONST( 7421703487488),LNVCONST(7421700443390.35536080251964387835425662360121) },
+  { UVCONST( 7696581394432),LNVCONST(7696578975137.73249441643024336954233783264803) },
+  { UVCONST( 7971459301376),LNVCONST(7971457197928.90863708984184849978605273042512) },
+  { UVCONST( 8246337208320),LNVCONST(8246333982863.77146812177727648999195989358960) },
+  { UVCONST( 8521215115264),LNVCONST(8529802085075.55635100929751669785228592926043) },
+  { UVCONST( 8796093022208),LNVCONST(8796089836425.34909684634625258535266362465034) },
+  { UVCONST( 9345848836096),LNVCONST(9345845828116.77456046925508587313) },
+  { UVCONST( 9895604649984),LNVCONST(9895601077915.26821447819584407150) },
+  { UVCONST(10000000000000),LNVCONST(9999996988293.03419965318214160284) },
+  { UVCONST(15000000000000),LNVCONST(14999996482301.7098815115045166858) },
+  { UVCONST(20000000000000),LNVCONST(19999995126082.2286880312461318496) },
+  { UVCONST(25000000000000),LNVCONST(24999994219058.4086216020475916538) },
+  { UVCONST(30000000000000),LNVCONST(29999995531389.8454274046657200568) },
+  { UVCONST(35000000000000),LNVCONST(34999992921190.8049427456456479005) },
+  { UVCONST(40000000000000),LNVCONST(39999993533724.3168289589273168844) },
+  { UVCONST(45000000000000),LNVCONST(44999993567606.9795798378256194424) },
+  { UVCONST(50000000000000),LNVCONST(49999992543194.2636545758235373677) },
+  { UVCONST(55000000000000),LNVCONST(54999990847877.2435105757522625171) },
+  { UVCONST(60000000000000),LNVCONST(59999990297033.6261976055811111726) },
+  { UVCONST(65000000000000),LNVCONST(64999990861395.5522142429859245014) },
+  { UVCONST(70000000000000),LNVCONST(69999994316409.8717306521862685981) },
+  { UVCONST(75000000000000),LNVCONST(74999990126219.8344899338374090165) },
+  { UVCONST(80000000000000),LNVCONST(79999990160858.3042387288372250950) },
+  { UVCONST(85000000000000),LNVCONST(84999987096970.5915212896832780715) },
+  { UVCONST(90000000000000),LNVCONST(89999989501395.0738966599857919767) },
+  { UVCONST(95000000000000),LNVCONST(94999990785908.6672552042792168144) },
+  { UVCONST(100000000000000),LNVCONST(99999990573246.9785384070303475639) },
+};
+#define NCHEBY_VALS (sizeof(_cheby_theta)/sizeof(_cheby_theta[0]))
+#endif
+
+NV chebyshev_theta(UV n)
+{
+  uint16_t i = 0;
+  UV tp, startn, seg_base, seg_low, seg_high;
+  unsigned char* segment;
+  void* ctx;
+  LNV initial_sum, prod = LNV_ONE;
   KAHAN_INIT(sum);
 
   if (n < 500) {
-    UV p, sp;
-    for (sp = 1;  (p = primes_tiny[sp]) <= n; sp++) {
-      logp = logl(p);
-      if (p <= sqrtn) logp *= floorl(logn/logp+1e-15);
-      KAHAN_SUM(sum, logp);
+    for (i = 1;  (tp = primes_tiny[i]) <= n; i++) {
+      KAHAN_SUM(sum, loglnv(tp));
     }
-  } else {
-    UV seg_base, seg_low, seg_high;
-    unsigned char* segment;
-    void* ctx;
-    long double logl2 = logl(2);
-    long double logl3 = logl(3);
-    long double logl5 = logl(5);
-    if (!which) {
-      KAHAN_SUM(sum,logl2); KAHAN_SUM(sum,logl3); KAHAN_SUM(sum,logl5);
-    } else {
-      KAHAN_SUM(sum, logl2 * floorl(logn/logl2 + 1e-15));
-      KAHAN_SUM(sum, logl3 * floorl(logn/logl3 + 1e-15));
-      KAHAN_SUM(sum, logl5 * floorl(logn/logl5 + 1e-15));
-    }
-    ctx = start_segment_primes(7, n, &segment);
-    while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
-      START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high ) {
-        logp = logl(p);
-        if (p <= sqrtn) logp *= floorl(logn/logp+1e-15);
-        KAHAN_SUM(sum, logp);
-      } END_DO_FOR_EACH_SIEVE_PRIME
-    }
-    end_segment_primes(ctx);
+    return sum;
   }
+
+#if defined NCHEBY_VALS
+  if (n >= _cheby_theta[0].n) {
+    for (i = 1; i < NCHEBY_VALS; i++)
+      if (n < _cheby_theta[i].n)
+        break;
+    startn = _cheby_theta[i-1].n;
+    initial_sum = _cheby_theta[i-1].theta;
+  } else
+#endif
+  {
+    KAHAN_SUM(sum, loglnv(2*3*5*7*11*13));
+    startn = 17;
+    initial_sum = 0;
+  }
+
+  ctx = start_segment_primes(startn, n, &segment);
+#if 0
+  while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
+    START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high ) {
+      KAHAN_SUM(sum, loglnv(p));
+    } END_DO_FOR_EACH_SIEVE_PRIME
+  }
+#else
+  while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
+    START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high ) {
+      prod *= (LNV) p;
+      if (++i >= (LNV_IS_QUAD ? 64 : 8)) {
+        KAHAN_SUM(sum, loglnv(prod));
+        prod = LNV_ONE;
+        i = 0;
+      }
+    } END_DO_FOR_EACH_SIEVE_PRIME
+  }
+  if (prod > 1.0) { KAHAN_SUM(sum, loglnv(prod));  prod = LNV_ONE; }
+#endif
+  end_segment_primes(ctx);
+
+  if (initial_sum > 0) KAHAN_SUM(sum, initial_sum);
   return sum;
 }
 
@@ -1753,11 +1927,11 @@ long double chebyshev_function(UV n, int which)
  * by many people).
  */
 
-static long double const euler_mascheroni = 0.57721566490153286060651209008240243104215933593992L;
-static long double const li2 = 1.045163780117492784844588889194613136522615578151L;
+static LNV const euler_mascheroni = LNVCONST(0.57721566490153286060651209008240243104215933593992);
+static LNV const li2 = LNVCONST(1.045163780117492784844588889194613136522615578151);
 
-long double Ei(long double x) {
-  long double val, term;
+NV Ei(NV x) {
+  LNV val, term;
   unsigned int n;
   KAHAN_INIT(sum);
 
@@ -1768,82 +1942,90 @@ long double Ei(long double x) {
 
   if (x < -1) {
     /* Continued fraction, good for x < -1 */
-    long double lc = 0;
-    long double ld = 1.0L / (1.0L - (long double)x);
-    val = ld * (-expl(x));
+    LNV lc = 0;
+    LNV ld = LNV_ONE / (LNV_ONE - (LNV)x);
+    val = ld * (-explnv(x));
     for (n = 1; n <= 100000; n++) {
-      long double old, t, n2;
-      t = (long double)(2*n + 1) - (long double) x;
+      LNV old, t, n2;
+      t = (LNV)(2*n + 1) - (LNV) x;
       n2 = n * n;
-      lc = 1.0L / (t - n2 * lc);
-      ld = 1.0L / (t - n2 * ld);
+      lc = LNV_ONE / (t - n2 * lc);
+      ld = LNV_ONE / (t - n2 * ld);
       old = val;
       val *= ld/lc;
-      if ( fabsl(val-old) <= LDBL_EPSILON*fabsl(val) )
+      if ( fabslnv(val-old) <= LNV_EPSILON*fabslnv(val) )
         break;
     }
   } else if (x < 0) {
     /* Rational Chebyshev approximation (Cody, Thacher), good for -1 < x < 0 */
-    static const long double C6p[7] = { -148151.02102575750838086L,
-                                    150260.59476436982420737L,
-                                     89904.972007457256553251L,
-                                     15924.175980637303639884L,
-                                      2150.0672908092918123209L,
-                                       116.69552669734461083368L,
-                                         5.0196785185439843791020L };
-    static const long double C6q[7] = {  256664.93484897117319268L,
-                                    184340.70063353677359298L,
-                                     52440.529172056355429883L,
-                                      8125.8035174768735759866L,
-                                       750.43163907103936624165L,
-                                        40.205465640027706061433L,
-                                         1.0000000000000000000000L };
-    long double sumn = C6p[0]-x*(C6p[1]-x*(C6p[2]-x*(C6p[3]-x*(C6p[4]-x*(C6p[5]-x*C6p[6])))));
-    long double sumd = C6q[0]-x*(C6q[1]-x*(C6q[2]-x*(C6q[3]-x*(C6q[4]-x*(C6q[5]-x*C6q[6])))));
-    val = logl(-x) - sumn/sumd;
-  } else if (x < (-2 * logl(LDBL_EPSILON))) {
+    static const LNV C6p[7] = { LNVCONST(-148151.02102575750838086),
+                                LNVCONST( 150260.59476436982420737),
+                                LNVCONST(  89904.972007457256553251),
+                                LNVCONST(  15924.175980637303639884),
+                                LNVCONST(   2150.0672908092918123209),
+                                LNVCONST(    116.69552669734461083368),
+                                LNVCONST(      5.0196785185439843791020) };
+    static const LNV C6q[7] = { LNVCONST( 256664.93484897117319268),
+                                LNVCONST( 184340.70063353677359298),
+                                LNVCONST(  52440.529172056355429883),
+                                LNVCONST(   8125.8035174768735759866),
+                                LNVCONST(    750.43163907103936624165),
+                                LNVCONST(     40.205465640027706061433),
+                                LNVCONST(      1.0000000000000000000000) };
+    LNV sumn = C6p[0]-x*(C6p[1]-x*(C6p[2]-x*(C6p[3]-x*(C6p[4]-x*(C6p[5]-x*C6p[6])))));
+    LNV sumd = C6q[0]-x*(C6q[1]-x*(C6q[2]-x*(C6q[3]-x*(C6q[4]-x*(C6q[5]-x*C6q[6])))));
+    val = loglnv(-x) - sumn/sumd;
+  } else if (x < (-2 * loglnv(LNV_EPSILON))) {
     /* Convergent series.  Accurate but slow especially with large x. */
-    long double fact_n = x;
+    LNV fact_n = x;
     for (n = 2; n <= 200; n++) {
-      long double invn = 1.0L / n;
-      fact_n *= (long double)x * invn;
+      LNV invn = LNV_ONE / n;
+      fact_n *= (LNV)x * invn;
       term = fact_n * invn;
       KAHAN_SUM(sum, term);
       /* printf("C  after adding %.20Lf, val = %.20Lf\n", term, sum); */
-      if (term < LDBL_EPSILON*sum) break;
+      if (term < LNV_EPSILON*sum) break;
     }
     KAHAN_SUM(sum, euler_mascheroni);
-    KAHAN_SUM(sum, logl(x));
+    KAHAN_SUM(sum, loglnv(x));
     KAHAN_SUM(sum, x);
     val = sum;
   } else if (x >= 24) {
     /* Cody / Thacher rational Chebyshev */
-    static const long double P2[10] = {
-        1.75338801265465972390E02L,-2.23127670777632409550E02L,
-        -1.81949664929868906455E01L,-2.79798528624305389340E01L,
-        -7.63147701620253630855E00L,-1.52856623636929636839E01L,
-        -7.06810977895029358836E00L,-5.00006640413131002475E00L,
-        -3.00000000320981265753E00L, 1.00000000000000485503E00L };
-    static const long double Q2[9] = {
-        3.97845977167414720840E04L, 3.97277109100414518365E00L,
-        1.37790390235747998793E02L, 1.17179220502086455287E02L,
-        7.04831847180424675988E01L,-1.20187763547154743238E01L,
-        -7.99243595776339741065E00L,-2.99999894040324959612E00L,
-        1.99999999999048104167E00L };
-    long double invx = 1.0L / x;
-    long double frac = 0.0;
+    static const LNV P2[10] = {
+        LNVCONST( 1.75338801265465972390E02),
+        LNVCONST(-2.23127670777632409550E02),
+        LNVCONST(-1.81949664929868906455E01),
+        LNVCONST(-2.79798528624305389340E01),
+        LNVCONST(-7.63147701620253630855E00),
+        LNVCONST(-1.52856623636929636839E01),
+        LNVCONST(-7.06810977895029358836E00),
+        LNVCONST(-5.00006640413131002475E00),
+        LNVCONST(-3.00000000320981265753E00),
+        LNVCONST( 1.00000000000000485503E00) };
+    static const LNV Q2[9] = {
+        LNVCONST( 3.97845977167414720840E04),
+        LNVCONST( 3.97277109100414518365E00),
+        LNVCONST( 1.37790390235747998793E02),
+        LNVCONST( 1.17179220502086455287E02),
+        LNVCONST( 7.04831847180424675988E01),
+        LNVCONST(-1.20187763547154743238E01),
+        LNVCONST(-7.99243595776339741065E00),
+        LNVCONST(-2.99999894040324959612E00),
+        LNVCONST( 1.99999999999048104167E00) };
+    LNV invx = LNV_ONE / x, frac = 0.0;
     for (n = 0; n <= 8; n++)
       frac = Q2[n] / (P2[n] + x + frac);
     frac += P2[9];
-    val = expl(x) * (invx + invx*invx*frac);
+    val = explnv(x) * (invx + invx*invx*frac);
   } else {
     /* Asymptotic divergent series */
-    long double invx = 1.0L / x;
+    LNV invx = LNV_ONE / x;
     term = 1.0;
     for (n = 1; n <= 200; n++) {
-      long double last_term = term;
-      term = term * ( (long double)n * invx );
-      if (term < LDBL_EPSILON*sum) break;
+      LNV last_term = term;
+      term = term * ( (LNV)n * invx );
+      if (term < LNV_EPSILON*sum) break;
       if (term < last_term) {
         KAHAN_SUM(sum, term);
         /* printf("A  after adding %.20llf, sum = %.20llf\n", term, sum); */
@@ -1853,25 +2035,25 @@ long double Ei(long double x) {
         break;
       }
     }
-    KAHAN_SUM(sum, 1.0L);
-    val = expl(x) * sum * invx;
+    KAHAN_SUM(sum, LNV_ONE);
+    val = explnv(x) * sum * invx;
   }
 
   return val;
 }
 
-long double Li(long double x) {
+NV Li(NV x) {
   if (x == 0) return 0;
   if (x == 1) return -INFINITY;
   if (x == 2) return li2;
   if (x < 0) croak("Invalid input to LogarithmicIntegral:  x must be >= 0");
-  if (x >= LDBL_MAX) return INFINITY;
+  if (x >= NV_MAX) return INFINITY;
 
   /* Calculate directly using Ramanujan's series. */
   if (x > 1) {
-    const long double logx = logl(x);
-    long double sum = 0, inner_sum = 0, old_sum, factorial = 1, power2 = 1;
-    long double q, p = -1;
+    const LNV logx = loglnv(x);
+    LNV sum = 0, inner_sum = 0, old_sum, factorial = 1, power2 = 1;
+    LNV q, p = -1;
     int k = 0, n = 0;
 
     for (n = 1, k = 0; n < 200; n++) {
@@ -1880,15 +2062,15 @@ long double Li(long double x) {
       q = factorial * power2;
       power2 *= 2;
       for (; k <= (n - 1) / 2; k++)
-        inner_sum += 1.0L / (2 * k + 1);
+        inner_sum += LNV_ONE / (2 * k + 1);
       old_sum = sum;
       sum += (p / q) * inner_sum;
-      if (fabsl(sum - old_sum) <= LDBL_EPSILON) break;
+      if (fabslnv(sum - old_sum) <= LNV_EPSILON) break;
     }
-    return euler_mascheroni + logl(logx) + sqrtl(x) * sum;
+    return euler_mascheroni + loglnv(logx) + sqrtlnv(x) * sum;
   }
 
-  return Ei(logl(x));
+  return Ei(loglnv(x));
 }
 
 static long double ld_inverse_li(long double lx) {
@@ -2163,7 +2345,7 @@ long double RiemannR(long double x) {
   if (x <= 0) croak("Invalid input to RiemannR:  x must be > 0");
 
   if (x > 1e19) {
-    const signed char* amob = _moebius_range(0, 100);
+    const signed char* amob = range_moebius(0, 100);
     KAHAN_SUM(sum, Li(x));
     for (k = 2; k <= 100; k++) {
       if (amob[k] == 0) continue;
@@ -2226,7 +2408,7 @@ static long double _lambertw_approx(long double x) {
   }
 }
 
-long double lambertw(long double x) {
+NV lambertw(NV x) {
   long double w;
   int i;
 
@@ -2255,13 +2437,23 @@ long double lambertw(long double x) {
 #else  /* Fritsch, see Veberic 2009.  1-2 iterations are enough. */
   for (i = 0; i < 6 && w != 0.0L; i++) {
     long double w1 = 1 + w;
-    long double zn = logl(x/w) - w;
+    long double zn = logl((long double)x/w) - w;
     long double qn = 2 * w1 * (w1+(2.0L/3.0L)*zn);
     long double en = (zn/w1) * (qn-zn)/(qn-2.0L*zn);
     /* w *= 1.0L + en;  if (fabsl(en) <= 16*LDBL_EPSILON) break; */
     long double wen = w * en;
     w += wen;
     if (fabsl(wen) <= 64*LDBL_EPSILON) break;
+  }
+#endif
+#if LNV_IS_QUAD /* For quadmath, one high precision correction */
+  if (w != LNV_ZERO) {
+    LNV lw = w;
+    LNV w1 = LNV_ONE + lw;
+    LNV zn = loglnv((LNV)x/lw) - lw;
+    LNV qn = LNVCONST(2.0) * w1 * (w1+(LNVCONST(2.0)/LNVCONST(3.0))*zn);
+    LNV en = (zn/w1) * (qn-zn)/(qn-LNVCONST(2.0)*zn);
+    return lw + lw * en;
   }
 #endif
 

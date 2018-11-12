@@ -14,6 +14,8 @@ build_requires:
   HTTP::Server::Simple::CGI: '0'
   LWP: '0'
   LWP::Simple: '0'
+  Perl::Critic: '0'
+  Perl::Tidy: '0'
   Test::Deep: '0'
   Test::Fatal: '0'
   Test::More: '0.96'
@@ -41,26 +43,26 @@ no_index:
 provides:
   WWW::Mechanize:
     file: lib/WWW/Mechanize.pm
-    version: '1.89'
+    version: '1.90'
   WWW::Mechanize::Image:
     file: lib/WWW/Mechanize/Image.pm
-    version: '1.89'
+    version: '1.90'
   WWW::Mechanize::Link:
     file: lib/WWW/Mechanize/Link.pm
-    version: '1.89'
+    version: '1.90'
 requires:
   Carp: '0'
   Getopt::Long: '0'
   HTML::Form: '1.00'
   HTML::HeadParser: '0'
   HTML::TokeParser: '0'
-  HTML::TreeBuilder: '0'
+  HTML::TreeBuilder: '5'
   HTTP::Cookies: '0'
   HTTP::Request: '1.30'
   HTTP::Request::Common: '0'
   LWP::UserAgent: '5.827'
   Pod::Usage: '0'
-  Scalar::Util: '0'
+  Scalar::Util: '1.14'
   Tie::RefHash: '0'
   URI::URL: '0'
   URI::file: '0'
@@ -72,7 +74,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/WWW-Mechanize/issues
   homepage: https://github.com/libwww-perl/WWW-Mechanize
   repository: https://github.com/libwww-perl/WWW-Mechanize.git
-version: '1.89'
+version: '1.90'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -430,7 +432,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.89
+          tag: v1.90
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -500,6 +502,10 @@ x_Dist_Zilla:
           default_jobs: 1
       name: RunExtraTests
       version: '0.029'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -623,6 +629,7 @@ x_contributors:
   - 'Matthew Chae <mschae@cpan.org>'
   - 'Matt S Trout <mst@shadowcat.co.uk>'
   - 'Max Maischein <corion@cpan.org>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Neil Bowers <neil@bowers.com>'
   - 'Nik LaBelle <nalabelle@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'

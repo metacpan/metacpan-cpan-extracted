@@ -41,19 +41,19 @@ sub _merge {
 }
 
 sub multivalue {
-    state $init = !!require Pcore::Util::Hash::Multivalue;
+    require Pcore::Util::Hash::Multivalue;
 
     return Pcore::Util::Hash::Multivalue->new(@_);
 }
 
 sub randkey {
-    state $init = !!require Pcore::Util::Hash::RandKey;
+    require Pcore::Util::Hash::RandKey;
 
     return Pcore::Util::Hash::RandKey->new;
 }
 
 sub limited ($max_size) {
-    state $init = !!require Pcore::Util::Hash::LRU;
+    require Pcore::Util::Hash::LRU;
 
     return Pcore::Util::Hash::LRU->new($max_size);
 }

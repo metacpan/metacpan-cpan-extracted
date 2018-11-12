@@ -27,7 +27,7 @@ no_index:
 provides:
   CPAN::Audit:
     file: lib/CPAN/Audit.pm
-    version: '0.10'
+    version: '0.12'
   CPAN::Audit::DB:
     file: lib/CPAN/Audit/DB.pm
   CPAN::Audit::Discover:
@@ -45,6 +45,7 @@ provides:
 requires:
   CPAN::DistnameInfo: '0'
   Module::CPANfile: '0'
+  Module::CoreList: '5.20181020'
   Pod::Usage: '1.69'
   perl: '5.008001'
   version: '0'
@@ -52,9 +53,10 @@ resources:
   bugtracker: https://github.com/vti/cpan-audit/issues
   homepage: https://github.com/vti/cpan-audit
   repository: git://github.com/vti/cpan-audit.git
-version: '0.10'
+version: '0.12'
 x_authority: cpan:VTI
 x_contributors:
+  - 'James Raspass <jraspass@gmail.com>'
   - 'Takumi Akiyama <t.akiym@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

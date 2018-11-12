@@ -8,10 +8,10 @@ use overload    #
   },
   fallback => undef;
 
-has old_umask => ( is => 'ro', isa => Int, required => 1 );
+has old_umask => ( required => 1 );    # Int
 
 sub DESTROY ( $self ) {
-    umask $self->old_umask;    ## no critic qw[InputOutput::RequireCheckedSyscalls]
+    umask $self->{old_umask};          ## no critic qw[InputOutput::RequireCheckedSyscalls]
 
     return;
 }

@@ -129,10 +129,9 @@ $gapi_client->user( $user );
 ####            AND SELECT THE PREFERRED VERSION IF NOT SPECIFIED
 ####
 
-
 #display_api_summary_and_return_versioned_api_string( $gapi_client, $config->{api}, 'v1beta2' );
 my $versioned_api = display_api_summary_and_return_versioned_api_string( $gapi_client, $config->{api} );
-exit;
+
 #say "Versioned version of API = $versioned_api ";
 
 ## interestingly an auth'd request is denied without the correct scope .. so can't use that to find the missing scope :)

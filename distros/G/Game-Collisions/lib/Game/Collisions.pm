@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Collisions;
-$Game::Collisions::VERSION = '0.1';
+$Game::Collisions::VERSION = '0.2';
 use v5.14;
 use warnings;
 use List::Util ();
@@ -199,7 +199,7 @@ there, and only then use more expensive algorthims to check more accurately.
 This module uses a binary tree to quickly search AABB collisions. Each branch 
 of the tree must be big enough to contain all its children. When you move a 
 leaf (any actual object you want to check will be a leaf), its parents must 
-be resized to accomidate.
+be resized to accommodate.
 
 If many leaves get moved rather far, you'll want to rebalance the tree. This is 
 expensive (which is why we normally resize rather than rebalance), so you 
@@ -213,7 +213,7 @@ L<https://www.azurefromthetrenches.com/introductory-guide-to-aabb-tree-collision
 
 This module does use circular references to keep track of parent/child 
 relationships. This would normally be a problem, but if you're using 
-C<<Game::Collisions::AABB->remove>> to take nodes out of the tree, then 
+C<<Game::Collisions::AABB-E<gt>remove>> to take nodes out of the tree, then 
 references are cleaned up, anyway.
 
 =head1 METHODS
@@ -266,7 +266,7 @@ objects are moving around a lot.
 
 =over 4
 
-=item * L<Game::Collision::AABBs>
+=item * L<Game::Collisions::AABB>
 
 =item * L<https://www.azurefromthetrenches.com/introductory-guide-to-aabb-tree-collision-detection/> for a description of the algorithm
 

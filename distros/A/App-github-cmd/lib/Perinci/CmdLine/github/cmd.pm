@@ -1,7 +1,7 @@
 package Perinci::CmdLine::github::cmd;
 
-our $DATE = '2018-10-10'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-11-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -77,7 +77,7 @@ Perinci::CmdLine::github::cmd - Subclass for github-cmd
 
 =head1 VERSION
 
-This document describes version 0.004 of Perinci::CmdLine::github::cmd (from Perl distribution App-github-cmd), released on 2018-10-10.
+This document describes version 0.005 of Perinci::CmdLine::github::cmd (from Perl distribution App-github-cmd), released on 2018-11-08.
 
 =head1 DESCRIPTION
 

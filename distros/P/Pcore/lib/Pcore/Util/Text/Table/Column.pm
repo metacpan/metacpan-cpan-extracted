@@ -2,19 +2,19 @@ package Pcore::Util::Text::Table::Column;
 
 use Pcore -class, -ansi;
 
-has id  => ( is => 'ro', isa => Str, required => 1 );
-has idx => ( is => 'ro', isa => Int, required => 1 );
+has id  => ( required => 1 );
+has idx => ( required => 1 );    # Int
 
-has width => ( is => 'ro', isa => Maybe [PositiveInt] );
+has width => ();                 # Maybe [PositiveInt]
 
-has title        => ( is => 'ro', isa => Str );
-has title_color  => ( is => 'ro', isa => Maybe [Str], default => $BOLD . $WHITE );
-has title_align  => ( is => 'ro', isa => Enum [ -1, 0, 1 ], default => 0 );
-has title_valign => ( is => 'ro', isa => Enum [ -1, 0, 1 ], default => 1 );
+has title        => ();
+has title_color  => ( $BOLD . $WHITE );
+has title_align  => (0);                  # Enum [ -1, 0, 1 ]
+has title_valign => (1);                  # Enum [ -1, 0, 1 ]
 
-has align  => ( is => 'ro', isa => Enum [ -1, 0, 1 ], default => -1 );
-has valign => ( is => 'ro', isa => Enum [ -1, 0, 1 ], default => -1 );
-has format => ( is => 'ro', isa => Maybe [ Str | CodeRef ] );
+has align  => (-1);                       # Enum [ -1, 0, 1 ]
+has valign => (-1);                       # Enum [ -1, 0, 1 ]
+has format => ();                         # Maybe [ Str | CodeRef ]
 
 sub format_val ( $self, $val, $row ) {
     if ( $self->{format} ) {

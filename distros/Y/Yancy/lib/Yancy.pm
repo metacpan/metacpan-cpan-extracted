@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.012';
+our $VERSION = '1.014';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -78,6 +78,12 @@ our $VERSION = '1.012';
 #pod
 #pod For information on how to use Yancy as a Mojolicious plugin, see
 #pod L<Mojolicious::Plugin::Yancy>.
+#pod
+#pod =head2 Example Applications
+#pod
+#pod The L<Yancy Git repository on Github|http://github.com/preaction/Yancy>
+#pod includes some example applications you can use to help build your own
+#pod websites. L<View the example application directory|https://github.com/preaction/Yancy/tree/master/eg>.
 #pod
 #pod =head2 Yancy Plugins
 #pod
@@ -185,7 +191,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 1.012
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -259,6 +265,12 @@ to customize the Yancy editor's appearance
 
 For information on how to use Yancy as a Mojolicious plugin, see
 L<Mojolicious::Plugin::Yancy>.
+
+=head2 Example Applications
+
+The L<Yancy Git repository on Github|http://github.com/preaction/Yancy>
+includes some example applications you can use to help build your own
+websites. L<View the example application directory|https://github.com/preaction/Yancy/tree/master/eg>.
 
 =head2 Yancy Plugins
 

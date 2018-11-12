@@ -7,20 +7,17 @@ use Pcore::Core::CLI::Opt;
 use Pcore::Core::CLI::Arg;
 use Config;
 
-has class => ( is => 'ro', isa => Str, required => 1 );
-has cmd_path => ( is => 'ro', isa => ArrayRef, default => sub { [] } );    # array of used cli commands
+has class    => ( required => 1 );
+has cmd_path => ( sub { [] } );      # array of used cli commands
 
-has spec => ( is => 'lazy', isa => HashRef,  init_arg => undef );
-has cmd  => ( is => 'lazy', isa => ArrayRef, init_arg => undef );
-has opt  => ( is => 'lazy', isa => HashRef,  init_arg => undef );
-has arg  => ( is => 'lazy', isa => ArrayRef, init_arg => undef );
+has spec       => ( is => 'lazy', init_arg => undef );    # HashRef
+has cmd        => ( is => 'lazy', init_arg => undef );    # ArrayRef
+has opt        => ( is => 'lazy', init_arg => undef );    # HashRef
+has arg        => ( is => 'lazy', init_arg => undef );    # ArrayRef
+has is_cmd     => ( is => 'lazy', init_arg => undef );
+has _cmd_index => ( is => 'lazy', init_arg => undef );    # HashRef
 
-has is_cmd     => ( is => 'lazy', isa => Bool,    init_arg => undef );
-has _cmd_index => ( is => 'lazy', isa => HashRef, init_arg => undef );
-
-sub _build_spec ($self) {
-    return $self->_get_class_spec;
-}
+sub _build_spec ($self) { return $self->_get_class_spec }
 
 sub _build_cmd ($self) {
     my $cmd = [];
@@ -117,7 +114,7 @@ sub _build_arg ($self) {
 
             die q[Can't have required argument after not mandatory argument] if $next_arg == 1 && $arg->min != 0;
 
-            die qq[Argument "@{[$arg->name]}" is duplicated] if exists $index->{ $arg->name };
+            die qq[Argument "@{[$arg->{name}]}" is duplicated] if exists $index->{ $arg->{name} };
 
             if ( !$arg->max ) {    # slurpy arg
                 $next_arg = 2;
@@ -128,7 +125,7 @@ sub _build_arg ($self) {
 
             push $args->@*, $arg;
 
-            $index->{ $arg->name } = 1;
+            $index->{ $arg->{name} } = 1;
         }
     }
 
@@ -149,9 +146,7 @@ sub _build__cmd_index ($self) {
     return $index;
 }
 
-sub _build_is_cmd ($self) {
-    return $self->_cmd_index->%* ? 1 : 0;
-}
+sub _build_is_cmd ($self) { return $self->_cmd_index->%* ? 1 : 0 }
 
 sub run ( $self, $argv ) {
 
@@ -243,9 +238,9 @@ sub _parse_cmd ( $self, $argv ) {
 
             my $class = $self->_cmd_index->{ $possible_commands->[0] };
 
-            push $self->cmd_path->@*, $self->_get_class_cmd($class)->[0];
+            push $self->{cmd_path}->@*, $self->_get_class_cmd($class)->[0];
 
-            return __PACKAGE__->new( { class => $class, cmd_path => $self->cmd_path } )->run( $res->{rest} );
+            return __PACKAGE__->new( { class => $class, cmd_path => $self->{cmd_path} } )->run( $res->{rest} );
         }
     }
 }
@@ -334,7 +329,7 @@ sub _parse_opt ( $self, $argv ) {
     return $self->help_usage( [qq[unexpected arguments]] ) if $parsed_args->@*;
 
     # validate cli
-    my $class = $self->class;
+    my $class = $self->{class};
 
     if ( $class->can('CLI_VALIDATE') && defined( my $error_msg = $class->CLI_VALIDATE( $res->{opt}, $res->{arg}, $res->{rest} ) ) ) {
         return $self->help_error($error_msg);
@@ -353,7 +348,7 @@ sub _parse_opt ( $self, $argv ) {
 }
 
 sub _get_class_spec ( $self, $class = undef ) {
-    $class //= $self->class;
+    $class //= $self->{class};
 
     if ( $class->can('CLI') && ( my $spec = $class->CLI ) ) {
         if ( !is_ref $spec ) {
@@ -382,7 +377,7 @@ sub _get_class_cmd ( $self, $class = undef ) {
         return $spec->{name};
     }
     else {
-        $class //= $self->class;
+        $class //= $self->{class};
 
         return [ lc $class =~ s/\A.*:://smr ];
     }
@@ -396,7 +391,7 @@ sub _help_class_abstract ( $self, $class = undef ) {
 }
 
 sub _help_usage_string ($self) {
-    my $usage = join q[ ], P->path( $ENV->{SCRIPT_NAME} )->filename, $self->cmd_path->@*;
+    my $usage = join q[ ], P->path( $ENV->{SCRIPT_NAME} )->{filename}, $self->{cmd_path}->@*;
 
     if ( $self->is_cmd ) {
         $usage .= ' [COMMAND] [OPTION]...';
@@ -459,7 +454,7 @@ sub _help_usage ($self) {
         $help = 'options ([+] - can be repeated, [!] - is required):' . $LF . $LF;
 
         for my $opt ( values $self->opt->%* ) {
-            $list->{ $opt->name } = [ $opt->help_spec, $opt->desc // q[] ];
+            $list->{ $opt->{name} } = [ $opt->help_spec, $opt->{desc} // '' ];
         }
     }
 
@@ -481,9 +476,7 @@ sub _help_usage ($self) {
     return $help // q[];
 }
 
-sub _help_footer ($self) {
-    return '(global options: --help, -h, -?, --version)';
-}
+sub _help_footer ($self) { return '(global options: --help, -h, -?, --version)' }
 
 sub help ($self) {
     say $self->_help_usage_string, $LF;
@@ -563,13 +556,15 @@ sub help_error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 45                   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 42                   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 334                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 329                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 495, 523             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "abstract"                              |
+## |    3 | 488, 516             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "abstract"                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 111                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 108                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 457                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

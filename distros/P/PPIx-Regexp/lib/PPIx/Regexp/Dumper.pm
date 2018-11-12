@@ -48,7 +48,7 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 
 =head2 new
 
@@ -502,7 +502,7 @@ sub PPIx::Regexp::Node::__PPIX_DUMPER__test {
     my @rslt;
     @rslt = (
 	'choose  ( ' . $dumper->__nav( $self->nav() ) . ' );',
-	'class   ( ' . $dumper->_safe( ref $self ) . ' );',
+	'klass   ( ' . $dumper->_safe( ref $self ) . ' );',
 	'count   ( ' . scalar $self->children() . ' );',
     );
 
@@ -609,7 +609,7 @@ sub PPIx::Regexp::Structure::__PPIX_DUMPER__test {
     my @nav = $self->nav();
     my @rslt = (
 	'choose  ( ' . $dumper->__nav( @nav ) . ' );',
-	'class   ( ' . $dumper->_safe( ref $self ) . ' );',
+	'klass   ( ' . $dumper->_safe( ref $self ) . ' );',
 	'count   ( ' . scalar $self->children() . ' );',
     );
     if ( $dumper->{verbose} ) {
@@ -628,7 +628,7 @@ sub PPIx::Regexp::Structure::__PPIX_DUMPER__test {
 	    my $elem = $eles[$inx];
 	    push @rslt, 'choose  ( ' . $dumper->__nav(
 		@nav, $method, $inx ) . ' );',
-		'class   ( ' . $dumper->_safe( ref $elem || $elem ) . ' );',
+		'klass   ( ' . $dumper->_safe( ref $elem || $elem ) . ' );',
 		'content ( ' . $dumper->_safe( $elem ) . ' );';
 	}
     }
@@ -720,7 +720,7 @@ sub PPIx::Regexp::Token::__PPIX_DUMPER__test {
     @nav or @nav = $self->nav();
     my @rslt = (
 	'choose  ( ' . join(', ', $dumper->__nav( @nav ) ) . ' );',
-	'class   ( ' . $dumper->_safe( ref $self ) . ' );',
+	'klass   ( ' . $dumper->_safe( ref $self ) . ' );',
 	'content ( ' . $dumper->_safe( $self ) . ' );',
     );
 

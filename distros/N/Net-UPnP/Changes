@@ -1,9 +1,14 @@
 Revision history for Perl extension UPnP.
 
-2014-10-16 Satoshi Konno <skonno@cybergarage.org>
-	* v1.4.3
-	* Added Build.PL for Module::Build.
-	* Updated MANIFEST and Makefile.PL.
+2018-11-09 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.5
+        * Thanks for Ted Lyngmo <ted@lyncon.se>
+	* Fallback for deprecated QueryStateVariable(PortMappingNumberOfEntries).
+
+2018-05-21 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.4
+        * Thanks for Ted Lyngmo <ted@lyncon.se>
+	* Bugfix: Unusual device locations should not crash the program.
 
 2013-12-27 Thomas Liske <thomas at fiasko-nw.net>
 	* Implement handling of chunked "Transfer-Encoding".

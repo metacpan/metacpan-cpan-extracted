@@ -31,6 +31,10 @@ our $tests = [
     [ 'path/path?q#f', base => 'http://host/path/?bq#bf' ] => 'http://host/path/path/path?q#f',
     [ 'path/path#f',   base => 'http://host/path/?bq#bf' ] => 'http://host/path/path/path#f',
     [ 'path/path?q',   base => 'http://host/path/?bq#bf' ] => 'http://host/path/path/path?q',
+    [ 'path/path?q',   base => 'file:base_path/?bq#bf' ]   => 'file:base_path/path/path?q',
+    [ 'path/path?q',   base => 'file:base_path?bq#bf' ]    => 'file:path/path?q',
+    [ '/path/path?q',  base => 'file:base_path?bq#bf' ]    => 'file:/path/path?q',
+    [ '/path/path?q',  base => 'file:/base_path?bq#bf' ]   => 'file:/path/path?q',
 
     [ '?q#f', base => 'http://host/path/?bq#bf' ] => 'http://host/path/?q#f',
     [ '?q',   base => 'http://host/path/?bq#bf' ] => 'http://host/path/?q',
@@ -71,7 +75,7 @@ done_testing $TESTS;
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 59                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 63                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

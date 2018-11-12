@@ -7,14 +7,13 @@ Module::Build->new(
     dist_author => 'Roland van Ipenburg <ipenburg@xs4all.nl>',
     requires    => {
         'perl'                 => '5.14.0',
-        'Mojo::DOM'            => 0,
+        'Moose'                => 0,
+        'Mojolicious'          => 6.0,
         'Log::Log4perl'        => 0,
         'Readonly'             => 1.03,
         'Set::Scalar'          => 0,
         'TeX::Hyphen'          => 0,
         'TeX::Hyphen::Pattern' => 0.100,
-        'Moose'                => 0,
-        'namespace::autoclean' => 0,
     },
     build_requires => {
         'Test::More'       => 0.86,

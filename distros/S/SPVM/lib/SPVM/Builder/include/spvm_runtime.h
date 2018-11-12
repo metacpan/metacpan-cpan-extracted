@@ -45,13 +45,15 @@ do {\
 
 struct SPVM_runtime {
   
-  char** symbols;
-  int32_t symbols_length;
+  char* string_pool;
+  int32_t string_pool_length;
+  
+  int32_t* constant_pool;
+  int32_t constant_pool_length;
   
   SPVM_OPCODE* opcodes;
   
-  SPVM_RUNTIME_MY* args;
-  SPVM_RUNTIME_MY* mys;
+  SPVM_RUNTIME_ARG* args;
   
   SPVM_RUNTIME_BASIC_TYPE* basic_types;
   int32_t basic_types_length;
@@ -67,26 +69,13 @@ struct SPVM_runtime {
 
   SPVM_RUNTIME_PACKAGE* packages;
   int32_t packages_length;
-  
-  int64_t* info_long_values;
-  double* info_double_values;
-  char** info_string_values;
-  int32_t info_string_values_length;
-  int32_t* info_string_lengths;
-  int32_t* info_sub_ids;
-  int32_t* info_package_var_ids;
-  int32_t* info_field_ids;
-  SPVM_RUNTIME_INFO_TYPE* info_types;
+
+  SPVM_HASH* basic_type_symtable;
+  SPVM_HASH* package_symtable;
   
   void** sub_native_addresses;
   void** sub_precompile_addresses;
-
-  SPVM_LIST* info_switch_infos;
   
-  // Symbol table
-  SPVM_HASH* basic_type_symtable;
-  SPVM_HASH* package_symtable;
-
   // Exception
   SPVM_OBJECT* exception;
   

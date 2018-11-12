@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use FFI::Platypus::Buffer;
 
-our $VERSION = 0.05_03;
+our $VERSION = 0.0601;
 
 sub DESTROY {
     my $self = shift;
@@ -33,6 +33,26 @@ sub GetSize {
         Geo::GDAL::FFI::GDALGetRasterBandXSize($$self),
         Geo::GDAL::FFI::GDALGetRasterBandYSize($$self)
         );
+}
+
+sub GetCategoryNames {
+    my $self = shift;
+    my $csl = Geo::GDAL::FFI::GDALGetRasterCategoryNames($$self);
+    my @names;
+    for my $i (0..Geo::GDAL::FFI::CSLCount($csl)-1) {
+        push @names, Geo::GDAL::FFI::CSLGetField($csl, $i);
+    }
+    return @names;
+}
+
+sub SetCategoryNames {
+    my ($self, @names) = @_;
+    my $csl = 0;
+    for my $n (@names) {
+        $csl = Geo::GDAL::FFI::CSLAddString($csl, $n);
+    }
+    Geo::GDAL::FFI::GDALSetRasterCategoryNames($$self, $csl);
+    Geo::GDAL::FFI::CSLDestroy($csl);
 }
 
 sub GetNoDataValue {
@@ -83,7 +103,6 @@ sub Read {
     $xoff //= 0;
     $yoff //= 0;
     my $t = Geo::GDAL::FFI::GDALGetRasterDataType($$self);
-    my $buf;
     my ($pc, $bytes_per_cell) = pack_char($t);
     my $w;
     $xsize //= Geo::GDAL::FFI::GDALGetRasterBandXSize($$self);
@@ -91,7 +110,7 @@ sub Read {
     $bufxsize //= $xsize;
     $bufysize //= $ysize;
     $w = $bufxsize * $bytes_per_cell;
-    $buf = ' ' x ($bufysize * $w);
+    my $buf = ' ' x ($bufysize * $w);
     my ($pointer, $size) = scalar_to_buffer $buf;
     Geo::GDAL::FFI::GDALRasterIO($$self, $Geo::GDAL::FFI::Read, $xoff, $yoff, $xsize, $ysize, $pointer, $bufxsize, $bufysize, $t, 0, 0);
     my $offset = 0;
@@ -168,7 +187,7 @@ sub GetColorInterpretation {
 sub SetColorInterpretation {
     my ($self, $i) = @_;
     my $tmp = $Geo::GDAL::FFI::color_interpretations{$i};
-    confess "Unknown color interpretation: $i\n" unless defined $tmp;
+    confess "Unknown color interpretation: $i." unless defined $tmp;
     $i = $tmp;
     Geo::GDAL::FFI::GDALSetRasterColorInterpretation($$self, $i);
 }
@@ -206,12 +225,12 @@ sub GetPiddle {
     $ysize //= $h - $yoff;
     my $t = Geo::GDAL::FFI::GDALGetRasterDataType($$self);
     my $pdl_t = $Geo::GDAL::FFI::data_type2pdl_data_type{$Geo::GDAL::FFI::data_types_reverse{$t}};
-    confess "The Piddle data_type is unsuitable.\n" unless defined $pdl_t;
+    confess "The Piddle data_type is unsuitable." unless defined $pdl_t;
     $xdim //= $xsize;
     $ydim //= $ysize;
     $alg //= 'NearestNeighbour';
     my $tmp = $Geo::GDAL::FFI::resampling{$alg};
-    confess "Unknown resampling scheme: $alg\n" unless defined $tmp;
+    confess "Unknown resampling scheme: $alg." unless defined $tmp;
     $alg = $tmp;
     my $bufxsize = $xsize;
     my $bufysize = $ysize;
@@ -238,7 +257,7 @@ sub SetPiddle {
     $yoff //= 0;
     my ($w, $h) = $self->GetSize;
     my $t = $Geo::GDAL::FFI::pdl_data_type2data_type{$pdl->get_datatype};
-    confess "The Piddle data_type '".$pdl->get_datatype."' is unsuitable.\n" unless defined $t;
+    confess "The Piddle data_type '".$pdl->get_datatype."' is unsuitable." unless defined $t;
     $t = $Geo::GDAL::FFI::data_types{$t};
     my ($xdim, $ydim) = $pdl->dims();
     $xsize //= $xdim;

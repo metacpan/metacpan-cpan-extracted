@@ -17,6 +17,6 @@ dies_ok {
     ++$o->bar->[0];
 } 'disallowed change of array element';
 
-is $o->bar->[0] => 1, 'element was changed';
+is $o->bar->[0] => 1, 'element was not changed';
 
 done_testing;

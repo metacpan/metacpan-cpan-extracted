@@ -1,16 +1,16 @@
-package Pcore::PgSQL v0.22.0;
+package Pcore::PgSQL v0.22.3;
 
 use Pcore -dist, -class;
 
-has data_dir => ( is => 'ro', isa => Str, required => 1 );
+has data_dir => ( required => 1 );    # Str
 
 sub run ( $self ) {
     my $db_dir = "$self->{data_dir}/db/";
 
     # create and prepare data dir
-    P->file->mkdir( $self->data_dir ) if !-d $self->data_dir;
+    P->file->mkdir( $self->{data_dir} ) if !-d $self->{data_dir};
     my $uid = getpwnam 'postgres';
-    chown $uid, $uid, $self->data_dir or die;
+    chown $uid, $uid, $self->{data_dir} or die;
 
     # init db
     if ( $self->is_empty ) {
@@ -71,7 +71,7 @@ sub run ( $self ) {
 }
 
 sub is_empty ($self) {
-    return P->file->read_dir( $self->data_dir )->@* ? 0 : 1;
+    return P->file->read_dir( $self->{data_dir} )->@* ? 0 : 1;
 }
 
 1;

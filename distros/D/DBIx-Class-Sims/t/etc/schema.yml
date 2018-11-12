@@ -9,5 +9,6 @@ connect_info:
 connect_opts: 
   name_sep: '.'
   quote_char: '`'
+  on_connect_call: 'use_foreign_keys'
 deploy_opts: 
   quote_identifiers: 1

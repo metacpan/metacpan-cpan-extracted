@@ -2,9 +2,7 @@
     Magrathea::API - Easier access to the Magrathea NTS API
 
   VERSION
-    Version 1.4.0
-
-    Please note that this software is currently beta.
+    Version 1.5.1
 
   SYNOPSIS
         use Magrathea::API;
@@ -185,6 +183,9 @@
    emergency_info
     Passed a phone number, this method returns a Magrathea::API::Emergency
     object with the current 999 information.
+
+    Optionally it can be passed a second parameter which, if it is a truthy
+    value, will set the "ported" flag.
 
   Low Level Methods
     All the Magrathea low level calls are available. These are simply passed

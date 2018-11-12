@@ -8,7 +8,7 @@ use Catalyst::Model::InjectionHelpers::PerRequest;
 
 requires 'setup_injected_component';
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 my $adaptor_namespace = sub {
   my $app = shift;
@@ -33,6 +33,19 @@ my $normalize_adaptor = sub {
   my $adaptor = shift || $app->$default_adaptor;
   return $adaptor=~m/::/ ? 
     $adaptor : "${\$app->$adaptor_namespace}::$adaptor";
+};
+
+before 'setup_injected_components', sub {
+  my ($class) = @_;
+  my @injectables = grep {
+    ($_ =~ m/^Model/) 
+    || ($_ =~ m/^Controller/)
+    || ($_ =~ m/^View/)
+  } keys %{$class->config};
+  foreach my $comp (@injectables) {
+    next unless my $inject = delete $class->config->{$comp}->{'-inject'};
+    $class->config->{inject_components}->{$comp} = $inject;
+  }
 };
 
 after 'setup_injected_component', sub {
@@ -98,6 +111,37 @@ Use the plugin in your application class:
     MyApp->config(
       'Model::SingletonA' => { aaa=>100 },
       'Model::SingletonB' => { arg=>300 },
+    );
+
+    MyApp->setup;
+
+Alternatively you can use the 'config' only approach which may be useful if you
+have configuration file overlays that change how injections work on a per environment
+basis:
+
+    package MyApp;
+    use Catalyst 'InjectionHelpers';
+
+    MyApp->config(
+      'Model::SingletonA' => {
+        -inject => {
+          from_class=>'MyApp::Singleton', 
+          adaptor=>'Application', 
+          roles=>['MyApp::Role::Foo'],
+          method=>'new',
+        },
+        aaa => 100,
+      },
+      'Model::SingletonB' => {
+        -inject => {
+          from_class=>'MyApp::Singleton', 
+          adaptor=>'Application', 
+          method=>sub {
+            my ($adaptor_instance, $from_class, $app, %args) = @_;
+            return $class->new(aaa=>$args{arg});
+        },
+        arg => 300,
+      },
     );
 
     MyApp->setup;
@@ -254,6 +298,11 @@ the request goes out of scope.
 
 The first time you call this model you may pass additional parameters, which get
 merged with the global configuration and used to initialize the model.
+
+=head2 PerSession.
+
+Scoped to a session.  Requires the Session plugin.
+See L<Catalyst::Model::InjectionHelpers::PerSession> for more.
 
 =head1 Creating your own adaptor
 

@@ -30,7 +30,7 @@ my %module_build_args = (
     "SRVSH"
   ],
   "dist_name" => "RT-Client-REST",
-  "dist_version" => "0.53",
+  "dist_version" => "0.54",
   "license" => "perl",
   "module_name" => "RT::Client::REST",
   "recursive_test_files" => 1,

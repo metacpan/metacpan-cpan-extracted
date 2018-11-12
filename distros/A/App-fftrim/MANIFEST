@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/App/fftrim.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+README.md
+script/fftrim
+t/00-load.t
+t/01-decode-cutpoint.t
+t/manifest.t

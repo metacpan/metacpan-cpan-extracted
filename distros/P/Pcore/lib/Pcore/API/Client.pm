@@ -2,37 +2,37 @@ package Pcore::API::Client;
 
 use Pcore -class, -res;
 use Pcore::WebSocket;
-use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref is_plain_coderef weaken];
+use Pcore::Util::Scalar qw[is_callback is_plain_arrayref is_plain_coderef weaken];
 use Pcore::Util::Data qw[to_cbor from_cbor];
 use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::HTTP qw[:TLS_CTX];
 
-has uri => ( is => 'ro', isa => InstanceOf ['Pcore::Util::URI'], required => 1 );    # http://token@host:port/api/, ws://token@host:port/api/
+has uri => ( required => 1 );    # InstanceOf ['Pcore::Util::URI'], http://token@host:port/api/, ws://token@host:port/api/
 
-has token   => ( is => 'ro', isa => Str );
-has api_ver => ( is => 'ro', isa => Str );                                           # eg: 'v1', default API version for relative methods
+has token   => ();
+has api_ver => ();               # eg: 'v1', default API version for relative methods
 
-has tls_ctx => ( is => 'ro', isa => Maybe [ HashRef | Enum [ $TLS_CTX_LOW, $TLS_CTX_HIGH ] ], default => $TLS_CTX_HIGH );
-has connect_timeout => ( is => 'ro', isa => PositiveOrZeroInt, default => 10 );
+has tls_ctx         => $TLS_CTX_HIGH;    # Maybe [ HashRef | Enum [ $TLS_CTX_LOW, $TLS_CTX_HIGH ] ]
+has connect_timeout => 10;
 
 # HTTP options
-has persistent => ( is => 'ro', isa => Maybe [PositiveOrZeroInt], default => 600 );
-has timeout => ( is => 'ro', isa => Maybe [PositiveOrZeroInt] );
+has persistent => 600;
+has timeout    => ();
 
 # WebSocket options
-has compression    => ( is => 'ro', isa => Bool, default => 0 );
-has bind_events    => ( is => 'ro', isa => ArrayRef );
-has forward_events => ( is => 'ro', isa => ArrayRef );
-has on_connect     => ( is => 'ro', isa => Maybe [CodeRef] );
-has on_disconnect  => ( is => 'ro', isa => Maybe [CodeRef] );
-has on_rpc         => ( is => 'ro', isa => Maybe [CodeRef] );
-has on_ping        => ( is => 'ro', isa => Maybe [CodeRef] );
-has on_pong        => ( is => 'ro', isa => Maybe [CodeRef] );
+has compression    => 0;
+has bind_events    => ();
+has forward_events => ();
+has on_connect     => ();                # Maybe [CodeRef]
+has on_disconnect  => ();                # Maybe [CodeRef]
+has on_rpc         => ();                # Maybe [CodeRef]
+has on_ping        => ();                # Maybe [CodeRef]
+has on_pong        => ();                # Maybe [CodeRef]
 
-has _is_http => ( is => 'lazy', isa => Bool, required => 1 );
+has _is_http => ( required => 1 );
 
-has _get_ws_cb => ( is => 'ro', isa => ArrayRef, init_arg => undef );
-has _ws => ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::WebSocket'], init_arg => undef );
+has _get_ws_cb => ( init_arg => undef );
+has _ws        => ( init_arg => undef );
 
 sub DESTROY ( $self ) {
     if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
@@ -47,9 +47,9 @@ around BUILDARGS => sub ( $orig, $self, $uri, @ ) {
 
     $args{uri} = P->uri($uri);
 
-    $args{token} = $args{uri}->userinfo if !$args{token};
+    $args{token} = $args{uri}->{userinfo} if !$args{token};
 
-    $args{_is_http} = $args{uri}->is_http;
+    $args{_is_http} = $args{uri}->{is_http};
 
     return $self->$orig( \%args );
 };
@@ -83,7 +83,7 @@ sub api_call ( $self, $method, @args ) {
     }
 
     # parse callback
-    my $cb = is_plain_coderef $_[-1] || ( is_blessed_ref $_[-1] && $_[-1]->can('IS_CALLBACK') ) ? pop : undef;
+    my $cb = is_plain_coderef $_[-1] || is_callback $_[-1] ? pop : undef;
 
     if ( defined wantarray ) {
         my $cv = P->cv;
@@ -120,7 +120,7 @@ sub _send_http ( $self, $method, $args, $cb ) {
     };
 
     P->http->post(
-        $self->uri,
+        $self->{uri},
         connect_timeout => $self->{connect_timeout},
         persistent      => $self->{persistent},
         tls_ctx         => $self->{tls_ctx},
@@ -145,10 +145,10 @@ sub _send_http ( $self, $method, $args, $cb ) {
                     my $tx = is_plain_arrayref $msg ? $msg->[0] : $msg;
 
                     if ( $tx->{type} eq 'exception' ) {
-                        $cb->( bless $tx->{message}, 'Pcore::Util::Result' );
+                        $cb->( bless $tx->{message}, 'Pcore::Util::Result::Class' );
                     }
                     elsif ( $tx->{type} eq 'rpc' ) {
-                        $cb->( bless $tx->{result}, 'Pcore::Util::Result' );
+                        $cb->( bless $tx->{result}, 'Pcore::Util::Result::Class' );
                     }
                 }
             }
@@ -189,7 +189,7 @@ sub _get_ws ( $self, $cb ) {
         weaken $self;
 
         Pcore::WebSocket->connect_ws(
-            $self->uri,
+            $self->{uri},
             protocol         => 'pcore',
             max_message_size => 0,
             compression      => $self->{compression},

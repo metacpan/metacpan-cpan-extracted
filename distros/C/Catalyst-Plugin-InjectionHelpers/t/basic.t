@@ -87,14 +87,16 @@ BEGIN {
         return $class->new(ctx=>$ctx);
       },
     },
-    'Model::Factory' => { from_class=>'MyApp::Singleton', adaptor=>'Factory' },
     'Model::PerRequest' => { from_class=>'MyApp::Singleton', adaptor=>'PerRequest' },
   );
 
   MyApp->config(
     'Model::SingletonA' => { aaa=>100 },
     'Model::SingletonB' => { arg=>300 },
-    'Model::Factory' => {aaa=>444},
+    'Model::Factory' => {
+      -inject => { from_class=>'MyApp::Singleton', adaptor=>'Factory' },
+      aaa => 444
+    },
     'Model::Normal' => { ccc=>200 },
   );
 

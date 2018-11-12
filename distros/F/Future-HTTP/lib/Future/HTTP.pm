@@ -55,9 +55,10 @@ but has not materialized yet.
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
-our @loops = (
+our @loops;
+push @loops, (
     ['IO/Async.pm'    => 'Future::HTTP::NetAsync' ],
     ['Mojo/IOLoop.pm' => 'Future::HTTP::Mojo' ],
     ['AnyEvent.pm'    => 'Future::HTTP::AnyEvent'],

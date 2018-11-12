@@ -99,7 +99,7 @@ sub upload ( $self, $path, $data, @args ) {
     # TODO check, that path is child
     # return $on_finish->( $cb, res 404 );
 
-    P->file->mkpath( $path->dirname, mode => 'rwxr-xr-x' ) || return res [ 500, qq[Can't create CDN path "$path", $!] ] if !-d $path->dirname;
+    P->file->mkpath( $path->{dirname}, mode => 'rwxr-xr-x' ) || return res [ 500, qq[Can't create CDN path "$path", $!] ] if !-d $path->{dirname};
 
     P->file->write_bin( $path, { mode => 'rw-r--r--' }, $data );    # TODO or return res [ 500, qq[Can't write "$path", $!] ];
 

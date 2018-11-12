@@ -1,3 +1,52 @@
+v0.77.2 2018-11-11T01:53:07Z
+ - scandeps improved
+ - ro attrs fixed
+ - vim integration
+ - role export overload fallback
+ - module auto deps fixed
+ - typo
+ - host->name fixed
+
+v0.77.1 2018-11-10T01:11:22Z
+ - tests fixed
+
+v0.77.0 2018-11-10T00:43:09Z
+ - Build.PL
+ - test
+ - typo
+ - code improvements
+ - tests fixed
+
+v0.76.1 2018-11-09T07:41:35Z
+ - Build.PL
+ - test
+ - typo
+
+v0.76.0 2018-11-09T07:21:39Z
+ - par gui option added
+ - path xs
+ - mime database updated
+ - s3 upload attrs renamed
+ - typo
+ - uri methods refactored
+ - uri ported to the new path
+ - ENV refactored
+ - DIST_CFG_TYPE removed
+ - Type::Tiny removed
+ - temp refactoring
+ - code cleanup
+ - cdn resources fixed
+ - mime refactored
+ - yaml indent 4
+ - src redesign
+ - src redesign #no filter
+ - src css indent
+ - code improvements
+ - par.ini --> par.yaml
+ - docker.json --> docker.yaml
+ - result refactored
+ - cpanfile
+
 v0.75.2 2018-10-26T20:44:26Z
  - path1
  - path1 normalize

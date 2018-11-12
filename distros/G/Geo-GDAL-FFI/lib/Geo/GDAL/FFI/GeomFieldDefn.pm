@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 0.05_03;
+our $VERSION = 0.0601;
 
 sub new {
     my ($class, $args) = @_;
@@ -12,7 +12,7 @@ sub new {
     my $name = $args->{Name} // 'Unnamed';
     my $type = $args->{Type} // 'Point';
     my $tmp = $Geo::GDAL::FFI::geometry_types{$type};
-    confess "Unknown geometry type: $type\n" unless defined $tmp;
+    confess "Unknown geometry type: $type." unless defined $tmp;
     my $self = bless \Geo::GDAL::FFI::OGR_GFld_Create($name, $tmp), $class;
     $self->SetSpatialRef($args->{SpatialReference}) if $args->{SpatialReference};
     $self->SetNullable(0) if $args->{NotNullable};
@@ -59,7 +59,7 @@ sub SetType {
     confess "Can't modify an immutable object." if $Geo::GDAL::FFI::immutable{$$self};
     $type //= 'Point';
     my $tmp = $Geo::GDAL::FFI::geometry_types{$type};
-    confess "Unknown geometry type: $type\n" unless defined $tmp;
+    confess "Unknown geometry type: $type." unless defined $tmp;
     $type = $tmp;
     Geo::GDAL::FFI::OGR_GFld_SetType($$self, $type);
 }

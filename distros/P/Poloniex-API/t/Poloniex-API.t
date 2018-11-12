@@ -96,7 +96,8 @@ my $api = Poloniex::API->new(
 foreach my $test (@test) {
     ++$test->{resp}{ok};
 
-    my ( $mock_agent, $mock_response, @call_order ) =
+    # variables not used $mock_response, @call_order
+    my ( $mock_agent ) =
       $test->{agent}->( $test->{resp} );
     $api->{_agent} = $mock_agent;
     my $method = $test->{method};

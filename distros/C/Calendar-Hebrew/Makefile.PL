@@ -20,7 +20,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Moo'                        => '2.000000',
-        'namespace::clean'           => '0.24',
+        'namespace::autoclean'       => '0.28',
         'Date::Hebrew::Simple'       => '0.04',
         'Calendar::Plugin::Renderer' => '0.12',
     },
@@ -29,7 +29,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Hebrew' => { file => 'lib/Calendar/Hebrew.pm', version => '0.05' },
+            'Calendar::Hebrew' => { file => 'lib/Calendar/Hebrew.pm', version => '0.06' },
         },
         resources => {
             repository => {

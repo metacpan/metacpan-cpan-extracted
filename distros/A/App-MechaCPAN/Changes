@@ -1,5 +1,12 @@
 Revision history for App-MechaCPAN
 
+0.26  2018-11-09 00:36:48 EST
+  - Use the full form of File::Temp->new for older perls. GH#11
+  - Consolidate use of CoreList so we can also check if a module is deprecated
+    and act like it's not core if it is deprecated. GH#12
+  - Bug fix for the tests that attempted to install Test::More when core perl
+    had the same version as cpan. Fixes perl rt #133617
+
 0.25  2018-10-17 22:45:47 EDT
   - Add fixes for fetch_file that was preventing successful testing on
     cpantesters, including the difference with BSD's tar that an empty input

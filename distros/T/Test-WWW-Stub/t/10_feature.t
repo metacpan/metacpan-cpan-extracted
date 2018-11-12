@@ -103,6 +103,13 @@ sub register : Tests {
         is $self->ua->get('http://example.com/OVERRIDE')->code, 200, 'restore stub when out of scope';
     };
 
+    subtest 'use shorter pattern' => sub {
+        my $g1 = Test::WWW::Stub->register(q<http://example.com/TEST/LONG_PATTERN> => [ 200, [], ['0'] ]);
+        my $g2 = Test::WWW::Stub->register(q<http://example.com/TEST/> => [ 200, [], ['1'] ]);
+
+        my $res = $self->ua->get('http://example.com/TEST/');
+        is $res->content, '1';
+    };
 }
 
 sub unstub : Tests {

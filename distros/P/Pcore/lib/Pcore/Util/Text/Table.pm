@@ -26,7 +26,7 @@ const our $GRID => {
 };
 
 const our $STYLE => {
-    pcore => {
+    full => {
         grid         => 'ascii',
         header       => 1,
         top_line     => 1,
@@ -46,26 +46,37 @@ const our $STYLE => {
         left_border  => 1,
         right_border => 1,
     },
+    compact_mini => {
+        grid         => 'ascii',
+        header       => 1,
+        top_line     => 0,
+        header_line  => 1,
+        row_line     => 0,
+        bottom_line  => 1,
+        left_border  => 0,
+        right_border => 0,
+    },
 };
 
-has style => ( is => 'ro', isa => Maybe [ Enum [ keys $STYLE->%* ] ] );
+has cols => ( required => 1 );    # ArrayRef [ InstanceOf ['Pcore::Util::Text::Table::Column'] ]
 
-has grid => ( is => 'ro', isa => Maybe [ Enum [ keys $GRID->%* ] ], default => 'ascii' );
-has header => ( is => 'ro', isa => Bool, default => 1 );    # render header
+has style => ();                  # Maybe [ Enum [ keys $STYLE->%* ] ]
 
-has top_line     => ( is => 'ro', isa => Bool, default => 1 );
-has header_line  => ( is => 'ro', isa => Bool, default => 1 );
-has row_line     => ( is => 'ro', isa => Bool, default => 1 );
-has bottom_line  => ( is => 'ro', isa => Bool, default => 1 );
-has left_border  => ( is => 'ro', isa => Bool, default => 1 );
-has right_border => ( is => 'ro', isa => Bool, default => 1 );
+has grid   => ('ascii');          # Maybe [ Enum [ keys $GRID->%* ] ]
+has header => (1);                # render header
 
-has color => ( is => 'ro', isa => Bool, default => 1 );
-has width => ( is => 'ro', isa => Maybe [PositiveInt] );
-has padding => ( is => 'ro', isa => PositiveOrZeroInt, default => 1 );
-has cols => ( is => 'ro', isa => ArrayRef [ InstanceOf ['Pcore::Util::Text::Table::Column'] ], required => 1 );
+has top_line     => (1);          # Bool
+has header_line  => (1);          # Bool
+has row_line     => (1);          # Bool
+has bottom_line  => (1);          # Bool
+has left_border  => (1);          # Bool
+has right_border => (1);          # Bool
 
-has _first_row => ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
+has color   => (1);               # Bool
+has width   => ();                # Maybe [PositiveInt]
+has padding => (1);               # PositiveOrZeroInt
+
+has _first_row => ( 1, init_arg => undef );    # Bool
 
 sub BUILDARGS ( $self, $args ) {
     my $cols = [];
@@ -86,30 +97,30 @@ sub BUILDARGS ( $self, $args ) {
 }
 
 sub BUILD ( $self, $args ) {
-    my $table_width = $self->width;
+    my $table_width = $self->{width};
 
     my $var_width_cols;
 
     # calculate width for columns with variable width
-    for my $col ( $self->cols->@* ) {
-        if ( !$col->width ) {
+    for my $col ( $self->{cols}->@* ) {
+        if ( !$col->{width} ) {
             die q[Table width must be defined if table has variable width columns] if !$table_width;
 
             push $var_width_cols->@*, $col;
         }
         else {
-            $table_width -= $col->width if $table_width;
+            $table_width -= $col->{width} if $table_width;
         }
     }
 
     if ($var_width_cols) {
 
         # - internal borders
-        $table_width -= scalar( $self->cols->@* ) + 1;
+        $table_width -= scalar( $self->{cols}->@* ) + 1;
 
         # - left / right borders
-        $table_width -= 1 if defined $self->grid && $self->left_border;
-        $table_width -= 1 if defined $self->grid && $self->right_border;
+        $table_width -= 1 if defined $self->{grid} && $self->{left_border};
+        $table_width -= 1 if defined $self->{grid} && $self->{right_border};
 
         my $col_width = int( $table_width / scalar $var_width_cols->@* );
 
@@ -144,13 +155,13 @@ sub render_header ($self) {
     my $buf;
 
     # top line
-    $buf .= $self->_render_line(0) if $self->grid && $self->top_line;
+    $buf .= $self->_render_line(0) if $self->{grid} && $self->{top_line};
 
     # header row
-    $buf .= $self->_render_row( [ map { $_->{title} // uc $_->{id} } $self->cols->@* ], 1 ) if $self->header;
+    $buf .= $self->_render_row( [ map { $_->{title} // uc $_->{id} } $self->{cols}->@* ], 1 ) if $self->{header};
 
     # header separator line
-    $buf .= $self->_render_line(2) if $self->grid && $self->header && $self->header_line;
+    $buf .= $self->_render_line(2) if $self->{grid} && $self->{header} && $self->{header_line};
 
     return $buf;
 }
@@ -166,7 +177,7 @@ sub render_row_line ($self) {
 }
 
 sub finish ($self) {
-    if ( $self->grid && $self->bottom_line ) {
+    if ( $self->{grid} && $self->{bottom_line} ) {
 
         # bottom line
         return $self->_render_line(5);
@@ -183,13 +194,13 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
         if ( $self->{_first_row} ) { $self->{_first_row} = 0 }
 
         # data row separator line
-        elsif ( $self->grid && $self->row_line ) { $buf .= $self->_render_line(4) }
+        elsif ( $self->{grid} && $self->{row_line} ) { $buf .= $self->_render_line(4) }
     }
 
     my $grid;
 
-    if ( $self->grid ) {
-        $grid = $header_row ? $GRID->{ $self->grid }->[1] : $GRID->{ $self->grid }->[3];
+    if ( $self->{grid} ) {
+        $grid = $header_row ? $GRID->{ $self->{grid} }->[1] : $GRID->{ $self->{grid} }->[3];
     }
 
     my @cells;
@@ -197,7 +208,7 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
     my $row_height = 1;
 
     # retrieve and format cells values
-    for my $col ( $self->cols->@* ) {
+    for my $col ( $self->{cols}->@* ) {
         my $val;
 
         if ( is_plain_arrayref $row ) {
@@ -226,17 +237,17 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
                 $val = $col->{title_color} . $val . "\e[0m";
             }
 
-            $align = $col->title_align;
+            $align = $col->{title_align};
         }
         else {
             $val = $col->format_val( $val, $row );
 
-            $align = $col->align;
+            $align = $col->{align};
         }
 
-        $val = wrap $val, $col->{width} - ( $self->padding * 2 ), ansi => $self->color, align => $align;
+        $val = wrap $val, $col->{width} - ( $self->{padding} * 2 ), ansi => $self->{color}, align => $align;
 
-        $val = [ q[ ] x ( $col->{width} - $self->padding * 2 ) ] if !$val->@*;
+        $val = [ q[ ] x ( $col->{width} - $self->{padding} * 2 ) ] if !$val->@*;
 
         push @cells, $val;
 
@@ -245,15 +256,15 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
 
     # valign
     if ( $row_height > 1 ) {
-        for my $col ( $self->cols->@* ) {
+        for my $col ( $self->{cols}->@* ) {
             my $cell = $cells[ $col->{idx} ];
 
             my $cell_height = scalar $cell->@*;
 
             if ( $cell_height < $row_height ) {
-                my $tmpl = q[ ] x ( $col->{width} - $self->padding * 2 );
+                my $tmpl = q[ ] x ( $col->{width} - $self->{padding} * 2 );
 
-                my $valign = $header_row ? $col->title_valign : $col->valign;
+                my $valign = $header_row ? $col->{title_valign} : $col->{valign};
 
                 if ( $valign == -1 ) {
                     push $cell->@*, ($tmpl) x ( $row_height - $cell_height );
@@ -277,15 +288,15 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
         }
     }
 
-    my $padding = $self->padding ? q[ ] x $self->padding : q[];
+    my $padding = $self->{padding} ? q[ ] x $self->{padding} : q[];
 
     # render
     for my $line_idx ( 0 .. $row_height - 1 ) {
-        $buf .= $grid->[0] if $grid && $self->left_border;
+        $buf .= $grid->[0] if $grid && $self->{left_border};
 
         $buf .= join $grid ? $grid->[1] : q[ ], map { $padding . $_->[$line_idx] . $padding } @cells;
 
-        $buf .= $grid->[2] if $grid && $self->right_border;
+        $buf .= $grid->[2] if $grid && $self->{right_border};
 
         $buf .= $LF;
     }
@@ -297,13 +308,13 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
 sub _render_line ( $self, $idx ) {
     my $buf;
 
-    my $grid = $GRID->{ $self->grid }->[$idx];
+    my $grid = $GRID->{ $self->{grid} }->[$idx];
 
-    $buf .= $grid->[0] if $self->left_border;
+    $buf .= $grid->[0] if $self->{left_border};
 
-    $buf .= join $grid->[3], map { $grid->[2] x $_->{width} } $self->cols->@*;
+    $buf .= join $grid->[3], map { $grid->[2] x $_->{width} } $self->{cols}->@*;
 
-    $buf .= $grid->[1] if $self->right_border;
+    $buf .= $grid->[1] if $self->{right_border};
 
     return $buf . $LF;
 }
@@ -315,7 +326,7 @@ sub _render_line ( $self, $idx ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 179                  | Subroutines::ProhibitExcessComplexity - Subroutine "_render_row" with high complexity score (34)               |
+## |    3 | 190                  | Subroutines::ProhibitExcessComplexity - Subroutine "_render_row" with high complexity score (34)               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

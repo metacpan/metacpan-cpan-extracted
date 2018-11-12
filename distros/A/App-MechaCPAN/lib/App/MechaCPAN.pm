@@ -33,7 +33,7 @@ BEGIN
   our %EXPORT_TAGS = ( go => [@EXPORT_OK] );
 }
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 require App::MechaCPAN::Perl;
 require App::MechaCPAN::Install;
@@ -292,7 +292,7 @@ sub humane_tmpfile
   my $tmp_dir = _mktmpdir;
 
   my $template = File::Spec->catdir( $tmp_dir, humane_tmpname($descr) );
-  return File::Temp->new($template);
+  return File::Temp->new(TEMPLATE => $template);
 }
 
 sub humane_tmpdir

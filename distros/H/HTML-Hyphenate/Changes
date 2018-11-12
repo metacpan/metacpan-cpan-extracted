@@ -1,5 +1,9 @@
 Revision history for Perl extension HTML::Hyphenate.
 
+v1.1.1 Sun Nov 11 11:03:51 UTC 2018
+	- RT127614 add Mojolicious minimum version 6.0 to requirements
+	- Refactored and improved critics
+
 v1.1.0 Sat Aug 4 13:01:36 UTC 2018
     - RT87759 add 'list' and 'placeholder' as hyphenable attributes
     - RT100747 ignore inline styling hints. This changes output that relies on 'nowrap'

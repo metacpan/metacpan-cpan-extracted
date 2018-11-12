@@ -32,13 +32,11 @@ $images = $h->display_gallery_thumbnails(
 
 say $h->head( 
 	-title => "Simple Template",
-	-cssLinks => "https://blueimp.github.io/Gallery/css/blueimp-gallery.min.css",
-	
+	-titleRotatingText => qq{T,E,XT},
 );
 say $h->body( 
 
 	-h1 => "Simple Template", 
-	-onload => "",
 	-content => qq{
 	<div class="container"><h2>Slideshow</h2>
 		<div id="links">$images</div>

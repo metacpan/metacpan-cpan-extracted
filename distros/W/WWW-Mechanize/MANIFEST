@@ -109,4 +109,5 @@ tidyall.ini
 xt/author/live/encoding.t
 xt/author/live/wikipedia.t
 xt/author/pod-coverage.t
+xt/author/pod-syntax.t
 xt/author/tidyall.t

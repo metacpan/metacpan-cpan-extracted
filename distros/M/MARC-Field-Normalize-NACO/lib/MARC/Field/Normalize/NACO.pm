@@ -6,9 +6,8 @@ use utf8;
 use Unicode::Normalize qw(NFD);
 use List::MoreUtils qw(natatime);
 use MARC::Field;
-use Method::Signatures;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use vars qw( @EXPORT_OK );
 use Exporter 'import';
@@ -17,7 +16,10 @@ use Exporter 'import';
     naco_from_field naco_from_authority
 );
 
-func naco_from_string( Str $s, Bool :$keep_first_comma ) {
+#func naco_from_string( Str $s, Bool :$keep_first_comma ) {
+sub naco_from_string {
+    my $s = shift;
+    my $keep_first_comma = (@_ == 2) ? $_[1] : undef;
     # decompose and uppercase
     $s = uc( NFD($s) );
 
@@ -41,10 +43,10 @@ func naco_from_string( Str $s, Bool :$keep_first_comma ) {
     $s =~ s/['\[\]ЪЬ·]//g;
 
     # blank out commas
-    if ($keep_first_comma) {
+    if ($keep_first_comma && $s =~ /,/) {
         my $i = index $s, ',';
         $s =~ s/,/ /g;
-        $s =~ s/^((?:.){$i})\s/$1,/;
+        substr $s, $i, 1, ',';
         # always strip off a trailing comma, even if it's the only one
         $s =~ s/,$//;
     }
@@ -59,7 +61,9 @@ func naco_from_string( Str $s, Bool :$keep_first_comma ) {
     return $s;
 }
 
-func naco_from_array( ArrayRef $subfs ) {
+#func naco_from_array( ArrayRef $subfs ) {
+sub naco_from_array {
+    my $subfs = shift;
     # Expects $subfs == [ 'a', 'Thurber, James', 'd', '1914-', ... ]
     my $itr = natatime 2, @$subfs;
     my $out = '';
@@ -70,12 +74,17 @@ func naco_from_array( ArrayRef $subfs ) {
     return $out;
 }
 
-func naco_from_field( MARC::Field $f, :$subfields = 'a-df-hj-vx-z') {
+#func naco_from_field( MARC::Field $f, :$subfields = 'a-df-hj-vx-z') {
+sub naco_from_field {
+    my $f = shift;
+    my $subfields = (@_ == 2) ? $_[1] : 'a-df-hj-vx-z';
     my @flat = map {@$_} grep {$_->[0] =~ /[$subfields]/} $f->subfields;
     return naco_from_array( \@flat );
 }
 
-func naco_from_authority( MARC::Record $r ) {
+#func naco_from_authority( MARC::Record $r ) {
+sub naco_from_authority {
+    my $r = shift;
     return naco_from_field( scalar $r->field('1..'), subfields => 'a-z' );
 }
 

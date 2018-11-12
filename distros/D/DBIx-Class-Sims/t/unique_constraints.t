@@ -99,7 +99,7 @@ subtest "Don't specify enough to find by multi-col UK" => sub {
   };
 };
 
-subtest "Load and retrieve a row by PK" => sub {
+subtest "Load and retrieve a row by other UK" => sub {
   sims_test "Create the row" => {
     spec => {
       Artist => { first_name => 'Taylor', last_name => 'Swift' },
@@ -115,7 +115,7 @@ subtest "Load and retrieve a row by PK" => sub {
       Artist => 1,
     },
     spec => {
-      Artist => { id => 1 },
+      Artist => { last_name => 'Swift' },
     },
     expect => {
       Artist => { id => 1, first_name => 'Taylor', last_name => 'Swift' },

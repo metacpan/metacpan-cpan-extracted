@@ -5,11 +5,11 @@ use Pcore::Util::Scalar qw[is_plain_coderef];
 
 our $EXPORT = { DOCKERHUB_SOURCE_TYPE => [qw[$DOCKERHUB_SOURCE_TYPE_TAG $DOCKERHUB_SOURCE_TYPE_BRANCH]] };
 
-has username => ( is => 'ro', isa => Str, required => 1 );
-has password => ( is => 'ro', isa => Str, required => 1 );
+has username => ( required => 1 );
+has password => ( required => 1 );
 
-has _login_token => ( is => 'ro', isa => Str, init_arg => undef );
-has _reg_queue => ( is => 'ro', isa => HashRef [ArrayRef], init_arg => undef );
+has _login_token => ( init_arg => undef );
+has _reg_queue   => ( init_arg => undef );    # HashRef [ArrayRef]
 
 const our $BASE_URL => 'https://hub.docker.com/v2';
 

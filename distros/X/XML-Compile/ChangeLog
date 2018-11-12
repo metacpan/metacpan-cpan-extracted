@@ -1,10 +1,20 @@
 
-=== version history of XML::Compile
+=== version history of distribution XML-Compile
 
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
 Plans and unwanted limitations? see README.todo
+
+version 1.61: Fri  9 Nov 10:51:04 CET 2018
+
+	Fixes:
+	- forgot to add README.md to GIT.
+	- simple value '0' occasionally totally ignored [Rob De Langhe]
+
+	Improvements:
+	- alternative output style for [Patrick Powell]
+	- explain use of CDATA in ::FAQ [Christopher Taranto]
 
 version 1.60: Sun Mar  4 22:53:03 CET 2018
 

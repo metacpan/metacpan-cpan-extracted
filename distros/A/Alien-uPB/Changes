@@ -1,5 +1,9 @@
 Revision history for Alien-uPB
 
+0.12      2018-11-10 22:41:46 CET
+
+    - New revision of uPB (compiles with Protobuf 3.6)
+
 0.11      2018-07-22 14:13:33 CEST
 
     - Tweak build for FreeBSD

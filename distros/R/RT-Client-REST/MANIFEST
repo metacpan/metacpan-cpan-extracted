@@ -66,6 +66,8 @@ t/80-timeout.t
 t/81-submit.t
 t/82-stringify.t
 t/83-attachments.t
+t/84-attachments-rt127607.t
+t/85-attachments-rt127607.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t
@@ -75,6 +77,8 @@ t/author-pod-coverage.t
 t/author-pod-spell.t
 t/author-pod-syntax.t
 t/author-portability.t
+t/data/nonewline.txt
+t/data/spaces.txt
 t/data/test.png
 t/release-distmeta.t
 t/release-kwalitee.t

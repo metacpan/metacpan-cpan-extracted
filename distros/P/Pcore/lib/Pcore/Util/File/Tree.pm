@@ -16,14 +16,14 @@ sub add_dir ( $self, $dir, $prefix = undef, $meta = undef ) {
         $prefix .= '/';
     }
 
-    $dir = P->path($dir)->realpath->to_string;
+    $dir = P->path($dir)->to_abs;
 
-    my $files = P->path1($dir)->read_dir( max_depth => 0, is_dir => 0 );
+    my $files = $dir->read_dir( max_depth => 0, is_dir => 0 );
 
     return if !$files;
 
     for my $file ( $files->@* ) {
-        $self->add_file( "${prefix}${file}", "${dir}${file}", $meta );
+        $self->add_file( "${prefix}${file}", "$dir/$file", $meta );
     }
 
     return;
@@ -91,34 +91,21 @@ sub render_tmpl ( $self, $tmpl_args ) {
     return;
 }
 
-sub write_to ( $self, $target_path, @ ) {
-    my %args = (
-        manifest => undef,
-        splice @_, 2,
-    );
-
+# manifest
+sub write_to ( $self, $target_path, %args ) {
     for my $file ( values $self->{files}->%* ) {
         $file->write_to($target_path);
     }
 
     # write MANIFEST
-    P->file->write_bin( $target_path . q[/MANIFEST], [ sort 'MANIFEST', keys $self->{files}->%* ] ) if $args{manifest};
+    P->file->write_bin( "$target_path/MANIFEST", [ sort 'MANIFEST', keys $self->{files}->%* ] ) if $args{manifest};
 
     return;
 }
 
-sub write_to_temp ( $self, @ ) {
-    my %args = (
-        base     => undef,
-        tmpl     => undef,
-        manifest => undef,
-        splice @_, 1,
-    );
-
-    my $tempdir = P->file->tempdir(    #
-        ( $args{base} ? ( base => $args{base} ) : () ),
-        ( $args{tmpl} ? ( tmpl => $args{tmpl} ) : () ),
-    );
+# manifest + tempdir args
+sub write_to_temp ( $self, %args ) {
+    my $tempdir = P->file1->tempdir(%args);
 
     $self->write_to( $tempdir, manifest => $args{manifest} );
 

@@ -56,12 +56,12 @@ for little tangible gain.
 =head1 NOTICE
 
 The use of this class to parse non-regexp quote-like strings was an
-experiment that I consider failed. Therefore this use is
-B<deprecated> in favor of L<PPIx::QuoteLike|PPIx::QuoteLike>. Six months
-after the release of version 0.053, the first use of the C<parse>
-argument to L<new()|/new> will result in a warning. Six months after
-that, all uses of the C<parse> argument will result in a warning. After
-another six months, the C<parse> argument will become fatal.
+experiment that I consider failed. Therefore this use is B<deprecated>
+in favor of L<PPIx::QuoteLike|PPIx::QuoteLike>. As of version 0.058_01,
+the first use of the C<parse> argument to L<new()|/new> resulted in a
+warning. As of version 0.062_01, all uses of the C<parse> argument
+resulted in a warning. After another six months, the C<parse> argument
+will become fatal.
 
 The author will attempt to preserve the documented interface, but if the
 interface needs to change to correct some egregiously bad design or
@@ -170,7 +170,7 @@ use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 
 =head2 new
 

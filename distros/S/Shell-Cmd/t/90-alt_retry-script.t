@@ -26,13 +26,13 @@ output exit    command all          => 0 0 0 0
 
 output command command all          =>
    [ '$tdir/bin/succ 1' ]
-   [ 'rm -f $tdir/fail_twice.*.flag' ]
+   [ 'rm -f $tdir/fail_twice.*.flag; echo "Removing fail flags"' ]
    [ '$tdir/bin/fail_twice $tdir' '$tdir/bin/fail 2' ]
    [ '$tdir/bin/succ 3' ]
 
 output stdout  command all          =>
    [ "This is the 'succ' command stdout with argument: 1" ]
-   []
+   [ "Removing fail flags" ]
    [ "fail_twice running first time"
      "This is the 'fail' command stdout with argument: 2"
      "fail_twice running second time"

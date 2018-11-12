@@ -30,7 +30,7 @@ no_index:
 provides:
   Test::WWW::Stub:
     file: lib/Test/WWW/Stub.pm
-    version: '0.07'
+    version: '0.08'
   Test::WWW::Stub::Handler:
     file: lib/Test/WWW/Stub/Handler.pm
   Test::WWW::Stub::Intercepter:
@@ -47,9 +47,10 @@ resources:
   bugtracker: https://github.com/astj/p5-Test-WWW-Stub/issues
   homepage: https://github.com/astj/p5-Test-WWW-Stub
   repository: git://github.com/astj/p5-Test-WWW-Stub.git
-version: '0.07'
+version: '0.08'
 x_contributors:
   - 'aereal <aereal@aereal.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Takumi Akiyama <t.akiym@gmail.com>'
+  - 'papix <mail@papix.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -81,7 +81,7 @@ sub getexternalipaddress {
 # getportmappingnumberofentries
 #------------------------------
 
-sub getportmappingnumberofentries{
+sub getportmappingnumberofentries {
 	my($this) = shift;
 
 	my (
@@ -96,13 +96,17 @@ sub getportmappingnumberofentries{
 		return 0;
 	}
 	
-	$query_res = $wanipcon_service->postquery("PortMappingNumberOfEntries");
+        $query_res = $wanipcon_service->postquery("PortMappingNumberOfEntries");
 
 	if ($query_res->getstatuscode() != 200) {
 		return 0;
 	}
-	
-	return $query_res->getvalue();
+
+        if( $query_res->getvalue() =~ /^(\d+)$/ ) {
+            return $1;
+        } else {
+            return scalar($this->getportmappingentries());
+        }
 }
 
 
@@ -110,7 +114,7 @@ sub getportmappingnumberofentries{
 # getportmapping
 #------------------------------
 
-sub getportmappingentry {
+sub getportmappingentries {
 	my($this) = shift;
 	
 	my (
@@ -125,21 +129,14 @@ sub getportmappingentry {
 		$ipaddr,
 	);
 	
-	@port_mapping = ();
-	
-	$port_mapping_num = $this->getportmappingnumberofentries();
-	if ($port_mapping_num <= 0) {
-		return @port_mapping;
-	}
-		
 	$dev = $this->getdevice();
 	$wanipcon_service = $dev->getservicebyname($Net::UPnP::GW::Gateway::WANIPCONNECTION_SERVICE_TYPE);
 	unless ($wanipcon_service) {
-		return @port_mapping ;
+		return @port_mapping;
 	}
 	
-	for ($n=0; $n<$port_mapping_num; $n++) {
-		#print "[$n]";
+        $n = 0;
+        while( 1 ) {
 		%req_arg = (
 				'NewPortMappingIndex' => $n,
 			);
@@ -147,17 +144,19 @@ sub getportmappingentry {
 		$action_res = $wanipcon_service->postaction("GetGenericPortMappingEntry", \%req_arg);
 		#print "[$n]" .$action_res->getstatuscode()  . "\n";
 		#print %req_arg;
-		if ($action_res->getstatuscode() != 200) {
-			push(@port_mapping, undef);
-			next;
-		}
+                last if ($action_res->getstatuscode() != 200);
 		$arg_list = $action_res->getargumentlist();
 		#print $arg_list;
 		push(@port_mapping, $arg_list);
+                ++$n;
 	}
 	
 	return @port_mapping;
 }
+
+# deprecated method - mapped to new name
+sub getportmappingentry { getportmappingentries(@_); }
+
 
 #------------------------------
 # addportmapping
@@ -321,51 +320,46 @@ Net::UPnP::GW::Gateway - Perl extension for UPnP.
 
 =head1 SYNOPSIS
 
-	use Net::UPnP::ControlPoint;
-	use Net::UPnP::GW::Gateway;
-	
-	my $obj = Net::UPnP::ControlPoint->new();
-	
-	@dev_list = ();
-	while (@dev_list <= 0 || $retry_cnt > 5) {
-	#	@dev_list = $obj->search(st =>'urn:schemas-upnp-org:device:InternetGatewayDevice:1', mx => 10);
-		@dev_list = $obj->search(st =>'upnp:rootdevice', mx => 3);
-		$retry_cnt++;
-	} 
-	
-	$devNum= 0;
-	foreach $dev (@dev_list) {
-		my $device_type = $dev->getdevicetype();
-		if  ($device_type ne 'urn:schemas-upnp-org:device:InternetGatewayDevice:1') {
-			next;
-		}
-		print "[$devNum] : " . $dev->getfriendlyname() . "\n";
-		unless ($dev->getservicebyname('urn:schemas-upnp-org:service:WANIPConnection:1')) {
-			next;
-		}
-		my $gwdev = Net::UPnP::GW::Gateway->new();
-		$gwdev->setdevice($dev);
-		print "\tExternalIPAddress = " . $gwdev->getexternalipaddress() . "\n";
-		print "\tPortMappingNumberOfEntries = " . $gwdev->getportmappingnumberofentries() . "\n";
-		@port_mapping = $gwdev->getportmappingentry();
-		$port_num = 0;
-		foreach $port_entry (@port_mapping) {
-			if ($port_entry) {
-				$port_map_name = $port_entry->{'NewPortMappingDescription'};
-				if (length($port_map_name) <= 0) {
-					$port_map_name = "(No name)";
-				}
-				print "  [$port_num] : $port_map_name\n";
-				foreach $name ( keys %{$port_entry} ) {
-					print "    $name = $port_entry->{$name}\n";
-				}
-			}
-			else {
-				print "  [$port_num] : Unknown\n";
-			}
-			$port_num++;
-		}
-	}
+        use Net::UPnP::ControlPoint;
+        use Net::UPnP::GW::Gateway;
+        
+        my $obj = Net::UPnP::ControlPoint->new();
+        
+        @dev_list = ();
+        while (@dev_list <= 0 || $retry_cnt > 5) {
+        #	@dev_list = $obj->search(st =>'urn:schemas-upnp-org:device:InternetGatewayDevice:1', mx => 10);
+                @dev_list = $obj->search(st =>'upnp:rootdevice', mx => 3);
+                $retry_cnt++;
+        } 
+        
+        $devNum= 0;
+        foreach $dev (@dev_list) {
+                my $device_type = $dev->getdevicetype();
+                if  ($device_type ne 'urn:schemas-upnp-org:device:InternetGatewayDevice:1') {
+                        next;
+                }
+                print "[$devNum] : " . $dev->getfriendlyname() . "\n";
+                unless ($dev->getservicebyname('urn:schemas-upnp-org:service:WANIPConnection:1')) {
+                        next;
+                }
+                my $gwdev = Net::UPnP::GW::Gateway->new();
+                $gwdev->setdevice($dev);
+                print "\tExternalIPAddress = " . $gwdev->getexternalipaddress() . "\n";
+                print "\tPortMappingNumberOfEntries = " . $gwdev->getportmappingnumberofentries() . "\n";
+                @port_mapping = $gwdev->getportmappingentries();
+                $port_num = 0;
+                foreach $port_entry (@port_mapping) {
+                        $port_map_name = $port_entry->{'NewPortMappingDescription'};
+                        if (length($port_map_name) <= 0) {
+                                $port_map_name = "(No name)";
+                        }
+                        print "  [$port_num] : $port_map_name\n";
+                        foreach $name ( keys %{$port_entry} ) {
+                                print "    $name = $port_entry->{$name}\n";
+                        }
+                        $port_num++;
+                }
+        }
 
 =head1 DESCRIPTION
 
@@ -397,13 +391,13 @@ Get the external IP address.
 
 =item B<getportmappingnumberofentries> - PortMappingNumberOfEntries
 
-    $gw->getexternalipaddress();
+    $gw->getportmappingnumberofentries();
 
 Get the number of the port mapping entries.
 
-=item B<getportmappingentry> - PortMappingEntry
+=item B<getportmappingentries> - PortMappingEntry
 
-    $gw->getexternalipaddress();
+    $gw->getportmappingentries();
 
 Get the port mapping entries.
 

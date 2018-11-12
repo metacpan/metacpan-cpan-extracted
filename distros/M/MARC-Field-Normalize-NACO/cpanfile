@@ -6,5 +6,4 @@ on test => sub {
     requires 'Test::More', '0.88';
     requires 'MARC::Record';
     requires 'List::MoreUtils';
-    requires 'Method::Signatures';
 };

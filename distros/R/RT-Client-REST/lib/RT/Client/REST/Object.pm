@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Object;
-$RT::Client::REST::Object::VERSION = '0.53';
+$RT::Client::REST::Object::VERSION = '0.54';
 
 use Error qw(:try);
 use Params::Validate;
@@ -600,7 +600,7 @@ RT::Client::REST::Object - base class for RT objects
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 

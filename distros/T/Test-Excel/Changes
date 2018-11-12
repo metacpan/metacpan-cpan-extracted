@@ -1,5 +1,15 @@
 Revision history for Perl extension Test::Excel.
 
+1.45  Sat Nov 10 07:25:00 2018
+      - Minor cosmetic changes in the pod.
+
+1.44  Fri Nov 09 15:10:00 2018
+      - Fixed typo in the pod.
+      - General code clean up.
+
+1.43  Thu Nov 08 15:50:00 2018
+      - SEE ALSO is now clickable.
+
 1.42  Wed Nov 07 12:00:00 2018
       - Added missing parser as reported by CPAN TESTER reports.
 

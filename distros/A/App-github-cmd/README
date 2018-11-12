@@ -2,8 +2,8 @@ NAME
     App::github::cmd - Yet another github CLI
 
 VERSION
-    This document describes version 0.004 of App::github::cmd (from Perl
-    distribution App-github-cmd), released on 2018-10-10.
+    This document describes version 0.005 of App::github::cmd (from Perl
+    distribution App-github-cmd), released on 2018-11-08.
 
 SYNOPSIS
     Please see included script github-cmd.
@@ -12,7 +12,7 @@ FUNCTIONS
   create_repo
     Usage:
 
-     create_repo(%args) -> [status, msg, result, meta]
+     create_repo(%args) -> [status, msg, payload, meta]
 
     Create a repository.
 
@@ -37,7 +37,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -46,7 +46,7 @@ FUNCTIONS
   delete_repo
     Usage:
 
-     delete_repo() -> [status, msg, result, meta]
+     delete_repo() -> [status, msg, payload, meta]
 
     This function is not exported.
 
@@ -57,7 +57,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -66,7 +66,7 @@ FUNCTIONS
   get_repo
     Usage:
 
-     get_repo(%args) -> [status, msg, result, meta]
+     get_repo(%args) -> [status, msg, payload, meta]
 
     Get information about a repository.
 
@@ -89,7 +89,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -98,7 +98,7 @@ FUNCTIONS
   get_user
     Usage:
 
-     get_user(%args) -> [status, msg, result, meta]
+     get_user(%args) -> [status, msg, payload, meta]
 
     Get information about a user.
 
@@ -119,7 +119,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -128,7 +128,7 @@ FUNCTIONS
   list_repos
     Usage:
 
-     list_repos(%args) -> [status, msg, result, meta]
+     list_repos(%args) -> [status, msg, payload, meta]
 
     List user's repositories.
 
@@ -151,7 +151,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -160,7 +160,7 @@ FUNCTIONS
   repo_exists
     Usage:
 
-     repo_exists(%args) -> [status, msg, result, meta]
+     repo_exists(%args) -> [status, msg, payload, meta]
 
     Check whether a repository exists.
 
@@ -183,7 +183,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

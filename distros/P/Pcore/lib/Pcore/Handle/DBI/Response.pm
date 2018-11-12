@@ -6,19 +6,19 @@ use Hash::Util::FieldHash qw[id idhashes register];
 idhashes my ( \%status, \%rows, \%data );
 
 use overload    #
-  q[bool] => sub {
+  'bool' => sub {
     return $status{ id $_[0] };
   },
-  q[""] => sub {
+  '""' => sub {
     return $status{ id $_[0] };
   },
-  q[0+] => sub {
+  '0+' => sub {
     return $rows{ id $_[0] };
   },
-  q[@{}] => sub {
+  '@{}' => sub {
     return $data{ id $_[0] };
   },
-  q[%{}] => sub {
+  '%{}' => sub {
     return $data{ id $_[0] }->[0];
   },
   fallback => 1;

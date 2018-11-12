@@ -7,12 +7,8 @@ use Geo::GDAL::FFI;
 use Test::More;
 use Data::Dumper;
 use JSON;
-use FFI::Platypus::Buffer;
-
-my $gdal = Geo::GDAL::FFI->new();
 
 my $have_geos = Geo::GDAL::FFI::HaveGEOS;
-#say STDERR $have_geos ? "GEOS OK" : "NO GEOS";
 
 {
     my $geometry = Geo::GDAL::FFI::Geometry->new(WKT => 'POINT(1 1)');

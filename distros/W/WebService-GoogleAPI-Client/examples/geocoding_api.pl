@@ -31,7 +31,7 @@ croak( "you must pass an address as a parameter") unless @ARGV>0;
 
 Perform an address lookup on the CLI paassed parameter - assumes $ENV{GOOGLE_MAPS_KEY}
 
-    perl geocoding_api.pl '465 pine ridge road, runaway bay qld, 4216, australia'
+    perl geocoding_api.pl 'Short Street, Southport, QLD 4215 Australia'
 
 =head2 PRE-REQUISITES
 

@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::API;
-our $VERSION = '1.012';
+our $VERSION = '1.014';
 # ABSTRACT: An OpenAPI REST controller for the Yancy editor
 
 #pod =head1 DESCRIPTION
@@ -138,6 +138,10 @@ sub set_item {
     my $coll = $c->stash( 'collection' );
     my $item = $c->yancy->filter->apply( $coll, $args->{ newItem } );
     $c->yancy->backend->set( $coll, $id, $item );
+
+    # ID field may have changed
+    $id = $item->{ $c->stash( 'id_field' ) } || $id;
+
     return $c->render(
         status => 200,
         openapi => _delete_null_values( $c->yancy->backend->get( $coll, $id ) ),
@@ -191,7 +195,7 @@ Yancy::Controller::Yancy::API - An OpenAPI REST controller for the Yancy editor
 
 =head1 VERSION
 
-version 1.012
+version 1.014
 
 =head1 DESCRIPTION
 

@@ -1,14 +1,19 @@
-Tests are grouped.
+# Tests are grouped.
 
-t/0*: bootstrap: if these fail, bail out and don't waste CPU
-t/1*: core modules in isolation (marked with module name)
-t/2*: refute{ ... } mini-apps for most common functionality
-t/3*: extra check libraries, experimental features
-t/4*: failure mode testing: check warnings, exceptions, and error messages
-t/5*: deprecated features (marked with EOL version/date)
-t/6+: interoperation with other systems
+* `t/0*`: bootstrap: if these fail, bail out and don't waste CPU
+* `t/1*`: core modules in isolation (marked with module name)
+* `t/2*`: try_refute{ ... } mini-apps for most common functionality
+* `t/3*`: extra check libraries, experimental features
+* `t/4*`: failure mode testing: check warnings, exceptions, and error messages
+* `t/5*`: deprecated features (marked with EOL version/date)
+* `t/6+`: interoperation with other systems
 
-TODO bootstrapping sequence:
+# NOTE! Tests MUSL start with the following line, or else results MAY be
+contaminated by environment:
+
+    BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
+
+# TODO bootstrapping sequence:
 1) Verify refute(), is_passing(), get_tap(), and get_sign()
 2) Verify try_refute { ... }
 3) Verify is, like assertions

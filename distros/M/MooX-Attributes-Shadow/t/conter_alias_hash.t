@@ -1,11 +1,7 @@
 #!perl
 
-use strict;
-use warnings;
-
-use Test::More;
-
-use lib 't';
+use Test2::V0;
+use Test::Lib;
 
 use Container1;
 

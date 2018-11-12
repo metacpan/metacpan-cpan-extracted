@@ -1,5 +1,14 @@
 Revision history for Test-MockFile
 
+0.011   11/08/2018
+ - Fix for my $file_contents = do { local $/; <$fh> };
+ - Mock CORE::GLOBAL::unlink and support directories for unlink
+ - Mock CORE::GLOBAL::mkdir
+ - Mock CORE::GLOBAL::rmdir
+ - MockFile->symlink now follows the symlink norm of ($target, $file), not the reverse.
+ - New mock helper 'exists' to check if the file is there.
+ - New mock helper 'permissions' tells you the current permissions of the mocked file.
+
 0.010   10/31/2018
  - Add .perltidyrc policy
  - When reporting strict mode violations, be sure to report the a stack location outside of our modules.

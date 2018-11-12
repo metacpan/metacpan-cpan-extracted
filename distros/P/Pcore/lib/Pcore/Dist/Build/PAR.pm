@@ -4,41 +4,47 @@ use Pcore -class, -ansi;
 use Config;
 use Pcore::Dist::Build::PAR::Script;
 
-has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'], required => 1 );
+has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
-has crypt => ( is => 'ro', isa => Maybe [Bool] );
-has clean => ( is => 'ro', isa => Maybe [Bool] );
+has crypt => ();
+has clean => ();
+has gui   => ();
 
-has release => ( is => 'lazy', isa => Bool, init_arg => undef );
+has release => ( is => 'lazy', init_arg => undef );
 
 sub _build_release ($self) {
-    return $self->dist->id->{release_distance} ? 0 : 1;
+    return $self->{dist}->id->{release_distance} ? 0 : 1;
 }
 
 sub run ($self) {
-    if ( !$self->dist->par_cfg ) {
+    if ( !$self->{dist}->par_cfg ) {
         say q[par profile wasn't found.];
 
         exit 1;
     }
-    elsif ( !$self->dist->scm ) {
+    elsif ( !$self->{dist}->scm ) {
         say q[SCM is required];
 
         exit 1;
     }
-    elsif ( !$self->dist->is_commited ) {
+    elsif ( !$self->{dist}->is_commited ) {
         say q[Working copy has uncommited changes];
 
         exit 1;
     }
 
     # build scripts
-    for my $script ( sort keys $self->dist->par_cfg->%* ) {
+    for my $script ( sort keys $self->{dist}->par_cfg->%* ) {
+        if ( $self->{dist}->par_cfg->{$script}->{disabled} ) {
+            say qq[Script "$script" is ] . $BOLD . $WHITE . $ON_RED . ' disabled ' . $RESET . '. Skipping.';
+
+            next;
+        }
 
         # load pardeps.json
         my $pardeps;
 
-        my $pardeps_path = $self->dist->root . "share/pardeps-$script-@{[$^V->normal]}-$Config{archname}.json";
+        my $pardeps_path = "$self->{dist}->{root}/share/pardeps-$script-@{[$^V->normal]}-$Config{archname}.json";
 
         if ( -f $pardeps_path ) {
             $pardeps = P->cfg->read($pardeps_path);
@@ -53,13 +59,14 @@ sub run ($self) {
             exit 1;
         }
 
-        my $profile = $self->dist->par_cfg->{$script};
+        my $profile = $self->{dist}->par_cfg->{$script};
 
-        $profile->{dist}    = $self->dist;
-        $profile->{script}  = P->path( $self->dist->root . 'bin/' . $script );
+        $profile->{dist}    = $self->{dist};
+        $profile->{script}  = P->path("$self->{dist}->{root}/bin/$script");
         $profile->{release} = $self->release;
-        $profile->{crypt}   = $self->crypt if defined $self->crypt;
-        $profile->{clean}   = $self->clean if defined $self->clean;
+        $profile->{crypt}   = $self->{crypt} if defined $self->{crypt};
+        $profile->{clean}   = $self->{clean} if defined $self->{clean};
+        $profile->{gui}     = $self->{gui} if defined $self->{gui};
 
         # check, that script from par profile exists in filesystem
         if ( !-f $profile->{script} ) {

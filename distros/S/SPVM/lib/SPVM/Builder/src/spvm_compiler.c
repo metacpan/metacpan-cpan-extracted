@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdarg.h>
 
 #include "spvm_compiler.h"
 #include "spvm_type.h"
@@ -28,6 +29,7 @@
 #include "spvm_opcode_builder.h"
 #include "spvm_object.h"
 #include "spvm_my.h"
+#include "spvm_string_buffer.h"
 
 SPVM_COMPILER* SPVM_COMPILER_new() {
   SPVM_COMPILER* compiler = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_COMPILER));
@@ -55,6 +57,8 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->module_include_pathes = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->opcode_array = SPVM_OPCODE_ARRAY_new(compiler);
+  compiler->string_pool = SPVM_STRING_BUFFER_new(0);
+  compiler->string_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
 
   // Add basic types
   SPVM_COMPILER_add_basic_types(compiler);
@@ -282,21 +286,247 @@ void SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
   SPVM_yydebug = 0;
 #endif
   
-  /* call SPVM_yyparse */
+  /* Parse */
   int32_t parse_error_flag = SPVM_yyparse(compiler);
   if (parse_error_flag) {
-    compiler->error_count++;
+    return;
+  }
+  if (compiler->error_count > 0) {
+    return;
   }
   
-  if (compiler->error_count == 0) {
-    // Check syntax
-    SPVM_OP_CHECKER_check(compiler);
+  // Check syntax
+  SPVM_OP_CHECKER_check(compiler);
+  if (compiler->error_count > 0) {
+    return;
+  }
 
-    // Build bytecode
-    if (compiler->error_count == 0) {
-      SPVM_OPCODE_BUILDER_build_opcode_array(compiler);
+  // Build operation code
+  SPVM_OPCODE_BUILDER_build_opcode_array(compiler);
+  if (compiler->error_count > 0) {
+    return;
+  }
+}
+
+void SPVM_COMPILER_error(SPVM_COMPILER* compiler, const char* message_template, ...) {
+  
+  int32_t message_length = 0;
+  
+  // Message template
+  int32_t message_template_length = (int32_t)strlen(message_template);
+  
+  va_list args;
+  va_start(args, message_template);
+
+  message_length += message_template_length;
+  
+  // Argument count
+  char* found_ptr = (char*)message_template;
+  while (1) {
+    found_ptr = strchr(found_ptr, '%');
+    if (found_ptr) {
+      if (*(found_ptr + 1) == 's') {
+        char* arg = va_arg(args, char*);
+        message_length += strlen(arg);
+      }
+      else if (*(found_ptr + 1) == 'd') {
+        (void) va_arg(args, int);
+        message_length += 30;
+      }
+      else {
+        assert(0);
+      }
+      found_ptr++;
+    }
+    else {
+      break;
     }
   }
+  va_end(args);
+  
+  char* message = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, message_length + 1);
+  
+  va_start(args, message_template);
+  vsprintf(message, message_template, args);
+  va_end(args);
+
+  compiler->error_count++;
+  
+  fprintf(stderr, "%s", message);
+}
+
+const char* SPVM_COMPILER_create_sub_signature(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
+  
+  int32_t length = 0;
+  
+  // Calcurate signature length
+  {
+    // Return type basic type
+    length += strlen(sub->return_type->basic_type->name);
+    
+    // Return type dimension
+    length += sub->return_type->dimension * 2;
+    
+    // (
+    length += 1;
+    
+    int32_t arg_index;
+    for (arg_index = 0; arg_index < sub->args->length; arg_index++) {
+      if (sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD && arg_index == 0) {
+        // self
+        length += 4;
+      }
+      else {
+        SPVM_MY* arg_my_sub = SPVM_LIST_fetch(sub->args, arg_index);
+        SPVM_TYPE* type_arg_sub = SPVM_OP_get_type(compiler, arg_my_sub->op_my);
+        
+        // Ref
+        if (SPVM_TYPE_is_ref_type(compiler, type_arg_sub->basic_type->id, type_arg_sub->dimension, type_arg_sub->flag)) {
+          length += 1;
+        }
+        
+        // TYPE
+        length += strlen(type_arg_sub->basic_type->name);
+        
+        // Dimension
+        length += type_arg_sub->dimension * 2;
+      }
+      // ,
+      if (arg_index != sub->args->length - 1) {
+        length += 1;
+      }
+    }
+    
+    // )
+    length += 1;
+  }
+  
+  char* sub_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
+  
+  // Calcurate sub signature length
+  char* bufptr = sub_signature;
+  {
+    // Return type
+    memcpy(bufptr, sub->return_type->basic_type->name, strlen(sub->return_type->basic_type->name));
+    bufptr += strlen(sub->return_type->basic_type->name);
+    
+    int32_t dim_index;
+    for (dim_index = 0; dim_index < sub->return_type->dimension; dim_index++) {
+      memcpy(bufptr, "[]", 2);
+      bufptr += 2;
+    }
+    
+    // (
+    *bufptr = '(';
+    bufptr += 1;
+    
+    int32_t arg_index;
+    for (arg_index = 0; arg_index < sub->args->length; arg_index++) {
+      // self
+      if (sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD && arg_index == 0) {
+        memcpy(bufptr, "self", 4);
+        bufptr += 4;
+      }
+      else {
+        SPVM_MY* arg_my_sub = SPVM_LIST_fetch(sub->args, arg_index);
+        SPVM_TYPE* type_arg_sub = SPVM_OP_get_type(compiler, arg_my_sub->op_my);
+        
+        // Ref
+        if (SPVM_TYPE_is_ref_type(compiler, type_arg_sub->basic_type->id, type_arg_sub->dimension, type_arg_sub->flag)) {
+          *bufptr = '&';
+          bufptr += 1;
+        }
+        
+        // TYPE
+        memcpy(bufptr, type_arg_sub->basic_type->name, strlen(type_arg_sub->basic_type->name));
+        bufptr += strlen(type_arg_sub->basic_type->name);
+
+        int32_t dim_index;
+        for (dim_index = 0; dim_index < type_arg_sub->dimension; dim_index++) {
+          memcpy(bufptr, "[]", 2);
+          bufptr += 2;
+        }
+      }
+
+      // ,
+      if (arg_index != sub->args->length - 1) {
+        memcpy(bufptr, ",", 1);
+        bufptr += 1;
+      }
+    }
+    
+    // )
+    memcpy(bufptr, ")", 1);
+    bufptr += 1;
+  }
+
+  return sub_signature;
+}
+
+const char* SPVM_COMPILER_create_field_signature(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
+  
+  int32_t length = 0;
+  
+  // Calcurate signature length
+  {
+    // Basic type
+    length += strlen(field->type->basic_type->name);
+    
+    // Type dimension
+    length += field->type->dimension * 2;
+  }
+  
+  char* field_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
+  
+  // Calcurate field signature length
+  char* bufptr = field_signature;
+  {
+    // Basic type
+    memcpy(bufptr, field->type->basic_type->name, strlen(field->type->basic_type->name));
+    bufptr += strlen(field->type->basic_type->name);
+    
+    // Type dimension
+    int32_t dim_index;
+    for (dim_index = 0; dim_index < field->type->dimension; dim_index++) {
+      memcpy(bufptr, "[]", 2);
+      bufptr += 2;
+    }
+  }
+
+  return field_signature;
+}
+
+const char* SPVM_COMPILER_create_package_var_signature(SPVM_COMPILER* compiler, SPVM_PACKAGE_VAR* package_var) {
+  
+  int32_t length = 0;
+  
+  // Calcurate signature length
+  {
+    // Basic type
+    length += strlen(package_var->type->basic_type->name);
+    
+    // Type dimension
+    length += package_var->type->dimension * 2;
+  }
+  
+  char* package_var_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
+  
+  // Calcurate package_var signature length
+  char* bufptr = package_var_signature;
+  {
+    // Basic type
+    memcpy(bufptr, package_var->type->basic_type->name, strlen(package_var->type->basic_type->name));
+    bufptr += strlen(package_var->type->basic_type->name);
+    
+    // Type dimension
+    int32_t dim_index;
+    for (dim_index = 0; dim_index < package_var->type->dimension; dim_index++) {
+      memcpy(bufptr, "[]", 2);
+      bufptr += 2;
+    }
+  }
+
+  return package_var_signature;
 }
 
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler) {
@@ -306,6 +536,9 @@ void SPVM_COMPILER_free(SPVM_COMPILER* compiler) {
   
   // Free opcode array
   SPVM_OPCODE_ARRAY_free(compiler, compiler->opcode_array);
+  
+  // Free string pool
+  SPVM_STRING_BUFFER_free(compiler->string_pool);
   
   free(compiler);
 }

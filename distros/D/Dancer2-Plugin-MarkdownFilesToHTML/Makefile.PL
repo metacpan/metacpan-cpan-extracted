@@ -37,9 +37,10 @@ my %WriteMakefileArgs = (
     "Plack::Test" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
-    "Test::NoWarnings" => 0
+    "Test::NoWarnings" => 0,
+    "Test::Output" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +63,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Most" => 0,
   "Test::NoWarnings" => 0,
+  "Test::Output" => 0,
   "Text::Markdown::Hoedown" => "1.02",
   "strict" => 0,
   "warnings" => 0

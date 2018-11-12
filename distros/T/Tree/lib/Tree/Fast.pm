@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use Scalar::Util qw( blessed weaken );
 
@@ -37,9 +37,8 @@ sub _init {
 
 sub _clone_self {
     my $self = shift;
-
     my $value = @_ ? shift : $self->value;
-    my $clone = blessed($self)->new( $value );
+
     return blessed($self)->new( $value );
 }
 
@@ -271,7 +270,7 @@ sub _null {
 
 package Tree::Null;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 #XXX Add this in once it's been thought out
 #our @ISA = qw( Tree );
@@ -398,8 +397,8 @@ Currently, no parameters are used.
 This will modify the tree such that it is a mirror of what it was before. This
 means that the order of all children is reversed.
 
-B<NOTE>: This is a destructive action. It I<will> modify the tree's internal
-structure. If you wish to get a mirror, yet keep the original tree intact, use
+B<NOTE>: This is a destructive action. It I<will> modify the internal
+structure of the tree. If you wish to get a mirror, yet keep the original tree intact, use
 C<< my $mirror = $tree->clone->mirror >>.
 
 =head2 traverse( [$order] )
@@ -508,7 +507,7 @@ The Tree::Null object is a singleton.
 
 =item *
 
-The Tree::Null object I<is> defined, though. I couldn't find a way to
+The Tree::Null object I<is> defined, though. I could not find a way to
 make it evaluate as undefined. That may be a good thing.
 
 =back

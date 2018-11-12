@@ -43,11 +43,11 @@ close $fh2;
 is( Test::MockFile::_fh_to_file($fh), undef, "_fh_to_file(\$fh) when closed." );
 
 note "_find_file_or_fh";
-push @mocked_files, Test::MockFile->symlink( '/abc', '/foo/bar' );
+push @mocked_files, Test::MockFile->symlink( '/foo/bar', '/abc' );
 is( Test::MockFile::_find_file_or_fh('/abc'), '/abc', "_find_file_or_fh('/abc')" );
 is( Test::MockFile::_find_file_or_fh( '/abc', 1 ), '/foo/bar', "_find_file_or_fh('/abc', 1) - follow" );
 
-push @mocked_files, Test::MockFile->symlink( '/broken_link', '/not/a/file' );
+push @mocked_files, Test::MockFile->symlink( '/not/a/file', '/broken_link' );
 like(
     dies { Test::MockFile::_find_file_or_fh( '/broken_link', 1 ) },
     qr{^Mocked file /broken_link points to unmocked file /not/a/file at },

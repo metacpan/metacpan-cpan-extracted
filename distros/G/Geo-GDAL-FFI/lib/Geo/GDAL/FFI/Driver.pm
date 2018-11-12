@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use base 'Geo::GDAL::FFI::Object';
 
-our $VERSION = 0.05_03;
+our $VERSION = 0.0601;
 
 sub GetName {
     my $self = shift;
@@ -36,12 +36,16 @@ sub Create {
         my $b = $args->{Bands} // 1;
         my $dt = $args->{DataType} // 'Byte';
         my $tmp = $Geo::GDAL::FFI::data_types{$dt};
-        confess "Unknown constant: $dt\n" unless defined $tmp;
+        unless (defined $tmp) {
+            confess "Unknown constant: $dt.";
+            Geo::GDAL::FFI::CSLDestroy($o);
+        }
         $ds = Geo::GDAL::FFI::GDALCreate($$self, $name, $w, $h, $b, $tmp, $o);
     }
+    Geo::GDAL::FFI::CSLDestroy($o);
     my $msg = Geo::GDAL::FFI::error_msg();
     if (!$ds || $msg) {
-        $msg //= "Dataset '$name' creation failed. (Driver = ".$self->Name.")";
+        $msg //= "Driver " . $self->Name . " failed to create dataset '$name'.";
         confess $msg;
     }
     return bless \$ds, 'Geo::GDAL::FFI::Dataset';
@@ -104,7 +108,10 @@ Optional, the dataset to copy.
 
 =item C<Progress>
 
-Optional, used only in dataset copy, a reference to a subroutine.
+Optional, used only in dataset copy, a reference to a subroutine. The
+subroutine is called with three arguments C<($fraction, $msg, $data)>,
+where C<$fraction> is a number, C<$msg> is a string, and C<$data> is a
+pointer that is given as the progress data argument.
 
 =item C<ProgressData>
 

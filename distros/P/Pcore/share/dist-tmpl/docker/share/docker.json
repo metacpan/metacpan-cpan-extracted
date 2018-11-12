@@ -1,4 +1,0 @@
-{
-   "repo_namespace": "<: $dockerhub_dist_repo_namespace | raw :>",
-   "repo_name": "<: $dockerhub_dist_repo_name | raw :>"
-}

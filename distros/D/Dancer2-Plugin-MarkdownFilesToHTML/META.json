@@ -44,7 +44,8 @@
             "Plack::Test" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
-            "Test::NoWarnings" : "0"
+            "Test::NoWarnings" : "0",
+            "Test::Output" : "0"
          }
       }
    },
@@ -59,7 +60,7 @@
          "web" : "https://github.com/sdondley/Dancer2-Plugin-MarkdownFilesToHTML"
       }
    },
-   "version" : "0.014",
+   "version" : "0.017",
    "x_generated_by_perl" : "v5.24.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

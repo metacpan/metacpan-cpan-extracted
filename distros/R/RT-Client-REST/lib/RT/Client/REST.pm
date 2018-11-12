@@ -24,7 +24,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST;
-$RT::Client::REST::VERSION = '0.53';
+$RT::Client::REST::VERSION = '0.54';
 use Error qw(:try);
 use HTTP::Cookies;
 use HTTP::Request::Common;
@@ -90,7 +90,7 @@ sub login {
     # server-side errors we bubble up and ignore all others.
     try {
         $self->_cookie(undef);  # Start a new session.
-        $self->_submit("ticket/1", undef, \%opts);
+        $self->_submit('ticket/1', undef, \%opts);
     } catch RT::Client::REST::AuthenticationFailureException with {
         shift->rethrow;
     } catch RT::Client::REST::MalformedRTResponseException with {
@@ -529,7 +529,7 @@ sub _submit {
         unless (ref $content) {
             # If it's just a string, make sure LWP handles it properly.
             # (By pretending that it's a file!)
-            $content = [ content => [undef, "", Content => $content] ];
+            $content = [ content => [undef, q(), Content => $content] ];
         }
         elsif (ref $content eq 'HASH') {
             my @data;
@@ -550,7 +550,7 @@ sub _submit {
     unless ($self->_cookie || $self->basic_auth_cb) {
         unless (defined($auth)) {
             RT::Client::REST::RequiredAttributeUnsetException->throw(
-                "You must log in first",
+                'You must log in first',
             );
         }
         push @$data, %$auth;
@@ -583,8 +583,8 @@ sub _submit {
 
         my ($head, $text) = split /\n\n/, $res->decoded_content(charset => 'none'), 2;
         my ($status) = split /\n/, $head; # my ($status, @headers) = split /\n/, $head;
-        $text =~ s/\n*$/\n/ if ($text);
 
+        # Example:
         # "RT/3.0.1 401 Credentials required"
         if ($status !~ m#^RT/\d+(?:\S+) (\d+) ([\w\s]+)$#) {
             RT::Client::REST::MalformedRTResponseException->throw(
@@ -613,21 +613,28 @@ sub _submit {
                 if (exists $d{user}) {
                     RT::Client::REST::AuthenticationFailureException->throw(
                         code    => $res->code,
-                        message => "Incorrect username or password",
+                        message => 'Incorrect username or password',
                     );
                 }
-                elsif ($req->header("Cookie")) {
+                elsif ($req->header('Cookie')) {
                     # We'll retry the request with credentials, unless
                     # we only wanted to logout in the first place.
                     #$session->delete;
                     #return submit(@_) unless $uri eq "$REST/logout";
                 }
-            } else {
+                else {
+                    RT::Client::REST::AuthenticationFailureException->throw(
+                        code    => $res->code,
+                        message => 'Server said: '. $res->message,
+                    );
+                }
+            }
+            else {
                 RT::Client::REST::Exception->_rt_content_to_exception(
                     $res->decoded_content)
                 ->throw(
                     code    => $res->code,
-                    message => "RT server returned this error: " .
+                    message => 'RT server returned this error: ' .
                                $res->decoded_content,
                 );
             }
@@ -636,10 +643,10 @@ sub _submit {
         500 == $res->code &&
         # Older versions of HTTP::Response populate 'message', newer
         # versions populate 'content'.  This catches both cases.
-        ($res->decoded_content || $res->message) =~ /read timeout/
+        ($res->decoded_content || $res->message) =~ m/read timeout/
     ) {
         RT::Client::REST::RequestTimedOutException->throw(
-            "Your request to " . $self->server . " timed out",
+            'Your request to ' . $self->server . ' timed out',
         );
     } elsif (302 == $res->code && !$self->{'_redirected'}) {
         $self->{'_redirected'} = 1;     # We only allow one redirection
@@ -804,7 +811,7 @@ sub _valid_transaction_type {
     unless (grep { $type eq $_ } $self->_list_of_valid_transaction_types) {
         RT::Client::REST::InvalidParameterValueException->throw(
             "'$type' is not a valid transaction type.  Allowed types: " .
-            join(", ", $self->_list_of_valid_transaction_types)
+            join(', ', $self->_list_of_valid_transaction_types)
         );
     }
 
@@ -834,7 +841,7 @@ sub _uri { shift->_rest . '/' . shift }
 
 sub _ua_string {
     my $self = shift;
-    return ref($self) . '/' . $self->_version;
+    return ref($self) . '/' . ($self->_version || '???');
 }
 
 sub _version { $RT::Client::REST::VERSION }
@@ -865,7 +872,7 @@ sub _version { $RT::Client::REST::VERSION }
     # The problem with the second approach is that it creates unrelated
     # methods in RT::Client::REST namespace.
     package RT::Client::REST::NoopLogger;
-$RT::Client::REST::NoopLogger::VERSION = '0.53';
+$RT::Client::REST::NoopLogger::VERSION = '0.54';
 sub new { bless \(my $logger), __PACKAGE__ }
     for my $method (RT::Client::REST::LOGGER_METHODS) {
         no strict 'refs'; ## no critic (ProhibitNoStrict)
@@ -887,7 +894,7 @@ RT::Client::REST - Client for RT using REST API
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -972,6 +979,17 @@ returns username and password:
 A logger object.  It should be able to debug(), info(), warn() and
 error().  It is not widely used in the code (yet), and so it is
 mostly useful for development.
+
+Something like this will get you started:
+
+  use Log::Dispatch;
+  my $log = Log::Dispatch->new(
+    outputs => [ [ 'Screen', min_level => 'debug' ] ],
+  );
+  my $rt = RT::Client::REST->new(
+    server => ... etc ...
+    logger => $log
+  );
 
 =back
 

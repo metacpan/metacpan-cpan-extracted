@@ -39,9 +39,9 @@
             "Exporter" : "0",
             "Parse::ANSIColor::Tiny" : "0",
             "Term::ANSIColor" : "0",
-            "Term::Choose" : "1.603",
-            "Term::Choose::Constants" : "1.603",
-            "Term::Choose::LineFold" : "1.603",
+            "Term::Choose" : "1.628",
+            "Term::Choose::Constants" : "1.628",
+            "Term::Choose::LineFold" : "1.628",
             "Text::ANSI::WideUtil" : "0",
             "if" : "0",
             "parent" : "0",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose_HAE"
       }
    },
-   "version" : "0.055",
+   "version" : "0.056",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

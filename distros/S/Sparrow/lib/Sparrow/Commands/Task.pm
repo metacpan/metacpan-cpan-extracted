@@ -23,6 +23,10 @@ use Term::ANSIColor;
 
 use Getopt::Long qw(GetOptionsFromArray);
 
+use File::Copy;
+
+use File::Path qw(rmtree make_path);
+
 our @EXPORT = qw{
 
     task_list
@@ -38,6 +42,9 @@ our @EXPORT = qw{
 
     task_get
     task_set
+
+    task_save
+    task_restore
 
 };
 
@@ -429,6 +436,148 @@ sub task_set {
 
 }
 
+sub task_save {
+
+    my $dir = shift or confess "usage: task_save(*/path/to/dir)";
+    my @opts = @_;
+
+    my $quiet_mode;
+    my $ignore_path;
+    my $merge_mode;
+
+    my $args_st = GetOptionsFromArray( 
+      \@opts,
+      "quiet"     => \$quiet_mode,
+      "merge"     => \$merge_mode,
+      "ignore=s"  => \$ignore_path,
+    );
+
+
+    die "directory $dir does not exist" unless -d $dir;
+
+    if ( -d "$dir/projects" and ! $merge_mode ) {
+      rmtree("$dir/projects") or die "can't remove dir: $dir/projects, error: $!";
+    }
+
+    my @ignore;
+
+    if ($ignore_path){
+      print "read task ignore file from $ignore_path ...\n";
+      @ignore = parse_task_ignore_file($ignore_path);
+    } elsif ( -f default_task_ignore_file() ) {
+      print "read task ignore file from ".(default_task_ignore_file())." ...\n";
+      @ignore = parse_task_ignore_file(default_task_ignore_file());
+    } else {
+      @ignore = ();
+    }
+
+    print "save current tasks to [$dir] ...\n=========================\n";
+
+    my $spr = sparrow_root()."/projects";
+    opendir(my $dh, $spr) || confess "can't opendir $spr: $!";
+
+    for my $p (sort { $a cmp $b } grep { ! /^\.{1,2}$/ } readdir($dh)){
+        next unless -d "$spr/$p/tasks";
+        my $project = basename($p);
+        opendir(my $th, "$spr/$p/tasks") || confess "can't opendir $spr/$p: $!";
+        for my $t (sort { $a cmp $b } grep { ! /^\.{1,2}$/ } readdir($th)){
+          my $task = basename($t);
+          my $skip = 0;
+          for my $i (@ignore){
+            $skip=1 if "$project:$task" =~ /^$i$/;
+          };
+          if ($skip){
+            print "SKIP $project/$task ...\n" unless $quiet_mode;
+          } else {
+            print "$project/$task ...\n" unless $quiet_mode;
+            make_path("$dir/projects/$project/tasks/$task/");
+            if (-f "$spr/$project/tasks/$task/settings.json" ){
+                copy("$spr/$project/tasks/$task/settings.json", "$dir/projects/$project/tasks/$task/");
+            } else {
+              warn "broken task $spr/$project/tasks/$task/ , settings.json file not found";
+            }
+            if (-f "$spr/$project/tasks/$task/suite.cfg" ){
+                copy("$spr/$project/tasks/$task/suite.cfg", "$dir/projects/$project/tasks/$task/");
+            };
+          }
+        }
+        closedir $th;
+    }
+    closedir $dh;
+
+}
+
+sub task_restore {
+
+    my $dir = shift or confess "usage: task_restore(*/path/to/dir)";
+
+    die "directory $dir does not exist" unless -d $dir;
+
+    my @opts = @_;
+
+    my $quiet_mode;
+
+    my $args_st = GetOptionsFromArray( 
+      \@opts,
+      "quiet"     => \$quiet_mode,
+    );
+
+
+    print "restore tasks from [$dir] ...\n=========================\n";
+
+    my $spr = sparrow_root()."/projects";
+
+    opendir(my $dh, "$dir/projects") || confess "can't opendir $dir/projects: $!";
+
+    for my $p (sort { $a cmp $b } grep { ! /^\.{1,2}$/ } readdir($dh)){
+
+        my $project = basename($p);
+
+        make_path("$spr/$project");
+
+        next unless -d "$dir/projects/$p/tasks";
+
+        opendir(my $th, "$dir/projects/$p/tasks") || confess "can't opendir $dir/projects/$p/tasks : $!";
+
+        for my $t (sort { $a cmp $b } grep { ! /^\.{1,2}$/ } readdir($th)){
+          my $task = basename($t);
+          print "restore $project/$task ...\n" unless $quiet_mode;
+          make_path("$spr/$project/tasks/$task/");
+
+          if (-f "$dir/projects/$project/tasks/$task/settings.json" ){
+              copy("$dir/projects/$project/tasks/$task/settings.json", "$spr/$project/tasks/$task/");
+              my $task_set = task_get($project,$task);
+              my $plg = $task_set->{plugin};
+              install_plugin($plg);
+          } else {
+            warn "broken task $dir/projects/$project/tasks/$task/ , settings.json file not found";
+          }
+          if (-f "$dir/projects/$project/tasks/$task/suite.cfg" ){
+              copy("$dir/projects/$project/tasks/$task/suite.cfg", "$spr/$project/tasks/$task/");
+          };
+       }
+       closedir $th;
+    }
+    closedir $dh;
+
+}
+
+sub parse_task_ignore_file {
+
+  my $path = shift;
+  my @ignore;
+
+  open my $fh, $path or die "can't open file [$path] to read: $!";
+  while( my $l = <$fh>){
+    chomp $l;
+    $l=~s/(.*)#.*/$1/;
+    $l=~s/\s+//g;
+    $l=~s{/}[:];
+    push @ignore, $l;
+  }
+  close $fh;
+  return @ignore;
+}
 
 sub nocolor { $ENV{SPARROW_NO_COLOR} }
 

@@ -3,32 +3,32 @@ package Pcore::Dist::Build;
 use Pcore -class;
 use Pcore::Util::File::Tree;
 
-has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'] );
+has dist => ();    # InstanceOf ['Pcore::Dist']
 
-has wiki   => ( is => 'lazy', isa => Maybe [ InstanceOf ['Pcore::Dist::Build::Wiki'] ],   init_arg => undef );
-has issues => ( is => 'lazy', isa => Maybe [ InstanceOf ['Pcore::Dist::Build::Issues'] ], init_arg => undef );
-has docker => ( is => 'lazy', isa => Maybe [ InstanceOf ['Pcore::Dist::Build::Docker'] ], init_arg => undef );
+has wiki   => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::Dist::Build::Wiki'] ]
+has issues => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::Dist::Build::Issues'] ]
+has docker => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::Dist::Build::Docker'] ]
 
 sub _build_wiki ($self) {
-    state $init = !!require Pcore::Dist::Build::Wiki;
+    require Pcore::Dist::Build::Wiki;
 
-    return Pcore::Dist::Build::Wiki->new( { dist => $self->dist } );
+    return Pcore::Dist::Build::Wiki->new( { dist => $self->{dist} } );
 }
 
 sub _build_issues ($self) {
-    state $init = !!require Pcore::Dist::Build::Issues;
+    require Pcore::Dist::Build::Issues;
 
-    return Pcore::Dist::Build::Issues->new( { dist => $self->dist } );
+    return Pcore::Dist::Build::Issues->new( { dist => $self->{dist} } );
 }
 
 sub _build_docker ($self) {
-    state $init = !!require Pcore::Dist::Build::Docker;
+    require Pcore::Dist::Build::Docker;
 
-    return Pcore::Dist::Build::Docker->new( { dist => $self->dist } );
+    return Pcore::Dist::Build::Docker->new( { dist => $self->{dist} } );
 }
 
 sub create ( $self, $args ) {
-    state $init = !!require Pcore::Dist::Build::Create;
+    require Pcore::Dist::Build::Create;
 
     return Pcore::Dist::Build::Create->new($args)->run;
 }
@@ -42,25 +42,25 @@ sub setup ($self) {
 }
 
 sub clean ($self) {
-    state $init = !!require Pcore::Dist::Build::Clean;
+    require Pcore::Dist::Build::Clean;
 
-    Pcore::Dist::Build::Clean->new( { dist => $self->dist } )->run;
+    Pcore::Dist::Build::Clean->new( { dist => $self->{dist} } )->run;
 
     return;
 }
 
 sub update ($self) {
-    state $init = !!require Pcore::Dist::Build::Update;
+    require Pcore::Dist::Build::Update;
 
-    Pcore::Dist::Build::Update->new( { dist => $self->dist } )->run;
+    Pcore::Dist::Build::Update->new( { dist => $self->{dist} } )->run;
 
     return;
 }
 
 sub deploy ( $self, %args ) {
-    state $init = !!require Pcore::Dist::Build::Deploy;
+    require Pcore::Dist::Build::Deploy;
 
-    Pcore::Dist::Build::Deploy->new( { dist => $self->dist, %args } )->run;
+    Pcore::Dist::Build::Deploy->new( { dist => $self->{dist}, %args } )->run;
 
     return;
 }
@@ -89,22 +89,22 @@ sub test ( $self, @ ) {
     {
         my $chdir_guard = P->file->chdir($build);
 
-        my $psplit = $MSWIN ? q[\\] : q[/];
+        my $psplit = $MSWIN ? '\\' : '/';
 
-        return if !P->sys->run_proc( [qw[perl Build.PL]] );
+        return if !P->sys->run_proc( [ $^X, 'Build.PL' ] );
 
         return if !P->sys->run_proc(".${psplit}Build");
 
-        return if !P->sys->run_proc( [ ".${psplit}Build", 'test', $args{verbose} ? '--verbose' : q[] ] );
+        return if !P->sys->run_proc( [ ".${psplit}Build", 'test', $args{verbose} ? '--verbose' : '' ] );
     }
 
     return 1;
 }
 
 sub release ( $self, @args ) {
-    state $init = !!require Pcore::Dist::Build::Release;
+    require Pcore::Dist::Build::Release;
 
-    return Pcore::Dist::Build::Release->new( { dist => $self->dist, @args } )->run;
+    return Pcore::Dist::Build::Release->new( { dist => $self->{dist}, @args } )->run;
 }
 
 sub par ( $self, @ ) {
@@ -115,29 +115,29 @@ sub par ( $self, @ ) {
         splice @_, 1,
     );
 
-    state $init = !!require Pcore::Dist::Build::PAR;
+    require Pcore::Dist::Build::PAR;
 
-    Pcore::Dist::Build::PAR->new( { %args, dist => $self->dist } )->run;    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+    Pcore::Dist::Build::PAR->new( { %args, dist => $self->{dist} } )->run;    ## no critic qw[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
 
     return;
 }
 
 sub temp_build ( $self, $keep = 0 ) {
-    state $init = !!require Pcore::Dist::Build::Temp;
+    require Pcore::Dist::Build::Temp;
 
-    return Pcore::Dist::Build::Temp->new( { dist => $self->dist } )->run($keep);
+    return Pcore::Dist::Build::Temp->new( { dist => $self->{dist} } )->run($keep);
 }
 
 sub tgz ($self) {
     my $temp = $self->temp_build;
 
-    state $init = !!require Archive::Tar;
+    require Archive::Tar;
 
     my $tgz = Archive::Tar->new;
 
-    my $base_dir = $self->dist->name . q[-] . $self->dist->version;
+    my $base_dir = $self->{dist}->name . q[-] . $self->{dist}->version;
 
-    for my $path ( P->path1($temp)->read_dir( max_depth => 0, is_dir => 0 )->@* ) {
+    for my $path ( $temp->read_dir( max_depth => 0, is_dir => 0 )->@* ) {
         my $mode;
 
         if ( $path =~ m[\A(script|t)/]sm ) {
@@ -150,7 +150,7 @@ sub tgz ($self) {
         $tgz->add_data( "$base_dir/$path", P->file->read_bin("$temp/$path")->$*, { mode => $mode } );
     }
 
-    my $path = $ENV->{PCORE_SYS_DIR} . 'build/' . $self->dist->name . q[-] . $self->dist->version . '.tar.gz';
+    my $path = "$ENV->{PCORE_TEMP_DIR}/build/" . $self->{dist}->name . '-' . $self->{dist}->version . '.tar.gz';
 
     $tgz->write( $path, Archive::Tar::COMPRESS_GZIP() );
 
@@ -158,6 +158,16 @@ sub tgz ($self) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    2 | 98                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

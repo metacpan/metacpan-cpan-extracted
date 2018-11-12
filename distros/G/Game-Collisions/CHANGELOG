@@ -1,0 +1,10 @@
+Revision history for perl module Game::Collisions
+
+0.2 2018-11-10
+
+- Documentation typo fixes
+- Allow setting of user_data on AABBs
+
+0.1 2018-10-28
+
+- Initial release

@@ -1,4 +1,4 @@
-Net::UPnP version 1.4.4
+Net::UPnP version 1.4.5
 ===========================
 
 The README is used to introduce the module and provide instructions on
@@ -23,7 +23,7 @@ To install this module type the following:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005-2014 Satoshi Konno
+Copyright (C) 2005 Satoshi Konno
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 

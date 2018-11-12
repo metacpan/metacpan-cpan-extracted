@@ -47,6 +47,45 @@ or by default from the XML schemas.
 
 See L<XML::Compile::Schema/"Key rewrite"> for the full list of options.
 
+=head3 Overruling produced structures (writer)
+
+You may encounter broken servers.  Actually, I have seen even expensive
+server implementations and professional high-profile services which do
+not follow the rules...
+
+On any location in the data structure you provide, you can give a value
+but also a fully prepared XML::LibXML node.  For instance
+
+   my $doc  = XML::LibXML::Document->new('1.1', 'UTF-8');
+   my $node = $doc->createElement('field);
+   $node->appendText(42);
+   my $xml  = $schema->writer($type)->($doc, { field => $node });
+   $doc->setDocumentElement($xml);
+   
+   print $xml->toString(1);   # perl string
+   print $doc->toString(1);   # bytes
+
+You will probably need more than one attempt to produce the correct
+output... Only use this when you are sure that the receiving party
+is broken.
+
+=head3 Producting CDATA blocks (writer)
+
+To get CDATA blocks, the solution is very close to the example in the
+previous section:
+
+   my $doc   = XML::LibXML::Document->new('1.1', 'UTF-8');
+   my $cdata = $doc->createCDATASection($content);
+   my $xml   = $schema->writer($type)->($doc, { field => $cdata });
+   $doc->setDocumentElement($xml);
+
+The "$content" is a Perl string, which means that it needs to be
+utf8 when it is utf8.  For instance:
+
+   use File::Slurp::Tiny;
+   my $content = read_file $filename, binmode => 'utf8';
+   my $cdata   = $doc->createCDATASection($content);
+
 =head2 Schemas
 
 Be aware that the "2001" schema specification is continuously under
@@ -214,8 +253,8 @@ Try turning on debugging with:
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile distribution version 1.60,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/xml-compile/>
+This module is part of XML-Compile distribution version 1.61,
+built on November 09, 2018. Website: F<http://perl.overmeer.net/xml-compile/>
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-package Pcore::PDF v0.5.7;
+package Pcore::PDF v0.5.8;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
@@ -128,7 +128,7 @@ sub generate_pdf ( $self, $html, $cb = undef ) {
 }
 
 sub remove_logo ( $self, $pdf_ref ) {
-    state $init = !!require CAM::PDF;
+    require CAM::PDF;
 
     # re-pack created PDF
     my $pdf = CAM::PDF->new( $pdf_ref->$* );

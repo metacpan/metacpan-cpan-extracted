@@ -1,3 +1,6 @@
+v0.2.8 2018-11-11T14:17:02Z
+ - Type::Tiny removed
+
 v0.2.7 2018-08-03T23:55:42Z
  - Pcore::HTTP refactoring
 

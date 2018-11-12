@@ -36,10 +36,10 @@ sub render_tmpl ( $self, $tmpl_args ) {
 sub write_to ( $self, $target_path ) {
     $target_path = P->path("$target_path/$self->{path}");
 
-    P->file->mkpath( $target_path->dirname );
+    P->file->mkpath( $target_path->{dirname} );
 
     if ( exists $self->{content} ) {
-        P->file->write_bin( $target_path, P->text->encode_utf8( $self->content->$* ) );
+        P->file->write_bin( $target_path, P->text->encode_utf8( $self->{content}->$* ) );
     }
     else {
         P->file->copy( $self->{source_path}, $target_path );

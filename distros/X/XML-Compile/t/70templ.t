@@ -75,7 +75,7 @@ __SCHEMA__
 
 ok(defined $schema, 'load schema');
 
-my $out = templ_perl($schema, "{$TestNS}test1", show => 'ALL', skip_header => 1);
+my $out = templ_perl($schema, "{$TestNS}test1", show => 'ALL', skip_header =>1);
 is($out, <<__TEST1a__, 'test 1a');
 # Describing complex x0:test1
 #     {http://test-types}test1

@@ -17,16 +17,17 @@ use constant {
 
 BEGIN {
     eval { require LWP::UserAgent, 1; }
-      || _croak('LWP::UserAgent package not found');
+      || die('LWP::UserAgent package not found');
 
     eval { require JSON::XS, 1; }
-      || _croak('JSON::XS package not found');
+      || die('JSON::XS package not found');
 }
-our $VERSION = '0.03';
+
+our $VERSION = '0.04';
 
 # singleton and accessor
 {
-    my $lwp = LWP::UserAgent->new();
+    my $lwp = LWP::UserAgent->new( keep_alive => 1 );
     sub _lwp_agent { return $lwp }
 
     my $json = JSON::XS->new();
@@ -68,8 +69,7 @@ sub api_trading {
     $http->content($param);
     my $respons = $self->{_agent}->request($http);
 
-    my $json = $self->_retrieve_json( $respons->{'_content'} );
-    return $json;
+    $self->_checkResponse($respons);
 }
 
 sub api_public {
@@ -84,13 +84,19 @@ sub api_public {
     $params = sprintf "$method&%s", join( '&', @request )
       if (@request);
 
-    my $requst = $self->{_agent}
+    my $respons = $self->{_agent}
       ->post( sprintf( URL_PUBLIC_API, ($params) ? $params : $method ) );
 
-    if (   ( $requst->is_success )
-        && ( !$self->parse_error( $requst->decoded_content ) ) )
+    $self->_checkResponse($respons);
+}
+
+sub _checkResponse {
+    my ( $self, $respons ) = @ARG;
+
+    if (   ( $respons->is_success )
+        && ( !$self->parse_error( $respons->decoded_content ) ) )
     {
-        return $json = $self->_retrieve_json( $requst->decoded_content );
+        return $self->_retrieve_json( $respons->decoded_content );
     }
 }
 
@@ -99,10 +105,12 @@ sub parse_error {
     my $error = { type => 'unknown', msg => $msg };
 
     return
-      unless $error->{msg} =~ m{ "error":"(?<MSG_ERROR>[^"]*)" }xg;
+      unless $error->{msg} =~ m/error":"([^"]*)/;
 
-    $self->{msg}  = $LAST_PAREN_MATCH{MSG_ERROR};
+    $self->{msg}  = $1;
     $self->{type} = 'api';
+
+    return 1;
 }
 
 sub _retrieve_json {
@@ -163,36 +171,39 @@ This method performs a query on a private API. The request uses the api key and 
 
 =head2 api_public
 
-	my $Ticker = $api->api_public('returnTicker');
-	
-	my $ChartData    = $api->api_public('returnChartData', {
-		currencyPair => 'BTC_XMR',
-		start        => 1405699200,
-		end          => 9999999999,
-		period       => 14400
-	});
+    my $Ticker = $api->api_public('returnTicker');
+
+    my $ChartData    = $api->api_public('returnChartData', {
+        currencyPair => 'BTC_XMR',
+        start        => 1405699200,
+        end          => 9999999999,
+        period       => 14400
+    });
 
 This method performs an API request. The first argument must be the method name
 (L<here's a list|https://poloniex.com/support/api/>).
 
 =head2 parse_error
 
-    $result = $api->api_public('fake', { map { $_ => $_ } 'a'..'d' })
+    handle_api_error($api, $api->api_public('fake'))
 
-    if (!$result) {
-        say sprintf('%s: %s', $api->{type}, $api->{msg});
+    sub handle_api_error {
+        my ( $api, $retval ) = @_;
+        unless ( $retval ) {
+            die sprintf("Error: %s; type: %s", $api->{msg}, $mapi->{type});
+        }
     }
 
 =head1 AUTHOR
 
-vlad mirkos, E<lt>vladmirkos@sd.apple.com<gt>
+    vlad mirkos, E<lt>vladmirkos@sd.apple.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by vlad mirkos
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.18.2 or,
-at your option, any later version of Perl 5 you may have available.
+    Copyright (C) 2017 by vlad mirkos
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself, either Perl version 5.18.2 or,
+    at your option, any later version of Perl 5 you may have available.
 
 =encoding UTF-8
 

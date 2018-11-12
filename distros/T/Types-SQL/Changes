@@ -1,5 +1,19 @@
 Revision history for Types-SQL
 
+v0.2.1    2018-11-10 22:17:54+00:00 Europe/London
+  [Bug Fixes]
+  - Clean namespaces.
+
+  - Frozen coercions.
+
+  [Documentation]
+  - Added INSTALL file to the distribution.
+
+  - Bumped copyright year.
+
+  [Toolchain]
+  - Use a different Pod::Coverage plugin.
+
 v0.2.0    2018-09-16 21:23:54+01:00 Europe/London
   [Enhancements]
   - Types::SQL::Util translates the following types:

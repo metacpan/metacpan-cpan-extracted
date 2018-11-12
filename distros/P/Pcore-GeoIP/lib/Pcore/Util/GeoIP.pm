@@ -52,7 +52,7 @@ sub update_all ($cb = undef) {
 }
 
 sub update ( $type, $cb = undef ) {
-    state $init = !!require IO::Uncompress::Gunzip;
+    require IO::Uncompress::Gunzip;
 
     return P->http->get(
         $RES->{$type}->[1],
@@ -63,11 +63,11 @@ sub update ( $type, $cb = undef ) {
 
             if ( $res->{status} == 200 ) {
                 eval {
-                    my $temp = P->file->tempfile;
+                    my $temp = P->file1->tempfile;
 
-                    IO::Uncompress::Gunzip::gunzip( $res->{data}, $temp->path, BinModeOut => 1 );
+                    IO::Uncompress::Gunzip::gunzip( $res->{data}->{path}, $temp->{path}, BinModeOut => 1 ) or die "gunzip failed: $IO::Uncompress::Gunzip::GunzipError\n";
 
-                    $ENV->{share}->write( 'Pcore-GeoIP', $RES->{$type}->[0], $temp->path );
+                    $ENV->{share}->write( 'Pcore-GeoIP', $RES->{$type}->[0], $temp );
 
                     # empty cache
                     delete $H->{$type};
@@ -123,12 +123,12 @@ sub _get_h ($type) {
     return if !$path;
 
     if ( $type == $TYPE_COUNTRY2 || $type == $TYPE_CITY2 ) {
-        state $init = !!require MaxMind::DB::Reader;
+        require MaxMind::DB::Reader;
 
         $H->{$type} = MaxMind::DB::Reader->new( file => $path );
     }
     else {
-        state $init = !!require Geo::IP;
+        require Geo::IP;    ## no critic qw[Modules::ProhibitEvilModules]
 
         $H->{$type} = Geo::IP->open( $path, Geo::IP::GEOIP_MEMORY_CACHE() | Geo::IP::GEOIP_CHECK_CACHE() );
     }

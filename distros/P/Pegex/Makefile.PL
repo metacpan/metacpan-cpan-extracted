@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "JSON::PP" => 0,
     "YAML::XS" => "0.74"
   },
-  "VERSION" => "0.67",
+  "VERSION" => "0.70",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,7 +80,7 @@ chmod 0755, 'inc/bin/testml-cpan';
 if ($^O eq 'MSWin32') {
   my $file = 'inc/bin/testml-cpan.cmd';
   open OUT, '>', $file or die "Can't open '$file' for output";
-  print OUT 'if exist %~dpn0 perl %0 %*', "\r\n";
+  print OUT 'if exist "%~dpn0" perl %0 %*', "\r\n";
   close OUT;
 
   find sub {

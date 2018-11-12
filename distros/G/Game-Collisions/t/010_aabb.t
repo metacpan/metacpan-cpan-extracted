@@ -21,7 +21,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
-use Test::More tests => 8;
+use Test::More tests => 9;
 use v5.14;
 use lib 'lib';
 use Game::Collisions;
@@ -58,3 +58,6 @@ ok( $box2->does_collide( $box3 ), "Box2 overlaps box3" );
 ok(! $box3->does_fully_enclose( $box1 ), "Box3 does not enclose box1" );
 ok( $box3->does_fully_enclose( $box2 ), "Box3 does enclose box2" );
 cmp_ok( $box1->user_data, 'eq', 'foobar', "User data is retrieved" );
+
+$box1->set_user_data( 'baz' );
+cmp_ok( $box1->user_data, 'eq', 'baz', "Set new user data" );

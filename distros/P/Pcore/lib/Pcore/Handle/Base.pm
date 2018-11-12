@@ -2,7 +2,7 @@ package Pcore::Handle::Base;
 
 use Pcore -role;
 
-has uri => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Util::URI'], required => 1 );
+has uri => ( required => 1 );    # InstanceOf ['Pcore::Util::URI']
 
 1;
 __END__

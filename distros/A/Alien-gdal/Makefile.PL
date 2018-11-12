@@ -11,6 +11,9 @@ my %common_reqs = (
     "File::Find::Rule" => 0,
     "parent" => 0,
     "PkgConfig" => 0.19026,
+    "Alien::Build::Plugin::Cleanse::BuildDir" => 0,
+    'Sort::Versions' => 0,
+    #"File::Stat" => 0,
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
 );
 
@@ -31,7 +34,7 @@ my %WriteMakefileArgs = (
         "Test::Alien" => 0,
     },
     "PREREQ_PM" => {
-        "Alien::Base" => "0.038",
+        "Alien::Base" => "1.41",
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

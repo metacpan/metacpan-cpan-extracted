@@ -8,7 +8,7 @@ use Carp qw(croak);
 
 use XSLoader;
 BEGIN {
-	our $VERSION = '1.01';
+	our $VERSION = '1.02';
 	XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -18,8 +18,8 @@ sub define {
 	$kw =~ /^\p{XIDS}\p{XIDC}*\z/ or croak "'$kw' doesn't look like an identifier";
 	defined($sub) or croak "'code' is not defined";
 
-	my $xsub = (ref($sub) eq 'CODE') ? 
-		sub { substr ${$_[0]}, 0, 0, $sub->() } :
+	my $xsub = (ref($sub) eq 'CODE') ?
+		sub { substr ${$_[0]}, 0, 0, $sub->(${$_[0]}) } :
 		sub { substr ${$_[0]}, 0, 0, $sub };
 
 	my $entry = [ $xsub, !!$expression ];
@@ -72,21 +72,18 @@ Keyword::Pluggable - define new keywords in pure Perl
 =head1 SYNOPSIS
 
  package Some::Module;
- 
+
  use Keyword::Pluggable;
- 
+
  sub import {
      # create keyword 'provided', expand it to 'if' at parse time
-     Keyword::Pluggable::define 
-	 keyword => 'provided', 
+     Keyword::Pluggable::define
+	 keyword => 'provided',
 	 package => scalar(caller),
-	 code    => sub {
-            my ($ref) = @_;
-            substr($$ref, 0, 0) = 'if';  # inject 'if' at beginning of parse buffer
-         }
+	 code    => 'if',
      ;
  }
- 
+
  sub unimport {
     # disable keyword again
     Keyword::Pluggable::undefine keyword => 'provided', package => scalar(caller);
@@ -123,7 +120,9 @@ The keyword is injected in the scope currently being compiled
 
 For every occurrence of the keyword, your coderef will be called and its result
 will be injected into perl's parse buffer, so perl will continue parsing as if
-its contents had been the real source code in the first place. 
+its contents had been the real source code in the first place. First paramater
+to the eventual coderef will be all code text following the keyword to be replaced,
+if examination is needed.
 
 =item expression
 
@@ -171,10 +170,9 @@ actually does this:
   }
 
 The C<;> represents a no-op statement, the C<if> was injected by the Perl code,
-and the rest of the file is unchanged.
-
-This also means your new keywords can only occur at the beginning of a
-statement, not embedded in an expression.
+and the rest of the file is unchanged. This also means your it can
+only occur at the beginning of a statement, not embedded in an expression.
+To be able to do that, use C< expression => 1 > flag.
 
 Keywords in the replacement part of a C<s//.../e> substitution aren't handled
 correctly and break parsing.
@@ -185,7 +183,7 @@ There are barely any tests.
 
 Lukas Mai, C<< <l.mai at web.de> >>
 
-Dmitry Karasik , C<< <dmitry at karasik.eu.org >>
+Dmitry Karasik , C<< <dmitry at karasik.eu.org> >>
 
 =head1 COPYRIGHT & LICENSE
 

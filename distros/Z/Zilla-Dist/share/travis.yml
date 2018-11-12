@@ -60,6 +60,9 @@ script:
 [% IF testbase -%]
   PERL5LIB=../test-base-pm/lib
 [% END -%]
+[% IF include_testml -%]
+  TESTML_RUN=perl5-tap
+[% END -%]
   prove -lv test/
 - true && [ ! -e test/ ] || cover
 

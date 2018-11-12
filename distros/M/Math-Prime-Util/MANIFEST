@@ -47,6 +47,8 @@ ramanujan_primes.h
 ramanujan_primes.c
 random_prime.h
 random_prime.c
+semi_primes.h
+semi_primes.c
 sieve.h
 sieve.c
 sieve_cluster.h
@@ -126,6 +128,7 @@ t/04-inputvalidation.t
 t/10-isprime.t
 t/11-primes.t
 t/11-ramanujanprimes.t
+t/11-semiprimes.t
 t/11-twinprimes.t
 t/11-sumprimes.t
 t/11-clusters.t

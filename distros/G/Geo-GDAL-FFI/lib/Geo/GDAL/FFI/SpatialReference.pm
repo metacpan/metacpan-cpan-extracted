@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 0.05_03;
+our $VERSION = 0.0601;
 
 sub new {
     my ($class, $arg, @arg) = @_;
@@ -15,8 +15,8 @@ sub new {
         $sr = Geo::GDAL::FFI::OSRNewSpatialReference($arg);
     } else {
         $sr = Geo::GDAL::FFI::OSRNewSpatialReference();
-        my $fake = Geo::GDAL::FFI->fake;
-        $arg = $fake->get_importer($arg);
+        my $gdal = Geo::GDAL::FFI->get_instance;
+        $arg = $gdal->get_importer($arg);
         if ($arg->($sr, @arg) != 0) {
             Geo::GDAL::FFI::OSRDestroySpatialReference($sr);
             $sr = 0;
@@ -34,8 +34,8 @@ sub DESTROY {
 sub Export {
     my $self = shift;
     my $format = shift;
-    my $fake = Geo::GDAL::FFI->fake;
-    my $exporter = $fake->get_exporter($format);
+    my $gdal = Geo::GDAL::FFI->get_instance;
+    my $exporter = $gdal->get_exporter($format);
     my $x;
     if ($exporter->($$self, \$x, @_) != 0) {
         confess Geo::GDAL::FFI::error_msg();
@@ -46,8 +46,8 @@ sub Export {
 sub Set {
     my $self = shift;
     my $set = shift;
-    my $fake = Geo::GDAL::FFI->fake;
-    my $setter = $fake->get_setter($set);
+    my $gdal = Geo::GDAL::FFI->get_instance;
+    my $setter = $gdal->get_setter($set);
     if ($setter->($$self, @_) != 0) {
         confess Geo::GDAL::FFI::error_msg();
     }

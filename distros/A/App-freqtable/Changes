@@ -1,3 +1,12 @@
+0.002   2018-11-12 (PERLANCAR)
+
+	- Add options --no-print-freq (-F) and --freq.
+
+	- [bugfix] Word and character modes didn't work.
+
+	- [doc] Add examples in Synopsis.
+
+
 0.001   2018-07-07 (PERLANCAR)
 
         - First release.

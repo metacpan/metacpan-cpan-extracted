@@ -44,11 +44,12 @@ To install this module, run the following commands:
 * `Changes` - change log
 * `examples` - really simple scripts demonstrating usage
 * `lib` - modules
+* `elib` - experimental modules that don't get released to CPAN
 * `Makefile.PL`
 * `README.md`/`README` - this file
 * `t` - tests required for installation
 * `TODO` - approximate roadmap
-* `xt` - tests required for development only
+* `et` - tests required for development only
 * `.githooks` - author's default pre-commit hooks
 
 The modules include:

@@ -2,26 +2,27 @@ package Pcore::Dist;
 
 use Pcore -class;
 use Config;
+use Pcore::Util::Scalar qw[is_path];
 
-has root         => ( is => 'ro', required => 1 );                      # Maybe [Str], absolute path to the dist root
-has is_cpan_dist => ( is => 'ro', isa      => Bool, required => 1 );    # dist is installed as CPAN module, root is undefined
-has share_dir    => ( is => 'ro', isa      => Str, required => 1 );     # absolute path to the dist share dir
+has root         => ( required => 1 );    # Maybe [Str], absolute path to the dist root
+has is_cpan_dist => ( required => 1 );    # dist is installed as CPAN module, root is undefined
+has share_dir    => ( required => 1 );    # absolute path to the dist share dir
 
-has module => ( is => 'lazy' );                                         # InstanceOf ['Pcore::Util::Perl::Module']
+has module => ( is => 'lazy' );           # InstanceOf ['Pcore::Util::Perl::Module']
 
-has cfg         => ( is => 'lazy', isa      => HashRef, init_arg => undef );               # dist cfg
-has docker_cfg  => ( is => 'lazy', init_arg => undef );                                    # Maybe [HashRef], docker.json
-has par_cfg     => ( is => 'lazy', init_arg => undef );                                    # Maybe [HashRef], par.ini
-has name        => ( is => 'lazy', isa      => Str, init_arg => undef );                   # Dist-Name
-has is_pcore    => ( is => 'lazy', isa      => Bool, init_arg => undef );
-has is_main     => ( is => 'ro',   isa      => Bool, default => 0, init_arg => undef );    # main process dist
-has scm         => ( is => 'lazy', init_arg => undef );                                    # Maybe [ ConsumerOf ['Pcore::API::SCM'] ]
-has build       => ( is => 'lazy', init_arg => undef );                                    # InstanceOf ['Pcore::Dist::Build']
-has id          => ( is => 'lazy', isa      => HashRef, init_arg => undef );
-has version     => ( is => 'lazy', isa      => Object, init_arg => undef );
-has is_commited => ( is => 'lazy', init_arg => undef );                                    # Maybe [Bool]
-has releases    => ( is => 'lazy', init_arg => undef );                                    # Maybe [ArrayRef]
-has docker      => ( is => 'lazy', init_arg => undef );                                    # Maybe [HashRef]
+has is_main     => ( init_arg => undef );                        # main process dist
+has cfg         => ( is       => 'lazy', init_arg => undef );    # dist cfg
+has docker_cfg  => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef], docker.yaml
+has par_cfg     => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef], par.yaml
+has name        => ( is       => 'lazy', init_arg => undef );    # Dist-Name
+has is_pcore    => ( is       => 'lazy', init_arg => undef );
+has scm         => ( is       => 'lazy', init_arg => undef );    # Maybe [ ConsumerOf ['Pcore::API::SCM'] ]
+has build       => ( is       => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Dist::Build']
+has id          => ( is       => 'lazy', init_arg => undef );
+has version     => ( is       => 'lazy', init_arg => undef );
+has is_commited => ( is       => 'lazy', init_arg => undef );    # Maybe [Bool]
+has releases    => ( is       => 'lazy', init_arg => undef );    # Maybe [ArrayRef]
+has docker      => ( is       => 'lazy', init_arg => undef );    # Maybe [HashRef]
 
 around new => sub ( $orig, $self, $dist ) {
 
@@ -32,28 +33,28 @@ around new => sub ( $orig, $self, $dist ) {
         return $self->$orig( {
             root         => undef,
             is_cpan_dist => 1,
-            share_dir    => P->path( $ENV{PAR_TEMP} . '/inc/share/' )->to_string,
+            share_dir    => P->path("$ENV{PAR_TEMP}/inc/share"),
         } );
     }
 
     my $module_name;
 
+    # if $dist contain .pm suffix - this is a full or related module name
     if ( substr( $dist, -3, 3 ) eq '.pm' ) {
-
-        # if $dist contain .pm suffix - this is a full or related module name
         $module_name = $dist;
     }
+
+    # if $dist doesn't contain .pm suffix, but contain ".", "/" or "\" - this is a path
     elsif ( $dist =~ m[[./\\]]sm ) {
 
-        # if $dist doesn't contain .pm suffix, but contain ".", "/" or "\" - this is a path
         # try find dist by path
         if ( my $root = $self->find_dist_root($dist) ) {
 
             # path is a part of the dist
             return $self->$orig( {
-                root         => $root->to_string,
+                root         => $root,
                 is_cpan_dist => 0,
-                share_dir    => $root . 'share/',
+                share_dir    => "$root/share",
             } );
         }
         else {
@@ -62,9 +63,9 @@ around new => sub ( $orig, $self, $dist ) {
             return;
         }
     }
-    else {
 
-        # otherwise $dist is a Package::Name
+    # otherwise $dist is a Package::Name
+    else {
         $module_name = $dist =~ s[(?:::|-)][/]smgr . '.pm';
     }
 
@@ -96,7 +97,7 @@ around new => sub ( $orig, $self, $dist ) {
     return if !$module_lib;
 
     # normalize module lib
-    $module_lib = P->path( $module_lib, is_dir => 1 )->to_string;
+    $module_lib = P->path($module_lib);
 
     # convert Module/Name.pm to Dist-Name
     my $dist_name = $module_name =~ s[/][-]smgr;
@@ -104,34 +105,32 @@ around new => sub ( $orig, $self, $dist ) {
     # remove .pm suffix
     substr $dist_name, -3, 3, q[];
 
-    if ( -f $module_lib . "auto/share/dist/$dist_name/dist.$Pcore::Core::Const::DIST_CFG_TYPE" ) {
+    if ( -f "$module_lib/auto/share/dist/$dist_name/dist.yaml" ) {
 
         # module is installed
         return $self->$orig( {
             root         => undef,
             is_cpan_dist => 1,
-            share_dir    => $module_lib . "auto/share/dist/$dist_name/",
+            share_dir    => "$module_lib/auto/share/dist/$dist_name",
             module       => P->perl->module( $module_name, $module_lib ),
         } );
     }
-    elsif ( $self->dir_is_dist_root("$module_lib/../") ) {
-        my $root = P->path("$module_lib/../")->to_string;
+    elsif ( $self->dir_is_dist_root("$module_lib/..") ) {
+        my $root = P->path("$module_lib/..");
 
         # module is a dist
         return $self->$orig( {
             root         => $root,
             is_cpan_dist => 0,
-            share_dir    => $root . 'share/',
+            share_dir    => "$root/share",
             module       => P->perl->module( $module_name, $module_lib ),
         } );
     }
-
-    return;
 };
 
 # CLASS METHODS
 sub find_dist_root ( $self, $path ) {
-    $path = P->path( $path, is_dir => 1 ) if !ref $path;
+    $path = P->path($path) if !is_path $path;
 
     if ( !$self->dir_is_dist_root($path) ) {
         $path = $path->parent;
@@ -144,16 +143,14 @@ sub find_dist_root ( $self, $path ) {
     }
 
     if ( defined $path ) {
-        return $path->realpath;
+        return $path->clone->to_realpath;
     }
     else {
         return;
     }
 }
 
-sub dir_is_dist_root ( $self, $path ) {
-    return -f $path . "/share/dist.$Pcore::Core::Const::DIST_CFG_TYPE" ? 1 : 0;
-}
+sub dir_is_dist_root ( $self, $path ) { return -f "$path/share/dist.yaml" ? 1 : 0 }
 
 # BUILDERS
 sub _build_module ($self) {
@@ -161,16 +158,16 @@ sub _build_module ($self) {
 
     my $module;
 
-    if ( $self->is_cpan_dist ) {
+    if ( $self->{is_cpan_dist} ) {
 
         # find main module in @INC
         $module = P->perl->module($module_name);
     }
-    elsif ( -f $self->root . 'lib/' . $module_name ) {
+    elsif ( -f "$self->{root}/lib/$module_name" ) {
 
         # we check -f manually, because perl->module will search for Module/Name.pm in whole @INC, but we need only to search module in dist root
         # get main module from dist root lib
-        $module = P->perl->module( $module_name, $self->root . 'lib/' );
+        $module = P->perl->module( $module_name, "$self->{root}/lib" );
     }
 
     die qq[Distr main module "$module_name" wasn't found, distribution is corrupted] if !$module;
@@ -178,43 +175,35 @@ sub _build_module ($self) {
     return $module;
 }
 
-sub _build_cfg ($self) {
-    return P->cfg->read( $self->share_dir . 'dist.' . $Pcore::Core::Const::DIST_CFG_TYPE );
-}
+sub _build_cfg ($self) { return P->cfg->read("$self->{share_dir}/dist.yaml") }
 
 sub _build_docker_cfg ($self) {
-    if ( -f $self->share_dir . 'docker.json' ) {
-        return P->cfg->read( $self->share_dir . 'docker.json' );
+    if ( -f "$self->{share_dir}/docker.yaml" ) {
+        return P->cfg->read("$self->{share_dir}/docker.yaml");
     }
 
     return;
 }
 
 sub _build_par_cfg ($self) {
-    if ( -f $self->share_dir . 'par.ini' ) {
-        return P->cfg->read( $self->share_dir . 'par.ini' );
+    if ( -f "$self->{share_dir}/par.yaml" ) {
+        return P->cfg->read("$self->{share_dir}/par.yaml");
     }
 
     return;
 }
 
-sub _build_name ($self) {
-    return $self->cfg->{name};
-}
+sub _build_name ($self) { return $self->cfg->{name} }
 
-sub _build_is_pcore ($self) {
-    return $self->name eq 'Pcore';
-}
+sub _build_is_pcore ($self) { return $self->name eq 'Pcore' }
 
 sub _build_scm ($self) {
-    return if $self->is_cpan_dist;
+    return if $self->{is_cpan_dist};
 
-    return P->class->load('Pcore::API::SCM')->new( $self->root );
+    return P->class->load('Pcore::API::SCM')->new( $self->{root} );
 }
 
-sub _build_build ($self) {
-    return P->class->load('Pcore::Dist::Build')->new( { dist => $self } );
-}
+sub _build_build ($self) { return P->class->load('Pcore::Dist::Build')->new( { dist => $self } ) }
 
 sub _build_id ($self) {
     my $id = {
@@ -229,7 +218,7 @@ sub _build_id ($self) {
         release_distance => undef,
     };
 
-    if ( !$self->is_cpan_dist && $self->scm ) {
+    if ( !$self->{is_cpan_dist} && $self->scm ) {
         if ( my $scm_id = $self->scm->scm_id ) {
             $id->@{ keys $scm_id->{data}->%* } = values $scm_id->{data}->%*;
         }
@@ -238,8 +227,8 @@ sub _build_id ($self) {
             $id->{release_distance} = 0 if $id->{desc} =~ /added tag.+$id->{release}/smi;
         }
     }
-    elsif ( -f $self->share_dir . 'dist-id.json' ) {
-        $id = P->cfg->read( $self->share_dir . 'dist-id.json' );
+    elsif ( -f "$self->{share_dir}/dist-id.json" ) {
+        $id = P->cfg->read("$self->{share_dir}/dist-id.json");
     }
 
     # convert date to UTC
@@ -266,7 +255,7 @@ sub _build_version ($self) {
 }
 
 sub _build_is_commited ($self) {
-    if ( !$self->is_cpan_dist && $self->scm && ( my $scm_is_commited = $self->scm->scm_is_commited ) ) {
+    if ( !$self->{is_cpan_dist} && $self->scm && ( my $scm_is_commited = $self->scm->scm_is_commited ) ) {
         return $scm_is_commited->{data};
     }
 
@@ -274,7 +263,7 @@ sub _build_is_commited ($self) {
 }
 
 sub _build_releases ($self) {
-    if ( !$self->is_cpan_dist && $self->scm && ( my $scm_releases = $self->scm->scm_releases ) ) {
+    if ( !$self->{is_cpan_dist} && $self->scm && ( my $scm_releases = $self->scm->scm_releases ) ) {
         return $scm_releases->{data};
     }
 
@@ -310,7 +299,7 @@ sub version_string ($self) {
 }
 
 sub _build_docker ($self) {
-    if ( $self->docker_cfg && -f $self->root . 'Dockerfile' ) {
+    if ( $self->docker_cfg && -f "$self->{root}/Dockerfile" ) {
         my $docker = {
             repo_namespace => $self->docker_cfg->{repo_namespace},
             repo_name      => $self->docker_cfg->{repo_name},
@@ -324,7 +313,7 @@ sub _build_docker ($self) {
 
         $docker->{repo_id} = "$docker->{repo_namespace}/$docker->{repo_name}";
 
-        my $dockerfile = P->file->read_bin( $self->root . 'Dockerfile' );
+        my $dockerfile = P->file->read_bin("$self->{root}/Dockerfile");
 
         if ( $dockerfile->$* =~ /^FROM\s+([^:]+):?(.*?)$/sm ) {
             $docker->{from_repo_id} = $1;
@@ -345,16 +334,6 @@ sub _build_docker ($self) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 107, 155             | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

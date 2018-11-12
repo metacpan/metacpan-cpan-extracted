@@ -4,9 +4,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 ## VERSION
 
-Version 1.4.0
-
-Please note that this software is currently beta.
+Version 1.5.1
 
 ## SYNOPSIS
 
@@ -229,6 +227,9 @@ the type and the target, separated by a space.
 Passed a phone number, this method returns a
 [Magrathea::API::Emergency](https://metacpan.org/pod/Magrathea::API::Emergency) object with the current 999
 information.
+
+Optionally it can be passed a second parameter which, if it
+is a truthy value, will set the `ported` flag.
 
 ## Low Level Methods
 

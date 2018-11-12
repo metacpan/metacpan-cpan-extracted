@@ -99,7 +99,7 @@ sub getvalue() {
 	$value = "";
 	
 	$res_content = $http_res->getcontent();
-	if ($res_content =~ m/<return>(.*?)<\/return>/si) {
+	if ($res_content =~ m{<return>(.*?)</return>}si) {
 		$value = $1;
 	}
 

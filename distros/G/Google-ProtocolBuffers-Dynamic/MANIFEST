@@ -28,6 +28,7 @@ src/dynamic.cpp
 src/dynamic.h
 src/mapper.cpp
 src/mapper.h
+src/perl_unpollute.h
 src/ppport.h
 src/ref.h
 src/servicedef.h

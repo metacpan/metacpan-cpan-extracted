@@ -19,19 +19,17 @@ requires 'Sort::Naturally';
 
 # OOP
 requires 'Class::XSAccessor';
-requires 'Type::Tiny';
-requires 'Type::Tiny::XS';
 
 # AnyEvent
-requires 'EV',              v4.22.0;
-requires 'AnyEvent',        v7.14.0;
-requires 'Coro',            v6.52.0;
-requires 'Guard',           v1.23.0;
-requires 'IO::FDPass',      v1.2.0;
-requires 'IO::AIO',         v4.6.0;
-requires 'AnyEvent::AIO',   v1.1.0;
-requires 'IO::Socket::SSL', v2.60.0;
-requires 'Net::DNS::Resolver';
+requires 'EV',                 v4.22.0;
+requires 'AnyEvent',           v7.14.0;
+requires 'Coro',               v6.52.0;
+requires 'Guard',              v1.23.0;
+requires 'IO::FDPass',         v1.2.0;
+requires 'IO::AIO',            v4.6.0;
+requires 'AnyEvent::AIO',      v1.1.0;
+requires 'IO::Socket::SSL',    v2.60.0;
+requires 'Net::DNS::Resolver', v1.18.0;
 
 # Inline
 requires 'Inline',      v0.80.0;
@@ -75,48 +73,34 @@ feature linux => sub {    #
     requires 'IO::Uncompress::Brotli';
 };
 
-# Pcore::Src
-requires 'Perl::Tidy';
-on develop => sub {
-    requires 'BerkeleyDB';
-    requires 'Perl::Stripper';
-    requires 'Perl::Strip';
-    requires 'Perl::Critic';
-    requires 'PPI::XS';
-    requires 'JavaScript::Packer';
-    requires 'CSS::Packer';
-    requires 'HTML::Packer';
-
-    # suggests 'Perl::Lint';    # Perl::Critic replacement
-};
-
 # Pcore::Util::Class
 requires 'Sub::Util';
 
 # Pcore::Util::Data
 requires 'YAML::XS';
-requires 'Cpanel::JSON::XS';
-requires 'CBOR::XS';
-requires 'XML::Hash::XS';
-requires 'Crypt::CBC';
-requires 'Crypt::DES';
-requires 'Compress::Zlib';
-requires 'MIME::Base64';
+requires 'Cpanel::JSON::XS', v4.7.0;
+requires 'CBOR::XS',         v1.7.0;
+requires 'XML::Hash::XS',    v0.53.0;
+requires 'Crypt::CBC',       v2.33.0;
+requires 'Crypt::DES',       v2.7.0;
+requires 'Compress::Zlib',   v2.81.0;
+requires 'MIME::Base64',     v3.15.0;
+requires 'Text::CSV_XS',     v1.37.0;
 
 # Pcore::Util::Date
-requires 'Time::Moment';
-requires 'HTTP::Date';
-requires 'Time::Zone';
+requires 'Time::Moment', v0.44.0;
+requires 'HTTP::Date',   v6.2.0;
+requires 'Time::Zone',   v2.30.0;
 
 # requires 'DateTime::TimeZone';
 
 # Pcore::Util::Digest
-requires 'Digest';
-requires 'String::CRC32';
-requires 'Digest::MD5';
-requires 'Digest::SHA1';
-requires 'Digest::SHA';
-requires 'Digest::SHA3';
+requires 'Digest',        v1.17.0;
+requires 'String::CRC32', v1.7.0;
+requires 'Digest::MD5',   v2.55.0;
+requires 'Digest::SHA1',  v2.13.0;
+requires 'Digest::SHA',   v6.2.0;
+requires 'Digest::SHA3',  v1.4.0;
 
 # Pcore::Util::File
 requires 'File::Copy::Recursive';
@@ -135,6 +119,22 @@ requires 'Regexp::Util';
 requires 'Devel::Refcount';
 requires 'Ref::Util';
 requires 'Ref::Util::XS';
+
+# Pcore::Util::Src
+requires 'Perl::Tidy';
+on develop => sub {
+    requires 'BerkeleyDB';
+    requires 'Perl::Stripper';
+    requires 'Perl::Strip';
+    requires 'Perl::Critic';
+    requires 'PPI::XS';
+    requires 'JavaScript::Beautifier', v0.25.0;
+    requires 'JavaScript::Packer';
+    requires 'CSS::Packer';
+    requires 'HTML::Packer';
+
+    # suggests 'Perl::Lint';    # Perl::Critic replacement
+};
 
 # Pcore::Util::Sys
 requires 'Sys::CpuAffinity';

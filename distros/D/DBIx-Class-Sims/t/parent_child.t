@@ -56,14 +56,6 @@ BEGIN {
 
 use common qw(sims_test);
 
-sims_test "Connect parent/child by id" => {
-  spec => {
-    Artist => [ { id => 1, name => 'foo' } ],
-    Album => [ { name => 'bar', artist_id => 1 } ],
-  },
-  expect => sub { shift->{spec} },
-};
-
 sims_test "Connect parent/child by lookup" => {
   spec => {
     Artist => [ map { { name => "foo$_" } } 1..4 ],
@@ -290,6 +282,7 @@ sims_test "Use a constraint to force a child row (parent specific ID)" => {
       constraints => {
         Artist => { albums => 1 },
       },
+      allow_pk_set_value => 1,
     }
   ],
   expect => {
@@ -339,16 +332,21 @@ sims_test "Autogenerate multiple children via constraint" => {
 };
 
 sims_test "Specify various parent IDs and connect properly" => {
-  spec => {
-    Artist => [
-      {
-        id => 20, albums => [ { name => 'i20' }, { name => 'j20' } ],
-      },
-      {
-        id => 10, albums => [ { name => 'i10' }, { name => 'j10' } ],
-      },
-    ],
-  },
+  spec => [
+    {
+      Artist => [
+        {
+          id => 20, albums => [ { name => 'i20' }, { name => 'j20' } ],
+        },
+        {
+          id => 10, albums => [ { name => 'i10' }, { name => 'j10' } ],
+        },
+      ],
+    },
+    {
+      allow_pk_set_value => 1,
+    },
+  ],
   expect => {
     Artist => [
       { id => 20, name => re('.+') },

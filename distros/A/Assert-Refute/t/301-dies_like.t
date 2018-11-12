@@ -5,10 +5,10 @@ use warnings;
 BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Test::More;
 
-use Assert::Refute qw(:core);
+use Assert::Refute qw(:core), {};
 use Assert::Refute::T::Errors qw(dies_like);
 
-my $c = contract {
+my $report = try_refute {
     dies_like {
         +1;
     } '', "Lives ok";
@@ -24,9 +24,8 @@ my $c = contract {
     dies_like {
         die "Barfooed";
     } '^Foobared', "Dies with wrong mess";
-}->apply;
+};
 
-contract_is $c, "t2NNNd", "Contract as expected";
-
+contract_is $report, "t2NNNd", "Contract as expected";
 
 done_testing;

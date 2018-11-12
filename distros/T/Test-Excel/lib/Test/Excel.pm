@@ -1,6 +1,6 @@
 package Test::Excel;
 
-$Test::Excel::VERSION   = '1.42';
+$Test::Excel::VERSION   = '1.45';
 $Test::Excel::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Excel - Interface to test and compare Excel files (.xls/.xlsx).
 
 =head1 VERSION
 
-Version 1.42
+Version 1.45
 
 =cut
 
@@ -48,9 +48,9 @@ Using as unit test as below:
     use Test::More tests => 2;
     use Test::Excel;
 
-    cmp_excel_ok("1.xls", "1.xls");
+    cmp_excel_ok("foo.xls", "foo.xls");
 
-    cmp_excel_not_ok("1.xls", "2.xls");
+    cmp_excel_not_ok("foo.xls", "bar.xls");
 
     done_testing();
 
@@ -59,7 +59,7 @@ Using as standalone as below:
     use strict; use warnings;
     use Test::Excel;
 
-    if (compare_excel("1.xls", "1.xls")) {
+    if (compare_excel("foo.xls", "foo.xls")) {
         print "Excels are similar.\n";
     }
     else {
@@ -71,9 +71,10 @@ Using as standalone as below:
 =head2 cmp_excel($got, $exp, \%rule, $message)
 
 This function will tell you whether the two Excel files are "visually" different,
-ignoring  differences  in  embedded fonts/images and metadata. Both $got and $exp
-can be either instances of Spreadsheet::Read / file path (which is in turn passed
-passed to the Spreadsheet::Read constructor). This one  is for use in  TEST MODE.
+ignoring differences  in  embedded  fonts / images and metadata.Both C<$got> and
+C<$exp>  can be either instance of L<Spreadsheet::Read> / file path (which is in
+turn passed to the L<Spreadsheet::Read> constructor).
+This one is for use in TEST MODE.
 
     use strict; use warnings;
     use Test::More tests => 1;
@@ -85,7 +86,7 @@ passed to the Spreadsheet::Read constructor). This one  is for use in  TEST MODE
 
 =head2 cmp_excel_ok($got, $exp, \%rule, $message)
 
-Test OK if excel files are identical. Same as cmp_excel().
+Test OK if excel files are identical. Same as C<cmp_excel()>.
 
 =head2 cmp_excel_not_ok($got, $exp, \%rule, $message)
 
@@ -121,10 +122,11 @@ sub cmp_excel_not_ok {
 
 =head2 compare_excel($got, $exp, \%rule)
 
+Same as C<cmp_excel_ok()> but ideal for non TEST MODE.
 This function will tell you whether the two Excel files are "visually" different,
-ignoring  differences  in  embedded fonts/images and  metadata. Both  C<$got> and
-C<$exp> can be either instances of Spreadsheet::Read / file  path (which  in turn
-passed to the Spreadsheet::Read constructor).
+ignoring differences  in  embedded  fonts / images and metadata.Both C<$got> and
+C<$exp>  can be either instance of L<Spreadsheet::Read> / file path (which is in
+turn passed to the L<Spreadsheet::Read> constructor).
 
     use strict; use warnings;
     use Test::Excel;
@@ -217,8 +219,6 @@ sub compare_excel {
         my ($swap);
         for (my $row = $gotRowMin; $row <= $gotRowMax; $row++) {
             for (my $col = $gotColMin; $col <= $gotColMax; $col++) {
-                #my $gotData = $gotWorkSheet->{Cells}[$row][$col]->{Val};
-                #my $expData = $expWorkSheet->{Cells}[$row][$col]->{Val};
                 my $gotData = $got_sheet->cell($col, $row);
                 my $expData = $exp_sheet->cell($col, $row);
 
@@ -296,13 +296,16 @@ sub compare_excel {
                     }
 
                     if ((exists $rule->{swap_check})
-                        && defined($rule->{swap_check}) && ($rule->{swap_check})) {
+                        && defined($rule->{swap_check})
+                        && ($rule->{swap_check})) {
                         if ($status == 0) {
                             $error_on_sheet++;
                             push @{$swap->{exp}->{_number_to_letter($col)}}, $expData;
                             push @{$swap->{got}->{_number_to_letter($col)}}, $gotData;
 
-                            if (($error_on_sheet >= $error_limit) && ($error_on_sheet % 2 == 0) && !_is_swapping($swap)) {
+                            if (($error_on_sheet >= $error_limit)
+                                && ($error_on_sheet % 2 == 0)
+                                && !_is_swapping($swap)) {
                                 _log_message("ERROR: Max error per sheet reached.[$error_on_sheet]\n");
                                 return $status;
                             }
@@ -314,12 +317,17 @@ sub compare_excel {
                 }
             } # col
 
-            if (($error_on_sheet > 0) && ($error_on_sheet >= $error_limit) && ($error_on_sheet % 2 == 0) && !_is_swapping($swap)) {
+            if (($error_on_sheet > 0)
+                && ($error_on_sheet >= $error_limit)
+                && ($error_on_sheet % 2 == 0)
+                && !_is_swapping($swap)) {
                 return $status if ($status == 0);
             }
         } # row
 
-        if (exists($rule->{swap_check}) && defined($rule->{swap_check}) && ($rule->{swap_check})) {
+        if (exists($rule->{swap_check})
+            && defined($rule->{swap_check})
+            && ($rule->{swap_check})) {
             if (($error_on_sheet > 0) && _is_swapping($swap)) {
                 _log_message("WARN: SWAP OCCURRED.\n");
                 $status = 1;
@@ -374,8 +382,9 @@ likely support font and image comparisons.
 =head1 How to find out what failed the comparison?
 
 By turning the environment variable DEBUG ON would spit out PASS/FAIL comparison.
+For example:
 
-e.g. $ $DEBUG=1 perl your_script.pl
+    $/> $DEBUG=1 perl your-test-script.pl
 
 =cut
 
@@ -620,11 +629,11 @@ that I have just "gotten it wrong" in some places.
 
 =over 4
 
-=item H.Merijn Brand (author of Spreadsheet::Read).
+=item H.Merijn Brand (author of L<Spreadsheet::Read>).
 
-=item Kawai Takanori (author of Spreadsheet::ParseExcel::Utility).
+=item Kawai Takanori (author of L<Spreadsheet::ParseExcel::Utility>).
 
-=item Stevan Little  (author of Test::PDF).
+=item Stevan Little  (author of L<Test::PDF>).
 
 =back
 

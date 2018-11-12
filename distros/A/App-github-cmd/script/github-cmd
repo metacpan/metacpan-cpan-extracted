@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-10-10'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-11-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,7 +42,7 @@ github-cmd - Yet another github CLI
 
 =head1 VERSION
 
-This document describes version 0.004 of github-cmd (from Perl distribution App-github-cmd), released on 2018-10-10.
+This document describes version 0.005 of github-cmd (from Perl distribution App-github-cmd), released on 2018-11-08.
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,7 @@ configuration.
 
 =head1 DESCRIPTION
 
-B<EARLY RELEASE. More commands coming soon.>
+B<EARLY RELEASE. More subcommands coming soon.>
 
 This is yet another Github CLI, written in Perl using the L<Perinci::CmdLine>
 framework and L<Net::GitHub::V3> API client.
@@ -120,6 +120,8 @@ C<*> marks required options.
 
 =over
 
+=item B<--access-token>=I<s>
+
 =item B<--config-path>=I<filename>
 
 Set path to configuration file.
@@ -154,6 +156,8 @@ Set output format to json.
 
 Set log level.
 
+=item B<--login>=I<s>
+
 =item B<--naked-res>
 
 When outputing as JSON, strip result envelope.
@@ -183,6 +187,8 @@ Do not use any configuration file.
 
 Do not read environment for default options.
 
+=item B<--pass>=I<s>
+
 =item B<--quiet>
 
 Shortcut for --log-level=error.
@@ -209,15 +215,9 @@ Display program's version and exit.
 
 =over
 
-=item B<--access-token>=I<s>
-
 =item B<--description>=I<s>
 
 =item B<--homepage>=I<s>
-
-=item B<--login>=I<s>
-
-=item B<--pass>=I<s>
 
 =item B<--repo>=I<s>*
 
@@ -226,12 +226,6 @@ Display program's version and exit.
 =head2 Options for subcommand get-repo
 
 =over
-
-=item B<--access-token>=I<s>
-
-=item B<--login>=I<s>
-
-=item B<--pass>=I<s>
 
 =item B<--repo>=I<s>*
 
@@ -243,12 +237,6 @@ Display program's version and exit.
 
 =over
 
-=item B<--access-token>=I<s>
-
-=item B<--login>=I<s>
-
-=item B<--pass>=I<s>
-
 =item B<--user>=I<s>
 
 =back
@@ -257,13 +245,7 @@ Display program's version and exit.
 
 =over
 
-=item B<--access-token>=I<s>
-
 =item B<--detail>, B<-l>
-
-=item B<--login>=I<s>
-
-=item B<--pass>=I<s>
 
 =item B<--start>=I<s>
 
@@ -276,12 +258,6 @@ Default value:
 =head2 Options for subcommand repo-exists
 
 =over
-
-=item B<--access-token>=I<s>
-
-=item B<--login>=I<s>
-
-=item B<--pass>=I<s>
 
 =item B<--repo>=I<s>*
 
@@ -327,7 +303,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/github-cmd.conf>, F</home/u1/github-cmd.conf>, or F</etc/github-cmd.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/github-cmd.conf>, F</home/s1/github-cmd.conf>, or F</etc/github-cmd.conf>.
 
 All found files will be read and merged.
 
@@ -345,17 +321,17 @@ List of available configuration parameters:
 
 =head2 Common for all subcommands
 
+ access_token (see --access-token)
  format (see --format)
  log_level (see --log-level)
+ login (see --login)
  naked_res (see --naked-res)
+ pass (see --pass)
 
 =head2 Configuration for subcommand create-repo
 
- access_token (see --access-token)
  description (see --description)
  homepage (see --homepage)
- login (see --login)
- pass (see --pass)
  repo (see --repo)
 
 =head2 Configuration for subcommand delete-repo
@@ -363,46 +339,34 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand get-repo
 
- access_token (see --access-token)
- login (see --login)
- pass (see --pass)
  repo (see --repo)
  user (see --user)
 
 =head2 Configuration for subcommand get-user
 
- access_token (see --access-token)
- login (see --login)
- pass (see --pass)
  user (see --user)
 
 =head2 Configuration for subcommand list-repos
 
- access_token (see --access-token)
  detail (see --detail)
- login (see --login)
- pass (see --pass)
  start (see --start)
 
 =head2 Configuration for subcommand repo-exists
 
- access_token (see --access-token)
- login (see --login)
- pass (see --pass)
  repo (see --repo)
  user (see --user)
 
 =head1 ENVIRONMENT
 
-=head2 VAQWEP66WA_OPT => str
+=head2 JSWNCCFYPZ_OPT => str
 
 Specify additional command-line options.
 
 =head1 FILES
 
-F</home/u1/.config/github-cmd.conf>
+F</home/s1/.config/github-cmd.conf>
 
-F</home/u1/github-cmd.conf>
+F</home/s1/github-cmd.conf>
 
 F</etc/github-cmd.conf>
 

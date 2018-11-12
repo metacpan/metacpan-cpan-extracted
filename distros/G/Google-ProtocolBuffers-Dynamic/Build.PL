@@ -13,7 +13,7 @@ my %module_build_args = (
     "Module::Build" => "0.28"
   },
   "configure_requires" => {
-    "Alien::ProtoBuf" => "0.01",
+    "Alien::ProtoBuf" => "0.08",
     "Alien::uPB" => "0.06",
     "Module::Build" => "0.28",
     "Module::Build::WithXSpp" => "0.14"
@@ -23,7 +23,7 @@ my %module_build_args = (
     "Mattia Barbon <mattia\@barbon.org>"
   ],
   "dist_name" => "Google-ProtocolBuffers-Dynamic",
-  "dist_version" => "0.22",
+  "dist_version" => "0.23",
   "license" => "perl",
   "module_name" => "Google::ProtocolBuffers::Dynamic",
   "recursive_test_files" => 1,

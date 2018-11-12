@@ -23,8 +23,8 @@ server {
     keepalive_timeout         70;
     # root                      <: $www_root_dir :>; # TODO
 
-    error_log                 <: $data_dir :>nginx-error.log info;
-    access_log                <: $data_dir :>nginx-access.log default;
+    error_log                 <: $data_dir :>/nginx-error.log info;
+    access_log                <: $data_dir :>/nginx-access.log default;
 
     client_max_body_size      10M;
 

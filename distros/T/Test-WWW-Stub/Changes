@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-WWW-Stub
 
+0.08 2018-11-08T03:04:13Z
+    - Use registered patterns after sorting by length, to deal with hash randomization. (#20, thanks to papix)
+
 0.07 2017-03-14T01:52:26Z
     - Fix a bug where handler would not override (#18, thanks to akiym)
     - Fix missing prereqs as reported by CPANTS. (#15, thanks to manwar)

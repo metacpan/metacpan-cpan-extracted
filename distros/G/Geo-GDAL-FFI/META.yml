@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Alien::gdal: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,8 +24,9 @@ requires:
   Alien::gdal: '0'
   FFI::Platypus: '0'
   PDL: '0'
-  PkgConfig: '0'
+  PkgConfig: '0.23026'
 resources:
+  bugtracker: https://github.com/ajolma/Geo-GDAL-FFI/issues/
   repository: git://github.com/ajolma/Geo-GDAL-FFI.git
-version: 0.0503
+version: 0.0601
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

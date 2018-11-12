@@ -4,34 +4,32 @@ use Pcore -class;
 use Pod::Markdown;
 use Pcore::API::SCM;
 
-has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'], required => 1 );
+has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
 around new => sub ( $orig, $self, $args ) {
-    return if !-d $args->{dist}->root . 'wiki/';
+    return if !-d "$args->{dist}->{root}/wiki";
 
     return $self->$orig($args);
 };
 
 sub run ($self) {
-    my $chdir_guard = P->file->chdir( $self->dist->root );
+    my $chdir_guard = P->file->chdir( $self->{dist}->{root} );
 
-    my $wiki_path = P->path('wiki/')->realpath;
+    my $wiki_path = P->path('wiki')->to_abs;
 
     my $scm = Pcore::API::SCM->new($wiki_path);
 
     my $upstream = $scm->upstream;
 
-    my $base_url = qq[/$upstream->{repo_id}/wiki/];
+    my $base_url = "/$upstream->{repo_id}/wiki";
 
-    P->file->rmtree( $wiki_path . 'POD/' );
+    P->file->rmtree("$wiki_path/POD");
 
     my $toc = {};
 
     # scan lib/ for .pm files
-    for my $path ( ( P->path1('lib')->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
-        $path = P->path($path);
-
-        if ( $path->suffix eq 'pm' ) {
+    for my $path ( ( P->path('lib')->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
+        if ( $path->{suffix} eq 'pm' ) {
             my $parser = Pod::Markdown->new(
                 perldoc_url_prefix       => $base_url,
                 perldoc_fragment_format  => 'pod_simple_html',    # CodeRef ( $self, $text )
@@ -54,7 +52,7 @@ sub run ($self) {
                 my $markdown = <<"MD";
 **!!! DO NOT EDIT. This document is generated automatically. !!!**
 
-back to **[INDEX](${base_url}POD)**
+back to **[INDEX]($base_url/POD)**
 
 **TABLE OF CONTENT**
 
@@ -64,11 +62,11 @@ $pod_markdown
 MD
 
                 # write markdown to the file
-                P->file->mkpath( $wiki_path . 'POD/' . $path->dirname );
+                P->path("$wiki_path/POD/$path->{dirname}")->mkpath;
 
-                $toc->{ $path->dirname . $path->filename_base } = $module->abstract;
+                $toc->{ P->path("$path->{dirname}/$path->{filename_base}") } = $module->abstract;
 
-                P->file->write_text( $wiki_path . 'POD/' . $path->dirname . $path->filename_base . q[.md], { crlf => 0 }, \$markdown );
+                P->file->write_text( "$wiki_path/POD/$path->{dirname}/$path->{filename_base}.md", { crlf => 0 }, \$markdown );
             }
         }
     }
@@ -81,7 +79,7 @@ MD
     for my $link ( sort keys $toc->%* ) {
         my $package_name = $link =~ s[/][::]smgr;
 
-        $toc_md .= "**[${package_name}](${base_url}POD/${link})**";
+        $toc_md .= "**[$package_name]($base_url/POD/$link)**";
 
         # add abstract
         $toc_md .= " - $toc->{$link}" if $toc->{$link};
@@ -90,7 +88,7 @@ MD
     }
 
     # write POD.md
-    P->file->write_text( $wiki_path . 'POD.md', { crlf => 0 }, \$toc_md );
+    P->file->write_text( "$wiki_path/POD.md", { crlf => 0 }, \$toc_md );
 
     say keys( $toc->%* ) + 1 . ' wiki page(s) were generated';
 
@@ -111,7 +109,7 @@ MD
         say $res;
 
         if ( !$res ) {
-            goto PUSH_WIKI if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
+            goto PUSH_WIKI if P->term->prompt( 'Repeat?', [qw[yes no]], enter => 1 ) eq 'yes';
         }
     }
 
@@ -125,7 +123,7 @@ MD
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 95                   | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
+## |    3 | 93                   | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

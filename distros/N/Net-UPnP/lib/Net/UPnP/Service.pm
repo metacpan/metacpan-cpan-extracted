@@ -143,7 +143,7 @@ sub getposturl() {
 	#print "$url_base\n";
 	#print "$ctrl_url\n";
 		
-	unless ($ctrl_url =~ m/http:\/\/(.*)/i) {
+	unless ($ctrl_url =~ m{http://(.*)}i) {
 		if (0 < length($url_base)) {
 			# Thanks for Thus0 (2005/01/12)
 			if (rindex($url_base, '/') == (length($url_base)-1) && index($ctrl_url, '/') == 0) {
@@ -153,11 +153,12 @@ sub getposturl() {
 			}
 		}
 		else {
-			if ($location_url =~ m/http:\/\/([0-9a-z.]+)[:]*([0-9]*)\/(.*)/i) {
+			if ($location_url =~ m{http://([0-9a-z.-]+)(?::(\d+))?/(.*)}i) {
+                                my $port = $2 || 80;
 				if (defined($3) && 0 < length($3)) {
-					$ctrl_url = "http:\/\/" . $1 . ":" . $2 . $ctrl_url;
+					$ctrl_url = 'http://' . $1 . ":" . $port . $ctrl_url;
 				} else {
-					$ctrl_url = "http:\/\/" . $1 . ":" . $2 . "\/" . $ctrl_url;
+					$ctrl_url = 'http://' . $1 . ":" . $port . '/' . $ctrl_url;
 				}
 			} else {
 				$ctrl_url = $location_url .  $ctrl_url;
@@ -198,23 +199,23 @@ sub postaction() {
 	$ctrl_url = $this->getcontrolurl();
 	$ctrl_url = $this->getposturl($ctrl_url);
 	
-	unless ($ctrl_url =~ m/http:\/\/([0-9a-z.]+)[:]*([0-9]*)\/(.*)/i) {
+	unless ($ctrl_url =~ m{http://([0-9a-z.-]+)(?::(\d+))?/(.*)}i) {
 		#print "Invalid URL : $ctrl_url\n";
 		$post_res = Net::UPnP::HTTPResponse->new();
 		$action_res->sethttpresponse($post_res);
 		return $action_res;
 	}
 	$post_addr = $1;
-	$post_port = $2;
+	$post_port = $2 || 80;
 	if (index($3, '/') == 0) {
 		$post_path = $3;
 	}
 	else {
-		$post_path = "\/" . $3;
+		$post_path = '/' . $3;
 	}
 
 	$service_type = $this->getservicetype();
-	$soap_action = "\"" . $service_type . "#" . $action_name . "\"";
+	$soap_action = '"' . $service_type . '#' . $action_name . '"';
 
 
 $soap_content = <<"SOAP_CONTENT";
@@ -285,23 +286,23 @@ sub postquery() {
 	$ctrl_url = $this->getcontrolurl();
 	$ctrl_url = $this->getposturl($ctrl_url);
 	
-	unless ($ctrl_url =~ m/http:\/\/([0-9a-z.]+)[:]*([0-9]*)\/(.*)/i) {
-		#print "Invalid URL : $ctrl_url\n";
+        print "ctrl_url=$ctrl_url\n" if ($Net::UPnP::DEBUG);
+	unless ($ctrl_url =~ m{http://([0-9a-z.-]+)(?::(\d+))?/(.*)}i) {
 		$post_res = Net::UPnP::HTTPResponse->new();
 		$query_res->sethttpresponse($post_res);
 		return $query_res;
 	}
 	$post_addr = $1;
-	$post_port = $2;
+	$post_port = $2 || 80;
 	if (index($3, '/') == 0) {
 		$post_path = $3;
 	}
 	else {
-		$post_path = "\/" . $3;
+		$post_path = '/' . $3;
 	}
-	
 	$service_type = $this->getservicetype();
-	$soap_action = "\"urn:schemas-upnp-org:control-1-0#QueryStateVariable\"";
+	$soap_action = '"urn:schemas-upnp-org:control-1-0#QueryStateVariable"';
+
 
 $soap_content = <<"SOAP_CONTENT";
 <?xml version=\"1.0\" encoding=\"utf-8\"?>

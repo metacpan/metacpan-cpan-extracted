@@ -7,19 +7,19 @@ use Pcore::API::SCM::Const qw[:ALL];
 use Pcore::API::SCM;
 use Pcore::API::SCM::Upstream;
 
-has base_path      => ( is => 'ro', isa => Str, required => 1 );
-has dist_namespace => ( is => 'ro', isa => Str, required => 1 );    # Dist::Name
-has dist_name      => ( is => 'ro', isa => Str, required => 1 );    # Dist-Name
-has tmpl           => ( is => 'ro', isa => Str, required => 1 );    # Dist-Name
+has base_path      => ( required => 1 );    # Str
+has dist_namespace => ( required => 1 );    # Str, Dist::Name
+has dist_name      => ( required => 1 );    # Str, Dist-Name
+has tmpl           => ( required => 1 );    # Str, Dist-Name
 
-has upstream_hosting => ( is => 'ro', isa => Enum [ $SCM_HOSTING_BITBUCKET, $SCM_HOSTING_GITHUB ], default => $SCM_HOSTING_BITBUCKET );
-has is_private => ( is => 'ro', isa => Bool, default => 0 );
-has upstream_scm_type => ( is => 'ro', isa => Enum [ $SCM_TYPE_HG, $SCM_TYPE_GIT ], default => $SCM_TYPE_HG );
-has local_scm_type    => ( is => 'ro', isa => Enum [ $SCM_TYPE_HG, $SCM_TYPE_GIT ], default => $SCM_TYPE_HG );
-has upstream_repo_namespace => ( is => 'ro', isa => Maybe [Str] );
+has upstream_hosting        => $SCM_HOSTING_BITBUCKET;    # Enum [ $SCM_HOSTING_BITBUCKET, $SCM_HOSTING_GITHUB ]
+has is_private              => 0;                         # Bool
+has upstream_scm_type       => $SCM_TYPE_HG;              # Enum [ $SCM_TYPE_HG, $SCM_TYPE_GIT ]
+has local_scm_type          => $SCM_TYPE_HG;              # Enum [ $SCM_TYPE_HG, $SCM_TYPE_GIT ]
+has upstream_repo_namespace => ();                        # Maybe [Str]
 
-has target_path => ( is => 'lazy', isa => Str,     init_arg => undef );
-has tmpl_params => ( is => 'lazy', isa => HashRef, init_arg => undef );
+has target_path => ( is => 'lazy', init_arg => undef );   # Str
+has tmpl_params => ( is => 'lazy', init_arg => undef );   # HashRef
 
 sub BUILDARGS ( $self, $args ) {
     $args->{dist_namespace} =~ s/-/::/smg;
@@ -29,7 +29,7 @@ sub BUILDARGS ( $self, $args ) {
 }
 
 sub _build_target_path ($self) {
-    return P->path( $self->base_path, is_dir => 1 )->realpath->to_string . lc $self->{dist_name};
+    return P->path( $self->{base_path} )->to_abs . '/' . lc $self->{dist_name};
 }
 
 sub _build_tmpl_params ($self) {
@@ -100,7 +100,7 @@ sub run ($self) {
     $files->move_tree( '\Alib/__dist_path__', 'lib/' . $self->{dist_name} =~ s[-][/]smgr );
 
     # rename dist cfg template
-    $files->move_file( "share/_dist_.$Pcore::Core::Const::DIST_CFG_TYPE", "share/dist.$Pcore::Core::Const::DIST_CFG_TYPE" );
+    $files->move_file( "share/_dist_.yaml", "share/dist.yaml" );
 
     $files->render_tmpl($tmpl_params);
 
@@ -157,6 +157,16 @@ sub _create_upstream_repo ($self) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 103                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

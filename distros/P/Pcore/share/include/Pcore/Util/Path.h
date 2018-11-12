@@ -8,14 +8,32 @@ typedef struct {
 
     // path
     size_t path_len;
-	U8 *path;
+    char *path;
 
     // volume
     size_t volume_len;
-    U8 *volume;
+    char *volume;
+
+    // dirname
+    size_t dirname_len;
+    char *dirname;
+
+    // filename
+    size_t filename_len;
+    char *filename;
+
+    // filename_base
+    size_t filename_base_len;
+    char *filename_base;
+
+    // suffix
+    size_t suffix_len;
+    char *suffix;
 } PcoreUtilPath;
 
-PcoreUtilPath *normalize (U8 *buf, size_t buf_len);
+void destroyPcoreUtilPath (PcoreUtilPath *path);
+
+PcoreUtilPath *parse (const char *buf, size_t buf_len);
 
 # include "Pcore/Util/Path.c"
 

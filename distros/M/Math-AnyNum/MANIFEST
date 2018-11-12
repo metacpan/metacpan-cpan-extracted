@@ -14,12 +14,14 @@ examples/fibonacci.pl
 examples/fibonacci_validation.pl
 examples/halley_s_method.pl
 examples/inverse_of_factorial.pl
+examples/inverse_of_fibonacci.pl
 examples/is_power.pl
 examples/krzysztof_reformulated_zeta_function.pl
 examples/lambert_W.pl
 examples/mandelbrot_set.pl
 examples/miller_rabin_primality_test.pl
 examples/newton_s_method.pl
+examples/partial_sums_of_sigma_function.pl
 examples/pi_machin.pl
 examples/PSW_primality_test.pl
 examples/rsa_algorithm.pl

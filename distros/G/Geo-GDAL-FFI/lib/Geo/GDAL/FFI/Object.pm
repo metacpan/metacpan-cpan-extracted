@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 0.05_03;
+our $VERSION = 0.0601;
 
 sub GetDescription {
     my $self = shift;
@@ -14,7 +14,7 @@ sub GetDescription {
 sub HasCapability {
     my ($self, $cap) = @_;
     my $tmp = $Geo::GDAL::FFI::capabilities{$cap};
-    confess "Unknown constant: $cap\n" unless defined $tmp;
+    confess "Unknown capability: $cap." unless defined $tmp;
     my $md = $self->GetMetadata('');
     return $md->{'DCAP_'.$cap};
 }
@@ -59,6 +59,7 @@ sub SetMetadata {
             $csl = Geo::GDAL::FFI::CSLAddString($csl, "$name=$metadata->{$name}");
         }
         my $err = Geo::GDAL::FFI::GDALSetMetadata($$self, $csl, $domain);
+        Geo::GDAL::FFI::CSLDestroy($csl);
         confess Geo::GDAL::FFI::error_msg() if $err == $Geo::GDAL::FFI::Failure;
         warn Geo::GDAL::FFI::error_msg() if $err == $Geo::GDAL::FFI::Warning;
     }

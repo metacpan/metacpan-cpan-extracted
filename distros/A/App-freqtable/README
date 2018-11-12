@@ -3,8 +3,8 @@ NAME
     lines/words/characters/bytes/numbers
 
 VERSION
-    This document describes version 0.001 of App::freqtable (from Perl
-    distribution App-freqtable), released on 2018-07-07.
+    This document describes version 0.002 of App::freqtable (from Perl
+    distribution App-freqtable), released on 2018-11-12.
 
 SYNOPSIS
     See the command-line script freqtable.

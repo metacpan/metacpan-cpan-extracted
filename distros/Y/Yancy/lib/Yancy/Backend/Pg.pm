@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '1.012';
+our $VERSION = '1.014';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -105,6 +105,12 @@ our $VERSION = '1.012';
 #pod         },
 #pod     }
 #pod
+#pod =head2 Ignored Tables
+#pod
+#pod By default, this backend will ignore some tables when using
+#pod C<read_schema>: C<mojo_migrations> and all the tables used by the
+#pod L<Minion::Backend::Pg> Minion backend.
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<Mojo::Pg>, L<Yancy>
@@ -118,6 +124,13 @@ BEGIN {
     eval { require Mojo::Pg; Mojo::Pg->VERSION( 4.03 ); 1 }
         or die "Could not load Pg backend: Mojo::Pg version 4.03 or higher required\n";
 }
+
+our %IGNORE_TABLE = (
+    mojo_migrations => 1,
+    minion_jobs => 1,
+    minion_workers => 1,
+    minion_locks => 1,
+);
 
 has pg =>;
 has collections =>;
@@ -276,8 +289,11 @@ ENDQ
         $keys{ $table } = \@keys;
         #; use Data::Dumper;
         #; say Dumper \@keys;
-        if ( @keys && $keys[0]{column_name} ne 'id' ) {
+        if ( @keys && !grep { $_->{column_name} eq 'id' } @keys ) {
             $schema{ $table }{ 'x-id-field' } = $keys[0]{column_name};
+        }
+        if ( $IGNORE_TABLE{ $table } ) {
+            $schema{ $table }{ 'x-ignore' } = 1;
         }
     }
 
@@ -342,7 +358,7 @@ sub _map_type {
     }
 
     if ( $column->{is_nullable} eq 'YES' && $db_type ne 'oid'
-        && ( !$key || $key->{constraint_type} ne 'PRIMARY KEY' )
+        && ( !$key || !$key->{constraint_type} || $key->{constraint_type} ne 'PRIMARY KEY' )
     ) {
         $conf{ type } = [ $conf{ type }, 'null' ];
     }
@@ -362,7 +378,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 1.012
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -465,6 +481,12 @@ You could map that schema to the following collections:
             },
         },
     }
+
+=head2 Ignored Tables
+
+By default, this backend will ignore some tables when using
+C<read_schema>: C<mojo_migrations> and all the tables used by the
+L<Minion::Backend::Pg> Minion backend.
 
 =head1 SEE ALSO
 

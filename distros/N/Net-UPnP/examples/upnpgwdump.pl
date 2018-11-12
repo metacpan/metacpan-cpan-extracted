@@ -27,7 +27,7 @@ foreach $dev (@dev_list) {
 	print "\tExternalIPAddress = " . $gwdev->getexternalipaddress() . "\n";
 	print "\tPortMappingNumberOfEntries = " . $gwdev->getportmappingnumberofentries() . "\n";
 	print "\tTotalBytesRecived = " . $gwdev->gettotalbytesrecieved() . "\n";
-	@port_mapping = $gwdev->getportmappingentry();
+	@port_mapping = $gwdev->getportmappingentries();
 	$port_num = 0;
 	foreach $port_entry (@port_mapping) {
 		if ($port_entry) {

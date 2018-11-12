@@ -1,5 +1,6 @@
 use 5.010;
 use alienfile;
+use Sort::Versions;
 
 #  add existing alien files to path etc
 #  not very elegant...
@@ -7,17 +8,16 @@ use alienfile;
 #  it looks to be already noted in https://github.com/Perl5-Alien/Alien-Build/issues/12
 #  might also be able to access via old hash via https://metacpan.org/pod/Alien::Build#install_prop
 my $have_alien_gdal = eval 'require Alien::gdal';
-if (0 && $have_alien_gdal) {
+if (0 && $have_alien_gdal && Alien::gdal->install_type eq 'share') {
     my $ag_version = Alien::gdal->version;
     say "Found existing gdal via alien ($ag_version) in " .  Alien::gdal->dist_dir;
-    #say -e Alien::gdal->dist_dir . '/lib/pkgconfig/' . 'gdal.pc';
     #  append the relevant path
     my $sep = ($^O =~ /mswin/i) ? ';' : ':';
     $ENV{PKG_CONFIG_PATH}
       = Alien::gdal->dist_dir . '/lib/pkgconfig/'
       . $sep
       . ($ENV{PKG_CONFIG_PATH} // '');
-    $ENV{PATH} = Alien::gdal->dist_dir . '/bin' . $sep . $ENV{PATH};
+    $ENV{PATH} = Alien::gdal->bin_dir . $sep . $ENV{PATH};
 }
 
 use Cwd;
@@ -37,45 +37,50 @@ plugin 'PkgConfig' => (
 
 share {
 
+  my $with_local = '';
+  my $with_cpp11 = '';
+
+  start_url 'http://download.osgeo.org/gdal/CURRENT';
+  #start_url "file://$base_dir";  #  debug
   plugin Download => (
-    url     => 'http://download.osgeo.org/gdal/CURRENT',
+    filter  => qr/^gdal-([0-9\.]+)\.tar\.gz$/,
     version => qr/^gdal-([0-9\.]+)\.tar\.gz$/,
   );
 
-  plugin Extract => 'tar.gz';
+  my $gdal_version = get_gdal_version() // 'not yet defined';
+  say "Downloaded gdal version is $gdal_version";
   
-  if ($^O =~ /mswin/i) {
-    #  fix known issue in 2.2.3, but need to make this more conditional
-    #  as it should be fixed in 2.2.4
-    #  Update 2018-04-07: It is not fixed in 2.2.4.
-    patch [
-      '%{patch} --verbose port/cpl_port.h < ' . $patch_file_isnan,
-    ];
-  }
-  elsif ($^O =~ /freebsd/i) {
-    #  make sure we run a shared install on freebsd by default
-    patch [
-      '%{patch} configure < ' . $patch_file_configure,
-    ];
+  plugin Extract => (format => 'tar.gz');
+
+  if (versioncmp($gdal_version, '2.3.0') == -1) {
+    if ($^O =~ /mswin/i) {
+      #  fix known issue in 2.2.3, harmless in 2.2.4.
+      patch [
+        '%{patch} port/cpl_port.h < ' . $patch_file_isnan,
+      ];
+    }
+    elsif ($^O =~ /freebsd/i) {
+      #  make sure we run a shared install on freebsd by default
+      #  (before libtool files were updated for gdal 2.3.0)
+      patch [
+        '%{patch} configure < ' . $patch_file_configure,
+      ];
+      $with_cpp11 = ' --without-cpp11 ';  #  issues with cad lib pre 2.3.0
+    }
   }
 
   plugin 'Build::Autoconf' => ();
 
   my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
   $build_static = '';
-  $build_static = '--enable-static=no';  #  override
+  $build_static = '--enable-static=no';  #  override - HUGE files if static
   $build_static = '' if $ENV{FORCE_DYNAMIC};
   
-  my $with_local = '';
-  my $with_cpp11 = '';
   
   if ($^O =~ /bsd/) {
-    #print "bsd OS detected, using gmake for make phase\n";
-    #$make_cmd = 'gmake';
     plugin 'Build::Make' => 'gmake';
-    $with_cpp11 = ' --without-cpp11 ';
     if (-d '/usr/local') {
-        $with_local = '--with-local=/usr/local';
+        $with_local = ' --with-local=/usr/local ';
     }
   }
   elsif ($^O =~ /dragonfly/) {
@@ -85,31 +90,55 @@ share {
   }
 
   my $make_cmd = '%{make}';
+  my $make_inst_cmd = '%{make} install';
   my @make_clean;
-  #  try not to fill up the cpan-testers disk space
-  if ($ENV{PERL_CPAN_REPORTER_DIR} || $ENV{AUTOMATED_TESTING}) {
-    print "Running under automated testing\n";
-    $make_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
+  #  try not to exceed the cpan-testers log limits
+  if ($ENV{PERL_CPAN_REPORTER_DIR} || $ENV{PERL_CPAN_REPORTER_CONFIG} || $ENV{AUTOMATED_TESTING} || $ENV{TRAVIS} || $ENV{APPVEYOR}) {
+    say "Running under CI or automated testing";
+    $make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
+    $make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type install.log/;
     if (not $^O =~ /mswin/i) {
         $make_cmd =~ s/%%/%/;
         $make_cmd =~ s/type/cat/;
         $make_cmd =~ s/"/'/g;
+        $make_inst_cmd =~ s/%%/%/;
+        $make_inst_cmd =~ s/type/cat/;
+        $make_inst_cmd =~ s/"/'/g;
     }
-    push @make_clean, '%{make} clean';
+    if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
+        push @make_clean, '%{make} clean';
+    }
+    #  clean up the build dir on cpan testers etc
+    #after 'build' => \&cleanse_build_dir;
+    plugin 'Cleanse::BuildDir';
   }
   
-  # the build step is only necessary if you need to customize the
-  # options passed to ./configure.  The default set by the
-  # Build::Autoconf plugin is frequently sufficient.
   build [
-    '%{configure} --with-libtiff=internal ' . $with_local . $with_cpp11 . $build_static,
+    "%{configure} --with-libtiff=internal $with_local $with_cpp11 $build_static",
     $make_cmd,
     \&patch_pkgconfig,
-    '%{make} install',
+    $make_inst_cmd,
     @make_clean
   ];
 
 };
+
+
+#sub cleanse_build_dir {
+##return;
+#    use Cwd qw /getcwd/;
+#    use File::Path qw /remove_tree/;
+#    my $wd = getcwd();
+#    say "Cleansing build dir, currently in: $wd";
+#
+#    if ($wd =~ '_alien' and $wd =~ /\b(gdal-[0-9\.]+)$/) {
+#        my $build_dir = $1;
+#        chdir '..';
+#        if (remove_tree ($build_dir, {safe => 1})) {
+#            say "Removed $build_dir";
+#        }
+#    }
+#}
 
 
 sub patch_pkgconfig {
@@ -158,7 +187,7 @@ sub patch_pkgconfig {
         foreach my $line (@pkg_conf) {
             if ($line =~ /^CONFIG_INST_LIBS/) {
                 chomp $line;
-                $line .= ' ' . $dep_libs . "\n";
+                $line .= " $dep_libs\n";
             }
             print {$pk_fh} $line;
         }
@@ -166,3 +195,23 @@ sub patch_pkgconfig {
     }
 }
 
+sub get_gdal_version {
+    my $h = get_alien_state_hash();
+    return $h->{runtime}{version};
+}
+
+sub get_alien_state_hash {
+    use JSON::PP;
+    my $root = "$base_dir/_alien";
+    my $f = "$root/state.json";
+    my $h = {};
+    if (-e $f) {
+        open my $fh, '<', $f or die $!;
+        my $d = do {
+            local $/ = undef;
+            <$fh>;
+        };
+        $h = JSON::PP::decode_json($d);
+    }
+    return $h;
+}

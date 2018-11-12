@@ -21,17 +21,16 @@ close $fh;
 sub create_http_body {
     my $binary_string = shift;
     my $length = length($binary_string);
-    $binary_string =~ s/\n/\n         /sg;
+    my $spaces = ' ' x length('Content: ');
+    $binary_string =~ s/\n/\n$spaces/sg;
     $binary_string .= "\n\n";
     my $body = <<"EOF";
 id: 873
-Subject:
-Creator: 12
+Subject: \nCreator: 12
 Created: 2013-11-06 07:15:36
 Transaction: 1457
 Parent: 871
-MessageId:
-Filename: prova2.png
+MessageId: \nFilename: prova2.png
 ContentType: image/png
 ContentEncoding: base64
 

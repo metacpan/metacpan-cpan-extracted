@@ -96,7 +96,7 @@ sub encode_data ( $type, $data, @ ) {
     if ( $args{compress} ) {
         if ( bytes::length $res->$* >= $args{compress_threshold} ) {
             if ( $args{compress} == $DATA_COMPRESS_ZLIB ) {
-                state $init = !!require Compress::Zlib;
+                require Compress::Zlib;
 
                 $res = \Compress::Zlib::compress( $res->$* );
             }
@@ -121,7 +121,7 @@ sub encode_data ( $type, $data, @ ) {
         }
 
         if ( defined $secret ) {
-            state $init = !!require Crypt::CBC;
+            require Crypt::CBC;
 
             $res = \Crypt::CBC->new(
                 -key    => $secret,
@@ -213,7 +213,7 @@ sub decode_data ( $type, @ ) {
         }
 
         if ( defined $secret ) {
-            state $init = !!require Crypt::CBC;
+            require Crypt::CBC;
 
             $data_ref = \Crypt::CBC->new(
                 -key    => $secret,
@@ -226,7 +226,7 @@ sub decode_data ( $type, @ ) {
     # decompress
     if ( $args{compress} ) {
         if ( $args{compress} == $DATA_COMPRESS_ZLIB ) {
-            state $init = !!require Compress::Zlib;
+            require Compress::Zlib;
 
             $data_ref = \Compress::Zlib::uncompress($data_ref);
 
@@ -272,7 +272,7 @@ sub decode_data ( $type, @ ) {
 
 # PERL
 sub to_perl ( $data, %args ) {
-    state $init = !!require Data::Dumper;
+    require Data::Dumper;    ## no critic qw[Modules::ProhibitEvilModules]
 
     state $sort_keys = sub {
         return [ nsort keys $_[0]->%* ];
@@ -308,18 +308,14 @@ sub to_perl ( $data, %args ) {
     }
 
     if ( $args{readable} ) {
-        state $init1 = !!require Pcore::Src::File;
-
-        $res = Pcore::Src::File->new( {
-            action      => $Pcore::Src::SRC_DECOMPRESS,
-            path        => 'config.perl',                 # mark file as perl config
-            is_realpath => 0,
-            in_buffer   => $res,
-            filter_args => {
+        $res = \P->src->decompress(
+            path   => 'config.perl',    # mark file as perl config
+            data   => $res->$*,
+            filter => {
                 perl_tidy   => '--comma-arrow-breakpoints=0',
                 perl_critic => 0,
-            },
-        } )->run->out_buffer;
+            }
+        )->{data};
     }
 
     return $res;
@@ -347,7 +343,7 @@ CODE
 
 # JSON
 sub get_json ( @args ) {
-    state $init = !!require Cpanel::JSON::XS;
+    require Cpanel::JSON::XS;    ## no critic qw[Modules::ProhibitEvilModules]
 
     my %args = (
         allow_nonref    => 1,    # allow scalars
@@ -373,7 +369,7 @@ sub to_json ( $data, %args ) {
         return \get_json(%args)->encode($data);
     }
     elsif ($readable) {
-        state $json = get_json( utf8 => 1, canonical => 1, indent => 1, space_after => 1 );
+        state $json = get_json( utf8 => 1, canonical => 1, indent => 1, indent_length => 4, space_after => 1 );
 
         return \$json->encode($data);
     }
@@ -397,7 +393,7 @@ sub from_json ( $data, %args ) {
 
 # CBOR
 sub get_cbor ( @args ) {
-    state $init = !!require CBOR::XS;
+    require CBOR::XS;
 
     my %args = (
         max_depth      => 512,
@@ -433,28 +429,28 @@ sub from_cbor ( $data, @ ) {
 
 # YAML
 sub to_yaml ( $data, @ ) {
-    state $init = !!require YAML::XS;
+    require YAML::XS;
 
     local $YAML::XS::UseCode  = 0;
     local $YAML::XS::DumpCode = 0;
-    local $YAML::XS::LoadCode = 0;
+    local $YAML::XS::Indent   = 4;
 
     return \YAML::XS::Dump($data);
 }
 
 sub from_yaml ( $data, @ ) {
-    state $init = !!require YAML::XS;
+    require YAML::XS;
 
-    local $YAML::XS::UseCode  = 0;
-    local $YAML::XS::DumpCode = 0;
-    local $YAML::XS::LoadCode = 0;
+    local $YAML::XS::LoadBlessed = 0;
+    local $YAML::XS::UseCode     = 0;
+    local $YAML::XS::LoadCode    = 0;
 
     return YAML::XS::Load( is_plain_scalarref $data ? $data->$* : $data );
 }
 
 # XML
 sub get_xml (@args) {
-    state $init = !!require XML::Hash::XS;
+    require XML::Hash::XS;
 
     my %args = (
         buf_size => 4096,         # buffer size for reading end encoding data
@@ -582,27 +578,27 @@ sub from_ini ( $data, @ ) {
 
 # BASE64
 sub to_b64 {
-    state $init = !!require MIME::Base64;
+    require MIME::Base64;    ## no critic qw[Modules::ProhibitEvilModules]
 
     return &MIME::Base64::encode_base64;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }
 
 sub to_b64_url {
-    state $init = !!require MIME::Base64;
+    require MIME::Base64;                   ## no critic qw[Modules::ProhibitEvilModules]
 
-    return &MIME::Base64::encode_base64url;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    return &MIME::Base64::encode_base64url; ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }
 
 sub from_b64 {
-    state $init = !!require MIME::Base64;
+    require MIME::Base64;                   ## no critic qw[Modules::ProhibitEvilModules]
 
-    return &MIME::Base64::decode_base64;       ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    return &MIME::Base64::decode_base64;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }
 
 sub from_b64_url {
-    state $init = !!require MIME::Base64;
+    require MIME::Base64;                   ## no critic qw[Modules::ProhibitEvilModules]
 
-    return &MIME::Base64::decode_base64url;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
+    return &MIME::Base64::decode_base64url; ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }
 
 # XOR
@@ -1045,10 +1041,10 @@ sub from_uri_query_utf8 : prototype($) ($uri) {
 ## |      | 159                  | * Subroutine "decode_data" with high complexity score (27)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
-## |      | 364, 417             | * Postfix control "for" used                                                                                   |
-## |      | 625                  | * Postfix control "while" used                                                                                 |
+## |      | 360, 413             | * Postfix control "for" used                                                                                   |
+## |      | 621                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 960                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 956                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

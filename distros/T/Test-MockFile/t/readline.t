@@ -80,15 +80,38 @@ close $fh_real;
     unlink $filename;
 }
 
-my $missing_error = 'No such file or directory';
 undef $fh;
 is( open( $fh, '<', $filename ), undef, qq{Can't open a missing file "$filename"} );
 is( $! + 0, ENOENT, 'What $! looks like when failing to open the missing file.' );
 
-note "-------------- MOCK MODE --------------";
-my $baz = Test::MockFile->file($filename);
-is( open( $fh, '<', $filename ), undef, qq{Can't open a missing file "$filename"} );
-is( $! + 0, ENOENT, 'What $! looks like when failing to open the missing file.' );
+{
+    note "-------------- MOCK MODE --------------";
+    my $baz = Test::MockFile->file($filename);
+    is( open( my $fh, '<', $filename ), undef, qq{Can't open a missing file "$filename"} );
+    is( $! + 0, ENOENT, 'What $! looks like when failing to open the missing file.' );
+}
+
+#### Slurp
+
+my $multiline      = "abc\ndef\nghi\r\ndhdbhjdb\r";
+my $mock_multiline = reverse "abc\ndef\nghi\r\ndhdbhjdb\r";
+open( $fh, ">", $filename ) or die;
+print $fh $multiline;
+close $fh;
+
+sub slurp {
+    open( my $fh, '<', $filename ) or die("Failed to open slurp file: $!");
+    my $content = do { local $/; <$fh> };
+    close $fh;
+    return $content;
+}
+
+{
+    note "---------------------------------------";
+    is( slurp(), $multiline, "REAL multiline do slurp works" );
+    my $baz = Test::MockFile->file( $filename, $mock_multiline );
+    is( slurp(), $mock_multiline, "MOCK multiline do slurp works" );
+}
 
 done_testing();
 

@@ -4,13 +4,13 @@
       "Clay Fouts <cfouts@khephera.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MARC-Field-Normalize-NACO",
    "no_index" : {
@@ -26,12 +26,12 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.039"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.16",
+            "Dist::Milla" : "v1.0.20",
             "Test::Pod" : "1.41"
          }
       },
@@ -44,7 +44,6 @@
          "requires" : {
             "List::MoreUtils" : "0",
             "MARC::Record" : "0",
-            "Method::Signatures" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -61,10 +60,13 @@
          "web" : "https://github.com/ctfliblime/MARC-Field-Normalize-NACO"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
-      "Clay Fouts <cfouts@liblime.com>"
+      "Clay Fouts <cfouts@liblime.com>",
+      "Clay Fouts <cfouts@ptfs.com>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.02"
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07",
+   "x_static_install" : 1
 }
 

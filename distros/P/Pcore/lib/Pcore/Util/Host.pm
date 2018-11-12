@@ -14,7 +14,8 @@ use overload    #
   },
   fallback => undef;
 
-has name                 => ( is => 'ro',   required => 1 );
+has name => ( required => 1 );
+
 has name_utf8            => ( is => 'lazy', init_arg => undef );
 has is_ip                => ( is => 'lazy', init_arg => undef );
 has is_ipv4              => ( is => 'lazy', init_arg => undef );
@@ -390,7 +391,7 @@ sub _build_root_label_utf8 ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 303                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 304                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

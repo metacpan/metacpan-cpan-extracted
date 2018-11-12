@@ -8,14 +8,14 @@ use overload    #
   },
   fallback => undef;
 
-has app   => ( required => 1 );    # ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
-has hosts => ( required => 1 );    # ( is => 'ro', isa => HashRef, required => 1 );
+has app   => ( required => 1 );    # ConsumerOf ['Pcore::App']
+has hosts => ( required => 1 );    # HashRef
 
-has map           => ();           # ( is => 'ro', isa => HashRef, init_arg => undef );    # router path -> class name
-has host_api_path => ();           # ( is => 'ro', isa => HashRef, init_arg => undef );
+has map           => ();           # HashRef, router path -> class name
+has host_api_path => ();           # HashRef
 
-has _path_class_cache     => ();   # ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );    # router path -> sigleton cache
-has _class_instance_cache => ();   # ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg => undef );    # class name -> sigleton cache
+has _path_class_cache     => ();   # HashRef, router path -> sigleton cache
+has _class_instance_cache => ();   # HashRef, class name -> sigleton cache
 
 sub init ($self) {
     my $map;
@@ -62,7 +62,7 @@ sub _get_host_map ( $self, $host, $ns ) {
             $modules->{$index_module} = undef;
         }
 
-        for my $file ( ( P->path1("$path/$index_path")->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
+        for my $file ( ( P->path("$path/$index_path")->read_dir( max_depth => 0, is_dir => 0 ) // [] )->@* ) {
             $modules->{"$index_path/$file"} = undef if $file =~ /[.]pm\z/sm;
         }
     }
@@ -112,11 +112,12 @@ sub _get_host_map ( $self, $host, $ns ) {
 sub run ( $self, $req ) {
     my $env = $req->{env};
 
-    my $path = P->path( '/' . $env->{PATH_INFO} );
+    my $path = P->path("/$env->{PATH_INFO}");
 
-    my $path_tail = $path->filename;
+    my $path_tail = $path->{filename} // '';
 
-    $path = $path->dirname;
+    $path = $path->{dirname};
+    $path .= '/' if length $path > 1;    # add triling '/' to path
 
     my $map = $self->{map};
 
@@ -145,7 +146,7 @@ sub run ( $self, $req ) {
         $class = $map->{$path};
     }
     else {
-        my @labels = split /\//sm, $path;
+        my @labels = split m[/]sm, $path;
 
         while (@labels) {
             $path_tail = pop(@labels) . "/$path_tail";
@@ -164,7 +165,7 @@ sub run ( $self, $req ) {
     $req->{app}       = $self->{app};
     $req->{host}      = $host;
     $req->{path}      = $path;
-    $req->{path_tail} = P->path($path_tail);
+    $req->{path_tail} = length $path_tail ? P->path($path_tail) : undef;
 
     my $ctrl = $self->{_path_class_cache}->{$host}->{$path};
 
@@ -184,6 +185,16 @@ sub get_host_api_path ( $self, $host ) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    2 | 117                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

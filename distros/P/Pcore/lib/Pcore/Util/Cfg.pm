@@ -1,10 +1,11 @@
 package Pcore::Util::Cfg;
 
-use Pcore -const;
+use Pcore;
 use Pcore::Util::Text qw[encode_utf8];
 use Pcore::Util::Data qw[:TYPE encode_data decode_data];
+use Pcore::Util::Scalar qw[is_path];
 
-const our $EXT_TYPE_MAP => {
+our $EXT_TYPE_MAP = {
     perl => $DATA_TYPE_PERL,
     json => $DATA_TYPE_JSON,
     cbor => $DATA_TYPE_CBOR,
@@ -14,65 +15,42 @@ const our $EXT_TYPE_MAP => {
     ini  => $DATA_TYPE_INI,
 };
 
-sub read ( $cfg, @ ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    my %args = (
-        type   => undef,
-        params => undef,
-        splice @_, 1,
-    );
-
+# type - can specify config type, if not defined - type will be get from file extension
+# params - params, passed to template
+sub read ( $path, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     my $type = delete $args{type};
 
-    if ( !ref $cfg ) {
-        die qq[Config file "$cfg" wasn't found.] if !-f $cfg;
+    $path = P->path($path) if !is_path $path;
 
-        $type = $EXT_TYPE_MAP->{$1} if !$type && $cfg =~ /[.]([^.]+)\z/sm;
+    die qq[Config file "$path" wasn't found.] if !-f $path;
 
-        $cfg = P->file->read_bin($cfg);
-    }
-    else {
-        encode_utf8 $cfg->$*;
-    }
+    $type = $EXT_TYPE_MAP->{ $path->{suffix} } if !$type && defined $path->{suffix};
+
+    my $data = P->file->read_bin($path);
 
     if ( defined $args{params} ) {
         state $tmpl = P->tmpl;
 
-        $cfg = $tmpl->( $cfg, $args{params} );
+        $data = $tmpl->( $data, $args{params} );
     }
 
-    $type //= $DATA_TYPE_PERL;
-
-    return decode_data( $type, $cfg, %args );
+    return decode_data( $type, $data, %args );
 }
 
-sub write ( $path, $cfg, @ ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    my %args = (
-        type => undef,
-        splice @_, 2,
-    );
-
+# type - can specify config type, if not defined - type will be get from file extension
+sub write ( $path, $data, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     my $type = delete $args{type};
 
-    $type = $EXT_TYPE_MAP->{$1} if !$type && $path =~ /[.]([^.]+)\z/sm;
+    $path = P->path($path) if !is_path $path;
 
-    $type //= $DATA_TYPE_PERL;
+    $type = $EXT_TYPE_MAP->{ $path->{suffix} } if !$type && defined $path->{suffix};
 
-    P->file->write_bin( $path, encode_data( $type, $cfg, %args ) );
+    P->file->write_bin( $path, encode_data( $type, $data, %args ) );
 
     return;
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    3 | 56                   | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

@@ -3,13 +3,13 @@ package Pcore::Dist::Build::Deploy;
 use Pcore -class;
 use Config;
 
-has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'], required => 1 );
+has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
-has install    => ( is => 'ro', isa => Bool, default => 0 );
-has devel      => ( is => 'ro', isa => Bool, default => 0 );
-has recommends => ( is => 'ro', isa => Bool, default => 0 );
-has suggests   => ( is => 'ro', isa => Bool, default => 0 );
-has verbose    => ( is => 'ro', isa => Bool, default => 0 );
+has install    => ();
+has devel      => ();
+has recommends => ();
+has suggests   => ();
+has verbose    => ();
 
 # TODO under windows acquire superuser automatically with use Win32::RunAsAdmin qw[force];
 
@@ -20,7 +20,7 @@ sub BUILDARGS ( $self, $args ) {
 }
 
 sub run ($self) {
-    my $chdir_guard = P->file->chdir( $self->dist->root );
+    my $chdir_guard = P->file->chdir( $self->{dist}->{root} );
 
     # deps
     exit 3 if !$self->_deps;
@@ -32,7 +32,7 @@ sub run ($self) {
     $self->_chmod;
 
     # install
-    exit 3 if $self->install && !$self->_install;
+    exit 3 if $self->{install} && !$self->_install;
 
     return;
 }
@@ -41,37 +41,36 @@ sub _chmod ($self) {
     print 'chmod ... ';
 
     if ( !$MSWIN ) {
-        for my $path ( ( P->path1('.')->read_dir( max_depth => 0 ) // [] )->@* ) {
-            $path = P->path($path);
+        for my $path ( ( P->path->read_dir( max_depth => 0 ) // [] )->@* ) {
 
             # directory
             if ( -d $path ) {
-                P->file->chmod( 'rwxr-xr-x', $path ) or say qq[$!: $path];
+                P->file->chmod( 'rwxr-xr-x', $path ) or say "$!: $path";
             }
 
             # file
             else {
                 my $is_exe;
 
-                if ( ( $path->dirname eq 'bin/' || $path->dirname eq 'script/' ) && !$path->suffix ) {
+                if ( !defined $path->{suffix} && ( $path->{dirname} eq 'bin' || $path->{dirname} eq 'script' ) ) {
                     $is_exe = 1;
                 }
-                elsif ( $path->suffix eq 'sh' || $path->suffix eq 'pl' || $path->suffix eq 't' ) {
+                elsif ( defined $path->{suffix} && ( $path->{suffix} eq 'sh' || lc $path->{suffix} eq 'pl' || $path->{suffix} eq 't' ) ) {
                     $is_exe = 1;
                 }
 
                 # executable script
                 if ($is_exe) {
-                    P->file->chmod( 'rwxr-xr-x', $path ) or say qq[$!: $path];
+                    P->file->chmod( 'rwxr-xr-x', $path ) or say "$!: $path";
                 }
 
                 # non-executable file
                 else {
-                    P->file->chmod( 'rw-r--r--', $path ) or say qq[$!: $path];
+                    P->file->chmod( 'rw-r--r--', $path ) or say "$!: $path";
                 }
             }
 
-            chown $>, $), $path or say qq[$!: $path];    # EUID, EGID
+            chown $>, $), $path or say "$!: $path";    # EUID, EGID
         }
     }
 
@@ -82,13 +81,13 @@ sub _chmod ($self) {
 
 sub _deps ($self) {
     if ( -f 'cpanfile' ) {
-        my @args = (                                     #
+        my @args = (                                   #
             'cpanm',
             '--with-feature', ( $MSWIN ? 'windows' : 'linux' ),
-            ( $self->devel      ? '--with-develop'    : () ),
-            ( $self->recommends ? '--with-recommends' : () ),
-            ( $self->suggests   ? '--with-suggests'   : () ),
-            ( $self->verbose    ? '--verbose'         : () ),
+            ( $self->{devel}      ? '--with-develop'    : () ),
+            ( $self->{recommends} ? '--with-recommends' : () ),
+            ( $self->{suggests}   ? '--with-suggests'   : () ),
+            ( $self->{verbose}    ? '--verbose'         : () ),
             '--metacpan', '--installdeps', q[.],
         );
 
@@ -102,7 +101,7 @@ sub _deps ($self) {
 
 sub _build ($self) {
     eval {
-        for my $file ( ( P->path1( $self->dist->root . 'lib' )->read_dir( max_depth => 0, abs => 1, is_dir => 0 ) // [] )->@* ) {
+        for my $file ( ( P->path("$self->{dist}->{root}/lib")->read_dir( max_depth => 0, abs => 1, is_dir => 0 ) // [] )->@* ) {
             if ( $file =~ /[.]PL\z/sm ) {
                 my $res = P->sys->run_proc( [ $^X, $file, $file =~ s/[.]PL\z//smr ] );
 
@@ -125,14 +124,14 @@ sub _install ($self) {
         return;
     }
 
-    my $canon_dist_root = P->path( $self->dist->root )->canonpath;
+    my $canon_dist_root = P->path( $self->{dist}->{root} );
 
     my $canon_bin_dir = "$canon_dist_root/bin";
 
-    my $pcore_lib_dir_canon = P->path("$canon_dist_root/../")->realpath->canonpath;
+    my $pcore_lib_dir_canon = P->path("$canon_dist_root/../")->to_abs;
 
     if ($MSWIN) {
-        if ( $self->dist->is_pcore ) {
+        if ( $self->{dist}->is_pcore ) {
 
             # set $ENV{PERL5LIB}
             P->sys->run_proc(qq[setx.exe /M PERL5LIB "$canon_dist_root/lib;"]) or return;
@@ -147,12 +146,12 @@ sub _install ($self) {
 
         # update $ENV{PATH}
         if ( -d $canon_bin_dir ) {
-            state $init = !!require Win32::TieRegistry;
+            require Win32::TieRegistry;
 
             my @system_path;
 
             for my $path ( grep { $_ && !/\A\h+\z/sm } split /$Config{path_sep}/sm, Win32::TieRegistry->new('LMachine\SYSTEM\CurrentControlSet\Control\Session Manager\Environment')->GetValue('PATH') ) {
-                my $normal_path = P->path( $path, is_dir => 1 );
+                my $normal_path = P->path($path);
 
                 push @system_path, $path if $normal_path !~ m[\A\Q$canon_bin_dir\E/\z]sm;
             }
@@ -171,7 +170,7 @@ sub _install ($self) {
 
         $data = qq[if ! echo \$PATH | grep -Eq "(^|$Config{path_sep})$canon_bin_dir/?(\$|$Config{path_sep})" ; then export PATH="\$PATH$Config{path_sep}$canon_bin_dir" ; fi\n] if -d $canon_bin_dir;
 
-        if ( $self->dist->is_pcore ) {
+        if ( $self->{dist}->is_pcore ) {
             $data .= <<"SH";
 if ! echo \$PERL5LIB | grep -Eq "(^|$Config{path_sep})$canon_dist_root/lib/?(\$|$Config{path_sep})" ; then export PERL5LIB="$canon_dist_root/lib$Config{path_sep}\$PERL5LIB" ; fi
 export PCORE_LIB="$pcore_lib_dir_canon"
@@ -179,9 +178,9 @@ SH
         }
 
         if ($data) {
-            P->file->write_bin( "/etc/profile.d/@{[lc $self->dist->name]}.sh", { mode => q[rw-r--r--] }, \$data );
+            P->file->write_bin( "/etc/profile.d/@{[lc $self->{dist}->name]}.sh", { mode => 'rw-r--r--' }, \$data );
 
-            say "/etc/profile.d/@{[lc $self->dist->name]}.sh installed";
+            say "/etc/profile.d/@{[lc $self->{dist}->name]}.sh installed";
         }
     }
 
@@ -195,11 +194,11 @@ SH
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 104                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 103                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 123, 140, 145, 166   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 122, 139, 144, 165   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 154                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 153                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

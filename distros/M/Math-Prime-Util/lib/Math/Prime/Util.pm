@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::VERSION = '0.71';
+  $Math::Prime::Util::VERSION = '0.72';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -32,19 +32,22 @@ our @EXPORT_OK =
       sqrtint rootint logint
       miller_rabin_random
       lucas_sequence lucasu lucasv
-      primes twin_primes ramanujan_primes sieve_prime_cluster sieve_range
+      primes twin_primes semi_primes ramanujan_primes
+      sieve_prime_cluster sieve_range
       forprimes forcomposites foroddcomposites forsemiprimes fordivisors
-      forpart forcomp forcomb forperm forderange formultiperm
+      forpart forcomp forcomb forperm forderange formultiperm forsetproduct
       forfactored forsquarefree
       lastfor
       numtoperm permtonum randperm shuffle
       prime_iterator prime_iterator_object
       next_prime  prev_prime
-      prime_count semiprime_count
+      prime_count
       prime_count_lower prime_count_upper prime_count_approx
       nth_prime nth_prime_lower nth_prime_upper nth_prime_approx inverse_li
       twin_prime_count twin_prime_count_approx
       nth_twin_prime nth_twin_prime_approx
+      semiprime_count semiprime_count_approx
+      nth_semiprime nth_semiprime_approx
       ramanujan_prime_count ramanujan_prime_count_approx
       ramanujan_prime_count_lower ramanujan_prime_count_upper
       nth_ramanujan_prime nth_ramanujan_prime_approx
@@ -414,6 +417,26 @@ sub twin_primes {
   }
 
   return segment_twin_primes($low, $high);
+}
+
+sub semi_primes {
+  my($low,$high) = @_;
+  if (scalar @_ > 1) {
+    _validate_num($low) || _validate_positive_integer($low);
+  } else {
+    ($low,$high) = (4, $low);
+  }
+  _validate_num($high) || _validate_positive_integer($high);
+
+  return [] if ($low > $high) || ($high < 4);
+
+  return Math::Prime::Util::semi_prime_sieve($low,$high)
+    if $high <= $_XS_MAXVAL
+    && ($low <= 4 || ($high-$low+1) > ($high/(600*sqrt($high))));
+
+  my $sp = [];
+  Math::Prime::Util::forsemiprimes(sub { push @$sp,$_; }, $low, $high);
+  $sp;
 }
 
 sub ramanujan_primes {
@@ -1013,7 +1036,7 @@ Math::Prime::Util - Utilities related to prime numbers, including fast sieves an
 
 =head1 VERSION
 
-Version 0.71
+Version 0.72
 
 
 =head1 SYNOPSIS
@@ -1566,6 +1589,27 @@ There is no ordering requirement for the input array reference.  The results
 will be in lexicographic order.
 
 
+=head2 forsetproduct
+
+  forsetproduct { say "@_" } [1,2,3],[qw/a b c/],[qw/@ $ !/];
+
+Takes zero or more array references as arguments and iterates over the
+set product (i.e. Cartesian product or cross product) of the lists.
+The given subroutine is repeatedly called with C<@_> set to the
+current list.
+Since no de-duplication is done, this is not literally a C<set> product.
+
+While zero or one array references are valid, the result is not very
+interesting.  If any array reference is empty, the product is
+empty, so no subroutine calls are performed.
+
+The subroutine is given an array whose values are aliased to the
+inputs, and are I<not> set to read-only.  Hence modifying the array
+inside the subroutine will cause side-effects.
+
+As with other iterators, the C<lastfor> function will cause an early exit.
+
+
 =head2 lastfor
 
   forprimes { lastfor,return if $_ > 1000; $sum += $_; } 1e9;
@@ -1725,6 +1769,17 @@ Sebah and Gourdon 2002.  For inputs under 10M, a correction factor is
 additionally applied to reduce the mean squared error.
 
 
+=head2 semi_primes
+
+Returns an array reference to semiprimes between the lower and upper
+limits (inclusive), with a lower limit of C<4> if none is given.
+This is L<OEIS A001358|http://oeis.org/A001358>.
+The semiprimes are composite integers which are products of
+exactly two primes.
+
+This works just like the L</primes> function.
+Like that function, an array reference is returned.
+
 =head2 semiprime_count
 
 Similar to prime count, but returns the count of semiprimes (composites with
@@ -1733,6 +1788,11 @@ from 2 to the argument, or two numbers indicating a range.
 
 A fast method that requires computation only to the square root of the
 range end is used, unless the range is so small that walking it is faster.
+
+=head2 semiprime_count_approx
+
+Returns an approximation to the semiprime count of C<n>.
+This returns quickly and is typically square root accurate.
 
 
 =head2 ramanujan_primes
@@ -1907,6 +1967,11 @@ generate any primes.  For values where the nth prime is smaller than
 C<2^64>, the inverse Riemann R function is used.  For larger values,
 the inverse logarithmic integral is used.
 
+The value returned will not necessarily be prime.  This applies to all
+the following nth prime approximations, where the returned value is
+close to the real value, but no effort is made to coerce the result
+to the nearest set element.
+
 
 =head2 nth_twin_prime
 
@@ -1918,6 +1983,17 @@ is not very fast for large values.
 Returns an approximation to the Nth twin prime.  A curve fit is used for
 small inputs (under 1200), while for larger inputs a binary search is done
 on the approximate twin prime count.
+
+=head2 nth_semiprime
+
+Returns the Nth semiprime, similar to where a C<forsemiprimes> loop would
+end after C<N> iterations, but much more efficiently.
+
+=head2 nth_semiprime_approx
+
+Returns an approximation to the Nth semiprime.  Curve fitting is used to
+get a fairly close approximation that is orders of magnitude better than
+the simple C<n log n / log log n> approximation for large C<n>.
 
 =head2 nth_ramanujan_prime
 
@@ -2159,9 +2235,8 @@ Frobenius test of Sergey Khashin.  This ensures C<n> is not a perfect square,
 selects the parameter C<c> as the smallest odd prime such that C<(c|n)=-1>,
 then verifies that C<(1+D)^n = (1-D) mod n> where C<D = sqrt(c) mod n>.
 
-There are no known pseudoprimes to this test and Khashin shows that under
-certain restrictions there are no counterexamples under C<2^60>.  Any that
-exist must have either one factor under 19 or have C<c E<gt> 128>.
+There are no known pseudoprimes to this test and Khashin (2018) shows
+there are no counterexamples under C<2^64>.
 Performance at 1e12 is about 40% slower than BPSW.
 
 =head2 miller_rabin_random
@@ -4901,8 +4976,18 @@ L<Algorithm::FastPermute> and L<Algorithm::Permute> are very similar
 but can be 2-10x faster than MPU (they use the same user-block
 structure but twiddle the user array each call).
 
+There are numerous modules to perform a set product (also called Cartesian
+product or cross product).  These include L<Set::Product>,
+L<Math::Cartesian::Product>, L<Set::Scalar>, and L<Set::CrossProduct>,
+as well as a few others.
+The L<Set::CartesianProduct::Lazy> module provides random access,
+albeit rather slowly.
+Our L</forsetproduct> matches L<Set::Product> in both high performance
+and functionality (that module's single function L<Set::Product/product>
+is essentially identical to ours).
+
 L<Math::Pari> supports a lot of features, with a great deal of overlap.  In
-general, MPU will be faster for native 64-bit integers, while it's differs
+general, MPU will be faster for native 64-bit integers, while it differs
 for bigints (Pari will always be faster if L<Math::Prime::Util::GMP> is not
 installed; with it, it varies by function).  Note that Pari extends many of
 these functions to other spaces (Gaussian integers, complex numbers, vectors,

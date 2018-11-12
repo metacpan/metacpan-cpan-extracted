@@ -1,0 +1,21 @@
+Changelog for Mojolicious-Plugin-PODViewer
+
+0.002     2018-11-08 22:07:11-06:00 America/Chicago
+
+    - Added option to change route to load POD under. Previously, it
+      would only be available under `/perldoc`.
+    - Added option to change the default module. Previously, it would
+      load Mojolicious::Guides.
+    - Added a custom template. The template being used previously was
+      the one shipped with Mojolicious and designed for the
+      mojolicious.org website (which is not appropriate for other
+      sites).
+    - Added a "layout" option. This is the easiest way to customize the
+      appearance of the POD output (using CSS and surrounding content).
+    - Added "allow_modules" option to restrict which modules are served
+      from the app. Any disallowed modules will be redirected to
+      MetaCPAN.
+
+0.001     2018-11-08 15:53:58-06:00 America/Chicago
+
+    - Initial release forked from Mojolicious

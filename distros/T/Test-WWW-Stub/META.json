@@ -64,7 +64,7 @@
    "provides" : {
       "Test::WWW::Stub" : {
          "file" : "lib/Test/WWW/Stub.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Test::WWW::Stub::Handler" : {
          "file" : "lib/Test/WWW/Stub/Handler.pm"
@@ -84,11 +84,12 @@
          "web" : "https://github.com/astj/p5-Test-WWW-Stub"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "aereal <aereal@aereal.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "Takumi Akiyama <t.akiym@gmail.com>"
+      "Takumi Akiyama <t.akiym@gmail.com>",
+      "papix <mail@papix.net>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

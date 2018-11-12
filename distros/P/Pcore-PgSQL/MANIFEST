@@ -12,6 +12,6 @@ lib/Pcore/PgSQL/DBH.pm
 lib/README.md
 share/dist-id.json
 share/dist.yaml
-share/docker.json
+share/docker.yaml
 t/001.t
 t/author-pod-syntax.t

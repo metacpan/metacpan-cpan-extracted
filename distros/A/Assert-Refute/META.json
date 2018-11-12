@@ -50,6 +50,10 @@
          "web" : "https://github.com/dallaylaen/assert-refute-perl"
       }
    },
-   "version" : "0.1301",
+   "version" : "0.1501",
+   "x_contributors" : [
+      "Jacobo Chamorro",
+      "Mohammad S Anwar <manwar@cpan.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

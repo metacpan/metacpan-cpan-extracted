@@ -49,6 +49,8 @@ my @files = (
     't/81-submit.t',
     't/82-stringify.t',
     't/83-attachments.t',
+    't/84-attachments-rt127607.t',
+    't/85-attachments-rt127607.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

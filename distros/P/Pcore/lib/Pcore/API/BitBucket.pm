@@ -4,10 +4,10 @@ use Pcore -class, -res;
 use Pcore::Util::Scalar qw[is_plain_coderef];
 use Pcore::API::SCM::Const qw[:SCM_TYPE];
 
-has username => ( is => 'ro', isa => Str, required => 1 );
-has password => ( is => 'ro', isa => Str, required => 1 );
+has username => ( required => 1 );
+has password => ( required => 1 );
 
-has _auth => ( is => 'lazy', isa => Str, init_arg => undef );
+has _auth => ( is => 'lazy', init_arg => undef );
 
 sub BUILDARGS ( $self, $args = undef ) {
     $args->{username} ||= $ENV->user_cfg->{BITBUCKET}->{username} if $ENV->user_cfg->{BITBUCKET}->{username};
@@ -18,7 +18,7 @@ sub BUILDARGS ( $self, $args = undef ) {
 }
 
 sub _build__auth ($self) {
-    return 'Basic ' . P->data->to_b64( "$self->{username}:$self->{password}", q[] );
+    return 'Basic ' . P->data->to_b64( "$self->{username}:$self->{password}", '' );
 }
 
 sub _req1 ( $self, $method, $endpoint, $data, $cb = undef ) {
@@ -290,6 +290,8 @@ sub update_issue ( $self, $repo_id, $issue_id, $data, $cb = undef ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 276, 281             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 21                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

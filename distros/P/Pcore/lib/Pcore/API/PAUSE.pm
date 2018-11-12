@@ -4,13 +4,13 @@ use Pcore -class, -res;
 use Pcore::Util::Text qw[encode_utf8];
 use Pcore::Util::Scalar qw[is_coderef];
 
-has username => ( is => 'ro', isa => Str, required => 1 );
-has password => ( is => 'ro', isa => Str, required => 1 );
+has username => ( required => 1 );
+has password => ( required => 1 );
 
-has _auth_header => ( is => 'lazy', isa => Str, init_arg => undef );
+has _auth_header => ( is => 'lazy', init_arg => undef );
 
 sub _build__auth_header ($self) {
-    return 'Basic ' . P->data->to_b64_url( encode_utf8( $self->username ) . q[:] . encode_utf8( $self->password ) ) . q[==];
+    return 'Basic ' . P->data->to_b64_url( encode_utf8( $self->{username} ) . q[:] . encode_utf8( $self->{password} ) ) . q[==];
 }
 
 sub upload ( $self, $path, $cb = undef ) {
@@ -20,15 +20,15 @@ sub upload ( $self, $path, $cb = undef ) {
 
     my $boundary = P->random->bytes_hex(64);
 
-    $self->_pack_multipart( \$body, $boundary, 'HIDDENNAME', \encode_utf8( $self->username ) );
+    $self->_pack_multipart( \$body, $boundary, 'HIDDENNAME', \encode_utf8( $self->{username} ) );
 
     $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_subdirtext', \q[] );
 
     $self->_pack_multipart( \$body, $boundary, 'CAN_MULTIPART', \1 );
 
-    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_upload', \$path->filename );
+    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_upload', \$path->{filename} );
 
-    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_httpupload', P->file->read_bin($path), $path->filename );
+    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_httpupload', P->file->read_bin($path), $path->{filename} );
 
     $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_uri', \q[] );
 
@@ -72,7 +72,7 @@ sub clean ( $self, @args ) {
     }
 
     my $params = [
-        HIDDENNAME                         => uc encode_utf8( $self->username ),
+        HIDDENNAME                         => uc encode_utf8( $self->{username} ),
         SUBMIT_pause99_delete_files_delete => 'Delete',
     ];
 

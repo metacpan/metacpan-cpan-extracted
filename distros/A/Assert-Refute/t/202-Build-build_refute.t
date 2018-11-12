@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
-use Test::More;
+use Test::More tests => 2;
 
-use Assert::Refute qw(:core);
+use Assert::Refute qw(:core), {};
 
 # emulate use Foo;
 BEGIN {
@@ -23,16 +23,12 @@ BEGIN {
     Foo->import;
 };
 
-my $spec = contract {
-    my_is shift, 137, "Fine";
+my $report = try_refute {
+    my_is 137, 137, "TEST FAILED IS YOU SEE THIS (equal)";
+    my_is  42, 137, "TEST FAILED IS YOU SEE THIS (not equal)";
 };
 
-my $report = $spec->apply( 137 );
-ok $report->is_passing, "137 is fine";
-
-   $report = $spec->apply( 42 );
-ok !$report->is_passing, "Life is not fine";
-
+is $report->get_sign, "t1Nd", "Signature as expected";
+like $report->get_tap, qr/# 42 ne 137/, "Diagnostic present";
 note $report->get_tap;
 
-done_testing;

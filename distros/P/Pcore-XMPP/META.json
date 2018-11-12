@@ -32,7 +32,6 @@
       "runtime" : {
          "requires" : {
             "AnyEvent::XMPP" : "v0.55.0",
-            "AnyEvent::XMPP::Ext::HTML" : "v0.2.0",
             "Pcore" : "v0.22.2"
          }
       }
@@ -49,6 +48,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-xmpp/overview"
       }
    },
-   "version" : "v0.10.5",
+   "version" : "v0.10.7",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

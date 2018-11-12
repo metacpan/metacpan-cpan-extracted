@@ -1,0 +1,141 @@
+---
+mime_tag:
+    css:
+        type: css
+    html:
+        type: html
+    javascript:
+        type: js
+    json:
+        type: json
+    perl-config:                                            # *.perl
+        type: perl
+        perl_critic: pcore-config
+    perl-cpanfile:                                          # cpanfile
+        type: perl
+        perl_critic: 0
+    perl-module:
+        type: perl
+        perl_critic: 1
+    perl-script:
+        type: perl
+        perl_critic: 1
+        perl_compress_end_section: 1
+    perl-script-auto:                                       # *.PL
+        type: perl
+        perl_critic: 0
+        perl_compress_end_section: 1
+
+perlcritic:
+    common:
+        __pcore__: 0
+        __defaults__:
+            severity: 1
+
+        BuiltinFunctions::ProhibitUselessTopic:
+            severity: 4
+        ClassHierarchies::ProhibitAutoloading:
+            severity: 5
+        CodeLayout::RequireTidyCode: ~                      # covered by running perltidy separately
+        ControlStructures::ProhibitCascadingIfElse:
+            max_elsif: 5
+        ControlStructures::ProhibitPostfixControls:
+            allow: if unless
+        ControlStructures::ProhibitUnlessBlocks: ~
+        ControlStructures::ProhibitYadaOperator:
+            severity: 3
+        Documentation::RequirePodSections: ~
+        InputOutput::ProhibitBacktickOperators:
+            only_in_void_context: 1
+        Miscellanea::ProhibitUselessNoCritic:
+            severity: 4
+        Modules::ProhibitEvilModules:
+            modules: indirect                               # NOTE !!! exporting indirect pragma cause random crashes under windows
+        Modules::RequireNoMatchVarsWithUseEnglish: ~
+        NamingConventions::Capitalization: ~
+        References::ProhibitDoubleSigils: ~                 # TODO enable, when bug with ->%* will be fixed, https://github.com/adamkennedy/PPI/issues/88
+        RegularExpressions::ProhibitEscapedMetacharacters:
+            severity: 4
+        RegularExpressions::ProhibitUnusualDelimiters:
+            allow_all_brackets: 1
+        RegularExpressions::ProhibitUselessTopic:
+            severity: 4
+        RegularExpressions::RequireBracesForMultiline:
+            allow_all_brackets: 1
+        RegularExpressions::RequireDotMatchAnything:
+            severity: 4
+        RegularExpressions::RequireExtendedFormatting: ~
+        RegularExpressions::RequireLineBoundaryMatching:
+            severity: 4
+        Subroutines::ProhibitAmpersandSigils:
+            severity: 4
+        Subroutines::ProhibitSubroutinePrototypes: ~        # TODO [PCORE-27] - remove this policy, https://github.com/Perl-Critic/Perl-Critic/issues/591
+        Subroutines::ProhibitUnusedPrivateSubroutines:
+            private_name_regex: _(?!_?build_)\w+
+        Subroutines::RequireArgUnpacking: ~
+        TestingAndDebugging::ProhibitNoStrict:
+            allow: subs refs
+        TestingAndDebugging::ProhibitNoWarnings:
+            allow_with_category_restriction: 1
+        TestingAndDebugging::RequireUseStrict:
+            equivalent_modules: common::header Pcore
+        TestingAndDebugging::RequireUseWarnings:
+            equivalent_modules: common::header Pcore
+        ValuesAndExpressions::ProhibitInterpolationOfLiterals:
+            severity: 3
+        ValuesAndExpressions::ProhibitMagicNumbers: ~
+        ValuesAndExpressions::ProhibitNoisyQuotes: ~
+        ValuesAndExpressions::ProhibitVersionStrings: ~
+        Variables::ProhibitPackageVars: ~
+        Variables::ProhibitPunctuationVars: ~
+        Variables::ProhibitReusedNames:
+            severity: 4
+        Variables::ProhibitUnusedVariables:
+            severity: 4
+
+    pcore-script:
+        __parent__: common
+        __pcore__: 1
+
+        ErrorHandling::RequireCarping: ~
+        InputOutput::RequireCheckedClose:
+            severity: 4
+        InputOutput::RequireCheckedOpen:
+            severity: 4
+        InputOutput::RequireCheckedSyscalls:
+            exclude_functions: print say sleep
+            functions: :builtins
+            severity: 4
+        Modules::ProhibitEvilModules:
+
+            # NOTE !!! exporting indirect pragma cause random crashes under windows
+            modules: >-
+                autodie indirect /\Aconstant/ /\AReadonly/ Const::Fast English
+                Encode Sys::Hostname Scalar::Util List::Util List::Util::XS List::AllUtils
+                Hash::Util Sub::Util /JSON/ /Data::Dump/ Data::Printer File::Path
+                File::Slurp File::Temp Path::Tiny File::Copy Cwd File::Spec File::Basename
+                File::Find /Data::UUID/ /Data::Serializer/ Capture::Tiny HTTP::Tiny
+                Sub::Name Sub::Identify MIME::Base64 /URI::Escape/ URL::Encode /Geo::IP/
+                Moo Moo::Role MooX::late /MooX::Types::MooseLike/ /Type::Tiny/ /\ATypes::/
+        Modules::ProhibitMultiplePackages: ~
+        Modules::RequireVersionVar: ~
+
+    pcore-config:
+        __parent__: pcore-script
+
+        Modules::RequireEndWithOne: ~
+        Modules::RequireExplicitPackage: ~
+        TestingAndDebugging::RequireUseStrict: ~
+        TestingAndDebugging::RequireUseWarnings: ~
+        ValuesAndExpressions::ProhibitEmptyQuotes: ~
+        ValuesAndExpressions::ProhibitInterpolationOfLiterals: ~
+        ValuesAndExpressions::ProhibitNoisyQuotes: ~
+        ValuesAndExpressions::RequireInterpolationOfMetachars: ~
+
+jshint: --verbose # --show-non-errors
+
+perltidy: >-
+    --perl-best-practices --tight-secret-operators --continuation-indentation=2
+    --weld-nested-containers --maximum-line-length=0 --format-skipping
+    --format-skipping-begin="# <<<" --format-skipping-end="# >>>" --converge
+    --nostandard-output --character-encoding=utf8

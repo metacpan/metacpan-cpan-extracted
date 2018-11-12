@@ -14,7 +14,7 @@ WriteMakefile(
         'Alien::gdal' => 0
     },
     PREREQ_PM => {
-        'PkgConfig' => 0,
+        'PkgConfig' => 0.23026,
         'FFI::Platypus' => 0,
         'Alien::gdal' => 0,
         'PDL' => 0
@@ -31,6 +31,9 @@ WriteMakefile(
                 type => 'git',
                 url => 'git://github.com/ajolma/Geo-GDAL-FFI.git',
                 web => 'https://github.com/ajolma/Geo-GDAL-FFI',
+            },
+            bugtracker => {
+                web => 'https://github.com/ajolma/Geo-GDAL-FFI/issues/',
             },
         },
     },

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Ticket;
-$RT::Client::REST::Ticket::VERSION = '0.53';
+$RT::Client::REST::Ticket::VERSION = '0.54';
 use base 'RT::Client::REST::Object';
 
 use Error qw(:try);
@@ -306,7 +306,7 @@ RT::Client::REST::Ticket - ticket object representation.
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 

@@ -3,9 +3,9 @@ package Pcore::Ext::Context::Func;
 use Pcore -class;
 use Pcore::Util::Scalar qw[refaddr];
 
-has ctx       => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
-has func_args => ();    # ( is => 'ro', isa => Maybe [ArrayRef] );
-has func_body => ();    # ( is => 'ro', isa => Str, required => 1 );
+has ctx       => ( required => 1 );    # InstanceOf ['Pcore::Ext::Context']
+has func_args => ();                   # Maybe [ArrayRef]
+has func_body => ( required => 1 );    # Str
 
 sub TO_JSON ( $self ) {
     my $id = refaddr $self;

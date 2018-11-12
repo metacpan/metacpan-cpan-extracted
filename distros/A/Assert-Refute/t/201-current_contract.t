@@ -5,19 +5,19 @@ use warnings;
 BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 
 # Load BEFORE T::M to avoid detecting it
-use Assert::Refute qw(:core);
+use Assert::Refute qw(:core), {};
 
 use Test::More;
+use Scalar::Util qw(refaddr);
 
-my $spec = contract {
-    current_contract->refute( 0, "fine" );
-    current_contract->refute( 42, "not so fine" );
+my @trace;
+my $report = try_refute {
+    push @trace, current_contract;
+    push @trace, "alive";
 };
 
-my $log = $spec->apply;
-
-is $log->get_count, 2, "Count as expected";
-ok !$log->is_passing, "Contract invalidated (as expected)";
+is refaddr $trace[0], refaddr $report, "current_contract is same as report";
+is $trace[1], "alive", "current_contract lives";
 
 my $permitted = eval {
     current_contract;

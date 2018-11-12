@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $ntheory::AUTHORITY = 'cpan:DANAJ';
-  $ntheory::VERSION = '0.71';
+  $ntheory::VERSION = '0.72';
 }
 
 BEGIN {
@@ -73,6 +73,7 @@ Tags:
 
   primes([start,] end)                array ref of primes
   twin_primes([start,] end)           array ref of twin primes
+  semi_primes([start,] end)           array ref of semiprimes
   ramanujan_primes([start,] end)      array ref of Ramanujan primes
   sieve_prime_cluster(start, end, @C) list of prime k-tuples
   sieve_range(n, width, depth)        sieve out small factors to depth
@@ -94,6 +95,9 @@ Tags:
   nth_twin_prime_approx(n)            fast approximate nth twin prime
   semiprime_count(n)                  count of semiprimes <= n
   semiprime_count(start, end)         count of semiprimes in range
+  semiprime_count_approx(n)           fast approximate count of semiprimes
+  nth_semiprime(n)                    the nth semiprime
+  nth_semiprime_approx(n)             fast approximate nth semiprime
   ramanujan_prime_count(n)            count of Ramanujan primes <= n
   ramanujan_prime_count(start, end)   count of Ramanujan primes in range
   ramanujan_prime_count_lower(n)      fast lower bound for Ramanujan count
@@ -134,6 +138,7 @@ Tags:
   forperm { ... } n                   loop over permutations
   formultiperm { ... } \@n            loop over multiset permutations
   forderange { ... } n                loop over derangements
+  forsetproduct { ... } \@a[,...]     loop over Cartesian product of lists
   prime_iterator                      returns a simple prime iterator
   prime_iterator_object               returns a prime iterator object
   lastfor                             stop iteration of for.... loop

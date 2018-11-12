@@ -7,42 +7,42 @@ use Pcore::Util::Scalar qw[is_plain_coderef];
 
 requires qw[_draw];
 
-has id => ( is => 'lazy', isa => Int, required => 1 );
+has id => ( required => 1 );
 
-has network => ( is => 'ro', isa => Bool, default => 0 );
+has network => ();    # Bool
 
-has message => ( is => 'lazy', isa => Str, default => q[] );
+has message => ('');  # Str
 
-has show_state => ( is => 'lazy', isa => Bool, default => 1 );    # show value/total/percent
+has show_state => (1);    # Bool, show value/total/percent
 
-has value => ( is => 'lazy', isa => PositiveOrZeroNum, default => 0 );
-has value_format => ( is => 'ro', isa => Str | CodeRef, default => q[%.0f] );
-has _format_value => ( is => 'lazy', isa => CodeRef, init_arg => undef );
+has value         => 0;                                      # PositiveOrZeroNum
+has value_format  => '%.0f';                                 # Str | CodeRef
+has _format_value => ( is => 'lazy', init_arg => undef );    # CodeRef
 
-has total => ( is => 'lazy', isa => PositiveOrZeroNum, default => 0 );
-has total_format => ( is => 'ro', isa => Str | CodeRef, default => q[%.0f] );
-has _format_total => ( is => 'lazy', isa => CodeRef, init_arg => undef );
+has total         => 0;                                      # PositiveOrZeroNum
+has total_format  => '%.0f';                                 # Str | CodeRef
+has _format_total => ( is => 'lazy', init_arg => undef );    # CodeRef
 
-has percent_format => ( is => 'lazy', isa => Str | CodeRef, default => q[%3.0f] );
-has _format_percent => ( is => 'lazy', isa => CodeRef, init_arg => undef );
+has percent_format => '%3.0f';                               # Str | CodeRef
+has _format_percent => ( is => 'lazy', init_arg => undef );  # CodeRef
 
-has show_speed => ( is => 'lazy', isa => Bool, default => 1 );
-has speed_format => ( is => 'lazy', isa => Str | CodeRef, default => q[%.2f] );
-has _format_speed => ( is => 'lazy', isa => CodeRef, init_arg => undef );
-has unit          => ( is => 'lazy', isa => Str,     default  => q[] );
+has show_speed    => 1;                                      # Bool
+has speed_format  => '%.2f';                                 # Str | CodeRef
+has _format_speed => ( is => 'lazy', init_arg => undef );    # CodeRef
+has unit          => '';                                     # Str
 
-has show_time => ( is => 'lazy', isa => Bool, default => 1 );
-has time_format => ( is => 'lazy', isa => Str | CodeRef, default => q[%M:%S] );
-has _format_time => ( is => 'lazy', isa => CodeRef, init_arg => undef );
+has show_time    => 1;                                       # Bool
+has time_format  => '%M:%S';                                 # Str | CodeRef
+has _format_time => ( is => 'lazy', init_arg => undef );     # CodeRef
 
-has size => ( is => 'ro', isa => PositiveInt );
+has size => ();                                              # PositiveInt
 
-has is_finished => 0, isa => Bool, init_arg => undef;
-has start_time  => 0, isa => Int,  init_arg => undef;
-has end_time    => 0, isa => Int,  init_arg => undef;
-has total_time  => 0, isa => Int,  init_arg => undef;
-has speed => ( isa => PositiveOrZeroNum, init_arg => undef );
-has eta => ( is => 'lazy', isa => PositiveOrZeroNum, default => 0, init_arg => undef );    # seconds, left to complete, 0 - unknown
+has is_finished => 0, init_arg => undef;                     # Bool
+has start_time  => 0, init_arg => undef;                     # Int
+has end_time    => 0, init_arg => undef;                     # Int
+has total_time  => 0, init_arg => undef;                     # Int
+has eta         => 0, init_arg => undef;                     # PositiveOrZeroNum, seconds, left to complete, 0 - unknown
+has speed => ( init_arg => undef );                          # PositiveOrZeroNum
 
 my $TERM_WIDTH = P->term->width;
 
@@ -65,13 +65,13 @@ sub BUILD ( $self, $args ) {
 }
 
 sub _build__format_value ($self) {
-    my $value_format = $self->value_format;
+    my $value_format = $self->{value_format};
 
     if ( is_plain_coderef $value_format ) {
         return $value_format;
     }
     else {
-        if ( $self->network ) {
+        if ( $self->{network} ) {
             return \&_format_network_unit;
         }
         else {
@@ -83,13 +83,13 @@ sub _build__format_value ($self) {
 }
 
 sub _build__format_total ($self) {
-    my $total_format = $self->total_format;
+    my $total_format = $self->{total_format};
 
     if ( is_plain_coderef $total_format ) {
         return $total_format;
     }
     else {
-        if ( $self->network ) {
+        if ( $self->{network} ) {
             return \&_format_network_unit;
         }
         else {
@@ -101,7 +101,7 @@ sub _build__format_total ($self) {
 }
 
 sub _build__format_percent ($self) {
-    my $percent_format = $self->percent_format;
+    my $percent_format = $self->{percent_format};
 
     if ( is_plain_coderef $percent_format ) {
         return $percent_format;
@@ -114,13 +114,13 @@ sub _build__format_percent ($self) {
 }
 
 sub _build__format_speed ($self) {
-    my $speed_format = $self->speed_format;
+    my $speed_format = $self->{speed_format};
 
     if ( is_plain_coderef $speed_format ) {
         return $speed_format;
     }
     else {
-        if ( $self->network ) {
+        if ( $self->{network} ) {
             return \&_format_network_unit;
         }
         else {
@@ -132,7 +132,7 @@ sub _build__format_speed ($self) {
 }
 
 sub _build__format_time ($self) {
-    my $time_format = $self->time_format;
+    my $time_format = $self->{time_format};
 
     if ( is_plain_coderef $time_format ) {
         return $time_format;
@@ -200,12 +200,12 @@ sub update ( $self, %args ) {
     $self->{total} = $args{total} if defined $args{total};
 
     # do not allow value to be larger than total
-    $args{value} = $self->total if $self->total && $args{value} && $args{value} > $self->total;
+    $args{value} = $self->{total} if $self->{total} && $args{value} && $args{value} > $self->{total};
 
     $self->{value} = $args{value} if defined $args{value};
 
     # automatically finish
-    if ( $self->value == $self->total ) {
+    if ( $self->{value} == $self->{total} ) {
         $self->finish;
     }
     else {
@@ -221,12 +221,12 @@ sub update ( $self, %args ) {
     }
 
     # calculate ETA
-    if ( $self->total ) {
+    if ( $self->{total} ) {
         if ( !$self->{speed} ) {
             $self->{eta} = 0;
         }
         else {
-            $self->{eta} = int( ( $self->total - $args{value} ) / $self->{speed} ) || 1;
+            $self->{eta} = int( ( $self->{total} - $args{value} ) / $self->{speed} ) || 1;
         }
     }
 
@@ -248,6 +248,8 @@ sub update ( $self, %args ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 236                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 14, 32               | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

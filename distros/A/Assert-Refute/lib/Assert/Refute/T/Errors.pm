@@ -3,7 +3,7 @@ package Assert::Refute::T::Errors;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.1301';
+our $VERSION = '0.1501';
 
 =head1 NAME
 

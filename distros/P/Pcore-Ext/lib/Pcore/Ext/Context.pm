@@ -10,7 +10,7 @@ has app  => ();
 has tree => ();
 has ctx  => ();
 
-has _js_gen_cache => ();    # ( is => 'ro', isa => HashRef, init_arg => undef );    # cache for JS functions strings
+has _js_gen_cache => ( init_arg => undef );    # HashRef, cache for JS functions strings
 
 # Ext resolvers
 sub _ext_api_method ( $self, $method_id ) {
@@ -77,17 +77,17 @@ sub _resolve_class_path ( $self, $path ) {
     if ( substr( $path, 0, 2 ) eq '//' ) {
         substr $path, 0, 2, q[];
 
-        $resolved = P->path( $path, base => $self->{ctx}->{app_path} )->to_string;
+        $resolved = P->path($path)->to_abs( $self->{ctx}->{app_path} );
     }
 
     # path is absolute
     elsif ( substr( $path, 0, 1 ) eq '/' ) {
-        $resolved = P->path( $path, base => '/' )->to_string;
+        $resolved = P->path($path)->to_abs('/');
     }
 
     # path is related to the current context context_path
     else {
-        $resolved = P->path( $path, base => $self->{ctx}->{context_path} )->to_string;
+        $resolved = P->path($path)->to_abs( $self->{ctx}->{context_path} );
     }
 
     die qq[Can't resolve path "$path" in class "$self->{ctx}->{namespace}::EXT_$self->{ctx}->{generator}"] if !exists $self->{tree}->{$resolved};

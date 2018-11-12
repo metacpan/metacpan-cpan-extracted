@@ -4,7 +4,7 @@
       "Shawn Laffan <shawnlaffan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -24,8 +24,9 @@
          "requires" : {
             "Alien::Build" : "1.41",
             "Alien::Build::MM" : "1.41",
+            "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::MSYS" : "0.07",
-            "Alien::patch" : "0.09",
+            "Alien::patch" : "0",
             "Archive::Tar" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
@@ -43,18 +44,20 @@
          "requires" : {
             "Alien::Build" : "1.41",
             "Alien::Build::MM" : "1.41",
+            "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::MSYS" : "0",
             "Alien::patch" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
             "HTTP::Tiny" : "0.044",
             "PkgConfig" : "0",
+            "Sort::Versions" : "0",
             "parent" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0.038",
+            "Alien::Base" : "1.41",
             "Alien::Build" : "0.25"
          }
       },
@@ -74,13 +77,12 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-gdal"
       }
    },
-   "version" : "1.09",
+   "version" : "1.11",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.41",
+      "generated_by" : "Alien::Build::MM version 1.48",
       "requires" : {
          "share" : {
             "Alien::MSYS" : "0.07",
-            "Alien::patch" : "0.09",
             "Archive::Tar" : "0",
             "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
@@ -92,5 +94,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

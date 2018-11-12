@@ -15,7 +15,7 @@ sub block {
   my ($self, $selector) = @_;
   return $self->{run}{block}
     if not defined $selector;
-  for my $block (@{$self->{run}{data}}) {
+  for my $block (@{$self->{run}{ast}{data}}) {
     if ($block->{label} eq $selector) {
       return $block;
     }
@@ -25,7 +25,7 @@ sub block {
 
 sub blocks {
   my ($self) = @_;
-  [@{$self->{run}{data}}];
+  [@{$self->{run}{ast}{data}}];
 }
 
 sub bool {

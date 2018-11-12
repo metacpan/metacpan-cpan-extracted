@@ -34,7 +34,14 @@ ok( -e "$dir/local/lib/perl5/$lib.pm", "Library file $lib exists" );
 ok( -e "$dir/local/lib/perl5/$deplib.pm", "Library file $deplib exists" );
 diag("Try::Tiny => $INC{'Try/Tiny.pm'}");
 
-require_ok("$dir/local/lib/perl5/$deplib.pm");
+{
+  # Silence warnings for the require_ok. If the user has LWP installed, then
+  # it will cause harmless warnings about redefined subs. These don't cause
+  # errors and just add to the noise in cpantesters.
+  local $SIG{__WARN__} = sub {};
+  require_ok("$dir/local/lib/perl5/$deplib.pm");
+}
+
 diag("Try::Tiny => $INC{'Try/Tiny.pm'}");
 is( $Try::Tiny::VERSION, '0.24', "The correct version was installed" );
 

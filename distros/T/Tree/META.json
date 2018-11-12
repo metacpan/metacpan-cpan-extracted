@@ -4,7 +4,7 @@
       "Rob Kinyin (rkinyon@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -48,7 +48,7 @@
          "requires" : {
             "Test::Deep" : "1.123",
             "Test::Exception" : "0.43",
-            "Test::More" : "1.302056",
+            "Test::More" : "1.001002",
             "Test::Pod" : "1.51",
             "Test::Pod::Coverage" : "1.1",
             "Test::Warn" : "0.3"
@@ -69,6 +69,6 @@
          "web" : "https://github.com/ronsavage/Tree"
       }
    },
-   "version" : "1.10",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "1.11",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

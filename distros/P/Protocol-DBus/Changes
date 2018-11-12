@@ -1,4 +1,10 @@
 Revision history for Perl module Protocol::DBus
 
+0.03 Sun 11 Nov 2018
+- Disable UNIX_FD stuff until it can be made to work.
+
+0.02 Sun 11 Nov 2018
+- Fix some examples, remove broken example script
+
 0.01 Tue 2 Oct 2018
 - Initial release

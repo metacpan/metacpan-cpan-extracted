@@ -6,7 +6,7 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '1.89';
+our $VERSION = '1.90';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
@@ -327,13 +327,16 @@ sub text {
     my $self = shift;
 
     if ( not defined $self->{text} ) {
-        require HTML::TreeBuilder;
+        unless ( exists $INC{'HTML::TreeBuilder'} ) {
+            require HTML::TreeBuilder;
+            HTML::TreeBuilder->VERSION(5);
+            HTML::TreeBuilder->import('-weak');
+        }
         my $tree = HTML::TreeBuilder->new();
         $tree->parse( $self->content );
         $tree->eof();
         $tree->elementify(); # just for safety
         $self->{text} = $tree->as_text();
-        $tree->delete;
     }
 
     return $self->{text};
@@ -1684,7 +1687,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 1.89
+version 1.90
 
 =head1 SYNOPSIS
 
@@ -1911,7 +1914,7 @@ strict and verbose mode for form handling, which is done with L<HTML::Form>.
 Globally sets the HTML::Form strict flag which causes form submission to
 croak if any of the passed fields don't exist in the form, and/or a value
 doesn't exist in a select element. This can still be disabled in individual
-calls to C<L<< submit_form()|"$mech->submit_form( ... )" >>>.
+calls to L<C<< submit_form()|"$mech->submit_form( ... )" >>>.
 
 Default is off.
 
@@ -2133,9 +2136,9 @@ are passed to I<content()>:
 =item I<< $mech->content( format => 'text' ) >>
 
 Returns a text-only version of the page, with all HTML markup
-stripped. This feature requires I<HTML::TreeBuilder> to be installed,
-or a fatal error will be thrown. This works only if the contents are
-HTML.
+stripped. This feature requires I<HTML::TreeBuilder> version 5 or higher
+to be installed, or a fatal error will be thrown. This works only if
+the contents are HTML.
 
 =item I<< $mech->content( base_href => [$base_href|undef] ) >>
 
@@ -2169,7 +2172,7 @@ specified and the text is HTML, in which case an error will be triggered.
 =head2 $mech->text()
 
 Returns the text of the current HTML content.  If the content isn't
-HTML, $mech will die.
+HTML, C<$mech> will die.
 
 The text is extracted by parsing the content, and then the extracted
 text is cached, so don't worry about performance of calling this
@@ -2830,15 +2833,15 @@ Sets the HTML::Form strict flag which causes form submission to croak if any of 
 fields don't exist on the page, and/or a value doesn't exist in a select element.
 By default HTML::Form sets this value to false.
 
-This behavior can also be turned on globally by passing C<< strict_forms => 1>> to
-C<<WWW::Mechanize->new>>. If you do that, you can still disable it for individual calls
-by passing C<< strict_forms => 0>> here.
+This behavior can also be turned on globally by passing C<< strict_forms => 1 >> to
+C<< WWW::Mechanize->new >>. If you do that, you can still disable it for individual calls
+by passing C<< strict_forms => 0 >> here.
 
 =back
 
 If no form is selected, the first form found is used.
 
-If I<button> is not passed, then the C<L<< submit()|"$mech->submit()" >>>
+If I<button> is not passed, then the L<C<< submit()|"$mech->submit()" >>>
 method is used instead.
 
 If you want to submit a file and get its content from a scalar rather

@@ -1,12 +1,14 @@
+
+   <% IF toc.length %>
       <div id="sb-slider">
       </div>
-
       <div id="sidebar">
         <div id="sidebar-inner">
           <h2>Table of Contents</h2>
           <% toc %>
         </div>
       </div>
+   <% END %>
 
       <div id="content">
         <h1 class="elegantshadow"><div id="main_title" >Dist::Zilla Tutorial for Beginners</div></h1>
@@ -14,4 +16,3 @@
           <% h %>
         <% END %>
       </div>
-      

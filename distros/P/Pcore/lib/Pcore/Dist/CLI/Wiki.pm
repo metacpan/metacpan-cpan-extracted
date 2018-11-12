@@ -12,7 +12,7 @@ sub CLI ($self) {
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     my $dist = $self->get_dist;
 
-    if ( !-d $dist->root . 'wiki/' ) {
+    if ( !-d "$dist->{root}/wiki" ) {
         my $confirm = P->term->prompt( qq[Wiki wasn't found. Clone upstream wiki?], [qw[yes no]], enter => 1 );
 
         exit 3 if $confirm eq 'no';
@@ -36,7 +36,7 @@ sub _clone_upstream_wiki ( $self, $dist ) {
 
     print qq[Cloning upstream wiki "$clone_uri" ... ];
 
-    my $res = Pcore::API::SCM->scm_clone( $clone_uri, $dist->root . '/wiki/', $SCM_TYPE_HG );
+    my $res = Pcore::API::SCM->scm_clone( $clone_uri, "$dist->{root}/wiki", $SCM_TYPE_HG );
 
     say $res;
 

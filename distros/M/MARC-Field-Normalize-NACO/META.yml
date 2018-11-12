@@ -3,18 +3,17 @@ abstract: 'Matching normalization for MARC::Field'
 author:
   - 'Clay Fouts <cfouts@khephera.net>'
 build_requires:
-  List::MoreUtils: 0
-  MARC::Record: 0
-  Method::Signatures: 0
-  Test::More: 0.88
+  List::MoreUtils: '0'
+  MARC::Record: '0'
+  Test::More: '0.88'
 configure_requires:
-  Module::Build::Tiny: 0.039
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MARC-Field-Normalize-NACO
 no_index:
   directory:
@@ -25,12 +24,15 @@ no_index:
     - t
     - xt
 requires:
-  perl: 5.008005
+  perl: '5.008005'
 resources:
   bugtracker: https://github.com/ctfliblime/MARC-Field-Normalize-NACO/issues
   homepage: https://github.com/ctfliblime/MARC-Field-Normalize-NACO
   repository: https://github.com/ctfliblime/MARC-Field-Normalize-NACO.git
-version: 0.05
+version: '0.06'
 x_contributors:
   - 'Clay Fouts <cfouts@liblime.com>'
-x_serialization_backend: 'YAML::Tiny version 1.51'
+  - 'Clay Fouts <cfouts@ptfs.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

@@ -3,7 +3,7 @@ package Pcore::Dist::Build::Update;
 use Pcore -class;
 use Pod::Markdown;
 
-has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'], required => 1 );
+has dist => ( required => 1 );    # InstanceOf ['Pcore::Dist']
 
 sub run ($self) {
     $self->update_readme_md;
@@ -25,35 +25,25 @@ sub update_readme_md ($self) {
     $parser->output_string( \my $markdown );
 
     # generate markdown document
-    $parser->parse_string_document( $self->dist->module->content->$* );
+    $parser->parse_string_document( $self->{dist}->module->content->$* );
 
-    P->file->write_bin( $self->dist->root . 'README.md', $markdown );
+    P->file->write_bin( "$self->{dist}->{root}/README.md", $markdown );
 
     return;
 }
 
 sub update_license ($self) {
-    my $lic = P->class->load( $self->dist->cfg->{license}, ns => 'Software::License' )->new( {
-        holder => $self->dist->cfg->{copyright_holder} || $self->dist->cfg->{author},
+    my $lic = P->class->load( $self->{dist}->cfg->{license}, ns => 'Software::License' )->new( {
+        holder => $self->{dist}->cfg->{copyright_holder} || $self->{dist}->cfg->{author},
         year => P->date->now->year,
     } );
 
-    P->file->write_bin( $self->dist->root . 'LICENSE', $lic->fulltext );
+    P->file->write_bin( "$self->{dist}->{root}/LICENSE", $lic->fulltext );
 
     return;
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 28                   | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

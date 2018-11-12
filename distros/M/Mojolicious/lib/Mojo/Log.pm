@@ -5,6 +5,7 @@ use Carp 'croak';
 use Fcntl ':flock';
 use Mojo::File;
 use Mojo::Util 'encode';
+use Time::HiRes 'time';
 
 has format => sub { shift->short ? \&_short : \&_default };
 has handle => sub {
@@ -36,10 +37,10 @@ sub append {
   flock $handle, LOCK_UN;
 }
 
-sub debug { shift->_log(debug => @_) }
-sub error { shift->_log(error => @_) }
-sub fatal { shift->_log(fatal => @_) }
-sub info  { shift->_log(info  => @_) }
+sub debug { 1 >= $LEVEL{$_[0]->level} ? _log(@_, 'debug') : $_[0] }
+sub error { 4 >= $LEVEL{$_[0]->level} ? _log(@_, 'error') : $_[0] }
+sub fatal { 5 >= $LEVEL{$_[0]->level} ? _log(@_, 'fatal') : $_[0] }
+sub info  { 2 >= $LEVEL{$_[0]->level} ? _log(@_, 'info')  : $_[0] }
 
 sub is_level { $LEVEL{pop()} >= $LEVEL{shift->level} }
 
@@ -49,18 +50,20 @@ sub new {
   return $self;
 }
 
-sub warn { shift->_log(warn => @_) }
+sub warn { 3 >= $LEVEL{$_[0]->level} ? _log(@_, 'warn') : $_[0] }
 
 sub _default {
-  '[' . localtime(shift) . '] [' . shift() . '] ' . join "\n", @_, '';
+  my ($time, $level) = (shift, shift);
+  my ($s, $m, $h, $day, $month, $year) = localtime $time;
+  $time = sprintf '%04d-%02d-%02d %02d:%02d:%08.5f', $year + 1900, $month + 1,
+    $day, $h, $m, "$s." . (split /\./, $time)[1];
+  return "[$time] [$$] [$level] " . join "\n", @_, '';
 }
 
-sub _log { shift->emit('message', shift, @_) }
+sub _log { shift->emit('message', pop, ref $_[0] eq 'CODE' ? $_[0]() : @_) }
 
 sub _message {
   my ($self, $level) = (shift, shift);
-
-  return unless $self->is_level($level);
 
   my $max     = $self->max_history_size;
   my $history = $self->history;
@@ -73,7 +76,7 @@ sub _message {
 sub _short {
   my ($time, $level) = (shift, shift);
   my ($magic, $short) = ("<$MAGIC{$level}>", substr($level, 0, 1));
-  return "${magic}[$short] " . join("\n$magic", @_) . "\n";
+  return "${magic}[$$] [$short] " . join("\n$magic", @_) . "\n";
 }
 
 1;
@@ -137,7 +140,7 @@ A callback for formatting log messages.
 
   $log->format(sub {
     my ($time, $level, @lines) = @_;
-    return "[Thu May 15 17:47:04 2014] [info] I ♥ Mojolicious\n";
+    return "[2018-11-08 14:20:13.77168] [28320] [info] I ♥ Mojolicious\n";
   });
 
 =head2 handle
@@ -200,6 +203,7 @@ Append message to L</"handle">.
 
   $log = $log->debug('You screwed up, but that is ok');
   $log = $log->debug('All', 'cool');
+  $log = $log->debug(sub {...});
 
 Emit L</"message"> event and log C<debug> message.
 
@@ -207,6 +211,7 @@ Emit L</"message"> event and log C<debug> message.
 
   $log = $log->error('You really screwed up this time');
   $log = $log->error('Wow', 'seriously');
+  $log = $log->error(sub {...});
 
 Emit L</"message"> event and log C<error> message.
 
@@ -214,6 +219,7 @@ Emit L</"message"> event and log C<error> message.
 
   $log = $log->fatal('Its over...');
   $log = $log->fatal('Bye', 'bye');
+  $log = $log->fatal(sub {...});
 
 Emit L</"message"> event and log C<fatal> message.
 
@@ -221,6 +227,7 @@ Emit L</"message"> event and log C<fatal> message.
 
   $log = $log->info('You are bad, but you prolly know already');
   $log = $log->info('Ok', 'then');
+  $log = $log->info(sub {...});
 
 Emit L</"message"> event and log C<info> message.
 
@@ -251,6 +258,7 @@ default logger.
 
   $log = $log->warn('Dont do that Dave...');
   $log = $log->warn('No', 'really');
+  $log = $log->warn(sub {...});
 
 Emit L</"message"> event and log C<warn> message.
 

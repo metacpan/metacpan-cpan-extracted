@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.026    2018-11-11
+        - File::Find: disable warnings if OS is MSWin32.
+
 2.025    2018-08-13
         - Removed "Term::ProgressBar" from the dependencies since "Term::TablePrint" has now its own progress bar module.
         - Minimum version "Term::TablePrint" is "0.072".

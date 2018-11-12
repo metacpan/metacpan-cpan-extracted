@@ -60,9 +60,9 @@ sub _show_dist_info ( $self, $dist ) {
 
     print $tbl->render_all( [    #
         [ module => $dist->module->name, ],
-        [ root   => $dist->root, ],
+        [ root   => $dist->{root}, ],
         [ lib    => $dist->module->lib, ],
-        [ share  => $dist->share_dir, ],
+        [ share  => $dist->{share_dir}, ],
         $dist->docker ? [ docker => $dist->docker->{repo_id} . ' FROM ' . $dist->docker->{from} ] : (),
     ] );
 

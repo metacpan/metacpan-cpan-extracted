@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0700';
 
 use Carp;
 
@@ -37,11 +37,8 @@ sub parse {
     my ( $self, $chord ) = @_;
 
     # Literal diatonic modes when chords attribute is zero
-    my @roman;
-    if ( $self->scale_name eq 'major' || $self->scale_name eq 'ionian' ) {
-        @roman = qw( I ii iii IV V vi vii );
-    }
-    elsif ( $self->scale_name eq 'dorian' ) {
+    my @roman = qw( I ii iii IV V vi vii ); # Default to major/ionian
+    if ( $self->scale_name eq 'dorian' ) {
         @roman = qw( i ii III IV v vi VII );
     }
     elsif ( $self->scale_name eq 'phrygian' ) {
@@ -131,7 +128,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.0600
+version 0.0700
 
 =head1 SYNOPSIS
 

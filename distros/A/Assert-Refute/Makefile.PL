@@ -34,6 +34,11 @@ WriteMakefile(
                 web => 'https://github.com/dallaylaen/assert-refute-perl',
             },
         },
+        x_contributors => [
+            # Alphabetically plz, comma at the end
+            q{Jacobo Chamorro},
+            q{Mohammad S Anwar <manwar@cpan.org>},
+        ],
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Assert-Refute-*' },

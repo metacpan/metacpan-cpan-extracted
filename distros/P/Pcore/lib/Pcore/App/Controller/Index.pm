@@ -5,7 +5,7 @@ use Pcore -role;
 with qw[Pcore::App::Controller];
 
 # around run => sub ( $orig, $self, $req ) {
-#     if ( $req->{path_tail}->is_file ) {
+#     if ( defined $req->{path_tail}->{filename} ) {
 #         $self->return_static($req);
 
 #         return;
@@ -16,13 +16,13 @@ with qw[Pcore::App::Controller];
 # };
 
 # sub return_static ( $self, $req ) {
-#     if ( $req->{path_tail} && $req->{path_tail}->is_file ) {
+#     if ( $req->{path_tail} && defined $req->{path_tail}->{filename} ) {
 #         if ( my $path = $ENV->{share}->get( 'www', $req->{path} . $req->{path_tail} ) ) {
 #             my $data = P->file->read_bin($path);
 
 #             $path = P->path($path);
 
-#             $req->( 200, [ 'Content-Type' => $path->mime_type ], $data )->finish;
+#             $req->( 200, [ 'Content-Type' => $path->mime_type // 'application/octet-stream' ], $data )->finish;
 #         }
 #         else {
 #             $req->(404)->finish;    # not found

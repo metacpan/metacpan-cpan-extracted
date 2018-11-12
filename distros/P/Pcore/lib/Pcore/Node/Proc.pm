@@ -12,9 +12,9 @@ has fh        => ();    # fh
 has on_finish => ();    # CodeRef->($self)
 
 sub DESTROY ($self) {
-    if ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) {
-        $self->{fh}->shutdown;
-    }
+
+    # inform node process, that parent is terminated
+    $self->{fh}->shutdown;
 
     return;
 }

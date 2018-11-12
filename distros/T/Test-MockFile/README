@@ -3,7 +3,7 @@ NAME
     without the file system ever being touched.
 
 VERSION
-    Version 0.010
+    Version 0.011
 
 SYNOPSIS
     Intercepts file system calls for specific files so unit testing can take
@@ -78,14 +78,26 @@ SUBROUTINES/METHODS
 
     See "Mock Stats" for what goes in this hash ref.
 
+  file_from_disk
+    Args: "($file_to_mock, $file_on_disk, $stats)"
+
+    This will make cause $file to be mocked in all file checks, opens, etc.
+
+    If "file_on_disk" isn't present, then this will die.
+
+    See "Mock Stats" for what goes in this hash ref.
+
   symlink
-    Args: ($file, $readlink )
+    Args: ($readlink, $file )
 
     This will cause $file to be mocked in all file checks, opens, etc.
 
     $readlink indicates what "fake" file it points to. If the file $readlink
     points to is not mocked, it will act like a broken link, regardless of
     what's on disk.
+
+    If $readlink is undef, then the symlink is mocked but not present.(lstat
+    $file is empty.)
 
     Stats are not able to be specified on instantiation but can in theory be
     altered after the object is created. People don't normally mess with the
@@ -148,7 +160,7 @@ SUBROUTINES/METHODS
     file. Symlinks have no contents.
 
   unlink
-    Makes the virtual file go away by making its contents undef.
+    Makes the virtual file go away. NOTE: This also works for directories.
 
   touch
     Optional Args: ($epoch_time)
@@ -180,6 +192,9 @@ SUBROUTINES/METHODS
   size
     returns the size of the file based on its contents.
 
+  exists
+    returns true or false base on if the file exists right now.
+
   blocks
     Calculates the block count of the file based on its size.
 
@@ -189,6 +204,9 @@ SUBROUTINES/METHODS
     Allows you to alter the permissions of a file. This only allows you to
     change the 07777 bits of the file permissions. The number passed should
     be the octal 0755 form, not the alphabetic "755" form
+
+  permissions
+    Returns the permissions of the file.
 
   mtime
     Optional Arg: $new_epoch_time

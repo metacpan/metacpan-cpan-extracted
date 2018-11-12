@@ -1,6 +1,6 @@
 package Calendar::Bahai;
 
-$Calendar::Bahai::VERSION   = '0.46';
+$Calendar::Bahai::VERSION   = '0.47';
 $Calendar::Bahai::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Bahai - Interface to the calendar used by Bahai faith.
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 
 use Date::Bahai::Simple;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 with 'Calendar::Plugin::Renderer';
 
 use overload q{""} => 'as_string', fallback => 1;

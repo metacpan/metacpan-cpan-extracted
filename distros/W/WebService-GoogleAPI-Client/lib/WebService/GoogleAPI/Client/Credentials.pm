@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::Credentials;
-$WebService::GoogleAPI::Client::Credentials::VERSION = '0.19';
+$WebService::GoogleAPI::Client::Credentials::VERSION = '0.20';
 
 # ABSTRACT: Credentials for particular Client instance. You can use this module as singleton also if you need to share
 #           credentials between two or more modules
@@ -59,7 +59,7 @@ WebService::GoogleAPI::Client::Credentials - Credentials for particular Client i
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 METHODS
 

@@ -10,16 +10,19 @@ our @EXPORT_OK = qw(
 );
 
 use Data::Dumper;
+use Hash::Merge qw( merge );
 
 sub build_schema {
-  my $def = shift;
+  my $def = shift || [];
+  my $options = shift // {};
+  $options->{sims_component} //= 1;
 
   my $schema = "MyApp::Schema";
   my $prefix = "MyApp::Schema::Result";
 
   my $pkg = '';
   my @packages;
-  while (my $name = shift @{$def//[]}) {
+  while (my $name = shift @{$def}) {
     my $defn = shift @$def;
 
     push @packages, $name;
@@ -58,7 +61,8 @@ sub build_schema {
   $pkg .= "{ package $schema;\n  use base 'DBIx::Class::Schema';\n";
   $pkg .= "  __PACKAGE__->register_class($_ => '${prefix}::$_');\n"
     for @packages;
-  $pkg .= "  __PACKAGE__->load_components('Sims');\n}\n";
+  $pkg .= "  __PACKAGE__->load_components('Sims');\n" if $options->{sims_component};
+  $pkg .= "}\n";
 
   #print STDERR $pkg;
   eval $pkg; if ($@) {

@@ -2,9 +2,9 @@ package Pcore::Util::UUID::Obj;
 
 use Pcore -class;
 
-has bin => ( is => 'lazy', isa => Str );
-has str => ( is => 'lazy', isa => Str );
-has hex => ( is => 'lazy', isa => Str );
+has bin => ( is => 'lazy' );
+has str => ( is => 'lazy' );
+has hex => ( is => 'lazy' );
 
 sub _build_bin ($self) {
     if ( defined $self->{str} ) {

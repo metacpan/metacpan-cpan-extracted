@@ -28,8 +28,8 @@ sub _start {
 
   # Pipe for subprocess communication
   return $self->$parent("Can't create pipe: $!")
-    unless pipe(my $reader, my $writer);
-  $writer->autoflush(1);
+    unless pipe(my $reader, $self->{writer});
+  $self->{writer}->autoflush(1);
 
   # Child
   return $self->$parent("Can't fork: $!")
@@ -37,24 +37,43 @@ sub _start {
   unless ($pid) {
     $self->ioloop->reset;
     my $results = eval { [$self->$child] } || [];
-    print $writer $self->serialize->([$@, @$results]);
+    print {$self->{writer}} '0-', $self->serialize->([$@, @$results]);
     POSIX::_exit(0);
   }
 
   # Parent
-  my $me     = $$;
+  my $me = $$;
+  close $self->{writer};
   my $stream = Mojo::IOLoop::Stream->new($reader)->timeout(0);
   $self->emit('spawn')->ioloop->stream($stream);
   my $buffer = '';
-  $stream->on(read => sub { $buffer .= pop });
+  $stream->on(
+    read => sub {
+      $buffer .= pop;
+      while (1) {
+        my ($len) = $buffer =~ /^([0-9]+)\-/;
+        last unless $len and length $buffer >= $len + $+[0];
+        my $snippet = substr $buffer, 0, $len + $+[0], '';
+        my $args = $self->deserialize->(substr $snippet, $+[0]);
+        $self->emit(progress => @$args);
+      }
+    }
+  );
   $stream->on(
     close => sub {
       return unless $$ == $me;
       waitpid $pid, 0;
+      substr $buffer, 0, 2, '';
       my $results = eval { $self->deserialize->($buffer) } || [];
       $self->$parent(shift(@$results) // $@, @$results);
     }
   );
+}
+
+sub progress {
+  my ($self, @args) = @_;
+  my $serialized = $self->serialize->(\@args);
+  print {$self->{writer}} length($serialized), '-', $serialized;
 }
 
 1;
@@ -96,6 +115,16 @@ expensive operations in subprocesses, without blocking the event loop.
 
 L<Mojo::IOLoop::Subprocess> inherits all events from L<Mojo::EventEmitter> and
 can emit the following new ones.
+
+=head2 progress
+
+  $subprocess->on(progress => sub {
+    my ($subprocess, @data) = @_;
+    ...
+  });
+
+Emitted in the parent process when the subprocess calls the
+L<progress|/"progress1"> method.
 
 =head2 spawn
 
@@ -160,6 +189,35 @@ implements the following new ones.
   my $pid = $subprocess->pid;
 
 Process id of the spawned subprocess if available.
+
+=head2 progress
+
+  $subprocess->progress(@data);
+
+Send data serialized with L<Storable> to the parent process at any time during
+the subprocess's execution. Must be called by the subprocess and emits the
+L</"progress"> event in the parent process with the data.
+
+  # Send progress information to the parent process
+  $subprocess->run(
+    sub {
+      my $subprocess = shift;
+      $subprocess->progress('0%');
+      sleep 5;
+      $subprocess->progress('50%');
+      sleep 5;
+      return 'Hello Mojo!';
+    },
+    sub {
+      my ($subprocess, $err, @results) = @_;
+      say 'Progress is 100%';
+      say $results[0];
+    }
+  );
+  $subprocess->on(progress => sub {
+    my ($subprocess, @data) = @_;
+    say "Progress is $data[0]";
+  });
 
 =head2 run
 

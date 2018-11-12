@@ -9,25 +9,25 @@ use Pcore::Core::Env::Share;
 use Fcntl qw[LOCK_EX SEEK_SET];
 use Pcore::Util::Scalar qw[is_ref];
 
-has is_par => ( is => 'ro', isa => Bool, init_arg => undef );    # process run from PAR distribution
-has main_dist => ( is => 'ro', isa => Maybe      [ InstanceOf ['Pcore::Dist'] ], init_arg => undef );    # main dist
-has pcore     => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'],                init_arg => undef );    # pcore dist
-has share     => ( is => 'ro', isa => InstanceOf ['Pcore::Core::Env::Share'],    init_arg => undef );    # share object
-has _dist_idx     => ( is => 'ro',   isa => HashRef, init_arg => undef );                                # registered dists. index
-has cli           => ( is => 'ro',   isa => HashRef, init_arg => undef );                                # parsed CLI data
-has user_cfg_path => ( is => 'lazy', isa => Str,     init_arg => undef );
-has user_cfg      => ( is => 'lazy', isa => HashRef, init_arg => undef );                                # $HOME/.pcore/pcore.ini config
+has is_par        => ( init_arg => undef );                        # process run from PAR distribution
+has main_dist     => ( init_arg => undef );                        # Maybe [ InstanceOf ['Pcore::Dist'] ], main dist
+has pcore         => ( init_arg => undef );                        # InstanceOf ['Pcore::Dist'], pcore dist
+has _dist_idx     => ( init_arg => undef );                        # HashRef, registered dists. index
+has cli           => ( init_arg => undef );                        # HashRef, parsed CLI data
+has share         => ( init_arg => undef );                        # InstanceOf ['Pcore::Core::Env::Share'], share object
+has user_cfg_path => ( is       => 'lazy', init_arg => undef );
+has user_cfg      => ( is       => 'lazy', init_arg => undef );    # $HOME/.pcore/pcore.ini config
 
-has SYS_USER_DIR   => ();                                                                                # OS user profile dir
-has PCORE_USER_DIR => ();                                                                                # SYS_USER_DIR/.pcore, pcore profile dir
-has INLINE_DIR     => ();
-has START_DIR      => ();
-has SCRIPT_DIR     => ();
-has SCRIPT_NAME    => ();
-has SYS_TEMP_DIR   => ();                                                                                # OS temp dir
-has TEMP_DIR       => ();                                                                                # SYS_TEMP_DIR/temp-xxxx, random temp dir, created in SYS_TEMP_DIR
-has PCORE_SYS_DIR  => ();                                                                                # SYS_TEMP_DIR/.pcore
-has DATA_DIR       => ();
+has PCORE_SHARE_DIR => ();
+has USER_DIR        => ();                                         # OS user profile dir
+has PCORE_USER_DIR  => ();                                         # USER_DIR/.pcore, pcore profile dir
+has INLINE_DIR      => ();
+has START_DIR       => ();
+has SCRIPT_DIR      => ();
+has SCRIPT_NAME     => ();
+has TEMP_DIR        => ();                                         # OS temp dir
+has PCORE_TEMP_DIR  => ();                                         # TEMP_DIR/.pcore
+has DATA_DIR        => ();
 
 has SCANDEPS  => ();
 has DAEMONIZE => ();
@@ -35,7 +35,7 @@ has UID       => ();
 has GID       => ();
 
 # create $ENV object
-$ENV = __PACKAGE__->new;                                                                                 ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+$ENV = __PACKAGE__->new;                                           ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
 _normalize_inc();
 
@@ -43,6 +43,7 @@ $ENV->BUILD1;
 
 _configure_inc();
 
+# TODO - remove??? check under windows
 sub _normalize_inc {
     my @inc;
 
@@ -59,7 +60,7 @@ sub _normalize_inc {
         # ignore non-exists path
         next if !-d $inc_path;
 
-        $inc_path = P->path( $inc_path, is_dir => 1 )->realpath->canonpath;
+        $inc_path = P->path($inc_path)->to_abs->{path};
 
         # ignore already added path
         if ( !exists $inc_index->{$inc_path} ) {
@@ -79,9 +80,9 @@ sub _configure_inc {
 
     my $inc_index;
 
-    # index @INC, resolve @INC paths, remove duplicates, preserve REF items
+    # index @INC, resolve @INC paths, remove duplicates, preserve Ref items
     for my $inc_path (@INC) {
-        if ( ref $inc_path ) {
+        if ( is_ref $inc_path ) {
             push @inc, $inc_path;
 
             next;
@@ -97,7 +98,7 @@ sub _configure_inc {
 
     # not for PAR
     if ( !$ENV->{is_par} ) {
-        my $is_module_build_test = 0;    # $ENV->dist && exists $inc_index->{ $ENV->dist->root . 'blib/lib' } ? 1 : 0;
+        my $is_module_build_test = 0;    # $ENV->dist && exists $inc_index->{ $ENV->dist->{root} . '/blib/lib' } ? 1 : 0;
 
         # add dist lib and PCORE_LIB to @INC only if we are int on the PAR archive and not in the Module::Build testing environment
         # under Module::Build dist lib is already added and PCORE_LIB is not added to emulate clean CPAN installation
@@ -105,8 +106,8 @@ sub _configure_inc {
             my $dist_lib_path;
 
             # detect dist lib path
-            if ( $ENV->dist && !exists $inc_index->{ $ENV->dist->root . 'lib' } && -d $ENV->dist->root . 'lib/' ) {
-                $dist_lib_path = $ENV->dist->root . 'lib';
+            if ( $ENV->dist && !exists $inc_index->{ $ENV->dist->{root} . '/lib' } && -d $ENV->dist->{root} . '/lib' ) {
+                $dist_lib_path = $ENV->dist->{root} . '/lib';
 
                 $inc_index->{$dist_lib_path} = 1;
             }
@@ -153,8 +154,10 @@ sub _init_inline ($self) {
             config => (
                 directory         => $self->{INLINE_DIR},
                 autoname          => 0,
-                clean_after_build => 0,
-                clean_build_area  => 0,
+                clean_after_build => 1,                     # clean up the current build area if the build was successful
+                clean_build_area  => 1,                     # clean up the old build areas within the entire Inline directory
+                force_build       => 0,                     # build (compile) the source code every time the program is run
+                build_noisy       => 0,                     #  dump build messages to the terminal rather than be silent about all the build details
             )
         );
     }
@@ -165,14 +168,35 @@ sub _init_inline ($self) {
 sub BUILD ( $self, $args ) {
     $self->{is_par} = $ENV{PAR_TEMP} ? 1 : 0;
 
-    $self->{SYS_USER_DIR} = $ENV{HOME} || $ENV{USERPROFILE};
+    $self->{USER_DIR} = $ENV{HOME} || $ENV{USERPROFILE};
 
-    $self->{PCORE_USER_DIR} = "$self->{SYS_USER_DIR}/.pcore/";
+    $self->{PCORE_USER_DIR} = "$self->{USER_DIR}/.pcore";
     mkdir $self->{PCORE_USER_DIR} || die qq[Error creating user dir "$self->{PCORE_USER_DIR}"] if !-d $self->{PCORE_USER_DIR};
+
     if ( !$self->{is_par} ) {
-        $self->{INLINE_DIR} = "$self->{PCORE_USER_DIR}inline/$Config{version}-$Config{archname}/";
-        mkdir "$self->{PCORE_USER_DIR}inline" || die qq[Error creating ""$self->{PCORE_USER_DIR}inline""] if !-d "$self->{PCORE_USER_DIR}inline";
+        $self->{INLINE_DIR} = "$self->{PCORE_USER_DIR}/inline/$Config{version}-$Config{archname}";
+        mkdir "$self->{PCORE_USER_DIR}/inline" || die qq[Error creating ""$self->{PCORE_USER_DIR}/inline""] if !-d "$self->{PCORE_USER_DIR}/inline";
         mkdir $self->{INLINE_DIR} || die qq[Error creating "$self->{INLINE_DIR}"] if !-d $self->{INLINE_DIR};
+    }
+
+    # find Pcore share dir
+    my $pcore_path = $INC{'Pcore.pm'};
+
+    # remove "/Pcore.pm"
+    substr $pcore_path, -9, 9, '';
+
+    if ( -d "$pcore_path/../share" ) {
+
+        # remove "/lib"
+        substr $pcore_path, -4, 4, '';
+
+        $self->{PCORE_SHARE_DIR} = "$pcore_path/share";
+    }
+    elsif ( -d "$pcore_path/auto/share/dist/Pcore" ) {
+        $self->{PCORE_SHARE_DIR} = "$pcore_path/auto/share/dist/Pcore";
+    }
+    else {
+        die q[Pcore share dir can't be found.];
     }
 
     $self->_init_inline;
@@ -181,15 +205,14 @@ sub BUILD ( $self, $args ) {
 }
 
 sub BUILD1 ($self) {
-
-    $self->{SYS_USER_DIR}   = P->path( $self->{SYS_USER_DIR},   is_dir => 1 );
-    $self->{PCORE_USER_DIR} = P->path( $self->{PCORE_USER_DIR}, is_dir => 1 );
-    $self->{INLINE_DIR}     = P->path( $self->{INLINE_DIR},     is_dir => 1 ) if $self->{INLINE_DIR};
+    $self->{USER_DIR}       = P->path( $self->{USER_DIR} )->{path};
+    $self->{PCORE_USER_DIR} = P->path( $self->{PCORE_USER_DIR} )->{path};
+    $self->{INLINE_DIR}     = P->path( $self->{INLINE_DIR} )->{path} if $self->{INLINE_DIR};
 
     # init share
     $self->{share} = Pcore::Core::Env::Share->new;
 
-    $self->{START_DIR} = P->file->cwd->to_string;
+    $self->{START_DIR} = P->path->to_abs->{path};
 
     if ( $Pcore::SCRIPT_PATH eq '-e' || $Pcore::SCRIPT_PATH eq '-' ) {
         $self->{SCRIPT_NAME} = '-e';
@@ -198,17 +221,16 @@ sub BUILD1 ($self) {
     else {
         die qq[Cannot find current script "$Pcore::SCRIPT_PATH"] if !-f $Pcore::SCRIPT_PATH;
 
-        my $path = P->path($Pcore::SCRIPT_PATH)->realpath;
+        my $path = P->path($Pcore::SCRIPT_PATH)->to_abs;
 
-        $self->{SCRIPT_NAME} = $path->filename;
-        $self->{SCRIPT_DIR}  = $path->dirname;
+        $self->{SCRIPT_NAME} = $path->{filename};
+        $self->{SCRIPT_DIR}  = $path->{dirname};
     }
 
-    $self->{SCRIPT_PATH} = $self->{SCRIPT_DIR} . $self->{SCRIPT_NAME};
+    $self->{SCRIPT_PATH} = "$self->{SCRIPT_DIR}/$self->{SCRIPT_NAME}";
 
-    $self->{SYS_TEMP_DIR} = P->path( File::Spec->tmpdir, is_dir => 1 )->to_string;
-    $self->{TEMP_DIR} = P->file->tempdir( base => $self->{SYS_TEMP_DIR}, lazy => 1 );
-    $self->{PCORE_SYS_DIR} = P->path( $self->{SYS_TEMP_DIR} . '.pcore/', is_dir => 1, lazy => 1 );
+    $self->{TEMP_DIR}       = P->path( File::Spec->tmpdir )->{path};
+    $self->{PCORE_TEMP_DIR} = P->path("$self->{TEMP_DIR}/.pcore")->{path};
 
     # find main dist
     if ( $self->{is_par} ) {
@@ -231,7 +253,8 @@ sub BUILD1 ($self) {
             $self->{DATA_DIR} = $self->{SCRIPT_DIR};
         }
         else {
-            $self->{DATA_DIR} = P->path( $dist->root . 'data/', is_dir => 1, lazy => 1 );
+            $self->{DATA_DIR} = P->path("$dist->{root}/data")->{path};
+            mkdir $self->{DATA_DIR} || die qq[Can't create "$self->{DATA_DIR}"] if !-d $self->{DATA_DIR};
         }
     }
     else {
@@ -250,8 +273,9 @@ sub BUILD1 ($self) {
 
     # scan deps
     if ( !$self->{is_par} && defined( my $dist = $self->{main_dist} ) ) {
-        if ( $dist->par_cfg && exists $dist->par_cfg->{ $self->{SCRIPT_NAME} } ) {
-            $self->set_scandeps( $dist->share_dir . "pardeps-$self->{SCRIPT_NAME}-@{[$^V->normal]}-$Config{archname}.json" );
+        if ( $dist->par_cfg && exists $dist->par_cfg->{ $self->{SCRIPT_NAME} } && !$dist->par_cfg->{ $self->{SCRIPT_NAME} }->{disabled} ) {
+
+            $self->set_scandeps("$dist->{share_dir}/pardeps-$self->{SCRIPT_NAME}-@{[$^V->normal]}-$Config{archname}.json");
         }
     }
 
@@ -269,9 +293,7 @@ sub set_scandeps ( $self, $path ) {
     return;
 }
 
-sub _build_user_cfg_path ($self) {
-    return "$self->{PCORE_USER_DIR}pcore.ini";
-}
+sub _build_user_cfg_path ($self) { return "$self->{PCORE_USER_DIR}/pcore.ini" }
 
 sub _build_user_cfg ($self) {
     if ( !-f $self->user_cfg_path ) {
@@ -297,7 +319,7 @@ sub register_dist ( $self, $dist ) {
     $self->{_dist_idx}->{ $dist->name } = $dist;
 
     # register dist share lib
-    $self->{share}->register_lib( $dist->name, $dist->share_dir );
+    $self->{share}->register_lib( $dist->name, $dist->{share_dir} );
 
     return;
 }
@@ -335,6 +357,8 @@ sub DESTROY ( $self ) {
         my ( $updated, $embedded_packages );
 
         for my $module ( sort keys %INC ) {
+            next if $INC{$module} eq '(embedded)';
+
             if ( !exists $index->{$module} ) {
                 if ( $INC{$module} !~ /\Q$module\E\z/sm ) {
                     $embedded_packages->{$module} = $INC{$module};
@@ -401,15 +425,19 @@ sub DESTROY ( $self ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 314                  | Subroutines::ProhibitExcessComplexity - Subroutine "DESTROY" with high complexity score (22)                   |
+## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
+## |      | 207                  | * Subroutine "BUILD1" with high complexity score (23)                                                          |
+## |      | 336                  | * Subroutine "DESTROY" with high complexity score (23)                                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 323                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 345                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 361                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 385                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 388                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
+## |    2 | 186, 191             | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 116                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    2 | 412                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 117                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

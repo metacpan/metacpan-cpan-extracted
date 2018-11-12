@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::TestMLIncluder;
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -95,7 +95,7 @@ chmod 0755, 'inc/bin/testml-cpan';
 if ($^O eq 'MSWin32') {
   my $file = 'inc/bin/testml-cpan.cmd';
   open OUT, '>', $file or die "Can't open '$file' for output";
-  print OUT 'if exist %~dpn0 perl %0 %*', "\r\n";
+  print OUT 'if exist "%~dpn0" perl %0 %*', "\r\n";
   close OUT;
 
   find sub {

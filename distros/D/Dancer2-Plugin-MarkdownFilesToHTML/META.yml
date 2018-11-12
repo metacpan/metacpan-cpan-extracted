@@ -9,6 +9,7 @@ build_requires:
   Test::More: '0'
   Test::Most: '0'
   Test::NoWarnings: '0'
+  Test::Output: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -36,6 +37,6 @@ requires:
 resources:
   bugtracker: https://github.com/sdondley/Dancer2-Plugin-MarkdownFilesToHTML/issues
   repository: git://github.com/sdondley/Dancer2-Plugin-MarkdownFilesToHTML.git
-version: '0.014'
+version: '0.017'
 x_generated_by_perl: v5.24.4
 x_serialization_backend: 'YAML::Tiny version 1.70'

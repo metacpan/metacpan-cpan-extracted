@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 0.05_03;
+our $VERSION = 0.0601;
 
 sub new {
     my ($class, $args) = @_;
     my $name = $args->{Name} // 'Unnamed';
     my $type = $args->{Type} // 'String';
     my $tmp = $Geo::GDAL::FFI::field_types{$type};
-    confess "Unknown field type: '$type'\n" unless defined $tmp;
+    confess "Unknown field type: '$type'." unless defined $tmp;
     my $self = bless \Geo::GDAL::FFI::OGR_Fld_Create($name, $tmp), $class;
     $self->SetDefault($args->{Default}) if defined $args->{Default};
     $self->SetSubtype($args->{Subtype}) if defined $args->{Subtype};
@@ -68,7 +68,7 @@ sub SetType {
     confess "Can't modify an immutable object." if $Geo::GDAL::FFI::immutable{$$self};
     $type //= 'String';
     my $tmp = $Geo::GDAL::FFI::field_types{$type};
-    confess "Unknown field type: $type\n" unless defined $tmp;
+    confess "Unknown field type: $type." unless defined $tmp;
     $type = $tmp;
     Geo::GDAL::FFI::OGR_Fld_SetType($$self, $type);
 }
@@ -98,7 +98,7 @@ sub SetSubtype {
     confess "Can't modify an immutable object." if $Geo::GDAL::FFI::immutable{$$self};
     $subtype //= 'None';
     my $tmp = $Geo::GDAL::FFI::field_subtypes{$subtype};
-    confess "Unknown field subtype: $subtype\n" unless defined $tmp;
+    confess "Unknown field subtype: $subtype." unless defined $tmp;
     $subtype = $tmp;
     Geo::GDAL::FFI::OGR_Fld_SetSubType($$self, $subtype);
 }
@@ -113,7 +113,7 @@ sub SetJustify {
     confess "Can't modify an immutable object." if $Geo::GDAL::FFI::immutable{$$self};
     $justify //= 'Undefined';
     my $tmp = $Geo::GDAL::FFI::justification{$justify};
-    confess "Unknown constant: $justify\n" unless defined $tmp;
+    confess "Unknown justify: $justify." unless defined $tmp;
     $justify = $tmp;
     Geo::GDAL::FFI::OGR_Fld_SetJustify($$self, $justify);
 }

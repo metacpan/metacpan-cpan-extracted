@@ -3,7 +3,7 @@ package Pcore::HTTP::Response;
 use Pcore -class;
 use Pcore::Util::Scalar qw[is_plain_coderef is_plain_scalarref];
 
-with qw[Pcore::Util::Result::Status];
+with qw[Pcore::Util::Result::Role];
 
 has url => ();
 
@@ -22,7 +22,7 @@ sub _build_decoded_data ($self) {
 
     return if !is_plain_scalarref $self->{data};
 
-    state $init = !!require HTTP::Message;
+    require HTTP::Message;
 
     return HTTP::Message->new( [ 'Content-Type' => $self->{headers}->{'content-type'} ], $self->{data}->$* )->decoded_content( raise_error => 1, ref => 1 );
 }
@@ -32,7 +32,7 @@ sub _build_tree ($self) {
 
     return if !is_plain_scalarref $self->{data};
 
-    state $init = !!require HTML::TreeBuilder::LibXML;
+    require HTML::TreeBuilder::LibXML;
 
     my $tree = HTML::TreeBuilder::LibXML->new;
 

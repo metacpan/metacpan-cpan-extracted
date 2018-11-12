@@ -23,6 +23,7 @@
 #include "spvm_use.h"
 #include "spvm_basic_type.h"
 #include "spvm_my.h"
+#include "spvm_string_buffer.h"
 
 SPVM_OP* SPVM_TOKE_newOP(SPVM_COMPILER* compiler, int32_t type) {
   
@@ -65,9 +66,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
     
     // line end
     switch (ch) {
-      case '\0':
+      case '\0': {
         compiler->cur_file = NULL;
-        free(compiler->cur_src);
         compiler->cur_src = NULL;
         compiler->bufptr = NULL;
         compiler->befbufptr = NULL;
@@ -76,14 +76,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         SPVM_LIST* op_use_stack = compiler->op_use_stack;
         
         while (1) {
-          if (op_use_stack->length > 0) {
+          if (op_use_stack->length == 0) {
+            return 0;
+          }
+          else if (op_use_stack->length > 0) {
             SPVM_OP* op_use = SPVM_LIST_pop(op_use_stack);
             
-            assert(op_use->uv.use->op_type);
-            assert(op_use->uv.use->op_type->uv.type->dimension == 0);
             const char* package_name = op_use->uv.use->op_type->uv.type->basic_type->name;
-            
-            assert(package_name);
             
             SPVM_PACKAGE* found_package = SPVM_HASH_fetch(compiler->package_symtable, package_name, strlen(package_name));
             
@@ -91,7 +90,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               continue;
             }
             else {
-              
               // change :: to / and add ".spvm"
               int32_t module_path_base_length = (int32_t)(strlen(package_name) + 6);
               char* module_path_base = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, module_path_base_length + 1);
@@ -138,21 +136,17 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
               }
               if (!fh) {
-                if (op_use) {
-                  fprintf(stderr, "Can't locate %s in @INC (@INC contains:", module_path_base);
-                  {
-                    int32_t i;
-                    for (i = 0; i < module_include_pathes_length; i++) {
-                      const char* include_path = (const char*) SPVM_LIST_fetch(compiler->module_include_pathes, i);
-                      fprintf(stderr, " %s", include_path);
-                    }
+                fprintf(stderr, "Can't locate %s in @INC (@INC contains:", module_path_base);
+                {
+                  int32_t i;
+                  for (i = 0; i < module_include_pathes_length; i++) {
+                    const char* include_path = (const char*) SPVM_LIST_fetch(compiler->module_include_pathes, i);
+                    fprintf(stderr, " %s", include_path);
                   }
-                  fprintf(stderr, ") at %s line %" PRId32 "\n", op_use->file, op_use->line);
                 }
-                else {
-                  fprintf(stderr, "Can't find file %s\n", cur_file);
-                }
-                exit(EXIT_FAILURE);
+                fprintf(stderr, ") at %s line %d\n", op_use->file, op_use->line);
+                compiler->error_count++;
+                return 0;
               }
               
               compiler->cur_file = cur_file;
@@ -161,19 +155,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               fseek(fh, 0, SEEK_END);
               int32_t file_size = (int32_t)ftell(fh);
               if (file_size < 0) {
-                fprintf(stderr, "Can't read file %s at %s line %" PRId32 "\n", cur_file, op_use->file, op_use->line);
-                exit(EXIT_FAILURE);
+                SPVM_COMPILER_error(compiler, "Can't read file %s at %s line %d\n", cur_file, op_use->file, op_use->line);
+                return 0;
               }
               fseek(fh, 0, SEEK_SET);
-              char* cur_src = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(file_size + 1);
+              char* cur_src = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, file_size + 1);
               if ((int32_t)fread(cur_src, 1, file_size, fh) < file_size) {
-                if (op_use) {
-                  fprintf(stderr, "Can't read file %s at %s line %" PRId32 "\n", cur_file, op_use->file, op_use->line);
-                }
-                else {
-                  fprintf(stderr, "Can't read file %s\n", cur_file);
-                }
-                exit(EXIT_FAILURE);
+                SPVM_COMPILER_error(compiler, "Can't read file %s at %s line %d\n", cur_file, op_use->file, op_use->line);
+                return 0;
               }
               fclose(fh);
               cur_src[file_size] = '\0';
@@ -184,10 +173,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               compiler->cur_line = 1;
               break;
             }
-            
           }
           else {
-            return 0;
+            assert(0);
           }
         }
         if (compiler->cur_src) {
@@ -196,20 +184,17 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         else {
           return 0;
         }
-      
+      }
       /* Skip space character */
       case ' ':
       case '\t':
       case '\r':
         compiler->bufptr++;
         continue;
-
       case '\n':
         compiler->bufptr++;
         compiler->cur_line++;
-        
         continue;
-      
       /* Cancat */
       case '.': {
         if (state_var_expansion == SPVM_TOKE_C_STATE_VAR_EXPANSION_FIRST_CONCAT) {
@@ -609,7 +594,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       case '\'': {
         compiler->bufptr++;
         
-        int8_t ch;
+        char ch;
         // Null string
         if (*compiler->bufptr == '\'') {
           ch = '\0';
@@ -619,19 +604,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         else {
           if (*compiler->bufptr == '\\') {
             compiler->bufptr++;
-            if (*compiler->bufptr == '"') {
-              ch = '"';
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == '\'') {
-              ch = '\'';
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == '\\') {
-              ch = '\\';
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == 'r') {
+            if (*compiler->bufptr == 'r') {
               ch = 0x0D;
               compiler->bufptr++;
             }
@@ -651,9 +624,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               ch = '\f';
               compiler->bufptr++;
             }
+            else if (*compiler->bufptr == '0') {
+              ch = '\0';
+              compiler->bufptr++;
+            }
             else {
-              fprintf(stderr, "Invalid escape character \"%c%c\" at %s line %" PRId32 "\n", *(compiler->bufptr -1),*compiler->bufptr, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
+              ch = *compiler->bufptr;
             }
           }
           else {
@@ -661,11 +637,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             compiler->bufptr++;
           }
           
-          if (*compiler->bufptr != '\'') {
-            fprintf(stderr, "syntax error: character literal don't finish with '\n");
-            exit(EXIT_FAILURE);
+          if (*compiler->bufptr == '\'') {
+            compiler->bufptr++;
           }
-          compiler->bufptr++;
+          else {
+            SPVM_COMPILER_error(compiler, "Can't find constant char terminator \"'\" at %s line %d\n", compiler->cur_file, compiler->cur_line);
+          }
         }
         
         // Constant 
@@ -679,8 +656,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         if (state_var_expansion == SPVM_TOKE_C_STATE_VAR_EXPANSION_DOUBLE_QUOTE) {
           // $var-> is invalid
           if (*compiler->bufptr == '-' && *(compiler->bufptr + 1) == '>') {
-            fprintf(stderr, "Don't support variable expansion of array access or field access at %s line %d\n", compiler->cur_file, compiler->cur_line);
-            exit(EXIT_FAILURE);
+            SPVM_COMPILER_error(compiler, "Don't support variable expansion of array access or field access at %s line %d\n", compiler->cur_file, compiler->cur_line);
           }
         }
         else {
@@ -725,8 +701,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
           }
           if (*compiler->bufptr == '\0') {
-            fprintf(stderr, "syntax error: string don't finish with '\"'\n");
-            exit(EXIT_FAILURE);
+            SPVM_COMPILER_error(compiler, "Can't find string terminator '\"' anywhere before EOF at %s line %d\n", compiler->cur_file, compiler->cur_line);
+            continue;
           }
           
           int32_t str_tmp_len = (int32_t)(compiler->bufptr - cur_token_ptr);
@@ -739,46 +715,28 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             while (char_ptr != compiler->bufptr - 1) {
               if (*char_ptr == '\\') {
                 char_ptr++;
-                if (*char_ptr == '"') {
-                  str[str_length] = '"';
-                  str_length++;
-                }
-                else if (*char_ptr == '\'') {
-                  str[str_length] = '\'';
-                  str_length++;
-                }
-                else if (*char_ptr == '\\') {
-                  str[str_length] = '\\';
-                  str_length++;
-                }
-                else if (*char_ptr == 'r') {
+                if (*char_ptr == 'r') {
                   str[str_length] = 0x0D;
-                  str_length++;
                 }
                 else if (*char_ptr == 'n') {
                   str[str_length] = 0x0A;
-                  str_length++;
                 }
                 else if (*char_ptr == 't') {
                   str[str_length] = '\t';
-                  str_length++;
                 }
                 else if (*char_ptr == 'b') {
                   str[str_length] = '\b';
-                  str_length++;
                 }
                 else if (*char_ptr == 'f') {
                   str[str_length] = '\f';
-                  str_length++;
                 }
                 else if (*char_ptr == '0') {
                   str[str_length] = '\0';
-                  str_length++;
                 }
                 else {
-                  fprintf(stderr, "Invalid escape character \"%c%c\" at %s line %" PRId32 "\n", *(compiler->bufptr -1),*compiler->bufptr, compiler->cur_file, compiler->cur_line);
-                  exit(EXIT_FAILURE);
+                  str[str_length] = *char_ptr;
                 }
+                str_length++;
               }
               else {
                 str[str_length] = *char_ptr;
@@ -854,8 +812,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 compiler->bufptr++;
               }
               else {
-                fprintf(stderr, "Need close brace at end of variable at %s line %" PRId32 "\n", compiler->cur_file, compiler->cur_line);
-                exit(EXIT_FAILURE);
+                SPVM_COMPILER_error(compiler, "Need close brace at end of variable at %s line %d\n", compiler->cur_file, compiler->cur_line);
               }
             }
 
@@ -947,7 +904,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           // Number literal(first is space for sign)
           int32_t str_len = (compiler->bufptr - cur_token_ptr);
-          char* num_str = (char*) SPVM_UTIL_ALLOCATOR_safe_malloc_zero(str_len + 2);
+          char* num_str = (char*)SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, str_len + 2);
           {
             int32_t i;
             int32_t pos = 0;
@@ -998,8 +955,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             double num = strtod(num_str, &end);
             
             if (*end != '\0') {
-              fprintf(stderr, "Invalid float literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
+              SPVM_COMPILER_error(compiler, "Invalid float literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
             }
             op_constant = SPVM_OP_new_op_constant_float(compiler, (float)num, compiler->cur_file, compiler->cur_line);
           }
@@ -1008,8 +964,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             double num = strtod(num_str, &end);
             
             if (*end != '\0') {
-              fprintf(stderr, "Invalid double literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
+              SPVM_COMPILER_error(compiler, "Invalid double literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
             }
             op_constant = SPVM_OP_new_op_constant_double(compiler, num, compiler->cur_file, compiler->cur_line);
           }
@@ -1041,12 +996,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
             
             if (invalid) {
-              fprintf(stderr, "Invalid int literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
+              SPVM_COMPILER_error(compiler, "Invalid int literal %s at %s line %d\n", compiler->cur_file, compiler->cur_line);
             }
             else if (out_of_range) {
-              fprintf(stderr, "int literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
+              SPVM_COMPILER_error(compiler, "int literal out of range %s at %s line %d\n", compiler->cur_file, compiler->cur_line);
             }
             op_constant = SPVM_OP_new_op_constant_int(compiler, num, compiler->cur_file, compiler->cur_line);
           }
@@ -1078,12 +1031,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
             
             if (invalid) {
-              fprintf(stderr, "Invalid long literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
+              SPVM_COMPILER_error(compiler, "Invalid long literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
             }
             else if (out_of_range) {
-              fprintf(stderr, "long literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
-              exit(EXIT_FAILURE);
+              SPVM_COMPILER_error(compiler, "long literal out of range at %s line %d\n", compiler->cur_file, compiler->cur_line);
             }
             op_constant = SPVM_OP_new_op_constant_long(compiler, num, compiler->cur_file, compiler->cur_line);
           }
@@ -1404,8 +1355,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           // Symbol name can't conatain __
           if (strstr(keyword, "__")) {
-            fprintf(stderr, "Symbol name can't contain __ at %s line %" PRId32 "\n", compiler->cur_file, compiler->cur_line);
-            exit(1);
+            SPVM_COMPILER_error(compiler, "Symbol name can't contain __ at %s line %d\n", compiler->cur_file, compiler->cur_line);
           }
           
           SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, keyword, compiler->cur_file, compiler->cur_line);

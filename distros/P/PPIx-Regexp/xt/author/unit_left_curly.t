@@ -46,21 +46,21 @@ use My::Module::Test;
 parse	( '/x{/' );	# }
 value	( failures => [], 0 );
 choose	( child => 1, child => 1 );
-class	( 'PPIx::Regexp::Token::Literal' );
+klass	( 'PPIx::Regexp::Token::Literal' );
 content	( '{' );	# }
 value	( perl_version_removed => [], REMOVE_PHASE_2 );	# THIS IS THE POINT
 
 parse	( '/ { /x' );	# }
 value	( failures => [], 0 );
 choose	( child => 1, child => 0 );
-class	( 'PPIx::Regexp::Token::Literal' );
+klass	( 'PPIx::Regexp::Token::Literal' );
 content	( '{' );	# }
 value	( perl_version_removed => [], REMOVE_NEVER );	# THIS IS THE POINT
 
 parse	( '/ ( { ) /x' );	# }
 value	( failures => [], 0 );
 choose	( child => 1, child => 0, child => 0 );
-class	( 'PPIx::Regexp::Token::Literal' );
+klass	( 'PPIx::Regexp::Token::Literal' );
 content	( '{' );	# }
 value	( perl_version_removed => [], REMOVE_PHASE_3 );	# THIS IS THE POINT
 

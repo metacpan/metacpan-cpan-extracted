@@ -20,6 +20,8 @@ if( !$ok) {
     plan skip_all => "Couldn't load Future::HTTP::Tiny::Paranoid: $err";
     exit;
 };
+plan tests => 10;
+
 
 diag( "Version of HTTP::Tiny::Paranoid: " . HTTP::Tiny::Paranoid->VERSION );
 my $url = $server->url;

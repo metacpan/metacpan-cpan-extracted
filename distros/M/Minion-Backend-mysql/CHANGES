@@ -1,5 +1,17 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.15      2018-11-10 11:46:56-06:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed warning when pulling history for the Minion admin console.
+    Thanks @chromedome! [Github #20]
+  - Fixed tests failing with "DBD::mysql::st execute failed: This
+    function has none of DETERMINISTIC, NO SQL, or READS SQL DATA in its
+    declaration and binary logging is enabled". MySQL 8 adds some sanity
+    checks to functions and we need to override them. This might
+    actually be a problem that we will have to fix later...
+
 0.14      2018-04-30 20:41:08-04:00 America/New_York
 
   [Fixed]

@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.4.4;
+package Pcore::Chrome v0.4.5;
 
 use Pcore -dist, -class, -res;
 use Pcore::Chrome::Tab;
@@ -8,7 +8,7 @@ use Pcore::Util::Data qw[from_json];
 has bin           => ();
 has host          => '127.0.0.1';
 has port          => 9222;
-has user_data_dir => sub { P->file->tempdir };
+has user_data_dir => sub { P->file1->tempdir };
 has useragent     => ();
 
 has _proc => ();

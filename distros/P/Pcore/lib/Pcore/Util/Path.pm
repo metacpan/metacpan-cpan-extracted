@@ -1,506 +1,427 @@
 package Pcore::Util::Path;
 
-use Pcore -class;
+use Pcore -class, -const, -res;
 use Clone qw[];
-use Pcore::Util::Scalar qw[is_blessed_ref is_plain_arrayref];
+use Cwd qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 use Pcore::Util::Data qw[from_uri_utf8 to_uri_path];
+use Pcore::Util::Scalar qw[is_path is_blessed_hashref];
+use Pcore::Util::Text qw[encode_utf8 decode_utf8];
 
-use overload    #
-  q[""] => sub {
-    return $_[0]->to_string;
+use overload
+  q[""]  => sub { $_[0]->{path} },
+  'bool' => sub {1},
+  '-X'   => sub {
+    state $map = { map { $_ => eval qq[sub { return -$_ \$_[0] }] } qw[r w x o R W X O e z s f d l p S b c t u g k T B M A C] };    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
+
+    return $map->{ $_[1] }->( $MSWIN ? $_[0]->encoded : $_[0]->{path} );
   },
-  q[cmp] => sub {
-    return !$_[2] ? $_[0]->to_string cmp $_[1] : $_[1] cmp $_[0]->to_string;
-  },
-  q[~~] => sub {
-    return !$_[2] ? $_[0]->to_string ~~ $_[1] : $_[1] ~~ $_[0]->to_string;
-  },
-  q[-X] => sub {
-    return eval "-$_[1] '@{[$_[0]->encoded]}'";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
-  },
-  fallback => undef;
+  fallback => 1;
 
-has to_string => ( is => 'lazy', init_arg => undef );
-has to_uri    => ( is => 'lazy', init_arg => undef );
-has encoded   => ( is => 'lazy', init_arg => undef );
+with qw[
+  Pcore::Util::Path::MIME
+  Pcore::Util::Path::Dir
+  Pcore::Util::Path::File
+  Pcore::Util::Path::Poll
+];
 
-has lazy    => ( is => 'ro',   default  => 0 );
-has is_abs  => ( is => 'ro',   required => 1 );
-has is_dir  => ( is => 'lazy', init_arg => undef );
-has is_file => ( is => 'lazy', init_arg => undef );
+has path          => ( required => 1 );
+has volume        => ( required => 1 );
+has dirname       => ( required => 1 );
+has filename      => ( required => 1 );
+has filename_base => ( required => 1 );
+has suffix        => ( required => 1 );
 
-has volume    => ( is => 'ro',   default  => q[] );
-has path      => ( is => 'ro',   required => 1 );                        # contains normalized path with volume
-has canonpath => ( is => 'lazy', isa      => Str, init_arg => undef );
+has is_abs => ();
 
-has dirname       => ( is => 'lazy', isa => Str, init_arg => undef );
-has dirname_canon => ( is => 'lazy', isa => Str, init_arg => undef );
-has filename      => ( is => 'lazy', isa => Str, init_arg => undef );
-has filename_base => ( is => 'lazy', isa => Str, init_arg => undef );
-has suffix        => ( is => 'lazy', isa => Str, init_arg => undef );
+has _encoded => ( init_arg => undef );    # utf8 encoded path
+has _to_url  => ( init_arg => undef );
 
-has default_mime_type => ( is => 'lazy', isa => Str, default => 'application/octet-stream' );
-has mime_type         => ( is => 'ro',   isa => Str );
-has mime_category     => ( is => 'lazy', isa => Str );
+# from_uri, from_mswin
+around new => sub ( $orig, $self, $path = undef, %args ) {
+    $self = ref $self if is_blessed_hashref $self;
 
-around new => sub ( $orig, $self, $path = q[], @ ) {
-    my %args = (
-        is_dir   => 0,
-        mswin    => $MSWIN,
-        base     => q[],
-        lazy     => 0,
-        from_uri => 0,
-        splice @_, 3,
-    );
-
-    $self = ref $self if is_blessed_ref $self;
-
-    my $path_args = {
-        path   => $path,
-        volume => q[],
-        is_abs => 0,
-        lazy   => $args{lazy},
-    };
-
-    # speed optimizations
-    if ( $path_args->{path} eq q[] ) {
-        if ( $args{base} eq q[] ) {
-            return bless {
-                path   => q[],
-                volume => q[],
-                is_abs => 0,
-              },
-              $self;
-        }
-        else {
-            $path_args->{path} = delete $args{base};
-        }
-    }
-    elsif ( $path_args->{path} eq q[/] ) {
+    if ( !defined $path || $path eq '' || $path eq '.' ) {
         return bless {
-            path   => q[/],
-            volume => q[],
-            is_abs => 1,
-          },
-          $self;
+            path    => '.',
+            dirname => '.',
+        }, $self;
     }
 
-    # unescape and decode URI
-    if ( $args{from_uri} && !ref $path_args->{path} ) {
-        $path_args->{path} = from_uri_utf8 $path_args->{path};
+    if ( is_blessed_hashref $path ) {
+        return $path->clone if is_path $path;
+
+        $path = "$path";
+    }
+    elsif ( $path eq '/' ) {
+        return bless {
+            path    => '/',
+            dirname => '/',
+        }, $self;
     }
 
-    # convert "\" to "/"
-    $path_args->{path} =~ s[\\+][/]smg;
-
-    # convert "//" -> "/"
-    $path_args->{path} =~ s[/{2,}][/]smg;
-
-    # parse MSWIN volume
-    if ( $args{mswin} ) {
-        if ( $args{from_uri} ) {
-            if ( $path_args->{path} =~ s[\A/([[:alpha:]]):/][/]smi ) {
-                $path_args->{volume} = lc $1;
-
-                $path_args->{is_abs} = 1;
-            }
-        }
-        elsif ( $path_args->{path} =~ s[\A([[:alpha:]]):/][/]smi ) {
-            $path_args->{volume} = lc $1;
-
-            $path_args->{is_abs} = 1;
-        }
+    if ( $args{from_uri} ) {
+        $path = from_uri_utf8 $path;
+    }
+    elsif ( $args{from_mswin} ) {
+        $path = $self->decode($path);
     }
 
-    # detect if path is absolute
-    $path_args->{is_abs} = 1 if substr( $path_args->{path}, 0, 1 ) eq q[/];
+    $self = bless _parse($path), $self;
 
-    # add trailing "/" if path marked as dir
-    $path_args->{path} .= q[/] if $args{is_dir} && substr( $path_args->{path}, -1, 1 ) ne q[/];
-
-    # inherit from base path
-    if ( defined $args{base} && $args{base} ne q[] && !$path_args->{is_abs} ) {
-
-        # create base path object
-        $args{base} = $self->new( $args{base}, mswin => $args{mswin}, from_uri => $args{from_uri} ) if !ref $args{base};
-
-        # inherit base path attributes
-        $path_args->{is_abs} = $args{base}->{is_abs};
-
-        if ( $args{base}->{volume} ) {
-            $path_args->{volume} = $args{base}->{volume};
-
-            # remove volume from base path dirname
-            $path_args->{path} = $args{base}->dirname =~ s[\A[[:alpha:]]:][]smr . $path_args->{path};
-        }
-        else {
-            $path_args->{path} = $args{base}->dirname . $path_args->{path};
-        }
-    }
-
-    # normalize, remove dot segments
-    if ( index( $path_args->{path}, q[.] ) > -1 ) {
-
-        # perform full normalization only if path contains "."
-        my @segments;
-
-        my @split = split m[/]sm, $path_args->{path};
-
-        for my $seg (@split) {
-            next if $seg eq q[] || $seg eq q[.];
-
-            if ( $seg eq q[..] ) {
-                if ( !$path_args->{is_abs} ) {
-                    if ( !@segments || $segments[-1] eq q[..] ) {
-                        push @segments, $seg;
-                    }
-                    else {
-                        pop @segments;
-                    }
-                }
-                else {
-                    pop @segments;
-                }
-            }
-            else {
-                push @segments, $seg;
-            }
-        }
-
-        # add leading "/" for abs path
-        unshift @segments, q[] if $path_args->{is_abs};
-
-        # preserve last "/"
-        push @segments, q[] if substr( $path_args->{path}, -1, 1 ) eq q[/] || $split[-1] eq q[.] || $split[-1] eq q[..];
-
-        # concatenate path segments
-        $path_args->{path} = join q[/], @segments;
-    }
-
-    # add volume
-    $path_args->{path} = $path_args->{volume} . q[:] . $path_args->{path} if $path_args->{volume};
-
-    return bless $path_args, $self;
+    return $self;
 };
 
-# TODO new, faster code, to use in new
-sub _normalize_path_new ( $path ) {
-    my @res;
+sub encoded ( $self ) {
+    if ( !exists $self->{_encoded} ) {
+        if ($MSWIN) {
+            state $enc = Encode::find_encoding($Pcore::WIN_ENC);
 
-    my @tokens = split m[(?:/|\\)+]sm, $path, -1;
-
-    my $is_abs = $tokens[0] eq q[]  ? q[/] : q[];
-    my $is_dir = $tokens[-1] eq q[] ? q[/] : q[];
-
-    for my $token (@tokens) {
-        next if $token eq q[];
-
-        next if $token eq '.';
-
-        if ( $token eq '..' ) {
-            if ($is_abs) {
-                pop @res;
-
-                next;
+            if ( utf8::is_utf8 $self->{path} ) {
+                $self->{_encoded} = $enc->encode( $self->{path}, Encode::LEAVE_SRC & Encode::DIE_ON_ERR );
             }
             else {
-                if ( @res && $res[-1] ne '..' ) {
-                    pop @res;
-
-                    next;
-                }
+                $self->{_encoded} = $self->{path};
             }
-        }
-
-        push @res, $token;
-    }
-
-    return $is_abs . join( '/', @res ) . $is_dir;
-}
-
-around mime_type => sub ( $orig, $self, $shebang = undef ) {
-    return q[] if !$self->is_file;
-
-    if ( $shebang && !$self->{mime_type} && !$self->{_mime_type_shebang} ) {
-        $self->{_mime_type_shebang} = 1;
-
-        delete $self->{mime_type};
-    }
-
-    if ( !exists $self->{mime_type} ) {
-        \my $mime_types = \$self->_get_mime_types;
-
-        if ( exists $mime_types->{filename}->{ $self->filename } ) {
-            $self->{mime_type} = $mime_types->{filename}->{ $self->filename };
-        }
-        elsif ( my $suffix = $self->suffix ) {
-            if ( exists $mime_types->{suffix}->{$suffix} ) {
-                $self->{mime_type} = $mime_types->{suffix}->{$suffix};
-            }
-            elsif ( exists $mime_types->{suffix}->{ lc $suffix } ) {
-                $self->{mime_type} = $mime_types->{suffix}->{ lc $suffix };
-            }
-        }
-
-        if ( $shebang && !exists $self->{mime_type} ) {
-            my $buf_ref;
-
-            if ( ref $shebang ) {
-                $buf_ref = $shebang;
-            }
-            elsif ( -f $self ) {
-
-                # read first 50 bytes
-                P->file->read_bin(
-                    $self,
-                    buf_size => 50,
-                    cb       => sub {
-                        $buf_ref = $_[0] if $_[0];
-
-                        return;
-                    }
-                );
-            }
-
-            if ( $buf_ref && $buf_ref->$* =~ /\A(#!.+?)$/sm ) {
-                for my $mime_type ( keys $mime_types->{shebang}->%* ) {
-                    if ( $1 =~ $mime_types->{shebang}->{$mime_type} ) {
-                        $self->{mime_type} = $mime_type;
-
-                        last;
-                    }
-                }
-            }
-        }
-
-        $self->{mime_type} //= q[];
-    }
-
-    return $self->{mime_type} || $self->default_mime_type;
-};
-
-# apache MIME types
-# http://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co
-our $MIME_TYPES;
-
-sub _build_to_string ($self) {
-    my $path = $self->path;
-
-    if ( $self->{lazy} ) {
-        $self->{lazy} = 0;
-
-        if ( $self->is_dir && !-d $path ) {
-            P->file->mkpath($path);
-        }
-        elsif ( $self->is_file && !-f $path ) {
-            P->file->mkpath( $self->dirname );
-
-            P->file->touch($path);
-        }
-    }
-
-    return $path;
-}
-
-sub _build_to_uri ($self) {
-
-    # Relative Reference: https://tools.ietf.org/html/rfc3986#section-4.2
-    # A path segment that contains a colon character (e.g., "this:that")
-    # cannot be used as the first segment of a relative-path reference, as
-    # it would be mistaken for a scheme name.  Such a segment must be
-    # preceded by a dot-segment (e.g., "./this:that") to make a relative-
-    # path reference.
-    my $path = $self->{path};
-
-    if ( $self->{volume} ) {
-        return to_uri_path "/$path";
-    }
-    elsif ( $path =~ m[\A[^/]*:]sm ) {
-        return to_uri_path "./$path";
-    }
-    else {
-        return to_uri_path $path;
-    }
-}
-
-sub _build_encoded ($self) {
-    return P->file->encode_path( $self->path );
-}
-
-sub _build_is_dir ($self) {
-
-    # empty path is dir
-    return 1 if $self->path eq q[];
-
-    # is dir if path ended with "/"
-    return substr( $self->path, -1, 1 ) eq q[/] ? 1 : 0;
-}
-
-sub _build_is_file ($self) {
-    return !$self->is_dir;
-}
-
-sub _build_dirname ($self) {
-    return substr $self->path, 0, rindex( $self->path, q[/] ) + 1;
-}
-
-sub _build_dirname_canon ($self) {
-    return $self->dirname =~ s[/\z][]smr;
-}
-
-sub _build_filename ($self) {
-    return q[] if $self->path eq q[];
-
-    return substr $self->path, rindex( $self->path, q[/] ) + 1;
-}
-
-sub _build_filename_base ($self) {
-    if ( $self->filename ne q[] ) {
-        if ( ( my $idx = rindex $self->filename, q[.] ) > 0 ) {
-            return substr $self->filename, 0, $idx;
         }
         else {
-            return $self->filename;
+            $self->{_encoded} = encode_utf8 $self->{path};
         }
     }
 
-    return q[];
+    return $self->{_encoded};
 }
 
-sub _build_suffix ($self) {
-    if ( $self->filename ne q[] ) {
-        if ( ( my $idx = rindex $self->filename, q[.] ) > 0 ) {
-            return substr $self->filename, $idx + 1;
+sub decode ( $self, $path ) {
+
+    # already decoded
+    return $path if utf8::is_utf8 $path;
+
+    if ($MSWIN) {
+        state $enc = Encode::find_encoding($Pcore::WIN_ENC);
+
+        return $enc->decode( $path, Encode::LEAVE_SRC & Encode::DIE_ON_ERR );
+    }
+    else {
+        return decode_utf8 $path;
+    }
+}
+
+sub to_string ($self) { return $self->{path} }
+
+sub clone ($self) { return Clone::clone($self) }
+
+sub to_uri ($self) {
+    if ( !exists $self->{_to_uri} ) {
+
+        # Relative Reference: https://tools.ietf.org/html/rfc3986#section-4.2
+        # A path segment that contains a colon character (e.g., "this:that")
+        # cannot be used as the first segment of a relative-path reference, as
+        # it would be mistaken for a scheme name.  Such a segment must be
+        # preceded by a dot-segment (e.g., "./this:that") to make a relative-
+        # path reference.
+        # $path = "./$path" if $path =~ m[\A[^/]*:]sm;
+
+        my $path = $self->{path};
+
+        if ( $path eq '/' ) {
+            $self->{_to_uri} = '/';
+        }
+        elsif ( $path eq '.' ) {
+            $self->{_to_uri} = '';
+        }
+        else {
+            if ( $self->{volume} ) {
+                $path = to_uri_path $path;
+
+                # encode ":" in volume name
+                substr $path, 1, 1, '%3A';
+
+                $self->{_to_uri} = $path;
+            }
+            elsif ( !$self->{is_abs} && $path =~ m[\A[^/]*:]sm ) {
+                $self->{_to_uri} = to_uri_path "./$path";
+            }
+            else {
+                $self->{_to_uri} = to_uri_path $path;
+            }
+
+            $self->{_to_uri} .= '/' if !defined $self->{filename} && substr( $self->{_to_uri}, -1, 1 ) ne '/';
         }
     }
 
-    return q[];
+    return $self->{_to_uri};
 }
 
-# path without trailing "/"
-sub _build_canonpath ($self) {
-    return q[] if $self->path eq q[];
+# SETTERS
+sub to_abs ( $self, $base = undef ) {
 
-    return q[/] if $self->path eq q[/];
+    # path is already absolute
+    return $self if $self->{is_abs};
 
-    return $self->path if $self->volume && $self->path eq $self->volume . q[:/];
-
-    if ( $self->is_dir ) {
-        return substr $self->path, 0, -1;
+    if ( !defined $base ) {
+        $base = Cwd::getcwd();
+    }
+    elsif ( is_path $base ) {
+        $base = $base->to_abs->{dirname};
     }
     else {
-        return $self->path;
+        $base = $self->new($base)->to_abs->{dirname};
     }
-}
 
-sub clone ($self) {
-    return Clone::clone($self);
-}
-
-sub realpath ($self) {
-    if ( $self->is_dir ) {
-        my $path = $self->path eq q[] ? './' : $self->path;
-
-        return if !-d $path;
-
-        return $self->new( Cwd::realpath($path), is_dir => 1 );    # Cwd::realpath always return path without trailing "/"
-    }
-    elsif ( $self->is_file && -f $self->path ) {
-        return $self->new( Cwd::realpath( Cwd::realpath( $self->path ) ) );
+    if ( defined $self->{filename} ) {
+        return $self->set_path("$base/$self->{path}");
     }
     else {
-        return;
+        return $self->set_path("$base/$self->{path}/");
     }
 }
 
-# return new path object
-sub to_abs ( $self, $abs_path = q[.] ) {
-    if ( $self->is_abs ) {
-        return $self->clone;
+sub merge ( $self, $base ) {
+
+    # path is absolute
+    return $self if $self->{is_abs};
+
+    return $self if !defined $base;
+
+    if ( is_path $base ) {
+        $base = $base->{dirname};
     }
     else {
-        return $self->new( $self->to_string, base => $abs_path );
+        $base = $self->new($base)->{dirname};
+    }
+
+    if ( defined $self->{filename} ) {
+        return $self->set_path("$base/$self->{path}");
+    }
+    else {
+        return $self->set_path("$base/$self->{path}/");
     }
 }
 
-sub parent ($self) {
-    if ( $self->dirname ) {
-        my $parent = $self->new( $self->dirname . q[../] );
-
-        return $parent if $parent ne $self->to_string;
-    }
+# TODO
+sub to_rel ( $self, $base = undef ) {
+    ...;
 
     return;
 }
 
-sub is_root ($self) {
-    if ( $self->is_abs ) {
-        if ( $self->volume && $self->dirname eq $self->volume . q[:/] ) {
-            return 1;
+sub to_realpath ( $self ) {
+    my $realpath = Cwd::realpath( $self->{path} );
+
+    return $self->set_path($realpath);
+}
+
+sub set_path ( $self, $path = undef ) {
+    my $hash = _parse($path);
+
+    $self->@{ keys $hash->%* } = values $hash->%*;
+
+    $self->_clear_cache;
+
+    return $self;
+}
+
+sub set_volume ( $self, $volume = undef ) {
+    my $path;
+
+    # remove volume
+    if ( !$volume ) {
+        if ( $self->{volume} ) {
+            $path = $self->{path};
+
+            substr $path, 0, 2, '';
         }
-        elsif ( $self->dirname eq q[/] ) {
-            return 1;
+
+        # nothing to do
+        else {
+            return $self;
         }
     }
+
+    # set volume
+    else {
+        $volume = lc $volume;
+
+        # has volume
+        if ( $self->{volume} ) {
+
+            # nothing to do
+            return $self if $self->{volume} eq $volume;
+
+            # replace volume
+            $path = $self->{path};
+
+            substr $path, 0, 1, $volume;
+        }
+
+        # add volume
+        else {
+            $path = "$volume:/$self->{path}";
+        }
+    }
+
+    return $self->set_path($path);
+}
+
+sub set_dirname ( $self, $dirname = undef ) {
+    if ( defined $dirname ) {
+        return $self->set_path( defined $self->{filename} ? "$dirname/$self->{filename}" : $dirname );
+    }
+    else {
+        return $self->set_path( $self->{filename} );
+    }
+}
+
+sub set_filename ( $self, $filename = undef ) {
+    if ( defined $filename ) {
+        return $self->set_path( defined $self->{dirname} ? "$self->{dirname}/$filename" : $filename );
+    }
+    else {
+        return $self if !defined $self->{filename};
+
+        return $self->set_path( defined $self->{dirname} ? "$self->{dirname}/" : undef );
+    }
+}
+
+sub set_filename_base ( $self, $filename_base = undef ) {
+    if ( !defined $filename_base ) {
+        return $self->set_filename;
+    }
+    else {
+        my $path = '';
+
+        $path .= "$self->{dirname}/" if defined $self->{dirname};
+
+        $path .= $filename_base;
+
+        $path .= ".$self->{suffix}" if defined $self->{suffix};
+
+        return $self->set_path($path);
+    }
+}
+
+sub set_suffix ( $self, $suffix = undef ) {
+    return $self if !defined $self->{filename};
+
+    my $path = '';
+
+    $path .= "$self->{dirname}/" if defined $self->{dirname};
+
+    $path .= $self->{filename_base};
+
+    $path .= ".$suffix" if defined $suffix && $suffix ne '';
+
+    return $self->set_path($path);
+}
+
+sub _clear_cache ($self) {
+    delete $self->@{qw[_encoded _to_uri]};
 
     return;
 }
 
-# MIME
-sub _get_mime_types ($self) {
-    unless ($MIME_TYPES) {
-        $MIME_TYPES = P->cfg->read( $ENV->{share}->get('data/mime.json') );
+*TO_JSON = *TO_CBOR = sub ($self) {
+    return $self->{path};
+};
 
-        # index MIME categories
-        for my $suffix ( keys $MIME_TYPES->{suffix}->%* ) {
-            my $type;
-
-            if ( is_plain_arrayref $MIME_TYPES->{suffix}->{$suffix} ) {
-                $type = $MIME_TYPES->{suffix}->{$suffix}->[0];
-
-                $MIME_TYPES->{category}->{$type} = $MIME_TYPES->{suffix}->{$suffix}->[1] if $MIME_TYPES->{suffix}->{$suffix}->[1];
-
-                $MIME_TYPES->{suffix}->{$suffix} = $type;
-            }
-            else {
-                $type = $MIME_TYPES->{suffix}->{$suffix};
-            }
-
-            if ( !$MIME_TYPES->{category}->{$type} && $type =~ m[\A(.+?)/]sm ) {
-                $MIME_TYPES->{category}->{$type} = $1;
-            }
-        }
-
-        # compile shebang
-        for my $key ( keys $MIME_TYPES->{shebang}->%* ) {
-            $MIME_TYPES->{shebang}->{$key} = qr/$MIME_TYPES->{shebang}->{$key}/sm;
-        }
-    }
-
-    return $MIME_TYPES;
-}
-
-sub _build_mime_category ($self) {
-    if ( $self->mime_type ) {
-        return $self->_get_mime_types->{category}->{ $self->mime_type } // q[];
-    }
-    else {
-        return q[];
-    }
-}
-
-# INTERNALS
-sub TO_DUMP {
-    my $self = shift;
-
+sub TO_DUMP1 ( $self, @ ) {
     my $res;
     my $tags;
 
-    $res = q[path: "] . $self->path . q["];
-    $res .= qq[\nMIME type: "] . $self->mime_type . q["] if $self->mime_type;
+    $res = qq[path: "$self->{path}"];
+
+    # $res .= qq[\nMIME type: "] . $self->mime_type . q["] if $self->mime_type;
 
     return $res, $tags;
 }
+
+use Inline(
+    C => <<'C',
+# include "Pcore/Util/Path.h"
+
+SV *_parse (SV *path) {
+
+    // call fetch() if a tied variable to populate the SV
+    SvGETMAGIC(path);
+
+    const char *buf = NULL;
+    size_t buf_len = 0;
+
+    // check for undef
+    if ( path != &PL_sv_undef ) {
+
+        // copy the sv without the magic struct
+        buf = SvPV_nomg_const(path, buf_len);
+    }
+
+    PcoreUtilPath *res = parse(buf, buf_len);
+
+    HV *hash = newHV();
+    hv_store(hash, "is_abs", 6, newSVuv(res->is_abs), 0);
+
+    // path
+    SV *path_sv = newSVpvn(res->path, res->path_len);
+    sv_utf8_decode(path_sv);
+    hv_store(hash, "path", 4, path_sv, 0);
+
+    // volume
+    hv_store(hash, "volume", 6, res->volume_len ? newSVpvn(res->volume, res->volume_len) : newSV(0), 0);
+
+    // dirname
+    if (res->dirname_len) {
+        SV *sv = newSVpvn(res->dirname, res->dirname_len);
+        sv_utf8_decode(sv);
+        hv_store(hash, "dirname", 7, sv, 0);
+    }
+    else {
+        hv_store(hash, "dirname", 7, newSV(0), 0);
+    }
+
+    // filename
+    if (res->filename_len) {
+        SV *sv = newSVpvn(res->filename, res->filename_len);
+        sv_utf8_decode(sv);
+        hv_store(hash, "filename", 8, sv, 0);
+    }
+    else {
+        hv_store(hash, "filename", 8, newSV(0), 0);
+    }
+
+    // filename_base
+    if (res->filename_base_len) {
+        SV *sv = newSVpvn(res->filename_base, res->filename_base_len);
+        sv_utf8_decode(sv);
+        hv_store(hash, "filename_base", 13, sv, 0);
+    }
+    else {
+        hv_store(hash, "filename_base", 13, newSV(0), 0);
+    }
+
+    // suffix
+    if (res->suffix_len) {
+        SV *sv = newSVpvn(res->suffix, res->suffix_len);
+        sv_utf8_decode(sv);
+        hv_store(hash, "suffix", 6, sv, 0);
+    }
+    else {
+        hv_store(hash, "suffix", 6, newSV(0), 0);
+    }
+
+    destroyPcoreUtilPath(res);
+
+    sv_2mortal((SV*)newRV_noinc((SV *)hash));
+
+    return newRV((SV *)hash);
+}
+C
+    inc        => "-I$ENV->{PCORE_SHARE_DIR}/include",
+    ccflagsex  => '-Wall -Wextra -Ofast -std=c11',
+    prototypes => 'ENABLE',
+    prototype  => { _parse => '$', },
+
+    # build_noisy => 1,
+    # force_build => 1,
+);
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -509,14 +430,12 @@ sub TO_DUMP {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (58)                               |
+## |    3 | 14                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 19                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 203                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 187                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_normalize_path_new' declared but   |
-## |      |                      | not used                                                                                                       |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 190                  | RegularExpressions::ProhibitSingleCharAlternation - Use [/\\] instead of /|\\                                  |
+## |    2 | 43, 130, 232, 291,   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |      | 306, 312             |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----
@@ -532,5 +451,11 @@ Pcore::Util::Path
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
+
+=head1 ATTRIBUTES
+
+=head1 METHODS
+
+=head1 SEE ALSO
 
 =cut

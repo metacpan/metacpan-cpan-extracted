@@ -8,7 +8,7 @@
 
 package XML::Compile::Schema;
 use vars '$VERSION';
-$VERSION = '1.60';
+$VERSION = '1.61';
 
 use base 'XML::Compile';
 

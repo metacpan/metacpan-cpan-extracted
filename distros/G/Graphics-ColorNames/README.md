@@ -4,7 +4,7 @@ Graphics::ColorNames - defines RGB values for common color names
 
 # VERSION
 
-version v3.3.3
+version v3.3.4
 
 # SYNOPSIS
 
@@ -233,6 +233,24 @@ sub NamesRgbTable() {
 ```
 
 See [Graphics::ColorNames::GrayScale](https://metacpan.org/pod/Graphics::ColorNames::GrayScale) for an example.
+
+# ROADMAP
+
+The following changes are planned in the future:
+
+- Support for Perl versions earlier than 5.10 will be removed sometime
+in 2019.
+- Autoloaded color name methods will be removed.
+- The tied interface will be removed, but implemented in a separate
+module for users that wish to use it.
+- The namespace for color schemes will be moved to the
+`Graphics::ColorNames::Schemes` but optios will be added to use the
+existing scheme.
+
+    This will allow modules to be named like `Graphics::ColorNames::Tied`
+    without being confused for color schemes.
+
+- This module will be rewritten to be a [Moo](https://metacpan.org/pod/Moo)-based class.
 
 # SEE ALSO
 

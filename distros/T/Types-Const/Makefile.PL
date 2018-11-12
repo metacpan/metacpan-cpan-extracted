@@ -18,22 +18,25 @@ my %WriteMakefileArgs = (
   "NAME" => "Types::Const",
   "PREREQ_PM" => {
     "Const::Fast" => 0,
-    "List::AllUtils" => "0.10",
+    "List::Util" => "1.33",
+    "Type::Coercion" => 0,
     "Type::Library" => 0,
-    "Type::Tiny" => 0,
+    "Type::Tiny" => "1.002001",
     "Type::Utils" => 0,
-    "Types::Standard" => 0
+    "Types::Standard" => 0,
+    "Types::TypeTiny" => 0,
+    "namespace::autoclean" => "0.28",
+    "version" => "0.77"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "Module::Metadata" => 0,
-    "Moo" => 0,
+    "Moo" => "1.006000",
     "Test::More" => 0,
     "Test::Most" => 0,
-    "lib" => 0,
-    "namespace::autoclean" => 0
+    "lib" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.3.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,17 +46,20 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Const::Fast" => 0,
   "File::Spec" => 0,
-  "List::AllUtils" => "0.10",
+  "List::Util" => "1.33",
   "Module::Metadata" => 0,
-  "Moo" => 0,
+  "Moo" => "1.006000",
   "Test::More" => 0,
   "Test::Most" => 0,
+  "Type::Coercion" => 0,
   "Type::Library" => 0,
-  "Type::Tiny" => 0,
+  "Type::Tiny" => "1.002001",
   "Type::Utils" => 0,
   "Types::Standard" => 0,
+  "Types::TypeTiny" => 0,
   "lib" => 0,
-  "namespace::autoclean" => 0
+  "namespace::autoclean" => "0.28",
+  "version" => "0.77"
 );
 
 

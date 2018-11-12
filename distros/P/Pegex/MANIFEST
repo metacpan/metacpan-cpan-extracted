@@ -73,6 +73,7 @@ t/api.t
 t/author-pod-syntax.t
 t/compiler-checks.t
 t/compiler-equivalence.t
+t/compiler-perl.t
 t/compiler.t
 t/error.t
 t/export-api.t

@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =head1 SYNOPSIS
 
@@ -105,17 +105,18 @@ Additionally, each Math::AnyNum object is B<immutable>.
     ilog2(n)                  integer logarithm of n to base 2
     ilog10(n)                 integer logarithm of n to base 10
     divmod(a,b)               quotient and remainder of a/b
-    invmod(n,k)               inverse of n modulo k
+    invmod(n,k)               multiplicative inverse of n modulo k
     powmod(a,b,n)             modular exponentiation: a ^ b mod n
     isqrtrem(n)               integer sqrt remainder: n - isqrt(n)^2
     irootrem(n,k)             integer root remainder: n - iroot(n,k)^k
     is_square(n)              return 1 if n is a perfect square
     is_power(n)               return 1 if n = c^k for integer c
     is_power(n,k)             return 1 if n = c^k for integer c, k
-    is_polygonal(n,k)         return 1 if n is a first k-polygonal number
-    is_polygonal2(n,k)        return 1 if n is a second k-polygonal number
+    is_polygonal(n,k)         return 1 if n is a first k-gonal number
+    is_polygonal2(n,k)        return 1 if n is a second k-gonal number
     is_coprime(n,k)           return 1 if gcd(n,k) = 1
     is_smooth(n,k)            return 1 if all prime factors of n are <= k
+    is_smooth_over_prod(n,k)  return 1 if n is smooth over the primes p|k
     is_prime(n,[r])           Miller-Rabin primality test
     primorial(n)              product of primes below n
     next_prime(n)             next prime > n
@@ -282,7 +283,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     is_div(n,k)         return 1 if n is exactly divisible by k
     is_congruent(n,k,m) return 1 if n is congruent to k mod m
 
-=head1 IMPORT / EXPORT
+=head1 EXPORT
 
 Each function can be exported individually, as:
 
@@ -326,7 +327,7 @@ useful mathematical constants that can be exported, such as:
     Inf         # positive Infinity
     NaN         # Not-a-Number
 
-The syntax for importing a constant, is:
+The syntax for exporting a constant, is:
 
     use Math::AnyNum qw(pi);
     say pi;                          # 3.141592653589...
@@ -335,8 +336,8 @@ Nothing is exported by default.
 
 =head1 HOW IT WORKS
 
-Internally, each Math::AnyNum object holds a reference to an object of type Math::GMPz, Math::GMPq, Math::MPFR or Math::MPC.
-Based on the internal types, it decides what functions to call on each operation and does automatic promotion whenever necessarily.
+Internally, each Math::AnyNum object holds a reference to an object of type L<Math::GMPz>, L<Math::GMPq>, L<Math::MPFR> or L<Math::MPC>.
+Based on the internal types, it decides what functions to call on each operation and does automatic promotion whenever is necessary.
 
 The promotion rules can be summarized as follows:
 
@@ -380,14 +381,21 @@ For example, if we change the precision to 3 decimal digits (where C<4> is the c
 we get the following results:
 
     local $Math::AnyNum::PREC = 3*4;
+
+    # Floating-points
     say sqrt(2);                                  #=> 1.41
+    say sqrt(19+13*i);                            #=> 4.58+1.42i
+
+    # Integers
     say 98**7;                                    #=> 86812553324672
+
+    # Rationals
     say 1 / 98**7                                 #=> 1/86812553324672
 
-As shown above, integers and rational numbers do not obey this precision, because they can grow and
+Notice that integers and rational numbers do not obey this precision, because they can grow and
 shrink dynamically, without a specific limit.
 
-Furthermore, a rational number never losses precision and accuracy in rational operations, therefore if we say:
+Furthermore, a rational number never losses precision or accuracy in rational operations, therefore if we say:
 
     my $x = 1/3;
     say $x*3;                                     #=> 1
@@ -673,7 +681,7 @@ Example:
 
 =head2 conj
 
-    conj(x)                                       #=> Any
+    conj(x)                                       #=> Float | Complex
 
 Complex conjugate of C<x>. Return C<x> when C<x> is a real number.
 
@@ -717,25 +725,25 @@ This section includes the special functions.
 
 =head2 sqrt
 
-    sqrt(x)                                       #=> Any
+    sqrt(x)                                       #=> Float | Complex
 
 Square root of C<x>. Returns a complex number when C<x> is negative.
 
 =head2 cbrt
 
-    cbrt(x)                                       #=> Any
+    cbrt(x)                                       #=> Float | Complex
 
 Cube root of C<x>. Returns a complex number when C<x> is negative.
 
 =head2 root
 
-    root(x, y)                                    #=> Any
+    root(x, y)                                    #=> Float | Complex
 
 The C<y> root of C<x>. Equivalent with C<x**(1/y)>.
 
 =head2 polygonal_root
 
-    polygonal_root(n, k)                          #=> Any
+    polygonal_root(n, k)                          #=> Float | Complex
 
 Returns the k-gonal root of C<n>. Also defined for complex numbers.
 
@@ -746,7 +754,7 @@ Example:
 
 =head2 polygonal_root2
 
-    polygonal_root2(n, k)                         #=> Any
+    polygonal_root2(n, k)                         #=> Float | Complex
 
 Returns the second k-gonal root of C<n>. Also defined for complex numbers.
 
@@ -770,7 +778,7 @@ Otherwise, it does floating-point exponentiation, which is equivalent with C<exp
 
 =head2 exp
 
-    exp(x)                                        #=> Any
+    exp(x)                                        #=> Float | Complex
 
 Natural exponentiation of C<x> (i.e.: C<e**x>).
 
@@ -788,9 +796,9 @@ Raises 10 to the power C<x>. (i.e.: C<10**x>)
 
 =head2 ln / log
 
-    ln(x)                                         #=> Any
-    log(x)                                        #=> Any
-    log(x, y)                                     #=> Any
+    ln(x)                                         #=> Float | Complex
+    log(x)                                        #=> Float | Complex
+    log(x, y)                                     #=> Float | Complex
 
 Logarithm of C<x> to base C<y> (or base I<e> when C<y> is omitted).
 
@@ -798,14 +806,14 @@ B<NOTE:> C<log(x, y)> is equivalent with C<log(x) / log(y)>.
 
 =head2 log2 / log10
 
-    log2(x)                                       #=> Any
-    log10(x)                                      #=> Any
+    log2(x)                                       #=> Float | Complex
+    log10(x)                                      #=> Float | Complex
 
 Logarithm of C<x> to base 2 and base 10, respectively.
 
 =head2 lgrt
 
-    lgrt(x)                                       #=> Any
+    lgrt(x)                                       #=> Float | Complex
 
 Logarithmic-root of C<x>, which is the solution to C<a**a = x>, where C<x> is known.
 When the value of C<x> is less than C<e**(-1/e)>, it returns a complex number.
@@ -823,7 +831,7 @@ This function is related to the Lambert-W function via the following identities:
 
 =head2 LambertW
 
-    LambertW(x)                                   #=> Any
+    LambertW(x)                                   #=> Float | Complex
 
 The Lambert-W function. When the value of C<x> is less than C<-1/e>, it returns a complex number.
 
@@ -862,13 +870,13 @@ where C<γ> is the Euler-Mascheroni constant.
 
 =head2 agm
 
-    agm(x, y)                                     #=> Any
+    agm(x, y)                                     #=> Float | Complex
 
 Arithmetic-geometric mean of C<x> and C<y>. Also defined for complex numbers.
 
 =head2 hypot
 
-    hypot(x, y)                                   #=> Any
+    hypot(x, y)                                   #=> Float | Complex
 
 The value of the hypotenuse for catheti C<x> and C<y>. Equivalent to C<sqrt(x**2 + y**2)>. Also defined for complex numbers.
 
@@ -997,61 +1005,61 @@ The dilogarithm function, defined as the integral of C<-log(1-t)/t> from C<0> to
 
 =head2 sin / sinh / asin / asinh
 
-    sin(x)                                        #=> Any
-    sinh(x)                                       #=> Any
-    asin(x)                                       #=> Any
-    asinh(x)                                      #=> Any
+    sin(x)                                        #=> Float | Complex
+    sinh(x)                                       #=> Float | Complex
+    asin(x)                                       #=> Float | Complex
+    asinh(x)                                      #=> Float | Complex
 
 Sine, hyperbolic sine, inverse sine and inverse hyperbolic sine.
 
 =head2 cos / cosh / acos / acosh
 
-    cos(x)                                        #=> Any
-    cosh(x)                                       #=> Any
-    acos(x)                                       #=> Any
-    acosh(x)                                      #=> Any
+    cos(x)                                        #=> Float | Complex
+    cosh(x)                                       #=> Float | Complex
+    acos(x)                                       #=> Float | Complex
+    acosh(x)                                      #=> Float | Complex
 
 Cosine, hyperbolic cosine, inverse cosine and inverse hyperbolic cosine.
 
 =head2 tan / tanh / atan / atanh
 
-    tan(x)                                        #=> Any
-    tanh(x)                                       #=> Any
-    atan(x)                                       #=> Any
-    atanh(x)                                      #=> Any
+    tan(x)                                        #=> Float | Complex
+    tanh(x)                                       #=> Float | Complex
+    atan(x)                                       #=> Float | Complex
+    atanh(x)                                      #=> Float | Complex
 
 Tangent, hyperbolic tangent, inverse tangent and inverse hyperbolic tangent.
 
 =head2 cot / coth / acot / acoth
 
-    cot(x)                                        #=> Any
-    coth(x)                                       #=> Any
-    acot(x)                                       #=> Any
-    acoth(x)                                      #=> Any
+    cot(x)                                        #=> Float | Complex
+    coth(x)                                       #=> Float | Complex
+    acot(x)                                       #=> Float | Complex
+    acoth(x)                                      #=> Float | Complex
 
 Cotangent, hyperbolic cotangent, inverse cotangent and inverse hyperbolic cotangent.
 
 =head2 sec / sech / asec / asech
 
-    sec(x)                                        #=> Any
-    sech(x)                                       #=> Any
-    asec(x)                                       #=> Any
-    asech(x)                                      #=> Any
+    sec(x)                                        #=> Float | Complex
+    sech(x)                                       #=> Float | Complex
+    asec(x)                                       #=> Float | Complex
+    asech(x)                                      #=> Float | Complex
 
 Secant, hyperbolic secant, inverse secant and inverse hyperbolic secant.
 
 =head2 csc / csch / acsc / acsch
 
-    csc(x)                                        #=> Any
-    csch(x)                                       #=> Any
-    acsc(x)                                       #=> Any
-    acsch(x)                                      #=> Any
+    csc(x)                                        #=> Float | Complex
+    csch(x)                                       #=> Float | Complex
+    acsc(x)                                       #=> Float | Complex
+    acsch(x)                                      #=> Float | Complex
 
 Cosecant, hyperbolic cosecant, inverse cosecant and inverse hyperbolic cosecant.
 
 =head2 atan2
 
-    atan2(x, y)                                   #=> Any
+    atan2(x, y)                                   #=> Float | Complex
 
 The arc tangent of C<x> and C<y>, defined as:
 
@@ -1059,7 +1067,7 @@ The arc tangent of C<x> and C<y>, defined as:
 
 =head2 deg2rad
 
-    deg2rad(x)                                    #=> Any
+    deg2rad(x)                                    #=> Float | Complex
 
 Returns the value of C<x> converted from degrees to radians.
 
@@ -1069,7 +1077,7 @@ Example:
 
 =head2 rad2deg
 
-    rad2deg(x)                                    #=> Any
+    rad2deg(x)                                    #=> Float | Complex
 
 Returns the value of C<x> converted from radians to degrees.
 
@@ -1122,8 +1130,9 @@ where both are integers. When C<y> is zero, it returns two NaN values.
 
     invmod(x, y)                                  #=> Int | NaN
 
-Computes the inverse of C<x> modulo C<y> and returns the result.
-When no inverse exists, the NaN value is returned.
+Computes the multiplicative inverse of C<x> modulo C<y> and returns the result.
+
+When no inverse exists (i.e.: C<gcd(x, y) != 1>), the NaN value is returned.
 
 =head2 powmod
 
@@ -1596,6 +1605,19 @@ Example:
     is_smooth(36, 3)    # true  : 36 = 2^2 * 3^2
     is_smooth(39, 6)    # false : 39 = 3 * 13, where 13 > 6
 
+=head2 is_smooth_over_prod
+
+    is_smooth_over_prod(n, k)                     #=> Bool
+
+Returns a true value when C<n> is the product of a subset of powers of prime factors of C<k>,
+where C<k> is a square-free integer, whose prime factors represent a set C<A>, such that C<n>
+is said to be smooth over a set C<A> if there exists a factorization of C<n> where the factors
+are powers of elements in C<A>.
+
+Example:
+
+    is_smooth_over_prod($n, 3*5*7*11)   # true for odd 11-smooth numbers $n
+
 =head2 is_power
 
     is_power(n)
@@ -1938,13 +1960,12 @@ Example:
     clearbit(0b1001, 0) = 0b1000
     clearbit(0b1100, 2) = 0b1000
 
-=head2 bit_scan0
-=head2 bit_scan1
+=head2 bit_scan0 / bit_scan1
 
     bit_scan0(n, k)                               #=> Scalar
     bit_scan1(n, k)                               #=> Scalar
 
-Scan C<n>, starting from bit index C<k>, towards more significant bits, 0 or 1 bit (respectively) is found.
+Scan C<n>, starting from bit index C<k>, towards more significant bits, until 0 or 1 bit (respectively) is found.
 
 When C<k> is omitted, C<k=0> is assumed.
 

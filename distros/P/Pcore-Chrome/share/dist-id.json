@@ -1,14 +1,14 @@
 {
-   "bookmark": "",
-   "branch": "default",
-   "date": "2018-09-09T19:06:56Z",
-   "desc": "Added tag latest, v0.4.4 for changeset a2047eefaf64",
-   "node": "644d8238c229",
-   "phase": "public",
-   "release": "v0.4.4",
-   "release_distance": 0,
-   "release_id": "v0.4.4",
-   "tags": [
-      "tip"
-   ]
+    "bookmark": "",
+    "branch": "default",
+    "date": "2018-11-11T14:16:16Z",
+    "desc": "Added tag latest, v0.4.5 for changeset dee3bda60b64",
+    "node": "027b4553ddd6",
+    "phase": "public",
+    "release": "v0.4.5",
+    "release_distance": 0,
+    "release_id": "v0.4.5",
+    "tags": [
+        "tip"
+    ]
 }

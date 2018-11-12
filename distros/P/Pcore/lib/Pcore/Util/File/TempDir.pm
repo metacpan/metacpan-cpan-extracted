@@ -3,23 +3,23 @@ package Pcore::Util::File::TempDir;
 use Pcore -class, -const;
 use Pcore::Util::Scalar qw[refaddr];
 
-has base  => ( is => 'lazy', isa => Str );
-has tmpl  => ( is => 'lazy', isa => Str );
-has mode  => ( is => 'lazy', isa => Maybe [ Int | Str ], default => 'rwx------' );
-has umask => ( is => 'ro',   isa => Maybe [ Int | Str ] );
-has lazy  => ( is => 'ro',   isa => Bool, default => 0 );
+has base  => ( $ENV->{TEMP_DIR} );
+has tmpl  => ("temp-$$-XXXXXXXX");
+has mode  => ('rwx------');
+has umask => ();
+has lazy  => ();
 
-has path => ( is => 'lazy', isa => Str, init_arg => undef );
-has owner_pid => ( is => 'ro', isa => Str, default => $$, init_arg => undef );
+has path => ( is => 'lazy', init_arg => undef );
+has owner_pid => ( $$, init_arg => undef );
 
 use overload    #
   q[""] => sub {
     return $_[0]->path;
   },
-  q[cmp] => sub {
+  'cmp' => sub {
     return !$_[2] ? $_[0]->path cmp $_[1] : $_[1] cmp $_[0]->path;
   },
-  q[0+] => sub {
+  '0+' => sub {
     return refaddr $_[0];
   },
   fallback => undef;
@@ -29,7 +29,7 @@ const our $TMPL => [ 0 .. 9, 'a' .. 'z', 'A' .. 'Z' ];
 sub DESTROY ( $self ) {
 
     # do not unlink files, created by others processes
-    return if $self->owner_pid ne $$;
+    return if $self->{owner_pid} ne $$;
 
     local $SIG{__WARN__} = sub { };
 
@@ -39,17 +39,9 @@ sub DESTROY ( $self ) {
 }
 
 sub BUILD ( $self, $args ) {
-    $self->path if !$self->lazy;
+    $self->path if !$self->{lazy};
 
     return;
-}
-
-sub _build_base ($self) {
-    return "$ENV->{TEMP_DIR}";
-}
-
-sub _build_tmpl ($self) {
-    return 'temp-' . $$ . '-XXXXXXXX';
 }
 
 sub _build_path ($self) {
@@ -58,17 +50,17 @@ sub _build_path ($self) {
   REDO:
     die q[Can't create temporary directory] if !$attempt--;
 
-    my $dirname = $self->tmpl =~ s/X/$TMPL->[rand $TMPL->@*]/smger;
+    my $dirname = $self->{tmpl} =~ s/X/$TMPL->[rand $TMPL->@*]/smger;
 
-    goto REDO if -e $self->base . q[/] . $dirname;
+    goto REDO if -e "$self->{base}/$dirname";
 
     my $umask_guard;
 
-    $umask_guard = P->file->umask( $self->umask ) if defined $self->umask;
+    $umask_guard = P->file->umask( $self->{umask} ) if defined $self->{umask};
 
-    P->file->mkpath( $self->base . q[/] . $dirname, mode => $self->mode );
+    P->file->mkpath( "$self->{base}/$dirname", mode => $self->{mode} );
 
-    return P->path( $self->base . q[/] . $dirname, is_dir => 1 )->realpath->to_string;
+    return P->path("$self->{base}/$dirname")->to_abs;
 }
 
 1;

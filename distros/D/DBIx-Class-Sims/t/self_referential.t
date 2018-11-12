@@ -58,7 +58,7 @@ sims_test "Specify a toposort->skip breaks the cycle, but entered a loop" => {
 
 Schema->source('Company')->column_info('parent_id')->{is_nullable} = 1;
 
-sims_test "Specify a toposort->skip breaks the cycle" => {
+sims_test "Specify a toposort->skip plus is_nullable breaks the cycle" => {
   spec => [
     { Company => 1 },
     {
@@ -74,9 +74,55 @@ sims_test "Specify a toposort->skip breaks the cycle" => {
   },
 };
 
-sims_test "Can build parents on the skipped relationship" => {
+# Note: This will find itself because the row is created, then it searches for
+# a row that can fit its parentage, which is itself.
+sims_test "Can find a parent on the skipped relationship" => {
   spec => [
-    { Company => { parent => {} } },
+    { Company => { parent => 1 } },
+    {
+      toposort => {
+        skip => {
+          Company => [ 'parent' ],
+        },
+      },
+    },
+  ],
+  expect => {
+    Company => [
+      { id => 1, parent_id => 1 },
+    ],
+  },
+  rv => {
+    Company => { id => 1, parent_id => 1 },
+  },
+};
+
+sims_test "Can build a parent on the skipped relationship" => {
+  spec => [
+    { Company => { parent => { id => 2 } } },
+    {
+      toposort => {
+        skip => {
+          Company => [ 'parent' ],
+        },
+      },
+      allow_pk_set_value => 1,
+    },
+  ],
+  expect => {
+    Company => [
+      { id => 1, parent_id => 2 },
+      { id => 2, parent_id => undef },
+    ],
+  },
+  rv => {
+    Company => { id => 1, parent_id => 2 },
+  },
+};
+
+sims_test "Can force-create a parent on the skipped relationship" => {
+  spec => [
+    { Company => { parent => { __META__ => { create => 1 } } } },
     {
       toposort => {
         skip => {
@@ -116,6 +162,35 @@ sims_test "Can build children on the skipped relationship" => {
   },
   rv => {
     Company => { id => 1, parent_id => undef },
+  },
+};
+
+sims_test "Can point to myself on the skipped relationship" => {
+  spec => [
+    {
+      Company => {
+        id => 1,
+        parent => {
+          id => 1,
+        }
+      }
+    },
+    {
+      toposort => {
+        skip => {
+          Company => [ 'parent' ],
+        },
+      },
+      allow_pk_set_value => 1,
+    },
+  ],
+  expect => {
+    Company => [
+      { id => 1, parent_id => 1 },
+    ],
+  },
+  rv => {
+    Company => { id => 1, parent_id => 1 },
   },
 };
 

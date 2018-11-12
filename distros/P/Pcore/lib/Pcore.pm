@@ -1,4 +1,4 @@
-package Pcore v0.75.2;
+package Pcore v0.77.2;
 
 use v5.28.0;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
@@ -20,7 +20,6 @@ our $EXPORT_PRAGMA = {
     res      => undef,    # export Pcore::Util::Result qw[res]
     role     => undef,    # package is a Moo role
     sql      => undef,    # export Pcore::Handle::DBI::Const qw[:TYPES]
-    types    => undef,    # export types
 };
 
 our $EMBEDDED    = 0;       # Pcore::Core used in embedded mode
@@ -35,6 +34,7 @@ our $P = sub : const {'Pcore'};
 our $UTIL = {
     handle => 'Pcore::Handle',
     http   => 'Pcore::HTTP',
+    mime   => 'Pcore::Util::MIME',
     uri    => 'Pcore::Util::URI',
     uuid   => 'Pcore::Util::UUID',
 };
@@ -82,7 +82,7 @@ sub import {
 
         # process -l10n pragma
         if ( $import->{pragma}->{l10n} ) {
-            state $L10N_INIT = !!require Pcore::Core::L10N;
+            require Pcore::Core::L10N;
 
             Pcore::Core::L10N->import( -caller => $caller );
         }
@@ -111,60 +111,26 @@ sub import {
 
         # process -res pragma
         if ( $import->{pragma}->{res} ) {
-            state $RESULT_INIT = !!require Pcore::Util::Result;
+            require Pcore::Util::Result;
 
             Pcore::Util::Result->import( -caller => $caller, qw[res] );
         }
 
         # process -sql pragma
         if ( $import->{pragma}->{sql} ) {
-            state $SQL_INIT = !!require Pcore::Handle::DBI::Const;
+            require Pcore::Handle::DBI::Const;
 
             Pcore::Handle::DBI::Const->import( -caller => $caller, qw[:TYPES :QUERY] );
         }
 
         # re-export OOP
-        if ( $import->{pragma}->{class} || $import->{pragma}->{role} ) {
-            $import->{pragma}->{types} = 1;
-
-            if ( $import->{pragma}->{class} ) {
-                Pcore::Core::OOP::Class->import($caller);
-            }
-            else {
-                Pcore::Core::OOP::Role->import($caller);
-            }
+        if ( $import->{pragma}->{class} ) {
+            Pcore::Core::OOP::Class->import($caller);
         }
-
-        # export types
-        _import_types($caller) if $import->{pragma}->{types};
+        elsif ( $import->{pragma}->{role} ) {
+            Pcore::Core::OOP::Role->import($caller);
+        }
     }
-
-    return;
-}
-
-sub _import_types ($caller) {
-    state $init = do {
-        local $ENV{PERL_TYPES_STANDARD_STRICTNUM} = 0;    # 0 - Num = LaxNum, 1 - Num = StrictNum
-
-        require Pcore::Core::Types;
-        require Types::TypeTiny;
-        require Types::Standard;
-        require Types::Common::Numeric;
-
-        # require Types::Common::String;
-        # require Types::Encodings();
-        # require Types::XSD::Lite();
-
-        1;
-    };
-
-    Types::TypeTiny->import( { into => $caller }, qw[StringLike HashLike ArrayLike CodeLike TypeTiny] );
-
-    Types::Standard->import( { into => $caller }, ':types' );
-
-    Types::Common::Numeric->import( { into => $caller }, ':types' );
-
-    Pcore::Core::Types->import( { into => $caller }, ':types' );
 
     return;
 }
@@ -254,7 +220,7 @@ sub _CORE_INIT_AFTER_FORK {
 sub config_stdout ($h) {
     if ($MSWIN) {
         if ( -t $h ) {    ## no critic qw[InputOutput::ProhibitInteractiveTest]
-            state $init = !!require Pcore::Core::PerlIOviaWinUniCon;
+            require Pcore::Core::PerlIOviaWinUniCon;
 
             binmode $h, ':raw:via(Pcore::Core::PerlIOviaWinUniCon)' or die;    # terminal
         }
@@ -274,8 +240,9 @@ sub config_stdout ($h) {
     return;
 }
 
-# TODO remove $B::VERSION = undef, after Type::Tiny will be removed from Core, test with par crypted
 sub _CORE_RUN {
+
+    # crack Filter::Crypto protection
     $B::VERSION = undef;
 
     # EMBEDDED mode, if run not from INIT block or -embedded pragma specified:
@@ -284,7 +251,7 @@ sub _CORE_RUN {
     # process will not daemonized;
 
     if ( !$EMBEDDED ) {
-        state $INIT_CLI = !!require Pcore::Core::CLI;
+        require Pcore::Core::CLI;
 
         Pcore::Core::CLI->new( { class => 'main' } )->run( \@ARGV );
 
@@ -311,7 +278,7 @@ sub _CORE_RUN {
 
 # L10N
 sub set_locale ( $self, $locale = undef ) {
-    state $L10N_INIT = !!require Pcore::Core::L10N;
+    require Pcore::Core::L10N;
 
     return Pcore::Core::L10N::set_locale($locale);
 }
@@ -373,7 +340,7 @@ sub ev ($self) {
 
         my $_broker = Pcore::Core::Event->new;
 
-        # # set default log channels
+        # set default log channels
         $_broker->bind_events( 'log.EXCEPTION.*', 'stderr:' );
 
         # file logs are disabled by default for scripts, that are not part of the distribution
@@ -439,7 +406,7 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 
 # CV
 *cv = *P::cv = sub ( $self, $cb = undef ) {
-    state $init = !!require Pcore::Core::CV;
+    require Pcore::Core::CV;
 
     return bless [$cb], 'Pcore::Core::CV';
 };
@@ -453,13 +420,13 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 65                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 191, 220, 223, 227,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 259, 262, 267, 270,  |                                                                                                                |
-## |      | 297, 428             |                                                                                                                |
+## |    3 | 157, 186, 189, 193,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 225, 228, 233, 236,  |                                                                                                                |
+## |      | 264, 395             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 278                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
+## |    3 | 243                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 195                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 161                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

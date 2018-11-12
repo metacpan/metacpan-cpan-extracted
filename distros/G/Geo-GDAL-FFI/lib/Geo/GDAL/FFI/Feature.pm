@@ -7,7 +7,7 @@ use Carp;
 use Encode qw(decode encode);
 use FFI::Platypus::Buffer;
 
-our $VERSION = 0.05_03;
+our $VERSION = 0.0601;
 
 sub new {
     my ($class, $defn) = @_;
@@ -50,11 +50,20 @@ sub Equals {
     return Geo::GDAL::FFI::OGR_F_Equal($$self, $$f);
 }
 
+sub field_index {
+    my ($self, $field_name, $is_geom) = @_;
+    my $index = $is_geom ?
+        Geo::GDAL::FFI::OGR_F_GetGeomFieldIndex($$self, $field_name) :
+        Geo::GDAL::FFI::OGR_F_GetFieldIndex($$self, $field_name);
+    confess "Field '$field_name' does not exist." if $index < 0;
+    return $index;
+}
+
 sub SetField {
     my $self = shift;
     my $i = shift;
     $i //= 0;
-    $i = Geo::GDAL::FFI::OGR_F_GetFieldIndex($$self, $i) unless Geo::GDAL::FFI::isint($i);
+    $i = $self->field_index($i) unless Geo::GDAL::FFI::isint($i);
     unless (@_) {
         Geo::GDAL::FFI::OGR_F_UnsetField($$self, $i) ;
         return;
@@ -120,7 +129,7 @@ sub SetField {
 sub GetField {
     my ($self, $i, $encoding) = @_;
     $i //= 0;
-    $i = Geo::GDAL::FFI::OGR_F_GetFieldIndex($$self, $i) unless Geo::GDAL::FFI::isint($i);
+    $i = $self->field_index($i) unless Geo::GDAL::FFI::isint($i);
     return unless $self->IsFieldSetAndNotNull($i);
     my $d = Geo::GDAL::FFI::OGR_F_GetFieldDefnRef($$self, $i);
     my $t = $Geo::GDAL::FFI::field_types_reverse{Geo::GDAL::FFI::OGR_Fld_GetType($d)};
@@ -175,28 +184,28 @@ sub GetField {
 sub IsFieldSet {
     my ($self, $i) = @_;
     $i //= 0;
-    $i = Geo::GDAL::FFI::OGR_F_GetFieldIndex($$self, $i) unless Geo::GDAL::FFI::isint($i);
+    $i = $self->field_index($i) unless Geo::GDAL::FFI::isint($i);
     return Geo::GDAL::FFI::OGR_F_IsFieldSet($$self, $i);
 }
 
 sub IsFieldNull {
     my ($self, $i) = @_;
     $i //= 0;
-    $i = Geo::GDAL::FFI::OGR_F_GetFieldIndex($$self, $i) unless Geo::GDAL::FFI::isint($i);
+    $i = $self->field_index($i) unless Geo::GDAL::FFI::isint($i);
     return Geo::GDAL::FFI::OGR_F_IsFieldNull($$self, $i);
 }
 
 sub IsFieldSetAndNotNull {
     my ($self, $i) = @_;
     $i //= 0;
-    $i = Geo::GDAL::FFI::OGR_F_GetFieldIndex($$self, $i) unless Geo::GDAL::FFI::isint($i);
+    $i = $self->field_index($i) unless Geo::GDAL::FFI::isint($i);
     return Geo::GDAL::FFI::OGR_F_IsFieldSetAndNotNull($$self, $i);
 }
 
 sub GetGeomField {
     my ($self, $i) = @_;
     $i //= 0;
-    $i = Geo::GDAL::FFI::OGR_F_GetGeomFieldIndex($$self, $i) unless Geo::GDAL::FFI::isint($i);
+    $i = $self->field_index($i, 1) unless Geo::GDAL::FFI::isint($i);
     my $g = Geo::GDAL::FFI::OGR_F_GetGeomFieldRef($$self, $i);
     confess "No such field: $i" unless $g;
     ++$Geo::GDAL::FFI::immutable{$g};
@@ -209,7 +218,7 @@ sub SetGeomField {
     my $g = pop;
     my $i = shift;
     $i //= 0;
-    $i = Geo::GDAL::FFI::OGR_F_GetGeomFieldIndex($$self, $i) unless Geo::GDAL::FFI::isint($i);
+    $i = $self->field_index($i, 1) unless Geo::GDAL::FFI::isint($i);
     if (ref $g eq 'ARRAY') {
         $g = Geo::GDAL::FFI::Geometry->new(@$g);
     }

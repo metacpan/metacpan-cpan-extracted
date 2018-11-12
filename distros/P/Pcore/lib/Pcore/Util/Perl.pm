@@ -3,7 +3,7 @@ package Pcore::Util::Perl;
 use Pcore;
 
 sub module {
-    state $init = !!require Pcore::Util::Perl::Module;
+    require Pcore::Util::Perl::Module;
 
     return Pcore::Util::Perl::Module->new(@_);
 }

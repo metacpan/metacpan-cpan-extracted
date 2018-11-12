@@ -7,82 +7,81 @@ use Pcore::Util::Scalar qw[is_ref is_plain_arrayref is_plain_hashref];
 
 with qw[Pcore::Core::CLI::Type];
 
-has name => ( is => 'ro', isa => Str, required => 1 );
-has short => ( is => 'lazy', isa => Maybe [ StrMatch [qr/\A[[:alpha:]]\z/sm] ] );    # undef - disable short option
-has desc => ( is => 'ro', isa => Str );
+has name  => ( required => 1 );
+has short => ( is       => 'lazy' );    # undef - disable short option
+has desc  => ();
 
-has type => ( is => 'lazy', isa => Str );                                                                             # option type desc for usage help
-has isa => ( is => 'ro', isa => CodeRef | RegexpRef | ArrayRef | Enum [ keys $Pcore::Core::CLI::Type::TYPE->%* ] );
-
-has default => ( is => 'ro', isa => Str | ArrayRef | HashRef );                                                       # applied, when option is not exists, possible only for required options
+has type    => ( is => 'lazy' );        # option type desc for usage help
+has isa     => ();                      # CodeRef | RegexpRef | ArrayRef | Enum [ keys $Pcore::Core::CLI::Type::TYPE->%* ]
+has default => ();                      # Str | ArrayRef | HashRef, applied, when option is not exists, possible only for required options
 
 # NOTE !!!WARNING!!! default_val is not work as it should with Getopt::Long, don't use it now
-has default_val => ( is => 'ro', isa => Maybe [Str] );                                                                # applied, when option value is not defined
+has default_val => ();                  # applied, when option value is not defined
 
-has min => ( is => 'lazy', isa => PositiveOrZeroInt );                                                                # 0 - option is not required
-has max => ( is => 'lazy', isa => PositiveOrZeroInt );                                                                # 0 - unlimited repeats
+has min => ( is => 'lazy' );            # PositiveOrZeroInt, 0 - option is not required
+has max => ( is => 'lazy' );            # PositiveOrZeroInt, 0 - unlimited repeats
 
-has negated => ( is => 'lazy', isa => Bool );                                                                         # trigger can be used with --no prefix
-has hash => ( is => 'ro', isa => Bool, default => 0 );                                                                # option ia a hash, --opt key=val
+has negated => ( is => 'lazy' );        # trigger can be used with --no prefix
+has hash => ();                         # if true - option is a hash, --opt key=val
 
-has getopt_name   => ( is => 'lazy', isa => Str,  init_arg => undef );
-has is_trigger    => ( is => 'lazy', isa => Bool, init_arg => undef );
-has is_repeatable => ( is => 'lazy', isa => Bool, init_arg => undef );
-has is_required   => ( is => 'lazy', isa => Bool, init_arg => undef );
-has getopt_spec   => ( is => 'lazy', isa => Str,  init_arg => undef );
-has help_spec     => ( is => 'lazy', isa => Str,  init_arg => undef );
+has getopt_name   => ( is => 'lazy', init_arg => undef );
+has is_trigger    => ( is => 'lazy', init_arg => undef );
+has is_repeatable => ( is => 'lazy', init_arg => undef );
+has is_required   => ( is => 'lazy', init_arg => undef );
+has getopt_spec   => ( is => 'lazy', init_arg => undef );
+has help_spec     => ( is => 'lazy', init_arg => undef );
 
 sub BUILD ( $self, $args ) {
-    my $name = $self->name;
+    my $name = $self->{name};
 
     # TODO remove, when this bug will be fixed
-    die qq[Option "$name", don't use default_val until bug with Getopt::Long will be fixed] if defined $self->default_val;
+    die qq[Option "$name", don't use default_val until bug with Getopt::Long will be fixed] if defined $self->{default_val};
 
     # max
     die qq[Option "$name", "max" must be >= "min" ] if $self->max && $self->max < $self->min;
 
     # default
-    if ( defined $self->default ) {
+    if ( defined $self->{default} ) {
         die qq[Option "$name", default value can be used only for required option (min > 0)] if $self->min == 0;
 
         if ( $self->is_trigger ) {
             if ( $self->is_repeatable ) {
-                die qq[Option "$name", default value can be positive integer for incremental trigger] if $self->default !~ /\A\d+\z/sm;
+                die qq[Option "$name", default value can be positive integer for incremental trigger] if $self->{default} !~ /\A\d+\z/sm;
             }
             else {
-                die qq[Option "$name", default value can be 0 or 1 for boolean trigger] if $self->default !~ /\A[01]\z/sm;
+                die qq[Option "$name", default value can be 0 or 1 for boolean trigger] if $self->{default} !~ /\A[01]\z/sm;
             }
         }
         else {
-            if ( $self->hash ) {
-                die qq[Option "$name", default value must be a hash for hash option] if !is_plain_hashref $self->default;
+            if ( $self->{hash} ) {
+                die qq[Option "$name", default value must be a hash for hash option] if !is_plain_hashref $self->{default};
             }
             elsif ( $self->is_repeatable ) {
-                die qq[Option "$name", default value must be a array for repeatable option] if !is_plain_arrayref $self->default;
+                die qq[Option "$name", default value must be a array for repeatable option] if !is_plain_arrayref $self->{default};
             }
             else {
-                die qq[Option "$name", default value must be a string for plain option] if is_ref $self->default;
+                die qq[Option "$name", default value must be a string for plain option] if is_ref $self->{default};
             }
         }
     }
 
     # default_val
-    if ( defined $self->default_val ) {
-        die qq[Option "$name", "default_val" can not be used for trigger, hash or repeatable option] if $self->is_trigger || $self->hash || $self->is_repeatable;
+    if ( defined $self->{default_val} ) {
+        die qq[Option "$name", "default_val" can not be used for trigger, hash or repeatable option] if $self->is_trigger || $self->{hash} || $self->is_repeatable;
     }
 
     if ( $self->is_trigger ) {
-        die qq[Option "$name", trigger can't be a hash] if $self->hash;
+        die qq[Option "$name", trigger can't be a hash] if $self->{hash};
 
         if ( $self->negated ) {
             die qq[Option "$name", negated can't be used with short option] if defined $self->short;
 
             die qq[Option "$name", negated can't be used with incremental trigger] if $self->is_repeatable;
 
-            die qq[Option "$name", negated is useless for the boolean trigger with default value = 0] if defined $self->default && $self->default == 0;
+            die qq[Option "$name", negated is useless for the boolean trigger with default value = 0] if defined $self->{default} && $self->{default} == 0;
         }
         else {
-            die qq[Option "$name", negated should be enabled for the boolean trigger with default value = 1] if !$self->is_repeatable && defined $self->default && $self->default == 1;
+            die qq[Option "$name", negated should be enabled for the boolean trigger with default value = 1] if !$self->is_repeatable && defined $self->{default} && $self->{default} == 1;
         }
     }
     else {
@@ -93,7 +92,7 @@ sub BUILD ( $self, $args ) {
 }
 
 sub _build_min ($self) {
-    return defined $self->default ? 1 : 0;
+    return defined $self->{default} ? 1 : 0;
 }
 
 sub _build_max ($self) {
@@ -101,41 +100,39 @@ sub _build_max ($self) {
 }
 
 sub _build_negated ($self) {
-    if ( $self->is_trigger && defined $self->default ) {
-        return 0 if $self->default == 0;    # negated is useless if default value is already = 0
+    if ( $self->is_trigger && defined $self->{default} ) {
+        return 0 if $self->{default} == 0;    # negated is useless if default value is already = 0
 
-        return 1 if $self->default == 1 && !$self->is_repeatable;    # negated is mandatory for boolean trigger with default value = 1
+        return 1 if $self->{default} == 1 && !$self->is_repeatable;    # negated is mandatory for boolean trigger with default value = 1
     }
 
     return 0;
 }
 
 sub _build_getopt_name ($self) {
-    return $self->name =~ s/_/-/smgr;
+    return $self->{name} =~ s/_/-/smgr;
 }
 
-sub _build_is_trigger ($self) {
-    return defined $self->isa ? 0 : 1;
-}
+sub _build_is_trigger ($self) { return defined $self->{isa} ? 0 : 1 }
 
 sub _build_is_repeatable ($self) {
     return $self->max != 1 ? 1 : 0;
 }
 
 sub _build_is_required ($self) {
-    return $self->min && !defined $self->default ? 1 : 0;
+    return $self->min && !defined $self->{default} ? 1 : 0;
 }
 
 sub _build_short ($self) {
-    return $self->negated ? undef : substr $self->name, 0, 1;
+    return $self->negated ? undef : substr $self->{name}, 0, 1;
 }
 
 sub _build_type ($self) {
     if ( !$self->is_trigger ) {
-        my $ref = ref $self->isa;
+        my $ref = ref $self->{isa};
 
         if ( !$ref ) {
-            return uc $self->isa;
+            return uc $self->{isa};
         }
         elsif ( $ref eq 'ARRAY' ) {
             return 'ENUM';
@@ -162,13 +159,13 @@ sub _build_getopt_spec ($self) {
         $spec .= q[+] if $self->is_repeatable;
     }
     else {
-        if ( defined $self->default_val ) {
+        if ( defined $self->{default_val} ) {
             $spec .= q[:s];
         }
         else {
             $spec .= q[=s];
 
-            if ( $self->hash ) {
+            if ( $self->{hash} ) {
                 $spec .= q[%];
             }
             elsif ( $self->is_repeatable ) {
@@ -192,11 +189,11 @@ sub _build_help_spec ($self) {
     if ( !$self->is_trigger ) {
         my $type = uc $self->type;
 
-        if ( $self->hash ) {
+        if ( $self->{hash} ) {
             $spec .= " key=$type";
         }
         else {
-            if ( defined $self->default_val ) {
+            if ( defined $self->{default_val} ) {
                 $spec .= "=[$type]";
             }
             else {
@@ -217,17 +214,17 @@ sub _build_help_spec ($self) {
 }
 
 sub validate ( $self, $opt ) {
-    my $name = $self->name;
+    my $name = $self->{name};
 
     # remap getopt name
     $opt->{$name} = delete $opt->{ $self->getopt_name } if exists $opt->{ $self->getopt_name };
 
     if ( !exists $opt->{$name} ) {
         if ( $self->min ) {    # option is required
-            if ( defined $self->default ) {
+            if ( defined $self->{default} ) {
 
                 # apply default value
-                $opt->{$name} = $self->default;
+                $opt->{$name} = $self->{default};
             }
             else {
                 return qq[option "$name" is required];
@@ -239,10 +236,10 @@ sub validate ( $self, $opt ) {
             return;
         }
     }
-    elsif ( defined $self->default_val && $opt->{$name} eq q[] ) {
+    elsif ( defined $self->{default_val} && $opt->{$name} eq '' ) {
 
         # apply default_val if opt is exists. but value is not specified
-        $opt->{$name} = $self->default_val;
+        $opt->{$name} = $self->{default_val};
     }
 
     # min / max check for the repeatable opt
@@ -275,7 +272,7 @@ sub validate ( $self, $opt ) {
   VALIDATE:
 
     # validate option value type
-    if ( defined $self->isa && ( my $error_msg = $self->_validate_isa( $opt->{$name} ) ) ) {
+    if ( defined $self->{isa} && ( my $error_msg = $self->_validate_isa( $opt->{$name} ) ) ) {
         return qq[option "$name" $error_msg];
     }
 
@@ -289,7 +286,9 @@ sub validate ( $self, $opt ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 35                   | Subroutines::ProhibitExcessComplexity - Subroutine "BUILD" with high complexity score (35)                     |
+## |    3 | 34                   | Subroutines::ProhibitExcessComplexity - Subroutine "BUILD" with high complexity score (35)                     |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 239                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

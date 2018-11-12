@@ -191,7 +191,7 @@ sub return_xxx ( $self, $h, $status, $close_connection = 1 ) {
 
     $status = 0+ $status;
 
-    my $reason = Pcore::Util::Result::get_standard_reason($status);
+    my $reason = P->result->resolve_reason($status);
 
     my $buf = "HTTP/1.1 $status $reason\r\nContent-Length:0\r\n";
 

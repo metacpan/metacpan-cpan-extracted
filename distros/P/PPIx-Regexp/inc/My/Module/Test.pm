@@ -3,7 +3,9 @@ package My::Module::Test;
 use strict;
 use warnings;
 
-use Exporter qw{ import };
+use Exporter;
+
+our @ISA = ( qw{ Exporter } );
 
 use PPIx::Regexp;
 use PPIx::Regexp::Dumper;
@@ -13,14 +15,14 @@ use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number refaddr };
 use Test::More 0.88;
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 
 use constant ARRAY_REF	=> ref [];
 
 our @EXPORT_OK = qw{
     cache_count
     choose
-    class
+    klass
     cmp_ok
     content
     count
@@ -40,6 +42,7 @@ our @EXPORT_OK = qw{
     plan
     ppi
     result
+    replace_characters
     skip
     tokenize
     true
@@ -62,19 +65,23 @@ my (
     $parse,		# Result of parse:
     			#    array ref if set by tokenize(), or
 			#    PPIx::Regexp object if set by parse()
+    %replace_characters, # Troublesome characters replaced in output
+			# before testing
     $result,		# Operation result.
 );
 
-sub cache_count {		## no critic (RequireArgUnpacking)
+sub cache_count {
     my ( $expect ) = @_;
     defined $expect or $expect = 0;
     $obj = undef;
     $parse = undef;
     _pause();
     $result = PPIx::Regexp->__cache_size();
-    @_ = ( $result, $expect,
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
+    return is( $result, $expect,
 	"Should be $expect leftover cache contents" );
-    goto &is;
 }
 
 sub choose {
@@ -83,61 +90,66 @@ sub choose {
     return navigate( @args );
 }
 
-sub class {		## no critic (RequireArgUnpacking)
+sub klass {
     my ( $class ) = @_;
     $result = ref $obj || $obj;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( defined $class ) {
-	@_ = ( $obj, $class, "$kind $nav" );
-	goto &isa_ok;
+	return isa_ok( $obj, $class, "$kind $nav" );
     } else {
-	@_ = ( ref $obj || undef, $class, "Class of $kind $nav" );
-	goto &is;
+	return is( ref $obj || undef, $class, "Class of $kind $nav" );
     }
 }
 
 sub content {		## no critic (RequireArgUnpacking)
+    # For some reason cperl seems to have no problem with this
     unshift @_, 'content';
     goto &_method_result;
 }
 
-sub count {		## no critic (RequireArgUnpacking)
+sub count {
     my ( @args ) = @_;
     my $expect = pop @args;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( ARRAY_REF eq ref $parse ) {
 	$result = @{ $parse };
-	@_ = ( $result, $expect, "Expect $expect tokens" );
+	return is( $result, $expect, "Expect $expect tokens" );
     } elsif ( ARRAY_REF eq ref $obj ) {
 	$result = @{ $obj };
-	@_ = ( $result, $expect, "Expect $expect tokens" );
+	return is( $result, $expect, "Expect $expect tokens" );
     } elsif ( $obj->can( 'children' ) ) {
 	$result = $obj->children();
-	@_ = ( $result, $expect, "Expect $expect children" );
+	return is( $result, $expect, "Expect $expect children" );
     } else {
 	$result = $obj->can( 'children' );
-	@_ = ( $result, ref( $obj ) . "->can( 'children')" );
-	goto &ok;
+	return ok( $result, ref( $obj ) . "->can( 'children')" );
     }
-    goto &is;
 }
 
-sub different {		## no critic (RequireArgUnpacking)
+sub different {
     my @args = @_;
     @args < 3 and unshift @args, $obj;
     my ( $left, $right, $name ) = @args;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( ! defined $left && ! defined $right ) {
-	@_ = ( undef, $name );
+	return ok( undef, $name );
     } elsif ( ! defined $left || ! defined $right ) {
-	@_ = ( 1, $name );
+	return ok( 1, $name );
     } elsif ( ref $left && ref $right ) {
-	@_ = ( refaddr( $left ) != refaddr( $right ), $name );
+	return ok( refaddr( $left ) != refaddr( $right ), $name );
     } elsif ( ref $left || ref $right ) {
-	@_ = ( 1, $name );
+	return ok( 1, $name );
     } elsif ( looks_like_number( $left ) && looks_like_number( $right ) ) {
-	@_ = ( $left != $right, $name );
+	return ok( $left != $right, $name );
     } else {
-	@_ = ( $left ne $right, $name );
+	return ok( $left ne $right, $name );
     }
-    goto &ok;
 }
 
 sub dump_result {
@@ -145,8 +157,10 @@ sub dump_result {
     if ( $opt->{test} ) {
 	my ( $expect, $name ) = splice @args, -2;
 	my $got = PPIx::Regexp::Dumper->new( $obj, @args )->string();
-	@_ = ( $got, $expect, $name );
-	goto &is;
+	# cperl does not seem to like goto &xxx; it throws a deep
+	# recursion error if you do it enough times.
+	$Test::Builder::Level = $Test::Builder::Level + 1;
+	return is( $got, $expect, $name );
     } elsif ( __instance( $result, 'PPIx::Regexp::Tokenizer' ) ||
 	__instance( $result, 'PPIx::Regexp::Element' ) ) {
 	diag( PPIx::Regexp::Dumper->new( $obj, @args )->string() );
@@ -160,24 +174,26 @@ sub dump_result {
     return;
 }
 
-sub equals {		## no critic (RequireArgUnpacking)
+sub equals {
     my @args = @_;
     @args < 3 and unshift @args, $obj;
     my ( $left, $right, $name ) = @args;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( ! defined $left && ! defined $right ) {
-	@_ = ( 1, $name );
+	return ok( 1, $name );
     } elsif ( ! defined $left || ! defined $right ) {
-	@_ = ( undef, $name );
+	return ok( undef, $name );
     } elsif ( ref $left && ref $right ) {
-	@_ = ( refaddr( $left ) == refaddr( $right ), $name );
+	return ok( refaddr( $left ) == refaddr( $right ), $name );
     } elsif ( ref $left || ref $right ) {
-	@_ = ( undef, $name );
+	return ok( undef, $name );
     } elsif ( looks_like_number( $left ) && looks_like_number( $right ) ) {
-	@_ = ( $left == $right, $name );
+	return ok( $left == $right, $name );
     } else {
-	@_ = ( $left eq $right, $name );
+	return ok( $left eq $right, $name );
     }
-    goto &ok;
 }
 
 sub error {		## no critic (RequireArgUnpacking)
@@ -185,28 +201,32 @@ sub error {		## no critic (RequireArgUnpacking)
     goto &_method_result;
 }
 
-sub false {		## no critic (RequireArgUnpacking)
+sub false {
     my ( $method, $args ) = @_;
     ARRAY_REF eq ref $args
 	or $args = [ $args ];
     my $class = ref $obj;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( $obj->can( $method ) ) {
 	$result = $obj->$method( @{ $args } );
 	my $fmtd = _format_args( $args );
-	@_ = ( ! $result, "$class->$method$fmtd is false" );
+	return ok( ! $result, "$class->$method$fmtd is false" );
     } else {
 	$result = undef;
-	@_ = ( undef, "$class->$method() exists" );
+	return ok( undef, "$class->$method() exists" );
     }
-    goto &ok;
 }
 
-sub finis {		## no critic (RequireArgUnpacking)
+sub finis {
     $obj = $parse = $result = undef;
     _pause();
     $result = PPIx::Regexp::Element->__parent_keys();
-    @_ = ( $result, 0, 'Should be no leftover objects' );
-    goto &is;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
+    return is( $result, 0, 'Should be no leftover objects' );
 }
 
 {
@@ -262,8 +282,11 @@ sub parse {		## no critic (RequireArgUnpacking)
     $result = $obj = $parse = PPIx::Regexp->new( $regexp, @args );
     $nav = '';
     $opt->{test} or return;
-    @_ = ( $parse, 'PPIx::Regexp', $regexp );
-    goto &isa_ok;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
+    return isa_ok( $parse, 'PPIx::Regexp',
+	_replace_characters( $regexp ) );
 }
 
 sub ppi {		## no critic (RequireArgUnpacking)
@@ -277,8 +300,15 @@ sub ppi {		## no critic (RequireArgUnpacking)
     } else {
 	$safe = 'undef';
     }
-    @_ = ( $result, $expect, "$kind $nav ppi() content '$safe'" );
-    goto &is;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
+    return is( $result, $expect, "$kind $nav ppi() content '$safe'" );
+}
+
+sub replace_characters {
+    %replace_characters	= @_;
+    return;
 }
 
 sub result {
@@ -300,8 +330,9 @@ sub tokenize {		## no critic (RequireArgUnpacking)
     $result = $parse;
     $nav = '';
     $opt->{test} or return;
-    @_ = ( $obj, 'PPIx::Regexp::Tokenizer', $regexp );
-    goto &isa_ok;
+    $Test::Builder::Level = $Test::Builder::Level + 1;
+    return isa_ok( $obj, 'PPIx::Regexp::Tokenizer',
+	_replace_characters( $regexp ) );
 }
 
 sub true {		## no critic (RequireArgUnpacking)
@@ -309,15 +340,17 @@ sub true {		## no critic (RequireArgUnpacking)
     ARRAY_REF eq ref $args
 	or $args = [ $args ];
     my $class = ref $obj;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( $obj->can( $method ) ) {
 	$result = $obj->$method( @{ $args } );
 	my $fmtd = _format_args( $args );
-	@_ = ( $result, "$class->$method$fmtd is true" );
+	return ok( $result, "$class->$method$fmtd is true" );
     } else {
 	$result = undef;
-	@_ = ( undef, "$class->$method() exists" );
+	return ok( undef, "$class->$method() exists" );
     }
-    goto &ok;
 }
 
 sub value {		## no critic (RequireArgUnpacking)
@@ -327,9 +360,11 @@ sub value {		## no critic (RequireArgUnpacking)
 
     my $invocant = $obj || $initial_class;
     my $class = ref $obj || $obj || $initial_class;
+    # cperl does not seem to like goto &xxx; it throws a deep recursion
+    # error if you do it enough times.
+    $Test::Builder::Level = $Test::Builder::Level + 1;
     if ( ! $invocant->can( $method ) ) {
-	@_ = ( undef, "$class->$method() exists" );
-	goto &ok;
+	return ok( undef, "$class->$method() exists" );
     }
 
     $result = ARRAY_REF eq ref $expect ?
@@ -338,11 +373,11 @@ sub value {		## no critic (RequireArgUnpacking)
 
     my $fmtd = _format_args( $args );
     my $answer = _format_args( [ $expect ], bare => 1 );
-    @_ = ( $result, $expect, "${class}->$method$fmtd is $answer" );
     if ( ref $result ) {
-	goto &is_deeply;
+	return is_deeply( $result, $expect,
+	    "${class}->$method$fmtd is $answer" );
     } else {
-	goto &is;
+	return is( $result, $expect, "${class}->$method$fmtd is $answer" );
     }
 }
 
@@ -378,7 +413,7 @@ sub _method_result {		## no critic (RequireArgUnpacking)
     } else {
 	$safe = 'undef';
     }
-    @_ = ( $result, $expect, "$kind $nav $method $safe" );
+    @_ = _replace_characters( $result, $expect, "$kind $nav $method $safe" );
     goto &is;
 }
 
@@ -427,6 +462,21 @@ sub __quote {
     return join( ', ', @rslt );
 }
 
+sub _replace_characters {
+    my @arg = @_;
+    if ( keys %replace_characters ) {
+	foreach ( @arg ) {
+	    $_ = join '',
+	    # The following assumes I will never want to replace 0.
+	    map { $replace_characters{$_} || $_ }
+	    split qr<>;
+	}
+    }
+    wantarray
+	or return join '', @arg;
+    return @arg;
+}
+
 1;
 
 __END__
@@ -442,15 +492,20 @@ My::Module::Test - support for testing PPIx::Regexp
 
  parse   ( '/foo/' );
  value   ( failures => [], 0 );
- class   ( 'PPIx::Regexp' );
+ klass   ( 'PPIx::Regexp' );
  choose  ( child => 0 );
- class   ( 'PPIx::Regexp::Token::Structure' );
+ klass   ( 'PPIx::Regexp::Token::Structure' );
  content ( '' );
  # and so on
 
 =head1 DETAILS
 
-This package exports various subroutines in support of testing
+This module is B<private> to the C<PPIx-Regexp> module. Its contents can
+be changed without warning. This was always the intent, and this
+paragraph should have been included in the POD much earlier than it
+actually was.
+
+This module exports various subroutines in support of testing
 C<PPIx::Regexp>. Most of these are tests, with C<Test::More> doing the
 dirty work. A few simply set up data for tests.
 
@@ -484,12 +539,14 @@ object to be tested, starting from the C<PPIx::Regexp> object. The
 arguments to the methods are passed in an array reference, but if there
 is a single argument it can be passed as a scalar, as in the example.
 
-=head2 class
+=head2 klass
 
- class( 'PPIx::Regexp::Token::Structure' );
+ klass( 'PPIx::Regexp::Token::Structure' );
 
 This test checks to see if the current object is of the given class, and
 succeeds if it is. If the current object is C<undef>, the test fails.
+
+This test was C<class>, but that tends to conflict with object systems.
 
 =head2 content
 

@@ -46,7 +46,7 @@ main () {
    #
 
    if [ $SC_CURR_SUCC -eq 0 ]; then
-      rm -f TESTDIR/fail_twice.*.flag;
+      rm -f TESTDIR/fail_twice.*.flag; echo "Removing fail flags";
       CMD_EXIT=$?;
       if [ $CMD_EXIT -eq 0 ]; then
          SC_CURR_SUCC=1;
@@ -80,7 +80,7 @@ main () {
       #
 
       if [ $SC_CURR_SUCC -eq 0 ]; then
-         TESTDIR/bin/fail_twice /home/sulbeck/perl-modules/Shell-Cmd-3.00/t;
+         TESTDIR/bin/fail_twice TESTDIR;
          CMD_EXIT=$?;
          if [ $CMD_EXIT -eq 0 ]; then
             SC_CURR_SUCC=1;

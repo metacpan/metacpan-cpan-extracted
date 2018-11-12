@@ -1,3 +1,9 @@
+0.0.203 Sun Nov 11 12:09:39 PST 2018
+ - TestML Travis fix
+
+0.0.202 Sun Nov 11 11:05:21 PST 2018
+ - Set up environment for releaseing modules with TestML tests
+
 0.0.201 Mon Aug 27 08:03:52 PDT 2018
  - Update travis code for new TestML
 

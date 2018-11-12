@@ -27,5 +27,5 @@ requires:
   Phone::Number: '0.01'
   enum: '0'
   perl: '5.010000'
-version: v1.4.0
+version: v1.5.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

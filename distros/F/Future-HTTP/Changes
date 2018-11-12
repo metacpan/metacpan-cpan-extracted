@@ -1,47 +1,56 @@
-0.09 20180519
-    + Silence warning when using Mojolicious
+0.11 2018-11-08
+    * Test stability (contributed by Hauke D)
+    * Allow changing @Future::HTTP::loops more easily (contributed by Hauke D)
+
+0.10 2018-05-20
+    * We now want HTTP::Tiny::Paranoid 0.07+
+      0.04 had errors when testing
+      ( http://www.cpantesters.org/cpan/report/7d410262-5b42-11e8-8d7e-b001725e5915 )
+
+0.09 2018-05-19
+    * Silence warning when using Mojolicious
       Thanks to pplu and Grinnz for reporting it and the diagnosis
       This addresses https://github.com/Corion/future-http/issues/2
-    ! The response body is now always decoded like HTTP::Message->decoded_content
+    * The response body is now always decoded like HTTP::Message->decoded_content
       If you need access to the raw, undecoded content, please tell me
-    . Switch from including Test::HTTP::LocalServer to loading it as
+    * Switch from including Test::HTTP::LocalServer to loading it as
       a test prerequisite
 
-0.08 20171129
-    ! 3xx status codes are not treated as errors anymore
-    . Common code was moved into a Role
-	+ Support for HTTP::Tiny::Paranoid
-	+ Support for IO::Async / Net::Async::HTTP
+0.08 2017-11-29
+    * 3xx status codes are not treated as errors anymore
+    * Common code was moved into a Role
+	* Support for HTTP::Tiny::Paranoid
+	* Support for IO::Async / Net::Async::HTTP
 
-0.07 20170703
-    . Only test changes, no need to upgrade
-	. Split up the backend test into separate files to avoid trying to reload
+0.07 2017-07-03
+    * Only test changes, no need to upgrade
+	* Split up the backend test into separate files to avoid trying to reload
 	  an identical module during the test run(s)
 
-0.06 20170630
-    . We want AnyEvent::Future 0.02 minimum
-	+ Actually return a "true" message when failing in HTTP::Future::Mojo
+0.06 2017-06-30
+    * We want AnyEvent::Future 0.02 minimum
+	* Actually return a "true" message when failing in HTTP::Future::Mojo
 
-0.05 20160524
-    . Old versions of HTTP::Tiny don't have some features, defang the tests
+0.05 2016-05-24
+    * Old versions of HTTP::Tiny don't have some features, defang the tests
       appropriately.
 
-0.04 20160523
-    . Attempt to be more compatible with older versions of HTTP::Tiny
+0.04 2016-05-23
+    * Attempt to be more compatible with older versions of HTTP::Tiny
       Those older versions are distributed with Perl 5.12.x etc, so
       compatibility with them allows us not to require an upgrade of the
       core module.
 
-0.03 20160523
-    . Tighten prerequisites
+0.03 2016-05-23
+    * Tighten prerequisites
       We need Future 0.33 now
       Actually, likely anything above 0.26 will work, but I'm too lazy to
       find out which versions work.
-    . Support Mojolicious as backend
+    * Support Mojolicious as backend
 
-0.02 20160520
-    . Fix test suite
+0.02 2016-05-20
+    * Fix test suite
 
-0.01 20160516
-    . Released on an unsuspecting world
+0.01 2016-05-16
+    * Released on an unsuspecting world
 

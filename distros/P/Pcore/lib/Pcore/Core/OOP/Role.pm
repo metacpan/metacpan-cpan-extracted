@@ -7,6 +7,10 @@ use Pcore::Util::Scalar qw[is_ref is_plain_hashref is_coderef];
 sub import ( $self, $caller = undef ) {
     $caller //= caller;
 
+    # register caller module in %INC
+    my $module = $caller =~ s[::][/]smgr . '.pm';
+    if ( !exists $INC{$module} ) { $INC{$module} = "(embedded)" }    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+
     # register role
     $Pcore::Core::OOP::Class::REG{$caller}{is_role} = 1;
 
@@ -87,7 +91,9 @@ sub _around ( $name, $code ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 13                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 12                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 17                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

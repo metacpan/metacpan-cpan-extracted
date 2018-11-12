@@ -1,5 +1,22 @@
 Revision history for Alien::gdal
 
+1.11 2018-11-09
+    - No further changes from 1.10 dev releases
+
+1.10_004 2018-07-30
+    - use Alien::Build::Plugin::Cleanse::BuildDir
+    - add Sort::Versions as a configure and build dependency
+    - add URI::Escape and URI::File as dependencies
+
+1.10_003 2018-05-14
+    - Abbreviate log output under more cpan tester rigs
+    - Minor alienfile cleanups
+
+1.10_002 2018-05-14
+    - Update the alienfile for GDAL 2.3.0
+    - Much of the patching is now version specific to avoid build failures, e.g. on BSD
+    - some tests now also set $ENV{DYLIB_DIR}
+
 1.09 2018-07-05
     - No further changes from 1.08 dev releases
 

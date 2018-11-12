@@ -5,7 +5,9 @@ use warnings;
 BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Test::More;
 
-use Assert::Refute;
+use Assert::Refute qw(contract_is);
+use Assert::Refute::Contract qw(contract);
+
 
 my $smart = contract {
     package T;

@@ -32,6 +32,7 @@
 #include "csprng.h"
 #include "random_prime.h"
 #include "ramanujan_primes.h"
+#include "semi_primes.h"
 #include "prime_nth_count.h"
 
 #ifdef FACTORING_HARNESSES
@@ -357,6 +358,54 @@ static void csprng_init_seed(void* ctx) {
   csprng_seed(ctx, 64, data);
   Safefree(data);
 }
+
+static void _comb_init(UV* cm, UV k, int derangement) {
+  UV i;
+  cm[0] = UV_MAX;
+  for (i = 0; i < k; i++)
+    cm[i] = k-i;
+  if (derangement && k >= 2) {   /* Make derangements start deranged */
+    for (i = 0; i < k; i++)
+      cm[k-i-1] = (i&1) ? i : i+2;
+    if (k & 1) {
+      cm[0] = k-2;
+      cm[1] = k;
+    }
+  }
+}
+
+static int _comb_iterate(UV* cm, UV k, UV n, int ix) {
+  UV i, j, m;
+  if (ix == 0) {
+    if (cm[0]++ < n)  return 0;                /* Increment last value */
+    for (i = 1; i < k && cm[i] >= n-i; i++) ;  /* Find next index to incr */
+    if (i >= k)  return 1;                     /* Done! */
+    cm[i]++;                                   /* Increment this one */
+    while (i-- > 0)  cm[i] = cm[i+1] + 1;      /* Set the rest */
+  } else if (ix == 1) {
+    for (j = 1; j < k && cm[j] > cm[j-1]; j++) ;  /* Find last decrease */
+    if (j >= k) return 1;                         /* Done! */
+    for (m = 0; cm[j] > cm[m]; m++) ;             /* Find next greater */
+    { UV t = cm[j];  cm[j] = cm[m];  cm[m] = t; } /* Swap */
+    for (i = j-1, m = 0;  m < i;  i--, m++)       /* Reverse the end */
+      { UV t = cm[i];  cm[i] = cm[m];  cm[m] = t; }
+  } else {
+    REDERANGE:
+    for (j = 1; j < k && cm[j] > cm[j-1]; j++) ;  /* Find last decrease */
+    if (j >= k) return 1;                         /* Done! */
+    for (m = 0; cm[j] > cm[m]; m++) ;             /* Find next greater */
+    { UV t = cm[j];  cm[j] = cm[m];  cm[m] = t; } /* Swap */
+    if (cm[j] == k-j) goto REDERANGE;             /* Skip? */
+    for (i = j-1, m = 0;  m < i;  i--, m++)       /* Reverse the end */
+      { UV t = cm[i];  cm[i] = cm[m];  cm[m] = t; }
+    for (i = 0; i < k; i++)                       /* Check deranged */
+      if (cm[k-i-1]-1 == i)
+        break;
+    if (i != k) goto REDERANGE;
+  }
+  return 0;
+}
+
 
 
 MODULE = Math::Prime::Util	PACKAGE = Math::Prime::Util
@@ -693,8 +742,9 @@ sieve_primes(IN UV low, IN UV high)
     erat_primes = 2
     segment_primes = 3
     segment_twin_primes = 4
-    _ramanujan_primes = 5
-    _n_ramanujan_primes = 6
+    semi_prime_sieve = 5
+    _ramanujan_primes = 6
+    _n_ramanujan_primes = 7
   PREINIT:
     AV* av;
   PPCODE:
@@ -705,9 +755,19 @@ sieve_primes(IN UV low, IN UV high)
       PUTBACK;
       SP = NULL; /* never use SP again, poison */
     }
-    if ((low <= 2) && (high >= 2) && ix != 4) { av_push(av, newSVuv( 2 )); }
-    if ((low <= 3) && (high >= 3) && ix != 5) { av_push(av, newSVuv( 3 )); }
-    if ((low <= 5) && (high >= 5) && ix != 5) { av_push(av, newSVuv( 5 )); }
+    if        (ix == 4) { /* twin primes */
+      if ((low <= 3) && (high >= 3)) av_push(av, newSVuv( 3 ));
+      if ((low <= 5) && (high >= 5)) av_push(av, newSVuv( 5 ));
+    } else if (ix == 5) {  /* semiprimes */
+      if ((low <= 4) && (high >= 4)) av_push(av, newSVuv( 4 ));
+      if ((low <= 6) && (high >= 6)) av_push(av, newSVuv( 6 ));
+    } else if (ix == 6) { /* ramanujan primes */
+      if ((low <= 2) && (high >= 2)) av_push(av, newSVuv( 2 ));
+    } else {
+      if ((low <= 2) && (high >= 2)) av_push(av, newSVuv( 2 ));
+      if ((low <= 3) && (high >= 3)) av_push(av, newSVuv( 3 ));
+      if ((low <= 5) && (high >= 5)) av_push(av, newSVuv( 5 ));
+    }
     if (low < 7)  low = 7;
     if (low <= high) {
       if (ix == 4) high += 2;
@@ -739,19 +799,25 @@ sieve_primes(IN UV low, IN UV high)
           END_DO_FOR_EACH_SIEVE_PRIME
         }
         end_segment_primes(ctx);
-      } else if (ix == 5) {                   /* Ramanujan primes */
+      } else if (ix == 5) {                   /* Semiprimes */
+        UV i, count, *semi;
+        count = range_semiprime_sieve(&semi, low, high);
+        for (i = 0; i < count; i++)
+          av_push(av, newSVuv(semi[i]));
+        Safefree(semi);
+      } else if (ix == 6) {                   /* Ramanujan primes */
         UV i, beg, end, *L;
         L = ramanujan_primes(&beg, &end, low, high);
         if (L && end >= beg)
           for (i = beg; i <= end; i++)
             av_push(av,newSVuv(L[i]));
         Safefree(L);
-      } else if (ix == 6) {                   /* Ramanujan primes */
+      } else if (ix == 7) {                   /* Ramanujan primes */
         UV i, *L;
         L = n_range_ramanujan_primes(low, high);
         if (L && high >= low)
-          for (i = low; i <= high; i++)
-            av_push(av,newSVuv(L[i-low]));
+          for (i = 0; i <= (high-low); i++)
+            av_push(av,newSVuv(L[i]));
         Safefree(L);
       }
     }
@@ -1434,31 +1500,35 @@ next_prime(IN SV* svn)
     inverse_li = 6
     nth_twin_prime = 7
     nth_twin_prime_approx = 8
-    nth_ramanujan_prime = 9
-    nth_ramanujan_prime_upper = 10
-    nth_ramanujan_prime_lower = 11
-    nth_ramanujan_prime_approx = 12
-    prime_count_upper = 13
-    prime_count_lower = 14
-    prime_count_approx = 15
-    ramanujan_prime_count_upper = 16
-    ramanujan_prime_count_lower = 17
-    twin_prime_count_approx = 18
-    urandomm = 19
+    nth_semiprime = 9
+    nth_semiprime_approx = 10
+    nth_ramanujan_prime = 11
+    nth_ramanujan_prime_upper = 12
+    nth_ramanujan_prime_lower = 13
+    nth_ramanujan_prime_approx = 14
+    prime_count_upper = 15
+    prime_count_lower = 16
+    prime_count_approx = 17
+    ramanujan_prime_count_upper = 18
+    ramanujan_prime_count_lower = 19
+    twin_prime_count_approx = 20
+    semiprime_count_approx = 21
+    urandomm = 22
   PPCODE:
     if (_validate_int(aTHX_ svn, 0)) {
       UV n = my_svuv(svn);
-      if ( (n >= MPU_MAX_PRIME     && ix == 0) ||
-           (n >= MPU_MAX_PRIME_IDX && (ix==2 || ix==3 || ix==4 || ix==5 || ix == 6)) ||
-           (n >= MPU_MAX_TWIN_PRIME_IDX && (ix==7 || ix==8)) ||
-           (n >= MPU_MAX_RMJN_PRIME_IDX && (ix==9)) ) {
+      if (   (n >= MPU_MAX_PRIME     && ix == 0)
+          || (n >= MPU_MAX_PRIME_IDX && (ix==2 || ix==3 || ix==4 || ix==5 || ix == 6))
+          || (n >= MPU_MAX_TWIN_PRIME_IDX && (ix==7 || ix==8))
+          || (n >= MPU_MAX_SEMI_PRIME_IDX && (ix==9 || ix==10))
+          || (n >= MPU_MAX_RMJN_PRIME_IDX && (ix==11 || ix==12 || ix==13 || ix==14)) ) {
         /* Out of range.  Fall through to Perl. */
       } else {
         UV ret;
         /* Prev prime of 2 or less should return undef */
         if (ix == 1 && n < 3) XSRETURN_UNDEF;
         /* nth_prime(0) and similar should return undef */
-        if (n == 0 && (ix >= 2 && ix <= 9 && ix != 6)) XSRETURN_UNDEF;
+        if (n == 0 && (ix >= 2 && ix <= 10 && ix != 6)) XSRETURN_UNDEF;
         switch (ix) {
           case 0: ret = next_prime(n);  break;
           case 1: ret = (n < 3) ? 0 : prev_prime(n);  break;
@@ -1469,17 +1539,23 @@ next_prime(IN SV* svn)
           case 6: ret = inverse_li(n); break;
           case 7: ret = nth_twin_prime(n); break;
           case 8: ret = nth_twin_prime_approx(n); break;
-          case 9: ret = nth_ramanujan_prime(n); break;
-          case 10:ret = nth_ramanujan_prime_upper(n); break;
-          case 11:ret = nth_ramanujan_prime_lower(n); break;
-          case 12:ret = nth_ramanujan_prime_approx(n); break;
-          case 13:ret = prime_count_upper(n); break;
-          case 14:ret = prime_count_lower(n); break;
-          case 15:ret = prime_count_approx(n); break;
-          case 16:ret = ramanujan_prime_count_upper(n); break;
-          case 17:ret = ramanujan_prime_count_lower(n); break;
-          case 18:ret = twin_prime_count_approx(n); break;
-          case 19:
+          case 9: ret = nth_semiprime(n); break;
+          case 10:ret = nth_semiprime_approx(n);
+                  /* Do the following if we need a semiprime returned. */
+                  /* while (!is_semiprime(ret)) ret++;  */
+                  break;
+          case 11:ret = nth_ramanujan_prime(n); break;
+          case 12:ret = nth_ramanujan_prime_upper(n); break;
+          case 13:ret = nth_ramanujan_prime_lower(n); break;
+          case 14:ret = nth_ramanujan_prime_approx(n); break;
+          case 15:ret = prime_count_upper(n); break;
+          case 16:ret = prime_count_lower(n); break;
+          case 17:ret = prime_count_approx(n); break;
+          case 18:ret = ramanujan_prime_count_upper(n); break;
+          case 19:ret = ramanujan_prime_count_lower(n); break;
+          case 20:ret = twin_prime_count_approx(n); break;
+          case 21:ret = semiprime_count_approx(n); break;
+          case 22:
           default:{ dMY_CXT; ret = urandomm64(MY_CXT.randcxt,n); } break;
         }
         XSRETURN_UV(ret);
@@ -1500,17 +1576,20 @@ next_prime(IN SV* svn)
       case 6:  _vcallsub_with_pp("inverse_li");   break;
       case 7:  _vcallsub_with_pp("nth_twin_prime");     break;
       case 8:  _vcallsub_with_pp("nth_twin_prime_approx"); break;
-      case 9:  _vcallsub_with_pp("nth_ramanujan_prime"); break;
-      case 10: _vcallsub_with_pp("nth_ramanujan_prime_upper"); break;
-      case 11: _vcallsub_with_pp("nth_ramanujan_prime_lower"); break;
-      case 12: _vcallsub_with_pp("nth_ramanujan_prime_approx"); break;
-      case 13: _vcallsub_with_pp("prime_count_upper");  break;
-      case 14: _vcallsub_with_pp("prime_count_lower");  break;
-      case 15: _vcallsub_with_pp("prime_count_approx"); break;
-      case 16: _vcallsub_with_pp("ramanujan_prime_count_upper");  break;
-      case 17: _vcallsub_with_pp("ramanujan_prime_count_lower");  break;
-      case 18: _vcallsub_with_pp("twin_prime_count_approx"); break;
-      case 19:
+      case 9:  _vcallsub_with_pp("nth_semiprime"); break;
+      case 10: _vcallsub_with_pp("nth_semiprime_approx"); break;
+      case 11: _vcallsub_with_pp("nth_ramanujan_prime"); break;
+      case 12: _vcallsub_with_pp("nth_ramanujan_prime_upper"); break;
+      case 13: _vcallsub_with_pp("nth_ramanujan_prime_lower"); break;
+      case 14: _vcallsub_with_pp("nth_ramanujan_prime_approx"); break;
+      case 15: _vcallsub_with_pp("prime_count_upper");  break;
+      case 16: _vcallsub_with_pp("prime_count_lower");  break;
+      case 17: _vcallsub_with_pp("prime_count_approx"); break;
+      case 18: _vcallsub_with_pp("ramanujan_prime_count_upper");  break;
+      case 19: _vcallsub_with_pp("ramanujan_prime_count_lower");  break;
+      case 20: _vcallsub_with_pp("twin_prime_count_approx"); break;
+      case 21: _vcallsub_with_pp("semiprime_count_approx"); break;
+      case 22:
       default: _vcallsub_with_gmpobj(0.44,"urandomm");
                OBJECTIFY_RESULT(svn, ST(0));
                break;
@@ -1580,13 +1659,14 @@ void random_factored_integer(IN SV* svn)
   PPCODE:
     if (_validate_int(aTHX_ svn, 0)) {
       dMY_CXT;
-      int nf;
+      int f, nf, flip;
       UV r, F[MPU_MAX_FACTORS+1], n = my_svuv(svn);
       AV* av = newAV();
       if (n < 1) croak("random_factored_integer: n must be >= 1");
       r = random_factored_integer(MY_CXT.randcxt, n, &nf, F);
-      while (nf > 0)
-        av_push(av, newSVuv(F[--nf]));
+      flip = (F[0] >= F[nf-1]);  /* Handle results in either sort order */
+      for (f = 0; f < nf; f++)
+        av_push(av, newSVuv(F[flip ? nf-1-f : f]));
       XPUSHs(sv_2mortal(newSVuv( r )));
       XPUSHs(sv_2mortal(newRV_noinc( (SV*) av )));
     } else {
@@ -1973,12 +2053,12 @@ _XS_ExponentialIntegral(IN SV* x)
   CODE:
     nv = SvNV(x);
     switch (ix) {
-      case 0: ret = (NV) Ei(nv); break;
-      case 1: ret = (NV) Li(nv); break;
+      case 0: ret = Ei(nv); break;
+      case 1: ret = Li(nv); break;
       case 2: ret = (NV) ld_riemann_zeta(nv); break;
       case 3: ret = (NV) RiemannR(nv); break;
       case 4:
-      default:ret = (NV) lambertw(nv); break;
+      default:ret = lambertw(nv); break;
     }
     RETVAL = ret;
   OUTPUT:
@@ -2007,19 +2087,19 @@ euler_phi(IN SV* svlo, IN SV* svhi = 0)
       UV lo = my_svuv(svlo);
       UV hi = my_svuv(svhi);
       if (lo <= hi) {
-        UV i;
-        EXTEND(SP, (IV)(hi-lo+1));
+        UV i, count = hi - lo + 1;
+        EXTEND(SP, (IV)count);
         if (ix == 0) {
-          UV  arraylo = (lo < 100)  ?  0  :  lo;
-          UV* totients = _totient_range(arraylo, hi);
-          for (i = lo; i <= hi; i++)
-            PUSHs(sv_2mortal(newSVuv(totients[i-arraylo])));
+          UV arrlo = (lo < 100) ?  0 : lo;
+          UV *totients = range_totient(arrlo, hi);
+          for (i = 0; i < count; i++)
+            PUSHs(sv_2mortal(newSVuv(totients[i+lo-arrlo])));
           Safefree(totients);
         } else {
-          signed char* mu = _moebius_range(lo, hi);
+          signed char* mu = range_moebius(lo, hi);
           dMY_CXT;
-          for (i = lo; i <= hi; i++)
-            PUSH_NPARITY(mu[i-lo]);
+          for (i = 0; i < count; i++)
+            PUSH_NPARITY(mu[i]);
           Safefree(mu);
         }
       }
@@ -2064,8 +2144,8 @@ carmichael_lambda(IN SV* svn)
                    int nfactors = factor(my_svuv(svn), factors);
                    RETURN_NPARITY( (nfactors & 1) ? -1 : 1 ); }
                  break;
-        case 3:  XSRETURN_NV(chebyshev_function(n, 0)); break;
-        case 4:  XSRETURN_NV(chebyshev_function(n, 1)); break;
+        case 3:  XSRETURN_NV(chebyshev_theta(n)); break;
+        case 4:  XSRETURN_NV(chebyshev_psi(n)); break;
         case 5:  r = factorial(n);
                  if (r != 0) XSRETURN_UV(r);
                  status = 0; break;
@@ -2380,6 +2460,11 @@ lastfor()
       if (MY_CXT.forcount-- != oldforloop) croak("for loop mismatch"); \
     } while (0)
 
+#define DECL_FORCOUNT \
+    uint16_t oldforloop; \
+    char     oldforexit; \
+    char    *forexit
+
 void
 forprimes (SV* block, IN SV* svbeg, IN SV* svend = 0)
   PROTOTYPE: &$;$
@@ -2390,9 +2475,7 @@ forprimes (SV* block, IN SV* svbeg, IN SV* svend = 0)
     CV *cv;
     unsigned char* segment;
     UV beg, end, seg_base, seg_low, seg_high;
-    uint16_t oldforloop;
-    char     oldforexit;
-    char    *forexit;
+    DECL_FORCOUNT;
     dMY_CXT;
   PPCODE:
     cv = sv_2cv(block, &stash, &gv, 0);
@@ -2482,13 +2565,12 @@ forprimes (SV* block, IN SV* svbeg, IN SV* svend = 0)
     END_FORCOUNT;
 
 #define FORCOMPTEST(ix,n) \
-  ( (ix==1) || (ix==0 && n&1) || (ix==2 && is_semiprime(n)) )
+  ( (ix==1) || (ix==0 && n&1) )
 
 void
 foroddcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
   ALIAS:
     forcomposites = 1
-    forsemiprimes = 2
   PROTOTYPE: &$;$
   PREINIT:
     UV beg, end;
@@ -2496,9 +2578,7 @@ foroddcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
     HV *stash;
     SV* svarg;  /* We use svarg to prevent clobbering $_ outside the block */
     CV *cv;
-    uint16_t oldforloop;
-    char     oldforexit;
-    char    *forexit;
+    DECL_FORCOUNT;
     dMY_CXT;
   PPCODE:
     cv = sv_2cv(block, &stash, &gv, 0);
@@ -2508,13 +2588,12 @@ foroddcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
     if (!_validate_int(aTHX_ svbeg, 0) || (items >= 3 && !_validate_int(aTHX_ svend,0))) {
       _vcallsubn(aTHX_ G_VOID|G_DISCARD, VCALL_ROOT,
          (ix == 0) ? "_generic_foroddcomposites"
-       : (ix == 1) ? "_generic_forcomposites"
-       :             "_generic_forsemiprimes", items, 0);
+       :             "_generic_forcomposites", items, 0);
       return;
     }
 
     if (items < 3) {
-      beg = ix ? 4 : 8;
+      beg = ix ? 4 : 9;
       end = my_svuv(svbeg);
     } else {
       beg = my_svuv(svbeg);
@@ -2562,17 +2641,15 @@ foroddcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
         while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
           int crossuv = (seg_high > IV_MAX) && !SvIsUV(svarg);
           START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
-            CHECK_FORCOUNT;
             cbeg = prevprime+1;
             if (cbeg < beg)
               cbeg = beg - (ix == 0 && (beg % 2));
             prevprime = p;
             cend = prevprime-1;  if (cend > end) cend = end;
             /* If ix=0, skip evens by starting 1 farther and skipping by 2 */
-            /* For ix==2 we could be clever and skip past %4 and %9 */
             cinc = 1 + (ix==0);
             for (c = cbeg + (ix==0); c <= cend; c += cinc) {
-              if (ix == 2 && !is_semiprime(c))  continue;
+              CHECK_FORCOUNT;
               if      (SvTYPE(svarg) != SVt_IV) { sv_setuv(svarg,c); }
               else if (crossuv && c > IV_MAX)   { sv_setuv(svarg,c); crossuv=0;}
               else                              { SvUV_set(svarg,c); }
@@ -2609,6 +2686,99 @@ foroddcomposites (SV* block, IN SV* svbeg, IN SV* svend = 0)
     END_FORCOUNT;
 
 void
+forsemiprimes (SV* block, IN SV* svbeg, IN SV* svend = 0)
+  PROTOTYPE: &$;$
+  PREINIT:
+    UV beg, end;
+    GV *gv;
+    HV *stash;
+    SV* svarg;  /* We use svarg to prevent clobbering $_ outside the block */
+    CV *cv;
+    DECL_FORCOUNT;
+    dMY_CXT;
+  PPCODE:
+    cv = sv_2cv(block, &stash, &gv, 0);
+    if (cv == Nullcv)
+      croak("Not a subroutine reference");
+
+    if (!_validate_int(aTHX_ svbeg, 0) || (items >= 3 && !_validate_int(aTHX_ svend,0))) {
+      _vcallsubn(aTHX_ G_VOID|G_DISCARD, VCALL_ROOT, "_generic_forsemiprimes", items, 0);
+      return;
+    }
+
+    if (items < 3) {
+      beg = 4;
+      end = my_svuv(svbeg);
+    } else {
+      beg = my_svuv(svbeg);
+      end = my_svuv(svend);
+    }
+    if (beg < 4) beg = 4;
+    if (end > MPU_MAX_SEMI_PRIME) end = MPU_MAX_SEMI_PRIME;
+
+    START_FORCOUNT;
+    SAVESPTR(GvSV(PL_defgv));
+    svarg = newSVuv(0);
+    GvSV(PL_defgv) = svarg;
+#if USE_MULTICALL
+    if (!CvISXSUB(cv) && end >= beg) {
+      UV c, seg_beg, seg_end, *S, count;
+      dMULTICALL;
+      I32 gimme = G_VOID;
+      PUSH_MULTICALL(cv);
+      if (beg >= MPU_MAX_SEMI_PRIME ||
+#if BITS_PER_WORD == 64
+          (beg >= UVCONST(10000000000000000000) && end-beg <  1400000) ||
+          (beg >= UVCONST( 1000000000000000000) && end-beg <   950000) ||
+          (beg >= UVCONST(  100000000000000000) && end-beg <   440000) ||
+          (beg >= UVCONST(   10000000000000000) && end-beg <   240000) ||
+          (beg >= UVCONST(    1000000000000000) && end-beg <    65000) ||
+          (beg >= UVCONST(     100000000000000) && end-beg <    29000) ||
+          (beg >= UVCONST(      10000000000000) && end-beg <    11000) ||
+          (beg >= UVCONST(       1000000000000) && end-beg <     5000) ||
+#endif
+          end-beg < 200 ) {
+        beg = (beg <= 4) ? 3 : beg-1;
+        while (beg++ < end) {
+          if (is_semiprime(beg)) { sv_setuv(svarg, beg); MULTICALL; }
+          CHECK_FORCOUNT;
+        }
+      } else {
+        while (beg < end) {
+          seg_beg = beg;
+          seg_end = end;
+          if ((seg_end - seg_beg) > 50000000) seg_end = seg_beg + 50000000 - 1;
+          count = range_semiprime_sieve(&S, seg_beg, seg_end);
+          for (c = 0; c < count; c++) {
+            sv_setuv(svarg, S[c]);
+            MULTICALL;
+            CHECK_FORCOUNT;
+          }
+          Safefree(S);
+          beg = seg_end+1;
+          CHECK_FORCOUNT;
+        }
+      }
+      FIX_MULTICALL_REFCOUNT;
+      POP_MULTICALL;
+    }
+    else
+#endif
+    if (beg <= end) {
+      beg = (beg <= 4) ? 3 : beg-1;
+      while (beg++ < end) {
+        if (is_semiprime(beg)) {
+          sv_setuv(svarg, beg);
+          PUSHMARK(SP);
+          call_sv((SV*)cv, G_VOID|G_DISCARD);
+          CHECK_FORCOUNT;
+        }
+      }
+    }
+    SvREFCNT_dec(svarg);
+    END_FORCOUNT;
+
+void
 fordivisors (SV* block, IN SV* svn)
   PROTOTYPE: &$
   PREINIT:
@@ -2618,9 +2788,7 @@ fordivisors (SV* block, IN SV* svn)
     HV *stash;
     SV* svarg;  /* We use svarg to prevent clobbering $_ outside the block */
     CV *cv;
-    uint16_t oldforloop;
-    char     oldforexit;
-    char    *forexit;
+    DECL_FORCOUNT;
     dMY_CXT;
   PPCODE:
     cv = sv_2cv(block, &stash, &gv, 0);
@@ -2678,9 +2846,7 @@ forpart (SV* block, IN SV* svn, IN SV* svh = 0)
     HV *stash;
     CV *cv;
     SV** svals;
-    uint16_t oldforloop;
-    char     oldforexit;
-    char    *forexit;
+    DECL_FORCOUNT;
     dMY_CXT;
   PPCODE:
     cv = sv_2cv(block, &stash, &gv, 0);
@@ -2729,9 +2895,9 @@ forpart (SV* block, IN SV* svn, IN SV* svh = 0)
     }
 
     if (n==0 && nmin <= 1) {
-      { dSP; ENTER; PUSHMARK(SP);
+      { PUSHMARK(SP);
         /* Nothing */
-        PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;
+        PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); SPAGAIN;
       }
     }
     if (n >= nmin && nmin <= nmax && amin <= amax && nmax > 0 && amax > 0)
@@ -2785,10 +2951,9 @@ forpart (SV* block, IN SV* svn, IN SV* svh = 0)
           if (i <= k) continue;
         }
 
-        { dSP; ENTER; PUSHMARK(SP);
-          EXTEND(SP, (IV)k); for (i = 0; i <= k; i++) { PUSHs(svals[a[i]]); }
-          PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;
-        }
+        PUSHMARK(SP); EXTEND(SP, (IV)k);
+        for (i = 0; i <= k; i++) { PUSHs(svals[a[i]]); }
+        PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); SPAGAIN;
         CHECK_FORCOUNT;
       }
       Safefree(a);
@@ -2805,15 +2970,13 @@ forcomb (SV* block, IN SV* svn, IN SV* svk = 0)
     forderange = 2
   PROTOTYPE: &$;$
   PREINIT:
-    UV i, n, k, j, m, begk, endk;
+    UV i, n, k, begk, endk;
     GV *gv;
     HV *stash;
     CV *cv;
     SV** svals;
     UV*  cm;
-    uint16_t oldforloop;
-    char     oldforexit;
-    char    *forexit;
+    DECL_FORCOUNT;
     dMY_CXT;
   PPCODE:
     cv = sv_2cv(block, &stash, &gv, 0);
@@ -2847,61 +3010,133 @@ forcomb (SV* block, IN SV* svn, IN SV* svk = 0)
     New(0, cm, endk+1, UV);
 
     START_FORCOUNT;
-    for (k = begk; k <= endk; k++) {
-      cm[0] = UV_MAX;
-      for (i = 0; i < k; i++)
-        cm[i] = k-i;
-      if (ix == 2 && k >= 2) {   /* Make derangements start deranged */
-        for (i = 0; i < k; i++)
-          cm[k-i-1] = (i&1) ? i : i+2;
-        if (k & 1) {
-          cm[0] = k-2;
-          cm[1] = k;
-        }
-      }
-      while (1) {
-        if (ix < 2 || k != 1) {
-          dSP; ENTER; PUSHMARK(SP);
-          EXTEND(SP, ((IV)k));
-          for (i = 0; i < k; i++) { PUSHs(svals[ cm[k-i-1]-1 ]); }
-          PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;
+#if USE_MULTICALL
+    if (!CvISXSUB(cv)) {
+      dMULTICALL;
+      I32 gimme = G_VOID;
+      AV *av = save_ary(PL_defgv);
+      AvREAL_off(av);
+      PUSH_MULTICALL(cv);
+      for (k = begk; k <= endk; k++) {
+        _comb_init(cm, k, ix == 2);
+        while (1) {
+          if (ix < 2 || k != 1) {
+            IV j;
+            av_extend(av, k-1);
+            av_fill(av, k-1);
+            for (j = k-1; j >= 0; j--)
+              AvARRAY(av)[j] = svals[ cm[k-j-1]-1 ];
+            MULTICALL;
+          }
           CHECK_FORCOUNT;
+          if (_comb_iterate(cm, k, n, ix)) break;
         }
-        if (ix == 0) {
-          if (cm[0]++ < n)  continue;                /* Increment last value */
-          for (i = 1; i < k && cm[i] >= n-i; i++) ;  /* Find next index to incr */
-          if (i >= k)  break;                        /* Done! */
-          cm[i]++;                                   /* Increment this one */
-          while (i-- > 0)  cm[i] = cm[i+1] + 1;      /* Set the rest */
-        } else if (ix == 1) {
-          for (j = 1; j < k && cm[j] > cm[j-1]; j++) ;  /* Find last decrease */
-          if (j >= k) break;                            /* Done! */
-          for (m = 0; cm[j] > cm[m]; m++) ;             /* Find next greater */
-          { UV t = cm[j];  cm[j] = cm[m];  cm[m] = t; } /* Swap */
-          for (i = j-1, m = 0;  m < i;  i--, m++)       /* Reverse the end */
-            { UV t = cm[i];  cm[i] = cm[m];  cm[m] = t; }
-        } else {
-          REDERANGE:
-          for (j = 1; j < k && cm[j] > cm[j-1]; j++) ;  /* Find last decrease */
-          if (j >= k) break;                            /* Done! */
-          for (m = 0; cm[j] > cm[m]; m++) ;             /* Find next greater */
-          { UV t = cm[j];  cm[j] = cm[m];  cm[m] = t; } /* Swap */
-          if (cm[j] == k-j) goto REDERANGE;             /* Skip? */
-          for (i = j-1, m = 0;  m < i;  i--, m++)       /* Reverse the end */
-            { UV t = cm[i];  cm[i] = cm[m];  cm[m] = t; }
-          for (i = 0; i < k; i++)                       /* Check deranged */
-            if (cm[k-i-1]-1 == i)
-              break;
-          if (i != k) goto REDERANGE;
-        }
+        CHECK_FORCOUNT;
       }
-      CHECK_FORCOUNT;
+      FIX_MULTICALL_REFCOUNT;
+      POP_MULTICALL;
+    } else
+#endif
+    {
+      for (k = begk; k <= endk; k++) {
+        _comb_init(cm, k, ix == 2);
+        while (1) {
+          if (ix < 2 || k != 1) {
+            PUSHMARK(SP); EXTEND(SP, ((IV)k));
+            for (i = 0; i < k; i++) { PUSHs(svals[ cm[k-i-1]-1 ]); }
+            PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); SPAGAIN;
+          }
+          CHECK_FORCOUNT;
+          if (_comb_iterate(cm, k, n, ix)) break;
+        }
+        CHECK_FORCOUNT;
+      }
     }
 
     Safefree(cm);
     for (i = 0; i < n; i++)
       SvREFCNT_dec(svals[i]);
     Safefree(svals);
+    END_FORCOUNT;
+
+void
+forsetproduct (SV* block, ...)
+  PROTOTYPE: &@
+  PREINIT:
+    IV narrays, i, *arlen, *arcnt;
+    AV **arptr;
+    SV **arout;
+    GV *gv;
+    HV *stash;
+    CV *cv;
+    DECL_FORCOUNT;
+    dMY_CXT;
+  PPCODE:
+    cv = sv_2cv(block, &stash, &gv, 0);
+    if (cv == Nullcv) croak("Not a subroutine reference");
+
+    narrays = items-1;
+    if (narrays < 1) return;
+
+    for (i = 1; i <= narrays; i++) {
+      SvGETMAGIC(ST(i));
+      if ((!SvROK(ST(i))) || (SvTYPE(SvRV(ST(i))) != SVt_PVAV))
+        croak("forsetproduct arguments must be array references");
+      if (av_len((AV *)SvRV(ST(i))) < 0)
+        return;
+    }
+
+    Newz(0, arcnt, narrays, IV);
+    New(0, arlen, narrays, IV);
+    New(0, arptr, narrays, AV*);
+    New(0, arout, narrays, SV*);
+    for (i = 0; i < narrays; i++) {
+      arptr[i] = (AV*) SvRV(ST(i+1));
+      arlen[i] = 1 + av_len(arptr[i]);
+      arout[i] = AvARRAY(arptr[i])[0];
+    }
+
+    START_FORCOUNT;
+#if USE_MULTICALL
+    if (!CvISXSUB(cv)) {
+      dMULTICALL;
+      I32 gimme = G_VOID;
+      AV *av = save_ary(PL_defgv);
+      AvREAL_off(av);
+      PUSH_MULTICALL(cv);
+      do {
+        av_extend(av, narrays-1);
+        av_fill(av, narrays-1);
+        for (i = narrays-1; i >= 0; i--)  /* Faster to fill backwards */
+          AvARRAY(av)[i] = arout[i];
+        MULTICALL;
+        CHECK_FORCOUNT;
+        for (i = narrays-1; i >= 0; i--) {
+          if (++arcnt[i] >= arlen[i])  arcnt[i] = 0;
+          arout[i] = AvARRAY(arptr[i])[arcnt[i]];
+          if (arcnt[i] > 0)  break;
+        }
+      } while (i >= 0);
+      FIX_MULTICALL_REFCOUNT;
+      POP_MULTICALL;
+    }
+    else
+#endif
+    do {
+      PUSHMARK(SP); EXTEND(SP, narrays);
+      for (i = 0; i < narrays; i++) { PUSHs(arout[i]); }
+      PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); SPAGAIN;
+      CHECK_FORCOUNT;
+      for (i = narrays-1; i >= 0; i--) {
+        if (++arcnt[i] >= arlen[i])  arcnt[i] = 0;
+        arout[i] = AvARRAY(arptr[i])[arcnt[i]];
+        if (arcnt[i] > 0)  break;
+      }
+    } while (i >= 0);
+    Safefree(arout);
+    Safefree(arptr);
+    Safefree(arlen);
+    Safefree(arcnt);
     END_FORCOUNT;
 
 void
@@ -2918,9 +3153,7 @@ forfactored (SV* block, IN SV* svbeg, IN SV* svend = 0)
     SV* svarg;  /* We use svarg to prevent clobbering $_ outside the block */
     CV *cv;
     SV* svals[64];
-    uint16_t oldforloop;
-    char     oldforexit;
-    char    *forexit;
+    DECL_FORCOUNT;
     dMY_CXT;
   PPCODE:
     cv = sv_2cv(block, &stash, &gv, 0);
@@ -2953,21 +3186,49 @@ forfactored (SV* block, IN SV* svbeg, IN SV* svend = 0)
     GvSV(PL_defgv) = svarg;
     START_FORCOUNT;
     if (beg <= 1) {
-      dSP; ENTER; PUSHMARK(SP);
+      PUSHMARK(SP);
       sv_setuv(svarg, 1);
-      PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;
+      PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); SPAGAIN;
       beg = 2;
     }
     fctx = factor_range_init(beg, end, ix);
+#if USE_MULTICALL
+    if (!CvISXSUB(cv)) {
+      dMULTICALL;
+      I32 gimme = G_VOID;
+      AV *av = save_ary(PL_defgv);
+      AvREAL_off(av);
+      PUSH_MULTICALL(cv);
+      for (n = 0; n < end-beg+1; n++) {
+        CHECK_FORCOUNT;
+        nfactors = factor_range_next(&fctx);
+        if (nfactors > 0) {
+          sv_setuv(svarg, fctx.n);
+          factors = fctx.factors;
+          av_extend(av, nfactors-1);
+          av_fill(av, nfactors-1);
+          for (i = nfactors-1; i >= 0; i--) {
+            SV* sv = svals[i];
+            SvREADONLY_off(sv);
+            sv_setuv(sv, factors[i]);
+            SvREADONLY_on(sv);
+            AvARRAY(av)[i] = sv;
+          }
+          MULTICALL;
+        }
+      }
+      FIX_MULTICALL_REFCOUNT;
+      POP_MULTICALL;
+    }
+    else
+#endif
     for (n = 0; n < end-beg+1; n++) {
       CHECK_FORCOUNT;
       nfactors = factor_range_next(&fctx);
       if (nfactors > 0) {
-        /* TODO: Figure out how to use multicall for this. */
-        dSP; ENTER; PUSHMARK(SP);
+        PUSHMARK(SP); EXTEND(SP, nfactors);
         sv_setuv(svarg, fctx.n);
         factors = fctx.factors;
-        EXTEND(SP, nfactors);
         for (i = 0; i < nfactors; i++) {
           SV* sv = svals[i];
           SvREADONLY_off(sv);
@@ -2975,7 +3236,7 @@ forfactored (SV* block, IN SV* svbeg, IN SV* svend = 0)
           SvREADONLY_on(sv);
           PUSHs(sv);
         }
-        PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;
+        PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); SPAGAIN;
       }
     }
     SvREFCNT_dec(svarg);

@@ -10,7 +10,7 @@ use TestTools;
 use XML::Compile::Schema;
 use XML::Compile::Tester;
 
-use Test::More tests => 92;
+use Test::More tests => 116;
 
 set_compile_defaults
     elements_qualified => 'NONE';
@@ -63,6 +63,14 @@ test_rw($schema, test1 => <<__XML, [1]);
 <test1>1</test1>
 __XML
 
+test_rw($schema, test1 => <<__XML, [0]);
+<test1>0</test1>
+__XML
+
+test_rw($schema, test1 => <<__XML, [0, 0]);
+<test1>0 0</test1>
+__XML
+
 test_rw($schema, test1 => <<__XML, [2, 3]);
 <test1>2 3</test1>
 __XML
@@ -78,6 +86,10 @@ __XML
 
 test_rw($schema, test2 => <<__XML, [2, 3]);
 <test2>2 3</test2>
+__XML
+
+test_rw($schema, test2 => <<__XML, [0, 0]);
+<test2>0 0</test2>
 __XML
 
 test_rw($schema, test2 => <<__XML, [4, 5, 6]);

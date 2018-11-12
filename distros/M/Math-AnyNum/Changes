@@ -1,5 +1,17 @@
 Revision history for Math-AnyNum
 
+0.29    2018-11-11
+
+        [ADDITIONS]
+
+        - is_smooth_over_prod(n,k)      return 1 if n is smooth over the primes p|k
+
+        [IMPROVEMENTS]
+
+        - Much faster algorithm in `is_smooth(n, k)`.
+        - Cached the values of the `bernoulli(n)` function for `n <= 500`.
+        - Also cached the Bernoulli numbers that are internally used in `bernoulli_polynomial(n, x)` and `faulhaber_sum(n, k)`.
+
 0.28    2018-09-29
 
         [ADDITIONS]

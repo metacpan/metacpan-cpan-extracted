@@ -17,7 +17,7 @@ sub hostname {
 }
 
 sub get_free_port : prototype(;$) ( $ip = undef ) {
-    state $init = !!require Socket;
+    require Socket;
 
     if ($ip) {
         $ip = Socket::inet_aton $ip;

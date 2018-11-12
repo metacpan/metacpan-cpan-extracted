@@ -21,7 +21,7 @@ my %module_build_args = (
     "Mattia Barbon <mattia\@barbon.org>"
   ],
   "dist_name" => "Alien-ProtoBuf",
-  "dist_version" => "0.07",
+  "dist_version" => "0.08",
   "license" => "perl",
   "module_name" => "Alien::ProtoBuf",
   "recursive_test_files" => 1

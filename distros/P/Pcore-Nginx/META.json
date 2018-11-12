@@ -47,6 +47,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-nginx/overview"
       }
    },
-   "version" : "v1.7.1",
+   "version" : "v1.7.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

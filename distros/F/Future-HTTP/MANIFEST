@@ -26,6 +26,8 @@ t/01-http-tiny-paranoid.t
 t/01-http-tiny.t
 t/01-mojo.t
 t/01-netasync.t
+t/02-changedefault1.t
+t/02-changedefault2.t
 xt/99-changes.t
 xt/99-compile.t
 xt/99-manifest.t
@@ -34,3 +36,4 @@ xt/99-test-prerequisites.t
 xt/99-todo.t
 xt/99-unix-text.t
 xt/99-versions.t
+xt/meta-lint.t

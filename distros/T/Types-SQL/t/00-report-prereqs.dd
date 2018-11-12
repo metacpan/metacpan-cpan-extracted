@@ -34,7 +34,10 @@ do { my $x = {
                                       'Type::Library' => '0',
                                       'Type::Utils' => '0.44',
                                       'Types::Standard' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.8.0',
                                       'strict' => '0',
+                                      'version' => '0.77',
                                       'warnings' => '0'
                                     }
                     },

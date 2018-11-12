@@ -1,0 +1,46 @@
+Changelog for Mojolicious-Plugin-Export
+
+0.004     2018-11-11 10:24:41-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed "wide character in syswrite" by encoding HTML files to UTF-8.
+      If someone would like to be able to configure the file encoding,
+      that sounds like a good first patch for this project :)
+      This also does not encode plain text files or other files that
+      could be encoded (another good first patch for this project)
+
+0.003     2018-11-08 21:39:27-06:00 America/Chicago
+
+    [Added]
+
+    - Added resolving of redirects and replacing links. Now if one of
+      your routes redirects to another route, all the links in your site
+      will be fixed appropriately.
+
+    [Fixed]
+
+    - Fixed exporting pages with URL fragments in the path
+
+0.002     2018-11-08 11:44:01-06:00 America/Chicago
+
+    [Added]
+
+    - Added `export` configuration to Mojolicious app. Now you can
+      configure the default export settings directly in your
+      application.
+    - Added `--base <url>` to rewrite absolute URLs. This helps when
+      deploying a site to a folder in a larger site.
+
+    [Fixed]
+
+    - Fixed pages not being updated if they already exist in the export
+      directory.
+    - Fixed accidental export of error pages. Error pages aren't useful
+      to export...
+
+0.001     2018-11-07 17:24:19-06:00 America/Chicago
+
+    [Added]
+
+    - Added ability to export a Mojolicious site to static files

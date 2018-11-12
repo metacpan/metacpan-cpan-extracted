@@ -4,10 +4,8 @@ use Pcore -role, -const, -l10n;
 use Pcore::Ext;
 use Pcore::Util::Data qw[to_json];
 use Pcore::Util::Scalar qw[is_plain_arrayref];
-use JavaScript::Packer qw[];
-use JavaScript::Beautifier qw[];
 
-has ext_app   => undef;                 # name of the linked application, required
+has ext_app   => ( required => 1 );     # name of the linked application, required
 has ext_title => 'ExtJS Application';
 has ext_theme => ();
 
@@ -247,19 +245,16 @@ sub _prepare_js ( $self, $js ) {
     P->text->encode_utf8($js);
 
     if ( $self->{app}->{devel} ) {
-        $js = JavaScript::Beautifier::js_beautify(
-            $js,
-            {   indent_size               => 4,
-                indent_character          => q[ ],
-                preserve_newlines         => 1,
-                space_after_anon_function => 1,
-            }
-        );
+        $js = P->src->decompress(
+            path => '1.js',
+            data => $js,
+        )->{data};
     }
     else {
-        my $js_packer = JavaScript::Packer->init;
-
-        $js_packer->minify( \$js, { compress => 'obfuscate' } );    # clean
+        $js = P->src->obfuscate(
+            path => '1.js',
+            data => $js,
+        )->{data};
     }
 
     return \$js;

@@ -48,6 +48,11 @@ test_dists/ConfigDeps/cpanfile
 test_dists/ConfigDeps/dist.ini
 test_dists/ConfigDeps/lib/ConfigDeps.pm
 test_dists/ConfigDeps/t/basic.t
+test_dists/CoreDeprDeps/CoreDeprDeps-1.0.tar.gz
+test_dists/CoreDeprDeps/cpanfile
+test_dists/CoreDeprDeps/dist.ini
+test_dists/CoreDeprDeps/lib/CoreDeprDeps.pm
+test_dists/CoreDeprDeps/t/basic.t
 test_dists/DeployCpanfile/cpanfile
 test_dists/DeployEmpty/cpanfile
 test_dists/DeploySnapshot/cpanfile

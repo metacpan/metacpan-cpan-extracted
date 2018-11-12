@@ -4,6 +4,7 @@ BEGIN {
     $DB::single = 1;
 }
 
+use lib 'examples';
 use Object::Tiny          ();
 use Class::Accessor::Fast ();
 use Foo_Bar_Accessor      ();

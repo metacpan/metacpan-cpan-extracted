@@ -11,11 +11,12 @@ use Config;
 use Cwd;
 
 my $base = Cwd::cwd;
-my $commit = '50c11cce165a0e2cda8ebbd70661b27d0b0abd5c';
+my $commit = 'a99b98f94f3289c50f653e2ab7d87d2416bbb89b';
 
 sub new {
     my $class = shift;
     my $protobuf_flags = Alien::ProtoBuf->cflags;
+    my $protobuf_cxxflags = Alien::ProtoBuf->cxxflags;
     my $make_args = '';
     if ($^O eq 'freebsd') {
         $make_args = 'CXX=c++';
@@ -27,7 +28,7 @@ sub new {
             'Alien::gmake' => 0.11, # needed for %{gmake} helper
         },
         alien_build_commands => [
-            "%{gmake} default googlepb USER_CPPFLAGS=\"$protobuf_flags -fPIC\" $make_args",
+            "%{gmake} default googlepb CXXFLAGS=\"$protobuf_cxxflags\" USER_CPPFLAGS=\"$protobuf_flags -fPIC\" $make_args",
         ],
         alien_install_commands => [
             "$^X ../../scripts/install.pl %s",

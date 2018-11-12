@@ -31,13 +31,11 @@ my ($reply_header, $reply_body) = do {
     $binary_string =~ s/\n/\n         /sg;
     my $body = <<"EOF";
 id: 873
-Subject:
-Creator: 12
+Subject: \nCreator: 12
 Created: 2013-11-06 07:15:36
 Transaction: 1457
 Parent: 871
-MessageId:
-Filename: prova2.png
+MessageId: \nFilename: prova2.png
 ContentType: image/png
 ContentEncoding: base64
 
@@ -114,7 +112,7 @@ my $rt = RT::Client::REST->new(
     timeout => 2,
 );
 
-# avoid need ot login
+# avoid need to login
 $rt->basic_auth_cb(sub { return });
 
 {

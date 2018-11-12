@@ -1,0 +1,6 @@
+---
+<: $main_script :>:
+    disabled: 0
+    crypt: 0
+    clean: 1
+    gui: 0

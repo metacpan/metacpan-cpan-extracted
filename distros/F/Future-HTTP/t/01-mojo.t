@@ -17,6 +17,8 @@ if( !$ok) {
     exit;
 };
 
+plan tests => 11;
+
 diag( "Version of Mojolicious: " . Mojolicious->VERSION );
 
 my $server = Test::HTTP::LocalServer->spawn(
@@ -65,8 +67,8 @@ is $headers->{Redirect}->[1]->{Redirect}->[1]->{URL}, $u, "... twice, starting f
 
     my $result = $f->get;
 
-    is 0+@warnings, 0, "No warnings when running"
-        or diag Dumper \@warnings;
+    is 0+grep({/\b\QUse of uninitialized value \$chunk in concatenation\E\b/} @warnings),
+        0, "No warnings when running (issue #2)" or diag Dumper \@warnings;
 }
 $server->stop;
 

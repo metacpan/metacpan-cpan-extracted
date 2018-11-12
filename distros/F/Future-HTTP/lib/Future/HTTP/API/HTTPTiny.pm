@@ -7,7 +7,7 @@ use feature 'signatures';
 require HTTP::Tiny;
 require URI;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 =head1 NAME
 

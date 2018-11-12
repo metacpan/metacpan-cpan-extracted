@@ -1,6 +1,16 @@
 Revision history for Term::Choose
 
 
+1.628   2018-11-12
+    - Changed modification of list elements.
+    - 'line_fold': use "\v" instead of "\n" to split the string.
+    - Modified 'CharWidthDefault.pm' and 'CharWidthAmbiguousWide.pm'.
+    - If 'll' is set, all list elements have to be defined.
+    - Removed 'ref' conversation.
+    - Removed "no warnings 'utf8'".
+    - Code refactoring.
+    - Update documentation.
+
 1.627   2018-08-21
     - Code refactoring.
 

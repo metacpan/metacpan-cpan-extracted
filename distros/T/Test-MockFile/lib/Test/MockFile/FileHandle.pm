@@ -24,7 +24,7 @@ Test::MockFile::FileHandle - Provides a class for L<Test::MockFile> to tie to on
 
 =head1 VERSION
 
-Version 0.010
+Version 0.011
 
 =cut
 
@@ -174,7 +174,8 @@ sub READLINE {
     my ($self) = @_;
 
     my $tell = $self->{'tell'};
-    my $new_tell = index( $self->{'data'}->{'contents'}, $/, $tell ) + length($/);
+    my $rs = $/ // '';
+    my $new_tell = index( $self->{'data'}->{'contents'}, $rs, $tell ) + length($rs);
 
     if ( $new_tell == 0 ) {
         $new_tell = length( $self->{'data'}->{'contents'} );

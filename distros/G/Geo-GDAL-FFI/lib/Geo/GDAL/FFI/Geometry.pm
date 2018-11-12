@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = 0.05_03;
+our $VERSION = 0.0601;
 
 my %ref;
 
@@ -15,7 +15,7 @@ sub new {
     if (@_ == 1) {
         my $type = shift // '';
         my $tmp = $Geo::GDAL::FFI::geometry_types{$type};
-        confess "Empty or unknown geometry type: '$type'\n" unless defined $tmp;
+        confess "Empty or unknown geometry type: '$type'." unless defined $tmp;
         my $m = $type =~ /M$/;
         my $z = $type =~ /ZM$/ || $type =~ /25D$/;
         $g = Geo::GDAL::FFI::OGR_G_CreateGeometry($tmp);
@@ -26,7 +26,7 @@ sub new {
     } else {
         my ($format, $string, $sr) = @_;
         my $tmp = $Geo::GDAL::FFI::geometry_formats{$format};
-        confess "Empty or unknown geometry format: '$format'\n" unless defined $tmp;
+        confess "Empty or unknown geometry format: '$format'." unless defined $tmp;
         $sr = $$sr if $sr;
         if ($format eq 'WKT') {
             my $e = Geo::GDAL::FFI::OGR_G_CreateFromWkt(\$string, $sr, \$g);
@@ -195,12 +195,67 @@ sub RemoveGeometry {
 }
 
 sub ExportToWKT {
-    my ($self) = @_;
+    my ($self, $variant) = @_;
+    $variant //= 'ISO';
     my $wkt = '';
-    Geo::GDAL::FFI::OGR_G_ExportToIsoWkt($$self, \$wkt);
+    if ($variant =~ /(?i)iso/) {
+        Geo::GDAL::FFI::OGR_G_ExportToIsoWkt($$self, \$wkt);
+    } else {
+        Geo::GDAL::FFI::OGR_G_ExportToWkt($$self, \$wkt);
+    }
     return $wkt;
 }
 *AsText = *ExportToWKT;
+
+sub ExportToGML {
+    my ($self, %options) = @_;
+    my $o = 0;
+    for my $key (keys %options) {
+        $o = Geo::GDAL::FFI::CSLAddString($o, "$key=$options{$key}");
+    }
+    my $p;
+    if ($o) {
+        $p = Geo::GDAL::FFI::OGR_G_ExportToGMLEx($$self, $o);
+        Geo::GDAL::FFI::CSLDestroy($o);
+    } else {
+        $p = Geo::GDAL::FFI::OGR_G_ExportToGML($$self);
+    }
+    my $ffi = FFI::Platypus->new;
+    my $gml = $ffi->cast(opaque => 'string', $p);
+    Geo::GDAL::FFI::VSIFree($p);
+    confess Geo::GDAL::FFI::error_msg() unless $gml;
+    return $gml;
+}
+
+sub ExportToKML {
+    my ($self) = @_;
+    my $p = Geo::GDAL::FFI::OGR_G_ExportToKML($$self);
+    my $ffi = FFI::Platypus->new;
+    my $kml = $ffi->cast(opaque => 'string', $p);
+    Geo::GDAL::FFI::VSIFree($p);
+    confess Geo::GDAL::FFI::error_msg() unless $kml;
+    return $kml;
+}
+
+sub ExportToJSON {
+    my ($self, %options) = @_;
+    my $o = 0;
+    for my $key (keys %options) {
+        $o = Geo::GDAL::FFI::CSLAddString($o, "$key=$options{$key}");
+    }
+    my $p;
+    if ($o) {
+        $p = Geo::GDAL::FFI::OGR_G_ExportToJsonEx($$self, $o);
+        Geo::GDAL::FFI::CSLDestroy($o);
+    } else {
+        $p = Geo::GDAL::FFI::OGR_G_ExportToJson($$self);
+    }
+    my $ffi = FFI::Platypus->new;
+    my $json = $ffi->cast(opaque => 'string', $p);
+    Geo::GDAL::FFI::VSIFree($p);
+    confess Geo::GDAL::FFI::error_msg() unless $json;
+    return $json;
+}
 
 sub Intersects {
     my ($self, $geom) = @_;
@@ -259,31 +314,45 @@ sub Buffer {
 
 sub Intersection {
     my ($self, $geom) = @_;
-    return bless \Geo::GDAL::FFI::OGR_G_Intersection($$self, $$geom), 'Geo::GDAL::FFI::Geometry';
+    confess "Undefined geometry." unless $geom;
+    $self = Geo::GDAL::FFI::OGR_G_Intersection($$self, $$geom);
+    confess Geo::GDAL::FFI::error_msg() unless $self;
+    return bless \$self, 'Geo::GDAL::FFI::Geometry';
 }
 
 sub Union {
     my ($self, $geom) = @_;
-    return bless \Geo::GDAL::FFI::OGR_G_Union($$self, $$geom), 'Geo::GDAL::FFI::Geometry';
+    confess "Undefined geometry." unless $geom;
+    $self = Geo::GDAL::FFI::OGR_G_Union($$self, $$geom);
+    confess Geo::GDAL::FFI::error_msg() unless $self;
+    return bless \$self, 'Geo::GDAL::FFI::Geometry';
 }
 
 sub Difference {
     my ($self, $geom) = @_;
-    return bless \Geo::GDAL::FFI::OGR_G_Difference($$self, $$geom), 'Geo::GDAL::FFI::Geometry';
+    confess "Undefined geometry." unless $geom;
+    $self = Geo::GDAL::FFI::OGR_G_Difference($$self, $$geom);
+    confess Geo::GDAL::FFI::error_msg() unless $self;
+    return bless \$self, 'Geo::GDAL::FFI::Geometry';
 }
 
 sub SymDifference {
     my ($self, $geom) = @_;
-    return bless \Geo::GDAL::FFI::OGR_G_SymDifference($$self, $$geom), 'Geo::GDAL::FFI::Geometry';
+    confess "Undefined geometry." unless $geom;
+    $self = Geo::GDAL::FFI::OGR_G_SymDifference($$self, $$geom);
+    confess Geo::GDAL::FFI::error_msg() unless $self;
+    return bless \$self, 'Geo::GDAL::FFI::Geometry';
 }
 
 sub Distance {
     my ($self, $geom) = @_;
+    confess "Undefined geometry." unless $geom;
     return Geo::GDAL::FFI::OGR_G_Distance($$self, $$geom);
 }
 
 sub Distance3D {
     my ($self, $geom) = @_;
+    confess "Undefined geometry." unless $geom;
     return Geo::GDAL::FFI::OGR_G_Distance3D($$self, $$geom);
 }
 
@@ -458,7 +527,29 @@ reference and thus changing that geometry will change the parent.
 
  $geom->RemoveGeometry($i);
 
+=head2 ExportToWKT($variant)
+
+ my $wkt = $geom->ExportToWKT($variant);
+
+Returns the geometry as WKT. $variant is optional (default is 'ISO').
+
 =head2 AsText
+
+Alias to ExportToWKT.
+
+=head2 ExportToGML($options)
+
+ my $gml = $geom->ExportToGML(%options);
+
+Returns the geometry as GML string. %options may contain options as
+described in GDAL documentation.
+
+=head2 ExportToJSON($options)
+
+ my $json = $geom->ExportToJSON(%options);
+
+Returns the geometry as JSON string. %options may contain options as
+described in GDAL documentation.
 
 =head2 Intersects
 

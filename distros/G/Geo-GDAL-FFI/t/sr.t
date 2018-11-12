@@ -9,7 +9,7 @@ use Data::Dumper;
 use JSON;
 use FFI::Platypus::Buffer;
 
-my $gdal = Geo::GDAL::FFI->new();
+my $gdal = Geo::GDAL::FFI->get_instance();
 
 {
     SKIP: {

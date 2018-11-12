@@ -12,41 +12,41 @@ sub _draw ($self) {
     my $info = q[];
 
     # state
-    if ( $self->show_state ) {
+    if ( $self->{show_state} ) {
 
         # precent, only if total is known
-        if ( $self->total ) {
-            $info .= q[ ] . $self->_format_percent->( $self, int( $self->value / $self->total * 100 ) ) . q[%];
+        if ( $self->{total} ) {
+            $info .= q[ ] . $self->_format_percent->( $self, int( $self->{value} / $self->{total} * 100 ) ) . q[%];
         }
 
         # value
-        my ( $value, $value_unit ) = $self->_format_value->( $self, $self->value );
+        my ( $value, $value_unit ) = $self->_format_value->( $self, $self->{value} );
 
         $info .= q[  ] . $value;
 
-        $value_unit ||= $self->unit;
+        $value_unit ||= $self->{unit};
 
         $info .= q[ ] . $value_unit if $value_unit;
 
         # total
-        if ( $self->total ) {
-            my ( $total, $total_unit ) = $self->_format_total->( $self, $self->total );
+        if ( $self->{total} ) {
+            my ( $total, $total_unit ) = $self->_format_total->( $self, $self->{total} );
 
             $info .= q[ / ] . $total;
 
-            $total_unit ||= $self->unit;
+            $total_unit ||= $self->{unit};
 
             $info .= q[ ] . $total_unit if $total_unit;
         }
     }
 
     # speed
-    if ( $self->show_speed ) {
+    if ( $self->{show_speed} ) {
         my ( $speed, $speed_unit ) = $self->_format_speed->( $self, $self->{speed} );
 
         $info .= q[  ] . $speed;
 
-        $speed_unit ||= $self->unit;
+        $speed_unit ||= $self->{unit};
 
         if ($speed_unit) {
             $speed_unit =~ s[(.+?)(\s*)\z][$1/s$2]smg;
@@ -59,29 +59,29 @@ sub _draw ($self) {
     }
 
     # time
-    if ( $self->show_time ) {
+    if ( $self->{show_time} ) {
         $info .= q[  ];
 
         if ( $self->{is_finished} ) {
             $info .= $self->_format_time->( $self, $self->{total_time} );
         }
-        elsif ( $self->total ) {
-            $info .= $self->_format_time->( $self, $self->eta );
+        elsif ( $self->{total} ) {
+            $info .= $self->_format_time->( $self, $self->{eta} );
         }
     }
 
     my $bar = q[];
 
     # bar
-    if ( $self->total ) {
-        my $bar_size = $self->size - length($info) - 2;
+    if ( $self->{total} ) {
+        my $bar_size = $self->{size} - length($info) - 2;
 
-        my $current_pos = int $bar_size * $self->value / $self->total;
+        my $current_pos = int $bar_size * $self->{value} / $self->{total};
 
         # progress bar
         $bar .= '[';
 
-        my $mess = $self->message;
+        my $mess = $self->{message};
 
         # truncate mess
         $mess = substr $mess, 0, $bar_size if length $mess > $bar_size;
@@ -124,7 +124,7 @@ sub _draw ($self) {
 
                 $bar .= $mess;
 
-                $bar .= q[ ] x abs $bar_size - length $self->message;
+                $bar .= q[ ] x abs $bar_size - length $self->{message};
             }
         }
         else {

@@ -47,7 +47,7 @@ It should not be constructed by user code; it is only avalible through
 the main L<Magrathea::API> code as follows:
 
     my $mt = new Magrathea::API($username, $password);
-    my $emerg = $mt->emergency_info($phone_number);
+    my $emerg = $mt->emergency_info($phone_number, $is_ported);
 
 =cut
 
@@ -93,12 +93,14 @@ sub new
     my $class = shift;
     my $api = shift;
     my $number = shift;
+    my $ported : Boolean = shift;
     local $_;
     croak "This package must not be called directly" unless ref $api eq 'Magrathea::API';
     my $self = {
         telnet  => $api->{telnet},
         debug   => $api->{params}{debug},
         number  => $number,
+        ported  => $ported,
     };
     bless $self, $class;
     my %info;
@@ -273,8 +275,9 @@ information on the Magrathea database.
 sub ported
 {
     my $self = shift;
-    my $value : Boolean = shift;
-    $self->{ported} = $value if defined $value;
+    my $val = shift;
+    my $value : Boolean = $val;
+    $self->{ported} = $value if defined $val;
     $value = $self->{ported};
     return $value;
 }

@@ -25,3 +25,4 @@ hjkl
 lf
 ll
 stackoverflow
+noncharacter

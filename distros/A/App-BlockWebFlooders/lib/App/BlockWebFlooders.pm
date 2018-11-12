@@ -1,7 +1,7 @@
 package App::BlockWebFlooders;
 
-our $DATE = '2017-06-09'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-11-12'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Block IP addresses of web flooders using iptables
@@ -18,7 +18,7 @@ App::BlockWebFlooders - Block IP addresses of web flooders using iptables
 
 =head1 VERSION
 
-This document describes version 0.004 of App::BlockWebFlooders (from Perl distribution App-BlockWebFlooders), released on 2017-06-09.
+This document describes version 0.009 of App::BlockWebFlooders (from Perl distribution App-BlockWebFlooders), released on 2018-11-12.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

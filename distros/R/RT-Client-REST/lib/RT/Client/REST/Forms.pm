@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Forms;
-$RT::Client::REST::Forms::VERSION = '0.53';
+$RT::Client::REST::Forms::VERSION = '0.54';
 use Exporter;
 
 use vars qw(@EXPORT @ISA);
@@ -34,9 +34,9 @@ sub expand_list {
 
 
 sub form_parse {
+    my @lines = split /\n/, shift;
     my $state = 0;
     my @forms = ();
-    my @lines = split /\n/, $_[0];
     my ($c, $o, $k, $e) = ('', [], {}, '');
 
     LINE:
@@ -65,26 +65,22 @@ sub form_parse {
                 }
                 $c .= "\n";
             }
-            elsif ($state <= 1 && $line =~ m/^($field):(?:\s+(.*))?$/) {
+            elsif ($state <= 1 && $line =~ m/^($field:\s)(.*)?$/) {
                 # Read a field: value specification.
-                my $f  = $1;
-                my @v  = ($2 || ());
+                my $f     = $1;
+                my $value = $2;
+                my $spaces = ' ' x length($f);
+                $f =~ s/:\s$//;
 
                 # Read continuation lines, if any.
-                while (@lines && ($lines[0] eq '' || $lines[0] =~ /^\s+/)) {
-                    push @v, shift @lines;
+                while (@lines && ($lines[0] eq '' || $lines[0] =~ m/^\s+/)) {
+                    my $l = shift @lines;
+                    $l =~ s/^$spaces//;
+                    $value .= "\n" . $l
                 }
-                pop @v while (@v && $v[-1] eq '');
-
-                # Strip longest common leading indent from text.
-                my $ws = '';
-                for my $ls (map {/^(\s+)/} @v[1..$#v]) {
-                    $ws = $ls if (!$ws || length($ls) < length($ws));
-                }
-                s/^$ws// foreach @v;
 
                 push(@$o, $f) unless exists $k->{$f};
-                vpush($k, $f, join("\n", @v));
+                vpush($k, $f, $value);
 
                 $state = 1;
             }
@@ -93,7 +89,7 @@ sub form_parse {
                 # form parsed thus far, and add an error marker. (>>)
                 $state = -1;
                 $e = form_compose([[ '', $o, $k, '' ]]);
-                $e.= $line =~ /^>>/ ? "$line\n" : ">> $line\n";
+                $e.= $line =~ m/^>>/ ? "$line\n" : ">> $line\n";
             }
         }
         else {
@@ -231,7 +227,7 @@ RT::Client::REST::Forms - This package provides functions from RT::Interface::RE
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head2 METHODS
 

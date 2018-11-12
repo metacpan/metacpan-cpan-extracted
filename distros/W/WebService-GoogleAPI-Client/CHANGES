@@ -1,10 +1,18 @@
 ==================================================
-Changes from 2018-10-23 00:00:00 +0000 to present.
+Changes from 2018-10-25 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.19 at 2018-11-06 23:16:29 +0000
+version 0.20 at 2018-11-08 03:19:08 +0000
 -----------------------------------------
+
+  Change: b305d7813c5c48f44a125dcb115d8d3f52e879fe
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-07 09:19:41 +0000
+
+    CPAN RELEASE 0.19
+
+    Fix for #9 and version bump to deploy to CPAN 
 
   Change: efe8a90c5b68f6989ea0717bce21cfd5b7ea10fd
   Author: Peter Scott <peter@shotgundriver.com>
@@ -286,5 +294,5 @@ version 0.14 at 2018-10-27 08:19:26 +0000
     transaction request. 
 
 ================================================
-Plus 2 releases after 2018-10-23 00:00:00 +0000.
+Plus 2 releases after 2018-10-25 00:00:00 +0000.
 ================================================

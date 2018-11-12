@@ -20,4 +20,4 @@ no_index:
 requires:
   Test::More: 0
   version: 0
-version: v1.4.4
+version: v1.4.5

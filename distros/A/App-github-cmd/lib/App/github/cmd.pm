@@ -1,7 +1,7 @@
 package App::github::cmd;
 
-our $DATE = '2018-10-10'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-11-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,12 +18,15 @@ $SPEC{':package'} = {
 our %args_common = (
     login => {
         schema => 'str*',
+        tags => ['common'],
     },
     pass => {
         schema => 'str*',
+        tags => ['common'],
     },
     access_token => {
         schema => 'str*',
+        tags => ['common'],
     },
 );
 our %argsrels_common = (
@@ -212,7 +215,7 @@ App::github::cmd - Yet another github CLI
 
 =head1 VERSION
 
-This document describes version 0.004 of App::github::cmd (from Perl distribution App-github-cmd), released on 2018-10-10.
+This document describes version 0.005 of App::github::cmd (from Perl distribution App-github-cmd), released on 2018-11-08.
 
 =head1 SYNOPSIS
 
@@ -225,7 +228,7 @@ Please see included script L<github-cmd>.
 
 Usage:
 
- create_repo(%args) -> [status, msg, result, meta]
+ create_repo(%args) -> [status, msg, payload, meta]
 
 Create a repository.
 
@@ -254,7 +257,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -265,7 +268,7 @@ Return value:  (any)
 
 Usage:
 
- delete_repo() -> [status, msg, result, meta]
+ delete_repo() -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -276,7 +279,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -287,7 +290,7 @@ Return value:  (any)
 
 Usage:
 
- get_repo(%args) -> [status, msg, result, meta]
+ get_repo(%args) -> [status, msg, payload, meta]
 
 Get information about a repository.
 
@@ -314,7 +317,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -325,7 +328,7 @@ Return value:  (any)
 
 Usage:
 
- get_user(%args) -> [status, msg, result, meta]
+ get_user(%args) -> [status, msg, payload, meta]
 
 Get information about a user.
 
@@ -350,7 +353,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -361,7 +364,7 @@ Return value:  (any)
 
 Usage:
 
- list_repos(%args) -> [status, msg, result, meta]
+ list_repos(%args) -> [status, msg, payload, meta]
 
 List user's repositories.
 
@@ -388,7 +391,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -399,7 +402,7 @@ Return value:  (any)
 
 Usage:
 
- repo_exists(%args) -> [status, msg, result, meta]
+ repo_exists(%args) -> [status, msg, payload, meta]
 
 Check whether a repository exists.
 
@@ -426,7 +429,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

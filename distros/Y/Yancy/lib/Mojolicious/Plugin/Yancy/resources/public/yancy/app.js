@@ -238,10 +238,12 @@ var app = new Vue({
                 this.$set( this, 'error', {} );
                 this.$set( this, 'formError', {} );
                 this.openedRow = null;
+                this.openedOldValue = null;
             }
             else {
                 this.addingItem = false;
                 this.openedRow = i;
+                this.openedOldValue = JSON.parse( JSON.stringify( this.items[i] ) );
             }
         },
 
@@ -339,7 +341,7 @@ var app = new Vue({
                 collectionName = pathParts[1];
 
                 // Skip hidden collections
-                if ( spec.definitions[ collectionName + 'Item' ]['x-hidden'] ) {
+                if ( spec.definitions[ collectionName ]['x-hidden'] ) {
                     continue;
                 }
 
@@ -359,13 +361,13 @@ var app = new Vue({
                     if ( pathObj.get ) {
                         collection.operations["list"] = {
                             url: [ spec.basePath, pathKey ].join(''),
-                            schema: spec.definitions[ collectionName + 'Item' ]
+                            schema: spec.definitions[ collectionName ]
                         };
                     }
                     if ( pathObj.post ) {
                         collection.operations["add"] = {
                             url: [ spec.basePath, pathKey ].join(''),
-                            schema: spec.definitions[ collectionName + 'Item' ]
+                            schema: spec.definitions[ collectionName ]
                         };
                     }
                 }
@@ -374,19 +376,19 @@ var app = new Vue({
                     if ( pathObj.get ) {
                         collection.operations["get"] = {
                             url: [ spec.basePath, pathKey ].join(''),
-                            schema: spec.definitions[ collectionName + 'Item' ]
+                            schema: spec.definitions[ collectionName ]
                         };
                     }
                     if ( pathObj.put ) {
                         collection.operations["set"] = {
                             url: [ spec.basePath, pathKey ].join(''),
-                            schema: spec.definitions[ collectionName + 'Item' ]
+                            schema: spec.definitions[ collectionName ]
                         };
                     }
                     if ( pathObj.delete ) {
                         collection.operations["delete"] = {
                             url: [ spec.basePath, pathKey ].join(''),
-                            schema: spec.definitions[ collectionName + 'Item' ]
+                            schema: spec.definitions[ collectionName ]
                         };
                     }
                 }
@@ -474,7 +476,7 @@ var app = new Vue({
             var self = this,
                 coll = this.collections[ this.currentCollection ],
                 value = this.prepareSaveItem( this.items[i], coll.operations['set'].schema ),
-                url = this.fillUrl( coll.operations['set'].url, this.items[i] );
+                url = this.fillUrl( coll.operations['set'].url, this.openedOldValue );
             delete this.error.saveItem;
             this.$set( this, 'formError', {} );
             $.ajax(

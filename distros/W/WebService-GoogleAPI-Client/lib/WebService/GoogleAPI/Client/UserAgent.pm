@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::UserAgent;
-$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.19';
+$WebService::GoogleAPI::Client::UserAgent::VERSION = '0.20';
 
 # ABSTRACT: User Agent wrapper for working with Google APIs
 
@@ -13,7 +13,7 @@ extends 'Mojo::UserAgent';
 use WebService::GoogleAPI::Client::Credentials;
 use WebService::GoogleAPI::Client::AuthStorage;
 use Mojo::UserAgent;
-use Data::Dump;    # for dev debug
+use Data::Dump qw/pp/;    # for dev debug
 
 use Carp;
 
@@ -210,7 +210,7 @@ WebService::GoogleAPI::Client::UserAgent - User Agent wrapper for working with G
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head2 C<header_with_bearer_auth_token>
 

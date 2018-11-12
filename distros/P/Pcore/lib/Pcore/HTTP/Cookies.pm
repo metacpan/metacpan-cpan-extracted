@@ -9,7 +9,7 @@ has cookies => sub { {} };
 sub parse_cookies ( $self, $url, $set_cookie_header ) {
     $url = P->uri($url) if !is_ref $url;
 
-    my $origin_domain = $url->{host}->name;
+    my $origin_domain = $url->{host}->{name};
     my $origin_path   = $url->{path}->to_string;
 
   COOKIE: for my $str ( is_plain_arrayref $set_cookie_header ? $set_cookie_header->@* : $set_cookie_header ) {
@@ -113,10 +113,10 @@ sub get_cookies ( $self, $url ) {
 
     my @cookies;
 
-    my @origin_domains = ( $url->{host}->name );
+    my @origin_domains = ( $url->{host}->{name} );
 
     if ( !$url->{host}->is_ip ) {
-        my $cover_domain = '.' . $url->{host}->name;
+        my $cover_domain = '.' . $url->{host}->{name};
 
         push @origin_domains, $cover_domain;
 

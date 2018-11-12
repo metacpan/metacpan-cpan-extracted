@@ -92,7 +92,7 @@ MUST provide the following methods:
 
 =head2 freeze
 
-this method should provide a serialized version of the object suitable for
+This method should provide a serialized version of the object suitable for
 placing in the session.  To be safe you should provide a string.  We recommend that
 you provide the smallest possible token useful for restoring a model at a later time,
 such the primary key of a database row, rather than all the data since session space
@@ -101,7 +101,7 @@ may be limited, depending on the session type you use.
 =head2 thaw
 
 This receives the serialized version of the object that you created with 'freeze'
-and you shold use it to restore your object
+and you shold use it to restore your object.
 
 =head2 cleanup
 

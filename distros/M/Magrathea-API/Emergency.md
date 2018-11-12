@@ -27,7 +27,7 @@ It should not be constructed by user code; it is only avalible through
 the main [Magrathea::API](https://metacpan.org/pod/Magrathea::API) code as follows:
 
     my $mt = new Magrathea::API($username, $password);
-    my $emerg = $mt->emergency_info($phone_number);
+    my $emerg = $mt->emergency_info($phone_number, $is_ported);
 
 ## METHODS
 

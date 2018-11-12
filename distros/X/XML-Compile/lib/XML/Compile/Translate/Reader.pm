@@ -8,7 +8,7 @@
 
 package XML::Compile::Translate::Reader;
 use vars '$VERSION';
-$VERSION = '1.60';
+$VERSION = '1.61';
 
 use base 'XML::Compile::Translate';
 
@@ -651,7 +651,7 @@ sub makeTaggedElement
 {   my ($self, $path, $tag, $st, $attrs, $attrs_any,undef,$is_nillable) = @_;
     my @attrs = (odd_elements(@$attrs), @$attrs_any);
 
-    sub { my $tree   = shift or return ();
+    sub { my $tree   = shift // return ();
           my $simple = $is_nillable && ref $tree && $tree->nodeNil ? 'NIL' : $st->($tree);
           ref $tree or return ($tag => {_ => $simple});
           my $node   = $tree->node;
@@ -716,7 +716,7 @@ sub makeSimpleElement
 {   my ( $self, $path, $tag, $st, undef, undef, $comptype, $is_nillable) = @_;
 
       $is_nillable
-    ? sub { my $tree  = shift or return $st->(undef);
+    ? sub { my $tree  = shift // return $st->(undef);
             my $value = (ref $tree && $tree->nodeNil) ? 'NIL' : $st->($tree);
             defined $value ? ($tag => $value) : ();
           }
@@ -788,8 +788,7 @@ sub makeBuiltin
 
 sub makeList
 {   my ($self, $path, $st) = @_;
-    sub { my $tree = shift;
-          defined $tree or return undef;
+    sub { my $tree = shift // return undef;
           my $node
              = UNIVERSAL::isa($tree, 'XML::LibXML::Node') ? $tree
              : ref $tree ? $tree->node : undef;
@@ -806,7 +805,7 @@ sub makeFacetsList
 
     # enumeration and pattern are probably rare
     @e or return sub {
-        my $values = $st->(@_) or return;
+        my $values = $st->(@_) // return;
         $_->($values) for @l;
         $values;
     };
@@ -814,7 +813,7 @@ sub makeFacetsList
     sub { defined $_[0] or return undef;
         my $list = ref $_[0] ? $_[0]->textContent : $_[0];
         $_->($list) for @e;
-        my $values = $st->($_[0]) or return;
+        my $values = $st->($_[0]) // return;
         $_->($values) for @l;
         $values;
     };
@@ -839,8 +838,7 @@ sub makeFacets
 		{   return if !defined $v;
             $v = $_->($v) for @$early;
         }
-        $v = $st->($v);
-		defined $v or return undef;
+        $v = $st->($v) // return undef;
         $v = $_->($v) for @$late;
         $v;
     };
@@ -848,9 +846,9 @@ sub makeFacets
 
 sub makeUnion
 {   my ($self, $path, @types) = @_;
-    sub { my $tree = shift or return undef;
+    sub { my $tree = shift // return undef;
           for(@types) { my $v = try { $_->($tree) }; $@ or return $v }
-          my $text = $tree->textContent;
+          my $text = ref $tree ? $tree->textContent : $tree;
 
           substr $text, 20, -5, '...' if length($text) > 50;
           error __x"no match for `{text}' in union at {path}"

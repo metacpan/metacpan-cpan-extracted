@@ -12,6 +12,7 @@ my @tests = (
   [ { data_type => 'varchar', size => 6 }, qr/^$/ ],
   [ { data_type => 'varchar', size => 7 }, qr/^\d{7}$/ ],
   [ { data_type => 'varchar', size => 8 }, qr/^\d{3}-\d{4}$/ ],
+  [ { data_type => 'varchar'}, qr/^\d{3}-\d{4}$/ ],
   [ { data_type => 'varchar', size => 9 }, qr/^\d{3}-\d{4}$/ ],
   [ { data_type => 'varchar', size => 10 }, qr/^\d{10}$/ ],
   [ { data_type => 'varchar', size => 11 }, qr/^\d{10}$/ ],

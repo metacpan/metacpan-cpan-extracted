@@ -1,3 +1,18 @@
+v0.22.3 2018-11-12T04:17:10Z
+ - typo
+
+v0.22.2 2018-11-12T04:01:03Z
+ - dockerfile fixed
+
+v0.22.1 2018-11-11T02:15:39Z
+ - uri methods refactored
+ - Type::Tiny removed
+ - docker.json --> docker.yaml
+ - fixes
+ - updated
+ - Docker base image changed from "softvisio/pcore:v0.74.0" to
+   "softvisio/pcore:v0.77.2"
+
 v0.22.0 2018-09-19T08:28:10Z
  - version update
 

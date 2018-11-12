@@ -3,8 +3,8 @@ package Pcore::Dist::Build::Docker;
 use Pcore -class, -ansi;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 
-has dist => ( is => 'ro', isa => InstanceOf ['Pcore::Dist'] );
-has dockerhub_api => ( is => 'lazy', isa => InstanceOf ['Pcore::API::DockerHub'], init_arg => undef );
+has dist => ();                                              # InstanceOf ['Pcore::Dist']
+has dockerhub_api => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::DockerHub']
 
 sub _build_dockerhub_api($self) {
     return Pcore::API::DockerHub->new;
@@ -17,7 +17,7 @@ sub init ( $self, $args ) {
         exit 3;
     }
 
-    my $scm_upstream = $self->dist->scm ? $self->dist->scm->upstream : undef;
+    my $scm_upstream = $self->{dist}->scm ? $self->{dist}->scm->upstream : undef;
 
     if ( !$scm_upstream ) {
         say q[Dist has no upstream repository];
@@ -33,7 +33,7 @@ sub init ( $self, $args ) {
         exit 3;
     }
 
-    my $repo_name = $args->{name} || lc $self->dist->name;
+    my $repo_name = $args->{name} || lc $self->{dist}->name;
 
     my $repo_id = "$repo_namespace/$repo_name";
 
@@ -51,7 +51,7 @@ sub init ( $self, $args ) {
         $repo_id,
         $scm_upstream->{hosting},
         $scm_upstream->{repo_id},
-        $self->dist->module->abstract || $self->dist->name,
+        $self->{dist}->module->abstract || $self->{dist}->name,
         private => 0,
         active  => 1
     );
@@ -70,26 +70,26 @@ sub init ( $self, $args ) {
         $files->add_dir( $ENV->{share}->get_storage( 'Pcore', 'dist-tmpl' ) . '/docker/' );
 
         # do not overwrite Dockerfile
-        $files->remove_file('Dockerfile') if -f $self->dist->root . 'Dockerfile';
+        $files->remove_file('Dockerfile') if -f "$self->{dist}->{root}/Dockerfile";
 
-        $files->move_tree( '__dist_name__', lc $self->dist->name );
+        $files->move_tree( '__dist_name__', lc $self->{dist}->name );
 
         $files->render_tmpl( {
-            author                        => $self->dist->cfg->{author},
-            dist_path                     => lc $self->dist->name,
+            author                        => $self->{dist}->cfg->{author},
+            dist_path                     => lc $self->{dist}->name,
             dockerhub_dist_repo_namespace => $repo_namespace,
             dockerhub_dist_repo_name      => $repo_name,
             dockerhub_pcore_repo_id       => $ENV->{pcore}->docker->{repo_id},
         } );
 
-        $files->write_to( $self->dist->root );
+        $files->write_to( $self->{dist}->{root} );
     }
 
     return;
 }
 
 sub set_from_tag ( $self, $tag ) {
-    my $dockerfile = P->file->read_bin( $self->dist->root . 'Dockerfile' );
+    my $dockerfile = P->file->read_bin("$self->{dist}->{root}/Dockerfile");
 
     if ( !defined $tag ) {
         $dockerfile->$* =~ /^FROM\s+([^:]+)(.*?)$/sm;
@@ -101,18 +101,18 @@ sub set_from_tag ( $self, $tag ) {
             say q[Docker base image wasn't changed];
         }
         else {
-            P->file->write_bin( $self->dist->root . 'Dockerfile', $dockerfile );
+            P->file->write_bin( "$self->{dist}->{root}/Dockerfile", $dockerfile );
 
             {
                 # cd to repo root
-                my $chdir_guard = P->file->chdir( $self->dist->root );
+                my $chdir_guard = P->file->chdir( $self->{dist}->{root} );
 
-                my $res = $self->dist->scm->scm_commit( qq[Docker base image changed from "$1$2" to "$1:$tag"], ['Dockerfile'] );
+                my $res = $self->{dist}->scm->scm_commit( qq[Docker base image changed from "$1$2" to "$1:$tag"], ['Dockerfile'] );
 
                 die "$res" if !$res;
             }
 
-            delete $self->dist->{docker};
+            delete $self->{dist}->{docker};
 
             say qq[Docker base image changed from "$1$2" to "$1:$tag"];
         }
@@ -131,7 +131,7 @@ sub status ( $self ) {
 
     $cv->begin;
     $self->dockerhub_api->get_tags(
-        $self->dist->docker->{repo_id},
+        $self->{dist}->docker->{repo_id},
         sub ($res) {
             $tags = $res;
 
@@ -143,7 +143,7 @@ sub status ( $self ) {
 
     $cv->begin;
     $self->dockerhub_api->get_build_history(
-        $self->dist->docker->{repo_id},
+        $self->{dist}->docker->{repo_id},
         sub ($res) {
             $build_history = $res;
 
@@ -155,7 +155,7 @@ sub status ( $self ) {
 
     $cv->begin;
     $self->dockerhub_api->get_autobuild_settings(
-        $self->dist->docker->{repo_id},
+        $self->{dist}->docker->{repo_id},
         sub ($res) {
             $build_settings = $res;
 
@@ -479,7 +479,7 @@ sub build_status ( $self ) {
 sub create_tag ( $self, $tag_name, $source_name, $source_type, $dockerfile_location ) {
     print qq[Creating autobuild tag "$tag_name" ... ];
 
-    my $autobuild_tags = $self->dockerhub_api->get_autobuild_tags( $self->dist->docker->{repo_id} );
+    my $autobuild_tags = $self->dockerhub_api->get_autobuild_tags( $self->{dist}->docker->{repo_id} );
 
     if ( !$autobuild_tags ) {
         say $autobuild_tags->{reason};
@@ -494,7 +494,7 @@ sub create_tag ( $self, $tag_name, $source_name, $source_type, $dockerfile_locat
         }
     }
 
-    my $res = $self->dockerhub_api->create_autobuild_tag( $self->dist->docker->{repo_id}, $tag_name, $source_name, $source_type, $dockerfile_location );
+    my $res = $self->dockerhub_api->create_autobuild_tag( $self->{dist}->docker->{repo_id}, $tag_name, $source_name, $source_type, $dockerfile_location );
 
     say $res;
 
@@ -508,7 +508,7 @@ sub remove_tag ( $self, $keep, $tags ) {
         for my $tag ( is_plain_arrayref $tags ? $tags->@* : $tags ) {
             print qq[Removing tag "$tag" ... ];
 
-            my $res = $self->dockerhub_api->unlink_tag( $self->dist->docker->{repo_id}, $tag );
+            my $res = $self->dockerhub_api->unlink_tag( $self->{dist}->docker->{repo_id}, $tag );
 
             $results->{$tag} = $res;
 
@@ -522,7 +522,7 @@ sub remove_tag ( $self, $keep, $tags ) {
         print q[Get docker tags ... ];
 
         $tags = $self->dockerhub_api->get_tags(
-            $self->dist->docker->{repo_id},
+            $self->{dist}->docker->{repo_id},
             sub ($res) {
                 say $res;
 
@@ -553,7 +553,7 @@ sub remove_tag ( $self, $keep, $tags ) {
 sub trigger_build ( $self, $tag ) {
     print qq[Triggering build for tag "$tag" ... ];
 
-    my $res = $self->dockerhub_api->trigger_autobuild_by_tag_name( $self->dist->docker->{repo_id}, $tag );
+    my $res = $self->dockerhub_api->trigger_autobuild_by_tag_name( $self->{dist}->docker->{repo_id}, $tag );
 
     say $res;
 

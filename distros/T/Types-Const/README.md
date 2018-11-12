@@ -4,11 +4,12 @@ Types::Const - Types that coerce references to read-only
 
 # VERSION
 
-version v0.1.0
+version v0.3.3
 
 # SYNOPSIS
 
 ```perl
+use Moo;
 use Types::Const -types;
 use Types::Standard -types;
 
@@ -16,29 +17,32 @@ use Types::Standard -types;
 
 has bar => (
   is      => 'ro',
-  isa     => ConstArrayRef,
+  isa     => Const[ArrayRef[Str]],
   coerce  => 1,
 );
 ```
 
 # DESCRIPTION
 
-The type library provides types that allow read-only attributes to be
-read-only.
+This is an _experimental_ type library that provides types that force
+read-only hash and array reference attributes to be deeply read-only.
+
+See the [known issues](#known_issues) below for a discussion of
+side-effects.
 
 # TYPES
 
-## `ConstArrayRef`
+## `` Const[`a] ``
 
-A read-only array reference.
+Any defined reference value that is read-only.
 
-## `ConstHashRef`
+If parameterized, then the referred value must also pass the type
+constraint, for example `Const[HashRef[Int]]` must a a hash reference
+with integer values.
 
-A read-only hash reference.
+It supports coercions to read-only.
 
-# KNOWN ISSUES
-
-Parameterized types, e.g. `ConstArrayRef[Int]` are not yet supported.
+This was added in v0.3.0.
 
 # SEE ALSO
 
@@ -46,12 +50,39 @@ Parameterized types, e.g. `ConstArrayRef[Int]` are not yet supported.
 
 [Type::Tiny](https://metacpan.org/pod/Type::Tiny)
 
-# SOURCE
+[Types::Standard](https://metacpan.org/pod/Types::Standard)
 
-The development version is on github at [https://github.com/robrwo/Types-Const](https://github.com/robrwo/Types-Const)
-and may be cloned from [git://github.com/robrwo/Types-Const.git](git://github.com/robrwo/Types-Const.git)
+# KNOWN ISSUES
 
-# BUGS
+## Side-effects of read-only data structures
+
+A side-effect of read-only data structures is that an exception will
+be thrown if you attempt to fetch the value of a non-existent key:
+
+```
+Attempt to access disallowed key 'foo' in a restricted hash
+```
+
+The work around for this is to check that a key exists beforehand.
+
+## Performance issues
+
+Validating that a complex data-structure is read-only can affect
+performance.  If this is an issue, one workaround is to use
+[Devel::StrictMode](https://metacpan.org/pod/Devel::StrictMode) and only validate data structures during tests:
+
+```perl
+has bar => (
+  is      => 'ro',
+  isa     => STRICT ? Const[ArrayRef[Str]] : ArrayRef,
+  coerce  => 1,
+);
+```
+
+Another means of improving performance is to only check the type
+once. (Since it is read-only, there is no need to re-check it.)
+
+## Bug reports and feature requests
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/Types-Const/issues](https://github.com/robrwo/Types-Const/issues)
@@ -59,6 +90,11 @@ Please report any bugs or feature requests on the bugtracker website
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/Types-Const](https://github.com/robrwo/Types-Const)
+and may be cloned from [git://github.com/robrwo/Types-Const.git](git://github.com/robrwo/Types-Const.git)
 
 # AUTHOR
 

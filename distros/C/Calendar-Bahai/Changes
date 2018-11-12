@@ -1,5 +1,8 @@
 Revision history for Calendar::Bahai
 
+0.47  Sun Nov 11 10:35:00 2018
+      - Used namespace::autoclean instead.
+
 0.46  Thu Jan 26 11:55:00 2017
       - Upgraded to use Date::Bahai::Simple v0.20.
 
