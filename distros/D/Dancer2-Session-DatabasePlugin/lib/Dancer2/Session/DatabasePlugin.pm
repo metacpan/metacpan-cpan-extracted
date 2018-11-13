@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Ref::Util qw(is_plain_hashref);
 use Storable qw(nfreeze thaw);
 with 'Dancer2::Core::Role::SessionFactory';
-our $VERSION="1.0010";
+our $VERSION="1.0011";
 
 our $HANDLE_SQL_STRING=\&stub_function;
 our $HANDLE_EXECUTE=\&handle_execute;
@@ -24,6 +24,19 @@ our $CACHE={};
 
 our $FREEZE=\&nfreeze;
 our $THAW=\&thaw;
+
+has no_create=>(
+  ias=>HashRef,
+  is=>'ro',
+  default=>sub { return {}},
+);
+
+has cache =>(
+  isa=>Bool,
+  is=>'ro',
+  default=>1,
+);
+
 has cache_sth=>(
   isa=>Bool,
   is=>'ro',
@@ -87,6 +100,7 @@ The session should be set to "DatabasePlugin" in order to use this session engin
   engines:
     session:
       DatabasePlugin:
+        cache: 1 # default 1, when 0 statement handles are not cached
         connection: "foo"
         session_table: "SESSIONS"
         id_column:     "SESSION_ID"
@@ -252,7 +266,10 @@ sub create_change_query {
 sub get_sth($) {
   my ($self,$method)=@_;
 
-  return $self->sth_cache->{$method} if exists $self->sth_cache->{$method};
+  if($self->no_create->{$method}) {
+    return undef;
+  }
+  return $self->sth_cache->{$method} if $self->cache && exists $self->sth_cache->{$method};
 
   my $query=$self->$method;
   my $sth;
@@ -261,6 +278,7 @@ sub get_sth($) {
 
   # only cache the statement handle if we are told too
   return $sth unless $self->cache_sth;
+  return $sth unless $self->cache;
   return $self->sth_cache->{$method}=$sth;
 }
 
@@ -281,7 +299,6 @@ sub find_session {
 
   my $sth=$self->get_sth('create_retrieve_query');$HANDLE_EXECUTE->('create_retrieve_query',$sth,$id);
   my ($s)=$sth->fetchrow_array;
-  $sth->finish;
   return $s;
 }
 
@@ -346,9 +363,36 @@ If you access sessions preforking, you will need to reset the statement handle s
 
 Example:
 
+
+=head3 Clearing the Statement Handle Cache
+
+The following code snippit will reset the built in statement handle cache to empty.
+
   %{$Dancer2::Session::DatabasePlugin::CACHE}=();
 
+=head3 Clearing the Database Connection
+
+To release the current database session, use the following code snippet.
+
+$Dancer2::Plugin::SessionDatabase::DBH=undef;
+
 =head1 Specal Examples
+
+=head2 Changing the freeze and thaw functions
+
+Your database may not support globs or glob syntax, when this is the case it is possible to set a new subrouteens in place that handle the freezing and thawing of data.
+
+=head3 Freeze
+
+The nfreeze code reference is stored here
+
+  $Dancer2::Session::DatabasePlugin::FREEZE
+
+=head3 Thaw
+
+The thaw code reference is stored here
+
+  $Dancer2::Session::DatabasePlugin::THAW
 
 =head2 Oracle in general
 
@@ -407,21 +451,84 @@ Sometimes you may want to replace the query created with something entierly new.
     }
   };
 
-=head2 Changing the freeze and thaw functions
+=head2 DBD::Sybase MSSQL FreeTDS Example
 
-Your database may not support globs or glob syntax, when this is the it is possible to set a new subrouteens in place that handle the freezing and thawing of data.
+This example represents how to deal with some of the strange limitations when connecting via MSSQL via DBD::Sybase with FreeTDS.
 
-=head3 Freeze
+The limitations are as follows: DBD::Sybase does not support multiple open statement handls when AuttoCommit is true.  DBD::Sybase doesn't handle placeholders properly, and has some issues with binary data as well.
 
-The nfreeze code reference is stored here
+=head3 Session Configuration
 
-  $Dancer2::Session::DatabasePlugin::FREEZE
+In our session configuration we need to do the following: Disable statement handle caching and turn off the standard query generation code for the following functions: [create_update_query,create_flush_query].
 
-=head3 Thaw
+  engines:
+    session:
+     DatabasePlugin:
+       connection: "myconnection"
+       session_table: "SESSIONS"
+       id_column:     "SESSION_ID"
+       data_column:   "SESSION_DATA"
+       # Disable Caching of Statement handles
+       cache: 0
+       # skip internal Statment handler creation code for the following
+       no_create:
+         create_update_query: 1
+         create_flush_query: 1
 
-The thaw code reference is stored here
+=head3 Database Configuration
 
-  $Dancer2::Session::DatabasePlugin::THAW
+Our example database has AutoCommit Disabled.
+
+  plugins:
+    Database:
+      connections:
+        socmon:
+          driver:   Sybase
+          server:   SOCMON_DEV
+          username: username
+          password: xxx
+          database: myconnection 
+          dbi_params:
+             RaiseError: 1
+             AutoCommit: 1
+             FetchHashKeyName: 'NAME_lc'
+
+=head3 MSSQL Table Creation
+
+MSSQL has some odd quirks when it comes to binary data, so in this case we will use varchar(max).
+
+  create table SESSIONS (
+    session_id varchar(32) ,
+    session_data varchar(max),
+    l astUpdate TimeStamp,
+    CONSTRAINT AK_session_id UNIQUE(session_id) 
+  )
+
+=head3 Code Example
+
+Finnaly in your Dancer2 App we add the following code.
+
+  use JSON qw(to_json from_jsom);
+
+  $Dancer2::Session::DatabasePlugin::FREEZE=\&to_json;
+  $Dancer2::Session::DatabasePlugin::THAW=\&from_json;
+
+  $Dancer2::Session::DatabasePlugin::HANDLE_EXECUTE=sub {
+    my ($name,$sth,@bind)=@_;
+    if($name eq 'create_update_query') {
+      my ($string,$id)=@bind;
+      $string=~ s/'/''/g;
+      $id=~ s/'/''/g;
+      $Dancer2::Plugin::SessionDatabase::DBH->do("update sessions set session_data='$string' where session_id='$id'");
+    } elsif($name eq 'create_flush_query') {
+      my ($id,$string)=@bind;
+      $string=~ s/'/''/g;
+      $id=~ s/'/''/g;
+      $Dancer2::Plugin::SessionDatabase::DBH->do("insert into sessions (session_data,session_id) values ('$string','$id')");
+    } else {
+      $sth->execute(@bind);
+    }
+  };
 
 =head1 See Also
 

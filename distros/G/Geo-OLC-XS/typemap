@@ -1,0 +1,28 @@
+OLC* O_SESSION
+
+######################################################################
+OUTPUT
+
+# The Perl object is blessed into 'CLASS', which should be a
+# char* having the name of the package for the blessing.
+O_SESSION
+    sv_setref_pvn($arg, CLASS, CLASS, strlen(CLASS));
+    sv_magicext(SvRV($arg), SvRV($arg), PERL_MAGIC_ext, &session_magic_vtbl, (char*) $var, 0);
+
+######################################################################
+INPUT
+
+# Address of static variable session_magic_vtbl serves as a key when looking up
+# magic entry, ensuring that MAGIC returned is the one we have set up earlier,
+# and value of mg_ptr can be trusted.
+O_SESSION
+    {
+        MAGIC *mg;
+        if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVMG &&
+            (mg = mg_findext(SvRV($arg), PERL_MAGIC_ext, &session_magic_vtbl)) != 0)
+        {
+            $var = (OLC*) mg->mg_ptr;
+        } else {
+            croak(\"${Package}::$func_name() -- $var is not a valid Geo::OLC::XS object\");
+        }
+    }
