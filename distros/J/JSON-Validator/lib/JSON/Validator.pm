@@ -18,15 +18,15 @@ use Time::Local ();
 
 use constant CASE_TOLERANT     => File::Spec->case_tolerant;
 use constant COLORS            => eval { require Term::ANSIColor };
-use constant DEBUG             => $ENV{JSON_VALIDATOR_DEBUG};
-use constant REPORT            => $ENV{JSON_VALIDATOR_REPORT} // $ENV{JSON_VALIDATOR_DEBUG};
+use constant DEBUG             => $ENV{JSON_VALIDATOR_DEBUG} || 0;
+use constant REPORT            => $ENV{JSON_VALIDATOR_REPORT} // DEBUG >= 2;
 use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '2.15';
+our $VERSION = '2.18';
 our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -231,12 +231,15 @@ sub _load_schema {
     return $self->_load_schema_from_url(Mojo::URL->new($url)->fragment(undef)), "$url";
   }
 
-  if ($url =~ m!^data://([^/]+)/(.*)!) {
-    my ($module, $file) = ($1, $2);
-    warn "[JSON::Validator] Loading schema from data section: $url\n" if DEBUG;
-    my $text = Mojo::Loader::data_section($module, $file)
-      || confess "$file could not be found in __DATA__ section of $module.";
-    return $self->_load_schema_from_text(\$text), "$url";
+  if ($url =~ m!^data://([^/]*)/(.*)!) {
+    my ($file, @modules) = ($2, ($1));
+    @modules = _stack() unless $modules[0];
+    for my $module (@modules) {
+      warn "[JSON::Validator] Looking for $file in $module\n" if DEBUG;
+      my $text = Mojo::Loader::data_section($module, $file);
+      return $self->_load_schema_from_text(\$text), "$url" if $text;
+    }
+    confess "$file could not be found in __DATA__ section of @modules.";
   }
 
   if ($url =~ m!^\s*[\[\{]!) {
@@ -289,8 +292,8 @@ sub _load_schema_from_url {
 
   for (@{$self->cache_paths}) {
     my $path = path $_, $cache_file;
+    warn "[JSON::Validator] Looking for cached spec $path ($url)\n" if DEBUG;
     next unless -r $path;
-    warn "[JSON::Validator] Loading cached file $path\n" if DEBUG;
     return $self->_load_schema_from_text(\$path->slurp);
   }
 
@@ -460,6 +463,17 @@ sub _resolve_ref {
   }
 
   tie %$topic, 'JSON::Validator::Ref', $other, $topic->{'$ref'}, $fqn;
+}
+
+sub _stack {
+  my @classes;
+  my $i = 2;
+  while (my $pkg = caller($i++)) {
+    no strict 'refs';
+    push @classes, grep { !/(^JSON::Validator$|^Mojo::Base$|^Mojolicious$|\w+::_Dynamic)/ } $pkg,
+      @{"$pkg\::ISA"};
+  }
+  return @classes;
 }
 
 sub _validate {
@@ -948,7 +962,11 @@ sub _is_date_time {
   @time = map { s/^0//; $_ } reverse @time[0 .. 5];
   $time[4] -= 1;    # month are zero based
   local $@;
-  return eval { Time::Local::timegm(@time); 1 } || 0;
+  return 1 if eval { Time::Local::timegm(@time); 1 };
+  $JSON::Validator::ERR = (split / at /, $@)[0];
+  $JSON::Validator::ERR =~ s!('-?\d+'\s|\s[\d\.]+)!!g;
+  $JSON::Validator::ERR .= '.';
+  return 0;
 }
 
 sub _is_domain { warn "Data::Validate::Domain is not installed"; return; }
@@ -1050,7 +1068,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-2.15
+2.18
 
 =head1 SYNOPSIS
 
@@ -1437,8 +1455,11 @@ A web resource will be fetched using the L<Mojo::UserAgent>, stored in L</ua>.
 
 =item * data://Some::Module/file.name
 
-This version will use L<Mojo::Loader/data_section> to load "file.name" from
-the module "Some::Module".
+This version will use L<Mojo::Loader/data_section> to load "file.name" from the
+module "Some::Module".
+
+It is also EXPERIMENTAL support for omitting C<Some::Module>. This will result
+in searching up the C<caller()>-tree for the file.
 
 =item * /path/to/file
 

@@ -512,7 +512,6 @@ encode_rv (enc_t *enc, SV *sv)
           dSP;
 
           ENTER; SAVETMPS;
-          SAVESTACK_POS ();
           PUSHMARK (SP);
           EXTEND (SP, 2);
           // we re-bless the reference to get overload and other niceties right
@@ -531,8 +530,14 @@ encode_rv (enc_t *enc, SV *sv)
           encode_uint (enc, MAJOR_ARRAY, count + 1);
           encode_strref (enc, 0, HvNAMEUTF8 (stash), HvNAME (stash), HvNAMELEN (stash));
 
-          while (count)
-            encode_sv (enc, SP[1 - count--]);
+          {
+            int i;
+
+            for (i = 0; i < count; ++i)
+              encode_sv (enc, SP[i + 1 - count]);
+
+            SP -= count;
+          }
 
           PUTBACK;
 
@@ -1143,7 +1148,6 @@ decode_tagged (dec_t *dec)
 
           dSP;
           ENTER; SAVETMPS;
-          SAVESTACK_POS ();
           PUSHMARK (SP);
           EXTEND (SP, 2);
           PUSHs (tag_sv);
@@ -1164,7 +1168,8 @@ decode_tagged (dec_t *dec)
             {
               SvREFCNT_dec_NN (tag_sv);
               SvREFCNT_dec_NN (sv);
-              sv = SvREFCNT_inc_NN (POPs);
+              sv = SvREFCNT_inc_NN (TOPs);
+              SP -= count;
             }
           else
             {

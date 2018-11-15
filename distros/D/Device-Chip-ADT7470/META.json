@@ -1,0 +1,47 @@
+{
+   "abstract" : "chip driver for an F<ADT7470>",
+   "author" : [
+      "the author"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Device-Chip-ADT7470",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Device::Chip::Adapter" : "0",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Bitfield" : "0",
+            "Device::Chip" : "0.04",
+            "Device::Chip::Base::RegisteredI2C" : "0.10"
+         }
+      }
+   },
+   "provides" : {
+      "Device::Chip::ADT7470" : {
+         "file" : "lib/Device/Chip/ADT7470.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

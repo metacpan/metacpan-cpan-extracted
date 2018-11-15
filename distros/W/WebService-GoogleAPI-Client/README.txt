@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.20
+    version 0.21
 
 SYNOPSIS
 
@@ -91,7 +91,7 @@ METHODS
 
     Required params: method, route
 
-    Optional params: api_endpoint_id
+    Optional params: api_endpoint_id cb_method_discovery_modify
 
     $self->access_token must be valid
 
@@ -122,11 +122,37 @@ METHODS
       #print pp $r;
     
     
-      NB: including the version in the API Endpoint Spec is not supported .. yet? eg gmail:v1.users.messages.list .. will always use the latest stable version
-    
-    
       if the pre-query validation fails then a 418 - I'm a Teapot error response is returned with the 
       body containing the specific description of the errors ( Tea Leaves ;^) ).   
+
+    NB: If you pass a 'path' parameter this takes precendence over the API
+    Discovery Spec. Any parameters defined in the path of the format
+    {VARNAME} will be filled in with values within the options=>{ VARNAME
+    => 'value '} parameter structure. This is the simplest way of
+    addressing issues where the API discovery spec is inaccurate. ( See
+    dev_sheets_example.pl as at 14/11/18 for illustration )
+
+    To allow the user to fix discrepencies in the Discovery Specification
+    the cb_method_discovery_modify callback can be used which must accept
+    the method specification as a parameter and must return a (potentially
+    modified) method spec.
+
+    eg.
+
+        my $r = $gapi_client->api_query(  api_endpoint_id => "sheets:v4.spreadsheets.values.update",  
+                                        options => { 
+                                          spreadsheetId => '1111111111111111111',
+                                          valueInputOption => 'RAW',
+                                          range => 'Sheet1!A1:A2',
+                                          'values' => [[99],[98]]
+                                        },
+                                        cb_method_discovery_modify => sub { 
+                                          my  $meth_spec  = shift; 
+                                          $meth_spec->{parameters}{valueInputOption}{location} = 'path';
+                                          $meth_spec->{path} = "v4/spreadsheets/{spreadsheetId}/values/{range}?valueInputOption={valueInputOption}";
+                                          return $meth_spec;
+                                        }
+                                        );
 
     Returns Mojo::Message::Response object
 
@@ -251,9 +277,9 @@ FEATURES
       * helper api_query to streamline request composition without
       preventing manual construction if preferred.
 
-      * CLI tool (goauth) with lightweight HTTP server to simplify OAuth2
-      configuration, sccoping, authorization and obtaining access_ and
-      refresh_ tokens from users
+      * CLI tool (goauth) with lightweight Mojo HTTP server to simplify
+      OAuth2 configuration, sccoping, authorization and obtaining access_
+      and refresh_ tokens from users
 
 AUTHOR
 

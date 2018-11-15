@@ -212,7 +212,7 @@ use warnings;
 
 package Mail::SPF::Iterator;
 
-our $VERSION = '1.118';
+our $VERSION = '1.119';
 
 use fields (
     # values given in or derived from params to new()
@@ -504,13 +504,12 @@ sub mailheader {
     $result .= " (using default SPF of \"$self->{used_default_spf}\")"
 	if $self->{used_default_spf};
     return $result ." ". join( "; ", map {
-	# Quote: this is not exactly rfc2822 but should be enough
 	my $v = $hash->{$_};
 	$v =~ s{([\"\\])}{\\$1}g;
 	$v =~ s{[\r\n]+}{ }g;
 	$v =~ s{^\s+}{};
 	$v =~ s{\s+$}{};
-	$v = qq("$v") if $v =~ m{[\s;()]} or $v eq '';
+	$v = qq("$v") if $v eq '' or $v =~ m{[^0-9a-zA-Z!#$%&'*+\-/=?^_`{|}~]};
 	"$_=$v"
     } sort keys %$hash );
 }

@@ -1,7 +1,7 @@
 package Mojo::UserAgent::Role::Queued;
 use Mojo::Base '-role';
 
-our $VERSION = "1.14";
+our $VERSION = "1.15";
 use Mojo::UserAgent::Role::Queued::Queue;
 
 has max_active => sub { shift->max_connections };

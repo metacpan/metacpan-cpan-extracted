@@ -1059,9 +1059,7 @@ lib/RPerl/Test/Module/Package_00_Bad_Terminator_02.pm
 lib/RPerl/Test/Module/Package_00_Bad_Terminator_03.pm
 lib/RPerl/Test/Module/Package_00_Good.pm
 lib/RPerl/Test/Module/program_00_good.pl
-lib/RPerl/Test/OO/MyClass01Good.cpp
 lib/RPerl/Test/OO/MyClass01Good.cpp.CPPOPS_CPPTYPES
-lib/RPerl/Test/OO/MyClass01Good.h
 lib/RPerl/Test/OO/MyClass01Good.h.CPPOPS_CPPTYPES
 lib/RPerl/Test/OO/MyClass01Good.pm
 lib/RPerl/Test/OO/MyClass01Good.pmc.CPPOPS_DUALTYPES
@@ -1787,7 +1785,11 @@ lib/RPerl/Test/Properties/class_01_good_02.pl
 lib/RPerl/Test/Properties/class_01_good_03.pl
 lib/RPerl/Test/Properties/Class_10_Good.pm
 lib/RPerl/Test/Properties/class_10_good_00.pl
+lib/RPerl/Test/Properties/Class_20_Good.cpp.CPPOPS_CPPTYPES
+lib/RPerl/Test/Properties/Class_20_Good.h.CPPOPS_CPPTYPES
 lib/RPerl/Test/Properties/Class_20_Good.pm
+lib/RPerl/Test/Properties/Class_20_Good.pmc.CPPOPS_DUALTYPES
+lib/RPerl/Test/Properties/class_20_good_00.cpp.CPPOPS_CPPTYPES
 lib/RPerl/Test/Properties/class_20_good_00.pl
 lib/RPerl/Test/Reserved/_Class_04_Good.pm
 lib/RPerl/Test/Reserved/_Class_04_Good.pm.PERL_CRITIC_ISSUE_NEED_FILE
@@ -2242,6 +2244,7 @@ lib/typemap.rperl
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+META.json
 README
 README.md
 script/demo/bubble_sort.pl
@@ -2324,4 +2327,3 @@ t/20_compile_oo_inherit.t.empty
 t/22_compile_execute.t.not_ready_yet
 THANKS
 META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

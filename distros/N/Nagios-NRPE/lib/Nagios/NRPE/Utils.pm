@@ -1,7 +1,3 @@
-#!/usr/bin/perl
-
-=pod
-
 =head1 NAME
 
 Nagios::NRPE::Utils - Common helper functions for Nagios::NRPE
@@ -36,7 +32,7 @@ Create a hash with the specified error message using this format
 
 package Nagios::NRPE::Utils;
 
-our $VERSION = '1.0.3';
+our $VERSION = '2.0.2';
 use strict;
 use warnings;
 require Exporter;

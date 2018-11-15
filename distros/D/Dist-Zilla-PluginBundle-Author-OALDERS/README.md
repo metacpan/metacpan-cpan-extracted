@@ -4,12 +4,12 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 # VERSION
 
-version 0.000019
+version 0.000020
 
 ## configure
 
 No docs for the time being, but you can see the bundled plugin by checking
-c&lt;configure()> in the module source.
+`configure()` in the module source.
 
 # SEE ALSO
 

@@ -3,7 +3,7 @@ package Pcore::App;
 use Pcore -role;
 use Pcore::Util::Scalar qw[is_ref];
 use Pcore::Util::Path::Poll qw[:POLL];
-use Pcore::Nginx;
+use Pcore::Service::Nginx;
 use Pcore::HTTP::Server;
 use Pcore::App::Router;
 use Pcore::App::API;
@@ -155,7 +155,7 @@ sub nginx_cfg ($self) {
 }
 
 sub start_nginx ($self) {
-    $self->{nginx} = Pcore::Nginx->new;
+    $self->{nginx} = Pcore::Service::Nginx->new;
 
     $self->{nginx}->add_vhost( 'vhost', $self->nginx_cfg );    # if !$self->{nginx}->is_vhost_exists('vhost');
 

@@ -6,7 +6,7 @@ use FindBin qw/$RealBin/;
 use IO::Uncompress::Gunzip qw/gunzip $GunzipError/;
 use Data::Dumper qw/Dumper/;
 
-use Test::More tests => 45;
+use Test::More tests => 17;
 
 use lib "$RealBin/../lib";
 use_ok 'Bio::Kmer';
@@ -34,58 +34,10 @@ my %query=(
   AAAAAAAA => 0,  # not found
 );
 
-# Test reading a BioPerl object
-SKIP:{
-  eval{
-    require Bio::SeqIO;
-  };
-  if($@){
-    skip("Bio::Perl test.", 14);
-  } else {
-    my $tempdir=tempdir("biokmertest.XXXXXX",TMPDIR=>1,CLEANUP=>1);
-
-    gunzip (dirname($0)."/../data/rand.fastq.gz" => "$tempdir/bp.fastq") or die "ERROR: could not decompress rand.fastq.gz: $GunzipError";
-    my $seqin=Bio::SeqIO->new(-file=>"$tempdir/bp.fastq");
-    my $kmerBP=Bio::Kmer->new($seqin,{kmerlength=>8});
-    my $histBP=$kmerBP->histogram();
-    for(my $i=0;$i<@correctCounts;$i++){
-      is $$histBP[$i], $correctCounts[$i], "Freq of $i checks out";
-    }
-    for my $query(keys(%query)){
-      is $query{$query}, $kmerBP->query($query), "Queried for $query{$query}";
-    }
-  }
-}
-
-# Test JellyFish
-SKIP:{
-  my $jfVersion=`jellyfish --version`; chomp($jfVersion);
-  # e.g., jellyfish 2.2.6
-  if($jfVersion =~ /(jellyfish\s+)?(\d+)?/){
-    my $majorVersion=$2;
-    if($majorVersion < 2){
-      warn "WARNING: Jellyfish v2 or greater is required";
-      skip("Jellyfish test", 14);
-    }
-  }
-  if(!$jfVersion){
-    skip("Jellyfish test.", 14);
-  }
-
-  my $kmerJf=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8, kmercounter=>"jellyfish"});
-  my $histJf=$kmerJf->histogram();
-  for(my $i=0;$i<@correctCounts;$i++){
-    is $$histJf[$i], $correctCounts[$i], "Freq of $i checks out";
-  }
-  for my $query(keys(%query)){
-    is $query{$query}, $kmerJf->query($query), "Queried for $query{$query}";
-  }
-}
-
-
-# Pure perl
-my $kmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8});
-my $hist=$kmer->histogram();
+# Test pure perl
+my $infile = dirname($0)."/../data/rand.fastq.gz";
+my $kmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8,kmercounter=>"perl"});
+my $hist=$kmer->histogram() || die Dumper $kmer;
 for(my $i=0;$i<@correctCounts;$i++){
   is $$hist[$i], $correctCounts[$i], "Freq of $i checks out";
 }
@@ -99,7 +51,11 @@ $kmer->close();
 my $subsampleKmer=Bio::Kmer->new(dirname($0)."/../data/rand.fastq.gz",{kmerlength=>8,sample=>0.1});
 my $subsampleHist=$kmer->histogram();
 my $subsampleKmerHash=$subsampleKmer->kmers();
-ok(scalar(keys(%$subsampleKmerHash)) > 0, "Subsample kmers more than zero.");
-ok(scalar(keys(%$subsampleKmerHash)) < scalar(keys(%{ $kmer->kmers() })), "Subsample kmers fewer than full count of kmers");
+my $numSubsampledKmers = scalar(keys(%$subsampleKmerHash));
+my $numKmers = scalar(keys(%{ $kmer->kmers() }));
+
+ok(($numSubsampledKmers > 0), "Subsample kmers, and there are a nonzero count of results.");
+
+ok(($numSubsampledKmers < $numKmers), "Subsample kmers fewer than full count of kmers");
 
 

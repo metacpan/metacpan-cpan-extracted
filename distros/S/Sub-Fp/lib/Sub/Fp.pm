@@ -4,6 +4,7 @@ use warnings;
 use Carp;
 use List::Util;
 use Data::Dumper qw(Dumper);
+use Data::PatternCompare;
 use Exporter qw(import);
 our @EXPORT_OK = qw(
     incr        reduces  flatten
@@ -14,16 +15,22 @@ our @EXPORT_OK = qw(
     none        uniq     bool        spread
     len         to_keys  to_vals     is_array
     is_hash     every    noop        identity
-    is_empty    flow     eql
+    is_empty    is_sub   flow        eql
 );
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use constant ARG_PLACE_HOLDER => {};
 
-sub __ { ARG_PLACE_HOLDER };
-
 # -----------------------------------------------------------------------------#
+
+my $cmp = Data::PatternCompare->new;
+
+sub _is_subset {
+    return $cmp->pattern_match($_[0], $_[1]);
+}
+
+sub __ { ARG_PLACE_HOLDER };
 
 sub noop { return undef }
 
@@ -44,6 +51,12 @@ sub flow {
         my $start_value = shift // noop;
         chain($start_value, spread($args));
     }
+}
+
+sub is_sub {
+    my $sub = shift;
+
+    return bool(eql(ref $sub, 'CODE'));
 }
 
 sub is_array {
@@ -129,48 +142,83 @@ sub uniq {
 }
 
 sub find {
-    my $fn   = shift;
+    my $pred = shift;
     my $coll = shift // [];
 
+    if (!is_sub($pred)) {
+        return find(sub {
+            my $subset = shift;
+            return bool(_is_subset($subset, $pred))
+        }, $coll);
+    }
+
     return List::Util::first {
-        $fn->($_)
+        $pred->($_)
     } @$coll;
 }
 
 sub filter {
-    my $fn   = shift;
+    my $pred  = shift;
     my $coll = shift // [];
 
-    return [grep { $fn->($_) } @$coll];
+    if (!is_sub($pred)) {
+        return filter(sub {
+            my $subset = shift;
+            return bool(_is_subset($subset, $pred))
+        }, $coll);
+    }
+
+    return [grep { $pred->($_) } @$coll];
 }
 
 sub some {
-    my $fn   = shift;
+    my $pred = shift;
     my $coll = shift // [];
 
-    return find($fn, $coll) ? 1 : 0
+    if (!is_sub($pred)) {
+        return some(sub {
+            my $subset = shift;
+            return bool(_is_subset($subset, $pred))
+        }, $coll);
+    }
+
+    return bool(find($pred, $coll));
 }
 
 sub every {
-    my $fn   = shift;
+    my $pred = shift;
     my $coll = shift // [];
 
+    if (!is_sub($pred)) {
+        return every(sub {
+            my $subset = shift;
+            return bool(_is_subset($subset, $pred));
+        }, $coll);
+    }
+
     my $bool = List::Util::all {
-        $fn->($_);
+        $pred->($_);
     } @$coll;
 
-    return $bool ? 1 : 0;
+    return bool($bool);
 }
 
 sub none {
-    my $fn   = shift;
+    my $pred = shift;
     my $coll = shift // [];
 
+    if (!is_sub($pred)) {
+        return none(sub {
+            my $subset = shift;
+            return bool(_is_subset($subset, $pred));
+        }, $coll);
+    }
+
     my $bool = List::Util::none {
-        $fn->($_)
+        $pred->($_)
     } @$coll;
 
-    return $bool ? 1 : 0;
+    return bool($bool);
 }
 
 sub incr {
@@ -390,8 +438,8 @@ sub eql {
         return 0;
     }
 
-    if (every(\&is_array, [$arg1, $arg2]) ||
-        every(\&is_hash,  [$arg1, $arg2])) {
+    if (is_array($arg1) && is_array($arg2) ||
+        is_hash($arg1) && is_hash($arg2)) {
         return bool($arg1 == $arg2);
     }
 
@@ -729,6 +777,25 @@ on equality following strings vs numbers in perl.
 
 =cut
 
+=head2 is_sub
+
+Returns 0 or 1 if the argument is a sub ref
+
+    is_sub()
+
+    # 0
+
+    is_sub(sub {})
+
+    # 1
+
+    my $sub = sub {};
+    is_sub($sub)
+
+    # 1
+
+=cut
+
 =head2 is_array
 
 Returns 0 or 1 if the argument is an array
@@ -927,6 +994,36 @@ Iterates over elements of collection, returning the first element predicate retu
 
     # { name => 'sally', age => 25 }
 
+    # find also supports 'iteratee object shorthand'
+
+    my $people = [
+        {
+            name          => 'john',
+            age           => 25,
+            favorite_food => 'broccoli',
+        },
+        {
+            name          => 'Sally',
+            age           => 25,
+            favorite_food => 'oranges',
+        },
+        {
+            name          => 'Old Greg',
+            age           => 100,
+            favorite_food => 'you do not want to know,
+        }
+    ]
+
+    find({ favorite_food => 'broccoli' }, $people);
+
+    # [
+    #     {
+    #         name          => 'Sally',
+    #         age           => 25,
+    #         favorite_food => 'broccoli',
+    #     },
+    # ]
+
 =cut
 
 =head2 filter
@@ -962,6 +1059,17 @@ Iterates over elements of collection, returning only elements the predicate retu
     #        name => 'Sally',
     #        age => 25,
     #    }
+    # ]
+
+    # Filter also supports 'iteratee object shorthand'
+
+    filter({ name => 'John' }, $people);
+
+    # [
+    #    {
+    #        name => 'john',
+    #        age  => 25,
+    #    },
     # ]
 
 =cut
@@ -1000,6 +1108,12 @@ If one element is found to return truthy for the given predicate, none returns 0
 
     # 1
 
+    # none also supports 'iteratee object shorthand'
+
+    none({ name => 'Black Bart' }, $people);
+
+    # 1
+
 =cut
 
 =head2 every
@@ -1021,6 +1135,30 @@ return truthy. If all elements cause predicate to return truthy, every returns 1
 
     # 0
 
+    # every also supports 'iteratee object shorthand'
+
+    my $people = [
+        {
+            name => 'john',
+            age => 25,
+            favorite_food => 'broccoli',
+        },
+        {
+            name => 'Sally',
+            age => 25,
+            favorite_food => 'broccoli',
+        },
+        {
+            name => 'Old Greg',
+            age => 100,
+            favorite_food => 'you do not want to know,
+        }
+    ]
+
+    every({ favorite_food => 'broccoli' }, $people)
+
+    # 0
+
 =cut
 
 =head2 some
@@ -1039,6 +1177,30 @@ Iteration is stopped once predicate returns truthy.
         my $num = shift;
         $num > 2;
     }, [1,2,3,4]);
+
+    # 1
+
+    # some also supports 'iteratee object shorthand'
+
+    my $people = [
+        {
+            name => 'john',
+            age => 25,
+            favorite_food => 'broccoli',
+        },
+        {
+            name => 'Sally',
+            age => 25,
+            favorite_food => 'broccoli',
+        },
+        {
+            name => 'Old Greg',
+            age => 100,
+            favorite_food => 'you do not want to know,
+        }
+    ]
+
+    some({ favorite_food => 'broccoli' }, $people)
 
     # 1
 

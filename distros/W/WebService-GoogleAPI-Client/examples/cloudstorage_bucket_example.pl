@@ -6,13 +6,8 @@ use WebService::GoogleAPI::Client;
 use Data::Dumper qw (Dumper);
 use Data::Dump 'pp';
 use Carp;
-#use File::Temp qw/ tempfile tempdir /;
-#use File::Which;
-#use feature 'say';
-#use MIME::Base64;
 use Text::Table;
 use MIME::Types;
-#use utf8;
 use Image::PNG::Libpng;
 
 require './EXAMPLE_HELPERS.pm'; ## check_api_endpoint_and_user_scopes() and display_api_summary_and_return_versioned_api_string()
@@ -26,7 +21,6 @@ my $config = {
   upload  =>  $ARGV[0] || undef,
   file_content => undef, ## will be filled with content of file at path 'upload'
   
-  # parameters_concise => 01, replaced by client->debug
 };
 
 

@@ -5,7 +5,7 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::PP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PP::VERSION = '0.72';
+  $Math::Prime::Util::PP::VERSION = '0.73';
 }
 
 BEGIN {
@@ -914,6 +914,62 @@ sub euler_phi {
   $totient = _bigint_to_int($totient) if ref($totient) eq 'Math::BigInt'
                                       && $totient->bacmp(BMAX) <= 0;
   return $totient;
+}
+
+sub inverse_totient {
+  my($n) = @_;
+  _validate_positive_integer($n);
+
+  return wantarray ? (1,2) : 2 if $n == 1;
+  return wantarray ? () : 0 if $n < 1 || ($n & 1);
+
+  $n = Math::Prime::Util::_to_bigint("$n") if !ref($n) && $n > 2**49;
+  my $do_bigint = ref($n);
+
+  if (is_prime($n >> 1)) {   # Coleman Remark 3.3 (Thm 3.1) and Prop 6.2
+    return wantarray ? () : 0             if !is_prime($n+1);
+    return wantarray ? ($n+1, 2*$n+2) : 2 if $n >= 10;
+  }
+
+  if (!wantarray) {
+    my %r = ( 1 => 1 );
+    Math::Prime::Util::fordivisors(sub { my $d = $_;
+      $d = $do_bigint->new("$d") if $do_bigint;
+      my $p = $d+1;
+      if (Math::Prime::Util::is_prime($p)) {
+        my($dp,@sumi,@sumv) = ($d);
+        for my $v (1 .. 1 + Math::Prime::Util::valuation($n, $p)) {
+          Math::Prime::Util::fordivisors(sub { my $d2 = $_;
+            if (defined $r{$d2}) { push @sumi, $d2*$dp; push @sumv, $r{$d2}; }
+          }, $n / $dp);
+          $dp *= $p;
+        }
+        $r{ $sumi[$_] } += $sumv[$_]  for 0 .. $#sumi;
+      }
+    }, $n);
+    return (defined $r{$n}) ? $r{$n} : 0;
+  } else {
+    my %r = ( 1 => [1] );
+    Math::Prime::Util::fordivisors(sub { my $d = $_;
+      $d = $do_bigint->new("$d") if $do_bigint;
+      my $p = $d+1;
+      if (Math::Prime::Util::is_prime($p)) {
+        my($dp,$pp,@T) = ($d,$p);
+        for my $v (1 .. 1 + Math::Prime::Util::valuation($n, $p)) {
+          Math::Prime::Util::fordivisors(sub { my $d2 = $_;
+            push @T, [ $d2*$dp, [map { $_ * $pp } @{ $r{$d2} }] ] if defined $r{$d2};
+          }, $n / $dp);
+          $dp *= $p;
+          $pp *= $p;
+        }
+        push @{$r{$_->[0]}}, @{$_->[1]} for @T;
+      }
+    }, $n);
+    return () unless defined $r{$n};
+    delete @r{ grep { $_ != $n } keys %r };  # Delete all intermediate results
+    my @result = sort { $a <=> $b } @{$r{$n}};
+    return @result;
+  }
 }
 
 sub euler_phi_range {
@@ -2058,7 +2114,7 @@ sub semiprime_count_approx {
   my($n) = @_;
   return 0 if $n < 4;
   _validate_positive_integer($n);
-  $n = _upgrade_to_float($n) if ref($n);
+  $n = "$n" + 0.00000001;
   my $l1 = log($n);
   my $l2 = log($l1);
   #my $est = $n * $l2 / $l1;
@@ -2116,7 +2172,7 @@ sub nth_semiprime_approx {
   return undef if $n < 0;  ## no critic qw(ProhibitExplicitReturnUndef)
   _validate_positive_integer($n);
   return (undef,4,6,9,10,14,15,21,22)[$n] if $n <= 8;
-  $n = _upgrade_to_float($n) if ref($n);
+  $n = "$n" + 0.00000001;
   my $l1 = log($n);
   my $l2 = log($l1);
   my $est = 0.966 * $n * $l1 / $l2;
@@ -6648,7 +6704,7 @@ Math::Prime::Util::PP - Pure Perl version of Math::Prime::Util
 
 =head1 VERSION
 
-Version 0.72
+Version 0.73
 
 
 =head1 SYNOPSIS

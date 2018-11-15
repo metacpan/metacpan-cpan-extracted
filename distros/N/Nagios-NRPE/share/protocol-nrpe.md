@@ -59,7 +59,7 @@ TCP Data looks like this:
 
 NRPE v. 3 works mostly like NRPE v. 2 but the length of the buffer is now of variable length. This means that the
 length of the packet buffer must now be sent as a field in the packet. An alignment field is also added and the 
-buffer is no longer padded, so a v. 3 packet can be both smaller and larger than a v. 2 packet.
+buffer is padded if it is shorter than 1024, so a v. 3 packet can be larger than a v. 2 packet, but not smaller.
 
 ```
 typedef struct packet_struct{
@@ -84,7 +84,7 @@ Values in the struct can be explained as following for a sent query:
 | 2             | int16_t    | result_code    | left empty on query                             | null          |
 | 2             | int16_t    | alignment      | alignment of the packet                         | 0             |
 | 4             | int32_t    | buffer_length  | length of the buffer                            | <length>      |
-| ?             | char[]     | buffer         | packet buffer terminated  with \x0              | "check_users" |
+| >= 1024       | char[]     | buffer         | packet buffer terminated  with \x0              | "check_users" |
 ```
 
 TCP Data looks like this:

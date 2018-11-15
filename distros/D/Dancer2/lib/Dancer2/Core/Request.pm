@@ -1,6 +1,6 @@
 package Dancer2::Core::Request;
 # ABSTRACT: Interface for accessing incoming requests
-$Dancer2::Core::Request::VERSION = '0.206000';
+$Dancer2::Core::Request::VERSION = '0.207000';
 use strict;
 use warnings;
 use parent 'Plack::Request';
@@ -199,6 +199,11 @@ sub deserialize {
         $serializer_fail = $_[1];
         $serializer_log_cb->(@_);
     };
+    # work-around to resolve a chicken-and-egg issue when instantiating a
+    # request object; the serializer needs that request object to deserialize
+    # the body params.
+    Scalar::Util::weaken( my $request = $self );
+    $self->serializer->has_request || $self->serializer->set_request($request);
     my $data = $serializer->deserialize($body);
     die $serializer_fail if $serializer_fail;
 
@@ -624,7 +629,7 @@ Dancer2::Core::Request - Interface for accessing incoming requests
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 SYNOPSIS
 

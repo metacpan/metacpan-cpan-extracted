@@ -9,6 +9,35 @@ Use the plugin in your application class:
     package MyApp;
     use Catalyst 'InjectionHelpers';
 
+    MyApp->config(
+      'Model::SingletonA' => {
+        -inject => {
+          from_class=>'MyApp::Singleton', 
+          adaptor=>'Application', 
+          roles=>['MyApp::Role::Foo'],
+          method=>'new',
+        },
+        aaa => 100,
+      },
+      'Model::SingletonB' => {
+        -inject => {
+          from_class=>'MyApp::Singleton', 
+          adaptor=>'Application', 
+          method=>sub {
+            my ($adaptor_instance, $from_class, $app, %args) = @_;
+            return $class->new(aaa=>$args{arg});
+        },
+        arg => 300,
+      },
+    );
+
+    MyApp->setup;
+
+Alternatively you can use the 'inject\_components' class method:
+
+    package MyApp;
+    use Catalyst 'InjectionHelpers';
+
     MyApp->inject_components(
       'Model::SingletonA' => {
         from_class=>'MyApp::Singleton', 
@@ -33,7 +62,19 @@ Use the plugin in your application class:
 
     MyApp->setup;
 
+The first method is a better choice if you need to alter how your injections work
+based on configuration that is controlled per environment.
+
 # DESCRIPTION
+
+**NOTE** Starting with `VERSION` 0.012 there is a breaking change in the number
+of arguments that the `method` and `from_code` callbacks get.  If you need to
+keep backwards compatibility you should set the version flag to 1:
+
+    MyApp->config(
+      'Plugin::InjectionHelpers' => { version => 1 },
+      ## Additional configuration as needed
+    );
 
 This plugin enhances the build in component injection features of [Catalyst](https://metacpan.org/pod/Catalyst)
 (since v5.90090) to make it easy to bring non [Catalyst::Component](https://metacpan.org/pod/Catalyst::Component) classes
@@ -41,28 +82,68 @@ into your application.  You may consider using this for what you often used
 [Catalyst::Model::Adaptor](https://metacpan.org/pod/Catalyst::Model::Adaptor) in the past for (although there is no reason to
 stop using that if you are doing so, its not a 'broken' approach, but for the
 very simple cases this might suffice and allow you to reduce the number of nearly
-empty 'boilerplate' classes in your application.
+empty 'boilerplate' classes in your application.)
 
 You should be familiar with how component injection works in newer versions of
 [Catalyst](https://metacpan.org/pod/Catalyst) (v5.90090+).
 
+It also experimentally supports a mechanism for dependency injection (that is
+the ability to set other componements as initialization arguments, similar to
+how you might see this work with inversion of control frameworks such as
+[Bread::Board](https://metacpan.org/pod/Bread::Board).)  Author has no plan to move this past experimental status; he
+is merely publishing code that he's used on jobs where the code worked for the
+exact cases he was using it for the purposes of easing long term maintainance
+on those projects.  If you like this feature and would like to see it stablized
+it will be on you to help the author validate it; its not impossible more changes
+and pontentially breaking changes will be needed to make that happen, and its
+also not impossible that changes to core [Catalyst](https://metacpan.org/pod/Catalyst) would be needed as well.
+Reports from users in the wild greatly appreciated.
+
 # USAGE
 
-    MyApp->inject_components($model_name => \%args);
+    MyApp->config(
+      $model_name => +{ 
+        -inject => +{ %injection_args },
+        \%configuration_args;
+or
+
+    MyApp->inject_components($model_name => \%injection_args);
+    MyApp->config($model_name => \%configuration_args);
 
 Where `$model_name` is the name of the component as it is in your [Catalyst](https://metacpan.org/pod/Catalyst)
-application (ie 'Model::User', 'View::HTML', 'Controller::Static') and `%args`
+application (ie 'Model::User', 'View::HTML', 'Controller::Static') and `%injection_args`
 are key /values as described below:
 
 ## from\_class
 
 This is the full namespace of the class you are adapting to use as a [Catalyst](https://metacpan.org/pod/Catalyst)
-component.
+component.  Example 'MyApp::Class'.
+
+## from\_code
+
+This is a codereference that generates your component instance.  Used when you
+don't have a class you wish to adapt (handy for prototyping or small components).
+
+    MyApp->inject_components(
+      'Model::Foo' => {
+        from_code => sub {
+          my ($app_ctx, %args) = @_;
+          return $XX;
+        },
+        adaptor => 'Factory',
+      },
+    );
+
+`$app_ctx` is either the application class or [Catalyst](https://metacpan.org/pod/Catalyst) context, depending on the
+scope of your component.
+
+If you use this you should not define the 'method' key or the 'roles' key (below).
 
 ## roles
 
 A list of [Moose::Roles](https://metacpan.org/pod/Moose::Roles)s that will be composed into the 'from\_class' prior
-to creating an instance of that class.
+to creating an instance of that class.  Useful if you apply roles for debugging
+or testing in certain environments.
 
 ## method
 
@@ -70,12 +151,85 @@ Either a string or a coderef. If left empty this defaults to 'new'.
 
 The name of the method used to create the adapted class instance.  Generally this
 is 'new'.  If you have complex instantiation requirements you may instead use
-a coderef. If so, your coderef will receive four arguments.   The first is the
-adaptor instance.  The second is the name of the from\_class.  The third is either
-the application or context, depending on the type adaptor.  The forth is a hash
+a coderef. If so, your coderef will receive three arguments. The first is the name
+of the from\_class.  The second is either
+the application or context, depending on the type adaptor.  The third is a hash
 of arguments which merges the global configuration for the named component along
 with any arguments passed in the request for the component (this only makes
 sense for non application scoped models, btw).
+
+Example:
+
+    MyApp->inject_components(
+      'Model::Foo' => {
+        from_class => 'Foo',
+        method => sub {
+          my ($from_class, $app_or_ctx, %args) = @_;
+        },
+        adaptor => 'Factory',
+      },
+    );
+
+Argument details:
+
+- $from\_class
+
+    The name of the class you set in the 'from\_class' parameter.
+
+- $app\_or\_ctx
+
+    Either your application class or a reference to the current context, depending on how
+    the adaptore is scoped (PerRequest and Factory get $ctx).
+
+- %args
+
+    A Hash of the configuration parameters from your application configuration.  If the
+    adaptor is context/request scoped, also combines any arguments included in the call
+    for the component.  for example:
+
+        package MyApp;
+
+        use Catalyst;
+
+        MyApp->inject_components( 'Model::Foo' => { from_class=>"Foo", adaptor=>'Factory' });
+        MyApp->config( 'Model::Foo' => { aaa => 111 } )
+        MyApp->setup;
+
+    If in an action you say:
+
+        my $model = $c->model('Foo', bbb=>222);
+
+    Then `%args` would be:
+
+        (aaa=>111, bbb=>222);
+
+    **NOTE** Please keep in mind supplying arguments in the ->model call (or ->view for
+    that matter) only makes sense for components that ACCEPT\_CONTEXT (in this case
+    are Factory, PerRequest or PerSession adaptor types).
+
+## transform\_args
+
+A coderef that you can use to transform configuration arguments into something
+more suitable for your class.  For example, the configuration args is typically
+a hash, but your object class may require some positional arguments.
+
+    MyApp->inject_components(
+      'Model::Foo' => {
+        from_class = 'Foo',
+        transform_args => sub {
+          my (%args) = @_;
+          my $path = delete $args{path},
+          return ($path, %args);
+        },
+      },
+    );
+
+Should return the args as they as used by the initialization method of the
+'from\_class'.
+
+Use 'transform\_args' when you just need to tweak how your object uses arguments
+and use 'from\_code' or 'method' when you need more control on what kind of object
+is returned (in other words choose the smallest hammer for the job).
 
 ## adaptor
 
@@ -111,11 +265,123 @@ the request goes out of scope.
 The first time you call this model you may pass additional parameters, which get
 merged with the global configuration and used to initialize the model.
 
-# Creating your own adaptor
+## PerSession.
+
+Scoped to a session.  Requires the Session plugin.
+See [Catalyst::Model::InjectionHelpers::PerSession](https://metacpan.org/pod/Catalyst::Model::InjectionHelpers::PerSession) for more.
+
+## Creating your own adaptor
 
 Your new adaptor should consume the role [Catalyst::ModelRole::InjectionHelpers](https://metacpan.org/pod/Catalyst::ModelRole::InjectionHelpers)
 and provide a method ACCEPT\_CONTEXT which must return the component you wish to
 inject.  Please review the existing adaptors and that role for insights.
+
+# DEPENDENCY INJECTION
+
+Often when you are setting configuration options for your components, you might
+desire to 'depend on' other existing components.  This design pattern is called
+'Inversion of Control', and you might be familiar with it from prior art on CPAN
+such as [IOC](https://metacpan.org/pod/IOC), [Bread::Board](https://metacpan.org/pod/Bread::Board) and [Beam::Wire](https://metacpan.org/pod/Beam::Wire).
+
+The IOC features that are exposed via this plugin are basic and marked experimental
+(please see preceding note).  The are however presented to the [Catalyst](https://metacpan.org/pod/Catalyst) community
+with the hope of provoking thought and discussion (or at the very least put an
+end to the idea that this is something people actually care about).
+
+To use this feature you simply tag configuration keys as 'dependent' using a
+hashref for the key value.  For example, here we define an inline model that
+is a [DBI](https://metacpan.org/pod/DBI) `$dbh` and a User model that depends on it:
+
+    MyApp->config(
+      'Model::DBH' => {
+        -inject => {
+          adaptor => 'Application',
+          from_code => sub {
+            my ($app, @args) = @_;
+            return DBI->connect(@args);
+          },
+        },
+        %DBI_Connection_Args,
+      },
+      'Model::User' => {
+        -inject => {
+          from_class => 'MyApp::User',
+          adaptor => 'Factory',
+        },
+        dbh => { -model => 'DBH' },
+      },
+      # Additional configuration as needed
+    );
+
+Now in you code (say in a controller if you do:
+
+    my $user = $c->model('User');
+
+We automatically resolve the value for `dbh` to be $c->model('DBH') and
+supply it as an argument.
+
+Currently we only support dependency substitutions on the first level of
+arguments.
+
+All injection syntax takes the form of "$argument\_key => { $type => $parameter }"
+where the following $types are supported
+
+- -model => $model\_name
+- -view => $view\_name
+- -controller => $controller\_name
+
+    Provide dependency in the form of $c->model($model\_name) (or $c->view($view\_name), 
+    $c->controller($controller\_name)).
+
+- -code => $subref
+
+    Custom dependency that resolves from a subref.  Example:
+
+        MyApp->config(
+          'Model::User' => {
+            current_time => {
+              -code => sub {
+                my $app_or_context = shift;
+                return DateTime->now;
+              },
+            },
+          },
+          # Rest of configuration
+        );
+
+    Please keep in mind that you must return an object.  `$app_or_context` will be
+    either the application class or $c (context) depending on the type of model (if
+    it accepts context or not).
+
+- -core => $target
+
+    This exposes some core objects such as $app, $c etc.  Where $target is:
+
+    - $app
+
+        The name of the application class.
+
+    - $ctx
+
+        The result of `$c`.  Please note its probably bad form to pass the entire
+        context object as it leads to unnecessary tight coupling.
+
+    - $req
+
+        The result of `$c-`req>
+
+    - $res
+
+        The result of `$c-`res>
+
+    - $log
+
+        The result of `$c-`log>
+
+    - $user
+
+        The result of `$c-`user> (if it exists, you should either define it or
+        use the Authentication plugin).
 
 # CONFIGURATION
 
@@ -130,6 +396,28 @@ Default namespace to look for adaptors.  Defaults to [Catalyst::Model::Injection
 ## default\_adaptor
 
 The default adaptor to use, should you not set one.  Defaults to 'Application'.
+
+## dispatchers
+
+Allows you to add to the default dependency injection handers:
+
+    MyApp->config(
+      'Plugin::InjectionHelpers' => {
+        dispatchers => {
+          '-my' => sub {
+            my ($app_ctx, $what) = @_;
+            warn "asking for a -my $what";
+            return ....;
+          },
+        },
+      },
+      # Rest of configuration
+    );
+
+## version
+
+Default is 2.  Set to 1 if you are need compatibility version 0.011 or older
+style of arguments for 'method' and 'from\_code'.
 
 # PRIOR ART
 
@@ -149,7 +437,7 @@ John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
 
 # COPYRIGHT & LICENSE
 
-Copyright 2015, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+Copyright 2016, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

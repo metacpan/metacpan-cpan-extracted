@@ -1,4 +1,4 @@
-# $Id: 05-OPT.t 1543 2017-02-28 19:27:23Z willem $	-*-perl-*-
+# $Id: 05-OPT.t 1717 2018-10-12 13:14:42Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -166,7 +166,7 @@ foreach my $method (qw(class ttl)) {
 
 
 	$edns->option( CHAIN => ( 'TRUST-POINT' => '' ) );
-	is( length( $edns->option(13) ), 0, "option CHAIN => ''" );
+	is( length( $edns->option(13) ), 1, "option CHAIN => ''" );
 
 	my $option13 = $edns->option( CHAIN => ( 'TRUST-POINT' => 'com.' ) );
 	is( scalar( $edns->option(13) ), $option13, "option CHAIN => ('TRUST-POINT' => 'com.')" );

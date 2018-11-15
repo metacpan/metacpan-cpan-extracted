@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Bio::Kmer
+Bio::Kmer - Helper module for Kmer Analysis.
 
 =head1 SYNOPSIS
 
@@ -61,6 +61,7 @@ Create a new instance of the kmer counter.  One object per file.
   sample       1          Retain only a percentage of kmers.
                           1 is 100%; 0 is 0%
                           Only works with the perl kmer counter.
+  verbose      0          Print more messages.
 
   Examples:
   my $kmer=Bio::Kmer->new("file.fastq.gz",{kmercounter=>"jellyfish",numcpus=>4});

@@ -1,6 +1,11 @@
 Revision history for Perl extension Time-Moment-Ext
 
+0.06 2018-11-15T16:30:07Z
+
+	- fix Time::Piece warnings
+
 0.05 2017-11-05T09:13:25Z
+
 	- fix cpan report issue
 
 0.04 2017-10-30T15:44:37Z

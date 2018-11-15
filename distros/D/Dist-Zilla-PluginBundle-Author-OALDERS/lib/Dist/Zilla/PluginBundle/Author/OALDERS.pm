@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::OALDERS;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use feature qw( say );
 
@@ -78,12 +78,26 @@ sub configure {
         'License',
         'InstallGuide',
 
-        'Prereqs',
+        # Stolen from Dist::Zilla::PluginBundle::DROLSKY
+        [
+            'Prereqs' => 'Modules for use with tidyall' => {
+                -phase                                        => 'develop',
+                -type                                         => 'requires',
+                'Code::TidyAll'                               => '0.71',
+                'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
+                'Code::TidyAll::Plugin::Test::Vars'           => '0.04',
+                'Parallel::ForkManager'                       => '1.19',
+                'Perl::Critic'                                => '1.132',
+                'Perl::Tidy'                                  => '20180220',
+                'Test::Vars'                                  => '0.014',
+            }
+        ],
 
         [ 'ExecDir' => { dir => 'script' } ],
 
         [ 'Test::PodSpelling' => { stopwords => $self->_all_stopwords } ],
         'PodCoverageTests',
+        'PodSyntaxTests',
         'Test::CPAN::Changes',
         'TestRelease',
         'Test::ReportPrereqs',
@@ -170,12 +184,12 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000019
+version 0.000020
 
 =head2 configure
 
 No docs for the time being, but you can see the bundled plugin by checking
-c<configure()> in the module source.
+C<configure()> in the module source.
 
 =head1 SEE ALSO
 

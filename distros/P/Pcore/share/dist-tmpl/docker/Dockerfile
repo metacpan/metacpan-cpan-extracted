@@ -6,9 +6,9 @@ USER root
 
 ENV DIST_PATH="$PCORE_LIB/<: $dist_path :>"
 
-ADD . $DIST_PATH/data
+ADD . $DIST_PATH
 
-WORKDIR $DIST_PATH
+WORKDIR $DIST_PATH/data
 
 RUN /bin/bash -c ' \
     \

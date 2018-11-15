@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::Plugin::InjectionHelpers
 
+0.012   13 November 2018
+        - Merged in experimental depenency injection support.
+        - Breaking API change, see docs for backcompat wedge.
+
 0.011   08 November 2018
         - Specify injection via '-inject' configuration key
 

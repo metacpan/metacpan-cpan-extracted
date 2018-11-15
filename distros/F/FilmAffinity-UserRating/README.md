@@ -1,15 +1,84 @@
-FilmAffinity-UserRating
-=======================
+FilmAffinity::UserRating
+========================
 
 [![Build Status](https://travis-ci.org/williambelle/filmaffinity-userrating.svg?branch=master)](https://travis-ci.org/williambelle/filmaffinity-userrating)
 [![Coverage Status](https://coveralls.io/repos/williambelle/filmaffinity-userrating/badge.svg?branch=master&service=github)](https://coveralls.io/github/williambelle/filmaffinity-userrating?branch=master)
+[![CPAN Version](https://img.shields.io/cpan/v/FilmAffinity-UserRating.svg)](https://metacpan.org/release/FilmAffinity-UserRating)
 
 Perl interface to FilmAffinity
 
-Synopsis
---------
+Install
+-------
 
-Get filmaffinity voted movies from a user
+Via CPAN with:
+
+```bash
+cpan install FilmAffinity::UserRating
+```
+
+Usage
+-----
+
+### Command Line
+
+##### `filmaffinity-get-ratings.pl`
+
+```console
+filmaffinity-get-ratings.pl
+Usage:
+    filmaffinity-get-rating.pl --userid=123456
+
+    filmaffinity-get-rating.pl --userid=123456 --delay=2
+
+    filmaffinity-get-rating.pl --userid=123456 --output=/home/william/myvote.list
+
+Options:
+  --delay=3
+    delay between requests
+
+  --output=/home/william/rating.list
+    output file
+```
+
+##### `filmaffinity-get-movie-info.pl`
+
+```console
+filmaffinity-get-movie-info.pl
+Usage:
+    filmaffinity-get-movie-info.pl --id=123456
+
+    filmaffinity-get-movie-info.pl --id=123456 --delay=2
+
+    filmaffinity-get-movie-info.pl --id=932476 --output=/home/william/matrix.json
+
+Options:
+  --delay=3
+    delay between requests
+
+  --output=/home/william/matrix.json
+    output json file
+```
+
+##### `filmaffinity-get-all-info.pl`
+
+```console
+filmaffinity-get-all-info.pl
+Usage:
+    filmaffinity-get-all-info.pl --userid=123456 --destination=path/to/my/folder
+
+    filmaffinity-get-all-info.pl --userid=123456 --destination=path/to/my/folder --delay=2
+
+    filmaffinity-get-all-info.pl --userid=123456 --destination=path/to/my/folder --force
+
+Options:
+  --delay=3
+    delay between requests
+
+  --force
+    force to retrieve all movies
+```
+
+### Module
 
 ```perl
 use FilmAffinity::UserRating;
@@ -29,55 +98,22 @@ $movie->parse();
 my $title = $movie->title;
 ```
 
-Via the command-line program
-
-    filmaffinity-get-rating.pl --userid=123456
-
-    filmaffinity-get-movie-info.pl --id=348488
-
-Installation
+Contributing
 ------------
 
-To install this module, run the following commands:
+Contributions are always welcome.
 
-```bash
-perl Build.PL
-./Build
-./Build test
-./Build install
-```
+See [Contributing](CONTRIBUTING.md).
 
-Support and documentation
--------------------------
+Developer
+---------
 
-After installing, you can find documentation for this module with the
-perldoc command.
+  * [William Belle](https://github.com/williambelle)
 
-```bash
-perldoc FilmAffinity::UserRating
-perldoc FilmAffinity::Utils
-perldoc FilmAffinity::Movie
-```
+License
+-------
 
-You can also look for information at:
-
-* RT, CPAN's request tracker (report bugs here)
-  http://rt.cpan.org/NoAuth/Bugs.html?Dist=FilmAffinity-UserRating
-
-* AnnoCPAN, Annotated CPAN documentation
-  http://annocpan.org/dist/FilmAffinity-UserRating
-
-* CPAN Ratings
-  http://cpanratings.perl.org/d/FilmAffinity-UserRating
-
-* Search CPAN
-  http://search.cpan.org/dist/FilmAffinity-UserRating/
-
-
-License and Copyright
----------------------
-
-Copyright (C) 2013 William Belle
+Copyright (C) 2013-2018 William Belle
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

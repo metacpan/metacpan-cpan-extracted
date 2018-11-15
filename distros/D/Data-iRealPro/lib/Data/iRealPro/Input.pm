@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 16:09:10 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov  1 21:08:41 2018
-# Update Count    : 80
+# Last Modified On: Wed Nov 14 21:35:40 2018
+# Update Count    : 82
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -55,12 +55,9 @@ sub parsefiles {
     my ( $self, @files ) = @_;
 
     my $all;
+    my $plname = $self->{playlist};
     foreach my $file ( @files ) {
 	warn("Parsing: $file...\n") if $self->{verbose};
-	unless ( $self->{playlist} ) {
-	    my @p = File::Basename::fileparse( $file,  qr/\.[^.]*/ );
-	    $self->{playlist} = $p[0];
-	}
 	my $u = $self->parsefile($file);
 	unless ( $all ) {
 	    $all = $u;
@@ -68,9 +65,17 @@ sub parsefiles {
 	else {
 	    $all->{playlist}->add_songs( $u->{playlist}->songs );
 	}
+	unless ( $plname ) {
+	    $plname = $all->{playlist}->{name};
+	    $plname = "" if $plname eq "<NoName>";
+	}
+	unless ( $plname ) {
+	    my @p = File::Basename::fileparse( $file,  qr/\.[^.]*/ );
+	    $plname = $p[0];
+	}
     }
 
-    $all->{playlist}->{name} = $self->{playlist} if $self->{playlist};
+    $all->{playlist}->{name} = $plname if $plname;
     $self->apply_selection($all);
 }
 

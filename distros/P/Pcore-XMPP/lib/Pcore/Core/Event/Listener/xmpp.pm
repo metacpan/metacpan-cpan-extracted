@@ -16,10 +16,8 @@ has host     => ( required => 1 );    # Str
 has port => 5222;                     # PositiveInt
 has to => ( required => 1 );          # Str
 
-has _tmpl  => ( init_arg => undef );  # InstanceOf ['Pcore::Util::Tmpl']
-has _h     => ( init_arg => undef );  # InstanceOf ['Pcore::Handle::xmpp']
-has _queue => ( init_arg => undef );  # ArrayRef
-has _init  => ( init_arg => undef );  # Bool
+has _tmpl => ( init_arg => undef );   # InstanceOf ['Pcore::Util::Tmpl']
+has _init => ( init_arg => undef );   # Bool
 
 const our $INDENT => q[ ] x 4;
 
@@ -36,21 +34,12 @@ sub forward_event ( $self, $ev ) {
 
         $self->{_tmpl}->add_tmpl( message => $self->{tmpl} );
 
-        $self->{_h} = AnyEvent::XMPP::Client->new;
-
-        $self->{_h}->add_account( $self->{username}, $self->{password}, $self->{host}, $self->{port}, undef );
-
-        weaken $self;
-
-        $self->{_h}->reg_cb(
-            session_ready => sub ( $h, $acc ) {
-                $self->_on_connect( $h, $acc ) if defined $self;
-
-                return;
-            }
+        Pcore::XMPP->add_account(
+            username => $self->{username},
+            password => $self->{password},
+            host     => $self->{host},
+            port     => $self->{port},
         );
-
-        $self->{_h}->start;
     }
 
     # sendlog
@@ -77,20 +66,7 @@ sub forward_event ( $self, $ev ) {
 
         my $message = $self->{_tmpl}->render( 'message', $ev );
 
-        if ( !$self->{_h}->get_connected_accounts ) {
-            push $self->{_queue}->@*, $message;
-        }
-        else {
-            $self->{_h}->send_message( $message->$*, $self->{to}, $self->{username}, 'chat' );
-        }
-    }
-
-    return;
-}
-
-sub _on_connect ( $self, $xmpp, $acc ) {
-    while ( my $msg = shift $self->{_queue}->@* ) {
-        $xmpp->send_message( $msg->$*, $self->{to}, $self->{username}, 'chat' );
+        Pcore::XMPP->sendmsg( $self->{username}, $self->{to}, $message->$* );
     }
 
     return;
@@ -103,11 +79,11 @@ sub _on_connect ( $self, $xmpp, $acc ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 62                   | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 51                   | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 59, 62               | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
+## |    2 | 48, 51               | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 73                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 62                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 11                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

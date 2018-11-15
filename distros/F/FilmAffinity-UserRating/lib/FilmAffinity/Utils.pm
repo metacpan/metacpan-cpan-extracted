@@ -12,11 +12,11 @@ FilmAffinity::Utils - Utils for FilmAffinity
 
 =head1 VERSION
 
-Version 0.10
+Version 1.01
 
 =cut
 
-our $VERSION = 0.10;
+our $VERSION = 1.01;
 
 =head1 SYNOPSIS
 

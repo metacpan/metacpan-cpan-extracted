@@ -1,6 +1,18 @@
 Revision history for Alien::geos::af
 
-1.001 2018-11-13
+1.005 2018-11-15
+    - More updates to the dynamic_libs method to find
+      geos and geos_c libs for shared installs on windows
+
+1.004 2018-11-15
+    - Update the dynamic_libs method to find geos and geos_c
+      libs for shared installs on windows
+
+1.003 2018-11-15
+    - Provide our own dynamic_libs method so system
+      installs return the correct libs.
+
+1.002 2018-11-13
     - Add File::Find::Rule to CONFIGURE_REQUIRES.
       This should avoid some CAN testers fails.
 

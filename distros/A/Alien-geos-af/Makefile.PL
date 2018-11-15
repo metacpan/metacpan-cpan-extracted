@@ -7,13 +7,10 @@ my %common_reqs = (
     "Alien::Build" => "1.41",
     "ExtUtils::MakeMaker" => "6.52",
     "Alien::Build::MM" => "1.41",
-    #"Alien::patch" => 0,
     "File::Find::Rule" => 0,
-    #"parent" => 0,
     "PkgConfig" => 0.19026,
     "Alien::Build::Plugin::Cleanse::BuildDir" => 0,
     'Sort::Versions' => 0,
-    #"File::Stat" => 0,
     ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
 );
 
@@ -25,7 +22,6 @@ my %WriteMakefileArgs = (
     "CONFIGURE_REQUIRES" => {
         %common_reqs,
         "PkgConfig"  => 0,
-        #"HTTP::Tiny" => 0.044,  #  something, somewhere needs this version, need to track it down
     },
     "BUILD_REQUIRES" => {
         %common_reqs,

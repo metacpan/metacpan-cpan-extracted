@@ -7,14 +7,13 @@ bin/filmaffinity-get-all-info.pl
 bin/filmaffinity-get-movie-info.pl
 bin/filmaffinity-get-ratings.pl
 Changes
+CONTRIBUTING.md
 ignore.txt
 lib/FilmAffinity/Movie.pm
 lib/FilmAffinity/UserRating.pm
 lib/FilmAffinity/Utils.pm
 MANIFEST			This list of files
-MANIFEST.bak
 MANIFEST.SKIP
-README
 README.md
 t/00-load.t
 t/01-parser-user.t

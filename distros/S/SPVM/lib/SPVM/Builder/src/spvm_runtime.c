@@ -131,10 +131,10 @@ SPVM_ENV* SPVM_RUNTIME_create_env(SPVM_RUNTIME* runtime) {
 SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(SPVM_RUNTIME));
+
+  SPVM_ENV* env = SPVM_RUNTIME_create_env(runtime);
   
   runtime->portable = portable;
-  
-  SPVM_ENV* env = SPVM_RUNTIME_create_env(runtime);
   
   runtime->string_pool = portable->string_pool;
   runtime->string_pool_length = portable->string_pool_length;
@@ -153,17 +153,11 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   runtime->opcodes = (SPVM_OPCODE*)portable->opcodes;
   runtime->subs = (SPVM_RUNTIME_SUB*)portable->subs;
   runtime->subs_length = portable->subs_length;
-
-  // Native sub addresses
-  runtime->sub_native_addresses = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(void*) * (runtime->subs_length + 1));
-  
-  // Precompile sub addresses
-  runtime->sub_precompile_addresses = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(void*) * (runtime->subs_length + 1));
-  
-  // build packages
   runtime->packages_length = portable->packages_length;
-  runtime->packages = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(SPVM_RUNTIME_PACKAGE) * (runtime->packages_length + 1));
-  memcpy(runtime->packages, portable->packages, sizeof(SPVM_RUNTIME_PACKAGE) * runtime->packages_length);
+  runtime->packages = (SPVM_RUNTIME_PACKAGE*)portable->packages;
+
+  // C function addresses(native or precompile)
+  runtime->sub_cfunc_addresses = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(void*) * (runtime->subs_length + 1));
 
   // build package symtable
   runtime->package_symtable = SPVM_HASH_new(0);
@@ -172,79 +166,6 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
     SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
     const char* package_name = &runtime->string_pool[package->name_id];
     SPVM_HASH_insert(runtime->package_symtable, package_name, strlen(package_name), package);
-    
-    package->fields = SPVM_LIST_new(0);
-    package->field_symtable = SPVM_HASH_new(0);
-    package->object_field_indexes = SPVM_LIST_new(0);
-    package->package_vars = SPVM_LIST_new(0);
-    package->package_var_symtable = SPVM_HASH_new(0);
-    package->subs = SPVM_LIST_new(0);
-    package->sub_symtable = SPVM_HASH_new(0);
-  }
-
-  // Register field to package
-  for (int32_t field_id = 1; field_id < runtime->fields_length; field_id++) {
-    SPVM_RUNTIME_FIELD* field = &runtime->fields[field_id];
-    
-    int32_t package_id = field->package_id;
-    
-    SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
-    
-    SPVM_LIST_push(package->fields, field);
-    const char* field_name = &runtime->string_pool[field->name_id];
-    SPVM_HASH_insert(package->field_symtable, field_name, strlen(field_name), field);
-    
-    switch (field->runtime_type) {
-      case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
-      case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
-      case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
-      case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
-      case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
-      {
-        SPVM_LIST_push(package->object_field_indexes, (void*)(intptr_t)field->index);
-        break;
-      }
-    }
-  }
-  
-  // Register package_var to package
-  for (int32_t package_var_id = 1; package_var_id < runtime->package_vars_length; package_var_id++) {
-    SPVM_RUNTIME_PACKAGE_VAR* package_var = &runtime->package_vars[package_var_id];
-    
-    int32_t package_id = package_var->package_id;
-    
-    SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
-    
-    SPVM_LIST_push(package->package_vars, package_var);
-    const char* package_var_name = &runtime->string_pool[package_var->name_id];
-    SPVM_HASH_insert(package->package_var_symtable, package_var_name, strlen(package_var_name), package_var);
-  }
-
-  // Register sub to package
-  for (int32_t sub_id = 1; sub_id < runtime->subs_length; sub_id++) {
-    SPVM_RUNTIME_SUB* sub = &runtime->subs[sub_id];
-    
-    int32_t package_id = sub->package_id;
-    
-    SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
-    
-    SPVM_LIST_push(package->subs, sub);
-    const char* sub_name = &runtime->string_pool[sub->name_id];
-    SPVM_HASH_insert(package->sub_symtable, sub_name, strlen(sub_name), sub);
-
-    // Variable allocation max length
-    int32_t vars_alloc_length = 
-      sub->byte_vars_alloc_length +
-      sub->short_vars_alloc_length +
-      sub->int_vars_alloc_length +
-      sub->long_vars_alloc_length +
-      sub->float_vars_alloc_length +
-      sub->double_vars_alloc_length +
-      sub->object_vars_alloc_length +
-      sub->ref_vars_alloc_length;
-    if (vars_alloc_length > runtime->vars_alloc_length_max) {
-      runtime->vars_alloc_length_max = vars_alloc_length;
-    }
   }
 
   // build runtime basic type symtable
@@ -257,9 +178,9 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   
   // Initialize Package Variables
   runtime->package_vars_heap = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(SPVM_VALUE) * (runtime->package_vars_length + 1));
-
+  
+  // Mortal stack
   runtime->mortal_stack_capacity = 1;
-
   runtime->mortal_stack = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(SPVM_OBJECT*) * runtime->mortal_stack_capacity);
   
   return env;
@@ -275,8 +196,7 @@ void SPVM_RUNTIME_free(SPVM_ENV* env) {
   // Free portable
   SPVM_PORTABLE_free(runtime->portable);
   
-  free(runtime->sub_native_addresses);
-  free(runtime->sub_precompile_addresses);
+  free(runtime->sub_cfunc_addresses);
   
   if (runtime->exception != NULL) {
     free(runtime->exception);
@@ -285,18 +205,6 @@ void SPVM_RUNTIME_free(SPVM_ENV* env) {
   free(runtime->mortal_stack);
   
   SPVM_HASH_free(runtime->basic_type_symtable);
-  
-  for (int32_t package_id = 1; package_id < runtime->packages_length; package_id++) {
-    
-    SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
-    SPVM_LIST_free(package->subs);
-    SPVM_HASH_free(package->sub_symtable);
-    SPVM_LIST_free(package->fields);
-    SPVM_HASH_free(package->field_symtable);
-    SPVM_LIST_free(package->package_vars);
-    SPVM_HASH_free(package->package_var_symtable);
-    SPVM_LIST_free(package->object_field_indexes);
-  }
   SPVM_HASH_free(runtime->package_symtable);
 
   // Free package variables heap

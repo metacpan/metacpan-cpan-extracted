@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::Serializer;
 # ABSTRACT: Role for Serializer engines
-$Dancer2::Core::Role::Serializer::VERSION = '0.206000';
+$Dancer2::Core::Role::Serializer::VERSION = '0.207000';
 use Moo::Role;
 use Dancer2::Core::Types;
 use Scalar::Util 'blessed';
@@ -74,16 +74,6 @@ around deserialize => sub {
     return $data;
 };
 
-# most serializer don't have to overload this one
-sub support_content_type {
-    my ( $self, $ct ) = @_;
-    return unless $ct;
-
-    my @toks = split /;/, $ct;
-    $ct = lc( $toks[0] );
-    return $ct eq $self->content_type;
-}
-
 1;
 
 __END__
@@ -98,7 +88,7 @@ Dancer2::Core::Role::Serializer - Role for Serializer engines
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 DESCRIPTION
 

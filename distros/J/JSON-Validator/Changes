@@ -1,5 +1,15 @@
 Revision history for perl distribution JSON-Validator
 
+2.18 2018-11-15T16:04:18+0900
+ - Add EXPERIMETNAL support for data:// without a package
+
+2.17 2018-11-14T13:04:03+0900
+ - Add basic support for OpenAPI v3
+
+2.16 2018-11-14T10:51:02+0900
+ - Improved openapi "date" format validation #123
+   Contributor: Jason Cooper
+
 2.15 2018-11-07T15:57:14+0900
  - Did not need to bump Mojolicious version in 2.15 #122
    Contributor: Dagfinn Ilmari Mannsåker

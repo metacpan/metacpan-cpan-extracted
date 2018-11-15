@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp;
 use DBD::mysql;
 use Mojo::IOLoop;
+use Mojo::JSON 'to_json';
 use Mojo::mysql::Results;
 use Mojo::mysql::Transaction;
 use Mojo::Promise;
@@ -44,7 +45,6 @@ sub begin {
 
 sub disconnect {
   my $self = shift;
-  $_->finish for @{$self->{async_sth} || []};
   $self->_unwatch;
   $self->dbh->disconnect;
 }
@@ -63,7 +63,7 @@ sub query {
     local $sth->{HandleError} = sub { $_[0] = Carp::shortmess($_[0]); 0 };
     _bind_params($sth, @_);
     my $rv = $sth->execute;
-    my $res = $self->results_class->new(sth => $sth);
+    my $res = $self->results_class->new(db => $self, sth => $sth);
     $res->{affected_rows} = defined $rv && $rv >= 0 ? 0 + $rv : undef;
     return $res;
   }
@@ -71,13 +71,13 @@ sub query {
   # Non-blocking
   push @{$self->{waiting}}, {args => [@_], err => Carp::shortmess('__MSG__'), cb => $cb, query => $query};
   $self->$_ for qw(_next _watch);
+  return $self;
 }
 
 sub query_p {
   my $self    = shift;
   my $promise = Mojo::Promise->new;
-  $self->query(
-  @_ => sub { $_[1] ? $promise->reject($_[1]) : $promise->resolve($_[2]) });
+  $self->query(@_ => sub { $_[1] ? $promise->reject($_[1]) : $promise->resolve($_[2]) });
   return $promise;
 }
 
@@ -85,19 +85,25 @@ sub quote { shift->dbh->quote(shift) }
 
 sub quote_id { shift->dbh->quote_identifier(shift) }
 
+sub tables {
+  shift->query('show tables')->arrays->reduce(sub { push @$a, $b->[0]; $a }, []);
+}
+
 sub _bind_params {
   my $sth = shift;
-  for my $i (0..$#_) {
+  for my $i (0 .. $#_) {
     my $param = $_[$i];
+    my %attrs;
     if (ref $param eq 'HASH') {
-      if (exists $param->{type} && exists $param->{value}) {
-        $sth->bind_param($i + 1, $param->{value}, $param->{type});
-      } else {
-        croak qq{Unknown parameter hashref (no "type"/"value")};
+      if (exists $param->{json}) {
+        $param = to_json $param->{json};
       }
-    } else {
-      $sth->bind_param($i + 1, $param);
+      elsif (exists $param->{type} && exists $param->{value}) {
+        ($param, $attrs{TYPE}) = @$param{qw(value type)};
+      }
     }
+
+    $sth->bind_param($i + 1, $param, \%attrs);
   }
   return $sth;
 }
@@ -118,21 +124,17 @@ sub _next {
 
 sub _unwatch {
   my $self = shift;
-  return unless delete $self->{watching};
-  Mojo::IOLoop->singleton->reactor->remove($self->{handle});
+  Mojo::IOLoop->singleton->reactor->remove(delete $self->{handle}) if $self->{handle};
+  $_->finish for grep { !$_->{private_mojo_results} } @{$self->{async_sth}};
   $self->{async_sth} = [];
 }
 
 sub _watch {
   my $self = shift;
-
-  return if $self->{watching} || $self->{watching}++;
+  return if $self->{handle};
 
   my $dbh = $self->dbh;
-  $self->{handle} ||= do {
-    open my $FH, '<&', $dbh->mysql_fd or die "Dup mysql_fd: $!";
-    $FH;
-  };
+  open $self->{handle}, '<&', $dbh->mysql_fd or die "Dup mysql_fd: $!" unless $self->{handle};
   Mojo::IOLoop->singleton->reactor->io(
     $self->{handle} => sub {
       my $reactor = shift;
@@ -143,7 +145,7 @@ sub _watch {
 
       # Do not raise exceptions inside the event loop
       my $rv = do { local $sth->{RaiseError} = 0; $sth->mysql_async_result; };
-      my $res = $self->results_class->new(sth => $sth);
+      my $res = $self->results_class->new(db => $self, sth => $sth);
 
       $err = undef if defined $rv;
       $err =~ s!\b__MSG__\b!{$dbh->errstr}!e if defined $err;
@@ -308,6 +310,8 @@ Check database connection.
 
   my $results = $db->query('select * from foo');
   my $results = $db->query('insert into foo values (?, ?, ?)', @values);
+  my $results = $db->query('insert into foo values (?)', {json => {bar => 'baz'}});
+  my $results = $db->query('insert into foo values (?)', {type => SQL_INTEGER, value => 42});
 
 Execute a blocking statement and return a L<Mojo::mysql::Results> object with the
 results. You can also append a callback to perform operation non-blocking.
@@ -317,6 +321,14 @@ results. You can also append a callback to perform operation non-blocking.
     ...
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+Hash reference arguments containing a value named C<json>, will be encoded to
+JSON text with L<Mojo::JSON/"to_json">. To accomplish the reverse, you can use
+the method L<Mojo::mysql::Results/"expand">, which automatically decodes data back
+to Perl data structures.
+
+  $db->query('insert into foo values (x) values (?)', {json => {bar => 'baz'}});
+  $db->query('select * from foo')->expand->hash->{x}{bar}; # baz
 
 Hash reference arguments containing values named C<type> and C<value> can be
 used to bind specific L<DBI> data types (see L<DBI/"DBI Constants">) to
@@ -411,6 +423,12 @@ L<Mojo::Promise> object instead of accepting a callback.
     my $err = shift;
     ...
   })->wait;
+
+=head2 tables
+
+  my $tables = $db->tables;
+
+Return an array reference with table names for this database.
 
 =head1 SEE ALSO
 

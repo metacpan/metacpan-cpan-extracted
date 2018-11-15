@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojo-UserAgent-Role-Queued
 
+1.15 2018-11-15T16:40:28Z
+    - correct required Mojolicious version to v7.56 (for -role)
+
 1.14 2018-10-07T15:44:25Z
 
     - rename queue attribute to job_queue (prevent clash with Mojo::UA->{queue})

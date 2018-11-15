@@ -1,9 +1,9 @@
 package Net::DNS::RR::IPSECKEY;
 
 #
-# $Id: IPSECKEY.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: IPSECKEY.pm 1718 2018-10-22 14:39:29Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1718 $)[1];
 
 
 use strict;
@@ -149,7 +149,7 @@ sub gateway {
 			$self->{gateway}  = new Net::DNS::DomainName($_);
 			last;
 		};
-		croak "unrecognised gateway type";
+		croak 'unrecognised gateway type';
 	}
 
 	if ( defined wantarray ) {

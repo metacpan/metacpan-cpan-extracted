@@ -39,6 +39,7 @@
             "Mojolicious" : "8.04",
             "Mojolicious::Plugin::Authentication" : "1.32",
             "Mojolicious::Plugin::OpenAPI" : "2.00",
+            "Mojolicious::Plugin::PODViewer" : "0.02",
             "Mojolicious::Plugin::RoutesConfig" : "0.05",
             "Role::Tiny" : "2.000006",
             "perl" : "5.020000"
@@ -63,6 +64,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2018.11.11",
+   "version" : "v2018.11.15",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

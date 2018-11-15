@@ -33,6 +33,8 @@ Lhotsky
 LoggingConfig
 MaxConnsPerServer
 MaxConnsTotal
+MaxPendingRequests
+MaxRecoveryBatches
 POE
 StatsHandler
 StatsInterval

@@ -1,3 +1,8 @@
+0.55 Tue Nov 13 21:56:10 PST 2018
+ - Remove TestML from CPAN
+ - Now installed from https://github.com/testml-lang/testml/
+ - See https://github.com/testml-lang/testml/wiki/TestML-and-CPAN
+
 0.54 Wed Jan 11 17:53:47 CET 2017
  - Fix bug in lite compiler. \ being removed too early.
 

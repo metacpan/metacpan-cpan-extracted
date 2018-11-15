@@ -66,7 +66,7 @@ package CBOR::XS;
 
 use common::sense;
 
-our $VERSION = 1.7;
+our $VERSION = 1.71;
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_cbor decode_cbor);

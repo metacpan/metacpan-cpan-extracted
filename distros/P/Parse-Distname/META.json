@@ -1,0 +1,58 @@
+{
+   "abstract" : "parse a distribution name",
+   "author" : [
+      "Kenichi Ishigaki <ishigaki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Parse-Distname",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::PP" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0.88",
+            "Test::UseAllModules" : "0.17"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/charsbar/Parse-Distname/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/charsbar/Parse-Distname"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

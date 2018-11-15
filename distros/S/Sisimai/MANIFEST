@@ -713,6 +713,7 @@ set-of-emails/maildir/mac/rhost-franceptt-01.eml
 set-of-emails/maildir/mac/rhost-google-apps-01.eml
 set-of-emails/maildir/mac/rhost-kddi-01.eml
 set-of-emails/maildir/not/is-not-bounce-01.eml
+set-of-emails/maildir/not/is-not-bounce-02.eml
 set-of-emails/to-be-debugged-because/something-is-wrong/issue-106-01.eml
 set-of-emails/to-be-debugged-because/something-is-wrong/issue-106-02.eml
 set-of-emails/to-be-debugged-because/something-is-wrong/issue-106-03.eml

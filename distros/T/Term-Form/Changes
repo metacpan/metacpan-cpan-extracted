@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.502   2018-11-14
+        - Bugfix parameter validation.
+
 0.501   2018-08-21
         - Use "Term::Choose::Linux" and "Term::Choose::Win32". [GH #1 mlawren ]
         - "Term::Choose" minimum version is "1.626".

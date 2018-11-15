@@ -10,7 +10,7 @@ use warnings;
 use 5.010;  # //
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 our $DEFAULT_UA = "Perl + " . __PACKAGE__ . "/$VERSION";
 our $DEFAULT_MAXREDIR = 3;
@@ -33,22 +33,10 @@ use Future::Utils 0.16 qw( repeat );
 
 use Scalar::Util qw( blessed reftype );
 use List::Util 1.29 qw( first pairs );
-use Socket qw( SOCK_STREAM IPPROTO_IP IP_TOS );
-BEGIN {
-   if( eval { Socket->VERSION( '2.010' ); 1 } ) {
-      Socket->import(qw( IPTOS_LOWDELAY IPTOS_THROUGHPUT IPTOS_RELIABILITY IPTOS_MINCOST ));
-   }
-   else {
-      # These are portable constants, set in RFC 1349
-      require constant;
-      constant->import({
-         IPTOS_LOWDELAY    => 0x10,
-         IPTOS_THROUGHPUT  => 0x08,
-         IPTOS_RELIABILITY => 0x04,
-         IPTOS_MINCOST     => 0x02,
-      });
-   }
-}
+use Socket 2.010 qw(
+   SOCK_STREAM IPPROTO_IP IP_TOS
+   IPTOS_LOWDELAY IPTOS_THROUGHPUT IPTOS_RELIABILITY IPTOS_MINCOST
+);
 
 use constant HTTP_PORT  => 80;
 use constant HTTPS_PORT => 443;
@@ -449,6 +437,7 @@ sub get_connection
       ready_queue   => $ready_queue,
       ( map { $_ => $self->{$_} }
          qw( max_in_flight pipeline read_len write_len decode_content ) ),
+      is_proxy => $args{is_proxy},
 
       on_closed => sub {
          my $conn = shift;
@@ -703,12 +692,13 @@ sub _do_one_request
    my $host    = delete $args{host};
    my $port    = delete $args{port};
    my $request = delete $args{request};
+   my $SSL     = delete $args{SSL};
 
    my $stall_timeout = $args{stall_timeout} // $self->{stall_timeout};
 
    $self->prepare_request( $request );
 
-   if( $self->{require_SSL} and not $args{SSL} ) {
+   if( $self->{require_SSL} and not $SSL ) {
       return Future->fail( "Non-SSL request is not allowed with 'require_SSL' set",
          http => undef, $request );
    }
@@ -716,10 +706,14 @@ sub _do_one_request
    return $self->get_connection(
       host => $args{proxy_host} || $self->{proxy_host} || $host,
       port => $args{proxy_port} || $self->{proxy_port} || $port,
+      is_proxy => !!( $args{proxy_host} || $self->{proxy_host} ),
       ( defined $args{family} ? ( family => $args{family} ) : () ),
-      SSL  => $args{SSL},
-      %{ $self->{ssl_params} },
-      ( map { m/^SSL_/ ? ( $_ => $args{$_} ) : () } keys %args ),
+      $SSL ? (
+         SSL  => 1,
+         SSL_hostname => $host,
+         %{ $self->{ssl_params} },
+         ( map { m/^SSL_/ ? ( $_ => $args{$_} ) : () } keys %args ),
+      ) : (),
    )->then( sub {
       my ( $conn ) = @_;
       $args{on_ready} ? $args{on_ready}->( $conn )->then_done( $conn )
@@ -731,6 +725,7 @@ sub _do_one_request
          request => $request,
          stall_timeout => $stall_timeout,
          %args,
+         $SSL ? ( SSL => 1 ) : (),
       );
    } );
 }

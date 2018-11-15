@@ -91,6 +91,7 @@ BEGIN {
   );
 
   MyApp->config(
+    'Plugin::InjectionHelpers' => { version => 1 },
     'Model::SingletonA' => { aaa=>100 },
     'Model::SingletonB' => { arg=>300 },
     'Model::Factory' => {

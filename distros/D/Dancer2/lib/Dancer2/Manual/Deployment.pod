@@ -13,7 +13,7 @@ Dancer2::Manual::Deployment - common ways to put your Dancer app into use
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 DESCRIPTION
 
@@ -401,9 +401,13 @@ A basic script to start an application: (in C</service/application/run>)
 
 Another option would be to run your app stand-alone as described above, but then
 use a proxy or load balancer to accept incoming requests (on the standard port
-80, say) and feed them to your Dancer app.
+80, say) and feed them to your Dancer app. Also, in this case you might want
+to look at the C<behind_proxy> configuration option, to make sure that all the
+URLs are constructed properly.
 
-This could be achieved using various software; examples would include:
+    behind_proxy: 1
+
+This setup can be achieved using various software; examples would include:
 
 =head3 Using Apache's mod_proxy
 
@@ -548,7 +552,7 @@ all environments variables in the "run" file.
 =head3 Using HAProxy
 
 C<HAProxy> is a reliable high-performance TCP/HTTP load balancer written in C available from
-L<http://haproxy.1wt.eu/>.
+L<https://www.haproxy.org/>.
 
 Suppose we want to run an application at C<app.example.com:80> and would to use two
 backends listen on hosts C<app-be1.example.com:3000> and C<app-be2.example.com:3000>.

@@ -1,6 +1,6 @@
 package Dancer2::Serializer::JSON;
 # ABSTRACT: Serializer for handling JSON data
-$Dancer2::Serializer::JSON::VERSION = '0.206000';
+$Dancer2::Serializer::JSON::VERSION = '0.207000';
 use Moo;
 use JSON::MaybeXS ();
 use Scalar::Util 'blessed';
@@ -61,7 +61,7 @@ Dancer2::Serializer::JSON - Serializer for handling JSON data
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 DESCRIPTION
 
@@ -95,6 +95,49 @@ This is an helper available to transform a JSON data structure to a Perl data st
 This is an helper available to transform a Perl data structure to JSON.
 
 Calling this function will B<not> trigger the serialization's hooks.
+
+=head2 Configuring the JSON Serializer using C<set engines>
+
+The JSON serializer options can be configured via C<set engines>. The most
+common settings are:
+
+=over 4
+
+=item allow_nonref
+
+Ignore non-ref scalars returned from handlers. With this set the "Hello, World!"
+handler returning a string will be dealt with properly.
+
+=back
+
+Set engines should be called prior to setting JSON as the serializer:
+
+ set engines =>
+ {
+     serializer =>
+     {
+         JSON =>
+         {
+            allow_nonref => 1
+         },
+     }
+ };
+
+ set serializer      => 'JSON';
+ set content_type    => 'application/json';
+
+=head2 Returning non-JSON data.
+
+Handlers can return non-JSON via C<send_as>, which overrides the default serializer:
+
+ get '/' =>
+ sub
+ {
+     send_as html =>
+     q{Welcome to the root of all evil...<br>step into my office.}
+ };
+
+Any other non-JSON returned format supported by 'send_as' can be used.
 
 =head1 AUTHOR
 

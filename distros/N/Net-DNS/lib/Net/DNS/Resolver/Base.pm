@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1709 2018-09-07 08:03:09Z willem $
+# $Id: Base.pm 1719 2018-11-04 05:01:43Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1709 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1719 $)[1];
 
 
 #
@@ -26,7 +26,7 @@ our $VERSION = (qw$LastChangedRevision: 1709 $)[1];
 # [Revised March 2016, June 2018]
 
 
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1;';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1';
 
 use constant IPv6 => USE_SOCKET_IP;
 
@@ -165,9 +165,9 @@ sub _untaint {
 sub _read_env {				## read resolver config environment variables
 	my $self = shift;
 
-	$self->nameservers( map split, $ENV{RES_NAMESERVERS} ) if defined $ENV{RES_NAMESERVERS};
+	$self->searchlist( map split, $ENV{LOCALDOMAIN} ) if defined $ENV{LOCALDOMAIN};
 
-	$self->domain( $ENV{LOCALDOMAIN} ) if defined $ENV{LOCALDOMAIN};
+	$self->nameservers( map split, $ENV{RES_NAMESERVERS} ) if defined $ENV{RES_NAMESERVERS};
 
 	$self->searchlist( map split, $ENV{RES_SEARCHLIST} ) if defined $ENV{RES_SEARCHLIST};
 
@@ -181,14 +181,14 @@ sub _read_config_file {			## read resolver config file
 	my $self = shift;
 	my $file = shift;
 
-	local *FILE;
-	open( FILE, $file ) or croak "$file: $!";
+	my $filehandle;
+	open( $filehandle, '<', $file ) or croak "$file: $!";
 
 	my @nameserver;
 	my @searchlist;
 
 	local $_;
-	while (<FILE>) {
+	while (<$filehandle>) {
 		s/[;#].*$//;					# strip comments
 
 		/^nameserver/ && do {
@@ -217,7 +217,7 @@ sub _read_config_file {			## read resolver config file
 		};
 	}
 
-	close(FILE);
+	close($filehandle);
 
 	$self->nameservers(@nameserver) if @nameserver;
 	$self->searchlist(@searchlist)	if @searchlist;
@@ -363,11 +363,7 @@ sub query {
 	my $self = shift;
 	my $name = shift || '.';
 
-	my @sfix;
-
-	if ( $self->{defnames} && ( ( $name =~ tr/././ ) < $self->{ndots} ) ) {
-		@sfix = $self->domain unless $name =~ m/:|\.\d*$/;
-	}
+	my @sfix = $self->{defnames} && ( $name !~ m/[.:]/ ) ? $self->domain : ();
 
 	my $fqdn = join '.', $name, @sfix;
 	$self->_diag( 'query(', $fqdn, @_, ')' );
@@ -382,11 +378,12 @@ sub search {
 	return $self->query(@_) unless $self->{dnsrch};
 
 	my $name = shift || '.';
+	my $dots = $name =~ tr/././;
 
-	my @sfix = ( $name =~ m/:|\.\d*$/ ) ? () : @{$self->{searchlist}};
-	my ( $domain, @etc ) = ( $name =~ tr/././ ) < $self->{ndots} ? (@sfix) : ( undef, @sfix );
+	my @sfix = ( $dots < $self->{ndots} ) ? @{$self->{searchlist}} : ();
+	my ( $one, @more ) = ( $name =~ m/:|\.\d*$/ ) ? () : ( $dots ? ( undef, @sfix ) : @sfix );
 
-	foreach my $suffix ( $domain, @etc ) {
+	foreach my $suffix ( $one, @more ) {
 		my $fqname = $suffix ? join( '.', $name, $suffix ) : $name;
 		$self->_diag( 'search(', $fqname, @_, ')' );
 		my $packet = $self->send( $fqname, @_ ) || next;
@@ -401,6 +398,8 @@ sub send {
 	my $self	= shift;
 	my $packet	= $self->_make_query_packet(@_);
 	my $packet_data = $packet->data;
+
+	$self->_reset_errorstring;
 
 	return $self->_send_tcp( $packet, $packet_data )
 			if $self->{usevc} || length $packet_data > $self->_packetsz;
@@ -417,8 +416,6 @@ sub send {
 
 sub _send_tcp {
 	my ( $self, $query, $query_data ) = @_;
-
-	$self->_reset_errorstring;
 
 	my $tcp_packet = pack 'n a*', length($query_data), $query_data;
 	my @ns = $self->nameservers();
@@ -464,8 +461,6 @@ sub _send_tcp {
 
 sub _send_udp {
 	my ( $self, $query, $query_data ) = @_;
-
-	$self->_reset_errorstring;
 
 	my @ns	    = $self->nameservers;
 	my $port    = $self->{port};
@@ -548,6 +543,8 @@ sub bgsend {
 	my $packet	= $self->_make_query_packet(@_);
 	my $packet_data = $packet->data;
 
+	$self->_reset_errorstring;
+
 	return $self->_bgsend_tcp( $packet, $packet_data )
 			if $self->{usevc} || length $packet_data > $self->_packetsz;
 
@@ -557,8 +554,6 @@ sub bgsend {
 
 sub _bgsend_tcp {
 	my ( $self, $packet, $packet_data ) = @_;
-
-	$self->_reset_errorstring;
 
 	my $tcp_packet = pack 'n a*', length($packet_data), $packet_data;
 
@@ -582,8 +577,6 @@ sub _bgsend_tcp {
 
 sub _bgsend_udp {
 	my ( $self, $packet, $packet_data ) = @_;
-
-	$self->_reset_errorstring;
 
 	my $port = $self->{port};
 
@@ -685,9 +678,8 @@ sub _accept_reply {
 	my $header = $reply->header;
 	return unless $header->qr;
 
-	return 1 unless $query;					# SpamAssassin 3.4.1 workaround
+	return if $query && $header->id != $query->header->id;
 
-	return unless $header->id == $query->header->id;
 	$self->errorstring( $header->rcode );			# historical quirk
 }
 
@@ -1123,7 +1115,7 @@ sub AUTOLOAD {				## Default method
 
 	my $name = $AUTOLOAD;
 	$name =~ s/.*://;
-	croak "$name: no such method" unless $public_attr{$name};
+	croak qq[unknown method "$name"] unless $public_attr{$name};
 
 	no strict q/refs/;
 	*{$AUTOLOAD} = sub {

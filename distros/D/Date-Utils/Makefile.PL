@@ -20,7 +20,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Moo::Role'               => '2.000000',
-        'namespace::clean'        => '0.24',
+        'namespace::autoclean'    => '0.28',
         'Term::ANSIColor::Markup' => '0.06',
         'Date::Exception'         => '0.03',
     },
@@ -29,7 +29,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Utils' => { file => 'lib/Date/Utils.pm', version => '0.23' },
+            'Date::Utils' => { file => 'lib/Date/Utils.pm', version => '0.24' },
         },
         resources => {
             repository => {

@@ -1119,8 +1119,8 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_package_csource(SPVM_ENV* env, SPVM_S
   SPVM_STRING_BUFFER_add(string_buffer, "// Function Declarations\n");
   {
     int32_t sub_index;
-    for (sub_index = 0; sub_index < package->subs->length; sub_index++) {
-      SPVM_RUNTIME_SUB* sub = SPVM_LIST_fetch(package->subs, sub_index);
+    for (sub_index = 0; sub_index < package->subs_length; sub_index++) {
+      SPVM_RUNTIME_SUB* sub = &runtime->subs[package->subs_base + sub_index];
       const char* sub_name = &runtime->string_pool[sub->name_id];
       const char* sub_signature = &runtime->string_pool[sub->signature_id];
       if (sub->flag & SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC) {
@@ -1138,8 +1138,8 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_package_csource(SPVM_ENV* env, SPVM_S
   SPVM_STRING_BUFFER_add(string_buffer, "// Function Implementations\n");
   {
     int32_t sub_index;
-    for (sub_index = 0; sub_index < package->subs->length; sub_index++) {
-      SPVM_RUNTIME_SUB* sub = SPVM_LIST_fetch(package->subs, sub_index);
+    for (sub_index = 0; sub_index < package->subs_length; sub_index++) {
+      SPVM_RUNTIME_SUB* sub = &runtime->subs[package->subs_base + sub_index];
       if (sub->flag & SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC) {
         const char* sub_name = &runtime->string_pool[sub->name_id];
         SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(env, string_buffer, package_name, sub_name);
@@ -1209,7 +1209,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_declaration(SPVM_ENV* env, SPVM_S
   SPVM_RUNTIME* runtime = env->runtime;
   
   SPVM_RUNTIME_PACKAGE* package = SPVM_HASH_fetch(runtime->package_symtable, package_name, strlen(package_name));
-  SPVM_RUNTIME_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
+  SPVM_RUNTIME_SUB* sub = SPVM_RUNTIME_API_get_sub(env, package, sub_name);
 
   assert(sub->flag & SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC);
   
@@ -1241,7 +1241,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
   SPVM_RUNTIME* runtime = env->runtime;
   
   SPVM_RUNTIME_PACKAGE* package = SPVM_HASH_fetch(runtime->package_symtable, package_name, strlen(package_name));
-  SPVM_RUNTIME_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
+  SPVM_RUNTIME_SUB* sub = SPVM_RUNTIME_API_get_sub(env, package, sub_name);
 
   assert(sub->flag & SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC);
   
@@ -3672,7 +3672,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_IF_CROAK_CATCH: {
-        SPVM_RUNTIME_SUB* sub = SPVM_LIST_fetch(package->subs, opcode->operand1);
+        SPVM_RUNTIME_SUB* sub = &runtime->subs[package->subs_base + opcode->operand1];
         int32_t sub_id = sub->id;
         int32_t rel_line = opcode->operand2;
         int32_t line = sub->line + rel_line;
@@ -3705,7 +3705,7 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
         break;
       }
       case SPVM_OPCODE_C_ID_IF_CROAK_RETURN: {
-        SPVM_RUNTIME_SUB* sub = SPVM_LIST_fetch(package->subs, opcode->operand1);
+        SPVM_RUNTIME_SUB* sub = &runtime->subs[package->subs_base + opcode->operand1];
         int32_t sub_id = sub->id;
         int32_t rel_line = opcode->operand2;
         int32_t line = sub->line + rel_line;

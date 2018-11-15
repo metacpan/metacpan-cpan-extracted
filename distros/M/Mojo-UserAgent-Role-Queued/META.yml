@@ -26,19 +26,19 @@ no_index:
 provides:
   Mojo::UserAgent::Role::Queued:
     file: lib/Mojo/UserAgent/Role/Queued.pm
-    version: '1.14'
+    version: '1.15'
   Mojo::UserAgent::Role::Queued::Queue:
     file: lib/Mojo/UserAgent/Role/Queued/Queue.pm
 requires:
   Class::Method::Modifiers: '2.12'
-  Mojolicious: '7.52'
+  Mojolicious: '7.56'
   Role::Tiny: '2.000001'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/dotandimet/Mojo-UserAgent-Role-Queued/issues
   homepage: https://github.com/dotandimet/Mojo-UserAgent-Role-Queued
   repository: git://github.com/dotandimet/Mojo-UserAgent-Role-Queued.git
-version: '1.14'
+version: '1.15'
 x_contributors:
   - 'Dan Book <grinnz@gmail.com>'
   - 'Vidar Tyldum <vidar@ksat.no>'

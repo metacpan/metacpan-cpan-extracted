@@ -57,6 +57,7 @@ my $handle;
          socktype => "stream",
          host     => "remote-site-here",
          service  => 80,
+         is_proxy => '',
 
          SOCKS_host => "socks.host",
          SOCKS_port => 1234,

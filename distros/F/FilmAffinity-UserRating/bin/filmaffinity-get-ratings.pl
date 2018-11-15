@@ -21,15 +21,15 @@ Get ratings from filmaffinity for a user and print them in Tab-separated values
 
 =head1 VERSION
 
-Version 0.10
+Version 1.01
 
 =head1 USAGE
 
-  ./filmaffinity-get-rating.pl --userid=123456
+  filmaffinity-get-rating.pl --userid=123456
 
-  ./filmaffinity-get-rating.pl --userid=123456 --delay=2
+  filmaffinity-get-rating.pl --userid=123456 --delay=2
 
-  ./filmaffinity-get-rating.pl --userid=123456 --output=/home/william/myvote.list
+  filmaffinity-get-rating.pl --userid=123456 --output=/home/william/myvote.list
 
 =head1 REQUIRED ARGUMENTS
 
@@ -57,7 +57,7 @@ output file
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '1.01';
 
 Readonly my $DELAY => 5;
 

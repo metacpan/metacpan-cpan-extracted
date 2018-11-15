@@ -88,3 +88,6 @@ Revision history for Perl module Term::Highlight and script hl.
                 from the trailing arguments automatically when option '-' is not
                 specified, fixed handling of option '0'.
 
+2018/11/13 - Version 2.0.4 - license update, explicitly licensed by the Perl 5
+                license.
+

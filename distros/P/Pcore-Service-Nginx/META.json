@@ -1,0 +1,52 @@
+{
+   "abstract" : "Pcore nginx application",
+   "author" : [
+      "zdm <zdm@softvisio.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "CPAN::Meta version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "version" : 2
+   },
+   "name" : "Pcore-Service-Nginx",
+   "no_index" : {
+      "directory" : [
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "v0.39.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "v1.51.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pcore" : "v0.77.3"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/softvisio/pcore-service-nginx/issues?status=new&status=open"
+      },
+      "homepage" : "https://bitbucket.org/softvisio/pcore-service-nginx/overview",
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://bitbucket.org/softvisio/pcore-service-nginx",
+         "web" : "https://bitbucket.org/softvisio/pcore-service-nginx/overview"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

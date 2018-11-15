@@ -1,9 +1,9 @@
 package Net::DNS::RR;
 
 #
-# $Id: RR.pm 1714 2018-09-21 14:14:55Z willem $
+# $Id: RR.pm 1718 2018-10-22 14:39:29Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1714 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1718 $)[1];
 
 
 =head1 NAME
@@ -752,7 +752,7 @@ sub AUTOLOAD {				## Default method
 	no strict q/refs/;
 	my ($method) = reverse split /::/, $AUTOLOAD;
 	*{$AUTOLOAD} = sub {undef};	## suppress repetition and deep recursion
-	croak "$self has no class method '$method'" unless $oref;
+	croak qq[$self has no class method "$method"] unless $oref;
 
 	my $string = $self->string;
 	my @object = grep defined($_), $oref, $oref->VERSION;
@@ -760,7 +760,7 @@ sub AUTOLOAD {				## Default method
 	eval("require $module") if $oref eq __PACKAGE__;
 
 	@_ = ( <<"END", $@, "@object" );
-***  FATAL PROGRAM ERROR!!	Unknown instance method '$method'
+***  FATAL PROGRAM ERROR!!	Unknown instance method "$method"
 ***  which the program has attempted to call for the object:
 ***
 $string

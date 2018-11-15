@@ -32,14 +32,22 @@
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
+            "Code::TidyAll" : "0.71",
+            "Code::TidyAll::Plugin::SortLines::Naturally" : "0.000003",
+            "Code::TidyAll::Plugin::Test::Vars" : "0.04",
+            "Parallel::ForkManager" : "1.19",
+            "Perl::Critic" : "1.132",
+            "Perl::Tidy" : "20180220",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::Code::TidyAll" : "0.50",
             "Test::More" : "0.96",
+            "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::Synopsis" : "0",
+            "Test::Vars" : "0.014",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -135,7 +143,7 @@
          "web" : "https://github.com/oalders/dist-zilla-pluginbundle-author-oalders"
       }
    },
-   "version" : "0.000019",
+   "version" : "0.000020",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -188,7 +196,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::TidyAll",
             "name" : "@Author::OALDERS/MAXMIND::TidyAll",
-            "version" : "0.13"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
@@ -258,17 +266,17 @@
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "name" : "@Author::OALDERS/InstallGuide",
-            "version" : "1.200009"
+            "version" : "1.200012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
                "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "runtime",
+                  "phase" : "develop",
                   "type" : "requires"
                }
             },
-            "name" : "@Author::OALDERS/Prereqs",
+            "name" : "@Author::OALDERS/Modules for use with tidyall",
             "version" : "6.012"
          },
          {
@@ -300,6 +308,11 @@
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Author::OALDERS/PodCoverageTests",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@Author::OALDERS/PodSyntaxTests",
             "version" : "6.012"
          },
          {
@@ -455,7 +468,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
             "name" : "@Author::OALDERS/GithubMeta",
-            "version" : "0.54"
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -481,7 +494,7 @@
                }
             },
             "name" : "@Author::OALDERS/Git::GatherDir",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromRelease",
@@ -517,18 +530,18 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.3",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::OALDERS/Git::Check",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.16.3",
+                  "git_version" : "2.19.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -536,7 +549,7 @@
                }
             },
             "name" : "@Author::OALDERS/Git::Contributors",
-            "version" : "0.034"
+            "version" : "0.035"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -636,7 +649,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.3",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -644,7 +657,7 @@
                }
             },
             "name" : "@Author::OALDERS/@Git::VersionManager/release snapshot",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -653,12 +666,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000019",
+                  "tag" : "v0.000020",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.3",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -666,7 +679,7 @@
                }
             },
             "name" : "@Author::OALDERS/@Git::VersionManager/Git::Tag",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional",
@@ -708,7 +721,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.3",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -716,7 +729,7 @@
                }
             },
             "name" : "@Author::OALDERS/@Git::VersionManager/post-release commit",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -728,12 +741,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.3",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::OALDERS/Git::Push",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -833,6 +846,6 @@
       "Olaf Alders <olaf@wundersolutions.com>"
    ],
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

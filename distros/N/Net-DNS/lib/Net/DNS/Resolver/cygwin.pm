@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::cygwin;
 
 #
-# $Id: cygwin.pm 1568 2017-05-27 06:40:20Z willem $
+# $Id: cygwin.pm 1719 2018-11-04 05:01:43Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1568 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1719 $)[1];
 
 
 =head1 NAME
@@ -21,11 +21,11 @@ use base qw(Net::DNS::Resolver::Base);
 sub _getregkey {
 	my $key = join '/', @_;
 
-	local *LM;
-	open( LM, "<$key" ) or return '';
-	my $value = <LM>;
+	my $filehandle;
+	open( $filehandle, '<', $key ) or return '';
+	my $value = <$filehandle>;
 	$value =~ s/\0+$// if $value;
-	close(LM);
+	close($filehandle);
 
 	return $value || '';
 }
@@ -34,7 +34,7 @@ sub _getregkey {
 sub _init {
 	my $defaults = shift->_defaults;
 
-	local *LM;
+	my $dirhandle;
 
 	my $root = '/proc/registry/HKEY_LOCAL_MACHINE/SYSTEM/CurrentControlSet/Services/Tcpip/Parameters';
 
@@ -75,9 +75,9 @@ sub _init {
 	my @nameservers;
 
 	my $dnsadapters = join '/', $root, 'DNSRegisteredAdapters';
-	if ( opendir( LM, $dnsadapters ) ) {
-		my @adapters = grep !/^\.\.?$/, readdir(LM);
-		closedir(LM);
+	if ( opendir( $dirhandle, $dnsadapters ) ) {
+		my @adapters = grep !/^\.\.?$/, readdir($dirhandle);
+		closedir($dirhandle);
 		foreach my $adapter (@adapters) {
 			my $ns = _getregkey( $dnsadapters, $adapter, 'DNSServerAddresses' );
 			until ( length($ns) < 4 ) {
@@ -88,9 +88,9 @@ sub _init {
 	}
 
 	my $interfaces = join '/', $root, 'Interfaces';
-	if ( opendir( LM, $interfaces ) ) {
-		my @ifacelist = grep !/^\.\.?$/, readdir(LM);
-		closedir(LM);
+	if ( opendir( $dirhandle, $interfaces ) ) {
+		my @ifacelist = grep !/^\.\.?$/, readdir($dirhandle);
+		closedir($dirhandle);
 		foreach my $iface (@ifacelist) {
 			my $ip = _getregkey( $interfaces, $iface, 'DhcpIPAddress' )
 					|| _getregkey( $interfaces, $iface, 'IPAddress' );

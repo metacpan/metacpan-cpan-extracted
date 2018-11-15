@@ -285,11 +285,6 @@ sub BUILD1 ($self) {
 sub set_scandeps ( $self, $path ) {
     $self->{SCANDEPS} = $path;
 
-    return if !$path;
-
-    # eval common modules
-    require Cpanel::JSON::XS;    ## no critic qw[Modules::ProhibitEvilModules]
-
     return;
 }
 
@@ -333,12 +328,14 @@ sub dist ( $self, $dist_name = undef ) {
     }
 }
 
-sub DESTROY ( $self ) {
-    if ( $self->{SCANDEPS} ) {
+END {
+    if ( $ENV->{SCANDEPS} ) {
+        require Cpanel::JSON::XS;    ## no critic qw[Modules::ProhibitEvilModules]
+
         my ( $fh, $index );
 
-        if ( -f $self->{SCANDEPS} ) {
-            open $fh, '+<:raw', $self->{SCANDEPS} or die;    ## no critic qw[InputOutput::RequireBriefOpen]
+        if ( -f $ENV->{SCANDEPS} ) {
+            open $fh, '+<:raw', $ENV->{SCANDEPS} or die $!;    ## no critic qw[InputOutput::RequireBriefOpen]
 
             flock $fh, LOCK_EX or die;
 
@@ -349,7 +346,7 @@ sub DESTROY ( $self ) {
             $index->@{ $deps->@* } = ();
         }
         else {
-            open $fh, '>:raw', $self->{SCANDEPS} or die;     ## no critic qw[InputOutput::RequireBriefOpen]
+            open $fh, '>:raw', $ENV->{SCANDEPS} or die $!;     ## no critic qw[InputOutput::RequireBriefOpen]
 
             flock $fh, LOCK_EX or die;
         }
@@ -414,8 +411,6 @@ sub DESTROY ( $self ) {
 
         close $fh or die;
     }
-
-    return;
 }
 
 1;
@@ -427,15 +422,15 @@ sub DESTROY ( $self ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 207                  | * Subroutine "BUILD1" with high complexity score (23)                                                          |
-## |      | 336                  | * Subroutine "DESTROY" with high complexity score (23)                                                         |
+## |      | 331                  | * Subroutine "END" with high complexity score (23)                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 345                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 342                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 385                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 382                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 186, 191             | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 412                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
+## |    2 | 409                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 117                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

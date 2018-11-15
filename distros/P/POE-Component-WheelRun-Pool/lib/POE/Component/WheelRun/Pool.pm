@@ -1,7 +1,7 @@
 # ABSTRACT: POE::Wheel::Run worker pool
 package POE::Component::WheelRun::Pool;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -105,7 +105,7 @@ sub pool_start {
     $heap->{replenish} = 1;
 
     # Stats engine enabled
-    $kernel->delay_add( stats => $args{StatsInterval} ) if exists $args{StatsInterval};
+    $kernel->delay( stats => $args{StatsInterval} ) if $args{StatsInterval};
 }
 
 sub pool_child {
@@ -125,16 +125,17 @@ sub pool_stats {
     my ($kernel,$heap) = @_[KERNEL,HEAP];
 
     my $stats = delete $heap->{stats};
-    if( defined $heap->{args}{StatsHandler} && ref $heap->{args}{StatsHandler} eq 'CODE' ) {
+    if( $heap->{args}{StatsHandler} && ref $heap->{args}{StatsHandler} eq 'CODE' ) {
         eval {
             $heap->{args}{StatsHandler}->($stats);
+            1;
+        } or do {
+            my $error = $@;
+            warn "StatsHandler threw error: $error";
         };
-        if(my $error = $@) {
-            # TODO: DEBUG("ERROR received processing stats: $error");
-        }
     }
     $heap->{stats} = { ticks => $stats->{ticks} + 1 };
-    $kernel->delay_add( stats => $heap->{args}{StatsInterval} );
+    $kernel->delay( stats => $heap->{args}{StatsInterval} );
 }
 
 sub pool_dispatch {
@@ -226,7 +227,7 @@ sub worker_spawn {
 
         # Assign Affinity
         for( 1..2 ) {
-            $heap->{_cpu} = $heap->{_max_cpu} if $heap->{_cpu} < 0;
+            $heap->{_cpu} ||= $heap->{_max_cpu};
             push @cpus, $heap->{_cpu};
             $heap->{_cpu}--;
         }
@@ -353,7 +354,7 @@ POE::Component::WheelRun::Pool - POE::Wheel::Run worker pool
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -480,7 +481,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/POE-Component-WheelRun-Pool>
+L<https://metacpan.org/release/POE-Component-WheelRun-Pool>
 
 =item *
 

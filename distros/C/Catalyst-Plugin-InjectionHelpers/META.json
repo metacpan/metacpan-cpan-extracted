@@ -49,7 +49,7 @@
          "web" : "https://github.com/jjn1056/Catalyst-Plugin-InjectionHelpers"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

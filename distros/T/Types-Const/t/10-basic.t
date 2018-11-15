@@ -1,28 +1,42 @@
 #!perl
 
 use Test::Most;
+use Test::TypeTiny;
 
 use Const::Fast;
-use Types::Const v0.3.2 -types;
+use Types::Const v0.3.4 -types;
 use Types::Standard -types;
 
 subtest 'Const' => sub {
 
     ok my $type = Const;
 
-    ok !$type->check( 1 ), 'check fails (not a reference)';
-    ok !$type->check( undef ), 'check fails (undef)';
+    ok_subtype( Ref, $type );
 
-    ok !$type->check( my $x = 1 ), 'check fails (not a reference)';
-    ok !$type->check( \$x ), 'check fails (not readonly)';
-    ok $type->check( \ 1 ), 'check (ref to const)';
-    ok $type->check( \ 'string' ), 'check (ref to const)';
+    should_fail( 1, $type);
+    should_fail( undef, $type );
+    should_fail( my $x = 1, $type, 'Value $x fails type constraint Const' );
+    should_fail( \$x, $type, 'Reference \$x fails type constraint Const');
+
+    should_pass( \ 1, $type );
+    should_pass( \ 'string', $type );
+
+  TODO: {
+      local $TODO = "inlined references are not readonly";
+
+      should_pass( [1], $type );
+      should_pass( { a => 1 }, $type );
+    }
 
     const my $re => qr/x/;
-    ok $type->check( $re ), 'check (regex)';
+  TODO: {
+      local $TODO = "Test::TypeTiny::should_pass";
+      should_pass($re, $type); # RT 127635
+    }
+    ok !!$type->check( $re ), 'Reference qr/x/ passes type constraint Const';
 
     const my @ro => qw/ a b c /;
-    ok $type->check( \@ro ), 'check';
+    should_pass( \@ro, $type);
 
     ok $type->has_coercion, 'has_coercion';
 
@@ -31,15 +45,15 @@ subtest 'Const' => sub {
     'get_message';
 
     my @rw = @ro;
-    ok !$type->check( \@rw ), 'check failed';
+    should_fail( \@rw, $type );
 
     ok my $cc = $type->coerce( \@rw ), 'coerce';
     dies_ok {
         $cc->[0]++;
     } 'coerced is read-only';
 
-    ok $type->check( $cc ), 'check';
-    ok !$type->check( \@rw ), 'check failed on original';
+    should_pass( $cc, $type );
+    should_fail( \@rw, $type ); # original is unaffected
 };
 
 subtest 'Const[ArrayRef]' => sub {
@@ -47,20 +61,20 @@ subtest 'Const[ArrayRef]' => sub {
     ok my $type = Const[ArrayRef];
 
     const my @ro => qw/ a b c /;
-    ok $type->check( \@ro ), 'check';
+    should_pass( \@ro, $type );
 
     ok $type->has_coercion, 'has_coercion';
 
     my @rw = @ro;
-    ok !$type->check( \@rw ), 'check failed';
+    should_fail( \@rw, $type );
 
     ok my $cc = $type->coerce( \@rw ), 'coerce';
     dies_ok {
         $cc->[0]++;
     } 'coerced is read-only';
 
-    ok $type->check( $cc ), 'check';
-    ok !$type->check( \@rw ), 'check failed on original';
+    should_pass( $cc, $type );
+    should_fail( \@rw, $type ); # original is unaffected
 };
 
 
@@ -69,20 +83,20 @@ subtest 'Const[HashRef]' => sub {
     ok my $type = Const[HashRef];
 
     const my %ro => ( a => 1, b => 2 );
-    ok $type->check( \%ro ), 'check';
+    should_pass( \%ro, $type );
 
     ok $type->has_coercion, 'has_coercion';
 
     my %rw = %ro;
-    ok !$type->check( \%rw ), 'check failed';
+    should_fail( \%rw, $type );
 
     ok my $cc = $type->coerce( \%rw ), 'coerce';
     dies_ok {
         $cc->{a}++;
     } 'coerced is read-only';
 
-    ok $type->check( $cc ), 'check';
-    ok !$type->check( \%rw ), 'check failed on original';
+    should_pass( $cc, $type );
+    should_fail( \%rw, $type ); # original is unaffected
 };
 
 done_testing;

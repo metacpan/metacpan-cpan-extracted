@@ -1,6 +1,6 @@
 package Calendar::Persian;
 
-$Calendar::Persian::VERSION   = '0.35';
+$Calendar::Persian::VERSION   = '0.36';
 $Calendar::Persian::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Persian - Interface to Persian Calendar.
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 
 use Date::Persian::Simple;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 with 'Calendar::Plugin::Renderer';
 
 use overload q{""} => 'as_string', fallback => 1;

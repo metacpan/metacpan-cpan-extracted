@@ -44,6 +44,14 @@ $loop->SSL_listen(
    on_stream => sub {
       my ( $stream ) = @_;
 
+      # SNI - RT#94605
+      SKIP: {
+         skip "SSL server does not support SNI", 1 unless IO::Socket::SSL->can_server_sni;
+
+         my $sslsocket = $stream->read_handle;
+         is( $sslsocket->get_servername, "127.0.0.1", '->get_servername on server' );
+      }
+
       $stream->configure(
          on_read => sub {
             my ( $self, $buffref ) = @_;

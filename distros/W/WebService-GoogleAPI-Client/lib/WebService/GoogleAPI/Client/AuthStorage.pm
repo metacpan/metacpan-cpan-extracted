@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::AuthStorage;
-$WebService::GoogleAPI::Client::AuthStorage::VERSION = '0.20';
+$WebService::GoogleAPI::Client::AuthStorage::VERSION = '0.21';
 
 # ABSTRACT: JSON File Persistence for Google OAUTH Project and User Access Tokens
 
@@ -31,7 +31,7 @@ sub setup
   }
   else
   {
-    croak "Unknown storage type. Allowed types are jsonfile, dbi and mongo";
+    croak "Unknown storage type.";
   }
   return $self;
 }
@@ -79,7 +79,7 @@ WebService::GoogleAPI::Client::AuthStorage - JSON File Persistence for Google OA
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 METHODS
 

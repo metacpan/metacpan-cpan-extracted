@@ -46,7 +46,7 @@ int32_t SPVM_RUNTIME_API_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* sta
     int32_t original_mortal_stack_top = SPVM_RUNTIME_API_enter_scope(env);
 
     // Call native subrotuine
-    int32_t (*native_address)(SPVM_ENV*, SPVM_VALUE*) = runtime->sub_native_addresses[sub->id];
+    int32_t (*native_address)(SPVM_ENV*, SPVM_VALUE*) = runtime->sub_cfunc_addresses[sub->id];
     int32_t exception_flag = (*native_address)(env, stack);
     
     // Leave scope
@@ -62,7 +62,7 @@ int32_t SPVM_RUNTIME_API_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* sta
   }
   // Call precompiled sub
   else if (sub->flag & SPVM_SUB_C_FLAG_IS_COMPILED) {
-    int32_t (*precompile_address)(SPVM_ENV*, SPVM_VALUE*) = runtime->sub_precompile_addresses[sub->id];
+    int32_t (*precompile_address)(SPVM_ENV*, SPVM_VALUE*) = runtime->sub_cfunc_addresses[sub->id];
     return (*precompile_address)(env, stack);
   }
   // Call sub virtual machine
@@ -2798,7 +2798,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         if (exception_flag) {
           exception_flag = 0;
           
-          SPVM_RUNTIME_SUB* sub = SPVM_LIST_fetch(package->subs, opcode->operand1);
+          SPVM_RUNTIME_SUB* sub = &runtime->subs[package->subs_base + opcode->operand1];
           int32_t sub_id = sub->id;
           int32_t rel_line = opcode->operand2;
           int32_t line = sub->line + rel_line;
@@ -2817,7 +2817,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
       }
       case SPVM_OPCODE_C_ID_IF_CROAK_RETURN: {
         if (exception_flag) {
-          SPVM_RUNTIME_SUB* sub = SPVM_LIST_fetch(package->subs, opcode->operand1);
+          SPVM_RUNTIME_SUB* sub = &runtime->subs[package->subs_base + opcode->operand1];
           int32_t sub_id = sub->id;
           int32_t rel_line = opcode->operand2;
           int32_t line = sub->line + rel_line;
@@ -3764,23 +3764,11 @@ int32_t SPVM_RUNTIME_API_call_entry_point_sub(SPVM_ENV* env, const char* package
   SPVM_RUNTIME* runtime = env->runtime;
 
   // Package
-  int32_t sub_id = 0;
-  SPVM_RUNTIME_PACKAGE* package = SPVM_HASH_fetch(runtime->package_symtable, package_name, strlen(package_name));
-  if (package) {
+  int32_t sub_id = SPVM_RUNTIME_API_get_sub_id(env, package_name, "main", "int(byte[][])");
   
-    const char* sub_name = "main";
-    
-    SPVM_RUNTIME_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
-    if (sub) {
-      sub_id = sub->id;
-    }
-    else {
-      fprintf(stderr, "Can't find entry point subroutine %s", sub_name);
-      exit(EXIT_FAILURE);
-    }
-  }
-  else {
+  if (sub_id == 0) {
     fprintf(stderr, "Can't find entry point package %s\n", package_name);
+    exit(EXIT_FAILURE);
   }
   
   // Enter scope
@@ -3832,30 +3820,35 @@ int32_t SPVM_RUNTIME_API_has_interface(SPVM_ENV* env, int32_t object_basic_type_
   assert(object_package);
   assert(interface_package);
   
-  assert(interface_package->subs->length == 1);
+  assert(interface_package->subs_length == 1);
   
-  SPVM_RUNTIME_SUB* sub_interface = SPVM_LIST_fetch(interface_package->subs, 0);
+  SPVM_RUNTIME_SUB* sub_interface = &runtime->subs[interface_package->subs_base];
   
   const char* sub_interface_name = &runtime->string_pool[sub_interface->name_id];
   const char* sub_interface_signature = &runtime->string_pool[sub_interface->signature_id];
   
-  SPVM_RUNTIME_SUB* found_sub;
+  int32_t has_interface;
   if (object_package->flag & SPVM_PACKAGE_C_FLAG_IS_HAS_ONLY_ANON_SUB) {
-    found_sub = SPVM_LIST_fetch(object_package->subs, 0);
+    SPVM_RUNTIME_SUB* sub = &runtime->subs[object_package->subs_base];
+    if (strcmp(sub_interface_signature, &runtime->string_pool[sub->signature_id]) == 0) {
+      has_interface = 1;
+    }
+    else {
+      has_interface = 0;
+    }
   }
   else {
-    found_sub = SPVM_HASH_fetch(object_package->sub_symtable, sub_interface_name, strlen(sub_interface_name));
-  } 
-  if (!found_sub) {
-    return 0;
+    const char* object_package_name = &runtime->string_pool[object_package->name_id];
+    int32_t sub_id = SPVM_RUNTIME_API_get_sub_id(env, object_package_name, sub_interface_name, sub_interface_signature);
+    if (sub_id > 0) {
+      has_interface = 1;
+    }
+    else {
+      has_interface = 0;
+    }
   }
   
-  if (strcmp(sub_interface_signature, &runtime->string_pool[found_sub->signature_id]) == 0) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
+  return has_interface;
 }
 
 int32_t SPVM_RUNTIME_API_enter_scope(SPVM_ENV* env) {
@@ -4482,8 +4475,8 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_value_t_array_raw(SPVM_ENV* env, int32_t basic
   SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
   const char* basic_type_name = &runtime->string_pool[basic_type->name_id];
   SPVM_RUNTIME_PACKAGE* package = SPVM_HASH_fetch(runtime->package_symtable, basic_type_name, strlen(basic_type_name));
-  int32_t fields_length = package->fields->length;
-  SPVM_RUNTIME_FIELD* field_first = SPVM_LIST_fetch(package->fields, 0);
+  int32_t fields_length = package->fields_length;
+  SPVM_RUNTIME_FIELD* field_first = &runtime->fields[package->fields_base];
   int32_t field_basic_type_id = field_first->basic_type_id;
 
   int32_t unit_size;
@@ -4548,7 +4541,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_object_raw(SPVM_ENV* env, int32_t basic_type_i
   SPVM_OBJECT* object = SPVM_RUNTIME_API_alloc_memory_block_zero(runtime, sizeof(SPVM_OBJECT));
 
   // Alloc body length + 1
-  int32_t fields_length = package->fields->length;
+  int32_t fields_length = package->fields_length;
   object->body = SPVM_RUNTIME_API_alloc_memory_block_zero(runtime, (fields_length + 1) * sizeof(SPVM_VALUE));
   
   object->basic_type_id = basic_type->id;
@@ -4791,8 +4784,9 @@ void SPVM_RUNTIME_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
       
       {
         int32_t index;
-        for (index = 0; index < package->object_field_indexes->length; index++) {
-          int32_t object_field_index = (intptr_t)SPVM_LIST_fetch(package->object_field_indexes, index);
+        int32_t object_field_indexes_length = runtime->constant_pool[package->constant_pool_base + package->object_field_indexes_constant_pool_id];
+        for (index = 0; index < object_field_indexes_length; index++) {
+          int32_t object_field_index = runtime->constant_pool[package->constant_pool_base + package->object_field_indexes_constant_pool_id + 1 + index];
           SPVM_VALUE* fields = *(SPVM_VALUE**)&(*(void**)object);
           
           SPVM_OBJECT** object_field_address = (SPVM_OBJECT**)&fields[object_field_index];
@@ -4851,6 +4845,43 @@ int32_t SPVM_RUNTIME_API_get_field_index(SPVM_ENV* env, int32_t field_id) {
   return field->index;
 }
 
+SPVM_RUNTIME_FIELD* SPVM_RUNTIME_API_get_field(SPVM_ENV* env, SPVM_RUNTIME_PACKAGE* package, const char* field_name) {
+  // Runtime
+  SPVM_RUNTIME* runtime = env->runtime;
+
+  // Find fieldroutine by binary search
+  int32_t fields_length = package->fields_length;
+  int32_t fields_base = package->fields_base;
+  SPVM_RUNTIME_FIELD* field = NULL;
+  int low = fields_base;
+  int high = fields_base + fields_length - 1;
+  while (low < high) {
+    int32_t middle = (low + high) / 2;
+    SPVM_RUNTIME_FIELD* middle_field = &runtime->fields[middle];
+    const char* middle_field_name = &runtime->string_pool[middle_field->name_id];
+    
+    if (strcmp(field_name, middle_field_name) > 0) {
+      low = middle + 1;
+    }
+    else if (strcmp(field_name, middle_field_name) < 0) {
+      high = middle - 1;
+    }
+    else {
+      field = middle_field;
+      break;
+    }
+  }
+  if (field == NULL) {
+    SPVM_RUNTIME_FIELD* low_field = &runtime->fields[low];
+    const char* low_field_name = &runtime->string_pool[low_field->name_id];
+    if (strcmp(field_name, low_field_name) == 0) {
+      field = low_field;
+    }
+  }
+  
+  return field;
+}
+
 int32_t SPVM_RUNTIME_API_get_field_id(SPVM_ENV* env, const char* package_name, const char* field_name, const char* signature) {
   (void)env;
   
@@ -4864,7 +4895,7 @@ int32_t SPVM_RUNTIME_API_get_field_id(SPVM_ENV* env, const char* package_name, c
   }
   
   // Field
-  SPVM_RUNTIME_FIELD* field = SPVM_HASH_fetch(package->field_symtable, field_name, strlen(field_name));
+  SPVM_RUNTIME_FIELD* field = SPVM_RUNTIME_API_get_field(env, package, field_name);
   if (!field) {
     return 0;
   }
@@ -4879,6 +4910,45 @@ int32_t SPVM_RUNTIME_API_get_field_id(SPVM_ENV* env, const char* package_name, c
   return field_id;
 }
 
+SPVM_RUNTIME_PACKAGE_VAR* SPVM_RUNTIME_API_get_package_var(SPVM_ENV* env, SPVM_RUNTIME_PACKAGE* package, const char* package_var_name) {
+  // Runtime
+  SPVM_RUNTIME* runtime = env->runtime;
+
+  // Find package_varroutine by binary search
+  int32_t package_vars_length = package->package_vars_length;
+  int32_t package_vars_base = package->package_vars_base;
+  SPVM_RUNTIME_PACKAGE_VAR* package_var = NULL;
+  int low = package_vars_base;
+  int high = package_vars_base + package_vars_length - 1;
+  while (low < high) {
+    int32_t middle = (low + high) / 2;
+    
+    SPVM_RUNTIME_PACKAGE_VAR* middle_package_var = &runtime->package_vars[middle];
+    const char* middle_package_var_name = &runtime->string_pool[middle_package_var->name_id];
+
+    
+    if (strcmp(package_var_name, middle_package_var_name) > 0) {
+      low = middle + 1;
+    }
+    else if (strcmp(package_var_name, middle_package_var_name) < 0) {
+      high = middle - 1;
+    }
+    else {
+      package_var = middle_package_var;
+      break;
+    }
+  }
+  if (package_var == NULL) {
+    SPVM_RUNTIME_PACKAGE_VAR* low_package_var = &runtime->package_vars[low];
+    const char* low_package_var_name = &runtime->string_pool[low_package_var->name_id];
+    if (strcmp(package_var_name, low_package_var_name) == 0) {
+      package_var = low_package_var;
+    }
+  }
+  
+  return package_var;
+}
+
 int32_t SPVM_RUNTIME_API_get_package_var_id(SPVM_ENV* env, const char* package_name, const char* package_var_name, const char* signature) {
   (void)env;
   
@@ -4890,9 +4960,9 @@ int32_t SPVM_RUNTIME_API_get_package_var_id(SPVM_ENV* env, const char* package_n
   if (!package) {
     return 0;
   }
-  
+
   // Package variable name
-  SPVM_RUNTIME_PACKAGE_VAR* package_var = SPVM_HASH_fetch(package->package_var_symtable, package_var_name, strlen(package_var_name));
+  SPVM_RUNTIME_PACKAGE_VAR* package_var = SPVM_RUNTIME_API_get_package_var(env, package, package_var_name);
   if (!package_var) {
     return 0;
   }
@@ -4907,31 +4977,81 @@ int32_t SPVM_RUNTIME_API_get_package_var_id(SPVM_ENV* env, const char* package_n
   return package_var_id;
 }
 
+SPVM_RUNTIME_SUB* SPVM_RUNTIME_API_get_sub(SPVM_ENV* env, SPVM_RUNTIME_PACKAGE* package, const char* sub_name) {
+  // Runtime
+  SPVM_RUNTIME* runtime = env->runtime;
+
+  // Find subroutine by binary search
+  int32_t subs_length = package->subs_length;
+  int32_t subs_base = package->subs_base;
+  SPVM_RUNTIME_SUB* sub = NULL;
+  int low = subs_base;
+  int high = subs_base + subs_length - 1;
+  while (low < high) {
+    int32_t middle = (low + high) / 2;
+    SPVM_RUNTIME_SUB* middle_sub = &runtime->subs[middle];
+    const char* middle_sub_name = &runtime->string_pool[middle_sub->name_id];
+    
+    if (strcmp(sub_name, middle_sub_name) > 0) {
+      low = middle + 1;
+    }
+    else if (strcmp(sub_name, middle_sub_name) < 0) {
+      high = middle - 1;
+    }
+    else {
+      sub = middle_sub;
+      break;
+    }
+  }
+  if (sub == NULL) {
+    SPVM_RUNTIME_SUB* low_sub = &runtime->subs[low];
+    const char* low_sub_name = &runtime->string_pool[low_sub->name_id];
+    if (strcmp(sub_name, low_sub_name) == 0) {
+      sub = low_sub;
+    }
+  }
+  
+  return sub;
+}
+
 int32_t SPVM_RUNTIME_API_get_sub_id(SPVM_ENV* env, const char* package_name, const char* sub_name, const char* signature) {
   (void)env;
   
   // Runtime
   SPVM_RUNTIME* runtime = env->runtime;
   
+  // Sub id
+  int32_t sub_id;
+  
   // Package name
   SPVM_RUNTIME_PACKAGE* package = SPVM_HASH_fetch(runtime->package_symtable, package_name, strlen(package_name));
   if (package == NULL) {
-    return 0;
+    sub_id = 0;
   }
-  
-  // Subroutine name
-  SPVM_RUNTIME_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
-  if (sub == NULL) {
-    return 0;
+  else {
+    int32_t subs_length = package->subs_length;
+    int32_t subs_base = package->subs_base;
+    
+    if (subs_length == 0) {
+      sub_id = 0;
+    }
+    else {
+      // Sub
+      SPVM_RUNTIME_SUB* sub = SPVM_RUNTIME_API_get_sub(env, package, sub_name);
+      if (sub == NULL) {
+        sub_id = 0;
+      }
+      else {
+        // Signature
+        if (strcmp(signature, &runtime->string_pool[sub->signature_id]) == 0) {
+          sub_id = sub->id;
+        }
+        else {
+          sub_id = 0;
+        }
+      }
+    }
   }
-  
-  
-  // Signature
-  if (strcmp(signature, &runtime->string_pool[sub->signature_id]) != 0) {
-    return 0;
-  }
-  
-  int32_t sub_id = sub->id;
   
   return sub_id;
 }
@@ -4943,39 +5063,33 @@ int32_t SPVM_RUNTIME_API_get_sub_id_method_call(SPVM_ENV* env, SPVM_OBJECT* obje
   SPVM_RUNTIME* runtime = env->runtime;
   
   // Package name
-  SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[object->basic_type_id];
-  const char* basic_type_name = &runtime->string_pool[basic_type->name_id];
-  SPVM_RUNTIME_PACKAGE* package = SPVM_HASH_fetch(runtime->package_symtable, basic_type_name, strlen(basic_type_name));  
-  if (package == NULL) {
+  SPVM_RUNTIME_BASIC_TYPE* object_basic_type = &runtime->basic_types[object->basic_type_id];
+  const char* object_basic_type_name = &runtime->string_pool[object_basic_type->name_id];
+  SPVM_RUNTIME_PACKAGE* object_package = SPVM_HASH_fetch(runtime->package_symtable, object_basic_type_name, strlen(object_basic_type_name));  
+  if (object_package == NULL) {
     return 0;
   }
   
   // Package which have only anon sub
-  SPVM_RUNTIME_SUB* sub;
-  if (package->flag & SPVM_PACKAGE_C_FLAG_IS_HAS_ONLY_ANON_SUB) {
+  int32_t sub_id;
+  if (object_package->flag & SPVM_PACKAGE_C_FLAG_IS_HAS_ONLY_ANON_SUB) {
     // Subroutine name
-    sub = SPVM_LIST_fetch(package->subs, 0);
+    SPVM_RUNTIME_SUB* sub = &runtime->subs[object_package->subs_base];
      
     // Signature
-    if (strcmp(signature, &runtime->string_pool[sub->signature_id]) != 0) {
-      return 0;
+    if (strcmp(signature, &runtime->string_pool[sub->signature_id]) == 0) {
+      sub_id = sub->id;
+    }
+    else {
+      sub_id = 0;
     }
   }
   // Normal sub
   else {
-    // Subroutine name
-    sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
-    if (sub == NULL) {
-      return 0;
-    }
-    
-    // Signature
-    if (strcmp(signature, &runtime->string_pool[sub->signature_id]) != 0) {
-      return 0;
-    }
+    sub_id = SPVM_RUNTIME_API_get_sub_id(env, object_basic_type_name, sub_name, signature);
   }
   
-  return sub->id;
+  return sub_id;
 }
 
 int32_t SPVM_RUNTIME_API_get_basic_type_id(SPVM_ENV* env, const char* name) {
@@ -4986,7 +5100,7 @@ int32_t SPVM_RUNTIME_API_get_basic_type_id(SPVM_ENV* env, const char* name) {
   }
   
   SPVM_RUNTIME* runtime = env->runtime;
-  
+
   SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_HASH_fetch(runtime->basic_type_symtable, name, strlen(name));
   if (basic_type) {
     int32_t basic_type_id = basic_type->id;

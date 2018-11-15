@@ -166,11 +166,11 @@
     #if __i386 || __i386__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("lock; orb $0, -1(%%esp)" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ (""                        : : : "memory")
-      #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("")
+      #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ (""                        : : : "memory")
     #elif ECB_GCC_AMD64
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("mfence"   : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ (""         : : : "memory")
-      #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("")
+      #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ (""         : : : "memory")
     #elif __powerpc__ || __ppc__ || __powerpc64__ || __ppc64__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("sync"     : : : "memory")
     #elif defined __ARM_ARCH_2__ \

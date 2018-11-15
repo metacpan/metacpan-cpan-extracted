@@ -1,4 +1,4 @@
-# $Id: 08-recurse.t 1709 2018-09-07 08:03:09Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 1719 2018-11-04 05:01:43Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -10,6 +10,10 @@ BEGIN {
 
 use Net::DNS;
 use Net::DNS::Resolver::Recurse;
+
+my @hints = new Net::DNS::Resolver()->_hints;
+
+my @NOIP = qw(:: 0.0.0.0);
 
 
 exit( plan skip_all => 'Online tests disabled.' ) if -e 't/online.disabled';
@@ -30,8 +34,8 @@ eval {
 
 
 eval {
-	my $resolver = new Net::DNS::Resolver::Recurse();
-	exit plan skip_all => "No nameservers" unless $resolver->nameservers;
+	my $resolver = new Net::DNS::Resolver( nameservers => [@hints] );
+	exit plan skip_all => 'No nameservers' unless $resolver->nameservers;
 
 	my $reply = $resolver->send(qw(. NS IN)) || die;
 	my $from = $reply->from();
@@ -45,7 +49,7 @@ eval {
 } || exit( plan skip_all => 'Unable to reach global root nameservers' );
 
 
-plan 'no_plan';
+plan tests => 13;
 
 NonFatalBegin();
 
@@ -55,9 +59,10 @@ NonFatalBegin();
 
 	ok( $res->isa('Net::DNS::Resolver::Recurse'), 'new() created object' );
 
-	my $packet = $res->query_dorecursion( 'www.net-dns.org', 'A' );
-	ok( $packet, 'got a packet' );
-	ok( scalar $packet->answer, 'answer section has RRs' ) if $packet;
+	my $reply = $res->query_dorecursion( 'www.net-dns.org', 'A' );
+	is( ref($reply), 'Net::DNS::Packet', 'query returned a packet' );
+	skip( 'no response to query', 1 ) unless $reply;
+	ok( scalar( $reply->answer ), 'answer section has RRs' );
 }
 
 
@@ -67,11 +72,7 @@ NonFatalBegin();
 
 	my $count = 0;
 
-	$res->recursion_callback(
-		sub {
-			ok( shift->isa('Net::DNS::Packet'), 'callback argument is a packet' );
-			$count++;
-		} );
+	$res->recursion_callback( sub { $count++ if ref(shift) } );
 
 	$res->query_dorecursion( 'a.t.net-dns.org', 'A' );
 
@@ -84,10 +85,7 @@ NonFatalBegin();
 
 	my $count = 0;
 
-	$res->recursion_callback(
-		sub {
-			$count++;
-		} );
+	$res->recursion_callback( sub { $count++ if ref(shift) } );
 
 	$res->query_dorecursion( '2a04:b900:0:0:8:0:0:60', 'PTR' );
 
@@ -96,14 +94,13 @@ NonFatalBegin();
 
 
 SKIP: {
-	my @hints = new Net::DNS::Resolver::Recurse()->_hints;
 	my $res	  = Net::DNS::Resolver::Recurse->new();
-	is( scalar( $res->hints() ), 0, "hints() initially empty" );
+	is( scalar( $res->hints() ), 0, 'hints() initially empty' );
 	$res->hints(@hints);
-	is( scalar( $res->hints ), scalar(@hints), "hints() set" );
+	is( scalar( $res->hints ), scalar(@hints), 'hints() set' );
 
-	my $reply = $res->send( ".", "NS" );
-	ok( $reply, 'got response to priming query' );
+	my $reply = $res->send( '.', 'NS' );
+	is( ref($reply), 'Net::DNS::Packet', 'response received for priming query' );
 	skip( 'no response to priming query', 3 ) unless $reply;
 	my $from = $reply->from();
 
@@ -118,21 +115,18 @@ SKIP: {
 
 
 {
-	my $res = Net::DNS::Resolver::Recurse->new();
-	$res->retrans(0);
-	$res->retry(0);
-	$res->srcport(-1);
+	my $res = Net::DNS::Resolver::Recurse->new( nameserver => [@NOIP], srcport => -1 );
 
-	ok( !$res->send( "www.net-dns.org", "A" ), 'fail if no reachable server' );
+	ok( !$res->send( 'www.net-dns.org', 'A' ), 'fail if no reachable server' );
 }
 
 
 {
-	Net::DNS::Resolver->retry(0);
+	Net::DNS::Resolver::Recurse->retry(0);
 	my $res = Net::DNS::Resolver::Recurse->new();
-	$res->hints( '0.0.0.0', '::' );
+	$res->hints(@NOIP);
 
-	ok( !$res->send( "www.net-dns.org", "A" ), 'fail if no usable hint' );
+	ok( !$res->send( 'www.net-dns.org', 'A' ), 'fail if no usable hint' );
 }
 
 

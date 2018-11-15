@@ -1,7 +1,7 @@
 use strictures;
 
 package WebService::GoogleAPI::Client::Discovery;
-$WebService::GoogleAPI::Client::Discovery::VERSION = '0.20';
+$WebService::GoogleAPI::Client::Discovery::VERSION = '0.21';
 
 # ABSTRACT: Google API discovery service
 
@@ -542,7 +542,7 @@ WebService::GoogleAPI::Client::Discovery - Google API discovery service
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head2 MORE INFORMATION
 

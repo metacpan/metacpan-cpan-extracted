@@ -102,6 +102,8 @@
 Types-Const-.*/
 Types-Const-.*\.tar\.gz
 \.mailmap$
+perltidy\.(LOG|ERR)
+fatlib/
 cpanfile\.snapshot$
 local/
 perltidy\.(LOG|ERR)

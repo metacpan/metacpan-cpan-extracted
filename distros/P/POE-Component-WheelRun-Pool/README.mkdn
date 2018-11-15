@@ -4,7 +4,7 @@ POE::Component::WheelRun::Pool - POE::Wheel::Run worker pool
 
 # VERSION
 
-version 0.002
+version 0.003
 
 # SYNOPSIS
 
@@ -121,7 +121,7 @@ in addition to those websites please use your favorite search engine to discover
 
     A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-    [http://metacpan.org/release/POE-Component-WheelRun-Pool](http://metacpan.org/release/POE-Component-WheelRun-Pool)
+    [https://metacpan.org/release/POE-Component-WheelRun-Pool](https://metacpan.org/release/POE-Component-WheelRun-Pool)
 
 - RT: CPAN's Bug Tracker
 

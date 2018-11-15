@@ -1,0 +1,55 @@
+upstream <: $name :> {
+    server <: $upstream :>;
+
+    keepalive 180; # TODO set from variable
+}
+
+: if $default_server {
+# default server
+server {
+    listen                    *:80 default_server;
+    listen                    [::]:80 default_server;
+    server_name               "";
+    return                    444;
+}
+: }
+
+: for $host.keys() -> $host_name {
+server {
+    listen                    *:80;
+    listen                    [::]:80;
+    server_name               <: $host_name | raw :>;
+
+    keepalive_timeout         70;
+    # root                      <: $www_root_dir :>; # TODO
+
+    error_log                 <: $data_dir :>/nginx-error.log info;
+    access_log                <: $data_dir :>/nginx-access.log default;
+
+    client_max_body_size      10M;
+
+    location @backend {
+        proxy_pass http://<: $name :>;
+
+        proxy_read_timeout 60s;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Accel-Support 1;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        # keepalive & websocket
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+
+    location /.well-known/acme-challenge/ {
+        alias /var/run/acme/acme-challenge/;
+    }
+
+: for $host[$host_name]["location"] -> $location {
+<: $location | raw :>
+: }
+}
+: }

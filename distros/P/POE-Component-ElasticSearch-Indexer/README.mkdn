@@ -4,7 +4,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 # VERSION
 
-version 0.004
+version 0.009
 
 # SYNOPSIS
 
@@ -15,7 +15,7 @@ This POE Session is used to index data to an ElasticSearch cluster.
     my $es_session = POE::Component::ElasticSearch::Indexer->spawn(
         Alias            => 'es',                    # Default
         Servers          => [qw(localhost)],         # Default
-        Timeout          => 10,                      # Default
+        Timeout          => 1,                       # Default
         FlushInterval    => 30,                      # Default
         FlushSize        => 1_000,                   # Default
         LoggingConfig    => undef,                   # Default
@@ -63,6 +63,10 @@ following parameters.
     the creation of a [POE::Component::Client::Keepalive](https://metacpan.org/pod/POE::Component::Client::Keepalive) connection pool.
 
     Defaults to **MaxConnsPerServer \* number of Servers**.
+
+- **MaxPendingRequests**
+
+    Maximum number of requests backlogged in the connection pool.  Defaults to **5**.
 
 - **LoggingConfig**
 
@@ -112,6 +116,11 @@ following parameters.
         BatchDiskSpace => 100mb,
         BatchDiskSpace => 10gb,
         BatchDiskSpace => 1tb,
+
+- **MaxRecoveryBatches**
+
+    The number of batches to process per backlog event.  This will only come into
+    play if there are batches on disk to flush.  Defaults to **25**.
 
 - **StatsHandler**
 

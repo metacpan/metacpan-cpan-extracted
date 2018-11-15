@@ -3,7 +3,7 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "2.0.3";
+$VERSION = "2.0.4";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
@@ -805,8 +805,7 @@ Alexey Radkov <alexey.radkov@gmail.com>
 
 Copyright (C) 2008-2018 by A. Radkov.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it
+under the same terms as the Perl 5 programming language system itself.
 
 =cut

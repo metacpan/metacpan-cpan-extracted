@@ -1,6 +1,7 @@
 #!perl
 
 use Test::Most;
+use Test::TypeTiny;
 
 use Const::Fast;
 use Types::Const -types;
@@ -22,20 +23,20 @@ subtest 'parameterize ArrayRef[Int] on Const' => sub {
     const my @ints  => ( 1 .. 3 );
     const my @strs  => qw/ a b c /;
 
-    ok $type->check( \@empty ), 'check';
-    ok $type->check( \@ints ),  'check';
-    ok !$type->check( \@strs ), 'check fails (not int)';
+    should_pass( \@empty, $type );
+    should_pass( \@ints, $type );
+    should_fail( \@strs, $type );
 
     my @vals = ( 1 .. 3 );
-    ok !$type->check( \@vals ), 'check fails (not read-only)';
+    should_fail( \@vals, $type );
 
     is_deeply $type->coerce( \@ints ), \@ints, 'coerce on const';
-    ok $type->check( $type->coerce( \@ints ) ), 'check coerce on const';
+    should_pass( $type->coerce( \@ints ), $type );
 
-    ok $type->check( $type->parent->coerce( \@vals ) ), 'coerce via parent';
+    should_pass( $type->parent->coerce( \@vals ), $type );
 
     ok my $cvals = $type->coerce( \@vals ), 'coerce';
-    ok $type->check( $cvals ), 'check coerce';
+    should_pass( $cvals, $type );
     is_deeply $cvals, \@vals, 'same values';
 
     lives_ok { $vals[0]++ } 'original unchanged';
@@ -53,20 +54,20 @@ subtest 'parameterize HashRef[Int] on Const' => sub {
     const my %ints  => ( A => 1, B => 2, C => 3 );
     const my %strs  => ( A => 1, B => 'bee', C => 'see' );
 
-    ok $type->check( \%empty ), 'check';
-    ok $type->check( \%ints ),  'check';
-    ok !$type->check( \%strs ), 'check fails (not int)';
+    should_pass( \%empty, $type );
+    should_pass( \%ints, $type );
+    should_fail( \%strs, $type );
 
     my %vals = ( A => 1, B => 2, C => 3 );
-    ok !$type->check( \%vals ), 'check fails (not read-only)';
+    should_fail( \%vals, $type );
 
     is_deeply $type->coerce( \%ints ), \%ints, 'coerce on const';
-    ok $type->check( $type->coerce( \%ints ) ), 'check coerce on const';
+    should_pass( $type->coerce( \%ints ), $type );
 
-    ok $type->check( $type->parent->coerce( \%vals ) ), 'coerce via parent';
+    should_pass( $type->parent->coerce( \%vals ), $type );
 
     ok my $cvals = $type->coerce( \%vals ), 'coerce';
-    ok $type->check( $cvals ), 'check coerce';
+    should_pass( $cvals, $type );
     is_deeply $cvals, \%vals, 'same values';
 
     lives_ok { $vals{b}++ } 'original unchanged';

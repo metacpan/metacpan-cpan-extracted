@@ -2,11 +2,11 @@ package Tree::DeepClone;
 
 use 5.006;
 
-use base 'Tree::Fast';
+use base 'Tree';
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Scalar::Util qw(blessed);
 

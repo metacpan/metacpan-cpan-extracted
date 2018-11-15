@@ -1,5 +1,10 @@
 Revision history for Dancer2-Plugin-Ajax
 
+0.400000  2018-11-12 21:52:07-05:00 America/New_York
+
+    * GH #7: Pass $self to ajax route handlers to allow access to ->app and other 
+      methods (Julien Fiegehenn)
+
 0.300000  2016-10-28 10:38:01-05:00 America/Chicago
 
     * Update to Dancer2::Plugin2 architecture. (Peter Mottram)

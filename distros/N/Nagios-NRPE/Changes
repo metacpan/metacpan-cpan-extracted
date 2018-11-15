@@ -1,3 +1,16 @@
+2.0.2 2018-11-15
+ - Fix crc32 and padding problem
+2.0.1 2018-11-09
+ - Create valid v3 Packets.
+ - Don't crash on invalid Packets.
+ - Don't crash on with Packets from an unauthorized IP.
+
+2.0.0 2018-09-20
+ - Fix missing exit codes from check
+ - NRPE v3 now working properly with "short" outputs
+ - Better SSL handling
+ - Deassemble function removed
+
 1.0.3 2017-08-22
  - Add Utils.pm that contains common helper functions.
  - Fix error handling in Packet.pm

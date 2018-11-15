@@ -5,6 +5,11 @@ TODO: document encode_cbor_sharing?
 TODO: weaken cyclic structures?
 TODO: large negative integers
 
+1.71 Thu Nov 15 20:52:13 CET 2018
+	- work around what smells like a perl bug w.r.t. exceptions
+          thrown in callbacks.
+	- update libecb.
+
 1.7  Tue Jun 27 04:02:23 CEST 2017
 	- SECURITY FIX: fix two bugs found by american fuzzy lop,
           upgrade is advised if you accept data from untrusted

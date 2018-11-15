@@ -9,8 +9,12 @@ alien_ok 'Alien::geos::af';
 
 diag ('libs: '   . Alien::geos::af->libs // '');
 diag ('cflags: ' . Alien::geos::af->cflags // '');
-#diag ('Dynamic libs: ' . join ':', Alien::geos::af->dynamic_libs // ());
-#diag ('bin dir: ' . Alien::geos::af->bin_dir // '');
+eval {
+    diag ('Dynamic libs: ' . join (':', Alien::geos::af->dynamic_libs));
+};
+warn $@ if $@;
+
+diag ('bin dir: ' . Alien::geos::af->bin_dir // '== unable to locate bin dir ==');
 #my $bin = Alien::geos::af->bin_dir // '';
 
 #  nasty hack

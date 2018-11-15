@@ -1,9 +1,9 @@
 package Net::DNS::RR::OPT;
 
 #
-# $Id: OPT.pm 1605 2017-11-27 11:37:40Z willem $
+# $Id: OPT.pm 1717 2018-10-12 13:14:42Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1717 $)[1];
 
 
 use strict;
@@ -72,9 +72,8 @@ sub string {				## overide RR method
 	my $flags  = sprintf '%04x', $self->flags;
 	my $rcode  = $self->rcode;
 	my $size   = $self->size;
-	my @option = sort { $a <=> $b } $self->options;
-	my @lines  = map $self->_format_option($_), @option;
-	my @format = join "\n;;\t\t", @lines;
+	my @option = map join( "\n;;\t\t\t\t", $self->_format_option($_) ), $self->options;
+	my @format = join "\n;;\t\t", @option;
 
 	$rcode = 0 if $rcode < 16;				# weird: 1 .. 15 not EDNS codes!!
 
@@ -144,7 +143,7 @@ sub flags {
 sub options {
 	my ($self) = @_;
 	my $options = $self->{option} || {};
-	return keys %$options;
+	my @options = sort { $a <=> $b } keys %$options;
 }
 
 sub option {
@@ -164,8 +163,9 @@ sub _format_option {
 	my $package = join '::', __PACKAGE__, $option;
 	$package =~ s/-/_/g;
 	my $defined = length($payload) && $package->can('_image');
-	my @payload = $defined ? eval { $package->_image($payload) } : unpack 'H*', $payload;
-	Net::DNS::RR::_wrap( "$option\t=> (", @payload, ')' );
+	my @element = $defined ? eval { $package->_image($payload) } : unpack 'H*', $payload;
+	my $protect = pop(@element);
+	Net::DNS::RR::_wrap( "$option\t=> (", map( "$_,", @element ), $protect, ')' );
 }
 
 
@@ -188,6 +188,7 @@ sub _set_option {
 
 	my $options = $self->{option} ||= {};
 	delete $options->{$number};
+	return unless defined $value;
 	if ( ref($value) || scalar(@etc) ) {
 		my $option = ednsoptionbyval($number);
 		my @arg = ( $value, @etc );
@@ -202,7 +203,7 @@ sub _set_option {
 			$value = $package->_compose(@arg);
 		}
 	}
-	$options->{$number} = $value if defined $value;
+	$options->{$number} = $value;
 }
 
 
@@ -258,7 +259,10 @@ sub _decompose {
 	my @payload = map { ( $_ => $hash{$_} ) } @field;
 }
 
-sub _image { &_decompose; }
+sub _image {
+	my %hash = &_decompose;
+	my @image = map "$_ => $hash{$_}", @field;
+}
 
 
 package Net::DNS::RR::OPT::EXPIRE;				# RFC7314
@@ -272,7 +276,7 @@ sub _decompose {
 	my @payload = ( 'EXPIRE-TIMER' => unpack 'N', $_[1] );
 }
 
-sub _image { &_decompose; }
+sub _image { join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::COOKIE;				# RFC7873
@@ -286,9 +290,13 @@ sub _compose {
 
 sub _decompose {
 	my %hash;
-	my $template = ( length( $_[1] ) < 16 ) ? 'a8' : 'a8 a*';
-	@hash{@key} = unpack $template, $_[1];
+	@hash{@key} = unpack 'a8 a*', $_[1];
 	my @payload = map { ( $_ => $hash{$_} ) } @key;
+}
+
+sub _image {
+	my %hash = &_decompose;
+	my @image = map join( ' => ', $_, unpack 'H*', $hash{$_} ), @key;
 }
 
 
@@ -300,10 +308,10 @@ sub _compose {
 }
 
 sub _decompose {
-	my @payload = ( TIMEOUT => unpack 'n', $_[1] );
+	my @payload = ( 'TIMEOUT' => unpack 'n', $_[1] );
 }
 
-sub _image { &_decompose; }
+sub _image { join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::PADDING;				# RFC7830
@@ -318,7 +326,7 @@ sub _decompose {
 	my @payload = ( 'OPTION-LENGTH' => length( $_[1] ) );
 }
 
-sub _image { &_decompose; }
+sub _image { join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::CHAIN;				# RFC7901
@@ -327,7 +335,7 @@ use Net::DNS::DomainName;
 sub _compose {
 	my ( $class, %argument ) = @_;
 	my ($trust_point) = values %argument;
-	Net::DNS::DomainName->new( $trust_point || return '' )->encode;
+	Net::DNS::DomainName->new($trust_point)->encode;
 }
 
 sub _decompose {
@@ -336,7 +344,7 @@ sub _decompose {
 	my @payload = ( 'CLOSEST-TRUST-POINT' => $fqdn );
 }
 
-sub _image { &_decompose; }
+sub _image { join ' => ', &_decompose; }
 
 
 package Net::DNS::RR::OPT::KEY_TAG;				# RFC8145
@@ -374,7 +382,11 @@ __END__
     ;;	    flags:  8000
     ;;	    rcode:  NOERROR
     ;;	    size:   1280
-    ;;	    option: COOKIE  => ( 7261776279746573 )
+    ;;	    option: DAU	   => ( 8, 10, 13, 14, 15, 16 )
+    ;;		    DHU	   => ( 1, 2, 4 )
+    ;;		    COOKIE => ( CLIENT-COOKIE => 7261776279746573,
+    ;;				SERVER-COOKIE =>  )
+
 
 =head1 DESCRIPTION
 
@@ -458,10 +470,10 @@ For the example above:
 
 	%hash = $packet->edns->option(10);
 
-	{
-	    'CLIENT-COOKIE' => 'rawbytes',
-	    'SERVER-COOKIE' => undef
-	};
+	%hash = (
+		'CLIENT-COOKIE' => 'rawbytes',
+		'SERVER-COOKIE' => ''
+		);
 
 
 For some options, an array is more appropriate:

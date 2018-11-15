@@ -79,12 +79,12 @@ use Pod::Usage;
 use Data::Dumper;
 use Nagios::NRPE::Client;
 
-our $VERSION = '1.0.3';
+our $VERSION = '2.0.2';
 
 my (
-    $arglist, $bindaddr, $check, $host,    $ipv4,
+    $arglist, $bindaddr, $check, $host,    $ipv4, $cipherlist,
     $ipv6,    $port,     $ssl,   $timeout, $unknown
-);
+   );
 
 Getopt::Long::Configure('no_ignore_case');
 my $result = GetOptions(
@@ -95,49 +95,56 @@ my $result = GetOptions(
     "b|bindadr=s"       => \$bindaddr,
     "c|command|check=s" => \$check,
     "n|nossl"           => \$ssl,
+    "L|cipher-list=s"   => \$cipherlist,
     "p|port=s"          => \$port,
     "t|timeout=i"       => \$timeout,
     "u|unknown"         => \$unknown,
     "h|help"            => sub {
         pod2usage(
-            -exitval   => 0,
-            -verbose   => 99,
-            -noperldoc => 1
-        );
+                  -exitval   => 0,
+                  -verbose   => 99,
+                  -noperldoc => 1
+                 );
     }
 );
 
-if ($ssl) {
+if ($ssl)
+{
     $ssl = 0;
 }
-else {
+else
+{
     $ssl = 1;
 }
-$bindaddr = 0           unless defined $bindaddr;
-$ipv4     = 0           unless defined $ipv4;
-$ipv6     = 0           unless defined $ipv6;
-$unknown  = 0           unless defined $unknown;
-$host     = "localhost" unless defined $host;
-$port     = 5666        unless defined $port;
-$timeout  = 20          unless defined $timeout;
+$bindaddr   = 0                                unless defined $bindaddr;
+$cipherlist = 'ALL:!MD5:@STRENGTH:@SECLEVEL=0' unless defined $bindaddr;
+$ipv4       = 0                                unless defined $ipv4;
+$ipv6       = 0                                unless defined $ipv6;
+$unknown    = 0                                unless defined $unknown;
+$host       = "localhost"                      unless defined $host;
+$port       = 5666                             unless defined $port;
+$timeout    = 20                               unless defined $timeout;
 
 die "Error: No check was given" unless defined $check;
 my $client = Nagios::NRPE::Client->new(
-    arglist  => \@ARGV,
-    bindaddr => $bindaddr,
-    check    => $check,
-    host     => $host,
-    ipv4     => $ipv4,
-    ipv6     => $ipv6,
-    port     => $port,
-    ssl      => $ssl,
-    timeout  => $timeout,
-    unknown  => $unknown
-);
+                                       arglist         => \@ARGV,
+                                       bindaddr        => $bindaddr,
+                                       check           => $check,
+                                       host            => $host,
+                                       ipv4            => $ipv4,
+                                       ipv6            => $ipv6,
+                                       port            => $port,
+                                       ssl             => $ssl,
+                                       SSL_cipher_list => $cipherlist,
+                                       timeout         => $timeout,
+                                       unknown         => $unknown
+                                      );
 my $response = $client->run();
 
-if ( $response->{error} ) {
-    if ($unknown) {
+if ($response->{error})
+{
+    if ($unknown)
+    {
         print "Socket error: $response->{reason}\n";
         exit 3;
     }

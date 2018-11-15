@@ -3,7 +3,7 @@
 use strictures;
 use Modern::Perl;
 use WebService::GoogleAPI::Client;
-
+use Data::Dumper;
 ################################  SOME GENERIC HELPER UTILITY SUBS   ###################
 
 
@@ -26,7 +26,9 @@ sub check_api_endpoint_and_user_scopes ## TODO - Doesn't actually do waht it say
     #print pp $api_method_details;exit;
 
     ## Construct summary textual display for the endpoint
+    $api_method_details->{scopes} = [] unless defined $api_method_details->{scopes}; ## dummy if none
     my $scopes_txt = join("\n", @{$api_method_details->{scopes}} );
+    $api_method_details->{parameterOrder} = [] unless defined $api_method_details->{parameterOrder}; ## dummy if none
     my $param_order_txt = join(",", @{$api_method_details->{parameterOrder}} );
 
     ## parameters 
@@ -53,6 +55,16 @@ sub check_api_endpoint_and_user_scopes ## TODO - Doesn't actually do waht it say
         }
     }
 
+    foreach my $expected_field ( qw/id description httpMethod path / )
+    {
+        if ( not defined $api_method_details->{$expected_field} )
+        {
+            print Dumper  $api_method_details;
+
+            croak("missing $expected_field");
+            $api_method_details->{$expected_field} = '';
+        }
+    }
 
     print qq{
 # $api_method_details->{description} - ( $api_method_details->{id} )
@@ -134,7 +146,7 @@ sub display_api_summary_and_return_versioned_api_string
     {
         $api_name = $preferred_api_name;
     }
-    say pp $new_hash->{$api_name}  if $client->{debug}; 
+    say Dumper $new_hash->{$api_name}  if $client->{debug}; 
     
     return $api_name;
 }

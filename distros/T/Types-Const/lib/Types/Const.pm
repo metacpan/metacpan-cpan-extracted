@@ -24,7 +24,7 @@ use Types::TypeTiny ();
 
 use namespace::autoclean 0.28;
 
-our $VERSION = 'v0.3.3';
+our $VERSION = 'v0.3.4';
 
 
 sub VERSION { # for older Perls
@@ -125,7 +125,7 @@ Types::Const - Types that coerce references to read-only
 
 =head1 VERSION
 
-version v0.3.3
+version v0.3.4
 
 =head1 SYNOPSIS
 
@@ -164,6 +164,11 @@ It supports coercions to read-only.
 This was added in v0.3.0.
 
 =for Pod::Coverage VERSION
+
+=head1 ROADMAP
+
+Support for Perl versions earlier than 5.10 will be removed sometime
+in 2019.
 
 =head1 SEE ALSO
 

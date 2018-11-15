@@ -1,7 +1,7 @@
 # ABSTRACT: Dancer2's Domain Specific Language (DSL)
 
 package Dancer2::Core::DSL;
-$Dancer2::Core::DSL::VERSION = '0.206000';
+$Dancer2::Core::DSL::VERSION = '0.207000';
 use Moo;
 use Carp;
 use Module::Runtime 'require_module';
@@ -514,13 +514,14 @@ Dancer2::Core::DSL - Dancer2's Domain Specific Language (DSL)
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 FUNCTIONS
 
 =head2 setting
 
 Lets you define settings and access them:
+
     setting('foo' => 42);
     setting('foo' => 42, 'bar' => 43);
     my $foo=setting('foo');
@@ -530,6 +531,7 @@ If settings were defined returns number of settings.
 =head2 set ()
 
 alias for L<setting>:
+
     set('foo' => '42');
     my $port=set('port');
 

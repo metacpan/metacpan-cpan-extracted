@@ -4,8 +4,57 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '1.002';
+our $VERSION = '1.005';
 
+#  make sure we find geos and geos_c
+sub dynamic_libs {
+    my ($class) = @_;
+
+    require FFI::CheckLib;
+
+    if ($class->install_type('system')) {
+        my @libs;
+        push @libs, FFI::CheckLib::find_lib(
+            lib => 'geos',
+        );
+        push @libs, FFI::CheckLib::find_lib(
+            lib => 'geos_c',
+        );
+        return wantarray ? @libs : $libs[0];
+    }
+    else {
+        my $dir = $class->dist_dir;
+
+        my $dynamic = Path::Tiny->new($class->dist_dir, 'dynamic');
+        if (-d $dynamic) {
+            $dir = $dynamic;
+        }
+        
+        my @libs;
+        if ($^O =~ /mswin/i) {
+            #warn "Checking $dir\n";
+            #  until FFI::CheckLib::find_lib handles names like geos-3-7-0.dll 
+            my $dh;
+            opendir $dh, "$dir/bin" or die "Unable to open dir handle for $dir/bin";
+            my @dlls
+              = map {"$dir/$_"}
+                grep {/geos.+\.dll$/}
+                readdir $dh;
+            push @libs, @dlls;
+            $dh->close;
+        }
+        else {
+            push @libs, FFI::CheckLib::find_lib(
+                lib        => ['geos', 'geos_c'],
+                libpath    => $dir,
+                systempath => [],
+                recursive  => 1,
+            );
+        }
+        #warn "FOUND LIBS: " . join (':', @libs);
+        return wantarray ? @libs : $libs[0];
+    }
+}
 
 1;
 

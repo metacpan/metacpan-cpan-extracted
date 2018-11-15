@@ -1,0 +1,70 @@
+{
+   "abstract" : "create a HTTP::Request from a curl command line",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "HTTP-Request-FromCurl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::signatures" : "0.09",
+            "Getopt::Long" : "2.38",
+            "HTTP::Request" : "6.07",
+            "HTTP::Request::Common" : "6.07",
+            "List::Util" : "1.29",
+            "MIME::Base64" : "0",
+            "Moo" : "2",
+            "PerlX::Maybe" : "0",
+            "URI" : "0",
+            "URL::Encode" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Data::Dumper" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::HTTP::LocalServer" : "0.61",
+            "Test::More" : "0",
+            "WWW::Mechanize" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/HTTP-Request-FromCurl.git",
+         "web" : "https://github.com/Corion/HTTP-Request-FromCurl"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27203",
+   "x_static_install" : 1
+}

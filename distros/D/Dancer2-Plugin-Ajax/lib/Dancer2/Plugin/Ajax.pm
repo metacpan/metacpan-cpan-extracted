@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Ajax;
 # ABSTRACT: a plugin for adding Ajax route handlers
-$Dancer2::Plugin::Ajax::VERSION = '0.300000';
+$Dancer2::Plugin::Ajax::VERSION = '0.400000';
 use strict;
 use warnings;
 use Dancer2::Core::Types 'Str';
@@ -43,7 +43,7 @@ sub ajax {
         # disable layout
         my $layout = $plugin->app->config->{'layout'};
         $plugin->app->config->{'layout'} = undef;
-        my $response = $code->();
+        my $response = $code->(@_);
         $plugin->app->config->{'layout'} = $layout;
         return $response;
     };
@@ -71,7 +71,7 @@ Dancer2::Plugin::Ajax - a plugin for adding Ajax route handlers
 
 =head1 VERSION
 
-version 0.300000
+version 0.400000
 
 =head1 SYNOPSIS
 
@@ -82,11 +82,15 @@ version 0.300000
 
     # For GET / POST
     ajax '/check_for_update' => sub {
+        my $self = shift;
+
         # ... some Ajax code
     };
 
     # For all valid HTTP methods
     ajax ['get', 'post', ... ] => '/check_for_more' => sub {
+        my $self = shift;
+
         # ... some Ajax code
     };
 
@@ -94,7 +98,7 @@ version 0.300000
 
 =head1 DESCRIPTION
 
-The C<ajax> keyword which is exported by this plugin allow you to define a route
+The C<ajax> keyword which is exported by this plugin allows you to define a route
 handler optimized for Ajax queries.
 
 The route handler code will be compiled to behave like the following:
@@ -115,12 +119,22 @@ The action built matches POST / GET requests by default. This can be extended by
 
 =back
 
+The route handler gets the Dancer C<$self> object passed in, just like any other Dancer2 route handler.
+You can use this to inspect the request data.
+
+    ajax '/check_for_update' => sub {
+        my $self = shift;
+        
+        my $method = $self->app->request->method;
+        # ...
+    }
+
 =head1 CONFIGURATION
 
-By default the plugin will use a content-type of 'text/xml' but this can be overridden
-with plugin setting 'content_type'.
+By default the plugin will use a content-type of 'text/xml', but this can be overridden
+with the plugin setting C<content_type>.
 
-Here is example to use JSON:
+Here is an example to use JSON:
 
   plugins:
     Ajax:

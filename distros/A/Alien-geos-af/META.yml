@@ -45,7 +45,7 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-geos/issues/
   repository: https://github.com/shawnlaffan/perl-alien-geos
-version: '1.002'
+version: '1.005'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 1.49'
   requires:

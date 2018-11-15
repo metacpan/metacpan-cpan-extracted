@@ -20,15 +20,15 @@ Get information from filmaffinity about a film and print them in JSON format
 
 =head1 VERSION
 
-Version 0.10
+Version 1.01
 
 =head1 USAGE
 
-  ./filmaffinity-get-movie-info.pl --id=123456
+  filmaffinity-get-movie-info.pl --id=123456
 
-  ./filmaffinity-get-movie-info.pl --id=123456 --delay=2
+  filmaffinity-get-movie-info.pl --id=123456 --delay=2
 
-  ./filmaffinity-get-movie-info.pl --id=932476 --output=/home/william/matrix.json
+  filmaffinity-get-movie-info.pl --id=932476 --output=/home/william/matrix.json
 
 =head1 REQUIRED ARGUMENTS
 
@@ -56,7 +56,7 @@ output json file
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '1.01';
 
 Readonly my $DELAY => 5;
 

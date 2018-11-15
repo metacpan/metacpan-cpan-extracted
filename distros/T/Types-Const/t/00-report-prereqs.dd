@@ -50,6 +50,7 @@ do { my $x = {
                                    'Moo' => '1.006000',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
+                                   'Test::TypeTiny' => '0',
                                    'lib' => '0'
                                  }
                  }

@@ -1,0 +1,13 @@
+
+
+5ec44181a536288f229077e084abe90d0422c7d6
+a60d8ee6e637082a465c7e31988926f36464d592
+6a9225efa4c7331367dfc214092757d4d44d9633
+04ac38709a449b14e15e690358cb06040cc26a8d
+https://dev.mysql.com/doc/refman/8.0/en/json.html
+
+bce3f28dcaee2c113b3ec7a1e1ead418465995ce
+disconnecting the handle manually does not work
+
+0c600420b40f2a16e362960a4a4c842f3df3d7e0
+add support for sharing the database connection cache between multiple Mojo::Pg objects

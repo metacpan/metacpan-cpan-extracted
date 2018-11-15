@@ -1,7 +1,3 @@
-#!/usr/bin/perl
-
-=pod
-
 =head1 NAME
 
 Nagios::NRPE::Client - A Nagios NRPE client
@@ -34,7 +30,7 @@ the same terms as the Perl 5 programming language system itself.
 
 package Nagios::NRPE::Client;
 
-our $VERSION = '1.0.3';
+our $VERSION = '2.0.2';
 
 use 5.010_000;
 
@@ -99,8 +95,9 @@ Use or don't use SSL
 
 =cut
 
-sub new {
-    my ( $class, %hash ) = @_;
+sub new
+{
+    my ($class, %hash) = @_;
     my $self = {};
     $self->{arglist}  = delete $hash{arglist}  || [];
     $self->{bindaddr} = delete $hash{bindaddr} || 0;
@@ -126,7 +123,8 @@ Helper function that can create either an INET socket or a SSL socket
 
 =cut 
 
-sub create_socket {
+sub create_socket
+{
     my ($self) = @_;
     my $reason;
     my $socket;
@@ -138,40 +136,48 @@ sub create_socket {
         PeerPort => $self->{port},
         Timeout  => $self->{timeout}
     );
-    if ( $self->{bindaddr} ) {
+    if ($self->{bindaddr})
+    {
         $socket_opts{LocalAddr} = $self->{bindaddr};
     }
-    if ( $self->{ipv4} ) {
+    if ($self->{ipv4})
+    {
         $socket_opts{Domain} = AF_INET;
     }
-    if ( $self->{ipv6} ) {
+    if ($self->{ipv6})
+    {
         $socket_opts{Domain} = AF_INET6;
     }
-    if ( $self->{ssl} ) {
+    if ($self->{ssl})
+    {
         eval {
             # required for new IO::Socket::SSL versions
             use IO::Socket::SSL;
         };
 
-        $socket_opts{SSL_cipher_list} = 'ADH';
+        $socket_opts{SSL_cipher_list} = $self->{SSL_cipher_list}
+          || 'ALL:!MD5:@STRENGTH:@SECLEVEL=0';
         $socket_opts{SSL_verify_mode} = SSL_VERIFY_NONE;
         $socket_opts{SSL_version}     = 'TLSv1';
 
         $socket = IO::Socket::SSL->new(%socket_opts);
-        if ($SSL_ERROR) {
+        if ($SSL_ERROR)
+        {
             $reason = "$!,$SSL_ERROR";
             return return_error($reason);
         }
 
     }
-    else {
+    else
+    {
         $socket_opts{Proto} = 'tcp';
         $socket_opts{Type}  = SOCK_STREAM;
         $socket             = IO::Socket::INET6->new(%socket_opts);
         $reason             = $@;
     }
 
-    if ( !$socket ) {
+    if (!$socket)
+    {
         return return_error($reason);
     }
 
@@ -215,53 +221,62 @@ and this for for NRPE V2:
 
 =cut
 
-sub run {
+sub run
+{
     my ($self) = @_;
     my $check;
-    if ( scalar @{ $self->{arglist} } == 0 ) {
+    if (scalar @{$self->{arglist}} == 0)
+    {
         $check = $self->{check};
     }
-    else {
-        $check = join '!', $self->{check}, @{ $self->{arglist} };
+    else
+    {
+        $check = join '!', $self->{check}, @{$self->{arglist}};
     }
 
     my $socket = $self->create_socket();
-    if ( ref $socket eq "HASH" ) {
+    if (ref $socket eq "HASH")
+    {
         return ($socket);
     }
     my $packet = Nagios::NRPE::Packet->new();
     my $response;
     my $assembled = $packet->assemble(
-        type    => NRPE_PACKET_QUERY,
-        check   => $check,
-        version => NRPE_PACKET_VERSION_3
-    );
+                                      type    => NRPE_PACKET_QUERY,
+                                      check   => $check,
+                                      version => NRPE_PACKET_VERSION_3
+                                     );
     print $socket $assembled;
-    while (<$socket>) {
+    while (<$socket>)
+    {
         $response .= $_;
     }
     close($socket);
 
-    if ( !$response ) {
+    if (!$response)
+    {
         $socket = $self->create_socket();
-        if ( ref $socket eq "REF" ) {
+        if (ref $socket eq "REF")
+        {
             return ($socket);
         }
-        $packet    = Nagios::NRPE::Packet->new();
-        $response  = undef;
+        $packet   = Nagios::NRPE::Packet->new();
+        $response = undef;
         $assembled = $packet->assemble(
-            type    => NRPE_PACKET_QUERY,
-            check   => $check,
-            version => NRPE_PACKET_VERSION_2
-        );
+                                       type    => NRPE_PACKET_QUERY,
+                                       check   => $check,
+                                       version => NRPE_PACKET_VERSION_2
+                                      );
 
         print $socket $assembled;
-        while (<$socket>) {
+        while (<$socket>)
+        {
             $response .= $_;
         }
         close($socket);
 
-        if ( !$response ) {
+        if (!$response)
+        {
             my $reason = "No output from remote host";
             return return_error($reason);
         }

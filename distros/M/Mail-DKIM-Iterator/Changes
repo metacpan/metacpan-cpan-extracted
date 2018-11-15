@@ -1,3 +1,7 @@
+1.002 - 2018/11/15
+- small fix authentication_results
+- fix if sub filter is used after dkim signatures are already read (like
+  from Mail::DMARC::Iterator)
 1.001 - 2018/10/27
 - return needed DNS queries as soon as possible
 - verify signature as soon as possible (return errors early)

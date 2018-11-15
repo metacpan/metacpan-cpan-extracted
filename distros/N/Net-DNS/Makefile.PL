@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1713 2018-09-12 05:57:50Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1719 2018-11-04 05:01:43Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -69,7 +69,7 @@ my @debris = qw(
 delete $optional{'Net::DNS::SEC'};	## Note: MUST NOT be installed automatically
 
 
-use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1;';
+use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1';
 use constant INET_FALLBACK => !USE_SOCKET_IP && eval 'require IO::Socket::INET';
 
 
@@ -232,12 +232,12 @@ sub install {
 		s|([/])[/]+|$1|g;				# remove gratuitous //s
 	}
 
-	eval 'require Net::DNS';
+	eval 'require Net::DNS; $Net::DNS::VERSION =~ s/(\.\d)$/${1}0/';
 	my @version = grep $_, ( 'version', $Net::DNS::VERSION );
 
-	my $nameregex = '\W+Net\WDNS.pm$';
+	my $nameregex = '\W+Net\W+DNS.pm$';
 	my @installed = grep $_ && m/$nameregex/io, values %INC;
-	my %noinstall;
+	my %occluded;
 
 	foreach (@installed) {
 		my $path = $1 if m/^(.+)$nameregex/i;
@@ -247,11 +247,11 @@ sub install {
 			last if $_ eq $path;
 		}
 		foreach ( grep !$seen{$_}, @INC ) {
-			$noinstall{$_}++;			# mark hidden libraries
+			$occluded{$_}++;			# suppress install
 		}
 	}
 
-	return $self->SUPER::install(@_) unless $noinstall{$install_site};
+	return $self->SUPER::install(@_) unless $occluded{$install_site};
 
 	my $message;
 	warn $message = <<"AMEN";

@@ -3,7 +3,7 @@
 use strictures;
 
 package goauth;
-$goauth::VERSION = '0.20';
+$goauth::VERSION = '0.21';
 use Carp;
 use Mojolicious::Lite;
 use Path::Class;
@@ -217,7 +217,7 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head2 SUMMARY
 

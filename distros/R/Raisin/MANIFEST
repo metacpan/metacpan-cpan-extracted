@@ -59,6 +59,7 @@ t/unit/entity/object.t
 t/unit/logger.t
 t/unit/middleware/formatter.t
 t/unit/param.t
+t/unit/param/moose.t
 t/unit/plugin.t
 t/unit/plugin/logger.t
 t/unit/plugin/swagger.t

@@ -194,6 +194,11 @@ sub _unmarshal_sct {
             # The value can be any SCT.
             my $value_type = substr( $sct_sig, 3, Protocol::DBus::Signature::get_sct_length($sct_sig, 3) );
 
+            # Do this here rather than in
+            # _unmarshal_to_hashref() to avoid
+            # the creation of an intermediate length.
+            Protocol::DBus::Pack::align($buf_offset, 8);
+
             $obj = _unmarshal_to_hashref($buf_sr, $buf_offset, $array_len, $key_type, $value_type);
             $buf_offset += $array_len;
         }
@@ -284,7 +289,7 @@ sub _unmarshal_to_hashref {
     my %items;
     my $obj = bless \%items, 'Protocol::DBus::Type::Dict';
 
-    Protocol::DBus::Pack::align($buf_offset, 8);
+    # NB: We already align()ed this.
 
     my $end_offset = $buf_offset + $array_len;
 

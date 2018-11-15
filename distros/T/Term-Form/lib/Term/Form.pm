@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.501';
+our $VERSION = '0.502';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -93,11 +93,24 @@ sub __validate_options {
     my $sub =  ( caller( 1 ) )[3];
     $sub =~ s/^.+::([^:]+)\z/$1/;
     for my $k ( keys %$opt ) {
-        croak $sub . ": '$k' is not a valid option name"                  if ! exists $valid->{$k};
-        next                                                              if ! defined $opt->{$k};
-        croak $sub . ": option '$k' : a reference is not a valid value."  if ref $opt->{$k} && $valid->{$k} ne 'ARRAY';
-        next                                                              if $valid->{$k} eq '';
-        croak $sub . ": option '$k' : '$opt->{$k}' is not a valid value." if $opt->{$k} !~ m/^$valid->{$k}\z/x;
+        if ( ! exists $valid->{$k} ) {
+            croak $sub . ": '$k' is not a valid option name";
+        }
+        if ( ! defined $opt->{$k} ) {
+            next;
+        }
+        if ( ref $opt->{$k} ) {
+            if ( $valid->{$k} eq 'ARRAY' ) {
+                next;
+            }
+            croak $sub . ": option '$k' : a reference is not a valid value.";
+        }
+        if ( $valid->{$k} eq '' ) {
+            next;
+        }
+        if ( $opt->{$k} !~ m/^$valid->{$k}\z/x ) {
+            croak $sub . ": option '$k' : '$opt->{$k}' is not a valid value.";
+        }
     }
     for my $k ( keys %$valid ) {
         $opt->{$k} = $self->{$k} if ! defined $opt->{$k};
@@ -1038,7 +1051,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.501
+Version 0.502
 
 =cut
 

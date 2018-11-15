@@ -1,5 +1,12 @@
 Revision history for Data-iRealPro
 
+1.14	2018-11-14
+
+	Add Forum backend, to generate cut/paste data to post songs to
+	the iRealPro forums, https://www.irealb.com/forums/forum.php .
+	Fix stdout output with --list.
+	Fix playlist name handling.
+
 1.13	2018-11-06
 
 	Miscellaneous small fixes, mostly for tests.

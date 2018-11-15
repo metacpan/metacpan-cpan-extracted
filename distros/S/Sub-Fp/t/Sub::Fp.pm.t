@@ -13,7 +13,36 @@ __          find      filter      some
 none        uniq      bool        spread   every
 len         is_array  is_hash     to_keys  to_vals
 noop        identity  is_empty    flow     eql
+is_sub
 );
+
+sub is_sub__returns_0_when_args_undef :Tests {
+    is(is_sub(), 0);
+}
+
+sub is_sub__returns_0_when_args_explicit_undef :Tests {
+    is(is_sub(undef), 0);
+}
+
+sub is_sub__returns_0_when_args_hash :Tests {
+    is(is_sub({}), 0);
+}
+
+sub is_sub__returns_0_when_args_array :Tests {
+    is(is_sub([]), 0);
+}
+
+sub is_sub__returns_0_when_args_string :Tests {
+    is(is_sub(''), 0);
+}
+
+sub is_sub__returns_0_when_args_number :Tests {
+    is(is_sub(1), 0);
+}
+
+sub is_sub__returns_1_when_args_is_code_ref :Tests {
+    is(is_sub(sub {}), 1);
+}
 
 sub eql__returns_0_when_args_incomplete :Tests {
     is(eql([]), 0);
@@ -255,19 +284,19 @@ sub partial__returns_partially_applied_func_with_placeholders_odd_placement :Tes
     );
 }
 
-sub to_vals__returns_empty_array_when_args_undef :Test {
+sub to_vals__returns_empty_array_when_args_undef :Tests {
     is_deeply(to_vals(), []);
 }
 
-sub to_vals__returns_empty_array_when_empty_array :Test {
+sub to_vals__returns_empty_array_when_empty_array :Tests {
     is_deeply(to_vals([]), []);
 }
 
-sub to_vals__returns_array_of_values :Test {
+sub to_vals__returns_array_of_values :Tests {
     is_deeply(to_vals([1,2,3]), [1,2,3]);
 }
 
-sub to_vals__returns_array_of_values_from_hash :Test {
+sub to_vals__returns_array_of_values_from_hash :Tests {
     my $result = to_vals({ key => 'val', key2 => 'val2' }),
 
     my $expected = ['val', 'val2'];
@@ -278,7 +307,7 @@ sub to_vals__returns_array_of_values_from_hash :Test {
     );
 }
 
-sub to_vals__returns_array_of_values_shallow_from_hash :Test {
+sub to_vals__returns_array_of_values_shallow_from_hash :Tests {
 
     my $result = to_vals({
         key => 'val',
@@ -296,7 +325,7 @@ sub to_vals__returns_array_of_values_shallow_from_hash :Test {
     );
 }
 
-sub to_vals__returns_array_of_values_from_string :Test {
+sub to_vals__returns_array_of_values_from_string :Tests {
 
     my $result = to_vals('Hello');
 
@@ -628,6 +657,43 @@ sub every__returns_0_when_predicate_only_matches_some :Tests {
     )
 }
 
+sub every__returns_true_when_all_items_matche_iteratee_shorthand :Tests {
+    my $people = [
+        {
+            name    => 'sally',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'teacher',
+            }
+        },
+        {
+            name    => 'Bob',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'wrestler',
+            }
+        },
+        {
+            name    => 'Robert',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'unemployed',
+            }
+        },
+    ];
+
+    my $all_teachers_like_cheese = every(
+        {
+            details => {
+                favorite_foods => ['cheese'],
+            }
+        },
+        $people,
+    );
+
+    is ($all_teachers_like_cheese, 1);
+}
+
 sub bool__returns_0_when_undef :Tests {
     is(bool(), 0)
 }
@@ -690,6 +756,39 @@ sub some__returns_false_if_none_match_predicate :Tests {
     );
 }
 
+sub some__returns_true_when_atleast_one_item_matches_iteratee_shorthand :Tests {
+    my $people = [
+        {
+            name    => 'sally',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'teacher',
+            }
+        },
+        {
+            name    => 'Bob',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'wrestler',
+            }
+        },
+        {
+            name    => 'Robert',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'unemployed',
+            }
+        },
+    ];
+
+    my $a_teacher_is_named_sally = some(
+        { name => 'sally' },
+        $people,
+    );
+
+    is ($a_teacher_is_named_sally, 1);
+}
+
 sub none__returns_true_when_empty_args :Tests {
     is(none(sub{}, []), 1);
 }
@@ -717,6 +816,43 @@ sub none__returns_false_when_multi_matches_predicate :Tests {
         none(sub { $_[0] > 3 }, [1,2,3,3,3,5,10]),
         0
     )
+}
+
+sub none__returns_true_when_no_items_matche_iteratee_shorthand :Tests {
+    my $people = [
+        {
+            name    => 'sally',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'teacher',
+            }
+        },
+        {
+            name    => 'Bob',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'wrestler',
+            }
+        },
+        {
+            name    => 'Robert',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'unemployed',
+            }
+        },
+    ];
+
+    my $nobody_likes_brussel_sprouts = none(
+        {
+            details => {
+                favorite_foods => ['brussel sprouts'],
+            }
+        },
+        $people,
+    );
+
+    is ($nobody_likes_brussel_sprouts, 1);
 }
 
 sub spread__returns_empty_list_when_args_undef :Tests {
@@ -788,6 +924,52 @@ sub find__returns_item_when_found_in_array :Tests {
     );
 }
 
+sub find__returns_item_based_on_iteratee_shorthand :Tests {
+    my $people = [
+        {
+            name    => 'sally',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'teacher',
+            }
+        },
+        {
+            name    => 'Bob',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'wrestler',
+            }
+        },
+        {
+            name    => 'Robert',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'unemployed',
+            }
+        },
+    ];
+
+    my $teachers = find(
+        {
+            details => {
+                occupation => 'teacher',
+            }
+        },
+        $people,
+    );
+
+    is_deeply(
+        $teachers,
+        {
+            name    => 'sally',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'teacher',
+            }
+        },
+    );
+}
+
 
 sub filter__returns_empty_when_empty_args :Tests {
     is_deeply(
@@ -796,20 +978,74 @@ sub filter__returns_empty_when_empty_args :Tests {
     );
 }
 
-sub filter__returns_empty_when_not_found_in_array {
+sub filter__returns_empty_when_not_found_in_array :Tests {
     is_deeply(
         filter(sub { $_[0] > 100}, [1,2,3,4,5]),
         [],
     );
 }
 
-sub filter__returns_multi_items_that_match_predicate {
+sub filter__returns_multi_items_that_match_predicate :Tests {
     is_deeply(
         filter(sub { $_[0] > 2}, [1,2,3,4,5]),
         [3,4,5]
     );
 }
 
+sub filter__returns_items_based_on_iteratee_shorthand :Tests {
+    my $people = [
+        {
+            name    => 'sally',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation => 'teacher',
+            }
+        },
+        {
+            name    => 'Bob',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'teacher',
+            }
+        },
+        {
+            name    => 'Robert',
+            details => {
+                favorite_foods => ["cheese", "bread", "oranges"],
+                occupation     => 'unemployed',
+            }
+        },
+    ];
+
+    my $teachers = filter(
+        {
+            details => {
+                occupation => 'teacher',
+            }
+        },
+        $people,
+    );
+
+    is_deeply(
+        $teachers,
+        [
+            {
+                name    => 'sally',
+                details => {
+                    favorite_foods => ["cheese", "bread", "oranges"],
+                    occupation => 'teacher',
+                }
+            },
+            {
+                name    => 'Bob',
+                details => {
+                    favorite_foods => ["cheese", "bread", "oranges"],
+                    occupation     => 'teacher',
+                }
+            },
+        ]
+    );
+}
 
 sub drop__returns_empty_array_when_empty_array :Tests {
     is_deeply(drop([]), []);

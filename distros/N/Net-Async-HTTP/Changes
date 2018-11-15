@@ -1,5 +1,13 @@
 Revision history for Net-Async-HTTP
 
+0.43    2018-11-14 22:05:27
+        [CHANGES]
+         * Use IPTOS_* constants directly from Socket 2.010
+         * Pass SNI hostname when making SSL connections (RT94605)
+
+        [BUGFIXES]
+         * Proxy connections require full authority string (RT119961)
+
 0.42    2018-04-03 15:37:17
         [CHANGES]
          * Optionally support SOCKS5 proxies, using Net::Async::SOCKS

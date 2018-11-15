@@ -1,3 +1,12 @@
+v0.77.4 2018-11-14T13:01:10Z
+ - paths fixed in docker bootstrap templte
+
+v0.77.3 2018-11-14T11:38:46Z
+ - dockerfile template fixed
+ - p changes renamed to log
+ - scandeps in END block
+ - pgsql drivers added
+
 v0.77.2 2018-11-11T01:53:07Z
  - scandeps improved
  - ro attrs fixed

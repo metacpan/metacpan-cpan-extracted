@@ -26,15 +26,15 @@ Get information from filmaffinity about a film and all ratings from a user
 
 =head1 VERSION
 
-Version 0.10
+Version 1.01
 
 =head1 USAGE
 
-  ./filmaffinity-get-all-info.pl --userid=123456 --destination=path/to/my/folder
+  filmaffinity-get-all-info.pl --userid=123456 --destination=path/to/my/folder
 
-  ./filmaffinity-get-all-info.pl --userid=123456 --destination=path/to/my/folder --delay=2
+  filmaffinity-get-all-info.pl --userid=123456 --destination=path/to/my/folder --delay=2
 
-  ./filmaffinity-get-all-info.pl --userid=123456 --destination=path/to/my/folder --force
+  filmaffinity-get-all-info.pl --userid=123456 --destination=path/to/my/folder --force
 
 =head1 REQUIRED ARGUMENTS
 
@@ -66,7 +66,9 @@ force to retrieve all movies
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '1.01';
+
+Readonly my $DELAY => 5;
 
 my ( $userID, $delay, $destination, $force, $help );
 

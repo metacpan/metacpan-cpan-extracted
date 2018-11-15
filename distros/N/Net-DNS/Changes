@@ -1,4 +1,17 @@
-$Id: Changes 1715 2018-09-21 14:17:46Z willem $                       -*-text-*-
+$Id: Changes 1722 2018-11-14 15:45:37Z willem $                       -*-text-*-
+
+
+**** 1.19 Nov 14, 2018
+
+	Show structure of EDNS options using Perl-like syntax.
+
+Fix rt.cpan.org #127557
+
+	Net::DNS::Resolver::Base should use 3 args open
+
+Fix rt.cpan.org #127182
+
+	Incorrect logic can cause DNS search to emit fruitless queries.
 
 
 **** 1.18 Sep 21, 2018

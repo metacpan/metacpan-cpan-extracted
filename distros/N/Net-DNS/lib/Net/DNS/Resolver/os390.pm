@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::os390;
 
 #
-# $Id: os390.pm 1579 2017-06-26 11:36:57Z willem $
+# $Id: os390.pm 1719 2018-11-04 05:01:43Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1579 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1719 $)[1];
 
 
 =head1 NAME
@@ -58,14 +58,14 @@ sub _init {
 
 	foreach my $dataset ( Net::DNS::Resolver::Base::_untaint( grep defined, @dataset ) ) {
 		eval {
-			local *FILE;				# "cat" able to read MVS dataset
-			open( FILE, qq[cat "$dataset" 2>/dev/null |] ) or die "$dataset: $!";
+			my $filehandle;				# "cat" able to read MVS dataset
+			open( $filehandle, '-|', qq[cat "$dataset" 2>/dev/null] ) or die "$dataset: $!";
 
 			my @nameserver;
 			my @searchlist;
 			local $_;
 
-			while (<FILE>) {
+			while (<$filehandle>) {
 				s/[;#].*$//;			# strip comment
 				s/^\s+//;			# strip leading white space
 				next unless $_;			# skip empty line
@@ -122,7 +122,7 @@ sub _init {
 				};
 			}
 
-			close(FILE);
+			close($filehandle);
 
 			$defaults->nameserver(@nameserver) if @nameserver && !$stop{nameserver}++;
 			$defaults->searchlist(@searchlist) if @searchlist && !$stop{search}++;

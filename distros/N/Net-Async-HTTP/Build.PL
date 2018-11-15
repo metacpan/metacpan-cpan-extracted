@@ -15,6 +15,7 @@ my $build = Module::Build->new(
       'IO::Async::Stream' => '0.59',
       'IO::Async::Timer::Countdown' => 0,
       'List::Util' => "1.29", # pairs()
+      'Socket' => '2.010',
       'Struct::Dumb' => '0.07',
       'URI' => 0,
       'perl' => '5.010', #  //

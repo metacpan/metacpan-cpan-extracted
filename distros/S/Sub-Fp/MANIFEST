@@ -4,6 +4,9 @@ lib/Sub/Fp.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+Sub-Fp-0.05.tar.gz
+Sub-Fp-0.06.tar.gz
+Sub-Fp-0.07.tar.gz
 t/00-load.t
 t/Fn.pm.t
 t/manifest.t

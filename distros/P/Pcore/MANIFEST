@@ -82,7 +82,6 @@ lib/Pcore/Dist/Build/Temp.pm
 lib/Pcore/Dist/Build/Update.pm
 lib/Pcore/Dist/Build/Wiki.pm
 lib/Pcore/Dist/CLI.pm
-lib/Pcore/Dist/CLI/Changes.pm
 lib/Pcore/Dist/CLI/Clean.pm
 lib/Pcore/Dist/CLI/Create.pm
 lib/Pcore/Dist/CLI/Deploy.pm
@@ -96,6 +95,7 @@ lib/Pcore/Dist/CLI/Docker/Status.pm
 lib/Pcore/Dist/CLI/Docker/Trigger.pm
 lib/Pcore/Dist/CLI/Id.pm
 lib/Pcore/Dist/CLI/Issues.pm
+lib/Pcore/Dist/CLI/Log.pm
 lib/Pcore/Dist/CLI/Ls.pm
 lib/Pcore/Dist/CLI/PAR.pm
 lib/Pcore/Dist/CLI/Pause.pm
@@ -126,6 +126,9 @@ lib/Pcore/Handle/DBI/Query/VALUES.pm
 lib/Pcore/Handle/DBI/Query/WHERE.pm
 lib/Pcore/Handle/DBI/Response.pm
 lib/Pcore/Handle/DBI/STH.pm
+lib/Pcore/Handle/pgsql.pm
+lib/Pcore/Handle/pgsql/AEHandle.pm
+lib/Pcore/Handle/pgsql/DBH.pm
 lib/Pcore/Handle/sqlite.pm
 lib/Pcore/Node.pm
 lib/Pcore/Node/Node.pm

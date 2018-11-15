@@ -2,21 +2,30 @@ package Mojo::mysql::Results;
 use Mojo::Base -base;
 
 use Mojo::Collection;
+use Mojo::JSON 'from_json';
 use Mojo::Util 'tablify';
 
-has 'sth';
+has [qw(db sth)];
 
-sub array { shift->sth->fetchrow_arrayref }
+sub array { ($_[0]->_expand($_[0]->sth->fetchrow_arrayref))[0] }
 
-sub arrays { Mojo::Collection->new(@{shift->sth->fetchall_arrayref}) }
+sub arrays { _c($_[0]->_expand(@{$_[0]->sth->fetchall_arrayref})) }
 
 sub columns { shift->sth->{NAME} }
 
+sub expand { $_[0]{expand} = defined $_[1] ? 2 : 1 and return $_[0] }
+
 sub finish { shift->sth->finish }
 
-sub hash { shift->sth->fetchrow_hashref }
+sub hash { ($_[0]->_expand($_[0]->sth->fetchrow_hashref))[0] }
 
-sub hashes { Mojo::Collection->new(@{shift->sth->fetchall_arrayref({})}) }
+sub hashes { _c($_[0]->_expand(@{$_[0]->sth->fetchall_arrayref({})})) }
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  ($self->{sth}{private_mojo_results} //= 0)++;
+  return $self;
+}
 
 sub rows { shift->sth->rows }
 
@@ -35,6 +44,46 @@ sub err { shift->sth->err }
 sub errstr { shift->sth->errstr }
 
 sub state { shift->sth->state }
+
+sub _c { Mojo::Collection->new(@_) }
+
+sub _expand {
+  my ($self, @rows) = @_;
+
+  return @rows unless my $mode = $self->{expand} and $rows[0];
+
+  # Force expanding
+  return map {
+    my $r = $_;
+    $_ = from_json $_ for grep {/^(\[|\{).*(\}|\])/} values %$r;
+    $r;
+  } @rows if $mode == 2;
+
+  # Only expand json columns
+  my ($idx, $name) = @$self{qw(idx name)};
+  unless ($idx) {
+    my $types = $self->sth->{mysql_type};
+    my @idx = grep { $types->[$_] == 245 } 0 .. $#$types;
+    ($idx, $name) = @$self{qw(idx name)} = (\@idx, [@{$self->columns}[@idx]]);
+  }
+
+  return @rows unless @$idx;
+  if (ref $rows[0] eq 'HASH') {
+    for my $r (@rows) { $r->{$_} and ($r->{$_} = from_json $r->{$_}) for @$name }
+  }
+  else {
+    for my $r (@rows) { $r->[$_] and ($r->[$_] = from_json $r->[$_]) for @$idx }
+  }
+
+  return @rows;
+}
+
+sub DESTROY {
+  my $self = shift;
+  return unless my $sth = $self->{sth};
+  $sth->finish unless --$sth->{private_mojo_results};
+}
+
 1;
 
 =encoding utf8
@@ -57,6 +106,13 @@ L<Mojo::mysql::Database>.
 =head1 ATTRIBUTES
 
 L<Mojo::mysql::Results> implements the following attributes.
+
+=head2 db
+
+  my $db   = $results->db;
+  $results = $results->db(Mojo::mysql::Database->new);
+
+L<Mojo::mysql::Database> object these results belong to.
 
 =head2 sth
 
@@ -98,6 +154,23 @@ array references.
 
 Return column names as an array reference.
 
+=head2 expand
+
+  $results = $results->expand;
+  $results = $results->expand(1)
+
+Decode C<json> fields automatically to Perl values for all rows. Passing in "1"
+as an argument will force expanding all columns that looks like a JSON array or
+object.
+
+  # Expand JSON
+  $results->expand->hashes->map(sub { $_->{foo}{bar} })->join("\n")->say;
+
+Note that this method is EXPERIMENTAL.
+
+See also L<https://dev.mysql.com/doc/refman/8.0/en/json.html> for more details
+on how to work with JSON in MySQL.
+
 =head2 finish
 
   $results->finish;
@@ -126,6 +199,13 @@ references.
 
   # Process all rows at once
   say $results->hashes->reduce(sub { $a->{money} + $b->{money} });
+
+=head2 new
+
+  my $results = Mojo::mysql::Results->new(db => $db, sth => $sth);
+  my $results = Mojo::mysql::Results->new({db => $db, sth => $sth});
+
+Construct a new L<Mojo::mysql::Results> object.
 
 =head2 rows
 

@@ -1,4 +1,9 @@
 UNRELEASED
+1.51 (15-Nov-2018):
+ - Fix old bugs from CPAN RT
+ - perltidy
+ - Update maintainer and copyright
+
 1.50 (20-Jan-2009):
  - Added Test::Pod::Coverage as a build dependency, as some CPANTS
    test hosts have died during the tests

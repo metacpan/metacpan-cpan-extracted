@@ -4,18 +4,18 @@
       "Andreas Marschke",
       "Sven Nierlein",
       "Franz Skale",
-      "Johan Carlquist <jocar@su.se>",
+      "Johan Wassberg <jocar@su.se>",
       "Christian Biamont <cbeam@su.se>",
       "Micke Nordin <mikael.nordin@su.se>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Nagios-NRPE",
    "no_index" : {
@@ -42,6 +42,8 @@
             "Digest::CRC" : "0",
             "IO::Socket" : "0",
             "IO::Socket::INET6" : "0",
+            "Net::Subnet" : "0",
+            "Time::HiRes" : "0",
             "constant" : "0",
             "perl" : "5.010_000"
          }
@@ -50,23 +52,23 @@
    "provides" : {
       "Nagios::NRPE" : {
          "file" : "lib/Nagios/NRPE.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.2"
       },
       "Nagios::NRPE::Client" : {
          "file" : "lib/Nagios/NRPE/Client.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.2"
       },
       "Nagios::NRPE::Daemon" : {
          "file" : "lib/Nagios/NRPE/Daemon.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.2"
       },
       "Nagios::NRPE::Packet" : {
          "file" : "lib/Nagios/NRPE/Packet.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.2"
       },
       "Nagios::NRPE::Utils" : {
          "file" : "lib/Nagios/NRPE/Utils.pm",
-         "version" : "v1.0.3"
+         "version" : "v2.0.2"
       }
    },
    "release_status" : "stable",
@@ -76,8 +78,9 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/stockholmuniversity/nagios-nrpe.git"
       }
    },
-   "version" : "v1.0.3"
+   "version" : "v2.0.2"
 }

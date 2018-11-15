@@ -1,0 +1,11 @@
+0.012 - 2018-11-14
+- better reporting of reason for result
+- better handling of Received-SPF
+0.011 - 2018-11-14
+- dkim_sub argument for new for external DKIM handling
+- next() creates exactly the same DNS packets for not yet handled tasks
+  instead of creating packets with different DNS Id
+- new method authentication_results
+- add real test
+0.010 - 2015-12-16
+- initial release

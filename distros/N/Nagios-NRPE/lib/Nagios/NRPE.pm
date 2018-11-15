@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 =head1 NAME
 
 Nagios::NRPE - A Nagios NRPE implementation in pure perl
@@ -65,6 +63,6 @@ package Nagios::NRPE;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.3';
+our $VERSION = '2.0.2';
 
 1;

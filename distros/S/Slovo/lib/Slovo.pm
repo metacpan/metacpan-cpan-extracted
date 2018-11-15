@@ -17,7 +17,7 @@ use Slovo::Controller;
 use Slovo::Validator;
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '2018.11.11';
+our $VERSION   = '2018.11.15';
 our $CODENAME  = 'U+2C10 GLAGOLITIC CAPITAL LETTER NASHI (Ⱀ)';
 my $CLASS = __PACKAGE__;
 
@@ -220,9 +220,9 @@ with nice core features like:
 
 =item * Multi-domain support - DONE;
 
-=item * Multi-user support - BASIC;
+=item * Multi-user support - DONE;
 
-=item * User registration - TODO;
+=item * User onboarding - STARTED;
 
 =item * User sign in - DONE;
 
@@ -230,7 +230,7 @@ with nice core features like:
 
 =item * Managing groups - TODO;
 
-=item * Multiple groups per user - BASIC;
+=item * Multiple groups per user - DONE;
 
 =item * Ownership and access permissions management per page and it's content - DONE;
 

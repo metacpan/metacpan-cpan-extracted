@@ -1,5 +1,5 @@
 package Dancer2;
-$Dancer2::VERSION = '0.206000';
+$Dancer2::VERSION = '0.207000';
 # ABSTRACT: Lightweight yet powerful web application framework
 
 use strict;
@@ -128,7 +128,7 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 DESCRIPTION
 
@@ -143,20 +143,14 @@ Dancer2 is easy and fun:
 
     use Dancer2;
     get '/' => sub { "Hello World" };
-    dance;
+    dance; 
 
 This is the main module for the Dancer2 distribution. It contains logic for
 creating a new Dancer2 application.
 
-You are welcome to join our mailing list.
-For subscription information, mail address and archives see
-L<http://lists.preshweb.co.uk/mailman/listinfo/dancer-users>.
-
-We are also on IRC: #dancer on irc.perl.org.
-
 =head2 Documentation Index
 
-Documentation on Dancer2 is split into several manpages. Below is a
+Documentation on Dancer2 is split into several sections. Below is a
 complete outline on where to go for help.
 
 =over 4
@@ -213,6 +207,20 @@ how to convert a Dancer (1) based application to Dancer2.
 
 Returns the current runner. It is of type L<Dancer2::Core::Runner>.
 
+=head1 SECURITY REPORTS
+
+If you need to report a security vulnerability in Dancer2, send all pertinent
+information to L<mailto:dancer-security@dancer.pm>. These matters are taken
+extremely seriously, and will be addressed in the earliest timeframe possible.
+
+=head1 SUPPORT
+
+You are welcome to join our mailing list.
+For subscription information, mail address and archives see
+L<http://lists.preshweb.co.uk/mailman/listinfo/dancer-users>.
+
+We are also on IRC: #dancer on irc.perl.org.
+
 =head1 AUTHORS
 
 =head2 CORE DEVELOPERS
@@ -253,6 +261,7 @@ Returns the current runner. It is of type L<Dancer2::Core::Runner>.
     Bas Bloemsaat
     baynes
     Ben Hutton
+    Ben Kaufman
     biafra
     Blabos de Blebe
     Breno G. de Oliveira
@@ -266,6 +275,8 @@ Returns the current runner. It is of type L<Dancer2::Core::Runner>.
     Colin Kuskie
     cym0n
     Dale Gallagher
+    Dan Book (Grinnz)
+    Daniel Böhmer
     Daniel Muey
     Daniel Perrett
     Dave Jacoby
@@ -274,6 +285,7 @@ Returns the current runner. It is of type L<Dancer2::Core::Runner>.
     David Steinbrunner
     David Zurborg
     Davs
+    Deirdre Moran
     Dennis Lichtenthäler
     Dinis Rebolo
     dtcyganov
@@ -282,6 +294,7 @@ Returns the current runner. It is of type L<Dancer2::Core::Runner>.
     Gabor Szabo
     geistteufel
     Gideon D'souza
+    Gil Magno
     Glenn Fowler
     Graham Knop
     Gregor Herrmann
@@ -319,6 +332,7 @@ Returns the current runner. It is of type L<Dancer2::Core::Runner>.
     Matt Phillips
     Matt S Trout
     Maurice
+    MaxPerl
     Menno Blom
     Michael Kröll
     Michał Wojciechowski

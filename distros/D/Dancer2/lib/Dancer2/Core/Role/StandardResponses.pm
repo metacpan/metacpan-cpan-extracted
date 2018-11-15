@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::StandardResponses;
 # ABSTRACT: Role to provide commonly used responses
-$Dancer2::Core::Role::StandardResponses::VERSION = '0.206000';
+$Dancer2::Core::Role::StandardResponses::VERSION = '0.207000';
 use Moo::Role;
 use Dancer2::Core::HTTP;
 
@@ -35,7 +35,7 @@ Dancer2::Core::Role::StandardResponses - Role to provide commonly used responses
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 METHODS
 

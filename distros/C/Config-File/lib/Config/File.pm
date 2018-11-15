@@ -6,21 +6,20 @@ use Exporter;
 use IO::File;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-@ISA = qw/Exporter/;
+@ISA       = qw/Exporter/;
 @EXPORT_OK = qw/read_config_file/;
-$VERSION='1.50';
-
+$VERSION   = '1.51';
 
 sub read_config_file($) {
-    my ($conf, $file, $fh, $line_num);
+    my ( $conf, $file, $fh, $line_num );
     $file = shift;
-    $fh = IO::File->new($file, 'r') or
-        croak "Can't read configuration in $file: $!\n";
+    $fh = IO::File->new( $file, 'r' )
+      or croak "Can't read configuration in $file: $!\n";
 
-    while (++$line_num and my $line = $fh->getline) {
-        my ($orig_line, $conf_ele, $conf_data);
+    while ( ++$line_num and my $line = $fh->getline ) {
+        my ( $orig_line, $conf_ele, $conf_data );
         chomp $line;
-	$orig_line = $line;
+        $orig_line = $line;
 
         next if $line =~ m/^\s*#/;
         $line =~ s/(?<!\\)#.*$//;
@@ -29,26 +28,26 @@ sub read_config_file($) {
         $line =~ s{\$(\w+)}{
             exists($conf->{$1}) ? $conf->{$1} : "\$$1"
             }gsex;
-        
 
-	unless ($line =~ m/\s*([^\s=]+)\s*=\s*(.*?)\s*$/) {
-	    warn "Line format invalid at line $line_num: '$orig_line'";
-	    next;
-	}
-
-        ($conf_ele, $conf_data) = ($1, $2);
-        unless ($conf_ele =~ /^[\]\[A-Za-z0-9_-]+$/) {
-            warn "Invalid characters in key $conf_ele at line $line_num" .
-		" - Ignoring";
+        unless ( $line =~ m/\s*([^\s=]+)\s*=\s*(.*?)\s*$/ ) {
+            warn "Line format invalid at line $line_num: '$orig_line'";
             next;
         }
-        $conf_ele = '$conf->{' . join("}->{", split /[][]+/, $conf_ele) . "}";
+
+        ( $conf_ele, $conf_data ) = ( $1, $2 );
+        unless ( $conf_ele =~ /^[\]\[A-Za-z0-9_-]+$/ ) {
+            warn "Invalid characters in key $conf_ele at line $line_num"
+              . " - Ignoring";
+            next;
+        }
+        $conf_ele =
+          '$conf->{"' . join( '"}->{"', split /[][]+/, $conf_ele ) . '"}';
         $conf_data =~ s!([\\\'])!\\$1!g;
         eval "$conf_ele = '$conf_data'";
     }
     $fh->close;
 
-    return $conf;
+    return $conf // {};
 }
 
 1;

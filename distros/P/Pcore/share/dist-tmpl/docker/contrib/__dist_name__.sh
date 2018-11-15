@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# wget -q https://bitbucket.org/softvisio/<: $dist_name :>/raw/tip/contrib/<: $dist_name :>.sh && chmod +x <: $dist_name :>.sh
+# wget -q https://bitbucket.org/softvisio/<: $dist_path :>/raw/tip/contrib/<: $dist_path :>.sh && chmod +x <: $dist_path :>.sh
 
 set -e
 
@@ -22,7 +22,7 @@ RESTART=always
 KILL_TIMEOUT=10
 
 DOCKER_CONTAINER_ARGS="
-    -v $SCRIPT_DIR/:/var/local/$NAME/data/ \
+    -v $SCRIPT_DIR:/var/local/$NAME/data \
     -p 80:80/tcp \
     -p 443:443/tcp \
 "

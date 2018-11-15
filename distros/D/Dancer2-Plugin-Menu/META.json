@@ -1,0 +1,64 @@
+{
+   "abstract" : "Automatically generate an HTML menu for your Dancer2 app",
+   "author" : [
+      "Steve Dondley <s@dondley.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-Menu",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.206000",
+            "Dancer2::Core::Hook" : "0",
+            "Dancer2::Plugin" : "0",
+            "Data::Dumper" : "0",
+            "HTML::Element" : "0",
+            "List::Util" : "0",
+            "Storable" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer2" : "0.206000",
+            "File::Path" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sdondley/Dancer2-Plugin-Menu/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sdondley/Dancer2-Plugin-Menu.git",
+         "web" : "https://github.com/sdondley/Dancer2-Plugin-Menu"
+      }
+   },
+   "version" : "0.006",
+   "x_generated_by_perl" : "v5.24.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

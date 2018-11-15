@@ -4,21 +4,21 @@
       "William Belle <william.belle@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "FilmAffinity-UserRating",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Find::Rule" : "0.33",
+            "File::Find::Rule" : "0.34",
             "Test::JSON" : "0.11",
-            "Test::LongString" : "0.15",
+            "Test::LongString" : "0.17",
             "Test::MockObject" : "1.2",
             "Test::More" : "0"
          }
@@ -30,18 +30,18 @@
       },
       "runtime" : {
          "requires" : {
-            "Encode" : "2.57",
-            "File::Copy::Recursive" : "0.38",
-            "HTML::TreeBuilder" : "5.03",
+            "Encode" : "2.98",
+            "File::Copy::Recursive" : "0.44",
+            "HTML::TreeBuilder" : "5.07",
             "HTML::TreeBuilder::XPath" : "0.14",
-            "IO::All" : "0.67",
-            "IO::Interactive" : "0.000006",
-            "JSON" : "2.9",
-            "LWP::RobotUA" : "6.03",
-            "List::Compare" : "0.39",
-            "Moose" : "2.12",
+            "IO::All" : "0.87",
+            "IO::Interactive" : "1.02",
+            "JSON" : "2.97",
+            "LWP::RobotUA" : "6.36",
+            "List::Compare" : "0.53",
+            "Moose" : "2.2",
             "MooseX::Privacy" : "0.05",
-            "Readonly" : "2",
+            "Readonly" : "2.05",
             "Text::Trim" : "1.02",
             "perl" : "5.006"
          }
@@ -50,15 +50,15 @@
    "provides" : {
       "FilmAffinity::Movie" : {
          "file" : "lib/FilmAffinity/Movie.pm",
-         "version" : "0.1"
+         "version" : "1.01"
       },
       "FilmAffinity::UserRating" : {
          "file" : "lib/FilmAffinity/UserRating.pm",
-         "version" : "0.10"
+         "version" : "1.01"
       },
       "FilmAffinity::Utils" : {
          "file" : "lib/FilmAffinity/Utils.pm",
-         "version" : "0.1"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -70,6 +70,6 @@
          "url" : "https://github.com/williambelle/filmaffinity-userrating"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

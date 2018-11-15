@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Device::Chip::Adapter;
+
+use Device::Chip::ADT7470;
+
+use feature 'say';
+
+my $ADAPTER     = "LinuxKernel";
+my $MOUNTPARAMS = 'bus=/dev/i2c-1,addr=0x2e';
+
+my $ina = Device::Chip::ADT7470->new;
+
+$ina->mount_from_paramstr(
+    Device::Chip::Adapter->new_from_description($ADAPTER), $MOUNTPARAMS, )->get;
+
+use constant { FAN1 => 1 };
+
+$ina->change_config( STRT => 1 )->get;
+
+my %config = %{ $ina->read_config->get };
+say "STRT is now " . $config{STRT};
+
+$ina->write_duty( FAN1, 180 )->get;
+
+my $duty = $ina->read_duty(FAN1)->get;
+say "Fan duty cycle is $duty";
+
+$ina->write_duty_percent( FAN1, 20 )->get;
+
+$duty = $ina->read_duty_percent(FAN1)->get;
+say "Fan duty cycle is $duty%";
+
+my $rpm = $ina->read_fan_rpm(FAN1)->get;
+say "Fan speed is $rpm rpm";
+

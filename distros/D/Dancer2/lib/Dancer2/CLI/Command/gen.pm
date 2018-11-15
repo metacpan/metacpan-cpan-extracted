@@ -1,6 +1,6 @@
 # ABSTRACT: create new Dancer2 application
 package Dancer2::CLI::Command::gen;
-$Dancer2::CLI::Command::gen::VERSION = '0.206000';
+$Dancer2::CLI::Command::gen::VERSION = '0.207000';
 use strict;
 use warnings;
 
@@ -110,10 +110,19 @@ NOYAML
     }
 
     print <<HOWTORUN;
-The application is ready to serve; to run it, do:
+
+Your new application is ready! To run it:
 
         cd $app_path
         plackup bin/app.psgi
+
+If you need community assistance, the following resources are available:
+- Dancer website: http://perldancer.org
+- Mailing list: http://lists.preshweb.co.uk/mailman/listinfo/dancer-users
+- IRC: irc.perl.org#dancer
+
+Happy Dancing!
+
 HOWTORUN
 
     return 0;
@@ -298,7 +307,7 @@ Dancer2::CLI::Command::gen - create new Dancer2 application
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 AUTHOR
 

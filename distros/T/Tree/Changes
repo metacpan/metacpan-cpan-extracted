@@ -1,7 +1,13 @@
 Revision history for Perl distribution Tree.
 
-1.12  2018-11-13t08:52:00
+1.13  2018-11-14T18:00:00
+	- Change parent of Tree::DeepClone from Tree::Fast to Tree. Tree inherits from Tree::Fast.
+		Thanx to Neven Luetic, Nagel Kuehne and Sven Willenbuecher for prompting me to release
+		versions 1.11 and 1.13.
+
+1.12  2018-11-13T08:52:00
 	- Fix licence statement in Tree::DeepClone to match that of Tree itself.
+		Thanx to Petr Pisar for advising me of this issue.
 
 1.11  2018-11-11T14:41:00
 	- Clean up Tree::Fast.clone_self() by removing useless code.

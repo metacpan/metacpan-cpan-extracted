@@ -4,8 +4,11 @@ Changes
 LICENSE
 MANIFEST
 Makefile.PL
+examples/anyevent.pl
 examples/introspect.pl
 examples/introspect_nb.pl
+examples/packagekit.pl
+examples/receive.pl
 lib/Protocol/DBus.pm
 lib/Protocol/DBus/.Connection.pm.swp
 lib/Protocol/DBus/Authn.pm

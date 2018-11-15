@@ -1,0 +1,80 @@
+upstream <: $name :> {
+    server <: $upstream :>;
+
+    keepalive 180; # TODO set from variable
+}
+
+: if $default_server {
+# default server
+server {
+    listen                    *:80 default_server;
+    listen                    [::]:80 default_server;
+    listen                    *:443 ssl default_server;
+    listen                    [::]:443 ssl default_server;
+    server_name               "";
+    return                    444;
+
+    ssl_certificate_key       <: $nginx_default_key :>;
+    ssl_certificate           <: $nginx_default_pem :>;
+    ssl_stapling              off;
+}
+: }
+
+: for $host.keys() -> $host_name {
+# default HTTP redirect
+server {
+    listen                    *:80;
+    listen                    [::]:80;
+    server_name               <: $host_name | raw :>;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+
+    location /.well-known/acme-challenge/ {
+        alias /var/run/acme/acme-challenge/;
+    }
+}
+
+server {
+    listen                    *:443 ssl http2;
+    listen                    [::]:443 ssl http2;
+    server_name               <: $host_name | raw :>;
+
+    # ssl_certificate           /var/lib/acme/live/billing.lcom.net.ua/fullchain;
+    # ssl_certificate_key       /var/lib/acme/live/billing.lcom.net.ua/privkey;
+    # ssl_trusted_certificate   /var/lib/acme/live/billing.lcom.net.ua/chain;
+
+    ssl_certificate_key       <: $nginx_default_key :>;
+    ssl_certificate           <: $nginx_default_pem :>;
+    ssl_stapling              off;
+
+    keepalive_timeout         70;
+    # root                      <: $www_root_dir :>; # TODO
+
+    error_log                 <: $data_dir :>/nginx-error.log info;
+    access_log                <: $data_dir :>/nginx-access.log default;
+
+    client_max_body_size      10M;
+
+    location @backend {
+        proxy_pass http://<: $name :>;
+
+        proxy_read_timeout 60s;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Accel-Support 1;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        # keepalive & websocket
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+    }
+
+: for $host[$host_name]["location"] -> $location {
+<: $location | raw :>
+: }
+}
+: }

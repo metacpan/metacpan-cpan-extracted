@@ -10,7 +10,7 @@ configure_requires:
   Alien::GSL: '1.01'
   IO::Socket::SSL: '2.043'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 keywords:
   - rperl
   - perl5
@@ -85,5 +85,5 @@ resources:
   homepage: http://www.rperl.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/rperl.git
-version: '4.001000'
+version: '4.002000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,9 +1,39 @@
 ==================================================
-Changes from 2016-02-04 00:00:00 +0000 to present.
+Changes from 2016-11-13 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2018-02-03 03:44:44 +0000
+version 0.003 at 2018-11-13 04:59:37 +0000
+------------------------------------------
+
+  Change: da8ae55ff328e3fdf1fe567508f9f44ea7492c1d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-13 05:57:10 +0000
+
+    Tweaks for reporting errors in the handlers
+
+    Code cleanup and making sure some errors bubble up. 
+
+  Change: 3db4322497c8b42e2007604ad8199b7ff02c0d00
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-13 05:40:23 +0000
+
+    Ignore the changes file. 
+
+  Change: 0604b52f706a2fdcc8aae778623e0ad05d8ce0eb
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-05-02 22:35:44 +0000
+
+    Fix "uninitialized value" bug 
+
+  Change: 359f9d82154a307e0898c64c342b04379657b86a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-02 19:48:50 +0000
+
+    Remove the Changes file from git-tracking 
+
+------------------------------------------
+version 0.002 at 2018-02-03 03:44:14 +0000
 ------------------------------------------
 
   Change: 0bc1293e78e433c554178c0f07b254332995f424

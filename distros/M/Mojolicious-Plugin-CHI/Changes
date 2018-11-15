@@ -1,3 +1,6 @@
+0.20 2018-11-14
+        - Fix tests for Mojolicious > 8.06 compatibility.
+
 0.19 2018-09-30
         - Fix tests for Mojolicious > 8.01 compatibility.
 

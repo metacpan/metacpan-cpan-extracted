@@ -1,9 +1,85 @@
 ==================================================
-Changes from 2016-05-03 00:00:00 +0000 to present.
+Changes from 2016-11-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2018-05-03 18:31:27 +0000
+version 0.009 at 2018-11-15 05:47:46 +0000
+------------------------------------------
+
+  Change: f2961717b9be9e4e83e9dfbe68f97f384883f72b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-14 21:45:47 +0000
+
+    Fix bug in the cleanup size calculations
+
+    I got too clever and tried to do something in one statement that should be
+    two. 
+
+  Change: f48972458c836fb4ae10455f9e4ce5351c1a0947
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-14 21:45:06 +0000
+
+    Stop words added for new options 
+
+------------------------------------------
+version 0.008 at 2018-11-15 05:38:24 +0000
+------------------------------------------
+
+  Change: 416da63d80f582a34fd18e72b2bf26b7cd5c4b97
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-15 06:38:24 +0000
+
+    Version bump to 0.008 
+
+  Change: 3cbb85abab58e255afdd90384174213b89dbfa7d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-15 06:37:31 +0000
+
+    Remove fatal error
+
+    I was attempting to add more debugging information, but inadvertently added
+    a fatal exception. 
+
+------------------------------------------
+version 0.007 at 2018-11-15 05:20:09 +0000
+------------------------------------------
+
+  Change: 995f86af18dd66327f2fddd7c45dda79f81990ce
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2018-11-14 21:20:09 +0000
+
+    Fix the bug with the diskbased queues
+
+    In the previous release, I failed to restore the batch content into the
+    heap's batch tracking before calling the save event. This led to the data
+    simpyl being discarded, which is not what was intended. 
+
+------------------------------------------
+version 0.006 at 2018-11-13 23:14:55 +0000
+------------------------------------------
+
+  Change: d1532374a1693ce8d0665ab3c08294104d31cab6
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2018-11-13 15:14:55 +0000
+
+    Fix typo in the name of the pending_requests_count event 
+
+------------------------------------------
+version 0.005 at 2018-11-13 04:22:56 +0000
+------------------------------------------
+
+  Change: 6c742a332a7c58d8357424efa3dbe2f264d77cca
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-12 20:22:56 +0000
+
+    Track pending_requests to the connection pool
+
+    Timeouts are causing unexpected failures, but we might be able to detect
+    them by detecting high number of pending requests. Default the
+    MaxPendingRequests to 100 for this first exploration. 
+
+------------------------------------------
+version 0.004 at 2018-05-03 18:31:11 +0000
 ------------------------------------------
 
   Change: b8090c274d0dad1f31504f7e147875378d2c2c84

@@ -30,7 +30,7 @@ WriteMakefile
 		    'Text::CSV_XS'   => 1.19,
 		    'JSON::PP'	     => 2.27300,
 		    'HTML::Entities' => 3.69,
-		    'App::Packager'  => 1.420,
+		    'App::Packager'  => 1.430,
 		    $ENV{DATA_IREALPRO_MUSICXML} ? ( 'XML::LibXML' => 2.0132 ) : (),
 		   },
  BUILD_REQUIRES  => {

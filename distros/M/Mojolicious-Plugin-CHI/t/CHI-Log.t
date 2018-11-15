@@ -2,16 +2,21 @@
 use Mojolicious::Lite;
 use Test::More;
 use Test::Mojo;
+use Mojo::Log;
 use File::Temp qw/:POSIX tempdir/;
 use File::Path qw/remove_tree/;
-
-use lib 'lib';
-use lib '../lib';
 
 use_ok 'Mojolicious::Plugin::CHI';
 
 my $t = Test::Mojo->new;
 my $app = $t->app;
+
+my $log = Mojo::Log->new(
+  level => 'debug',
+  path => scalar tmpnam()
+);
+
+$app->log($log);
 
 my $c = Mojolicious::Controller->new;
 $c->app($app);

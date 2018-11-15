@@ -25,67 +25,11 @@ my %known_inconsistent = (
 				# Kelso: Failed 16-Nov-2017
 				# Decayed: 24-Nov-2017
 				# Sladen removed 24-Nov-2017
-#   24793 => { sladen => 1 },	# Sladen: failed 02-Nov-2017
-				# Kelso: failed 30-May-2018
-#   24794 => { sladen => 1 },	# Sladen: failed 23-Nov-2017
-				# Kelso: failed 19-Dec-2017
-#   24795 => { sladen => 1 },	# Kelso: Failed 16-Nov-2017
-				# Sladen Failed 17-Nov-2017
-    24796 => { sladen => 1 },	# Kelso: failed 20-Oct-2012;
-				# Sladen: still operational.
-#   24837 => { sladen => 1 },	# Kelso: Spare 23-Mar-2018
-				# Sladen: Failed 24-Mar-2018
-				# Kelso: Backup 30-May-2018
-				# Kelso: Failed 23-Aug-2018
-				# Decayed: 02-Sep-2018
-#   24839 => { sladen => 1 },	# Kelso: Partial failure 16-Sep-2018
-				# Kelso: Failed 20-Sep-2018
-				# Decayed: 06-Oct-2018
-    24840 => { sladen => 1 },	# Sladen: failed 17-Mar-2018
-#   24869 => { sladen => 1 },	# Sladen: failed 14-May-2017
-				# Kelso: Backup 30-May-2018
-				# Kelso: Failed 04-Oct-2018
-				# Kelso: partial failure 26-Sep-2018
-				# Kelso & Sladen dropped 15-Oct-2018
-				# Decayed 14-Oct-2018
-#   24872 => { sladen => 1 },	# Sladen: failed 19-May-2017
-				# Kelso: Backup 30-May-2018
-				# Kelso: Tumbling 12-Jun-2018
-				# Decayed: 19-Aug-2018
-    24904 => { sladen => 1 },	# Kelso: spare 08-Feb-2018
-				# Sladen: failed 14-Feb-2018
-#   24905 => { sladen => 1 },	# Kelso: spare 08-Feb-2018
-				# Kelso: Tumbling 30-May-2018
-    24906 => { sladen => 1 },	# Kelso: spare 08-Feb-2018
-				# Sladen: failed 14-May-2018
-				# Decayed: 28-Mar-2018
-    24907 => { sladen => 1 },	# Kelso: failed 19-Dec-2017
     24950 => { sladen => 1 },	# about 28-Aug-2017: Sladen declares failed
 				# Kelso: Backup 30-May-2018
     24966 => { sladen => 1 },	# 14-Apr-2018: Sladen failed
 				# Kelso: Backup 30-May-2018
-#   24968 => { sladen => 1 },	# Sladen: failed 09-Dec-2017
-				# Decayed 26-May-2018
-#   24969 => { sladen => 1 },	# Sladen: failed 09-Dec-2017
-				# SpaceTrack: Decayed 08-Jan-2018
-#   25042 => { sladen => 1 },	# 19-Aug-2016: Sladen - Failed on station?
-				# Kelso: Failed 30-May-2018
-#   25106 => { sladen => 1 },	# 06-May 2018: Sladen - Failed
-				# Kelso: Backup 30-May-2018
-				# Kelso: Failed 25-Aug-2018
-#   25108 => { sladen => 1 },	# 26-Jan-2018: Kelso - Partly operational.
-    25169 => { sladen => 1 },	# Sladen: Failed 17-Sep-2018
-				# Kelso: Partial 16-Oct-2018
-    25170 => { sladen => 1 },	# Kelso: Partial failure 23-Aug-2018
-				# Kelso: Failure 11-Sep-2018
     25171 => { sladen => 1 },	# Sladen: Failed 09-Sep-2018
-#   25172 => { sladen => 1 },	# Kelso: Partial failure 31-Aug-2018
-				# Sladen: failed 02-Sep-2018
-				# Kelso: failed 08-Sep-2018
-				# Spacetrack: decayed 23-Sep-2018
-#   25173 => { sladen => 1 },	# Sladen: Failed 17-Sep-2018
-				# Kelso: Failed 20-Sep-2018
-				# Space Track: decayed 30-Sep-2018
     25263 => { sladen => 1 },	# Sladen: operational; others: spare.
 				# Sladen: failed 09-Dec-2017 (Kelso: operational)
 				# Kelso: Backup 30-May-2018
@@ -93,73 +37,12 @@ my %known_inconsistent = (
 				# Kelso: Backup 30-May-2018
     25274 => { sladen => 1 },	# about 28-Aug-2017: Sladen declares failed.
 				# Kelso: Backup 30-May-2018
-    25285 => { sladen => 1 },	# 18-May-2018: Sladen failed
-				# Kelso: Backup 30-May-2018
     25287 => { sladen => 1 },	# 10-May-2018: Kelso partly operational
 				# 18-May-2018: Sladen failed
 				# Kelso: Backup 30-May-2018
-#   25288 => { sladen => 1 },	# 26-Jun-2018: Kelso partly operational
-				# 01-Jul-2018: Sladen failed
-				# 03-Jul-2018: Kelso failed
-#   25289 => { sladen => 1 },	# 10-May-2018: Kelso partly operational
-				# 18-May-2018: Sladen failed
-				# Kelso: Backup 30-May-2018
-				# Decayed: 23-Aug-2018
-#   25290 => { sladen => 1 },	# 08-Jun-2018: Kelso partly operational
-				# 11-Jun-2018: Sladen failed on station
-				# 20-Jun-2018: Kelso failed
-#   25291 => { sladen => 1 },	# 10-May-2018: Kelso partly operational
-				# 18-May-2018: Sladen failed
-				# Kelso: Failed 30-May-2018
-				# Space Track: Decayed 06-Jun-2018
-#   25342 => { sladen => 1 },	# 14-Jun-2018: Sladen failed.
-				# Kelso: partial failure 20-Sep-2018
-				# Kelso: failed 04-Oct-2018
-    25343 => { sladen => 1 },	# 27-Apr-2018: Kelso partly operational
-#   25346 => { sladen => 1 },	# 14-Jun-2018: Kelso partly operational
-				# 15-Jun-2018: Sladen failed on station
-				# 22-Jun-2018: Kelso failed
-#   25431 => { sladen => 1 },	# 21-Jan-2018: Sladen failed.
-    25431 => { sladen => 1 },	# Sladen: failed 09-Feb-2018
-#   25432 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
-				# Kelso: Backup 30-May-2018
-				# Decayed: 28-Aug-2018
-#   25468 => { sladen => 1 },	# Sladen: failed 14-May-2017
-				# Kelso: Backup 30-May-2018
-				# Kelso: Tumbling 20-Jun-2018
-				# SpaceTrack: decaued 17-Jul-2018
-#   25469 => { sladen => 1 },	# 12-Jul-2018: Kelso partially operational
-				# 12-Jul-2018: Sladen failed
-				# 12-Aug-2018: Decayed
-#   25528 => { sladen => 1 },	# Kelso: partial failure 23-Aug-2018
-				# Kelso: failed 11-Sep-2018
-				# Decayed: 05-Oct-2018
-#   25530 => { sladen => 1 },	# Kelso: partial failure 07-Sep-2018
-    				# Sladen: failed 09-Sep-2018
-				# Kelso: failed 26-Sep-2018
-#   25531 => { sladen => 1 },	# Kelso: partial failure 10-Oct-2018
-				# Kelso: failure 18-Oct-2018
-#   25577 => { sladen => 1 },	# 14-Apr-2018: Sladen failed
-				# Kelso: Backup 30-May-2018
-				# Kelso: Failed 13-Oct-2018
-				# Decayed: 22-Oct-2018
-#   25578 => { sladen => 1 },	# 26-Apr-2018: Sladen failed
-				# Kelso: Backup 30-May-2018
-				# Kelso: failed 10-Oct-2018
-				# Decayed: 22-Oct-2018
     25777 => { sladen => 1 },	# Sladen failed 27-Sep-2018
-#   25778 => { sladen => 1 },	# 04-May-2018: Sladen failed
-				# 25-May-2018: Decayed
-#   27373 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
-				# Kelso: Failed 30-May-2018
-    27374 => { sladen => 1 },	# 02-Mar-2018 Kelso: partly operationsl
-#   27376 => { sladen => 1 },	# Sladen: failed 22-Dec-2017
-				# Kelso: Failed 30-May-2018
     27450 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
 				# Kelso: Backup 30-May-2018
-#   27451 => { sladen => 1 },	# 06-Jul-2018: Kelso partly operational
-    				# 09-Jul-2018: Sladen failed
-				# 24-Jul-2018: Kelso failed
 );
 
 my $st = Astro::SpaceTrack->new();
@@ -234,7 +117,6 @@ foreach (
  25078   Iridium 44     [-]      Tumbling
  25104   Iridium 45     [+]      
  25105   Iridium 24     [-]      Tumbling
- 25169   Iridium 52     [-]      Tumbling
  25171   Iridium 54     [+]      
  25262   Iridium 51     [-]      Tumbling
  25263   Iridium 61     [B]      
@@ -243,7 +125,7 @@ foreach (
  25274   Iridium 58     [B]      
  25275   Iridium 59     [+]      
  25276   Iridium 60     [+]      
- 25285   Iridium 62     [P]      
+ 25285   Iridium 62     [-]      Tumbling
  25286   Iridium 63     [-]      Tumbling
  25287   Iridium 64     [B]      
  25319   Iridium 69     [-]      Tumbling
@@ -251,8 +133,6 @@ foreach (
  25344   Iridium 73     [-]      Tumbling
  25467   Iridium 82     [-]      Tumbling
  25527   Iridium 2      [-]      Tumbling
- 25530   Iridium 84     [-]      Tumbling
- 25531   Iridium 83     [-]      Tumbling
  25777   Iridium 14     [+]      
  27372   Iridium 91     [+]      
  27373   Iridium 90     [-]      Tumbling
@@ -289,7 +169,6 @@ KELSO
  25078   Iridium 44     [-]      Plane 6
  25104   Iridium 45     [+]      Plane 3
  25105   Iridium 24     [-]      Plane 2
- 25169   Iridium 52     [-]      Plane 5 - Failed on station?
  25171   Iridium 54     [-]      Plane 5
  25262   Iridium 51     [-]      Plane 4 - Failed on station?
  25263   Iridium 61     [-]      Plane 4
@@ -298,7 +177,6 @@ KELSO
  25274   Iridium 58     [-]      Plane 3
  25275   Iridium 59     [+]      Plane 3
  25276   Iridium 60     [+]      Plane 3
- 25285   Iridium 62     [-]      Plane 1 - Failed on station?
  25286   Iridium 63     [-]      Plane 1 - Failed on station?
  25287   Iridium 64     [-]      Plane 1
  25319   Iridium 69     [-]      Plane 2
@@ -306,8 +184,6 @@ KELSO
  25344   Iridium 73     [-]      Plane 1
  25467   Iridium 82     [-]      Plane 6 - Failed on station?
  25527   Iridium 2      [-]      Plane 5
- 25530   Iridium 84     [-]      Plane 5 - Failed on station?
- 25531   Iridium 83     [-]      Plane 5 - Failed on station?
  25777   Iridium 14     [-]      Plane 1
  27372   Iridium 91     [+]      Plane 3
  27373   Iridium 90     [-]      Plane 5 - Failed on station?
@@ -364,7 +240,7 @@ SLADEN
  25106   Iridium 47     [D]      Decayed 2018-09-01
  25107   Iridium 48     [D]      Decayed 2001-05-05
  25108   Iridium 49     [D]      Decayed 2018-02-13
- 25169   Iridium 52     [?]      SpaceTrack
+ 25169   Iridium 52     [D]      Decayed 2018-11-05
  25170   Iridium 56     [D]      Decayed 2018-10-11
  25171   Iridium 54     [?]      SpaceTrack
  25172   Iridium 50     [D]      Decayed 2018-09-23
@@ -376,7 +252,7 @@ SLADEN
  25274   Iridium 58     [?]      SpaceTrack
  25275   Iridium 59     [?]      SpaceTrack
  25276   Iridium 60     [?]      SpaceTrack
- 25285   Iridium 62     [?]      SpaceTrack
+ 25285   Iridium 62     [D]      Decayed 2018-11-07
  25286   Iridium 63     [?]      SpaceTrack
  25287   Iridium 64     [?]      SpaceTrack
  25288   Iridium 65     [D]      Decayed 2018-07-19
@@ -400,8 +276,8 @@ SLADEN
  25527   Iridium 2      [?]      SpaceTrack
  25528   Iridium 86     [D]      Decayed 2018-10-05
  25529   Iridium 85     [D]      Decayed 2000-12-30
- 25530   Iridium 84     [?]      SpaceTrack
- 25531   Iridium 83     [?]      SpaceTrack
+ 25530   Iridium 84     [D]      Decayed 2018-11-04
+ 25531   Iridium 83     [D]      Decayed 2018-11-05
  25577   Iridium 20     [D]      Decayed 2018-10-22
  25578   Iridium 11     [D]      Decayed 2018-10-22
  25777   Iridium 14     [?]      SpaceTrack

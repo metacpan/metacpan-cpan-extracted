@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 14:58:26 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Oct 31 22:31:44 2018
-# Update Count    : 95
+# Last Modified On: Tue Nov 13 10:31:13 2018
+# Update Count    : 98
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -126,9 +126,10 @@ sub encode_song {
     }
     if ( $data =~ /; actual\s+key:\s+([^;\n]+)/ ) {
 	$tv->{actual_key} = $keymap{$1};
+	$tv->{_transpose} = ( $tv->{actual_key} - $keymap{$tv->{key}} ) % 12;
     }
     else {
-	$tv->{actual_key} = $keymap{$tv->{key}};
+	$tv->{actual_key} = '';
     }
 
     if ( $data =~ /; tempo:\s+(\d+)/ ) {
@@ -152,7 +153,7 @@ sub encode_song {
 	actual_style   => $tv->{actual_style},
 	actual_repeats => $tv->{actual_repeats},
 	transpose      => $self->{transpose},
-	_transpose     => ( $tv->{actual_key} - $keymap{$tv->{key}} ) % 12,
+	_transpose     => $tv->{_transpose} // 0,
      );
     $song->{data} = yfitaen($data);
 

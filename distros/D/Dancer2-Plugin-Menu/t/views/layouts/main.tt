@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title><% title %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="<% request.uri_base %>/css/style.css">
+  <link rel="stylesheet" href="<% request.uri_base %>/javascripts/jquery-ui-1.12.1.custom/jquery-ui.min.css">
+</head>
+
+<body>
+    <% content %>
+</body>
+</html>

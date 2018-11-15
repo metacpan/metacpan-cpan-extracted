@@ -1,4 +1,4 @@
 requires 'Pcore',                 <: $pcore_version :>;
-requires 'Pcore::Nginx',          v1.6.3;
 requires 'Pcore::SMTP',           v0.5.6;
 requires 'Pcore::API::ReCaptcha', v0.2.3;
+requires 'Pcore::Service::Nginx', v0.1.0;

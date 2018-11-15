@@ -34,7 +34,6 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Plack::Test' => '0',
                                    'Test::More' => '0.92',
-                                   'blib' => '1.01',
                                    'perl' => '5.006'
                                  }
                  }

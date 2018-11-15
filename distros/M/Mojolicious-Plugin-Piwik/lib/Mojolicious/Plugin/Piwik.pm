@@ -5,7 +5,7 @@ use Mojo::ByteStream 'b';
 use Mojo::UserAgent;
 use Mojo::IOLoop;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 # Todo:
 # - Better test tracking API support
@@ -30,9 +30,11 @@ sub register {
     $plugin_param = { %$plugin_param, %$config_param };
   };
 
-  # Embed tag
-  my $embed = $plugin_param->{embed} //
-    ($mojo->mode eq 'production' ? 1 : 0);
+  # Set embed value
+  $mojo->defaults(
+    'piwik.embed' => $plugin_param->{embed} //
+      ($mojo->mode eq 'production' ? 1 : 0)
+    );
 
   # No script route defined
   my $script_route = 0;
@@ -40,12 +42,11 @@ sub register {
   # Add 'piwik_tag' helper
   $mojo->helper(
     piwik_tag => sub {
-
-      # Do not embed
-      return '' unless $embed;
-
       # Controller
       my $c = shift;
+
+      # Do not embed
+      return '' unless $c->stash('piwik.embed');
 
       # Per default integrate as inline
       my $as_script = 0;
@@ -522,7 +523,8 @@ C<site_id> - ID of the site to monitor. Defaults to 1.
 
 C<embed> - Activates or deactivates the embedding of Piwik tag.
 Defaults to a C<true> value if Mojolicious is in production mode,
-defaults to a C<false> value otherwise.
+defaults to a C<false> value otherwise. The value is accessible
+from stash as C<piwik.embed>.
 
 =item
 
@@ -761,7 +763,7 @@ L<Mojolicious>.
 Please make sure you are using Matomo (Piwik) in compliance to the law.
 For german users,
 L<this information|https://www.datenschutzzentrum.de/uploads/projekte/verbraucherdatenschutz/20110315-webanalyse-piwik.pdf>
-(last accessed on 2018-02-27)
+(last accessed on 2018-11-13)
 may help you to design your service correctly.
 You may need to inform your users about your usage of
 Piwik, especially if you are located in the European Union.

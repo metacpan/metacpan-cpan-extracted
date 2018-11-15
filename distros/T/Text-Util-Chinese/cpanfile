@@ -1,0 +1,1 @@
+requires 'List::Util', '1.5';

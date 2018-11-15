@@ -4,7 +4,7 @@ package POE::Component::ElasticSearch::Indexer;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Const::Fast;
 use Digest::SHA1 qw(sha1_hex);
@@ -45,16 +45,18 @@ sub spawn {
 
     # Build Configuration
     my %CONFIG = (
-        Alias             => 'es',
-        Servers           => [qw(localhost)],
-        Timeout           => 10,
-        FlushInterval     => 30,
-        FlushSize         => 1_000,
-        DefaultIndex      => 'logs-%Y.%m.%d',
-        DefaultType       => 'log',
-        BatchDir          => '/tmp/es_index_backlog',
-        StatsInterval     => 60,
-        MaxConnsPerServer => 3,
+        Alias              => 'es',
+        Servers            => [qw(localhost)],
+        Timeout            => 1,
+        FlushInterval      => 30,
+        FlushSize          => 1_000,
+        DefaultIndex       => 'logs-%Y.%m.%d',
+        DefaultType        => 'log',
+        BatchDir           => '/tmp/es_index_backlog',
+        StatsInterval      => 60,
+        MaxConnsPerServer  => 3,
+        MaxPendingRequests => 5,
+        MaxRecoveryBatches => 25,
         %params,
     );
     if( $CONFIG{BatchDiskSpace} ) {
@@ -80,6 +82,7 @@ sub spawn {
             batch     => \&es_batch,
             save      => \&es_save,
             backlog   => \&es_backlog,
+            cleanup   => \&es_cleanup,
             shutdown  => \&es_shutdown,
             #health    => \&es_health,
 
@@ -161,6 +164,12 @@ sub _stats {
     # Extract the stats from the heap
     my $stats = delete $heap->{stats};
     $heap->{stats} = {};
+
+    # Fetch the pending request count from the HTTP client
+    $stats->{pending_requests} = $kernel->call( http => 'pending_requests_count' );
+
+    # Check and set readiness
+    $heap->{es_ready} = $stats->{pending_requests} < $heap->{cfg}{MaxPendingRequests};
 
     # Display our stats
     if( is_coderef($heap->{cfg}{StatsHandler}) ) {
@@ -279,7 +288,7 @@ sub es_backlog {
 
     delete $heap->{backlog_scheduled};
 
-    my $max_batches = 25;
+    my $max_batches = $heap->{cfg}{MaxRecoveryBatches};
     my $batch_dir = path($heap->{cfg}{BatchDir});
 
     # randomize
@@ -381,7 +390,7 @@ sub resp_bulk {
     TRACE(sprintf "bulk_resp(%s) %s", $id, $r->status_line);
 
     # Record the responses we receive
-    my $resp_key = "bulk_" . $r->is_success ? 'success' : 'failure';
+    my $resp_key = "bulk_" . ($r->is_success ? 'success' : 'failure');
     $heap->{stats}{$resp_key} ||= 0;
     $heap->{stats}{$resp_key}++;
 
@@ -417,9 +426,11 @@ sub resp_bulk {
         $batch_file->remove if $batch_file->is_file;
         delete $heap->{start}{$id};
     }
-    else {
-        # Write batch to disk, unless it exists.
-        $kernel->yield( save => $id ) unless $batch_file->is_file;
+    elsif( !$batch_file->is_file ) {
+        # Reload the batch into the heap
+        $heap->{batch}{$id} = $req->content;
+        # Write batch to disk
+        $kernel->yield( save => $id );
     }
     # Remove the lock
     unlock_batch_file($batch_file);
@@ -479,7 +490,8 @@ sub es_cleanup {
         return unless $p->basename =~ /\.batch$/;
 
         # Figure out the average size
-        $total += my $size = $p->stat->size;
+        my $size = $p->stat->size;
+        $total += $size;
         push @files, {
             path  => $p,
             size  => $size,
@@ -575,7 +587,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 =head1 VERSION
 
-version 0.004
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -586,7 +598,7 @@ This POE Session is used to index data to an ElasticSearch cluster.
     my $es_session = POE::Component::ElasticSearch::Indexer->spawn(
         Alias            => 'es',                    # Default
         Servers          => [qw(localhost)],         # Default
-        Timeout          => 10,                      # Default
+        Timeout          => 1,                       # Default
         FlushInterval    => 30,                      # Default
         FlushSize        => 1_000,                   # Default
         LoggingConfig    => undef,                   # Default
@@ -637,6 +649,10 @@ the creation of a L<POE::Component::Client::Keepalive> connection pool.
 
 Defaults to B<MaxConnsPerServer * number of Servers>.
 
+=item B<MaxPendingRequests>
+
+Maximum number of requests backlogged in the connection pool.  Defaults to B<5>.
+
 =item B<LoggingConfig>
 
 The L<Log::Log4perl> configuration file for the indexer to use.  Defaults to
@@ -685,6 +701,11 @@ You may specify either as absolute bytes or using shortcuts:
     BatchDiskSpace => 100mb,
     BatchDiskSpace => 10gb,
     BatchDiskSpace => 1tb,
+
+=item B<MaxRecoveryBatches>
+
+The number of batches to process per backlog event.  This will only come into
+play if there are batches on disk to flush.  Defaults to B<25>.
 
 =item B<StatsHandler>
 

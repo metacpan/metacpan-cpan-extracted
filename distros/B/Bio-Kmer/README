@@ -1,5 +1,5 @@
 NAME
-    Bio::Kmer
+    Bio::Kmer - Helper module for Kmer Analysis.
 
 SYNOPSIS
     A module for helping with kmer analysis.
@@ -54,6 +54,7 @@ METHODS
           sample       1          Retain only a percentage of kmers.
                                   1 is 100%; 0 is 0%
                                   Only works with the perl kmer counter.
+          verbose      0          Print more messages.
 
           Examples:
           my $kmer=Bio::Kmer->new("file.fastq.gz",{kmercounter=>"jellyfish",numcpus=>4});

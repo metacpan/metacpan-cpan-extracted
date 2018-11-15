@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -35,7 +35,7 @@
             "Date::Exception" : "0.03",
             "Moo::Role" : "2.000000",
             "Term::ANSIColor::Markup" : "0.06",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -43,7 +43,7 @@
    "provides" : {
       "Date::Utils" : {
          "file" : "lib/Date/Utils.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "web" : "https://github.com/manwar/Date-Utils"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

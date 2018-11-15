@@ -1,6 +1,6 @@
 package Dancer2::CLI::Command::version;
 # ABSTRACT: display version
-$Dancer2::CLI::Command::version::VERSION = '0.206000';
+$Dancer2::CLI::Command::version::VERSION = '0.207000';
 use strict;
 use warnings;
 use App::Cmd::Setup -command;
@@ -32,7 +32,7 @@ Dancer2::CLI::Command::version - display version
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 AUTHOR
 

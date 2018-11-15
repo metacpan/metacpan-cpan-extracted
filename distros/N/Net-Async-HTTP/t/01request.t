@@ -35,7 +35,8 @@ sub do_test_req
    my $error;
 
    my $request = $args{req};
-   my $host    = $args{no_host} ? $request->uri->host : "host$hostnum"; $hostnum++;
+   my $host    = $args{no_host} ? $request->uri->host : $http->{proxy_host} || "host$hostnum"; $hostnum++;
+   my $service = $http->{proxy_port} || 80;
 
    my $peersock;
    no warnings 'redefine';
@@ -43,8 +44,8 @@ sub do_test_req
       my $self = shift;
       my %args = @_;
 
-      $args{host}    eq $host or die "Expected $args{host} eq $host";
-      $args{service} eq "80"  or die "Expected $args{service} eq 80";
+      $args{host}    eq $host     or die "Expected $args{host} eq $host";
+      $args{service} eq $service  or die "Expected $args{service} eq $service";
 
       ( my $selfsock, $peersock ) = IO::Async::OS->socketpair() or die "Cannot create socket pair - $!";
       $self->set_handle( $selfsock );
@@ -217,6 +218,37 @@ do_test_req( "GET to full URL",
    },
    expect_res_content => "Hello, world!",
 );
+
+{
+   $http->configure( proxy_host => 'proxyhost', proxy_port => 3128 );
+
+   do_test_req( "GET over proxy",
+      req => $req,
+      host => "myhost",
+
+      expect_req_firstline => "GET http://myhost/some/path HTTP/1.1",
+      expect_req_headers => {
+         Host => "myhost",
+      },
+
+      response => "HTTP/1.1 200 OK$CRLF" . 
+                  "Content-Length: 13$CRLF" . 
+                  "Content-Type: text/plain$CRLF" .
+                  "Connection: Keep-Alive$CRLF" .
+                  $CRLF . 
+                  "Hello, world!",
+
+      expect_res_code    => 200,
+      expect_res_headers => {
+         'Content-Length' => 13,
+         'Content-Type'   => "text/plain",
+         'Connection'     => "Keep-Alive",
+      },
+      expect_res_content => "Hello, world!",
+   );
+
+   $http->configure( proxy_host => undef, proxy_port => undef );
+}
 
 $req = HTTP::Request->new( GET => "/empty", [ Host => "myhost" ] );
 

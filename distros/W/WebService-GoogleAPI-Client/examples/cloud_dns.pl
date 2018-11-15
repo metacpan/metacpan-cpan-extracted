@@ -16,7 +16,7 @@ my $config = {
   api => 'dns',
   debug => 01,
   project => $ENV{GOOGLE_PROJECT_ID},
-  managedZone => '7224978179641503608',
+  managedZone => $ENV{GOOGLE_DNS_MANAGED_ZONE}, 
 };
 
 
@@ -44,11 +44,10 @@ NB:
 =head2 PRE-REQUISITES
 
 
-Setup a Google Project in the Google Console and add the Translate API Library. You may need 
-to enable billing to access Google Cloud Services.
+Setup a Google Project in the Google Console and add the Cloud API Library. 
 
 The project resource is a top level container for resources including Cloud DNS ManagedZones. 
-Projects can be created only in the APIs console. L<https://cloud.google.com/dns/docs/reference/v1/projects#resource>
+Projects can be created only in the APIs console. L<https://console.cloud.google.com/apis>
 
 dns.googleapis.com
 

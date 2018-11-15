@@ -1,5 +1,8 @@
 Revision history for Date::Utils
 
+0.24  Thu Nov 15 12:10:00 2018
+      - Used namespace::autoclean instead.
+
 0.23  Sun Apr 02 16:40:00 2017
       - Updated copyright year information.
 

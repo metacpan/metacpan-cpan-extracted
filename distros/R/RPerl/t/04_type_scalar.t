@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # suppress 'WEXRP00: Found multiple rperl executables' due to blib/ & pre-existing installation(s)
 BEGIN { $ENV{RPERL_WARNINGS} = 0; }
@@ -57,7 +57,7 @@ foreach my integer $mode_id ( sort keys %{$RPerl::MODES} ) {
 #for my $mode_id ( 1 .. 1 ) {  # TEMPORARY DEBUGGING CPPOPS_PERLTYPES ONLY
 
     # [[[ MODE SETUP ]]]
-    #    RPerl::diag("in 04_type_scalar.t, top of for() loop, have \$mode_id = $mode_id\n");
+#    RPerl::diag("in 04_type_scalar.t, top of for() loop, have \$mode_id = $mode_id\n");
     my scalartype_hashref $mode = $RPerl::MODES->{$mode_id};
     my string $ops          = $mode->{ops};
     my string $types        = $mode->{types};
@@ -66,10 +66,10 @@ foreach my integer $mode_id ( sort keys %{$RPerl::MODES} ) {
         Test::More::diag( '[[[ Beginning RPerl Scalar Type Tests, ' . $ops . ' Operations & ' . $types . ' Data Types' . ' ]]]' );
     }
 
-    #    $RPerl::DEBUG = 1;
-    #    RPerl::diag('have $ops = ' . $ops . "\n");
-    #    RPerl::diag('have $types = ' . $types . "\n");
-    #    RPerl::diag('have $mode_tagline = ' . $mode_tagline . "\n");
+#    $RPerl::DEBUG = 1;
+#    RPerl::diag('have $ops = ' . $ops . "\n");
+#    RPerl::diag('have $types = ' . $types . "\n");
+#    RPerl::diag('have $mode_tagline = ' . $mode_tagline . "\n");
 
     lives_ok( sub { rperltypes::types_enable($types) }, q{mode '} . $ops . ' Operations & ' . $types . ' Data Types' . q{' enabled} );
 

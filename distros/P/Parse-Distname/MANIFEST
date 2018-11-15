@@ -1,0 +1,14 @@
+Changes
+cpanfile
+lib/Parse/Distname.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/basic.t
+t/compat/ext.t
+t/compat/path.t
+xt/walk_through.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

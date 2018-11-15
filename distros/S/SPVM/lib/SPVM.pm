@@ -17,7 +17,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0388';
+our $VERSION = '0.0389';
 
 my $SPVM_ENV;
 my $BUILDER;
@@ -105,6 +105,9 @@ SPVM - Static Perl Virtual Machine. Fast calcuration & Easy C/C++ Binding
 
 =head1 SYNOPSIS
 
+SPVM Module:
+
+  # lib/MyMath.spvm
   package MyMath {
     sub sum : int ($nums : int[]) {
       
@@ -117,23 +120,48 @@ SPVM - Static Perl Virtual Machine. Fast calcuration & Easy C/C++ Binding
     }
   }
 
+Use SPVM Module from Perl
+  
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  
+  use SPVM 'MyMath';
+  
+  # New int array
+  my $sp_nums = SPVM::new_int_array([3, 6, 8, 9]);
+  
+  # Call subroutine
+  my $total = MyMath->sum($sp_nums);
+  
+  print $total . "\n";
+
 =head1 DESCRIPTION
 
-SPVM provide B<fast array and numeric operation>.
+SPVM is Static Perl Virtual Machine. Provide fast calcuration & easy C/C++ Binding.
 
-SPVM provide B<easy way to Bind C/C++ Language to Perl>.
-
-=head1 FEATURES
+B<Features:>
 
 =over 4
 
-=item *
+=item * B<Fast culcuration>, B<Fast array operation>, B<Small memory>
 
-B<Fast array operation>, B<Fast numeric operation>, B<Static typing>, B<Virtual machine>, B<Precompile>, B<Pre compile>
+=item * B<Perl syntax>, B<Static typing>, B<Switch syntax>, B<Have language specification>
 
-=item *
+=item * B<Enum>, B<Type inference>, B<Anon subroutine>, B<Variable captures>
 
-B<Perlish syntax>, B<Easy way to C/C++ binding>, B<C99 math functions>
+=item * B<Array initialization>, 
+
+=item * B<Reference count GC>, B<Weaken reference>, B<Module system>
+
+=item * B<Exception>, B<Package variable>
+
+=item * B<Object oriented>, B<Inteface>, B<Value type>, B<Value array type>, B<Reference type>
+
+=item * B<Easy way to C/C++ binding>, B<Automatically Perl binding>, B<C99 math functions>
+
+=item * B<Dynamic linking>, B<Subroutine precompile>, B<AOT compile(create exe file)>
+
+=item * B<Native API(C level api)>, B<C99 standard>
 
 =back
 
@@ -256,6 +284,10 @@ L<SPVM::Document::NativeInterface>
 
 L<SPVM::Document::Language>
 
+=head1 NOTE
+
+B<SPVM is before 1.0 under development! I will change implementation and specification without warnings.>
+
 =head1 SUPPORT
 
 If you have problems or find bugs, comment to GitHub Issue.
@@ -266,37 +298,15 @@ L<SPVM(GitHub)|https://github.com/yuki-kimoto/SPVM>.
 
 Yuki Kimoto E<lt>kimoto.yuki@gmail.com<gt>
 
+=head1 CORE DEVELOPER
+
+moti<lt>motohiko.ave@gmail.com<gt>
+
 =head1 CONTRIBUTERS
 
-=over 4
-
-=item *
-
-L<akinomyoga|https://github.com/akinomyoga> (Koichi Murase)
-
-=item *
-
-L<[NAGAYASU Shinya|https://github.com/nagayasu-shinya>
-
-=item *
-
-L<Reini Urban|https://github.com/rurban>
-
-=item *
-
-L<chromatic|https://github.com/chromatic>
-
-=item *
-
-L<Kazutake Hiramatsu|https://github.com/kazhiramatsu>
+akinomyoga, NAGAYASU Shinya, Reini Urban, chromatic, Kazutake Hiramatsu
 
 =back
-
-=head1 NOTE
-
-B<SPVM is before 1.0 under development! I will change implementation and specification without warnings.>
-
-Curent SPVM version is 0.3 serieses. This means implementation is finshed by 30% of version 1.0.
 
 =head1 COPYRIGHT & LICENSE
 

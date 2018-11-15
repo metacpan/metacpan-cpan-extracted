@@ -1,3 +1,6 @@
+1.119 2018-11-15
+- quote fields like envelope-from correctly when writing Received-SPF
+
 1.118 2018-10-29
 - fixed potential busy loop with specific DNS responses
 - ignore case when comparing answer from DNS to query

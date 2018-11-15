@@ -14,9 +14,11 @@ cpanfile
 dist.ini
 examples/EXAMPLE_HELPERS.pm
 examples/README.md
+examples/api_discovery_audit.pl
 examples/cloud_dns.pl
 examples/cloudstorage_bucket_example.pl
 examples/discovery_example.pl
+examples/drive_example.pl
 examples/geocoding_api.pl
 examples/gmail_example.pl
 examples/people_api.pl
@@ -26,10 +28,10 @@ examples/usage_basic_examples.pl
 lib/WebService/GoogleAPI/Client.pm
 lib/WebService/GoogleAPI/Client/AuthStorage.pm
 lib/WebService/GoogleAPI/Client/AuthStorage/ConfigJSON.pm
+lib/WebService/GoogleAPI/Client/AuthStorage/Memory.pm
 lib/WebService/GoogleAPI/Client/Credentials.pm
 lib/WebService/GoogleAPI/Client/Discovery.pm
 lib/WebService/GoogleAPI/Client/UserAgent.pm
-priceless_jones.tar
 t/00-load.t
 t/01-client-discovery.t
 t/03-pre-warmed-cache-discovery.t

@@ -1,0 +1,42 @@
+---
+abstract: 'create a HTTP::Request from a curl command line'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  LWP::UserAgent: '0'
+  Test::HTTP::LocalServer: '0.61'
+  Test::More: '0'
+  WWW::Mechanize: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTTP-Request-FromCurl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Filter::signatures: '0.09'
+  Getopt::Long: '2.38'
+  HTTP::Request: '6.07'
+  HTTP::Request::Common: '6.07'
+  List::Util: '1.29'
+  MIME::Base64: '0'
+  Moo: '2'
+  PerlX::Maybe: '0'
+  URI: '0'
+  URL::Encode: '0'
+  perl: '5.008'
+resources:
+  repository: git://github.com/Corion/HTTP-Request-FromCurl.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

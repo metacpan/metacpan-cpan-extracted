@@ -63,35 +63,35 @@
    "provides" : {
       "Math::Prime::Util" : {
          "file" : "lib/Math/Prime/Util.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "Math::Prime::Util::ChaCha" : {
          "file" : "lib/Math/Prime/Util/ChaCha.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "Math::Prime::Util::Entropy" : {
          "file" : "lib/Math/Prime/Util/Entropy.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "Math::Prime::Util::MemFree" : {
          "file" : "lib/Math/Prime/Util/MemFree.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "Math::Prime::Util::PP" : {
          "file" : "lib/Math/Prime/Util/PP.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "Math::Prime::Util::PrimeArray" : {
          "file" : "lib/Math/Prime/Util/PrimeArray.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "Math::Prime::Util::PrimeIterator" : {
          "file" : "lib/Math/Prime/Util/PrimeIterator.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       },
       "ntheory" : {
          "file" : "lib/ntheory.pm",
-         "version" : "0.72"
+         "version" : "0.73"
       }
    },
    "release_status" : "stable",
@@ -104,6 +104,6 @@
          "url" : "https://github.com/danaj/Math-Prime-Util"
       }
    },
-   "version" : "0.72",
+   "version" : "0.73",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

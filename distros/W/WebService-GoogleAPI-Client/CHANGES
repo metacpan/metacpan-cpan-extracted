@@ -1,10 +1,154 @@
 ==================================================
-Changes from 2018-10-25 00:00:00 +0000 to present.
+Changes from 2018-10-31 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.20 at 2018-11-08 03:19:08 +0000
+version 0.21 at 2018-11-14 10:10:22 +0000
 -----------------------------------------
+
+  Change: 44f4339b994fe47f4fccab809b5bc1f268907901
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-14 20:08:57 +0000
+
+    CPANEL RELEASE V0.21
+
+    Includes refactored api_query including the ulimate inclusion of
+    parameters specified with location='query' to be added as GET params.
+    Performed an audit of existing endpoints to cofirm that can always
+    assume ok to append the '?'. The other hackable options remain
+    available but default behavious is now working thanks to @rabbiveesh 
+
+  Change: 5cb1eb7a15ae90cb6d2d3e140c5fadb90d834e0b
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-14 09:02:29 +0000
+
+    update sheets example 
+
+  Change: 84cc82731332aba665a8a1698e8ea7611cb86af8
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-14 08:59:00 +0000
+
+    Refactor api_query including path parameter interpolation.
+
+    To simplify user fixes to broken API Discovery Spec - user can
+    provide a 'path' parameter which will be interpolated with the
+    %options values. This is necessary for example with the sheets api
+    covered in #11 and #12 
+
+  Change: f875fe24c8539e9429e0f4fd7041452b655adeb7
+  Author: Peter Scott <peter@pscott.com.au>
+  Date : 2018-11-13 23:53:53 +0000
+
+    Merge pull request #12 from rabbiveesh/query
+
+    Moved query params to URL, related cleanup, solves Issue #11 
+
+  Change: d63cf87917bb2ea19ef31c89ac85552319e9318c
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 16:07:30 +0000
+
+    Merge branch 'master' of
+    https://github.com/pscott-au/WebService-GoogleAPI-Client 
+
+  Change: 5c67d16a975a9852a5f28f999bdc800fe95b26e8
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 16:07:25 +0000
+
+    Added cb_method_discovery_modify to Client->api_query method
+
+    Workaround for #11 issues in API specification 
+
+  Change: c5172bab98848a940eb97138baab8503bf26f685
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 13:24:40 +0000
+
+    simplify 
+
+  Change: d2044d49e260f7fcb825e52989b39903a4b80380
+  Author: LapVeesh <rabbiveesh@gmail.com>
+  Date : 2018-11-12 20:59:14 +0000
+
+    Moved query params to URL, related cleanup 
+
+  Change: 93a346cdbbff1e7d415f541a7120ee4041c367ca
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 02:19:33 +0000
+
+    REmove META.yml 
+
+  Change: 016fdbcfe9ee2c7c0bfab7ebfeeb4a1840641d00
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 02:18:56 +0000
+
+    meta.yml ignore 
+
+  Change: 6a763b233d838af44ce61df987cd3cbc70ac95bf
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 02:17:39 +0000
+
+    re-introduce META.yml 
+
+  Change: 75f29697520362cf0987e370cdbe72dee0df584c
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 01:13:06 +0000
+
+    add META.yml
+
+    removed from gitignore as indicated by Kwalitee experimental issue. 
+
+  Change: fb4624cbb553a36641949bfe08403715ad25728a
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 01:07:00 +0000
+
+    remove broken badge 
+
+  Change: 455a33174116c07b56f27e589c60be4a5914ecb6
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 01:02:21 +0000
+
+    add badges 
+
+  Change: 794947af17503b8ac54d370f2831c14717641776
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 00:39:38 +0000
+
+    Merge branch 'master' of
+    https://github.com/pscott-au/WebService-GoogleAPI-Client 
+
+  Change: 75c1dbc921372f560b6da7d17634b2bee066711d
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-13 00:39:35 +0000
+
+    geocoding change 
+
+  Change: c9a130f4de3b2ddc3f89d6ab289aa3ca90cdc1e9
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-11-12 18:45:52 +0000
+
+    Merge branch 'master' of
+    https://github.com/pscott-au/WebService-GoogleAPI-Client 
+
+  Change: 88a0a492b8d0041cb4fe4b17a870de76830d60f7
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-11-12 18:44:38 +0000
+
+    DNS and DRIVE examples + bump version 0.20.1 
+
+  Change: 619d090a1be39f8dedd1e5af6482ca21736e958a
+  Author: Peter Scott <peter@shotgundriver.com>
+  Date : 2018-11-11 21:24:20 +0000
+
+    added initial version of API explorer 
+
+  Change: 0103b59539e8231d86513c66ee58ae40878b83a7
+  Author: Peter Scott <peter@computerpros.com.au>
+  Date : 2018-11-08 13:19:56 +0000
+
+    CPAN RELEASE 0.20 - Fix More pp errors in Libs
+
+    * Similar to previous pp not included in goauth I have also not
+    explictly included pp in the libraries * Also added cloud_dns.pl
+    example 
 
   Change: b305d7813c5c48f44a125dcb115d8d3f52e879fe
   Author: Peter Scott <peter@shotgundriver.com>
@@ -146,153 +290,6 @@ version 0.20 at 2018-11-08 03:19:08 +0000
 
     bump version to 0.15.1 and add cpanfile to build 
 
------------------------------------------
-version 0.14 at 2018-10-27 08:19:26 +0000
------------------------------------------
-
-  Change: 27712515c258c94a9b0af1e72a09be63b180a659
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-27 18:19:26 +0000
-
-    Bump Version 0.14
-
-    FIX PAUSE FAILED MY VERSIONING SCHEME 
-
-  Change: 38626a8ec0cf935cfeef0c59793073d489ee1bf8
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-27 18:04:35 +0000
-
-    Minor Version Bump 0.13.1 to push #8 fix into cpan 
-
-  Change: 547edaba3db6511512abc1d54a3f1819457d1373
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-27 17:48:33 +0000
-
-    Set min perl in build
-
-    #8 
-
-  Change: e91aed3121ab59d61407f1b56b1e1f09fec5af26
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-27 11:54:05 +0000
-
-    expand test coverage 
-
-  Change: d7957983ab1ffc587f2f54279e8daa8933adc55e
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-27 11:31:08 +0000
-
-    Merge branch 'master' of
-    https://github.com/pscott-au/WebService-GoogleAPI-Client 
-
-  Change: 3a8b3c83ef3101f898edb532222079129399638f
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-27 11:31:02 +0000
-
-    client tests with http mocked 
-
-  Change: 3b4f9aa79f60c9b2030a08d9478ff351c17c391e
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-27 07:36:21 +0000
-
-    Replace docs index 
-
-  Change: f63268df4ddaffc2a57f73d90eeb0759814d7e93
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-27 06:17:15 +0000
-
-    add favicon 
-
-  Change: 7a83b4beb659bebfe20c07727946f4350ef5d5e4
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-27 05:31:39 +0000
-
-    tests - injecting http response instead of pre-warming cache 
-
-  Change: 3404e7428ecf6b2be4e254705bf49f610af8d8d9
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-26 04:34:49 +0000
-
-    added text to speech example 
-
-  Change: 4ffc258387b2dd6490e313eee38a0c740e9f5fea
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-25 21:10:22 +0000
-
-    Fix Minimum Perl Version - format breaking Travis 
-
-  Change: cac98b82b034fcca922e79ab652d09bd7f9679f1
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-25 20:58:08 +0000
-
-    cleanup 
-
-  Change: c7565c2b38c7848e2d41dec2e3be30e2ce845061
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-24 06:05:43 +0000
-
-    Extend Discovery test coverage 
-
-  Change: 3022a5874516295b79a50ad56db78a3617e6ce8d
-  Author: Peter Scott <peter@computerpros.com.au>
-  Date : 2018-10-24 05:43:14 +0000
-
-    Refactor Discovery to include internal stats and added new pre-cached
-    discovery test 
-
-  Change: 9f2e8585e18a4d54710807223492534013941311
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-23 22:23:32 +0000
-
-    Release V0.13 - Windows Installable Fixes
-
-    #7 #4 
-
-  Change: f1d659e307d791956d0acec2c0d124de27bc170f
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-23 18:20:33 +0000
-
-    exclude gapi.json from examples and t 
-
-  Change: 99184ec89afb5a007a49b9b2baadd0106bedb746
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-23 18:14:41 +0000
-
-    Bump Version for Microsoft Github Release 
-
-  Change: b0fdc2248a6142b19784adbd8c4fdd87a220dcf9
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-23 16:51:39 +0000
-
-    dist.ini change borked on install 
-
-  Change: 70945cc5588ba31d4514e25d87952315ef7cd25e
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-23 16:49:31 +0000
-
-    Refactor path handling for Windows/Unix using Path::Class
-
-    will test install on windows form repo 
-
-  Change: dcaac2cd388ea3b41b56a6e149ed9765bf551b93
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-22 22:57:42 +0000
-
-    blogger example 
-
-  Change: afe41f54aadbd7f7d85c34ff1877e59e3c60cbd2
-  Author: Peter Scott <peter@shotgundriver.com>
-  Date : 2018-10-21 21:46:14 +0000
-
-    Fix for #6 #4
-
-    #6 - List::Util is a core module but the uniq function was not
-    provided until v1.45 which was included in an older version of Perl
-    around 5.8 ish .. by setting the required version minimum this should
-    guide auto installers to update. #4 - think previous fix was in wrong
-    place - hacked in a validation of type in case unable to start HTTP
-    transaction request. 
-
 ================================================
-Plus 2 releases after 2018-10-25 00:00:00 +0000.
+Plus 3 releases after 2018-10-31 00:00:00 +0000.
 ================================================

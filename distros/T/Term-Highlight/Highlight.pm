@@ -9,7 +9,7 @@ our @ISA = qw( Exporter );
 
 our @EXPORT = qw( LoadArgs LoadPatterns ClearPatterns GetPatterns Process );
 
-our $VERSION = "2.0.3";
+our $VERSION = "2.0.4";
 
 
 sub new
@@ -406,9 +406,8 @@ A. Radkov, E<lt>alexey.radkov@gmail.comE<gt>
 
 Copyright (C) 2008-2018 by A. Radkov.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it
+under the same terms as the Perl 5 programming language system itself.
 
 =cut
 

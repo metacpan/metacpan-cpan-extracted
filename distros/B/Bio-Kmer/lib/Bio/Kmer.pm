@@ -5,7 +5,7 @@
 
 package Bio::Kmer;
 require 5.10.0;
-our $VERSION=0.21;
+our $VERSION=0.23;
 
 use strict;
 use warnings;
@@ -33,18 +33,27 @@ our @richseqExt=qw(.gbk .gbf .gb .embl);
 our @sffExt=qw(.sff);
 our @samExt=qw(.sam .bam);
 
-our $fhStick :shared; # Helps us open only one file at a time
+our $fhStick :shared;      # Helps us open only one file at a time
+our $enqueueStick :shared; # Helps control access to the kmer queue
 
 
 # TODO if 'die' is imported by a script, redefine
 # sig die in that script as this function.
 local $SIG{'__DIE__'} = sub { my $e = $_[0]; $e =~ s/(at [^\s]+? line \d+\.$)/\nStopped $1/; die("$0: ".(caller(1))[3].": ".$e); };
 
+my $startTime = time();
+sub logmsg{
+  local $0 = basename $0; 
+  my $tid=threads->tid;
+  my $elapsedTime = time() - $startTime;
+  print STDERR "$0.$tid $elapsedTime @_\n";
+}
+
 =pod
 
 =head1 NAME
 
-Bio::Kmer
+Bio::Kmer - Helper module for Kmer Analysis.
 
 =head1 SYNOPSIS
 
@@ -103,6 +112,7 @@ Create a new instance of the kmer counter.  One object per file.
   sample       1          Retain only a percentage of kmers.
                           1 is 100%; 0 is 0%
                           Only works with the perl kmer counter.
+  verbose      0          Print more messages.
 
   Examples:
   my $kmer=Bio::Kmer->new("file.fastq.gz",{kmercounter=>"jellyfish",numcpus=>4});
@@ -123,6 +133,7 @@ sub new{
   $$settings{kmercounter} ||="perl";
   $$settings{tempdir}     ||=tempdir("Kmer.pm.XXXXXX",TMPDIR=>1,CLEANUP=>1);
   $$settings{sample}        =1 if(!defined($$settings{sample}));
+  $$settings{verbose}     ||=0;
 
   # If the first parameter $seqfile is a Bio::SeqIO object,
   # then send it to a file to dovetail with the rest of
@@ -170,12 +181,13 @@ sub new{
     gt         =>$$settings{gt},
     kmercounter=>$$settings{kmercounter},
     sample     =>$$settings{sample},
+    verbose    =>$$settings{verbose},
 
     # Values that will be filled in after analysis
     _kmers     =>{},
   };
   # Add in some other temporary files
-  ($$self{kmerfileFh},$$self{kmerfile})      = tempfile("KMER.XXXXXX", DIR=>$$self{tempdir}, SUFFIX=>".tsv");
+  #($$self{kmerfileFh},$$self{kmerfile})      = tempfile("KMER.XXXXXX", DIR=>$$self{tempdir}, SUFFIX=>".tsv");
   ($$self{histfileFh},$$self{histfile})      = tempfile("HIST.XXXXXX", DIR=>$$self{tempdir}, SUFFIX=>".tsv");
   ($$self{jellyfishdbFh},$$self{jellyfishdb})= tempfile("JF.XXXXXX",   DIR=>$$self{tempdir}, SUFFIX=>".jf");
 
@@ -333,63 +345,58 @@ sub histogramPerl{
   return \@hist;
 }
 
+# Pure perl to make this standalone... the only reason
+# we are counting kmers in Perl instead of C.
 sub countKmersPurePerl{
   my($self,$seqfile,$kmerlength)=@_;
 
-  # Multithreading
-  my $seqQ=Thread::Queue->new;
-  my @thr;
-  for(0..$self->{numcpus}-1){
-    $thr[$_]=threads->new(\&_countKmersPurePerlWorker,$kmerlength,$seqQ,$self->{sample});
-  }
+  my @allSeqs;
 
-  # Pure perl to make this standalone... the only reason
-  # we are counting kmers in Perl instead of C.
+  # Save all seqs to an array, for passing out to individual threads.
   my $fastqFh=$self->openFastq($seqfile);
   my $i=0;
   my @buffer=();
   while(<$fastqFh>){ # burn the read ID line
     $i++;
     my $seq=<$fastqFh>;
-    push(@buffer, uc($seq));
-
-    if($i % 1000000 == 0){
-      $seqQ->enqueue(@buffer);
-      @buffer=();
-    }
-    
+    push(@allSeqs, uc($seq));
     # Burn the quality score lines
     <$fastqFh>;
     <$fastqFh>;
   }
   close $fastqFh;
 
-  $seqQ->enqueue(@buffer);
+  # The number of sequences per thread is divided evenly but cautions
+  # toward having one extra sequence per thread in the first threads
+  # rather than accidentally leaving some off at the end.
+  my $numSeqsPerThread = int(scalar(@allSeqs)/$self->{numcpus}) + 1;
+
+  # Multithreading
+  my @thr;
+  for(0..$self->{numcpus}-1){
+    # Get a set of sequences to kmerize
+    my @threadSeqs = splice(@allSeqs, 0, $numSeqsPerThread);
+    # Set up a place for kmers to land
+    $thr[$_]=threads->new(\&_countKmersPurePerlWorker,$kmerlength,\@threadSeqs,$self->{sample});
+    #logmsg "Kicking off thread ".$thr[$_]->tid." with ".scalar(@threadSeqs)." sequences";
+  }
   
-  # Send the termination signal
-  $seqQ->enqueue(undef) for(@thr);
-
-  while($seqQ->pending > @thr){
-    for(1..60){
-      last if($seqQ->pending <= @thr);
-      sleep 1;
-    }
-  }
-
   # Join the threads and put everything into a large kmer hash
-  my %kmer=();
+  my %kmer;
   for(@thr){
-    my $threadKmer=$_->join;
-    for my $kmer(keys(%$threadKmer)){
-      $kmer{$kmer}+=$$threadKmer{$kmer};
+    my $kmerArr =  $_->join;
+    for my $kmer(@$kmerArr){
+      $kmer{$kmer}++;
     }
   }
+  
+  my($fh, $filename)                    = tempfile("KMER.XXXXXX", DIR=>$$self{tempdir}, SUFFIX=>".tsv");
+  ($$self{kmerfileFh},$$self{kmerfile}) = ($fh, $filename);
 
   # Write everything to file. The FH should still be open.
   #      Do not return the kmer.
   #      Make a new method that returns the kmer hash
   #      Do the same for jellyfish
-  my $fh=$self->{kmerfileFh};
   while(my($kmer,$count)=each(%kmer)){
     # Filtering step
     if($count < $self->{gt}){
@@ -463,7 +470,7 @@ Finds the union between two sets of kmers
 sub union{
   my($self,$other)=@_;
   
-  if(!$self->_checkCompatibility($other,{verbose=>1})){
+  if(!$self->_checkCompatibility($other)){
     die;
   }
 
@@ -496,7 +503,7 @@ Finds the intersection between two sets of kmers
 sub intersection{
   my($self,$other)=@_;
 
-  if(!$self->_checkCompatibility($other,{verbose=>1})){
+  if(!$self->_checkCompatibility($other)){
     die;
   }
 
@@ -529,7 +536,7 @@ Finds the set of kmers unique to this Bio::Kmer object.
 sub subtract{
   my($self,$other)=@_;
 
-  if(!$self->_checkCompatibility($other,{verbose=>1})){
+  if(!$self->_checkCompatibility($other)){
     die;
   }
 
@@ -546,10 +553,10 @@ sub subtract{
 # See if another Bio::Kmer is the same kind as this one.
 # Return Boolean
 sub _checkCompatibility{
-  my($self,$other,$settings)=@_;
+  my($self,$other)=@_;
 
   if($self->{kmerlength} != $other->{kmerlength}){
-    warn "WARNING: kmer lengths do not match\n" if($$settings{verbose});
+    warn "WARNING: kmer lengths do not match\n" if($self->{verbose});
     return 0;
   }
 
@@ -557,10 +564,10 @@ sub _checkCompatibility{
 }
 
 sub _countKmersPurePerlWorker{
-  my($kmerlength,$seqQ,$sample)=@_; 
+  my($kmerlength,$seqArr,$sample)=@_; 
 
-  my %kmer;
-  while(defined(my $seq=$seqQ->dequeue)){
+  my $outKmerArray=[];
+  for my $seq(@$seqArr){
 
     my $numKmersInRead=length($seq)-$kmerlength;
 
@@ -568,12 +575,12 @@ sub _countKmersPurePerlWorker{
     # We must keep this loop optimized for speed.
     for(my $j=0;$j<$numKmersInRead;$j++){
       next if($sample < rand(1)); # subsample
-      $kmer{substr($seq,$j,$kmerlength)}++;
+      #$kmer{substr($seq,$j,$kmerlength)}++;
+      push(@$outKmerArray, substr($seq,$j,$kmerlength));
     }
 
   }
-
-  return \%kmer;
+  return $outKmerArray;
 }
 
 

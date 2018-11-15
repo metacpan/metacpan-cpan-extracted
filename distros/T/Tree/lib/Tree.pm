@@ -6,7 +6,7 @@ use base 'Tree::Fast';
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Scalar::Util qw( blessed refaddr weaken );
 

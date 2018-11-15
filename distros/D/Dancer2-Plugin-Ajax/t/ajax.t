@@ -26,6 +26,10 @@ use HTTP::Request::Common qw<GET POST DELETE PUT>;
     ajax ['put', 'delete', 'get'] => "/more/test" => sub {
         "{some: 'json'}";
     };
+
+    ajax '/subargs' => sub {
+        return $_[0]->app->request->to_string;
+    };
 }
 
 my $test = Plack::Test->create( AjaxApp->to_app );
@@ -96,5 +100,12 @@ subtest 'GH #143: response content with ajax route' => sub {
     is $res->content, 'some text', 'ajax route has proper content for GET without XHR';
     is $res->content_type, 'text/html', 'content type on non-XMLHttpRequest not munged';
 };
+
+like(
+    $test->request( GET '/subargs', 'X-Requested-With' => 'XMLHttpRequest' )
+         ->content,
+    qr{/subargs},
+    'GH #7: ajax routes have access to $self',
+);
 
 done_testing;

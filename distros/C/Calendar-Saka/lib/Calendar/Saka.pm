@@ -1,6 +1,6 @@
 package Calendar::Saka;
 
-$Calendar::Saka::VERSION   = '1.34';
+$Calendar::Saka::VERSION   = '1.35';
 $Calendar::Saka::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Saka - Interface to Indian Calendar.
 
 =head1 VERSION
 
-Version 1.34
+Version 1.35
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 
 use Date::Saka::Simple;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 with 'Calendar::Plugin::Renderer';
 
 use overload q{""} => 'as_string', fallback => 1;

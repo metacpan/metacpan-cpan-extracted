@@ -10,9 +10,9 @@ use Mojo::URL;
 use Scalar::Util 'weaken';
 use SQL::Abstract;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
-has abstract => sub { SQL::Abstract->new(quote_char => chr(96), name_sep => '.') };
+has abstract        => sub { SQL::Abstract->new(quote_char => chr(96), name_sep => '.') };
 has auto_migrate    => 0;
 has database_class  => 'Mojo::mysql::Database';
 has dsn             => 'dbi:mysql:dbname=test';
@@ -35,6 +35,15 @@ has pubsub => sub {
   return $pubsub;
 };
 
+sub close_idle_connections {
+  my ($self, $keep) = (shift, $_[0] || 0);
+  my $queue = $self->{queue} || [];
+
+  # The database handle needs to be destroyed before the file handle
+  shift(@$queue)->[0] = undef while @$queue > $keep;
+  return $self;
+}
+
 sub db {
   my $self = shift;
 
@@ -53,8 +62,10 @@ sub from_string {
   my $url = UNIVERSAL::isa($str, "Mojo::URL") ? $str : Mojo::URL->new($str);
   croak qq{Invalid MySQL connection string "$str"} unless $url->protocol eq 'mysql';
 
+  my $dsn = 'dbi:mysql';
+
   # Database
-  my $dsn = 'dbi:mysql:dbname=' . $url->path->parts->[0];
+  $dsn .= ':dbname=' . $url->path->parts->[0] if defined $url->path->parts->[0];
 
   # Host and port
   if (my $host = $url->host) { $dsn .= file_name_is_absolute($host) ? ";mysql_socket=$host" : ";host=$host" }
@@ -81,7 +92,7 @@ sub strict_mode {
   my $self = ref $_[0] ? shift : shift->new(@_);
   $self->{strict_mode} = $_[0] ? 1 : @_ ? 0 : 1;
   warn "[Mojo::mysql] strict_mode($self->{strict_mode})\n" if $ENV{DBI_TRACE};
-  delete @$self{qw(pid queue)};
+  $self->close_idle_connections;
   return $self;
 }
 
@@ -89,7 +100,7 @@ sub _dequeue {
   my $self = shift;
   my $dbh;
 
-  while (my $c = shift @{$self->{queue} || []}) { return $c if $c->[0]->ping }
+  while (my $c = shift @{$self->{queue}}) { return $c if $c->[0]->ping }
   $dbh = DBI->connect(map { $self->$_ } qw(dsn username password options));
 
   # <mst> batman's probably going to have more "fun" than you have ...
@@ -109,9 +120,8 @@ sub _dequeue {
 
 sub _enqueue {
   my ($self, $dbh, $handle) = @_;
-  my $queue = $self->{queue} ||= [];
-  push @$queue, [$dbh, $handle] if $dbh->{Active};
-  shift @{$self->{queue}} while @{$self->{queue}} > $self->max_connections;
+  push @{$self->{queue}}, [$dbh, $handle] if $dbh->{Active};
+  $self->close_idle_connections($self->max_connections);
 }
 
 sub _set_strict_mode {
@@ -293,6 +303,12 @@ soon as the first database connection has been established.
 
 Defaults to false.
 
+=head2 close_idle_connections
+
+  $mysql = $mysql->close_idle_connections;
+
+Close all connections that are not currently active.
+
 =head2 database_class
 
   $class = $mysql->database_class;
@@ -468,6 +484,9 @@ You can set the C<DBI_TRACE> environment variable to get some advanced
 diagnostics information printed to C<STDERR> by L<DBI>.
 
   DBI_TRACE=1
+  DBI_TRACE=15
+  DBI_TRACE=15=dbitrace.log
+  DBI_TRACE=SQL
 
 =head1 REFERENCE
 

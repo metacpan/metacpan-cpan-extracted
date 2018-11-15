@@ -1,7 +1,7 @@
 # ABSTRACT: Template toolkit engine for Dancer2
 
 package Dancer2::Template::TemplateToolkit;
-$Dancer2::Template::TemplateToolkit::VERSION = '0.206000';
+$Dancer2::Template::TemplateToolkit::VERSION = '0.207000';
 use Moo;
 use Carp qw<croak>;
 use Dancer2::Core::Types;
@@ -101,7 +101,7 @@ Dancer2::Template::TemplateToolkit - Template toolkit engine for Dancer2
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 SYNOPSIS
 

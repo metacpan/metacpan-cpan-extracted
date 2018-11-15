@@ -5,6 +5,7 @@ t/piwik_api_url.t
 t/piwik_tag.t
 t/piwik_tag-opt-out.t
 t/piwik_tag-as-script.t
+t/piwik_tag-embed.t
 Changes
 MANIFEST
 LICENSE

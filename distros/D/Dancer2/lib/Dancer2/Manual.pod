@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 DESCRIPTION
 
@@ -1032,7 +1032,7 @@ Get complete hash stored in session:
 In Dancer 2, a session backend consumes the role
 L<Dancer2::Core::Role::SessionFactory>.
 
-The following example using the Reddis session demonstrates how session
+The following example using the Redis session demonstrates how session
 engines are written in Dancer 2.
 
 First thing to do is to create the class for the session engine,
@@ -1418,7 +1418,9 @@ And in a production one:
 
 Please note that you are not limited to writing configuration files in YAML.
 Dancer2 supports any file format that is supported by L<Config::Any>, such
-as JSON, XML, INI files, and Apache-style config files.
+as JSON, XML, INI files, and Apache-style config files. See the Dancer2
+L<configuration guide|https://metacpan.org/pod/Dancer2::Config#MANIPULATING-SETTINGS-VIA-CONFIGURATION-FILES>
+for more information.
 
 =head2 Accessing configuration information
 
@@ -1681,7 +1683,7 @@ Assuming we have a different app that has two states we want to test:
      use Dancer2;
      set serializer => 'JSON';
 
-     get '/' => sub {
+     get '/:user' => sub {
          my $user = route_parameters->get('user');
 
          $user and return { user => $user };
@@ -1937,7 +1939,6 @@ If you want to use Plack middlewares, you need to enable them using
 L<Plack::Builder> as such:
 
     # in app.psgi or any other handler
-    use Dancer2;
     use MyApp;
     use Plack::Builder;
 
@@ -1945,7 +1946,7 @@ L<Plack::Builder> as such:
         enable 'Deflater';
         enable 'Session', store => 'File';
         enable 'Debug', panels => [ qw<DBITrace Memory Timer> ];
-        dance;
+        MyApp->to_app;
     };
 
 The nice thing about this setup is that it will work seamlessly through
@@ -1965,16 +1966,40 @@ If you want to set up a middleware for a specific path, you can do that using
 L<Plack::Builder> which uses L<Plack::App::URLMap>:
 
     # in your app.psgi or any other handler
-    use Dancer2;
     use MyApp;
     use Plack::Builder;
 
     my $special_handler = sub { ... };
 
     builder {
-        mount '/'        => dance;
         mount '/special' => $special_handler;
+        mount '/'        => MyApp->to_app;
     };
+
+=head3 Removing default middlewares
+
+By default, a Dancer2 app is automatically wrapped with the following middleware
+
+=over 4
+
+=item * L<Plack::Middleware::FixMissingBodyInRedirect>
+
+=item * L<Plack::Middleware::Head>
+
+=back
+
+You can configure the setting C<no_default_middleware> to a true value to stop your
+Dancer2 app being wrapped with these default middleware layers.
+
+    # in you Dancer2 app or config.yml
+    package MyApp;
+    use Dancer2
+
+    set no_default_middleware => true;
+
+This is necessary if you need to add eTag or ContentMD5 headers to
+C<HEAD> requests, and you are encouraged to manually add those default
+middleware back into your PSGI stack.
 
 =head3 Running on Perl web servers with plackup
 
@@ -2024,7 +2049,7 @@ F<app.psgi>) edit it to use L<Plack::Builder>, as described above:
 
     builder {
         enable 'Deflater';
-        dance;
+        MyApp->to_app;
     };
 
 To test if content compression works, trace the HTTP request and response
@@ -2565,7 +2590,7 @@ parameters. Check C<param> below to access quickly to a single parameter
 value.
 
     post '/login' => sub {
-        // get all parameters as a single hash
+        # get all parameters as a single hash
         my %all_parameters = params;
 
         // request all parmameters from a specific source: body, query, route
@@ -2573,7 +2598,7 @@ value.
         my %route_parameters = params('route');
         my %query_parameters = params('query');
 
-        // any $source that is not body, query, or route generates an exception
+        # any $source that is not body, query, or route generates an exception
         params('fake_source'); // Unknown source params "fake_source"
     };
 

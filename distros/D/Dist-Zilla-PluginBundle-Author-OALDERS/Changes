@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-OALDERS
 
+0.000020  2018-11-14 18:44:26Z
+    - Add develop prereqs for tidyall
+    - Add PodSyntaxTests
+
 0.000019  2018-05-15 13:51:44Z
     - Default ExecDir to /script
 

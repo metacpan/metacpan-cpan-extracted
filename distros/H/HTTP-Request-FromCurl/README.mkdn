@@ -1,0 +1,161 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/HTTP-Request-FromCurl.svg?branch=master)](https://travis-ci.org/Corion/HTTP-Request-FromCurl)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/HTTP-Request-FromCurl?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/HTTP-Request-FromCurl)
+
+# NAME
+
+HTTP::Request::FromCurl - create a HTTP::Request from a curl command line
+
+# SYNOPSIS
+
+    my $req = HTTP::Request::FromCurl->new(
+        # Note - curl itself may not appear
+        argv => ['https://example.com'],
+    );
+
+    my $req = HTTP::Request::FromCurl->new(
+        command => 'https://example.com',
+    );
+
+    my $req = HTTP::Request::FromCurl->new(
+        command_curl => 'curl -A mycurl/1.0 https://example.com',
+    );
+
+    my @requests = HTTP::Request::FromCurl->new(
+        command_curl => 'curl -A mycurl/1.0 https://example.com https://www.example.com',
+    );
+    # Send the requests
+    for my $r (@requests) {
+        $ua->request( $r->as_request )
+    }
+
+# METHODS
+
+## `->new`
+
+    my $req = HTTP::Request::FromCurl->new(
+        # Note - curl itself may not appear
+        argv => ['--agent', 'myscript/1.0', 'https://example.com'],
+    );
+
+    my $req = HTTP::Request::FromCurl->new(
+        # Note - curl itself may not appear
+        command => '--agent myscript/1.0 https://example.com',
+    );
+
+The constructor returns one or more [HTTP::Request::CurlParameters](https://metacpan.org/pod/HTTP::Request::CurlParameters) objects
+that encapsulate the parameters. If the command generates multiple requests,
+they will be returned in list context. In scalar context, only the first request
+will be returned.
+
+    my $req = HTTP::Request::FromCurl->new(
+        command => '--data-binary @/etc/passwd https://example.com',
+        read_files => 1,
+    );
+
+## `->squash_uri( $uri )`
+
+    my $uri = HTTP::Request::FromCurl->squash_uri(
+        URI->new( 'https://example.com/foo/bar/..' )
+    );
+    # https://example.com/foo/
+
+Helper method to clean up relative path elements from the URI the same way
+that curl does.
+
+# GLOBAL VARIABLES
+
+## `%default_headers`
+
+Contains the default headers added to every request
+
+## `@option_spec`
+
+Contains the [Getopt::Long](https://metacpan.org/pod/Getopt::Long) specification of the recognized command line
+parameters
+
+# LIVE DEMO
+
+[https://corion.net/curl2lwp.psgi](https://corion.net/curl2lwp.psgi)
+
+# KNOWN DIFFERENCES
+
+## Different Content-Length for POST requests
+
+## Different delimiter for form data
+
+The delimiter is built by [HTTP::Message](https://metacpan.org/pod/HTTP::Message), and `curl` uses a different
+mechanism to come up with a unique data delimiter. This results in differences
+in the raw body content and the `Content-Length` header.
+
+# MISSING FUNCTIONALITY
+
+- Cookie files
+
+    Curl cookie files are neither read nor written
+
+- File uploads / content from files
+
+    While file uploads and reading POST data from files are supported, the content
+    is slurped into memory completely. This can be problematic for large files
+    and little available memory.
+
+- Sequence expansion
+
+    Curl supports speficying sequences of URLs such as
+    ` https://example.com/[1-100] ` , which expands to
+    ` https://example.com/1 `, ` https://example.com/2 ` ...
+    ` https://example.com/100 `
+
+    This is not (yet) supported.
+
+- List expansion
+
+    Curl supports speficying sequences of URLs such as
+    ` https://{www,ftp}.example.com/ ` , which expands to
+    ` https://www.example.com/ `, ` https://ftp.example.com/ `.
+
+    This is not (yet) supported.
+
+- Multiple sets of parameters from the command line
+
+    Curl supports the `--next` command line switch which resets
+    parameters for the next URL.
+
+    This is not (yet) supported.
+
+# SEE ALSO
+
+[LWP::Curl](https://metacpan.org/pod/LWP::Curl)
+
+[LWP::Protocol::Net::Curl](https://metacpan.org/pod/LWP::Protocol::Net::Curl)
+
+[LWP::CurlLog](https://metacpan.org/pod/LWP::CurlLog)
+
+# REPOSITORY
+
+The public repository of this module is
+[http://github.com/Corion/HTTP-Request-FromCurl](http://github.com/Corion/HTTP-Request-FromCurl).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Request-FromCurl](https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Request-FromCurl)
+or via mail to [filter-signatures-Bugs@rt.cpan.org](https://metacpan.org/pod/filter-signatures-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2018 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

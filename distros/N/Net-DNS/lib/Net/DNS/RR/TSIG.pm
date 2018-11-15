@@ -1,9 +1,9 @@
 package Net::DNS::RR::TSIG;
 
 #
-# $Id: TSIG.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: TSIG.pm 1718 2018-10-22 14:39:29Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1718 $)[1];
 
 
 use strict;
@@ -367,7 +367,7 @@ sub create {
 				);
 		}
 
-		croak "Usage:	create $class(keyfile)\n\tcreate $class(keyname, key)"
+		croak "Usage:	create $class(keyfile)\n\tcreate $class(keyname, key)";
 
 	} elsif ( scalar(@_) == 1 ) {
 		my $key = shift;				# ( keyname, key )
@@ -388,7 +388,7 @@ sub create {
 		}
 
 		my ( $vol, $dir, $file ) = File::Spec->splitpath( $keyfile->name );
-		croak "misnamed private key" unless $file =~ /^K([^+]+)+.+private$/;
+		croak 'misnamed private key' unless $file =~ /^K([^+]+)+.+private$/;
 		my $kname = $1;
 		return new Net::DNS::RR(
 			name	  => $kname,

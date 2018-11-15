@@ -8,7 +8,7 @@ package Net::Async::HTTP::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 use Carp;
 
@@ -53,7 +53,7 @@ sub configure
    my $self = shift;
    my %params = @_;
 
-   foreach (qw( pipeline max_in_flight ready_queue decode_content )) {
+   foreach (qw( pipeline max_in_flight ready_queue decode_content is_proxy )) {
       $self->{$_} = delete $params{$_} if exists $params{$_};
    }
 
@@ -267,7 +267,8 @@ sub request
       );
    } : undef;
 
-   # Unless the request method is CONNECT, the URL is not allowed to contain
+   # Unless the request method is CONNECT, or we are connecting to a
+   # non-transparent proxy, the URL is not allowed to contain
    # an authority; only path
    # Take a copy of the headers since we'll be hacking them up
    my $headers = $req->headers->clone;
@@ -277,8 +278,13 @@ sub request
    }
    else {
       my $uri = $req->uri;
-      $path = $uri->path_query;
-      $path = "/$path" unless $path =~ m{^/};
+      if ( $self->{is_proxy} ) {
+          $path = $uri->as_string;
+      }
+      else {
+          $path = $uri->path_query;
+          $path = "/$path" unless $path =~ m{^/};
+      }
       my $authority = $uri->authority;
       if( defined $authority and
           my ( $user, $pass, $host ) = $authority =~ m/^(.*?):(.*)@(.*)$/ ) {

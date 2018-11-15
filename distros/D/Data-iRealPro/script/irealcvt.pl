@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Jan 15 19:15:00 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Nov  5 21:34:36 2018
-# Update Count    : 130
+# Last Modified On: Sat Nov 10 15:04:53 2018
+# Update Count    : 134
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -16,7 +16,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../CPAN";
 use lib "$FindBin::Bin/../lib";
-use App::Packager qw( :name Data::iRealPro );
+use App::Packager qw( 1.430 :name Data::iRealPro );
 
 use Data::iRealPro 1.11;
 use Data::iRealPro::Output;

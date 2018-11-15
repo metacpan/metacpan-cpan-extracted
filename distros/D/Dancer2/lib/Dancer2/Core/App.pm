@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '0.206000';
+$Dancer2::Core::App::VERSION = '0.207000';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -153,6 +153,12 @@ has '+local_triggers' => (
                 $self->template_engine->layout($value);
             },
 
+            layout_dir => sub {
+                my $self  = shift;
+                my $value = shift;
+                $self->template_engine->layout_dir($value);
+            },
+
             log => sub {
                 my ( $self, $value, $config ) = @_;
 
@@ -244,7 +250,7 @@ sub _build_session_engine {
         %{$engine_options},
         postponed_hooks => $self->postponed_hooks,
 
-        log_cb => sub { $weak_self->logger_engine->log(@_) },
+        log_cb => sub { $weak_self->log(@_) },
     );
 }
 
@@ -268,7 +274,9 @@ sub _build_template_engine {
     my $engine_attrs = { config => $engine_options };
     $engine_attrs->{layout} ||= $config->{layout};
     $engine_attrs->{views}  ||= $config->{views}
-        || path( $self->location, 'views' );
+                            || path( $self->location, 'views' );
+    $engine_attrs->{layout_dir} ||= $config->{layout_dir}
+                                || 'layouts';
 
     Scalar::Util::weaken( my $weak_self = $self );
 
@@ -277,7 +285,7 @@ sub _build_template_engine {
         %{$engine_attrs},
         postponed_hooks => $self->postponed_hooks,
 
-        log_cb => sub { $weak_self->logger_engine->log(@_) },
+        log_cb => sub { $weak_self->log(@_) },
     );
 }
 
@@ -302,7 +310,7 @@ sub _build_serializer_engine {
         config          => $engine_options,
         postponed_hooks => $self->postponed_hooks,
 
-        log_cb => sub { $weak_self->logger_engine->log(@_) },
+        log_cb => sub { $weak_self->log(@_) },
     );
 }
 
@@ -367,7 +375,8 @@ sub set_request {
     $defined_engines ||= $self->defined_engines;
     # populate request in app and all engines
     $self->_set_request($request);
-    $_->set_request( $request ) for @{$defined_engines};
+    Scalar::Util::weaken( my $weak_request = $request );
+    $_->set_request( $weak_request ) for @{$defined_engines};
 }
 
 has response => (
@@ -942,15 +951,15 @@ sub send_as {
 
     $type or croak "Can not send_as using an undefined type";
 
-    if ( lc($type) eq 'html' ) {
-        if ( $type ne 'html' ) {
+    if ( lc($type) eq 'html' || lc($type) eq 'plain' ) {
+        if ( $type ne lc $type ) {
             local $Carp::CarpLevel = 2;
-            carp "Please use 'html' as the type for 'send_as', not $type";
+            carp sprintf( "Please use %s as the type for 'send_as', not %s", lc($type), $type );
         }
 
         $options->{charset} = $self->config->{charset} || 'UTF-8';
         my $content = Encode::encode( $options->{charset}, $data );
-        $options->{content_type} ||= 'text/html';
+        $options->{content_type} ||= join '/', 'text', lc $type;
         $self->send_file( \$content, %$options );     # returns from sub
     }
 
@@ -1397,11 +1406,7 @@ sub to_app {
         return $response;
     };
 
-    # Wrap with common middleware
-    # FixMissingBodyInRedirect
-    $psgi = Plack::Middleware::FixMissingBodyInRedirect->wrap( $psgi );
-
-    # Only add static content handler if requires
+    # Only add static content handler if required
     if ( $self->config->{'static_handler'} ) {
         # Use App::File to "serve" the static content
         my $static_app = Plack::App::File->new(
@@ -1417,8 +1422,14 @@ sub to_app {
         );
     }
 
-    # Apply Head. After static so a HEAD request on static content DWIM.
-    $psgi = Plack::Middleware::Head->wrap( $psgi );
+    # Wrap with common middleware
+    if ( ! $self->config->{'no_default_middleware'} ) {
+        # FixMissingBodyInRedirect
+        $psgi = Plack::Middleware::FixMissingBodyInRedirect->wrap( $psgi );
+        # Apply Head. After static so a HEAD request on static content DWIM.
+        $psgi = Plack::Middleware::Head->wrap( $psgi );
+    }
+
     return $psgi;
 }
 
@@ -1665,7 +1676,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 DESCRIPTION
 

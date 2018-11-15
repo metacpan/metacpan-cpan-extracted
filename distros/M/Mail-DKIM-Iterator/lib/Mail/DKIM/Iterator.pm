@@ -1,7 +1,7 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 use strict;
 use warnings;
@@ -151,7 +151,10 @@ sub result {
 }
 
 sub authentication_results {
-    return join(";\n",map { " ".$_->authentication_results } @{shift->result || []});
+    return join(";\n",map {
+	my $ar = $_->authentication_results;
+	$ar ? (' '.$ar) : (),
+    } @{shift->result || []});
 }
 
 
@@ -698,65 +701,58 @@ sub _parse_header {
     # add data to the body
     sub _append_body {
 	my ($self,$buf) = @_;
-	my $bh = $self->{_bodyhash} ||= do {
-	    my @bh;
-	    for(@{$self->{sig}}) {
-		if (!$_->{error} and
-		    my $digest = $digest{$_->{'a:hash'}}() and
-		    my $transform = $bodyc{$_->{'c:body'}}()
+	for my $sig (@{$self->{sig}}) {
+	    $sig->{'bh:computed'} and next;
+	    my $bh = $sig->{'bh:collecting'} ||= do {
+		if (!$sig->{error} and
+		    my $digest = $digest{$sig->{'a:hash'}}() and
+		    my $transform = $bodyc{$sig->{'c:body'}}()
 		) {
-		    push @bh, {
+		    {
 			digest => $digest,
 			transform => $transform,
-			$_->{l} ? (l => $_->{l}) :
-			defined($_->{l}) ? (l => \$_->{l}) :  # capture l
+			$sig->{l} ? (l => $sig->{l}) :
+			defined($sig->{l}) ? (l => \$sig->{l}) :  # capture l
 			(),
 		    };
 		} else {
-		    push @bh, { done => 1 };
+		    { done => 1 };
 		}
-	    }
-	    \@bh;
-	};
+	    };
 
-	my $i=-1;
-	for(@$bh) {
-	    $i++;
-	    $_->{done} and next;
+	    $bh->{done} and next;
 	    if ($buf eq '') {
-		$_->{done} = 1;
+		$bh->{done} = 1;
 		goto compute_signature;
 	    }
-	    my $tbuf = $_->{transform}($buf);
+	    my $tbuf = $bh->{transform}($buf);
 	    $tbuf eq '' and next;
 	    {
-		defined $_->{l} or last;
-		if (ref $_->{l}) {
-		    ${$_->{l}} += length($tbuf);
+		defined $bh->{l} or last;
+		if (ref $bh->{l}) {
+		    ${$bh->{l}} += length($tbuf);
 		    next;
 		}
-		if ($_->{l} > 0) {
-		    last if ($_->{l} -= length($tbuf))>0;
-		    $_->{_data_after_l} ||=
-			substr($tbuf,$_->{l},-$_->{l},'') =~m{\S} & 1;
-		    $_->{l} = 0;
+		if ($bh->{l} > 0) {
+		    last if ($bh->{l} -= length($tbuf))>0;
+		    $bh->{_data_after_l} ||=
+			substr($tbuf,$bh->{l},-$bh->{l},'') =~m{\S} & 1;
+		    $bh->{l} = 0;
 		} else {
-		    $_->{_data_after_l} ||= $tbuf =~m{\S} & 1;
+		    $bh->{_data_after_l} ||= $tbuf =~m{\S} & 1;
 		    $tbuf = '';
 		}
-		$_->{done} = 1;
+		$bh->{done} = 1;
 	    }
-	    $_->{digest}->add($tbuf) if $tbuf ne '';
-	    $_->{done} or next;
+	    $bh->{digest}->add($tbuf) if $tbuf ne '';
+	    $bh->{done} or next;
 
 	    compute_signature:
-	    $self->{sig}[$i]{'bh:computed'} = $_->{digest}->digest;
-	    push @{$self->{sig}[$i]{':warning'}}, 'data after signed body'
-		if $_->{_data_after_l};
+	    delete $sig->{'bh:collecting'};
+	    $sig->{'bh:computed'} = $bh->{digest}->digest;
+	    push @{$sig->{':warning'}}, 'data after signed body'
+		if $bh->{_data_after_l};
 	}
-
-	delete $self->{_bodyhash}
-	    if @$bh == grep { $_->{done} } @$bh; # done with all
     }
 }
 
@@ -851,6 +847,7 @@ sub warning   { $_[0]->[2] >0 ? $_[0]->[3] : undef }
 
 sub authentication_results {
     my $self = shift;
+    return if ! $self->[2];
     my $ar = "dkim=$self->[2]";
     $ar .= " ($self->[3])" if defined $self->[3] and $self->[3] ne '';
     $ar .= " header.d=".$self->[0]{d};

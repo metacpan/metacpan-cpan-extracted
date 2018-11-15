@@ -4,6 +4,7 @@
 Changes
 cpanfile
 lib/JSON/Validator.pm
+lib/JSON/Validator/cache/10a5eeb37fcd5d829449028f7ceb0774
 lib/JSON/Validator/cache/36d1bd12eeed51e86c8695bd8876a9df
 lib/JSON/Validator/cache/3d35aac549d951f4cf9182ff47bff0b4
 lib/JSON/Validator/cache/49c95b866e40f788892a7fb3c816b0e8
@@ -112,7 +113,10 @@ t/spec/petstore.json
 't/spec/space bundle.json'
 t/spec/with-deep-mixed-ref.json
 t/spec/with-relative-ref.json
+t/stack/Some.pm
+t/stack/Some/Module.pm
 t/to-json.t
+t/v3-openapi.t
 t/validate-id.t
 t/validate-json.t
 t/validate-recursive.t

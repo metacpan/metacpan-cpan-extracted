@@ -5,8 +5,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep  6 16:09:10 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov  1 21:08:33 2018
-# Update Count    : 79
+# Last Modified On: Tue Nov 13 10:10:20 2018
+# Update Count    : 80
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -36,7 +36,7 @@ sub new {
 	$opts->{output} ||= "-";
     }
 
-    if ( $options->{list}
+    elsif ( $options->{list}
 	 || $opts->{output} =~ /\.txt$/i ) {
 	require Data::iRealPro::Output::Text;
 	$self->{_backend} = Data::iRealPro::Output::Text::;

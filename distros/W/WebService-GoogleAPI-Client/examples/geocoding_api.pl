@@ -47,7 +47,6 @@ An API Key is required with permission to access the GeoCode API and if required
 
 =item  L<WWW::Google::Places> 
 
-
 =back
 
 

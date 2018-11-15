@@ -11,12 +11,11 @@ build_requires:
   IPC::Open3: '0'
   Plack::Test: '0'
   Test::More: '0.92'
-  blib: '1.01'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +24,7 @@ name: Dancer2-Plugin-Ajax
 provides:
   Dancer2::Plugin::Ajax:
     file: lib/Dancer2/Plugin/Ajax.pm
-    version: '0.300000'
+    version: '0.400000'
 requires:
   Dancer2: '0.200000'
   Dancer2::Core::Types: '0'
@@ -38,5 +37,6 @@ resources:
   bugtracker: https://github.com/PerlDancer/Dancer2-Plugin-Ajax/issues
   homepage: https://github.com/PerlDancer/Dancer2-Plugin-Ajax
   repository: https://github.com/PerlDancer/Dancer2-Plugin-Ajax.git
-version: '0.300000'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.400000'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

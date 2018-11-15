@@ -37,7 +37,7 @@ sub parse {
             my $body_data;
 
             if ($body_sig) {
-                ($body_data) = Protocol::DBus::Marshal->can( 'unmarshal_' . ($is_be ? 'be' : 'le') )->($buf_sr, $hdr_len, $body_sig);
+                ($body_data) = Protocol::DBus::Marshal->can( $is_be ? 'unmarshal_be' : 'unmarshal_le' )->($buf_sr, $hdr_len, $body_sig);
             }
 
             my %self = ( _body_sig => $body_sig );

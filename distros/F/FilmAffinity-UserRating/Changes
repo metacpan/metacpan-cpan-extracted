@@ -1,38 +1,18 @@
 Revision history for FilmAffinity-UserRating
 
-0.01    23 Feb 2013 / 18h00
-        First release to "master"
-        Get filmaffinity voted movies from a user
+1.01    15 Nov 2018 / 19h00
+        Fix tarball
 
-0.02    20 Apr 2013 / 17h40
-        Get information from filmaffinity about a film
-
-0.03    27 Apr 2013 / 16h00
-        Retrieve votes
-        Retrieve global rating
-
-0.04    29 Aug 2013 / 20h30
-        bug-fix: films with empty duration
-        bug-fix: films with empty topics
-        bug-fix: confusion between title and original title
-        New script to get information from filmaffinity
-
-0.05    28 Sep 2013 / 18h00
-        Improve script to retrieve only the difference since last run
-        add "force" option to retrieve all movies again
-
-0.06    08 Mar 2014 / 20h00
-        bug-fix: encoding problems with unit test
-        Improve unit test with json files
-
-0.07    12 Oct 2014 / 16h00
-        Rewrite some code because of the new layout of filmaffinity
-        Clean lib/*
-        bug-fix: films with empty rating
-        bug-fix: films with empty vote
-
-0.08    13 Nov 2014 / 20h10
+1.00    14 Nov 2018 / 21h00
+        Fix delay initialization
+        Fix usage example
+        Improve README.md
+        Add CONTRIBUTING.md
         Update dependencies
+
+0.10    31 Nov 2016 / 11h20
+        Improve pod documentation
+        Clean code
 
 0.09    22 Nov 2014 / 15h45
         Rewrite XPath expression because of the new layout of filmaffinity
@@ -40,6 +20,36 @@ Revision history for FilmAffinity-UserRating
         add myrating accessor
         bug-fix: unit test failures on Windows
 
-0.10    31 Nov 2016 / 11h20
-        Improve pod documentation
-        Clean code
+0.08    13 Nov 2014 / 20h10
+        Update dependencies
+
+0.07    12 Oct 2014 / 16h00
+        Rewrite some code because of the new layout of filmaffinity
+        Clean lib/*
+        bug-fix: films with empty rating
+        bug-fix: films with empty vote
+
+0.06    08 Mar 2014 / 20h00
+        bug-fix: encoding problems with unit test
+        Improve unit test with json files
+
+0.05    28 Sep 2013 / 18h00
+        Improve script to retrieve only the difference since last run
+        add "force" option to retrieve all movies again
+
+0.04    29 Aug 2013 / 20h30
+        bug-fix: films with empty duration
+        bug-fix: films with empty topics
+        bug-fix: confusion between title and original title
+        New script to get information from filmaffinity
+
+0.03    27 Apr 2013 / 16h00
+        Retrieve votes
+        Retrieve global rating
+
+0.02    20 Apr 2013 / 17h40
+        Get information from filmaffinity about a film
+
+0.01    23 Feb 2013 / 18h00
+        First release to "master"
+        Get filmaffinity voted movies from a user

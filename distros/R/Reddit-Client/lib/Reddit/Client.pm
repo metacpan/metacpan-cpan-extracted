@@ -1,8 +1,8 @@
 package Reddit::Client;
 
-our $VERSION = '1.2811';
+our $VERSION = '1.2814';
 # TODO: make ispost, iscomment and get_type static
-# 1.2811-documentation update
+# 1.2814-documentation update
 # 1.281 -morecomments get_collapsed args
 # 1.281 -get_collapsed can also return morecomments
 # 1.28  -get_links_by_id
@@ -1128,11 +1128,10 @@ sub set_user_flair {
 sub get_flair_options {
     	my ($self, %param) = @_;
 	my $sub 	= $param{subreddit} || croak "Expected 'subreddit'";
-	my $post_id 	= $param{post_id};
+	my $post_id = $param{post_id};
 	my $user	= $param{username};
 	my $data	= {};
 
-	# what happens when both are sent?
 	if ($post_id) {
 		if (!$self->ispost($post_id)) { $post_id = "t3_".$post_id; }
 		$data->{link} = $post_id;
@@ -1573,174 +1572,162 @@ Reddit::Client - A Perl wrapper for the Reddit API.
 =head1 SYNOPSIS
 
     use Reddit::Client;
-
-    my $client_id  	= "DFhtrhBgfhhRTd";
-    my $secret     	= "KrDNsbeffdbILOdgbgSvSBsbfFs";
-    my $username   	= "reddit_username";
-    my $password   	= "reddit_password";
-
-
-    # Create a Reddit::Client object and authorize in one step
+    
+    my $client_id   = "DFhtrhBgfhhRTd";
+    my $secret      = "KrDNsbeffdbILOdgbgSvSBsbfFs";
+    
+    # Create a Reddit::Client object and authorize in one step: "script" app
     my $reddit = new Reddit::Client(
-	user_agent 	=> 'MyScriptName 1.0 by /u/myusername',
-	client_id	=> $client_id,
-	secret		=> $secret,
-	username	=> $username,
-	password	=> $password,
+        user_agent  => 'Test script 1.0 by /u/myusername',
+        client_id   => $client_id,
+        secret      => $secret,
+        username    => 'reddit_username',
+        password    => 'reddit_password',
     );
-	
-    # Or create object then authorize.
-    # Useful if you need to switch between accounts, for example if you were to check the inboxes of several accounts.
-    my $reddit = Reddit::Client->new(
-        user_agent   	=> 'MyApp/1.0 by /u/myusername',
-    );
-
-    $reddit->get_token(
-	client_id	=> $client_id,
-	secret		=> $secret,
-	username	=> $username,
-	password	=> $password,
-    );
-
+    
+    # Create a Reddit::Client object and authorize in one step: "web" app
+    my $reddit = new Reddit::Client(
+        user_agent    => 'Test script 1.0 by /u/myusername',
+        client_id     => $client_id,
+        secret        => $secret,
+        refresh_token => 'refresh_token',
+    );	
+    
     # Check your inbox
     my $me = $reddit->me();
     print "You've got mail!" if $me->{has_mail};
-
+    
     # Submit a link
     $reddit->submit_link(
-        subreddit 	=> 'test',
-        title     	=> 'Perl is still alive!',
-        url       	=> 'http://www.perl.org'
+        subreddit   => 'test',
+        title       => 'Change is bad, use Perl',
+        url         => 'http://www.perl.org'
     );
-
-    # Submit a text post
-    $reddit->submit_text(
-	subreddit 	=> 'test',
-	title		=> 'my test',
-	text		=> 'a test'
-    );
-
+    
     # Get posts from a subreddit or multi
-    my $posts = $reddit->fetch_links(subreddit=>'test', limit=>5);
+    my $posts = $reddit->get_links(subreddit=>'test', limit=>5);
+    
     foreach my $post (@$posts) {
-	print $post->{title} . "\n";
-	if (!$post->{is_self}) { # Is it a self post or a link?
-		print $post->{url};
-	} else {
-		print $post->{selftext};
-	}
-    }
+        print $post->{is_self} ? $post->{selftext} : $post->{url};
+        print $post->get_web_url();
 
-    # Get comments from a subreddit or multi
-    my $cmts = $reddit->get_subreddit_comments('test');
-    foreach my $cmt (@$cmts) {
-	print "$cmt->{author} says: $cmt->{body}\n";
+        if ($post->{title} =~ /some phrase/) {
+            $post->reply("hi, I'm a bot");
+        }
     }
-
 
 =head1 DESCRIPTION
 
-Reddit::Client handles HTTP communication, oauth session management, and communication with Reddit's external API. For more information about the Reddit API, see L<https://github.com/reddit/reddit/wiki/API>.
+Reddit::Client handles oauth session management and HTTP communication with Reddit's external API. Since August 3rd, 2015, the Reddit API requires Oauth2 authentication. For more information about the Reddit API, see L<https://github.com/reddit/reddit/wiki/API>. 
 
-Beginning August 3rd, 2015, the Reddit API requires Oauth2 authentication. This amounts to two extra arguments at the beginning of your script (for basic authentication); in exchange you get twice as many requests per minute as before (60 vs 30) and some added convenience on the back end.
+To get Oauth keys, visit your apps page: L<https://www.reddit.com/prefs/apps>. There are three types of apps to choose from, but most people will want a "script"-type app. This is an app for personal use; only your account and accounts you explicitly give permission to can use it. To run a "script"-type app you need your username, password, and the app's client ID and secret.
 
-To get Oauth keys, visit your apps page: L<https://www.reddit.com/prefs/apps>. Choose a "script" type app. None of the other fields are needed for this type of app; the URL fields must be filled, but can be any valid URL.
+As of v1.20, Reddit::Client also supports "web" apps. These are apps that are intended to run on a web server and can take actions on behalf of the public at large. (If you have ever seen a permission screen for a Reddit app that says "SomeRedditApp wants your permission to...", that's a web type app.) While they are fully supported, there is not yet a setup guide, so getting one running is left as an exercise for the reader. You will need a web server (obviously), and you will need to generate a refresh token, which is a unique string that your app will use to authenticate instead of a username and password. You will probably want to store refresh tokens locally so that your app doesn't have to get a new one every time it runs. Documentation for the "web" app flow can be found at L<https://github.com/reddit-archive/reddit/wiki/OAuth2>.
 
-As of v1.20, Reddit::Client supports "web" apps. These are the kind of apps that are intended to run on a web server and can take actions on behalf of the public at large. While they are supported, there is not yet a setup guide, so getting one running is left as an exercise for the reader. 
-
-=head1 Constants
-
-    DEFAULT_LIMIT           => 25
-    
-    VIEW_HOT                => ''
-    VIEW_NEW                => 'new'
-    VIEW_CONTROVERSIAL      => 'controversial'
-    VIEW_TOP                => 'top'
-    VIEW_RISING             => 'rising'
-    VIEW_DEFAULT            => VIEW_HOT
-    
-    VOTE_UP                 => 1
-    VOTE_DOWN               => -1
-    VOTE_NONE               => 0
-    
-    SUBMIT_LINK             => 'link'
-    SUBMIT_SELF             => 'self'
-    SUBMIT_MESSAGE          => 'message'
-    
-    MESSAGES_INBOX          => 'inbox'
-    MESSAGES_UNREAD         => 'unread'
-    MESSAGES_SENT           => 'sent'
-    MESSAGES_MESSAGES       => 'messages'
-    MESSAGES_COMMENTREPLIES => 'comments'
-    MESSAGES_POSTREPLIES    => 'selfreply'
-    MESSAGES_MENTIONS       => 'mentions'
-    
-    SUBREDDITS_HOME         => ''
-    SUBREDDITS_MINE         => 'subscriber'
-    SUBREDDITS_POPULAR      => 'popular'
-    SUBREDDITS_NEW          => 'new'
-    SUBREDDITS_CONTRIB      => 'contributor'
-    SUBREDDITS_MOD          => 'moderator'
-    
-    USER_OVERVIEW           => 'overview'
-    USER_COMMENTS           => 'comments'
-    USER_SUBMITTED          => 'submitted'
-    USER_GILDED             => 'gilded'
-    USER_UPVOTED            => 'upvoted'
-    USER_DOWNVOTED          => 'downvoted'
-    USER_HIDDEN             => 'hidden'
-    USER_SAVED              => 'saved'
-
-=head1 Methods
-
-These are the methods of the Reddit::Client class.
-
-Two notes about methods that return lists of things:
-
-1. All methods that return lists of things return them as a Perl list-- that is, a reference to an anonymous array. In practice this means that you get at the values with C<@$array> instead of C<@array>.
-
-2. All methods that return lists of things accept three optional parameters: I<limit>, I<before>, and I<after>. You may recognize them from your address bar when viewing pages after the front page. I<limit> defaults to 25 with a maximum of 100. (If I<limit> is present but false, this is interpreted as "no limit" and the maximum is returned.) I<before> and I<after> limit results to those posted before I<before> and after I<after>.
-
-
-=head1 Methods
+=head1 TERMINOLOGY
 
 =over
+
+C<fullname>: A thing's complete ID with prefix. Example: t1_3npkj4. Whe Reddit returns data, the fullname is usually found in the "name" field. The type of thing can be determined by the prefix; for example, "t1" for comments and "t3" for links.
+
+C<id>: A thing's short ID without prefix. Example: 3npkj4. Seen in your address bar when viewing, for example, a post or comment. 
+
+=back
+
+=head1 LISTINGS
+
+Methods that return lists of things can accept several optional parameters:
+
+=over
+
+C<limit> I<integer> How many things to return. Default 25, maximum 100. If I<limit> is present but false, this is interpreted as "no limit" and the maximum is returned.
+
+C<before> I<fullname> Return results that occur before I<fullname> in the listing. 
+
+C<after> I<fullname> Return results that occur after I<fullname> in the listing.
+
+C<count> I<integer> Appears to be used by Reddit to number listings after the first page. Does not seem to have a use in the API.
+
+C<only> I<"links" or "comments"> Return only links or comments. Only relevant to listings that could contain both.
+
+C<show_all> I<boolean> Return items that would have been omitted, for example posts you have hidden, or have reported, or are hidden from you because you are using the option to hide posts after you've upvoted/downvoted them. Default false.
+
+=back
+
+Note that 'before' and 'after' mean before and after I<in the listing>, not necessarily in time. It's best to think of Reddit as a database where new lines are constantly inserted at the top, because that's basically what it is.
+
+=head1 MISC
+
+All functions that take the parameter 'subreddit' also accept the alias 'sub'.
+
+This guide indicates optional arguments with brackets ([]), a convention we borrowed from from PHP's online manual. This creates some slight overlap with Perl's brackets, which are used to indicate an anonymous array reference, however which of the two is intended should be clear from the context. For example, here is an optional argument where the argument is an array reference, from the C<create_multi> function: C<[ subreddits =E<gt> [ subreddits ], ]>
+
+=head1 METHODS
+
+=over
+
+=item approve
+
+    approve ( $fullname )
+
+Approve a comment or post (moderator action).
+
+=item ban
+
+    ban ( username => $username, subreddit => $subreddit,
+        [ duration => $duration, ] [ ban_message => $message, ] [ reason => $reason, ] [ note => $note ] )
+
+Ban a user from a subreddit. C<username> and C<subreddit> are required. Optional arguments include:
+
+* C<duration>: Duration in days. Range 1-999. If false or not provided, the ban is indefinite.
+
+* C<ban_message>: The message sent to the banned user. (Markdown is allowed.)
+
+* C<reason>: A short ban reason (100 characters max). On the website ban page, this matches the ban reason you would select from the dropdown menu. It is arbitrary: it doesn't have to match up with the reasons from the menu and can be blank. Only visible to moderators.
+
+* C<note>: An optional note, 300 characters max. Only visible to moderators.
+
+A ban will overwrite any existing ban for that user. For example, to change the duration, you can call C<ban()> again with a new duration.
 
 =item comment
 
     comment ( $fullname, $text )
 	
-Make a comment under I<$fullname>, which must be either a post or a comment. Return the fullname of the new comment.
+Make a comment under C<$fullname>, which must be either a post or a comment. Return the fullname of the new comment.
 
 This function is an alias for C<submit_comment>, and is equivalent to
 
     submit_comment ( parent_id => $fullname, text => $text )
-
+	
 =item create_multi
 
-    create_multi ( name => $multi_name, [ description => $description, ] [ visibility => $visibility, ]
-                 [ subreddits => [ subreddits ], ] [ icon_name => $icon_name, ] [ key_color => $hex_code, ]
-                 [ weighting_scheme => $weighting_scheme, ] )
+    create_multi ( name => $multi_name, 
+                 [ description => $description, ] [ visibility => $visibility, ] [ subreddits => [ subreddits ], ]
+                 [ icon_name => $icon_name, ] [ key_color => $hex_code, ] [ weighting_scheme => $weighting_scheme, ] )
 
 Create a multireddit. The only required argument is the name. A multi can also be created with C<edit_multi>, the only difference being that C<create_multi> will fail with a HTTP 409 error if a multi with that name already exists.
 
 Returns a hash of information about the newly created multireddit.
 
-I<name> The name of the multireddit. Maximum 50 characters. Only letters, numbers and underscores are allowed. Required.
+=over
 
-I<description> Description of the multi. This can contain markdown.
+* C<name> The name of the multireddit. Maximum 50 characters. Only letters, numbers and underscores are allowed (and underscores cannot be the first character). Required.
 
-I<visibility> One of 'private', 'public', or 'hidden'. Default 'private'.
+* C<description> Description of the multi. This can contain markdown.
 
-I<subreddits> or I<subs>: An array reference.
+* C<visibility> One of 'private', 'public', or 'hidden'. Default 'private'.
+
+* C<subreddits> or C<subs>: An array reference.
+
+=back
 
 The remaining arguments don't currently do anything. It seems like at least some of them are intended for future mobile updates.
 
-I<icon_name> If provided, must be one of the following values: 'art and design', 'ask', 'books', 'business', 'cars', 'comics', 'cute animals', 'diy', 'entertainment', 'food and drink', 'funny', 'games', 'grooming', 'health', 'life advice', 'military', 'models pinup', 'music', 'news', 'philosophy', 'pictures and gifs', 'science', 'shopping', 'sports', 'style', 'tech', 'travel', 'unusual stories', 'video', '', 'None'.
+* C<icon_name> If provided, must be one of the following values: 'art and design', 'ask', 'books', 'business', 'cars', 'comics', 'cute animals', 'diy', 'entertainment', 'food and drink', 'funny', 'games', 'grooming', 'health', 'life advice', 'military', 'models pinup', 'music', 'news', 'philosophy', 'pictures and gifs', 'science', 'shopping', 'sports', 'style', 'tech', 'travel', 'unusual stories', 'video', '', 'None'.
 
-I<weighting_scheme> If provided, must be either 'classic' or 'fresh'.
+* C<weighting_scheme> If provided, must be either 'classic' or 'fresh'.
 
-I<key_color> A 6-character hex code. Defaults to CEE3F8.
+* C<key_color> A 6-character hex code. Defaults to CEE3F8.
 
 =item delete 
 
@@ -1754,121 +1741,245 @@ Delete a post or comment.
 	
 Delete a multireddit.
 
+=item edit
+
+    edit ( $fullname, $text )
+	
+Edit a text post or comment. Unlike on the website, C<$text> can be an empty string, although to prevent accidental wipeouts it must be defined.
+
 =item edit_multi
 
-Edit a multireddit. Will create a new multireddit if one with that name doesn't exist. The arguments are identical to C<create_multi>.
+Edit a multireddit. Will create a new multireddit if one with that name doesn't exist. The arguments are identical to [create_multi](#create_multi).
 
 =item edit_wiki
 
     edit_wiki ( subreddit => $subreddit, page => $page, content => $content,
-              [ previous => $previous_version_number,] [ reason => $edit_reason, ] )
+              [ previous => $previous_version_id, ] [ reason => $edit_reason, ] )
 	
-I<page> is the page being edited.
+* C<page> is the page being edited.
 
-I<content> is the new page content. Can be empty but must be defined. Maximum 524,288 characters.
+* C<content> is the new page content. Can be empty but must be defined. Maximum 524,288 characters.
 
-I<reason> is the edit reason. Max 256 characters, will be truncated if longer. Optional.
-	
-I<previous> is the ID of the intended previous version of the page; if provided, that is the version the page will be rolled back to in a rollback. However, there's no way to find out what this should be from the Reddit website, or currently from Reddit::Client either. Use it only if you know what you're doing. Optional.
+* C<reason> is the edit reason. Max 256 characters, will be truncated if longer. Optional.
+
+* C<previous> is the ID of the intended previous version of the page; if provided, that is the version the page will be rolled back to in a rollback. However, there's no way to find out what this should be from the Reddit website, or currently from Reddit::Client either. Use it only if you know what you're doing.
 
 =item find_subreddits
 
-    find_subreddits ( q => $query, [ sort => 'relevance' ,] 
-                    [ limit => DEFAULT_LIMIT ,] [ before => undef ,] [ after => undef ,] )
+    find_subreddits ( q => $query, [ sort => 'relevance', ]  )
 
-Returns a list of Subreddit objects matching the search string I<$query>. Optionally sort them by I<sort>, which can be "relevance" or "activity".
+Returns a list of Subreddit objects matching the search string C<$query>. Optionally sort them by C<sort>, which can be "relevance" or "activity".
+
+=item get_collapsed_comments
+
+    get_collapsed_comments ( link_id => $link_id, children => $children,
+                           [ limit_children => 0, ] [ sort => $sort, ] )
+
+Expand a list of collapsed comments found in a MoreComments object. Return a flat list of Comment objects.
+
+C<link_id> is the ID of the link the comments are under. C<children> is a reference to an array containing the comment IDs. 
+
+If C<limit_children> is true, return only the requested comments, not replies to them. Otherwise return as many replies as possible (possibly resulting in more MoreComments objects down the line). C<sort> is one of 'confidence', 'top', 'new', 'controversial', 'old', 'random', 'qa', 'live'. Default seems to be 'confidence'.
 
 =item get_comment 
 
-    get_comment ( $fullname )
+    get_comment ( $id_or_fullname, [ include_children => 0 ] )
 
-Returns a Comment object for I<$fullname>.
+Returns a Comment object for C<$id_or_fullname>. Note that by default, this only includes the comment itself and not replies. This is by Reddit's design; there isn't a way to return a comment and its replies in one request, using only the comment's id. 
+
+You can get its replies at the same time by setting C<include_children> to a true value, which will cause Reddit::Client to make a second request before getting back to you.
+
+=item get_comments
+
+    get_comments ( subreddit => $subreddit, link_id => $link_id_or_fullname )
+
+or 
+
+    get_comments ( subreddit => $subreddit, link_id => $link_id_or_fullname, comment_id => $comment_id_or_fullname )
+
+or
+
+    get_comments ( permalink => $permalink )
+
+or
+
+    get_comments ( url => $url )
+
+Get the comment tree for the selected subreddit/link\_id, subreddit/link\_id/comment_id, permalink, or URL. This will be a mix of Comment and MoreComments objects, which are placeholders for collapsed comments. This is analogous to the "show more comments" links on the website.
+
+If you already have a Link or Comment object, it's best to call its own C<get_comments> method, which takes no arguments and supplies all of the necessary information for you. If you do decide to use this version:
+
+=over
+
+C<permalink> is the value found in the C<permalink> field of a Link or Comment. It is the URL minus the protocol and hostname, i.e. "/r/subreddit/comments/link_id/optional_title/comment_id". This is somewhat awkward but it's just how Reddit works. It's not intended to be something you contruct yourself; this option is intended for passing in the C<permalink> from an existing Link or Comment.
+
+C<url> is a complete URL for a link or comment, i.e. what would be in address bar on the website.
+
+C<subreddit>, C<link_id> and C<comment_id> should be self explanatory. It accepts either short IDs or fullnames, and like all functions that take C<subreddit> as an argument, it can be appreviated to C<sub>.
+
+=back
+
+Interally, all of these options simply create a permalink and pass it on to Reddit's API, because that is the only argument that this endpoint accepts.
 
 =item get_flair_options
 
-    get_flair_options( subreddit => $subreddit, post_id => $post_id_or_fullname, username => $username )
+    get_flair_options( subreddit => $subreddit, post_id => $post_id_or_fullname )
+
+    get_flair_options( subreddit => $subreddit, username => $username )
 	
-Get the flair options for either the post or the user provided.
+Return the flair options for either the post or the user provided.
 
 Returns a hash containing two keys:
 
-1. I<choices> is an array of hash references containing the flair options. Most important is I<flair_template_id>, which is used to set the flair of a post or user with C<set_post_flair> or C<set_user_flair>. I<flair_text> contains the text of the flair.
+=over
 
-2. I<current> is a hash of the post or user's existing flair.
+C<choices> is an array of hash references containing the flair options. Most important is C<flair_template_id>, which is used to set the flair of a post or user with set_post_flair or set_user_flair. C<flair_text> contains the text of the flair.
+
+C<current> is a hash of the post or user's existing flair.
+
+=back
 
 =item get_inbox 
 
-    get_inbox ( [ view => MESSAGES_INBOX ,] [ limit => DEFAULT_LIMIT ,]
-                [ before => undef ,] [ after => undef ,] )
+    get_inbox ( [ view => MESSAGES_INBOX ] )
 				
-Returns a list of Message objects, where I<view> is one of the MESSAGE constants. All arguments are optional. If all are omitted your default inbox will be returned-- what you would see if you went to reddit.com and clicked the mailbox icon.
+Returns a listing of Message objects, where C<view> is one of the MESSAGE L<constants|https://metacpan.org/pod/Reddit::Client#CONSTANTS>. All arguments are optional. If all are omitted your default inbox will be returned-- what you would see if you went to reddit.com and clicked the mailbox icon.
 
-Checking your inbox via the API doesn't mark it as read. To do that you'll need to call C<mark_inbox_read>: L<http://redditclient.readthedocs.org/en/latest/main-methods/#mark_inbox_read>
+Checking your inbox via the API doesn't mark it as read. To do that you'll need to call C<mark_inbox_read>.
 
 =item get_link 
 
-    get_link ( $fullname )
+    get_link ( $id_or_fullname )
 
-Returns a Link object for I<$fullname>.
+Returns a Link object for C<$id_or_fullname>.
 
 =item get_links
 
-    get_links ( [ subreddit => undef ,] [ view => VIEW_DEFAULT ,] [ limit => DEFAULT_LIMIT ,]
-                [ before => undef ,] [ after => undef ,] )
+    get_links ( [ subreddit => undef, ] [ view => VIEW_DEFAULT, ] )
 
-Returns a list of Link objects. All arguments are optional.
+Returns a listing of Link objects. All arguments are optional.
 
-I<subreddit> can be a subreddit or multi (ex: "pics+science"). If omitted, results from the user's front page will be returned-- i.e. what you would see if you visited reddit.com as that user. 
-
-I<view> is a feed type constant-- i.e. VIEW_HOT, VIEW_NEW, etc.
+C<subreddit> can be a subreddit or multi (ex: "pics+funny"). If omitted, results from the user's front page will be returned-- i.e. what you would see if you visited reddit.com as that user. 
 		
-fetch_links is an alias for get_links.
+C<fetch_links()> is an alias for C<get_links()>.
+
+=item get_links_by_id
+
+    get_links_by_id ( @ids_or_fullnames )
+
+Return an array of Link objects.
+
+=item get_modlinks
+
+    get_modlinks ( [ subreddit => 'mod', ] [ mode => 'modqueue' ] )
+	
+Return links related to subreddit moderation. C<subreddit> defaults to 'mod', which is subreddits you moderate. C<mode> can be one of 5 values: reports, spam, modqueue, unmoderated, and edited. It defaults to 'modqueue'. Using both defaults will get you the same result as clicking the "modqueue" link that RES places in the upper left of the page, or /r/mod/about/modqueue.
+
+Here is an explanation of the C<mode> options from the API site:
+
+=over
+
+reports: Things that have been reported.
+
+spam: Things that have been marked as spam or otherwise removed.
+
+modqueue: Things requiring moderator review, such as reported things and items caught by the spam filter. Default.
+
+unmoderated: Things that have yet to be approved/removed by a mod.
+
+edited: Things that have been edited recently.
+
+=back
+
+C<num_reports> contains the total number of reports. Reports themselves can be found in the C<mod_reports> and C<user_reports> properties. These are arrays of arrays, i.e.
+
+    [ [ "Spam",  3 ], [ "report #2", 1 ] ]    # user_reports
+	[ [ "mod report", "moderator_name" ] ]    # mod_reports
+	
+The number with C<user_reports> is the number of times that particular report has been sent. This is mainly for duplicates that users have selected from the menu, for example "Spam".
+
+=item get_modqueue
+
+    get_modqueue ( [ subreddit => 'mod' ] )
+
+Get the modqueue, i.e. the listing of links and comments you get by visiting /r/mod/about/modqueue. Optionally supply a subreddit. Defaults to 'mod', which is all subreddits you moderate. Identical to calling C<get_modlinks (subreddit => 'mod', mode => 'modqueue')>.
 
 =item get_multi
 
-    get_multi ( name => $multi_name, [ user => $username, ] [ expand => 0, ] )
+    get_multi ( name => $multi_name, 
+              [ user => $username, ] [ expand => 0, ] )
 	
-Get a hash of information about a multireddit. I<$username> defaults to your username.
+Get a hash of information about a multireddit. C<$username> defaults to your username.
 
-If I<expand> is true, returns more detailed information about the subreddits in the multi. This can be quite a bit of information, comparable to the amount of information contained in a Subreddit object, however it's not I<exactly> the same, and if you try to create a Subreddit object out of it you'll fail.
+If C<expand> is true, returns more detailed information about the subreddits in the multi. This can be quite a bit of information, comparable to the amount of information contained in a Subreddit object, however it's not I<exactly> the same, and if you try to create a Subreddit object out of it you'll fail.
 
 =item get_permalink
 
     get_permalink ( $comment_id, $post_id )
 	
-Returns a permalink for I<$comment_id>. B<If you already have a Comment object, use its get_permalink function instead>, ala C<$comment->get_permalink()>. 
+Returns a permalink for C<$comment_id>. B<If you already have a Comment object, use its C<get_permalink()> function instead>. This version causes an extra request because it has to ask Reddit for the parent post's URL first, while a Comment object already has that information. It's provided for backwards compatibility, and for the rare case when you may have a comment's ID but not a comment object (perhaps you have a list of IDs stored in a database). It may be deprecated in the future.
 
-This version causes an extra request because it has to ask Reddit for the parent post's URL first, while a Comment object already has that information. It's provided for backwards compatibility, and for the rare case when you may have a comment's ID but not a comment object (perhaps you have a list of IDs stored in a database). It may be deprecated in the future.
+C<$comment_id> and C<$post_id> can be either fullnames or short IDs.
 
-I<$comment_id> and I<$post_id> can be either fullnames or short IDs.
+=item get_refresh_token
+
+    Reddit::Client->get_refresh_token ( $code, $redirect_uri, $client_id, $secret, $user_agent )
+
+Get a permanent refresh token for use in Web-type apps. All arguments are required*. Returns the refresh token.
+
+This is best called in static context, just as it's written above (i.e. with C<Reddit::Client->get_refresh_token>, rather than by instantiating an RC object first.) The reason is that it's completely separate from every other program flow and you only create extra work for yourself by using an existing RC object. If you choose to use an existing RC object, you'll need to create it and then call C<get_token> with your new refresh_token as a parameter. (C<client_id> and C<secret> will need to be passed in either on object creation or when calling get_token.)
+
+C<code> is the one-time use code returned by Reddit after a user authorizes your app. For an explanation of that and C<redirect_uri>, see the token retrieval code flow:L<https://github.com/reddit-archive/reddit/wiki/OAuth2#token-retrieval-code-flow>.
 
 =item get_subreddit_comments
 
-    get_subreddit_comments ( [ subreddit => '' ,] [ view => VIEW_DEFAULT ,] [ limit => DEFAULT_LIMIT ,]
-                             [ before => undef ,] [ after => undef ,]  )
+    get_subreddit_comments ( [ subreddit => '', ] )
 
-Returns a list of Comment objects from a subreddit or multi.
+Returns a list of Comment objects from a subreddit or multi. If subreddit is omitted the account's "front page" subreddits are returned (i.e. what you see when you visit reddit.com and are logged in).
 
-All arguments are optional. If subreddit is omitted the account's "front page" subreddits are returned (i.e. what you see when you visit reddit.com and are logged in). 
+=item get_subreddit_info
 
-I<view> is a feed type constant-- i.e. VIEW_HOT, VIEW_NEW, etc.
+    get_subreddit_info ( $subreddit )
+	
+Returns a hash of information about subreddit C<$subreddit>.
 
 =item get_token
 
     get_token ( client_id => $client_id, secret => $secret, username => $username, password => $password )
 
-Get an Oauth token from Reddit. This is analogous to the old login function, and can be considered identical, with the exception that, if your script runs continuously for more than an hour, a new token will be obtained hourly.
+or
+
+    get_token ( client_id => $client_id, secret => $secret, refresh_token => $refresh_token )
+
+or
+
+    get_token
+
+Get an authentication token from Reddit. Normally a user has no reason to call this function themselves. If you pass in your authentication info when creating a new Reddit::Client onject, C<get_token> will be called automatically using the information provided. Similarly, if your script runs continuously for more than an hour, a new token will be obtained automatically. C<get_token> is exposed in case you need to refresh your authorization token manually for some reason, for example if you want to switch to a different user within the same Reddit::Client instance.
+
+If any arguments are provided, all of the appropriate arguments are required. If none are provided, it will use the information from the previous call.
 
 =item get_user
 
-    get_user ( [ user => $username ,] [ view => USER_OVERVIEW ,]
-               [ limit => DEFAULT_LIMIT ,][ before => undef ,] [ after => undef ,]  )
+    get_user ( user => $username, [ view => USER_OVERVIEW, ] )
 			   
-Get information about a user, where I<view> is one of the USER constants: overview, comments, submitted, gilded, upvoted, downvoted, hidden, or saved. Defaults to overview, which shows the user's most recent comments and posts.
+Get information about a user, where C<view> is one of the user L<constants|https://metacpan.org/pod/Reddit::Client#CONSTANTS>: overview, comments, submitted, gilded, upvoted, downvoted, hidden, saved, or about. Defaults to 'overview', which shows the user's most recent comments and posts.
 
-Note that if you try to get the upvoted, downvoted, hidden, or saved activity for a user other than yourself, Reddit will return a 403 error, so be sure to wrap requests in a try/catch (L<http://redditclient.readthedocs.org/en/latest/examples/#catch-exceptions>) if there's any chance that might happen. (Of course, all requests should be wrapped in a try/catch anyway, the internet being an unpredictable place.)
+The result will be a listing of Links or Comments or a mix of both, except in the case of the 'about' view, in which case it will be a single Account object.
 
-The result can be a list of Links, Comments, or a mix of both, depending on what I<view> you requested. You can determine which is which by looking at the type property, which is "t1" for comments and "t3" for posts.
+=item get_wiki
+
+    get_wiki ( sub => $subreddit, page => $page, 
+             [ data => 0, ] [ v => $version, ] [ v2 => $diff_version ] )
+
+Get the content of a wiki page. If C<data> is true, fetch the full data hash for the page. If C<v> is given, show the wiki page as it was at that version. If both C<v> and C<v2> are given, show a diff of the two.
+
+=item get_wiki_data
+
+    get_wiki_data ( sub => $subreddit, page => $page, 
+                  [ v => $version, ] [ v2 => $diff_version ] )
+
+Get a data hash for wiki page I<$page>. This function is the same as calling C<get_wiki> with C<data=>1>.
 
 =item has_token
 
@@ -1882,36 +1993,23 @@ Return true if a valid Oauth token exists.
 
 Hide a post.
 
+=item ignore_reports
+
+    ignore_reports ( $fullname )
+
+	Ignore reports for a comment or post (moderator action).
+
 =item info 
 
     info ( $fullname )
 
-Returns a hash of information about I<$fullname>. I<$fullname> can be any of the 8 types of thing.
+Returns a hash of information about C<$fullname>. C<$fullname> can be any of the 8 types of thing.
 
 =item list_subreddits
 
-    list_subreddits ( [ view => SUBREDDITS_HOME ,] [ limit => DEFAULT_LIMIT ,]
-                      [ before => undef ,] [ after => undef ,]  )
+    list_subreddits ( [ view => SUBREDDITS_HOME ] )
 
-Returns a list of subreddits, where I<view> is one of the SUBREDDIT constants. 
-
-An alias function is provided for each view type, which is the same as calling C<list_subreddits> with the view already provided:
-
-=over
-
-C<contrib_subreddits ( [ limit => DEFAULT_LIMIT ,] [ before => undef ,] [ after => undef ,] )>
-
-C<home_subreddits ( [ limit => DEFAULT_LIMIT ,] [ before => undef ,] [ after => undef ,] )>
-
-C<mod_subreddits ( [ limit => DEFAULT_LIMIT ,] [ before => undef ,] [ after => undef ,] )>
-
-C<my_subreddits ( [ limit => DEFAULT_LIMIT ,] [ before => undef ,] [ after => undef ,] )>
-
-C<new_subreddits ( [ limit => DEFAULT_LIMIT ,] [ before => undef ,] [ after => undef ,] )>
-
-C<popular_subreddits ( [ limit => DEFAULT_LIMIT ,] [ before => undef ,] [ after => undef ,] )>
-
-=back
+Returns a list of subreddits, where C<view> is one of the subreddit L<constants|https://metacpan.org/pod/Reddit::Client#CONSTANTS>: '' (i.e. home), 'subscriber', 'popular', 'new', 'contributor', or 'moderator'. Note that as of January 2018 some views, such as the default, are limited to 5,000 results. 'new' still gives infinite results (i.e. a list of all subreddits in existence). Others are untested.
 
 =item mark_inbox_read
 
@@ -1923,19 +2021,50 @@ Mark everything in your inbox as read. May take some time to complete.
 
     me()
 
-Return an Account object that contains information about the logged in account. Aside from static account information it contains the I<has_mail> property, which will be true if there is anything in your inbox.
+Return an Account object that contains information about the logged in account. Aside from static account information it contains the C<has_mail> property, which will be true if there is anything in your inbox.
 
 =item new 
 
-    new ( user_agent => $user_agent, [ client_id => $client_id, secret => $secret, 
-          username => $username, password => $password ] )
+    new ( user_agent => $user_agent, 
+        [ client_id => $client_id, secret => $secret, username => $username, password => $password, ]
+        [ print_request_errors => 0, ]  [ print_response => 0, ] [ print_request => 0, ] [ print_request_on_error => 0 ] 
+        [ subdomain => 'www', ] )
 
-Instantiate a Reddit::Client object. Optionally get an Oauth token (analogous to logging in) at the same time. If any of the four optional arguments are used, all are required.
+or
 
-I<$user_agent> is always required, and should be something descriptive that uniquely identifies your app. The API Rules (L<https://github.com/reddit/reddit/wiki/API#rules>) say it should be "something unique and descriptive, including the target platform, a unique application identifier, a version string, and your username as contact information".
+    new ( user_agent => $user_agent, 
+        [ client_id => $client_id, secret => $secret, refresh_token => $refresh_token ]
+        [ print_request_errors => 0, ]  [ print_response => 0, ] [ print_request => 0, ] [ print_request_on_error => 0 ]
+        [ subdomain => 'www', ] )
 
-It also includes this warning: "**NEVER lie about your user-agent.** This includes spoofing popular browsers and spoofing other bots. We will ban liars with extreme prejudice."
+Instantiate a new Reddit::Client object. Optionally authenticate at the same time. (Unless you have some reason not to, this is the recommended way to do it.) For "script"-type apps, this is done by passing in a username, password, client_id and secret. For "web"-type apps, this is done by passing in a refresh_token, client_id and secret.
 
+C<user_agent> is a string that uniquely identifies your app. The API Rules (L<https://github.com/reddit/reddit/wiki/API#rules>) say it should be "something unique and descriptive, including the target platform, a unique application identifier, a version string, and your username as contact information". It also includes this warning: "NEVER lie about your user-agent. This includes spoofing popular browsers and spoofing other bots. We will ban liars with extreme prejudice." C<user_agent> is required as of version 1.2 (before, Reddit::Client would provide one if you didn't).
+
+Optional arguments:
+
+=over
+
+C<subdomain>: The subdomain in links generated by Reddit::Client (for example with C<get_web_url>). You can use this to generate links to old.reddit.com to force the old version of Reddit, for example, or new.reddit.com for the new. Default www.
+
+C<print_response_content>: Print the content portion of Reddit's HTTP response. Default is print nothing on success and an error code on failure. The content will usually be a blob of JSON, but for certain 500 errors, it may be an entre web page.
+
+C<print_request_errors>: If there is an error, print the content portion of Reddit's response. Not very useful as Reddit's response is usually just a text string repeating the error code.
+
+C<print_request>: Print the I<entire> HTTP request and response for every request.
+
+C<print_request_on_error>: If there is a request error, print the I<entire> HTTP request and response.
+
+=back
+
+=item remove
+
+    remove ( $fullname )
+
+Remove a post or comment (moderator action). Link and Comment objects also have their own C<remove> method, which doesn't require a fullname.
+
+Note on the mechanics of Reddit: removing is different than flagging as spam, although both have the end result of hiding a thing from view of non-moderators. Flagging as spam also trains the spam filter and will cause further posts from that user to be automatically removed.
+	
 =item save 
 
     save ( $fullname )
@@ -1946,37 +2075,53 @@ Save a post or comment.
 
     send_message ( to => $username, subject => $subject, text => $message )
 
-Send a private message to I<$username>. I<$subject> is limited to 100 characters.
+Send a private message to C<$username>. C<$subject> is limited to 100 characters.
 
 =item set_post_flair
 
     set_post_flair ( subreddit => $subreddit, post_id => $post_id_or_fullname, flair_template_id => $flair_id )
 	
-Set the flair on a post. The 'flair_template_id' is acquired via I<get_flair_options>.
+Set the flair on a post. C<flair_template_id> is acquired via C<get_flair_options()>.
 
 =item set_user_flair
 
     set_user_flair ( subreddit => $subreddit, username => $username, flair_template_id => $flair_id )
 	
-Set the flair for a user. The 'flair_template_id' is acquired via I<get_flair_options>.
+Set the flair for a user. C<flair_template_id> is acquired via C<get_flair_options()>.
 
 =item submit_comment 
 
     submit_comment ( parent_id => $fullname, text => $text)
 
-Submit a comment under I<$fullname>, which must be a post or comment. Returns fullname of the new comment.
+Submit a comment under C<$fullname>, which must be a post or comment. Returns fullname of the new comment.
+
+=item submit_crosspost
+
+    submit_crosspost ( subreddit => $subreddit, title => $title, source_id => $fullname, 
+                     [ inbox_replies => 1, ] [ repost => 0, ] )
+
+Submit a crosspost. Returns the fullname of the new post. You must be subscribed to or a moderator of the subreddit you are crossposting to, otherwise it will fail with the error message "subreddit not found". (This message seems to be an error itself, or is possibly referring to Reddit's internal logic. For example, when crossposting, maybe Reddit selects the subreddit from your list of subscribed/moderated subreddits, and "subreddit not found" means it can't be found in this list.)
+
+C<source_id> is the id or fullname of an existing post. This function is identical to C<submit_link>, but with C<source_id> replacing C<url>.  
+
+If C<inbox_replies> is defined and is false, disable inbox replies for that post. If C<repost> is true, the link is allowed to be a repost. (Otherwise, if it is a repost, the request will fail with the error "That link has already been submitted".) C<sub> can be used as an alias for C<subreddit>.
+
 
 =item submit_link 
 
-    submit_link ( subreddit => $subreddit, title => $title, url => $url, [ inbox_replies => 1, [repost => 0] )
+    submit_link ( subreddit => $subreddit, title => $title, url => $url, 
+                [ inbox_replies => 1, ] [ repost => 0, ] )
 
-Submit a link. Returns the fullname of the new post. If I<inbox_replies> is defined and is false, disable inbox replies for that post. If I<repost> is true, the link is allowed to be a repost. (Otherwise, if it is a repost, the request will fail with the error "That link has already been submitted".)
+Submit a link. Returns the fullname of the new post. 
+
+If C<inbox_replies> is defined and is false, disable inbox replies for that post. If C<repost> is true, the link is allowed to be a repost. (Otherwise, if it is a repost, the request will fail with the error "That link has already been submitted".) C<sub> can be used as an alias for C<subreddit>.
 
 =item submit_text 
 
-    submit_text ( subreddit => $subreddit, title => $title, text => $text, [ inbox_replies => 1 ] )
+    submit_text ( subreddit => $subreddit, title => $title, text => $text, 
+                [ inbox_replies => 1 ] )
 
-Submit a text post. Returns the fullname of the new post. If I<inbox_replies> is defined and is false, disable inbox replies for that post.
+Submit a text post. Returns the fullname of the new post. If C<inbox_replies> is defined and is false, disable inbox replies for that post.
 
 =item unhide 
 
@@ -2000,9 +2145,64 @@ Return the Reddit::Client version.
 
     vote ( $fullname, $direction )
 
-Vote on a post or comment. Direction must be 1, 0, or -1 (0 to clear votes).
+=begin html
+
+Vote on a post or comment. <code>$direction</code> can be 1, 0, or -1 (0 to clear votes).
+
+=end html
+
+=begin text
+
+Vote on a post or comment. Direction can be 1, 0, or -1 (0 to clear votes).
+
+=end text
 
 =back
+
+=head1 CONSTANTS
+
+    DEFAULT_LIMIT           => 25
+
+    VIEW_HOT                => ''
+    VIEW_NEW                => 'new'
+    VIEW_CONTROVERSIAL      => 'controversial'
+    VIEW_TOP                => 'top'
+    VIEW_RISING             => 'rising'
+    VIEW_DEFAULT            => VIEW_HOT
+
+    VOTE_UP                 => 1
+    VOTE_DOWN               => -1
+    VOTE_NONE               => 0
+
+    SUBMIT_LINK             => 'link'
+    SUBMIT_SELF             => 'self'
+    SUBMIT_MESSAGE          => 'message'
+    SUBMIT_CROSSPOST        => 'crosspost'
+
+    MESSAGES_INBOX          => 'inbox'
+    MESSAGES_UNREAD         => 'unread'
+    MESSAGES_SENT           => 'sent'
+    MESSAGES_MESSAGES       => 'messages'
+    MESSAGES_COMMENTREPLIES => 'comments'
+    MESSAGES_POSTREPLIES    => 'selfreply'
+    MESSAGES_MENTIONS       => 'mentions'
+
+    SUBREDDITS_HOME         => ''
+    SUBREDDITS_MINE         => 'subscriber'
+    SUBREDDITS_POPULAR      => 'popular'
+    SUBREDDITS_NEW          => 'new'
+    SUBREDDITS_CONTRIB      => 'contributor'
+    SUBREDDITS_MOD          => 'moderator'
+
+    USER_OVERVIEW           => 'overview'
+    USER_COMMENTS           => 'comments'
+    USER_SUBMITTED          => 'submitted'
+    USER_GILDED             => 'gilded'
+    USER_UPVOTED            => 'upvoted'
+    USER_DOWNVOTED          => 'downvoted'
+    USER_HIDDEN             => 'hidden'
+    USER_SAVED              => 'saved'
+    USER_ABOUT              => 'about'
 
 =head1 AUTHOR
 

@@ -3,8 +3,7 @@ package Catalyst::ComponentRole::InjectionHelpers;
 use Moose::Role;
 use Moose::Util;
 
-#requires 'ACCEPT_CONTEXT';
-
+has _version => (is=>'ro', required=>1);
 has application => (is=>'ro', required=>1);
 has from => (is=>'ro', isa=>'ClassName|CodeRef', required=>1);
 has method => (is=>'ro', required=>1, default=>'new');
@@ -38,7 +37,11 @@ sub merge_args {
 sub transform_args_if_needed {
   my ($self, $composed_class, $app_or_c, @merged_args) = @_;
   if($self->has_transform_args) {
-    @merged_args = $self->transform_args->($self, $composed_class, $app_or_c, @merged_args);
+    if($self->_version == 2) {
+      @merged_args = $self->transform_args->(@merged_args);
+    } else {
+      @merged_args = $self->transform_args->($self, $composed_class, $app_or_c, @merged_args);
+    }
   }
   return @merged_args;
 }
@@ -53,7 +56,13 @@ sub build_new_instance {
   @merged_args = $self->transform_args_if_needed($composed_class, $app_or_c, @merged_args);
 
   if((ref($method)||'') eq 'CODE') {
-    return $self->$method($composed_class, $app_or_c, @merged_args)
+    if($self->_version == 2) {
+      my @init_args = ($app_or_c, @merged_args);
+      unshift @init_args, $composed_class unless ref($composed_class);
+      return $method->(@init_args);
+    } else {
+      return $self->$method($composed_class, $app_or_c, @merged_args);
+    }
   } else {
     return $composed_class->$method(@merged_args);
   }

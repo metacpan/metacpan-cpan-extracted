@@ -2,21 +2,21 @@ use strictures;
 use 5.14.0;
 
 package WebService::GoogleAPI::Client;
-$WebService::GoogleAPI::Client::VERSION = '0.20';
-
-# ABSTRACT: Google API Discovery and SDK
-
-#   FROM MCE POD -- <p><img src="https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.png" width="664" height="446" alt="Bank Queuing Model" /></p>
-
-
+$WebService::GoogleAPI::Client::VERSION = '0.21';
 use Data::Dump qw/pp/;
 use Moo;
 use WebService::GoogleAPI::Client::UserAgent;
 use WebService::GoogleAPI::Client::Discovery;
 use Carp;
 use CHI;
+use List::MoreUtils qw(uniq);
 
-## TODO: review class structure hierarchy and dependencies and refactor properly - currently fudging critical fixes as we go
+
+# ABSTRACT: Google API Discovery and SDK
+
+#   FROM MCE POD -- <p><img src="https://img.shields.io/cpan/v/WebService-GoogleAPI-Client.png" width="664" height="446" alt="Bank Queuing Model" /></p>
+
+
 has 'debug' => ( is => 'rw', default => 0, lazy => 1 );    ## NB - when udpated change doesn't propogate !
 has 'ua' => (
   handles => [qw/access_token auth_storage  do_autorefresh get_scopes_as_array user /],
@@ -56,12 +56,9 @@ sub BUILD
 
 
 ## ASSUMPTIONS:
-##   - path should never include '{'..'}' characters after all interpolations
-##   - extra post params as consequence of including path interpolation var values in options will not break server-side requests
-##   - either query parameters are not defined for GET or the user agent will handle the options for GET as URL appendaged escaped vals?
 ##   - no complex parameter checking ( eg required mediaUpload in endpoint gmail.users.messages.send ) so user assumes responsiiblity
 ## TODO: Exceeding a rate limit will cause an HTTP 403 or HTTP 429 Too Many Requests response and your app should respond by retrying with exponential backoff. (https://developers.google.com/gmail/api/v1/reference/quota)
-## TODO: follow the method spec reqeust reference to the api spec schema api_discovery_struct->{schemas}{Message};
+##  follows the method spec reqeust reference to the api spec schema api_discovery_struct->{schemas}{Message};
 ##  THE METHOD SPEC CONTAINS
 ##          'request' => {
 ##                       '$ref' => 'Message'
@@ -71,11 +68,9 @@ sub BUILD
 ##    'properties' => {
 ##       'raw' => {
 ##           {annotations}{required}[ 'gmail.users.drafts.create','gmail.users.drafts.update','gmail.users.messages.insert','gmail.users.messages.send' ]
-##  so need to confirm asumption that approach is valid as follows:
-##     - iterate through referenced reqerust $ref schema properties and look for matching api endpoint annotation:required entry
-##       and if found then error if not defined.
+
 ## NB - uses the ua api_query to execute the server request
-## NB - this is getting too long .. should split this up into managable chunk to make more readable
+##################################################
 sub api_query
 {
   my ( $self, @params_array ) = @_;
@@ -85,160 +80,27 @@ sub api_query
   if ( scalar( @params_array ) == 1 && ref( $params_array[0] ) eq 'HASH' )
   {
     $params = $params_array[0];
-
   }
   else
   {
     $params = { @params_array };    ## what happens if not even count
   }
-  carp( pp $params) if $self->{ debug } > 10;
+  carp( pp $params) if $self->debug > 10;
+
 
   my @teapot_errors = ();           ## used to collect pre-query validation errors - if set we return a response with 418 I'm a teapot
-
-  ## pre-query validation if api_id parameter is included
-  ## push any critical issues onto @teapot_errors
-  ## include interpolation and defaults if required because user has ommitted them
+  @teapot_errors = $self->_process_params_for_api_endpoint_and_return_errors( $params )
+    if ( defined $params->{ api_endpoint_id } );    ## ## pre-query validation if api_id parameter is included
 
 
-  if ( defined $params->{ api_endpoint_id } )
+  if ( not defined $params->{ path } )              ## either as param or from discovery
   {
-
-    ## $api_discovery_struct requried for service base URL
-    my $api_discovery_struct = $self->discovery->get_api_discovery_for_api_id( $params->{ api_endpoint_id } );
-
-
-    ## if can get discovery data for google api endpoint then continue to perform detailed checks
-    my $method_discovery_struct = $self->extract_method_discovery_detail_from_api_spec( $params->{ api_endpoint_id } );
-    if ( keys %{ $method_discovery_struct } > 0 )    ## method discovery struct ok
-    {
-      ## ensure user has required scope access
-      push( @teapot_errors, "Client Credentials do not include required scope to access $params->{api_endpoint_id}" )
-        unless $self->has_scope_to_access_api_endpoint( $params->{ api_endpoint_id } );
-      ## set http method to default if unset
-      if ( not defined $params->{ method } )
-      {
-        $params->{ method } = $method_discovery_struct->{ httpMethod } || carp( "API Endpoint discovered specification didn't include expected httpMethod value" );
-        if ( not defined $params->{ method } )       ##
-        {
-          carp( 'setting to GET but this may well be incorrect' );
-          $params->{ method } = 'GET';
-        }
-      }
-      elsif ( $params->{ method } !~ /^$method_discovery_struct->{httpMethod}$/sxim )
-      {
-        push( @teapot_errors, "method mismatch - you requested a $params->{method} which conflicts with discovery spec requirement for $method_discovery_struct->{httpMethod}" );
-      }
-
-      warn( "API Endpoint $params->{api_endpoint_id} discovered specification didn't include expected 'parameters' keyed HASH structure" )
-        unless ref( $method_discovery_struct->{ parameters } ) eq 'HASH';
-
-      ## Set default path iff not set by user - NB - will prepend baseUrl later
-      $params->{ path } = $method_discovery_struct->{ path } unless defined $params->{ path };
-      push @teapot_errors, 'path is a required parameter' unless defined $params->{ path };
-
-      foreach my $meth_param_spec ( keys %{ $method_discovery_struct->{ parameters } } )
-      {
-        carp( "Checking $meth_param_spec" ) if ( $self->{ debug } > 10 );
-        ## set default value if is not provided within $params->{options} - nb technically not required but provides visibility of the params if examining the options when debugging
-        $params->{ options }{ $meth_param_spec } = $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default }
-          if (
-          ( not defined $params->{ options }{ $meth_param_spec } )
-          && ( defined $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default }
-            && $method_discovery_struct->{ parameters }{ $meth_param_spec }{ location } eq 'query' )
-          );
-        ## this looks to be clobbering all options - TODO - review and stop clobbering if already defined
-
-        carp( "checking discovery spec'd parameter - $meth_param_spec" ) if $self->debug > 10;
-
-        #carp("$meth_param_spec  has a user option value defined") if ( defined $params->{options}{$meth_param_spec} );
-        if ( $params->{ path } =~ /\{.+\}/xms )    ## there are un-interpolated variables in the path - try to fill them for this param if reqd
-        {
-          carp( "$params->{path} includes un-filled variables " ) if $self->debug > 10;
-          carp( Dumper $params) if $self->debug > 10;
-          ## interpolate variables into URI if available and not filled
-          if ( $method_discovery_struct->{ parameters }{ $meth_param_spec }{ 'location' } eq 'path' )    ## this is a path variable
-          {
-            ## requires interpolations into the URI -- consider && into containing if
-            if ( $params->{ path } =~ /\{\+*$meth_param_spec\}/xg )                                      ## eg match {jobId} in 'v1/jobs/{jobId}/reports/{reportId}'
-            {
-              ## if provided as an option
-              if ( defined $params->{ options }{ $meth_param_spec } )
-              {
-                carp( "DEBUG: $meth_param_spec is defined in param->{options}" ) if $self->{ debug } > 10;
-                $params->{ path } =~ s/\{\+*$meth_param_spec\}/$params->{options}{$meth_param_spec}/xsmg;
-                ## TODO - possible source of errors in future - do we need to undefine the option here?
-                ## undefining it so that it doesn't break post contents
-                delete $params->{ options }{ $meth_param_spec };
-              }
-              ## else if not provided as an option but a default value is provided in the spec
-              elsif ( defined $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default } )
-              {
-                $params->{ path } =~ s/\{$meth_param_spec\}/$method_discovery_struct->{parameters}{$meth_param_spec}{default}/xsmg;
-              }
-              else    ## otherwise flag as an error - unable to interpolate
-              {
-                push( @teapot_errors,
-                  "$params->{path} requires interpolation value for $meth_param_spec but none provided as option and no default value provided by specification" );
-              }
-            }
-          }
-        }
-        elsif ( $method_discovery_struct->{ parameters }{ $meth_param_spec }{ 'location' } eq 'query' )    ## check post form variables .. assume not get?
-        {
-          if ( !defined $params->{ options }{ $meth_param_spec } )
-          {
-            $params->{ options }{ $meth_param_spec } = $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default }
-              if ( defined $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default } );
-          }
-
-        }
-      }
-
-      ## error now if there remain uninterpolated variables in the path ?
-      if ( $params->{ path } =~ /\{.+\}/xms )
-      {
-        push @teapot_errors, "Path '$params->{path}' includes unfilled variable after processing";
-      }
-
-
-      ## prepend base if it doesn't match expected base
-      #print pp $method_discovery_struct;
-      $api_discovery_struct->{ baseUrl } =~ s/\/$//sxmg;    ## remove trailing '/'
-      $params->{ path } =~ s/^\///sxmg;                     ## remove leading '/'
-
-      $params->{ path } = "$api_discovery_struct->{baseUrl}/$params->{path}" unless $params->{ path } =~ /^$api_discovery_struct->{baseUrl}/ixsmg;
-
-
-      ## if errors - add detail available in the discovery struct for the method and service to aid debugging
-      if ( @teapot_errors )
-      {
-        ## provide defaults for keys to method discovery that are known to be missing in small number of instances
-        $api_discovery_struct->{ canonicalName }     = $api_discovery_struct->{ title } unless defined $api_discovery_struct->{ canonicalName };
-        $api_discovery_struct->{ documentationLink } = '??'                             unless defined $api_discovery_struct->{ documentationLink };
-        $api_discovery_struct->{ rest }              = ''                               unless defined $api_discovery_struct->{ rest };
-
-        ## Replace all other undefined keys used in error message with ''
-        foreach my $expected_key ( qw/title canonicalName ownerName  version id discoveryVersion revision description/ )
-        {
-          $api_discovery_struct->{ $expected_key } = '?' unless defined $api_discovery_struct->{ $expected_key };
-        }
-
-        ## something not quite right here - commenting out for review TODO: REVIEW
-#push (@teapot_errors, qq{ $api_discovery_struct->{title} $api_discovery_struct->{rest} API into $api_discovery_struct->{ownerName} $api_discovery_struct->{canonicalName} $api_discovery_struct->{version} with id $method_discovery_struct->{id} as described by discovery document version $method_discovery_struct->{discoveryVersion} revision $method_discovery_struct->{revision} with documentation at $api_discovery_struct->{documentationLink} \nDescription $api_discovery_struct->{description}\n} );
-      }
-
-    }
-    else    ## teapot error - cannot can get discovery data for google api endpoint
-    {
-      push( @teapot_errors, "Checking discovery of $params->{api_endpoint_id} method data failed - is this a valid end point" );
-    }
-
+    push @teapot_errors, 'path is a required parameter';
+    $params->{ path } = '';
   }
+  push @teapot_errors, "Path '$params->{path}' includes unfilled variable after processing" if ( $params->{ path } =~ /\{.+\}/xms );
 
-
-  push @teapot_errors, 'path is a required parameter' unless defined $params->{ path };
-
-  if ( @teapot_errors > 0 )    ## carp and include in 418 response body the teapot errors
+  if ( @teapot_errors > 0 )                         ## carp and include in 418 TEAPOT ERROR - response body with @teapot errors
   {
     carp( join( "\n", @teapot_errors ) ) if $self->debug;
     return Mojo::Message::Response->new(
@@ -248,18 +110,141 @@ sub api_query
       body         => join( "\n", @teapot_errors )
     );
   }
-  else
+  else                                              ## query looks good - send to user agent to execute
   {
-    #carp pp $params;
-
+    #print pp $params;
     return $self->ua->validated_api_query( $params );
+  }
+}
+##################################################
+
+##################################################
+## _ensure_api_spec_has_defined_fields is really only used to allow carping without undef warnings if needed
+sub _ensure_api_spec_has_defined_fields
+{
+  my ( $self, $api_discovery_struct ) = @_;
+  ## Ensure API Discovery has expected fields defined
+  foreach my $expected_key ( qw/path title ownerName version id discoveryVersion revision description documentationLink rest/ )
+  {
+    $api_discovery_struct->{ $expected_key } = '' unless defined $api_discovery_struct->{ $expected_key };
+  }
+  $api_discovery_struct->{ canonicalName } = $api_discovery_struct->{ title } unless defined $api_discovery_struct->{ canonicalName };
+  return $api_discovery_struct;
+}
+##################################################
+
+##################################################
+sub _process_params_for_api_endpoint_and_return_errors
+{
+  my ( $self, $params ) = @_;    ## nb - api_endpoint is a param - param key values are modified through this sub
+
+  croak( 'this should never happen - this method is internal only!' ) unless defined $params->{ api_endpoint_id };
+
+  my $api_discovery_struct = $self->_ensure_api_spec_has_defined_fields( $self->discovery->get_api_discovery_for_api_id( $params->{ api_endpoint_id } ) )
+    ;                                                   ## $api_discovery_struct requried for service base URL
+  $api_discovery_struct->{ baseUrl } =~ s/\/$//sxmg;    ## remove trailing '/' from baseUrl
+
+  my $method_discovery_struct = $self->extract_method_discovery_detail_from_api_spec( $params->{ api_endpoint_id } )
+    ;                                                   ## if can get discovery data for google api endpoint then continue to perform detailed checks
+
+  ## allow optional user callback pre-processing of method_discovery_struct
+  $method_discovery_struct = &{ $params->{ cb_method_discovery_modify } }( $method_discovery_struct )
+    if ( defined $params->{ cb_method_discovery_modify } && ref( $params->{ cb_method_discovery_modify } ) eq 'CODE' );
+
+  return ( "Checking discovery of $params->{api_endpoint_id} method data failed - is this a valid end point" ) unless ( keys %{ $method_discovery_struct } > 0 );
+  ## assertion: method discovery struct ok - or at least has keys
+  carp( "API Endpoint $params->{api_endpoint_id} discovered specification didn't include expected 'parameters' keyed HASH structure" )
+    unless ref( $method_discovery_struct->{ parameters } ) eq 'HASH';
+
+  my @teapot_errors = ();                               ## errors are pushed into this as encountered
+  $params->{ method } = $method_discovery_struct->{ httpMethod } || 'GET' if ( not defined $params->{ method } );
+  push( @teapot_errors, "method mismatch - you requested a $params->{method} which conflicts with discovery spec requirement for $method_discovery_struct->{httpMethod}" )
+    if ( $params->{ method } !~ /^$method_discovery_struct->{httpMethod}$/sxim );
+  push( @teapot_errors, "Client Credentials do not include required scope to access $params->{api_endpoint_id}" )
+    unless $self->has_scope_to_access_api_endpoint( $params->{ api_endpoint_id } );    ## ensure user has required scope access
+  $params->{ path } = $method_discovery_struct->{ path } unless $params->{ path };     ## Set default path iff not set by user - NB - will prepend baseUrl later
+  push @teapot_errors, 'path is a required parameter' unless $params->{ path };
+
+  push @teapot_errors, $self->_interpolate_path_parameters_append_query_params_and_return_errors( $params, $method_discovery_struct );
+
+  $params->{ path } =~ s/^\///sxmg;                                                    ## remove leading '/'  from path
+  $params->{ path } = "$api_discovery_struct->{baseUrl}/$params->{path}" unless $params->{ path } =~ /^$api_discovery_struct->{baseUrl}/ixsmg;    ## prepend baseUrl if required
+
+  ## if errors - add detail available in the discovery struct for the method and service to aid debugging
+  push( @teapot_errors,
+    qq{ $api_discovery_struct->{title} $api_discovery_struct->{rest} API into $api_discovery_struct->{ownerName} $api_discovery_struct->{canonicalName} $api_discovery_struct->{version} with id $method_discovery_struct->{id} as described by discovery document version $method_discovery_struct->{discoveryVersion} revision $method_discovery_struct->{revision} with documentation at $api_discovery_struct->{documentationLink} \nDescription $api_discovery_struct->{description}\n}
+  ) if ( @teapot_errors );
+
+  return @teapot_errors;
+}
+##################################################
 
 
-    #return $params;
+##################################################
+sub _interpolate_path_parameters_append_query_params_and_return_errors
+{
+  my ( $self, $params, $method_discovery_struct ) = @_;
+  my @teapot_errors = ();
+
+  my @get_query_params = ();
+  my %path_params = map { $_ => 1 } ( $params->{ path } =~ /\{\+*([^\}]+)\}/xg );    ## the params embedded in the path as indexes of hash
+
+  foreach my $meth_param_spec ( uniq( keys %path_params, keys %{ $method_discovery_struct->{ parameters } } ) )
+  {
+    if ( ( defined $path_params{ $meth_param_spec } ) && ( defined $params->{ options }{ $meth_param_spec } ) )    ## if param option is in the path then interpolate and forget
+    {
+      $params->{ path } =~ s/\{\+*$meth_param_spec\}/$params->{options}{$meth_param_spec}/xsmg;
+      delete $params->{ options }{ $meth_param_spec };                                                             ## if a GET param should not also be a BODY param
+    }
+    elsif ( $method_discovery_struct->{ parameters }{ $meth_param_spec }{ 'location' } eq 'path' )                 ## this is a path variable
+    {
+      ## interpolate variables into URI if available and not filled
+      if ( $params->{ path } =~ /\{.+\}/xms )    ## there are un-interpolated variables in the path - try to fill them for this param if reqd
+      {
+        #carp( "$params->{path} includes un-filled variables " ) if $self->debug > 10;
+        ## requires interpolations into the URI -- consider && into containing if
+        if ( $params->{ path } =~ /\{\+*$meth_param_spec\}/xg )    ## eg match {jobId} or {+jobId} in 'v1/jobs/{jobId}/reports/{reportId}'
+        {
+          ## if provided as an option
+          if ( defined $params->{ options }{ $meth_param_spec } )
+          {
+            carp( "DEBUG: $meth_param_spec is defined in param->{options}" ) if $self->{ debug } > 10;
+            $params->{ path } =~ s/\{\+*$meth_param_spec\}/$params->{options}{$meth_param_spec}/xsmg;
+            delete $params->{ options }{ $meth_param_spec };       ## if a GET param should not also be a BODY param
+          }
+          elsif (
+            defined $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default }
+            )    ## not provided as an option but a default value is provided in the spec - should be assumed by server so could probbaly remove this
+          {
+            $params->{ path } =~ s/\{\+*$meth_param_spec\}/$method_discovery_struct->{parameters}{$meth_param_spec}{default}/xsmg;
+          }
+          else    ## otherwise flag as an error - unable to interpolate
+          {
+            push( @teapot_errors, "$params->{path} requires interpolation value for $meth_param_spec but none provided as option and no default value provided by specification" );
+          }
+        }
+      }
+    }
+    elsif ( ( defined $params->{ options }{ $meth_param_spec } )
+      && ( $method_discovery_struct->{ parameters }{ $meth_param_spec }{ 'location' } eq 'query' ) )    ## check post form variables .. assume not get?
+    {
+      $params->{ options }{ $meth_param_spec } = $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default }
+        if ( defined $method_discovery_struct->{ parameters }{ $meth_param_spec }{ default } );
+      push( @get_query_params, "$meth_param_spec=$params->{options}{$meth_param_spec}" ) if defined $params->{ options }{ $meth_param_spec };
+      delete $params->{ options }{ $meth_param_spec };
+    }
+  }
+  if ( scalar( @get_query_params ) > 0 )
+  {
+    #$params->{path} .= '/' unless $params->{path} =~ /\/$/mx;
+    $params->{ path } .= '?' . join( '&', @get_query_params );
   }
 
+  #print pp $params;
+  #exit;
+  return @teapot_errors;
 }
-
+##################################################
 
 
 ########################################################
@@ -316,7 +301,7 @@ WebService::GoogleAPI::Client - Google API Discovery and SDK
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -402,7 +387,7 @@ handles user auth token inclusion in request headers and refreshes token if requ
 
 Required params: method, route
 
-Optional params: api_endpoint_id 
+Optional params: api_endpoint_id  cb_method_discovery_modify
 
 $self->access_token must be valid
 
@@ -433,11 +418,32 @@ $self->access_token must be valid
   #print pp $r;
 
 
-  NB: including the version in the API Endpoint Spec is not supported .. yet? eg gmail:v1.users.messages.list .. will always use the latest stable version
-
-
   if the pre-query validation fails then a 418 - I'm a Teapot error response is returned with the 
   body containing the specific description of the errors ( Tea Leaves ;^) ).   
+
+NB: If you pass a 'path' parameter this takes precendence over the API Discovery Spec. Any parameters defined in the path of the format {VARNAME} will be
+    filled in with values within the options=>{ VARNAME => 'value '} parameter structure. This is the simplest way of addressing issues where the API 
+    discovery spec is inaccurate. ( See dev_sheets_example.pl as at 14/11/18 for illustration )
+
+To allow the user to fix discrepencies in the Discovery Specification the cb_method_discovery_modify callback can be used which must accept the 
+method specification as a parameter and must return a (potentially modified) method spec.
+
+eg.
+
+    my $r = $gapi_client->api_query(  api_endpoint_id => "sheets:v4.spreadsheets.values.update",  
+                                    options => { 
+                                      spreadsheetId => '1111111111111111111',
+                                      valueInputOption => 'RAW',
+                                      range => 'Sheet1!A1:A2',
+                                      'values' => [[99],[98]]
+                                    },
+                                    cb_method_discovery_modify => sub { 
+                                      my  $meth_spec  = shift; 
+                                      $meth_spec->{parameters}{valueInputOption}{location} = 'path';
+                                      $meth_spec->{path} = "v4/spreadsheets/{spreadsheetId}/values/{range}?valueInputOption={valueInputOption}";
+                                      return $meth_spec;
+                                    }
+                                    );
 
 Returns L<Mojo::Message::Response> object
 
@@ -553,7 +559,7 @@ that is either fetched or cached in CHI locally for 30 days.
 
 =item * helper api_query to streamline request composition without preventing manual construction if preferred.
 
-=item * CLI tool (I<goauth>) with lightweight HTTP server to simplify OAuth2 configuration, sccoping, authorization and obtaining access_ and refresh_ tokens from users
+=item * CLI tool (I<goauth>) with lightweight Mojo HTTP server to simplify OAuth2 configuration, sccoping, authorization and obtaining access_ and refresh_ tokens from users
 
 =back
 

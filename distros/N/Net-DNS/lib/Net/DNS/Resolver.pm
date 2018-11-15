@@ -1,9 +1,9 @@
 package Net::DNS::Resolver;
 
 #
-# $Id: Resolver.pm 1714 2018-09-21 14:14:55Z willem $
+# $Id: Resolver.pm 1717 2018-10-12 13:14:42Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1714 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1717 $)[1];
 
 =head1 NAME
 
@@ -158,8 +158,7 @@ Prints the resolver state on the standard output.
     $packet = $resolver->query( 'annotation.example.com', 'TXT', 'IN' );
 
 Performs a DNS query for the given name; the search list is not applied.
-If C<defnames> is true, and the number of dots is less than C<ndots>,
-the default domain will be appended unless name is absolute.
+If C<defnames> is true, the default domain will be appended to unqualified names.
 
 The record type and class can be omitted; they default to A and IN.
 If the name looks like an IP address (IPv4 or IPv6),
@@ -183,10 +182,10 @@ any answers or not, use the C<send()> method instead.
 Performs a DNS query for the given name, applying the searchlist if
 appropriate.  The search algorithm is as follows:
 
-Unless the number of dots is less than C<ndots>,
+If the name contains one or more non-terminal dots,
 perform an initial query using the unmodified name.
 
-If C<dnsrch> is true and the name has no terminal dot,
+If the number of dots is less than C<ndots>, and there is no terminal dot,
 try appending each suffix in the search list.
 
 The record type and class can be omitted; they default to A and IN.

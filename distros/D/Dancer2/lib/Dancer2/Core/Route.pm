@@ -1,6 +1,6 @@
 package Dancer2::Core::Route;
 # ABSTRACT: Dancer2's route handler
-$Dancer2::Core::Route::VERSION = '0.206000';
+$Dancer2::Core::Route::VERSION = '0.207000';
 use Moo;
 use Dancer2::Core::Types;
 use Carp 'croak';
@@ -272,7 +272,7 @@ Dancer2::Core::Route - Dancer2's route handler
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 ATTRIBUTES
 

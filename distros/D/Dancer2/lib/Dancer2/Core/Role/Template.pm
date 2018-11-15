@@ -1,7 +1,7 @@
 # ABSTRACT: Role for template engines
 
 package Dancer2::Core::Role::Template;
-$Dancer2::Core::Role::Template::VERSION = '0.206000';
+$Dancer2::Core::Role::Template::VERSION = '0.207000';
 use Dancer2::Core::Types;
 use Dancer2::FileUtils 'path';
 use Carp 'croak';
@@ -54,16 +54,6 @@ has default_tmpl_ext => (
     default => sub { shift->config->{extension} || 'tt' },
 );
 
-has views => (
-    is  => 'rw',
-    isa => Maybe [Str],
-);
-
-has layout => (
-    is  => 'rw',
-    isa => Maybe [Str],
-);
-
 has engine => (
     is      => 'ro',
     isa     => Object,
@@ -79,10 +69,23 @@ has settings => (
     writer  => 'set_settings',
 );
 
+# The attributes views, layout and layout_dir have triggers in
+# Dancer2::Core::App that enable their values to be modified by
+# the `set` keyword. As such, these are defined as read-write attrs.
+
+has views => (
+    is  => 'rw',
+    isa => Maybe [Str],
+);
+
+has layout => (
+    is  => 'rw',
+    isa => Maybe [Str],
+);
+
 has layout_dir => (
-    is      => 'ro',
-    isa     => Str,
-    default => sub {'layouts'},
+    is  => 'rw',
+    isa => Maybe [Str],
 );
 
 sub _template_name {
@@ -234,7 +237,7 @@ Dancer2::Core::Role::Template - Role for template engines
 
 =head1 VERSION
 
-version 0.206000
+version 0.207000
 
 =head1 DESCRIPTION
 
