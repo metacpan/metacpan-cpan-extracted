@@ -8,6 +8,7 @@ README.mkdn
 bin/file-to-elasticsearch.pl
 dist.ini
 lib/POE/Component/ElasticSearch/Indexer.pm
+perlcritic.rc
 t/00-compile.t
 t/author-critic.t
 t/author-eol.t

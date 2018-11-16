@@ -222,6 +222,7 @@ t/default/lib/TestCase/CompileError/InvalidType.spvm
 t/default/lib/TestCase/CompileError/Isa/LeftIsNotObject.spvm
 t/default/lib/TestCase/CompileError/Isa/RightIsAnyObject.spvm
 t/default/lib/TestCase/CompileError/New/Private.spvm
+t/default/lib/TestCase/CompileError/PackageVar/Private.spvm
 t/default/lib/TestCase/CompileError/TypeCantBeDetectedUndef.spvm
 t/default/lib/TestCase/CompileError/TypeCantBeDetectedUndefDefault.spvm
 t/default/lib/TestCase/CompileError/Weaken/ArrayNotObject.spvm
@@ -235,6 +236,8 @@ t/default/lib/TestCase/Data/Weaken.spvm
 t/default/lib/TestCase/Destructor.spvm
 t/default/lib/TestCase/Double.spvm
 t/default/lib/TestCase/Empty.spvm
+t/default/lib/TestCase/Enum.spvm
+t/default/lib/TestCase/Enum/Data1.spvm
 t/default/lib/TestCase/Example.spvm
 t/default/lib/TestCase/Exception.spvm
 t/default/lib/TestCase/Extension.native/Extension.c

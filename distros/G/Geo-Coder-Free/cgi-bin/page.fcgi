@@ -1,10 +1,13 @@
-#!/usr/bin/env PERL5OPT=-T perl
+#!/usr/bin/env perl
 
 # Geo::Coder::Free is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk
 
 # use File::HomeDir;
 # use lib File::HomeDir->my_home() . '/lib/perl5';
+
+# Can be tested at the command line, e.g.:
+# rootdir=$(pwd)/.. ./page.fcgi page=index
 
 # TODO: use the memory_cache in the config file for the database searches
 
@@ -28,6 +31,7 @@ use Error qw(:try);
 use File::Spec;
 use Log::WarnDie 0.09;
 use CGI::ACL;
+use HTTP::Date;
 use autodie qw(:all);
 
 # use lib '/usr/lib';	# This needs to point to the Geo::Coder::Free directory lives,
@@ -97,6 +101,7 @@ sub sig_handler {
 			$buffercache->purge();
 		}
 		CHI->stats->flush();
+		Log::WarnDie->dispatcher(undef);
 		exit(0);
 	}
 }
@@ -167,6 +172,7 @@ if($buffercache) {
 	$buffercache->purge();
 }
 CHI->stats->flush();
+Log::WarnDie->dispatcher(undef);
 exit(0);
 
 sub doit

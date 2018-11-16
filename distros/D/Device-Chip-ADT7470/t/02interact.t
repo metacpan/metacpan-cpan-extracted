@@ -42,6 +42,25 @@ $chip->mount( my $adapter = Test::Device::Chip::Adapter->new, )->get;
     $adapter->check_and_clear('->write_duty');
 }
 
+# ->write_duty (too big pwm)
+{
+    $adapter->expect_write("\x32\xFF");
+
+    is( $chip->write_duty( 1, 256 )->get, undef, '->write_duty (too big pwm)' );
+
+    $adapter->check_and_clear('->write_duty (too big pwm)');
+}
+
+# ->write_duty (too small pwm)
+{
+    $adapter->expect_write("\x32\x00");
+
+    is( $chip->write_duty( 1, -1 )->get, undef, '->write_duty (too small pwm)' );
+
+    $adapter->check_and_clear('->write_duty (too small pwm)');
+}
+
+
 # ->write_duty_percent
 {
     $adapter->expect_write("\x32\xFF");

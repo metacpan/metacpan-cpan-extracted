@@ -4,7 +4,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 # VERSION
 
-version 0.009
+version 0.010
 
 # SYNOPSIS
 
@@ -68,6 +68,12 @@ following parameters.
 
     Maximum number of requests backlogged in the connection pool.  Defaults to **5**.
 
+- **MaxFailedRatio**
+
+    A number between 0 and 1 representing a percentage of bulk requests that can
+    fail before we back off the cluster for the **StatsInterval**.  This is
+    calculated every **StatsInterval**.  The default is **0.8** or 80%.
+
 - **LoggingConfig**
 
     The [Log::Log4perl](https://metacpan.org/pod/Log::Log4perl) configuration file for the indexer to use.  Defaults to
@@ -76,7 +82,8 @@ following parameters.
 - **Timeout**
 
     Number of seconds for the HTTP transport connect and transport timeouts.
-    Defaults to **10** seconds.
+    Defaults to **5** seconds.  The total request timeout, waiting for an open
+    connection slot and then completing the request, will be this multiplied by 2.
 
 - **FlushInterval**
 
@@ -120,7 +127,7 @@ following parameters.
 - **MaxRecoveryBatches**
 
     The number of batches to process per backlog event.  This will only come into
-    play if there are batches on disk to flush.  Defaults to **25**.
+    play if there are batches on disk to flush.  Defaults to **10**.
 
 - **StatsHandler**
 
@@ -131,6 +138,22 @@ following parameters.
 - **StatsInterval**
 
     Run the `StatsHandler` every `StatsInterval` seconds.  Default to **60**.
+
+- **BacklogInterval**
+
+    Run the backlog processing event  every `BacklogInterval` seconds.  Default to **60**.
+    Will process up to `MaxRecoveryBatches` batches per `BacklogInterval`.
+
+    This event only fires when there are batches on disk.  When it's done
+    processing them, it will then stop firing.
+
+- **CleanupInterval**
+
+    Run the cleanup event  every `CleanupInterval` seconds.  Default to **60**.
+    This will check to ensure the `BatchDiskSpace` is honored and delete the
+    oldest batches if that is exceeded.
+
+    This event only fires when there are batches on disk.
 
 ## EVENTS
 

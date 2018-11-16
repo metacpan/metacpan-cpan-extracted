@@ -102,5 +102,7 @@
 MooX-Const-.*/
 MooX-Const-.*\.tar\.gz
 \.mailmap$
+perltidy\.(LOG|ERR)
+fatlib/
 cpanfile\.snapshot$
 local/

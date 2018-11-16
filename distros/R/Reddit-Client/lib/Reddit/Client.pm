@@ -1,8 +1,8 @@
 package Reddit::Client;
 
-our $VERSION = '1.2814';
+our $VERSION = '1.2816';
 # TODO: make ispost, iscomment and get_type static
-# 1.2814-documentation update
+# 1.2816-documentation update
 # 1.281 -morecomments get_collapsed args
 # 1.281 -get_collapsed can also return morecomments
 # 1.28  -get_links_by_id
@@ -1569,6 +1569,10 @@ __END__
 
 Reddit::Client - A Perl wrapper for the Reddit API.
 
+=head1 DESCRIPTION
+
+Reddit::Client handles Oauth session management and HTTP communication with Reddit's external API. For more information about the Reddit API, see L<https://github.com/reddit/reddit/wiki/API>. 
+
 =head1 SYNOPSIS
 
     use Reddit::Client;
@@ -1578,19 +1582,19 @@ Reddit::Client - A Perl wrapper for the Reddit API.
     
     # Create a Reddit::Client object and authorize in one step: "script" app
     my $reddit = new Reddit::Client(
-        user_agent  => 'Test script 1.0 by /u/myusername',
+        user_agent  => "Test script 1.0 by /u/myusername",
         client_id   => $client_id,
         secret      => $secret,
-        username    => 'reddit_username',
-        password    => 'reddit_password',
+        username    => "reddit_username",
+        password    => "reddit_password",
     );
     
     # Create a Reddit::Client object and authorize in one step: "web" app
     my $reddit = new Reddit::Client(
-        user_agent    => 'Test script 1.0 by /u/myusername',
+        user_agent    => "Test script 1.0 by /u/myusername",
         client_id     => $client_id,
         secret        => $secret,
-        refresh_token => 'refresh_token',
+        refresh_token => "refresh_token",
     );	
     
     # Check your inbox
@@ -1599,9 +1603,9 @@ Reddit::Client - A Perl wrapper for the Reddit API.
     
     # Submit a link
     $reddit->submit_link(
-        subreddit   => 'test',
-        title       => 'Change is bad, use Perl',
-        url         => 'http://www.perl.org'
+        subreddit   => "test",
+        title       => "Change is bad, use Perl",
+        url         => "http://www.perl.org",
     );
     
     # Get posts from a subreddit or multi
@@ -1616,21 +1620,37 @@ Reddit::Client - A Perl wrapper for the Reddit API.
         }
     }
 
-=head1 DESCRIPTION
+=head1 OAUTH
 
-Reddit::Client handles oauth session management and HTTP communication with Reddit's external API. Since August 3rd, 2015, the Reddit API requires Oauth2 authentication. For more information about the Reddit API, see L<https://github.com/reddit/reddit/wiki/API>. 
+Reddit::Client uses Oauth to communicate with Reddit. To get Oauth keys, visit your apps page on Reddit, located at L<https://www.reddit.com/prefs/apps>, and create an app.
 
-To get Oauth keys, visit your apps page: L<https://www.reddit.com/prefs/apps>. There are three types of apps to choose from, but most people will want a "script"-type app. This is an app for personal use; only your account and accounts you explicitly give permission to can use it. To run a "script"-type app you need your username, password, and the app's client ID and secret.
+=over
 
-As of v1.20, Reddit::Client also supports "web" apps. These are apps that are intended to run on a web server and can take actions on behalf of the public at large. (If you have ever seen a permission screen for a Reddit app that says "SomeRedditApp wants your permission to...", that's a web type app.) While they are fully supported, there is not yet a setup guide, so getting one running is left as an exercise for the reader. You will need a web server (obviously), and you will need to generate a refresh token, which is a unique string that your app will use to authenticate instead of a username and password. You will probably want to store refresh tokens locally so that your app doesn't have to get a new one every time it runs. Documentation for the "web" app flow can be found at L<https://github.com/reddit-archive/reddit/wiki/OAuth2>.
+=item Script apps
+
+Reddit::Client supports "script" and "web" type apps, but most users will want a "script"-type app. This is an app intended for personal use that uses a username and password to authenticate. The description and about url fields can be empty, and the redirect URI can be any valid address (script apps don't use them). Once created, you can give other users permission to run it by adding them in the "add developer" field. (They each use their own username and password to authenticate.)
+
+Use the app's B<client id> and B<secret> along with your username and password to create a new Reddit::Client object.
+
+=item Web apps
+
+As of v1.20, Reddit::Client also supports "web" apps. These are apps that can take actions on behalf of any user that grants them permission. (If you have ever seen a permission screen for a Reddit app that says "SomeRedditApp wants your permission to...", that's a web type app.) While they are fully supported, there is not yet a setup guide, so getting one running is left as an exercise for the reader. You will need a web server (obviously), and you will need to generate a refresh token, which is a unique string that your app will use to authenticate instead of a username and password. You will probably want to store refresh tokens locally so that your app doesn't have to get a new one every time it runs.
+
+Documentation for the "web" app flow can be found at L<https://github.com/reddit-archive/reddit/wiki/OAuth2>.
+
+=back
 
 =head1 TERMINOLOGY
 
 =over
 
-C<fullname>: A thing's complete ID with prefix. Example: t1_3npkj4. Whe Reddit returns data, the fullname is usually found in the "name" field. The type of thing can be determined by the prefix; for example, "t1" for comments and "t3" for links.
+=item fullname
 
-C<id>: A thing's short ID without prefix. Example: 3npkj4. Seen in your address bar when viewing, for example, a post or comment. 
+A thing's complete ID with prefix. Example: t1_3npkj4. Whe Reddit returns data, the fullname is usually found in the "name" field. The type of thing can be determined by the prefix; for example, "t1" for comments and "t3" for links.
+
+=item id
+
+A thing's short ID without prefix. Example: 3npkj4. Seen in your address bar when viewing, for example, a post or comment. 
 
 =back
 
@@ -1640,17 +1660,17 @@ Methods that return lists of things can accept several optional parameters:
 
 =over
 
-C<limit> I<integer> How many things to return. Default 25, maximum 100. If I<limit> is present but false, this is interpreted as "no limit" and the maximum is returned.
+C<limit>: Integer. How many things to return. Default 25, maximum 100. If I<limit> is present but false, this is interpreted as "no limit" and the maximum is returned.
 
-C<before> I<fullname> Return results that occur before I<fullname> in the listing. 
+C<before>: Fullname. Return results that occur before I<fullname> in the listing. 
 
-C<after> I<fullname> Return results that occur after I<fullname> in the listing.
+C<after>: Fullname. Return results that occur after I<fullname> in the listing.
 
-C<count> I<integer> Appears to be used by Reddit to number listings after the first page. Does not seem to have a use in the API.
+C<count>: Integer. Appears to be used by Reddit to number listings after the first page. Listings returned by the API are not numbered, so it does not seem to have a use in the API.
 
-C<only> I<"links" or "comments"> Return only links or comments. Only relevant to listings that could contain both.
+C<only>: The string "links" or "comments". Return only links or only comments. Only relevant to listings that could contain both.
 
-C<show_all> I<boolean> Return items that would have been omitted, for example posts you have hidden, or have reported, or are hidden from you because you are using the option to hide posts after you've upvoted/downvoted them. Default false.
+C<show_all>: Boolean. Return items that would have been omitted, for example posts you have hidden, or have reported, or are hidden from you because you are using the option to hide posts after you've upvoted/downvoted them. Default false.
 
 =back
 
@@ -1660,7 +1680,7 @@ Note that 'before' and 'after' mean before and after I<in the listing>, not nece
 
 All functions that take the parameter 'subreddit' also accept the alias 'sub'.
 
-This guide indicates optional arguments with brackets ([]), a convention we borrowed from from PHP's online manual. This creates some slight overlap with Perl's brackets, which are used to indicate an anonymous array reference, however which of the two is intended should be clear from the context. For example, here is an optional argument where the argument is an array reference, from the C<create_multi> function: C<[ subreddits =E<gt> [ subreddits ], ]>
+This guide indicates optional arguments with brackets ([]), a convention we borrowed from from PHP's online manual. This creates some slight overlap with Perl's brackets, which are used to indicate an anonymous array reference, however which of the two is intended should be clear from the context.
 
 =head1 METHODS
 
@@ -1679,13 +1699,17 @@ Approve a comment or post (moderator action).
 
 Ban a user from a subreddit. C<username> and C<subreddit> are required. Optional arguments include:
 
-* C<duration>: Duration in days. Range 1-999. If false or not provided, the ban is indefinite.
+=over
 
-* C<ban_message>: The message sent to the banned user. (Markdown is allowed.)
+C<duration>: Duration in days. Range 1-999. If false or not provided, the ban is indefinite.
 
-* C<reason>: A short ban reason (100 characters max). On the website ban page, this matches the ban reason you would select from the dropdown menu. It is arbitrary: it doesn't have to match up with the reasons from the menu and can be blank. Only visible to moderators.
+C<ban_message>: The message sent to the banned user. (Markdown is allowed.)
 
-* C<note>: An optional note, 300 characters max. Only visible to moderators.
+C<reason>: A short ban reason (100 characters max). On the website ban page, this matches the ban reason you would select from the dropdown menu. It is arbitrary: it doesn't have to match up with the reasons from the menu and can be blank. Only visible to moderators.
+
+C<note>: An optional note, 300 characters max. Only visible to moderators.
+
+=back
 
 A ban will overwrite any existing ban for that user. For example, to change the duration, you can call C<ban()> again with a new duration.
 
@@ -1711,23 +1735,27 @@ Returns a hash of information about the newly created multireddit.
 
 =over
 
-* C<name> The name of the multireddit. Maximum 50 characters. Only letters, numbers and underscores are allowed (and underscores cannot be the first character). Required.
+C<name> The name of the multireddit. Maximum 50 characters. Only letters, numbers and underscores are allowed (and underscores cannot be the first character). Required.
 
-* C<description> Description of the multi. This can contain markdown.
+C<description> Description of the multi. This can contain markdown.
 
-* C<visibility> One of 'private', 'public', or 'hidden'. Default 'private'.
+C<visibility> One of 'private', 'public', or 'hidden'. Default 'private'.
 
-* C<subreddits> or C<subs>: An array reference.
+C<subreddits> or C<subs>: An array reference.
 
 =back
 
 The remaining arguments don't currently do anything. It seems like at least some of them are intended for future mobile updates.
 
-* C<icon_name> If provided, must be one of the following values: 'art and design', 'ask', 'books', 'business', 'cars', 'comics', 'cute animals', 'diy', 'entertainment', 'food and drink', 'funny', 'games', 'grooming', 'health', 'life advice', 'military', 'models pinup', 'music', 'news', 'philosophy', 'pictures and gifs', 'science', 'shopping', 'sports', 'style', 'tech', 'travel', 'unusual stories', 'video', '', 'None'.
+=over
 
-* C<weighting_scheme> If provided, must be either 'classic' or 'fresh'.
+C<icon_name>: If provided, must be one of the following values: 'art and design', 'ask', 'books', 'business', 'cars', 'comics', 'cute animals', 'diy', 'entertainment', 'food and drink', 'funny', 'games', 'grooming', 'health', 'life advice', 'military', 'models pinup', 'music', 'news', 'philosophy', 'pictures and gifs', 'science', 'shopping', 'sports', 'style', 'tech', 'travel', 'unusual stories', 'video', '', 'None'.
 
-* C<key_color> A 6-character hex code. Defaults to CEE3F8.
+C<weighting_scheme>: If provided, must be either 'classic' or 'fresh'.
+
+C<key_color>: A 6-character hex code. Defaults to CEE3F8.
+
+=back
 
 =item delete 
 
@@ -1755,14 +1783,18 @@ Edit a multireddit. Will create a new multireddit if one with that name doesn't 
 
     edit_wiki ( subreddit => $subreddit, page => $page, content => $content,
               [ previous => $previous_version_id, ] [ reason => $edit_reason, ] )
+
+=over
 	
-* C<page> is the page being edited.
+C<page> is the page being edited.
 
-* C<content> is the new page content. Can be empty but must be defined. Maximum 524,288 characters.
+C<content> is the new page content. Can be empty but must be defined. Maximum 524,288 characters.
 
-* C<reason> is the edit reason. Max 256 characters, will be truncated if longer. Optional.
+C<reason> is the edit reason. Max 256 characters, will be truncated if longer. Optional.
 
-* C<previous> is the ID of the intended previous version of the page; if provided, that is the version the page will be rolled back to in a rollback. However, there's no way to find out what this should be from the Reddit website, or currently from Reddit::Client either. Use it only if you know what you're doing.
+C<previous> is the ID of the intended previous version of the page; if provided, that is the version the page will be rolled back to in a rollback. However, there's no way to find out what this should be from the Reddit website, or currently from Reddit::Client either. Use it only if you know what you're doing.
+
+=back
 
 =item find_subreddits
 
@@ -1777,9 +1809,17 @@ Returns a list of Subreddit objects matching the search string C<$query>. Option
 
 Expand a list of collapsed comments found in a MoreComments object. Return a flat list of Comment objects.
 
-C<link_id> is the ID of the link the comments are under. C<children> is a reference to an array containing the comment IDs. 
+=over
 
-If C<limit_children> is true, return only the requested comments, not replies to them. Otherwise return as many replies as possible (possibly resulting in more MoreComments objects down the line). C<sort> is one of 'confidence', 'top', 'new', 'controversial', 'old', 'random', 'qa', 'live'. Default seems to be 'confidence'.
+C<link_id> is the ID of the link the comments are under. 
+
+C<children> is a reference to an array containing the comment IDs. 
+
+If C<limit_children> is true, return only the requested comments, not replies to them. Otherwise return as many replies as possible (possibly resulting in more MoreComments objects down the line).
+
+C<sort> is one of 'confidence', 'top', 'new', 'controversial', 'old', 'random', 'qa', 'live'. Default seems to be 'confidence'.
+
+=back
 
 =item get_comment 
 
@@ -1894,7 +1934,7 @@ edited: Things that have been edited recently.
 C<num_reports> contains the total number of reports. Reports themselves can be found in the C<mod_reports> and C<user_reports> properties. These are arrays of arrays, i.e.
 
     [ [ "Spam",  3 ], [ "report #2", 1 ] ]    # user_reports
-	[ [ "mod report", "moderator_name" ] ]    # mod_reports
+    [ [ "mod report", "moderator_name" ] ]    # mod_reports
 	
 The number with C<user_reports> is the number of times that particular report has been sent. This is mainly for duplicates that users have selected from the menu, for example "Spam".
 
@@ -1927,9 +1967,9 @@ C<$comment_id> and C<$post_id> can be either fullnames or short IDs.
 
 Get a permanent refresh token for use in Web-type apps. All arguments are required*. Returns the refresh token.
 
-This is best called in static context, just as it's written above (i.e. with C<Reddit::Client->get_refresh_token>, rather than by instantiating an RC object first.) The reason is that it's completely separate from every other program flow and you only create extra work for yourself by using an existing RC object. If you choose to use an existing RC object, you'll need to create it and then call C<get_token> with your new refresh_token as a parameter. (C<client_id> and C<secret> will need to be passed in either on object creation or when calling get_token.)
+This is best called in static context, just as it's written above (i.e. with C<<Reddit::Client->get_refresh_token>>, rather than by instantiating an RC object first.) The reason is that it's completely separate from every other program flow and you only create extra work for yourself by using an existing RC object. If you choose to use an existing RC object, you'll need to create it and then call C<get_token> with your new refresh_token as a parameter. (C<client_id> and C<secret> will need to be passed in either on object creation or when calling get_token.)
 
-C<code> is the one-time use code returned by Reddit after a user authorizes your app. For an explanation of that and C<redirect_uri>, see the token retrieval code flow:L<https://github.com/reddit-archive/reddit/wiki/OAuth2#token-retrieval-code-flow>.
+C<code> is the one-time use code returned by Reddit after a user authorizes your app. For an explanation of that and C<redirect_uri>, see the token retrieval code flow: L<https://github.com/reddit-archive/reddit/wiki/OAuth2#token-retrieval-code-flow>.
 
 =item get_subreddit_comments
 
@@ -2145,17 +2185,7 @@ Return the Reddit::Client version.
 
     vote ( $fullname, $direction )
 
-=begin html
-
-Vote on a post or comment. <code>$direction</code> can be 1, 0, or -1 (0 to clear votes).
-
-=end html
-
-=begin text
-
-Vote on a post or comment. Direction can be 1, 0, or -1 (0 to clear votes).
-
-=end text
+Vote on a post or comment. C<$direction> can be 1, 0, or -1 (0 to clear votes).
 
 =back
 

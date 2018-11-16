@@ -4,13 +4,13 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.628';
+our $VERSION = '1.630';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
 use Carp qw( croak carp );
 
-use Term::Choose::Constants qw( :choose );
+use Term::Choose::Constants qw( :choose :screen );
 use Term::Choose::LineFold  qw( line_fold print_columns cut_to_printwidth );
 
 
@@ -50,7 +50,7 @@ sub DESTROY {
 }
 
 
-sub __defaults {        #hae
+sub __defaults {
     my ( $self ) = @_;
     my $prompt = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
     return {
@@ -58,6 +58,7 @@ sub __defaults {        #hae
         info                => '',
         beep                => 0,
         clear_screen        => 0,
+        color               => 0,
         #default            => undef,
         empty               => '<empty>',
         hide_cursor         => 1,
@@ -91,7 +92,7 @@ sub __undef_to_defaults {
 }
 
 
-sub __valid_options {       #hae
+sub __valid_options {
     return {
         beep                => '[ 0 1 ]',
         clear_screen        => '[ 0 1 ]',
@@ -101,6 +102,7 @@ sub __valid_options {       #hae
         page                => '[ 0 1 ]',
         include_highlighted => '[ 0 1 2 ]',
         justify             => '[ 0 1 2 ]',
+        color               => '[ 0 1 2 3 ]',
         layout              => '[ 0 1 2 3 ]',
         mouse               => '[ 0 1 2 3 4 ]',
         keep                => '[ 1-9 ][ 0-9 ]*',
@@ -198,7 +200,7 @@ sub __get_key {
 }
 
 
-sub choose {      #hae
+sub choose {
     if ( ref $_[0] ne 'Term::Choose' ) {
         return __choose( bless( { plugin => $Plugin->new() }, 'Term::Choose' ), @_ );
     }
@@ -218,7 +220,9 @@ sub __choose {
     if ( ! @$orig_list_ref ) {
         return;
     }
-
+    if ( $^O eq "MSWin32" && $self->{color} ) {
+        require Win32::Console::ANSI;
+    }
     local $\ = undef;
     local $, = undef;
     local $| = 1;
@@ -232,6 +236,10 @@ sub __choose {
         exit 1;
     };
     $self->__init_term();
+    ( $self->{term_width}, $self->{term_height} ) = $self->{plugin}->__get_term_size();
+    if ( $self->{ll} && $self->{ll} > $self->{term_width} ) {
+        return -2;                                                          ###
+    }
     $self->__write_first_screen();
     my $fast_page = 25;
     #if ( $self->{count_pp} > 30_000 ) {
@@ -251,6 +259,7 @@ sub __choose {
             if ( $self->{ll} ) {
                 return -1;
             }
+            ( $self->{term_width}, $self->{term_height} ) = ( $new_width, $new_height );
             $self->__copy_orig_list( $orig_list_ref );
             $self->{default} = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
             if ( $self->{wantarray} && @{$self->{marked}} ) {
@@ -651,26 +660,57 @@ sub __marked_rc2idx {
 }
 
 
-sub __copy_orig_list {      #hae
+sub __copy_orig_list {
     my ( $self, $orig_list_ref ) = @_;
-    $self->{list} = [ @$orig_list_ref ];
-    if ( ! $self->{ll} ) {
-        for ( @{$self->{list}} ) {
-            if ( ! $_ ) {
-                $_ = $self->{undef} if ! defined $_;
-                $_ = $self->{empty} if $_ eq '';
+    if ( $self->{ll} ) {
+        if ( $self->{color} ) {
+            $self->{orig_list} = $orig_list_ref;
+            $self->{list} = [ @$orig_list_ref ];
+            for ( @{$self->{list}} ) {
+                s/\x{feff}//g;
+                s/\e\[[\d;]*m/\x{feff}/msg;
             }
-            s/\t/ /g;
-            s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
-            # \p{Cn} might not be up to date and remove assigned codepoints
-            # therefore only \p{Noncharacter_Code_Point}
-            s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+        }
+        else {
+            $self->{list} = $orig_list_ref;
+        }
+    }
+    else {
+        $self->{list} = [ @$orig_list_ref ];
+        if ( $self->{color} ) {
+            $self->{orig_list} = $orig_list_ref;
+            for ( @{$self->{list}} ) {
+                if ( ! $_ ) {
+                    $_ = $self->{undef} if ! defined $_;
+                    $_ = $self->{empty} if $_ eq '';    #
+                }
+                s/\x{feff}//g;
+                s/\e\[[\d;]*m/\x{feff}/msg;
+                s/\t/ /g;
+                s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
+                # \p{Cn} might not be up to date and remove assigned codepoints
+                # therefore only \p{Noncharacter_Code_Point}
+                s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+            }
+        }
+        else {
+            for ( @{$self->{list}} ) {
+                if ( ! $_ ) {
+                    $_ = $self->{undef} if ! defined $_;
+                    $_ = $self->{empty} if $_ eq '';    #
+                }
+                s/\t/ /g;
+                s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
+                # \p{Cn} might not be up to date and remove assigned codepoints
+                # therefore only \p{Noncharacter_Code_Point}
+                s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+            }
         }
     }
 }
 
 
-sub __length_longest {        #hae
+sub __length_longest {
     my ( $self ) = @_;
     my $list = $self->{list};
     if ( $self->{ll} ) {
@@ -692,7 +732,6 @@ sub __length_longest {        #hae
 
 sub __write_first_screen {
     my ( $self ) = @_;
-    ( $self->{term_width}, $self->{term_height} ) = $self->{plugin}->__get_term_size();
     ( $self->{avail_width}, $self->{avail_height} ) = ( $self->{term_width}, $self->{term_height} );
     if ( $self->{length_longest} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
         $self->{avail_width} += WIDTH_CURSOR;
@@ -765,9 +804,18 @@ sub __prepare_promptline {
     }
     my $init   = $self->{lf}[0] ? $self->{lf}[0] : 0;
     my $subseq = $self->{lf}[1] ? $self->{lf}[1] : 0;
+    my @color;
+    if ( $self->{color} ) {
+        $prompt =~ s/\x{feff}//g;
+        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+    }
     $self->{prompt_copy} = line_fold( $prompt, $self->{avail_width}, ' ' x $init, ' ' x $subseq );
     $self->{prompt_copy} .= "\n\r";
     $self->{nr_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
+    if ( @color ) {
+        $self->{prompt_copy} =~ s/\x{feff}/shift @color/ge;
+        $self->{prompt_copy} .= RESET;
+    }
 }
 
 
@@ -775,7 +823,7 @@ sub __size_and_layout {
     my ( $self ) = @_;
     my $layout = $self->{layout};
     $self->{rc2idx} = [];
-    if ( $self->{length_longest} > $self->{avail_width} ) {
+    if ( $self->{length_longest} >= $self->{avail_width} ) {
         $self->{avail_col_width} = $self->{avail_width};
         $layout = 3;
     }
@@ -957,48 +1005,86 @@ sub __wr_cell {
     }
     else {
         $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width} );
-
     }
-    $self->__unicode_sprintf( $idx, $row == $self->{pos}[ROW] && $col == $self->{pos}[COL], $self->{marked}[$row][$col] );
-    $self->{i_col} = $self->{i_col} + $self->{avail_col_width};
-}
-
-
-# Term::Choose_HAE overwrites: __valid_options, __defaults, choose, __copy_orig_list, __length_longest, __unicode_sprintf
-
-
-sub __unicode_sprintf {     # hae
-    my ( $self, $idx, $is_current_pos, $is_marked ) = @_;
-    my $unicode;
-    my $str_w = $self->{length}[$idx];
-    if ( $str_w > $self->{avail_col_width} ) {
-        if ( $self->{avail_col_width} > 3 ) {
-            $unicode = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} - 3 ) . '...';
+    $self->{i_col} += $self->{avail_col_width};
+    my $is_current_pos = $row == $self->{pos}[ROW] && $col == $self->{pos}[COL];
+    my $is_marked = $self->{marked}[$row][$col]; ###
+    my $str;
+    my ( $pre, $post ) = ( '', '' );
+    if ( $self->{ll} || $self->{length}[$idx] == $self->{avail_col_width} ) {
+        $str = $self->{list}[$idx];
+    }
+    elsif ( $self->{length}[$idx] > $self->{avail_col_width} ) {
+        if ( $self->{avail_col_width} > 6 ) {
+            $str = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} - 3 ) . '...';
         }
         else {
-            $unicode = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} );
-        }
-    }
-    elsif ( $str_w < $self->{avail_col_width} ) {
-        if ( $self->{justify} == 0 ) {
-            $unicode = $self->{list}[$idx] . " " x ( $self->{avail_col_width} - $str_w );
-        }
-        elsif ( $self->{justify} == 1 ) {
-            $unicode = " " x ( $self->{avail_col_width} - $str_w ) . $self->{list}[$idx];
-        }
-        elsif ( $self->{justify} == 2 ) {
-            my $all = $self->{avail_col_width} - $str_w;
-            my $half = int( $all / 2 );
-            $unicode = " " x $half . $self->{list}[$idx] . " " x ( $all - $half );
+            $str = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} );
         }
     }
     else {
-        $unicode = $self->{list}[$idx];
+        $str = $self->{list}[$idx];
+        if ( $self->{justify} == 0 ) {
+            $post = " " x ( $self->{avail_col_width} - $self->{length}[$idx] );
+        }
+        elsif ( $self->{justify} == 1 ) {
+            $pre = " " x ( $self->{avail_col_width} - $self->{length}[$idx] );
+        }
+        elsif ( $self->{justify} == 2 ) {
+            my $all = $self->{avail_col_width} - $self->{length}[$idx];
+            my $half = int( $all / 2 );
+            ( $pre, $post ) = ( " " x $half, " " x ( $all - $half ) );
+        }
     }
-    $self->{plugin}->__bold_underline() if $is_marked;
-    $self->{plugin}->__reverse()        if $is_current_pos;
-    print $unicode;
-    $self->{plugin}->__reset()          if $is_marked || $is_current_pos;
+    if ( $self->{color} ) {
+        my $emphasised = ( $is_marked ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
+        my @color = ( $self->{orig_list}[$idx] || '' ) =~ /(\e\[[\d;]*m)/g;
+        if ( $emphasised ) {
+            for ( @color ) {
+                # keep emphasise after color escapes
+                $_ .= $emphasised;
+            }
+            if ( $self->{color} == 1 ) {
+                # don't emphasise leading and trailing spaces
+                $str = $pre . $emphasised . $str . RESET . $post;
+            }
+            elsif ( $self->{color} == 2 ) {
+                # the cursor keeps the default color
+                $str = $emphasised . $pre . $str . $post . RESET;
+                if ( $is_current_pos ) {
+                    @color = ();
+                    $str =~ s/\x{feff}//g;
+                }
+            }
+            elsif ( $self->{color} == 3 ) {
+                # the cursor has the color of the string
+                if ( $str =~ s/^\x{feff}([^\x{feff}]*)\x{feff}?\z/$1/sm ) {
+                    # leading and trailing spaces have the color of the string if only one color
+                    $str = $color[0] . $pre . $str . $post . RESET;
+                }
+                else {
+                    # else leading and trailing spaces have the default color
+                    $str = $emphasised . $pre . $str . $post . RESET;
+                }
+            }
+        }
+        else {
+            $str = $pre . $str . $post;
+        }
+        if ( @color ) {
+            $str =~ s/\x{feff}/shift @color/ge;
+            if ( ! $emphasised ) {
+                $str .= RESET;
+            }
+        }
+        print $str;
+    }
+    else {
+        $self->{plugin}->__bold_underline() if $is_marked;
+        $self->{plugin}->__reverse()        if $is_current_pos;
+        print $pre . $str . $post;
+        $self->{plugin}->__reset() if $is_marked || $is_current_pos;
+    }
 }
 
 
@@ -1083,7 +1169,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.628
+Version 1.630
 
 =cut
 
@@ -1288,9 +1374,6 @@ Code points from the ranges of control, surrogate and noncharacter are removed.
 
     $element =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
 
-C<ESC> characters are removed by this substitution so it is not possible to color the output with ANSI escape sequences.
-For colored output see L<Term::Choose_HAE>.
-
 =item *
 
 If the length of an element is greater than the width of the screen the element is cut and at the end of the string are
@@ -1313,6 +1396,22 @@ Options which expect a number as their value expect integers.
 0 - off (default)
 
 1 - clears the screen before printing the choices
+
+=head3 color
+
+Setting this option to C<1>, C<2> or C<3> enables the support for color and text formatting escape sequences.
+
+0 - off (default)
+
+1, 2 or 3 - on
+
+How the current position and marked items are highlighted:
+
+1 - only the width of the string is highlighted
+
+2 - the whole column width is highlighted, the cursor keeps the default color
+
+3 - the whole column width is highlighted, the cursor takes the color of the string
 
 =head3 default
 
@@ -1451,24 +1550,22 @@ See C<INITIAL_TAB> and C<SUBSEQUENT_TAB> in L<Text::LineFold>.
 
 =head3 ll
 
-If all elements have the same length, the length can be passed with this option.
+If all elements have the same length, the length can be passed with this option. C<choose> then doesn't calculate the
+length of the longest element itself but uses the passed value. I<length> refers here to the number of print columns
+the element will use on the terminal.
 
-If I<ll> is set, then C<choose> doesn't calculate the length of the longest element itself but uses the value passed
-with this option.
-
-I<length> refers here to the number of print columns the element will use on the terminal.
+If I<ll> is set, C<choose> returns always the index(es) of the chosen item(s) regardless of how I<index> is set.
 
 Undefined list elements are not allowed.
+
+If the option I<color> is enabled, all C<U+FEFF> code points have to be removed.
 
 The replacements described in L</Modifications for the output> are not applied. If elements contain unsupported
 characters the output might break.
 
 If I<ll> is set to a value less than the length of the elements, the output could break.
 
-If the value of I<ll> is greater than the screen width, the elements will be trimmed to fit into the screen.
-
-If I<ll> is set, C<choose> returns (in list or scalar context) always the indexes of the chosen items regardless of how
-I<index> is set.
+If the value of I<ll> is greater than the screen width, C<choose> returns immediately C<-2>.
 
 If I<ll> is set and the window size has changed, choose returns immediately C<-1>.
 
@@ -1672,7 +1769,8 @@ If a I<mouse> mode is enabled
 
 are used to enable/disable the different I<mouse> modes.
 
-If the OS is MSWin32 L<Win32::Console> is used, to emulate the behavior of the escape sequences.
+If the OS is MSWin32 L<Win32::Console> is used, to emulate the behavior of the escape sequences. If the option I<color> is
+enabled, L<Win32::Console::ANSI> is loaded to translate the color and text formatting escape sequences.
 
 =head1 SUPPORT
 

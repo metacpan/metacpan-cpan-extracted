@@ -1,4 +1,9 @@
+2.3       2018-11-16 16:14:07+00:00 Europe/London
+
 2.2       2018-10-25 14:25:34+01:00 Europe/London
+- render_error SIGNATURE CHANGE: Removed argument for providing a primary
+resource due to the specification not allowing `error` and `data` top level
+members at the same time.
 
 2.1       2018-07-25 23:41:24+01:00 Europe/London
 - Update minimum dependency on JSONAPI::Document

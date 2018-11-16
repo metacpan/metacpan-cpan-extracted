@@ -8,10 +8,12 @@ build_requires:
   CGI::Lingua: '0'
   CHI: '0'
   CHI::Driver::RawMemory: '0'
+  Config::Auto: '0'
   Data::Throttler: '0'
   File::Basename: '0'
   File::Copy: '0'
   File::Spec: '0'
+  IO::AIO: '0'
   IPC::System::Simple: '0'
   JSON: '0'
   LWP::UserAgent::Throttled: '0'
@@ -58,7 +60,7 @@ requires:
   Text::CSV: '0'
   perl: '5.006002'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free
+  bugtracker: https://github.com/nigelhorne/Geo-Coder-Free/issues
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

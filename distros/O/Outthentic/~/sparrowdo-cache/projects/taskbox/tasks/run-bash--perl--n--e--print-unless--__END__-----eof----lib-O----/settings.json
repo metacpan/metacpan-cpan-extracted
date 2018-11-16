@@ -1,0 +1,1 @@
+{"task_desc":"run bash: perl -n -e \"print unless /__END__/ .. eof()\" lib/O ...","plugin":"public@bash"}

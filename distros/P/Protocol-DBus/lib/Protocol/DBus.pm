@@ -3,7 +3,7 @@ package Protocol::DBus;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =encoding utf8
 
@@ -74,6 +74,13 @@ For non-blocking I/O:
 This is an original, pure-Perl implementation of client logic for
 L<the D-Bus protocol|https://dbus.freedesktop.org/doc/dbus-specification.html>.
 
+It’s not much more than an implementation of the wire protocol; it doesn’t
+know about objects, services, or anything else besides the actual messages.
+That said, what’s here already should allow implementation of anything you
+can do with D-Bus; moreover, it would not be difficult to implement
+convenience logic—e.g., to mimic interfaces like L<Net::DBus>—on top of
+what is here now.
+
 Right now this distribution is an experimental effort. If you use it in your
 project, be sure to check the changelog before deploying a new version. Please
 file bug reports as appropriate.
@@ -83,5 +90,34 @@ See L<Protocol::DBus::Client> and the above sample for a starting point.
 =head1 EXAMPLES
 
 See the distribution’s F<examples/> directory.
+
+=head1 NOTES
+
+=over
+
+=item * Currently EXTERNAL is the only supported authentication mechanism.
+
+=item * UNIX FD support is “transparent”: send and receive Perl filehandles
+as part of message bodies. :)
+
+=back
+
+=head1 TODO
+
+=over
+
+=item * Add conveniences like match rule logic.
+
+=item * Add DBUS_COOKIE_SHA1 authentication.
+
+=item * Add more tests.
+
+=back
+
+=head1 SEE ALSO
+
+L<Net::DBus> uses libdbus (via XS) as its backend. It’s more mature and
+more idiomatic as to how a D-Bus application is normally written, but
+it’s also heavier, and it doesn’t appear to support passing filehandles.
 
 =cut

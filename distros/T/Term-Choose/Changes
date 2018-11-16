@@ -1,6 +1,15 @@
 Revision history for Term::Choose
 
 
+
+1.630   2018-11-16
+    - Update option 'color'.
+
+1.629   2018-11-16
+    - If 'll' is set, 'choose' returns -2 if 'll' is greater than the terminal width.
+    - If 'll' is set and 'color' is not set, no copy of the passed list is made.
+    - New option 'color'.
+
 1.628   2018-11-12
     - Changed modification of list elements.
     - 'line_fold': use "\v" instead of "\n" to split the string.

@@ -1,0 +1,1 @@
+{"command":"perl -n -e \"print unless /__END__/ .. eof()\" lib/Outthentic.pm > /tmp/Outthentic.pm"}

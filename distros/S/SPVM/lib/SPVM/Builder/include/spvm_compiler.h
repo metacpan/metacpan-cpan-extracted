@@ -43,6 +43,10 @@ struct SPVM_compiler {
   // Current enum value
   int32_t current_enum_value;
   
+  // Current sub names
+  // This is used to omit parenthes of subroutine
+  SPVM_LIST* current_sub_names;
+  
   // Temporary variable length
   int32_t tmp_var_length;
   
@@ -88,9 +92,6 @@ struct SPVM_compiler {
   // OP our symtable
   SPVM_LIST* package_vars;
 
-  // OP our symtable
-  SPVM_HASH* package_var_symtable;
-
   // Subroutine ops
   SPVM_LIST* subs;
   
@@ -99,15 +100,6 @@ struct SPVM_compiler {
 
   // Field ops
   SPVM_LIST* fields;
-  
-  // Field absolute name symbol table
-  SPVM_HASH* field_symtable;
-
-  // Method signature
-  SPVM_LIST* signatures;
-
-  // Method signature symbol table
-  SPVM_HASH* signature_symtable;
   
   // String pool
   SPVM_STRING_BUFFER* string_pool;

@@ -25,9 +25,9 @@ requires:
   Exporter: '0'
   Parse::ANSIColor::Tiny: '0'
   Term::ANSIColor: '0'
-  Term::Choose: '1.628'
-  Term::Choose::Constants: '1.628'
-  Term::Choose::LineFold: '1.628'
+  Term::Choose: '== 1.628'
+  Term::Choose::Constants: '== 1.628'
+  Term::Choose::LineFold: '== 1.628'
   Text::ANSI::WideUtil: '0'
   if: '0'
   parent: '0'
@@ -36,5 +36,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Choose_HAE.git
-version: '0.056'
+version: '0.057'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

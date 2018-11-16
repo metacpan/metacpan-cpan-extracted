@@ -25,9 +25,11 @@
             "App::csv2sqlite" : "0",
             "CHI" : "0",
             "CHI::Driver::RawMemory" : "0",
+            "Config::Auto" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Spec" : "0",
+            "IO::AIO" : "0",
             "IPC::System::Simple" : "0",
             "JSON" : "0",
             "LWP::UserAgent::Throttled" : "0",
@@ -82,7 +84,7 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Geo-Coder-Free@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free"
+         "web" : "https://github.com/nigelhorne/Geo-Coder-Free/issues"
       },
       "repository" : {
          "type" : "git",
@@ -90,6 +92,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,32 +1,17 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of IPC::PrettyPipe
-#
-# IPC::PrettyPipe is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package IPC::PrettyPipe::Arg;
+
+# ABSTRACT: An argument to an IPC::PrettyPipe::Cmd command
 
 use Carp;
 
-use Moo;
 use String::ShellQuote;
 
 use Types::Standard qw[ Str ];
+use IPC::PrettyPipe::Arg::Format;
+
+use Moo;
+
+our $VERSION = '0.08';
 
 has name => (
     is       => 'ro',
@@ -40,27 +25,37 @@ has value => (
     predicate => 1,
 );
 
-use IPC::PrettyPipe::Arg::Format;
+use namespace::clean;
+
+
+BEGIN {
 
 IPC::PrettyPipe::Arg::Format->shadow_attrs;
 
+}
+
 with 'MooX::Attributes::Shadow::Role';
 
+
 shadowable_attrs( 'fmt',
-		  values %{IPC::PrettyPipe::Arg::Format->shadowed_attrs }
-		);
+                  values %{IPC::PrettyPipe::Arg::Format->shadowed_attrs }
+                );
 
 with 'IPC::PrettyPipe::Queue::Element';
 
 has fmt => (
-	    is => 'ro',
-	    lazy => 1,
-	    handles => [ keys %{IPC::PrettyPipe::Arg::Format->shadowed_attrs} ],
-	    default => sub {
-		IPC::PrettyPipe::Arg::Format->new_from_attrs( shift );
-	    },
+            is => 'ro',
+            lazy => 1,
+            handles => [ keys %{IPC::PrettyPipe::Arg::Format->shadowed_attrs} ],
+            default => sub {
+                IPC::PrettyPipe::Arg::Format->new_from_attrs( shift );
+            },
 );
 
+
+#pod =for Pod::Coverage BUILDARGS
+#pod
+#pod =cut
 
 # accept full attribute interface, or
 #  new( name );
@@ -108,18 +103,18 @@ sub render {
 
         if ( $fmt->has_sep ) {
 
-	    return join( '', $name, $fmt->sep, $self->value );
+            return join( '', $name, $fmt->sep, $self->value );
 
         }
-	else {
+        else {
 
-	    return $name, $self->value;
-	}
+            return $name, $self->value;
+        }
     }
 
     else {
 
-	return $name;
+        return $name;
     }
 
 }
@@ -152,11 +147,30 @@ sub valsubst {
 
 1;
 
+#
+# This file is part of IPC-PrettyPipe
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory Bourne pfx sep valmatch
+valsubst
 
 =head1 NAME
 
-B<IPC::PrettyPipe::Arg> - An argument to an B<IPC::PrettyPipe::Cmd> command
+IPC::PrettyPipe::Arg - An argument to an IPC::PrettyPipe::Cmd command
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -180,6 +194,8 @@ B<IPC::PrettyPipe::Arg> - An argument to an B<IPC::PrettyPipe::Cmd> command
 
 B<IPC::PrettyPipe::Arg> objects are containers for arguments to
 commands in an B<L<IPC::PrettyPipe::Cmd>> object.
+
+=for Pod::Coverage BUILDARGS
 
 =head1 METHODS
 
@@ -221,7 +237,7 @@ A string to insert between the argument name and value when rendering.
 In some cases arguments must be a single string where the name and
 value are separated with an C<=> character; in other cases they
 are treated as separate entities.  If C<sep> is C<undef> it indicates
-that they are treated as separate entitites.  It defaults to C<undef>.
+that they are treated as separate entities.  It defaults to C<undef>.
 
 =back
 
@@ -307,16 +323,44 @@ If the argument has a value, perform the equivalent to
 
 =back
 
-=head1 COPYRIGHT & LICENSE
+=head1 BUGS
 
-Copyright 2014 Smithsonian Astrophysical Observatory
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
+email to
+L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
 
-This software is released under the GNU General Public License.  You
-may find a copy at
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-   http://www.fsf.org/copyleft/gpl.html
+=head1 SOURCE
 
+The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
+and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<IPC::PrettyPipe|IPC::PrettyPipe>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

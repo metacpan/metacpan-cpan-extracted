@@ -1,10 +1,6 @@
 #! perl
 
-use strict;
-use warnings;
-
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use IPC::PrettyPipe;
 
@@ -14,12 +10,11 @@ use IPC::PrettyPipe;
     extends 'IPC::PrettyPipe::Render::Template::Tiny';
 }
 
-is(
-    exception {
+ok(
+    lives {
         my $p = IPC::PrettyPipe->new( renderer => 'ExtendRenderer' );
         $p->renderer;
     },
-    undef,
     "extend existing renderer"
 );
 
@@ -31,21 +26,19 @@ is(
     with 'IPC::PrettyPipe::Renderer';
 }
 
-is(
-    exception {
+ok(
+    lives {
         my $p = IPC::PrettyPipe->new( renderer => 'NewRenderer' );
         $p->renderer;
     },
-    undef,
     "extend existing renderer"
 );
 
-is(
-    exception {
+ok(
+    lives {
         my $p = IPC::PrettyPipe->new( renderer => NewRenderer->new );
         $p->renderer;
     },
-    undef,
     "object"
 );
 

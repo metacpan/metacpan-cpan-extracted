@@ -217,17 +217,18 @@ OPENADDR: {
 				delta_within($location->{longitude}, -123.36, 1e-2);
 
 				$location = $geo_coder->geocode(location => 'Caboolture, Queensland, Australia');
-				if($ENV{'WHOSONFIRST_HOME'}) {
-					delta_within($location->{latitude}, -27.06, 1e-2);
-					delta_within($location->{longitude}, 152.98, 1e-2);
-				} else {
-					delta_within($location->{latitude}, -27.09, 1e-2);
-					delta_within($location->{longitude}, 152.95, 1e-2);
-				}
+				delta_within($location->{latitude}, -27.06, 1e-2);
+				delta_within($location->{longitude}, 152.97, 1e-2);
 
 				$location = $geo_coder->geocode(location => 'Whitley, Indiana, USA');
 				ok(defined($location));
 				ok(ref($location) eq 'HASH');
+
+				# RT#127140
+				# $location = $geo_coder->geocode({ location => '131 107th St, Manhattan, New York, New York, USA' });
+				# ok(defined($location));
+				# ok(ref($location) eq 'HASH');
+
 			} else {
 				diag('Author tests not required for installation');
 				skip('Author tests not required for installation', 97);
@@ -249,8 +250,8 @@ OPENADDR: {
 				$geo_coder = new_ok('Geo::Coder::Free' => [ openaddr => 'not/there' ]);
 			});
 		} else {
-			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 99);
+			diag('Set OPENADDR_HOME to enable openaddresses.io testing');
+			skip('Set OPENADDR_HOME to enable openaddresses.io testing', 99);
 		}
 	}
 }

@@ -272,6 +272,17 @@ To list all the task with projects use:
 
 **sparrow task list**
 
+You can filter tasks out by using `--search` options:
+
+    # list tasks with project name or task name matching `database` and `production` strings
+
+    $ sparrow task list --search database --search production
+
+    # you can use Perl5 regexps in --search filters:
+
+    $ sparrow task list --search database --search '(test|dev)'
+
+
 ### Run plugins
 
 There are two ways to run sparrow plugins:
@@ -1073,7 +1084,7 @@ For servers with limited or no access to internet, there is offline mode support
     $ curl https://sparrowhub.org/plugins/python-echo-script-v0.001000.tar.gz -o sparrow-local-repo/plugins/python-echo-script-v0.001000.tar.gz
     $ # so on
 
-## Set sparrow_hub_api_url
+## Set sparrow\_hub\_api\_url
 
     $ export sparrow_hub_api_url=$PWD/sparrow-local-repo
 

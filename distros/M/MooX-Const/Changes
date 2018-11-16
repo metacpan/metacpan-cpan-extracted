@@ -1,5 +1,12 @@
 Revision history for MooX-Const:
 
+v0.2.1    2018-11-16 18:28:00+00:00 Europe/London
+  [Documentation]
+  - Added a ROADMAP section for planned changes.
+
+  [Tests]
+  - Added more tests.
+
 v0.2.0    2018-11-10 23:03:30+00:00 Europe/London
   [Enhancements]
   - Add support for write-once attributes.

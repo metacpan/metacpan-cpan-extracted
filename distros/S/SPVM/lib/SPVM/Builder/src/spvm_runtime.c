@@ -72,7 +72,7 @@ SPVM_ENV* SPVM_RUNTIME_create_env(SPVM_RUNTIME* runtime) {
     SPVM_RUNTIME_API_new_double_array_raw,
     SPVM_RUNTIME_API_new_object_array_raw,
     SPVM_RUNTIME_API_new_multi_array_raw,
-    SPVM_RUNTIME_API_new_value_t_array_raw,
+    SPVM_RUNTIME_API_new_value_array_raw,
     SPVM_RUNTIME_API_new_string_raw,
     SPVM_RUNTIME_API_new_pointer_raw,
     SPVM_RUNTIME_API_get_exception,
@@ -106,7 +106,7 @@ SPVM_ENV* SPVM_RUNTIME_create_env(SPVM_RUNTIME* runtime) {
     SPVM_RUNTIME_API_new_double_array,
     SPVM_RUNTIME_API_new_object_array,
     SPVM_RUNTIME_API_new_multi_array,
-    SPVM_RUNTIME_API_new_value_t_array,
+    SPVM_RUNTIME_API_new_value_array,
     SPVM_RUNTIME_API_new_string,
     SPVM_RUNTIME_API_new_pointer,
     SPVM_RUNTIME_API_get_package_var_id,
@@ -144,6 +144,27 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   
   runtime->basic_types = portable->basic_types;
   runtime->basic_types_length = portable->basic_types_length;
+  
+  // Create basic type rank(string_pool_id and rank)
+  runtime->sorted_basic_types = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(SPVM_BASIC_TYPE) * runtime->basic_types_length);
+  memcpy(runtime->sorted_basic_types, runtime->basic_types, sizeof(SPVM_BASIC_TYPE) * runtime->basic_types_length);
+  
+  // Sort basic type id
+  for (int32_t i = 0; i < runtime->basic_types_length - 1; i++) {
+    for (int32_t j = (runtime->basic_types_length - 1); j > i; j--) {
+      SPVM_RUNTIME_BASIC_TYPE* basic_type1 = &runtime->sorted_basic_types[j - 1];
+      SPVM_RUNTIME_BASIC_TYPE* basic_type2 = &runtime->sorted_basic_types[j];
+      
+      const char* basic_type1_name = &runtime->string_pool[basic_type1->name_id];
+      const char* basic_type2_name = &runtime->string_pool[basic_type2->name_id];
+      
+      if (strcmp(basic_type1_name, basic_type2_name) > 0) {
+        SPVM_RUNTIME_BASIC_TYPE temp = *(SPVM_RUNTIME_BASIC_TYPE*)&runtime->sorted_basic_types[j - 1];
+        *(SPVM_RUNTIME_BASIC_TYPE*)&runtime->sorted_basic_types[j - 1] = *(SPVM_RUNTIME_BASIC_TYPE*)&runtime->sorted_basic_types[j];
+        *(SPVM_RUNTIME_BASIC_TYPE*)&runtime->sorted_basic_types[j] = temp;
+      }
+    }
+  }
 
   runtime->fields = (SPVM_RUNTIME_FIELD*)portable->fields;
   runtime->fields_length = portable->fields_length;
@@ -158,23 +179,6 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
 
   // C function addresses(native or precompile)
   runtime->sub_cfunc_addresses = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(void*) * (runtime->subs_length + 1));
-
-  // build package symtable
-  runtime->package_symtable = SPVM_HASH_new(0);
-  for (int32_t package_id = 1; package_id < runtime->packages_length; package_id++) {
-    
-    SPVM_RUNTIME_PACKAGE* package = &runtime->packages[package_id];
-    const char* package_name = &runtime->string_pool[package->name_id];
-    SPVM_HASH_insert(runtime->package_symtable, package_name, strlen(package_name), package);
-  }
-
-  // build runtime basic type symtable
-  runtime->basic_type_symtable = SPVM_HASH_new(0);
-  for (int32_t basic_type_id = 0; basic_type_id < runtime->basic_types_length; basic_type_id++) {
-    SPVM_RUNTIME_BASIC_TYPE* runtime_basic_type = &runtime->basic_types[basic_type_id];
-    const char* runtime_basic_type_name = &runtime->string_pool[runtime_basic_type->name_id];
-    SPVM_HASH_insert(runtime->basic_type_symtable, runtime_basic_type_name, strlen(runtime_basic_type_name), runtime_basic_type);
-  }
   
   // Initialize Package Variables
   runtime->package_vars_heap = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(SPVM_VALUE) * (runtime->package_vars_length + 1));
@@ -203,9 +207,6 @@ void SPVM_RUNTIME_free(SPVM_ENV* env) {
   }
   
   free(runtime->mortal_stack);
-  
-  SPVM_HASH_free(runtime->basic_type_symtable);
-  SPVM_HASH_free(runtime->package_symtable);
 
   // Free package variables heap
   free(runtime->package_vars_heap);

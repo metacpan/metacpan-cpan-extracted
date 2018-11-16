@@ -1,0 +1,1 @@
+{"command":"diff -u lib/Outthentic.pm /tmp/Outthentic.pm; echo"}

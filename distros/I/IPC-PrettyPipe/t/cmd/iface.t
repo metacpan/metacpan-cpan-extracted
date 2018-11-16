@@ -1,14 +1,10 @@
 #! perl
 
-use strict;
-use warnings;
+use Test2::V0;
+use Test::Lib;
 
 use IPC::PrettyPipe::Cmd;
 
-use Test::Lib;
-use Test::Deep;
-use Test::More;
-use Test::Exception;
 
 sub new { IPC::PrettyPipe::Cmd->new( @_ ); }
 
@@ -25,13 +21,13 @@ test_attr(
     {
         desc => 'new: hash, args',
         new  => [ {
-                cmd  => 'true',
-                args => ['false'],
-                   debug => 1,
-                  }
+                cmd   => 'true',
+                args  => ['false'],
+                debug => 1,
+            }
         ],
         expected => { cmd => 'true' },
-        compare => [ [ 'args->elements->[0]', { name => 'false' } ], ],
+        compare  => [ [ 'args->elements->[0]', { name => 'false' } ], ],
     },
 
 
@@ -207,7 +203,7 @@ test_attr(
             [
                 'streams->elements->[0]',
                 {
-                    spec   => '>',
+                    spec => '>',
                     file => 'stdout'
                 }
             ],
@@ -222,20 +218,23 @@ test_attr(
 
 ### flush out corner cases
 
-throws_ok {
-    my $cmd = new( cmd => 'ls' );
+ok(
+    dies {
+        my $cmd = new( cmd => 'ls' );
 
-    $cmd->add( arg => sub { } );
-}
-qr/did not pass type constraint/, 'add: bad argument';
+        $cmd->add( arg => sub { } );
+    },
+    qr/did not pass type constraint/,
+    'add: bad argument'
+);
 
-throws_ok {
-    my $cmd = new( cmd => 'ls' );
-
-    $cmd->add( arg => ['l'] );
-}
-qr/missing value/, 'add array: not enough elements';
-
-
+ok(
+    dies {
+        my $cmd = new( cmd => 'ls' );
+        $cmd->add( arg => ['l'] );
+    },
+    qr/missing value/,
+    'add array: not enough elements'
+);
 
 done_testing;

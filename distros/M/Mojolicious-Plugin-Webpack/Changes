@@ -1,4 +1,11 @@
 Revision history for perl distribution Mojolicious-Plugin-Webpack
 
+0.02 2018-11-16T19:53:02+0900
+ - Fix markup.t
+
 0.01 2018-11-07T15:44:27+0900
- - Started project
+ - Will automatically setup webpack config files
+ - Can process CSS, JavaScript, Sass and Vue
+ - Can extend the webpack config file
+ - Add automatic installation of node modules
+ - Add crushinator for development

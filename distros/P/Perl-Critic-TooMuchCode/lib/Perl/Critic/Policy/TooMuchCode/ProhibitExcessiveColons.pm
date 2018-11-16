@@ -40,7 +40,7 @@ sub gather_violations_generic {
 
 =head1 NAME
 
-TooMuchCode::ProhibitExcessiveColons
+TooMuchCode::ProhibitExcessiveColons - Finds '::::::::' in module names.
 
 =head1 DESCRIPTION
 

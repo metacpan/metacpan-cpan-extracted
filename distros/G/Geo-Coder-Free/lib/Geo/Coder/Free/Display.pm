@@ -415,15 +415,15 @@ sub _pfopen {
 		next unless(-d $dir);
 		if($suffixes) {
 			foreach my $suffix(split(/:/, $suffixes)) {
-				$self->_debug({ message => "check for file $dir/$prefix.$suffix" });
-				my $rc = "$dir/$prefix.$suffix";
+				my $rc = File::Spec->catdir($dir, "$prefix.$suffix");
+				$self->_debug({ message => "check for file $rc" });
 				if(-r $rc) {
 					$savedpaths->{$candidate} = $rc;
 					return $rc;
 				}
 			}
 		} elsif(-r "$dir/$prefix") {
-			my $rc = "$dir/$prefix";
+			my $rc = File::Spec->catdir($dir, $prefix);
 			$savedpaths->{$candidate} = $rc;
 			$self->_debug({ message => "using $rc" });
 			return $rc;

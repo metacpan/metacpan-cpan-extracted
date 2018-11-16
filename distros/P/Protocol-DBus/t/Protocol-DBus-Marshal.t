@@ -151,16 +151,34 @@ my @marshal_le_tests = (
         ],
         out => "\x7f\0\0\0\2\0\0\0(\0\0\0\0\0\0\0\1\1o\0\37\0\0\0/org/freedesktop/NetworkManager\0",
     },
+
+    # Note the reuse of index 1 (STDOUT).
+    {
+        in => [
+            'hhyh',
+            [ \*STDERR, \*STDOUT, 2, \*STDOUT ],
+        ],
+        out => "\0\0\0\0\1\0\0\0\x02\0\0\0\1\0\0\0",
+        out_fds => [ map { fileno $_ } (\*STDERR, \*STDOUT) ],
+    },
 );
 
 for my $t (@marshal_le_tests) {
-    my $out = Protocol::DBus::Marshal::marshal_le( @{ $t->{'in'} } );
+    my ($out_sr, $out_fds) = Protocol::DBus::Marshal::marshal_le( @{ $t->{'in'} } );
 
     is(
-        $$out,
+        $$out_sr,
         $t->{'out'},
         'marshal_le(): ' . _terse_dump($t->{'in'}),
-    ) or diag _terse_dump( [ got => $out, wanted => $t->{'out'} ] );
+    ) or diag _terse_dump( [ got => $out_sr, wanted => $t->{'out'} ] );
+
+    if ($t->{'out_fds'}) {
+        is_deeply(
+            $out_fds,
+            $t->{'out_fds'},
+            '... and associated file handles',
+        );
+    }
 }
 
 #done_testing();

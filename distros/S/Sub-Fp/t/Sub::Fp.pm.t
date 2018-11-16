@@ -7,13 +7,14 @@ use Test::More;
 use Sub::Fp qw(
 incr         reduces   flatten
 drop_right  drop      take_right  take
-assoc       maps      decr      chain
+assoc       maps      decr        chain
 first       end       subarray    partial
 __          find      filter      some
 none        uniq      bool        spread   every
 len         is_array  is_hash     to_keys  to_vals
 noop        identity  is_empty    flow     eql
-is_sub
+is_sub      to_pairs  for_each    apply
+get
 );
 
 sub is_sub__returns_0_when_args_undef :Tests {
@@ -361,6 +362,51 @@ sub noop__returns_undef_when_args_filled :Tests {
 }
 
 
+sub for_each__returns_undef_when_args_undef :Tests {
+    my $result   = for_each();
+    my $expected = undef;
+
+    is_deeply($result, $expected);
+}
+
+sub for_each__itterates_through_each_val_in_collection :Tests {
+
+    my $result = [];
+
+    for_each(sub {
+        my $val = shift;
+        push @{ $result }, $val;
+    }, [1,2,3]);
+
+    is_deeply($result, [1,2,3]);
+}
+
+sub for_each__itterates_and_can_use_idx_in_collection :Tests {
+
+    my $result = [];
+
+    for_each(sub {
+        my (undef, $idx) = @_;
+        push @{ $result }, $idx;
+    }, ["I", "am", "a", "string"]);
+
+    is_deeply($result, [0, 1, 2, 3]);
+}
+
+sub for_each__itterates_and_can_use_collection_ref :Tests {
+
+    my $result = [];
+
+    for_each(sub {
+        my (undef, undef, $coll) = @_;
+        push @{ $result }, $coll;
+    }, [1,2,3]);
+
+    is_deeply($result, [[1,2,3], [1,2,3], [1,2,3]]);
+}
+
+
+
 sub maps__returns_empty_array_when_args_undef :Tests {
     is_deeply(maps(), []);
 }
@@ -657,42 +703,7 @@ sub every__returns_0_when_predicate_only_matches_some :Tests {
     )
 }
 
-sub every__returns_true_when_all_items_matche_iteratee_shorthand :Tests {
-    my $people = [
-        {
-            name    => 'sally',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'teacher',
-            }
-        },
-        {
-            name    => 'Bob',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'wrestler',
-            }
-        },
-        {
-            name    => 'Robert',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'unemployed',
-            }
-        },
-    ];
 
-    my $all_teachers_like_cheese = every(
-        {
-            details => {
-                favorite_foods => ['cheese'],
-            }
-        },
-        $people,
-    );
-
-    is ($all_teachers_like_cheese, 1);
-}
 
 sub bool__returns_0_when_undef :Tests {
     is(bool(), 0)
@@ -756,38 +767,7 @@ sub some__returns_false_if_none_match_predicate :Tests {
     );
 }
 
-sub some__returns_true_when_atleast_one_item_matches_iteratee_shorthand :Tests {
-    my $people = [
-        {
-            name    => 'sally',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'teacher',
-            }
-        },
-        {
-            name    => 'Bob',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'wrestler',
-            }
-        },
-        {
-            name    => 'Robert',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'unemployed',
-            }
-        },
-    ];
 
-    my $a_teacher_is_named_sally = some(
-        { name => 'sally' },
-        $people,
-    );
-
-    is ($a_teacher_is_named_sally, 1);
-}
 
 sub none__returns_true_when_empty_args :Tests {
     is(none(sub{}, []), 1);
@@ -818,42 +798,66 @@ sub none__returns_false_when_multi_matches_predicate :Tests {
     )
 }
 
-sub none__returns_true_when_no_items_matche_iteratee_shorthand :Tests {
-    my $people = [
-        {
-            name    => 'sally',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'teacher',
-            }
-        },
-        {
-            name    => 'Bob',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'wrestler',
-            }
-        },
-        {
-            name    => 'Robert',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'unemployed',
-            }
-        },
-    ];
 
-    my $nobody_likes_brussel_sprouts = none(
-        {
-            details => {
-                favorite_foods => ['brussel sprouts'],
-            }
-        },
-        $people,
-    );
 
-    is ($nobody_likes_brussel_sprouts, 1);
+sub to_pairs__returns_empty_array_when_args_undef :Tests {
+    is_deeply(to_pairs(), []);
 }
+
+sub to_pairs__returns_empty_array_when_empty_array :Tests {
+    is_deeply(to_pairs([]), []);
+}
+
+sub to_pairs__returns_array_of_idx_val_from_array :Tests {
+    is_deeply(
+        to_pairs(["I", "am", "some", "strings"]),
+        [[0, "I"], [1, "am"], [2, "some"], [3, "strings"]]
+    )
+}
+
+sub to_pairs__returns_array_of_idx_val_from_multi_array :Tests {
+    is_deeply(
+        to_pairs(["I", "am", "some", ["nestedArray"]]),
+        [[0, "I"], [1, "am"], [2, "some"], [3, ["nestedArray"]]]
+    )
+}
+
+sub to_pairs__returns_array_of_key_value_pairs_from_hash :Tests {
+    my $result   = to_pairs({ someKey => 'someValue', someOtherKey => 'someOtherValue' });
+    my $expected = [['someKey', 'someValue'], ['someOtherKey', 'someOtherValue']];
+
+    is_deeply(
+        [sort @{ $result }],
+        [sort @{ $result }]
+    );
+}
+
+sub to_pairs__returns_array_of_key_value_pairs_from_nested_hash :Tests {
+    my $result = to_pairs({
+        someKey      => 'someValue',
+        someOtherKey => {
+            nested => 'nestedValue'
+        }
+    });
+    my $expected = [['someKey', 'someValue'], ['someOtherKey', { nested => 'nestedValue' }]];
+
+    is_deeply(
+        [sort @{ $result }],
+        [sort @{ $result }]
+    );
+}
+
+sub to_pairs__returns_array_of_idx_char_from_string :Tests {
+    my $result   = to_pairs("I am the string");
+    my $expected = [[0, "I"], [1, "am"], [2, "the"], [3, "string"]];
+
+    is_deeply(
+        [sort @{ $result }],
+        [sort @{ $result }]
+    );
+}
+
+
 
 sub spread__returns_empty_list_when_args_undef :Tests {
     is_deeply(
@@ -924,51 +928,6 @@ sub find__returns_item_when_found_in_array :Tests {
     );
 }
 
-sub find__returns_item_based_on_iteratee_shorthand :Tests {
-    my $people = [
-        {
-            name    => 'sally',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'teacher',
-            }
-        },
-        {
-            name    => 'Bob',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'wrestler',
-            }
-        },
-        {
-            name    => 'Robert',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'unemployed',
-            }
-        },
-    ];
-
-    my $teachers = find(
-        {
-            details => {
-                occupation => 'teacher',
-            }
-        },
-        $people,
-    );
-
-    is_deeply(
-        $teachers,
-        {
-            name    => 'sally',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'teacher',
-            }
-        },
-    );
-}
 
 
 sub filter__returns_empty_when_empty_args :Tests {
@@ -992,60 +951,7 @@ sub filter__returns_multi_items_that_match_predicate :Tests {
     );
 }
 
-sub filter__returns_items_based_on_iteratee_shorthand :Tests {
-    my $people = [
-        {
-            name    => 'sally',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation => 'teacher',
-            }
-        },
-        {
-            name    => 'Bob',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'teacher',
-            }
-        },
-        {
-            name    => 'Robert',
-            details => {
-                favorite_foods => ["cheese", "bread", "oranges"],
-                occupation     => 'unemployed',
-            }
-        },
-    ];
 
-    my $teachers = filter(
-        {
-            details => {
-                occupation => 'teacher',
-            }
-        },
-        $people,
-    );
-
-    is_deeply(
-        $teachers,
-        [
-            {
-                name    => 'sally',
-                details => {
-                    favorite_foods => ["cheese", "bread", "oranges"],
-                    occupation => 'teacher',
-                }
-            },
-            {
-                name    => 'Bob',
-                details => {
-                    favorite_foods => ["cheese", "bread", "oranges"],
-                    occupation     => 'teacher',
-                }
-            },
-        ]
-    );
-}
 
 sub drop__returns_empty_array_when_empty_array :Tests {
     is_deeply(drop([]), []);
@@ -1197,6 +1103,64 @@ sub take_right__returns_new_array :Tests {
     my $array = [];
     ok($array != take($array))
 }
+
+
+
+sub get__returns_undef_when_args_undef :Tests {
+    is_deeply(get(), undef);
+}
+
+sub get__returns_value_at_single_level_hash_get :Tests {
+    my $hash = {
+        key1 => 'value1',
+    };
+
+    is_deeply(
+        get($hash, 'key1'),
+        'value1',
+    );
+}
+
+sub get__returns_value_at_single_level_array :Tests {
+    my $array = [100, 200, 300];
+
+    is_deeply(
+        get($array, 1),
+        200,
+    );
+}
+
+sub get__returns_value_at_single_level_string :Tests {
+    my $string = "String";
+
+    is_deeply(
+        get($string, 1),
+        "t",
+    );
+}
+
+sub get__returns_default_if_key_isnt_defined :Tests {
+    my $hash = {
+        key1 => 'value1'
+    };
+
+    is_deeply(
+        get($hash, 'nonKey', 'DEFAULT VALUE'),
+        "DEFAULT VALUE",
+    );
+}
+
+sub get__returns_value_not_default_when_value_falsy :Tests {
+    my $hash = {
+        key1 => 0,
+    };
+
+    is_deeply(
+        get($hash, 'key1', 'DEFAULT VALUE'),
+        0,
+    );
+}
+
 
 
 sub assoc_returns_undef_when_args_undef :Tests {
@@ -1385,6 +1349,43 @@ sub decr__returns_num_minus_one :Tests {
 
 sub decr__returns_num_minus_one_when_zero :Tests {
     is(decr(0), -1);
+}
+
+
+
+sub apply__calls_func_with_array_and_applies_as_args :Tests {
+    my $sum_all_nums = sub {
+        my $num        = shift;
+        my $second_num = shift;
+
+        return $num + $second_num;
+    };
+
+    my $result   = apply($sum_all_nums, [100, 200]);
+    my $expected = 300;
+
+    is($result, $expected);
+}
+
+sub apply__returns_undef_when_args_undef :Tests {
+    my $result   = apply();
+    my $expected = undef;
+
+    is_deeply($result, $expected);
+}
+
+sub apply__calls_func_with_empty_array :Tests {
+    my $sum_all_nums = sub {
+        my $num        = shift;
+        my $second_num = shift;
+
+        return $num + $second_num;
+    };
+
+    my $result   = apply($sum_all_nums, [100, 200]);
+    my $expected = 300;
+
+    is($result, $expected);
 }
 
 __PACKAGE__->runtests;

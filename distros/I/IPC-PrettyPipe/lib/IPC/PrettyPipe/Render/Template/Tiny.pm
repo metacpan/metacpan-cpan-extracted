@@ -1,28 +1,6 @@
-#!perl
-
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of IPC::PrettyPipe
-#
-# IPC::PrettyPipe is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
-
 package IPC::PrettyPipe::Render::Template::Tiny;
+
+# ABSTRACT: rendering backend using B<Template::Tiny>
 
 use Carp;
 use Template::Tiny;
@@ -32,12 +10,17 @@ use Moo;
 use Types::Standard -all;
 use Type::Params qw[ validate ];
 
+
+our $VERSION = '0.08';
+
 BEGIN {
     if ( $^O =~ /Win32/i ) {
         require Win32::Console::ANSI;
     }
 }
 use Term::ANSIColor ();
+
+use namespace::clean;
 
 
 has pipe => (
@@ -135,20 +118,18 @@ sub render {
 
     my $self = shift;
 
-    my ( $args ) = 
+    my ( $args ) =
       validate( \@_,
-		slurpy Dict[
-			    colorize => Optional[ Bool ],
-			   ]
-	      );
+                slurpy Dict[
+                            colorize => Optional[ Bool ],
+                           ]
+              );
 
 
 
     $args->{colorize} //= 1;    ## no critic (ProhibitAccessOfPrivateData)
 
     my $output;
-
-    my $colors = $self->colors;
 
     my %color;
     _colorize( $self->colors, \%color );
@@ -160,7 +141,7 @@ sub render {
     Template::Tiny->new->process(
         \$self->template,
         {
-	 ## no critic (ProhibitAccessOfPrivateData)
+         ## no critic (ProhibitAccessOfPrivateData)
             pipe => $self->pipe,
             $args->{colorize} ? ( color => \%color ) : (),
         },
@@ -174,11 +155,29 @@ with 'IPC::PrettyPipe::Renderer';
 
 1;
 
+#
+# This file is part of IPC-PrettyPipe
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory cmds renderer
 
 =head1 NAME
 
-B<IPC::PrettyPipe::Render::Template::Tiny> - rendering backend using B<Template::Tiny>
+IPC::PrettyPipe::Render::Template::Tiny - rendering backend using B<Template::Tiny>
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -194,7 +193,7 @@ B<IPC::PrettyPipe::Render::Template::Tiny> - rendering backend using B<Template:
 =head1 DESCRIPTION
 
 B<IPC::PrettyPipe::Render::Template::Tiny> implements the
-B<L<IPC::PrettyPipe::Renderer>> role, providing a renderding backend for
+B<L<IPC::PrettyPipe::Renderer>> role, providing a rendering backend for
 B<L<IPC::PrettyPipe>> using the B<L<Template::Tiny>> module.
 
 =head1 METHODS
@@ -224,7 +223,6 @@ A B<L<Template::Tiny>> template to generate the output.  See L</Rendering
 Template>.
 
 =back
-
 
 =item render
 
@@ -283,7 +281,6 @@ support loop constructs, so the B<L<IPC::PrettyPipe>> B<L<streams|IPC::PrettyPip
 B<L<cmds|IPC::PrettyPipe/cmds>> methods return B<L<IPC::PrettyPipe::Queue>> objects, which
 provide methods for determining if the lists are empty.
 
-
   [% IF pipe.streams.empty %][% ELSE %](\t\\
   [% END -%]
 
@@ -309,7 +306,6 @@ all colors at once.  Here's an example bit of template to output
 and colorize a command:
 
   [% color.cmd.cmd %][% cmd.cmd %][% color.reset %]
-
 
 =back
 
@@ -342,20 +338,44 @@ stored as a hashref with the following default contents:
       },
   },
 
+=head1 BUGS
 
-=head1 COPYRIGHT & LICENSE
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
+email to
+L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
 
-Copyright 2014 Smithsonian Astrophysical Observatory
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-This software is released under the GNU General Public License.  You
-may find a copy at
+=head1 SOURCE
 
-   http://www.fsf.org/copyleft/gpl.html
+The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
+and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
 
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<IPC::PrettyPipe|IPC::PrettyPipe>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut
-

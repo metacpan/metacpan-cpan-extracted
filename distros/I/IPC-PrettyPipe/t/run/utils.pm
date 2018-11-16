@@ -1,17 +1,17 @@
 package t::run::utils;
 
-use Test::Most;
-use Test::File;
+use Test2::V0;
+use Test2::API;
 
-use Test::Builder;
+use File::Slurper qw[ read_text ];
 
-use parent 'Exporter';
+use Exporter 'import';
 
 our @EXPORT = qw[ expect_files test_run ];
 
 sub expect_files {
 
-    my $Test = Test::Builder->new;
+    my $ctx = context;
 
     my %expected = map { $_ => 1 } @_;
 
@@ -19,15 +19,17 @@ sub expect_files {
 
     my @missing = grep { !$existing{$_} } keys %expected;
 
-    $Test->ok( !@missing, 'expected files' );
-    $Test->diag( "    missing file(s): ", join( ', ', @missing ) )
+    ok( !@missing, 'expected files' );
+    diag( "    missing file(s): ", join( ', ', @missing ) )
       if @missing;
 
     my @unexpected = grep { !$expected{$_} } keys %existing;
 
-    $Test->ok( !@unexpected, 'extra files' );
-    $Test->diag( "    found unexpected file(s): ", join( ', ', @unexpected ) )
+    ok( !@unexpected, 'extra files' );
+    diag( "    found unexpected file(s): ", join( ', ', @unexpected ) )
       if @unexpected;
+
+    $ctx->release;
 }
 
 sub test_run {
@@ -35,26 +37,23 @@ sub test_run {
 
     my $trap = shift;
 
-    my $Test = Test::Builder->new;
-
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $ctx = context;
 
     my %dispatch = (
 
-	die => sub { $Test->is_eq( $trap->die, $_[0], 'exception' ) },
+        die => sub { is( $trap->die, $_[0], 'exception' ) },
 
-        leaveby => sub { $Test->is_eq( $trap->leaveby, $_[0], 'leaveby' ) },
+        leaveby => sub { is( $trap->leaveby, $_[0], 'leaveby' ) },
 
         stdout => sub { my @re = 'ARRAY' eq ref $_[0] ? @{$_[0]} : $_[0];
-			$Test->like( $trap->stdout, $_, "stdout: $_" ) foreach @re;
-		    },
+                        like( $trap->stdout, $_, "stdout: $_" ) foreach @re;
+                    },
 
         stderr => sub { my @re = 'ARRAY' eq ref $_[0] ? @{$_[0]} : $_[0];
-			$Test->like( $trap->stderr, $_, "stderr: $_" ) foreach @re;
-		    },
+                        like( $trap->stderr, $_, "stderr: $_" ) foreach @re;
+                    },
 
         expect_files => sub {
-            local $Test::Builder::Level = $Test::Builder::Level + 1;
 
             expect_files( @{ $_[0] } );
         },
@@ -63,33 +62,27 @@ sub test_run {
 
             my ( $logfile, $expected ) = @{ $_[0] };
 
-            local $Test::Builder::Level = $Test::Builder::Level + 1;
+            my $have_logfile = -e $logfile;
 
-	    my $have_logfile = file_exists_ok( $logfile, 'exists' );
+            if ( $have_logfile ) {
+                my $log;
 
+                ok( $log = eval { do $logfile }, 'parse' );
+                is( $log, $expected, 'content' );
 
-	    if ( $have_logfile ) {
-		my $log;
+            }
 
-		ok( $log = eval { do $logfile }, 'parse' );
-		is_deeply( $log, $expected, 'content' );
-
-	    }
-
-	    else {
-		$Test->skip( "logfile $logfile doesn't exist" );
-	    }
+            else {
+                skip( "logfile $logfile doesn't exist" );
+            }
 
         },
 
         file_contains_like => sub {
 
-            local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-
             my %files = @{ $_[0] };
             while ( my ( $file, $qr ) = each %files ) {
-                file_contains_like( $file, $qr, "contents of file '$file'" );
+                like( read_text( $file ), $qr, "contents of file '$file'" );
             }
 
         },
@@ -114,13 +107,15 @@ sub test_run {
     while ( my ( $key, $value ) = splice( @_, 0, 2 ) ) {
 
         my $test = $dispatch{$key} // sub {
-            $Test->BAIL_OUT( "internal error: unknown test result: $key\n" );
+            BAIL_OUT( "internal error: unknown test result: $key\n" );
         };
 
         $test->( $value );
 
     }
 
+
+    $ctx->release;
 
 }
 

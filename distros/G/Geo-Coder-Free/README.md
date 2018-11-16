@@ -10,7 +10,7 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 # VERSION
 
-Version 0.14
+Version 0.15
 
 # SYNOPSIS
 
@@ -120,19 +120,19 @@ There is a sample website at [https://geocode.nigelhorne.com/](https://geocode.n
 
 # BUGS
 
-Lots of lookups fail at the moment.
+Some lookups fail at the moments, if you find one please file a bug report.
 
 The MaxMind data only contains cities.
-The openaddresses data doesn't cover the globe.
+The OpenAddresses data doesn't cover the globe.
 
 Can't parse and handle "London, England".
 
-See [Geo::Coder::Free::OpenAddresses](https://metacpan.org/pod/Geo::Coder::Free::OpenAddresses) for instructions creating its SQLite database from
-[http://results.openaddresses.io/](http://results.openaddresses.io/).
-
 # SEE ALSO
 
-VWF, openaddresses, MaxMind and geonames.
+VWF, OpenAddresses, MaxMind and geonames.
+
+See [Geo::Coder::Free::OpenAddresses](https://metacpan.org/pod/Geo::Coder::Free::OpenAddresses) for instructions creating the SQLite database from
+[http://results.openaddresses.io/](http://results.openaddresses.io/).
 
 # LICENSE AND COPYRIGHT
 
@@ -142,8 +142,8 @@ The program code is released under the following licence: GPL for personal use o
 All other users (including Commercial, Charity, Educational, Government)
 must apply in writing for a licence for use from Nigel Horne at \`&lt;njh at nigelhorne.com>\`.
 
-This product includes GeoLite2 data created by MaxMind, available from
-[https://www.maxmind.com/en/home](https://www.maxmind.com/en/home).
+This product uses GeoLite2 data created by MaxMind, available from
+[https://www.maxmind.com/en/home](https://www.maxmind.com/en/home). See their website for licensing information.
 
-This product includes data from Who's on First.
+This product uses data from Who's on First.
 See [https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.md](https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.md) for licensing information.

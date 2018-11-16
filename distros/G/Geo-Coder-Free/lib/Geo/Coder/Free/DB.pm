@@ -280,9 +280,6 @@ sub selectall_hash {
 			$self->{'logger'}->debug("selectall_hash $query");
 		}
 	}
-	my $sth = $self->{$table}->prepare($query);
-	$sth->execute(@args) || throw Error::Simple("$query: @args");
-
 	my $key = $query;
 	if(defined($args[0])) {
 		$key .= ' ' . join(', ', @args);
@@ -293,6 +290,9 @@ sub selectall_hash {
 			return @{$rc};
 		}
 	}
+	my $sth = $self->{$table}->prepare($query);
+	$sth->execute(@args) || throw Error::Simple("$query: @args");
+
 	my @rc;
 	while(my $href = $sth->fetchrow_hashref()) {
 		push @rc, $href;

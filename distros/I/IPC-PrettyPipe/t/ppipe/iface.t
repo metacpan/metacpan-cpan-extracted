@@ -1,24 +1,20 @@
 #! perl
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use IPC::PrettyPipe;
 use IPC::PrettyPipe::Cmd;
-
-use Test::More;
-use Test::Exception;
 
 use Test::Lib;
 use My::Tests;
 
 sub new { IPC::PrettyPipe->new( @_ ); }
 
-lives_ok {
+ok( lives {
 
     IPC::PrettyPipe->new();
-}
-'new';
+},
+'new' );
 
 test_attr(
     \&new,

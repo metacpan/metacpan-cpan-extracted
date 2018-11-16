@@ -40,11 +40,11 @@ Geo::Coder::Free::OpenAddresses - Provides a geocoding functionality to the data
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -271,6 +271,7 @@ sub geocode {
 	if($ap) {
 		if(my $error = $ap->parse($location)) {
 			# Carp::croak($ap->report());
+			# ::diag('Address parse failed: ', $ap->report());
 		} else {
 			my %c = $ap->components();
 			# ::diag(Data::Dumper->new([\%c])->Dump());
@@ -495,6 +496,7 @@ sub geocode {
 								if($href->{'number'}) {
 									if($county) {
 										if($rc = $self->_get($href->{'number'}, "$street$city$county$state", 'US')) {
+											$rc->{'country'} = 'US';
 											return $rc;
 										}
 									}
@@ -610,16 +612,19 @@ sub geocode {
 						my $first = uc($1);
 						my $second = uc($2);
 						if($rc = $self->_get("$first$second$state", 'CA')) {
+							$rc->{'country'} = 'CA';
 							return $rc;
 						}
 						# Perhaps it's a city in a county?
 						# Silver Spring, Montgomery County, MD, USA
 						$second =~ s/\s+COUNTY$//;
 						if($rc = $self->_get("$first$second$state", 'CA')) {
+							$rc->{'country'} = 'CA';
 							return $rc;
 						}
 						# Not all the database has the county
 						if($rc = $self->_get("$first$state", 'CA')) {
+							$rc->{'country'} = 'CA';
 							return $rc;
 						}
 						# Brute force last ditch approach
@@ -642,18 +647,21 @@ sub geocode {
 			} else {
 				# Currently only handles Town, Region, Country
 				# TODO: add addresses support
-				if($c eq 'au') {
-					my $sc = Locale::SubCountry->new(uc($c));
-					if(my $abbrev = $sc->code(ucfirst(lc($state)))) {
+				if(($c eq 'au') && (length($state) > 3)) {
+					if(my $abbrev = Locale::SubCountry->new('AU')->code(ucfirst(lc($state)))) {
 						if($abbrev ne 'unknown') {
 							$state = $abbrev;
 						}
 					}
 				}
-				if($city =~ /^(\w[\w\s]+),\s*([\w\s]+)/) {
+				if($city =~ /^(\w[\w\s]+),\s*([,\w\s]+)/) {
 					# City includes a street name
 					my $street = uc($1);
 					$city = uc($2);
+					# TODO: Configurable - or better still remove the need
+					if($city eq 'MINSTER, THANET') {
+						$city = 'RAMSGATE';
+					}
 					if($street =~ /(.+)\s+STREET$/) {
 						$street = "$1 ST";
 					} elsif($street =~ /(.+)\s+ROAD$/) {
@@ -692,7 +700,14 @@ sub geocode {
 					}
 				}
 				if(my $rc = $self->_get("$city$state$c")) {
-					return $rc;
+					return {
+						'number' => undef,
+						'street' => undef,
+						'city' => $city,
+						'state' => $state,
+						'country' => $country,
+						%{$rc}
+					};
 				}
 			}
 		}
@@ -815,12 +830,13 @@ sub _search {
 	}
 }
 
+# State must be the abbreviated form
 sub _get {
 	my ($self, @location) = @_;
 
 	my $location = join('', @location);
 	$location =~ s/,\s*//g;
-	# ::diag($location);
+	# ::diag("_get: $location");
 	my $digest = substr Digest::MD5::md5_base64(uc($location)), 0, 16;
 	# my @call_details = caller(0);
 	# print "line ", $call_details[2], "\n";
@@ -897,6 +913,8 @@ sub _normalize {
 		return 'PL';
 	} elsif(($type eq 'GRDNS') || ($type eq 'GARDENS')) {
 		return 'GRDNS';
+	} elsif(($type eq 'HWY') || ($type eq 'HIGHWAY')) {
+		return 'HWY';
 	}
 
 	# Most likely failure of Geo::StreetAddress::US, but warn anyway, just in case

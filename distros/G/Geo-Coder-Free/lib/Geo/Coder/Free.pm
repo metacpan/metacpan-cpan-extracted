@@ -5,6 +5,7 @@ use warnings;
 
 use lib '.';
 
+use Config::Auto;
 use Geo::Coder::Free::MaxMind;
 use Geo::Coder::Free::OpenAddresses;
 use List::MoreUtils;
@@ -16,11 +17,13 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
+
+our $alternatives;
 
 =head1 SYNOPSIS
 
@@ -70,8 +73,21 @@ sub new {
 	# Geo::Coder::Free->new not Geo::Coder::Free::new
 	return unless($class);
 
+	if(!$alternatives) {
+		my $keep = $/;
+		local $/ = undef;
+		my $data = <DATA>;
+		$/ = $keep;
+
+		$alternatives = Config::Auto->new(source => $data)->parse();
+		foreach my $entry(keys %{$alternatives}) {
+			$alternatives->{$entry} = join(', ', @{$alternatives->{$entry}});
+		}
+	}
+
 	my $rc = {
-		maxmind => Geo::Coder::Free::MaxMind->new(%param)
+		maxmind => Geo::Coder::Free::MaxMind->new(%param),
+		alternatives => $alternatives
 	};
 
 	if((!$param{'openaddr'}) && $ENV{'OPENADDR_HOME'}) {
@@ -150,6 +166,20 @@ sub geocode {
 			return @rc if($rc[0]);
 		} elsif(my $rc = $self->{'openaddr'}->geocode(\%param)) {
 			return $rc;
+		}
+		if((!$param{'scantext'}) && (my $alternatives = $self->{'alternatives'})) {
+			# Try some alternatives, would be nice to read this from somewhere on line
+			my $location = $param{'location'};
+			foreach my $left(keys %{$alternatives}) {
+				if($location =~ $left) {
+					# ::diag($left, '=>', $alternatives->{$left});
+					$location =~ s/$left/$alternatives->{$left}/;
+					$param{'location'} = $location;
+					if(my $rc = $self->geocode(\%param)) {
+						return $rc;
+					}
+				}
+			}
 		}
 	}
 
@@ -251,19 +281,19 @@ There is a sample website at L<https://geocode.nigelhorne.com/>.  The source cod
 
 =head1 BUGS
 
-Lots of lookups fail at the moment.
+Some lookups fail at the moments, if you find one please file a bug report.
 
 The MaxMind data only contains cities.
-The openaddresses data doesn't cover the globe.
+The OpenAddresses data doesn't cover the globe.
 
 Can't parse and handle "London, England".
 
-See L<Geo::Coder::Free::OpenAddresses> for instructions creating its SQLite database from
-L<http://results.openaddresses.io/>.
-
 =head1 SEE ALSO
 
-VWF, openaddresses, MaxMind and geonames.
+VWF, OpenAddresses, MaxMind and geonames.
+
+See L<Geo::Coder::Free::OpenAddresses> for instructions creating the SQLite database from
+L<http://results.openaddresses.io/>.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -273,12 +303,18 @@ The program code is released under the following licence: GPL for personal use o
 All other users (including Commercial, Charity, Educational, Government)
 must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
 
-This product includes GeoLite2 data created by MaxMind, available from
-L<https://www.maxmind.com/en/home>.
+This product uses GeoLite2 data created by MaxMind, available from
+L<https://www.maxmind.com/en/home>. See their website for licensing information.
 
-This product includes data from Who's on First.
+This product uses data from Who's on First.
 See L<https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.md> for licensing information.
 
 =cut
 
 1;
+
+# Common mappings allowing looser lookups
+# Would be nice to read this from somewhere on-line
+__DATA__
+St Lawrence, Thanet, Kent = Ramsgate, Kent
+St Peters, Thanet, Kent = St Peters, Kent

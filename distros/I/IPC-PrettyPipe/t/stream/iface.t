@@ -1,12 +1,8 @@
 #! perl
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use IPC::PrettyPipe::Stream;
-
-use Test::More;
-use Test::Exception;
 
 use Test::Lib;
 use My::Tests;
@@ -24,44 +20,26 @@ test_attr(
 
     {
         desc => 'spec+file',
-        new      => [ [ '>' => 'output' ] ],
+        new => [ [ '>' => 'output' ] ],
         expected => {
-            spec   => '>',
+            spec => '>',
             file => 'output'
         }
     },
 
     {
         desc => '> no file, strict = 0',
-        new      => [
-                      { spec => '>', strict => 0 }
-                    ],
+        new      => [               { spec => '>', strict => 0 } ],
         expected => { requires_file => 1 }
     },
 
 );
 
 
-throws_ok {
+like( dies { new( '>>>' ) }, qr/cannot parse/, "bad spec" );
 
-    new( '>>>' );
+like( dies { new( '>' ) }, qr/requires a file/, '> no file' );
 
-}
-qr/cannot parse/, "bad spec";
-
-throws_ok {
-
-    new( '>' );
-
-}
-qr/requires a file/, '> no file';
-
-
-throws_ok {
-
-    new( '<' );
-
-}
-qr/requires a file/, '< no file';
+like( dies { new( '<' ) }, qr/requires a file/, '< no file' );
 
 done_testing;

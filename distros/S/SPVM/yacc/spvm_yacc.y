@@ -18,9 +18,9 @@
 %}
 
 %token <opval> PACKAGE HAS SUB OUR ENUM MY SELF USE 
-%token <opval> DESCRIPTOR CONST
+%token <opval> DESCRIPTOR
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT EVAL
-%token <opval> NAME VAR_NAME CONSTANT
+%token <opval> NAME VAR_NAME CONSTANT PACKAGE_VAR_NAME MAYBE_SUB_NAME
 %token <opval> RETURN WEAKEN CROAK NEW
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
 %token <opval> AMPERSAND DOT3
@@ -40,10 +40,10 @@
 %type <opval> array_access field_access weaken_field weaken_array_element convert_type array_length 
 %type <opval> deref ref assign incdec
 %type <opval> new array_init isa
-%type <opval> my_var var
+%type <opval> my_var var package_var_access
 %type <opval> term opt_normal_terms normal_terms normal_term logical_term relative_term
 %type <opval> field_name sub_name
-%type <opval> type basic_type array_type array_type_with_length const_array_type ref_type  type_or_void
+%type <opval> type basic_type array_type array_type_with_length ref_type  type_or_void
 
 %right <opval> ASSIGN SPECIAL_ASSIGN
 %left <opval> OR
@@ -222,19 +222,19 @@ enumeration_values
   | enumeration_value
   
 enumeration_value
-  : NAME
+  : sub_name
     {
       $$ = SPVM_OP_build_enumeration_value(compiler, $1, NULL);
     }
-  | NAME ASSIGN CONSTANT
+  | sub_name ASSIGN CONSTANT
     {
       $$ = SPVM_OP_build_enumeration_value(compiler, $1, $3);
     }
 
 our
-  : OUR var ':' type
+  : OUR PACKAGE_VAR_NAME ':' opt_descriptors type
     {
-      $$ = SPVM_OP_build_our(compiler, $2, $4);
+      $$ = SPVM_OP_build_our(compiler, $1, $2, $4, $5);
     }
 
 has
@@ -576,6 +576,7 @@ term
 
 normal_term
   : var
+  | package_var_access
   | CONSTANT
     {
       $$ = SPVM_OP_build_constant(compiler, $1);
@@ -780,9 +781,17 @@ array_access
     }
 
 call_sub
-  : sub_name '(' opt_normal_terms  ')'
+  : NAME '(' opt_normal_terms  ')'
     {
       $$ = SPVM_OP_build_call_sub(compiler, NULL, $1, $3);
+    }
+  | MAYBE_SUB_NAME '(' opt_normal_terms')'
+    {
+      $$ = SPVM_OP_build_call_sub(compiler, NULL, $1, $3);
+    }
+  | MAYBE_SUB_NAME opt_normal_terms
+    {
+      $$ = SPVM_OP_build_call_sub(compiler, NULL, $1, $2);
     }
   | basic_type ARROW sub_name '(' opt_normal_terms  ')'
     {
@@ -807,7 +816,6 @@ call_sub
       SPVM_OP* op_sub_name = SPVM_OP_new_op_name(compiler, "", $2->file, $2->line);
       $$ = SPVM_OP_build_call_sub(compiler, $1, op_sub_name, $4);
     }
-
 field_access
   : normal_term ARROW '{' field_name '}'
     {
@@ -916,10 +924,15 @@ var
       $$ = SPVM_OP_build_var(compiler, $1);
     }
 
+package_var_access
+  : PACKAGE_VAR_NAME
+    {
+      $$ = SPVM_OP_build_package_var_access(compiler, $1);
+    }
+
 type
   : basic_type
   | array_type
-  | const_array_type
   | ref_type
 
 basic_type
@@ -992,12 +1005,6 @@ array_type
       $$ = SPVM_OP_build_array_type(compiler, $1, NULL);
     }
 
-const_array_type
-  : CONST array_type
-    {
-      $$ = SPVM_OP_build_const_array_type(compiler, $2);
-    }
-
 array_type_with_length
   : basic_type '[' normal_term ']'
     {
@@ -1015,7 +1022,12 @@ type_or_void
       $$ = SPVM_OP_new_op_void_type(compiler, compiler->cur_file, compiler->cur_line);
     }
 
-field_name : NAME
-sub_name : NAME
+field_name
+  : NAME
+  | MAYBE_SUB_NAME
+
+sub_name
+  : NAME
+  | MAYBE_SUB_NAME
 
 %%

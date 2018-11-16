@@ -18,6 +18,7 @@ no_index:
     - t
     - inc
 requires:
+  IO::Socket::SSL::PublicSuffix: '0'
   Mail::DKIM::Iterator: '1.002'
   Mail::SPF::Iterator: '1.115'
 resources:
@@ -25,5 +26,5 @@ resources:
   homepage: https://github.com/noxxi/p5-mail-dmarc-iterator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/noxxi/p5-mail-dmarc-iterator
-version: '0.012'
+version: '0.013'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

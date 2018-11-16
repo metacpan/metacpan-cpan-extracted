@@ -45,9 +45,9 @@ WriteMakefile(
         'Exporter'                => 0,
         'Parse::ANSIColor::Tiny'  => 0,
         'Term::ANSIColor'         => 0,
-        'Term::Choose'            => '1.628',
-        'Term::Choose::LineFold'  => '1.628',
-        'Term::Choose::Constants' => '1.628',
+        'Term::Choose'            => '== 1.628',
+        'Term::Choose::LineFold'  => '== 1.628',
+        'Term::Choose::Constants' => '== 1.628',
         'Text::ANSI::WideUtil'    => 0,
         %prereqs_os_specific
     },

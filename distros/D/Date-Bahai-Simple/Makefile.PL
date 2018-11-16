@@ -21,7 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'              => '2.000000',
         'namespace::clean' => '0.24',
-        'Date::Utils'      => '0.22',
+        'Date::Utils'      => '0.24',
         'Time::localtime'  => '1.02',
         'Astro::Utils'     => '0.01',
     },
@@ -30,7 +30,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Bahai::Simple' => { file => 'lib/Date/Bahai/Simple.pm', version => '0.21' },
+            'Date::Bahai::Simple' => { file => 'lib/Date/Bahai/Simple.pm', version => '0.22' },
         },
         resources => {
             repository => {

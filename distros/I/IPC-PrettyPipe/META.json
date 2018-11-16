@@ -1,46 +1,96 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "manage human readable external command execution pipelines",
    "author" : [
-      "Diab Jerius"
+      "Diab Jerius <djerius@cpan.org>"
    ],
-   "dynamic_config" : "0",
-   "generated_by" : "Module::Install version 1.10, CPAN::Meta::Converter version 2.131560",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IPC-PrettyPipe",
    "no_index" : {
       "directory" : [
+         "eg",
+         "examples",
          "inc",
+         "share",
          "t",
          "xt"
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "6.36"
-         }
-      },
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "ExtUtils::MakeMaker" : "6.36"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "Module::Install" : "0",
-            "Module::Install::AuthorTests" : "0",
-            "Module::Install::CPANfile" : "0",
-            "Test::NoBreakpoints" : "0",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::AutoMetaResources" : "0",
+            "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::CheckMetaResources" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
+            "Dist::Zilla::Plugin::DynamicPrereqs" : "0",
+            "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::EnsurePrereqsInstalled" : "0",
+            "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Plugin::InsertCopyright" : "0",
+            "Dist::Zilla::Plugin::InsertExample" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::PodCoverageTests" : "0",
+            "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
+            "Dist::Zilla::Plugin::Readme::Brief" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::Regenerate" : "0",
+            "Dist::Zilla::Plugin::RewriteVersion" : "0",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
+            "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::DistManifest" : "0",
+            "Dist::Zilla::Plugin::Test::Fixme" : "0",
+            "Dist::Zilla::Plugin::Test::NoBreakpoints" : "0",
+            "Dist::Zilla::Plugin::Test::NoTabs" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
+            "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
+            "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
+            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
+            "Dist::Zilla::Plugin::Test::Version" : "0",
+            "Dist::Zilla::PluginBundle::Basic" : "0",
+            "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Weaver::Plugin::StopWords" : "0",
+            "Pod::Weaver::Section::BugsAndLimitations" : "0",
+            "Pod::Weaver::Section::SeeAlso" : "0",
+            "Software::License::GPL_3" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::DistManifest" : "0",
+            "Test::More" : "0.88",
+            "Test::NoBreakpoints" : "0.15",
+            "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
-            "Test::Pod" : "0",
-            "Test::Pod::Coverage" : "0"
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::TrailingSpace" : "0.0203",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -52,7 +102,7 @@
             "Module::Load" : "0",
             "Module::Runtime" : "0",
             "Moo" : "1.001000",
-            "MooX::Attributes::Shadow" : "0",
+            "MooX::Attributes::Shadow" : "0.05",
             "Safe::Isa" : "0",
             "String::ShellQuote" : "0",
             "Template::Tiny" : "0",
@@ -63,28 +113,110 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "Data::Dumper" : "0",
             "Devel::FindPerl" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Slurper" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
             "File::pushd" : "0",
+            "Getopt::Long" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Moo" : "1.001000",
+            "Scalar::Util" : "0",
+            "Template::Tiny" : "0",
+            "Term::ANSIColor" : "0",
+            "Test2::API" : "0",
+            "Test2::V0" : "0",
             "Test::Base" : "0",
-            "Test::Deep" : "0",
-            "Test::Exception" : "0",
-            "Test::File" : "0",
             "Test::Lib" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0",
-            "Test::Trap" : "0"
+            "Test::Trap" : "0",
+            "Types::Standard" : "0"
          }
+      }
+   },
+   "provides" : {
+      "IPC::PrettyPipe" : {
+         "file" : "lib/IPC/PrettyPipe.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Arg" : {
+         "file" : "lib/IPC/PrettyPipe/Arg.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Arg::Format" : {
+         "file" : "lib/IPC/PrettyPipe/Arg/Format.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Cmd" : {
+         "file" : "lib/IPC/PrettyPipe/Cmd.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::DSL" : {
+         "file" : "lib/IPC/PrettyPipe/DSL.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Execute::IPC::Run" : {
+         "file" : "lib/IPC/PrettyPipe/Execute/IPC/Run.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Executor" : {
+         "file" : "lib/IPC/PrettyPipe/Executor.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Format" : {
+         "file" : "lib/IPC/PrettyPipe/Format.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Queue" : {
+         "file" : "lib/IPC/PrettyPipe/Queue.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Queue::Element" : {
+         "file" : "lib/IPC/PrettyPipe/Queue/Element.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Render::Template::Tiny" : {
+         "file" : "lib/IPC/PrettyPipe/Render/Template/Tiny.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Renderer" : {
+         "file" : "lib/IPC/PrettyPipe/Renderer.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Stream" : {
+         "file" : "lib/IPC/PrettyPipe/Stream.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Stream::Utils" : {
+         "file" : "lib/IPC/PrettyPipe/Stream/Utils.pm",
+         "version" : "0.08"
+      },
+      "IPC::PrettyPipe::Types" : {
+         "file" : "lib/IPC/PrettyPipe/Types.pm",
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
+         "mailto" : "bug-IPC-PrettyPipe@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe"
       },
       "repository" : {
-         "url" : "http://bitbucket.org/djerius/ipc-prettypipe"
+         "type" : "git",
+         "url" : "git://github.com/djerius/ipc-prettypipe.git",
+         "web" : "https://github.com/djerius/ipc-prettypipe"
       }
    },
-   "version" : "0.03"
+   "version" : "0.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
+

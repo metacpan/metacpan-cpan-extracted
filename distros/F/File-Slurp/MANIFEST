@@ -18,6 +18,7 @@ t/01-error_read_file.t
 t/01-error_write_file.t
 t/append_null.t
 t/binmode.t
+t/data_glob.t
 t/data_section.t
 t/edit_file.t
 t/error.t
@@ -27,6 +28,7 @@ t/inode.t
 t/large.t
 t/lib/FileSlurpTest.pm
 t/lib/FileSlurpTestOverride.pm
+t/lib/FSGlobby.pm
 t/newline.t
 t/no_clobber.t
 t/original.t

@@ -14,11 +14,10 @@ use Types::Standard qw( Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v0.2.1';
 
 
 sub VERSION { # for older Perls
-    my ( $class, $wanted ) = @_;
     require version;
     return version->parse($VERSION);
 }
@@ -118,7 +117,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.2.0
+version v0.2.1
 
 =head1 SYNOPSIS
 
@@ -168,6 +167,11 @@ This allows you to set the attribute I<once>. The value is coerced
 into a constant, and cannot be changed again.
 
 =for Pod::Coverage VERSION
+
+=head1 ROADMAP
+
+Support for Perl versions earlier than 5.10 will be removed sometime
+in 2019.
 
 =head1 SEE ALSO
 

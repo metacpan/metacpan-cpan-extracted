@@ -1,24 +1,33 @@
 {
-   "abstract" : "chip driver for an F<ADT7470>",
+   "abstract" : "unknown",
    "author" : [
-      "the author"
+      "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Device-Chip-ADT7470",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Device::Chip::Adapter" : "0",
-            "Test::Exception" : "0.43",
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -26,22 +35,14 @@
             "Carp" : "0",
             "Data::Bitfield" : "0",
             "Device::Chip" : "0.04",
-            "Device::Chip::Base::RegisteredI2C" : "0.10"
+            "Device::Chip::Base::RegisteredI2C" : "0.10",
+            "Test::Device::Chip::Adapter" : "0",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.88"
          }
       }
    },
-   "provides" : {
-      "Device::Chip::ADT7470" : {
-         "file" : "lib/Device/Chip/ADT7470.pm",
-         "version" : "0.01"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
-   },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,6 +1,9 @@
 Revision history for Term::Choose_HAE
 
 
+0.057   2018-11-16
+        - "Term::Choose" version has to be "1.628".
+
 0.056   2018-11-12
         - Adapted to "Term::Choose 1.628".
         - "Term::Choose": minimum version "1.628".

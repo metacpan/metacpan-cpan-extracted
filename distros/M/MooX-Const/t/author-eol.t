@@ -18,6 +18,7 @@ my @files = (
     'lib/MooX/Const.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/10-has.t',
     't/20-moo.t',
     't/author-clean-namespaces.t',
     't/author-critic.t',

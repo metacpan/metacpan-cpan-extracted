@@ -1,4 +1,70 @@
-Revision history for Perl extension IPC::PrettyPipe
+Revision history for IPC-PrettyPipe
+
+0.08      2018-11-16 14:27:40-05:00 America/New_York
+
+
+      * No changes from previous release.
+      * Promote to stable.
+
+
+0.07      2018-11-15 10:03:28-05:00 America/New_York (TRIAL RELEASE)
+
+
+  [BUILD FIX]
+
+     * previous release had an incomplete Makefile.PL, causing
+       failures on Windows
+
+     * note to self: don't release under Dist::Zilla::Shell.
+       Dist::Zilla::Plugin::DynamicPrereqs isn't designed to be run in
+       that environment.  It munges Makefile.PL and caches what it has
+       done to avoid duplication. Unfortunately, this means that
+       Makefile.PL will not be properly munged after the first build.
+
+
+0.06      2018-11-09 16:24:42-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD FIX]
+
+     * test dependencies were incompletely listed in dist.ini
+     * tests now moved as much as possible to Test2::V0
+
+
+0.05      2018-11-09 16:24:42-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUG FIX ]
+
+     * Fix RT# 108397. Finally. (srezic++)
+
+
+0.04      2018-11-07 17:01:33-05:00 America/New_York (TRIAL RELEASE)
+
+  [BUILD FIX]
+
+     * switch from Module::Install to Dist::Zilla + EU::MM
+
+
+0.03_03 2014-08-05T12:58:51-0400
+  [BUG FIX]
+
+     * make work on Perl 5.10.0; see
+       http://www.cpantesters.org/cpan/report/15ef7e40-150f-11e4-b698-db7a2867dcfa
+
+0.03_02 2014-07-21T17:29:59-0400
+
+  [BUILD FIX]
+
+     * remove extraneous dependency on Exporter::Tiny. Jumped the gun
+       on
+       http://www.cpantesters.org/cpan/report/0c9e658d-6c00-1014-9524-043f55012b15,
+       which reported a problem, but it's with Type::Tiny; this module
+       doesn't doesn't explicitly use it.  Might be a tester problem.
+
+
+0.03_01 2014-07-21T17:21:35-0400
+
+  [BUILD FIX]
+     * add missing dependency on Exporter::Tiny
 
 0.03	2014-07-18T16:42:33-0400
 

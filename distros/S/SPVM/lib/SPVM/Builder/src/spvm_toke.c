@@ -24,6 +24,8 @@
 #include "spvm_basic_type.h"
 #include "spvm_my.h"
 #include "spvm_string_buffer.h"
+#include "spvm_sub.h"
+#include "spvm_package.h"
 
 SPVM_OP* SPVM_TOKE_newOP(SPVM_COMPILER* compiler, int32_t type) {
   
@@ -80,7 +82,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             return 0;
           }
           else if (op_use_stack->length > 0) {
-            SPVM_OP* op_use = SPVM_LIST_pop(op_use_stack);
+            SPVM_OP* op_use = SPVM_LIST_shift(op_use_stack);
             
             const char* package_name = op_use->uv.use->op_type->uv.type->basic_type->name;
             
@@ -827,7 +829,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               compiler->state_var_expansion = SPVM_TOKE_C_STATE_VAR_EXPANSION_SECOND_CONCAT;
             }
             
-            return VAR_NAME;
+            // Package variable
+            if (isupper(var_name[1]) || strstr(var_name, "::")) {
+              return PACKAGE_VAR_NAME;
+            }
+            // Lexical variable
+            else {
+              return VAR_NAME;
+            }
           }
         }
         /* Number literal */
@@ -1081,7 +1090,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             SPVM_HASH_insert(compiler->name_symtable, keyword, str_len, keyword);
           }
           
-          if (!expect_sub_name) {
+          if (expect_sub_name) {
+            SPVM_LIST_push(compiler->current_sub_names, keyword);
+          }
+          else {
             switch (keyword[0]) {
               // Keyword
               case 'b' :
@@ -1098,10 +1110,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "croak") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CROAK);
                   return CROAK;
-                }
-                else if (strcmp(keyword, "const") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CONST);
-                  return CONST;
                 }
                 break;
               case 'd' :
@@ -1361,8 +1369,32 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, keyword, compiler->cur_file, compiler->cur_line);
           yylvalp->opval = op_name;
+
+          // Name is subroutine if core function or already define sub
+          int32_t is_sub_name = 0;
+          SPVM_PACKAGE* core_package = SPVM_HASH_fetch(compiler->package_symtable, "SPVM::CORE", strlen("SPVM::CORE"));
+          if (core_package) {
+            SPVM_SUB* found_core_sub = SPVM_HASH_fetch(core_package->sub_symtable, keyword, strlen(keyword));
+            if (found_core_sub) {
+              is_sub_name = 1;
+            }
+            else {
+              for (int32_t sub_index = 0; sub_index < compiler->current_sub_names->length; sub_index++) {
+                const char* current_sub = (const char*)SPVM_LIST_fetch(compiler->current_sub_names, sub_index);
+                if (strcmp(keyword, current_sub) == 0) {
+                  is_sub_name = 1;
+                  break;
+                }
+              }
+            }
+          }
           
-          return NAME;
+          if (is_sub_name) {
+            return MAYBE_SUB_NAME;
+          }
+          else {
+            return NAME;
+          }
         }
         
         /* Return character */

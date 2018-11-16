@@ -1,59 +1,76 @@
 IPC::PrettyPipe
 
-NAME
+Connecting a series of programs via pipes is a time honored tradition.
+When it comes to displaying them for debug or informational purposes,
+simple dumps may suffice for simple pipelines, but when the number of
+programs and arguments grows large, it can become difficult to
+understand the overall structure of the pipeline.
 
-    IPC::PrettyPipe - human readable command pipelines
+IPC::PrettyPipe provides a mechanism to construct and output readable
+external command execution pipelines. It does this by treating commands,
+their options, and the options' values as separate entities so that it
+can produce nicely formatted output.
 
-DESCRIPTION
+It is designed to be used in conjunction with other modules which
+actually execute pipelines, such as IPC::Run
 
-    IPC::PrettyPipe provides a mechanism to maintain human readable
-    execution pipelines.  Pipelines are created by adding commands to
-    a IPC::PrettyPipe object.  Options to the commands are set using a
-    readable format; IPC::PrettyPipe takes care of quoting strings,
-    sticking equal signs in, etc.  The pipeline may be rendered into a
-    nicely formatted string, as well as being executed.
+This module (and its siblings IPC::PrettyPipe::Cmd,
+IPC::PrettyPipe::Arg, and IPC::PrettyPipe::Stream) present the
+object-oriented interface for manipulating the underlying
+infrastructure.
 
+For a simpler, more intuitive means of constructing pipelines, see
+IPC::PrettyPipe::DSL.
+
+  Pipeline Rendering (Pretty Printing)
+
+IPC::PrettyPipe doesn't render a pipeline directly; instead it passes
+that job on to another object (which must consume the
+IPC::PrettyPipe::Renderer role).
+
+By default IPC::PrettyPipe provides a renderer which uses Template::Tiny
+to render a pipeline as if it were to be fed to a POSIX shell (which can
+be handy for debugging complex pipelines).
+
+The same renderer may be fed a different template to use, or it may be
+replaced via the "renderer" attribute.
+
+  Pipeline Execution
+
+Just as with rendering, IPC::PrettyPipe doesn't execute a pipeline on
+its own. Instead it calls upon another object (which must consume the
+IPC::PrettyPipe::Executor role). By default it provides an executor
+which uses IPC::Run to run the pipeline. The executor may be replaced
+via the "executor" attribute.
+
+  Rewriting Commands' argument values
+
+Sometimes it's not possible to fill in an argument's value until after a
+pipeline has been created. The "valsubst" method allows altering them
+after the fact.
 
 INSTALLATION
 
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    To compile, test and install:
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-CHANGES
+COPYRIGHT AND LICENSE
 
-    See the Changes file for more details
+This software is Copyright (c) 2018 by Smithsonian Astrophysical
+Observatory.
 
-COPYRIGHT
+This is free software, licensed under:
 
---8<--8<--8<--8<--
-
-Copyright (C) 2014 Smithsonian Astrophysical Observatory
-
-This file is part of IPC::PrettyPipe
-
-IPC::PrettyPipe is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
--->8-->8-->8-->8--
-
-
-AUTHOR
-
-    Diab Jerius (djerius@cpan.org)
-
+  The GNU General Public License, Version 3, June 2007

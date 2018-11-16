@@ -1,14 +1,10 @@
 #! perl
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use IPC::PrettyPipe::DSL qw[ ppipe ] ;
 
-use Test::More;
-use Test::Exception;
-
-lives_and {
+try_ok {
     is( ppipe( [ 'ls', [ '-a', '%OUTPUT%' ] ] )
         ->valmatch( qr/%OUTPUT%/ ),
         1
@@ -16,7 +12,7 @@ lives_and {
 }
 'valmatch: value, matched';
 
-lives_and {
+try_ok {
     is( ppipe( [ 'ls', [ '-a', '%INPUT%' ] ] )
         ->valmatch( qr/%OUTPUT%/ ),
         0
@@ -25,14 +21,14 @@ lives_and {
 'valmatch: value, not matched';
 
 
-lives_and {
+try_ok {
     is( ppipe( [ 'ls', '-l' ] )->valmatch( qr/%INPUT%/ ),
         0
       );
 }
 'valmatch: no value';
 
-lives_and {
+try_ok {
     is(
         ppipe( [ 'ls', [ '-a', '%OUTPUT%' ],
                      [ '-b', '%OUTPUT%' ] ] )
@@ -42,7 +38,7 @@ lives_and {
 }
 'valmatch: match (1 cmd; 2 args)';
 
-lives_and {
+try_ok {
 
     my $pipe = ppipe( [ 'ls', [ '-a', '%OUTPUT%' ] ] );
     $pipe->valsubst( qr/%OUTPUT%/, 'foo', );
@@ -51,7 +47,7 @@ lives_and {
 }
 'valsubst: match ( 1 cmd; 1 arg )';
 
-lives_and {
+try_ok {
 
     my $pipe
       = ppipe( [ 'a', [ '-a', '%OUTPUT%' ],
@@ -66,7 +62,7 @@ lives_and {
 'valsubst: match, 1 cmd, 2 args';
 
 
-lives_and {
+try_ok {
 
     my $pipe
       = ppipe( [ 'a', [ '-a', '%OUTPUT%' ], [ '-b', '%OUTPUT%' ] ],
@@ -82,7 +78,7 @@ lives_and {
 }
 'valsubst: match, 2 cmds, 2 args';
 
-lives_and {
+try_ok {
 
     my $pipe
       = ppipe( [ 'a', [ '-a', '%OUTPUT%' ] ],
@@ -95,7 +91,7 @@ lives_and {
 }
 'valsubst: match, lastvalue, 2cmds, 1 arg';
 
-lives_and {
+try_ok {
 
     my $pipe = ppipe( [ 'ls', [ '-a', '%OUTPUT%' ], [ '-b', '%INPUT%' ] ] );
     $pipe->valsubst( qr/%OUTPUT%/, 'foo', lastvalue => 'last' );
@@ -105,7 +101,7 @@ lives_and {
 }
 'valsubst: match, lastvalue, 1 cmd, 2 args, 1 match';
 
-lives_and {
+try_ok {
 
     my $pipe = ppipe( [ 'ls', [ '-a', '%OUTPUT%' ], [ '-b', '%INPUT%' ] ] );
     $pipe->valsubst( qr/%OUTPUT%/, 'foo', { lastvalue => 'last' }, );
@@ -115,7 +111,7 @@ lives_and {
 }
 'valsubst: match, lastvalue in hash';
 
-lives_and {
+try_ok {
 
     my $pipe = ppipe( [ 'ls', [ '-a', '%OUTPUT%' ], [ '-b', '%INPUT%' ] ] );
 
@@ -127,7 +123,7 @@ lives_and {
 }
 'valsubst: match, firstvalue, nmatch = 1';
 
-lives_and {
+try_ok {
 
     my $pipe
       = ppipe( [ 'a', [ '-a', '%OUTPUT%' ] ],
@@ -144,7 +140,7 @@ lives_and {
 'valsubst: match, firstvalue';
 
 
-lives_and {
+try_ok {
 
     my $pipe = ppipe(
         [ 'a', [ '-a', '%OUTPUT%' ], [ '-b', '%OUTPUT%' ] ],
@@ -164,7 +160,7 @@ lives_and {
 }
 'valsubst: match, firstvalue, lastvalue, 2 cmds';
 
-lives_and {
+try_ok {
 
     my $pipe = ppipe(
         [ 'a', [ '-a', '%OUTPUT%' ], [ '-b', '%OUTPUT%' ] ],
@@ -188,7 +184,7 @@ lives_and {
 }
 'valsubst: match, firstvalue, lastvalue, 3 cmds';
 
-lives_and {
+try_ok {
 
     my $pipe = ppipe(
         [ 'a', [ '-a', '%INPUT%' ], [ '-b', '%OUTPUT%' ] ],

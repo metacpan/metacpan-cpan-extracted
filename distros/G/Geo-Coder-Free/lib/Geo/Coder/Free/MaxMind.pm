@@ -165,7 +165,7 @@ sub geocode {
 		$county =~ s/\s$//g;
 		$state =~ s/^\s//g;
 		$state =~ s/\s$//g;
-		$country =~ s/^\s//g;
+		# $country =~ s/^\s//g;
 		$country =~ s/\s$//g;
 	} elsif($location =~ /^[\w\s-],[\w\s-]/) {
 		Carp::carp(__PACKAGE__, ": can't parse and handle $location");
@@ -174,16 +174,24 @@ sub geocode {
 		$location =~ s/^\s//g;
 		$location =~ s/\s$//g;
 		$country = uc($region);
+	} elsif($location =~ /^(\w+),\s*(\w+)$/) {
+	# } elsif(0) {
+		$county = $1;
+		$country = $2;
+		$county =~ s/^\s//g;
+		$county =~ s/\s$//g;
+		# $country =~ s/^\s//g;
+		$country =~ s/\s$//g;
 	} else {
 		# Carp::croak(__PACKAGE__, ' only supports towns, not full addresses');
 		return;
 	}
 	if($country) {
-		my $countrycode = country2code($country);
 		if(defined($country) && (($country eq 'UK') || ($country eq 'United Kingdom') || ($country eq 'England'))) {
 			$country = 'Great Britain';
 			$concatenated_codes = 'GB';
 		}
+		my $countrycode = country2code($country);
 
 		if($state && $admin1cache{$state}) {
 			$concatenated_codes = $admin1cache{$state};
@@ -319,6 +327,7 @@ sub geocode {
 	}
 
 	my $options = { City => lc($location) };
+	$options->{'City'} =~ s/,\s*\w+$//;
 	if($region) {
 		if($region =~ /^.+\.(.+)$/) {
 			$region = $1;

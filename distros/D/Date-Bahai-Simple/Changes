@@ -1,5 +1,8 @@
 Revision history for Date::Bahai::Simple
 
+0.22  Fri Nov 16 16:15:00 2018
+      - Updated the dependency on Date::Utils v0.24.
+
 0.21  Tue Aug 29 12:00:00 2017
       - Updated copyright year information.
       - Updated SEE ALSO section in the pod.

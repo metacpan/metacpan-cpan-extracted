@@ -34,6 +34,9 @@ t/markup.t
 t/process-css.t
 t/process-js.t
 t/process-sass.t
+t/public/asset/webpack.development.html
+t/public/asset/webpack.markup.html
+t/public/asset/webpack.register.html
 t/register.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

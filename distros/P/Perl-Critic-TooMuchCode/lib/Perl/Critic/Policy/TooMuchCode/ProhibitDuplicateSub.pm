@@ -29,7 +29,7 @@ sub violates {
 
         $self->violation(
             "Duplicate subroutine definition. Redefined at line: " . $last_sub->line_number . ", column: " . $last_sub->column_number,
-            "Aonther subroutine definition latter in the same scope with identical name masks this one.",
+            "Another subroutine definition latter in the same scope with identical name masks this one.",
             $_,
         );
     } @duplicates;
@@ -38,3 +38,30 @@ sub violates {
 }
 
 1;
+
+=encoding utf-8
+
+=head1 NAME
+
+TooMuchCode::ProhibitDuplicateSub
+
+=head1 DESCRIPTION
+
+This policy checks if there are subroutine definitions with idential
+names in the same document. If they exists, all except for the last
+one are marked as violation.
+
+perl runtime allows a named subroutine to be redefined in the same
+source file and the latest definition wins. In the event that this is
+done by developers, preferrably unintentionally, perl runtime (when
+<C>warnings</C> pragma is in place) warns that a subroutine is
+redefined, but the position is for the one that wins. This policy does
+the opposite.
+
+Although the last one is not marked as a violation, it's position is
+reported together. Making it easier for developer to locate the subroutine.
+
+Should the developer decide to programatically remove the duplicates,
+simply go through all the violations and remove those statements.
+
+=cut

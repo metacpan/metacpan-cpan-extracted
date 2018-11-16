@@ -37,6 +37,15 @@
 #include "spvm_array_field_access.h"
 #include "spvm_string_buffer.h"
 
+
+
+
+
+
+
+
+
+
 const char* const SPVM_OP_C_ID_NAMES[] = {
   "IF",
   "UNLESS",
@@ -147,18 +156,11 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "STRING_LE",
   "ISA",
   "SEQUENCE",
-  "COSNT",
-  "COMPILE",
+  "PRECOMPILE",
   "SCALAR",
   "ARRAY_FIELD_ACCESS",
   "REF",
   "DEREF",
-  "BYTE_REF",
-  "SHORT_REF",
-  "INT_REF",
-  "LONG_REF",
-  "FLOAT_REF",
-  "DOUBLE_REF",
   "DOT3",
 };
 
@@ -298,6 +300,14 @@ SPVM_OP* SPVM_OP_build_var(SPVM_COMPILER* compiler, SPVM_OP* op_var_name) {
   return op_var_ret;
 }
 
+SPVM_OP* SPVM_OP_build_package_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_package_var_name) {
+      
+  // Package var op
+  SPVM_OP* op_package_var_access = SPVM_OP_new_op_package_var_access(compiler, op_package_var_name);
+  
+  return op_package_var_access;
+}
+
 SPVM_OP* SPVM_OP_new_op_descriptor(SPVM_COMPILER* compiler, int32_t id, const char* file, int32_t line) {
   SPVM_OP* op_descriptor = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_DESCRIPTOR, file, line);
   
@@ -321,16 +331,6 @@ SPVM_OP* SPVM_OP_new_op_block(SPVM_COMPILER* compiler, const char* file, int32_t
   op_block->uv.block = block;
   
   return op_block;
-}
-
-SPVM_OP* SPVM_OP_new_op_package_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_name) {
-  SPVM_OP* op_package_var_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE_VAR_ACCESS, op_name->file, op_name->line);
-
-  SPVM_PACKAGE_VAR_ACCESS* package_var_access = SPVM_PACKAGE_VAR_ACCESS_new(compiler);
-  package_var_access->op_name = op_name;
-  op_package_var_access->uv.package_var_access = package_var_access;
-  
-  return op_package_var_access;
 }
 
 SPVM_OP* SPVM_OP_clone_op_type(SPVM_COMPILER* compiler, SPVM_OP* op_type) {
@@ -358,6 +358,17 @@ SPVM_OP* SPVM_OP_new_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_name) {
   op_var->uv.var = var;
   
   return op_var;
+}
+
+SPVM_OP* SPVM_OP_new_op_package_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_package_var_name) {
+  
+  SPVM_OP* op_package_var_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE_VAR_ACCESS, op_package_var_name->file, op_package_var_name->line);
+
+  SPVM_PACKAGE_VAR_ACCESS* package_var_access = SPVM_PACKAGE_VAR_ACCESS_new(compiler);
+  package_var_access->op_name = op_package_var_name;
+  op_package_var_access->uv.package_var_access = package_var_access;
+  
+  return op_package_var_access;
 }
 
 SPVM_OP* SPVM_OP_new_op_var_clone(SPVM_COMPILER* compiler, SPVM_OP* original_op_var, const char* file, int32_t line) {
@@ -622,7 +633,7 @@ SPVM_OP* SPVM_OP_build_constant(SPVM_COMPILER* compiler, SPVM_OP* op_constant) {
   SPVM_CONSTANT* constant = op_constant->uv.constant;
   
   // New String
-  if (constant->type->dimension == 1 && constant->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+  if (SPVM_TYPE_is_string_type(compiler, constant->type->basic_type->id, constant->type->dimension, 0)) {
     SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, op_constant->file, op_constant->line);
     SPVM_OP_insert_child(compiler, op_new, op_new->last, op_constant);
 
@@ -1166,9 +1177,6 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
       type->basic_type = basic_type;
       assert(first_type->dimension > 0);
       type->dimension = first_type->dimension - 1;
-      if (first_type->flag & SPVM_TYPE_C_FLAG_CONST) {
-        type->flag |= SPVM_TYPE_C_FLAG_CONST;
-      }
       break;
     }
     case SPVM_OP_C_ID_ADD:
@@ -1489,7 +1497,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   if (!(package->flag & SPVM_PACKAGE_C_FLAG_IS_ANON) && islower(package_name[0])) {
     SPVM_COMPILER_error(compiler, "Package name must start with upper case \"%s\" at %s line %d\n", package_name, op_package->file, op_package->line);
   }
-
+  
   SPVM_HASH* package_symtable = compiler->package_symtable;
 
   // Redeclaration package error
@@ -1617,8 +1625,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     SPVM_FIELD* field = SPVM_LIST_fetch(package->fields, i);
     field->index = i;
     const char* field_name = field->op_name->uv.name;
-    const char* field_abs_name = SPVM_OP_create_abs_name(compiler, package_name, field_name);
-    field->abs_name = field_abs_name;
 
     SPVM_FIELD* found_field = SPVM_HASH_fetch(package->field_symtable, field_name, strlen(field_name));
     
@@ -1630,10 +1636,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     }
     else {
       field->id = compiler->fields->length + 1;
-      field->rel_id = i;
-      
       SPVM_LIST_push(compiler->fields, field);
-      SPVM_HASH_insert(compiler->field_symtable, field_abs_name, strlen(field_abs_name), field);
       SPVM_HASH_insert(package->field_symtable, field_name, strlen(field_name), field);
       
       // Add op package
@@ -1662,10 +1665,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     int32_t i;
     for (i = 0; i < package->package_vars->length; i++) {
       SPVM_PACKAGE_VAR* package_var = SPVM_LIST_fetch(package->package_vars, i);
-      package_var->rel_id = i;
-      const char* package_var_name = package_var->op_var->uv.var->op_name->uv.name;
-      const char* package_var_abs_name = SPVM_OP_create_abs_name(compiler, package_name, package_var_name);
-      package_var->abs_name = package_var_abs_name;
+      const char* package_var_name = package_var->name;
 
       // Add package var name to string pool
       int32_t found_string_pool_id = (intptr_t)SPVM_HASH_fetch(compiler->string_symtable, package_var_name, strlen(package_var_name) + 1);
@@ -1686,8 +1686,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         const char* package_var_access_abs_name = SPVM_OP_create_package_var_access_abs_name(compiler, package_name, package_var_name);
         package_var->id = compiler->package_vars->length + 1;
         SPVM_LIST_push(compiler->package_vars, package_var);
-        SPVM_HASH_insert(compiler->package_var_symtable, package_var_access_abs_name, strlen(package_var_access_abs_name), package_var);
-
         SPVM_HASH_insert(package->package_var_symtable, package_var_name, strlen(package_var_name), package_var);
         
         // Add op package
@@ -1721,6 +1719,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       if (sub->flag & SPVM_SUB_C_FLAG_IS_ANON_SUB) {
         package->flag |= SPVM_PACKAGE_C_FLAG_IS_HAS_ONLY_ANON_SUB;
         assert(package->subs->length == 1);
+        assert(package->flag & SPVM_PACKAGE_C_FLAG_IS_ANON);
       }
 
       sub->rel_id = i;
@@ -1797,6 +1796,11 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     }
   }
   
+  // Clear current sub names
+  if (package->flag & SPVM_PACKAGE_C_FLAG_IS_ANON) {
+    compiler->current_sub_names = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  }
+  
   // Interface must have only one method
   if (package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
     if (package->subs->length != 1) {
@@ -1860,14 +1864,12 @@ SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_v
   return op_var;
 }
 
-SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type) {
+SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_package_var, SPVM_OP* op_name, SPVM_OP* op_descriptors, SPVM_OP* op_type) {
   
-  SPVM_OP* op_package_var = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE_VAR, op_var->file, op_var->line);
   SPVM_PACKAGE_VAR* package_var = SPVM_PACKAGE_VAR_new(compiler);
   
-  const char* name = op_var->uv.var->op_name->uv.name;;
-  
-  package_var->name = op_var->uv.var->op_name->uv.name;
+  const char* name = op_name->uv.name;;
+  package_var->name = op_name->uv.name;
   
   int32_t invalid_name = 0;
   if (strchr(name, ':')) {
@@ -1875,14 +1877,32 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op
   }
   
   if (invalid_name) {
-    SPVM_COMPILER_error(compiler, "Invalid package variable name %s at %s line %d\n", name, op_var->file, op_var->line);
+    SPVM_COMPILER_error(compiler, "Invalid package variable name %s at %s line %d\n", name, op_name->file, op_name->line);
   }
   
-  package_var->op_var = op_var;
+  package_var->op_name = op_name;
   package_var->type = op_type->uv.type;
   package_var->op_package_var = op_package_var;
 
   op_package_var->uv.package_var = package_var;
+
+  // Check descriptors
+  if (op_descriptors) {
+    SPVM_OP* op_descriptor = op_descriptors->first;
+    while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
+      SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
+      
+      switch (descriptor->id) {
+        case SPVM_DESCRIPTOR_C_ID_PRIVATE:
+          package_var->flag |= SPVM_PACKAGE_VAR_C_FLAG_PRIVATE;
+          break;
+        case SPVM_DESCRIPTOR_C_ID_PUBLIC:
+          break;
+        default:
+          SPVM_COMPILER_error(compiler, "Invalid package variable descriptor %s", SPVM_DESCRIPTOR_C_ID_NAMES[descriptor->id], op_descriptors->file, op_descriptors->line);
+      }
+    }
+  }
   
   return op_package_var;
 }
@@ -1903,6 +1923,7 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
   // Set field informaiton
   op_field->uv.field = field;
   
+  // Check descriptors
   if (op_descriptors) {
     SPVM_OP* op_descriptor = op_descriptors->first;
     while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
@@ -2145,6 +2166,9 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
   // Subroutine is constant
   op_sub->uv.sub->flag |= SPVM_SUB_C_FLAG_IS_ENUM;
   op_sub->uv.sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD;
+  
+  // Add current sub names
+  SPVM_LIST_push(compiler->current_sub_names, (void*)op_name->uv.name);
   
   return op_sub;
 }
@@ -2465,24 +2489,6 @@ SPVM_OP* SPVM_OP_build_basic_type(SPVM_COMPILER* compiler, SPVM_OP* op_name) {
   return op_type;
 }
 
-SPVM_OP* SPVM_OP_build_const_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type) {
-  
-  SPVM_TYPE* type = op_type->uv.type;
-  
-  SPVM_BASIC_TYPE* basic_type = type->basic_type;
-  int32_t dimension = type->dimension;
-  
-  if (!(basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE && dimension == 1)) {
-    SPVM_COMPILER_error(compiler, "const only can specify byte array at %s line %d\n", op_type->file, op_type->line);
-  }
-  
-  type->flag |= SPVM_TYPE_C_FLAG_CONST;
-
-  type->op_type = op_type;
-  
-  return op_type;
-}
-
 SPVM_OP* SPVM_OP_build_ref_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_original) {
   
   // Type
@@ -2506,9 +2512,6 @@ SPVM_OP* SPVM_OP_build_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_chil
   SPVM_TYPE* type = SPVM_TYPE_new(compiler);
   type->dimension = op_type_child->uv.type->dimension + 1;
   type->basic_type = op_type_child->uv.type->basic_type;
-  if (op_type_child->uv.type->flag & SPVM_TYPE_C_FLAG_CONST) {
-    type->flag |= SPVM_TYPE_C_FLAG_CONST;
-  }
   
   // Type OP
   SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, type, op_type_child->file, op_type_child->line);

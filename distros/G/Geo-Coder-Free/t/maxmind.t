@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 72;
+use Test::Most tests => 75;
 use Test::Number::Delta;
 use Test::Carp;
 use lib 't/lib';
@@ -159,6 +159,11 @@ LOOKUP: {
 			$location = $geocoder->geocode('Thanet, Kent, England');
 			ok(defined($location));
 
+			$location = $geocoder->geocode('Kent, England');
+			ok(defined($location));
+			delta_within($location->{latitude}, 51.25, 1e-2);
+			delta_within($location->{longitude}, 0.75, 1e-2);
+
 			$location = $geocoder->geocode('Vessels, Misc Ships At sea or abroad, England');
 			ok(!defined($location));
 
@@ -174,7 +179,7 @@ LOOKUP: {
 			});
 		} else {
 			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 71);
+			skip('Author tests not required for installation', 74);
 		}
 	}
 }

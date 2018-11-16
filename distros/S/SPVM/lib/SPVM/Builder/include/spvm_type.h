@@ -6,8 +6,7 @@
 #include "spvm_base.h"
 
 enum {
-  SPVM_TYPE_C_FLAG_CONST = 1,
-  SPVM_TYPE_C_FLAG_REF = 2,
+  SPVM_TYPE_C_FLAG_REF = 1,
 };
 
 enum {
@@ -24,6 +23,7 @@ enum {
   SPVM_TYPE_C_RUNTIME_TYPE_VALUE_LONG,
   SPVM_TYPE_C_RUNTIME_TYPE_VALUE_FLOAT,
   SPVM_TYPE_C_RUNTIME_TYPE_VALUE_DOUBLE,
+  SPVM_TYPE_C_RUNTIME_TYPE_STRING,
   SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT,
   SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE,
   SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY,
@@ -123,6 +123,8 @@ int32_t SPVM_TYPE_is_value_type(SPVM_COMPILER* compiler, int32_t basic_type_id, 
 int32_t SPVM_TYPE_is_value_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_value_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_basic_type_is_value_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_byte_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+int32_t SPVM_TYPE_is_string_compatible_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 int32_t SPVM_TYPE_is_class_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 int32_t SPVM_TYPE_is_interface_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);

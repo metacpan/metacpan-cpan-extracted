@@ -3,7 +3,6 @@ Changes
 lib/Device/Chip/ADT7470.pm
 examples/adt7470-example
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
@@ -12,3 +11,4 @@ t/01config.t
 t/02interact.t
 t/99pod.t
 README
+Makefile.PL

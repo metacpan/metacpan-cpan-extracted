@@ -1,27 +1,22 @@
 #! perl
 
-use strict;
-use warnings;
+use Test2::V0;
+use Test::Lib;
 
 use IPC::PrettyPipe::DSL ':all';
 
-use Test::More;
-use Test::Exception;
-use Test::Deep;
-
-use Test::Lib;
 use My::Tests;
 
-lives_ok {
-
-    ppipe();
-
-}
-'ppipe';
+ok(
+    lives {
+        ppipe();
+    },
+    'ppipe'
+);
 
 subtest 'new cmd' => sub {
     my $p;
-    lives_ok { $p = ppipe ['ls'] } 'new';
+    ok( lives { $p = ppipe ['ls'] }, 'new' );
     is( $p->cmds->elements->[0]->cmd, 'ls' );
 };
 
@@ -30,7 +25,8 @@ subtest 'new IPC::PrettyPipe::Cmd' => sub {
 
     my $p;
 
-    lives_ok {$p = ppipe( IPC::PrettyPipe::Cmd->new( cmd => 'ls' ) ) } 'new';
+    ok( lives { $p = ppipe( IPC::PrettyPipe::Cmd->new( cmd => 'ls' ) ) },
+        'new' );
 
     is( $p->cmds->elements->[0]->cmd, 'ls' );
 };
@@ -40,7 +36,8 @@ subtest 'cmd(args) cmd' => sub {
 
     my $p;
 
-    lives_ok { $p = ppipe( ['ls'], [ 'make', [ '-f', 'Makefile' ], '-k' ] ) } 'new';
+    ok( lives { $p = ppipe( ['ls'], [ 'make', [ '-f', 'Makefile' ], '-k' ] ) },
+        'new' );
 
     my $i = 0;
 
@@ -50,85 +47,93 @@ subtest 'cmd(args) cmd' => sub {
 
     is( $cmd->cmd, 'make' );
 
-    cmp_deeply(
+    is(
         $cmd->args->elements->[0],
-        methods(
-            name  => '-f',
-            value => 'Makefile',
-        ) );
+        object {
+            call name  => '-f';
+            call value => 'Makefile';
+        },
+    );
 
-    cmp_deeply( $cmd->args->elements->[1], methods( name => '-k', ) );
+    is( $cmd->args->elements->[1], object { call name => '-k'; } );
 };
-
-
 
 subtest 'argsep argpfx cmd(args)' => sub {
 
     my $p;
-
-    lives_ok { $p = ppipe argsep ' ', argpfx '-', [ 'make', [ 'f', 'Makefile' ], 'k' ] } 'new';
+    ok(
+        lives {
+            $p = ppipe argsep ' ', argpfx '-',
+              [ 'make', [ 'f', 'Makefile' ], 'k' ]
+        },
+        'new'
+    );
 
     my $cmd = $p->cmds->elements->[0];
 
-    cmp_deeply(
+    is(
         $cmd,
-        methods(
-            cmd    => 'make',
-            argsep => ' ',
-            argpfx => '-'
-        ) );
+        object {
+            call cmd    => 'make';
+            call argsep => ' ';
+            call argpfx => '-';
+        } );
 
-    cmp_deeply(
+    is(
         $cmd->args->elements->[0],
-        methods(
-            name  => 'f',
-            value => 'Makefile',
-        ) );
+        object {
+            call name  => 'f';
+            call value => 'Makefile';
+        } );
 
-    cmp_deeply( $cmd->args->elements->[1], methods( name => 'k', ) );
+    is( $cmd->args->elements->[1], object { call name => 'k' } );
 
 };
 
 subtest 'cmd( argpfx argsep cmds )' => sub {
 
     my $p;
-
-    lives_ok { $p = ppipe( [ 'make', argpfx '-', argsep ' ', [ 'f', 'Makefile' ], 'k' ] ) } 'new';
+    ok(
+        lives {
+            $p = ppipe(
+                [ 'make', argpfx '-', argsep ' ', [ 'f', 'Makefile' ], 'k' ] )
+        },
+        'new'
+    );
 
     my $cmd = $p->cmds->elements->[0];
 
     is( $cmd->cmd, 'make' );
 
-    cmp_deeply(
+    is(
         $cmd->args->elements->[0],
-        methods(
-            name   => 'f',
-            value  => 'Makefile',
-            sep => ' ',
-            pfx => '-'
-        ) );
+        object {
+            call name  => 'f';
+            call value => 'Makefile';
+            call sep   => ' ';
+            call pfx   => '-';
+        } );
 
-    cmp_deeply(
+    is(
         $cmd->args->elements->[1],
-        methods(
-            name   => 'k',
-            sep => ' ',
-            pfx => '-'
-        ) );
-
-
+        object {
+            call name => 'k';
+            call sep  => ' ';
+            call pfx  => '-';
+        },
+    );
 };
 
 subtest 'cmd( stream )' => sub {
 
     my $p;
-    lives_ok { $p = ppipe( [ 'make', '2>&1' ] ) } 'new';
+    ok( lives { $p = ppipe( [ 'make', '2>&1' ] ) }, 'new' );
 
     my $cmd = $p->cmds->elements->[0];
 
     is( $cmd->cmd, 'make' );
 
-    cmp_deeply( $cmd->streams->elements->[0], methods( spec => '2>&1', ) );
+    is( $cmd->streams->elements->[0], object { call spec => '2>&1'; } );
 
 };
 

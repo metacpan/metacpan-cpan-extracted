@@ -7,6 +7,11 @@ README
 Sub-Fp-0.05.tar.gz
 Sub-Fp-0.06.tar.gz
 Sub-Fp-0.07.tar.gz
+Sub-Fp-0.14.tar.gz
+Sub-Fp-0.15.tar.gz
+Sub-Fp-0.16.tar.gz
+Sub-Fp-0.17.tar.gz
+Sub-Fp-0.18.tar.gz
 t/00-load.t
 t/Fn.pm.t
 t/manifest.t

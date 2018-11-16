@@ -1,83 +1,60 @@
 #! perl
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use IPC::PrettyPipe::Arg;
-
-use Test::More;
-use Test::Exception;
 
 sub new { IPC::PrettyPipe::Arg->new( @_ ); }
 
 
-lives_and {
-    is(
-        new(
-            name   => 'a',
-            value => '%OUTPUT%',
-          )->valmatch( qr/%OUTPUT%/ ),
-       1 );
-}
-'match';
+try_ok {
+    my $arg = new(
+        name  => 'a',
+        value => '%OUTPUT%',
+    );
+    is( $arg->valmatch( qr/%OUTPUT%/ ), 1, 'match' );
+};
 
-lives_and {
-    is(
-        new(
-            name   => 'a',
-            value => '%OUTPUT%',
-          )->valmatch( qr/%INPUT%/ ),
-       '' );
-}
-'valmatch: value, not matched';
+try_ok {
+    my $arg = new(
+        name  => 'a',
+        value => '%OUTPUT%',
+    );
+    is( $arg->valmatch( qr/%INPUT%/ ), '', 'valmatch: value, not matched' );
+};
 
-lives_and {
-    is(
-        new(
-            name   => 'a',
-          )->valmatch( qr/%INPUT%/ ),
-       '' );
-}
-'valmatch: no value';
 
-lives_and {
+try_ok {
+    my $arg = new( name => 'a', );
+    is( $arg->valmatch( qr/%INPUT%/ ), '', 'valmatch: no value' );
+};
 
-	my $arg = new(
-	              name   => 'a',
-	              value => '%OUTPUT%bar',
-	             );
+try_ok {
+    my $arg = new(
+        name  => 'a',
+        value => '%OUTPUT%bar',
+    );
+    $arg->valsubst( qr/%OUTPUT%/, 'foo' );
+    is( $arg->value, 'foobar', 'valsubst: value match' );
+};
 
-	$arg->valsubst( qr/%OUTPUT%/, 'foo' );
 
-	is( $arg->value, 'foobar' );
+try_ok {
+    my $arg = new( name => 'a', );
 
-}
-'valsubst: value match';
+    is( $arg->valsubst( qr/%OUTPUT%/, 'foo' ), 0, 'valsubst: no value' );
+};
 
-lives_and {
 
-	my $arg = new(
-	              name   => 'a',
-	             );
+try_ok {
+    my $arg = new(
+        name  => 'a',
+        value => '%OUTPUT%bar',
+    );
+    $arg->valsubst( qr/%INPUT%/, 'foo' );
+    is( $arg->value, '%OUTPUT%bar', 'valsubst not match' );
+};
 
-	is( $arg->valsubst( qr/%OUTPUT%/, 'foo' ), 0 );
-
-}
-'valsubst: no value';
-
-lives_and {
-
-	my $arg = new(
-	              name   => 'a',
-	              value => '%OUTPUT%bar',
-	             );
-
-	$arg->valsubst( qr/%INPUT%/, 'foo' );
-
-	is( $arg->value, '%OUTPUT%bar' );
-
-}
-'valsubst not match';
 
 
 done_testing;

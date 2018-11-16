@@ -3,7 +3,7 @@ package File::Slurp;
 use strict;
 use warnings ;
 
-our $VERSION = '9999.24';
+our $VERSION = '9999.25';
 $VERSION = eval $VERSION;
 
 use Carp ;
@@ -59,188 +59,84 @@ my $is_win32 = $^O =~ /win32/i ;
 *rf = \&read_file ;
 
 sub read_file {
+	my $file_name = shift;
+	my $opts = (ref $_[0] eq 'HASH') ? shift : {@_};
+	# options we care about:
+	# array_ref binmode blk_size buf_ref chomp err_mode scalar_ref
 
-	my $file_name = shift ;
-	my $opts = ( ref $_[0] eq 'HASH' ) ? shift : { @_ } ;
-
-# this is the optimized read_file for shorter files.
-# the test for -s > 0 is to allow pseudo files to be read with the
-# regular loop since they return a size of 0.
-
-	if ( !ref $file_name && -e $file_name && -s _ > 0 &&
-	     -s _ < $max_fast_slurp_size && !%{$opts} && !wantarray ) {
-
-
-		my $fh ;
-		unless( sysopen( $fh, $file_name, O_RDONLY ) ) {
-
-			@_ = ( $opts, "read_file '$file_name' - sysopen: $!");
-			goto &_error ;
+	# let's see if we have a stringified object before doing anything else
+	# We then only have to deal with when we are given a file handle/globref
+	if (ref($file_name)) {
+		my $ref_result = _check_ref($file_name, $opts);
+		if (ref($ref_result)) {
+			@_ = ($opts, $ref_result);
+			goto &_error;
 		}
-
-		my $read_cnt = sysread( $fh, my $buf, -s _ ) ;
-
-		unless ( defined $read_cnt ) {
-
-			@_ = ( $opts,
-				"read_file '$file_name' - small sysread: $!");
-			goto &_error ;
-		}
-
-		$buf =~ s/\015\012/\n/g if $is_win32 ;
-		return $buf ;
+		$file_name = $ref_result if $ref_result;
+		# we have now stringified $file_name if possible. if it's still a ref
+		# then we probably have a file handle
 	}
 
-# set the buffer to either the passed in one or ours and init it to the null
-# string
-
-	my $buf ;
-	my $buf_ref = $opts->{'buf_ref'} || \$buf ;
-	${$buf_ref} = '' ;
-
-	my( $read_fh, $size_left, $blk_size ) ;
-
-# deal with ref for a file name
-# it could be an open handle or an overloaded object
-
-	if ( ref $file_name ) {
-
-		my $ref_result = _check_ref( $file_name ) ;
-
-		if ( ref $ref_result ) {
-
-# we got an error, deal with it
-
-			@_ = ( $opts, $ref_result ) ;
-			goto &_error ;
+	my $fh;
+	if (ref($file_name)) {
+		$fh = $file_name;
+	}
+	else {
+		# to keep with the old ways, read in :raw by default
+		unless (open $fh, "<:raw", $file_name) {
+			@_ = ($opts, "read_file '$file_name' - open: $!");
+			goto &_error;
 		}
-
-		if ( $ref_result ) {
-
-# we got an overloaded object and the result is the stringified value
-# use it as the file name
-
-			$file_name = $ref_result ;
-		}
-		else {
-
-# here we have just an open handle. set $read_fh so we don't do a sysopen
-
-			$read_fh = $file_name ;
-			$blk_size = $opts->{'blk_size'} || 1024 * 1024 ;
-			$size_left = $blk_size ;
+		# even though we set raw, let binmode take place here (busted)
+		if (my $bm = $opts->{binmode}) {
+			binmode $fh, $bm;
 		}
 	}
 
-# see if we have a path we need to open
-
-	unless ( $read_fh ) {
-
-# a regular file. set the sysopen mode
-
-		my $mode = O_RDONLY ;
-
-#printf "RD: BINARY %x MODE %x\n", O_BINARY, $mode ;
-
-		$read_fh = local( *FH ) ;
-#		$read_fh = gensym ;
-		unless ( sysopen( $read_fh, $file_name, $mode ) ) {
-			@_ = ( $opts, "read_file '$file_name' - sysopen: $!");
-			goto &_error ;
-		}
-
-		if ( my $binmode = $opts->{'binmode'} ) {
-			binmode( $read_fh, $binmode ) ;
-		}
-
-# get the size of the file for use in the read loop
-
-		$size_left = -s $read_fh ;
-
-#print "SIZE $size_left\n" ;
-
-# we need a blk_size if the size is 0 so we can handle pseudofiles like in
-# /proc. these show as 0 size but have data to be slurped.
-
-		unless( $size_left ) {
-
-			$blk_size = $opts->{'blk_size'} || 1024 * 1024 ;
-			$size_left = $blk_size ;
-		}
+	# we are now sure to have an open file handle. Let's slurp it in the same
+	# way that File::Slurper does.
+	my $buf;
+	my $buf_ref = $opts->{buf_ref} || \$buf;
+	${$buf_ref} = '';
+	my $blk_size = $opts->{blk_size} || 1024 * 1024;
+	if (my $size = -s $fh) {
+		$blk_size = $size if $size < $blk_size;
+		my ($pos, $read) = 0;
+		do {
+			unless(defined($read = read $fh, ${$buf_ref}, $blk_size, $pos)) {
+				@_ = ($opts, "read_file '$file_name' - read: $!");
+				goto &_error;
+			}
+			$pos += $read;
+		} while ($read && $pos < $size);
 	}
-
-# infinite read loop. we exit when we are done slurping
-
-	while( 1 ) {
-
-# do the read and see how much we got
-
-		my $read_cnt = sysread( $read_fh, ${$buf_ref},
-				$size_left, length ${$buf_ref} ) ;
-
-# since we're using sysread Perl won't automatically restart the call
-# when interrupted by a signal.
-
-		next if $!{EINTR};
-
-		unless ( defined $read_cnt ) {
-
-			@_ = ( $opts, "read_file '$file_name' - loop sysread: $!");
-			goto &_error ;
-		}
-
-# good read. see if we hit EOF (nothing left to read)
-
-		last if $read_cnt == 0 ;
-
-# loop if we are slurping a handle. we don't track $size_left then.
-
-		next if $blk_size ;
-
-# count down how much we read and loop if we have more to read.
-
-		$size_left -= $read_cnt ;
-		last if $size_left <= 0 ;
+	else {
+		${$buf_ref} = do { local $/; <$fh> };
 	}
+	seek($fh, $opts->{_data_tell}, SEEK_SET) if $opts->{_is_data} && $opts->{_data_tell};
 
-# fix up cr/lf to be a newline if this is a windows text file
+	# line endings if we're on Windows
+	${$buf_ref} =~ s/\015\012/\012/g if $is_win32 && !$opts->{binmode};
 
-	${$buf_ref} =~ s/\015\012/\n/g if $is_win32 && !$opts->{'binmode'} ;
-
-	my $sep = $/ ;
-	$sep = '\n\n+' if defined $sep && $sep eq '' ;
-
-# see if caller wants lines
-
-	if( wantarray || $opts->{'array_ref'} ) {
-
-		use re 'taint' ;
-
+	# we now have a buffer filled with the file content. Figure out how to
+	# return it to the user
+	my $want_array = wantarray; # let's only ask for this once
+	if ($want_array || $opts->{array_ref}) {
+		use re 'taint';
+		my $sep = $/;
+		$sep = '\n\n+' if defined $sep && $sep eq '';
+		# split the buffered content into lines
 		my @lines = length(${$buf_ref}) ?
-			${$buf_ref} =~ /(.*?$sep|.+)/sg : () ;
-
-		chomp @lines if $opts->{'chomp'} ;
-
-# caller wants an array ref
-
-		return \@lines if $opts->{'array_ref'} ;
-
-# caller wants list of lines
-
-		return @lines ;
+			${$buf_ref} =~ /(.*?$sep|.+)/sg : ();
+		chomp @lines if $opts->{chomp};
+		return \@lines if $opts->{array_ref};
+		return @lines;
 	}
-
-# caller wants a scalar ref to the slurped text
-
-	return $buf_ref if $opts->{'scalar_ref'} ;
-
-# caller wants a scalar with the slurped text (normal scalar context)
-
-	return ${$buf_ref} if defined wantarray ;
-
-# caller passed in an i/o buffer by reference (normal void context)
-
-	return ;
+	return $buf_ref if $opts->{scalar_ref};
+	# if the function was called in scalar context, return the contents
+	return ${$buf_ref} if defined $want_array;
+	# if we were called in void context, return nothing
+	return;
 }
 
 # errors in this sub are returned as scalar refs
@@ -249,7 +145,7 @@ sub read_file {
 
 sub _check_ref {
 
-	my( $handle ) = @_ ;
+	my( $handle, $opts ) = @_ ;
 
 # check if we are reading from a handle (GLOB or IO object)
 
@@ -257,7 +153,7 @@ sub _check_ref {
 
 # we have a handle. deal with seeking to it if it is DATA
 
-		my $err = _seek_data_handle( $handle ) ;
+		my $err = _seek_data_handle( $handle, $opts ) ;
 
 # return the error string if any
 
@@ -282,7 +178,10 @@ sub _check_ref {
 
 sub _seek_data_handle {
 
-	my( $handle ) = @_ ;
+	my( $handle, $opts ) = @_ ;
+	# store some meta-data about the __DATA__ file handle
+	$opts->{_is_data} = 0;
+	$opts->{_data_tell} = 0;
 
 # DEEP DARK MAGIC. this checks the UNTAINT IO flag of a
 # glob/handle. only the DATA handle is untainted (since it is from
@@ -304,11 +203,18 @@ ERR
 
 	if ( B::svref_2object( $handle )->IO->IoFLAGS & 16 ) {
 
+		# we now know we have the data handle. Let's store its original
+		# location in the file so that we can put it back after the read.
+		# this is only done for Bugwards-compatibility in some dists such as
+		# CPAN::Index::API that made use of the oddity where sysread was in use
+		# before
+		$opts->{_is_data} = 1;
+		$opts->{_data_tell} = tell($handle);
 # set the seek position to the current tell.
 
-		unless( sysseek( $handle, tell( $handle ), SEEK_SET ) ) {
-			return "read_file '$handle' - sysseek: $!" ;
-		}
+		# unless( sysseek( $handle, tell( $handle ), SEEK_SET ) ) {
+		# 	return "read_file '$handle' - sysseek: $!" ;
+		# }
 	}
 
 # seek was successful, return no error string
@@ -818,7 +724,7 @@ directory.
 =head2 WARNING - PENDING DOOM
 
 Although you technically I<can>, do NOT use this module to work on file handles,
-pipes, sockets, standard IO, pseudo-files, or the C<DATA> handle. These are
+pipes, sockets, standard IO, or the C<DATA> handle. These are
 features implemented long ago that just really shouldn't be abused here.
 
 Be warned: this activity will lead to inaccurate encoding/decoding of data.
@@ -937,7 +843,7 @@ L<File::Slurp/"write_file"> function.
 	use File::Slurp qw(prepend_file);
 	prepend_file('/path/file', $header);
 	prepend_file('/path/file', \@lines);
-	prepend_file('/path/file', { binmode => 'raw:'}, $bin_data);
+	prepend_file('/path/file', { binmode => ':raw'}, $bin_data);
 
 	# equivalent to:
 	use File::Slurp qw(read_file write_file);

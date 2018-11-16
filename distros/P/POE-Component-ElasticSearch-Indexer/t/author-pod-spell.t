@@ -18,9 +18,11 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+BacklogInterval
 BatchDir
 BatchDiskSpace
 Brad
+CleanupInterval
 Component
 DefaultIndex
 DefaultType
@@ -33,6 +35,7 @@ Lhotsky
 LoggingConfig
 MaxConnsPerServer
 MaxConnsTotal
+MaxFailedRatio
 MaxPendingRequests
 MaxRecoveryBatches
 POE

@@ -1,5 +1,5 @@
 package Test::POE::Client::TCP;
-$Test::POE::Client::TCP::VERSION = '1.24';
+$Test::POE::Client::TCP::VERSION = '1.26';
 #ABSTRACT: A POE Component providing TCP client services for test cases
 
 use strict;
@@ -511,7 +511,7 @@ Test::POE::Client::TCP - A POE Component providing TCP client services for test 
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 

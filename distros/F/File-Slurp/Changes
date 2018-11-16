@@ -1,5 +1,16 @@
 Revision history File::Slurp
 
+9999.25     2018-10-29
+    - The previous release contained nothing but a documentation update. That
+      updated documentation errantly mentioned pseudo-files. Pseudo-files
+      are perfectly fine to use with File::Slurp.
+    - Add regression test for GLOB refs being slurped in. Thank you, James Keenan!
+      https://github.com/perhunter/slurp/pull/17#issuecomment-437174592
+    - Refactor read_file to use open and read rather than sysopen and sysread.
+    - Add a bugwards compatible feature to keep track of the cursor when
+      dealing with the DATA handle (https://github.com/perhunter/slurp/pull/17)
+    - Fix a typo in the docs.
+
 9999.24     2018-10-29
     - Document the clear downfalls of using file handles of any kind rather
       than just the file's path string.

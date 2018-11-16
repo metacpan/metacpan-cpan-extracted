@@ -13,13 +13,13 @@ my @fh = ( [ \*STDIN, '<' ], [ \*STDOUT, '>' ], [ \*STDERR, '>' ], );
 my %opt;
 
 GetOptions( \%opt,
-	    qw[
-		  logdir=s
-		  long=s
-		  sleep=i
-		  s=s
-		  name=s
-	  ] )
+            qw[
+                  logdir=s
+                  long=s
+                  sleep=i
+                  s=s
+                  name=s
+          ] )
   or die;
 
 die( "must specify name\n" )
@@ -37,7 +37,7 @@ while ( @ARGV ) {
 
     my $fd = shift @ARGV;
 
-    my ( $fh, my $mode )
+    my ( $fh, $mode )
       = @{ $fh[$fd]
           // [ IO::Handle->new_from_fd( $fd, $ARGV[0] ), shift @ARGV ] };
 
@@ -46,9 +46,9 @@ while ( @ARGV ) {
 
     if ( $mode eq '<' or $mode eq 'r' ) {
 
-	my @input = $fh->getlines;
+        my @input = $fh->getlines;
 
-	$LOG{$fd} = \@input;
+        $LOG{$fd} = \@input;
 
         print STDOUT @input if $fd == 0;
 

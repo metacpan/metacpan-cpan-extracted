@@ -88,10 +88,10 @@
          "web" : "https://github.com/reyjrar/POE-Component-ElasticSearch-Indexer"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026001"
+         "version" : "5.026000"
       },
       "plugins" : [
          {
@@ -310,8 +310,10 @@
                   ],
                   "spell_cmd" : "",
                   "stopwords" : [
+                     "BacklogInterval",
                      "BatchDir",
                      "BatchDiskSpace",
+                     "CleanupInterval",
                      "DefaultIndex",
                      "DefaultType",
                      "Elasticsearch",
@@ -320,6 +322,7 @@
                      "LoggingConfig",
                      "MaxConnsPerServer",
                      "MaxConnsTotal",
+                     "MaxFailedRatio",
                      "MaxPendingRequests",
                      "MaxRecoveryBatches",
                      "StatsHandler",
@@ -423,7 +426,7 @@
                }
             },
             "name" : "Git::GatherDir",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::NextVersion",
@@ -434,12 +437,12 @@
                   "version_regexp" : "(?^u:^release-(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.0.4",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
             "name" : "Git::NextVersion",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurPkgVersion",
@@ -464,17 +467,17 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.0.4",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
             "name" : "Git::Check",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
             "name" : "GithubMeta",
-            "version" : "0.54"
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
@@ -512,7 +515,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.0.4",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -520,7 +523,7 @@
                }
             },
             "name" : "Commit_Dirty_Files",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -529,12 +532,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-0.009",
+                  "tag" : "release-0.010",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.0.4",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -542,7 +545,7 @@
                }
             },
             "name" : "Git::Tag",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
@@ -565,7 +568,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.0.4",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -573,7 +576,7 @@
                }
             },
             "name" : "Commit_Changes",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -585,12 +588,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.0.4",
+                  "git_version" : "2.19.1",
                   "repo_root" : "."
                }
             },
             "name" : "Git::Push",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -651,7 +654,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.26.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

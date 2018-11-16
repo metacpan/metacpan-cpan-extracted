@@ -32,3 +32,13 @@ my $val = decode ("utf-16be", $val);
 
 use FindBin qw( $RealBin );
 my $prog = $RealBin . "/../foo.pl";
+
+## name used in ternary op
+## failures 0
+## cut
+
+use Foo qw( FOO BAR BAZ );
+
+my $fb = hoi () ? FOO :
+         hai () ? BAR :
+         hui () ? BAZ ;

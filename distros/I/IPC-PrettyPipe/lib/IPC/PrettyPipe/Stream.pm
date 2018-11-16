@@ -1,29 +1,8 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of IPC::PrettyPipe
-#
-# IPC::PrettyPipe is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package IPC::PrettyPipe::Stream;
 
-use Carp;
+# ABSTRACT: An I/O stream for an B<IPC::PrettyPipe> pipeline or command
 
-use Moo;
+use Carp;
 
 use Types::Standard qw[ Bool Str ];
 
@@ -34,7 +13,16 @@ use IO::ReStoreFH;
 use POSIX ();
 use Fcntl qw[ O_RDONLY O_WRONLY O_CREAT O_TRUNC O_APPEND ];
 
+
+use Moo;
+
+our $VERSION = '0.08';
+
+
 with 'IPC::PrettyPipe::Queue::Element';
+
+use namespace::clean;
+
 
 my %fh_map = (
     0 => *STDIN,
@@ -92,6 +80,10 @@ has strict => (
     is      => 'ro',
     isa     => Bool,
     default => sub { 1 } );
+
+#pod =for Pod::Coverage BUILDARGS BUILD
+#pod
+#pod =cut
 
 sub BUILDARGS {
 
@@ -218,11 +210,11 @@ sub _dup {
 
 sub _redirect_stdout_stderr {
 
-	my $self = shift;
+        my $self = shift;
 
-	( undef, my $sub_redir ) = $self->_redirect( *STDOUT );
-	( undef, my $sub_dup   ) = $self->_dup( *STDERR, *STDOUT );
-	return sub { $sub_redir->(), $sub_dup->() },  *STDOUT, *STDERR;
+        ( undef, my $sub_redir ) = $self->_redirect( *STDOUT );
+        ( undef, my $sub_dup   ) = $self->_dup( *STDERR, *STDOUT );
+        return sub { $sub_redir->(), $sub_dup->() },  *STDOUT, *STDERR;
 
 }
 
@@ -255,30 +247,47 @@ sub _close {
 
 sub apply {
 
-	my $self = shift;
+        my $self = shift;
 
-	my ( $N, $M ) =  do {
+        my ( $N, $M ) =  do {
 
-		no warnings 'uninitialized';
+                no warnings 'uninitialized';
 
-		map { $fh_map{$_} } $self->N, $self->M;
+                map { $fh_map{$_} } $self->N, $self->M;
 
-	};
+        };
 
-	my $mth = '_' . $self->_type;
-	return $self->$mth( $N, $M );
+        my $mth = '_' . $self->_type;
+        return $self->$mth( $N, $M );
 }
 
 
 
 1;
 
+#
+# This file is part of IPC-PrettyPipe
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 __END__
 
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory Bourne
+
 =head1 NAME
 
-B<IPC::PrettyPipe::Stream> - An I/O stream for an B<IPC::PrettyPipe> pipline or command
+IPC::PrettyPipe::Stream - An I/O stream for an B<IPC::PrettyPipe> pipeline or command
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -297,6 +306,8 @@ B<IPC::PrettyPipe::Stream> - An I/O stream for an B<IPC::PrettyPipe> pipline or 
 B<IPC::PrettyPipe::Stream> objects represent I/O streams attached to
 either B<L<IPC::PrettyPipe>> or B<L<IPC::PrettyPipe::Cmd>> objects.
 
+=for Pod::Coverage BUILDARGS BUILD
+
 =head1 METHODS
 
 =over 8
@@ -310,7 +321,6 @@ either B<L<IPC::PrettyPipe>> or B<L<IPC::PrettyPipe::Cmd>> objects.
   # concise interface
   $stream = IPC::PrettyPipe::Stream->new( $spec );
   $stream = IPC::PrettyPipe::Stream->new( [ $spec, $file ] );
-
 
 The available attributes are:
 
@@ -353,7 +363,6 @@ Return the file passed in to the constructor (if one was),
 appropriately quoted for passing as a single word to a Bourne
 compatible shell.
 
-
 =item B<has_file>
 
   $bool = $stream->has_file;
@@ -388,7 +397,6 @@ Retrieve the components of the specification.
 Return true if the stream specification contained the associated
 component.
 
-
 =item B<apply>
 
   ( $sub, @fh ) = $stream->apply;
@@ -402,16 +410,44 @@ modules).
 
 =back
 
-=head1 COPYRIGHT & LICENSE
+=head1 BUGS
 
-Copyright 2014 Smithsonian Astrophysical Observatory
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
+email to
+L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
 
-This software is released under the GNU General Public License.  You
-may find a copy at
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-   http://www.fsf.org/copyleft/gpl.html
+=head1 SOURCE
 
+The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
+and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<IPC::PrettyPipe|IPC::PrettyPipe>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

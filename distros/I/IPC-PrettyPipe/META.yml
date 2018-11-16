@@ -1,34 +1,93 @@
 ---
-abstract: unknown
+abstract: 'manage human readable external command execution pipelines'
 author:
-  - 'Diab Jerius'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
+  Data::Dumper: '0'
   Devel::FindPerl: '0'
-  ExtUtils::MakeMaker: '6.36'
+  ExtUtils::MakeMaker: '0'
+  File::Slurper: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
   File::pushd: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Moo: '1.001000'
+  Scalar::Util: '0'
+  Template::Tiny: '0'
+  Term::ANSIColor: '0'
+  Test2::API: '0'
+  Test2::V0: '0'
   Test::Base: '0'
-  Test::Deep: '0'
-  Test::Exception: '0'
-  Test::File: '0'
   Test::Lib: '0'
   Test::More: '0'
-  Test::Most: '0'
   Test::Trap: '0'
+  Types::Standard: '0'
 configure_requires:
-  CPAN::Meta: '0'
-  ExtUtils::MakeMaker: '6.36'
-dynamic_config: '0'
-generated_by: 'Module::Install version 1.10, CPAN::Meta::Converter version 2.131560'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: IPC-PrettyPipe
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  IPC::PrettyPipe:
+    file: lib/IPC/PrettyPipe.pm
+    version: '0.08'
+  IPC::PrettyPipe::Arg:
+    file: lib/IPC/PrettyPipe/Arg.pm
+    version: '0.08'
+  IPC::PrettyPipe::Arg::Format:
+    file: lib/IPC/PrettyPipe/Arg/Format.pm
+    version: '0.08'
+  IPC::PrettyPipe::Cmd:
+    file: lib/IPC/PrettyPipe/Cmd.pm
+    version: '0.08'
+  IPC::PrettyPipe::DSL:
+    file: lib/IPC/PrettyPipe/DSL.pm
+    version: '0.08'
+  IPC::PrettyPipe::Execute::IPC::Run:
+    file: lib/IPC/PrettyPipe/Execute/IPC/Run.pm
+    version: '0.08'
+  IPC::PrettyPipe::Executor:
+    file: lib/IPC/PrettyPipe/Executor.pm
+    version: '0.08'
+  IPC::PrettyPipe::Format:
+    file: lib/IPC/PrettyPipe/Format.pm
+    version: '0.08'
+  IPC::PrettyPipe::Queue:
+    file: lib/IPC/PrettyPipe/Queue.pm
+    version: '0.08'
+  IPC::PrettyPipe::Queue::Element:
+    file: lib/IPC/PrettyPipe/Queue/Element.pm
+    version: '0.08'
+  IPC::PrettyPipe::Render::Template::Tiny:
+    file: lib/IPC/PrettyPipe/Render/Template/Tiny.pm
+    version: '0.08'
+  IPC::PrettyPipe::Renderer:
+    file: lib/IPC/PrettyPipe/Renderer.pm
+    version: '0.08'
+  IPC::PrettyPipe::Stream:
+    file: lib/IPC/PrettyPipe/Stream.pm
+    version: '0.08'
+  IPC::PrettyPipe::Stream::Utils:
+    file: lib/IPC/PrettyPipe/Stream/Utils.pm
+    version: '0.08'
+  IPC::PrettyPipe::Types:
+    file: lib/IPC/PrettyPipe/Types.pm
+    version: '0.08'
 requires:
   IO::ReStoreFH: '0.04'
   IPC::Run: '0'
@@ -37,7 +96,7 @@ requires:
   Module::Load: '0'
   Module::Runtime: '0'
   Moo: '1.001000'
-  MooX::Attributes::Shadow: '0'
+  MooX::Attributes::Shadow: '0.05'
   Safe::Isa: '0'
   String::ShellQuote: '0'
   Template::Tiny: '0'
@@ -47,5 +106,6 @@ requires:
   parent: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe
-  repository: http://bitbucket.org/djerius/ipc-prettypipe
-version: '0.03'
+  repository: git://github.com/djerius/ipc-prettypipe.git
+version: '0.08'
+x_serialization_backend: 'YAML::Tiny version 1.70'

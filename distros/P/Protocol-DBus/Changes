@@ -1,5 +1,11 @@
 Revision history for Perl module Protocol::DBus
 
+0.05 Thu 15 Nov 2018
+- Add proper UNIX_FD support and an example of its use.
+- Add preserve_variant_signatures() mode.
+- Add send_signal() method.
+- Update documentation, add README.md.
+
 0.04 Wed 14 Nov 2018
 - Fix DICT unmarshaling alignment.
 - Add receive.pl example and two contributed ones.

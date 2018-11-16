@@ -1,92 +1,95 @@
 #! perl
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use IPC::PrettyPipe::Stream::Utils 'parse_spec';
 
-use Test::More;
-use Test::Exception;
+my @tests = ( {
+        op     => '<',
+        expect => { Op => '<', N => 0, type => 'redirect' }
+    },
 
+    {
+        op     => 'N<',
+        expect => { Op => '<', type => 'redirect' },
+    },
 
-my @tests =
-  (
- {
-   op => '<',
-   expect => { Op => '<', N => 0, type => 'redirect' }
- },
+    {
+        op     => '>',
+        expect => { Op => '>', N => 1, type => 'redirect' }
+    },
 
- { op => 'N<',
-   expect => { Op => '<', type => 'redirect' },
- },
+    {
+        op     => 'N>',
+        expect => { Op => '>', type => 'redirect' },
+    },
 
- { op => '>',
-   expect => { Op => '>', N => 1, type => 'redirect'  }
- },
+    {
+        op     => '>>',
+        expect => { Op => '>>', N => 1, type => 'redirect' },
+    },
 
- { op => 'N>',
-   expect => { Op => '>', type => 'redirect'  },
- },
+    {
+        op     => 'N>>',
+        expect => { Op => '>>', type => 'redirect' },
+    },
 
- { op => '>>',
-   expect => { Op => '>>', N => 1, type => 'redirect'  },
- },
+    {
+        op     => '>&',
+        expect => { Op => '>&', type => 'redirect_stdout_stderr' },
+    },
 
- { op  => 'N>>',
-   expect => { Op => '>>', type => 'redirect'  },
- },
+    {
+        op     => '&>',
+        expect => { Op => '&>', type => 'redirect_stdout_stderr' },
+    },
 
- { op => '>&',
-   expect => { Op => '>&', type => 'redirect_stdout_stderr'  },
- },
+    {
+        op     => 'M<&N',
+        expect => { Op => '<&', type => 'dup' },
+    },
 
- { op => '&>',
-   expect => { Op => '&>',  type => 'redirect_stdout_stderr' },
- },
+    {
+        op     => 'N>&M',
+        expect => { Op => '>&', type => 'dup' },
+    },
 
- { op => 'M<&N',
-   expect => { Op => '<&', type => 'dup' },
- },
+    {
+        op     => 'N<&-',
+        expect => { Op => '<&', M => '-', type => 'close' },
+    },
 
- { op => 'N>&M',
-   expect => { Op => '>&', type => 'dup' },
- },
+    # { op => '<pty',
+    #   expect => { Op => '<pty', N => 0 },
+    # },
 
- { op => 'N<&-',
-   expect => { Op => '<&', M => '-', type => 'close' },
- },
+    # { op => 'N<pty',
+    #   expect => { Op => '<pty' },
+    # },
 
- # { op => '<pty',
- #   expect => { Op => '<pty', N => 0 },
- # },
+    # { op => '>pty',
+    #   expect => { Op => '>pty', N => 1 },
+    # },
 
- # { op => 'N<pty',
- #   expect => { Op => '<pty' },
- # },
+    # { op => 'N>pty',
+    #   expect => { Op => '>pty' },
+    # },
 
- # { op => '>pty',
- #   expect => { Op => '>pty', N => 1 },
- # },
+    # { op => '<pipe',
+    #   expect => { Op => '<pipe', N => 0 },
+    # },
 
- # { op => 'N>pty',
- #   expect => { Op => '>pty' },
- # },
+    # { op => 'N<pipe',
+    #   expect => { Op => '<pipe' },
+    # },
 
- # { op => '<pipe',
- #   expect => { Op => '<pipe', N => 0 },
- # },
+    # { op => '>pipe',
+    #   expect => { Op => '>pipe', N => 1 },
+    # },
 
- # { op => 'N<pipe',
- #   expect => { Op => '<pipe' },
- # },
-
- # { op => '>pipe',
- #   expect => { Op => '>pipe', N => 1 },
- # },
-
- # { op => 'N>pipe',
- #   expect => { Op => '>pipe' },
- # },
+    # { op => 'N>pipe',
+    #   expect => { Op => '>pipe' },
+    # },
 
 );
 
@@ -97,85 +100,91 @@ sub test {
 
     $par{desc} //= $par{op};
 
-    lives_ok {
-	    my $got = parse_spec( $par{op} );
+    ok(
+        lives {
+            my $got = parse_spec( $par{op} );
 
-	    delete $got->{param};
+            delete $got->{param};
 
-	    is_deeply( $got, $par{expect} );
-    } $par{desc};
+            is( $got, $par{expect} );
+        },
+        $par{desc},
+    );
 
 }
 
 for my $test ( @tests ) {
 
-	my @pt = ( $test );
+    my @pt = ( $test );
 
-	my @ftests;
+    my @ftests;
 
-	# fill in N & M
-	my %r = ( N => [ 3, 45 ],
-	          M => [ 6, 78 ]
-	        );
+    # fill in N & M
+    my %r = (
+        N => [ 3, 45 ],
+        M => [ 6, 78 ] );
 
-	while ( @pt ) {
+    while ( @pt ) {
 
-		my $t = shift @pt;
+        my $t = shift @pt;
 
-		if ( my ( $x ) = $t->{op} =~ /(N|M)/ ) {
+        if ( my ( $x ) = $t->{op} =~ /(N|M)/ ) {
 
-			for my $r ( @{$r{$x}} ) {
+            for my $r ( @{ $r{$x} } ) {
 
-				my %nt = %$t;
-				$nt{expect} = { %{$nt{expect}} };
-				$nt{op} =~ s/$x/$r/;
-				$nt{expect}{$x} = $r;
+                my %nt = %$t;
+                $nt{expect} = { %{ $nt{expect} } };
+                $nt{op} =~ s/$x/$r/;
+                $nt{expect}{$x} = $r;
 
-				push @pt, \%nt;
+                push @pt, \%nt;
 
-			}
+            }
 
-		}
+        }
 
-		else {
+        else {
 
-			push @ftests, $t
+            push @ftests, $t
 
-		}
+        }
 
-	}
+    }
 
-	test( %$_ ) for @ftests;
+    test( %$_ ) for @ftests;
 }
 
 # test if param checking works
 
-lives_and {
+try_ok {
 
-	my $op = parse_spec( '2>&3' );
+    my $op = parse_spec( '2>&3' );
 
-    is( $op->{Op}, '>&' );
-	is( !!$op->{param}, !!0 );
+    is( $op->{Op},      '>&' );
+    is( !!$op->{param}, !!0 );
 
-} 'N>&M';
+}
+'N>&M';
 
-lives_and {
+try_ok {
 
-	my $op = parse_spec( '>' );
+    my $op = parse_spec( '>' );
 
-    is( $op->{Op}, '>' );
-	is( $op->{param}, 1 );
+    is( $op->{Op},    '>' );
+    is( $op->{param}, 1 );
 
-} '>';
+}
+'>';
 
-lives_and {
+try_ok {
 
-	my $op = parse_spec( '>&' );
+    my $op = parse_spec( '>&' );
 
-    is( $op->{Op}, '>&' );
-	is( $op->{param}, 1 );
+    is( $op->{Op},    '>&' );
+    is( $op->{param}, 1 );
 
-} '>&';
+}
+'>&';
 
 
 done_testing;

@@ -1,41 +1,18 @@
-#! perl
-
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of IPC::PrettyPipe
-#
-# IPC::PrettyPipe is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
-
-# This class exists primarily to provide a workaround for
-# Template::Tiny's lack of support for the Template Toolkit loop
-# constructs.  It adds an extra (ugly) layer on top of a simple
-# array.
-
-
 package IPC::PrettyPipe::Queue;
+
+# ABSTRACT: A simple queue
 
 use Moo;
 
+our $VERSION = '0.08';
+
+use namespace::clean;
+
+
 has elements => (
-	      is => 'ro',
-	      init_arg => undef,
-	      default => sub { [] },
+              is => 'ro',
+              init_arg => undef,
+              default => sub { [] },
 );
 
 sub empty { ! !!@{ $_[0]->elements } }
@@ -52,15 +29,15 @@ sub push {
     my $elements = $self->elements;
 
     if ( @$elements ) {
-	## no critic (ProhibitAccessOfPrivateData)
-	$elements->[-1]->_set_last( 0 );
-	$elem->_set_last( 1 );
-	$elem->_set_first( 0 );
+        ## no critic (ProhibitAccessOfPrivateData)
+        $elements->[-1]->_set_last( 0 );
+        $elem->_set_last( 1 );
+        $elem->_set_first( 0 );
     }
     else {
 
-	$elem->_set_last( 1 );
-	$elem->_set_first( 1 );
+        $elem->_set_last( 1 );
+        $elem->_set_first( 1 );
 
     }
 
@@ -71,12 +48,29 @@ sub push {
 
 1;
 
+#
+# This file is part of IPC-PrettyPipe
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 __END__
 
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory nelements
+
 =head1 NAME
 
-B<IPC::PrettyPipe::Queue> - A simple queue
+IPC::PrettyPipe::Queue - A simple queue
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -87,7 +81,6 @@ B<IPC::PrettyPipe::Queue> - A simple queue
   $elements = $q->elements;
   $is_q_empty = $q->empty;
 
-
 =head1 DESCRIPTION
 
 This module provides a simple queue for objects which perform the
@@ -97,7 +90,6 @@ one queue at a time.
 =head1 METHODS
 
 The following methods are available:
-
 
 =over
 
@@ -134,7 +126,6 @@ Returns the number of elements in the queue.
 
 =back
 
-
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2014 Smithsonian Astrophysical Observatory
@@ -144,9 +135,48 @@ may find a copy at
 
    http://www.fsf.org/copyleft/gpl.html
 
-
 =head1 AUTHOR
 
 Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
+email to
+L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
+and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<IPC::PrettyPipe|IPC::PrettyPipe>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut

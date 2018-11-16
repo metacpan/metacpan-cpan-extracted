@@ -18,7 +18,7 @@ use Protocol::DBus::Client;
 
 my $dbus = Protocol::DBus::Client::system();
 
-use Carp::Always;
+$dbus->preserve_variant_signatures(1);
 
 $dbus->do_authn();
 

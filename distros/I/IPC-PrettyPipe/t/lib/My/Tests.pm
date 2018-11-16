@@ -1,76 +1,90 @@
 package My::Tests;
 
-use base qw[ Test::Builder::Module Exporter ];
-
-our @EXPORT = qw[ test_attr run_methods ];
-
+use Test2::V0;
+use Test2::API qw[ context ];
 
 use Carp;
 
-use Test::Exception;
-use Test::Deep;
+use Exporter 'import';
 
-use strict;
-use warnings;
+our @EXPORT = qw[ test_attr run_methods ];
 
 sub test_attr {
 
-    my $tb = __PACKAGE__->builder;
 
-    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $ctx = context;
 
     my $new = shift;
 
-    for my $test ( @_ ) {
+    try_ok {
 
+        for my $test ( @_ ) {
 
-        if ( 'ARRAY' eq ref( $test ) ) {
+            if ( 'ARRAY' eq ref( $test ) ) {
 
-            test_attr( $new, $_ ) foreach @$test;
-        }
+                test_attr( $new, $_ ) foreach @$test;
+            }
 
-        elsif ( 'HASH' eq ref( $test ) ) {
+            elsif ( 'HASH' eq ref( $test ) ) {
 
+                try_ok {
 
-            lives_and {
+                    my @new_args
+                      = 'CODE' eq ref( $test->{new} )
+                      ? $test->{new}->()
+                      : @{ $test->{new} };
 
-		my @new_args = 'CODE' eq ref( $test->{new}  )
-		             ? $test->{new}->() 
-			     : @{$test->{new}};
+                    my $obj = $new->( @new_args );
 
-                my $obj = $new->( @new_args );
+                    run_methods( $obj, @{ $test->{methods} // [] } );
 
-                run_methods( $obj, @{ $test->{methods} // [] } );
+                    if ( exists $test->{expected} ) {
+                        is(
+                            $obj,
+                            object {
+                                map { call( $_, $test->{expected}{$_} ) }
+                                  keys %{ $test->{expected} }
+                            },
+                        );
+                    }
 
-                cmp_deeply( $obj, methods( %{ $test->{expected} } ) )
-                  if exists $test->{expected};
+                    if ( exists $test->{compare} ) {
 
-                if ( exists $test->{compare} ) {
+                        for my $stest ( @{ $test->{compare} } ) {
 
-	                for my $stest ( @{ $test->{compare} } ) {
+                            my ( $eval, $expected ) = @{$stest};
 
-		                my ( $eval, $expected ) = @{ $stest } ;
+                            my $got = eval "\$obj->$eval";
+                            die( "error evaling $eval: $@\n" )
+                              if $@;
+                            is(
+                                $got,
+                                object {
+                                    map { call( $_, $expected->{$_} ) }
+                                      keys %{$expected}
+                                },
+                                "$test->{desc}:  $eval"
+                            );
 
-		                my $got = eval "\$obj->$eval";
-		                die( "error evaling $eval: $@\n" )
-		                  if $@;
-		                cmp_deeply( $got, methods( %{ $expected } ), "$test->{desc}:  $eval" );
+                        }
 
-	                }
+                    }
 
                 }
+                $test->{desc};
 
             }
-            $test->{desc};
+
+            else {
+
+                croak( "test must be a hash ref\n" );
+            }
 
         }
 
-        else {
+    };
 
-            croak( "test must be a hash ref\n" );
-        }
-
-    }
+    $ctx->release;
 
     return;
 

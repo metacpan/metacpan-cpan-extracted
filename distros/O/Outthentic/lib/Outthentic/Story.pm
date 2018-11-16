@@ -7,8 +7,10 @@ use Outthentic::Story::Stat;
 use File::ShareDir;
 use JSON;
 use Carp;
+use Time::localtime;
 
 use File::Path::Tiny;
+use Term::ANSIColor;
 
 our @EXPORT = qw{ 
 
@@ -31,6 +33,8 @@ our @EXPORT = qw{
     do_python_hook
 
     do_bash_hook
+
+    do_ps_hook
 
     ignore_story_err
 
@@ -115,6 +119,8 @@ sub set_story {
     _mk_python_glue_file();
 
     _mk_bash_glue_file();
+
+    _mk_ps_glue_file();
 
 }
 
@@ -248,6 +254,10 @@ sub _bash_glue_file {
   story_cache_dir()."/glue.bash";
 }
 
+sub _ps_glue_file {
+  story_cache_dir()."/glue.ps1";
+}
+
 sub dsl {
     get_prop('dsl')
 }
@@ -311,6 +321,8 @@ sub run_story {
 sub do_perl_hook {
 
     my $hook_file = shift;
+
+    print_hook_header();
 
     {
       package main;
@@ -523,6 +535,54 @@ CODE
 
 }
 
+sub _mk_ps_glue_file {
+
+    open PS_GLUE, ">", _ps_glue_file() or die $!;
+
+    my $stdout_file = stdout_file();
+    my $cache_root_dir = cache_root_dir();
+    my $story_dir = get_prop('story_dir');
+    my $project_root_dir = project_root_dir();
+    my $debug_mod12 = debug_mod12();
+
+    my $cache_dir = story_cache_dir;
+
+    print PS_GLUE <<"CODE";
+
+    function debug_mod12 {
+      '$debug_mod12'
+    }
+
+    function cache_root_dir {
+      '$cache_root_dir'
+    }
+
+    function test_root_dir {
+      '$cache_root_dir'
+    }
+
+    function project_root_dir {
+      '$project_root_dir'
+    }
+
+    function cache_dir {
+      '$cache_dir'
+    }
+
+    function story_dir {
+      '$story_dir'
+    }
+
+    function stdout_file {
+      '$stdout_file'
+    }
+
+CODE
+
+    close PS_GLUE;
+
+}
+
 sub do_ruby_hook {
 
     my $file = shift;
@@ -530,6 +590,8 @@ sub do_ruby_hook {
     my $ruby_lib_dir = File::ShareDir::dist_dir('Outthentic');
 
     my $cmd;
+
+    print_hook_header();
 
     if (-f project_root_dir()."/Gemfile" ){
       $cmd = "cd ".project_root_dir()." && bundle exec ruby -I $ruby_lib_dir -r outthentic -I ".story_cache_dir()." $file"
@@ -565,6 +627,7 @@ sub do_ruby_hook {
       next if $l=~/#/;
 
       quit($1) if $l=~/quit:(.*)/;
+
       outthentic_die($1) if $l=~/outthentic_die:(.*)/;
 
       ignore_story_err($1) if $l=~/ignore_story_err:\s+(\d)/;
@@ -586,7 +649,7 @@ sub do_ruby_hook {
         run_story($path, decode_json($story_vars_json||{}));
         $story_vars_json = undef;
 
-        }
+      }
     }
 
     return 1;
@@ -600,6 +663,8 @@ sub do_python_hook {
 
     my $cmd  = "PYTHONPATH=\$PYTHONPATH:".(story_cache_dir()).":$python_lib_dir python $file";
   
+    print_hook_header();
+
     if (debug_mod12()){
         main::note("do_python_hook: $cmd"); 
     }
@@ -628,6 +693,7 @@ sub do_python_hook {
       next if $l=~/#/;
 
       quit($1) if $l=~/quit:(.*)/;
+
       outthentic_die($1) if $l=~/outthentic_die:(.*)/;
 
       ignore_story_err($1) if $l=~/ignore_story_err:\s+(\d)/;
@@ -650,7 +716,7 @@ sub do_python_hook {
 
         $story_vars_json = undef;
 
-        }
+      }
     }
 
     return 1;
@@ -667,6 +733,8 @@ sub do_bash_hook {
     $cmd.=" && source $file";
 
     $cmd="bash -c '$cmd'";
+
+    print_hook_header();
 
     if (debug_mod12()){
         main::note("do_bash_hook: $cmd"); 
@@ -696,6 +764,7 @@ sub do_bash_hook {
       next if $l=~/#/;
       
       quit($1) if $l=~/quit:(.*)/;
+
       outthentic_die($1) if $l=~/outthentic_die:(.*)/;
 
       ignore_story_err($1) if $l=~/ignore_story_err:\s+(\d)/;
@@ -714,6 +783,81 @@ sub do_bash_hook {
         run_story($path, {%story_vars_bash});
         %story_vars_bash = ();
       }
+    }
+
+    return 1;
+
+}
+
+
+sub do_ps_hook {
+
+    my $file = shift;
+
+    my $ps_lib_dir = File::ShareDir::dist_dir('Outthentic');
+
+    my $cmd;
+
+    print_hook_header();
+
+    if ( $^O  =~ 'MSWin'  ){
+      $cmd = "powershell.exe -NoProfile -c \". ".story_cache_dir()."/glue.ps1; . $ps_lib_dir/outthentic.ps1; . $file; \"";
+    } else {
+      $cmd = "pwsh -c \". ".story_cache_dir()."/glue.ps1; . $ps_lib_dir/outthentic.ps1; . $file; \"";
+    }
+
+    if (debug_mod12()){
+        main::note("do_ps_hook: $cmd"); 
+    }
+
+
+    my $rand = int(rand(1000));
+
+    my $st = system("$cmd 2>".story_cache_dir()."/$rand.err 1>".story_cache_dir()."/$rand.out");
+
+    if($st != 0){
+      die "do_ps_hook failed. \n see ".story_cache_dir()."/$rand.err for details";
+    }
+
+    my $out_file = story_cache_dir()."/$rand.out";
+
+    open HOOK_OUT, $out_file or die "can't open HOOK_OUT file $out_file to read!";
+
+    my @out = <HOOK_OUT>;
+
+    close HOOK_OUT;
+
+    my $story_vars_json;
+
+    for my $l (@out) {
+
+      next if $l=~/#/;
+      
+      quit($1) if $l=~/quit:(.*)/;
+
+      outthentic_die($1) if $l=~/outthentic_die:(.*)/;
+
+      ignore_story_err($1) if $l=~/ignore_story_err:\s+(\d)/;
+      
+      if ($l=~s/story_var_json_begin.*// .. $l=~s/story_var_json_end.*//){
+        $story_vars_json.=$l;    
+        next;
+      }
+
+      if ($l=~/story:\s+(\S+)/){
+
+        my $path = $1;
+
+        if (debug_mod12()){
+            main::note("run downstream story from powershell hook"); 
+        }
+
+        run_story($path, decode_json($story_vars_json||{}));
+
+        $story_vars_json = undef;
+
+      }
+
     }
 
     return 1;
@@ -756,6 +900,47 @@ sub story_var {
 sub story_vars_pretty {
 
     join " ", map { "$_:".(story_var($_)) } sort keys %{get_prop( 'story_vars' ) };
+
+}
+
+sub print_hook_header {
+
+    my $task_name = get_prop('task_name');
+
+    my $format = get_prop('format');
+
+    my $data;
+
+    if ($format eq 'production') {
+        $data = timestamp().' : '.($task_name || '').' '.'[hook]'
+    } elsif ($format ne 'concise') {
+        $data = timestamp().' : '.($task_name ||  '' ).' '.(nocolor() ? ' hook' : colored(['yellow'],'[hook]'))
+    }
+
+    note($data) if $format ne 'concise';
+}
+
+sub note {
+
+    my $message = shift;
+    my $no_new_line = shift;
+
+    binmode(STDOUT, ":utf8");
+    print $message;
+    print "\n" unless $no_new_line;
+
+}
+
+sub nocolor {
+  get_prop('nocolor')
+}
+
+sub timestamp {
+
+    sprintf '%02d-%02d-%02d %02d:%02d:%02d',
+    localtime->year()+1900,
+    localtime->mon()+1, localtime->mday,
+    localtime->hour, localtime->min, localtime->sec;
 
 }
 

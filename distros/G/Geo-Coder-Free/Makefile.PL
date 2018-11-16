@@ -37,7 +37,6 @@ my %urls = (
 	'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
 );
 
-
 # unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
 
 foreach my $url(keys %urls) {
@@ -71,10 +70,12 @@ WriteMakefile(
 		'App::csv2sqlite' => 0,
 		'CHI' => 0,
 		'CHI::Driver::RawMemory' => 0,
+		'Config::Auto' => 0,
 		'File::Basename' => 0,
 		'File::Copy' => 0,
 		'File::Spec' => 0,
 		'autodie' => 0,
+		'IO::AIO' => 0,
 		'IPC::System::Simple' => 0,
 		'JSON' => 0,
 		'LWP::UserAgent::Throttled' => 0,
@@ -113,7 +114,7 @@ WriteMakefile(
 		'Storable' => 0,
 		'Text::CSV' => 0,
 	},
-	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
 	clean		=> { FILES => 'Geo-Coder-Free-*' },
 	# META_ADD => {
 		# provides => {
@@ -135,12 +136,13 @@ WriteMakefile(
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
-			type => 'git',
-			url => 'git://github.com/nigelhorne/Geo-Coder-Free.git',
-			web => 'https://github.com/nigelhorne/Geo-Coder-Free',
+				type => 'git',
+				url => 'git://github.com/nigelhorne/Geo-Coder-Free.git',
+				web => 'https://github.com/nigelhorne/Geo-Coder-Free',
 			},
 			bugtracker => {
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free',
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free',
+				web => 'https://github.com/nigelhorne/Geo-Coder-Free/issues',
 				mailto => 'bug-Geo-Coder-Free@rt.cpan.org'
 			}
 		},

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '2.2';
+$Mojolicious::Plugin::JSONAPI::VERSION = '2.3';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -42,6 +42,7 @@ sub create_route_helpers {
             my ($c, $spec) = @_;
             $spec->{resource} || Carp::confess('resource is a required param');
             $spec->{relationships} ||= [];
+            my $http_verbs = $spec->{http_verbs} // ['get', 'post', 'patch', 'delete'];
             my @DEV_LOGS;
 
             my $resource          = Lingua::EN::Inflexion::noun($spec->{resource});
@@ -57,14 +58,20 @@ sub create_route_helpers {
             my $controller = $spec->{controller} || "api-$action_plural";
 
             my $r = $router->any($base_path)->to(controller => $controller);
-            $r->get('/')->to(action => "fetch_${action_plural}");
-            $r->post('/')->to(action => "post_${action_singular}");
-            push @DEV_LOGS, "GET $base_path/ -> ${controller}#fetch_${action_plural}";
-            push @DEV_LOGS, "POST $base_path/ -> ${controller}#post_${action_singular}";
-            foreach my $method (qw/get patch delete/) {
+
+            # use the allowed verbs to create the main resources routes.
+            if (grep { $_ eq 'get' } @$http_verbs) {
+                $r->get('/')->to(action => "fetch_${action_plural}");
+                push @DEV_LOGS, "GET $base_path/ -> ${controller}#fetch_${action_plural}";
+            }
+            if (grep { $_ eq 'post' } @$http_verbs) {
+                $r->post('/')->to(action => "post_${action_singular}");
+                push @DEV_LOGS, "POST $base_path/ -> ${controller}#post_${action_singular}";
+            }
+            foreach my $method (grep { $_ =~ m/\A(?:get|patch|delete)\z/ } @$http_verbs) {
+                $r->$method("/:${action_singular}_id")->to(action => "${method}_${action_singular}");
                 push @DEV_LOGS,
                     uc($method) . " $base_path/:${action_singular}_id -> ${controller}#${method}_${action_singular}";
-                $r->$method("/:${action_singular}_id")->to(action => "${method}_${action_singular}");
             }
 
             foreach my $relationship (@{ $spec->{relationships} }) {
@@ -212,7 +219,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 2.2
+version 2.3
 
 =head1 SYNOPSIS
 
@@ -282,7 +289,7 @@ See L<http://jsonapi.org/> for the JSON API specification. At the time of writin
 =item C<namespace>
 
 The prefix that's added to all routes, defaults to 'api'. You can also provided an empty string as the namespace,
-meaing no prefix will be added.
+meaning no prefix will be added.
 
 =item C<kebab_case_attrs>
 
@@ -301,6 +308,7 @@ Creates a set of routes for the given resource. C<$spec> is a hash reference tha
         resource        => 'post', # name of resource, required
         controller      => 'api-posts', # name of controller, defaults to "api-{resource_plural}"
         relationships   => ['author', 'comments'], # default is []
+        http_verbs      => ['get', 'post'], # default is ['get', 'post', 'patch', 'delete']
     }
 
 =over
@@ -345,6 +353,14 @@ Specifying C<relationships> will create additional routes that fall under the re
 B<NOTE>: Your relationships should be in the correct form (singular/plural) based on the relationship in your
 schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
 sure comments is passed in as a plural noun here.
+
+=item C<http_verbs I<ArrayRef>>
+
+The HTTP verbs/methods to use when creating the resources routes. Defaults to C<GET>, C<POST>, C<PATCH> and C<DELETE>, where
+C<GET> is both for the collection route as well as the single resource route (e.g. C</api/authors> and C</api/authors/:author_id>).
+
+Specifying this will not, if provided, affect the relationship routes that will be created. Those will have routes created for
+all verbs regardless.
 
 =back
 
@@ -421,6 +437,16 @@ Available in controllers:
  $c->resource_documents($dbix_resultset, $options);
 
 See L<resource_documents|https://metacpan.org/pod/JSONAPI::Document#resource_documents(DBIx::Class::Row-$row,-HashRef-$options)> for usage.
+
+=head1 TODO
+
+=over
+
+=item *
+
+Allow specifying C<http_verbs> in the C<resource_routes> helper for relationships.
+
+=back
 
 =head1 LICENSE
 

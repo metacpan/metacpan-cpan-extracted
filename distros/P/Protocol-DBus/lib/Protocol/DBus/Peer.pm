@@ -42,10 +42,10 @@ implementation.)
 =cut
 
 use Call::Context;
-use IO::Framed::Write;
 
 use Protocol::DBus::Message;
 use Protocol::DBus::Parser;
+use Protocol::DBus::WriteMsg;
 
 #----------------------------------------------------------------------
 
@@ -135,14 +135,14 @@ sub send_call {
     return $ret;
 }
 
-#sub send_signal {
-#    my ($self, %opts) = @_;
-#
-#    return $self->_send_msg(
-#        %opts,
-#        type => 'SIGNAL',
-#    );
-#}
+sub send_signal {
+    my ($self, %opts) = @_;
+
+    return $self->_send_msg(
+        %opts,
+        type => 'SIGNAL',
+    );
+}
 
 #----------------------------------------------------------------------
 
@@ -161,10 +161,31 @@ sub big_endian {
     if (@_ > 0) {
         my $old = $self->{'_big_endian'};
         $self->{'_big_endian'} = !!$_[1];
+
+        $self->{'_to_str_fn'} = 'to_string_' . ($_[1] ? 'be' : 'le');
+
         return $self->{'_big_endian'};
     }
 
     return !!$self->{'_big_endian'};
+}
+
+#----------------------------------------------------------------------
+
+=head2 I<OBJ>->preserve_variant_signatures()
+
+Same interface as C<blocking()>, but when this is enabled
+variants are given as two-member array references ([ signature => value ]),
+blessed as C<Protocol::DBus::Type::Variant> instances.
+
+For most Perl applications this is probably counterproductive.
+
+=cut
+
+sub preserve_variant_signatures {
+    my $self = shift;
+
+    return $self->{'_parser'}->preserve_variant_signatures(@_);
 }
 
 #----------------------------------------------------------------------
@@ -211,7 +232,7 @@ sub pending_send {
 sub _set_up_peer_io {
     my ($self, $socket) = @_;
 
-    $self->{'_io'} = IO::Framed::Write->new( $socket )->enable_write_queue();
+    $self->{'_io'} = Protocol::DBus::WriteMsg->new( $socket )->enable_write_queue();
     $self->{'_parser'} = Protocol::DBus::Parser->new( $socket );
 
     return;
@@ -239,8 +260,11 @@ sub _send_msg {
     );
 
     $self->{'_endian'} ||= 'le';
+    $self->{'_to_str_fn'} ||= "to_string_$self->{'_endian'}";
 
-    $self->{'_io'}->write( ${ $msg->can('to_string_' . ($self->{'_big_endian'} ? 'be' : 'le'))->($msg) } );
+    my ($buf_sr, $fds_ar) = $msg->can($self->{'_to_str_fn'})->($msg);
+
+    $self->{'_io'}->enqueue_message( $buf_sr, $fds_ar );
 
     return $self->{'_io'}->flush_write_queue();
 }

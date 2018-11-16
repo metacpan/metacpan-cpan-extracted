@@ -1,3 +1,6 @@
+0.013 - 2018-11-16
+- Makefile.PL: add one module providing a public suffix function as prereq.
+  Preferable a module which is already installed.
 0.012 - 2018-11-14
 - better reporting of reason for result
 - better handling of Received-SPF

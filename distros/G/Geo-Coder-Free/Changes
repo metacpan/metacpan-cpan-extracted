@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-Free
 
+0.15	Thu Nov 15 21:10:51 EST 2018
+	Added alternatives table, for when a place could be listed elsewhere
+	Support lookups of British counties e.g. 'Kent, England'
+
 0.14	Fri Sep  7 16:07:39 EDT 2018
 	Work on fixing http://www.cpantesters.org/cpan/report/6b68841a-8cc6-11e8-98d5-bb14e5798fec
 	Re-enable Lingua::EN::AddressParse usage and prefer over Geo::libpostal

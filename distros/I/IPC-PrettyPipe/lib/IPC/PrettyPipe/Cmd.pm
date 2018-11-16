@@ -1,25 +1,6 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of IPC::PrettyPipe
-#
-# IPC::PrettyPipe is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package IPC::PrettyPipe::Cmd;
+
+# ABSTRACT: A command in an B<IPC::PrettyPipe> pipeline
 
 use Carp;
 
@@ -33,7 +14,6 @@ use Safe::Isa;
 use IPC::PrettyPipe::Arg;
 use IPC::PrettyPipe::Stream;
 
-use Moo;
 use Types::Standard -all;
 use Type::Params qw[ validate ];
 
@@ -43,10 +23,21 @@ use IPC::PrettyPipe::Arg::Format;
 
 use String::ShellQuote 'shell_quote';
 
+use Moo;
+
+our $VERSION = '0.08';
+
 with 'IPC::PrettyPipe::Queue::Element';
 
-IPC::PrettyPipe::Arg::Format
-  ->shadow_attrs( fmt => sub { 'arg' . shift } );
+use namespace::clean;
+
+
+# need access to has method which will get removed at the end of the
+# compilation of this module
+BEGIN {
+    IPC::PrettyPipe::Arg::Format
+        ->shadow_attrs( fmt => sub { 'arg' . shift } );
+}
 
 has cmd => (
     is       => 'ro',
@@ -83,6 +74,10 @@ has argfmt => (
   default => sub { IPC::PrettyPipe::Arg::Format->new_from_attrs( shift ) },
 );
 
+#pod =for Pod::Coverage BUILDARGS BUILD
+#pod
+#pod =cut
+
 sub BUILDARGS {
 
     my $class = shift;
@@ -93,8 +88,8 @@ sub BUILDARGS {
         'HASH' eq ref( $_[0] )        ? $_[0]
         : 'ARRAY' eq ref( $_[0] )
           && @{ $_[0] } == 2          ? { cmd => $_[0][0], args => $_[0][1] }
-        :                               { cmd => $_[0] } 
-	)
+        :                               { cmd => $_[0] }
+        )
       : {@_};
 
     ## no critic (ProhibitAccessOfPrivateData)
@@ -166,12 +161,12 @@ sub add {
 
     elsif ( 'ARRAY' eq $ref ) {
 
-	croak( "missing value for argument ", $arg->[-1] )
-	  if  @$arg % 2;
+        croak( "missing value for argument ", $arg->[-1] )
+          if  @$arg % 2;
 
-	foreach ( pairs @$arg ) {
+        foreach ( pairs @$arg ) {
 
-	    my ( $name, $value ) = @$_;
+            my ( $name, $value ) = @$_;
 
             $self->args->push(
                 IPC::PrettyPipe::Arg->new(
@@ -243,8 +238,6 @@ sub ffadd {
 
         else {
 
-            my $stream;
-
             try {
 
                 my $stream = IPC::PrettyPipe::Stream->new(
@@ -254,10 +247,10 @@ sub ffadd {
 
                 if ( $stream->requires_file ) {
 
-	                croak( "arg[$idx]: stream operator $t requires a file\n" )
-	                  if ++$idx == @args;
+                        croak( "arg[$idx]: stream operator $t requires a file\n" )
+                          if ++$idx == @args;
 
-	                $stream->file( $args[$idx] );
+                        $stream->file( $args[$idx] );
                 }
 
                 $self->stream( $stream );
@@ -292,9 +285,9 @@ sub stream {
 
     elsif ( !ref $spec ) {
 
-	$self->streams->push(
+        $self->streams->push(
           IPC::PrettyPipe::Stream->new( spec => $spec, +@_ ? ( file => @_ ) : () )
-			     );
+                             );
     }
 
     else {
@@ -326,13 +319,13 @@ sub valsubst {
 
     my ( $pattern, $value, $args ) =
       validate( \@args,
-		RegexpRef,
-		Str,
-		Optional[ Dict[
-			    lastvalue  => Optional[ Str ],
-			    firstvalue => Optional[ Str ]
-			   ] ],
-	      );
+                RegexpRef,
+                Str,
+                Optional[ Dict[
+                            lastvalue  => Optional[ Str ],
+                            firstvalue => Optional[ Str ]
+                           ] ],
+              );
 
     my $nmatch = $self->valmatch( $pattern );
 
@@ -363,12 +356,30 @@ sub valsubst {
 
 1;
 
+#
+# This file is part of IPC-PrettyPipe
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 __END__
 
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory Bourne argfmt argpfx
+argsep cmd ffadd valmatch valsubst
+
 =head1 NAME
 
-B<IPC::PrettyPipe::Cmd> - A command in an B<IPC::PrettyPipe> pipeline
+IPC::PrettyPipe::Cmd - A command in an B<IPC::PrettyPipe> pipeline
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -408,7 +419,6 @@ B<IPC::PrettyPipe::Cmd> - A command in an B<IPC::PrettyPipe> pipeline
   # perform value substution on a command's arguments' values
   $cmd->valsubst( %stuff );
 
-
 =head1 DESCRIPTION
 
 B<IPC::PrettyPipe::Cmd> objects are containers for the individual
@@ -421,6 +431,7 @@ C<-> for short options).  B<IPC::PrettyPipe::Cmd> makes no distinction
 between option and non-option arguments.  The latter are simply
 specified as arguments with a blank prefix.
 
+=for Pod::Coverage BUILDARGS BUILD
 
 =head1 METHODS
 
@@ -437,10 +448,8 @@ specified as arguments with a blank prefix.
   $cmd = IPC::PrettyPipe::Cmd->new( $cmd );
   $cmd = IPC::PrettyPipe::Cmd->new( [ $cmd, $args ] );
 
-
 Construct a B<IPC::PrettyPipe::Cmd> object encapsulating C<$cmd>.
 C<$cmd> must be specified.
-
 
 The available attributes are:
 
@@ -466,6 +475,11 @@ An B<L<IPC::PrettyPipe::Arg>> object;
 
 =item *
 
+A hashref with pairs of names and values. The arguments will be
+supplied to the command in a random order.
+
+=item *
+
 An array reference containing more complex argument specifications.
 Its elements are processed with the B<L</ffadd>> method.
 
@@ -482,7 +496,6 @@ details.  These override any specified via the C<L</argfmt>> object.
 I<Optional>. An B<L<IPC::PrettyPipe::Arg::Format>> object which will be used to
 specify the default prefix and separation attributes for arguments to
 commands.  May be overridden by C<L</argpfx>> and C<L</argsep>>.
-
 
 =back
 
@@ -502,9 +515,8 @@ passed, it is assumed to be the C<arg> parameter.
 
 This is useful if some arguments should be conditionally given, e.g.
 
-	$cmd = IPC::PrettyPipe::Cmd->new( 'ls' );
-	$cmd->add( '-l' ) if $want_long_listing;
-
+        $cmd = IPC::PrettyPipe::Cmd->new( 'ls' );
+        $cmd->add( '-l' ) if $want_long_listing;
 
 The available options are:
 
@@ -665,12 +677,12 @@ available:
 
 =item C<firstvalue>
 
-If true, the first occurance of a match will be replaced with
+If true, the first occurence of a match will be replaced with
 this.
 
 =item C<lastvalue>
 
-If true, the last occurance of a match will be replaced with
+If true, the last occurence of a match will be replaced with
 this.  In the case where there is only one match and both
 C<firstvalue> and C<lastvalue> are specified, C<lastvalue> takes
 precedence.
@@ -679,16 +691,44 @@ precedence.
 
 =back
 
-=head1 COPYRIGHT & LICENSE
+=head1 BUGS
 
-Copyright 2014 Smithsonian Astrophysical Observatory
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
+email to
+L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
 
-This software is released under the GNU General Public License.  You
-may find a copy at
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-   http://www.fsf.org/copyleft/gpl.html
+=head1 SOURCE
 
+The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
+and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<IPC::PrettyPipe|IPC::PrettyPipe>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

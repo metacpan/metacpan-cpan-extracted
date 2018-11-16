@@ -1,35 +1,21 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of IPC::PrettyPipe
-#
-# IPC::PrettyPipe is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package IPC::PrettyPipe::Format;
+
+# ABSTRACT: Format role
 
 ## no critic (ProhibitAccessOfPrivateData)
 
-use Moo::Role;
 use Try::Tiny;
 use Module::Load;
+
+
+use Moo::Role;
+our $VERSION = '0.08';
 
 with 'MooX::Attributes::Shadow::Role';
 
 requires 'copy_into';
+
+use namespace::clean;
 
 # IS THIS REALLY NEEDED?????  this will convert an attribute with a
 # an undef value into a switch.
@@ -85,6 +71,15 @@ sub _copy_attrs {
 }
 
 
+#pod =method copy_from
+#pod
+#pod   $self->copy_from( $src );
+#pod
+#pod Copy attributes from the C<$src> object into the object.
+#pod
+#pod
+#pod =cut
+
 sub copy_from {
 
     $_[1]->copy_into( $_[0] );
@@ -92,6 +87,13 @@ sub copy_from {
     return;
 }
 
+#pod =method clone
+#pod
+#pod   $object = $self->clone;
+#pod
+#pod Clone the object;
+#pod
+#pod =cut
 
 sub clone {
 
@@ -105,6 +107,15 @@ sub clone {
     return $clone;
 }
 
+#pod =method new_from_attrs
+#pod
+#pod
+#pod    my $obj = IPC::PrettyPipe::Format->new_from_attrs( $container_obj, \%options );
+#pod
+#pod Create a new object using attributes from the C<$container_obj>.
+#pod
+#pod =cut
+
 sub new_from_attrs {
 
     my $class = shift;
@@ -112,6 +123,18 @@ sub new_from_attrs {
 
     return $class->new( $class->xtract_attrs( @_ ) );
 }
+
+#pod =method new_from_hash
+#pod
+#pod
+#pod    my $obj = IPC::PrettyPipe::Format->new_from_hash( ?$container, \%attr );
+#pod
+#pod Create a new object using attributes from C<%attr> which are indicated as
+#pod being shadowed from C<$container>.  If C<$container> is not specified
+#pod it is taken from the Caller's class.
+#pod
+#pod =cut
+
 
 sub new_from_hash {
 
@@ -127,7 +150,7 @@ sub new_from_hash {
     my %attr;
     while( my ( $alias, $orig ) = each %{ $shadowed } ) {
 
-	$attr{$orig} = $hash->{$alias} if exists $hash->{$alias};
+        $attr{$orig} = $hash->{$alias} if exists $hash->{$alias};
 
     }
 
@@ -135,3 +158,97 @@ sub new_from_hash {
 }
 
 1;
+
+#
+# This file is part of IPC-PrettyPipe
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+__END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+
+=head1 NAME
+
+IPC::PrettyPipe::Format - Format role
+
+=head1 VERSION
+
+version 0.08
+
+=head1 METHODS
+
+=head2 copy_from
+
+  $self->copy_from( $src );
+
+Copy attributes from the C<$src> object into the object.
+
+=head2 clone
+
+  $object = $self->clone;
+
+Clone the object;
+
+=head2 new_from_attrs
+
+   my $obj = IPC::PrettyPipe::Format->new_from_attrs( $container_obj, \%options );
+
+Create a new object using attributes from the C<$container_obj>.
+
+=head2 new_from_hash
+
+   my $obj = IPC::PrettyPipe::Format->new_from_hash( ?$container, \%attr );
+
+Create a new object using attributes from C<%attr> which are indicated as
+being shadowed from C<$container>.  If C<$container> is not specified
+it is taken from the Caller's class.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
+email to
+L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
+and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<IPC::PrettyPipe|IPC::PrettyPipe>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

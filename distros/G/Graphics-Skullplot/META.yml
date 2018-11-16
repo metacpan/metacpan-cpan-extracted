@@ -1,0 +1,40 @@
+---
+abstract: 'Plot the result of an SQL select (e.g. from an emacs shell window)'
+author:
+  - 'Joseph Brenner, <doom@kzsu.stanford.edu>,'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graphics-Skullplot
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Data::BoxFormat: '0.01'
+  Getopt::Long: '2.49'
+  Image::Magick: v6.9.7
+  Moo: '2.003004'
+  MooX::Types::MooseLike::Base: '0.29'
+  Scalar::Classify: '0.03'
+  perl: '5.010000'
+  utf8::all: '0.024'
+resources:
+  bugtracker: https://github.com/doomvox/graphics-skullplot/issues
+  homepage: https://github.com/doomvox/graphics-skullplot
+  repository: https://github.com/doomvox/graphics-skullplot.git
+version: '0.02'
+x_contributors:
+  - 'Joseph Brenner <doomvox@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.73'

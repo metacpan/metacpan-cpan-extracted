@@ -7,7 +7,7 @@ use Net::DNS;
 use Scalar::Util 'dualvar';
 use Exporter;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 # TODO
 # provide some way to get reports (rua)
@@ -52,7 +52,7 @@ sub import {
 
 
 # defined at the end, based on the public suffix module we have installed
-sub domain_organisation($);
+sub organizational_domain($);
 
 sub new {
     my ($class,%args) = @_;

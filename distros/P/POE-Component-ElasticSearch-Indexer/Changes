@@ -1,9 +1,46 @@
 ==================================================
-Changes from 2016-11-15 00:00:00 +0000 to present.
+Changes from 2016-11-16 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.009 at 2018-11-15 05:47:46 +0000
+version 0.010 at 2018-11-16 19:39:31 +0000
+------------------------------------------
+
+  Change: 9e8c423eb30bf62d10ad4d49abea743b2aefa94e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-11-16 11:36:54 +0000
+
+    Update Perl::Critic policies to pass tests 
+
+  Change: 2cbed9b55c3d37253edab943ecf329537e2a3e23
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2018-11-16 11:33:33 +0000
+
+    Set more reasonable defaults for timeouts, failures, and batch recovery 
+
+  Change: 2eec820e0d87e4805b93e7a2bdaec39cc73e037e
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2018-11-15 21:52:59 +0000
+
+    Fixup how failures are handled
+
+    New options:
+
+    * MaxFailedRatio: Controls which percentage of bulk requests can fail
+
+    each StatsInterval before we back off the cluster * BacklogInterval: How
+    frequently we attempt to flush
+
+    MaxReceoveryBatches from the disk * CleanupInterval: How frequently we
+    evaluate BatchDiskSpace and discard
+
+    batches
+
+    Incorporate those mechanism into the process and squash a bug that
+    prevented BatchDiskSpace from being evaluated properly. 
+
+------------------------------------------
+version 0.009 at 2018-11-15 05:45:47 +0000
 ------------------------------------------
 
   Change: f2961717b9be9e4e83e9dfbe68f97f384883f72b

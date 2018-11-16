@@ -52,6 +52,7 @@ struct SPVM_runtime {
   SPVM_OPCODE* opcodes;
   
   SPVM_RUNTIME_BASIC_TYPE* basic_types;
+  SPVM_RUNTIME_BASIC_TYPE* sorted_basic_types;
   int32_t basic_types_length;
 
   SPVM_RUNTIME_FIELD* fields;
@@ -70,18 +71,15 @@ struct SPVM_runtime {
 
   char* string_pool;
   int32_t string_pool_length;
-  
-  SPVM_HASH* basic_type_symtable;
-  SPVM_HASH* package_symtable;
-  
-  // Exception
-  SPVM_OBJECT* exception;
 
+  // Package variables
+  SPVM_VALUE* package_vars_heap;
+  
   // C function addresses(native or precompile)
   void** sub_cfunc_addresses;
   
-  // Package variables
-  SPVM_VALUE* package_vars_heap;
+  // Exception
+  SPVM_OBJECT* exception;
   
   // Mortal stack
   SPVM_OBJECT** mortal_stack;

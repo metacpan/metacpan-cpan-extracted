@@ -1,10 +1,6 @@
 #! perl
 
-use strict;
-use warnings;
-
-use Test::More;
-use Test::Fatal;
+use Test2::V0;
 
 use IPC::PrettyPipe;
 
@@ -14,12 +10,11 @@ use IPC::PrettyPipe;
     extends 'IPC::PrettyPipe::Execute::IPC::Run';
 }
 
-is(
-    exception {
+ok(
+    lives {
         my $p = IPC::PrettyPipe->new( executor => 'ExtendExecutor' );
         $p->executor;
     },
-    undef,
     "extend existing executor"
 );
 
@@ -31,24 +26,20 @@ is(
     with 'IPC::PrettyPipe::Executor';
 }
 
-is(
-    exception {
+ok(
+    lives {
         my $p = IPC::PrettyPipe->new( executor => 'NewExecutor' );
         $p->executor;
     },
-    undef,
     "extend existing executor"
 );
 
-is(
-    exception {
+ok(
+    lives {
         my $p = IPC::PrettyPipe->new( executor => NewExecutor->new );
         $p->executor;
     },
-    undef,
     "object"
 );
-
-
 
 done_testing;

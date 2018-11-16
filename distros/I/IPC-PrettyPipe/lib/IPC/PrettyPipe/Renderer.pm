@@ -1,37 +1,40 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of IPC::PrettyPipe
-#
-# IPC::PrettyPipe is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package IPC::PrettyPipe::Renderer;
 
+# ABSTRACT: role for renderer backends
+
 use Moo::Role;
+
+our $VERSION = '0.08';
+
+use namespace::clean;
 
 requires qw[ render ];
 
 1;
 
+#
+# This file is part of IPC-PrettyPipe
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory renderer
 
 =head1 NAME
 
-B<IPC::PrettyPipe::Renderer> - role for renderer backends
+IPC::PrettyPipe::Renderer - role for renderer backends
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -46,7 +49,6 @@ B<IPC::PrettyPipe::Renderer> - role for renderer backends
 This role defines the required interface for rendering backends for
 B<L<IPC::PrettyPipe>>.  Backend classes must consume this role.
 
-
 =head1 METHODS
 
 The following methods must be defined:
@@ -59,19 +61,44 @@ Return the rendered the pipeline.
 
 =back
 
+=head1 BUGS
 
-=head1 COPYRIGHT & LICENSE
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
+email to
+L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
 
-Copyright 2014 Smithsonian Astrophysical Observatory
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-This software is released under the GNU General Public License.  You
-may find a copy at
+=head1 SOURCE
 
-   http://www.fsf.org/copyleft/gpl.html
+The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
+and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
 
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<IPC::PrettyPipe|IPC::PrettyPipe>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut

@@ -33,4 +33,4 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-Protocol-DBus/issues
   repository: git://github.com/FGasper/p5-Protocol-DBus.git
-version: '0.04'
+version: '0.05'

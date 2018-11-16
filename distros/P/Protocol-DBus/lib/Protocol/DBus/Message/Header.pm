@@ -77,6 +77,10 @@ sub parse_simple {
         );
 
         if (length($$buf_sr) >= (_MIN_HEADER_LENGTH + $array_length)) {
+
+            # We never care about the header signatures.
+            local $Protocol::DBus::Marshal::PRESERVE_VARIANT_SIGNATURES = 0;
+
             my ($content, $length) = Protocol::DBus::Marshal->can(
                 $_is_big_endian ? 'unmarshal_be' : 'unmarshal_le'
             )->($buf_sr, 0, SIGNATURE());

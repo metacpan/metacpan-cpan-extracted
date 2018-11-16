@@ -86,7 +86,7 @@ package TestCase::PerlAPI {
   
   sub spvm_object_set_object : int ($obj : TestCase) {
     my $nums = $obj->{x_int_array};
-    my $values = ($obj->{x_string});
+    my $values = ($obj->{x_byte_array});
     
     
     # [INT32_MAX, INT32_MAX]
@@ -131,19 +131,13 @@ package TestCase::PerlAPI {
   }
   
   # SPVM Functions
-  sub spvm_new_byte_array_string : int ($values : byte[]) {
+  sub spvm_new_byte_array_from_binary : int ($values : byte[]) {
     
-    if ((int)$values->[0] == (int)(byte)0xE3) {
-      if ((int)$values->[1] == (int)(byte)0x81) {
-        if ((int)$values->[2] == (int)(byte)0x82) {
-          if (@$values == 3) {
-            return 1;
-          }
-        }
-      }
+    unless ($values eq "あ") {
+      return 0;
     }
     
-    return 0;
+    return 1;
   }
 
   sub spvm_new_byte_array_bin : int ($values : byte[]) {
@@ -161,7 +155,7 @@ package TestCase::PerlAPI {
     return 0;
   }
 
-  sub spvm_new_byte_array_bin_pack : int ($values : byte[]) {
+  sub spvm_new_byte_array_binary_pack : int ($values : byte[]) {
     
     if ($values->[0] == 97) {
       if ($values->[1] == 98) {
@@ -176,7 +170,7 @@ package TestCase::PerlAPI {
     return 0;
   }
 
-  sub spvm_new_short_array_bin_pack : int ($values : short[]) {
+  sub spvm_new_short_array_binary_pack : int ($values : short[]) {
     
     if ((int)$values->[0] == (int)(short)97) {
       if ((int)$values->[1] == (int)(short)98) {
@@ -191,7 +185,7 @@ package TestCase::PerlAPI {
     return 0;
   }
   
-  sub spvm_new_int_array_bin_pack : int ($values : int[]) {
+  sub spvm_new_int_array_binary_pack : int ($values : int[]) {
     
     if ($values->[0] == (int)97) {
       if ($values->[1] == (int)98) {
@@ -206,7 +200,7 @@ package TestCase::PerlAPI {
     return 0;
   }
 
-  sub spvm_new_long_array_bin_pack : int ($values : long[]) {
+  sub spvm_new_long_array_binary_pack : int ($values : long[]) {
     
     if ($values->[0] == (long)97) {
       if ($values->[1] == (long)98) {
@@ -221,7 +215,7 @@ package TestCase::PerlAPI {
     return 0;
   }
 
-  sub spvm_new_float_array_bin_pack : int ($values : float[]) {
+  sub spvm_new_float_array_binary_pack : int ($values : float[]) {
     
     if ($values->[0] == (float)97) {
       if ($values->[1] == (float)98) {
@@ -236,7 +230,7 @@ package TestCase::PerlAPI {
     return 0;
   }
   
-  sub spvm_new_double_array_bin_pack : int ($values : double[]) {
+  sub spvm_new_double_array_binary_pack : int ($values : double[]) {
     
     if ($values->[0] == (double)97) {
       if ($values->[1] == (double)98) {
@@ -446,7 +440,7 @@ package TestCase::PerlAPI {
     return 0;
   }
 
-  sub spvm_new_value_t_array_int : int ($points : TestCase::Point_i3[]) {
+  sub spvm_new_value_array_int : int ($points : TestCase::Point_i3[]) {
     
     if ($points->[0]{x} == INT32_MIN()) {
       if ($points->[0]{y} == 1) {
@@ -473,7 +467,7 @@ package TestCase::PerlAPI {
     return 0;
   }
 
-  sub spvm_new_value_t_array_bin_int : int ($points : TestCase::Point_i3[]) {
+  sub spvm_new_value_array_binary_int : int ($points : TestCase::Point_i3[]) {
     if ($points->[0]{x} == INT32_MIN()) {
       if ($points->[0]{y} == 1) {
         if ($points->[0]{z} == 2) {

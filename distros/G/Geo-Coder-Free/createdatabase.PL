@@ -21,15 +21,30 @@ use Locale::US;
 use Digest::MD5;
 use Encode;
 use Geo::StreetAddress::US;
+use CHI;
+use CHI::Driver::RawMemory;
 use File::Basename;
 use File::Spec;
 use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
+use IO::AIO;
+use Lingua::EN::AddressParse;
+use Locale::SubCountry;
 use Text::CSV;
-use CHI;
-use CHI::Driver::RawMemory;
 use Try::Tiny;
 
+use	constant	DEBUG_OFF => 0;
+use	constant	DEBUG_INVALID_LENGTH => 1;
+use	constant	DEBUG_L_EN_A => 2;
+use	constant	DEBUG_NEW_LOCATION => 4;
+use	constant	DEBUG_DETERMINE_LOCATION => 8;
+use	constant	DEBUG_GET_WOF => 0x10;
+use	constant	DEBUG_BREAKUP => 0x20;
+use	constant	DEBUG_DATA_VALIDATE => 0x40;
+use	constant	DEBUG_ALL => 0xFF;
+use	constant	DEBUG => DEBUG_OFF;
+
 use	constant	MAX_INSERT_COUNT => 250;	# Maximum number of CSV rows to insert in a single statement
+# use	constant	MAX_INSERT_COUNT => 1;	# Maximum number of CSV rows to insert in a single statement
 
 my %zipcodes = (
 	'04350' => { city => 'Litchfield', county => 'Kennebec' },
@@ -103,72 +118,9 @@ my %max_state_lengths = (
 );
 
 my %known_places = (	# Places I've checked with my GPS
-	'gb/kent/statewide.csv' => [
+	'us/md/statewide.csv' => [
 		{
-			'LAT' => 51.34320725,
-			'LON' => 1.31680853,
-			'NAME' => 'HOLIDAY INN EXPRESS',
-			'STREET' => 'TOTHILL ST',
-			'CITY' => 'MINSTER-IN-THANET',
-			'STATE' => 'KENT',
-			'COUNTRY' => 'GB',
-		}, {
-			'LAT' => 51.33995174,
-			'LON' => 1.31570211,
-			'NUMBER' => 106,
-			'STREET' => 'TOTHILL ST',
-			'CITY' => 'MINSTER-IN-THANET',
-			'STATE' => 'KENT',
-			'COUNTRY' => 'GB',
-		}, {
-			'LAT' => 51.34015944,
-			'LON' => 1.31580976,
-			'NUMBER' => 114,
-			'STREET' => 'TOTHILL ST',
-			'CITY' => 'MINSTER-IN-THANET',
-			'STATE' => 'KENT',
-			'COUNTRY' => 'GB',
-		}, {
-			'LAT' => 51.33090893,
-			'LON' => 1.31559716,
-			'NAME' => 'ST MARY THE VIRGIN CHURCH',
-			'STREET' => 'CHURCH ST',
-			'CITY' => 'MINSTER-IN-THANET',
-			'STATE' => 'KENT',
-			'COUNTRY' => 'GB',
-		}, {
-			'LAT' => 51.34203083,
-			'LON' => 1.31609075,
-			'NAME' => 'MINSTER CEMETERY',
-			'NUMBER' => 115,
-			'STREET' => 'TOTHILL ST',
-			'CITY' => 'MINSTER-IN-THANET',
-			'STATE' => 'KENT',
-			'COUNTRY' => 'GB',
-		}, {
-			'LAT' => 51.34772374,
-			'LON' => 1.39532565,
-			'NUMBER' => 20,
-			'STREET' => 'MELBOURNE AVE',
-			'CITY' => 'RAMSGATE',
-			'STATE' => 'KENT',
-			'COUNTRY' => 'GB',
-		}
-	], 'gb/london/statewide.csv' => [
-		{
-			'LAT' => 51.5082675,
-			'LON' => -0.0754225,
-			'NAME' => 'TOWER OF LONDON',
-			'NUMBER' => 35,
-			'STREET' => 'TOWER HILL',
-			'CITY' => 'LONDON',
-			'STATE' => 'LONDON',
-			'COUNTRY' => 'GB',
-			# 'POSTCODE' => 20894,
-		}
-	], 'us/md/statewide.csv' => [
-		{
-			# NCBI
+			'NAME' => 'NCBI',
 			'LAT' => 38.99516556,
 			'LON' => -77.09943963,
 			'STREET' => 'MEDLARS DR',
@@ -186,7 +138,7 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
 		}, {
-			'NAME' => 'BOLD BITE',
+			# 'NAME' => 'BOLD BITE',
 			'LAT' => 38.98939358,
 			'LON' => -77.09819543,
 			'STREET' => 'NORFOLK AVE',
@@ -264,6 +216,46 @@ my %known_places = (	# Places I've checked with my GPS
 			'LON' => -77.04162824,
 			'NUMBER' => 1936,
 			'STREET' => 'SEMINARY RD',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910,
+		}, {
+			'LAT' => 39.008961,
+			'LON' => -77.043030,
+			'NUMBER' => 1954,
+			'STREET' => 'SEMINARY RD',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910,
+		}, {
+			'LAT' => 39.008845,
+			'LON' => -77.043317,
+			'NUMBER' => 1956,
+			'STREET' => 'SEMINARY RD',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910,
+		}, {
+			'LAT' => 39.008810,
+			'LON' => -77.048953,
+			'NUMBER' => 9315,
+			'STREET' => 'WARREN ST',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910,
+		}, {
+			'LAT' => 39.010436,
+			'LON' => -77.048550,
+			'NUMBER' => 9411,
+			'STREET' => 'WARREN ST',
 			'CITY' => 'SILVER SPRING',
 			'COUNTY' => 'MONTGOMERY',
 			'STATE' => 'MD',
@@ -377,6 +369,29 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20011
 		}
+	], 'us/oh/statewide.csv' => [
+		{
+			'LAT' => 39.997959,
+			'LON' => -82.881320,
+			'NAME' => 'JOHN GLENN AIRPORT',
+			'NUMBER' => 4600,
+			'ROAD' => 'INTERNATIONAL GATEWAY',
+			'CITY' => 'COLUMBUS',
+			'COUNTY' => 'FRANKLIN',
+			'STATE' => 'OH',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 43219,
+		}, {
+			'LAT' => 40.097097,
+			'LON' => -83.123745,
+			'NAME' => 'RESIDENCE INN BY MARRIOTT',
+			'NUMBER' => '6364',
+			'STREET' => 'FRANTZ RD',
+			'CITY' => 'DUBLIN',
+			'STATE' => 'OH',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 43017
+		}
 	], 'us/va/statewide.csv' => [
 		{
 			'LAT' => 44.40662476,
@@ -389,6 +404,87 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'VA',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 22180
+		}
+	], 'other' => [
+		{
+			'LAT' => 51.37875,
+			'LON' => 1.1955,
+			'NAME' => 'RECULVER ABBEY',
+			'STREET' => 'RECULVER',
+			'CITY' => 'HERNE BAY',
+			'STATE' => 'KENT',
+			'COUNTRY' => 'GB',
+		}, {
+			'LAT' => 51.34320725,
+			'LON' => 1.31680853,
+			'NAME' => 'HOLIDAY INN EXPRESS',
+			'STREET' => 'TOTHILL ST',
+			# 'CITY' => 'MINSTER, THANET',
+			'CITY' => 'RAMSGATE',
+			'STATE' => 'KENT',
+			'COUNTRY' => 'GB',
+		}, {
+			'LAT' => 51.33995174,
+			'LON' => 1.31570211,
+			'NUMBER' => 106,
+			'STREET' => 'TOTHILL ST',
+			# 'CITY' => 'MINSTER, THANET',
+			'CITY' => 'RAMSGATE',
+			'STATE' => 'KENT',
+			'COUNTRY' => 'GB',
+		}, {
+			'LAT' => 51.34015944,
+			'LON' => 1.31580976,
+			'NUMBER' => 114,
+			'STREET' => 'TOTHILL ST',
+			# 'CITY' => 'MINSTER, THANET',
+			'CITY' => 'RAMSGATE',
+			'STATE' => 'KENT',
+			'COUNTRY' => 'GB',
+		}, {
+			'LAT' => 51.34203083,
+			'LON' => 1.31609075,
+			'NAME' => 'MINSTER CEMETERY',
+			'NUMBER' => 116,
+			'STREET' => 'TOTHILL ST',
+			# 'CITY' => 'MINSTER, THANET',
+			'CITY' => 'RAMSGATE',
+			'STATE' => 'KENT',
+			'COUNTRY' => 'GB',
+		}, {
+			'LAT' => 51.33090893,
+			'LON' => 1.31559716,
+			'NAME' => 'ST MARY THE VIRGIN CHURCH',
+			'STREET' => 'CHURCH ST',
+			# 'CITY' => 'MINSTER, THANET',
+			'CITY' => 'RAMSGATE',
+			'STATE' => 'KENT',
+			'COUNTRY' => 'GB',
+		}, {
+			'LAT' => 51.34772374,
+			'LON' => 1.39532565,
+			'NUMBER' => 20,
+			'STREET' => 'MELBOURNE AVE',
+			'CITY' => 'RAMSGATE',
+			'STATE' => 'KENT',
+			'COUNTRY' => 'GB',
+		}, {
+			'LAT' => 51.32711,
+			'LON' => 1.406806,
+			'STREET' => 'WESTCLIFF PROMENADE',
+			'CITY' => 'RAMSGATE',
+			'STATE' => 'KENT',
+			'COUNTRY' => 'GB',
+		}, {
+			'LAT' => 51.5082675,
+			'LON' => -0.0754225,
+			'NAME' => 'TOWER OF LONDON',
+			'NUMBER' => 35,
+			'STREET' => 'TOWER HILL',
+			'CITY' => 'LONDON',
+			'STATE' => 'LONDON',
+			'COUNTRY' => 'GB',
+			# 'POSTCODE' => 20894,
 		}
 	]
 );
@@ -418,6 +514,8 @@ if(!-r 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql') {
 
 exit(0) if($ENV{'AUTOMATED_TESTING'});
 
+$Data::Dumper::Sortkeys = 1;
+
 if(my $oa = $ENV{'OPENADDR_HOME'}) {
 	# Import openaddresses.io data into an SQLite database
 	# TODO: download and unzip the files from results.openaddresses.io
@@ -433,7 +531,15 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 		}
 		# $dbh->do('CREATE TABLE cities(sequence INTEGER, city VARCHAR, county VARCHAR, state VARCHAR NOT NULL, country CHAR(2) NOT NULL)');
 		# $dbh->do('CREATE TABLE openaddresses(md5 CHAR(16), lat DECIMAL, lon DECIMAL, name VARCHAR, number VARCHAR, street VARCHAR, city INTEGER, FOREIGN KEY (city) REFERENCES cities(sequence))');
-		$dbh->do('CREATE TABLE openaddresses(md5 CHAR(16), lat DECIMAL, lon DECIMAL)');
+		if((DEBUG&DEBUG_ALL) && (MAX_INSERT_COUNT != 1)) {
+			warn "MAX_INSERT_COUNT not set to 1 in DEBUG&DEBUG_ALL mode";
+		}
+
+		if(MAX_INSERT_COUNT == 1) {
+			$dbh->do('CREATE TABLE openaddresses(md5 CHAR(16) PRIMARY KEY, lat DECIMAL, lon DECIMAL)');
+		} else {
+			$dbh->do('CREATE TABLE openaddresses(md5 CHAR(16), lat DECIMAL, lon DECIMAL)');
+		}
 		# $dbh->do('CREATE TABLE openaddresses(md5 CHAR(16) PRIMARY KEY, lat DECIMAL, lon DECIMAL, name VARCHAR, number VARCHAR, street VARCHAR, city INTEGER, FOREIGN KEY (city) REFERENCES cities(sequence))');
 		# $dbh->prepare('CREATE TABLE tree(lat DECIMAL, lon DECIMAL, md5 CHAR(16) NOT NULL, parent CHAR(16))')->execute();
 
@@ -476,7 +582,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					'LON' => $row->{'Longitude'},
 				);
 				# print "$zip => $query\n";
-				$inserts += insert($dbh, 1, \%columns);
+				$inserts += insert($dbh, 1, %columns);
 				if($inserts >= MAX_INSERT_COUNT) {
 					flush_queue($dbh);
 					$inserts = 0;
@@ -519,12 +625,14 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					'LON' => $row->{'Longitude'},
 				);
 				# print "$zip => $query\n";
-				$inserts += insert($dbh, 1, \%columns);
+				$inserts += insert($dbh, 1, %columns);
 				if($inserts >= MAX_INSERT_COUNT) {
 					flush_queue($dbh);
 					$inserts = 0;
 				}
 			}
+			close($fin);
+
 			flush_queue($dbh);
 		}
 
@@ -560,7 +668,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 			$| = 1;
 			printf "%-70s\r", $file;
 			$| = 0;
-			print "\n";
+			print "\n" if(MAX_INSERT_COUNT == 1);
 
 			my $inserts = 0;
 			my $sth = $wof_global_dbh->prepare('SELECT body FROM geojson');
@@ -572,6 +680,8 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					# $data = $data->{'body'};
 				# }
 			my $rowcache = $sth->fetchall_arrayref(undef, 10_000);
+			my $region_id;
+			my $region_name;
 			while(my $aref = shift(@{$rowcache})) {
 				if(scalar(@{$rowcache}) == 0) {
 					$rowcache = $sth->fetchall_arrayref(undef, 10_000);
@@ -581,10 +691,14 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				next if(!defined($data));
 				$data = $j->decode($data);
 				my $properties = $data->{'properties'};
+				# print "processing ", $properties->{'wof:id'}, "\n";
 				next if(scalar(@{$properties->{'wof:superseded_by'}}));
+				next if(exists($properties->{'mz:is_current'}) && ($properties->{'mz:is_current'} == 0));
+				next if(exists($properties->{'src:geom'}) && ($properties->{'src:geom'} eq 'missing'));	# https://github.com/whosonfirst-data/whosonfirst-data/issues/1346
 				my $placetype = $properties->{'wof:placetype'};
 				next if($placetype eq 'country');
-				my $country = $properties->{'wof:country'};
+				next if($placetype eq 'marketarea');
+				my $country = uc($properties->{'wof:country'});
 				next if(!defined($country));
 				if(!$openaddresses_supported_countries{lc($country)}) {
 					my $found = 0;
@@ -596,23 +710,84 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					}
 					next if(!$found);
 				}
-				my $state;
 				# print $placetype, "\n";
+				my $state;
 				if($placetype eq 'region') {
+					# print "\t$country\n";
 					if(($country eq 'US') || ($country eq 'CA') || ($country eq 'AU')) {
-						$state = $properties->{'wof:abbreviation'} || $properties->{'wof:name'};
+						$state = $properties->{'wof:abbreviation'} || $properties->{'wof:shortcode'} || $properties->{'wof:name'};
 					} else {
 						$state = $properties->{'wof:name'};
 					}
+					# print "\t$state\n";
 				} else {
 					$state = $properties->{'sg:province'};
+					if((!defined($state)) && ($country eq 'US') && (my $rc = $properties->{'qs:gn_nameadm1'})) {
+						if($rc =~ /^\[A-Z]{2}$/) {
+							die $rc;
+						}
+					}
 				}
+				# if((!defined($state)) && ($placetype eq 'borough') && (my $region = $properties->{'wof:region_id'})) {
+					# # FIXME:  This is probably a dup of the next if clause
+					# $state = get_wof($wof_global_dbh, $region);
+				# }
+				if((!defined($state)) && (my $a1 = ($properties->{'as:a1'} || $properties->{'qs:a1'} || $properties->{'qs:name_adm1'} || $properties->{'woe:name_adm1'}))) {
+					if(($a1 eq 'England') || ($a1 eq 'Scotland') || ($a1 eq 'Wales') || ($a1 eq 'Northern Ireland')) {
+						$a1 = $properties->{'qs:name_adm2'};
+					}
+					if(($country eq 'US') || ($country eq 'CA') || ($country eq 'AU')) {
+						if(my $sc = Locale::SubCountry->new($country)) {
+							if($a1 =~ /^(.+)[\s_]COUNTY/i) {
+								$a1 = $1;
+							}
+							$a1 =~ s/^\W+//;
+							# die Data::Dumper->new([$properties])->Dump();
+							if(my $code = $sc->code($a1)) {
+								$code = uc($code);
+								$state = $code if($code ne 'UNKNOWN');
+							}
+						} else {
+							die "Locale::SubCountry failed on $country";
+						}
+					} else {
+						$state = $a1;
+					}
+					if($state) {
+						$state =~ s/^\W+//;
+						if($state =~ /^CITY\[_\s]OF/i) {
+							$state = undef;
+						} else {
+							die Data::Dumper->new([$properties])->Dump() if($state eq 'England');
+							print "Gained $state from looking at the record\n" if(DEBUG&DEBUG_DETERMINE_LOCATION);
+						}
+					}
+				}
+
 				if(!defined($state)) {
 					my @hierarchy = @{$properties->{'wof:hierarchy'}};
 					if(scalar(@hierarchy) && (my $region = $hierarchy[0]->{'region_id'})) {
-						next if($region < 0);
-						$state = get_wof($wof_global_dbh, $region);
+						if(defined($region_id) && ($region == $region_id)) {
+							$state = $region_name;
+							# print "Saved state = $state\n" if(DEBUG&DEBUG_ALL);
+						} else {
+							next if($region < 0);
+							print "Getting state from hierachy:\n\t", Data::Dumper->new([$properties])->Dump() if(DEBUG&DEBUG_DETERMINE_LOCATION);
+							$state = get_wof($wof_global_dbh, $region);
+							if($state) {
+								print "\tGot $state\n" if(DEBUG&DEBUG_DETERMINE_LOCATION);
+								# Remember the region's name, since consecutive entries in the file are often the same,
+								# this is save a number of calls to get_wof()
+								$region_id = $region;
+								$region_name = $state;
+							} else {
+								print "\tCouldn't work out the state\n" if(DEBUG&DEBUG_DETERMINE_LOCATION);
+							}
+						}
 					} else {
+						# print "\tcan't determine the state\n",
+							# Data::Dumper->new([$properties])->Dump();
+						# print "\tcan't determine the state\n";
 						next;
 					}
 					# FIXME: the information will be in there somewhere
@@ -621,13 +796,33 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					# }
 					next unless($state);
 				}
+				if($max_state_lengths{$country} && (length($state) > $max_state_lengths{$country})) {
+					if(my $sc = Locale::SubCountry->new($country)) {
+						if(my $code = $sc->code($state)) {
+							$code = uc($code);
+							$state = $code if($code ne 'UNKNOWN');
+							# die Data::Dumper->new([$properties])->Dump();
+						}
+					} else {
+						die "Locale::SubCountry failed on $country";
+					}
+				}
 				my $city;
-				if(($placetype eq 'locality') || ($placetype eq 'neighbourhood')) {
+				if(($placetype eq 'locality') || ($placetype eq 'neighbourhood') || ($placetype eq 'borough')) {
 					$city = $properties->{'wof:name'};
-					die if(!defined($city));
+					if(($placetype eq 'borough') && (my $parent = $properties->{'wof:parent_id'})) {
+						if(my $parent = get_wof($wof_global_dbh, $parent)) {
+							$city = "$city, $parent";
+						# } else {
+							# Most likely the parent is in a different database
+							# die "Can't determine the parent for $city in ", $properties->{'wof:id'}, "->$parent";
+						}
+					}
+					die "Can't determine the city" if(!defined($city));
 				} else {
 					$city = $properties->{'sg:city'};
 					# Don't trust sg:city to be correct
+					# You can look up a place by https://spelunker.whosonfirst.org/id/$locality_id
 					my @hierarchy = @{$properties->{'wof:hierarchy'}};
 					if(scalar(@hierarchy) && (my $locality = $hierarchy[0]->{'locality_id'})) {
 						if(my $w = get_wof($wof_global_dbh, $locality)) {
@@ -635,12 +830,25 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 						}
 					}
 				}
-				# print Data::Dumper->new([$properties])->Dump();
-				# if($city) {
-					# print "$country, $state, $city\n";
-				# } else {
-					# print "$country, $state\n";
-				# }
+				if($placetype eq 'county') {
+					# TODO
+					# print "\tcounty: ", $properties->{'wof:name'}, ", $state, $country\n";
+						# Data::Dumper->new([$properties])->Dump();
+					my $row = {
+						'LAT' => $properties->{'geom:latitude'},
+						'LON' => $properties->{'geom:longitude'},
+						'COUNTY' => uc($properties->{'wof:name'}),
+						'STATE' => $state,
+						'COUNTRY' => $country,
+					};
+					$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh, global => 1);
+					next;
+				}
+				if($city) {
+					# print "\t$country, $state, $city\n";
+				} else {
+					# print "\t$country, $state\n";
+				}
 				if(!defined($city)) {
 					my $address = $properties->{'addr:full'};
 					next if(!defined($address));
@@ -659,9 +867,31 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				if($street) {
 					$street = uc($street);
 				}
-				my $number = $properties->{'addr:number'};
+				my $number = $properties->{'addr:number'} || $properties->{'addr:housenumber'};
 				if($number) {
 					$number = uc($number);
+				}
+				$state = uc($state);
+				# print "\tqueuing ", $properties->{'wof:id'}, ': ', $properties->{'wof:name'}, ", $city, $state, $country\n";
+				if(my $name = $properties->{'wof:name'}) {
+					if($name ne $city) {
+						my $row = {
+							'LAT' => $properties->{'geom:latitude'} || $properties->{'lbl:latitude'},
+							'LON' => $properties->{'geom:longitude'} || $properties->{'lbl:longitude'},
+							'NAME' => uc($name),
+							'NUMBER' => $number,
+							'STREET' => $street,
+							'CITY' => uc($city),
+							'STATE' => $state,
+							'COUNTRY' => $country,
+							'POSTCODE' => $postcode,
+						};
+						unless($row->{'LAT'} && $row->{'LON'}) {
+							print 'Empty LAT/LON in WOF entry ', $properties->{'wof:id'}, " in $file\n" if(DEBUG&DEBUG_DATA_VALIDATE);
+							next;
+						}
+						$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh, global => 1);
+					}
 				}
 				my $row = {
 					'LAT' => $properties->{'geom:latitude'},
@@ -670,11 +900,41 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					'NUMBER' => $number,
 					'STREET' => $street,
 					'CITY' => uc($city),
-					'STATE' => uc($state),
-					'COUNTRY' => uc($country),
+					'STATE' => $state,
+					'COUNTRY' => $country,
 					'POSTCODE' => $postcode,
 				};
 				$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh, global => 1);
+				if(my $addr_full = $properties->{'addr:full'}) {
+					my $ap;
+					if($country =~ /^ENGLAND/) {
+						$ap = Lingua::EN::AddressParse->new(country => 'GB', auto_clean => 1, force_case => 1, force_post_code => 0);
+					} else {
+						$ap = Lingua::EN::AddressParse->new(country => $country, auto_clean => 1, force_case => 1, force_post_code => 0);
+					}
+					if($ap) {
+						if(my $error = $ap->parse($addr_full)) {
+							# print STDERR 'Address parse failed: ', $ap->report(), "\n";
+						} else {
+							my %c = $ap->components();
+							if(my $type = $c{'street_type'}) {
+								$c{'street_name'} .= " $type";
+							}
+							$row = {
+								'LAT' => $properties->{'geom:latitude'},
+								'LON' => $properties->{'geom:longitude'},
+								'NUMBER' => $c{'property_identifier'},
+								'STREET' => uc($c{'street_name'}),
+								'CITY' => uc($c{'suburb'}),
+								'STATE' => $state,
+								'COUNTRY' => $country,
+								'POSTCODE' => uc($c{'post_code'}),
+							};
+							# print(Data::Dumper->new([$row])->Dump()) if(DEBUG&DEBUG_ALL);
+							$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh, global => 1);
+						}
+					}
+				}
 				if($inserts >= MAX_INSERT_COUNT) {
 					flush_queue($dbh);
 					$inserts = 0;
@@ -682,16 +942,19 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 			}
 		}
 
+		# print "Debug exit\n" if(DEBUG&DEBUG_ALL);
 		# $dbh->commit();
 		# $dbh->disconnect();
 		# $wof_global_dbh->disconnect();
 		# exit(0);
 
+		my %address_parsers;
+
 		# Find all of the .csv files in $OPENADDR_HOME
 		foreach my $csv_file (uniq(create_tree($oa))) {
 			# next unless($csv_file =~ /us\/md\/statewide/);
 			# next unless($csv_file =~ /us\/ne\/dawes/);
-			# next unless($csv_file =~ /us\/mo\//);
+			# next unless($csv_file =~ /us\/al\//);
 
 			# Handle https://github.com/openaddresses/openaddresses/issues/3928
 			# TODO: It would be better to merge airdrie.csv and city_of_airdrie.csv
@@ -700,12 +963,15 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 			my $f = $csv_file;
 			$f =~ s/^$oa\///;
 			my @components = split(/\//, $f);
-			if(my $country = $components[0]) {
-				next unless($openaddresses_supported_countries{lc($country)});
-
+			if(my $country = uc($components[0])) {
 				my $query;
 				my $state;
 				my $file;
+				my $region_id;
+				my $region_name;
+
+				next unless($openaddresses_supported_countries{lc($country)});
+
 				if($components[1] =~ /\.csv$/) {
 					$file = $components[1];
 				} else {
@@ -714,9 +980,10 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				}
 
 				# Clear the deduping hash when we can, to avoid it becoming too large
-				if($country eq 'us') {
+				if($country eq 'US') {
 					if((!defined($current_state)) || ($state ne $current_state)) {
-						# print "New state, clear state_md5s; state = $state, country = $country\n";
+						print "New state, clear state_md5s; state = $state, country = $country\n" if(DEBUG&DEBUG_NEW_LOCATION);
+						flush_queue($dbh);	# Check for hanging dups in current state
 						%state_md5s = ();
 						%state_parent_md5s = ();
 						$current_country = $country;
@@ -724,6 +991,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					}
 				} elsif((!defined($current_country)) || ($country ne $current_country)) {
 					# print "New country, clear state_md5s\n";
+					flush_queue($dbh);	# Check for hanging dups in current country
 					%state_md5s = ();
 					%state_parent_md5s = ();
 					$current_country = $country;
@@ -733,6 +1001,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 
 				# Import this state's hand curated data
 				if(my $k = $known_places{$f}) {
+					# print "Known place:\n\t", Data::Dumper->new([\$k])->Dump();
 					foreach my $row(@{$k}) {
 						$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh, global => 1);
 						if($inserts >= MAX_INSERT_COUNT) {
@@ -745,17 +1014,16 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				# Import this state's Who's on First data
 				# This strange loop is there to avoid importing a file more than once
 				foreach my $wof_file (keys %whosonfirst) {
-					if($state && ($country eq 'us')) {
+					if($state && ($country eq 'US')) {
 						next unless($wof_file =~ /\/whosonfirst\-data\-venue\-([a-z]{2})\-([a-z]+)\-latest/);
-						next if((lc($1) ne $country) || (uc($2) ne $state));
+						next if((uc($1) ne $country) || (uc($2) ne $state));
 					} else {
 						next unless($wof_file =~ /\/whosonfirst\-data\-venue\-([a-z]{2})\-latest/);
-						my $c = lc($1);
-						next if($c ne $country);
+						next if(uc($1) ne $country);
 					}
 				# if(my $whosonfirst = $ENV{WHOSONFIRST_HOME}) {
 					# my $wof_file;
-					# if($state && ($country eq 'us')) {
+					# if($state && ($country eq 'US')) {
 						# $wof_file = "$whosonfirst/whosonfirst-data-venue-us-" . lc($state) . '-latest.db';
 					# } else {
 						# $wof_file = "$whosonfirst/whosonfirst-data-venue-" . lc($country) . '-latest.db';
@@ -764,7 +1032,8 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					$| = 1;
 					printf "%-70s\r", $file;
 					$| = 0;
-					print "\n";
+					print "\n" if(MAX_INSERT_COUNT == 1);
+					print __LINE__, ": state = $state\n" if(DEBUG&DEBUG_NEW_LOCATION);
 					my $wof_dbh = DBI->connect("dbi:SQLite:dbname=$wof_file", undef, undef, {
 						sqlite_open_flags => SQLITE_OPEN_READONLY,
 					});
@@ -790,7 +1059,8 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 						$data = $j->decode($data);
 						my $properties = $data->{'properties'};
 						next if(scalar(@{$properties->{'wof:superseded_by'}}));
-						next if($properties->{'wof:country'} ne uc($country));
+						next if(exists($properties->{'mz:is_current'}) && ($properties->{'mz:is_current'} == 0));
+						next if($properties->{'wof:country'} ne $country);
 						my $city = $properties->{'sg:city'};
 						# Don't trust sg:city to be correct
 						my @hierarchy = @{$properties->{'wof:hierarchy'}};
@@ -799,10 +1069,47 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 								$city = $w;
 							}
 						}
-						if($country ne 'us') {
+						if($country eq 'US') {
+							die "$country, $state" if($state ne uc($components[1]));
+						} else {
 							# For the US, the state name comes from the WOF filename
 							# For the rest of the world there is one WOF file per country
 							$state = $properties->{'sg:region'} || $properties->{'sg:province'};
+						}
+						# TODO: If DEBUG_DATA_VALIDATE is set, always check the
+						#	state in the hierachy is correct
+						if(!defined($state)) {
+							if($country eq 'US') {
+								die 'States in the US should be obtained from the file name';
+							}
+							my @hierarchy = @{$properties->{'wof:hierarchy'}};
+							if(scalar(@hierarchy) && (my $region = $hierarchy[0]->{'region_id'})) {
+								if(defined($region_id) && ($region == $region_id)) {
+									$state = $region_name;
+									# print "Saved state = $state\n" if(DEBUG&DEBUG_ALL);
+								} else {
+									next if($region < 0);
+									print "Getting state from hierachy:\n\t", Data::Dumper->new([$properties])->Dump() if(DEBUG&DEBUG_ALL);
+									my $state = get_wof($wof_global_dbh, $region);
+									# Remember the region's name, since consecutive entries in the file are often the same,
+									# this is save a number of calls to get_wof()
+									$region_id = $region;
+									$region_name = $state;
+								}
+							} else {
+								# print "\tcan't determine the state\n",
+									# Data::Dumper->new([$properties])->Dump();
+								# print "\tcan't determine the state\n";
+								next;
+							}
+							# FIXME: the information will be in there somewhere
+							# if(!defined($state)) {
+								# die Data::Dumper->new([$properties])->Dump();
+							# }
+							next unless($state);
+						}
+						if($country eq 'US') {
+							die $properties->{'wof:id'}, "; $country: $state/", $components[1] if($state ne uc($components[1]));
 						}
 						# if($city) {
 							# print "$country, $state, $city\n";
@@ -812,7 +1119,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 						if(!defined($city)) {
 							my $address = $properties->{'addr:full'};
 							next if(!defined($address));
-							if($country eq 'us') {
+							if($country eq 'US') {
 								if(my $href = (Geo::StreetAddress::US->parse_location($address) || Geo::StreetAddress::US->parse_address($address))) {
 									if($href->{city}) {
 										$city = $href->{city};
@@ -829,22 +1136,90 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 						if($street) {
 							$street = uc($street);
 						}
-						my $number = $properties->{'addr:number'};
+						my $number = $properties->{'addr:number'} || $properties->{'addr:housenumber'};
 						if($number) {
 							$number = uc($number);
 						}
+						my $name = $properties->{'wof:name'};
+						if($name) {
+							$name = uc($name);
+						}
 						my $row = {
+							'LINE' => __LINE__,
 							'LAT' => $properties->{'geom:latitude'},
 							'LON' => $properties->{'geom:longitude'},
-							'NAME' => uc($properties->{'wof:name'}),
+							'NAME' => $name,
 							'NUMBER' => $number,
 							'STREET' => $street,
 							'CITY' => uc($city),
 							'STATE' => $state,
-							'COUNTRY' => uc($country),
+							'COUNTRY' => $country,
 							'POSTCODE' => $postcode,
 						};
+						die Data::Dumper->new([$properties])->Dump() if(!defined($state));
 						$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh);
+						if(my $addr_full = $properties->{'addr:full'}) {
+							if($inserts >= MAX_INSERT_COUNT) {
+								flush_queue($dbh);
+								$inserts = 0;
+							}
+							my $ap;
+							if($country =~ /^ENGLAND/) {
+								$address_parsers{'GB'} ||= Lingua::EN::AddressParse->new(country => 'GB', auto_clean => 1, force_case => 1, force_post_code => 0);
+								$ap = $address_parsers{'GB'};
+							} else {
+								$address_parsers{$country} ||= Lingua::EN::AddressParse->new(country => $country, auto_clean => 1, force_case => 1, force_post_code => 0);
+								$ap = $address_parsers{$country};
+							}
+							if($ap) {
+								if($country eq 'us') {
+									die if($state ne uc($components[1]));
+								}
+								if(my $error = $ap->parse($addr_full)) {
+									# print STDERR 'Address parse failed: ', $ap->report(), "\n";
+								} else {
+									my %c = $ap->components();
+									my $post_code = $c{'post_code'};
+									if($post_code) {
+										$post_code = uc($post_code);
+									}
+									if($c{'street_name'} && (my $type = $c{'street_type'})) {
+										$c{'street_name'} .= " $type";
+									}
+									if($number && ($c{'property_identifier'} ne $number)) {
+										print "diff number\n" if(DEBUG&DEBUG_L_EN_A);
+									}
+									if(defined($street) && (uc($c{'street_name'}) ne $street)) {
+										print "diff street ($street/$c{street_name})\n" if(DEBUG&DEBUG_L_EN_A);
+									}
+									if(uc($c{'suburb'}) ne uc($city)) {
+										print "diff city ($city/$c{suburb})\n" if(DEBUG&DEBUG_L_EN_A);
+									}
+									if(defined($postcode) && ($post_code && ($post_code ne $postcode))) {
+										print "diff postcode\n" if(DEBUG&DEBUG_L_EN_A);
+									}
+									if(($number && ($c{'property_identifier'} ne $number)) ||
+									   ($street && (uc($c{'street_name'}) ne $street)) ||
+									   (uc($c{'suburb'}) ne uc($city)) ||
+									   ($postcode && ($post_code && ($post_code ne $postcode)))) {
+										print 'After ', Data::Dumper->new([$row])->Dump() if(DEBUG&DEBUG_L_EN_A);
+										$row = {
+											'LAT' => $properties->{'geom:latitude'},
+											'LON' => $properties->{'geom:longitude'},
+											'NAME' => $name,
+											'NUMBER' => $c{'property_identifier'},
+											'STREET' => uc($c{'street_name'}),
+											'CITY' => uc($c{'suburb'}),
+											'STATE' => $state,
+											'COUNTRY' => $country,
+											'POSTCODE' => $post_code,
+										};
+										print "\tAdding from L:EN:A($addr_full):\n\t", Data::Dumper->new([$row])->Dump() if(DEBUG&DEBUG_L_EN_A);
+										$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh);
+									}
+								}
+							}
+						}
 						if($inserts >= MAX_INSERT_COUNT) {
 							flush_queue($dbh);
 							$inserts = 0;
@@ -852,13 +1227,17 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					}
 					$wof_dbh->disconnect();
 					delete $whosonfirst{$wof_file};
-					# last;
+					flush_queue($dbh);	# Check for hanging dups in current state
+					$inserts = 0;
 				}
+
+				open(my $fin, '<', $csv_file);
+				aio_readahead($fin, 0, 10240);
 
 				$| = 1;
 				printf "%-70s\r", $f;
 				$| = 0;
-				print "\n";
+				print "\n" if(MAX_INSERT_COUNT == 1);
 
 				# Import this state's OpenAddresses data
 				my $csv = Text::CSV->new({
@@ -871,7 +1250,6 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					# escape_char => '\\',	# Put back once issue 3905 has been fixed
 				});
 
-				open(my $fin, '<', $csv_file);
 				$csv->column_names($csv->getline($fin));
 
 				while(my $row = $csv->getline_hr($fin)) {
@@ -881,26 +1259,48 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 						$inserts = 0;
 					}
 				}
+
+				flush_queue($dbh);	# Check for hanging dups in current state
+				$inserts = 0;
+
+				close($fin);
 			}
 		}
 
+		# print "Debug exit\n" if(DEBUG&DEBUG_ALL);
+		# $dbh->commit();
+		# $dbh->disconnect();
+		# $wof_global_dbh->disconnect();
+		# exit(0);
+
+		flush_queue($dbh);	# Check for hanging dups in last state
 		%state_md5s = ();
 		%state_parent_md5s = ();
 
 		foreach my $country(@whosonfirst_only_countries) {
-			# TODO: import known_places for this country
+			# Import this country's hand curated data
+			my $inserts = 0;
+			if(my $k = $known_places{'other'}) {
+				# print "Known place:\n\t", Data::Dumper->new([\$k])->Dump();
+				foreach my $row(@{$k}) {
+					$inserts += import(row => $row, file => "$country/countrywide.csv", ua => $ua, dbh => $dbh);
+				}
+			}
+
+			if($inserts >= MAX_INSERT_COUNT) {
+				flush_queue($dbh);
+				$inserts = 0;
+			}
 
 			# Import this country's Who's on First data
-			my $inserts = 0;
 			foreach my $wof_file (keys %whosonfirst) {
 				next unless($wof_file =~ /\/whosonfirst\-data\-venue\-([a-z]{2})\-latest/);
-				my $c = lc($1);
-				next if($c ne $country);
+				next if(uc($1) ne $country);
 				my $file = basename($wof_file);
 				$| = 1;
 				printf "%-70s\r", $file;
 				$| = 0;
-				print "\n";
+				print "\n" if(MAX_INSERT_COUNT == 1);
 				my $wof_dbh = DBI->connect("dbi:SQLite:dbname=$wof_file", undef, undef, {
 					sqlite_open_flags => SQLITE_OPEN_READONLY,
 				});
@@ -928,25 +1328,26 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 
 					my $properties = $data->{'properties'};
 					next if(scalar(@{$properties->{'wof:superseded_by'}}));
-					next if($properties->{'wof:country'} ne uc($country));
+					next if(exists($properties->{'mz:is_current'}) && ($properties->{'mz:is_current'} == 0));
+					next if($properties->{'wof:country'} ne $country);
 					my $street = $properties->{'addr:street'};
-					next if(!defined($street));
+					# next if(!defined($street));
 					# https://github.com/whosonfirst-data/whosonfirst-data/issues/1193
-					$street =~ s/;.+$//;
+					if($street) {
+						$street =~ s/;.+$//;
+						$street = uc($street);
+					}
 					my $city = $properties->{'sg:city'};
 					# Don't trust sg:city to be correct
 					my @hierarchy = @{$properties->{'wof:hierarchy'}};
 					if(scalar(@hierarchy) && (my $locality = $hierarchy[0]->{'locality_id'})) {
+						# print 'Check locality_id at ', __LINE__, "\n\t", Data::Dumper->new([$properties])->Dump() if(DEBUG&DEBUG_ALL);
 						if(my $w = get_wof($wof_global_dbh, $locality)) {
 							$city = $w;
 						}
 					}
 					my $state = $properties->{'sg:region'} || $properties->{'sg:province'};
 					my $postcode = $properties->{'addr:postcode'};
-					$country = uc($country);
-					if(defined($city)) {
-						$city = uc($city);
-					}
 					if(defined($postcode)) {
 						$postcode = uc($postcode);
 					}
@@ -959,26 +1360,86 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 							$state = 'SOMERSET';
 						}
 					}
-					if(!defined($city)) {
-						if(defined($postcode) && ($postcode =~ /^W1 /)) {
-							$city = 'LONDON';
-						} else {
-							# warn Data::Dumper->new([$data])->Dump();
-							next;
+					if(defined($city)) {
+						$city = uc($city);
+					} elsif(defined($postcode) && ($postcode =~ /^W1 /)) {
+						$city = 'LONDON';
+					} else {
+						print STDERR "City not defined:\n\t",
+							Data::Dumper->new([$data])->Dump();
+						next;
+					}
+					if(!defined($state)) {
+						my $placetype = $properties->{'wof:placetype'};
+						if(($placetype eq 'venue') && scalar(@hierarchy) && (my $region = $hierarchy[0]->{'region_id'})) {
+							$state = get_wof($wof_global_dbh, $region);
 						}
 					}
+					$city =~ s/^CITY OF //g;
+					# Note that if import says that if city == state, set city to undef
+					if(($country eq 'GB') && ($city eq 'LONDON')) {
+						# if(defined($state) && ($state ne 'GREATER LONDON')) {
+							# warn Data::Dumper->new([$data])->Dump();
+						# }
+						$state = 'LONDON';
+					} elsif(defined($state)) {
+						if($state =~ /$city CITY/) {
+							$state = $city;
+						} elsif($state =~ /CITY OF $city/) {
+							$state = $city;
+						}
+					}
+					# print $properties->{'wof:id'}, ': ', $properties->{'wof:name'}, ", $city, $state, $country\n";
 					my $row = {
 						'LAT' => $properties->{'geom:latitude'},
 						'LON' => $properties->{'geom:longitude'},
 						'NAME' => uc($properties->{'wof:name'}),
-						'NUMBER' => uc($properties->{'addr:housenumber'}),
-						'STREET' => uc($street),
+						'STREET' => $street,
 						'CITY' => $city,
 						'STATE' => $state,
 						'COUNTRY' => $country,
 						'POSTCODE' => $postcode,
 					};
+					if(my $number = $properties->{'addr:housenumber'}) {
+						$row->{'NUMBER'} = uc($number);
+					}
 					$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh);
+					if(my $addr_full = $properties->{'addr:full'}) {
+						my $ap;
+						if($country =~ /^ENGLAND/i) {
+							$address_parsers{'GB'} ||= Lingua::EN::AddressParse->new(country => 'GB', auto_clean => 1, force_case => 1, force_post_code => 0);
+							$ap = $address_parsers{'GB'};
+						} else {
+							$address_parsers{$country} ||= Lingua::EN::AddressParse->new(country => $country, auto_clean => 1, force_case => 1, force_post_code => 0);
+							$ap = $address_parsers{$country};
+						}
+						if($ap) {
+							if(my $error = $ap->parse($addr_full)) {
+								# print STDERR 'Address parse failed: ', $ap->report(), "\n";
+							} else {
+								my %c = $ap->components();
+								my $post_code = $c{'post_code'};
+								if($post_code) {
+									$post_code = uc($post_code);
+								}
+								if(my $type = $c{'street_type'}) {
+									$c{'street_name'} .= " $type";
+								}
+								$row = {
+									'LAT' => $properties->{'geom:latitude'},
+									'LON' => $properties->{'geom:longitude'},
+									'NUMBER' => $c{'property_identifier'},
+									'STREET' => uc($c{'street_name'}),
+									'CITY' => uc($c{'suburb'}),
+									'STATE' => $state,
+									'COUNTRY' => $country,
+									'POSTCODE' => $post_code,
+								};
+								print(Data::Dumper->new([$row])->Dump()) if(DEBUG&DEBUG_ALL);
+								$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh);
+							}
+						}
+					}
 					if($inserts >= MAX_INSERT_COUNT) {
 						flush_queue($dbh);
 						$inserts = 0;
@@ -1021,18 +1482,20 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 		%global_md5s = ();
 		%cities = ();
 
-		# $dbh->prepare('CREATE UNIQUE INDEX sequence_index ON cities(sequence)')->execute();
-		$dbh->prepare('CREATE UNIQUE INDEX md5_index ON openaddresses(md5)')->execute();
-		# $dbh->prepare('CREATE UNIQUE INDEX tree_index ON tree(md5,parent)')->execute();
-		# $dbh->prepare('CREATE UNIQUE INDEX node_index ON level(md5)')->execute();
-		# $dbh->prepare('CREATE UNIQUE INDEX leaf_index ON leaf(md5)')->execute();
+		if(MAX_INSERT_COUNT > 1) {
+			# $dbh->prepare('CREATE UNIQUE INDEX sequence_index ON cities(sequence)')->execute();
+			$dbh->prepare('CREATE UNIQUE INDEX md5_index ON openaddresses(md5)')->execute();
+			# $dbh->prepare('CREATE UNIQUE INDEX tree_index ON tree(md5,parent)')->execute();
+			# $dbh->prepare('CREATE UNIQUE INDEX node_index ON level(md5)')->execute();
+			# $dbh->prepare('CREATE UNIQUE INDEX leaf_index ON leaf(md5)')->execute();
+		}
 
 		$| = 1;
 		printf "%-70s\r", 'committing';
 		$| = 0;
 		$dbh->commit();
 		$dbh->disconnect();
-		print ' ' x 70, "\r";
+		print ' ' x 70, "\r" if(!DEBUG);
 	}
 
 	# TODO: Import the Maxmind databases
@@ -1086,6 +1549,10 @@ sub import {
 	my $dbh = $param{'dbh'} || die 'import: no dbh';
 	my $global = $param{'global'} || 0;
 	my $inserts = 0;
+
+	if($state) {
+		$state = uc($state);
+	}
 
 	my $city = $row->{'CITY'};
 	my $county = $row->{'COUNTY'};
@@ -1143,7 +1610,7 @@ sub import {
 			if($city) {
 				# Counties and states alone have already been read in
 				my %columns = (
-					'COUNTRY' => uc($country),
+					'COUNTRY' => $country,
 					'STATE' => $state,
 					'COUNTY' => $county,
 					'CITY' => $city,
@@ -1151,7 +1618,7 @@ sub import {
 					'LON' => $place->{'longitude'},
 				);
 				# print "$zip => $query\n";
-				$inserts += insert($dbh, $global, \%columns);
+				$inserts += insert($dbh, $global, %columns);
 			}
 		}
 		if(!defined($city)) {
@@ -1160,6 +1627,24 @@ sub import {
 			# print "\n", Data::Dumper->new([\$row])->Dump();
 			$dbh->disconnect();
 			die $file;
+		}
+	}
+	return 0 if(($row->{'LAT'} == 0) && ($row->{'LON'} == 0));
+	my $street = $row->{'STREET'};
+	if($street && ($city =~ /(.+),\s*(.+)/)) {
+		# For example the city could be "North Side, Chicago", which comes from the case when a borough record
+		# has been added.  Let's allow searches on the borough or the city alone
+		my $borough = $1;
+		my $city_name = $2;
+		print "Break up $city\n\tstreet = $street\n\tborough = $borough\n\tcity_name = $city_name\n" if(DEBUG&DEBUG_BREAKUP);
+		if($borough ne $street) {
+			my %columns = ( %{$param{'row'}}, 'COUNTRY' => $country, 'STATE' => $state, 'COUNTY' => $county, 'CITY' => $borough );
+			print "\t", Data::Dumper->new([\%columns])->Dump() if(DEBUG&DEBUG_BREAKUP);
+			$inserts += insert($dbh, $global, %columns);
+			$columns{'CITY'} = $city_name;
+			print "\t", Data::Dumper->new([\%columns])->Dump() if(DEBUG&DEBUG_BREAKUP);
+			$inserts += insert($dbh, $global, %columns);
+			print "\tDone\n" if(DEBUG&DEBUG_BREAKUP);
 		}
 	}
 	$city =~ s/\.csv$//;
@@ -1174,7 +1659,6 @@ sub import {
 	$city =~ s/\s\s+/ /g;
 	$city =~ s/\s+$//g;
 	$city =~ s/^\s+//g;
-	my $street = $row->{'STREET'};
 	if($street) {
 		$street = uc($street);
 		if($street =~ /(.+)\s+STREET$/) {
@@ -1205,6 +1689,8 @@ sub import {
 			$street = "$1 PL";
 		} elsif($street =~ /(.+)\s+GARDENS$/) {
 			$street = "$1 GRDNS";
+		} elsif($street =~ /(.+)\s+HIGHWAY$/) {
+			$street = "$1 HWY";
 		} elsif($street =~ /(.+)\s+CREEK$/) {
 			$street = "$1 CRK";
 		}
@@ -1263,7 +1749,6 @@ sub import {
 	}
 	if(($city && ($city !~ /^\s+$/)) || $county) {
 		# Counties and states alone have already been read in
-		$country = uc($country);
 		my %columns = (
 			'COUNTRY' => $country,
 			'CITY' => $city,
@@ -1280,9 +1765,9 @@ sub import {
 		if(($country eq 'GB') && ($city eq 'LONDON') && defined($state) && ($state eq 'LONDON')) {
 			delete $columns{'CITY'};
 		}
-		$inserts += insert($dbh, $global, \%columns);
+		$inserts += insert($dbh, $global, %columns);
 		if(delete($columns{'COUNTY'})) {
-			$inserts += insert($dbh, $global, \%columns);
+			$inserts += insert($dbh, $global, %columns);
 		}
 		my $name = $columns{'NAME'};
 		if($name) {
@@ -1291,50 +1776,50 @@ sub import {
 			#	Check if $name ends with uc($classifier->{category})
 			if($name =~ /^(.+)\s+RESTAURANT/i) {
 				$columns{'NAME'} = $1;
-				$inserts += insert($dbh, $global, \%columns);
-				# print "$1\n";
+				$inserts += insert($dbh, $global, %columns);
+				# print "RESTAURANT: $1\n";
 			}
 			if(delete($columns{'NAME'})) {
-				$inserts += insert($dbh, $global, \%columns);
+				$inserts += insert($dbh, $global, %columns);
 			}
 		}
 		if(delete($columns{'NUMBER'})) {
 			if($name) {
 				# For when a name is known but not a street number
 				$columns{'NAME'} = $name;
-				$inserts += insert($dbh, $global, \%columns);
+				$inserts += insert($dbh, $global, %columns);
 				if($name =~ /^(.+)\s+RESTAURANT/i) {
 					$columns{'NAME'} = $1;
-					$inserts += insert($dbh, $global, \%columns);
-					# print "$1\n";
+					$inserts += insert($dbh, $global, %columns);
+					# print "RESTAURANT: $1\n";
 				}
 				delete($columns{'NAME'});
 			}
 			# Match somewhere in the street when number isn't known
-			$inserts += insert($dbh, $global, \%columns);
+			$inserts += insert($dbh, $global, %columns);
 			if(delete($columns{'STREET'})) {
 				if($name) {
 					# For when a name is known but not a street
 					$columns{'NAME'} = $name;
-					$inserts += insert($dbh, $global, \%columns);
+					$inserts += insert($dbh, $global, %columns);
 					if($name =~ /^(.+)\s+RESTAURANT/i) {
 						$columns{'NAME'} = $1;
-						$inserts += insert($dbh, $global, \%columns);
-						# print "$1\n";
+						$inserts += insert($dbh, $global, %columns);
+						# print "RESTAURANT: $1\n";
 					}
 					delete($columns{'NAME'});
 				}
 				# Match somewhere in the city when street isn't known
-				$inserts += insert($dbh, $global, \%columns);
+				$inserts += insert($dbh, $global, %columns);
 			}
 		} elsif($name && delete($columns{'STREET'})) {
 			# For when a name is known but not a street
 			$columns{'NAME'} = $name;
-			$inserts += insert($dbh, $global, \%columns);
+			$inserts += insert($dbh, $global, %columns);
 			if($name =~ /^(.+)\s+RESTAURANT/i) {
 				$columns{'NAME'} = $1;
-				$inserts += insert($dbh, $global, \%columns);
-				# print "$1\n";
+				$inserts += insert($dbh, $global, %columns);
+				# print "RESTAURANT: $1\n";
 			}
 		}
 	}
@@ -1343,45 +1828,43 @@ sub import {
 
 # Insert data into the database, returns the number of new rows
 sub insert {
-	my ($dbh, $global, $c) = @_;
+	my ($dbh, $global, %columns) = @_;
 
-	my $columns = { %{$c} };	# Take a copy of the hash because we're going to play with it
-
-	foreach my $column(keys %{$columns}) {
-		if(!defined($columns->{$column})) {
-			delete $columns->{$column};
-		} elsif($columns->{$column} =~ /^\s+$/) {
-			delete $columns->{$column};
+	foreach my $column(keys %columns) {
+		if(!defined($columns{$column})) {
+			delete $columns{$column};
+		} elsif($columns{$column} =~ /^\s+$/) {
+			delete $columns{$column};
 		}
 	}
 
-	# print Data::Dumper->new([$columns])->Dump() if($columns->{'CITY'} && (uc($columns->{'CITY'}) eq 'INDIANAPOLIS'));
-	# print Data::Dumper->new([$columns])->Dump() if($columns->{'NAME'} && (uc($columns->{'NAME'}) eq 'EL PAPI STREET TACOS'));
+	# print Data::Dumper->new([$columns])->Dump() if($columns{'CITY'} && (uc($columns{'CITY'}) eq 'INDIANAPOLIS'));
+	# print Data::Dumper->new([$columns])->Dump() if($columns{'NAME'} && (uc($columns{'NAME'}) eq 'EL PAPI STREET TACOS'));
 	# my @call_details = caller(0);
 	# print "line " . $call_details[2], "\n";
 	# print Data::Dumper->new([$columns])->Dump();
 
-	my $lat = $columns->{'LAT'};
-	my $lon = $columns->{'LON'};
+	my $lat = $columns{'LAT'};
+	my $lon = $columns{'LON'};
 
-	die Data::Dumper->new([$columns])->Dump() unless(defined($lat) && defined($lon));
-	# die "$lat/$lon" unless($columns->{'STATE'});
+	die Data::Dumper->new([\%columns])->Dump() unless(defined($lat) && defined($lon));
+	# die "$lat/$lon" unless($columns{'STATE'});
 
 	# Remove duplicate, leading and trailing spaces from entries.  Some openaddresses files are littered with them
-	foreach my $column(keys %{$columns}) {
-		$columns->{$column} =~ s/\s+$//g;
-		$columns->{$column} =~ s/^\s+//g;
-		$columns->{$column} =~ s/\s\s+/ /g;
+	foreach my $column(keys %columns) {
+		$columns{$column} =~ s/\s+$//g;
+		$columns{$column} =~ s/^\s+//g;
+		$columns{$column} =~ s/\s\s+/ /g;
 	}
 
-	# my $digest = Digest::MD5::md5_base64(map { Encode::encode_utf8($columns->{$_}) } sort keys %{$columns});
+	# my $digest = Digest::MD5::md5_base64(map { Encode::encode_utf8($columns{$_}) } sort keys %{$columns});
 	my $digest;
 	# print Data::Dumper->new([$columns])->Dump();
 	foreach my $column('NAME','NUMBER','STREET','CITY','COUNTY','STATE','COUNTRY') {
-		$digest .= $columns->{$column} if($columns->{$column});
+		$digest .= $columns{$column} if($columns{$column});
 	}
 	# print "$digest\n";
-	$digest = hash($global, Encode::encode_utf8($digest));
+	$digest = create_md5($global, Encode::encode_utf8($digest));
 
 	if(!defined($digest)) {
 		# print "Ignore ", join(',', values(%{$columns})), "\n";
@@ -1390,18 +1873,27 @@ sub insert {
 
 	# print "$digest\n";
 
-	# my $q = "SELECT * FROM openaddresses WHERE MD5 = '$digest'";
-	# my $sth = $dbh->prepare($q);
+	# $dbh->prepare("SELECT * FROM openaddresses WHERE MD5 = '$digest'");
 	# $sth->execute();
 	# while(my $href = $sth->fetchrow_hashref()) {
 		# my @call_details = caller(0);
 		# print "line " . $call_details[2], "\n";
-		# print Data::Dumper->new([$columns])->Dump();
+		# print Data::Dumper->new([\%columns])->Dump();
 		# print Data::Dumper->new([$href])->Dump();
 	# }
 
-	$queued_commits{$digest} = $columns;
-	my $key = city_key($columns->{'CITY'}, $columns->{'COUNTY'}, $columns->{'STATE'}, $columns->{'COUNTRY'});
+	my @call_details = caller(0);
+	$columns{'LINE'} = $call_details[2] if(DEBUG);
+	$queued_commits{$digest} = \%columns;
+	if(DEBUG&DEBUG_ALL) {
+		flush_queue($dbh);
+	}
+	if(!defined($columns{'COUNTRY'})) {
+		my @call_details = caller(0);
+		print "insert: no country. Called from line " . $call_details[2], "\n";
+		die Data::Dumper->new([\%columns])->Dump();
+	}
+	my $key = city_key($columns{'CITY'}, $columns{'COUNTY'}, $columns{'STATE'}, $columns{'COUNTRY'});
 	if(!$cities{$key}) {
 		$city_sequence++;
 		# print "adding '$key' to cities list\n";
@@ -1409,19 +1901,24 @@ sub insert {
 	}
 
 	# Some postal address parsers have problems with "N FOO ST", so also store "NFOOST"
-	if($columns->{'STREET'} && ($columns->{'STREET'} =~ /^[A-Z]\s\w+\s\w+$/)) {
+	if($columns{'STREET'} && ($columns{'STREET'} =~ /^[A-Z]\s\w+\s\w+$/)) {
+		my %columns2 = %columns;
 		# Handle https://rt.cpan.org/Public/Bug/Display.html?id=124919
-		$columns->{'STREET'} =~ s/\s+//g;
-		$digest = '';
+		$columns2{'STREET'} =~ s/\s+//g;
+		$columns2{'LINE'} = $call_details[2] if(DEBUG);
+		$digest = undef;
 
 		foreach my $column('NUMBER','STREET','CITY','COUNTY','STATE','COUNTRY') {
-			$digest .= $columns->{$column} if($columns->{$column});
+			$digest .= $columns2{$column} if($columns2{$column});
 		}
-		if($digest = hash($global, Encode::encode_utf8($digest))) {
-			$queued_commits{$digest} = $columns;
+		if($digest = create_md5($global, Encode::encode_utf8($digest))) {
+			$queued_commits{$digest} = \%columns2;
+			if(DEBUG&DEBUG_ALL) {
+				flush_queue($dbh);
+			}
 			return 2;
 		# } else {
-			# print "Ignore ", join(',', values(%{$columns})), "\n";
+			# print "Ignore ", join(',', values(%columns2)), "\n";
 		}
 	}
 	return 1;
@@ -1433,7 +1930,7 @@ sub flush_queue
 {
 	my $dbh = shift;
 
-	# print "flush\n";
+	# print "flush\n" if(DEBUG&DEBUG_ALL);
 
 	# my @columns = ('LAT','LON','NUMBER','STREET','CITY','COUNTY','STATE','COUNTRY');
 	my @columns = ('LAT','LON','NAME','NUMBER','STREET');
@@ -1442,15 +1939,36 @@ sub flush_queue
 
 	keys %queued_commits;
 	# print scalar(keys %queued_commits), "\n";
-	while(my($md5, $row) = each %queued_commits) {
+	# while(my($md5, $row) = each %queued_commits) {
+	foreach my $md5(keys %queued_commits) {
+		my $row = $queued_commits{$md5};
+		# if($md5 eq 'D8GO4pMZCAYej/OR') {
+			# my @call_details = caller(0);
+			# print "flush_queue: Flomation called from line ", $call_details[2], "\n\t",
+				# Data::Dumper->new([\%queued_commits])->Dump();
+		# }
+		die if(ref($row) ne 'HASH');
 		my $country = $row->{'COUNTRY'};
+		if(!defined($country)) {
+			my @call_details = caller(0);
+			print "flush_queue: called from line ", $call_details[2], "\n";
+			die Data::Dumper->new([$row])->Dump();
+		}
 		my $state = $row->{'STATE'};
 		if($max_state_lengths{$country} && $state && (length($state) > $max_state_lengths{$country})) {
-			print STDERR 'Invalid state length: ', Data::Dumper->new([$row])->Dump();
+			print STDERR 'Invalid state length: ', Data::Dumper->new([$row])->Dump() if(DEBUG&DEBUG_INVALID_LENGTH);
 			next;
 		}
 		if(length($country) != 2) {
-			print STDERR "Invalid country length:\n", Data::Dumper->new([$row])->Dump();
+			print STDERR "Invalid country length:\n", Data::Dumper->new([$row])->Dump() if(DEBUG&DEBUG_INVALID_LENGTH);
+			next;
+		}
+
+		# die Data::Dumper->new([$row])->Dump() unless ($row->{'LAT'} && $row->{'LON'});
+		unless ($row->{'LAT'} && $row->{'LON'}) {
+			my @call_details = caller(0);
+			print "flush_queue: ignoring blank entry called from line ", $call_details[2], "\n\t",
+				Data::Dumper->new([$row])->Dump() if(DEBUG&DEBUG_ALL);
 			next;
 		}
 
@@ -1478,14 +1996,14 @@ sub flush_queue
 				# $query .= 'NULL,';
 			# }
 		# }
-		die $key unless $cities{$key};
+		# die $key unless $cities{$key};
 		# $query .= $cities{$key} . ",'$md5')";
 	}
 
 	my $tree_query;
 	# while(my($md5, $row) = each %queued_commits) {
 	if(0) {
-	my $row;
+		my $row;
 		my $digest = $row->{'COUNTRY'};
 		my $parent_md5;
 
@@ -1603,7 +2121,9 @@ sub flush_queue
 		try {
 			$dbh->do($query);
 		} catch {
-			print Data::Dumper->new([\%queued_commits])->Dump();
+			my @call_details = caller(1);
+			print "Error in flush_queue ($query) called from line ", $call_details[2], "\n\t",
+				Data::Dumper->new([\%queued_commits])->Dump();
 			die $_;
 		};
 	}
@@ -1623,13 +2143,13 @@ sub flush_queue
 	%queued_commits = ();
 }
 
-sub hash
+sub create_md5
 {
 	my $global = shift;
 
 	# my $digest = Digest::MD5::md5_base64(@_);
 	my $digest = substr Digest::MD5::md5_base64(@_), 0, 16;
-	return if($global_md5s{$digest} || $state_md5s{$digest});
+	return if($global_md5s{$digest} || $state_md5s{$digest} || $queued_commits{$digest});
 
 	# print join(',', @_), ": $digest\n";
 	if($global) {
@@ -1644,6 +2164,7 @@ sub uniq {
 	grep !$seen{$_}++, @_;
 }
 
+# State must be the abbreviated form
 sub city_key {
 	my ($city, $county, $state, $country) = @_;
 
@@ -1659,18 +2180,31 @@ sub city_key {
 	return "$city,$county,$state,$country";
 }
 
+# Given a Whosonfirst ID, return the matching geojson. Cache lookups
 sub get_wof {
 	my ($dbh, $id) = @_;
 
-	state $cache;
+	state %l1_cache;
+	state $l2_cache;
 
-	if(defined($cache)) {
-		if(my $name = $cache->get($id)) {
-			# print "get_wof: cached $name\n";
+	if($l1_cache{$id}) {
+		# my @call_details = caller(0);
+		# print "get_wof: stored $l1_cache{$id} at line " . $call_details[2], "\n" if(DEBUG&DEBUG_ALL);
+		return $l1_cache{$id};
+	}
+	if(scalar(keys %l1_cache) >= 50) {
+		%l1_cache = ();
+	}
+
+	if(defined($l2_cache)) {
+		if(my $name = $l2_cache->get($id)) {
+			my @call_details = caller(0);
+			print "get_wof: cached $name at line " . $call_details[2], "\n" if(DEBUG&DEBUG_GET_WOF);
+			$l1_cache{$id} = $name;
 			return $name;
 		}
 	} else {
-		$cache = CHI->new(driver => 'RawMemory', global => 0, max_size => 1_000);
+		$l2_cache = CHI->new(driver => 'RawMemory', global => 0, max_size => 1_000);
 	}
 
 	# print "get_wof: not cached $id\n";
@@ -1681,17 +2215,18 @@ sub get_wof {
 	my $data = $sth->fetchrow_arrayref();
 	return if(!defined($data));
 	# print Data::Dumper->new([@{$data}])->Dump();
-	# print $data, "\n", 'x' x 70, "\n";
+	# print "\n", 'x' x 70, "\n";
 	$data = JSON->new()->utf8()->decode(@{$data});
 	my $properties = $data->{'properties'};
 	return if(scalar(@{$properties->{'wof:superseded_by'}}));
+	return if(exists($properties->{'mz:is_current'}) && ($properties->{'mz:is_current'} == 0));
 	# if($properties->{'wof:name'}) {
 		if($properties->{'wof:placetype'} eq 'region') {
-			my $country = $properties->{'wof:country'};
+			my $country = uc($properties->{'wof:country'});
 			if(($country eq 'US') || ($country eq 'CA') || ($country eq 'AU')) {
-				return $cache->set($id, $properties->{'wof:abbreviation'} || $properties->{'wof:name'}, '1 minute');
+				return $l1_cache{$id} = $l2_cache->set($id, $properties->{'wof:abbreviation'} || $properties->{'wof:shortcode'} || $properties->{'wof:name'}, '1 minute');
 			}
 		}
-		return $cache->set($id, $properties->{'wof:name'}, '1 minute');
+		return $l1_cache{$id} = $l2_cache->set($id, $properties->{'wof:name'}, '1 minute');
 	# }
 }

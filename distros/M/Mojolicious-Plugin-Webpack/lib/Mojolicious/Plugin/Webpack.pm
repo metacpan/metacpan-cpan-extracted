@@ -8,7 +8,7 @@ use Mojo::Path;
 
 use constant LAZY => $ENV{MOJO_WEBPACK_LAZY} ? 1 : 0;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub assets_dir { shift->{assets_dir} }
 

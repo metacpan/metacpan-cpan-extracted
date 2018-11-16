@@ -1,88 +1,78 @@
 #! perl
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use IPC::PrettyPipe::DSL ':all';
 
-use Test::Deep;
-use Test::More;
-use Test::Exception;
-
-throws_ok {
-
-    ppcmd;
-
-}
-qr/missing required argument/i, 'no cmd';
+ok( dies { ppcmd }, qr/missing required argument/i, 'no cmd' );
 
 subtest 'argsep, srgpfx, cmd, arg' => sub {
-
     my $cmd;
 
-    lives_ok { $cmd = ppcmd argsep( '=' ), argpfx( '--' ), 'mycmd', 'foo' }
-    'ppcmd';
+    ok( lives { $cmd = ppcmd argsep( '=' ), argpfx( '--' ), 'mycmd', 'foo' },
+        'ppcmd' );
 
-    cmp_deeply(
+    is(
         $cmd,
-        methods(
-            argsep => '=',
-            argpfx => '--',
-            cmd    => 'mycmd'
-        ),
-
+        object {
+            call argsep => '=';
+            call argpfx => '--';
+            call cmd    => 'mycmd';
+        },
     );
 
-    cmp_deeply(
+    is(
         $cmd->args->elements->[0],
-        methods(
-            sep => '=',
-            pfx => '--',
-            name   => 'foo'
-        ) );
-
+        object {
+            call sep  => '=';
+            call pfx  => '--';
+            call name => 'foo';
+        },
+    );
 };
 
 # ensure that initial attributes set object, later ones don't
 subtest 'attribute isolation' => sub {
 
     my $cmd;
-    lives_ok {
-        $cmd = ppcmd argsep( '=' ), argpfx( '--' ),
-          'mycmd',
-          'foo',
-          argpfx '-',
-          'l';
-    }
-    'ppcmd';
-
-    cmp_deeply(
-        $cmd,
-        methods(
-            argsep => '=',
-            argpfx => '--',
-            cmd    => 'mycmd'
-        ),
-
+    ok(
+        lives {
+            $cmd = ppcmd argsep( '=' ), argpfx( '--' ),
+              'mycmd',
+              'foo',
+              argpfx '-',
+              'l';
+        },
+        'ppcmd'
     );
 
-    cmp_deeply(
-        $cmd->args->elements->[0],
-        methods(
-            sep => '=',
-            pfx => '--',
-            name   => 'foo'
-        ) );
+    is(
+        $cmd,
+        object {
+            call argsep => '=';
+            call argpfx => '--';
+            call cmd    => 'mycmd';
+        },
+    );
 
-    cmp_deeply(
+    is(
+        $cmd->args->elements->[0],
+        object {
+            call sep  => '=';
+            call pfx  => '--';
+            call name => 'foo';
+        },
+    );
+
+    is(
         $cmd->args->elements->[1],
-        methods(
-            sep => '=',
-            pfx => '-',
-            name   => 'l'
-        ) );
+        object {
+            call sep  => '=';
+            call pfx  => '-';
+            call name => 'l';
+        },
+    );
 
 };
-
 
 done_testing;

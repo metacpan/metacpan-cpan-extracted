@@ -50,6 +50,11 @@ sub gather_violations_generic {
         $used{"$el_word"}++;
     }
 
+    ## Look for the signature of misparsed ternary operator.
+    ## https://github.com/adamkennedy/PPI/issues/62
+    ## Once PPI is fixe, this workaround can be eliminated.
+    __get_terop_usage(\%used, $doc);
+
     Perl::Critic::Policy::Variables::ProhibitUnusedVariables::_get_symbol_usage(\%used, $doc);
     Perl::Critic::Policy::Variables::ProhibitUnusedVariables::_get_regexp_symbol_usage(\%used, $doc);
 
@@ -62,6 +67,19 @@ sub gather_violations_generic {
     }
 
     return @violations;
+}
+
+sub __get_terop_usage {
+    my ($used, $doc) = @_;
+    for my $question_mark (@{ $doc->find( sub { $_[1]->isa('PPI::Token::Operator') && $_[1]->content eq '?' }) ||[]}) {
+        my $el = $question_mark->snext_sibling;
+        next unless $el->isa('PPI::Token::Label');
+
+        my $tok = $el->content;
+        $tok =~ s/\s*:\z//;
+
+        $used->{$tok}++;
+    }
 }
 
 1;

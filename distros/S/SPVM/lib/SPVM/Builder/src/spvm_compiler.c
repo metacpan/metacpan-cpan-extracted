@@ -49,16 +49,15 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->subs = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->sub_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   compiler->fields = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->field_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   compiler->packages = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->package_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   compiler->package_vars = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->package_var_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->module_include_pathes = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->opcode_array = SPVM_OPCODE_ARRAY_new(compiler);
   compiler->string_pool = SPVM_STRING_BUFFER_new(0);
   compiler->string_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  compiler->current_sub_names = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
 
   // Add basic types
   SPVM_COMPILER_add_basic_types(compiler);
@@ -213,7 +212,16 @@ void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler) {
      SPVM_HASH_insert(compiler->basic_type_symtable, basic_type->name, strlen(basic_type->name), basic_type);
   }
 
-  // Add Object basic_type
+  // Add string basic_type
+  {
+     SPVM_BASIC_TYPE* basic_type = SPVM_BASIC_TYPE_new(compiler);
+     basic_type->id = SPVM_BASIC_TYPE_C_ID_STRING;
+     basic_type->name = SPVM_BASIC_TYPE_C_ID_NAMES[basic_type->id];
+     SPVM_LIST_push(compiler->basic_types, basic_type);
+     SPVM_HASH_insert(compiler->basic_type_symtable, basic_type->name, strlen(basic_type->name), basic_type);
+  }
+
+  // Add any object basic_type
   {
      SPVM_BASIC_TYPE* basic_type = SPVM_BASIC_TYPE_new(compiler);
      basic_type->id = SPVM_BASIC_TYPE_C_ID_ANY_OBJECT;

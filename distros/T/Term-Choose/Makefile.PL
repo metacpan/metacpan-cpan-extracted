@@ -11,6 +11,7 @@ if ( $^O eq 'MSWin32' ) {
         'Encode'                          => 0,
         'Encode::Locale'                  => 0,
         'Win32::Console'                  => 0,
+        'Win32::Console::ANSI'            => 0,
         'Win32::Console::PatchForRT33513' => 0,
     );
 }

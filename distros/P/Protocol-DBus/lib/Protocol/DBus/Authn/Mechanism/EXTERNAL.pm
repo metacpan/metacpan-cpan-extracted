@@ -26,10 +26,6 @@ sub new {
 
     $self->{'_skip_unix_fd'} = 1 if !Socket->can('SCM_RIGHTS');
 
-    # TODO: Research this a bit more to figure out
-    # how to make it work.
-    $self->{'_skip_unix_fd'} = 1;
-
     return $self;
 }
 

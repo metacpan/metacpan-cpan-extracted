@@ -111,20 +111,24 @@ sub wanted {
 
     my $story_dir = $File::Find::dir;
 
-    if ($file =~ /^story\.(bash|pl|pm|rb|py)$/ or $file =~ /^hook\.(bash|pl|rb|py)$/ ) {
+    if ($file =~ /^story\.(bash|pl|pm|rb|py|ps1)$/ or $file =~ /^hook\.(bash|pl|rb|py|ps1)$/ ) {
 
-        return if $file=~/^hook\./ and -e "$story_dir/story.pl";
-        return if $file=~/^hook\./ and -e "$story_dir/story.bash";
-        return if $file=~/^hook\./ and -e "$story_dir/story.rb";
-        return if $file=~/^hook\./ and -e "$story_dir/story.py";
+        my $story_exist = ( 
+          -e "$story_dir/story.pl"    or 
+          -e "$story_dir/story.rb"    or 
+          -e "$story_dir/story.py"    or 
+          -e "$story_dir/story.bash"  or 
+          -e "$story_dir/story.ps1"
+        );
 
-        return if $file eq 'story.pm' and -e "$story_dir/story.pl";
-        return if $file eq 'story.pm' and -e "$story_dir/story.bash";
-        return if $file eq 'story.pm' and -e "$story_dir/story.rb";
-        return if $file eq 'story.pm' and -e "$story_dir/story.py";
+        return if $file eq 'story.pm'  and $story_exist;
+        return if $file eq 'hook.pm'   and $story_exist;
+        return if $file eq 'hook.rb'   and $story_exist;
+        return if $file eq 'hook.py'   and $story_exist;
+        return if $file eq 'hook.bash' and $story_exist;
+        return if $file eq 'hook.ps1'  and $story_exist;
 
         return if $seen{$File::Find::name};
-
 
         my $story_local_dir;
 
@@ -203,6 +207,8 @@ sub wanted {
             print F "eval { do_python_hook('$story_dir/hook.py') };  our \$STATUS=0, die \"python hook error: \$@\" if \$@ ;\n\n";
         }elsif ( -e "$story_dir/hook.bash" ){
             print F "eval { do_bash_hook('$story_dir/hook.bash') }; our \$STATUS=0, die \"bash hook error: \$@\" if \$@ ;\n\n";
+        }elsif ( -e "$story_dir/hook.ps1" ){
+            print F "eval { do_ps_hook('$story_dir/hook.ps1') }; our \$STATUS=0, die \"powershell hook error: \$@\" if \$@ ;\n\n";
         }
 
         if (-e "$story_dir/story.check"){
@@ -243,6 +249,7 @@ if ($story_path){
 
 }elsif ($recurse_mod) {
     $st = 1;
+    use Data::Dumper;
     for my $s ( sort { $a->{story_dir} <=> $b->{story_dir} } @stories) {
           my $strun_cmd = "perl $cache_root_dir/$s->{story_dir}/story.outth";
           my $st_i = (system($strun_cmd)==0);

@@ -4,11 +4,13 @@ Changes
 LICENSE
 MANIFEST
 Makefile.PL
+README.md
 examples/anyevent.pl
 examples/introspect.pl
 examples/introspect_nb.pl
 examples/packagekit.pl
 examples/receive.pl
+examples/unix_fds.pl
 lib/Protocol/DBus.pm
 lib/Protocol/DBus/.Connection.pm.swp
 lib/Protocol/DBus/Authn.pm
@@ -22,11 +24,14 @@ lib/Protocol/DBus/Message.pm
 lib/Protocol/DBus/Message/Header.pm
 lib/Protocol/DBus/Pack.pm
 lib/Protocol/DBus/Parser.pm
+lib/Protocol/DBus/Parser/UnixFDs.pm
 lib/Protocol/DBus/Path.pm
 lib/Protocol/DBus/Peer.pm
 lib/Protocol/DBus/Signature.pm
+lib/Protocol/DBus/WriteMsg.pm
 t/Protocol-DBus-Marshal.t
 t/Protocol-DBus-Message.t
+t/Protocol-DBus-Parser-UnixFDs.t
 t/Protocol-DBus-Signature.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

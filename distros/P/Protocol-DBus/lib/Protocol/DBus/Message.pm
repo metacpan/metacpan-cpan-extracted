@@ -22,7 +22,7 @@ use Protocol::DBus::Message::Header ();
 use constant _PROTOCOL_VERSION => 1;
 
 sub parse {
-    my ($class, $buf_sr) = @_;
+    my ($class, $buf_sr, $filehandles_ar) = @_;
 
     if ( my ($hdr, $hdr_len, $is_be) = Protocol::DBus::Message::Header::parse_simple($buf_sr) ) {
 
@@ -37,6 +37,8 @@ sub parse {
             my $body_data;
 
             if ($body_sig) {
+                local $Protocol::DBus::Marshal::FILEHANDLES = $filehandles_ar;
+
                 ($body_data) = Protocol::DBus::Marshal->can( $is_be ? 'unmarshal_be' : 'unmarshal_le' )->($buf_sr, $hdr_len, $body_sig);
             }
 
@@ -120,7 +122,8 @@ sub new {
 
 =head2 I<OBJ>->get_header( $NAME )
 
-$NAME is, e.g., C<PATH>.
+$NAME is, e.g., C<PATH> or the value of the corresponding
+member of C<Protocol::DBus::Message::Header::FIELD()>.
 
 =cut
 
@@ -231,14 +234,19 @@ use constant _LEADING_BYTE => map { ord } ('l', 'B');
 sub _to_string {
     my ($self) = @_;
 
-    my $body_m_sr;
+    my ($body_m_sr, $fds_ar);
 
     if ($self->{'_body_sig'}) {
-        $body_m_sr = Protocol::DBus::Marshal->can( $_use_be ? 'marshal_be' : 'marshal_le' )->(
+        ($body_m_sr, $fds_ar) = Protocol::DBus::Marshal->can( $_use_be ? 'marshal_be' : 'marshal_le' )->(
             $self->{'_body_sig'},
             $self->{'_body'},
         );
     }
+
+    local $self->{'_hfields'}{ Protocol::DBus::Message::Header::FIELD()->{'UNIX_FDS'} } = [
+        Protocol::DBus::Message::Header::FIELD_SIGNATURE()->{'UNIX_FDS'},
+        0 + @$fds_ar,
+    ] if $fds_ar && @$fds_ar;
 
     my $data = [
         (_LEADING_BYTE())[ $_use_be ],
@@ -250,7 +258,7 @@ sub _to_string {
         $self->{'_hfields'},
     ];
 
-    my $buf_sr = Protocol::DBus::Marshal->can( $_use_be ? 'marshal_be' : 'marshal_le' )->(
+    my ($buf_sr) = Protocol::DBus::Marshal->can( $_use_be ? 'marshal_be' : 'marshal_le' )->(
         Protocol::DBus::Message::Header::SIGNATURE(),
         $data,
     );
@@ -259,7 +267,7 @@ sub _to_string {
 
     $$buf_sr .= $$body_m_sr if $body_m_sr;
 
-    return $buf_sr;
+    return( $buf_sr, $fds_ar );
 }
 
 #----------------------------------------------------------------------
@@ -270,14 +278,21 @@ sub _to_string {
 
 =item * Numeric and string types are represented as plain Perl scalars.
 
-=item * Containers are represented as blessed references:
+=item * UNIX_FDs are normally represented as Perl filehandle objects.
+If Protocol::DBus receives a UNIX_FD that doesn’t correspond to a received
+file descriptor, the UNIX_FD will be represented as the number passed in
+the raw D-Bus message, and a warning is thrown.
+
+=item * By default, variant signatures are discarded, and the values are
+given by themselves. See L<Protocol::DBus::Peer>’s
+C<preserve_variant_signatures()> if you need an alternative mapping
+method that preserves the signatures.
+
+=item * Other containers are represented as blessed references:
 C<Protocol::DBus::Type::Dict>, C<Protocol::DBus::Type::Array>, and
 C<Protocol::DBus::Type::Struct>. Currently these are just plain hash and
-array references that are bless()ed; i.e., the classes don’t have any
-methods defined.
-
-=item * Variant signatures are B<not> preserved; the values are represented
-according to the above logic.
+array references that are bless()ed; i.e., the classes themselves have no
+methods defined (and aren’t even defined Perl namespaces).
 
 =back
 
@@ -287,11 +302,13 @@ according to the above logic.
 
 =item * Use plain Perl scalars to represent all numeric and string types.
 
+=item * Use plain Perl filehandle objects to represent UNIX_FDs.
+
 =item * Use array references to represent D-Bus arrays and structs.
 Use hash references for dicts.
 
 =item * Use a two-member array reference—signature then value—to represent
-a D-Bus variant.
+a D-Bus variant. (Note the inconsistency with the reverse mapping.)
 
 =back
 

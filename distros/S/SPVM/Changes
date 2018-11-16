@@ -1,3 +1,31 @@
+0.0390 2018-11-16
+  - package variable must start upper case or contain ::
+  - add SPVM::List module
+  - add private private package variable
+  - fix constant pool cache bug
+  - support no parenthes sub
+      INT8_MAX
+      sin 0.5
+  - string relative operator can receive byte array
+    if ($bytes1 eq $bytes2) {
+      
+    }
+  - concat operator can receive byte array
+    $bytes1 . $bytes2
+  - string type become real string type, instead of alias of const byte[]
+  - rename SPVM::new_byte_array_string to SPVM::new_byte_array_from_binary.
+    and recieve binary data instead of Perl internal string
+  - rename new_value_t_array to new_value_array
+  - add SPVM::new_value_array_from_binary
+  - remove SPVM::set_array_elements
+  - remove SPVM::set_array_elements_bin
+  - add new_multi_array
+  - rename SPVM::get_elements to SPVM::to_elements
+  - rename SPVM::get_elements_bin to SPVM::to_binary
+  - add to_elements to SPVM::Data::Array
+  - add to_binary to SPVM::Data::Array
+  - remove SPVM::to_elements
+  - remove SPVM::to_binary
 0.0389 2018-11-13
   - fix nested loop last bugs
   - fix nested loop next bugs

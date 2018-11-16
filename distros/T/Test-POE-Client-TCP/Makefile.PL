@@ -26,7 +26,8 @@ my %WriteMakefileArgs = (
     "POE::Filter" => 0,
     "POE::Filter::Line" => 0,
     "POE::Wheel::ReadWrite" => 0,
-    "POE::Wheel::SocketFactory" => 0
+    "POE::Wheel::SocketFactory" => 0,
+    "Socket" => "2.013"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.47"
   },
-  "VERSION" => "1.24",
+  "VERSION" => "1.26",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "POE::Filter::Line" => 0,
   "POE::Wheel::ReadWrite" => 0,
   "POE::Wheel::SocketFactory" => 0,
+  "Socket" => "2.013",
   "Test::More" => "0.47",
   "Text::ParseWords" => 0
 );

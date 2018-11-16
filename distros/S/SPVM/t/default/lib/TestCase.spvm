@@ -32,7 +32,7 @@ package TestCase {
   has x_float : float;
   has x_double : double;
   has x_int_array : int[];
-  has x_string : byte[];
+  has x_byte_array : byte[];
   has x_test_case : TestCase;
   has minimal : TestCase::Minimal;
   has private_field : private int;
@@ -56,8 +56,8 @@ package TestCase {
     $self->{x_int_array} = $x_int_array;
   }
 
-  sub set_x_string : void ($self : self, $x_string : byte[]) {
-    $self->{x_string} = $x_string;
+  sub set_x_byte_array : void ($self : self, $x_string : byte[]) {
+    $self->{x_byte_array} = $x_string;
   }
 
   sub set_x_byte : void ($self : self, $x_byte : byte) {
@@ -324,33 +324,6 @@ package TestCase {
     return 1;
   }
 
-  enum {
-    INT_ZERO,
-    INT_ONE,
-    INT_THREE = 3,
-    INT_FOUR,
-    INT_SIX = 6,
-    INT_MINUS_MAX = -2147483648
-  }
-  sub enum_int  : int () {
-    
-    if (TestCase->INT_ZERO == 0) {
-      if (TestCase->INT_ONE == 1) {
-        if (TestCase->INT_THREE == 3) {
-          if (TestCase->INT_FOUR == 4) {
-            if (TestCase->INT_SIX == 6) {
-              if (TestCase->INT_MINUS_MAX == -2147483648) {
-                return 1;
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    return 0;
-  }
-  
   # Sum
   sub sum_byte : byte ($a : byte, $b :byte) {
     

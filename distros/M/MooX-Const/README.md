@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.2.0
+version v0.2.1
 
 # SYNOPSIS
 
@@ -58,6 +58,11 @@ has setting => (
 
 This allows you to set the attribute _once_. The value is coerced
 into a constant, and cannot be changed again.
+
+# ROADMAP
+
+Support for Perl versions earlier than 5.10 will be removed sometime
+in 2019.
 
 # SEE ALSO
 

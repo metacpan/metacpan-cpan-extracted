@@ -4,7 +4,7 @@ use warnings;
 use Carp;
 use List::Util;
 use Data::Dumper qw(Dumper);
-use Data::PatternCompare;
+use Data::Dumper qw(Dumper);
 use Exporter qw(import);
 our @EXPORT_OK = qw(
     incr        reduces  flatten
@@ -16,19 +16,14 @@ our @EXPORT_OK = qw(
     len         to_keys  to_vals     is_array
     is_hash     every    noop        identity
     is_empty    is_sub   flow        eql
+    to_pairs    for_each apply       get
 );
 
-our $VERSION = '0.12';
+our $VERSION = '0.19';
 
 use constant ARG_PLACE_HOLDER => {};
 
 # -----------------------------------------------------------------------------#
-
-my $cmp = Data::PatternCompare->new;
-
-sub _is_subset {
-    return $cmp->pattern_match($_[0], $_[1]);
-}
 
 sub __ { ARG_PLACE_HOLDER };
 
@@ -38,6 +33,31 @@ sub identity {
     my $args = shift // undef;
 
     return $args;
+}
+
+sub get {
+    my $coll    = shift // [];
+    my $key     = shift // 0;
+    my $default = shift;
+
+    if (is_array($coll)) {
+        return defined $coll->[$key] ? $coll->[$key] : $default;
+    }
+
+    if (is_hash($coll)) {
+        return defined $coll->{$key} ? $coll->{$key} : $default;
+    }
+
+    my $string_coll = [spread($coll)];
+
+    return defined $string_coll->[$key] ? $string_coll->[$key] : $default;
+}
+
+sub apply {
+    my $fn   = shift // sub {};
+    my $args = shift // [];
+
+    return $fn->(@{$args});
 }
 
 sub flow {
@@ -74,6 +94,29 @@ sub is_hash {
     my $coll = shift;
 
     return bool(ref $coll eq 'HASH');
+}
+
+sub to_pairs {
+    my $coll = shift // [];
+
+    if (is_array($coll)) {
+        return maps(sub {
+            my ($val, $idx) = @_;
+            return [$idx, $val]
+        }, $coll)
+    }
+
+    if (is_hash($coll)) {
+        return maps(sub {
+            my $key = shift;
+            return [$key, $coll->{$key}]
+        }, to_keys($coll))
+    }
+
+    return maps(sub {
+        my ($char, $idx) = @_;
+        return [$idx, $char];
+    }, to_vals($coll));
 }
 
 sub to_vals {
@@ -125,6 +168,16 @@ sub len {
     return length($coll);
 }
 
+sub for_each {
+    my ($fn, $coll) = @_;
+    my $idx = 0;
+
+    foreach my $val (@{ $coll }) {
+        $idx++;
+        $fn->($val, $idx - 1, $coll);
+    }
+}
+
 sub is_empty {
     my $coll = shift;
     return bool(len($coll) == 0);
@@ -145,13 +198,6 @@ sub find {
     my $pred = shift;
     my $coll = shift // [];
 
-    if (!is_sub($pred)) {
-        return find(sub {
-            my $subset = shift;
-            return bool(_is_subset($subset, $pred))
-        }, $coll);
-    }
-
     return List::Util::first {
         $pred->($_)
     } @$coll;
@@ -161,13 +207,6 @@ sub filter {
     my $pred  = shift;
     my $coll = shift // [];
 
-    if (!is_sub($pred)) {
-        return filter(sub {
-            my $subset = shift;
-            return bool(_is_subset($subset, $pred))
-        }, $coll);
-    }
-
     return [grep { $pred->($_) } @$coll];
 }
 
@@ -175,26 +214,12 @@ sub some {
     my $pred = shift;
     my $coll = shift // [];
 
-    if (!is_sub($pred)) {
-        return some(sub {
-            my $subset = shift;
-            return bool(_is_subset($subset, $pred))
-        }, $coll);
-    }
-
     return bool(find($pred, $coll));
 }
 
 sub every {
     my $pred = shift;
     my $coll = shift // [];
-
-    if (!is_sub($pred)) {
-        return every(sub {
-            my $subset = shift;
-            return bool(_is_subset($subset, $pred));
-        }, $coll);
-    }
 
     my $bool = List::Util::all {
         $pred->($_);
@@ -207,18 +232,7 @@ sub none {
     my $pred = shift;
     my $coll = shift // [];
 
-    if (!is_sub($pred)) {
-        return none(sub {
-            my $subset = shift;
-            return bool(_is_subset($subset, $pred));
-        }, $coll);
-    }
-
-    my $bool = List::Util::none {
-        $pred->($_)
-    } @$coll;
-
-    return bool($bool);
+    return some($pred, $coll) ? 0 : 1;
 }
 
 sub incr {
@@ -482,15 +496,16 @@ concise code.
 
 =head1 EXPORT
 
-    incr        reduces  flatten
-    drop_right  drop     take_right  take
-    assoc       maps     decr        chain
-    first       end      subarray    partial
-    __          find     filter      some
-    none        uniq     bool        spread
-    len         to_keys  to_vals     is_array
-    is_hash     every    noop        identity
-    flow        eql
+    incr        reduces    flatten
+    drop_right  drop       take_right  take
+    assoc       maps       decr        chain
+    first       end        subarray    partial
+    __          find       filter      some
+    none        uniq       bool        spread
+    len         to_keys    to_vals     is_array
+    is_hash     every      noop        identity
+    is_empty    is_sub     flow        eql
+    to_pairs    for_each   apply       get
 
 =cut
 
@@ -511,6 +526,53 @@ Decrements the supplied number by 1
     decr(2)
 
     # => 1
+
+=cut
+
+=head2 apply
+Calls the supplied function with the array of arguments, spreading the
+arguments into the function it invokes
+
+    my $sum_all_nums = sub {
+        my $num        = shift;
+        my $second_num = shift;
+
+        return $num + $second_num;
+    };
+
+    apply($sum_all_nums, [100, 200]);
+    # same as $sum_all_nums->(100, 200)
+
+    # => 300
+
+=cut
+
+=head2 for_each
+
+Iterates over elements of collection and invokes iteratee for each element. The iteratee is invoked with three arguments: (value, index|key, collection).
+
+
+    for_each(sub {
+       my $num = shift;
+       print $num;
+    }, [1,2,3]);
+
+
+    for_each(sub {
+       my ($num, $idx, $coll) = @_;
+       print $idx;
+    }, [1,2,3])
+
+    # 0 1 2
+
+    for_each(sub {
+       my ($num, $idx, $coll) = @_;
+       print Dumper $coll;
+    }, [1,2,3])
+
+    #   [1,2,3],
+    #   [1,2,3],
+    #   [1,2,3]
 
 =cut
 
@@ -851,6 +913,47 @@ Returns 1 if the argument is 'empty',
 
 =cut
 
+=head2 get
+
+Returns value from hash, string, array based on key/idx provided.
+Returns default value if provided key/idx does not exist on collection.
+Only works one level deep;
+
+    my $hash = {
+        key1 => 'value1',
+    };
+
+    get($hash, 'key1');
+
+    # 'value1'
+
+
+    my $array = [100, 200, 300]
+
+    get($array, 1);
+
+    # 200
+
+
+    my $string = "Hello";
+
+    get($string, 1);
+
+    # e
+
+
+    # Also has the ability to supply default-value when key/idx does not exist
+
+    my $hash = {
+        key1 => 'value1',
+    };
+
+    get($hash, 'key2', "DEFAULT HERE");
+
+    # 'DEFAULT HERE'
+
+=cut
+
 =head2 spread
 
 Destructures an array / hash into non-ref context.
@@ -930,6 +1033,44 @@ Creates an array of the values in a hash, of an array, or string.
 
 =cut
 
+=head2 to_pairs
+
+Creates an array of key-value, or idx-value pairs from arrays, hashes, and strings.
+If used on a hash, key-pair order can not be guaranteed;
+
+    to_pairs("I am a string");
+
+    # [
+    #  [0, "I"],
+    #  [1, "am"],
+    #  [2, "a"],
+    #  [3, "string"]
+    # ]
+
+    to_pairs([100, 101, 102]);
+
+    # [
+    #  [0, 100],
+    #  [1, 102],
+    #  [2, 103],
+    # ]
+
+    to_pairs({ key1 => 'value1', key2 => 'value2' });
+
+    # [
+    #   [key1, 'value1'],
+    #   [key2, 'value2']
+    # ]
+
+    to_pairs({ key1 => 'value1', key2 => { nested => 'nestedValue' }});
+
+    # [
+    #   [key1, 'value1'],
+    #   [key2, { nested => 'nestedValue' }]
+    # ]
+
+=cut
+
 =head2 uniq
 
 Creates a duplicate-free version of an array,
@@ -994,36 +1135,6 @@ Iterates over elements of collection, returning the first element predicate retu
 
     # { name => 'sally', age => 25 }
 
-    # find also supports 'iteratee object shorthand'
-
-    my $people = [
-        {
-            name          => 'john',
-            age           => 25,
-            favorite_food => 'broccoli',
-        },
-        {
-            name          => 'Sally',
-            age           => 25,
-            favorite_food => 'oranges',
-        },
-        {
-            name          => 'Old Greg',
-            age           => 100,
-            favorite_food => 'you do not want to know,
-        }
-    ]
-
-    find({ favorite_food => 'broccoli' }, $people);
-
-    # [
-    #     {
-    #         name          => 'Sally',
-    #         age           => 25,
-    #         favorite_food => 'broccoli',
-    #     },
-    # ]
-
 =cut
 
 =head2 filter
@@ -1059,17 +1170,6 @@ Iterates over elements of collection, returning only elements the predicate retu
     #        name => 'Sally',
     #        age => 25,
     #    }
-    # ]
-
-    # Filter also supports 'iteratee object shorthand'
-
-    filter({ name => 'John' }, $people);
-
-    # [
-    #    {
-    #        name => 'john',
-    #        age  => 25,
-    #    },
     # ]
 
 =cut
@@ -1108,12 +1208,6 @@ If one element is found to return truthy for the given predicate, none returns 0
 
     # 1
 
-    # none also supports 'iteratee object shorthand'
-
-    none({ name => 'Black Bart' }, $people);
-
-    # 1
-
 =cut
 
 =head2 every
@@ -1135,30 +1229,6 @@ return truthy. If all elements cause predicate to return truthy, every returns 1
 
     # 0
 
-    # every also supports 'iteratee object shorthand'
-
-    my $people = [
-        {
-            name => 'john',
-            age => 25,
-            favorite_food => 'broccoli',
-        },
-        {
-            name => 'Sally',
-            age => 25,
-            favorite_food => 'broccoli',
-        },
-        {
-            name => 'Old Greg',
-            age => 100,
-            favorite_food => 'you do not want to know,
-        }
-    ]
-
-    every({ favorite_food => 'broccoli' }, $people)
-
-    # 0
-
 =cut
 
 =head2 some
@@ -1177,30 +1247,6 @@ Iteration is stopped once predicate returns truthy.
         my $num = shift;
         $num > 2;
     }, [1,2,3,4]);
-
-    # 1
-
-    # some also supports 'iteratee object shorthand'
-
-    my $people = [
-        {
-            name => 'john',
-            age => 25,
-            favorite_food => 'broccoli',
-        },
-        {
-            name => 'Sally',
-            age => 25,
-            favorite_food => 'broccoli',
-        },
-        {
-            name => 'Old Greg',
-            age => 100,
-            favorite_food => 'you do not want to know,
-        }
-    ]
-
-    some({ favorite_food => 'broccoli' }, $people)
 
     # 1
 

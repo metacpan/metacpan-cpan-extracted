@@ -1,33 +1,14 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of IPC::PrettyPipe
-#
-# IPC::PrettyPipe is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package IPC::PrettyPipe;
 
-## no critic (RequireUseStrict)
+# ABSTRACT: manage human readable external command execution pipelines
 
-our $VERSION = '0.03';
+use strict;
+use warnings;
 
+our $VERSION = '0.08';
 use Carp;
 
-use List::Util qw[ sum first ];
+use List::Util qw[ sum ];
 use Module::Load qw[ load ];
 use Module::Runtime qw[ check_module_name compose_module_name use_package_optimistically ];
 use Safe::Isa;
@@ -36,18 +17,41 @@ use Try::Tiny;
 use Types::Standard -all;
 use Type::Params qw[ validate ];
 
-use Moo;
-use Moo::Role ();
-
 use IPC::PrettyPipe::Types -all;
 
 use IPC::PrettyPipe::Cmd;
 use IPC::PrettyPipe::Queue;
 use IPC::PrettyPipe::Arg::Format;
 
+use Moo;
+use Moo::Role ();
 
+use namespace::clean;
 
-IPC::PrettyPipe::Arg::Format->shadow_attrs( fmt => sub { 'arg' . shift } );
+BEGIN {
+    IPC::PrettyPipe::Arg::Format->shadow_attrs( fmt => sub { 'arg' . shift } );
+}
+
+#pod =for stopwords
+#pod argfmt
+#pod argpfx
+#pod argsep
+#pod cmds
+#pod ffadd
+#pod renderer
+#pod valmatch
+#pod valsubst
+#pod
+#pod =cut
+
+#pod =attr argfmt
+#pod
+#pod I<Optional>. An L<IPC::PrettyPipe::Arg::Format> object specifying
+#pod the default prefix and separation attributes for arguments to
+#pod commands.  May be overridden by L</argpfx> and L</argsep>.
+#pod
+#pod =cut
+
 
 has argfmt => (
   is => 'ro',
@@ -55,6 +59,28 @@ has argfmt => (
   handles => IPC::PrettyPipe::Arg::Format->shadowed_attrs,
   default => sub { IPC::PrettyPipe::Arg::Format->new_from_attrs( shift ) },
 );
+
+#pod =attr argpfx
+#pod
+#pod =attr argsep
+#pod
+#pod I<Optional>.  The default prefix and separation attributes for
+#pod arguments to commands.  See L<IPC::PrettyPipe::Arg> for more
+#pod details.  These override any specified via the L</argfmt> object.
+#pod
+#pod =cut
+
+
+#pod =attr streams
+#pod
+#pod   $streams = $pipe->streams;
+#pod
+#pod A L<IPC::PrettyPipe::Queue> object containing the
+#pod L<IPC::PrettyPipe::Stream> objects associated with the pipe. Created
+#pod automatically.
+#pod
+#pod =cut
+
 
 has streams => (
     is       => 'ro',
@@ -72,6 +98,14 @@ has _init_cmds => (
     predicate => 1,
     clearer   => 1,
 );
+
+#pod =attr cmds
+#pod
+#pod I<Optional>. The value should be an arrayref of commands to load into
+#pod the pipe.  The contents of the array are passed to the L</ffadd>
+#pod method for processing.
+#pod
+#pod =cut
 
 # must delay building cmds until all attributes have been specified
 has cmds => (
@@ -98,12 +132,23 @@ has _executor => (
 
         my $backend = $_[0]->_executor_arg;
 
-	## no critic (ProhibitAccessOfPrivateData)
+        ## no critic (ProhibitAccessOfPrivateData)
         return $backend->$_does( 'IPC::PrettyPipe::Executor' )
           ? $backend
           : $_[0]->_backend_factory( Execute => $backend );
     },
 );
+
+
+#pod =attr executor
+#pod
+#pod I<Optional>. The means by which the pipeline will be executed.  It may
+#pod be either a class name or an object reference, and must consume the
+#pod L<IPC::PrettyPipe::Executor> role.  It defaults to
+#pod L<IPC::PrettyPipe::Execute::IPC::Run>.
+#pod
+#pod =cut
+
 
 sub executor {
     my $self = shift;
@@ -129,15 +174,24 @@ has _renderer  => (
     clearer => 1,
     default => sub {
 
-	my $backend = $_[0]->_renderer_arg;
+        my $backend = $_[0]->_renderer_arg;
 
-	## no critic (ProhibitAccessOfPrivateData)
-	return $backend->$_does( 'IPC::PrettyPipe::Renderer' )
-	  ? $backend
-	  : $_[0]->_backend_factory( Render => $backend )
-	  ;
+        ## no critic (ProhibitAccessOfPrivateData)
+        return $backend->$_does( 'IPC::PrettyPipe::Renderer' )
+          ? $backend
+          : $_[0]->_backend_factory( Render => $backend )
+          ;
       },
 );
+
+#pod =attr renderer
+#pod
+#pod I<Optional>. The means by which the pipeline will be rendered.  It may
+#pod be either a class name or an object reference, and must consume the
+#pod L<IPC::PretyyPipe::Renderer> role.  It defaults to
+#pod L<IPC::PrettyPipe::Render::Template::Tiny>.
+#pod
+#pod =cut
 
 sub renderer {
     my $self = shift;
@@ -149,6 +203,9 @@ sub renderer {
 }
 
 
+#pod =for Pod::Coverage BUILDARGS BUILD
+#pod
+#pod =cut
 
 # accept:
 #  new( \%hash )
@@ -156,7 +213,7 @@ sub renderer {
 #  new( @stuff )
 sub BUILDARGS {
 
-    my $class = shift;
+    shift;
 
     return
         @_ == 1
@@ -184,6 +241,23 @@ sub BUILD {
 
 
 
+#pod =method add
+#pod
+#pod   $cmd_obj = $pipe->add( $cmd );
+#pod   $cmd_obj = $pipe->add( cmd => $cmd, %options );
+#pod
+#pod Create an L<IPC::PrettyPipe::Cmd> object, add it to the
+#pod B<IPC::PrettyPipe> object, and return a handle to it.  If passed
+#pod a single parameter, it is assumed to be a C<cmd> parameter.
+#pod
+#pod This is a thin wrapper around the L<IPC::PrettyPipe::Cmd> constructor,
+#pod taking the same parameters.  The only difference is that if the value
+#pod of the C<cmd> parameter is an L<IPC::PrettyPipe::Cmd> object it
+#pod is inserted into the pipeline.
+#pod
+#pod =cut
+
+
 sub add {
 
     my $self = shift;
@@ -200,7 +274,7 @@ sub add {
         \@_,
         slurpy Dict [
             cmd    => Str | Cmd,
-	    args   => Optional,
+            args   => Optional,
             argfmt => Optional [ InstanceOf ['IPC::PrettyPipe::Arg::Format'] ],
             ( map { $_ => Optional [Str] } keys %{$argfmt_attrs} ),
         ] );
@@ -223,15 +297,56 @@ sub add {
     else {
 
         $cmd = IPC::PrettyPipe::Cmd->new( cmd => $attr->{cmd},
-					  argfmt => $argfmt->clone,
-					  exists $attr->{args} ? ( args => $attr->{args} ) : (),
-					);
+                                          argfmt => $argfmt->clone,
+                                          exists $attr->{args} ? ( args => $attr->{args} ) : (),
+                                        );
     }
 
     $self->cmds->push( $cmd );
 
     return $cmd;
 }
+
+#pod =method ffadd
+#pod
+#pod   $pipe->ffadd( @cmds );
+#pod
+#pod A more relaxed means of adding commands. C<@cmds> may contain any
+#pod of the following items:
+#pod
+#pod =over
+#pod
+#pod =item *
+#pod
+#pod an L<IPC::PrettyPipe::Cmd> object
+#pod
+#pod =item *
+#pod
+#pod A command name (i.e. a string), for a command without arguments.
+#pod
+#pod =item *
+#pod
+#pod A string which matches a stream specification
+#pod (L<IPC::PrettyPipe::Stream::Utils/Stream Specification>), which will cause
+#pod a new I/O stream to be attached to the pipeline.  If the specification
+#pod requires an additional parameter, the next value in C<@cmds> will be
+#pod used for that parameter.
+#pod
+#pod =item *
+#pod
+#pod An arrayref. The first element is the command name; the rest are its
+#pod arguments; these are passed to
+#pod L<IPC::PrettyPipe::Cmd::new|IPC::PrettyPipe::Cmd/new> as the C<cmd>
+#pod and C<args> parameters.
+#pod
+#pod =item *
+#pod
+#pod An L<IPC::PrettyPipe::Arg::Format> object, specifying the argument
+#pod prefix and separator attributes for successive commands.
+#pod
+#pod =back
+#pod
+#pod =cut
 
 sub ffadd {
 
@@ -258,8 +373,8 @@ sub ffadd {
 
         elsif ( 'ARRAY' eq ref $t ) {
 
-	    my $cmd = IPC::PrettyPipe::Cmd->new( cmd => shift( @$t ), argfmt => $argfmt->clone );
-	    $cmd->ffadd( @$t);
+            my $cmd = IPC::PrettyPipe::Cmd->new( cmd => shift( @$t ), argfmt => $argfmt->clone );
+            $cmd->ffadd( @$t);
 
             $self->add( $cmd );
         }
@@ -271,9 +386,6 @@ sub ffadd {
         }
 
         elsif ( !ref $t ) {
-
-
-            my $stream;
 
             try {
 
@@ -296,10 +408,10 @@ sub ffadd {
 
                 die $_ unless /requires a file|cannot parse/;
 
-		# FIXME: this is the "fall through" which takes care
-		# of calling with a simple string argument, which is
-		# taken to be a command to run.  It probably shouldn't
-		# be buried at this level of the code.
+                # This is the "fall through" which takes care
+                # of calling with a simple string argument, which is
+                # taken to be a command to run.  It probably shouldn't
+                # be buried at this level of the code.
 
                 $self->add( cmd => $t, argfmt => $argfmt );
             };
@@ -315,6 +427,17 @@ sub ffadd {
     }
 
 }
+
+#pod =method stream
+#pod
+#pod   $pipe->stream( $stream_spec );
+#pod   $pipe->stream( $stream_spec, $file );
+#pod
+#pod Add an I/O stream to the pipeline.  See
+#pod L<IPC::PrettyPipe::Stream::Utils/Stream Specification> for more
+#pod information.
+#pod
+#pod =cut
 
 sub stream {
 
@@ -335,7 +458,7 @@ sub stream {
 
         $self->streams->push(
           IPC::PrettyPipe::Stream->new( spec => $spec, +@_ ? ( file => @_ ) : () )
-			     );
+                             );
     }
 
     else {
@@ -348,6 +471,17 @@ sub stream {
     return;
 }
 
+#pod =method valmatch
+#pod
+#pod   $n = $pipe->valmatch( $pattern );
+#pod
+#pod Returns the number of I<commands> with a value matching the passed
+#pod regular expression.  (This is B<not> equal to the number of total
+#pod I<values> which matched.  To determine this, iterate over each
+#pod command, calling it's L<valmatch|IPC::PrettyPipe::Cmd/valmatch> method ).
+#pod
+#pod =cut
+
 sub valmatch {
 
     my $self    = shift;
@@ -355,6 +489,74 @@ sub valmatch {
 
     return sum 0, map { $_->valmatch( $pattern ) && 1 || 0 } @{ $self->cmds->elements };
 }
+
+#pod =method valsubst
+#pod
+#pod    $pipe->valsubst( $pattern, $value, %attr );
+#pod
+#pod Replace arguments to options whose arguments match the Perl regular
+#pod expression I<$pattern> with I<$value>.  The following attributes
+#pod are available:
+#pod
+#pod =over
+#pod
+#pod =item C<firstvalue>
+#pod
+#pod The first matched argument will be replaced with this value
+#pod
+#pod =item C<lastvalue>
+#pod
+#pod The last matched argument will be replaced with this value.
+#pod
+#pod =back
+#pod
+#pod Note that matching is done on a per-command basis, not per-argument
+#pod basis, so that if a command has multiple matching values, they will
+#pod all use the same replacement string.  To perform more specific
+#pod changes, use each command's
+#pod L<valsubst|IPC::PrettyPipe::Cmd/valsubst> method directly.
+#pod
+#pod Here's an example where the commands use parameters C<input> and
+#pod C<output> to indicate where they should write.  The strings "stdout"
+#pod and "stdin" are special and indicate the standard streams. Using
+#pod B<valsubst> allows an easy update of the pipeline after construction
+#pod to specify the correct streams.
+#pod
+#pod   $p = new IPC::PrettyPipe;
+#pod
+#pod   $p->add( cmd => 'cmd1',
+#pod            args => [ [ input  => 'INPUT',
+#pod                        output => 'OUTPUT' ] ] );
+#pod
+#pod   $p->add( cmd => 'cmd2',
+#pod            args => [ [ input  => 'INPUT',
+#pod                        output => 'OUTPUT' ] ] );
+#pod
+#pod   $p->add( cmd => 'cmd3',
+#pod            args => [ [ input  => 'INPUT',
+#pod                        output => 'OUTPUT' ] ] );
+#pod
+#pod   $p->valsubst( qr/OUTPUT/, 'stdout',
+#pod                 lastvalue => 'output_file' );
+#pod
+#pod   $p->valsubst( qr/INPUT/, 'stdin',
+#pod                 firstvalue => 'input_file' );
+#pod
+#pod   print $p->render, "\n"
+#pod
+#pod results in
+#pod
+#pod         cmd1 \
+#pod           input input_file \
+#pod           output stdout \
+#pod   |     cmd2 \
+#pod           input stdin \
+#pod           output stdout \
+#pod   |     cmd3 \
+#pod           input stdin \
+#pod           output output_file
+#pod
+#pod =cut
 
 
 sub valsubst {
@@ -365,26 +567,26 @@ sub valsubst {
 
     my ( $pattern, $value, $args ) =
       validate( \@args,
-		RegexpRef,
-		Str,
-		Optional[ Dict[
-			    lastvalue  => Optional[ Str ],
-			    firstvalue => Optional[ Str ]
-			   ] ],
-	      );
+                RegexpRef,
+                Str,
+                Optional[ Dict[
+                            lastvalue  => Optional[ Str ],
+                            firstvalue => Optional[ Str ]
+                           ] ],
+              );
 
     my $nmatch = $self->valmatch( $pattern );
 
     if ( $nmatch == 1 ) {
 
-	## no critic (ProhibitAccessOfPrivateData)
+        ## no critic (ProhibitAccessOfPrivateData)
         $args->{lastvalue} //= $args->{firstvalue} // $value;
         $args->{firstvalue} //= $args->{lastvalue};
 
     }
     else {
 
-	## no critic (ProhibitAccessOfPrivateData)
+        ## no critic (ProhibitAccessOfPrivateData)
         $args->{lastvalue}  ||= $value;
         $args->{firstvalue} ||= $value;
     }
@@ -392,7 +594,7 @@ sub valsubst {
     my $match = 0;
     foreach ( @{ $self->cmds->elements } ) {
 
-	## no critic (ProhibitAccessOfPrivateData)
+        ## no critic (ProhibitAccessOfPrivateData)
 
         $match++
           if $_->valsubst( $pattern,
@@ -411,16 +613,22 @@ sub _backend_factory {
     check_module_name( $req );
 
     my $role = compose_module_name( __PACKAGE__,
-				    { Render => 'Renderer',
-				      Execute => 'Executor'}->{$type} );
+                                    { Render => 'Renderer',
+                                      Execute => 'Executor'}->{$type} );
 
-    my $module = first { use_package_optimistically($_)->DOES( $role ) } $req,
-	  compose_module_name( "IPC::PrettyPipe::$type", $req );
+    my $module;
+
+    for my $try (  $req,
+                   compose_module_name( "IPC::PrettyPipe::$type", $req ) ) {
+
+        next unless use_package_optimistically($try)->DOES( $role );
+
+        $module = $try;
+        last;
+    }
 
     croak( "requested $type module ($req) either doesn't exist or doesn't consume $role\n" )
       if ! defined $module;
-
-    load $module;
 
     return $module->new( pipe => $self, @_ );
 }
@@ -434,11 +642,11 @@ sub _storefh {
 
     for my $stream ( @{ $self->streams->elements } ) {
 
-	my ( $sub, @fh ) = $stream->apply;
+        my ( $sub, @fh ) = $stream->apply;
 
-	$sfh->store( $_ ) foreach @fh;
+        $sfh->store( $_ ) foreach @fh;
 
-	$sub->();
+        $sub->();
     }
 
     return $sfh;
@@ -446,12 +654,30 @@ sub _storefh {
 
 1;
 
+#
+# This file is part of IPC-PrettyPipe
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 __END__
 
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory argfmt argpfx argsep cmds
+ffadd renderer valmatch valsubst
+
 =head1 NAME
 
-B<IPC::PrettyPipe> - manage human readable external command execution pipelines
+IPC::PrettyPipe - manage human readable external command execution pipelines
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -480,46 +706,89 @@ the overall structure of the pipeline.
 B<IPC::PrettyPipe> provides a mechanism to construct and output
 readable external command execution pipelines.  It does this by
 treating commands, their options, and the options' values as separate
-entitites so that it can produce nicely formatted output.
+entities so that it can produce nicely formatted output.
 
 It is designed to be used in conjunction with other modules which
-actually execute pipelines, such as B<L<IPC::Run>>
+actually execute pipelines, such as L<IPC::Run>
 
-This module (and its siblings B<L<IPC::PrettyPipe::Cmd>>,
-B<L<IPC::PrettyPipe::Arg>>, and B<L<IPC::PrettyPipe::Stream>>) present
+This module (and its siblings L<IPC::PrettyPipe::Cmd>,
+L<IPC::PrettyPipe::Arg>, and L<IPC::PrettyPipe::Stream>) present
 the object-oriented interface for manipulating the underlying
 infrastructure.
 
 For a simpler, more intuitive means of constructing pipelines, see
-B<L<IPC::PrettyPipe::DSL>>.
+L<IPC::PrettyPipe::DSL>.
 
 =head2 Pipeline Rendering (Pretty Printing)
 
-B<L<IPC::PrettyPipe>> doesn't render a pipeline directly; instead it
+L<IPC::PrettyPipe> doesn't render a pipeline directly; instead it
 passes that job on to another object (which must consume the
-B<L<IPC::PrettyPipe::Renderer>> role).
+L<IPC::PrettyPipe::Renderer> role).
 
 By default B<IPC::PrettyPipe> provides a renderer which uses
-B<L<Template::Tiny>> to render a pipeline as if it were to be fed to a
+L<Template::Tiny> to render a pipeline as if it were to be fed to a
 POSIX shell (which can be handy for debugging complex pipelines).
 
 The same renderer may be fed a different template to use, or it may be
-replaced via the B<L</renderer>> attribute.
+replaced via the L</renderer> attribute.
 
 =head2 Pipeline Execution
 
 Just as with rendering, B<IPC::PrettyPipe> doesn't execute a pipeline
 on its own.  Instead it calls upon another object (which must consume
-the B<L<IPC::PrettyPipe::Executor>> role).  By default it provides an
-executor which uses B<L<IPC::Run>> to run the pipeline.  The executor
-may be replaced via the B<L</executor>> attribute.
+the L<IPC::PrettyPipe::Executor> role).  By default it provides an
+executor which uses L<IPC::Run> to run the pipeline.  The executor
+may be replaced via the L</executor> attribute.
 
 =head2 Rewriting Commands' argument values
 
 Sometimes it's not possible to fill in an argument's value until after
-a pipeline has been created.  The B<L</valsubst>> method allows
+a pipeline has been created.  The L</valsubst> method allows
 altering them after the fact.
 
+=head1 ATTRIBUTES
+
+=head2 argfmt
+
+I<Optional>. An L<IPC::PrettyPipe::Arg::Format> object specifying
+the default prefix and separation attributes for arguments to
+commands.  May be overridden by L</argpfx> and L</argsep>.
+
+=head2 argpfx
+
+=head2 argsep
+
+I<Optional>.  The default prefix and separation attributes for
+arguments to commands.  See L<IPC::PrettyPipe::Arg> for more
+details.  These override any specified via the L</argfmt> object.
+
+=head2 streams
+
+  $streams = $pipe->streams;
+
+A L<IPC::PrettyPipe::Queue> object containing the
+L<IPC::PrettyPipe::Stream> objects associated with the pipe. Created
+automatically.
+
+=head2 cmds
+
+I<Optional>. The value should be an arrayref of commands to load into
+the pipe.  The contents of the array are passed to the L</ffadd>
+method for processing.
+
+=head2 executor
+
+I<Optional>. The means by which the pipeline will be executed.  It may
+be either a class name or an object reference, and must consume the
+L<IPC::PrettyPipe::Executor> role.  It defaults to
+L<IPC::PrettyPipe::Execute::IPC::Run>.
+
+=head2 renderer
+
+I<Optional>. The means by which the pipeline will be rendered.  It may
+be either a class name or an object reference, and must consume the
+L<IPC::PretyyPipe::Renderer> role.  It defaults to
+L<IPC::PrettyPipe::Render::Template::Tiny>.
 
 =head1 METHODS
 
@@ -528,7 +797,7 @@ altering them after the fact.
 =item new
 
   # initialize the pipe with commands
-  $pipe = IPC::PrettyPipe->new( 
+  $pipe = IPC::PrettyPipe->new(
     cmds => [ $cmd1, $cmd2 ], %attrs
   );
 
@@ -540,57 +809,42 @@ altering them after the fact.
 
 Create a new C<IPC::PrettyPipe> object. The available attributes are:
 
-=over
+=item B<cmds>
 
-=item C<cmds>
+  $cmds = $pipe->cmds;
 
-I<Optional>. The value should be an arrayref of commands to load into
-the pipe.  The contents of the array are passed to the B<L</ffadd>>
-method for processing.
+Return a L<IPC::PrettyPipe::Queue> object containing the
+L<IPC::PrettyPipe::Cmd> objects associated with the pipe.
 
-=item C<argpfx>, C<argsep>
+=item B<render>
 
-I<Optional>.  The default prefix and separation attributes for
-arguments to commands.  See B<L<IPC::PrettyPipe::Arg>> for more
-details.  These override any specified via the C<L</argfmt>> object.
+  my $string = $pipe->render
 
-=item C<argfmt>
+Return a prettified string of the pipeline.
 
-I<Optional>. An B<L<IPC::PrettyPipe::Arg::Format>> object specifying
-the default prefix and separation attributes for arguments to
-commands.  May be overridden by C<L</argpfx>> and C<L</argsep>>.
+=item B<run>
 
-=item C<executor>
+   $pipe->run
 
-I<Optional>. The means by which the pipeline will be executed.  It may
-be either a class name or an object reference, and must consume the
-B<L<IPC::PrettyPipe::Executor>> role.  It defaults to
-C<L<IPC::PrettyPipe::Execute::IPC::Run>>.
-
-=item C<renderer>
-
-I<Optional>. The means by which the pipeline will be rendered.  It may
-be either a class name or an object reference, and must consume the
-B<L<IPC::PretyyPipe::Renderer>> role.  It defaults to
-B<L<IPC::PrettyPipe::Render::Template::Tiny>>.
+Execute the pipeline.
 
 =back
 
-=item B<add>
+=head2 add
 
   $cmd_obj = $pipe->add( $cmd );
   $cmd_obj = $pipe->add( cmd => $cmd, %options );
 
-Create an B<L<IPC::PrettyPipe::Cmd>> object, add it to the
+Create an L<IPC::PrettyPipe::Cmd> object, add it to the
 B<IPC::PrettyPipe> object, and return a handle to it.  If passed
 a single parameter, it is assumed to be a C<cmd> parameter.
 
-This is a thin wrapper around the B<L<IPC::PrettyPipe::Cmd>> constructor,
+This is a thin wrapper around the L<IPC::PrettyPipe::Cmd> constructor,
 taking the same parameters.  The only difference is that if the value
-of the C<cmd> parameter is an B<L<IPC::PrettyPipe::Cmd>> object it
+of the C<cmd> parameter is an L<IPC::PrettyPipe::Cmd> object it
 is inserted into the pipeline.
 
-=item B<ffadd>
+=head2 ffadd
 
   $pipe->ffadd( @cmds );
 
@@ -601,7 +855,7 @@ of the following items:
 
 =item *
 
-an B<L<IPC::PrettyPipe::Cmd>> object
+an L<IPC::PrettyPipe::Cmd> object
 
 =item *
 
@@ -619,48 +873,17 @@ used for that parameter.
 
 An arrayref. The first element is the command name; the rest are its
 arguments; these are passed to
-B<L<IPC::PrettyPipe::Cmd::new|IPC::PrettyPipe::Cmd/new>> as the C<cmd>
+L<IPC::PrettyPipe::Cmd::new|IPC::PrettyPipe::Cmd/new> as the C<cmd>
 and C<args> parameters.
 
 =item *
 
-An B<L<IPC::PrettyPipe::Arg::Format>> object, specifying the argument
+An L<IPC::PrettyPipe::Arg::Format> object, specifying the argument
 prefix and separator attributes for successive commands.
 
 =back
 
-=item B<argpfx>
-
-=item B<argsep>
-
-These methods retrieve (when called with no arguments) or modify (when
-called with an argument) the similarly named object
-attributes. Changing these affects the defaults for future command
-arguments; it does not affect existing arguments.
-
-See B<L<IPC::PrettyPipe::Arg>> for more information.
-
-=item B<cmds>
-
-  $cmds = $pipe->cmds;
-
-Return a B<L<IPC::PrettyPipe::Queue>> object containing the
-B<L<IPC::PrettyPipe::Cmd>> objects associated with the pipe.
-
-=item B<render>
-
-  my $string = $pipe->render
-
-Return a prettified string of the pipeline.
-
-
-=item B<run>
-
-   $pipe->run
-
-Execute the pipeline.
-
-=item B<stream>
+=head2 stream
 
   $pipe->stream( $stream_spec );
   $pipe->stream( $stream_spec, $file );
@@ -669,30 +892,22 @@ Add an I/O stream to the pipeline.  See
 L<IPC::PrettyPipe::Stream::Utils/Stream Specification> for more
 information.
 
-=item B<streams>
-
-  $streams = $pipe->streams
-
-Return a B<L<IPC::PrettyPipe::Queue>> object containing the
-B<L<IPC::PrettyPipe::Stream>> objects associated with the pipe.
-
-=item B<valmatch>
+=head2 valmatch
 
   $n = $pipe->valmatch( $pattern );
 
 Returns the number of I<commands> with a value matching the passed
 regular expression.  (This is B<not> equal to the number of total
 I<values> which matched.  To determine this, iterate over each
-command, calling it's B<L<valmatch|IPC::PrettyPipe::Cmd/valmatch>> method ).
+command, calling it's L<valmatch|IPC::PrettyPipe::Cmd/valmatch> method ).
 
-=item B<valsubst>
+=head2 valsubst
 
    $pipe->valsubst( $pattern, $value, %attr );
 
 Replace arguments to options whose arguments match the Perl regular
 expression I<$pattern> with I<$value>.  The following attributes
-are avaliable:
-
+are available:
 
 =over
 
@@ -710,7 +925,7 @@ Note that matching is done on a per-command basis, not per-argument
 basis, so that if a command has multiple matching values, they will
 all use the same replacement string.  To perform more specific
 changes, use each command's
-B<L<valsubst|IPC::PrettyPipe::Cmd/valsubst>> method directly.
+L<valsubst|IPC::PrettyPipe::Cmd/valsubst> method directly.
 
 Here's an example where the commands use parameters C<input> and
 C<output> to indicate where they should write.  The strings "stdout"
@@ -742,29 +957,44 @@ to specify the correct streams.
 
 results in
 
-	cmd1 \
-  	  input input_file \
-  	  output stdout \
-  |	cmd2 \
-  	  input stdin \
-  	  output stdout \
-  |	cmd3 \
-  	  input stdin \
-  	  output output_file
+        cmd1 \
+          input input_file \
+          output stdout \
+  |     cmd2 \
+          input stdin \
+          output stdout \
+  |     cmd3 \
+          input stdin \
+          output output_file
 
-=back
+=for Pod::Coverage BUILDARGS BUILD
 
+=head1 BUGS
 
-=head1 COPYRIGHT & LICENSE
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
+email to
+L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
 
-Copyright 2014 Smithsonian Astrophysical Observatory
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-This software is released under the GNU General Public License.  You
-may find a copy at
+=head1 SOURCE
 
-   http://www.fsf.org/copyleft/gpl.html
-
+The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
+and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
 
 =head1 AUTHOR
 
-Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

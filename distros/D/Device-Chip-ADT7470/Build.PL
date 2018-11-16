@@ -16,9 +16,14 @@ my $build = Module::Build->new(
         'Test::More'                  => '0.88',    # done_testing
         'Test::Exception'             => '0.43',
     },
+    meta_merge => {
+	resources => {
+	    repository => 'https://github.com/john-/Device-Chip-ADT7470'
+	}
+    },
     auto_configure_requires => 0,         # Don't add M::B to configure_requires
     license                 => 'perl',
-    create_makefile_pl      => 'small',
+    create_makefile_pl      => 'traditional',
     create_license          => 1,
     create_readme           => 1,
     dist_author             => 'the author',

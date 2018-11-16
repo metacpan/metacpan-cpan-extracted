@@ -1,11 +1,9 @@
 #! perl
 
-use strict;
-use warnings;
+use Test2::V0;
 
 use IPC::PrettyPipe;
 
-use Test::More;
 use Scalar::Util;
 
 use Test::Lib;

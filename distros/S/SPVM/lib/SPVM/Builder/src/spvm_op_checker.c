@@ -150,9 +150,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                       SPVM_TYPE* type_element = SPVM_TYPE_new(compiler);
                       type_element->basic_type = type_term_element->basic_type;
                       type_element->dimension = type_term_element->dimension;
-                      if (type_term_element->flag & SPVM_TYPE_C_FLAG_CONST) {
-                        type_element->flag |= SPVM_TYPE_C_FLAG_CONST;
-                      }
                       op_type_element = SPVM_OP_new_op_type(compiler, type_element, file, line);
                     }
                     
@@ -190,9 +187,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                       SPVM_TYPE* type_new = SPVM_TYPE_new(compiler);
                       type_new->basic_type = type_term_element->basic_type;
                       type_new->dimension = type_term_element->dimension + 1;
-                      if (type_term_element->flag & SPVM_TYPE_C_FLAG_CONST) {
-                        type_new->flag |= SPVM_TYPE_C_FLAG_CONST;
-                      }
                       op_type_new = SPVM_OP_new_op_type(compiler, type_new, file, line);
                     }
 
@@ -207,11 +201,11 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                           SPVM_HASH_insert(package->info_basic_type_id_symtable, type_tmp->basic_type->name, strlen(type_tmp->basic_type->name), type_tmp->basic_type);
                         }
                         // type constant pool id
-                        char type_id_string[sizeof(int64_t)];
+                        char type_id_string[sizeof(int32_t) * 2];
                         memcpy(type_id_string, &type_tmp->basic_type->id, sizeof(int32_t));
                         memcpy((char*)(type_id_string + sizeof(int32_t)), &type_tmp->dimension, sizeof(int32_t));
                         
-                        int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t));
+                        int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_32bit_value_symtable, type_id_string, sizeof(int32_t) * 2);
                         if (found_constant_pool_id > 0) {
                           type_tmp->constant_pool_id = found_constant_pool_id;
                         }
@@ -219,7 +213,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                           int32_t constant_pool_id = SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->basic_type->id);
                           SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->dimension);
                           type_tmp->constant_pool_id = constant_pool_id;
-                          SPVM_HASH_insert(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t), (void*)(intptr_t)constant_pool_id);
+                          SPVM_HASH_insert(package->constant_pool_32bit_value_symtable, type_id_string, sizeof(int32_t) * 2, (void*)(intptr_t)constant_pool_id);
                         }
                       }
                     }
@@ -291,14 +285,33 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               int32_t add_constant = 0;
               
               // long or double
-              if (type->dimension == 0) {
+              // String
+              if (SPVM_TYPE_is_string_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
+                add_constant = 1;
+                
+                char* string_value = op_cur->uv.constant->value.oval;
+                int32_t string_length = op_cur->uv.constant->string_length;
+                int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->string_symtable, string_value, string_length);
+                if (found_constant_pool_id > 0) {
+                  op_cur->uv.constant->constant_pool_id = found_constant_pool_id;
+                }
+                else {
+                  int32_t constant_pool_id = SPVM_CONSTANT_POOL_push_int(package->constant_pool, string_length);
+                  int32_t string_pool_id = (intptr_t)SPVM_HASH_fetch(compiler->string_symtable, string_value, string_length + 1);
+                  assert(string_pool_id > 0);
+                  SPVM_CONSTANT_POOL_push_int(package->constant_pool, string_pool_id);
+                  op_cur->uv.constant->constant_pool_id = constant_pool_id;
+                  SPVM_HASH_insert(package->string_symtable, string_value, string_length, (void*)(intptr_t)constant_pool_id);
+                }
+              }
+              else if (SPVM_TYPE_is_numeric_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
                 switch (type->basic_type->id) {
                   case SPVM_BASIC_TYPE_C_ID_LONG: {
                     add_constant = 1;
 
                     // Add long constant
                     char long_value_string[sizeof(int64_t)];
-                    memcpy(long_value_string, &op_cur->uv.constant->value.lval, sizeof(int64_t));
+                    memcpy(long_value_string, (int64_t*)&op_cur->uv.constant->value.lval, sizeof(int64_t));
                     int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_64bit_value_symtable, long_value_string, sizeof(int64_t));
                     if (found_constant_pool_id > 0) {
                       op_cur->uv.constant->constant_pool_id = found_constant_pool_id;
@@ -325,25 +338,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                       SPVM_HASH_insert(package->constant_pool_64bit_value_symtable, double_value_string, sizeof(int64_t), (void*)(intptr_t)constant_pool_id);
                     }
                   }
-                }
-              }
-              // String
-              else if (SPVM_TYPE_is_string_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-                add_constant = 1;
-                
-                char* string_value = op_cur->uv.constant->value.oval;
-                int32_t string_length = op_cur->uv.constant->string_length;
-                int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->string_symtable, string_value, string_length);
-                if (found_constant_pool_id > 0) {
-                  op_cur->uv.constant->constant_pool_id = found_constant_pool_id;
-                }
-                else {
-                  int32_t constant_pool_id = SPVM_CONSTANT_POOL_push_int(package->constant_pool, string_length);
-                  int32_t string_pool_id = (intptr_t)SPVM_HASH_fetch(compiler->string_symtable, string_value, string_length + 1);
-                  assert(string_pool_id > 0);
-                  SPVM_CONSTANT_POOL_push_int(package->constant_pool, string_pool_id);
-                  op_cur->uv.constant->constant_pool_id = constant_pool_id;
-                  SPVM_HASH_insert(package->string_symtable, string_value, string_length, (void*)(intptr_t)constant_pool_id);
                 }
               }
               
@@ -834,7 +828,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
             }
             case SPVM_OP_C_ID_NEW: {
               assert(op_cur->first);
-                    
               if (op_cur->first->id == SPVM_OP_C_ID_TYPE) {
                 SPVM_PACKAGE* new_package = op_cur->first->uv.type->basic_type->package;
                 
@@ -930,6 +923,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     if (compiler->error_count > 0) {
                       return;
                     }
+
                     
                     {
                       SPVM_OP* op_type_tmp = op_type;
@@ -941,11 +935,11 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                         SPVM_HASH_insert(package->info_basic_type_id_symtable, type_tmp->basic_type->name, strlen(type_tmp->basic_type->name), type_tmp->basic_type);
                       }
                       // type constant pool id
-                      char type_id_string[sizeof(int64_t)];
+                      char type_id_string[sizeof(int32_t) * 2];
                       memcpy(type_id_string, &type_tmp->basic_type->id, sizeof(int32_t));
                       memcpy((char*)(type_id_string + sizeof(int32_t)), &type_tmp->dimension, sizeof(int32_t));
                       
-                      int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t));
+                      int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_32bit2_value_symtable, type_id_string, sizeof(int32_t) * 2);
                       if (found_constant_pool_id > 0) {
                         type_tmp->constant_pool_id = found_constant_pool_id;
                       }
@@ -953,7 +947,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                         int32_t constant_pool_id = SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->basic_type->id);
                         SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->dimension);
                         type_tmp->constant_pool_id = constant_pool_id;
-                        SPVM_HASH_insert(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t), (void*)(intptr_t)constant_pool_id);
+                        SPVM_HASH_insert(package->constant_pool_32bit2_value_symtable, type_id_string, sizeof(int32_t) * 2, (void*)(intptr_t)constant_pool_id);
                       }
                     }
                   }
@@ -1024,9 +1018,9 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 else {
                   assert(0);
                 }
-                
                 if (!SPVM_TYPE_is_numeric_type(compiler, op_type->uv.type->basic_type->id, op_type->uv.type->dimension, op_type->uv.type->flag)) {
                   {
+                
                     SPVM_OP* op_type_tmp = op_type;
                     // No duplicate basic type id
                     SPVM_TYPE* type_tmp = op_type_tmp->uv.type;
@@ -1036,11 +1030,11 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                       SPVM_HASH_insert(package->info_basic_type_id_symtable, type_tmp->basic_type->name, strlen(type_tmp->basic_type->name), type_tmp->basic_type);
                     }
                     // type constant pool id
-                    char type_id_string[sizeof(int64_t)];
+                    char type_id_string[sizeof(int32_t) * 2];
                     memcpy(type_id_string, &type_tmp->basic_type->id, sizeof(int32_t));
                     memcpy((char*)(type_id_string + sizeof(int32_t)), &type_tmp->dimension, sizeof(int32_t));
                     
-                    int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t));
+                    int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_32bit2_value_symtable, type_id_string, sizeof(int32_t) * 2);
                     if (found_constant_pool_id > 0) {
                       type_tmp->constant_pool_id = found_constant_pool_id;
                     }
@@ -1048,7 +1042,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                       int32_t constant_pool_id = SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->basic_type->id);
                       SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->dimension);
                       type_tmp->constant_pool_id = constant_pool_id;
-                      SPVM_HASH_insert(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t), (void*)(intptr_t)constant_pool_id);
+                      SPVM_HASH_insert(package->constant_pool_32bit2_value_symtable, type_id_string, sizeof(int32_t) * 2, (void*)(intptr_t)constant_pool_id);
                     }
                   }
                 }
@@ -1149,11 +1143,11 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     SPVM_HASH_insert(package->info_basic_type_id_symtable, type_tmp->basic_type->name, strlen(type_tmp->basic_type->name), type_tmp->basic_type);
                   }
                   // type constant pool id
-                  char type_id_string[sizeof(int64_t)];
+                  char type_id_string[sizeof(int32_t) * 2];
                   memcpy(type_id_string, &type_tmp->basic_type->id, sizeof(int32_t));
                   memcpy((char*)(type_id_string + sizeof(int32_t)), &type_tmp->dimension, sizeof(int32_t));
                   
-                  int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t));
+                  int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_32bit2_value_symtable, type_id_string, sizeof(int32_t) * 2);
                   if (found_constant_pool_id > 0) {
                     type_tmp->constant_pool_id = found_constant_pool_id;
                   }
@@ -1161,7 +1155,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     int32_t constant_pool_id = SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->basic_type->id);
                     SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->dimension);
                     type_tmp->constant_pool_id = constant_pool_id;
-                    SPVM_HASH_insert(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t), (void*)(intptr_t)constant_pool_id);
+                    SPVM_HASH_insert(package->constant_pool_32bit2_value_symtable, type_id_string, sizeof(int32_t) * 2, (void*)(intptr_t)constant_pool_id);
                   }
                 }
               }
@@ -1183,12 +1177,12 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Can receive only numeric type
-              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "eq left type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "eq left type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
-              if (!SPVM_TYPE_is_string_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "eq right type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "eq right type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -1209,12 +1203,12 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Can receive only numeric type
-              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "ne left type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "ne left type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
-              if (!SPVM_TYPE_is_string_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "ne right type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "ne right type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -1235,12 +1229,12 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Can receive only numeric type
-              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "gt left type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "gt left type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
-              if (!SPVM_TYPE_is_string_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "gt right type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "gt right type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -1261,12 +1255,12 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Can receive only numeric type
-              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "ge left type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "ge left type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
-              if (!SPVM_TYPE_is_string_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "ge right type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "ge right type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -1287,12 +1281,12 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Can receive only numeric type
-              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "lt left type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "lt left type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
-              if (!SPVM_TYPE_is_string_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "lt right type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "lt right type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -1313,12 +1307,12 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               // Can receive only numeric type
-              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "le left type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "le left type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
-              if (!SPVM_TYPE_is_string_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "le right type must be string at %s line %d\n", op_cur->file, op_cur->line);
+              if (!SPVM_TYPE_is_string_compatible_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "le right type must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -2091,8 +2085,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
               }
               // Left type is not string type
-              else if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "\".\" operator left value must be string at %s line %d\n", op_cur->file, op_cur->line);
+              else if (!SPVM_TYPE_is_string_compatible_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "\".\" operator left value must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -2104,8 +2098,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
               }
               // Right value is not string type
-              else if (!SPVM_TYPE_is_string_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-                SPVM_COMPILER_error(compiler, "\".\" operator right value must be string at %s line %d\n", op_cur->file, op_cur->line);
+              else if (!SPVM_TYPE_is_string_compatible_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "\".\" operator right value must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -2114,7 +2108,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
             case SPVM_OP_C_ID_CROAK: {
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "croak argument must be string at %s line %d\n", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "croak argument must be string compatible type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               break;
@@ -2258,34 +2252,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   }
                 }
                 else {
-                  // Variable is package var
-                  int32_t is_package_var;
-                  SPVM_PACKAGE_VAR* found_package_var = SPVM_HASH_fetch(compiler->package_var_symtable, var->op_name->uv.name, strlen(var->op_name->uv.name));
-                  if (!found_package_var) {
-                    found_package_var = SPVM_HASH_fetch(package->package_var_symtable, var->op_name->uv.name, strlen(var->op_name->uv.name));
-                  }
-                  if (found_package_var) {
-                    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
-                    
-                    // Var OP
-                    SPVM_OP* op_name_package_var = SPVM_OP_new_op_name(compiler, op_cur->uv.var->op_name->uv.name, op_cur->file, op_cur->line);
-                    SPVM_OP* op_package_var_access = SPVM_OP_new_op_package_var_access(compiler, op_name_package_var);
-                    op_package_var_access->uv.package_var_access->package_var = found_package_var;
-                    op_package_var_access->is_lvalue = op_cur->is_lvalue;
-                    op_cur = op_package_var_access;
-
-                    SPVM_OP_replace_op(compiler, op_stab, op_package_var_access);
-                    
-                    SPVM_OP_CHECKER_check_tree(compiler, op_package_var_access, check_ast_info);
-                    if (compiler->error_count > 0) {
-                      return;
-                    }
-                  }
-                  // Error
-                  else {
-                    SPVM_COMPILER_error(compiler, "%s is not declared at %s line %d\n", var->op_name->uv.name, op_cur->file, op_cur->line);
-                    return;
-                  }
+                  SPVM_COMPILER_error(compiler, "%s is not declared at %s line %d\n", var->op_name->uv.name, op_cur->file, op_cur->line);
                 }
               }
               
@@ -2522,6 +2489,10 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 return;
               }
               
+              SPVM_PACKAGE_VAR_ACCESS* package_var_access = op_cur->uv.package_var_access;
+              SPVM_PACKAGE_VAR* package_var = package_var_access->package_var;
+              SPVM_PACKAGE* package_var_access_package = package_var->package;
+              
               // Field accesss constant pool id
               char package_var_id_string[sizeof(int32_t)];
               memcpy(package_var_id_string, &op_cur->uv.package_var_access->package_var->id, sizeof(int32_t));
@@ -2540,6 +2511,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               if (found_package_var == NULL) {
                 SPVM_LIST_push(package->info_package_var_ids, (void*)(intptr_t)op_cur->uv.package_var_access->package_var->id);
                 SPVM_HASH_insert(package->info_package_var_id_symtable, package_var_id_string, sizeof(int32_t), op_cur->uv.package_var_access->package_var);
+              }
+
+              if (package_var->flag & SPVM_PACKAGE_VAR_C_FLAG_PRIVATE) {
+                if (strcmp(package_var_access_package->name, sub->package->op_name->uv.name) != 0) {
+                  SPVM_COMPILER_error(compiler, "Can't access to private package variable \"%s\" at %s line %d\n", op_cur->uv.package_var_access->op_name->uv.name, op_cur->file, op_cur->line);
+                  return;
+                }
               }
               
               break;
@@ -2660,9 +2638,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               if (field->flag & SPVM_FIELD_C_FLAG_PRIVATE) {
                 if (strcmp(type->basic_type->name, sub->package->op_name->uv.name) != 0) {
-                  char* type_name = tmp_buffer;
-                  SPVM_TYPE_sprint_type_name(compiler, type_name, type->basic_type->id, type->dimension, type->flag);
-                  SPVM_COMPILER_error(compiler, "Can't access to private field %s::%s at %s line %d\n", type_name, op_name->uv.name, op_cur->file, op_cur->line);
+                  SPVM_COMPILER_error(compiler, "Can't access to private field \"%s\" at %s line %d\n", op_name->uv.name, op_cur->file, op_cur->line);
                   return;
                 }
               }
@@ -2886,7 +2862,27 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   if (SPVM_TYPE_is_numeric_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
                     can_convert = 1;
                   }
-                  else if (SPVM_TYPE_is_object_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+                  else if (SPVM_TYPE_is_string_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+                    can_convert = 1;
+                  }
+                  else if (SPVM_TYPE_is_byte_array_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+                    can_convert = 1;
+                  }
+                  else if (SPVM_TYPE_is_any_object_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+                    can_convert = 1;
+                  }
+                  else {
+                    can_convert = 0;
+                  }
+                }
+                else if (SPVM_TYPE_is_byte_array_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
+                  if (SPVM_TYPE_is_string_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+                    can_convert = 1;
+                  }
+                  else if (SPVM_TYPE_is_byte_array_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+                    can_convert = 1;
+                  }
+                  else if (SPVM_TYPE_is_any_object_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
                     can_convert = 1;
                   }
                   else {
@@ -2957,11 +2953,11 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     SPVM_HASH_insert(package->info_basic_type_id_symtable, type_tmp->basic_type->name, strlen(type_tmp->basic_type->name), type_tmp->basic_type);
                   }
                   // type constant pool id
-                  char type_id_string[sizeof(int64_t)];
+                  char type_id_string[sizeof(int32_t) * 2];
                   memcpy(type_id_string, &type_tmp->basic_type->id, sizeof(int32_t));
                   memcpy((char*)(type_id_string + sizeof(int32_t)), &type_tmp->dimension, sizeof(int32_t));
                   
-                  int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t));
+                  int32_t found_constant_pool_id = (intptr_t)SPVM_HASH_fetch(package->constant_pool_32bit2_value_symtable, type_id_string, sizeof(int32_t) * 2);
                   if (found_constant_pool_id > 0) {
                     type_tmp->constant_pool_id = found_constant_pool_id;
                   }
@@ -2969,7 +2965,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     int32_t constant_pool_id = SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->basic_type->id);
                     SPVM_CONSTANT_POOL_push_int(package->constant_pool, type_tmp->dimension);
                     type_tmp->constant_pool_id = constant_pool_id;
-                    SPVM_HASH_insert(package->constant_pool_64bit_value_symtable, type_id_string, sizeof(int64_t), (void*)(intptr_t)constant_pool_id);
+                    SPVM_HASH_insert(package->constant_pool_32bit2_value_symtable, type_id_string, sizeof(int32_t) * 2, (void*)(intptr_t)constant_pool_id);
                   }
                 }
                 break;
@@ -3983,6 +3979,10 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
       else if (SPVM_TYPE_is_string_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
         can_assign = 1;
       }
+      // Source type is byte array
+      else if (SPVM_TYPE_is_byte_array_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+        can_assign = 1;
+      }
       else if (SPVM_TYPE_is_undef_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
         can_assign = 1;
       }
@@ -4112,17 +4112,11 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
     else {
       SPVM_TYPE_sprint_type_name(compiler, compiler->buffer1, src_type->basic_type->id, src_type->dimension, src_type->flag);
       SPVM_TYPE_sprint_type_name(compiler, compiler->buffer2, dist_type->basic_type->id, dist_type->dimension, dist_type->flag);
-      SPVM_COMPILER_error(compiler, "Can't convert %s to %s at %s line %d\n", compiler->buffer1, compiler->buffer2, op_src->file, op_src->line);
+      SPVM_COMPILER_error(compiler, "Can't automatically convert %s to %s at %s line %d\n", compiler->buffer1, compiler->buffer2, op_src->file, op_src->line);
       return NULL;
     }
   }
-
-  // Const check
-  if (!(dist_type->flag & SPVM_TYPE_C_FLAG_CONST) && (src_type->flag & SPVM_TYPE_C_FLAG_CONST)) {
-    SPVM_COMPILER_error(compiler, "Can't convert const type to not const type at %s line %d\n", op_src->file, op_src->line);
-    return NULL;
-  }
-
+  
   if (need_convertion) {
     SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_src);
     
@@ -4273,23 +4267,42 @@ void SPVM_OP_CHECKER_resolve_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_f
   }
 }
 
-void SPVM_OP_CHECKER_resolve_package_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_package_var_access, SPVM_OP* op_package) {
+void SPVM_OP_CHECKER_resolve_package_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_package_var_access, SPVM_OP* op_current_package) {
+  
+  assert(op_package_var_access->uv.package_var_access);
   
   SPVM_OP* op_name = op_package_var_access->uv.package_var_access->op_name;
   
+  char* package_name;
+  char* base_name;
+  
   const char* name = op_name->uv.name;
-  const char* abs_name;
-  if (strchr(name, ':')) {
-    abs_name = name;
+  
+  char* colon_ptr = strrchr(name, ':');
+  if (colon_ptr) {
+    // Package name
+    // (end - start + 1) - $ - colon * 2
+    int32_t package_name_length = (colon_ptr - name + 1) - 1 - 2;
+    package_name = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, package_name_length + 1);
+    memcpy(package_name, name + 1, package_name_length);
+    
+    // Base name($foo)
+    int32_t base_name_length = 1 + (name + strlen(name) - 1) - colon_ptr;
+    base_name = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, base_name_length + 1);
+    base_name[0] = '$';
+    memcpy(base_name + 1, colon_ptr + 1, base_name_length);
   }
   else {
-    abs_name = SPVM_OP_create_package_var_access_abs_name(compiler, op_package->uv.package->op_name->uv.name, name);
+    package_name = (char*)op_current_package->uv.package->name;
+    base_name = (char*)name;
   }
   
-  SPVM_PACKAGE_VAR* package_var = SPVM_HASH_fetch(compiler->package_var_symtable, abs_name, strlen(abs_name));
-  
-  if (package_var) {
-    op_package_var_access->uv.package_var_access->package_var = package_var;
+  SPVM_PACKAGE* found_package = SPVM_HASH_fetch(compiler->package_symtable, package_name, strlen(package_name));
+  if (found_package) {
+    SPVM_PACKAGE_VAR* found_package_var = SPVM_HASH_fetch(found_package->package_var_symtable, base_name, strlen(base_name));
+    if (found_package_var) {
+      op_package_var_access->uv.package_var_access->package_var = found_package_var;
+    }
   }
 }
 

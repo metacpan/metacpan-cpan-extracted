@@ -82,7 +82,7 @@
    "provides" : {
       "MooX::Const" : {
          "file" : "lib/MooX/Const.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.1"
       }
    },
    "release_status" : "stable",
@@ -90,13 +90,14 @@
       "bugtracker" : {
          "web" : "https://github.com/robrwo/MooX-Const/issues"
       },
+      "homepage" : "https://metacpan.org/release/MooX-Const",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/robrwo/MooX-Const.git",
          "web" : "https://github.com/robrwo/MooX-Const"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.2.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Kang-min Liu \u5289\u5eb7\u6c11 <gugod@gugod.org>"

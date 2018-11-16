@@ -27,7 +27,7 @@ __END__
 
 =head1 NAME
 
-TooMuchCode::ProhibitUnnecessaryScalarKeyword
+TooMuchCode::ProhibitUnnecessaryScalarKeyword - Finds `scalar` in scalar context.
 
 =head1 DESCRIPTION
 

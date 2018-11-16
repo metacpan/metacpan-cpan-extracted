@@ -146,6 +146,17 @@ sub get_message {
     return undef;
 }
 
+=head2 $name = I<OBJ>->get_connection_name()
+
+Returns the name of the connection. This must only be called after at least
+one message is received; if it is called before then, an exception is thrown.
+
+=cut
+
+sub get_connection_name {
+    return $_[0]->{'_connection_name'} || die 'No connection name known yet!';
+}
+
 # undocumented
 sub new {
     my ($class, %opts) = @_;
