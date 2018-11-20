@@ -8,7 +8,7 @@ with qw[Pcore::Handle::Base];
 
 requires qw[_get_schema_patch_table_query prepare quote];
 
-has on_connect => ();                          # Maybe [CodeRef]
+has on_connect    => ();                       # Maybe [CodeRef]
 has _schema_patch => ( init_arg => undef );    # HashRef
 
 const our $SCHEMA_PATCH_TABLE_NAME => '__schema_patch';

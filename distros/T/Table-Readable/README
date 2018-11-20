@@ -6,7 +6,7 @@
                                                                            
 
 
-This is the README for Table::Readable version 0.02.
+This is the README for Table::Readable version 0.03.
 
 Table::Readable is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -35,12 +35,11 @@ support any kind of nesting, and can only be text in UTF-8 encoding.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?Table::Readable
     * http://metacpan.org/release/Table-Readable
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -61,11 +60,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Table::Readable
 
-To install the module from the source file, Table-Readable-0.02.tar.gz,
+To install the module from the source file, Table-Readable-0.03.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Table-Readable-0.02.tar.gz
-    cd Table-Readable-0.02
+    tar xfz Table-Readable-0.03.tar.gz
+    cd Table-Readable-0.03
     perl Makefile.PL
     make
     make install
@@ -90,6 +89,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Feb 28 15:30:58 2017.
+This README was written on Mon Nov 19 14:51:08 2018.
 
 -----------------------------------------------------------------------------

@@ -14,7 +14,7 @@ has on_finish => ();    # CodeRef->($self)
 sub DESTROY ($self) {
 
     # inform node process, that parent is terminated
-    $self->{fh}->shutdown;
+    $self->{fh}->shutdown if defined $self->{fh};
 
     return;
 }

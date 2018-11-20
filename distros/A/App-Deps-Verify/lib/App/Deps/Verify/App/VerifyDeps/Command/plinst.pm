@@ -1,5 +1,5 @@
 package App::Deps::Verify::App::VerifyDeps::Command::plinst;
-$App::Deps::Verify::App::VerifyDeps::Command::plinst::VERSION = '0.4.0';
+$App::Deps::Verify::App::VerifyDeps::Command::plinst::VERSION = '0.6.0';
 use App::Deps::Verify::App::VerifyDeps -command;
 
 use strict;
@@ -14,7 +14,10 @@ sub description { return abstract(); }
 
 sub opt_spec
 {
-    return ( [ "input|i=s\@", "the input file" ], );
+    return (
+        [ "input|i=s\@", "the input files" ],
+        [ "notest",      "speed up installation by skipping the tests" ],
+    );
 }
 
 sub validate_args
@@ -31,7 +34,9 @@ sub execute
 
     exit(
         system(
-            "cpanm", "--",
+            "cpanm",
+            ( $opt->{notest} ? ('--notest') : () ),
+            "--",
             grep { /\A[A-Za-z0-9_:]+\z/ }
                 @{ App::Deps::Verify->new->list_perl5_modules_in_yamls(
                     +{ filenames => [ @{ $opt->{input} }, ] }
@@ -57,7 +62,7 @@ App::Deps::Verify::App::VerifyDeps::Command::plinst
 
 =head1 VERSION
 
-version 0.4.0
+version 0.6.0
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

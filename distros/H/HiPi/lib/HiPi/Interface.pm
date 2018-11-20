@@ -17,7 +17,7 @@ use Time::HiRes qw( usleep );
 
 __PACKAGE__->create_accessors( qw( device ) );
 
-our $VERSION ='0.72';
+our $VERSION ='0.74';
 
 sub new {
     my ($class, %params) = @_;

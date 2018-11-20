@@ -69,31 +69,31 @@
    "provides" : {
       "Google::Ads::AdWords::Client" : {
          "file" : "lib/Google/Ads/AdWords/Client.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Constants" : {
          "file" : "lib/Google/Ads/AdWords/Constants.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Deserializer" : {
          "file" : "lib/Google/Ads/AdWords/Deserializer.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::FaultDetail" : {
          "file" : "lib/Google/Ads/AdWords/FaultDetail.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Logging" : {
          "file" : "lib/Google/Ads/AdWords/Logging.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::OAuth2ApplicationsHandler" : {
          "file" : "lib/Google/Ads/AdWords/OAuth2ApplicationsHandler.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::OAuth2ServiceAccountsHandler" : {
          "file" : "lib/Google/Ads/AdWords/OAuth2ServiceAccountsHandler.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Reports::DateRange" : {
          "file" : "lib/Google/Ads/AdWords/Reports/DateRange.pm"
@@ -124,7 +124,7 @@
       },
       "Google::Ads::AdWords::Reports::ReportingConfiguration" : {
          "file" : "lib/Google/Ads/AdWords/Reports/ReportingConfiguration.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Reports::Selector" : {
          "file" : "lib/Google/Ads/AdWords/Reports/Selector.pm"
@@ -137,7 +137,7 @@
       },
       "Google::Ads::AdWords::Serializer" : {
          "file" : "lib/Google/Ads/AdWords/Serializer.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Utilities::BatchJobHandler" : {
          "file" : "lib/Google/Ads/AdWords/Utilities/BatchJobHandler.pm",
@@ -153,23 +153,23 @@
       },
       "Google::Ads::AdWords::Utilities::PageProcessor" : {
          "file" : "lib/Google/Ads/AdWords/Utilities/PageProcessor.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Utilities::QueryBuilder" : {
          "file" : "lib/Google/Ads/AdWords/Utilities/QueryBuilder.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Utilities::QueryBuilder::WhereBuilder" : {
          "file" : "lib/Google/Ads/AdWords/Utilities/QueryBuilder.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Utilities::ReportQueryBuilder" : {
          "file" : "lib/Google/Ads/AdWords/Utilities/ReportQueryBuilder.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::Utilities::ServiceQueryBuilder" : {
          "file" : "lib/Google/Ads/AdWords/Utilities/ServiceQueryBuilder.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::AdWords::v201802::AccessReason" : {
          "file" : "lib/Google/Ads/AdWords/v201802/AccessReason.pm"
@@ -13835,7 +13835,7 @@
       },
       "Google::Ads::Common::ReportDownloadHandler" : {
          "file" : "lib/Google/Ads/Common/ReportDownloadHandler.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::Common::ReportUtils" : {
          "file" : "lib/Google/Ads/Common/ReportUtils.pm",
@@ -13843,7 +13843,7 @@
       },
       "Google::Ads::Common::Utilities::AdsUtilityRegistry" : {
          "file" : "lib/Google/Ads/Common/Utilities/AdsUtilityRegistry.pm",
-         "version" : "v5.6.0"
+         "version" : "v5.6.1"
       },
       "Google::Ads::Common::XPathSAXParser" : {
          "file" : "lib/Google/Ads/Common/XPathSAXParser.pm",
@@ -13868,6 +13868,6 @@
          "http://apache.org/licenses/LICENSE-2.0"
       ]
    },
-   "version" : "v5.6.0",
+   "version" : "v5.6.1",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

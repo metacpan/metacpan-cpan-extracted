@@ -15,7 +15,7 @@ use warnings;
 use Bit::Vector;
 use parent qw( HiPi::Class );
 
-our $VERSION ='0.72';
+our $VERSION ='0.74';
 
 __PACKAGE__->create_accessors ( qw( buffer y_buffer width height autoresize ) );
 
@@ -67,7 +67,7 @@ sub set_bit {
             $newh = $y + 1;
         }
         if( $neww || $newh ) {
-            $self->_reset_buffer( $neww || $self->width, $newh | $self->height );
+            $self->_reset_buffer( $neww || $self->width, $newh || $self->height );
         }
     } else {
         return if( $x >= $self->width || $y >= $self->height );
@@ -91,19 +91,20 @@ sub get_bit {
 sub _reset_buffer {
     my( $self, $w, $h ) = @_;
     
+    # change the width ? extend each column vector
+    if( $w > $self->width ) {
+        for my $vector (  @{ $self->buffer } ) {
+            $vector->Resize( $w );
+        }
+        $self->width( $w );
+    }
+    
     # change the height ? - add a new bit vector for every row
     if( $h > $self->height ) {
         for (my $i = 0; $i < $h - $self->height; $i++) {
             push @{ $self->buffer }, Bit::Vector->new( $self->width );
         }
         $self->height( $h );
-    }
-    # change the width ? extend each column vector
-    if( $w > $self->width ) {
-        for my $vector (  @{$self->buffer} ) {
-            $vector->Resize( $w );
-        }
-        $self->width( $w );
     }
     
     return;

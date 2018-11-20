@@ -27,10 +27,6 @@ push @dir_files, scalar readdir($dir_fh);
 my $base = basename $filename;
 is( [ sort @dir_files ], [ sort( qw/. .. /, $base ) ], "We read 3 entries in some order. Not predictable, but sort fixes that!" );
 is( scalar readdir($dir_fh), undef, "undef when nothing left from readdir." );
-my ( undef, $f2 ) = tempfile( DIR => $temp_dir );
-$base = basename $f2;
-ok( -e $f2, "File 2 ($f2) exists but...." );
-is( scalar readdir($dir_fh), undef, "readdir doesn't see it since it's there after the opendir." );
 is( closedir($dir_fh),       1,     "close the fake dir handle" );
 
 like( warning { readdir($dir_fh) }, qr/^readdir\(\) attempted on invalid dirhandle \S+ /, "warn on readdir when file handle is closed." );

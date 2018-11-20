@@ -23,7 +23,7 @@ has level      => ( required => 1 );    # Enum [qw[ERROR WARN]]
 has call_stack => ( required => 1 );
 has timestamp  => ( required => 1 );
 
-has exit_code => ( is => 'lazy' );
+has exit_code  => ( is => 'lazy' );
 has with_trace => 1;
 
 has longmess  => ( is => 'lazy', init_arg => undef );

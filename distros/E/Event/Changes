@@ -1,3 +1,6 @@
+1.27 2018-11-17
+  - only Zero(Polld) if not NULL (reported by @andk, thanks!)
+
 1.26 2015-06-13
   - fix doc typos (Lucas Kanashiro)
 

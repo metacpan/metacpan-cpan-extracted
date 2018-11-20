@@ -5,7 +5,7 @@ BEGIN {
 # ABSTRACT: A bundle of MIDI and music modules
 use strict;
 use warnings;
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 1;
 
 __END__
@@ -20,7 +20,7 @@ Task::MusicBundle - A bundle of MIDI and music modules
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -39,14 +39,6 @@ or use rt.cpan.org.
 
 Modules marked with a date, in the C<CONTENTS>, are 10 years or older. But so
 what?  B<Music is older than agriculture.>
-
-* L<File::Format::RIFF> is a dependency of L<MIDI::SoundFont> that I had to
-install separately, for some reason.  L<String::Approx> is a "sub-dependency"
-included for the same reason.
-
-=head1 NAME
-
-Task::MusicBundle - A bundle of MIDI and music modules
 
 =head1 CONTENTS
 
@@ -128,37 +120,13 @@ L<Music::Tempo> - Aug 08, 2003
 
 L<Music::Tension>
 
+L<Music::ToRoman>
+
 L<Music::VoiceGen>
 
 L<Music::Voss>
 
 L<Text::Chord::Piano>
-
-=head1 TO DO
-
-* Install in order of reverse dependency somehow?
-
-* Maybe include:
-
-L<BokkaKumiai>,
-
-L<GD::Chord::Piano>,
-
-L<GD::Tab::Guitar>,
-
-L<MIDI::XML> - Jan 24, 2003 - This has Tk as a dependency - for an XML module. Sorry not including.
-
-L<Music::Image::Chord> - Oct 03, 2003,
-
-L<PDL::Audio>,
-
-L<POE::Framework::MIDI> - Mar 19, 2006,
-
-L<Syntax::Highlight::Engine::Kate::LilyPond>,
-
-L<Syntax::Highlight::Engine::Kate::Music_Publisher>,
-
-L<Win32API::MIDI> - Apr 13, 2003.
 
 =head1 AUTHOR
 

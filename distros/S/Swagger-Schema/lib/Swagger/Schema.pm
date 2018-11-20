@@ -13,7 +13,7 @@ coerce 'Swagger::Schema::Parameter',
    };
 
 package Swagger::Schema {
-  our $VERSION = '1.02';
+  our $VERSION = '1.03';
   #ABSTRACT: Object model for Swagger schema files
   use MooseX::DataModel;
   use Moose::Util::TypeConstraints;
@@ -237,6 +237,7 @@ package Swagger::Schema::Operation {
   object responses => (isa => 'Swagger::Schema::Response');
   array schemes => (isa => 'Str');
   key deprecated => (isa => 'Bool');
+  key x_ms_long_running_operation => (isa => 'Bool', location => 'x-ms-long-running-operation');
   #key security => (isa =>
   #TODO: x-^ fields  
 }

@@ -1,8 +1,9 @@
+1.03 2018 Nov 19
+ - add namespace::autoclean as dependency
 1.02 2017 Sept 18
  - additionalProperties is a Swagger::Schema object (as per https://github.com/OAI/OpenAPI-Specification/issues/668)
  - Swagger schemes is an array (not a key)
  - use autoclean to clean up the methods that MooseX::DataModel injects
-
 1.01 2017 Sept 6
  - exclusiveMaximum and exclusiveMinimum were declared 
    as Ints, when in reality they are Bool as per the spec

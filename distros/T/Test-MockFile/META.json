@@ -1,10 +1,10 @@
 {
-   "abstract" : "Lets tests validate code which interacts with files without the file system ever being touched. ",
+   "abstract" : "Allows tests to validate code that can interact with files without touching the file system.",
    "author" : [
       "Todd Rinaldo <toddr@cpanel.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -53,6 +53,6 @@
          "url" : "https://github.com/cpanelinc/Test-MockFile"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

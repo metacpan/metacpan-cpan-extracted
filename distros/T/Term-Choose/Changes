@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.632   2018-11-17
+    - Bugfix string concatenation in substitution.
+
+1.631   2018-11-17
+    - If 'll' is set, no copy of the passed list is made no matter if 'color' is enabled or not.
 
 1.630   2018-11-16
     - Update option 'color'.

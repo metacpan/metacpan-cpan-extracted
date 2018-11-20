@@ -8,6 +8,7 @@ use Data::Dumper;
 use File::Basename 'basename';
 use FindBin;
 use POSIX();
+use Encode 'encode';
 
 use Test::More 'no_plan';
 
@@ -36,6 +37,31 @@ my $DBL_MIN = POSIX::DBL_MIN();
 
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
+
+# String arguments and return value
+{
+  # String - UTF-8 string, new_string, new_string_from_binary, to_string, to_binary
+  {
+    my $string1 = SPVM::new_string("あいう");
+    my $string2 = SPVM::new_string_from_binary(encode('UTF-8', "えお"));
+    my $string3 = TestCase::PerlAPI->string_argments_and_return_value($string1, $string2);
+    isa_ok($string3, 'SPVM::Data::String');
+    is($string3->to_string, "あいうえお");
+    is($string3->to_binary, encode('UTF-8', "あいうえお"));
+  }
+
+  # String - ascii string, new_string, new_string_from_binary, to_string, to_binary, to_element
+  {
+    my $string1 = SPVM::new_string_from_binary("abc");
+    my $string2 = SPVM::new_string("de");
+    my $string3 = TestCase::PerlAPI->string_argments_and_return_value($string1, $string2);
+    isa_ok($string3, 'SPVM::Data::String');
+    is($string3->to_string, "abcde");
+    is($string3->to_binary, "abcde");
+    is_deeply($string3->to_elements, [ord('a'), ord('b'), ord('c'), ord('d'), ord('e')]);
+  }
+
+}
 
 # Argument is value reference and numeric reference mixed
 {
@@ -181,7 +207,7 @@ is_deeply(
 );
 =cut
 
-# SPVM new_object_array_len
+# SPVM new_object_array
 {
 
   # element object array

@@ -4,7 +4,7 @@ Photonic::Retarded::GreenP
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ Criteria of convergence. 0 means don't check. From Photonic::Roles::EpsParams.
 =cut
 
 package Photonic::Retarded::GreenP;
-$Photonic::Retarded::GreenP::VERSION = '0.009';
+$Photonic::Retarded::GreenP::VERSION = '0.010';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -152,6 +152,23 @@ sub evaluate {
     $self->_Gpp($u*$g0b02/($epsA*$fn));
     return $self->Gpp;
 }
+
+#sub storeAllH {
+#    my $self=shift;
+#    my $nh=$self->nh;
+#    my $polr=$self->haydock->polarization->re;
+#    my $poli=$self->haydock->polarization->im;
+#    my $filename="nh_$nh-pol_$polr.i$poli";
+#    my @states=@{$self->haydock->states};
+#    open(OUT, ">", $filename) or die "Couldn't open $filename for writing. $!";
+#    print OUT "@states";
+#}
+
+#sub forgetstates {
+#        my $self=shift;
+#        undef @{$self->haydock->states} if  $self->haydock->reorthogonalize;
+#}
+
 
 __PACKAGE__->meta->make_immutable;
     

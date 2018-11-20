@@ -10,7 +10,7 @@ use Pcore::App::API;
 use Pcore::CDN;
 
 has app_cfg => ( required => 1 );    # HashRef
-has devel => 0;                      # Bool
+has devel   => 0;                    # Bool
 
 has server => ( init_arg => undef ); # InstanceOf ['Pcore::HTTP::Server']
 has router => ( init_arg => undef ); # InstanceOf ['Pcore::App::Router']
@@ -19,9 +19,6 @@ has node   => ( init_arg => undef ); # InstanceOf ['Pcore::Node']
 has cdn    => ( init_arg => undef ); # InstanceOf['Pcore::CDN']
 
 sub BUILD ( $self, $args ) {
-
-    # apply default HTTP router settings
-    $self->{app_cfg}->{router} //= { '*' => ref $self };
 
     # create HTTP router
     $self->{router} = Pcore::App::Router->new( {
@@ -118,12 +115,10 @@ sub api_call ( $self, @args ) {
 }
 
 sub nginx_cfg ($self) {
-    my $www_storage = $ENV->{share}->get_storage('www');
-
     my $params = {
         name              => lc( ref $self ) =~ s/::/-/smgr,
         data_dir          => $ENV->{DATA_DIR},
-        www_root_dir      => $www_storage ? $www_storage->[0] : undef,                                   # TODO
+        root_dir          => undef,                                                                      # TODO
         default_server    => 1,                                                                          # generate default server config
         nginx_default_key => $ENV->{share}->get('data/nginx/default.key'),
         nginx_default_pem => $ENV->{share}->get('data/nginx/default.pem'),
@@ -249,7 +244,7 @@ sub _init_reload ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 195, 218             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 190, 213             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

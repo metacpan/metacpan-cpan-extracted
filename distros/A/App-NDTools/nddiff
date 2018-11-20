@@ -29,6 +29,8 @@ Where X is an op tag: C<A> (added), C<N> (new value), C<O> (old value), C<R>
 (removed) or C<U> (unchanged). All ops enabled by default, except C<U>. See
 L<Struct::Diff/DIFF FORMAT> for more info about nested diff format.
 
+Ignored when C<--ofmt JSONMERGEPATCH> used.
+
 =item B<--brief>
 
 Show where differences occured, but don't show what exactly changed.
@@ -40,11 +42,6 @@ On/Off colors for diff.
 =item B<--ctx-text> E<lt>intE<gt>
 
 Amount of lines for multiline values context. Default is 3.
-
-=item B<--full-headers>
-
-Print full headers (delta printed by default). B<Deprecated and will be removed
-soon>. C<--no-pretty> should be used instead.
 
 =item B<--grep> E<lt>pathE<gt>
 
@@ -69,7 +66,7 @@ Ignore substructure. May be used several times.
 
 Use JSON as output diff format. It's just a shortcut for C<--ofmt JSON>.
 
-=item B<--ofmt> E<lt>TERM|JSON|YAMLE<gt>
+=item B<--ofmt> E<lt>TERM|JSON|YAML|JSONMERGEPATCH|JSONPATCHE<gt>
 
 Force specified output format usage. C<TERM> is used by default; L<YAML::XS>
 should be installed for YAML support, see L<App::NDTools/LIMITATIONS> for

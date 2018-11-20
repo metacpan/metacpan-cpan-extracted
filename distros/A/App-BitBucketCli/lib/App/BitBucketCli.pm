@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use App::BitBucketCli::Core;
 
-our $VERSION = 0.006;
+our $VERSION = 0.007;
 
 has core => (
     is      => 'ro',
@@ -35,6 +35,11 @@ around BUILDARGS => sub {
         %param = @params;
     }
 
+    # only pass on defined params
+    for my $key (keys %param) {
+        delete $param{$key} if ! defined $param{$key};
+    }
+
     $param{core} = App::BitBucketCli::Core->new(%param);
 
     return $class->$orig(%param);
@@ -50,7 +55,7 @@ App::BitBucketCli - Library for talking to BitBucket Server (or Stash)
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli version 0.006
+This documentation refers to App::BitBucketCli version 0.007
 
 =head1 SYNOPSIS
 

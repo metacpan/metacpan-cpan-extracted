@@ -2,28 +2,28 @@ From: from@example.com
 Subject: Alert Log Message
 To: foo@example.com,bar@example.org
 Date: [^\n]+
-MIME-Version: 1.0
+MIME-Version: 1\.0
 Content-Type: multipart/mixed; boundary="[^"]+"
 Content-Transfer-Encoding: 7bit
 
 
 --\S+
 Date: [^\n]+
-MIME-Version: 1.0
+MIME-Version: 1\.0
 Content-Type: multipart/alternative; boundary="[^"]+"
 Content-Transfer-Encoding: 7bit
 
 
 --\S+
 Date: [^\n]+
-MIME-Version: 1.0
+MIME-Version: 1\.0
 Content-Type: text/plain
 
 This is a generic message: This is to alert you something happened..
 
 --\S+
 Date: [^\n]+
-MIME-Version: 1.0
+MIME-Version: 1\.0
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -34,11 +34,11 @@ b>.</p>=
 
 --\S+
 Date: [^\n]+
-MIME-Version: 1.0
+MIME-Version: 1\.0
 Content-Type: text/plain; name="log_file.txt"
 [^:]+: [^\n]+
 [^:]+: [^\n]+
 
-This is plain text attachment content.=
+\S+=
 
 --[^\-]+--

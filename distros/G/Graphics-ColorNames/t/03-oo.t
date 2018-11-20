@@ -66,4 +66,12 @@ subtest 'load_scheme' => sub {
 
 };
 
+subtest 'autoloading removed' => sub {
+
+    ok $s->rgb('darkgreen'), 'has darkgreen color';
+
+    ok !$s->can('darkgreen'), 'no darkgreen method';
+
+};
+
 done_testing;

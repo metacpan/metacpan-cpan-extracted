@@ -102,15 +102,12 @@ void zmq::own_t::process_term_req (own_t *object_)
     if (_terminating)
         return;
 
-    //  If I/O object is well and alive let's ask it to terminate.
-    owned_t::iterator it = std::find (_owned.begin (), _owned.end (), object_);
-
     //  If not found, we assume that termination request was already sent to
     //  the object so we can safely ignore the request.
-    if (it == _owned.end ())
+    if (0 == _owned.erase (object_))
         return;
 
-    _owned.erase (it);
+    //  If I/O object is well and alive let's ask it to terminate.
     register_term_acks (1);
 
     //  Note that this object is the root of the (partial shutdown) thus, its
@@ -161,7 +158,8 @@ void zmq::own_t::process_term (int linger_)
     zmq_assert (!_terminating);
 
     //  Send termination request to all owned objects.
-    for (owned_t::iterator it = _owned.begin (); it != _owned.end (); ++it)
+    for (owned_t::iterator it = _owned.begin (), end = _owned.end (); it != end;
+         ++it)
         send_term (*it, linger_);
     register_term_acks (static_cast<int> (_owned.size ()));
     _owned.clear ();

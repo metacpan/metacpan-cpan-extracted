@@ -1,0 +1,29 @@
+Revision history for DBIx-Class-Helper-Row-Types:
+
+v0.2.0    2018-11-18 21:04:29+00:00 Europe/London
+  [Enhancements]
+  - Add strict and coerce options to enforce/coerce on set_column.
+
+  [Incompatabilies]
+  - Moved the isa attribute key into the extra.type key, so as to avoid
+    conflicts.
+
+v0.1.2    2018-11-18 16:36:27+00:00 Europe/London
+  [Enhancements]
+  - Removed reliance on Hash::Merge.
+
+  [Other]
+  - Added DBIx::Class as an explicit prerequisite.
+
+  - Removed prereq on namespace::autoclean.
+
+v0.1.1    2018-11-18 12:01:40+00:00 Europe/London
+  [Tests]
+  - Added diagnostics for cpantesters.
+
+v0.1.0    2018-11-18 01:35:56+00:00 Europe/London
+- Initial release on CPAN,
+
+Note that an earlier version was submitted as a pull request to
+DBIx-Class-Helpers.  It was not accepted due to the addition of
+prerequisites for Types::SQL (and implicity Type::Tiny).

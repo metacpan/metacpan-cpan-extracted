@@ -55,7 +55,7 @@ sub generate {
 
     for my $t ( keys %{$task} ) {
         my $bbox = $task->{$t}->{font_obj}->bounding_box( string => $task->{$t}->{text}, size => $task->{$t}->{font_size} );
-        my $dim = _transformed_bounds( $bbox, $task->{$t}->{matrix} );
+        my $dim  = _transformed_bounds( $bbox, $task->{$t}->{matrix} );
 
         my $rx = $task->{$t}->{width} / $dim->{width};
         my $ry = $task->{$t}->{height} / $dim->{height};
@@ -63,7 +63,7 @@ sub generate {
         $task->{$t}->{font_size} *= $k;
 
         my $bbox1 = $task->{$t}->{font_obj}->bounding_box( string => $task->{$t}->{text}, size => $task->{$t}->{font_size} );
-        my $dim1 = _transformed_bounds( $bbox1, $task->{$t}->{matrix} );
+        my $dim1  = _transformed_bounds( $bbox1, $task->{$t}->{matrix} );
 
         $task->{$t}->{_width}  = $dim1->{width};
         $task->{$t}->{_height} = $dim1->{height};

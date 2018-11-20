@@ -7,7 +7,7 @@ use File::Find;
 use File::Slurp;
 use File::Basename qw/dirname/;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -79,6 +79,13 @@ The available hostfile fragments.
 
 A list of the names of available fragments.
 
+=cut
+
+sub fragment_list {
+    my ($self) = @_;
+    return sort { $a cmp $b } keys %{$self->fragments};
+}
+
 =item B<< Str get_fragment( Str $fragment_name ) >>
 
 The contents of an individual hostfile fragment.
@@ -94,7 +101,6 @@ has fragments => (
     lazy    => 1,
     builder => '_load_fragments',
     handles => {
-        fragment_list => 'keys',
         get_fragment  => 'get',
     },
     init_arg => undef,
@@ -282,7 +288,7 @@ __END__
 
 =head1 LICENSE
 
-Copyright (c) 2010-11 Anthony J. Mirabella. All rights reserved.
+Copyright (c) 2010-11,2018 Anthony J. Mirabella. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

@@ -30,10 +30,6 @@ server {
     location / {
         return 301 https://$host$request_uri;
     }
-
-    location /.well-known/acme-challenge/ {
-        alias /var/run/acme/acme-challenge/;
-    }
 }
 
 server {
@@ -50,7 +46,7 @@ server {
     ssl_stapling              off;
 
     keepalive_timeout         70;
-    # root                      <: $www_root_dir :>; # TODO
+    # root                      <: $root_dir :>; # TODO
 
     error_log                 <: $data_dir :>/nginx-error.log info;
     access_log                <: $data_dir :>/nginx-access.log default;

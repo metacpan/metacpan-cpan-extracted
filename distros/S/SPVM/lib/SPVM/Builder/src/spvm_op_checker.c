@@ -35,6 +35,7 @@
 #include "spvm_check_ast_info.h"
 #include "spvm_string_buffer.h"
 #include "spvm_constant_pool.h"
+#include "spvm_use.h"
 
 void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_CHECK_AST_INFO* check_ast_info) {
 
@@ -134,6 +135,11 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 SPVM_OP* op_term_element = op_list_elements->first;
                 int32_t index = 0;
                 while ((op_term_element = SPVM_OP_sibling(compiler, op_term_element))) {
+                  if (op_term_element->id == SPVM_OP_C_ID_ARRAY_LENGTH) {
+                    SPVM_COMPILER_error(compiler, "Can't use @ in array initialization at %s line %d\n", file, line);
+                    return;
+                  }
+                  
                   if (index == 0) {
                     
                     if (op_term_element->id == SPVM_OP_C_ID_UNDEF) {
@@ -1323,7 +1329,18 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               // First value must be array
               if (!SPVM_TYPE_is_array_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "right of @ or len must be array at %s line %d\n", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "right of @ must be array at %s line %d\n", op_cur->file, op_cur->line);
+                return;
+              }
+              
+              break;
+            }
+            case SPVM_OP_C_ID_STRING_LENGTH: {
+              SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
+              
+              // First must be string type
+              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "length argument must be string type at %s line %d\n", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -1764,6 +1781,11 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_OP_CHECKER_check_assign(compiler, dist_type, op_term_src);
               if (compiler->error_count > 0) {
                 return;
+              }
+
+              // If dist is string access and const, it is invalid
+              if (op_term_dist->id == SPVM_OP_C_ID_ARRAY_ACCESS && op_term_dist->flag & SPVM_OP_C_FLAG_ARRAY_ACCESS_CONST) {
+                SPVM_COMPILER_error(compiler, "Can't change each character of string at %s line %d\n", op_term_dist->file, op_term_dist->line);
               }
               
               break;
@@ -2282,7 +2304,6 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 return;
               }
               
-              const char* sub_abs_name = call_sub->sub->abs_name;
               const char* sub_name = call_sub->sub->op_name->uv.name;
               
               int32_t sub_args_count = call_sub->sub->args->length;
@@ -2360,6 +2381,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   
                   SPVM_OP* op_term_element = op_list_args->first;
                   while ((op_term_element = SPVM_OP_sibling(compiler, op_term_element))) {
+
                     op_term_element->no_need_check = 1;
 
                     if (arg_index < sub_args_count - 1) {
@@ -2421,8 +2443,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   SPVM_OP* op_term = op_list_args->first;
                   while ((op_term = SPVM_OP_sibling(compiler, op_term))) {
                     call_sub_args_count++;
+                    if (op_term->id == SPVM_OP_C_ID_ARRAY_LENGTH) {
+                      SPVM_COMPILER_error(compiler, "Can't use @ in subroutine arguments at %s line %d\n", op_cur->file, op_cur->line);
+                      return;
+                    }
+
                     if (call_sub_args_count > sub_args_count) {
-                      SPVM_COMPILER_error(compiler, "Too many arguments \"%s\" at %s line %d\n", sub_abs_name, op_cur->file, op_cur->line);
+                      SPVM_COMPILER_error(compiler, "Too many arguments \"%s\" at %s line %d\n", sub_name, op_cur->file, op_cur->line);
                       return;
                     }
                     
@@ -2439,7 +2466,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 }
                 
                 if (call_sub_args_count < sub_args_count) {
-                  SPVM_COMPILER_error(compiler, "Too few argument. sub \"%s\" at %s line %d\n", sub_abs_name, op_cur->file, op_cur->line);
+                  SPVM_COMPILER_error(compiler, "Too few argument. sub \"%s\" at %s line %d\n", sub_name, op_cur->file, op_cur->line);
                   return;
                 }
                 
@@ -2526,10 +2553,18 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
               
-              // Left value must be array
-              if (!SPVM_TYPE_is_array_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "left value must be array at %s line %d\n", op_cur->file, op_cur->line);
+              // Left value must be array or string
+              if (!SPVM_TYPE_is_array_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag) &&
+                !SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)
+              )
+              {
+                SPVM_COMPILER_error(compiler, "Array access invocant must be array or string at %s line %d\n", op_cur->file, op_cur->line);
                 return;
+              }
+              
+              // String access is const
+              if (SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                op_cur->flag |= SPVM_OP_C_FLAG_ARRAY_ACCESS_CONST;
               }
               
               // Right value must be integer
@@ -4189,49 +4224,84 @@ void SPVM_OP_CHECKER_resolve_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_call_
   SPVM_SUB* found_sub;
   
   const char* sub_name = call_sub->op_name->uv.name;
-  // $obj->sub_name
+  // Method call
   if (call_sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD) {
     SPVM_TYPE* type = SPVM_OP_get_type(compiler, call_sub->op_invocant);
     const char* basic_type_name = type->basic_type->name;
-    const char* sub_abs_name = SPVM_OP_create_abs_name(compiler, basic_type_name, sub_name);
     
-    found_sub= SPVM_HASH_fetch(
-      compiler->sub_symtable,
-      sub_abs_name,
-      strlen(sub_abs_name)
-    );
-  }
-  else {
-    // Package->sub_name
-    if (call_sub->op_invocant) {
-      const char* package_name = call_sub->op_invocant->uv.type->basic_type->name;
-      const char* sub_abs_name = SPVM_OP_create_abs_name(compiler, package_name, sub_name);
-      found_sub= SPVM_HASH_fetch(
-        compiler->sub_symtable,
-        sub_abs_name,
-        strlen(sub_abs_name)
+    SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, basic_type_name, strlen(basic_type_name));
+    
+    if (package) {
+      found_sub = SPVM_HASH_fetch(
+        package->sub_symtable,
+        sub_name,
+        strlen(sub_name)
       );
     }
-    // sub_name
+    else {
+      found_sub = NULL;
+    }
+  }
+  // Class method call
+  else {
+    if (call_sub->op_invocant) {
+      const char* package_name = call_sub->op_invocant->uv.type->basic_type->name;
+      SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, package_name, strlen(package_name));
+      
+      if (package) {
+        found_sub = SPVM_HASH_fetch(
+          package->sub_symtable,
+          sub_name,
+          strlen(sub_name)
+        );
+      }
+      else {
+        found_sub = NULL;
+      }
+    }
+    // Subroutine call
     else {
       // Search current pacakge
       SPVM_PACKAGE* package = op_package_current->uv.package;
-      const char* package_name = package->op_name->uv.name;
-      const char* sub_abs_name = SPVM_OP_create_abs_name(compiler, package_name, sub_name);
-      found_sub= SPVM_HASH_fetch(
-        compiler->sub_symtable,
-        sub_abs_name,
-        strlen(sub_abs_name)
+      found_sub = SPVM_HASH_fetch(
+        package->sub_symtable,
+        sub_name,
+        strlen(sub_name)
       );
       
-      // Search SPVM::CORE
+      // Search imported subs
+      SPVM_LIST* op_uses = package->op_uses;
+      if (op_uses) {
+        for (int32_t use_index = 0; use_index < op_uses->length; use_index++) {
+          SPVM_OP* op_use = SPVM_LIST_fetch(op_uses, use_index);
+          SPVM_TYPE* type = op_use->uv.use->op_type->uv.type;
+          const char* basic_type_name = type->basic_type->name;
+          SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, basic_type_name, strlen(basic_type_name));
+          assert(package);
+          
+          SPVM_LIST* import_sub_names = op_use->uv.use->sub_names;
+          if (import_sub_names) {
+            for (int32_t import_sub_name_index = 0; import_sub_name_index < import_sub_names->length; import_sub_name_index++) {
+              const char* import_sub_name = SPVM_LIST_fetch(import_sub_names, import_sub_name_index);
+              if (strcmp(sub_name, import_sub_name) == 0) {
+                found_sub = SPVM_HASH_fetch(
+                  package->sub_symtable,
+                  sub_name,
+                  strlen(sub_name)
+                );
+              }
+            }
+          }
+        }
+      }
+      
+      // Search core functions
       if (!found_sub) {
-        sub_abs_name = SPVM_OP_create_abs_name(compiler, "SPVM::CORE", sub_name);
-        
+        SPVM_PACKAGE* core_package = SPVM_HASH_fetch(compiler->package_symtable, "SPVM::CORE", strlen("SPVM::CORE"));
         found_sub= SPVM_HASH_fetch(
-          compiler->sub_symtable,
-          sub_abs_name,
-          strlen(sub_abs_name)
+          core_package->sub_symtable,
+          sub_name,
+          strlen(sub_name)
         );
       }
     }

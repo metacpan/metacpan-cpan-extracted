@@ -8,17 +8,19 @@ use Data::RecordStore;
 use File::Copy;
 use File::Path qw( make_path );
 
-die "Converter requires Data::RecordStore version of at least 3.1" unless $Data::RecordStore::VERSION >= 3.1;
+die "$0 : requires Data::RecordStore version of at least 4" unless $Data::RecordStore::VERSION >= 4;
 
 my( $source_dir, $dest_dir ) = @ARGV;
 die "Usage: $0 source_dir destination_dir" unless $source_dir && $dest_dir;
-die "source_dir and destination_dir may not be the same" if $source_dir eq $dest_dir;
+die "$0 : source_dir and destination_dir may not be the same" if $source_dir eq $dest_dir;
 
-die "Directory '$dest_dir' already exists" if -d $dest_dir;
+die "$0 : Directory '$dest_dir' already exists" if -d $dest_dir;
 
 my $source_version = 1;
 my( $source_obj_idx_file, $dest_obj_idx_file );
 convert( $source_dir, $dest_dir );
+
+exit;
 
 =head2 convert( $source_dir, $dest_dir )
 
@@ -31,8 +33,8 @@ sub convert {
     my( $source_dir, $dest_dir ) = @ARGV;
     die "Usage : converter.pl <db source dir> <db target dir>" unless $source_dir && $dest_dir;
 
-    $source_obj_idx_file = "$source_dir/OBJ_INDEX";
-    $dest_obj_idx_file = "$dest_dir/RECORD_INDEX";
+    $source_obj_idx_file = "$source_dir/RECORD_INDEX_SILO";
+    $dest_obj_idx_file = "$dest_dir/RECORD_INDEX_SILO";
     die "Database not found in directory '$source_dir'" unless -e $source_obj_idx_file;
 
     my $ver_file = "$source_dir/VERSION";
@@ -43,9 +45,12 @@ sub convert {
         close $FH;
     }
 
-    if( $source_version >= 3.1 ) {
+    if( $source_version >= 4 ) {
         print STDERR "Database at '$source_dir' already at version $source_version. Doing nothing\n";
-        exit;
+        exit;        
+    }
+    elsif ( $source_version >= 3.1 ) {
+        convert_3_1_to_4();
     }
     elsif ( $source_version == 3 ) {
         convert_3_to_3_1();
@@ -493,7 +498,7 @@ sub convert_3_to_3_1 {
 
     print STDERR "Starting Convertes from $source_version to $Data::RecordStore::VERSION\n";
     # copy the OBJ_INDEX --> RECORD_INDEX_SILO
-    `cp -R $source_dir/OBJ_INDEX $dest_dir/RECORD_INDEX_SILO`;
+    system( "cp", "-R", "$source_dir/OBJ_INDEX", "$dest_dir/RECORD_INDEX_SILO" );
 
     make_path( "$dest_dir/silos" );
 
@@ -529,3 +534,54 @@ sub convert_3_to_3_1 {
     print STDERR "Done. Remember that your new database is in $dest_dir and your old one is in $source_dir\n";
 
 } #convert_3_to_3_1
+
+sub convert_3_1_to_4 {
+
+    print STDERR "Converting from $source_dir/RECORD_INDEX_SILO to $dest_dir/RECORD_INDEX_SILO\n";
+    # copy the OBJ_INDEX --> RECORD_INDEX_SILO
+    my $source_index = Data::RecordStore::Silo->open_silo( "IL", "$source_dir/RECORD_INDEX_SILO" );
+    my $dest_index = Data::RecordStore::Silo->open_silo( "IL", "$dest_dir/RECORD_INDEX_SILO" );
+    my $entries = $source_index->entry_count;
+    my( @source_silos, @dest_silos );
+    print STDERR "Converting $entries entries\n";
+    for my $id ( 1..$entries ) {
+        my $rec = $source_index->get_record($id);
+        my( $silo_id, $silo_idx ) = @$rec;
+        next unless $silo_id;
+        print STDERR "loading $id from old silo $silo_id/$silo_idx\n";
+        my $silo = $source_silos[ $silo_id ];
+        unless( $silo ) {
+            $silo = Data::RecordStore::Silo->open_silo( "LIZ*", 
+                                                        "$source_dir/silos/${silo_id}_RECSTORE", int(exp($silo_id)) ),
+            $source_silos[ $silo_id ] = $silo;
+        }
+        my $data = $silo->get_record( $silo_idx );
+        ( my $id, my $uue, $data ) = @$data;
+        if( $uue ) {
+            $data = unpack 'u', $data;
+        }
+        my $save_size = 5 + do { use bytes; length( $data ); };
+        $silo_id = 12;
+        if( $save_size > 4096 ) {
+            $silo_id = log( $save_size ) / log( 2 );
+            if( $silo_id > int($silo_id) ) {
+                $silo_id = 1 + int($silo_id);
+            }
+        }
+        $silo = $dest_silos[ $silo_id ];
+        unless( $silo ) {
+            $silo = Data::RecordStore::Silo->open_silo( "LZ*", 
+                                                        "$dest_dir/silos/${silo_id}_RECSTORE", 2 ** $silo_id ),
+            $dest_silos[ $silo_id ] = $silo;
+        }
+        my $sid = $silo->push( [ $id, $data ] );
+        
+        $dest_index->_ensure_entry_count( $id );
+        $dest_index->put_record( $id, [ $silo_id, $sid ] );
+        print STDERR " put entry $id into $silo_id/$sid\n";
+    } #each entry
+    open my $ver, ">", "$dest_dir/VERSION";
+    print $ver "$Data::RecordStore::VERSION\n";
+    close $ver;
+    print STDERR "DONE Converting from $source_dir/RECORD_INDEX_SILO to $dest_dir/RECORD_INDEX_SILO\n";   
+} #convert_3_1_to_4

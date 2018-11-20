@@ -1,0 +1,76 @@
+
+Release history for Data-Bool
+
+2.98014   2018-11-17 17:29:27-08:00 America/Los_Angeles
+
+   - Rename namespace to Data::Bool (from Types::Bool)
+
+2.98013   2018-11-17 16:06:13-08:00 America/Los_Angeles (NOT RELEASED)
+
+   - Minor fixes to documentation
+   - Fix a mistake in documenting new()
+
+2.98012   2018-08-18 17:37:15-07:00 America/Los_Angeles
+
+   - Rename BOOL_CORE to BOOL_PACKAGE
+   - Make BOOL_PACKAGE exportable
+   - Rearrange POD sections
+
+2.98011   2018-05-14 18:19:25-07:00 America/Los_Angeles
+
+   - Detach Types::Bool and the implementation package for booleans
+   - Types::Bool::BOOL_CORE ≡ JSON::PP::Boolean
+   - Only overloads and new() at implementation package
+
+   [others]
+   - Test fix for Perl < 5.8.3
+   - new() method for booleans
+
+2.98010   2018-05-10 10:12:20-07:00 America/Los_Angeles
+
+   - TYPES_BOOL_LOUD=1
+   - TYPES_BOOL_NICE=1
+
+2.98009   2018-05-09 14:34:09-07:00 America/Los_Angeles
+
+   - Fix generated t/after-*.t tests
+
+2.98008   2018-05-09 13:42:03-07:00 America/Los_Angeles
+
+   - Better cooperation with JSON::PP
+   - Make modules needed for tests soft dependencies
+
+2.98007   2018-05-09 10:52:48-07:00 America/Los_Angeles
+
+   - Add generated tests loading JSON::PP, Types::Serialiser, and Cpanel::JSON::XS before and
+     after Types::Bool
+
+2.98006   2018-05-09 09:09:24-07:00 America/Los_Angeles
+
+   - First non-development release
+
+2.98005   2018-05-08 17:02:14-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+   - Fix warning about masked "my" variables
+   - More tests
+
+2.98004   2018-05-08 10:40:57-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+   - Documentation: "COMPATIBILITY" section
+
+2.98003   2018-05-07 18:32:43-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+   - Documentation: overloaded operations are part of interface
+
+2.98002   2018-05-07 17:30:14-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+   - Get rid of unwanted files in last tarball
+
+2.98001   2018-05-07 14:29:29-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+   - Bump version - greater than current JSON::PP::Boolean version
+   - Fix SYNOPSIS
+
+0.1.0     2018-05-07 11:19:11-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+   - Initial version

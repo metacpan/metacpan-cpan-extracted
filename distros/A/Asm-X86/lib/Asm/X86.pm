@@ -40,23 +40,22 @@ use strict;
 
 =head1 NAME
 
-Asm::X86 - List of instructions and registers of Intel x86-compatible processors,
- validating and converting instructions and memory references.
+Asm::X86 - List of instructions and registers of x86-compatible processors, validating and converting instructions and memory references.
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 =head1 DESCRIPTION
 
 This module provides the user with the ability to check whether a given
 string represents an x86 processor register or instruction. It also provides
 lists of registers and instructions and allows to check if a given
-expression is a valid addressing mode. Other subrotuines include converting
+expression is a valid addressing mode. Other subroutines include converting
 between AT&T and Intel syntaxes.
 
 =head1 SYNOPSIS
@@ -323,7 +322,7 @@ our @instr_intel = (
 	'blendpd', 'blendps', 'blendvpd', 'blendvps', 'blsfill', 'blsi', 'blsic', 'blsmsk', 'blsr',
 	'bnd', 'bndcl', 'bndcn', 'bndcu', 'bndldx', 'bndmk', 'bndmov', 'bndstx',
 	'bound', 'bsf', 'bsr', 'bswap', 'bt', 'btc', 'btr', 'bts', 'bzhi', 'call', 'cbw',
-	'cdq', 'cdqe', 'clac', 'clc', 'cld', 'clflush', 'clflushopt', 'clgi', 'cli', 'clts', 'clzero',
+	'cdq', 'cdqe', 'clac', 'clc', 'cld', 'cldemote', 'clflush', 'clflushopt', 'clgi', 'cli', 'clts', 'clzero',
 	'clwb', 'cmc', 'cmova', 'cmovae', 'cmovb', 'cmovbe', 'cmovc', 'cmove', 'cmovg', 'cmovge',
 	'cmovl', 'cmovle', 'cmovna', 'cmovnae', 'cmovnb', 'cmovnbe', 'cmovnc',
 	'cmovne', 'cmovng', 'cmovnge', 'cmovnl', 'cmovnle', 'cmovno', 'cmovnp',
@@ -347,7 +346,8 @@ our @instr_intel = (
 	'cvtpd2ps', 'cvtph2ps', 'cvtpi2pd', 'cvtpi2ps', 'cvtps2dq', 'cvtps2pd', 'cvtps2ph',
 	'cvtps2pi', 'cvtsd2si', 'cvtsd2ss', 'cvtsi2sd', 'cvtsi2ss', 'cvtss2sd', 'cvtss2si', 'cvttpd2dq',
 	'cvttpd2pi', 'cvttps2dq', 'cvttps2pi', 'cvttsd2si', 'cvttss2si', 'cwd', 'cwde', 'daa', 'das',
-	'dec', 'div', 'divpd', 'divps', 'divsd', 'divss', 'dmint', 'dppd', 'dpps', 'emms', 'enter',
+	'dec', 'div', 'divpd', 'divps', 'divsd', 'divss', 'dmint', 'dppd',
+	'dpps', 'emms', 'encls', 'enclu', 'enclv', 'enter',
 	'equ', 'extractps', 'extrq', 'f2xm1', 'fabs', 'fadd', 'faddp', 'fbld', 'fbstp', 'fchs', 'fclex',
 	'fcmovb', 'fcmovbe', 'fcmove', 'fcmovnb', 'fcmovnbe', 'fcmovne', 'fcmovnu', 'fcmovu', 'fcom',
 	'fcomi', 'fcomip', 'fcomp', 'fcompp', 'fcos', 'fdecstp', 'fdisi', 'fdiv', 'fdivp', 'fdivr',
@@ -363,7 +363,7 @@ our @instr_intel = (
 	'fscale', 'fsetpm', 'fsin', 'fsincos', 'fsqrt', 'fst', 'fstcw', 'fstenv', 'fstenvd', 'fstenvw', 'fstp', 'fstsw',
 	'fsub', 'fsubp', 'fsubr', 'fsubrp', 'ftst', 'fucom', 'fucomi', 'fucomip', 'fucomp', 'fucompp',
 	'fwait', 'fxam', 'fxch', 'fxrstor', 'fxrstor64', 'fxsave', 'fxsave64',
-	'fxtract', 'fyl2x', 'fyl2xp1', 'getsec', 'haddpd',
+	'fxtract', 'fyl2x', 'fyl2xp1', 'getsec', 'gf2p8affineinvqb', 'gf2p8affineqb', 'gf2p8mulb', 'haddpd',
 	'haddps', 'hint_nop0', 'hint_nop1', 'hint_nop10', 'hint_nop11', 'hint_nop12', 'hint_nop13',
 	'hint_nop14','hint_nop15', 'hint_nop16', 'hint_nop17', 'hint_nop18', 'hint_nop19', 'hint_nop2',
 	'hint_nop20', 'hint_nop21', 'hint_nop22', 'hint_nop23', 'hint_nop24', 'hint_nop25', 'hint_nop26',
@@ -393,7 +393,7 @@ our @instr_intel = (
 	'loopzd', 'loopzq', 'loopzw', 'lsl', 'lss', 'ltr', 'lwpins', 'lwpval', 'lzcnt', 'maskmovdqu',
 	'maskmovq', 'maxpd', 'maxps', 'maxsd', 'maxss', 'mfence', 'minpd', 'minps', 'minsd',
 	'minss', 'monitor', 'monitorx', 'montmul', 'mov', 'movapd',
-	'movaps', 'movbe', 'movd', 'movddup', 'movdq2q',
+	'movaps', 'movbe', 'movd', 'movddup', 'movdir64b', 'movdiri', 'movdq2q',
 	'movdqa', 'movdqu', 'movhlps', 'movhpd', 'movhps', 'movlhps', 'movlpd', 'movlps', 'movmskpd',
 	'movmskps', 'movntdq', 'movntdqa', 'movnti', 'movntpd', 'movntps', 'movntq', 'movntsd',
 	'movntss', 'movq', 'movq2dq', 'movsb', 'movsd', 'movshdup', 'movsldup', 'movsq', 'movss',
@@ -415,7 +415,8 @@ our @instr_intel = (
 	'pcomltw', 'pcommit', 'pcomneqb', 'pcomneqd', 'pcomneqq', 'pcomnequb', 'pcomnequd', 'pcomnequq',
 	'pcomnequw', 'pcomneqw', 'pcomq', 'pcomtrueb', 'pcomtrued', 'pcomtrueq', 'pcomtrueub',
 	'pcomtrueud', 'pcomtrueuq', 'pcomtrueuw', 'pcomtruew', 'pcomub', 'pcomud', 'pcomuq', 'pcomuw',
-	'pcomw', 'pdep', 'pdistib', 'permpd', 'permps', 'pext', 'pextrb', 'pextrd', 'pextrq', 'pextrw', 'pf2id',
+	'pcomw', 'pconfig', 'pdep', 'pdistib', 'permpd', 'permps', 'pext', 'pextrb',
+	'pextrd', 'pextrq', 'pextrw', 'pf2id',
 	'pf2iw', 'pfacc', 'pfadd', 'pfcmpeq', 'pfcmpge', 'pfcmpgt', 'pfmax', 'pfmin', 'pfmul',
 	'pfnacc', 'pfpnacc', 'pfrcp', 'pfrcpit1', 'pfrcpit2', 'pfrcpv', 'pfrsqit1', 'pfrsqrt',
 	'pfrsqrtv', 'pfsub', 'pfsubr', 'phaddbd', 'phaddbq', 'phaddbw', 'phaddd', 'phadddq', 'phaddsw',
@@ -434,7 +435,7 @@ our @instr_intel = (
 	'pshab', 'pshad', 'pshaq', 'pshaw', 'pshlb', 'pshld', 'pshlq', 'pshlw', 'pshufb', 'pshufd',
 	'pshufhw', 'pshuflw', 'pshufw', 'psignb', 'psignd', 'psignw', 'pslld', 'pslldq', 'psllq',
 	'psllw', 'psrad', 'psraw', 'psrld', 'psrldq', 'psrlq', 'psrlw', 'psubb', 'psubd', 'psubq',
-	'psubsb', 'psubsiw', 'psubsw', 'psubusb', 'psubusw', 'psubw', 'pswapd', 'ptest', 'punpckhbw',
+	'psubsb', 'psubsiw', 'psubsw', 'psubusb', 'psubusw', 'psubw', 'pswapd', 'ptest', 'ptwrite', 'punpckhbw',
 	'punpckhdq', 'punpckhqdq', 'punpckhwd', 'punpcklbw', 'punpckldq', 'punpcklqdq', 'punpcklwd',
 	'push', 'pusha', 'pushad', 'pushaw', 'pushd', 'pushf', 'pushfd', 'pushfq', 'pushfw', 'pushq',
 	'pushw', 'pxor', 'rcl',	'rcpps', 'rcpss', 'rcr', 'rdfsbase', 'rdgsbase', 'rdm', 'rdmsr',
@@ -452,9 +453,10 @@ our @instr_intel = (
 	'skinit', 'sldt', 'slwpcb', 'smi', 'smint', 'smintold', 'smsw', 'sqrtpd', 'sqrtps', 'sqrtsd',
 	'sqrtss', 'stac', 'stc', 'std', 'stgi', 'sti', 'stmxcsr', 'stosb', 'stosd', 'stosq', 'stosw', 'str', 'sub',
 	'subpd', 'subps', 'subsd', 'subss', 'svdc', 'svldt', 'svts', 'swapgs', 'syscall', 'sysenter',
-	'sysexit', 'sysexitq', 'sysret', 'sysretq', 't1mskc', 'test', 'tzcnt', 'tzmsk',
-	'ucomisd', 'ucomiss', 'ud0', 'ud1', 'ud2', 'ud2a', 'ud2b', 'umov',
-	'unpckhpd', 'unpckhps', 'unpcklpd', 'unpcklps', 'useavx256', 'useavx512',
+	'sysexit', 'sysexitq', 'sysret', 'sysretq', 't1mskc', 'test', 'tpause', 'tzcnt', 'tzmsk',
+	'ucomisd', 'ucomiss', 'ud0', 'ud1', 'ud2', 'ud2a', 'ud2b', 'umonitor', 'umov',
+	'umwait', 'unpckhpd', 'unpckhps', 'unpcklpd', 'unpcklps', 'useavx256', 'useavx512',
+	'v4dpwssd', 'v4dpwssds', 'v4fmaddps', 'v4fmaddss', 'v4fnmaddps', 'v4fnmaddss',
 	'vaddpd', 'vaddps', 'vaddsd', 'vaddss', 'vaddsubpd', 'vaddsubps', 'vaesdec',
 	'vaesdeclast', 'vaesenc', 'vaesenclast', 'vaesimc', 'vaeskeygenassist', 'valignd',
 	'valignq', 'vandnpd', 'vandnps', 'vandpd', 'vandps', 'vblendmpd',
@@ -547,7 +549,8 @@ our @instr_intel = (
 	'vgatherpf0dpd', 'vgatherpf0dps', 'vgatherpf0qpd', 'vgatherpf0qps',
 	'vgatherpf1dpd', 'vgatherpf1dps', 'vgatherpf1qpd', 'vgatherpf1qps',
 	'vgatherqpd', 'vgatherqps', 'vgetexppd', 'vgetexpps', 'vgetexpsd', 'vgetexpss',
-	'vgetmantpd', 'vgetmantps', 'vgetmantsd', 'vgetmantss', 'vhaddpd', 'vhaddps', 'vhsubpd',
+	'vgetmantpd', 'vgetmantps', 'vgetmantsd', 'vgetmantss', 'vgf2p8affineinvqb',
+	'vgf2p8affineqb', 'vgf2p8mulb', 'vhaddpd', 'vhaddps', 'vhsubpd',
 	'vhsubps', 'vinsertf128', 'vinsertf32x4', 'vinsertf32x8',
 	'vinsertf64x2', 'vinsertf64x4', 'vinserti128', 'vinserti32x4', 'vinserti32x8', 'vinserti64x2',
 	'vinserti64x4', 'vinsertps', 'vlddqu', 'vldmxcsr', 'vldqqu', 'vmaskmovdqu',
@@ -574,8 +577,8 @@ our @instr_intel = (
 	'vpcmpltud', 'vpcmpltuq', 'vpcmpneqd', 'vpcmpneqq', 'vpcmpnequd', 'vpcmpnequq',
 	'vpcmpnled', 'vpcmpnleq', 'vpcmpnleud', 'vpcmpnleuq', 'vpcmpnltd', 'vpcmpnltq',
 	'vpcmpnltud', 'vpcmpnltuq', 'vpcmpq', 'vpcmpub', 'vpcmpud', 'vpcmpuq', 'vpcmpuw',
-	'vpcmpw', 'vpcomb', 'vpcomd', 'vpcompressd',
-	'vpcompressq', 'vpcomeqb', 'vpcomeqd', 'vpcomeqq', 'vpcomequb', 'vpcomequd', 'vpcomequq',
+	'vpcmpw', 'vpcomb', 'vpcomd', 'vpcompressb', 'vpcompressd', 'vpcompressq', 'vpcompressw',
+	'vpcomeqb', 'vpcomeqd', 'vpcomeqq', 'vpcomequb', 'vpcomequd', 'vpcomequq',
 	'vpcomequw', 'vpcomeqw', 'vpcomfalseb', 'vpcomfalsed', 'vpcomfalseq', 'vpcomfalseub',
 	'vpcomfalseud', 'vpcomfalseuq', 'vpcomfalseuw', 'vpcomfalsew', 'vpcomgeb', 'vpcomged',
 	'vpcomgeq', 'vpcomgeub', 'vpcomgeud', 'vpcomgeuq', 'vpcomgeuw', 'vpcomgew', 'vpcomgtb',
@@ -586,12 +589,13 @@ our @instr_intel = (
 	'vpcomnequq', 'vpcomnequw', 'vpcomneqw', 'vpcomq', 'vpcomtrueb', 'vpcomtrued', 'vpcomtrueq',
 	'vpcomtrueub', 'vpcomtrueud', 'vpcomtrueuq', 'vpcomtrueuw', 'vpcomtruew',
 	'vpcomub', 'vpcomud', 'vpcomuq', 'vpcomuw', 'vpcomw', 'vpconflictd', 'vpconflictq',
+	'vpdpbusd', 'vpdpbusds', 'vpdpwssd', 'vpdpwssds',
 	'vperm2f128', 'vperm2i128', 'vpermb', 'vpermd', 'vpermi2b', 'vpermi2d',
 	'vpermi2pd', 'vpermi2w', 'vpermi2ps',
 	'vpermi2q', 'vpermil2pd', 'vpermil2ps', 'vpermilmo2pd',
 	'vpermilmo2ps', 'vpermilmz2pd', 'vpermilmz2ps', 'vpermilpd', 'vpermilps', 'vpermpd',
 	'vpermps', 'vpermq', 'vpermt2b', 'vpermt2d', 'vpermt2pd', 'vpermt2ps', 'vpermt2q', 'vpermt2w',
-	'vpermw', 'vpexpandd', 'vpexpandq','vpermiltd2pd', 'vpermiltd2ps', 'vpextrb',
+	'vpermw', 'vpexpandb', 'vpexpandd', 'vpexpandq', 'vpexpandw', 'vpermiltd2pd', 'vpermiltd2ps', 'vpextrb',
 	'vpextrd', 'vpextrq', 'vpextrw', 'vpgatherdd', 'vpgatherdq', 'vpgatherqd', 'vpgatherqq',
 	'vphaddbd', 'vphaddbq', 'vphaddbw', 'vphaddd',
 	'vphadddq', 'vphaddsw', 'vphaddubd', 'vphaddubq', 'vphaddubw', 'vphaddubwd', 'vphaddudq',
@@ -612,12 +616,15 @@ our @instr_intel = (
 	'vpmovsxwd', 'vpmovsxwq', 'vpmovusdb', 'vpmovusdw', 'vpmovusqb', 'vpmovusqd',
 	'vpmovusqw', 'vpmovuswb', 'vpmovw2m', 'vpmovwb', 'vpmovzxbd', 'vpmovzxbq', 'vpmovzxbw', 'vpmovzxdq',
 	'vpmovzxwd', 'vpmovzxwq', 'vpmuldq', 'vpmulhrsw', 'vpmulhuw', 'vpmulhw', 'vpmulld', 'vpmullq',
-	'vpmullw', 'vpmultishiftqb', 'vpmuludq', 'vpor', 'vpord', 'vporq', 'vpperm', 'vprold',
+	'vpmullw', 'vpmultishiftqb', 'vpmuludq', 'vpopcntb', 'vpopcntd', 'vpopcntq', 'vpopcntw',
+	'vpor', 'vpord', 'vporq', 'vpperm', 'vprold',
 	'vprolq', 'vprolvd', 'vprolvq', 'vprord', 'vprorq', 'vprorvd',
 	'vprorvq','vprotb', 'vprotd', 'vprotq', 'vprotw',
 	'vpsadbw', 'vpscatterdd', 'vpscatterdq', 'vpscatterqd',
-	'vpscatterqq', 'vpshab', 'vpshad', 'vpshaq', 'vpshaw', 'vpshlb', 'vpshld', 'vpshlq',
-	'vpshlw', 'vpshufb', 'vpshufd', 'vpshufhw', 'vpshuflw', 'vpsignb', 'vpsignd', 'vpsignw',
+	'vpscatterqq', 'vpshab', 'vpshad', 'vpshaq', 'vpshaw', 'vpshlb', 'vpshld',
+	'vpshldd', 'vpshldq', 'vpshldvd', 'vpshldvq', 'vpshldvw', 'vpshldw', 'vpshlq',
+	'vpshlw', 'vpshrdd', 'vpshrdq', 'vpshrdvd', 'vpshrdvq', 'vpshrdvw', 'vpshrdw',
+	'vpshufb', 'vpshufbitqmb', 'vpshufd', 'vpshufhw', 'vpshuflw', 'vpsignb', 'vpsignd', 'vpsignw',
 	'vpslld', 'vpslldq', 'vpsllq', 'vpsllvd', 'vpsllvq', 'vpsllvw', 'vpsllw', 'vpsrad', 'vpsraq', 'vpsravd',
 	'vpsravq', 'vpsravw', 'vpsraw', 'vpsrld', 'vpsrldq', 'vpsrlq', 'vpsrlvd', 'vpsrlvq', 'vpsrlvw', 'vpsrlw',
 	'vpsubb', 'vpsubd', 'vpsubq', 'vpsubsb', 'vpsubsw', 'vpsubusb',
@@ -639,7 +646,7 @@ our @instr_intel = (
 	'vshufps', 'vsqrtpd', 'vsqrtps', 'vsqrtsd', 'vsqrtss', 'vstmxcsr', 'vsubpd',
 	'vsubps', 'vsubsd', 'vsubss', 'vtestpd', 'vtestps', 'vucomisd', 'vucomiss', 'vunpckhpd',
 	'vunpckhps', 'vunpcklpd', 'vunpcklps', 'vxorpd', 'vxorps', 'vzeroall', 'vzeroupper',
-	'wait', 'wbinvd', 'wrfsbase', 'wrgsbase', 'wrmsr', 'wrmsrq', 'wrpkru', 'wrshr', 'xabort',
+	'wait', 'wbinvd', 'wbnoinvd', 'wrfsbase', 'wrgsbase', 'wrmsr', 'wrmsrq', 'wrpkru', 'wrshr', 'xabort',
 	'xacquire', 'xadd', 'xbegin', 'xbts', 'xchg', 'xcryptcbc', 'xcryptcfb',
 	'xcryptctr', 'xcryptecb', 'xcryptofb', 'xend', 'xgetbv', 'xlat', 'xlatb', 'xor', 'xorpd',
 	'xorps', 'xrelease', 'xrstor', 'xrstor64', 'xrstors', 'xrstors64', 'xsave', 'xsave64',
@@ -4287,9 +4294,11 @@ You can also look for information at:
 
 Bogdan Drozdowski, C<< <bogdandr at op.pl> >>
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT
 
-Copyright 2008-2017 Bogdan Drozdowski, all rights reserved.
+Copyright 2008-2018 Bogdan Drozdowski, all rights reserved.
+
+=head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

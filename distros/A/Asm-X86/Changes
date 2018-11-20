@@ -1,11 +1,19 @@
 Revision history for Asm-X86
 
+2018-11-18	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.26
+	* X86.pm: Updated the register and instruction list from NASM version
+	  2.14. Updated copyright inside the module.
+	* README: updated copyright inside the file.
+	* Makefile.PL: fixed some rpmlint errors.
+
 2017-05-06	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* Version 0.25
 	* X86.pm: Updated the register and instruction list from NASM version
 	  2.13.01. Updated copyright inside the module.
-	* README: updated copyright inside the file, quoted module names.
+	* README: updated copyright inside the file.
 
 2016-03-22	Bogdan Drozdowski <bogdandr@op.pl>
 

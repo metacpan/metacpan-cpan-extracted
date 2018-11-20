@@ -4,7 +4,7 @@ require Exporter;
 @EXPORT_OK = qw/copy_diff_only/;
 use warnings;
 use strict;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Carp;
 use File::Copy 'copy';
 use File::Path qw/rmtree mkpath/;

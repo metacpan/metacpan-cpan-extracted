@@ -9,10 +9,9 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
-use Future::AsyncAwait;
 
 use constant PROTOCOL => "I2C";
 
@@ -30,7 +29,7 @@ C<Device::Chip::MCP4725> - chip driver for F<MCP4725>
  $chip->mount( Device::Chip::Adapter::...->new )->get;
 
  # Presuming Vcc = 5V
- $chip->write_dac( 4096 * 1.23 / 5 )->get;
+ $chip->write_dac_ratio( 1.23 / 5 )->get;
  print "Output is now set to 1.23V\n";
 
 =head1 DESCRIPTION
@@ -94,23 +93,25 @@ Returns a C<HASH> reference containing the chip's current configuration
 
 =cut
 
-async sub read_config
+sub read_config
 {
    my $self = shift;
 
-   my $bytes = await $self->protocol->read( 5 );
-   my ( $status, $dac, $eeprom ) = unpack( "C S> S>", $bytes );
+   $self->protocol->read( 5 )->then( sub {
+      my ( $bytes ) = @_;
+      my ( $status, $dac, $eeprom ) = unpack( "C S> S>", $bytes );
 
-   return {
-      RDY => !!( $status & 0x80 ),
-      POR => !!( $status & 0x40 ),
-      PD  => $POWERDOWN_TO_NAME[ ( $status & 0x06 ) >> 1 ],
+      Future->done({
+         RDY => !!( $status & 0x80 ),
+         POR => !!( $status & 0x40 ),
+         PD  => $POWERDOWN_TO_NAME[ ( $status & 0x06 ) >> 1 ],
 
-      DAC => $dac >> 4,
+         DAC => $dac >> 4,
 
-      EEPROM_PD  => $POWERDOWN_TO_NAME[ ( $eeprom & 0x6000 ) >> 13 ],
-      EEPROM_DAC => ( $eeprom & 0x0FFF ),
-   };
+         EEPROM_PD  => $POWERDOWN_TO_NAME[ ( $eeprom & 0x6000 ) >> 13 ],
+         EEPROM_DAC => ( $eeprom & 0x0FFF ),
+      });
+   });
 }
 
 =head1 METHODS
@@ -139,6 +140,23 @@ sub write_dac
       if defined $powerdown;
 
    $self->protocol->write( pack "S>", $pd << 12 | $dac );
+}
+
+=head2 write_dac_ratio
+
+   $chip->write_dac_ratio( $ratio )->get
+
+Writes a new value for the DAC output, setting it to normal output for a given
+ratio between 0 and 1.
+
+=cut
+
+sub write_dac_ratio
+{
+   my $self = shift;
+   my ( $ratio ) = @_;
+
+   $self->write_dac_ratio( $ratio * 2**12 );
 }
 
 =head2 write_dac_and_eeprom

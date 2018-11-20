@@ -59,19 +59,18 @@ int zmq::msg_t::init (void *data_,
                       content_t *content_)
 {
     if (size_ < max_vsm_size) {
-        int const rc = init_size (size_);
+        const int rc = init_size (size_);
 
         if (rc != -1) {
             memcpy (data (), data_, size_);
             return 0;
         }
         return -1;
-
-    } else if (content_) {
-        return init_external_storage (content_, data_, size_, ffn_, hint_);
-    } else {
-        return init_data (data_, size_, ffn_, hint_);
     }
+    if (content_) {
+        return init_external_storage (content_, data_, size_, ffn_, hint_);
+    }
+    return init_data (data_, size_, ffn_, hint_);
 }
 
 int zmq::msg_t::init ()
@@ -443,6 +442,43 @@ bool zmq::msg_t::is_join () const
 bool zmq::msg_t::is_leave () const
 {
     return _u.base.type == type_leave;
+}
+
+bool zmq::msg_t::is_ping () const
+{
+    return (_u.base.flags & CMD_TYPE_MASK) == ping;
+}
+
+bool zmq::msg_t::is_pong () const
+{
+    return (_u.base.flags & CMD_TYPE_MASK) == pong;
+}
+
+size_t zmq::msg_t::command_body_size () const
+{
+    if (this->is_ping () || this->is_pong ())
+        return this->size () - ping_cmd_name_size;
+    if (this->is_subscribe ())
+        return this->size () - sub_cmd_name_size;
+    if (this->is_cancel ())
+        return this->size () - cancel_cmd_name_size;
+
+    return 0;
+}
+
+void *zmq::msg_t::command_body ()
+{
+    unsigned char *data = NULL;
+    if (this->is_ping () || this->is_pong ())
+        data =
+          static_cast<unsigned char *> (this->data ()) + ping_cmd_name_size;
+    if (this->is_subscribe ())
+        data = static_cast<unsigned char *> (this->data ()) + sub_cmd_name_size;
+    if (this->is_cancel ())
+        data =
+          static_cast<unsigned char *> (this->data ()) + cancel_cmd_name_size;
+
+    return data;
 }
 
 void zmq::msg_t::add_refs (int refs_)

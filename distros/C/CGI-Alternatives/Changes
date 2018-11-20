@@ -1,5 +1,11 @@
 Revision history for CGI::Alternatives
 
+0.17 2018-11-18
+    - Typo fixes
+
+0.16 2018-11-18
+    - Add note about running Plack scripts as fire-and-forget (one off) CGI scripts
+
 0.15 2016-10-13
     - Fix typos (thanks to davorg)
 

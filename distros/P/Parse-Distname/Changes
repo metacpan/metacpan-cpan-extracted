@@ -1,5 +1,8 @@
 Revision history for Parse-Distname
 
+0.03 2018/11/20
+  - fixed to return early correctly
+
 0.02 2018/11/15
   - renamed two hash keys (dist/distv => name/name_and_version)
   - fixed cpan_path not to have a needless slash

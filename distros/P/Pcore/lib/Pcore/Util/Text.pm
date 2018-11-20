@@ -16,8 +16,7 @@ our %ESC_ANSI_CTRL = (
     qq[\e] => q[\e],
 );
 
-our $EXPORT = [
-    qw[
+our $EXPORT = [ qw[
       cut
       cut_all
       decode_eol
@@ -50,8 +49,7 @@ our $EXPORT = [
       trim_multi
       unmark_raw
       wrap
-      ]
-];
+      ] ];
 
 # TODO
 # - crunch - ?;
@@ -398,7 +396,7 @@ sub wrap ( $text, $width, % ) {
             elsif ( $args{align} == 0 ) {
 
                 # center
-                my $left = int( ( $width - $len ) / 2 );
+                my $left  = int( ( $width - $len ) / 2 );
                 my $right = $width - $len - $left;
 
                 $line = ( q[ ] x $left ) . $line . ( q[ ] x $right );
@@ -576,15 +574,15 @@ sub to_camel_case {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 205                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 203                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 229, 417             | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 227, 415             | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 295                  | Subroutines::ProhibitExcessComplexity - Subroutine "wrap" with high complexity score (28)                      |
+## |    3 | 293                  | Subroutines::ProhibitExcessComplexity - Subroutine "wrap" with high complexity score (28)                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | NamingConventions::ProhibitAmbiguousNames                                                                      |
-## |      | 401, 402             | * Ambiguously named variable "left"                                                                            |
-## |      | 402                  | * Ambiguously named variable "right"                                                                           |
+## |      | 399, 400             | * Ambiguously named variable "left"                                                                            |
+## |      | 400                  | * Ambiguously named variable "right"                                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 10, 11, 12, 13, 14,  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## |      | 15, 16               |                                                                                                                |

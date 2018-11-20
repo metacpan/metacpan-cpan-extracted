@@ -2812,7 +2812,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_IF_CROAK_CATCH: {
+      case SPVM_OPCODE_C_ID_IF_EXCEPTION_CATCH: {
         if (exception_flag) {
           exception_flag = 0;
           
@@ -2833,7 +2833,7 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_IF_CROAK_RETURN: {
+      case SPVM_OPCODE_C_ID_IF_EXCEPTION_RETURN: {
         if (exception_flag) {
           SPVM_RUNTIME_SUB* sub = &runtime->subs[package->subs_base + opcode->operand1];
           int32_t sub_id = sub->id;
@@ -4628,6 +4628,8 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_string_raw(SPVM_ENV* env, const char* bytes, i
   }
 
   SPVM_OBJECT* object = SPVM_RUNTIME_API_new_byte_array_raw(env, length);
+  object->basic_type_id = SPVM_BASIC_TYPE_C_ID_STRING;
+  object->type_dimension = 0;
   object->runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_STRING;
   
   if (length > 0) {

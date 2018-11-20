@@ -6,7 +6,7 @@
 use strict;
 no warnings;
 use Test::More;
-BEGIN { plan tests => 39 };
+BEGIN { plan tests => 38 };
 
 use JSON::XS;
 
@@ -31,8 +31,6 @@ for (;;) {
 }
 
 __DATA__
-"A JSON payload should be an object or array, not a string."
-# fail1.json
 {"Extra value after close": true} "misplaced quoted value"
 # fail10.json
 {"Illegal expression": 1 + 2}

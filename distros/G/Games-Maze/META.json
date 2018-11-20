@@ -4,7 +4,7 @@
       "John M. Gamble <jgamble@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "games",
       "maze",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Games-Maze",
    "prereqs" : {
@@ -26,28 +26,30 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3624"
+            "Module::Build" : "0.4"
          }
       },
       "runtime" : {
          "requires" : {
-            "parent" : "0",
-            "perl" : "v5.8.3"
+            "Moo" : "0",
+            "Scalar::Util" : "1.09",
+            "Type::Tiny" : "1.004",
+            "perl" : "5.016001"
          }
       }
    },
    "provides" : {
       "Games::Maze" : {
          "file" : "lib/Games/Maze.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       },
       "Games::Maze::Hex" : {
          "file" : "lib/Games/Maze.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       },
       "Games::Maze::Quad" : {
          "file" : "lib/Games/Maze.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
@@ -59,5 +61,6 @@
          "url" : "git://github.com/jgamble/Games-Maze.git"
       }
    },
-   "version" : "1.08"
+   "version" : "1.09",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

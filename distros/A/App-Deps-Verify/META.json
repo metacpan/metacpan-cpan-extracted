@@ -62,19 +62,19 @@
    "provides" : {
       "App::Deps::Verify" : {
          "file" : "lib/App/Deps/Verify.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.6.0"
       },
       "App::Deps::Verify::App::VerifyDeps" : {
          "file" : "lib/App/Deps/Verify/App/VerifyDeps.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.6.0"
       },
       "App::Deps::Verify::App::VerifyDeps::Command::plinst" : {
          "file" : "lib/App/Deps/Verify/App/VerifyDeps/Command/plinst.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.6.0"
       },
       "App::Deps::Verify::App::VerifyDeps::Command::verify" : {
          "file" : "lib/App/Deps/Verify/App/VerifyDeps/Command/verify.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -89,7 +89,7 @@
          "web" : "https://github.com/shlomif/perl-App-Deps-Verify"
       }
    },
-   "version" : "0.4.0",
+   "version" : "0.6.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -548,6 +548,6 @@
       }
    },
    "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

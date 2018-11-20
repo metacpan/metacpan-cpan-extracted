@@ -1,4 +1,5 @@
 Changes
+deploy.pl
 examples/default-make-date-interval.pl
 examples/make-date.pl
 examples/my-date.pl
@@ -6,8 +7,10 @@ examples/nengo-to-seireki.pl
 examples/seireki-to-nengo.pl
 examples/subsjdate-make-date.pl
 examples/subsjdate-make-interval.pl
+examples/synopsis-make-date.pl
+examples/synopsis-nengo.pl
+examples/synopsis-replace.pl
 examples/synopsis.pl
-guff.pl
 lib/Lingua/JA/FindDates.pm
 lib/Lingua/JA/FindDates.pod
 Makefile.PL
@@ -15,6 +18,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 script/subsjdate
+t/kanji2number.t
 t/Lingua-JA-FindDates.t
 t/nengo-to-seireki.t
 t/seireki-to-nengo.t

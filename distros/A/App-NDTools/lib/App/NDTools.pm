@@ -17,15 +17,15 @@ App::NDTools - Command line tools for nested structures
 
 =head1 VERSION
 
-Version 0.6.1
+Version 0.6.2
 
 =cut
 
-our $VERSION = "0.6.1";
+our $VERSION = "0.6.2";
 
 =head1 DESCRIPTION
 
-Diff, patch, process and query JSON and YAML with ease.
+Diff, patch, process, query JSON and YAML with ease.
 
 =head1 TOOLS
 
@@ -45,10 +45,13 @@ Process structure using rules and modules.
 
 Available modules:
 
-    Insert     Insert value into structure
-    Merge      Merge structures according provided rules
-    Pipe       Modify structure using external process
-    Remove     Remove specified parts from structure
+    Insert           Insert value into structure
+    JsonMergePatch   Apply JSON Merge Patch (rfc7396) patches
+    JsonPatch        Apply JSON Patch (rfc6902) patches
+    Merge            Merge structures according provided rules
+    Patch            Apply nested diff to the structure
+    Pipe             Modify structure using external process
+    Remove           Remove specified parts from structure
 
 =item B<L<ndquery>>
 

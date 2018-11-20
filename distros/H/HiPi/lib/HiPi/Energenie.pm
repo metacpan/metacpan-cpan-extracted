@@ -21,7 +21,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( backend ook_repeat can_rx ) );
 
-our $VERSION ='0.72';
+our $VERSION ='0.74';
 
 use constant {
     STATE_LISTEN                => 2,

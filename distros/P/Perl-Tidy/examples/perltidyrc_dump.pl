@@ -190,8 +190,17 @@ sub dump_options {
             # print the long version of the parameter
             # with the short version as a side comment
             my $short_name   = $short_name{$long_name};
-            my $short_option = $short_prefix . $short_name . $suffix;
             my $long_option  = $prefix . $long_name . $suffix;
+
+	    # A few options do not have a short abbreviation.  These include
+	    # 'recombine' and 'valign', which are mainly for debugging.  As a
+	    # workaround, we will make it the same as the long option. This
+	    # will insure that the -s -q flags work.  
+	    my $short_option = $long_option;
+	    if ($short_name) {
+            	$short_option = $short_prefix . $short_name . $suffix;
+	    }
+
             my $note = $requals_default->{$long_name} ? "  [=default]" : "";
             if ( $rmy_opts->{s} ) {
                 print $short_option. "\n";

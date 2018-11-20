@@ -1,0 +1,58 @@
+{
+   "abstract" : "Manage a hostfile by composing multiple fragments into a whole.",
+   "author" : [
+      "Anthony J. Mirabella"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hostfile-Manager",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Slurp" : "0",
+            "Getopt::Long" : "0",
+            "Moose" : "0",
+            "Pod::Usage" : "0",
+            "Term::Clui" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/Aneurysm9/hostfile_manager",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Aneurysm9/hostfile_manager.git"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

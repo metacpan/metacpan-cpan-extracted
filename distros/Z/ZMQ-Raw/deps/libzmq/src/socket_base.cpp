@@ -97,7 +97,39 @@
 #include "scatter.hpp"
 #include "dgram.hpp"
 
-bool zmq::socket_base_t::check_tag ()
+void zmq::socket_base_t::inprocs_t::emplace (const char *endpoint_uri_,
+                                             pipe_t *pipe_)
+{
+    _inprocs.ZMQ_MAP_INSERT_OR_EMPLACE (std::string (endpoint_uri_), pipe_);
+}
+
+int zmq::socket_base_t::inprocs_t::erase_pipes (
+  const std::string &endpoint_uri_str_)
+{
+    const std::pair<map_t::iterator, map_t::iterator> range =
+      _inprocs.equal_range (endpoint_uri_str_);
+    if (range.first == range.second) {
+        errno = ENOENT;
+        return -1;
+    }
+
+    for (map_t::iterator it = range.first; it != range.second; ++it)
+        it->second->terminate (true);
+    _inprocs.erase (range.first, range.second);
+    return 0;
+}
+
+void zmq::socket_base_t::inprocs_t::erase_pipe (pipe_t *pipe_)
+{
+    for (map_t::iterator it = _inprocs.begin (), end = _inprocs.end ();
+         it != end; ++it)
+        if (it->second == pipe_) {
+            _inprocs.erase (it);
+            break;
+        }
+}
+
+bool zmq::socket_base_t::check_tag () const
 {
     return _tag == 0xbaddecaf;
 }
@@ -253,7 +285,7 @@ zmq::socket_base_t::~socket_base_t ()
     zmq_assert (_destroyed);
 }
 
-zmq::i_mailbox *zmq::socket_base_t::get_mailbox ()
+zmq::i_mailbox *zmq::socket_base_t::get_mailbox () const
 {
     return _mailbox;
 }
@@ -267,37 +299,39 @@ void zmq::socket_base_t::stop ()
     send_stop ();
 }
 
+// TODO consider renaming protocol_ to scheme_ in conformance with RFC 3986
+// terminology, but this requires extensive changes to be consistent
 int zmq::socket_base_t::parse_uri (const char *uri_,
                                    std::string &protocol_,
-                                   std::string &address_)
+                                   std::string &path_)
 {
     zmq_assert (uri_ != NULL);
 
     std::string uri (uri_);
-    std::string::size_type pos = uri.find ("://");
+    const std::string::size_type pos = uri.find ("://");
     if (pos == std::string::npos) {
         errno = EINVAL;
         return -1;
     }
     protocol_ = uri.substr (0, pos);
-    address_ = uri.substr (pos + 3);
+    path_ = uri.substr (pos + 3);
 
-    if (protocol_.empty () || address_.empty ()) {
+    if (protocol_.empty () || path_.empty ()) {
         errno = EINVAL;
         return -1;
     }
     return 0;
 }
 
-int zmq::socket_base_t::check_protocol (const std::string &protocol_)
+int zmq::socket_base_t::check_protocol (const std::string &protocol_) const
 {
     //  First check out whether the protocol is something we are aware of.
-    if (protocol_ != "inproc"
+    if (protocol_ != protocol_name::inproc
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
   && !defined ZMQ_HAVE_VXWORKS
-        && protocol_ != "ipc"
+        && protocol_ != protocol_name::ipc
 #endif
-        && protocol_ != "tcp"
+        && protocol_ != protocol_name::tcp
 #if defined ZMQ_HAVE_OPENPGM
         //  pgm/epgm transports only available if 0MQ is compiled with OpenPGM.
         && protocol_ != "pgm"
@@ -305,15 +339,15 @@ int zmq::socket_base_t::check_protocol (const std::string &protocol_)
 #endif
 #if defined ZMQ_HAVE_TIPC
         // TIPC transport is only available on Linux.
-        && protocol_ != "tipc"
+        && protocol_ != protocol_name::tipc
 #endif
 #if defined ZMQ_HAVE_NORM
         && protocol_ != "norm"
 #endif
 #if defined ZMQ_HAVE_VMCI
-        && protocol_ != "vmci"
+        && protocol_ != protocol_name::vmci
 #endif
-        && protocol_ != "udp") {
+        && protocol_ != protocol_name::udp) {
         errno = EPROTONOSUPPORT;
         return -1;
     }
@@ -330,7 +364,7 @@ int zmq::socket_base_t::check_protocol (const std::string &protocol_)
     }
 #endif
 
-    if (protocol_ == "udp"
+    if (protocol_ == protocol_name::udp
         && (options.type != ZMQ_DISH && options.type != ZMQ_RADIO
             && options.type != ZMQ_DGRAM)) {
         errno = ENOCOMPATPROTO;
@@ -341,14 +375,16 @@ int zmq::socket_base_t::check_protocol (const std::string &protocol_)
     return 0;
 }
 
-void zmq::socket_base_t::attach_pipe (pipe_t *pipe_, bool subscribe_to_all_)
+void zmq::socket_base_t::attach_pipe (pipe_t *pipe_,
+                                      bool subscribe_to_all_,
+                                      bool locally_initiated_)
 {
     //  First, register the pipe so that we can terminate it later on.
     pipe_->set_event_sink (this);
     _pipes.push_back (pipe_);
 
     //  Let the derived socket type know about new pipe.
-    xattach_pipe (pipe_, subscribe_to_all_);
+    xattach_pipe (pipe_, subscribe_to_all_, locally_initiated_);
 
     //  If the socket is already being closed, ask any new pipes to terminate
     //  straight away.
@@ -363,11 +399,6 @@ int zmq::socket_base_t::setsockopt (int option_,
                                     size_t optvallen_)
 {
     scoped_optional_lock_t sync_lock (_thread_safe ? &_sync : NULL);
-
-    if (!options.is_valid (option_)) {
-        errno = EINVAL;
-        return -1;
-    }
 
     if (unlikely (_ctx_terminated)) {
         errno = ETERM;
@@ -416,7 +447,7 @@ int zmq::socket_base_t::getsockopt (int option_,
     }
 
     if (option_ == ZMQ_EVENTS) {
-        int rc = process_commands (0, false);
+        const int rc = process_commands (0, false);
         if (rc != 0 && (errno == EINTR || errno == ETERM)) {
             return -1;
         }
@@ -442,20 +473,14 @@ int zmq::socket_base_t::join (const char *group_)
 {
     scoped_optional_lock_t sync_lock (_thread_safe ? &_sync : NULL);
 
-    int rc = xjoin (group_);
-
-
-    return rc;
+    return xjoin (group_);
 }
 
 int zmq::socket_base_t::leave (const char *group_)
 {
     scoped_optional_lock_t sync_lock (_thread_safe ? &_sync : NULL);
 
-    int rc = xleave (group_);
-
-
-    return rc;
+    return xleave (group_);
 }
 
 void zmq::socket_base_t::add_signaler (signaler_t *s_)
@@ -474,7 +499,7 @@ void zmq::socket_base_t::remove_signaler (signaler_t *s_)
     (static_cast<mailbox_safe_t *> (_mailbox))->remove_signaler (s_);
 }
 
-int zmq::socket_base_t::bind (const char *addr_)
+int zmq::socket_base_t::bind (const char *endpoint_uri_)
 {
     scoped_optional_lock_t sync_lock (_thread_safe ? &_sync : NULL);
 
@@ -489,19 +514,20 @@ int zmq::socket_base_t::bind (const char *addr_)
         return -1;
     }
 
-    //  Parse addr_ string.
+    //  Parse endpoint_uri_ string.
     std::string protocol;
     std::string address;
-    if (parse_uri (addr_, protocol, address) || check_protocol (protocol)) {
+    if (parse_uri (endpoint_uri_, protocol, address)
+        || check_protocol (protocol)) {
         return -1;
     }
 
-    if (protocol == "inproc") {
+    if (protocol == protocol_name::inproc) {
         const endpoint_t endpoint = {this, options};
-        rc = register_endpoint (addr_, endpoint);
+        rc = register_endpoint (endpoint_uri_, endpoint);
         if (rc == 0) {
-            connect_pending (addr_, this);
-            _last_endpoint.assign (addr_);
+            connect_pending (endpoint_uri_, this);
+            _last_endpoint.assign (endpoint_uri_);
             options.connected = true;
         }
         return rc;
@@ -510,13 +536,13 @@ int zmq::socket_base_t::bind (const char *addr_)
     if (protocol == "pgm" || protocol == "epgm" || protocol == "norm") {
         //  For convenience's sake, bind can be used interchangeable with
         //  connect for PGM, EPGM, NORM transports.
-        rc = connect (addr_);
+        rc = connect (endpoint_uri_);
         if (rc != -1)
             options.connected = true;
         return rc;
     }
 
-    if (protocol == "udp") {
+    if (protocol == protocol_name::udp) {
         if (!(options.type == ZMQ_DGRAM || options.type == ZMQ_DISH)) {
             errno = ENOCOMPATPROTO;
             return -1;
@@ -546,8 +572,6 @@ int zmq::socket_base_t::bind (const char *addr_)
           session_base_t::create (io_thread, true, this, options, paddr);
         errno_assert (session);
 
-        pipe_t *newpipe = NULL;
-
         //  Create a bi-directional pipe.
         object_t *parents[2] = {this, session};
         pipe_t *new_pipes[2] = {NULL, NULL};
@@ -558,8 +582,8 @@ int zmq::socket_base_t::bind (const char *addr_)
         errno_assert (rc == 0);
 
         //  Attach local end of the pipe to the socket object.
-        attach_pipe (new_pipes[0], true);
-        newpipe = new_pipes[0];
+        attach_pipe (new_pipes[0], true, true);
+        pipe_t *const newpipe = new_pipes[0];
 
         //  Attach remote end of the pipe to the session object later on.
         session->attach_pipe (new_pipes[1]);
@@ -567,7 +591,7 @@ int zmq::socket_base_t::bind (const char *addr_)
         //  Save last endpoint URI
         paddr->to_string (_last_endpoint);
 
-        add_endpoint (addr_, (own_t *) session, newpipe);
+        add_endpoint (endpoint_uri_, static_cast<own_t *> (session), newpipe);
 
         return 0;
     }
@@ -580,7 +604,7 @@ int zmq::socket_base_t::bind (const char *addr_)
         return -1;
     }
 
-    if (protocol == "tcp") {
+    if (protocol == protocol_name::tcp) {
         tcp_listener_t *listener =
           new (std::nothrow) tcp_listener_t (io_thread, this, options);
         alloc_assert (listener);
@@ -594,14 +618,15 @@ int zmq::socket_base_t::bind (const char *addr_)
         // Save last endpoint URI
         listener->get_address (_last_endpoint);
 
-        add_endpoint (_last_endpoint.c_str (), (own_t *) listener, NULL);
+        add_endpoint (_last_endpoint.c_str (), static_cast<own_t *> (listener),
+                      NULL);
         options.connected = true;
         return 0;
     }
 
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
   && !defined ZMQ_HAVE_VXWORKS
-    if (protocol == "ipc") {
+    if (protocol == protocol_name::ipc) {
         ipc_listener_t *listener =
           new (std::nothrow) ipc_listener_t (io_thread, this, options);
         alloc_assert (listener);
@@ -615,13 +640,14 @@ int zmq::socket_base_t::bind (const char *addr_)
         // Save last endpoint URI
         listener->get_address (_last_endpoint);
 
-        add_endpoint (_last_endpoint.c_str (), (own_t *) listener, NULL);
+        add_endpoint (_last_endpoint.c_str (), static_cast<own_t *> (listener),
+                      NULL);
         options.connected = true;
         return 0;
     }
 #endif
 #if defined ZMQ_HAVE_TIPC
-    if (protocol == "tipc") {
+    if (protocol == protocol_name::tipc) {
         tipc_listener_t *listener =
           new (std::nothrow) tipc_listener_t (io_thread, this, options);
         alloc_assert (listener);
@@ -635,13 +661,13 @@ int zmq::socket_base_t::bind (const char *addr_)
         // Save last endpoint URI
         listener->get_address (_last_endpoint);
 
-        add_endpoint (addr_, (own_t *) listener, NULL);
+        add_endpoint (endpoint_uri_, static_cast<own_t *> (listener), NULL);
         options.connected = true;
         return 0;
     }
 #endif
 #if defined ZMQ_HAVE_VMCI
-    if (protocol == "vmci") {
+    if (protocol == protocol_name::vmci) {
         vmci_listener_t *listener =
           new (std::nothrow) vmci_listener_t (io_thread, this, options);
         alloc_assert (listener);
@@ -654,7 +680,8 @@ int zmq::socket_base_t::bind (const char *addr_)
 
         listener->get_address (_last_endpoint);
 
-        add_endpoint (_last_endpoint.c_str (), (own_t *) listener, NULL);
+        add_endpoint (_last_endpoint.c_str (), static_cast<own_t *> (listener),
+                      NULL);
         options.connected = true;
         return 0;
     }
@@ -664,7 +691,7 @@ int zmq::socket_base_t::bind (const char *addr_)
     return -1;
 }
 
-int zmq::socket_base_t::connect (const char *addr_)
+int zmq::socket_base_t::connect (const char *endpoint_uri_)
 {
     scoped_optional_lock_t sync_lock (_thread_safe ? &_sync : NULL);
 
@@ -679,43 +706,40 @@ int zmq::socket_base_t::connect (const char *addr_)
         return -1;
     }
 
-    //  Parse addr_ string.
+    //  Parse endpoint_uri_ string.
     std::string protocol;
     std::string address;
-    if (parse_uri (addr_, protocol, address) || check_protocol (protocol)) {
+    if (parse_uri (endpoint_uri_, protocol, address)
+        || check_protocol (protocol)) {
         return -1;
     }
 
-    if (protocol == "inproc") {
+    if (protocol == protocol_name::inproc) {
         //  TODO: inproc connect is specific with respect to creating pipes
         //  as there's no 'reconnect' functionality implemented. Once that
         //  is in place we should follow generic pipe creation algorithm.
 
         //  Find the peer endpoint.
-        endpoint_t peer = find_endpoint (addr_);
+        const endpoint_t peer = find_endpoint (endpoint_uri_);
 
         // The total HWM for an inproc connection should be the sum of
         // the binder's HWM and the connector's HWM.
-        int sndhwm = 0;
-        if (peer.socket == NULL)
-            sndhwm = options.sndhwm;
-        else if (options.sndhwm != 0 && peer.options.rcvhwm != 0)
-            sndhwm = options.sndhwm + peer.options.rcvhwm;
-        int rcvhwm = 0;
-        if (peer.socket == NULL)
-            rcvhwm = options.rcvhwm;
-        else if (options.rcvhwm != 0 && peer.options.sndhwm != 0)
-            rcvhwm = options.rcvhwm + peer.options.sndhwm;
+        const int sndhwm = peer.socket == NULL
+                             ? options.sndhwm
+                             : options.sndhwm != 0 && peer.options.rcvhwm != 0
+                                 ? options.sndhwm + peer.options.rcvhwm
+                                 : 0;
+        const int rcvhwm = peer.socket == NULL
+                             ? options.rcvhwm
+                             : options.rcvhwm != 0 && peer.options.sndhwm != 0
+                                 ? options.rcvhwm + peer.options.sndhwm
+                                 : 0;
 
         //  Create a bi-directional pipe to connect the peers.
         object_t *parents[2] = {this, peer.socket == NULL ? this : peer.socket};
         pipe_t *new_pipes[2] = {NULL, NULL};
 
-        bool conflate =
-          options.conflate
-          && (options.type == ZMQ_DEALER || options.type == ZMQ_PULL
-              || options.type == ZMQ_PUSH || options.type == ZMQ_PUB
-              || options.type == ZMQ_SUB);
+        const bool conflate = get_effective_conflate_option (options);
 
         int hwms[2] = {conflate ? -1 : sndhwm, conflate ? -1 : rcvhwm};
         bool conflates[2] = {conflate, conflate};
@@ -733,42 +757,19 @@ int zmq::socket_base_t::connect (const char *addr_)
             //  to send the routing id message or not. To resolve this,
             //  we always send our routing id and drop it later if
             //  the peer doesn't expect it.
-            msg_t id;
-            rc = id.init_size (options.routing_id_size);
-            errno_assert (rc == 0);
-            memcpy (id.data (), options.routing_id, options.routing_id_size);
-            id.set_flags (msg_t::routing_id);
-            bool written = new_pipes[0]->write (&id);
-            zmq_assert (written);
-            new_pipes[0]->flush ();
+            send_routing_id (new_pipes[0], options);
 
             const endpoint_t endpoint = {this, options};
-            pend_connection (std::string (addr_), endpoint, new_pipes);
+            pend_connection (std::string (endpoint_uri_), endpoint, new_pipes);
         } else {
             //  If required, send the routing id of the local socket to the peer.
             if (peer.options.recv_routing_id) {
-                msg_t id;
-                rc = id.init_size (options.routing_id_size);
-                errno_assert (rc == 0);
-                memcpy (id.data (), options.routing_id,
-                        options.routing_id_size);
-                id.set_flags (msg_t::routing_id);
-                bool written = new_pipes[0]->write (&id);
-                zmq_assert (written);
-                new_pipes[0]->flush ();
+                send_routing_id (new_pipes[0], options);
             }
 
             //  If required, send the routing id of the peer to the local socket.
             if (options.recv_routing_id) {
-                msg_t id;
-                rc = id.init_size (peer.options.routing_id_size);
-                errno_assert (rc == 0);
-                memcpy (id.data (), peer.options.routing_id,
-                        peer.options.routing_id_size);
-                id.set_flags (msg_t::routing_id);
-                bool written = new_pipes[1]->write (&id);
-                zmq_assert (written);
-                new_pipes[1]->flush ();
+                send_routing_id (new_pipes[1], peer.options);
             }
 
             //  Attach remote end of the pipe to the peer socket. Note that peer's
@@ -778,23 +779,22 @@ int zmq::socket_base_t::connect (const char *addr_)
         }
 
         //  Attach local end of the pipe to this socket object.
-        attach_pipe (new_pipes[0]);
+        attach_pipe (new_pipes[0], false, true);
 
         // Save last endpoint URI
-        _last_endpoint.assign (addr_);
+        _last_endpoint.assign (endpoint_uri_);
 
         // remember inproc connections for disconnect
-        _inprocs.ZMQ_MAP_INSERT_OR_EMPLACE (std::string (addr_), new_pipes[0]);
+        _inprocs.emplace (endpoint_uri_, new_pipes[0]);
 
         options.connected = true;
         return 0;
     }
-    bool is_single_connect =
+    const bool is_single_connect =
       (options.type == ZMQ_DEALER || options.type == ZMQ_SUB
        || options.type == ZMQ_PUB || options.type == ZMQ_REQ);
     if (unlikely (is_single_connect)) {
-        const endpoints_t::iterator it = _endpoints.find (addr_);
-        if (it != _endpoints.end ()) {
+        if (0 != _endpoints.count (endpoint_uri_)) {
             // There is no valid use for multiple connects for SUB-PUB nor
             // DEALER-ROUTER nor REQ-REP. Multiple connects produces
             // nonsensical results.
@@ -814,7 +814,7 @@ int zmq::socket_base_t::connect (const char *addr_)
     alloc_assert (paddr);
 
     //  Resolve address (if needed by the protocol)
-    if (protocol == "tcp") {
+    if (protocol == protocol_name::tcp) {
         //  Do some basic sanity checks on tcp:// address syntax
         //  - hostname starts with digit or letter, with embedded '-' or '.'
         //  - IPv6 address may contain hex chars and colons.
@@ -858,7 +858,7 @@ int zmq::socket_base_t::connect (const char *addr_)
     }
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_OPENVMS                     \
   && !defined ZMQ_HAVE_VXWORKS
-    else if (protocol == "ipc") {
+    else if (protocol == protocol_name::ipc) {
         paddr->resolved.ipc_addr = new (std::nothrow) ipc_address_t ();
         alloc_assert (paddr->resolved.ipc_addr);
         int rc = paddr->resolved.ipc_addr->resolve (address.c_str ());
@@ -869,7 +869,7 @@ int zmq::socket_base_t::connect (const char *addr_)
     }
 #endif
 
-    if (protocol == "udp") {
+    if (protocol == protocol_name::udp) {
         if (options.type != ZMQ_RADIO) {
             errno = ENOCOMPATPROTO;
             LIBZMQ_DELETE (paddr);
@@ -902,7 +902,7 @@ int zmq::socket_base_t::connect (const char *addr_)
     }
 #endif
 #if defined ZMQ_HAVE_TIPC
-    else if (protocol == "tipc") {
+    else if (protocol == protocol_name::tipc) {
         paddr->resolved.tipc_addr = new (std::nothrow) tipc_address_t ();
         alloc_assert (paddr->resolved.tipc_addr);
         int rc = paddr->resolved.tipc_addr->resolve (address.c_str ());
@@ -922,7 +922,7 @@ int zmq::socket_base_t::connect (const char *addr_)
     }
 #endif
 #if defined ZMQ_HAVE_VMCI
-    else if (protocol == "vmci") {
+    else if (protocol == protocol_name::vmci) {
         paddr->resolved.vmci_addr =
           new (std::nothrow) vmci_address_t (this->get_ctx ());
         alloc_assert (paddr->resolved.vmci_addr);
@@ -941,8 +941,9 @@ int zmq::socket_base_t::connect (const char *addr_)
 
     //  PGM does not support subscription forwarding; ask for all data to be
     //  sent to this pipe. (same for NORM, currently?)
-    bool subscribe_to_all = protocol == "pgm" || protocol == "epgm"
-                            || protocol == "norm" || protocol == "udp";
+    const bool subscribe_to_all = protocol == "pgm" || protocol == "epgm"
+                                  || protocol == "norm"
+                                  || protocol == protocol_name::udp;
     pipe_t *newpipe = NULL;
 
     if (options.immediate != 1 || subscribe_to_all) {
@@ -950,11 +951,7 @@ int zmq::socket_base_t::connect (const char *addr_)
         object_t *parents[2] = {this, session};
         pipe_t *new_pipes[2] = {NULL, NULL};
 
-        bool conflate =
-          options.conflate
-          && (options.type == ZMQ_DEALER || options.type == ZMQ_PULL
-              || options.type == ZMQ_PUSH || options.type == ZMQ_PUB
-              || options.type == ZMQ_SUB);
+        const bool conflate = get_effective_conflate_option (options);
 
         int hwms[2] = {conflate ? -1 : options.sndhwm,
                        conflate ? -1 : options.rcvhwm};
@@ -963,7 +960,7 @@ int zmq::socket_base_t::connect (const char *addr_)
         errno_assert (rc == 0);
 
         //  Attach local end of the pipe to the socket object.
-        attach_pipe (new_pipes[0], subscribe_to_all);
+        attach_pipe (new_pipes[0], subscribe_to_all, true);
         newpipe = new_pipes[0];
 
         //  Attach remote end of the pipe to the session object later on.
@@ -973,21 +970,51 @@ int zmq::socket_base_t::connect (const char *addr_)
     //  Save last endpoint URI
     paddr->to_string (_last_endpoint);
 
-    add_endpoint (addr_, (own_t *) session, newpipe);
+    add_endpoint (endpoint_uri_, static_cast<own_t *> (session), newpipe);
     return 0;
 }
 
-void zmq::socket_base_t::add_endpoint (const char *addr_,
+std::string zmq::socket_base_t::resolve_tcp_addr (std::string endpoint_uri_,
+                                                  const char *tcp_address_)
+{
+    // The resolved last_endpoint is used as a key in the endpoints map.
+    // The address passed by the user might not match in the TCP case due to
+    // IPv4-in-IPv6 mapping (EG: tcp://[::ffff:127.0.0.1]:9999), so try to
+    // resolve before giving up. Given at this stage we don't know whether a
+    // socket is connected or bound, try with both.
+    if (_endpoints.find (endpoint_uri_) == _endpoints.end ()) {
+        tcp_address_t *tcp_addr = new (std::nothrow) tcp_address_t ();
+        alloc_assert (tcp_addr);
+        int rc = tcp_addr->resolve (tcp_address_, false, options.ipv6);
+
+        if (rc == 0) {
+            tcp_addr->to_string (endpoint_uri_);
+            if (_endpoints.find (endpoint_uri_) == _endpoints.end ()) {
+                rc = tcp_addr->resolve (tcp_address_, true, options.ipv6);
+                if (rc == 0) {
+                    tcp_addr->to_string (endpoint_uri_);
+                }
+            }
+        }
+        LIBZMQ_DELETE (tcp_addr);
+    }
+    return endpoint_uri_;
+}
+
+void zmq::socket_base_t::add_endpoint (const char *endpoint_uri_,
                                        own_t *endpoint_,
                                        pipe_t *pipe_)
 {
     //  Activate the session. Make it a child of this socket.
     launch_child (endpoint_);
-    _endpoints.ZMQ_MAP_INSERT_OR_EMPLACE (std::string (addr_),
+    _endpoints.ZMQ_MAP_INSERT_OR_EMPLACE (std::string (endpoint_uri_),
                                           endpoint_pipe_t (endpoint_, pipe_));
+
+    if (pipe_ != NULL)
+        pipe_->set_endpoint_uri (endpoint_uri_);
 }
 
-int zmq::socket_base_t::term_endpoint (const char *addr_)
+int zmq::socket_base_t::term_endpoint (const char *endpoint_uri_)
 {
     scoped_optional_lock_t sync_lock (_thread_safe ? &_sync : NULL);
 
@@ -998,75 +1025,43 @@ int zmq::socket_base_t::term_endpoint (const char *addr_)
     }
 
     //  Check whether endpoint address passed to the function is valid.
-    if (unlikely (!addr_)) {
+    if (unlikely (!endpoint_uri_)) {
         errno = EINVAL;
         return -1;
     }
 
     //  Process pending commands, if any, since there could be pending unprocessed process_own()'s
     //  (from launch_child() for example) we're asked to terminate now.
-    int rc = process_commands (0, false);
+    const int rc = process_commands (0, false);
     if (unlikely (rc != 0)) {
         return -1;
     }
 
-    //  Parse addr_ string.
-    std::string protocol;
-    std::string address;
-    if (parse_uri (addr_, protocol, address) || check_protocol (protocol)) {
+    //  Parse endpoint_uri_ string.
+    std::string uri_protocol;
+    std::string uri_path;
+    if (parse_uri (endpoint_uri_, uri_protocol, uri_path)
+        || check_protocol (uri_protocol)) {
         return -1;
     }
 
-    const std::string addr_str = std::string (addr_);
+    const std::string endpoint_uri_str = std::string (endpoint_uri_);
 
     // Disconnect an inproc socket
-    if (protocol == "inproc") {
-        if (unregister_endpoint (addr_str, this) == 0) {
-            return 0;
-        }
-        std::pair<inprocs_t::iterator, inprocs_t::iterator> range =
-          _inprocs.equal_range (addr_str);
-        if (range.first == range.second) {
-            errno = ENOENT;
-            return -1;
-        }
-
-        for (inprocs_t::iterator it = range.first; it != range.second; ++it)
-            it->second->terminate (true);
-        _inprocs.erase (range.first, range.second);
-        return 0;
+    if (uri_protocol == protocol_name::inproc) {
+        return unregister_endpoint (endpoint_uri_str, this) == 0
+                 ? 0
+                 : _inprocs.erase_pipes (endpoint_uri_str);
     }
 
-    std::string resolved_addr = addr_;
+    const std::string resolved_endpoint_uri =
+      uri_protocol == protocol_name::tcp
+        ? resolve_tcp_addr (endpoint_uri_str, uri_path.c_str ())
+        : endpoint_uri_str;
 
-    // The resolved last_endpoint is used as a key in the endpoints map.
-    // The address passed by the user might not match in the TCP case due to
-    // IPv4-in-IPv6 mapping (EG: tcp://[::ffff:127.0.0.1]:9999), so try to
-    // resolve before giving up. Given at this stage we don't know whether a
-    // socket is connected or bound, try with both.
-    if (protocol == "tcp") {
-        if (_endpoints.find (resolved_addr) == _endpoints.end ()) {
-            tcp_address_t *tcp_addr = new (std::nothrow) tcp_address_t ();
-            alloc_assert (tcp_addr);
-            rc = tcp_addr->resolve (address.c_str (), false, options.ipv6);
-
-            if (rc == 0) {
-                tcp_addr->to_string (resolved_addr);
-                if (_endpoints.find (resolved_addr) == _endpoints.end ()) {
-                    rc =
-                      tcp_addr->resolve (address.c_str (), true, options.ipv6);
-                    if (rc == 0) {
-                        tcp_addr->to_string (resolved_addr);
-                    }
-                }
-            }
-            LIBZMQ_DELETE (tcp_addr);
-        }
-    }
-
-    //  Find the endpoints range (if any) corresponding to the addr_ string.
+    //  Find the endpoints range (if any) corresponding to the endpoint_uri_ string.
     const std::pair<endpoints_t::iterator, endpoints_t::iterator> range =
-      _endpoints.equal_range (resolved_addr);
+      _endpoints.equal_range (resolved_endpoint_uri);
     if (range.first == range.second) {
         errno = ENOENT;
         return -1;
@@ -1131,7 +1126,7 @@ int zmq::socket_base_t::send (msg_t *msg_, int flags_)
     //  Compute the time when the timeout should occur.
     //  If the timeout is infinite, don't care.
     int timeout = options.sndtimeo;
-    uint64_t end = timeout < 0 ? 0 : (_clock.now_ms () + timeout);
+    const uint64_t end = timeout < 0 ? 0 : (_clock.now_ms () + timeout);
 
     //  Oops, we couldn't send the message. Wait for the next
     //  command, process it and try to send the message again.
@@ -1223,7 +1218,7 @@ int zmq::socket_base_t::recv (msg_t *msg_, int flags_)
     //  Compute the time when the timeout should occur.
     //  If the timeout is infinite, don't care.
     int timeout = options.rcvtimeo;
-    uint64_t end = timeout < 0 ? 0 : (_clock.now_ms () + timeout);
+    const uint64_t end = timeout < 0 ? 0 : (_clock.now_ms () + timeout);
 
     //  In blocking scenario, commands are processed over and over again until
     //  we are able to fetch a message.
@@ -1319,12 +1314,7 @@ void zmq::socket_base_t::start_reaping (poller_t *poller_)
 
 int zmq::socket_base_t::process_commands (int timeout_, bool throttle_)
 {
-    int rc;
-    command_t cmd;
-    if (timeout_ != 0) {
-        //  If we are asked to wait, simply ask mailbox to wait.
-        rc = _mailbox->recv (&cmd, timeout_);
-    } else {
+    if (timeout_ == 0) {
         //  If we are asked not to wait, check whether we haven't processed
         //  commands recently, so that we can throttle the new commands.
 
@@ -1345,10 +1335,11 @@ int zmq::socket_base_t::process_commands (int timeout_, bool throttle_)
                 return 0;
             _last_tsc = tsc;
         }
-
-        //  Check whether there are any commands pending for this thread.
-        rc = _mailbox->recv (&cmd, 0);
     }
+
+    //  Check whether there are any commands pending for this thread.
+    command_t cmd;
+    int rc = _mailbox->recv (&cmd, timeout_);
 
     //  Process all available commands.
     while (rc == 0) {
@@ -1465,13 +1456,6 @@ int zmq::socket_base_t::xrecv (msg_t *)
     return -1;
 }
 
-static const zmq::blob_t empty_blob;
-
-const zmq::blob_t &zmq::socket_base_t::get_credential () const
-{
-    return empty_blob;
-}
-
 void zmq::socket_base_t::xread_activated (pipe_t *)
 {
     zmq_assert (false);
@@ -1557,16 +1541,25 @@ void zmq::socket_base_t::pipe_terminated (pipe_t *pipe_)
     xpipe_terminated (pipe_);
 
     // Remove pipe from inproc pipes
-    for (inprocs_t::iterator it = _inprocs.begin (); it != _inprocs.end ();
-         ++it)
-        if (it->second == pipe_) {
-            _inprocs.erase (it);
-            break;
-        }
+    _inprocs.erase_pipe (pipe_);
 
     //  Remove the pipe from the list of attached pipes and confirm its
     //  termination if we are already shutting down.
     _pipes.erase (pipe_);
+
+    // Remove the pipe from _endpoints (set it to NULL).
+    if (!pipe_->get_endpoint_uri ().empty ()) {
+        std::pair<endpoints_t::iterator, endpoints_t::iterator> range;
+        range = _endpoints.equal_range (pipe_->get_endpoint_uri ());
+
+        for (endpoints_t::iterator it = range.first; it != range.second; ++it) {
+            if (it->second.second == pipe_) {
+                it->second.second = NULL;
+                break;
+            }
+        }
+    }
+
     if (is_terminating ())
         unregister_term_ack ();
 }
@@ -1581,7 +1574,7 @@ void zmq::socket_base_t::extract_flags (msg_t *msg_)
     _rcvmore = (msg_->flags () & msg_t::more) != 0;
 }
 
-int zmq::socket_base_t::monitor (const char *addr_, int events_)
+int zmq::socket_base_t::monitor (const char *endpoint_, int events_)
 {
     scoped_lock_t lock (_monitor_sync);
 
@@ -1591,18 +1584,18 @@ int zmq::socket_base_t::monitor (const char *addr_, int events_)
     }
 
     //  Support deregistering monitoring endpoints as well
-    if (addr_ == NULL) {
+    if (endpoint_ == NULL) {
         stop_monitor ();
         return 0;
     }
-    //  Parse addr_ string.
+    //  Parse endpoint_uri_ string.
     std::string protocol;
     std::string address;
-    if (parse_uri (addr_, protocol, address) || check_protocol (protocol))
+    if (parse_uri (endpoint_, protocol, address) || check_protocol (protocol))
         return -1;
 
     //  Event notification only supported over inproc://
-    if (protocol != "inproc") {
+    if (protocol != protocol_name::inproc) {
         errno = EPROTONOSUPPORT;
         return -1;
     }
@@ -1624,107 +1617,110 @@ int zmq::socket_base_t::monitor (const char *addr_, int events_)
         stop_monitor (false);
 
     //  Spawn the monitor socket endpoint
-    rc = zmq_bind (_monitor_socket, addr_);
+    rc = zmq_bind (_monitor_socket, endpoint_);
     if (rc == -1)
         stop_monitor (false);
     return rc;
 }
 
-void zmq::socket_base_t::event_connected (const std::string &addr_,
+void zmq::socket_base_t::event_connected (const std::string &endpoint_uri_,
                                           zmq::fd_t fd_)
 {
-    event (addr_, fd_, ZMQ_EVENT_CONNECTED);
+    event (endpoint_uri_, fd_, ZMQ_EVENT_CONNECTED);
 }
 
-void zmq::socket_base_t::event_connect_delayed (const std::string &addr_,
-                                                int err_)
+void zmq::socket_base_t::event_connect_delayed (
+  const std::string &endpoint_uri_, int err_)
 {
-    event (addr_, err_, ZMQ_EVENT_CONNECT_DELAYED);
+    event (endpoint_uri_, err_, ZMQ_EVENT_CONNECT_DELAYED);
 }
 
-void zmq::socket_base_t::event_connect_retried (const std::string &addr_,
-                                                int interval_)
+void zmq::socket_base_t::event_connect_retried (
+  const std::string &endpoint_uri_, int interval_)
 {
-    event (addr_, interval_, ZMQ_EVENT_CONNECT_RETRIED);
+    event (endpoint_uri_, interval_, ZMQ_EVENT_CONNECT_RETRIED);
 }
 
-void zmq::socket_base_t::event_listening (const std::string &addr_,
+void zmq::socket_base_t::event_listening (const std::string &endpoint_uri_,
                                           zmq::fd_t fd_)
 {
-    event (addr_, fd_, ZMQ_EVENT_LISTENING);
+    event (endpoint_uri_, fd_, ZMQ_EVENT_LISTENING);
 }
 
-void zmq::socket_base_t::event_bind_failed (const std::string &addr_, int err_)
+void zmq::socket_base_t::event_bind_failed (const std::string &endpoint_uri_,
+                                            int err_)
 {
-    event (addr_, err_, ZMQ_EVENT_BIND_FAILED);
+    event (endpoint_uri_, err_, ZMQ_EVENT_BIND_FAILED);
 }
 
-void zmq::socket_base_t::event_accepted (const std::string &addr_,
+void zmq::socket_base_t::event_accepted (const std::string &endpoint_uri_,
                                          zmq::fd_t fd_)
 {
-    event (addr_, fd_, ZMQ_EVENT_ACCEPTED);
+    event (endpoint_uri_, fd_, ZMQ_EVENT_ACCEPTED);
 }
 
-void zmq::socket_base_t::event_accept_failed (const std::string &addr_,
+void zmq::socket_base_t::event_accept_failed (const std::string &endpoint_uri_,
                                               int err_)
 {
-    event (addr_, err_, ZMQ_EVENT_ACCEPT_FAILED);
+    event (endpoint_uri_, err_, ZMQ_EVENT_ACCEPT_FAILED);
 }
 
-void zmq::socket_base_t::event_closed (const std::string &addr_, zmq::fd_t fd_)
+void zmq::socket_base_t::event_closed (const std::string &endpoint_uri_,
+                                       zmq::fd_t fd_)
 {
-    event (addr_, fd_, ZMQ_EVENT_CLOSED);
+    event (endpoint_uri_, fd_, ZMQ_EVENT_CLOSED);
 }
 
-void zmq::socket_base_t::event_close_failed (const std::string &addr_, int err_)
+void zmq::socket_base_t::event_close_failed (const std::string &endpoint_uri_,
+                                             int err_)
 {
-    event (addr_, err_, ZMQ_EVENT_CLOSE_FAILED);
+    event (endpoint_uri_, err_, ZMQ_EVENT_CLOSE_FAILED);
 }
 
-void zmq::socket_base_t::event_disconnected (const std::string &addr_,
+void zmq::socket_base_t::event_disconnected (const std::string &endpoint_uri_,
                                              zmq::fd_t fd_)
 {
-    event (addr_, fd_, ZMQ_EVENT_DISCONNECTED);
+    event (endpoint_uri_, fd_, ZMQ_EVENT_DISCONNECTED);
 }
 
 void zmq::socket_base_t::event_handshake_failed_no_detail (
-  const std::string &addr_, int err_)
+  const std::string &endpoint_uri_, int err_)
 {
-    event (addr_, err_, ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL);
+    event (endpoint_uri_, err_, ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL);
 }
 
 void zmq::socket_base_t::event_handshake_failed_protocol (
-  const std::string &addr_, int err_)
+  const std::string &endpoint_uri_, int err_)
 {
-    event (addr_, err_, ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL);
+    event (endpoint_uri_, err_, ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL);
 }
 
-void zmq::socket_base_t::event_handshake_failed_auth (const std::string &addr_,
-                                                      int err_)
+void zmq::socket_base_t::event_handshake_failed_auth (
+  const std::string &endpoint_uri_, int err_)
 {
-    event (addr_, err_, ZMQ_EVENT_HANDSHAKE_FAILED_AUTH);
+    event (endpoint_uri_, err_, ZMQ_EVENT_HANDSHAKE_FAILED_AUTH);
 }
 
-void zmq::socket_base_t::event_handshake_succeeded (const std::string &addr_,
-                                                    int err_)
+void zmq::socket_base_t::event_handshake_succeeded (
+  const std::string &endpoint_uri_, int err_)
 {
-    event (addr_, err_, ZMQ_EVENT_HANDSHAKE_SUCCEEDED);
+    event (endpoint_uri_, err_, ZMQ_EVENT_HANDSHAKE_SUCCEEDED);
 }
 
-void zmq::socket_base_t::event (const std::string &addr_,
+void zmq::socket_base_t::event (const std::string &endpoint_uri_,
                                 intptr_t value_,
                                 int type_)
 {
     scoped_lock_t lock (_monitor_sync);
     if (_monitor_events & type_) {
-        monitor_event (type_, value_, addr_);
+        monitor_event (type_, value_, endpoint_uri_);
     }
 }
 
 //  Send a monitor event
 void zmq::socket_base_t::monitor_event (int event_,
                                         intptr_t value_,
-                                        const std::string &addr_)
+                                        const std::string &endpoint_uri_) const
 {
     // this is a private method which is only called from
     // contexts where the mutex has been locked before
@@ -1742,8 +1738,9 @@ void zmq::socket_base_t::monitor_event (int event_,
         zmq_sendmsg (_monitor_socket, &msg, ZMQ_SNDMORE);
 
         //  Send address in second frame
-        zmq_msg_init_size (&msg, addr_.size ());
-        memcpy (zmq_msg_data (&msg), addr_.c_str (), addr_.size ());
+        zmq_msg_init_size (&msg, endpoint_uri_.size ());
+        memcpy (zmq_msg_data (&msg), endpoint_uri_.c_str (),
+                endpoint_uri_.size ());
         zmq_sendmsg (_monitor_socket, &msg, 0);
     }
 }
@@ -1761,4 +1758,110 @@ void zmq::socket_base_t::stop_monitor (bool send_monitor_stopped_event_)
         _monitor_socket = NULL;
         _monitor_events = 0;
     }
+}
+
+zmq::routing_socket_base_t::routing_socket_base_t (class ctx_t *parent_,
+                                                   uint32_t tid_,
+                                                   int sid_) :
+    socket_base_t (parent_, tid_, sid_)
+{
+}
+
+zmq::routing_socket_base_t::~routing_socket_base_t ()
+{
+    zmq_assert (_out_pipes.empty ());
+}
+
+int zmq::routing_socket_base_t::xsetsockopt (int option_,
+                                             const void *optval_,
+                                             size_t optvallen_)
+{
+    switch (option_) {
+        case ZMQ_CONNECT_ROUTING_ID:
+            // TODO why isn't it possible to set an empty connect_routing_id
+            //   (which is the default value)
+            if (optval_ && optvallen_) {
+                _connect_routing_id.assign (static_cast<const char *> (optval_),
+                                            optvallen_);
+                return 0;
+            }
+            break;
+    }
+    errno = EINVAL;
+    return -1;
+}
+
+void zmq::routing_socket_base_t::xwrite_activated (pipe_t *pipe_)
+{
+    const out_pipes_t::iterator end = _out_pipes.end ();
+    out_pipes_t::iterator it;
+    for (it = _out_pipes.begin (); it != end; ++it)
+        if (it->second.pipe == pipe_)
+            break;
+
+    zmq_assert (it != end);
+    zmq_assert (!it->second.active);
+    it->second.active = true;
+}
+
+std::string zmq::routing_socket_base_t::extract_connect_routing_id ()
+{
+    std::string res = ZMQ_MOVE (_connect_routing_id);
+    _connect_routing_id.clear ();
+    return res;
+}
+
+bool zmq::routing_socket_base_t::connect_routing_id_is_set () const
+{
+    return !_connect_routing_id.empty ();
+}
+
+void zmq::routing_socket_base_t::add_out_pipe (blob_t routing_id_,
+                                               pipe_t *pipe_)
+{
+    //  Add the record into output pipes lookup table
+    const out_pipe_t outpipe = {pipe_, true};
+    const bool ok =
+      _out_pipes.ZMQ_MAP_INSERT_OR_EMPLACE (ZMQ_MOVE (routing_id_), outpipe)
+        .second;
+    zmq_assert (ok);
+}
+
+bool zmq::routing_socket_base_t::has_out_pipe (const blob_t &routing_id_) const
+{
+    return 0 != _out_pipes.count (routing_id_);
+}
+
+zmq::routing_socket_base_t::out_pipe_t *
+zmq::routing_socket_base_t::lookup_out_pipe (const blob_t &routing_id_)
+{
+    // TODO we could probably avoid constructor a temporary blob_t to call this function
+    out_pipes_t::iterator it = _out_pipes.find (routing_id_);
+    return it == _out_pipes.end () ? NULL : &it->second;
+}
+
+const zmq::routing_socket_base_t::out_pipe_t *
+zmq::routing_socket_base_t::lookup_out_pipe (const blob_t &routing_id_) const
+{
+    // TODO we could probably avoid constructor a temporary blob_t to call this function
+    const out_pipes_t::const_iterator it = _out_pipes.find (routing_id_);
+    return it == _out_pipes.end () ? NULL : &it->second;
+}
+
+void zmq::routing_socket_base_t::erase_out_pipe (pipe_t *pipe_)
+{
+    const size_t erased = _out_pipes.erase (pipe_->get_routing_id ());
+    zmq_assert (erased);
+}
+
+zmq::routing_socket_base_t::out_pipe_t
+zmq::routing_socket_base_t::try_erase_out_pipe (const blob_t &routing_id_)
+{
+    const out_pipes_t::iterator it = _out_pipes.find (routing_id_);
+    out_pipe_t res = {NULL, false};
+    if (it != _out_pipes.end ()) {
+        res = it->second;
+        _out_pipes.erase (it);
+    }
+    return res;
 }

@@ -51,6 +51,10 @@ zmq::pgm_sender_t::pgm_sender_t (io_thread_t *parent_,
     more_flag (false),
     pgm_socket (false, options_),
     options (options_),
+    handle (static_cast<handle_t> (NULL)),
+    uplink_handle (static_cast<handle_t> (NULL)),
+    rdata_notify_handle (static_cast<handle_t> (NULL)),
+    pending_notify_handle (static_cast<handle_t> (NULL)),
     out_buffer (NULL),
     out_buffer_size (0),
     write_size (0)
@@ -133,9 +137,10 @@ void zmq::pgm_sender_t::restart_output ()
     out_event ();
 }
 
-void zmq::pgm_sender_t::restart_input ()
+bool zmq::pgm_sender_t::restart_input ()
 {
     zmq_assert (false);
+    return true;
 }
 
 const char *zmq::pgm_sender_t::get_endpoint () const

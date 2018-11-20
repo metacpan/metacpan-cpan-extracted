@@ -4,7 +4,7 @@ Photonic::NonRetarded::FieldH
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ evaluation of the field
 =cut
 
 package Photonic::NonRetarded::FieldH;
-$Photonic::NonRetarded::FieldH::VERSION = '0.009';
+$Photonic::NonRetarded::FieldH::VERSION = '0.010';
 
 use namespace::autoclean;
 use PDL::Lite;

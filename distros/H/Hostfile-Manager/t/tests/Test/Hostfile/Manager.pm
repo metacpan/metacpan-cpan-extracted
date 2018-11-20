@@ -310,7 +310,8 @@ sub fragment_list : Tests(2) {
     my $manager   = $test->class->new( path_prefix => $prefix );
 
     can_ok $manager, 'fragment_list';
-    is $manager->fragment_list, @fragments,
+    my @fl = $manager->fragment_list;
+    is_deeply \@fl, \@fragments,
       '... and fragment list matches expectation';
 }
 

@@ -1,5 +1,12 @@
 Revision history for Device-Chip-ADT7470
 
+0.03    2018/11/16
+        Bump prereq version of Data::Bitfield.
+	Switch to ExtUtils::MakeMaker.
+
+0.02    2018/11/15
+        Added test cases and change to build.
+
 0.01    2018/11/10
         First version.
 

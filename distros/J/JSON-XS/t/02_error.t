@@ -1,4 +1,4 @@
-BEGIN { $| = 1; print "1..31\n"; }
+BEGIN { $| = 1; print "1..35\n"; }
 
 use utf8;
 use JSON::XS;
@@ -20,7 +20,7 @@ eval { JSON::XS->new->allow_nonref (1)->decode ('"\u1234\udc00"') }; ok $@ =~ /m
 eval { JSON::XS->new->allow_nonref->decode ('"\ud800"') }; ok $@ =~ /missing low /;
 eval { JSON::XS->new->allow_nonref (1)->decode ('"\ud800\u1234"') }; ok $@ =~ /surrogate pair /;
 
-eval { JSON::XS->new->decode ('null') }; ok $@ =~ /allow_nonref/;
+eval { JSON::XS->new->allow_nonref (0)->decode ('null') }; ok $@ =~ /allow_nonref/;
 eval { JSON::XS->new->allow_nonref (1)->decode ('+0') }; ok $@ =~ /malformed/;
 eval { JSON::XS->new->allow_nonref->decode ('.2') }; ok $@ =~ /malformed/;
 eval { JSON::XS->new->allow_nonref (1)->decode ('bare') }; ok $@ =~ /malformed/;
@@ -44,4 +44,8 @@ eval { JSON::XS->new->decode (*STDERR) }; ok !!$@; # cannot coerce GLOB
 
 eval { decode_json ("\"\xa0") }; ok $@ =~ /malformed.*character/;
 eval { decode_json ("\"\xa0\"") }; ok $@ =~ /malformed.*character/;
+eval { decode_json ("1\x01") }; ok $@ =~ /garbage after/;
+eval { decode_json ("1\x00") }; ok $@ =~ /garbage after/;
+eval { decode_json ("\"\"\x00") }; ok $@ =~ /garbage after/;
+eval { decode_json ("[]\x00") }; ok $@ =~ /garbage after/;
 

@@ -9,8 +9,8 @@ has mode  => ('rwx------');
 has umask => ();
 has lazy  => ();
 
-has path => ( is => 'lazy', init_arg => undef );
-has owner_pid => ( $$, init_arg => undef );
+has path      => ( is => 'lazy', init_arg => undef );
+has owner_pid => ( $$,           init_arg => undef );
 
 use overload    #
   q[""] => sub {

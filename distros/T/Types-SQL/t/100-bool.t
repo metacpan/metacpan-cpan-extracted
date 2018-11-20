@@ -7,35 +7,32 @@ use if $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING}, 'Test::Warnings';
 use Types::SQL::Util;
 use Types::Standard -types;
 
-subtest 'bool' => sub {
+foreach my $type (Bool,
+                  InstanceOf['Types::Serialiser::Boolean'],
+                  InstanceOf['JSON::PP::Boolean'],
+    ) {
+    subtest $type->display_name => sub {
 
-    my $type = Bool;
+        my %info = column_info_from_type($type);
 
-    isa_ok $type => 'Type::Tiny';
+        is_deeply \%info => { data_type => 'boolean' },
+          'column_info'
+          or note( explain \%info );
 
-    my %info = column_info_from_type($type);
+    };
 
-    is_deeply \%info => { data_type => 'boolean' },
-      'column_info'
-      or note( explain \%info );
+    my $maybe = Maybe [$type];
 
-};
+    subtest $maybe->display_name => sub {
 
-subtest 'maybe bool' => sub {
+        my %info = column_info_from_type($maybe);
 
-    my $type = Maybe [Bool];
+        is_deeply \%info => { data_type => 'boolean', is_nullable => 1 },
+          'column_info'
+          or note( explain \%info );
 
-    isa_ok $type => 'Type::Tiny';
+    };
 
-    my %info = column_info_from_type($type);
-
-    is_deeply \%info => {
-        data_type   => 'boolean',
-        is_nullable => 1,
-      },
-      'column_info'
-      or note( explain \%info );
-
-};
+}
 
 done_testing;

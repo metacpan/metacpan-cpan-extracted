@@ -1,6 +1,6 @@
 # Build.PL
 # Use to build the package Photonic
-our $VERSION = '0.009';
+our $VERSION = '0.010';
     
 use strict;
 use warnings;
@@ -23,17 +23,19 @@ my $builder = Module::Build::Pluggable->new(
     f_source   => [ 'fortran' ],
     requires   => { 
 	"Inline" => 0,
+	"Carp" => 0,
 	"List::Util" => 0,
+	"Machine::Epsilon" => 0,
 	"Moose" => 0,
 	"Moose::Role" => 0,
 	"Moose::Util::TypeConstraints" => 0,
+	"namespace::autoclean" => 0,
 	"PDL" => 0,
 	"PDL::FFTW3" => 0,
 	"PDL::IO::Pic" => 0,
 	"PDL::IO::Storable" => 0,
 	"PDL::NiceSlice" => 0,
 	"Storable" => 0,
-	"Carp" => 0,
     },
     test_requires => {
 	"Test::More" => 0,

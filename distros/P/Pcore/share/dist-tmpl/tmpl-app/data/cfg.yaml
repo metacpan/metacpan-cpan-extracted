@@ -19,3 +19,19 @@ node:
     # node listen address, if not defined - local listen address will be generated
     # see node server uri examples above
     listen:
+
+smtp:
+  username: no-reply@softvisio.net
+  password:
+  host: smtp.gmail.com
+  port: 465
+  tls: 1
+  to:
+  cc:
+
+xmpp:
+    username: no-reply@softvisio.net
+    password:
+    host: talk.google.com
+    port: 5222
+    to:

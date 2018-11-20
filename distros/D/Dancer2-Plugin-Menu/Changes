@@ -1,10 +1,31 @@
 Revision history for Dancer2-Plugin-Menu
 
+0.009     2018-11-20 04:41:24-05:00 America/New_York
+  - typo fixes to POD
+  - include route prefix in tests
+  - simplify menu_item code
+
+0.008     2018-11-19 09:58:21-05:00 America/New_York
+  - improved performance with cache for html menus
+  - fix bug that could cause wrong menu item to get displayed
+  - improve tests
+  - documentation improvements
+
+0.007     2018-11-17 06:55:33-05:00 America/New_York
+  - reorder routes in test
+  - improve code readability and logic
+    - eliminate crufty object attributes
+    - rename variables
+    - better code comments
+    - make logic of menu_item function easier to follow
+  - documentation improvements
+  - get smoke tests on machines using pure perl modules to pass
+
 0.006     2018-11-14 03:19:51-05:00 America/New_York
   - More code tightening and tidying
   - Ensure default titles are set if not supplied by user
   - Ensure default weights are set if not supplied by user
-  - Protect menu item data from getting overwritten by other routes
+  - Protect menu item data from getting clobbered by other routes
   - Add missing "Name" section to weaver.ini
 
 0.005     2018-11-13 11:24:27-05:00 America/New_York

@@ -19,9 +19,14 @@ deps/libzmq/README.md
 deps/libzmq/RELICENSE/AndreLouisCaron.md
 deps/libzmq/RELICENSE/Asmod4n.md
 deps/libzmq/RELICENSE/BerndPrager.md
+deps/libzmq/RELICENSE/BillTorpey.md
 deps/libzmq/RELICENSE/Bklyn.md
 deps/libzmq/RELICENSE/BrianBuchanan.md
+deps/libzmq/RELICENSE/ByronMallett.md
+deps/libzmq/RELICENSE/ChristophSchulz.md
 deps/libzmq/RELICENSE/ChuckRemes.md
+deps/libzmq/RELICENSE/FabriceFontaine.md
+deps/libzmq/RELICENSE/FrancescoMontorsi.md
 deps/libzmq/RELICENSE/FrancoFichtner.md
 deps/libzmq/RELICENSE/GavinMcNiff.md
 deps/libzmq/RELICENSE/GhislainPutois.md
@@ -42,9 +47,12 @@ deps/libzmq/RELICENSE/SylvainCorlay.md
 deps/libzmq/RELICENSE/TimotheeBesset.md
 deps/libzmq/RELICENSE/VincentTellier.md
 deps/libzmq/RELICENSE/VolodymyrKorniichuk.md
+deps/libzmq/RELICENSE/WenbinHou.md
 deps/libzmq/RELICENSE/abbradar.md
 deps/libzmq/RELICENSE/agronholm.md
 deps/libzmq/RELICENSE/amuraru.md
+deps/libzmq/RELICENSE/answeroo.md
+deps/libzmq/RELICENSE/antonrd.md
 deps/libzmq/RELICENSE/arsenm.md
 deps/libzmq/RELICENSE/aseering.md
 deps/libzmq/RELICENSE/bjorntopel.md
@@ -59,6 +67,7 @@ deps/libzmq/RELICENSE/chugga_fan.md
 deps/libzmq/RELICENSE/cjuniet.md
 deps/libzmq/RELICENSE/ckamm.md
 deps/libzmq/RELICENSE/clkao.md
+deps/libzmq/RELICENSE/crocket.md
 deps/libzmq/RELICENSE/danielhtshih.md
 deps/libzmq/RELICENSE/danriegsecker.md
 deps/libzmq/RELICENSE/dfons.md
@@ -70,10 +79,14 @@ deps/libzmq/RELICENSE/evoskuil.md
 deps/libzmq/RELICENSE/febeling.md
 deps/libzmq/RELICENSE/fidlej.md
 deps/libzmq/RELICENSE/flub.md
+deps/libzmq/RELICENSE/gabm.md
 deps/libzmq/RELICENSE/gena-moscow.md
+deps/libzmq/RELICENSE/glemercier.md
 deps/libzmq/RELICENSE/gonzus.md
 deps/libzmq/RELICENSE/goodfella_ltd.md
 deps/libzmq/RELICENSE/google.md
+deps/libzmq/RELICENSE/hoditohod.md
+deps/libzmq/RELICENSE/hpsaturn.md
 deps/libzmq/RELICENSE/ianbarber.md
 deps/libzmq/RELICENSE/imatix.md
 deps/libzmq/RELICENSE/jakecobb.md
@@ -84,6 +97,7 @@ deps/libzmq/RELICENSE/johntconklin.md
 deps/libzmq/RELICENSE/jruffin.md
 deps/libzmq/RELICENSE/kentzo.md
 deps/libzmq/RELICENSE/kevinsapper.md
+deps/libzmq/RELICENSE/kfish.md
 deps/libzmq/RELICENSE/kobolog.md
 deps/libzmq/RELICENSE/kurdybacha.md
 deps/libzmq/RELICENSE/linville.md
@@ -102,6 +116,7 @@ deps/libzmq/RELICENSE/mkluwe.md
 deps/libzmq/RELICENSE/montoyaedu.md
 deps/libzmq/RELICENSE/naos_ltd.md
 deps/libzmq/RELICENSE/natano.md
+deps/libzmq/RELICENSE/ojura.md
 deps/libzmq/RELICENSE/olafmandel.md
 deps/libzmq/RELICENSE/pijyoi.md
 deps/libzmq/RELICENSE/ptroja.md
@@ -119,6 +134,7 @@ deps/libzmq/RELICENSE/shripchenko.md
 deps/libzmq/RELICENSE/sigiesec.md
 deps/libzmq/RELICENSE/simias.md
 deps/libzmq/RELICENSE/soulik.md
+deps/libzmq/RELICENSE/ssbl.md
 deps/libzmq/RELICENSE/swansontec.md
 deps/libzmq/RELICENSE/t-b.md
 deps/libzmq/RELICENSE/tSed.md
@@ -129,6 +145,7 @@ deps/libzmq/RELICENSE/templates/relicense-template-mplv2-any-osi.txt
 deps/libzmq/RELICENSE/templates/relicense-template-mplv2-share-alike-osi.txt
 deps/libzmq/RELICENSE/templates/relicense-template-mplv2.txt
 deps/libzmq/RELICENSE/thompsa.md
+deps/libzmq/RELICENSE/toonetown.md
 deps/libzmq/RELICENSE/torehalvorsen.md
 deps/libzmq/RELICENSE/twhittock.md
 deps/libzmq/RELICENSE/ulikoehler.md
@@ -276,6 +293,8 @@ deps/libzmq/src/poll.hpp
 deps/libzmq/src/poller.hpp
 deps/libzmq/src/poller_base.cpp
 deps/libzmq/src/poller_base.hpp
+deps/libzmq/src/polling_util.cpp
+deps/libzmq/src/polling_util.hpp
 deps/libzmq/src/pollset.cpp
 deps/libzmq/src/pollset.hpp
 deps/libzmq/src/precompiled.cpp
@@ -290,6 +309,8 @@ deps/libzmq/src/push.cpp
 deps/libzmq/src/push.hpp
 deps/libzmq/src/radio.cpp
 deps/libzmq/src/radio.hpp
+deps/libzmq/src/radix_tree.cpp
+deps/libzmq/src/radix_tree.hpp
 deps/libzmq/src/random.cpp
 deps/libzmq/src/random.hpp
 deps/libzmq/src/raw_decoder.cpp
@@ -303,7 +324,6 @@ deps/libzmq/src/rep.hpp
 deps/libzmq/src/req.cpp
 deps/libzmq/src/req.hpp
 deps/libzmq/src/router.cpp
-deps/libzmq/src/router.cpp~RF40cad05.TMP
 deps/libzmq/src/router.hpp
 deps/libzmq/src/scatter.cpp
 deps/libzmq/src/scatter.hpp
@@ -312,7 +332,6 @@ deps/libzmq/src/select.hpp
 deps/libzmq/src/server.cpp
 deps/libzmq/src/server.hpp
 deps/libzmq/src/session_base.cpp
-deps/libzmq/src/session_base.cpp~RF4069b78.TMP
 deps/libzmq/src/session_base.hpp
 deps/libzmq/src/signaler.cpp
 deps/libzmq/src/signaler.hpp
@@ -394,6 +413,7 @@ deps/libzmq/unittests/CMakeLists.txt
 deps/libzmq/unittests/unittest_ip_resolver.cpp
 deps/libzmq/unittests/unittest_mtrie.cpp
 deps/libzmq/unittests/unittest_poller.cpp
+deps/libzmq/unittests/unittest_radix_tree.cpp
 deps/libzmq/unittests/unittest_resolver_common.hpp
 deps/libzmq/unittests/unittest_udp_address.cpp
 deps/libzmq/unittests/unittest_ypipe.cpp

@@ -45,32 +45,32 @@ class ctx_t;
 class pipe_t;
 
 //  TODO: This class uses O(n) scheduling. Rewrite it to use O(1) algorithm.
-class router_t : public socket_base_t
+class router_t : public routing_socket_base_t
 {
   public:
     router_t (zmq::ctx_t *parent_, uint32_t tid_, int sid_);
     ~router_t ();
 
     //  Overrides of functions from socket_base_t.
-    void xattach_pipe (zmq::pipe_t *pipe_, bool subscribe_to_all_);
+    void xattach_pipe (zmq::pipe_t *pipe_,
+                       bool subscribe_to_all_,
+                       bool locally_initiated_);
     int xsetsockopt (int option_, const void *optval_, size_t optvallen_);
     int xsend (zmq::msg_t *msg_);
     int xrecv (zmq::msg_t *msg_);
     bool xhas_in ();
     bool xhas_out ();
     void xread_activated (zmq::pipe_t *pipe_);
-    void xwrite_activated (zmq::pipe_t *pipe_);
     void xpipe_terminated (zmq::pipe_t *pipe_);
-    int get_peer_state (const void *identity_, size_t identity_size_) const;
+    int get_peer_state (const void *routing_id_, size_t routing_id_size_) const;
 
   protected:
     //  Rollback any message parts that were sent but not yet flushed.
     int rollback ();
-    const blob_t &get_credential () const;
 
   private:
     //  Receive peer id and update lookup map
-    bool identify_peer (pipe_t *pipe_);
+    bool identify_peer (pipe_t *pipe_, bool locally_initiated_);
 
     //  Fair queueing object for inbound pipes.
     fq_t _fq;
@@ -97,18 +97,8 @@ class router_t : public socket_base_t
     //  If true, more incoming message parts are expected.
     bool _more_in;
 
-    struct out_pipe_t
-    {
-        zmq::pipe_t *pipe;
-        bool active;
-    };
-
     //  We keep a set of pipes that have not been identified yet.
     std::set<pipe_t *> _anonymous_pipes;
-
-    //  Outbound pipes indexed by the peer IDs.
-    typedef std::map<blob_t, out_pipe_t> outpipes_t;
-    outpipes_t _out_pipes;
 
     //  The pipe we are currently writing to.
     zmq::pipe_t *_current_out;

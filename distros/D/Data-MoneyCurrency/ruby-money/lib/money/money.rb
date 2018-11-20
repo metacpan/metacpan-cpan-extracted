@@ -149,7 +149,9 @@ class Money
 
   def self.use_i18n=(value)
     if value
-      warn '[DEPRECATION] `use_i18n` is deprecated - use `Money.locale_backend = :i18n` instead'
+      warn '[DEPRECATION] `use_i18n` is deprecated - use `Money.locale_backend = :i18n` instead for locale based formatting'
+    else
+      warn '[DEPRECATION] `use_i18n` is deprecated - use `Money.locale_backend = :currency` instead for currency based formatting'
     end
 
     @use_i18n = value
@@ -274,10 +276,13 @@ class Money
   #   Money.new(100, "EUR") #=> #<Money @fractional=100 @currency="EUR">
   #
   def initialize(obj, currency = Money.default_currency, bank = Money.default_bank)
-    @fractional = obj.respond_to?(:fractional) ? obj.fractional : as_d(obj)
+    @fractional = as_d(obj.respond_to?(:fractional) ? obj.fractional : obj)
     @currency   = obj.respond_to?(:currency) ? obj.currency : Currency.wrap(currency)
     @currency ||= Money.default_currency
     @bank       = obj.respond_to?(:bank) ? obj.bank : bank
+
+    # BigDecimal can be Infinity and NaN, money of that amount does not make sense
+    raise ArgumentError, 'must be initialized with a finite value' unless @fractional.finite?
   end
 
   # Assuming using a currency using dollars:

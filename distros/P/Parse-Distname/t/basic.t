@@ -44,4 +44,9 @@ is $info->pathname => $path, "pathname";
 ok !$info->is_perl6, "is_perl6";
 is $info->version_number => "0.01", "version_number";
 
+# unrelated files
+ok !parse_distname("authors/id/A/AU/AUTHOR/CHECKSUMS");
+ok !parse_distname("RECENT-6h.json");
+ok !parse_distname("authors/00whois.xml");
+
 done_testing;

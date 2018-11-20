@@ -31,14 +31,13 @@ do { my $x = {
                                       'Exporter' => '0',
                                       'PerlX::Maybe' => '0',
                                       'Ref::Util' => '0',
+                                      'Safe::Isa' => '1.000008',
                                       'Type::Library' => '0',
                                       'Type::Utils' => '0.44',
                                       'Types::Standard' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.8.0',
-                                      'strict' => '0',
-                                      'version' => '0.77',
-                                      'warnings' => '0'
+                                      'version' => '0.77'
                                     }
                     },
        'test' => {
@@ -55,6 +54,7 @@ do { my $x = {
                                    'Time::Piece' => '1.16',
                                    'Time::Seconds' => '0',
                                    'Types::Common::Numeric' => '0',
+                                   'Types::Common::String' => '0',
                                    'if' => '0'
                                  }
                  }

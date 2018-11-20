@@ -1,3 +1,49 @@
+4.03 - fix too agressive db format upgrading.
+
+4.02 - Setup upgrade test in temporary directory rather than test directory. (duh)
+
+4.01 - Update the test to use error codes rather than error
+       message text. Different langauge and locales make
+       comparing error text fail, but the codes will work.
+
+4 -
+ This is a major version update that will require that
+ bin/record_store_convert is run for existing record stores.
+ Sorry about that.
+
+
+ TUNING
+  The minimum silo size for records ( but _not_ the record index ) is
+  4096 - 5 which is also the block size minus the stored id at the
+  beginning of the record and the \0 at the end of it.
+  This is to align the record stores with
+  disc blocks so that the reading and writing is faster.
+
+  removed the utf 8 int stored for each record. The utf-8 encoding
+  should be handled by things that call the record store.
+
+ TRANSACTIONS
+  open_transaction is now 'start_transaction', though open_transaction
+  still has an alias to start_transaction.
+
+  Transactions are now attached to the store instance and remember
+  that multiple store instances can use the store at once.
+
+   when in transaction, values that were updated since the beginning
+    of the transaction are used, rather than the values stored in
+    the store.
+   aliased 'create_transaction' to 'begin_transaction' and deprecated
+    create_transaction
+   added 'commit_transaction' and 'rollback_transaction' methods to
+    the store itself
+
+ BUGFIXES
+  fixed bug where deleted space was not being reclaimed.
+
+  fixed bug in Data::RecordStore::has_id where it
+    could return false for large ids when items were
+    recycled.
+       
 3.21 - removed bad exe files from Makefile.PL, checked Makefile.PL in
     
 3.20 - updated minimum perl version to 5.20 

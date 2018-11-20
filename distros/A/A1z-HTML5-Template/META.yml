@@ -19,6 +19,6 @@ requires:
   strict: '0'
   vars: '0'
   warnings: '0'
-version: '0.19'
+version: '0.20'
 x_generated_by_perl: v5.16.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

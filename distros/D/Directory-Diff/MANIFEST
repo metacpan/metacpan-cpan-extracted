@@ -15,5 +15,6 @@ MANIFEST.SKIP
 README
 t/Directory-Diff-Copy.t
 t/Directory-Diff.t
+t/DirOps.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,34 +1,35 @@
---- #YAML:1.0
-name:               Hostfile-Manager
-version:            0.08
-abstract:           Manage a hostfile by composing multiple fragments into a whole.
+---
+abstract: 'Manage a hostfile by composing multiple fragments into a whole.'
 author:
-    - Anthony J. Mirabella
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Anthony J. Mirabella'
 build_requires:
-    Test::Class:       0
-    Test::Deep:        0
-    Test::Most:        0
-    Test::NoWarnings:  0
-requires:
-    File::Basename:  0
-    File::Find:      0
-    File::Slurp:     0
-    Getopt::Long:    0
-    Moose:           0
-    Pod::Usage:      0
-    Term::Clui:      0
-resources:
-    homepage:    https://github.com/Aneurysm9/hostfile_manager
-    repository:  git://github.com/Aneurysm9/hostfile_manager.git
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  Test::Class: '0'
+  Test::Deep: '0'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hostfile-Manager
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '0'
+  File::Find: '0'
+  File::Slurp: '0'
+  Getopt::Long: '0'
+  Moose: '0'
+  Pod::Usage: '0'
+  Term::Clui: '0'
+resources:
+  homepage: https://github.com/Aneurysm9/hostfile_manager
+  repository: git://github.com/Aneurysm9/hostfile_manager.git
+version: '0.09'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

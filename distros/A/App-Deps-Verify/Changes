@@ -1,5 +1,8 @@
 Revision history for App-Deps-Verify
 
+0.6.0       2018-11-19
+    - Add the --notest option to plinst.
+
 0.4.0       2018-10-26
     - Allow the subcommands to accept several input files using -i flags.
         - For maintaining a common base.

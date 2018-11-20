@@ -129,10 +129,10 @@ sub _req1 ( $self, $args ) {
     my $credential_scope = "$date_ymd/$args->{region}/$self->{service}/aws4_request";
     my $string_to_sign   = "AWS4-HMAC-SHA256\n$date_iso08601\n$credential_scope\n" . sha256_hex $canon_req;
 
-    my $k_date = hmac_sha256 $date_ymd, "AWS4$self->{secret}";
-    my $k_region  = hmac_sha256 $args->{region},  $k_date;
+    my $k_date    = hmac_sha256 $date_ymd, "AWS4$self->{secret}";
+    my $k_region  = hmac_sha256 $args->{region}, $k_date;
     my $k_service = hmac_sha256 $self->{service}, $k_region;
-    my $sign_key = hmac_sha256 'aws4_request', $k_service;
+    my $sign_key  = hmac_sha256 'aws4_request', $k_service;
     my $signature = hmac_sha256_hex $string_to_sign, $sign_key;
 
     # max retries number
@@ -228,9 +228,9 @@ sub get_bucket_content ( $self, @args ) {
         method => 'GET',
         path   => '/',
         query  => [
-            delimiter  => $args{delim} // '',
+            delimiter  => $args{delim}  // '',
             marker     => $args{marker} // '',
-            'max-keys' => $args{max} // '',
+            'max-keys' => $args{max}    // '',
             prefix     => $args{prefix} // '',
         ],
         cb => sub ($res) {

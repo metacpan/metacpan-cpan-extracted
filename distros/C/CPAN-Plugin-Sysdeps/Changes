@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.53  2018-11-17
+	- mapping update
+	- more diagnostics with cpan-sysdeps --debug
+
 0.52  2018-10-27
 	- mapping update
 

@@ -21,7 +21,7 @@ __PACKAGE__->create_ro_accessors( qw(
     backend
 ) );
 
-our $VERSION ='0.72';
+our $VERSION ='0.74';
 
 use constant {
     CHANNEL_BIT     => 0x4,

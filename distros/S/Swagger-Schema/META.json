@@ -4,7 +4,7 @@
       "Jose Luis Martinez <jlmartinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -19,17 +19,10 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "develop" : {
-         "requires" : {
-            "Dist::Zilla" : "0",
-            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
-            "Dist::Zilla::Plugin::VersionFromModule" : "0",
-            "Dist::Zilla::PluginBundle::Git" : "0"
-         }
-      },
       "runtime" : {
          "requires" : {
-            "MooseX::DataModel" : "0"
+            "MooseX::DataModel" : "0",
+            "namespace::autoclean" : "0"
          }
       },
       "test" : {
@@ -50,7 +43,8 @@
          "web" : "https://github.com/pplu/swagger-schema-perl"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "1.03",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

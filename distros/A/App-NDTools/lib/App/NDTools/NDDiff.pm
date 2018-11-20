@@ -6,15 +6,17 @@ use parent 'App::NDTools::NDTool';
 
 use Algorithm::Diff qw(compact_diff);
 use JSON qw();
+use JSON::Patch 0.04 qw();
 use App::NDTools::Slurp qw(s_dump);
 use App::NDTools::Util qw(is_number);
 use Log::Log4Cli 0.18;
 use Struct::Diff 0.96 qw();
+use Struct::Diff::MergePatch qw();
 use Struct::Path 0.80 qw(path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 use Term::ANSIColor qw(color);
 
-our $VERSION = '0.56';
+our $VERSION = '0.60';
 
 my $JSON = JSON->new->canonical->allow_nonref;
 my %COLOR;
@@ -32,7 +34,6 @@ sub arg_opts {
         'brief' => sub { $self->{OPTS}->{ofmt} = $_[0] },
         'colors!' => \$self->{OPTS}->{colors},
         'ctx-text=i' => \$self->{OPTS}->{'ctx-text'},
-        'full-headers' => \$self->{OPTS}->{'full-headers'}, # deprecated since 17 May 2018
         'grep=s@' => \$self->{OPTS}->{grep},
         'json' => sub { $self->{OPTS}->{ofmt} = $_[0] },
         'ignore=s@' => \$self->{OPTS}->{ignore},
@@ -60,14 +61,6 @@ sub configure {
 
     $self->SUPER::configure();
 
-    if ($self->{OPTS}->{'full-headers'}) {
-        log_alert {
-            '--full-headers opt is deprecated and will be removed soon. ' .
-            '--nopretty should be used instead'
-        };
-        $self->{OPTS}->{pretty} = 0;
-    }
-
     $self->{OPTS}->{colors} = $self->{TTY}
         unless (defined $self->{OPTS}->{colors});
 
@@ -91,6 +84,12 @@ sub configure {
         die_fatal "Failed to parse '$_'", 4 if ($@);
         $_ = $tmp;
     }
+
+    $self->{OPTS}->{ofmt} = lc($self->{OPTS}->{ofmt});
+
+    # Use full diff (JSON Merge Patch does not provide arrays diffs)
+    map { $self->{OPTS}->{diff}->{$_} = 1 } keys %{$self->{OPTS}->{diff}},
+        if ($self->{OPTS}->{ofmt} eq 'jsonmergepatch');
 
     return $self;
 }
@@ -244,12 +243,16 @@ sub dump {
 
     log_debug { "Dumping results" };
 
-    if ($self->{OPTS}->{ofmt} eq 'term') {
-        $self->dump_term($diff);
-    } elsif ($self->{OPTS}->{ofmt} eq 'brief') {
-        $self->dump_brief($diff);
-    } elsif ($self->{OPTS}->{ofmt} eq 'rules') {
-        $self->dump_rules($diff);
+    my %formats = (
+        brief           => \&dump_brief,
+        jsonmergepatch  => \&dump_json_merge_patch,
+        jsonpatch       => \&dump_json_patch,
+        rules           => \&dump_rules,
+        term            => \&dump_term,
+    );
+
+    if (my $dump = $formats{$self->{OPTS}->{ofmt}}) {
+        $dump->($self, $diff);
     } else {
         s_dump(\*STDOUT, $self->{OPTS}->{ofmt},
             {pretty => $self->{OPTS}->{pretty}}, $diff);
@@ -272,6 +275,27 @@ sub dump_brief {
         }
     }
 }
+
+sub dump_json_merge_patch {
+    my ($self, $diff) = @_;
+
+    s_dump(
+        \*STDOUT, 'JSON',
+        {pretty => $self->{OPTS}->{pretty}},
+        Struct::Diff::MergePatch::diff($diff)
+    );
+}
+
+sub dump_json_patch {
+    my ($self, $diff) = @_;
+
+    s_dump(
+        \*STDOUT, 'JSON',
+        {pretty => $self->{OPTS}->{pretty}},
+        JSON::Patch::diff($diff)
+    );
+}
+
 
 sub dump_rules {
     my ($self, $diff) = @_;

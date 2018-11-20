@@ -43,59 +43,59 @@
    "provides" : {
       "App::BitBucketCli" : {
          "file" : "lib/App/BitBucketCli.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Base" : {
          "file" : "lib/App/BitBucketCli/Base.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Branch" : {
          "file" : "lib/App/BitBucketCli/Branch.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Command::Branches" : {
          "file" : "lib/App/BitBucketCli/Command/Branches.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Command::Projects" : {
          "file" : "lib/App/BitBucketCli/Command/Projects.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Command::PullRequests" : {
          "file" : "lib/App/BitBucketCli/Command/PullRequests.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Command::Repositories" : {
          "file" : "lib/App/BitBucketCli/Command/Repositories.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Command::Repository" : {
          "file" : "lib/App/BitBucketCli/Command/Repository.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Core" : {
          "file" : "lib/App/BitBucketCli/Core.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Link" : {
          "file" : "lib/App/BitBucketCli/Link.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Links" : {
          "file" : "lib/App/BitBucketCli/Links.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Project" : {
          "file" : "lib/App/BitBucketCli/Project.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::PullRequest" : {
          "file" : "lib/App/BitBucketCli/PullRequest.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "App::BitBucketCli::Repository" : {
          "file" : "lib/App/BitBucketCli/Repository.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -110,6 +110,6 @@
          "url" : "git://github.com/ivanwills/App-bitbucket-cli.git"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

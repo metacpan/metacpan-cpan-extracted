@@ -4,13 +4,13 @@
       "Patrick Galbraith <patg@patg.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBD-mysql",
    "no_index" : {
@@ -72,7 +72,7 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
    },
-   "version" : "4.048",
+   "version" : "4.049",
    "x_contributors" : [
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>",
       "Alexandr Ciornii <alexchorny@gmail.com>",
@@ -133,5 +133,6 @@
       "tokuhirom <tokuhirom@gmail.com>",
       "zefram <zefram@fysh.org>",
       "zentooo <ankerasoy@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

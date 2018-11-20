@@ -20,13 +20,12 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "PerlX::Maybe" => 0,
     "Ref::Util" => 0,
+    "Safe::Isa" => "1.000008",
     "Type::Library" => 0,
     "Type::Utils" => "0.44",
     "Types::Standard" => 0,
     "namespace::autoclean" => 0,
-    "strict" => 0,
-    "version" => "0.77",
-    "warnings" => 0
+    "version" => "0.77"
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -38,9 +37,10 @@ my %WriteMakefileArgs = (
     "Time::Piece" => "1.16",
     "Time::Seconds" => 0,
     "Types::Common::Numeric" => 0,
+    "Types::Common::String" => 0,
     "if" => 0
   },
-  "VERSION" => "v0.2.1",
+  "VERSION" => "v0.3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,6 +55,7 @@ my %FallbackPrereqs = (
   "Path::Tiny" => "0.004",
   "PerlX::Maybe" => 0,
   "Ref::Util" => 0,
+  "Safe::Isa" => "1.000008",
   "Test::More" => 0,
   "Test::Most" => 0,
   "Time::Piece" => "1.16",
@@ -62,12 +63,11 @@ my %FallbackPrereqs = (
   "Type::Library" => 0,
   "Type::Utils" => "0.44",
   "Types::Common::Numeric" => 0,
+  "Types::Common::String" => 0,
   "Types::Standard" => 0,
   "if" => 0,
   "namespace::autoclean" => 0,
-  "strict" => 0,
-  "version" => "0.77",
-  "warnings" => 0
+  "version" => "0.77"
 );
 
 

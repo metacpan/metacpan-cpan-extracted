@@ -10,32 +10,52 @@ Lingua::JA::FindDates - scan text to find dates in a Japanese format
 
     
     use utf8;
-    
-    # Find and replace Japanese dates:
-    
     use Lingua::JA::FindDates 'subsjdate';
     
     # Given a string, find and substitute all the Japanese dates in it.
     
     my $dates = '昭和４１年三月１６日';
     print subsjdate ($dates), "\n";
-    
-    # Find and substitute Japanese dates within a string:
-    
     $dates = 'blah blah blah 三月１６日';
     print subsjdate ($dates), "\n";
+
+
+produces output
+
+    March 16, 1966
+    blah blah blah March 16
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/synopsis.pl> in the distribution.)
+
+
     
-    # subsjdate can also call back a user-supplied routine each time a
-    # date is found:
+    use utf8;
+    use Lingua::JA::FindDates 'subsjdate';
+    
+    # subsjdate can call back when a date is found:
     
     sub replace_callback
     {
         my ($data, $before, $after) = @_;
         print "'$before' was replaced by '$after'.\n";
     }
-    $dates = '三月１６日';
-    my $data = 'xyz';               # something to send to replace_callback
-    subsjdate ($dates, {replace => \&replace_callback, data => $data});
+    my $date = '三月１６日';
+    subsjdate ($date, {replace => \&replace_callback});
+    
+
+
+produces output
+
+    '三月１６日' was replaced by 'March 16'.
+
+
+(This example is included as L<F<synopsis-replace.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/synopsis-replace.pl> in the distribution.)
+
+
+    
+    use utf8;
+    use Lingua::JA::FindDates 'subsjdate';
     
     # A routine can be used to format the date any way, letting C<subsjdate>
     # print it:
@@ -45,9 +65,20 @@ Lingua::JA::FindDates - scan text to find dates in a Japanese format
         my ($data, $original, $date) = @_;
         return join '/', $date->{month}."/".$date->{date};
     }
-    $dates = '三月１６日';
+    my $dates = '三月１６日';
     print subsjdate ($dates, {make_date => \&my_date}), "\n";
+
+
+produces output
+
+    3/16
+
+
+(This example is included as L<F<synopsis-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/synopsis-make-date.pl> in the distribution.)
+
+
     
+    use utf8;
     # Convert Western to Japanese dates
     use Lingua::JA::FindDates 'seireki_to_nengo';
     print seireki_to_nengo ('1989年1月1日'), "\n";
@@ -55,20 +86,16 @@ Lingua::JA::FindDates - scan text to find dates in a Japanese format
 
 produces output
 
-    March 16, 1966
-    blah blah blah March 16
-    '三月１６日' was replaced by 'March 16'.
-    3/16
     昭和64年1月1日
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/synopsis-nengo.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Lingua::JA::FindDates version 0.027
-corresponding to git commit L<b81c538e423e7b262dc1b07b5484db23b965777c|https://github.com/benkasminbullock/Lingua--JA--FindDates/commit/b81c538e423e7b262dc1b07b5484db23b965777c> released on Wed Oct 24 19:46:22 2018 +0900.
+This documents Lingua::JA::FindDates version 0.028
+corresponding to git commit L<21926e6dc89996f842a306c39d7a7f0b7554fab4|https://github.com/benkasminbullock/Lingua--JA--FindDates/commit/21926e6dc89996f842a306c39d7a7f0b7554fab4> released on Mon Nov 19 12:24:41 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -126,8 +153,8 @@ supply a different date-making function using the second argument:
     my $translation = subsjdate ($text, {make_date => \&mymakedate,
                                  make_date_interval => \&myinterval});
 
-The second argument is a hash reference which may have the
-following members:
+The second argument is a hash reference containing callbacks. It may
+have the following members:
 
 =over
 
@@ -165,7 +192,7 @@ produces output
     Sa 1959/1/17。Sa 1997/12/20。
 
 
-(This example is included as L<F<subsjdate-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/subsjdate-make-date.pl> in the distribution.)
+(This example is included as L<F<subsjdate-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/subsjdate-make-date.pl> in the distribution.)
 
 
 The first two arguments passed to your routine will be whatever you
@@ -218,7 +245,7 @@ produces output
     1959/1/17 until 12/20。
 
 
-(This example is included as L<F<subsjdate-make-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/subsjdate-make-interval.pl> in the distribution.)
+(This example is included as L<F<subsjdate-make-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/subsjdate-make-interval.pl> in the distribution.)
 
 
 =item replace
@@ -260,7 +287,7 @@ produces output
 
     昭和64年1月1日
 
-(This example is included as L<F<seireki-to-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/seireki-to-nengo.pl> in the distribution.)
+(This example is included as L<F<seireki-to-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/seireki-to-nengo.pl> in the distribution.)
 
 
 This function substitutes Western-style dates with Japanese-style
@@ -279,7 +306,7 @@ produces output
 
     1989年1月1日
 
-(This example is included as L<F<nengo-to-seireki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/nengo-to-seireki.pl> in the distribution.)
+(This example is included as L<F<nengo-to-seireki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/nengo-to-seireki.pl> in the distribution.)
 
 
 This function substitutes Japanese-style "nengo" dates (年号) with
@@ -331,7 +358,7 @@ produces output
     Monday, March 19, 2012
 
 
-(This example is included as L<F<make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/make-date.pl> in the distribution.)
+(This example is included as L<F<make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/make-date.pl> in the distribution.)
 
 
 To replace the default routine C<default_make_date> with a different
@@ -353,7 +380,7 @@ produces output
 
     3/16
 
-(This example is included as L<F<my-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/my-date.pl> in the distribution.)
+(This example is included as L<F<my-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/my-date.pl> in the distribution.)
 
 
 Note that, depending on what dates are in your document, some of the
@@ -388,7 +415,7 @@ produces output
     Friday 19 February, 2010-Monday 19 March, 2012
 
 
-(This example is included as L<F<default-make-date-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.027/examples/default-make-date-interval.pl> in the distribution.)
+(This example is included as L<F<default-make-date-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.028/examples/default-make-date-interval.pl> in the distribution.)
 
 
 This function is called when an interval of two dates, such as 平成３年
@@ -447,8 +474,7 @@ Please also note the following:
 
 It does not detect that dates like 昭和99年 (Showa 99, an impossible
 year, since Showa 63 (1988) was succeeded by Heisei 1 (1989)) are
-invalid. It does, however, only allow two digits for these named-era
-dates.
+invalid.
 
 =item Only goes back to Meiji
 
@@ -582,6 +608,10 @@ invalid weekday)
 =item z
 
 A I<jun> (旬), a period of one third of a month, or ten days.
+
+=item x
+
+This indicates a date like a "fill in the blanks" date on a form.
 
 =item B<1>
 

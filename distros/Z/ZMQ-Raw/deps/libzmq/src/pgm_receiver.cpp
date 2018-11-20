@@ -86,7 +86,8 @@ void zmq::pgm_receiver_t::plug (io_thread_t *io_thread_,
 void zmq::pgm_receiver_t::unplug ()
 {
     //  Delete decoders.
-    for (peers_t::iterator it = peers.begin (); it != peers.end (); ++it) {
+    for (peers_t::iterator it = peers.begin (), end = peers.end (); it != end;
+         ++it) {
         if (it->second.decoder != NULL) {
             LIBZMQ_DELETE (it->second.decoder);
         }
@@ -116,7 +117,7 @@ void zmq::pgm_receiver_t::restart_output ()
     drop_subscriptions ();
 }
 
-void zmq::pgm_receiver_t::restart_input ()
+bool zmq::pgm_receiver_t::restart_input ()
 {
     zmq_assert (session != NULL);
     zmq_assert (active_tsi != NULL);
@@ -135,7 +136,7 @@ void zmq::pgm_receiver_t::restart_input ()
             //  HWM reached; we will try later.
             if (errno == EAGAIN) {
                 session->flush ();
-                return;
+                return true;
             }
             //  Data error. Delete message decoder, mark the
             //  peer as not joined and drop remaining data.
@@ -151,6 +152,8 @@ void zmq::pgm_receiver_t::restart_input ()
 
     active_tsi = NULL;
     in_event ();
+
+    return true;
 }
 
 const char *zmq::pgm_receiver_t::get_endpoint () const
@@ -160,6 +163,12 @@ const char *zmq::pgm_receiver_t::get_endpoint () const
 
 void zmq::pgm_receiver_t::in_event ()
 {
+    // If active_tsi is not null, there is a pending restart_input.
+    // Keep the internal state as is so that restart_input would process the right data
+    if (active_tsi) {
+        return;
+    }
+
     // Read data from the underlying pgm_socket.
     const pgm_tsi_t *tsi = NULL;
 
@@ -173,9 +182,9 @@ void zmq::pgm_receiver_t::in_event ()
     while (true) {
         //  Get new batch of data.
         //  Note the workaround made not to break strict-aliasing rules.
+        insize = 0;
         void *tmp = NULL;
         ssize_t received = pgm_socket.receive (&tmp, &tsi);
-        inpos = (unsigned char *) tmp;
 
         //  No data to process. This may happen if the packet received is
         //  neither ODATA nor ODATA.
@@ -209,6 +218,7 @@ void zmq::pgm_receiver_t::in_event ()
         }
 
         insize = static_cast<size_t> (received);
+        inpos = (unsigned char *) tmp;
 
         //  Read the offset of the fist message in the current packet.
         zmq_assert (insize >= sizeof (uint16_t));

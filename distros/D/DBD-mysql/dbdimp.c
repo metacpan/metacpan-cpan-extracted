@@ -329,7 +329,7 @@ free_param(pTHX_ imp_sth_ph_t *params, int num_params)
 
 static enum enum_field_types mysql_to_perl_type(enum enum_field_types type)
 {
-  static enum enum_field_types enum_type;
+  enum enum_field_types enum_type;
 
   switch (type) {
   case MYSQL_TYPE_DOUBLE:
@@ -1907,20 +1907,22 @@ MYSQL *mysql_dr_connect(
                          (SvTRUE(*svp) ? "utf8" : "latin1"));
         }
 
-#if (MYSQL_VERSION_ID >= 50723) && (MYSQL_VERSION_ID < MARIADB_BASE_VERSION)
+#ifndef MARIADB_BASE_VERSION
+#if (MYSQL_VERSION_ID >= 50723)
         if ((svp = hv_fetch(hv, "mysql_get_server_pubkey", 23, FALSE)) && *svp && SvTRUE(*svp)) {
           my_bool server_get_pubkey = 1;
           mysql_options(sock, MYSQL_OPT_GET_SERVER_PUBLIC_KEY, &server_get_pubkey);
         }
 #endif
 
-#if (MYSQL_VERSION_ID >= 50600) && (MYSQL_VERSION_ID < MARIADB_BASE_VERSION)
+#if (MYSQL_VERSION_ID >= 50600)
         if ((svp = hv_fetch(hv, "mysql_server_pubkey", 19, FALSE)) && *svp) {
           STRLEN plen;
           char *server_pubkey = SvPV(*svp, plen);
           mysql_options(sock, MYSQL_SERVER_PUBLIC_KEY, server_pubkey);
         }
 #endif
+#endif /* MARIADB_BASE_VERSION */
 
 	if ((svp = hv_fetch(hv, "mysql_ssl", 9, FALSE)) && *svp && SvTRUE(*svp))
           {
@@ -5544,6 +5546,7 @@ int mysql_db_async_result(SV* h, MYSQL_RES** resp)
   MYSQL_RES* _res;
   int retval = 0;
   int htype;
+  bool async_sth = FALSE;
 
   if(! resp) {
       resp = &_res;
@@ -5558,9 +5561,13 @@ int mysql_db_async_result(SV* h, MYSQL_RES** resp)
       D_imp_sth(h);
       D_imp_dbh_from_sth;
       dbh = imp_dbh;
+      async_sth = imp_sth->is_async;
+      retval = imp_sth->row_num;
   }
 
   if(! dbh->async_query_in_flight) {
+      if (async_sth)
+          return retval;
       do_error(h, 2000, "Gathering asynchronous results for a synchronous handle", "HY000");
       return -1;
   }
@@ -5619,6 +5626,8 @@ int mysql_db_async_ready(SV* h)
   D_imp_xxh(h);
   imp_dbh_t* dbh;
   int htype;
+  bool async_sth = FALSE;
+  bool async_active = FALSE;
 
   htype = DBIc_TYPE(imp_xxh);
   
@@ -5629,6 +5638,8 @@ int mysql_db_async_ready(SV* h)
       D_imp_sth(h);
       D_imp_dbh_from_sth;
       dbh = imp_dbh;
+      async_sth = imp_sth->is_async;
+      async_active = !!DBIc_ACTIVE(imp_sth);
   }
 
   if(dbh->async_query_in_flight) {
@@ -5643,6 +5654,12 @@ int mysql_db_async_ready(SV* h)
           return -1;
       }
   } else {
+      if (async_sth) {
+          if (async_active)
+              return 1;
+          do_error(h, 2000, "Asynchronous handle was not executed yet", "HY000");
+          return -1;
+      }
       do_error(h, 2000, "Handle is not in asynchronous mode", "HY000");
       return -1;
   }

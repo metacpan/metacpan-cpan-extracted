@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,14 +17,15 @@ no_index:
   directory:
     - t
     - inc
+    - examples/old_dir
+    - examples/new_dir
+  file:
+    - t/DirOps.pm
 requires:
-  Cwd: '0'
   File::Compare: '0'
-  File::Copy: '0'
-  File::Path: '0'
   perl: '5.006001'
 resources:
   bugtracker: https://github.com/benkasminbullock/Directory-Diff/issues
   repository: git://github.com/benkasminbullock/Directory-Diff.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

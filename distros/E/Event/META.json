@@ -3,14 +3,14 @@
    "author" : [
       "unknown"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Event",
    "no_index" : {
@@ -30,10 +30,21 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Pod" : "1.22"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "Test" : "1",
             "perl" : "5.008000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "1"
          }
       }
    },
@@ -45,5 +56,6 @@
          "web" : "https://github.com/mohawk2/cpan-Event"
       }
    },
-   "version" : "1.26"
+   "version" : "1.27",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -45,7 +45,7 @@ my %module = (
     },
 
     PREREQ_PM => {
-        'Getopt::Long'          => '2.38', # for GetOptionsFromArray
+        'Getopt::Long'          => '2.39', # for ->getoptionsfromarray
         'Filter::signatures'    => '0.09',
         'Moo'                   => '2',
         'HTTP::Request'         => '6.07',

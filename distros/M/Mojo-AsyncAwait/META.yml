@@ -1,0 +1,33 @@
+---
+abstract: 'An Async/Await implementation for Mojolicious'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+  - 'Marcus Ramberg <mramberg@cpan.org>'
+build_requires:
+  Test::Lib: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.024, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-AsyncAwait
+provides:
+  Mojo::AsyncAwait:
+    file: lib/Mojo/AsyncAwait.pm
+    version: '0.01'
+  Mojo::AsyncAwait::Backend::Coro:
+    file: lib/Mojo/AsyncAwait/Backend/Coro.pm
+requires:
+  Coro: '0'
+  Import::Into: '0'
+  Mojolicious: '7.66'
+  Sub::Util: '1.41'
+resources:
+  bugtracker: http://github.com/mojolicious/Mojo-AsyncAwait/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mojolicious/Mojo-AsyncAwait
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

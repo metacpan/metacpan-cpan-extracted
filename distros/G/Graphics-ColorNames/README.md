@@ -4,7 +4,7 @@ Graphics::ColorNames - defines RGB values for common color names
 
 # VERSION
 
-version v3.3.4
+version v3.4.0
 
 # SYNOPSIS
 
@@ -123,15 +123,7 @@ $color = $pal->hex('#123abc');         # returns '123abc'
 
 ## autoloaded color name methods
 
-An autoloading interface was added in v2.11:
-
-```
-$po->green; # same as $po->rgb('green');
-```
-
-Method names are case-insensitive, and underscores are ignored.
-
-This is deprecated, and will be removed in a future version.
+Autoloaded color name methods were removed in v3.4.0.
 
 ## `load_scheme`
 
@@ -240,7 +232,6 @@ The following changes are planned in the future:
 
 - Support for Perl versions earlier than 5.10 will be removed sometime
 in 2019.
-- Autoloaded color name methods will be removed.
 - The tied interface will be removed, but implemented in a separate
 module for users that wish to use it.
 - The namespace for color schemes will be moved to the

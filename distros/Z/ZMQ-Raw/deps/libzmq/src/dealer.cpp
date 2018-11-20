@@ -44,9 +44,12 @@ zmq::dealer_t::~dealer_t ()
 {
 }
 
-void zmq::dealer_t::xattach_pipe (pipe_t *pipe_, bool subscribe_to_all_)
+void zmq::dealer_t::xattach_pipe (pipe_t *pipe_,
+                                  bool subscribe_to_all_,
+                                  bool locally_initiated_)
 {
     LIBZMQ_UNUSED (subscribe_to_all_);
+    LIBZMQ_UNUSED (locally_initiated_);
 
     zmq_assert (pipe_);
 
@@ -57,7 +60,7 @@ void zmq::dealer_t::xattach_pipe (pipe_t *pipe_, bool subscribe_to_all_)
 
         rc = pipe_->write (&probe_msg);
         // zmq_assert (rc) is not applicable here, since it is not a bug.
-        (void) rc;
+        LIBZMQ_UNUSED (rc);
 
         pipe_->flush ();
 
@@ -113,12 +116,6 @@ bool zmq::dealer_t::xhas_out ()
 {
     return _lb.has_out ();
 }
-
-const zmq::blob_t &zmq::dealer_t::get_credential () const
-{
-    return _fq.get_credential ();
-}
-
 
 void zmq::dealer_t::xread_activated (pipe_t *pipe_)
 {

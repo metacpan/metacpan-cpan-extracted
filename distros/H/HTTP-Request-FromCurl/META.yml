@@ -25,7 +25,7 @@ no_index:
     - inc
 requires:
   Filter::signatures: '0.09'
-  Getopt::Long: '2.38'
+  Getopt::Long: '2.39'
   HTTP::Request: '6.07'
   HTTP::Request::Common: '6.07'
   List::Util: '1.29'
@@ -37,6 +37,6 @@ requires:
   perl: '5.008'
 resources:
   repository: git://github.com/Corion/HTTP-Request-FromCurl.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

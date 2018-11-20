@@ -1,0 +1,24 @@
+Revision history for Perl module {{$dist->name}}
+
+{{$NEXT}}
+
+1.01      2018-08-10 07:26:03 -0400
+  - Add verify option
+
+1.00      2018-08-09 13:12:40 -0400
+  - New maintainer from the developer who brought you FFI::Platypus and
+    FFI::CheckLib (PLICEASE)
+  - Future version of this module will likely be merged into
+    Dist-Zilla-Plugin-FFI, which requires Perl 5.14 and Dist::Zilla 6.
+  - New home in the Perl5-FFI GitHub org:
+    https://github.com/Perl5-FFI/Dist-Zilla-Plugin-FFI-CheckLib
+
+0.002001 2015-03-21
+
+  - Support 'systempath' and 'recursive' options from FFI::CheckLib-0.11
+
+  - Fix dist repo META
+
+0.001001 2014-11-08
+
+  - Initial release

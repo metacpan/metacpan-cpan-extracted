@@ -1,0 +1,10 @@
+#!include_default
+^MANIFEST\.bak$
+Makefile(\.old)?$
+\.rej$
+^\.i.*$
+^\.git
+Event\.bs
+Event\.c
+Event\.o
+\.swp$

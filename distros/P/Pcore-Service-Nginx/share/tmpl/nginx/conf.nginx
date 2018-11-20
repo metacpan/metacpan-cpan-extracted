@@ -14,10 +14,13 @@ events {
 http {
     types {
 : for $mime_types.keys().sort() -> $suffix {
-        <: sprintf("%-60s %s", $mime_types[$suffix], $suffix) :>;
+        <: sprintf("%-80s %s", $mime_types[$suffix], $suffix) :>;
 : }
     }
     default_type              application/octet-stream;
+
+    # for FC29
+    types_hash_max_size       4096;
 
     log_format                default "$time_local\t$remote_addr\t$status\t$body_bytes_sent\t$request";
     error_log                 <: $error_log :>;

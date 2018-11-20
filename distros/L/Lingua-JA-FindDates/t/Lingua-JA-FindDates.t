@@ -11,23 +11,15 @@ binmode $builder->failure_output, ":utf8";
 binmode $builder->todo_output,    ":utf8";
 
 use Lingua::JA::FindDates qw/subsjdate/;
-#$Lingua::JA::FindDates::verbose =1;
-my $warning;
-{
-    local $SIG{__WARN__} = sub { $warning = "@_"; };
-    ok (Lingua::JA::FindDates::kanji2number ('3百三十五') == 0, 'bad kanji number failure test');
-    like ($warning, qr/can't cope with '3' of input '3百三十五'/);
-};
-ok (Lingua::JA::FindDates::kanji2number ('二百三十五') == 235, 'kanji number');
-ok (Lingua::JA::FindDates::kanji2number ('二三五') == 235, 'kanji number');
-ok (Lingua::JA::FindDates::kanji2number ('二三五五') == 2355, 'kanji number');
-
 my @tests= qw/平成２０年７月３日（木） H二十年七月三日(木曜日) 二千八年7月三日(木曜)/;
 for my $d (@tests) {
     note subsjdate ($d);
     ok (subsjdate ($d) eq 'Thursday, July 3, 2008', 
 	'year + month + day + weekday');
 }
+
+is (subsjdate (''), '', "Empty input gives empty output");
+is (subsjdate (undef), undef, "Undef input gives undef output");
 
 sub mymakedate
 {

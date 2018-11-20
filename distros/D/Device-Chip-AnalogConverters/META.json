@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -22,8 +22,7 @@
       "runtime" : {
          "requires" : {
             "Data::Bitfield" : "0.02",
-            "Device::Chip" : "0.10",
-            "Future::AsyncAwait" : "0.13"
+            "Device::Chip" : "0.10"
          }
       },
       "test" : {
@@ -36,27 +35,35 @@
    "provides" : {
       "Device::Chip::AD5691R" : {
          "file" : "lib/Device/Chip/AD5691R.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Device::Chip::ADS1115" : {
          "file" : "lib/Device/Chip/ADS1115.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Device::Chip::AnalogConverters" : {
          "file" : "lib/Device/Chip/AnalogConverters.pm",
-         "version" : "0.05"
+         "version" : "0.06"
+      },
+      "Device::Chip::DAC7571" : {
+         "file" : "lib/Device/Chip/DAC7571.pm",
+         "version" : "0.06"
       },
       "Device::Chip::LTC2400" : {
          "file" : "lib/Device/Chip/LTC2400.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Device::Chip::MAX11200" : {
          "file" : "lib/Device/Chip/MAX11200.pm",
-         "version" : "0.05"
+         "version" : "0.06"
+      },
+      "Device::Chip::MCP3221" : {
+         "file" : "lib/Device/Chip/MCP3221.pm",
+         "version" : "0.06"
       },
       "Device::Chip::MCP4725" : {
          "file" : "lib/Device/Chip/MCP4725.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -65,6 +72,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

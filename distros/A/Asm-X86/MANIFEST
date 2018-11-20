@@ -18,4 +18,5 @@ t/zz_instr_mixed.t
 t/zz_regs_att.t
 t/zz_regs_intel.t
 t/zz_regs_mixed.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

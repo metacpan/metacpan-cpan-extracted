@@ -1,3 +1,7 @@
+0.18 Mon Nov 19 09:33:47 PST 2018
+ - Use inline testml-cpan
+ - Change compiled extension from .json to .lingy
+
 0.17 Sun Nov 11 16:07:22 PST 2018
  - Use quotes where %0 might contain spaces. @mohawk2++
 

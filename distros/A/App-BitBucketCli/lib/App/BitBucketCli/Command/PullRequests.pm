@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 
 extends 'App::BitBucketCli';
 
-our $VERSION = 0.006;
+our $VERSION = 0.007;
 
 sub options {
     return [qw/
@@ -24,7 +24,7 @@ sub options {
         to_branch|to-branch|t=s
         from_branch|from-branch|f=s
         title|T=s
-        state|s=s
+        state|S=s
         long|l
         project|p=s
         regexp|R
@@ -86,11 +86,11 @@ App::BitBucketCli::Command::PullRequests - Show the pull requests of a repositor
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Command::PullRequests version 0.006
+This documentation refers to App::BitBucketCli::Command::PullRequests version 0.007
 
 =head1 SYNOPSIS
 
-   bb-cli pull_requests [options]
+   bb-cli pull-requests [options]
 
  OPTIONS:
   -c --colors[=]str Change colours used specified as key=value
@@ -117,7 +117,7 @@ This documentation refers to App::BitBucketCli::Command::PullRequests version 0.
                     Show only pull requests from this branchx
   -T --title[=]regex
                     Show only pull requests matching this title
-  -s --state[=](OPEN|MERGED|DECLINED|ALL)
+  -S --state[=](OPEN|MERGED|DECLINED|ALL)
                     Show pull requests of this type (Default OPEN)
 
  CONFIGURATION:

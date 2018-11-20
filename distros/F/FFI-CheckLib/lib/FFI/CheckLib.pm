@@ -22,7 +22,7 @@ our @EXPORT_OK = qw(
 );
 
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 our $system_path = [];
@@ -47,6 +47,7 @@ else
 }
 
 our $pattern = [ qr{^lib(.*?)\.so(?:\.([0-9]+(?:\.[0-9]+)*))?$} ];
+our $version_split = qr/\./;
 
 if($os eq 'cygwin')
 {
@@ -61,7 +62,9 @@ elsif($os eq 'msys')
 }
 elsif($os eq 'MSWin32')
 {
-  $pattern = [ qr{^(?:lib)?(.*?)(?:-([0-9])+)?\.dll$}i ];
+  #  handle cases like libgeos-3-7-0___.dll and libgtk-2.0-0.dll
+  $pattern = [ qr{^(?:lib)?(\w+?)(?:-([0-9-\.]+))?_*\.dll$}i ];
+  $version_split = qr/\-/;
 }
 elsif($os eq 'darwin')
 {
@@ -71,12 +74,13 @@ elsif($os eq 'darwin')
 sub _matches
 {
   my($filename, $path) = @_;
+
   foreach my $regex (@$pattern)
   {
     return [
-      $1,                                      # 0    capture group 1 library name
-      File::Spec->catfile($path, $filename),   # 1    full path to library
-      defined $2 ? (split /\./, $2) : (),      # 2... capture group 2 library version
+      $1,                                            # 0    capture group 1 library name
+      File::Spec->catfile($path, $filename),         # 1    full path to library
+      defined $2 ? (split $version_split, $2) : (),  # 2... capture group 2 library version
     ] if $filename =~ $regex;
   }
   return ();
@@ -344,7 +348,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -568,6 +572,8 @@ Bakkiaraj Murugesan (bakkiaraj)
 Dan Book (grinnz, DBOOK)
 
 Ilya Pavlov (Ilya, ILUX)
+
+Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 

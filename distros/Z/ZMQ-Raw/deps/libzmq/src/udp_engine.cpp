@@ -149,6 +149,21 @@ void zmq::udp_engine_t::plug (io_thread_t *io_thread_, session_base_t *session_)
                 errno_assert (rc == 0);
 #endif
 
+                int hops = _options.multicast_hops;
+
+                if (hops > 0) {
+                    rc = setsockopt (_fd, level, IP_MULTICAST_TTL,
+                                     reinterpret_cast<char *> (&hops),
+                                     sizeof (hops));
+                } else {
+                    rc = 0;
+                }
+
+#ifdef ZMQ_HAVE_WINDOWS
+                wsa_assert (rc != SOCKET_ERROR);
+#else
+                errno_assert (rc == 0);
+#endif
                 if (out->family () == AF_INET6) {
                     int bind_if = udp_addr->bind_if ();
 
@@ -206,6 +221,18 @@ void zmq::udp_engine_t::plug (io_thread_t *io_thread_, session_base_t *session_)
         bool multicast = udp_addr->is_mcast ();
 
         if (multicast) {
+        //  Multicast addresses should be allowed to bind to more than
+        //  one port as all ports should receive the message
+#ifdef SO_REUSEPORT
+            rc = setsockopt (_fd, SOL_SOCKET, SO_REUSEPORT,
+                             reinterpret_cast<char *> (&on), sizeof (on));
+#ifdef ZMQ_HAVE_WINDOWS
+            wsa_assert (rc != SOCKET_ERROR);
+#else
+            errno_assert (rc == 0);
+#endif
+#endif
+
             //  In multicast we should bind ANY and use the mreq struct to
             //  specify the interface
             any.set_port (bind_addr->port ());
@@ -361,6 +388,8 @@ void zmq::udp_engine_t::out_event ()
     if (rc == 0) {
         msg_t body_msg;
         rc = _session->pull_msg (&body_msg);
+        //  TODO rc is not checked here. We seem to assume rc == 0. An
+        //  assertion should be added.
 
         const size_t group_size = group_msg.size ();
         const size_t body_size = body_msg.size ();
@@ -535,11 +564,12 @@ void zmq::udp_engine_t::in_event ()
     _session->flush ();
 }
 
-void zmq::udp_engine_t::restart_input ()
+bool zmq::udp_engine_t::restart_input ()
 {
-    if (!_recv_enabled)
-        return;
+    if (_recv_enabled) {
+        set_pollin (_handle);
+        in_event ();
+    }
 
-    set_pollin (_handle);
-    in_event ();
+    return true;
 }

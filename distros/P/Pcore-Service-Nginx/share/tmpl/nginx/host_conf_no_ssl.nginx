@@ -21,7 +21,7 @@ server {
     server_name               <: $host_name | raw :>;
 
     keepalive_timeout         70;
-    # root                      <: $www_root_dir :>; # TODO
+    # root                      <: $root_dir :>; # TODO
 
     error_log                 <: $data_dir :>/nginx-error.log info;
     access_log                <: $data_dir :>/nginx-access.log default;
@@ -42,10 +42,6 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
-    }
-
-    location /.well-known/acme-challenge/ {
-        alias /var/run/acme/acme-challenge/;
     }
 
 : for $host[$host_name]["location"] -> $location {

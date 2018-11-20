@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FFI 0.01 {
+package Dist::Zilla::Plugin::FFI 1.02 {
 
   use strict;
   use warnings;
@@ -23,7 +23,7 @@ Dist::Zilla::Plugin::FFI - FFI related Dist::Zilla plugins
 
 =head1 VERSION
 
-version 0.01
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -37,9 +37,13 @@ This distribution contains some useful plugins for working with FFI::Platypus an
 
 =over 4
 
-=item L<Dist::Zilla::Plugin::FFI>
+=item L<Dist::Zilla::Plugin::FFI::Build>
 
 Install the L<FFI::Build::MM> layer into your C<Makefile.PL>.
+
+=item L<Dist::Zilla::Plugin::FFI::CheckLib>
+
+Add L<FFI::CheckLib> checks into your C<Makefile.PL>.
 
 =back
 

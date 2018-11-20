@@ -13,4 +13,6 @@ WriteMakefile(
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Asm-X86-*' },
+    LICENSE		=> 'perl_5',
+    INSTALLDIRS		=> 'vendor',
 );

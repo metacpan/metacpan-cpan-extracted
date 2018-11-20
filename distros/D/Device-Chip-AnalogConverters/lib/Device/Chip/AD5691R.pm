@@ -10,9 +10,8 @@ use warnings;
 use base qw( Device::Chip );
 
 use Carp;
-use Future::AsyncAwait;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Data::Bitfield qw( bitfield boolfield enumfield );
 
@@ -104,7 +103,7 @@ initialised to power-on defaults, and tracked by the C<change_config> method.
 
 =cut
 
-async sub read_config
+sub read_config
 {
    my $self = shift;
 
@@ -112,7 +111,7 @@ async sub read_config
    # defaults. We'll track updates.
    my $config = $self->{config} //= 0;
 
-   return { unpack_CONFIG( $config ) };
+   return Future->done( { unpack_CONFIG( $config ) } );
 }
 
 =head2 change_config
@@ -124,17 +123,18 @@ their existing values.
 
 =cut
 
-async sub change_config
+sub change_config
 {
    my $self = shift;
    my %changes = @_;
 
-   my $config = await $self->read_config;
+   $self->read_config->then( sub {
+      my ( $config ) = @_;
+      $self->{config} = pack_CONFIG( %$config, %changes );
 
-   $self->{config} = pack_CONFIG( %$config, %changes );
-
-   await $self->protocol->write( pack "C S>",
-      CMD_WRITE_CTRL, $self->{config} << 11 );
+      $self->protocol->write( pack "C S>",
+         CMD_WRITE_CTRL, $self->{config} << 11 );
+   });
 }
 
 =head1 METHODS
@@ -154,12 +154,12 @@ the output voltage.
 
 =cut
 
-async sub write_dac
+sub write_dac
 {
    my $self = shift;
    my ( $value, $update ) = @_;
 
-   await $self->protocol->write( pack "C S>",
+   $self->protocol->write( pack "C S>",
       ( $update ? CMD_WRITE_AND_UPDATE : CMD_WRITE_INPUT ), $value << 4 );
 }
 
@@ -173,22 +173,24 @@ C<GAIN> config bit.
 
 =cut
 
-async sub write_dac_voltage
+sub write_dac_voltage
 {
    my $self = shift;
    my ( $voltage ) = @_;
 
-   my $config = await $self->read_config;
+   $self->read_config->then( sub {
+      my ( $config ) = @_;
 
-   my $value = $voltage * ( 1 << 12 ) / 2.5;
-   $value /= $config->{GAIN};
+      my $value = $voltage * ( 1 << 12 ) / 2.5;
+      $value /= $config->{GAIN};
 
-   croak "Cannot set DAC voltage to $voltage - too high"
-      if $value >= ( 1 << 12 );
-   croak "Cannot set DAC voltage to $voltage - too low"
-      if $value < 0;
+      croak "Cannot set DAC voltage to $voltage - too high"
+         if $value >= ( 1 << 12 );
+      croak "Cannot set DAC voltage to $voltage - too low"
+         if $value < 0;
 
-   await $self->write_dac( $value, 1 );
+      $self->write_dac( $value, 1 );
+   });
 }
 
 =head1 AUTHOR

@@ -1,7 +1,7 @@
 package Versioning::Scheme::Perl;
 
-our $DATE = '2018-10-11'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-11-18'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -85,7 +85,7 @@ sub bump_version {
 }
 
 1;
-# ABSTRACT: Version as dotted numbers
+# ABSTRACT: Perl (version.pm) version numbering
 
 __END__
 
@@ -95,11 +95,11 @@ __END__
 
 =head1 NAME
 
-Versioning::Scheme::Perl - Version as dotted numbers
+Versioning::Scheme::Perl - Perl (version.pm) version numbering
 
 =head1 VERSION
 
-This document describes version 0.007 of Versioning::Scheme::Perl (from Perl distribution Versioning-Scheme), released on 2018-10-11.
+This document describes version 0.008 of Versioning::Scheme::Perl (from Perl distribution Versioning-Scheme), released on 2018-11-18.
 
 =head1 SYNOPSIS
 

@@ -44,14 +44,14 @@ class ipc_address_t
 {
   public:
     ipc_address_t ();
-    ipc_address_t (const sockaddr *sa, socklen_t sa_len);
+    ipc_address_t (const sockaddr *sa_, socklen_t sa_len_);
     ~ipc_address_t ();
 
     //  This function sets up the address for UNIX domain transport.
     int resolve (const char *path_);
 
     //  The opposite to resolve()
-    int to_string (std::string &addr_);
+    int to_string (std::string &addr_) const;
 
     const sockaddr *addr () const;
     socklen_t addrlen () const;

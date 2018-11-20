@@ -11,4 +11,5 @@ t/fixtures/hosts/2
 t/fixtures/hosts/3
 t/run.t
 t/tests/Test/Hostfile/Manager.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

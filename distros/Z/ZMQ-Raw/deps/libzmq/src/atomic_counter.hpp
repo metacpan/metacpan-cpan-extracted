@@ -31,6 +31,7 @@
 #define __ZMQ_ATOMIC_COUNTER_HPP_INCLUDED__
 
 #include "stdint.hpp"
+#include "macros.hpp"
 
 #if defined ZMQ_FORCE_MUTEXES
 #define ZMQ_ATOMIC_COUNTER_MUTEX
@@ -90,15 +91,16 @@ class atomic_counter_t
   public:
     typedef uint32_t integer_t;
 
-    inline atomic_counter_t (integer_t value_ = 0) : _value (value_) {}
-
-    inline ~atomic_counter_t () {}
+    inline atomic_counter_t (integer_t value_ = 0) ZMQ_NOEXCEPT
+        : _value (value_)
+    {
+    }
 
     //  Set counter _value (not thread-safe).
-    inline void set (integer_t value_) { _value = value_; }
+    inline void set (integer_t value_) ZMQ_NOEXCEPT { _value = value_; }
 
     //  Atomic addition. Returns the old _value.
-    inline integer_t add (integer_t increment_)
+    inline integer_t add (integer_t increment_) ZMQ_NOEXCEPT
     {
         integer_t old_value;
 
@@ -143,7 +145,7 @@ class atomic_counter_t
     }
 
     //  Atomic subtraction. Returns false if the counter drops to zero.
-    inline bool sub (integer_t decrement_)
+    inline bool sub (integer_t decrement_) ZMQ_NOEXCEPT
     {
 #if defined ZMQ_ATOMIC_COUNTER_WINDOWS
         LONG delta = -((LONG) decrement_);
@@ -186,7 +188,7 @@ class atomic_counter_t
                            "+Qo"(_value)
                          : "Ir"(decrement_), "r"(&_value)
                          : "cc");
-        return old_value - decrement != 0;
+        return old_value - decrement_ != 0;
 #elif defined ZMQ_ATOMIC_COUNTER_MUTEX
         sync.lock ();
         _value -= decrement_;
@@ -198,7 +200,7 @@ class atomic_counter_t
 #endif
     }
 
-    inline integer_t get () const { return _value; }
+    inline integer_t get () const ZMQ_NOEXCEPT { return _value; }
 
   private:
 #if defined ZMQ_ATOMIC_COUNTER_CXX11

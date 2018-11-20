@@ -1,6 +1,6 @@
 package Date::Bahai::Simple;
 
-$Date::Bahai::Simple::VERSION   = '0.22';
+$Date::Bahai::Simple::VERSION   = '0.23';
 $Date::Bahai::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Bahai::Simple - Represents Bahai date.
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
@@ -22,7 +22,7 @@ use Date::Exception::InvalidDay;
 use Date::Exception::InvalidMonth;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 

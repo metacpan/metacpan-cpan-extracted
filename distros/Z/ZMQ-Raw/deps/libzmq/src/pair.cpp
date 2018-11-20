@@ -47,9 +47,12 @@ zmq::pair_t::~pair_t ()
     zmq_assert (!_pipe);
 }
 
-void zmq::pair_t::xattach_pipe (pipe_t *pipe_, bool subscribe_to_all_)
+void zmq::pair_t::xattach_pipe (pipe_t *pipe_,
+                                bool subscribe_to_all_,
+                                bool locally_initiated_)
 {
     LIBZMQ_UNUSED (subscribe_to_all_);
+    LIBZMQ_UNUSED (locally_initiated_);
 
     zmq_assert (pipe_ != NULL);
 
@@ -65,7 +68,6 @@ void zmq::pair_t::xpipe_terminated (pipe_t *pipe_)
 {
     if (pipe_ == _pipe) {
         if (_last_in == _pipe) {
-            _saved_credential.set_deep_copy (_last_in->get_credential ());
             _last_in = NULL;
         }
         _pipe = NULL;
@@ -133,9 +135,4 @@ bool zmq::pair_t::xhas_out ()
         return false;
 
     return _pipe->check_write ();
-}
-
-const zmq::blob_t &zmq::pair_t::get_credential () const
-{
-    return _last_in ? _last_in->get_credential () : _saved_credential;
 }

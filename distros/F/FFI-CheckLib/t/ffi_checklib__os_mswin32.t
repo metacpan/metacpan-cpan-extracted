@@ -42,6 +42,34 @@ subtest 'in sync with $ENV{PATH}' => sub {
 
 };
 
+subtest 'lib with name like libname-1-2-3.dll' => sub {
+  my($path) = find_lib( lib => 'maiasaura' );
+  ok -r $path, "path = $path is readable";
+  
+  my $path2 = find_lib( lib => 'maiasaura' );
+  is $path, $path2, 'scalar context';
+    
+};
+
+subtest 'lib with name like name-1-2-3.dll' => sub {
+  my($path) = find_lib( lib => 'dromornis_planei' );
+  ok -r $path, "path = $path is readable";
+  
+  my $path2 = find_lib( lib => 'dromornis_planei' );
+  is $path, $path2, 'scalar context';
+    
+};
+
+subtest 'lib with name like libname-1-2___.dll' => sub {
+  my($path) = find_lib( lib => 'thylacaleo_carnifex' );
+  ok -r $path, "path = $path is readable";
+  
+  my $path2 = find_lib( lib => 'thylacaleo_carnifex' );
+  is $path, $path2, 'scalar context';
+    
+};
+
+
 sub p ($)
 {
   my($path) = @_;

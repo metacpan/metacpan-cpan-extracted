@@ -6,8 +6,9 @@ use warnings;
 use Exporter qw/ import /;
 
 use PerlX::Maybe;
+use Safe::Isa 1.000008 qw/ $_isa $_call_if_can /;
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.3.1';
 
 # RECOMMEND PREREQ: PerlX::Maybe::XS
 
@@ -18,21 +19,159 @@ our @EXPORT    = qw/ column_info_from_type /;
 our @EXPORT_OK = @EXPORT;
 
 my %CLASS_TYPES = (
-    'DateTime'       => 'datetime',
-    'DateTime::Tiny' => 'datetime',
-    'Time::Moment'   => 'datetime',
-    'Time::Piece'    => 'datetime',
+    'DateTime'                   => 'datetime',
+    'DateTime::Tiny'             => 'datetime',
+    'JSON::PP::Boolean'          => 'boolean',
+    'Time::Moment'               => 'datetime',
+    'Time::Piece'                => 'datetime',
+    'Types::Serialiser::Boolean' => 'boolean',
 );
+
+
+my %FROM_PARENT = (
+
+    'Types::Standard' => {
+
+        'ArrayRef' => sub {
+            my %type = column_info_from_type( $_[0]->type_parameter );
+            $type{data_type} .= '[]';
+            return %type;
+        },
+
+        'Maybe' => sub {
+            return (
+                is_nullable => 1,
+                column_info_from_type( $_[0]->type_parameter )
+            );
+        },
+
+        'Object' => sub {
+            my $class = $_[0]->$_call_if_can('class') or return;
+            if ( my $data_type = $CLASS_TYPES{$class} ) {
+                return ( data_type => $data_type );
+            }
+            return;
+        },
+
+      }
+
+);
+
+my %FROM_TYPE = (
+
+    'Types::Standard' => {
+
+        'Bool' => sub {
+            return ( data_type => 'boolean' );
+        },
+
+        'Int' => sub {
+            return ( data_type => 'integer', is_numeric => 1 );
+        },
+
+        'Num' => sub {
+            return ( data_type => 'numeric', is_numeric => 1 );
+        },
+
+
+        'Str' => sub {
+            return ( data_type => 'text', is_numeric => 0 );
+        },
+
+    },
+
+    'Types::Common::Numeric' => {
+
+        'PositiveInt' => sub {
+            return (
+                data_type  => 'integer',
+                is_numeric => 1,
+                extra      => { unsigned => 1 }
+                );
+        },
+
+        'PositiveOrZeroInt' => sub {
+            return (
+                data_type  => 'integer',
+                is_numeric => 1,
+                extra      => { unsigned => 1 }
+                );
+        },
+
+        'PositiveNum' => sub {
+            return (
+                data_type  => 'numeric',
+                is_numeric => 1,
+                extra      => { unsigned => 1 }
+                );
+        },
+
+        'PositiveOrZeroNum' => sub {
+            return (
+                data_type  => 'numeric',
+                is_numeric => 1,
+                extra      => { unsigned => 1 }
+                );
+        },
+
+        'SingleDigit' => sub {
+            return (
+                data_type  => 'integer',
+                is_numeric => 1,
+                size       => 1,
+                extra      => { unsigned => 1 }
+            );
+        },
+
+      },
+
+    'Types::Common::String' => {
+
+        'LowerCaseStr' => sub {
+            return ( data_type => 'text', is_numeric => 0 );
+        },
+
+        'UpperCaseStr' => sub {
+            return ( data_type => 'text', is_numeric => 0 );
+        },
+
+        'NonEmptyStr' => sub {
+            return ( data_type => 'text', is_numeric => 0 );
+        },
+
+        'LowerCaseSimpleStr' => sub {
+            return ( data_type => 'text', is_numeric => 0, size => 255 );
+        },
+
+        'UpperCaseSimpleStr' => sub {
+            return ( data_type => 'text', is_numeric => 0, size => 255 );
+        },
+
+        'NonEmptySimpleStr' => sub {
+            return ( data_type => 'text', is_numeric => 0, size => 255 );
+        },
+
+        'SimpleStr' => sub {
+            return ( data_type => 'text', is_numeric => 0, size => 255 );
+        },
+
+    },
+
+);
+
 
 sub column_info_from_type {
     my ($type) = @_;
 
+    return { } unless $type->$_isa('Type::Tiny');
+
     my $name    = $type->name;
     my $methods = $type->my_methods;
+    my $parent  = $type->has_parent ? $type->parent : undef;
 
-    if ( $type->is_anon && $type->has_parent ) {
-        $name    = $type->parent->name;
-        $methods = $type->parent->my_methods;
+    if ( $type->is_anon && $parent ) {
+        $name    = $parent->name;
+        $methods = $parent->my_methods;
     }
 
     if ( $methods && $methods->{dbic_column_info} ) {
@@ -50,62 +189,22 @@ sub column_info_from_type {
         );
     }
 
-    if ( $name eq 'Maybe' ) {
-        return (
-            is_nullable => 1,
-            column_info_from_type( $type->type_parameter )
-        );
-    }
-
-    if ( $name eq 'ArrayRef' ) {
-        my %type = column_info_from_type( $type->type_parameter );
-        $type{data_type} .= '[]';
-        return %type;
-    }
-
-    if (   $name eq 'Object'
-        && $type->display_name =~ /^InstanceOf\[['"](.+)['"]\]$/ )
-    {
-        if ( my $data_type = $CLASS_TYPES{$1} ) {
-            return ( data_type => $data_type );
+    if ( my $parent_lib = $parent->$_call_if_can('library') ) {
+        if ( my $code = $FROM_PARENT{$parent_lib}{$name} ) {
+            if ( my %info = $code->($type) ) {
+                return %info;
+            }
         }
-
     }
 
-    if ( $name eq 'Str' ) {
-        return ( data_type => 'text', is_numeric => 0 );
+    if ( my $code = $FROM_TYPE{ $type->library }{$name} ) {
+        if ( my %info = $code->($type) ) {
+            return %info;
+        }
     }
 
-    if ( $name eq 'Int' ) {
-        return ( data_type => 'integer', is_numeric => 1 );
-    }
-
-    if ( $name eq 'PositiveOrZeroInt' ) {
-        return (
-            data_type  => 'integer',
-            is_numeric => 1,
-            extra      => { unsigned => 1 }
-        );
-    }
-
-    if ( $name eq 'Num' ) {
-        return ( data_type => 'numeric', is_numeric => 1 );
-    }
-
-    if ( $name eq 'PositiveOrZeroNum' ) {
-        return (
-            data_type  => 'numeric',
-            is_numeric => 1,
-            extra      => { unsigned => 1 }
-        );
-    }
-
-    if ( $name eq 'Bool' ) {
-        return ( data_type => 'boolean' );
-    }
-
-    if ( $type->has_parent ) {
-        my @info = eval { column_info_from_type( $type->parent ) };
+    if ( $parent ) {
+        my @info = eval { column_info_from_type( $parent ) };
         return @info if @info;
     }
 
@@ -127,7 +226,7 @@ Types::SQL::Util - extract DBIx::Class column_info from types
 
 =head1 VERSION
 
-version v0.2.1
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -156,7 +255,8 @@ C<add_column> method of L<DBIx::Class::ResultSource>, based on the
 type.
 
 Besides the types from L<Types::SQL>, it also supports the following
-types from L<Types::Standard> and C<Types::Common::Numeric>:
+types from L<Types::Standard>, L<Types::Common::String>, and
+L<Types::Common::Numeric>:
 
 =head3 C<ArrayRef>
 
@@ -196,9 +296,29 @@ This is treated as an C<unsigned integer> without a precision.
 
 This is treated as an C<unsigned numeric> without a precision.
 
+=head3 C<SingleDigit>
+
+This is treated as an C<unsigned integer> of size 1.
+
 =head3 C<Str>
 
-This is treated as a C<text> value without a size.
+=head3 C<NonEmptyStr>
+
+=head3 C<LowerCaseStr>
+
+=head3 C<UpperCaseStr>
+
+These are treated as a C<text> value without a size.
+
+=head3 C<SimpleStr>
+
+=head3 C<NonEmptySimpleStr>
+
+=head3 C<LowerCaseSimpleStr>
+
+=head3 C<UpperCaseSimpleStr>
+
+These is trated as a C<text> value with a size of 255.
 
 =head1 CUSTOM TYPES
 

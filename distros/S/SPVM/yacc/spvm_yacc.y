@@ -23,23 +23,23 @@
 %token <opval> NAME VAR_NAME CONSTANT PACKAGE_VAR_NAME MAYBE_SUB_NAME
 %token <opval> RETURN WEAKEN CROAK NEW
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
-%token <opval> AMPERSAND DOT3
+%token <opval> AMPERSAND DOT3 LENGTH
 
 %type <opval> grammar
 %type <opval> opt_packages packages package package_block
 %type <opval> opt_declarations declarations declaration
 %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
-%type <opval> sub anon_sub opt_args args arg invocant has use our
-%type <opval> opt_descriptors descriptors
+%type <opval> sub anon_sub opt_args args arg invocant has use our string_length
+%type <opval> opt_descriptors descriptors sub_names opt_sub_names
 %type <opval> opt_statements statements statement normal_statement if_statement else_statement 
 %type <opval> for_statement while_statement switch_statement case_statement default_statement
 %type <opval> block eval_block
 %type <opval> expression
 %type <opval> unop binop
 %type <opval> call_sub opt_vaarg
-%type <opval> array_access field_access weaken_field weaken_array_element convert_type array_length 
+%type <opval> array_access field_access weaken_field weaken_array_element convert_type array_length
 %type <opval> deref ref assign incdec
-%type <opval> new array_init isa
+%type <opval> new array_init
 %type <opval> my_var var package_var_access
 %type <opval> term opt_normal_terms normal_terms normal_term logical_term relative_term
 %type <opval> field_name sub_name
@@ -166,7 +166,11 @@ declaration
 use
   : USE basic_type ';'
     {
-      $$ = SPVM_OP_build_use(compiler, $1, $2);
+      $$ = SPVM_OP_build_use(compiler, $1, $2, NULL);
+    }
+  | USE basic_type '(' opt_sub_names ')' ';'
+    {
+      $$ = SPVM_OP_build_use(compiler, $1, $2, $4);
     }
 
 enumeration
@@ -568,11 +572,6 @@ term
   : normal_term
   | relative_term
   | logical_term
-  | isa
-  | '(' term ')'
-    {
-      $$ = $2;
-    }
 
 normal_term
   : var
@@ -589,6 +588,7 @@ normal_term
   | new
   | array_init
   | array_length
+  | string_length
   | my_var
   | binop
   | unop
@@ -596,6 +596,10 @@ normal_term
   | deref
   | assign
   | incdec
+  | '(' normal_term ')'
+    {
+      $$ = SPVM_OP_build_single_parenthes_term(compiler, $2);
+    }
 
 normal_terms
   : normal_terms ',' normal_term
@@ -701,10 +705,6 @@ binop
   | normal_term SHIFT normal_term
     {
       $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
-    }
-  | '(' normal_term ')'
-    {
-      $$ = $2;
     }
 
 assign
@@ -864,6 +864,11 @@ array_length
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $4);
     }
 
+string_length
+  : LENGTH normal_term
+    {
+      $$ = SPVM_OP_build_string_length(compiler, $1, $2);
+    }
 deref
   : DEREF var
     {
@@ -887,11 +892,13 @@ relative_term
     {
       $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
     }
-
-isa
-  : term ISA type
+  | term ISA type
     {
       $$ = SPVM_OP_build_isa(compiler, $2, $1, $3);
+    }
+  | '(' relative_term ')'
+    {
+      $$ = SPVM_OP_build_single_parenthes_term(compiler, $2);
     }
 
 logical_term
@@ -906,6 +913,10 @@ logical_term
   | NOT term
     {
       $$ = SPVM_OP_build_not(compiler, $1, $2);
+    }
+  | '(' logical_term ')'
+    {
+      $$ = SPVM_OP_build_single_parenthes_term(compiler, $2);
     }
 
 my_var
@@ -1024,10 +1035,43 @@ type_or_void
 
 field_name
   : NAME
-  | MAYBE_SUB_NAME
 
 sub_name
   : NAME
   | MAYBE_SUB_NAME
+
+opt_sub_names
+  :	/* Empty */
+    {
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+    }
+  |	sub_names
+    {
+      if ($1->id == SPVM_OP_C_ID_LIST) {
+        $$ = $1;
+      }
+      else {
+        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+        $$ = op_list;
+      }
+    }
+
+sub_names
+  : sub_names ',' sub_name
+    {
+      SPVM_OP* op_list;
+      if ($1->id == SPVM_OP_C_ID_LIST) {
+        op_list = $1;
+      }
+      else {
+        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+      }
+      SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
+      
+      $$ = op_list;
+    }
+  | sub_name
 
 %%

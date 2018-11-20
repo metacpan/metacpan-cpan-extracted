@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,9 +33,15 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::Bitfield" : "0",
+            "Data::Bitfield" : "0.02",
             "Device::Chip" : "0.04",
             "Device::Chip::Base::RegisteredI2C" : "0.10",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::Device::Chip::Adapter" : "0",
             "Test::Exception" : "0.43",
             "Test::More" : "0.88"
@@ -43,6 +49,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {},
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

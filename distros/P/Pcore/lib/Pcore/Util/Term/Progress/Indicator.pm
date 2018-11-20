@@ -23,7 +23,7 @@ has total         => 0;                                      # PositiveOrZeroNum
 has total_format  => '%.0f';                                 # Str | CodeRef
 has _format_total => ( is => 'lazy', init_arg => undef );    # CodeRef
 
-has percent_format => '%3.0f';                               # Str | CodeRef
+has percent_format  => '%3.0f';                              # Str | CodeRef
 has _format_percent => ( is => 'lazy', init_arg => undef );  # CodeRef
 
 has show_speed    => 1;                                      # Bool

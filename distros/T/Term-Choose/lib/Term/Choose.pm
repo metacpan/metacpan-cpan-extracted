@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.630';
+our $VERSION = '1.632';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -663,48 +663,27 @@ sub __marked_rc2idx {
 sub __copy_orig_list {
     my ( $self, $orig_list_ref ) = @_;
     if ( $self->{ll} ) {
-        if ( $self->{color} ) {
-            $self->{orig_list} = $orig_list_ref;
-            $self->{list} = [ @$orig_list_ref ];
-            for ( @{$self->{list}} ) {
-                s/\x{feff}//g;
-                s/\e\[[\d;]*m/\x{feff}/msg;
-            }
-        }
-        else {
-            $self->{list} = $orig_list_ref;
-        }
+        $self->{list} = $orig_list_ref;
     }
     else {
         $self->{list} = [ @$orig_list_ref ];
         if ( $self->{color} ) {
             $self->{orig_list} = $orig_list_ref;
-            for ( @{$self->{list}} ) {
-                if ( ! $_ ) {
-                    $_ = $self->{undef} if ! defined $_;
-                    $_ = $self->{empty} if $_ eq '';    #
-                }
+        }
+        for ( @{$self->{list}} ) {
+            if ( ! $_ ) {
+                $_ = $self->{undef} if ! defined $_;
+                $_ = $self->{empty} if $_ eq '';    #
+            }
+            if ( $self->{color} ) {
                 s/\x{feff}//g;
                 s/\e\[[\d;]*m/\x{feff}/msg;
-                s/\t/ /g;
-                s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
-                # \p{Cn} might not be up to date and remove assigned codepoints
-                # therefore only \p{Noncharacter_Code_Point}
-                s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
             }
-        }
-        else {
-            for ( @{$self->{list}} ) {
-                if ( ! $_ ) {
-                    $_ = $self->{undef} if ! defined $_;
-                    $_ = $self->{empty} if $_ eq '';    #
-                }
-                s/\t/ /g;
-                s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
-                # \p{Cn} might not be up to date and remove assigned codepoints
-                # therefore only \p{Noncharacter_Code_Point}
-                s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
-            }
+            s/\t/ /g;
+            s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
+            # \p{Cn} might not be up to date and remove assigned codepoints
+            # therefore only \p{Noncharacter_Code_Point}
+            s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
         }
     }
 }
@@ -1009,81 +988,105 @@ sub __wr_cell {
     $self->{i_col} += $self->{avail_col_width};
     my $is_current_pos = $row == $self->{pos}[ROW] && $col == $self->{pos}[COL];
     my $is_marked = $self->{marked}[$row][$col]; ###
-    my $str;
-    my ( $pre, $post ) = ( '', '' );
-    if ( $self->{ll} || $self->{length}[$idx] == $self->{avail_col_width} ) {
-        $str = $self->{list}[$idx];
-    }
-    elsif ( $self->{length}[$idx] > $self->{avail_col_width} ) {
-        if ( $self->{avail_col_width} > 6 ) {
-            $str = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} - 3 ) . '...';
-        }
-        else {
-            $str = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} );
-        }
-    }
-    else {
-        $str = $self->{list}[$idx];
-        if ( $self->{justify} == 0 ) {
-            $post = " " x ( $self->{avail_col_width} - $self->{length}[$idx] );
-        }
-        elsif ( $self->{justify} == 1 ) {
-            $pre = " " x ( $self->{avail_col_width} - $self->{length}[$idx] );
-        }
-        elsif ( $self->{justify} == 2 ) {
-            my $all = $self->{avail_col_width} - $self->{length}[$idx];
-            my $half = int( $all / 2 );
-            ( $pre, $post ) = ( " " x $half, " " x ( $all - $half ) );
-        }
-    }
-    if ( $self->{color} ) {
-        my $emphasised = ( $is_marked ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
-        my @color = ( $self->{orig_list}[$idx] || '' ) =~ /(\e\[[\d;]*m)/g;
-        if ( $emphasised ) {
-            for ( @color ) {
-                # keep emphasise after color escapes
-                $_ .= $emphasised;
-            }
-            if ( $self->{color} == 1 ) {
-                # don't emphasise leading and trailing spaces
-                $str = $pre . $emphasised . $str . RESET . $post;
-            }
-            elsif ( $self->{color} == 2 ) {
-                # the cursor keeps the default color
-                $str = $emphasised . $pre . $str . $post . RESET;
-                if ( $is_current_pos ) {
-                    @color = ();
-                    $str =~ s/\x{feff}//g;
-                }
-            }
-            elsif ( $self->{color} == 3 ) {
-                # the cursor has the color of the string
-                if ( $str =~ s/^\x{feff}([^\x{feff}]*)\x{feff}?\z/$1/sm ) {
-                    # leading and trailing spaces have the color of the string if only one color
-                    $str = $color[0] . $pre . $str . $post . RESET;
+    if ( $self->{ll} ) {
+        if ( $self->{color} ) {
+            my $emphasised = ( $is_marked ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
+            my $str = $self->{list}[$idx];
+            if ( $emphasised ) {
+                if ( $self->{color} == 2 && $is_current_pos ) {
+                    $str =~ s/(\e\[[\d;]*m)//g;
                 }
                 else {
-                    # else leading and trailing spaces have the default color
-                    $str = $emphasised . $pre . $str . $post . RESET;
+                    $str =~ s/(\e\[[\d;]*m)/${1}$emphasised/g;
                 }
+                $str = $emphasised . $str;
+            }
+            print $str . RESET; # if \e[
+        }
+        else {
+            $self->{plugin}->__bold_underline() if $is_marked;
+            $self->{plugin}->__reverse()        if $is_current_pos;
+            print $self->{list}[$idx];
+            $self->{plugin}->__reset() if $is_marked || $is_current_pos;
+        }
+    }
+    else {
+        my $str;
+        my ( $pre, $post ) = ( '', '' );
+        if ( $self->{length}[$idx] < $self->{avail_col_width} ) {
+            $str = $self->{list}[$idx];
+            if ( $self->{justify} == 0 ) {
+                $post = " " x ( $self->{avail_col_width} - $self->{length}[$idx] );
+            }
+            elsif ( $self->{justify} == 1 ) {
+                $pre = " " x ( $self->{avail_col_width} - $self->{length}[$idx] );
+            }
+            elsif ( $self->{justify} == 2 ) {
+                my $all = $self->{avail_col_width} - $self->{length}[$idx];
+                my $half = int( $all / 2 );
+                ( $pre, $post ) = ( " " x $half, " " x ( $all - $half ) );
+            }
+        }
+        elsif ( $self->{length}[$idx] > $self->{avail_col_width} ) {
+            if ( $self->{avail_col_width} > 6 ) {
+                $str = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} - 3 ) . '...';
+            }
+            else {
+                $str = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} );
             }
         }
         else {
-            $str = $pre . $str . $post;
+            $str = $self->{list}[$idx];
         }
-        if ( @color ) {
-            $str =~ s/\x{feff}/shift @color/ge;
-            if ( ! $emphasised ) {
-                $str .= RESET;
+        if ( $self->{color} ) {
+            my $emphasised = ( $is_marked ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
+            my @color = ( $self->{orig_list}[$idx] || '' ) =~ /(\e\[[\d;]*m)/g;
+            if ( $emphasised ) {
+                for ( @color ) {
+                    # keep emphasise after color escapes
+                    $_ .= $emphasised;
+                }
+                if ( $self->{color} == 1 ) {
+                    # don't emphasise leading and trailing spaces
+                    $str = $pre . $emphasised . $str . RESET . $post;
+                }
+                elsif ( $self->{color} == 2 ) {
+                    # the cursor keeps the default color
+                    $str = $emphasised . $pre . $str . $post . RESET;
+                    if ( $is_current_pos ) {
+                        @color = ();
+                        $str =~ s/\x{feff}//g;
+                    }
+                }
+                elsif ( $self->{color} == 3 ) {
+                    # the cursor has the color of the string
+                    if ( $str =~ s/^\x{feff}([^\x{feff}]*)\x{feff}?\z/$1/sm ) {
+                        # leading and trailing spaces have the color of the string if only one color
+                        $str = $color[0] . $pre . $str . $post . RESET;
+                    }
+                    else {
+                        # else leading and trailing spaces have the default color
+                        $str = $emphasised . $pre . $str . $post . RESET;
+                    }
+                }
             }
+            else {
+                $str = $pre . $str . $post;
+            }
+            if ( @color ) {
+                $str =~ s/\x{feff}/shift @color/ge;
+                if ( ! $emphasised ) {
+                    $str .= RESET;
+                }
+            }
+            print $str;
         }
-        print $str;
-    }
-    else {
-        $self->{plugin}->__bold_underline() if $is_marked;
-        $self->{plugin}->__reverse()        if $is_current_pos;
-        print $pre . $str . $post;
-        $self->{plugin}->__reset() if $is_marked || $is_current_pos;
+        else {
+            $self->{plugin}->__bold_underline() if $is_marked;
+            $self->{plugin}->__reverse()        if $is_current_pos;
+            print $pre . $str . $post;
+            $self->{plugin}->__reset() if $is_marked || $is_current_pos;
+        }
     }
 }
 
@@ -1169,7 +1172,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.630
+Version 1.632
 
 =cut
 
@@ -1557,8 +1560,6 @@ the element will use on the terminal.
 If I<ll> is set, C<choose> returns always the index(es) of the chosen item(s) regardless of how I<index> is set.
 
 Undefined list elements are not allowed.
-
-If the option I<color> is enabled, all C<U+FEFF> code points have to be removed.
 
 The replacements described in L</Modifications for the output> are not applied. If elements contain unsupported
 characters the output might break.

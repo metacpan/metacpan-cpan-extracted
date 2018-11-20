@@ -1,3 +1,11 @@
+Version 0.74  - 20 November 2018
+                Added HiPi::Interface::MAX7219LEDStrip - LED strip controller. 
+
+Version 0.73  - 18 November 2018
+                Support Raspberry Pi 3 Model A +
+                Added HiPi::Interace::ZeroSeg - 8 x 7 segment LED
+                Added HiPi::Interface::MAX7219 - LED matrix controller.
+
 Version 0.72  - 06 June 2018
                 Added HiPi::Interface::MicroDotPHAT - Pimoroni retro LED matrix Hat
                 Added HiPi::Interface::IS31FL3730 - LED matrix controller.

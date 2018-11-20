@@ -107,14 +107,14 @@ my %WriteMakefile = (
 
 	'TEST_REQUIRES' => {
 		'Test::More' => '0.94',
-		'Test::Trap' => 'v0.3.2',
 		},
 
 	'PREREQ_PM'     => {
-		'App::a2p'     => '0',
-		'Make'         => '0',
-		'MIME::Parser' => '0',
-		'DB_File'      => '0',
+		'App::a2p'       => '0',
+		'App::find2perl' => '0',
+		'Make'           => '0',
+		'MIME::Parser'   => '0',
+		'DB_File'        => '0',
 		},
 
 	'META_MERGE' => {

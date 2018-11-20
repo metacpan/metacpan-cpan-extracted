@@ -10,7 +10,7 @@ CGI::Alternatives - Documentation for alternative solutions to CGI.pm
 
 # VERSION
 
-0.15
+0.17
 
 # DESCRIPTION
 
@@ -205,60 +205,6 @@ engine is [Text::Xslate](https://metacpan.org/pod/Text::Xslate). I would **avoid
 Please don't write your own template engine. If you want to completely split
 out your html and still have some sort of templating system there are modules
 to do that, such as [HTML::Zoom](https://metacpan.org/pod/HTML::Zoom).
-
-# PSGI/Plack
-
-[http://metacpan.org/release/PSGI](http://metacpan.org/release/PSGI)
-
-[http://metacpan.org/release/Plack](http://metacpan.org/release/Plack)
-
-[http://plackperl.org/](http://plackperl.org/)
-
-PSGI is an interface between Perl web applications and web servers, and Plack
-is a Perl module and toolkit that contains PSGI middleware, helpers and
-adapters to web servers.
-
-Plack is a collection of building blocks to create web applications, ranging from
-quick & easy scripts, to the foundations of building larger frameworks.
-
-    #!/usr/bin/env perl
-
-    use strict;
-    use warnings;
-    use feature qw/ state /;
-
-    use FindBin qw/ $Bin /;
-    use Template;
-    use Plack::Request;
-    use Plack::Response;
-
-    my $app = sub {
-        my $req = Plack::Request->new( shift );
-        my $res = Plack::Response->new( 200 );
-
-        state $tt  = Template->new({
-            INCLUDE_PATH => "$Bin/templates",
-        });
-
-        my $out;
-
-        $tt->process(
-            "example_form.html.tt",
-            {
-                result => $req->parameters->{'user_input'},
-            },
-            \$out,
-        ) or die $tt->error;
-
-        $res->body( $out );
-        $res->finalize;
-    };
-
-To run this script:
-
-    plackup examples/plack_psgi.pl
-
-That makes the script (the "app") available at http://\*:5000
 
 # Mojolicious
 
@@ -458,6 +404,78 @@ Then running the server:
     perl examples/example_form/script/example_form_server.pl
 
 Again makes the page available at http://\*:3000/example\_form
+
+# PSGI/Plack
+
+Raw Plack is lower-level than Mojolicious so the code will be more verbose,
+but Plack is probably a closer match to CGI.pm in terms of the things you're
+having to handle.
+
+[http://metacpan.org/release/PSGI](http://metacpan.org/release/PSGI)
+
+[http://metacpan.org/release/Plack](http://metacpan.org/release/Plack)
+
+[http://plackperl.org/](http://plackperl.org/)
+
+PSGI is an interface between Perl web applications and web servers, and Plack
+is a Perl module and toolkit that contains PSGI middleware, helpers and
+adapters to web servers.
+
+Plack is a collection of building blocks to create web applications, ranging from
+quick & easy scripts, to the foundations of building larger frameworks.
+
+## Plack As A Persistent Process
+
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+    use feature qw/ state /;
+
+    use FindBin qw/ $Bin /;
+    use Template;
+    use Plack::Request;
+    use Plack::Response;
+
+    my $app = sub {
+        my $req = Plack::Request->new( shift );
+        my $res = Plack::Response->new( 200 );
+
+        state $tt  = Template->new({
+            INCLUDE_PATH => "$Bin/templates",
+        });
+
+        my $out;
+
+        $tt->process(
+            "example_form.html.tt",
+            {
+                result => $req->parameters->{'user_input'},
+            },
+            \$out,
+        ) or die $tt->error;
+
+        $res->body( $out );
+        $res->finalize;
+    };
+
+To run this script:
+
+    plackup examples/plack_psgi.pl
+
+That makes the script (the "app") available at http://\*:5000
+
+## Plack As A Run On Demand CGI Script
+
+If your CGI script only runs once in a while, and doesn't need to be persistent,
+then you can use Plack the same way and not have to worry about deployment
+concerns such has having to restart a process. To do so requires adding:
+
+    use Plack::Handler::CGI;
+    Plack::Handler::CGI->new->run($app);
+
+to the end of the script. This will allow it to be exec'd correctly by the
+upfront webserver and to behave like a standalone CGI script
 
 # Others
 

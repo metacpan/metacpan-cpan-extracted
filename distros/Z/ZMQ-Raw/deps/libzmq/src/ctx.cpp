@@ -137,8 +137,8 @@ int zmq::ctx_t::terminate ()
 
     // Connect up any pending inproc connections, otherwise we will hang
     pending_connections_t copy = _pending_connections;
-    for (pending_connections_t::iterator p = copy.begin (); p != copy.end ();
-         ++p) {
+    for (pending_connections_t::iterator p = copy.begin (), end = copy.end ();
+         p != end; ++p) {
         zmq::socket_base_t *s = create_socket (ZMQ_PAIR);
         // create_socket might fail eg: out of memory/sockets limit reached
         zmq_assert (s);
@@ -271,8 +271,7 @@ int zmq::ctx_t::get (int option_)
     else if (option_ == ZMQ_ZERO_COPY_RECV) {
         rc = _zero_copy;
     } else {
-        errno = EINVAL;
-        rc = -1;
+        rc = thread_ctx_t::get (option_);
     }
     return rc;
 }
@@ -448,10 +447,7 @@ int zmq::thread_ctx_t::set (int option_, int optval_)
         _thread_affinity_cpus.insert (optval_);
     } else if (option_ == ZMQ_THREAD_AFFINITY_CPU_REMOVE && optval_ >= 0) {
         scoped_lock_t locker (_opt_sync);
-        std::set<int>::iterator it = _thread_affinity_cpus.find (optval_);
-        if (it != _thread_affinity_cpus.end ()) {
-            _thread_affinity_cpus.erase (it);
-        } else {
+        if (0 == _thread_affinity_cpus.erase (optval_)) {
             errno = EINVAL;
             rc = -1;
         }
@@ -463,6 +459,25 @@ int zmq::thread_ctx_t::set (int option_, int optval_)
     } else if (option_ == ZMQ_THREAD_PRIORITY && optval_ >= 0) {
         scoped_lock_t locker (_opt_sync);
         _thread_priority = optval_;
+    } else {
+        errno = EINVAL;
+        rc = -1;
+    }
+    return rc;
+}
+
+int zmq::thread_ctx_t::get (int option_)
+{
+    int rc = 0;
+    if (option_ == ZMQ_THREAD_PRIORITY) {
+        scoped_lock_t locker (_opt_sync);
+        rc = _thread_priority;
+    } else if (option_ == ZMQ_THREAD_SCHED_POLICY) {
+        scoped_lock_t locker (_opt_sync);
+        rc = _thread_sched_policy;
+    } else if (option_ == ZMQ_THREAD_NAME_PREFIX) {
+        scoped_lock_t locker (_opt_sync);
+        rc = atoi (_thread_name_prefix.c_str ());
     } else {
         errno = EINVAL;
         rc = -1;
@@ -531,15 +546,17 @@ void zmq::ctx_t::unregister_endpoints (socket_base_t *socket_)
 {
     scoped_lock_t locker (_endpoints_sync);
 
-    endpoints_t::iterator it = _endpoints.begin ();
-    while (it != _endpoints.end ()) {
-        if (it->second.socket == socket_) {
-            endpoints_t::iterator to_erase = it;
+    for (endpoints_t::iterator it = _endpoints.begin (),
+                               end = _endpoints.end ();
+         it != end;) {
+        if (it->second.socket == socket_)
+#if __cplusplus >= 201103L
+            it = _endpoints.erase (it);
+#else
+            _endpoints.erase (it++);
+#endif
+        else
             ++it;
-            _endpoints.erase (to_erase);
-            continue;
-        }
-        ++it;
     }
 }
 
@@ -618,15 +635,7 @@ void zmq::ctx_t::connect_inproc_sockets (
         errno_assert (rc == 0);
     }
 
-    bool conflate =
-      pending_connection_.endpoint.options.conflate
-      && (pending_connection_.endpoint.options.type == ZMQ_DEALER
-          || pending_connection_.endpoint.options.type == ZMQ_PULL
-          || pending_connection_.endpoint.options.type == ZMQ_PUSH
-          || pending_connection_.endpoint.options.type == ZMQ_PUB
-          || pending_connection_.endpoint.options.type == ZMQ_SUB);
-
-    if (!conflate) {
+    if (!get_effective_conflate_option (pending_connection_.endpoint.options)) {
         pending_connection_.connect_pipe->set_hwms_boost (bind_options_.sndhwm,
                                                           bind_options_.rcvhwm);
         pending_connection_.bind_pipe->set_hwms_boost (
@@ -661,15 +670,7 @@ void zmq::ctx_t::connect_inproc_sockets (
     // is open before sending.
     if (pending_connection_.endpoint.options.recv_routing_id
         && pending_connection_.endpoint.socket->check_tag ()) {
-        msg_t routing_id;
-        const int rc = routing_id.init_size (bind_options_.routing_id_size);
-        errno_assert (rc == 0);
-        memcpy (routing_id.data (), bind_options_.routing_id,
-                bind_options_.routing_id_size);
-        routing_id.set_flags (msg_t::routing_id);
-        const bool written = pending_connection_.bind_pipe->write (&routing_id);
-        zmq_assert (written);
-        pending_connection_.bind_pipe->flush ();
+        send_routing_id (pending_connection_.bind_pipe, bind_options_);
     }
 }
 

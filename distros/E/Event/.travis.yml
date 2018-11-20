@@ -1,0 +1,38 @@
+language: perl
+sudo: false
+matrix:
+  include:
+    - perl: "5.8.3"
+    - perl: "5.28-dbg"
+    - perl: "5.28"
+      env: RELEASE_TESTING=1
+    # separate from release testing else cover_db blows up xt/manifest.t
+    - perl: "5.28"
+      env: COVERAGE=1
+before_install:
+  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
+  - source ~/travis-perl-helpers/init
+  - env|sort
+  - build-perl
+  - local-lib cache
+  - perl -V
+  - cpan-install ExtUtils::MakeMaker~6.64 # for TEST_REQUIRES
+  - if [ "$RELEASE_TESTING" = 1 ]; then cpan-install --deps; prove -l xt; fi
+  - build-dist
+  - cd $BUILD_DIR             # $BUILD_DIR is set by the build-dist command
+install:
+  - cpan-install --deps       # installs prereqs, including recommends
+  - cpan-install --coverage   # installs converage prereqs, if enabled
+before_script:
+  - coverage-setup
+script:
+  - make
+  - prove -b -j$(test-jobs) $(test-files)   # parallel testing
+after_success:
+  - coverage-report
+notifications:
+  irc:
+    channels:
+    - "irc.perl.org#graphql-perl"
+    on_failure: always
+    skip_join: true

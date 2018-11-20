@@ -5,7 +5,6 @@
 [![Code Climate](https://codeclimate.com/github/RubyMoney/money.svg)](https://codeclimate.com/github/RubyMoney/money)
 [![Coverage Status](https://coveralls.io/repos/RubyMoney/money/badge.svg?branch=master)](https://coveralls.io/r/RubyMoney/money?branch=master)
 [![Inline docs](https://inch-ci.org/github/RubyMoney/money.svg)](https://inch-ci.org/github/RubyMoney/money)
-[![Dependency Status](https://gemnasium.com/RubyMoney/money.svg)](https://gemnasium.com/RubyMoney/money)
 [![License](https://img.shields.io/github/license/RubyMoney/money.svg)](https://opensource.org/licenses/MIT)
 
 :warning: Please read the [migration notes](#migration-notes) before upgrading to a new major version.
@@ -199,7 +198,7 @@ using:
 Money.default_currency = Money::Currency.new("CAD")
 ```
 
-If you use Rails, then `environment.rb` is a very good place to put this.
+If you use [Rails](https://github.com/RubyMoney/money/tree/master#ruby-on-rails), then `config/initializers/money.rb` is a very good place to put this.
 
 ### Currency Exponent
 
@@ -433,6 +432,48 @@ If you wish to disable this feature and use defaults instead:
 
 ``` ruby
 Money.locale_backend = nil
+```
+
+### Deprecation
+
+The current default behaviour always checks the I18n locale first, falling back to "per currency"
+localization. This is now deprecated and will be removed in favour of explicitly defined behaviour
+in the next major release.
+
+If you would like to use I18n localization (formatting depends on the locale):
+
+```ruby
+Money.locale_backend = :i18n
+
+# example (using default localization from rails-i18n):
+I18n.locale = :en
+Money.new(10_000_00, 'USD').format # => $10,000.00
+Money.new(10_000_00, 'EUR').format # => €10,000.00
+
+I18n.locale = :es
+Money.new(10_000_00, 'USD').format # => $10.000,00
+Money.new(10_000_00, 'EUR').format # => €10.000,00
+```
+
+For the legacy behaviour of "per currency" localization (formatting depends only on currency):
+
+```ruby
+Money.locale_backend = :currency
+
+# example:
+Money.new(10_000_00, 'USD').format # => $10,000.00
+Money.new(10_000_00, 'EUR').format # => €10.000,00
+```
+
+In case you don't need localization and would like to use default values (can be redefined using
+`Money.default_formatting_rules`):
+
+```ruby
+Money.locale_backend = nil
+
+# example:
+Money.new(10_000_00, 'USD').format # => $10000.00
+Money.new(10_000_00, 'EUR').format # => €10000.00
 ```
 
 ## Collection

@@ -13,7 +13,7 @@ use Struct::Diff 0.94 qw(diff split_diff);
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path);
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 sub arg_opts {
     my $self = shift;
@@ -112,7 +112,7 @@ sub exec {
     my $self = shift;
 
     if ($self->{OPTS}->{'list-modules'}) {
-        map { printf "%-10s %-8s %s\n", @{$_} } $self->list_modules;
+        map { printf "%-16s %-8s %s\n", @{$_} } $self->list_modules;
         die_info undef, 0;
     }
 

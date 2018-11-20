@@ -1,7 +1,7 @@
 package Versioning::Scheme::Dotted;
 
-our $DATE = '2018-10-11'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-11-18'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -102,7 +102,7 @@ Versioning::Scheme::Dotted - Version as dotted numbers
 
 =head1 VERSION
 
-This document describes version 0.007 of Versioning::Scheme::Dotted (from Perl distribution Versioning-Scheme), released on 2018-10-11.
+This document describes version 0.008 of Versioning::Scheme::Dotted (from Perl distribution Versioning-Scheme), released on 2018-11-18.
 
 =head1 SYNOPSIS
 

@@ -8,12 +8,12 @@ use 5.010000;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK= qw/subsjdate kanji2number seireki_to_nengo nengo_to_seireki
-		   regjnums @jdatere/;
+		   regjnums @jdatere $jera %jera2w/;
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 # Kanji number conversion table.
 
@@ -42,20 +42,25 @@ my $kanjidigits = join ('', keys %kanjinums);
 sub kanji2number
 {
     my ($knum) = @_;
-    return 1 if $knum eq '元';
+    # Special case of 元日 (ganjitsu), 元年 (gannen), etc.
+    if ($knum eq '元') {
+	return 1;
+    }
     my @kanjis = split '', $knum;
     my $value = 0;
     my $keta = 1;
     while (1) {
 	my $k = pop @kanjis;
-	return $value if ! defined $k;
+	if (! defined $k) {
+	    return $value;
+	}
 	my $val = $kanjinums{$k};
-        # Make sure this kanji number is one we know how to handle.
+        # Make sure this kanji is one we know
 	if (! defined $val) {
 	    warn "can't cope with '$k' of input '$knum'";
 	    return 0;
 	}
-        # If the value of the individual kanji is more than 10.
+        # If the value of the individual kanji is 10 or more.
 	if ($val >= 10) {
 	    $keta = $val;
 	    my $knext = pop @kanjis;
@@ -63,12 +68,18 @@ sub kanji2number
 		return $value + $val;
 	    }
 	    my $val_next = $kanjinums{$knext};
-	    if (!defined $val_next) {
+	    if (! defined $val_next) {
+		# Kanji is not a numerical one we know of.
 		warn "can't cope with '$knext' of input '$knum'.\n";
 		return 0;
 	    }
+	    # If we have a hundred followed by a thousand, without a
+	    # three, four, etc., like "千百".
 	    if ($val_next > 10) {
+		# Put it back on the stack
 		push @kanjis, $knext;
+		# $value += 1*$val, since the digit for $val is
+		# defaulted to one.
 		$value += $val;
 	    }
             else {
@@ -76,7 +87,9 @@ sub kanji2number
 	    }
 	}
         else {
-            # $k is a kanji digit from 0 to 9, and $val is its value.
+            # $k is a kanji digit from 0 to 9, and $val is its value,
+            # as if 一二三 or something, without tens, hundreds,
+            # thousands, etc.
 	    $value += $val * $keta;
 	    $keta *= 10;
 	}
@@ -116,18 +129,18 @@ my $alpha_era = qr/
                       (?:
                           [H|Ｈ|S|Ｓ|T|Ｔ|M|Ｍ]
                       )
-                  /x;
+                  /xi;
 
 # The recent era names (Heisei, Showa, Taisho, Meiji). These eras are
 # sometimes written using the letters H, S, T, and M.
 
-my $jera = qr/($alpha_era|平|昭|大|明|平成|昭和|大正|明治|㍻|㍼|㍽|㍾)/;
+our $jera = qr/($alpha_era|平|昭|大|明|平成|昭和|大正|明治|㍻|㍼|㍽|㍾)/;
 
 # A map of Japanese eras to Western dates. These are the starting year
 # of the period minus one, to allow for that the first year is "heisei
 # one" rather than "heisei zero".
 
-my %jera2w = (
+our %jera2w = (
     H    => 1988,
     Ｈ   => 1988,
     平成 => 1988,

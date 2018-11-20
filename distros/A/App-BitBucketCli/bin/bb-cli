@@ -15,7 +15,7 @@ use FindBin qw/$Bin/;
 use YAML::Syck qw/LoadFile DumpFile/;
 use Path::Tiny;
 
-our $VERSION = 0.006;
+our $VERSION = 0.007;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 exit main();
@@ -204,7 +204,7 @@ bb-cli - Command line tool for communicating with BitBucket Server
 
 =head1 VERSION
 
-0his documentation refers to bb-cli version 0.006
+0his documentation refers to bb-cli version 0.007
 
 =head1 SYNOPSIS
 

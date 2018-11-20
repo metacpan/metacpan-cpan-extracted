@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FFI::Build 0.01 {
+package Dist::Zilla::Plugin::FFI::Build 1.02 {
 
   use 5.014;
   use Moose;
@@ -78,7 +78,7 @@ Dist::Zilla::Plugin::FFI::Build
 
 =head1 VERSION
 
-version 0.01
+version 1.02
 
 =head1 SYNOPSIS
 

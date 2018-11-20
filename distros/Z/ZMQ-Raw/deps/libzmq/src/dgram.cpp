@@ -51,9 +51,12 @@ zmq::dgram_t::~dgram_t ()
     zmq_assert (!_pipe);
 }
 
-void zmq::dgram_t::xattach_pipe (pipe_t *pipe_, bool subscribe_to_all_)
+void zmq::dgram_t::xattach_pipe (pipe_t *pipe_,
+                                 bool subscribe_to_all_,
+                                 bool locally_initiated_)
 {
     LIBZMQ_UNUSED (subscribe_to_all_);
+    LIBZMQ_UNUSED (locally_initiated_);
 
     zmq_assert (pipe_);
 
@@ -69,7 +72,6 @@ void zmq::dgram_t::xpipe_terminated (pipe_t *pipe_)
 {
     if (pipe_ == _pipe) {
         if (_last_in == _pipe) {
-            _saved_credential.set_deep_copy (_last_in->get_credential ());
             _last_in = NULL;
         }
         _pipe = NULL;
@@ -104,18 +106,12 @@ int zmq::dgram_t::xsend (msg_t *msg_)
             errno = EINVAL;
             return -1;
         }
-
-        //  Expect one more message frame.
-        _more_out = true;
     } else {
         //  dgram messages are two part only, reject part if more is set
         if (msg_->flags () & msg_t::more) {
             errno = EINVAL;
             return -1;
         }
-
-        //  This is the last part of the message.
-        _more_out = false;
     }
 
     // Push the message into the pipe.
@@ -126,6 +122,9 @@ int zmq::dgram_t::xsend (msg_t *msg_)
 
     if (!(msg_->flags () & msg_t::more))
         _pipe->flush ();
+
+    // flip the more flag
+    _more_out = !_more_out;
 
     //  Detach the message from the data buffer.
     int rc = msg_->init ();
@@ -167,9 +166,4 @@ bool zmq::dgram_t::xhas_out ()
         return false;
 
     return _pipe->check_write ();
-}
-
-const zmq::blob_t &zmq::dgram_t::get_credential () const
-{
-    return _last_in ? _last_in->get_credential () : _saved_credential;
 }

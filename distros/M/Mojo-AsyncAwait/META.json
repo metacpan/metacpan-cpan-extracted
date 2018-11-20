@@ -1,0 +1,66 @@
+{
+   "abstract" : "An Async/Await implementation for Mojolicious",
+   "author" : [
+      "Joel Berger <joel.a.berger@gmail.com>",
+      "Marcus Ramberg <mramberg@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.024",
+   "license" : [
+      "artistic_2",
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-AsyncAwait",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.024"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Coro" : "0",
+            "Import::Into" : "0",
+            "Mojolicious" : "7.66",
+            "Sub::Util" : "1.41"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::AsyncAwait" : {
+         "file" : "lib/Mojo/AsyncAwait.pm",
+         "version" : "0.01"
+      },
+      "Mojo::AsyncAwait::Backend::Coro" : {
+         "file" : "lib/Mojo/AsyncAwait/Backend/Coro.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mojolicious/Mojo-AsyncAwait/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mojolicious/Mojo-AsyncAwait"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -13,11 +13,11 @@ Dancer2::Plugin::Tail - Tail a file from Dancer2
 
 =head1 VERSION
 
-Version 0.016
+Version 0.017
 
 =cut
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 
 =head1 SYNOPSIS
@@ -334,7 +334,7 @@ sub display_tail {
 
   if (    ! defined $tail_file 
        || $tail_file eq '' ) {
-    $plugin->app->log( debug => "file id " . $file_id . " is not defined." );
+    $plugin->app->log( debug => "tail_file " . $tail_file . " is not defined." );
     $error = 'The file-id you specified does not exist.' ;
   } 
 

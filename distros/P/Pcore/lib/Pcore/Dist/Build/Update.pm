@@ -35,7 +35,7 @@ sub update_readme_md ($self) {
 sub update_license ($self) {
     my $lic = P->class->load( $self->{dist}->cfg->{license}, ns => 'Software::License' )->new( {
         holder => $self->{dist}->cfg->{copyright_holder} || $self->{dist}->cfg->{author},
-        year => P->date->now->year,
+        year   => P->date->now->year,
     } );
 
     P->file->write_bin( "$self->{dist}->{root}/LICENSE", $lic->fulltext );

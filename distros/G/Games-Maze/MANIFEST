@@ -1,4 +1,5 @@
 Build.PL
+CONTRIBUTING.md
 Changes
 LICENSE
 MANIFEST
@@ -7,7 +8,7 @@ META.yml
 Makefile.PL
 eg/mz.pl
 lib/Games/Maze.pm
-README
+README.md
 t/first.t
 t/mazeprop.pl
 t/pod.t

@@ -25,11 +25,15 @@ lib/Photonic/NonRetarded/SHP.pm
 lib/Photonic/Retarded/AllH.pm
 lib/Photonic/Retarded/EpsilonP.pm
 lib/Photonic/Retarded/EpsilonTensor.pm
+lib/Photonic/Retarded/EpsilonTensorF.pm
+lib/Photonic/Retarded/FieldH.pm
 lib/Photonic/Retarded/Green.pm
+lib/Photonic/Retarded/GreenF.pm
 lib/Photonic/Retarded/GreenP.pm
 lib/Photonic/Retarded/Metric.pm
 lib/Photonic/Retarded/OneH.pm
 lib/Photonic/Retarded/Wave.pm
+lib/Photonic/Retarded/WaveF.pm
 lib/Photonic/Retarded/WaveP.pm
 lib/Photonic/Roles/EpsParams.pm
 lib/Photonic/Roles/KeepStates.pm

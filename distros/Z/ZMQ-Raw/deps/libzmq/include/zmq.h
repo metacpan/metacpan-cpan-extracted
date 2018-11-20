@@ -41,7 +41,7 @@
 /*  Version macros for compile-time API version detection                     */
 #define ZMQ_VERSION_MAJOR 4
 #define ZMQ_VERSION_MINOR 3
-#define ZMQ_VERSION_PATCH 1
+#define ZMQ_VERSION_PATCH 0
 
 #define ZMQ_MAKE_VERSION(major, minor, patch)                                  \
     ((major) *10000 + (minor) *100 + (patch))
@@ -216,6 +216,9 @@ ZMQ_EXPORT void zmq_version (int *major_, int *minor_, int *patch_);
 #define ZMQ_THREAD_SCHED_POLICY 4
 #define ZMQ_MAX_MSGSZ 5
 #define ZMQ_MSG_T_SIZE 6
+#define ZMQ_THREAD_AFFINITY_CPU_ADD 7
+#define ZMQ_THREAD_AFFINITY_CPU_REMOVE 8
+#define ZMQ_THREAD_NAME_PREFIX 9
 
 /*  Default for new contexts                                                  */
 #define ZMQ_IO_THREADS_DFLT 1
@@ -437,6 +440,38 @@ ZMQ_EXPORT const char *zmq_msg_gets (const zmq_msg_t *msg_,
 #define ZMQ_EVENT_DISCONNECTED 0x0200
 #define ZMQ_EVENT_MONITOR_STOPPED 0x0400
 #define ZMQ_EVENT_ALL 0xFFFF
+/*  Unspecified system errors during handshake. Event value is an errno.      */
+#define ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL 0x0800
+/*  Handshake complete successfully with successful authentication (if        *
+ *  enabled). Event value is unused.                                          */
+#define ZMQ_EVENT_HANDSHAKE_SUCCEEDED 0x1000
+/*  Protocol errors between ZMTP peers or between server and ZAP handler.     *
+ *  Event value is one of ZMQ_PROTOCOL_ERROR_*                                */
+#define ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL 0x2000
+/*  Failed authentication requests. Event value is the numeric ZAP status     *
+ *  code, i.e. 300, 400 or 500.                                               */
+#define ZMQ_EVENT_HANDSHAKE_FAILED_AUTH 0x4000
+#define ZMQ_PROTOCOL_ERROR_ZMTP_UNSPECIFIED 0x10000000
+#define ZMQ_PROTOCOL_ERROR_ZMTP_UNEXPECTED_COMMAND 0x10000001
+#define ZMQ_PROTOCOL_ERROR_ZMTP_INVALID_SEQUENCE 0x10000002
+#define ZMQ_PROTOCOL_ERROR_ZMTP_KEY_EXCHANGE 0x10000003
+#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_UNSPECIFIED 0x10000011
+#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_MESSAGE 0x10000012
+#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_HELLO 0x10000013
+#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_INITIATE 0x10000014
+#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_ERROR 0x10000015
+#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_READY 0x10000016
+#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_WELCOME 0x10000017
+#define ZMQ_PROTOCOL_ERROR_ZMTP_INVALID_METADATA 0x10000018
+// the following two may be due to erroneous configuration of a peer
+#define ZMQ_PROTOCOL_ERROR_ZMTP_CRYPTOGRAPHIC 0x11000001
+#define ZMQ_PROTOCOL_ERROR_ZMTP_MECHANISM_MISMATCH 0x11000002
+#define ZMQ_PROTOCOL_ERROR_ZAP_UNSPECIFIED 0x20000000
+#define ZMQ_PROTOCOL_ERROR_ZAP_MALFORMED_REPLY 0x20000001
+#define ZMQ_PROTOCOL_ERROR_ZAP_BAD_REQUEST_ID 0x20000002
+#define ZMQ_PROTOCOL_ERROR_ZAP_BAD_VERSION 0x20000003
+#define ZMQ_PROTOCOL_ERROR_ZAP_INVALID_STATUS_CODE 0x20000004
+#define ZMQ_PROTOCOL_ERROR_ZAP_INVALID_METADATA 0x20000005
 
 ZMQ_EXPORT void *zmq_socket (void *, int type_);
 ZMQ_EXPORT int zmq_close (void *s_);
@@ -543,6 +578,25 @@ ZMQ_EXPORT int zmq_atomic_counter_dec (void *counter_);
 ZMQ_EXPORT int zmq_atomic_counter_value (void *counter_);
 ZMQ_EXPORT void zmq_atomic_counter_destroy (void **counter_p_);
 
+/******************************************************************************/
+/*  Scheduling timers                                                         */
+/******************************************************************************/
+
+#define ZMQ_HAVE_TIMERS
+
+typedef void(zmq_timer_fn) (int timer_id, void *arg);
+
+ZMQ_EXPORT void *zmq_timers_new (void);
+ZMQ_EXPORT int zmq_timers_destroy (void **timers_p);
+ZMQ_EXPORT int
+zmq_timers_add (void *timers, size_t interval, zmq_timer_fn handler, void *arg);
+ZMQ_EXPORT int zmq_timers_cancel (void *timers, int timer_id);
+ZMQ_EXPORT int
+zmq_timers_set_interval (void *timers, int timer_id, size_t interval);
+ZMQ_EXPORT int zmq_timers_reset (void *timers, int timer_id);
+ZMQ_EXPORT long zmq_timers_timeout (void *timers);
+ZMQ_EXPORT int zmq_timers_execute (void *timers);
+
 
 /******************************************************************************/
 /*  These functions are not documented by man pages -- use at your own risk.  */
@@ -556,11 +610,9 @@ ZMQ_EXPORT void zmq_atomic_counter_destroy (void **counter_p_);
 /*  Starts the stopwatch. Returns the handle to the watch.                    */
 ZMQ_EXPORT void *zmq_stopwatch_start (void);
 
-#ifdef ZMQ_BUILD_DRAFT_API
 /*  Returns the number of microseconds elapsed since the stopwatch was        */
 /*  started, but does not stop or deallocate the stopwatch.                   */
 ZMQ_EXPORT unsigned long zmq_stopwatch_intermediate (void *watch_);
-#endif
 
 /*  Stops the stopwatch. Returns the number of microseconds elapsed since     */
 /*  the stopwatch was started, and deallocates that watch.                    */
@@ -599,48 +651,9 @@ ZMQ_EXPORT void zmq_threadclose (void *thread_);
 #define ZMQ_LOOPBACK_FASTPATH 94
 #define ZMQ_METADATA 95
 #define ZMQ_MULTICAST_LOOP 96
-
-/*  DRAFT 0MQ socket events and monitoring                                    */
-/*  Unspecified system errors during handshake. Event value is an errno.      */
-#define ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL 0x0800
-/*  Handshake complete successfully with successful authentication (if        *
- *  enabled). Event value is unused.                                          */
-#define ZMQ_EVENT_HANDSHAKE_SUCCEEDED 0x1000
-/*  Protocol errors between ZMTP peers or between server and ZAP handler.     *
- *  Event value is one of ZMQ_PROTOCOL_ERROR_*                                */
-#define ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL 0x2000
-/*  Failed authentication requests. Event value is the numeric ZAP status     *
- *  code, i.e. 300, 400 or 500.                                               */
-#define ZMQ_EVENT_HANDSHAKE_FAILED_AUTH 0x4000
-
-#define ZMQ_PROTOCOL_ERROR_ZMTP_UNSPECIFIED 0x10000000
-#define ZMQ_PROTOCOL_ERROR_ZMTP_UNEXPECTED_COMMAND 0x10000001
-#define ZMQ_PROTOCOL_ERROR_ZMTP_INVALID_SEQUENCE 0x10000002
-#define ZMQ_PROTOCOL_ERROR_ZMTP_KEY_EXCHANGE 0x10000003
-#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_UNSPECIFIED 0x10000011
-#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_MESSAGE 0x10000012
-#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_HELLO 0x10000013
-#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_INITIATE 0x10000014
-#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_ERROR 0x10000015
-#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_READY 0x10000016
-#define ZMQ_PROTOCOL_ERROR_ZMTP_MALFORMED_COMMAND_WELCOME 0x10000017
-#define ZMQ_PROTOCOL_ERROR_ZMTP_INVALID_METADATA 0x10000018
-
-// the following two may be due to erroneous configuration of a peer
-#define ZMQ_PROTOCOL_ERROR_ZMTP_CRYPTOGRAPHIC 0x11000001
-#define ZMQ_PROTOCOL_ERROR_ZMTP_MECHANISM_MISMATCH 0x11000002
-
-#define ZMQ_PROTOCOL_ERROR_ZAP_UNSPECIFIED 0x20000000
-#define ZMQ_PROTOCOL_ERROR_ZAP_MALFORMED_REPLY 0x20000001
-#define ZMQ_PROTOCOL_ERROR_ZAP_BAD_REQUEST_ID 0x20000002
-#define ZMQ_PROTOCOL_ERROR_ZAP_BAD_VERSION 0x20000003
-#define ZMQ_PROTOCOL_ERROR_ZAP_INVALID_STATUS_CODE 0x20000004
-#define ZMQ_PROTOCOL_ERROR_ZAP_INVALID_METADATA 0x20000005
+#define ZMQ_ROUTER_NOTIFY 97
 
 /*  DRAFT Context options                                                     */
-#define ZMQ_THREAD_AFFINITY_CPU_ADD 7
-#define ZMQ_THREAD_AFFINITY_CPU_REMOVE 8
-#define ZMQ_THREAD_NAME_PREFIX 9
 #define ZMQ_ZERO_COPY_RECV 10
 
 /*  DRAFT Socket methods.                                                     */
@@ -658,6 +671,10 @@ ZMQ_EXPORT const char *zmq_msg_group (zmq_msg_t *msg);
 #define ZMQ_MSG_PROPERTY_SOCKET_TYPE "Socket-Type"
 #define ZMQ_MSG_PROPERTY_USER_ID "User-Id"
 #define ZMQ_MSG_PROPERTY_PEER_ADDRESS "Peer-Address"
+
+/*  Router notify options                                                     */
+#define ZMQ_NOTIFY_CONNECT 1
+#define ZMQ_NOTIFY_DISCONNECT 2
 
 /******************************************************************************/
 /*  Poller polling on sockets,fd and thread-safe sockets                      */
@@ -705,25 +722,6 @@ ZMQ_EXPORT int zmq_poller_remove_fd (void *poller, int fd);
 ZMQ_EXPORT int zmq_socket_get_peer_state (void *socket,
                                           const void *routing_id,
                                           size_t routing_id_size);
-
-/******************************************************************************/
-/*  Scheduling timers                                                         */
-/******************************************************************************/
-
-#define ZMQ_HAVE_TIMERS
-
-typedef void(zmq_timer_fn) (int timer_id, void *arg);
-
-ZMQ_EXPORT void *zmq_timers_new (void);
-ZMQ_EXPORT int zmq_timers_destroy (void **timers_p);
-ZMQ_EXPORT int
-zmq_timers_add (void *timers, size_t interval, zmq_timer_fn handler, void *arg);
-ZMQ_EXPORT int zmq_timers_cancel (void *timers, int timer_id);
-ZMQ_EXPORT int
-zmq_timers_set_interval (void *timers, int timer_id, size_t interval);
-ZMQ_EXPORT int zmq_timers_reset (void *timers, int timer_id);
-ZMQ_EXPORT long zmq_timers_timeout (void *timers);
-ZMQ_EXPORT int zmq_timers_execute (void *timers);
 
 #endif // ZMQ_BUILD_DRAFT_API
 

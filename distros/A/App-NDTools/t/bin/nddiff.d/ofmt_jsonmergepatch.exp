@@ -1,0 +1,10 @@
+{
+   "false" : true,
+   "list" : [
+      true,
+      true,
+      false,
+      false
+   ],
+   "true" : false
+}

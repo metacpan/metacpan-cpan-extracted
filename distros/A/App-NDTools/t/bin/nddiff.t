@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 use File::Spec::Functions qw(catfile);
 use Test::File::Contents;
-use Test::More tests => 77;
+use Test::More tests => 78;
 
 use App::NDTools::Test;
 
@@ -138,6 +138,22 @@ run_ok(
     exit => 8,
 );
 
+$test = "ofmt_jsonmergepatch";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--ofmt', "jsonmergepatch", "_bool.a.json", "_bool.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "ofmt_jsonpatch";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--ofmt', "jsonpatch", "_cfg.alpha.json", "_cfg.beta.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
 $test = "ofmt_yaml";
 run_ok(
     name => $test,
@@ -215,15 +231,6 @@ run_ok(
     name => $test,
     cmd => [ @cmd, '--colors', '-U', "_cfg.alpha.json", "_cfg.beta.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
-    exit => 8,
-);
-
-$test = "term_full_headers";
-run_ok(
-    name => $test,
-    cmd => [ @cmd, '--full-headers', "_cfg.alpha.json", "_cfg.beta.json" ],
-    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
-    stderr => qr/ ALERT] --full-headers opt is deprecated and will be removed soon/,
     exit => 8,
 );
 

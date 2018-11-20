@@ -1,5 +1,11 @@
 Revision history for Test-MockFile
 
+0.012   11/16/2018
+ - Fix for #21 - length undef on perl 5.10
+ - GH #20 - Add EPERM support for freebsd when unlinking directories
+ - Fix for print $fh undef throwing a warning
+ - Remove faulty OS level test of readdir after opendir.
+
 0.011   11/08/2018
  - Fix for my $file_contents = do { local $/; <$fh> };
  - Mock CORE::GLOBAL::unlink and support directories for unlink

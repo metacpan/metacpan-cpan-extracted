@@ -12,7 +12,7 @@ use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.006;
+our $VERSION = 0.007;
 
 extends qw/App::BitBucketCli::Base/;
 
@@ -85,7 +85,7 @@ App::BitBucketCli::Branch - Stores details about a repository's branch
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Branch version 0.006
+This documentation refers to App::BitBucketCli::Branch version 0.007
 
 =head1 SYNOPSIS
 

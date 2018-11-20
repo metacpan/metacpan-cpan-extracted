@@ -1,13 +1,17 @@
+
+
+
+Worry in the following order :
+
+  Behavior
+
+  API boundaries
+
+  Data structures
+
+  Implementation (flowchart) details
+
+
 --== TODO ==--
 
-review documentation
-
-regenerate readme ( perldoc )
-
-upload new version
-
-cap the size of the file silos at 2G and split them further, so there is a 2.1, 2.2, etc silo that
-is algorithmically calculated based on silo size and ID
-
-investigate the possibility of having the record store spam multiple hosts and filesystems.
-
+  Consider error messages based on locale?

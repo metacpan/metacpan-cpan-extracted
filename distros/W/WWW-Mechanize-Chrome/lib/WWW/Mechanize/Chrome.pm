@@ -21,7 +21,7 @@ use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -861,11 +861,11 @@ callback will be invoked.
 =cut
 
 sub setRequestInterception_future( $self, @patterns ) {
-    $self->driver->send_message('Network.setRequestInterception', @patterns)
+    $self->driver->send_message('Network.setRequestInterception', patterns => @patterns)
 }
 
 sub setRequestInterception( $self, @patterns ) {
-    $self->requestInterception_future( @patterns )->get
+    $self->setRequestInterception_future( @patterns )->get
 }
 
 =head2 C<< $mech->add_listener >>

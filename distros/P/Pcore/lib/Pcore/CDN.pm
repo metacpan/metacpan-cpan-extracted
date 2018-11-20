@@ -7,8 +7,8 @@ use overload '&{}' => sub ( $self, @ ) {
   },
   fallback => 1;
 
-has bucket => ( init_arg => undef );
-has resources => ();    # HashRef[CodeRef]
+has bucket    => ( init_arg => undef );
+has resources => ();                      # HashRef[CodeRef]
 
 around new => sub ( $orig, $self, $args ) {
     $self = $self->$orig;

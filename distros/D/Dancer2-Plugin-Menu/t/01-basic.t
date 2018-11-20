@@ -2,74 +2,102 @@ use strict;
 use warnings;
 use File::Path;
 use Data::Dumper qw(Dumper);
+use t::Data;
 use Test::NoWarnings;
 use Test::Output;
 use Plack::Test;
 use HTTP::Request::Common;
-use Test::Most tests => 1, 'die';
+use Test::Most tests => 5, 'die';
 
 BEGIN {
-  $ENV{'DANCER_ENVIRONMENT'} = 'testing';
+    $ENV{'DANCER_ENVIRONMENT'} = 'testing';
 }
 
 my $app_obj;
 
 {
-  package MyApp;
-  use Dancer2;
-  use Dancer2::Plugin::Menu;
-  use Data::Dumper qw(Dumper);
 
-  get '/' => sub { return 'hi' };
-  menu_item(
-    { title => 'My Menu Item', weight => 1 },
-    get 'test' => sub { template 'index.tt', { html => 'went_down' } }
-  );
+    package MyApp;
+    use Dancer2;
+    use Dancer2::Plugin::Menu;
+    use Data::Dumper qw(Dumper);
 
-  menu_item(
-    { title => 'A Tom Tom', weight => 3 },
-    get 'test/snig' => sub { template }
-  );
+    get '/' => sub { return 'hi' };
 
-  menu_item(
-    { title => 'Dinky', weight => 3 },
-    get 'test/big' => sub { template },
-  );
+    menu_item(
+        { title => 'Deep One', weight => 3 },
+        get '/test/snig/one/baloney pony/three' =>
+          sub { template 'index.tt', { html => 'booya' } }
+    );
 
-  menu_item(
-    { title => 'Deep One', weight => 3 },
-    get 'test/snig/one/baloney pony/three' => sub { template 'index.tt', { html => 'booya' } }
-  );
+    menu_item( { title => 'My Menu Item', weight => 1 },
+        get '/test' => sub { template 'index.tt', { html => 'went_down' } } );
 
-#  menu_item(
-#    { title => 'My Single', weight => 7 },
-#    get 'single' => sub { return 'test' }
-#  );
+    prefix '/test';
+    menu_item(
+        { title => 'A Tom Tom', weight => 3 },
+        get '/snig' => sub { template }
+    );
 
-  #print Dumper $app;
-#  $app->plugins->[0]->num;
-#  $app->plugins->[0]->_do_stuff;
-#
-#  $app_obj = bless $app, 'MyApp';
+    menu_item(
+        { title => 'Dinky', weight => 3 },
+        get '/big' => sub { template },
+    );
+
+    menu_item( {}, get '/nut' => sub { template }, );
 
 }
 
 my $test = Plack::Test->create( MyApp->to_app );
+
 my $res = $test->request( GET 'test/snig/one/baloney pony/three' );
-print Dumper $res->content;
+cmp_deeply( $res->content, $Data::test1, 'returns proper HTML' );
+
 $res = $test->request( GET 'test' );
-print Dumper $res->content;
+cmp_deeply( $res->content, $Data::test2, 'returns proper HTML' );
 
+$res = $test->request( GET 'test' );
+cmp_deeply( $res->content, $Data::test2, 'returns proper HTML from cache' );
 
+my $plugin = _dispatch_route('test');
+my $cache  = $plugin->_html_cache;
+cmp_deeply(
+    $cache,
+    { '/test' => "<ul>\n\t<li class=\"active\">blah</li>\n</ul>" },
+    'html menu in cache'
+);
 
+my @warnings = grep { $_->{Message} =~ /fallback to PP version/ }
+  &Test::NoWarnings::warnings;
+&Test::NoWarnings::clear_warnings if @warnings == &Test::NoWarnings::warnings;
 
+sub _dispatch_route {
+    my $path = shift;
+    my $app  = Dancer2::Core::App->new();
+    $app->with_plugins('Menu');
+    $app->plugins->[0]->menu_item(
+        { title => 'blah' },
+        $app->add_route(
+            method => 'get',
+            regexp => '/' . $path,
+            code   => sub { $app->template( 'index.tt', shift ) }
+        )
+    );
 
-#my $menu = Dancer2::Plugin::Menu->new( app => $test);
-#    menu_item();
-#    my $result = $menu->_convert_routes_to_array;
-#    cmp_deeply($result, [ '/', '/test' ], 'returns array of menu paths');
+    my $req = Dancer2::Core::Request->new(
+        env => {
+            SERVER_NAME => 'localhost',
+            SERVER_PORT => 8000,
+        }
+    );
+    my $route = $app->routes->{get}->[0];
+    $req->{route}   = $route;
+    $req->{cookies} = {};
+    $app->{request} = $req;
+    $route->execute($app);
+    return $app->plugins->[0];
+}
 
-#{ # 12, 13, 14, 15
 #  SKIP: {
 #    skip 'test_isolation', 3, if $skip;
 #    $res = $test->request( GET 'get_toc' );

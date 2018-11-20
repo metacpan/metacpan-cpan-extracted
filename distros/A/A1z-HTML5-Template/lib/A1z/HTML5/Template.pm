@@ -9,7 +9,7 @@ use vars qw(%ENV);
 
 sub NAME { my $self = shift; my $NAME; $NAME = "Fast and Easy Web Apps"; return $NAME; }
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 
 
@@ -725,6 +725,7 @@ sub end_body
 
 
 
+
 # begin content folder to select form 
 sub body_form 
 {
@@ -733,12 +734,14 @@ sub body_form
 	my $out; 
 	
 	my @keys;  
-	if (@_) { @keys = "@_"; } 
+	if (@_) { @keys = @_; } 
 	
 	my ($vars, $vals) = (''); 
 	for (@keys) 
 	{
 		$vars = $_ if ($_ =~ /^vars/); 
+
+		# $vals not used
 		$vals = $_ if ($_ =~ /^vals/); 
 	}
 	
@@ -750,7 +753,7 @@ sub body_form
 	my @hidden; 
 	if ($form_vars[4] and $form_vars[4] =~ /\,/) 
 	{
-		 @hidden = split(/\,/, $_) if $_; 
+		 @hidden = split(/\,/, $form_vars[4]); 
 	}
 	else 
 	{
@@ -764,13 +767,15 @@ sub body_form
 	if ($form_vars[3] and $form_vars[3] =~ /^select/) 
 	{
 		# get the params for the form 
-		my ($sel_key, $sel_name, $sel_default, $folder_or_file) = split(/\,/, $form_vars[3], 4); 
+		#   select,   
+		my ($sel_key, $sel_name, $sel_default, $folder_or_file, $selectLabelText) = split(/\,/, $form_vars[3], 5); 
+
 		$select .= qq{
-			<label for"$sel_name">$sel_default</label>
-			<div class="form-group"><!--begin select-->
-			<select name="$sel_name">
-			<option selected value="$sel_default">$sel_default</option>
-		};
+	<label for="$sel_name">$selectLabelText</label>
+	<div class="form-group"><!--begin select-->
+	\t<select name="$sel_name">
+	\t\t<option selected value="$sel_default">$sel_default</option>
+	};
 		
 		#now open file/folder to fill "options" 
 		if ( -f $folder_or_file ) 
@@ -781,34 +786,36 @@ sub body_form
 		elsif (-d $folder_or_file)
 		{
 			# open as dir and add all files in it to "options" 
-			opendir (D, "$folder_or_file") or print "$!";
-			my @dir = readdir(D); 
-			close D;
+			opendir(D, "$folder_or_file") or $select .= qq{<div class="error">$!</div>};
+			my @DIR = readdir(D);
 			
-			for my $file (@dir)
+			while ( my $file = <each @DIR> )
 			{
-				next unless $file =~ /[a-zA-Z0-9]/; 
-				# comment if your want subfolders also listed 
+				# only if file contains alphabets, numbers, and dashes 
+				next unless $file =~ /[a-zA-Z0-9\-]/; 
+
+				# comment if you want subfolders also listed 
 				next unless -f "$folder_or_file/$file"; 
+
 				# get rid of . and ..
 				next if $file =~ /^(\.|\.\.)/; 
+
 				# do not add hidden files to the options list
 				next if $file =~ /^\./; 
-				#$select .= '  ' x 8 . qq{<option value="$file">$file</option>\n} if $file; 	# ' ' x 8 = 8 spaces 
 				
 				# get the size of th file 
 				my $size = -s "$folder_or_file/$file"; 
 				my $original = $size; 
 					$size /= 1024; 
-					$size /= 1024;
+					#$size /= 1024;
 					$size = sprintf "%.2f", $size; 
-				$select .= qq{\t<option value="$file">$file [$size mb]</option>\n} if $file; 	# ' ' x 9 #= spaces
+				$select .= qq{\n\t\t\t<option value="$file">$file [$size kb]</option>} if $file; 
 			}
+
+			close D;
 		}
 
-		$select .= qq{
-			</select> </div> 
-		}; 
+		$select .= qq{\n\t\t</select>\n\t</div>\n}; 
 	}
 	else 
 	{
@@ -823,13 +830,13 @@ sub body_form
 		for (@hidden)
 		{
 			my ($name, $value) = split(/\-\-\-/, $_, 2) if $_; 
-			$out .= qq{<input type="hidden" name="$name" value="$value"/>\n} if $_; 
+			$out .= qq{\n\t<input type="hidden" name="$name" value="$value"/>} if $_; 
 		}
 		# add select 
 		$out .= qq{$select};  
-	$out .= qq{\n<button type="submit" class="btn btn-default">Submit</button>\n</form>\n\n}; 
+	$out .= qq{\n\t<button type="submit" class="btn btn-default">Submit</button>\n</form>\n}; 
 	
-	return qq{$out}; 
+	return qq{<div class="body_form">$out</div>}; 
 }
 
 # end body_form 
@@ -1233,9 +1240,9 @@ sub body
 	my %in; 
 	
 	%in = (
-		-h1		=> qq{$ENV{SERVER_NAME}},
+		-h1 => qq{$ENV{SERVER_NAME}},
 		-onload => qq{setTitle();},  
-		-nbhead 	=> qq{},
+		-nbhead => qq{},
 		-nbpage => qq{}, 
 		-nbmenu => qq{More}, 
 		-defaultjquery => qq{$HTML{-defaultjquery}}, 
@@ -1289,54 +1296,44 @@ $in{-userjquery}
 # end body 
 
 
-sub create_accordion 
-{
-	my $out; 
-	
-	my $file = "@_"; 
-	
-	my @data; 
-	
-	if ($file and -e -f $file) 
-	{ 
-		$out .= open_file("$file");
-	} 
-	else 
-	{
-		$out .= qq{#55 Unable to open file $file}; 
-	
-	}
-	
-	return $out; 
-	
-} 
-# end create accordion
-
 
 
 
 sub open_file 
 {
 	my $self =shift;
+
+
+
+	my %in;
+	%in = 
+	(
+		file => "",
+		
+		output_header => "",
+
+		output_format => "",
+
+		@_,
+	);
+
+	my $file = "$in{file}" || "$_[0]"; 
 	
-	# OUTPUT FORMAT OPTIONS: table, accordion, menu, as is; where "as is" is the default
+	my $output_format = "$in{output_format}" || "$_[1]"; 	
 	
-	my $file = "$_[0]"; 			# do not use @_ for a scalar: it puts all together and the file path was wrong.  # use $_[n] # use $_ if and only if there will be just one var passed to this sub
-	
-	my $output_format = "$_[1]"; 	
-	
-	my $output_header = "$_[2]"; 
+	my $output_header = "$in{output_header}" || "$_[2]"; 
 	
 	my $out; 
+
+	my $div4tabs;
 	
 	my @data; 
 	
-	if (open(FILE, "$file") )
-	{
-		#open(FILE, "$file") or $out .= qq{77 $!}; 
-		
-		@data = <FILE>; 
-		
+	if (-e -f "$file")
+	{ 
+
+		open(FILE, "$file") or die "$!";
+
 		$out .= qq{\n<!--begin file output-->\n<div class="file_output">\n}; 
 		
 		# Step 1 
@@ -1366,7 +1363,7 @@ sub open_file
 			
 			my $sl = '0'; 
 			
-				foreach my $line (@data) 
+				while ( my $line = <FILE>) 
 				{
 					$sl++ if $line; 
 					
@@ -1375,7 +1372,7 @@ sub open_file
 					if ($line =~ /\|/) 		
 					{ 
 						($h1, $div) = split(/\|/, $line, 2); 
-					} 			# no (\|) # i.e., do not enclose with brackets.  Enclosing was the culprit 
+					} 			# no (\|) # i.e., do not enclose with brackets
 					elsif ($line =~ /\t+/) { 
 						($h1, $div) = split(/\t+/, $line, 2); 
 					} 
@@ -1400,8 +1397,14 @@ sub open_file
 					}
 				
 					$out .= qq{\t<li><a href="#tabs-$sl">$h1</a></li>\n}; 
+
+					$div4tabs .= qq{<div id="tabs-$sl">$div</div>};
 				}
 			$out .= qq{</ul>\n}; 
+
+			$out .= $div4tabs;
+
+			close FILE;
 		}
 		elsif ($output_format eq 'dialog')
 		{
@@ -1418,7 +1421,7 @@ sub open_file
 		
 		my $serial = '0'; 
 		
-		foreach my $line (@data) 
+		while ( my $line = <FILE> ) 
 		{ 
 			chomp $line; 
 			
@@ -1500,14 +1503,14 @@ sub open_file
 				if ( $h1 =~ /^\s+/ or $div =~ /^\s+/ ) 
 				{
 					next unless ($h1 =~ /^\s+http/ or $div =~ /^\s+http/);					
-					$div =~ s!^\s+http!!g;
-					$h1 =~ s!^\s+http!!g;
+					#$div =~ s!^\s+http!!g;
+					#$h1 =~ s!^\s+http!!g;
 				}
 				else
 				{
 					next unless ($h1 =~ /^http/ or $div =~ /^http/);
-					$div =~ s!^http!!g;
-					$h1 =~ s!^http!!g;
+					#$div =~ s!^http!!g;
+					#$h1 =~ s!^http!!g;
 				}
 				$out .= qq{\t<li id="li-$serial"><a id="a-$serial" href="$div" title="$h1">$h1</a></li>\n};
 			}
@@ -1528,7 +1531,10 @@ sub open_file
 					$h1 =~ s!^==!!g;
 				}
 				
+				# Mismatching fragment identifier. See 1797.
+				# $div not available here as <FILE> is not open here.
 				$out .= qq{\t<div id="tabs-$serial"><p>$div</p></div>\n}; 
+				
 			}
 			elsif ($output_format eq 'dialog')
 			{
@@ -1538,7 +1544,7 @@ sub open_file
 				$div =~ s!^(==|\#|--)!!g;
 				$h1 =~ s!^(==|\#|--)!!g;
 					
-				$out .= qq{<p>$h1</p>\n<p>$div</p>\n}; 
+				$out .= qq{\t\t<h4 class="dialog-header">$h1</h4>\n\t\t<div class="dialog-content">$div <hr/></div>\n}; 
 			}
 			else 
 			{
@@ -1577,22 +1583,18 @@ sub open_file
 		}
 		
 		# end file output wrapper
-		$out .= qq{</div><!--end file output-->\n}; 
-		
-		close FILE; 
+		$out .= qq{</div><!--end file output-->\n};  
 		
 		return $out; 
 	}
 	else 
 	{
 		my $out;
-		
-		@data = <DATA>; 
 
-		close DATA;
+		
 	
 		$out .= qq{\n<!--begin accord 112-->\n<div id="accordion1460" class="accordion">\n}; 
-		foreach my $line (@data) 
+		while ( my $line = <FILE> ) 
 		{ 
 			chomp $line; 
 			
@@ -1608,6 +1610,8 @@ sub open_file
 		
 		return $out; 
 	}
+
+	close FILE;
 	
 }
 # end open_file
@@ -1872,12 +1876,12 @@ A1z::HTML5::Template - Fast/easy Web Apps in Perl
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
     use A1z::HTML5::Template;
-    my $foo = A1z::HTML5::Template->new();
+    my $h = A1z::HTML5::Template->new();
 
     This directory should be writable by the web server, required to create/hold page content files.
 	This may also contain your custom JavaScript/CSS libraries.
@@ -1948,7 +1952,7 @@ version 0.19
 
 =head2 VERSION
 
-	0.19
+	0.20
 
 =head1 Installation
 
@@ -2093,11 +2097,15 @@ version 0.19
 
 =head2 body_form
 
-	provides the ability to add forms 
+	Form, lists items from a directory in a neat drop-down list with each item's file size in KB!
+
+	Should be in the exact format like below: 
 	
-	$h->body_form();
+	$h->body_form("vars;METHOD;Action.cgi;select,NameForSelectTag,DefaultOptionSelected,AbsPathToDir,TextForSelectLabel;hidN1---hidV1,hidN2---hidV2,hidN3---hidV3");
 
 =head2 defaults_begin
+
+	Internal Use Only
 
 	Provides defaults for very lightweight template for those in a hurry; Can be used for apps/sites that are under construction! 
 	
@@ -2105,11 +2113,15 @@ version 0.19
 
 =head2 defaults_end
 
+	Internal Use Only.
+
 	provides defaults for lightweight or under construction app/website. 
 	
 	$h->defaults_end();
 
 =head1 HTML Hash
+
+	For Internal/Future Use
 
 	Hash contains -defaultjquery which is used in body.
 
@@ -2127,6 +2139,8 @@ version 0.19
 
 =head2 html_bootstrap_css 
 
+	For Internal/Future Use
+
 	Used in $h->head and $h->body internally.
 
 	All methods starting with 'html_' are used internally!
@@ -2137,14 +2151,20 @@ version 0.19
 
 =head2 html_jqueryui_css
 
+	For Internal/Future Use
+
 	Includes jquery ui theme jquery-ui.css #1.12.0
 
 =head2 html_shim_respond
+
+	For Internal/Future Use
 
 	html5shiv.min.js   #3.7.2
 	respond.min.js     #1.4.2
 
 =head2 html_navbar
+
+	For Internal/Future Use
 
 	Customizations for top-nav-bar.js from a1z.us
 
@@ -2157,9 +2177,13 @@ version 0.19
 
 =head2 html_bootstrap_js
 
+	For Internal/Future Use
+
 	bootstrap.min.js, #3.3.0, from maxcdn
 
 =head2 html_setTitle 
+
+	For Internal/Future Use
 
 	setTitle javascript function 
 
@@ -2171,10 +2195,14 @@ version 0.19
 
 =head2 html_humanejs_css
 
+	For Internal/Future Use
+
 	humane-js #3.2.2 cdnjs.cloudflare
 	fonts.googleapis.com
 
 =head2 html_bootstrap_bluimp
+
+	For Internal/Future Use
 
 	bootstrap gallery lightbox controls for use immediately after C<body> tag
 
@@ -2186,29 +2214,58 @@ version 0.19
 
 	$h->head();
 
-	For use in Fast/Easy Web App - E.g., in under construction web sites.
+	$h-head (
+		-type 	=> "Content-Type: text/html;charset=utf-8\n\n", 
+		-bootstrap 	=> html_bootstrap_css, 
+		-jqueryui 	=> html_jqueryui_css, 
+		-htmlshim	=> html_shim_respond, 
+		-humanejs  => html_humanejs_css, 
+		-title 		=> "$ENV{SERVER_NAME}", 
+		-cssLinks => "https://code.jquery.com/ui/1.11.4/themes/ui-lightness/jquery-ui.css,https://blueimp.github.io/Gallery/css/blueimp-gallery.min.css,https://www.a1z.us/A1z/HTML5/Template.css", 
+		-cssCode => "", 
+		-mobilemeta => qq{<meta name="HandheldFriendly" content="true">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+}, 
+		-charsetmeta => qq{<meta charset="utf-8">}, 
+		-usermeta => "",
+		-titleRotatingText => qq{text1,text2,text3}	
+	); 
 
 =head2 body
 
 	$h->body();
 
-	For use in Fast/Easy Web App - E.g., in under construction web sites.
+	$h->body(
+		-h1	=> qq{$ENV{SERVER_NAME}},
+		-onload => qq{setTitle();},  
+		-nbhead => qq{},
+		-nbpage => qq{}, 
+		-nbmenu => qq{More}, 
+		-defaultjquery => qq{$HTML{-defaultjquery}}, 
+		-humanejs => qq{<script src="https://cdnjs.cloudflare.com/ajax/libs/humane-js/3.2.2/humane.min.js">},
+		-userjquery => qq{}, 
+		-navbar => html_navbar( $in{-nbmenu}, $in{-nbpage}, "", ""), 
+		-content => qq{<div class="content">Content</div>}, 
+		-footer => qq{All rights reserved &copy; $ENV{SERVER_NAME}}, 	
+		-bootstrapbluimp => html_bootstrap_bluimp,
+		-nbLinks => qq{contact-help-feedback}		
+	); 
 
-=head2 create_accordion
-
-	$h->create_accordion("path/to/file/containing/accordion/elements");
-
-	Uses open_file to load content from a text file
-
-=head2 open_file
+=head1 open_file
 
 	Used for loading all kinds of custom elements for different output formats stored in simple text files.
 
-	$h->open_file("path/to/file", "outputFormat", "outputHeader");
+	$h->open_file("/path/to/file", "outputFormat", "outputHeader");
 
 	$h->open_file("C:/Inetpub/wwwroot/MyApp/menu.txt", "menu", "Menu");
 
-	This is the heart of the App, A1z::HTML5::Template, quite a long sub/method comprising of about 292 lines including empty lines. 
+	This is the heart of the App.
+
+=head2 OUTPUT FORMAT OPTIONS: 
+
+	table, accordion, menu, as is; where "as is" is the default
+
+	$h->open_file( file => "abs/path/to/file", output_format => "table", output_header => "Heading" ); 
 
 =head2 edit_file
 

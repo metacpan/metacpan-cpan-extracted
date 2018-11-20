@@ -29,6 +29,7 @@
 
 #include "precompiled.hpp"
 #include "poller.hpp"
+#include "polling_util.hpp"
 
 #if defined ZMQ_POLL_BASED_ON_POLL
 #if !defined ZMQ_HAVE_WINDOWS && !defined ZMQ_HAVE_AIX
@@ -186,15 +187,10 @@ void zmq::signaler_t::send ()
     errno_assert (sz == sizeof (inc));
 #elif defined ZMQ_HAVE_WINDOWS
     unsigned char dummy = 0;
-    while (true) {
-        int nbytes =
-          ::send (_w, reinterpret_cast<char *> (&dummy), sizeof (dummy), 0);
-        wsa_assert (nbytes != SOCKET_ERROR);
-        if (unlikely (nbytes == SOCKET_ERROR))
-            continue;
-        zmq_assert (nbytes == sizeof (dummy));
-        break;
-    }
+    const int nbytes =
+      ::send (_w, reinterpret_cast<char *> (&dummy), sizeof (dummy), 0);
+    wsa_assert (nbytes != SOCKET_ERROR);
+    zmq_assert (nbytes == sizeof (dummy));
 #elif defined ZMQ_HAVE_VXWORKS
     unsigned char dummy = 0;
     while (true) {
@@ -246,16 +242,17 @@ int zmq::signaler_t::wait (int timeout_)
     struct pollfd pfd;
     pfd.fd = _r;
     pfd.events = POLLIN;
-    int rc = poll (&pfd, 1, timeout_);
+    const int rc = poll (&pfd, 1, timeout_);
     if (unlikely (rc < 0)) {
         errno_assert (errno == EINTR);
         return -1;
-    } else if (unlikely (rc == 0)) {
+    }
+    if (unlikely (rc == 0)) {
         errno = EAGAIN;
         return -1;
     }
 #ifdef HAVE_FORK
-    else if (unlikely (pid != getpid ())) {
+    if (unlikely (pid != getpid ())) {
         // we have forked and the file descriptor is closed. Emulate an interrupt
         // response.
         //printf("Child process %d signaler_t::wait returning simulating interrupt #2\n", getpid());
@@ -269,19 +266,21 @@ int zmq::signaler_t::wait (int timeout_)
 
 #elif defined ZMQ_POLL_BASED_ON_SELECT
 
-    fd_set fds;
-    FD_ZERO (&fds);
-    FD_SET (_r, &fds);
+    optimized_fd_set_t fds (1);
+    FD_ZERO (fds.get ());
+    FD_SET (_r, fds.get ());
     struct timeval timeout;
     if (timeout_ >= 0) {
         timeout.tv_sec = timeout_ / 1000;
         timeout.tv_usec = timeout_ % 1000 * 1000;
     }
 #ifdef ZMQ_HAVE_WINDOWS
-    int rc = select (0, &fds, NULL, NULL, timeout_ >= 0 ? &timeout : NULL);
+    int rc =
+      select (0, fds.get (), NULL, NULL, timeout_ >= 0 ? &timeout : NULL);
     wsa_assert (rc != SOCKET_ERROR);
 #else
-    int rc = select (_r + 1, &fds, NULL, NULL, timeout_ >= 0 ? &timeout : NULL);
+    int rc =
+      select (_r + 1, fds.get (), NULL, NULL, timeout_ >= 0 ? &timeout : NULL);
     if (unlikely (rc < 0)) {
         errno_assert (errno == EINTR);
         return -1;
@@ -320,7 +319,7 @@ void zmq::signaler_t::recv ()
 #else
     unsigned char dummy;
 #if defined ZMQ_HAVE_WINDOWS
-    int nbytes =
+    const int nbytes =
       ::recv (_r, reinterpret_cast<char *> (&dummy), sizeof (dummy), 0);
     wsa_assert (nbytes != SOCKET_ERROR);
 #elif defined ZMQ_HAVE_VXWORKS
@@ -344,24 +343,24 @@ int zmq::signaler_t::recv_failable ()
     if (sz == -1) {
         errno_assert (errno == EAGAIN);
         return -1;
-    } else {
-        errno_assert (sz == sizeof (dummy));
-
-        //  If we accidentally grabbed the next signal(s) along with the current
-        //  one, return it back to the eventfd object.
-        if (unlikely (dummy > 1)) {
-            const uint64_t inc = dummy - 1;
-            ssize_t sz2 = write (_w, &inc, sizeof (inc));
-            errno_assert (sz2 == sizeof (inc));
-            return 0;
-        }
-
-        zmq_assert (dummy == 1);
     }
+    errno_assert (sz == sizeof (dummy));
+
+    //  If we accidentally grabbed the next signal(s) along with the current
+    //  one, return it back to the eventfd object.
+    if (unlikely (dummy > 1)) {
+        const uint64_t inc = dummy - 1;
+        ssize_t sz2 = write (_w, &inc, sizeof (inc));
+        errno_assert (sz2 == sizeof (inc));
+        return 0;
+    }
+
+    zmq_assert (dummy == 1);
+
 #else
     unsigned char dummy;
 #if defined ZMQ_HAVE_WINDOWS
-    int nbytes =
+    const int nbytes =
       ::recv (_r, reinterpret_cast<char *> (&dummy), sizeof (dummy), 0);
     if (nbytes == SOCKET_ERROR) {
         const int last_error = WSAGetLastError ();

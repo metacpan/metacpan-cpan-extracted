@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-RecordStore",
    "prereqs" : {
@@ -34,7 +34,7 @@
    "provides" : {
       "Data::RecordStore" : {
          "file" : "lib/Data/RecordStore.pm",
-         "version" : "3.21"
+         "version" : "4.03"
       },
       "Data::RecordStore::Silo" : {
          "file" : "lib/Data/RecordStore.pm"
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "3.21",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "4.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

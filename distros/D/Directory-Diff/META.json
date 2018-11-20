@@ -4,7 +4,7 @@
       "Ben Bullock <bkb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,12 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples/old_dir",
+         "examples/new_dir"
+      ],
+      "file" : [
+         "t/DirOps.pm"
       ]
    },
    "prereqs" : {
@@ -32,10 +37,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Cwd" : "0",
             "File::Compare" : "0",
-            "File::Copy" : "0",
-            "File::Path" : "0",
             "perl" : "5.006001"
          }
       }
@@ -51,6 +53,6 @@
          "web" : "https://github.com/benkasminbullock/Directory-Diff"
       }
    },
-   "version" : "0.07",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

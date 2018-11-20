@@ -1,5 +1,8 @@
 Revision history for Data-MoneyCurrency
 
+0.07    Sa 17 Nov 2018 16:19:26 CET
+        new ruby-money conf to get new currency for Venezuala
+
 0.06    So 19 Aug 2018 10:13:23 MDT
         fixing mismatch of version number between .pm and dist.ini, no code changes
 

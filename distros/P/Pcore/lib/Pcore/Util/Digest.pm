@@ -24,8 +24,7 @@ use Digest::SHA3 qw[sha3_224 sha3_224_hex sha3_256 sha3_256_hex sha3_384 sha3_38
 our $EXPORT = {
     CRC  => [qw[crc32]],
     MD5  => [qw[md5 md5_hex]],
-    SHA1 => [
-        qw[
+    SHA1 => [ qw[
           sha1 sha1_hex sha1_b64
           sha224 sha224_hex sha224_b64
           sha256 sha256_hex sha256_b64
@@ -33,10 +32,8 @@ our $EXPORT = {
           sha512 sha512_hex sha512_b64
           sha512224 sha512224_hex sha512224_b64
           sha512256 sha512256_hex sha512256_b64
-          ]
-    ],
-    HMAC_SHA1 => [
-        qw[
+          ] ],
+    HMAC_SHA1 => [ qw[
           hmac_sha1 hmac_sha1_hex hmac_sha1_b64
           hmac_sha224 hmac_sha224_hex hmac_sha224_b64
           hmac_sha256 hmac_sha256_hex hmac_sha256_b64
@@ -44,16 +41,13 @@ our $EXPORT = {
           hmac_sha512 hmac_sha512_hex hmac_sha512_b64
           hmac_sha512224 hmac_sha512224_hex hmac_sha512224_b64
           hmac_sha512256 hmac_sha512256_hex hmac_sha512256_b64
-          ]
-    ],
-    SHA3 => [
-        qw[
+          ] ],
+    SHA3 => [ qw[
           sha3_224 sha3_224_hex sha3_224_b64
           sha3_256 sha3_256_hex sha3_256_b64
           sha3_384 sha3_384_hex sha3_384_b64
           sha3_512 sha3_512_hex sha3_512_b64
-          ]
-    ],
+          ] ],
 };
 
 *sha1_b64 = \&Digest::SHA1::sha1_base64;

@@ -2,8 +2,8 @@ package Pcore::Util::Src::Filter;
 
 use Pcore -role, -res, -const;
 
-has data => ( required => 1 );                          # ScalarRef
-has has_kolon => ( is => 'lazy', init_arg => undef );
+has data      => ( required => 1 );                           # ScalarRef
+has has_kolon => ( is       => 'lazy', init_arg => undef );
 
 sub src_cfg ($self) { return Pcore::Util::Src::cfg() }
 

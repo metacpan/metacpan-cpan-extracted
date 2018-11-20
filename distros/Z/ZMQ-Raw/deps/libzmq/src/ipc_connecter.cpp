@@ -67,7 +67,7 @@ zmq::ipc_connecter_t::ipc_connecter_t (class io_thread_t *io_thread_,
     current_reconnect_ivl (options.reconnect_ivl)
 {
     zmq_assert (addr);
-    zmq_assert (addr->protocol == "ipc");
+    zmq_assert (addr->protocol == protocol_name::ipc);
     addr->to_string (endpoint);
     socket = session->get_socket ();
 }
@@ -176,10 +176,12 @@ void zmq::ipc_connecter_t::start_connecting ()
 
 void zmq::ipc_connecter_t::add_reconnect_timer ()
 {
-    int rc_ivl = get_new_reconnect_ivl ();
-    add_timer (rc_ivl, reconnect_timer_id);
-    socket->event_connect_retried (endpoint, rc_ivl);
-    timer_started = true;
+    if (options.reconnect_ivl != -1) {
+        int rc_ivl = get_new_reconnect_ivl ();
+        add_timer (rc_ivl, reconnect_timer_id);
+        socket->event_connect_retried (endpoint, rc_ivl);
+        timer_started = true;
+    }
 }
 
 int zmq::ipc_connecter_t::get_new_reconnect_ivl ()

@@ -1,5 +1,8 @@
 package Role::Versioning::Scheme;
 
+our $DATE = '2018-11-18'; # DATE
+our $VERSION = '0.008'; # VERSION
+
 use Role::Tiny;
 
 requires qw(
@@ -25,7 +28,7 @@ Role::Versioning::Scheme - Role for Versioning::Scheme::* modules
 
 =head1 VERSION
 
-This document describes version 0.007 of Role::Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2018-10-11.
+This document describes version 0.008 of Role::Versioning::Scheme (from Perl distribution Versioning-Scheme), released on 2018-11-18.
 
 =head1 REQUIRED METHODS
 

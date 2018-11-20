@@ -9,7 +9,7 @@ use base 'Log::Dispatch::Email';
 
 use Email::Mailer 1.07;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 sub _params {
     my %params = @_;
@@ -69,7 +69,7 @@ Log::Dispatch::Email::Mailer - Log::Dispatch::Email subclass that sends mail usi
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Log-Dispatch-Email-Mailer.svg)](https://travis-ci.org/gryphonshafer/Log-Dispatch-Email-Mailer)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Log-Dispatch-Email-Mailer/badge.png)](https://coveralls.io/r/gryphonshafer/Log-Dispatch-Email-Mailer)
@@ -326,7 +326,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

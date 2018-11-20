@@ -7,10 +7,10 @@ use Pcore::Util::Scalar qw[weaken is_plain_scalarref];
 
 with qw[Pcore::Captcha::API];
 
-has api_key => ( required => 1 );
-has api_soft_id => ();    # AppCenter Application ID used for comission earnings
+has api_key     => ( required => 1 );
+has api_soft_id => ();                  # AppCenter Application ID used for comission earnings
 
-has _signal => sub { Coro::Signal->new };
+has _signal  => sub { Coro::Signal->new };
 has _threads => ();
 
 const our $STATUS_REASON => {
@@ -117,7 +117,7 @@ sub resolve ( $self, $captcha, $cb = undef ) {
     if ( $captcha->{type} == $ANTICAPTCHA_QUEUE_IMAGE_EN || $captcha->{type} == $ANTICAPTCHA_QUEUE_IMAGE_RU ) {
         $task = {
             languagePool => $captcha->{type} == $ANTICAPTCHA_QUEUE_IMAGE_EN ? 'en' : 'ru',
-            task => {
+            task         => {
                 type      => 'ImageToTextTask',
                 body      => to_b64( $captcha->{image}->$*, q[] ),
                 phrase    => $captcha->{phrase} ? \1 : \0,

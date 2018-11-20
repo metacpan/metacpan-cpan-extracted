@@ -1,0 +1,106 @@
+NAME
+    Versioning::Scheme::Python - Python (PEP 440) version numbering
+
+VERSION
+    This document describes version 0.001 of Versioning::Scheme::Python
+    (from Perl distribution Versioning-Scheme-Python), released on
+    2018-11-18.
+
+SYNOPSIS
+     use Versioning::Scheme::Python;
+
+     # checking validity
+     Versioning::Scheme::Perl->is_valid_version('1.2.1a1');  # 1
+     Versioning::Scheme::Perl->is_valid_version('foo1');     # 0
+
+     # parsing
+     $parsed = Versioning::Scheme::Perl->parse_version('1.2.1a1');  # => {base=>[1, 2, 1], prerelease=>["a",1]}
+
+     # normalizing
+     Versioning::Scheme::Perl->normalize_version('1.001');  # => '1.1'
+
+     # comparing
+     Versioning::Scheme::Perl->cmp_version('1.2.1', '1.2.01');    # 0
+     Versioning::Scheme::Perl->cmp_version('1.2.1', '1.2.1a1');   # 1
+     Versioning::Scheme::Perl->cmp_version('1.2.1', '1!1.1.0');   # -1
+
+     # bumping
+     Versioning::Scheme::Perl->bump_version('1.2.3');                               # => '1.2.4'
+     Versioning::Scheme::Perl->bump_version('1.2.3', {num=>2});                     # => '1.2.5'
+     Versioning::Scheme::Perl->bump_version('1.2.3', {num=>-1});                    # => '1.2.2'
+     Versioning::Scheme::Perl->bump_version('1.2.3', {part=>-2});                   # => '1.3.0'
+     Versioning::Scheme::Perl->bump_version('1.2.3', {part=>0});                    # => '2.0.0'
+     Versioning::Scheme::Perl->bump_version('1.2.3', {part=>-2, reset_smaller=>0}); # => '1.3.3'
+     Versioning::Scheme::Perl->bump_version('1.2.3a1', {part=>'a'});                # => '1.2.3a2'
+
+    You can also mix this role into your class.
+
+DESCRIPTION
+    This role handles Python versioning scheme (as defined in PEP 440) which
+    can be used to version Python-based projects. The role uses
+    Python::Version internally.
+
+METHODS
+  is_valid_version
+  parse_version
+  normalize_version
+  parse_version
+  cmp_version
+  bump_version
+    Usage:
+
+     Versioning::Scheme::Python->bump_version($v [ , \%opts ]);
+
+    Options:
+
+    *   num => int (default: 1)
+
+    *   part => int|str (default: -1)
+
+        Use number to bump base version, e.g.:
+
+         Versioning::Scheme::Python->bump_version('1.2.7', {part=>1});                   # => 1.3.0
+         Versioning::Scheme::Python->bump_version('1.2.7', {part=>1, reset_smaller=>0}); # => 1.3.7
+
+         Versioning::Scheme::Python->bump_version('1.2.7', {part=>-3});                  # => 2.0.0
+
+        Use "dev", "post", "a", "b", "rc" to bump dev/post/alpha/beta/rc
+        numbers, respectively. Will die if version does not have those
+        elements.
+
+        Use "epoch" to bump epoch number.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Versioning-Scheme-Python>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Versioning-Scheme-Python>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Versioning-Scheme-Pyt
+    hon>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Python::Version
+
+    Python PEP 440, <https://www.python.org/dev/peps/pep-0440/>
+
+    Role::Versioning::Scheme
+
+    Other "Versioning::Scheme::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -4,7 +4,7 @@ Photonic::Geometry::FromImage2D
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ The filename containing the image
 =cut
 
 package Photonic::Geometry::FromImage2D;
-$Photonic::Geometry::FromImage2D::VERSION = '0.009';
+$Photonic::Geometry::FromImage2D::VERSION = '0.010';
 use namespace::autoclean;
 use Moose;
 extends 'Photonic::Geometry';

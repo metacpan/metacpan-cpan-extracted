@@ -16,9 +16,7 @@ t/01_arguments/01_new_invalid.t
 t/01_arguments/Data_Test_Arguments.pm
 xt/00_get_key_linux.t
 xt/01_option.t
-xt/01_option_hae.t
 xt/02_option_error.t
-xt/02_option_error_hae.t
 xt/cntr_choose.t
 xt/critic.t
 xt/get_key_linux.pl

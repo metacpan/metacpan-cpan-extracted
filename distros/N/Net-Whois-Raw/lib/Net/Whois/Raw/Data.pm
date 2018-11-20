@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Data;
-$Net::Whois::Raw::Data::VERSION = '2.99020';
+$Net::Whois::Raw::Data::VERSION = '2.99021';
 # ABSTRACT: Config for Net::Whois::Raw.
 
 use utf8;
@@ -2049,7 +2049,7 @@ our %notfound = (
     'whois.com.ua'              => 'No entries found for',
     'whois.co.ua'               => 'No entries found',
     'whois.biz.ua'              => 'No entries found',
-    'whois.net.ua'              => 'No match record found',
+    'whois.net.ua'              => 'No match record found|No entries found',
     'delta.hostmaster.net.ua'   => 'No entries found for domain',
     'whois.pp.ua'               => 'No entries found',
     'whois.dn.ua'               => 'No match record found',
@@ -2083,7 +2083,7 @@ our %notfound = (
     'whois.uniregistry.net'      => 'object does not exist',
     'whois.nic.uno'              => '^No Data Found',
     'whois.nic.berlin'           => '^The queried object does not exis',
-    'whois.nic.kiwi'             => 'Status\: Not Registered',
+    'whois.nic.kiwi'             => 'Status\: Not Registered|Not found',
     'whois.nic.build'            => 'No Data Found',
     'whois.nic.club'             => '^No Data Found',
     'whois.nic.luxury'           => 'No Data Found',
@@ -2121,7 +2121,7 @@ our %notfound = (
     'whois.nic.fm'            => 'DOMAIN NOT FOUND',
     'whois.nic.fr'            => 'No entries found',
     'whois.channelisles.net'  => '^NOT FOUND',
-    'whois.nic.gd'            => '^not found\.',
+    'whois.nic.gd'            => '^not found\.|DOMAIN NOT FOUND',
     'whois.nic.gs'            => 'No Object Found',
     'whois.registry.gy'       => 'No Object Found',
     'whois.hkirc.hk'          => '^The domain has not been registered',
@@ -2175,6 +2175,7 @@ our %notfound = (
     'whois.nic.sh'            => '^NOT FOUND',
     'whois.arnes.si'          => 'No entries found',
     'whois.nic.st'            => '^No entries found',
+    'whois.sx'                => 'Not found',
     'whois.nic.tc'            => 'No Object Found',
     'whois.adamsnames.com'    => '^\S+ is not registered',
     'whois.nic.tl'            => 'No Object Found',
@@ -2664,7 +2665,7 @@ our %notfound = (
     'whois.nic.vanguard'                   => 'No match for "',
     'whois.nic.verisign'                   => 'No match for "',
     'whois.nic.versicherung'               => 'The queried object does not exist',
-    'whois.nic.vg'                         => 'not found',
+    'whois.nic.vg'                         => 'not found|DOMAIN NOT FOUND',
     'whois.nic.visa'                       => 'No match for "',
     'whois.nic.viva'                       => 'DOMAIN NOT FOUND',
     'whois.nic.vlaanderen'                 => 'The queried object does not exist',
@@ -4341,7 +4342,7 @@ Net::Whois::Raw::Data - Config for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99020
+version 2.99021
 
 =head1 AUTHOR
 

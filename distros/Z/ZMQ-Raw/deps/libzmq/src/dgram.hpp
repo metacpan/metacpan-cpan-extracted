@@ -48,12 +48,13 @@ class dgram_t : public socket_base_t
     ~dgram_t ();
 
     //  Overrides of functions from socket_base_t.
-    void xattach_pipe (zmq::pipe_t *pipe_, bool subscribe_to_all_);
+    void xattach_pipe (zmq::pipe_t *pipe_,
+                       bool subscribe_to_all_,
+                       bool locally_initiated_);
     int xsend (zmq::msg_t *msg_);
     int xrecv (zmq::msg_t *msg_);
     bool xhas_in ();
     bool xhas_out ();
-    const blob_t &get_credential () const;
     void xread_activated (zmq::pipe_t *pipe_);
     void xwrite_activated (zmq::pipe_t *pipe_);
     void xpipe_terminated (zmq::pipe_t *pipe_);
@@ -62,8 +63,6 @@ class dgram_t : public socket_base_t
     zmq::pipe_t *_pipe;
 
     zmq::pipe_t *_last_in;
-
-    blob_t _saved_credential;
 
     //  If true, more outgoing message parts are expected.
     bool _more_out;

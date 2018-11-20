@@ -4,7 +4,7 @@ Photonic::Retarded::Green
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ fraction. 0 means don't check.
 =cut
 
 package Photonic::Retarded::Green;
-$Photonic::Retarded::Green::VERSION = '0.009';
+$Photonic::Retarded::Green::VERSION = '0.010';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -114,11 +114,10 @@ with 'Photonic::Roles::KeepStates';
 with 'Photonic::Roles::EpsParams';
 
 has 'metric'=>(is=>'ro', isa => 'Photonic::Retarded::Metric',
-    handles=>[qw(geometry B dims r G GNorm L scale f)],required=>1
-);
+       handles=>[qw(geometry B dims r G GNorm L scale f)],required=>1);
 has 'haydock' =>(is=>'ro', isa=>'ArrayRef[Photonic::Retarded::AllH]',
             init_arg=>undef, lazy=>1, builder=>'_build_haydock',
-            documentation=>'Array of Haydock calculators');
+	    documentation=>'Array of Haydock calculators');
 has 'greenP'=>(is=>'ro', isa=>'ArrayRef[Photonic::Retarded::GreenP]',
              init_arg=>undef, lazy=>1, builder=>'_build_greenP',
              documentation=>'Array of projected G calculators');
@@ -128,6 +127,10 @@ has 'greenTensor'=>(is=>'ro', isa=>'PDL', init_arg=>undef,
 has 'converged'=>(is=>'ro', init_arg=>undef, writer=>'_converged',
              documentation=>
                   'All greenP evaluations converged in last evaluation'); 
+
+has 'outputfilename'=>(is=>'ro', default=>0, documentation=> 
+		 'Name for output file containing haydocks array');
+
 sub evaluate {
     my $self=shift;
     $self->_epsA(my $epsA=$self->metric->epsilon->r2C);
@@ -185,7 +188,6 @@ sub _build_greenP {
     }
     return [@greenP]
 }
-
 
 __PACKAGE__->meta->make_immutable;
     

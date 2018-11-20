@@ -40,12 +40,12 @@ produces output
     /usr/home/ben/projects/directory-diff/examples/old_dir/diff-file is different from /usr/home/ben/projects/directory-diff/examples/new_dir/diff-file.
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.07/examples/synopsis.pl> in the distribution.)  
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.08/examples/synopsis.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents Directory-Diff version 0.07
-corresponding to git commit L<bbd5ab962db512f71beb6e65f653d9b222073700|https://github.com/benkasminbullock/Directory-Diff/commit/bbd5ab962db512f71beb6e65f653d9b222073700> released on Wed Oct 25 14:02:10 2017 +0900.
+This documents Directory-Diff version 0.08
+corresponding to git commit L<80910e5ff3eaeb27ebbe432883b1798ab6dc6ebe|https://github.com/benkasminbullock/Directory-Diff/commit/80910e5ff3eaeb27ebbe432883b1798ab6dc6ebe> released on Sat Nov 17 06:38:54 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -166,22 +166,6 @@ are different. This uses L<File::Compare> to test the files for
 differences. It searches subdirectories. Usually the hashes
 C<%dir1_ls> and C<%dir2_ls> are those output by L</ls_dir>.
 
-=head2 default_dir_only
-
-     use Directory::Diff qw/directory_diff default_dir_only/;
-     directory_diff ('old', 'new', {dir1_only => \&default_dir_only});
-
-A simple routine to print out when a file is only in one of the
-directories. This is for testing the C<Directory::Diff> module.
-
-=head2 default_diff
-
-     use Directory::Diff qw/directory_diff default_diff/;
-     directory_diff ('old', 'new', {dir1_only => \&default_diff});
-
-A simple routine to print out when a file is different between the
-directories. This is for testing the C<Directory::Diff> module.
-
 =head1 SEE ALSO
 
 =head2 CPAN modules
@@ -289,7 +273,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2009-2017
+2009-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

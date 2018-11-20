@@ -38,6 +38,7 @@ use vars qw ($__gettext_pp_default_dir
 
 use locale;
 use File::Spec;
+use Locale::Messages;
 
 BEGIN {
     $__gettext_pp_textdomain = 'messages';

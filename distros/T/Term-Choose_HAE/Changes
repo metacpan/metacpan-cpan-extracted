@@ -1,6 +1,9 @@
 Revision history for Term::Choose_HAE
 
 
+0.058   2018-11-17
+        - This module is DEPRECATED.
+
 0.057   2018-11-16
         - "Term::Choose" version has to be "1.628".
 

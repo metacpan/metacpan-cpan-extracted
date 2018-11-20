@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.72';
+our $VERSION ='0.74';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
@@ -58,32 +58,36 @@ my %_revinfostash = (
         '2' => 1024,
     },
     manufacturer => {
-        '0' => 'Sony',
+        '0' => 'Sony UK',
         '1' => 'Egoman',
         '2' => 'Embest',
-        '3' => 'Other',
+        '3' => 'Sony Japan',
+        '4' => 'Embest',
+        '5' => 'Stadium',
     },
+    
     processor => {
         '0' => 'BCM2835',
         '1' => 'BCM2836',
         '2' => 'BCM2837',
     },
+    
     type => {
         '0'  => 'Raspberry Pi Model A',
         '1'  => 'Raspberry Pi Model B',
-        '2'  => 'Raspberry Pi Model A +',
-        '3'  => 'Raspberry Pi Model B +',
+        '2'  => 'Raspberry Pi Model A Plus',
+        '3'  => 'Raspberry Pi Model B Plus',
         '4'  => 'Raspberry Pi 2 Model B',
         '5'  => 'Raspberry Pi Alpha',
         '6'  => 'Raspberry Pi Compute Module 1',
         '7'  => 'Raspberry Pi Unknown Model 07',
-        '8'  => 'Raspberry Pi 3',
+        '8'  => 'Raspberry Pi 3 Model B',
         '9'  => 'Raspberry Pi Zero',
         '10' => 'Raspberry Pi Compute Module 3',
         '11' => 'UNKNOWN Rasberry Pi Model 11',
         '12' => 'Raspberry Pi Zero W',
-        '13' => 'Raspberry Pi 3 Plus',
-        '14' => 'UNKNOWN Rasberry Pi Model 14',
+        '13' => 'Raspberry Pi 3 Model B Plus',
+        '14' => 'Raspberry Pi 3 Model A Plus',
         '15' => 'UNKNOWN Rasberry Pi Model 15',
     },
     board_type => {
@@ -119,7 +123,7 @@ my %_revinfostash = (
         '11' => 'unknown',
         '12' => 'Q1 2017',
         '13' => 'Q1 2018',
-        '14' => 'unknown',
+        '14' => 'Q4 2018',
         '15' => 'unknown',
     },
 );
@@ -252,6 +256,7 @@ sub _configure {
             $binfo->{board_type} =  $_revinfostash{board_type}->{$schemetype} || $board_type;
             $binfo->{processor} = $_revinfostash{processor}->{$schemeproc} || 'BCM2835';
             $binfo->{revision} = $rev;
+            $binfo->{revisionnumber} = $schemerev;
             
             $israspberry2 = ( $schemetype == 4 ) ? 1 : 0;
             $israspberry3 = ( $schemetype == 8 || $schemetype == 10 || $schemetype == 13 ) ? 1 : 0;
@@ -261,6 +266,7 @@ sub _configure {
             my $infokey = exists($_revstash{$rev}) ? $rev : $defaultkey;
             $_config = { %{ $_revstash{$infokey} } };
             $_config->{processor} = 'BCM2835';
+            $_config->{revisionnumber} = 0;
         }
         
     }    
@@ -302,7 +308,7 @@ sub dump_board_info {
     $dump .= qq(Raspberry Pi Board Info\n);
     $dump .= qq(--------------------------------------------------\n);
     $dump .= qq(Model Name       : $_config->{model_name}\n);
-    $dump .= qq(Released         : $_config->{release}\n);
+    #$dump .= qq(Released         : $_config->{release}\n);
     $dump .= qq(Manufacturer     : $_config->{manufacturer}\n);
     $dump .= qq(Memory           : $_config->{memory}\n);
     $dump .= qq(Processor        : $_config->{processor}\n);
@@ -312,9 +318,13 @@ sub dump_board_info {
     $dump .= qq(Revision         : $_config->{revision}\n);
     $dump .= qq(Serial Number    : $_config->{serial}\n);
     $dump .= qq(GPIO Header Type : $_config->{board_type}\n);
+    $dump .= qq(Revision Number  : $_config->{revisionnumber}\n);
     my $devtree = ( has_device_tree() ) ? 'Yes' : 'No';
     
     $dump .= qq(Device Tree      : $devtree\n);
+    $dump .= q(Is Raspberry     : ) . (($israspberry) ? 'Yes' : 'No' ) . qq(\n);
+    $dump .= q(Is Raspberry 2   : ) . (($israspberry2) ? 'Yes' : 'No' ) . qq(\n);
+    $dump .= q(Is Raspberry 3   : ) . (($israspberry3) ? 'Yes' : 'No' ) . qq(\n);
     
     return $dump;
 }

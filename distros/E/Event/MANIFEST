@@ -1,3 +1,4 @@
+.travis.yml
 ANNOUNCE
 c/ev.c
 c/generic.c
@@ -46,6 +47,7 @@ lib/Event/var.pm
 lib/Event/Watcher.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 ppport.h
 README
 README.EV
@@ -77,5 +79,7 @@ Tutorial.pdf
 Tutorial.pdf-errata.txt
 util/bench.pl
 util/filehandle.txt
+xt/manifest.t
+xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

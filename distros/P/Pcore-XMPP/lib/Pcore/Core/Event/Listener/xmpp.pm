@@ -14,7 +14,7 @@ has username => ( required => 1 );    # Str
 has password => ( required => 1 );    # Str
 has host     => ( required => 1 );    # Str
 has port => 5222;                     # PositiveInt
-has to => ( required => 1 );          # Str
+has to   => ( required => 1 );        # Str
 
 has _tmpl => ( init_arg => undef );   # InstanceOf ['Pcore::Util::Tmpl']
 has _init => ( init_arg => undef );   # Bool

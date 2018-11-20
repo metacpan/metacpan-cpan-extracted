@@ -1,13 +1,13 @@
 use strict;
 
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2018 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 
 use lib 'inc';
 require Module::Build::HiPi;
 
-our $VERSION ='0.72';
+our $VERSION ='0.74';
 
 my $requires = {
         'Try::Tiny'             => '0',

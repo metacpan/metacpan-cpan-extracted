@@ -1,5 +1,5 @@
 package ZMQ::Raw::Loop::Promise;
-$ZMQ::Raw::Loop::Promise::VERSION = '0.26';
+$ZMQ::Raw::Loop::Promise::VERSION = '0.27';
 use strict;
 use warnings;
 use Carp;
@@ -37,7 +37,7 @@ ZMQ::Raw::Loop::Promise - Promise class
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 

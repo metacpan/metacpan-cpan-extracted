@@ -2,7 +2,6 @@ package Sub::Fp::Test;
 use warnings;
 use strict;
 use parent qw(Test::Class);
-use Data::Dumper qw(Dumper);
 use Test::More;
 use Sub::Fp qw(
 incr         reduces   flatten
@@ -14,7 +13,7 @@ none        uniq      bool        spread   every
 len         is_array  is_hash     to_keys  to_vals
 noop        identity  is_empty    flow     eql
 is_sub      to_pairs  for_each    apply
-get
+get         second
 );
 
 sub is_sub__returns_0_when_args_undef :Tests {
@@ -1289,6 +1288,21 @@ sub subarray__returns_new_array {
 
     ok($array != subarray($array, 1))
 }
+
+
+
+sub second__returns_undef_if_no_args :Tests {
+    is(second(), undef);
+}
+
+sub second__returns_second_item_in_list_of_two :Tests {
+    is(second([1,2]), 2);
+}
+
+sub second__returns_second_item_in_list_of_many_items :Tests {
+    is(second(["first", "second", "third", "fourth"]), "second");
+}
+
 
 
 sub first__returns_undefined_if_no_args :Tests {

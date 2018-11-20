@@ -48,7 +48,7 @@ $chip->mount(
          SIGBUF => '',
          REFBUF => '',
          EXTCLK => '',
-         UB     => 'UNIPOLAR',
+         UB     => 'BIPOLAR',
          LINEF  => '60Hz',
          NOSCO  => 1,
          NOSCG  => 1,
@@ -85,6 +85,17 @@ $chip->mount(
       '$chip->read_adc returns result' );
 
    $adapter->check_and_clear( '$chip->trigger and ->read_adc' );
+}
+
+# ->read_adc_ratio
+{
+   $adapter->expect_readwrite( "\xC9\x00\x00\x00" )
+      ->returns( "\x00\x20\x00\x00" );
+
+   is( $chip->read_adc_ratio->get, 0.25,
+      '$chip->read_adc_ratio returns result' );
+
+   $adapter->check_and_clear( '$chip->read_adc_ratio' );
 }
 
 # ->write_gpios and ->read_gpios

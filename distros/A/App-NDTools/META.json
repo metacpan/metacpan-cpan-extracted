@@ -48,6 +48,7 @@
             "Hash::Merge::Extra" : "0.06",
             "IPC::Run3" : "0",
             "JSON" : "0",
+            "JSON::Patch" : "0.04",
             "List::MoreUtils" : "0",
             "Log::Log4Cli" : "0.21",
             "Module::Find" : "0",
@@ -55,7 +56,8 @@
             "Pod::Usage" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
-            "Struct::Diff" : "0.96",
+            "Struct::Diff" : "0.97",
+            "Struct::Diff::MergePatch" : "0.01",
             "Struct::Path" : "0.81",
             "Struct::Path::PerlStyle" : "0.9",
             "Term::ANSIColor" : "0",
@@ -69,5 +71,5 @@
          "url" : "https://github.com/mr-mixas/NDTools"
       }
    },
-   "version" : "v0.6.1"
+   "version" : "v0.6.2"
 }

@@ -79,7 +79,8 @@ class Money
       #   Money::Currency.find_by_iso_numeric('001') #=> nil
       def find_by_iso_numeric(num)
         num = num.to_s
-        id, _ = self.table.find{|key, currency| currency[:iso_numeric] == num}
+        return if num.empty?
+        id, _ = self.table.find { |key, currency| currency[:iso_numeric] == num }
         new(id)
       rescue UnknownCurrency
         nil
@@ -200,7 +201,6 @@ class Money
         @stringified_keys = nil if existed
         existed ? true : false
       end
-
 
       def each
         all.each { |c| yield(c) }
@@ -399,6 +399,17 @@ class Money
 
     def symbol_first?
       !!@symbol_first
+    end
+
+    # Returns if a code currency is ISO.
+    #
+    # @return [Boolean]
+    #
+    # @example
+    #   Money::Currency.new(:usd).iso?
+    #
+    def iso?
+      iso_numeric && iso_numeric != ''
     end
 
     # Returns the relation between subunit and unit as a base 10 exponent.

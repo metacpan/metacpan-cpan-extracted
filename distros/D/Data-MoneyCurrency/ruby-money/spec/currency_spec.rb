@@ -59,6 +59,11 @@ class Money
         expect(Currency.find_by_iso_numeric('non iso 4217 numeric code')).to be_nil
         expect(Currency.find_by_iso_numeric(0)).to be_nil
       end
+
+      it "returns nil when given empty input" do
+        expect(Currency.find_by_iso_numeric('')).to be_nil
+        expect(Currency.find_by_iso_numeric(nil)).to be_nil
+      end
     end
 
     describe ".wrap" do
@@ -318,6 +323,16 @@ class Money
     describe "#inspect" do
       it "works as documented" do
         expect(Currency.new(:usd).inspect).to eq %Q{#<Money::Currency id: usd, priority: 1, symbol_first: true, thousands_separator: ,, html_entity: $, decimal_mark: ., name: United States Dollar, symbol: $, subunit_to_unit: 100, exponent: 2, iso_code: USD, iso_numeric: 840, subunit: Cent, smallest_denomination: 1>}
+      end
+    end
+
+    describe "#iso?" do
+      it "returns true for iso currency" do
+        expect(Money::Currency.new(:eur).iso?).to be true
+      end
+
+      it "returns false if the currency is not iso" do
+        expect(Money::Currency.new(:btc).iso?).to be false
       end
     end
 

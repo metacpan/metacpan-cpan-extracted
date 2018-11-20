@@ -50,7 +50,9 @@ my %WriteMakefileArgs = (
     %WriteMakefileArgs,
     PREREQ_PM     => {
 
+        'Data::Dumper'                   => 0,
         'Devel::Gladiator'               => 0,
+        'Env'                            => 0,
         'Plack::Middleware::Debug::Base' => 0,
         'Scalar::Util'                   => 0,
         'namespace::clean'               => 0,
@@ -60,6 +62,7 @@ my %WriteMakefileArgs = (
         'HTTP::Request::Common'               => 0,
         'Plack::Builder'                      => 0,
         'Plack::Test'                         => 0,
+        'Test::More'                          => 0,
     },
 );
 

@@ -72,7 +72,7 @@ zmq::socks_connecter_t::socks_connecter_t (class io_thread_t *io_thread_,
     _current_reconnect_ivl (options.reconnect_ivl)
 {
     zmq_assert (_addr);
-    zmq_assert (_addr->protocol == "tcp");
+    zmq_assert (_addr->protocol == protocol_name::tcp);
     _proxy_addr->to_string (_endpoint);
     _socket = _session->get_socket ();
 }
@@ -268,10 +268,12 @@ void zmq::socks_connecter_t::error ()
 
 void zmq::socks_connecter_t::start_timer ()
 {
-    const int interval = get_new_reconnect_ivl ();
-    add_timer (interval, reconnect_timer_id);
-    _status = waiting_for_reconnect_time;
-    _socket->event_connect_retried (_endpoint, interval);
+    if (options.reconnect_ivl != -1) {
+        const int interval = get_new_reconnect_ivl ();
+        add_timer (interval, reconnect_timer_id);
+        _status = waiting_for_reconnect_time;
+        _socket->event_connect_retried (_endpoint, interval);
+    }
 }
 
 int zmq::socks_connecter_t::get_new_reconnect_ivl ()

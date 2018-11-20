@@ -33,6 +33,7 @@
 #include "err.hpp"
 #include "socks.hpp"
 #include "tcp.hpp"
+#include "blob.hpp"
 
 #ifndef ZMQ_HAVE_WINDOWS
 #include <sys/socket.h>
@@ -45,7 +46,7 @@ zmq::socks_greeting_t::socks_greeting_t (uint8_t method_) : num_methods (1)
     methods[0] = method_;
 }
 
-zmq::socks_greeting_t::socks_greeting_t (uint8_t *methods_,
+zmq::socks_greeting_t::socks_greeting_t (const uint8_t *methods_,
                                          uint8_t num_methods_) :
     num_methods (num_methods_)
 {
@@ -132,7 +133,7 @@ zmq::socks_request_t::socks_request_t (uint8_t command_,
                                        std::string hostname_,
                                        uint16_t port_) :
     command (command_),
-    hostname (hostname_),
+    hostname (ZMQ_MOVE (hostname_)),
     port (port_)
 {
     zmq_assert (hostname_.size () <= UINT8_MAX);
@@ -273,8 +274,8 @@ bool zmq::socks_response_decoder_t::message_ready () const
         return _bytes_read == 10;
     if (atyp == 0x03)
         return _bytes_read > 4 && _bytes_read == 4 + 1 + _buf[4] + 2u;
-    else
-        return _bytes_read == 22;
+
+    return _bytes_read == 22;
 }
 
 zmq::socks_response_t zmq::socks_response_decoder_t::decode ()

@@ -1,2 +1,8 @@
+v0.1.1 2018-11-18T15:54:02Z
+ - fa v5.4.2
+ - cdn resources renamed
+ - method call fixed
+ - fa v5.5.0
+
 v0.1.0 2018-10-17T03:19:26Z
  - init

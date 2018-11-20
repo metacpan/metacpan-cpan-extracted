@@ -1,5 +1,5 @@
 package Photonic::Types;
-$Photonic::Types::VERSION = '0.009';
+$Photonic::Types::VERSION = '0.010';
 use Moose::Util::TypeConstraints;
 #use PDL::Lite;
 #use PDL::NiceSlice;
@@ -21,7 +21,12 @@ subtype 'Photonic::Types::GeometryG0' =>
 subtype 'Photonic::Types::NonRetarded::AllHSave' =>
   as 'Photonic::NonRetarded::AllH',
   where { $_->keepStates == 1 },
-  message { "Can't calculate fields if you don't keepStates" };
+    message { "Can't calculate fields if you don't keepStates" };
+
+subtype 'Photonic::Types::Retarded::AllHSave' =>
+  as 'Photonic::Retarded::AllH',
+  where { $_->keepStates == 1 },
+    message { "Can't calculate fields if you don't keepStates" };
 
 no Moose::Util::TypeConstraints;
 
@@ -33,7 +38,7 @@ Photonic::Types
 
 =head1 VERSION
 
-version 0.009
+version 0.008
 
 =head1 SYNOPSIS
 

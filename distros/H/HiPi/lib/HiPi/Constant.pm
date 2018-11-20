@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.72';
+our $VERSION ='0.74';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -999,6 +999,28 @@ my $const = {
         FL3730_CS_65_MA       =>     0b0101,
         FL3730_CS_70_MA       =>     0b0110,
         FL3730_CS_75_MA       =>     0b0111,       
+    },
+    
+    max7219 => {
+        MAX7219_FLAG_FLIPPED  => 0x01,
+        MAX7219_FLAG_MIRROR   => 0x02,
+        MAX7219_FLAG_DECIMAL  => 0x04,
+        
+        MAX7219_REG_NOOP        => 0x00,
+        MAX7219_REG_DIGIT_0     => 0x01,
+        MAX7219_REG_DIGIT_1     => 0x02,
+        MAX7219_REG_DIGIT_2     => 0x03,
+        MAX7219_REG_DIGIT_3     => 0x04,
+        MAX7219_REG_DIGIT_4     => 0x05,
+        MAX7219_REG_DIGIT_5     => 0x06,
+        MAX7219_REG_DIGIT_6     => 0x07,
+        MAX7219_REG_DIGIT_7     => 0x08,
+        MAX7219_REG_DECODE_MODE => 0x09,
+        MAX7219_REG_INTENSITY   => 0x0A,
+        MAX7219_REG_SCAN_LIMIT  => 0x0B,
+        MAX7219_REG_SHUTDOWN    => 0x0C,
+        MAX7219_REG_TEST        => 0x0F,
+        
     },
 };
 

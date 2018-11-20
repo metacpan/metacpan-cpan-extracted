@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99021  Nov 20 2018 Eugeny Subachev
+    - Fixed/added 'not found' patterns of net.ua vg gd kiwi sx TLDs.
+
 2.99020  Sep 24 2018 Alexander Nalobin
     - fix recursive whois regexp. Now matches \r\n line endings. 
 

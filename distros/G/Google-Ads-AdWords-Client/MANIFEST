@@ -272,6 +272,7 @@ examples/v201809/shopping_campaigns/add_product_partition_tree.pl
 examples/v201809/shopping_campaigns/add_product_scope.pl
 examples/v201809/shopping_campaigns/add_shopping_campaign.pl
 examples/v201809/shopping_campaigns/add_shopping_campaign_for_showcase_ads.pl
+examples/v201809/shopping_campaigns/add_smart_shopping_ad.pl
 examples/v201809/shopping_campaigns/get_product_category_taxonomy.pl
 examples/v201809/targeting/add_campaign_targeting_criteria.pl
 examples/v201809/targeting/add_customer_negative_criteria.pl

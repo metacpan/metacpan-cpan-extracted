@@ -1,5 +1,47 @@
 Revision history for Types-SQL
 
+v0.3.1    2018-11-18 11:46:52+00:00 Europe/London
+  [Enhancements]
+  - InstanceOf['JSON::PP::Boolean', 'Types::Serialiser::Boolean'] can be
+    translated.
+
+  [Bug Fixes]
+  - Specify minimum version of Safe::Isa (Slaven Rezić).
+
+  [Toolchain]
+  - Clean up prereqs list.
+
+  - Include cpanfile and MANIFEST.SKIP in distribution.
+
+v0.3.0    2018-11-17 22:13:33+00:00 Europe/London
+  [Enhancements]
+  - Types::SQL::Util checks type library names.
+
+  - Types::SQL::Util uses a lookup table for improved performance, and to make supporting
+    additional type libraries easier.
+
+  - Types::SQL::Util translates the following types from Types::Common::Numeric
+    and Types::Common::String:
+     * LowerCaseSimpleStr
+     * LowerCaseStr
+     * NonEmptySimpleStr
+     * NonEmptyStr
+     * PositiveInt
+     * PositiveNum
+     * SimpleStr
+     * SingleDigit
+     * UpperCaseSimpleStr
+     * UpperCaseStr
+
+  [Documentation]
+  - Added a ROADMAP section to POD about planned changes.
+
+  [Bug Fixes]
+  - column_info_from_type checks that the type isa Type::Tiny object.
+
+  [Tests]
+  - Add more tests.
+
 v0.2.1    2018-11-10 22:17:54+00:00 Europe/London
   [Bug Fixes]
   - Clean namespaces.

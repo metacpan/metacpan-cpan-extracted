@@ -313,6 +313,7 @@ ok(add_product_partition_tree($client, $search_ad_group_id), "Test of add_produc
 # Skipping add_product_scope because a shopping campaign is needed.
 # Skipping add_shopping_campaign because it requires a merchant account.
 # Skipping add_shopping_campaign_for_showcase_ads because it requires a merchant
+# Skipping add_smart_shopping_ad. Requires merchant account.
 # account.
 require qw(examples/v201809/shopping_campaigns/get_product_category_taxonomy.pl);
 ok(get_product_category_taxonomy($client),

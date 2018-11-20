@@ -34,7 +34,6 @@ my $int = {
     hide_cursor  => '[ 0 1 ]',
     index        => '[ 0 1 ]',
     justify      => '[ 0 1 2 ]',
-    fill_up      => '[ 0 1 2 ]',
     layout       => '[ 0 1 2 3 ]',
     mouse        => '[ 0 1 2 3 4 ]',
     order        => '[ 0 1 ]',
@@ -102,13 +101,13 @@ for my $opt ( sort keys %$no_spacebar ) {
 
 my $exception = exception { $d = choose( $choices, {
     beep  => -1, clear_screen => 2, hide_cursor => 3, index => 4, justify => '@', layout => 5, mouse => {},
-    order => 1, page => 0, keep => -1, ll => -1, max_height => 0, max_width => 0, default => [], fill_up => -1,
+    order => 1, page => 0, keep => -1, ll => -1, max_height => 0, max_width => 0, default => [],
     pad => 'a', empty => [], prompt => {}, undef => [], lf => 4, no_spacebar => 4 } ) };
 ok( $exception =~ $begin_errormessage );
 
 $exception = exception { $d = choose( [ 'aaa' .. 'zzz' ], {
     no_spacebar => 'a', lf => 'b', undef => [], prompt => {}, empty => {}, pad => 'd', default => 'e', max_width => -1,
-    max_height => -2, ll => -4, keep => -5, page => -6, order => -7, fill_up => 3, mouse => 'k', layout => 'e',
+    max_height => -2, ll => -4, keep => -5, page => -6, order => -7, mouse => 'k', layout => 'e',
     justify => [], index => {}, hide_cursor => -1,  clear_screen => [], beep  => 10 } ) };
 ok( $exception =~ $begin_errormessage );
 

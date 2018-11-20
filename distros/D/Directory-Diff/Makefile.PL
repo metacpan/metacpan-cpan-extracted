@@ -19,9 +19,6 @@ WriteMakefile (
     LICENSE => 'perl',
     PREREQ_PM => {
         'File::Compare' => 0,
-        'File::Copy' => 0,
-        'Cwd' => 0,
-        'File::Path' => 0,
     },
     META_MERGE => {
         'meta-spec' => {
@@ -37,6 +34,10 @@ WriteMakefile (
                 web => "$repo/issues",
             },
 #           homepage => 'http://',
+        },
+        no_index => {
+            directory => [ qw( examples/old_dir examples/new_dir ) ],
+	    file => [ 't/DirOps.pm', ],
         },
     },
     MIN_PERL_VERSION => '5.006001',

@@ -4,7 +4,7 @@
       "Jose Luis Martinez <jlmartinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -19,17 +19,9 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "develop" : {
-         "requires" : {
-            "Dist::Zilla" : "0",
-            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
-            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
-            "Dist::Zilla::Plugin::VersionFromModule" : "0",
-            "Dist::Zilla::PluginBundle::Git" : "0"
-         }
-      },
       "runtime" : {
          "requires" : {
+            "JSON::MaybeXS" : "0",
             "Moose" : "0"
          }
       },
@@ -53,7 +45,8 @@
          "web" : "https://github.com/pplu/moosex-datamodel"
       }
    },
-   "version" : "1.00",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "1.01",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

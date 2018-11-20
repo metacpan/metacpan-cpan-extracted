@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+0.04 2018-11-19T05:10:31Z
+
+    - Update "retrieve" function to take parameters.
+
 0.03 2018-10-23T09:19:57Z
 
     - Add App::ansifold notation.

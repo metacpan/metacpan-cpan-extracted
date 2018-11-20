@@ -4,181 +4,63 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
-use Parse::ANSIColor::Tiny qw();
-use Term::ANSIColor        qw( colored );
-use Text::ANSI::WideUtil   qw( ta_mbtrunc );
+use Carp qw( croak );
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
-
-use Term::Choose::Constants qw( :choose :screen :linux );
-use Term::Choose::LineFold qw( print_columns );
 
 use parent 'Term::Choose';
 
 
+my $Plugin;
 
-sub __valid_options {
-    my $valid = Term::Choose::__valid_options();
-    $valid->{fill_up} = '[ 0 1 2 ]';
-    return $valid;
-};
+BEGIN {
+    if ( $^O eq 'MSWin32' ) {
+        require Term::Choose::Win32;
+        $Plugin = 'Term::Choose::Win32';
+    }
+    else {
+        require Term::Choose::Linux;
+        $Plugin = 'Term::Choose::Linux';
+    }
+}
 
 
-sub __defaults {
-    my ( $self ) = @_;
-    my $defaults = Term::Choose::__defaults();
-    $defaults->{fill_up} = 1;
-    return $defaults;
+sub new {
+    # the function 'choose' uses its own implicit new
+    my $class = shift;
+    my ( $opt ) = @_;
+    croak "new: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
+    my $self = bless {}, $class;
+    if ( defined $opt ) {
+        croak "new: the (optional) argument must be a HASH reference" if ref $opt ne 'HASH';
+        $self->__validate_and_add_options( $opt );
+    }
+    if ( $opt->{fill_up} ) {
+        $opt->{color} = 1 + delete $opt->{fill_up};
+    }
+    $self->{backup_opt} = { defined $opt ? %$opt : () };
+    $self->{plugin} = $Plugin->new();
+    return $self;
 }
 
 
 sub choose {
     if ( ref $_[0] ne 'Term::Choose_HAE' ) {
+        if ( $_[1]->{fill_up} ) {
+            $_[1]->{color} = 1 + delete $_[1]->{fill_up};
+        }
         return Term::Choose_HAE->new()->Term::Choose::__choose( @_ );
     }
     my $self = shift;
+    if ( $_[1]->{fill_up} ) {
+        $_[1]->{color} = 1 + delete $_[1]->{fill_up};
+    }
     return $self->Term::Choose::__choose( @_ );
 }
-
-
-sub __copy_orig_list {
-    my ( $self, $orig_list ) = @_;
-    $self->{list} = [ @$orig_list ];
-    if ( $self->{ll} ) {
-        for ( @{$self->{list}} ) {
-            $_ = $self->{undef} if ! defined $_;
-        }
-    }
-    else {
-        for ( @{$self->{list}} ) {
-            if ( ! $_ ) {
-                $_ = $self->{undef} if ! defined $_;
-                $_ = $self->{empty} if $_ eq '';
-            }
-            if ( ref ) {
-                $_ = sprintf "%s(0x%x)", ref $_, $_;
-            }
-            s/\t/ /g;
-            s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
-            s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]/$&=~m|\e| && $&/eg; # remove \p{Cc} but keep \e\[
-        }
-    }
-}
-
-
-sub __length_longest {
-    my ( $self ) = @_;
-    my $list = $self->{list};
-    if ( $self->{ll} ) {
-        $self->{length_longest} = $self->{ll};
-        $self->{length} = [ ( $self->{length_longest} ) x @$list ];
-    }
-    else {
-        my $len = [];
-        my $longest = 0;
-        for my $i ( 0 .. $#$list ) {
-            $len->[$i] = print_columns( _strip_ansi_color( $list->[$i] ) );
-            $longest = $len->[$i] if $len->[$i] > $longest;
-        }
-        $self->{length_longest} = $longest;
-        $self->{length} = $len;
-    }
-}
-
-
-sub _strip_ansi_color {
-    ( my $str = $_[0] ) =~ s/\e\[[\d;]*m//msg;
-    return $str;
-}
-
-
-sub __unicode_sprintf {
-    my ( $self, $idx, $is_current_pos, $is_marked ) = @_;
-    my $unicode = '';
-    my $str_length = $self->{length}[$idx];
-    if ( $str_length > $self->{avail_col_width} ) {
-        if ( $self->{avail_col_width} > 3 ) {
-            $unicode = ta_mbtrunc( $self->{list}[$idx], $self->{avail_col_width} - 3 ) . '...';
-        }
-        else {
-            $unicode = ta_mbtrunc( $self->{list}[$idx], $self->{avail_col_width} );
-        }
-    }
-    elsif ( $str_length < $self->{avail_col_width} ) {
-        if ( $self->{justify} == 0 ) {
-            $unicode = $self->{list}[$idx] . " " x ( $self->{avail_col_width} - $str_length );
-        }
-        elsif ( $self->{justify} == 1 ) {
-            $unicode = " " x ( $self->{avail_col_width} - $str_length ) . $self->{list}[$idx];
-        }
-        elsif ( $self->{justify} == 2 ) {
-            my $all = $self->{avail_col_width} - $str_length;
-            my $half = int( $all / 2 );
-            $unicode = " " x $half . $self->{list}[$idx] . " " x ( $all - $half );
-        }
-    }
-    else {
-        $unicode = $self->{list}[$idx];
-    }
-
-    my $wrap = '';
-    open my $trapstdout, '>', \$wrap or die "can't open TRAPSTDOUT: $!";
-    select $trapstdout;
-    print BOLD_UNDERLINE if $is_marked;
-    print REVERSE        if $is_current_pos;
-    select STDOUT;
-    close $trapstdout;
-    my $ansi   = Parse::ANSIColor::Tiny->new();
-    my @codes  = ( $wrap =~ /\e\[([\d;]*)m/g );
-    my @attr   = $ansi->identify( @codes ? @codes : '' );
-    my $marked = $ansi->parse( $unicode );
-    if ( $self->{length}[$idx] > $self->{avail_width} && $self->{fill_up} != 2 ) {
-        if ( @$marked > 1 && ! @{$marked->[-1][0]} && $marked->[-1][1] =~ /^\.\.\.\z/ ) {
-            $marked->[-1][0] = $marked->[-2][0];
-        }
-    }
-    if ( $attr[0] ne 'clear' ) {
-        if ( $self->{fill_up} == 1 && @$marked > 1 ) {
-            if ( ! @{$marked->[0][0]} && $marked->[0][1] =~ /^\s+\z/ ) {
-                $marked->[0][0] = $marked->[1][0];
-            }
-            if ( ! @{$marked->[-1][0]}&& $marked->[-1][1] =~ /^\s+\z/ ) {
-                $marked->[-1][0] = $marked->[-2][0];
-            }
-        }
-        if ( ! $self->{fill_up} ) {
-            if ( ! @{$marked->[0][0]} && $marked->[0][1] =~ /^(\s+)\S/ ) {
-                my $tmp = $1;
-                $marked->[0][1] =~ s/^\s+//;
-                unshift @$marked, [ [], $tmp ];
-            }
-            elsif ( ! @{$marked->[-1][0]} && $marked->[-1][1] =~ /\S(\s+)\z/ ) {
-                my $tmp = $1;
-                $marked->[-1][1] =~ s/\s+\z//;
-                push @$marked, [ [], $tmp ];
-            }
-        }
-        for my $i ( 0 .. $#$marked ) {
-            if ( ! $self->{fill_up} ) {
-                if ( $i == 0 || $i == $#$marked ) {
-                    if ( ! @{$marked->[$i][0]} && $marked->[$i][1] =~ /^\s+\z/ ) {
-                        next;
-                    }
-                }
-            }
-            $marked->[$i][0] = [ $ansi->normalize( @{ $marked->[$i][0] }, @attr ) ];
-        }
-    }
-    print join '', map { @{$_->[0]} ? colored( @$_ ) : $_->[1] } @$marked;
-    if ( $is_marked || $is_current_pos ) {
-        print RESET;
-    }
-}
-
 
 
 
@@ -193,11 +75,11 @@ __END__
 
 =head1 NAME
 
-Term::Choose_HAE - Choose items from a list interactively.
+Term::Choose_HAE - DEPRECATED
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =cut
 
@@ -245,6 +127,8 @@ Object-oriented interface:
     $stopp->choose( [ 'Press ENTER to continue' ] );               # no choice
 
 =head1 DESCRIPTION
+
+This module is DEPRECATED and will be removed. Use L<Term::Choose> with its option I<color> instead.
 
 Choose interactively from a list of items.
 

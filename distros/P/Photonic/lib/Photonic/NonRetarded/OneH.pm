@@ -4,7 +4,7 @@ Photonic::NonRetarded::OneH
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ next_b2, next_b, shifting the current values where necessary. Returns
 =cut
 
 package Photonic::NonRetarded::OneH;
-$Photonic::NonRetarded::OneH::VERSION = '0.009';
+$Photonic::NonRetarded::OneH::VERSION = '0.010';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -163,17 +163,12 @@ sub _iterate_indeed {
     my $current_a=(Cmul(Cconj($psi_G), $GBGpsi_G))->re->sum;
     # was ->((0))->real->sum;
     # next b^2
-    my $next_b2=Cabs2($GBGpsi_G)->sum #square magnitude of state
-	-$current_a**2 - $self->current_b2;
-    carp "\$next_b2=$next_b2 is too negative!" if $next_b2 < -$self->smallH;
-    $next_b2=0 if $next_b2<0; 
+    my $bpsi=$GBGpsi_G - $current_a*$psi_G -
+	    $self->current_b*$self->previousState;
+    my $next_b2=$bpsi->Cabs2->sum;
     my $next_b=sqrt($next_b2);
-    #If b is too small, time to quit.
     my $next_state=undef;
-    $next_state=$GBGpsi_G - $current_a*$psi_G -
-	$self->current_b*$self->previousState,  
-	$next_state=Cscale($next_state,1/$next_b)
-	unless $next_b2 < $self->smallH;
+    $next_state=$bpsi/$next_b if($next_b2 > $self->smallH);
     #save values
     $self->_current_a($current_a);
     $self->_next_b2($next_b2);

@@ -1,11 +1,11 @@
 package <: $module_name ~ "::Index::Admin" :>;
 
-use Pcore -class;
+use Pcore -class, -l10n;
 
-with qw[Pcore::App::Controller::Ext];
+with qw[Pcore::App::Controller Pcore::App::Controller::Ext];
 
 has ext_app   => 'Ext';
-has ext_title => l10n('App Title');
+has ext_title => sub { l10n('App Title') };
 has ext_theme => ();
 
 1;

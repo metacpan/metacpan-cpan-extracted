@@ -1,7 +1,11 @@
 Revision history for Music-ToRoman
 
+0.0701 2018-11-18 15:52:45
+    - Restrict the note regex to [A-G] (instead of \w).
+    - Improve documentation.
+
 0.0700 2018-11-07 14:28:18
-    - Default to major/ionian when chords attribute is off.
+    - Default to major/ionian when the chords attribute is off.
 
 0.0600 2018-11-06 17:44:07
     - Band-aid note-in-bass logic.

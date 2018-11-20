@@ -69,8 +69,6 @@ struct options_t
     int setsockopt (int option_, const void *optval_, size_t optvallen_);
     int getsockopt (int option_, void *optval_, size_t *optvallen_) const;
 
-    bool is_valid (int option_) const;
-
     //  High-water marks for message pipes.
     int sndhwm;
     int rcvhwm;
@@ -263,9 +261,21 @@ struct options_t
     // Use zero copy strategy for storing message content when decoding.
     bool zero_copy;
 
+    // Router socket ZMQ_NOTIFY_CONNECT/ZMQ_NOTIFY_DISCONNECT notifications
+    int router_notify;
+
     // Application metadata
     std::map<std::string, std::string> app_metadata;
 };
+
+inline bool get_effective_conflate_option (const options_t &options)
+{
+    // conflate is only effective for some socket types
+    return options.conflate
+           && (options.type == ZMQ_DEALER || options.type == ZMQ_PULL
+               || options.type == ZMQ_PUSH || options.type == ZMQ_PUB
+               || options.type == ZMQ_SUB);
+}
 
 int do_getsockopt (void *const optval_,
                    size_t *const optvallen_,

@@ -1,13 +1,27 @@
 Revision history for Perl extension JSON::XS
 
-TODO: maybe detetc and croak on more invalid inputs (e.g. +-inf/nan)
+TODO: maybe detect and croak on more invalid inputs (e.g. +-inf/nan)
 TODO: maybe avoid the reblessing and better support readonly objects.
-TODO: http://stevehanov.ca/blog/index.php?id=104 compression
 TODO: how to cope with tagged values and standard json decoders
 TODO: investigate magic (Eric Brine)
-TODO: rfc7464
-TODO: Victor Efimov
-TODO: move json_xs to types::serialiser
+TODO: [PATCH] Types::Serialiser: Inline true(), false() and error() functions
+
+4.0  Fri Nov 16 00:06:54 CET 2018
+	- 4.0 pre-release, do not use other than for testing.
+	- SECURITY IMPLICATION: this release enables allow_nonref by default
+          for compatibnility with RFC 7159 and newer. See "old" vs. "new"
+          JSON under SECURITY CONSIDERATIONS.
+        - reworked the "old" vs. "new" JSON section.
+        - add ->boolean_values to provide the values to which booleans
+          decode (requested by Aristotle Pagaltzis).
+        - decode would wrongly accept ASCII NUL characters instead of
+          reporting them as trailing garbage.
+        - work around what smells like a perl bug w.r.t. exceptions
+          thrown in callbacks.
+        - incremental parser now more or less respects allow_nonref.
+	- json_xs json-pretty now enables canonical mode.
+        - add documentation section about I-JSON.
+        - minor documentation fixes/updates.
 
 3.04 Thu Aug 17 04:30:47 CEST 2017
 	- change exponential realloc algorithm on encoding and string decoding to be

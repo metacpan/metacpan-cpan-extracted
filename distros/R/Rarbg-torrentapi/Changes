@@ -1,5 +1,11 @@
 Revision history for Rarbg-torrentapi
 
+v0.1.8  2018-11-17 19:47:42 CET
+        - search by tvrage id is deprecated
+        - you can now search by themoviedb id
+        - api request limit still gives some problems on first run. Trying to
+          better handle that.
+
 v0.1.7  2018-03-22 13:31:57 CET
         - torrentapi time request limit was making the module crash ...
           Also, the token validity is better tested now.

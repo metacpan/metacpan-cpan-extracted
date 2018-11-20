@@ -1,5 +1,10 @@
 Revision history for Perl module Directory::Diff
 
+0.08 2018-11-17
+
+- Removed unused testing routines "default_dir_only" and "default_diff"
+- Additional tests for DD::Copy
+
 0.07 2017-10-25
 
 - Restore accidentally removed dependence on mkpath in File::Copy

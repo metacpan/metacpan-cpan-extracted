@@ -1,3 +1,10 @@
+0.03 2018-11-19
+    * Fix prerequisite versions, C<< ->getoptionsfromarray() >> was introduced
+      in Getopt::Long 2.39
+    * Add support for --max-time
+    * Add support for (ignored options) --(no-)keepalive and --(no-)buffer
+    * Add support for (ignored option) --progress-bar , -#
+
 0.02 2018-11-15
     * Support --compressed option
     * Run output through HTML::Tidy if it is installed

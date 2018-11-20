@@ -1,5 +1,10 @@
 Revision history for App-bitbucket-cli
 
+0.007   2018-11-17
+        Updating for release of version 0.007
+        Only passing on defined params to core (Ivan Wills)
+        Changed --state's short form so that it doesn't conflict with --sleep (Ivan Wills)
+
 0.006   2018-10-07
         Updating for release of version 0.006
         Added documentation for max attribute (Ivan Wills)

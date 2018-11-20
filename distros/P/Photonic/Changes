@@ -18,6 +18,94 @@
 * 0.008
   1. Added two smallness parameters, one for Haydock and one for
      continued fractions.
-  2. 
-
+  2. Correct version in Wave.pm
+  3. There is a logical error en EpsL and GreeP. The upper of the
+     iteration was wrong, but now we can't distinguish between
+     nonconvergence or using up all Haydock coefficients.
+  4. Update Changes and README. Correct upper limit in iterations.
+  5. Change logic of convergence tests
+  6. Modified code to allow two smallness parameters
+     1. Independently state criteria for Haydock coefficient
+        calculations and for continued fraction convergence.
+  7. Added projected wave operator and projected dielectric function
+     1. This modules may be used along principal directions when the full
+	matricial response is unneeded, thus saving time.
+  8. The routines cgtsl and dgtsl were incorrectly imported and documented
+  9. Corrected interface to the linpack routines cgtsl and dgtsl
+  10. Changes to allow disttest to pass
+* 0.009
+  1. Changed slightly the code for second harmonic calculations. 
+  2. Corrected SHG
+     1. Cleaned code to run slatec routines cgtsl and dgtsl. Now they
+	can be used with 4 or 6 arguments and may use inplace
+	arguments. Added typemap.PL so that it creates a copy of PDL's
+	typemap to be used by .pd code.
+  3. Changes to the documentation fo FieldH
+  4. Correct mistakes in Geometry from image2D.
+  5. Deleted a couple of unneeded prints
+  6. Changed calls to fortran routines
+     1. I copyied arguments except when inplace since cgtsl and dgtsl
+        destroy all its arguments.
+     2. Changed tests to test inplace.
+  7. Added documentation to shg
+  8. Found convergence problems with current field
+     calculation. Started exploring.
+  9. Changed FieldH to use linpack
+     1. instead of solving naively tridiagonal linear equation to get
+        field
+  10. Added code to accelerate selfconsistent longitudinal polarization.
+      1. Left it commented, as it is missing the longitudinal projetor and
+	 the full self consistent field
+  11. Added field1 and field2 accesors and buiders to SH
+      1. And eliminated now unnecessary BUILD
+  12. Added to SH alternative self consistent longitudinal macroscopic
+      polarization component P2LMCalt. The non alternative hasn't been
+      added yet.
+  13. Subtle changes in SHG. Now we obey y y<-> -y symmetry for 2D systems
+      with mirror line.
+* 0.010
+  1. Eliminated Makefile.PL, as it is automatically built
+  2. Merge branch 'bernardo'
+  3. Modified SH to have finite polarizability at zero density
+  4. Added Lucila's retarded field calculations
+  5. Added Lucila's field calculation to the proper directory
+  6. First attempt to reorthogonalize
+  7. Normalize states on each step
+  8. First working reorthogonalization
+  9. Added flag to reorthogonalize in the old NR/AllH module
+  10. removed old AllH with reorthogonalization
+  11. Changed retarded calculation of b coefficient
+  12. Removed some comments
+  13. Allow reorthogonalization in NonRetarded::AllH and change
+      normalization in Retarded and NonRetarded OneH to stabilize
+      calculation.
+  14. Merge branch 'reorthogonalization'
+  15. Added files that Build said were missing
+  16. Added travis yaml file
+  17. Renamed travis yaml file
+  18. Added after_failure: to look a build failure
+  19. Corrected .travis.yml
+  20. Add namespace::autoclean to dependencies in Build.PL
+  21. Add mask to SH susceptibility
+  22. Modify SHChiTensor in order to admit options
+      1. The option mask takes an array of ones and zeroes to indicate
+         the contributions from which regions to be taken into account.
+      2. The option kind takes a letter 'f' full, 'd', dipolar or 'q',
+         quadrupolar.
+  23. Add modules for gyrotropy
+      1. Add complex unit pairs and dyad to obtain all independent
+         components        of the Green's function, the wave operator
+         and the epsilon tensor for gyrotropic systems.
+  24. Correct version string
+      1. Correct version string in EpsilonTensorF and WaveF
+  25. Add reorthogonalization to Retarded. Correct code for gyrotropic
+      1. Added reorthogonalization methods to retarded calculations.
+      2. Added code to save and restore haydock fields. Incomplete.
+      3. Added complex conjugate unit vectors and dyads.
+      4. Quite untested. Lucila's changes.
+  26. Meta files, to be deleted soon
+  27. Removed META files
+* 0.011
+  1. Change travis file
+  2. Add before_install to .travis.yml
 

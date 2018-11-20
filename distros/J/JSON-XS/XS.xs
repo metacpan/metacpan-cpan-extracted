@@ -52,7 +52,7 @@
 
 #define F_PRETTY    F_INDENT | F_SPACE_BEFORE | F_SPACE_AFTER
 
-#define INIT_SIZE   32 // initial scalar size to be allocated
+#define INIT_SIZE   64 // initial scalar size to be allocated
 #define INDENT_STEP 3  // spaces per indentation level
 
 #define SHORT_STRING_LEN 16384 // special-case strings of up to this size
@@ -80,23 +80,26 @@
 #define ERR_NESTING_EXCEEDED "json text or perl structure exceeds maximum nesting level (max_depth set too low?)"
 
 #ifdef USE_ITHREADS
-# define JSON_SLOW 1
-# define JSON_STASH (json_stash ? json_stash : gv_stashpv ("JSON::XS", 1))
-# define BOOL_STASH (bool_stash ? bool_stash : gv_stashpv ("Types::Serialiser::Boolean", 1))
+# define JSON_STASH (expect_true (json_stash) ? json_stash : gv_stashpv ("JSON::XS", 1))
+# define BOOL_STASH (expect_true (bool_stash) ? bool_stash : gv_stashpv ("Types::Serialiser::Boolean", 1))
+# define GET_BOOL(value) (expect_true (bool_ ## value) ? bool_ ## value : get_bool ("Types::Serialiser::" # value))
 #else
-# define JSON_SLOW 0
 # define JSON_STASH json_stash
 # define BOOL_STASH bool_stash
+# define GET_BOOL(value) bool_ ## value
 #endif
 
 // the amount of HEs to allocate on the stack, when sorting keys
 #define STACK_HES 64
 
 static HV *json_stash, *bool_stash; // JSON::XS::, Types::Serialiser::Boolean::
-static SV *bool_true, *bool_false, *sv_json;
+static SV *bool_false, *bool_true;
+static SV *sv_json;
 
 enum {
   INCR_M_WS = 0, // initial whitespace skipping, must be 0
+  INCR_M_TFN,    // inside true/false/null
+  INCR_M_NUM,    // inside number
   INCR_M_STR,    // inside string
   INCR_M_BS,     // inside backslash
   INCR_M_C0,     // inside comment in initial whitespace sequence
@@ -119,13 +122,16 @@ typedef struct {
   STRLEN incr_pos; // the current offset into the text
   int incr_nest;   // {[]}-nesting level
   unsigned char incr_mode;
+
+  SV *v_false, *v_true;
 } JSON;
 
 INLINE void
 json_init (JSON *json)
 {
-  Zero (json, 1, JSON);
-  json->max_depth = 512;
+  static const JSON init = { F_ALLOW_NONREF, 512 };
+
+  *json = init;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -182,7 +188,7 @@ json_sv_grow (SV *sv, size_t len1, size_t len2)
   return SvGROW (sv, len1);
 }
 
-// decode an utf-8 character and return it, or (UV)-1 in
+// decode a utf-8 character and return it, or (UV)-1 in
 // case of an error.
 // we special-case "safe" characters from U+80 .. U+7FF,
 // but use the very good perl function to parse anything else.
@@ -778,10 +784,8 @@ encode_rv (enc_t *enc, SV *sv)
 
       if (stash == bool_stash)
         {
-          if (SvIV (sv))
-            encode_str (enc, "true", 4, 0);
-          else
-            encode_str (enc, "false", 5, 0);
+          if (SvIV (sv)) encode_str (enc, "true" , 4, 0);
+          else           encode_str (enc, "false", 5, 0);
         }
       else if ((enc->json.flags & F_ALLOW_TAGS) && (method = gv_fetchmethod_autoload (stash, "FREEZE", 0)))
         {
@@ -789,7 +793,6 @@ encode_rv (enc_t *enc, SV *sv)
           dSP;
 
           ENTER; SAVETMPS;
-          SAVESTACK_POS ();
           PUSHMARK (SP);
           EXTEND (SP, 2);
           // we re-bless the reference to get overload and other niceties right
@@ -811,12 +814,18 @@ encode_rv (enc_t *enc, SV *sv)
           encode_ch (enc, ')');
           encode_ch (enc, '[');
 
-          while (count)
+          if (count)
             {
-              encode_sv (enc, SP[1 - count--]);
+              int i;
 
-              if (count)
-                encode_ch (enc, ',');
+              for (i = 0; i < count - 1; ++i)
+                {
+                  encode_sv (enc, SP[i + 1 - count]);
+                  encode_ch (enc, ',');
+                }
+
+              encode_sv (enc, TOPs);
+              SP -= count;
             }
 
           encode_ch (enc, ']');
@@ -1517,7 +1526,6 @@ decode_hv (dec_t *dec)
               int count;
 
               ENTER; SAVETMPS;
-              SAVESTACK_POS ();
               PUSHMARK (SP);
               XPUSHs (HeVAL (he));
               sv_2mortal (sv);
@@ -1530,6 +1538,8 @@ decode_hv (dec_t *dec)
                   FREETMPS; LEAVE;
                   return sv;
                 }
+              else if (count)
+                croak ("filter_json_single_key_object callbacks must not return more than one scalar");
 
               SvREFCNT_inc (sv);
               FREETMPS; LEAVE;
@@ -1542,7 +1552,6 @@ decode_hv (dec_t *dec)
           int count;
 
           ENTER; SAVETMPS;
-          SAVESTACK_POS ();
           PUSHMARK (SP);
           XPUSHs (sv_2mortal (sv));
 
@@ -1554,6 +1563,8 @@ decode_hv (dec_t *dec)
               FREETMPS; LEAVE;
               return sv;
             }
+          else if (count)
+            croak ("filter_json_object callbacks must not return more than one scalar");
 
           SvREFCNT_inc (sv);
           FREETMPS; LEAVE;
@@ -1668,31 +1679,33 @@ decode_sv (dec_t *dec)
       case '5': case '6': case '7': case '8': case '9':
         return decode_num (dec);
 
-      case 't':
-        if (dec->end - dec->cur >= 4 && !memcmp (dec->cur, "true", 4))
-          {
-            dec->cur += 4;
-#if JSON_SLOW
-            bool_true = get_bool ("Types::Serialiser::true");
-#endif
-            return newSVsv (bool_true);
-          }
-        else
-          ERR ("'true' expected");
-
-        break;
-
       case 'f':
         if (dec->end - dec->cur >= 5 && !memcmp (dec->cur, "false", 5))
           {
             dec->cur += 5;
-#if JSON_SLOW
-            bool_false = get_bool ("Types::Serialiser::false");
-#endif
-            return newSVsv (bool_false);
+
+            if (expect_false (!dec->json.v_false))
+              dec->json.v_false = GET_BOOL (false);
+
+            return newSVsv (dec->json.v_false);
           }
         else
           ERR ("'false' expected");
+
+        break;
+
+      case 't':
+        if (dec->end - dec->cur >= 4 && !memcmp (dec->cur, "true", 4))
+          {
+            dec->cur += 4;
+
+            if (expect_false (!dec->json.v_true))
+              dec->json.v_true = GET_BOOL (true);
+
+            return newSVsv (dec->json.v_true);
+          }
+        else
+          ERR ("'true' expected");
 
         break;
 
@@ -1786,7 +1799,7 @@ decode_json (SV *string, JSON *json, STRLEN *offset_return)
       // check for trailing garbage
       decode_ws (&dec);
 
-      if (*dec.cur)
+      if (dec.cur != dec.end)
         {
           dec.err = "garbage after JSON object";
           SvREFCNT_dec (sv);
@@ -1834,9 +1847,17 @@ incr_parse (JSON *self)
 
   for (;;)
     {
-      //printf ("loop pod %d *p<%c><%s>, mode %d nest %d\n", p - SvPVX (self->incr_text), *p, p, self->incr_mode, self->incr_nest);//D
       switch (self->incr_mode)
         {
+          // reached end of a scalar, see if we are inside a nested structure or not
+          end_of_scalar:
+            self->incr_mode = INCR_M_JSON;
+
+            if (self->incr_nest) // end of a scalar inside array, object or tag
+              goto incr_m_json;
+            else // end of scalar outside structure, json text ends here
+              goto interrupt;
+
           // only used for initial whitespace skipping
           case INCR_M_WS:
             for (;;)
@@ -1888,6 +1909,40 @@ incr_parse (JSON *self)
 
             break;
 
+          // inside true/false/null
+          case INCR_M_TFN:
+          incr_m_tfn:
+            for (;;)
+              switch (*p++)
+                {
+                  case 'r': case 'u': case 'e': // tRUE, falsE, nUll
+                  case 'a': case 'l': case 's': // fALSe, nuLL
+                    // allowed
+                    break;
+                   
+                  default:
+                    --p;
+                    goto end_of_scalar;
+                }
+
+          // inside a number
+          case INCR_M_NUM:
+          incr_m_num:
+            for (;;)
+              switch (*p++)
+                {
+                  case 'e': case 'E': case '.': case '+':
+                  case '-':
+                  case '0': case '1': case '2': case '3': case '4':
+                  case '5': case '6': case '7': case '8': case '9':
+                    // allowed
+                    break;
+
+                  default:
+                    --p;
+                    goto end_of_scalar;
+                }
+
           // inside a string
           case INCR_M_STR:
           incr_m_str:
@@ -1896,12 +1951,7 @@ incr_parse (JSON *self)
                 if (*p == '"')
                   {
                     ++p;
-                    self->incr_mode = INCR_M_JSON;
-
-                    if (!self->incr_nest)
-                      goto interrupt;
-
-                    goto incr_m_json;
+                    goto end_of_scalar;
                   }
                 else if (*p == '\\')
                   {
@@ -1940,6 +1990,21 @@ incr_parse (JSON *self)
                           goto interrupt;
                         }
                       break;
+
+                    // the following three blocks handle scalars. this makes the parser
+                    // more strict than required inside arrays or objects, and could
+                    // be moved to a special case on the toplevel (except strings)
+                    case 't':
+                    case 'f':
+                    case 'n':
+                      self->incr_mode = INCR_M_TFN;
+                      goto incr_m_tfn;
+
+                    case '-':
+                    case '0': case '1': case '2': case '3': case '4':
+                    case '5': case '6': case '7': case '8': case '9':
+                      self->incr_mode = INCR_M_NUM;
+                      goto incr_m_num;
 
                     case '"':
                       self->incr_mode = INCR_M_STR;
@@ -1997,8 +2062,8 @@ BOOT:
 
 	json_stash = gv_stashpv ("JSON::XS"                  , 1);
 	bool_stash = gv_stashpv ("Types::Serialiser::Boolean", 1);
-        bool_true  = get_bool ("Types::Serialiser::true");
         bool_false = get_bool ("Types::Serialiser::false");
+        bool_true  = get_bool ("Types::Serialiser::true");
 
         sv_json = newSVpv ("JSON", 0);
         SvREADONLY_on (sv_json);
@@ -2010,8 +2075,13 @@ PROTOTYPES: DISABLE
 
 void CLONE (...)
 	CODE:
+        // as long as these writes are atomic, the race should not matter
+        // as existing threads either already use 0, or use the old value,
+        // which is sitll correct for the initial thread.
         json_stash = 0;
         bool_stash = 0;
+        bool_false = 0;
+        bool_true  = 0;
 
 void new (char *klass)
 	PPCODE:
@@ -2024,6 +2094,21 @@ void new (char *klass)
            strEQ (klass, "JSON::XS") ? JSON_STASH : gv_stashpv (klass, 1)
         )));
 }
+
+void boolean_values (JSON *self, SV *v_false = 0, SV *v_true = 0)
+	PPCODE:
+	self->v_false = newSVsv (v_false);
+	self->v_true  = newSVsv (v_true);
+        XPUSHs (ST (0));
+
+void get_boolean_values (JSON *self)
+	PPCODE:
+        if (self->v_false && self->v_true)
+	  {
+            EXTEND (SP, 2);
+            PUSHs (self->v_false);
+            PUSHs (self->v_true);
+          }
 
 void ascii (JSON *self, int enable = 1)
 	ALIAS:
@@ -2270,6 +2355,8 @@ void incr_reset (JSON *self)
 
 void DESTROY (JSON *self)
 	CODE:
+        SvREFCNT_dec (self->v_false);
+        SvREFCNT_dec (self->v_true);
         SvREFCNT_dec (self->cb_sk_object);
         SvREFCNT_dec (self->cb_object);
         SvREFCNT_dec (self->incr_text);

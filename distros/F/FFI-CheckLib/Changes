@@ -1,5 +1,9 @@
 Revision history for FFI-CheckLib
 
+0.23      2018-11-18 00:07:49 -0500
+  - Handle DLLs on Windows with "dashed" version numbers (example: foo-1-2-3.dll)
+    (gh#10, gh#11, SLAFFAN++)
+
 0.22      2018-10-13 22:24:46 -0400
   - Production version identical to 0.21_01
 

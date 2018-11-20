@@ -7,7 +7,7 @@ my $build = Module::Build->new(
 
 	dist_abstract => 'Create Mazes',
 	dist_author => 'John M. Gamble <jgamble@cpan.org>',
-	dist_version => '1.08',
+	dist_version => '1.09',
 	dist_name => 'Games-Maze',
 
 	#
@@ -26,12 +26,14 @@ my $build = Module::Build->new(
 	},
 
 	requires => {
-		perl => '5.8.3',
-		parent => 0,
+		perl => '5.016001',
+		Moo => 0,
+		'Scalar::Util' => 1.09,
+		'Type::Tiny' => 1.004,
 	},
 
 	configure_requires => {
-		'Module::Build' => '0.3624',
+		'Module::Build' => '0.4',
 	},
 
 	build_requires => {

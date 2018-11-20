@@ -8,6 +8,8 @@ META.json
 META.yml
 Makefile.PL
 README.md
+cpanfile
+dist.ini
 lib/Types/SQL.pm
 lib/Types/SQL/Util.pm
 t/00-report-prereqs.dd

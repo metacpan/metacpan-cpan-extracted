@@ -1,5 +1,5 @@
 package ZMQ::Raw::Error;
-$ZMQ::Raw::Error::VERSION = '0.26';
+$ZMQ::Raw::Error::VERSION = '0.27';
 use strict;
 use warnings;
 use Carp;
@@ -38,7 +38,7 @@ ZMQ::Raw::Error - Error class
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 

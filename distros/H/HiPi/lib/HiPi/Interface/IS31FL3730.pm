@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::IS31FL3730
 # Description  : Interface to IS31FL3730 matrix LED driver
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2018 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -18,7 +18,7 @@ use HiPi::RaspberryPi;
 use Carp;
 use Try::Tiny;
 
-our $VERSION ='0.72';
+our $VERSION ='0.74';
 
 __PACKAGE__->create_accessors( qw( ) );
 

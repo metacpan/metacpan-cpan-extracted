@@ -139,8 +139,6 @@ sub s_decode($$;$) {
         $data = eval {
             JSON->new(
                 )->allow_nonref($o->{allow_nonref}
-                )->canonical($o->{canonical}
-                )->pretty($o->{pretty}
                 )->relaxed($o->{relaxed}
             )->decode($data);
         };
@@ -158,7 +156,7 @@ sub s_decode($$;$) {
 }
 
 sub s_dump(@) {
-    my ($uri, $fmt, $opts) = (shift, shift, shift);
+    my ($uri, $fmt, $opts) = splice @_, 0, 3;
 
     $uri = \*STDOUT if ($uri eq '-');
 
@@ -209,7 +207,7 @@ sub s_encode($$;$) {
 sub s_fmt_by_uri($) {
     my @names = split(/\./, basename(shift));
     if (@names and @names > 1) {
-        my $ext = uc(pop @names);
+        my $ext = uc($names[-1]);
         return 'YAML' if ($ext eq 'YML' or $ext eq 'YAML');
     }
 

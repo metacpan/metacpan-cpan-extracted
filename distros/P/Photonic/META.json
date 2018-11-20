@@ -42,6 +42,7 @@
             "Carp" : "0",
             "Inline" : "0",
             "List::Util" : "0",
+            "Machine::Epsilon" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
             "Moose::Util::TypeConstraints" : "0",
@@ -50,7 +51,8 @@
             "PDL::IO::Pic" : "0",
             "PDL::IO::Storable" : "0",
             "PDL::NiceSlice" : "0",
-            "Storable" : "0"
+            "Storable" : "0",
+            "namespace::autoclean" : "0"
          }
       },
       "test" : {
@@ -63,107 +65,123 @@
    "provides" : {
       "Photonic" : {
          "file" : "lib/Photonic.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::CharacteristicFunctions" : {
          "file" : "lib/Photonic/CharacteristicFunctions.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::ExtraUtils" : {
          "file" : "lib/Photonic/ExtraUtils.pd",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Geometry" : {
          "file" : "lib/Photonic/Geometry.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Geometry::FromImage2D" : {
          "file" : "lib/Photonic/Geometry/FromImage2D.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::NonRetarded::AllH" : {
          "file" : "lib/Photonic/NonRetarded/AllH.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::NonRetarded::EpsL" : {
          "file" : "lib/Photonic/NonRetarded/EpsL.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::NonRetarded::EpsTensor" : {
          "file" : "lib/Photonic/NonRetarded/EpsTensor.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::NonRetarded::FieldH" : {
          "file" : "lib/Photonic/NonRetarded/FieldH.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::NonRetarded::OneH" : {
          "file" : "lib/Photonic/NonRetarded/OneH.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::NonRetarded::SH" : {
          "file" : "lib/Photonic/NonRetarded/SH.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::NonRetarded::SHChiTensor" : {
          "file" : "lib/Photonic/NonRetarded/SHChiTensor.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::NonRetarded::SHP" : {
          "file" : "lib/Photonic/NonRetarded/SHP.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Retarded::AllH" : {
          "file" : "lib/Photonic/Retarded/AllH.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Retarded::EpsilonP" : {
          "file" : "lib/Photonic/Retarded/EpsilonP.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Retarded::EpsilonTensor" : {
          "file" : "lib/Photonic/Retarded/EpsilonTensor.pm",
-         "version" : "0.009"
+         "version" : "0.010"
+      },
+      "Photonic::Retarded::EpsilonTensorF" : {
+         "file" : "lib/Photonic/Retarded/EpsilonTensorF.pm",
+         "version" : "0.010"
+      },
+      "Photonic::Retarded::FieldH" : {
+         "file" : "lib/Photonic/Retarded/FieldH.pm",
+         "version" : "0.010"
       },
       "Photonic::Retarded::Green" : {
          "file" : "lib/Photonic/Retarded/Green.pm",
-         "version" : "0.009"
+         "version" : "0.010"
+      },
+      "Photonic::Retarded::GreenF" : {
+         "file" : "lib/Photonic/Retarded/GreenF.pm",
+         "version" : "0.010"
       },
       "Photonic::Retarded::GreenP" : {
          "file" : "lib/Photonic/Retarded/GreenP.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Retarded::Metric" : {
          "file" : "lib/Photonic/Retarded/Metric.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Retarded::OneH" : {
          "file" : "lib/Photonic/Retarded/OneH.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Retarded::Wave" : {
          "file" : "lib/Photonic/Retarded/Wave.pm",
-         "version" : "0.009"
+         "version" : "0.010"
+      },
+      "Photonic::Retarded::WaveF" : {
+         "file" : "lib/Photonic/Retarded/WaveF.pm",
+         "version" : "0.010"
       },
       "Photonic::Retarded::WaveP" : {
          "file" : "lib/Photonic/Retarded/WaveP.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Roles::EpsParams" : {
          "file" : "lib/Photonic/Roles/EpsParams.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Roles::KeepStates" : {
          "file" : "lib/Photonic/Roles/KeepStates.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Types" : {
          "file" : "lib/Photonic/Types.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "Photonic::Utils" : {
          "file" : "lib/Photonic/Utils.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -172,6 +190,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.009",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.010",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

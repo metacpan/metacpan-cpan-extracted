@@ -35,14 +35,14 @@ subtest 'unlink on a missing file' => sub {
 
 subtest 'unlink on a existing directory' => sub {
     $! = 0;
-    is( CORE::unlink($temp_dir_name), 0,      "REAL CORE::unlink returns 0 files deleted." );
-    is( $! + 0,                       EISDIR, '$! is set to EISDIR' );
+    is( CORE::unlink($temp_dir_name), 0, "REAL CORE::unlink returns 0 files deleted." );
+    my $real_dir_unlink_error = $! + 0;
 
     my $mock = Test::MockFile->dir( $temp_dir_name, [] );
 
     $! = 0;
-    is( unlink($temp_dir_name), 0,      "MOCKED unlink returns 0 files deleted." );
-    is( $! + 0,                 EISDIR, '$! is set to EISDIR' );
+    is( unlink($temp_dir_name), 0, "MOCKED unlink returns 0 files deleted." );
+    is( $! + 0, $real_dir_unlink_error, '$! is set to EISDIR' );
 };
 
 subtest 'unlink on an existing file' => sub {

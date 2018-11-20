@@ -3,7 +3,10 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::Bundle::Extended;
+use Test2::Tools::Explain;
+use Test2::Plugin::NoWarnings;
+
 use File::Temp qw/tempfile/;
 
 use Test::MockFile;    # Everything below this can have its open overridden.
@@ -24,7 +27,7 @@ is( -s $filename, 11, "Temp file is on disk and right size assuming a re-write h
 note "-------------- MOCK MODE --------------";
 my $bar = Test::MockFile->file($filename);
 is( open( my $fh, '>', $filename ), 1, "Mocked temp file opens for write and returns true" );
-isa_ok( $fh, "IO::File", '$fh is a IO::File' );
+isa_ok( $fh, ["IO::File"], '$fh is a IO::File' );
 like( "$fh", qr/^IO::File=GLOB\(0x[0-9a-f]+\)$/, '$fh stringifies to a IO::File GLOB' );
 my $oneline = "Just one line";
 is( ( print {$fh} $oneline ), 13, "overwrite the contents" );
@@ -35,9 +38,11 @@ ok( $!, '$! hasn\'t been cleared' );
 is( open( $fh, '>>', $filename ), 1, 'Re-open $fh for append' );
 is( ( print $fh " but really long\n" ), 17, "Append line" );
 my $bytes = printf $fh "%04d", 42;
-is( $bytes,         4,                                "Append line with a printf" );
+is( $bytes, 4, "Append line with a printf" );
 is( $bar->contents, "$oneline but really long\n0042", '$foo->contents reflects an append' );
-is( close($fh),     1,                                'Close $fh' );
+my $undef_len = print $fh undef;
+is( $undef_len, 0, "Printing undef returns 0 and is not a warning." );
+is( close($fh), 1, 'Close $fh' );
 ok( $!, '$! hasn\'t been cleared' );
 undef $bar;
 

@@ -1,3 +1,28 @@
+0.0392 2018-11-20
+  - add subroutine import syntax
+    use Foo (bar, baz);
+  - allow string index access
+    my $char = $string->[0];
+0.0392 2018-11-19
+  - add copy_string;
+  - add copy_byte_array;
+  - add copy_short_array;
+  - add copy_int_array;
+  - add copy_long_array;
+  - add copy_float_array;
+  - add copy_double_array;
+  - add copy_object_array;
+  - add length keyword to get string length
+  - don't allow @$foo in list context
+0.0391 2018-11-17
+  - field name become not conflict reserved words and core func names
+  - rename Native Interface to Native API
+  - rename SPVM::PerlAPI to SPVM::ExchangeAPI
+  - add SPVM::Data::Package
+  - add to_string to SPVM::Data::Array
+  - add SPVM::Data::String for SPVM string type
+  - add SPVM::new_string
+  - add SPVM::new_string_from_binary
 0.0390 2018-11-16
   - package variable must start upper case or contain ::
   - add SPVM::List module

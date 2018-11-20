@@ -1,5 +1,5 @@
 package App::Deps::Verify;
-$App::Deps::Verify::VERSION = '0.4.0';
+$App::Deps::Verify::VERSION = '0.6.0';
 # ABSTRACT: An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.
 
 use strict;
@@ -112,7 +112,7 @@ sub _find_perl5_modules
             my $v = $required_modules->{$m};
             local $SIG{__WARN__} = sub { };
             my $verdict = eval( "use $m " . ( $v || '' ) . ' ();' );
-            my $Err = $@;
+            my $Err     = $@;
 
             if ($Err)
             {
@@ -347,7 +347,7 @@ App::Deps::Verify - An app and API to verify the presence of dependencies (Perl
 
 =head1 VERSION
 
-version 0.4.0
+version 0.6.0
 
 =head1 SYNOPSIS
 

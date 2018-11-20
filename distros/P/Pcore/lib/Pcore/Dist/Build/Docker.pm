@@ -3,7 +3,7 @@ package Pcore::Dist::Build::Docker;
 use Pcore -class, -ansi;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 
-has dist => ();                                              # InstanceOf ['Pcore::Dist']
+has dist          => ();                                     # InstanceOf ['Pcore::Dist']
 has dockerhub_api => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::DockerHub']
 
 sub _build_dockerhub_api($self) {

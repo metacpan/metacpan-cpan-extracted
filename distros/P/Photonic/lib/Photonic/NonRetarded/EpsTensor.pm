@@ -4,7 +4,7 @@ Photonic::NonRetarded::EpsTensor
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -78,10 +78,6 @@ The dielectric tensor
 
 The maximum number of Haydock coefficients to use.
 
-=item * nhActual
-
-The actual number of Haydock coefficients used in the last calculation
-
 =item * converged
 
 Flags that the last calculation converged before using up all coefficients
@@ -98,7 +94,7 @@ don't check. From Photonic::Roles::EpsParams.
 =cut
 
 package Photonic::NonRetarded::EpsTensor;
-$Photonic::NonRetarded::EpsTensor::VERSION = '0.009';
+$Photonic::NonRetarded::EpsTensor::VERSION = '0.010';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -117,6 +113,8 @@ has 'geometry'=>(is=>'ro', isa => 'Photonic::Geometry',
 );
 with 'Photonic::Roles::KeepStates';
 with 'Photonic::Roles::EpsParams';
+has 'reorthogonalize'=>(is=>'ro', required=>1, default=>0,
+         documentation=>'Reorthogonalize haydock flag');
 has 'nr' =>(is=>'ro', isa=>'ArrayRef[Photonic::NonRetarded::AllH]',
             init_arg=>undef, lazy=>1, builder=>'_build_nr',
             documentation=>'Array of Haydock calculators');
@@ -167,8 +165,10 @@ sub _build_nr { # One Haydock coefficients calculator per direction0
 	my $g=dclone($self->geometry); #clone geometry
 	$g->Direction0($_); #add G0 direction
 	#Build a corresponding NonRetarded::AllH structure
-	my $nr=Photonic::NonRetarded::AllH->new(geometry=>$g, smallH=>$self->smallH, 
-			   nh=>$self->nh, keepStates=>$self->keepStates);
+	my $nr=Photonic::NonRetarded::AllH->new(
+	    geometry=>$g, smallH=>$self->smallH, 
+	    nh=>$self->nh, keepStates=>$self->keepStates,
+	    reorthogonalize=>$self->reorthogonalize);
 	push @nr, $nr;
     }
     return [@nr]

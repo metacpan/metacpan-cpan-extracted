@@ -4,7 +4,7 @@ Photonic::Retarded::Wave
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -59,13 +59,13 @@ The macroscopic wave operator of the last operation
 =cut
 
 package Photonic::Retarded::Wave;
-$Photonic::Retarded::Wave::VERSION = '0.009';
+$Photonic::Retarded::Wave::VERSION = '0.010';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
 use PDL::Complex;
 use PDL::MatrixOps;
-use Storable qw(dclone);
+use Storable qw(dclone store);
 use PDL::IO::Storable;
 #use Photonic::Retarded::AllH;
 use Moose;
@@ -92,6 +92,17 @@ around 'evaluate' => sub {
     $self->_waveOperator($wave);
     return $wave;
 };
+
+# I guess having around and after evaluate might be wrong
+# Worries me as this is the old wave routine.
+after 'evaluate' => sub {
+    my $self=shift;
+    return unless $self->outputfilename;
+    my $hay=$self->haydock;
+    my $oname=$self->outputfilename;
+    store $hay, $oname;
+};
+
 
 __PACKAGE__->meta->make_immutable;
     

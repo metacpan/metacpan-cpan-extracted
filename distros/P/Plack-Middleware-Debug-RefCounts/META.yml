@@ -8,6 +8,7 @@ build_requires:
   HTTP::Request::Common: '0'
   Plack::Builder: '0'
   Plack::Test: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
@@ -22,7 +23,9 @@ no_index:
     - t
     - inc
 requires:
+  Data::Dumper: '0'
   Devel::Gladiator: '0'
+  Env: '0'
   Plack::Middleware::Debug::Base: '0'
   Scalar::Util: '0'
   namespace::clean: '0'
@@ -31,5 +34,5 @@ resources:
   bugtracker: https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts/issues
   homepage: https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts
   repository: https://github.com/GrantStreetGroup/Plack-Middleware-Debug-RefCounts.git
-version: '0.90'
+version: '0.91'
 x_authority: cpan:GSG

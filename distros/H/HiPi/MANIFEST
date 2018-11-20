@@ -112,6 +112,7 @@ lib/HiPi/Graphics/BitmapFont/SerifExtended29.pm
 lib/HiPi/Graphics/BitmapFont/SerifExtended37.pm
 lib/HiPi/Graphics/BitmapFont/SerifExtended9.pm
 lib/HiPi/Graphics/DrawingContext.pm
+lib/HiPi/Graphics/Font5x7.pm
 lib/HiPi/Interface.pm
 lib/HiPi/Interface/Common/HD44780.pm
 lib/HiPi/Interface/Common/MCP23X17.pm
@@ -138,6 +139,8 @@ lib/HiPi/Interface/HTADCI2C.pm
 lib/HiPi/Interface/HTBackpackV2.pm
 lib/HiPi/Interface/IS31FL3730.pm
 lib/HiPi/Interface/LCDBackpackPCF8574.pm
+lib/HiPi/Interface/MAX7219.pm
+lib/HiPi/Interface/MAX7219LEDStrip.pm
 lib/HiPi/Interface/MCP23017.pm
 lib/HiPi/Interface/MCP23S17.pm
 lib/HiPi/Interface/MCP3004.pm
@@ -157,6 +160,7 @@ lib/HiPi/Interface/PCF8574.pm
 lib/HiPi/Interface/SerLCD.pm
 lib/HiPi/Interface/Si470N.pm
 lib/HiPi/Interface/TMP102.pm
+lib/HiPi/Interface/ZeroSeg.pm
 lib/HiPi/Pin.pm
 lib/HiPi/RaspberryPi.pm
 lib/HiPi/RF/OpenThings.pm

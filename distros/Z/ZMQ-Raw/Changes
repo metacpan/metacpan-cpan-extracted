@@ -1,5 +1,9 @@
 Revision history for ZMQ-Raw
 
+0.27      2018-11-20 10:10:28+02:00 Africa/Johannesburg
+
+ - Update to libzmq 1bb0d63f1
+
 0.26      2018-07-10 13:22:10+02:00 Africa/Johannesburg
 
  - Circular reference fixes.

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 1.02
 
 SYNOPSIS
 
@@ -17,9 +17,13 @@ DESCRIPTION
 
 SEE ALSO
 
-    Dist::Zilla::Plugin::FFI
+    Dist::Zilla::Plugin::FFI::Build
 
       Install the FFI::Build::MM layer into your Makefile.PL.
+
+    Dist::Zilla::Plugin::FFI::CheckLib
+
+      Add FFI::CheckLib checks into your Makefile.PL.
 
 AUTHOR
 

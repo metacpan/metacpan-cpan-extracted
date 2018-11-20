@@ -1,5 +1,14 @@
 Revision history for App-NDTools
 
+0.6.2   2018-11-19
+        - nddiff: --full-headers opt is no longer supported
+        - nddiff: JSON Patch output format supported
+        - nddiff: JSON Merge Patch output format supported
+        - ndproc: Patch (Nested Diff) module added
+        - ndproc: Json Patch module added
+        - ndproc: JSON Merge Patch module added
+        - cosmetics, unsignificant tweaks
+
 0.6.1   2018-09-05
         - nddiff: term diff fixed for text vs number case
         - nddiff: term diff fixed for number vs its string form

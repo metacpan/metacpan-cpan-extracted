@@ -12,11 +12,11 @@ Photonic - A perl package for calculations on photonics and metamaterials.
 
 =head1 VERSION
 
-Version 0.009
+Version 0.010
 
 =cut
     
-$Photonic::VERSION = '0.009';
+$Photonic::VERSION = '0.010';
 
 =head1 SYNOPSIS
 
@@ -63,7 +63,7 @@ Definition of some types.
 
 Some useful functions.
 
-=item L<Photonic::NonRetarded::One>
+=item L<Photonic::NonRetarded::OneH>
 
 Object to calculate one Haydock coefficient.
 
@@ -101,6 +101,66 @@ nonretarded regime.
 Object to calculate the second harmonic susceptibility tensor in the
 non retarded regime using the dipolium model.
 
+=item L<Photonic::Retarded::OneH>
+
+Object to calculate one Haydock coefficient with retardation.
+
+=item L<Photonic::Retarded::AllH>
+
+Object to calculate all Haydock coeffficients with retardation.
+
+=item L<Photonic::Retarded::EpsilonP>
+
+Object to calculate the retarded macroscopic dielectric response along
+a principal direction.  
+
+=item L<Photonic::Retarded::EpsilonTensorF>
+
+Object to calculate the retarded macroscopic dielectric tensor
+including girotropy. 
+
+=item L<Photonic::Retarded::EpsilonTensor>
+
+Object to calculate the retarded macroscopic dielectric tensor without
+girotropy. 
+
+=item L<Photonic::Retarded::FieldH>
+
+Object to calculate the microscopic retarded electric field.
+
+=item L<Photonic::Retarded::GreenF>
+
+Object to calculate the macroscopic inverse of the (retarded) wave operator
+including girotropy.
+
+=item L<Photonic::Retarded::Green>
+
+Object to calculate the macroscopic inverse of the (retarded) wave operator
+including girotropy.
+
+=item L<Photonic::Retarded::GreenP>
+
+Object to calculate the macroscopic inverse of the (retarded) wave operator
+along a principal direction.
+
+=item L<Photonic::Retarded::Metric>
+
+Object to provide a Metric tensor for Haydock's retarded calculations.
+
+=item L<Photonic::Retarded::WaveF>
+
+Objecto to calculate the macroscopic retarded wave operator including
+girotropy. 
+
+=item L<Photonic::Retarded::Wave>
+
+Objecto to calculate the macroscopic retarded wave operator without
+girotropy. 
+
+=item L<Photonic::Retarded::WaveP>
+
+Objecto to calculate the macroscopic retarded wave operator along a
+principal direction.
 
 =item L<Photonic::Roles::EpsParams>
 

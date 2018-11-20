@@ -22,7 +22,7 @@ use namespace::autoclean;
 
 # ABSTRACT: a library of SQL types
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.3.1';
 
 
 sub VERSION { # for older Perls
@@ -192,7 +192,7 @@ Types::SQL - a library of SQL types
 
 =head1 VERSION
 
-version v0.2.1
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -286,6 +286,11 @@ C<add_column> method of L<DBIx::Class::ResultSource>.
 
 =for readme continue
 
+=head1 ROADMAP
+
+Support for Perl versions earlier than 5.10 will be removed sometime
+in 2019.
+
 =head1 SEE ALSO
 
 L<Type::Tiny>.
@@ -311,6 +316,12 @@ feature.
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Slaven Rezić
+
+Slaven Rezić <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 

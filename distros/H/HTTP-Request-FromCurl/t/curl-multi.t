@@ -35,7 +35,7 @@ sub curl_request( @args ) {
     my ($stdout, $stderr, $exit) = curl(@args);
 
     my @res;
-    
+
     if( ! $exit ) {
         my @requests = grep { /^> /m } split /^\* .*$/m, $stderr;
         for my $stderr (@requests) {
@@ -50,10 +50,15 @@ sub curl_request( @args ) {
             $res{ method } = $1;
             $res{ path } = $2;
             $res{ protocol } = $3;
-    
+
             $res{ headers } = { map { /^> ([^:]+)\s*:\s*([^\r\n]*)$/ ? ($1 => $2) : () } @sent };
+
+            # Fix weirdo CentOS6 build of Curl which has a weirdo User-Agent header:
+            if( exists $res{ headers }->{ 'User-Agent' }) {
+                $res{ headers }->{ 'User-Agent' } =~ s!^(curl/7\.19\.7)\b.+!$1!;
+            };
             $res{ response_body } = $stdout;
-            
+
             push @res, \%res
         };
     } else {
@@ -102,7 +107,7 @@ sub request_identical_ok {
 
     my $name = $test->{name} || (join " ", @{ $test->{cmd}});
     my $status;
-    
+
     my $requests = @r;
     if( $requests != @res ) {
         is $requests, 0+@res, "$name (requests)";
@@ -118,26 +123,26 @@ sub request_identical_ok {
             diag join " ", @{ $test->{cmd} };
             return;
         };
-    
+
         if( url_decode($r->uri->path_query) ne $res->{path} ) {
             is url_decode($r->uri->path_query), $res->{path}, $name;
             diag join " ", @{ $test->{cmd} };
             return;
         };
-    
+
         # There is no convenient way to get at the form data from curl
         #if( $r->content ne $res->{body} ) {
         #    is $r->content, $res->{body}, $name;
         #    diag join " ", @{ $test->{cmd} };
         #    return;
         #};
-    
+
         my %got = %{ $r->headers };
         if( $test->{ignore} ) {
             delete @got{ @{ $test->{ignore}}};
             delete @{$res->{headers}}{ @{ $test->{ignore}}};
         };
-    
+
         is_deeply \%got, $res->{headers}, $name;
     };
 

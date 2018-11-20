@@ -1,175 +1,65 @@
-NAME
-    Data::RecordStore - Simple and fast record based data store
+Data::RecordStore internals
 
-SYNPOSIS
-    use Data::RecordStore;
 
-    my $store = Data::RecordStore->open_store( $directory );
 
-    my $data = "TEXT DATA OR BYTES";
+Directory Structure
+   datastore_root
+        |
+        +- VERSION     # version file (text)
+        |
+        +- RECORD_INDEX_SILO # subdirectory with silo that indexes all records, indexed by Record ID
+        |         |
+        |         +- 0   # silo file with record size 12 and pack template "IL" for Silo Number and index in silo
+        |
+        +- silos  # subdirectory with silo subdirectories named by Silo Number and _RECORDSTORE
+        |    |
+        |    +- 12_RECORDSTORE   # subdirectory for silo #12 of record size 4096 (2^12) 
+        |    |       |
+        |    |       +- 0   # first silo file of record data for store 12 (up to 2GB or configured max file size)
+        |    |       |      # has pack template "LZ*" for Record ID and byte data
+        |    |       |
+        |    |       +- 1   # second silo file of record data for store 12
+        |    |       |      # has pack template "LZ*" for Record ID and byte data
+        |    |       |
+        |    |       |  ... more silo files
+        |    |
+        |    +- 13_RECORDSTORE   # subdirectory for silo #13 of record size 8192 (2^13) and pack template "LZ*"
+        |    |       |
+        |    |       +- 0   # silo file with record data with pack template "LZ*" for Record ID and data
+        |    |
+        |    | ... more silo subdirectories
+        |
+        +- RECYC_SILO  # subdirectory with silo that keeps track of recycled ids
+        |         |
+        |         +- 0   # silo file with record size 8 and pack template "L" for Record ID
+        |
+        +- TRANS  # subdirectory with silo that keeps track of transactions
+                  |
+                  +- META # subdirectory with silo that keeps track of transactions
+                  |    |
+                  |    +- 0   # silo file  with size 24 and pack template "ILLI" ( Transaction ID, process id, timestamp, transaction state )
+                  |           # states are TRA_ACTIVE, TRA_IN_COMMIT, TRA_IN_ROLLBACK, TRA_CLEANUP_COMMIT, TRA_CLEANUP_ROLLBACK, TRA_DONE
+                  |
+                  +- instances      # subdirectory of active transaction silo subdirectories
+                       |
+                       +- trans_id  # silo subdirectory file with transaction action data. The name is the Transaction ID
+                       |    |
+                       |    +- 0   # silo file with pack template "ALILIL", for transaction type, Record ID, from_silo_number, from_silo_index, to_silo_number, to_silo_index,
+                       |           # transaction types : S - stow, D - delete, R - recycle
+                       |
+                       +- D_trans_id  # 'directory' silo file. The name is the Transaction ID with the suffix "_trans_id"
+                            |         # stores Record IDs that have been changed in this transaction. Used to ensure fetch returns
+                            |         # the value this has so far in the transaction.
+                            |
+                            +- 0   # silo file with pack template "L",
 
-    my $id = $store->stow( $data, $optionalID );
+Silo Files
+   Silo files store byte data in a fixed record format. Each silo has a record size.
+   The number of records in a silo file is equal to the file size divided by the record size.
+   The indexes into a silo file start counting at 1.
+   Entry idx inside a silo file will be at file byte RECORD_SIZE * (idx-1)
 
-    my $val = $store->fetch( $id );
+Transactions
+   
 
-    my $new_or_recycled_id = $store->next_id;
-
-    $store->stow( "MORE DATA", $new_or_recycled_id );
-
-    my $has_object_at_id = $store->has_id( $someid );
-
-    $store->delete( $someid );
-
-    $store->empty_recycler; $store->recycle( $dead_id );
-
-DESCRIPTION
-    A simple and fast way to store arbitrary text or byte data. It is
-    written entirely in perl with no non-core dependencies. It is designed
-    to be both easy to set up and easy to use.
-
-LIMITATIONS
-    Data::RecordStore is not meant to store huge amounts of data. It will
-    fail if it tries to create a file size greater than the max allowed by
-    the filesystem. This limitation may be removed in subsequent versions.
-    This limitation is most important when working with sets of data that
-    approach the max file size of the system in question.
-
-    This is not written with thread safety in mind, so unexpected behavior
-    can occur when multiple Data::RecordStore objects open the same
-    directory. Locking coordination is currently the responsibility of the
-    implementation.
-
-METHODS
-  open_store( directory )
-    Takes a single argument - a directory, and constructs the data store in
-    it. The directory must be writeable or creatible. If a RecordStore
-    already exists there, it opens it, otherwise it creates a new one.
-
-  stow( data, optionalID )
-    This saves the text or byte data to the record store. If an id is passed
-    in, this saves the data to the record for that id, overwriting what was
-    there. If an id is not passed in, it creates a new record store.
-
-    Returns the id of the record written to.
-
-  fetch( id )
-    Returns the record associated with the ID. If the ID has no record
-    associated with it, undef is returned.
-
-  entry_count
-    Returns how many active ids have been assigned in this store. If an ID
-    was assigned but not used, it still counts towards the number of
-    entries.
-
-  delete( id )
-    Removes the entry with the given id from the store, freeing up its
-    space. It does not reuse the id.
-
-  has_id( id )
-      Returns true if an object with this id exists in the record store.
-
-  next_id
-    This sets up a new empty record and returns the id for it.
-
-  empty()
-    This empties out the entire record store completely. Use only if you
-    mean it.
-
-  empty_recycler()
-      Clears out all data from the recycler
-
-  recycle( id, keep_data_flag )
-      Ads the id to the recycler, so it will be returned when next_id is called.
-      This removes the data occupied by the id, freeing up space unles keep_data_flag
-      is set to true.
-
-HELPER PACKAGES
-    Data::RecordStore relies on two helper packages that are useful in their
-    own right and are documented here.
-
-HELPER PACKAGE
-    Data::RecordStore::FixedStore
-
-DESCRIPTION
-    A fixed record store that uses perl pack and unpack templates to store
-    identically sized sets of data and uses a single file to do so.
-
-SYNOPSIS
-    my $template = "LII"; # perl pack template. See perl pack/unpack.
-
-    my $size; #required if the template does not have a definite size, like
-    A*
-
-    my $store = Data::RecordStore::FixedStore->open_fixed_store( $template,
-    $filename, $size );
-
-    my $new_id = $store->next_id;
-
-    $store->put_record( $id, [ 321421424243, 12, 345 ] );
-
-    my $more_data = $store->get_record( $other_id );
-
-    my $removed_last = $store->pop;
-
-    my $last_id = $store->push( $data_at_the_end );
-
-    my $entries = $store->entry_count;
-
-    if( $entries < $min ) {
-
-        $store->_ensure_entry_count( $min );
-
-    }
-
-    $store->emtpy;
-
-    $store->unlink_store;
-
-METHODS
-  open_fixed_store( template, filename, size )
-    Opens or creates the file given as a fixed record length data store. If
-    a size is not given, it calculates the size from the template, if it
-    can. This will die if a zero byte record size is determined.
-
-  empty
-    This empties out the database, setting it to zero records.
-
-  
-    Returns the number of entries in this store. This is the same as the
-    size of the file divided by the record size.
-
-  get_record( idx )
-    Returns an arrayref representing the record with the given id. The array
-    in question is the unpacked template.
-
-  next_id
-    adds an empty record and returns its id, starting with 1
-
-  pop
-    Remove the last record and return it.
-
-  last_entry
-    Return the last record.
-
-  push( data )
-    Add a record to the end of this store. Returns the id assigned to that
-    record. The data must be a scalar or list reference. If a list
-    reference, it should conform to the pack template assigned to this
-    store.
-
-  push( idx, data )
-    Saves the data to the record and the record to the filesystem. The data
-    must be a scalar or list reference. If a list reference, it should
-    conform to the pack template assigned to this store.
-
-  unlink_store
-    Removes the file for this record store entirely from the file system.
-
-AUTHOR
-       Eric Wolf        coyocanid@gmail.com
-COPYRIGHT AND LICENSE
-           Copyright (c) 2015-2017 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
-           under the same terms as Perl itself.
-
-VERSION
-       Version 2.03  (Nov 21, 2017))
+Configurations

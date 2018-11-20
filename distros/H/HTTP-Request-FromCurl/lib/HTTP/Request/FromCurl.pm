@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -102,6 +102,7 @@ our @option_spec = (
     'verbose|v',
     'silent|s',
     #'c|cookie-jar=s',   # ignored
+    'buffer!',
     'compressed',
     'data|d=s@',
     'data-binary=s@',
@@ -111,10 +112,12 @@ our @option_spec = (
     'header|H=s@',
     'include|i',         # ignored
     'head|I',
-    'no-keepalive',
+    'max-time|m=s',
+    'keepalive!',
     'request|X=s',
     'oauth2-bearer=s',
     'output|o=s',
+    'progress-bar|#',    # ignored
     'user|u=s',
 );
 
@@ -283,6 +286,13 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         $headers{ 'User-Agent' } = $options->{ 'agent' };
     };
 
+    # Curl 7.61.0 ignores these:
+    #if( $options->{ keepalive }) {
+    #    $headers{ 'Keep-Alive' } = 1;
+    #} elsif( exists $options->{ keepalive }) {
+    #    $headers{ 'Keep-Alive' } = 0;
+    #};
+
     if( $options->{ compressed }) {
         my $compressions = HTTP::Message::decodable();
         $headers{ 'Accept-Encoding' } = $compressions;
@@ -295,6 +305,7 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         body   => $body,
         maybe credentials => $options->{ user },
         maybe output => $options->{ output },
+        maybe timeout => $options->{ 'max-time' },
     });
 };
 

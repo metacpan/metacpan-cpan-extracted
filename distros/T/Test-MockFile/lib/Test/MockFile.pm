@@ -33,15 +33,15 @@ use constant FOLLOW_LINK_MAX_DEPTH => 10;
 
 =head1 NAME
 
-Test::MockFile - Lets tests validate code which interacts with files without the file system ever being touched. 
+Test::MockFile - Allows tests to validate code that can interact with files without touching the file system.
 
 =head1 VERSION
 
-Version 0.011
+Version 0.012
 
 =cut
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 our %files_being_mocked;
 
@@ -192,7 +192,7 @@ See L<Mock Stats> for what goes in this hash ref.
 sub file {
     my ( $class, $file, $contents, @stats ) = @_;
 
-    length $file or die("No file provided to instantiate $class");
+    ( defined $file && length $file ) or die("No file provided to instantiate $class");
     $files_being_mocked{$file} and die("It looks like $file is already being mocked. We don't support double mocking yet.");
 
     my %stats;
@@ -264,7 +264,7 @@ Stats are not able to be specified on instantiation but can in theory be altered
 sub symlink {
     my ( $class, $readlink, $file ) = @_;
 
-    length $file or die("No file provided to instantiate $class");
+    ( defined $file && length $file ) or die("No file provided to instantiate $class");
     ( !defined $readlink || length $readlink ) or die("No file provided for $file to point to in $class");
 
     $files_being_mocked{$file} and die("It looks like $file is already being mocked. We don't support double mocking yet.");
@@ -295,7 +295,7 @@ See L<Mock Stats> for what goes in this hash ref.
 sub dir {
     my ( $class, $dir_name, $contents, @stats ) = @_;
 
-    length $dir_name or die("No directory name provided to instantiate $class");
+    ( defined $dir_name && length $dir_name ) or die("No directory name provided to instantiate $class");
     $files_being_mocked{$dir_name} and die("It looks like $dir_name is already being mocked. We don't support double mocking yet.");
 
     # Because undef means it's a missing dir.
@@ -444,7 +444,7 @@ sub _mock_stat {
         return FALLBACK_TO_REAL_OP();
     }
 
-    if ( !length $file_or_fh ) {
+    if ( !defined $file_or_fh || !length $file_or_fh ) {
         _real_file_access_hook( $type, [$file_or_fh] );
         return FALLBACK_TO_REAL_OP();
     }
@@ -452,7 +452,7 @@ sub _mock_stat {
     my $file = _find_file_or_fh( $file_or_fh, $follow_link );
     return $file if ref $file eq 'ARRAY';    # Allow an ELOOP to fall through here.
 
-    if ( !length $file ) {
+    if ( !defined $file or !length $file ) {
         _real_file_access_hook( $type, [$file_or_fh] );
         return FALLBACK_TO_REAL_OP();
     }
@@ -602,7 +602,12 @@ sub unlink {
     }
 
     if ( $self->is_dir ) {
-        $! = EISDIR;
+        if ( $^O eq 'freebsd' ) {
+            $! = EPERM;
+        }
+        else {
+            $! = EISDIR;
+        }
         return 0;
     }
 
@@ -710,7 +715,7 @@ returns true/false, depending on whether this object is a symlink.
 sub is_link {
     my ($self) = @_;
 
-    return ( length $self->{'readlink'} && $self->{'mode'} & S_IFLNK ) ? 1 : 0;
+    return ( defined $self->{'readlink'} && length $self->{'readlink'} && $self->{'mode'} & S_IFLNK ) ? 1 : 0;
 }
 
 =head2 is_dir
@@ -756,7 +761,7 @@ sub size {
 
 =head2 exists
 
-returns true or false base on if the file exists right now.
+returns true or false based on if the file exists right now.
 
 =cut
 
@@ -938,8 +943,8 @@ Since 5.10, it has been possible to override function calls by defining them. li
 
     *CORE::GLOBAL::open = sub(*;$@) {...}
     
-Any code which is loaded B<AFTER> this happens will use the alternate open. This means you can place your C<use Test::MockFile> statement after statements you don't want mocked and
-there is no risk that that code will ever be altered by Test::MockModule.
+Any code which is loaded B<AFTER> this happens will use the alternate open. This means you can place your C<use Test::MockFile> statement after statements you don't want to be mocked and
+there is no risk that the code will ever be altered by Test::MockModule.
 
 We oveload the following statements and then return tied handles to enable the rest of the IO functions to work properly. Only B<open> / B<sysopen> are needed to address file operations.
 However B<opendir> file handles were never setup for tie so we have to override all of B<opendir>'s related functions.

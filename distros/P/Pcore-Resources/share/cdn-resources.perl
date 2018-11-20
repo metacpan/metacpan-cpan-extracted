@@ -1,5 +1,5 @@
 {    #
-    fa             => sub ( $cdn, $ver = 'v5.4.1' )  { [ $cdn->get_css_tag("/static/fa-$ver/css/all.min.css") ] },    #
+    fa             => sub ( $cdn, $ver = 'v5.5.0' )  { [ $cdn->get_css_tag("/static/fa-$ver/css/all.min.css") ] },    #
     jquery3        => sub ( $cdn, $ver = 'v3.3.1' )  { [ $cdn->get_script_tag("/static/jquery-$ver.min.js") ] },
     united_gallery => sub ( $cdn, $ver = 'v1.7.45' ) { [                                                              #
         $cdn->get_script_tag("/static/unitegallery-$ver/js/unitegallery.min.js"),
@@ -10,11 +10,11 @@
         # $cdn->get_css_tag("/static/unitegallery-$ver/themes/default/ug-theme-default.css"),
     ] },
 
-    amcharts3_base => sub ( $cdn, $ver = 'v3.21.14' ) { $cdn->("/static/amcharts-$ver/") },    #
-    ammap3_base    => sub ( $cdn, $ver = 'v3.21.14' ) { $cdn->("/static/ammap-$ver/") },
+    amcharts3_path => sub ( $cdn, $ver = 'v3.21.14' ) { $cdn->("/static/amcharts-$ver/") },    #
+    ammap3_path    => sub ( $cdn, $ver = 'v3.21.14' ) { $cdn->("/static/ammap-$ver/") },
 
-    amcharts4_base         => sub ( $cdn, $ver = 'v4.0.0.b56' ) { $cdn->("/static/amcharts-$ver/") },           #
-    amcharts4_geodata_base => sub ( $cdn, $ver = 'v4.0.13' )    { $cdn->("/static/amcharts-geodata-$ver/") },
+    amcharts4_path         => sub ( $cdn, $ver = 'v4.0.0.b56' ) { $cdn->("/static/amcharts-$ver/") },           #
+    amcharts4_geodata_path => sub ( $cdn, $ver = 'v4.0.13' )    { $cdn->("/static/amcharts-geodata-$ver/") },
 
     ext => sub ( $cdn, $ver, $type, $theme, $default_theme, $debug = undef ) {
         $ver ||= 'v6.6.0';

@@ -2,7 +2,7 @@ package Rarbg::torrentapi;
 
 use strict;
 use 5.008_005;
-our $VERSION = 'v0.1.7';
+our $VERSION = 'v0.1.8';
 use LWP::UserAgent;
 use JSON;
 use Carp;
@@ -12,7 +12,7 @@ use Moose;
 
 our $BASEURL = 'https://torrentapi.org/pubapi_v2.php?';
 
-has [qw(search_string search_imdb search_tvrage search_tvdb category)] => (
+has [qw(search_string search_imdb search_themoviedb search_tvdb category)] => (
     is  => 'rw',
     isa => 'Str'
 );
@@ -79,12 +79,12 @@ has _token => (
 has _token_time => (
     is      => 'rw',
     isa     => 'Int',
-    default => 1,
+    default => -1,
 );
 
 sub _renew_token {
-    my $self     = shift;
-    my $url      = $BASEURL . "get_token=get_token&app_id=" . $self->app_id;
+    my $self = shift;
+    my $url  = $BASEURL . "get_token=get_token&app_id=" . $self->app_id;
     my $res_json = $self->_ua->get($url);
     sleep 1;
     if ( $res_json->is_success ) {
@@ -104,8 +104,8 @@ sub _token_valid {
 
 sub _make_request {
     my $self = shift;
-    unless ($self->_token_valid) {
-        $self->_token($self->_renew_token);
+    unless ( $self->_token_valid ) {
+        $self->_token( $self->_renew_token );
     }
     my $url = $BASEURL;
     foreach my $attribute ( $self->meta->get_attribute_list ) {
@@ -193,9 +193,9 @@ Rarbg::torrentapi - Wrapper around Rarbg torrentapi (L<https://torrentapi.org/ap
       search_imdb => 'tt123456'
   });
 
-  # search by tvrage id
+  # search by themoviedb id
   my $search = $tapi->search({
-      search_tvrage => '123456'
+      search_themoviedb => '123456'
   });
 
   # search by tvdb id
@@ -222,7 +222,7 @@ You can find more info about their values at L<https://torrentapi.org/apidocs_v2
 
 This is the Imdb id (http://imdb.com) in the form 'tt123456'
 
-=head2 search_tvrage
+=head2 search_themoviedb
 
 =head2 search_tvdb
 

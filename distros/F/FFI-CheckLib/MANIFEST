@@ -53,7 +53,10 @@ corpus/unix/usr/lib/libxor.so.1.2
 corpus/unix/usr/lib/libxor.so.1.2.3
 corpus/unix/usr/lib/libxor.so.1.2.4
 corpus/windows/bin/dinosaur.dll
+corpus/windows/bin/dromornis_planei-3.0-7-0.dll
 corpus/windows/bin/libapatosaurus-0.dll
+corpus/windows/bin/libmaiasaura-3-7-0.dll
+corpus/windows/bin/libthylacaleo_carnifex-3-7___.dll
 corpus/windows/bincase/LIBbar.DLL
 corpus/windows/bincase/foo.DLL
 dist.ini

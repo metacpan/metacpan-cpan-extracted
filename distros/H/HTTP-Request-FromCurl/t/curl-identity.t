@@ -48,6 +48,10 @@ my @tests = (
     },
     { cmd => [ '--verbose', '-s', '--data-binary', '@$tempfile', '$url' ] },
     { cmd => [ '--verbose', '-s', '$url' ] },
+    { cmd => [ '--verbose', '-s', '$url', '--max-time', 5 ] },
+    { cmd => [ '--verbose', '-s', '$url', '--keepalive' ] },
+    { cmd => [ '--verbose', '-s', '$url', '--no-keepalive' ] },
+    { cmd => [ '--verbose', '-s', '$url', '--buffer' ] },
     { cmd => [ '--verbose', '-s', '-i', '$url' ],
       name => 'ignore --include option' },
 

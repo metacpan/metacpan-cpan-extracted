@@ -162,6 +162,7 @@ enum {
   SPVM_OP_C_ID_REF,
   SPVM_OP_C_ID_DEREF,
   SPVM_OP_C_ID_DOT3,
+  SPVM_OP_C_ID_STRING_LENGTH,
 };
 
 extern const char* const SPVM_OP_C_ID_NAMES[];
@@ -203,8 +204,9 @@ enum {
   SPVM_OP_C_FLAG_FIELD_ACCESS_WEAKEN = 1
 };
 enum {
-  // FIELD_ACCESS flag
-  SPVM_OP_C_FLAG_ARRAY_ACCESS_WEAKEN = 1
+  // ARRAY_ACCESS flag
+  SPVM_OP_C_FLAG_ARRAY_ACCESS_WEAKEN = 1,
+  SPVM_OP_C_FLAG_ARRAY_ACCESS_CONST = 2,
 };
 
 /* Binary operation */
@@ -243,6 +245,10 @@ struct SPVM_op {
   int8_t is_passed_to_sub;
   int8_t no_need_check;
 };
+
+SPVM_OP* SPVM_OP_build_single_parenthes_term(SPVM_COMPILER* compiler, SPVM_OP* op_term);
+
+SPVM_OP* SPVM_OP_build_string_length(SPVM_COMPILER* compiler, SPVM_OP* op_string_length, SPVM_OP* op_term);
 
 SPVM_OP* SPVM_OP_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_TYPE* type, const char* file, int32_t line);
 
@@ -320,7 +326,7 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* package_var, SPVM_O
 SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages);
-SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package);
+SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package, SPVM_OP* sub_names);
 SPVM_OP* SPVM_OP_build_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_invocant, SPVM_OP* op_subname, SPVM_OP* op_terms);
 SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block);
@@ -332,9 +338,6 @@ SPVM_OP* SPVM_OP_build_weaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_weaken,
 SPVM_OP* SPVM_OP_build_weaken_array_element(SPVM_COMPILER* compiler, SPVM_OP* op_weaken, SPVM_OP* op_field_access);
 
 void SPVM_OP_resolve_op_convert_type(SPVM_COMPILER* compiler, SPVM_OP* op_convert_type);
-
-const char* SPVM_OP_create_abs_name(SPVM_COMPILER* compiler, const char* package_name, const char* base_name);
-const char* SPVM_OP_create_package_var_access_abs_name(SPVM_COMPILER* compiler, const char* package_name, const char* name);
 
 SPVM_OP* SPVM_OP_new_op_constant_byte(SPVM_COMPILER* compiler, int8_t value, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_constant_short(SPVM_COMPILER* compiler, int16_t value, const char* file, int32_t line);

@@ -9,11 +9,16 @@ use Data::Dumper;
 
 my $db_dir = shift @ARGV;
 
-die "Usage: $0 <recordstore directory>" unless $db_dir;
+my( $name ) = ( $0 =~ /([^\/]+)$/ );
+unless( $db_dir && -d $db_dir ) {
+    print STDERR "$name: Data::RecordStore version $Data::RecordStore::VERSION\nUsage: $name <recordstore directory>\n";
+    exit;
+}
 
-die "No recordstore found at $db_dir;" unless -d $db_dir;
+my $store = Data::RecordStore->open_store( $db_dir );
 
-my $store = Data::RecordStore->open( $db_dir );
+print "Opened store in '$db_dir'\n";
+print "Store has ".$store->entry_count." entries and ".$store->record_count." records\n";
 
 print "Enter the id of a record to view in the database at '$db_dir'\n";
 print ">";
@@ -22,15 +27,32 @@ while( my $in = <STDIN> ) {
     chomp $in;
 
     if( $in =~ /^(FULL\s+)?(\d+)$/ ) {
-        my $val = $store->fetch( $2 );
-        if( length($val) < 1001 || $1 ) {
-            print $val."\n";
-        } else {
-            print substr( $val, 0, 1000 )."\n...(use FULL $2 to show all)";
+        my( $useFull, $reqid ) = ( $1, $2 );
+        if( $reqid < 1 || int($reqid) != $reqid ) {
+            print "error: id must be a whole number\n";
+            next;
         }
-    } elsif( $in =~ /^SET (\d+) (.*)$/ ) {
+        my $val = $store->fetch( $reqid );
+        if( ! defined $val ) {
+            print "no data found\n";
+        }
+        else {
+            my ( $silo_id, $id_in_silo ) = 
+                @{ $store->[1]->get_record( $reqid ) };
+            print "silo: $silo_id (max record size ".(2**$silo_id-5).")\n";
+            print "silo-index: $id_in_silo\n";
+            if( length($val) < 1001 || $useFull ) {
+                print "data: $val\n";
+            } 
+            else {
+                print "data: ".substr( $val, 0, 1000 )."\n...(use 'FULL $reqid' to show all)";
+            }
+        }
+    } 
+    elsif( $in =~ /^SET (\d+) (.*)$/ ) {
         $store->stow( $1, $2 );
-    } else {
+    }
+    else {
         print "Don't know how to show '$in'.\n";
     }
     

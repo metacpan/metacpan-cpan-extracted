@@ -60,6 +60,19 @@ my $sysdeps = CPAN::Plugin::Sysdeps->new({
 					 ($dryrun? 'dryrun' : ()),
 					 ($batch? 'batch' : ()),
 					);
+if ($debug) {
+    print STDERR "OS/Distribution config:\n";
+    for my $key (qw(os osvers linuxdistro linuxdistroversion linuxdistrocodename)) {
+	print STDERR "  $key: ";
+	if (!defined $key) {
+	    print STDERR "<undef>";
+	} else {
+	    print STDERR $sysdeps->{$key};
+	}
+	print STDERR "\n";
+    }
+}
+
 my @packages = $sysdeps->_map_cpandist($dist);
 if (@packages) {
     if ($uninstalled) {

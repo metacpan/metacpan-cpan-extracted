@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -222,7 +222,7 @@ sub retrieve {
     my $obj = shift;
     local *_ = \$obj->{text};
     return '' if $_ eq '';
-    (my $folded, $_) = $obj->fold($_);
+    (my $folded, $_) = $obj->fold($_, @_);
     $folded;
 }
 

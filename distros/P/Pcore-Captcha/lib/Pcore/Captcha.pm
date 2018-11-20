@@ -1,9 +1,9 @@
-package Pcore::Captcha v1.4.0;
+package Pcore::Captcha v1.4.1;
 
 use Pcore -dist, -class;
 use Pcore::Util::Scalar qw[weaken];
 use overload
-  bool => sub { ( $_[0]->{is_finished} // 0 ) && ( $_[0]->{is_resolved} // 0 ) },
+  bool     => sub { ( $_[0]->{is_finished} // 0 ) && ( $_[0]->{is_resolved} // 0 ) },
   fallback => 1;
 
 with qw[Pcore::Util::Result::Role];

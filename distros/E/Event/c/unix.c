@@ -161,7 +161,8 @@ static void pe_sys_multiplex(NV timeout) {
 
     if (!IOWatch_OK) {
         Nfds = 0;
-        Zero(Pollfd, pollMax, struct pollfd);
+	if (Pollfd)
+            Zero(Pollfd, pollMax, struct pollfd);
         ev = (pe_io*) IOWatch.next->self;
         while (ev) {
             int fd = ev->fd;
@@ -269,7 +270,8 @@ static void pe_sys_multiplex(NV timeout) {
     }
     if (!IOWatch_OK) {
 	Nfds = 0;
-	Zero(Pollfd, pollMax, struct pollfd);
+	if (Pollfd)
+            Zero(Pollfd, pollMax, struct pollfd);
 	ev = (pe_io*) IOWatch.next->self;
 	while (ev) {
 	    int fd = ev->fd;

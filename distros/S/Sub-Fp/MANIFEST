@@ -12,6 +12,7 @@ Sub-Fp-0.15.tar.gz
 Sub-Fp-0.16.tar.gz
 Sub-Fp-0.17.tar.gz
 Sub-Fp-0.18.tar.gz
+Sub-Fp-0.19.tar.gz
 t/00-load.t
 t/Fn.pm.t
 t/manifest.t

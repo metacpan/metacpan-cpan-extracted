@@ -3,17 +3,17 @@ require 5.009004;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'NAME' => 'Data::RecordStore',
-  'VERSION_FROM' => 'lib/Data/RecordStore.pm',
-  'PREREQ_PM' => {
-                   'Module::Build' => 0,
-                   'Test::More' => 0
-                 },
+  'PL_FILES' => {},
   'INSTALLDIRS' => 'site',
+  'NAME' => 'Data::RecordStore',
   'EXE_FILES' => [
                    'bin/record_store_convert',
                    'bin/recordstore_explorer'
                  ],
-  'PL_FILES' => {}
+  'VERSION_FROM' => 'lib/Data/RecordStore.pm',
+  'PREREQ_PM' => {
+                   'Test::More' => 0,
+                   'Module::Build' => 0
+                 }
 )
 ;

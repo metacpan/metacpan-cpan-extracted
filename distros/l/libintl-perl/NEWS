@@ -1,3 +1,17 @@
+Version 1.31 - 19 Nov 2018
+
+* Fixes this bug in Locale::Simple:
+
+  https://rt.cpan.org/Ticket/Display.html?id=127675
+
+Version 1.30 - 04 Nov 2018
+
+* Bugs fixed:
+
+  https://github.com/gflohr/libintl-perl/issues/2
+  https://github.com/gflohr/libintl-perl/issues/3
+  https://github.com/gflohr/libintl-perl/issues/4
+
 Version 1.29 - 09 Aug 2017
 
 * Important: Fixed a bug that caused Locale::gettext_pp and 

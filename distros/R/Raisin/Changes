@@ -1,3 +1,11 @@
+0.79
+    * Do not eval inside eval to propagate error message correctly from
+      parameter validator (relates to #32);
+
+0.78
+    * Ignore media type options when negotiating format (#15);
+    * Type coercions (#32);
+
 0.77
     * Set tag's description to empty to comply with Swagger specification (#51);
     * Support MooseX::Types (#52);

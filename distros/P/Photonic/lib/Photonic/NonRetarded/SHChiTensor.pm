@@ -4,7 +4,7 @@ Photonic::NonRetarded::SHChiTensor
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -41,14 +41,16 @@ $ff is a (maybe smooth) cutoff function in reciprocal space to smothen the geome
 $smallH and $smallE are the criteria of convergence (default 1e-7) for
 haydock coefficients and continued fraction. From Photonic::Roles::EpsParams.
 
-=item * evaluate($epsA1, $epsB1, $epsA2, $epsB2, [$kind])
+=item * evaluate($epsA1, $epsB1, $epsA2, $epsB2, [kind=>$kind,] [mask=>$mask] )
 
 Returns the macroscopic second Harmonic susceptibility function for a
 given value of the dielectric functions of the host $epsA and the
 particle $epsB at the fundamental 1 and second harmonic 2 frequency. 
 $kind is an optional letter for testing purposes with values 'd' for
 dipolar, 'q' for quadrupolar, 'e' for external and 'f' for full
-selfconsistent calculation (the default).
+selfconsistent calculation (the default). Mask is a mask with ones and
+zeroes, to evaluate the contribution of certain regions to the
+susceptibility. 
 
 
 =back
@@ -95,10 +97,6 @@ The dielectric tensor
 
 The maximum number of Haydock coefficients to use.
 
-=item * nhActual
-
-The actual number of Haydock coefficients used in the last calculation
-
 =item * converged
 
 Flags that the last calculation converged before using up all coefficients
@@ -123,7 +121,7 @@ Spectral variables
 =cut
 
 package Photonic::NonRetarded::SHChiTensor;
-$Photonic::NonRetarded::SHChiTensor::VERSION = '0.009';
+$Photonic::NonRetarded::SHChiTensor::VERSION = '0.010';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -148,6 +146,9 @@ has 'densityB'=>(is=>'ro', isa=>'Num', required=>1,
 has 'nhf'=>(is=>'ro', required=>1, 
          documentation=>'Maximum number of desired Haydock
                          coefficients for field calculation');
+has 'reorthogonalize'=>(is=>'ro', required=>1, default=>0,
+         documentation=>'Reorthogonalize haydock flag');
+
 #optional parameters 
 has 'filter'=>(is=>'ro', isa=>'PDL', predicate=>'has_filter',
                documentation=>'Optional reciprocal space filter');
@@ -178,8 +179,10 @@ sub evaluate {
     $self->_epsB1(my $epsB1=shift);
     $self->_epsA2(my $epsA2=shift);
     $self->_epsB2(my $epsB2=shift);
-    my $kind=lc(shift); # Undocumented, for testing: Use full (f) P2 or
+    my %options=@_; #the rest are options. Currently, kind and mask.
+    my $kind=lc($options{kind}); # Undocumented, for testing: Use full (f) P2 or
 		    # (d) dipolar or  (q) quadrupolar or (e) external  
+    my $mask=$options{mask};
     my $nd=$self->geometry->B->ndims;
     my $epsT=$self->epsTensor->evaluate($epsA2, $epsB2);
     my @P2M; #array of longitudinal polarizations along different directions.
@@ -205,11 +208,24 @@ sub evaluate {
 	    /$self->geometry->npoints;
 	my $k=$_->nrf->nr->geometry->Direction0;
 	my $FPChi=$epsT-identity($nd); #four pi chi linear 2w
-	my $P2MLC=($k*$P2M)->sumover; #Longitudinal projection
+	my $P2MLC=($k*$P2M)->sumover; #Longitudinal component
 	my $P2ML=$k*$P2MLC; #longitudinal projection
 	my $Dep2=($FPChi*$P2ML)->sumover; # depolarization polarization
-	$P2M += $Dep2 if $kind eq 'f' or $kind eq 'l' or $kind eq 'a';
-	push @P2M, $P2M;
+	my $P2Mmask=$P2M; #masked macroscopic polarization
+	my $f=1; #filling fraction of masked region.
+	if (defined $mask){ # is there a real mask?
+	    $f=$mask->sum/$self->geometry->npoints; #filling fraction
+				#of mask
+	    $P2=$P2*$mask->(*1); #masked polarization
+	    $P2Mmask=$P2->mv(0,-1)->mv(0,-1) #masked macroscopic polarization
+	    ->clump(-3) #linear index, RorI, XorY
+	    ->mv(-2,0) #RorI, index, XorY
+	    ->complex->sumover  #RorI, XorY
+		/$self->geometry->npoints;
+	}
+	$P2Mmask = $P2Mmask + $f*$Dep2 if $kind eq 'f' or $kind eq 'l'
+	    or $kind eq 'a'; # substract masked macro depolarization field
+	push @P2M, $P2Mmask; 
     }
     #NOTE. Maybe I have to correct response to D-> response to E
     #I have to convert from the array of polarizations for given
@@ -238,8 +254,8 @@ sub evaluate {
     return $chiTensor;
 }
 
-#Need geometry, maximum number of Haydock coefficients for NonRetarded::ALL nh, número de
-#haydock para el comp nhf
+#Need geometry, maximum number of Haydock coefficients for NonRetarded::ALL nh
+
 sub _build_nrshp { # One Haydock coefficients calculator per direction0
     my $self=shift;
     my @nrshp;
@@ -248,8 +264,9 @@ sub _build_nrshp { # One Haydock coefficients calculator per direction0
 	#OJO: Cuánto vale el campo macroscópico? Hay que normalizar esto?
 	$g->Direction0($_); #add G0 direction
 	#Build a corresponding NonRetarded::AllH structure
-	my $nr=Photonic::NonRetarded::AllH->new(nh=>$self->nh, geometry=>$g,
-				keepStates=>1, smallH=>$self->smallH);  
+	my $nr=Photonic::NonRetarded::AllH->new(
+	    nh=>$self->nh, geometry=>$g, keepStates=>1,
+	    reorthogonalize=>$self->reorthogonalize, smallH=>$self->smallH);  
 	my @args=(nr=>$nr, nh=>$self->nhf, smallE=>$self->smallE);
 	push @args, filter=>$self->filter if $self->has_filter;
 	my $nrf=Photonic::NonRetarded::FieldH->new(@args);
@@ -268,7 +285,8 @@ sub _build_epsTensor {
     my $smallH=$self->smallH; #smallness 
     my $smallE=$self->smallE; #smallness 
     my $eT=Photonic::NonRetarded::EpsTensor
-	->new(geometry=>$self->geometry, nh=>$self->nh, smallH=>$self->smallH, 
+	->new(geometry=>$self->geometry, nh=>$self->nh,
+	      reorthogonalize=>$self->reorthogonalize, smallH=>$self->smallH, 
 	      smallE=>$self->smallE);
     return $eT;
 }

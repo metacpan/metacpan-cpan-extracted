@@ -4,7 +4,7 @@ Photonic::Retarded::OneH
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -107,7 +107,7 @@ next_b2, next_c, next_g, shifting the current values where necessary. Returns
 =cut
 
 package Photonic::Retarded::OneH;
-$Photonic::Retarded::OneH::VERSION = '0.009';
+$Photonic::Retarded::OneH::VERSION = '0.010';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -207,25 +207,20 @@ sub _iterate_indeed {
     # gPsi_np1 is RorI xyz nx ny nz
     # Eq. 4.41
     my $a_n=$g_n*($gpsi->Cconj*$psi_np1)->re->sum;
-    #my $err = $g_n*($gpsi->Cconj*$psi_np1)->im->sum;
-    #croak "Imaginary part of \$a_n too large: $err" unless abs($err)
-    #< $smallH;   Eq 4.43
-    my $psi2_np1=($psi_np1->Cconj*$gPsi_np1)->re->sum;
-    #$err = ($psi_np1->Cconj*$gPsi_np1)->im->sum;
-    #croak "Imaginary part of \$psi2_np1 too large: $err" unless
-    #abs($err) < $smallH;
     # Eq. 4.30
+    #Modified algorithm:
+    my $next_state=($psi_np1-$a_n*$psi_n-$c_n*$psi_nm1);
+    my $gnext_state=($gGG*$next_state(:,:,*1))->sumover;
+    my $b2_np1=($next_state->Cconj*$gnext_state)->re->sum;
     my $g_np1=1;
-    my $b2_np1=$psi2_np1-$g_n*$a_n**2-$g_nm1*$b2_n;
     $g_np1=-1, $b2_np1=-$b2_np1 if $b2_np1 < 0;
     my $b_np1=sqrt($b2_np1);
     # Eq. 4.31
     my $c_np1=$g_np1*$g_n*$b_np1;
     my $bc_np1=$g_np1*$g_n*$b2_np1;
     # Eq. 4.33
-    my $next_state=undef;
-    $next_state=($psi_np1-$a_n*$psi_n-$c_n*$psi_nm1)/$b_np1 
-	unless $b2_np1 < $self->smallH;
+    $next_state=undef if $b2_np1 < $self->smallH;
+    $next_state/=$b_np1 if defined $next_state;
     #save values
     $self->_nextState($next_state);
     $self->_current_a($a_n);

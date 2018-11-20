@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,6 +32,7 @@
       "runtime" : {
          "requires" : {
             "App::a2p" : "0",
+            "App::find2perl" : "0",
             "DB_File" : "0",
             "MIME::Parser" : "0",
             "Make" : "0",
@@ -40,8 +41,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
-            "Test::Trap" : "v0.3.2"
+            "Test::More" : "0.94"
          }
       }
    },
@@ -57,6 +57,6 @@
          "web" : "https://github.com/briandfoy/PerlPowerTools"
       }
    },
-   "version" : "1.012",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.013",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

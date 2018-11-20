@@ -1,3 +1,10 @@
+0.008   2018-11-18 (PERLANCAR)
+
+	- Forgot to add $DATE and $VERSION to Role::Versioning::Scheme.
+
+	- Fix Abstract.
+
+
 0.007   2018-10-11 (PERLANCAR)
 
 	- Add parse_version().

@@ -1,2 +1,4 @@
-0.01    14 June 2018
+0.0.1   14 June 2018
         First version
+0.0.2   20 November 2018
+        Fixed bug relating to cleaning numbers starting with +44

@@ -8,7 +8,7 @@ use Log::Log4Cli;
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(path2str);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub MODINFO { "Remove specified parts from structure" }
 
@@ -36,7 +36,7 @@ sub process_path {
     return ${$data} = undef unless (@{$spath});
 
     my @list = eval { path(${$data}, $spath, paths => 1, strict => $opts->{strict}) };
-    die_fatal "Failed to resolve path '$path'", 4 if ($@);
+    die_fatal "Failed to lookup path '$path'", 4 if ($@);
 
     while (@list) {
         my ($p, undef) = splice @list, -2, 2;

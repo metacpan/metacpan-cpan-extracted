@@ -1,0 +1,24 @@
+{
+   "D" : {
+      "false" : {
+         "N" : true,
+         "O" : false
+      },
+      "list" : {
+         "D" : [
+            {
+               "I" : 1,
+               "R" : false
+            },
+            {
+               "A" : false,
+               "I" : 3
+            }
+         ]
+      },
+      "true" : {
+         "N" : false,
+         "O" : true
+      }
+   }
+}

@@ -1,0 +1,11 @@
+0.003     2018-11-18 23:11:51 EST
+  - Added Carp dependency
+  - Avoid loading Mojo::Collection until it's needed
+
+0.002     2018-11-18 20:37:38 EST
+  - Quick incompatible change: methods now operate in default keys order for efficiency unless otherwise noted.
+  - Added methods to operate in sorted keys order: each_sorted, each_sorted_c, map_sorted, map_sorted_c
+  - Replaced method to_array with to_collection and to_collection_sorted
+
+0.001     2018-11-18 18:14:56 EST
+  - First release

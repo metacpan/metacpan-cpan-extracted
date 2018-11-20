@@ -31,9 +31,9 @@ SYNOPSIS
           search_imdb => 'tt123456'
       });
     
-      # search by tvrage id
+      # search by themoviedb id
       my $search = $tapi->search({
-          search_tvrage => '123456'
+          search_themoviedb => '123456'
       });
     
       # search by tvdb id
@@ -63,7 +63,7 @@ ATTRIBUTES
 
     This is the Imdb id (http://imdb.com) in the form 'tt123456'
 
- search_tvrage
+ search_themoviedb
 
  search_tvdb
 

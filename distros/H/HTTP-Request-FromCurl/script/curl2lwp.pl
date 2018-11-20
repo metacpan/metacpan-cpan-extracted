@@ -6,7 +6,7 @@ use Pod::Usage;
 
 use HTTP::Request::FromCurl;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 Getopt::Long::Configure('pass_through');
 GetOptions(
@@ -86,7 +86,11 @@ Include response in output (ignored)
 
 Issue a C<HEAD> request
 
-=item B<no-keepalive>
+=item B<max-time>
+
+Set a timeout for the request
+
+=item B<keepalive> / B<no-keepalive>
 
 Don't send a keep-alive header (ignored)
 

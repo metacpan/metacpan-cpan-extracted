@@ -1,10 +1,16 @@
 use warnings;
 use strict;
 use Test::More;
-use FindBin '$Bin';
-use File::Path 'remove_tree';
-BEGIN { use_ok('Directory::Diff') };
-use Directory::Diff qw/get_only get_diff ls_dir/;
+BEGIN {
+    use FindBin '$Bin';
+    use lib "$Bin";
+    use DirOps;
+};
+BEGIN {
+    use_ok('Directory::Diff');
+};
+
+use Directory::Diff qw/get_only get_diff ls_dir directory_diff/;
 
 my %dir1 = ("file" => 1, "dir/" => 1, "dir/file" => 1);
 my %dir2 = ("dir/" => 1, "dir2/" => 1);
@@ -83,42 +89,33 @@ create_file ("bananas", $new_boo, "no");
 ok (keys %diff == 1, "Correct number of results");
 ok ($diff{"boo/bananas"}, "Detected simple difference");
 
+my %dd;
+
+directory_diff ($old_dir, $new_dir, {
+    dir1_only => \& dir_only,
+    dir2_only => \& dir_only,
+    diff => \& diff,
+    data => \%dd,
+}, undef);
+
+ok ($dd{$old_dir}{$new_dir}{'boo/bananas'}, "Found different file");
+
 rmdirs (@dirs);
 
 done_testing ();
 
 exit;
 
-sub create_file 
+sub dir_only
 {
-    my ($file_name, $dir_name, $contents) = @_;
-    my $path = "$dir_name/$file_name";
-    die "$path exists" if -f $path;
-    open my $output, ">:encoding(utf8)", $path or die "$path: $!";
-    print $output $contents;
-    close $output or die $!;
+    my ($data, $dir, $file) = @_;
+    $data->{$dir}{$file} = 1;
 }
 
-sub rmdirs
+sub diff
 {
-    for (@_) {
-	(-d $_) && remove_tree ($_);
-        die if -d $_;
-    }
-}
-
-sub mkdirs
-{
-    for (@_) {
-        die if -d $_;
-        mkdir $_ or die $!;
-    }
-}
-
-sub rm_mk_dirs
-{
-    rmdirs (@_);
-    mkdirs (@_);
+    my ($data, $dir1, $dir2, $file) = @_;
+    $data->{$dir1}{$dir2}{$file} = 1;
 }
 
 sub run_diff

@@ -1,5 +1,8 @@
 Revision history for Dancer2-Plugin-Tail
 
+0.017   Mon Nov 19 04:43:57 GMT 2018
+        Fix a debug statement in Tail.pm that was causing problems with cpan tests
+
 0.016   Sun Apr  8 04:59:52 GMT 2018
         Changes to Tail.pm
         Cleanup unit tests

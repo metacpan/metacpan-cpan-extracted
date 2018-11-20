@@ -17,11 +17,24 @@ has host_api_path => ();           # HashRef
 has _path_class_cache     => ();   # HashRef, router path -> sigleton cache
 has _class_instance_cache => ();   # HashRef, class name -> sigleton cache
 
+sub BUILD ( $self, $args ) {
+
+    # init hosts
+    $self->{hosts} //= {};
+
+    # add default router
+    $self->{hosts}->{'*'} = ref $self->{app} if !keys $self->{hosts}->%*;
+
+    return;
+}
+
 sub init ($self) {
     my $map;
 
     for my $host ( keys $self->{hosts}->%* ) {
-        $map->{$host} = $self->_get_host_map( $host, $self->{hosts}->{$host} ) if defined $self->{hosts}->{$host};
+        my $ns = $self->{hosts}->{$host} // ref $self->{app};
+
+        $map->{$host} = $self->_get_host_map( $host, $ns );
     }
 
     $self->{map} = $map;
@@ -191,7 +204,7 @@ sub get_host_api_path ( $self, $host ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 117                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 130                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

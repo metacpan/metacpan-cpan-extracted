@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.067';
+our $VERSION = '0.068';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -671,28 +671,30 @@ sub term_width {
 
 
 sub unicode_sprintf {
-    my ( $unicode, $avail_width, $right_justify ) = @_;
-    my $colwidth = print_columns( "$unicode" );
-    if ( $colwidth > $avail_width ) {
-        return cut_to_printwidth( $unicode, $avail_width );
+    #my ( $unicode, $avail_width, $right_justify ) = @_;
+    my $colwidth = print_columns( $_[0] );
+    if ( $colwidth > $_[1] ) {
+        return cut_to_printwidth( $_[0], $_[1] );
     }
-    elsif ( $colwidth < $avail_width ) {
-        if ( $right_justify ) {
-            $unicode = " " x ( $avail_width - $colwidth ) . $unicode;
+    elsif ( $colwidth < $_[1] ) {
+        if ( $_[2] ) {
+            return " " x ( $_[1] - $colwidth ) . $_[0];
         }
         else {
-            $unicode = $unicode . " " x ( $avail_width - $colwidth );
+            return $_[0] . " " x ( $_[1] - $colwidth );
         }
     }
-    return $unicode;
+    else {
+        return $_[0];
+    }
 }
 
 
 
 sub unicode_trim {
-    my ( $unicode, $len ) = @_;
-    return '' if $len <= 0;
-    cut_to_printwidth( $unicode, $len );
+    #my ( $unicode, $len ) = @_;
+    return '' if $_[1] <= 0;
+    cut_to_printwidth( $_[0], $_[1] );
 }
 
 
@@ -711,7 +713,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.067
+Version 0.068
 
 =cut
 

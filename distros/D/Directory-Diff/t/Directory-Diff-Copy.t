@@ -1,9 +1,30 @@
 use warnings;
 use strict;
+BEGIN {
+    use FindBin '$Bin';
+    use lib "$Bin";
+    use DirOps;
+};
+use Test::More;
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
 
-# At the moment this only tests for compilability.
-
-use Test::More tests => 1;
 BEGIN { use_ok('Directory::Diff::Copy') };
 use Directory::Diff::Copy qw/copy_diff_only/;
-
+my $a = "$Bin/a";
+my $b = "$Bin/b";
+my $c = "$Bin/c";
+rm_mk_dirs ($a, $b);
+create_file ('same', $a, "same");
+create_file ('same', $b, "same");
+create_file ('diff', $a, "hocus");
+create_file ('diff', $b, "pocus");
+copy_diff_only ($a, $b, $c, undef);
+ok (-f "$c/diff", "Copied differing file");
+ok (! -f "$c/same", "Did not copy identical file");
+rmdirs ($a, $b, $c);
+done_testing ();

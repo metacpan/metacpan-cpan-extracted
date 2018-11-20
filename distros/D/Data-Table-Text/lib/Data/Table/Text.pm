@@ -9,7 +9,7 @@
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20181101;                                                        # Version
+our $VERSION = 20181118;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -23,7 +23,7 @@ use JSON;
 use MIME::Base64;
 use Scalar::Util qw(blessed reftype looks_like_number);
 use Storable qw(store retrieve);
-use Time::HiRes qw(gettimeofday);
+use Time::HiRes qw(time gettimeofday);
 use utf8;
 sub ˢ(&);                                                                       # Immediately executed inline sub to allow a code block before B<if>.
 
@@ -330,7 +330,8 @@ sub checkFile($)                                                                
 sub quoteFile($)                                                                # Quote a file name.
  {my ($file) = @_;                                                              # File name
   $file or confess "Undefined file to quote";
-  $file =~ s(") (\\\")gs;
+  $file =~ s(")  (\\\")gs;
+  $file =~ s(\$) (\\\$)gs;
   qq(\"$file\")
  }
 
@@ -579,11 +580,40 @@ sub searchDirectoryTreesForMatchingFiles(@)                                     
    {next unless -d $dir;
     for my $d(split /\0/, qx(find $dir -print0))
      {next if -d $d;                                                            # Do not include folder names
-      push @file, $d if $d =~ m(($ext)\Z)is;
+      push @file, $d if !@extensions or $d =~ m(($ext)\Z)is;
      }
    }
   sort @file
  } # searchDirectoryTreesForMatchingFiles
+
+sub countFileExtensions(@)                                                      # Return a hash which counts the file extensions under the specified directories
+ {my (@folders) = @_;                                                           # Folders to search
+  my %ext;
+  for my $dir(@folders)                                                         # Directories
+   {next unless -d $dir;
+    for my $file(split /\0/, qx(find $dir -print0))
+     {next if -d $file;                                                         # Do not include folder names
+      $ext{fe $file}++;
+     }
+   }
+  \%ext
+ } # countFileExtensions
+
+sub countFileTypes(@)                                                           # Return a hash which counts the results of applying the B<file> command to each file under the specified directories
+ {my (@folders) = @_;                                                           # Folders to search
+  my %ext;
+  for my $dir(@folders)                                                         # Directories
+   {next unless -d $dir;
+    for my $file(split /\0/, qx(find $dir -print0))
+     {next if -d $file;                                                         # Do not include folder names
+      my $f = quoteFile($file);
+      my $r = qx(file $f);
+      my $R = trim(swapFilePrefix($r, $file.q(:), q()));
+      $ext{$R}++;
+     }
+   }
+  \%ext
+ } # countFileTypes
 
 sub matchPath($)                                                                # Given an absolute path find out how much of the path actually exists.
  {my ($file) = @_;                                                              # File name
@@ -804,7 +834,7 @@ sub dumpGZipFile($$)                                                            
 sub writeFiles($;$)                                                             # Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
  {my ($hash, $folder) = @_;                                                     # Hash of key value pairs representing files and data, optional folder to contain files else the current folder
   for my $file(sort keys %$hash)                                                # Write file data for each hash key
-   {writeFile(fpf($folder ? $folder : '.', $file), $hash->{$file})
+   {overWriteFile(fpf($folder ? $folder : '.', $file), $hash->{$file})
    }
  } # writeFiles
 
@@ -817,13 +847,14 @@ sub readFiles($)                                                                
   \%h
  } # readFiles
 
-sub appendFile($$)                                                              # Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess.
+sub appendFile($$)                                                              # Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess. The file being appended to is locked first with L<https://perldoc.perl.org/functions/flock.html> to allow  multiple processes to append linearly to the same file.
  {my ($file, $string) = @_;                                                     # File to append to, string to append
   $file or confess "No file name supplied\n";
   $string or carp "No string for file:\n$file\n";
   makePath($file);
   open my $F, ">>$file" or confess "Cannot open for write file:\n$file\n$!\n";
   binmode($F, ":utf8");
+  flock($F, 2);
   print  {$F} $string;
   close  ($F);
   -e $file or confess "Failed to write to file:\n$file\n";
@@ -886,13 +917,24 @@ sub imageSize($)                                                                
    }
  }
 
-sub convertImageToJpx690($$;$)                                                  #P Convert an image to jpx format using versions of L<Imagemagick> version 6.9.0 and above.
- {my ($source, $target, $Size) = @_;                                            # Source file, target folder (as multiple files will be created),  optional size of each tile - defaults to 256
+sub convertImageToJpx690($$;$$)                                                 #P Convert an image to jpx format using versions of L<Imagemagick> version 6.9.0 and above with optional image reduction.
+ {my ($Source, $target, $Size, $Tiles) = @_;                                    # Source file, target folder (as multiple files will be created),  optional size of each tile - defaults to 256, optional limit on the number of tiles in either dimension
+  my $source = $Source;
   my $size = $Size // 256;                                                      # Size of each tile
   my $N    = 4;                                                                 # Power of ten representing the maximum number of tiles
   -e $source or confess "Image file does not exist:\n$source\n";                # Check source
   $target  = fpd($target);                                                      # Make sure the target is a folder
   makePath($target);                                                            # Make target folder
+
+  if ($Tiles)                                                                   # Restrict the converted image to a maximum number of tiles if requested
+   {my $s = quoteFile($source);
+    my $t = temporaryFile;
+    my $n = $Size*$Tiles;
+    my $c = qq(convert $s -resize ${n}x${n}\\> $t);
+    say STDERR $_ for qx($c 2>&1);
+    $source = $t;                                                               # Resized file is now source
+   }
+
   my ($w, $h) = imageSize($source);                                             # Image size
   my $W = int($w/$size); ++$W if $w % $size;                                    # Image size in tiles
   my $H = int($h/$size); ++$H if $h % $size;
@@ -900,7 +942,7 @@ sub convertImageToJpx690($$;$)                                                  
 version 1
 type    jpx
 size    $size
-source  $source
+source  $Source
 width   $w
 height  $h
 END
@@ -909,7 +951,6 @@ END
    {my $s = quoteFile($source);
     my $t = quoteFile($target."%0${N}d.jpg");
     my $c = qq(convert $s -crop ${size}x${size} $t);
-    say STDERR $c;
     say STDERR $_ for qx($c 2>&1);
    }
 
@@ -928,8 +969,9 @@ END
    }
  }
 
-sub convertImageToJpx($$;$)                                                     # Convert an image to jpx format using L<Imagemagick>.
- {my ($source, $target, $Size) = @_;                                            # Source file, target folder (as multiple files will be created),  optional size of each tile - defaults to 256
+sub convertImageToJpx($$;$$)                                                    # Convert an image to jpx format using L<Imagemagick> applying an optional scaling if required.
+ {my ($Source, $target, $Size, $Tiles) = @_;                                    # Source file, target folder (as multiple files will be created),  optional size of each tile - defaults to 256, optional limit in either direction on the number of tiles
+  my $source = $Source;
 
   if (1)
    {my $r = qx(convert --version);
@@ -945,12 +987,21 @@ sub convertImageToJpx($$;$)                                                     
 
   makePath($target);
 
+  if ($Tiles)                                                                   # Restrict the converted image to a maximum number of tiles if requested
+   {my $s = quoteFile($source);
+    my $t = temporaryFile;
+    my $n = $Size*$Tiles;
+    my $c = qq(convert $s -resize ${n}x${n}\\> $t);
+    say STDERR $_ for qx($c 2>&1);
+    $source = $t;                                                               # Resized file is now source
+   }
+
   my ($w, $h) = imageSize($source);                                             # Write Jpx header
   writeFile(filePath($target, "jpx.data"), <<END);
 version 1
 type    jpx
 size    $size
-source  $source
+source  $Source
 width   $w
 height  $h
 END
@@ -959,7 +1010,6 @@ END
    {my $s = quoteFile($source);
     my $t = quoteFile($target);
     my $c = qq(convert $s -crop ${size}x${size} $t);
-    say STDERR $c;
     say STDERR $_ for qx($c 2>&1);
    }
 
@@ -1994,11 +2044,56 @@ sub waitForAllStartedProcessesToFinish(\%)                                      
 sub newProcessStarter($;$)                                                      #I Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
  {my ($maximumNumberOfProcesses, $transferArea) = @_;                           # Maximum number of processes to start, optional folder to be used to save and retrieve results.
   genHash(q(Data::Table::Text::Starter),                                        # Process starter definition.
-    transferArea             => $transferArea,                                  # The name of the folder in which files transferring results from the child to the parent process will be stored.
-    maximumNumberOfProcesses => $maximumNumberOfProcesses,                      # The maximum number of processes to start in parallel at one time. If this limit is exceeded, the start of subsequent processes will be delayed until processes started earlier have finished.
+    transferArea             => $transferArea // temporaryFolder,               # The name of the folder in which files transferring results from the child to the parent process will be stored.
+    maximumNumberOfProcesses => $maximumNumberOfProcesses // 8,                 # The maximum number of processes to start in parallel at one time. If this limit is exceeded, the start of subsequent processes will be delayed until processes started earlier have finished.
     pids                     => {},                                             #P A hash of pids representing processes started but not yet completed.
-    resultsArray             => [],                                             #P Consolidated array of results
+    resultsArray             => [],                                             #P Consolidated array of results.
+    processingTitle          => undef,                                          # An optional title describing the processing being performed.
+    processingLogFile        => undef,                                          # Optionally the name of a file to which process start and end information should be appended
+    totalToBeStarted         => undef,                                          # Optionally: the total number of processes to be started - if this is supplied then an estimate of the finish time for this processing is printed to the log file every time a process starts or finishes.
+    processStartTime         => {},                                             #P {pid} == time the process was started.
+    processFinishTime        => {},                                             #P {pid} == time the process finished.
+    startTime                => time,                                           #P Start time
    );
+ }
+
+sub Data::Table::Text::Starter::logEntry($$)                                    #P Create a log entry showing progress and eta.
+ {my ($starter, $finish) = @_;                                                  # Starter, 0 - start; 1 - finish
+  if (my $l = $starter->processingLogFile)                                      # Write a log entry if a log file has been supplied
+   {my $t   = $starter->processingTitle // '';                                  # Title of processing
+    my $sf  = $finish ? q(F) : q(S);                                            # Whether we are starting or finishing
+    my $N   = $starter->totalToBeStarted;                                       # Total number to be started if known
+    my $started  = keys %{$starter->processStartTime};                          # Number of processes started
+    my $finished = keys %{$starter->processFinishTime};                         # Number of processes finished
+
+    if (!$finish and $started == 1 and $t)
+     {my $n = $N ? qq(Start $N processes for:) : q(Process:);
+      appendFile($l, join " ", timeStamp, "$n $t\n");
+     }
+
+    my $eta = sub                                                               # Estimate finish time
+     {if ($N and $finished)                                                     # Expected number of starts has been supplied and at least one process has finished
+       {my $execTime = 0;                                                       # Total execution time for all processes that have finished so far
+        my $ft = $starter->processFinishTime;                                   # Finish time
+        for $finish(sort keys %{$starter->processFinishTime})                   # Sum execution time over all processes that have finished
+         {my $f =               $starter->processFinishTime->{$finish};         # Finish time
+          my $s =               $starter->processStartTime ->{$finish};         # Start time
+          $execTime += $f - $s;                                                 # Execution time
+         }
+        my $avgExecTime = $execTime / $finished;                                # Average execution time process
+        my $toGo        = ($N - $finished) * $avgExecTime;                      # Time to go
+        my @finishAt    = localtime(time + $toGo);                              # Finish time
+        my $finishTime  = strftime('%H:%M:%S', @finishAt);                      # Format finish time
+        return sprintf("eta: %.2f seconds at $finishTime", $toGo);             # Finish time message
+       }
+      q()                                                                       # No estimate available for finish time
+     }->();
+
+    my $w = $N ? length($N) : 0;                                                # Width of output field
+    my $p = $N == 0 ? q()   : sprintf("%${w}d", $started).q(/).$N;              # Progress indicator
+
+    appendFile($l, join " ", timeStamp, $sf, $p, $eta, $t, "\n");
+   }
  }
 
 sub Data::Table::Text::Starter::start($$)                                       # Start a new process to run the specified B<$sub>.
@@ -2010,7 +2105,9 @@ sub Data::Table::Text::Starter::start($$)                                       
    }
 
   if (my $pid = fork)                                                           # Create new process
-   {$starter->pids->{$pid}++                                                    # Update pids
+   {$starter->pids->{$pid}++;                                                   # Update pids
+    $starter->processStartTime->{$pid} = time;                                  # Time process was started
+    $starter->logEntry;                                                         # Write a log entry
    }
   else                                                                          # Run sub in new process
    {my $results = &$sub;                                                        # Execute sub and address results
@@ -2037,6 +2134,8 @@ sub Data::Table::Text::Starter::waitOne($)                                      
         my $e = qq(push ${s}{\$starter->resultsArray}, $s\$d);                  # Save data in parent
         eval $e;                                                                # Execute
         $@ and confess "$@\n$e\n";                                              # Confess to any errors
+        $starter->processFinishTime->{$p} = time;                               # Approximate time process ended
+        $starter->logEntry(1);                                                  # Write a log entry
        }
       delete $starter->pids->{$p};
       last;
@@ -2050,8 +2149,36 @@ sub Data::Table::Text::Starter::finish($)                                       
   while(keys(%{$starter->pids}) > 0)                                            # Wait for all started processes to terminate
    {$starter->waitOne;
    }
+  my @r = @{$starter->resultsArray};                                            # Return results
 
-  @{$starter->resultsArray}                                                     # Return results
+  if (my $l = $starter->processingLogFile)                                      # Log file provided
+   {my $t        = $starter->processingTitle // '';                             # Title of processing
+    my $N        = $starter->totalToBeStarted;                                  # Total number to be started if known
+    my $started  = keys %{$starter->processStartTime};                          # Number of processes started
+    my $finished = keys %{$starter->processFinishTime};                         # Number of processes finished
+
+    my @m;
+    if ($t)
+     {push @m, "Finished $finished processes for: $t"
+     }
+    else
+     {push @m, "Finished $finished processes"
+     }
+
+    if ($started != @r)
+     {my $r = @r;
+      push @m, "Started $started processes but only received results from $r";
+     }
+    if ($started != $finished)
+     {push @m, "Started $started processes but only $finished finished";
+     }
+    if ($started != $N)
+     {push @m, "Started $started processes but totalToBeStarted=>$N was specified";
+     }
+
+    appendFile($l, join " ", timeStamp, @m);
+   }
+  @r                                                                            # Return results
  }
 
 sub newServiceIncarnation($;$)                                                  # Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
@@ -2060,7 +2187,7 @@ sub newServiceIncarnation($;$)                                                  
     qw(.config com.appaapps services), $service, q(txt));                       # Service specification file
   my $t = genHash(q(Data::Exchange::Service),                                   # Service details.
     service=> $service,                                                         # The name of the service.
-    start  => time + (-e $file ? 1 : 0),                                        # The time this service was started time plus a minor hack to simplify testing.
+    start  => int(time) + (-e $file ? 1 : 0),                                   # The time this service was started time plus a minor hack to simplify testing.
     file   => $file,                                                            # The file in which the service start details is being recorded.
    );
   dumpFile($file, $t);                                                          # Write details
@@ -2068,10 +2195,10 @@ sub newServiceIncarnation($;$)                                                  
  }
 
 sub Data::Exchange::Service::check($$)                                          # Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>. If the optional B<$continue> flag has been set then return the service details if this is the current service incarnation else B<undef>. Otherwise if the B<$continue> flag is false confess unless this is the current service incarnation thus bringing the earlier version of this service to an abrupt end.
- {my ($s, $continue) = @_;                                                      # Current service details, return result if B<$continue> is true else confess if the service has been replaced
-  my $t = evalFile($s->file);                                                   # Latest service details
-  return $t if $t->start   == $s->start   and                                   # Check service details match
-               $t->service eq $s->service and
+ {my ($service, $continue) = @_;                                                # Current service details, return result if B<$continue> is true else confess if the service has been replaced
+  my $t = evalFile($service->file);                                             # Latest service details
+  return $t if $t->start   == $service->start   and                             # Check service details match
+               $t->service eq $service->service and
                $t->file    eq $t->file;
   confess $t->service. " replaced by a newer version\n" unless $continue;       # Replaced by a newer incarnation
   undef                                                                         # Not the current incarnation but continue specified
@@ -2759,7 +2886,7 @@ binModeAllUtf8 boldString boldStringUndo
 call checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys clearFolder contains containingPowerOfTwo
 convertDocxToFodt convertImageToJpx convertUnicodeToXml
-copyBinaryFile copyFile copyFolder
+copyBinaryFile copyFile copyFolder countFileExtensions countFileTypes
 createEmptyFile currentDirectory currentDirectoryAbove cutOutImagesInFodtFile
 dateStamp dateTimeStamp dateTimeStampName decodeJson decodeBase64 dumpFile dumpGZipFile
 enclosedString enclosedStringUndo enclosedReversedString enclosedReversedStringUndo
@@ -2971,7 +3098,7 @@ Data::Table::Text - Write data in tabular text format.
 Write data in tabular text format.
 
 
-Version 20181101.
+Version 20181118.
 
 
 The following sections describe the methods in each functional area of this
@@ -3821,6 +3948,32 @@ B<Example:>
               ["a.txt", "b.txt", "c.txt"];                                                                                                                 
   
 
+=head3 countFileExtensions(@)
+
+Return a hash which counts the file extensions under the specified directories
+
+     Parameter  Description
+  1  @folders   Folders to search
+
+B<Example:>
+
+
+    𝗰𝗼𝘂𝗻𝘁𝗙𝗶𝗹𝗲𝗘𝘅𝘁𝗲𝗻𝘀𝗶𝗼𝗻𝘀(q(/home/phil/perl/));                                     
+  
+
+=head3 countFileTypes(@)
+
+Return a hash which counts the results of applying the B<file> command to each file under the specified directories
+
+     Parameter  Description
+  1  @folders   Folders to search
+
+B<Example:>
+
+
+    𝗰𝗼𝘂𝗻𝘁𝗙𝗶𝗹𝗲𝗧𝘆𝗽𝗲𝘀(q(/home/phil/perl/));                                          
+  
+
 =head3 matchPath($)
 
 Given an absolute path find out how much of the path actually exists.
@@ -4125,9 +4278,6 @@ B<Example:>
     ok !$@;
     ok fileSize($f) == 4;
   
-    eval {readFile($f)};
-    ok $@, "readFile";
-  
     ok $s eq eval {readBinaryFile($f)};
   
     copyBinaryFile($f, my $F = temporaryFile);
@@ -4173,9 +4323,6 @@ B<Example:>
     eval {overWriteBinaryFile($f, $s)};
     ok !$@;
     ok fileSize($f) == 4;
-  
-    eval {readFile($f)};
-    ok $@, "readFile";
   
     ok $s eq eval {readBinaryFile($f)};
   
@@ -4335,7 +4482,7 @@ B<Example:>
 
 =head3 appendFile($$)
 
-Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess.
+Append a unicode utf8 string to a file, possibly creating the file and the path to the file if necessary and return the name of the file on success else confess. The file being appended to is locked first with L<https://perldoc.perl.org/functions/flock.html> to allow  multiple processes to append linearly to the same file.
 
      Parameter  Description
   1  $file      File to append to
@@ -4463,9 +4610,6 @@ B<Example:>
     ok !$@;
     ok fileSize($f) == 4;
   
-    eval {readFile($f)};
-    ok $@, "readFile";
-  
     ok $s eq eval {readBinaryFile($f)};
   
     𝗰𝗼𝗽𝘆𝗕𝗶𝗻𝗮𝗿𝘆𝗙𝗶𝗹𝗲($f, my $F = temporaryFile);
@@ -4525,14 +4669,15 @@ B<Example:>
     my ($width, $height) = 𝗶𝗺𝗮𝗴𝗲𝗦𝗶𝘇𝗲(fpe(qw(a image jpg)));                       
   
 
-=head2 convertImageToJpx($$$)
+=head2 convertImageToJpx($$$$)
 
-Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
 
      Parameter  Description
-  1  $source    Source file
+  1  $Source    Source file
   2  $target    Target folder (as multiple files will be created)
   3  $Size      Optional size of each tile - defaults to 256
+  4  $Tiles     Optional limit in either direction on the number of tiles
 
 B<Example:>
 
@@ -6209,7 +6354,7 @@ B<Example:>
 Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>. If the optional B<$continue> flag has been set then return the service details if this is the current service incarnation else B<undef>. Otherwise if the B<$continue> flag is false confess unless this is the current service incarnation thus bringing the earlier version of this service to an abrupt end.
 
      Parameter  Description
-  1  $s         Current service details
+  1  $service   Current service details
   2  $continue  Return result if B<$continue> is true else confess if the service has been replaced
 
 B<Example:>
@@ -6397,6 +6542,12 @@ Process starter definition.
 
 B<maximumNumberOfProcesses> - The maximum number of processes to start in parallel at one time. If this limit is exceeded, the start of subsequent processes will be delayed until processes started earlier have finished.
 
+B<processingLogFile> - Optionally the name of a file to which process start and end information should be appended
+
+B<processingTitle> - An optional title describing the processing being performed.
+
+B<totalToBeStarted> - Optionally: the total number of processes to be started - if this is supplied then an estimate of the finish time for this processing is printed to the log file every time a process starts or finishes.
+
 B<transferArea> - The name of the folder in which files transferring results from the child to the parent process will be stored.
 
 
@@ -6460,14 +6611,15 @@ B<Example:>
     𝗯𝗶𝗻𝗠𝗼𝗱𝗲𝗔𝗹𝗹𝗨𝘁𝗳𝟴;                                                               
   
 
-=head2 convertImageToJpx690($$$)
+=head2 convertImageToJpx690($$$$)
 
-Convert an image to jpx format using versions of L<Imagemagick|/https://www.imagemagick.org/script/index.php> version 6.9.0 and above.
+Convert an image to jpx format using versions of L<Imagemagick|/https://www.imagemagick.org/script/index.php> version 6.9.0 and above with optional image reduction.
 
      Parameter  Description
-  1  $source    Source file
+  1  $Source    Source file
   2  $target    Target folder (as multiple files will be created)
   3  $Size      Optional size of each tile - defaults to 256
+  4  $Tiles     Optional limit on the number of tiles in either dimension
 
 =head2 formatTableMultiLine($$)
 
@@ -6555,6 +6707,14 @@ Save source code.
   1  $aws                    Aws target file and keywords
   2  $saveIntervalInSeconds  Save internal
 
+=head2 Data::Table::Text::Starter::logEntry($$)
+
+Create a log entry showing progress and eta.
+
+     Parameter  Description
+  1  $starter   Starter
+  2  $finish    0 - start; 1 - finish
+
 =head2 Data::Table::Text::Starter::waitOne($)
 
 Wait for one process to finish and consolidate its results.
@@ -6638,7 +6798,7 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 17 L<convertDocxToFodt|/convertDocxToFodt> - Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.
 
-18 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+18 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
 
 19 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|/https://www.imagemagick.org/script/index.php> version 6.
 
@@ -6650,307 +6810,313 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 23 L<copyFolder|/copyFolder> - Copy a folder
 
-24 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
+24 L<countFileExtensions|/countFileExtensions> - Return a hash which counts the file extensions under the specified directories
 
-25 L<currentDirectory|/currentDirectory> - Get the current working directory.
+25 L<countFileTypes|/countFileTypes> - Return a hash which counts the results of applying the B<file> command to each file under the specified directories
 
-26 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
+26 L<createEmptyFile|/createEmptyFile> - Create an empty file - L<writeFile|/writeFile> complains if no data is written to the file -  and return the name of the file on success else confess.
 
-27 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
+27 L<currentDirectory|/currentDirectory> - Get the current working directory.
+
+28 L<currentDirectoryAbove|/currentDirectoryAbove> - The path to the folder above the current working folder.
+
+29 L<cutOutImagesInFodtFile|/cutOutImagesInFodtFile> - Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDocxToFodt|/convertDocxToFodt>, placing them in the specified folder and replacing them in the source file with:
 
   <image href="$imageFile" outputclass="imageType">.
 
-28 L<Data::Exchange::Service::check|/Data::Exchange::Service::check> - Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>.
+30 L<Data::Exchange::Service::check|/Data::Exchange::Service::check> - Check that we are the current incarnation of the named service with details obtained from L<newServiceIncarnation|/newServiceIncarnation>.
 
-29 L<Data::Table::Text::Starter::finish|/Data::Table::Text::Starter::finish> - Wait for all started processes to finish and return their results as an array.
+31 L<Data::Table::Text::Starter::finish|/Data::Table::Text::Starter::finish> - Wait for all started processes to finish and return their results as an array.
 
-30 L<Data::Table::Text::Starter::start|/Data::Table::Text::Starter::start> - Start a new process to run the specified B<$sub>.
+32 L<Data::Table::Text::Starter::logEntry|/Data::Table::Text::Starter::logEntry> - Create a log entry showing progress and eta.
 
-31 L<Data::Table::Text::Starter::waitOne|/Data::Table::Text::Starter::waitOne> - Wait for one process to finish and consolidate its results.
+33 L<Data::Table::Text::Starter::start|/Data::Table::Text::Starter::start> - Start a new process to run the specified B<$sub>.
 
-32 L<dateStamp|/dateStamp> - Year-monthName-day
+34 L<Data::Table::Text::Starter::waitOne|/Data::Table::Text::Starter::waitOne> - Wait for one process to finish and consolidate its results.
 
-33 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
+35 L<dateStamp|/dateStamp> - Year-monthName-day
 
-34 L<dateTimeStampName|/dateTimeStampName> - Date time stamp without white space.
+36 L<dateTimeStamp|/dateTimeStamp> - Year-monthNumber-day at hours:minute:seconds
 
-35 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
+37 L<dateTimeStampName|/dateTimeStampName> - Date time stamp without white space.
 
-36 L<decodeJson|/decodeJson> - Decode Perl from Json.
+38 L<decodeBase64|/decodeBase64> - Decode a string in base 64.
 
-37 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
+39 L<decodeJson|/decodeJson> - Decode Perl from Json.
 
-38 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
+40 L<denormalizeFolderName|/denormalizeFolderName> - Remove any trailing folder separator from a folder name component.
 
-39 L<dumpFile|/dumpFile> - Dump a data structure to a file
+41 L<docUserFlags|/docUserFlags> - Generate documentation for a method by calling the extractDocumentationFlags method in the package being documented, passing it the flags for a method and the name of the method.
 
-40 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
+42 L<dumpFile|/dumpFile> - Dump a data structure to a file
 
-41 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
+43 L<dumpGZipFile|/dumpGZipFile> - Write a data structure through B<gzip> to a file.
 
-42 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
+44 L<enclosedReversedString|/enclosedReversedString> - Convert alphanumerics in a string to enclosed reversed alphanumerics.
 
-43 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
+45 L<enclosedReversedStringUndo|/enclosedReversedStringUndo> - Undo alphanumerics in a string to enclosed reversed alphanumerics.
 
-44 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
+46 L<enclosedString|/enclosedString> - Convert alphanumerics in a string to enclosed alphanumerics.
 
-45 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
+47 L<enclosedStringUndo|/enclosedStringUndo> - Undo alphanumerics in a string to enclosed alphanumerics.
 
-46 L<encodeJson|/encodeJson> - Encode Perl to Json.
+48 L<encodeBase64|/encodeBase64> - Encode a string in base 64.
 
-47 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
+49 L<encodeJson|/encodeJson> - Encode Perl to Json.
 
-48 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
+50 L<evalFile|/evalFile> - Read a file containing unicode in utf8, evaluate it, confess to any errors and then return any result - an improvement on B<do> which silently ignores any problems.
 
-49 L<extractTest|/extractTest> - Remove example markers from test code.
+51 L<evalGZipFile|/evalGZipFile> - Read a file containing compressed utf8, evaluate it, confess to any errors or return any result.
 
-50 L<fe|/fe> - Get extension of file name.
+52 L<extractTest|/extractTest> - Remove example markers from test code.
 
-51 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
+53 L<fe|/fe> - Get extension of file name.
 
-52 L<fileMd5Sum|/fileMd5Sum> - Get the Md5 sum for a file
+54 L<fileList|/fileList> - Files that match a given search pattern handed to bsd_glob.
 
-53 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
+55 L<fileMd5Sum|/fileMd5Sum> - Get the Md5 sum for a file
 
-54 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
+56 L<fileModTime|/fileModTime> - Get the modified time of a file in seconds since the epoch.
 
-55 L<filePath|/filePath> - Create a file name from an array of file name components.
+57 L<fileOutOfDate|/fileOutOfDate> - Calls the specified sub once for each source file that is missing, then calls the sub for the target if there were any missing files or if the target is older than any of the non missing source files or if the target does not exist.
 
-56 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
+58 L<filePath|/filePath> - Create a file name from an array of file name components.
 
-57 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
+59 L<filePathDir|/filePathDir> - Create a directory name from an array of file name components.
 
-58 L<fileSize|/fileSize> - Get the size of a file.
+60 L<filePathExt|/filePathExt> - Create a file name from an array of file name components the last of which is an extension.
 
-59 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
+61 L<fileSize|/fileSize> - Get the size of a file.
 
-60 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
+62 L<findDirs|/findDirs> - Find all the folders under a folder and optionally filter the selected folders with a regular expression.
 
-61 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
+63 L<findFiles|/findFiles> - Find all the files under a folder and optionally filter the selected files with a regular expression.
 
-62 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
+64 L<findFileWithExtension|/findFileWithExtension> - Find the first extension from the specified extensions that produces a file that exists when appended to the specified file.
 
-63 L<firstNChars|/firstNChars> - First N characters of a string.
+65 L<firstFileThatExists|/firstFileThatExists> - Returns the name of the first file that exists or B<undef> if none of the named files exist.
 
-64 L<fn|/fn> - Remove path and extension from file name.
+66 L<firstNChars|/firstNChars> - First N characters of a string.
 
-65 L<fne|/fne> - Remove path from file name.
+67 L<fn|/fn> - Remove path and extension from file name.
 
-66 L<formatTable|/formatTable> - Format various data structures as a table.
+68 L<fne|/fne> - Remove path from file name.
 
-67 L<formatTableA|/formatTableA> - Tabularize an array.
+69 L<formatTable|/formatTable> - Format various data structures as a table.
 
-68 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
+70 L<formatTableA|/formatTableA> - Tabularize an array.
 
-69 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
+71 L<formatTableAA|/formatTableAA> - Tabularize an array of arrays.
 
-70 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
+72 L<formatTableAH|/formatTableAH> - Tabularize an array of hashes.
 
-71 L<formatTableH|/formatTableH> - Tabularize a hash.
+73 L<formatTableBasic|/formatTableBasic> - Tabularize an array of arrays of text.
 
-72 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
+74 L<formatTableH|/formatTableH> - Tabularize a hash.
 
-73 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
+75 L<formatTableHA|/formatTableHA> - Tabularize a hash of arrays.
 
-74 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
+76 L<formatTableHH|/formatTableHH> - Tabularize a hash of hashes.
 
-75 L<fp|/fp> - Get path from file name.
+77 L<formatTableMultiLine|/formatTableMultiLine> - Tabularize text that has new lines in it.
 
-76 L<fpn|/fpn> - Remove extension from file name.
+78 L<fp|/fp> - Get path from file name.
 
-77 L<fullFileName|/fullFileName> - Full name of a file.
+79 L<fpn|/fpn> - Remove extension from file name.
 
-78 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes> accessible via L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method calls.
+80 L<fullFileName|/fullFileName> - Full name of a file.
 
-79 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
+81 L<genHash|/genHash> - Return a B<$bless>ed hash with the specified B<$attributes> accessible via L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> method calls.
 
-80 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
+82 L<genLValueArrayMethods|/genLValueArrayMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> array methods in the current package.
 
-81 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
+83 L<genLValueHashMethods|/genLValueHashMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> hash methods in the current package.
 
-82 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
+84 L<genLValueScalarMethods|/genLValueScalarMethods> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods in the current package, A method whose value has not yet been set will return a new scalar with value B<undef>.
 
-83 L<hostName|/hostName> - The name of the host we are running on.
+85 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
 
-84 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
+86 L<hostName|/hostName> - The name of the host we are running on.
 
-85 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+87 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
 
-86 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
+88 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
 
-87 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
+89 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
 
-88 L<isBlank|/isBlank> - Test whether a string is blank.
+90 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
 
-89 L<isSubInPackage|/isSubInPackage> - Test whether a subroutine is present in a package.
+91 L<isBlank|/isBlank> - Test whether a string is blank.
 
-90 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
+92 L<isSubInPackage|/isSubInPackage> - Test whether a subroutine is present in a package.
 
-91 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
+93 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
 
-92 L<keyCount|/keyCount> - Count keys down to the specified level.
+94 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
 
-93 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
+95 L<keyCount|/keyCount> - Count keys down to the specified level.
 
-94 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
+96 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
 
-95 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is an hash of words.
+97 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
 
-96 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
+98 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is an hash of words.
 
-97 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
+99 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
 
-98 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
+100 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-99 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+101 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
 
-100 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred.
+102 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
 
-101 L<makePath|/makePath> - Make the path for the specified file name or folder.
+103 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred.
 
-102 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
+104 L<makePath|/makePath> - Make the path for the specified file name or folder.
 
-103 L<max|/max> - Find the maximum number in a list.
+105 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
 
-104 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
+106 L<max|/max> - Find the maximum number in a list.
 
-105 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge the specified hashes by summing their values
+107 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
 
-106 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+108 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge the specified hashes by summing their values
 
-107 L<min|/min> - Find the minimum number in a list.
+109 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-108 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
+110 L<min|/min> - Find the minimum number in a list.
 
-109 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+111 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
 
-110 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
+112 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
 
-111 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
+113 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
 
-112 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+114 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-113 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
+115 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-114 L<overWriteBinaryFile|/overWriteBinaryFile> - Write a binary string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+116 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
 
-115 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+117 L<overWriteBinaryFile|/overWriteBinaryFile> - Write a binary string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-116 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
+118 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-117 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
+119 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
 
-118 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
+120 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
 
-119 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+121 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
 
-120 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
+122 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-121 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
+123 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
 
-122 L<printQw|/printQw> - Print an array of words in qw() format.
+124 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
 
-123 L<quoteFile|/quoteFile> - Quote a file name.
+125 L<printQw|/printQw> - Print an array of words in qw() format.
 
-124 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
+126 L<quoteFile|/quoteFile> - Quote a file name.
 
-125 L<readFile|/readFile> - Read a file containing unicode in utf8.
+127 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
 
-126 L<readFiles|/readFiles> - Read all the files in a folder into a hash
+128 L<readFile|/readFile> - Read a file containing unicode in utf8.
 
-127 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
+129 L<readFiles|/readFiles> - Read all the files in a folder into a hash
 
-128 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
+130 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
 
-129 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
+131 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
 
-130 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+132 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
 
-131 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+133 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-132 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
+134 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-133 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
+135 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
 
-134 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
+136 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
 
-135 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
+137 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
 
-136 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+138 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
 
-137 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
+139 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-138 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
+140 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-139 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
+141 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
 
-140 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
+142 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
 
-141 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
+143 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
 
-142 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
+144 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-143 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+145 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-144 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
+146 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-145 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
+147 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
 
-146 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
+148 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
 
-147 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
+149 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
 
-148 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
+150 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
 
-149 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
+151 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
 
-150 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
+152 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
 
-151 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a known name to a new one,
+153 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
 
-152 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
+154 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a known name to a new one,
 
-153 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
+155 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
 
-154 L<timeStamp|/timeStamp> - hours:minute:seconds
+156 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
-155 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
+157 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-156 L<trackFiles|/trackFiles> - Track the existence of files.
+158 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
 
-157 L<trim|/trim> - Remove any white space from the front and end of a string.
+159 L<trackFiles|/trackFiles> - Track the existence of files.
 
-158 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
+160 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-159 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
+161 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
 
-160 L<userId|/userId> - The userid we are currently running under.
+162 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
 
-161 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+163 L<userId|/userId> - The userid we are currently running under.
 
-162 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+164 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
 
-163 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+165 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
 
-164 L<writeBinaryFile|/writeBinaryFile> - Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+166 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
 
-165 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+167 L<writeBinaryFile|/writeBinaryFile> - Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
 
-166 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+168 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
 
-167 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+169 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
 
-168 L<wwwDecode|/wwwDecode> - Replace %20 in a string with a space.
+170 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
 
-169 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
+171 L<wwwDecode|/wwwDecode> - Replace %20 in a string with a space.
 
-170 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+172 L<wwwEncode|/wwwEncode> - Replace spaces in a string with %20 .
 
-171 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+173 L<xxx|/xxx> - Execute a shell command optionally checking its response.
 
-172 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+174 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
 
-173 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
+175 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+
+176 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
 
 =head1 Installation
 
@@ -7018,6 +7184,7 @@ my $windows   = $^O =~ m(MSWin32)i;
 my $mac       = $^O =~ m(darwin)i;
 my $freeBsd   = $^O =~ m(freebsd)i;
 my $dragonFly = $^O =~ m(dragonfly)i;
+my $linux     = $^O =~ m(linux)i;
 
 if (1)                                                                          # Unicode to local file
  {use utf8;
@@ -7842,6 +8009,8 @@ if (0) {
   makeDieConfess                                                                #TmakeDieConfess
   ipAddressViaArp(q(secarias));                                                 #TipAddressViaArp
   fileMd5Sum(q(/etc/hosts));                                                    #TfileMd5Sum
+  countFileExtensions(q(/home/phil/perl/));                                     #TcountFileExtensions
+  countFileTypes(q(/home/phil/perl/));                                          #TcountFileTypes
  }
 
 ok nws(htmlToc("XXXX", <<END)), 'htmlToc'                                       #ThtmlToc
@@ -8230,14 +8399,24 @@ if (1)                                                                          
 
 if (!$windows)                                                                  #TnewProcessStarter #TData::Table::Text::Starter::start #TData::Table::Text::Starter::finish
  {my $N = 100;
+  my $l = q(logFile.txt);
+  unlink $l;
   my $s = newProcessStarter(4, q(processes));
+     $s->processingTitle   = q(Test processes);
+     $s->totalToBeStarted  = $N;
+     $s->processingLogFile = $l;
+
   for my $i(1..$N)
    {Data::Table::Text::Starter::start($s, sub{$i*$i});
    }
+
   is_deeply
    [sort {$a <=> $b} Data::Table::Text::Starter::finish($s)],
    [map {$_**2} 1..$N];
-  clearFolder($s->transferArea, 1e2);
+
+  ok readFile($l) =~ m(Finished $N processes for: Test processes)s;
+  clearFolder($s->transferArea, 1e3);
+  unlink $l;
  }
 else
  {ok 1
@@ -8272,7 +8451,7 @@ if (1) {                                                                        
   unlink $f;
  }
 
-if ($freeBsd or $windows or $dragonFly) {ok 1 for 1..3} else {
+if ($freeBsd or $windows or $dragonFly or $linux) {ok 1 for 1..3} else {
 if (1) {                                                                        #TwriteFiles #TreadFiles #TcopyFile #TcopyFolder
   my $h =
    {"aaa/1.txt"=>"1111",
@@ -8401,6 +8580,9 @@ if (1)                                                                          
    }
  }
 
+#eval {readFile($f)};                                                           # Fails to fail in the following section on a number of operating systems
+#ok $@, "readFile";
+
 if (1)                                                                          #ToverWriteBinaryFile #TwriteBinaryFile #TcopyBinaryFile
  {vec(my $a, 0, 8) = 254;
   vec(my $b, 0, 8) = 255;
@@ -8421,9 +8603,6 @@ if (1)                                                                          
   eval {overWriteBinaryFile($f, $s)};
   ok !$@;
   ok fileSize($f) == 4;
-
-  eval {readFile($f)};
-  ok $@, "readFile";
 
   ok $s eq eval {readBinaryFile($f)};
 

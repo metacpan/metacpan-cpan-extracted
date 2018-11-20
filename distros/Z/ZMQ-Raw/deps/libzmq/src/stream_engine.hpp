@@ -76,7 +76,7 @@ class stream_engine_t : public io_object_t, public i_engine
     //  i_engine interface implementation.
     void plug (zmq::io_thread_t *io_thread_, zmq::session_base_t *session_);
     void terminate ();
-    void restart_input ();
+    bool restart_input ();
     void restart_output ();
     void zap_msg_available ();
     const char *get_endpoint () const;
@@ -93,11 +93,21 @@ class stream_engine_t : public io_object_t, public i_engine
     //  Function to handle network disconnections.
     void error (error_reason_t reason_);
 
-    //  Receives the greeting message from the peer.
-    int receive_greeting ();
-
     //  Detects the protocol used by the peer.
     bool handshake ();
+
+    //  Receive the greeting from the peer.
+    int receive_greeting ();
+    void receive_greeting_versioned ();
+
+    typedef bool (stream_engine_t::*handshake_fun_t) ();
+    static handshake_fun_t select_handshake_fun (bool unversioned,
+                                                 unsigned char revision);
+
+    bool handshake_v1_0_unversioned ();
+    bool handshake_v1_0 ();
+    bool handshake_v2_0 ();
+    bool handshake_v3_0 ();
 
     int routing_id_msg (msg_t *msg_);
     int process_routing_id_msg (msg_t *msg_);
@@ -134,9 +144,6 @@ class stream_engine_t : public io_object_t, public i_engine
 
     //  Underlying socket.
     fd_t _s;
-
-    //  True iff this is server's engine.
-    bool _as_server;
 
     msg_t _tx_msg;
     //  Need to store PING payload for PONG

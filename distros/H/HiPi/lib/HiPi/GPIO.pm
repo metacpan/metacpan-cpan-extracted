@@ -17,7 +17,7 @@ use XSLoader;
 use Carp;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.72';
+our $VERSION ='0.74';
 
 __PACKAGE__->create_accessors( );
 
@@ -58,13 +58,13 @@ my @_alt_function_names = (
     [qw( UART0_TXD     SD6          ALT2   ALT3   ALT4   UART1_TXD ) ], # GPIO 14
     [qw( UART0_RXD     SD7          ALT2   ALT3   ALT4   UART1_RXD ) ], # GPIO 15
     
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 16
+    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_CE2_N        ALT5 ) ], # GPIO 16
     [qw( ALT0          SD9          ALT2   UART0_RTS   SPI1_CE1_N  UART1_RTS ) ], # GPIO 17
     [qw( PCM_CLK       SD10         ALT2   BSCSL_SDA/MOSI   SPI1_CE0_N   PWM0 ) ], # GPIO 18
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 19
+    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_MISO        ALT5 ) ], # GPIO 19
     
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        ALT5 ) ], # GPIO 20
-    [qw( ALT0          ALT1         ALT2   ALT3   ALT4        GPCLK1 ) ], # GPIO 21
+    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_MOSI        ALT5 ) ], # GPIO 20
+    [qw( ALT0          ALT1         ALT2   ALT3   SPI1_SCLK        GPCLK1 ) ], # GPIO 21
     [qw( ALT0          SD14         ALT2   SD1_CLK   ARM_TRST ALT5 ) ], # GPIO 22
     [qw( ALT0          SD15         ALT2   SD1_CMD   ARM_RTCK ALT5 ) ], # GPIO 23
     

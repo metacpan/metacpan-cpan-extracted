@@ -13,7 +13,7 @@ use base 'Exporter';
 use Carp;
 eval { require Carp::Heavy; };  # work around perl_call_pv bug XXX
 our $API;
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 # If we inherit DynaLoader then we inherit AutoLoader; Bletch!
 require DynaLoader;

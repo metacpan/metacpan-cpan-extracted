@@ -14,6 +14,45 @@ my $file = 't/' . basename $0;
 use FindBin;
 use lib "$FindBin::Bin/default/lib";
 
+# String
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::String::CharacterAssign');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+# Term
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Term::SingleParenthesArrayLength');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+# Array init
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::ArrayInit::ArrayLength');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+# Call sub
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::CallSub::ArrayLength');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
 # Weaken
 {
   {

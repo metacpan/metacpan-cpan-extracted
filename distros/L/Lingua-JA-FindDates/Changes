@@ -1,3 +1,8 @@
+0.028 2018-11-19
+
+* Allow export of $jera and $jera2w
+* Lower-case h/s etc. single-letter eras accepted (h 30 for Heisei 30, etc.)
+
 0.027 2018-10-24
 
 * Documentation

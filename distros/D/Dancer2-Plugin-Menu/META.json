@@ -26,7 +26,7 @@
             "Dancer2::Plugin" : "0",
             "Data::Dumper" : "0",
             "HTML::Element" : "0",
-            "List::Util" : "0",
+            "MooX::HandlesVia" : "0",
             "Storable" : "0",
             "perl" : "5.010",
             "strict" : "0",
@@ -57,7 +57,7 @@
          "web" : "https://github.com/sdondley/Dancer2-Plugin-Menu"
       }
    },
-   "version" : "0.006",
+   "version" : "0.009",
    "x_generated_by_perl" : "v5.24.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

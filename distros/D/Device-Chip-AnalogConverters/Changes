@@ -1,5 +1,15 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.06    2018-11-18 01:14:00
+        [CHANGES]
+         * Revert Future::AsyncAwait experimentation
+         * Document some standard ADC and DAC methods
+         * Added drivers for MCP3221 and DAC7571
+         * Created generic adc.pl and dac.pl example wrapper scripts
+
+        [BUGFIXES]
+         * Fix MAX11200's UB config bit decoding
+
 0.05    2018-01-18 16:19:14
         [CHANGES]
          * Rewrite logic to use Future::AsyncAwait as demonstration

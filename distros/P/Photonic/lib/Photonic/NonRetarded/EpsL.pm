@@ -4,7 +4,7 @@ Photonic::NonRetarded::EpsL
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ check. From Photonic::Roles::EpsParams
 =cut
 
 package Photonic::NonRetarded::EpsL;
-$Photonic::NonRetarded::EpsL::VERSION = '0.009';
+$Photonic::NonRetarded::EpsL::VERSION = '0.010';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -148,7 +148,6 @@ sub evaluate {
     #If there are less available coefficients than $self->nh and all
     #of them were used, there is no remaining work to do, so, converged 
     $converged=1 if $self->nr->iteration < $self->nh;
-    $self->_converged($converged);
     $self->_converged($converged);
     $self->_nhActual($n);
     $self->_epsL($epsA*$fn/$u);

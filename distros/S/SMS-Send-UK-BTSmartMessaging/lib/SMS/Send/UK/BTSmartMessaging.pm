@@ -10,11 +10,11 @@ SMS::Send::UK::BTSmartMessaging
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,7 @@ sub clean_number {
     }
     # Strip any leading +
     elsif ($source_number =~ /^\+44/) {
-        $source_number =~ s/^\+/44/;
+        $source_number =~ s/^\+//;
         return $source_number;
     }
     # Replace a leading 0 with 44

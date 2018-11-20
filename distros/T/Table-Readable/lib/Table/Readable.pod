@@ -25,13 +25,13 @@ produces output
     de Fehlerstrom-Schutzschalter
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Table-Readable-0.02/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.03/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Table::Readable version 0.02
-corresponding to git commit L<f0071dae7a70ea6ce9ac7a03641975ca3abcb328|https://github.com/benkasminbullock/Table-Readable/commit/f0071dae7a70ea6ce9ac7a03641975ca3abcb328> released on Tue Feb 28 15:30:27 2017 +0900.
+This documents Table::Readable version 0.03
+corresponding to git commit L<f3df88e9d66f7cbfb70c8d1c4aced75db03cfe84|https://github.com/benkasminbullock/Table-Readable/commit/f3df88e9d66f7cbfb70c8d1c4aced75db03cfe84> released on Mon Nov 19 14:50:42 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -143,23 +143,6 @@ a colon, followed by the value.
 
 A blank line may contain spaces (something which matches C<\s>).
 
-=head2 Multiline entries
-
-    %%key1:
-
-    value goes here.
-
-    %%
-
-Multiline entries begin and end with two percent characters at the
-beginning of the line. Between the two percent characters there may be
-any number of blank lines. Whitespace (anything matching C<\s>) is
-stripped from the beginning and end of the value. There is no way to
-have double percent characters at the beginning of a line within a
-multiline value, so if you need double percents, you must use a
-different syntax and then post-process the entry to convert your
-syntax to double percent characters.
-
 =head2 Comments
 
 Lines containing a hash character '#' at the beginning of the line are
@@ -190,14 +173,39 @@ produces output
     2
 
 
-(This example is included as L<F<comment-not-row.pl>|https://api.metacpan.org/source/BKB/Table-Readable-0.02/examples/comment-not-row.pl> in the distribution.)
+(This example is included as L<F<comment-not-row.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.03/examples/comment-not-row.pl> in the distribution.)
 
 
 =head2 Encoding
 
 The file must be encoded in the UTF-8 encoding.
 
-=head2 Whitespace
+=head2 Unparseable lines
+
+Lines which are not part of a multiline value, are not comments, and
+do not contain a key, are discarded and a warning is printed.
+
+=head2 Values
+
+=head3 Multiline values
+
+    %%key1:
+
+    value goes here.
+
+    %%
+
+Multiline values begin and end with two percent characters at the
+beginning of the line. Between the two percent characters there may be
+any number of blank lines. Whitespace (anything matching C<\s>) is
+stripped from the beginning and end of the value. 
+
+There is no way to have double percent characters at the beginning of
+a line within a multiline value, so if you need double percents, you
+must use a different syntax and then post-process the entry to convert
+your syntax to double percent characters.
+
+=head3 Whitespace
 
 Whitespace (anything matching C<\s>) is stripped from the beginning
 and end of the value. To preserve whitespace, use your own syntax such
@@ -237,10 +245,65 @@ produces output
     'a' = 'b'
 
 
-(This example is included as L<F<whitespace.pl>|https://api.metacpan.org/source/BKB/Table-Readable-0.02/examples/whitespace.pl> in the distribution.)
+(This example is included as L<F<whitespace.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.03/examples/whitespace.pl> in the distribution.)
 
 
-=head2 Empty values
+Leading and trailing whitespace can be preserved by preceding it with
+a backslash character:
+
+    
+    use utf8;
+    use Table::Readable 'read_table';
+    my $table =<<'EOF';
+    a: \  b     
+    %%c:
+    \
+    
+    d
+    
+    %%
+    %%e:
+    
+    f
+    
+    !
+    
+    
+    \
+    %%
+    EOF
+    my @entries = read_table ($table, scalar => 1);
+    for my $k (keys %{$entries[0]}) {
+        my $v = $entries[0]{$k};
+        $v =~ s/!$//;
+        print "'$k' = '$v'\n";
+    }
+    
+
+
+produces output
+
+    'a' = '  b'
+    'e' = 'f
+    
+    !
+    
+    
+    '
+    'c' = '
+    
+    d'
+
+
+(This example is included as L<F<slash.pl>|https://fastapi.metacpan.org/source/BKB/Table-Readable-0.03/examples/slash.pl> in the distribution.)
+
+
+If you actually need a backslash at the start or end of your string,
+use a double backslash, C<\\>. In parts of the string other than the
+first or the last position, double backslashes are not treated
+specially.
+
+=head3 Empty values
 
 Keys without values, like
 
@@ -250,7 +313,9 @@ are permitted within the table. A key with no value results in the
 value for that key being an empty string, rather than the undefined
 value.
 
-=head2 Key syntax
+=head2 Keys
+
+=head3 Key syntax
 
 A key is a series of one or more of any characters whatsoever except
 for colons. In regular expression language, a key matches $2 in the
@@ -262,22 +327,17 @@ Keys cannot contain colons, so if you need to have colons in your
 keys, invent your own escape sequence, such as substituting semicolons
 or @ marks for colons.
 
-=head2 Consistency of keys
+=head3 Consistency of keys
 
 There is no requirement that the keys in one row of the table have to
 be the same as the keys in the subsequent row. Each row of the table
 may have completely inconsistent keys. If you need consistent keys,
 add a post-processor of your own.
 
-=head2 Uniqueness of keys
+=head3 Uniqueness of keys
 
 Keys within a single row must be unique. A duplicate key within a row
 causes a fatal error.
-
-=head2 Unparseable lines
-
-Lines which are not part of a multiline value, are not comments, and
-do not contain a key, are discarded and a warning is printed.
 
 =head2 Design and motivation
 
@@ -291,16 +351,17 @@ L<http://kanji.sljfaq.org/translations.txt>, and files of tabular
 information, such as
 L<https://www.lemoda.net/unix/troff-dictionary/dictionary.txt>.
 
-This format is deliberately designed to reduce the amount of mental
-effort necessary to type in a machine-readable table of
-information. By design, it adds only the most minimal possible
-interpretations to characters. There are only four significant
-characters, the newline, the colon, the hash character #, and the
-percent character %. The hash character and the percent character are
-only significant either when they come immediately after a new line or
-when they are the first byte in the file. The multiline escape
-sequence is two percents at the beginning of a line, a sequence which
-rarely occurs in normal text.
+This format is designed to reduce the amount of mental effort
+necessary to type in a machine-readable table of information. By
+design, it adds only the most minimal possible interpretations to
+characters. There are only five significant characters, the newline,
+the colon, the hash character #, the percent character %, and the
+backslash \. The hash character and the percent character are only
+significant either when they come immediately after a new line or when
+they are the first byte in the file, and the backslash is only
+significant in conjunction with leading or trailing white space. The
+multiline escape sequence is two percents at the beginning of a line,
+a sequence which rarely occurs in normal text.
 
 The minimalism of this module is intentional; I will never, ever, add
 new syntax, extra escape characters, comments not at the end of lines,
@@ -343,6 +404,7 @@ request. A tag ":all" exports all the functions:
     use Table::Readable ':all';
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -350,7 +412,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2010-2017
+2010-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

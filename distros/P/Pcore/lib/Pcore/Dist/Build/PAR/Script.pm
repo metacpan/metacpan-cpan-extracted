@@ -20,8 +20,8 @@ has mod     => ( required => 1 );    # HashRef
 has tree         => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::Util::File::Tree']
 has par_suffix   => ( is => 'lazy', init_arg => undef );
 has exe_filename => ( is => 'lazy', init_arg => undef );
-has main_mod => ( sub { {} }, is => 'lazy', init_arg => undef );    # HashRef, main modules, found during deps processing
-has shared_objects => ( init_arg => undef );                        # HashRef
+has main_mod       => ( sub { {} }, is => 'lazy', init_arg => undef );    # HashRef, main modules, found during deps processing
+has shared_objects => ( init_arg       => undef );                        # HashRef
 
 sub _build_tree ($self) {
     return Pcore::Util::File::Tree->new;

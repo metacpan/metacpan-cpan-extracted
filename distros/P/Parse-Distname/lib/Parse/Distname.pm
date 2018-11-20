@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use Exporter 5.57 'import';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw/parse_distname/;
 
 our $SUFFRE = qr/\.(?:tgz|tbz|tar[\._-]gz|tar\.bz2|tar\.Z|zip)$/;
@@ -63,8 +63,8 @@ sub parse_distname {
   }
 
   # PAUSE allows only a few extensions ($PAUSE::dist::SUFFQR + zip)
-  $path =~ s/($SUFFRE)//i;
-  $res{extension} = $1 or return;
+  $path =~ s/($SUFFRE)//i or return;
+  $res{extension} = $1;
 
   $res{name_and_version} = $path;
 

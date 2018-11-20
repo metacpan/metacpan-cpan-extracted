@@ -2,7 +2,7 @@ package MooseX::DataModel {
   use Moose;
   use Moose::Exporter;
   use Moose::Util::TypeConstraints qw/find_type_constraint register_type_constraint coerce subtype from via/;
-  our $VERSION = "1.00";
+  our $VERSION = "1.01";
 
   Moose::Exporter->setup_import_methods(
     with_meta => [ qw/ key array object / ],
@@ -167,8 +167,8 @@ package MooseX::DataModel {
 
   sub new_from_json {
     my ($class, $json) = @_;
-    require JSON;
-    return $class->new(JSON::decode_json($json));
+    require JSON::MaybeXS;
+    return $class->new(JSON::MaybeXS::decode_json($json));
   }
 
 }

@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::TestMLIncluder;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -45,9 +45,27 @@ sub gather_files {
   }
 
   # Also add the user-side-only TestML runner bin: 'testml-cpan':
+  my $testml_cpan = <<'...';
+#!/usr/bin/perl
+
+use lib 't', 'inc/lib';
+
+use TestML::Run::TAP;
+
+my $testml_file = $ARGV[-1];
+my $test_file = $testml_file;
+
+$test_file =~ s/(.*)\.t$/inc\/$1.tml.lingy/
+  or die "Error with '$testml_file'. testml-cpan only works with *.t files.";
+-e $test_file
+  or die "TestML file '$testml_file' not compiled as '$test_file'";
+
+TestML::Run::TAP->run($test_file);
+...
+
   $self->add(
     "inc/bin/testml-cpan",
-    io("$testml_root/src/perl5/pkg/bin/testml-cpan")->all,
+    $testml_cpan,
   );
 }
 
@@ -64,12 +82,12 @@ sub munge_file {
 
     # Then precompile the TestML .t files to Lingy/JSON:
     my $compiler = TestML::Compiler->new;
-    my $json = $compiler->compile($content, $file->name);
+    my $lingy = $compiler->compile($content, $file->name);
     my $name = $file->name;
     $name =~ s/\.t$// or die;
-    $name = "inc/$name.tml.json";
+    $name = "inc/$name.tml.lingy";
 
-    $self->add($name => $json);
+    $self->add($name => $lingy);
   }
   # Add a footer to Makefile.PL to use the user's perl in testml-cpan:
   elsif ($file->name eq 'Makefile.PL') {

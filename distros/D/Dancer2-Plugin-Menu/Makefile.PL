@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Dancer2::Plugin" => 0,
     "Data::Dumper" => 0,
     "HTML::Element" => 0,
-    "List::Util" => 0,
+    "MooX::HandlesVia" => 0,
     "Storable" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::NoWarnings" => 0,
     "Test::Output" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,7 @@ my %FallbackPrereqs = (
   "File::Path" => 0,
   "HTML::Element" => 0,
   "HTTP::Request::Common" => 0,
-  "List::Util" => 0,
+  "MooX::HandlesVia" => 0,
   "Plack::Test" => 0,
   "Storable" => 0,
   "Test::More" => 0,

@@ -14,7 +14,7 @@ use constant REG_DATA_SIZE => 8;
 
 use utf8;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp;
 use Data::Bitfield qw( bitfield boolfield );

@@ -30,7 +30,6 @@ do { my $x = {
                                       'DBIx::Class::Core' => '0',
                                       'Ref::Util' => '0',
                                       'Sub::Quote' => '0',
-                                      'parent' => '0',
                                       'perl' => 'v5.10.1'
                                     }
                     },
@@ -40,13 +39,13 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'DBD::SQLite' => '0',
+                                   'DBIx::Class::Core' => '0',
                                    'DBIx::Class::Schema' => '0',
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
                                    'SQL::Translator' => '0.11018',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0',
-                                   'base' => '0'
+                                   'Test::Most' => '0'
                                  }
                  }
      };

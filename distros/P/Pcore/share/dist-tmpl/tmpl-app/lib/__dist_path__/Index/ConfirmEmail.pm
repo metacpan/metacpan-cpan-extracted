@@ -2,7 +2,7 @@ package Lcom::Index::ConfirmEmail;
 
 use Pcore -class, -l10n;
 
-with qw[Pcore::App::Controller];
+with qw[Pcore::App::Controller Pcore::App::Controller::Ext];
 
 has path => '/confirm-email/', init_arg => undef;
 

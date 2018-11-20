@@ -9,10 +9,9 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
-use Future::AsyncAwait;
 use Data::Bitfield 0.02 qw( bitfield boolfield enumfield );
 use List::Util qw( first );
 
@@ -71,18 +70,19 @@ use constant {
    REG_SCGC  => 8,
 };
 
-async sub read_register
+sub read_register
 {
    my $self = shift;
    my ( $reg, $len ) = @_;
 
    $len //= 1;
 
-   my $bytes = await $self->protocol->readwrite(
+   $self->protocol->readwrite(
       pack "C a*", 0xC1 | ( $reg << 1 ), "\0" x $len
-   );
-
-   return substr $bytes, 1;
+   )->then( sub {
+      my ( $bytes ) = @_;
+      Future->done( substr $bytes, 1 );
+   });
 }
 
 sub write_register
@@ -136,13 +136,14 @@ bitfield { format => "bytes-LE" }, STAT =>
    RATE  => enumfield(4, @RATES),
    SYSOR => boolfield(7);
 
-async sub read_status
+sub read_status
 {
    my $self = shift;
 
-   my $bytes = await $self->read_register( REG_STAT );
-
-   return unpack_STAT( $bytes );
+   $self->read_register( REG_STAT )->then( sub {
+      my ( $bytes ) = @_;
+      return Future->done( unpack_STAT( $bytes ) );
+   });
 }
 
 =head2 read_config
@@ -173,7 +174,7 @@ bitfield { format => "bytes-LE" }, CONFIG =>
    SIGBUF => boolfield(3),
    REFBUF => boolfield(4),
    EXTCLK => boolfield(5),
-   UB     => enumfield(6, qw( UNIPOLAR BIPOLAR )),
+   UB     => enumfield(6, qw( BIPOLAR UNIPOLAR )),
    LINEF  => enumfield(7, qw( 60Hz 50Hz )),
    # CTRL2 is all GPIO control; we'll do that elsewhere
    # CTRL3
@@ -183,15 +184,17 @@ bitfield { format => "bytes-LE" }, CONFIG =>
    NOSYSG => boolfield(8+4),
    DGAIN  => enumfield(8+5, qw( 1 2 4 8 16 ));
 
-async sub read_config
+sub read_config
 {
    my $self = shift;
 
-   my ( $ctrl1, $ctrl3 ) = await Future->needs_all(
-      $self->read_register( REG_CTRL1 ), $self->read_register( REG_CTRL3 )
-   );
-
-   return $self->{config} = { unpack_CONFIG( $ctrl1 . $ctrl3 ) };
+   Future->needs_all(
+      $self->read_register( REG_CTRL1 ),
+      $self->read_register( REG_CTRL3 ),
+   )->then( sub {
+      my ( $ctrl1, $ctrl3 ) = @_;
+      Future->done( $self->{config} = { unpack_CONFIG( $ctrl1 . $ctrl3 ) } );
+   });
 }
 
 =head2 change_config
@@ -203,20 +206,23 @@ their existing values.
 
 =cut
 
-async sub change_config
+sub change_config
 {
    my $self = shift;
    my %changes = @_;
 
-   my $config = $self->{config} // await $self->read_config;
+   ( $self->{config} ? Future->done( $self->{config} ) : $self->read_config )
+   ->then( sub {
+      my ( $config ) = @_;
 
-   $self->{config} = { %$config, %changes };
-   my $ctrlb = pack_CONFIG( %{ $self->{config} } );
+      $self->{config} = { %$config, %changes };
+      my $ctrlb = pack_CONFIG( %{ $self->{config} } );
 
-   await Future->needs_all(
-      $self->write_register( REG_CTRL1, substr $ctrlb, 0, 1 ),
-      $self->write_register( REG_CTRL3, substr $ctrlb, 1, 1 ),
-   );
+      Future->needs_all(
+         $self->write_register( REG_CTRL1, substr $ctrlb, 0, 1 ),
+         $self->write_register( REG_CTRL3, substr $ctrlb, 1, 1 ),
+      );
+   });
 }
 
 =head2 selfcal
@@ -301,13 +307,53 @@ either signed or unsigned as per the C<FORMAT> configuration.
 
 =cut
 
-async sub read_adc
+sub read_adc
 {
    my $self = shift;
 
-   my $bytes = await $self->read_register( REG_DATA, 3 );
+   $self->read_register( REG_DATA, 3 )->then( sub {
+      my ( $bytes ) = @_;
+      return Future->done( unpack "L>", "\0$bytes" );
+   });
+}
 
-   return unpack "L>", "\0$bytes";
+=head2 read_adc_ratio
+
+   $ratio = $chip->read_adc_ratio->get
+
+Converts a reading obtained by L</read_adc> into a ratio between -1 and 1,
+taking into account the current mode setting of the chip.
+
+=cut
+
+sub read_adc_ratio
+{
+   my $self = shift;
+
+   Future->needs_all(
+      $self->read_adc,
+      ( $self->{config} ? Future->done( $self->{config} ) : $self->read_config )
+   )->then( sub {
+      my ( $value, $config ) = @_;
+
+      if( $config->{UB} eq "UNIPOLAR" ) {
+         # Raw 24bit integer
+         $value /= 2**24;
+      }
+      else {
+         if( $config->{FORMAT} eq "TWOS_COMP" ) {
+            # Signed integer in twos-complement form
+            $value -= 2**24 if $value >= 2**23;
+         }
+         else {
+            # Signed-integer in offset form
+            $value -= 2**23;
+         }
+         $value /= 2**23;
+      }
+
+      return Future->done( $value );
+   });
 }
 
 =head2 write_gpios
@@ -332,13 +378,14 @@ sub write_gpios
    $self->write_register( REG_CTRL2, pack "C", ( $dir << 4 ) | $values );
 }
 
-async sub read_gpios
+sub read_gpios
 {
    my $self = shift;
 
-   my $bytes = await $self->read_register( REG_CTRL2 );
-
-   return 0x0F & unpack "C", $bytes;
+   $self->read_register( REG_CTRL2 )->then( sub {
+      my ( $bytes ) = @_;
+      return Future->done( 0x0F & unpack "C", $bytes );
+   });
 }
 
 =head2 Calibration Registers
@@ -368,9 +415,11 @@ foreach (
 
    no strict 'refs';
 
-   *{"read_$name"} = async sub {
-      my $bytes = await $_[0]->read_register( $reg, 3 );
-      return unpack "I>", "\0" . $bytes;
+   *{"read_$name"} = sub {
+      $_[0]->read_register( $reg, 3 )->then( sub {
+         my ( $bytes ) = @_;
+         Future->done( unpack "I>", "\0" . $bytes );
+      });
    };
 
    *{"write_$name"} = sub {

@@ -10,14 +10,19 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Dist::Zilla::Plugin::ModuleBuildTiny
   Dist::Zilla::Role::FileMunger
+  Dist::Zilla::Role::InstallTool
   Dist::Zilla::Role::MetaProvider
+  Dist::Zilla::Role::PrereqSource
   ExtUtils::MakeMaker
   JSON::PP
   List::Util
   Moose
+  Path::Tiny
   Test2::V0
   Test::DZil
+  namespace::autoclean
 );
 
 

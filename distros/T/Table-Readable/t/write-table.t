@@ -53,4 +53,22 @@ unlink ($wfile) or warn "Failed to remove $wfile: $!";
 my $tbl = write_table ([{a => "b\nc"}]);
 like ($tbl, qr/%%a:/, "Use long format if value contains newlines");
 
+my $file = "$Bin/temp.$$";
+write_table ([{a => 'b'}], $file);
+ok (-f $file, "Got file $file");
+unlink $file or die $!;
+
+{
+    my $warning;
+    local $SIG{__WARN__} = sub {$warning = "@_";};
+    write_table ();
+    like ($warning,
+	  qr!First argument to 'write_table' must be array reference!);
+    write_table ([qw!a b c!]);
+    like ($warning, 
+	  qr!Elements of first argument to 'write_table' must be hash references!);
+    write_table ([{x => \my %nonsense}]);
+    like ($warning, qr!Non-scalar value in key!);
+}
+
 done_testing ();

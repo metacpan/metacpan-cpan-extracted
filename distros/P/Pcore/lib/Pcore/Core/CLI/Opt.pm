@@ -22,7 +22,7 @@ has min => ( is => 'lazy' );            # PositiveOrZeroInt, 0 - option is not r
 has max => ( is => 'lazy' );            # PositiveOrZeroInt, 0 - unlimited repeats
 
 has negated => ( is => 'lazy' );        # trigger can be used with --no prefix
-has hash => ();                         # if true - option is a hash, --opt key=val
+has hash    => ();                      # if true - option is a hash, --opt key=val
 
 has getopt_name   => ( is => 'lazy', init_arg => undef );
 has is_trigger    => ( is => 'lazy', init_arg => undef );

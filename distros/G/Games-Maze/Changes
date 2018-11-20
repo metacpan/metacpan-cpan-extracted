@@ -1,11 +1,17 @@
 
-###
-NOTE: This module is being re-written.  From now on version 1.0x will
-only be changed for bug fixes and maintenance.  New features will be in
-the version 2.00-track.
-###
-
 Revision history:
+
+1.09
+	Sun Nov 18 2018
+	- José Joaquín Atria contributed a change to base the module on
+	  Moo instead of bless-this-hash. Thanks!
+	- Stop using "use integer" and explicitly call int() where needed.
+	- Bump up the required perl version (starting to base my modules
+	  on version 5.16.1).
+	- Turn README into README.md. With MetaCPAN replacing CPAN,
+	  there is no reason to have a plain-text README anymore
+	  (MetaCPAN doesn't treat the file as special).
+	- Add a CONTRIBUTING.md file, which is becoming a thing.
 
 1.08
 	Mon Sep 10 2012
@@ -14,6 +20,8 @@ Revision history:
 	- Added 'create_license => 1' to the Build.PL list of attributes.
 	- Added 'dynamic_config => 0' to the Build.PL list of attributes.
 	- Added LICENSE to the MANIFEST file.
+	Fri Jun 07 2012
+	- POD changes from Ben Bullock merged in.
 
 1.07
 	Fri May 25 2012

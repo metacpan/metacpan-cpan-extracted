@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 # shortcuts
 #  os and distros
@@ -187,6 +187,15 @@ sub mapping {
        [package => 'gdb']],
       [like_fedora,
        [package => 'gdb']],
+     ],
+
+     [cpanmod => 'Archive::Peek::Libarchive',
+      [os_freebsd,
+       [package => 'libarchive']],
+      [like_debian,
+       [package => 'libarchive-dev']],
+      [like_fedora,
+       [package => 'libarchive-devel']],
      ],
 
      [cpanmod => 'Archive::Rar',
@@ -611,7 +620,7 @@ sub mapping {
        [package => [qw(libmcrypt-devel libtool-ltdl-devel)]]],
      ],
 
-     [cpanmod => ['Crypt::OpenSSL::DSA', 'Crypt::OpenSSL::Random', 'Crypt::OpenSSL::RSA', 'Crypt::OpenSSL::X509', 'Net::SSLeay', 'IO::Socket::SSL'],
+     [cpanmod => ['Crypt::OpenSSL::DSA', 'Crypt::OpenSSL::PKCS12', 'Crypt::OpenSSL::Random', 'Crypt::OpenSSL::RSA', 'Crypt::OpenSSL::X509', 'Net::SSLeay', 'IO::Socket::SSL'],
       # freebsd has all libssl in the base system
       [like_debian,
        [package => ['libssl-dev', 'zlib1g-dev']]],
@@ -676,6 +685,8 @@ sub mapping {
        [package => 'libu2f-server-dev']],
       [os_darwin,
        [package => 'libu2f-server']],
+      [linuxdistro => 'fedora', # not available for CentOS6 or 7
+       [package => 'libu2f-server-devel']],
      ],
 
      [cpanmod => 'CSS::Croco',
@@ -754,6 +765,17 @@ sub mapping {
 	[package => 'libdb5.1-dev']],
        [package => 'libdb5.3-dev']], # e.g. jessie, stretch, trusty, xenial, yakkety, zesty
       # FreeBSD and MacOSX have libdb in the base system
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^6\.},
+	package => 'db4-devel'],
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^7\.},
+	package => 'libdb-devel'],
+       [linuxdistro => 'fedora',
+	linuxdistroversion => '28',
+	package => 'libdb-devel'],
+      ],
      ],
 
      [cpanmod => 'DBD::Firebird',
@@ -772,7 +794,7 @@ sub mapping {
 
      [cpanmod => 'DBD::mysql',
       [os_freebsd,
-       [package => 'mysql-connector-c | mysql57-client | mysql56-client | mysql55-client | mariadb103-client | mariadb102-client | mariadb101-client | mariadb100-client | mariadb55-client | percona56-client | percona55-client']],
+       [package => 'mysql80-client | mysql57-client | mysql56-client | mysql55-client | mariadb103-client | mariadb102-client | mariadb101-client | mariadb100-client | mariadb55-client | percona56-client | percona55-client | mysql-connector-c']],
       [os_dragonfly,
        [package => 'mariadb101-client | mariadb100-client | mariadb55-client-5.5.58']],
       [os_openbsd,
@@ -1494,7 +1516,7 @@ sub mapping {
       [like_debian,
        [before_debian_stretch,
 	[package => ['libopencv-dev', 'libdecodeqr-dev']]],
-       [package => []], # not available anymore in stretch, but currently available in sid for at least arm64
+       [package => []], # not available anymore in stretch, bionic or buster, but currently available in sid for at least arm64
       ]],
 
      [cpanmod => ['Image::ObjectDetect', 'Image::Resize::OpenCV'],
@@ -1528,13 +1550,21 @@ sub mapping {
        [package => 'libexif-dev']],
       [os_darwin,
        [package => 'libexif']],
+      [like_fedora,
+       [package => 'libexif-devel']],
      ],
 
      [cpanmod => 'Image::Libpuzzle',
       [os_freebsd,
        [package => 'libpuzzle']],
       [like_debian,
-       [package => 'libpuzzle-dev']]],
+       [package => 'libpuzzle-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^7\.},
+	package => []], # for some reason not available for centos7 (but it is for centos6)
+       [package => 'libpuzzle-devel']],
+     ],
 
      [cpanmod => 'Image::LibRSVG',
       [os_freebsd,
@@ -1620,6 +1650,8 @@ sub mapping {
        linuxdistrocodename => [qw(squeeze wheezy)],
        [package => 'libt1-dev']],
       # not available anymore since jessie, also not in xenial
+      [like_fedora,
+       [package => 't1lib-devel']],
      ],
 
      # modules just needing java and nothing else:
@@ -1654,6 +1686,12 @@ sub mapping {
        # XXX tests fail on Ubuntu16.04; <dynload.h> missing on stretch
        [linuxdistrocodename => [qw(stretch xenial)],
 	[package => [qw(moarvm-dev libuv1-dev libatomic-ops-dev libtommath-dev rakudo)]]]],
+      [like_fedora,
+       # XXX Does not work, moar.h missing
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^6\.}, # not available
+	package => []],
+       [package => 'moarvm-devel']],
      ],
 
      [cpanmod => 'Inline::Python',
@@ -1674,7 +1712,10 @@ sub mapping {
 	[package => 'ruby1.8-dev']],
        [linuxdistrocodename => 'jessie',
 	[package => 'ruby2.1-dev']],
-       [package => 'ruby2.3-dev'], # xenial, stretch
+       [linuxdistrocodename => [qw(xenial stretch)],
+	[package => 'ruby2.3-dev']],
+       [linuxdistrocodename => [qw(bionic buster)],
+	[package => 'ruby2.5-dev']],
       ],
       [like_fedora,
        [package => 'ruby-devel']],
@@ -1693,7 +1734,12 @@ sub mapping {
       [os_freebsd,
        [package => 'mm']],
       [like_debian,
-       [package => 'libmm-dev']]],
+       [package => 'libmm-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos', # not available for 6 and 7
+	package => []],
+       [package => 'mm-devel']],
+     ],
 
      [cpanmod => 'IPC::XPA',
       # no package for FreeBSD or CentOS7
@@ -1723,7 +1769,7 @@ sub mapping {
       [os_freebsd,
        [package => 'v8']],
       [like_debian,
-       [package => 'libv8-dev']],
+       [package => 'libv8-dev']], # but not anymore in buster, see https://tracker.debian.org/news/876959/libv8-314-removed-from-testing/
       [like_fedora,
        [package => 'v8-devel']], # but problems with Devel-CheckLib and compilation errors
       [os_darwin,
@@ -2440,6 +2486,10 @@ sub mapping {
        [linuxdistrocodename => [qw(squeeze wheezy jessie xenial)],
 	[package => []]], # not available before stretch
        [package => 'libhyperscan-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos', # not available for 6 and 7
+	package => []],
+       [package => 'hyperscan-devel']],
      ],
 
      [cpanmod => 're::engine::PCRE2',
@@ -2675,7 +2725,7 @@ sub mapping {
       [os_freebsd,
        [package => 'libvterm']],
       [like_debian,
-       [linuxdistrocodename => ['squeeze', 'wheezy', 'jessie'],
+       [before_debian_stretch,
 	[package => []]],
        [package => 'libvterm-dev']]],
 
@@ -2716,7 +2766,10 @@ sub mapping {
       [os_freebsd,
        [package => 'libcsv']],
       [like_debian,
-       [package => 'libcsv-dev']]],
+       [package => 'libcsv-dev']],
+      [like_fedora,
+       [package => 'libcsv-devel']],
+     ],
 
      [cpanmod => 'Text::Hunspell',
       [os_freebsd,

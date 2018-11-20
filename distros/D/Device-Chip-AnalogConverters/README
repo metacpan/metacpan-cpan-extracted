@@ -13,13 +13,74 @@ ADCs
 
       * Device::Chip::LTC2400
 
+      * Device::Chip::MCP3221
+
       * Device::Chip::MAX11200
+
+ SUGGESTED ADC METHODS
+
+  read_adc
+
+       $value = $chip->read_adc->get
+
+    Obtains the most recent reading performed by the chip, as a plain
+    integer value. This may be signed or unsigned, scaled to whatever
+    precision the chip works at.
+
+  read_adc_voltage
+
+       $voltage = $chip->read_adc_voltage->get
+
+    If the chip contains an internal reference, or in some other way the
+    scale is known by the driver, this method should be provided that
+    converts the result of "read_adc" into an actual signed voltage.
+
+  read_adc_ratio
+
+       $ratio = $chip->read_adc_ratio->get
+
+    If the chip (driver) does not have a reference to scale convert the
+    output directly to a voltage level, then this method should be provided
+    instead that merely scales the raw reading down by a factor such that
+    the returned value is a floating-point number between 0 and 1 for
+    unipolar (single-ended unsigned) readings, or between -1 and 1 for
+    bipolar (differential signed) readings.
 
 DACs
 
       * Device::Chip::AD5691R
 
+      * Device::Chip::DAC7571
+
       * Device::Chip::MCP4725
+
+ SUGGESTED DAC METHODS
+
+  write_dac
+
+       $chip->write_dac( $value )->get
+
+    Sets the value of the DAC's output as a plain integer value. This may
+    be signed or unsigned, scaled to whatever precision the chip works at.
+
+  write_dac_voltage
+
+       $chip->write_dac_voltage( $voltage )->get
+
+    If the chip contains an internal reference, or in some other way the
+    scale is known by the driver, this method should be provided that
+    converts the given voltage into a raw value to invoke "write_dac" with.
+
+  write_dac_ratio
+
+       $chip->write_dac_ratio( $ratio )->get
+
+    If the chip (driver) does not have a reference to scale convert a given
+    voltage to a DAC code valjue, then this method should be provided
+    instead that takes a given ratio, as a floating-point number between 0
+    and 1 for unipolar (single-ended unsigned) outputs or between -1 and 1
+    for bipolar (differential signed) outputs, and scales it by a suitable
+    factor.
 
 AUTHOR
 

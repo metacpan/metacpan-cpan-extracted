@@ -1,3 +1,7 @@
+v0.1.1 2018-11-18T15:35:58Z
+ - types_hash_max_size set to 4096
+ - vhost templates cleared
+
 v0.1.0 2018-11-14T13:00:08Z
  - version updated
  - init

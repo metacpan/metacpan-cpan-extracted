@@ -3,7 +3,7 @@
 use strict;
 no warnings;
 use Test::More;
-BEGIN { plan tests => 697 };
+BEGIN { plan tests => 745 };
 
 use JSON::XS;
 
@@ -21,16 +21,23 @@ sub splitter {
       $coder->incr_parse ($b);
 
       my $data = $coder->incr_parse;
-      ok ($data);
-      ok ($coder->encode ($data) eq $coder->encode ($coder->decode ($text)), "data");
+      #ok (defined $data, "split<$a><$b>");
+      ok (defined $data, "split");
+      my $e1 = $coder->encode ($data);
+      my $e2 = $coder->encode ($coder->decode ($text));
+      #ok ($e1 eq $e2, "data<$a><$b><$e1><$e2>");
+      #ok ($coder->incr_text =~ /^\s*$/, "tailws<$a><$b>");
+      ok ($e1 eq $e2, "data");
       ok ($coder->incr_text =~ /^\s*$/, "tailws");
    }
 }
 
-splitter +JSON::XS->new              , '  ["x\\"","\\u1000\\\\n\\nx",1,{"\\\\" :5 , "": "x"}]';
-splitter +JSON::XS->new              , '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\\\ " :5 , "": " x"} ] ';
-splitter +JSON::XS->new->allow_nonref, '"test"';
-splitter +JSON::XS->new->allow_nonref, ' "5" ';
+splitter +JSON::XS->new->allow_nonref (0), '  ["x\\"","\\u1000\\\\n\\nx",1,{"\\\\" :5 , "": "x"}]';
+splitter +JSON::XS->new->allow_nonref (0), '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\\\ " :5 , "": " x"} ] ';
+splitter +JSON::XS->new                  , '"test"';
+splitter +JSON::XS->new                  , ' "5" ';
+splitter +JSON::XS->new                  , '-1e5';
+splitter +JSON::XS->new                  , ' 0.00E+00 ';
 
 {
    my $text = '[5],{"":1} , [ 1,2, 3], {"3":null}';

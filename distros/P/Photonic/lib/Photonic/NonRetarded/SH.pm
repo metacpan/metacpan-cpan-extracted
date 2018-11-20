@@ -4,7 +4,7 @@ Photonic::NonRetarded::SH
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -147,16 +147,16 @@ polarization using the field (nrf) filter.
 
 =back
 
-#=begin Pod::Coverage
-#
-#=head2 BUILD
-#
-#=end Pod::Coverage
+=begin Pod::Coverage
+
+=head2 BUILD
+
+=end Pod::Coverage
 
 =cut
 
 package Photonic::NonRetarded::SH;
-$Photonic::NonRetarded::SH::VERSION = '0.009';
+$Photonic::NonRetarded::SH::VERSION = '0.010';
 use namespace::autoclean;
 use PDL::Lite;
 use PDL::NiceSlice;
@@ -292,7 +292,9 @@ sub _alpha {
     $alphaA1=($epsA1-1)/(4*$self->densityA*PI) unless
 	$self->densityA==0; 
     $alphaB1=($epsB1-1)/(4*$self->densityB*PI) unless
-	$self->densityB==0; 
+	$self->densityB==0;
+    $alphaA1=$alphaB1 if $self->densityA==0;
+    $alphaB1=$alphaA1 if $self->densityB==0;
     my $B=$self->nrf->nr->B;
     return $alphaA1*(1-$B)+$B*$alphaB1;
 }
@@ -448,11 +450,11 @@ sub _build_externalL_n {
 sub _build_selfConsistentL_n {
     my $self=shift;
     my $external=$self->externalL_n;
-    my $nh=$self->HP->nh;
+    my $nh=$self->HP->iteration;
     my $as=$self->HP->as;
     my $bs=$self->HP->bs;
     my $u2=$self->u2;
-    my $diag=$u2->complex - PDL->pdl([@$as])->(0:$nh-1);
+    my $diag=$u2->complex - PDL->pdl($as)->(0:$nh-1);
     my $subdiag=-PDL->pdl(@$bs)->(0:$nh-1)->r2C;
     # rotate complex zero from first to last element.
     my $supradiag=$subdiag->mv(0,-1)->rotate(-1)->mv(-1,0);
@@ -538,16 +540,12 @@ sub _build_P2LMCalt {
     my $betaV_n=PDL->pdl(
 	[map {HProd($betaV_G,$states->[$_]->(,*1), 1)} (0..$nh-1)]
 	)->complex;
-    #my $tmp=HProd($betaV_G->(,(1),:,:), $states->[200]);
-    #print $tmp, "==?", $betaV_n->(:,(1), (200)), "\n";
-    
     my @Ppsi;
     foreach(0..$ndims-1){
 	my ($psi_n, $psiinfo)= 
 	    cgtsl($subdiag, $diag, $supradiag, $betaV_n->(:,($_),:)); 
 	die "Error solving tridiag system" unless $psiinfo == 0;
 	# RorI nx ny .... cartesian
-	#print "psi_n[$_]=$psi_n\n";
 	my $psi_G=linearCombine([$psi_n->dog], $states);
 	my $Ppsi=HProd($psi_G, $PexL_G);
 	push @Ppsi, $Ppsi;

@@ -7,17 +7,16 @@ use v5.10.1;
 use strict;
 use warnings;
 
-use parent 'DBIx::Class::Core';
-
 use Ref::Util  ();
 use Sub::Quote ();
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.1.5';
 
 # The names of all methods installed by this module.
 my %MINE;
+
 
 
 sub add_columns {
@@ -106,7 +105,7 @@ DBIx::Class::Helper::Row::Enumeration - Add methods for emum values
 
 =head1 VERSION
 
-version v0.1.4
+version v0.1.5
 
 =head1 SYNOPSIS
 
@@ -189,6 +188,8 @@ that value.
 
 If C<handles> is set to "0", then no methods will be generated for the
 column at all.
+
+=for Pod::Coverage add_columns
 
 =head1 KNOWN ISSUES
 
