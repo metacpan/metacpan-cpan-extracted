@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Impedance;
-$Lab::Moose::Instrument::SCPI::Sense::Impedance::VERSION = '3.664';
+$Lab::Moose::Instrument::SCPI::Sense::Impedance::VERSION = '3.670';
 #ABSTRACT: Role for the HP/Agilent/Keysight SCPI SENSe:$function:IMPedance subsystem
 
 use Moose::Role;
@@ -10,7 +10,7 @@ use Carp;
 use namespace::autoclean;
 
 
-with 'Lab::Moose::Instrument::SCPI::Sense::Function';
+requires 'cached_sense_function';
 
 cache sense_impedance_auto => ( getter => 'sense_impedance_auto_query' );
 
@@ -54,7 +54,7 @@ Lab::Moose::Instrument::SCPI::Sense::Impedance - Role for the HP/Agilent/Keysigh
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 METHODS
 

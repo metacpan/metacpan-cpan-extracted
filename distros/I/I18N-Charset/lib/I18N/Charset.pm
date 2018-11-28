@@ -68,7 +68,7 @@ functions will always return undef.
 #-----------------------------------------------------------------------
 
 our
-$VERSION = 1.417;
+$VERSION = 1.418;
 
 our @EXPORT = qw( iana_charset_name
 map8_charset_name
@@ -1297,13 +1297,13 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 sub _init_data
   {
   # This big piece of data is the original document from
-  # http://www.iana.org/assignments/character-sets
+  # http://www.iana.org/assignments/character-sets.xml
   return <<'EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE';
 <?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="character-sets.xsl"?>
 <?oxygen RNGSchema="character-sets.rng" type="xml"?>
 <registry xmlns="http://www.iana.org/assignments" id="character-sets">
-  <updated>2013-10-01</updated>
+  <updated>2018-11-21</updated>
   <title>Character Sets</title>
   <category>Character Sets</category>
   <xref type="rfc" data="rfc2978"/>
@@ -1384,7 +1384,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>4</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-100</alias>
@@ -1403,7 +1403,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>5</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-101</alias>
@@ -1420,7 +1420,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>6</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-109</alias>
@@ -1437,7 +1437,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>7</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-110</alias>
@@ -1454,7 +1454,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>8</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-144</alias>
@@ -1470,7 +1470,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>9</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-127</alias>
@@ -1489,7 +1489,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>10</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-126</alias>
@@ -1508,7 +1508,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>11</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-138</alias>
@@ -1524,7 +1524,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>12</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-148</alias>
@@ -1541,7 +1541,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>13</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-157</alias>
@@ -1557,7 +1557,7 @@ revised character set from the original character set.</note>
       <xref type="person" data="Keld_Simonsen"/>
       <value>14</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref> and ISO 6937-2:1983<br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref> and ISO 6937-2:1983<br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-142</alias>
@@ -1635,7 +1635,7 @@ and 21-7E in the second byte</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>20</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-4</alias>
@@ -1650,7 +1650,7 @@ and 21-7E in the second byte</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>21</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-11</alias>
@@ -1664,7 +1664,7 @@ and 21-7E in the second byte</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>22</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-15</alias>
@@ -1677,7 +1677,7 @@ and 21-7E in the second byte</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>23</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-17</alias>
@@ -1690,7 +1690,7 @@ and 21-7E in the second byte</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>24</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-21</alias>
@@ -1704,7 +1704,7 @@ and 21-7E in the second byte</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>25</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-60</alias>
@@ -1719,7 +1719,7 @@ and 21-7E in the second byte</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>26</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-69</alias>
@@ -1741,7 +1741,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>28</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>ref</alias>
@@ -1760,7 +1760,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>30</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-2</alias>
@@ -1773,7 +1773,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>31</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-8-1</alias>
@@ -1785,7 +1785,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>32</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-8-2</alias>
@@ -1797,7 +1797,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>33</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-9-1</alias>
@@ -1809,7 +1809,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>34</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-9-2</alias>
@@ -1821,7 +1821,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>35</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-10</alias>
@@ -1837,7 +1837,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>36</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-149</alias>
@@ -1890,7 +1890,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>41</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>JIS_C6220-1969</alias>
@@ -1905,7 +1905,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>42</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-14</alias>
@@ -1919,7 +1919,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>43</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-16</alias>
@@ -1932,7 +1932,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>44</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-18</alias>
@@ -1944,7 +1944,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>45</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-19</alias>
@@ -1956,7 +1956,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>46</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-25</alias>
@@ -1969,7 +1969,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>47</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-27</alias>
@@ -1981,7 +1981,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>48</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-37</alias>
@@ -1993,7 +1993,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>49</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-42</alias>
@@ -2005,7 +2005,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>50</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-47</alias>
@@ -2017,7 +2017,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>51</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-49</alias>
@@ -2029,7 +2029,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>52</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-50</alias>
@@ -2041,7 +2041,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>53</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-51</alias>
@@ -2053,7 +2053,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>54</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-54</alias>
@@ -2066,7 +2066,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>55</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-55</alias>
@@ -2078,7 +2078,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>56</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-57</alias>
@@ -2092,7 +2092,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>57</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-58</alias>
@@ -2105,7 +2105,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>58</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>ISO646-NO2</alias>
@@ -2119,7 +2119,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>59</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-70</alias>
@@ -2131,7 +2131,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>60</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-84</alias>
@@ -2144,7 +2144,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>61</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-85</alias>
@@ -2157,7 +2157,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>62</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-86</alias>
@@ -2171,7 +2171,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>63</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-87</alias>
@@ -2185,7 +2185,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>64</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-88</alias>
@@ -2197,7 +2197,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>65</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>ISO_9036</alias>
@@ -2211,7 +2211,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>66</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>csISO90</alias>
@@ -2222,7 +2222,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>67</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-91</alias>
@@ -2235,7 +2235,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>68</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-92</alias>
@@ -2249,7 +2249,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>69</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-93</alias>
@@ -2262,7 +2262,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>70</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-94</alias>
@@ -2275,7 +2275,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>71</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-95</alias>
@@ -2288,7 +2288,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>72</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-96</alias>
@@ -2300,7 +2300,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>73</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-98</alias>
@@ -2313,7 +2313,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>74</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-99</alias>
@@ -2327,7 +2327,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>75</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-102</alias>
@@ -2339,7 +2339,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>76</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>T.61</alias>
@@ -2362,7 +2362,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>78</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-121</alias>
@@ -2378,7 +2378,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>79</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-122</alias>
@@ -2393,7 +2393,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>80</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-123</alias>
@@ -2429,7 +2429,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>83</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-128</alias>
@@ -2465,7 +2465,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>86</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-139</alias>
@@ -2477,7 +2477,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>87</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-141</alias>
@@ -2492,7 +2492,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>88</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-143</alias>
@@ -2504,7 +2504,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>89</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-146</alias>
@@ -2517,7 +2517,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>90</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>macedonian</alias>
@@ -2530,7 +2530,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>91</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-150</alias>
@@ -2543,7 +2543,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>92</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>cuba</alias>
@@ -2557,7 +2557,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>93</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-152</alias>
@@ -2569,7 +2569,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>94</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>ST_SEV_358-88</alias>
@@ -2582,7 +2582,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>95</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-154</alias>
@@ -2595,7 +2595,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>96</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>iso-ir-155</alias>
@@ -2607,7 +2607,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>97</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>lap</alias>
@@ -2620,7 +2620,7 @@ ordering issues.</description>
       <xref type="person" data="Keld_Simonsen"/>
       <value>98</value>
       <description>
-        <xref type="uri" data="http://www.itscj.ipsj.or.jp/ISO-IR/">ISO-IR: International Register of Escape Sequences</xref><br/>
+        <xref type="uri" data="https://www.itscj.ipsj.or.jp/itscj_english/iso-ir/ISO-IR.pdf">ISO-IR: International Register of Escape Sequences</xref><br/>
         Note: The current registration authority is IPSJ/ITSCJ, Japan.
       </description>
       <alias>x0212</alias>
@@ -3932,7 +3932,6 @@ INIS-Cyrillic, ISO-5427.</description>
       <alias>PT154</alias>
       <alias>CP154</alias>
       <alias>Cyrillic-Asian</alias>
-      <alias>csPTCP154</alias>
     </record>
     <record>
       <name>Amiga-1251</name>
@@ -4077,7 +4076,8 @@ INIS-Cyrillic, ISO-5427.</description>
     </person>
     <person id="Keld_Simonsen">
       <name>Keld Simonsen</name>
-      <uri>mailto:Keld.Simonsen&amp;dkuug.dk</uri>
+      <uri>mailto:Keld&amp;keldix.com</uri>
+      <updated>2018-10-19</updated>
     </person>
     <person id="Keld_Simonsen_2">
       <name>Keld Simonsen</name>

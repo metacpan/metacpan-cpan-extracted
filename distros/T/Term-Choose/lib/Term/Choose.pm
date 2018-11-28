@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.632';
+our $VERSION = '1.636';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -58,6 +58,7 @@ sub __defaults {
         info                => '',
         beep                => 0,
         clear_screen        => 0,
+        codepage_mapping    => 0,
         color               => 0,
         #default            => undef,
         empty               => '<empty>',
@@ -96,13 +97,14 @@ sub __valid_options {
     return {
         beep                => '[ 0 1 ]',
         clear_screen        => '[ 0 1 ]',
+        codepage_mapping    => '[ 0 1 ]',
+        color               => '[ 0 1 ]',
         hide_cursor         => '[ 0 1 ]',
         index               => '[ 0 1 ]',
         order               => '[ 0 1 ]',
         page                => '[ 0 1 ]',
         include_highlighted => '[ 0 1 2 ]',
         justify             => '[ 0 1 2 ]',
-        color               => '[ 0 1 2 3 ]',
         layout              => '[ 0 1 2 3 ]',
         mouse               => '[ 0 1 2 3 4 ]',
         keep                => '[ 1-9 ][ 0-9 ]*',
@@ -220,14 +222,20 @@ sub __choose {
     if ( ! @$orig_list_ref ) {
         return;
     }
-    if ( $^O eq "MSWin32" && $self->{color} ) {
-        require Win32::Console::ANSI;
-    }
     local $\ = undef;
     local $, = undef;
     local $| = 1;
     $self->{wantarray} = wantarray;
     $self->__undef_to_defaults();
+    if ( $^O eq "MSWin32" && $self->{color} ) {
+        require Win32::Console::ANSI;
+        if ( $self->{codepage_mapping} ) {
+            print "\e(K";
+        }
+        else {
+            print "\e(U";
+        }
+    }
     $self->__copy_orig_list( $orig_list_ref );
     $self->__length_longest();
     $self->{col_width} = $self->{length_longest} + $self->{pad};
@@ -993,10 +1001,11 @@ sub __wr_cell {
             my $emphasised = ( $is_marked ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
             my $str = $self->{list}[$idx];
             if ( $emphasised ) {
-                if ( $self->{color} == 2 && $is_current_pos ) {
+                if ( $is_current_pos ) {
                     $str =~ s/(\e\[[\d;]*m)//g;
                 }
                 else {
+                    # keep emphasise after color escapes
                     $str =~ s/(\e\[[\d;]*m)/${1}$emphasised/g;
                 }
                 $str = $emphasised . $str;
@@ -1046,28 +1055,10 @@ sub __wr_cell {
                     # keep emphasise after color escapes
                     $_ .= $emphasised;
                 }
-                if ( $self->{color} == 1 ) {
-                    # don't emphasise leading and trailing spaces
-                    $str = $pre . $emphasised . $str . RESET . $post;
-                }
-                elsif ( $self->{color} == 2 ) {
-                    # the cursor keeps the default color
-                    $str = $emphasised . $pre . $str . $post . RESET;
-                    if ( $is_current_pos ) {
-                        @color = ();
-                        $str =~ s/\x{feff}//g;
-                    }
-                }
-                elsif ( $self->{color} == 3 ) {
-                    # the cursor has the color of the string
-                    if ( $str =~ s/^\x{feff}([^\x{feff}]*)\x{feff}?\z/$1/sm ) {
-                        # leading and trailing spaces have the color of the string if only one color
-                        $str = $color[0] . $pre . $str . $post . RESET;
-                    }
-                    else {
-                        # else leading and trailing spaces have the default color
-                        $str = $emphasised . $pre . $str . $post . RESET;
-                    }
+                $str = $emphasised . $pre . $str . $post . RESET;
+                if ( $is_current_pos ) {
+                    @color = ();
+                    $str =~ s/\x{feff}//g;
                 }
             }
             else {
@@ -1172,7 +1163,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.632
+Version 1.636
 
 =cut
 
@@ -1400,21 +1391,26 @@ Options which expect a number as their value expect integers.
 
 1 - clears the screen before printing the choices
 
+=head3 codepage_mapping
+
+This option has only meaning if the operating system is MSWin32 and the option I<color> is enabled.
+
+By setting this option to C<1> one can enable the codepage mapping offered by L<Win32::Console::ANSI>.
+
+0 - disable automatic codepage mapping (default)
+
+1 - keep automatic codepage mapping
+
 =head3 color
 
-Setting this option to C<1>, C<2> or C<3> enables the support for color and text formatting escape sequences.
+Setting this option to C<1> enables the support for color and text formatting escape sequences.
 
 0 - off (default)
 
-1, 2 or 3 - on
+1 - on
 
-How the current position and marked items are highlighted:
-
-1 - only the width of the string is highlighted
-
-2 - the whole column width is highlighted, the cursor keeps the default color
-
-3 - the whole column width is highlighted, the cursor takes the color of the string
+If the OS is MSWin32 and this option is enabled, L<Win32::Console::ANSI> is loaded. C<Win32::Console::ANSI> emulates
+an ANSI console. See also the option L</codepage_mapping>.
 
 =head3 default
 
@@ -1754,7 +1750,7 @@ to a true value, ambiguous width characters are treated as full width.
 
 =head2 Escape sequences
 
-It is required a terminal that supports ANSI escape sequences.
+It is required a terminal that supports ANSI escape sequences except the OS is MSWin32.
 
 If the option "hide_cursor" is enabled, it is also required the support for the following escape sequences:
 
@@ -1770,8 +1766,13 @@ If a I<mouse> mode is enabled
 
 are used to enable/disable the different I<mouse> modes.
 
-If the OS is MSWin32 L<Win32::Console> is used, to emulate the behavior of the escape sequences. If the option I<color> is
-enabled, L<Win32::Console::ANSI> is loaded to translate the color and text formatting escape sequences.
+=head2 MSWin32
+
+If the OS is MSWin32 L<Win32::Console> is used.
+
+If the option I<color> is enabled also L<Win32::Console::ANSI> is used. By default C<Win32::Console::ANSI> converts the
+characters from Windows code page to DOS code page (the so-called ANSI to OEM conversion). This conversation is disabled
+by default in C<Term::Choose> but one can enable it by setting the option L</codepage_mapping>.
 
 =head1 SUPPORT
 

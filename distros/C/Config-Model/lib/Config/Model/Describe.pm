@@ -9,7 +9,7 @@
 #
 
 package Config::Model::Describe;
-$Config::Model::Describe::VERSION = '2.127';
+$Config::Model::Describe::VERSION = '2.128';
 use Carp;
 use strict;
 use warnings;
@@ -214,7 +214,7 @@ Config::Model::Describe - Provide a description of a node element
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -287,7 +287,7 @@ This module is also used by the C<ll> command of L<Config::Model::TermUI>.
 
 =head1 CONSTRUCTOR
 
-=head2 new ( )
+=head2 new
 
 No parameter. The constructor should be used only by
 L<Config::Model::Node>.

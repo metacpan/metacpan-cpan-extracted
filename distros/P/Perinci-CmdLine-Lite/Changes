@@ -1,3 +1,10 @@
+1.816   2018-11-22 (PERLANCAR)
+
+	- [ux] Dump %main::SPEC to x.main.spec.
+
+	- Avoid duplicate config file reading.
+
+
 1.815   2018-07-16 (PERLANCAR)
 
 	- Invoke hook_before_parse_argv() in do_completion() and do_dump()

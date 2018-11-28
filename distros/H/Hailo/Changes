@@ -1,5 +1,16 @@
 Revision history for Hailo
 
+0.74 2018-11-28 00:26:12
+
+    - Fix missing test dependency on Pod::Section.
+    - Use MooseX::Types::Moose internally.
+    - Remove a bunch of missing Mouse things from docs / script code /
+      build system.
+
+0.73 2018-11-27 13:53:39
+
+   - Fully use Moose instead of now deprecated Any::Moose.
+
 0.72 2013-12-01 17:06:55
 
     - Our tests have been broken on perl 5.19.* (soon to become

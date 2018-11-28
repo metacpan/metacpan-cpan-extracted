@@ -13,7 +13,7 @@ use Moose::Util::TypeConstraints;
 use English qw/ -no_match_vars /;
 use Term::ANSIColor qw/colored/;
 
-our $VERSION = version->new('0.4.7');
+our $VERSION = version->new('0.4.8');
 
 coerce 'RegexpRef'
     => from 'Str'
@@ -76,7 +76,7 @@ Tail::Tool::Regex - Base class for regex details
 
 =head1 VERSION
 
-This documentation refers to Tail::Tool::Regex version 0.4.7.
+This documentation refers to Tail::Tool::Regex version 0.4.8.
 
 =head1 SYNOPSIS
 

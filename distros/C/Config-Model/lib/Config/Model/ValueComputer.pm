@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::ValueComputer;
-$Config::Model::ValueComputer::VERSION = '2.127';
+$Config::Model::ValueComputer::VERSION = '2.128';
 use Mouse;
 use MouseX::StrictConstructor;
 
@@ -179,8 +179,9 @@ sub compute_info {
         foreach my $k ( sort keys %$variables ) {
             my $u_val = $variables->{$k};
             if ( ref($u_val) ) {
-                map { $str .= "\n\t\t'\$$k" . "{$_} is converted to '$orig_variables->{$k}{$_}'"; }
-                    sort keys %$u_val;
+                foreach (sort keys %$u_val) {
+                    $str .= "\n\t\t'\$$k" . "{$_} is converted to '$orig_variables->{$k}{$_}'";
+                }
             }
             else {
                 my $val;
@@ -549,7 +550,7 @@ Config::Model::ValueComputer - Provides configuration value computation
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -612,7 +613,7 @@ A string formula that use variables and replace function.
 
 A set of variable and their relative location in the tree (using the
 notation explained in 
-L<grab() method|Config::Model::Role::Grab/grab">
+L<grab method|Config::Model::Role::Grab/grab">
 
 =item *
 
@@ -627,7 +628,7 @@ An optional parameter to force a Perl eval of a string.
 B<Note>: A variable must point to a valid location in the configuration
 tree. Even when C<&index()> or C<$replace{}> is used. After substitution
 of these functions, the string is used as a path (See
-L<grab()|Config::Model::Role::Grab/grab">) starting from the
+L<grab|Config::Model::Role::Grab/grab">) starting from the
 computed value. Hence the path must begin with C<!> to go back to root
 node, or C<-> to go up a level.
 

@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Collisions;
-$Game::Collisions::VERSION = '0.2';
+$Game::Collisions::VERSION = '0.3';
 use v5.14;
 use warnings;
 use List::Util ();
@@ -123,6 +123,12 @@ sub rebalance_tree
     $self->_add_aabb( $_ ) for @aabbs;
 
     return;
+}
+
+sub root
+{
+    my ($self) = @_;
+    return $self->{root_aabb};
 }
 
 

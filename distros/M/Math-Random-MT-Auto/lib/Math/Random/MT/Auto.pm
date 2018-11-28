@@ -5,7 +5,7 @@ require 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '6.22';
+our $VERSION = '6.23';
 my $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -644,7 +644,10 @@ sub _seed_prng :PRIVATE
 
     my $seed = $seed_for{$$prng};   # Get the seed for the PRNG
 
-    if ($threads::shared::threads_shared && threads::shared::_id($seed)) {
+    if ($Config::Config{'useithreads'} &&
+        $threads::shared::threads_shared &&
+        threads::shared::_id($seed))
+    {
         # If the seed is thread-shared, then must make a non-shared copy to
         # send to the PRNG
         my @seed = @{$seed};
@@ -668,7 +671,7 @@ Math::Random::MT::Auto - Auto-seeded Mersenne Twister PRNGs
 
 =head1 VERSION
 
-This documentation refers to Math::Random::MT::Auto version 6.22
+This documentation refers to Math::Random::MT::Auto version 6.23
 
 =head1 SYNOPSIS
 
@@ -1712,8 +1715,13 @@ L<http://rt.cpan.org/Public/Dist/Display.html?Name=Math-Random-MT-Auto>
 
 =head1 SEE ALSO
 
-Math::Random::MT::Auto Discussion Forum on CPAN:
-L<http://www.cpanforum.com/dist/Math-Random-MT-Auto>
+Math::Random::MT::Auto on MetaCPAN:
+L<https://metacpan.org/release/Math-Random-MT-Auto>
+
+Code repository:
+L<https://github.com/jdhedden/Math-Random-MT-Auto>
+
+Sample code in the I<examples> directory of this distribution on CPAN.
 
 The Mersenne Twister is the (current) quintessential pseudorandom number
 generator. It is fast, and has a period of 2^19937 - 1.  The Mersenne

@@ -1,5 +1,5 @@
 This archive contains the distribution Log-Dispatch-Email-Mailer,
-version 1.04:
+version 1.05:
 
   Log::Dispatch::Email subclass that sends mail using Email::Mailer
 

@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use 5.008003;
 
-use Term::Choose::LineFold  qw( print_columns cut_to_printwidth );
+use Term::Choose::LineFold qw( print_columns cut_to_printwidth );
+use Term::Choose::Util     qw( term_width );
 
 use constant DEFAULTS => {
     fh         => \*STDERR,
     name       => undef,
-    term_width => undef,
     count      => undef,
+    so_far     => 0,
     remove     => 0,
     #silent     => 0,
 };
@@ -19,22 +20,21 @@ use constant DEFAULTS => {
 
 sub new {
     my $class = shift;
-    my $self = {};
+    my $self = shift || {};
     bless $self, $class;
-    $self->init( @_ );
     return $self;
 }
 
 
 sub init {
     my ( $self, $config ) = @_;
-    my $target = delete $config->{count};
-    my $term_w = $config->{term_width};
-    die "No 'count'!"     if ! defined $target;
-    die "No 'term_width'" if ! defined $term_w;
     for ( keys %{DEFAULTS()} ) {
-        $self->{$_} = exists $config->{$_} ? $config->{$_} : DEFAULTS->{$_};
+        $self->{$_} = $config->{$_}  if defined $config->{$_};
+        $self->{$_} = DEFAULTS->{$_} if ! defined $self->{$_};
     }
+    my $target = $self->{count};
+    die "No 'count'!" if ! defined $target;
+    my $term_w = term_width();
     $self->{bar_width} = $term_w - 7; # for the  "100% ["  and the  "]"
     if ( defined $self->{name} ) {
         my $name = $self->{name};
@@ -45,7 +45,7 @@ sub init {
             $name_w = $max_name_w;
         }
         $self->{bar_width} -= $name_w;
-        $self->{bar_width} -= 2; # for the ': '
+        #$self->{bar_width} -= 2; # for the ': '
     }
     $self->{short_print_fmt} = 0;
     if ( $self->{bar_width} < 8 ) {
@@ -60,21 +60,14 @@ sub init {
     my $prev_fh = select( $self->{fh} );
     local $| = 1;
     select( $prev_fh );
-    $self->{last_update} = 0;
-    $self->{target} = $target;
-    $self->update( 0 ); # Initialize the progress bar
+    $self->{target} = $target; #
+    $self->update( $self->{so_far} ); # Initialize the progress bar
 
 }
 
 
 sub update {
     my ( $self, $so_far ) = @_;
-    $self->{last_update} = $so_far;
-    #if ( $self->{silent} ) {
-    #    # returning target + 1 as next value should avoid calling update
-    #    # method in the smooth form of using the progress bar
-    #    return $self->{target} + 1;
-    #}
     my $target = my $next = $self->{target};
     my @chars = ( ' ' ) x $self->{bar_width};
     my $biggies = $self->{major_units} * $so_far;
@@ -89,7 +82,8 @@ sub update {
     }
     else {
         if ( defined $self->{name} && ! $self->{short_print_fmt} ) {
-            $to_print .= $self->{name} . ': ';
+            #$to_print .= $self->{name} . ': ';
+            $to_print .= $self->{name};
         }
         my $ratio = $so_far / $target;
         # Rounds down %

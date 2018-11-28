@@ -4,7 +4,7 @@
       "Thomas Kratz <tomk@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Mojo::IOLoop::Thread" : {
          "file" : "lib/Mojo/IOLoop/Thread.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -69,9 +69,9 @@
          "web" : "https://github.com/tomk3003/mojo-ioloop-thread"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_contributors" : [
       "tomk3003 <ThomasKratz@web.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

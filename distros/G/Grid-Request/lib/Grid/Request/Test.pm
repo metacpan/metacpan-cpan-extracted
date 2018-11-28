@@ -41,7 +41,7 @@ use Test::More;
 our $GR_PROJECT_NAME = "GRID_REQUEST_TEST_PROJECT";
 our $GR_HOST_NAME = "GRID_REQUEST_TEST_HOST";
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 
 sub get_test_request {

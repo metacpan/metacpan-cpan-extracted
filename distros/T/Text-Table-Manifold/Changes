@@ -1,4 +1,10 @@
 Revision history for Perl extension Text::Table::Manifold.
 
+1.01  2018-11-22:09:55:00
+	- Update pre-reqs for deal with test failures for CPAN Testers.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Add t/00*.t
+
 1.00  2015-01-31 19:00:00
 	- Original version.

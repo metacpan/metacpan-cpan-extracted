@@ -7,7 +7,7 @@ use Test::Deep;
 use Test::Exception;
 use Test::More tests => 37;
 ########################################
-require 't/Util.pm';
+require './t/Util.pm';
 D64::Disk::Layout::Dir::Test::Util->import(qw(:all));
 ########################################
 our $class;

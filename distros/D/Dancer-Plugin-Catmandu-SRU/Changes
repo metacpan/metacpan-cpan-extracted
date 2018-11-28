@@ -1,5 +1,9 @@
 Revision history for Dancer-Plugin-Catmandu-SRU
 
+0.0503  2018-11-27 12:06:54 CET
+  - fix setting content type
+  - new content_type setting
+
 0.0502  2018-02-27 12:10:52 CET
   - host and port are derived by Dancer (better support for reverse proxy)
   - maximumRecords can be 0 (handy to check number of records)

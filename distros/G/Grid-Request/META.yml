@@ -1,25 +1,36 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Grid-Request
-version:      0.11
-version_from: VERSION
-installdirs:  site
+---
+abstract: 'Easily formulate, submit, and monitor grid jobs.'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Grid-Request
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Carp:                          0
-    Config::IniFiles:              2.19
-    Exception::Class:              1.23
-    File::Path:                    1.0403
-    File::Temp:                    0.12
-    File::Which:                   0.05
-    FindBin:                       0
-    IO::Capture:                   0.05
-    IO::Scalar:                    2.104
-    Log::Log4perl:                 1.08
-    Schedule::DRMAAc:              0
-    Sys::Hostname:                 1.1
-    Test::MockObject:              0
-    Test::More:                    0.46
-    XML::Writer:                   0.4
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Carp: '0'
+  Config::IniFiles: '2.19'
+  Exception::Class: '1.23'
+  File::Path: '1.0403'
+  File::Temp: '0.12'
+  File::Which: '0.05'
+  FindBin: '0'
+  IO::Capture: '0.05'
+  IO::Scalar: '2.104'
+  Log::Log4perl: '1.08'
+  Schedule::DRMAAc: '0'
+  Sys::Hostname: '1.1'
+  Test::MockObject: '0'
+  Test::More: '0.46'
+  XML::Writer: '0.4'
+version: '0.12'

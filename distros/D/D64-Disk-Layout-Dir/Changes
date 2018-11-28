@@ -1,5 +1,10 @@
 Revision history for Perl extension D64::Disk::Layout::Dir.
 
+0.03  2018-11-24
+    - bug fixed: "Can't locate t/Util.pm in @INC" thrown while running "make
+      test" (reason: a recent security patch to Perl removed current working
+      directory from "@INC", the default search path for 'require')
+
 0.02  2013-03-24
     - bug fixed: invalid version number of dependency on D64::Disk::Dir::Item
       has been corrected

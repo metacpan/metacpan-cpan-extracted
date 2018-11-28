@@ -1,15 +1,11 @@
 #!/usr/bin/env perl
 package hailo;
-BEGIN {
-  $hailo::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $hailo::VERSION = '0.72';
-}
-use 5.010;
+our $AUTHORITY = 'cpan:AVAR';
+$hailo::VERSION = '0.74';
+use v5.28.0;
 use open qw< :encoding(utf8) :std >;
 use Dir::Self;
-use Any::Moose;
+use Moose;
 use Encode qw(decode);
 use Hailo::Command;
 use namespace::clean -except => 'meta';
@@ -48,6 +44,7 @@ hailo - Command-line interface to the L<Hailo|Hailo> Markov bot
 
 =head1 USAGE
 
+    usage: hailo [-abEfhLlopRrSsTtuv] [long options...]
     usage: hailo [-abEfhLlopRrSsTtuv] [long options...]
 	-v --version           Print version and exit
 	-u --ui                Use UI CLASS

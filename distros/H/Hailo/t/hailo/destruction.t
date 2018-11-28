@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use 5.010;
+use v5.28.0;
 use strict;
 use warnings;
 use Hailo;
@@ -7,7 +7,7 @@ use Test::More tests => 3;
 
 {
     package Fernando;
-    use Any::Moose;
+    use Moose;
 
     extends 'Hailo';
 

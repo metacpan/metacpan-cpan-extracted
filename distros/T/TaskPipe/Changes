@@ -17,7 +17,13 @@ Revision history for Perl extension TaskPipe.
 	- correct distribution errors
 
 0.06  Fri Nov 02 05:00:00 2018
-    - resume mechanism rewrite
-    - threading rewrite
-    - memory leak mitigation
-    - multiple bug fixes + minor improvements
+        - resume mechanism rewrite
+        - threading rewrite
+        - memory leak mitigation
+        - multiple bug fixes + minor improvements
+
+0.07  Tue Nov 21 20:12:32 2018
+        - Fix missing test dependencies
+
+0.08  Wed Nov 22 10:39:10 2018
+	- Remove auto-created configs which were causing test fails

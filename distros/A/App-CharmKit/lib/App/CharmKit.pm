@@ -1,9 +1,18 @@
+# ABSTRACT: Additional helper hook routines
 package App::CharmKit;
 
-our $VERSION = '2.08';
+use charm;
+use base "Exporter::Tiny";
+use FindBin;
+use lib "$FindBin::Bin/..lib";
+use Module::Runtime qw(use_package_optimistically);
 
-use strict;
-use warnings;
+our $VERSION = '2.11';
+our @EXPORT  = qw(plugin);
+
+sub plugin ($name, $opts = {}) {
+    return use_package_optimistically("$name")->new($opts);
+}
 
 1;
 
@@ -18,9 +27,11 @@ App::CharmKit - ez pz charm authoring
 =head1 SYNOPSIS
 
     #!/usr/bin/env perl
+    #
+    # In hooks/install
     BEGIN {
-        # Install charmkit
-        system "curl -L http://charmkit.pl/setup.sh | sh";
+      system "apt-get install -qyf cpanminus";
+      system "cpanm -qn App::CharmKit";
     }
 
     use charm;
@@ -32,7 +43,7 @@ App::CharmKit - ez pz charm authoring
 
     file "/etc/systemd/system/znc.service", source => "$hook_path/templates/znc.service";
 
-    my $content = template("$hook_path/templates/znc.conf", port => config 'port');
+    my $content = template("$hook_path/templates/znc.conf", port => sh 'config-get port');
     file "/home/ubuntu/.znc/configs", ensure => "directory", owner => "ubuntu", group => "ubuntu";
     file "/home/ubuntu/.znc/configs/znc.conf",
       owner     => "ubuntu",

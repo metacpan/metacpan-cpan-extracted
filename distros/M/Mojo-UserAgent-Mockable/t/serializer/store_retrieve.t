@@ -7,11 +7,74 @@ use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Mojo::UserAgent::Mockable::Serializer;
 use Mojo::UserAgent::Mockable::Request::Compare;
-use Mojolicious::Quick;
 use Path::Tiny;
 use FindBin qw($Bin);
 use lib qq{$Bin/../lib};
 use RandomOrgQuota qw/check_quota/;
+
+package LocalApp {
+    use Mojolicious::Lite;
+    my $app = Mojolicious->new;
+
+    get '/records' => sub {
+        my $c = shift;
+        $c->render(
+            json => {
+                meta    => { count => 1, },
+                records => [
+                    {   id            => 8675309,
+                        author        => 'Tommy Tutone',
+                        subject       => 'Jenny',
+                        repercussions => 'Many telephone companies now refuse to give out the number '  #
+                                         . '"867-5309".  People named "Jenny" have come to despise this song. ' #
+                                         . 'Mr. Tutone made out well.',
+                    }
+                ],
+            }
+        );
+    };
+    get '/record/:id' => sub {
+            my $c  = shift;
+            my $id = $c->stash('id');
+            if ( $id eq '8675309' ) {
+                $c->render(
+                    json => [
+                        {   id            => 8675309,
+                            author        => 'Tommy Tutone',
+                            subject       => 'Jenny',
+                            repercussions => 'Many telephone companies now refuse to give out the number ' 
+                                            . '"867-5309".  People named "Jenny" have come to despise this song. ' 
+                                            . 'Mr. Tutone made out well.',
+                            summary       => 'The singer wonders who he can turn to, and recalls Jenny, who he feels ' 
+                                            . 'gives him something that he can hold on to.  He worries that she will ' 
+                                            . 'think that he is like other men who have seen her name and number written ' 
+                                            . 'upon the wall, but persists in calling her anyway. In his heart, the ' 
+                                            . 'singer knows that Jenny is the girl for him.',
+                        }
+                    ]
+                );
+            }
+    };
+};
+
+package LocalRandomApp {
+    use Mojolicious::Lite;
+    get '/integers' => sub {
+        my $c     = shift;
+        my $count = $c->req->param('num') || 1;
+        my $min   = $c->req->param('min') || 0;
+        my $max   = $c->req->param('max') || 1e9;
+        my $cols  = $c->req->param('cols') || 1;
+
+        my @nums;
+        for ( 0 .. ( $count - 1 ) ) {
+            my $number = ( int rand( $max - $min ) ) + $min;
+            push @nums, $number;
+        }
+
+        $c->render( text => join qq{\n}, @nums );
+    };
+}
 
 my $serializer = Mojo::UserAgent::Mockable::Serializer->new;
 
@@ -41,7 +104,7 @@ subtest 'Local App' => sub {
     my $dir = File::Temp->newdir;
     my $output_file = qq{$dir/local_app.json};
 
-    my $app = get_local_app();
+    my $app = LocalApp::app;
     my $ua = Mojo::UserAgent->new;
     $ua->server->app($app);
 
@@ -91,7 +154,7 @@ subtest 'URL bits' => sub {
     my $dir = File::Temp->newdir;
     my $output_file = qq{$dir/local_random.json};
 
-    my $app = get_local_random_app();
+    my $app = LocalRandomApp::app;
     my $ua = Mojo::UserAgent->new;
     $ua->server->app($app);
 
@@ -153,73 +216,4 @@ sub test_transactions {
     return;
 }
 
-sub get_local_app {
-    my $app = Mojolicious->new;
-    $app->routes->get(
-        '/records' => sub {
-            my $c = shift;
-            $c->render(
-                json => {
-                    meta    => { count => 1, },
-                    records => [
-                        {   id            => 8675309,
-                            author        => 'Tommy Tutone',
-                            subject       => 'Jenny',
-                            repercussions => 'Many telephone companies now refuse to give out the number '
-                                . '"867-5309".  People named "Jenny" have come to despise this song. '
-                                . 'Mr. Tutone made out well.',
-                        }
-                    ],
-                }
-            );
-        },
-    );
-    $app->routes->get(
-        '/record/:id' => sub {
-            my $c  = shift;
-            my $id = $c->stash('id');
-            if ( $id eq '8675309' ) {
-                $c->render(
-                    json => [
-                        {   id            => 8675309,
-                            author        => 'Tommy Tutone',
-                            subject       => 'Jenny',
-                            repercussions => 'Many telephone companies now refuse to give out the number '
-                                . '"867-5309".  People named "Jenny" have come to despise this song. '
-                                . 'Mr. Tutone made out well.',
-                            summary => 'The singer wonders who he can turn to, and recalls Jenny, who he feels '
-                                . 'gives him something that he can hold on to.  He worries that she will '
-                                . 'think that he is like other men who have seen her name and number written '
-                                . 'upon the wall, but persists in calling her anyway. In his heart, the '
-                                . 'singer knows that Jenny is the girl for him.',
-                        }
-                    ]
-                );
-            }
-        },
-    );
-    return $app;
-}
-
-sub get_local_random_app {
-    my $app = Mojolicious->new;
-    $app->routes->get(
-        '/integers' => sub {
-            my $c     = shift;
-            my $count = $c->req->param('num') || 1;
-            my $min   = $c->req->param('min') || 0;
-            my $max   = $c->req->param('max') || 1e9;
-            my $cols  = $c->req->param('cols') || 1;
-
-            my @nums;
-            for ( 0 .. ( $count - 1 ) ) {
-                my $number = ( int rand( $max - $min ) ) + $min;
-                push @nums, $number;
-            }
-
-            $c->render( text => join qq{\n}, @nums );
-        },
-    );
-    return $app;
-}
 __END__

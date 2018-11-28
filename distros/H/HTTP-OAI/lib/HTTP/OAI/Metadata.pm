@@ -4,16 +4,23 @@ package HTTP::OAI::Metadata;
 
 use strict;
 
-our $VERSION = '4.07';
+our $VERSION = '4.08';
 
 sub new
 {
 	my( $class, %self ) = @_;
 
-	$self{doc} = XML::LibXML::Document->new( '1.0', 'UTF-8' );
-	$self{dom} = $self{current} = $self{doc}->createDocumentFragment;
+    my $inst = bless \%self, $class;
 
-	return bless \%self, $class;
+    if ($self{dom}) {
+        $inst->_elem("dom", $self{dom});
+    }
+    else {
+        $inst->{doc} = XML::LibXML::Document->new( '1.0', 'UTF-8' );
+        $inst->{dom} = $inst->{current} = $inst->{doc}->createDocumentFragment;
+    }
+
+	return $inst;
 }
 
 sub metadata { shift->dom( @_ ) }
@@ -71,6 +78,10 @@ HTTP::OAI::Metadata - Base class for data objects that contain DOM trees
 
 	$xml = XML::LibXML::Document->new();
 	$xml = XML::LibXML->new->parse( ... );
+
+    $md = new HTTP::OAI::Metadata();
+
+    $md->dom($xml);
 
 	$md = new HTTP::OAI::Metadata(dom=>$xml);
 

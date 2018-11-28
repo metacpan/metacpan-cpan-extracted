@@ -1,10 +1,13 @@
 # This -*- cperl -*- program writes the Makefile for WWW::Search
 
+use warnings;
+use strict;
+
 use lib '.';
 
 use inc::Module::Install;
 
-version(2.517);
+version(2.518);
 all_from('lib/WWW/Search.pm');
 perl_version(5.005);
 license('perl');
@@ -60,8 +63,7 @@ test_requires('Test::Simple');
 # FULLPERLRUNINST:
 test_requires('ExtUtils::MM_Unix' => 1.41);
 
-sub MY::preamble
-  {
+sub MY::preamble {
   # This does not work because MakeMaker apparently does not have a
   # preamble method.
   return <<'PREAMBLE';
@@ -70,36 +72,42 @@ AutoSearch :: FORCE
 PREAMBLE
   } # MY::preamble
 
-  my $ret = q{};
-  if (1)
-    {
-    $ret .= <<'PART0';
+my $ret = q{};
+if (1)
+  {
+  $ret .= <<'PART0';
 coverage :
 	- cover -delete
 	$(MAKE) HARNESS_PERL_SWITCHES=-MDevel::Cover test
 	cover
 PART0
-    } # if
-  if (0)
-    {
-    $ret .= <<'PART2';
+  } # if
+if (0)
+  {
+  $ret .= <<'PART2';
 test_parsing : pure_all
 	$(FULLPERLRUNINST) t/test_parsing.pl $(TEST_ARGS)
 
 PART2
-    } # if
-  if (1)
-    {
-    $ret .= <<'PART3';
+  } # if
+if (1)
+  {
+  $ret .= <<'PART3';
 tags:
 	cat MANIFEST | etags -
 
 PART3
-    } # if
-  postamble $ret;
+  } # if
+postamble $ret;
 
-use Env;
-if ($ENV{MTHURN_PERL_DEV})
+my $iHaveEnv = 1;
+eval 'use Env';
+if ($@)
+  {
+  $iHaveEnv = 0;
+  } # if
+
+if ($iHaveEnv and $ENV{MTHURN_PERL_DEV})
   {
   warn "DDD This is author's development environment\n";
   use_ptar();
@@ -107,7 +115,7 @@ if ($ENV{MTHURN_PERL_DEV})
 
 WriteAll;
 
-if (0 && $ENV{MTHURN_PERL_DEV})
+if (0 and $iHaveEnv and $ENV{MTHURN_PERL_DEV})
   {
   print "DDD This is author's development environment\n";
   my $sFnameMakefile = q{Makefile};

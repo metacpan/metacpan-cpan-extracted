@@ -4,7 +4,7 @@
       "Klaus Eichner <klaus03@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,17 +33,15 @@
             "File::Spec" : "0",
             "Win32::File" : "0",
             "Win32::OLE" : "0",
-            "Win32::OLE::Const" : "0",
             "Win32::OLE::Variant" : "0",
-            "Win32::VBScript" : "0",
-            "perl" : "5.012",
-            "strict" : "0",
+            "perl" : "5.026",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "strict" : "0"
          }
       }
    },
@@ -56,6 +54,8 @@
          "web" : "https://github.com/klaus03/Win32-Scsv"
       }
    },
-   "version" : "0.39"
+   "version" : "0.41",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

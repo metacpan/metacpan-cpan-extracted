@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -155,12 +155,19 @@ our $VERSION = '1.014';
 #pod =cut
 
 use Mojo::Base 'Mojolicious';
+use Mojo::File qw(path);
+use Mojo::JSON qw(decode_json);
 
 sub startup {
     my ( $app ) = @_;
     $app->plugin( Config => { default => { } } );
+    my %config = %{ $app->config };
+    if ( $config{openapi} and !ref $config{openapi} ) {
+        # assume a file in JSON format: load and parse it
+        $config{openapi} = decode_json path( ( $ENV{MOJO_HOME} || () ), $config{openapi} )->slurp;
+    }
     $app->plugin( 'Yancy', {
-        %{ $app->config },
+        %config,
         route => $app->routes->any('/yancy'),
     } );
 
@@ -191,7 +198,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 SYNOPSIS
 

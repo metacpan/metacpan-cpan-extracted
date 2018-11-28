@@ -4,7 +4,7 @@ use base HTTP::OAI::UserAgent;
 
 use strict;
 
-our $VERSION = '4.07';
+our $VERSION = '4.08';
 
 sub new {
 	my ($class,%args) = @_;

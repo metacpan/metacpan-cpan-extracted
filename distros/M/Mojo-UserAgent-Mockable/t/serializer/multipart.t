@@ -4,22 +4,20 @@ use Test::Most;
 use Test::JSON;
 use Mojo::JSON;
 use Mojo::UserAgent::Mockable::Serializer;
-use Mojolicious::Quick;
 use Safe::Isa qw($_isa);
 
 my $TEST_FILES_DIR = qq{$Bin/../files};
 
 my $serializer = Mojo::UserAgent::Mockable::Serializer->new;
 
-my $app = Mojolicious::Quick->new(
-    [   POST => [
-            '/target' => sub {
-                my $c = shift;
-                $c->render( text => 'Zip zop zoobity bop' );
-            }
-        ]
-    ]
-);
+package TestApp {
+    use Mojolicious::Lite;
+    post '/target' => sub {
+        my $c = shift;
+        $c->render( text => 'Zip zop zoobity bop' );
+    };
+};
+my $app = TestApp::app;
 my $ua = $app->ua;
 my $tx = $ua->post(
     '/target' => {

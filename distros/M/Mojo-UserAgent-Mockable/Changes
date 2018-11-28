@@ -1,4 +1,13 @@
-1.54      2018-05-04 22:24:09-05:00 America/Chicago
+1.56      2018-11-21 23:33:38-06:00 America/Chicago
+
+- #15: Fixed issue where save wouldn't work if called during global destruction
+
+1.55      2018-11-21 22:05:33-06:00 America/Chicago
+
+- Mojo::UserAgent::Mockable::Request::Compare compares GET parameters without regard to parameter order.
+- Removed dependency on Mojolicious::Quick in favor of Mojolicious::Lite
+
+1.53      2017-02-27 15:58:36-06:00 America/Chicago
 
 - Fixed dependencies screwed up in v1.52
 - Fixed issue #18 where tests failed due updates to the V&A site.

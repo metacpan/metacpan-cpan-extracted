@@ -1,6 +1,6 @@
 package Lab::Connection::LinuxGPIB::Log;
 #ABSTRACT: Add logging capability to the LinuxGPIB connection
-$Lab::Connection::LinuxGPIB::Log::VERSION = '3.664';
+$Lab::Connection::LinuxGPIB::Log::VERSION = '3.670';
 use 5.010;
 use warnings;
 use strict;
@@ -32,7 +32,7 @@ Lab::Connection::LinuxGPIB::Log - Add logging capability to the LinuxGPIB connec
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 COPYRIGHT AND LICENSE
 

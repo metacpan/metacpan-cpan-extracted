@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Dummy;
 #ABSTRACT: Dummy sweep
-$Lab::XPRESS::Sweep::Dummy::VERSION = '3.664';
+$Lab::XPRESS::Sweep::Dummy::VERSION = '3.670';
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -43,7 +43,7 @@ Lab::XPRESS::Sweep::Dummy - Dummy sweep
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 COPYRIGHT AND LICENSE
 

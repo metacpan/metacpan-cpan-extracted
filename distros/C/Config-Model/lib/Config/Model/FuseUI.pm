@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::FuseUI;
-$Config::Model::FuseUI::VERSION = '2.127';
+$Config::Model::FuseUI::VERSION = '2.128';
 # there's no Singleton with Mouse
 use Mouse;
 
@@ -327,7 +327,7 @@ Config::Model::FuseUI - Fuse virtual file interface for Config::Model
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -387,7 +387,7 @@ empty and the old value is lost.
 
 =head1 constructor
 
-=head1 new (...)
+=head1 new
 
 parameters are:
 
@@ -407,7 +407,9 @@ Root of the configuration tree (C<Config::Model::Node> object )
 
 =head1 Methods
 
-=head2 run_loop( fork_in_loop => 1|0, debug => 1|0)
+=head2 run_loop
+
+Parameters: C<< ( fork_in_loop => 1|0, debug => 1|0 ) >>
 
 Mount the file system either in the current process or fork a new process before mounting the file system.
 In the former case, the call is blocking. In the latter case, the call returns after forking a process that

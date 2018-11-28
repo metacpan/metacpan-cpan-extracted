@@ -4,7 +4,83 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
+
+my $have_geos;
+BEGIN {
+    $have_geos = eval 'require Alien::geos::af';
+    my $pushed_to_env = 0;
+    if ($have_geos && !$pushed_to_env && Alien::geos::af->install_type eq 'share') {
+        my $sep_char = ($^O =~ /mswin/i) ? ';' : ':';
+        #  crude, but otherwise Geo::GDAL::FFI does not
+        #  get fed all the needed info
+        #warn "Adding Alien::geos bin to path: " . Alien::geos::af->bin_dir;
+        $ENV{PATH} =~ s/;$//;
+        $ENV{PATH} .= $sep_char . join ($sep_char, Alien::geos::af->bin_dir);
+        $pushed_to_env++;
+        #warn $ENV{PATH};
+    }
+}
+
+sub dynamic_libs {
+    my $self = shift;
+    
+    my (@libs) = $self->SUPER::dynamic_libs;
+    
+    if ($have_geos) {
+        push @libs, Alien::geos::af->dynamic_libs;
+    }
+    
+    return @libs;
+}
+
+sub cflags {
+    my $self = shift;
+    
+    my $cflags = $self->SUPER::cflags;
+    
+    if ($have_geos) {
+        $cflags .= ' ' . Alien::geos::af->cflags;
+    }
+    
+    return $cflags;
+}
+
+sub libs {
+    my $self = shift;
+    
+    my $cflags = $self->SUPER::libs;
+    
+    if ($have_geos) {
+        $cflags .= ' ' . Alien::geos::af->libs;
+    }
+    
+    return $cflags;
+}
+
+#sub cflags_static {
+#    my $self = shift;
+#    
+#    my $cflags = $self->SUPER::cflags_static;
+#    
+#    if ($have_geos) {
+#        $cflags .= ' ' . Alien::geos::af->cflags_static;
+#    }
+#    
+#    return $cflags;
+#}
+#
+#sub libs_static {
+#    my $self = shift;
+#    
+#    my $cflags = $self->SUPER::libs_static;
+#    
+#    if ($have_geos) {
+#        $cflags .= ' ' . Alien::geos::af->libs_static;
+#    }
+#    
+#    return $cflags;
+#}
 
 sub data_dir {
     my $self = shift;
@@ -92,6 +168,8 @@ L<Geo::GDAL>
 
 L<Geo::GDAL::FFI>
 
+L<Alien::geos::af>
+
 =head1 AUTHORS
 
 Shawn Laffan, E<lt>shawnlaffan@gmail.comE<gt>
@@ -103,7 +181,7 @@ Ari Jolma
 =head1 COPYRIGHT AND LICENSE
 
 
-Copyright 2017 by Shawn Laffan and Jason Mumbulla
+Copyright 2017- by Shawn Laffan and Jason Mumbulla
 
 
 This library is free software; you can redistribute it and/or modify

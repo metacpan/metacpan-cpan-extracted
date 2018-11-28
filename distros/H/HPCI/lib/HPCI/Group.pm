@@ -33,25 +33,16 @@ role {
     my $theDriver = $p->theDriver;
     my $StageClass = "${theDriver}::Stage";
 
-    has '_stage_class' => (
-        is       => 'ro',
-        isa      => 'Str',
-        init_arg => undef,
-        default  => $StageClass,
-    );
-
-    sub name;         # tell Logger we provide a name attribute
-    sub group_dir;    # tell Logger we provide a group_dir attribute
-    sub _unique_name; # tell Logger we provide a _unique_name attribute
-
     # do nothing, but let roles write before/after/around wrappers
     method BUILD => sub {
     };
 
-    with qw(
-        HPCI::Logger
-        HPCI::Env
-    );
+    with
+        'HPCI::Super',
+        'HPCI::SuperSub',
+        'HPCI::Logger',
+        'HPCI::Env',
+    ;
     # Future considerations for adding:
     #
     # HPCI::HTML         - generate a report about an execution
@@ -63,7 +54,7 @@ role {
     method wait_for_completed_stage => sub {
         my $self         = shift;
         my $finished_job = $self->next_finished_job;
-        my $name         = $finished_job->stage->name;
+        my $name         = $finished_job->stage->_full_name;
         my $stage        = $self->_stages->{$name};
         if ($stage->_has_command) {
             $stage->_analyse_completion_state($finished_job);
@@ -156,11 +147,25 @@ C<cluster> argument) to request an appropriate to build it.
 
 =head1 ATTRIBUTES
 
+=head2 name (optional)
+
+The name of this group of stages.  Defaults to 'default_group_name'.
+Not actually required for a group.
+
+=cut
+
+    has 'name' => (
+        is       => 'ro',
+        isa      => 'Str',
+        default  => 'default_group_name',
+    );
+
 =head2 cluster
 
 The type of cluster that will be used to execute the group of stages.
-This value is passed on by the HPCI->group method when it
-creates a new group.  Since it also uses that value to select the type
+This value is passed on internally by the HPCI->stage method when it
+creates a new stage, or by the group->subgroup method when it creates
+a new subgroup.  Since it also uses that value to select the type
 of group object that is created, it is somewhat redundant.
 
 =cut
@@ -171,21 +176,24 @@ of group object that is created, it is somewhat redundant.
         required => 1,
     );
 
-=head2 name (optional)
+=head2 base_dir (optional)
 
-The name of this group of stages.  Defaults to 'default_group_name'.
+The directory that will contain all generated output (unless
+that output is specifically directed to some other location).
+The default is the current directory.
 
 =cut
 
-    has 'name' => (
-        is       => 'ro',
-        isa      => 'Str',
-        lazy     => 1,
-        default  => 'default_group_name',
-        required => 1,
+    has 'base_dir' => (
+        is => 'ro',
+        isa     => 'Path::Class::Dir',
+        coerce  => 1,
+        default => sub {
+            my $self = shift;
+            Dir->new( '.' );
+        },
     );
-
-=head2 storage_classes (optional)
+=head2 storage_classes (optional) (Not currently used, needs work)
 
 HPCI has two conceptual storage types that it expects to be available.
 
@@ -276,67 +284,47 @@ corresponding location in the long-term storage.
 
 See the documentation for HPCI::File for details on writing new classes.
 
-=head2 storage_class
+=head2 file_class
 
 The default storage class attribute for files that do not
-have an explicit class given and are not covered by an element in
-storage_classes.  This is a (sub-)class of HPCI::File, the default
-is HPCI::File.
+have an explicit class given.  This is the name of a class.
+The default is HPCI::File, but a sub-class of HPCI::File can
+be provided instead.
 
 =cut
 
-has 'storage_class' => (
+has 'file_class' => (
     is      => 'ro',
-    isa     => 'HPCIFileGen',
+    isa     => 'Str',
     lazy    => 1,
-    default => sub { HPCI::File::Classes::generator('HPCI::File') },
+    default => 'HPCI::File',
 );
 
-=head2 file_params
+=head2 _default_file_info (internal)
 
-A hash containing the param list for files that need params.
-Providing them here means that they do not have to be written
-out in full every time the file is used through the program.
-
-You can use the method add_file_params to augment the hash, so
-the file info can be provided in the sectio of code that creates
-the stage(s) that use that file, rather than having to list them
-all in one place.
-
-Defaults to an empty hash.
+This over-rides the _default_file_info method from HPCI::Super
+which sets the default contents of the C<file_params> attribute.
+HPCI::Super normally copies from the parent group, but since this
+top-level group has no parent it is set to an empty hash.
 
 =cut
 
-has 'file_params' => (
-    is      => 'bare',
-    isa     => 'HashRef',
-    trigger => sub {
-        my $self = shift;
-        $self->add_file_params( @_ );
-    },
-);
-
-has '_file_info' => (
-    is      => 'ro',
-    isa     => 'HashRef',
-    lazy    => 1,
-    default => sub { { } },
-);
-
+sub _default_file_info { return { } };
 
 =head2 _unique_name (internal)
 
-The name of this group of stages.  Used as the default value for
-the B<group_dir> attribute.
+The name of the top level group with a timestamp added to make it
+unique so that the directory created to hold to files from the
+execution of the group will not conflict with other runs.
 
 =cut
 
     has '_unique_name' => (
-        is => 'ro',
-        isa => 'Str',
-        lazy => 1,
+        is       => 'ro',
+        isa      => 'Str',
+        lazy     => 1,
         init_arg => undef,
-        default => sub {
+        default  => sub {
             my $self = shift;
             my $name  = $self->name;
             my $tstamp = DateTime->now->strftime("%Y%m%d-%H%M%S");
@@ -344,51 +332,45 @@ the B<group_dir> attribute.
         },
     );
 
-=head2 base_dir (optional)
-
-The directory that will contain all generated output (unless
-that output is specifically directed to some other location).
-The default is the current directory.
-
-=cut
-
-    has 'base_dir' => (
-        is => 'ro',
-        isa     => 'Path::Class::Dir',
-        coerce  => 1,
-        default => sub {
-            my $self = shift;
-            Dir->new( '.' );
-        },
+    has '_stages' => (
+        is       => 'ro',
+        isa      => "HashRef[$StageClass]",
+        lazy     => 1,
+        init_arg => undef,
+        default  => sub { {} },
     );
 
-=head2 group_dir (optional)
+    method _register_stage => sub {
+        my $self     = shift;
+        my $stage    = shift;
+        my $name     = $stage->name;
+        my $fullname = $stage->_full_name;
+        $self->info( "Created stage($fullname)" );
+        $self->_stages->{$fullname} = $stage;
+        $self->_stage_cnt( $self->_stage_cnt + 1 );
+        $self->_ready->{$fullname} = 1;
+    };
 
-The directory which will contain all output pertaining to the entire
-group.  By default, this is a new directory under B<base_dir> which
-is given a name combining the name of the group and the timestamp
-when the group was created (e.g. EXAMPLEGROUP-YYMMDD-HHMMSS).
-
-=cut
-
-    has 'group_dir' => (
-        is => 'ro',
-        isa     => 'Path::Class::Dir',
-        lazy    => 1,
-        coerce  => 1,
-        default => sub {
-            my $self = shift;
-            my $subdir = $self->_unique_name;
-            my $target = $self->base_dir->subdir($subdir);
-            HPCI::_trigger_mkdir( $self, $target );
-            return $target;
-        },
-        trigger => \&HPCI::_trigger_mkdir,
+    has '_subgroups' => (
+        is       => 'ro',
+        isa      => "HashRef[HPCI::Subgroup]",
+        lazy     => 1,
+        init_arg => undef,
+        default  => sub { {} },
     );
+
+    method _register_subgroup => sub {
+        my $self     = shift;
+        my $subgroup = shift;
+        my $name     = $subgroup->name;
+        my $fullname = $subgroup->_full_name;
+        $self->info( "Created subgroup($fullname)" );
+        $self->_subgroups->{$fullname} = $subgroup;
+    };
 
 =head2 connect (optional)
 
-This can contain an URL to be used by the driver for types of cluster
+This can contain a value to be used by the driver for types of cluster
 where it is necessary to connect to the cluster in some way.  It can
 be omitted for local clusters that are directly accessible.
 
@@ -401,8 +383,10 @@ be omitted for local clusters that are directly accessible.
 
 =head2 login, password (optional)
 
-This can contain an identifier to be used by the driver for types of
-cluster which require authorization.
+This can contain a value to be used by drivers for
+clusters which carry out a connection process which
+require a login and password or some other similar
+authorization data.
 
 =cut
 
@@ -413,10 +397,14 @@ cluster which require authorization.
 
 =head2 max_concurrent (optional)
 
-The maximum number of stages to be running concurrently.  If 0
-(which is the default), then there is no limit applied directly by
+The maximum number of stages to be running concurrently.  The value 0
+(which is the default) means that there is no limit applied directly by
 HPCI (although the underlying cluster-specific driver might apply
-limits of its own).
+limits of its own).  This limit is for the group and there is no
+mechanism provided at present to manage the number of stages for a
+user across separately invoked programs.  So, if your cluster requires
+the user to limit the number of separate jobs a user is running
+simultaneously then this can only be a partial solution for you.
 
 =cut
 
@@ -424,20 +412,6 @@ limits of its own).
         is       => 'ro',
         isa      => 'Int',
         default  => 0,
-    );
-
-=head2 stage_defaults
-
-This attribute can be given a hash reference containing values that
-will be passed to every stage created.
-
-=cut
-
-    has 'stage_defaults' => (
-        is       => 'ro',
-        isa      => 'HashRef',
-        lazy     => 1,
-        default  => sub { {} },
     );
 
 =head2 status (provided internally)
@@ -502,14 +476,6 @@ stage output files have been created.
 
 #### Internal attributes
 
-    has '_stages' => (
-        is       => 'ro',
-        isa      => "HashRef[$StageClass]",
-        lazy     => 1,
-        init_arg => undef,
-        default  => sub { {} },
-    );
-
     has [qw(_deps _pre_reqs)] => (
         is       => 'ro',
         isa      => 'HashRef[Str]',
@@ -546,222 +512,7 @@ stage output files have been created.
     );
 
 =head1 METHODS
-
-=head2 $group->stage( name=>'stagename', ... )
-
-Creates a stage and adds it to the group.  See HPCI::Stage
-for the generic parameters you may provide for a stage; and see
-HPCD::$cluster::Stage for the cluster-specific parameters for the
-actual type of cluster you are using.
-
-Note: this is the only way to add a stage object to the group.
-In particular, you cannot create a stage object separately and add
-it to the group - this is done to ensure that the created stage
-object is consistant with the actual group object and that you don't
-have to change code in multiple places if you switch to using a
-different cluster type for the group.  (If you want to mix stages
-for multiple cluster types within your program, you should either
-create two groups that execute independently, or else create a
-stage that itself creates a group and manages the stages for the second
-type of cluster.)
-
-The name parameter is required and must be unique - two stages
-within the same group may not have the same name.
-
-The method returns the stage object that was created, although
-most code will not need it directly.  (Whenever you need to refer
-to a stage to add dependencies, you can use its name instead of a
-reference to the object.)
-
 =cut
-
-    requires qw(submit_stage);
-
-    method stage => sub {
-        my $self = shift;
-        $self->_croak("Cannot define new stages after execution has started!")
-            if $self->_execution_started;
-        my $use_args = { };
-        # $self->debug( "Calling stage.  Provided args: " . Dumper( \@_ ));
-        HPCI::_merge_hash( $use_args, $self->stage_defaults );
-        my $args     = { @_ };
-        my $cluster  = $self->cluster;
-        for my $arg_set ($use_args, $args) {
-            if (my $spec_args = delete $arg_set->{cluster_specific}) {
-                HPCI::_merge_hash( $use_args, $spec_args->{$cluster} // {} );
-            }
-        }
-        HPCI::_merge_hash( $use_args, $args );
-
-        $self->debug( "Calling stage.  Composed args: " . Dumper( \@_ ));
-        my $stage    = $self->_stage_class->new(
-            %$use_args,
-            cluster => $self->cluster,
-            group   => $self,
-        );
-        my $name   = $stage->name;
-        my $stages = $self->_stages;
-        $self->_croak("Duplicate stage name ($name)") if exists $stages->{$name};
-        $self->info( "Created stage($name)" );
-        $stages->{$name} = $stage;
-        $self->_stage_cnt( $self->_stage_cnt + 1 );
-        $self->_ready->{$name} = 1;
-        return $stage;
-    };
-
-=head2 $group->add_deps
-
-    $group->add_deps(
-        dep      => 'a_dep',                  ## one of these two
-        deps     => ['dep1', 'dep2', ...],
-        pre_req  => 'a_pre_req',              ## and one of these two
-        pre_reqs => ['pre_req1', 'pre_req2', ...],
-    );
-
-    # A scalar value, either provided alone or in a list, can be
-    # any of:
-    #    - an existing stage object
-    #    - a string - the exact value of some existing stage's name
-    #    - a regexp - all of the stages whose name matches the regexp
-
-The add_deps method marks the pre_req (or all of the pre_reqs)
-as being pre-requisites to the dep (or all of the deps).  When the
-group is executed, stages may be run in parallel, but a dependent
-stage will not be permitted to start executing until all of its
-prerequisites stages have completed successfully.
-
-It is permitted to list the same dependency multiple times.  This can
-be convenient in that you do not need to be careful about providing
-non-overlapping groups when you specify sets of prerequisites.
-
-So, you could write:
-
-    $group->add_deps( pre_req=>'stage1', deps=>[qw(stage2 stage3)] );
-    $group->add_deps( pre_reqs=>[qw(stage1 stage2)], dep=>'stage3' );
-
-instead of:
-
-    $group->add_deps( pre_req=>'stage1', deps=>qr(^stage[23]$) );
-    $group->add_deps( pre_req=>'stage2', dep=>'stage3' );
-
-or:
-
-    $group->add_deps( pre_req=>'stage1', dep=>'stage2' );
-    $group->add_deps( pre_req=>'stage2', dep=>'stage3' );
-
-
-All three forms will provide the same ordering, the last is
-clearer for this simple sequence, but when there are many
-stages that have it may be easier to specify collections of
-dependencies at once.
-
-However, you B<must> be careful to avoid dependency loops.
-That would be a chain of dependencies stages that include the
-same stage multiple times (stage1 -> stage2 -> stage1).  Since a
-dependency indicates that the prerequisite stage must be finished
-executing before the dependent stage can start executing, this loop
-would mean that the stage1 cannot start until stage2 has completed,
-but also that stage2 cannot start until stage1 has completed.  So,
-neither one can ever start and they will both never complete.
-
-Such a loop will eventually be detected, when the group has reached
-a point where there are no stages running, and no stages can be
-started - but there could have been a lot of time wasted executing
-stages that were not part of the loop before this is noticed and
-the run aborted.
-
-Each stage argument passed can be either a reference to the stage
-object or the name of the stage, or a regexp that select all of the
-stages whose name matches the regexp.  (If no stage name matches a
-regexp, then no stages are selected.  This allows using a regexp to
-match against an optional stage without having to check whether that
-optional stage was actually used in this run.  The downside is that
-a mistyped regexp will give no complaint when it matches nothing,
-but it is certainly not possibly to give a complaint if a mistyped
-regexp matches more stages than the user intended so checking the
-regexp carefully is necessary in any case.)
-
-=cut
-
-    method add_deps => sub {
-        my $self = shift;
-        my %defargs = (
-            dep => undef,
-            deps => [],
-            pre_req => undef,
-            pre_reqs => [],
-        );
-        my %args     = ( %defargs, scalar(@_) == 1 ? %{ $_[0] } : @_ );
-        my $badargs  = join ' ', grep { ! exists $defargs{$_} } keys %args;
-        $self->_croak( "Unknown arg($badargs) provided to add_deps" ) if $badargs;
-        #       for my $arg ( qw(dep pre_req) ) {
-        #           my $args = $arg.'s';
-        #           $self->_croak( "Arg ($args) must be an array ref" )
-        #               unless ref($args{$args}) eq 'ARRAY';
-        #           $self->_croak( "Arg ($arg) may not be an array ref" )
-        #               if ref($args{$arg}) eq 'ARRAY';
-        #       }
-        my @deps     = $self->_build_stage_list($args{dep}, $args{deps});
-        my @pre_reqs = $self->_build_stage_list($args{pre_req}, $args{pre_reqs});
-        for my $dep (@deps) {
-            for my $pre_req (@pre_reqs) {
-                $self->_add_dep( $pre_req, $dep );
-            }
-        }
-    };
-
-    sub _build_stage_list {
-        my $self = shift;
-        my $stages = $self->_stages;
-        return
-            map  { $self->_croak( "Unknown stage name ($_) passed to add_deps" )
-                       unless exists $stages->{$_};
-                   $_
-                 }
-            grep { defined }
-            map  { ref($_) ? $_->name : $_ }
-            map  { ref($_) eq 'Regexp' ? ($self->_match_stages( $_ )) : ($_) }
-            map  { ref($_) eq 'ARRAY' ? @{$_} : ($_) }
-            @_
-    }
-
-    sub _match_stages {
-        my $self = shift;
-        my $pat  = shift;
-        return grep { m/$pat/ } keys %{ $self->_stages };
-    }
-
-    method _add_dep => sub {
-        # little cost/no damage if called again with same dep and pre_req
-        my ( $self, $pre_req, $dep ) = @_;
-        return if $self->_deps->{$pre_req}{$dep};
-        $self->_deps->{$pre_req}{$dep}     = 1;
-        $self->_pre_reqs->{$dep}{$pre_req} = 1;
-        $self->_blocked->{$dep}            = 1;
-        delete $self->_ready->{$dep};
-    };
-
-=head2 $group->add_file_params
-
-Augment the file_params list with additioal files.
-Provide either a hashref or a list of value pairs,
-in either case, the pairs are filename as the key,
-and params as the value.
-
-=cut
-
-    method add_file_params => sub {
-        my $self = shift;
-        my $fi   = $self->_file_info;
-        my $args = $_[0];
-        $args    = { @_ } unless ref $args eq 'HASH';
-        while ( my ($k,$v) = each %$args ) {
-            $self->_croak( "file params value for $k must be a hash ref" )
-                unless (ref($v) eq 'HASH');
-            $k = File::Spec->rel2abs($k);
-            $fi->{$k}{params} = $v;
-        }
-    };
 
 =head2 $group->execute
 
@@ -796,39 +547,69 @@ other stage or the attempt is aborted).
             }
             $self->_await_one_job;
         }
-        # $self->info("All done.\n");
         my $ret_stat = {};
         while (my ($name, $stage) = each %{ $self->_stages }) {
-            $ret_stat->{$name} = $stage->get_run_stats;
-        }
-        # $self->info( "All done!  Stage status:", Dumper($ret_stat) );
-        $self->info( "All done!  Stage status:" );
-        for my $jobname (sort keys %$ret_stat) {
-            my $jobs = $ret_stat->{$jobname};
-            for my $jobnum (0..$#$jobs) {
-                my $job = $jobs->[$jobnum];
-                my $jobnumdesc =
-                    $jobnum != $#$jobs ? "Retried run $jobnum"
-                    : $jobnum          ? "Final run after $jobnum retries"
-                    :                    "Only run - no retries";
-                for my $key (sort keys %$job) {
-                    my $val = $job->{$key};
-                    if (defined $jobname) {
-                        $self->info( "  $jobname" );
-                        undef $jobname;
-                    }
-                    if (defined $jobnumdesc) {
-                        $self->info( "    $jobnumdesc" );
-                        undef $jobnumdesc;
-                    }
-                    $self->info( sprintf "      %-20s => %s", $key, $val );
-                }
+            my $base_name = $stage->name;
+            next if $base_name =~ m/^__(START|END)__$/;
+            my @subgroups;
+            my $check = $stage;
+            while (my $parent = $check->group) {
+                last unless $parent->does('HPCI::Sub');
+                unshift @subgroups, $parent->name;
+                $check = $parent;
             }
+            my $ret_hash = $ret_stat;
+            while (my $subgroup = shift @subgroups) {
+                $ret_hash = $ret_hash->{$subgroup} //= {};
+            }
+            $ret_hash->{$base_name} = $stage->get_run_stats;
         }
+        $self->info( "All done!  Stage status:" );
+        $self->_disp_status( "  Group", $self->name, $ret_stat );
         $self->_set_status($ret_stat);
         $self->systemlogger->($self,$ret_stat)
             if $self->can('systemlogger') && $self->_has_systemlogger;
         return $ret_stat;
+    };
+
+    method _disp_status => sub {
+        my $self     = shift;
+        my $type     = shift;
+        my $name     = shift;
+        my $hash     = shift;
+        my $fullname = shift // $name;
+        my $indent   = shift // '';
+        my @stages;
+        my @subgroups;
+        return unless %$hash;
+        $self->info( "$indent$type $name" );
+        $indent .= '  | ';
+        map {
+            my $val = $hash->{$_};
+            push @{ ref($val) eq 'HASH' ? \@subgroups : \@stages }, [ $_, $val ];
+        } sort keys %$hash;
+        if (@stages) {
+            for my $stageinfo (@stages) {
+                my ($sname,$runs) = @$stageinfo;
+                $self->info( "${indent}Stage $sname   ($fullname/$sname)" );
+                for my $runnum (0..$#$runs) {
+                    my $run = $runs->[$runnum];
+                    my $runnumdesc =
+                        $runnum != $#$runs ? "Retried run $runnum"
+                        : $runnum          ? "Final run after $runnum retries"
+                        :                    "Only run - no retries";
+                    $self->info( "$indent    $runnumdesc" );
+                    $self->info( sprintf "$indent      %-20s => %s", $_, $run->{$_} )
+                        for sort keys %$run;
+                }
+            }
+        }
+        if (@subgroups) {
+            for my $sginfo (@subgroups) {
+                my ($name, $childinfo) = @$sginfo;
+                $self->_disp_status( "Subgroup", $name, $childinfo, "$fullname/$name", $indent );
+            }
+        }
     };
 
     # sub wait_for_all_jobs {
@@ -892,10 +673,6 @@ other stage or the attempt is aborted).
         confess $msg;
     };
 
-    method _croak_extra => sub {
-        return;
-    };
-
     # _submit_ready
     #   - submit all stages that are ready to be run
     #   - that will be stages which have no pre_reqs, or for which all pre_reqs
@@ -921,14 +698,24 @@ other stage or the attempt is aborted).
                      && $self->max_concurrent <= $self->_running_cnt;
             delete $self->_ready->{$name};
             my $stage = $self->_stages->{$name};
+            my ($check, $type) =
+                $stage->name eq '__START__'
+                    ? ( $stage->group, 'subgroup' )
+                    : ( $stage,        'stage'    );
+            my $checkname = $check->_full_name;
             $stage->assert_command_filled;
-            if ($stage->_can_be_skipped) {
-                $self->info("Successful skip of stage ($name).\n");
-                $self->_completed->{$name} = 1;
-                $self->_finished_cnt( $self->_finished_cnt + 1 );
-                $self->_unblock_deps($name);
-                $stage->_set_state('pass');
-                return 0;
+            if ($check->_can_be_skipped) {
+                $self->info("Determined that $type ($checkname) can be skipped.\n");
+                if ($type eq 'stage') {
+                    $self->_completed->{$name} = 1;
+                    $self->_finished_cnt( $self->_finished_cnt + 1 );
+                    $self->_unblock_deps($name);
+                    $stage->_set_state('pass');
+                    return 0;
+                }
+                else {
+                    $self->_skip_subgroup($checkname);
+                }
             }
             if ( ! $stage->_files_ready_to_start_stage) {
                 # required in file not present, abort running the stage
@@ -993,7 +780,8 @@ other stage or the attempt is aborted).
     method _blocked_deps_list => sub {
         my $self   = shift;
         my $target = shift;
-        my $seen   = shift || {};
+        my $seen   = shift // {};
+
         for my $dep ( grep { !$seen->{$_} && $self->_blocked->{$_} }
             keys %{ $self->_deps->{$target} } )
         {
@@ -1024,18 +812,22 @@ other stage or the attempt is aborted).
         return                                   if $action eq 'ignore'; 
 
         my $name = $stage->name;
-        my $reason = "failure of stage $name";
-        my $list = $action eq 'abort_deps'
-            ? $self->_blocked_deps_list( $name )
-            : $self->_blocked; # $action eq 'abort_group'
-
-        $self->_discard_list( $reason, $list );
+        $self->_discard_list(
+            "failure of stage $name",
+            $action eq 'abort_deps'
+                ? $self->_blocked_deps_list( $name )
+                : () # $action eq 'abort_group'
+        );
     };
 
     method _discard_list => sub {
         my $self     = shift;
         my $reason   = shift;
         my $list     = shift // $self->_blocked;
+        unless (defined $list) {
+            # discard all blocked stages, if no explicit list was provided
+            $list = $self->_blocked;
+        }
         my @discards = sort keys %$list;
         for my $stage (@discards) {
             $self->error(
@@ -1056,28 +848,45 @@ other stage or the attempt is aborted).
     method _await_one_job => sub {
         my $self  = shift;
         my $stage = $self->wait_for_fully_completed_stage;
-        my $name  = $stage->name;
+        my $fullname  = $stage->_full_name;
 
-        delete $self->_submitted->{$name};
+        delete $self->_submitted->{$fullname};
         $self->_finished_cnt( $self->_finished_cnt + 1 );
         $self->_running_cnt( $self->_running_cnt - 1 );
         if ($stage->is_pass) {
-            $self->info("Successful completion of stage ($name).\n");
-            $self->_completed->{$name} = 1;
+            $self->info("Successful completion of stage ($fullname).\n");
+            $self->_completed->{$fullname} = 1;
         }
         else {
             # job failed and cannot be resubmitted
-            $self->fail_stage( $name, $stage );
+            $self->fail_stage( $fullname, $stage );
         }
-        $self->_unblock_deps($name);
+        $self->_unblock_deps($fullname);
+    };
+
+    method _skip_subgroup => sub {
+        my $self     = shift;
+        my $subgroup = shift;
+        my @consider = ( $subgroup->_full_name . '/__END__' );
+        my %skipping = ();
+        my $comp     = $self->_completed;
+        while (my $next = shift @consider) {
+            # next if $comp->{$next};
+            # unshift @members, $next;
+            for my $pred ( @{ $self->_pre_reqs->{$next} } ) {
+                next if $comp->{$next} || $skipping{$pred}++;
+                unshift @consider, $pred;
+            }
+        }
+        $self->_discard_list( "part of subgroup ($subgroup) being skipped", \%skipping );
     };
 
     method fail_stage => sub {
         my $self  = shift;
-        my $name  = shift;
+        my $fullname  = shift;
         my $stage = shift;
-        $self->error( "Failed stage ($name).\n" );
-        $self->_failed->{$name} = 1;
+        $self->error( "Failed stage ($fullname).\n" );
+        $self->_failed->{$fullname} = 1;
         $self->_discard_deps( $stage );
         $stage->_set_state( 'fail' );
     };

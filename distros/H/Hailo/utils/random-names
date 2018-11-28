@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-use 5.010;
-use Mouse;
+use v5.28.0;
+use Moose;
 use Hailo;
 
 # Usage e.g.:

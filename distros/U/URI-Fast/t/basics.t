@@ -3,6 +3,7 @@ use ExtUtils::testlib;
 use Test2::V0;
 use URI::Encode::XS qw(uri_encode_utf8 uri_decode_utf8);
 use URI::Fast qw(uri uri_split);
+use URI;
 
 my @uris = (
   '/foo/bar/baz',
@@ -181,6 +182,26 @@ subtest 'clearers' => sub{
     $uri->$method;
     is $uri->$_, '', $method;
   }
+};
+
+subtest 'non-standard inputs' => sub{
+  subtest 'URI::Fast' => sub{
+    ok my $uri = uri(uri($uris[1])), 'ctor';
+    is $uri->scheme, 'http', 'scheme';
+    is $uri->host, 'www.test.com', 'host';
+  };
+
+  subtest 'URI' => sub{
+    ok my $uri = uri(URI->new($uris[1])), 'ctor';
+    is $uri->scheme, 'http', 'scheme';
+    is $uri->host, 'www.test.com', 'host';
+  };
+};
+
+subtest 'append' => sub{
+  my $uri = uri 'http://www.example.com/foo?k=v';
+  ok $uri->append('bar', 'baz/bat', '?k=v1&k=v2', '#fnord', 'slack'), 'append';
+  is "$uri", 'http://www.example.com/foo/bar/baz/bat/slack?k=v&k=v1&k=v2#fnord', 'expected uri';
 };
 
 done_testing;

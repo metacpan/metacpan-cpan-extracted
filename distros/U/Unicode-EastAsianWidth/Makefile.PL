@@ -1,9 +1,14 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use strict;
-use inc::Module::Package 'Au:dry 1';
+use warnings;
 
-my $DefaultVersion  = 'v5.0.0';
-my $DefaultDate     = '2006-02-15';
+use lib 'inc/';
+use Module::Package 'Au:dry 1';
+
+license 'cc0';
+
+my $DefaultVersion  = 'v11.0.0';
+my $DefaultDate     = '2018-05-14';
 
 _build_pm();
 

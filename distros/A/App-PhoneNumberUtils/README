@@ -1,0 +1,118 @@
+NAME
+    App::PhoneNumberUtils - Utilities related to phone numbers
+
+VERSION
+    This document describes version 0.001 of App::PhoneNumberUtils (from
+    Perl distribution App-PhoneNumberUtils), released on 2018-11-25.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   normalize-phone-number
+
+    *   phone-number-info
+
+    *   phone-number-is-valid
+
+FUNCTIONS
+  normalize_phone_number
+    Usage:
+
+     normalize_phone_number(%args) -> [status, msg, result, meta]
+
+    Normalize phone number.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   phnum* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  phone_number_info
+    Usage:
+
+     phone_number_info(%args) -> [status, msg, result, meta]
+
+    Show information about a phone number.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   phnum* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  phone_number_is_valid
+    Usage:
+
+     phone_number_is_valid(%args) -> [status, msg, result, meta]
+
+    Check whether phone number is valid.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   phnum* => *str*
+
+    *   quiet => *true*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PhoneNumberUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PhoneNumberUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PhoneNumberUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Number::Phone
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

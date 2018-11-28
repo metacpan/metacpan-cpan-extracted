@@ -15,19 +15,24 @@ use Mojo::IOLoop;
 use Mojo::IOLoop::Thread;
 
 # Huge result
-my ($fail, $result);
+my ($fail, $result, @start);
 my $subprocess = Mojo::IOLoop::Thread->new;
+$subprocess->on(spawn => sub { push @start, shift->pid });
 $subprocess->run(
-  sub { shift->pid . $$ . ('x' x 100000) },
+  sub { shift->pid . ('x' x 100000) },
   sub {
     my ($subprocess, $err, $two) = @_;
     $fail = $err;
     $result .= $two;
   }
 );
+$result = $$;
+ok !$subprocess->pid, 'no process id available yet';
 Mojo::IOLoop->start;
+ok $subprocess->pid, 'process id available';
 ok !$fail, 'no error';
-is $result, $$  . $subprocess->pid . ('x' x 100000), 'right result';
+is $result, $$ . $subprocess->pid . ('x' x 100000), 'right result';
+is_deeply \@start, [$subprocess->pid], 'spawn event has been emitted once';
 
 # Custom event loop
 ($fail, $result) = ();
@@ -155,6 +160,37 @@ $subprocess->run(
 );
 Mojo::IOLoop->start;
 like $fail, qr/Whatever/, 'right error';
+
+# Progress
+($fail, $result) = (undef, undef);
+my @progress;
+$subprocess = Mojo::IOLoop::Thread->new;
+$subprocess->run(
+  sub {
+    my $s = shift;
+    $s->progress(20);
+    $s->progress({percentage => 45});
+    $s->progress({percentage => 90}, {long_data => [1 .. 1e5]});
+    'yay';
+  },
+  sub {
+    my ($subprocess, $err, @res) = @_;
+    $fail   = $err;
+    $result = \@res;
+  }
+);
+$subprocess->on(
+  progress => sub {
+    my ($subprocess, @args) = @_;
+    push @progress, \@args;
+  }
+);
+Mojo::IOLoop->start;
+ok !$fail, 'no error';
+is_deeply $result, ['yay'], 'correct result';
+is_deeply \@progress,
+  [[20], [{percentage => 45}], [{percentage => 90}, {long_data => [1 .. 1e5]}]],
+  'correct progress';
 
 done_testing();
 

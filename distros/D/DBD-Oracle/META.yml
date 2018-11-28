@@ -11,17 +11,30 @@ build_requires:
   Data::Dumper: '0'
   Devel::Peek: '0'
   Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Math::BigInt: '0'
-  Test::More: '0.88'
+  Symbol: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
   Thread::Semaphore: '0'
   lib: '0'
   utf8: '0'
   vars: '0'
 configure_requires:
-  DBI: '1.51'
-  ExtUtils::MakeMaker: '6.30'
+  Config: '0'
+  DBI: '1.623'
+  Data::Dumper: '0'
+  Devel::Peek: '0'
+  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  Math::BigInt: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,13 +43,13 @@ name: DBD-Oracle
 provides:
   DBD::Oracle:
     file: lib/DBD/Oracle.pm
-    version: '1.74'
+    version: '1.76'
   DBD::Oracle::GetInfo:
     file: lib/DBD/Oracle/GetInfo.pm
-    version: '1.74'
+    version: '1.76'
   DBD::Oracle::Object:
     file: lib/DBD/Oracle/Object.pm
-    version: '1.74'
+    version: '1.76'
 requires:
   DBI: '0'
   DynaLoader: '0'
@@ -44,26 +57,37 @@ requires:
   perl: '5.006'
   strict: '0'
   warnings: '0'
-resources:
-  bugtracker: https://github.com/pythian/DBD-Oracle/issues
-  homepage: http://search.cpan.org/dist/DBD-Oracle/
-  repository: https://github.com/pythian/DBD-Oracle.git
-version: '1.74'
-x_authority: cpan:PYTHIAN
+version: '1.76'
 x_contributors:
+  - 'Aaron Crane <arc@cpan.org>'
+  - 'Alice Maz <alice@alicemaz.com>'
+  - 'cjardine <cjardine@50811bd7-b8ce-0310-adc1-d9db26280581>'
+  - 'Dag Lem <dag@nimrod.no>'
   - 'David E. Wheeler <david@justatheory.com>'
   - 'David Perry <perry@pythian.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
-  - 'Gwen Shapira <shapira@pythian.com>'
-  - 'Joe Crotty <joe.crotty@returnpath.net>'
-  - 'Michael Portnoy <portnoy@pythian.com>'
-  - 'StephenCIQG <StephenCIQG@50811bd7-b8ce-0310-adc1-d9db26280581>'
-  - 'cjardine <cjardine@50811bd7-b8ce-0310-adc1-d9db26280581>'
+  - 'Dean Hamstead <dean.hamstead@winc.com.au>'
+  - 'Dean Hamstead <djzort@cpan.org>'
+  - 'Dean Pearce <deanpearce@gmail.com>'
+  - 'Dean Pearce <pearce@pythian.com>'
   - 'gregor herrmann <gregoa@debian.org>'
+  - 'Gwen Shapira <shapira@pythian.com>'
+  - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
+  - 'Jochen Hayek <jochen.hayek@ext.eex.com>'
+  - 'Joe Crotty <joe.crotty@returnpath.net>'
   - 'jurl <jurl@50811bd7-b8ce-0310-adc1-d9db26280581>'
   - 'lbaxter <lbaxter@50811bd7-b8ce-0310-adc1-d9db26280581>'
+  - 'Martin J. Evans <github@virginmedia.com>'
+  - 'Martin J. Evans <mjegh@virginmedia.com>'
+  - 'Michael Portnoy <portnoy@pythian.com>'
+  - "Mike O'Regan <moregan@football.flr.follett.com>"
+  - "Mike O'Regan <moregan@stresscafe.com>"
   - 'robert <robert@50811bd7-b8ce-0310-adc1-d9db26280581>'
+  - 'StephenCIQG <StephenCIQG@50811bd7-b8ce-0310-adc1-d9db26280581>'
+  - 'Wesley Hinds <wesley.hinds@swri.org>'
+x_generated_by_perl: v5.26.1
 x_help_wanted:
   - developer
   - documenter
   - tester
+x_serialization_backend: 'YAML::Tiny version 1.73'

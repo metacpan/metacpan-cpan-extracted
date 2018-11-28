@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use MooseX::Types::Moose qw( HashRef Maybe Str );
 
@@ -100,7 +100,7 @@ Pg::CLI::pg_config - Wrapper for the F<psql> utility
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

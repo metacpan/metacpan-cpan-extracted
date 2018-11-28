@@ -1,0 +1,55 @@
+{
+   "abstract" : "Easily formulate, submit, and monitor grid jobs.",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Grid-Request",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::IniFiles" : "2.19",
+            "Exception::Class" : "1.23",
+            "File::Path" : "1.0403",
+            "File::Temp" : "0.12",
+            "File::Which" : "0.05",
+            "FindBin" : "0",
+            "IO::Capture" : "0.05",
+            "IO::Scalar" : "2.104",
+            "Log::Log4perl" : "1.08",
+            "Schedule::DRMAAc" : "0",
+            "Sys::Hostname" : "1.1",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.46",
+            "XML::Writer" : "0.4"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.12"
+}

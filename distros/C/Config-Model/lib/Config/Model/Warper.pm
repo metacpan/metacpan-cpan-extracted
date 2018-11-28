@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Warper;
-$Config::Model::Warper::VERSION = '2.127';
+$Config::Model::Warper::VERSION = '2.128';
 use Mouse;
 
 use Log::Log4perl qw(get_logger :levels);
@@ -623,7 +623,7 @@ Config::Model::Warper - Warp tree properties
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -791,7 +791,7 @@ be shown or not (assuming C<FooClass> and C<BarClass> classes are declared):
 
 =head1 Methods
 
-=head2 warp_error()
+=head2 warp_error
 
 This method returns a string describing:
 

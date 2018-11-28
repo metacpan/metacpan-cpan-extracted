@@ -3,6 +3,7 @@ package URI::Fast::Test;
 use strict;
 use warnings;
 use Test2::V0;
+use URI::Fast qw(uri);
 
 use parent 'Exporter';
 
@@ -23,12 +24,12 @@ sub export_uri {
 
 sub is_same_uri {
   my ($got, $expected, $msg) = @_;
-  is export_uri($got), export_uri($expected), $msg;
+  is export_uri(uri("$got")), export_uri(uri("$expected")), $msg;
 }
 
 sub isnt_same_uri {
   my ($got, $expected, $msg) = @_;
-  isnt export_uri($got), export_uri($expected), $msg;
+  isnt export_uri(uri("$got")), export_uri(uri("$expected")), $msg;
 }
 
 1;
@@ -39,7 +40,6 @@ URI::Fast::Test - Unit test comparisons for URI::Fast objects
 
 =head1 SYNOPSIS
 
-  use URI::Fast qw(uri);
   use URI::Fast::Test;
 
   is_same_uri uri($got), uri($expected), 'got expected uri';
@@ -51,12 +51,14 @@ URI::Fast::Test - Unit test comparisons for URI::Fast objects
 =head2 is_same_uri
 
 Builds a nested structure of uri components for comparison with Test2's deep
-comparison using C<is>.
+comparison using C<is>. The test subjects may be either L<URI::Fast> objects
+or strings, in which case they will be parsed into L<URI::Fast> objects.
 
 =head2 isnt_same_uri
 
 Builds a nested structure of uri components for comparison with Test2's deep
-comparison using C<isnt>.
+comparison using C<isnt>. The test subjects may be either L<URI::Fast> objects
+or strings, in which case they will be parsed into L<URI::Fast> objects.
 
 =head1 SUBROUTINES
 

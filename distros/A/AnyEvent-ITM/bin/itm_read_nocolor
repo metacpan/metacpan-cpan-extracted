@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+# PODNAME: itm_read_nocolor
+# ABSTRACT: Simple ITM Reader (No Color)
+
+use strict;
+use warnings;
+use AnyEvent;
+use AnyEvent::Handle;
+use AnyEvent::ITM;
+
+$|=1;
+
+my $file = shift or die qq{usage: $0 filename};
+open my $fh, '<', $file or die qq{can't open file: $file};
+my $cv = AE::cv;
+my $handle = create_handle();
+
+sub create_handle {
+  new AnyEvent::Handle
+  fh => $fh,
+  on_error => sub {
+    my ($handle, $fatal, $message) = @_;
+    $handle->destroy;
+    undef $handle;
+    $cv->send("$fatal: $message");
+  },
+  on_eof => sub {
+    $handle->destroy;
+    undef $handle;
+    $handle = create_handle();
+  },
+  on_read => sub {
+    my $handle = shift;
+    $handle->push_read(itm => sub {
+      my ($handle, $itm) = @_;
+      if (ref $itm eq 'ITM::Instrumentation') {
+        print $itm->payload;
+      }
+    });
+  };
+}
+
+warn $cv->recv;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+itm_read_nocolor - Simple ITM Reader (No Color)
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+  itm_read_nocolor openocd.itmlog
+
+In the openocd.cfg (for a 72MHz ARM)
+
+  itm ports on
+  tpiu config internal openocd.itmlog uart off 72000000
+
+Best is to make a fifo for the exchange (more stable)
+
+  mkfifo openocd.itmlog
+
+=head1 DESCRIPTION
+
+Displays ITM/SWO Debugging data.
+
+=encoding utf8
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/p5-anyevent-itm
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/p5-anyevent-itm/issues
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

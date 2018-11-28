@@ -1,4 +1,4 @@
-D64::Disk::Layout::Dir Version 0.02
+D64::Disk::Layout::Dir Version 0.03
 ===================================
 
 D64::Disk::Layout::Dir provides a helper class for D64::Disk module, enabling
@@ -17,7 +17,7 @@ To install this module type the following:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013 by Pawel Krol.
+Copyright (C) 2013, 2018 by Pawel Krol.
 
 This library is free open source software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or, at your

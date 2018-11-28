@@ -19,6 +19,12 @@ This module requires these other modules and libraries:
 
   Imlib2
 
+USAGE
+
+  use Ithumb::XS ();
+ 
+  Ithumb::XS::create_thumbnail('src.png', 100, 100, 'output.png');
+
 COPYRIGHT AND LICENCE
 
 Copyright (C) 2018 by Peter P. Neuromantic <p.brovchenko@protonmail.com>

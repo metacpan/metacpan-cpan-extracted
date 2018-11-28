@@ -1,9 +1,41 @@
-DESCRIPTION
+NAME
+    Dist::Zilla::Plugin::Test::Rinci - A release test for Rinci metadata
 
+VERSION
+    This document describes version 0.040 of
+    Dist::Zilla::Plugin::Test::Rinci (from Perl distribution
+    Dist-Zilla-Plugin-Test-Rinci), released on 2018-11-22.
+
+DESCRIPTION
     This is an extension of Dist::Zilla::Plugin::InlineFiles, providing the
     following files:
 
       xt/release/rinci.t - a standard Rinci metadata test
 
     This test uses Test::Rinci to check your Rinci metadata.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Test-Rinci>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Test-Rinci>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Tes
+    t-Rinci>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015, 2012 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

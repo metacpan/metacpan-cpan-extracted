@@ -1,30 +1,31 @@
 ---
-abstract: 'PNG Image file support'
+abstract: 'PNG Image file support for Imager'
 author:
   - 'Tony Cook <tonyc@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
-  Imager: 0.90
-  Test::More: 0.47
+  ExtUtils::MakeMaker: '0'
+  Imager: '0.90'
+  Test::More: '0.47'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-  Imager: 0.90
+  ExtUtils::MakeMaker: '0'
+  Imager: '0.90'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Imager-File-PNG
 no_index:
   directory:
     - t
     - inc
 requires:
-  Imager: 0.90
-  XSLoader: 0
+  Imager: '0.90'
+  XSLoader: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager
   homepage: http://imager.perl.org/
   repository: git://git.imager.perl.org/imager.git
-version: 0.92
+version: '0.94'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

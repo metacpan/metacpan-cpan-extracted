@@ -205,7 +205,7 @@ sub composed_stats_class {
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90122';
+our $VERSION = '5.90123';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -2196,15 +2196,26 @@ sub finalize {
 
     $c->log_response;
 
-    if ($c->use_stats) {
-        my $elapsed = $c->stats->elapsed;
-        my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
-        $c->log->info(
-            "Request took ${elapsed}s ($av/s)\n" . $c->stats->report . "\n" );
-    }
+    $c->log_stats if $c->use_stats;
 
     return $c->response->status;
 }
+
+=head2 $c->log_stats
+
+Logs statistics.
+
+=cut
+
+sub log_stats {
+    my $c = shift;
+
+    my $elapsed = $c->stats->elapsed;
+    my $av = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
+    $c->log->info(
+        "Request took ${elapsed}s ($av/s)\n" . $c->stats->report . "\n" );
+}
+
 
 =head2 $c->finalize_body
 
@@ -3467,7 +3478,7 @@ sub apply_default_middlewares {
           condition => sub {
               my ($env) = @_;
               return if $app->config->{ignore_frontend_proxy};
-              return $env->{REMOTE_ADDR} eq '127.0.0.1';
+              return $env->{REMOTE_ADDR} && $env->{REMOTE_ADDR} eq '127.0.0.1';
           },
       );
     }
@@ -5010,6 +5021,8 @@ random: Roland Lammel <lammel@cpan.org>
 revmischa: Mischa Spiegelmock <revmischa@cpan.org>
 
 Robert Sedlacek <rs@474.at>
+
+rrwo: Robert Rothenberg <rrwo@cpan.org>
 
 SpiceMan: Marcel Montes
 

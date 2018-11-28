@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Loader;
-$Config::Model::Loader::VERSION = '2.127';
+$Config::Model::Loader::VERSION = '2.128';
 use Carp;
 use strict;
 use warnings;
@@ -989,7 +989,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -1368,7 +1368,7 @@ Now that ssh config is mucked up with dummy entries, let's clean up:
 
 =head1 Methods
 
-=head2 load ( ... )
+=head2 load
 
 Load data into the node tree (from the node passed with C<node>)
 and fill values as we go following the instructions passed with

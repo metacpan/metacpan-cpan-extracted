@@ -4,20 +4,38 @@
 =encoding utf-8
 
 =head1 NAME
-
+################################################################################
 P  -   Safer, friendlier printf/print/sprintf + say
 
 =head1 VERSION
 
-Version  "1.1.37"
+Version  "1.1.40"
 
 =cut
 
 { package P;
 	use warnings; use strict;use mem;
-	our $VERSION='1.1.37';
+	our $VERSION='1.1.40';
 
-# RCS $Revision: 1.46 $ -  $Date: 2016-04-13 22:23:12-07 $
+# RCS $Revision: 1.55 $ -  $Date: 2018-06-16 04:34:53-07 $
+# 1.1.40	- remove check for parent pid in test phase -- not important
+#           and caused win platform to fail
+# 1.1.39	- fix in carat encoding; had Single Quote (SQ) included in string
+#						of chars to match for encoding resulting in SQ being converted
+#						for carat encoding (print SQ though %s printed ^G )
+# 1.1.38  - split declare + definition  in "local *fn=sub" to 
+#           "local (*fn); *fn=sub"
+#         - expand SCALAR refs even past limit as they don't take much space
+#           and they aren't likly to contain nested refs
+#         - moderate code cleanups
+#         - handle 'undef' if 1st param passed:
+#           - 1) if only parm, unshift in a format "%s", so undef will print
+#           - 2) if 2nd parm looks like format, discard the null(ignore)
+#         - OUTPUT CHANGE: if 1st char of a variable is a control character
+#           then print it as carat(0x40+cc), so ctl-W, becomes ^W.
+#         - remove unneeded reference to '@ISA' (Xporter doesn't need it)
+#         - refactor module-default handling; have global default module
+#           default and single-usage OO method to supply non-default params
 # 1.1.37	- instead of trying to disable non-working tests in early perl's,
 # 					require perl 5.8.5 and perlIO 1.0.3 to build;
 # 				- only do win32 checks in P.Pt
@@ -214,39 +232,59 @@ Version  "1.1.37"
 #						#}}}
 
 	use utf8;
-	our (@ISA, @EXPORT);
-	# no sense to support iohandle w/Pe, as Pe is tied to stderr
 	{ no warnings "once"; *IO::Handle::P = \&P::P }
 		
-	use Types::Core;
+	use Types::Core qw(blessed);
 
+	our @EXPORT;
 	use mem(@EXPORT=qw(P Pe));
 	use Xporter;
 
 	my $ignore=<<'IGN'									#{{{
 	BEGIN {
 		use constant EXPERIMENTAL=>0;
-
-	if (EXPERIMENTAL) {				
-		sub rm_adjacent {
-			my $c = 1;
-			($a, $c) = @$a if ref $a;
-			$b //= "∄";
-			if ($a ne $b) { $c > 1 ? "$a × $c" : $a , $b } 
-			else { (undef, [$a, ++$c]) }
-		}
-		sub reduce(&@) {
-			my (@final, $i) =((), 0);
-			my ($f, $ar)=@_;
-			for (my $i=0; $i <  $#$ar; ++$i ) {
-				($a, $b) = ($ar->[$i], $ar->[$i+1]);
-				my @r = &$f;
-				push @final, $r[0] if $r[0];
-				$ar->[$i+1] = $r[1];
+		if (EXPERIMENTAL) {				
+			sub rm_adjacent {
+				my $c = 1;
+				($a, $c) = @$a if ref $a;
+				$b //= "∄";
+				if ($a ne $b) { $c > 1 ? "$a × $c" : $a , $b } 
+				else { (undef, [$a, ++$c]) }
 			}
-			@final;
-		}
-	} 
+			sub reduce(&\[@$]) { my $f = shift;
+				my (@final, $i)		= ((), 0);
+				my ($cnt, $term) = (0, undef);
+				my ($parms, $rv);
+				if (@_ < 2 && ARRAY $_[0] ? $_[0] : \@_;
+				$parms = q(ARRAY) eq 
+				$rv = 
+
+				while (@_ >= 2) {
+					my $res = $f->($_[0], $_[1])) {
+					if ($f->($_[0], $_[1])) {
+						if ($cnt == 0) {
+							$term = $_[0];
+							++$cnt;
+						} else { ++$cnt};
+					} else {
+						if ($cnt) {
+							push @final, "\"$term\" × $cnt";
+							($cnt, $term) = (undef, 0);
+						}
+					}
+					shift;
+				}
+				@final
+
+				for (my $i=0; $i < (@$ar-1); ++$i ) {
+					my ($x, $y) = ($ar->[$i], $ar->[$i+1]);
+					my @r = &$f($ar->[$i], $ar->[$i+1]);
+					push @final, $r[0] if $r[0];
+					$ar->[$i+1] = $r[1];
+				}
+				@final;
+			}
+		} 
 	}												
 IGN
 	||undef;															#}}}
@@ -255,112 +293,171 @@ IGN
 
 	use constant NoBrHr => 0x83;					# Unicode codepoint="No Break Here"
 	our	%_dflts;
-	our ($dflts, %mod_dflts, %types);
+	our (%mod_dflts, %types);
 	BEGIN {
 		%_dflts=(
-			implicit_io	=> 0, 
-			depth				=> 3, 
-			ellipsis		=> '…', 
-			noquote			=> 1, 
-			maxstring		=> undef,
-			seen				=> '🔁',
-			undef				=> '∄',
+			depth						=> 3, 
+			ellipsis				=> '…', 
+			expand_duprefs	=> 0,
+			implicit_io			=> 0,
+			maxstring				=> undef,
+			noquote					=> 1, 
+			seen						=> '🔁',		# 🔁
+			undef						=> '∄',
 		);
 
 		my $bool	 = sub { $_[0] ? 1 : 0 };
 		my $intnum = sub { $_[0] =~ m{^([0-9]+)$} ? 0 + $1 : 0 };
-		my $string = sub { length($_[0]) ? $_[0]  : '' };
+		my $string = sub { length($_[0]) ? "$_[0]"  : '' };
 		my $true	 = sub { 1 };
 
 		%types=(
-			default			=> $true,
-			depth				=> $intnum, 
-			ellipsis		=> $string,
-			implicit_io	=> $bool,
-			maxstring		=> $intnum,
-			seen				=> $string,
-			undef				=> $string,
+			default					=> $true,
+			depth						=> $intnum, 
+			ellipsis				=> $string,
+			expand_duprefs	=> $bool,
+			implicit_io			=> $bool,
+			maxstring				=> $intnum,
+			noquote					=> $bool,
+			seen						=> $string,
+			undef						=> $string,
 		);
-
 
 		#global default copy
 		$mod_dflts{""}	= \%_dflts;
-		$dflts					=	$mod_dflts{""};
-
 	}
 
-	sub sw(*);
 
-	sub Px { my ($p, $v) = (shift, shift);
-		local (*sw); *sw = sub (*) {$dflts->{$_[0]}};
-		if (ref $v) {
-			if ($p->{__P_seen}{$v}) { return "*". sw(seen) . ":" . $v . "*" }
-			else {$p->{__P_seen}{$v} = 1}
+	use constant cc => '\x00-\x1f'; 			## cc = caret class
+
+	sub vrfmt($) {
+		my ($v, $pkg)		= (shift || "", "");
+		my ($vl, $ic)		= (length $v, 2+index $v, "::");
+		if ($ic >= 2  &&  $vl - $ic > 0) {
+			$pkg	= substr $v, 0, $ic;
+			$v 		= substr $v, $ic;
+		}																							# here, 'v' is a var name
+		if ( $v =~ m{^([\x00-\x1f])(\w*)$} ) {				# varname starting w/ctl-ch
+			$v = "^" . chr(0x40 + ord $1) . $2;					# use carot encoding
 		}
-		my $lvl = scalar @_ ? $_[0] : 2;
-		my $ro	= scalar @_>1 ? $_[1]:0;
+		$pkg . $v;
+	}
+
+################################################################################
+
+
+	sub sw(*):lvalue;
+# sub sw_decr(*);
+
+	sub _Px($$;$) { my ($p, $v) = (shift, shift);
+		local (*sw); *sw = sub (*):lvalue {
+  		defined($p->{$_[0]}) 
+              ?  $p->{$_[0]}
+              : ($p->{$_[0]} = $mod_dflts{""}->{$_[0]});
+		};
+#    local (*sw_decr); *sw_decr = sub(*) { my $res;
+#      0 >= ($res = sw($_[0])) and return $res;
+#      --sw($_[0]); $res };
+
+		unless (sw(expand_duprefs)) {
+			if (ref $v && ! SCALAR $v) {
+				if ($p->{__P_seen}{$v}) { return "*". sw(seen) . ":" . $v . "*" }
+				else { $p->{__P_seen}{$v} = 1 }
+			}
+		}
+		my ($nargs, $lvl, $ro) = (scalar @_, 2, 0);
+		if ($nargs) {
+			$lvl = $_[0];
+			if ($nargs>1) { $ro = $_[1] }
+		}
 		return sw('undef') unless defined $v;
-		my $ref = ref $v;
-		if (1 > $lvl-- || !$ref) {
+		my $rv = ref $v;
+		if (1 > $lvl-- || !$rv) {													# LAST level actons:
 			my $fmt;			# prototypes are documentary (rt#89053)
-			my $given = [	sub ($$) { $_[0] =~ /^[-+]?[0-9]+\.?\z/			&& q{%s}	},
-										sub ($$) { $_[1] 														&& qq{%s}},
-										sub ($$) { 1 == length($_[0]) 							&& q{'%s'}},
-										sub ($$) { $_[0] =~ m{^(?:[+-]?(?:\.[0-9]+)
-															|	(?:[0-9]+\.[0-9]+))\z}x  				&&  q{%.2f}},
-										sub ($$) { substr($_[0],0,5) eq 'HASH('			&& 
-																								'{'.sw(ellipsis).'}'.q{%.0s}	},
-										sub ($$) { substr($_[0],0,6) eq 'ARRAY('		&& 
-																								'['.sw(ellipsis).']'.q{%.0s}	},
-										#	sub ($$) { $mxstr && length ($_[0])>$mxstr 
-										#						&& qq("%.${mxstr}s")},
-										sub ($$) { 1																&& q{"%s"}} ];
+			my $given = [	
+				sub ($$) { $_[0] =~ /^[-+]?[0-9]+\.?\z/						&& 	q{%s}		},
+				sub ($$) { $_[1] && ($_[0] = vrfmt($_[0])), $_[1]	&& qq{%s}		},
+				sub ($$) { 1 == length($_[0]) 										&& q{'%s'}	},
+				sub ($$) { $_[0] =~ m{^(?:[+-]?(?:\.\d+)
+															|(?:\d+\.\d+))\z}x  				&& q{%.2f}	},
+				sub ($$) { substr($_[0],0,5) eq 'HASH('						&& 
+																	'{'. sw(q(ellipsis)) .'}' . q{%.0s}	},
+				sub ($$) { substr($_[0],0,6) eq 'ARRAY('					&& 
+																	'['. sw(q(ellipsis)) .']' . q{%.0s}	},
+				sub ($$) { substr($_[0],0,7) eq 'SCALAR('					&& 
+																do {'\\' . $p->_Px(${$_[0]}, $lvl) .' ' } },
+				#	sub ($$) { $mxstr && length ($_[0])>$mxstr 			&& qq("%.${mxstr}s")},
+				sub ($$) { ref $_[0]															&& q{%s}	}, 
+				sub ($$) { 1																			&& q{"%s"}	},
+			];
 
 			do { $fmt = $_->($v, $ro) and last } for @$given;
 			return sprintf($fmt, $v);
 		} else { 
 			my $pkg = '';
-			($pkg, $ref) = ($1, $2) if 0 <= (index $v,'=') && $v=~m{([\w:]+)=(\w+)}; 
-			local * nonrefs_b4_refs ;
-			* nonrefs_b4_refs = sub {
+
+			($pkg, $rv) = ($1, $2) if 0 <= (index $v, '=') && 
+																$v =~ m{([\w:]+)=([cc\w][\w:]+)}; 
+
+			local * nonrefs_b4_refs ; * nonrefs_b4_refs = sub {
 				ref $v->{$a} cmp ref $v->{$b}  || $a cmp $b 
 			};
 
 			local (*IO_glob, *NIO_glob, *IO_io, *NIO_io);
 			(*IO_glob, *NIO_glob, *IO_io, *NIO_io) = (
-						sub(){'<*'.<$v>.'>'}, sub(){'<*='.$p->Px($v, $lvl-1).'>'},
-						sub(){'<='.<$v>.'>'}, sub(){'<|'.$p->Px($v, $lvl-1).'|>'},
+						sub(){'<*'.<$v>.'>'}, sub(){'<*='.$p->_Px($v, $lvl-1).'>'},
+						sub(){'<='.<$v>.'>'}, sub(){'<|'.$p->_Px($v, $lvl-1).'|>'},
 					);
 			no strict 'refs';
 			my %actions = ( 
 				GLOB	=>	($p->{implicit_io}? *IO_glob: *NIO_glob),
 				IO		=>	($p->{implicit_io}? *IO_io	 : *NIO_io),
-				REF		=>	sub(){ "\\" . $p->Px($$_, $lvl-1) . ' '},
-				SCALAR=>	sub(){ $pkg.'\\' . $p->Px($$_, $lvl).' ' },
+				REF		=>	sub(){ "\\" . $p->_Px($$_, $lvl-1) . ' '},
+				SCALAR=>	sub(){ $pkg.'\\' . $p->_Px($$_, $lvl).' ' },
 				ARRAY	=>	sub(){ $pkg."[". 
 												(join ', ', 
 #	not working: why?			#reduce \&rm_adjacent, (commented out)
-												map{ $p->Px($_, $lvl) } @$v ) ."]" },
+												map{ $p->_Px($_, $lvl) } @$v ) ."]" },
 				HASH	=>	sub(){ $pkg.'{' . ( join ', ', @{[
-										map {$p->Px($_, $lvl, 1) . '=>'. $p->Px($v->{$_}, $lvl,0)} 
-										sort  nonrefs_b4_refs keys %$v]} ) . '}' },);
-			if (my $act=$actions{$ref}) { &$act } 
+										map {	$p->_Px($_, $lvl, 1) . '=>'. 
+													$p->_Px($v->{$_}, $lvl,0) } 
+										sort  nonrefs_b4_refs keys %$v]} ) . '}' },
+			);
+			if (my $act=$actions{$rv}) { &$act } 
 			else { return "$v" }
 		}
 	}
 
-	sub get_dflts($) {
-		my $p = shift; my $caller = $_[0];
-		return $p->{dflts}  if exists $p->{dflts};
-		return exists $mod_dflts{$caller} ? $mod_dflts{$caller} : $mod_dflts{""};
+	sub _init_p($) { my $p; my $caller	= $_[0];
+		croak P "FATAL: P::_init_p called with wrong# args (%s)", 0+@_
+						unless (@_ == 1);
+		if (blessed $mod_dflts{$caller}) {			# blessed caller already stored
+			$p = $mod_dflts{$caller};
+		} elsif (HASH $mod_dflts{$caller}) {		# have hash, so bless it
+			bless $p = $mod_dflts{$caller};
+		} else {
+			bless $p = $mod_dflts{$caller} = {};	# init caller's flag hash
+		}
+		$p;
 	}
-			
 
+	
+	sub P(@) {
+		my $undef_cnt=0;
+		if (!defined($_[0])) {
+			my $fmt = ("%s, " x (@_-1))."%s";
+			unshift @_, $fmt;
+		}
 
-	sub P(@) {    # 'safen' to string or FH or STDOUT
-		local *sw = sub (*) {$dflts->{$_[0]}};
-		my $p = ref $_[0] eq 'P' ? shift: bless {};
-		$p->{__P_seen}={} unless ref $p->{__P_seen};
+		my $p = ref $_[0] eq 'P' ? shift : _init_p(caller);
+
+		local (*sw); *sw = sub (*):lvalue {
+  		defined($p->{$_[0]}) 
+              ?  $p->{$_[0]}
+              : ($p->{$_[0]} = $mod_dflts{""}->{$_[0]});
+		};
+
+		$p->{__P_seen} = {} unless ref $p->{__P_seen};
 
 		local * unsee_ret  = sub ($) { 
 			delete $p->{__P_seen} if exists $p->{__P_seen}; 
@@ -368,16 +465,16 @@ IGN
 
 		my $v = $_[0];
     my $rv = ref $v;
-		$dflts = $p->get_dflts((caller)[0]);
 		my ($depth, $noquote) = (sw(depth), sw(noquote));
+
     if (HASH eq $rv) {
 			my $params = $v; $v = shift; $rv = ref $v;
 			$depth = $params->{depth} if exists $params->{depth};
     }
     if (ARRAY eq $rv ) { $v = shift;
-      @_=(@$v, @_); $v=$_[0]; $rv = ref $v }
+      @_ = (@$v, @_); $v = $_[0]; $rv = ref $v }
 
-		my ($fh, $f, $explicit_out);
+		my ($fh, $explicit_out);
 		if ($rv eq GLOB || $rv eq IO) {
 			($fh, $explicit_out) = (shift, 1);
 			$v = $_[0]; $rv = ref $v;
@@ -386,10 +483,12 @@ IGN
 		if (ARRAY eq $rv ) { $v = shift;
       @_=(@$v, @_); $v=$_[0]; $rv = ref $v }
     
-		my ($fc, $fmt, @flds, $res)=(1, $_[0]);
-		if ($fc) { $f = shift; no warnings;
-			$res =  sprintf $f,	map {local $_ = $p->Px($_,$depth,$noquote) } @_ } 
-		else { $res = $p->Px(@_)}
+		my $fmt = shift;
+		my $res = do {
+			no warnings;
+			sprintf $fmt,	
+			map {local $_ = $p->_Px($_, $depth, $noquote) } @_ 
+		};
 
 		chomp $res;
 
@@ -403,62 +502,57 @@ IGN
 				P $fh "Invalid File Handle presented for output, using STDERR";
 			($explicit_out, $nl) = (1, "\n") }
 
-		else { return unsee_ret($res) if (!$explicit_out and $ctx==1) }
+		else { return unsee_ret($res) if (!$explicit_out and $ctx == 1) }
 
 		no warnings 'utf8';
 		print $fh ($res . (!$ctx && (!$\ || $\ ne "\n") ? "\n" : "")  );
 		unsee_ret($res);
-	};
+	}
+
 
 	sub Pe(@) {
-		my $p = shift if ref $_[0];
-		return '' unless @_;
+		my $p = ref $_[0] eq 'P' ? shift : _init_p(caller);
 		unshift @_, \*STDERR;
 		unshift @_, $p if ref $p;
 		goto &P 
 	}
 
 
-	#Pe "_dflts=%s", \%_dflts;
-	#Pe "mod_dflts{}=%s", $mod_dflts{""};
-	#Pe "mod_dflts=%s", \%mod_dflts;
-
-	sub import {
+	sub import { my $p = ref $_[0] eq 'P' ? $_[0] : _init_p(caller);
 		my ($modname, @args) = @_;
+		goto &Xporter::import if caller eq 'P';
 		if (@args) {
 			my @others;
-			my $caller = (caller)[0];
-			if (exists $mod_dflts{$caller}) {
-				$dflts = $mod_dflts{$caller};
-			} else {
-				$dflts = undef;					# indicate no customization to dflts
-			}
 			my $default = 0;
-			my @tags = grep {	if (m{^:(.*)$}) {
-													if ($1 eq 'default') { $default = 1; $_ = undef } 
-													else { $_ = $1 }
-												} else { push @others, $_; undef }
-											} @args;
-			if (@tags) {
-				if ($default) {
-					# change global defaults (don't use copy)
-					$dflts = $mod_dflts{""};
-				} else {
-					# if dflts was undef start w/copy of glbl-dflts
-					%{$mod_dflts{$caller}} = %{$mod_dflts{""}} unless exists
-						$mod_dflts{$caller};
-						$dflts=$mod_dflts{$caller}
-				}
-				for (@tags) {
-					my ($tag, $value) = m{^(\w+)(?:=(.+))?$} or 
-							die "Tag-format: missing :TAG=VALUE for tag '" . $_ . "'";
-
-					my $chk;
-				 	{no warnings; no strict; $chk = eval $types{$tag}->($value) };
-					$dflts->{$tag} = $chk;
-				}
-			}
-			$dflts = $mod_dflts{""} unless $dflts;	# set to global if not set
+			my $got_default = 0;
+			my $save_p	= [];
+			my @tags = grep { 
+					my $full_switch;				# has tag+args, but no colon
+					if (0 == index $_, ':') {
+						$_						= substr $_, 1;
+						$full_switch	= $_;		# includes any '=' fields
+						my ($l, $tag, $val) = (-1, $_);
+						if (($l = index $_, '=') > 0) {
+							$tag = substr $_, 0, $l;
+							$val = substr $_, $l+1;
+						}
+						if ($tag eq 'default' && !$got_default) {	#can only have 1 dflt sec.
+							$default = 1;
+							push @$save_p, $p;
+							$p = $mod_dflts{""};
+						} elsif ($tag eq '--') {	#end of dflts (:--)
+							$p = pop @$save_p;
+							$default			= 0;
+							$got_default	= 1;
+						} else {
+							warnings::warn P "Unrecognized flag: %s", $tag unless
+								exists $mod_dflts{""}->{$tag};
+							$p->{"$tag"} = defined("$val") ? "$val" : -1;
+						}
+					} else {
+						push @others, $_;
+					}
+			} @args;
 			@_=($modname, @others);
 		}
 		goto &Xporter::import;
@@ -467,21 +561,20 @@ IGN
 
 
 
-	sub ops($) {
-		my $p = shift; my $c=ref $p || $p;
-		bless $p = {}, $c unless ref $p;
-		my $args = $_[0];
-		my $ldflts = $p->get_dflts((caller)[0]);
-		%{$p->{dflts}} = %$dflts unless ref $p->{dflts};
-		die "ops takes a hash to pass arguments" unless HASH $args;
-		$ldflts = $p->{dflts};
+	sub ops($) { my $p = shift; my $c = ref $p || $p;
+		bless $p = {};
+		use Carp qw(croak);
+		my $caller	= (caller)[0];
+		my	$args = $_[0];
+		croak "ops takes a hash to pass arguments" unless HASH $args;
 		foreach (sort keys %$args) {
-			if (exists $ldflts->{$_}) { $ldflts->{$_} = $args->{$_} } 
+			if (defined $_dflts{$_}) { $p->{$_} = $args->{$_} } 
 			else { 
 				warn  "Unknown key \"$_\" passed to ops";} 
 		}
-		$p }
-1;}		#value 1 placed at as w/most of my end-of-packages (rt#89054)
+		$p
+ 	}
+1}
 
 {
 	package main;
@@ -508,13 +601,13 @@ IGN
 
 =head1 SYNOPSIS
 
-  use P qw[:depth=5 :undef=(undef)];
+  use P qw[:depth=5 :undef="(undef)"];
 
   P FILEHANDLE FORMAT, LIST
-  P FILEHANDLE LIST
+  P FILEHANDLE, LIST         # comma is not disallowed
   P FORMAT, (LIST)
   P (LIST)
-  P @ARRAY                   # can contain FH, FMT+ARGS & return string
+  P @ARRAY                   # may contain FH, FMT+ARGS & return string
   $s = P @ARRAY; P $s;       # can be same output as "P @ARRAY" 
   Pe                         # same as P STDERR,...
   $s = P FILEHANDLE ...      # sends same output to $s and FILEHANDLE
@@ -522,8 +615,8 @@ IGN
 =head1 DESCRIPTION
 
 C<P> is a combined print, printf, sprintf & say in 1 routine.  It saves
-tremendously on development time.  It's not just the 1 char verb, but
-has these time saving and powerful features:
+tremendously on development time.  It's not just a 1 character verb, 
+but has other time-saving and powerful features:
 
 =over
 
@@ -531,22 +624,23 @@ has these time saving and powerful features:
 
 =back
 
-Too often I've either changed a string to a format statement, or just
-forgot the 'f'.  With C<P> it doesn't matter -- either will work.
+A fixed string can be changed to formatted output with no change of
+verb:
 
  Example: 
-     # Let's start with a "die" statement.
+     # Starting with a "die" statement.
   1) die "Wrong number of params";
-    # Then wants to add how many params one got:
+    # Then number of arguments passed is added:
   2) die P "Expecting 2 params, got %s", scalar @ARGV;
-    # Then you want to see what was passed.  No loop needed:
+    # Then contents of @ARGV can be printed as well (no loop needed):
   3) die P "Expecting 2 params, got %s (ARGV=%s), 0+@ARGV, \@ARGV;
 
 
-In the send C<die>, C<P> is replacing C<sprintf> -- however, instead
-of something like "C<ARRAY(0x12345678)>",
-C<P> would try to display the actual contents of the array, showing
-["arg1", "arg2".
+C<P> can replacing C<sprintf> without the need for a temporary
+variable and without printing cryptic representations for @ARGV,
+like "C<ARRAY(0x12345678)>".  Instead,
+C<P> displays the actual contents of the array, showing
+["arg1", "arg2"].
 
 
 =over
@@ -556,13 +650,18 @@ C<P> would try to display the actual contents of the array, showing
 =back
 
 When it comes to C<newline>'s, or "\n" at the end of line, C<P> 
-behaves like C<say> when printing to output or a file handle and will 
-auto append a line feed when needed.  
+attempts to look at context.  If output is assigned to a variable,
+then C<P> acts like C<sprintf>.  If it is to a file handle, then
+it will act like C<say> and automatically append a C<newline>.
+Unlike C<say>, C<P> can use formatted output and print to a file
+handle.  Printing to STDERR is simplified with the C<Pe> form of
+C<P>, which is a short form of 'P STDERR, "..."'.
 
-Since C<P>  can be used to print to strings, when doing so, 
-it will auto-suppress up to one included "C<\n>" at the end of a
-format statement AND automatically add one if it is printing to a device
-(if it is doing both at he same time -- it favors suppression).
+When C<P> prints to strings, any one newline at the end of the 
+string will be suppressed.  Conversely it will add one if
+printing to a device.  If printing to a string and a device
+at the same time, it will favor suppression and not output
+a newline to the device.
 
 =over
 
@@ -570,13 +669,10 @@ format statement AND automatically add one if it is printing to a device
 
 =back
 
-How often have you printed diagnostic output only to get nothing
-because one of the variables being printed was C<undef>.  C<P> handles
-it.  
-
-By default, it prints a symbol for "does not exist" in place
-of where the string would have displayed (%s fmt, only) and prints the 
-rest of the string normally. 
+Rather than aborting output when C<undef> is part of the output, 
+C<P> prints a configurable symbol, '∄', by default, the symbol
+for "does not exist" where the undef would have printed and the 
+rest of the string is printed normally.
 
 =over
 
@@ -584,33 +680,32 @@ rest of the string normally.
 
 =back
 
-C<P> doesn't have as many arbitrary restrictions on it's arguments.
+C<P> tries not to have arbitrary restrictions on it's arguments.
 
 It handles cases that the equivalent perl statement won't.
 
 
 
-           VERB ->           P    print   printf  sprintf   say
-       V --FEATURE-- V      ---   -----   ------  -------   ---
-      to a FH               Yes    Yes     Yes       No     Yes
-      to $fh                Yes    Yes     Yes       No      No
-      to a string           Yes     No      No      Yes      No 
-      add EOL-NL to FH?     Yes     No      No       No     Yes
-      sub EOL-NL w/"-l"     Yes     No      No       No     Yes 
-      sub EOL-NL in string  Yes     No      No       No      No
-      FMT                   Yes     No     Yes      Yes      No
-      @[FMT,ARGS]           Yes     No     Yes       No      No
-      undef to "%s"         Yes     No      No       No      No
-      @[$fh,FMT,ARGS] (7)   Yes     No      No       No      No
-      like "tee" (8)        Yes     No      No       No      No
+              VERB ->           P    print   printf  sprintf   say
+          V --FEATURE-- V      ---   -----   ------  -------   ---
+      1) to a FH               Yes    Yes     Yes       No     Yes
+      2) to $fh                Yes    Yes     Yes       No      No
+      3) to a string           Yes     No      No      Yes      No 
+      4) add EOL-NL to FH?     Yes     No      No       No     Yes
+      5) sub EOL-NL in string  Yes     No      No       No      No
+      6) FMT                   Yes     No     Yes      Yes      No
+      7) @[FMT,ARGS]           Yes     No     Yes       No      No
+      8) undef to "%s"         Yes     No      No       No      No
+      9) @[$fh,FMT,ARGS]       Yes     No      No       No      No
+     10) like "tee"            Yes     No      No       No      No
 
-  7 - File Handle in 1st member of ARRAY used for output.
+   (9) - File Handle in 1st member of ARRAY used for output.
 
-  8 - When P is being used as a string formatter like sprintf,
-      it can still have a "$fh" as the first argument that will 
-      print the formatted string to the file handle as well as 
-      returning it's value (note: this will force the string
-      to be printed w/o a trailing newline).
+  (10) - When P is being used as a string formatter like sprintf,
+         it can still have a "$fh" as the first argument that will 
+         print the formatted string to the file handle as well as 
+         returning it's value (note: this will force the string
+         to be printed w/o a trailing newline).
 
 
 
@@ -623,8 +718,8 @@ When printed as strings (C<"%s">), undefs are automatically caught and
 printed in place of "C<Use of uninitialized value $x in xxx at -e line z.>"
 
 By default C<P>, prints the content of references (instead HASH 
-(or ARRAY)=(0x12345678), three levels deep.  Deeper nesting is replaced
-by the unicode ellipsis character (U+2026).
+(or ARRAY)=(0x12345678).  By default, it prints three levels deep with
+deeper nesting replaced by by the unicode ellipsis character (U+2026).
 
 While designed for development use, it is useful in many more situations, as 
 tries to "do the right thing" based on context.  It can usually be used
@@ -641,16 +736,17 @@ or by assigning the return value B<and> having a file handle as the first
 argument.  Ex: C<my $fmt = P STDOUT, "no LF added here--E<gt>">.
 
 
-C<Bless>ed objects, by default,  are printed with the Class or package name
-in front of the reference.   Note that these substitutions are performed only with 
+C<Bless>ed objects, by default, are printed with the class or package name
+in front of the reference. Note that these substitutions are performed only with 
 references printed through a string (C<"%s">) format -- features designed
 to give useful output in development or debug situations.
 
-One minor difference between C<P> and C<sprintf>: C<P> can take 
+One difference between C<P> and C<sprintf>: C<P> can take 
 an array with the format in the 0th element, and parameters following.  
 C<Sprintf> will cause an error to be raised, if you try passing an array
 to it, as it will force the array into scalar context -- which as 
-the manpage says "is almost never useful".  Rather than follow in the
+the manpage says "is almost never useful", and the perl-developers
+admit "is never useful".  Rather than follow in the
 design flaws of its predecessors, P I<tries> to do the right thing.
 
 
@@ -658,7 +754,25 @@ B<NOTE:> A side effect of P being a contextual replacement for sprintf,
 is if it is used as the last line of a subroutine.  By default, this
 won't print it's arguments to STDOUT unless you explicity specify the
 filehandle, as it will think it is supposed to return the result -- not
-print it.
+print it.  An alternate workaround -- return another value, like a
+status value.  OR use it as a feature.  A subroutine that has 
+a C<P-statment> at the end can be used in string construction or
+can be used for direct output.
+
+=head1 EXAMPLE: Duel-Use Subroutines for Strings or Printing
+
+
+   sub items_in_list() {
+	    my $numitems = get_num();
+			P "num items=%s", $numitems;
+   }   # can be used:
+
+	 my $s=items_in_list();
+	 # or
+	 $items_in_list();	# prints to STDOUT w/newline on end
+
+
+
 
 
 =head2 Special Use Features
@@ -815,27 +929,77 @@ output entirely!
  bless my $h=\%H, 'Hclass';        # Blessed objects...
  P "Obj_h = %s", $h;               #   & content:
 
-	 Obj_h = Hclass{u=>(undef), one=>1, two=>2}
+   Obj_h = Hclass{u=>(undef), one=>1, two=>2}
+
+
+=head1 Sample Code + Test + Demo
+
+To demonstrate the various usages of P, several examples are embedded
+with this documenation in a special C<DATA> section.  If this module
+is executed as with C<perl P.pm> or just C<P.pm> if the module is
+set to be executable, it will run a short program that shows
+different features of P as well as doing a short run-time test 
+(that is actually part of the test suite).
+
+The demo/example/test code embedded in this module is NOT compiled or
+accessed when it is C<use>ed in code.
+
+As of this writing there are 13 examples.  The output of these 
+examples follows:
+
+=over 
+
+   #1  (ret from func)          : Hello Perl 1
+   #2  (w/string)               : Hello Perl 2
+   #3  (passed array)           : Hello Perl 3
+   #4  (w/fmt+string)           : Hello Perl 4
+   #5  (to STDERR)              : Hello Perl 5
+   #6  (to strng embedded in #7): 
+   #7  (prev string)            : prev str="Hello Perl 6" (no LF) && Hello Perl 7
+   #8  (P && array ref)         : ["one", "two", "three", 4, 5, 6]
+   #9  (P HASH ref)             : {a=>"apple", b=>"bread", c=>"cherry"}
+   #10 (P Pkg ref)              : Pkg{a=>1, b=>2, x=>'y'}
+   #11 (P @{[FH,["fmt:%s",…]]}) : fmt:Hello Perl 11
+   #12 (truncate embedded float): norm=3.14159265358979324, embed={pi=>3.14}
+   #13 (test mixed digit string): embed roman pi = ["3.ⅰⅳⅰⅴⅸ"]
+
+=back
+
+The code uses a function C<iter> that prints I<Hello Perl> followed by
+an autoincrementing counter that also is used as the test or example
+number. 
+
+Putting the format + its arguments in an array is simple and does not
+change if P is printing to output or to a string (cf. sprintf/printf).
+P goes further than allowing the format specification in an array -- it
+also allows putting the file handle as the 1st element in the array as
+shown in #11.
+
+P is not picky about how file handles can be used -- they can be
+followed by a space or by a comma.  No special syntax is needed for the
+arguments of P, it can follow the example of printf or the standard
+usage of using commas to separate arguments.
 
 
 =head1 NOTES
 
-Values given as args with a format statement, are
-checked for B<undef> and have "E<0x2204>" substituted for undefined values.
-If you print vars as in decimal or floating point, they'll likely show up 
-as 0, which doesn't stand out as well.
+Values given as args with a format statement, are checked for B<undef>
+and have "E<0x2204>" substituted for undefined values.  If you print
+vars as in decimal or floating point, they'll likely show up as 0, which
+doesn't stand out as well.
 
 Sometimes the perl parser gets confused about what args belong to P and
-which do not.  Using parentheses (I<ex.> C<P("Hello World")>) can help in those
-cases.
+which do not.  Using parentheses (I<ex.> C<P("Hello World")>) can help
+in those cases.
 
-Usable in any code, P was was designed to save typing, time
-and work of undef checking, newline handling, peeking at data 
-structures in small spaces during development.  It tries to do
-the "right thing" with the given input. It may not be 
-suitable where speed is paramount.
+Usable in any code, P was was designed to save typing, time and work of
+undef checking, newline handling, peeking at data structures in small
+spaces during development.  It tries to do the "right thing" with the
+given input. It may not be suitable where speed is paramount.
 
 =cut
+
+
 #}}}1
 
 package P;
@@ -950,5 +1114,5 @@ case "test mixed digit string" && do		# case 13 - embed foreign digits
 {	use utf8;my $p="3.ⅰⅳⅰⅴⅸ";
 	P "embed roman pi = %s", [$p];
 };
-# vim: ts=2 sw=2
+# vim: ts=2 sw=2 fdc=1 ai
 

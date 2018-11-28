@@ -6,8 +6,9 @@ use autodie;
 use App::Rangeops -command;
 use App::Rangeops::Common;
 
-use constant abstract =>
-    'replace ranges within links, incorporate hit strands and remove nested links';
+sub abstract {
+    return 'replace ranges within links, incorporate hit strands and remove nested links';
+}
 
 sub opt_spec {
     return (

@@ -1,16 +1,21 @@
-use 5.010;
+use v5.28.0;
 use strict;
 use warnings;
-use Test::Synopsis;
+use Pod::Section qw(select_podsection);
 use Test::More tests => 1;
 
-my ($synopsis) = Test::Synopsis::extract_synopsis('lib/Hailo.pm');
+my ($synopsis) = select_podsection('lib/Hailo.pm' , 'SYNOPSIS');
 $synopsis =~ s/^.*?(?=\s+use)//s;
+$synopsis =~ s!"megahal\.trn"!"t/lib/Hailo/Test/badger.trn"!s;
+{
+    my $trim = '$hailo->train($filehandle);';
+    $synopsis =~ s!\Q$trim\E!!;
+}
+$synopsis =~ s/say //g;
 
 local $@;
-eval <<'SYNOPSIS';
-open my $filehandle, '<', __FILE__;
-chdir 't/lib/Hailo/Test';
+eval <<SYNOPSIS;
+open my \$filehandle, '<', __FILE__;
 $synopsis
 SYNOPSIS
 

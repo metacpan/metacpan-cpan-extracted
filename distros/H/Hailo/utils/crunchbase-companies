@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-use 5.010;
-use Any::Moose;
+use v5.28.0;
+use Moose;
 use WWW::Mechanize;
 
 =head1 NAME

@@ -5,6 +5,14 @@ use warnings;
 use Test::More;
 use Test::Warn;
 
+# If there are warnings while loading Neaf's dependencies,
+#     they'll botch the warnings_like test below.
+# So preload the most dependency-heavy module right now,
+#     and hope for the best.
+use Plack::Request;
+
+# Before anything, fake Apache modules because we're not (hopefully)
+#    inside a mod_perl
 BEGIN {
     # Avoid loading REAL modules - fake everything
     foreach (qw(
@@ -47,6 +55,8 @@ BEGIN {
 
 };
 
+# Now the testing begins. The Apache backend is no longer maintained,
+# let's complain loudly about that and also check that the mocks worked:
 warnings_like {
     $ENV{MOD_PERL} = 2;
     require MVC::Neaf::Request::Apache2;

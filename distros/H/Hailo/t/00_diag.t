@@ -1,11 +1,10 @@
-use 5.010;
+use v5.28.0;
 use strict;
-use Any::Moose;
+use Moose;
 use Test::More tests => 1;
 use Hailo;
 
 my $version = $Hailo::VERSION // 'dev-git';
 
-my $m = any_moose();
-diag("Testing Hailo $version with $^X $] using $m for Moose");
+diag("Testing Hailo $version with $^X $]");
 pass("Token test");

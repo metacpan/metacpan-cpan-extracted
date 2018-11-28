@@ -1,6 +1,17 @@
 Revision history for Perl extension App-Egaz
 
+0.2.2 2018-11-26T17:46:32Z
+
+    - `egaz template`
+        - Add `--partition`
+        - Avoid errors of too many highlights
+        - Remove link4
+        - Use more jrunlist and jrange
+    - `egaz lpcnam`
+        - Use `pigz` if available
+
 0.2.1 2018-06-29T11:18:45Z
+
     - Handle old NCBI fasta headers: `>gi|\d+gb|\d+` or `>gi|\d+ref|\d+`
     - Update flowcharts
     - `egaz template`
@@ -8,6 +19,7 @@ Revision history for Perl extension App-Egaz
         - Exclude _fasta/ and _raw/
 
 0.2.0 2018-04-24T21:32:24Z
+
     - `egaz template`
         - Add 7_multi_aligndb.sh
         - Add 7_self_aligndb.sh
@@ -21,6 +33,7 @@ Revision history for Perl extension App-Egaz
         - Handle unmasked sequences
 
 0.1.3 2018-04-22T20:03:24Z
+
     - `egaz template`
         - Add 0_prep.sh
         - and companion options
@@ -29,6 +42,7 @@ Revision history for Perl extension App-Egaz
         - Find rmOutToGFF3.pl and create .rm.gff
 
 0.1.2 2018-04-16T19:39:57Z
+
     - Create chr.fasta and chr.fasta.fai in `egaz prepseq`
     - Add `egaz fas2vcf`
     - `egaz template`
@@ -41,6 +55,7 @@ Revision history for Perl extension App-Egaz
     - Add optional dependencies
 
 0.1.1 2018-04-15T18:21:46Z
+
     - Add `egaz blastmatch`
     - Add `egaz blastlink`
     - `egaz template`
@@ -48,6 +63,7 @@ Revision history for Perl extension App-Egaz
         - Add 3_proc_cmd.sh
 
 0.1.0 2018-04-14T21:55:22Z
+
     - Add `egaz template`
         - Add --outdir, --taxon
         - Add 1_pair_cmd.sh
@@ -59,6 +75,7 @@ Revision history for Perl extension App-Egaz
     - Requires pigz
 
 0.0.14 2018-04-02T20:22:09Z
+
     - Add `egaz multiz`
     - Add normalize section to `egaz lastz`
     - Add `share/check_dep.sh`
@@ -67,28 +84,34 @@ Revision history for Perl extension App-Egaz
     - Add ladder() to Common.pm
 
 0.0.13 2018-04-01T17:32:38Z
+
     - Add `egaz prepseq`
     - Add `egaz lpcnam`
     - Install lastz, faops and kent-tools to $HOME/bin on CI
 
 0.0.12 2018-03-30T12:11:11Z
+
     - Add `egaz lastz`
     - Use `abstract()` to replace `use constant abstract =>`
 
 0.0.11 2018-03-28T00:36:36Z
+
     - Add `egaz plottree`
     - Test installations of R and its packages
     - Add `egaz blastn`
 
 0.0.10 2018-03-26T14:26:50Z
+
     - Add `egaz raxml`
     - Add exec_cmd() to Common.pm
 
 0.0.9 2018-03-24T22:16:24Z
+
     - Add `egaz exactmatch`
     - Add run_sparsemem() and get_size() to Common.pm
 
 0.0.8 2018-03-24T17:32:15Z
+
     - Move `egaz mergecsv` to `fasops mergecsv`
     - Escape braces in regex
     - Add overlap_ranges() to Common.pm
@@ -96,27 +119,34 @@ Revision history for Perl extension App-Egaz
     - Add `egaz normalize`
 
 0.0.7 2018-03-18T16:00:35Z
+
     - Add `egaz masked`
     - Use `fasops check` in t/04-lav2axt.t
 
 0.0.6 2018-03-18T13:28:34Z
+
     - Add `egaz maskfasta`
     - Use markdown syntax in formats.pm
 
 0.0.5 2018-03-18T11:57:35Z
+
     - Add `egaz formats`
 
 0.0.4 2018-03-18T08:54:47Z
+
     - Add `egaz lav2psl`
     - Add round() to Common.pm
 
 0.0.3 2018-03-17T08:18:33Z
+
     - Add `egaz lav2axt`
     - Add resolve_file() to Common.pm
 
 0.0.2 2018-03-16T07:14:30Z
+
     - Add `egaz mergecsv`
 
 0.0.1 2018-03-15T20:54:33Z
+
     - original version
 

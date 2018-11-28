@@ -1,4 +1,4 @@
-use Test::More tests => 2;
+use Test2::V0;
 
 use String::Interpolate::RE qw( strinterp );
 
@@ -11,3 +11,5 @@ is( strinterp( $str, \%vars, { UseENV => 0, Format => 0 } ),
 
 is( strinterp( $str, \%vars, { UseENV => 0, Format => 1 } ),
     '01 1 1', "format = on" );
+
+done_testing;

@@ -4,11 +4,12 @@ require 5.006;
 
 use strict;
 use warnings;
+use Config;
 
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 $VERSION = eval $VERSION;
 
-use Object::InsideOut::Metadata 4.04;
+use Object::InsideOut::Metadata 4.05;
 
 ### Module Initialization ###
 
@@ -19,7 +20,7 @@ BEGIN {
     }
 
     # Import 'share' and 'bless' if threads::shared
-    if ($threads::shared::threads_shared) {
+    if ($Config::Config{useithreads} && $threads::shared::threads_shared) {
         import threads::shared;
     }
 }
@@ -109,6 +110,7 @@ sub make_shared
 
     # If not sharing or already thread-shared, then just return the input
     if (! ref($in) ||
+        ! $Config::Config{useithreads} ||
         ! $threads::threads ||
         ! $threads::shared::threads_shared ||
         threads::shared::is_shared($in))
@@ -205,7 +207,8 @@ sub make_shared
 # If thread-sharing, then make the copy thread-shared.
 sub shared_copy
 {
-    return (($threads::shared::threads_shared) ? clone_shared(@_) : clone(@_));
+    return (($Config::Config{useithreads} && $threads::shared::threads_shared)
+                    ? clone_shared(@_) : clone(@_));
 }
 
 

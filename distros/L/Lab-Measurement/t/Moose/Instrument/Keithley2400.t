@@ -28,7 +28,7 @@ my $keithley = mock_instrument(
 );
 
 $keithley->rst();
-
+$keithley->sense_function_concurrent( value => 0 );
 # Test getters and setters
 
 # Sense subsystem
@@ -41,13 +41,26 @@ scpi_set_get_test(
 
 $keithley->sense_function_concurrent( value => 0 );
 
-scpi_set_get_test(
-    instr      => $keithley,
-    func       => 'sense_function',
-    values     => [qw/CURR:DC VOLT:DC/],
-    is_numeric => 0
-);
 
+$keithley->sense_function_on(value => ['CURR:DC']);
+my $functions = $keithley->sense_function_on_query();
+is_deeply($functions, ['CURR:DC'], 'Set function to CURR:DC');
+
+
+$keithley->sense_function_on(value => ['VOLT:DC']);
+$functions = $keithley->sense_function_on_query();
+is_deeply($functions, ['VOLT:DC'], 'Set function to VOLT:DC');
+
+
+
+# scpi_set_get_test(
+#     instr      => $keithley,
+#     func       => 'sense_function_on',
+#     values     => [['CURR:DC'],['VOLT:DC']],
+#     is_numeric => 0
+# );
+
+$keithley->sense_function_on( value => ['CURR'] );
 $keithley->sense_function( value => 'CURR' );
 
 scpi_set_get_test(

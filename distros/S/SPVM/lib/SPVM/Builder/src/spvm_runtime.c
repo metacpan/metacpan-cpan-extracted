@@ -31,16 +31,29 @@
 #include "spvm_basic_type.h"
 #include "spvm_field.h"
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 SPVM_ENV* SPVM_RUNTIME_create_env(SPVM_RUNTIME* runtime) {
 
   void* env_init[]  = {
     SPVM_RUNTIME_API_get_array_length,
-    SPVM_RUNTIME_API_get_byte_array_elements,
-    SPVM_RUNTIME_API_get_short_array_elements,
-    SPVM_RUNTIME_API_get_int_array_elements,
-    SPVM_RUNTIME_API_get_long_array_elements,
-    SPVM_RUNTIME_API_get_float_array_elements,
-    SPVM_RUNTIME_API_get_double_array_elements,
+    SPVM_RUNTIME_API_get_byte_array_elements_new,
+    SPVM_RUNTIME_API_get_short_array_elements_new,
+    SPVM_RUNTIME_API_get_int_array_elements_new,
+    SPVM_RUNTIME_API_get_long_array_elements_new,
+    SPVM_RUNTIME_API_get_float_array_elements_new,
+    SPVM_RUNTIME_API_get_double_array_elements_new,
     SPVM_RUNTIME_API_get_object_array_element,
     SPVM_RUNTIME_API_set_object_array_element,
     SPVM_RUNTIME_API_get_field_id,
@@ -119,9 +132,10 @@ SPVM_ENV* SPVM_RUNTIME_create_env(SPVM_RUNTIME* runtime) {
     (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_LONG_OBJECT,
     (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_FLOAT_OBJECT,
     (void*)(intptr_t)SPVM_BASIC_TYPE_C_ID_DOUBLE_OBJECT,
+    SPVM_RUNTIME_API_get_field_byte_offset,
   };
   
-  int32_t env_length = 85;
+  int32_t env_length = 255;
   SPVM_ENV* env = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(void*) * env_length);
   memcpy(&env[0], &env_init[0], sizeof(void*) * env_length);
   
@@ -133,6 +147,15 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(SPVM_RUNTIME));
 
   SPVM_ENV* env = SPVM_RUNTIME_create_env(runtime);
+  
+  // Adjust alignment SPVM_VALUE
+  int32_t object_header_byte_size = sizeof(SPVM_OBJECT);
+  if (object_header_byte_size % sizeof(SPVM_VALUE) != 0) {
+    object_header_byte_size += (sizeof(SPVM_VALUE) - object_header_byte_size % sizeof(SPVM_VALUE));
+  }
+  assert(object_header_byte_size % sizeof(SPVM_VALUE) == 0);
+  
+  env->object_header_byte_size = (void*)(intptr_t)object_header_byte_size;
   
   runtime->portable = portable;
   
@@ -185,7 +208,7 @@ SPVM_ENV* SPVM_RUNTIME_build_runtime_env(SPVM_PORTABLE* portable) {
   
   // Mortal stack
   runtime->mortal_stack_capacity = 1;
-  runtime->mortal_stack = SPVM_RUNTIME_API_safe_malloc_zero(sizeof(SPVM_OBJECT*) * runtime->mortal_stack_capacity);
+  runtime->mortal_stack = SPVM_RUNTIME_API_alloc_memory_block_zero(env, sizeof(SPVM_OBJECT*) * runtime->mortal_stack_capacity);
   
   return env;
 }
@@ -194,20 +217,18 @@ void SPVM_RUNTIME_free(SPVM_ENV* env) {
   
   SPVM_RUNTIME* runtime = env->runtime;
   
+  // Free mortal stack
+  SPVM_RUNTIME_API_free_memory_block(env, runtime->mortal_stack);
+  
   // Free exception
   SPVM_RUNTIME_API_set_exception(env, NULL);
   
   // Free portable
   SPVM_PORTABLE_free(runtime->portable);
   
+  // Free C function addresses
   free(runtime->sub_cfunc_addresses);
   
-  if (runtime->exception != NULL) {
-    free(runtime->exception);
-  }
-  
-  free(runtime->mortal_stack);
-
   // Free package variables heap
   free(runtime->package_vars_heap);
   

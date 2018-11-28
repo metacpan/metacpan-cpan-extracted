@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::SimpleUI;
-$Config::Model::SimpleUI::VERSION = '2.127';
+$Config::Model::SimpleUI::VERSION = '2.128';
 use Carp;
 use 5.010;
 use strict;
@@ -338,7 +338,7 @@ Config::Model::SimpleUI - Simple interface for Config::Model
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -543,7 +543,7 @@ current node.
 
 =head1 Methods
 
-=head2 run_loop()
+=head2 run_loop
 
 Engage in user interaction until user enters '^D' (CTRL-D).
 

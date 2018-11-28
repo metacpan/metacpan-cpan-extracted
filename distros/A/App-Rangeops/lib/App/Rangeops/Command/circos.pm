@@ -6,7 +6,9 @@ use autodie;
 use App::Rangeops -command;
 use App::Rangeops::Common;
 
-use constant abstract => 'range links to circos links or highlight file';
+sub abstract {
+    return 'range links to circos links or highlight file';
+}
 
 sub opt_spec {
     return (
@@ -78,8 +80,7 @@ sub execute {
                 PAIR: for ( my $j = $i + 1; $j <= $#parts; $j++ ) {
                         my @fields;
                         for ( $i, $j ) {
-                            my $info
-                                = App::RL::Common::decode_header( $parts[$_] );
+                            my $info = App::RL::Common::decode_header( $parts[$_] );
                             next PAIR
                                 unless App::RL::Common::info_is_valid($info);
 

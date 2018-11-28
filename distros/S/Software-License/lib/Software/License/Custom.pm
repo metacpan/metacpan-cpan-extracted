@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Software::License::Custom;
 # ABSTRACT: custom license handler
-$Software::License::Custom::VERSION = '0.103013';
+$Software::License::Custom::VERSION = '0.103014';
 use parent 'Software::License';
 
 use Carp;
@@ -49,6 +49,8 @@ use Text::Template;
 #pod    foo_bar_meta
 #pod    __{ META2_NAME }__
 #pod    foo_bar_meta2
+#pod    __{ SPDX_EXPRESSION }__
+#pod    foo_bar_spdx_expression
 #pod    __[ NOTICE ]__
 #pod    Copyright (C) 2000-2002 by P.R. Evious
 #pod    Copyright (C) {{$self->year}} by {{$self->holder}}.
@@ -177,6 +179,12 @@ sub meta2_name {
   $self->_fill_in('META2_NAME')
 }
 
+sub spdx_expression  {
+   my $self = shift;
+   return undef unless ref $self;
+   return $self->_fill_in('SPDX_EXPRESSION')
+}
+
 sub license    { shift->_fill_in('LICENSE') }
 sub notice     { shift->_fill_in('NOTICE') }
 
@@ -205,7 +213,7 @@ Software::License::Custom - custom license handler
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 DESCRIPTION
 
@@ -248,6 +256,8 @@ the end of the file. Example:
    foo_bar_meta
    __{ META2_NAME }__
    foo_bar_meta2
+   __{ SPDX_EXPRESSION }__
+   foo_bar_spdx_expression
    __[ NOTICE ]__
    Copyright (C) 2000-2002 by P.R. Evious
    Copyright (C) {{$self->year}} by {{$self->holder}}.
@@ -342,7 +352,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,7 +6,9 @@ use autodie;
 use App::Rangeops -command;
 use App::Rangeops::Common;
 
-use constant abstract => 'connect bilaterial links into multilateral ones';
+sub abstract {
+    return 'connect bilaterial links into multilateral ones';
+}
 
 sub opt_spec {
     return (

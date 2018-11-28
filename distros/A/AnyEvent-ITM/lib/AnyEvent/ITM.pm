@@ -1,7 +1,7 @@
 package AnyEvent::ITM;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Debug ITM/SWD stream deserializer for AnyEvent
-$AnyEvent::ITM::VERSION = '0.002';
+$AnyEvent::ITM::VERSION = '0.003';
 use strict;
 use warnings;
 use bytes;
@@ -48,7 +48,7 @@ AnyEvent::ITM - Debug ITM/SWD stream deserializer for AnyEvent
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

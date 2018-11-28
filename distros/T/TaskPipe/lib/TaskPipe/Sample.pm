@@ -63,10 +63,10 @@ sub deploy_files{
 
        }
 
-    } catch {
+    } catch ( $err ){
 
         $self->file_installer->rollback;
-        confess "Rolled back changes: ".$_;
+        confess "Rolled back changes: ".$err;
 
     };
 

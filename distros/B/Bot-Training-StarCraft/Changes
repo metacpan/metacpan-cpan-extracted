@@ -1,5 +1,9 @@
 Revision history for Bot::Training::StarCraft
 
+0.03 2018-11-27 13:25:45
+
+    - Remove Any::Moose dependency. See log for Bot::Training itself.
+
 0.02 2010-05-01 21:25:24
 
     - Re-release due to Makefile.PL breakage caused by Dist::Zilla

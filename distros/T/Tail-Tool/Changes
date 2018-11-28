@@ -1,5 +1,11 @@
 Revision history for Tail-Tool
 
+0.4.8   2018-11-23
+        Updating for release of version 0.4.8
+        Added perl 5.26 to .travis build (Ivan Wills)
+        Updated date (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.4.7   2017-04-10
         Updating for release of version 0.4.7
         Improving on file specification documentation (Ivan Wills)

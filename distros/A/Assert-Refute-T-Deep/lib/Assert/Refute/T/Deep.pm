@@ -3,7 +3,7 @@ package Assert::Refute::T::Deep;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -74,7 +74,7 @@ Please report bugs via github or RT:
 
 =over
 
-=item * L<https://github.com/dallaylaen/refute-t-deep-perl/issues>
+=item * L<https://github.com/dallaylaen/assert-refute-t-extra/issues>
 
 =item * C<bug-assert-refute-t-deep at rt.cpan.org>
 
@@ -91,6 +91,8 @@ You can find documentation for this module with the C<perldoc> command.
 You can also look for information at:
 
 =over 4
+
+=item * Github: L<https://github.com/dallaylaen/assert-refute-t-extra>
 
 =item * RT: CPAN's request tracker (report bugs here)
 
@@ -153,7 +155,6 @@ YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
 CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 =cut
 

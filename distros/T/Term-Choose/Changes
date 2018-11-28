@@ -1,6 +1,20 @@
 Revision history for Term::Choose
 
 
+1.636   2018-11-25
+    - Update char-width tables.
+
+1.635   2018-11-24
+    - Don't enable codepage mapping if 'color' is set to avoid two different defaults.
+
+1.634   2018-11-22
+    - New option 'codepage_mapping'.
+    - Code cleanup.
+    - Update documentation.
+
+1.633   2018-11-21
+    - Update option 'color'.
+
 1.632   2018-11-17
     - Bugfix string concatenation in substitution.
 

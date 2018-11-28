@@ -1,15 +1,12 @@
 package Calendar::Hijri;
 
-$Calendar::Hijri::VERSION   = '0.33';
-$Calendar::Hijri::AUTHORITY = 'cpan:MANWAR';
-
 =head1 NAME
 
 Calendar::Hijri - Interface to Islamic Calendar.
 
 =head1 VERSION
 
-Version 0.33
+Version 0.35
 
 =cut
 
@@ -18,10 +15,13 @@ use Data::Dumper;
 
 use Date::Hijri::Simple;
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 with 'Calendar::Plugin::Renderer';
 
 use overload q{""} => 'as_string', fallback => 1;
+
+$Calendar::Hijri::VERSION   = '0.35';
+$Calendar::Hijri::AUTHORITY = 'cpan:MANWAR';
 
 has year  => (is => 'rw', predicate => 1);
 has month => (is => 'rw', predicate => 1);

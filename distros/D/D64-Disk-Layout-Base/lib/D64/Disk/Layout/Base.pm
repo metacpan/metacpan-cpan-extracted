@@ -89,7 +89,7 @@ $EXPORT_TAGS{'all'} = [];
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp qw(carp croak);
 
@@ -481,11 +481,11 @@ Pawel Krol, E<lt>pawelkrol@cpan.orgE<gt>.
 
 =head1 VERSION
 
-Version 0.01 (2011-01-22)
+Version 0.02 (2018-11-24)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2011 by Pawel Krol <pawelkrol@cpan.org>.
+Copyright 2011, 2018 by Pawel Krol <pawelkrol@cpan.org>.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

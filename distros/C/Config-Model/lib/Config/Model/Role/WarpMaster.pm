@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::WarpMaster;
-$Config::Model::Role::WarpMaster::VERSION = '2.127';
+$Config::Model::Role::WarpMaster::VERSION = '2.128';
 # ABSTRACT: register and trigger a warped element
 
 use Mouse::Role;
@@ -106,7 +106,7 @@ Config::Model::Role::WarpMaster - register and trigger a warped element
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -122,16 +122,22 @@ warped_node) or the feature of various elements like leaf, hash ...
 
 =head1 METHODS
 
-=head2 register ( $warped_object, warper_name )
+=head2 register
+
+Parameters: C<< ( $warped_object, warper_name ) >>
 
 Register a new warped object. Called by an element which has a C<warp> parameter.
 This method is calling on the object pointed by C<follow> value.
 
-=head2 unregister ( warper_name )
+=head2 unregister
+
+Parameters: C<< ( warper_name ) >>
 
 Remove a warped object from the object controlled by this warp master.
 
-=head2 trigger_warp ( value, stringified_value )
+=head2 trigger_warp
+
+Parameters: C<< ( value, stringified_value ) >>
 
 Called by the object using this role when the value held by this object is changed (i.e.
 something like store was called). The passed value can be a plain scalar (from a value

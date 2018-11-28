@@ -4,7 +4,7 @@
       "Tobias Oetiker <tobi@oetiker.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -35,7 +35,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.26",
+            "Mojolicious" : "8",
             "perl" : "5.010001"
          }
       }
@@ -52,5 +52,6 @@
          "url" : "https://github.com/oetiker/Mojolicious-Plugin-Qooxdoo"
       }
    },
-   "version" : "0.908"
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

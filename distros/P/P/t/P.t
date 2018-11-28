@@ -1,6 +1,7 @@
 #	perl script -- run with perl <scriptname>
 
 delete $ENV{PERL5OPT};
+$ENV{PARENT}="{name=>\"P.t\", pid=>$$}";
 #use lib ($bin . "/../blib", $bin . "/../blib/lib");
 use Config;
 

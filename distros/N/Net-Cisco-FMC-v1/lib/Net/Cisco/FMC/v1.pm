@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1;
-$Net::Cisco::FMC::v1::VERSION = '0.001001';
+$Net::Cisco::FMC::v1::VERSION = '0.002001';
 # ABSTRACT: Cisco Firepower Management Center (FMC) API version 1 client library
 
 use 5.024;
@@ -137,6 +137,11 @@ Net::Cisco::FMC::v1::Role::ObjectMethods->apply([
     },
     {
         path     => 'object',
+        object   => 'interfacegroups',
+        singular => 'interfacegroup',
+    },
+    {
+        path     => 'object',
         object   => 'networkgroups',
         singular => 'networkgroup',
     },
@@ -149,6 +154,41 @@ Net::Cisco::FMC::v1::Role::ObjectMethods->apply([
         path     => 'object',
         object   => 'hosts',
         singular => 'host',
+    },
+    {
+        path     => 'object',
+        object   => 'ranges',
+        singular => 'range',
+    },
+    {
+        path     => 'object',
+        object   => 'securityzones',
+        singular => 'securityzone',
+    },
+    {
+        path     => 'object',
+        object   => 'slamonitors',
+        singular => 'slamonitor',
+    },
+    {
+        path     => 'object',
+        object   => 'urlgroups',
+        singular => 'urlgroup',
+    },
+    {
+        path     => 'object',
+        object   => 'urls',
+        singular => 'url',
+    },
+    {
+        path     => 'object',
+        object   => 'vlangrouptags',
+        singular => 'vlangrouptag',
+    },
+    {
+        path     => 'object',
+        object   => 'vlantags',
+        singular => 'vlantag',
     },
     {
         path     => 'policy',
@@ -174,6 +214,9 @@ sub login($self) {
         $self->_refresh_token($res->response->header('x-auth-refresh-token'));
         $self->set_persistent_header('X-auth-access-token',
             $res->response->header('x-auth-access-token'));
+    }
+    else {
+        croak($res->data->{error}->{messages}[0]->{description});
     }
 }
 
@@ -554,7 +597,7 @@ Net::Cisco::FMC::v1 - Cisco Firepower Management Center (FMC) API version 1 clie
 
 =head1 VERSION
 
-version 0.001001
+version 0.002001
 
 =head1 SYNOPSIS
 
@@ -715,7 +758,8 @@ No workaround on client side possible, only a FMC update helps.
 
 =item no response to the 11th call (version 6.2.2.1)
 
-Workaround by logging in again.
+No workaround on client side because newer FMC versions (at least 6.2.3.6)
+throttle the login call too.
 
 =item accessrule is created but error 'You do not have the required
 authorization to do this operation' is thrown (version 6.2.2)

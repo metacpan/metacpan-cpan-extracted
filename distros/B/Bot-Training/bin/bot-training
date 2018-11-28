@@ -2,7 +2,7 @@
 use 5.010;
 use open qw< :encoding(utf8) :std >;
 use Dir::Self;
-use Any::Moose;
+use Moose;
 use Encode qw< decode >;
 use Bot::Training;
 use namespace::clean -except => 'meta';

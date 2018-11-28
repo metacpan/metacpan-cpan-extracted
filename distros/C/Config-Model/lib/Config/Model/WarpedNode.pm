@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::WarpedNode;
-$Config::Model::WarpedNode::VERSION = '2.127';
+$Config::Model::WarpedNode::VERSION = '2.128';
 use Mouse;
 
 use Carp qw(cluck croak);
@@ -313,7 +313,7 @@ Config::Model::WarpedNode - Node that change config class properties
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -478,7 +478,9 @@ i.e. the warp master have values so a node was warped in.
 Returns the node object hidden behind the warped node. Croaks if the
 node is not accessible.
 
-=head2 load_data ( hash_ref )
+=head2 load_data
+
+Parameters: C<< ( hash_ref ) >>
 
 Load configuration data with a hash ref. The hash ref key must match
 the available elements of the node carried by the warped node.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use MooseX::Params::Validate qw( validated_hash );
 use MooseX::Types qw( as coerce from subtype via where );
@@ -74,7 +74,7 @@ Pg::CLI::psql - Wrapper for the F<psql> utility
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

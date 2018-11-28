@@ -9,11 +9,13 @@ t/basic.t
 t/chunked.t
 t/delayed.t
 t/env.t
+t/formdata.t
 t/instance.t
 t/script/basic.psgi
 t/script/chunked.psgi
 t/script/delayed.psgi
 t/script/env.psgi
+t/script/formdata.psgi
 t/script/streaming.psgi
 t/streaming.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

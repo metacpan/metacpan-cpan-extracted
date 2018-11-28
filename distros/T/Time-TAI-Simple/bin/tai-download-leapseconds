@@ -92,7 +92,7 @@ At the time of this writing, C<tai-download-leapseconds> first tries to download
 the leapseconds list from the module author's own server, B<which under normal
 circumstances should fail> (with an HTTP C<404> reply code).  When it is unable
 to retrieve the list from this location, it will attempt to download the list
-from the IETF's server at L<http://www.ietf.org/timezones/data/leap-seconds.list>.
+from the IETF's server at L<https://www.ietf.org/timezones/data/leap-seconds.list>.
 
 The reason for doing it this way is to allow workarounds should the IETF suffer
 infrastructure failure.  If the IETF changes the location of their official list

@@ -6,7 +6,7 @@ use 5.008001;
 use Carp qw( croak );
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.56'; # VERSION
+our $VERSION = '0.58'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -19,7 +19,7 @@ our $VERSION = '0.56'; # VERSION
 #  Kinda like gluing a duckbill to an adorable mammal
 
 
-our @CARP_NOT = qw( FFI::Platypus::Declare );
+our @CARP_NOT = qw( FFI::Platypus::Declare FFI::Platypus::Record );
 
 require XSLoader;
 XSLoader::load(
@@ -372,16 +372,20 @@ sub alignof
 {
   my($self, $name) = @_;
   my $meta = $self->type_meta($name);
-  
+
+  # TODO: it is possible, though complicated
+  #       to compute the alignment of a struct
+  #       type record.  
   croak "cannot determine alignment of record"
-    if $meta->{type} eq 'record';
+    if $meta->{type} eq 'record'
+    && $meta->{ref} == 1;
   
   my $ffi_type;
   if($meta->{type} eq 'pointer')
   {
     $ffi_type = 'pointer';
   }
-  elsif($meta->{type} eq 'string' && $meta->{fixed_size})
+  elsif($meta->{type} eq 'record')
   {
     $ffi_type = 'uint8';
   }
@@ -550,7 +554,7 @@ sub _have_pm
 
 package FFI::Platypus::Function;
 
-our $VERSION = '0.56'; # VERSION
+our $VERSION = '0.58'; # VERSION
 
 use overload '&{}' => sub {
   my $ffi = shift;
@@ -571,7 +575,7 @@ use overload '&{}' => sub {
   sub { $self->{code}->(@_) };
 };
 
-our $VERSION = '0.56'; # VERSION
+our $VERSION = '0.58'; # VERSION
 
 sub new
 {
@@ -600,13 +604,13 @@ sub get_data
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '0.56'; # VERSION
+our $VERSION = '0.58'; # VERSION
 
 package FFI::Platypus::Type;
 
 use Carp qw( croak );
 
-our $VERSION = '0.56'; # VERSION
+our $VERSION = '0.58'; # VERSION
 
 sub new
 {
@@ -624,7 +628,7 @@ sub new
   }
   
   my $ffi_type;
-  my $platypus_type;
+  my $fuzzy_type;
   my $size = 0;
   my $classname;
   my $rw = 0;
@@ -633,14 +637,22 @@ sub new
   {
     my $extra = $1;
     $ffi_type = 'pointer';
-    $platypus_type = 'string';
     $rw = 1 if $extra =~ /rw$/;
-    $size = $1 if $extra =~ /\(([0-9]+)\)$/;
+    if($extra =~ /\(([0-9]+)\)$/)
+    {
+      # Fixed string is really an alias for an unpackaged record
+      $size = $1;
+      $fuzzy_type = 'record';
+    }
+    else
+    {
+      $fuzzy_type = 'string';
+    }
   }
   elsif($type =~ /^record\s*\(([0-9:A-Za-z_]+)\)$/)
   {
     $ffi_type = 'pointer';
-    $platypus_type = 'record';
+    $fuzzy_type = 'record';
     if($1 =~ /^([0-9]+)$/)
     {
       $size = $1;
@@ -669,21 +681,21 @@ sub new
   }
   elsif($type =~ s/\s+\*$//) {
     $ffi_type = $type;
-    $platypus_type = 'pointer';
+    $fuzzy_type = 'pointer';
   }
   elsif($type =~ s/\s+\[([0-9]*)\]$//)
   {
     $ffi_type = $type;
-    $platypus_type = 'array';
+    $fuzzy_type = 'array';
     $size = $1 ? $1 : 0;
   }
   else
   {
     $ffi_type = $type;
-    $platypus_type = 'ffi';
+    $fuzzy_type = 'ffi';
   }
   
-  $class->_new($ffi_type, $platypus_type, $size, $classname, $rw);
+  $class->_new($ffi_type, $fuzzy_type, $size, $classname, $rw);
 }
 
 1;
@@ -700,7 +712,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 

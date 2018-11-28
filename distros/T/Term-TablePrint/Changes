@@ -1,6 +1,20 @@
 Revision history for Term::TablePrint
 
 
+0.101   2018-11-24
+        - Don't enable codepage mapping if 'color' is set to avoid two different defaults.
+
+0.100   2018-11-23
+        - New option 'color'.
+        - New option 'codepage_mapping'.
+        - Going back: no difference between empty and not-empty tables.
+        - Changed defaults: 'squash_spaces' and 'max_rows'.
+        - Update progress bar.
+
+0.078   2018-11-00
+        - 'squash_spaces' disabled by default.
+        - Default 'progress_bar' to 50_000.
+
 0.077   2018-11-12
         - Changed modification of list elements.
         - Removed "no warnings 'utf8'".

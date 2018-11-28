@@ -1,18 +1,20 @@
 package Object::InsideOut::Secure; {
     use strict;
     use warnings;
+    use Config;
 
-    our $VERSION = '4.04';
+    our $VERSION = '4.05';
     $VERSION = eval $VERSION;
 
-    use Object::InsideOut 4.04 ':hash_only';
+    use Object::InsideOut 4.05 ':hash_only';
 
     # Holds used IDs
     my %used :Field = ( 0 => undef );
 
     # Our PRNG
     BEGIN {
-        $Math::Random::MT::Auto::shared = $threads::shared::threads_shared;
+        $Math::Random::MT::Auto::shared = ($Config::Config{useithreads} &&
+                                           $threads::shared::threads_shared);
     }
     use Math::Random::MT::Auto 5.04 ':!auto';
     my $prng = Math::Random::MT::Auto->new();

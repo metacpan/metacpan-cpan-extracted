@@ -1,3 +1,8 @@
+[Changes for 1.40 - 2018-11-24]
+
+* Fix installation compatibility with Perl 5.26+.
+* Update to Unicode v11.0.0.
+
 [Changes for 1.33 - 2012-10-21]
 
 * Rebuild with up-to-date Module::Install 1.06; no functional changes.

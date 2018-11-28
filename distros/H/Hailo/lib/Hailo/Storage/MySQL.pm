@@ -1,14 +1,9 @@
 package Hailo::Storage::MySQL;
-BEGIN {
-  $Hailo::Storage::MySQL::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Hailo::Storage::MySQL::VERSION = '0.72';
-}
-
-use 5.010;
-use Any::Moose;
-use Any::Moose 'X::StrictConstructor';
+our $AUTHORITY = 'cpan:AVAR';
+$Hailo::Storage::MySQL::VERSION = '0.74';
+use v5.28.0;
+use Moose;
+use MooseX::StrictConstructor;
 use List::MoreUtils qw< all >;
 use namespace::clean -except => 'meta';
 

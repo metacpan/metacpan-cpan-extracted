@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Report;
-$Config::Model::Report::VERSION = '2.127';
+$Config::Model::Report::VERSION = '2.128';
 use Carp;
 use strict;
 use warnings;
@@ -90,7 +90,7 @@ Config::Model::Report - Reports data from config tree
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -178,7 +178,7 @@ value.
 
 =head1 CONSTRUCTOR
 
-=head2 new ( )
+=head2 new
 
 No parameter. The constructor should be used only by
 L<Config::Model::Node>.

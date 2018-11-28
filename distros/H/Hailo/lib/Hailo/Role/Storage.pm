@@ -1,33 +1,29 @@
 package Hailo::Role::Storage;
-BEGIN {
-  $Hailo::Role::Storage::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Hailo::Role::Storage::VERSION = '0.72';
-}
-
-use 5.010;
-use Any::Moose '::Role';
+our $AUTHORITY = 'cpan:AVAR';
+$Hailo::Role::Storage::VERSION = '0.74';
+use v5.28.0;
+use Moose::Role;
+use MooseX::Types::Moose ':all';
 use namespace::clean -except => 'meta';
 
 has brain => (
-    isa => 'Str',
+    isa => Str,
     is  => 'rw',
 );
 
 has order => (
-    isa => 'Int',
+    isa => Int,
     is  => 'rw',
 );
 
 has hailo => (
-    isa => 'HashRef',
+    isa => HashRef,
     is  => 'ro',
     documentation => "Miscellaneous private callbacks that Hailo provides to communicate with it",
 );
 
 has tokenizer_class => (
-    isa => 'Str',
+    isa => Str,
     is  => 'rw',
 );
 

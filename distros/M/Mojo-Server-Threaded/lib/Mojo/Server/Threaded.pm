@@ -1,7 +1,7 @@
 package Mojo::Server::Threaded;
 use Mojo::Base 'Mojo::Server::Daemon';
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 use threads('stack_size' => 64*4096);
 use Thread::Queue;
@@ -199,7 +199,7 @@ sub _manage {
     }
 
     # No heartbeat (graceful stop)
-    $log->error("Worker $tid has no heartbeat, restarting")
+    $log->error("Worker $tid has no heartbeat ($ht seconds), restarting")
       and $w->{graceful} = $time
       if !$w->{graceful} && ($w->{time} + $interval + $ht <= $time);
 

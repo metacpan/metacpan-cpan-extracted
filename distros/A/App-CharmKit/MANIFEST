@@ -3,14 +3,16 @@ Changes
 LICENSE
 META.json
 README.md
-README.mkdn
 cpanfile
 eg/Charmkit.toml.ex
+eg/test-charm/hooks/install
+eg/test-charm/lib/docker.pm
 lib/App/CharmKit.pm
 lib/App/CharmKit/Manual/GettingStarted.pod
 lib/App/CharmKit/Manual/WritingHooks.pod
 lib/charm.pm
 minil.toml
 t/01-sugar.t
+tidyall.ini
 META.yml
 MANIFEST

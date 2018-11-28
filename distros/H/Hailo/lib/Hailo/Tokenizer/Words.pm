@@ -1,15 +1,10 @@
 package Hailo::Tokenizer::Words;
-BEGIN {
-  $Hailo::Tokenizer::Words::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Hailo::Tokenizer::Words::VERSION = '0.72';
-}
-
-use 5.010;
+our $AUTHORITY = 'cpan:AVAR';
+$Hailo::Tokenizer::Words::VERSION = '0.74';
+use v5.28.0;
 use utf8;
-use Any::Moose;
-use Any::Moose 'X::StrictConstructor';
+use Moose;
+use MooseX::StrictConstructor;
 use Regexp::Common qw/ URI /;
 use namespace::clean -except => 'meta';
 

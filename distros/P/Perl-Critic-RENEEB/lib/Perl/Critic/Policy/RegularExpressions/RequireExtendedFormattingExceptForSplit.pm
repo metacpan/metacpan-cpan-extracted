@@ -110,7 +110,7 @@ Perl::Critic::Policy::RegularExpressions::RequireExtendedFormattingExceptForSpli
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

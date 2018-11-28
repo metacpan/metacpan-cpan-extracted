@@ -36,6 +36,17 @@ subtest 'Equivalent URL, different query order' => sub {
     is $compare->compare_result, '', 'Compare result is empty';
 };
 
+subtest 'Equivalent URL, different order of values for list param' => sub {
+    my $compare = Mojo::UserAgent::Mockable::Request::Compare->new;
+    my $r2 = $r1->clone;
+    my $r3 = $r1->clone;
+
+    $r2->url->query->append(foo => ['baz','boo']);
+    $r3->url->query->append(foo => ['boo','baz']);
+    ok $compare->compare( $r2, $r3 ), 'Equivalent requests are equivalent';
+    is $compare->compare_result, '', 'Compare result is empty';
+};
+
 subtest 'Different query' => sub {
     my $compare = Mojo::UserAgent::Mockable::Request::Compare->new;
     my $r2 = $r1->clone;

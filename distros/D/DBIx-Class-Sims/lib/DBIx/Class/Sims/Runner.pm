@@ -114,32 +114,19 @@ sub create_search {
   };
   $rs = $rs->search($search);
 
-  # This section needs to be rethought.
-  # 1. There are no tests that fail when it's commented out
-  # 2. Keeping it in breaks the test in t/parent_child_parent.t named
-  #     "Auto-generate other children of parent by amount"
-  # 3. It's unclear if the functionality is even desirable.
-  #
-  # The goal of this section looked to be to find the best match, including any
-  # parentage. The best element in the tree of parentage is a good goal, but it
-  # does require that we have converted the FK relationships first. We need a
-  # test before this section can be re-enabled.
-  #
-  # In any case, it definitely won't be in this form.
-  #
-  #foreach my $rel_name ($source->relationships) {
-  #  next unless exists $cond->{$rel_name};
-  #  next unless reftype($cond->{$rel_name}) eq 'HASH';
-  #
-  #  my %search = map {
-  #    ;"$rel_name.$_" => $cond->{$rel_name}{$_}
-  #  } grep {
-  #    # Nested relationships are "automagically handled."
-  #    !ref $cond->{$rel_name}{$_}
-  #  } keys %{$cond->{$rel_name}};
-  #
-  #  $rs = $rs->search(\%search, { join => $rel_name });
-  #}
+  foreach my $rel_name ($source->relationships) {
+    next unless exists $cond->{$rel_name};
+    next unless (reftype($cond->{$rel_name}) // '') eq 'HASH';
+
+    my %search = map {
+      ;"$rel_name.$_" => $cond->{$rel_name}{$_}
+    } grep {
+      # Nested relationships are "automagically handled."
+      !ref $cond->{$rel_name}{$_}
+    } keys %{$cond->{$rel_name}};
+
+    $rs = $rs->search(\%search, { join => $rel_name });
+  }
 
   return $rs;
 }
@@ -319,7 +306,7 @@ sub find_by_unique_constraints {
 
       $criteria{$colname} = $value;
     }
-    
+
     $rs = $rs->search(\%criteria);
     $searched = merge($searched, \%criteria);
   }
@@ -401,7 +388,7 @@ sub fix_deferred_fks {
 
     $row->$col($parent->get_column($fkcol));
   }
-  $row->update;
+  $row->update if $row->get_dirty_columns;
 }
 
 my %types = (
@@ -492,7 +479,13 @@ sub fix_columns {
         warn "DEPRECATED: Use a regular HASHREF for overriding simspec. HASHREFREF will be removed in a future release.";
         $sim_spec = ${ delete $item->{$col_name} };
       }
-      elsif ((reftype($item->{$col_name}) // '') eq 'HASH') {
+      elsif (
+        (reftype($item->{$col_name}) // '') eq 'HASH' &&
+        # Assume a blessed hash is a DBIC object
+        !blessed($item->{$col_name}) &&
+        # Do not assume we understand something to be inflated/deflated
+        !$source->column_info($col_name)->{_inflate_info}
+      ) {
         $sim_spec = delete $item->{$col_name};
       }
       # Pass the value along to DBIC - we don't know how to deal with it.

@@ -5,6 +5,7 @@ use Capture::Tiny qw(capture_stdout);
 use IO::Scalar;
 use Test::More tests => 11;
 use D64::Disk::Image qw(:all);
+use File::Temp qw(tmpnam);
 #########################
 {
 BEGIN { use_ok('D64::Disk::Dir', qw(:all)) };
@@ -12,7 +13,7 @@ BEGIN { use_ok('D64::Disk::Dir', qw(:all)) };
 #########################
 # Helper subroutine to create image and populate it with files for directory access method test cases:
 sub create_test_image {
-    my $filename = '__temp__.d64';
+    my $filename = tmpnam() . '.d64';
     my $d64 = D64::Disk::Image->create_image($filename, D64);
     my $rawname = $d64->rawname_from_name(' djgruby/oxyron ');
     my $rawid = $d64->rawname_from_name('10');

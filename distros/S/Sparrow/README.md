@@ -200,7 +200,30 @@ For example:
 
 Installing plugin from local source:
 
-    $ cd /plg/src/ && sparrow plg install .
+    $ cd /plg/src/ && sparrow plg install /path/to/source --local 
+
+Install plugin from local source recursively:
+
+    $ sparrow plg install /path/to/plugins --local --recursive
+
+This command will recursively go through /path/to/plugins directory and for every directory containing 
+`sparrow.json` file runs `sparrow plg install .` command.
+
+Forcefully reinstall plugin
+
+Use `force` flag to reinstall local plugins:
+
+    $ sparrow plg install /path/to/source --local --recursive --force 
+
+    $ sparrow plg install /path/to/plugins --local --force 
+
+Reinstall plugins dependencies
+
+Use `install-deps`.. It only works with public plugins:
+
+
+    $ sparrow plg install cpan-upload --install-deps
+
 
 To see installed plugin list say this:
 

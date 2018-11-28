@@ -5,10 +5,22 @@ use File::Compare qw(compare);
 use File::Spec;
 use Test::Most;
 use Mojo::UserAgent::Mockable::Serializer;
-use Mojolicious;
 
 my $serializer = Mojo::UserAgent::Mockable::Serializer->new;
 my $file = qq{$Bin/../files/sample resume.docx};
+
+package TestApp {
+    use Mojolicious::Lite;
+
+    get '/download' => sub {
+        my $c = shift;
+
+        my ( $dir, $filename ) = ( File::Spec->splitpath($file) )[ 1 .. 2 ];
+        push @{ $c->app->static->paths }, $dir;
+        $c->res->headers->content_disposition('attachment; filename=sample_resume.docx');
+        $c->reply->static($filename);
+    };
+};
 
 my $action = sub {
     my $c = shift;
@@ -19,10 +31,7 @@ my $action = sub {
     $c->reply->static($filename);
 };
 
-my $app = Mojolicious->new;
-$app->routes->any(
-    '/*any' => { any => '' } => $action
-);
+my $app = TestApp::app;
 my $ua = $app->ua;
 my $tx = $ua->get('/download');
 my $serialized = $serializer->serialize($tx);

@@ -1,0 +1,197 @@
+NAME
+
+    REST::Client::CrossRef - Read data from CrossRef using its REST API
+
+VERSION
+
+    Version 0.001
+
+INSTALLATION
+
+    To install REST::Client::CrossRef, cd to the directory that contains
+    this file and type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    On windows use nmake or dmake instead of make.
+
+    To install this module into a specific directory, do: perl Makefile.PL
+    PREFIX=/name/of/the/directory ...the rest is the same...
+
+    Please also read the perlmodinstall man page, if available.
+
+DEPENDENCIES
+
+            Test::More      1.001014
+            Log::Any        1.049
+            Carp    1.4
+            JSON    2.9
+            HTTP::Cache::Transparent        1.4
+            Moo     2.001001
+            URI::Escape     3.31
+            REST::Client    273
+
+DESCRIPTION
+
+    This module use CrossRef REST API
+    <https://github.com/CrossRef/rest-api-doc> to read the data from the
+    CrossRef repository.
+
+SYNOPSIS
+
+       use Log::Any::Adapter( 'File', './log.txt', 'log_level'=> 'info');
+       use REST::Client::CrossRef;
+    
+       #the mail address is added in the request's header
+       #return the data without transformation
+    
+       my $cr = REST::Client::CrossRef->new(
+          mailto        => 'you@somewhre.com', 
+          spit_raw_data => 1,
+       );
+    
+       #cache the data with HTTP::Cache::Transparent
+       $cr->init_cache(
+        {   BasePath => ".\cache",
+            NoUpdate => => 60 * 60,
+            verbose  => 0
+        });
+    
+       my $data =  $cr->journal_from_doi('10.1088/0004-637X/722/2/971');
+       print Dumper($data), "\n";   #$data is a hash ref of the json data converted to perl
+    
+       #unfold the data to something like
+       # field1/subfield1/subfield2 : value 
+       #add an undef value after each item fields
+       #output only the fields given with keys_to_keep, with the same ordering
+    
+       my $cr = REST::Client::CrossRef->new(
+             mailto        => 'you@somewhere.com',
+             add_end_flag  => 1,
+             keys_to_keep => [
+                 ['author'], ['title'], ['container-title'],
+                 ['volume'],['issue'], ['page'],['issued/date-parts'], ['published-print/date-parts']
+        
+        ],);
+       
+        my $data = $cr->article_from_doi('10.1088/0004-637X/722/2/971');
+    
+        for my $row (@$data) {
+            if (! $row) {
+                print "\n";
+                next;
+             }
+             while ( my ($f, $v) = each  %$row) {
+                print "$f : $v \n";
+            }
+        }
+    
+    
+        #display the item's fields in alphabetic order
+        #add 'end of data' field after each item
+    
+        my $cr = REST::Client::CrossRef->new(
+            mailto       => 'you@somewhre.com',
+            add_end_flag => 1,
+            sort_output => 1,
+         );
+    
+        $cr->init_cache(
+        {   BasePath => "C:\\Windows\\Temp\\perl",
+            NoUpdate => => 60 * 60,
+            verbose  => 0
+        });
+    
+        my @fields = (qw/author title/);
+        my @values = (qw/allan electron/);
+    
+        #return 100 items by page
+      
+        $cr->rows(100);
+    
+        my $data = $cr->query_articles( \@fields, \@values );
+    
+        while () {
+            last unless $data;
+    
+            for my $row (@$data) {
+                for my $field (keys %$row) {
+                    print $field, ": ", $row->{$field}. "\n";
+                }
+            }
+            $data = $cr->get_next();
+        }
+    
+        Example of one of the item in the output above
+    
+        author : Wilke, Ingrid;
+        MacLeod, Allan M.;
+        Gillespie, William A.;
+        Berden, Giel;
+        Knippels, Guido M. H.;
+        van der Meer, Alexander F. G.;
+        container-title : Optics and Photonics News
+        issue : 12
+        issued/date-parts : 2002, 12, 1, 
+        page : 16
+        published-online/date-parts : 2002, 12, 1, 
+        published-print/date-parts : 2002, 12, 1, 
+        title : Detectors: Time-Domain Terahertz Science Improves Relativistic Electron-Beam Diagnostics
+        volume : 13
+        end of data :    
+    
+         my $cr = REST::Client::CrossRef->new( mailto => 'you@somewher.com'
+           ,keys_to_keep => [["breakdowns/id", "id"], ["location"], [ "primary-name", "breakdowns/primary-name", "name" ]],
+          ); 
+    
+        $cr->init_cache(
+            {   BasePath => "C:\\Windows\\Temp\\perl",
+                NoUpdate => => 60 * 60,
+                verbose  => 0
+            });
+    
+        $cr->rows(100);
+    
+        my $rs_ar = $cr->get_members;
+    
+        while () {
+            last unless $rs_ar;
+            for my $row_hr (@$rs_ar) {
+                 for my $k (keys  %$row_hr) {
+                       print $k . " : " . $row_hr->{$k} . "\n";
+                 }
+             } 
+             $rs_ar = $cr->get_next();
+         }
+    
+        Example of items in the output above
+    
+        id : 5007
+        location : W. Struve 1 Tartu 50091 Estonia
+        primary-name : University of Tartu Press
+    
+        id : 310
+        location : 23 Millig Street Helensburgh Helensburgh Argyll G84 9LD United Kingdom
+        primary-name : Westburn Publishers
+    
+        id : 183
+        location : 9650 Rockville Pike Attn: Lynn Willis Bethesda MD 20814 United States
+        primary-name : Society for Leukocyte Biology
+
+AUTHOR
+
+        FranE<ccedil>ois Rappaz
+        CPAN ID: RAPPAZF
+        rappazf@gmail.com
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

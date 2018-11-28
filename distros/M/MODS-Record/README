@@ -232,12 +232,15 @@ DESIGN NOTES
       * Heiko Jansen provides at GitHub a Moose-based MODS parser
       https://github.com/heikojansen/MODS--Record
 
-AUTHORS
+AUTHOR
 
-      * Patrick Hochstenbach <Patrick . Hochstenbach at UGent . be>
+    Patrick Hochstenbach <Patrick.Hochstenbach at UGent.be>
 
-LICENSE
+LICENSE AND COPYRIGHT
 
-    This library is free software and may be distributed under the same
-    terms as perl itself. See http://dev.perl.org/licenses/.
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
 

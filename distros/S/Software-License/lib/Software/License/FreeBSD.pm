@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::FreeBSD;
-$Software::License::FreeBSD::VERSION = '0.103013';
+$Software::License::FreeBSD::VERSION = '0.103014';
 use parent 'Software::License';
 # ABSTRACT: The FreeBSD License (aka two-clause BSD)
 
@@ -10,6 +10,7 @@ sub url  { 'http://www.freebsd.org/copyright/freebsd-license.html' }
 
 sub meta_name  { 'open_source' }
 sub meta2_name { 'freebsd' }
+sub spdx_expression  { 'BSD-2-Clause-FreeBSD' }
 
 1;
 
@@ -23,7 +24,7 @@ Software::License::FreeBSD - The FreeBSD License (aka two-clause BSD)
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 AUTHOR
 
@@ -31,7 +32,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

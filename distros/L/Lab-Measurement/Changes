@@ -4,6 +4,13 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.670 2018-11-22
+  * Add Moose driver for Lakeshore340
+  * Add driver for Keysight B2901A SMU
+  * Add support for SCPI concurrent sense block
+  * Add better support for live plots in high dimensional sweeps
+  * Documentation improvements
+
 3.664 2018-10-17
   * Fix pod error breaking tests
 

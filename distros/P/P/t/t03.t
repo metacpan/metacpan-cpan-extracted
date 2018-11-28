@@ -26,12 +26,11 @@ my $ans = q({a=>{array=>[1, 2, 'c', {…}, 3, 4, 5], ahash=>{a=>1, b=>2, c=>"thr
 my @tstmsg = ("%s", $struct);
 
 my $out = P @tstmsg;
-#P "%s", $out;
-like ($out, qr/array.*one.*ahash.*three.*/, 'check increase depth');
+like ($out, qr/array.*one.*ahash.*three.*/, 'check increased depth');
 
 {	package one;
 	use Test::More;
-	use P (':depth=3');
+	use P qw(:depth=3);
 	my $out = P @tstmsg;
 	cmp_ok($out, 'eq', $ans, "check standard depth 3 as pkg-op");
 }
@@ -42,7 +41,7 @@ like ($out, qr/array.*one.*ahash.*three.*/, 'check increase depth');
 	my $out = P @tstmsg;
 	like ($out, qr/array.*one.*ahash.*three.*/, 'check increased depth in new pkg (default standard)');
 }
-
+package main;
 $out = P @tstmsg;
 #P "%s", $out;
 like ($out, qr/array.*one.*ahash.*three.*/, 'check depth in main again');
@@ -53,8 +52,10 @@ my $p=P::->ops({depth=>3});
 $out = $p->P(@tstmsg);
 cmp_ok($out, 'eq', $ans, "check depth 3 as OO-op");
 
+#Pe "out=%s, ans=%s", $out, $ans unless ($out eq $ans);
+
 $out = P @tstmsg;
-#P "%s", $out;
+#Pe "%s", $out;
 like ($out, qr/array.*one.*ahash.*three.*/, 'check one last in main again');
 
 

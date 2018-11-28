@@ -53,21 +53,105 @@ int windlclose(void *);
 
 #endif
 
-typedef enum _platypus_type {
-  FFI_PL_NATIVE = 0,
-  FFI_PL_STRING,
-  FFI_PL_POINTER,
-  FFI_PL_ARRAY,
-  FFI_PL_CLOSURE,
-  FFI_PL_CUSTOM_PERL,
-  FFI_PL_RECORD,
-  FFI_PL_EXOTIC_FLOAT
-} platypus_type;
+typedef enum _ffi_pl_type_code {
+
+  /*
+   * the first three bits represent the
+   * native unit size for each type.
+   */
+  FFI_PL_SIZE_0        = 0x0000,
+  FFI_PL_SIZE_8        = 0x0001,
+  FFI_PL_SIZE_16       = 0x0002,
+  FFI_PL_SIZE_32       = 0x0003,
+  FFI_PL_SIZE_64       = 0x0004,
+  FFI_PL_SIZE_128      = 0x0005,
+  FFI_PL_SIZE_256      = 0x0006,
+  FFI_PL_SIZE_512      = 0x0007,
+#if SIZEOF_VOIDP == 4
+  FFI_PL_SIZE_PTR      = FFI_PL_SIZE_32,
+#elif SIZEOF_VOIDP == 8
+  FFI_PL_SIZE_PTR      = FFI_PL_SIZE_64,
+#else
+#error "strange pointer size"
+#endif
+  FFI_PL_SIZE_MASK     = 0x0007,
+
+  /*
+   * The next nine bits represent the type:
+   * basics: void, integer, float, complex
+   *
+   * opaque is a pointer to something, a void*
+   * 
+   * string is a pointer to a null terminated string
+   * (a c string, basically)
+   *
+   * closure is a pointer to a function, usually a
+   * Perl function, enclosed within a FFI::Platypus::Closure
+   *
+   * record is a fixed bitmap, could be either a struct,
+   * or a fixed length string.
+   */
+  FFI_PL_BASE_VOID     = 0x0008,
+  FFI_PL_BASE_SINT     = 0x0010,
+  FFI_PL_BASE_UINT     = 0x0020,
+  FFI_PL_BASE_FLOAT    = 0x0040,
+  FFI_PL_BASE_COMPLEX  = 0x0080,
+  FFI_PL_BASE_OPAQUE   = 0x0100,
+  FFI_PL_BASE_STRING   = 0x0200,
+  FFI_PL_BASE_CLOSURE  = 0x0400,
+  FFI_PL_BASE_RECORD   = 0x0800,
+  FFI_PL_BASE_MASK     = 0x0ff8,
+
+  /*
+   * The shape describes how the data is organized.
+   * sclar is a simple value, pointer is usually used
+   * for pass by reference, array is a list of objects
+   * and custom types allow users to create their own
+   * custom types.
+   */
+  FFI_PL_SHAPE_SCALAR        = 0x0000,
+  FFI_PL_SHAPE_POINTER       = 0x1000,
+  FFI_PL_SHAPE_ARRAY         = 0x2000,
+  FFI_PL_SHAPE_CUSTOM_PERL   = 0x4000,
+  FFI_PL_SHAPE_CUSTOM_NATIVE = 0x8000,
+  FFI_PL_SHAPE_MASK          = 0xf000,
+
+  /*
+   * You can or together the different bit fields above to
+   * describe a type.  An int for example (usually signed 32 bit integer)
+   * is `FFI_PL_SIZE_32 | FFI_PL_BASE_SINT`.  Not all combinations
+   * have meaning, for example `FFI_PL_SIZE_8 | FFI_PL_BASE_FLOAT`
+   * is gibberish
+   */
+  FFI_PL_TYPE_VOID           = FFI_PL_SIZE_0   | FFI_PL_BASE_VOID,
+  FFI_PL_TYPE_SINT8          = FFI_PL_SIZE_8   | FFI_PL_BASE_SINT,
+  FFI_PL_TYPE_SINT16         = FFI_PL_SIZE_16  | FFI_PL_BASE_SINT,
+  FFI_PL_TYPE_SINT32         = FFI_PL_SIZE_32  | FFI_PL_BASE_SINT,
+  FFI_PL_TYPE_SINT64         = FFI_PL_SIZE_64  | FFI_PL_BASE_SINT,
+  FFI_PL_TYPE_UINT8          = FFI_PL_SIZE_8   | FFI_PL_BASE_UINT,
+  FFI_PL_TYPE_UINT16         = FFI_PL_SIZE_16  | FFI_PL_BASE_UINT,
+  FFI_PL_TYPE_UINT32         = FFI_PL_SIZE_32  | FFI_PL_BASE_UINT,
+  FFI_PL_TYPE_UINT64         = FFI_PL_SIZE_64  | FFI_PL_BASE_UINT,
+  FFI_PL_TYPE_FLOAT          = FFI_PL_SIZE_32  | FFI_PL_BASE_FLOAT,
+  FFI_PL_TYPE_DOUBLE         = FFI_PL_SIZE_64  | FFI_PL_BASE_FLOAT,
+  FFI_PL_TYPE_LONG_DOUBLE    = FFI_PL_SIZE_128 | FFI_PL_BASE_FLOAT,
+  FFI_PL_TYPE_COMPLEX_FLOAT  = FFI_PL_SIZE_64  | FFI_PL_BASE_COMPLEX,
+  FFI_PL_TYPE_COMPLEX_DOUBLE = FFI_PL_SIZE_128 | FFI_PL_BASE_COMPLEX,
+
+  FFI_PL_TYPE_OPAQUE         = FFI_PL_SIZE_PTR | FFI_PL_BASE_OPAQUE,
+
+  /*
+   * These types are passed as pointers, and act like opaque types
+   * in terms of sizeof, alignof, etc, but get passed differently.
+   */
+  FFI_PL_TYPE_STRING         = FFI_PL_TYPE_OPAQUE | FFI_PL_BASE_STRING,
+  FFI_PL_TYPE_CLOSURE        = FFI_PL_TYPE_OPAQUE | FFI_PL_BASE_CLOSURE,
+  FFI_PL_TYPE_RECORD         = FFI_PL_TYPE_OPAQUE | FFI_PL_BASE_RECORD,
+} ffi_pl_type_code;
 
 typedef enum _platypus_string_type {
-  FFI_PL_STRING_RO = 0,
-  FFI_PL_STRING_RW,
-  FFI_PL_STRING_FIXED
+  FFI_PL_TYPE_STRING_RO = 0,
+  FFI_PL_TYPE_STRING_RW = 1
 } platypus_string_type;
 
 typedef struct _ffi_pl_type_extra_record {
@@ -95,22 +179,16 @@ typedef struct _ffi_pl_type_extra_closure {
   struct _ffi_pl_type *argument_types[0];
 } ffi_pl_type_extra_closure;
 
-typedef struct _ffi_pl_type_extra_string {
-  platypus_string_type platypus_string_type;
-  size_t size;
-} ffi_pl_type_extra_string;
-
 typedef union _ffi_pl_type_extra {
   ffi_pl_type_extra_custom_perl  custom_perl;
   ffi_pl_type_extra_array        array;
   ffi_pl_type_extra_closure      closure;
   ffi_pl_type_extra_record       record;
-  ffi_pl_type_extra_string       string;
 } ffi_pl_type_extra;
 
 typedef struct _ffi_pl_type {
-  ffi_type *ffi_type;
-  platypus_type platypus_type;
+  unsigned short type_code;
+  unsigned short sub_type;
   ffi_pl_type_extra extra[0];
 } ffi_pl_type;
 
@@ -231,19 +309,43 @@ typedef struct _ffi_pl_record_member {
 
 #define ffi_pl_arguments_pointers(arguments) ((void**)&arguments->slot[arguments->count])
 
+typedef struct _ffi_pl_heap {
+  void *_this;
+  void *_next;
+} ffi_pl_heap;
+
+#define ffi_pl_heap_add(ptr, count, type) { \
+  ffi_pl_heap *n;                           \
+  Newx(ptr, count, type);                   \
+  Newx(n, 1, ffi_pl_heap);                  \
+  n->_this = ptr;                           \
+  n->_next = (void*) heap;                  \
+  heap = n;                                 \
+}
+
+#define ffi_pl_heap_free() {                \
+  while(heap != NULL)                       \
+  {                                         \
+    ffi_pl_heap *old = heap;                \
+    heap = (ffi_pl_heap *) old->_next;      \
+    Safefree(old->_this);                   \
+    Safefree(old);                          \
+  }                                         \
+}
+
+
 #if defined(_MSC_VER)
 #define Newx_or_alloca(ptr, count, type) ptr = _alloca(sizeof(type)*count)
-#define Safefree_or_alloca(ptr)
 #define HAVE_ALLOCA 1
 #elif defined(HAVE_ALLOCA)
 #define Newx_or_alloca(ptr, count, type) ptr = alloca(sizeof(type)*count)
-#define Safefree_or_alloca(ptr)
 #else
-#define Newx_or_alloca(ptr, count, type) Newx(ptr, count, type)
-#define Safefree_or_alloca(ptr) Safefree(ptr)
+#define Newx_or_alloca(ptr, count, type) ffi_pl_heap_add(ptr, count, type)
 #endif
 
-ffi_type *ffi_pl_name_to_type(const char *);
+ffi_type *ffi_pl_type_to_libffi_type(ffi_pl_type *type);
+int ffi_pl_name_to_code(const char *name);
+ffi_pl_type *ffi_pl_type_new(size_t size);
 
 #ifdef __cplusplus
 }

@@ -32,6 +32,8 @@ sub check {
             fail($_);
       }
       for my $line (@version_lines) {
+            $line =~ s/^\s+//;
+            $line =~ s/\s+$//;
             if (!defined $last_version) {
                   $last_version = shift @version_lines;
                   diag "Checking for $last_version";

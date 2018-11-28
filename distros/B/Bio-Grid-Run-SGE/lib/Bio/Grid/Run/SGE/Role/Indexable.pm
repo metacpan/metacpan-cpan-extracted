@@ -9,7 +9,7 @@ use Storable qw/nstore retrieve/;
 use Bio::Grid::Run::SGE::Util qw/my_glob/;
 use Bio::Gonzales::Util::Log;
 
-our $VERSION = '0.065'; # VERSION
+our $VERSION = '0.066'; # VERSION
 
 requires qw/num_elem create get_elem type close/;
 

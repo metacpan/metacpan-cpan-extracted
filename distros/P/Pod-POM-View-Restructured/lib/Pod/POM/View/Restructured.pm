@@ -15,7 +15,7 @@ use Pod::POM;
 
 package Pod::POM::View::Restructured;
 
-our $VERSION = '1.000001'; # VERSION
+our $VERSION = '1.000002'; # VERSION
 
 use base 'Pod::POM::View::Text';
 
@@ -304,6 +304,21 @@ sub view_item {
 
     $title =~ s/\A\s+//;
     $title =~ s/\n/ /;
+    $title = "- $title"
+        unless $title =~ /
+            # the line starts with
+            \A
+            # single unordered bullet,
+            (?:(?:[-+] | \\[*])
+            # or ordered bullet followed by dot,
+            |     [1AaIi] \.
+            # or ordered bullet within parens (first optional),
+            | \(? [1AaIi] \)
+            # then finally followed by whitespace.
+            )\s
+            /xms;
+    # Make asterisk an actual bullet
+    $title =~ s/ \A \\ [*]/*/xms;
     # $content =~ s/\n/\n /g;
     # $content = ' ' . $content;
 
@@ -718,6 +733,6 @@ This software is available under the same terms as the perl 5 programming langua
 
 =head1 VERSION
 
-1.000001
+1.000002
 
 =cut

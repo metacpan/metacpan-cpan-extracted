@@ -1,6 +1,6 @@
 package Lab::Data::Analysis;
 #ABSTRACT: Analyze data from 'Trace' files
-$Lab::Data::Analysis::VERSION = '3.664';
+$Lab::Data::Analysis::VERSION = '3.670';
 use 5.006;
 use strict;
 use Clone qw(clone);
@@ -1112,7 +1112,7 @@ Lab::Data::Analysis - Analyze data from 'Trace' files
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 SYNOPSIS
 

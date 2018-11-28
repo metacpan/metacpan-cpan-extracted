@@ -73,8 +73,6 @@ These attributes have no effect if the user provides their own logger instead of
 
 =cut
 
-requires qw(group_dir name);
-
 has 'log_dir' => (
 	is       => 'ro',
 	isa      => Dir,

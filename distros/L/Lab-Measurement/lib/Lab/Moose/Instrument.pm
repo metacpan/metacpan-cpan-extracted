@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument;
-$Lab::Moose::Instrument::VERSION = '3.664';
+$Lab::Moose::Instrument::VERSION = '3.670';
 #ABSTRACT: Base class for instrument drivers
 
 use 5.010;
@@ -10,6 +10,7 @@ use MooseX::Params::Validate;
 use Module::Load 'load';
 use Data::Dumper;
 use Exporter 'import';
+use Carp;
 
 our @EXPORT_OK = qw(
     timeout_param
@@ -266,7 +267,7 @@ Lab::Moose::Instrument - Base class for instrument drivers
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 SYNOPSIS
 
@@ -418,6 +419,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

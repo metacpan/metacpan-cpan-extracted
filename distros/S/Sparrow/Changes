@@ -1,3 +1,9 @@
+0.3.7 2018-11-26
+
+* Recursively installs plugins from directory.
+* Install local plugin from directory, not only `.`
+* Adding `--force`, `--install-deps` options for plugin install command
+
 0.3.6 2018-11-16
 
 * Requires the latest version of Outthentic (0.4.2 ) to ensure Powershell support

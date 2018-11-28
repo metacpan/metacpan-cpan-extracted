@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Fstab;
-$Config::Model::Backend::Fstab::VERSION = '2.127';
+$Config::Model::Backend::Fstab::VERSION = '2.128';
 use Mouse;
 use Carp;
 use Log::Log4perl qw(get_logger :levels);
@@ -160,7 +160,7 @@ Config::Model::Backend::Fstab - Read and write config from fstab file
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -184,7 +184,9 @@ L<Config::Model>. You don't need to read it to write a model.
 
 =head1 CONSTRUCTOR
 
-=head2 new ( node => $node_obj, name => 'fstab' ) ;
+=head2 new
+
+Parameters: C<< ( node => $node_obj, name => 'fstab' ) >>
 
 Inherited from L<Config::Model::Backend::Any>. The constructor is
 called by L<Config::Model::BackendMgr>.
@@ -194,14 +196,14 @@ called by L<Config::Model::BackendMgr>.
 Of all parameters passed to this read call-back, only C<file_path> is
 used. This parameter must be a L<Path::Tiny> object.
 
-When a file is read,  C<read()> returns 1.
+When a file is read, C<read> returns 1.
 
 =head2 write
 
 Of all parameters passed to this write call-back, only C<file_path> is
 used.
 
-C<write()> returns 1.
+C<write> returns 1.
 
 =head1 AUTHOR
 

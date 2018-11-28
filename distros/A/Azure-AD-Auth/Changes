@@ -1,0 +1,6 @@
+0.02 2018-11-23
+ - New flow: Password
+
+0.01 2018-10-19
+ - First release into an unexpected world
+ - Flows implemented: Client Credentials and Device Flow

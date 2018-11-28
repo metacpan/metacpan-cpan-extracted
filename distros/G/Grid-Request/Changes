@@ -1,5 +1,11 @@
 Revision history for Grid::Request.
 
+0.12    - Added missing methods for add_dir_param, add_file_param and
+          add_array_param.
+        - Fix the use of qw() due to changes in Perl 5.14.0.
+        - Fixed problems with calls to the "state" method always
+          returning "INIT".
+
 0.11    - Made tests more robust. Using auxiliary methods in the Test module.
         - POD forthe runtime() method added.
         - Tests skip plans when support is missing or misconfiguration is detected.

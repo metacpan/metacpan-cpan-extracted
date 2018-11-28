@@ -24,7 +24,7 @@ use Types::TypeTiny ();
 
 use namespace::autoclean 0.28;
 
-our $VERSION = 'v0.3.4';
+our $VERSION = 'v0.3.5';
 
 
 sub VERSION { # for older Perls
@@ -125,7 +125,7 @@ Types::Const - Types that coerce references to read-only
 
 =head1 VERSION
 
-version v0.3.4
+version v0.3.5
 
 =head1 SYNOPSIS
 
@@ -203,6 +203,11 @@ L<Devel::StrictMode> and only validate data structures during tests:
 
 Another means of improving performance is to only check the type
 once. (Since it is read-only, there is no need to re-check it.)
+
+=head2 RegexpRefs
+
+There may be an issue with regexp references. See
+L<RT#127635|https://rt.cpan.org/Ticket/Display.html?id=127635>.
 
 =head2 Bug reports and feature requests
 

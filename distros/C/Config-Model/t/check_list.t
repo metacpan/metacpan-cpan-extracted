@@ -207,7 +207,7 @@ subtest 'test _store method' => sub {
 subtest 'test _store warning' => sub {
     my $foo = Test::Log::Log4perl->expect(
         ignore_priority => 'info',
-        ['Tree.Element.CheckList', warn => qr/Unknown check_list item/ ]
+        [ 'User', warn => qr/Unknown check_list item/ ]
         );
     $cl->_store('bug-skipped', 1, 'skip');
 };
@@ -221,7 +221,7 @@ subtest 'test store method' => sub {
         [ value => 'S,T ,  O, R, E' ],
         [ 'S,O,T,R,E', check => 'yes' ],
         [ value => 'S,T ,  O, R, E', check => 'yes' ],
-        [ 'S,T,O,R,E,bug', check => 'yes' ],
+        [ 'S,T,O,R,E,bug', check => 'skip' ],
     );
 
     foreach my $test_arg ( @store_args) {
@@ -298,6 +298,20 @@ subtest 'test set_checked_list method' => sub {
         $cl->clear;
         $inst->clear_changes;
     }
+
+};
+
+subtest 'test set_checked_list error handling' => sub {
+    # bug is not an allowed value
+    throws_ok { $cl->set_checked_list(qw/A bug/ ) } qr/wrong value/, 'got exception';
+};
+
+subtest 'test behavior when skipping bad value' => sub {
+    my $foo = Test::Log::Log4perl->expect(
+        ignore_priority => 'info',
+        ['User', warn => qr/Unknown check_list item/ ]
+        );
+    $cl->set_checked_list([qw/A bug/], check => 'skip');
 };
 
 $cl->clear;

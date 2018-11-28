@@ -156,6 +156,7 @@ sql_typecode_name(int dbtype) {
 		case 97:	return "CHARZ";
 		case 100:	return "BINARY FLOAT oracle-endian";
 		case 101:	return "BINARY DOUBLE oracle-endian";
+                case 104:       return "ROWID";
 		case 106:	return "MLSLABEL";
 		case 102:	return "SQLT_CUR	OCI 7 cursor variable";
 		case 112:	return "SQLT_CLOB / long";
@@ -288,7 +289,9 @@ oci_mode(ub4  mode)
 	dTHX;
 	SV *sv;
 	switch (mode) {
-		case 3:					return "THREADED | OBJECT";
+		case OCI_THREADED | OCI_OBJECT:	return "THREADED | OBJECT";
+		case OCI_OBJECT | OCI_EVENTS:	return "OBJECT | EVENTS";
+		case OCI_THREADED | OCI_OBJECT | OCI_EVENTS:	return "THREADED | OBJECT | EVENTS";
 		case OCI_DEFAULT:		return "DEFAULT";
 		/* the default value for parameters and attributes */
 		/*-------------OCIInitialize Modes / OCICreateEnvironment Modes -------------*/
@@ -1127,7 +1130,7 @@ dbd_phs_in(dvoid *octxp, OCIBind *bindp, ub4 iter, ub4 index,
 			phs->alen = 0;
 			phs->indp = 0;
 		}
-	else
+		else
 			if (SvOK(phs->sv)) {
 				*bufpp  = SvPV(phs->sv, phs_len);
 				phs->alen = (phs->alen_incnull) ? phs_len+1 : phs_len;;
@@ -1138,20 +1141,20 @@ dbd_phs_in(dvoid *octxp, OCIBind *bindp, ub4 iter, ub4 index,
 				phs->alen = 0;
 				phs->indp = -1;
 			}
-			*alenp  = phs->alen;
-			*indpp  = &phs->indp;
-			*piecep = OCI_ONE_PIECE;
-            /* MJE commented out as we are avoiding DBIS now but as this is
-               an Oracle callback there is no way to pass something non
-               OCI into this func.
+	*alenp  = phs->alen;
+	*indpp  = &phs->indp;
+	*piecep = OCI_ONE_PIECE;
+	/* MJE commented out as we are avoiding DBIS now but as this is
+	   an Oracle callback there is no way to pass something non
+	   OCI into this func.
 
-			if (DBIS->debug >= 3 || dbd_verbose >= 3 )
-				PerlIO_printf(DBILOGFP, "		in  '%s' [%lu,%lu]: len %2lu, ind %d%s, value=%s\n",
-					phs->name, ul_t(iter), ul_t(index), ul_t(phs->alen), phs->indp,
-					(phs->desc_h) ? " via descriptor" : "",neatsvpv(phs->sv,10));
-            */
-			if (!tuples_av && (index > 0 || iter > 0))
-				croak(" Arrays and multiple iterations not currently supported by DBD::Oracle (in %d/%d)", index,iter);
+	if (DBIS->debug >= 3 || dbd_verbose >= 3 )
+		PerlIO_printf(DBILOGFP, "		in  '%s' [%lu,%lu]: len %2lu, ind %d%s, value=%s\n",
+			phs->name, ul_t(iter), ul_t(index), ul_t(phs->alen), phs->indp,
+			(phs->desc_h) ? " via descriptor" : "",neatsvpv(phs->sv,10));
+	*/
+	if (!tuples_av && (index > 0 || iter > 0))
+		croak(" Arrays and multiple iterations not currently supported by DBD::Oracle (in %d/%d)", index,iter);
 
 	return OCI_CONTINUE;
 }
@@ -1844,7 +1847,8 @@ ora_blob_read_mb_piece(SV *sth, imp_sth_t *imp_sth, imp_fbh_t *fbh,
             DBIc_LOGPIO(imp_sth),
             "	blob_read field %d, ftype %d, offset %ld, len %lu, "
             "destoffset %ld, retlen %lu\n",
-			fbh->field_num+1, ftype, offset, len, destoffset, ul_t(amtp));
+			fbh->field_num+1, ftype, offset, (unsigned long) len,
+                        destoffset, ul_t(amtp));
 
 	SvCUR_set(dest_sv, byte_destoffset+amtp);
 	*SvEND(dest_sv) = '\0'; /* consistent with perl sv_setpvn etc	*/
@@ -2562,7 +2566,7 @@ the concept is simple really
 	The the obj_ind is for the entier object not the properties so you call it once it
 	gets all of the indicators for the objects so you pass it into OCIObjectGetAttr and that
 	function will set attr_null_status as in the get below.
- 5. interate over the atributes of the object
+ 5. interate over the attributes of the object
 
 The thing to remember is that OCI and C have no way of representing a DB NULLs so we use the OCIInd find out
 if the object or any of its properties are NULL, This is one little line in a 20 chapter book and even then
@@ -2850,13 +2854,17 @@ fetch_get_piece(SV *sth, imp_fbh_t *fbh,SV *dest_sv)
                 actual_bufl,fb_ary->piece_count,fbh->piece_size,buflen);
 		}
 	}
-	sv_setpvn(dest_sv, (char*)fb_ary->cb_abuf,(STRLEN)actual_bufl);
 
-	if (fbh->ftype != SQLT_BIN){
+	if (actual_bufl > 0){
+		sv_setpvn(dest_sv, (char*)fb_ary->cb_abuf,(STRLEN)actual_bufl);
+		if (fbh->ftype != SQLT_BIN){
 
-		if (CSFORM_IMPLIES_UTF8(fbh->csform) ){ /* do the UTF 8 magic*/
-			SvUTF8_on(dest_sv);
+			if (CSFORM_IMPLIES_UTF8(fbh->csform) ){ /* do the UTF 8 magic*/
+				SvUTF8_on(dest_sv);
+			}
 		}
+	} else {
+		sv_set_undef(dest_sv);
 	}
 
 	return 1;
@@ -3661,8 +3669,11 @@ dbd_describe(SV *h, imp_sth_t *imp_sth)
             break;
 
           case	ORA_ROWID:				/* ROWID	*/
-          case	104:				/* ROWID Desc	*/
             fbh->disize = 20;
+            fbh->prec	= fbh->disize;
+            break;
+          case	104:				/* ROWID Desc	*/
+            fbh->disize = 2000;
             fbh->prec	= fbh->disize;
             break;
           case	108:				 /* some sort of embedded object */
@@ -4260,16 +4271,7 @@ ora_parse_uid(imp_dbh_t *imp_dbh, char **uidp, char **pwdp)
 		return OCI_CRED_EXT;
 	}
 #ifdef ORA_OCI_112
-    if (imp_dbh->using_drcp){
-		OCIAttrSet_log_stat(imp_dbh, imp_dbh->authp, OCI_HTYPE_SESSION,
-			*uidp, strlen(*uidp),
-			(ub4) OCI_ATTR_USERNAME, imp_dbh->errhp, status);
-
-		OCIAttrSet_log_stat(imp_dbh, imp_dbh->authp, OCI_HTYPE_SESSION,
-			(strlen(*pwdp)) ? *pwdp : NULL, strlen(*pwdp),
-			(ub4) OCI_ATTR_PASSWORD, imp_dbh->errhp, status);
-	}
-	else {
+	if (!imp_dbh->using_drcp) {
 #endif
 		OCIAttrSet_log_stat(imp_dbh, imp_dbh->seshp, OCI_HTYPE_SESSION,
 				*uidp, strlen(*uidp),
@@ -4290,6 +4292,11 @@ ora_db_reauthenticate(SV *dbh, imp_dbh_t *imp_dbh, char *uid, char *pwd)
 {
 	dTHX;
 	sword status;
+#ifdef ORA_OCI_112
+	if (imp_dbh->using_drcp) {
+		return 0;
+	}
+#endif
 	/* XXX should possibly create new session before ending the old so	*/
 	/* that if the new one can't be created, the old will still work.	*/
 	OCISessionEnd_log_stat(imp_dbh, imp_dbh->svchp, imp_dbh->errhp,

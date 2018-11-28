@@ -4,8 +4,6 @@
 This test ensures that the standalone Yancy CMS works as expected,
 including the default welcome page and the template handlers.
 
-This test uses the config file located in C<t/lib/share/config.pl>.
-
 =head1 SEE ALSO
 
 L<Yancy::Backend::Test>
@@ -162,6 +160,16 @@ subtest 'plugins' => sub {
     $t->get_ok( '/test' )
       ->status_is( 200 )
       ->json_is( [ { args => "one" } ] )
+      ;
+};
+
+subtest 'with openapi spec file' => sub {
+    my $t = Test::Mojo->new( 'Yancy', {
+        backend => $backend_url,
+        openapi => 'openapi-spec.json',
+    } );
+    $t->get_ok( '/yancy/api' )
+      ->status_is( 200 )
       ;
 };
 

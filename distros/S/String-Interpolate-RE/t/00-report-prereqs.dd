@@ -85,8 +85,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Test::Fatal' => '0',
-                                   'Test::More' => '0.98',
+                                   'Test2::V0' => '0',
+                                   'Test::More' => '0',
                                    'perl' => '5.006'
                                  }
                  }

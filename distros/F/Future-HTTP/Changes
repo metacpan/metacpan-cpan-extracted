@@ -1,3 +1,7 @@
+0.12 2018-11-23
+    * Remove imaginary HTPP::Tiny::threaded
+      This adresses  RT #123801 , reported by ANDK
+
 0.11 2018-11-08
     * Test stability (contributed by Hauke D)
     * Allow changing @Future::HTTP::loops more easily (contributed by Hauke D)

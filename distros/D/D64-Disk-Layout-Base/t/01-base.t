@@ -1,9 +1,9 @@
 #########################
 use Test::More tests => 9;
+use File::Temp qw(tmpnam);
 #########################
 {
 BEGIN { require_ok('D64::Disk::Layout::Base') };
-unlink('__temp__.d64');
 }
 #########################
 {
@@ -45,10 +45,11 @@ ok(! $saveOK, 'save - unable to save disk layout object created as an empty disk
 }
 #########################
 {
+my $filename = tmpnam() . '.d64';
 my $diskLayoutObj = D64::Disk::Layout::Base->new();
-my $saveOK = $diskLayoutObj->save_as('__temp__.d64');
+my $saveOK = $diskLayoutObj->save_as($filename);
 ok($saveOK, 'save_ok - save disk layout data to file with specified name');
-unlink('__temp__.d64');
+unlink($filename);
 }
 #########################
 {

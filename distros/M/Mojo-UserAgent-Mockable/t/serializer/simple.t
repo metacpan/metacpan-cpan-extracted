@@ -8,7 +8,49 @@ use Mojo::UserAgent::Mockable::Request::Compare;
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Mojo::UserAgent;
-use Mojolicious::Quick;
+
+package LocalApp { 
+    use Mojolicious::Lite;
+    get '/records' => sub {
+        my $c = shift;
+        $c->render(
+            json => {
+                meta    => { count => 1, },
+                records => [
+                    {   id            => 8675309,
+                        author        => 'Tommy Tutone',
+                        subject       => 'Jenny',
+                        repercussions => 'Many telephone companies now refuse to give out the number '
+                            . '"867-5309".  People named "Jenny" have come to despise this song. '
+                            . 'Mr. Tutone made out well.',
+                    }
+                ],
+            }
+        );
+    };
+    get '/record/:id' => sub {
+        my $c  = shift;
+        my $id = $c->stash('id');
+        if ( $id eq '8675309' ) {
+            $c->render(
+                json => [
+                    {   id            => 8675309,
+                        author        => 'Tommy Tutone',
+                        subject       => 'Jenny',
+                        repercussions => 'Many telephone companies now refuse to give out the number '
+                            . '"867-5309".  People named "Jenny" have come to despise this song. '
+                            . 'Mr. Tutone made out well.',
+                        summary => 'The singer wonders who he can turn to, and recalls Jenny, who he feels '
+                            . 'gives him something that he can hold on to.  He worries that she will '
+                            . 'think that he is like other men who have seen her name and number written '
+                            . 'upon the wall, but persists in calling her anyway. In his heart, the '
+                            . 'singer knows that Jenny is the girl for him.',
+                    }
+                ]
+            );
+        }
+    };
+};
 
 my $serializer = Mojo::UserAgent::Mockable::Serializer->new;
 
@@ -34,7 +76,7 @@ subtest 'Victoria and Albert Museum' => sub {
 };
 
 subtest 'Local App' => sub {
-    my $app = get_local_app();
+    my $app = LocalApp::app;
 
     my @transactions = $app->ua->get(q{/records});
      
@@ -89,52 +131,5 @@ sub test_transactions {
     return;
 }
 
-sub get_local_app {
-    my $app = Mojolicious->new;
-    $app->routes->get(
-        '/records' => sub {
-            my $c = shift;
-            $c->render(
-                json => {
-                    meta    => { count => 1, },
-                    records => [
-                        {   id            => 8675309,
-                            author        => 'Tommy Tutone',
-                            subject       => 'Jenny',
-                            repercussions => 'Many telephone companies now refuse to give out the number '
-                                . '"867-5309".  People named "Jenny" have come to despise this song. '
-                                . 'Mr. Tutone made out well.',
-                        }
-                    ],
-                }
-            );
-        },
-    );
-    $app->routes->get(
-        '/record/:id' => sub {
-            my $c  = shift;
-            my $id = $c->stash('id');
-            if ( $id eq '8675309' ) {
-                $c->render(
-                    json => [
-                        {   id            => 8675309,
-                            author        => 'Tommy Tutone',
-                            subject       => 'Jenny',
-                            repercussions => 'Many telephone companies now refuse to give out the number '
-                                . '"867-5309".  People named "Jenny" have come to despise this song. '
-                                . 'Mr. Tutone made out well.',
-                            summary => 'The singer wonders who he can turn to, and recalls Jenny, who he feels '
-                                . 'gives him something that he can hold on to.  He worries that she will '
-                                . 'think that he is like other men who have seen her name and number written '
-                                . 'upon the wall, but persists in calling her anyway. In his heart, the '
-                                . 'singer knows that Jenny is the girl for him.',
-                        }
-                    ]
-                );
-            }
-        },
-    );
-    return $app;
-}
 
 __END__

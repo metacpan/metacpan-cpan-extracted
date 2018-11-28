@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use 5.010;
+use v5.28.0;
 use autodie ':all';
 use strict;
 use Benchmark ':all';
@@ -14,11 +14,11 @@ my %tests = (
 
 cmpthese($tests, {
     map {
-        my $_ = $_;
-        $_ => sub {
+        my $what = $_;
+        $what => sub {
             state $test = 1;
-            my $cmd = qq[ANY_MOOSE=Mouse prove $tests{$_}[0] -r $testfiles];
-            say STDERR "Testing $_ $test/$tests (command: <<$cmd>>)";
+            my $cmd = qq[prove $tests{$what}[0] -r $testfiles];
+            say STDERR "Testing $what $test/$tests (command: <<$cmd>>)";
             system $cmd;
             $test++;
         }

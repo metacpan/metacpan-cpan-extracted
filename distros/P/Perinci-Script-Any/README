@@ -1,0 +1,47 @@
+NAME
+    Perinci::Script::Any - Allow a script to be a command-line script or
+    PSGI (CGI, FCGI)
+
+VERSION
+    This document describes version 0.001 of Perinci::Script::Any (from Perl
+    distribution Perinci-Script-Any), released on 2018-11-22.
+
+SYNOPSIS
+    In your script:
+
+     #!/usr/bin/env perl
+     use Perinci::Script::Any;
+     Perinci::Script::Any->new(url => '/Package/func')->run;
+
+DESCRIPTION
+    This module lets you have a script that can be a command-line script as
+    well as a PSGI (CGI, FCGI) script.
+
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Script-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Script-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Script-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Perinci::CmdLine::Any, Perinci::WebScript::JSON
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

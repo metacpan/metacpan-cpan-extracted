@@ -5,6 +5,8 @@ use warnings;
 
 use Mojo::JSON qw(encode_json decode_json);
 use Mojo::Base 'Mojolicious::Controller';
+use Mojo::Promise;
+
 use Encode;
 
 
@@ -140,16 +142,31 @@ sub dispatch {
         }
         # reply
         no strict 'refs';
-        $self->$method(@$params);
+        return $self->$method(@$params);
     };
     if ($@){
         $self->renderJsonRpcError($@);
     }
     else {
-    	# do NOT render if
-    	if (not $self->stash->{'mojo.rendered'}){
-    		$self->renderJsonRpcResult($reply);
-    	}
+        if (eval { $reply->isa('Mojo::Promise') }){
+            $reply->then(
+                sub {
+                    my $ret = shift;
+                    $self->renderJsonRpcResult($ret);
+                },
+                sub {
+                    my $err = shift;
+                    $self->renderJsonRpcError($err);
+                }
+            );
+            $self->render_later;
+        }
+        else {
+            # do NOT render if
+            if (not $self->stash->{'mojo.rendered'}){
+                $self->renderJsonRpcResult($reply);
+            }
+        }
     }
 }
 
@@ -243,7 +260,8 @@ Mojolicious::Plugin::Qooxdoo::JsonRpcController - A controller base class for Qo
  package MyApp::MyJsonRpcController;
 
  use Mojo::Base qw(Mojolicious::Plugin::Qooxdoo::JsonRpcController);
- 
+ use Mojo::Promise;
+
  has service => sub { 'Test' };
  
  out %allow = ( echo => 1, bad =>  1, async => 1);
@@ -279,6 +297,21 @@ Mojolicious::Plugin::Qooxdoo::JsonRpcController - A controller base class for Qo
             $self->renderJsonRpcError($@);
         }
     });
+ }
+
+ sub async_p {
+    my $self=shift;
+    my $p = Mojo::Promise->new;
+    xyzWithCallback(callback => sub {
+        eval {
+            local $SIG{__DIE__};
+            $p->resolve('Late Reply');
+        }
+        if ($@) {
+            $p->reject($@);
+        }
+    });
+    return $p;
  }
 
  package MyException;
@@ -317,11 +350,15 @@ request.
 
 =head2 Async Processing
 
-If you want to do asyncronoous data processing, call the C<render_later> method
+If you want to do async data processing, call the C<render_later> method
 to let the dispatcher know that it should not bother with trying to render anyting.
 In the callback, call the C<renderJsonRpcResult> method to render your result. Note
 that you have to take care of any exceptions in the callback yourself and use
 the C<renderJsonRpcError> method to send the exception to the client.
+
+=head2 Mojo::Promise Support
+
+If your method returns a promise, all will workout as expected. See the example above.
 
 =head2 Debugging
 

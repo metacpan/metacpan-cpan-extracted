@@ -1,4 +1,7 @@
 
+use warnings;
+use strict;
+
 use lib '.';
 
 use inc::Module::Install;

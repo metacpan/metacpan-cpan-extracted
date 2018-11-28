@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-my $VERSION = 1.601;
+my $VERSION = 1.602;
 
 use constant DEBUG_CONTENTS => 0;
 
@@ -50,7 +50,7 @@ my $qrBid = qr{\b$sBidPattern};
 # print STDERR " DDD qrBid ==$qrBid==\n";
 my @ara = (
            ['description', 'like', $qrBid, 'description contains bid amount'],
-           ['url', 'like', qr{\Ahttp://(cgi|www)\d*\.ebay\.fr}, 'URL is from ebay.fr'],
+           ['url', 'like', qr{\Ahttps?://(cgi|www)\d*\.ebay\.fr}, 'URL is from ebay.fr'],
            ['title', 'ne', q{''}, 'result Title is not empty'],
            ['change_date', 'date', 'change_date is really a date'],
            ['description', 'like', qr{([0-9]+|no)\s+bids?}, 'result bidcount is ok'],

@@ -1,7 +1,7 @@
 use 5.014;
 
 package Mojo::UserAgent::Mockable::Request::Compare;
-$Mojo::UserAgent::Mockable::Request::Compare::VERSION = '1.54';
+$Mojo::UserAgent::Mockable::Request::Compare::VERSION = '1.56';
 # VERSION
 
 # ABSTRACT: Helper class for Mojo::UserAgent::Mockable that compares two Mojo::Message::Request instances
@@ -122,8 +122,16 @@ sub _compare_url {
         return 0;
     }
     for my $key (keys %{$q1}) {
-        if ($q1->{$key} ne $q2->{$key}) {
-            $self->compare_result(qq{URL query mismatch: for key "$key", got "$q1->{$key}", expected "$q2->{$key}"});
+        my $val1 = $q1->{$key};
+        my $val2 = $q2->{$key};
+
+        if ( ref $val2 eq 'ARRAY' ){
+            $val1 = join(",", sort { $a cmp $b } @{$val1});
+            $val2 = join(",", sort { $a cmp $b } @{$val2});
+        }
+
+        if ($val1 ne $val2) {
+            $self->compare_result(qq{URL query mismatch: for key "$key", got "$val1", expected "$val2"});
             return 0;
         }
     }
@@ -146,7 +154,7 @@ Mojo::UserAgent::Mockable::Request::Compare - Helper class for Mojo::UserAgent::
 
 =head1 VERSION
 
-version 1.54
+version 1.56
 
 =head1 ATTRIBUTES
 
@@ -174,7 +182,7 @@ Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Kit Peters.
+This software is copyright (c) 2018 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

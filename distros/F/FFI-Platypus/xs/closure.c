@@ -79,109 +79,104 @@ ffi_pl_closure_call(ffi_cif *ffi_cif, void *result, void **arguments, void *user
   {
     for(i=0; i< ffi_cif->nargs; i++)
     {
-      if(extra->argument_types[i]->platypus_type == FFI_PL_NATIVE)
+      switch(extra->argument_types[i]->type_code)
       {
-        switch(extra->argument_types[i]->ffi_type->type)
-        {
-          case FFI_TYPE_VOID:
-            break;
-          case FFI_TYPE_UINT8:
-            sv = sv_newmortal();
-            sv_setuv(sv, *((uint8_t*)arguments[i]));
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_SINT8:
-            sv = sv_newmortal();
-            sv_setiv(sv, *((int8_t*)arguments[i]));
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_UINT16:
-            sv = sv_newmortal();
-            sv_setuv(sv, *((uint16_t*)arguments[i]));
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_SINT16:
-            sv = sv_newmortal();
-            sv_setiv(sv, *((int16_t*)arguments[i]));
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_UINT32:
-            sv = sv_newmortal();
-            sv_setuv(sv, *((uint32_t*)arguments[i]));
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_SINT32:
-            sv = sv_newmortal();
-            sv_setiv(sv, *((int32_t*)arguments[i]));
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_UINT64:
-            sv = sv_newmortal();
+        case FFI_PL_TYPE_VOID:
+          break;
+        case FFI_PL_TYPE_SINT8:
+          sv = sv_newmortal();
+          sv_setiv(sv, *((int8_t*)arguments[i]));
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_SINT16:
+          sv = sv_newmortal();
+          sv_setiv(sv, *((int16_t*)arguments[i]));
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_SINT32:
+          sv = sv_newmortal();
+          sv_setiv(sv, *((int32_t*)arguments[i]));
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_SINT64:
+          sv = sv_newmortal();
 #ifdef HAVE_IV_IS_64
-            sv_setuv(sv, *((uint64_t*)arguments[i]));
+          sv_setiv(sv, *((int64_t*)arguments[i]));
 #else
-            sv_setu64(sv, *((uint64_t*)arguments[i]));
+          sv_seti64(sv, *((int64_t*)arguments[i]));
 #endif
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_SINT64:
-            sv = sv_newmortal();
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_UINT8:
+          sv = sv_newmortal();
+          sv_setuv(sv, *((uint8_t*)arguments[i]));
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_UINT16:
+          sv = sv_newmortal();
+          sv_setuv(sv, *((uint16_t*)arguments[i]));
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_UINT32:
+          sv = sv_newmortal();
+          sv_setuv(sv, *((uint32_t*)arguments[i]));
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_UINT64:
+          sv = sv_newmortal();
 #ifdef HAVE_IV_IS_64
-            sv_setiv(sv, *((int64_t*)arguments[i]));
+          sv_setuv(sv, *((uint64_t*)arguments[i]));
 #else
-            sv_seti64(sv, *((int64_t*)arguments[i]));
+          sv_setu64(sv, *((uint64_t*)arguments[i]));
 #endif
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_FLOAT:
-            sv = sv_newmortal();
-            sv_setnv(sv, *((float*)arguments[i]));
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_DOUBLE:
-            sv = sv_newmortal();
-            sv_setnv(sv, *((double*)arguments[i]));
-            XPUSHs(sv);
-            break;
-          case FFI_TYPE_POINTER:
-            sv = sv_newmortal();
-            if( *((void**)arguments[i]) != NULL)
-              sv_setiv(sv, PTR2IV( *((void**)arguments[i]) ));
-            XPUSHs(sv);
-            break;
-        }
-      }
-      else if(extra->argument_types[i]->platypus_type == FFI_PL_STRING)
-      {
-        sv = sv_newmortal();
-        if( *((char**)arguments[i]) != NULL)
-        {
-          if(extra->argument_types[i]->extra[0].string.platypus_string_type == FFI_PL_STRING_FIXED)
-            sv_setpvn(sv, *((char**)arguments[i]), extra->argument_types[i]->extra[0].string.size);
-          else
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_FLOAT:
+          sv = sv_newmortal();
+          sv_setnv(sv, *((float*)arguments[i]));
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_DOUBLE:
+          sv = sv_newmortal();
+          sv_setnv(sv, *((double*)arguments[i]));
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_OPAQUE:
+          sv = sv_newmortal();
+          if( *((void**)arguments[i]) != NULL)
+            sv_setiv(sv, PTR2IV( *((void**)arguments[i]) ));
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_STRING:
+          sv = sv_newmortal();
+          if( *((char**)arguments[i]) != NULL)
+          {
             sv_setpv(sv, *((char**)arguments[i]));
-        }
-        XPUSHs(sv);
-      }
-      else if(extra->argument_types[i]->platypus_type == FFI_PL_RECORD)
-      {
-        sv = sv_newmortal();
-        if( *((char**)arguments[i]) != NULL)
-        {
-          sv_setpvn(sv, *((char**)arguments[i]), extra->argument_types[i]->extra[0].record.size);
-          if(extra->argument_types[i]->extra[0].record.stash)
-          {
-            SV *ref = newRV_inc(sv);
-            sv_bless(ref, extra->argument_types[i]->extra[0].record.stash);
-            SvREADONLY_on(sv);
-            sv = ref;
           }
-          else
+          XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_RECORD:
+          sv = sv_newmortal();
+          if( *((char**)arguments[i]) != NULL)
           {
-            SvREADONLY_on(sv);
+            sv_setpvn(sv, *((char**)arguments[i]), extra->argument_types[i]->extra[0].record.size);
+            if(extra->argument_types[i]->extra[0].record.stash)
+            {
+              SV *ref = newRV_inc(sv);
+              sv_bless(ref, extra->argument_types[i]->extra[0].record.stash);
+              SvREADONLY_on(sv);
+              sv = ref;
+            }
+            else
+            {
+              SvREADONLY_on(sv);
+            }
           }
-        }
-        XPUSHs(sv);
+          XPUSHs(sv);
+          break;
+        default:
+          warn("bad type");
+          break;
       }
     }
     PUTBACK;
@@ -211,84 +206,86 @@ ffi_pl_closure_call(ffi_cif *ffi_cif, void *result, void **arguments, void *user
     else
       sv = POPs;
 
-    if(extra->return_type->platypus_type == FFI_PL_NATIVE)
+    switch(extra->return_type->type_code)
     {
-      switch(extra->return_type->ffi_type->type)
-      {
-        case FFI_TYPE_UINT8:
+      case FFI_PL_TYPE_VOID:
+        break;
+      case FFI_PL_TYPE_UINT8:
 #if defined FFI_PL_PROBE_BIGENDIAN
-          ((uint8_t*)result)[3] = SvUV(sv);
+        ((uint8_t*)result)[3] = SvUV(sv);
 #elif defined FFI_PL_PROBE_BIGENDIAN64
-          ((uint8_t*)result)[7] = SvUV(sv);
+        ((uint8_t*)result)[7] = SvUV(sv);
 #else
-          *((uint8_t*)result) = SvUV(sv);
+        *((uint8_t*)result) = SvUV(sv);
 #endif
-          break;
-        case FFI_TYPE_SINT8:
+        break;
+      case FFI_PL_TYPE_SINT8:
 #if defined FFI_PL_PROBE_BIGENDIAN
-          ((int8_t*)result)[3] = SvIV(sv);
+        ((int8_t*)result)[3] = SvIV(sv);
 #elif defined FFI_PL_PROBE_BIGENDIAN64
-          ((int8_t*)result)[7] = SvIV(sv);
+        ((int8_t*)result)[7] = SvIV(sv);
 #else
-          *((int8_t*)result) = SvIV(sv);
+        *((int8_t*)result) = SvIV(sv);
 #endif
-          break;
-        case FFI_TYPE_UINT16:
+        break;
+      case FFI_PL_TYPE_UINT16:
 #if defined FFI_PL_PROBE_BIGENDIAN
-          ((uint16_t*)result)[1] = SvUV(sv);
+        ((uint16_t*)result)[1] = SvUV(sv);
 #elif defined FFI_PL_PROBE_BIGENDIAN64
-          ((uint16_t*)result)[3] = SvUV(sv);
+        ((uint16_t*)result)[3] = SvUV(sv);
 #else
-          *((uint16_t*)result) = SvUV(sv);
+        *((uint16_t*)result) = SvUV(sv);
 #endif
-          break;
-        case FFI_TYPE_SINT16:
+        break;
+      case FFI_PL_TYPE_SINT16:
 #if defined FFI_PL_PROBE_BIGENDIAN
-          ((int16_t*)result)[1] = SvIV(sv);
+        ((int16_t*)result)[1] = SvIV(sv);
 #elif defined FFI_PL_PROBE_BIGENDIAN64
-          ((int16_t*)result)[3] = SvIV(sv);
+        ((int16_t*)result)[3] = SvIV(sv);
 #else
-          *((int16_t*)result) = SvIV(sv);
+        *((int16_t*)result) = SvIV(sv);
 #endif
-          break;
-        case FFI_TYPE_UINT32:
+        break;
+      case FFI_PL_TYPE_UINT32:
 #if defined FFI_PL_PROBE_BIGENDIAN64
-          ((uint32_t*)result)[1] = SvUV(sv);
+        ((uint32_t*)result)[1] = SvUV(sv);
 #else
-          *((uint32_t*)result) = SvUV(sv);
+        *((uint32_t*)result) = SvUV(sv);
 #endif
-          break;
-        case FFI_TYPE_SINT32:
+        break;
+      case FFI_PL_TYPE_SINT32:
 #if defined FFI_PL_PROBE_BIGENDIAN64
-          ((int32_t*)result)[1] = SvIV(sv);
+        ((int32_t*)result)[1] = SvIV(sv);
 #else
-          *((int32_t*)result) = SvIV(sv);
+        *((int32_t*)result) = SvIV(sv);
 #endif
-          break;
-        case FFI_TYPE_UINT64:
+        break;
+      case FFI_PL_TYPE_UINT64:
 #ifdef HAVE_IV_IS_64
-          *((uint64_t*)result) = SvUV(sv);
+        *((uint64_t*)result) = SvUV(sv);
 #else
-          *((uint64_t*)result) = SvU64(sv);
+        *((uint64_t*)result) = SvU64(sv);
 #endif
-          break;
-        case FFI_TYPE_SINT64:
+        break;
+      case FFI_PL_TYPE_SINT64:
 #ifdef HAVE_IV_IS_64
-          *((int64_t*)result) = SvIV(sv);
+        *((int64_t*)result) = SvIV(sv);
 #else
-          *((int64_t*)result) = SvI64(sv);
+        *((int64_t*)result) = SvI64(sv);
 #endif
-          break;
-        case FFI_TYPE_FLOAT:
-          *((float*)result) = SvNV(sv);
-          break;
-        case FFI_TYPE_DOUBLE:
-          *((double*)result) = SvNV(sv);
-          break;
-        case FFI_TYPE_POINTER:
-          *((void**)result) = SvOK(sv) ? INT2PTR(void*, SvIV(sv)) : NULL;
-          break;
-      }
+        break;
+      case FFI_PL_TYPE_FLOAT:
+        *((float*)result) = SvNV(sv);
+        break;
+      case FFI_PL_TYPE_DOUBLE:
+        *((double*)result) = SvNV(sv);
+        break;
+      case FFI_PL_TYPE_OPAQUE:
+        *((void**)result) = SvOK(sv) ? INT2PTR(void*, SvIV(sv)) : NULL;
+        break;
+      default:
+        warn("bad type");
+        break;
     }
 
     PUTBACK;

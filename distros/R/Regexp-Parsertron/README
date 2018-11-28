@@ -9,17 +9,11 @@ ftp://ftp.info-zip.org/pub/infozip/
 
 1 Installing from a Unix-like distro
 ------------------------------------
-shell>gunzip Regexp-Parsertron-1.00.tgz
-shell>tar mxvf Regexp-Parsertron-1.00.tar
+shell> gunzip Regexp-Parsertron-1.00.tgz
+shell> tar xvf Regexp-Parsertron-1.00.tar
+shell> cd Regexp-Parsertron-1.00
 
 Note: 'make' on MS Windows-like systems may be called 'nmake' or 'dmake'.
-
-shell>perl Makefile.PL
-shell>make
-shell>make test
-shell>make install
-
-Or you may need:
 
 shell>perl Makefile.PL
 shell>make

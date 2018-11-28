@@ -55,7 +55,7 @@ but has not materialized yet.
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 our @loops;
 push @loops, (
@@ -69,7 +69,7 @@ push @loops, (
     # A threaded backend would also be nice but likely brings in other
     # interesting problems. How will we load this? We have two prerequisites
     # now, threads.pm and HTTP::Tiny...
-    ['threads.pm' => 'Future::HTTP::Tiny::threaded' ],
+    #['threads.pm' => 'Future::HTTP::Tiny::threaded' ],
 
     ['HTTP/Tiny/Paranoid.pm' => 'Future::HTTP::Tiny::Paranoid'],
 

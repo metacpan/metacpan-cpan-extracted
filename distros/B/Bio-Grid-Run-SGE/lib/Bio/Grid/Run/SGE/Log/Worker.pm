@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.065'; # VERSION
+our $VERSION = '0.066'; # VERSION
 use Bio::Gonzales::Util::File qw/slurpc open_on_demand/;
 has log_file => ( is => 'rw', required => 1 );
 has log_data => ( is => 'rw' );

@@ -1,6 +1,6 @@
-use 5.010;
+use v5.28.0;
 use autodie;
-use Any::Moose;
+use Moose;
 use List::MoreUtils qw(uniq);
 use Test::More tests => 22;
 use Test::Exception;

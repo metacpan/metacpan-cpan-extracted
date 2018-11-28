@@ -113,8 +113,23 @@ sub _log_ret {
     say $fh "GroupName\t$gname";
     say $fh "GroupCount\t", ++$groupcnt;
     say $fh "GroupEndTime\t", DateTime->from_epoch(epoch => time);
-    for my $stage (sort keys %$ret) {
-        my $runs = $ret->{$stage};
+    $self->_log_stages( $fh, $gname, $ret );
+}
+
+sub _log_stages {
+    my ($self, $fh, $gname, $ret, @parents) = @_;
+
+    my @stages;
+    my @subgroups;
+
+    map {
+        my $val = $ret->{$_};
+        push @{ ref($val) eq 'HASH' ? \@subgroups : \@stages }, [ $_, $val ];
+    } sort keys %$ret;
+
+    for my $stage_pair (@stages) {
+        my ($stage, $runs) = @$stage_pair;
+        $stage = join( '__', @parents, $stage );
         say $fh "StageName\t$gname\t$stage";
         say $fh "StageAttempts\t$gname\t$stage\t", scalar( @$runs );
         for my $i (0..$#$runs) {
@@ -125,6 +140,10 @@ sub _log_ret {
                 say $fh "Res$pre$k\t$v";
             }
         }
+    }
+    for my $subgroup_pair (@subgroups) {
+        my ($subgroup, $val) = @$subgroup_pair;
+        $self->_log_stages( $fh, $gname, $val, @parents, $self->_subgroups->{$subgroup}->name );
     }
 }
 

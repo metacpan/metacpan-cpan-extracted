@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Util-Tempdir
   homepage: https://metacpan.org/release/File-Util-Tempdir
   repository: git://github.com/perlancar/perl-File-Util-Tempdir.git
-version: '0.033'
+version: '0.034'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

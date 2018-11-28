@@ -1,6 +1,6 @@
 package TaskPipe::Task;
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 use Moose;
 use Module::Runtime qw(require_module);
@@ -119,7 +119,8 @@ has test_settings => (
 ###################################################
 
 
-sub name{ my ($n) = ref($_[0]) =~ /^${\__PACKAGE__}_(\w+)$/; $n; }
+sub name{ 
+    my ($n) = ref($_[0]) =~ /^${\__PACKAGE__}_(\w+)$/; $n; }
 
 
 sub test{
@@ -354,7 +355,7 @@ sub execute_as_task{
     my $logger = Log::Log4perl->get_logger;
 
     $logger->trace("Starting execute_as_task subroutine");
-
+    $logger->info("Starting task");
 
 #    if ( $self->seen_xbranch ){
 #        $logger->info("Already seen xbranch ".$self->xbranch_ids->[0]." - skipping");
@@ -423,7 +424,7 @@ sub execute_as_task{
 #    }
 
     #$self->show_xbranches("at end of task");
-    $logger->trace("Ending task");
+    $logger->info("Ending task");
 
     Log::Log4perl->remove_logger( $logger );
 
@@ -530,6 +531,10 @@ sub cache_xresults{
                 thread_id => +$self->run_info->thread_id,
                 result => +$self->utils->serialize( $self->results->[0] )
             });
+
+        } catch ( DBIx::Error $err where { $_->state !~ /^23/ } ){
+
+            confess "error $err. SQLSTATE WAS: ".$err->state;
 
         };
                 

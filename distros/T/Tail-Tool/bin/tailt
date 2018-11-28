@@ -19,7 +19,7 @@ use TryCatch;
 use YAML qw/LoadFile DumpFile Dump/;
 use File::HomeDir;
 
-our $VERSION = version->new('0.4.7');
+our $VERSION = version->new('0.4.8');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -846,7 +846,7 @@ tailt - Tail files using the Tail::Tool library
 
 =head1 VERSION
 
-This documentation refers to tailt version 0.4.7.
+This documentation refers to tailt version 0.4.8.
 
 =head1 SYNOPSIS
 

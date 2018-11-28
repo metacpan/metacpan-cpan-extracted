@@ -1,3 +1,6 @@
+Version 1.000002
+	* Fix list items without bullet (thanks to Wouter Depypere)
+
 Version 1.000001
 	* Fix kwalitee issues
 

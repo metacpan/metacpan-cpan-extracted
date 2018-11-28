@@ -1,6 +1,6 @@
 package Bot::Training::Plugin;
 our $AUTHORITY = 'cpan:AVAR';
-$Bot::Training::Plugin::VERSION = '0.06';
+$Bot::Training::Plugin::VERSION = '0.07';
 use 5.010;
 use Moose;
 use File::ShareDir qw< :ALL >;

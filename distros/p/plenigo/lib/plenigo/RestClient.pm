@@ -11,13 +11,12 @@ package plenigo::RestClient;
 use REST::Client;
 use JSON;
 use Carp qw(confess);
-use Carp::Always;
 use Crypt::JWT qw(encode_jwt);
 use Data::UUID;
 use Moo;
 use plenigo::Ex;
 
-our $VERSION = '0.1001';
+our $VERSION = '0.1002';
 
 has configuration => (
     is       => 'ro',

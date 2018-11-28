@@ -20,7 +20,7 @@ use Scalar::Util qw(blessed);
 
 our @EXPORT = qw(params_to_dbic);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub params_to_dbic ( $query_string, %opts ) {
     my $query;
@@ -94,6 +94,8 @@ sub _parse_orderby ( $orderby_data ) {
 }
 
 sub _parse_select ( $select_data ) {
+    return if !defined $select_data;
+    return if !length $select_data;
     return columns => [ split /\s*,\s*/, $select_data ];
 }
 
@@ -175,7 +177,7 @@ OData::QueryParams::DBIC - parse OData style query params and provide info for D
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -288,7 +290,7 @@ A more complex one:
 
 =head2 skip
 
-In combination with C<top>, this can be used for pageination.
+In combination with C<top>, this can be used for pagination.
 
     my $query_string = 'skip=5';
     my $opts = paras_to_dbic( $query_string );

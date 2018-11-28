@@ -29,5 +29,3 @@ perl/examples/ex7_distancematrix
 perl/examples/ex8_kmedoids
 data/cyano.txt
 doc/cluster.pdf
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

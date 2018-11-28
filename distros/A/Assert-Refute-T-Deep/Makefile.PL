@@ -15,12 +15,28 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
-        'Test::More' => '0',
+        'Test::More'     => 0.98, # done_testing + subtest
     },
     PREREQ_PM => {
+        'Assert::Refute' => 0.15,
         'Test::Deep' => 1.04,
-        'Assert::Refute' => 0.13,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Assert-Refute-T-Deep-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            bugtracker => {
+                web => 'https://github.com/dallaylaen/assert-refute-t-extra/issues',
+            },
+            repository => {
+                type => 'git',
+                url => 'https://github.com/dallaylaen/assert-refute-t-extra.git',
+                web => 'https://github.com/dallaylaen/assert-refute-t-extra',
+            },
+        },
+        x_contributors => [
+            # Alphabetically, with a comma at the end of line
+        ],
+    },
 );

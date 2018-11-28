@@ -5,7 +5,6 @@ use FindBin qw($Bin);
 use lib qq{$Bin/lib};
 use RandomOrgQuota qw/check_quota/;
 use Mojo::UserAgent::Mockable;
-use Mojolicious::Quick;
 use Test::Most;
 use Test::Mojo;
 

@@ -12,17 +12,17 @@ Files: Changes
 Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: COPYRIGHT
- CREDITS
- SIGNATURE
-Copyright: None
-License: public-domain
-
 Files: Makefile.PL
  dist.ini
  t/03provided.t
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
 
 Files: t/01basic.t
  t/02maybe.t

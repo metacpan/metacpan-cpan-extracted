@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.2",
+   "generated_by" : "Minilla/v3.1.3",
    "license" : [
       "perl_5"
    ],
@@ -63,11 +63,11 @@
    "provides" : {
       "Perl::Build" : {
          "file" : "lib/Perl/Build.pm",
-         "version" : "1.27"
+         "version" : "1.28"
       },
       "Perl::Build::Built" : {
          "file" : "lib/Perl/Build/Built.pm",
-         "version" : "1.27"
+         "version" : "1.28"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/tokuhirom/Perl-Build"
       }
    },
-   "version" : "1.27",
+   "version" : "1.28",
    "x_contributors" : [
       "Akihiro Uchida <uchida@ike-dyn.ritsumei.ac.jp>",
       "AnaTofuZ <anatofuz@gmail.com>",

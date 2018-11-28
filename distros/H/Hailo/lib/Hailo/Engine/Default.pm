@@ -1,20 +1,16 @@
 package Hailo::Engine::Default;
-BEGIN {
-  $Hailo::Engine::Default::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Hailo::Engine::Default::VERSION = '0.72';
-}
-
-use 5.010;
-use Any::Moose;
+our $AUTHORITY = 'cpan:AVAR';
+$Hailo::Engine::Default::VERSION = '0.74';
+use v5.28.0;
+use Moose;
+use MooseX::Types::Moose ':all';
 use List::Util qw<min first shuffle>;
 use List::MoreUtils qw<uniq>;
 
 with qw[ Hailo::Role::Arguments Hailo::Role::Engine ];
 
 has repeat_limit => (
-    isa     => 'Int',
+    isa     => Int,
     is      => 'rw',
     lazy    => 1,
     default => sub {

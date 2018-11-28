@@ -3,7 +3,7 @@ package namespace::local;
 use 5.008;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -25,6 +25,27 @@ the whole package:
     sub no_import {
         # quux() is unknown
     }
+
+Another use case is confining private functions:
+
+    package My::Package;
+
+    sub public {
+        return _private();
+    };
+
+    use namespace::local -below;
+    sub _private {
+        return 42;
+    };
+
+    # now elsewhere
+    use My::Package;
+    My::Package->public; # 42
+    My::Package->_private; # dies! no such function/method
+
+Note that this doesn't work for private methods since methods
+are resolved at runtime.
 
 Unlike L<namespace::clean> by which it is clearly inspired,
 it is useless at the top or your module as it will erase all
@@ -63,6 +84,8 @@ More exceptions MAY be added in the future (e.g. C<ARGV>).
 
 =cut
 
+use Carp;
+
 # this was stolen from namespace::clean
 use B::Hooks::EndOfScope 'on_scope_end';
 
@@ -73,8 +96,16 @@ use B::Hooks::EndOfScope 'on_scope_end';
 #    all imports that followed the use of this module
 
 sub import {
+    my ($class, $action) = @_;
+
+    croak "Unknown argument $action"
+        if defined $action and $action ne '-below';
+    $action ||= '';
+
     my $caller = caller;
 
+    # FIXME the ($caller, @names, %content) triplet makes me cry,
+    #    should be an object.
     my @names = _get_syms( $caller );
 
     # Shallow copy of symbol table does not work for all cases,
@@ -90,11 +121,15 @@ sub import {
     #     above 'use namespace::local' line
     #     thus preventing subsequent imports from leaking upwards
     # I do not know why it works, it shouldn't.
-    _erase_syms( $caller );
-    foreach my $name (@names) {
-        _restore_glob( $caller, $name, $content{$name} )
+    unless ($action eq '-below') {
+        _erase_syms( $caller );
+        foreach my $name (@names) {
+            _restore_glob( $caller, $name, $content{$name} )
+        };
     };
 
+    # TODO Somehow adding an `unless $action eq '-above'
+    # doesn't turn this into namespace::clean ...
     on_scope_end {
         _erase_syms( $caller );
         foreach my $name (@names) {

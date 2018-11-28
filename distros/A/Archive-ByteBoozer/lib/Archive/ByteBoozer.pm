@@ -75,7 +75,7 @@ $EXPORT_TAGS{'all'} = [ @{$EXPORT_TAGS{'crunch'}} ];
 our @EXPORT_OK = @{ $EXPORT_TAGS{'all'} };
 our @EXPORT = qw();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Data::Dumper;
 use IO::Scalar;
@@ -373,7 +373,7 @@ Pawel Krol, E<lt>djgruby@gmail.comE<gt>.
 
 =head1 VERSION
 
-Version 0.09 (2016-04-01)
+Version 0.10 (2018-11-26)
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -383,7 +383,7 @@ Copyright (C) 2004-2006, 2008-2009, 2012 David Malmborg.
 
 Archive::ByteBoozer Perl interface:
 
-Copyright (C) 2012-2013, 2016 by Pawel Krol.
+Copyright (C) 2012-2013, 2016, 2018 by Pawel Krol.
 
 This library is free open source software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.6 or, at your option, any later version of Perl 5 you may have available.
 

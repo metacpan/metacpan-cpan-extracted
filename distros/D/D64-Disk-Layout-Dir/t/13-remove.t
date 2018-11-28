@@ -7,7 +7,7 @@ use Text::Convert::PETSCII qw(:convert);
 use Test::Exception;
 use Test::More tests => 34;
 ########################################
-require 't/Util.pm';
+require './t/Util.pm';
 D64::Disk::Layout::Dir::Test::Util->import(qw(:all));
 ########################################
 our $class;

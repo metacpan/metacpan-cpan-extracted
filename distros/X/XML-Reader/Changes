@@ -1,5 +1,25 @@
 Revision history for XML-Reader
 
+0.67 - 2018-11-21T21:42:12+01:00
+
+  [DOCUMENTATION]
+
+  - correct an omission in the english POD documentation where I forgot to
+    add the XML::Parser of use XML::Reader qw(slurp_xml);
+    Therefore, the correct line is:
+    use XML::Reader qw(XML::Parser slurp_xml);
+
+0.66 - 2018-01-30T10:00:00+01:00
+
+  [DOCUMENTATION]
+
+  - 'use' this module now defaults to using XML::Parser, and only if
+    this fails, fallback to XML::Parsepp.
+
+  [DOCUMENTATION]
+
+  - Add META.json to the package
+
 0.65 - 2014-12-28T09:24:30+01:00
 
   [DOCUMENTATION]

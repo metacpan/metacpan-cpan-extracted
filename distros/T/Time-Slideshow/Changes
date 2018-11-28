@@ -1,7 +1,11 @@
-0.02 20161206
+0.03 2018-11-21
+    * Fix some spelling and grammatical errors
+    * No code changes, no need to upgrade
+
+0.02 2016-12-06
     - Documentation fix for synopsis
     . Add Prima example
     . move author tests into xt/
 
-0.01 20140629
+0.01 2014-06-29
     - Released to an unsuspecting world

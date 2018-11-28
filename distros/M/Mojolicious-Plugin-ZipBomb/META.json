@@ -1,0 +1,43 @@
+{
+   "abstract" : "Mojolicious Plugin to serve a zip bomb on configured routes.",
+   "author" : [
+      "Luc Didry <ldidry@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-ZipBomb",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Share" : "0",
+            "Mojolicious" : "8.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

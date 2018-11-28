@@ -5,9 +5,11 @@ App::CharmKit - ez pz charm authoring
 # SYNOPSIS
 
     #!/usr/bin/env perl
+    #
+    # In hooks/install
     BEGIN {
-        # Install charmkit
-        system "curl -L http://charmkit.pl/setup.sh | sh";
+      system "apt-get install -qyf cpanminus";
+      system "cpanm -qn App::CharmKit";
     }
 
     use charm;
@@ -19,7 +21,7 @@ App::CharmKit - ez pz charm authoring
 
     file "/etc/systemd/system/znc.service", source => "$hook_path/templates/znc.service";
 
-    my $content = template("$hook_path/templates/znc.conf", port => config 'port');
+    my $content = template("$hook_path/templates/znc.conf", port => sh 'config-get port');
     file "/home/ubuntu/.znc/configs", ensure => "directory", owner => "ubuntu", group => "ubuntu";
     file "/home/ubuntu/.znc/configs/znc.conf",
       owner     => "ubuntu",

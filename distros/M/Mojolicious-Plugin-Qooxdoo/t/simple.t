@@ -28,7 +28,7 @@ $t->put_ok('/root/jsonrpc','{"hello": dummy}')
   ->status_is(500);
 
 $t->post_ok('/root/jsonrpc','{"hello": dummy}')
-  ->content_like(qr/Invalid json string: Malformed JSON/,'bad request identified')
+  ->content_like(qr/Invalid json string/i,'bad request identified')
   ->status_is(500);
 
 $t->post_ok('/root/jsonrpc','{"ID":1,"method":"test"}')
@@ -60,6 +60,12 @@ $t->post_ok('/root/jsonrpc','{"id":1,"service":"rpc","method":"async","params":[
 
 $t->post_ok('/root/jsonrpc','{"id":1,"service":"rpc","method":"asyncException","params":[]}')
   ->json_is('',{id=>1,error=>{origin=>2,code=>334,message=>'a simple error'}},'async exception');
+
+$t->post_ok('/root/jsonrpc','{"id":1,"service":"rpc","method":"async_p","params":["hello"]}')
+  ->json_is('',{id=>1,result=>'Delayed hello for 1.5 seconds!'},'promise request');
+
+$t->post_ok('/root/jsonrpc','{"id":1,"service":"rpc","method":"asyncException_p","params":[]}')
+  ->json_is('',{id=>1,error=>{origin=>2,code=>334,message=>'a simple error'}},'promise exception');
 
 $t->get_ok('/root/jsonrpc?_ScriptTransport_id=1&_ScriptTransport_data="id":1,"service":"rpc","method":"echo","params":["hello"]}')
   ->content_like(qr/Invalid json/, 'invalid json get request')

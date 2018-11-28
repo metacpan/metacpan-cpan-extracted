@@ -1,4 +1,4 @@
-#PODNAME: DBD::Oracle::Troubleshooting 
+#PODNAME: DBD::Oracle::Troubleshooting
 #ABSTRACT: Tips and Hints to Troubleshoot DBD::Oracle
 
 __END__
@@ -9,11 +9,11 @@ __END__
 
 =head1 NAME
 
-DBD::Oracle::Troubleshooting  - Tips and Hints to Troubleshoot DBD::Oracle
+DBD::Oracle::Troubleshooting - Tips and Hints to Troubleshoot DBD::Oracle
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 CONNECTING TO ORACLE
 
@@ -75,8 +75,8 @@ Oracle technical support (and not the dbi-users mailing list).
 =head2 Connecting using a bequeather
 
 If you are using a bequeather to connect to a server
-on the same host as the client, you might have 
-to add 
+on the same host as the client, you might have
+to add
 
     bequeath_detach = yes
 
@@ -125,7 +125,7 @@ forking).
 
 It looks like this was fixed in 0.012 of Module::Runtime.
 
-=head2 bin_param_inout swapping return values
+=head2 bind_param_inout swapping return values
 
 See RT 71819 (https://rt.cpan.org/Ticket/Display.html?id=71819)
 
@@ -160,7 +160,7 @@ Martin J. Evans <mjevans@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1994 by Tim Bunce.
+This software is copyright (c) 2018, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

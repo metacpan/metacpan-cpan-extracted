@@ -69,9 +69,7 @@ role {
 		default  => sub {
 			my $self  = shift;
 			my $stage = $self->stage;
-			return $stage->group->_unique_name
-				. '_'  . $stage->name
-				. '._' . $self->index;
+			return $stage->_sub_name( $self->index );
 		},
 	);
 

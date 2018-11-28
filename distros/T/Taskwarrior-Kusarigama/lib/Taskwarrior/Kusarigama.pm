@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: plugin system for the Taskwarrior task manager
-$Taskwarrior::Kusarigama::VERSION = '0.10.0';
+$Taskwarrior::Kusarigama::VERSION = '0.11.0';
 
 # TODO document the kusarigama.dir key
 1;
@@ -18,7 +18,7 @@ Taskwarrior::Kusarigama - plugin system for the Taskwarrior task manager
 
 =head1 VERSION
 
-version 0.10.0
+version 0.11.0
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ configuration under the key <kusarigama.plugins>. E.g.,
 
     kusarigama.plugins=Renew,Command::ButBefore,Command::AndAfter,+FishCurrent
 
-Plugin namess prefixed with a plus sign are left left alone (minus the '+'),
+Plugin names prefixed with a plus sign are left alone (minus the '+'),
 while the other ones get C<Taskwarrior::Kusarigama::Plugin::> prefixed to
 them.
 

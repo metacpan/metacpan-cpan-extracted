@@ -2,6 +2,22 @@ use 5.010;
 use alienfile;
 use Sort::Versions;
 
+my $on_windows = $^O =~ /mswin/i;
+my $on_automated_rig
+  =  $ENV{PERL_CPAN_REPORTER_DIR}
+  || $ENV{PERL_CPAN_REPORTER_CONFIG}
+  || $ENV{AUTOMATED_TESTING}
+  || $ENV{TRAVIS}
+  || $ENV{APPVEYOR};
+
+#  make sure we get GEOS support
+use Alien::geos::af;
+my $sep_char = $on_windows ? ';' : ':';
+$ENV{PATH} .= $sep_char . join ($sep_char, Alien::geos::af->bin_dir);
+
+#  make libtool noisy for debug purposes
+#$ENV{LTFLAGS} = "--debug --verbose" if $on_windows;
+
 #  add existing alien files to path etc
 #  not very elegant...
 #  disable for now - config tests fail
@@ -12,12 +28,11 @@ if (0 && $have_alien_gdal && Alien::gdal->install_type eq 'share') {
     my $ag_version = Alien::gdal->version;
     say "Found existing gdal via alien ($ag_version) in " .  Alien::gdal->dist_dir;
     #  append the relevant path
-    my $sep = ($^O =~ /mswin/i) ? ';' : ':';
     $ENV{PKG_CONFIG_PATH}
       = Alien::gdal->dist_dir . '/lib/pkgconfig/'
-      . $sep
+      . $sep_char
       . ($ENV{PKG_CONFIG_PATH} // '');
-    $ENV{PATH} = Alien::gdal->bin_dir . $sep . $ENV{PATH};
+    $ENV{PATH} = Alien::gdal->bin_dir . $sep_char . $ENV{PATH};
 }
 
 use Cwd;
@@ -93,11 +108,11 @@ share {
   my $make_inst_cmd = '%{make} install';
   my @make_clean;
   #  try not to exceed the cpan-testers log limits
-  if ($ENV{PERL_CPAN_REPORTER_DIR} || $ENV{PERL_CPAN_REPORTER_CONFIG} || $ENV{AUTOMATED_TESTING} || $ENV{TRAVIS} || $ENV{APPVEYOR}) {
+  if ($on_automated_rig) {
     say "Running under CI or automated testing";
     $make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
     $make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type install.log/;
-    if (not $^O =~ /mswin/i) {
+    if (!$on_windows) {
         $make_cmd =~ s/%%/%/;
         $make_cmd =~ s/type/cat/;
         $make_cmd =~ s/"/'/g;
@@ -105,16 +120,17 @@ share {
         $make_inst_cmd =~ s/type/cat/;
         $make_inst_cmd =~ s/"/'/g;
     }
-    if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
-        push @make_clean, '%{make} clean';
-    }
+    #if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
+    #    push @make_clean, '%{make} clean';
+    #}
     #  clean up the build dir on cpan testers etc
-    #after 'build' => \&cleanse_build_dir;
     plugin 'Cleanse::BuildDir';
   }
   
   build [
     "%{configure} --with-libtiff=internal $with_local $with_cpp11 $build_static",
+    \&update_makefile,
+    \&pause,
     $make_cmd,
     \&patch_pkgconfig,
     $make_inst_cmd,
@@ -123,22 +139,23 @@ share {
 
 };
 
+sub update_makefile {
+    return;  #  should not be needed now
+    return if !$on_windows;
+    system ($^X, '-p', '-i.bak', q{-e"s/\$\(GDAL_ROOT\)/\./"}, "GNUmakefile");
+}
 
-#sub cleanse_build_dir {
-##return;
-#    use Cwd qw /getcwd/;
-#    use File::Path qw /remove_tree/;
-#    my $wd = getcwd();
-#    say "Cleansing build dir, currently in: $wd";
-#
-#    if ($wd =~ '_alien' and $wd =~ /\b(gdal-[0-9\.]+)$/) {
-#        my $build_dir = $1;
-#        chdir '..';
-#        if (remove_tree ($build_dir, {safe => 1})) {
-#            say "Removed $build_dir";
-#        }
-#    }
-#}
+sub pause {
+    return;  #  re-enable in case of debug
+    return if $on_automated_rig;
+    return if !$on_windows;
+
+    say "CONTINUE?";
+    my $response = <>;
+    while (not $response =~ /yes/) {
+        $response = <>;
+    }
+}
 
 
 sub patch_pkgconfig {

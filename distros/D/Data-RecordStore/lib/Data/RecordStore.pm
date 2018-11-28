@@ -9,7 +9,7 @@ use Data::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = '4.03';
+$VERSION = '4.04';
 
 our $DEBUG = 0;
 
@@ -573,7 +573,7 @@ sub empty {
 } #empty
 
 sub entry_count {
-    # return how many entries this index has
+    # return how many entries this silo has
     my $self = shift;
     my @files = $self->_files;
     my $filesize;
@@ -1414,6 +1414,6 @@ Removes the file for this record store entirely from the file system.
        and/or modify it under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 4.03  (November, 2018))
+       Version 4.04  (November, 2018))
 
 =cut

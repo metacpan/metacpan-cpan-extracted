@@ -1,3 +1,8 @@
+0.008   2018-11-21 (PERLANCAR)
+
+	- Add subcommand: archive-info.
+
+
 0.007   2018-10-18 (PERLANCAR)
 
 	- [Bugfix] Don't only set argument default once, but every time.

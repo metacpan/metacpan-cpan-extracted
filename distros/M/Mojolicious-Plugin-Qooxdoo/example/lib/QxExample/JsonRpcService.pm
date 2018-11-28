@@ -2,6 +2,7 @@ package QxExample::JsonRpcService;
 use strict;
 
 use Mojo::Base 'Mojolicious::Plugin::Qooxdoo::JsonRpcController';
+use Mojo::Promise;
 
 =head1 NAME
 
@@ -29,6 +30,8 @@ our %allow_access =  (
     echo => 1,
     async => 1,
     asyncException => 1,
+    async_p => 1,
+    asyncException_p => 1,
 );
 
 sub allow_rpc_access {
@@ -70,6 +73,25 @@ sub asyncException {
     Mojo::IOLoop->timer('1' => sub {
          $self->renderJsonRpcError(QxExample::Exception->new(code=>334, message=>"a simple error"));
     });
+}
+
+sub async_p {
+    my $self = shift;
+    my $text = shift;
+    my $p = Mojo::Promise->new;
+    Mojo::IOLoop->timer('1.5' => sub {
+        $p->resolve("Delayed $text for 1.5 seconds!");
+    });
+    return $p;
+}
+
+sub asyncException_p {
+    my $self = shift;
+    my $p = Mojo::Promise->new;
+    Mojo::IOLoop->timer('1' => sub {
+         $p->reject(QxExample::Exception->new(code=>334, message=>"a simple error"));
+    });
+    return $p;
 }
 
 package QxExample::Exception;

@@ -15,7 +15,7 @@ require AutoLoader;
 @EXPORT_OK = qw(&device_types &device_classes &device_list &device_info
                 &decode_device_bitmap &device_info_item &mount &dismount
                 &allocate &deallocate &initialize);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 bootstrap VMS::Device $VERSION;
 

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::EUPL_1_2;
-$Software::License::EUPL_1_2::VERSION = '0.103013';
+$Software::License::EUPL_1_2::VERSION = '0.103014';
 use utf8;
 use parent 'Software::License';
 # ABSTRACT: The European Union Public License (EUPL) v1.2
@@ -11,6 +11,7 @@ sub url       { 'https://joinup.ec.europa.eu/software/page/eupl' }
 
 sub meta_name  { 'open_source' }
 sub meta2_name { 'open_source' }
+sub spdx_expression { 'EUPL-1.2' }
 
 1;
 
@@ -24,7 +25,7 @@ Software::License::EUPL_1_2 - The European Union Public License (EUPL) v1.2
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 AUTHOR
 
@@ -32,7 +33,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

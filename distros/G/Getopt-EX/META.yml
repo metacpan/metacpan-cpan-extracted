@@ -26,7 +26,7 @@ no_index:
 provides:
   Getopt::EX:
     file: lib/Getopt/EX.pm
-    version: v1.10.0
+    version: v1.10.1
   Getopt::EX::Colormap:
     file: lib/Getopt/EX/Colormap.pm
   Getopt::EX::Func:
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX
   repository: git://github.com/kaz-utashiro/Getopt-EX.git
-version: v1.10.0
+version: v1.10.1
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <utashiro@cpan.org>'

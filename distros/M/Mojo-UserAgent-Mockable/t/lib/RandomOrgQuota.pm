@@ -19,18 +19,17 @@ sub get_quota {
     my $ua = Mojo::UserAgent->new;
     my $url = 'https://www.random.org/quota/?format=plain';
     my $tx = $ua->get($url);
-    if ( my $res = $tx->success ) {
+
+    my $quota;
+    eval {
+        my $res = $tx->result;
         if ( $res->code eq 200 ) {
-            my $quota = int $res->body;
-            return $quota;
+            $quota = int $res->body;
         }
         else { die qq{$res->{code} $res->{message}\n}; }
-    }
-    else {
-        my $err = $tx->error;
-        die "$err->{code} response: $err->{message}\n" if $err->{code};
-        die "Connection error: $err->{message}\n";
-    }
+        1;
+    } or die "Connection error: $@\n";
+    return $quota;
 }
 
 1;

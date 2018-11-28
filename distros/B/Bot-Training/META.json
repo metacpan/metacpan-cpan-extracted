@@ -1,16 +1,16 @@
 {
    "abstract" : "Plain text training material for bots like L<Hailo> and L<AI::MegaHAL>",
    "author" : [
-      "Ævar Arnfjörð Bjarmason <avar@cpan.org>"
+      "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason <avar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Bot-Training",
    "no_index" : {
@@ -32,7 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Any::Moose" : "0",
             "Class::Load" : "0",
             "Dir::Self" : "0",
             "Encode" : "0",
@@ -79,7 +78,9 @@
          "web" : "http://github.com/avar/bot-training"
       }
    },
-   "version" : "0.06",
-   "x_authority" : "cpan:AVAR"
+   "version" : "0.07",
+   "x_authority" : "cpan:AVAR",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "JSON::XS version 4.0"
 }
 

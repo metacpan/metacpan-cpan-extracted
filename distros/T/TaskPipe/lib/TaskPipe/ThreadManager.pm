@@ -126,9 +126,6 @@ sub manage{
 
     $logger->trace("Starting manage subroutine");
     $logger->info("pid $$ started manage sub");
-
-    use Carp 'longmess';
-    $logger->info("manage: ".longmess("trace:"));
 #    do {
 
     while(1){

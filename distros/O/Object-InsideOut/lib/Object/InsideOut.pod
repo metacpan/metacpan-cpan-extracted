@@ -4,7 +4,7 @@ Object::InsideOut - Comprehensive inside-out object support module
 
 =head1 VERSION
 
-This document describes Object::InsideOut version 4.04
+This document describes Object::InsideOut version 4.05
 
 =head1 SYNOPSIS
 
@@ -1111,7 +1111,7 @@ Here is a detailed example:
  $obj->set_phone() = '800-555-1212';
  $obj->email()     = 'jdhedden AT cpan DOT org';
 
- # Use :lvalue accessor in substituion regexp
+ # Use :lvalue accessor in substitution regexp
  $obj->email() =~ s/ AT (\w+) DOT /\@$1./;
 
  # Use :lvalue accessor in a 'substr' call

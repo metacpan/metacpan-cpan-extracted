@@ -9,8 +9,8 @@ package plenigo::CheckoutHelper;
  use plenigo::CheckoutHelper;
 
  my $product = plenigo::Product->createPlenigoProduct('PRODUCT_ID');
- my $checkoutHelper = plenigo::CheckoutHelper->new(configuration => $configuration);
- my $checkout_code = $checkoutHelper->createCheckoutCode($product);
+ my $checkout_helper = plenigo::CheckoutHelper->new(configuration => $configuration);
+ my $checkout_code = $checkout_helper->createCheckoutCode($product);
 
 =head1 DESCRIPTION
 
@@ -20,11 +20,10 @@ package plenigo::CheckoutHelper;
 
 use Moo;
 use Carp qw(confess);
-use Carp::Always;
 use Crypt::JWT qw(encode_jwt);
 use Data::UUID;
 
-our $VERSION = '2.0003';
+our $VERSION = '2.0006';
 
 has configuration => (
     is       => 'ro',
@@ -35,7 +34,7 @@ has configuration => (
 
 =cut
 
-=head2 hasAccess($customer_id, @product_ids)
+=head2 createCheckoutCode($product)
 
  Create checkout code necessary for plenigo checkout.
 

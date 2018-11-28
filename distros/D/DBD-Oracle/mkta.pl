@@ -1,4 +1,4 @@
-#!/bin/env perl -w
+#!/bin/env perl
 
 # mkta - make-test-all
 #
@@ -7,6 +7,8 @@
 # keep log files from failures
 
 use strict;
+use warnings;
+
 use Symbol;
 
 local $| = 1;
@@ -26,13 +28,13 @@ my $seq = 0;
 my $dbuser = $ENV{ORACLE_USERID} || 'scott/tiger';
 my (@queue, @run, %running, %skipped, @fail, $tested);
 
-my @cs_utf8 = (ORA_OCI() < 9.2) ? ("UTF8") : ("AL32UTF8", ($opt_full) ? ("UTF8") : ());
-my @cs_8bit = ($opt_full) ? ("WE8ISO8859P1", "WE8MSWIN1252") : ("WE8MSWIN1252");
-my @charsets = ("", @cs_utf8, @cs_8bit);
+my @cs_utf8 = (ORA_OCI() < 9.2) ? ('UTF8') : ('AL32UTF8', ($opt_full) ? ('UTF8') : ());
+my @cs_8bit = ($opt_full) ? ('WE8ISO8859P1', 'WE8MSWIN1252') : ('WE8MSWIN1252');
+my @charsets = (q||, @cs_utf8, @cs_8bit);
 
 # need to add in:
-#	multiple perl versions/achitectures
-#	multiple oracle versions
+#        multiple perl versions/achitectures
+#        multiple oracle versions
 
 for my $sid (@sid) {
     mkta_sid_cs($sid, \@charsets);
@@ -43,34 +45,34 @@ sub mkta_sid_cs {
     my $start_time = time;
 
     local $ENV{ORACLE_SID} = $sid;
-    my $dbh = DBI->connect("dbi:Oracle:", $dbuser, undef, { PrintError=>0 });
+    my $dbh = DBI->connect('dbi:Oracle:', $dbuser, undef, { PrintError=>0 });
     unless ($dbh) {
         (my $errstr = $DBI::errstr) =~ s/\n.*//s;
-	push @{ $skipped{$errstr} }, $sid;
-    	return;
+        push @{ $skipped{$errstr} }, $sid;
+        return;
     }
     mkdir $opt_dir, 0771 unless -d $opt_dir;
     print "$sid: testing with @$charsets ...\n";
 
-    system("make") == 0
+    system('make') == 0
         or die "$0 aborted - make failed\n";
     system("rm -f $opt_dir/$sid-*-*.log");
 
     for my $ochar (@$charsets) {
         for my $nchar (@$charsets) {
-	    # because empty NLS_NCHAR is same as NLS_LANG charset
-	    next if $nchar eq '' && $ochar ne '';
-	    push @queue, [ $sid, $ochar, $nchar ];
-	}
+            # because empty NLS_NCHAR is same as NLS_LANG charset
+            next if $nchar eq '' && $ochar ne '';
+            push @queue, [ $sid, $ochar, $nchar ];
+        }
     }
     while (@queue) {
         while (@queue && keys %running < $opt_j) {
-	    my ($tag, $fh) = start_test(@{ shift @queue });
-	    $running{$tag} = $fh;
-	    push @run, $tag;
-	    ++$tested;
-	}
-	wait_for_tests();
+            my ($tag, $fh) = start_test(@{ shift @queue });
+            $running{$tag} = $fh;
+            push @run, $tag;
+            ++$tested;
+        }
+        wait_for_tests();
     }
     wait_for_tests();
     printf "$sid: completed in %.1f minutes\n", (time-$start_time)/60;
@@ -92,13 +94,13 @@ sub start_test {
 }
 
 sub wait_for_tests {
-    while(%running) {
+    while (keys %running) {
         my @running = grep { $running{$_} } @run;
-	my $tag = $running[0] or die;
-	close $running{ $tag };
-	printf "$tag: %s\n", ($?) ? "FAILED" : "pass";
-	push @fail, $tag if $?;
-	delete $running{$tag};
+        my $tag = $running[0] or die;
+        close $running{ $tag };
+        printf "$tag: %s\n", ($?) ? "FAILED" : "pass";
+        push @fail, $tag if $?;
+        delete $running{$tag};
     }
 }
 

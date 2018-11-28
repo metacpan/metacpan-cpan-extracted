@@ -1,18 +1,37 @@
+ExtUtils::F77
 
+Copyright(C) 2001
+ Karl Glazebrook <karl_pgplot@mac.com>
 
-ExtUtils::F77 module 
---------------------
-
-Karl Glazebrook
-
-karlglazebrook@yahoo.com
-
-[see file CHANGES for new features]
+1. Abstract
 
 This module tries to figure out how to link C programs with
-Fortran subroutines on your system. Basically one must add a list
-of Fortran runtime libraries. The problem is their location
-and name varies with each OS/compiler combination!
+Fortran subroutines on your system.
 
-Please see file COPYING for copyright/license information
+2. Install
 
+Extract archive file.
+Change current directory to ExtUtils::F77-x.xx ("x.xx" is version
+number).
+Type "perl Makefile.PL" to create Makefile.
+Type "make" to build module.
+Type "make test" to test build.
+Type "make install" to install.
+
+3. How to use
+
+See "perldoc ExtUtils::F77".
+
+4. Changes
+
+See CHANGES file.
+
+5. Copyright
+
+See COPYING file.
+
+6. See also
+
+https://github.com/PDLPorters/extutils-f77
+https://metacpan.org/pod/ExtUtils::F77
+http://pdl.perl.org/

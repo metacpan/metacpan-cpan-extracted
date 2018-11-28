@@ -67,3 +67,17 @@ bash $(dirname $(readlink $(which circos)))/../data/karyotype/parse.karyotype \
 popd
 
 ```
+
+# Rice
+
+```bash
+
+perl ~/Scripts/withncbi/ensembl/chr_kary.pl -e oryza_sativa_core_29_82_7
+bash ~/share/circos/data/karyotype/parse.karyotype oryza_sativa_core_29_82_7.kary.tsv > Processing/OsatJap/karyotype.OsatJap.txt
+
+# ensembldb.ensembl.org         5306
+# mysql-eg-publicsql.ebi.ac.uk  4157
+mysql -hmysql-eg-publicsql.ebi.ac.uk -P4157 -uanonymous
+perl ~/Scripts/withncbi/ensembl/chr_kary.pl -s mysql-eg-publicsql.ebi.ac.uk --port 4157 -u anonymous -p '' -e oryza_sativa_core_29_82_7
+
+```

@@ -1,0 +1,40 @@
+NAME
+    Bencher::Scenarios::PerinciSubGetArgsArgv - Benchmark
+    Perinci::Sub::GetArgs::Argv
+
+VERSION
+    This document describes version 0.002 of
+    Bencher::Scenarios::PerinciSubGetArgsArgv (from Perl distribution
+    Bencher-Scenarios-PerinciSubGetArgsArgv), released on 2018-11-22.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::PerinciSubGetArgsArgv::get_args_from_argv
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-PerinciSubGetArgsArgv>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-PerinciSubGetArgsAr
+    gv>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Per
+    inciSubGetArgsArgv>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

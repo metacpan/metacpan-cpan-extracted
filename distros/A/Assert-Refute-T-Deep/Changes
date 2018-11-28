@@ -1,8 +1,11 @@
 Revision history for Assert-Refute-T-Deep
 
+0.03    Sun Nov 11 2018
+        - Move to new repo, no changes
+
 0.02    Fri Aug 24 2018
-        Don't load Test::Builder
+        - Don't load Test::Builder
 
 0.01    Fri Aug 24 2018
-        Implement cmp_deeply, reexport the rest of Test::Deep
+        - Implement cmp_deeply, reexport the rest of Test::Deep
 

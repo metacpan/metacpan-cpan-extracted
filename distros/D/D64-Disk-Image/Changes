@@ -1,5 +1,11 @@
 Revision history for Perl extension D64::Disk::Image.
 
+0.03  2018-11-24
+    - remove hard-coded file names in tests and replace them with a File::Temp's
+      "tmpnam" function call that returns the full name of a temporary file
+    - fix XS interface compilation warnings, e.g. "pointer targets in passing
+      argument 2 of 'Perl_newSVpv' differ in signedness"
+
 0.02  2013-01-12
     - Fixed "Segmentation fault" exception on OpenBSD and alikes, which was
       originally caused by closing an opened file without having written any

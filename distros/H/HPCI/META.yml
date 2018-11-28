@@ -31,7 +31,7 @@ provides:
     file: lib/HPCD/uni/Stage.pm
   HPCI:
     file: lib/HPCI.pm
-    version: '0.70'
+    version: '0.73'
   HPCI::CommandScript:
     file: lib/HPCI/CommandScript.pm
   HPCI::Env:
@@ -54,6 +54,14 @@ provides:
     file: lib/HPCI/ScriptSource.pm
   HPCI::Stage:
     file: lib/HPCI/Stage.pm
+  HPCI::Sub:
+    file: lib/HPCI/Sub.pm
+  HPCI::Subgroup:
+    file: lib/HPCI/Subgroup.pm
+  HPCI::Super:
+    file: lib/HPCI/Super.pm
+  HPCI::SuperSub:
+    file: lib/HPCI/SuperSub.pm
   HPCI::SystemLogger:
     file: lib/HPCI/SystemLogger.pm
   HPCI::Template:
@@ -86,5 +94,5 @@ requires:
   namespace::autoclean: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.70'
+version: '0.73'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,88 @@
+{
+   "abstract" : "File globbing utility ",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Path-Tiny-Glob",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "0",
+            "List::Lazy" : "0",
+            "Moo" : "0",
+            "Path::Tiny" : "0",
+            "experimental" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Path::Tiny::Glob" : {
+         "file" : "lib/Path/Tiny/Glob.pm",
+         "version" : "v0.0.1"
+      },
+      "Path::Tiny::Glob::Visitor" : {
+         "file" : "lib/Path/Tiny/Glob/Visitor.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Path-Tiny-Glob/issues"
+      },
+      "homepage" : "https://github.com/yanick/Path-Tiny-Glob",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Path-Tiny-Glob.git",
+         "web" : "https://github.com/yanick/Path-Tiny-Glob"
+      }
+   },
+   "version" : "0.0.1",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+}
+

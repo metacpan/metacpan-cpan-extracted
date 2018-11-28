@@ -1,13 +1,8 @@
 package Hailo::Engine::Scored;
-BEGIN {
-  $Hailo::Engine::Scored::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Hailo::Engine::Scored::VERSION = '0.72';
-}
-
-use 5.010;
-use Any::Moose;
+our $AUTHORITY = 'cpan:AVAR';
+$Hailo::Engine::Scored::VERSION = '0.74';
+use v5.28.0;
+use Moose;
 use List::Util qw<sum>;
 use List::MoreUtils qw<any>;
 use Time::HiRes qw<gettimeofday tv_interval>;

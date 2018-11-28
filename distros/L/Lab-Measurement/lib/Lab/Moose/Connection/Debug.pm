@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Debug;
-$Lab::Moose::Connection::Debug::VERSION = '3.664';
+$Lab::Moose::Connection::Debug::VERSION = '3.670';
 #ABSTRACT: Debug connection
 
 use Moose;
@@ -68,7 +68,7 @@ Lab::Moose::Connection::Debug - Debug connection
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 SYNOPSIS
 

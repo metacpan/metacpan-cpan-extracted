@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Null;
-$Lab::Moose::Instrument::SCPI::Sense::Null::VERSION = '3.664';
+$Lab::Moose::Instrument::SCPI::Sense::Null::VERSION = '3.670';
 #ABSTRACT: Role for the HP/Agilent/Keysight SCPI SENSe:$function:NULL subsystem
 
 use Moose::Role;
@@ -10,7 +10,7 @@ use Carp;
 use namespace::autoclean;
 
 
-with 'Lab::Moose::Instrument::SCPI::Sense::Function';
+requires 'cached_sense_function';
 
 cache sense_null_state => ( getter => 'sense_null_state_query' );
 
@@ -73,7 +73,7 @@ Lab::Moose::Instrument::SCPI::Sense::Null - Role for the HP/Agilent/Keysight SCP
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 METHODS
 

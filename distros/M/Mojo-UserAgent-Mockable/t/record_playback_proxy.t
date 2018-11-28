@@ -1,4 +1,4 @@
-use 5.016;
+use 5.014;
 
 # Test MUA::Mockable behavior with CONNECT proxies. Heavily based on 
 # https://metacpan.org/source/SRI/Mojolicious-7.26/t/mojo/websocket_proxy_tls.t

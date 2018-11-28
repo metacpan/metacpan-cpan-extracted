@@ -1,3 +1,19 @@
+0.07 2018-11-27
+    * Fix broken code generation
+    * The requests worked but the generated code did not
+
+0.06 2018-11-26
+    * Add support for --cookie option. This option doesn't read from a file
+      though, but only supports literal cookies.
+    * Ignore --dump-header, document ignored options
+    * Tests for some other options
+
+0.05 2018-11-23
+    * Fix -XPOST and other option-bundling commands
+
+0.04 2018-11-20
+    * Test stability, fix test count when skipping, no need to upgrade
+
 0.03 2018-11-19
     * Fix prerequisite versions, C<< ->getoptionsfromarray() >> was introduced
       in Getopt::Long 2.39

@@ -6,6 +6,26 @@
 #include <stdio.h>
 #include <Imlib2.h>
 
+static
+char *validate_input(int *w, int *h, const char *src_path, const char *dst_path)
+{
+    char *error_msg;
+	
+	if (w <= 0)
+		 error_msg = "Ithumb::XS error: invalid value of width";
+
+	if (h <= 0)
+		error_msg = "Ithumb::XS error: invalid value of height";
+
+	if (src_path[0] == '\0')
+		error_msg = "Ithumb::XS error: invalid value of source path";
+
+	if (dst_path[0] == '\0')
+		error_msg = "Ithumb::XS error: invalid value of destination path";
+
+    return error_msg;
+}
+
 MODULE = Ithumb::XS		PACKAGE = Ithumb::XS
 
 int
@@ -20,8 +40,10 @@ create_thumbnail(src_path, w, h, dst_path)
 	CODE:
 	{
 
-	 if (w <= 0 || h <= 0)
-		 Perl_croak(aTHX_ "Ithumb::XS value error: invalid width or height");
+     char *validate_error = validate_input(&w, &h, src_path, dst_path);
+
+	 if (validate_error[0] != '\0')
+		 Perl_croak(aTHX_ "%s", validate_error);
 	 
 	 float aspect;
 	 int width=0, height=0, crop_x = 0, crop_y = 0, new_width = 0, new_height = 0;

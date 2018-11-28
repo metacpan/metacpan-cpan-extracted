@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::CheckList;
-$Config::Model::CheckList::VERSION = '2.127';
+$Config::Model::CheckList::VERSION = '2.128';
 use Mouse;
 use 5.010;
 
@@ -27,7 +27,8 @@ with "Config::Model::Role::Grab";
 with "Config::Model::Role::HelpAsText";
 with "Config::Model::Role::ComputeFunction";
 
-my $logger = get_logger("Tree::Element::CheckList");
+my $logger = get_logger("Tree.Element.CheckList");
+my $user_logger   = get_logger("User");
 
 my @introspect_params = qw/refer_to computed_refer_to/;
 
@@ -342,7 +343,7 @@ sub _store {
             Config::Model::Exception::WrongValue->throw( error => $err_str, object => $self );
         }
         elsif ($check eq 'skip') {
-            $logger->warn($err_str);
+            $user_logger->warn($err_str);
         }
     }
 
@@ -640,8 +641,13 @@ sub set_checked_list {
     my @changed;
 
     foreach my $c ( $self->get_choice ) {
-        my $v = $set{$c} // 0;
+        my $v = delete $set{$c} // 0;
         push @changed, "$c:$v" if $self->_store( $c, $v, $check );
+    }
+
+    # Items left in %set are unknown. _store will handle the error
+    foreach my $item (keys %set) {
+        $self->_store( $item, 1, $check );
     }
 
     $self->{ordered_data} = $list;
@@ -779,7 +785,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -1038,11 +1044,11 @@ example is admittedly convoluted):
 
 Returns C<check_list>.
 
-=head2 cargo_type()
+=head2 cargo_type
 
 Returns 'leaf'.
 
-=head2 check ( ... )
+=head2 check
 
 Set choice. Parameter is either a list of choices to set or 
 a list ref and some optional parameter. I.e:
@@ -1052,7 +1058,7 @@ a list ref and some optional parameter. I.e:
 C<check> parameter decide on behavior in case of invalid
 choice value: either die (if yes) or discard bad value (if skip)
 
-=head2 uncheck (...)
+=head2 uncheck
 
 Unset choice. Parameter is either a list of choices to unset or 
 a list ref and some optional parameter. I.e:
@@ -1062,7 +1068,9 @@ a list ref and some optional parameter. I.e:
 C<check> parameter decide on behavior in case of invalid
 choice value: either die (if yes) or discard bad value (if skip)
 
-=head2 is_checked( choice, [ check => yes|skip ] , [ mode => ... ])
+=head2 is_checked
+
+Parameters: C<< ( choice, [ check => yes|skip ] , [ mode => ... ]) >>
 
 Return 1 if the given C<choice> was set. Returns 0 otherwise.
 
@@ -1081,7 +1089,9 @@ or upstream default set of check.
 Returns an array of all items names that can be checked (i.e.
 that can have value 0 or 1).
 
-=head2 get_help (choice_value)
+=head2 get_help
+
+Parameters: C<(choice_value)>
 
 Return the help string on this choice value
 
@@ -1089,11 +1099,15 @@ Return the help string on this choice value
 
 Reset the check list (can also be called as C<clear_values>)
 
-=head2 clear_item (choice_value)
+=head2 clear_item
+
+Parameters: C<(choice_value)>
 
 Reset an element of the checklist.
 
-=head2 get_checked_list_as_hash ( [ custom | preset | standard | default ] )
+=head2 get_checked_list_as_hash
+
+Parameters: C<< ( [ custom | preset | standard | default ] ) >>
 
 Returns a hash (or a hash ref) of all items. The boolean value is the
 value of the hash.
@@ -1144,16 +1158,22 @@ by layered data or preset or default)
 
 =back
 
-=head2 get_checked_list ( < mode >  )
+=head2 get_checked_list
+
+Parameters: C<< ( < mode > ) >>
 
 Returns a list (or a list ref) of all checked items (i.e. all items
-set to 1). 
+set to 1).
 
-=head2 fetch ( < mode > )
+=head2 fetch
+
+Parameters: C<< ( < mode > ) >>
 
 Returns a string listing the checked items (i.e. "A,B,C")
 
-=head2 get( path  [, < mode> ] )
+=head2 get
+
+Parameters: C<< ( path  [, < mode> ] ) >>
 
 Get a value from a directory like path.
 
@@ -1179,7 +1199,7 @@ A wrong item is ignored
 
 =head2 set
 
-Parameters are: C<( path, items_to_set, [ check => [ yes | no | skip  ] ] )>
+Parameters: C<< ( path, items_to_set, [ check => [ yes | no | skip  ] ] ) >>
 
 Set a checklist with a directory like path. Since a checklist is a leaf, the path
 should be empty.
@@ -1250,15 +1270,21 @@ Example:
 
 All the methods below are valid only for ordered checklists.
 
-=head1 swap ( choice_a, choice_b)
+=head1 swap
+
+Parameters: C<< ( choice_a, choice_b) >>
 
 Swap the 2 given choice in the list. Both choice must be already set.
 
-=head1 move_up ( choice )
+=head1 move_up
+
+Parameters: C<< ( choice ) >>
 
 Move the choice up in the checklist.
 
-=head1 move_down ( choice )
+=head1 move_down
+
+Parameters: C<< ( choice ) >>
 
 Move the choice down in the checklist.
 

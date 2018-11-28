@@ -1,9 +1,6 @@
 #########################
 use Test::More tests => 9;
-#########################
-{
-unlink('__temp__.d64');
-}
+use File::Temp qw(tmpnam);
 #########################
 {
 package D64::MyLayout;
@@ -23,9 +20,10 @@ is(ref $diskLayoutObj, 'D64::MyLayout', 'new - create unformatted disk image lay
 }
 #########################
 {
+my $filename = tmpnam() . '.d64';
 my $diskLayoutObj = D64::MyLayout->new();
-my $saveOK = $diskLayoutObj->save_as('__temp__.d64');
-$diskLayoutObj = D64::MyLayout->new('__temp__.d64');
+my $saveOK = $diskLayoutObj->save_as($filename);
+$diskLayoutObj = D64::MyLayout->new($filename);
 my $sector_count = '';
 my $bytes_count = 0;
 my $num_tracks = $diskLayoutObj->num_tracks();
@@ -38,7 +36,7 @@ for (my $track = 1; $track <= $num_tracks; $track++) {
     }
 }
 is("$sector_count/$bytes_count", '33222/48', 'new - read disk image data from file');
-unlink('__temp__.d64');
+unlink($filename);
 }
 #########################
 {
@@ -85,7 +83,7 @@ is($sector_data, '$31$32$33$34', 'sector_data - write physical sector data into 
 #########################
 {
 my $diskLayoutObj = D64::MyLayout->new();
-my $filename = '__temp__.d64';
+my $filename = tmpnam() . '.d64';
 my $saveOK = $diskLayoutObj->save_as($filename);
 my $mtime_create = (stat($filename))[9];
 sleep 2;

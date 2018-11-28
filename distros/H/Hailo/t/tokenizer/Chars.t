@@ -1,11 +1,14 @@
-use 5.010;
+use v5.28.0;
 use utf8;
 use strict;
 use warnings;
 use Test::More tests => 2;
 use Hailo::Tokenizer::Chars;
 
-binmode $_, ':encoding(utf8)' for (*STDIN, *STDOUT, *STDERR);
+my $builder = Test::More->builder;
+binmode $builder->output,         ":encoding(utf8)";
+binmode $builder->failure_output, ":encoding(utf8)";
+binmode $builder->todo_output,    ":encoding(utf8)";
 
 my $toke = Hailo::Tokenizer::Chars->new();
 
@@ -31,9 +34,8 @@ subtest make_tokens => sub {
     my @random_chars = map { $chr[rand @chr] } 1 .. 30;
     my @wrd = qw<
                     Hailo is a fast and lightweight markov engine
-                    intended to replace AI::MegaHAL. It has a Mouse
-                    (or Moose) based core with pluggable storage and
-                    tokenizer backends.
+                    intended to replace AI::MegaHAL. It has pluggable
+                    storage and tokenizer backends.
                 >;
     my @random_words = map { $chr[rand @chr] } 1 .. 30;
 
@@ -64,9 +66,8 @@ subtest make_output => sub {
     my @random_chars = map { $chr[rand @chr] } 1 .. 30;
     my @wrd = qw<
                     Hailo is a fast and lightweight markov engine
-                    intended to replace AI::MegaHAL. It has a Mouse
-                    (or Moose) based core with pluggable storage and
-                    tokenizer backends.
+                    intended to replace AI::MegaHAL. It has pluggable
+                    storage and tokenizer backends.
                 >;
     my @random_words = map { $chr[rand @chr] } 1 .. 30;
 

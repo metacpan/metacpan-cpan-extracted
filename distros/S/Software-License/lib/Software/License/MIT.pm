@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::MIT;
-$Software::License::MIT::VERSION = '0.103013';
+$Software::License::MIT::VERSION = '0.103014';
 use parent 'Software::License';
 # ABSTRACT: The MIT (aka X11) License
 
@@ -9,6 +9,7 @@ sub name { 'The MIT (X11) License' }
 sub url  { 'http://www.opensource.org/licenses/mit-license.php' }
 sub meta_name  { 'mit' }
 sub meta2_name { 'mit' }
+sub spdx_expression  { 'MIT' }
 
 1;
 
@@ -22,7 +23,7 @@ Software::License::MIT - The MIT (aka X11) License
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 AUTHOR
 
@@ -30,7 +31,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

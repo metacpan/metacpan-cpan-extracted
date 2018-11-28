@@ -6,17 +6,17 @@ use FindBin qw($Bin);
 use lib "$Bin/../lib";
 use Test::More;
 
-use Mojo::File qw(path);
+use Mojo::File qw(path tempdir);
 use Mojo::IOLoop::Server;
 use Mojo::Server::Threaded;
 use Mojo::UserAgent;
 
-my $debug_level = $ARGV[0] || 'fatal';
-my $threaded = Mojo::Server::Threaded->new;
-
 # Manage and clean up PID file
-my $file = $threaded->pid_file;
-unlink($file) if -e $file;
+my $threaded = Mojo::Server::Threaded->new;
+my $dir     = tempdir;
+ok $threaded->pid_file, 'has default path';
+my $file = $dir->child('threaded.pid');
+$threaded->pid_file($file);
 ok !$threaded->check_pid, 'no process id';
 $threaded->ensure_pid_file(-23);
 ok -e $file, 'file exists';
@@ -34,7 +34,7 @@ ok !-e $file, 'file has been cleaned up';
 # Bad PID file
 my $bad = path(__FILE__)->sibling('does_not_exist', 'test.pid');
 $threaded = Mojo::Server::Threaded->new(pid_file => $bad);
-$threaded->app->log->level($debug_level);
+$threaded->app->log->level('debug')->unsubscribe('message');
 my $log = '';
 my $cb = $threaded->app->log->on(message => sub { $log .= pop });
 eval { $threaded->ensure_pid_file($$) };
@@ -47,7 +47,8 @@ $threaded->app->log->unsubscribe(message => $cb);
 my $port = Mojo::IOLoop::Server::->generate_port;
 $threaded = Mojo::Server::Threaded->new(
   heartbeat_interval => 2,
-  listen             => ["http://*:$port"]
+  listen             => ["http://*:$port"],
+  pid_file           => $file,
 );
 $threaded->unsubscribe('request');
 $threaded->on(
@@ -71,8 +72,9 @@ $threaded->on(
 );
 $threaded->on(reap => sub { push @reap, pop });
 $threaded->on(finish => sub { $graceful = pop });
+$threaded->app->log->level('debug')->unsubscribe('message');
 $log = '';
-$cb = $threaded->app->log->on(message => sub { $log .= pop });
+$cb  = $threaded->app->log->on(message => sub { $log .= pop });
 is $threaded->healthy, 0, 'no healthy workers';
 my @server;
 my $can_server = $threaded->app->can('server');
@@ -89,8 +91,7 @@ SKIP: {
 }
 is scalar @spawn, 4, 'four workers spawned';
 is scalar @reap,  4, 'four workers reaped';
-(my $wok) = grep { $worker eq $_ } @spawn;
-ok $wok, 'worker has a heartbeat';
+ok !!grep { $worker eq $_ } @spawn, 'worker has a heartbeat';
 ok $graceful, 'server has been stopped gracefully';
 is_deeply [sort @spawn], [sort @reap], 'same process ids';
 is $tx->res->code, 200,           'right status';
@@ -129,8 +130,6 @@ $threaded->on(
 );
 my $count = $tx = $graceful = undef;
 @spawn = @reap = ();
-$log = '';
-$cb = $threaded->app->log->on(message => sub { $log .= pop });
 $threaded->on(spawn => sub { push @spawn, pop });
 $threaded->once(
   heartbeat => sub {
@@ -140,7 +139,6 @@ $threaded->once(
 );
 $threaded->on(reap => sub { push @reap, pop });
 $threaded->on(finish => sub { $graceful = pop });
-
 $threaded->run;
 is $threaded->ioloop->max_accepts, 500, 'right value';
 is scalar @spawn, 1, 'one worker spawned';
@@ -150,4 +148,3 @@ is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'right content';
 
 done_testing();
-

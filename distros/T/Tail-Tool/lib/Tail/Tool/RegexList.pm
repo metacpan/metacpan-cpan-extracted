@@ -14,7 +14,7 @@ use version;
 use English qw/ -no_match_vars /;
 use Tail::Tool::Regex;
 
-our $VERSION = version->new('0.4.7');
+our $VERSION = version->new('0.4.8');
 
 subtype 'ArrayRefRegex'
     => as 'ArrayRef[Tail::Tool::Regex]';
@@ -107,7 +107,7 @@ Tail::Tool::RegexList - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Tail::Tool::RegexList version 0.4.7.
+This documentation refers to Tail::Tool::RegexList version 0.4.8.
 
 
 =head1 SYNOPSIS

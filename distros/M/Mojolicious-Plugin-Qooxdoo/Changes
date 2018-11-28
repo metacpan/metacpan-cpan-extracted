@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Pugin::Qooxdoo
 
+1.0.0 2018-11-26
+  - add support for Mojo::Promise responses
+  
 0.907 2018-05-01
   - fixed placeholder syntax to not use deprecated braces anymore
 

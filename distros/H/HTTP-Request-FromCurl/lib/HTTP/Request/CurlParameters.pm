@@ -13,7 +13,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -44,6 +44,15 @@ has uri => (
 );
 
 has headers => (
+    is => 'ro',
+    default => sub { {} },
+);
+
+has cookie_jar => (
+    is => 'ro',
+);
+
+has cookie_jar_options => (
     is => 'ro',
     default => sub { {} },
 );
@@ -164,9 +173,25 @@ sub _fill_snippet( $self, $snippet ) {
     $snippet
 }
 
+sub _init_cookie_jar( $self ) {
+    if( my $fn = $self->cookie_jar ) {
+        my $save = $self->cookie_jar_options->{'write'};
+        return {
+            preamble => [
+                "use Path::Tiny;",
+                "use HTTP::CookieJar;",
+            ],
+            code => \"HTTP::CookieJar->new->load_cookies(path('$fn')->lines),",
+            postamble => [
+                "path('$fn')->spew(\$ua->cookie_jar->dump_cookies())",
+            ],
+        };
+    }
+}
+
 sub _pairlist( $self, $l, $prefix = "    " ) {
     return join ",\n",
-        pairmap { qq{$prefix'$a' => '$b'} } @$l
+        pairmap { my $v = ref $b ? $$b : qq{'$b'}; qq{$prefix'$a' => $v} } @$l
 }
 
 sub _build_headers( $self, $prefix = "    " ) {
@@ -188,15 +213,26 @@ snippets from C<curl> examples.
 =cut
 
 sub as_snippet( $self, %options ) {
+    $options{ prefix } ||= '';
+
+    my @preamble;
+    push @preamble, @{ $options{ preamble } } if $options{ preamble };
+    
     my $request_args = join ", ",
                                  '$r',
                            $self->_pairlist([
                                maybe ':content_file', $self->output
                            ], '')
                        ;
+    my $init_cookie_jar = $self->_init_cookie_jar();
+    if( my $p = $init_cookie_jar->{preamble}) {
+        push @preamble, @{$p}
+    };
+
     my $constructor_args = join ",",
                            $self->_pairlist([
-                               maybe timeout => $self->timeout
+                               maybe timeout => $self->timeout,
+                               maybe cookie_jar => $init_cookie_jar->{code},
                            ], '')
                            ;
     my $setup_credentials = '';
@@ -206,7 +242,11 @@ sub as_snippet( $self, %options ) {
             quotemeta $user,
             quotemeta $pass;
     };
+
+    @preamble = map { "$options{prefix}    $_\n" } @preamble;
+
     return <<SNIPPET;
+@preamble
     my \$ua = WWW::Mechanize->new($constructor_args);$setup_credentials
     my \$r = HTTP::Request->new(
         '@{[$self->method]}' => '@{[$self->uri]}',

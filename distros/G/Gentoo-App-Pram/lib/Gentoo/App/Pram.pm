@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 package Gentoo::App::Pram;
 
-our $VERSION = '0.100200';
+our $VERSION = '0.200000';
 
 use warnings;
 use strict;
@@ -75,7 +75,19 @@ sub run {
     my $editor      = $self->{editor} || $ENV{EDITOR} || 'less';
 
     my $git_command = which('git') . ' am --keep-cr -S';
-    $self->{signoff} and $git_command = "$git_command -s";
+
+    # Automatically pass the Sign-Off option to the git am command if the
+    # repository is Gentoo.
+    if ($repo_name =~ /gentoo\/gentoo/) {
+        $git_command = "$git_command -s";
+    }
+
+    # But don't add the option again if the -s option is passed to pram.
+    if ($self->{signoff}) {
+        if ($repo_name !~ /gentoo\/gentoo/) {
+            $git_command = "$git_command -s";
+        }
+    }
 
     my $patch_url   = "https://patch-diff.githubusercontent.com/raw/$repo_name/pull/$pr_number.patch";
     $self->{pr_url} = "https://github.com/$repo_name/pull/$pr_number";
@@ -253,13 +265,13 @@ The bot then automatically closes the bug report. See GLEP 0066 for more info.
 =item * apply_patch($editor, $git_command, $patch)
 
 Apply $patch onto HEAD of the current git repository using $git_command. This
-functions also shows $patch in $editor for a final review.
+function also shows $patch in $editor for a final review.
 
 =back
 
 =head1 VERSION
 
-version 0.100200
+version 0.200000
 
 =head1 COPYRIGHT AND LICENSE
 

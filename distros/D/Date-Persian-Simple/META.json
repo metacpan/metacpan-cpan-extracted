@@ -36,7 +36,7 @@
             "Date::Utils" : "0.24",
             "Moo" : "2.000000",
             "Time::localtime" : "1.02",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -44,7 +44,7 @@
    "provides" : {
       "Date::Persian::Simple" : {
          "file" : "lib/Date/Persian/Simple.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/manwar/Date-Persian-Simple"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

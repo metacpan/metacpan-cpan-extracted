@@ -455,6 +455,7 @@ quick & easy scripts, to the foundations of building larger frameworks.
             \$out,
         ) or die $tt->error;
 
+        $res->headers([ 'Content-Type' => 'text/html' ]);
         $res->body( $out );
         $res->finalize;
     };

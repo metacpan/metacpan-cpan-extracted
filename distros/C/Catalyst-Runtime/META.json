@@ -96,6 +96,7 @@
             "Plack::Test::ExternalServer" : "0",
             "Safe::Isa" : "0",
             "Scalar::Util" : "0",
+            "Socket" : "1.96",
             "Stream::Buffered" : "0",
             "String::RewritePrefix" : "0.004",
             "Sub::Exporter" : "0",
@@ -139,7 +140,7 @@
       "x_IRC" : "irc://irc.perl.org/#catalyst",
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst"
    },
-   "version" : "5.90122",
+   "version" : "5.90123",
    "x_authority" : "cpan:MSTROUT",
    "x_breaks" : {
       "Catalyst::Action::REST" : "<= 0.67",

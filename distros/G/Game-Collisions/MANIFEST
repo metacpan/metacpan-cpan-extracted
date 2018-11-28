@@ -9,6 +9,7 @@ TODO
 dist.ini
 lib/Game/Collisions.pm
 lib/Game/Collisions/AABB.pm
+lib/Game/Collisions/UserData.pm
 nytprof.out
 'nytprof/(eval 1)[Time-HiRes-pm-33]-10-line.html'
 'nytprof/(eval 2)[List-Util-pm-20]-14-line.html'
@@ -74,3 +75,5 @@ t/230_rotate_suggest.t
 t/300_remove.t
 t/310_remove_prune.t
 t/320_remove_branch_error.t
+t/330_move_user_data.t
+t/340_root.t

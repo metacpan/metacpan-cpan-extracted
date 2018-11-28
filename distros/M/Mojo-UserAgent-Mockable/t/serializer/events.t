@@ -4,14 +4,14 @@ use Test::Most;
 use Mojo::JSON;
 use Mojo::UserAgent::Mockable::Serializer;
 use Mojo::UserAgent;
-use Mojolicious::Quick;
 
-my $app = Mojolicious::Quick->new(
-    [   '/foo' => sub {
-            shift->render( text => 'OK' );
-        }
-    ]
-);
+package TestApp {
+    use Mojolicious::Lite;
+    get '/foo' => sub {
+        shift->render( text => 'OK' );
+    };
+};
+my $app = TestApp::app;
 
 my $serializer = Mojo::UserAgent::Mockable::Serializer->new;
 my $tx = $app->ua->get('/foo');

@@ -46,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-instopt
   homepage: https://metacpan.org/release/App-instopt
   repository: git://github.com/perlancar/perl-App-instopt.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

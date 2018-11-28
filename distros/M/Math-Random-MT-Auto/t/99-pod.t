@@ -55,7 +55,7 @@ SKIP: {
     }
     set_spell_cmd('aspell list --lang=en');
     add_stopwords(<DATA>);
-    pod_file_spelling_ok('lib/Math/Random/MT/Auto.pm', 'MRAM POD spelling');
+    pod_file_spelling_ok('lib/Math/Random/MT/Auto.pm', 'MRMA POD spelling');
     pod_file_spelling_ok('lib/Math/Random/MT/Auto/Range.pm', 'MRMA::Range POD spelling');
     unlink("/home/$ENV{'USER'}/en.prepl", "/home/$ENV{'USER'}/en.pws");
 }
@@ -67,6 +67,7 @@ __DATA__
 Cokus's
 FreeBSD
 Hedden
+Cokus
 HotBits
 MSWin32
 Makoto
@@ -107,4 +108,5 @@ Arg
 PRNG's
 subclasses
 
+MetaCPAN
 __END__

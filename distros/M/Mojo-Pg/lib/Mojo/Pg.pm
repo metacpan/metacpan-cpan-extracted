@@ -34,7 +34,7 @@ has options         => sub {
 has [qw(password username)] => '';
 has pubsub => sub { Mojo::Pg::PubSub->new(pg => shift) };
 
-our $VERSION = '4.11';
+our $VERSION = '4.12';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -51,7 +51,7 @@ sub from_string {
     unless $url->protocol =~ /^postgres(?:ql)?$/;
 
   # Connection information
-  my $db = $url->path->parts->[0];
+  my $db  = $url->path->parts->[0];
   my $dsn = defined $db ? "dbi:Pg:dbname=$db" : 'dbi:Pg:';
   if (my $host = $url->host) { $dsn .= ";host=$host" }
   if (my $port = $url->port) { $dsn .= ";port=$port" }

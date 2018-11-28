@@ -17,6 +17,7 @@ my $builder = Module::Build->new(
     test_files         => [ 't/recordstore.t',
                             't/silo.t',
                             't/transactions.t',
+                            't/upgrade.t',
                         ],
     requires => {
         'perl'       => 'v5.9.4',

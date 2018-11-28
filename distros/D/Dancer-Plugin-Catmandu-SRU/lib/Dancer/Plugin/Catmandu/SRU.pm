@@ -6,22 +6,23 @@ Dancer::Plugin::Catmandu::SRU - SRU server backed by a searchable Catmandu::Stor
 
 =cut
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0503';
 
 use Catmandu::Sane;
-use Dancer::Plugin;
-use Dancer qw(:syntax);
 use Catmandu;
-use Catmandu::Util qw(:all);
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
 use SRU::Request;
 use SRU::Response;
+use Dancer qw(:syntax);
+use Dancer::Plugin;
 
 sub sru_provider {
     my ($path) = @_;
 
     my $setting = plugin_setting;
+
+    my $content_type = $setting->{content_type} // 'text/xml';
 
     my $default_record_schema = $setting->{default_record_schema};
 
@@ -78,7 +79,7 @@ sub sru_provider {
     $config_info .= qq(</configInfo>);
 
     get $path => sub {
-        content_type 'xml';
+        content_type $content_type;
 
         my $params = params('query');
         my $operation = $params->{operation} // 'explain';
@@ -89,7 +90,7 @@ sub sru_provider {
 
             my $transport   = request->scheme;
             my $database    = substr request->path, 1;
-            my $uri         = request->uri_for( request->path_info() );
+            my $uri         = request->uri_for(request->path_info);
             my $host        = $uri->host;
             my $port        = $uri->port;
             $response->record(SRU::Response::Record->new(
@@ -294,7 +295,7 @@ With the Catmandu configuration files in place records can be imported with the 
 
 =head1 DANCER CONFIGURATION
 
-The Dancer configuration file 'config.yml' contains basic information for the OAI-PMH plugin to work:
+The Dancer configuration file 'config.yml' contains basic information for the Catmandu::SRU plugin to work:
 
     * store - In which Catmandu::Store are the metadata records stored
     * bag   - In which Catmandu::Bag are the records of this 'store' (use: 'data' as default)
@@ -307,7 +308,8 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
         * name - A short descriptive name for the schema
         * fix - Optionally an array of fixes to apply to the records before they are transformed into XML
         * template - The path to a Template Toolkit file to transform your records into this format
-    * template_options - An optional hash of configuration options that will be passed to L<Catmandu::Exporter::Template> or L<Template>.
+    * template_options - An optional hash of configuration options that will be passed to L<Catmandu::Exporter::Template> or L<Template>
+    * content_type - Set a custom content type header, the default is 'text/xml'.
 
 Below is a sample minimal configuration for the 'sample.yml' demo above:
 

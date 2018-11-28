@@ -179,7 +179,7 @@ sub create_field
 
 
 # Ensure correct versioning
-($Object::InsideOut::VERSION eq '4.04')
+($Object::InsideOut::VERSION eq '4.05')
     or die("Version mismatch\n");
 
 # EOF

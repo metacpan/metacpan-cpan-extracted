@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VISA::VXI11;
-$Lab::Moose::Connection::VISA::VXI11::VERSION = '3.664';
+$Lab::Moose::Connection::VISA::VXI11::VERSION = '3.670';
 #ABSTRACT: VXI-11 frontend to National Instruments' VISA library.
 
 
@@ -48,7 +48,7 @@ Lab::Moose::Connection::VISA::VXI11 - VXI-11 frontend to National Instruments' V
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 SYNOPSIS
 

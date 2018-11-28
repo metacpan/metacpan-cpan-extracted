@@ -10,7 +10,7 @@ use Mojo::URL;
 use Scalar::Util 'weaken';
 use SQL::Abstract;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 has abstract        => sub { SQL::Abstract->new(quote_char => chr(96), name_sep => '.') };
 has auto_migrate    => 0;
@@ -487,6 +487,10 @@ diagnostics information printed to C<STDERR> by L<DBI>.
   DBI_TRACE=15
   DBI_TRACE=15=dbitrace.log
   DBI_TRACE=SQL
+  DBI_PROFILE=2
+
+See also L<https://metacpan.org/pod/DBI#DBI_TRACE> and
+L<https://metacpan.org/pod/DBI#DBI_PROFILE>.
 
 =head1 REFERENCE
 

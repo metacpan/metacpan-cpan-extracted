@@ -2,8 +2,8 @@
 
 package Test::Rinci;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.150'; # VERSION
+our $DATE = '2018-11-22'; # DATE
+our $VERSION = '0.152'; # VERSION
 
 use 5.010001;
 use strict;
@@ -136,6 +136,7 @@ sub metadata_in_module_ok {
     my $res;
     my $ok = 1;
 
+    $opts{load}                    //= 1;
     $opts{test_package_metadata}   //= 1;
     $opts{exclude_packages}        //= [];
     $opts{test_function_metadata}  //= 1;
@@ -147,8 +148,10 @@ sub metadata_in_module_ok {
 
     my $has_tests;
 
-    my $modulep = $module; $modulep =~ s!::!/!g; $modulep .= ".pm";
-    require $modulep;
+    if ($opts{load}) {
+        my $modulep = $module; $modulep =~ s!::!/!g; $modulep .= ".pm";
+        require $modulep;
+    }
 
     $Test->subtest(
         $msg,
@@ -325,7 +328,7 @@ Test::Rinci - Test Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.150 of Test::Rinci (from Perl distribution Test-Rinci), released on 2018-09-10.
+This document describes version 0.152 of Test::Rinci (from Perl distribution Test-Rinci), released on 2018-11-22.
 
 =head1 SYNOPSIS
 
@@ -369,6 +372,11 @@ metadata, a wrapping to the function is done to see if it can be wrapped.
 Available options:
 
 =over 4
+
+=item * load => BOOL (default: 1)
+
+Set to false if you do not want to load the module, e.g. if you want to test
+metadata in C<main> package or if you have already loaded the module yourself.
 
 =item * test_package_metadata => BOOL (default: 1)
 
@@ -436,6 +444,9 @@ feature.
 =head1 SEE ALSO
 
 L<test-rinci>, a command-line interface for C<metadata_in_all_modules_ok()>.
+
+L<Test::Rinci::CmdLine> and L<test-rinci-cmdline> to test metadata inside
+L<Perinci::CmdLine> scripts.
 
 L<Rinci>
 

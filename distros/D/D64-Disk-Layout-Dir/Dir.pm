@@ -81,7 +81,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use D64::Disk::Dir::Item qw(:types);
 use D64::Disk::Layout::Sector;
@@ -1349,11 +1349,11 @@ Pawel Krol, E<lt>pawelkrol@cpan.orgE<gt>.
 
 =head1 VERSION
 
-Version 0.02 (2013-03-24)
+Version 0.03 (2018-11-24)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013 by Pawel Krol E<lt>pawelkrol@cpan.orgE<gt>.
+Copyright 2013, 2018 by Pawel Krol E<lt>pawelkrol@cpan.orgE<gt>.
 
 This library is free open source software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.6 or, at your option, any later version of Perl 5 you may have available.
 

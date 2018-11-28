@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::GitCommit;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: turns the task repo into a git repository
-$Taskwarrior::Kusarigama::Plugin::GitCommit::VERSION = '0.10.0';
+$Taskwarrior::Kusarigama::Plugin::GitCommit::VERSION = '0.11.0';
 
 use strict;
 use warnings;
@@ -54,7 +54,7 @@ Taskwarrior::Kusarigama::Plugin::GitCommit - turns the task repo into a git repo
 
 =head1 VERSION
 
-version 0.10.0
+version 0.11.0
 
 =head1 DESCRIPTION
 

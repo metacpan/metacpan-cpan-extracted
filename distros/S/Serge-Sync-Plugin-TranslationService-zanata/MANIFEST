@@ -7,5 +7,4 @@ META.yml
 Makefile.PL
 lib/Serge/Sync/Plugin/TranslationService/zanata.pm
 t/00-compile.t
-t/default.t
 xt/author/critic.t

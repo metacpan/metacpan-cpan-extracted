@@ -14,7 +14,7 @@ use Scalar::Util qw/openhandle/;
 use English qw/ -no_match_vars /;
 use AnyEvent;
 
-our $VERSION = version->new('0.4.7');
+our $VERSION = version->new('0.4.8');
 
 has name => (
     is            => 'rw',
@@ -281,7 +281,7 @@ Tail::Tool::File - Looks after individual files
 
 =head1 VERSION
 
-This documentation refers to Tail::Tool::File version 0.4.7.
+This documentation refers to Tail::Tool::File version 0.4.8.
 
 =head1 SYNOPSIS
 

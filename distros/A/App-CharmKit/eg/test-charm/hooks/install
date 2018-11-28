@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+
+use charm;
+use Data::Dumper;
+
+my $docker = plugin 'docker', { version => 7 };
+
+print Dumper($docker->version);
+
+print Dumper($docker->is_installed());
+
+print Dumper(sh('ls -l /tmp | wc -l'));

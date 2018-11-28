@@ -128,13 +128,13 @@ sub execute {
     if ( $opt->{tp} ) {
         @t_files = File::Find::Rule->file->name(qr{\.fa\[.+\]$})->in( $args->[0] );
     }
-    else {
+    if (!scalar @t_files) {
         @t_files = File::Find::Rule->file->name('*.fa')->in( $args->[0] );
     }
     if ( $opt->{qp} ) {
         @q_files = File::Find::Rule->file->name(qr{\.fa\[.+\]$})->in( $args->[1] );
     }
-    else {
+    if (!scalar @q_files) {
         @q_files = File::Find::Rule->file->name('*.fa')->in( $args->[1] );
     }
     printf STDERR "* T files: [%d]; Q files: [%d]\n", scalar @t_files, scalar @q_files;

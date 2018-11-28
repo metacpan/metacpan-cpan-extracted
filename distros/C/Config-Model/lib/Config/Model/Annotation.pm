@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Annotation;
-$Config::Model::Annotation::VERSION = '2.127';
+$Config::Model::Annotation::VERSION = '2.128';
 use Mouse;
 use English;
 use Mouse::Util::TypeConstraints;
@@ -163,7 +163,7 @@ Config::Model::Annotation - Read and write configuration annotations
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -252,11 +252,11 @@ object.
 
 =head1 METHODS
 
-=head2 save()
+=head2 save
 
 Save annotations in a file (See L<DESCRIPTION>)
 
-=head2 load()
+=head2 load
 
 Loads annotations from a file (See L<DESCRIPTION>)
 

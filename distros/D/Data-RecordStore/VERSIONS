@@ -1,3 +1,6 @@
+4.04 - update the convert program to call a module rather than have the logic
+       just in the program.
+
 4.03 - fix too agressive db format upgrading.
 
 4.02 - Setup upgrade test in temporary directory rather than test directory. (duh)

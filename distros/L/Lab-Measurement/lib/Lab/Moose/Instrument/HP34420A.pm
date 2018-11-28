@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34420A;
-$Lab::Moose::Instrument::HP34420A::VERSION = '3.664';
+$Lab::Moose::Instrument::HP34420A::VERSION = '3.670';
 #ABSTRACT: HP 34420A nanovolt meter.
 
 # So far only one channel. Could add support for two channels
@@ -71,7 +71,7 @@ Lab::Moose::Instrument::HP34420A - HP 34420A nanovolt meter.
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 SYNOPSIS
 

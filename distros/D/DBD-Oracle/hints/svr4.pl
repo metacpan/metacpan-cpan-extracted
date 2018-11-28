@@ -8,7 +8,7 @@ my @libs = qw(-lsocket -lnsl -lm -ldl);	# general svr4 default
 
 # modified by Davide Migliavacca <davide.migliavacca@inferentia.it>
 if ($archname eq 'RM400-svr4') {
-	@libs = qw(-lucb);
+    @libs = qw(-lucb);
 }
 
 push @libs, '-lc';
@@ -31,19 +31,19 @@ Content-Type: TEXT/PLAIN; charset=US-ASCII
 
 On Fri, 18 Aug 1995, Tim Bunce wrote:
 > > From: Alan Burlison <aburlison@cix.compulink.co.uk>
-> > 
+> >
 > > Tim,
-> > 
-> > The following hints file is required for DBD::Oracle on svr4, you might 
+> >
+> > The following hints file is required for DBD::Oracle on svr4, you might
 > > like to add it to the next release :-)
-> > 
+> >
 > > File: Oracle/hints/svr4.pl
-> > 
+> >
 > > # Some SVR4 systems may need to link against -lc to pick up things like
 > > $att{LIBS} = [ '-lsocket -lnsl -lm -ldl -lc' ];
 >
 > Umm, 'some', 'may', 'things like'. Care to clarify?
-> 
+>
 > Why _exactly_ is this needed, and why doesn't MakeMaker do this already?
 > (CC'd to the MakeMaker mailing list.)
 
@@ -56,21 +56,21 @@ That looks like a bad editing of the ODBM_File/hints/svr4.pl:
 $att{LIBS} = ['-ldbm -lucb -lc'];
 ###################################################################
 
-"Some" includes Unisys 6000 (or something like that).  I don't know 
-if it includes anything else.  It doesn't include Unixware 2.1, but it 
+"Some" includes Unisys 6000 (or something like that).  I don't know
+if it includes anything else.  It doesn't include Unixware 2.1, but it
 might include Esix.  It's *really* hard to get accurate info.
 
-"May" because some do and some don't, and any listing gets out of date 
-quickly as vendors issue different versions, and probably more than 
-half the info you *do* get about specific versions is wrong.  Hence all 
+"May" because some do and some don't, and any listing gets out of date
+quickly as vendors issue different versions, and probably more than
+half the info you *do* get about specific versions is wrong.  Hence all
 the vague weasel-words.
 
-"Things like" is ecvt() for Unisys (for ODBM_File).  Since some linkers 
-only report the first missing symbol, it's sometimes hard (and 
+"Things like" is ecvt() for Unisys (for ODBM_File).  Since some linkers
+only report the first missing symbol, it's sometimes hard (and
 sometimes pointless) to get a complete list of things that you need).
 
-Basically, there are *many* SVR4-derived systems out there, and there are 
-many little idiosyncracies; the best bet is to put someone else's name 
+Basically, there are *many* SVR4-derived systems out there, and there are
+many little idiosyncracies; the best bet is to put someone else's name
 and email address in the hint file so you can blame them :-).
 
     Andy Dougherty		doughera@lafcol.lafayette.edu
@@ -79,25 +79,25 @@ and email address in the hint file so you can blame them :-).
 From: Tye McQueen <tye@metronet.com>
 Subject: Re: [MM] Re: hints file for Oracle
 Date: Fri, 18 Aug 1995 16:01:39 -0500 (CDT)
-Cc: aburlison@cix.compulink.co.uk, perldb-interest@vix.com, 
+Cc: aburlison@cix.compulink.co.uk, perldb-interest@vix.com,
     makemaker@franz.ww.tu-berlin.de
 
 Excerpts from the mail message of Tim Bunce:
 ) > From: Alan Burlison <aburlison@cix.compulink.co.uk>
-) > 
-) > The following hints file is required for DBD::Oracle on svr4, you might 
+) >
+) > The following hints file is required for DBD::Oracle on svr4, you might
 ) > like to add it to the next release :-)
-) > 
+) >
 ) > File: Oracle/hints/svr4.pl
-) > 
+) >
 ) > # Some SVR4 systems may need to link against -lc to pick up things like
 ) > $att{LIBS} = [ '-lsocket -lnsl -lm -ldl -lc' ];
 )
 ) Umm, 'some', 'may', 'things like'. Care to clarify?
-) 
+)
 ) Why _exactly_ is this needed, and why doesn't MakeMaker do this already?
 ) (CC'd to the MakeMaker mailing list.)
-) 
+)
 ) Is anyone else using DBD::Oracle on an svr4 system (not solaris 2)?
 
 That looks like something I wrote.  I'll take credit and blame
@@ -119,7 +119,7 @@ of it hurting anything yet (and I've tested it on my machines).
 I'm putting together a README.svr4 for Perl that will describe this
 and many other things in case people are curious or run into a
 problem and need to know why some of the strange things were done.
--- 
+--
 Tye McQueen                 tye@metronet.com  ||  tye@doober.usu.edu
              Nothing is obvious unless you are overlooking something
        http://www.metronet.com/~tye/ (scripts, links, nothing fancy)

@@ -1,5 +1,28 @@
 Revision history for Perl extension Archive::ByteBoozer.
 
+0.10  2018-11-26
+    - For an unknown reason BSD-like systems export some "inline" functions
+      into a target object file but leave symbols undefined, which results
+      in a failure while loading a shared library: "ByteBoozer.so: undefined
+      symbol 'outLen'". This is how it had manifested itself after compiling
+      the package on an OpenBSD system:
+
+      $ nm -g cruncher.o | grep outLen
+                       U outLen
+
+      In order to address the problem every "inline" function defined by the
+      cruncher code has been explicitly declared as "static". Static functions
+      leave no trace in a target object file allowing to successfully load
+      a shared library.
+    - fix XS interface compilation warnings, e.g. "pointer targets in passing
+      argument 2 of 'Perl_newSVpv' differ in signedness"
+    - fix XS interface compilation warnings, e.g. "warning: unused variable
+      'RETVAL'" (when using a PPCODE section no manipulation of the RETVAL
+      variable is required, the section may use direct stack manipulation to
+      place output values on the stack)
+    - commented out two params check tests failing due to Params::Validate's
+      bug report RT#127811: "validate" crashes on a closed IO::Scalar object
+
 0.09  2016-04-01
     - rebuilt a distribution package to include missing files "META.yml" and
       "META.json"

@@ -1,3 +1,25 @@
+0.73 - improved error message for misparsed files attribute lists (odd
+       number of arguments for HPCI::File now lists those arguments so
+	   that you can track down which config file elements needs to be
+	   adjusted)
+
+0.72 - new files for 0.71 weren't added to the MANIFEST, fixing now
+
+0.71 - added support for subgroup (collection of stages that can be used
+       in dependency relationships
+	 - made Super, Sub and SuperSub roles to contains attributes and methods
+	   common to two or more of Group, Subgroup, and Stage
+	 - stage names now contain the parent subgroup names, so there can be
+	   stages in different subgroups that have the same name.  This makes
+	   is possible to easily create a subgroup for a pipeline without
+	   having to give unique names to all of the stages that might be
+	   created in any other pipeline (or multiple copies of the same pipeline)
+	   that might be in the same job
+	 - added pre_req and dep handlers to stage and subgroup methods
+	   this usually makes it unnecessary to use a separate add_deps call
+	 - renamed the skipstage file directive to skip (since it can be used
+	   to skip subgroups as well)
+
 0.70 - fixed bug in handling multiple out-req files from the same stage
 
 0.69 - converted rename files directive to use new HPCI::File methods

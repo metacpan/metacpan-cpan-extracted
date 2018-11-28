@@ -57,11 +57,15 @@ my %module = (
         'MIME::Base64'          => 0,
     },
     TEST_REQUIRES => {
-        'Test::More'    => 0,
-        'Data::Dumper'  => 0,
-        'Capture::Tiny' => 0,
-        'WWW::Mechanize' => 0,
-        'LWP::UserAgent' => 0,
+        'Test::More'              => 0,
+        'Data::Dumper'            => 0,
+        'Capture::Tiny'           => 0,
+        'Path::Tiny'              => 0,
+        'WWW::Mechanize'          => 0,
+        'LWP::UserAgent'          => 0,
+        #'HTTP::Cookies::Netscape' => 0, # this can't cope with the Netscape cookie files that curl writes :(
+        'HTTP::CookieJar'         => 0, # this one doesn't have an adapter to save/load at all :(
+        'HTTP::CookieJar::LWP'    => 0, # this one doesn't have an adapter to save/load at all :(
         'Test::HTTP::LocalServer' => 0.61, # we want the improved IPC
     },
 

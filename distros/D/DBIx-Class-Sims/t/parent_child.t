@@ -93,6 +93,26 @@ sims_test "Connect parent/child by object in relationship" => {
   rv => sub { { Album => shift->{expect}{Album} } },
 };
 
+sims_test "Connect parent/child by object in column" => {
+  load_sims => sub {
+    my ($schema) = @_;
+    my $rv = $schema->load_sims({
+      Artist => [ map { { name => "foo$_" } } 1..4 ],
+    });
+
+    return $schema->load_sims({
+      Album => { name => 'bar1', artist_id => $rv->{Artist}[2] },
+    });
+  },
+  expect => {
+    Artist => [ map { { id => $_, name => "foo$_" } } 1..4 ],
+    Album  => [
+      { id => 1, name => 'bar1', artist_id => 3 },
+    ],
+  },
+  rv => sub { { Album => shift->{expect}{Album} } },
+};
+
 sims_test "Autogenerate a parent with a name" => {
   spec => {
     Album => [

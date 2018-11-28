@@ -1,0 +1,4 @@
+# $Id: Changes 66 2018-11-21 18:22:53Z stro $
+
+1.002 2018-11-21 Fixed prerequisites (damn you stupid [AutoPrereqs])
+1.001 2018-11-15 Initial release

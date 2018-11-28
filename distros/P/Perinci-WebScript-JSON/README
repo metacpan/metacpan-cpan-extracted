@@ -1,0 +1,66 @@
+NAME
+    Perinci::WebScript::JSON - From Rinci + function, Create Plack
+    application that returns JSON response
+
+VERSION
+    This document describes version 0.002 of Perinci::WebScript::JSON (from
+    Perl distribution Perinci-WebScript-JSON), released on 2018-11-22.
+
+SYNOPSIS
+    In My/App.pm:
+
+     package My::App;
+     use Encode::Simple;
+
+     our %SPEC;
+     $SPEC{uppercase} = {
+         v => 1.1,
+         args => {
+             input => {schema=>'str*', req=>1},
+         },
+         args_as => 'array',
+         result_naked => 1,
+     };
+     sub uppercase {
+         my ($input) = @_;
+         uc(decode 'UTF-8', $input);
+     }
+     1;
+
+    To run as CGI script, create app.cgi:
+
+     #!/usr/bin/env perl
+     use Perinci::WebScript::JSON;
+     Perinci::WebScript::JSON->new(url => '/My/App/uppercase')->run;
+
+    To run as FCGI script, create app.fcgi:
+
+     #!/usr/bin/env perl
+     use Perinci::WebScript::JSON;
+     Perinci::WebScript::JSON->new(url => '/My/App/uppercase')->run;
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-WebScript-JSON>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-WebScript-JSON>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-WebScript-JSO
+    N>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

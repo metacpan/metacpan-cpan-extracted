@@ -1,15 +1,11 @@
 package Hailo;
-BEGIN {
-  $Hailo::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Hailo::VERSION = '0.72';
-}
-
-use 5.010;
+our $AUTHORITY = 'cpan:AVAR';
+$Hailo::VERSION = '0.74';
+use v5.28.0;
 use autodie qw(open close);
-use Any::Moose;
-use Any::Moose 'X::StrictConstructor';
+use Moose;
+use MooseX::StrictConstructor;
+use MooseX::Types::Moose ':all';
 use File::Glob ':glob';
 use Class::Load qw(try_load_class);
 use Scalar::Util qw(blessed);
@@ -28,12 +24,12 @@ use constant PLUGINS => [ qw[
 ] ];
 
 has brain => (
-    isa => 'Str',
+    isa => Str,
     is  => 'rw',
 );
 
 has order => (
-    isa     => 'Int',
+    isa     => Int,
     is      => 'rw',
     default => 2,
     trigger => sub {
@@ -43,7 +39,7 @@ has order => (
 );
 
 has _custom_order => (
-    isa           => 'Bool',
+    isa           => Bool,
     is            => 'rw',
     default       => 0,
     init_arg      => undef,
@@ -51,7 +47,7 @@ has _custom_order => (
 );
 
 has _custom_tokenizer_class => (
-    isa           => 'Bool',
+    isa           => Bool,
     is            => 'rw',
     default       => 0,
     init_arg      => undef,
@@ -59,14 +55,14 @@ has _custom_tokenizer_class => (
 );
 
 has save_on_exit => (
-    isa     => 'Bool',
+    isa     => Bool,
     is      => 'rw',
     default => 1,
 );
 
 has brain_resource => (
     documentation => "Alias for `brain' for backwards compatibility",
-    isa           => 'Str',
+    isa           => Str,
     is            => 'rw',
     trigger       => sub {
         my ($self, $brain) = @_;
@@ -109,7 +105,7 @@ for my $k (keys %has) {
 
     # working classes
     has "${k}_class" => (
-        isa           => 'Str',
+        isa           => Str,
         is            => "rw",
         default       => $default,
         ($k eq 'tokenizer'
@@ -123,7 +119,7 @@ for my $k (keys %has) {
     # Object arguments
     has "${k}_args" => (
         documentation => "Arguments for the $name class",
-        isa           => 'HashRef',
+        isa           => HashRef,
         is            => "ro",
         default       => sub { +{} },
     );
@@ -360,8 +356,8 @@ This is the synopsis for using Hailo as a module. See L<hailo> for
 command-line invocation.
 
     # Hailo requires Perl 5.10
-    use 5.010;
-    use Any::Moose;
+    use v5.28.0;
+    use Moose;
     use Hailo;
 
     # Construct a new in-memory Hailo using the SQLite backend. See
@@ -387,8 +383,7 @@ command-line invocation.
 =head1 DESCRIPTION
 
 Hailo is a fast and lightweight markov engine intended to replace
-L<AI::MegaHAL|AI::MegaHAL>. It has a L<Mouse|Mouse> (or
-L<Moose|Moose>) based core with pluggable
+L<AI::MegaHAL|AI::MegaHAL>. It has a pluggable
 L<storage|Hailo::Role::Storage>, L<tokenizer|Hailo::Role::Tokenizer>
 and L<engine|Hailo::Role::Engine> backends.
 

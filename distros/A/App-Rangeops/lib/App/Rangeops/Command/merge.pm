@@ -10,7 +10,9 @@ use MCE::Candy;
 use App::Rangeops -command;
 use App::Rangeops::Common;
 
-use constant abstract => 'merge overlapped ranges via overlapping graph';
+sub abstract {
+    return 'merge overlapped ranges via overlapping graph';
+}
 
 sub opt_spec {
     return (

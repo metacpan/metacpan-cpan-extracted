@@ -3,7 +3,7 @@ package CGI::Alternatives;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 1;
 
@@ -17,7 +17,7 @@ CGI::Alternatives - Documentation for alternative solutions to CGI.pm
 
 =head1 VERSION
 
-0.17
+0.18
 
 =head1 DESCRIPTION
 
@@ -462,6 +462,7 @@ quick & easy scripts, to the foundations of building larger frameworks.
             \$out,
         ) or die $tt->error;
 
+        $res->headers([ 'Content-Type' => 'text/html' ]);
         $res->body( $out );
         $res->finalize;
     };

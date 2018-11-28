@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -120,7 +120,7 @@ SUPPORTED QUERY PARAMS
 
  skip
 
-    In combination with top, this can be used for pageination.
+    In combination with top, this can be used for pagination.
 
         my $query_string = 'skip=5';
         my $opts = paras_to_dbic( $query_string );

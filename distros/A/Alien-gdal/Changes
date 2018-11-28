@@ -1,5 +1,8 @@
 Revision history for Alien::gdal
 
+1.13 2018-11-27
+    - Add Alien::geos::af as a dependency.  This gives us access to the GEOS library.
+    
 1.11 2018-11-09
     - No further changes from 1.10 dev releases
 

@@ -347,6 +347,8 @@ subtest 'plugin' => sub {
         read_schema => 1,
     } );
     $t->app->yancy->plugin( 'Test', { route => '/plugin', args => 1 } );
+    eval { $t->app->yancy->plugin( 'Notfound' ) };
+    like $@, qr/Could not find/, 'plugin not found = error';
     $t->get_ok( '/plugin' )
       ->status_is( 200 )
       ->json_is( [ { route => '/plugin', args => 1 } ] );
@@ -385,9 +387,11 @@ subtest 'schema' => sub {
             backend => $backend_url,
             read_schema => 1,
         });
-        is_deeply [ sort keys %{ $t->app->yancy->schema }],
-            [qw{ mojo_migrations people user }],
-            'schema() gets correct collections from read_schema';
+        my $collection_keys = [ sort keys %{ $t->app->yancy->schema } ];
+        is_deeply $collection_keys,
+            [qw{ blog mojo_migrations people user }],
+            'schema() gets correct collections from read_schema'
+            or diag explain $collection_keys;
     };
 
     subtest 'add schema' => sub {

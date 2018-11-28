@@ -1,6 +1,17 @@
 ExtUtils::F77 Changes list 
 --------------------------
 
+v1.21 released Nov 25th 2018
+-----------------------------
+
+* Adjust ordering of searched for Generic GNU compilers (Nov 2018)
+
+* Addition to pod format content (Nov 2018)
+
+* Use Text::ParseWords not naive split (mohawk2)
+
+* Modernize t/require.t (mohawk2)
+
 v1.20 released May 28th 2016
 ------------------------------
 

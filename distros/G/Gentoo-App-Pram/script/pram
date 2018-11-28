@@ -41,7 +41,7 @@ Github repository. Give it a try!
 pram <pull request number>
 
  --repository|r <repository> Set repository to fetch PR from.
- --signoff|-s                Pass --signoff option to git am.
+ --signoff|-s                Pass --signoff option to git am (default if GH repository is gentoo/gentoo).
  --editor|e     <editor>     Set editor to visualise patch in.
  --closes|c     <bug number> Add "Closes: https://bugs.gentoo.org/<bug number>" header to first commit.
  --bug|b        <bug number> Add "Bug: https://bugs.gentoo.org/<bug number>" header to first commit.
@@ -67,7 +67,7 @@ pram <pull request number>
 
 =head1 VERSION
 
-version 0.100200
+version 0.200000
 
 =head1 COPYRIGHT AND LICENSE
 

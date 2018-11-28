@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-10-18'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-11-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010;
 use strict;
@@ -46,7 +46,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.005 of instopt (from Perl distribution App-instopt), released on 2018-10-18.
+This document describes version 0.006 of instopt (from Perl distribution App-instopt), released on 2018-11-21.
 
 =head1 SYNOPSIS
 
@@ -416,6 +416,20 @@ See C<--no-download>.
 
 =back
 
+=head2 Options for subcommand update-all
+
+=over
+
+=item B<--no-download>
+
+=item B<-D>
+
+Shortcut for --no-download.
+
+See C<--no-download>.
+
+=back
+
 =head1 COMPLETION
 
 This script has shell tab completion capability with support for several
@@ -519,6 +533,8 @@ List of available configuration parameters:
  softwares_or_patterns (see --software-or-pattern)
 
 =head2 Configuration for subcommand update-all
+
+ download (see --no-download)
 
 =head1 ENVIRONMENT
 

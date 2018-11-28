@@ -1,7 +1,7 @@
 package File::Util::Tempdir;
 
-our $DATE = '2018-09-20'; # DATE
-our $VERSION = '0.033'; # VERSION
+our $DATE = '2018-09-22'; # DATE
+our $VERSION = '0.034'; # VERSION
 
 use strict;
 use warnings;
@@ -69,7 +69,7 @@ File::Util::Tempdir - Cross-platform way to get system-wide & user private tempo
 
 =head1 VERSION
 
-This document describes version 0.033 of File::Util::Tempdir (from Perl distribution File-Util-Tempdir), released on 2018-09-20.
+This document describes version 0.034 of File::Util::Tempdir (from Perl distribution File-Util-Tempdir), released on 2018-09-22.
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ This document describes version 0.033 of File::Util::Tempdir (from Perl distribu
 
  my $tmpdir = get_tempdir(); # => e.g. "/tmp"
 
- my $mytmpdir = get_tempdir(); # => e.g. "/run/user/1000", or "/tmp/1000"
+ my $mytmpdir = get_user_tempdir(); # => e.g. "/run/user/1000", or "/tmp/1000"
 
 =head1 DESCRIPTION
 

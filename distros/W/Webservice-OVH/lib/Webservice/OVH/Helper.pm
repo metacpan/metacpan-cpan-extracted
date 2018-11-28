@@ -44,22 +44,21 @@ sub construct_filter {
     my @values = values %params;
     my $filter = scalar @values ? '?' : "";
 
+    my $pairs = [];
+
     foreach my $param (@params) {
 
         my $value = $params{$param};
         next unless $value;
 
         $value = $value eq '_empty_' ? "" : $value;
+        push @$pairs, sprintf( "%s=%s", $param, $value );
 
-        if ( $filter ne '?' ) {
-
-            $filter .= '&';
-        }
-
-        $filter .= sprintf( "%s=%s", $param, $value );
     }
+    
+    my $str = join('&', @$pairs);
 
-    return $filter;
+    return $str ? "?" . $str : "";
 }
 
 =head2 construct_filter

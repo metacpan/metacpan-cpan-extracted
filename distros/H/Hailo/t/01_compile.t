@@ -1,4 +1,4 @@
-use 5.010;
+use v5.28.0;
 use strict;
 use warnings;
 use Class::Load 'try_load_class';

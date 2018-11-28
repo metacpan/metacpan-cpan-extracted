@@ -13,32 +13,30 @@ package plenigo::CustomersManager;
  my $activate_testing = 0;
  my $configuration = plenigo::Configuration->new(company_id => 'YOUR_COMPANY_ID, secret => 'YOUR_SECRET', staging => $activate_testing);
 
- # Instantiate access rights manager
+ # Instantiate customers manager
 
- my $access_rights = plenigo::AccessRightsManager->new(configuration => $configuration);
+ my $customers_manager = plenigo::CustomersManager->new(configuration => $configuration);
 
  # Register a new external customer
 
- my $customersManager = plenigo::CustomersManager->new(configuration => $configuration);
- my %customerDetails = $customersManager->registerCustomer('newuser@example.com', 'DE', '123456789', 'MALE', 'Mike', 'Miller', 0, 0);
+ my %customer_details = $customers_manager->registerCustomer('newuser@example.com', 'DE', '123456789', 'MALE', 'Mike', 'Miller', 0, 0);
 
  # Change email address of an exiting customer
 
- $customersManager->editCustomer('CUSTOMER_ID', 'newmail@example.com')
+ $customers_manager->editCustomer('CUSTOMER_ID', 'newmail@example.com')
 
 =head1 DESCRIPTION
 
- plenigo::CustomerManager provides functionality to manage customers.
+ plenigo::CustomersManager provides functionality to manage customers.
 
 =cut
 
 use Moo;
 use Carp qw(confess);
-use Carp::Always;
 use plenigo::Ex;
 use plenigo::RestClient;
 
-our $VERSION = '2.0003';
+our $VERSION = '2.0006';
 
 has configuration => (
     is       => 'ro',

@@ -1,8 +1,8 @@
 package Reddit::Client;
 
-our $VERSION = '1.2816';
+our $VERSION = '1.2817';
 # TODO: make ispost, iscomment and get_type static
-# 1.2816-documentation update
+# 1.2817-documentation update
 # 1.281 -morecomments get_collapsed args
 # 1.281 -get_collapsed can also return morecomments
 # 1.28  -get_links_by_id
@@ -1622,31 +1622,35 @@ Reddit::Client handles Oauth session management and HTTP communication with Redd
 
 =head1 OAUTH
 
-Reddit::Client uses Oauth to communicate with Reddit. To get Oauth keys, visit your apps page on Reddit, located at L<https://www.reddit.com/prefs/apps>, and create an app.
+Reddit::Client uses Oauth to communicate with Reddit. To get Oauth keys, visit your apps page on Reddit, located at L<https://www.reddit.com/prefs/apps>, and create an app. There are three types of apps available. Reddit::Client supports "script" and "web" type apps.
 
 =over
 
 =item Script apps
 
-Reddit::Client supports "script" and "web" type apps, but most users will want a "script"-type app. This is an app intended for personal use that uses a username and password to authenticate. The description and about url fields can be empty, and the redirect URI can be any valid address (script apps don't use them). Once created, you can give other users permission to run it by adding them in the "add developer" field. (They each use their own username and password to authenticate.)
+Most users will want a "script"-type app. This is an app intended for personal use that uses a username and password to authenticate. The I<description> and I<about url> fields can be empty, and the I<redirect URI> can be any valid URL (script apps don't use them). Once created, you can give other users permission to use it by adding them in the "add developer" field. (They each use their own username and password to authenticate.)
 
-Use the app's B<client id> and B<secret> along with your username and password to create a new Reddit::Client object.
+Use the app's client id and secret along with your username and password to create a L<new|https://metacpan.org/pod/Reddit::Client#new> Reddit::Client object.
 
 =item Web apps
 
-As of v1.20, Reddit::Client also supports "web" apps. These are apps that can take actions on behalf of any user that grants them permission. (If you have ever seen a permission screen for a Reddit app that says "SomeRedditApp wants your permission to...", that's a web type app.) While they are fully supported, there is not yet a setup guide, so getting one running is left as an exercise for the reader. You will need a web server (obviously), and you will need to generate a refresh token, which is a unique string that your app will use to authenticate instead of a username and password. You will probably want to store refresh tokens locally so that your app doesn't have to get a new one every time it runs.
+As of v1.20, Reddit::Client also supports "web" apps. These are apps that can take actions on behalf of any user that grants them permission. (If you have ever seen a permission screen for a Reddit app that says "SomeRedditApp wants your permission to...", that's a web app.)
 
-Documentation for the "web" app flow can be found at L<https://github.com/reddit-archive/reddit/wiki/OAuth2>.
+While they are fully supported, there is not yet a setup guide, so getting one running is left as an exercise for the reader. You will need a web server, which you will use to direct users to Reddit's authorization page, which will get the user's permission to do whatever the app has asked to do. It will then redirect the user back to the app's I<redirect URI>. This process generates a refresh token, which is a unique string that your app will use to authenticate instead of a username and password. You will probably want to store refresh tokens locally, otherwise you will have to get permission from the user every time the app runs.
+
+Documentation for the web app flow can be found at L<https://github.com/reddit-archive/reddit/wiki/OAuth2>.
 
 =back
 
 =head1 TERMINOLOGY
 
+Reddit's API is slightly inconsistent in its naming. To avoid confusion, this guide will always use the following terms in the following ways:
+
 =over
 
 =item fullname
 
-A thing's complete ID with prefix. Example: t1_3npkj4. Whe Reddit returns data, the fullname is usually found in the "name" field. The type of thing can be determined by the prefix; for example, "t1" for comments and "t3" for links.
+A thing's complete ID with prefix. Example: t1_3npkj4. Whe Reddit returns data, the fullname is usually found in the "name" field. The type of thing can be determined by the prefix; for example, t1 for comments and t3 for links.
 
 =item id
 
@@ -1656,7 +1660,7 @@ A thing's short ID without prefix. Example: 3npkj4. Seen in your address bar whe
 
 =head1 LISTINGS
 
-Methods that return lists of things can accept several optional parameters:
+Methods that return listings can accept several optional parameters:
 
 =over
 
@@ -1666,7 +1670,7 @@ C<before>: Fullname. Return results that occur before I<fullname> in the listing
 
 C<after>: Fullname. Return results that occur after I<fullname> in the listing.
 
-C<count>: Integer. Appears to be used by Reddit to number listings after the first page. Listings returned by the API are not numbered, so it does not seem to have a use in the API.
+C<count>: Integer. Appears to be used by the Reddit website to number listings after the first page. Listings returned by the API are not numbered, so it does not seem to have a use in the API.
 
 C<only>: The string "links" or "comments". Return only links or only comments. Only relevant to listings that could contain both.
 
@@ -1707,7 +1711,7 @@ C<ban_message>: The message sent to the banned user. (Markdown is allowed.)
 
 C<reason>: A short ban reason (100 characters max). On the website ban page, this matches the ban reason you would select from the dropdown menu. It is arbitrary: it doesn't have to match up with the reasons from the menu and can be blank. Only visible to moderators.
 
-C<note>: An optional note, 300 characters max. Only visible to moderators.
+C<note>: An optional note, 300 characters max. Only visible to moderators. Will be concatenated to the `reason` on the subreddit's ban page.
 
 =back
 
@@ -1965,9 +1969,9 @@ C<$comment_id> and C<$post_id> can be either fullnames or short IDs.
 
     Reddit::Client->get_refresh_token ( $code, $redirect_uri, $client_id, $secret, $user_agent )
 
-Get a permanent refresh token for use in Web-type apps. All arguments are required*. Returns the refresh token.
+Get a permanent refresh token for use in "web" apps. All arguments are required*. Returns the refresh token.
 
-This is best called in static context, just as it's written above (i.e. with C<<Reddit::Client->get_refresh_token>>, rather than by instantiating an RC object first.) The reason is that it's completely separate from every other program flow and you only create extra work for yourself by using an existing RC object. If you choose to use an existing RC object, you'll need to create it and then call C<get_token> with your new refresh_token as a parameter. (C<client_id> and C<secret> will need to be passed in either on object creation or when calling get_token.)
+This is best called in static context, just as it's written above, rather than by instantiating an RC object first. The reason is that it's completely separate from every other program flow and you only create extra work for yourself by using an existing RC object. If you choose to use an existing RC object, you'll need to create it and then call C<get_token> with your new refresh_token as a parameter. (C<client_id> and C<secret> will need to be passed in either on object creation or when calling get_token.)
 
 C<code> is the one-time use code returned by Reddit after a user authorizes your app. For an explanation of that and C<redirect_uri>, see the token retrieval code flow: L<https://github.com/reddit-archive/reddit/wiki/OAuth2#token-retrieval-code-flow>.
 

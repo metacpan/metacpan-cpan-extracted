@@ -10,6 +10,7 @@ use Carp;
 use Module::Load;
 use Module::Load::Conditional qw(can_load);
 use List::MoreUtils qw(uniq);
+use HPCI::Subgroup;
 
 our @extra_roles;
 
@@ -117,9 +118,10 @@ sub group {
 		}
 	}
 	_merge_hash( $use_args, $args );
-	my $clmod = "HPCD::${cluster}::Group";
-	load $clmod;
-	return $clmod->new($use_args);
+	my $clgmod = "HPCD::${cluster}::Group";
+	load $clgmod;
+
+	return $clgmod->new($use_args);
 }
 
 
@@ -135,11 +137,11 @@ sub _trigger_mkdir {
 
 =head1 VERSION
 
-Version 0.70
+Version 0.73
 
 =cut
 
-our $VERSION = '0.70';
+our $VERSION = '0.73';
 
 our $LocalConfigFound;
 

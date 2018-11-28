@@ -1,3 +1,11 @@
+0.43 2018-11-??
+-new feature: append() method serially constructs a URI from fragments of path,
+ query, and fragment (credit: merlyn)
+
+0.42 2018-11-21
+-bugfix: uri_split() forces stringification of input
+-behavior: URI::Fast::Test routines now automatically stringify and parse their parameters
+
 0.41 2018-08-15
 -bugfix: small memory leak in to_string when there is no authority section present
 -bugfix: to_string did not properly encode authority section in some cases

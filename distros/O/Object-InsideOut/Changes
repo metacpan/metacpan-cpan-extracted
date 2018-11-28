@@ -1,5 +1,8 @@
 Revision history for Perl extension Object::InsideOut.
 
+4.05 Tue Nov 27 03:42:46 2018
+	- Fix for non-threaded Perl
+
 4.04 Wed Mar  1 04:59:11 2017
 	- Fix for threads::shared < 0.96
 

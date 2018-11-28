@@ -2,7 +2,8 @@ use utf8;
 use ExtUtils::testlib;
 use Test2::V0;
 use URI::Split qw();
-use URI::Fast qw(uri_split);
+use URI::Fast qw(uri uri_split);
+use URI;
 
 my @uris = (
   '/foo/bar/baz',
@@ -18,10 +19,13 @@ my @uris = (
 
 # From URI::Split's test suite
 subtest 'equivalence' => sub{
-  is [uri_split('p')],           [U, U, 'p', U, U],          'p';
-  is [uri_split('p?q')],         [U, U, 'p', 'q', U],        'p?q';
-  is [uri_split('p?q/#f/?')],    [U, U, 'p', 'q/', 'f/?'],   'p?q/f/?';
-  is [uri_split('s://a/p?q#f')], ['s', 'a', '/p', 'q', 'f'], 's://a/p?qf';
+  is [uri_split('p')],                     [U, U, 'p', U, U],          'p';
+  is [uri_split('p?q')],                   [U, U, 'p', 'q', U],        'p?q';
+  is [uri_split('p?q/#f/?')],              [U, U, 'p', 'q/', 'f/?'],   'p?q/f/?';
+  is [uri_split('s://a/p?q#f')],           ['s', 'a', '/p', 'q', 'f'], 's://a/p?qf';
+  is [uri_split(undef)],                   [U, U, U, U, U],            '<undef>';
+  is [uri_split(URI->new('s://a/p?q#f'))], ['s', 'a', '/p', 'q', 'f'], '<URI>';
+  is [uri_split(uri('s://a/p?q#f'))],      ['s', 'a', '/p', 'q', 'f'], '<URI::Fast>';
 };
 
 # Ensure identical output to URI::Split

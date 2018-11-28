@@ -1,0 +1,10 @@
+lib/Mojolicious/Plugin/ZipBomb.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/basic.t
+share/42.zip
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

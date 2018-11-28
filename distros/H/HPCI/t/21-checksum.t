@@ -20,8 +20,8 @@ chomp($dir_path);
 
 -d 'scratch' or mkdir 'scratch';
 
-my $in  = "scratch/CHECKSUM_IN";
-my $out = "scratch/CHECKSUM_OUT";
+my $in   = "scratch/CHECKSUM_IN";
+my $out  = "scratch/CHECKSUM_OUT";
 my $out2 = "scratch/CHECKSUM_OUT2";
 
 sub clean {
@@ -50,11 +50,11 @@ sub run_test {
 
     my $ret = $group->execute();
 
-    return $ret;
+    return (values(%$ret))[0][0]{exit_status};
 }
 
 my $name = 'inTestNoSum';
-my $ret = run_test(
+my $stat = run_test(
     name    => $name,
     command => "exit 0",
     files   => {
@@ -66,10 +66,10 @@ my $ret = run_test(
     }
 );
 
-like ($ret->{$name}[0]{exit_status}, qr(one or more required input files), "stage ($name) should fail because no sum file present");
+like ($stat, qr(one or more required input files), "stage ($name) should fail because no sum file present");
 
 $name = 'inTestCreateSum';
-$ret = run_test(
+$stat = run_test(
     name    => $name,
     command => "exit 0",
     files   => {
@@ -81,11 +81,11 @@ $ret = run_test(
     }
 );
 
-is ($ret->{$name}[0]{exit_status}, 0, "stage ($name) should run");
+is ($stat, 0, "stage ($name) should run");
 ok ( -e "$in.sum", "  ... and the in file sum file should have been created" );
 
 $name = 'outTestCreateSum';
-$ret = run_test(
+$stat = run_test(
     name    => $name,
     command => "cp $in $out",
     files   => {
@@ -102,12 +102,12 @@ $ret = run_test(
     }
 );
 
-is ($ret->{$name}[0]{exit_status}, 0, "stage ($name) should run");
+is ($stat, 0, "stage ($name) should run");
 ok ( -e "$out.sum", "  ... and the out file sum file should have been created" );
 is (qx(cat "$in.sum"), qx(cat "$out.sum" ), "  ... and the checksums should be the same" );
 
 $name = 'outTestCreate2Sum';
-$ret = run_test(
+$stat = run_test(
     name    => $name,
     command => "cp $in $out; cp $in $out2",
     files   => {
@@ -118,20 +118,20 @@ $ret = run_test(
         },
         out => {
             req => [
-                [ $out, sum=>1, ],
+                [ $out,  sum=>1, ],
                 [ $out2, sum=>1, ],
             ],
         },
     }
 );
 
-is ($ret->{$name}[0]{exit_status}, 0, "stage ($name) should run");
+is ($stat, 0, "stage ($name) should run");
 ok ( -e "$out.sum", "  ... and the out file sum file should have been created" );
 is (qx(cat "$in.sum"), qx(cat "$out.sum" ), "  ... and the checksums should be the same" );
 ok ( -e "$out2.sum", "  ... and the out2 file sum file should have been created" );
 is (qx(cat "$in.sum"), qx(cat "$out2.sum" ), "  ... and the checksums should be the same" );
 
 done_testing();
-# clean;
+clean;
 
 1;

@@ -132,26 +132,26 @@ rangeops filter  links.connect.tsv      -o links.filter.tsv      -r 0.8
 rangeops create links.filter.tsv    -o multi.temp.fas       -g genome.fa
 fasops   refine multi.temp.fas      -o multi.refine.fas     --msa mafft -p 8 --chop 10
 fasops   links  multi.refine.fas    -o stdout \
-    | rangeops sort stdin -o links.refine.tsv
+    | jrange sort stdin -o links.refine.tsv
 
 fasops   links  multi.refine.fas    -o stdout     --best \
-    | rangeops sort stdin -o links.best.tsv
+    | jrange sort stdin -o links.best.tsv
 rangeops create links.best.tsv      -o pair.temp.fas    -g genome.fa
 fasops   refine pair.temp.fas       -o pair.refine.fas  --msa mafft -p 8
 
 cat links.refine.tsv \
     | perl -nla -F"\t" -e 'print for @F' \
-    | runlist cover stdin -o cover.yml
+    | jrunlist cover stdin -o cover.yml
 
 echo "* Stats of links"
 echo "key,count" > links.count.csv
-for n in 2 3 4 5-50; do
+for n in 2 3 4-50; do
     rangeops filter links.refine.tsv -n ${n} -o stdout \
         > links.copy${n}.tsv
 
     cat links.copy${n}.tsv \
         | perl -nla -F"\t" -e 'print for @F' \
-        | runlist cover stdin -o copy${n}.yml
+        | jrunlist cover stdin -o copy${n}.yml
 
     wc -l links.copy${n}.tsv \
         | perl -nl -e '
@@ -165,7 +165,7 @@ for n in 2 3 4 5-50; do
     rm links.copy${n}.tsv
 done
 
-runlist merge copy2.yml copy3.yml copy4.yml copy5-50.yml -o copy.all.yml
+runlist merge copy2.yml copy3.yml copy4-50.yml -o copy.all.yml
 runlist stat --size chr.sizes copy.all.yml --mk --all -o links.copy.csv
 
 fasops mergecsv links.copy.csv links.count.csv --concat -o copy.csv

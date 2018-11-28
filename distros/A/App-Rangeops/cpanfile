@@ -8,7 +8,7 @@ requires 'List::MoreUtils', '0.413';
 requires 'MCE',             '1.708';
 requires 'Path::Tiny',      '0.076';
 requires 'YAML::Syck',      '1.29';
-requires 'perl',            '5.010001';
+requires 'perl',            '5.018001';
 
 on test => sub {
     requires 'Test::More', 0.88;

@@ -1,6 +1,6 @@
 package Date::Persian::Simple;
 
-$Date::Persian::Simple::VERSION   = '0.19';
+$Date::Persian::Simple::VERSION   = '0.20';
 $Date::Persian::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Persian::Simple - Represents Persian date.
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
@@ -20,7 +20,7 @@ use POSIX qw/floor ceil/;
 use Date::Calc qw/Delta_Days/;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 

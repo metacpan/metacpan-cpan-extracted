@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::ShellVar;
-$Config::Model::Backend::ShellVar::VERSION = '2.127';
+$Config::Model::Backend::ShellVar::VERSION = '2.128';
 use Carp;
 use Mouse;
 use Config::Model::Exception;
@@ -104,7 +104,9 @@ sub write {
 
     if (@to_write) {
         my $res = $self->write_global_comment( '#' );
-        map { $res .= $self->write_data_and_comments( '#', @$_ ); } @to_write;
+        foreach my $line_ref (@to_write) {
+            $res .= $self->write_data_and_comments( '#', @$line_ref );
+        }
         $args{file_path}->spew_utf8($res);
     }
 
@@ -130,7 +132,7 @@ Config::Model::Backend::ShellVar - Read and write config as a C<SHELLVAR> data s
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -181,7 +183,9 @@ contains C<'a','b'>.
 
 =head1 CONSTRUCTOR
 
-=head2 new ( node => $node_obj, name => 'shellvar' ) ;
+=head2 new
+
+Parameters: C<< ( node => $node_obj, name => 'shellvar' ) >>
 
 Inherited from L<Config::Model::Backend::Any>. The constructor is
 called by L<Config::Model::BackendMgr>.
@@ -191,14 +195,14 @@ called by L<Config::Model::BackendMgr>.
 Of all parameters passed to this read call-back, only C<file_path> is
 used.
 
-When a file is read, C<read()> returns 1.
+When a file is read, C<read> returns 1.
 
 =head2 write
 
 Of all parameters passed to this write call-back, only C<file_path> is
 used.
 
-C<write()> returns 1.
+C<write> returns 1.
 
 =head1 AUTHOR
 

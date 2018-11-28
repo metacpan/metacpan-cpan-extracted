@@ -4,7 +4,7 @@ Tail::Tool::Config - Description of the configuration of Tail::Tool
 
 =head1 VERSION
 
-This documentation refers to Tail::Tool::Config version 0.4.7
+This documentation refers to Tail::Tool::Config version 0.4.8
 
 =head1 DESCRIPTION
 

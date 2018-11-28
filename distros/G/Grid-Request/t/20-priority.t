@@ -20,7 +20,7 @@ my $req = Grid::Request::Test->get_test_request();
 # Get the configured temporary directory
 my $drm = $req->_config()->val($Grid::Request::HTC::config_section, "drm");
 
-if ($drm ne "SGE") {
+if (uc($drm) ne "SGE") {
    plan skip_all => "Test written for SGE. The 'drm' is set to another grid type: $drm.";
 }  else {
     my $qacct = which("qacct");

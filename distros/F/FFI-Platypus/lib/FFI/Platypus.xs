@@ -39,8 +39,6 @@ void *cast1(void *value)
 XS(ffi_pl_sub_call)
 {
   ffi_pl_function *self;
-  char *buffer;
-  size_t buffer_size;
   int i,n, perl_arg_index;
   SV *arg;
   ffi_pl_result result;
@@ -53,7 +51,9 @@ XS(ffi_pl_sub_call)
   self = (ffi_pl_function*) CvXSUBANY(cv).any_ptr;
 
 #define EXTRA_ARGS 0
+  {
 #include "ffi_platypus_call.h"
+  }
 }
 
 MODULE = FFI::Platypus PACKAGE = FFI::Platypus
@@ -97,7 +97,7 @@ int
 _have_type(name)
     const char *name
   CODE:
-    RETVAL = !strcmp(name, "string") || ffi_pl_name_to_type(name) != NULL;
+    RETVAL = !strcmp(name, "string") || ffi_pl_name_to_code(name) != -1;
   OUTPUT:
     RETVAL
 
@@ -106,7 +106,8 @@ CLONE(...)
   CODE:
     MY_CXT_CLONE;
 
-INCLUDE: ../../xs/dl.xs
+INCLUDE: ../../xs/DL.xs
+INCLUDE: ../../xs/Internal.xs
 INCLUDE: ../../xs/Type.xs
 INCLUDE: ../../xs/Function.xs
 INCLUDE: ../../xs/Declare.xs

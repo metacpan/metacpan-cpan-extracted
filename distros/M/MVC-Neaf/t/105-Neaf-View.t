@@ -41,6 +41,11 @@ sub is_json {
     my ($got, $exp, $note) = @_;
 
     is( $got->[1], 'application/json; charset=utf-8', "json ctype" );
-    return is_deeply( decode_json( $got->[0] ), $exp, $note );
+
+    my $struct = eval { decode_json( $got->[0] ) };
+    if (!is_deeply( $struct, $exp, $note )) {
+        diag "JSON not decoded: $got->[0]";
+        diag "Error was: $@";
+    };
 };
 

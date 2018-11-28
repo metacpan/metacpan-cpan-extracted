@@ -40,63 +40,63 @@ sub defaults {
     my ( $sf, $section, $key ) = @_;
     my $defaults = {
         G => {
-            plugins              => [ 'SQLite', 'mysql', 'Pg' ],
-            menu_memory          => 0,
-            thsd_sep             => ',', ###
-            max_rows             => 50_000,
-            meta                 => 0,
+            alias                => 0,
+            create_table_ok      => 0,
+            delete_ok            => 0,
+            drop_table_ok        => 0,
+            file_find_warnings   => 0,
+            insert_ok            => 0,
             lock_stmt            => 0,
+            max_rows             => 200_000,
+            menu_memory          => 0,
+            meta                 => 0,
             operators            => [ "REGEXP", "REGEXP_i", " = ", " != ", " < ", " > ", "IS NULL", "IS NOT NULL" ],
+            parentheses          => 0,
+            plugins              => [ 'SQLite', 'mysql', 'Pg' ],
+            qualified_table_name => 0,
+            quote_identifiers    => 1,
             subqueries_select    => 0,
             subqueries_set       => 0,
-            subqueries_w_h       => 0,
             subqueries_table     => 0,
-            alias                => 0,
-            parentheses          => 0,
-            quote_identifiers    => 1,
-            qualified_table_name => 0,
-            insert_ok            => 0,
+            subqueries_w_h       => 0,
+            thsd_sep             => ',', ###
             update_ok            => 0,
-            delete_ok            => 0,
-            create_table_ok       => 0,
-            drop_table_ok        => 0,
+
         },
         table => {
-            table_expand         => 1,
-            mouse                => 0,
-            keep_header          => 0,
-            progress_bar         => 40_000,
-            min_col_width        => 30,
-            tab_width            => 2,
-            grid                 => 0,
-            squash_spaces        => 1,
-            undef                => '',
-            binary_string        => 'BNRY',
             binary_filter        => 0,
+            binary_string        => 'BNRY',
+            codepage_mapping     => 0, # not an option, always 0
+            color                => 0,
+            grid                 => 0,
+            keep_header          => 0,
+            min_col_width        => 30,
+            mouse                => 0,
+            progress_bar         => 40_000,
+            squash_spaces        => 0,
+            tab_width            => 2,
+            table_expand         => 1,
+            undef                => '',
         },
         insert => {
-            #input_modes          => [ 'Cols', 'Rows', 'Multi-row', 'File' ],
-            #files_dir            => undef,
-            file_encoding        => 'UTF-8',
-            max_files            => 15,
-            file_parse_mode      => 0,
             copy_parse_mode      => 1,
+            file_encoding        => 'UTF-8',
+            file_parse_mode      => 0,
+            #files_dir            => undef,
+            #input_modes          => [ 'Cols', 'Rows', 'Multi-row', 'File' ],
+            max_files            => 15,
         },
         create => {
             auto_inc_col_name    => 'Id',
             default_data_type    => 'TEXT',
         },
         split => {
-            i_r_s                => '\n',
             i_f_s                => ',',
+            i_r_s                => '\n',
             trim_leading         => '\s+',
             trim_trailing        => '\s+',
         },
         csv => {
-            sep_char             => ',',
-            quote_char           => '"',
-            escape_char          => '"',
-            eol                  => '',
             allow_loose_escapes  => 0,
             allow_loose_quotes   => 0,
             allow_whitespace     => 0,
@@ -104,6 +104,10 @@ sub defaults {
             blank_is_undef       => 1,
             binary               => 1,
             empty_is_undef       => 0,
+            eol                  => '',
+            escape_char          => '"',
+            quote_char           => '"',
+            sep_char             => ',',
         }
     };
     return $defaults                   if ! $section;
@@ -283,7 +287,7 @@ sub __menus {
             { name => 'mouse',         text => "- Mouse Mode",  section => 'table' },
         ],
         config_sql => [
-            { name => 'max_rows',           text => "- Auto Limit",   section => 'G' },
+            { name => 'max_rows',           text => "- Max Rows",     section => 'G' },
             { name => 'lock_stmt',          text => "- Lock Mode",    section => 'G' },
             { name => 'meta',               text => "- Metadata",     section => 'G' },
             { name => 'operators',          text => "- Operators",    section => 'G' },
@@ -294,14 +298,16 @@ sub __menus {
             { name => 'parentheses',        text => "- Parentheses",  section => 'G' },
         ],
         config_output => [
-            { name => 'min_col_width', text => "- Colwidth",      section => 'table' },
-            { name => 'progress_bar',  text => "- ProgressBar",   section => 'table' },
-            { name => 'tab_width',     text => "- Tabwidth",      section => 'table' },
-            { name => 'grid',          text => "- Grid",          section => 'table' },
-            { name => 'keep_header',   text => "- Keep Header",   section => 'table' },
-            { name => 'undef',         text => "- Undef",         section => 'table' },
-            { name => 'binary_filter', text => "- Binary filter", section => 'table' },
-            { name => 'squash_spaces', text => "- Squash spaces", section => 'table' },
+            { name => 'min_col_width',      text => "- Colwidth",      section => 'table' },
+            { name => 'progress_bar',       text => "- ProgressBar",   section => 'table' },
+            { name => 'tab_width',          text => "- Tabwidth",      section => 'table' },
+            { name => 'grid',               text => "- Grid",          section => 'table' },
+            { name => 'color',              text => "- Color",         section => 'table' },
+            { name => 'keep_header',        text => "- Keep Header",   section => 'table' },
+            { name => 'undef',              text => "- Undef",         section => 'table' },
+            { name => 'binary_filter',      text => "- Binary filter", section => 'table' },
+            { name => 'squash_spaces',      text => "- Squash spaces", section => 'table' },
+            { name => 'file_find_warnings', text => "- Warnings",      section => 'G' },
         ],
     };
     return $menus->{$group};
@@ -431,6 +437,12 @@ sub set_options {
                 my $sub_menu = [ [ $opt, "  Keep header", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
+            elsif ( $opt eq 'color' ) {
+                my $prompt = '"Enable ANSI color escapes"';
+                my $list = [ 'NO', 'YES' ];
+                my $sub_menu = [ [ $opt, "  ANSI color escapes", $list ] ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
             elsif ( $opt eq 'binary_filter' ) {
                 my $prompt = 'Print "BNRY" instead of binary data';
                 my $list = [ 'NO', 'YES' ];
@@ -460,9 +472,15 @@ sub set_options {
                 my $prompt = 'Threshold ProgressBar: ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
+            elsif ( $opt eq 'file_find_warnings' ) {
+                my $prompt = '"SQLite database search"';
+                my $list = [ 'NO', 'YES' ];
+                my $sub_menu = [ [ $opt, "Enable \"File::Find\" warnings", $list ] ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
             elsif ( $opt eq 'max_rows' ) {
                 my $digits = 7;
-                my $prompt = 'Max rows: ';
+                my $prompt = 'SQL auto LIMIT: ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq 'lock_stmt' ) {

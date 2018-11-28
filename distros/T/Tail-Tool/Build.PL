@@ -36,7 +36,7 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'Test::More'     => '0.88',
-        'Test::Warnings' => 0,
+        'Test::Warnings' => '0.026',
         'Test::Output'   => 0,
     },
     recommends => {

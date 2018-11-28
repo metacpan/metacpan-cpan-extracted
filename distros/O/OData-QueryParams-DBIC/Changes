@@ -1,6 +1,10 @@
 Change history for OData::QueryParams::DBIC
 ===========================================
 
+0.04 2018-11-24 20:09:00
+
+    do not return a list of columns when no select is given
+
 0.03 2018-11-01 19:59:00
 
     accept a Mojo::Parameters object

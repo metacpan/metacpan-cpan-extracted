@@ -4,7 +4,7 @@ use Carp;
 
 package Software::LicenseUtils;
 # ABSTRACT: little useful bits of code for licensey things
-$Software::LicenseUtils::VERSION = '0.103013';
+$Software::LicenseUtils::VERSION = '0.103014';
 use File::Spec;
 use IO::Dir;
 use Module::Load;
@@ -54,6 +54,7 @@ my @phrases = (
 my %meta_keys  = ();
 my %meta1_keys = ();
 my %meta2_keys = ();
+my %spdx_expression  = ();
 
 # find all known Software::License::* modules and get identification data
 #
@@ -77,6 +78,9 @@ for my $lib (map { "$_/Software/License" } @INC) {
       $meta1_keys{ $class->meta_name  }{$mod} = undef;
       $meta_keys{  $class->meta2_name }{$mod} = undef;
       $meta2_keys{ $class->meta2_name }{$mod} = undef;
+      if (defined $class->spdx_expression) {
+        $spdx_expression{  $class->spdx_expression   }{$class} = undef;
+      }
       my $name = $class->name;
       unshift @phrases, qr/\Q$name\E/, [$mod];
       if ((my $name_without_space = $name) =~ s/\s+\(.+?\)//) {
@@ -221,6 +225,36 @@ sub new_from_short_name {
   return $lic_class->new( $arg );
 }
 
+#pod =method new_from_spdx_expression
+#pod
+#pod   my $license_object = Software::LicenseUtils->new_from_spdx_expression( {
+#pod      spdx_expression => 'MPL-2.0',
+#pod      holder => 'X. Ample'
+#pod   }) ;
+#pod
+#pod Create a new L<Software::License> object from the license specified
+#pod with C<spdx_expression>. Some licenses doesn't have an spdx
+#pod identifier (for example L<Software::License::Perl_5>), so you can pass
+#pod spdx identifier but also expressions.
+#pod Known spdx license identifiers are C<BSD>, C<MPL-1.0>.
+#pod
+#pod =cut
+
+sub new_from_spdx_expression {
+  my ( $class, $arg ) = @_;
+
+  Carp::croak "no license spdx name specified"
+    unless defined $arg->{spdx_expression};
+  my $spdx = delete $arg->{spdx_expression};
+  Carp::croak "Unknow license with spdx name $spdx"
+    unless $spdx_expression{$spdx};
+
+  my ($lic_file) = my ($lic_class) = keys %{$spdx_expression{$spdx}} ;
+  $lic_file =~ s!::!/!g;
+  require "$lic_file.pm";
+  return $lic_class->new( $arg );
+}
+
 1;
 
 __END__
@@ -235,7 +269,7 @@ Software::LicenseUtils - little useful bits of code for licensey things
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 METHODS
 
@@ -276,13 +310,26 @@ Create a new L<Software::License> object from the license specified
 with C<short_name>. Known short license names are C<GPL-*>, C<LGPL-*> ,
 C<Artistic> and C<Artistic-*>
 
+=head2 new_from_spdx_expression
+
+  my $license_object = Software::LicenseUtils->new_from_spdx_expression( {
+     spdx_expression => 'MPL-2.0',
+     holder => 'X. Ample'
+  }) ;
+
+Create a new L<Software::License> object from the license specified
+with C<spdx_expression>. Some licenses doesn't have an spdx
+identifier (for example L<Software::License::Perl_5>), so you can pass
+spdx identifier but also expressions.
+Known spdx license identifiers are C<BSD>, C<MPL-1.0>.
+
 =head1 AUTHOR
 
 Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

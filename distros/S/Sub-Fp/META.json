@@ -22,7 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Exporter" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
@@ -32,11 +34,16 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "List::Util" : "0",
+            "POSIX" : "0",
+            "Test::Class" : "0",
+            "Test::More" : "0",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.21",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

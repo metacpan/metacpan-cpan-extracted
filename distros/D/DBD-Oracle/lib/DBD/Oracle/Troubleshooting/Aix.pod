@@ -13,9 +13,9 @@ DBD::Oracle::Troubleshooting::Aix - Tips and Hints to Troubleshoot DBD::Oracle o
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
-=head1 Using Visual Age 7 C Compiler 
+=head1 Using Visual Age 7 C Compiler
 
 Oracle 9i is only certified as a 64-bit application on AIX 5L (5.1,5.2,5.3) with 32-bit support;
 in other words, there is no 9i "32-bit" Oracle client
@@ -24,12 +24,12 @@ Oracle 10g is certified as both a 64-bit application and a 32-bit Oracle client
 
 This information only pertains to deploying:
 
-	the DBI (version 1.48)
-	and DBD-Oracle (version 1.16):
-        on AIX 5.3
-        using Oracle 9i (9.2.0.1/9.2.0.5)
-        using the existing Perl 5.8.2 (no custom-built Perl) which is 32-bit
-        using Visual Age 7.0 C/C++ compiler
+    the DBI (version 1.48)
+    and DBD-Oracle (version 1.16):
+    on AIX 5.3
+    using Oracle 9i (9.2.0.1/9.2.0.5)
+    using the existing Perl 5.8.2 (no custom-built Perl) which is 32-bit
+    using Visual Age 7.0 C/C++ compiler
 
 Install the DBI (required for the DBD-Oracle install - no issues here)
 Untar the DBD-Oracle bundle
@@ -53,13 +53,13 @@ I've tested the basics of the DBD-Oracle and it seems fully functional.
 
 Stephen de Vries
 
-=head1 Using gcc C Compiler 
+=head1 Using gcc C Compiler
 
     DBD::Oracle with gcc and Oracle Instant Client on AIX
-    --------------------------------------------------------------------------------------	
+    --------------------------------------------------------------------------------------
     Nathan Vonnahme     Dec 15 2005, 4:28 pm   Newsgroups: perl.dbi.users
     See:  http://groups.google.com/group/perl.dbi.users/msg/0bd9097f80f2c8a9
-    [ with updates 1/31/2006 - DBD::Oracle 1.17 doesn't need makefile hacking 
+    [ with updates 1/31/2006 - DBD::Oracle 1.17 doesn't need makefile hacking
     to work with instantclient on AIX ]
 
 
@@ -88,11 +88,11 @@ Stephen de Vries
     Oracle wasn't providing the sqlplus package for 32 bit AIX so I
     explicitly told Makefile.PL the version:
 
-    perl Makefile.PL -V 10.1 
+    perl Makefile.PL -V 10.1
 
     make
 
-    My test databases were on other machines so I set these environment variables 
+    My test databases were on other machines so I set these environment variables
     to get the tests to run:
 
     export ORACLE_DSN=DBI:Oracle://host/dbinstance
@@ -102,11 +102,11 @@ Stephen de Vries
     make install
 
 
-    NOTE:  I have an older full version of Oracle on this machine, and the 
-    ORACLE_HOME environment variable is normally set to point to that, so 
+    NOTE:  I have an older full version of Oracle on this machine, and the
+    ORACLE_HOME environment variable is normally set to point to that, so
     my perl scripts that use DBD::Oracle have to make sure to first set
     $ENV{ORACLE_HOME}='/usr/local/oracle/instantclient';
-    
+
 
 
 
@@ -132,9 +132,9 @@ Stephen de Vries
     This setup worked with 8.1.7 w/32 bit support, and with 9.2.0 w/ 32-bit support.
     --Adrian Terranova
 
-=head1 Using xlc_r C Compiler 
+=head1 Using xlc_r C Compiler
 
-    From: Rafael Caceres 
+    From: Rafael Caceres
     Date: 22 Jul 2003 10:05:20 -0500
 
     The following sequence worked for me on AIX 5.1:
@@ -144,12 +144,12 @@ Stephen de Vries
     -use the xlc_r version of IBM's compiler and build a 32 bit Perl
     (which xlc_r will do by default). All tests should be successful.
 
-    -get and install DBI 
+    -get and install DBI
 
     -get DBD::Oracle. Edit the Makefile.PL or Makefile for DBD::Oracle,
     changing references to Oracle's ../lib to ../lib32. and change crt0_64.o
     to crt0_r.o. Remove the -q32 and/or -q64 options from the list of
-    libraries to link with. Do the make and make test. 
+    libraries to link with. Do the make and make test.
 
     -Set up the environment for making DBD::Oracle:
         ORACLE_HOME="your oracle home"
@@ -157,7 +157,7 @@ Stephen de Vries
         ORACLE_USERID..
         ORACLE_SID ..
 
-    -Run make, all tests should be successfull -against Oracle 9.x at least.
+    -Run make, all tests should be successful -against Oracle 9.x at least.
 
     You should have no problems with Oracle 8.1.7, but accessing Oracle 7.x
     or previous is not possible (you'll core dump, or simply hang). The same
@@ -168,40 +168,40 @@ Stephen de Vries
 
     > I don't believe I compiled Oracle.  During the installation it was linked
     > but I am not sure it was compiled
-    > 
+    >
     > I used a xlc compiler to compile PERL.
     > Got this message in the Perl Makefile.PL output
-    > 
+    >
     > Warning: You will may need to rebuild perl using the xlc_r compiler.
     >          You may also need do: ORACCENV='cc=xlc_r'; export ORACCENV
     >          Also see the README about the -p option
-    > 
+    >
     > this probably means I need to rebuild PERL with xlc_r??
-    > 
+    >
     > thanx
-    > 
+    >
     > Mike Paladino
     > Database Administrator
 
 
-    From: Rafael Caceres                                                                                  
-    > 
+    From: Rafael Caceres
+    >
     > Make sure you use the same compiler to build Oracle and Perl. We have
     > used xlc_r on Aix 5.1 with no problems. Your Perl build is 32 bit, so
     > when building DBD::Oracle, you should use the 32bit libraries (change
     > references to .../oracle/lib to .../oracle/lib32 in your Makefile).
     > Remove the references to the -q64 or -q32 parameters for ld in Makefile,
     > as they shouldn't be there.
-    > 
+    >
     > Rafael Caceres
 
 
-    From: "cartman ltd" 
+    From: "cartman ltd"
     Subject: Tip for DBI and DBD::Oracle on AIX 5.1 and Oracle 9.2
     Date: Mon, 11 Aug 2003 18:15:38 +0000
     Message-ID: <BAY1-F58Temqpg2ItZe00032a0f@hotmail.com>
 
-    Here is a tip for compiling DBD::Oracle as a 32 bit application on AIX 5.1 
+    Here is a tip for compiling DBD::Oracle as a 32 bit application on AIX 5.1
     64 bit and Oracle 9.2 64 bit without editing any makefiles. I hope people
     find this useful:
 
@@ -212,16 +212,16 @@ Stephen de Vries
     AIX 5.1 ML03 - 64 bit kernel - ships with Perl as a 32 bit application.
     VisualAge C/C++ 5.0.2
 
-    Basically DBD must be compiled as 32 bit to link with Perl's 32 bit 
+    Basically DBD must be compiled as 32 bit to link with Perl's 32 bit
     libraries.
     gunzip -c DBD-Oracle-1.14.tar.gz | tar xvf 
     cd DBD-Oracle-1.14
     perl Makefile.PL -m $ORACLE_HOME/rdbms/demo/demo_rdbms32.mk
     make
 
-    NB: I think there is a bug in the Oracle 9.2.0.3 file 
+    NB: I think there is a bug in the Oracle 9.2.0.3 file
     $ORACLE_HOME/rdbms/lib/env_rdbms.mk
-    I corrected this (before running the above commands) by replacing the 
+    I corrected this (before running the above commands) by replacing the
     invalid linker option
     LDFLAGS32=-q32
     with
@@ -231,7 +231,7 @@ Stephen de Vries
     --------------------------------------------------------------------------------------
 
     Date: Wed, 30 Jun 2004 23:34:24 -0500
-    From: "SCHULTZ, DARYLE (SBCSI)" 
+    From: "SCHULTZ, DARYLE (SBCSI)"
 
     Got it to work.  Using dbd 1.16
 
@@ -283,7 +283,7 @@ Martin J. Evans <mjevans@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1994 by Tim Bunce.
+This software is copyright (c) 2018, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

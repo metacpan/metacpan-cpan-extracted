@@ -2,7 +2,7 @@
 
 # gvim=:SetNumberAndWidth
 
-## Before 'make install' is performed this script should be runnable with
+## Before 'make install' is performed this script should be run as part of 
 # 'make test'. After 'make install' it should work as 'perl P.t'
 
 #########################
@@ -10,7 +10,21 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 #########################
+use P;
 
+# Be less stringent about checking to see if we were not run
+# from our test.  If we are too stringent, test fails on windows
+# but if we are not stringent enough -- not sure it is that harmful.
+
+sub chk_par($) {
+	my $env=shift;
+	if ($env->{name} ne "P.t" ) {
+		die "This test should be run by P.t";
+	}
+}
+
+my $env=eval "$ENV{PARENT}";
+chk_par($env);
 
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.

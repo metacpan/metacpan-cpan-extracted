@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Test::Rinci;
 
-our $DATE = '2015-09-11'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2018-11-22'; # DATE
+our $VERSION = '0.040'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -22,7 +22,7 @@ sub register_prereqs {
             type  => 'requires',
             phase => 'develop',
         },
-        'Test::Rinci' => '0.01',
+        'Test::Rinci' => '0.151',
     );
 }
 
@@ -72,7 +72,7 @@ Dist::Zilla::Plugin::Test::Rinci - A release test for Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.03 of Dist::Zilla::Plugin::Test::Rinci (from Perl distribution Dist-Zilla-Plugin-Test-Rinci), released on 2015-09-11.
+This document describes version 0.040 of Dist::Zilla::Plugin::Test::Rinci (from Perl distribution Dist-Zilla-Plugin-Test-Rinci), released on 2018-11-22.
 
 =head1 DESCRIPTION
 
@@ -107,7 +107,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -385,7 +385,7 @@ sub register {
     $app->helper( 'yancy.config' => sub { return $config } );
     $app->helper( 'yancy.route' => sub { return $route } );
     $app->helper( 'yancy.backend' => sub {
-        state $backend = load_backend( $config->{backend}, $config->{collections} );
+        state $backend = load_backend( $config->{backend}, $config->{collections} || $config->{openapi}{definitions} );
     } );
 
     $app->helper( 'yancy.plugin' => \&_helper_plugin );
@@ -411,35 +411,45 @@ sub register {
             action => 'index',
         );
 
-    # Merge configuration
-    if ( $config->{read_schema} ) {
-        my $schema = $app->yancy->backend->read_schema;
-        for my $c ( keys %$schema ) {
-            my $coll = $config->{collections}{ $c } ||= {};
-            my $conf_props = $coll->{properties} ||= {};
-            my $schema_props = delete $schema->{ $c }{properties};
-            for my $k ( keys %{ $schema->{ $c } } ) {
-                $coll->{ $k } ||= $schema->{ $c }{ $k };
-            }
-            for my $p ( keys %{ $schema_props } ) {
-                my $conf_prop = $conf_props->{ $p } ||= {};
-                my $schema_prop = $schema_props->{ $p };
-                for my $k ( keys %$schema_prop ) {
-                    $conf_prop->{ $k } ||= $schema_prop->{ $k };
+    die "Cannot pass both openapi AND (collections or read_schema)"
+        if $config->{openapi}
+        and ( $config->{collections} or $config->{read_schema} );
+
+    my $spec;
+    if ( $config->{openapi} ) {
+        $spec = $config->{openapi};
+    } else {
+        # Merge configuration
+        if ( $config->{read_schema} ) {
+            my $schema = $app->yancy->backend->read_schema;
+            for my $c ( keys %$schema ) {
+                my $coll = $config->{collections}{ $c } ||= {};
+                my $conf_props = $coll->{properties} ||= {};
+                my $schema_props = delete $schema->{ $c }{properties};
+                for my $k ( keys %{ $schema->{ $c } } ) {
+                    $coll->{ $k } ||= $schema->{ $c }{ $k };
+                }
+                for my $p ( keys %{ $schema_props } ) {
+                    my $conf_prop = $conf_props->{ $p } ||= {};
+                    my $schema_prop = $schema_props->{ $p };
+                    for my $k ( keys %$schema_prop ) {
+                        $conf_prop->{ $k } ||= $schema_prop->{ $k };
+                    }
                 }
             }
+            # ; say 'Merged Config';
+            # ; use Data::Dumper;
+            # ; say Dumper $config;
         }
-        # ; say 'Merged Config';
-        # ; use Data::Dumper;
-        # ; say Dumper $config;
-    }
 
-    # Add OpenAPI spec
-    my $spec = $self->_openapi_spec_from_schema( $config );
+        # Add OpenAPI spec
+        $spec = $self->_openapi_spec_from_schema( $config );
+    }
     $self->_openapi_spec_add_mojo( $spec, $config );
     my $openapi = $app->plugin( OpenAPI => {
         route => $route->any( '/api' )->name( 'yancy.api' ),
         spec => $spec,
+        default_response_name => '_Error',
     } );
     $app->helper( 'yancy.openapi' => sub { $openapi } );
 
@@ -510,6 +520,27 @@ sub _openapi_spec_add_mojo {
 sub _openapi_spec_from_schema {
     my ( $self, $config ) = @_;
     my ( %definitions, %paths );
+    my %parameters = (
+        '$limit' => {
+            name => '$limit',
+            type => 'integer',
+            in => 'query',
+            description => 'The number of items to return',
+        },
+        '$offset' => {
+            name => '$offset',
+            type => 'integer',
+            in => 'query',
+            description => 'The index (0-based) to start returning items',
+        },
+        '$order_by' => {
+            name => '$order_by',
+            type => 'string',
+            in => 'query',
+            pattern => '^(?:asc|desc):[^:,]+$',
+            description => 'How to sort the list. A string containing one of "asc" (to sort in ascending order) or "desc" (to sort in descending order), followed by a ":", followed by the field name to sort by.',
+        },
+    );
     for my $name ( keys %{ $config->{collections} } ) {
         # Set some defaults so users don't have to type as much
         my $collection = $config->{collections}{ $name };
@@ -527,25 +558,9 @@ sub _openapi_spec_from_schema {
         $paths{ '/' . $name } = {
             get => {
                 parameters => [
-                    {
-                        name => '$limit',
-                        type => 'integer',
-                        in => 'query',
-                        description => 'The number of items to return',
-                    },
-                    {
-                        name => '$offset',
-                        type => 'integer',
-                        in => 'query',
-                        description => 'The index (0-based) to start returning items',
-                    },
-                    {
-                        name => '$order_by',
-                        type => 'string',
-                        in => 'query',
-                        pattern => '^(?:asc|desc):[^:,]+$',
-                        description => 'How to sort the list. A string containing one of "asc" (to sort in ascending order) or "desc" (to sort in descending order), followed by a ":", followed by the field name to sort by.',
-                    },
+                    { '$ref' => '#/parameters/$limit' },
+                    { '$ref' => '#/parameters/$offset' },
+                    { '$ref' => '#/parameters/$order_by' },
                     map {; {
                         name => $_,
                         in => 'query',
@@ -593,10 +608,6 @@ sub _openapi_spec_from_schema {
                         description => "Entry was created",
                         schema => { '$ref' => "#/definitions/${name}/properties/${id_field}" },
                     },
-                    400 => {
-                        description => "New entry contains errors",
-                        schema => { '$ref' => "#/definitions/_Error" },
-                    },
                     default => {
                         description => "Unexpected error",
                         schema => { '$ref' => "#/definitions/_Error" },
@@ -624,10 +635,6 @@ sub _openapi_spec_from_schema {
                         description => "Item details",
                         schema => { '$ref' => "#/definitions/${name}" },
                     },
-                    404 => {
-                        description => "The item was not found",
-                        schema => { '$ref' => '#/definitions/_Error' },
-                    },
                     default => {
                         description => "Unexpected error",
                         schema => { '$ref' => '#/definitions/_Error' },
@@ -650,10 +657,6 @@ sub _openapi_spec_from_schema {
                         description => "Item was updated",
                         schema => { '$ref' => "#/definitions/${name}" },
                     },
-                    404 => {
-                        description => "The item was not found",
-                        schema => { '$ref' => "#/definitions/_Error" },
-                    },
                     default => {
                         description => "Unexpected error",
                         schema => { '$ref' => "#/definitions/_Error" },
@@ -666,10 +669,6 @@ sub _openapi_spec_from_schema {
                 responses => {
                     204 => {
                         description => "Item was deleted",
-                    },
-                    404 => {
-                        description => "The item was not found",
-                        schema => { '$ref' => '#/definitions/_Error' },
                     },
                     default => {
                         description => "Unexpected error",
@@ -714,6 +713,7 @@ sub _openapi_spec_from_schema {
             %definitions,
         },
         paths => \%paths,
+        parameters => \%parameters,
     };
 }
 
@@ -890,7 +890,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 SYNOPSIS
 

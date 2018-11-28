@@ -10,7 +10,7 @@ use CPAN::Audit::Query;
 use CPAN::Audit::DB;
 use Module::CoreList;
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 sub new {
     my $class = shift;
@@ -23,6 +23,7 @@ sub new {
     $self->{verbose}     = $params{verbose};
     $self->{quiet}       = $params{quiet};
     $self->{no_color}    = $params{no_color};
+    $self->{no_corelist} = $params{no_corelist};
     $self->{interactive} = $params{interactive};
 
     if ( !$self->{interactive} ) {
@@ -43,9 +44,14 @@ sub command {
 
     my %dists;
 
-    # Find core modules for this perl version first.
-    # This way explictly installed versions will overwrite.
-    if ( $command eq 'dependencies' || $command eq 'deps' || $command eq 'installed' ) {
+    if (!$self->{no_corelist}
+        && (   $command eq 'dependencies'
+            || $command eq 'deps'
+            || $command eq 'installed' )
+        )
+    {
+        # Find core modules for this perl version first.
+        # This way explictly installed versions will overwrite.
         if ( my $core = $Module::CoreList::version{$]} ) {
             while ( my ( $mod, $ver ) = each %$core ) {
                 my $dist = $self->{db}{module2dist}{$mod} or next;
@@ -294,5 +300,7 @@ Viacheslav Tykhanovskyi E<lt>viacheslav.t@gmail.comE<gt>
 Takumi Akiyama (github.com/akiym)
 
 James Raspass (github.com/JRaspass)
+
+MCRayRay (github.com/MCRayRay)
 
 =cut

@@ -332,8 +332,38 @@ sub color {
     cached_colorize($obj->{CACHE}, $c, $text);
 }
 
-1;
+sub colormap {
+    my $obj = shift;
+    my %opt = @_;
+    $opt{name}    //= "--newopt";
+    $opt{option}  //= "--colormap";
+    $opt{sort}    //= "length";
 
+    my $hash = $obj->{HASH};
+    join "\n", (
+	"option $opt{name} \\",
+	do {
+	    my $maxlen = $opt{noalign} ? "" : do {
+		use List::Util qw(max);
+		max map { length } keys %{$hash};
+	    };
+	    my $format = "\t%s %${maxlen}s=%s \\";
+	    my $compare = do {
+		if ($opt{sort} eq "length") {
+		    sub { length $a <=> length $b or $a cmp $b };
+		} else {
+		    sub { $a cmp $b };
+		}
+	    };
+	    map {
+		sprintf $format, $opt{option}, $_, $hash->{$_} // "";
+	    } sort $compare keys %{$hash};
+	},
+	"\t\$<move(0,0)>\n",
+	);
+}
+
+1;
 
 __END__
 
@@ -681,6 +711,36 @@ than color list, it rounds up.
 
 See super class L<Getopt::EX::LabeledParam>.
 
+=item B<colormap>
+
+Return string which can be used for option definition.  Some
+parameters can be specified like:
+
+    $obj->colormap(name => "--newopt", option => "--colormap");
+
+=over 4
+
+=item B<name>
+
+Specify new option name.
+
+=item B<option>
+
+Specify option name for colormap setup.
+
+=item B<sort>
+
+Default value is C<length> and sort options by their length.  Use
+C<alphabet> to sort them alphabetically.
+
+=item B<noalign>
+
+Colormap label is aligned so that `=' marks are lined vertically.
+Give true value to B<noalign> parameter, if you don't like this
+behaviour.
+
+=back
+
 =back
 
 
@@ -688,5 +748,7 @@ See super class L<Getopt::EX::LabeledParam>.
 
 L<Getopt::EX>,
 L<Getopt::EX::LabeledParam>
+
+L<Graphics::ColorNames::WWW>
 
 L<https://en.wikipedia.org/wiki/ANSI_escape_code>

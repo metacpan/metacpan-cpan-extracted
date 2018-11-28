@@ -80,6 +80,7 @@ subtest 'URL rewrite' => sub {
         ],
         rewrite_url => 1
     );
+    $app->ua->server->app($app);
 
     my $ua   = $app->ua;
     my $host = 'foo.bar.baz.bak';

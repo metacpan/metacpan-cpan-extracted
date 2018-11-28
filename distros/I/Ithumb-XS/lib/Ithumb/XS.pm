@@ -4,7 +4,7 @@ package Ithumb::XS;
 
 =head1 NAME
 
-Ithumb::XS - small and simple Imlib2 thumbnail module.
+Ithumb::XS - Small and simple thumbnail module, based on Imlib2 library.
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( create_thumbnail );
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.4.1';
 
 require XSLoader;
 XSLoader::load('Ithumb::XS', $VERSION);

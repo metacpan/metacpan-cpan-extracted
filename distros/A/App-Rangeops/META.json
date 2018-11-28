@@ -4,7 +4,7 @@
       "Qiang Wang <wang-q@outlook.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "perl_5"
    ],
@@ -52,7 +52,7 @@
             "MCE" : "1.708",
             "Path::Tiny" : "0.076",
             "YAML::Syck" : "1.29",
-            "perl" : "5.010001"
+            "perl" : "5.018001"
          }
       },
       "test" : {
@@ -64,7 +64,7 @@
    "provides" : {
       "App::Rangeops" : {
          "file" : "lib/App/Rangeops.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       },
       "App::Rangeops::Command::circos" : {
          "file" : "lib/App/Rangeops/Command/circos.pm"
@@ -102,7 +102,8 @@
          "web" : "https://github.com/wang-q/App-Rangeops"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.1",
    "x_authority" : "cpan:WANGQ",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

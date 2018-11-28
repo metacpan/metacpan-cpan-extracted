@@ -7,7 +7,7 @@ use strict;
 
 use POSIX qw/ceil/;
 
-our $VERSION = '0.065'; # VERSION
+our $VERSION = '0.066'; # VERSION
 
 has idx => (is => 'rw', default => sub { [ 'a'..'z' ] });
 has idx_file  => ( is => 'rw', required => 0 );

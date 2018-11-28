@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Moose;
 use MooseX::SemiAffordanceAccessor;
@@ -29,7 +29,7 @@ Pg::CLI::createdb - Wrapper for the F<createdb> utility
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

@@ -23,20 +23,9 @@ chromosomes_display_default = yes
 <links>
 
 <link>
-file          = [% id %].link4.txt
-radius        = 0.88r
-bezier_radius = 0.2r
-color         = purple
-thickness     = 2
-ribbon        = yes
-stroke_color  = purple
-stroke_thickness = 2
-</link>
-
-<link>
 file          = [% id %].link3.txt
 radius        = 0.88r
-bezier_radius = 0.1r
+bezier_radius = 0.2r
 color         = dgreen
 thickness     = 3
 ribbon        = yes
@@ -47,7 +36,7 @@ stroke_thickness = 2
 <link>
 file          = [% id %].link2.txt
 radius        = 0.88r
-bezier_radius = 0r
+bezier_radius = 0.1r
 color         = dorange
 thickness     = 3
 ribbon        = yes

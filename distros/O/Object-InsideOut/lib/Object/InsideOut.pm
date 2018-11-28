@@ -4,13 +4,14 @@ require 5.006;
 
 use strict;
 use warnings;
+use Config;
 
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 $VERSION = eval $VERSION;
 
-use Object::InsideOut::Exception 4.04;
-use Object::InsideOut::Util 4.04 qw(create_object hash_re is_it make_shared);
-use Object::InsideOut::Metadata 4.04;
+use Object::InsideOut::Exception 4.05;
+use Object::InsideOut::Util 4.05 qw(create_object hash_re is_it make_shared);
+use Object::InsideOut::Metadata 4.05;
 
 require B;
 
@@ -99,7 +100,7 @@ if (! exists($GBL{'GBL_SET'})) {
 
         share => {              # Object sharing between threads
             cl  => {},
-            ok  => $threads::shared::threads_shared,
+            ok  => ($Config::Config{useithreads} && $threads::shared::threads_shared),
             # obj               # Tracks TIDs for shared objects
         },
 
@@ -115,7 +116,10 @@ if (! exists($GBL{'GBL_SET'})) {
         'heritage'               => {'restricted' => 1},
     };
 
-    if ($threads::shared::threads_shared && ($threads::shared::VERSION lt '0.96')) {
+    if ($Config::Config{useithreads} &&
+        $threads::shared::threads_shared &&
+        ($threads::shared::VERSION lt '0.96'))
+    {
         *threads::shared::is_shared = \&threads::shared::_id;
     }
 }
@@ -1233,7 +1237,8 @@ sub set_sharing :Sub(Private)
             line  => $line,
         };
         # Set up equality via overload
-        if ($sharing && $threads::shared::threads_shared
+        if ($sharing && $Config::Config{useithreads}
+                     && $threads::shared::threads_shared
                      && $threads::shared::VERSION ge '0.95')
         {
             push(@{$GBL{'sub'}{'ol'}}, { 'pkg' => $class, 'ify' => 'EQUATE' });
@@ -1273,7 +1278,10 @@ sub CLONE
     }
 
     # Check for delayed threads::shared usage
-    if ($threads::shared::threads_shared && ! $GBL{'share'}{'ok'}) {
+    if ($Config::Config{useithreads} &&
+        $threads::shared::threads_shared &&
+        ! $GBL{'share'}{'ok'})
+    {
         OIO::Code->die(
             'message' => q/'threads::shared' imported after Object::InsideOut initialized/,
             'Info'    => q/Add 'use threads::shared;' to the start of your application code/);
@@ -1942,7 +1950,10 @@ sub DESTROY
     local($!, $^E, $?);
 
     # Workaround for Perl's "in cleanup" bug
-    if ($threads::shared::threads_shared && ! $GBL{'term'}) {
+    if ($Config::Config{useithreads} &&
+        $threads::shared::threads_shared &&
+        ! $GBL{'term'})
+    {
         eval {
             my $bug = keys(%{$GBL{'id'}{'obj'}})
                     + keys(%{$GBL{'id'}{'reuse'}})

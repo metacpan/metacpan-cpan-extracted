@@ -1,28 +1,30 @@
-# $Id$
+#!perl
+
 use strict;
+use warnings;
+
+use lib 't/lib';
+use DBDOracleTestLib qw/ db_handle table drop_table force_drop_table /;
 
 use DBI;
 use DBD::Oracle;
 
 use Test::More;
 
-use lib 't';
-require 'nchar_test_lib.pl';
+my $dbh = db_handle()
+  or plan skip_all => q|Can't connect to database|;
 
-my $dbh = db_handle() or plan skip_all => "can't connect to database";
-
-my %priv = map { $_ => 1 } get_privs( $dbh );
+my %priv = map { $_ => 1 } get_privs($dbh);
 
 unless ( $priv{'CREATE TABLE'} ) {
     plan skip_all => q{requires permissions 'CREATE TABLE'};
 }
 
-plan tests => 9;
+my $table = table('rt13865__drop_me');
+force_drop_table($dbh, $table);
 
-$dbh->do( 'DROP TABLE RT13865' );
-
-$dbh->do( <<'END_SQL' ) or die $dbh->errstr;
-CREATE TABLE RT13865(
+my $create_sql = <<"END_SQL";
+CREATE TABLE $table(
     COL_INTEGER INTEGER,
     COL_NUMBER NUMBER,
     COL_NUMBER_37 NUMBER(37),
@@ -37,52 +39,108 @@ CREATE TABLE RT13865(
 )
 END_SQL
 
-my $col_h = $dbh->column_info( undef, undef, 'RT13865', 'COL_INTEGER' );
+my @tests = (
+    {
+        col  => 'COL_INTEGER',
+        size => 38,
+        cmp  => '==',
+        name => 'INTEGER is alias for NUMBER(38)'
+    },
+    {
+        col  => 'COL_NUMBER_37',
+        size => 37,
+        cmp  => '==',
+        name => 'NUMBER(37)'
+    },
+    {
+        col  => 'COL_NUMBER',
+        size => 0,
+        cmp  => '>',
+        name => 'NUMBER'
+    },
+    {
+        col  => 'COL_VC2',
+        size => 67,
+        cmp  => '==',
+        name => 'VARCHAR2(67)'
+    },
+    {
+        col  => 'COL_VC2_69CHAR',
+        size => 69,
+        cmp  => '==',
+        name => 'VARCHAR2(69)'
+    },
+    {
+        col  => 'COL_NVC2',
+        size => 69,
+        cmp  => '==',
+        name => 'NVARCHAR2(69)'
+    },
+    {
+        col  => 'COL_NC',
+        size => 69,
+        cmp  => '==',
+        name => 'NCHAR(69)'
+    },
+    {
+        col  => 'COL_CHAR',
+        size => 67,
+        cmp  => '==',
+        name => 'CHAR(67)'
+    },
+    {
+        col  => 'COL_CHAR_69CHAR',
+        size => 69,
+        cmp  => '==',
+        name => 'CHAR(69)'
+    },
+);    # @tests
 
-is $col_h->fetchrow_hashref->{COLUMN_SIZE} => 38,
-    "INTEGER is alias for NUMBER(38)";
+ok( $dbh->do($create_sql), "Create database: $table" )
+  or die $dbh->errstr;
 
-$col_h = $dbh->column_info( undef, undef, 'RT13865', 'COL_NUMBER_37' );
-is $col_h->fetchrow_hashref->{COLUMN_SIZE} => 37,
-    "NUMBER(37)";
+for my $test (@tests) {
 
-$col_h = $dbh->column_info( undef, undef, 'RT13865', 'COL_NUMBER' );
-cmp_ok $col_h->fetchrow_hashref->{COLUMN_SIZE}, '>', 0,
-    "NUMBER";
+    my $col_h = $dbh->column_info( undef, undef, uc($table), $test->{col} );
 
-$col_h = $dbh->column_info( undef, undef, 'RT13865', 'COL_VC2' );
-is $col_h->fetchrow_hashref->{COLUMN_SIZE} => 67,
-    "VARCHAR(67)";
+    # if column_info() returns undef, then the driver doesnt support column_info. DBD::Oracle should support it.
+    ok(
+        $col_h,
+        sprintf(
+            'column_info() returns something for test: %s', $test->{name}
+        )
+    ) or next;
+    cmp_ok( ref $col_h, 'eq', 'DBI::st',
+        sprintf( 'returned object is correct for test: %s', $test->{name} ) );
 
-$col_h = $dbh->column_info( undef, undef, 'RT13865', 'COL_VC2_69CHAR' );
-is $col_h->fetchrow_hashref->{COLUMN_SIZE} => 69,
-    "VARCHAR(69)";
+# if there is no row, then the table/column couldnt be found... this should not happen either
+    my $row = $col_h->fetchrow_hashref;
+    cmp_ok(
+        ref $row,
+        'eq', 'HASH',
+        sprintf(
+'column/table now found - fetchrow_hashref returned a hash for test: %s',
+            $test->{name} )
+    ) or next;
 
-$col_h = $dbh->column_info( undef, undef, 'RT13865', 'COL_NVC2' );
-is $col_h->fetchrow_hashref->{COLUMN_SIZE} => 69,
-    "NVARCHAR2(69)";
+    # this is the actual test, everything above it sanity checking / pre-diagnosis
+    cmp_ok( $row->{COLUMN_SIZE}, $test->{cmp}, $test->{size}, $test->{name} );
 
-$col_h = $dbh->column_info( undef, undef, 'RT13865', 'COL_NC' );
-is $col_h->fetchrow_hashref->{COLUMN_SIZE} => 69,
-    "NCHAR(69)";
+}
 
-$col_h = $dbh->column_info( undef, undef, 'RT13865', 'COL_CHAR' );
-is $col_h->fetchrow_hashref->{COLUMN_SIZE} => 67,
-    "CHAR(67)";
-
-$col_h = $dbh->column_info( undef, undef, 'RT13865', 'COL_CHAR_69CHAR' );
-is $col_h->fetchrow_hashref->{COLUMN_SIZE} => 69,
-    "CHAR(69)";
-
-$dbh->do( 'DROP TABLE RT13865' );
+drop_table($dbh, $table);
 
 # utility functions
 
-sub get_privs  {
+sub get_privs {
     my $dbh = shift;
 
-    my $sth = $dbh->prepare( 'SELECT PRIVILEGE from session_privs' );
+    my $sth = $dbh->prepare('SELECT PRIVILEGE from session_privs');
     $sth->execute;
 
     return map { $_->[0] } @{ $sth->fetchall_arrayref };
 }
+
+$dbh->disconnect if $dbh;
+
+done_testing();

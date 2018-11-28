@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::BSD;
-$Software::License::BSD::VERSION = '0.103013';
+$Software::License::BSD::VERSION = '0.103014';
 use parent 'Software::License';
 # ABSTRACT: The (three-clause) BSD License
 
@@ -9,6 +9,7 @@ sub name { 'The (three-clause) BSD License' }
 sub url  { 'http://opensource.org/licenses/BSD-3-Clause' }
 sub meta_name  { 'bsd' }
 sub meta2_name { 'bsd' }
+sub spdx_expression  { 'BSD' }
 
 1;
 
@@ -22,7 +23,7 @@ Software::License::BSD - The (three-clause) BSD License
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 AUTHOR
 
@@ -30,7 +31,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

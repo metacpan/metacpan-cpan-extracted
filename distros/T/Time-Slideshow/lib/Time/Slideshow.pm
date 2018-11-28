@@ -2,7 +2,7 @@ package Time::Slideshow;
 use strict;
 use Time::HiRes qw(time);
 use vars qw($VERSION);
-$VERSION= '0.02';
+$VERSION= '0.03';
 
 =head1 NAME
 
@@ -256,7 +256,9 @@ __END__
 =head1 SHUFFLING PERMUTATIONS
 
 This module does not use the real permutations
-of the slides,
+of the slides. The module uses an approach to select non-neighbouring images
+by first selecting a permutation from C<1..@items -2> according to the current
+time and then selecting the C<n-th> slide from that permutation.
 
 =head1 INTEGRATION
 
@@ -335,7 +337,7 @@ to all users that load that page.
 
 =head2 Prima
 
-Using L<Prima>, we can create an application with a natve UI that displays
+Using L<Prima>, we can create an application with a native UI that displays
 the images. Not implemented here are the resizing or zooming of the images
 to the window size.
 
@@ -368,12 +370,12 @@ to the window size.
 =head1 REPOSITORY
 
 The public repository of this module is
-L<http://github.com/Corion/time-slideshow>.
+L<https://github.com/Corion/time-slideshow>.
 
 =head1 SUPPORT
 
 The public support forum of this module is
-L<http://perlmonks.org/>.
+L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
@@ -387,7 +389,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2014-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2014-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

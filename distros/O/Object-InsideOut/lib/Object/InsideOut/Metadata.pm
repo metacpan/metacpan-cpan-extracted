@@ -3,7 +3,7 @@ package Object::InsideOut::Metadata; {
 use strict;
 use warnings;
 
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 $VERSION = eval $VERSION;
 
 # Stores method metadata
@@ -99,7 +99,7 @@ __DATA__
 
 ### Object Interface ###
 
-use Object::InsideOut 4.04;
+use Object::InsideOut 4.05;
 
 my @CLASSES :Field;
 my @FOREIGN :Field;
@@ -268,7 +268,7 @@ Object::InsideOut::Metadata - Introspection for Object::InsideOut classes
 
 =head1 VERSION
 
-This document describes Object::InsideOut::Metadata version 4.04
+This document describes Object::InsideOut::Metadata version 4.05
 
 =head1 SYNOPSIS
 
@@ -311,7 +311,7 @@ This document describes Object::InsideOut::Metadata version 4.04
  # Obtain the class hierarchy from the metadata object
  my @classes = $meta->get_classes();
 
- # Obtain infomation on the parameters for a class's construction
+ # Obtain information on the parameters for a class's construction
  my %args = $meta->get_args();
 
  # Obtain information on a class's methods

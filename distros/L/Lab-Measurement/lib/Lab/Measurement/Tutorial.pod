@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 How to read the documentation
 
@@ -387,20 +387,16 @@ the C<start> method:
      folder      => 'IV_curve'
  );
 
-This will create output folders with names F<IV_curve_xxx>.
-
-Setting the C<date_prefix> attribute to C<1> will prefix the folder name with
-the date:
+This will create output folders with names F<YYYY-MM-DD_HH-MM-SS_IV_curve_xxx>
+If you do not want to use the date/time prefixes use
 
  $sweep->start(
      measurement => $meas,
      datafile    => $datafile,
      folder      => 'IV_curve',
-     date_prefix => 1
+     date_prefix => 0,
+     time_prefix => 0
  );
-
-This will create output folders with names F<YYYY-MM-DD_IV_curve_xxx>. The
-exact timestamp with second precision can always be found in F<META.yml>.
 
 =head2 Multiple datafiles
 
@@ -705,6 +701,28 @@ L<PDL::Graphics::Gnuplot> separates between plot options and curve options.
  );      
 
 More plot and curve options are documented in L<PDL::Graphics::Gnuplot>.
+
+=head3 Live plots in higher dimensional sweeps
+
+Live plotting is also supported for higher dimensional sweeps. When the sweep
+creates multiple subfolders with datafiles, C<add_plot> will be called each
+time a new datafile is created. In this case, the C<hard_copy> argument to
+C<add_plot> cannot be used, as the hard copies of each datafile plot need to
+have unique names. Instead we use C<hard_copy_suffix>:
+
+ # plot current versus voltage
+ $datafile->add_plot(
+     x         => 'voltage',
+     y         => 'current',
+     hard_copy_suffix => '_IV',
+ );
+
+ # plot voltage versus current
+ $datafile->add_plot(
+     x         => 'current',
+     y         => 'voltage',
+     hard_copy_suffix => '_VI',
+ );
 
 =head2 Block data
 

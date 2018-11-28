@@ -431,6 +431,16 @@ BEGIN {
       my $cmd=$_[0];
       my $handle=$_[1]||'';
       my $hostlabel=$_[2]||'';
+      my @topcaller=caller;
+      print "\nINFO: main::gbp() (((((((CALLER))))))):\n       ",
+         (join ' ',@topcaller)," and CMD=$cmd\n\n"
+         if !$Net::FullAuto::FA_Core::cron &&
+         $Net::FullAuto::FA_Core::debug;
+      print $Net::FullAuto::FA_Core::LOG
+         "\nmain::gbp() (((((((CALLER))))))):\n       ",
+         (join ' ',@topcaller)," and CMD=$cmd\n\n"
+         if $Net::FullAuto::FA_Core::log &&
+         -1<index $Net::FullAuto::FA_Core::LOG,'*';
       $Net::FullAuto::FA_Core::cmdinfo={}
          unless $Net::FullAuto::FA_Core::cmdinfo;
       my $object=($handle)?$handle:$Net::FullAuto::FA_Core::cmdinfo;

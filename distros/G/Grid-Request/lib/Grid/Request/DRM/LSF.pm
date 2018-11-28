@@ -2,7 +2,7 @@ package Grid::Request::DRM::LSF;
 
 
 use strict;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub hostname {
 }

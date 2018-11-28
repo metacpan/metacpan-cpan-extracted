@@ -3,7 +3,7 @@ package TaskPipe;
 use strict;
 use warnings;
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 1;
 

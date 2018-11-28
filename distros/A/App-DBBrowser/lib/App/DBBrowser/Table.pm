@@ -151,6 +151,10 @@ sub on_table {
             }
         }
         elsif ( $custom eq $cu{'print_tbl'} ) {
+            local $| = 1;
+            print $sf->{i}{clear_screen};
+            print HIDE_CURSOR;
+            print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
             my $select = $ax->get_stmt( $sql, 'Select', 'prepare' );
             if ( $sf->{o}{G}{max_rows} && ! $sql->{limit_stmt} ) {
                 $select .= " LIMIT " . $sf->{o}{G}{max_rows};
@@ -176,16 +180,11 @@ sub on_table {
                 unshift @{$sf->{i}{stmt_history}}, [ $tmp, \@arguments ];
                 $#{$sf->{i}{stmt_history}} = 19 if $#{$sf->{i}{stmt_history}} > 19;
             }
-            local $| = 1;
-            print $sf->{i}{clear_screen};
             my $sth = $sf->{d}{dbh}->prepare( $select );
-            print HIDE_CURSOR;
-            print 'Computing:' . "\n" if $sf->{o}{table}{progress_bar};
             $sth->execute( @arguments );
             my $col_names = $sth->{NAME}; # not quoted
             my $all_arrayref = $sth->fetchall_arrayref;
             unshift @$all_arrayref, $col_names;
-            print $sf->{i}{clear_screen};
             # return $sql explicitly since after a restore backup it refers to a different hash.
             return $all_arrayref, $sql;
         }

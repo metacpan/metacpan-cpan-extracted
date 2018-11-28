@@ -14,12 +14,12 @@ package MY;
 sub c_o {
   my $self = shift;
   local($_) = $self->SUPER::c_o(@_);
-  s/\.c$/\.c \+ SYS\$LIBRARY\:SYS\$LIB\_C\/LIBRARY/m; # Add our library to the end
+  s/^(\s\$\(CCC.*\.c)/$1 \+ SYS\$LIBRARY\:SYS\$LIB\_C\/LIBRARY/m;
   $_;
 }
 sub xs_o {
   my $self = shift;
   local($_) = $self->SUPER::xs_o(@_);
-  s/^(\s\$\(CCC.*\.c)$/$1 \+ SYS\$LIBRARY\:SYS\$LIB\_C\/LIBRARY/m;
+  s/^(\s\$\(CCC.*\.c)/$1 \+ SYS\$LIBRARY\:SYS\$LIB\_C\/LIBRARY/m;
   $_;
 }

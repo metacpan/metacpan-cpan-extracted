@@ -1,5 +1,13 @@
 # $rcs = ' $Id: Test.pm,v 2.293 2015-06-06 20:55:31 Martin Exp $ ' ;
 
+package WWW::Search::Test;
+
+use strict;
+use warnings;
+
+our
+$VERSION = 2.294;
+
 =head1 NAME
 
 WWW::Search::Test - utilities to aid in testing WWW::Search backends
@@ -17,11 +25,6 @@ See file test.pl in the WWW-Search-HotBot distribution for a detailed
 =head1 METHODS AND FUNCTIONS
 
 =cut
-
-package WWW::Search::Test;
-
-use strict;
-use warnings;
 
 use Bit::Vector;
 use Carp;
@@ -51,9 +54,8 @@ use vars qw( @EXPORT );
               tm_new_engine tm_run_test tm_run_test_no_approx
             );
 
-use vars qw( $VERSION $bogus_query $websearch );
+use vars qw( $bogus_query $websearch );
 
-$VERSION = do { my @r = (q$Revision: 2.293 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
 $bogus_query = "Bogus" . $$ . "NoSuchWord" . time;
 
 ($MODE_DUMMY, $MODE_INTERNAL, $MODE_EXTERNAL, $MODE_UPDATE) = qw(dummy internal external update);
@@ -893,6 +895,12 @@ ENDCODE
       {
       Test::More::diag(Dumper($oResult));
       } # while
+    $sSaveOnError ||= q'';
+    if ($sSaveOnError ne q'')
+      {
+      write_file($sSaveOnError, { err_mode => 'quiet'}, $oSearch->response->content);
+      Test::More::diag(qq'HTML was saved in $sSaveOnError');
+      } # if
     } # if
   } # test_most_results
 

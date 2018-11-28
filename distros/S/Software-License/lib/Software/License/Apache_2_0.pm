@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::Apache_2_0;
-$Software::License::Apache_2_0::VERSION = '0.103013';
+$Software::License::Apache_2_0::VERSION = '0.103014';
 use parent 'Software::License';
 # ABSTRACT: The Apache License, Version 2.0
 
@@ -9,6 +9,7 @@ sub name { 'The Apache License, Version 2.0, January 2004' }
 sub url  { 'http://www.apache.org/licenses/LICENSE-2.0.txt' }
 sub meta_name  { 'apache' }
 sub meta2_name { 'apache_2_0' }
+sub spdx_expression { 'Apache-2.0' }
 
 1;
 
@@ -22,7 +23,7 @@ Software::License::Apache_2_0 - The Apache License, Version 2.0
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 AUTHOR
 
@@ -30,7 +31,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

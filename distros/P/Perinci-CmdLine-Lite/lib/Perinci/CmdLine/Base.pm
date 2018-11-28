@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2018-07-16'; # DATE
-our $VERSION = '1.815'; # VERSION
+our $DATE = '2018-11-22'; # DATE
+our $VERSION = '1.816'; # VERSION
 
 use 5.010001;
 use strict;
@@ -547,6 +547,10 @@ sub do_dump {
     # added in hook_after_get_meta().
     my $meta = $self->get_meta($r, $scd->{url} // $self->{url});
 
+    # additional information, because scripts often put their metadata in 'main'
+    # package
+    $self->{'x.main.spec'} = \%main::SPEC;
+
     my $dump = join(
         "",
         "# BEGIN DUMP $ENV{PERINCI_CMDLINE_DUMP}\n",
@@ -958,7 +962,7 @@ sub _parse_argv2 {
             log_trace("[pericmd] Running hook_before_read_config_file ...");
             $self->hook_before_read_config_file($r);
 
-            $self->_read_config($r);
+            $self->_read_config($r) unless $r->{config};
 
             log_trace("[pericmd] Running hook_after_read_config_file ...");
             $self->hook_after_read_config_file($r);
@@ -1684,7 +1688,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.815 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-07-16.
+This document describes version 1.816 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-11-22.
 
 =head1 DESCRIPTION
 

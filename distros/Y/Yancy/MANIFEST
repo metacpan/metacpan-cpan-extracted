@@ -11,10 +11,13 @@ bin/yancy
 cpanfile
 dist.ini
 eg/README.md
+eg/doc-site/.gitignore
 eg/doc-site/README.md
 eg/doc-site/cpanfile
+eg/doc-site/deploy.sh
 eg/doc-site/docs.db
 eg/doc-site/myapp.pl
+eg/doc-site/myapp.preaction.conf
 eg/screenshot-edit.png
 eg/screenshot.png
 eg/test-app/myapp.conf
@@ -80,6 +83,7 @@ t/examples/test-app.t
 t/examples/todo-app.t
 t/filter.t
 t/helpers.t
+t/lib/Digest/Broken.pm
 t/lib/Local/BackendTestSchema.pm
 t/lib/Local/BackendTestSchema/Result/mojo_migrations.pm
 t/lib/Local/BackendTestSchema/Result/people.pm
@@ -98,7 +102,7 @@ t/plugin/form/bootstrap4.t
 t/schema/mysql.sql
 t/schema/pg.sql
 t/schema/sqlite.sql
-t/share/config.pl
+t/share/openapi-spec.json
 t/share/templates/blog_delete.html.ep
 t/share/templates/blog_edit.html.ep
 t/share/templates/blog_list.html.ep

@@ -13,12 +13,12 @@ DBD::Oracle::Troubleshooting::Linux - Tips and Hints to Troubleshoot DBD::Oracle
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 SELinux and httpd
 
-If SELinux is running, it can prevents DBD::Oracle running in 
-an Apache process to load shared libraries it requires (libclntsh.so 
+If SELinux is running, it can prevents DBD::Oracle running in
+an Apache process to load shared libraries it requires (libclntsh.so
 or libnnz12.so). A typical symptom is a line like the following in
 the Apache error logs:
 
@@ -72,9 +72,9 @@ No real problem with the above however you will have to
 
 4) do the make install and it should work fine for you
 
-=head1 Oracle 9i Lite 
+=head1 Oracle 9i Lite
 
-The advice is to use the regular Oracle9i not the lite version. 
+The advice is to use the regular Oracle9i not the lite version.
 
 Another great source of help was: http://www.puschitz.com/InstallingOracle9i.html
 
@@ -99,28 +99,28 @@ smooth as just about every other CPAN module.
 =head1 Oracle 10g Instantclient
 
 The Makefile.PL will now work for  Oracle 10g Instantclient. To have both the Compile and
-the test.pl to work you must first have the LD_LIBRARY_PATH correctly set to your 
-"instantclient" directory. (http://www.oracle.com/technology/tech/oci/instantclient/instantclient.html) 
+the test.pl to work you must first have the LD_LIBRARY_PATH correctly set to your
+"instantclient" directory. (http://www.oracle.com/technology/tech/oci/instantclient/instantclient.html)
 
 The present version of the make creates a link on your "instantclient" directory as follows
-"ln -s libclntsh.so.10.1 libclntsh.so". It is needed for both the makefile creation and the compile 
+"ln -s libclntsh.so.10.1 libclntsh.so". It is needed for both the makefile creation and the compile
 but is not need for the test.pl. It should be removed after the compile.
 
 If the Makefile.PL or make fails try creating this link directly in your "instantclient" directory.
 
 =head1 Oracle Database 10g Express Edition  10.2
 
-To get 10Xe to compile correctly I had to add $ORACLE_HOME/lib to the LD_LIBRARY_PATH 
-as you would for an install against 10g Standard Edition, Standard Edition One, or 
-Enterprise Edition 
+To get 10Xe to compile correctly I had to add $ORACLE_HOME/lib to the LD_LIBRARY_PATH
+as you would for an install against 10g Standard Edition, Standard Edition One, or
+Enterprise Edition
 
 =head1 UTF8 bug in Oracle  9.2.0.5.0 and 9.2.0.7.0
 
 DBD::Oracle seems to hit some sort of bug with the above two versions of DB.
 The bug seems to hit when you when the Oracle database charset: US7ASCII and the Oracle nchar charset: AL16UTF16 and it has also
-been reported when the Oracle database charset: WE8ISO8850P1 Oracle nchar charset: AL32UTF16.  
+been reported when the Oracle database charset: WE8ISO8850P1 Oracle nchar charset: AL32UTF16.
 
-So far there is no patch for this but here are some workarounds 
+So far there is no patch for this but here are some workarounds
 
     use DBD::Oracle qw( SQLCS_IMPLICIT SQLCS_NCHAR );
     ...
@@ -158,7 +158,7 @@ Martin J. Evans <mjevans@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1994 by Tim Bunce.
+This software is copyright (c) 2018, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

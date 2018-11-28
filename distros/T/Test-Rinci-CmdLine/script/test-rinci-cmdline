@@ -1,0 +1,112 @@
+#!perl
+
+our $DATE = '2018-11-22'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config bundling no_ignore_case auto_help auto_version);
+use Test::Rinci::CmdLine;
+
+my %opts = (
+    exclude_scripts => [],
+    wrap_function => 1,
+    test_function_examples => 1,
+);
+GetOptions(
+    'exclude-script=s' => $opts{exclude_scripts},
+    'W' => sub { $opts{wrap_function} = 0 },
+    'E' => sub { $opts{test_function_examples} = 0 },
+);
+
+if (@ARGV) {
+    metadata_in_scripts_ok(\%opts, \@ARGV);
+} else {
+    metadata_in_all_scripts_ok(\%opts);
+}
+
+1;
+# ABSTRACT: Test Rinci metadata in scripts under script/ and bin/
+# PODNAME: test-rinci-cmdline
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+test-rinci-cmdline - Test Rinci metadata in scripts under script/ and bin/
+
+=head1 VERSION
+
+This document describes version 0.001 of test-rinci-cmdline (from Perl distribution Test-Rinci-CmdLine), released on 2018-11-22.
+
+=head1 SYNOPSIS
+
+In your dist directory:
+
+ % test-rinci-cmdline [options]
+
+Or, to test individual scripts:
+
+ % test-rinci-cmdline [options] script1.pl ...
+
+=head1 DESCRIPTION
+
+This script is an command-line interface for L<Test::Rinci::CmdLine>'s
+C<metadata_in_all_scripts_ok()> function.
+
+=head1 OPTIONS
+
+=over
+
+=item * --exclude-script=s
+
+Exclude a script path. Can be specified multiple times.
+
+=item * -E
+
+This sets C<test_function_examples> to 0.
+
+=item * -W
+
+This sets C<wrap_function> to 0.
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Test-Rinci-CmdLine>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Test-Rinci-CmdLine>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Rinci-CmdLine>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Test::Rinci::CmdLine>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

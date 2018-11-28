@@ -1,5 +1,8 @@
 Revision history for Calendar::Persian
 
+0.37  Tue Nov 27 09:35:00 2018
+      - Upgraded to use Date::Persian::Simple v0.20.
+
 0.36  Wed Nov 14 14:20:00 2018
       - Used namespace::autoclean instead.
 

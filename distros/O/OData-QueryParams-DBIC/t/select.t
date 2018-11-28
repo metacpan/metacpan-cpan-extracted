@@ -8,6 +8,7 @@ use OData::QueryParams::DBIC;
 
 my %tests = (
     'select=col1'        => { columns => ['col1'] },
+    'select='            => {},
     ''                   => {},
     'select=col1,col2'   => { columns => ['col1','col2'] },
     'select=col1 ,col2'  => { columns => ['col1','col2'] },

@@ -2,6 +2,7 @@
 Build.PL
 CONTRIBUTING
 Changes
+Changes.FFI-Platypus-Type-StringArray
 INSTALL
 LICENSE
 MANIFEST
@@ -77,6 +78,7 @@ lib/FFI/Platypus/API.pm
 lib/FFI/Platypus/Buffer.pm
 lib/FFI/Platypus/DL.pm
 lib/FFI/Platypus/Declare.pm
+lib/FFI/Platypus/Internal.pm
 lib/FFI/Platypus/Lang.pm
 lib/FFI/Platypus/Lang/ASM.pm
 lib/FFI/Platypus/Lang/C.pm
@@ -87,6 +89,7 @@ lib/FFI/Platypus/Record/TieArray.pm
 lib/FFI/Platypus/ShareConfig.pm
 lib/FFI/Platypus/Type.pod
 lib/FFI/Platypus/Type/PointerSizeBuffer.pm
+lib/FFI/Platypus/Type/StringArray.pm
 lib/FFI/Platypus/Type/StringPointer.pm
 maint/gen.pl
 share/README.txt
@@ -112,6 +115,7 @@ t/ffi/sint32.c
 t/ffi/sint64.c
 t/ffi/sint8.c
 t/ffi/string.c
+t/ffi/string_array.c
 t/ffi/uint16.c
 t/ffi/uint32.c
 t/ffi/uint64.c
@@ -123,6 +127,7 @@ t/ffi_platypus_closure.t
 t/ffi_platypus_declare.t
 t/ffi_platypus_dl.t
 t/ffi_platypus_function.t
+t/ffi_platypus_internal.t
 t/ffi_platypus_lang.t
 t/ffi_platypus_lang_asm.t
 t/ffi_platypus_lang_c.t
@@ -132,6 +137,7 @@ t/ffi_platypus_record.t
 t/ffi_platypus_record_tiearray.t
 t/ffi_platypus_shareconfig.t
 t/ffi_platypus_type_pointersizebuffer.t
+t/ffi_platypus_type_stringarray.t
 t/ffi_platypus_type_stringpointer.t
 t/forks.t
 t/threads.t
@@ -156,14 +162,15 @@ xs/ABI.xs
 xs/API.xs
 xs/Closure.xs
 xs/ClosureData.xs
+xs/DL.xs
 xs/Declare.xs
 xs/Function.xs
+xs/Internal.xs
 xs/Record.xs
 xs/Type.xs
 xs/closure.c
 xs/complex.c
 xs/custom.c
-xs/dl.xs
 xs/havepm.c
 xs/meta.c
 xs/names.c

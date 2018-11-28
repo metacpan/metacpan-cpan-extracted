@@ -44,7 +44,7 @@ use vars qw( %VALID_OS %VALID_PARAM_ARGS %VALID_STATE
              %VALID_TYPE %VALID_CMD_TYPE );
 
 # The IO:Scalar and XML::Writer are pulled in with "require" if necessary.
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # Get rid of warnings about single usage.
 if ($^W) {
@@ -147,9 +147,9 @@ sub _init {
     $logger->debug("Setting the default block size.");
     $self->{block_size} = $DEFAULT_BLOCK_SIZE;
     
-    foreach my $method qw(block_size command class error getenv initialdir input output
-                          name project priority times evictable length runtime hosts
-                         ) {
+    foreach my $method (qw(block_size command class error getenv initialdir
+                           input output name project priority times evictable
+                           length runtime hosts)) {
         if (exists($args{$method}) && defined($args{$method})) {
             $logger->info("Initializing $method.");
             $self->$method( $args{$method} );
@@ -478,15 +478,13 @@ sub email {
 =item $obj->end_time()
 
 B<Description:> This method is used as a getter for the finish time of the
-command. It may only be used as a setter by the ProxyServer module. If any
-other package (including main) attempts to set the end_time attribute with
-this method, an error will result.
+command. If any other package (including main) attempts to set the end_time
+attribute with this method, an error will result.
 
 B<Parameters:> None.
 
-B<Returns:> The ending time of the command (the time the DCE finished
-processing the command), or undef if the end_time has not yet been
-established.
+B<Returns:> The ending time of the command or undef if the end_time has not yet
+been established.
 
 =cut
 
@@ -936,9 +934,8 @@ sub priority {
 =item $obj->start_time([time]);
 
 B<Description:> This method is only intended to be used as a getter by end
-users. It may only be used as a setter by the ProxyServer module. If any
-attempt is made to set the start_time attribute of the command object
-elsewhere, an error will occur.
+users. If any attempt is made to set the start_time attribute of the command
+object elsewhere, an error will occur.
 
 B<Parameters:> None.
 
@@ -966,9 +963,8 @@ sub start_time {
 =item $obj->state([state]);
 
 B<Description:> This method is only intended to be used as a getter by end
-users. It may only be used as a setter by the ProxyServer module. If any
-attempt is made to set the "state" attribute of the command object
-elsewhere, an error will occur. Valid states are:
+users. If any attempt is made to set the "state" attribute of the command
+object elsewhere, an error will occur. Valid states are:
 
     INIT
     INTERRUPTED

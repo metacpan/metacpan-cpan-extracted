@@ -221,23 +221,22 @@ But each sub-element keeps its original order (e.g. each 'title' in 'titleInfo')
 
 =back
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-=over 4
+Patrick Hochstenbach <Patrick.Hochstenbach at UGent.be>
 
-=item * Patrick Hochstenbach <Patrick . Hochstenbach at UGent . be>
+=head1 LICENSE AND COPYRIGHT
 
-=back
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
 
-=head1 LICENSE
-
-This library is free software and may be distributed under the same terms
-as perl itself. See L<http://dev.perl.org/licenses/>.
+See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
 
 use vars qw( $VERSION );
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -602,7 +601,11 @@ package MODS::Element::Affiliation;
 
 use Moo;
 
-with('MODS::Record::Util','MODS::Record::Unique');
+with('MODS::Record::Util');
+
+use overload fallback => 1 , '""' => sub { $_[0]->_body };
+
+has _body            => ( is => 'rw' );
 
 package MODS::Element::Classification;
 
@@ -944,6 +947,7 @@ has displayLabel    => ( is => 'rw' );
 has usage           => ( is => 'rw' );
 has altRepGroup     => ( is => 'rw' );
 has nameTitleGroup  => ( is => 'rw' );
+has type            => ( is => 'rw' );
 
 has namePart        => ( is => 'rw' , isa => \&_isa , default => sub { [] } );
 has displayForm     => ( is => 'rw' , isa => \&_isa , default => sub { [] } );

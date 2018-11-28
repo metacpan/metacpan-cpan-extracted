@@ -1,10 +1,8 @@
 package Bot::Training::StarCraft;
-BEGIN {
-  $Bot::Training::StarCraft::VERSION = '0.02';
-}
-
+our $AUTHORITY = 'cpan:AVAR';
+$Bot::Training::StarCraft::VERSION = '0.03';
 use 5.010;
-use Any::Moose;
+use Moose;
 
 extends 'Bot::Training::Plugin';
 

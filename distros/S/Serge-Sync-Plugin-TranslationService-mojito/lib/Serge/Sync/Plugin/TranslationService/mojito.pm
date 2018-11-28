@@ -9,7 +9,7 @@ use strict;
 use Serge::Util qw(subst_macros culture_from_lang locale_from_lang);
 use version;
 
-our $VERSION = qv('0.902.0');
+our $VERSION = qv('0.903.0');
 
 sub name {
     return 'Mojito translation server (http://www.mojito.global/) synchronization plugin';
@@ -53,7 +53,6 @@ sub validate_data {
     $self->{data}->{status_equal_target} = subst_macros($self->{data}->{status_equal_target});
     $self->{data}->{status_pull} = subst_macros($self->{data}->{status_pull});
     $self->{data}->{destination_locales} = subst_macros($self->{data}->{destination_locales});
-    $self->{data}->{java_home} = subst_macros($self->{data}->{java_home});
 
     die "'project_id' not defined" unless defined $self->{data}->{project_id};
 

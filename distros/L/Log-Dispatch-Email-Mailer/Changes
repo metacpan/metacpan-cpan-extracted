@@ -1,5 +1,9 @@
 Revision history for Log::Dispatch::Email::Mailer
 
+1.05      2018-11-20 08:42:32-08:00 America/Los_Angeles
+        - Update minimum required version of Email::Mailer
+        - Fix formatting error in README/POD
+
 1.04      2018-11-19 09:33:12-08:00 America/Los_Angeles
         - Adding Perl versions to test; annual general update for 2018
         - Fix HTML attachment test for improved Email::Mailer handling

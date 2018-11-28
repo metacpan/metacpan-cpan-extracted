@@ -1,8 +1,9 @@
 use strict;
 use warnings;
+use 5.010001;
 
 package Mojolicious::Quick;
-$Mojolicious::Quick::VERSION = '0.002';
+$Mojolicious::Quick::VERSION = '0.003';
 use Carp;
 use Mojo::Base 'Mojolicious';
 
@@ -78,7 +79,7 @@ Mojolicious::Quick - A quick way of generating a simple Mojolicious app.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -171,6 +172,10 @@ internally to originate from localhost. The original request will be available i
 Instance of L<Mojo::UserAgent>.  Note that this comes from L<Mojo>; it is noted here to remind the 
 user that they have it available to them. You can also use this to attach your own instance of 
 Mojo::UserAgent if need be.
+
+=head1 CONTRIBUTORS 
+
+Shlomi Fish C<< <shlomif@shlomifish.org > >>
 
 =head1 NOTES
 

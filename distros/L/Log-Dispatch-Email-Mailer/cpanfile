@@ -1,4 +1,4 @@
-requires "Email::Mailer" => "1.07";
+requires "Email::Mailer" => "1.09";
 requires "Log::Dispatch::Email" => "0";
 requires "base" => "0";
 requires "perl" => "5.014";

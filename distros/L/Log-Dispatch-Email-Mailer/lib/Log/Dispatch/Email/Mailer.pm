@@ -7,9 +7,9 @@ use warnings;
 
 use base 'Log::Dispatch::Email';
 
-use Email::Mailer 1.07;
+use Email::Mailer 1.09;
 
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 sub _params {
     my %params = @_;
@@ -69,7 +69,7 @@ Log::Dispatch::Email::Mailer - Log::Dispatch::Email subclass that sends mail usi
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Log-Dispatch-Email-Mailer.svg)](https://travis-ci.org/gryphonshafer/Log-Dispatch-Email-Mailer)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Log-Dispatch-Email-Mailer/badge.png)](https://coveralls.io/r/gryphonshafer/Log-Dispatch-Email-Mailer)
@@ -158,7 +158,7 @@ version 1.04
 This is a subclass of L<Log::Dispatch::Email> that implements the C<send_email()>
 method using the L<Email::Mailer> module. Much like the L<Email::Mailer> module,
 you can send email in a great variety of ways including text-only, HTML with
-text auto-generated, including attachments, and even using your favoriate
+text auto-generated, including attachments, and even using your favorite
 templating system.
 
 =head2 Simple Text Email
@@ -179,7 +179,7 @@ L<Log::Dispatch> much like you would any other email subclass.
     $log->alert('This is to alert you something happened.');
 
 By default, log messages are buffered and sent either when C<$log> is destroyed
-or when you call C<$log->flush>.
+or when you call C<< $log->flush >>.
 
     $log->alert('This message will appear in an email.');
     $log->alert('This message will appear in the same email, but not yet...');

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::Artistic_2_0;
-$Software::License::Artistic_2_0::VERSION = '0.103013';
+$Software::License::Artistic_2_0::VERSION = '0.103014';
 use parent 'Software::License';
 # ABSTRACT: The Artistic License 2.0
 
@@ -9,6 +9,7 @@ sub name { 'The Artistic License 2.0 (GPL Compatible)' }
 sub url  { 'http://www.perlfoundation.org/artistic_license_2_0' }
 sub meta_name  { 'artistic_2' }
 sub meta2_name { 'artistic_2' }
+sub spdx_expression { 'Artistic-2.0' }
 
 1;
 
@@ -22,7 +23,7 @@ Software::License::Artistic_2_0 - The Artistic License 2.0
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 AUTHOR
 
@@ -30,7 +31,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

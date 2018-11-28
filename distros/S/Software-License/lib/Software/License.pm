@@ -3,7 +3,7 @@ use warnings;
 use 5.006; # warnings
 package Software::License;
 # ABSTRACT: packages that provide templated software licenses
-$Software::License::VERSION = '0.103013';
+$Software::License::VERSION = '0.103014';
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
 use Text::Template ();
 
@@ -144,6 +144,15 @@ sub meta2_name {
   return undef;
 }
 
+#pod =method spdx_expression
+#pod
+#pod This method should return the string with the spdx identifier as indicated by
+#pod L<https://spdx.org/licenses/>
+#pod
+#pod =cut
+
+sub spdx_expression { return undef; }
+
 sub _fill_in {
   my ($self, $which) = @_;
 
@@ -223,7 +232,7 @@ Software::License - packages that provide templated software licenses
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 SYNOPSIS
 
@@ -297,6 +306,11 @@ META.json or META.yml file, according to the CPAN Meta spec v2, or undef if
 there is no known string to use.  If this method does not exist, and
 C<meta_name> returns open_source, restricted, unrestricted, or unknown, that
 value will be used.
+
+=head2 spdx_expression
+
+This method should return the string with the spdx identifier as indicated by
+L<https://spdx.org/licenses/>
 
 =head1 LOOKING UP LICENSE CLASSES
 
@@ -453,7 +467,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Kapranoff Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Karen Etheridge Kenichi Ishigaki Leon Timmermans magnolia mikegrb Neil Bowers Olivier Mengué Shlomi Fish Syohei YOSHIDA Wesley Schwengle
+=for stopwords Alex Kapranoff Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Karen Etheridge Kenichi Ishigaki Leon Timmermans magnolia mikegrb Neil Bowers Olivier Mengué Pablo Rodríguez González Shlomi Fish Syohei YOSHIDA Wesley Schwengle
 
 =over 4
 
@@ -551,6 +565,10 @@ Olivier Mengué <dolmen@cpan.org>
 
 =item *
 
+Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
+
+=item *
+
 Shlomi Fish <shlomif@iglu.org.il>
 
 =item *
@@ -565,7 +583,7 @@ Wesley Schwengle <wesley@schwengle.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

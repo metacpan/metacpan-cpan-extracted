@@ -2,14 +2,11 @@
 abstract: 'ez pz charm authoring'
 author:
   - 'Adam Stokes <adamjs@cpan.org>'
-build_requires:
-  Test::More: '0'
+build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
-  File::ShareDir::Install: '0.06'
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,27 +25,31 @@ no_index:
 provides:
   App::CharmKit:
     file: lib/App/CharmKit.pm
-    version: '2.08'
+    version: '2.11'
   charm:
     file: lib/charm.pm
 requires:
-  Data::Printer: '0'
   Import::Into: '1.002005'
-  Path::Tiny: '0.076'
-  Rex: v1.3.3
-  autobox: '0'
-  autobox::Core: '0'
-  boolean: '0.45'
-  'true': '0'
+  Module::Runtime: '0.016'
+  Moo: '2.003004'
+  Path::Tiny: '0.108'
+  Rex: v1.6.0
+  Smart::Comments: '1.06'
+  Sub::Install: '0.928'
+  Test::More: '1.302133'
+  bareword::filehandles: '0.006'
+  boolean: '0.46'
+  'true': '0.18'
 resources:
   bugtracker: https://github.com/charmkit/App-CharmKit/issues
   homepage: https://github.com/charmkit/App-CharmKit
   repository: git://github.com/charmkit/App-CharmKit.git
-version: '2.08'
+version: '2.11'
 x_contributors:
+  - 'Adam Stokes <adam.stokes@ubuntu.com>'
+  - 'Adam Stokes <battlemidget@users.noreply.github.com>'
+  - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
   - 'The Gitter Badger <badger@gitter.im>'
   - 'Сергей Романов <sromanov-dev@yandex.ru>'
-  - 'Adam Stokes <adam.stokes@ubuntu.com>'
-  - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
-  - 'Adam Stokes <battlemidget@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

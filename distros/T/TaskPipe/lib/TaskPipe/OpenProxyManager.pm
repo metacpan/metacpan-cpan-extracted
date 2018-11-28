@@ -96,13 +96,56 @@ sub fetch_proxies{
 
 
 
+#sub test_proxy{
+#    my ($self,$proxy) = @_;
+
+#    my $logger = Log::Log4perl->get_logger;
+
+#    my $uri = $self->settings->proxy_scheme.'://'.$proxy->ip.':'.$proxy->port;
+#    $logger->debug("Open proxy checker: Testing proxy $uri");
+
+#    my $ua_mgr = TaskPipe::UserAgentManager->new(
+#        gm => $self->gm
+#    );
+
+#    $ua_mgr->ua_handler->call( 'proxy', $self->settings->protocols => $uri );
+
+#    my $ip = $ua_mgr->check_ip;
+#    $logger->debug("ip [$ip] my ip [".$self->my_ip."]") if $ip;
+
+#    my $success = 0;
+#    if ( $ip ){
+#        $logger->debug("Successful response from proxy $uri");
+#        
+#        if ( $ip ne $self->my_ip ){
+#            $logger->debug("Proxy $uri does not project originating IP - test successful");
+#            $success = 1;
+#        } else {
+#            $logger->debug("Proxy $uri seems to project originating IP - test failed");
+#        }
+#    } 
+
+#    my $status = $success ? 'available' : 'dud';
+
+#    my $dt = DateTime->now;
+
+#    $proxy->update({
+#        checked_dt => $dt,
+#        status => $status
+#    });
+
+#    return $success;
+
+#}
+
+
 sub test_proxy{
     my ($self,$proxy) = @_;
 
     my $logger = Log::Log4perl->get_logger;
 
-    my $uri = $self->settings->proxy_scheme.'://'.$proxy->ip.':'.$proxy->port;
-    $logger->debug("Open proxy checker: Testing proxy $uri");
+    my $uri = $proxy->{scheme}.'://'.$proxy->{ip}.':'.$proxy->{port};
+    $logger->info("Open proxy checker: Testing proxy $uri");
 
     my $ua_mgr = TaskPipe::UserAgentManager->new(
         gm => $self->gm
@@ -115,24 +158,26 @@ sub test_proxy{
 
     my $success = 0;
     if ( $ip ){
-        $logger->debug("Successful response from proxy $uri");
+        $logger->info("Successful response from proxy $uri");
         
         if ( $ip ne $self->my_ip ){
-            $logger->debug("Proxy $uri does not project originating IP - test successful");
+            $logger->info("Proxy $uri does not project originating IP - test successful");
             $success = 1;
         } else {
-            $logger->debug("Proxy $uri seems to project originating IP - test failed");
+            $logger->info("Proxy $uri seems to project originating IP - test failed");
         }
-    } 
+    } else {
+        $logger->info("Could not proxy using $uri");
+    }
 
-    my $status = $success ? 'available' : 'dud';
+#    my $status = $success ? 'available' : 'dud';
 
-    my $dt = DateTime->now;
+#    my $dt = DateTime->now;
 
-    $proxy->update({
-        checked_dt => $dt,
-        status => $status
-    });
+#    $proxy->update({
+#        checked_dt => $dt,
+#        status => $status
+#    });
 
     return $success;
 

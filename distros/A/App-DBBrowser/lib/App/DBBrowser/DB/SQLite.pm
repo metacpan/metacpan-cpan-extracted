@@ -28,6 +28,7 @@ sub new {
         home_dir => $info->{home_dir},
         app_dir => $info->{app_dir},
         reset_search_cache => $info->{reset_search_cache},
+        file_find_warnings => $info->{file_find_warnings},
     };
     bless $self, $class;
 }
@@ -87,32 +88,51 @@ sub get_databases {
         }
     }
     $databases = [];
+
     print 'Searching ...' . "\n";
-
-    no if $^O eq "MSWin32", 'warnings', 'File::Find';
-
-    for my $dir ( @$dirs ) {
-        File::Find::find( {
-            wanted => sub {
-                my $file = $_;
-                return if ! -f $file;
-                return if ! -s $file; #
-                return if ! -r $file; #
-                #print "$file\n";
-                if ( ! eval {
-                    open my $fh, '<:raw', $file or die "$file: $!";
-                    defined( read $fh, my $string, 13 ) or die "$file: $!";
-                    close $fh;
-                    push @$databases, decode( 'locale_fs', $file ) if $string eq 'SQLite format';
-                    1 }
-                ) {
-                    utf8::decode( $@ );
-                    print $@ if $^O ne "MSWin32";
-                }
+    if ( $self->{file_find_warnings} ) {
+        for my $dir ( @$dirs ) {
+            File::Find::find( {
+                wanted => sub {
+                    my $file = $_;
+                    return if ! -f $file;
+                    #print "$file\n";
+                    if ( ! eval {
+                        open my $fh, '<:raw', $file or die "$file: $!";
+                        defined( read $fh, my $string, 13 ) or die "$file: $!";
+                        close $fh;
+                        push @$databases, decode( 'locale_fs', $file ) if $string eq 'SQLite format';
+                        1 }
+                    ) {
+                        utf8::decode( $@ );
+                        print $@;
+                    }
+                },
+                no_chdir => 1,
             },
-            no_chdir => 1,
-        },
-        encode( 'locale_fs', $dir ) );
+            encode( 'locale_fs', $dir ) );
+        }
+        choose( [ 'Press ENTER to continue' ], { prompt => 'Search finished.' } );
+    }
+    else {
+        no warnings qw( File::Find );
+        for my $dir ( @$dirs ) {
+            File::Find::find( {
+                wanted => sub {
+                    my $file = $_;
+                    return if ! -f $file;
+                    #print "$file\n";
+                    eval {
+                        open my $fh, '<:raw', $file or die "$file: $!";
+                        defined( read $fh, my $string, 13 ) or die "$file: $!";
+                        close $fh;
+                        push @$databases, decode( 'locale_fs', $file ) if $string eq 'SQLite format';
+                    };
+                },
+                no_chdir => 1,
+            },
+            encode( 'locale_fs', $dir ) );
+        }
     }
     print 'Ended searching' . "\n";
     $db_cache->{directories} = $dirs;

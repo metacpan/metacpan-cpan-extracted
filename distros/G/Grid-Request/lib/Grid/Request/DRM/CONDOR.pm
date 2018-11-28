@@ -3,7 +3,7 @@ package Grid::Request::DRM::CONDOR;
 use strict;
 use Log::Log4perl qw(get_logger);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my $logger = get_logger(__PACKAGE__);
 

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 use File::Basename;
 use Cwd 'abs_path';
 use File::Spec;
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 print "\nMakefile.PL for TaskPipe version $VERSION\n(c) Virtual Blue LTD 2018\n\n";
 
@@ -96,10 +96,14 @@ WriteMakefile(
     EXE_FILES => ['scripts/taskpipe', 'scripts/taskpipe-xtask'],
     TEST_REQUIRES => {
         'Test::More' => 0,
+	'Data::Dumper' => 0,
+	'File::Spec' => 0,
         'File::Basename' => 0,
+	'Moose' => 0,
         'MooseX::ConfigCascade' => 0,
         'Proc::ProcessTable' => 0,
-        'Try::Tiny' => 0
+        'Try::Tiny' => 0,
+	'Time::HiRes' => 0
     },
     ABSTRACT_FROM     => 'lib/TaskPipe.pm',
     AUTHOR            => 'Tom Gracey <tomgracey@gmail.com>',

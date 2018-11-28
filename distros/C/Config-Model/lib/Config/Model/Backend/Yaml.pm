@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Yaml;
-$Config::Model::Backend::Yaml::VERSION = '2.127';
+$Config::Model::Backend::Yaml::VERSION = '2.128';
 use 5.10.1;
 use Carp;
 use strict;
@@ -124,7 +124,7 @@ Config::Model::Backend::Yaml - Read and write config as a YAML data structure
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -252,7 +252,9 @@ module which writes C<true> and C<false> without quotes.
 
 =head1 CONSTRUCTOR
 
-=head2 new ( node => $node_obj, name => 'yaml' ) ;
+=head2 new
+
+Parameters: C<< ( node => $node_obj, name => 'yaml' ) >>
 
 Inherited from L<Config::Model::Backend::Any>. The constructor is
 called by L<Config::Model::BackendMgr>.
@@ -261,13 +263,13 @@ called by L<Config::Model::BackendMgr>.
 
 Read YAML file and load into C<$node_obj> tree.
 
-When a file is read,  C<read()> returns 1.
+When a file is read, C<read> returns 1.
 
 =head2 write
 
 Write YAML File using C<$node_obj> data.
 
-C<write()> returns 1.
+C<write> returns 1.
 
 =head1 AUTHOR
 

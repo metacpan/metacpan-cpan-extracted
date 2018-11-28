@@ -49,9 +49,14 @@ benutzt) oder man benutzt XML::Reader::PP (welches XML::Parsepp benutzt).
 Falls man dennoch XML::Reader direkt benutzen will, hier ist die Beschreibung wie man zwischen XML::Parser und XML::Parsepp
 auswE<auml>hlt:
 
-XML::Reader benutzt XML::Parser als Parser Modul. Das funktioniert sehr gut, ausser in den FE<auml>llen in denen kein
-C-compiler zur verfE<uuml>gung steht um XML::Parser zu installieren. In diesen FE<auml>llen kann XML::Parsepp 
-als eine Perl Alternative zu XML::Parser benutzt werden. Hier ist ein Beispiel:
+Wenn bei der C<use>-Anweisung keine Angabe zum Parser Modul gemacht wird, lE<auml>dt XML::Reader zunE<auml>chst
+XML::Parser.  Das funktioniert sehr gut, ausser in den FE<auml>llen in denen kein C-compiler zur verfE<uuml>gung
+steht um XML::Parser zu installieren.  Wenn also das Laden von XML::Parser fehlschlE<auml>gt, wird XML::Parsepp als
+Ersatz geladen.
+
+Es ist auch mE<ouml>glich, den Parser explizit auszuwE<auml>hlen.  Im folgenden Beispiel wird XML::Parser
+ausgewE<auml>hlt, so dass nun die E<Uuml>bersetzung des Moduls fehlschlE<auml>gt, wenn XML::Parser nicht
+verfE<uuml>gbar ist.
 
   use XML::Reader qw(XML::Parser);
 

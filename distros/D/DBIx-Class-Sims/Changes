@@ -1,5 +1,13 @@
 Revision history for DBIx::Class::Sims (ordered by revision number).
 
+0.303000 Nov 25 2018 14:30:00 PDT
+   - Find the best match including all parentage. (Re-enabled feature)
+   - Don't call update() in fix_deferred_fks if no columns are dirty.
+   - Ignore inflated columns when looking for a sims spec.
+
+0.302001 Nov 25 2018 13:30:00 PDT
+   - Allow a DBIC object to be set to a column, not just a relationship.
+
 0.302000 Nov 11 2018 19:30:00 PDT
    All fixes below graciously provided by ZipRecruiter.
    - Warn when a not-null autoincrement primary key has a value set.

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use 5.010;
+use v5.28.0;
 use autodie;
 use strict;
 use Hailo;

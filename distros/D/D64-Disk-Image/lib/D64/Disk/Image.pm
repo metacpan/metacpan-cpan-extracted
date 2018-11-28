@@ -128,7 +128,7 @@ use constant T_REL => 4;
 use constant T_CBM => 5;
 use constant T_DIR => 6;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw/carp croak verbose/;
 
@@ -763,7 +763,7 @@ Pawel Krol, E<lt>pawelkrol@cpan.orgE<gt>.
 
 =head1 VERSION
 
-Version 0.02 (2013-01-12)
+Version 0.03 (2018-11-24)
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -777,16 +777,18 @@ Redistribution and use in source and binary forms, with or without modification,
 =over
 
 =item *
+
 Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 
 =item *
+
 Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 
 =back
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-diskimage.c website: L<http://www.paradroid.net/diskimage/>
+diskimage.c website: L<https://paradroid.automac.se/diskimage/>
 
 =cut
 

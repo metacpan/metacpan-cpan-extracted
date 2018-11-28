@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 53ca240de02ec42979ffe5328579d9cc30465d43ec5ab3a211ba1328d27dac89 AUTHOR_PLEDGE
+SHA256 ce0736394bf7b9bdf342fc8856b96efbde75e2a9c2b8ed91868daf5410688e4e CODE_OF_CONDUCT.md
+SHA256 b6f857134ddea467cef1d263762165558ea963b6c27d04dc7d86daec747e1fa7 Changes
+SHA256 fb78f71418dd331d5e013131cd79d1f095f5e5ee433d3748cecb04ae85741ebb INSTALL
+SHA256 1fe95b2bbbc998dee7eb37337877a8c3bea93c68cb304a18c582182d772cb62c LICENSE
+SHA256 276d6592e90c70b3766a2b9ec174ea34f5dfececde425ef80026e2d81089a130 MANIFEST
+SHA256 9cd8de39395d08597e4dd8ee8cbb65e0be3043399fc20887d0dbbfad9b2ccd42 META.json
+SHA256 580157189f8f1fecca8000fcf23a61ba47f9f9ef93429d2d088784904d8cf36b META.yml
+SHA256 0d7251d454268f31955132845573a168dd146322623633cb401f0f159b871b01 Makefile.PL
+SHA256 97dd705bc83032cdb45c00c2b38b3389074e4075b067114cfc87a5640e36fc01 README.mkdn
+SHA256 4036c86b28067796701e9fa0bdbf13d915a609ff3c34a917967b81b4d1aaee0a cpanfile
+SHA256 d6a258311616de3f9e055511cb24717ec30993e19c336b0155b4c096d66d9499 doap.xml
+SHA256 435fa99687e03680f210d3ba2a49501a52e433205fd5d4f03dd36f8346e0b33c lib/Path/Tiny/Glob.pm
+SHA256 c3924fd0d2921821ed77cc85e7e8ffcc8d655a605bb8cb620a02e9dc7602e1e5 lib/Path/Tiny/Glob/Visitor.pm
+SHA256 dfa361a080030328608103af793908533002d040ef60c3754ed3a41c2316659b t/00-compile.t
+SHA256 62589c0bd094e1dab37da80b6b170729c51798efcea4500e8837a4702bbeac15 t/00-report-prereqs.dd
+SHA256 32862ed3cdb28367324e2dd1f20af158acc637de8e0487bb296157634e12e08c t/00-report-prereqs.t
+SHA256 216e597fc22d32cc5baf111204729058177975a0eb5f2e5b1fc169b0161bf1b6 t/basic.t
+SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 t/corpus/foo/bar/baz/a.x
+SHA256 63d9827f7014ae7145a2f3dde173b115b0f529a713aad5f747933bd381a6bd05 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlv68I4ACgkQ34Hwf+GwC4w8swCfVWc2vnd4+Wuq+hL5pBwH+2jO
+J3cAoJwOSYhEmQKiznFNMARKj1Llu7ep
+=1DMT
+-----END PGP SIGNATURE-----

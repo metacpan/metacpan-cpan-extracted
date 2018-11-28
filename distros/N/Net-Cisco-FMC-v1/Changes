@@ -1,4 +1,13 @@
-Revision history for Net-Cisco-FMC-v1: 0.001001
+Revision history for Net-Cisco-FMC-v1: 0.002001
+
+0.002001  2018-11-26 14:52:43+01:00 Europe/Vienna
+    - fix recursive relogins when 429 too many requests is returned by the API
+    - increased number of retries from 3 to 20
+    - throw error on unsuccessful login
+    - don't try to relogin on http status code 401 unauthorized
+    - add methods for all missing object types supporting all CRUD methods:
+      interfacegroups, ranges, securityzones, slamonitors, urlgroups, urls,
+      vlangrouptags and vlantags
 
 0.001001  2018-11-05 17:14:28+01:00 Europe/Vienna
     - Initial release using the JSON REST API version 1

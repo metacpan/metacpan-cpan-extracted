@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::PerlFile;
-$Config::Model::Backend::PerlFile::VERSION = '2.127';
+$Config::Model::Backend::PerlFile::VERSION = '2.128';
 use 5.10.1;
 use Carp;
 use strict;
@@ -86,7 +86,7 @@ Config::Model::Backend::PerlFile - Read and write config as a Perl data structur
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -182,16 +182,16 @@ Of all parameters passed to this read call-back, only C<ifile_path> is
 used. This parameter must be L<IO::File> object already opened for
 read.
 
-It can also be undef. In which case C<read()> returns 0.
+It can also be undef. In which case C<read> returns 0.
 
-When a file is read,  C<read()> returns 1.
+When a file is read, C<read> returns 1.
 
 =head2 write
 
 Of all parameters passed to this write call-back, only C<file_path> is
 used. This parameter must be a L<Path::Tiny> object.
 
-C<write()> returns 1.
+C<write> returns 1.
 
 =head1 AUTHOR
 

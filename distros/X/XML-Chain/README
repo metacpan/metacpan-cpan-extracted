@@ -46,20 +46,21 @@ EXPORTS
 
  xc
 
-    Exported factory method creating new XML::Chain::Selector object with a
+    Exported factory method creating new XML::Chain::Element object with a
     document element as provided in parameters. For example:
 
         my $icon = xc('i', class => 'icon-download icon-white');
         # <i class="icon-download icon-white"/>
 
-    See "c, append_and_current" in XML::Chain::Selector for the element
-    parameter description and "CHAINED METHODS" in XML::Chain::Selector for
-    methods of returned object.
+    See also "c, append_and_current" in XML::Chain::Selector, from which
+    XML::Chain::Element inherits all methods, for the element parameter
+    description and "CHAINED METHODS" in XML::Chain::Selector for methods
+    of returned object.
 
-  xc($name, @attrs) scalar with 1+ arguments
+  xc($el_name, @attrs) scalar with 1+ arguments
 
-    Element with $name will be create as document element and  @attrs  will
-    be added to it in the same order.
+    Element with $el_name will be create as document element and  @attrs 
+    will be added to it in the same order.
 
     In case of hash reference passed as argument, key + values will be set
     as attributes, in alphabetical sorted key name order.
@@ -126,6 +127,7 @@ CONTRIBUTORS & CREDITS
     suggesting useful advice, nitpicking, chatting on IRC or commenting on
     my blog (in no particular order):
 
+        Slaven Rezic
         Vienna.pm (for listening to my talk and providing valuable feedback)
         Mohammad S Anwar
         you?

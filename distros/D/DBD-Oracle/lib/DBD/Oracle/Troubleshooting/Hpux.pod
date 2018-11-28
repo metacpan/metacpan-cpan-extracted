@@ -13,7 +13,7 @@ DBD::Oracle::Troubleshooting::Hpux - Tips and Hints to Troubleshoot DBD::Oracle 
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 INTRODUCTION
 
@@ -140,7 +140,7 @@ versions of the compiler are unreliable.
 Both Roger Foskett, I and most others have been using the HP Softbench
 C compiler normally installed in:
 
-	/opt/softbench/bin/cc.
+    /opt/softbench/bin/cc.
 
 While the DBD-Oracle F<Makefile.PL> checks for some of the conditions
 which, when met, we know will produce a working build, there are many
@@ -203,7 +203,7 @@ Perl from source, the Configure program will ask you a series of
 questions about how to build Perl.  You may supply default answers to the
 questions when you invoke the Configure program by command line flags.
 
-We want to build a Perl that understands large files (over 2GB, wich is
+We want to build a Perl that understands large files (over 2GB, which is
 the default for building perl on HP-UX), and that is incompatible with
 v5.005 Perl scripts (compiling with v5.005 compatibility causes mod_perl
 to complain about malloc pollution).  At the command prompt type:
@@ -387,9 +387,9 @@ and add the missing libraries.
 When you add those library files to OTHERLDFLAGS you must convert the
 name from the actual name to the notation that OTHERLDFLAGS uses.
 
-      libclntsh.sl         becomes =>	-lclntsh
-      libagtsh.sl          becomes =>	-lagtsh
-      libwtc8.sl           becomes =>	-lwtc8
+      libclntsh.sl         becomes => -lclntsh
+      libagtsh.sl          becomes => -lagtsh
+      libwtc8.sl           becomes => -lwtc8
 
 That is, you replace the "lib" in the name to "-l" and remove the ".sl"
 (or the .so).
@@ -435,7 +435,7 @@ time of this document,  then the above conditions will likely not be
 met.
 You can fix this as follows:
 
-	perl -pi -e's/-Wl,\+[sn]//' Makefile
+    perl -pi -e's/-Wl,\+[sn]//' Makefile
 
 =head1 Building on a Oracle Client Machine
 
@@ -573,7 +573,7 @@ The following folks contributed to this document:
    Weiguo Sun        <wesun@cisco.com.Fix.This>
    Tony Foiani       <anthony_foiani@non.hp.com.Fix.This>
    Hugh J. Hitchcock <hugh@hitchco.com.Fix.This>
-	Heiko Herms  <Heiko.Herms.extern@HypoVereinsbank.de.Fix.This>
+   Heiko Herms  <Heiko.Herms.extern@HypoVereinsbank.de.Fix.This>
    Waldemar Zurowski <bilbek0@poczta.onet.pl.Fix.This>
    Michael Schuh     <Michael.Schuh@airborne.com.Fix.This>
    Gram M. Ludlow    <LUDLOW_GRAM_M@cat.com.Fix.This>
@@ -593,7 +593,7 @@ And probably others unknown to me.
 
 This is pretty much verbatim the build information I received from
 Waldemar Zurowski on building Perl and DBD-Oracle using gcc on HP.  Note
-that this build was on a PA-RISC1.1 machine.  
+that this build was on a PA-RISC1.1 machine.
 
 =head3 Host
 
@@ -677,7 +677,7 @@ the extra link options.
 Gram M. Ludlow writes:
 
 I recently had a problem with Oracle 9 64-bit on HPUX 11i. We have
-another application that required SH_LIBARY_PATH to point to the 64-bit
+another application that required SH_LIBRARY_PATH to point to the 64-bit
 libraries, which "broke" the Oraperl module. So I did some research and
 successfully recompiled and re-installed with the most recent versions of
 everything (perl, DBI, DBD) that works with 64-bit shared libraries. This
@@ -867,7 +867,7 @@ warnings;". However, it was annoying, since all my scripts had -w in the
 
 Since almost every OS now supports dynamic linking, I believe that static
 linking is NOT getting the same level of vetting it maybe used to.
-Dynamicly linking is what you get by default, so its way better tested.
+Dynamically linking is what you get by default, so its way better tested.
 
 =item 5 It's required for Apache and mod_perl.
 
@@ -896,7 +896,7 @@ To work around this problem, complete the following procedure:
 
 =over
 
-=item 1 Log in to your Oracle account: 
+=item 1 Log in to your Oracle account:
 
    su - oracle
 
@@ -904,7 +904,7 @@ To work around this problem, complete the following procedure:
 
    $ORACLE_HOME/rdbms/admin/shrept.lst
 
-=item 3 Add the following line: 
+=item 3 Add the following line:
 
    rdbms:OCILobLocatorAssign
 
@@ -954,7 +954,7 @@ Martin J. Evans <mjevans@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1994 by Tim Bunce.
+This software is copyright (c) 2018, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

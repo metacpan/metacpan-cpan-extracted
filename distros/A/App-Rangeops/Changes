@@ -1,5 +1,10 @@
 Revision history for App-Rangeops
 
+0.1.1 2018-11-25T08:54:14Z
+
+    - Require Perl 5.18
+    - Don't use `use constant abstract`
+
 0.1.0 2017-05-07T19:44:32Z
     - Switch to Minilla
     - Mature enough

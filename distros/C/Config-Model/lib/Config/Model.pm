@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.127';
+$Config::Model::VERSION = '2.128';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -520,7 +520,7 @@ sub normalize_class_parameters {
 
     # check for duplicate in @element_list.
     my %check_list;
-    map { $check_list{$_}++ } @element_list;
+    foreach (@element_list) { $check_list{$_}++ };
     my @extra = grep { $check_list{$_} > 1 } keys %check_list;
     if (@extra) {
         Config::Model::Exception::ModelDeclaration->throw(
@@ -555,7 +555,7 @@ sub normalize_class_parameters {
                 $self->handle_experience_permission( $config_class_name, $info );
 
                 # copy in element data *after* legacy translation
-                map { $model->{element}{$_} = dclone($info); } @element_names;
+                foreach (@element_names) { $model->{element}{$_} = dclone($info); };
             }
 
             # move some information into element declaration (without clobberring)
@@ -715,7 +715,9 @@ sub translate_legacy_backend_info {
     # merge write_config spec in rw_config
     if ($model->{write_config}) {
         $self->show_legacy_issue("$config_class_name: write_config specification is deprecated, please merge with read_config and move in rw_config", 'warn');
-        map {$model->{rw_config}{$_} = $model->{write_config}{$_} } keys %{$model->{write_config}} ;
+        foreach (keys %{$model->{write_config}}) {
+            $model->{rw_config}{$_} = $model->{write_config}{$_}
+        }
         delete $model->{write_config};
     }
 
@@ -832,13 +834,13 @@ sub translate_compute_info {
 
         my ( $user_formula, %var ) = @$compute_info;
         my $replace_h;
-        map { $replace_h = delete $var{$_} if ref( $var{$_} ) } keys %var;
+        foreach ( keys %var ) { $replace_h = delete $var{$_} if ref( $var{$_} ) };
 
         # cleanup user formula
         $user_formula =~ s/\$(\w+)\{/\$replace{/g;
 
         # cleanup variable
-        map { s/\$(\w+)\{/\$replace{/g } values %var;
+        foreach ( values %var ) { s/\$(\w+)\{/\$replace{/g };
 
         # change the hash *in* the info structure
         $info->{$new_name} = {
@@ -1094,7 +1096,7 @@ sub translate_follow_arg {
         # translate legacy follow arguments ['warp1','warp2',...]
         my $follow = {};
         my $idx    = 0;
-        map { $follow->{ 'f' . $idx++ } = $_ } @$raw_follow;
+        foreach ( @$raw_follow ) { $follow->{ 'f' . $idx++ } = $_ } ;
         return $follow;
     }
     elsif ( defined $raw_follow ) {
@@ -1839,7 +1841,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,9 @@
+0.002   2018-11-22 (PERLANCAR)
+
+	- Determine CGI/FCGI from ENV FCGI_ROLE or GATEWAY_INTERFACE in
+	  addition to script extension.
+
+
+0.001   2018-11-22 (PERLANCAR)
+
+        - First very early release.

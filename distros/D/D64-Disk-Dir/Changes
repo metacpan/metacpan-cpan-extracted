@@ -1,5 +1,9 @@
 Revision history for Perl extension D64::Disk::Dir.
 
+0.04  2018-11-25
+    - remove hard-coded file names in tests and replace them with a File::Temp's
+      "tmpnam" function call that returns the full name of a temporary file
+
 0.03  2013-02-16
     - fixed failing unit-tests for Perl 5.6.2 by switching to Capture::Tiny
       to capture the contents written into a standard output and IO::Scalar

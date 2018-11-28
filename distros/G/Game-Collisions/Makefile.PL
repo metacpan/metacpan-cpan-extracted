@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Test::Memory::Cycle" => "1.06",
     "Test::Pod" => 0
   },
-  "VERSION" => "0.2",
+  "VERSION" => "0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }

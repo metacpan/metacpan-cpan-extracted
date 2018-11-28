@@ -52,14 +52,12 @@ if (! defined $task_id || $task_id <= 0) {
 $logger->info("Task id for this worker: $task_id");
 
 # an array of arrays for all the parameters to invoke
-my @invocations = $jb->formulate($block_size, $, @mw_params);
-@invocations = splice_task_invocations(\@invocations);
+my $jb = Grid::Request::JobFormulator->new();
+my @invocations = $jb->formulate($block_size, $executable, @mw_params);
+
 execute(\@invocations);
 
 #############################################################################
-
-sub splice_task_invocations {
-}
 
 sub execute {
     $logger->debug("In execute.");

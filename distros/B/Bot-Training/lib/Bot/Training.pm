@@ -1,6 +1,6 @@
 package Bot::Training;
 our $AUTHORITY = 'cpan:AVAR';
-$Bot::Training::VERSION = '0.06';
+$Bot::Training::VERSION = '0.07';
 use 5.010;
 use autodie qw(open close);
 use Class::Load;

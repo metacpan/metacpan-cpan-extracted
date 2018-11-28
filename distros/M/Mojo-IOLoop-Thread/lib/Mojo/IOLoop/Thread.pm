@@ -1,9 +1,10 @@
 package Mojo::IOLoop::Thread;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 use threads;
+use Thread::Queue;
 
 use Scalar::Util qw(weaken);
 use Mojo::IOLoop;
@@ -17,32 +18,53 @@ BEGIN {
     }
 }
 
-use Carp 'croak';
-use Config;
 use Storable;
 
 has deserialize => sub { \&Storable::thaw };
 has ioloop      => sub { Mojo::IOLoop->singleton };
 has serialize   => sub { \&Storable::freeze };
-has pid         => sub { $$ };
+
+sub pid  { threads->tid() || shift->{pid}  };
 
 sub run {
+  my ($self, @args) = @_;
+  $self->ioloop->next_tick(sub { $self->_start(@args) });
+  return $self;
+}
+
+sub _start {
   my ($self, $child, $parent) = @_;
 
+  $self->{queue} = Thread::Queue->new();
   my($thr) = threads->create(
     {'exit' => 'thread_only'},
     sub {
+      my($q) = @_;
       $self->ioloop->reset;
       my $results = eval { [$self->$child] } || [];
       return $@, $results;
-    }
+    },
   );
+  $self->{pid} = $thr->tid();
+  $self->emit('spawn');
+
+  while ( !$thr->is_joinable() ) {
+      if ( my $args = $self->{queue}->dequeue_nb() ) {
+          $self->emit(progress => @$args);
+      }
+      threads->yield();
+  }
 
   my($err, $results) = $thr->join();
 
   $self->$parent($err, @$results);
 
   return $self;
+}
+
+sub progress {
+  my ($self, @args) = @_;
+  $self->{queue}->enqueue(\@args);
 }
 
 1;
@@ -113,7 +135,7 @@ L<https://github.com/tomk3003/mojo-ioloop-thread>
 
 =head1 COPYRIGHT
 
-Copyright 2017 Thomas Kratz.
+Copyright 2017-18 Thomas Kratz.
 
 =head1 LICENSE
 

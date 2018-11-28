@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-10-18'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-11-21'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010;
 use strict;
@@ -19,6 +19,7 @@ my $cli = Perinci::CmdLine::Any->new(
         'list' => {url=>"${prefix}list"},
         'latest-version' => {url=>"${prefix}latest_version"},
         'download-url' => {url=>"${prefix}download_url"},
+        'archive-info' => {url=>"${prefix}archive_info"},
     },
 );
 $cli->run;
@@ -38,7 +39,7 @@ swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.007 of swcat (from Perl distribution App-swcat), released on 2018-10-18.
+This document describes version 0.008 of swcat (from Perl distribution App-swcat), released on 2018-11-21.
 
 =head1 SYNOPSIS
 
@@ -64,6 +65,10 @@ This document describes version 0.007 of swcat (from Perl distribution App-swcat
  % swcat download-url firefox --arch win32
 
 =head1 SUBCOMMANDS
+
+=head2 B<archive-info>
+
+Get info of a software archive.
 
 =head2 B<download-url>
 
@@ -190,6 +195,16 @@ Display program's version and exit.
 
 =back
 
+=head2 Options for subcommand archive-info
+
+=over
+
+=item B<--arch>=I<s>
+
+=item B<--software>=I<s>*
+
+=back
+
 =head2 Options for subcommand download-url
 
 =over
@@ -289,6 +304,11 @@ List of available configuration parameters:
  format (see --format)
  log_level (see --log-level)
  naked_res (see --naked-res)
+
+=head2 Configuration for subcommand archive-info
+
+ arch (see --arch)
+ software (see --software)
 
 =head2 Configuration for subcommand download-url
 

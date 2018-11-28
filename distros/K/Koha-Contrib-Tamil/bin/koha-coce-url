@@ -107,7 +107,7 @@ koha-coce-url - Generate a JSON structure of Cover url via Coce
 
 =head1 VERSION
 
-version 0.059
+version 0.061
 
 =head1 DESCRIPTION
 

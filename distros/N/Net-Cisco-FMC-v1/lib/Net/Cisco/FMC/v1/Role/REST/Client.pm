@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1::Role::REST::Client;
-$Net::Cisco::FMC::v1::Role::REST::Client::VERSION = '0.001001';
+$Net::Cisco::FMC::v1::Role::REST::Client::VERSION = '0.002001';
 # ABSTRACT: Cisco Firepower Management Center (FMC) REST client
 
 use 5.024;
@@ -24,7 +24,7 @@ before '_call' => sub {
 };
 
 around '_call' => sub($orig, $self, @params) {
-    my $try_count = 3;
+    my $try_count = 20;
     my $try_timeout = 3;
 
     return retry $try_count, $try_timeout,
@@ -32,12 +32,6 @@ around '_call' => sub($orig, $self, @params) {
             my $n = shift;
             warn "api call retry #$n\n"
                 if $n > 1;
-            # FIXME: the 6.2.2.1 API doesn't responde to the 11th call which
-            # triggers this error
-            if ($n == $try_count) {
-                warn "last retry, logging in again\n";
-                $self->relogin;
-            }
             return $orig->($self, @params);
         }, sub {
             my $res = shift;
@@ -50,11 +44,6 @@ around '_call' => sub($orig, $self, @params) {
             elsif ($res->code == 599
                 && $res->data =~ /Timed out while waiting for socket to become ready for reading/) {
                 warn "timeout, retrying in $try_timeout seconds\n";
-                return 1;
-            }
-            elsif ($res->code == 401) {
-                warn "unauthorized, logging in again\n";
-                $self->relogin;
                 return 1;
             }
             #elsif ($res->response->is_error ) {
@@ -78,7 +67,7 @@ Net::Cisco::FMC::v1::Role::REST::Client - Cisco Firepower Management Center (FMC
 
 =head1 VERSION
 
-version 0.001001
+version 0.002001
 
 =head1 AUTHOR
 

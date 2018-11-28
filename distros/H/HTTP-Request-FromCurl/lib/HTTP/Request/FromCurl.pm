@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -76,7 +76,7 @@ will be returned.
 
 Helper method to clean up relative path elements from the URI the same way
 that curl does.
-    
+
 =head1 GLOBAL VARIABLES
 
 =head2 C<< %default_headers >>
@@ -93,7 +93,23 @@ our %default_headers = (
 =head2 C<< @option_spec >>
 
 Contains the L<Getopt::Long> specification of the recognized command line
-parameters
+parameters.
+
+The following C<curl> options are recognized but ignored:
+
+=over 4
+
+=item C< --dump-header >
+
+=item C< --include >
+
+=item C< --progress-bar >
+
+=item C< --silent >
+
+=item C< --verbose >
+
+=back
 
 =cut
 
@@ -101,11 +117,13 @@ our @option_spec = (
     'agent|A=s',
     'verbose|v',
     'silent|s',
-    #'c|cookie-jar=s',   # ignored
     'buffer!',
     'compressed',
+    'cookie|b=s',
+    'cookie-jar|c=s',
     'data|d=s@',
     'data-binary=s@',
+    'dump-header|D=s',   # ignored
     'referrer|e=s',
     'form|F=s@',
     'get|G',
@@ -137,7 +155,7 @@ sub new( $class, %options ) {
     };
 
     my $p = Getopt::Long::Parser->new(
-        config => [ 'no_ignore_case' ],
+        config => [ 'bundling', 'no_auto_abbrev', 'no_ignore_case_always' ],
     );
     $p->getoptionsfromarray( $cmd,
         \my %curl_options,
@@ -282,6 +300,19 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         $headers{ Referer } = $options->{ 'referrer' };
     };
 
+    if( defined $options->{ 'cookie-jar' }) {
+            $options->{'cookie-jar-options'}->{ 'write' } = 1;
+    };
+
+    if( defined( my $c = $options->{ cookie })) {
+        if( $c =~ /=/ ) {
+            $headers{ Cookie } = $options->{ 'cookie' };
+        } else {
+            $options->{'cookie-jar'} = $c;
+            $options->{'cookie-jar-options'}->{ 'read' } = 1;
+        };
+    };
+
     if( defined $options->{ agent }) {
         $headers{ 'User-Agent' } = $options->{ 'agent' };
     };
@@ -306,6 +337,8 @@ sub _build_request( $self, $uri, $options, %build_options ) {
         maybe credentials => $options->{ user },
         maybe output => $options->{ output },
         maybe timeout => $options->{ 'max-time' },
+        maybe cookie_jar => $options->{'cookie-jar'},
+        maybe cookie_jar_options => $options->{'cookie-jar-options'},
     });
 };
 
@@ -316,6 +349,25 @@ sub _build_request( $self, $uri, $options, %build_options ) {
 L<https://corion.net/curl2lwp.psgi>
 
 =head1 KNOWN DIFFERENCES
+
+=head2 Incompatible cookie jar formats
+
+Until somebody writes a robust Netscape cookie file parser and proper loading
+and storage for L<HTTP::CookieJar>, this module will not be able to load and
+save files in the format that Curl uses.
+
+=head2 Loading/saving cookie jars is the job of the UA
+
+You're expected to instruct your UA to load/save cookie jars:
+
+    use Path::Tiny;
+    use HTTP::CookieJar::LWP;
+
+    if( my $cookies = $r->cookie_jar ) {
+        $ua->cookie_jar( HTTP::CookieJar::LWP->new()->load_cookies(
+            path($cookies)->lines
+        ));
+    };
 
 =head2 Different Content-Length for POST requests
 
@@ -328,12 +380,6 @@ in the raw body content and the C<Content-Length> header.
 =head1 MISSING FUNCTIONALITY
 
 =over 4
-
-=item *
-
-Cookie files
-
-Curl cookie files are neither read nor written
 
 =item *
 
@@ -382,6 +428,8 @@ L<LWP::Curl>
 L<LWP::Protocol::Net::Curl>
 
 L<LWP::CurlLog>
+
+L<HTTP::Request::AsCurl> - for the inverse function
 
 =head1 REPOSITORY
 

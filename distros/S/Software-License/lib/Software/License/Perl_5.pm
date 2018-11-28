@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::Perl_5;
-$Software::License::Perl_5::VERSION = '0.103013';
+$Software::License::Perl_5::VERSION = '0.103014';
 use parent 'Software::License';
 # ABSTRACT: The Perl 5 License (Artistic 1 & GPL 1)
 
@@ -12,6 +12,7 @@ sub name { 'the same terms as the perl 5 programming language system itself' }
 sub url  { 'http://dev.perl.org/licenses/' }
 sub meta_name  { 'perl' }
 sub meta2_name { 'perl_5' }
+sub spdx_expression  { 'Artistic-1.0-Perl OR GPL-1.0-or-later' }
 
 sub _gpl {
   my ($self) = @_;
@@ -41,7 +42,7 @@ Software::License::Perl_5 - The Perl 5 License (Artistic 1 & GPL 1)
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 AUTHOR
 
@@ -49,7 +50,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

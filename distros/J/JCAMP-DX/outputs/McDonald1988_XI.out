@@ -1,0 +1,71 @@
+$VAR1 = {
+  'blocks' => [
+    {
+      'data' => {
+        'DATATYPE' => [
+          ' Chromatogram'
+        ],
+        'JCAMPDX' => [
+          ' 4.24'
+        ]
+      },
+      'labels' => [
+        'JCAMPDX',
+        'DATATYPE'
+      ],
+      'title' => ' Chromatogram XYZ'
+    },
+    {
+      'data' => {
+        'DATATYPE' => [
+          ' Infrared Spectrum'
+        ],
+        'JCAMPDX' => [
+          ' 4.24'
+        ]
+      },
+      'labels' => [
+        'JCAMPDX',
+        'DATATYPE'
+      ],
+      'title' => ' IR Spectrum of Fraction XYZ-1'
+    },
+    {
+      'data' => {
+        'DATATYPE' => [
+          ' Infrared Spectrum'
+        ],
+        'JCAMPDX' => [
+          ' 4.24'
+        ]
+      },
+      'labels' => [
+        'JCAMPDX',
+        'DATATYPE'
+      ],
+      'title' => ' IR Spectrum of Fraction XYZ-N'
+    }
+  ],
+  'data' => {
+    'BLOCKS' => [
+      ' N + 1'
+    ],
+    'DATATYPE' => [
+      ' LINK'
+    ],
+    'JCAMPDX' => [
+      ' 4.24'
+    ],
+    'SAMPLEDESCRIPTION' => [
+      ' '
+    ]
+  },
+  'labels' => [
+    'JCAMPDX',
+    'DATATYPE',
+    'BLOCKS',
+    'SAMPLEDESCRIPTION'
+  ],
+  'title' => ' GCIR Test XYZ
+'
+};

@@ -15,13 +15,13 @@ package plenigo::LoginManager;
 
  # verify a customers log in data 
 
- my $loginManager = plenigo::LoginManager->new(configuration => $configuration);
- my %customer_details = $loginManager->verifyLoginData($customer_email, $customer_password);
+ my $login_manager = plenigo::LoginManager->new(configuration => $configuration);
+ my %customer_details = $login_manager->verifyLoginData($customer_email, $customer_password);
  my $customer_id = $customer_details{'userId'};
 
  # create one or more login tokens for the checkout process or customer snippets
 
- my %loginTokens = $loginManager->createLoginTokens($customer_id);
+ my %loginTokens = $login_manager->createLoginTokens($customer_id);
 
 =head1 DESCRIPTION
 
@@ -31,11 +31,10 @@ package plenigo::LoginManager;
 
 use Moo;
 use Carp qw(confess);
-use Carp::Always;
 use plenigo::Ex;
 use plenigo::RestClient;
 
-our $VERSION = '2.0003';
+our $VERSION = '2.0006';
 
 has configuration => (
     is       => 'ro',

@@ -1,3 +1,11 @@
+0.0394 2018-11-24
+  - reduce malloc count when object is created.
+  - reduce object fields memory size.
+0.0393 2018-11-20
+  - add fat camma syntax
+    "x", 1, "y", 2
+    is same as
+    "x" => 1, "y" => 2
 0.0392 2018-11-20
   - add subroutine import syntax
     use Foo (bar, baz);

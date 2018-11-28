@@ -46,7 +46,7 @@
             "PERLANCAR::File::HomeDir" : "0",
             "PERLANCAR::Module::List" : "0",
             "Perinci::CmdLine::Any" : "0",
-            "Perinci::Object" : "0.26",
+            "Perinci::Object" : "0.310",
             "PerlX::Maybe" : "0",
             "SQL::Schema::Versioned" : "0.234",
             "Sah::Schema::filename" : "0",
@@ -80,7 +80,7 @@
          "web" : "https://github.com/perlancar/perl-App-swcat"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

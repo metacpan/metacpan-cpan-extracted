@@ -36,11 +36,15 @@
    "provides" : {
       "Game::Collisions" : {
          "file" : "lib/Game/Collisions.pm",
-         "version" : "0.2"
+         "version" : "0.3"
       },
       "Game::Collisions::AABB" : {
          "file" : "lib/Game/Collisions/AABB.pm",
-         "version" : "0.2"
+         "version" : "0.3"
+      },
+      "Game::Collisions::UserData" : {
+         "file" : "lib/Game/Collisions/UserData.pm",
+         "version" : "0.3"
       }
    },
    "release_status" : "stable",
@@ -51,7 +55,7 @@
          "web" : "https://github.com/frezik/Game-Collisions"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

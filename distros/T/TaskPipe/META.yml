@@ -3,11 +3,15 @@ abstract: 'A task management framework for building web scrapers and crawlers'
 author:
   - 'Tom Gracey <tomgracey@gmail.com>'
 build_requires:
+  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
   File::Basename: '0'
+  File::Spec: '0'
+  Moose: '0'
   MooseX::ConfigCascade: '0'
   Proc::ProcessTable: '0'
   Test::More: '0'
+  Time::HiRes: '0'
   Try::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -74,5 +78,5 @@ requires:
   WWW::Mechanize::PhantomJS: '0.18'
   Web::Scraper: '0'
   YAML::XS: '0'
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

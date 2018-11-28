@@ -3,8 +3,8 @@
    "author" : [
       "Tony Cook <tonyc@cpan.org>, Arnar M. Hrafnkelsson"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "XSLoader" : "0"
          }
       },
       "configure" : {
@@ -42,21 +43,30 @@
             "Parse::RecDescent" : "0"
          },
          "requires" : {
-            "Scalar::Util" : "1",
+            "Scalar::Util" : "1.00",
             "Test::More" : "0.99",
             "XSLoader" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.99"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager"
+         "mailto" : "bug-Imager@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Imager"
       },
       "homepage" : "http://imager.perl.org/",
       "repository" : {
-         "url" : "git://git.imager.perl.org/imager.git"
+         "type" : "git",
+         "url" : "git://git.imager.perl.org/imager.git",
+         "web" : "http://git.imager.perl.org/imager.git"
       }
    },
-   "version" : "1.006"
+   "version" : "1.007",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

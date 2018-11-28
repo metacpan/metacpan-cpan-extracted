@@ -19,7 +19,7 @@ pod2usage( -exitval => 0, -verbose => 2 ) if ( $opt{help} );
 pod2usage(2)
   unless ( @ARGV && @ARGV > 0 );
 
-our $VERSION = '0.065'; # VERSION
+our $VERSION = '0.066'; # VERSION
 
 # FIXME sections needed: NAME, SYNOPSIS, DESCRIPTION
 

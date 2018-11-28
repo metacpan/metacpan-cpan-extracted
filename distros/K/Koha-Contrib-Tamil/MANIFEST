@@ -17,7 +17,6 @@ bin/koha-index
 bin/koha-index-daemon
 bin/koha-overdue
 bin/koha-rebuild-editors
-bin/koha-sitemap
 dist.ini
 lib/Koha/Contrib/Tamil.pm
 lib/Koha/Contrib/Tamil/AuthoritiesLoader.pm

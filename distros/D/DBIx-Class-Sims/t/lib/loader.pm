@@ -25,12 +25,13 @@ sub build_schema {
   while (my $name = shift @{$def}) {
     my $defn = shift @$def;
 
+    local $Data::Dumper::Terse = 1;
+
     push @packages, $name;
     $pkg .= "{ package ${prefix}::$name;\n  use base 'DBIx::Class::Core';\n";
 
     $pkg .= "  __PACKAGE__->table('$defn->{table}');\n";
 
-    local $Data::Dumper::Terse = 1;
     (my $v = Dumper($defn->{columns})) =~ s/{\n(.*)}\n/$1/ms;
     $pkg .= "  __PACKAGE__->add_columns(\n$v  );\n";
 
@@ -55,6 +56,14 @@ sub build_schema {
       }
     }
 
+    # NOTE: This is limited to just one column - YAGNI.
+    if ($defn->{inflate_json}) {
+      $pkg .= "  use JSON qw(encode_json decode_json);\n";
+      $pkg .= "  __PACKAGE__->inflate_column('$defn->{inflate_json}' => {\n";
+      $pkg .= "    inflate => sub { decode_json(shift) },\n";
+      $pkg .= "    deflate => sub { encode_json(shift) },\n";
+      $pkg .= "  });\n";
+    }
     $pkg .= "}\n";
   }
 

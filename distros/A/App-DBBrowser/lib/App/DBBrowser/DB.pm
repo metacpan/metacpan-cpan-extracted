@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.026';
+our $VERSION = '2.029';
 
 use Scalar::Util qw( looks_like_number );
 
@@ -21,7 +21,7 @@ sub new {
         app_dir       => $info->{app_dir},
         add_metadata  => $opt->{G}{meta},
         reset_search_cache => $info->{sqlite_search},
-
+        file_find_warnings => $opt->{G}{file_find_warnings},
     } );
     bless { Plugin => $plugin }, $class;
 }
@@ -300,7 +300,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.026
+Version 2.029
 
 =head1 DESCRIPTION
 

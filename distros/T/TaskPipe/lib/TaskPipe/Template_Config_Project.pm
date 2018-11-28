@@ -12,8 +12,10 @@ has option_specs => (is => 'ro', isa => 'ArrayRef', default => sub{[
             'plan',
             'task_module_prefix'
         ]
+    }, {
+        module => 'TaskPipe::Task::Settings',
+        section => 'OPTIONS'
     },
-    'TaskPipe::Task::Settings',
     'TaskPipe::Task::TestSettings',
     'TaskPipe::SchemaManager::Settings_Project', {
         module => 'TaskPipe::LoggerManager::Settings',

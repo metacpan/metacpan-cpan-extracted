@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -108,7 +108,9 @@ our $VERSION = '1.014';
 #pod =head2 Ignored Tables
 #pod
 #pod By default, this backend will ignore some tables when using
-#pod C<read_schema>: C<mojo_migrations> and all the tables used by the
+#pod C<read_schema>: Tables used by L<Mojo::Pg::Migrations>,
+#pod L<DBIx::Class::Schema::Versioned> (in case we're co-habitating with
+#pod a DBIx::Class schema), and all the tables used by the
 #pod L<Minion::Backend::Pg> Minion backend.
 #pod
 #pod =head1 SEE ALSO
@@ -130,6 +132,7 @@ our %IGNORE_TABLE = (
     minion_jobs => 1,
     minion_workers => 1,
     minion_locks => 1,
+    dbix_class_schema_versions => 1,
 );
 
 has pg =>;
@@ -378,7 +381,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 SYNOPSIS
 
@@ -485,7 +488,9 @@ You could map that schema to the following collections:
 =head2 Ignored Tables
 
 By default, this backend will ignore some tables when using
-C<read_schema>: C<mojo_migrations> and all the tables used by the
+C<read_schema>: Tables used by L<Mojo::Pg::Migrations>,
+L<DBIx::Class::Schema::Versioned> (in case we're co-habitating with
+a DBIx::Class schema), and all the tables used by the
 L<Minion::Backend::Pg> Minion backend.
 
 =head1 SEE ALSO

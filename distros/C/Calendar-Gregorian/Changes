@@ -1,5 +1,8 @@
 Revision history for Calendar::Gregorian
 
+0.17  Mon Nov 26 14:55:00 2018
+      - Updated dependency on Date::Gregorian::Simple v0.12.
+
 0.16  Wed Mar 07 16:30:00 2018
       - Updated dependency on namespace::autoclean.
 

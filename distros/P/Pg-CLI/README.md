@@ -4,7 +4,7 @@ Pg::CLI - Run Postgres CLI utilities
 
 # VERSION
 
-version 0.13
+version 0.14
 
 # SYNOPSIS
 

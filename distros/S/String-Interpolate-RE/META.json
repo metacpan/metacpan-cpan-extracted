@@ -4,7 +4,7 @@
       "Diab Jerius <djerius@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -110,8 +110,8 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::Fatal" : "0",
-            "Test::More" : "0.98",
+            "Test2::V0" : "0",
+            "Test::More" : "0",
             "perl" : "5.006"
          }
       }
@@ -119,7 +119,7 @@
    "provides" : {
       "String::Interpolate::RE" : {
          "file" : "lib/String/Interpolate/RE.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -134,8 +134,7 @@
          "web" : "https://github.com/djerius/string-interpolate-re"
       }
    },
-   "version" : "0.07",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
+   "version" : "0.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

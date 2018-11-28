@@ -1,5 +1,9 @@
 Revision history for time-tai-simple
 
+1.15 Mon Nov 26 16:30:40 PDT 2018
+	- Updated user agent string for fetching leap-seconds.list; IETF redirects to their home page otherwise.
+	- Updated URL fetching leap-seconds.list to use https.
+
 1.14 Wed Jun 27 16:57:00 PST 2018
 	- Updated documentation "SEE ALSO" to point at DateTime's subtract_datetime_absolute method
         - bin/tai: added --version feature

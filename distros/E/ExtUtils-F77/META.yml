@@ -1,7 +1,7 @@
 ---
 abstract: 'a simple interface to F77 libs'
 author:
-  - 'Karl Glazebrook <karlglazebrook@yahoo.com>'
+  - 'Karl Glazebrook <karl_pgplot@mac.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -17,5 +17,9 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '1.20'
+requires:
+  Text::ParseWords: '0'
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  repository: git://github.com/PDLPorters/extutils-f77.git
+version: '1.21'

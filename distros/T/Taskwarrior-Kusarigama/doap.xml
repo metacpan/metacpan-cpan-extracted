@@ -28,8 +28,20 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Mohammad S Anwar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Paul Fenwick</foaf:name>
       <foaf:mbox rdf:resource="mailto:pjf@perltraining.com.au" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>pru.mike</foaf:name>
+      <foaf:mbox rdf:resource="mailto:pru.mike@gmail.com" />
     </foaf:Person>
   </helper>
   <helper>
@@ -135,6 +147,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.9.3</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-10-03</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.10.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-11-06</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

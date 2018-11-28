@@ -1,17 +1,13 @@
 package Hailo::Role::Tokenizer;
-BEGIN {
-  $Hailo::Role::Tokenizer::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Hailo::Role::Tokenizer::VERSION = '0.72';
-}
-
-use 5.010;
-use Any::Moose '::Role';
+our $AUTHORITY = 'cpan:AVAR';
+$Hailo::Role::Tokenizer::VERSION = '0.74';
+use v5.28.0;
+use Moose::Role;
+use MooseX::Types::Moose ':all';
 use namespace::clean -except => 'meta';
 
 has spacing => (
-    isa     => 'HashRef[Int]',
+    isa     => HashRef[Int],
     is      => 'rw',
     default => sub { {
         normal  => 0,

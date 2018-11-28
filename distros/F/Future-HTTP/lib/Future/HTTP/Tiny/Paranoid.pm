@@ -7,7 +7,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 extends 'Future::HTTP::Tiny';
 

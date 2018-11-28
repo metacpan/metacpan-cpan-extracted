@@ -17,6 +17,10 @@ lib/HPCI/ModuleLoad.pm
 lib/HPCI/Run.pm
 lib/HPCI/ScriptSource.pm
 lib/HPCI/Stage.pm
+lib/HPCI/Sub.pm
+lib/HPCI/Subgroup.pm
+lib/HPCI/Super.pm
+lib/HPCI/SuperSub.pm
 lib/HPCI/SystemLogger.pm
 lib/HPCI/Template.pm
 lib/HPCI/TimeoutQueue.pm
@@ -44,7 +48,8 @@ t/16-choose_retries.t
 t/17-verify_completion_state_callback.t
 t/18-required_output_files.t
 t/19-env_key.t
-t/20-skipstage.t
+t/20-skip.t
 t/21-checksum.t
 t/22-file_params.t
+t/23-subgroup.t
 TODO

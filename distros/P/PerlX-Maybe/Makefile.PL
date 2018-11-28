@@ -26,8 +26,8 @@ my $meta = {
                           test      => { requires => { "Test::More" => 0.61 } },
                         },
   "provides"         => {
-                          "PerlX::Maybe" => { file => "lib/PerlX/Maybe.pm", version => "1.200" },
-                          "Syntax::Feature::Maybe" => { file => "lib/Syntax/Feature/Maybe.pm", version => "1.200" },
+                          "PerlX::Maybe" => { file => "lib/PerlX/Maybe.pm", version => 1.201 },
+                          "Syntax::Feature::Maybe" => { file => "lib/Syntax/Feature/Maybe.pm", version => 1.201 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -41,7 +41,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/project",
                         },
-  "version"          => "1.200",
+  "version"          => 1.201,
   "x_static_install" => 1,
 };
 

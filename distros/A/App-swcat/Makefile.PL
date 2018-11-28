@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "PERLANCAR::File::HomeDir" => 0,
     "PERLANCAR::Module::List" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::Object" => "0.26",
+    "Perinci::Object" => "0.310",
     "PerlX::Maybe" => 0,
     "SQL::Schema::Versioned" => "0.234",
     "Sah::Schema::filename" => 0,
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
     "Test::SQL::Schema::Versioned" => 0,
     "Test::WithDB::SQLite" => "0.08"
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,7 +74,7 @@ my %FallbackPrereqs = (
   "PERLANCAR::File::HomeDir" => 0,
   "PERLANCAR::Module::List" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::Object" => "0.26",
+  "Perinci::Object" => "0.310",
   "PerlX::Maybe" => 0,
   "SQL::Schema::Versioned" => "0.234",
   "Sah::Schema::filename" => 0,

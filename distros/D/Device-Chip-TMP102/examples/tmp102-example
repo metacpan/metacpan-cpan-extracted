@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Device::Chip::Adapter;
+use Device::Chip::TMP102;
+
+use feature 'say';
+
+my $ADAPTER     = "LinuxKernel";
+my $MOUNTPARAMS = 'bus=/dev/i2c-1,addr=0x48';
+
+my $sensor = Device::Chip::TMP102->new;
+
+$sensor->mount_from_paramstr(
+    Device::Chip::Adapter->new_from_description($ADAPTER), $MOUNTPARAMS, )->get;
+
+my $config = $sensor->read_config->get;
+
+say "Extended mode is $config->{EM}";
+
+$sensor->change_config(
+    EM => 1,
+)->get;
+
+$config = $sensor->read_config->get;
+
+say "config changed and EM now $config->{EM}";
+
+my $temp = $sensor->read_temp->get;
+say "Current Temp:";
+printf ( "\t%2.4f C\n", $temp );
+printf ( "\t%2.4f F\n", $temp * 1.8 + 32 );
+
+$sensor->write_temp_low($temp - 10);
+
+my $temp_low = $sensor->read_temp_low->get;
+say "Low Temp:";
+printf ( "\t%2.4f C\n", $temp_low );
+printf ( "\t%2.4f F\n", $temp_low * 1.8 + 32 );
+
+$sensor->write_temp_high($temp + 10);
+
+my $temp_high = $sensor->read_temp_high->get;
+say "High Temp:";
+printf ( "\t%2.4f C\n", $temp_high );
+printf ( "\t%2.4f F\n", $temp_high * 1.8 + 32 );
+

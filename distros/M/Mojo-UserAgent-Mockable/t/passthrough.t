@@ -3,7 +3,6 @@ use 5.014;
 use File::Temp;
 use FindBin qw($Bin);
 use Mojo::UserAgent::Mockable;
-use Mojolicious::Quick;
 use Test::Most;
 use Test::JSON;
 
@@ -28,15 +27,14 @@ subtest 'Local App' => sub {
     my $dir = File::Temp->newdir;
     my $mock = Mojo::UserAgent::Mockable->new( mode => 'passthrough' );
 
-    my $app = Mojolicious::Quick->new(
-        [   GET => [
-                '/thingy' => sub {
-                    my $c = shift;
-                    $c->render( json => { foo => 'bar', baz => 'Lehmann', things => [qw/noise noise noise/] } );
-                },
-            ],
-        ]
-    );
+    package LocalApp {
+        use Mojolicious::Lite;
+        get '/thingy' => sub {
+            my $c = shift;
+            $c->render( json => { foo => 'bar', baz => 'Lehmann', things => [qw/noise noise noise/] } );
+        };
+    };
+    my $app    = LocalApp::app;
     my $result = $app->ua->get(q{/thingy})->res->json;
 
     $mock->server->app($app);

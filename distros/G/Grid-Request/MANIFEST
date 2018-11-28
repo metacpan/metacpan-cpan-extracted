@@ -158,4 +158,5 @@ t/test_data/test_dir/89
 t/test_data/test_dir/.hidden_test_file
 t/test_data/test_file.txt
 t/test_data/smaller_test_file.txt
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

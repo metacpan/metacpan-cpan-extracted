@@ -16,7 +16,11 @@ has gm => (is => 'rw', isa => 'TaskPipe::SchemaManager');
 has run_info => (is => 'rw', isa => 'TaskPipe::RunInfo', default => sub{
     TaskPipe::RunInfo->new;
 });
-
+has json_encoder => (is => 'ro', isa => 'JSON', default => sub{
+    my $json_enc = JSON->new;
+    $json_enc->canonical;
+    return $json_enc;
+});
 
 
 
@@ -39,6 +43,7 @@ sub call{
 
     my $logger = Log::Log4perl->get_logger;
     $self->clear_cookies;
+    $logger->info(uc($method)." ".$self->json_encoder->encode(\@params));
     my $resp = $self->ua->$method(@params);
 
     return $resp;

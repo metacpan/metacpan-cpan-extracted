@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -102,8 +102,10 @@ our $VERSION = '1.014';
 #pod =head2 Ignored Tables
 #pod
 #pod By default, this backend will ignore some tables when using
-#pod C<read_schema>: C<mojo_migrations> and all the tables used by the
-#pod L<Minion::Backend::SQLite> Minion backend.
+#pod C<read_schema>: Tables used by L<Mojo::SQLite::Migrations>,
+#pod L<Mojo::SQLite::PubSub>, L<DBIx::Class::Schema::Versioned> (in case
+#pod we're co-habitating with a DBIx::Class schema), and all the tables used
+#pod by the L<Minion::Backend::SQLite> Minion backend.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -126,6 +128,11 @@ our %IGNORE_TABLE = (
     minion_jobs => 1,
     minion_workers => 1,
     minion_locks => 1,
+    mojo_pubsub_listener => 1,
+    mojo_pubsub_listen => 1,
+    mojo_pubsub_notify => 1,
+    mojo_pubsub_queue => 1,
+    dbix_class_schema_versions => 1,
 );
 
 has sqlite =>;
@@ -349,7 +356,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 SYNOPSIS
 
@@ -451,8 +458,10 @@ You could map that schema to the following collections:
 =head2 Ignored Tables
 
 By default, this backend will ignore some tables when using
-C<read_schema>: C<mojo_migrations> and all the tables used by the
-L<Minion::Backend::SQLite> Minion backend.
+C<read_schema>: Tables used by L<Mojo::SQLite::Migrations>,
+L<Mojo::SQLite::PubSub>, L<DBIx::Class::Schema::Versioned> (in case
+we're co-habitating with a DBIx::Class schema), and all the tables used
+by the L<Minion::Backend::SQLite> Minion backend.
 
 =head1 SEE ALSO
 

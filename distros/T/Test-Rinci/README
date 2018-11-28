@@ -2,8 +2,8 @@ NAME
     Test::Rinci - Test Rinci metadata
 
 VERSION
-    This document describes version 0.150 of Test::Rinci (from Perl
-    distribution Test-Rinci), released on 2018-09-10.
+    This document describes version 0.152 of Test::Rinci (from Perl
+    distribution Test-Rinci), released on 2018-11-22.
 
 SYNOPSIS
     To check all metadata in a module:
@@ -39,6 +39,12 @@ FUNCTIONS
     be wrapped.
 
     Available options:
+
+    *   load => BOOL (default: 1)
+
+        Set to false if you do not want to load the module, e.g. if you want
+        to test metadata in "main" package or if you have already loaded the
+        module yourself.
 
     *   test_package_metadata => BOOL (default: 1)
 
@@ -101,6 +107,9 @@ BUGS
 
 SEE ALSO
     test-rinci, a command-line interface for "metadata_in_all_modules_ok()".
+
+    Test::Rinci::CmdLine and test-rinci-cmdline to test metadata inside
+    Perinci::CmdLine scripts.
 
     Rinci
 

@@ -1,3 +1,7 @@
+0.14    2018-11-26 18:00:00
+        - Provide REMOTE_ATTR, REMOTE_HOST, REMOTE_PORT in PSGI env hash (haarg++)
+        - Fix multipart bodies (though inefficiently)
+        - Set PLACK_ENV during PSGI script loading and synchronous requests
 0.13    2018-03-15 21:30:00
         - Mojo is deprecated as base class so inherit from Mojolicious instead.
 0.12    2016-08-28 14:00:00

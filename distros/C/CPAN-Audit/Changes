@@ -1,5 +1,10 @@
 Revision history for Perl extension CPAN-Audit
 
+0.13 2018-11-22T20:38:09Z
+
+    - --no-corelist option by MCRayRay
+    - test fixes
+
 0.12 2018-11-11T19:43:25Z
 
     - require Module::CoreList latest version

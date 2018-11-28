@@ -3,33 +3,34 @@ abstract: 'Auto-seeded Mersenne Twister PRNGs'
 author:
   - 'Jerry D. Hedden <jdhedden AT cpan DOT org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Math-Random-MT-Auto
 no_index:
   directory:
     - t
     - inc
 requires:
-  Carp: 0
-  Config: 0
-  Data::Dumper: 0
-  Exception::Class: 1.32
-  Fcntl: 0
-  Object::InsideOut: 3.88
-  Scalar::Util: 1.23
-  Test::More: 0
-  XSLoader: 0
-  strict: 0
-  warnings: 0
-version: 6.22
+  Carp: '0'
+  Config: '0'
+  Data::Dumper: '0'
+  Exception::Class: '1.32'
+  Fcntl: '0'
+  Object::InsideOut: '3.88'
+  Scalar::Util: '1.23'
+  Test::More: '0'
+  XSLoader: '0'
+  strict: '0'
+  warnings: '0'
+version: '6.23'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 recommends:
   LWP::UserAgent: 0
   Win32::API: 0

@@ -1,6 +1,6 @@
 package Lab::Connection::MODBUS_RS232;
 #ABSTRACT: RS232/RS485 MODBUS RTU connection
-$Lab::Connection::MODBUS_RS232::VERSION = '3.664';
+$Lab::Connection::MODBUS_RS232::VERSION = '3.670';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -91,7 +91,7 @@ Lab::Connection::MODBUS_RS232 - RS232/RS485 MODBUS RTU connection
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 CAVEATS/BUGS
 

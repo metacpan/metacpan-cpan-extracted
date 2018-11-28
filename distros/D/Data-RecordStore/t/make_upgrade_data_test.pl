@@ -1,11 +1,11 @@
-use Data::RecordStore;
-
 use strict;
 use warnings;
 
-print $Data::RecordStore::VERSION,"\n";
-die if $Data::RecordStore::VERSION > 4 || $Data::RecordStore::VERSION < 3.1;
+require '/home/wolf/opensource/Yote/FixedRecordStore/lib/Data/RecordStore.pm';
 
+print $Data::RecordStore::VERSION,"\n";
+
+#print STDERR "BEEP\n";exit;
 #
 # Make a test for convert from 3.21 to 4.
 #  include records that are in different sizes and
@@ -19,107 +19,303 @@ die if $Data::RecordStore::VERSION > 4 || $Data::RecordStore::VERSION < 3.1;
 # verify.
 #
 
+mkdir ( "t/upgrade_data/$Data::RecordStore::VERSION" );
+my $store = Data::RecordStore->open( "t/upgrade_data/$Data::RecordStore::VERSION" );
 
+sub make_1 {
+  my $old_min_size = 0;
+  my $last_new_id = 12;
+  my $stows = 1;
 
-my $store = Data::RecordStore::open_store( "t/upgrade_data" );
+  my $old_size_chunk = 500;
 
-my $id = 1;
-sub check {
-    my( $size ) = @_;
-    my $d = $store->fetch( $id++ );
-    print length($d)." vs $size\n";
-    if( length( $d ) == $size ) {
-        return;
+  # go through 12 old stores?
+  for my $old_store_id (1..12) {
+    my $old_max_size = $old_size_chunk * $old_store_id;
+
+    my $new_store_id = log( $old_max_size + 1 ) / log( 2 );
+
+    print "))$old_store_id --> $new_store_id((\n";
+
+    if ( int( $new_store_id ) < $new_store_id ) {
+      $new_store_id = 1 + int( $new_store_id );
     }
-    return "ERROR\n";exit;
-}
+    if ( $new_store_id < 12 ) {
+      $new_store_id = 12;       #4096
+    }
+    my $avg = int( ($old_min_size + $old_max_size) / 2 );
+    print "old store $old_store_id is from $old_min_size to $old_max_size  -> to store $new_store_id. (avg $avg)\n";
 
-my $old_min_size = 0;
-my $last_new_id = 12;
-for my $old_store_id (1..12) {
-    my $old_max_size = int( exp( $old_store_id ) );
-    $old_max_size -= 12; # long,id,rest. Its the rest that we get the size for
-    if( $old_max_size < 0 ) {next;
-        $old_store_id = 3;
+    if( $old_store_id == 12 ) {
+      my $bigid = $store->stow( 'x'x(8192-5) );
+      my $r = $store->{OBJ_INDEX}->get_record( $bigid );
+      ++$stows;
     }
-    my $new_size = 4 + $old_max_size;
-    if( $new_size < 1 ) { $new_size = 1; }
-    my $new_store_id = log( $new_size ) / log( 2 );
-    if( int( $new_store_id ) < $new_store_id ) {
-        $new_store_id = 1 + int( $new_store_id );
-    }
-    if( $new_store_id < 12 ) {
-        $new_store_id = 12; #4096
-    }
-    my $avg = int( $old_max_size / 2 );
-    print "old store $old_store_id is from $old_min_size to $old_max_size  -> to store $new_store_id. \n";
-    check( $old_min_size );
-    check( $old_max_size );
-#    $store->stow( 'x'x$old_min_size );
-#    $store->stow( 'x'x$old_max_size );
 
-    if( $new_store_id > ($last_new_id+1) ) {
-        my $mid_boundary = 2**($last_new_id+1);
-        print "   new store ".($new_store_id-1)." with min $mid_boundary\n";
-        check( $mid_boundary-1 );
-        check( $mid_boundary );
-#        $store->stow( 'x'x() ); #still on the first new store id
-#        $store->stow( 'x'x($mid_boundary) ); #start of cleft
+    $store->stow( 'x'x$old_min_size ) if $old_min_size;
+    ++$stows if $old_min_size;
+
+    if ( $new_store_id > ($last_new_id+1) ) {
+      my $mid_boundary = 2**($last_new_id+1);
+      print "   new store ".($new_store_id-1)." with min ".($mid_boundary-1)."\n";
+      $store->stow( 'x'x($mid_boundary-1) ); #still on the first new store id
+      ++$stows;
+      $store->stow( 'x'x($mid_boundary) ); #start of cleft
+      ++$stows;
     } 
     else {
-        check( $avg );
-#        $store->stow( 'x'x$avg );
+      $store->stow( 'x'x$avg );
+      ++$stows;
     }
     
     $last_new_id = $new_store_id;
     $old_min_size = $old_max_size + 1;
-}
+  }
 
+  print STDERR "Did $stows stows\n";
+} #make_1
 
-for (1..$store->entry_count) {
-    my $d = $store->fetch( $_ );
-    print length( $d ),"\n";
-}
-exit;
-$store->empty;
+sub make_3_1 {
+  my $old_min_size = 0;
+  my $last_new_id = 12;
+  my $stows = 0;
+  my $recs = 0;
 
-$old_min_size = 0;
-$last_new_id = 12;
-for my $old_store_id (1..12) {
+  for my $old_store_id (1..12,12) {
     my $old_max_size = int( exp( $old_store_id ) );
     $old_max_size -= 12; # long,id,rest. Its the rest that we get the size for
-    if( $old_max_size < 0 ) {next;
-        $old_store_id = 3;
+    if ( $old_max_size < 0 ) {
+      next;
+      $old_store_id = 3;
     }
     my $new_size = 4 + $old_max_size;
-    if( $new_size < 1 ) { $new_size = 1; }
+    if ( $new_size < 1 ) {
+      $new_size = 1;
+    }
     my $new_store_id = log( $new_size ) / log( 2 );
-    if( int( $new_store_id ) < $new_store_id ) {
-        $new_store_id = 1 + int( $new_store_id );
+    if ( int( $new_store_id ) < $new_store_id ) {
+      $new_store_id = 1 + int( $new_store_id );
     }
-    if( $new_store_id < 12 ) {
-        $new_store_id = 12; #4096
+    if ( $new_store_id < 12 ) {
+      $new_store_id = 12;       #4096
     }
-    my $avg = int( $old_max_size / 2 );
-    print "old store $old_store_id is from $old_min_size to $old_max_size  -> to store $new_store_id. \n";
-    $store->stow( 'x'x$old_min_size );
+    my $avg = int( ($old_max_size+$old_max_size) / 2 );
+
+    $store->stow( 'x'x$old_min_size ) if $old_min_size;
+    ++$stows if $old_min_size;
+    ++$recs if $old_min_size;
+    print "  $recs) $old_min_size in old store $old_store_id -> to store $new_store_id. \n" if $old_min_size;
     my $id = $store->stow( 'x'x($old_max_size-4) );
+    ++$recs;
     $store->stow( 'x'x$old_max_size );
-    $store->delete_record( $id );
+    ++$stows;
+    ++$recs;
+    print "  $recs) $old_max_size in old store $old_store_id -> to store $new_store_id. \n";
+    $store->delete( $id );
 
-    if( $new_store_id > ($last_new_id+1) ) {
-        my $mid_boundary = 2**($last_new_id+1);
-        print "   new store ".($new_store_id-1)." with min ".($mid_boundary-1)."\n";
-        $store->stow( 'x'x($mid_boundary-1) ); #still on the first new store id
-        $store->stow( 'x'x($mid_boundary) ); #start of cleft
+    if ( $new_store_id > ($last_new_id+1) ) {
+      my $mid_boundary = 2**($last_new_id+1);
+      print "   new store ".($new_store_id-1)." with min ".($mid_boundary-1)."\n";
+      $store->stow( 'x'x($mid_boundary-1) ); #still on the first new store id
+      ++$recs;
+      ++$stows;
+    print "  $recs) ".($mid_boundary-1)." in old store $old_store_id -> to store $new_store_id. \n";
+      $store->stow( 'x'x($mid_boundary) ); #start of cleft
+      ++$recs;
+      ++$stows;
+      print "  $recs) $mid_boundary in old store $old_store_id -> to store $new_store_id. \n";
     } 
     else {
-        $store->stow( 'x'x$avg );
+      $store->stow( ('x'x$avg)."\0" );
+      ++$recs;
+      ++$stows;
+      print "  $recs) $avg in old store $old_store_id -> to store $new_store_id. \n";
     }
     
     $last_new_id = $new_store_id;
     $old_min_size = $old_max_size + 1;
-}
+  }
+
+  print STDERR "Did $stows stows, recs $recs\n";
+} #make_3_1
+
+sub make_3 {
+  my $old_min_size = 0;
+  my $last_new_id = 12;
+  my $stows = 0;
+  my $recs = 0;
+  for my $old_store_id (1..12,12) {
+    my $old_max_size = int( exp( $old_store_id ) );
+    $old_max_size -= 4; # long,rest. Its the rest that we get the size for
+    if ( $old_max_size < 0 ) {
+      next;
+    }
+    my $new_size = 4 + $old_max_size;
+    if ( $new_size < 1 ) {
+      $new_size = 1;
+    }
+    my $new_store_id = log( $new_size ) / log( 2 );
+    if ( int( $new_store_id ) < $new_store_id ) {
+      $new_store_id = 1 + int( $new_store_id );
+    }
+    if ( $new_store_id < 12 ) {
+      $new_store_id = 12;       #4096
+    }
+    my $avg = int( ($old_min_size+$old_max_size) / 2 );
+    print STDERR "old store $old_store_id is from $old_min_size/$avg/$old_max_size  -> to store $new_store_id. \n";
+    $store->stow( 'x'x$old_min_size ) if $old_min_size;
+    ++$stows if $old_min_size;
+    ++$recs if $old_min_size;
+
+    my $id = $store->stow( 'x'x($old_max_size-4) );
+    ++$recs;
+    $store->stow( 'x'x$old_max_size );
+    ++$stows;
+    $store->delete( $id );
+    ++$recs;
+
+    if ( $new_store_id > ($last_new_id+1) ) {
+      my $mid_boundary = 2**($last_new_id+1);
+      print "   new store ".($new_store_id-1)." with min ".($mid_boundary-1)."\n";
+      $store->stow( 'x'x($mid_boundary-1) ); #still on the first new store id
+      ++$stows;
+      ++$recs;
+      $store->stow( 'x'x($mid_boundary) ); #start of cleft
+      ++$stows;
+      ++$recs;
+    } 
+    else {
+      $store->stow( 'x'x$avg );
+      ++$stows;
+      ++$recs;
+    }
+    
+    $last_new_id = $new_store_id;
+    $old_min_size = $old_max_size + 1;
+  }
+
+  print STDERR "Did $stows stows, $recs records\n";
+} #make_3
+
+sub make_2 {
+  my $old_min_size = 0;
+  my $last_new_id = 12;
+  my $stows = 0;
+  my $recs = 0;
+  for my $old_store_id (1..12,12) {
+    my $old_max_size = int( exp( $old_store_id ) );
+    $old_max_size -= 4; # long,rest. Its the rest that we get the size for
+    if ( $old_max_size < 0 ) {
+      next;
+    }
+    my $new_size = 4 + $old_max_size;
+    if ( $new_size < 1 ) {
+      $new_size = 1;
+    }
+    my $new_store_id = log( $new_size ) / log( 2 );
+    if ( int( $new_store_id ) < $new_store_id ) {
+      $new_store_id = 1 + int( $new_store_id );
+    }
+    if ( $new_store_id < 12 ) {
+      $new_store_id = 12;       #4096
+    }
+    my $avg = int( ($old_min_size+$old_max_size) / 2 );
+    print STDERR "old store $old_store_id is from $old_min_size/$avg/$old_max_size  -> to store $new_store_id. \n";
+    $store->stow( 'x'x$old_min_size ) if $old_min_size;
+    ++$stows if $old_min_size;
+    ++$recs if $old_min_size;
+
+    my $id = $store->stow( 'x'x($old_max_size-4) );
+    ++$recs;
+    $store->stow( 'x'x$old_max_size );
+    ++$stows;
+    $store->delete( $id );
+    ++$recs;
+
+    if ( $new_store_id > ($last_new_id+1) ) {
+      my $mid_boundary = 2**($last_new_id+1);
+      print "   new store ".($new_store_id-1)." with min ".($mid_boundary-1)."\n";
+      $store->stow( 'x'x($mid_boundary-1) ); #still on the first new store id
+      ++$stows;
+      ++$recs;
+      $store->stow( 'x'x($mid_boundary) ); #start of cleft
+      ++$stows;
+      ++$recs;
+    } 
+    else {
+      $store->stow( 'x'x$avg );
+      ++$stows;
+      ++$recs;
+    }
+    
+    $last_new_id = $new_store_id;
+    $old_min_size = $old_max_size + 1;
+  }
+
+  print STDERR "Did $stows stows, $recs records\n";
+} #make_2
+
+sub make_4 {
+  my $old_min_size = 0;
+  my $last_new_id = 12;
+  my $stows = 0;
+  my $recs = 0;
+  for my $old_store_id (1..12,12) {
+    my $old_max_size = int( exp( $old_store_id ) );
+    $old_max_size -= 4; # long,rest. Its the rest that we get the size for
+    if ( $old_max_size < 0 ) {
+      next;
+    }
+    my $new_size = 4 + $old_max_size;
+    if ( $new_size < 1 ) {
+      $new_size = 1;
+    }
+    my $new_store_id = log( $new_size ) / log( 2 );
+    if ( int( $new_store_id ) < $new_store_id ) {
+      $new_store_id = 1 + int( $new_store_id );
+    }
+    if ( $new_store_id < 12 ) {
+      $new_store_id = 12;       #4096
+    }
+    my $avg = int( ($old_min_size+$old_max_size) / 2 );
+    $store->stow( 'x'x$old_min_size ) if $old_min_size;
+    ++$stows if $old_min_size;
+    ++$recs if $old_min_size;
+
+    my $id = $store->stow( 'x'x($old_max_size-4) );
+    ++$recs;
+    $store->stow( 'x'x$old_max_size );
+    ++$stows;
+    $store->delete( $id );
+    ++$recs;
+
+    if ( $new_store_id > ($last_new_id+1) ) {
+      my $mid_boundary = 2**($last_new_id+1);
+      print "   new store ".($new_store_id-1)." with min ".($mid_boundary-1)."\n";
+      $store->stow( 'x'x($mid_boundary-1) ); #still on the first new store id
+      ++$stows;
+      ++$recs;
+      $store->stow( 'x'x($mid_boundary) ); #start of cleft
+      ++$stows;
+      ++$recs;
+    } 
+    else {
+      $store->stow( 'x'x$avg );
+      ++$stows;
+      ++$recs;
+    }
+    
+    $last_new_id = $new_store_id;
+    $old_min_size = $old_max_size + 1;
+  }
+
+  print STDERR "Did $stows stows, $recs records\n";
+} #make_4
+#make_2();
+#make_3();
+make_3_1();
+#make_4();
+
 __END__
 
 3.21

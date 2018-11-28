@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests=>64;
+use Test::More tests=>68;
 
 use MODS::Record qw(xml_string);
 use IO::File;
@@ -62,6 +62,11 @@ is($access,'test');
 ok($access = $mods->add_accessCondition(xml_string('<test/>')),"set XML accessCondition");
 is($access,'<test/>');
 
+my $name   = $mods->add_name(type => 'test');
+ok ($name->type,'test');
+ok ($mods->get_name(type => 'test'));
+ok (!$mods->get_name(type => 'best'));
+
 my @access;
 ok(@access = $mods->get_accessCondition,"get accessCondition");
 is(@access,2,"count accessCondition");
@@ -75,6 +80,7 @@ ok($collection = MODS::Record->from_xml(IO::File->new("t/mods.xml")),"from_xml")
 is($collection->get_mods->get_titleInfo->get_title,"Telescope Peak from Zabriskie Point","titleInfo/title");
 is($collection->get_mods->get_titleInfo(type=>'alternative')->get_title,"Telescope PK from Zabriskie Pt.","titleInfo[type=\"alternative\"]/title");
 is($collection->get_mods->get_relatedItem(type=>'original')->get_location->get_shelfLocator,"381 J8223","relatedItem[type=\"original\"]/location/shelfLocator");
+is($collection->get_mods->get_name->get_affiliation,"ug_TW14");
 
 ok($collection = MODS::Record->from_json(IO::File->new("t/mods.json")),"from_json");
 is($collection->get_mods->get_titleInfo->get_title,"Telescope Peak from Zabriskie Point","titleInfo/title");

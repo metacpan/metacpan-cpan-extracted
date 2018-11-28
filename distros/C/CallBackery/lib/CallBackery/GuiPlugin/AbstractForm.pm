@@ -2,6 +2,7 @@ package CallBackery::GuiPlugin::AbstractForm;
 use Carp qw(carp croak);
 use CallBackery::Translate qw(trm);
 use CallBackery::Exception qw(mkerror);
+use Mojo::Promise;
 
 =head1 NAME
 
@@ -134,7 +135,7 @@ sub validateData {
 
 =head2 processData($args)
 
-The default behaviour of the method is to validate all the form fields
+The default behavior of the method is to validate all the form fields
 and then store the data into the config database.
 
 =cut
@@ -157,7 +158,7 @@ sub processData {
         }
         $handler = $self->actionCfgMap->{$args->{key}}{handler};
         if (ref $handler eq 'CODE'){
-            $self->log->warn("Using hand[M 2ler properties in actionCfg is deprecated. User actionHandler instead.");
+            $self->log->warn("Using handler properties in actionCfg is deprecated. User actionHandler instead.");
             return $handler->($formData);
         }
         $self->log->error('Plugin instance '.$self->name." action $args->{key} has a broken handler");
@@ -217,8 +218,28 @@ Return all field values of the form.
 sub getAllFieldValues {
     my $self = shift;
     my %map;
+    my @promises;
     for my $key (keys %{$self->formCfgMap}){
-        $map{$key} = $self->getFieldValue($key);
+        my $value = $self->getFieldValue($key);
+        if (eval { blessed $value && $value->isa('Mojo::Promise')}){
+            push @promises, $value;
+            $value->then(
+                sub{
+                    $map{$key} = shift;
+                },
+                sub {
+                    die shift;
+                }
+            );
+        }
+        else {
+            $map{$key} = $self->getFieldValue($key);
+        }
+    }
+    if (@promises){
+        return Mojo::Promise->new->all(@promises)->then(sub {
+            return \%map;
+        });
     }
     return \%map;
 }

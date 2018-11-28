@@ -41,6 +41,7 @@ clean;
 sleep 2;
 
 my $count = 1;
+my $gname = 'T_Checksum';
 
 sub run_test {
     my $group = HPCI->group(
@@ -55,11 +56,11 @@ sub run_test {
 
     my $ret = $group->execute();
 
-    return $ret;
+    return (values(%$ret))[0][0]{exit_status};
 }
 
 my $name = 'inTestNoSum';
-my $ret = run_test(
+my $stat = run_test(
     {
         $in  => { sum => 1 },
     },
@@ -74,12 +75,12 @@ my $ret = run_test(
     }
 );
 
-like ($ret->{$name}[0]{exit_status}, qr(one or more required input files), "stage should fail because no sum file present");
+like ($stat, qr(one or more required input files), "stage ($name) should fail because no sum file present");
 
 clean;
 
 $name = 'inTestCreateSum';
-$ret = run_test(
+$stat = run_test(
     {
         $in  => { sum => 1, sum_generate_in => 1 },
     },
@@ -94,13 +95,13 @@ $ret = run_test(
     }
 );
 
-is ($ret->{inTestCreateSum}[0]{exit_status}, 0, "stage should run");
+is ($stat, 0, "stage ($name) should run");
 ok ( -e $ins, "  ... and the in file sum file shoud have been created" );
 
 clean;
 
 $name = 'outTestCreateSum';
-$ret = run_test(
+$stat = run_test(
     {
         $in  => { sum => 1 },
         $out => { sum => 1 },
@@ -121,14 +122,14 @@ $ret = run_test(
     }
 );
 
-is ($ret->{outTestCreateSum}[0]{exit_status}, 0, "stage should run");
+is ($stat, 0, "stage ($name) should run");
 ok ( -e $outs, "  ... and the out file sum file should have been created" );
 is (qx(cat $ins), qx(cat $outs ), "  ... and the checksums should be the same" );
 
 clean;
 
 $name = 'deleteWithSumTest';
-$ret = run_test(
+$stat = run_test(
     {
         $in  => { sum => 1 },
         $out => { sum => 1 },
@@ -150,14 +151,14 @@ $ret = run_test(
     }
 );
 
-is ($ret->{deleteWithSumTest}[0]{exit_status}, 0, "stage should run");
+is ($stat, 0, "stage ($name) should run");
 ok ( !(-e "$out"), "  ... and the out file should have been deleted" );
 ok ( !(-e "$outs"), "  ... ... as wellas the out file sum file" );
 
 clean;
 
 $name = 'deleteTest';
-$ret = run_test(
+$stat = run_test(
     name    => $name,
     command => "cp $in $out",
     files   => {
@@ -175,13 +176,13 @@ $ret = run_test(
     }
 );
 
-is ($ret->{deleteTest}[0]{exit_status}, 0, "stage should run");
+is ($stat, 0, "stage ($name) should run");
 ok ( !(-e "$out"), "  ... and the out file should have been deleted" );
 
 clean;
 
 $name = 'renameTest';
-$ret = run_test(
+$stat = run_test(
     name    => $name,
     command => "cp $in $out",
     files   => {
@@ -199,7 +200,7 @@ $ret = run_test(
     }
 );
 
-is ($ret->{renameTest}[0]{exit_status}, 0, "stage should run");
+is ($stat, 0, "stage ($name) should run");
 ok ( !(-e "$out"), "  ... and the out file should have been renamed" );
 ok (  (-e "$dup"), "  ... ... to the dup file" );
 ok ( !(-e "$outs"), "  ... with no sum file created" );
@@ -208,7 +209,7 @@ ok ( !(-e "$dups"), "  ... ... for either" );
 clean;
 
 $name = 'renameWithSumTest';
-$ret = run_test(
+$stat = run_test(
     {
         $in  => { sum => 1 },
         $out => { sum => 1 },
@@ -230,7 +231,7 @@ $ret = run_test(
     }
 );
 
-is ($ret->{renameWithSumTest}[0]{exit_status}, 0, "stage should run");
+is ($stat, 0, "stage ($name) should run");
 ok ( !(-e "$out"), "  ... and the out file should have been renamed" );
 ok (  (-e "$dup"), "  ... ... to the dup file" );
 ok ( !(-e "$outs"), "  ... with its sum file also renamed" );

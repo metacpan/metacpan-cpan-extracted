@@ -1,4 +1,13 @@
-Changes for plenigo
- 
-2.0   2018-08-16
-      - first version of the plenigo Perl SDK
+Changes for plenigo perl SDK
+
+2.0006  2018-11-27
+        - Bugfixes
+        
+2.0005  2018-11-27
+        - Added https://api.plenigo.com/#!/user/getSubscriptionsBought functionality
+
+2.0004  2018-11-21
+        - Removed Carp::Always
+
+2.0003  2018-08-16
+        - first version of the plenigo Perl SDK

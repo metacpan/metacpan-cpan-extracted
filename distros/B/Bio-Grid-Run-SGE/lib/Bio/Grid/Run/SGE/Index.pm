@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION = '0.065'; # VERSION
+our $VERSION = '0.066'; # VERSION
 
 sub new {
     my $class = shift;

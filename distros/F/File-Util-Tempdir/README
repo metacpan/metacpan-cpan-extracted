@@ -3,15 +3,15 @@ NAME
     private temporary directory
 
 VERSION
-    This document describes version 0.033 of File::Util::Tempdir (from Perl
-    distribution File-Util-Tempdir), released on 2018-09-20.
+    This document describes version 0.034 of File::Util::Tempdir (from Perl
+    distribution File-Util-Tempdir), released on 2018-09-22.
 
 SYNOPSIS
      use File::Util::Tempdir qw(get_tempdir get_user_tempdir);
 
      my $tmpdir = get_tempdir(); # => e.g. "/tmp"
 
-     my $mytmpdir = get_tempdir(); # => e.g. "/run/user/1000", or "/tmp/1000"
+     my $mytmpdir = get_user_tempdir(); # => e.g. "/run/user/1000", or "/tmp/1000"
 
 DESCRIPTION
 FUNCTIONS

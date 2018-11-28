@@ -1,14 +1,14 @@
 package Perinci::CmdLine::Base::Patch::DumpAndExit;
 
-our $DATE = '2017-07-07'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $DATE = '2018-11-22'; # DATE
+our $VERSION = '0.120'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
 
 use Data::Dump;
-use Module::Patch 0.19 qw();
+use Module::Patch qw();
 use base qw(Module::Patch);
 
 our %config;
@@ -28,6 +28,7 @@ sub patch_data {
                 sub_name    => 'run',
                 code        => sub {
                     my $self = shift;
+                    $self->{'x.main.spec'} = \%main::SPEC;
                     _dump($self);
                     $config{-exit_method} eq 'exit' ? exit(0) : die;
                 },
@@ -61,7 +62,7 @@ Perinci::CmdLine::Base::Patch::DumpAndExit - Patch Perinci::CmdLine::Base to dum
 
 =head1 VERSION
 
-This document describes version 0.11 of Perinci::CmdLine::Base::Patch::DumpAndExit (from Perl distribution Perinci-CmdLine-Dump), released on 2017-07-07.
+This document describes version 0.120 of Perinci::CmdLine::Base::Patch::DumpAndExit (from Perl distribution Perinci-CmdLine-Dump), released on 2018-11-22.
 
 =head1 DESCRIPTION
 
@@ -92,7 +93,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

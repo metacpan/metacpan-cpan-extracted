@@ -1,0 +1,21 @@
+##TITLE= GCIR Test XYZ
+##JCAMP-DX= 4.24
+##DATA TYPE= LINK
+##BLOCKS= N + 1
+##SAMPLE DESCRIPTION= $$ of original sample
+  ##TITLE= Chromatogram XYZ
+  ##JCAMP-DX= 4.24
+  ##DATA TYPE= Chromatogram
+    $$ Chromatogram parameters and data
+  ##END= $$Chromatogram
+  ##TITLE= IR Spectrum of Fraction XYZ-1
+  ##JCAMP-DX= 4.24
+  ##DATA TYPE= Infrared Spectrum
+    $$ parameters & spectrum, fraction 1
+  ##END= $$ Spectrum
+  ##TITLE= IR Spectrum of Fraction XYZ-N
+  ##JCAMP-DX= 4.24
+  ##DATA TYPE= Infrared Spectrum
+    $$ parameters & spectrum, fraction N
+  ##END= $$ Spectrum N
+##END= $$ GCIR TEST XYZ

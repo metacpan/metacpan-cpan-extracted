@@ -14,7 +14,7 @@ use Bio::Grid::Run::SGE::Util qw/glob_list/;
 use Data::Dumper;
 use Cwd qw/fastcwd/;
 
-our $VERSION = '0.065'; # VERSION
+our $VERSION = '0.066'; # VERSION
 
 has 'sep'     => ( is => 'rw', default => '' );
 has 'sep_pos' => ( is => 'rw', default => '^' );

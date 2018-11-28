@@ -1,5 +1,3 @@
-.gitignore
-Build.PL
 Changelog.ini
 Changes
 data/html.table.log
@@ -13,9 +11,8 @@ data/utf8.log
 lib/Text/Table/Manifold.pm
 LICENSE
 Makefile.PL
-MANIFEST
-META.json
-META.yml
+MANIFEST			This list of files
+MANIFEST.SKIP
 README
 scripts/html.table.pl
 scripts/internal.boxed.pl
@@ -26,6 +23,10 @@ scripts/synopsis.pl
 scripts/text.csv.pl
 scripts/text.unicodebox.table.pl
 scripts/utf8.pl
+t/00.versions.t
+t/00.versions.tx
 t/boxed.t
 xt/author/changes.t
 xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

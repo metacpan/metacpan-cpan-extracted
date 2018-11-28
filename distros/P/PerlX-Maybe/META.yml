@@ -25,10 +25,10 @@ optional_features: {}
 provides:
   PerlX::Maybe:
     file: lib/PerlX/Maybe.pm
-    version: '1.200'
+    version: '1.201'
   Syntax::Feature::Maybe:
     file: lib/Syntax/Feature/Maybe.pm
-    version: '1.200'
+    version: '1.201'
 recommends:
   Exporter::Tiny: '0'
   PerlX::Maybe::XS: '0'
@@ -41,6 +41,6 @@ resources:
   homepage: https://metacpan.org/release/PerlX-Maybe
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-perlx-maybe.git
-version: '1.200'
+version: '1.201'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,0 +1,5 @@
+Revision history for Assert-Refute-T-Numeric
+
+0.16    Sun Nov 11 2018
+        - Copy from Assert::Refute main repo, version bump
+        - has is_between, within_delta, within_relative

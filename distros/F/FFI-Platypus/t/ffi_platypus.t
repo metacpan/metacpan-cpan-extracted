@@ -120,10 +120,9 @@ subtest 'alignof' => sub {
   };
 
   subtest 'record' => sub {
-    eval { $ffi->alignof('record(22)') };
-    isnt $@, '', "generic record alignment not supported";
-    note $@;
-
+    my $align = $ffi->alignof('record(22)');
+    is $align, 1;
+    xdump($ffi->type_meta('record(22)'));
   };
 };
 
@@ -479,7 +478,6 @@ subtest 'type' => sub {
         my $meta = $ffi->type_meta($type);
 
         is $meta->{size}, $ptr_size, "sizeof $type = $ptr_size";
-        is $meta->{fixed_size}, 0, 'not fixed size';
 
         my $access = $type =~ /rw$/ ? 'rw' : 'ro';
 
@@ -495,9 +493,8 @@ subtest 'type' => sub {
 
         my $meta = $ffi->type_meta($type);
 
+        is $meta->{type}, 'record', 'is actually a record type';
         is $meta->{size}, 10, "sizeof $type = 10";
-        is $meta->{fixed_size}, 1, "fixed size";
-        is $meta->{access}, 'rw', 'access = rw';
 
         note xdump($meta);
 

@@ -1,0 +1,80 @@
+NAME
+    Test::Rinci::CmdLine - Test Rinci metadata of Perinci::CmdLine scripts
+
+VERSION
+    This document describes version 0.001 of Test::Rinci::CmdLine (from Perl
+    distribution Test-Rinci-CmdLine), released on 2018-11-22.
+
+SYNOPSIS
+    To check all metadata in a script:
+
+     use Test::Rinci::CmdLine tests => 1;
+     metadata_in_script_ok("script.pl", {opt => ...}, $msg);
+
+    Alternatively, you can check all metadata in all scripts in a distro:
+
+     # save in release-rinci-cmdline.t, put in distro's t/ subdirectory
+     use Test::More;
+     plan skip_all => "Not release testing" unless $ENV{RELEASE_TESTING};
+     eval "use Test::Rinci::CmdLine";
+     plan skip_all => "Test::Rinci::CmdLine required for testing Rinci metadata" if $@;
+     metadata_in_all_scripts_ok({opt => ...}, $msg);
+
+DESCRIPTION
+    This module is like Test::Rinci except that it looks for metadata in the
+    "main" package of scripts, instead of modules.
+
+ACKNOWLEDGEMENTS
+    Some code taken from Test::Pod::Coverage by Andy Lester.
+
+FUNCTIONS
+    All these functions are exported by default.
+
+  metadata_in_script_ok($module [, \%opts ] [, $msg])
+    Load $script, get its metadata in the "main" package, and perform test
+    on the metadata on the "main" package using Test::Rinci's
+    "metadata_in_module_ok()". See Test::Rinci for available options.
+
+  metadata_in_scripts_ok([ \%opts, ] \@scripts [, $msg])
+    Run "metadata_in_script_ok()" for each script specified in @scripts.
+
+    Options are the same as in "metadata_in_script_ok()".
+
+  metadata_in_all_scripts_ok([ \%opts ] [, $msg])
+    Look for scripts in directory "script" (and "scripts" and "bin") and run
+    "metadata_in_script_ok()" on each of them.
+
+    Options are the same as in "metadata_in_script_ok()".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Test-Rinci-CmdLine>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Test-Rinci-CmdLine>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Rinci-CmdLine>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    test-rinci-cmdline, a command-line interface for
+    "metadata_in_all_scripts_ok()".
+
+    Test::Rinci and test-rinci.
+
+    Rinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0.98"
          }
       },
       "configure" : {
@@ -32,13 +32,24 @@
       },
       "runtime" : {
          "requires" : {
-            "Assert::Refute" : "0.13",
+            "Assert::Refute" : "0.15",
             "Test::Deep" : "1.04",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dallaylaen/assert-refute-t-extra/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dallaylaen/assert-refute-t-extra.git",
+         "web" : "https://github.com/dallaylaen/assert-refute-t-extra"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

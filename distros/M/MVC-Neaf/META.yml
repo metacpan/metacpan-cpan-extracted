@@ -35,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/dallaylaen/perl-mvc-neaf/issues
   repository: https://github.com/dallaylaen/perl-mvc-neaf.git
-version: 0.2601
+version: 0.2603
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

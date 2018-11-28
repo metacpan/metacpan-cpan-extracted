@@ -9,7 +9,7 @@ use Carp;
 use Exporter qw[ import ];
 our @EXPORT_OK = qw( strinterp );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 ## no critic (ProhibitAccessOfPrivateData)
 
@@ -20,6 +20,7 @@ sub strinterp {
     $var = {} unless defined $var;
 
     my %opt = (
+        variable_re        => qr/\w+/,
         raiseundef         => 0,
         emptyundef         => 0,
         useenv             => 1,
@@ -49,11 +50,12 @@ sub _strinterp {
     my $var = $_[1];
     my $opt = $_[2];
     my $fmt = $opt->{fmt};
+    my $re  = $opt->{variable_re};
 
     $_[0] =~ s{
                \$                    # find a literal dollar sign
               (                      # followed by either
-               \{ (\w+)(?:$fmt)? \}  #  a variable name in curly brackets ($2)
+               \{ ($re)(?:$fmt)? \}  #  a variable name in curly brackets ($2)
                                      #  and an optional sprintf format
                |                     # or
                 (\w+)                #   a bareword ($3)
@@ -141,7 +143,7 @@ String::Interpolate::RE - interpolate variables into strings using regular expre
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -253,6 +255,13 @@ limit.
 The number of recursion levels to descend when recursing into a
 variable's value before giving up and croaking.  The default is C<100>.
 Setting this to C<0> means no limit.
+
+=item variable_re I<regular expression>
+
+This specifies the regular expression (created with the C<qr>
+operator) which will match a variable name.  It defaults to
+C<qr/\w+/>. Don't use C<:>, C<{>, or C<}> in the regex, or things may
+break.
 
 =back
 
@@ -415,6 +424,12 @@ __END__
 #pod variable's value before giving up and croaking.  The default is C<100>.
 #pod Setting this to C<0> means no limit.
 #pod
+#pod =item variable_re I<regular expression>
+#pod
+#pod This specifies the regular expression (created with the C<qr>
+#pod operator) which will match a variable name.  It defaults to
+#pod C<qr/\w+/>. Don't use C<:>, C<{>, or C<}> in the regex, or things may
+#pod break.
 #pod
 #pod =back
 #pod

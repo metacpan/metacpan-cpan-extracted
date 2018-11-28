@@ -1,0 +1,18 @@
+##TITLE= Epichlorohydrin vapor
+##JCAMP-DX= 4.24
+##DATA TYPE= INFRARED SPECTRUM
+##ORIGIN= Sadtler Research Laboratories 
+##OWNER= EPA/Public Domain 
+$$ Lines 6-24 are optional. See Table IIb. 
+##XUNITS= 1/CM 
+##YUNITS= ABSORBANCE 
+##XFACTOR= 1.0 
+##YFACTOR= 0.001 
+##FIRSTX= 450. 
+##LASTX= 4000. 
+##NPOINTS= 1776
+##FIRSTY= 0.058 
+##XYDATA= (X++(Y..Y)) 
+450 58 44 34 39 26 24 22 21 21 19 16 15 15 17 16 $$ etc.
+3998 16 15 14 
+##END=

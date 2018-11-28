@@ -10,7 +10,7 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '0.56'; # VERSION
+our $VERSION = '0.58'; # VERSION
 
 
 sub record_layout
@@ -53,8 +53,7 @@ sub record_layout
     {
 
       if($meta->{type} eq 'string'
-      && $meta->{access} eq 'rw'
-      && $meta->{fixed_size} == 0)
+      && $meta->{access} eq 'rw')
       {
         push @destroy, eval '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) .qq{
           sub {
@@ -64,13 +63,13 @@ sub record_layout
         die $@ if $@;
       }
 
-      $name = join '::', $caller, $name;
-      my $error_str =_accessor
-        $name,
+      my $full_name = join '::', $caller, $name;
+      my $error_str = _accessor
+        $full_name,
         "$filename:$line",
         $ffi->_type_lookup($type),
         $offset;
-      croak($error_str) if $error_str;
+      croak("$error_str ($type $name)") if $error_str;
     };
     
     $offset += $size;
@@ -130,7 +129,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 

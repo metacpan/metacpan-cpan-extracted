@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Protection;
-$Lab::Moose::Instrument::SCPI::Sense::Protection::VERSION = '3.664';
+$Lab::Moose::Instrument::SCPI::Sense::Protection::VERSION = '3.670';
 #ABSTRACT: Role for the SCPI SENSe:$function:Protection subsystem
 
 use Moose::Role;
@@ -9,7 +9,7 @@ use Lab::Moose::Instrument qw/validated_getter validated_setter/;
 use namespace::autoclean;
 
 
-with 'Lab::Moose::Instrument::SCPI::Sense::Function';
+requires 'cached_sense_function';
 
 cache sense_protection => ( getter => 'sense_protection_query' );
 
@@ -77,7 +77,7 @@ Lab::Moose::Instrument::SCPI::Sense::Protection - Role for the SCPI SENSe:$funct
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 METHODS
 

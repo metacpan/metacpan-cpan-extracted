@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use Fcntl qw(:flock);
 
 use MVC::Neaf::X::Session::File;
 
@@ -14,8 +15,19 @@ like ($@, qr/dir/, "no dir = no go");
 
 my $temp = tempdir( CLEANUP => 1 );
 
-my $sess = MVC::Neaf::X::Session::File->new( dir => $temp, session_ttl => 600 );
+# test flock just in case tests are being run on NFS
+my $testfile = "$temp/lock-test";
+open my $fd, "+>", $testfile
+    or die "Failed ot open (rw) $testfile: $!";
+if (!flock $fd, LOCK_SH) {
+    plan skip_all => "File lock unavailable at $temp, skipping test: $!";
+    exit;
+};
+close $fd;
+unlink $testfile;
 
+# Now real testing begins
+my $sess = MVC::Neaf::X::Session::File->new( dir => $temp, session_ttl => 600 );
 
 my $w = $sess->save_session( 'foo/../bar' => { bar => 42 } );
 is ($w->{id}, 'foo/../bar', "save: id round trip" );

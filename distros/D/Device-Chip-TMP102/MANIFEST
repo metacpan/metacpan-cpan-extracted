@@ -1,0 +1,14 @@
+Makefile.PL
+Changes
+lib/Device/Chip/TMP102.pm
+examples/tmp102-example
+LICENSE
+MANIFEST			This list of files
+t/00use.t
+t/01config.t
+t/02standard.t
+t/03extended.t
+t/99pod.t
+README.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -13,9 +13,9 @@ DBD::Oracle::Troubleshooting::Macos - Tips and Hints to Troubleshoot DBD::Oracle
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
-=head1 General Info 
+=head1 General Info
 
 These instructions allow for the compilation and successful testing of
 DBD::Oracle on MacOS X 10.2.4 and higher, using Oracle 9iR2 DR
@@ -28,8 +28,8 @@ with a Perl version of 5.6.0., which I can report to work with
 DBD::Oracle 1.14 and higher once you take certain steps (see below).
 You may want to install a later perl, e.g., Perl 5.8.x. Please refer to:
 
-	Installing Perl 5.8 on Jaguar
-	http://developer.apple.com/internet/macosx/perl.html
+    Installing Perl 5.8 on Jaguar
+    http://developer.apple.com/internet/macosx/perl.html
 
 for Perl 5.8.0 installation instructions.
 
@@ -523,13 +523,13 @@ instructions, and the Perl IO patch is credit to Hilmar Lapp, hlapp at
 gmx.net.
 
 Earlier and original instructions thanks to:
-	Andy Lester 
-	Steve Sapovits
-	Tom Mornini
+    Andy Lester
+    Steve Sapovits
+    Tom Mornini
 
 Date: Tue, 15 Apr 2003 16:02:17 +1000
 Subject: Compilation bug in DBI on OSX with threaded Perl 5.8.0
-From: Danial Pearce 
+From: Danial Pearce
 
 In regards to a previous message on this list:
 
@@ -593,7 +593,7 @@ Martin J. Evans <mjevans@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1994 by Tim Bunce.
+This software is copyright (c) 2018, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

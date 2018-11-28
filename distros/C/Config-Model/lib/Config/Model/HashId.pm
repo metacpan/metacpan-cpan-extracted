@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::HashId;
-$Config::Model::HashId::VERSION = '2.127';
+$Config::Model::HashId::VERSION = '2.128';
 use Mouse;
 use 5.10.1;
 
@@ -114,7 +114,9 @@ sub _migrate {
             $logger->debug( $self->name, " migrate keys from ", $followed->name );
         }
 
-        map { $self->_store( $_, undef ) unless $self->_defined($_) } $followed->fetch_all_indexes;
+        for my $idx ($followed->fetch_all_indexes) {
+            $self->_store( $idx, undef ) unless $self->_defined($idx);
+        }
     }
     elsif ( $self->{migrate_values_from} ) {
         my $followed = $self->safe_typed_grab( param => 'migrate_values_from', check => 'no' );
@@ -331,16 +333,13 @@ sub move {
         $self->set_data_mode( $to, $imode );
 
         my ( $to_idx, $from_idx );
-        my $idx  = 0;
         my $list = $self->{list};
-        map {
+        for (my $idx = 0; $idx <= $#$list; $idx++) {
             $to_idx   = $idx if $list->[$idx] eq $to;
             $from_idx = $idx if $list->[$idx] eq $from;
-            $idx++;
-        } @$list;
+        }
 
         if ( defined $to_idx ) {
-
             # Since $to is clobbered, $from takes its place in the list
             $list->[$from_idx] = $to;
 
@@ -539,7 +538,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -596,11 +595,15 @@ function.
 Returns the next key of the hash. Behaves like C<each> core perl
 function.
 
-=head2 swap ( key1 , key2 )
+=head2 swap
+
+Parameters: C<< ( key1 , key2 ) >>
 
 Swap the order of the 2 keys. Ignored for non ordered hash.
 
-=head2 move ( key1 , key2 )
+=head2 move
+
+Parameters: C<< ( key1 , key2 ) >>
 
 Rename key1 in key2. 
 
@@ -608,23 +611,31 @@ Also also optional check parameter to disable warning:
 
  move ('foo','bar', check => 'no')
 
-=head2 move_after ( key_to_move [ , after_this_key ] )
+=head2 move_after
+
+Parameters: C<< ( key_to_move [ , after_this_key ] ) >>
 
 Move the first key after the second one. If the second parameter is
 omitted, the first key is placed in first position. Ignored for non
 ordered hash.
 
-=head2 move_up ( key )
+=head2 move_up
+
+Parameters: C<< ( key ) >>
 
 Move the key up in a ordered hash. Attempt to move up the first key of
 an ordered hash is ignored. Ignored for non ordered hash.
 
-=head2 move_down ( key )
+=head2 move_down
+
+Parameters: C<< ( key ) >>
 
 Move the key down in a ordered hash. Attempt to move up the last key of
 an ordered hash is ignored. Ignored for non ordered hash.
 
-=head2 load_data ( data => ( hash_ref | array_ref ) [ , check => ... , ... ])
+=head2 load_data
+
+Parameters: C<< ( data => ( hash_ref | array_ref ) [ , check => ... , ... ]) >>
 
 Load check_list as a hash ref for standard hash. 
 

@@ -26,5 +26,5 @@ resources:
   homepage: https://metacpan.org/module/CGI::Alternatives
   license: http://dev.perl.org/licenses/
   repository: https://github.com/leejo/cgi-alternatives
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

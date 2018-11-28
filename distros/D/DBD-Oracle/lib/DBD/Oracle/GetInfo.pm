@@ -1,12 +1,12 @@
-package DBD::Oracle::GetInfo;
-$DBD::Oracle::GetInfo::VERSION = '1.74';
-BEGIN {
-  $DBD::Oracle::GetInfo::AUTHORITY = 'cpan:PYTHIAN';
-}
+#!perl
 # ABSTRACT: Wrapper to get Oracle information
-
 use strict;
-use DBD::Oracle();
+use warnings;
+
+package DBD::Oracle::GetInfo;
+our $VERSION = '1.76'; # VERSION
+
+use DBD::Oracle ();
 
 my $sql_driver = 'Oracle';
 my $sql_ver_fmt = '%02d.%02d.%04d';   # ODBC version string: ##.##.#####
@@ -22,7 +22,7 @@ my $sql_driver_ver = sprintf $sql_ver_fmt, $a, $b, $c;
 sub sql_dbms_version {
     my $dbh = shift;
     local $^W; # for ora_server_version having too few parts
-    return sprintf $sql_ver_fmt, @{DBD::Oracle::db::ora_server_version($dbh)};
+    return sprintf $sql_ver_fmt, @{DBD::Oracle::db::ora_server_version($dbh)}[0..2];
 }
 
 my @Keywords = qw(
@@ -295,7 +295,7 @@ DBD::Oracle::GetInfo - Wrapper to get Oracle information
 
 =head1 VERSION
 
-version 1.74
+version 1.76
 
 =head1 AUTHORS
 
@@ -321,7 +321,7 @@ Martin J. Evans <mjevans@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1994 by Tim Bunce.
+This software is copyright (c) 2018, 2014, 2013, 2012, 2011, 2010 by Tim Bunce.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,13 +4,13 @@
       "LA Walsh <LAWALSH@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "P",
    "no_index" : {
@@ -24,12 +24,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.82",
             "PerlIO" : "1.03",
-            "Test::Simple" : "0.44",
-            "Types::Core" : "v0.1.8",
-            "Xporter" : "v0.1.2",
-            "mem" : "v0.4.3",
-            "perl" : "v5.8.5",
-            "version" : "0.77"
+            "perl" : "v5.8.5"
          }
       },
       "configure" : {
@@ -43,9 +38,18 @@
             "Xporter" : "v0.1.2",
             "mem" : "v0.4.5"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0.44",
+            "Types::Core" : "v0.1.8",
+            "Xporter" : "v0.1.2",
+            "mem" : "v0.4.3",
+            "version" : "0.77"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.37",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v1.1.40",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

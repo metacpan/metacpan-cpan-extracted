@@ -1,3 +1,7 @@
+0.200000
+- Automatically pass the --signoff option to the git am command when dealing
+  with the Gentoo repository. pram now complies with GLEP 76! \o/
+
 0.100200
 - Fix a bunch of typos in the README.pod file.
 

@@ -1,14 +1,9 @@
 package Hailo::Tokenizer::Chars;
-BEGIN {
-  $Hailo::Tokenizer::Chars::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Hailo::Tokenizer::Chars::VERSION = '0.72';
-}
-
-use 5.010;
-use Any::Moose;
-use Any::Moose 'X::StrictConstructor';
+our $AUTHORITY = 'cpan:AVAR';
+$Hailo::Tokenizer::Chars::VERSION = '0.74';
+use v5.28.0;
+use Moose;
+use MooseX::StrictConstructor;
 use namespace::clean -except => 'meta';
 
 with qw(Hailo::Role::Arguments

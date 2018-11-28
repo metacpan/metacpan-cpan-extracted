@@ -13,8 +13,9 @@ my %common_reqs = (
     "PkgConfig" => 0.19026,
     "Alien::Build::Plugin::Cleanse::BuildDir" => 0,
     'Sort::Versions' => 0,
+    "Alien::geos::af" => 1.005,
     #"File::Stat" => 0,
-    ($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
+    #($^O =~ /mswin/i) ? ("Alien::MSYS" => 0) : (),
 );
 
 my %WriteMakefileArgs = (

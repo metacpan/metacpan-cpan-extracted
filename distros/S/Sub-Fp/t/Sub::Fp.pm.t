@@ -13,8 +13,105 @@ none        uniq      bool        spread   every
 len         is_array  is_hash     to_keys  to_vals
 noop        identity  is_empty    flow     eql
 is_sub      to_pairs  for_each    apply
-get         second
+get         second    range
 );
+
+sub range__returns_empty_array_when_args_undef :Tests {
+    is_deeply(range(), []);
+}
+
+sub range__returns_list_when_start_is_positive :Tests {
+    is_deeply(range(4), [0, 1,2,3]);
+}
+
+sub range__returns_list_when_positive_start_and_positive_end :Tests {
+    is_deeply(range(1,10), [1,2,3,4,5,6,7,8,9])
+}
+
+sub range__returns_list_when_zero_start_and_positive_end_and_positive_step :Tests {
+    is_deeply(range(0,20,5), [0, 5, 10, 15]);
+}
+
+sub range__returns_list_when_positive_start_and_positive_end_and_positive_step :Tests {
+    is_deeply(range(1, 10, 1), [1,2,3,4,5,6,7,8,9]);
+}
+
+sub range__returns_list_when_positive_start_and_positive_end_and_negative_step :Tests {
+    is_deeply(range(10, 1, -1), [10, 9, 8, 7, 6, ,5, 4, 3, 2,]);
+}
+
+sub range__returns_list_when_positive_start_and_end_is_zero_and_negative_step :Tests {
+    is_deeply(range(100, 0, -100), [ 100 ]);
+}
+
+sub range__returns_list_when_start_is_negative :Tests {
+    is_deeply(range(-4), [0, -1, -2, -3]);
+}
+
+sub range__returns_list_when_negative_start_and_negative_end :Tests {
+    is_deeply(range(-1, -10), [-1, -2, -3, -4, -5, -6, -7, -8, -9]);
+}
+
+sub range__returns_list_when_zero_start_and_negative_end_and_negative_step :Tests {
+    is_deeply(range(0, -20, -5), [0, -5, -10, -15]);
+}
+
+sub range__returns_list_when_negative_start_and_negative_end_and_negative_step :Tests {
+    is_deeply(range(-1, -10, -1), [-1, -2, -3, -4, -5, -6, -7, -8, -9]);
+}
+
+sub range__returns_list_when_negative_start_and_negative_end_and_positive_step :Tests {
+    is_deeply(range(-10, -1, 1), [-10, -9, -8, -7, -6, -5, -4, -3, -2]);
+}
+
+sub range__returns_list_when_negative_start_and_zero_step_and_positive_end :Tests {
+    is_deeply(range(-100, 0, 100), [ -100 ]);
+}
+
+sub range__returns_empty_when_start_is_greater_than_end_and_step_is_not_negative :Tests {
+    is_deeply(range(100, 1, 0), []);
+}
+
+sub range__returns_empty_array_when_all_nums_the_same :Tests {
+    is_deeply(range(0,0,0), []);
+}
+
+sub range__returns_empty_when_range_from_zero_to_negative_with_positive_step :Tests {
+    is_deeply(range(0, -100, 100), []);
+}
+
+sub range__returns_empty_when_range_from_zero_to_positive_with_negative_step :Tests {
+    is_deeply(range(0, 100, -100), []);
+}
+
+sub range__returns_empty_when_range_from_negative_to_zero_with_negative_step :Tests {
+    is_deeply(range(-100, 0, -100), []);
+}
+
+sub range__returns_empty_array_when_range_from_negative_to_one_with_negative_step :Tests {
+    is_deeply(range(-100, 1, -100), []);
+}
+
+sub range__returns_empty_array_when_range_from_positive_to_negative_with_positive_step :Tests {
+    is_deeply(range(100, -1, 100), []);
+}
+
+sub range__returns_empty_when_start_and_end_are_same_with_negative_step :Tests {
+    is_deeply(range(0, 0, -100), []);
+}
+
+sub range__returns_empty_when_start_and_end_are_same_with_positive_step :Tests {
+    is_deeply(range(0, 0, 100), []);
+}
+
+sub range__returns_list_of_same_num_when_step_zero :Tests {
+    is_deeply(range(1, 4, 0), [1,1,1]);
+}
+
+sub range__returns_empty_array_when_negative_numbers_and_zero_step :Tests {
+    is_deeply(range(-1, -4, 0), [-1, -1, -1]);
+}
+
 
 sub is_sub__returns_0_when_args_undef :Tests {
     is(is_sub(), 0);
@@ -43,6 +140,8 @@ sub is_sub__returns_0_when_args_number :Tests {
 sub is_sub__returns_1_when_args_is_code_ref :Tests {
     is(is_sub(sub {}), 1);
 }
+
+
 
 sub eql__returns_0_when_args_incomplete :Tests {
     is(eql([]), 0);

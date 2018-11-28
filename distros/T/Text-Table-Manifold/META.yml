@@ -1,28 +1,31 @@
 ---
 abstract: 'Render tables in manifold styles'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: '1.001006'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '1.48'
 configure_requires:
-  Module::Build: '0.421'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.142060'
-license: artistic_2
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Text-Table-Manifold
-provides:
-  Text::Table::Manifold:
-    file: lib/Text/Table/Manifold.pm
-    version: '1.00'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Const::Exporter: v0.2.3
   HTML::Entities::Interpolate: '1.05'
   List::AllUtils: '0.08'
   Module::Runtime: '0.014'
   Moo: '1.006'
+  Scalar::Util: '1.5'
   Types::Standard: '1.000004'
   Unicode::GCString: '2013.1'
   open: '0'
@@ -30,5 +33,7 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
-version: '1.00'
+  license: https://perldoc.perl.org/perlartistic.html
+  repository: https://github.com/ronsavage/Text-Table-Manifold.git
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

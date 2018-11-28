@@ -30,8 +30,7 @@ my %WriteMakefileArgs = (
     "bin/koha-index",
     "bin/koha-index-daemon",
     "bin/koha-overdue",
-    "bin/koha-rebuild-editors",
-    "bin/koha-sitemap"
+    "bin/koha-rebuild-editors"
   ],
   "LICENSE" => "gpl",
   "MIN_PERL_VERSION" => "5.010",
@@ -51,8 +50,6 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => 0,
     "IO::File" => 0,
     "JSON" => 0,
-    "Koha::Contrib::Tamil::RecordWriter::File" => 0,
-    "Koha::Contrib::Tamil::Sitemaper" => 0,
     "LWP" => 0,
     "LWP::UserAgent" => 0,
     "List::Util" => 0,
@@ -96,7 +93,7 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.059",
+  "VERSION" => "0.061",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -119,8 +116,6 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "IO::File" => 0,
   "JSON" => 0,
-  "Koha::Contrib::Tamil::RecordWriter::File" => 0,
-  "Koha::Contrib::Tamil::Sitemaper" => 0,
   "LWP" => 0,
   "LWP::UserAgent" => 0,
   "List::Util" => 0,

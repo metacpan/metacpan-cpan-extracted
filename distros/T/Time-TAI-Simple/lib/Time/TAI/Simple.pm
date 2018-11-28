@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 BEGIN {
     @Time::TAI::Simple::EXPORT = qw(tai tai10 tai35);
-    $Time::TAI::Simple::VERSION = '1.14';
+    $Time::TAI::Simple::VERSION = '1.15';
 }
 
 our @LEAPSECOND_UNIX_PATHNAME_LIST = (
@@ -32,7 +32,7 @@ our @LEAPSECOND_WINDOWS_PATHNAME_LIST = (
 
 our $LEAPSECOND_IETF_DELTA = 2208960000;  # difference between IETF's leapseconds (since 1900-01-01 00:00:00) and equivalent UNIX epoch time.
 
-our @FALLBACK_LEAPSECONDS_LIST = (  # from http://www.ietf.org/timezones/data/leap-seconds.list
+our @FALLBACK_LEAPSECONDS_LIST = (  # from https://www.ietf.org/timezones/data/leap-seconds.list
     [2272060800, 10],
     [2287785600, 11],
     [2303683200, 12],
@@ -86,7 +86,7 @@ sub new {
         dl_to   => undef
     };
     bless ($self, $class);
-    $self->{http_or} = HTTP::Tiny->new(max_redirect => 15);
+    $self->{http_or} = HTTP::Tiny->new(max_redirect => 15, agent => 'Wget/1.18 (linux-gnu)');
     $self->{mode}    = $self->opt('mode', 'tai10');
     $self->download_leapseconds() if ($self->opt('download_leapseconds', 0));
     $self->load_leapseconds() unless ($self->opt('do_not_load_leapseconds'));
@@ -178,7 +178,7 @@ sub download_leapseconds {
         }
     }
     push (@url_list, 'http://www.ciar.org/ttk/codecloset/leap-seconds.list');
-    push (@url_list, 'http://www.ietf.org/timezones/data/leap-seconds.list');
+    push (@url_list, 'https://www.ietf.org/timezones/data/leap-seconds.list');
     eval {
         my $http_or = $self->{http_or};
         my $leapseconds_filename = $self->_leapseconds_filename(\%opt_h);
@@ -393,7 +393,7 @@ leapsecond will be one second ahead of the desired TAI time.
 
 This problem can be avoided by downloading the most recent leapsecond list
 file, either by invoking the C<download_leapseconds> method or by manually
-downloading it from L<http://www.ietf.org/timezones/data/leap-seconds.list>
+downloading it from L<https://www.ietf.org/timezones/data/leap-seconds.list>
 and putting it somewhere C<Time::TAI::Simple> will find it, such as
 C</etc/leap-seconds.list> or C<C:\WINDOWS\leap-seconds.list>.
 

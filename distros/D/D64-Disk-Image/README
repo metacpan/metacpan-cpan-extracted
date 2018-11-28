@@ -1,4 +1,4 @@
-D64::Disk::Image Version 0.02
+D64::Disk::Image Version 0.03
 =============================
 
 D64::Disk::Image package provides Perl interface to Per Olofsson's diskimage.c,

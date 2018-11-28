@@ -4,7 +4,7 @@
       "Qiang Wang <wang-q@outlook.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.16",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "perl_5"
    ],
@@ -75,7 +75,7 @@
    "provides" : {
       "App::Egaz" : {
          "file" : "lib/App/Egaz.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       },
       "App::Egaz::Command::blastlink" : {
          "file" : "lib/App/Egaz/Command/blastlink.pm"
@@ -152,7 +152,8 @@
          "web" : "https://github.com/wang-q/App-Egaz"
       }
    },
-   "version" : "0.2.1",
+   "version" : "0.2.2",
    "x_authority" : "cpan:WANGQ",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

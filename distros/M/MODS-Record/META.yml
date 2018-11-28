@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl extension for handling MODS records'
 author:
-  - '=over 4'
+  - 'Patrick Hochstenbach <Patrick.Hochstenbach at UGent.be>'
 build_requires:
   Test::Deep: '0.110'
   Test::Exception: '0.31'
@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,6 +35,7 @@ resources:
   bugtracker: https://github.com/LibreCat/MODS-Record/issues
   homepage: https://github.com/LibreCat/MODS-Record
   repository: https://github.com/LibreCat/MODS-Record.git
-version: '0.12'
+version: '0.13'
 x_contributors:
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

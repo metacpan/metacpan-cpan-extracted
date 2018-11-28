@@ -1,0 +1,8 @@
+Revision history for Assert-Refute-T-Hash
+
+0.17    Sat Nov 24 2018
+        - BUG Fix error reporting in values_are, fix test
+
+0.16    Thu Nov 22 2018
+        - Split away from Assert::Refute
+        - has keys_are, values_are

@@ -1,6 +1,6 @@
 package Lab::XPRESS::Data::XPRESS_plotter;
 #ABSTRACT: XPRESS plotting module
-$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.664';
+$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.670';
 use strict;
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Time::HiRes qw/usleep/, qw/time/;
@@ -1384,7 +1384,7 @@ Lab::XPRESS::Data::XPRESS_plotter - XPRESS plotting module
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 COPYRIGHT AND LICENSE
 

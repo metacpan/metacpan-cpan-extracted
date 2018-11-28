@@ -54,9 +54,9 @@ sub check_valid_runtime {
 
     if (scalar(@ids)) {
         my $id = $ids[0];
-        if ($drm eq "SGE") {
+        if (uc($drm) eq "SGE") {
             analyze_sge_job($id, $sleeptime, $runtime);
-        } elsif (lc($drm) eq "condor") {
+        } elsif (uc($drm) eq "CONDOR") {
             analyze_condor_job($id, $sleeptime, $runtime);
         } else {
             die "Bad DRM value: $drm.\n";
@@ -103,9 +103,9 @@ sub analyze_sge_job {
     # It appears we need some time before the job becomes available to qacct
     sleep 20;
 
-    my $qacct = `qacct -j $id`;
+    my $qacct_result = `$qacct -j $id`;
 
-    my @q_output = split(/\n/, $qacct);
+    my @q_output = split(/\n/, $qacct_result);
     my @runtime = grep { m/wall/ } @q_output;
     ok(scalar(@runtime) == 1, "Got only one line with job wall clock time.");
     my $qacct_runtime_line = $runtime[0];

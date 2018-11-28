@@ -1,5 +1,8 @@
 Changelog.ini
 Changes
+examples/ambiguous.pl
+examples/commit.pl
+examples/negative.assertion.pl
 lib/Regexp/Parsertron.pm
 LICENSE
 Makefile.PL

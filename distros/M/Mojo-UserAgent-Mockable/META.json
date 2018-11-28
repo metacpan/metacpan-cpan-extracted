@@ -43,7 +43,7 @@
             "Safe::Isa" : "0",
             "Scalar::Util" : "0",
             "Try::Tiny" : "0",
-            "perl" : "5.016",
+            "perl" : "5.014",
             "warnings" : "0",
             "warnings::register" : "0"
          }
@@ -68,7 +68,6 @@
             "Mojo::UserAgent" : "0",
             "Mojolicious::Lite" : "0",
             "Mojolicious::Plugin::BasicAuthPlus" : "0",
-            "Mojolicious::Quick" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::Exception" : "0",
             "Test::JSON" : "0",
@@ -86,19 +85,19 @@
    "provides" : {
       "Mojo::UserAgent::Mockable" : {
          "file" : "lib/Mojo/UserAgent/Mockable.pm",
-         "version" : "1.54"
+         "version" : "1.56"
       },
       "Mojo::UserAgent::Mockable::Proxy" : {
          "file" : "lib/Mojo/UserAgent/Mockable/Proxy.pm",
-         "version" : "1.54"
+         "version" : "1.56"
       },
       "Mojo::UserAgent::Mockable::Request::Compare" : {
          "file" : "lib/Mojo/UserAgent/Mockable/Request/Compare.pm",
-         "version" : "1.54"
+         "version" : "1.56"
       },
       "Mojo::UserAgent::Mockable::Serializer" : {
          "file" : "lib/Mojo/UserAgent/Mockable/Serializer.pm",
-         "version" : "1.54"
+         "version" : "1.56"
       }
    },
    "release_status" : "stable",
@@ -113,7 +112,7 @@
          "web" : "https://github.com/popefelix/Mojo-UserAgent-Mockable"
       }
    },
-   "version" : "1.54",
+   "version" : "1.56",
    "x_generated_by_perl" : "v5.16.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }

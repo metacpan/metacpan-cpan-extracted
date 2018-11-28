@@ -1,0 +1,29 @@
+---
+abstract: 'Prune a list of dates down to the ones you want to keep'
+author:
+  - 'Michael Conrad <mconrad@intellitree.com>'
+build_requires:
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-RetentionPolicy
+requires:
+  DateTime: '0'
+  DateTime::Format::Flexible: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/intellitree/perl-Date-RetentionPolicy/issues
+  homepage: https://github.com/intellitree/perl-Date-RetentionPolicy
+  repository: https://github.com/intellitree/perl-Date-RetentionPolicy.git
+version: '0.01'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

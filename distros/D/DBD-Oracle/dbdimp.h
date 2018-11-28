@@ -21,11 +21,28 @@ typedef struct imp_fbh_st imp_fbh_t;
 struct imp_drh_st {
 	dbih_drc_t com;		/* MUST be first element in structure	*/
 	OCIEnv *envhp;
+	bool leak_state;
+#ifdef ORA_OCI_112
+	HV *charset_hv;
+	HV *pool_hv;
+#endif
 	SV *ora_long;
 	SV *ora_trunc;
 	SV *ora_cache;
 	SV *ora_cache_o;		/* for ora_open() cache override */
 };
+
+#ifdef ORA_OCI_112
+typedef struct session_pool_st session_pool_t;
+struct session_pool_st {
+	OCIEnv		*envhp;
+	OCIError 	*errhp;
+	OCISPool	*poolhp;
+	OraText		*pool_name;
+	ub4		pool_namel;
+	int		active_sessions;
+};
+#endif
 
 /* Define dbh implementor data structure */
 struct imp_dbh_st {
@@ -44,16 +61,16 @@ struct imp_dbh_st {
 	OCISvcCtx 	*svchp;
 	OCISession	*seshp;
 #ifdef ORA_OCI_112
-	OCIAuthInfo *authp;
-	OCISPool    *poolhp;
-	text        *pool_name;
-	ub4			pool_namel;
+	session_pool_t	*pool;
+	OraText		session_tag[50];
+	boolean		session_tag_found;
 	bool		using_drcp;
 	text		*pool_class;
 	ub4			pool_classl;
 	ub4			pool_min;
 	ub4			pool_max;
 	ub4			pool_incr;
+	ub4			pool_rlb;
 	char		*driver_name;/*driver name user defined*/
 #endif
     SV          *taf_function; /*User supplied TAF functiomn*/
@@ -394,6 +411,7 @@ sb4 reg_taf_callback _((SV *dbh, imp_dbh_t *imp_dbh));
 /* These defines avoid name clashes for multiple statically linked DBD's	*/
 
 #define dbd_init			ora_init
+#define dbd_dr_destroy		ora_dr_destroy
 #define dbd_db_login		ora_db_login
 #define dbd_db_login6		ora_db_login6
 #define dbd_db_do			ora_db_do
@@ -402,6 +420,7 @@ sb4 reg_taf_callback _((SV *dbh, imp_dbh_t *imp_dbh));
 #define dbd_db_cancel		ora_db_cancel
 #define dbd_db_disconnect	ora_db_disconnect
 #define dbd_db_destroy		ora_db_destroy
+#define dbd_take_imp_data	ora_take_imp_data
 #define dbd_db_STORE_attrib	ora_db_STORE_attrib
 #define dbd_db_FETCH_attrib	ora_db_FETCH_attrib
 #define dbd_st_prepare		ora_st_prepare

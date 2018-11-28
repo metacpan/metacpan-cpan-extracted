@@ -47,6 +47,8 @@ L<LWP::Protocol::Net::Curl>
 
 L<LWP::CurlLog>
 
+L<HTTP::Request::AsCurl> - for the inverse function
+
 AUTHOR
 
 Max Maischein C<corion@cpan.org>

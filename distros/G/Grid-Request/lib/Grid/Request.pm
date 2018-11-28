@@ -11,7 +11,7 @@ such as Sun Grid Engine (SGE) or Condor.
 
 =head1 SYNOPSIS
 
- use Grid::Request;
+ use Grid::Request drm => 'sge';
  my $request = Grid::Request->new();
 
  # Optionally set the job's project, if the configured scheduler requires it.
@@ -97,7 +97,6 @@ the file may also specify the path to a Log::Log4perl configuration file with th
 'log4perl-conf' entry name.The following is an example:
 
       [request]
-      drm=SGE
       tempdir=/path/to/grid/accessible/tmp/directory
       log4perl-conf=/path/to/custom-log4perl.conf
 
@@ -137,8 +136,9 @@ my $section = $Grid::Request::HTC::config_section;
 
 my $WORKER = $Grid::Request::HTC::WORKER;
 
+our $DRM = undef;
 my $DRMAA_INITIALIZED = 0;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 my $SESSION_NAME = lc(__PACKAGE__);
 $SESSION_NAME =~ s/:+/_/g;
 
@@ -193,6 +193,13 @@ sub new {
     return $self;
 }
 
+sub import {
+    my ($module, $drm, $drm_target) = @_;
+    if (defined $drm && $drm eq "drm") {
+        $DRM = $drm_target;
+    }
+}
+
 # Initialize the object. This is a private method. Do not call directly.
 sub _init {
     # Initialize the Request object. We need to parse the configuration
@@ -206,14 +213,18 @@ sub _init {
     # temporary files and other information that user configuration files do
     # not need (or should) know about.
 
-    my $cfg = _init_config_logger($config);
+    my $cfg = _get_config($config);
+    _init_logger($cfg);
 
     $logger->info("Creating the first Command object.");
     # holds an array of command elements.
     $self->{_cmd_ele}->[0] =
         Grid::Request::Command->new(%$command_args_ref);
 
-    $self->{_drm} = _load_drm($cfg);
+    if (! defined $DRM) {
+        $DRM = _get_drm_from_config($cfg);
+    }
+    $self->{_drm} = _load_drm($DRM);
     $self->{_simulate} = 0;   # For simulate.
     $self->{_submitted} = 0;  # For the submitted flag.
     $self->{_config} = $cfg;  # For the configuration object.
@@ -223,20 +234,27 @@ sub _init {
 }
 
 # Private method only. Used to configure logging.
-sub _init_config_logger {
+sub _get_config {
     my $config = shift;
+
     # TODO: Since Grid::Request::HTC already parsed the default config file, use
     # an accessor to get that config object rather than reparsing it
     # here. This will involve adding an additional method in Grid::Request::HTC.
     my $default_cfg_obj = Config::IniFiles->new( -file => $default_config );
-    my ($cfg, $same_configs);
+    my $cfg;
     if (defined $config && ($config eq $default_config)) {
-        $same_configs = 1;
+        # The configs are the same
         $cfg = $default_cfg_obj;
     } else {
         $cfg = Config::IniFiles->new(-file   => $config,
                                      -import => $default_cfg_obj);
     }
+
+    return $cfg;
+}
+
+sub _init_logger {
+    my $cfg = shift;
 
     # Parse the location of the logger configuration and initialize
     # Log4perl, if it has not already been initialized.
@@ -250,8 +268,6 @@ sub _init_config_logger {
     }
 
     $logger = get_logger(__PACKAGE__);
-
-    return $cfg;
 }
 
 # Accessors (private) used to return internal objects.
@@ -260,13 +276,23 @@ sub _com_obj_list { return wantarray ? @{ $_[0]->{_cmd_ele} } : $_[0]->{_cmd_ele
 sub _com_obj { return $_[0]->{_cmd_ele}->[-1]; }
 sub _config { return $_[0]->{_config}; }
 
+sub _get_drm_from_config {
+    my $cfg = shift;
+    my $param = "drm";
+    my $drm = uc($cfg->val($section, $param));
+
+    if (! defined $drm || length($drm) == 0) {
+        Grid::Request::Exception->throw("No $param parameter specified in the config file " . $cfg->GetFileName());
+    }
+
+    return $drm;
+}
+
 sub _load_drm {
     $logger->debug("In _load_drm.");
-    my $cfg = shift;
-    my $param = $Grid::Request::HTC::drm_param;
-    my $drm = uc($cfg->val($section, $param));
+    my $drm = uc(shift);
     if (! defined $drm) {
-        Grid::Request::Exception->throw("No $param parameter specified in the config file " . $cfg->GetFileName());
+        Grid::Request::Exception->throw("No $drm specified!");
     }
     my $package = __PACKAGE__ . "::DRM::$drm";
     my $load_result = eval "require $package";
@@ -388,6 +414,128 @@ set (or reset) the account attribute for the command.
 
 B<Returns:> The currently set account (if called with no parameters).
 
+=item $obj->add_array_param($argument, $array_ref);
+
+B<Description:> Add an iterable command line argument to the executable when it
+is run on the grid. This is a higher level method that wraps add_param for
+easier iteration over elements in an array. The following two method calls are
+equivalent:
+
+    $request->add_array_param('--arg=$(Name)', \@values);
+
+    $request->add_param({ type   => "ARRAY",
+                          key    => '--arg=$(Name)',
+                          value  => \@values,
+                        });
+
+B<Parameters:> The first parameter is the the template for the argument for the
+command's execution. The second argument is the directory to iterate over. The
+name of each file in the directory will be token replaced into occurrences of
+'$(Name)' in the template (first argument).
+
+B<Returns:> None.
+
+=cut
+
+sub add_array_param {
+    my ($self, $arg_template, $array_ref) = @_;
+    $logger->debug("In add_array_param.");
+
+    if (! defined($arg_template) || ! defined($array_ref)) {
+        Grid::Request::InvalidArgumentException->throw("add_array_param() requires 2 arguments.");
+    }
+
+    if (ref($array_ref) ne "ARRAY" || length(@$array_ref) == 0) {
+        Grid::Request::InvalidArgumentException->throw("Empty or invalid array reference provided.");
+    }
+
+    $self->add_param({ type  => "ARRAY",
+                       key   => $arg_template,
+                       value => $array_ref });
+                      
+}
+
+
+=item $obj->add_dir_param($argument, $path_to_dir);
+
+B<Description:> Add an iterable command line argument to the executable when it is
+run on the grid. This is a higher level method that wraps add_param for easier
+iteration over files in a directory. The following two method calls are equivalent:
+
+    $request->add_dir_param('--arg=$(Name)', "/path/to/some/directory");
+
+    $request->add_param({ type   => "DIR",
+                          key    => '--arg=$(Name)',
+                          value  => "/path/to/some/directory",
+                        });
+
+
+
+B<Parameters:> The first parameter is the the template for the argument for the
+command's execution. The second argument is the directory to iterate over. The
+name of each file in the directory will be token replaced into occurrences of
+'$(Name)' in the template (first argument).
+
+B<Returns:> None.
+
+=cut
+
+sub add_dir_param {
+    my ($self, $arg_template, $directory) = @_;
+    $logger->debug("In add_dir_param.");
+
+    if (! defined($arg_template) || ! defined($directory)) {
+        Grid::Request::InvalidArgumentException->throw("add_dir_param() requires 2 arguments.");
+    }
+
+    if (length($directory) == 0 || ! -d $directory) {
+        Grid::Request::InvalidArgumentException->throw("Invalid or non-existent directory ($directory).");
+    }
+
+    $self->add_param({ type  => "DIR",
+                       key   => $arg_template,
+                       value => $directory });
+                      
+}
+
+=item $obj->add_file_param($argument, $path_to_file);
+
+B<Description:> Add an iterable command line argument to the executable when it is
+run on the grid. This is a higher level method that wraps add_param for easier
+iteration over lines in a file. The following two method calls are equivalent:
+
+    $request->add_file_param('--arg=$(Name)', "/path/to/some/file");
+
+    $request->add_param({ type   => "FILE",
+                          key    => '--arg=$(Name)',
+                          value  => "/path/to/some/file",
+                        });
+
+B<Parameters:> The first parameter is the the template for the argument for the
+command's execution. The second argument is the file to iterate over. The text
+in each line inside the file will be token replaced into occurrences of
+'$(Name)' in the template (first argument).
+
+B<Returns:> None.
+
+=cut
+
+sub add_file_param {
+    my ($self, $arg_template, $file) = @_;
+    $logger->debug("In add_file_param.");
+
+    if (! defined($arg_template) || ! defined($file)) {
+        Grid::Request::InvalidArgumentException->throw("add_file_param() requires 2 arguments.");
+    }
+
+    if (length($file) == 0 || ! -f $file) {
+        Grid::Request::InvalidArgumentException->throw("Invalid or non-existent file ($file).");
+    }
+
+    $self->add_param({ type  => "FILE",
+                       key   => $arg_template,
+                       value => $file });
+}
 
 =item $obj->add_param($scalar | @list | %hash );
 
@@ -1547,9 +1695,14 @@ sub _submit_htc {
         my $job_ids;
         ($error, $job_ids, $diagnosis) = drmaa_run_bulk_jobs($jt, 1, $times, 1);
         _throw_drmaa("Could not run bulk jobs.", $error, $diagnosis) if $error;
-        for (my $i=1; $i<=$times; $i++) {
+        for (my $time_index = 1; $time_index <= $times; $time_index++) {
             my ($error, $job_id) = drmaa_get_next_job_id($job_ids);
-            _throw_drmaa("Problem getting next job id.", $error, $diagnosis) if $error;
+            if ($error) {
+                _throw_drmaa("Problem getting next job id.", $error, $diagnosis);
+                $cmd->state('FAILED');
+            } else {
+                $cmd->state('WAITING');
+            }
             $logger->debug("Adding job id $job_id to the jobs array.");
             push (@ids, $job_id);
         }
@@ -1557,7 +1710,12 @@ sub _submit_htc {
         # If here, this is a singleton type job. Only 1 execution...
         my $job_id;
         ($error, $job_id, $diagnosis) = drmaa_run_job($jt);
-        _throw_drmaa("Error running job.", $error, $diagnosis) if $error;
+        if ($error) {
+            _throw_drmaa("Error running job.", $error, $diagnosis);
+            $cmd->state('FAILED');
+        } else {
+            $cmd->state('WAITING');
+        }
         $logger->debug("Adding job id $job_id to the jobs array.");
         # since the return is for an array of ids, make an array containing
         # a single job id.
@@ -1737,53 +1895,19 @@ sub _sync_ids {
         $logger->debug("Will wait for $wait_time seconds.")
     }
     my @job_ids = $cmd_obj->ids();
+    $cmd_obj->state('RUNNING');
     my ($error, $diagnosis) = drmaa_synchronize(\@job_ids, $wait_time, 0);
-    _throw_drmaa("Error waiting for job execution.", $error, $diagnosis) if $error;
-}
-
-=item $obj->get_tasks();
-
-B<Description:> Retrieve the tasks for this request
-
-B<Parameters:> None.
-
-B<Returns:> A hash of hashes (HoH) representing the tasks for this
-request. The hash is organized by the index and the value
-is another hashref with the actual data. The following is an example
-of the return data structure:
-
-  $hashref = {
-            '1' => {
-                   'returnValue' => 0,
-                   'message'     => undef,
-                   'state'       => 'FINISHED'
-                 },
-            '2' => {
-                   'returnValue' => -1,
-                   'message'     => 'Failed task.',
-                   'state'       => 'FAILED'
-                 }
-          }
-
-=cut
-
-sub get_tasks {
-    $logger->debug("In get_tasks.");
-    my ($self, @args) = @_;
-    my $tasks;
-    if ($self->is_submitted) {
-        # TODO: Implement via DRMAA vice HTC
-    } else {
-        $logger->logwarn("The request must be submitted before get_tasks ",
-                         "may be called.");
+    if ($error) {
+        $cmd_obj->state('FAILED');
+        _throw_drmaa("Error waiting for job execution.", $error, $diagnosis);
     }
-    return $tasks;
+    $cmd_obj->state('FINISHED');
 }
 
 sub get_status {
     my ($class, $job_id) = @_;
     if (! defined $logger) {
-        _init_config_logger($default_config);
+        _init_logger($default_config);
     }
     _init_drmaa();
 
@@ -1796,6 +1920,7 @@ sub get_status {
     my $status;
     my ($error, $remoteps, $diagnosis) = drmaa_job_ps($job_id);
     _throw_drmaa("Could not get status.", $error, $diagnosis) if $error;
+
     if ($remoteps == $DRMAA_PS_RUNNING) {
         $status = "RUNNING";
     } elsif ($remoteps == $DRMAA_PS_QUEUED_ACTIVE) {

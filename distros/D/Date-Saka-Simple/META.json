@@ -4,7 +4,7 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -34,11 +34,11 @@
          "requires" : {
             "Date::Calc" : "5.7",
             "Date::Exception" : "0.03",
-            "Date::Utils" : "0.22",
+            "Date::Utils" : "0.24",
             "List::Util" : "1.41",
             "Moo" : "2.000000",
             "Time::localtime" : "1.02",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.26",
             "perl" : "5.006"
          }
       }
@@ -46,7 +46,7 @@
    "provides" : {
       "Date::Saka::Simple" : {
          "file" : "lib/Date/Saka/Simple.pm",
-         "version" : "0.19"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "web" : "https://github.com/manwar/Date-Saka-Simple"
       }
    },
-   "version" : "0.19",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

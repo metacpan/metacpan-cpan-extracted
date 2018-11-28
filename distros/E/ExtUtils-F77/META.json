@@ -1,7 +1,7 @@
 {
    "abstract" : "a simple interface to F77 libs",
    "author" : [
-      "Karl Glazebrook <karlglazebrook@yahoo.com>"
+      "Karl Glazebrook <karl_pgplot@mac.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
@@ -31,9 +31,19 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Text::ParseWords" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.20"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/extutils-f77.git",
+         "web" : "http://github.com/PDLPorters/extutils-f77"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pdl"
+   },
+   "version" : "1.21"
 }

@@ -21,7 +21,6 @@ build_requires:
   Mojo::UserAgent: '0'
   Mojolicious::Lite: '0'
   Mojolicious::Plugin::BasicAuthPlus: '0'
-  Mojolicious::Quick: '0'
   Pod::Coverage::TrustPod: '0'
   Test::Exception: '0'
   Test::JSON: '0'
@@ -45,16 +44,16 @@ name: Mojo-UserAgent-Mockable
 provides:
   Mojo::UserAgent::Mockable:
     file: lib/Mojo/UserAgent/Mockable.pm
-    version: '1.54'
+    version: '1.56'
   Mojo::UserAgent::Mockable::Proxy:
     file: lib/Mojo/UserAgent/Mockable/Proxy.pm
-    version: '1.54'
+    version: '1.56'
   Mojo::UserAgent::Mockable::Request::Compare:
     file: lib/Mojo/UserAgent/Mockable/Request/Compare.pm
-    version: '1.54'
+    version: '1.56'
   Mojo::UserAgent::Mockable::Serializer:
     file: lib/Mojo/UserAgent/Mockable/Serializer.pm
-    version: '1.54'
+    version: '1.56'
 requires:
   Carp: '0'
   Class::Load: '0'
@@ -69,13 +68,13 @@ requires:
   Safe::Isa: '0'
   Scalar::Util: '0'
   Try::Tiny: '0'
-  perl: '5.016'
+  perl: '5.014'
   warnings: '0'
   warnings::register: '0'
 resources:
   bugtracker: https://github.com/popefelix/Mojo-UserAgent-Mockable/issues
   homepage: https://github.com/popefelix/Mojo-UserAgent-Mockable
   repository: https://github.com/popefelix/Mojo-UserAgent-Mockable.git
-version: '1.54'
+version: '1.56'
 x_generated_by_perl: v5.16.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

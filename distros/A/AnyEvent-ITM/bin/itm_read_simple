@@ -88,7 +88,37 @@ itm_read_simple - Simple ITM Reader
 
 =head1 VERSION
 
-version 0.002
+version 0.003
+
+=head1 SYNOPSIS
+
+  itm_read_simple openocd.itmlog
+
+In the openocd.cfg (for a 72MHz ARM)
+
+  itm ports on
+  tpiu config internal openocd.itmlog uart off 72000000
+
+Best is to make a fifo for the exchange (more stable)
+
+  mkfifo openocd.itmlog
+
+=head1 DESCRIPTION
+
+Displays ITM/SWO Debugging data in colored form.
+
+=encoding utf8
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/p5-anyevent-itm
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/p5-anyevent-itm/issues
 
 =head1 AUTHOR
 

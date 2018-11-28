@@ -1,0 +1,36 @@
+NAME
+
+    REST::Client::CrossRef - Read data from CrossRef using its REST API
+
+VERSION
+
+    Version 0.001
+
+INSTALLATION
+
+    To install REST::Client::CrossRef, cd to the directory that contains
+    this file and type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    On windows use nmake or dmake instead of make.
+
+    To install this module into a specific directory, do: perl Makefile.PL
+    PREFIX=/name/of/the/directory ...the rest is the same...
+
+    Please also read the perlmodinstall man page, if available.
+
+DEPENDENCIES
+
+            Test::More      1.001014
+            Log::Any        1.049
+            Carp    1.4
+            JSON    2.9
+            HTTP::Cache::Transparent        1.4
+            Moo     2.001001
+            URI::Escape     3.31
+            REST::Client    273
+

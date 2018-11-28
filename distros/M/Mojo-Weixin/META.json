@@ -38,7 +38,7 @@
             "Encode::Locale" : "0",
             "IO::Compress::Gzip" : "0",
             "IO::Socket::SSL" : "2.009",
-            "Mojolicious" : "7.83",
+            "Mojolicious" : "8.02",
             "Time::HiRes" : "0",
             "Time::Piece" : "0",
             "Time::Seconds" : "0"
@@ -53,6 +53,6 @@
          "web" : "https://github.com/sjdy521/Mojo-Weixin"
       }
    },
-   "version" : "v1.4.2",
+   "version" : "v1.4.3",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

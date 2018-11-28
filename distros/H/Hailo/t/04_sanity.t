@@ -1,4 +1,4 @@
-use 5.010;
+use v5.28.0;
 use lib 't/lib';
 use strict;
 use warnings;

@@ -99,7 +99,7 @@ void init(File *aSource)
   plainLen = 0;
 }
 
-inline void out(byte b)
+static inline void out(byte b)
 {
 #ifdef DEBUG
   printf("%i", b);
@@ -124,7 +124,7 @@ inline void out(byte b)
   }
 }
 
-inline void outLen(byte b)
+static inline void outLen(byte b)
 {
 #ifdef DEBUG
   printf(";");
@@ -140,7 +140,7 @@ inline void outLen(byte b)
   }
 }
 
-inline void outCopyFlag()
+static inline void outCopyFlag()
 {
   if(copyFlag == 1) {
     out(1);

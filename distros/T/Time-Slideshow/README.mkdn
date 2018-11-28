@@ -1,3 +1,6 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/Time-Slideshow.svg?branch=master)](https://travis-ci.org/Corion/Time-Slideshow)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Time-Slideshow?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Time-Slideshow)
 # NAME
 
 Time::Slideshow - simple stateless slideshow with a fixed set of images
@@ -118,7 +121,9 @@ Returns the name of the slide at the given index.
 # SHUFFLING PERMUTATIONS
 
 This module does not use the real permutations
-of the slides,
+of the slides. The module uses an approach to select non-neighbouring images
+by first selecting a permutation from `1..@items -2` according to the current
+time and then selecting the `n-th` slide from that permutation.
 
 # INTEGRATION
 
@@ -197,7 +202,7 @@ to all users that load that page.
 
 ## Prima
 
-Using [Prima](https://metacpan.org/pod/Prima), we can create an application with a natve UI that displays
+Using [Prima](https://metacpan.org/pod/Prima), we can create an application with a native UI that displays
 the images. Not implemented here are the resizing or zooming of the images
 to the window size.
 
@@ -230,12 +235,12 @@ to the window size.
 # REPOSITORY
 
 The public repository of this module is
-[http://github.com/Corion/time-slideshow](http://github.com/Corion/time-slideshow).
+[https://github.com/Corion/time-slideshow](https://github.com/Corion/time-slideshow).
 
 # SUPPORT
 
 The public support forum of this module is
-[http://perlmonks.org/](http://perlmonks.org/).
+[https://perlmonks.org/](https://perlmonks.org/).
 
 # BUG TRACKER
 
@@ -249,7 +254,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2014-2016 by Max Maischein `corion@cpan.org`.
+Copyright 2014-2018 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

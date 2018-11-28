@@ -1,9 +1,37 @@
 ==================================================
-Changes from 1741-05-24 00:00:00 +0000 to present.
+Changes from 1745-02-09 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2015-03-08 03:27:47 +0000
+version 0.003 at 2018-11-24 23:39:23 +0000
+------------------------------------------
+
+  Change: e2f314fc6d53baa88bb42eff86560a27987f6095
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2018-11-25 00:39:12 +0000
+
+    Updated travis.yml 
+
+  Change: 706e119c99b1a06725db53947016cf0b7195f15e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2018-11-25 00:36:26 +0000
+
+    Updated travis config, no color tool, Win32 bundle batch 
+
+  Change: 8369d0b3fc22531c4c5ac6a10d282d222935b4f4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-08 04:37:31 +0000
+
+    More doc 
+
+  Change: 9d7dbff3a79545277edf34cb46226c355c7e7253
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-08 04:34:01 +0000
+
+    A bit of pot for the bin 
+
+------------------------------------------
+version 0.002 at 2015-03-08 03:27:40 +0000
 ------------------------------------------
 
   Change: 3bdac75a969168f0292d63f51051bcafe63834a8

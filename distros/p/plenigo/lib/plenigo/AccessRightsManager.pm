@@ -43,11 +43,10 @@ package plenigo::AccessRightsManager;
 
 use Moo;
 use Carp qw(confess);
-use Carp::Always;
 use plenigo::Ex;
 use plenigo::RestClient;
 
-our $VERSION = '2.0003';
+our $VERSION = '2.0006';
 
 has configuration => (
     is       => 'ro',

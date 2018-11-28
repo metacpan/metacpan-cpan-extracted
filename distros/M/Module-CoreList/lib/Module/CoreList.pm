@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20181020';
+our $VERSION = '5.20181120';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -339,6 +339,7 @@ sub changes_between {
     5.029002 => '2018-08-20',
     5.029003 => '2018-09-20',
     5.029004 => '2018-10-20',
+    5.029005 => '2018-11-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -15813,6 +15814,35 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'arybase'               => 1,
         }
     },
+    5.029005 => {
+        delta_from => 5.029004,
+        changed => {
+            'B::Op_private'         => '5.029005',
+            'Config'                => '5.029005',
+            'Cwd'                   => '3.76',
+            'Data::Dumper'          => '2.173',
+            'Errno'                 => '1.30',
+            'File::Spec'            => '3.76',
+            'File::Spec::AmigaOS'   => '3.76',
+            'File::Spec::Cygwin'    => '3.76',
+            'File::Spec::Epoc'      => '3.76',
+            'File::Spec::Functions' => '3.76',
+            'File::Spec::Mac'       => '3.76',
+            'File::Spec::OS2'       => '3.76',
+            'File::Spec::Unix'      => '3.76',
+            'File::Spec::VMS'       => '3.76',
+            'File::Spec::Win32'     => '3.76',
+            'GDBM_File'             => '1.18',
+            'Module::CoreList'      => '5.20181120',
+            'Module::CoreList::Utils'=> '5.20181120',
+            'NDBM_File'             => '1.15',
+            'ODBM_File'             => '1.16',
+            'SDBM_File'             => '1.15',
+            're'                    => '0.37',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -16743,6 +16773,13 @@ sub is_core
         },
         removed => {
             arybase => '1',
+        }
+    },
+    5.029005 => {
+        delta_from => 5.027002,
+        changed => {
+        },
+        removed => {
         }
     },
 );

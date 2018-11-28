@@ -9,7 +9,7 @@ use feature 'signatures';
 use HTTP::Request;
 use IO::Async::Future;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 with 'Future::HTTP::Handler';
 

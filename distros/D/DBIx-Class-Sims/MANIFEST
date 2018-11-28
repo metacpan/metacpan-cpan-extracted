@@ -28,6 +28,7 @@ t/datetime.t
 t/etc/schema.yml
 t/expand_dots.t
 t/grandchild.t
+t/inflate_deflate.t
 t/normalize_aoh.t
 t/normalize_input.t
 t/parent_child.t

@@ -2,13 +2,20 @@ package Mojolicious::Plugin::MountPSGI::Proxy;
 use Mojo::Base 'Mojolicious';
 use Plack::Util;
 
-has app => sub { Plack::Util::load_psgi shift->script };
+has app => sub {
+  my $self = shift;
+  local $ENV{PLACK_ENV} = $self->mode;
+  Plack::Util::load_psgi $self->script;
+};
+has mode => sub { $ENV{PLACK_ENV} || 'development' };
 has 'script';
 has 'rewrite';
 
 sub handler {
   my ($self, $c) = @_;
-  my $plack_env = _mojo_req_to_psgi_env($c->req, $self->rewrite);
+  local $ENV{PLACK_ENV} = $self->mode;
+
+  my $plack_env = _mojo_req_to_psgi_env($c, $self->rewrite);
   $plack_env->{'MOJO.CONTROLLER'} = $c;
   my $plack_res = Plack::Util::run_app $self->app, $plack_env;
 
@@ -24,6 +31,7 @@ sub handler {
   die 'PSGI response not understood'
     unless ref $plack_res eq 'CODE';
 
+  #TODO do something with $self->mode in delayed response
   # delayed (code reference) response
   my $responder = sub {
     my $plack_res = shift;
@@ -45,11 +53,28 @@ sub handler {
 }
 
 sub _mojo_req_to_psgi_env {
-  my $mojo_req = shift;
+  my $c = shift;
   my $rewrite = shift;
+  my $mojo_tx = $c->tx;
+  my $mojo_req = $c->req;
   my $url = $mojo_req->url;
   my $base = $url->base;
-  my $body = $mojo_req->body;
+  my $content = $mojo_req->content;
+  my $body;
+  if ($content->is_multipart) {
+    $content = $content->clone;
+    my $offset = 0;
+    while (1) {
+      my $chunk = $content->get_body_chunk($offset);
+      next unless defined $chunk;
+      my $len = length $chunk;
+      last unless $len;
+      $offset += $len;
+      $body   .= $chunk;
+    }
+  } else {
+    $body = $mojo_req->body;
+  }
   open my $input, '<', \$body or die "Cannot open handle to scalar reference: $!";
 
   my %headers = %{$mojo_req->headers->to_hash};
@@ -60,7 +85,7 @@ sub _mojo_req_to_psgi_env {
     $headers{'HTTP_'. uc $key} = $value;
   }
 
-  # certain headers get their own psgi slot 
+  # certain headers get their own psgi slot
   for my $key (qw/CONTENT_LENGTH CONTENT_TYPE/) {
     next unless exists $headers{"HTTP_$key"};
     $headers{$key} = delete $headers{"HTTP_$key"};
@@ -76,6 +101,9 @@ sub _mojo_req_to_psgi_env {
   return {
     %ENV,
     %headers,
+    'REMOTE_ADDR'       => $mojo_tx->remote_address,
+    'REMOTE_HOST'       => $mojo_tx->remote_address,
+    'REMOTE_PORT'       => $mojo_tx->remote_port,
     'SERVER_PROTOCOL'   => 'HTTP/'. $mojo_req->version,
     'SERVER_NAME'       => $base->host,
     'SERVER_PORT'       => $base->port,

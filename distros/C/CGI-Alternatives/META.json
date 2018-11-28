@@ -51,6 +51,6 @@
          "url" : "https://github.com/leejo/cgi-alternatives"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,70 +1,67 @@
-#!/usr/bin/perl
+#!perl
 
 use strict;
+use warnings;
+
+use lib 't/lib';
+use DBDOracleTestLib qw/ oracle_test_dsn table drop_table db_handle force_drop_table /;
+
 use Test::More;
 use DBD::Oracle qw(:ora_types ORA_OCI );
 use DBI;
 
-unshift @INC ,'t';
-require 'nchar_test_lib.pl';
+my $dbh = db_handle( { PrintError => 0 } );
 
-my $dsn = oracle_test_dsn();
-my $dbuser = $ENV{ORACLE_USERID} || 'scott/tiger';
-
-my $dbh = DBI->connect($dsn, $dbuser, '',{ PrintError => 0, });
-
-plan $dbh ? ( tests => 12 )
-          : ( skip_all => "Unable to connect to Oracle" );
+plan $dbh
+  ? ( tests => 12 )
+  : ( skip_all => 'Unable to connect to Oracle' );
 
 my $table = table();
-drop_table($dbh);
+force_drop_table($dbh);
 
-$dbh->do( <<"END_SQL" );
-	CREATE TABLE $table (
-	    id INTEGER NOT NULL,
-	    data BLOB
-	)
-END_SQL
+$dbh->do("CREATE TABLE $table ( id INTEGER NOT NULL, data BLOB )");
 
-my ($stmt, $sth, $id, $loc);
+my ( $stmt, $sth, $id, $loc );
 ## test with insert empty blob and select locator.
 $stmt = "INSERT INTO $table (id,data) VALUES (1, EMPTY_BLOB())";
 $dbh->do($stmt);
 
 $stmt = "SELECT data FROM $table WHERE id = ?";
-$sth = $dbh->prepare($stmt, {ora_auto_lob => 0});
-$id = 1;
-$sth->bind_param(1, $id);
+$sth  = $dbh->prepare( $stmt, { ora_auto_lob => 0 } );
+$id   = 1;
+$sth->bind_param( 1, $id );
 $sth->execute;
 ($loc) = $sth->fetchrow;
-is (ref $loc, "OCILobLocatorPtr", "returned valid locator");
+is( ref $loc, 'OCILobLocatorPtr', 'returned valid locator' );
+$sth->finish;
 
 ## test inserting a large value
 
 $stmt = "INSERT INTO $table (id,data) VALUES (666, ?)";
-$sth = $dbh->prepare($stmt);
-my $content = join(q{}, map { chr } ( 32 .. 64 )) x 16384;
-$sth->bind_param(1, $content, { ora_type => ORA_BLOB, ora_field => 'data' });
+$sth  = $dbh->prepare($stmt);
+my $content = join( q{}, map { chr } ( 32 .. 64 ) ) x 16384;
+$sth->bind_param( 1, $content, { ora_type => ORA_BLOB, ora_field => 'data' } );
 eval { $sth->execute($content) };
 is $@, '', 'inserted into BLOB successfully';
 {
-  local $dbh->{LongReadLen} = 1_000_000;
-  my ($fetched) = $dbh->selectrow_array("select data from $table where id = 666");
-  is $fetched, $content, 'got back what we put in';
+    local $dbh->{LongReadLen} = 1_000_000;
+    my ($fetched) =
+      $dbh->selectrow_array("select data from $table where id = 666");
+    is $fetched, $content, 'got back what we put in';
 }
 
-
 ## test with insert empty blob returning blob to a var.
-($id, $loc) = (2, undef);
-$stmt = "INSERT INTO $table (id,data) VALUES (?, EMPTY_BLOB()) RETURNING data INTO ?";
-$sth = $dbh->prepare($stmt, {ora_auto_lob => 0});
-$sth->bind_param(1, $id);
-$sth->bind_param_inout(2, \$loc, 0, {ora_type => ORA_BLOB});
+( $id, $loc ) = ( 2, undef );
+$stmt =
+  "INSERT INTO $table (id,data) VALUES (?, EMPTY_BLOB()) RETURNING data INTO ?";
+$sth = $dbh->prepare( $stmt, { ora_auto_lob => 0 } );
+$sth->bind_param( 1, $id );
+$sth->bind_param_inout( 2, \$loc, 0, { ora_type => ORA_BLOB } );
 $sth->execute;
-is (ref $loc, "OCILobLocatorPtr", "returned valid locator");
+is( ref $loc, 'OCILobLocatorPtr', 'returned valid locator' );
 
 sub temp_lob_count {
-    my $dbh  = shift;
+    my $dbh = shift;
     return $dbh->selectrow_array(<<'END_SQL');
         SELECT cache_lobs + nocache_lobs AS temp_lob_count
         FROM v$temporary_lobs templob,
@@ -76,10 +73,8 @@ END_SQL
 
 sub have_v_session {
     $dbh->do('select * from v$session where 0=1');
-    return defined($dbh->err) ? $dbh->err != 942 : 1;
+    return defined( $dbh->err ) ? $dbh->err != 942 : 1;
 }
-
-
 
 ## test writing / reading large data
 {
@@ -97,36 +92,34 @@ sub have_v_session {
     $sth->execute;
     ($loc) = $sth->fetchrow;
 
-    is( ref $loc, "OCILobLocatorPtr", "returned valid locator" );
+    is( ref $loc, 'OCILobLocatorPtr', 'returned valid locator' );
 
-    is( $dbh->ora_lob_is_init($loc), 1, "returned initialized locator" );
+    is( $dbh->ora_lob_is_init($loc), 1, 'returned initialized locator' );
 
     # write string > 32k
     $large_value = 'ABCD' x 10_000;
 
     $dbh->ora_lob_write( $loc, 1, $large_value );
-    eval {
-        $len = $dbh->ora_lob_length($loc);
-    };
+    eval { $len = $dbh->ora_lob_length($loc); };
     if ($@) {
-        note ("It appears your Oracle or Oracle client has problems with ora_lob_length(lob_locator). We have seen this before - see RT 69350. The test is not going to fail because of this because we have seen it before but if you are using lob locators you might want to consider upgrading your Oracle client to 11.2 where we know this test works");
+        note(
+'It appears your Oracle or Oracle client has problems with ora_lob_length(lob_locator). We have seen this before - see RT 69350. The test is not going to fail because of this because we have seen it before but if you are using lob locators you might want to consider upgrading your Oracle client to 11.2 where we know this test works'
+        );
         done_testing();
-    } else {
-        is( $len, length($large_value), "returned length" );
-        
+    }
+    else {
+        is( $len, length($large_value), 'returned length' );
     }
     is( $dbh->ora_lob_read( $loc, 1, length($large_value) ),
-        $large_value, "returned written value" );
+        $large_value, 'returned written value' );
 
     ## PL/SQL TESTS
   SKIP: {
-    ## test calling PL/SQL with LOB placeholder
+        ## test calling PL/SQL with LOB placeholder
         my $plsql_testcount = 4;
 
-        my $sth = $dbh->prepare(
-            'BEGIN ? := DBMS_LOB.GETLENGTH( ? ); END;',
-            { ora_auto_lob => 0 } 
-        );
+        my $sth = $dbh->prepare( 'BEGIN ? := DBMS_LOB.GETLENGTH( ? ); END;',
+            { ora_auto_lob => 0 } );
         $sth->bind_param_inout( 1, \$len, 16 );
         $sth->bind_param( 2, $loc, { ora_type => ORA_BLOB } );
         $sth->execute;
@@ -137,20 +130,23 @@ sub have_v_session {
         # ORA-06553: PLS-00213: package STANDARD not accessible
 
         if ( $dbh->err && grep { $dbh->err == $_ } ( 600, 900, 6550, 6553 ) ) {
-            skip "Your Oracle server doesn't support PL/SQL", $plsql_testcount
+            skip q|Your Oracle server doesn't support PL/SQL|, $plsql_testcount
               if $dbh->err == 900;
             skip
-              "Your Oracle PL/SQL package DBMS_LOB is not properly installed", $plsql_testcount
+              'Your Oracle PL/SQL package DBMS_LOB is not properly installed',
+              $plsql_testcount
               if $dbh->err == 6550;
-            skip "Your Oracle PL/SQL is not properly installed", $plsql_testcount
+            skip 'Your Oracle PL/SQL is not properly installed',
+              $plsql_testcount
               if $dbh->err == 6553 || $dbh->err == 600;
         }
 
-        TODO: {
-            local $TODO = "problem reported w/ lobs and Oracle 11.2.*, see RT#69350"
-                if ORA_OCI() =~ /^11\.2\./;
+      TODO: {
+            local $TODO =
+              'problem reported w/ lobs and Oracle 11.2.*, see RT#69350'
+              if ORA_OCI() =~ m/^11\.2\./;
 
-            is( $len, length($large_value), "returned length via PL/SQL" );
+            is( $len, length($large_value), 'returned length via PL/SQL' );
         }
 
         $dbh->{LongReadLen} = length($large_value) * 2;
@@ -188,31 +184,41 @@ sub have_v_session {
   END;
 END_SQL
 
-            $sth->bind_param( ':in', $large_value, { ora_type => ORA_BLOB });
+            $sth->bind_param( ':in', $large_value, { ora_type => ORA_BLOB } );
 
-            $sth->bind_param_inout( ':out', \$out, 100, { ora_type => ORA_BLOB } );
-            $sth->bind_param_inout( ':inout', \$inout, 100, { ora_type => ORA_BLOB } );
+            $sth->bind_param_inout( ':out', \$out, 100,
+                { ora_type => ORA_BLOB } );
+            $sth->bind_param_inout( ':inout', \$inout, 100,
+                { ora_type => ORA_BLOB } );
             $sth->execute;
 
         };
 
-        local $TODO = "problem reported w/ lobs and Oracle 11.2.*, see RT#69350"
-            if ORA_OCI() =~ /^11\.2\./;
+        local $TODO = 'problem reported w/ lobs and Oracle 11.2.*, see RT#69350'
+          if ORA_OCI() =~ m/^11\.2\./;
 
-        skip "Your Oracle PL/SQL installation does not implement temporary LOBS", 3
+        skip
+          'Your Oracle PL/SQL installation does not implement temporary LOBS', 3
           if $dbh->err && $dbh->err == 6550;
 
-        is($out, lc($large_value), "returned LOB as string");
-        is($inout, lc($large_value).$large_value, "returned IN/OUT LOB as string");
+        is( $out, lc($large_value), 'returned LOB as string' );
+        is(
+            $inout,
+            lc($large_value) . $large_value,
+            'returned IN/OUT LOB as string'
+        );
 
         undef $sth;
+
         # lobs are freed with statement handle
-        skip q{can't check num of temp lobs, no access to v$session}, 1, unless have_v_session();
-        is(temp_lob_count($dbh), 0, "no temp lobs left");
+        skip q{can't check num of temp lobs, no access to v$session}, 1,
+          unless have_v_session();
+        is( temp_lob_count($dbh), 0, 'no temp lobs left' );
     }
 }
 
-$dbh->do("DROP TABLE $table");
-$dbh->disconnect;
+undef $sth;
+
+END { eval { drop_table($dbh); $dbh->disconnect if $dbh } }
 
 1;

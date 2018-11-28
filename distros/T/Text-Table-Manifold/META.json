@@ -1,27 +1,33 @@
 {
    "abstract" : "Render tables in manifold styles",
    "author" : [
-      "Ron Savage <ron@savage.net.au>"
+      "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "artistic_2"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
    "name" : "Text-Table-Manifold",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "1.001006"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.421"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -31,6 +37,7 @@
             "List::AllUtils" : "0.08",
             "Module::Runtime" : "0.014",
             "Moo" : "1.006",
+            "Scalar::Util" : "1.5",
             "Types::Standard" : "1.000004",
             "Unicode::GCString" : "2013.1",
             "open" : "0",
@@ -38,19 +45,25 @@
             "utf8" : "0",
             "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Text::Table::Manifold" : {
-         "file" : "lib/Text/Table/Manifold.pm",
-         "version" : "1.00"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002",
+            "Test::Pod" : "1.48"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+         "https://perldoc.perl.org/perlartistic.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Text-Table-Manifold.git",
+         "web" : "https://github.com/ronsavage/Text-Table-Manifold"
+      }
    },
-   "version" : "1.00"
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

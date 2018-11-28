@@ -1,3 +1,15 @@
+0.152   2018-11-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Test::Rinci::CmdLine and test-rinci-cmdline.
+
+
+0.151   2018-11-22 (PERLANCAR)
+
+	- Add option: load.
+
+
 0.150   2018-09-10 (PERLANCAR)
 
 	- test-rinci: Add Getopt::Long config bundling no_ignore_case.

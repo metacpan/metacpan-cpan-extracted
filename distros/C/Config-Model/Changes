@@ -1,3 +1,21 @@
+2.128 2018-11-21
+
+  
+  Usability improvements:
+    * CheckList: die or warn (with cme -force) when storing unknown item
+      in check list. Bad values used to be silently dropped.
+
+  Test fixes:
+    * add \n at end of yaml test files (gh #22)
+
+  Internal changes:
+    * improve code quality thanks to the feedbacks provided by kritika.io
+
+  Doc change:
+    * Improve navigation in doc: move parameters from header line to paragraph.
+    * Instance: add doc for backend_arg
+    * Instance: improve doc of data method
+
 2.127 2018-09-30
 
   Feature improvement:
@@ -35,8 +53,8 @@
 
   Config::Model::initialize_log4perl now accepts a verbose parameter
   to enable verbose message of Loader class (used by cme run and
-  modify). In verbose mode, Loader now shows the effect fi each
-  instruction specify on 'cme modify' command line or specified in the
+  modify). In verbose mode, Loader now shows the effect for each
+  instruction specified on 'cme modify' command line or specified in the
   script run by 'cme run'. This feature will be available with the
   next release of cme.
 

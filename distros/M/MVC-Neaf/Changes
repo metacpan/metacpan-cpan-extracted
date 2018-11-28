@@ -1,5 +1,14 @@
 Revision history for MVC-Neaf
 
+0.2603  Sat Nov 24 2018
+        - BUG Fix Apache2 test warning
+
+0.2602  Sat Nov 24 2018
+        - BUG Fix (?) failing test
+
+0.2601  Fri Jun 22 2018
+        - BUG Skip empty parameters in strict mode
+
 0.26    Sun Jun 10 2018
         - API BREAK rework load_resources, @@ foo.tpl view=TT now supported
         - TST Improve coverage, add tests, refactor things

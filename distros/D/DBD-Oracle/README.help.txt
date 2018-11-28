@@ -11,11 +11,11 @@ build/link process for OCI applications between versions.
 -------------------------------------------------------------------------------
 AIX 4 - core dump on login and similar problems
 
-set 
-	cc='xlc_r'
+set
+        cc='xlc_r'
 in config.sh. Rebuild everything, and make sure xlc_r is used everywhere.
-set environment 
-	ORACCENV='cc=xlc_r'; export ORACCENV 
+set environment
+        ORACCENV='cc=xlc_r'; export ORACCENV
 to enforce this in oraxlc
 
 Thanks to Goran Thyni <goran@bildbasen.kiruna.se> for this information.
@@ -76,11 +76,11 @@ For platforms which require static linking.
 You'll need to build DBD::Oracle statically linked and then link it
 into a perl binary:
 
-	perl Makefile.PL LINKTYPE=static
-	make
-	make perl                  (makes a perl binary in current directory)
-	make test FULLPERL=./perl  (run tests using the new perl binary)
-	make install
+        perl Makefile.PL LINKTYPE=static
+        make
+        make perl                  (makes a perl binary in current directory)
+        make test FULLPERL=./perl  (run tests using the new perl binary)
+        make install
 
 You will probably need to have already built and installed a static
 version of the DBI in order that it be automatically included when
@@ -156,7 +156,7 @@ Environment:  Solaris, GCC
 
 Do not use GNU as or GNU ld on Solaris. Delete or rename them, they are
 just bad news.  In the words of John D Groenveld <groenvel@cse.psu.edu>:
-Run, dont walk, to your console and 'mv /opt/gnu/bin/as /opt/gnu/bin/gas;
+Run, don't walk, to your console and 'mv /opt/gnu/bin/as /opt/gnu/bin/gas;
 mv /opt/gnu/bin/ld /opt/gnu/bin/gld'. You can add -v to the gcc command
 in the Makefile to see what GCC is using.
 
@@ -244,10 +244,10 @@ complain to Oracle about bugs in their header files on 64 bit systems.
 Link errors or test core dumps
 
 Try each of these in turn (follow each with a make && make test):
-	perl Makefile.PL -nob
-	perl Makefile.PL -c
-	perl Makefile.PL -l
-	perl Makefile.PL -n LIBCLNTSH
+        perl Makefile.PL -nob
+        perl Makefile.PL -c
+        perl Makefile.PL -l
+        perl Makefile.PL -n LIBCLNTSH
 let me know if any of these help.
 
 ===============================================================================

@@ -4,13 +4,13 @@
       "Jerry D. Hedden <jdhedden AT cpan DOT org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-Random-MT-Auto",
    "no_index" : {
@@ -47,5 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "6.22"
+   "version" : "6.23",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojolicious::Plugin::MountPSGI::Proxy;
 
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -22,19 +22,26 @@ sub register {
   }
   else { $path = $prefix }
 
-  $rewrite = $rewrite ? $path : undef;
+  my %args = (
+    rewrite => $rewrite ? $path : undef,
+  );
 
-  my $proxy;
+  unless ($ENV{PLACK_ENV}) {
+    $args{mode} = $app->mode;
+  }
+
   my $psgi = $conf->{$prefix};
   if (ref $psgi) {
-    $proxy = Mojolicious::Plugin::MountPSGI::Proxy->new(app => $psgi, rewrite => $rewrite);
+    $args{app} = $psgi;
   } else {
     unless (-r $psgi) {
       my $abs = $app->home->rel_file($psgi);
       $psgi = $abs if -r $abs;
     }
-    $proxy = Mojolicious::Plugin::MountPSGI::Proxy->new(script => $psgi, rewrite => $rewrite);
+    $args{script} = $psgi;
   }
+
+  my $proxy = Mojolicious::Plugin::MountPSGI::Proxy->new(%args);
 
   # Generate route
   my $route = $app->routes->route($path)->detour(app => $proxy);
@@ -63,7 +70,7 @@ Mojolicious::Plugin::MountPSGI - Mount PSGI apps
 
   # rewrite the path so the psgi app doesn't see the mount point
   # thus app.psgi sees / when /mount is visited
-  plugin 'MountPSGI, { '/mount' => 'ext/MyApp/app.psgi', rewrite => 1 };
+  plugin 'MountPSGI', { '/mount' => 'ext/MyApp/app.psgi', rewrite => 1 };
 
 =head1 DESCRIPTION
 
@@ -80,6 +87,22 @@ One additional option is C<rewrite> which if set to a true value
 will rewrite the C<PATH_INFO> and C<SCRIPT_NAME> values in the env
 hash so that the application does not see the mount point in
 its request path. This uses the mechanism as described by L<Plack::App::URLMap>.
+
+=head1 CAVEATS
+
+Due to the way Mojolicious parses multipart requests, the original request body
+is not available to pass to the PSGI application. As a stopgap measure this
+plugin rebuilds the request from its parts at what is likely a huge cost in
+L<performance|https://github.com/marcusramberg/Mojolicious-Plugin-MountPSGI/issues/8>.
+There has been discussion about L<"adding proxying
+primatives"|https://github.com/mojolicious/mojo/issues/1295> to Mojolicious
+which would likely be useful in resolving this performance hit.
+
+If C<PLACK_ENV> is not otherwise set, the L<Mojolicious/mode> will be used
+while loading the application script and during synchronous responses. For
+delayed responses, the plugin cannot ensure that it will be set. Applications
+should fetch their C<PLACK_ENV> before requesting a delayed response and manage
+it appropriately.
 
 =head1 METHODS
 
@@ -103,6 +126,8 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 Joel Berger (jberger)
 
 Peter Valdemar Mørch (pmorch)
+
+Graham Knop (haarg)
 
 =back
 

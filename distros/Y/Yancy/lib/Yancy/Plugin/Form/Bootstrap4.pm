@@ -1,5 +1,5 @@
 package Yancy::Plugin::Form::Bootstrap4;
-our $VERSION = '1.014';
+our $VERSION = '1.015';
 # ABSTRACT: Generate forms using Bootstrap 4
 
 #pod =head1 SYNOPSIS
@@ -233,7 +233,7 @@ Yancy::Plugin::Form::Bootstrap4 - Generate forms using Bootstrap 4
 
 =head1 VERSION
 
-version 1.014
+version 1.015
 
 =head1 SYNOPSIS
 
@@ -338,6 +338,15 @@ __DATA__
 %><input class="form-control<%= $input->{class} ? ' '.$input->{class} : '' %>"<%
 for my $attr ( @found_attrs ) {
 %> <%= $attr %>="<%= $input->{ $attr } %>" <% } %> />
+
+@@ yancy/form/bootstrap4/markdown.html.ep
+<%  my $input = stash( 'input' );
+    my @found_attrs =
+        grep { defined $input->{ $_ } }
+        qw( required readonly disabled id name );
+%><textarea class="form-control<%= $input->{class} ? ' '.$input->{class} : '' %>"<%
+for my $attr ( @found_attrs ) {
+%> <%= $attr %>="<%= $input->{$attr} %>" <% } %> rows="5"><%= $input->{value} %></textarea>
 
 @@ yancy/form/bootstrap4/textarea.html.ep
 <%  my $input = stash( 'input' );

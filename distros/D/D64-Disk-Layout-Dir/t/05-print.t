@@ -6,7 +6,7 @@ use D64::Disk::Dir::Item;
 use D64::Disk::Layout::Sector;
 use Test::More tests => 6;
 ########################################
-require 't/Util.pm';
+require './t/Util.pm';
 D64::Disk::Layout::Dir::Test::Util->import(qw(:all));
 ########################################
 our $class;

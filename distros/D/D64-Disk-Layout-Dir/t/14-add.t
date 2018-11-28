@@ -8,7 +8,7 @@ use Test::Exception;
 use Test::MockModule;
 use Test::More tests => 25;
 ########################################
-require 't/Util.pm';
+require './t/Util.pm';
 D64::Disk::Layout::Dir::Test::Util->import(qw(:all));
 ########################################
 our $class;

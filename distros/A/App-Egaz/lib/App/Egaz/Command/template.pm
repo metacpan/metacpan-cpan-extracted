@@ -30,6 +30,7 @@ sub opt_spec {
         [ "verbose|v",    "verbose mode", ],
         [],
         [ "length=i", "minimal length of alignment fragments",  { default => 1000 }, ],
+        [ "partition",  "use partitioned sequences if available", ],
         [ "msa=s",    "aligning program for refine alignments", { default => "mafft" }, ],
         [ "taxon=s",  "taxon.csv for this project", ],
         [ "aligndb",  "create aligndb scripts", ],
@@ -71,6 +72,7 @@ sub description {
 * Species/strain names in result files are the basenames of <path/seqdir>
 * Default --multiname is the basename of --outdir. This option is for more than one aligning combinations
 * without --tree and --rawphylo, the order of multiz stitch is the same as the one from command line
+* --tree > --order > --rawphylo
 * --outgroup uses basename, not full path. *DON'T* set --outgroup to target
 * --taxon may also contain unused taxons, for constructing chr_length.csv
 * --preq is designed for NCBI ASSEMBLY and WGS, <path/seqdir> are directories containing multiple
@@ -584,7 +586,8 @@ if [ -e Pairwise/[% t %]vs[% q %] ]; then
 else
     log_info lastz Pairwise/[% t %]vs[% q %]
     egaz lastz \
-        --set set01 -C 0 --parallel [% opt.parallel %] --verbose \
+        --set set01 -C 0 [% IF opt.partition %]--tp --qp [% END %]\
+        --parallel [% opt.parallel %] --verbose \
         [% opt.data.0.dir %] [% item.dir %] \
         -o Pairwise/[% t %]vs[% q %]
 
@@ -1074,7 +1077,8 @@ if [ -e Pairwise/[% item.name %]vsSelf ]; then
 else
     log_info lastz Pairwise/[% item.name %]vsSelf
     egaz lastz \
-        --isself --set set01 -C 0 --parallel [% opt.parallel %] --verbose \
+        --isself --set set01 -C 0 [% IF opt.partition %]--tp --qp [% END %]\
+        --parallel [% opt.parallel %] --verbose \
         [% item.dir %] [% item.dir %] \
         -o Pairwise/[% item.name %]vsSelf
 
@@ -1228,7 +1232,7 @@ egaz blastlink axt.all.blast -c 0.95 -o links.blast.tsv --parallel [% opt.parall
 echo >&2 "==> Merge paralogs"
 
 echo >&2 "    * Sort links"
-rangeops sort -o links.sort.tsv \
+jrange sort -o links.sort.tsv \
 [% IF opt.noblast -%]
    links.lastz.tsv
 [% ELSE -%]
@@ -1236,15 +1240,9 @@ rangeops sort -o links.sort.tsv \
 [% END -%]
 
 echo >&2 "    * Clean links"
-[% IF jrange -%]
 jrange clean   links.sort.tsv       -o links.sort.clean.tsv
 jrange merge   links.sort.clean.tsv -o links.merge.tsv       -c 0.95
 jrange clean   links.sort.clean.tsv -o links.clean.tsv       -r links.merge.tsv --bundle 500
-[% ELSE -%]
-rangeops clean links.sort.tsv       -o links.sort.clean.tsv
-rangeops merge links.sort.clean.tsv -o links.merge.tsv       -c 0.95 --parallel [% opt.parallel2 %]
-rangeops clean links.sort.clean.tsv -o links.clean.tsv       -r links.merge.tsv --bundle 500
-[% END -%]
 
 echo >&2 "    * Connect links"
 rangeops connect links.clean.tsv    -o links.connect.tsv     -r 0.9
@@ -1270,28 +1268,28 @@ log_debug multiple links
 rangeops create links.filter.tsv -o multi.temp.fas    -g genome.fa
 fasops   refine multi.temp.fas   -o multi.refine.fas  --msa mafft -p [% opt.parallel %] --chop 10
 fasops   links  multi.refine.fas -o stdout |
-    rangeops sort stdin -o stdout |
+    jrange sort stdin -o stdout |
     rangeops filter stdin -n 2-50 -o links.refine.tsv
 
 log_debug pairwise links
 fasops   links  multi.refine.fas    -o stdout     --best |
-    rangeops sort stdin -o links.best.tsv
+    jrange sort stdin -o links.best.tsv
 rangeops create links.best.tsv   -o pair.temp.fas    -g genome.fa --name [% id %]
 fasops   refine pair.temp.fas    -o pair.refine.fas  --msa mafft -p [% opt.parallel %]
 
 cat links.refine.tsv |
     perl -nla -F"\t" -e "print for @F" |
-    runlist cover stdin -o cover.yml
+    jrunlist cover stdin -o cover.yml
 
 log_debug Stats of links
 echo "key,count" > links.count.csv
-for n in 2 3 4 5-50; do
+for n in 2 3 4-50; do
     rangeops filter links.refine.tsv -n ${n} -o stdout \
         > links.copy${n}.tsv
 
     cat links.copy${n}.tsv |
         perl -nla -F"\t" -e "print for @F" |
-        runlist cover stdin -o copy${n}.temp.yml
+        jrunlist cover stdin -o copy${n}.temp.yml
 
     wc -l links.copy${n}.tsv |
         perl -nl -e "
@@ -1305,7 +1303,7 @@ for n in 2 3 4 5-50; do
     rm links.copy${n}.tsv
 done
 
-runlist merge copy2.temp.yml copy3.temp.yml copy4.temp.yml copy5-50.temp.yml -o copy.yml
+runlist merge copy2.temp.yml copy3.temp.yml copy4-50.temp.yml -o copy.yml
 runlist stat --size chr.sizes copy.yml --mk --all -o links.copy.csv
 
 fasops mergecsv links.copy.csv links.count.csv --concat -o copy.csv
@@ -1349,7 +1347,6 @@ EOF
         {   args   => $args,
             opt    => $opt,
             sh     => $sh_name,
-            jrange => IPC::Cmd::can_run('jrange'),
         },
         Path::Tiny::path( $opt->{outdir}, $sh_name )->stringify
     ) or Carp::confess Template->error;
@@ -1451,43 +1448,49 @@ fi
 #----------------------------#
 log_debug Create highlight files
 
-# coding and other features
-perl -anl -e '
-    /^#/ and next;
-    $F[0] =~ s/\.\d+//;
-    $color = q{};
-    $F[2] eq q{CDS} and $color = q{chr9};
-    $F[2] eq q{ncRNA} and $color = q{dark2-8-qual-1};
-    $F[2] eq q{rRNA} and $color = q{dark2-8-qual-2};
-    $F[2] eq q{tRNA} and $color = q{dark2-8-qual-3};
-    $F[2] eq q{tmRNA} and $color = q{dark2-8-qual-4};
-    $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};
-    ' \
-    [% item.dir %]/*.gff \
-    > highlight.features.[% id %].txt
+if [ ${SIZE} -ge 10000000 ]; then
+    # avoid errors of too many highlights
+    touch highlight.features.[% id %].txt
+    touch highlight.repeats.[% id %].txt
+else
+    # coding and other features
+    perl -anl -e '
+        /^#/ and next;
+        $F[0] =~ s/\.\d+//;
+        $color = q{};
+        $F[2] eq q{CDS} and $color = q{chr9};
+        $F[2] eq q{ncRNA} and $color = q{dark2-8-qual-1};
+        $F[2] eq q{rRNA} and $color = q{dark2-8-qual-2};
+        $F[2] eq q{tRNA} and $color = q{dark2-8-qual-3};
+        $F[2] eq q{tmRNA} and $color = q{dark2-8-qual-4};
+        $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};
+        ' \
+        [% item.dir %]/*.gff \
+        > highlight.features.[% id %].txt
 
-# repeats
-perl -anl -e '
-    /^#/ and next;
-    $F[0] =~ s/\.\d+//;
-    $color = q{};
-    $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and $color = q{chr15};
-    $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and $color = q{chr15};
-    $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};
-    ' \
-    [% item.dir %]/*.gff \
-    > highlight.repeats.[% id %].txt
+    # repeats
+    perl -anl -e '
+        /^#/ and next;
+        $F[0] =~ s/\.\d+//;
+        $color = q{};
+        $F[2] eq q{region} and $F[8] =~ /mobile_element|Transposon/i and $color = q{chr15};
+        $F[2] =~ /repeat/ and $F[8] !~ /RNA/ and $color = q{chr15};
+        $color and ($F[4] - $F[3] > 49) and print qq{$F[0] $F[3] $F[4] fill_color=$color};
+        ' \
+        [% item.dir %]/*.gff \
+        > highlight.repeats.[% id %].txt
+fi
 
 #----------------------------#
 # links of paralog ranges
 #----------------------------#
 log_debug Create link files
 
-for n in 2 3 4 5-50; do
+for n in 2 3 4-50; do
     rangeops filter [% opt.outdir %]/Results/[% id %]/[% id %].links.tsv -n ${n} -o stdout \
         > links.copy${n}.tsv
 
-    if [ "${n}" == "5-50" ]; then
+    if [ "${n}" == "4-50" ]; then
         rangeops circos links.copy${n}.tsv -o [% id %].linkN.txt --highlight
     else
         rangeops circos links.copy${n}.tsv -o [% id %].link${n}.txt

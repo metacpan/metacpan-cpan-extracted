@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use IPC::Run3 qw( run3 );
 use MooseX::Params::Validate qw( validated_hash validated_list );

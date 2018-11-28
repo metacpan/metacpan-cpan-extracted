@@ -1,4 +1,4 @@
-use 5.010;
+use v5.28.0;
 use open qw< :encoding(utf8) :std >;
 use autodie;
 use strict;

@@ -11,6 +11,7 @@ lib/plenigo/Ex.pm
 lib/plenigo/LoginManager.pm
 lib/plenigo/Product.pm
 lib/plenigo/ProductsManager.pm
+lib/plenigo/PurchasesManager.pm
 lib/plenigo/RestClient.pm
 Makefile.PL
 MANIFEST			This list of files

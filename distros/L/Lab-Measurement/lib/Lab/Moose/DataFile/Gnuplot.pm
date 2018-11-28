@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.664';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.670';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use 5.010;
@@ -369,6 +369,7 @@ sub add_plot {
         type => { isa => 'Str',  default => 'points' },
         live => { isa => 'Bool', default => 1 },          # only for testing
         hard_copy                  => { isa => 'Str',     optional => 1 },
+        hard_copy_suffix           => { isa => 'Str',     optional => 1 },
         hard_copy_terminal         => { isa => 'Str',     optional => 1 },
         hard_copy_terminal_options => { isa => 'HashRef', default  => {} },
         terminal_options           => { isa => 'HashRef', default  => {} },
@@ -381,15 +382,24 @@ sub add_plot {
 
     my $type               = delete $args{type};
     my $hard_copy          = delete $args{hard_copy};
+    my $hard_copy_suffix   = delete $args{hard_copy_suffix};
     my $terminal           = $args{terminal};
     my $hard_copy_terminal = delete $args{hard_copy_terminal} // 'png';
     my $hard_copy_terminal_options = delete $args{hard_copy_terminal_options};
     my $live                       = delete $args{live};
+
+    if ( defined $hard_copy and defined $hard_copy_suffix ) {
+        croak "Give either 'hard_copy' or 'hard_copy_suffix' parameter";
+    }
+
     if ( not defined $hard_copy ) {
         $hard_copy = $self->filename();
 
         # Remove suffix
         $hard_copy =~ s/\.\w*$//;
+        if ( defined $hard_copy_suffix ) {
+            $hard_copy .= $hard_copy_suffix;
+        }
         $hard_copy .= ".$hard_copy_terminal";
     }
 
@@ -596,7 +606,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 SYNOPSIS
 
@@ -792,6 +802,10 @@ Default for 3D plots. Replot when finishing a block.
 Filename for the copy of the plot in the data folder. Default: Switch datafile
 filename suffix of datafile to the $terminal, e.g. F<data.dat> =>
 F<data.png>. Mandatory if you add multiple plots to one datafile.
+
+=item * hard_copy_suffix
+
+Filename suffix for the copy of the plot in the data folder. The filename off the copy will be basename off the datafile with this suffix added.
 
 =item * hard_copy_terminal
 

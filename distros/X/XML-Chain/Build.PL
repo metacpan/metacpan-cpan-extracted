@@ -5,10 +5,15 @@ use Module::Build;
 my $mb_subclass = Module::Build->subclass(
     class => 'XML::Chain::MB_Builder',
     code  => q{
-        use Path::Class qw(file);
-        use Pod::Simple::Text;
+        eval q|
+            use Path::Class qw(file);
+            use Pod::Simple::Text;
+        |;
+        my $skip_readme = $@;
 
         sub create_readme {
+            die 'unable to create readme: '.$skip_readme
+                if $skip_readme;
             my @readmes;
             my @lib_files = qw(
                 lib/XML/Chain.pm

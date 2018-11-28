@@ -1,5 +1,8 @@
 Revision history for Perl extension Math::Random::MT::Auto.
 
+6.23 Tue Nov 27 03:12:07 2018
+	- Fix for non-threaded Perl (rt.cpan.org #127809)
+
 6.22 Tue Sep  4 14:06:20 2012
 	- Enhancement to shuffle() to return an array
 

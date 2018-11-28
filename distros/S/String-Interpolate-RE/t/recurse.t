@@ -1,8 +1,6 @@
 #!perl
 
-use Test::More;
-
-use Test::Fatal;
+use Test2::V0;
 
 use String::Interpolate::RE qw( strinterp );
 
@@ -17,16 +15,15 @@ foreach ( [ 0 => 0 ], [ 1 => 1 ], [ 2 => 1 ], [ 3 => 1 ], [ 4 => 0 ] ) {
     if ( $exp ) {
 
         like(
-             exception { strinterp( '$a', \%vars, { recurse => 1, recurse_fail_limit => $limit } ) },
+           dies { strinterp( '$a', \%vars, { recurse => 1, recurse_fail_limit => $limit } ) },
              qr/recursion fail-safe limit/,
              "recursion fail limit = $limit"
             ) or BAIL_OUT( "fail-safe recursion limit doesn't work! Must Abort!\n" );
     }
 
     else {
-        is(
-           exception { strinterp( '$a', \%vars, { recurse => 1, recurse_fail_limit => $limit } ) },
-           undef,
+        ok(
+           lives { strinterp( '$a', \%vars, { recurse => 1, recurse_fail_limit => $limit } ) },
            "recursion fail limit = $limit"
           )  or BAIL_OUT( "fail-safe recursion limit doesn't work! Must Abort!\n" );
     }
@@ -62,7 +59,7 @@ foreach ( [ 'loop => 0 <= 0', '$a', { a => '$a' } ],
 
     my ( $label, $str, $var ) = @$_;
 
-    like( exception { strinterp( $str, $var, { recurse => 1 } ) },
+    like( dies { strinterp( $str, $var, { recurse => 1 } ) },
           qr/circular interpolation loop detected/,
           "dependency loops: $label"
         );

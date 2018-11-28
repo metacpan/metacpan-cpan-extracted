@@ -29,6 +29,7 @@ requires 'String::Random';
 requires 'YAML::Any'; # Removes a warning.
  
 test_requires 'File::Temp'        => '0.01';
+test_requires 'JSON'              => '0.01';
 test_requires 'Test::DBIx::Class' => '0.01';
 test_requires 'Test::Exception'   => '0.21';
 test_requires 'Test::More'        => '0.88'; # done_testing

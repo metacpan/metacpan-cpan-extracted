@@ -4,7 +4,7 @@ use Capture::Tiny qw(capture_stderr);
 use IO::Scalar;
 use Test::Deep;
 use Test::Exception;
-use Test::More tests => 27;
+use Test::More tests => 25;
 #########################
 {
     my %params = ();
@@ -222,17 +222,18 @@ use Test::More tests => 27;
     );
 }
 #########################
-{
-    my $in = new IO::Scalar;
-    $in->close;
-    my $out = new IO::Scalar;
-    my %params = (source => $in, target => $out);
-    throws_ok(
-        sub { crunch(%params) },
-        qr/source file IO::Handle is closed/,
-        'input stream is closed',
-    );
-}
+# TODO: Test commented out due to RT#127811: Params::Validate's "validate" crashes on a closed IO::Scalar object
+# {
+#     my $in = new IO::Scalar;
+#     $in->close;
+#     my $out = new IO::Scalar;
+#     my %params = (source => $in, target => $out);
+#     throws_ok(
+#         sub { crunch(%params) },
+#         qr/source file IO::Handle is closed/,
+#         'input stream is closed',
+#     );
+# }
 #########################
 {
     my @data = (0x00, 0x10, 0x01, 0x02, 0x03, 0x04, 0x05);
@@ -247,19 +248,20 @@ use Test::More tests => 27;
     );
 }
 #########################
-{
-    my @data = (0x00, 0x10, 0x01, 0x02, 0x03, 0x04, 0x05);
-    my $data = join '', map { chr $_ } @data;
-    my $in = new IO::Scalar \$data;
-    my $out = new IO::Scalar;
-    $out->close;
-    my %params = (source => $in, target => $out);
-    throws_ok(
-        sub { crunch(%params) },
-        qr/target file IO::Handle is closed/,
-        'output stream is closed',
-    );
-}
+# TODO: Test commented out due to RT#127811: Params::Validate's "validate" crashes on a closed IO::Scalar object
+# {
+#     my @data = (0x00, 0x10, 0x01, 0x02, 0x03, 0x04, 0x05);
+#     my $data = join '', map { chr $_ } @data;
+#     my $in = new IO::Scalar \$data;
+#     my $out = new IO::Scalar;
+#     $out->close;
+#     my %params = (source => $in, target => $out);
+#     throws_ok(
+#         sub { crunch(%params) },
+#         qr/target file IO::Handle is closed/,
+#         'output stream is closed',
+#     );
+# }
 #########################
 {
     my @data = (0x00, 0x10, 0x01, 0x02, 0x03, 0x04, 0x05);

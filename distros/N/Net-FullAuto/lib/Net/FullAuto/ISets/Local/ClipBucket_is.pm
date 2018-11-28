@@ -74,8 +74,41 @@ my $configure_clipbucket=sub {
    if (exists $main::aws->{permanent_ip}) {
       $permanent_ip=$main::aws->{permanent_ip}; 
    }
-   #my $handle=$main::aws->{$server_type}->[$cnt]->[1];
-   #my $local=connect_shell();
+   if (exists $main::aws->{'CLIPBUCKET.com'}) {
+      my $n=$main::aws->{fullauto}->
+            {SecurityGroups}->[0]->{GroupName}||'';
+      my $c='aws ec2 describe-security-groups '.
+            "--group-names $n";
+      my ($hash,$output,$error)=('','','');
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error;
+      my $cidr=$hash->{SecurityGroups}->[0]->{IpPermissions}
+              ->[0]->{IpRanges}->[0]->{CidrIp};
+      $c='aws ec2 create-security-group --group-name '.
+         'ClipBucketSecurityGroup --description '.
+         '"CLIPBUCKET.com Security Group" 2>&1';
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name ClipBucketSecurityGroup --protocol '.
+         'tcp --port 22 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name ClipBucketSecurityGroup --protocol '.
+         'tcp --port 80 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name ClipBucketSecurityGroup --protocol '.
+         'tcp --port 443 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+   }
    my $local=$localhost;
    my $handle=$local;
    my ($stdout,$stderr)=('','');
@@ -112,6 +145,8 @@ my $configure_clipbucket=sub {
       '__display__');
    # https://www.unixmen.com/setup-your-own-youtube-clone-website-using-clipbucket/
    # http://opensourceeducation.net/clip-bucket-2-8-on-ubuntu-14-04-with-nginx-php5-fpm-on-digitalocean-vps/
+   # https://mtlynch.io/ansible-role-clipbucket/
+   # https://www.vultr.com/docs/install-clipbucket-and-nginx-on-centos-7  posted Apr 13, 2018
    my $install_clipbucket=<<'END';
 
            o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
@@ -147,6 +182,15 @@ END
       "yum -y groupinstall 'Development tools'",'__display__');
    # https://shaunfreeman.name/compiling-php-7-on-centos/
    # https://www.vultr.com/docs/how-to-install-php-7-x-on-centos-7
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ls -1 /opt/source/mariadb','__display__');
+   if ($stdout=~/[Mm]aria[Dd][Bb].*rpm/) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /opt/mariadb','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source/mariadb');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mv -fv *rpm /opt/mariadb','__display__');
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf /opt/source',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /opt/source',
@@ -168,6 +212,7 @@ END
    ($stdout,$stderr)=$handle->cwd('/opt/source');
 my $b=1;
 if ($b==1) {
+   #if ($b==1) {
    if (-1==index `php -v`,'PHP') {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone https://github.com/php/php-src.git','__display__');
@@ -227,8 +272,8 @@ if ($b==1) {
          'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php7/etc/php-fpm.conf',
          '__display__');
       my $zend=<<END;
-# Zend OPcache
-zend_extension=opcache.so
+; Zend OPcache
+extension=opcache.so
 END
       ($stdout,$stderr)=$handle->cmd("echo -e \"$zend\" > ".
          '/usr/local/php7/etc/conf.d/modules.ini');
@@ -237,6 +282,12 @@ END
          '/usr/local/php7/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/group = nobody/group = www-data/' ".
+         '/usr/local/php7/etc/php-fpm.d/www.conf');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/\;clear_env/clear_env/' ".
+         '/usr/local/php7/etc/php-fpm.d/www.conf');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/\;env.PATH./env[PATH]/' ".
          '/usr/local/php7/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ln -s /usr/local/php7/sbin/php-fpm /usr/sbin/php-fpm');
@@ -317,7 +368,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install '.
       'a52dec-devel libmpeg2-devel','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'which ffmpeg');
+      'export PATH=/usr/local/bin/:$PATH;which ffmpeg');
    if ($stdout!~/\/ffmpeg/) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'mkdir -pv /opt/source/ffmpeg','__display__');
@@ -434,33 +485,6 @@ END
          './configure --enable-shared','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
-   #my $ffmpeg_tar='ffmpeg.static.64bit.2014-07-16.tar.gz';
-   #my $ffmpeg_md5='965739cd5cfeb84401857dadea3af93c';
-   #foreach my $count (1..3) {
-   #   ($stdout,$stderr)=$handle->cmd($sudo.
-   #      "wget --random-wait --progress=dot ".
-   #      "http://ffmpeg.gusari.org/static/64bit/$ffmpeg_tar",
-   #      '__display__');
-   #   ($stdout,$stderr)=$handle->cmd(
-   #      "sudo md5sum -c - <<<\"$ffmpeg_md5 $ffmpeg_tar\"",
-   #      '__display__');
-   #   unless ($stderr) {
-   #      print(qq{ + CHECKSUM Test for $ffmpeg_tar *PASSED* \n});
-   #      last
-   #   } elsif ($count>=3) {
-   #      print "FATAL ERROR! : CHECKSUM Test for $ffmpeg_tar *FAILED* ",
-   #            "after $count attempts\n";
-   #      &Net::FullAuto::FA_Core::cleanup;
-   #   }
-   #   ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $ffmpeg_tar",'__display__');
-   #}
-   #($stdout,$stderr)=$handle->cmd($sudo.
-   #   "tar zxvf $ffmpeg_tar",'__display__');
-   #($stdout,$stderr)=$handle->cmd($sudo."rm -rvf $ffmpeg_tar",'__display__');
-   #($stdout,$stderr)=$handle->cmd("./ffmpeg -version",'__display__');
-   #($stdout,$stderr)=$handle->cmd($sudo.
-   #   "ln -s /usr/local/bin/ffmpeg/ffmpeg /usr/bin/ffmpeg");
-   # http://wiki.razuna.com/display/ecp/FFMpeg+Installation+on+CentOS+and+RedHat
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'wget -qO- https://www.libsdl.org/download-2.0.php');
@@ -617,77 +641,89 @@ END
    } 
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "gem install flvtool2",'__display__');
+      'export PATH=/usr/local/bin/:$PATH;which flvtool2');
+   if ($stdout!~/\/FLV/) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "gem install flvtool2",'__display__');
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'yum -y install freetype-devel freeglut-devel',
       '__display__');
-   my $mediainfo_tar='MediaInfo_CLI_0.7.92.1_GNU_FromSource.tar.gz';
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "https://mediaarea.net/download/binary/mediainfo/0.7.92.1/".
-      $mediainfo_tar,300,
-      '__display__');
+      'export PATH=/usr/local/bin/:$PATH;which mediainfo');
+   if ($stdout!~/\/mediainfo/) {
+      my $mediainfo_tar='MediaInfo_CLI_0.7.92.1_GNU_FromSource.tar.gz';
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "wget --random-wait --progress=dot ".
+         "https://mediaarea.net/download/binary/mediainfo/0.7.92.1/".
+         $mediainfo_tar,300,
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar xvf $mediainfo_tar",'__display__');
+      ($stdout,$stderr)=$handle->cwd('MediaInfo_CLI_GNU_FromSource');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './CLI_Compile.sh','__display__');
+      ($stdout,$stderr)=$handle->cwd('MediaInfo/Project/GNU/CLI');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ln -s /usr/local/bin/mediainfo /usr/bin/mediainfo');
+      ($stdout,$stderr)=$handle->cwd('/opt/source/');
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "tar xvf $mediainfo_tar",'__display__');
-   ($stdout,$stderr)=$handle->cwd('MediaInfo_CLI_GNU_FromSource');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      './CLI_Compile.sh','__display__');
-   ($stdout,$stderr)=$handle->cwd('MediaInfo/Project/GNU/CLI');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ln -s /usr/local/bin/mediainfo /usr/bin/mediainfo');
-   ($stdout,$stderr)=$handle->cwd('/opt/source/');
-   my $c='wget -qO- https://api.github.com/users/gpac/repos';
-   ($stdout,$stderr)=$local->cmd($c);
-   my @repos=();
-   @repos=decode_json($stdout);
-   my $default_branch=$repos[0]->[1]->{'default_branch'};
-   my $updated=$repos[0]->[1]->{'updated_at'};
-   my @branches=();
-   $c='wget -qO- https://api.github.com/repos/gpac/gpac/branches';
-   ($stdout,$stderr)=$local->cmd($c);
-   @branches=decode_json($stdout);
-   my @builds=();
-   $updated=~s/^(.*)T.*$/$1/;
-   my $scrollnum=0;my $count=0;
-   foreach my $branch (@{$branches[0]}) {
-      $count++;
-      #print "BRANCH NAME=",$branch->{name},"\n";
-      push @builds,$branch->{name};
-      if ($default_branch eq $branch->{name}) {
-         $scrollnum=$count;
+      'export PATH=/usr/local/bin/:$PATH;which MP4Box');
+   if ($stdout!~/\/MP4Box/) {
+      my $c='wget -qO- https://api.github.com/users/gpac/repos';
+      ($stdout,$stderr)=$local->cmd($c);
+      my @repos=();
+      @repos=decode_json($stdout);
+      my $default_branch=$repos[0]->[1]->{'default_branch'};
+      my $updated=$repos[0]->[1]->{'updated_at'};
+      my @branches=();
+      $c='wget -qO- https://api.github.com/repos/gpac/gpac/branches';
+      ($stdout,$stderr)=$local->cmd($c);
+      @branches=decode_json($stdout);
+      my @builds=();
+      $updated=~s/^(.*)T.*$/$1/;
+      my $scrollnum=0;my $count=0;
+      foreach my $branch (@{$branches[0]}) {
+         $count++;
+         #print "BRANCH NAME=",$branch->{name},"\n";
+         push @builds,$branch->{name};
+         if ($default_branch eq $branch->{name}) {
+            $scrollnum=$count;
+         }
       }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git clone -v -b $default_branch git://github.com/gpac/gpac",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git ls-remote --tags git://github.com/gpac/gpac",
+         '__display__');
+      my %tags=();
+      foreach my $line (split /\n/, $stdout) {
+         my ($string,$tag)=('','');
+         ($string,$tag)=split /refs\/tags\//, $line;
+         $tags{$tag}=$string;
+      }
+      ($stdout,$stderr)=$handle->cwd('gpac');
+      my $tag=(reverse sort keys %tags)[0];
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git checkout tags/$tag",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ls -l','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'sed -i \'s#-lgpac$#-lgpac -Wl,-rpath=/usr/local/lib#\' '.
+         'applications/mp4box/Makefile');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v gpac.pc /usr/lib64/pkgconfig','__display__');
    }
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "git clone -v -b $default_branch git://github.com/gpac/gpac",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "git ls-remote --tags git://github.com/gpac/gpac",
-      '__display__');
-   my %tags=();
-   foreach my $line (split /\n/, $stdout) {
-      my ($string,$tag)=('','');
-      ($string,$tag)=split /refs\/tags\//, $line;
-      $tags{$tag}=$string;
-   }
-   ($stdout,$stderr)=$handle->cwd('gpac');
-   my $tag=(reverse sort keys %tags)[0];
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "git checkout tags/$tag",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'ls -l','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      './configure','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'sed -i \'s#-lgpac$#-lgpac -Wl,-rpath=/usr/local/lib#\' '.
-      'applications/mp4box/Makefile');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'cp -v gpac.pc /usr/lib64/pkgconfig','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/php7/bin/pecl config-set php_ini '.
@@ -697,9 +733,27 @@ END
       '/usr/local/php7/bin/pear config-set php_ini '.
       '/usr/local/php7/lib/php.ini',
       '__display__');
-   ($stdout,$stderr)=$handle->cmd(
-      "yes '' | sudo /usr/local/php7/bin/pecl install imagick",
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      '-O imagick.tgz https://pecl.php.net/get/imagick'
+      ,300,'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'tar -xvf imagick.tgz','__display__');
+   ($stdout,$stderr)=$handle->cwd('imagick-*');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/php7/bin/phpize','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './configure --with-php-config=/usr/local/php7/bin/php-config',
       '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   $stdout=~s/^.*extensions:\s+(.*?)\s.*$/$1/s;
+   my $img_ext=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chmod -v 755 $img_ext/*','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd(
       "yes '' | sudo /usr/local/php7/bin/pear install mail",
       '__display__');
@@ -707,82 +761,301 @@ END
       "yes '' | sudo /usr/local/php7/bin/pear install Net_SMTP",
       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-#   my $im=<<END;
-#; Enable imagick extension module
-#extension=/usr/lib64/php/5.5/modules/imagick.so
-#END
-#   ($stdout,$stderr)=$handle->cmd(
-#      "echo -e \"$im\" > imagick.ini");
-#   ($stdout,$stderr)=$handle->cmd($sudo.
-#      "mv -fv imagick.ini /etc/php.d",'__display__');
-#   ($stdout,$stderr)=$handle->cmd($sudo.
-#      "mkdir -pv /opt/source/sourceguardian",'__display__');
-#   ($stdout,$stderr)=$handle->cwd(
-#      '/opt/source/sourceguardian');
-#   ($stdout,$stderr)=$handle->cmd($sudo.
-#      "wget --random-wait --progress=dot ".
-#      "http://www.sourceguardian.com/loaders/download/".
-#      "loaders.linux-x86_64.tar.gz",'__display__');
-#   ($stdout,$stderr)=$handle->cmd($sudo.
-#      "tar zxvf loaders.linux-x86_64.tar.gz",'__display__');
-#   ($stdout,$stderr)=$handle->cmd($sudo.
-#      "cp -Rv ixed.5.5.lin /usr/lib64/php/5.5/modules",'__display__');
-#   ($stdout,$stderr)=$handle->cwd('/opt/source');
-#   my $zd=<<END;
-#[sourceguardian] 
-#zend_extension=/usr/lib64/php/5.5/modules/ixed.5.5.lin
-#END
-#   ($stdout,$stderr)=$handle->cmd(
-#      "echo -e \"$zd\" > sourceguardian.ini");
-#   ($stdout,$stderr)=$handle->cmd($sudo.
-#      "mv -fv sourceguardian.ini /etc/php.d",'__display__');
+   my $im=<<END;
+; Enable imagick extension module
+extension=${img_ext}imagick.so
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$im\" > imagick.ini");
+   # use  php -i | grep ini  to check location of ini files
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -fv imagick.ini /usr/local/php7/etc/conf.d','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp phpshield','__display__');
+   ($stdout,$stderr)=$handle->cwd('phpshield');
+   # https://linuxflow.blogspot.com/2017/05/clipbucket-installation.html
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      'https://www.sourceguardian.com/loaders/download/'.
+      'loaders.linux-x86_64.zip',300,'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'unzip loaders.linux-x86_64.zip','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "cp -v ixed.7.1.lin $img_ext",'__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-#   my $ad=<<END;
-#[mariadb]
-#name = MariaDB
-#baseurl = http://yum.mariadb.org/10.1/centos6-amd64
-#gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-#gpgcheck=1
-#END
-#   ($stdout,$stderr)=$handle->cmd(
-#      "echo -e \"$ad\" > maria.repo");
-#   ($stdout,$stderr)=$handle->cmd(
-#      "sudo yum-config-manager --add-repo maria.repo",'__display__');
-#   ($stdout,$stderr)=$handle->cmd(
-#      "sudo rpm --import https://yum.mariadb.org/RPM-GPG-KEY-MariaDB",
-#      '__display__');
-#   ($stdout,$stderr)=$handle->cmd(
-#      "sudo yum -y install MariaDB-server MariaDB-client",'__display__');
+   # https://forum.likg.org.ua/server-side-actions/
+   # install-phpshield-sourceguardian-php-encoders-t306.html
+   my $zd=<<END;
+; Enable phpshield extension module
+extension=${img_ext}ixed.7.1.lin
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$zd\" > phpshield.ini");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "mv -fv phpshield.ini /usr/local/php7/etc/conf.d",'__display__');
 }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.'which mysql');
+   my $msstatus='';my $msversion='';
    if ($stdout=~/\/mysql/) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'mysql --version');
-      $stdout=~s/^mysql\s+Ver\s+(.*?)\s+Distrib.*$/$1/;
+      ($msversion,$stderr)=$handle->cmd($sudo.
+         'mysql --version','__display__');
+      $msversion=~s/^mysql\s+Ver\s+(.*?)\s+Distrib.*$/$1/;
+      ($msstatus,$stderr)=$handle->cmd($sudo.
+         'sudo service mysql status','__display__');
    }
-   if ($stdout<15.1) {
+   if ($msversion<15.1 || $msstatus!~/SUCCESS/) {
+   #my $u=1;
+   #if ($u==1) {
+      # https://docs.couchbase.com/server/6.0/install/thp-disable.html
+      my $do_thp=1;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'mkdir -vp mariadb',,'__display__');
-      ($stdout,$stderr)=$handle->cwd('mariadb');
+         'cat /sys/kernel/mm/transparent_hugepage/enabled');
+      if ($stdout!~/never/) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'cat /sys/kernel/mm/redhat_transparent_hugepage/enabled');
+         if ($stdout!~/never/ || $stdout=~/\[never\]/) {
+            $do_thp=0;
+         }
+      } elsif ($stdout=~/\[never\]/) {
+         $do_thp=0;
+      }
+      if ($do_thp==1) {
+         #
+         # echo-ing/streaming files over ssh can be tricky. Use echo -e
+         #          and replace these characters with thier HEX
+         #          equivalents (use an external editor for quick
+         #          search and replace - and paste back results.
+         #          use copy/paste or cat file and copy/paste results.):
+         #
+         #          !  -   \\x21     `  -  \\x60   * - \\x2A
+         #          "  -   \\x22     \  -  \\x5C
+         #          $  -   \\x24     %  -  \\x25
+         #
+         # https://www.lisenet.com/2014/ - bash approach to conversion
+         my $thp=<<END;
+#\\x21/bin/bash
+### BEGIN INIT INFO
+# Provides:          disable-thp
+# Required-Start:    \\x24local_fs
+# Required-Stop:
+# X-Start-Before:    mysql
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Disable THP
+# Description:       disables Transparent Huge Pages (THP) on boot
+### END INIT INFO
+
+case \\x241 in
+start)
+  if [ -d /sys/kernel/mm/transparent_hugepage ]; then
+    echo 'never' > /sys/kernel/mm/transparent_hugepage/enabled
+    echo 'never' > /sys/kernel/mm/transparent_hugepage/defrag
+  elif [ -d /sys/kernel/mm/redhat_transparent_hugepage ]; then
+    echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/enabled
+    echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/defrag
+  else
+    return 0
+  fi
+;;
+esac
+END
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "echo -e \"$thp\" > disable-thp");
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mv -fv disable-thp /etc/init.d/disable-thp',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'chmod -v 755 /etc/init.d/disable-thp',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'service disable-thp start','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'sudo chkconfig disable-thp on','__display__');
+      }
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git clone https://github.com/MariaDB/server.git','__display__');
-      ($stdout,$stderr)=$handle->cwd('server');
+         'systemctl stop mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git checkout 10.3','__display__');
+         'systemctl stop mariadb','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum list installed | grep "[Mm]aria\|[Mm][Yy][Ss][Qq][Ll]"',
+         '__display__');
+      my @pkgs=split "\n", $stdout;
+      foreach my $pkg (@pkgs) {
+         $pkg=~s/^(.*?)\s+.*$/$1/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "yum -y erase $pkg",'__display__');
+      }
+      # https://zapier.com/engineering/celery-python-jemalloc/
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone --branch master '.
+         'https://github.com/jemalloc/jemalloc.git',
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd('jemalloc');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './autogen.sh','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      # to make tokudb the default storage engine,
+      # you have to start mysqld with: --default-storage-engine=tokudb
+      my $toku_cnf=<<END;
+[mariadb]
+# See https://mariadb.com/kb/en/tokudb-differences/ for differences
+# between TokuDB in MariaDB and TokuDB from http://www.tokutek.com/
+
+plugin-load-add=ha_tokudb.so
+
+[mysqld_safe]
+malloc-lib=/usr/local/lib/libjemalloc.so.2
+END
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "echo -e \"$toku_cnf\" > ~/tokudb.cnf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v ~/tokudb.cnf /etc/my.cnf.d/tokudb.cnf',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rvf ~/tokudb.cnf','__display__');
+      # https://github.com/arslancb/clipbucket/issues/429
+      my $strict_mode_cnf=<<END;
+[mysqld]
+sql_mode=IGNORE_SPACE,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+END
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "echo -e \"$strict_mode_cnf\" > ~/strict_mode.cnf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v ~/strict_mode.cnf /etc/my.cnf.d/strict_mode.cnf',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rvf ~/strict_mode.cnf','__display__');
       ($stdout,$stderr)=$handle->cwd('..');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'yum-builddep -y mariadb-server','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         '/bin/cmake -DRPM=centos7 server/','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'make install',600,'__display__');
+         'ls -1 /opt','__display__');
+      if ($stdout!~/mariadb/i) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mkdir -vp mariadb','__display__');
+         ($stdout,$stderr)=$handle->cwd('mariadb');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone https://github.com/MariaDB/server.git',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'yum-builddep -y mariadb-server',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            '/bin/cmake -DRPM=centos7 server/',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'make install',600,'__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'make package',600,'__display__');
+      } else {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mv -fv /opt/mariadb /opt/source/mariadb',
+            '__display__');
+         ($stdout,$stderr)=$handle->cwd('mariadb');
+      }
       ($stdout,$stderr)=$handle->cmd($sudo.
          'groupadd mysql');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'useradd -r -g mysql mysql');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         '/bin/mysql_install_db --user=mysql','__display__');
+         'ls -1','__display__');
+      my @rpm_files=split "\n", $stdout;
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-common/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-client/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y install galera perl-DBI','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service mysql stop','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 1777 /tmp','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rvf /var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /var/lib/mysql','__display__');
+      # https://dba.stackexchange.com/questions/49446/mysql-failures-after-changing-innodb-flush-method-to-o-direct-and-innodb-log-fil
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-server/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      # To see mysql log locations:
+      # mysql -se "SHOW VARIABLES" | grep -e log_error
+      # -e general_log -e slow_query_log
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-backup/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-connect/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-rocksdb/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-toku/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-shared/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-test/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      #foreach my $rpm (@rpm_files) {
+      #   next if $rpm!~/-gssapi/;
+      #   ($stdout,$stderr)=$handle->cmd($sudo.
+      #      "rpm -ivh $rpm",'__display__');
+      #   last;
+      #}
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service mysql stop','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rvf /var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mysql_install_db --user=mysql --basedir=/usr '.
+         '--datadir=/var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 755 /var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chgrp -v mysql /var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chgrp -v mysql /var/lib/mysql/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service mysql start','__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   'chmod -v 711 /var/lib/mysql/mysql','__display__');
+      print "MYSQL START STDOUT=$stdout and STDERR=$stderr<==\n";sleep 5;
       print "\n\n\n\n\n\n\nWE SHOULD HAVE INSTALLED MARIADB=$stdout<==\n\n\n\n\n\n\n";
+      sleep 5;
    }
    ($stdout,$stderr)=$handle->cmd("uname -a");
    if ($stdout=~/Ubuntu/i) {
@@ -989,6 +1262,8 @@ END
    # https://wiki.loadaverage.org/clipbucket/installation_guides/install_like_loadaverage
    # https://karp.id.au/social/index.html
    # http://jeffreifman.com/how-to-install-your-own-private-e-mail-server-in-the-amazon-cloud-aws/
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'rm -rvf /usr/local/nginx','__display__');
    my $nginx='nginx-1.14.0'; # updated from 1.10.0
    $nginx='nginx-1.9.13' if $^O eq 'cygwin';
    ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
@@ -1392,16 +1667,23 @@ esac
 END
    ($stdout,$stderr)=$handle->cmd(
       "echo -e \"$nginxconf\" > /opt/source/nginx");
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v /opt/source/nginx /etc/init.d','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'/etc/init.d/mysql start',
-      '__display__');
-   if ($stderr) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "yum -y install MariaDB-server MariaDB-client",'__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'/etc/init.d/mysql start',
-         '__display__');
-   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chmod -v 755 /etc/init.d/nginx','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl daemon-reload','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service nginx start','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i 's|^plugin-load-add=auth_gssapi.so|".
+      "#plugin-load-add=auth_gssapi.so|' ".
+      '/etc/my.cnf.d/auth_gssapi.cnf');
+   # HOW TO CHECK MYSQL FOR ERRORS
+   # mkdir /var/run/mysqld/
+   # chown mysql: /var/run/mysqld/
+   # mysqld --basedir=/usr --datadir=/var/lib/mysql
+   # --user=mysql --socket=/var/run/mysqld/mysqld.sock
    $handle->{_cmd_handle}->print($sudo.'mysql_secure_installation');
    $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
    while (1) {
@@ -1466,6 +1748,7 @@ END
    ($stdout,$stderr)=$handle->cmd(
       "${sudo}sed -i \'s#127.0.0.1:9000#/var/run/php-fpm/php7.0-fpm.sock#\' ".
       '/usr/local/php7/etc/php-fpm.d/www.conf');
+   # https://serversforhackers.com/c/php-fpm-configuration-the-listen-directive
    ($stdout,$stderr)=$handle->cmd(
       "${sudo}sed -i \'s/;listen.owner = nobody/listen.owner = www-data/\' ".
       '/usr/local/php7/etc/php-fpm.d/www.conf');
@@ -1614,13 +1897,14 @@ END
    exit_on_error($output." in package ".__PACKAGE__.
       " line ".__LINE__."\n")
       if $output=~/error occurred/;
+   sleep 5;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'rm -rvf ~/sespolicy','__display__');
    ($stdout,$stderr)=$handle->cwd("/opt/source"); 
    my $policy_arn=$hash->{Policy}->{Arn};
    $c="aws iam attach-user-policy --user-name clipbucket_email ".
       "--policy-arn $policy_arn";
    ($hash,$output,$error)=run_aws_cmd($c);
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'rm -rvf ./sespolicy','__display__'); 
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \'s/post_max_size = 8M/post_max_size = 500M/\' ".
       "/usr/local/php7/lib/php.ini");
@@ -1800,8 +2084,8 @@ END
       "sed -i 's/root/clipbucket/' dbconnect.php");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "sed -i \"s/''/'".$service_and_cert_password."'/\" dbconnect.php");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'rm -rvf /var/www/html/clipbucket/cb_install','__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'rm -rvf /var/www/html/clipbucket/cb_install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chmod -Rv 755 /var/www/html/clipbucket/includes/','__display__');
@@ -1817,8 +2101,8 @@ END
       'rm -rvf root','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service crond restart','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'rm -rvf /var/www/html/clipbucket/files/temp/install.me','__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'rm -rvf /var/www/html/clipbucket/files/temp/install.me','__display__');
    use LWP::UserAgent;
    use HTTP::Request::Common;
    use IO::Socket::SSL qw();
@@ -2708,7 +2992,6 @@ our $clipbucket_choose_build=sub {
    my $scrollnum=0;my $count=0;
    foreach my $branch (@{$branches[0]}) {
       $count++;
-      print "BRANCH NAME=",$branch->{name},"\n";
       push @builds,$branch->{name};
       if ($default_branch eq $branch->{name}) {
          $scrollnum=$count;
@@ -2871,7 +3154,6 @@ our $clipbucket_validate_domain=sub {
 
    package clipbucket_validate_domain;
    my $domain="]I[{'clipbucket_enter_domain_name',1}";
-print "DOMAIN=$domain\n";<STDIN>;
    my $c="aws ec2 allocate-address --domain vpc";
    my ($hash,$output,$error)=
          &Net::FullAuto::Cloud::fa_amazon::run_aws_cmd($c);

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Any;
-$Config::Model::Backend::Any::VERSION = '2.127';
+$Config::Model::Backend::Any::VERSION = '2.128';
 use Carp;
 use strict;
 use warnings;
@@ -213,7 +213,7 @@ Config::Model::Backend::Any - Virtual class for other backends
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 
@@ -324,7 +324,7 @@ following methods:
 
 =item read
 
-C<read()> is called with the following parameters:
+C<read> is called with the following parameters:
 
  %custom_parameters,       # e.g. my_param   => 'my_value' in the example above
  object     => $obj,         # Config::Model::Node object
@@ -346,7 +346,7 @@ C<<  my_param   => 'my_value' >>.
 
 =item write
 
-C<write()> is called with the following parameters:
+C<write> is called with the following parameters:
 
  %$custom_parameters,         # e.g. my_param   => 'my_value' in the example above
  object      => $obj,         # Config::Model::Node object
@@ -413,9 +413,12 @@ Return the node (a L<Config::Model::Node>) holding this backend.
 
 Return the instance (a L<Config::Model::Instance>) holding this configuration.
 
-=head2 show_message( string )
+=head2 show_message
 
-Show a message to STDOUT (unless overridden). Delegated to L<Config::Model::Instance/"show_message( string )">.
+Parameters: C<( string )>
+
+Show a message to STDOUT (unless overridden).
+Delegated to L<Config::Model::Instance/"show_message">.
 
 =head2 read_global_comments
 

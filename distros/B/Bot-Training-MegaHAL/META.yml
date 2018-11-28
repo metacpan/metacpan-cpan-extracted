@@ -3,28 +3,33 @@ abstract: 'Provide F<megahal.trn> via L<Bot::Training>'
 author:
   - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
 build_requires:
-  File::Find: 0
-  File::Temp: 0
-  Test::More: 0
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.31
-  File::ShareDir::Install: 0.03
-generated_by: 'Dist::Zilla version 2.101170'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Bot-Training-MegaHAL
 no_index: {}
-recommends: {}
 requires:
-  Any::Moose: 0
-  Bot::Training::Plugin: 0
-  perl: 5.010
+  Bot::Training::Plugin: '0'
+  Moose: '0'
+  perl: '5.010'
 resources:
-  Ratings: http://cpanratings.perl.org/d/Bot-Training-MegaHAL
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bot-Training-MegaHAL
-  homepage: http://search.cpan.org/dist/Bot-Training-MegaHAL/
+  homepage: http://metacpan.org/release/Bot-Training-MegaHAL
   license: http://dev.perl.org/licenses/
-  repository: http://github.com/avar/bot-training-megahal
-version: 0.02
+  repository: git://github.com/avar/bot-training-megahal.git
+version: '0.03'
+x_authority: cpan:AVAR
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

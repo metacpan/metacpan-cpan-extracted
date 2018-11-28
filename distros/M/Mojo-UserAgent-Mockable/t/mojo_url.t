@@ -6,7 +6,6 @@ use lib qq{$Bin/lib};
 use RandomOrgQuota qw/check_quota/;
 use Mojo::JSON qw(encode_json decode_json);
 use Mojo::UserAgent::Mockable;
-use Mojolicious::Quick;
 use Test::Most;
 use Test::Mojo;
 

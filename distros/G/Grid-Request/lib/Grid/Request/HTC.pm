@@ -26,7 +26,7 @@ use File::Which;
 use Log::Log4perl qw(:easy :levels);
 
 my $logger = get_logger(__PACKAGE__);
-our ($config_section, $drm_param);
+our $config_section;
 
 my $worker_name = "grid_request_worker";
 our $WORKER = which($worker_name);
@@ -35,7 +35,7 @@ if (! defined $WORKER) {
 }
 
 use vars qw($config $client $server);
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 if ($^W) {
     $VERSION = $VERSION;
@@ -43,7 +43,6 @@ if ($^W) {
 
 BEGIN {
     $config_section = "request";
-    $drm_param = "drm";
 
     my $central_config = "$ENV{HOME}/.grid_request.conf";
 
@@ -53,11 +52,6 @@ BEGIN {
         if (! defined $cfg) {
             warn "There was a problem with the configuration file at $config\n";
             warn "Is it a valid INI file with a [" . $config_section . "] section?\n";
-            exit 1;
-        }
-        my $drm = $cfg->val($config_section, $drm_param);
-        if (! defined $drm) {
-            warn "The config file does not define a '" . $drm_param . "' parameter.\n";
             exit 1;
         }
     } else {

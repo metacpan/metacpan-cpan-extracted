@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use autodie;
 
-use 5.010001;
+use 5.018001;
 
 use Carp;
 use Graph;

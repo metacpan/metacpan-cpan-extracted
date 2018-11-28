@@ -1,14 +1,9 @@
 package Hailo::UI::ReadLine;
-BEGIN {
-  $Hailo::UI::ReadLine::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Hailo::UI::ReadLine::VERSION = '0.72';
-}
-
-use 5.010;
-use Any::Moose;
-use Any::Moose 'X::StrictConstructor';
+our $AUTHORITY = 'cpan:AVAR';
+$Hailo::UI::ReadLine::VERSION = '0.74';
+use v5.28.0;
+use Moose;
+use MooseX::StrictConstructor;
 use Encode 'decode';
 use Hailo;
 use Term::ReadLine;

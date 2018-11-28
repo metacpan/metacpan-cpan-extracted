@@ -65,6 +65,7 @@ requires:
   Plack::Test::ExternalServer: '0'
   Safe::Isa: '0'
   Scalar::Util: '0'
+  Socket: '1.96'
   Stream::Buffered: '0'
   String::RewritePrefix: '0.004'
   Sub::Exporter: '0'
@@ -86,7 +87,7 @@ resources:
   homepage: http://dev.catalyst.perl.org/
   license: http://dev.perl.org/licenses/
   repository: git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git
-version: '5.90122'
+version: '5.90123'
 x_authority: cpan:MSTROUT
 x_breaks:
   Catalyst::Action::REST: '<= 0.67'

@@ -48,7 +48,7 @@
    "provides" : {
       "Gentoo::App::Pram" : {
          "file" : "lib/Gentoo/App/Pram.pm",
-         "version" : "0.100200"
+         "version" : "0.200000"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/monsieurp/Gentoo-App-Pram/"
       }
    },
-   "version" : "0.100200",
+   "version" : "0.200000",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

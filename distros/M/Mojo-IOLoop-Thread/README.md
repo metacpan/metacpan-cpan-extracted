@@ -61,7 +61,7 @@ Thomas Kratz <tomk@cpan.org>
 
 # COPYRIGHT
 
-Copyright 2017 Thomas Kratz.
+Copyright 2017-18 Thomas Kratz.
 
 # LICENSE
 

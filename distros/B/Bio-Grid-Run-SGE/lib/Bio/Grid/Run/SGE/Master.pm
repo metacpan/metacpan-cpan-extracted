@@ -25,7 +25,7 @@ use Bio::Gonzales::Util qw/sys_fmt/;
 use FindBinNew qw($Bin $Script);
 FindBinNew::again();
 
-our $VERSION = '0.065'; # VERSION
+our $VERSION = '0.066'; # VERSION
 
 has 'env'    => ( is => 'rw', required => 1 );
 has 'config' => ( is => 'rw', required => 1 );
@@ -283,7 +283,7 @@ EOS
     my @dirs = uniq( grep {$_} split( /\Q$Config{path_sep}\E/, $ENV{PATH} ) );
     my $path = "'" . join( "','", @dirs ) . "'";
     print $fh <<EOS;
-my \@path = do { my \%seen; grep { !\$seen{\$_}++ } ( split(/:/, \$ENV{PATH}), $path) };
+my \@path = do { my \%seen; grep { !\$seen{\$_}++ } ( $path, split(/:/, \$ENV{PATH})) };
 \$ENV{PATH} = join(":", \@path);
 EOS
   }

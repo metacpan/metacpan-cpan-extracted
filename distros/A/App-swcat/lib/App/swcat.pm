@@ -1,7 +1,7 @@
 package App::swcat;
 
-our $DATE = '2018-10-18'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-11-21'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -427,6 +427,29 @@ sub download_url {
     $res;
 }
 
+$SPEC{archive_info} = {
+    v => 1.1,
+    summary => 'Get info of a software archive',
+    args => {
+        %args_common,
+        %arg0_software,
+        #%arg_version,
+        %argopt_arch,
+    },
+};
+sub archive_info {
+    my %args = @_;
+    my $state = _init(\%args, 'ro');
+
+    my $sw = $args{software};
+
+    my $mod = _load_swcat_mod($sw);
+    my $res = $mod->get_archive_info(
+        maybe arch => $args{arch},
+    );
+    $res;
+}
+
 1;
 # ABSTRACT: Software catalog
 
@@ -442,7 +465,7 @@ App::swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.007 of App::swcat (from Perl distribution App-swcat), released on 2018-10-18.
+This document describes version 0.008 of App::swcat (from Perl distribution App-swcat), released on 2018-11-21.
 
 =head1 SYNOPSIS
 
@@ -453,6 +476,44 @@ See L<swcat> script.
 L<swcat> is a CLI for L<Software::Catalog>.
 
 =head1 FUNCTIONS
+
+
+=head2 archive_info
+
+Usage:
+
+ archive_info(%args) -> [status, msg, payload, meta]
+
+Get info of a software archive.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<arch> => I<software::arch>
+
+=item * B<cache_period> => I<int>
+
+=item * B<db_path> => I<filename>
+
+Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+
+=item * B<software>* => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
 
 
 =head2 download_url

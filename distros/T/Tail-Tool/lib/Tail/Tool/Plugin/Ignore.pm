@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 extends 'Tail::Tool::PreProcess';
 with 'Tail::Tool::RegexList';
 
-our $VERSION = version->new('0.4.7');
+our $VERSION = version->new('0.4.8');
 
 sub process {
     my ($self, $line) = @_;
@@ -44,7 +44,7 @@ Tail::Tool::Plugin::Ignore - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Tail::Tool::Plugin::Ignore version 0.4.7.
+This documentation refers to Tail::Tool::Plugin::Ignore version 0.4.8.
 
 
 =head1 SYNOPSIS

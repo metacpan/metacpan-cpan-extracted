@@ -1,0 +1,24 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+cpanfile
+t/PrivateKey.t
+t/PublicKey.t
+t/Network.t
+t/Config.t
+t/Base58.t
+t/Util.t
+t/Helpers.t
+t/Crypto.t
+lib/Bitcoin/Crypto.pm
+lib/Bitcoin/Crypto/PrivateKey.pm
+lib/Bitcoin/Crypto/PublicKey.pm
+lib/Bitcoin/Crypto/Config.pm
+lib/Bitcoin/Crypto/Network.pm
+lib/Bitcoin/Crypto/Util.pm
+lib/Bitcoin/Crypto/Base58.pm
+lib/Bitcoin/Crypto/Roles/Key.pm
+lib/Bitcoin/Crypto/Helpers.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

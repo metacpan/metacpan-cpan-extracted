@@ -1,4 +1,5 @@
 # ABSTRACT: Serge Zanata translation server (http://zanata.org/) synchronization plugin
+#           Tested with zanata-cli v4.6+
 
 package Serge::Sync::Plugin::TranslationService::zanata;
 
@@ -9,7 +10,7 @@ use strict;
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.903.0');
+our $VERSION = qv('0.905.0');
 
 sub name {
     return 'Zanata translation server (http://zanata.org/) synchronization plugin';
@@ -24,21 +25,29 @@ sub init {
 
     $self->merge_schema({
         # Project configuration file, eg zanata.xml
-        project_config => 'STRING',
+        project_config   => 'STRING',
         # User configuration, eg /home/user/.config/zanata.ini
-        user_config    => 'STRING',
+        user_config      => 'STRING',
         # Type of push to perform on the server:
-        #   source  pushes source documents only
-        #   both (default) pushes both source and translation documents
-        push_type      => 'STRING',
+        #   'source' pushes source documents only
+        #   'both' (default) pushes both source and translation documents
+        push_type        => 'STRING',
         # The base directory for storing zanata cache files. Default is current directory.
-        cache_dir      => 'STRING',
+        cache_dir        => 'STRING',
         # Whether to use an Entity cache when fetching documents.
-        use_cache      => 'BOOLEAN',
+        use_cache        => 'BOOLEAN',
         # Whether to purge the cache before performing the pull operation
-        purge_cache    => 'BOOLEAN',
+        purge_cache      => 'BOOLEAN',
         # File types to locate and transmit to the server when using project type 'file'
-        file_types     => 'ARRAY'
+        file_types       => 'ARRAY',
+        # Whether to enable debug logging. Default is false.
+        debug            => 'BOOLEAN',
+        # Whether to output full execution error messages (stacktraces). Default is false.
+        errors           => 'BOOLEAN',
+        # Whether verification of SSL certificates should be disabled. Default is false.
+        disable_ssl_cert => 'BOOLEAN',
+        #  Dry run: don't change any data, on the server or on the filesystem. Default is false.
+        dry_run          => 'BOOLEAN'
     });
 }
 
@@ -54,7 +63,10 @@ sub validate_data {
     $self->{data}->{use_cache} = subst_macros($self->{data}->{use_cache});
     $self->{data}->{purge_cache} = subst_macros($self->{data}->{purge_cache});
     $self->{data}->{file_types} = subst_macros($self->{data}->{file_types});
-    $self->{data}->{java_home} = subst_macros($self->{data}->{java_home});
+    $self->{data}->{debug} = subst_macros($self->{data}->{debug});
+    $self->{data}->{errors} = subst_macros($self->{data}->{errors});
+    $self->{data}->{disable_ssl_cert} = subst_macros($self->{data}->{disable_ssl_cert});
+    $self->{data}->{dry_run} = subst_macros($self->{data}->{dry_run});
 
     die "'project_config' not defined" unless defined $self->{data}->{project_config};
     die "'project_config', which is set to '$self->{data}->{project_config}', does not point to a valid file.\n" unless -f $self->{data}->{project_config};
@@ -95,6 +107,22 @@ sub run_zanata_cli {
         $command .= ' --locales '.$locales_as_string;
     }
 
+    if (defined $self->{data}->{debug} && $self->{data}->{debug}) {
+        $command .= ' --debug';
+    }
+
+    if (defined $self->{data}->{errors} && $self->{data}->{errors}) {
+        $command .= ' --errors';
+    }
+
+    if (defined $self->{data}->{disable_ssl_cert} && $self->{data}->{disable_ssl_cert}) {
+        $command .= ' --disable-ssl-cert';
+    }
+
+    if (defined $self->{data}->{dry_run} && $self->{data}->{dry_run}) {
+        $command .= ' --dry-run';
+    }
+
     $command = 'zanata-cli '.$command;
 
     print "Running '$command'...\n";
@@ -118,25 +146,15 @@ sub pull_ts {
         $action .= ' --cache-dir '.$self->{data}->{cache_dir};
     }
 
-    if (defined $self->{data}->{use_cache}) {
-        $action .= ' --use-cache '.$self->to_boolean($self->{data}->{use_cache});
+    if (defined $self->{data}->{use_cache} && $self->{data}->{use_cache}) {
+        $action .= ' --use-cache';
     }
 
-    if (defined $self->{data}->{purge_cache}) {
-        $action .= ' --purge-cache '.$self->to_boolean($self->{data}->{purge_cache});
+    if (defined $self->{data}->{purge_cache} && $self->{data}->{purge_cache}) {
+        $action .= ' --purge-cache';
     }
 
     return $self->run_zanata_cli($action, $langs);
-}
-
-sub to_boolean {
-    my ($self, $boolean) = @_;
-
-    if ($boolean) {
-        return 'true';
-    }
-
-    return 'false';
 }
 
 sub push_ts {

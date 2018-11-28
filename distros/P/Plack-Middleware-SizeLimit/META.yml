@@ -1,27 +1,30 @@
 ---
-abstract: 'Terminate PSGI server processes if they grow too large'
+abstract: 'Terminate processes if they grow too large'
 author:
   - 'Audrey Tang <cpan@audreyt.org>'
 build_requires:
-  Module::Package::Au: '0'
-  ExtUtils::MakeMaker: '0'
-  Test::More: 0
-dynamic_config: 0
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
-name: Plack-Middleware-SizeLimit
+  version: 1.4
 module_name: Plack::Middleware::SizeLimit
+name: Plack-Middleware-SizeLimit
 no_index:
   directory:
     - inc
     - t
 requires:
-  perl: '5.008'
-  parent: '0'
-  Plack::Middleware: '0'
+  Plack::Middleware: 0
   Process::SizeLimit::Core: '0.9501'
+  parent: 0
+  perl: 5.8.0
 resources:
-  repository: http://github.com/audreyt/plack-middleware-sizelimit
-version: '0.07'
+  homepage: https://github.com/audreyt/plack-middleware-sizelimit/tree
+  repository: git://github.com/audreyt/plack-middleware-sizelimit.git
+version: '0.09'

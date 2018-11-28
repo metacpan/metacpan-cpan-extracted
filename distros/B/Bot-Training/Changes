@@ -1,5 +1,10 @@
 Revision history for Bot::Training
 
+0.07 2018-11-27 13:18:02
+
+   - Fully removed Any::Moose, first started in 0.05. The command-line
+     utility still used it.
+
 0.06 2015-01-08 15:15:12
 
     - Fixed "Can't modify split in chomp" error (See http://www.cpantesters.org/cpan/report/6e341b28-9675-11e4-a3f3-4fad3a6893cb).

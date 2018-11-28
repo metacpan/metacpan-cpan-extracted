@@ -59,3 +59,7 @@ Revision history for Perl extension VMS::Device.
     - Updated ppport.h.
     - Changed #ifdef __ALPHA to #ifndef __VAX
 
+0.11  Fri Nov 16 15:30 2018
+    - Fixed Makefile.PL to append SYS$LIBRARY:SYS$LIB_C (needed for
+      ucbdef.h) to the source file name rather than the end of the
+      whole command because there are other things at the end now.

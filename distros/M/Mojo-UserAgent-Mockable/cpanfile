@@ -11,7 +11,7 @@ requires "Path::Tiny" => "0";
 requires "Safe::Isa" => "0";
 requires "Scalar::Util" => "0";
 requires "Try::Tiny" => "0";
-requires "perl" => "5.016";
+requires "perl" => "5.014";
 requires "warnings" => "0";
 requires "warnings::register" => "0";
 
@@ -34,7 +34,6 @@ on 'test' => sub {
   requires "Mojo::UserAgent" => "0";
   requires "Mojolicious::Lite" => "0";
   requires "Mojolicious::Plugin::BasicAuthPlus" => "0";
-  requires "Mojolicious::Quick" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Test::Exception" => "0";
   requires "Test::JSON" => "0";

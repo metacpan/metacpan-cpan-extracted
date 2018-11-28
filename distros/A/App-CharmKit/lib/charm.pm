@@ -3,10 +3,7 @@ package charm;
 use strict;
 use warnings;
 no bareword::filehandles;
-no indirect ':fatal';
 
-use autobox                ();
-use autobox::Core          ();
 use true                   ();
 use feature                ();
 use Path::Tiny             ();
@@ -23,9 +20,8 @@ use Rex::Commands::Run     ();
 use Rex::Commands::SCM     ();
 use Rex::Commands::Service ();
 use Rex::Commands::User    ();
-use POSIX                  ();
-use Data::Printer          ();
 
+use Sub::Install;
 use Import::Into;
 
 sub import {
@@ -38,23 +34,16 @@ sub import {
     'strict'->import::into($target);
     'warnings'->import::into($target);
     'English'->import::into($target, '-no_match_vars');
-    'autobox'->import::into($target);
-    'autobox::Core'->import::into($target);
 
     warnings->unimport('once');
     warnings->unimport('experimental');
     warnings->unimport('experimental::signatures');
     warnings->unimport('reserved');
 
-    bareword::filehandles->unimport;
-    indirect->unimport(':fatal');
-
-    feature->import(':5.20');
+    feature->import(':5.24');
     feature->import('signatures');
-
     true->import;
 
-    POSIX->import::into($target, qw(strftime));
     Rex->import::into($target, '-feature' => [qw(no_path_cleanup disable_taskname_warning)]);
     Rex::Commands->import::into($target);
     Rex::Commands::File->import::into($target);
@@ -68,11 +57,23 @@ sub import {
     Rex::Commands::Service->import::into($target);
     Rex::Commands::User->import::into($target);
     Path::Tiny->import::into($target, qw(path cwd));
-    Data::Printer->import::into($target);
 
     if ($flags{tester}) {
         Test::More->import::into($target);
     }
+
+    # overrides
+    require 'App/CharmKit.pm';
+    'App::CharmKit'->import::into($target);
+
+    Sub::Install::install_sub(
+        {   code => 'run',
+            from => 'Rex::Commands::Run',
+            into => $target,
+            as   => 'sh',
+        }
+    );
 }
+
 
 1;

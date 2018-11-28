@@ -1,7 +1,7 @@
 package App::instopt;
 
-our $DATE = '2018-10-18'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-11-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -41,6 +41,18 @@ our %argopt_detail = (
     detail => {
         schema => ['true*'],
         cmdline_aliases => {l=>{}},
+    },
+);
+
+our %argopt_download = (
+    download => {
+        summary => 'Whether to download latest version from URL'.
+            'or just find from download dir',
+        schema => 'bool*',
+        default => 1,
+        cmdline_aliases => {
+            D => {is_flag=>1, summary => 'Shortcut for --no-download', code=>sub {$_[0]{download} = 0}},
+        },
     },
 );
 
@@ -593,15 +605,7 @@ $SPEC{update} = {
     args => {
         %args_common,
         %App::swcat::arg0_softwares_or_patterns,
-        download => {
-            summary => 'Whether to download latest version from URL'.
-                'or just find from download dir',
-            schema => 'bool*',
-            default => 1,
-            cmdline_aliases => {
-                D => {is_flag=>1, summary => 'Shortcut for --no-download', code=>sub {$_[0]{download} = 0}},
-            },
-        },
+        %argopt_download,
     },
 };
 sub update {
@@ -732,7 +736,8 @@ sub update {
             my $ar = Archive::Any->new($filepath);
             $ar->extract($target_dir);
 
-            _unwrap($target_dir) if $aires->[2]{unwrap};
+            _unwrap($target_dir) unless
+                defined($aires->[2]{unwrap}) && !$aires->[2]{unwrap};
         } # EXTRACT
 
       SYMLINK_DIR: {
@@ -773,6 +778,7 @@ $SPEC{update_all} = {
     summary => 'Update all installed software',
     args => {
         %args_common,
+        %argopt_download,
     },
 };
 sub update_all {
@@ -800,7 +806,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.005 of App::instopt (from Perl distribution App-instopt), released on 2018-10-18.
+This document describes version 0.006 of App::instopt (from Perl distribution App-instopt), released on 2018-11-21.
 
 =head1 SYNOPSIS
 
@@ -1208,6 +1214,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<download> => I<bool> (default: 1)
+
+Whether to download latest version from URLor just find from download dir.
 
 =item * B<download_dir> => I<dirname>
 

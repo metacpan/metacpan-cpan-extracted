@@ -1,4 +1,4 @@
-D64::Disk::Dir Version 0.03
+D64::Disk::Dir Version 0.04
 ===========================
 
 D64::Disk::Dir is a Perl module providing an abstraction layer above
@@ -10,7 +10,7 @@ object-oriented way.
 PREREQUISITES
 
     Array::Iterator >= 0.06
-    D64::Disk::Image >= 0.01
+    D64::Disk::Image >= 0.03
 
 INSTALLATION
 

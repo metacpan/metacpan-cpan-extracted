@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Reader::Testcases;
-$XML::Reader::Testcases::VERSION = '0.65';
+$XML::Reader::Testcases::VERSION = '0.67';
 require Exporter;
 
 our @ISA         = qw(Exporter);
@@ -1903,7 +1903,7 @@ $TestProg{'0030_test_Module.t'} = [29, sub {
 
 {
     package DebCnt;
-$DebCnt::VERSION = '0.65';
+$DebCnt::VERSION = '0.67';
 sub new     { our $obj++; bless {}; }
     sub DESTROY { our $obj--; }
 }

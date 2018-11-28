@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+use JCAMP::DX;
+
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Indent   = 1;
+
+for my $filename (@ARGV) {
+    print Dumper JCAMP::DX::parse_jcamp_dx( $filename );
+}

@@ -2,8 +2,8 @@ NAME
     App::swcat - Software catalog
 
 VERSION
-    This document describes version 0.007 of App::swcat (from Perl
-    distribution App-swcat), released on 2018-10-18.
+    This document describes version 0.008 of App::swcat (from Perl
+    distribution App-swcat), released on 2018-11-21.
 
 SYNOPSIS
     See swcat script.
@@ -12,6 +12,39 @@ DESCRIPTION
     swcat is a CLI for Software::Catalog.
 
 FUNCTIONS
+  archive_info
+    Usage:
+
+     archive_info(%args) -> [status, msg, payload, meta]
+
+    Get info of a software archive.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arch => *software::arch*
+
+    *   cache_period => *int*
+
+    *   db_path => *filename*
+
+        Location of SQLite database (for caching), defaults to
+        ~/.cache/swcat.db.
+
+    *   software* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   download_url
     Usage:
 

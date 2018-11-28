@@ -57,8 +57,10 @@ di_status(di)
         int   numstatus, statuslen;
     PPCODE:
         New(1, status, DISKDRIVE_STATUS_LENGTH + 1, char);
-        if (status == NULL)
+        if (status == NULL) {
+            Safefree(status);
             XSRETURN_UNDEF;
+        }
         memset(status, '\0', DISKDRIVE_STATUS_LENGTH + 1);
         PUSHs(sv_2mortal(newSViv(numstatus = di_status(di, status))));
         statuslen = strlen(status);
@@ -135,8 +137,8 @@ di_title(di)
     PPCODE:
         title = di_title(di);
         id = title + 18;
-        PUSHs(sv_2mortal(newSVpv(title, 16)));
-        PUSHs(sv_2mortal(newSVpv(id, 5)));
+        PUSHs(sv_2mortal(newSVpv((const char *)title, 16)));
+        PUSHs(sv_2mortal(newSVpv((const char *)id, 5)));
 
 # my $track_blocks_free = di_track_blocks_free($diskImage, $track);
 
@@ -200,11 +202,13 @@ di_rawname_from_name(name)
         unsigned char *rawname;
     PPCODE:
         New(1, rawname, DIRECTORY_FILENAME_LENGTH + 1, unsigned char);
-        if (rawname == NULL)
+        if (rawname == NULL) {
+            Safefree(rawname);
             XSRETURN_UNDEF;
+        }
         PUSHs(sv_2mortal(newSViv(rawnamelen = di_rawname_from_name(rawname, name))));
         rawname[DIRECTORY_FILENAME_LENGTH] = '\0';
-        PUSHs(sv_2mortal(newSVpv(rawname, 0)));
+        PUSHs(sv_2mortal(newSVpv((const char *)rawname, 0)));
         Safefree(rawname);
 
 # my $name = di_name_from_rawname($rawname);
@@ -216,9 +220,11 @@ di_name_from_rawname(rawname)
         int   namelen;
         char *name;
     PPCODE:
-        New(1, name, DIRECTORY_FILENAME_LENGTH + 1, unsigned char);
-        if (name == NULL)
+        New(1, name, DIRECTORY_FILENAME_LENGTH + 1, char);
+        if (name == NULL) {
+            Safefree(name);
             XSRETURN_UNDEF;
+        }
         PUSHs(sv_2mortal(newSViv(namelen = di_name_from_rawname(name, rawname))));
         name[DIRECTORY_FILENAME_LENGTH] = '\0';
         PUSHs(sv_2mortal(newSVpv(name, 0)));
@@ -281,11 +287,13 @@ di_read(imgfile, len);
         int            counter;
     PPCODE:
         New(1, buffer, len + 1, unsigned char);
-        if (buffer == NULL)
+        if (buffer == NULL) {
+            Safefree(buffer);
             XSRETURN_UNDEF;
+        }
         memset(buffer, '\0', len + 1);
         PUSHs(sv_2mortal(newSViv(counter = di_read(imgfile, buffer, len))));
-        PUSHs(sv_2mortal(newSVpv(buffer, counter)));
+        PUSHs(sv_2mortal(newSVpv((const char *)buffer, counter)));
         PUSHs(sv_2mortal(newSVnv(counter)));
         Safefree(buffer);
 

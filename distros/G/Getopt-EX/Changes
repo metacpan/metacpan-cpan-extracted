@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.10.1 2018-11-22T12:26:27Z
+
+    - Introduce new `colormap' method to dump option definition.
+
 v1.10.0 2018-10-12T02:03:34Z
 
     - Now L00-L25 means black, 24 grey levels, and white.

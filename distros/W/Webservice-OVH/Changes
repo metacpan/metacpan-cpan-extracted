@@ -1,5 +1,9 @@
 Revision history for Perl extension Webservice-OVH
 
+0.42 2018-11-22T09:35:38Z
+
+    - Filter construction fixes
+
 0.41 2017-06-14T14:49:42Z
 
     - Allowed Parameters for activate_free_webhosting

@@ -50,17 +50,17 @@ bb_crunch(source, start_address)
 
 # my $data = bb_data($file);
 
-SV*
+void
 bb_data(file)
         File *file
     PPCODE:
         # Push string (PV) with data on the stack and mortalize it:
-        SV *fileData = sv_2mortal(newSVpv(file->data, file->size));
+        SV *fileData = sv_2mortal(newSVpv((const char *)file->data, file->size));
         XPUSHs(fileData);
 
 # my $size = bb_size($file);
 
-unsigned int
+void
 bb_size(file)
         File *file
     PPCODE:
@@ -70,7 +70,7 @@ bb_size(file)
 
 # bb_free($source, $target);
 
-SV*
+void
 bb_free(source, target)
         File *source
         File *target

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 13;
 
-use_ok('Win32::Scsv', qw(XLRef XLConst));
+use_ok('Win32::Scsv', qw(XLRef));
 
 is(XLRef(   1,   1), 'A1',   'XLRef Test 01');
 is(XLRef(  28,  22), 'AB22', 'XLRef Test 02');
@@ -17,13 +17,3 @@ is(XLRef(1377,   1), 'AZY1', 'XLRef Test 09 - Big column numbers');
 is(XLRef(1378,   1), 'AZZ1', 'XLRef Test 10 - Big column numbers');
 is(XLRef(1379,   1), 'BAA1', 'XLRef Test 11 - Big column numbers');
 is(XLRef(1380,   1), 'BAB1', 'XLRef Test 12 - Big column numbers');
-
-my $CN = XLConst();
-
-is ($CN->{'xlNormal'},             -4143, 'Test xlNormal');
-is ($CN->{'xlPasteValues'},        -4163, 'Test xlPasteValues');
-is ($CN->{'xlCSV'},                    6, 'Test xlCSV');
-is ($CN->{'xlCalculationManual'},  -4135, 'Test xlCalculationManual');
-is ($CN->{'xlPrevious'},               2, 'Test xlPrevious');
-is ($CN->{'xlByRows'},                 1, 'Test xlByRows');
-is ($CN->{'xlByColumns'},              2, 'Test xlByColumns');

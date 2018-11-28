@@ -9,7 +9,8 @@ code piece by piece
   #!/usr/bin/env perl
   BEGIN {
       # Install charmkit
-      system "curl -L http://charmkit.pl/setup.sh | sh";
+      system "qpt-get install -qyf cpanminus";
+      system "cpanm -qn App::Charmkit";
   }
 
   use charm;
@@ -18,7 +19,7 @@ C<use charm> is the entrypoint to exposing charm routines useful for deploying
 the service. This provides facilities such as installing packages, printing logs,
 getting relation information, and configuring service level options.
 
-  my $port = config 'port';
+  my $port = sh 'config-get port';
 
 C<config> routine will pull config options defined in F<config.yaml>.
 
@@ -37,7 +38,7 @@ C<config> routine will pull config options defined in F<config.yaml>.
 C<service> is another helper for start/stopping services on the system
 where the charm is placed.
 
-  run "open-port $port";
+  sh "open-port $port";
 
 C<open_port> exposes a port accessible publicly, and its opposite C<close_port> will
 remove that accessibility.
@@ -50,7 +51,7 @@ project searching for a B<lib> directory. Similar to how you write Perl modules.
 
 For example, your directory structure
 
-The structure your project should look similar to:
+The structure of your project should look similar to:
 
   charm-project/
     hooks/

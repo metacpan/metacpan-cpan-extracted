@@ -6,7 +6,9 @@ use autodie;
 use App::Rangeops -command;
 use App::Rangeops::Common;
 
-use constant abstract => 'sort links and ranges within links';
+sub abstract {
+    return 'sort links and ranges within links';
+}
 
 sub opt_spec {
     return (

@@ -112,6 +112,11 @@ sub execute {
         $outdir->child($d)->mkpath();
     }
 
+    my $gzip_bin = "gzip";
+    if ( IPC::Cmd::can_run('pigz') ) {
+        $gzip_bin = "pigz -p " . $opt->{parallel};
+    }
+
     #----------------------------#
     # lavToPsl
     #----------------------------#
@@ -336,7 +341,7 @@ sub execute {
                     . " $args->[1]/chr.2bit"
                     . " stdout"
                     . " | axtSort stdin stdout"
-                    . " | gzip -c >"
+                    . " | $gzip_bin >"
                     . " $outdir/axtNet/$output";
                 App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );
             }
@@ -353,17 +358,18 @@ sub execute {
 
         # bsdtar (mac) doesn't support `--remove-files`
         if ( !-e "lav.tar.gz" ) {
-            App::Egaz::Common::exec_cmd( "tar -czvf lav.tar.gz *.lav",
+            App::Egaz::Common::exec_cmd( "tar -cvf - *.lav | $gzip_bin > lav.tar.gz",
                 { verbose => $opt->{verbose}, } );
         }
         for ( Path::Tiny::path(".")->children(qr/\.lav$/) ) {
             $_->remove;
         }
 
-        App::Egaz::Common::exec_cmd( "tar -czvf net.tar.gz net/", { verbose => $opt->{verbose}, } );
+        App::Egaz::Common::exec_cmd( "tar -cvf - net/ | $gzip_bin > net.tar.gz",
+            { verbose => $opt->{verbose}, } );
         Path::Tiny::path("net")->remove_tree;
 
-        App::Egaz::Common::exec_cmd( "tar -czvf psl.tar.gz *.psl",
+        App::Egaz::Common::exec_cmd( "tar -cvf - *.psl | $gzip_bin > psl.tar.gz",
             { verbose => $opt->{verbose}, } );
         for ( Path::Tiny::path(".")->children(qr/^.+\.psl$/) ) {
             $_->remove;
@@ -374,10 +380,10 @@ sub execute {
         }
 
         for my $p (qw{all all.pre over}) {
-            App::Egaz::Common::exec_cmd( "gzip $p.chain", { verbose => $opt->{verbose}, } );
+            App::Egaz::Common::exec_cmd( "$gzip_bin $p.chain", { verbose => $opt->{verbose}, } );
         }
 
-        App::Egaz::Common::exec_cmd( "tar -czvf chain.tar.gz *.chain",
+        App::Egaz::Common::exec_cmd( "tar -cvf - *.chain | $gzip_bin > chain.tar.gz",
             { verbose => $opt->{verbose}, } );
         for ( Path::Tiny::path(".")->children(qr/^.+\.chain$/) ) {
             $_->remove;
@@ -429,7 +435,7 @@ sub execute {
                 . " $args->[0]/chr.sizes"
                 . " $args->[1]/chr.sizes"
                 . " stdout"
-                . " | gzip -c >"
+                . " | $gzip_bin >"
                 . " $output";
             App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );
         };
@@ -500,7 +506,7 @@ sub execute {
                     . " $args->[0]/chr.sizes"
                     . " $args->[1]/chr.sizes"
                     . " stdout"
-                    . " | gzip -c >"
+                    . " | $gzip_bin >"
                     . " $output";
                 App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );
 

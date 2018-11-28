@@ -375,7 +375,7 @@ sub timestamp {
     file_timestamp( $_[0]->file );
 }
 
-# generate a sum file is desired
+# generate a sum file if desired
 # but extend to copy when long-term storage is not working storage
 sub accepted_for_out {
     my $self = shift;
@@ -410,16 +410,33 @@ sub rename {
     }
 }
 
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my @args  = @_;
+
+    try {
+        return $class->$orig(@args);
+    }
+    catch {
+        my $msg = $_;
+        $msg .= "\nArgs are:\n";
+        my $cnt = 0;
+        my @pref = ( "  Key: ", "       Val: " );
+
+        for my $arg (@args) {
+            $msg .= $pref[$cnt] . $arg . "\n";
+            $cnt = 1 - $cnt;
+        }
+        die $msg;
+    };
+};
+
 package HPCI::File::Classes;
 
 use MooseX::Role::Parameterized;
 use MooseX::Types::Path::Class qw(Dir File);
 use Moose::Util::TypeConstraints;
-
-sub generator {
-	my ($class,@args) = @_;
-	return sub { $class->new( file => @_, @args ) };
-}
 
 subtype 'HPCIFileGen',
     as 'CodeRef';
@@ -427,6 +444,10 @@ subtype 'HPCIFileGen',
 coerce 'HPCIFileGen',
     from 'Str',      via { _create_HPCIFileGen(  $_ ) },
     from 'ArrayRef', via { _create_HPCIFileGen( @$_ ) };
+
+sub _create_HPCIFileGen {
+	return sub { shift->new( @_ ) };
+}
 
 sub _create_HPCIFileGenHash {
     my $key = shift;

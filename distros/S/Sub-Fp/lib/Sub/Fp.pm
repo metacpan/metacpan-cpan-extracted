@@ -2,6 +2,7 @@ package Sub::Fp;
 use strict;
 use warnings;
 use Carp;
+use POSIX;
 use List::Util;
 use Exporter qw(import);
 our @EXPORT_OK = qw(
@@ -15,10 +16,10 @@ our @EXPORT_OK = qw(
     is_hash     every    noop        identity
     is_empty    is_sub   flow        eql
     to_pairs    for_each apply       get
-    second
+    second      range
 );
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 use constant ARG_PLACE_HOLDER => {};
 
@@ -32,6 +33,68 @@ sub identity {
     my $args = shift // undef;
 
     return $args;
+}
+
+# Forgive me below father, for I have sinned.
+# Seriously, I can't figure a simpler way to do this...
+# TODO: Please refactor this eventually...
+sub range {
+    my ($start, $end, $step) = @_;
+
+    if (!defined $start) {
+        return [];
+    }
+
+    if (!defined $end) {
+        return range(0, $start, $start < 0 ? -1 : 1);
+    }
+
+    if (!defined $step) {
+        return range($start, $end, $end < 0 ? -1 : 1);
+    }
+
+    if (_is_nonsense_range($start, $end, $step)) {
+        return [];
+    }
+
+    my $loop_count = ceil(abs(($end - $start) / ($step || 1)));
+    my $list       = [];
+
+    while ($loop_count) {
+        push(@{ $list }, $start);
+
+        $start+=$step;
+        $loop_count-=1;
+    }
+
+    return $list;
+}
+
+sub _is_nonsense_range {
+    my ($start, $end, $step) = @_;
+
+    if ($start == $end &&
+        $end == $step) {
+        return 1;
+    }
+
+    #TODO Refactor this...;
+    if ($start > $end &&
+        $step == 0 &&
+        $start < 0 &&
+        $end < 0) {
+        return 0;
+    }
+
+    if ($start > $end &&
+        $step >= 0 ) {
+        return 1;
+    }
+
+    if ($start < $end &&
+        $step < 0) {
+        return 1;
+    }
 }
 
 sub get {
@@ -549,6 +612,58 @@ arguments into the function it invokes
     # same as $sum_all_nums->(100, 200)
 
     # => 300
+
+=cut
+
+=head2 range
+
+Creates an array of numbers (positive and/or negative) progressing from start up to, but not including, end.
+A step of -1 is used if a negative start is specified without an end or step.
+If end is not specified, it's set to start with start then set to 0.
+
+    range(10);
+
+    # [1,2,3,4,5,6,7,8,9]
+
+
+    range(1,10);
+
+    # [1,2,3,4,5,6,7,8,9]
+
+    range(-1, -10);
+
+    # [-1, -2, -3, -4, -5, -6 ,-7, -8, -9]
+
+    range(1, 4, 0);
+
+    # [1, 1, 1]
+
+
+    range(-1, -4, 0);
+
+    # [-1, -1, -1]
+
+
+    #Ranges that "dont make sense" will return empty arrays
+
+
+    range(100, 1, 0)
+
+    # []
+
+    range(0,0,0)
+
+    # []
+
+    range(0, -100, 100)
+
+    # []
+
+    range(0, 100, -100)
+
+    # []
+
+    #etc...
 
 =cut
 

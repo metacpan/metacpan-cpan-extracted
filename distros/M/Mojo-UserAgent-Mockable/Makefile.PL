@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.016;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojo-UserAgent-Mockable",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.016",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Mojo::UserAgent::Mockable",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -52,7 +52,6 @@ my %WriteMakefileArgs = (
     "Mojo::UserAgent" => 0,
     "Mojolicious::Lite" => 0,
     "Mojolicious::Plugin::BasicAuthPlus" => 0,
-    "Mojolicious::Quick" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test::Exception" => 0,
     "Test::JSON" => 0,
@@ -65,7 +64,7 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.54",
+  "VERSION" => "1.56",
   "test" => {
     "TESTS" => "t/*.t t/request_compare/*.t t/serializer/*.t"
   }
@@ -100,7 +99,6 @@ my %FallbackPrereqs = (
   "Mojolicious" => "7.22",
   "Mojolicious::Lite" => 0,
   "Mojolicious::Plugin::BasicAuthPlus" => 0,
-  "Mojolicious::Quick" => 0,
   "Path::Tiny" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Safe::Isa" => 0,

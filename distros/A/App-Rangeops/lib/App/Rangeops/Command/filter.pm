@@ -6,8 +6,9 @@ use autodie;
 use App::Rangeops -command;
 use App::Rangeops::Common;
 
-use constant abstract =>
-    'filter links by numbers of ranges or length difference';
+sub abstract {
+    return 'filter links by numbers of ranges or length difference';
+}
 
 sub opt_spec {
     return (

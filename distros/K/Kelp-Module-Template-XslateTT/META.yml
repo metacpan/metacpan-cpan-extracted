@@ -1,0 +1,24 @@
+---
+abstract: 'process .tt files with Text::Xslate'
+author:
+  - 'Serguei Trouchelle <stro@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Kelp-Module-Template-XslateTT
+requires:
+  Kelp::Module::Template::Xslate: '0.01'
+version: '1.002'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::Open;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: open links associated to a task
-$Taskwarrior::Kusarigama::Plugin::Command::Open::VERSION = '0.10.0';
+$Taskwarrior::Kusarigama::Plugin::Command::Open::VERSION = '0.11.0';
 
 use 5.20.0;
 
@@ -120,7 +120,7 @@ Taskwarrior::Kusarigama::Plugin::Command::Open - open links associated to a task
 
 =head1 VERSION
 
-version 0.10.0
+version 0.11.0
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,11 +24,12 @@ no_index:
 requires:
   Config::Grammar: '1.12'
   Locale::PO: '0.27'
-  Mojolicious: '7.26'
-  Mojolicious::Plugin::Qooxdoo: '0.908'
+  Mojolicious: '8.0'
+  Mojolicious::Plugin::Qooxdoo: v1.0.1
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.13.8
+version: v0.14.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

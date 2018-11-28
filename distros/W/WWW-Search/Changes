@@ -1,3 +1,11 @@
+2018-11-24  Kingpin  <martin@ubuntu>
+
+	* Makefile.PL: gracefully handle missing Env module
+
+2018-06-17  Kingpin  <martin@ubuntu>
+
+	* Test.pm (test_most_results): save failed HTML on error
+
 2017-04-30  Kingpin  <martin@martin-M17x>
 
 	* Makefile.PL: fixed for Perl 5.26

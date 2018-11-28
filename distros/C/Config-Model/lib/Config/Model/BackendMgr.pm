@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.127';
+$Config::Model::BackendMgr::VERSION = '2.128';
 use Mouse;
 use strict;
 use warnings;
@@ -239,8 +239,10 @@ sub read_config_sub_layer {
     my $layered_config = delete $rw_config->{default_layer};
     my $layered_read   = dclone $rw_config ;
 
-    map { my $lc = delete $layered_config->{$_}; $layered_read->{$_} = $lc if $lc; }
-        qw/file config_dir os_config_dir/;
+    foreach my $item ( qw/file config_dir os_config_dir/ ) {
+        my $lc = delete $layered_config->{$item};
+        $layered_read->{$item} = $lc if $lc;
+    }
 
     Config::Model::Exception::Model->throw(
         error => "backend error: unexpected default_layer parameters: "
@@ -498,7 +500,7 @@ sub is_auto_write_for_type {
 __PACKAGE__->meta->make_immutable;
 
 package Config::Model::DeprecatedHandle;
-$Config::Model::DeprecatedHandle::VERSION = '2.127';
+$Config::Model::DeprecatedHandle::VERSION = '2.128';
 our $AUTOLOAD;
 
 sub new {
@@ -541,7 +543,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.127
+version 2.128
 
 =head1 SYNOPSIS
 

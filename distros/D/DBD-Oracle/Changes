@@ -1,5 +1,79 @@
 Revision history for DBD::Oracle
 
+1.76      2018-11-22
+
+  No Changes from 1.75, we just botched up publishing to CPAN
+
+1.75   2018-11-22
+
+  No Changes from 1.75_42
+
+1.75_42   2018-08-22
+
+  [BUG FIXES]
+
+  Fix potential buffer overflow in dbdimp.c - (GH#57, Various)
+
+  Fix truncation error on ROWIDs from an Index Organized table as they are
+  not a fixed length. Code now allows up to a size of 2000.
+  (GH#31, Martin J. Evans)
+
+  Various fixes for compiler warnings, OCI handle leaks, and OCI programming
+  errors. - (PR#38, Dag Lem)
+
+  Corrections to t/25plsql.t - (GH#56, kjetillll)
+
+  Fix: Invalid binding call for large undef arrays. - (GH#36, GH ghost)
+
+  Fix: compile warnings about int vs long unsigned. - (PR#62, Dean Hamstead)
+
+  Fix: Spelling errors in pod. - (PR#63, Jochen Hayek)
+
+  Fix: Various changes in pod. - (PR#54, Mike O'Regan)
+
+  [ENHANCEMENT]
+
+  Connection informational messages like "ORA-28002: the password will
+  expire" were lost. Thanks to J.D. Laub.
+
+  Add new path to find 64 bit Oracle client on MAC OSX - (GH#20, Martin J. Evans)
+
+  Ignore constraints which are not enabled in primary/foreign key_info
+  (GH#23, Martin J. Evans)
+
+  dist.init overhaul. - (PR#62, Dean Hamstead)
+
+  Mailmap and TODO changes. - (PR#62, Dean Hamstead)
+
+  Travis CI testing. - (PR#62, Dean Hamstead)
+  Note: this uses Oracle XE which doesn't provide enough features to test
+  the entire suite. Nor does it test anything other than Linux on Linux.
+  Release tests are also NOT yet run in Travis.
+
+  Rewrite of DRCP session pooling to make it work as intended - (PR#38, Dag Lem)
+
+  Support for Oracle Fast Application Notification (FAN). - (PR#38, Dag Lem)
+
+  Work by Dag Lem was sponsored by EVRY Information Services. Thank you!
+
+1.75_2    2014-11-19
+
+  [ENHANCEMENT]
+
+  Try and set -l when the build would have failed (H.Merijn Brand)
+
+1.75_1    2014-11-17
+
+  [DOCUMENTATION]
+
+  Change mentions of READMEs in Makefile.PL to troubleshooting guides.
+  (GH#17, reported by Ken Williams)
+
+  [BUG FIXES]
+
+  Fix GH#15 and GH#21 (the same problem). Previous change for
+  RT91698 broke other things in output parameters.
+
 1.74      2014-04-24
   - Promote to stable.
 
@@ -14,7 +88,7 @@ Revision history for DBD::Oracle
 
 1.71_00   2014-03-31
     - Recognizes __CYGWIN64__. (RT88709, reported by Witold Petriczek)
-    - CHOOSE hint is deprecated. (RT91217, reported by Andy Bucksch, 
+    - CHOOSE hint is deprecated. (RT91217, reported by Andy Bucksch,
         fix by Martin J Evans)
     - Set UTF8 flag per-connection. (RT88185, reported by Heinrich Mislik, patch by Martin
       J. Evans)
@@ -28,16 +102,16 @@ Revision history for DBD::Oracle
 
     [IMPROVEMENTS]
 
-    - The DSN 'dbi:Oracle:sid=foo' is now an alias for 'dbi:Oracle:foo'. 
+    - The DSN 'dbi:Oracle:sid=foo' is now an alias for 'dbi:Oracle:foo'.
         (RT#91775, Yanick Champoux, requested by David Wheeler)
 
-    - Support for ORA_SYSBACKUP, ORA_SYSDG and ORA_SYSKM. (RT#91473, 
+    - Support for ORA_SYSBACKUP, ORA_SYSDG and ORA_SYSKM. (RT#91473,
         Kris Lemaire)
 
     [BUG FIXES]
 
    - OCI_THREADED setting had been accidentally removed, causing potential
-    crashes when using threads. (RT#92229, Martin J. Evans, reported 
+    crashes when using threads. (RT#92229, Martin J. Evans, reported
     by Detlef Lütticke)
 
   - When using fetch*_hashref the values are decoded but
@@ -1760,4 +1834,3 @@ please enjoy.
 19th Sep 1994: DBperl project renamed to DBI.
 
 29th Sep 1992: DBperl project started.
-

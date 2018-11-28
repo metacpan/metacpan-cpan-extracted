@@ -32,7 +32,7 @@ my $stage1 = $group->stage(
 	resources_required => {
 		h_vmem => '2G'
 		},
-	command => "sleep 10;mkdir $workdir",
+	command => "mkdir $workdir && sleep 10",
 	);
 
 ok($stage1, "Stage 1 created.");
@@ -72,7 +72,7 @@ my $stage5 = $group->stage(
 	resources_required => {
 		h_vmem => '2G'
 		},
-	command => "[ -d $workdir -a -f $workdir/2.pre -a -f $workdir/3.pre -a -f $workdir/4.pre -a -f $workdir/2.post -a -f $workdir/3.post -a -f $workdir/4.post ]",
+	command => "sleep 10;[ -d $workdir -a -f $workdir/2.pre -a -f $workdir/3.pre -a -f $workdir/4.pre -a -f $workdir/2.post -a -f $workdir/3.post -a -f $workdir/4.post ]",
 	);
 
 ok($stage5, "Stage 5 created.");

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Rangeops:
     file: lib/App/Rangeops.pm
-    version: v0.1.0
+    version: v0.1.1
   App::Rangeops::Command::circos:
     file: lib/App/Rangeops/Command/circos.pm
   App::Rangeops::Command::clean:
@@ -54,11 +54,12 @@ requires:
   MCE: '1.708'
   Path::Tiny: '0.076'
   YAML::Syck: '1.29'
-  perl: '5.010001'
+  perl: '5.018001'
 resources:
   bugtracker: https://github.com/wang-q/App-Rangeops/issues
   homepage: https://github.com/wang-q/App-Rangeops
   repository: git://github.com/wang-q/App-Rangeops.git
-version: 0.1.0
+version: 0.1.1
 x_authority: cpan:WANGQ
-x_serialization_backend: 'CPAN::Meta::YAML version 0.014'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

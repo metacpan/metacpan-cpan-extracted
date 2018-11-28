@@ -1,21 +1,21 @@
 package plenigo;
 
-our $VERSION = '2.0003';
+our $VERSION = '2.0006';
 
 =head1 NAME
 
-App::Meta - plenigo Perl SDK
+plenigo::Meta - plenigo Perl SDK
 
 =head1 DESCRIPTION
 
-This is a .
+The plenigo Perl SDK offers wrappers for the plenigo API.
 
 =head1 AUTHOR
 
-David Farrell
+plenigo GmbH
 
 =head1 LICENSE
 
-FreeBSD
+GNU AFFERO GENERAL PUBLIC LICENSE Version 3
 
 =cut

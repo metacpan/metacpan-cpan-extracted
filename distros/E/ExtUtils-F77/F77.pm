@@ -3,6 +3,7 @@ package ExtUtils::F77;
 
 use Config;
 use File::Spec;
+use Text::ParseWords;
 
 =head1 NAME
 
@@ -20,12 +21,12 @@ This module tries to implement a simple
 A simple self-documenting Perl database of knowledge/code
 for figuring out how to link for various combinations of OS and
 compiler is embedded in the modules Perl code. Please help 
-save the world by sending database entries for
-your system to karl_pgplot@mac.com
+save the world by submitted patches for new database entries for
+your system at L<https://github.com/PDLPorters/extutils-f77>
 
 Note the default on most systems is now to search for a generic 'GNU' compiler
-which can be g77, gfortran or g95 and then find the appropriate link
-libraries automatically. (This is the 'Generic' 'GNU' database entry
+which can be gfortran, g77, g95 or fort77 (in that order based on usage) and then find 
+the appropriate link libraries automatically. (This is the 'Generic' 'GNU' database entry
 in the code.)
 
 The library list which the module returns 
@@ -38,7 +39,7 @@ variable F77LIBS, e.g.
 
 =cut
 
-$VERSION = "1.20"; 
+$VERSION = "1.21"; 
 
 warn "\nExtUtils::F77: Version $VERSION\n";
 
@@ -108,7 +109,7 @@ $F77config{MinGW}{G77}{Link} = sub {
       $dir = "/usr/local/lib";
       $lib = "f2c";
    }  
-   return( "-L$dir -L/usr/lib -l$lib -lm" );
+   return( qq{"-L$dir" -L/usr/lib -l$lib -lm} );
 };
 
 $F77config{MinGW}{GFortran}{Link} = sub {
@@ -123,7 +124,7 @@ $F77config{MinGW}{GFortran}{Link} = sub {
    } else {
       $dir = "/usr/local/lib";
    }    
-   return( "-L$dir -L/usr/lib -lgfortran -lquadmath -lm" );
+   return( qq{"-L$dir" -L/usr/lib -lgfortran -lquadmath -lm} );
 };
 
 $F77config{MinGW}{G77}{Trail_} = 1;
@@ -142,7 +143,7 @@ $F77config{Sunos}{F77}{Link} = sub {
    $dir = find_highest_SC("/usr/lang/SC*");
    return "" unless $dir; # Failure
    print "$Pkg: Found Fortran latest version lib dir $dir\n";
-   return "-L$dir -lF77 -lm";
+   return qq{"-L$dir" -lF77 -lm};
 };
 
 # Whether symbols (subroutine names etc.) have trailing underscores 
@@ -244,7 +245,7 @@ $F77config{Solaris}{F77}{Link} = sub {
       /;
    }
 
-   join( ' ', "-L$dir", @libs );
+   join( ' ', qq{"-L$dir"}, @libs );
 };
 
 
@@ -257,8 +258,8 @@ $F77config{Solaris}{DEFAULT} = 'F77';
 
 $F77config{Generic}{GNU}{Trail_} = 1;
 $F77config{Generic}{GNU}{Cflags} = ' ';        # <---need this space!
-$F77config{Generic}{GNU}{Link}   = link_gnufortran_compiler('g77', 'gfortran', 'g95', 'fort77');    
-$F77config{Generic}{GNU}{Compiler} = find_in_path('g77', "$gfortran", 'g95','fort77');
+$F77config{Generic}{GNU}{Link}   = link_gnufortran_compiler('gfortran', 'g77', 'g95', 'fort77');    
+$F77config{Generic}{GNU}{Compiler} = find_in_path("$gfortran", 'g77',  'g95','fort77');
 $F77config{Generic}{DEFAULT}     = 'GNU';
 
 ### cygwin ###
@@ -361,7 +362,7 @@ $F77config{Freebsd}{G77}{Link} = sub {
     } else {
         $dir = "/usr/local/lib";
     }    
-    return( "-L$dir -L/usr/lib -lg2c -lm" );
+    return( qq{"-L$dir" -L/usr/lib -lg2c -lm} );
 };
 
 $F77config{Freebsd}{GFortran}{Link} = sub {
@@ -376,7 +377,7 @@ $F77config{Freebsd}{GFortran}{Link} = sub {
     } else {
         $dir = "/usr/local/lib";
     }    
-    return( "-L$dir -L/usr/lib -lgfortran -lm" );
+    return( qq{"-L$dir" -L/usr/lib -lgfortran -lm} );
 };
 
 $F77config{Freebsd}{G77}{Trail_} = 1;
@@ -619,7 +620,7 @@ sub find_highest_SC {
 
 sub validate_libs {
    print "$Pkg: Validating $_[0]   ";
-   my @args = split(' ',shift());
+   my @args = shellwords(shift());
    my $pat;
    my $ret = 1;
 
@@ -656,7 +657,7 @@ sub testcompiler {
 
    my $ret;
    open(OUT,">$file.f");
-   print OUT "      print *, 'Hello World'\n";
+   print OUT "      write(*,*) 'Hello World'\n";
    print OUT "      end\n";
    close(OUT);
    print "Compiling the test Fortran program...\n";
@@ -702,7 +703,7 @@ sub gcclibs {
       unless($fallback_compiler eq 'GFortran' && $^O =~ /MSWin/i) {
          $gccdir = `$gcc -m32 -print-libgcc-file-name`; chomp $gccdir;
          $gccdir =~ s/\/libgcc.a//;
-         return " -L$gccdir -lgcc";
+         return qq{ "-L$gccdir" -lgcc};
       }else{
          return "";
       } 
@@ -789,15 +790,18 @@ sub link_gnufortran_compiler {
    if ( $Config{osname} =~ /darwin/ && $Config{osvers} >= 14
       && $compiler eq 'gfortran' && $version >= 4.9 ) { # Add extra libs for gfortran versions >= 4.9 and OS X
       $append = "-lgcc_ext.10.5 -lgcc_s.10.5 -lquadmath";
-      return( "-L$dir $append -L/usr/lib -l$lib -lm" );
+      return( qq{"-L$dir" $append -L/usr/lib -l$lib -lm} );
    }
-   return( "-L$dir -L/usr/lib -l$lib -lm" );
+   return( qq{"-L$dir" -L/usr/lib -l$lib -lm} );
 }
 
+=head1 SEE ALSO
+
+The L<PGPLOT> module uses this to link with the Fortran based graphics library, and was the cause of this modules development.
 
 =head1 AUTHOR
 
-Karl Glazebrook (karlglazebrook@mac.com).
+Karl Glazebrook
 
 =cut
 

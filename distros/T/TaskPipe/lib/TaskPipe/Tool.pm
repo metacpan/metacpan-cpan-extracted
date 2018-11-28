@@ -20,7 +20,7 @@ use POSIX qw(isatty);
 
 with 'MooseX::ConfigCascade';
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 
 has cmd => (is => 'rw', isa => 'ArrayRef');

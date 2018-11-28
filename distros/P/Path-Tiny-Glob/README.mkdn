@@ -1,0 +1,69 @@
+# NAME
+
+Path::Tiny::Glob - File globbing utility 
+
+# VERSION
+
+version 0.0.1
+
+# SYNOPSIS
+
+```perl
+use Path::Tiny::Glob;
+
+my $dzil_files = pathglob( '~/work/perl-modules/*/dist.ini' );
+
+while( my $file = $dzil_files->next ) {
+    say "found a Dist::Zilla project at ", $file->parent;
+}
+```
+
+# DESCRIPTION
+
+This module exports a single function, `pathglob`. 
+
+# EXPORTED FUNCTIONS 
+
+## `pathglob`
+
+```perl
+my $list = pathglob( $glob );
+```
+
+This function takes in 
+a shell-like file glob, and returns a [Lazy::List](https://metacpan.org/pod/Lazy::List) of [Path::Tiny](https://metacpan.org/pod/Path::Tiny) objects
+matching it.
+
+Caveat: backtracking paths using `..` don't work.
+
+### Supported globbing patterns
+
+- `*`
+
+    Matches zero or more characters.
+
+- `?`
+
+    Matches zero or one character.
+
+- `**`
+
+    Matches zero or more directories.
+
+    Note that `**` only matches directories. If you want to glob all files in a directory and its subdirectories, you 
+    have to do \`\*\*/\*\`.
+
+# SEE ALSO
+
+[File::Wildcard](https://metacpan.org/pod/File::Wildcard)
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

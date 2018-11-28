@@ -116,7 +116,27 @@ sub login { ## no critic (RequireArgUnpacking)
     my $login = shift;
     my $password = shift;
     my $cfg = $self->config->cfgHash->{BACKEND};
-    if ($self->user->login($login,$password)){
+    my $ok = $self->user->login($login,$password);
+    if (eval { blessed $ok && $ok->isa('Mojo::Promise') }){
+        my $ret = Mojo::Promise->new;
+        $ok->then(
+            sub {
+                if (shift){
+                    $ret->resolve({            
+                        sessionCookie => $self->user->makeSessionCookie()
+                    });
+                }
+                else {
+                    $ret->resolve(undef);
+                }
+            },
+            sub {
+                $ret->reject(@_);
+            }
+        );
+        return $ret;
+    }
+    if ($ok) {
         return {
             sessionCookie => $self->user->makeSessionCookie()
         };
@@ -211,11 +231,10 @@ sub getUserConfig {
         };
         warn "$@" if $@;
         next unless $obj;
-        my $iM = $obj->can('instanciationMode') ? $obj->instanciationMode : $obj->instantiationMode;
         push @plugins, {
             tabName => $obj->tabName,
             name => $obj->name,
-            instantiationMode => $iM
+            instantiationMode => $obj->instantiationMode
         };
     }
     return {
@@ -355,6 +374,25 @@ sub handleUpload {
         }
         return $self->render(text=>encode_json({exception=>{message=>$@,code=>9999}}));
     }
+    if (evan { blessed $return and $return->isa('Mojo::Promise')}){
+        $return->then(sub {
+            $self->render(text=>encode_json(shift));
+        },
+        sub {
+            my $err = shift;
+            if (blessed $err){
+                if ($err->isa('CallBackery::Exception')){
+                    return $self->render(text=>encode_json({exception=>{message=>$err->message,code=>$err->code}}));
+                }
+                elsif ($err->isa('Mojo::Exception')){
+                    return $self->render(text=>encode_json({exception=>{message=>$err->message,code=>9999}}));
+                }
+            }
+            return $self->render(text=>encode_json({exception=>{message=>$err,code=>9999}}));
+        });
+        $self->render_later;
+        return $return;
+    }
     #warn Dumper $return;
     $self->render(text=>encode_json($return));
 }
@@ -422,6 +460,29 @@ sub handleDownload {
             }
         }
         return $self->render(text=>encode_json({exception=>{message=>$@,code=>9999}}));
+    }
+    if (eval { blessed $map and $map->isa('Mojo::Promise')}){
+        $map->then(sub {
+            my $map = shift;
+            $self->res->headers->content_type($map->{type}.';name=' .$map->{filename});
+            $self->res->headers->content_disposition('attachment;filename='.$map->{filename});
+            $self->res->content->asset($map->{asset});
+            $self->rendered(200);
+        },
+        sub {
+            my $err = shift;
+            if (blessed $err){
+                if ($err->isa('CallBackery::Exception')){
+                    return $self->render(text=>encode_json({exception=>{message=>$err->message,code=>$err->code}}));
+                }
+                elsif ($err->isa('Mojo::Exception')){
+                    return $self->render(text=>encode_json({exception=>{message=>$err->message,code=>9999}}));
+                }
+            }
+            return $self->render(text=>encode_json({exception=>{message=>$err,code=>9999}}));
+        });
+        $self->render_later;
+        return $map;
     }
     #warn Dumper $return;
     $self->res->headers->content_type($map->{type}.';name=' .$map->{filename});

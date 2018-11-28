@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.664
+version 3.670
 
 =head1 OVERVIEW
 
@@ -45,8 +45,6 @@ instruments and the high-level Lab::XPRESS interface
 =item * L<Lab::Measurement::Backends>
 
 =item * L<Lab::Measurement::Developer>
-
-=item * L<Lab::Measurement::Developer::Testing>
 
 =item * L<Lab::Measurement::Examples::Example1_Simple_IV>
 
@@ -146,9 +144,17 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 =item * L<Lab::Moose::Instrument::Yokogawa7651>
 
+=item * L<Lab::Moose::Instrument::DummySource>
+
+=back
+
+=head3 Source/Measure Units
+
+=over
+
 =item * L<Lab::Moose::Instrument::Keithley2400>
 
-=item * L<Lab::Moose::Instrument::DummySource>
+=item * L<Lab::Moose::Instrument::KeysightB2901A>
 
 =back
 
@@ -216,6 +222,8 @@ contains support for temperature sensor and He/N2 level meters.
 
 =item * L<Lab::Moose::Instrument::OI_Triton>
 
+=item * L<Lab::Moose::Instrument::Lakeshore340>
+
 =back
 
 =head2 Moose::Instrument Roles
@@ -257,6 +265,8 @@ contains support for temperature sensor and He/N2 level meters.
 =item * L<Lab::Moose::Instrument::SCPI::Sense::Frequency>
 
 =item * L<Lab::Moose::Instrument::SCPI::Sense::Function>
+
+=item * L<Lab::Moose::Instrument::SCPI::Sense::Function::Concurrent>
 
 =item * L<Lab::Moose::Instrument::SCPI::Sense::Impedance>
 
@@ -357,6 +367,8 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =over
 
 =item * L<Lab::Measurement::Legacy::Tutorial>
+
+=item * L<Lab::Measurement::Legacy::Developer::Testing>
 
 =back
 

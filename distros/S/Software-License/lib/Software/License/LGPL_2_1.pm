@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::LGPL_2_1;
-$Software::License::LGPL_2_1::VERSION = '0.103013';
+$Software::License::LGPL_2_1::VERSION = '0.103014';
 use parent 'Software::License';
 # ABSTRACT: GNU Lesser General Public License, Version 2.1
 
@@ -9,6 +9,7 @@ sub name { 'The GNU Lesser General Public License, Version 2.1, February 1999' }
 sub url  { 'http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt' }
 sub meta_name  { 'lgpl' }
 sub meta2_name { 'lgpl_2_1' }
+sub spdx_expression  { 'LGPL-2.1' }
 
 1;
 
@@ -22,7 +23,7 @@ Software::License::LGPL_2_1 - GNU Lesser General Public License, Version 2.1
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 AUTHOR
 
@@ -30,7 +31,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2018 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

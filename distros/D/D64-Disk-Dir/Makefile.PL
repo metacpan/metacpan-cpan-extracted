@@ -4,7 +4,8 @@ WriteMakefile(
     VERSION_FROM      => 'Dir.pm',
     PREREQ_PM         => { 'Array::Iterator'  => 0,
                            'Capture::Tiny'    => 0,
-                           'D64::Disk::Image' => 0,
+                           'D64::Disk::Image' => 0.03,
+                           'File::Temp'       => 0,
                            'IO::Scalar'       => 0,
                          },
     ($] >= 5.005 ?
